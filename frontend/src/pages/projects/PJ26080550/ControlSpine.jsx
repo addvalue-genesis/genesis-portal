@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./ControlSpine.css";
 
 const TRACE_ROWS = [
@@ -112,6 +112,28 @@ const STATES = [
 export function ControlSpine(){
   const [mode,setMode]=useState("trace");
   const [q,setQ]=useState("");
+  const [liveData,setLiveData]=useState(null);
+  const [apiMode,setApiMode]=useState("PREVIEW");
+
+  useEffect(()=>{
+    let active=true;
+    fetch("/backend/api/etm/control-spine.php?project=PJ2608-0550")
+      .then((response)=>{
+        if(!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then((payload)=>{
+        if(!payload.ok) throw new Error(payload.message||payload.error||"ETM API error");
+        if(active){
+          setLiveData(payload);
+          setApiMode("LIVE DB");
+        }
+      })
+      .catch(()=>{
+        if(active) setApiMode("PREVIEW");
+      });
+    return ()=>{active=false;};
+  },[]);
 
   const rows=useMemo(()=>{
     const s=q.trim().toLowerCase();
@@ -131,6 +153,10 @@ export function ControlSpine(){
           </p>
         </div>
         <div className="cs-hard-rules">
+          <div className="cs-mode-line">
+            <strong>CONTROL DATA</strong>
+            <span className={apiMode==="LIVE DB"?"live":"preview"}>{apiMode}</span>
+          </div>
           <strong>HARD CONTROLS</strong>
           <span>NOT FOUND ≠ ZERO SCOPE</span>
           <span>TBC ≠ ZERO COST</span>
@@ -147,6 +173,18 @@ export function ControlSpine(){
         ))}
       </div>
 
+      {liveData?.summary && (
+        <div className="cs-live-grid">
+          {Object.entries(liveData.summary).map(([key,value])=>(
+            <div key={key}>
+              <small>{key}</small>
+              <strong>{value.total}</strong>
+              <span>{value.open_count} open / TBC</span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <nav className="cs-tabs">
         <button className={mode==="trace"?"active":""} onClick={()=>setMode("trace")}>0550 Trace / Closure</button>
         <button className={mode==="schema"?"active":""} onClick={()=>setMode("schema")}>DB Control Fields</button>
@@ -160,6 +198,25 @@ export function ControlSpine(){
             <div><small>CURRENT CONTROL OBJECTS</small><h2>อะไรปิดแล้ว / อะไรยังขาดก่อนราคา freeze</h2></div>
             <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search object / source / owner / next action…" />
           </div>
+          {liveData?.traceEdges?.length>0 && (
+            <div className="cs-live-trace">
+              <strong>LIVE DB TRACE EDGES</strong>
+              <div className="cs-table-wrap">
+                <table className="cs-table">
+                  <thead><tr><th>Edge</th><th>From</th><th>Relationship</th><th>To</th><th>State</th></tr></thead>
+                  <tbody>{liveData.traceEdges.map(edge=>(
+                    <tr key={edge.edge_code}>
+                      <td><code>{edge.edge_code}</code></td>
+                      <td>{edge.source_object_type} #{edge.source_object_id}</td>
+                      <td>{edge.relationship_type}</td>
+                      <td>{edge.target_object_type} #{edge.target_object_id}</td>
+                      <td><State text={edge.binding_state}/></td>
+                    </tr>
+                  ))}</tbody>
+                </table>
+              </div>
+            </div>
+          )}
           <div className="cs-card-grid">
             {rows.map(r=>(
               <article className="cs-card" key={r.id}>
