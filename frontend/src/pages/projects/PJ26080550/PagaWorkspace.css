@@ -184,3 +184,50 @@ body{margin:0;background:#f4f7fb;color:var(--ink)}
   .etm-user-input-row button{grid-column:2}
   .etm-impact-equations{align-items:flex-start}
 }
+
+
+/* PAGA Catering system picture — source facts + explicit dummy scenario */
+.paga-picture-hero{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;border-left:4px solid #6d4aff}
+.paga-picture-hero p strong:first-child{color:#1d72d8}.paga-picture-hero p strong:nth-child(2){color:#137a5a}.paga-picture-hero p strong:nth-child(3){color:#b66a00}
+.paga-picture-badges{display:flex;gap:6px;flex-wrap:wrap}
+.paga-picture-badges span,.paga-state{font-size:8px;font-weight:900;letter-spacing:.06em;border-radius:999px;padding:5px 8px;white-space:nowrap}
+.paga-picture-badges .fact,.paga-state.fact{background:#eaf2ff;border:1px solid #b7cef8;color:#2457d6}
+.paga-picture-badges .vendor{background:#e9f8f0;border:1px solid #b9e5cb;color:#137a5a}
+.paga-picture-badges .dummy,.paga-state.dummy{background:#fff3d6;border:1px solid #f3d38b;color:#8a5a00}
+
+.paga-system-map{display:grid;grid-template-columns:1fr auto 1fr auto 1.05fr auto 1.45fr;gap:8px;align-items:center;margin-top:18px;padding:14px;border-radius:14px;background:#f6f8fb;border:1px solid #e2e8f0;overflow-x:auto}
+.paga-map-column{display:grid;gap:7px;min-width:180px}
+.paga-map-column.speakers{grid-template-columns:repeat(2,minmax(155px,1fr));min-width:340px}
+.paga-map-arrow{font-size:10px;font-weight:900;color:#8794a7;white-space:nowrap;text-align:center}
+.paga-map-node{padding:11px;border-radius:11px;background:#fff;border:1px solid #dfe5ec;min-height:82px;display:flex;flex-direction:column;gap:3px}
+.paga-map-node.fact{border-left:4px solid #1d72d8}.paga-map-node.vendor{border-left:4px solid #137a5a;background:#f7fcf9}
+.paga-map-node small{font-size:8px;font-weight:900;letter-spacing:.08em;color:#8290a3}.paga-map-node strong{font-size:11px}.paga-map-node span{font-size:9px;line-height:1.35;color:#667487}
+.paga-speaker{padding:9px;border-radius:10px;background:#fff;border:1px solid #dfe5ec;display:grid;grid-template-columns:24px 1fr;gap:2px 7px;align-items:center}
+.paga-speaker b{grid-row:1/3;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#eaf2ff;color:#2457d6;font-size:8px}
+.paga-speaker span{font-size:9px;font-weight:850}.paga-speaker small{font-size:8px;color:#7b8798}
+
+.paga-dummy-strip{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-top:12px}
+.paga-dummy-strip>div{padding:9px;border:1px solid #eed79f;background:#fff9ea;border-radius:9px;display:flex;flex-direction:column;gap:2px}
+.paga-dummy-strip small{font-size:8px;color:#8a7447}.paga-dummy-strip strong{font-size:10px}.paga-dummy-strip span{font-size:7px;font-weight:900;color:#a16500;letter-spacing:.05em}
+
+.paga-calc-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.paga-calc-grid article{border:1px solid #e3e8ef;border-radius:11px;padding:11px;background:#fbfcfe;display:flex;flex-direction:column;gap:4px;min-height:112px}
+.paga-calc-grid small{font-size:8px;color:#7d899a;text-transform:uppercase;letter-spacing:.06em}.paga-calc-grid strong{font-size:20px;line-height:1.15}.paga-calc-grid code{font-size:8px;padding:5px 6px;border-radius:6px;background:#edf2f7;color:#42536a;white-space:normal}.paga-calc-grid span{margin-top:auto;font-size:8px;color:#8a5a00;font-weight:800}
+
+.paga-register-table{min-width:1060px}
+.paga-vendor-list{display:grid;gap:8px;margin-top:12px}
+.paga-vendor-list>div{display:grid;gap:4px;padding:10px;border-radius:10px;border:1px solid #e5eaf0;background:#fbfcfe}
+.paga-vendor-list strong{font-size:10px}.paga-vendor-list span{font-size:9px;line-height:1.4;color:#5d6b7e}.paga-vendor-list span b{color:#26384f}
+
+.paga-recalc-flow{display:flex;gap:5px;align-items:center;overflow-x:auto;margin-top:13px;padding:12px;background:#f5f8fc;border-radius:10px}
+.paga-recalc-flow span{min-width:135px;padding:8px 10px;border:1px solid #dce5ef;background:#fff;border-radius:8px;font-size:9px;font-weight:800;text-align:center}
+.paga-recalc-flow b{color:#99a6b6}
+
+@media(max-width:1180px){
+  .paga-calc-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .paga-dummy-strip{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:820px){
+  .paga-picture-hero{flex-direction:column}
+  .paga-calc-grid,.paga-dummy-strip{grid-template-columns:1fr}
+}
