@@ -4,6 +4,7 @@ import { Home } from "./pages/Home";
 import { Employees } from "./pages/Employees";
 import { PagaWorkspace } from "./pages/projects/PJ26080550/PagaWorkspace";
 import { BidWorkspace } from "./pages/projects/PJ26080550/BidWorkspace";
+import { AccessControl } from "./pages/projects/PJ26080550/AccessControl";
 
 const STRINGS = {
   th: {
@@ -62,6 +63,7 @@ export function App() {
             <Route path="/" element={<Home lang={lang} />} />
             <Route path="/employees" element={<Employees lang={lang} />} />
             <Route path="/projects/pj2608-0550/bid" element={<BidWorkspace lang={lang} />} />
+            <Route path="/projects/pj2608-0550/access" element={<AccessControl lang={lang} />} />
             <Route path="/projects/pj2608-0550/paga" element={<PagaWorkspace lang={lang} />} />
           </Routes>
         </main>
