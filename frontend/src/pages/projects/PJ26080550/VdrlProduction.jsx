@@ -32,6 +32,13 @@ const ROWS = [
 
 const STATUS=["All","Not started","In progress","Partial","Ready","Blocked","Hold"];
 
+const WORKLOAD_MODEL = [
+  ["Q_issue","Number of controlled issues / occurrences","Bid issue, execution issue, recurring register/report occurrence, final issue — source-driven."],
+  ["Q_content","Actual engineering content quantity","Locations, equipment types, interfaces, sheets, test events, calculations or other content driver."],
+  ["MH_prepare","Q_issue × (MH_setup/issue + Q_content × UMH_content)","Preparation workload; inputs remain TBC until a controlled 0550 estimating basis exists."],
+  ["MH_lifecycle","Check + document control + internal approval + external review + revision + final issue","Added once by lifecycle state; B1 technical authoring must not be duplicated inside B2 document control."]
+];
+
 export function VdrlProduction(){
   const [status,setStatus]=useState("All");
   const [dossier,setDossier]=useState("All");
@@ -79,6 +86,27 @@ export function VdrlProduction(){
         <span>Source Rev = revision of the requirement/source document. Deliverable Rev = revision of our document being issued. Hist Rev = immutable issue history; never overwrite prior revisions.</span>
       </div>
 
+      <section className="vdrl-generator-map">
+        {WORKLOAD_MODEL.map(([key,meaning,control],idx)=>(
+          <React.Fragment key={key}>
+            <div>
+              <b>{key}</b>
+              <span>{meaning}</span>
+              <small>{control}</small>
+            </div>
+            {idx<WORKLOAD_MODEL.length-1&&<em>→</em>}
+          </React.Fragment>
+        ))}
+      </section>
+
+      <div className="vdrl-warning">
+        <strong>VDRL workload control:</strong>
+        <span>
+          One VDRL row is not automatically one engineering work unit. Q_issue and Q_content are independent drivers.
+          Unknown recurrence, content quantity, review cycle or UMH remains TBC and therefore cannot be treated as zero cost.
+        </span>
+      </div>
+
       <div className="vdrl-warning">
         <strong>Source-control rule:</strong>
         <span>
@@ -111,7 +139,10 @@ export function VdrlProduction(){
                 <td>{r[8]}<small>WORKING MODEL</small></td>
                 <td><Status status={r[9]}/></td>
                 <td>{r[10]}</td>
-                <td><code>Q × UMH</code><small>UMH = TBC</small></td>
+                <td>
+                  <code>Q_issue × (setup + Q_content × UMH)</code>
+                  <small>+ check / DC / review / revise / final · inputs TBC</small>
+                </td>
                 <td><input placeholder="Assignee / evidence / gap / due…" /></td>
               </tr>
             ))}
