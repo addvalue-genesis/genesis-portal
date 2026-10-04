@@ -1,0 +1,272 @@
+{
+  "project_code": "PJ2608-0550",
+  "system_code": "PAGA",
+  "location_code": "APF-CATERING",
+  "revision": "Rev00",
+  "status": "INTERNAL_WORKING_PREVIEW",
+  "purpose": "Controlled vertical slice for Requirement -> Evidence -> Proof -> Required MTO -> Vendor Gap -> Lifecycle -> Cost. Dummy values are preview inputs only and must never be promoted to FACT without source closure.",
+  "hard_controls": [
+    "NOT_FOUND != ZERO_SCOPE",
+    "TBC != ZERO_COST",
+    "VENDOR_BOM != PROJECT_REQUIREMENT",
+    "DUMMY_PREVIEW != PROJECT_FACT"
+  ],
+  "source_register": [
+    {
+      "source_code": "MR-0001-A1",
+      "title": "MM-ASK-1A-APF-TEL-MR-0001 Rev.A1",
+      "authority": "PROJECT_SOURCE",
+      "drive_url": "https://drive.google.com/file/d/1q1XR9TZneFmmWTcxwLHIgfU9t_1jfVeE/view",
+      "extracted_facts": [
+        "Appendix 1.4 is PAGA Scope of Supply.",
+        "PAGA cabinets, OCU/OAP, indoor/outdoor speakers and flashing beacons are scope objects.",
+        "Catering Building is listed among PAGA cabinet locations.",
+        "Vendor scope includes design/engineering, documentation, FAT/SAT, spares and other requirements referenced by project documents."
+      ]
+    },
+    {
+      "source_code": "SPE-0004-B1",
+      "title": "MM-ASK-1A-APF-TEL-SPE-0004 Rev.B1",
+      "authority": "PROJECT_SOURCE",
+      "drive_url": "https://drive.google.com/file/d/13_qHdw7ivCxGGwbHu5bPXQS0w1tTO1Eb/view",
+      "extracted_facts": [
+        "Catering Building is Zone 1 accommodation area.",
+        "Speech: at least 10 dB and not more than 20 dB above ambient when ambient <85 dBA; minimum 65 dBA.",
+        "Alarm tones: at least 6 dB above background noise.",
+        "When ambient >=85 dBA, flashing beacons shall supplement audible alarms.",
+        "Amplifier channel output 200-400 W; total loading <=80% nominal.",
+        "Remote amplifier units at each building shall be N+1.",
+        "APF has 230 VAC UPS; Vendor is responsible for complete package power engineering.",
+        "PAGA interfaces with Fire & Gas, IP Telephony/PABX and Entertainment.",
+        "FAT, IFAT and SAT are required."
+      ]
+    },
+    {
+      "source_code": "PHI-0004-B1",
+      "title": "MM-ASK-1A-APF-TEL-PHI-0004 Rev.B1",
+      "authority": "PROJECT_SOURCE",
+      "drive_url": "https://drive.google.com/file/d/1vUC87UWButLARiOKzy_22zZ-k3nLki_4/view",
+      "extracted_facts": [
+        "Reference list identifies MM-ASK-1A-APF-TEL-BLD-0003 as PAGA System Block and Wiring Diagram for APF.",
+        "APF utility basis includes 230 VAC UPS."
+      ]
+    },
+    {
+      "source_code": "IND-A20261632",
+      "title": "INDUSTRONIC Offer A20261632",
+      "authority": "VENDOR_OFFERED_SOURCE",
+      "drive_url": "https://drive.google.com/file/d/1kLVdiDP4FZwEJjAIE9sGW0h2qowx1bik/view",
+      "extracted_facts": [
+        "Offer project is PTTEP Aung Sinkha PAGA System.",
+        "Group 4000 remote amplifier nodes covers Catering, Store, Office and Security buildings.",
+        "Each listed remote node includes managed FE switch, 1 x NPA 300 W active and 1 x NPA 300 W N+1.",
+        "NPA 300 W supports 4 lines or 2 loops.",
+        "Project-wide LD 8 UE/IP54 EN54 ceiling speaker offered: 8 W, 100 V transformer taps.",
+        "Project-wide beacon and optional XBC beacon-monitoring/control equipment are offered.",
+        "Commercial basis: FCA Wertheim/Germany; validity 31-Dec-2026; approx. six-month delivery after PO/details."
+      ]
+    },
+    {
+      "source_code": "IND-DAT-302-144-100-V02",
+      "title": "INDUSTRONIC NPA IP-Based Public Address Unit",
+      "authority": "VENDOR_DATASHEET",
+      "drive_url": "https://drive.google.com/file/d/1xn_b0D8kqS5g2TzW9iw-9HrfbNZIHRpE/view",
+      "extracted_facts": [
+        "Type 300 NPA output max. 300 W at 100 VRMS.",
+        "NPA supports speaker circuit monitoring and N+1 redundancy.",
+        "300 NPA provides 4 speaker circuits in listed configurations."
+      ]
+    },
+    {
+      "source_code": "PAGA-BULK-PILOT-REV00",
+      "title": "PJ2608-0550_PAGA_Bulk-Pilot_Rev00",
+      "authority": "INTERNAL_DERIVED_WORKING",
+      "drive_url": "https://drive.google.com/file/d/1SazV6070ohHyEfqp6tNQNYHCBTV3r1JL/view",
+      "extracted_facts": [
+        "Historical Catering baseline uses PAGA-303-201 and LSN-303-201 through LSN-303-208.",
+        "Working extract from legacy cable schedule gives 20 m cabinet-to-first, seven 20 m inter-speaker segments and 50 m return-to-cabinet, approx. 210 m closed-loop route.",
+        "This is historical/working evidence and not current final route authority."
+      ]
+    }
+  ],
+  "source_conflicts": [
+    {
+      "conflict_code": "SRC-CONFLICT-PAGA-BLD-001",
+      "topic": "APF PAGA block/wiring drawing number",
+      "source_a": "MR-0001 Appendix 2 -> MM-ASK-1A-APF-TEL-BLD-0004 for PAGA",
+      "source_b": "PHI-0004 reference list -> MM-ASK-1A-APF-TEL-BLD-0003 for PAGA",
+      "state": "OPEN_SOURCE_CONFLICT",
+      "rule": "Do not silently select either drawing number."
+    }
+  ],
+  "preview_dummy_inputs": {
+    "ambient_noise_dba": {
+      "value": 75,
+      "state": "DUMMY_TBC",
+      "reason": "Current Catering operating ambient-noise survey not found."
+    },
+    "geometry": {
+      "value": "24 m x 12 m x 3.2 m",
+      "state": "DUMMY_TBC",
+      "reason": "Current controlled architectural geometry not yet bound."
+    },
+    "speaker_layout": {
+      "value": "2 x 4 using historical eight tags",
+      "state": "DUMMY_TBC",
+      "reason": "Used only to make coverage workflow visible."
+    },
+    "speaker_tap_w": {
+      "value": 8,
+      "state": "DUMMY_TBC",
+      "reason": "Maximum candidate tap available on offered LD 8 speaker; actual tap is coverage-driven."
+    },
+    "cable": {
+      "value": "2C x 2.5 mm2 Cu",
+      "state": "DUMMY_TBC",
+      "reason": "Current cable type/size is not controlled."
+    },
+    "loop_length_m": {
+      "value": 210,
+      "state": "HISTORICAL_WORKING",
+      "reason": "Legacy schedule extraction; final route must be revalidated."
+    },
+    "ups_autonomy_h": {
+      "value": 1,
+      "state": "DUMMY_TBC",
+      "reason": "60-minute autonomy requirement has not been confirmed in current project sources."
+    },
+    "dummy_node_load_w": {
+      "value": 1000,
+      "state": "DUMMY_TBC",
+      "reason": "Only to demonstrate the UPS calculation chain; not a design load."
+    }
+  },
+  "preview_calculation_results": {
+    "speech_target_dba": {
+      "expression": "max(65, ambient+10)",
+      "value": 85,
+      "state": "DUMMY_DERIVED"
+    },
+    "alarm_target_dba": {
+      "expression": "ambient+6",
+      "value": 81,
+      "state": "DUMMY_DERIVED"
+    },
+    "beacon_trigger": {
+      "expression": "ambient>=85",
+      "value": false,
+      "state": "DUMMY_DERIVED"
+    },
+    "speaker_load_w": {
+      "expression": "8 speakers x 8 W",
+      "value": 64,
+      "state": "MIXED_HISTORICAL_DUMMY_DERIVED"
+    },
+    "amp_allowable_w": {
+      "expression": "300 W x 80%",
+      "value": 240,
+      "state": "PROJECT_VENDOR_DERIVED"
+    },
+    "amp_utilization_pct": {
+      "expression": "64/300 x 100",
+      "value": 21.3333333333,
+      "state": "DUMMY_DERIVED"
+    },
+    "ups_energy_kwh": {
+      "expression": "1000 W x 1 h / 1000",
+      "value": 1,
+      "state": "DUMMY_DERIVED"
+    }
+  },
+  "requirement_register": [
+    {
+      "id": "REQ-PAGA-CAT-001",
+      "topic": "Audible speech",
+      "state": "FACT",
+      "proof": "PAGA-SDY-COVER-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-002",
+      "topic": "Alarm audibility",
+      "state": "FACT",
+      "proof": "PAGA-SDY-COVER-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-003",
+      "topic": "Visual alarm trigger",
+      "state": "FACT",
+      "proof": "PAGA-SDY-COVER-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-004",
+      "topic": "Speaker/beacon deployment calculation",
+      "state": "FACT",
+      "proof": "RPT-0005"
+    },
+    {
+      "id": "REQ-PAGA-CAT-005",
+      "topic": "Amplifier loading",
+      "state": "FACT",
+      "proof": "PAGA-CAL-AMP-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-006",
+      "topic": "Remote amplifier N+1",
+      "state": "FACT",
+      "proof": "PAGA-CAL-AMP-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-007",
+      "topic": "Power engineering",
+      "state": "FACT",
+      "proof": "PAGA-CAL-UPS-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-008",
+      "topic": "PAGA external interfaces",
+      "state": "FACT",
+      "proof": "PAGA-SDY-IF-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-009",
+      "topic": "FAT/IFAT/SAT",
+      "state": "FACT",
+      "proof": "PAGA-TEST-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-010",
+      "topic": "Current ambient noise",
+      "state": "TBC_DUMMY",
+      "proof": "PAGA-SDY-COVER-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-011",
+      "topic": "Current geometry",
+      "state": "TBC_DUMMY",
+      "proof": "PAGA-SDY-COVER-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-012",
+      "topic": "Current cable/loss criterion",
+      "state": "TBC_DUMMY",
+      "proof": "PAGA-CAL-LOSS-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-013",
+      "topic": "UPS autonomy duration",
+      "state": "TBC_DUMMY",
+      "proof": "PAGA-CAL-UPS-001"
+    },
+    {
+      "id": "REQ-PAGA-CAT-014",
+      "topic": "PAGA block drawing reference",
+      "state": "SOURCE_CONFLICT",
+      "proof": "SOURCE-RECON-001"
+    }
+  ],
+  "release_rules": {
+    "required_mto": "BLOCKED until coverage, loop/cable and relevant power/interface proofs close.",
+    "vendor_reconciliation": "Allowed as PRELIMINARY against required objects, never as replacement for Required MTO.",
+    "pricing": "Dummy-derived quantities/costs are not eligible for AUTHORISED_OFFER."
+  }
+}
