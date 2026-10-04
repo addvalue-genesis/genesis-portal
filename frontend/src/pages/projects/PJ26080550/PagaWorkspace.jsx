@@ -14,10 +14,52 @@ const TABS = [
   "Cost / Risk",
 ];
 
+const PREVIEW_DATA = {
+  project: {
+    code: "PJ2608-0550",
+    name: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
+  },
+  system: {
+    code: "PAGA",
+    name: "Public Address and General Alarm",
+  },
+  locations: [
+    { id: 1, location_code: "APF-CATERING", location_name: "Catering Building", cal_count: 4, sdy_count: 1, open_proofs: 3 },
+    { id: 2, location_code: "APF-ACCOMMODATION", location_name: "Accommodation Building", cal_count: 0, sdy_count: 0, open_proofs: 0 },
+    { id: 3, location_code: "APF-FIRE-SAFETY", location_name: "Fire/Safety Building", cal_count: 0, sdy_count: 0, open_proofs: 0 },
+    { id: 4, location_code: "APF-CONTROL", location_name: "Control Building", cal_count: 0, sdy_count: 0, open_proofs: 0 },
+  ],
+  proofs: [
+    { proof_code: "PAGA-SDY-COVER-001", proof_type: "SDY", proof_name: "PAGA Sound Coverage / SNR Study", location_name: "Catering Building", input_status: "INCOMPLETE", result_status: "OPEN", release_gate_status: "NOT_RELEASED" },
+    { proof_code: "PAGA-CAL-LOAD-001", proof_type: "CAL", proof_name: "Speaker Tap & Loop Load Calculation", location_name: "Catering Building", input_status: "PARTIAL", result_status: "PRELIMINARY", release_gate_status: "NOT_RELEASED" },
+    { proof_code: "PAGA-CAL-AMP-001", proof_type: "CAL", proof_name: "Amplifier Sizing / Loading Calculation", location_name: "Catering Building", input_status: "PARTIAL", result_status: "PRELIMINARY", release_gate_status: "NOT_RELEASED" },
+    { proof_code: "PAGA-CAL-LOSS-001", proof_type: "CAL", proof_name: "Speaker Loop Cable Loss Calculation", location_name: "Catering Building", input_status: "BLOCKED", result_status: "OPEN", release_gate_status: "NOT_RELEASED" },
+    { proof_code: "PAGA-CAL-UPS-001", proof_type: "CAL", proof_name: "PAGA UPS / Autonomy Calculation", location_name: "Catering Building", input_status: "INCOMPLETE", result_status: "OPEN", release_gate_status: "NOT_RELEASED" },
+  ],
+  lifecycleStages: [
+    { stage_code: "ENGINEERING", stage_name: "Engineering", sequence_no: 10, cost_category: "ENGINEERING" },
+    { stage_code: "PROCUREMENT", stage_name: "Procurement", sequence_no: 20, cost_category: "EQUIPMENT" },
+    { stage_code: "FAB_INTEGRATION", stage_name: "Fabrication / Integration", sequence_no: 30, cost_category: "FABRICATION" },
+    { stage_code: "FAT", stage_name: "Factory Acceptance Test", sequence_no: 40, cost_category: "FAT_IFAT" },
+    { stage_code: "IFAT", stage_name: "Integrated Factory Acceptance Test", sequence_no: 50, cost_category: "FAT_IFAT" },
+    { stage_code: "PACK_LOGISTICS", stage_name: "Packing / Logistics", sequence_no: 60, cost_category: "LOGISTICS" },
+    { stage_code: "INSTALLATION", stage_name: "Site Installation", sequence_no: 70, cost_category: "INSTALLATION" },
+    { stage_code: "PRECOM", stage_name: "Pre-Commissioning", sequence_no: 80, cost_category: "PRECOM" },
+    { stage_code: "STARTUP", stage_name: "Start-up", sequence_no: 90, cost_category: "STARTUP" },
+    { stage_code: "COMMISSIONING", stage_name: "Commissioning", sequence_no: 100, cost_category: "COMMISSIONING" },
+    { stage_code: "TRAINING", stage_name: "Training", sequence_no: 110, cost_category: "TRAINING" },
+    { stage_code: "SAT", stage_name: "Site Acceptance Test", sequence_no: 120, cost_category: "SAT_ISAT" },
+    { stage_code: "ISAT", stage_name: "Integrated Site Acceptance Test", sequence_no: 130, cost_category: "SAT_ISAT" },
+    { stage_code: "PUNCH_CLOSEOUT", stage_name: "Punch / Closeout", sequence_no: 140, cost_category: "CLOSEOUT" },
+    { stage_code: "WARRANTY_SUPPORT", stage_name: "Warranty / Support", sequence_no: 150, cost_category: "WARRANTY_SUPPORT" },
+  ],
+};
+
 export function PagaWorkspace() {
-  const [data, setData] = useState(null);
+  const [data, setData] = useState(PREVIEW_DATA);
   const [tab, setTab] = useState("Overview");
-  const [error, setError] = useState(null);
+  const [apiError, setApiError] = useState(null);
+  const [mode, setMode] = useState("PREVIEW");
 
   useEffect(() => {
     fetch("/backend/api/etm/paga-workspace.php?project=PJ2608-0550")
@@ -28,8 +70,12 @@ export function PagaWorkspace() {
       .then((payload) => {
         if (!payload.ok) throw new Error(payload.message || payload.error || "ETM API error");
         setData(payload);
+        setMode("LIVE DB");
       })
-      .catch(setError);
+      .catch((err) => {
+        setApiError(err);
+        setMode("PREVIEW");
+      });
   }, []);
 
   const summary = useMemo(() => {
@@ -42,21 +88,6 @@ export function PagaWorkspace() {
     };
   }, [data]);
 
-  if (error) {
-    return (
-      <div className="etm-page">
-        <h1>PJ2608-0550 · PAGA</h1>
-        <div className="etm-alert">
-          Rev0 UI is ready; MariaDB/API is not configured yet.
-          <br />
-          <small>{String(error)}</small>
-        </div>
-      </div>
-    );
-  }
-
-  if (!data) return <div className="etm-page">Loading ETM Rev0...</div>;
-
   return (
     <div className="etm-page">
       <div className="etm-title-row">
@@ -65,8 +96,16 @@ export function PagaWorkspace() {
           <h1>{data.project.code} · PAGA</h1>
           <p>{data.project.name}</p>
         </div>
-        <div className="etm-status">DB-backed</div>
+        <div className="etm-status">{mode}</div>
       </div>
+
+      {apiError && (
+        <div className="etm-alert" style={{ marginBottom: "1rem" }}>
+          Preview mode: React UI is running, but MariaDB/API is not connected yet.
+          <br />
+          <small>{String(apiError)}</small>
+        </div>
+      )}
 
       <div className="etm-grid">
         <Metric label="Proof Objects" value={summary.total} />
