@@ -107,6 +107,7 @@ const CATERING = {
     { title: "Current geometry", detail: "Latest architectural geometry / listener distance required", impact: "Blocks final coverage result" },
     { title: "APF cable schedule", detail: "Current cable type / length not yet confirmed", impact: "Blocks loop-loss and bulk cable" },
     { title: "Loop topology", detail: "Two-loop arrangement is a working hypothesis only", impact: "Blocks final loop assignment" },
+    { title: "Drawing reference conflict", detail: "MR-0001 references APF PAGA BLD-0004 while PHI-0004 references BLD-0003", impact: "Must reconcile governing drawing before final topology release" },
   ],
 };
 
@@ -518,7 +519,7 @@ export function PagaWorkspace() {
         <SummaryCard label="Engineering proofs" value={String(proofSummary.total)} detail="CAL + SDY objects" tone="violet" />
         <SummaryCard label="Prelim loop load" value="64 W" detail="8 × 8 W upper-bound" tone="green" />
         <SummaryCard label="Amp allowable" value="240 W" detail="300 W × 80%" tone="green" />
-        <SummaryCard label="Open blockers" value="4" detail="Noise · Geometry · Cable · Loop" tone="amber" />
+        <SummaryCard label="Open blockers" value="5" detail="Noise · Geometry · Cable · Loop · Drawing conflict" tone="amber" />
         <SummaryCard label="Evidence state" value="A / B / C / D" detail="Source · Derived · TBC · Model" tone="slate" />
       </section>
 
