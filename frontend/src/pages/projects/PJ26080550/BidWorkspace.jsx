@@ -180,6 +180,7 @@ export function BidWorkspace() {
         ].map(([key, label]) => (
           <button key={key} className={active === key ? "active" : ""} onClick={() => setActive(key)}>{label}</button>
         ))}
+        <Link to="/projects/pj2608-0550/access" className="bid-drill">Team Access</Link>
         <Link to="/projects/pj2608-0550/paga" className="bid-drill">Open PAGA Engineering →</Link>
       </nav>
 
