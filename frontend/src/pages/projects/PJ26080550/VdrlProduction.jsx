@@ -46,13 +46,13 @@ export function VdrlProduction(){
 
   const dossiers=useMemo(()=>["All",...Array.from(new Set(ROWS.map(r=>r[1])))],[]);
   const data=useMemo(()=>ROWS.filter(r=>
-    (status==="All"||r[6]===status) &&
+    (status==="All"||r[9]===status) &&
     (dossier==="All"||r[1]===dossier) &&
     (!q||r.join(" ").toLowerCase().includes(q.toLowerCase()))
   ),[status,dossier,q]);
 
-  const ready=ROWS.filter(r=>r[6]==="Ready").length;
-  const inprog=ROWS.filter(r=>r[6]==="In progress"||r[6]==="Partial").length;
+  const ready=ROWS.filter(r=>r[9]==="Ready").length;
+  const inprog=ROWS.filter(r=>r[9]==="In progress"||r[9]==="Partial").length;
 
   return (
     <div className="vdrl-shell">
