@@ -4,6 +4,7 @@ import "./BidWorkspace.css";
 import { BidFormTracker } from "./BidFormTracker";
 import { VdrlProduction } from "./VdrlProduction";
 import { EquationKernel } from "./EquationKernel";
+import { PricingStrategy } from "./PricingStrategy";
 
 const SOURCE_GROUPS = [
   {
@@ -172,6 +173,7 @@ export function BidWorkspace() {
       <nav className="bid-tabs">
         {[
           ["overview", "Bid Overview"],
+          ["strategy", "Pricing / Win Strategy"],
           ["model", "Method / Equation Engine"],
           ["form", "Bid Form Tracker"],
           ["scope", "Scope / Compliance"],
@@ -187,6 +189,7 @@ export function BidWorkspace() {
       </nav>
 
       {active === "overview" && <Overview />}
+      {active === "strategy" && <PricingStrategy />}
       {active === "model" && <EquationKernel />}
       {active === "form" && <BidFormTracker />}
       {active === "scope" && <ScopeView />}
