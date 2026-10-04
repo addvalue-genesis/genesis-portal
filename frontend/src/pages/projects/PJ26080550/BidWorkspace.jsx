@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import "./BidWorkspace.css";
 import { BidFormTracker } from "./BidFormTracker";
 import { VdrlProduction } from "./VdrlProduction";
+import { EquationKernel } from "./EquationKernel";
 
 const SOURCE_GROUPS = [
   {
@@ -171,6 +172,7 @@ export function BidWorkspace() {
       <nav className="bid-tabs">
         {[
           ["overview", "Bid Overview"],
+          ["model", "Method / Equation Engine"],
           ["form", "Bid Form Tracker"],
           ["scope", "Scope / Compliance"],
           ["price", "Price Schedules"],
@@ -185,6 +187,7 @@ export function BidWorkspace() {
       </nav>
 
       {active === "overview" && <Overview />}
+      {active === "model" && <EquationKernel />}
       {active === "form" && <BidFormTracker />}
       {active === "scope" && <ScopeView />}
       {active === "price" && <PriceView />}
