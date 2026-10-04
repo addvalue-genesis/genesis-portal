@@ -59,6 +59,7 @@ const PAGA_REQUIREMENT_REGISTER = [
   ["REQ-PAGA-CAT-011","Current geometry","Current room geometry and listener coordinates","Current drawing geometry not yet controlled","PAGA-SDY-COVER-001","TBC → DUMMY 24×12×3.2 m"],
   ["REQ-PAGA-CAT-012","Loop cable design","Current cable size/route + acceptance loss criterion","Current controlled cable basis not located","PAGA-CAL-LOSS-001","TBC → DUMMY 2C×2.5 mm² / legacy 210 m"],
   ["REQ-PAGA-CAT-013","UPS autonomy","Required autonomy duration / duty case","60-min requirement not confirmed in current source set","PAGA-CAL-UPS-001","TBC → DUMMY 1 h"],
+  ["REQ-PAGA-CAT-014","PAGA block drawing reference","MR Appendix 2 says APF PAGA = BLD-0004; PHI-0004 reference list says APF PAGA = BLD-0003","MR-0001 vs PHI-0004","SOURCE-RECON-001","SOURCE_CONFLICT"],
 ];
 
 const PAGA_VENDOR_MAPPING = [
