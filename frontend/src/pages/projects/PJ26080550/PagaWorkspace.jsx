@@ -199,6 +199,78 @@ const FINAL_OUTPUTS = [
     th: "รู้ต้นทุนรวม เวลา และความเสี่ยงของโครงการ",
     detail: "Material + labor + lifecycle service + spares + document + risk, with TBC kept visible",
   },
+  {
+    code: "QUOTE",
+    title: "Quotation / Selling Price",
+    th: "ได้ราคาเสนอที่มีที่มาและอธิบายได้",
+    detail: "Controlled cost basis + approved commercial pricing policy / margin + exclusions and assumptions",
+  },
+];
+
+const BID_WORKFLOW = {
+  objective: "ทำราคา PAGA ให้ครบ scope และลดความเสี่ยงต้นทุนตกหล่นก่อน freeze ราคาเสนอ",
+  focus: "Catering Building",
+  stage: "Engineering Proof",
+  nextGate: "Close critical inputs → release Required MTO → price equipment / bulk / work / lifecycle",
+};
+
+const NEED_FROM_USER = [
+  { item: "Ambient Noise / Noise Study", why: "ใช้ปิด Sound Coverage, speaker tap และ beacon requirement", action: "Provide / locate source" },
+  { item: "Latest Catering Geometry / Layout", why: "ใช้ยืนยัน coverage, listener distance และตำแหน่ง speaker", action: "Confirm current drawing" },
+  { item: "Current APF Cable Schedule", why: "ใช้คำนวณ loop loss และ bulk cable", action: "Locate controlled schedule" },
+  { item: "Final Loop Topology", why: "ใช้ยืนยัน 2-loop hypothesis ก่อน freeze loop load / cable", action: "Verify drawing / vendor" },
+];
+
+const CHATGPT_CAN_DO = [
+  { label: "Trace requirements back to MR / SPE / PHI / BOD / STD / TC", state: "CAN DO NOW" },
+  { label: "Run preliminary CAL from controlled inputs and version the result", state: "CAN DO NOW" },
+  { label: "Reconcile Required vs INDUSTRONIC offered BOM / deviation", state: "CAN DO NOW" },
+  { label: "Build VDRL / workload / lifecycle cost structure with TBC visible", state: "CAN DO NOW" },
+  { label: "Freeze final coverage / cable loss / final MTO", state: "WAITING INPUT" },
+];
+
+const DECISIONS = [
+  {
+    id: "DEC-PAGA-009",
+    topic: "Catering two-loop topology",
+    proposal: "Use Loop A = LSN-303-201..205 and Loop B = LSN-303-206..208 as a preliminary working hypothesis only.",
+    confidence: "MEDIUM",
+    impact: "Allows preliminary loop-load organization but cannot release cable / final MTO.",
+  },
+  {
+    id: "DEC-PAGA-008",
+    topic: "Acoustic criterion",
+    proposal: "Use ≥65 dBA and +10 to +20 dB above ambient for preliminary speech design so both project minimum and PTTEP STD are satisfied.",
+    confidence: "HIGH WORKING",
+    impact: "May increase speaker / tap requirement versus a +6 dB-only interpretation.",
+  },
+  {
+    id: "OPEN-SPARE",
+    topic: "N+1 vs 25% future spare",
+    proposal: "Do not double-count automatically; keep future-spare compliance open until vendor architecture / project interpretation is reconciled.",
+    confidence: "OPEN",
+    impact: "Can change amplifier quantity, rack size, power and price.",
+  },
+];
+
+const QUOTE_READINESS = [
+  { label: "Engineering Basis", status: "PARTIAL", detail: "Source/criteria ready; coverage/loss not closed" },
+  { label: "Required MTO", status: "NOT READY", detail: "Speaker/beacon/cable still proof-driven" },
+  { label: "Vendor / Pricing", status: "PARTIAL", detail: "INDUSTRONIC offer available; required-vs-offered not final" },
+  { label: "Bulk", status: "OPEN", detail: "Cable/JB/termination drivers not frozen" },
+  { label: "VDRL / Manhour", status: "STRUCTURE READY", detail: "Document/work model ready; UMH/rates still controlled inputs" },
+  { label: "Lifecycle Cost", status: "TBC", detail: "FAT/IFAT/site/pre-com/commissioning/SAT resource basis not priced" },
+  { label: "Spares / Tools", status: "TBC", detail: "Start-up, commissioning, 2-year spares and tools need quantity basis" },
+  { label: "Commercial Price", status: "NOT READY", detail: "Selling price must wait for controlled cost basis + pricing policy" },
+];
+
+const IMPACT_CHAIN = [
+  { label: "Required Speaker Qty", value: "TBC", note: "Coverage study controls final quantity" },
+  { label: "Cable / Bulk Qty", value: "TBC", note: "Depends on final speaker / loop / route" },
+  { label: "Installation MH", value: "TBC", note: "MH = Q × UMH" },
+  { label: "Pre-Com / SAT MH", value: "TBC", note: "Driven by loop/device/test cases" },
+  { label: "Total Project Cost", value: "TBC", note: "TBC is never treated as zero" },
+  { label: "Selling Price", value: "TBC", note: "Cost basis + approved margin/markup policy" },
 ];
 
 export function PagaWorkspace() {
@@ -263,6 +335,22 @@ export function PagaWorkspace() {
         </div>
       )}
 
+      <section className="etm-bid-banner">
+        <div>
+          <div className="etm-section-kicker">BID ENGINEERING & COST WORKBENCH</div>
+          <h2>{BID_WORKFLOW.objective}</h2>
+          <p>
+            First Principles + Constraint-Based Engineering + Parametric Cost Engineering
+            คือวิธีที่เราใช้เปลี่ยน RFQ ไปเป็น Required Scope, Workload, Cost Basis และ Selling Price ที่ trace กลับหา evidence ได้
+          </p>
+        </div>
+        <div className="etm-bid-state">
+          <div><small>Current focus</small><strong>{BID_WORKFLOW.focus}</strong></div>
+          <div><small>Current stage</small><strong>{BID_WORKFLOW.stage}</strong></div>
+          <div><small>Next gate</small><strong>{BID_WORKFLOW.nextGate}</strong></div>
+        </div>
+      </section>
+
       <section className="etm-purpose">
         <div className="etm-purpose-main">
           <div className="etm-section-kicker">WHY FIRST PRINCIPLES?</div>
@@ -311,6 +399,61 @@ export function PagaWorkspace() {
         </div>
       </section>
 
+      <section className="etm-workbench-grid">
+        <section className="etm-panel">
+          <div className="etm-section-kicker">WHAT I NEED FROM YOU</div>
+          <h3>ข้อมูลที่ถ้าได้มา จะปลดล็อกการคำนวณ / ราคา</h3>
+          <div className="etm-user-input-list">
+            {NEED_FROM_USER.map((row) => (
+              <div className="etm-user-input-row" key={row.item}>
+                <span>INPUT</span>
+                <div>
+                  <strong>{row.item}</strong>
+                  <p>{row.why}</p>
+                </div>
+                <button type="button" title="Preview action only">{row.action}</button>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="etm-panel">
+          <div className="etm-section-kicker">WHAT CHATGPT CAN DO NOW</div>
+          <h3>งานที่ผมเดินต่อได้โดยไม่รอคุณ</h3>
+          <div className="etm-ai-work-list">
+            {CHATGPT_CAN_DO.map((row) => (
+              <div key={row.label}>
+                <span className={row.state === "CAN DO NOW" ? "can" : "wait"}>{row.state}</span>
+                <p>{row.label}</p>
+              </div>
+            ))}
+          </div>
+          <div className="etm-chat-hint">
+            <strong>คุณไม่ต้องพูดภาษา DB</strong>
+            <span>พิมพ์ใน Chat เช่น “ลองเช็ค speaker 8 ตัวอีกครั้ง”, “ทำ TC ขอ Cable Schedule”, หรือ “ถ้าราคา Vendor เปลี่ยนให้คำนวณผลกระทบใหม่”</span>
+          </div>
+        </section>
+      </section>
+
+      <section className="etm-quote-readiness">
+        <div className="etm-quote-head">
+          <div>
+            <div className="etm-section-kicker">QUOTATION READINESS</div>
+            <h2>ก่อน freeze ราคาเสนอ ต้องเห็นว่าส่วนไหนพร้อม และส่วนไหนยังเสี่ยงตกหล่น</h2>
+          </div>
+          <StatusPill status="PRICE NOT READY" />
+        </div>
+        <div className="etm-readiness-grid">
+          {QUOTE_READINESS.map((item) => (
+            <div className="etm-readiness-card" key={item.label}>
+              <small>{item.label}</small>
+              <StatusPill status={item.status} small />
+              <p>{item.detail}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="etm-summary-grid">
         <SummaryCard label="Historical speakers" value="8" detail="LSN-303-201 … 208" tone="blue" />
         <SummaryCard label="Engineering proofs" value={String(proofSummary.total)} detail="CAL + SDY objects" tone="violet" />
@@ -318,6 +461,33 @@ export function PagaWorkspace() {
         <SummaryCard label="Amp allowable" value="240 W" detail="300 W × 80%" tone="green" />
         <SummaryCard label="Open blockers" value="4" detail="Noise · Geometry · Cable · Loop" tone="amber" />
         <SummaryCard label="Evidence state" value="A / B / C / D" detail="Source · Derived · TBC · Model" tone="slate" />
+      </section>
+
+      <section className="etm-impact-panel">
+        <div className="etm-panel-head">
+          <div>
+            <div className="etm-section-kicker">ENGINEERING → COST IMPACT</div>
+            <h2>เมื่อ Engineering Input เปลี่ยน อะไรจะเปลี่ยนตามในราคา?</h2>
+            <p>ผลลัพธ์ Derived ต้องคำนวณใหม่จากสมการ ไม่แก้ตัวเลขปลายทางด้วยมือ</p>
+          </div>
+          <div className="etm-impact-equations">
+            <code>MH = Q × UMH</code>
+            <code>C_project = Σ Material + Σ Work + Σ Lifecycle + Σ Spares + Σ Risk</code>
+            <code>P_sell = PricingPolicy(C_project, Margin / Markup)</code>
+          </div>
+        </div>
+        <div className="etm-impact-chain">
+          {IMPACT_CHAIN.map((item, index) => (
+            <React.Fragment key={item.label}>
+              <div className="etm-impact-node">
+                <small>{item.label}</small>
+                <strong>{item.value}</strong>
+                <span>{item.note}</span>
+              </div>
+              {index < IMPACT_CHAIN.length - 1 && <b>→</b>}
+            </React.Fragment>
+          ))}
+        </div>
       </section>
 
       <nav className="etm-view-tabs">
@@ -347,6 +517,36 @@ export function PagaWorkspace() {
           </button>
         ))}
       </section>
+
+      {selectedLocation.code === "APF-CATERING" && (
+        <section className="etm-decision-panel">
+          <div className="etm-panel-head">
+            <div>
+              <div className="etm-section-kicker">DECISION QUEUE</div>
+              <h2>Working decisions ที่ต้องควบคุม ไม่ให้ Assumption กลายเป็น Fact</h2>
+            </div>
+            <span className="etm-preview-action-note">Actions below are Rev0 UI preview</span>
+          </div>
+          <div className="etm-decision-grid">
+            {DECISIONS.map((d) => (
+              <article key={d.id} className="etm-decision-card">
+                <div className="etm-decision-top">
+                  <code>{d.id}</code>
+                  <StatusPill status={d.confidence} small />
+                </div>
+                <h3>{d.topic}</h3>
+                <p>{d.proposal}</p>
+                <small>{d.impact}</small>
+                <div className="etm-decision-actions">
+                  <button type="button">Accept working basis</button>
+                  <button type="button">Keep TBC</button>
+                  <button type="button">Create TC / Ask Vendor</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
 
       {selectedLocation.code !== "APF-CATERING" ? (
         <section className="etm-panel etm-coming">
