@@ -1,6 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import "./BidWorkspace.css";
+import { BidFormTracker } from "./BidFormTracker";
+import { VdrlProduction } from "./VdrlProduction";
 
 const SOURCE_GROUPS = [
   {
@@ -169,9 +171,11 @@ export function BidWorkspace() {
       <nav className="bid-tabs">
         {[
           ["overview", "Bid Overview"],
+          ["form", "Bid Form Tracker"],
           ["scope", "Scope / Compliance"],
           ["price", "Price Schedules"],
           ["deviation", "Deviation Control"],
+          ["vdrl", "VDRL / Document Production"],
           ["submission", "Submission Outputs"],
         ].map(([key, label]) => (
           <button key={key} className={active === key ? "active" : ""} onClick={() => setActive(key)}>{label}</button>
@@ -180,11 +184,13 @@ export function BidWorkspace() {
       </nav>
 
       {active === "overview" && <Overview />}
+      {active === "form" && <BidFormTracker />}
       {active === "scope" && <ScopeView />}
       {active === "price" && <PriceView />}
       {active === "deviation" && (
         <DeviationView filter={filter} setFilter={setFilter} rows={deviationRows} />
       )}
+      {active === "vdrl" && <VdrlProduction />}
       {active === "submission" && <SubmissionView />}
     </div>
   );
