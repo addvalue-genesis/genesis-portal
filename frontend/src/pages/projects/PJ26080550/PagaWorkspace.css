@@ -115,3 +115,72 @@ body{margin:0;background:#f4f7fb;color:var(--ink)}
   .etm-outcome-grid{grid-template-columns:1fr}
   .etm-purpose-route b{display:none}
 }
+
+/* Rev0 UX: bid engineering & cost workbench */
+.etm-bid-banner{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(360px,.9fr);gap:14px;margin:16px 0;padding:20px 22px;border-radius:16px;background:linear-gradient(135deg,#f7fbff 0%,#edf5ff 100%);border:1px solid #dce8f6}
+.etm-bid-banner h2{font-size:20px;line-height:1.35;margin:6px 0 7px}
+.etm-bid-banner p{font-size:11px;line-height:1.55;margin:0;color:#5d6c80}
+.etm-bid-state{display:grid;gap:7px}
+.etm-bid-state>div{padding:10px 12px;border-radius:10px;background:#fff;border:1px solid #dfe7f1}
+.etm-bid-state small{display:block;font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:#8290a3}
+.etm-bid-state strong{display:block;margin-top:3px;font-size:10px;line-height:1.4;color:#26384f}
+
+.etm-workbench-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:14px;margin:16px 0}
+.etm-user-input-list{display:grid;gap:7px;margin-top:11px}
+.etm-user-input-row{display:grid;grid-template-columns:42px 1fr auto;gap:9px;align-items:center;padding:9px 10px;border:1px solid #e8edf2;border-radius:10px;background:#fbfcfe}
+.etm-user-input-row>span{font-size:8px;font-weight:900;letter-spacing:.08em;color:#8a5a00;background:#fff4d8;border:1px solid #f1d498;border-radius:6px;padding:4px 5px;text-align:center}
+.etm-user-input-row strong{display:block;font-size:10px}
+.etm-user-input-row p{font-size:9px!important;margin:3px 0 0!important;color:#6d798a!important}
+.etm-user-input-row button{border:1px solid #cdd7e4;background:#fff;border-radius:8px;padding:6px 8px;font-size:9px;color:#42536a;cursor:pointer}
+.etm-ai-work-list{display:grid;gap:7px;margin-top:11px}
+.etm-ai-work-list>div{display:grid;grid-template-columns:92px 1fr;gap:8px;align-items:center;padding:8px 10px;border-radius:9px;background:#f8fafc;border:1px solid #edf0f4}
+.etm-ai-work-list span{font-size:8px;font-weight:900;border-radius:999px;padding:4px 6px;text-align:center}
+.etm-ai-work-list span.can{background:#e8f7ef;color:#087047;border:1px solid #b8e5cc}
+.etm-ai-work-list span.wait{background:#fff4df;color:#8a5a00;border:1px solid #f1d59f}
+.etm-ai-work-list p{margin:0!important;font-size:9px!important;color:#405068!important}
+.etm-chat-hint{display:flex;gap:8px;align-items:flex-start;margin-top:10px;padding:10px;border-radius:9px;background:#10253f;color:#dbe7f3}
+.etm-chat-hint strong{font-size:9px;white-space:nowrap}
+.etm-chat-hint span{font-size:9px;line-height:1.45;color:#b8c7d7}
+
+.etm-quote-readiness{margin:16px 0;padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 18px rgba(20,40,70,.035)}
+.etm-quote-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.etm-quote-head h2{font-size:17px;line-height:1.4;margin:5px 0 0}
+.etm-readiness-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:12px}
+.etm-readiness-card{min-height:105px;padding:10px;border-radius:10px;border:1px solid #e7ebf0;background:#fbfcfd}
+.etm-readiness-card>small{display:block;font-size:9px;font-weight:850;color:#4c5d73;margin-bottom:6px}
+.etm-readiness-card p{font-size:8.5px!important;line-height:1.4!important;margin-top:7px!important;color:#7a8797!important}
+
+.etm-impact-panel{margin:16px 0;padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 18px rgba(20,40,70,.035)}
+.etm-impact-panel h2{font-size:17px;margin:5px 0 4px}
+.etm-impact-panel p{font-size:10px;margin:0;color:#748195}
+.etm-impact-equations{display:flex;gap:5px;flex-direction:column;align-items:flex-end}
+.etm-impact-equations code{font-size:8px;background:#eef3f8;border:1px solid #dce5ef;border-radius:6px;padding:5px 7px;color:#42536a}
+.etm-impact-chain{display:flex;align-items:stretch;gap:5px;overflow-x:auto;margin-top:13px;padding-bottom:4px}
+.etm-impact-node{min-width:160px;flex:1;border:1px solid #e6ebf1;background:#fbfcfe;border-radius:10px;padding:10px}
+.etm-impact-node small{display:block;font-size:8px;color:#7d8999}.etm-impact-node strong{display:block;font-size:15px;margin:3px 0;color:#b42318}.etm-impact-node span{font-size:8px;line-height:1.35;color:#69778a}
+.etm-impact-chain>b{display:flex;align-items:center;color:#9aa7b8}
+
+.etm-decision-panel{margin:16px 0;padding:18px 20px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 18px rgba(20,40,70,.035)}
+.etm-decision-panel h2{font-size:16px;margin:5px 0 0}
+.etm-preview-action-note{font-size:8px;color:#8793a3;border:1px dashed #cbd5e1;border-radius:999px;padding:5px 8px}
+.etm-decision-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px;margin-top:12px}
+.etm-decision-card{border:1px solid #e6ebf1;border-radius:11px;padding:11px;background:#fbfcfe}
+.etm-decision-top{display:flex;justify-content:space-between;gap:8px;align-items:center}
+.etm-decision-top code{font-size:8px;color:#738095}
+.etm-decision-card h3{font-size:11px;margin:7px 0 4px}
+.etm-decision-card p{font-size:9px!important;line-height:1.45!important;margin:0!important;color:#56667a!important}
+.etm-decision-card>small{display:block;margin-top:7px;font-size:8px;line-height:1.35;color:#8a5a00}
+.etm-decision-actions{display:flex;gap:5px;flex-wrap:wrap;margin-top:9px}
+.etm-decision-actions button{border:1px solid #ced8e4;background:#fff;border-radius:7px;padding:5px 7px;font-size:8px;color:#3d4e65;cursor:pointer}
+
+@media(max-width:1150px){
+  .etm-bid-banner,.etm-workbench-grid{grid-template-columns:1fr}
+  .etm-readiness-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .etm-decision-grid{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+  .etm-readiness-grid{grid-template-columns:1fr}
+  .etm-user-input-row{grid-template-columns:42px 1fr}
+  .etm-user-input-row button{grid-column:2}
+  .etm-impact-equations{align-items:flex-start}
+}
