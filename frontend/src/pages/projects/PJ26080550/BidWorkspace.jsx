@@ -5,6 +5,7 @@ import { BidFormTracker } from "./BidFormTracker";
 import { VdrlProduction } from "./VdrlProduction";
 import { EquationKernel } from "./EquationKernel";
 import { PricingStrategy } from "./PricingStrategy";
+import { ControlSpine } from "./ControlSpine";
 
 const SOURCE_GROUPS = [
   {
@@ -175,6 +176,7 @@ export function BidWorkspace() {
           ["overview", "Bid Overview"],
           ["strategy", "Pricing / Win Strategy"],
           ["model", "Method / Equation Engine"],
+          ["control", "Control Spine"],
           ["form", "Bid Form Tracker"],
           ["scope", "Scope / Compliance"],
           ["price", "Price Schedules"],
@@ -191,6 +193,7 @@ export function BidWorkspace() {
       {active === "overview" && <Overview />}
       {active === "strategy" && <PricingStrategy />}
       {active === "model" && <EquationKernel />}
+      {active === "control" && <ControlSpine />}
       {active === "form" && <BidFormTracker />}
       {active === "scope" && <ScopeView />}
       {active === "price" && <PriceView />}
