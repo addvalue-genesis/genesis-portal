@@ -2,11 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./PagaWorkspace.css";
 
 const VIEWS = [
-  { key: "trace", label: "First Principles Trace" },
-  { key: "proof", label: "CAL / SDY / RPT" },
-  { key: "mto", label: "Required MTO + Vendor" },
-  { key: "vdrl", label: "VDRL + Work / MH" },
-  { key: "lifecycle", label: "Lifecycle + Cost" },
+  { key: "trace", label: "1. Requirement → Result" },
+  { key: "proof", label: "2. Engineering Proof" },
+  { key: "mto", label: "3. MTO → Vendor" },
+  { key: "vdrl", label: "4. VDRL → Manhour" },
+  { key: "lifecycle", label: "5. Delivery → Cost" },
 ];
 
 const LOCATIONS = [
@@ -162,6 +162,45 @@ const COST_BUCKETS = [
   "Risk",
 ];
 
+const FINAL_OUTPUTS = [
+  {
+    code: "DESIGN",
+    title: "Engineering Design Basis",
+    th: "รู้ว่าระบบต้องทำอะไรจริง",
+    detail: "Requirement + constraint + interface + approved engineering result",
+  },
+  {
+    code: "MTO",
+    title: "Required MTO & Bulk",
+    th: "รู้ว่าต้องซื้อและติดตั้งอะไร เท่าไร",
+    detail: "Equipment, cable, JB, interface hardware and quantities released from proof",
+  },
+  {
+    code: "TBE",
+    title: "Vendor / TBE Decision",
+    th: "รู้ว่าผู้ขายเสนอครบหรือขาดอะไร",
+    detail: "Required vs Offered, compliance, deviation, capability and regulatory status",
+  },
+  {
+    code: "VDRL",
+    title: "VDRL & Workload",
+    th: "รู้ว่าต้องทำเอกสารอะไร และใช้คนกี่ชั่วโมง",
+    detail: "PTTEP deliverables, review cycles, role, Q × UMH and document-production workload",
+  },
+  {
+    code: "DELIVERY",
+    title: "Execution & Acceptance Plan",
+    th: "รู้ว่าต้องทำงานและทดสอบอะไรจนรับมอบ",
+    detail: "FAT, IFAT, logistics, installation, pre-com, start-up, commissioning, SAT / ISAT",
+  },
+  {
+    code: "COST",
+    title: "Project Cost / Schedule / Risk",
+    th: "รู้ต้นทุนรวม เวลา และความเสี่ยงของโครงการ",
+    detail: "Material + labor + lifecycle service + spares + document + risk, with TBC kept visible",
+  },
+];
+
 export function PagaWorkspace() {
   const [view, setView] = useState("trace");
   const [location, setLocation] = useState("APF-CATERING");
@@ -223,6 +262,54 @@ export function PagaWorkspace() {
           </span>
         </div>
       )}
+
+      <section className="etm-purpose">
+        <div className="etm-purpose-main">
+          <div className="etm-section-kicker">WHY FIRST PRINCIPLES?</div>
+          <h2>เราใช้ First Principles เพื่อเปลี่ยน RFQ ให้เป็น “สิ่งที่ออกแบบได้ ซื้อได้ ทดสอบได้ และคิดต้นทุนได้”</h2>
+          <p>
+            ระบบนี้ไม่ได้มีเป้าหมายแค่เก็บ Requirement หรือทำ Calculation แต่ต้องตามรอยได้ว่า
+            <strong> ข้อกำหนดมาจากไหน → พิสูจน์อย่างไร → ต้องใช้อะไร → ใครทำ → ทดสอบอะไร → แล้วต้นทุน/เวลา/ความเสี่ยงเท่าไร</strong>
+          </p>
+          <div className="etm-purpose-route">
+            <span>Source / Requirement</span><b>→</b>
+            <span>Engineering Proof</span><b>→</b>
+            <span>Required Design / MTO</span><b>→</b>
+            <span>Vendor / Delivery</span><b>→</b>
+            <span>Cost / Acceptance</span>
+          </div>
+        </div>
+        <div className="etm-purpose-status">
+          <small>CURRENT POSITION · CATERING</small>
+          <strong>Engineering proof ยังไม่ปิด</strong>
+          <p>ดังนั้น Required MTO และ Final Cost ยังห้าม freeze</p>
+          <div>
+            <span className="done">Source / Criteria ✓</span>
+            <span className="partial">CAL / SDY ◐</span>
+            <span className="blocked">MTO / Cost ⛔</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="etm-outcome-section">
+        <div className="etm-outcome-head">
+          <div>
+            <div className="etm-section-kicker">FINAL OUTPUTS</div>
+            <h2>เมื่อข้อมูลและ Proof ปิดครบ เราต้องได้ผลลัพธ์อะไรจากระบบนี้?</h2>
+          </div>
+          <span>Definition of Done</span>
+        </div>
+        <div className="etm-outcome-grid">
+          {FINAL_OUTPUTS.map((item) => (
+            <article className="etm-outcome-card" key={item.code}>
+              <div className="etm-outcome-code">{item.code}</div>
+              <h3>{item.title}</h3>
+              <strong>{item.th}</strong>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
 
       <section className="etm-summary-grid">
         <SummaryCard label="Historical speakers" value="8" detail="LSN-303-201 … 208" tone="blue" />
@@ -306,8 +393,11 @@ function TraceView() {
         <div className="etm-panel-head">
           <div>
             <div className="etm-section-kicker">VERTICAL SLICE · CATERING</div>
-            <h2>First Principles Engineering Thread</h2>
-            <p>See exactly how source evidence becomes an engineering result, then MTO, vendor scope and cost.</p>
+            <h2>จาก Requirement ไปสู่ผลลัพธ์ที่ใช้ทำงานจริง</h2>
+            <p>
+              อ่านจากซ้ายไปขวา: เราเริ่มจากหลักฐาน/ข้อกำหนด แล้วใช้ CAL / SDY / RPT พิสูจน์
+              จนได้ Required MTO, Vendor gap, งานที่ต้องทำ และต้นทุนที่เชื่อถือได้
+            </p>
           </div>
           <div className="etm-legend">
             <span><i className="a" />A Source</span>
@@ -384,7 +474,7 @@ function TraceView() {
         <div className="etm-panel-head">
           <div>
             <div className="etm-section-kicker">RELEASE GATE</div>
-            <h3>Why Required MTO is not released yet</h3>
+            <h3>อะไรยังขาดก่อนที่เราจะได้ Final MTO / Final Cost</h3>
           </div>
           <StatusPill status="NOT READY" />
         </div>
@@ -630,3 +720,4 @@ function InfoPanel({ kicker, title, text }) {
     </section>
   );
 }
+
