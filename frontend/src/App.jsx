@@ -2,18 +2,21 @@ import React, { useState } from "react";
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Employees } from "./pages/Employees";
+import { PagaWorkspace } from "./pages/projects/PJ26080550/PagaWorkspace";
 
 const STRINGS = {
   th: {
     appTitle: "GENESIS Portal",
     home: "หน้าแรก",
     employees: "พนักงาน",
+    project0550: "PJ2608-0550",
     language: "ภาษา",
   },
   en: {
     appTitle: "GENESIS Portal",
     home: "Home",
     employees: "Employees",
+    project0550: "PJ2608-0550",
     language: "Language",
   },
 };
@@ -38,6 +41,7 @@ export function App() {
           <nav style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
             <Link to="/">{t.home}</Link>
             <Link to="/employees">{t.employees}</Link>
+            <Link to="/projects/pj2608-0550/paga">{t.project0550}</Link>
             <span>
               {t.language}:{" "}
               <select
@@ -56,6 +60,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<Home lang={lang} />} />
             <Route path="/employees" element={<Employees lang={lang} />} />
+            <Route path="/projects/pj2608-0550/paga" element={<PagaWorkspace lang={lang} />} />
           </Routes>
         </main>
       </div>
