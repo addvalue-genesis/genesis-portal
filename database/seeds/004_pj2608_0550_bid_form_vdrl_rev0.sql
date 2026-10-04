@@ -1,0 +1,93 @@
+SET @p=(SELECT id FROM etm_projects WHERE project_code='PJ2608-0550');
+SET @s=(SELECT id FROM etm_systems WHERE project_id=@p AND system_code='PAGA');
+SET @bid=(SELECT id FROM etm_bid_packages WHERE project_id=@p AND bid_code='PJ2608-0550-BID');
+
+INSERT INTO etm_bid_form_lines
+(bid_package_id,control_id,source_group,source_ref,requirement_text,bidder_response,response_ref,response_status,deviation_route,internal_note)
+VALUES
+(@bid,'BID-001','Contract','Exhibit A §4.1-4.3',
+ 'Meet or exceed applicable codes, standards and project specifications; resolve conflicts before design/procurement.',
+ 'TBC - technical compliance review in progress','Technical Compliance / Deviation Register','REVIEW','TBC',
+ 'Clause-level reconciliation against MR/SPE/PHI/BOD/STD required before final comply statement.'),
+(@bid,'BID-002','Scope','Exhibit A §5',
+ 'Engineering, procurement, fabrication, testing, packing, transport, pre-com/commissioning spares, site services, documents, training and warranty form part of scope.',
+ 'INCLUDE - costing not complete','Scope / Cost Workbench','PARTIAL','NONE',
+ 'Main scope completeness gate; do not price equipment only.'),
+(@bid,'BID-003','Engineering','Exhibit A §6.1',
+ 'Validate FEED, complete detailed design, calculations/drawings, installation methods and AFC development.',
+ 'INCLUDE','Engineering Proof + VDRL','PARTIAL','NONE',
+ 'Convert each engineering obligation into proof object + deliverable + MH.'),
+(@bid,'BID-004','Spares','Exhibit A §7.6-7.8',
+ 'Provide pre-com/commissioning spares & consumables; price 2-year spares; price capital spares; provide special tools.',
+ 'INCLUDE / SEPARATE SCHEDULES','Exhibit C C2/C3/C4/C5','OPEN','NONE',
+ 'Base vs separate-price classification must follow Exhibit C.'),
+(@bid,'BID-005','QA/Test','Exhibit A §9.4-9.5',
+ 'Submit ITP and support Hold/Witness/Review points including FAT/SIT notifications and attendance.',
+ 'INCLUDE','ITP / FAT / SIT / Cost','OPEN','NONE',
+ 'Need witness basis, factory location, travel/facility cost and notice dates.'),
+(@bid,'BID-006','Site Service','Exhibit A §13.1',
+ 'Provide instruction and supervision for installation, pre-commissioning, commissioning and testing at site.',
+ 'INCLUDE - service duration TBC','Exhibit C C7 / Site Service','OPEN','TBC',
+ 'Derive personnel x days/hours x rate; clarify execution vs supervision responsibility.'),
+(@bid,'BID-007','Documents','Exhibit A §15.1-15.3',
+ 'Prepare MDDR/VDRS with document no., title, planned/actual submission, return dates and approval status.',
+ 'INCLUDE','VDRL / MDDR / VDRS','PARTIAL','NONE',
+ 'Use VDRL tracker + generator; cost document preparation/review cycles.'),
+(@bid,'BID-008','Documents','MR-0001 Appendix 3 SDRL',
+ 'Supplier documentation requirements must be costed; documents marked with Bid requirement shall be submitted with bid.',
+ 'INCLUDE - source-row extraction in progress','VDRL Production Queue','PARTIAL','NONE',
+ 'Titles verified from MR. Exact SDRL code / With-Bid mark must be source-verified before release.'),
+(@bid,'BID-009','PAGA','MR-0001 Appendix 1.4 PAGA',
+ 'Design/supply PAGA complete system; contractual documents; FAT/SAT; IFAT; spares; site supervision; packing/transportation.',
+ 'INCLUDE - engineering proof open','PAGA Engineering Workspace','PARTIAL','TBC',
+ 'First Principles vertical slice currently Catering.'),
+(@bid,'BID-010','Commercial','Exhibit C C7',
+ 'Field service and training basis must be sufficient and included in quoted scope; personnel hours/rates required.',
+ 'TBC - service basis to be quantified','Field Service / Training Price','OPEN','COMMERCIAL',
+ 'Do not leave service time undefined; this can become unrecoverable cost.'),
+(@bid,'BID-011','Commercial','Exhibit C C3',
+ '2-year operating spares are priced separately from base scope.',
+ 'SEPARATE PRICE','Schedule C3','READY','NONE',
+ 'Need OEM recommended list, part number, qty, lead time and unit price.'),
+(@bid,'BID-012','Logistics','Exhibit C A1 / Delivery Terms',
+ 'Overseas manufacturer basis CIF Yangon; China manufacturer basis FOB major China port, subject to contract template.',
+ 'TBC per vendor origin','A1 / Logistics Cost','OPEN','COMMERCIAL',
+ 'Vendor origin drives freight/import boundary and possible commercial deviation.')
+ON DUPLICATE KEY UPDATE
+ requirement_text=VALUES(requirement_text),bidder_response=VALUES(bidder_response),response_ref=VALUES(response_ref),
+ response_status=VALUES(response_status),deviation_route=VALUES(deviation_route),internal_note=VALUES(internal_note);
+
+INSERT INTO etm_vdrl_occurrences
+(project_id,system_id,occurrence_code,dossier_group,deliverable_title,source_authority,source_mapping_status,with_bid_status,owner_basis,owner_basis_class,status,generator_profile)
+VALUES
+(@p,@s,'VDRL-001','PROJECT DOSSIER','Vendor document schedule','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','ADDVALUE PREP','WORKING_MODEL','NOT_STARTED','GENESS Register'),
+(@p,@s,'VDRL-002','PROJECT DOSSIER','Bought out items list','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','IN_PROGRESS','GENESS List'),
+(@p,@s,'VDRL-003','ENGINEERING DOSSIER','RF path and coverage study report','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT / ENGINEERING','WORKING_MODEL','IN_PROGRESS','Study / RPT'),
+(@p,@s,'VDRL-004','ENGINEERING DOSSIER','Functional Design Specification / FDS','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','DOCX Generator'),
+(@p,@s,'VDRL-005','ENGINEERING DOSSIER','General arrangement drawings','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT / OEM','WORKING_MODEL','NOT_STARTED','Drawing Register'),
+(@p,@s,'VDRL-006','ENGINEERING DOSSIER','Block diagrams','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT / OEM','WORKING_MODEL','IN_PROGRESS','Drawing / JSX'),
+(@p,@s,'VDRL-007','ENGINEERING DOSSIER','Schematic diagrams','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT / OEM','WORKING_MODEL','NOT_STARTED','Drawing Register'),
+(@p,@s,'VDRL-008','ENGINEERING DOSSIER','Equipment data sheets','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','OEM INPUT','WORKING_MODEL','IN_PROGRESS','DTS Generator'),
+(@p,@s,'VDRL-009','ENGINEERING DOSSIER','Catalogues and brochures','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','OEM INPUT','WORKING_MODEL','PARTIAL','OEM Attachment'),
+(@p,@s,'VDRL-010','ENGINEERING DOSSIER','Telecommunication termination and typical installation details','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','DOC/DWG'),
+(@p,@s,'VDRL-011','ENGINEERING DOSSIER','Termination diagrams','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','DWG Generator'),
+(@p,@s,'VDRL-012','ENGINEERING DOSSIER','Telecom calculations','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','ENGINEERING','WORKING_MODEL','IN_PROGRESS','CAL Generator'),
+(@p,@s,'VDRL-013','QUALITY DOSSIER','Quality management system certificate','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','OEM INPUT','WORKING_MODEL','PARTIAL','OEM Attachment'),
+(@p,@s,'VDRL-014','QUALITY DOSSIER','Performance guarantee certificate','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','OEM / JOINT','WORKING_MODEL','NOT_STARTED','Certificate'),
+(@p,@s,'VDRL-015','QUALITY DOSSIER','Performance testing and acceptance test procedures','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','Procedure Generator'),
+(@p,@s,'VDRL-016','QUALITY DOSSIER','Site acceptance test procedure','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','SAT Generator'),
+(@p,@s,'VDRL-017','QUALITY DOSSIER','Factory acceptance test report (FAT)','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT / OEM','WORKING_MODEL','NOT_STARTED','FAT Report'),
+(@p,@s,'VDRL-018','QUALITY DOSSIER','Inspection and test plan','MR-0001 Rev.A1 Appendix 3 pp38-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','ITP Generator'),
+(@p,@s,'VDRL-019','QUALITY DOSSIER','Quality Assurance Dossier','MR-0001 Rev.A1 Appendix 3 pp39-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','Dossier'),
+(@p,@s,'VDRL-020','MAINT. / OPERATION','Unpacking and preservation procedure','MR-0001 Rev.A1 Appendix 3 pp39-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT / OEM','WORKING_MODEL','NOT_STARTED','Procedure'),
+(@p,@s,'VDRL-021','MAINT. / OPERATION','Handling and shipping procedures','MR-0001 Rev.A1 Appendix 3 pp39-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT / OEM','WORKING_MODEL','NOT_STARTED','Procedure'),
+(@p,@s,'VDRL-022','MAINT. / OPERATION','Pre-commissioning / commissioning procedure','MR-0001 Rev.A1 Appendix 3 pp39-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','Procedure Generator'),
+(@p,@s,'VDRL-023','MAINT. / OPERATION','Erection / installation procedure','MR-0001 Rev.A1 Appendix 3 pp39-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','Procedure Generator'),
+(@p,@s,'VDRL-024','MAINT. / OPERATION','Recommended start-up and commissioning spares list','MR-0001 Rev.A1 Appendix 3 pp39-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT / OEM','WORKING_MODEL','IN_PROGRESS','Spares List'),
+(@p,@s,'VDRL-025','MAINT. / OPERATION','Recommended spares list for two years operation','MR-0001 Rev.A1 Appendix 3 pp39-40','TITLE_VERIFIED_CODE_TBC','VERIFY','OEM INPUT','WORKING_MODEL','NOT_STARTED','SPIR / Price List'),
+(@p,@s,'VDRL-026','MAINT. / OPERATION','Operation Dossier','MR-0001 Rev.A1 Appendix 3 pp39-40','TITLE_VERIFIED_CODE_TBC','VERIFY','JOINT','WORKING_MODEL','NOT_STARTED','Manual / Dossier'),
+(@p,@s,'VDRL-027','PAGA PARTICULAR','MM-ASK-1A-APF-TEL-RPT-0005 - PAGA Sound Coverage Study Report','0550 PAGA project source','VERIFIED','NOT_APPLICABLE','ENGINEERING / OEM CONFIRM','WORKING_MODEL','IN_PROGRESS','RPT Generator')
+ON DUPLICATE KEY UPDATE
+ deliverable_title=VALUES(deliverable_title),source_authority=VALUES(source_authority),source_mapping_status=VALUES(source_mapping_status),
+ with_bid_status=VALUES(with_bid_status),owner_basis=VALUES(owner_basis),owner_basis_class=VALUES(owner_basis_class),
+ status=VALUES(status),generator_profile=VALUES(generator_profile);
