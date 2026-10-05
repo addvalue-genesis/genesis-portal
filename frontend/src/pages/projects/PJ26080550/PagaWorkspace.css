@@ -271,3 +271,5 @@ body{margin:0;background:#f4f7fb;color:var(--ink)}
 .etm-chat-hint strong{white-space:normal}
 @media(max-width:820px){.etm-rpt-flow{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.etm-rpt-flow{grid-template-columns:1fr}}
+
+.etm-back-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #cad8e8;background:#fff;border-radius:999px;padding:7px 10px;color:#355a86;text-decoration:none;font-size:12px;font-weight:800;white-space:nowrap}
