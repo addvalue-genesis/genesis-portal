@@ -24,8 +24,8 @@ const GATES = [
   },
   {
     id:"G5", title:"Authorised Offer", state:"BLOCKED",
-    question:"Floor / Target policy ถูกอนุมัติ และ Jack เลือกราคายื่นพร้อมเหตุผลแล้วหรือยัง?",
-    output:"price_state = AUTHORISED_OFFER only after approval."
+    question:"Profit / margin / markup policy, risk appetite และ strategic bid position ถูกอนุมัติแล้วหรือยัง?",
+    output:"ระบบคำนวณราคาจาก policy ที่อนุมัติ; price_state = AUTHORISED_OFFER เฉพาะเมื่อผู้มีอำนาจอนุมัติ."
   }
 ];
 
@@ -185,23 +185,32 @@ export function PricingStrategy(){
           </section>
 
           <section className="ps-panel ps-decision-map">
-            <small>DECISION LOGIC</small>
-            <h2>สิ่งที่ Jack ต้องตัดสิน vs สิ่งที่ระบบต้องคำนวณ</h2>
+            <small>DECISION AUTHORITY BOUNDARY</small>
+            <h2>Technical truth ให้ระบบ resolve จาก evidence — Jack ตัดสินเฉพาะ Policy / Risk / Commercial Authority</h2>
             <div className="ps-decision-grid">
               <div>
-                <strong>System calculates</strong>
-                <span>Requirement applicability</span><span>Required quantity</span><span>MH / Duration</span>
-                <span>Internal cost</span><span>Financing / risk exposure</span><span>Floor / Target from approved policy</span>
+                <strong>System resolves from evidence</strong>
+                <span>Requirement / applicability from RFQ, MR, SPE, PHI, BOD, STD, DWG, TC</span>
+                <span>Technical architecture / topology / sizing / required quantity</span>
+                <span>Compliance / gap / deviation recommendation</span>
+                <span>Responsibility and lifecycle obligation</span>
+                <span>If sources conflict: reconcile or raise clarification — do not ask Jack to guess</span>
               </div>
               <div>
-                <strong>System verifies</strong>
-                <span>Evidence / source state</span><span>No double count</span><span>No unpriced required scope</span>
-                <span>Buyer-form completeness</span><span>Benchmark / sensitivity</span>
+                <strong>System derives & verifies</strong>
+                <span>Evidence class / source strength / rationale</span>
+                <span>Required MTO / work / VDRL / lifecycle / cost exposure</span>
+                <span>No double count / no unpriced required scope</span>
+                <span>Floor / Target from approved commercial policy</span>
+                <span>Buyer-form completeness / benchmark / sensitivity</span>
               </div>
               <div>
-                <strong>Jack decides</strong>
-                <span>Policy mode</span><span>Floor / Target policy inputs</span><span>Which strategic point inside the approved band</span>
-                <span>Final deviation position</span><span>Authorise Offer</span>
+                <strong>Jack / Commercial Authority decides</strong>
+                <span>Profit policy: margin / markup / partner layer</span>
+                <span>Minimum acceptable return / target return</span>
+                <span>Risk appetite / walk-away position</span>
+                <span>Strategic point within the approved price band</span>
+                <span>Accept material residual deviation/risk and Authorise Offer</span>
               </div>
             </div>
           </section>
