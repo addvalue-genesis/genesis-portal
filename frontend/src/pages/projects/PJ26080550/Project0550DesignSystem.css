@@ -1,0 +1,202 @@
+/*
+ * PJ2608-0550 UI Design System
+ * Readability target: normal desktop viewing at 100% browser zoom.
+ * Rule: important readable text must not be rendered below 11px.
+ */
+:root{
+  --p0550-fs-min:11px;
+  --p0550-fs-meta:11px;
+  --p0550-fs-label:12px;
+  --p0550-fs-body:13px;
+  --p0550-fs-base:14px;
+  --p0550-fs-card-title:15px;
+  --p0550-fs-subtitle:16px;
+  --p0550-fs-section:20px;
+  --p0550-fs-section-lg:22px;
+  --p0550-fs-page:30px;
+  --p0550-lh-tight:1.25;
+  --p0550-lh-ui:1.4;
+  --p0550-lh-body:1.55;
+}
+
+/* Project shells */
+.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell{
+  font-size:var(--p0550-fs-base);
+  line-height:var(--p0550-lh-body);
+}
+
+/* Page titles / major hero headings */
+.etm-title-line h1,.bid-hero h1,.acl-hero h1{
+  font-size:var(--p0550-fs-page);
+  line-height:1.15;
+}
+.ps-hero h2,.eq-banner h2{
+  font-size:var(--p0550-fs-section-lg);
+  line-height:1.3;
+}
+
+/* Section hierarchy */
+.etm-panel h2,.etm-purpose-main h2,.etm-bid-banner h2,.etm-outcome-head h2,
+.bid-panel h2,.bid-goal h2,.acl-panel h2,.eq-panel h2,.ps-panel h2,.cs-panel h2{
+  font-size:var(--p0550-fs-section);
+  line-height:1.3;
+}
+.etm-panel h3,.bid-panel h3,.acl-panel h3,.eq-panel h3,.ps-panel h3,.cs-panel h3,
+.etm-outcome-card h3,.paga-vendor-list strong{
+  font-size:var(--p0550-fs-card-title);
+  line-height:1.35;
+}
+
+/* Normal reading text */
+.etm-panel p,.etm-purpose-main p,.etm-bid-banner p,.etm-subtitle,
+.bid-panel p,.bid-goal p,.bid-source-card>p,.bid-price-card p,
+.acl-panel p,.acl-hero p,.eq-banner p,.eq-panel p,.ps-hero p,.ps-panel p,
+.cs-hero p,.cs-muted,.cs-card dd,.cs-card footer span{
+  font-size:var(--p0550-fs-body);
+  line-height:var(--p0550-lh-body);
+}
+
+/* Eyebrows / labels / secondary captions */
+.etm-eyebrow,.etm-section-kicker,.bid-eyebrow,.bid-panel small,
+.acl-eyebrow,.acl-panel>small,.acl-panel-head small,
+.eq-banner small,.eq-panel>small,.ps-hero small,.ps-panel>small,
+.cs-hero small,.cs-panel>small,
+.etm-panel small,.bid-source-card small,.bid-price-card footer span,
+.cs-card dt{
+  font-size:var(--p0550-fs-meta);
+  line-height:1.35;
+}
+
+/* Tabs, buttons, inputs and interactive UI */
+.etm-view-tabs button,.etm-location-strip button span,
+.bid-tabs button,.bid-drill,.bid-form-actions input,.bid-form-actions select,.bid-form-actions button,
+.vdrl-toolbar input,.vdrl-toolbar select,.vdrl-toolbar button,
+.eq-tabs button,.eq-panel-head input,
+.ps-tabs button,.ps-state select,
+.cs-tabs button,.cs-panel-head input,
+.acl-actions a,.acl-actions span,.acl-role-list button{
+  font-size:var(--p0550-fs-label);
+  line-height:1.3;
+}
+
+/* Pills / statuses: compact but still readable */
+.etm-mode,.etm-release,.etm-pill,.bid-status,.bid-chip,
+.eq-state,.ps-state-pill,.cs-state,.acl-badge,.paga-state,
+.paga-picture-badges span{
+  font-size:11px;
+  line-height:1.2;
+}
+
+/* Cards and workflow nodes */
+.etm-summary-card small,.etm-result-card small,.etm-impact-node small,
+.etm-life-step span,.etm-thread-node small,.etm-proof-card dt,
+.bid-goal-route span,.bid-output-card p,.bid-control-grid span,
+.eq-binding-flow b,.eq-example-flow span,.eq-family-grid span,
+.ps-gates article>span,.ps-trace span,
+.cs-live-grid small{
+  font-size:var(--p0550-fs-meta);
+  line-height:1.4;
+}
+.etm-summary-card span,.etm-result-card span,.etm-impact-node span,
+.etm-life-step strong,.etm-thread-node strong,.etm-proof-card dd,
+.bid-goal-route strong,.bid-source-card li,.bid-output-card h3,.bid-control-grid strong,
+.eq-binding-flow strong,.eq-example-flow strong,.eq-family-grid h3,.eq-family-grid p,
+.ps-gates h3,.ps-gates p,.ps-trace b,
+.cs-live-grid span{
+  font-size:var(--p0550-fs-label);
+  line-height:1.4;
+}
+
+/* PAGA system picture / engineering preview */
+.paga-map-node small,.paga-speaker small,.paga-dummy-strip small,
+.paga-calc-grid small,.paga-vendor-list span,.paga-recalc-flow span{
+  font-size:var(--p0550-fs-meta);
+}
+.paga-map-node span,.paga-speaker span,.paga-dummy-strip span,.paga-calc-grid span{
+  font-size:var(--p0550-fs-label);
+}
+.paga-map-node strong,.paga-speaker b,.paga-dummy-strip strong{
+  font-size:var(--p0550-fs-body);
+}
+.paga-calc-grid strong{font-size:22px}
+.paga-calc-grid code{font-size:11px;line-height:1.4}
+
+/* Tables: deliberately denser than prose, but never micro-text */
+.etm-data-table th,.bid-table th,.bid-form-table th,.vdrl-table th,.eq-table th,.cs-table th{
+  font-size:11px;
+  line-height:1.3;
+}
+.etm-data-table td,.bid-table td,.bid-form-table td,.vdrl-table td,.eq-table td,.cs-table td{
+  font-size:12px;
+  line-height:1.45;
+}
+.etm-data-table td strong,.bid-table td strong,.bid-form-table td strong,
+.vdrl-table td strong,.eq-table td strong,.cs-table td strong{
+  font-size:12px;
+}
+.etm-data-table code,.bid-table code,.bid-form-table code,.vdrl-table code,.eq-table code,.cs-table code{
+  font-size:11px;
+  line-height:1.35;
+}
+.vdrl-table td small,.bid-form-table td small,.eq-table td small{font-size:11px}
+
+/* Equation / formula content */
+.etm-equation,.etm-cost-formula,.etm-impact-equations code,.ps-formulas code,
+.cs-table code{
+  font-size:12px;
+  line-height:1.45;
+}
+
+/* Access control */
+.acl-level-grid h3,.acl-example-grid strong,.acl-role-list strong,.acl-role-detail strong{
+  font-size:var(--p0550-fs-body);
+}
+.acl-level-grid p,.acl-level-grid span,.acl-example-grid span,.acl-example-grid em,
+.acl-role-list span,.acl-chips span,.acl-sensitive span,.acl-none{
+  font-size:var(--p0550-fs-label);
+  line-height:1.45;
+}
+
+/* Equation */
+.eq-source-grid h3,.eq-research-list strong,.eq-rule b{font-size:var(--p0550-fs-body)}
+.eq-source-grid p,.eq-research-list span,.eq-rule span,.eq-source-grid b,.eq-source-grid span{
+  font-size:var(--p0550-fs-label);
+}
+
+/* Pricing */
+.ps-decision-grid strong,.ps-costclass-grid h3,.ps-buyer-list h3,.ps-control-grid h3,.ps-research-grid h3{
+  font-size:var(--p0550-fs-body);
+}
+.ps-decision-grid span,.ps-costclass-grid p,.ps-costclass-grid span,
+.ps-buyer-list strong,.ps-buyer-list p,.ps-control-grid p,.ps-control-grid span,
+.ps-research-grid b,.ps-research-grid p,.ps-research-grid span,.ps-research-rule span{
+  font-size:var(--p0550-fs-label);
+}
+
+/* Bid / VDRL */
+.bid-source-top strong,.bid-price-card h3,.bid-callout,.vdrl-history-note strong,
+.vdrl-history-note span,.vdrl-warning strong,.vdrl-warning span,
+.vdrl-revision-control strong,.vdrl-revision-control span,.vdrl-generator-map b,.vdrl-generator-map span{
+  font-size:var(--p0550-fs-label);
+}
+.bid-form-stats span,.vdrl-stats span{font-size:var(--p0550-fs-label)}
+.bid-form-stats strong,.vdrl-stats strong{font-size:22px}
+
+/* Preserve density on smaller screens without returning to micro text */
+@media(max-width:900px){
+  :root{
+    --p0550-fs-body:12.5px;
+    --p0550-fs-base:13px;
+    --p0550-fs-card-title:14px;
+    --p0550-fs-section:19px;
+    --p0550-fs-page:27px;
+  }
+}
+@media(max-width:560px){
+  :root{
+    --p0550-fs-body:12px;
+    --p0550-fs-base:13px;
+    --p0550-fs-section:18px;
+    --p0550-fs-page:25px;
+  }
+}
