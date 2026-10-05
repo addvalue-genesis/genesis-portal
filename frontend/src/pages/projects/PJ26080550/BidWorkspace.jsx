@@ -192,7 +192,8 @@ export function BidWorkspace() {
           </button>
         ))}
         <Link to="/projects/pj2608-0550/access" className="bid-drill"><b>11.0</b> Team Access</Link>
-        <Link to="/projects/pj2608-0550/paga" className="bid-drill system"><b>12.1</b> Open PAGA Engineering →</Link>
+        <Link to="/projects/pj2608-0550/systems" className="bid-drill system"><b>12.0</b> System Engineering · 19 Systems</Link>
+        <Link to="/projects/pj2608-0550/paga" className="bid-drill system"><b>12.7</b> Open PAGA Engineering →</Link>
       </nav>
 
       {active === "overview" && <Overview />}
