@@ -15,3 +15,13 @@ body{margin:0;background:#f4f7fb}
 .acl-gate{background:linear-gradient(135deg,#f7fbff,#eef5ff);border-color:#d8e5f4}.acl-gate>div{display:flex;align-items:center;gap:6px;overflow-x:auto}.acl-gate span{min-width:185px;flex:1;border:1px solid #dae5f0;border-radius:9px;background:#fff;padding:10px;font-size:9px;font-weight:800}.acl-gate b{color:#9aa7b8}
 @media(max-width:1050px){.acl-level-grid{grid-template-columns:repeat(2,1fr)}.acl-two-col{grid-template-columns:1fr}.acl-example-grid{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:700px){.acl-shell{padding:18px 12px 40px}.acl-hero{flex-direction:column}.acl-level-grid,.acl-example-grid,.acl-role-list{grid-template-columns:1fr}}
+
+
+/* Viewport-fit pass */
+.acl-shell,.acl-panel,.acl-level-grid article,.acl-example-grid>div{min-width:0;max-width:100%}
+.acl-level-grid,.acl-example-grid{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.acl-gate>div{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:7px;overflow:visible;width:100%}
+.acl-gate span{min-width:0;width:100%;overflow-wrap:anywhere}
+.acl-gate b{display:none}
+.acl-panel h2,.acl-panel p,.acl-panel span{overflow-wrap:anywhere}
+@media(max-width:620px){.acl-level-grid,.acl-example-grid{grid-template-columns:1fr}}
