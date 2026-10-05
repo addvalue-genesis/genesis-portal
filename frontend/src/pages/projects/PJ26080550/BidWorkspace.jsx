@@ -6,6 +6,7 @@ import { VdrlProduction } from "./VdrlProduction";
 import { EquationKernel } from "./EquationKernel";
 import { PricingStrategy } from "./PricingStrategy";
 import { ControlSpine } from "./ControlSpine";
+import { BID_NAV_MODULES } from "./Project0550ModuleRegistry";
 
 const SOURCE_GROUPS = [
   {
@@ -171,23 +172,27 @@ export function BidWorkspace() {
         </div>
       </section>
 
+      <div className="bid-module-legend">
+        <span className="system">SYSTEM RESOLVES</span>
+        <span className="executive">EXECUTIVE DECISION</span>
+        <span className="mixed">DEVIATION / MIXED AUTHORITY</span>
+      </div>
+
       <nav className="bid-tabs">
-        {[
-          ["overview", "Bid Overview"],
-          ["strategy", "Pricing / Win Strategy"],
-          ["model", "Method / Equation Engine"],
-          ["control", "Control Spine"],
-          ["form", "Bid Form Tracker"],
-          ["scope", "Scope / Compliance"],
-          ["price", "Price Schedules"],
-          ["deviation", "Deviation Control"],
-          ["vdrl", "VDRL / Document Production"],
-          ["submission", "Submission Outputs"],
-        ].map(([key, label]) => (
-          <button key={key} className={active === key ? "active" : ""} onClick={() => setActive(key)}>{label}</button>
+        {BID_NAV_MODULES.map((m) => (
+          <button
+            key={m.key}
+            className={"bid-module-tab "+(active === m.key ? "active " : "")+
+              (m.authority === "EXECUTIVE_DECISION" ? "executive" : m.authority === "MIXED" ? "mixed" : "system")}
+            onClick={() => setActive(m.key)}
+            title={m.purpose}
+          >
+            <span className="bid-module-id">{m.id}</span>
+            <span>{m.title}</span>
+          </button>
         ))}
-        <Link to="/projects/pj2608-0550/access" className="bid-drill">Team Access</Link>
-        <Link to="/projects/pj2608-0550/paga" className="bid-drill">Open PAGA Engineering →</Link>
+        <Link to="/projects/pj2608-0550/access" className="bid-drill"><b>11.0</b> Team Access</Link>
+        <Link to="/projects/pj2608-0550/paga" className="bid-drill system"><b>12.1</b> Open PAGA Engineering →</Link>
       </nav>
 
       {active === "overview" && <Overview />}
@@ -212,7 +217,7 @@ function Overview() {
       <section className="bid-panel">
         <div className="bid-panel-head">
           <div>
-            <small>BID INPUT PACK</small>
+            <small>1.1 · BID INPUT PACK</small>
             <h2>ข้อมูลที่ระบบต้องอ่านก่อนทำราคา</h2>
           </div>
           <span className="bid-chip">4 SOURCE GROUPS</span>
@@ -234,7 +239,7 @@ function Overview() {
       <section className="bid-panel">
         <div className="bid-panel-head">
           <div>
-            <small>WHAT MUST COME OUT</small>
+            <small>1.2 · WHAT MUST COME OUT</small>
             <h2>ผลลัพธ์สุดท้ายที่ใช้ยื่นราคา</h2>
           </div>
           <span className="bid-chip">SUBMISSION CONTROL</span>
@@ -252,7 +257,7 @@ function Overview() {
       </section>
 
       <section className="bid-panel bid-highlight">
-        <small>THE CONNECTION TO FIRST PRINCIPLES</small>
+        <small>1.3 · REQUIREMENT-TO-SUBMISSION LOGIC</small>
         <h2>First Principles เป็น “เครื่องมือหลังบ้าน” เพื่อให้เราตอบเอกสารเสนอราคาได้อย่างมีหลักฐาน</h2>
         <div className="bid-connection">
           <div><span>Contract / Technical Requirement</span><strong>What must we accept?</strong></div>
