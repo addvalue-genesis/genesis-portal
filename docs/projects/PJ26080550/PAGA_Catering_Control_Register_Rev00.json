@@ -1,6 +1,17 @@
 {
   "project_code": "PJ2608-0550",
   "system_code": "PAGA",
+  "internal_system_no": 7,
+  "module_id": "12.7",
+  "system_token": "TEL-PAGA",
+  "rfq_binding": {
+    "mr": "MM-ASK-1A-APF-TEL-MR-0001 Rev.A1 · Appendix 1.4",
+    "phi": "MM-ASK-1A-APF-TEL-PHI-0001 · §7.3.4",
+    "bod": "MM-ASK-1A-APF-TEL-BOD-0001 Rev.C8 · §7.1.4",
+    "spe": "MM-ASK-1A-APF-TEL-SPE-0004",
+    "std": "10008-STD-6-TEL-007",
+    "tel021": "01 PAGA-A; 02 PAGA-B only if project evidence confirms B-loop applicability"
+  },
   "location_code": "APF-CATERING",
   "revision": "Rev00",
   "status": "INTERNAL_WORKING_PREVIEW",
