@@ -645,7 +645,7 @@ function SystemPictureView() {
     <div className="etm-content-stack">
       <section className="etm-panel paga-picture-hero">
         <div>
-          <div className="etm-section-kicker">PAGA SYSTEM PICTURE · CATERING · FACT + DUMMY PREVIEW</div>
+          <div className="etm-section-kicker">12.1.1 · PAGA SYSTEM PICTURE · CATERING · FACT + DUMMY PREVIEW</div>
           <h2>เห็นระบบทั้งเส้นก่อน — ข้อมูลที่ยังไม่มีใช้ Dummy เพื่อให้ Engineering Flow ทำงานได้</h2>
           <p>
             <strong>Blue = Project / historical fact</strong>, <strong>Green = INDUSTRONIC offered evidence</strong>,
@@ -788,7 +788,7 @@ function TraceView() {
       <section className="etm-panel">
         <div className="etm-panel-head">
           <div>
-            <div className="etm-section-kicker">VERTICAL SLICE · CATERING</div>
+            <div className="etm-section-kicker">12.1.2 · REQUIREMENT / EVIDENCE · CATERING</div>
             <h2>จาก Requirement ไปสู่ผลลัพธ์ที่ใช้ทำงานจริง</h2>
             <p>
               อ่านจากซ้ายไปขวา: เราเริ่มจากหลักฐาน/ข้อกำหนด แล้วใช้ CAL / SDY / RPT พิสูจน์
@@ -896,7 +896,7 @@ function ProofView() {
     <section className="etm-panel">
       <div className="etm-panel-head">
         <div>
-          <div className="etm-section-kicker">ENGINEERING PROOF</div>
+          <div className="etm-section-kicker">12.1.3 · ENGINEERING PROOF</div>
           <h2>CAL / SDY / RPT — not one document type</h2>
           <p>Each proof object has its own inputs, equation / method, result and release status.</p>
         </div>
@@ -940,7 +940,7 @@ function MtoView() {
       <section className="etm-panel">
         <div className="etm-panel-head">
           <div>
-            <div className="etm-section-kicker">ENGINEERING TRUTH VS SUPPLIER TRUTH</div>
+            <div className="etm-section-kicker">12.1.4 · REQUIRED MTO / VENDOR</div>
             <h2>Required MTO → Vendor Offered → Gap</h2>
             <p>Vendor BOM never becomes the requirement. Required quantity must come from controlled engineering proof.</p>
           </div>
