@@ -289,27 +289,30 @@ const CHATGPT_CAN_DO = [
   { label: "Freeze final coverage / cable loss / final MTO", state: "WAITING INPUT" },
 ];
 
-const DECISIONS = [
+const RESOLUTION_QUEUE = [
   {
-    id: "DEC-PAGA-009",
-    topic: "Catering two-loop topology",
-    proposal: "Use Loop A = LSN-303-201..205 and Loop B = LSN-303-206..208 as a preliminary working hypothesis only.",
-    confidence: "MEDIUM",
-    impact: "Allows preliminary loop-load organization but cannot release cable / final MTO.",
+    id: "RES-PAGA-009",
+    topic: "Catering loop topology",
+    systemAction: "Reconcile BLD / LIS / vendor architecture and derive loop arrangement from controlled evidence.",
+    currentBasis: "Two-loop arrangement remains a working hypothesis only.",
+    state: "SYSTEM TO RESOLVE",
+    escalation: "Raise TC/TQ only if governing sources remain incomplete/conflicting. Jack decision not required."
   },
   {
-    id: "DEC-PAGA-008",
-    topic: "Acoustic criterion",
-    proposal: "Use ≥65 dBA and +10 to +20 dB above ambient for preliminary speech design so both project minimum and PTTEP STD are satisfied.",
-    confidence: "HIGH WORKING",
-    impact: "May increase speaker / tap requirement versus a +6 dB-only interpretation.",
+    id: "RES-PAGA-008",
+    topic: "Acoustic design criterion",
+    systemAction: "Apply SPE/STD sound-level requirements and verify by coverage study.",
+    currentBasis: "≥65 dBA, speech +10 to +20 dB above ambient; alarm +6 dB; beacon if ambient ≥85 dBA.",
+    state: "SOURCE-BASED",
+    escalation: "No Jack decision required unless business chooses to accept a documented deviation."
   },
   {
-    id: "OPEN-SPARE",
-    topic: "N+1 vs 25% future spare",
-    proposal: "Do not double-count automatically; keep future-spare compliance open until vendor architecture / project interpretation is reconciled.",
-    confidence: "OPEN",
-    impact: "Can change amplifier quantity, rack size, power and price.",
+    id: "RES-PAGA-SPARE",
+    topic: "N+1 vs future spare capacity",
+    systemAction: "Separate redundancy requirement from future expansion/spare-capacity requirement, then reconcile vendor architecture.",
+    currentBasis: "SPE requires N+1 remote amplifier and minimum future spare/expansion provisions.",
+    state: "SYSTEM TO RECONCILE",
+    escalation: "Escalate only if residual commercial/risk acceptance remains after technical interpretation is closed."
   },
 ];
 
@@ -582,26 +585,22 @@ export function PagaWorkspace() {
         <section className="etm-decision-panel">
           <div className="etm-panel-head">
             <div>
-              <div className="etm-section-kicker">DECISION QUEUE</div>
-              <h2>Working decisions ที่ต้องควบคุม ไม่ให้ Assumption กลายเป็น Fact</h2>
+              <div className="etm-section-kicker">TECHNICAL RESOLUTION QUEUE</div>
+              <h2>สิ่งที่ระบบต้องค้นหลักฐานและปิดคำตอบเอง — ไม่โยน Technical choice ให้ Jack เดา</h2>
             </div>
             <span className="etm-preview-action-note">Actions below are Rev0 UI preview</span>
           </div>
           <div className="etm-decision-grid">
-            {DECISIONS.map((d) => (
+            {RESOLUTION_QUEUE.map((d) => (
               <article key={d.id} className="etm-decision-card">
                 <div className="etm-decision-top">
                   <code>{d.id}</code>
-                  <StatusPill status={d.confidence} small />
+                  <StatusPill status={d.state} small />
                 </div>
                 <h3>{d.topic}</h3>
-                <p>{d.proposal}</p>
-                <small>{d.impact}</small>
-                <div className="etm-decision-actions">
-                  <button type="button">Accept working basis</button>
-                  <button type="button">Keep TBC</button>
-                  <button type="button">Create TC / Ask Vendor</button>
-                </div>
+                <p><strong>System action:</strong> {d.systemAction}</p>
+                <p><strong>Current basis:</strong> {d.currentBasis}</p>
+                <small>{d.escalation}</small>
               </article>
             ))}
           </div>
