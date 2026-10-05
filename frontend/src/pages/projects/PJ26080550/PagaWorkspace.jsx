@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import "./PagaWorkspace.css";
 import { PAGA_VIEW_MODULES } from "./Project0550ModuleRegistry";
 
@@ -377,6 +378,7 @@ export function PagaWorkspace() {
           <p className="etm-subtitle">SAM PTTEPI MY ASK TEL [MMC24-5002]</p>
         </div>
         <div className="etm-hero-actions">
+          <Link to="/projects/pj2608-0550/systems" className="etm-back-link">← 12.0 · 19 Systems</Link>
           <span className={`etm-mode ${mode === "LIVE DB" ? "live" : "preview"}`}>{mode}</span>
           <span className="etm-release">MTO RELEASE: NOT READY</span>
         </div>
