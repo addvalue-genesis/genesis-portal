@@ -1,14 +1,8 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./PagaWorkspace.css";
+import { PAGA_VIEW_MODULES } from "./Project0550ModuleRegistry";
 
-const VIEWS = [
-  { key: "system", label: "0. PAGA System Picture" },
-  { key: "trace", label: "1. Requirement → Result" },
-  { key: "proof", label: "2. Engineering Proof" },
-  { key: "mto", label: "3. MTO → Vendor" },
-  { key: "vdrl", label: "4. VDRL → Manhour" },
-  { key: "lifecycle", label: "5. Delivery → Cost" },
-];
+const VIEWS = PAGA_VIEW_MODULES.map((m)=>({ key:m.key, label:`${m.id} · ${m.title}` }));
 
 const LOCATIONS = [
   { code: "APF-CATERING", name: "Catering", state: "ACTIVE", detail: "Vertical slice in progress" },
@@ -374,7 +368,7 @@ export function PagaWorkspace() {
     <div className="etm-shell">
       <header className="etm-hero">
         <div>
-          <div className="etm-eyebrow">GENESIS · Engineering Truth Model · Rev0</div>
+          <div className="etm-eyebrow">12.1 · PAGA ENGINEERING · EVIDENCE-CONTROLLED SYSTEM RESOLUTION</div>
           <div className="etm-title-line">
             <h1>PJ2608-0550</h1>
             <span className="etm-divider">/</span>
@@ -585,7 +579,7 @@ export function PagaWorkspace() {
         <section className="etm-decision-panel">
           <div className="etm-panel-head">
             <div>
-              <div className="etm-section-kicker">TECHNICAL RESOLUTION QUEUE</div>
+              <div className="etm-section-kicker">12.1.7 · TECHNICAL RESOLUTION QUEUE</div>
               <h2>สิ่งที่ระบบต้องค้นหลักฐานและปิดคำตอบเอง — ไม่โยน Technical choice ให้ Jack เดา</h2>
             </div>
             <span className="etm-preview-action-note">Actions below are Rev0 UI preview</span>
