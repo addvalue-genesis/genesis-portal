@@ -56,3 +56,25 @@ body{margin:0;background:#f4f7fb;color:var(--bid-ink)}
 .vdrl-source-rev{display:inline-flex;padding:3px 6px;border-radius:6px;background:#eef4ff;color:#2c5a9c;font-size:7.5px;font-weight:800}
 .vdrl-deliverable-rev{display:inline-flex;padding:3px 6px;border-radius:6px;background:#f4f5f7;color:#586779;font-size:7.5px;font-weight:800}
 .vdrl-hist-btn{border:1px solid #ccd6e2;background:#fff;border-radius:6px;padding:4px 6px;font-size:7.5px;color:#40546c;cursor:pointer}
+
+
+/* Viewport-fit pass */
+.bid-shell,.bid-panel,.bid-source-card,.bid-output-card,.bid-price-card,.bid-control-grid>div{min-width:0;max-width:100%}
+.bid-goal-route,.bid-connection,.vdrl-generator-map{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:7px;overflow:visible;width:100%
+}
+.bid-goal-route>div,.bid-connection>div,.vdrl-generator-map>div{min-width:0;width:100%;overflow-wrap:anywhere}
+.bid-goal-route>em,.bid-connection>em,.vdrl-generator-map>em{display:none}
+.bid-tabs{display:flex;flex-wrap:wrap;overflow:visible}
+.bid-tabs button,.bid-drill{min-width:0;white-space:normal}
+.bid-form-actions input,.vdrl-toolbar input{min-width:0}
+.bid-table-wrap{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+.bid-callout strong,.vdrl-history-note strong,.vdrl-warning strong,.vdrl-revision-control strong{white-space:normal}
+@media(max-width:760px){
+  .bid-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+  .bid-tabs button,.bid-drill{width:100%}
+  .bid-form-stats,.vdrl-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media(max-width:520px){
+  .bid-tabs,.bid-form-stats,.vdrl-stats{grid-template-columns:1fr}
+}
