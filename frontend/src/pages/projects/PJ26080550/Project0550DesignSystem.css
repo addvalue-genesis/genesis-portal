@@ -221,3 +221,13 @@
 }
 :is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) th{font-size:11px}
 :is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) td{font-size:12px}
+
+
+/* 12.0 System Engineering index participates in the same project typography system. */
+.sys-shell{font-size:var(--p0550-fs-base);line-height:var(--p0550-lh-body)}
+.sys-hero h1{font-size:var(--p0550-fs-page);line-height:1.15}
+.sys-card h2{font-size:var(--p0550-fs-card-title);line-height:1.35}
+.sys-pattern h2{font-size:var(--p0550-fs-section);line-height:1.3}
+.sys-hero p,.sys-pattern p{font-size:var(--p0550-fs-body);line-height:var(--p0550-lh-body)}
+.sys-principle span,.sys-bindings span,.sys-card footer a,.sys-card footer span{font-size:var(--p0550-fs-label)}
+.sys-hero small,.sys-pattern>small,.sys-bindings small,.sys-state,.sys-card>code{font-size:var(--p0550-fs-min)}
