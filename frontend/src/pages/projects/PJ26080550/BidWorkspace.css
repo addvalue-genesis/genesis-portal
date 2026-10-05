@@ -78,3 +78,19 @@ body{margin:0;background:#f4f7fb;color:var(--bid-ink)}
 @media(max-width:520px){
   .bid-tabs,.bid-form-stats,.vdrl-stats{grid-template-columns:1fr}
 }
+
+
+/* Hierarchical module navigation */
+.bid-module-legend{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 7px}
+.bid-module-legend span{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:800;border:1px solid #d9e2ec;background:#fff}
+.bid-module-legend .system{border-color:#b9d2f4;color:#285f9e;background:#f4f8fe}
+.bid-module-legend .executive{border-color:#d7c7f4;color:#6940a5;background:#faf7ff}
+.bid-module-legend .mixed{border-color:#f0d39e;color:#8b5b00;background:#fffaf0}
+.bid-module-tab{display:flex!important;align-items:center;gap:7px;text-align:left}
+.bid-module-id{display:inline-flex;align-items:center;justify-content:center;min-width:35px;padding:4px 6px;border-radius:7px;font-weight:900;background:#edf2f7;color:#42536a}
+.bid-module-tab.system{border-left:3px solid #4b83c5}
+.bid-module-tab.executive{border-left:3px solid #7d56b3}
+.bid-module-tab.mixed{border-left:3px solid #d19a2b}
+.bid-module-tab.executive .bid-module-id{background:#f1eaff;color:#6940a5}
+.bid-module-tab.mixed .bid-module-id{background:#fff2d8;color:#8b5b00}
+.bid-drill b{margin-right:5px}
