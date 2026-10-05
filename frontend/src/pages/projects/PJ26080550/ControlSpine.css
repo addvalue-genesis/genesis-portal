@@ -44,3 +44,14 @@
 .cs-live-trace>strong{font-size:.75rem;letter-spacing:.06em;color:#607080}
 @media(max-width:980px){.cs-live-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:620px){.cs-live-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Viewport-fit pass */
+.cs-shell,.cs-panel,.cs-card,.cs-rule-grid article,.cs-state-grid article,.cs-live-grid>div{min-width:0;max-width:100%}
+.cs-route{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:.45rem;overflow:visible;width:100%}
+.cs-route div{min-width:0;width:100%;overflow-wrap:anywhere}
+.cs-route em{display:none}
+.cs-panel-head input{min-width:0;max-width:420px;width:100%}
+.cs-table-wrap{max-width:100%;overflow-x:auto;overscroll-behavior-inline:contain}
+@media(max-width:700px){.cs-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.cs-tabs button{width:100%}}
+@media(max-width:480px){.cs-tabs{grid-template-columns:1fr}}
