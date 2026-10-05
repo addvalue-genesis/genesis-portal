@@ -5,6 +5,7 @@ import { Employees } from "./pages/Employees";
 import { PagaWorkspace } from "./pages/projects/PJ26080550/PagaWorkspace";
 import { BidWorkspace } from "./pages/projects/PJ26080550/BidWorkspace";
 import { AccessControl } from "./pages/projects/PJ26080550/AccessControl";
+import "./pages/projects/PJ26080550/Project0550DesignSystem.css";
 
 const STRINGS = {
   th: {
