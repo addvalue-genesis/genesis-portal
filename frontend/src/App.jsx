@@ -5,6 +5,7 @@ import { Employees } from "./pages/Employees";
 import { PagaWorkspace } from "./pages/projects/PJ26080550/PagaWorkspace";
 import { BidWorkspace } from "./pages/projects/PJ26080550/BidWorkspace";
 import { AccessControl } from "./pages/projects/PJ26080550/AccessControl";
+import { SystemEngineeringIndex } from "./pages/projects/PJ26080550/SystemEngineeringIndex";
 import "./pages/projects/PJ26080550/Project0550DesignSystem.css";
 
 const STRINGS = {
@@ -65,6 +66,7 @@ export function App() {
             <Route path="/employees" element={<Employees lang={lang} />} />
             <Route path="/projects/pj2608-0550/bid" element={<BidWorkspace lang={lang} />} />
             <Route path="/projects/pj2608-0550/access" element={<AccessControl lang={lang} />} />
+            <Route path="/projects/pj2608-0550/systems" element={<SystemEngineeringIndex lang={lang} />} />
             <Route path="/projects/pj2608-0550/paga" element={<PagaWorkspace lang={lang} />} />
           </Routes>
         </main>
