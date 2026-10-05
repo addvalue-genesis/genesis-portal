@@ -200,3 +200,24 @@
     --p0550-fs-page:25px;
   }
 }
+
+
+/* Hard readability floor: protects against legacy 7–10px module rules. */
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) small,
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) code{
+  font-size:var(--p0550-fs-min);
+  line-height:1.35;
+}
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) button,
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) input,
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) select,
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) a{
+  font-size:var(--p0550-fs-label);
+}
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) p,
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) li,
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) dd{
+  font-size:var(--p0550-fs-body);
+}
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) th{font-size:11px}
+:is(.etm-shell,.bid-shell,.acl-shell,.eq-shell,.ps-shell,.cs-shell) td{font-size:12px}
