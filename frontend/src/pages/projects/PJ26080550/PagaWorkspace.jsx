@@ -368,7 +368,7 @@ export function PagaWorkspace() {
     <div className="etm-shell">
       <header className="etm-hero">
         <div>
-          <div className="etm-eyebrow">12.1 · PAGA ENGINEERING · EVIDENCE-CONTROLLED SYSTEM RESOLUTION</div>
+          <div className="etm-eyebrow">12.7 · PAGA ENGINEERING · EVIDENCE-CONTROLLED SYSTEM RESOLUTION</div>
           <div className="etm-title-line">
             <h1>PJ2608-0550</h1>
             <span className="etm-divider">/</span>
@@ -579,7 +579,7 @@ export function PagaWorkspace() {
         <section className="etm-decision-panel">
           <div className="etm-panel-head">
             <div>
-              <div className="etm-section-kicker">12.1.7 · TECHNICAL RESOLUTION QUEUE</div>
+              <div className="etm-section-kicker">12.7.7 · TECHNICAL RESOLUTION QUEUE</div>
               <h2>สิ่งที่ระบบต้องค้นหลักฐานและปิดคำตอบเอง — ไม่โยน Technical choice ให้ Jack เดา</h2>
             </div>
             <span className="etm-preview-action-note">Actions below are Rev0 UI preview</span>
@@ -645,7 +645,7 @@ function SystemPictureView() {
     <div className="etm-content-stack">
       <section className="etm-panel paga-picture-hero">
         <div>
-          <div className="etm-section-kicker">12.1.1 · PAGA SYSTEM PICTURE · CATERING · FACT + DUMMY PREVIEW</div>
+          <div className="etm-section-kicker">12.7.1 · PAGA SYSTEM PICTURE · CATERING · FACT + DUMMY PREVIEW</div>
           <h2>เห็นระบบทั้งเส้นก่อน — ข้อมูลที่ยังไม่มีใช้ Dummy เพื่อให้ Engineering Flow ทำงานได้</h2>
           <p>
             <strong>Blue = Project / historical fact</strong>, <strong>Green = INDUSTRONIC offered evidence</strong>,
@@ -788,7 +788,7 @@ function TraceView() {
       <section className="etm-panel">
         <div className="etm-panel-head">
           <div>
-            <div className="etm-section-kicker">12.1.2 · REQUIREMENT / EVIDENCE · CATERING</div>
+            <div className="etm-section-kicker">12.7.2 · REQUIREMENT / EVIDENCE · CATERING</div>
             <h2>จาก Requirement ไปสู่ผลลัพธ์ที่ใช้ทำงานจริง</h2>
             <p>
               อ่านจากซ้ายไปขวา: เราเริ่มจากหลักฐาน/ข้อกำหนด แล้วใช้ CAL / SDY / RPT พิสูจน์
@@ -896,7 +896,7 @@ function ProofView() {
     <section className="etm-panel">
       <div className="etm-panel-head">
         <div>
-          <div className="etm-section-kicker">12.1.3 · ENGINEERING PROOF</div>
+          <div className="etm-section-kicker">12.7.3 · ENGINEERING PROOF</div>
           <h2>CAL / SDY / RPT — not one document type</h2>
           <p>Each proof object has its own inputs, equation / method, result and release status.</p>
         </div>
@@ -940,7 +940,7 @@ function MtoView() {
       <section className="etm-panel">
         <div className="etm-panel-head">
           <div>
-            <div className="etm-section-kicker">12.1.4 · REQUIRED MTO / VENDOR</div>
+            <div className="etm-section-kicker">12.7.4 · REQUIRED MTO / VENDOR</div>
             <h2>Required MTO → Vendor Offered → Gap</h2>
             <p>Vendor BOM never becomes the requirement. Required quantity must come from controlled engineering proof.</p>
           </div>
