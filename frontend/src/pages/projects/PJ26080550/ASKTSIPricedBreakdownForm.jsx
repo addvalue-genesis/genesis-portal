@@ -69,6 +69,17 @@ function money(value,currency="USD"){
   }
 }
 
+function displayAmount(line,currency,field){
+  const value=lineAmount(line,currency,field);
+  if(value!==null && value!==undefined && value!=="") return money(value,currency);
+
+  const map = field==="unitPrice" ? line.unitPriceByCurrency : line.subtotalByCurrency;
+  if(map && Number.isFinite(map.EUR)){
+    return money(map.EUR,"EUR")+" · FX TBC";
+  }
+  return "—";
+}
+
 function stateTone(state){
   const s=String(state||"TBC").toLowerCase();
   if(s.includes("ready")||s.includes("approved")||s.includes("controlled")) return "good";
@@ -178,8 +189,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td><strong>{description}</strong>{line.state?<><br/><Status state={line.state}/></>:null}</td>
                     <td>{line.qty ?? 1}</td>
                     <td>{line.unit || "Lot"}</td>
-                    <td>{money(lineAmount(line,currency,"unitPrice"),currency)}</td>
-                    <td>{money(lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice"),currency)}</td>
+                    <td>{displayAmount(line,currency,"unitPrice")}</td>
+                    <td>{displayAmount(line,currency,"subtotal")}</td>
                     <td><RemarkCell base={line.sourceRemark || t.sourceRemarks.A_DEFAULT} line={line} mode={mode}/></td>
                   </tr>
                 );
@@ -202,8 +213,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td>{line.tagNo || ""}</td>
                     <td>{line.qty ?? "1 lot"}</td>
                     <td>{line.unit || ""}</td>
-                    <td>{money(lineAmount(line,currency,"unitPrice"),currency)}</td>
-                    <td>{money(lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice"),currency)}</td>
+                    <td>{displayAmount(line,currency,"unitPrice")}</td>
+                    <td>{displayAmount(line,currency,"subtotal")}</td>
                     <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
                   </tr>
                 );
@@ -232,8 +243,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td>{line.tagNo || ""}</td>
                     <td>{line.qty ?? "1 lot"}</td>
                     <td>{line.unit || ""}</td>
-                    <td>{money(lineAmount(line,currency,"unitPrice"),currency)}</td>
-                    <td>{money(lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice"),currency)}</td>
+                    <td>{displayAmount(line,currency,"unitPrice")}</td>
+                    <td>{displayAmount(line,currency,"subtotal")}</td>
                     <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
                   </tr>
                 );
