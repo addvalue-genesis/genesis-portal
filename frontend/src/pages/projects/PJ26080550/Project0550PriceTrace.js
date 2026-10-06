@@ -64,7 +64,18 @@ function serviceTrace(description,equations=SERVICE_EQUATIONS){
 }
 
 export const PROJECT0550_PRICE_TRACE = {
-  "A1-01": goodsTrace("Network System / KU-Band Internet price line"),
+  "A1-01": {
+    modelClass:"COMPOSITE CUSTOMER-FORM LINE / NETWORK + KU + AIS COMPONENT",
+    sourceBasis:"Current 0550 controlled system registry + Rev07 controlled pricing baseline + Jason QT2026-160 AIS component evidence.",
+    requirement:"Treat TEL-LAN, TEL-VSAT-KU and TEL-AIS as separate engineering systems even though the ASK-TSI customer form currently rolls them into A1-01. A form label must not redefine engineering scope.",
+    constraint:"Do not infer AIS requirement from the Network/KU label. Confirm AIS onshore/offshore/free-issue/interface responsibility, avoid double counting any historical AIS allowance, and keep KU recurring OPEX separate from CAPEX.",
+    proof:"Network/KU require their applicable capacity/link/interface proof; AIS requires handoff/interface/port/bandwidth verification and commercial-scope confirmation. Vendor price evidence is not proof of the required quantity by itself.",
+    quantityDriver:"Derive TEL-LAN, TEL-VSAT-KU and TEL-AIS quantities independently from their source/constraints/proof, then roll them into A1-01 only after controlled commercial mapping.",
+    equations:GOODS_EQUATIONS,
+    costObject:"Current A1-01 displayed value remains the Rev07 controlled composite baseline. Jason QT2026-160 adds a current FURUNO FA-170 AIS component anchor of THB 180,000, but it must replace only the isolated AIS allowance after mapping is proven; it must not be added blindly on top of the existing composite value.",
+    commercialRule:"Reconcile each engineering system first, then perform the customer-form roll-up. No AIS replacement/addition until the previously embedded AIS cost is identified, preventing double counting.",
+    releaseState:"BUDGETARY / PARTIAL — AIS current component quote bound; Network/KU quote and AIS commercial mapping remain open",
+  },
   "A1-02": goodsTrace("VSAT System price line"),
   "A1-03": goodsTrace("Video Conference System price line"),
   "A1-04": goodsTrace("IP Telephony / PABX price line"),
