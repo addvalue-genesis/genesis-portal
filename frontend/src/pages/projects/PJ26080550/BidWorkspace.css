@@ -525,3 +525,150 @@ body{margin:0;background:#f4f7fb;color:var(--bid-ink)}
 @media(max-width:1000px){
   .ask-price-source-detail{grid-template-columns:1fr}
 }
+
+
+/* Trace sub-menu: source evidence separated from engineering / reconciliation / build-up */
+.ask-trace-subtabs{
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+  margin-top:10px;
+  padding:6px;
+  border:1px solid #cfdbe7;
+  border-radius:8px;
+  background:#eef4f9;
+}
+.ask-trace-subtabs button{
+  border:1px solid #b9c8d6;
+  border-radius:6px;
+  padding:5px 8px;
+  background:#fff;
+  color:#335a7e;
+  font-size:7.5px;
+  font-weight:800;
+  cursor:pointer;
+}
+.ask-trace-subtabs button.active{
+  background:#173b5d;
+  color:#fff;
+  border-color:#173b5d;
+}
+.ask-vendor-view,.ask-recon-view,.ask-build-view,.ask-gaps-view{
+  margin-top:8px;
+}
+.ask-vendor-head{
+  display:grid;
+  grid-template-columns:1.5fr .8fr 1fr;
+  gap:7px;
+}
+.ask-vendor-head>div{
+  border:1px solid #d5dfe8;
+  border-radius:8px;
+  padding:9px;
+  background:#fff;
+}
+.ask-vendor-head small{
+  display:block;
+  color:#61758a;
+  font-size:6.8px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.ask-vendor-head strong{
+  display:block;
+  margin-top:4px;
+  color:#173e61;
+  font-size:9px;
+}
+.ask-vendor-head span{
+  display:block;
+  margin-top:4px;
+  color:#68788a;
+  font-size:7.2px;
+  line-height:1.4;
+}
+.ask-vendor-table-wrap{
+  margin-top:7px;
+  overflow-x:auto;
+  border:1px solid #ccd7e1;
+  border-radius:8px;
+  background:#fff;
+}
+.ask-vendor-table,.ask-recon-table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:880px;
+}
+.ask-vendor-table th,.ask-vendor-table td,
+.ask-recon-table th,.ask-recon-table td{
+  border:1px solid #dce4eb!important;
+  padding:6px 7px!important;
+  font-size:7.2px!important;
+  line-height:1.35!important;
+  background:#fff;
+}
+.ask-vendor-table th,.ask-recon-table th{
+  background:#eaf0f5!important;
+  color:#40566e!important;
+  font-weight:900!important;
+}
+.ask-vendor-table td:nth-child(5),
+.ask-vendor-table td:nth-child(6){
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.ask-vendor-table small{
+  display:block;
+  margin-top:3px;
+  color:#768494;
+  font-size:6.5px;
+}
+.ask-source-lock{
+  display:flex;
+  gap:6px;
+  margin-top:7px;
+  padding:7px 9px;
+  border-left:3px solid #2e6ea2;
+  background:#edf5fb;
+  color:#52687e;
+  font-size:7.2px;
+}
+.ask-source-lock strong{white-space:nowrap}
+.ask-empty-source{
+  border:1px dashed #c5d0db;
+  border-radius:8px;
+  padding:14px;
+  background:#fff;
+  text-align:left;
+}
+.ask-empty-source strong{
+  display:block;
+  color:#8b4a20;
+  font-size:8.5px;
+}
+.ask-empty-source span,.ask-empty-source p{
+  display:block;
+  margin-top:5px;
+  color:#667789;
+  font-size:7.5px;
+  line-height:1.45;
+}
+.ask-gap-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin-top:8px;
+}
+.ask-gap-list span{
+  display:inline-flex;
+  padding:5px 7px;
+  border:1px solid #ebc8bd;
+  border-radius:6px;
+  background:#fff4f1;
+  color:#8a4739;
+  font-size:7.2px;
+}
+@media(max-width:900px){
+  .ask-vendor-head{grid-template-columns:1fr}
+}
