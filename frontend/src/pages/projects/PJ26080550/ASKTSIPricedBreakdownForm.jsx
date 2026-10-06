@@ -193,6 +193,41 @@ function rowValue(lines,code){
   return lines?.[code] || {};
 }
 
+function vendorQuotedCost(vendorOffer){
+  if(!vendorOffer) return null;
+  if(Number.isFinite(vendorOffer.quotedFinal)) return vendorOffer.quotedFinal;
+  const items=(vendorOffer.vendorItems||[]).filter(x=>x.inFinal!==false && Number.isFinite(x.total));
+  if(!items.length) return null;
+  return items.reduce((sum,x)=>sum+Number(x.total),0);
+}
+
+function commercialLayerStatus(code,audit,trace,line){
+  const build=(audit?.buildUp||[]);
+  const selling=build.find(x=>/SELLING PRICE/i.test(String(x.priceClass||"")));
+  if(selling){
+    return {
+      state:"COMMERCIAL RULE APPLIED",
+      detail:"Displayed controlled line includes the modeled commercial transformation shown in Price Build-up."
+    };
+  }
+  if(code==="A1-05" || /not yet the final customer selling line|final customer sell not released/i.test(String(trace?.commercialRule||"")+" "+String(trace?.releaseState||""))){
+    return {
+      state:"NOT YET APPLIED / SELLING PRICE HOLD",
+      detail:"Vendor/selected cost is controlled, but the final customer selling line has not been released."
+    };
+  }
+  if(/HOLD|OPEN|TBC/i.test(String(line?.state||""))){
+    return {
+      state:"COMMERCIAL TREATMENT OPEN",
+      detail:"The displayed baseline is not a released final selling price. Review Price Build-up / Engineering Trace."
+    };
+  }
+  return {
+    state:"CONTROLLED BASELINE — VERIFY BUILD-UP",
+    detail:"Use Price Build-up and Commercial Rule to confirm which markup/allowance layers are already included."
+  };
+}
+
 function lineAmount(line,currency,field){
   const map = field==="unitPrice" ? line.unitPriceByCurrency : line.subtotalByCurrency;
   if(map && Object.prototype.hasOwnProperty.call(map,currency)) return map[currency];
@@ -222,6 +257,8 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const displayed=displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
   const [traceTab,setTraceTab]=useState("OVERVIEW");
   const sourceInfo=classifyProject0550PriceLine(code,line);
+  const vendorCost=vendorQuotedCost(vendorOffer);
+  const commercialStatus=commercialLayerStatus(code,audit,trace,line);
 
   const nodes=[
     ["Requirement",trace.requirement],
@@ -273,7 +310,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             <div className="ask-line-overview">
               <div className="ask-overview-grid">
                 <div>
-                  <small>Displayed line</small>
+                  <small>Displayed controlled line</small>
                   <strong>{displayed}</strong>
                   <span>{line.state || "TBC"}</span>
                 </div>
@@ -368,6 +405,18 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             <div className="ask-vendor-view">
               {vendorOffer ? (
                 <>
+                  <div className="ask-cost-layer-banner">
+                    <div>
+                      <small>PRICE LAYER 1 · SOURCE COST</small>
+                      <strong>VENDOR OFFER — AS QUOTED · BEFORE PROJECT COMMERCIAL RULE</strong>
+                      <span>ตัวเลขใน tab นี้คือราคาที่ supplier เสนอมาโดยตรง ใช้เป็น procurement/source cost input. ยังไม่ใช่ราคาขายลูกค้าของ ADDVALUE/SAMTEL เว้นแต่มีการระบุเป็นอย่างอื่นใน source.</span>
+                    </div>
+                    <div>
+                      <small>COMMERCIAL STATUS</small>
+                      <strong>{commercialStatus.state}</strong>
+                      <span>{commercialStatus.detail}</span>
+                    </div>
+                  </div>
                   <div className="ask-vendor-head">
                     <div>
                       <small>AS-QUOTED SOURCE</small>
@@ -380,8 +429,8 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                       <span>{vendorOffer.incoterm || vendorOffer.status || ""}</span>
                     </div>
                     <div>
-                      <small>Quoted Final</small>
-                      <strong>{Number.isFinite(vendorOffer.quotedFinal) ? money(vendorOffer.quotedFinal,vendorOffer.currency) : "PARTIAL / NO SINGLE PACKAGE TOTAL"}</strong>
+                      <small>Vendor Net / Quoted Final · Cost Input</small>
+                      <strong>{Number.isFinite(vendorOffer.quotedFinal) ? money(vendorOffer.quotedFinal,vendorOffer.currency) : (Number.isFinite(vendorCost) ? money(vendorCost,vendorOffer.currency)+" · mapped quoted items" : "PARTIAL / NO SINGLE PACKAGE TOTAL")}</strong>
                       {Number.isFinite(vendorOffer.quotedTotalBeforeDiscount) ? (
                         <span>Before discount {money(vendorOffer.quotedTotalBeforeDiscount,vendorOffer.currency)} · Discount {money(vendorOffer.discount,vendorOffer.currency)}</span>
                       ) : null}
@@ -396,8 +445,8 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                           <th>Vendor Item — As Quoted</th>
                           <th>Qty</th>
                           <th>Unit</th>
-                          <th>Unit Price</th>
-                          <th>Total</th>
+                          <th>Vendor Unit Price · Cost</th>
+                          <th>Vendor Total · Cost</th>
                           <th>Base / Option</th>
                         </tr>
                       </thead>
@@ -418,7 +467,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                   </div>
                   <div className="ask-source-lock">
                     <strong>Source lock:</strong>
-                    <span>Vendor Offer shows the supplier quotation as received. Do not add requirement corrections in this tab.</span>
+                    <span>Vendor Offer shows supplier/source cost AS RECEIVED and BEFORE ADDVALUE/SAMTEL commercial treatment. Requirement corrections, completion allowances, logistics and mark-up belong in Reconciliation / Price Build-up — not in this tab.</span>
                   </div>
                 </>
               ) : (
@@ -473,7 +522,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
               <div className="ask-price-source-detail">
                 <div><b>Basis</b><span>{audit?.basis || trace.costObject}</span></div>
                 <div><b>Primary source</b><span>{audit?.source || trace.sourceBasis}</span></div>
-                <div><b>Displayed selling line</b><span>{displayed}</span></div>
+                <div><b>Displayed controlled line</b><span>{displayed} · {commercialStatus.state}</span></div>
               </div>
 
               {audit?.quantityBasis?.length ? (
@@ -539,7 +588,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
 
           <div className="ask-engineering-trace-rule">
             <strong>Control:</strong>
-            <span>Vendor Offer = source evidence. Reconciliation = engineering comparison. Price Build-up = controlled cost/commercial transformation. These layers must not be mixed.</span>
+            <span>Vendor Offer = SOURCE COST as quoted. Reconciliation = required vs offered. Price Build-up = completion / landed / lifecycle cost + commercial transformation. Displayed customer selling price is valid only after those layers and release gates are explicitly closed.</span>
           </div>
         </div>
       </td>
