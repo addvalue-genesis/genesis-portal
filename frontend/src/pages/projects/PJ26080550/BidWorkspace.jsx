@@ -315,7 +315,19 @@ function ScopeView() {
 
 function PriceView() {
   const [currency,setCurrency] = useState("USD");
+  const [eurThbFx,setEurThbFx] = useState(() => {
+    if(typeof window==="undefined") return "";
+    return window.localStorage.getItem("pj2608-0550-eur-thb-working-fx") || "";
+  });
   const p = PROJECT0550_PRICING_BASELINE;
+
+  function updateEurThbFx(value){
+    setEurThbFx(value);
+    if(typeof window!=="undefined"){
+      if(value) window.localStorage.setItem("pj2608-0550-eur-thb-working-fx",value);
+      else window.localStorage.removeItem("pj2608-0550-eur-thb-working-fx");
+    }
+  }
 
   return (
     <div className="bid-stack">
@@ -355,14 +367,35 @@ function PriceView() {
           </div>
         </div>
 
-        <div className="bid-filter" style={{marginTop:"12px"}}>
-          {["USD","THB","EUR"].map((x)=>(
-            <button key={x} onClick={()=>setCurrency(x)} className={currency===x?"active":""}>{x}</button>
-          ))}
+        <div className="bid-price-controls">
+          <div className="bid-filter">
+            {["USD","THB","EUR"].map((x)=>(
+              <button key={x} onClick={()=>setCurrency(x)} className={currency===x?"active":""}>{x}</button>
+            ))}
+          </div>
+          <label className="bid-fx-input">
+            <span>EUR/THB Working FX</span>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              inputMode="decimal"
+              value={eurThbFx}
+              onChange={(e)=>updateEurThbFx(e.target.value)}
+              placeholder="กรอก EUR/THB"
+            />
+            <small>{eurThbFx ? "Working conversion only · not firm FX" : "Required to show INDUSTRONIC PAGA in THB/USD"}</small>
+          </label>
         </div>
       </section>
 
-      <ASKTSIPricedBreakdownForm lines={p.lines} currency={currency} mode="INTERNAL" />
+      <ASKTSIPricedBreakdownForm
+        lines={p.lines}
+        currency={currency}
+        mode="INTERNAL"
+        eurThbFx={eurThbFx}
+        usdThbFx={p.fx.thbPerUsd}
+      />
 
       <section className="bid-panel bid-formula-panel">
         <small>PARAMETRIC COST ENGINEERING → CUSTOMER FORM</small>
