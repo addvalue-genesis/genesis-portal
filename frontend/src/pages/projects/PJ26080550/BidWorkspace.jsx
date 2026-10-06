@@ -9,6 +9,7 @@ import { ControlSpine } from "./ControlSpine";
 import { BID_NAV_MODULES } from "./Project0550ModuleRegistry";
 import { Project0550WorkingMemoryPanel, PROJECT0550_TEAM_WORKING_MEMORY } from "./Project0550WorkingMemory";
 import { ASKTSIPricedBreakdownForm } from "./ASKTSIPricedBreakdownForm";
+import { PROJECT0550_PRICING_BASELINE } from "./Project0550PricingBaseline";
 
 const SOURCE_GROUPS = [
   {
@@ -313,22 +314,62 @@ function ScopeView() {
 }
 
 function PriceView() {
+  const [currency,setCurrency] = useState("USD");
+  const p = PROJECT0550_PRICING_BASELINE;
+
   return (
     <div className="bid-stack">
-      <ASKTSIPricedBreakdownForm lines={{}} currency="USD" mode="INTERNAL" />
+      <section className="bid-panel bid-highlight">
+        <div className="bid-panel-head">
+          <div>
+            <small>CURRENT 0550 PRICING BASELINE · {p.revision} · {p.date}</small>
+            <h2>ASK-TSI Priced Breakdown — Current Controlled Price View</h2>
+          </div>
+          <span className="bid-status bad">PROJECT TOTAL: HOLD</span>
+        </div>
+
+        <div className="bid-control-grid">
+          <div>
+            <strong>PAGA Selected</strong>
+            <span>{p.paga.vendor} · {p.paga.offer}</span>
+          </div>
+          <div>
+            <strong>PAGA Known Subtotal</strong>
+            <span>EUR {p.paga.knownSelectedSubtotalEur.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+          </div>
+          <div>
+            <strong>Known A+B excl. open PAGA</strong>
+            <span>USD {p.knownBaseExPaga.usd.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {p.knownBaseExPaga.thb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+          </div>
+          <div>
+            <strong>FX Control</strong>
+            <span>USD/THB = {p.fx.thbPerUsd.toFixed(2)} · EUR/THB = TBC</span>
+          </div>
+        </div>
+
+        <div className="bid-filter" style={{marginTop:"12px"}}>
+          {["USD","THB","EUR"].map((x)=>(
+            <button key={x} onClick={()=>setCurrency(x)} className={currency===x?"active":""}>{x}</button>
+          ))}
+        </div>
+      </section>
+
+      <ASKTSIPricedBreakdownForm lines={p.lines} currency={currency} mode="INTERNAL" />
 
       <section className="bid-panel bid-formula-panel">
         <small>PARAMETRIC COST ENGINEERING → CUSTOMER FORM</small>
         <h2>Form เป็น output ของ Engineering Truth ไม่ใช่แหล่งกำเนิดราคา</h2>
         <div className="bid-formulas">
+          <code>Requirement → Constraint → CAL/Study/RPT → Engineering Proof</code>
           <code>Required Qty = f(Requirement, Constraint, Proof, Quantity Driver)</code>
           <code>MH = Q × UMH × Factor</code>
           <code>Internal Cost = Material + Bulk + Work + Lifecycle + Common + Risk</code>
           <code>Customer Line = CommercialMapping(Controlled Cost, Treatment, Policy)</code>
         </div>
         <p>
-          เมื่อข้อมูลจริงถูก bind จาก MariaDB/JSON แล้ว component นี้ต้องรับค่า Part A / B / C
-          จาก Smart Control + Cost Engine โดยคง TBC / NOT PRICED / OPEN ไว้ตามสถานะจริง.
+          Current baseline ผูก Part A / B / C จาก controlled 0550 pricing state แล้ว.
+          PAGA ใช้ INDUSTRONIC เป็น selected basis; USD/THB และ Project Total ต้องคง HOLD
+          จนกว่า EUR conversion และ OPEN/TBC ของ PAGA จะถูกปิดด้วย source-backed evidence.
         </p>
       </section>
     </div>
