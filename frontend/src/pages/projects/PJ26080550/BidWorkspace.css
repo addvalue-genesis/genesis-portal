@@ -216,3 +216,41 @@ body{margin:0;background:#f4f7fb;color:var(--bid-ink)}
 @media(max-width:900px){
   .ask-price-table{min-width:1050px}
 }
+
+
+/* Price currency + working FX controls */
+.bid-price-controls{
+  display:flex;
+  align-items:flex-end;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:12px;
+}
+.bid-fx-input{
+  display:grid;
+  gap:4px;
+  min-width:230px;
+}
+.bid-fx-input>span{
+  font-size:8px;
+  font-weight:800;
+  color:#53657a;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.bid-fx-input input{
+  width:160px;
+  border:1px solid #c8d2de;
+  border-radius:7px;
+  padding:6px 8px;
+  background:#fff;
+  color:#17263b;
+  font-size:9px;
+  font-variant-numeric:tabular-nums;
+}
+.bid-fx-input small{
+  font-size:7px;
+  color:#7a8797;
+  letter-spacing:0;
+  text-transform:none;
+}
