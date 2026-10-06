@@ -84,7 +84,16 @@ export const PROJECT0550_PRICING_BASELINE = {
     note: "Replaces superseded historical CCTV proxy that used 24 Ex PTZ cameras at THB 500,000 each. Current 0550 known camera population is materially lower. AMS01, final coverage, storage days/bitrate, exact Ex certification and vendor quote remain OPEN/TBC."
   },
   lines: {
-    "A1-01": { unitPriceByCurrency:{USD:862084.14,THB:27155650.44}, subtotalByCurrency:{USD:862084.14,THB:27155650.44}, state:"HISTORICAL / PROXY — CURRENT QUOTE NOT FOUND", internalTrace:"GDrive audit: current 0550 quantity mapping with historical LAN/KU/AIS unit rates and completion allowances. Use as budgetary only until current network/KU quote is received." },
+    "A1-01": {
+      unitPriceByCurrency:{USD:862084.14,THB:27155650.44},
+      subtotalByCurrency:{USD:862084.14,THB:27155650.44},
+      state:"MIXED SOURCE — CURRENT AIS COMPONENT QUOTE + NETWORK/KU HISTORICAL/PROXY",
+      tagNo:"JASON QT2026-160 (AIS COMPONENT) / NETWORK-KU MIXED SOURCE",
+      vendor:"JASON ELECTRONICS (THAILAND) CO., LTD. — AIS component only",
+      quoteRef:"QT2026-160 · FURUNO FA-170 AIS Receiver THB 180,000",
+      internalTrace:"A1-01 is a composite commercial-form line, not one engineering system. Jason QT2026-160 provides a current AIS receiver component at THB 180,000. The displayed A1-01 value remains the existing Rev07 controlled baseline and is intentionally NOT recomputed until the prior AIS allowance and TEL-AIS commercial mapping/free-issue boundary are isolated, preventing double counting. Network/KU current quotations remain open.",
+      openItems:["confirm TEL-AIS commercial mapping / free-issue boundary","isolate historical AIS allowance already embedded in A1-01 before replacement","current LAN/network quotation","current KU equipment quotation","AIS integration / handoff responsibility"]
+    },
     "A1-02": { unitPriceByCurrency:{USD:40839.70,THB:1286450.53}, subtotalByCurrency:{USD:40839.70,THB:1286450.53}, state:"DUMMY / NO CURRENT COMMERCIAL QUOTE", internalTrace:"GDrive audit: VSAT line remains a non-free-issued accessories/cable/interface allowance. THAICOM technical/RFQ documents exist, but no current commercial quotation was found." },
     "A1-03": { unitPriceByCurrency:{USD:81668.87,THB:2572569.47}, subtotalByCurrency:{USD:81668.87,THB:2572569.47}, state:"HISTORICAL UNIT RATE — REPRICE REQUIRED", internalTrace:"GDrive audit: current working VCS quantity uses historical per-system rates. No current VCS vendor quotation found; fourth location/license scope remains open." },
     "A1-04": { unitPriceByCurrency:{USD:99185.56,THB:3124345.26}, subtotalByCurrency:{USD:99185.56,THB:3124345.26}, state:"HISTORICAL UNIT RATE — REPRICE REQUIRED", internalTrace:"GDrive audit: current MR phone/PBX quantities are mapped to historical IP phone/PBX/Ex-phone unit rates. No current Avaya commercial quotation found." },
