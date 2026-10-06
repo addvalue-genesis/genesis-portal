@@ -18,6 +18,12 @@ export const PROJECT0550_PRICING_BASELINE = {
   date: "2026-10-06",
   source: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_INDUSTRONIC-ONLY_20261006.xlsx",
   status: "HOLD",
+  offerComposition: {
+    baseOffer: "PART A + PART B",
+    partC: "OPTIONS / EXCLUDED FROM BASE OFFER UNLESS SELECTED",
+    submittedProjectOffer: "HOLD",
+    rule: "The template Total row is the Base Offer total before Part C options."
+  },
   fx: {
     thbPerUsd: 31.50,
     thbPerEur: null,
