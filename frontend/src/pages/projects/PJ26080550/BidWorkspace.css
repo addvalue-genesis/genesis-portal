@@ -94,3 +94,125 @@ body{margin:0;background:#f4f7fb;color:var(--bid-ink)}
 .bid-module-tab.executive .bid-module-id{background:#f1eaff;color:#6940a5}
 .bid-module-tab.mixed .bid-module-id{background:#fff2d8;color:#8b5b00}
 .bid-drill b{margin-right:5px}
+
+
+/* ASK-TSI Price Breakdown — mirror original Excel geometry */
+.ask-price-wrap{
+  width:100%;
+  overflow-x:auto;
+  border:1px solid #aeb8c4;
+  background:#fff;
+}
+.ask-price-table{
+  width:100%;
+  min-width:1180px;
+  table-layout:fixed;
+  border-collapse:collapse;
+  background:#fff;
+}
+.ask-price-table .ask-col-sn{width:5%}
+.ask-price-table .ask-col-tag{width:12%}
+.ask-price-table .ask-col-desc{width:32%}
+.ask-price-table .ask-col-qty{width:4%}
+.ask-price-table .ask-col-unit{width:5%}
+.ask-price-table .ask-col-price{width:12%}
+.ask-price-table .ask-col-subtotal{width:12%}
+.ask-price-table .ask-col-remark{width:18%}
+
+.ask-price-table th,
+.ask-price-table td{
+  border:1px solid #aeb8c4!important;
+  padding:7px 8px;
+  vertical-align:middle;
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+.ask-price-table th{
+  background:#e9eef4;
+  color:#39495d;
+  font-size:8px;
+  font-weight:800;
+  text-align:center;
+  letter-spacing:.04em;
+}
+.ask-price-table td{
+  font-size:8.5px;
+  line-height:1.35;
+  background:#fff;
+}
+.ask-price-table td:nth-child(1),
+.ask-price-table td:nth-child(4),
+.ask-price-table td:nth-child(5){
+  text-align:center;
+}
+.ask-price-table td:nth-child(6),
+.ask-price-table td:nth-child(7){
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+  white-space:normal;
+}
+.ask-price-table td:nth-child(3){
+  font-weight:600;
+}
+.ask-price-table .ask-part-head td{
+  background:#e2e7ec;
+  text-align:left;
+  font-weight:800;
+  padding:8px 9px;
+}
+.ask-price-table .ask-total-row td{
+  background:#f5f7f9;
+  border-top:2px solid #77889a!important;
+  font-weight:700;
+}
+.ask-price-table .ask-base-total td{
+  background:#e8f1fb;
+  border-top:2px solid #245b8f!important;
+  border-bottom:2px solid #245b8f!important;
+}
+.ask-price-table .ask-base-total strong{
+  color:#143e64;
+  font-size:10px;
+}
+.ask-price-table .ask-option-total td{
+  background:#faf7ee;
+  border-top:2px solid #ad8a3d!important;
+}
+.ask-price-table td small{
+  display:block;
+  margin-top:3px;
+  color:#6d7a89;
+  font-size:7px;
+  font-weight:500;
+  letter-spacing:0;
+  text-transform:none;
+}
+.ask-remark{
+  max-width:100%;
+  font-size:7.8px;
+  line-height:1.35;
+}
+.ask-remark-source{
+  color:#465569;
+}
+.ask-trace{
+  margin-top:5px;
+  border-top:1px dashed #c2cad3;
+  padding-top:4px;
+  color:#5c6878;
+}
+.ask-trace summary{
+  cursor:pointer;
+  font-size:7.3px;
+  font-weight:800;
+  color:#315d8a;
+  user-select:none;
+}
+.ask-trace>div{
+  margin-top:5px;
+  font-size:7.3px;
+  line-height:1.4;
+}
+@media(max-width:900px){
+  .ask-price-table{min-width:1050px}
+}
