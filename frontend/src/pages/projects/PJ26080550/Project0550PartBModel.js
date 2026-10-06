@@ -29,13 +29,15 @@ Important:
 - Superseded PAGA dummy logistics/spares/tools and old PAGA OEM service must not be silently retained.
 */
 
+import { PROJECT0550_FX_CONTROL } from "./Project0550FxControl";
+
 export const PROJECT0550_PART_B_POLICY = {
   serviceSamtelMarkup:0.05,
   goodsSamtelMarkup:0.20,
   goodsAddvalueFinalMargin:0.05,
   goodsCommercialFactor:1.20/0.95,
   passThroughMarkup:0,
-  fxThbUsdControl:31.50,
+  fxThbUsdControl:PROJECT0550_FX_CONTROL.thbPerUnit.USD,
   sourceRevision:"REV04 / current controlled adaptation",
 };
 
