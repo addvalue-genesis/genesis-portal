@@ -319,6 +319,10 @@ function PriceView() {
     if(typeof window==="undefined") return "";
     return window.localStorage.getItem("pj2608-0550-eur-thb-working-fx") || "";
   });
+  const [cnyThbFx,setCnyThbFx] = useState(() => {
+    if(typeof window==="undefined") return "";
+    return window.localStorage.getItem("pj2608-0550-cny-thb-working-fx") || "";
+  });
   const p = PROJECT0550_PRICING_BASELINE;
 
   function updateEurThbFx(value){
@@ -327,6 +331,25 @@ function PriceView() {
       if(value) window.localStorage.setItem("pj2608-0550-eur-thb-working-fx",value);
       else window.localStorage.removeItem("pj2608-0550-eur-thb-working-fx");
     }
+  }
+
+  function updateCnyThbFx(value){
+    setCnyThbFx(value);
+    if(typeof window!=="undefined"){
+      if(value) window.localStorage.setItem("pj2608-0550-cny-thb-working-fx",value);
+      else window.localStorage.removeItem("pj2608-0550-cny-thb-working-fx");
+    }
+  }
+
+  function knownBaseIn(currencyCode){
+    const thb=p.knownBaseExPaga.thb;
+    if(currencyCode==="THB") return "THB "+thb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+    if(currencyCode==="USD") return "USD "+(thb/p.fx.thbPerUsd).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+    const eurFx=Number(eurThbFx);
+    if(currencyCode==="EUR" && Number.isFinite(eurFx) && eurFx>0) return "EUR "+(thb/eurFx).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+    const cnyFx=Number(cnyThbFx);
+    if(currencyCode==="CNY" && Number.isFinite(cnyFx) && cnyFx>0) return "CNY "+(thb/cnyFx).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+    return "FX TBC";
   }
 
   return (
@@ -338,6 +361,24 @@ function PriceView() {
             <h2>ASK-TSI Priced Breakdown — Current Controlled Price View</h2>
           </div>
           <span className="bid-status bad">PROJECT TOTAL: HOLD</span>
+        </div>
+
+        <div className="bid-offer-summary">
+          <div>
+            <small>PROJECT SELLING PRICE / BASE OFFER</small>
+            <strong>HOLD</strong>
+            <span>Base Offer = Part A + Part B. This is the project selling price that will be submitted when all price gates are closed.</span>
+          </div>
+          <div>
+            <small>Known customer-priced subset · excludes open PAGA</small>
+            <strong>{knownBaseIn(currency)}</strong>
+            <span>PAGA selected vendor input is EUR {p.paga.knownSelectedSubtotalEur.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}, but its final customer selling line is not released yet.</span>
+          </div>
+          <div>
+            <small>PART C</small>
+            <strong>OPTIONS</strong>
+            <span>Not included in Base Offer unless specifically selected/required.</span>
+          </div>
         </div>
 
         <div className="bid-control-grid">
@@ -363,14 +404,14 @@ function PriceView() {
           </div>
           <div>
             <strong>FX Control</strong>
-            <span>USD/THB = {p.fx.thbPerUsd.toFixed(2)} · EUR/THB = TBC</span>
+            <span>USD/THB = {p.fx.thbPerUsd.toFixed(2)} · EUR/THB = {eurThbFx || "TBC"} · CNY/THB = {cnyThbFx || "TBC"}</span>
           </div>
         </div>
 
         <div className="bid-price-controls">
           <div className="bid-filter">
-            {["USD","THB","EUR"].map((x)=>(
-              <button key={x} onClick={()=>setCurrency(x)} className={currency===x?"active":""}>{x}</button>
+            {["USD","THB","EUR","CNY"].map((x)=>(
+              <button key={x} onClick={()=>setCurrency(x)} className={currency===x?"active":""}>{x==="CNY" ? "CNY (RMB)" : x}</button>
             ))}
           </div>
           <label className="bid-fx-input">
@@ -382,9 +423,22 @@ function PriceView() {
               inputMode="decimal"
               value={eurThbFx}
               onChange={(e)=>updateEurThbFx(e.target.value)}
-              placeholder="กรอก EUR/THB"
+              placeholder="1 EUR = ? THB"
             />
-            <small>{eurThbFx ? "Working conversion only · not firm FX" : "Required to show INDUSTRONIC PAGA in THB/USD"}</small>
+            <small>{eurThbFx ? "Working conversion only · not firm FX" : "Required for EUR conversion / PAGA THB"}</small>
+          </label>
+          <label className="bid-fx-input">
+            <span>CNY/THB Working FX</span>
+            <input
+              type="number"
+              step="0.0001"
+              min="0"
+              inputMode="decimal"
+              value={cnyThbFx}
+              onChange={(e)=>updateCnyThbFx(e.target.value)}
+              placeholder="1 CNY = ? THB"
+            />
+            <small>{cnyThbFx ? "Working conversion only · not firm FX" : "Required to display project price in CNY/RMB"}</small>
           </label>
         </div>
       </section>
@@ -395,6 +449,7 @@ function PriceView() {
         mode="INTERNAL"
         eurThbFx={eurThbFx}
         usdThbFx={p.fx.thbPerUsd}
+        cnyThbFx={cnyThbFx}
       />
 
       <section className="bid-panel bid-formula-panel">
