@@ -92,16 +92,50 @@ function lineAmount(line,currency,field){
   return line[field];
 }
 
-function remarkText(base,line,mode){
-  const parts=[];
-  if(base) parts.push(base);
-  if(mode==="INTERNAL" && line.internalTrace) parts.push("[INTERNAL TRACE] "+line.internalTrace);
-  if(line.openItems?.length) parts.push("[OPEN] "+line.openItems.join("; "));
-  return parts.join("\n\n");
+function RemarkCell({base,line,mode}){
+  const hasInternal = mode==="INTERNAL" && (line.internalTrace || line.openItems?.length);
+  return (
+    <div className="ask-remark">
+      {base ? <div className="ask-remark-source">{base}</div> : null}
+      {hasInternal ? (
+        <details className="ask-trace">
+          <summary>Internal trace / open items</summary>
+          {line.internalTrace ? <div><strong>Trace:</strong> {line.internalTrace}</div> : null}
+          {line.openItems?.length ? <div><strong>Open:</strong> {line.openItems.join("; ")}</div> : null}
+        </details>
+      ) : null}
+    </div>
+  );
+}
+
+function numericSubtotal(lines,codes,currency){
+  return codes.reduce((sum,code)=>{
+    const line=rowValue(lines,code);
+    const v=lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice");
+    return Number.isFinite(v) ? sum+v : sum;
+  },0);
+}
+
+function hasOpenTotal(lines,codes,currency){
+  return codes.some(code=>{
+    const line=rowValue(lines,code);
+    const v=lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice");
+    const state=String(line.state||"");
+    return v===null || v===undefined || /OPEN|TBC|HOLD|NOT PRICED/i.test(state);
+  });
 }
 
 export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNAL"}){
   const t=ASKTSI_PRICED_BREAKDOWN_TEMPLATE;
+  const aCodes=t.partA.map(([code])=>code);
+  const bCodes=t.partB.map(([code])=>code);
+  const cCodes=t.partC.map(([code])=>code);
+
+  const aKnown=numericSubtotal(lines,aCodes,currency);
+  const bKnown=numericSubtotal(lines,bCodes,currency);
+  const cKnown=numericSubtotal(lines,cCodes,currency);
+  const aHold=hasOpenTotal(lines,aCodes,currency);
+  const bHold=hasOpenTotal(lines,bCodes,currency);
 
   return (
     <div className="bid-stack">
@@ -118,13 +152,23 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
           ช่องว่าง/TBC ต้องคงสถานะไว้และห้ามถูกแปลงเป็นศูนย์โดยอัตโนมัติ.
         </p>
 
-        <div className="bid-table-wrap">
-          <table className="bid-table">
+        <div className="bid-table-wrap ask-price-wrap">
+          <table className="bid-table ask-price-table">
+            <colgroup>
+              <col className="ask-col-sn"/>
+              <col className="ask-col-tag"/>
+              <col className="ask-col-desc"/>
+              <col className="ask-col-qty"/>
+              <col className="ask-col-unit"/>
+              <col className="ask-col-price"/>
+              <col className="ask-col-subtotal"/>
+              <col className="ask-col-remark"/>
+            </colgroup>
             <thead>
               <tr>{t.columns.map(c=><th key={c}>{c}</th>)}</tr>
             </thead>
             <tbody>
-              <tr><td colSpan="8"><strong>Part A: BASIC PRICE / A1. Main Equipment Price</strong></td></tr>
+              <tr className="ask-part-head"><td colSpan="8"><strong>Part A: BASIC PRICE / A1. Main Equipment Price</strong></td></tr>
               {t.partA.map(([code,sn,description])=>{
                 const line=rowValue(lines,code);
                 return (
@@ -136,12 +180,18 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td>{line.unit || "Lot"}</td>
                     <td>{money(lineAmount(line,currency,"unitPrice"),currency)}</td>
                     <td>{money(lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice"),currency)}</td>
-                    <td>{remarkText(line.sourceRemark || t.sourceRemarks.A_DEFAULT,line,mode)}</td>
+                    <td><RemarkCell base={line.sourceRemark || t.sourceRemarks.A_DEFAULT} line={line} mode={mode}/></td>
                   </tr>
                 );
               })}
+              <tr className="ask-total-row">
+                <td colSpan="5"><strong>Part A Known Priced Subtotal</strong><small>Open/TBC items excluded from this numeric subtotal</small></td>
+                <td></td>
+                <td><strong>{money(aKnown,currency)}</strong></td>
+                <td>{aHold ? <Status state="PART A TOTAL = HOLD"/> : <Status state="PART A TOTAL READY"/>}</td>
+              </tr>
 
-              <tr><td colSpan="8"><strong>Part B: OTHERS</strong></td></tr>
+              <tr className="ask-part-head"><td colSpan="8"><strong>Part B: OTHERS</strong></td></tr>
               {t.partB.map(([code,sourceDescription])=>{
                 const line=rowValue(lines,code);
                 const description=sourceDescription || (mode==="INTERNAL" ? (line.description || "") : "");
@@ -154,15 +204,25 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td>{line.unit || ""}</td>
                     <td>{money(lineAmount(line,currency,"unitPrice"),currency)}</td>
                     <td>{money(lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice"),currency)}</td>
-                    <td>{remarkText(line.sourceRemark || t.sourceRemarks[code] || "",line,mode)}{line.state?<><br/><Status state={line.state}/></>:null}</td>
+                    <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
                   </tr>
                 );
               })}
-
-              <tr><td colSpan="8"><strong>Total</strong></td></tr>
+              <tr className="ask-total-row">
+                <td colSpan="5"><strong>Part B Known Priced Subtotal</strong><small>Open/TBC items excluded from this numeric subtotal</small></td>
+                <td></td>
+                <td><strong>{money(bKnown,currency)}</strong></td>
+                <td>{bHold ? <Status state="PART B TOTAL = HOLD"/> : <Status state="PART B TOTAL READY"/>}</td>
+              </tr>
+              <tr className="ask-base-total">
+                <td colSpan="5"><strong>BASE OFFER = PART A + PART B</strong><small>This is the project offer amount before optional Part C.</small></td>
+                <td></td>
+                <td><strong>{aHold || bHold ? "HOLD" : money(aKnown+bKnown,currency)}</strong></td>
+                <td><Status state={aHold || bHold ? "PROJECT OFFER = HOLD" : "PROJECT OFFER READY"}/></td>
+              </tr>
               <tr><td colSpan="8">Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
 
-              <tr><td colSpan="8"><strong>Part C: OPTIONS</strong></td></tr>
+              <tr className="ask-part-head"><td colSpan="8"><strong>Part C: OPTIONS — EXCLUDED FROM BASE OFFER UNLESS SELECTED</strong></td></tr>
               {t.partC.map(([code,description])=>{
                 const line=rowValue(lines,code);
                 return (
@@ -174,10 +234,16 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td>{line.unit || ""}</td>
                     <td>{money(lineAmount(line,currency,"unitPrice"),currency)}</td>
                     <td>{money(lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice"),currency)}</td>
-                    <td>{remarkText(line.sourceRemark || t.sourceRemarks[code] || "",line,mode)}{line.state?<><br/><Status state={line.state}/></>:null}</td>
+                    <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
                   </tr>
                 );
               })}
+              <tr className="ask-option-total">
+                <td colSpan="5"><strong>Part C Known Options Subtotal</strong><small>For reference only; not included in Base Offer automatically.</small></td>
+                <td></td>
+                <td><strong>{money(cKnown,currency)}</strong></td>
+                <td><Status state="OPTIONS / SEPARATE"/></td>
+              </tr>
               <tr><td colSpan="8"><strong>Remark:</strong> {t.sourceRemarks.FINAL}</td></tr>
             </tbody>
           </table>
