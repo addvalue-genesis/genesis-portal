@@ -294,13 +294,21 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const sourceInfo=classifyProject0550PriceLine(code,line);
   const vendorCost=vendorQuotedCost(vendorOffer);
   const commercialStatus=commercialLayerStatus(code,audit,trace,line);
+  const traceSourceCurrency=primarySourceCurrency(line,"subtotal");
+  const fxEquationRequired=Boolean(traceSourceCurrency && currency && traceSourceCurrency!==currency);
+  const equationsForDisplay=[
+    ...(Array.isArray(trace.equations)?trace.equations:[]),
+    ...(fxEquationRequired && !(trace.equations||[]).some(x=>String(x).startsWith("GEQ-034"))
+      ? ["GEQ-034 Controlled Currency Conversion"]
+      : [])
+  ];
 
   const nodes=[
     ["Requirement",trace.requirement],
     ["Constraint",trace.constraint],
     ["CAL / Study / RPT",trace.proof],
     ["Quantity Driver",trace.quantityDriver],
-    ["Equation ID",trace.equations],
+    ["Equation ID",equationsForDisplay],
     ["Cost Object",trace.costObject],
     ["Commercial Rule",trace.commercialRule],
     ["Displayed Price / Release",displayed+" · "+trace.releaseState],
