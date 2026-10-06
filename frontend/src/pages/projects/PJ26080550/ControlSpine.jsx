@@ -2,7 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./ControlSpine.css";
 import { PROJECT0550_ENGINEERING_DOCTRINE } from "./Project0550EngineeringDoctrine";
 import { PROJECT0550_CONTROL_OBJECTS } from "./Project0550ControlObjects";
-import { evaluateProject0550Portfolio, runProject0550EvidenceReasoning } from "./Project0550SmartControlEngine";
+import {
+  evaluateProject0550Portfolio,
+  runProject0550EvidenceReasoning,
+  project0550EvidenceMemoryFromApi
+} from "./Project0550SmartControlEngine";
 
 const LEGACY_TRACE_ROWS_UNUSED = [
   {
@@ -116,10 +120,13 @@ export function ControlSpine(){
   const [mode,setMode]=useState("trace");
   const [q,setQ]=useState("");
   const [liveData,setLiveData]=useState(null);
+  const [liveEvidenceData,setLiveEvidenceData]=useState(null);
   const [apiMode,setApiMode]=useState("PREVIEW");
+  const [evidenceApiMode,setEvidenceApiMode]=useState("CONTROLLED JSON");
   const [releaseIntent,setReleaseIntent]=useState("PRICE_FREEZE");
   const smart=useMemo(()=>evaluateProject0550Portfolio(PROJECT0550_CONTROL_OBJECTS,{releaseIntent}),[releaseIntent]);
-  const evidence=useMemo(()=>runProject0550EvidenceReasoning(),[]);
+  const evidenceMemory=useMemo(()=>project0550EvidenceMemoryFromApi(liveEvidenceData),[liveEvidenceData]);
+  const evidence=useMemo(()=>runProject0550EvidenceReasoning(evidenceMemory),[evidenceMemory]);
 
   useEffect(()=>{
     let active=true;
@@ -137,6 +144,27 @@ export function ControlSpine(){
       })
       .catch(()=>{
         if(active) setApiMode("PREVIEW");
+      });
+    return ()=>{active=false;};
+  },[]);
+
+
+  useEffect(()=>{
+    let active=true;
+    fetch("/backend/api/etm/evidence-intelligence.php?project=PJ2608-0550")
+      .then((response)=>{
+        if(!response.ok) throw new Error(`HTTP ${response.status}`);
+        return response.json();
+      })
+      .then((payload)=>{
+        if(!payload.ok) throw new Error(payload.message||payload.error||"ETM evidence API error");
+        if(active){
+          setLiveEvidenceData(payload);
+          setEvidenceApiMode("LIVE DB + CONTROLLED JSON");
+        }
+      })
+      .catch(()=>{
+        if(active) setEvidenceApiMode("CONTROLLED JSON");
       });
     return ()=>{active=false;};
   },[]);
@@ -317,7 +345,7 @@ export function ControlSpine(){
         <section className="cs-panel">
           <div className="cs-panel-head">
             <div>
-              <small>CONTROLLED EVIDENCE MEMORY · {evidence.memoryRevision}</small>
+              <small>CONTROLLED EVIDENCE MEMORY · {evidence.memoryRevision} · {evidenceApiMode}</small>
               <h2>ข้อมูลที่ทีม/AI อ่านมาแล้ว → code ตรวจสอบ / bind / reconcile / เสนอ action</h2>
             </div>
             <State text={evidence.status}/>
