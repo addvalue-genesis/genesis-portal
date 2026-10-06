@@ -1,0 +1,915 @@
+{
+  "meta": {
+    "schemaVersion": "1.1.0",
+    "datasetId": "PJ2608-0550_TPP_CONTROLLED_SNAPSHOT_REV07_20261006",
+    "projectCode": "PJ2608-0550",
+    "projectGroup": "ASK",
+    "status": "CONTROLLED_SNAPSHOT / PAGA_SELECTED / TOTAL_HOLD",
+    "snapshotDate": "2026-10-06",
+    "createdFor": "TPP UI sync to Rev07 INDUSTRONIC-only current 0550 baseline",
+    "sourcePolicy": {
+      "projectFacts": "PJ2608-0550 sources only",
+      "methodologyReference": "PJ2608-0553 may be used only as methodology/reference, never as 0550 project facts",
+      "zeroSemantics": [
+        "NO SOURCE != ZERO SCOPE",
+        "NO FINAL QUANTITY != ZERO QUANTITY",
+        "TBC != ZERO COST"
+      ]
+    },
+    "upstream": [
+      {
+        "id": "PRICE-INTERNAL-REV07",
+        "name": "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_INDUSTRONIC-ONLY_20261006.xlsx",
+        "role": "Current internal priced-breakdown baseline; INDUSTRONIC selected for PAGA; project total HOLD",
+        "integration": "MANUAL_CONTROLLED_SNAPSHOT"
+      },
+      {
+        "id": "INTERNAL-WORK-MANIFEST-REV01",
+        "name": "PJ2608-0550_INTERNAL_WORK_MANIFEST_Rev01.md",
+        "role": "Internal work/index and source-control boundary",
+        "integration": "REFERENCE"
+      },
+      {
+        "id": "GENESS-LEGACY-RUNTIME",
+        "name": "ASK0550_20260827-122548",
+        "role": "Preserved GENESS runtime/release baseline",
+        "integration": "COMPATIBILITY_BOUNDARY"
+      }
+    ],
+    "integrationState": {
+      "engineeringExcel": "UPSTREAM REV07 / NOT_DIRECTLY_BOUND_TO_BROWSER",
+      "controlledJson": "ACTIVE",
+      "sql": "NOT_YET_CONNECTED",
+      "agerp": "NOT_YET_CONNECTED",
+      "ui": "READS_THROUGH_COMPATIBILITY_FACADE"
+    },
+    "legacyRuntime": {
+      "runtimeApps": [
+        "ASK_TCP_Workspace.jsx",
+        "MR_Document_Map_Viewer.jsx"
+      ],
+      "runtimeData": [
+        "ASK_MR-0001_RevA1.data.json",
+        "ASK_TCP_LIS-0001_RevA1.data.json"
+      ],
+      "workingOnly": [
+        "ASK_MR-0001_RevA1_Mindmap.jsx"
+      ],
+      "overwritePolicy": "PRESERVE / DO_NOT_REPLACE_WITHOUT_CONTROLLED_RELEASE"
+    }
+  },
+  "project": {
+    "id": "PJ2608-0550",
+    "shortName": "ASK Onshore Telecom",
+    "title": "SAMTEL - PTTEPI Myanmar ASK TEL [MMC24-5002]",
+    "state": "BUDGETARY / WORKING / HOLD - PAGA OPEN",
+    "method": "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
+    "fxThbUsd": 31.5,
+    "systemCount": 19,
+    "priceDate": "06 Oct 2026",
+    "baseUsd": null,
+    "baseThb": null,
+    "c2Usd": 225967.4,
+    "c2Thb": 7117973.05,
+    "c3Usd": 163097.82,
+    "c3Thb": 5137581.47,
+    "totalWithOptionsUsd": null,
+    "totalWithOptionsThb": null,
+    "c1State": "NOT PRICED - CNEEC OPTIONAL INSTALLATION",
+    "opexState": "VSAT/KU recurring service remains separate from project CAPEX",
+    "pricingStatus": "HOLD",
+    "pricingHoldReason": "Selected INDUSTRONIC PAGA still requires EUR conversion plus source-backed compliance/logistics/site-service/spares closure.",
+    "knownBaseExPagaUsd": 4231051.57,
+    "knownBaseExPagaThb": 133278124.54,
+    "knownBasePlusC2C3ExPagaUsd": 4620116.79,
+    "knownBasePlusC2C3ExPagaThb": 145533679.06,
+    "fxEurThb": null,
+    "selectedPaga": {
+      "vendor": "INDUSTRONIC",
+      "offer": "A20261632",
+      "baseNetEur": 226454.05,
+      "knownAdditionsEur": [
+        {
+          "item": "AP712 Access Panel +1",
+          "amountEur": 3210
+        },
+        {
+          "item": "XBC Beacon Control",
+          "amountEur": 2014
+        }
+      ],
+      "knownSelectedSubtotalEur": 231678.05,
+      "delivery": "FCA Wertheim/Germany",
+      "state": "SELECTED / OPEN GAPS / EUR FX TBC",
+      "open": [
+        "Additional ACT-IP activation",
+        "Complete speaker-circuit monitoring",
+        "6-hour UPS/autonomy completion",
+        "Final compliant cabinet/loop/MTO confirmation",
+        "Site commissioning/SAT",
+        "PAGA startup/capital/2Y spares",
+        "FCA Germany onward freight/import/logistics"
+      ]
+    }
+  },
+  "commercialPolicy": [
+    {
+      "title": "Goods / Procured Cost",
+      "formula": "Customer = Cost × (1 + 20% SAMTEL) / (1 - 5% ADDVALUE final margin)",
+      "state": "LOCKED WORKING POLICY"
+    },
+    {
+      "title": "Professional Service",
+      "formula": "Workload → protected ADDVALUE rate → SAMTEL +5%",
+      "state": "RESOURCE-PROTECTED"
+    },
+    {
+      "title": "Pass-through Cash",
+      "formula": "Official fees / insurance premiums / reimbursables = 0% markup until agreed",
+      "state": "OPEN COMMERCIAL TREATMENT"
+    },
+    {
+      "title": "Project Risk",
+      "formula": "Contract entitlement + insurance + mitigation before explicit residual reserve",
+      "state": "SCENARIO-BASED"
+    }
+  ],
+  "systemGroups": [
+    {
+      "id": "digital",
+      "name": "A. Digital, Data & Voice",
+      "description": "Core network, voice, conferencing and satellite services",
+      "systems": [
+        {
+          "no": 1,
+          "token": "TEL-LAN",
+          "name": "Network System",
+          "ref": "PHI 7.3.1 / MR App 1.3",
+          "proof": "Port / PoE / capacity / redundancy / cyber zoning review",
+          "proofState": "PRELIMINARY",
+          "quantityState": "REQUIRED_DERIVED",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "SAMTEL supply / ADDVALUE retained integration",
+          "open": "Close exact BOM, SFP, licenses, port capacity and current vendor quote"
+        },
+        {
+          "no": 2,
+          "token": "TEL-LAN-VCS",
+          "name": "Video Conference System",
+          "ref": "PHI 7.3.2 / MR App 1.3",
+          "proof": "Room AV / LAN / bandwidth / licensing compatibility",
+          "proofState": "PRELIMINARY",
+          "quantityState": "PRELIMINARY",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "SAMTEL supply / retained integration",
+          "open": "Confirm fourth VCS location and licensing"
+        },
+        {
+          "no": 3,
+          "token": "TEL-VSAT",
+          "name": "VSAT Communications",
+          "ref": "PHI 7.3.6 / MR App 1.2",
+          "proof": "Link / bandwidth / rain-fade / free-issue / remote-end boundary",
+          "proofState": "REQUIRED / NOT FINAL",
+          "quantityState": "REQUIRED_DERIVED",
+          "costBasis": "DUMMY",
+          "owner": "TSI accessories/integration; core equipment partly free-issued",
+          "open": "Current THAICOM quote and free-issue inventory"
+        },
+        {
+          "no": 4,
+          "token": "TEL-VSAT-KU",
+          "name": "KU-Band Satellite Internet",
+          "ref": "PHI 7.3.18 / MR App 1.2",
+          "proof": "Link / service capacity / provider acceptance",
+          "proofState": "PRELIMINARY",
+          "quantityState": "PRELIMINARY",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "THAICOM / SAMTEL coordination",
+          "open": "Replace hardware and recurring proxy with current service quotation"
+        },
+        {
+          "no": 5,
+          "token": "TEL-PABX",
+          "name": "IP Telephony / PABX",
+          "ref": "PHI 7.3.3 / MR App 1.3",
+          "proof": "Dial plan / capacity / QoS / interface / failover",
+          "proofState": "PRELIMINARY",
+          "quantityState": "REQUIRED_DERIVED",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "SAMTEL / MGW; retained integration",
+          "open": "Confirm licenses, gateways, trunks and redundancy"
+        },
+        {
+          "no": 6,
+          "token": "TEL-IPP",
+          "name": "Hazardous Area Telephone",
+          "ref": "PHI 7.3.3 / MR App 1.3",
+          "proof": "Ex compliance + call / indication functional proof",
+          "proofState": "PRELIMINARY",
+          "quantityState": "REQUIRED_FIXED/PRELIMINARY",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "SAMTEL / MGW",
+          "open": "Close Ex accessories, JB/media converter and certificates"
+        }
+      ]
+    },
+    {
+      "id": "safety",
+      "name": "B. Safety, Security & Alarm",
+      "description": "Plant-wide public address and surveillance",
+      "systems": [
+        {
+          "no": 7,
+          "token": "TEL-PAGA",
+          "name": "Public Address & General Alarm",
+          "ref": "PHI 7.3.4 / MR App 1.4",
+          "proof": "Sound coverage + amplifier load + loop integrity / redundancy",
+          "proofState": "PRELIMINARY REQUIRED / VENDOR SELECTED",
+          "quantityState": "REQUIRED_DERIVED / PRELIMINARY",
+          "costBasis": "INDUSTRONIC_SELECTED_CURRENT_QUOTE_OPEN_GAPS",
+          "owner": "INDUSTRONIC OEM + ADDVALUE TSI",
+          "open": "Close RPT-0005 / sound coverage, amplifier/loop loading, cabinet/location reconciliation, beacon monitoring, ACT-IP, 6-hour UPS, final MTO, FCA logistics, site SAT/commissioning and selected-vendor spares",
+          "selectedVendor": "INDUSTRONIC",
+          "selectedOffer": "A20261632"
+        },
+        {
+          "no": 8,
+          "token": "TEL-CCTV",
+          "name": "CCTV",
+          "ref": "PHI 7.3.5 / MR App 1.3",
+          "proof": "Coverage / FoV / lens + bandwidth / storage calculation",
+          "proofState": "PRELIMINARY REQUIRED",
+          "quantityState": "REQUIRED_FIXED/PRELIMINARY",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "SAMTEL / CCTV vendor",
+          "open": "Run preliminary coverage/storage model and obtain current BOM"
+        }
+      ]
+    },
+    {
+      "id": "radio",
+      "name": "C. Radio & Navigation",
+      "description": "Operational, marine, aeronautical and navigation radio",
+      "systems": [
+        {
+          "no": 9,
+          "token": "TEL-RADIO-DTRS",
+          "name": "VHF DMR Radio",
+          "ref": "PHI 7.3.7 / MR App 1.1",
+          "proof": "RF coverage + frequency/channel + feeder-loss study",
+          "proofState": "PRELIMINARY REQUIRED",
+          "quantityState": "REQUIRED_FIXED/PRELIMINARY",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "SAMTEL / radio OEM",
+          "open": "Vendor configuration, frequency plan, Myanmar permit and coverage proof"
+        },
+        {
+          "no": 10,
+          "token": "TEL-RADIO-MARINE",
+          "name": "VHF-FM Marine Radio",
+          "ref": "PHI 7.3.8 / MR App 1.1",
+          "proof": "RF / antenna / interface verification",
+          "proofState": "PRELIMINARY",
+          "quantityState": "REQUIRED_FIXED/PRELIMINARY",
+          "costBasis": "CURRENT_QUOTE_PARTIAL",
+          "owner": "SAMTEL / Jason or equivalent",
+          "open": "Mounting, cable, gateway, handheld quantity and permit"
+        },
+        {
+          "no": 11,
+          "token": "TEL-RADIO-AERO",
+          "name": "VHF-AM Aeronautical Radio",
+          "ref": "PHI 7.3.9 / MR App 1.1",
+          "proof": "RF / antenna + aviation compliance proof",
+          "proofState": "PRELIMINARY",
+          "quantityState": "REQUIRED_FIXED/PRELIMINARY",
+          "costBasis": "CURRENT_QUOTE_PARTIAL",
+          "owner": "SAMTEL / specialist",
+          "open": "Confirm redundancy and DCA / authority scope"
+        },
+        {
+          "no": 12,
+          "token": "TEL-RADIO-SSB",
+          "name": "MF/HF SSB Radio",
+          "ref": "PHI 7.3.10 / MR App 1.1",
+          "proof": "HF link / antenna / frequency verification",
+          "proofState": "PRELIMINARY",
+          "quantityState": "PRELIMINARY",
+          "costBasis": "CURRENT_QUOTE_PARTIAL",
+          "owner": "SAMTEL / specialist",
+          "open": "Confirm exact site count and Myanmar frequency licence"
+        },
+        {
+          "no": 18,
+          "token": "TEL-NDB",
+          "name": "Non-Directional Beacon",
+          "ref": "PHI 7.3.17 / MR App 1.7",
+          "proof": "NDB coverage / siting / counterpoise / performance study",
+          "proofState": "CONFLICT / PRELIMINARY REQUIRED",
+          "quantityState": "REQUIRED_FIXED/PRELIMINARY",
+          "costBasis": "CURRENT_QUOTE_PARTIAL",
+          "owner": "SAMTEL / aviation specialist",
+          "open": "Close 75 NM vs 120 km criterion and DCA scope"
+        },
+        {
+          "no": 19,
+          "token": "TEL-AIS",
+          "name": "AIS Monitoring",
+          "ref": "PHI 7.3.16",
+          "proof": "Interface / port / bandwidth handoff verification",
+          "proofState": "PRELIMINARY",
+          "quantityState": "PRELIMINARY",
+          "costBasis": "CURRENT_QUOTE_PARTIAL",
+          "owner": "Offshore vendor + TSI retained integration",
+          "open": "Exact onshore quantity and offshore handoff responsibility"
+        }
+      ]
+    },
+    {
+      "id": "transport",
+      "name": "D. Transport & Infrastructure",
+      "description": "Microwave, optical backbone and supporting towers",
+      "systems": [
+        {
+          "no": 13,
+          "token": "TEL-DMR",
+          "name": "Digital Microwave + WBB",
+          "ref": "PHI 7.3.11 / MR App 1.5",
+          "proof": "Path profile + link budget + availability",
+          "proofState": "PRELIMINARY REQUIRED",
+          "quantityState": "REQUIRED_FIXED/PRELIMINARY",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "ADDVALUE / MGW / Ceragon / RADWIN working",
+          "open": "Current vendor quote, final link budget and frequency"
+        },
+        {
+          "no": 15,
+          "token": "TEL-FO",
+          "name": "Fiber Optic Network",
+          "ref": "PHI 7.3.13 / SPE / DTS / LIS",
+          "proof": "Route/core allocation + optical loss budget",
+          "proofState": "PRELIMINARY REQUIRED",
+          "quantityState": "PRELIMINARY/HISTORICAL PROXY",
+          "costBasis": "HIST_QTY_PROXY",
+          "owner": "ADDVALUE / AVL",
+          "open": "Replace historical route proxy with current MTO and loss budget"
+        },
+        {
+          "no": 16,
+          "token": "TEL-TELT",
+          "name": "Telecommunication Towers",
+          "ref": "PHI 7.3.14 / MR App 1.1",
+          "proof": "Structural / antenna load / foundation / geotechnical study",
+          "proofState": "CURRENT QUOTE / DESIGN REQUIRED",
+          "quantityState": "REQUIRED_FIXED",
+          "costBasis": "CURRENT_QUOTE",
+          "owner": "Local tower contractor; physical installation C1 boundary",
+          "open": "Piling excluded; confirm commercial boundary and site access"
+        }
+      ]
+    },
+    {
+      "id": "facility",
+      "name": "E. Facility & Operations",
+      "description": "Entertainment and meteorological support systems",
+      "systems": [
+        {
+          "no": 14,
+          "token": "TEL-ES",
+          "name": "Entertainment System",
+          "ref": "PHI 7.3.12 / MR App 1.6",
+          "proof": "Room/equipment schedule and interface check",
+          "proofState": "PRELIMINARY",
+          "quantityState": "REQUIRED_FIXED/PRELIMINARY",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "SAMTEL",
+          "open": "Avoid VCS double count; confirm room/device schedule"
+        },
+        {
+          "no": 17,
+          "token": "TEL-MET",
+          "name": "Meteorological System",
+          "ref": "PHI 7.3.15 / MR App 1.3",
+          "proof": "Siting / calibration / logging / export verification",
+          "proofState": "PRELIMINARY",
+          "quantityState": "REQUIRED_FIXED/PRELIMINARY",
+          "costBasis": "HIST_CURRENT_QTY",
+          "owner": "SAMTEL",
+          "open": "Current package quote and cloud/service boundary"
+        }
+      ]
+    }
+  ],
+  "firstPrinciplesChain": [
+    "Source / Evidence",
+    "Requirement",
+    "Fundamental Need",
+    "Constraint",
+    "Interface / Physical Context",
+    "Engineering Input",
+    "CAL / Study / RPT",
+    "Engineering Proof",
+    "Architecture",
+    "Physical Object",
+    "Quantity Driver",
+    "Required MTO",
+    "Bulk",
+    "Procurement / Vendor",
+    "Work / Service / Resource",
+    "VDRL / SDRL",
+    "QA / ITP / Inspection",
+    "FAT / IFAT",
+    "Logistics / Regulatory",
+    "Site Readiness",
+    "Installation",
+    "Pre-Commissioning",
+    "SAT / Integration",
+    "Commissioning / Start-up",
+    "Training / Handover",
+    "Warranty / Support",
+    "Cost / Schedule / Risk",
+    "Check / Release"
+  ],
+  "executionCampaigns": [
+    {
+      "id": "CAM-01",
+      "location": "Office / Thailand",
+      "title": "Project initiation, design control, vendor / procurement, PM & interfaces",
+      "days": 180,
+      "state": "PARAMETRIC"
+    },
+    {
+      "id": "CAM-02",
+      "location": "Project sites",
+      "title": "Site survey / existing-condition campaign",
+      "days": 12,
+      "state": "WORKING"
+    },
+    {
+      "id": "CAM-03",
+      "location": "Nantong, China",
+      "title": "Integrated FAT / IFAT, vendor-system FAT, punch and release",
+      "days": 20,
+      "state": "WORKING ASSUMPTION"
+    },
+    {
+      "id": "CAM-04",
+      "location": "Ranong Free Zone / Supply Base",
+      "title": "Receiving, packing/marking, permit/shipping readiness and logistics handoff",
+      "days": 5,
+      "state": "SOURCE-BACKED POINT / ROUTE TBC"
+    },
+    {
+      "id": "CAM-05",
+      "location": "Myanmar / site",
+      "title": "Pre-commissioning + SAT + integration + commissioning",
+      "days": 30,
+      "state": "WORKING"
+    },
+    {
+      "id": "CAM-06",
+      "location": "Myanmar / site",
+      "title": "Punch, retest, handover and closeout",
+      "days": 10,
+      "state": "WORKING"
+    },
+    {
+      "id": "CAM-07",
+      "location": "Remote / office",
+      "title": "Warranty / 90-day support / final dossier",
+      "days": 20,
+      "state": "PARAMETRIC"
+    }
+  ],
+  "coreTeam": [
+    {
+      "role": "Project Manager / Project Director",
+      "protectedUsdDay": 1000,
+      "customerUsdDay": 1050,
+      "scarcity": "CRITICAL"
+    },
+    {
+      "role": "Chief Telecom Engineer",
+      "protectedUsdDay": 1000,
+      "customerUsdDay": 1050,
+      "scarcity": "CRITICAL"
+    },
+    {
+      "role": "Senior Telecom Engineer",
+      "protectedUsdDay": 833.33,
+      "customerUsdDay": 875,
+      "scarcity": "HIGH"
+    },
+    {
+      "role": "Chief Telecom Technician",
+      "protectedUsdDay": 611.11,
+      "customerUsdDay": 641.67,
+      "scarcity": "HIGH"
+    },
+    {
+      "role": "Project / Support Engineer",
+      "protectedUsdDay": 555.56,
+      "customerUsdDay": 583.33,
+      "scarcity": "MEDIUM"
+    },
+    {
+      "role": "Document Controller",
+      "protectedUsdDay": 333.33,
+      "customerUsdDay": 350,
+      "scarcity": "MEDIUM"
+    },
+    {
+      "role": "Local Project Admin / Secretary",
+      "protectedUsdDay": 133.33,
+      "customerUsdDay": 140,
+      "scarcity": "LOCAL REQUIRED"
+    }
+  ],
+  "cneecBreakdown": [
+    {
+      "code": "A1-01",
+      "description": "Network System (KU Band Internet)",
+      "usd": 862084.14,
+      "thb": 27155650.44,
+      "state": "WORKING"
+    },
+    {
+      "code": "A1-02",
+      "description": "VSAT System",
+      "usd": 40839.7,
+      "thb": 1286450.53,
+      "state": "WORKING"
+    },
+    {
+      "code": "A1-03",
+      "description": "Video Conference System (VCS)",
+      "usd": 81668.87,
+      "thb": 2572569.47,
+      "state": "WORKING"
+    },
+    {
+      "code": "A1-04",
+      "description": "IP Telephony and PABX",
+      "usd": 99185.56,
+      "thb": 3124345.26,
+      "state": "WORKING"
+    },
+    {
+      "code": "A1-05",
+      "description": "Public Address and General Alarm (PAGA)",
+      "usd": null,
+      "thb": null,
+      "state": "SELECTED / OPEN GAPS / EUR FX TBC",
+      "eur": 231678.05,
+      "vendor": "INDUSTRONIC",
+      "offer": "A20261632",
+      "note": "Known selected subtotal only; customer USD/THB remains HOLD pending EUR FX and PAGA closure."
+    },
+    {
+      "code": "A1-06",
+      "description": "Closed Circuit Television (CCTV)",
+      "usd": 775929.12,
+      "thb": 24441767.16,
+      "state": "PRELIMINARY"
+    },
+    {
+      "code": "A1-07",
+      "description": "VHF DMR Radio System",
+      "usd": 441182.66,
+      "thb": 13897253.89,
+      "state": "PRELIMINARY"
+    },
+    {
+      "code": "A1-08",
+      "description": "VHF-FM Marine Radio",
+      "usd": 67950.84,
+      "thb": 2140451.37,
+      "state": "PARTIAL QUOTE"
+    },
+    {
+      "code": "A1-09",
+      "description": "VHF-AM Aeronautical Radio",
+      "usd": 16015.4,
+      "thb": 504485.05,
+      "state": "PARTIAL QUOTE"
+    },
+    {
+      "code": "A1-10",
+      "description": "MF/HF SSB Radio",
+      "usd": 40612.41,
+      "thb": 1279290.95,
+      "state": "PARTIAL QUOTE"
+    },
+    {
+      "code": "A1-11",
+      "description": "Microwave System (Telecommunication Tower)",
+      "usd": 122545.04,
+      "thb": 3860168.84,
+      "state": "PRELIMINARY"
+    },
+    {
+      "code": "A1-12",
+      "description": "Entertainment System",
+      "usd": 95544.86,
+      "thb": 3009663.16,
+      "state": "PRELIMINARY"
+    },
+    {
+      "code": "A1-13",
+      "description": "Fiber Optic Communication and Installation",
+      "usd": 171563.03,
+      "thb": 5404235.37,
+      "state": "HISTORICAL QTY PROXY"
+    },
+    {
+      "code": "A1-14",
+      "description": "Meteorological System",
+      "usd": 40839.7,
+      "thb": 1286450.53,
+      "state": "PRELIMINARY"
+    },
+    {
+      "code": "A1-15",
+      "description": "Non-Directional Beacon (NDB)",
+      "usd": 122545.04,
+      "thb": 3860168.84,
+      "state": "PARTIAL QUOTE"
+    },
+    {
+      "code": "B1",
+      "description": "Detail Design Engineering",
+      "usd": 493593.68,
+      "thb": 15548200.84,
+      "state": "RESOURCE-PROTECTED"
+    },
+    {
+      "code": "B2",
+      "description": "Transportation / Logistics",
+      "usd": 173531.99,
+      "thb": 5466257.68,
+      "state": "KNOWN NON-PAGA + PAGA FCA LOGISTICS TBC"
+    },
+    {
+      "code": "B3",
+      "description": "End-user / Purchaser Training",
+      "usd": 17956.53,
+      "thb": 565630.83,
+      "state": "PARAMETRIC"
+    },
+    {
+      "code": "B4",
+      "description": "Specialist Field Assistance / FAT / SAT / Commissioning",
+      "usd": 323575.87,
+      "thb": 10192639.81,
+      "state": "RESOURCE-PROTECTED / PAGA SITE OEM TBC"
+    },
+    {
+      "code": "B5",
+      "description": "Pre-commissioning / Commissioning / Start-up Spares",
+      "usd": 55836.31,
+      "thb": 1758843.79,
+      "state": "NON-PAGA KNOWN + PAGA START-UP SPARES TBC"
+    },
+    {
+      "code": "B6",
+      "description": "Special Tools for O&M",
+      "usd": 43709.27,
+      "thb": 1376842.11,
+      "state": "NON-PAGA ONLY / PAGA TOOLS IN SELECTED QUOTE"
+    },
+    {
+      "code": "B7",
+      "description": "Site Survey and Existing Condition Verification",
+      "usd": 49130.43,
+      "thb": 1547608.66,
+      "state": "PARAMETRIC"
+    },
+    {
+      "code": "B8",
+      "description": "Permit, Licence, Import/Export & Regulatory Coordination",
+      "usd": 67421.43,
+      "thb": 2123775.08,
+      "state": "PARAMETRIC + PASS-THROUGH"
+    },
+    {
+      "code": "B9",
+      "description": "Project & Personnel Insurance / Risk Transfer",
+      "usd": 27789.68,
+      "thb": 875374.9,
+      "state": "WORKING / PASS-THROUGH"
+    }
+  ],
+  "options": [
+    {
+      "code": "C1",
+      "description": "On-site installation construction",
+      "usd": null,
+      "thb": null,
+      "state": "NOT PRICED - CNEEC OPTIONAL"
+    },
+    {
+      "code": "C2",
+      "description": "10-year Capital Spares",
+      "usd": 225967.4,
+      "thb": 7117973.05,
+      "state": "NON-PAGA KNOWN + PAGA CAPITAL SPARES TBC"
+    },
+    {
+      "code": "C3",
+      "description": "2-year Normal Operation Spares",
+      "usd": 163097.82,
+      "thb": 5137581.47,
+      "state": "NON-PAGA KNOWN + PAGA 2Y SPARES TBC"
+    }
+  ],
+  "logisticsGates": [
+    {
+      "gate": "Equipment Freeze",
+      "detail": "Exact model, quantity, HS/COO and technical data available",
+      "state": "OPEN BY PACKAGE"
+    },
+    {
+      "gate": "Regulatory Classification",
+      "detail": "Investment / Drawback / Temporary import method and controlled-equipment path",
+      "state": "OPEN"
+    },
+    {
+      "gate": "Prior Authority Approval",
+      "detail": "MOTC / radio-frequency / DCA as applicable",
+      "state": "OPEN"
+    },
+    {
+      "gate": "Import Licence",
+      "detail": "FaFE dossier, product brochure / usage, Proforma Invoice and approvals",
+      "state": "OPEN"
+    },
+    {
+      "gate": "Packing & Shipping Documents",
+      "detail": "CIPL, packing list, COO, shipping mark, inspection / insurance certificates",
+      "state": "OPEN"
+    },
+    {
+      "gate": "PTTEPI Green-Light",
+      "detail": "Shipment release before movement to Myanmar logistics chain",
+      "state": "MANDATORY GATE"
+    },
+    {
+      "gate": "Ranong Handoff",
+      "detail": "Free Zone / non-Free Zone receiving and PTTEPI-appointed logistics coordination",
+      "state": "ROUTE TBC FOR 0550"
+    },
+    {
+      "gate": "Myanmar Customs / Inland",
+      "detail": "Customs readiness and onward delivery owner to site",
+      "state": "CONTRACT BOUNDARY OPEN"
+    }
+  ],
+  "riskScenarios": [
+    {
+      "id": "RSK-001",
+      "group": "WEATHER",
+      "name": "Monsoon / heavy rain",
+      "exposureThb": 60000,
+      "treatment": "Standby clause / schedule float"
+    },
+    {
+      "id": "RSK-002",
+      "group": "NATCAT",
+      "name": "Flood / flash flood",
+      "exposureThb": 196000,
+      "treatment": "Standby / access / inspection / remobilisation"
+    },
+    {
+      "id": "RSK-003",
+      "group": "NATCAT",
+      "name": "Cyclone / storm / high wind",
+      "exposureThb": 222000,
+      "treatment": "Weather warning / demob plan / insurance"
+    },
+    {
+      "id": "RSK-004",
+      "group": "NATCAT",
+      "name": "Lightning / surge",
+      "exposureThb": 74000,
+      "treatment": "Retest power / earthing / telecom equipment"
+    },
+    {
+      "id": "RSK-005",
+      "group": "NATCAT",
+      "name": "Earthquake",
+      "exposureThb": 160000,
+      "treatment": "Structural / telecom reinspection + TPI"
+    },
+    {
+      "id": "RSK-006",
+      "group": "NATCAT",
+      "name": "Landslide / ground failure",
+      "exposureThb": 222000,
+      "treatment": "Access / reroute / reinspection"
+    },
+    {
+      "id": "RSK-007",
+      "group": "POLITICAL",
+      "name": "Civil unrest / political disruption",
+      "exposureThb": 284000,
+      "treatment": "Political standby / security / insurance"
+    },
+    {
+      "id": "RSK-008",
+      "group": "SECURITY",
+      "name": "Armed conflict / evacuation",
+      "exposureThb": 440000,
+      "treatment": "Evacuation / remobilisation / force-majeure entitlement"
+    },
+    {
+      "id": "RSK-009",
+      "group": "ACCESS",
+      "name": "Curfew / checkpoint / site access",
+      "exposureThb": 110000,
+      "treatment": "Access coordination / standby"
+    },
+    {
+      "id": "RSK-010",
+      "group": "LOGISTICS",
+      "name": "Border / road / airport closure",
+      "exposureThb": 140000,
+      "treatment": "Storage / demurrage / alternate route"
+    },
+    {
+      "id": "RSK-011",
+      "group": "REGULATORY",
+      "name": "Government / permit delay",
+      "exposureThb": 30000,
+      "treatment": "Early application / local agent"
+    },
+    {
+      "id": "RSK-012",
+      "group": "THIRD PARTY",
+      "name": "Client / other contractor not ready",
+      "exposureThb": 60000,
+      "treatment": "Readiness gate / delay / standby entitlement"
+    }
+  ],
+  "sourceRegister": [
+    {
+      "id": "S01",
+      "name": "MM-ASK-1A-APF-TEL-MR-0001 Rev.A1",
+      "use": "Scope, quantity, SDRL, ITR",
+      "state": "PROJECT SOURCE"
+    },
+    {
+      "id": "S02",
+      "name": "MM-ASK-1A-APF-TEL-PHI-0001 Rev.B1",
+      "use": "System philosophy and requirements",
+      "state": "PROJECT SOURCE"
+    },
+    {
+      "id": "S03",
+      "name": "MM-ASK-1A-APF-TEL-BOD-0001 Rev.C8",
+      "use": "Onshore design basis",
+      "state": "PROJECT SOURCE"
+    },
+    {
+      "id": "S04",
+      "name": "10015-WIS-LOG-MM0001-R03",
+      "use": "Myanmar logistics, permits, licences and shipping controls",
+      "state": "PROJECT SOURCE"
+    },
+    {
+      "id": "S05",
+      "name": "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_INDUSTRONIC-ONLY_20261006.xlsx",
+      "use": "Current internal price-control baseline; PAGA INDUSTRONIC selected; project total HOLD",
+      "state": "CURRENT INTERNAL BASELINE"
+    },
+    {
+      "id": "S08",
+      "name": "INDUSTRONIC Offer A20261632, 03-Sep-2026",
+      "use": "Selected PAGA vendor commercial/technical offer; base net EUR 226,454.05",
+      "state": "SELECTED VENDOR SOURCE"
+    },
+    {
+      "id": "S06",
+      "name": "ASK-TSI Priced Breakdown List.xlsx",
+      "use": "SAMTEL / CNEEC commercial output form",
+      "state": "CUSTOMER FORM"
+    },
+    {
+      "id": "S07",
+      "name": "PJ2608-0553 Mathematical / Labour Model",
+      "use": "Methodology, equations and rate-chain calibration only",
+      "state": "METHODOLOGY ONLY"
+    }
+  ],
+  "controlRules": [
+    "NO SOURCE ≠ ZERO SCOPE",
+    "NO FINAL QUANTITY ≠ ZERO QUANTITY",
+    "TBC ≠ ZERO COST",
+    "Vendor offered quantity ≠ required quantity",
+    "Selling rate ≠ internal payroll cost",
+    "One physical trip is counted once",
+    "Shared/common cost is not divided equally by 19 systems",
+    "Risk scenarios are not automatically summed into Base",
+    "0553 facts never become 0550 facts; only reusable methodology may transfer"
+  ]
+}
