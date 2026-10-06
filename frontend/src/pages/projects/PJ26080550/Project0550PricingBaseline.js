@@ -14,6 +14,7 @@ Rules:
 */
 
 import { PROJECT0550_PART_B_MODEL, thbToUsd } from "./Project0550PartBModel";
+import { PROJECT0550_FX_CONTROL } from "./Project0550FxControl";
 
 const PB = PROJECT0550_PART_B_MODEL;
 
@@ -29,12 +30,18 @@ export const PROJECT0550_PRICING_BASELINE = {
     rule: "The template Total row is the Base Offer total before Part C options."
   },
   fx: {
-    thbPerUsd: 31.50,
-    thbPerEur: null,
-    workingEurThb: 37.713,
-    workingEurThbBasis: "MARKET WORKING REFERENCE · 2026-10-06 14:15 ICT · NOT FIRM PROJECT FX",
-    workingCnyThb: 5.01585,
-    workingCnyThbBasis: "MARKET WORKING REFERENCE · 2026-10-06 14:38 ICT · NOT FIRM PROJECT FX",
+    source:"BANK OF THAILAND",
+    sourceReport:PROJECT0550_FX_CONTROL.report,
+    sourceDate:PROJECT0550_FX_CONTROL.asOfDate,
+    rateType:PROJECT0550_FX_CONTROL.rateType,
+    thbPerUsd: PROJECT0550_FX_CONTROL.thbPerUnit.USD,
+    thbPerEur: PROJECT0550_FX_CONTROL.thbPerUnit.EUR,
+    workingEurThb: PROJECT0550_FX_CONTROL.thbPerUnit.EUR,
+    workingEurThbBasis: "BOT FM_FX_001_S3 · MID RATE · 06-Oct-2026 · working/reference conversion only",
+    workingCnyThb: PROJECT0550_FX_CONTROL.thbPerUnit.CNY,
+    workingCnyThbBasis: "BOT FM_FX_001_S3 · MID RATE · 06-Oct-2026 · working/reference conversion only",
+    eurUsdCross: PROJECT0550_FX_CONTROL.cross.EURUSD,
+    basisId: PROJECT0550_FX_CONTROL.id
   },
   paga: {
     vendor: "INDUSTRONIC",
@@ -113,6 +120,8 @@ export const PROJECT0550_PRICING_BASELINE = {
     "A1-03": { unitPriceByCurrency:{USD:81668.87,THB:2572569.47}, subtotalByCurrency:{USD:81668.87,THB:2572569.47}, state:"HISTORICAL UNIT RATE — REPRICE REQUIRED", internalTrace:"GDrive audit: current working VCS quantity uses historical per-system rates. No current VCS vendor quotation found; fourth location/license scope remains open." },
     "A1-04": { unitPriceByCurrency:{USD:99185.56,THB:3124345.26}, subtotalByCurrency:{USD:99185.56,THB:3124345.26}, state:"HISTORICAL UNIT RATE — REPRICE REQUIRED", internalTrace:"GDrive audit: current MR phone/PBX quantities are mapped to historical IP phone/PBX/Ex-phone unit rates. No current Avaya commercial quotation found." },
     "A1-05": {
+      sourceCurrency:"EUR",
+      fxPolicy:"BOT MID CROSS-CURRENCY DISPLAY",
       unitPriceByCurrency:{EUR:231678.05,USD:null,THB:null},
       subtotalByCurrency:{EUR:231678.05,USD:null,THB:null},
       state:"CURRENT QUOTE / SELECTED / OPEN GAPS",
