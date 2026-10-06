@@ -19,6 +19,10 @@ This is a working/reference conversion only, not a firm hedged project FX.
 */
 
 export const PROJECT0550_FX_CONTROL = {
+  equationCode:"GEQ-034",
+  equationName:"Controlled Currency Conversion",
+  equationExpression:"P_to = P_from × R_from,THB / R_to,THB",
+  equationLayer:"COMMON / GENERIC",
   id:"BOT-FM_FX_001_S3-20261006-MID",
   authority:"Bank of Thailand",
   report:"FM_FX_001_S3",
