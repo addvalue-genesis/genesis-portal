@@ -63,6 +63,8 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     "Project0550SmartControlEngine.js",
     "Project0550EvidenceMemory.json",
     "Project0550EvidenceReasoner.js",
+    "Project0550PriceSourceModel.js",
+    "Project0550OutputContract.js",
     "current module .jsx",
     "controlled JSON / DB state",
     "0550 source evidence as needed"
