@@ -288,7 +288,7 @@ export function ingestProject0550EvidencePacket(packet,memory=PROJECT0550_EVIDEN
   };
 }
 
-export function runProject0550EvidenceReasoning(memory=PROJECT0550_EVIDENCE_MEMORY){
+export function runProject0550EvidenceReasoning(memory=PROJECT0550_EVIDENCE_MEMORY,{candidateLines=null}={}){
   const validation = validateProject0550EvidenceMemory(memory);
   const findings = [...validation.findings];
   const controls = [];
@@ -315,6 +315,34 @@ export function runProject0550EvidenceReasoning(memory=PROJECT0550_EVIDENCE_MEMO
       message:"Current CCTV budgetary customer sell no longer matches the locked Rev07 control THB 4,163,873.68.",
       action:"Review the price build-up before generating ASK-TSI output."
     });
+  }
+
+  // Output-candidate stale guard: a caller may supply the exact lines it is about to render/export.
+  if(candidateLines){
+    const candidateCctv = candidateLines["A1-06"];
+    const candidateCctvThb = candidateCctv?.subtotalByCurrency?.THB ??
+      candidateCctv?.unitPriceByCurrency?.THB ??
+      candidateCctv?.subtotalThb ??
+      candidateCctv?.unitPriceThb ??
+      null;
+    if(Number.isFinite(num(candidateCctvThb)) && Number(candidateCctvThb) !== Number(baselineCctv.budgetaryCustomerSellThb)){
+      findings.push({
+        severity:"BLOCKER",
+        code:"OUT-STALE-CCTV",
+        message:`Output candidate A1-06 CCTV THB ${Number(candidateCctvThb).toLocaleString("en-US")} does not match current controlled Rev07 THB ${Number(baselineCctv.budgetaryCustomerSellThb).toLocaleString("en-US")}.`,
+        action:"Stop render/export from this candidate and rebuild it from the current controlled pricing state."
+      });
+    }
+
+    const candidateTrace = String(candidateCctv?.internalTrace || "");
+    if(/24\s*Ex\s*PTZ/i.test(candidateTrace) && !/supersed/i.test(candidateTrace)){
+      findings.push({
+        severity:"BLOCKER",
+        code:"OUT-SUPERSEDED-CCTV-PROXY",
+        message:"Output candidate appears to use the superseded 24-Ex-PTZ CCTV proxy as an active basis.",
+        action:"Reject the candidate and restore the current 55-known-camera controlled basis."
+      });
+    }
   }
 
   // Vendor source total and price-line binding checks.
