@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261006-08",
+  syncRevision: "SYNC-20261007-01",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -57,6 +57,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     priceLayerRule: "Vendor Offer = source/procurement cost AS QUOTED. Price Build-up must show required additions/completion and commercial transformation separately. An indicative sell may be shown only with an explicit scope limitation; final customer sell remains HOLD until all required cost/release gates are closed.",
     pagaSellControl: "Known selected PAGA cost EUR 231,678.05. Working goods commercial preview = cost ×1.20/0.95 = EUR 292,645.96 on known selected cost only. Final PAGA customer sell remains HOLD because bulk/logistics/site service/spares/compliance are still open.",
     partBControl: "B1-B9 restored from the existing controlled parametric model rather than the resource-continuity management overlay. B1/B3/B4 use service sell + SAMTEL 5%; B2/B5/B6 use goods/procured rule on known non-PAGA cost; B7/B8/B9 come from dedicated Survey / Permit / Insurance sheets. 24_Safe_Service_Pricing remains management protection and must not overwrite contractual B-line semantics.",
+    fxControl: "Cross-currency display uses Bank of Thailand FM_FX_001_S3 MID RATE from the latest published official table. Current basis 06-Oct-2026: USD/THB 33.6643, EUR/THB 37.7629, CNY/THB 5.0217. Source/vendor currency remains authoritative; conversion is working/reference only.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
     jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
   },
@@ -68,6 +69,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     "Project0550EvidenceReasoner.js",
     "Project0550PriceSourceModel.js",
     "Project0550PartBModel.js",
+    "Project0550FxControl.js",
     "Project0550OutputContract.js",
     "current module .jsx",
     "controlled JSON / DB state",
