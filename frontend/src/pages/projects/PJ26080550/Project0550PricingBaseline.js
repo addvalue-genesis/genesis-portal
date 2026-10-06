@@ -39,7 +39,16 @@ export const PROJECT0550_PRICING_BASELINE = {
     ap712AddEur: 3210.00,
     xbcAddEur: 2014.00,
     knownSelectedSubtotalEur: 231678.05,
-    state: "SELECTED / OPEN GAPS / EUR FX TBC",
+    workingGoodsCommercialRule: {
+      samtelMarkup: 0.20,
+      addvalueFinalMargin: 0.05,
+      factor: 1.2631578947,
+      formula: "Cost × 1.20 / 0.95"
+    },
+    indicativeKnownCostSellEur: 292645.96,
+    finalCustomerSellEur: null,
+    state: "SELECTED / OPEN GAPS / INDICATIVE SELL AVAILABLE / FINAL SELL HOLD",
+    sellControlNote: "EUR 292,645.96 is a commercial preview on the known selected vendor subtotal only. It excludes open bulk/logistics/site service/spares/compliance cost and must not be released as the final customer sell."
   },
   knownBaseExPaga: {
     usd: 3743159.87,
