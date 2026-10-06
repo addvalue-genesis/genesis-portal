@@ -13,6 +13,7 @@ It is NOT the engineering source of truth.
 import React, { useState } from "react";
 import { traceForPriceLine } from "./Project0550PriceTrace";
 import { auditForPriceLine } from "./Project0550A1PriceAudit";
+import { vendorOfferForPriceLine } from "./Project0550VendorOfferRegister";
 
 export const ASKTSI_PRICED_BREAKDOWN_TEMPLATE = {
   id: "ASK-TSI-PRICED-BREAKDOWN",
@@ -170,7 +171,9 @@ function RemarkCell({base,line,mode}){
 function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const trace=traceForPriceLine(code,line);
   const audit=auditForPriceLine(code);
+  const vendorOffer=vendorOfferForPriceLine(code);
   const displayed=displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
+  const [traceTab,setTraceTab]=useState("ENGINEERING");
 
   const nodes=[
     ["Requirement",trace.requirement],
@@ -181,6 +184,14 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
     ["Cost Object",trace.costObject],
     ["Commercial Rule",trace.commercialRule],
     ["Displayed Price / Release",displayed+" · "+trace.releaseState],
+  ];
+
+  const tabs=[
+    ["ENGINEERING","Engineering Trace"],
+    ["VENDOR","Vendor Offer"],
+    ["RECON","Reconciliation"],
+    ["BUILDUP","Price Build-up"],
+    ["GAPS","Open Gaps"],
   ];
 
   return (
@@ -195,39 +206,163 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             </div>
             <Status state={trace.releaseState}/>
           </div>
-          {audit ? (
+
+          <div className="ask-trace-subtabs">
+            {tabs.map(([key,label])=>(
+              <button
+                key={key}
+                type="button"
+                className={traceTab===key ? "active" : ""}
+                onClick={()=>setTraceTab(key)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          {traceTab==="ENGINEERING" ? (
             <>
               <div className="ask-price-audit">
-                <div><b>GDrive Price Audit</b><span>{audit.grade}</span></div>
-                <div><b>Verdict</b><span>{audit.verdict}</span></div>
-                <div><b>Vendor</b><span>{audit.vendor || "NO CURRENT VENDOR QUOTE IDENTIFIED"}</span></div>
-                <div><b>Quote / Source Ref</b><span>{audit.quoteRef || audit.source}</span></div>
-                <div><b>CBE / Parametric Status</b><span>{audit.modelStatus || "CONTROLLED BASELINE / MATURITY VARIES"}</span></div>
+                <div><b>GDrive Price Audit</b><span>{audit?.grade || "NOT AUDITED"}</span></div>
+                <div><b>Verdict</b><span>{audit?.verdict || "TBC"}</span></div>
+                <div><b>Vendor</b><span>{audit?.vendor || vendorOffer?.vendor || "NO CURRENT VENDOR QUOTE IDENTIFIED"}</span></div>
+                <div><b>Quote / Source Ref</b><span>{audit?.quoteRef || vendorOffer?.quoteRef || audit?.source || "TBC"}</span></div>
+                <div><b>CBE / Parametric Status</b><span>{audit?.modelStatus || "CONTROLLED BASELINE / MATURITY VARIES"}</span></div>
               </div>
 
+              <div className="ask-engineering-trace-chain">
+                {nodes.map(([label,value],idx)=>(
+                  <div className="ask-engineering-trace-node" key={label}>
+                    <b>{String(idx+1).padStart(2,"0")} · {label}</b>
+                    {Array.isArray(value)
+                      ? <div className="ask-equation-tags">{value.map(x=><code key={x}>{x}</code>)}</div>
+                      : <span>{value}</span>}
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : null}
+
+          {traceTab==="VENDOR" ? (
+            <div className="ask-vendor-view">
+              {vendorOffer ? (
+                <>
+                  <div className="ask-vendor-head">
+                    <div>
+                      <small>AS-QUOTED SOURCE</small>
+                      <strong>{vendorOffer.vendor}</strong>
+                      <span>{vendorOffer.quoteRef} · {vendorOffer.quoteDate || "Date TBC"}</span>
+                    </div>
+                    <div>
+                      <small>Currency</small>
+                      <strong>{vendorOffer.currency || "TBC"}</strong>
+                      <span>{vendorOffer.incoterm || vendorOffer.status || ""}</span>
+                    </div>
+                    <div>
+                      <small>Quoted Final</small>
+                      <strong>{Number.isFinite(vendorOffer.quotedFinal) ? money(vendorOffer.quotedFinal,vendorOffer.currency) : "PARTIAL / NO SINGLE PACKAGE TOTAL"}</strong>
+                      {Number.isFinite(vendorOffer.quotedTotalBeforeDiscount) ? (
+                        <span>Before discount {money(vendorOffer.quotedTotalBeforeDiscount,vendorOffer.currency)} · Discount {money(vendorOffer.discount,vendorOffer.currency)}</span>
+                      ) : null}
+                    </div>
+                  </div>
+
+                  <div className="ask-vendor-table-wrap">
+                    <table className="ask-vendor-table">
+                      <thead>
+                        <tr>
+                          <th>Group</th>
+                          <th>Vendor Item — As Quoted</th>
+                          <th>Qty</th>
+                          <th>Unit</th>
+                          <th>Unit Price</th>
+                          <th>Total</th>
+                          <th>Base / Option</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {vendorOffer.vendorItems.map((row,idx)=>(
+                          <tr key={row.group+"-"+row.item+"-"+idx}>
+                            <td>{row.group}</td>
+                            <td>{row.item}{row.note ? <small>{row.note}</small> : null}</td>
+                            <td>{row.qty}</td>
+                            <td>{row.unit}</td>
+                            <td>{Number.isFinite(row.unitPrice) ? money(row.unitPrice,vendorOffer.currency) : "—"}</td>
+                            <td>{Number.isFinite(row.total) ? money(row.total,vendorOffer.currency) : "—"}</td>
+                            <td><Status state={row.inFinal ? "IN QUOTED BASE" : "OPTION / NOT IN BASE"}/></td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                  <div className="ask-source-lock">
+                    <strong>Source lock:</strong>
+                    <span>Vendor Offer shows the supplier quotation as received. Do not add requirement corrections in this tab.</span>
+                  </div>
+                </>
+              ) : (
+                <div className="ask-empty-source">
+                  <strong>NO CURRENT VENDOR OFFER REGISTERED</strong>
+                  <span>{audit?.source || "No current commercial quotation is bound to this line."}</span>
+                  <p>Use Engineering Trace / Price Build-up to see whether the displayed amount comes from historical, parametric, market-sanity or allowance data.</p>
+                </div>
+              )}
+            </div>
+          ) : null}
+
+          {traceTab==="RECON" ? (
+            <div className="ask-recon-view">
+              {vendorOffer?.reconciliation?.length ? (
+                <table className="ask-recon-table">
+                  <thead>
+                    <tr>
+                      <th>Required Object</th>
+                      <th>Required</th>
+                      <th>Vendor Offered</th>
+                      <th>Unit</th>
+                      <th>Gap</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {vendorOffer.reconciliation.map((row,idx)=>(
+                      <tr key={row.object+"-"+idx}>
+                        <td>{row.object}</td>
+                        <td>{String(row.required)}</td>
+                        <td>{String(row.offered)}</td>
+                        <td>{row.unit}</td>
+                        <td>{String(row.gap)}</td>
+                        <td><Status state={row.status}/></td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="ask-empty-source">
+                  <strong>REQUIRED VS OFFERED MATRIX NOT AVAILABLE YET</strong>
+                  <span>{audit?.basis || trace.quantityDriver}</span>
+                  <p>This remains OPEN until the required quantity and the vendor BOM can be compared object-by-object.</p>
+                </div>
+              )}
+            </div>
+          ) : null}
+
+          {traceTab==="BUILDUP" ? (
+            <div className="ask-build-view">
               <div className="ask-price-source-detail">
-                <div>
-                  <b>Basis</b>
-                  <span>{audit.basis}</span>
-                </div>
-                <div>
-                  <b>Primary source</b>
-                  <span>{audit.source}</span>
-                </div>
-                <div>
-                  <b>Closure</b>
-                  <span>{audit.action}</span>
-                </div>
+                <div><b>Basis</b><span>{audit?.basis || trace.costObject}</span></div>
+                <div><b>Primary source</b><span>{audit?.source || trace.sourceBasis}</span></div>
+                <div><b>Displayed selling line</b><span>{displayed}</span></div>
               </div>
 
-              {audit.quantityBasis?.length ? (
+              {audit?.quantityBasis?.length ? (
                 <div className="ask-quantity-basis">
                   <b>Project Quantity Basis</b>
                   <div>{audit.quantityBasis.map(x=><span key={x}>{x}</span>)}</div>
                 </div>
               ) : null}
 
-              {audit.buildUp?.length ? (
+              {audit?.buildUp?.length ? (
                 <div className="ask-build-up">
                   <div className="ask-build-up-head">
                     <b>Vendor → Completion → Bulk → Commercial Build-up</b>
@@ -256,25 +391,34 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                     </tbody>
                   </table>
                 </div>
-              ) : null}
-            </>
-          ) : null}
-          <div className="ask-engineering-trace-chain">
-            {nodes.map(([label,value],idx)=>(
-              <React.Fragment key={label}>
-                <div className="ask-engineering-trace-node">
-                  <b>{String(idx+1).padStart(2,"0")} · {label}</b>
-                  {Array.isArray(value)
-                    ? <div className="ask-equation-tags">{value.map(x=><code key={x}>{x}</code>)}</div>
-                    : <span>{value}</span>}
+              ) : (
+                <div className="ask-empty-source">
+                  <strong>DETAILED NUMERIC BUILD-UP NOT MIGRATED YET</strong>
+                  <span>{trace.costObject}</span>
+                  <p>The line is still traceable by source class and equations, but the itemized arithmetic has not yet been bound to this view.</p>
                 </div>
-                {idx<nodes.length-1 ? <i>→</i> : null}
-              </React.Fragment>
-            ))}
-          </div>
+              )}
+            </div>
+          ) : null}
+
+          {traceTab==="GAPS" ? (
+            <div className="ask-gaps-view">
+              <div className="ask-price-source-detail">
+                <div><b>Release State</b><span>{trace.releaseState}</span></div>
+                <div><b>Audit Verdict</b><span>{audit?.verdict || "TBC"}</span></div>
+                <div><b>Closure Action</b><span>{audit?.action || "Close source / proof / quantity / commercial gaps."}</span></div>
+              </div>
+              <div className="ask-gap-list">
+                {(line.openItems || []).length
+                  ? line.openItems.map(x=><span key={x}>{x}</span>)
+                  : <span>No itemized open-gap list has been migrated for this line yet.</span>}
+              </div>
+            </div>
+          ) : null}
+
           <div className="ask-engineering-trace-rule">
             <strong>Control:</strong>
-            <span>A displayed baseline value is not promoted to a firm selling price unless its critical source, proof, quantity, lifecycle cost and commercial treatment are closed.</span>
+            <span>Vendor Offer = source evidence. Reconciliation = engineering comparison. Price Build-up = controlled cost/commercial transformation. These layers must not be mixed.</span>
           </div>
         </div>
       </td>
