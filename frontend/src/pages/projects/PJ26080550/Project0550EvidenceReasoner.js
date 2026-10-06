@@ -46,6 +46,74 @@ function assertionKey(a){
   ].join("|");
 }
 
+function parseJsonMaybe(value,fallback={}){
+  if(value == null) return fallback;
+  if(typeof value === "object") return value;
+  try { return JSON.parse(value); } catch { return fallback; }
+}
+
+export function project0550EvidenceMemoryFromApi(payload,base=PROJECT0550_EVIDENCE_MEMORY){
+  if(!payload || !Array.isArray(payload.assertions)) return base;
+
+  const grouped = new Map();
+  for(const row of payload.assertions){
+    const sourceId = row.evidence_code || "DB-UNIDENTIFIED-SOURCE";
+    const meta = parseJsonMaybe(row.evidence_metadata_json,{});
+    const value = parseJsonMaybe(row.value_json,{});
+    if(!grouped.has(sourceId)){
+      grouped.set(sourceId,{
+        sourceId,
+        sourceType:meta.sourceType || "ASSUMPTION",
+        evidenceClass:row.evidence_class || "D",
+        title:meta.title || sourceId,
+        sourceRef:meta.sourceRef || row.statement_text || sourceId,
+        sourceUrl:meta.sourceUrl || null,
+        assertions:[]
+      });
+    }
+    grouped.get(sourceId).assertions.push({
+      assertionId:row.assertion_code,
+      domain:row.assertion_domain,
+      systemToken:row.system_token || null,
+      priceLine:row.price_line_code || null,
+      location:row.location_code || null,
+      object:row.object_key || null,
+      state:row.assertion_state || "TBC",
+      value:Object.prototype.hasOwnProperty.call(value,"value") ? value.value : null,
+      qty:Object.prototype.hasOwnProperty.call(value,"qty") ? value.qty : null,
+      unit:row.unit || null,
+      unitPrice:Object.prototype.hasOwnProperty.call(value,"unitPrice") ? value.unitPrice : null,
+      total:Object.prototype.hasOwnProperty.call(value,"total") ? value.total : null,
+      currency:Object.prototype.hasOwnProperty.call(value,"currency") ? value.currency : null,
+      note:Object.prototype.hasOwnProperty.call(value,"note") ? value.note : null,
+      reviewState:row.review_state || "REVIEW_REQUIRED",
+      sourcePriority:Number(row.source_priority || 0)
+    });
+  }
+
+  const mergedSources = new Map((base.sources || []).map(s => [s.sourceId,{...s,assertions:[...(s.assertions || [])]}]));
+  for(const overlay of grouped.values()){
+    const prior = mergedSources.get(overlay.sourceId);
+    if(!prior){
+      mergedSources.set(overlay.sourceId,overlay);
+      continue;
+    }
+    const assertions = new Map((prior.assertions || []).map(a => [a.assertionId,a]));
+    for(const a of overlay.assertions || []) assertions.set(a.assertionId,a);
+    mergedSources.set(overlay.sourceId,{
+      ...prior,
+      ...overlay,
+      assertions:[...assertions.values()]
+    });
+  }
+
+  return {
+    ...base,
+    revision:`${base.revision}+LIVE_DB`,
+    sources:[...mergedSources.values()]
+  };
+}
+
 function allAssertions(memory=PROJECT0550_EVIDENCE_MEMORY){
   return (memory.sources || []).flatMap(source =>
     (source.assertions || []).map(assertion => ({
