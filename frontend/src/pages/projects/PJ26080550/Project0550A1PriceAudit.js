@@ -6,14 +6,14 @@ This registry does not upgrade a historical/proxy input into a current quote.
 
 export const PROJECT0550_A1_PRICE_AUDIT = {
   "A1-01":{
-    vendor:"NO CURRENT VENDOR QUOTE IDENTIFIED",
-    quoteRef:"Rev04 model + historical cost library",
-    modelStatus:"CBE / PARAMETRIC = PARTIAL",
-    grade:"HISTORICAL / PROXY",
-    verdict:"USE AS BUDGETARY ONLY",
-    basis:"Current 0550 quantities mapped to historical LAN/KU/AIS unit rates and completion allowances in Rev04 model.",
-    source:"Rev04 Budget Model + MR App1.2/App1.3; no current LAN/KU commercial quotation found in GDrive.",
-    action:"Obtain current Cisco/network + KU equipment quote; keep airtime/OPEX separate."
+    vendor:"MIXED SOURCE — JASON AIS COMPONENT / NETWORK-KU CURRENT QUOTE NOT FOUND",
+    quoteRef:"Jason QT2026-160 (AIS THB 180,000) + Rev07 controlled baseline",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL / AIS CURRENT QUOTE BOUND",
+    grade:"HISTORICAL / PROXY + CURRENT AIS COMPONENT",
+    verdict:"BUDGETARY ONLY — DO NOT TREAT A1-01 AS FULL CURRENT QUOTE",
+    basis:"A1-01 is a composite customer-form line. Jason QT2026-160 provides a current FURUNO FA-170 AIS receiver component at THB 180,000; the Network/KU remainder is still historical/proxy until current quotations are obtained.",
+    source:"Current Rev07 controlled pricing state + QT2026-160 + current 0550 TEL-LAN / TEL-VSAT-KU / TEL-AIS system registry.",
+    action:"Confirm TEL-AIS commercial mapping versus the interface/free-issue boundary, isolate any historical AIS allowance already embedded in A1-01 before replacement, obtain current Network/KU quotes, and prevent AIS double counting."
   },
   "A1-02":{
     vendor:"THAICOM / VSAT PROVIDER — COMMERCIAL QUOTE NOT FOUND",
