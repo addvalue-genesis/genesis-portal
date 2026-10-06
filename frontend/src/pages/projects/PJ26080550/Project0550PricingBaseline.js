@@ -55,14 +55,14 @@ export const PROJECT0550_PRICING_BASELINE = {
     sellControlNote: "EUR 292,645.96 is a commercial preview on the known selected vendor subtotal only. It excludes open bulk/logistics/site service/spares/compliance cost and must not be released as the final customer sell."
   },
   knownBaseExPaga: {
-    usd: 3743159.87,
-    thb: 117909535.90,
-    semanticLabel: "WORKING MIXED-SOURCE PRICED MODEL — EXCLUDES OPEN PAGA",
-    warning: "Not an all-vendor-quoted amount. Contains current quotes, partial quotes, market sanity, historical/proxy and parametric/service pricing."
+    usd: 3505536.44,
+    thb: 110424397.72,
+    semanticLabel: "KNOWN NUMERIC PORTION OF A+B — FINAL BASE OFFER HOLD",
+    warning: "Derived from current controlled line values after restoring Part B semantics. Open/TBC portions are not converted to zero and are not represented as final Base Offer."
   },
   knownBasePlusC2C3ExPaga: {
-    usd: 4132225.09,
-    thb: 130165090.42,
+    usd: 3894601.66,
+    thb: 122679952.24,
   },
   cctvMarketSanity: {
     status: "BUDGETARY MARKET-SANITY / PRELIMINARY",
