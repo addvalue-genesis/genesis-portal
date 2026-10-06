@@ -16,7 +16,7 @@ Rules:
 export const PROJECT0550_PRICING_BASELINE = {
   revision: "REV07",
   date: "2026-10-06",
-  source: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_INDUSTRONIC-ONLY_20261006.xlsx",
+  source: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx",
   status: "HOLD",
   offerComposition: {
     baseOffer: "PART A + PART B",
@@ -44,6 +44,8 @@ export const PROJECT0550_PRICING_BASELINE = {
   knownBaseExPaga: {
     usd: 3743159.87,
     thb: 117909535.90,
+    semanticLabel: "WORKING MIXED-SOURCE PRICED MODEL — EXCLUDES OPEN PAGA",
+    warning: "Not an all-vendor-quoted amount. Contains current quotes, partial quotes, market sanity, historical/proxy and parametric/service pricing."
   },
   knownBasePlusC2C3ExPaga: {
     usd: 4132225.09,
