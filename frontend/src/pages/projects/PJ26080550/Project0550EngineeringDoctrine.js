@@ -92,6 +92,9 @@ export const PROJECT0550_ENGINEERING_DOCTRINE = {
 };
 
 export const PROJECT0550_CONTROL_POLICY = {
+  teamWorkingRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
+  teamReadFirst: true,
+  dataArchitecture: "JSX USER SURFACE → API/SERVICE → MariaDB + JSON in parallel → controlled project/source evidence",
   learningMode: "CONTROLLED_CALIBRATION_ONLY",
   autoChangeProjectFacts: false,
   autoChangeCommercialRate: false,

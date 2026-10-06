@@ -22,7 +22,7 @@ export const PROJECT0550_MODULES = [
 
   { id:"5.0", key:"form", title:"Bid Form Tracker", parent:null, kind:"OUTPUT", authority:"SYSTEM_RESOLUTION", purpose:"Customer response form control." },
   { id:"6.0", key:"scope", title:"Scope / Compliance", parent:null, kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"Resolve obligations and compliance from governing sources." },
-  { id:"7.0", key:"price", title:"Price Schedules", parent:null, kind:"COMMERCIAL", authority:"SYSTEM_RESOLUTION", purpose:"Map approved cost/commercial treatment to Exhibit C." },
+  { id:"7.0", key:"price", title:"ASK-TSI Priced Breakdown", parent:null, kind:"COMMERCIAL", authority:"SYSTEM_RESOLUTION", purpose:"Generate/map the controlled engineering and commercial result into ASK-TSI Priced Breakdown List.xlsx form structure." },
   { id:"8.0", key:"deviation", title:"Deviation Control", parent:null, kind:"DEVIATION", authority:"MIXED", purpose:"Technical/commercial deviation after evidence-based resolution is exhausted." },
   { id:"9.0", key:"vdrl", title:"VDRL / Document Production", parent:null, kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"Document obligation, workload, revision and issue control." },
   { id:"10.0", key:"submission", title:"Submission Outputs", parent:null, kind:"OUTPUT", authority:"SYSTEM_RESOLUTION", purpose:"Ready-to-submit controlled bid package." },

@@ -7,6 +7,8 @@ import { EquationKernel } from "./EquationKernel";
 import { PricingStrategy } from "./PricingStrategy";
 import { ControlSpine } from "./ControlSpine";
 import { BID_NAV_MODULES } from "./Project0550ModuleRegistry";
+import { Project0550WorkingMemoryPanel, PROJECT0550_TEAM_WORKING_MEMORY } from "./Project0550WorkingMemory";
+import { ASKTSIPricedBreakdownForm } from "./ASKTSIPricedBreakdownForm";
 
 const SOURCE_GROUPS = [
   {
@@ -86,7 +88,7 @@ const PRICE_SCHEDULES = [
 ];
 
 const OUTPUTS = [
-  ["PRICE", "Commercial Price Schedules", "Exhibit C A1/A2 + C1…C8", "NOT READY"],
+  ["PRICE", "ASK-TSI Priced Breakdown", "Customer form: Part A / Part B / Part C", "NOT READY"],
   ["TECH-DEV", "Technical Deviations", "Attachment 3 template", "ACTIVE"],
   ["COM-DEV", "Commercial Deviations", "Attachment 4 template", "ACTIVE"],
   ["TECH", "Technical Proposal / Compliance", "MR/SPE/PHI/DWG + calculations/studies", "PARTIAL"],
@@ -147,7 +149,7 @@ export function BidWorkspace() {
           </p>
         </div>
         <div className="bid-hero-status">
-          <span className="preview">PREVIEW / DB MIGRATION PENDING</span>
+          <span className="preview">TEAM MEMORY · {PROJECT0550_TEAM_WORKING_MEMORY.syncRevision}</span>
           <span className="danger">PRICE FREEZE: NOT READY</span>
         </div>
       </header>
@@ -215,6 +217,7 @@ export function BidWorkspace() {
 function Overview() {
   return (
     <div className="bid-stack">
+      <Project0550WorkingMemoryPanel />
       <section className="bid-panel">
         <div className="bid-panel-head">
           <div>
@@ -312,38 +315,20 @@ function ScopeView() {
 function PriceView() {
   return (
     <div className="bid-stack">
-      <section className="bid-panel">
-        <div className="bid-panel-head">
-          <div>
-            <small>EXHIBIT C → PRICE OUTPUT MODEL</small>
-            <h2>Cost Model ต้อง map ลงแบบฟอร์มราคาที่ลูกค้าต้องการ ไม่ใช่จบแค่ Internal Cost</h2>
-          </div>
-          <Status status="PRICE NOT READY" />
-        </div>
-        <div className="bid-price-grid">
-          {PRICE_SCHEDULES.map(([code, title, classif, note]) => (
-            <article key={code} className="bid-price-card">
-              <div><b>{code}</b><Status status={classif} /></div>
-              <h3>{title}</h3>
-              <p>{note}</p>
-              <footer><span>Source of value</span><strong>ETM Cost Engine → Exhibit C</strong></footer>
-            </article>
-          ))}
-        </div>
-      </section>
+      <ASKTSIPricedBreakdownForm lines={{}} currency="USD" mode="INTERNAL" />
 
       <section className="bid-panel bid-formula-panel">
-        <small>PARAMETRIC COST ENGINEERING</small>
-        <h2>Internal engineering math must end in the customer price form</h2>
+        <small>PARAMETRIC COST ENGINEERING → CUSTOMER FORM</small>
+        <h2>Form เป็น output ของ Engineering Truth ไม่ใช่แหล่งกำเนิดราคา</h2>
         <div className="bid-formulas">
-          <code>MH = Q × UMH</code>
-          <code>Labor Cost = Σ(MH_role × Rate_role)</code>
-          <code>Total Cost = Material + Bulk + Engineering + VDRL + Lifecycle + Spares + Risk</code>
-          <code>Selling Price = PricingPolicy(Total Cost, Margin / Markup)</code>
+          <code>Required Qty = f(Requirement, Constraint, Proof, Quantity Driver)</code>
+          <code>MH = Q × UMH × Factor</code>
+          <code>Internal Cost = Material + Bulk + Work + Lifecycle + Common + Risk</code>
+          <code>Customer Line = CommercialMapping(Controlled Cost, Treatment, Policy)</code>
         </div>
         <p>
-          Base / Optional / 2-Year Spares / Capital Spares / Tools / Field Service / Training / Facilities
-          ต้องแยกตาม Schedule ของ Exhibit C เพื่อไม่ให้ scope ที่ควรอยู่ใน Lump Sum หลุดไปเป็น “extra”.
+          เมื่อข้อมูลจริงถูก bind จาก MariaDB/JSON แล้ว component นี้ต้องรับค่า Part A / B / C
+          จาก Smart Control + Cost Engine โดยคง TBC / NOT PRICED / OPEN ไว้ตามสถานะจริง.
         </p>
       </section>
     </div>
