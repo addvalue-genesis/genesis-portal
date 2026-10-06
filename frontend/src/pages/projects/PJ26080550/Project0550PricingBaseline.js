@@ -116,6 +116,8 @@ export const PROJECT0550_PRICING_BASELINE = {
       unitPriceByCurrency:{EUR:231678.05,USD:null,THB:null},
       subtotalByCurrency:{EUR:231678.05,USD:null,THB:null},
       state:"CURRENT QUOTE / SELECTED / OPEN GAPS",
+      includeInKnownCustomerSubtotal:false,
+      priceRole:"VENDOR_COST_INPUT / FINAL CUSTOMER SELL HOLD",
       tagNo:"INDUSTRONIC A20261632",
       internalTrace:"Selected Technical + Pricing Basis = INDUSTRONIC. Base net EUR 226,454.05 + AP712 +1 EUR 3,210 + XBC EUR 2,014 = known selected subtotal EUR 231,678.05. USD/THB intentionally HOLD pending EUR FX and remaining PAGA closure.",
       openItems:["ACT-IP activation","complete speaker-circuit monitoring","6-hour UPS/autonomy","final cabinet/loop/MTO","site commissioning/SAT","startup/capital/2Y spares","FCA Germany onward logistics"]
