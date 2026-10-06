@@ -12,7 +12,7 @@ It is NOT the engineering source of truth.
 
 import React, { useState } from "react";
 import { traceForPriceLine } from "./Project0550PriceTrace";
-import { auditForA1 } from "./Project0550A1PriceAudit";
+import { auditForPriceLine } from "./Project0550A1PriceAudit";
 
 export const ASKTSI_PRICED_BREAKDOWN_TEMPLATE = {
   id: "ASK-TSI-PRICED-BREAKDOWN",
@@ -169,7 +169,7 @@ function RemarkCell({base,line,mode}){
 
 function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const trace=traceForPriceLine(code,line);
-  const audit=auditForA1(code);
+  const audit=auditForPriceLine(code);
   const displayed=displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
 
   const nodes=[
