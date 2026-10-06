@@ -343,10 +343,22 @@ function PriceView() {
   }
 
   const a1Codes=Object.keys(p.lines).filter(code=>/^A1-/.test(code));
+  const bCodes=["B1","B2","B3","B4","B5","B6","B7","B8","B9"];
   const sourceSummary=useMemo(()=>summarizeProject0550PriceSources(p.lines,a1Codes),[p]);
 
+  function sumKnownThb(codes){
+    return codes.reduce((sum,code)=>{
+      const value=p.lines?.[code]?.subtotalByCurrency?.THB;
+      return sum+(Number.isFinite(value)?Number(value):0);
+    },0);
+  }
+
+  const partAKnownThb=sumKnownThb(a1Codes);
+  const partBKnownThb=sumKnownThb(bCodes);
+  const knownBaseThb=partAKnownThb+partBKnownThb;
+
   function knownBaseIn(currencyCode){
-    const thb=p.knownBaseExPaga.thb;
+    const thb=knownBaseThb;
     if(currencyCode==="THB") return "THB "+thb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
     if(currencyCode==="USD") return "USD "+(thb/p.fx.thbPerUsd).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
     const eurFx=Number(eurThbFx);
@@ -374,10 +386,10 @@ function PriceView() {
             <span>Base Offer = Part A + Part B. This is the project selling price that will be submitted when all price gates are closed.</span>
           </div>
           <div>
-            <small>WORKING PRICED MODEL · MIXED SOURCES · EXCLUDES OPEN PAGA</small>
+            <small>KNOWN NUMERIC PORTION OF A + B · MIXED SOURCES · FINAL BASE OFFER STILL HOLD</small>
             <strong>{knownBaseIn(currency)}</strong>
             <span>
-              This is NOT an all-vendor-quoted total. A1 source mix: {sourceSummary.selectedQuoteLines} selected current quote · {sourceSummary.partialQuoteLines} partial/mixed current quote · {sourceSummary.marketSanityLines} market sanity · {sourceSummary.historicalProxyLines} historical/proxy · {sourceSummary.dummyAllowanceLines} dummy.
+              Dynamic from current controlled lines — not a hard-coded project total. Part A known = THB {partAKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · Part B known = THB {partBKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. Open/TBC portions such as PAGA remain outside the final released Base Offer.
             </span>
           </div>
           <div>
@@ -389,8 +401,8 @@ function PriceView() {
 
         <div className="bid-control-grid">
           <div>
-            <strong>WORKING BASE MODEL · A + B</strong>
-            <span>HOLD · mixed-source priced model excluding open PAGA = USD {p.knownBaseExPaga.usd.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {p.knownBaseExPaga.thb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. Use source-confidence view before treating this as a vendor-supported amount.</span>
+            <strong>A + B CONTROL</strong>
+            <span>Formula = Σ known numeric Part A + Σ known numeric Part B. Current known numeric portion = USD {(knownBaseThb/p.fx.thbPerUsd).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {knownBaseThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. BASE OFFER remains HOLD until all open/TBC portions are closed.</span>
           </div>
           <div>
             <strong>PROJECT OFFER AMOUNT</strong>
