@@ -13,6 +13,10 @@ Rules:
 - Do not reconstruct superseded project totals.
 */
 
+import { PROJECT0550_PART_B_MODEL, thbToUsd } from "./Project0550PartBModel";
+
+const PB = PROJECT0550_PART_B_MODEL;
+
 export const PROJECT0550_PRICING_BASELINE = {
   revision: "REV07",
   date: "2026-10-06",
@@ -143,15 +147,72 @@ export const PROJECT0550_PRICING_BASELINE = {
     "A1-14": { unitPriceByCurrency:{USD:40839.70,THB:1286450.53}, subtotalByCurrency:{USD:40839.70,THB:1286450.53}, state:"CURRENT QUOTE PARTIAL + HISTORICAL COMPLETION", internalTrace:"GDrive audit: Jason QT2026-160 includes RM YOUNG ultrasonic anemometer THB 120k as a current sensor anchor. Full two-station MET package remains a historical working allowance." },
     "A1-15": { unitPriceByCurrency:{USD:122545.04,THB:3860168.84}, subtotalByCurrency:{USD:122545.04,THB:3860168.84}, state:"CURRENT QUOTE PARTIAL + COMPLETION ALLOWANCE", internalTrace:"GDrive audit: Jason QT2026-160 quotes FLUGCOM Dual NDB125 rack at THB 2.45M. Current line retains a working completion allowance for full NDB scope; coverage/DCA/antenna/counterpoise/commissioning remain open." },
 
-    "B1": { unitPriceByCurrency:{USD:493593.68,THB:15548200.84}, subtotalByCurrency:{USD:493593.68,THB:15548200.84}, state:"RESOURCE-PROTECTED", internalTrace:"ADDVALUE detail-design / VDRL / vendor-coordination service. INDUSTRONIC OEM documentation must not be double counted." },
-    "B2": { unitPriceByCurrency:{USD:173531.99,THB:5466257.68}, subtotalByCurrency:{USD:173531.99,THB:5466257.68}, state:"KNOWN NON-PAGA + PAGA FCA LOGISTICS TBC", internalTrace:"Known non-PAGA/common logistics only. INDUSTRONIC FCA Wertheim onward logistics remains TBC.", openItems:["PAGA FCA Germany onward freight/import/logistics"] },
-    "B3": { unitPriceByCurrency:{USD:17956.53,THB:565630.83}, subtotalByCurrency:{USD:17956.53,THB:565630.83}, state:"PARAMETRIC", internalTrace:"Training working basis." },
-    "B4": { unitPriceByCurrency:{USD:323575.87,THB:10192639.81}, subtotalByCurrency:{USD:323575.87,THB:10192639.81}, state:"RESOURCE-PROTECTED / PAGA SITE OEM TBC", internalTrace:"ADDVALUE protected FAT/SAT/integration/commissioning resources. INDUSTRONIC factory FAT is already inside selected quote; site OEM scope remains TBC." },
-    "B5": { unitPriceByCurrency:{USD:55836.31,THB:1758843.79}, subtotalByCurrency:{USD:55836.31,THB:1758843.79}, state:"NON-PAGA KNOWN + PAGA START-UP SPARES TBC", internalTrace:"PAGA startup spares await INDUSTRONIC selected-vendor recommendation.", openItems:["PAGA startup spares"] },
-    "B6": { unitPriceByCurrency:{USD:43709.27,THB:1376842.11}, subtotalByCurrency:{USD:43709.27,THB:1376842.11}, state:"NON-PAGA ONLY / PAGA TOOLS IN SELECTED QUOTE", internalTrace:"INDUSTRONIC selected quote already contains PAGA special/commissioning tools." },
-    "B7": { description:"Site Survey and Existing Condition Verification", unitPriceByCurrency:{USD:49130.43,THB:1547608.66}, subtotalByCurrency:{USD:49130.43,THB:1547608.66}, state:"PARAMETRIC", internalTrace:"Site survey working basis." },
-    "B8": { description:"Permit, Licence, Import/Export & Regulatory Coordination", unitPriceByCurrency:{USD:67421.43,THB:2123775.08}, subtotalByCurrency:{USD:67421.43,THB:2123775.08}, state:"PARAMETRIC + PASS-THROUGH", internalTrace:"Permit/licence/regulatory working basis." },
-    "B9": { description:"Project & Personnel Insurance / Risk Transfer", unitPriceByCurrency:{USD:27789.68,THB:875374.90}, subtotalByCurrency:{USD:27789.68,THB:875374.90}, state:"WORKING / PASS-THROUGH", internalTrace:"Insurance working basis." },
+    "B1": {
+      unitPriceByCurrency:{USD:thbToUsd(PB.B1.customerPriceThb),THB:PB.B1.customerPriceThb},
+      subtotalByCurrency:{USD:thbToUsd(PB.B1.customerPriceThb),THB:PB.B1.customerPriceThb},
+      state:PB.B1.state,
+      internalTrace:"Recovered from the controlled Part B parametric model: system CBE + interface engineering + VDRL lifecycle + common PM/vendor/regulatory work. Resource-continuity reserve is a management gate and is NOT injected into B1.",
+      openItems:PB.B1.openItems
+    },
+    "B2": {
+      unitPriceByCurrency:{USD:thbToUsd(PB.B2.customerPriceThb),THB:PB.B2.customerPriceThb},
+      subtotalByCurrency:{USD:thbToUsd(PB.B2.customerPriceThb),THB:PB.B2.customerPriceThb},
+      state:PB.B2.state,
+      internalTrace:"Known non-PAGA goods logistics from the controlled Rev04 logistics model with goods commercial rule applied. Superseded PAGA percentage proxy removed; INDUSTRONIC FCA Germany onward logistics remains TBC.",
+      openItems:PB.B2.openItems
+    },
+    "B3": {
+      unitPriceByCurrency:{USD:thbToUsd(PB.B3.customerPriceThb),THB:PB.B3.customerPriceThb},
+      subtotalByCurrency:{USD:thbToUsd(PB.B3.customerPriceThb),THB:PB.B3.customerPriceThb},
+      state:PB.B3.state,
+      internalTrace:"Controlled parametric training service × SAMTEL 5%.",
+      openItems:PB.B3.openItems
+    },
+    "B4": {
+      unitPriceByCurrency:{USD:thbToUsd(PB.B4.customerPriceThb),THB:PB.B4.customerPriceThb},
+      subtotalByCurrency:{USD:thbToUsd(PB.B4.customerPriceThb),THB:PB.B4.customerPriceThb},
+      state:PB.B4.state,
+      internalTrace:"Retained FAT/SAT/pre-com/commissioning + QA/warranty/people travel. Old PAGA OEM service/FAT removed because selected INDUSTRONIC factory FAT is already inside A1-05; PAGA site OEM attendance remains TBC.",
+      openItems:PB.B4.openItems
+    },
+    "B5": {
+      unitPriceByCurrency:{USD:thbToUsd(PB.B5.customerPriceThb),THB:PB.B5.customerPriceThb},
+      subtotalByCurrency:{USD:thbToUsd(PB.B5.customerPriceThb),THB:PB.B5.customerPriceThb},
+      state:PB.B5.state,
+      internalTrace:"Known non-PAGA startup spares only; old PAGA percentage spare proxy removed and selected-vendor PAGA startup spares remain TBC.",
+      openItems:PB.B5.openItems
+    },
+    "B6": {
+      unitPriceByCurrency:{USD:thbToUsd(PB.B6.customerPriceThb),THB:PB.B6.customerPriceThb},
+      subtotalByCurrency:{USD:thbToUsd(PB.B6.customerPriceThb),THB:PB.B6.customerPriceThb},
+      state:PB.B6.state,
+      internalTrace:"Known non-PAGA special tools only; old PAGA allowance removed because selected INDUSTRONIC quote already includes PAGA tools.",
+      openItems:PB.B6.openItems
+    },
+    "B7": {
+      description:"Site Survey and Existing Condition Verification",
+      unitPriceByCurrency:{USD:thbToUsd(PB.B7.customerPriceThb),THB:PB.B7.customerPriceThb},
+      subtotalByCurrency:{USD:thbToUsd(PB.B7.customerPriceThb),THB:PB.B7.customerPriceThb},
+      state:PB.B7.state,
+      internalTrace:"Integrated survey campaign from 16_Site_Survey: planning + APF + ACP + ABV01/AMS01 + Yangon + specialist measurements + report closeout. No 19× travel duplication.",
+      openItems:PB.B7.openItems
+    },
+    "B8": {
+      description:"Permit, Licence, Import/Export & Regulatory Coordination",
+      unitPriceByCurrency:{USD:thbToUsd(PB.B8.customerPriceThb),THB:PB.B8.customerPriceThb},
+      subtotalByCurrency:{USD:thbToUsd(PB.B8.customerPriceThb),THB:PB.B8.customerPriceThb},
+      state:PB.B8.state,
+      internalTrace:"Permit/licence professional service plus explicit official/agent pass-through pools. Pass-through markup remains 0% until policy changes.",
+      openItems:PB.B8.openItems
+    },
+    "B9": {
+      description:"Project & Personnel Insurance / Risk Transfer",
+      unitPriceByCurrency:{USD:thbToUsd(PB.B9.customerPriceThb),THB:PB.B9.customerPriceThb},
+      subtotalByCurrency:{USD:thbToUsd(PB.B9.customerPriceThb),THB:PB.B9.customerPriceThb},
+      state:PB.B9.state,
+      internalTrace:"Insurance premium cash is pass-through; only incremental policy administration receives the service layer.",
+      openItems:PB.B9.openItems
+    },
 
     "C1": { unitPriceByCurrency:{USD:null,THB:null,EUR:null}, subtotalByCurrency:{USD:null,THB:null,EUR:null}, state:"NOT PRICED - CNEEC OPTIONAL", internalTrace:"On-site installation construction remains CNEEC optional / not priced." },
     "C2": { unitPriceByCurrency:{USD:225967.40,THB:7117973.05}, subtotalByCurrency:{USD:225967.40,THB:7117973.05}, state:"NON-PAGA KNOWN + PAGA CAPITAL SPARES TBC", internalTrace:"Known non-PAGA capital spares only.", openItems:["PAGA 10-year capital spares"] },
