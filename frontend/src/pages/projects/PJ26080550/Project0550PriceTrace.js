@@ -13,6 +13,8 @@ Important:
 - A displayed baseline value is not automatically a live equation result.
 */
 
+import { PROJECT0550_PART_B_MODEL } from "./Project0550PartBModel";
+
 const GOODS_EQUATIONS = [
   "GEQ-001 Applicability",
   "GEQ-002 Installed Quantity",
@@ -22,8 +24,6 @@ const GOODS_EQUATIONS = [
   "GEQ-032 Procurement-class Quantity Conservation",
   "GEQ-033 Commercial-treatment Line Cost",
 ];
-
-import { PROJECT0550_PART_B_MODEL } from "./Project0550PartBModel";
 
 const SERVICE_EQUATIONS = [
   "GEQ-001 Applicability",
