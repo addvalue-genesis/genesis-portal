@@ -10,7 +10,9 @@ It must be populated from controlled engineering/cost/commercial state.
 It is NOT the engineering source of truth.
 */
 
-import React from "react";\n\nexport const ASKTSI_PRICED_BREAKDOWN_TEMPLATE = {
+import React from "react";
+
+export const ASKTSI_PRICED_BREAKDOWN_TEMPLATE = {
   id: "ASK-TSI-PRICED-BREAKDOWN",
   sourceFile: "ASK-TSI Priced Breakdown List.xlsx",
   sheet: "PriceBreakdown",
