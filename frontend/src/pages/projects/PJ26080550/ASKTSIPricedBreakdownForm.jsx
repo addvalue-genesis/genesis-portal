@@ -93,12 +93,27 @@ function convertedAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx){
   return null;
 }
 
+function primarySourceCurrency(line,field){
+  if(line?.sourceCurrency) return String(line.sourceCurrency).toUpperCase();
+  const map = field==="unitPrice" ? line?.unitPriceByCurrency : line?.subtotalByCurrency;
+  if(!map) return null;
+  if(Number.isFinite(map.THB)) return "THB";
+  if(Number.isFinite(map.EUR)) return "EUR";
+  if(Number.isFinite(map.USD)) return "USD";
+  if(Number.isFinite(map.CNY)) return "CNY";
+  return null;
+}
+
 function displayAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx){
+  const sourceCurrency=primarySourceCurrency(line,field);
+  const converted=convertedAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx);
+  if(Number.isFinite(converted)){
+    const suffix=sourceCurrency && sourceCurrency!==currency ? " · BOT MID FX" : "";
+    return money(converted,currency)+suffix;
+  }
+
   const value=lineAmount(line,currency,field);
   if(value!==null && value!==undefined && value!=="") return money(value,currency);
-
-  const converted=convertedAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx);
-  if(Number.isFinite(converted)) return money(converted,currency)+" · BOT MID FX";
 
   const map = field==="unitPrice" ? line.unitPriceByCurrency : line.subtotalByCurrency;
   if(map && Number.isFinite(map.EUR)){
