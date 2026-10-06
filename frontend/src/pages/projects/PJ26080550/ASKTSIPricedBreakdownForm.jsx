@@ -432,14 +432,21 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
               </div>
 
               <div className="ask-engineering-trace-chain">
-                {nodes.map(([label,value],idx)=>(
-                  <div className="ask-engineering-trace-node" key={label}>
-                    <b>{String(idx+1).padStart(2,"0")} · {label}</b>
-                    {Array.isArray(value)
-                      ? <div className="ask-equation-tags">{value.map(x=><code key={x}>{x}</code>)}</div>
-                      : <span>{value}</span>}
-                  </div>
-                ))}
+                {nodes.map(([label,value],idx)=>{
+                  const tone =
+                    label==="Equation ID" ? " is-equation" :
+                    label==="Displayed Price / Release" ? " is-price" :
+                    label==="Commercial Rule" ? " is-commercial" :
+                    "";
+                  return (
+                    <div className={"ask-engineering-trace-node"+tone} key={label}>
+                      <b>{String(idx+1).padStart(2,"0")} · {label}</b>
+                      {Array.isArray(value)
+                        ? <div className="ask-equation-tags">{value.map(x=><code key={x}>{x}</code>)}</div>
+                        : <span>{value}</span>}
+                    </div>
+                  );
+                })}
               </div>
             </>
           ) : null}
