@@ -31,7 +31,8 @@ const KERNEL = [
   ["GEQ-028","Standby Cost","C_standby,i = I_standby,i × Σ_r N_persons,r × StandbyDays_r × Rate_standby,r","ACCOUNTING_IDENTITY","RATE POLICY","Standby is explicit, never silently free"],
   ["GEQ-031","Hazardous Area Compliance / Cost Gate","I_ExReq = Applicable(...); I_ExCompat = CompatibilityGate(...); C_ExProtection = I_ExReq × (...applicable Ex cost terms...)","ENGINEERING_COMPLIANCE_GATE","SCOPE / RATE INPUT","Ex compliance gate + only applicable premium/accessory/install/inspection/cert costs"],
   ["GEQ-032","Procurement-class Quantity Conservation","Q_ordered,pseg = I_required × I_awarded × Q_required; Q_physical,pse = Σ_g Q_ordered,pseg","MATHEMATICAL_IDENTITY","CONTROLLED","Installed / commissioning spare / 2Y / capital quantities stay separate"],
-  ["GEQ-033","Commercial-treatment Line Cost","C_line,psj = I_required × I_awarded × Q_psj × P_psj; C_award = C_base + C_separate,awarded + C_option,exercised","ACCOUNTING_IDENTITY","RATE / AWARD INPUT","Base vs separate vs option commercial state"]
+  ["GEQ-033","Commercial-treatment Line Cost","C_line,psj = I_required × I_awarded × Q_psj × P_psj; C_award = C_base + C_separate,awarded + C_option,exercised","ACCOUNTING_IDENTITY","RATE / AWARD INPUT","Base vs separate vs option commercial state"],
+  ["GEQ-034","Controlled Currency Conversion","P_to = P_from × R_from,THB / R_to,THB","MATHEMATICAL_IDENTITY / COMMON_GENERIC","CONTROLLED FX INPUT","Cross-currency display uses one controlled FX authority/date/rate type while preserving the source currency amount"]
 ];
 
 const MODEL_FAMILIES = [
@@ -77,7 +78,8 @@ const BINDING = [
   ["FAT / SAT / Comm","GEQ-001/004/005/006/007/018/023","Required event keys + days + crew + resource caps","Test/site MH + stage cost","EVENT INPUT OPEN"],
   ["Mob / Travel","GEQ-013…017","People / trips / route / hotel / per-diem / permit","Mobilization cost","RATE INPUT OPEN"],
   ["Total Cost","GEQ-019/020/021/023","All direct equipment/activity + common cost","Internal project cost","NOT READY"],
-  ["Commercial / Quote","GEQ-032/033","Required/awarded quantity + Base/Separate/Option treatment","Exhibit C / awarded price state","NOT READY"]
+  ["Commercial / Quote","GEQ-032/033","Required/awarded quantity + Base/Separate/Option treatment","Exhibit C / awarded price state","NOT READY"],
+  ["Currency Conversion","GEQ-034","Source amount + source currency + BOT THB-reference rates + selected display currency","Derived display amount; source amount remains unchanged","CONTROLLED"]
 ];
 
 export function EquationKernel(){
@@ -123,7 +125,7 @@ export function EquationKernel(){
       {view==="kernel" && (
         <section className="eq-panel">
           <div className="eq-panel-head">
-            <div><small>GEQ-001…033</small><h2>Equation Registry — ค้นหาสมการที่ใช้กับงาน</h2></div>
+            <div><small>GEQ-001…034</small><h2>Equation Registry — ค้นหาสมการที่ใช้กับงาน</h2></div>
             <input value={q} onChange={e=>setQ(e.target.value)} placeholder="Search equation / domain / output…" />
           </div>
           <div className="eq-table-wrap">
