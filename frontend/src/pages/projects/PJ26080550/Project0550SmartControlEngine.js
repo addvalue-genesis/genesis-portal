@@ -1,7 +1,8 @@
 import { PROJECT0550_ENGINEERING_DOCTRINE } from "./Project0550EngineeringDoctrine";
 import {
   runProject0550EvidenceReasoning,
-  ingestProject0550EvidencePacket
+  ingestProject0550EvidencePacket,
+  project0550EvidenceMemoryFromApi
 } from "./Project0550EvidenceReasoner";
 
 const CLOSED = new Set(["FACT","DERIVED","PASS","APPROVED","CONTROLLED","READY","NOT_APPLICABLE"]);
@@ -263,7 +264,7 @@ export function proposeCalibration(history=[],{minSamples=5}={}){
 }
 
 
-export { runProject0550EvidenceReasoning, ingestProject0550EvidencePacket };
+export { runProject0550EvidenceReasoning, ingestProject0550EvidencePacket, project0550EvidenceMemoryFromApi };
 
 export function evaluateProject0550SmartState(records,options={}){
   const portfolio = evaluateProject0550Portfolio(records,options);
