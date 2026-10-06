@@ -69,28 +69,52 @@ function money(value,currency="USD"){
   }
 }
 
-function convertedAmount(line,currency,field,eurThbFx,usdThbFx){
+function sourceAmountToThb(line,field,eurThbFx,usdThbFx,cnyThbFx){
   const map = field==="unitPrice" ? line.unitPriceByCurrency : line.subtotalByCurrency;
-  const eur = map?.EUR;
-  const fx = Number(eurThbFx);
-  if(!Number.isFinite(eur) || !Number.isFinite(fx) || fx<=0) return null;
+  if(!map) return null;
 
-  if(currency==="THB") return eur * fx;
-  if(currency==="USD" && Number.isFinite(usdThbFx) && usdThbFx>0) return eur * fx / usdThbFx;
+  if(Number.isFinite(map.THB)) return map.THB;
+
+  const usdFx=Number(usdThbFx);
+  if(Number.isFinite(map.USD) && Number.isFinite(usdFx) && usdFx>0) return map.USD * usdFx;
+
+  const eurFx=Number(eurThbFx);
+  if(Number.isFinite(map.EUR) && Number.isFinite(eurFx) && eurFx>0) return map.EUR * eurFx;
+
+  const cnyFx=Number(cnyThbFx);
+  if(Number.isFinite(map.CNY) && Number.isFinite(cnyFx) && cnyFx>0) return map.CNY * cnyFx;
+
   return null;
 }
 
-function displayAmount(line,currency,field,eurThbFx,usdThbFx){
+function convertedAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx){
+  const thb=sourceAmountToThb(line,field,eurThbFx,usdThbFx,cnyThbFx);
+  if(!Number.isFinite(thb)) return null;
+
+  if(currency==="THB") return thb;
+
+  const usdFx=Number(usdThbFx);
+  if(currency==="USD" && Number.isFinite(usdFx) && usdFx>0) return thb / usdFx;
+
+  const eurFx=Number(eurThbFx);
+  if(currency==="EUR" && Number.isFinite(eurFx) && eurFx>0) return thb / eurFx;
+
+  const cnyFx=Number(cnyThbFx);
+  if(currency==="CNY" && Number.isFinite(cnyFx) && cnyFx>0) return thb / cnyFx;
+
+  return null;
+}
+
+function displayAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx){
   const value=lineAmount(line,currency,field);
   if(value!==null && value!==undefined && value!=="") return money(value,currency);
 
-  const converted=convertedAmount(line,currency,field,eurThbFx,usdThbFx);
+  const converted=convertedAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx);
   if(Number.isFinite(converted)) return money(converted,currency)+" · Working FX";
 
   const map = field==="unitPrice" ? line.unitPriceByCurrency : line.subtotalByCurrency;
-  if(map && Number.isFinite(map.EUR)){
-    return money(map.EUR,"EUR")+" · FX TBC";
-  }
+  if(map && Number.isFinite(map.EUR)) return money(map.EUR,"EUR")+" · EUR FX TBC";
+  if(map && Number.isFinite(map.CNY)) return money(map.CNY,"CNY")+" · CNY FX TBC";
   return "—";
 }
 
@@ -133,11 +157,11 @@ function RemarkCell({base,line,mode}){
   );
 }
 
-function numericSubtotal(lines,codes,currency,eurThbFx,usdThbFx){
+function numericSubtotal(lines,codes,currency,eurThbFx,usdThbFx,cnyThbFx){
   return codes.reduce((sum,code)=>{
     const line=rowValue(lines,code);
     let v=lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice");
-    if(!Number.isFinite(v)) v=convertedAmount(line,currency,"subtotal",eurThbFx,usdThbFx);
+    if(!Number.isFinite(v)) v=convertedAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
     return Number.isFinite(v) ? sum+v : sum;
   },0);
 }
@@ -151,15 +175,15 @@ function hasOpenTotal(lines,codes,currency){
   });
 }
 
-export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNAL",eurThbFx=null,usdThbFx=31.50}){
+export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNAL",eurThbFx=null,usdThbFx=31.50,cnyThbFx=null}){
   const t=ASKTSI_PRICED_BREAKDOWN_TEMPLATE;
   const aCodes=t.partA.map(([code])=>code);
   const bCodes=t.partB.map(([code])=>code);
   const cCodes=t.partC.map(([code])=>code);
 
-  const aKnown=numericSubtotal(lines,aCodes,currency,eurThbFx,usdThbFx);
-  const bKnown=numericSubtotal(lines,bCodes,currency,eurThbFx,usdThbFx);
-  const cKnown=numericSubtotal(lines,cCodes,currency,eurThbFx,usdThbFx);
+  const aKnown=numericSubtotal(lines,aCodes,currency,eurThbFx,usdThbFx,cnyThbFx);
+  const bKnown=numericSubtotal(lines,bCodes,currency,eurThbFx,usdThbFx,cnyThbFx);
+  const cKnown=numericSubtotal(lines,cCodes,currency,eurThbFx,usdThbFx,cnyThbFx);
   const aHold=hasOpenTotal(lines,aCodes,currency);
   const bHold=hasOpenTotal(lines,bCodes,currency);
 
@@ -204,8 +228,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td><strong>{description}</strong>{line.state?<><br/><Status state={line.state}/></>:null}</td>
                     <td>{line.qty ?? 1}</td>
                     <td>{line.unit || "Lot"}</td>
-                    <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx)}</td>
-                    <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx)}</td>
+                    <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx,cnyThbFx)}</td>
+                    <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx)}</td>
                     <td><RemarkCell base={line.sourceRemark || t.sourceRemarks.A_DEFAULT} line={line} mode={mode}/></td>
                   </tr>
                 );
@@ -228,8 +252,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td>{line.tagNo || ""}</td>
                     <td>{line.qty ?? "1 lot"}</td>
                     <td>{line.unit || ""}</td>
-                    <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx)}</td>
-                    <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx)}</td>
+                    <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx,cnyThbFx)}</td>
+                    <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx)}</td>
                     <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
                   </tr>
                 );
@@ -258,8 +282,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td>{line.tagNo || ""}</td>
                     <td>{line.qty ?? "1 lot"}</td>
                     <td>{line.unit || ""}</td>
-                    <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx)}</td>
-                    <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx)}</td>
+                    <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx,cnyThbFx)}</td>
+                    <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx)}</td>
                     <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
                   </tr>
                 );
