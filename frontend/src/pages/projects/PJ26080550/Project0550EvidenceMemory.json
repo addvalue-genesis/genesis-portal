@@ -1,0 +1,298 @@
+{
+  "projectCode": "PJ2608-0550",
+  "revision": "EVIDENCE-SYNC-20261006-01",
+  "generatedFromControlledReview": true,
+  "governingRule": "Evidence is memory input; it may drive deterministic reasoning but may not silently change requirement, final quantity, commercial policy or release state.",
+  "currentPricingBaseline": {
+    "revision": "REV07",
+    "source": "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_INDUSTRONIC-ONLY_20261006.xlsx"
+  },
+  "sources": [
+    {
+      "sourceId": "SRC-JASON-QT2026-160",
+      "sourceType": "CURRENT_VENDOR_QUOTE",
+      "evidenceClass": "B",
+      "title": "QT2026-160-Add Value System.pdf",
+      "sourceRef": "JASON ELECTRONICS (THAILAND) CO., LTD. · QT2026-160 · 16-Sep-2026",
+      "sourceUrl": "https://drive.google.com/file/d/1oXJrw53p6FlfWzGbIw5gEOQ2n20Ex24P/view?usp=sharing",
+      "quoteCurrency": "THB",
+      "quotedTotalExVat": 3507650,
+      "vatPct": 0.07,
+      "quotedGrandTotal": 3753185.5,
+      "exclusions": [
+        "Cable",
+        "Installation",
+        "Commissioning",
+        "Transportation"
+      ],
+      "specialConditions": [
+        "NDB import licence is customer responsibility per vendor quotation",
+        "Shipment from factory stated as 16-20 weeks ARO"
+      ],
+      "assertions": [
+        {
+          "assertionId": "JASON-MARINE-001",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-MARINE",
+          "priceLine": "A1-08",
+          "object": "SAILOR 7222 VHF DSC Class A",
+          "qty": 1,
+          "unit": "set",
+          "unitPrice": 80500,
+          "total": 80500,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-MARINE-002",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-MARINE",
+          "priceLine": "A1-08",
+          "object": "U-mount bracket kit",
+          "qty": 1,
+          "unit": "pc",
+          "unitPrice": 2300,
+          "total": 2300,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-MARINE-003",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-MARINE",
+          "priceLine": "A1-08",
+          "object": "SAILOR N163S Power Supply",
+          "qty": 1,
+          "unit": "pc",
+          "unitPrice": 15350,
+          "total": 15350,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-AERO-001",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-AERO",
+          "priceLine": "A1-09",
+          "object": "TR-810 DE Transceiver Desktop",
+          "qty": 1,
+          "unit": "pc",
+          "unitPrice": 165000,
+          "total": 165000,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-AERO-002",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-AERO",
+          "priceLine": "A1-09",
+          "object": "Procom CXL3-1LW Antenna 118-137 MHz",
+          "qty": 1,
+          "unit": "pc",
+          "unitPrice": 18500,
+          "total": 18500,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-AERO-003",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-AERO",
+          "priceLine": "A1-09",
+          "object": "Lightning Protector",
+          "qty": 1,
+          "unit": "pc",
+          "unitPrice": 29000,
+          "total": 29000,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-SSB-001",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-SSB",
+          "priceLine": "A1-10",
+          "object": "SAILOR MF/HF SYSTEM 6000B 150W",
+          "qty": 1,
+          "unit": "set",
+          "unitPrice": 330000,
+          "total": 330000,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-SSB-002",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-SSB",
+          "priceLine": "A1-10",
+          "object": "SAILOR 6080 AC/DC Power Supply",
+          "qty": 1,
+          "unit": "set",
+          "unitPrice": 32000,
+          "total": 32000,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-SSB-003",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-SSB",
+          "priceLine": "A1-10",
+          "object": "Wall-mounting tray",
+          "qty": 1,
+          "unit": "set",
+          "unitPrice": 6000,
+          "total": 6000,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-SSB-004",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-SSB",
+          "priceLine": "A1-10",
+          "object": "COMROD AT82M Tx Antenna",
+          "qty": 1,
+          "unit": "set",
+          "unitPrice": 39500,
+          "total": 39500,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-SSB-005",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-RADIO-SSB",
+          "priceLine": "A1-10",
+          "object": "COMROD AR62M Rx Antenna",
+          "qty": 1,
+          "unit": "set",
+          "unitPrice": 39500,
+          "total": 39500,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-NDB-001",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-NDB",
+          "priceLine": "A1-15",
+          "object": "FLUGCOM Dual NDB125 Transmitter Rack package",
+          "qty": 1,
+          "unit": "set",
+          "unitPrice": 2450000,
+          "total": 2450000,
+          "currency": "THB",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "JASON-AIS-001",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-AIS",
+          "priceLine": "A1-01",
+          "object": "FURUNO FA-170 AIS Receiver package",
+          "qty": 1,
+          "unit": "set",
+          "unitPrice": 180000,
+          "total": 180000,
+          "currency": "THB",
+          "state": "FACT",
+          "commercialMappingState": "OPEN_COMPOSITE_LINE"
+        },
+        {
+          "assertionId": "JASON-MET-001",
+          "domain": "VENDOR_OFFER",
+          "systemToken": "TEL-MET",
+          "priceLine": "A1-14",
+          "object": "RM YOUNG 86106 Ultrasonic Anemometer",
+          "qty": 1,
+          "unit": "set",
+          "unitPrice": 120000,
+          "total": 120000,
+          "currency": "THB",
+          "state": "FACT"
+        }
+      ]
+    },
+    {
+      "sourceId": "SRC-CCTV-MR-APP1.3-CURRENT",
+      "sourceType": "GOVERNING_PROJECT_SOURCE",
+      "evidenceClass": "A",
+      "title": "Current 0550 CCTV quantity basis",
+      "sourceRef": "MR-0001 · Appendix 1.3 CCTV lines / controlled Rev07 state",
+      "assertions": [
+        {
+          "assertionId": "CCTV-QTY-EX-PTZ",
+          "domain": "REQUIRED_QUANTITY",
+          "systemToken": "TEL-CCTV",
+          "priceLine": "A1-06",
+          "object": "Ex PTZ camera",
+          "qty": 6,
+          "unit": "pc",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "CCTV-QTY-EX-FIXED",
+          "domain": "REQUIRED_QUANTITY",
+          "systemToken": "TEL-CCTV",
+          "priceLine": "A1-06",
+          "object": "Ex Fixed camera",
+          "qty": 2,
+          "unit": "pc",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "CCTV-QTY-IN-PTZ",
+          "domain": "REQUIRED_QUANTITY",
+          "systemToken": "TEL-CCTV",
+          "priceLine": "A1-06",
+          "object": "Indoor PTZ camera",
+          "qty": 6,
+          "unit": "pc",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "CCTV-QTY-IN-FIXED",
+          "domain": "REQUIRED_QUANTITY",
+          "systemToken": "TEL-CCTV",
+          "priceLine": "A1-06",
+          "object": "Indoor Fixed/Dome camera",
+          "qty": 41,
+          "unit": "pc",
+          "state": "FACT"
+        },
+        {
+          "assertionId": "CCTV-QTY-AMS01",
+          "domain": "REQUIRED_QUANTITY",
+          "systemToken": "TEL-CCTV",
+          "priceLine": "A1-06",
+          "object": "AMS01 camera population",
+          "qty": null,
+          "unit": "pc",
+          "state": "TBC"
+        }
+      ],
+      "derivedControls": [
+        {
+          "controlId": "CCTV-KNOWN-CAMERA-TOTAL",
+          "formula": "6+2+6+41",
+          "value": 55,
+          "unit": "camera",
+          "state": "DERIVED"
+        },
+        {
+          "controlId": "CCTV-REV07-BUDGETARY-SELL",
+          "value": 4163873.68,
+          "unit": "THB",
+          "state": "CONTROLLED_BASELINE"
+        },
+        {
+          "controlId": "CCTV-SUPERSEDED-PROXY-BLOCK",
+          "value": "24 Ex PTZ × THB 500,000",
+          "state": "SUPERSEDED_DO_NOT_REUSE"
+        }
+      ]
+    }
+  ]
+}
