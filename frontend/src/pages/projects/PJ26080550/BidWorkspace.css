@@ -1179,3 +1179,251 @@ body{margin:0;background:#f4f7fb;color:var(--bid-ink)}
 @media(max-width:950px){
   .ask-cost-layer-banner{grid-template-columns:1fr}
 }
+
+
+/* 0550 Price UX Rev10 — executive-readable detail sizing + cost-to-sell ladder */
+.ask-engineering-trace{
+  font-size:12px;
+}
+.ask-engineering-trace-head small{
+  font-size:10px!important;
+}
+.ask-engineering-trace-head strong{
+  font-size:15px!important;
+  line-height:1.3;
+}
+.ask-engineering-trace-head span{
+  font-size:11.5px!important;
+  line-height:1.5!important;
+}
+
+.ask-trace-subtabs{
+  gap:7px;
+  padding:8px;
+}
+.ask-trace-subtabs button{
+  padding:8px 12px;
+  font-size:12px;
+  line-height:1.2;
+}
+
+.ask-price-source-detail{
+  gap:9px;
+}
+.ask-price-source-detail>div{
+  padding:11px 12px;
+}
+.ask-price-source-detail b,
+.ask-quantity-basis>b,
+.ask-build-up-head b{
+  font-size:10.5px!important;
+}
+.ask-price-source-detail span{
+  font-size:12px!important;
+  line-height:1.5!important;
+}
+
+.ask-quantity-basis{
+  padding:11px 12px;
+}
+.ask-quantity-basis span{
+  padding:6px 8px;
+  font-size:11px!important;
+}
+
+.ask-build-up-head{
+  padding:10px 12px;
+}
+.ask-build-up-head span{
+  font-size:10px!important;
+}
+.ask-build-up th,
+.ask-build-up td{
+  padding:10px 12px!important;
+  font-size:11.5px!important;
+  line-height:1.5!important;
+}
+.ask-build-up th{
+  font-size:10.5px!important;
+}
+
+.ask-empty-source{
+  padding:16px;
+}
+.ask-empty-source strong{
+  font-size:12px!important;
+}
+.ask-empty-source span,
+.ask-empty-source p{
+  font-size:11.5px!important;
+  line-height:1.55!important;
+}
+
+.ask-engineering-trace-rule{
+  padding:10px 12px!important;
+  font-size:11px!important;
+  line-height:1.55!important;
+}
+.ask-engineering-trace-rule strong{
+  font-size:11px!important;
+}
+
+.ask-cost-layer-banner small{
+  font-size:10px!important;
+}
+.ask-cost-layer-banner strong{
+  font-size:14px!important;
+}
+.ask-cost-layer-banner span{
+  font-size:11.5px!important;
+}
+
+.ask-vendor-head small{
+  font-size:10px!important;
+}
+.ask-vendor-head strong{
+  font-size:14px!important;
+}
+.ask-vendor-head span{
+  font-size:11px!important;
+}
+.ask-vendor-table th,.ask-vendor-table td,
+.ask-recon-table th,.ask-recon-table td{
+  font-size:11.5px!important;
+}
+.ask-vendor-table th,.ask-recon-table th{
+  font-size:10.5px!important;
+}
+.ask-vendor-table small{
+  font-size:10px!important;
+}
+.ask-source-lock{
+  font-size:11px!important;
+}
+
+.ask-overview-grid small{
+  font-size:9.5px!important;
+}
+.ask-overview-grid strong{
+  font-size:13px!important;
+}
+.ask-overview-grid span{
+  font-size:11px!important;
+}
+.ask-overview-explain b{
+  font-size:10px!important;
+}
+.ask-overview-explain span{
+  font-size:11.5px!important;
+}
+.ask-overview-children-head b{
+  font-size:11px!important;
+}
+.ask-overview-children-head span{
+  font-size:10.5px!important;
+}
+.ask-child-list span{
+  font-size:9.5px!important;
+}
+.ask-child-list strong{
+  font-size:11.5px!important;
+}
+.ask-child-list em{
+  font-size:11px!important;
+}
+.ask-overview-build>b{
+  font-size:11px!important;
+}
+.ask-overview-build small{
+  font-size:9px!important;
+}
+.ask-overview-build strong{
+  font-size:10.5px!important;
+}
+.ask-overview-build em{
+  font-size:11px!important;
+}
+
+.ask-price-ladder{
+  display:grid;
+  grid-template-columns:minmax(180px,1fr) 28px minmax(180px,1fr) 28px minmax(220px,1.2fr) 28px minmax(180px,1fr);
+  align-items:stretch;
+  gap:7px;
+  margin:10px 0;
+}
+.ask-price-ladder>div{
+  padding:12px 13px;
+  border:1px solid #cfdbe5;
+  border-radius:9px;
+  background:#fff;
+}
+.ask-price-ladder>em{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:#7690a7;
+  font-size:20px;
+  font-style:normal;
+  font-weight:900;
+}
+.ask-price-ladder small{
+  display:block;
+  color:#61788d;
+  font-size:9.5px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.035em;
+}
+.ask-price-ladder strong{
+  display:block;
+  margin-top:5px;
+  color:#173e61;
+  font-size:15px;
+  line-height:1.25;
+}
+.ask-price-ladder span{
+  display:block;
+  margin-top:5px;
+  color:#66798a;
+  font-size:10.5px;
+  line-height:1.45;
+}
+.ask-price-ladder .preview{
+  border-color:#d8b25f;
+  background:#fff8e8;
+}
+.ask-price-ladder .preview strong{
+  color:#7e5700;
+}
+.ask-price-ladder .hold{
+  border-color:#e0a7a0;
+  background:#fff3f1;
+}
+.ask-price-ladder .hold strong{
+  color:#9a3e34;
+}
+.ask-commercial-preview-note{
+  display:flex;
+  gap:7px;
+  margin:8px 0 10px;
+  padding:10px 12px;
+  border-left:4px solid #d09228;
+  background:#fff8e8;
+  color:#68583a;
+  font-size:11px;
+  line-height:1.5;
+}
+.ask-commercial-preview-note strong{
+  white-space:nowrap;
+  color:#7c5400;
+}
+
+@media(max-width:1250px){
+  .ask-price-ladder{
+    grid-template-columns:1fr;
+  }
+  .ask-price-ladder>em{
+    transform:rotate(90deg);
+    min-height:18px;
+  }
+}
