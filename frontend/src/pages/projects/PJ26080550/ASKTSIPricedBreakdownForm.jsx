@@ -86,6 +86,12 @@ function rowValue(lines,code){
   return lines?.[code] || {};
 }
 
+function lineAmount(line,currency,field){
+  const map = field==="unitPrice" ? line.unitPriceByCurrency : line.subtotalByCurrency;
+  if(map && Object.prototype.hasOwnProperty.call(map,currency)) return map[currency];
+  return line[field];
+}
+
 function remarkText(base,line,mode){
   const parts=[];
   if(base) parts.push(base);
@@ -128,8 +134,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td><strong>{description}</strong>{line.state?<><br/><Status state={line.state}/></>:null}</td>
                     <td>{line.qty ?? 1}</td>
                     <td>{line.unit || "Lot"}</td>
-                    <td>{money(line.unitPrice,currency)}</td>
-                    <td>{money(line.subtotal ?? line.unitPrice,currency)}</td>
+                    <td>{money(lineAmount(line,currency,"unitPrice"),currency)}</td>
+                    <td>{money(lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice"),currency)}</td>
                     <td>{remarkText(line.sourceRemark || t.sourceRemarks.A_DEFAULT,line,mode)}</td>
                   </tr>
                 );
@@ -146,8 +152,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td>{line.tagNo || ""}</td>
                     <td>{line.qty ?? "1 lot"}</td>
                     <td>{line.unit || ""}</td>
-                    <td>{money(line.unitPrice,currency)}</td>
-                    <td>{money(line.subtotal ?? line.unitPrice,currency)}</td>
+                    <td>{money(lineAmount(line,currency,"unitPrice"),currency)}</td>
+                    <td>{money(lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice"),currency)}</td>
                     <td>{remarkText(line.sourceRemark || t.sourceRemarks[code] || "",line,mode)}{line.state?<><br/><Status state={line.state}/></>:null}</td>
                   </tr>
                 );
@@ -166,8 +172,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                     <td>{line.tagNo || ""}</td>
                     <td>{line.qty ?? "1 lot"}</td>
                     <td>{line.unit || ""}</td>
-                    <td>{money(line.unitPrice,currency)}</td>
-                    <td>{money(line.subtotal ?? line.unitPrice,currency)}</td>
+                    <td>{money(lineAmount(line,currency,"unitPrice"),currency)}</td>
+                    <td>{money(lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice"),currency)}</td>
                     <td>{remarkText(line.sourceRemark || t.sourceRemarks[code] || "",line,mode)}{line.state?<><br/><Status state={line.state}/></>:null}</td>
                   </tr>
                 );
