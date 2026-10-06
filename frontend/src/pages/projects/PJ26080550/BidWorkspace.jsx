@@ -314,16 +314,16 @@ function ScopeView() {
 }
 
 function PriceView() {
+  const p = PROJECT0550_PRICING_BASELINE;
   const [currency,setCurrency] = useState("USD");
   const [eurThbFx,setEurThbFx] = useState(() => {
-    if(typeof window==="undefined") return "";
-    return window.localStorage.getItem("pj2608-0550-eur-thb-working-fx") || "";
+    if(typeof window==="undefined") return String(p.fx.workingEurThb ?? "");
+    return window.localStorage.getItem("pj2608-0550-eur-thb-working-fx") || String(p.fx.workingEurThb ?? "");
   });
   const [cnyThbFx,setCnyThbFx] = useState(() => {
-    if(typeof window==="undefined") return "";
-    return window.localStorage.getItem("pj2608-0550-cny-thb-working-fx") || "";
+    if(typeof window==="undefined") return String(p.fx.workingCnyThb ?? "");
+    return window.localStorage.getItem("pj2608-0550-cny-thb-working-fx") || String(p.fx.workingCnyThb ?? "");
   });
-  const p = PROJECT0550_PRICING_BASELINE;
 
   function updateEurThbFx(value){
     setEurThbFx(value);
@@ -425,7 +425,7 @@ function PriceView() {
               onChange={(e)=>updateEurThbFx(e.target.value)}
               placeholder="1 EUR = ? THB"
             />
-            <small>{eurThbFx ? "Working conversion only · not firm FX" : "Required for EUR conversion / PAGA THB"}</small>
+            <small>{eurThbFx ? "Working conversion only · not firm project FX" : "Required for EUR conversion / PAGA THB"}</small>
           </label>
           <label className="bid-fx-input">
             <span>CNY/THB Working FX</span>
@@ -438,7 +438,7 @@ function PriceView() {
               onChange={(e)=>updateCnyThbFx(e.target.value)}
               placeholder="1 CNY = ? THB"
             />
-            <small>{cnyThbFx ? "Working conversion only · not firm FX" : "Required to display project price in CNY/RMB"}</small>
+            <small>{cnyThbFx ? "Working conversion only · not firm project FX" : "Required to display project price in CNY/RMB"}</small>
           </label>
         </div>
       </section>
@@ -461,6 +461,7 @@ function PriceView() {
           <code>MH = Q × UMH × Factor</code>
           <code>Internal Cost = Material + Bulk + Work + Lifecycle + Common + Risk</code>
           <code>Customer Line = CommercialMapping(Controlled Cost, Treatment, Policy)</code>
+          <code>Price View = Controlled Equation Output + Selected Vendor Evidence + FX Layer</code>
         </div>
         <p>
           Current baseline ผูก Part A / B / C จาก controlled 0550 pricing state แล้ว.
