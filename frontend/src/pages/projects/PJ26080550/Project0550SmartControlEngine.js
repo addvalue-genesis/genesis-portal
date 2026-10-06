@@ -1,4 +1,8 @@
 import { PROJECT0550_ENGINEERING_DOCTRINE } from "./Project0550EngineeringDoctrine";
+import {
+  runProject0550EvidenceReasoning,
+  ingestProject0550EvidencePacket
+} from "./Project0550EvidenceReasoner";
 
 const CLOSED = new Set(["FACT","DERIVED","PASS","APPROVED","CONTROLLED","READY","NOT_APPLICABLE"]);
 const SOFT = new Set(["WORKING","PARTIAL","PRELIMINARY","ASSUMPTION"]);
@@ -255,5 +259,27 @@ export function proposeCalibration(history=[],{minSamples=5}={}){
     confidence:mad<=0.1?"HIGH":mad<=0.25?"MEDIUM":"LOW",
     autoApply:false,
     rule:"Learning may propose calibration only; adoption requires engineering/commercial approval."
+  };
+}
+
+
+export { runProject0550EvidenceReasoning, ingestProject0550EvidencePacket };
+
+export function evaluateProject0550SmartState(records,options={}){
+  const portfolio = evaluateProject0550Portfolio(records,options);
+  const evidence = runProject0550EvidenceReasoning();
+  const blockers = portfolio.summary.blockers + evidence.summary.blockers;
+  const warnings = portfolio.summary.warnings + evidence.summary.warnings;
+  return {
+    status:blockers ? "BLOCKED" : warnings ? "CONDITIONAL" : "READY",
+    portfolio,
+    evidence,
+    summary:{
+      blockers,
+      warnings,
+      portfolioObjects:portfolio.summary.objects,
+      evidenceSources:evidence.summary.sources,
+      evidenceAssertions:evidence.summary.assertions
+    }
   };
 }
