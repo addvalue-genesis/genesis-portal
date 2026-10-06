@@ -262,3 +262,129 @@ body{margin:0;background:#f4f7fb;color:var(--bid-ink)}
 .bid-offer-summary strong{display:block;margin-top:5px;color:#123a5e;font-size:20px;line-height:1.1;font-variant-numeric:tabular-nums}
 .bid-offer-summary span{display:block;margin-top:6px;color:#647386;font-size:8.5px;line-height:1.45}
 @media(max-width:900px){.bid-offer-summary{grid-template-columns:1fr}}
+
+
+/* ASK-TSI price-line engineering trace */
+.ask-price-line.is-trace-open td{
+  background:#f8fbfe;
+  border-bottom-color:#6e91b3!important;
+}
+.ask-trace-btn{
+  display:inline-flex;
+  margin-top:5px;
+  margin-left:6px;
+  border:1px solid #9fb6cb;
+  border-radius:6px;
+  padding:3px 6px;
+  background:#fff;
+  color:#24557f;
+  font:inherit;
+  font-size:7px;
+  font-weight:800;
+  cursor:pointer;
+  vertical-align:middle;
+}
+.ask-trace-btn:hover{
+  background:#edf5fb;
+  border-color:#6e91b3;
+}
+.ask-engineering-trace-row>td{
+  padding:0!important;
+  border:1px solid #6e91b3!important;
+  background:#f4f8fc!important;
+}
+.ask-engineering-trace{
+  padding:12px;
+}
+.ask-engineering-trace-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  padding-bottom:9px;
+  border-bottom:1px solid #cbd8e4;
+}
+.ask-engineering-trace-head small{
+  display:block;
+  color:#55718d;
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:.06em;
+  text-transform:uppercase;
+}
+.ask-engineering-trace-head strong{
+  display:block;
+  margin-top:3px;
+  color:#173e61;
+  font-size:11px;
+}
+.ask-engineering-trace-head span{
+  display:block;
+  margin-top:4px;
+  color:#647487;
+  font-size:7.5px;
+  line-height:1.4;
+}
+.ask-engineering-trace-chain{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+.ask-engineering-trace-chain>i{
+  display:none;
+}
+.ask-engineering-trace-node{
+  min-width:0;
+  border:1px solid #d6e0e9;
+  border-radius:8px;
+  padding:9px;
+  background:#fff;
+}
+.ask-engineering-trace-node b{
+  display:block;
+  color:#315b80;
+  font-size:7px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.ask-engineering-trace-node>span{
+  display:block;
+  margin-top:5px;
+  color:#4f5f70;
+  font-size:7.5px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.ask-equation-tags{
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  margin-top:6px;
+}
+.ask-equation-tags code{
+  display:inline-flex;
+  border-radius:5px;
+  padding:3px 5px;
+  background:#edf4fb;
+  color:#244f77;
+  font-size:6.8px;
+  line-height:1.2;
+}
+.ask-engineering-trace-rule{
+  display:flex;
+  gap:6px;
+  margin-top:9px;
+  padding:7px 9px;
+  border-left:3px solid #c58a18;
+  background:#fff8e9;
+  color:#6a5a36;
+  font-size:7.5px;
+  line-height:1.4;
+}
+.ask-engineering-trace-rule strong{
+  white-space:nowrap;
+}
+@media(max-width:1000px){
+  .ask-engineering-trace-chain{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
