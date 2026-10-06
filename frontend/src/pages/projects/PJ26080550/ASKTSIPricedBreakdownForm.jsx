@@ -14,6 +14,7 @@ import React, { useState } from "react";
 import { traceForPriceLine } from "./Project0550PriceTrace";
 import { auditForPriceLine } from "./Project0550A1PriceAudit";
 import { vendorOfferForPriceLine } from "./Project0550VendorOfferRegister";
+import { runProject0550EvidenceReasoning } from "./Project0550SmartControlEngine";
 
 export const ASKTSI_PRICED_BREAKDOWN_TEMPLATE = {
   id: "ASK-TSI-PRICED-BREAKDOWN",
@@ -460,6 +461,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
   const cKnown=numericSubtotal(lines,cCodes,currency,eurThbFx,usdThbFx,cnyThbFx);
   const aHold=hasOpenTotal(lines,aCodes,currency);
   const bHold=hasOpenTotal(lines,bCodes,currency);
+  const evidenceGate=runProject0550EvidenceReasoning(undefined,{candidateLines:lines});
+  const outputHold=aHold || bHold || evidenceGate.status==="BLOCKED";
 
   return (
     <div className="bid-stack">
@@ -475,6 +478,27 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
           Form นี้รับค่าจาก controlled engineering / cost / commercial model.
           ช่องว่าง/TBC ต้องคงสถานะไว้และห้ามถูกแปลงเป็นศูนย์โดยอัตโนมัติ.
         </p>
+        <div className="ask-price-audit">
+          <div><b>Evidence Gate</b><span>{evidenceGate.status}</span></div>
+          <div><b>Memory</b><span>{evidenceGate.memoryRevision}</span></div>
+          <div><b>Current baseline</b><span>{evidenceGate.baselineRevision}</span></div>
+          <div><b>Stale/conflict blockers</b><span>{evidenceGate.summary.blockers}</span></div>
+          <div>
+            <b>Output rule</b>
+            <span>{evidenceGate.status==="BLOCKED" ? "HOLD — candidate must be rebuilt from controlled state" : "Candidate passes current evidence-memory checks"}</span>
+          </div>
+        </div>
+        {evidenceGate.findings.length ? (
+          <details className="ask-trace">
+            <summary>Evidence gate findings</summary>
+            {evidenceGate.findings.map((finding,idx)=>(
+              <div key={(finding.code||"EVD")+"-"+idx}>
+                <strong>{finding.code}</strong> · {finding.message}
+                {finding.action ? <> · <em>{finding.action}</em></> : null}
+              </div>
+            ))}
+          </details>
+        ) : null}
 
         <div className="bid-table-wrap ask-price-wrap">
           <table className="bid-table ask-price-table">
@@ -558,8 +582,8 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
               <tr className="ask-base-total">
                 <td colSpan="5"><strong>BASE OFFER = PART A + PART B</strong><small>This is the project offer amount before optional Part C.</small></td>
                 <td></td>
-                <td><strong>{aHold || bHold ? "HOLD" : money(aKnown+bKnown,currency)}</strong></td>
-                <td><Status state={aHold || bHold ? "PROJECT OFFER = HOLD" : "PROJECT OFFER READY"}/></td>
+                <td><strong>{outputHold ? "HOLD" : money(aKnown+bKnown,currency)}</strong></td>
+                <td><Status state={outputHold ? "PROJECT OFFER = HOLD" : "PROJECT OFFER READY"}/></td>
               </tr>
               <tr><td colSpan="8">Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
 
