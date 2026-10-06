@@ -12,6 +12,7 @@ It is NOT the engineering source of truth.
 
 import React, { useState } from "react";
 import { traceForPriceLine } from "./Project0550PriceTrace";
+import { auditForA1 } from "./Project0550A1PriceAudit";
 
 export const ASKTSI_PRICED_BREAKDOWN_TEMPLATE = {
   id: "ASK-TSI-PRICED-BREAKDOWN",
@@ -168,6 +169,7 @@ function RemarkCell({base,line,mode}){
 
 function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const trace=traceForPriceLine(code,line);
+  const audit=auditForA1(code);
   const displayed=displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
 
   const nodes=[
@@ -193,6 +195,15 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             </div>
             <Status state={trace.releaseState}/>
           </div>
+          {audit ? (
+            <div className="ask-price-audit">
+              <div><b>GDrive Price Audit</b><span>{audit.grade}</span></div>
+              <div><b>Verdict</b><span>{audit.verdict}</span></div>
+              <div><b>Basis</b><span>{audit.basis}</span></div>
+              <div><b>Primary source</b><span>{audit.source}</span></div>
+              <div><b>Closure</b><span>{audit.action}</span></div>
+            </div>
+          ) : null}
           <div className="ask-engineering-trace-chain">
             {nodes.map(([label,value],idx)=>(
               <React.Fragment key={label}>
