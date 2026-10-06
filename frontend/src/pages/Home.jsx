@@ -27,7 +27,7 @@ export function Home({ lang }) {
                 ? "19 ระบบ · First-Principles control spine · Resource-protected pricing · FAT/SAT execution · Logistics / Permit / Insurance / Risk"
                 : "19 systems · First-Principles control spine · Resource-protected pricing · FAT/SAT execution · Logistics / Permit / Insurance / Risk"}
             </p>
-            <div className="home-card__meta">Base A+B · USD 5.853M / THB 184.374M</div>
+            <div className="home-card__meta">Rev07 · PAGA INDUSTRONIC selected · Project Total HOLD</div>
           </Link>
 
           <Link className="home-card" to="/employees">
