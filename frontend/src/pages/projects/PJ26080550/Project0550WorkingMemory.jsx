@@ -41,7 +41,9 @@ Code must evaluate source/evidence, constraints, proof gates, quantity drivers,
 vendor reconciliation, lifecycle work, cost completeness and release readiness.
 */
 
-import React from "react";\n\nexport const PROJECT0550_TEAM_WORKING_MEMORY = {
+import React from "react";
+
+export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
