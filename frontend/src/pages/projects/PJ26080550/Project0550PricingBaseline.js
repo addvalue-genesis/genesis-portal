@@ -2,7 +2,7 @@
 PJ2608-0550 — CURRENT ASK-TSI PRICING BASELINE
 
 Current internal baseline:
-PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_INDUSTRONIC-ONLY_20261006.xlsx
+PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx
 
 Rules:
 - PAGA selected technical + pricing basis = INDUSTRONIC Offer A20261632.
