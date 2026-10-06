@@ -144,13 +144,13 @@ export function ControlSpine(){
     const s=q.trim().toLowerCase();
     if(!s) return smart.objects;
     return smart.objects.filter(x=>Object.values(x).filter(v=>typeof v!=="object").join(" ").toLowerCase().includes(s));
-  },[q]);
+  },[q,smart]);
 
   return (
     <div className="cs-shell">
       <section className="cs-hero">
         <div>
-          <small>0550 SMART ENGINEERING CONTROL · ${PROJECT0550_ENGINEERING_DOCTRINE.revision}</small>
+          <small>0550 SMART ENGINEERING CONTROL · {PROJECT0550_ENGINEERING_DOCTRINE.revision}</small>
           <h2>{PROJECT0550_ENGINEERING_DOCTRINE.name}</h2>
           <p>
             Code ประมวลผลข้อมูล 0550 ตาม First Principles, technical/non-technical constraints, proof gates,
