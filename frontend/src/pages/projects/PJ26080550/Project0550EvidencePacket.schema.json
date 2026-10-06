@@ -1,0 +1,73 @@
+{
+  "title": "PJ2608-0550 Controlled Evidence Packet",
+  "type": "object",
+  "required": ["projectCode", "sourceId", "sourceType", "evidenceClass", "assertions"],
+  "properties": {
+    "projectCode": { "const": "PJ2608-0550" },
+    "sourceId": { "type": "string" },
+    "sourceType": {
+      "type": "string",
+      "enum": [
+        "APPROVED_HUMAN_DECISION",
+        "GOVERNING_PROJECT_SOURCE",
+        "CURRENT_VENDOR_QUOTE",
+        "CURRENT_PROJECT_CALCULATION",
+        "CURRENT_MARKET_SANITY",
+        "HISTORICAL_REFERENCE",
+        "ASSUMPTION"
+      ]
+    },
+    "evidenceClass": { "type": "string", "enum": ["A", "B", "C", "D"] },
+    "title": { "type": ["string", "null"] },
+    "sourceRef": { "type": ["string", "null"] },
+    "assertions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["assertionId", "domain", "state"],
+        "properties": {
+          "assertionId": { "type": "string" },
+          "domain": {
+            "type": "string",
+            "enum": [
+              "REQUIREMENT",
+              "REQUIRED_QUANTITY",
+              "VENDOR_OFFER",
+              "EXCLUSION",
+              "PROOF",
+              "COST_INPUT",
+              "COMMERCIAL",
+              "INTERFACE",
+              "CONSTRAINT",
+              "OTHER"
+            ]
+          },
+          "systemToken": { "type": ["string", "null"] },
+          "priceLine": { "type": ["string", "null"] },
+          "location": { "type": ["string", "null"] },
+          "object": { "type": ["string", "null"] },
+          "state": {
+            "type": "string",
+            "enum": [
+              "FACT",
+              "DERIVED",
+              "ASSUMPTION",
+              "TBC",
+              "NOT_FOUND",
+              "SOURCE_CONFLICT",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "value": {},
+          "qty": { "type": ["number", "null"] },
+          "unit": { "type": ["string", "null"] },
+          "unitPrice": { "type": ["number", "null"] },
+          "total": { "type": ["number", "null"] },
+          "currency": { "type": ["string", "null"] },
+          "note": { "type": ["string", "null"] }
+        }
+      }
+    }
+  }
+}
