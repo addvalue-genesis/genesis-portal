@@ -789,16 +789,26 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
               {t.partB.map(([code,sourceDescription])=>{
                 const line=rowValue(lines,code);
                 const description=sourceDescription || (mode==="INTERNAL" ? (line.description || "") : "");
+                const sourceInfo=classifyProject0550PriceLine(code,line);
                 return (
                   <React.Fragment key={code}>
                     <tr className={traceCode===code ? "ask-price-line is-trace-open" : "ask-price-line"}>
                       <td><strong>{code}</strong></td>
-                      <td>{description}</td>
+                      <td>
+                        {description}
+                        {mode==="INTERNAL" ? (
+                          <div className="ask-row-source-line">
+                            <SourceChip info={sourceInfo}/>
+                          </div>
+                        ) : null}
+                      </td>
                       <td>
                         {line.tagNo || ""}
-                        <button type="button" className="ask-trace-btn" onClick={()=>toggleTrace(code)}>
-                          {traceCode===code ? "Close trace" : "Trace price"}
-                        </button>
+                        {mode==="INTERNAL" ? (
+                          <button type="button" className="ask-trace-btn" onClick={()=>toggleTrace(code)}>
+                            {traceCode===code ? "▾ Close details" : `▸ View details${sourceInfo.detailCount ? " · "+sourceInfo.detailCount : ""}`}
+                          </button>
+                        ) : null}
                       </td>
                       <td>{line.qty ?? "1 lot"}</td>
                       <td>{line.unit || ""}</td>
