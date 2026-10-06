@@ -8,6 +8,25 @@ Rules:
 */
 
 export const PROJECT0550_VENDOR_OFFER_REGISTER = {
+  "A1-01":{
+    vendor:"JASON ELECTRONICS (THAILAND) CO., LTD. — AIS COMPONENT ONLY",
+    quoteRef:"QT2026-160",
+    quoteDate:"16-Sep-2026",
+    currency:"THB",
+    incoterm:"Quote excludes cable, installation, commissioning and transportation",
+    quotedFinal:null,
+    sourceQuoteTotalThb:3507650,
+    mappedQuoteSubtotalThb:180000,
+    status:"CURRENT AIS COMPONENT QUOTE / COMPOSITE A1-01 STILL PARTIAL",
+    vendorItems:[
+      {group:"AIS",item:"FURUNO FA-170 AIS Receiver",qty:1,unit:"set",unitPrice:180000,total:180000,inFinal:true,note:"Includes Transponder Unit, Monitor Unit, GPS Antenna GPA-017S and VHF Antenna 150MV"}
+    ],
+    reconciliation:[
+      {object:"AIS onshore receiver / monitoring package",required:"TBC — no independent A1 hardware line confirmed",offered:1,unit:"set",gap:"OPEN",status:"CURRENT COMPONENT QUOTE / COMMERCIAL MAPPING OPEN"},
+      {object:"Network / KU equipment represented by A1-01",required:"Required",offered:0,unit:"package",gap:"OPEN",status:"CURRENT NETWORK / KU QUOTE NOT FOUND"}
+    ]
+  },
+
   "A1-05":{
     vendor:"INDUSTRONIC Industrie-Electronic GmbH & Co. KG",
     quoteRef:"A20261632",
