@@ -37,10 +37,15 @@ function money(value, currency) {
 
 function compactMoney(value, currency) {
   if (value === null || value === undefined) return "—";
-  const prefix = currency === "USD" ? "$" : "฿";
+  const prefix = currency === "USD" ? "$" : currency === "EUR" ? "€" : "฿";
   if (value >= 1_000_000) return prefix + (value / 1_000_000).toFixed(2) + "M";
   if (value >= 1_000) return prefix + (value / 1_000).toFixed(1) + "K";
   return prefix + value.toFixed(0);
+}
+
+function priceCell(row, currency) {
+  if (currency === "EUR") return Number.isFinite(row.eur) ? money(row.eur, "EUR") : "—";
+  return Number.isFinite(row[currency.toLowerCase()]) ? money(row[currency.toLowerCase()], currency) : "HOLD";
 }
 
 function toneFor(value = "") {
@@ -99,32 +104,38 @@ function Overview() {
     (s) => s.proofState.includes("PRELIMINARY") || s.proofState.includes("CONFLICT") || s.proofState.includes("NOT FOUND")
   ).length;
   const quoted = SYSTEMS.filter((s) => s.costBasis.includes("CURRENT_QUOTE")).length;
+  const paga = PROJECT_0550.selectedPaga;
 
   return (
     <div className="p55-stack">
       <SectionTitle
         eyebrow="Management view"
         title="Project control spine"
-        text="One screen connecting engineering evidence, execution readiness, budgetary price and commercial risk."
+        text="Current 0550 baseline is evidence-controlled. PAGA is selected on INDUSTRONIC, while the overall project price remains HOLD until the selected package is commercially normalized."
       />
 
       <div className="p55-metric-grid">
         <MetricCard label="Systems" value="19" sub="Controlled project spine" />
         <MetricCard
-          label="Base A+B"
-          value={compactMoney(PROJECT_0550.baseUsd, "USD")}
-          sub={compactMoney(PROJECT_0550.baseThb, "THB") + " @ 31.50"}
-          tone="money"
+          label="Part A+B"
+          value="HOLD"
+          sub={"Known subset excl. PAGA: " + compactMoney(PROJECT_0550.knownBaseExPagaUsd, "USD") + " / " + compactMoney(PROJECT_0550.knownBaseExPagaThb, "THB")}
+          tone="warn"
+        />
+        <MetricCard
+          label="PAGA selected"
+          value={compactMoney(paga.knownSelectedSubtotalEur, "EUR")}
+          sub={paga.vendor + " · " + paga.offer + " · EUR FX TBC"}
+          tone="good"
         />
         <MetricCard
           label="Base + C2 + C3"
-          value={compactMoney(PROJECT_0550.totalWithOptionsUsd, "USD")}
-          sub={compactMoney(PROJECT_0550.totalWithOptionsThb, "THB")}
-          tone="money"
+          value="HOLD"
+          sub={"Known subset excl. PAGA: " + compactMoney(PROJECT_0550.knownBasePlusC2C3ExPagaThb, "THB")}
+          tone="warn"
         />
         <MetricCard label="Open / preliminary proofs" value={String(openProofs)} sub="Engineering closure required" tone="warn" />
-        <MetricCard label="Current quote-backed systems" value={String(quoted)} sub="Remaining rows use partial / historical / proxy" tone="good" />
-        <MetricCard label="FX" value="31.50" sub="THB / USD budgetary control" />
+        <MetricCard label="FX control" value="31.50" sub="THB/USD · EUR/THB = TBC" />
       </div>
 
       <div className="p55-grid p55-grid--2">
@@ -145,28 +156,31 @@ function Overview() {
             ))}
           </div>
           <p className="p55-note">
-            Price is downstream of engineering. Unknown scope remains visible as OPEN / TBC / proxy; it is never silently treated as zero.
+            Vendor selection follows Requirement → Constraint → CAL/Study/RPT → Engineering Proof → Architecture → Required Quantity → Cost. Unknown scope remains OPEN/TBC and is never silently treated as zero.
           </p>
         </section>
 
         <section className="p55-panel">
           <div className="p55-panel__head">
             <div>
-              <div className="p55-eyebrow">Commercial control</div>
-              <h3>Cost → ADDVALUE → SAMTEL → CNEEC</h3>
+              <div className="p55-eyebrow">Selected PAGA basis</div>
+              <h3>{paga.vendor} · {paga.offer}</h3>
             </div>
-            <Badge>Budgetary</Badge>
+            <Badge tone="good">SELECTED</Badge>
           </div>
           <div className="p55-policy-list">
-            {COMMERCIAL_POLICY.map((item) => (
-              <div className="p55-policy" key={item.title}>
-                <div>
-                  <strong>{item.title}</strong>
-                  <p>{item.formula}</p>
-                </div>
-                <Badge>{item.state}</Badge>
-              </div>
-            ))}
+            <div className="p55-policy">
+              <div><strong>Base net</strong><p>{money(paga.baseNetEur, "EUR")} · {paga.delivery}</p></div>
+              <Badge>DIRECT QUOTE</Badge>
+            </div>
+            <div className="p55-policy">
+              <div><strong>Known requirement additions</strong><p>AP712 +1 and XBC Beacon Control</p></div>
+              <Badge>DERIVED / PRICED</Badge>
+            </div>
+            <div className="p55-policy">
+              <div><strong>Known selected subtotal</strong><p>{money(paga.knownSelectedSubtotalEur, "EUR")}</p></div>
+              <Badge>{paga.state}</Badge>
+            </div>
           </div>
         </section>
       </div>
@@ -179,12 +193,12 @@ function Overview() {
         />
         <div className="p55-control-grid">
           {[
-            ["PAGA proof", "Sound coverage / amplifier loading / cabinet and beacon reconciliation", "HIGH"],
+            ["PAGA proof", "Sound coverage / amplifier loading / cabinet and loop reconciliation", "HIGH"],
+            ["PAGA commercial closure", "ACT-IP, monitoring, UPS 6h, selected-vendor spares, site service and FCA logistics", "HIGH"],
             ["CCTV proof", "Coverage, lens, bandwidth and storage closure", "HIGH"],
             ["FO / bulk MTO", "Replace historical route proxy with current quantity take-off", "HIGH"],
             ["Myanmar permits", "Equipment freeze, MOTC / frequency / DCA / import licence path", "HIGH"],
             ["Resource continuity", "External replacement cover for PM / Chief / Sr / Tech", "PROTECTED"],
-            ["FAT / SAT campaign", "De-duplicate system events against integrated core-team campaign", "HIGH"],
           ].map(([name, text, state]) => (
             <div className="p55-control" key={name}>
               <div className="p55-control__dot" />
@@ -520,17 +534,19 @@ function BudgetView() {
   const [currency, setCurrency] = useState("USD");
   const [part, setPart] = useState("ALL");
   const rows = CNEEC_BREAKDOWN.filter((row) => part === "ALL" || row.code.startsWith(part));
+  const paga = PROJECT_0550.selectedPaga;
 
   return (
     <div className="p55-stack">
       <SectionTitle
         eyebrow="SAMTEL → CNEEC budgetary output"
         title="Priced breakdown control"
-        text="Management view mirrors the current ASK-TSI breakdown while preserving the internal engineering / cost basis behind each amount."
+        text="Current Rev07 baseline: INDUSTRONIC is the selected PAGA technical/pricing basis. Project headline remains HOLD until EUR conversion and open PAGA scope are closed."
         action={
           <div className="p55-segmented">
             <button className={currency === "USD" ? "is-active" : ""} onClick={() => setCurrency("USD")} type="button">USD</button>
             <button className={currency === "THB" ? "is-active" : ""} onClick={() => setCurrency("THB")} type="button">THB</button>
+            <button className={currency === "EUR" ? "is-active" : ""} onClick={() => setCurrency("EUR")} type="button">EUR</button>
           </div>
         }
       />
@@ -538,27 +554,45 @@ function BudgetView() {
       <div className="p55-metric-grid">
         <MetricCard
           label="Part A + B Base"
-          value={currency === "USD" ? money(PROJECT_0550.baseUsd, "USD") : money(PROJECT_0550.baseThb, "THB")}
-          sub={currency === "USD" ? money(PROJECT_0550.baseThb, "THB") : money(PROJECT_0550.baseUsd, "USD")}
-          tone="money"
+          value="HOLD"
+          sub={"Known excl. PAGA: " + money(PROJECT_0550.knownBaseExPagaUsd, "USD") + " / " + money(PROJECT_0550.knownBaseExPagaThb, "THB")}
+          tone="warn"
         />
         <MetricCard
-          label="C2 10-year spares"
-          value={currency === "USD" ? money(PROJECT_0550.c2Usd, "USD") : money(PROJECT_0550.c2Thb, "THB")}
-          sub="Working allowance"
+          label="PAGA selected"
+          value={money(paga.knownSelectedSubtotalEur, "EUR")}
+          sub={paga.vendor + " · " + paga.offer}
+          tone="good"
         />
         <MetricCard
-          label="C3 2-year spares"
-          value={currency === "USD" ? money(PROJECT_0550.c3Usd, "USD") : money(PROJECT_0550.c3Thb, "THB")}
-          sub="PAGA partly current quote"
+          label="C2 known non-PAGA"
+          value={currency === "THB" ? money(PROJECT_0550.c2Thb, "THB") : currency === "EUR" ? "PAGA TBC" : money(PROJECT_0550.c2Usd, "USD")}
+          sub="PAGA capital spares remain TBC"
         />
         <MetricCard
-          label="Base + C2 + C3"
-          value={currency === "USD" ? money(PROJECT_0550.totalWithOptionsUsd, "USD") : money(PROJECT_0550.totalWithOptionsThb, "THB")}
-          sub="C1 excluded / not priced"
-          tone="money"
+          label="C3 known non-PAGA"
+          value={currency === "THB" ? money(PROJECT_0550.c3Thb, "THB") : currency === "EUR" ? "PAGA TBC" : money(PROJECT_0550.c3Usd, "USD")}
+          sub="PAGA 2-year spares remain TBC"
+        />
+        <MetricCard
+          label="Project Total"
+          value="HOLD"
+          sub="C1 unpriced · PAGA open · EUR/THB TBC"
+          tone="warn"
+        />
+        <MetricCard
+          label="FX"
+          value="31.50"
+          sub="THB/USD locked · EUR/THB TBC"
         />
       </div>
+
+      <section className="p55-callout p55-callout--warning">
+        <strong>Selected PAGA commercial gate</strong>
+        <p>
+          INDUSTRONIC base net {money(paga.baseNetEur, "EUR")} plus currently priced requirement additions gives {money(paga.knownSelectedSubtotalEur, "EUR")}. The project total must remain HOLD until the remaining PAGA compliance gaps, selected-vendor spares, site service, FCA logistics and EUR conversion are source-backed.
+        </p>
+      </section>
 
       <div className="p55-filterbar p55-filterbar--simple">
         <div className="p55-segmented">
@@ -568,7 +602,7 @@ function BudgetView() {
             </button>
           ))}
         </div>
-        <Badge tone="warn">BUDGETARY / WORKING</Badge>
+        <Badge tone="warn">REV07 · TOTAL HOLD</Badge>
       </div>
 
       <section className="p55-panel p55-panel--flush">
@@ -580,6 +614,7 @@ function BudgetView() {
                 <th>Description</th>
                 <th className="is-number">USD</th>
                 <th className="is-number">THB @ 31.50</th>
+                <th className="is-number">EUR</th>
                 <th>State</th>
               </tr>
             </thead>
@@ -587,9 +622,13 @@ function BudgetView() {
               {rows.map((row) => (
                 <tr key={row.code}>
                   <td><strong>{row.code}</strong></td>
-                  <td>{row.description}</td>
-                  <td className="is-number">{money(row.usd, "USD")}</td>
-                  <td className="is-number">{money(row.thb, "THB")}</td>
+                  <td>
+                    {row.description}
+                    {row.vendor ? <small>{row.vendor}{row.offer ? " · " + row.offer : ""}</small> : null}
+                  </td>
+                  <td className="is-number">{priceCell(row, "USD")}</td>
+                  <td className="is-number">{priceCell(row, "THB")}</td>
+                  <td className="is-number">{priceCell(row, "EUR")}</td>
                   <td><Badge>{row.state}</Badge></td>
                 </tr>
               ))}
@@ -599,13 +638,21 @@ function BudgetView() {
       </section>
 
       <section className="p55-panel">
-        <SectionTitle eyebrow="Part C" title="Options" />
+        <SectionTitle eyebrow="Part C" title="Options / spares" />
         <div className="p55-option-grid">
           {OPTIONS.map((option) => (
             <div className="p55-option" key={option.code}>
               <div><span>{option.code}</span><strong>{option.description}</strong></div>
               <div className="p55-option__price">
-                <strong>{currency === "USD" ? money(option.usd, "USD") : money(option.thb, "THB")}</strong>
+                <strong>
+                  {option.code === "C1"
+                    ? "NOT PRICED"
+                    : currency === "THB"
+                      ? money(option.thb, "THB")
+                      : currency === "EUR"
+                        ? "PAGA TBC"
+                        : money(option.usd, "USD")}
+                </strong>
                 <Badge>{option.state}</Badge>
               </div>
             </div>
@@ -616,7 +663,7 @@ function BudgetView() {
       <section className="p55-callout p55-callout--warning">
         <strong>Budget release note</strong>
         <p>
-          These values are budgetary working prices, not a final firm quotation. Current vendor quotes, exact MTO, regulatory fees, external-resource cover quotes and campaign de-duplication still control final release.
+          Current project total is intentionally HOLD. The UI must not recreate the superseded numeric headline from the previous PAGA basis. Only source-backed selected-vendor amounts may be promoted into the final customer price.
         </p>
       </section>
     </div>
