@@ -113,8 +113,16 @@ function displayAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx){
   if(Number.isFinite(converted)) return money(converted,currency)+" · Working FX";
 
   const map = field==="unitPrice" ? line.unitPriceByCurrency : line.subtotalByCurrency;
-  if(map && Number.isFinite(map.EUR)) return money(map.EUR,"EUR")+" · EUR FX TBC";
-  if(map && Number.isFinite(map.CNY)) return money(map.CNY,"CNY")+" · CNY FX TBC";
+  if(map && Number.isFinite(map.EUR)){
+    if(currency==="THB") return "THB HOLD · EUR/THB FX TBC";
+    if(currency==="USD") return "USD HOLD · EUR/THB FX TBC";
+    if(currency==="CNY") return "CNY HOLD · FX TBC";
+    return money(map.EUR,"EUR");
+  }
+  if(map && Number.isFinite(map.CNY)){
+    if(currency==="THB") return "THB HOLD · CNY/THB FX TBC";
+    return money(map.CNY,"CNY");
+  }
   return "—";
 }
 
