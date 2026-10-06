@@ -63,6 +63,23 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     verdict:"REVISED BUDGETARY",
     basis:"Current 0550 known quantity = 55 cameras; market sanity for Ex/indoor cameras, NVR/storage/monitor/network accessories.",
     source:"MR/App1.3 current quantities in GDrive; no current Hikvision project quotation found. Historical 24-Ex-PTZ basis rejected.",
+    quantityBasis:["Ex PTZ 6","Ex Fixed 2","Indoor PTZ 6","Indoor Fixed/Dome 41","Known total 55","AMS01 TBC"],
+    buildUp:[
+      {priceClass:"MARKET-SANITY EQUIPMENT",item:"Ex PTZ camera",qty:"6",unitPriceThb:125000,amountThb:750000},
+      {priceClass:"MARKET-SANITY EQUIPMENT",item:"Ex Fixed camera",qty:"2",unitPriceThb:95000,amountThb:190000},
+      {priceClass:"MARKET-SANITY EQUIPMENT",item:"Indoor PTZ camera",qty:"6",unitPriceThb:22000,amountThb:132000},
+      {priceClass:"MARKET-SANITY EQUIPMENT",item:"Indoor Fixed/Dome camera",qty:"41",unitPriceThb:5000,amountThb:205000},
+      {priceClass:"SYSTEM ALLOWANCE",item:"64ch NVR",qty:"1",amountThb:100000},
+      {priceClass:"SYSTEM ALLOWANCE",item:"Storage 60TB working allowance",qty:"1 lot",amountThb:120000},
+      {priceClass:"SYSTEM ALLOWANCE",item:"Monitors",qty:"1 lot",amountThb:220000},
+      {priceClass:"SYSTEM ALLOWANCE",item:"Switches / patch / ODF",qty:"1 lot",amountThb:270000},
+      {priceClass:"SYSTEM ALLOWANCE",item:"Fiber / media / accessories",qty:"1 lot",amountThb:160000},
+      {priceClass:"SYSTEM ALLOWANCE",item:"VMS / cabinet / mounts / accessories",qty:"1 lot",amountThb:600000},
+      {priceClass:"RAW MARKET COST",item:"Known equipment + allowances",qty:"",amountThb:2747000},
+      {priceClass:"DESIGN / MARKET UNCERTAINTY",item:"+20% working uncertainty",qty:"",amountThb:549400},
+      {priceClass:"CONTROLLED COST",item:"Before commercial rule",qty:"",amountThb:3296400},
+      {priceClass:"SELLING PRICE",item:"Cost × 1.20 / 0.95",qty:"",amountThb:4163873.68}
+    ],
     action:"Replace with current project Hikvision quote after coverage/lens/storage/certification/AMS01 closure."
   },
   "A1-07":{
@@ -127,6 +144,13 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     verdict:"REVISED BUDGETARY",
     basis:"Current 30m+60m tower supply portion THB 3.9425M + MW/WBB historical/current-topology equipment allowance THB 3.0M.",
     source:"Tower quotes 2609.95.1/2609.95.2 dated 22-Sep-2026 + Rev04 MW/WBB model. Civil/erection excluded to C1; engineering/logistics separated.",
+    quantityBasis:["60m tower 1","30m tower 1","Microwave APF-ACP link 1","WBB APF/APM package OPEN"],
+    buildUp:[
+      {priceClass:"CURRENT QUOTE · ATTRIBUTABLE SUPPLY",item:"30m + 60m tower supply portion used in A1",qty:"2 tower",amountThb:3942500},
+      {priceClass:"HISTORICAL / TOPOLOGY PROXY",item:"Microwave + WBB equipment allowance",qty:"1 lot",amountThb:3000000},
+      {priceClass:"CONTROLLED COST",item:"Before commercial rule",qty:"",amountThb:6942500},
+      {priceClass:"SELLING PRICE",item:"Cost × 1.20 / 0.95",qty:"",amountThb:8769473.68}
+    ],
     action:"Replace THB 3.0M MW/WBB proxy with current Ceragon/RADWIN/MGW quotation after link-budget proof."
   },
   "A1-12":{
