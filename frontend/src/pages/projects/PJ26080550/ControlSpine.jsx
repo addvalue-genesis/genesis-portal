@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import "./ControlSpine.css";
 import { PROJECT0550_ENGINEERING_DOCTRINE } from "./Project0550EngineeringDoctrine";
 import { PROJECT0550_CONTROL_OBJECTS } from "./Project0550ControlObjects";
-import { evaluateProject0550Portfolio } from "./Project0550SmartControlEngine";
+import { evaluateProject0550Portfolio, runProject0550EvidenceReasoning } from "./Project0550SmartControlEngine";
 
 const LEGACY_TRACE_ROWS_UNUSED = [
   {
@@ -119,6 +119,7 @@ export function ControlSpine(){
   const [apiMode,setApiMode]=useState("PREVIEW");
   const [releaseIntent,setReleaseIntent]=useState("PRICE_FREEZE");
   const smart=useMemo(()=>evaluateProject0550Portfolio(PROJECT0550_CONTROL_OBJECTS,{releaseIntent}),[releaseIntent]);
+  const evidence=useMemo(()=>runProject0550EvidenceReasoning(),[]);
 
   useEffect(()=>{
     let active=true;
@@ -206,6 +207,7 @@ export function ControlSpine(){
         <button className={mode==="schema"?"active":""} onClick={()=>setMode("schema")}>DB Control Fields</button>
         <button className={mode==="double"?"active":""} onClick={()=>setMode("double")}>Anti-Double-Count</button>
         <button className={mode==="state"?"active":""} onClick={()=>setMode("state")}>Evidence / State Model</button>
+        <button className={mode==="evidence"?"active":""} onClick={()=>setMode("evidence")}>Evidence Intelligence</button>
         <button className={mode==="smart"?"active":""} onClick={()=>setMode("smart")}>Smart Engine Findings</button>
       </nav>
 
@@ -307,6 +309,62 @@ export function ControlSpine(){
                 </tr>
               ))}</tbody>
             </table>
+          </div>
+        </section>
+      )}
+
+      {mode==="evidence" && (
+        <section className="cs-panel">
+          <div className="cs-panel-head">
+            <div>
+              <small>CONTROLLED EVIDENCE MEMORY · {evidence.memoryRevision}</small>
+              <h2>ข้อมูลที่ทีม/AI อ่านมาแล้ว → code ตรวจสอบ / bind / reconcile / เสนอ action</h2>
+            </div>
+            <State text={evidence.status}/>
+          </div>
+          <p className="cs-muted">
+            Evidence reader สามารถเป็นคน, AI, connector หรือ import process. หลังอ่าน source แล้วต้องส่ง structured assertion เข้า controlled memory;
+            engine จะตรวจ stale data, source conflict, vendor mapping, quantity conservation และออกข้อเสนอแบบ REVIEW_REQUIRED — ไม่แก้ requirement/ราคา/final release เองแบบเงียบ ๆ.
+          </p>
+          <div className="cs-live-grid">
+            <div><small>SOURCES</small><strong>{evidence.summary.sources}</strong><span>controlled evidence sources</span></div>
+            <div><small>ASSERTIONS</small><strong>{evidence.summary.assertions}</strong><span>machine-readable facts / TBC</span></div>
+            <div><small>SYSTEMS</small><strong>{evidence.summary.systemsWithEvidence}</strong><span>systems currently bound</span></div>
+            <div><small>PRICE LINES</small><strong>{evidence.summary.priceLinesWithEvidence}</strong><span>output mappings with evidence</span></div>
+          </div>
+          <div className="cs-table-wrap">
+            <table className="cs-table">
+              <thead><tr><th>Control</th><th>Status</th><th>Result</th></tr></thead>
+              <tbody>{evidence.controls.map((row,idx)=>(
+                <tr key={row.code+"-"+idx}>
+                  <td><code>{row.code}</code></td>
+                  <td><State text={row.status}/></td>
+                  <td>{row.message}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+          {evidence.findings.length>0 && (
+            <div className="cs-table-wrap">
+              <table className="cs-table">
+                <thead><tr><th>Severity</th><th>Rule</th><th>Finding</th><th>Action</th></tr></thead>
+                <tbody>{evidence.findings.map((row,idx)=>(
+                  <tr key={(row.code||"EVD")+"-"+idx}>
+                    <td><State text={row.severity}/></td>
+                    <td><code>{row.code}</code></td>
+                    <td>{row.message}</td>
+                    <td>{row.action || "Review / disposition in controlled state"}</td>
+                  </tr>
+                ))}</tbody>
+              </table>
+            </div>
+          )}
+          <div className="cs-state-rule">
+            <strong>Intelligence boundary</strong>
+            <span>
+              ระบบสามารถจำข้อมูลจากเอกสารที่อ่าน, ตรวจขัดแย้ง, derive quantity/cost candidate, reconcile vendor quote และชี้ next action ได้;
+              แต่ requirement change, conflict disposition, final quantity, commercial policy, price freeze และ final release ยังต้องมี human approval.
+            </span>
           </div>
         </section>
       )}
