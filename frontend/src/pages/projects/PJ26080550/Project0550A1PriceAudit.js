@@ -53,7 +53,32 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     verdict:"VALID SOURCE — OPEN GAPS",
     basis:"INDUSTRONIC Offer A20261632; selected PAGA basis.",
     source:"A20261632.pdf in GDrive; base net EUR 226,454.05. Current controlled priced additions AP712 +1 and XBC are tracked separately.",
-    action:"Close sound/loading/loop/autonomy/interface proof, site service, spares and FCA onward logistics before firm customer sell."
+    quantityBasis:[
+      "Vendor base net EUR 226,454.05",
+      "AP712 additional access panel +1 = EUR 3,210.00",
+      "XBC beacon control module = EUR 2,014.00",
+      "Known selected cost subtotal = EUR 231,678.05",
+      "Remaining bulk / logistics / site OEM service / spares / compliance = OPEN"
+    ],
+    buildUp:[
+      {priceClass:"CURRENT VENDOR QUOTE",item:"INDUSTRONIC base net offer",qty:"1 lot",amount:226454.05,currency:"EUR"},
+      {priceClass:"CONTROLLED REQUIREMENT ADDITION",item:"AP712 additional access panel +1",qty:"1",unitPrice:3210.00,amount:3210.00,currency:"EUR"},
+      {priceClass:"CONTROLLED REQUIREMENT ADDITION",item:"XBC beacon control module",qty:"1",unitPrice:2014.00,amount:2014.00,currency:"EUR"},
+      {priceClass:"KNOWN SELECTED COST",item:"Known selected vendor subtotal",qty:"",amount:231678.05,currency:"EUR"},
+      {priceClass:"OPEN COMPLETION COST",item:"Bulk / FCA onward logistics / site OEM service / startup + capital + 2Y spares / compliance closure",qty:"",amountText:"TBC — not yet added",currency:"EUR"},
+      {priceClass:"WORKING COMMERCIAL PREVIEW",item:"Known selected cost × 1.20 / 0.95",qty:"",amount:292645.96,currency:"EUR",note:"Indicative sell on KNOWN selected cost only; excludes all open completion cost and is NOT the final customer sell."},
+      {priceClass:"FINAL CUSTOMER SELL",item:"Released PAGA selling price",qty:"",amountText:"HOLD",currency:"EUR",note:"Release only after open lifecycle/scope cost and commercial gates are closed."}
+    ],
+    commercialPreview:{
+      sourceCostEur:226454.05,
+      knownSelectedCostEur:231678.05,
+      workingGoodsFactor:1.2631578947,
+      formula:"Known selected cost × 1.20 / 0.95",
+      indicativeKnownCostSellEur:292645.96,
+      status:"INDICATIVE ONLY / FINAL SELL HOLD",
+      openCompletion:["bulk","FCA onward logistics","site OEM service","startup spares","10Y capital spares","2Y operation spares","compliance / proof closure"]
+    },
+    action:"Close sound/loading/loop/autonomy/interface proof, bulk, site service, spares and FCA onward logistics before firm customer sell."
   },
   "A1-06":{
     vendor:"HIKVISION / PROJECT-APPROVED EQUIVALENT — CURRENT PROJECT QUOTE NOT FOUND",
