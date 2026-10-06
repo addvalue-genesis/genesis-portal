@@ -47,9 +47,15 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261006-01",
+  syncRevision: "SYNC-20261006-02",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
+  currentPricingControl: {
+    baseline: "REV07 controlled pricing state in Project0550PricingBaseline.js",
+    cctvControl: "A1-06 current known 55-camera market-sanity basis; superseded 24-Ex-PTZ proxy must not return",
+    vendorEvidenceRule: "New vendor evidence updates the controlled JS/JSX state first; do not regenerate outputs from an older workbook revision.",
+    jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
+  },
   teamReadOrder: [
     "Project0550WorkingMemory.jsx",
     "Project0550EngineeringDoctrine.js",
