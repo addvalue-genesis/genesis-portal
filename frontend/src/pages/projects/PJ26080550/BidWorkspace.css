@@ -254,3 +254,11 @@ body{margin:0;background:#f4f7fb;color:var(--bid-ink)}
   letter-spacing:0;
   text-transform:none;
 }
+
+.bid-offer-summary{display:grid;grid-template-columns:1.25fr 1fr .8fr;gap:10px;margin-top:14px}
+.bid-offer-summary>div{border:1px solid #cfd9e5;border-radius:10px;padding:12px 13px;background:#fff;min-width:0}
+.bid-offer-summary>div:first-child{border:2px solid #264f78;background:#edf5fb}
+.bid-offer-summary small{display:block;color:#66778b;font-size:8px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+.bid-offer-summary strong{display:block;margin-top:5px;color:#123a5e;font-size:20px;line-height:1.1;font-variant-numeric:tabular-nums}
+.bid-offer-summary span{display:block;margin-top:6px;color:#647386;font-size:8.5px;line-height:1.45}
+@media(max-width:900px){.bid-offer-summary{grid-template-columns:1fr}}
