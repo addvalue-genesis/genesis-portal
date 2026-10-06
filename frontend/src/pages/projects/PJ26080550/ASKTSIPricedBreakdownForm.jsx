@@ -10,7 +10,8 @@ It must be populated from controlled engineering/cost/commercial state.
 It is NOT the engineering source of truth.
 */
 
-import React from "react";
+import React, { useState } from "react";
+import { traceForPriceLine } from "./Project0550PriceTrace";
 
 export const ASKTSI_PRICED_BREAKDOWN_TEMPLATE = {
   id: "ASK-TSI-PRICED-BREAKDOWN",
@@ -165,6 +166,56 @@ function RemarkCell({base,line,mode}){
   );
 }
 
+function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
+  const trace=traceForPriceLine(code,line);
+  const displayed=displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
+
+  const nodes=[
+    ["Requirement",trace.requirement],
+    ["Constraint",trace.constraint],
+    ["CAL / Study / RPT",trace.proof],
+    ["Quantity Driver",trace.quantityDriver],
+    ["Equation ID",trace.equations],
+    ["Cost Object",trace.costObject],
+    ["Commercial Rule",trace.commercialRule],
+    ["Displayed Price / Release",displayed+" · "+trace.releaseState],
+  ];
+
+  return (
+    <tr className="ask-engineering-trace-row">
+      <td colSpan="8">
+        <div className="ask-engineering-trace">
+          <div className="ask-engineering-trace-head">
+            <div>
+              <small>{code} · {trace.modelClass}</small>
+              <strong>Engineering → Cost → Selling Price Trace</strong>
+              <span>{trace.sourceBasis}</span>
+            </div>
+            <Status state={trace.releaseState}/>
+          </div>
+          <div className="ask-engineering-trace-chain">
+            {nodes.map(([label,value],idx)=>(
+              <React.Fragment key={label}>
+                <div className="ask-engineering-trace-node">
+                  <b>{String(idx+1).padStart(2,"0")} · {label}</b>
+                  {Array.isArray(value)
+                    ? <div className="ask-equation-tags">{value.map(x=><code key={x}>{x}</code>)}</div>
+                    : <span>{value}</span>}
+                </div>
+                {idx<nodes.length-1 ? <i>→</i> : null}
+              </React.Fragment>
+            ))}
+          </div>
+          <div className="ask-engineering-trace-rule">
+            <strong>Control:</strong>
+            <span>A displayed baseline value is not promoted to a firm selling price unless its critical source, proof, quantity, lifecycle cost and commercial treatment are closed.</span>
+          </div>
+        </div>
+      </td>
+    </tr>
+  );
+}
+
 function numericSubtotal(lines,codes,currency,eurThbFx,usdThbFx,cnyThbFx){
   return codes.reduce((sum,code)=>{
     const line=rowValue(lines,code);
@@ -185,6 +236,11 @@ function hasOpenTotal(lines,codes,currency){
 
 export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNAL",eurThbFx=null,usdThbFx=31.50,cnyThbFx=null}){
   const t=ASKTSI_PRICED_BREAKDOWN_TEMPLATE;
+  const [traceCode,setTraceCode]=useState(null);
+
+  function toggleTrace(code){
+    setTraceCode(current=>current===code ? null : code);
+  }
   const aCodes=t.partA.map(([code])=>code);
   const bCodes=t.partB.map(([code])=>code);
   const cCodes=t.partC.map(([code])=>code);
@@ -230,16 +286,25 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
               {t.partA.map(([code,sn,description])=>{
                 const line=rowValue(lines,code);
                 return (
-                  <tr key={code}>
-                    <td><strong>{sn}</strong><small>{code}</small></td>
-                    <td>{line.tagNo || ""}</td>
-                    <td><strong>{description}</strong>{line.state?<><br/><Status state={line.state}/></>:null}</td>
-                    <td>{line.qty ?? 1}</td>
-                    <td>{line.unit || "Lot"}</td>
-                    <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx,cnyThbFx)}</td>
-                    <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx)}</td>
-                    <td><RemarkCell base={line.sourceRemark || t.sourceRemarks.A_DEFAULT} line={line} mode={mode}/></td>
-                  </tr>
+                  <React.Fragment key={code}>
+                    <tr className={traceCode===code ? "ask-price-line is-trace-open" : "ask-price-line"}>
+                      <td><strong>{sn}</strong><small>{code}</small></td>
+                      <td>{line.tagNo || ""}</td>
+                      <td>
+                        <strong>{description}</strong>
+                        {line.state?<><br/><Status state={line.state}/></>:null}
+                        <button type="button" className="ask-trace-btn" onClick={()=>toggleTrace(code)}>
+                          {traceCode===code ? "Close trace" : "Trace price"}
+                        </button>
+                      </td>
+                      <td>{line.qty ?? 1}</td>
+                      <td>{line.unit || "Lot"}</td>
+                      <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx,cnyThbFx)}</td>
+                      <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx)}</td>
+                      <td><RemarkCell base={line.sourceRemark || t.sourceRemarks.A_DEFAULT} line={line} mode={mode}/></td>
+                    </tr>
+                    {traceCode===code ? <PriceTraceDetail code={code} line={line} currency={currency} eurThbFx={eurThbFx} usdThbFx={usdThbFx} cnyThbFx={cnyThbFx}/> : null}
+                  </React.Fragment>
                 );
               })}
               <tr className="ask-total-row">
@@ -254,16 +319,24 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                 const line=rowValue(lines,code);
                 const description=sourceDescription || (mode==="INTERNAL" ? (line.description || "") : "");
                 return (
-                  <tr key={code}>
-                    <td><strong>{code}</strong></td>
-                    <td>{description}</td>
-                    <td>{line.tagNo || ""}</td>
-                    <td>{line.qty ?? "1 lot"}</td>
-                    <td>{line.unit || ""}</td>
-                    <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx,cnyThbFx)}</td>
-                    <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx)}</td>
-                    <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
-                  </tr>
+                  <React.Fragment key={code}>
+                    <tr className={traceCode===code ? "ask-price-line is-trace-open" : "ask-price-line"}>
+                      <td><strong>{code}</strong></td>
+                      <td>{description}</td>
+                      <td>
+                        {line.tagNo || ""}
+                        <button type="button" className="ask-trace-btn" onClick={()=>toggleTrace(code)}>
+                          {traceCode===code ? "Close trace" : "Trace price"}
+                        </button>
+                      </td>
+                      <td>{line.qty ?? "1 lot"}</td>
+                      <td>{line.unit || ""}</td>
+                      <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx,cnyThbFx)}</td>
+                      <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx)}</td>
+                      <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
+                    </tr>
+                    {traceCode===code ? <PriceTraceDetail code={code} line={line} currency={currency} eurThbFx={eurThbFx} usdThbFx={usdThbFx} cnyThbFx={cnyThbFx}/> : null}
+                  </React.Fragment>
                 );
               })}
               <tr className="ask-total-row">
@@ -284,16 +357,24 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
               {t.partC.map(([code,description])=>{
                 const line=rowValue(lines,code);
                 return (
-                  <tr key={code}>
-                    <td><strong>{code}</strong></td>
-                    <td>{description}</td>
-                    <td>{line.tagNo || ""}</td>
-                    <td>{line.qty ?? "1 lot"}</td>
-                    <td>{line.unit || ""}</td>
-                    <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx,cnyThbFx)}</td>
-                    <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx)}</td>
-                    <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
-                  </tr>
+                  <React.Fragment key={code}>
+                    <tr className={traceCode===code ? "ask-price-line is-trace-open" : "ask-price-line"}>
+                      <td><strong>{code}</strong></td>
+                      <td>{description}</td>
+                      <td>
+                        {line.tagNo || ""}
+                        <button type="button" className="ask-trace-btn" onClick={()=>toggleTrace(code)}>
+                          {traceCode===code ? "Close trace" : "Trace price"}
+                        </button>
+                      </td>
+                      <td>{line.qty ?? "1 lot"}</td>
+                      <td>{line.unit || ""}</td>
+                      <td>{displayAmount(line,currency,"unitPrice",eurThbFx,usdThbFx,cnyThbFx)}</td>
+                      <td>{displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx)}</td>
+                      <td><RemarkCell base={line.sourceRemark || t.sourceRemarks[code] || ""} line={line} mode={mode}/>{line.state?<><br/><Status state={line.state}/></>:null}</td>
+                    </tr>
+                    {traceCode===code ? <PriceTraceDetail code={code} line={line} currency={currency} eurThbFx={eurThbFx} usdThbFx={usdThbFx} cnyThbFx={cnyThbFx}/> : null}
+                  </React.Fragment>
                 );
               })}
               <tr className="ask-option-total">
