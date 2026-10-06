@@ -60,16 +60,45 @@ export function validateProject0550Dataset(dataset) {
     });
   }
 
+  const pricingOnHold = /HOLD/i.test(project?.pricingStatus || project?.state || "");
+
   if (!Array.isArray(cneecBreakdown)) {
     errors.push("cneecBreakdown must be an array");
   } else if (project) {
-    const sumUsd = cneecBreakdown.reduce((sum, row) => sum + (row.usd ?? 0), 0);
-    const sumThb = cneecBreakdown.reduce((sum, row) => sum + (row.thb ?? 0), 0);
-    if (!closeEnough(sumUsd, project.baseUsd)) errors.push("Part A+B USD rows do not reconcile to project.baseUsd");
-    if (!closeEnough(sumThb, project.baseThb)) errors.push("Part A+B THB rows do not reconcile to project.baseThb");
+    const sumUsd = cneecBreakdown.reduce((sum, row) => sum + (Number.isFinite(row.usd) ? row.usd : 0), 0);
+    const sumThb = cneecBreakdown.reduce((sum, row) => sum + (Number.isFinite(row.thb) ? row.thb : 0), 0);
+
+    if (pricingOnHold) {
+      if (!closeEnough(sumUsd, project.knownBaseExPagaUsd)) {
+        errors.push("Known A+B USD rows do not reconcile to project.knownBaseExPagaUsd");
+      }
+      if (!closeEnough(sumThb, project.knownBaseExPagaThb)) {
+        errors.push("Known A+B THB rows do not reconcile to project.knownBaseExPagaThb");
+      }
+
+      const paga = cneecBreakdown.find((row) => row.code === "A1-05");
+      if (
+        !paga ||
+        paga.usd !== null ||
+        paga.thb !== null ||
+        !Number.isFinite(paga.eur) ||
+        paga.eur <= 0 ||
+        paga.vendor !== "INDUSTRONIC" ||
+        !/OPEN|TBC|HOLD/i.test(paga.state || "")
+      ) {
+        errors.push("A1-05 PAGA must be INDUSTRONIC selected, EUR-valued, USD/THB null and explicitly OPEN/TBC");
+      }
+
+      if (project.baseUsd !== null || project.baseThb !== null) {
+        errors.push("project.baseUsd/baseThb must remain null while project pricing is HOLD");
+      }
+    } else {
+      if (!closeEnough(sumUsd, project.baseUsd)) errors.push("Part A+B USD rows do not reconcile to project.baseUsd");
+      if (!closeEnough(sumThb, project.baseThb)) errors.push("Part A+B THB rows do not reconcile to project.baseThb");
+    }
 
     cneecBreakdown.forEach((row) => {
-      if (row.usd === 0 && /TBC|OPEN|NOT PRICED/i.test(row.state || "")) {
+      if (row.usd === 0 && /TBC|OPEN|NOT PRICED|HOLD/i.test(row.state || "")) {
         errors.push(row.code + ": uncertain/unpriced cost must not be encoded as zero");
       }
     });
@@ -92,10 +121,28 @@ export function validateProject0550Dataset(dataset) {
       errors.push("C3 does not reconcile to project headline");
     }
 
-    const totalUsd = project.baseUsd + project.c2Usd + project.c3Usd;
-    const totalThb = project.baseThb + project.c2Thb + project.c3Thb;
-    if (!closeEnough(totalUsd, project.totalWithOptionsUsd, 0.01)) errors.push("Base+C2+C3 USD headline mismatch");
-    if (!closeEnough(totalThb, project.totalWithOptionsThb, 0.02)) errors.push("Base+C2+C3 THB headline mismatch");
+    if (pricingOnHold) {
+      if (project.totalWithOptionsUsd !== null || project.totalWithOptionsThb !== null) {
+        errors.push("project total must remain null while pricing is HOLD");
+      }
+      const knownUsd = project.knownBaseExPagaUsd + project.c2Usd + project.c3Usd;
+      const knownThb = project.knownBaseExPagaThb + project.c2Thb + project.c3Thb;
+      if (!closeEnough(knownUsd, project.knownBasePlusC2C3ExPagaUsd, 0.01)) {
+        errors.push("known Base+C2+C3 USD subset mismatch");
+      }
+      if (!closeEnough(knownThb, project.knownBasePlusC2C3ExPagaThb, 0.02)) {
+        errors.push("known Base+C2+C3 THB subset mismatch");
+      }
+    } else {
+      const totalUsd = project.baseUsd + project.c2Usd + project.c3Usd;
+      const totalThb = project.baseThb + project.c2Thb + project.c3Thb;
+      if (!closeEnough(totalUsd, project.totalWithOptionsUsd, 0.01)) errors.push("Base+C2+C3 USD headline mismatch");
+      if (!closeEnough(totalThb, project.totalWithOptionsThb, 0.02)) errors.push("Base+C2+C3 THB headline mismatch");
+    }
+  }
+
+  if (/EXION|GAI[- ]?TRONICS|GAITRONIC/i.test(JSON.stringify(dataset))) {
+    errors.push("Removed PAGA vendor reference remains in current controlled dataset");
   }
 
   if (errors.length) {
