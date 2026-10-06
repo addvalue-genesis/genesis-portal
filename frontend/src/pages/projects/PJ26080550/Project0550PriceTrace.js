@@ -23,6 +23,8 @@ const GOODS_EQUATIONS = [
   "GEQ-033 Commercial-treatment Line Cost",
 ];
 
+import { PROJECT0550_PART_B_MODEL } from "./Project0550PartBModel";
+
 const SERVICE_EQUATIONS = [
   "GEQ-001 Applicability",
   "GEQ-004 Activity Quantity Driver",
@@ -134,54 +136,86 @@ export const PROJECT0550_PRICE_TRACE = {
   "A1-14": goodsTrace("Meteorological System price line"),
   "A1-15": goodsTrace("NDB System price line"),
 
-  "B1": serviceTrace(
-    "Detail Design Engineering / VDRL / vendor coordination",
-    [
+  "B1": {
+    ...serviceTrace("Detail Design Engineering / CBE / VDRL / PM / Vendor Coordination",[
       "GEQ-004 Activity Quantity Driver",
       "GEQ-005 Role Man-hours",
       "GEQ-008 Regular Labor Cost",
       "GEQ-009 Document Workflow MH",
       "GEQ-024 Document Revision Workload",
-      "GEQ-018 Direct Activity Cost",
-      "GEQ-033 Commercial-treatment Line Cost",
-    ]
-  ),
-  "B2": {
-    ...serviceTrace("Transportation / Logistics",[
-      "GEQ-012 Material / Landed Cost",
-      "GEQ-013 Travel / Transport Cost",
-      "GEQ-017 Mobilization Cost",
+      "GEQ-025 Integration Workload",
       "GEQ-018 Direct Activity Cost",
       "GEQ-033 Commercial-treatment Line Cost",
     ]),
-    modelClass:"LOGISTICS / SHIPMENT / MIXED COST",
-    quantityDriver:"Shipment / origin / delivery point / Incoterm / cargo characteristics / permit-import route.",
-    commercialRule:"Keep vendor-included freight, project logistics, cargo insurance, duties and pass-through items separated. Do not add the same physical movement twice.",
+    sourceBasis:"Controlled Part B model recovered from 05_Service_Parametric + 06_Interface_Graph + 07_VDRL + 08_Common_Project. 24_Safe_Service_Pricing is a management continuity gate, not a direct B1 substitute.",
+    costObject:"B1 ADDVALUE service sell THB "+PROJECT0550_PART_B_MODEL.B1.addvalueSellThb.toLocaleString("en-US",{maximumFractionDigits:2})+" → SAMTEL +5% → customer known line THB "+PROJECT0550_PART_B_MODEL.B1.customerPriceThb.toLocaleString("en-US",{maximumFractionDigits:2})+".",
+    commercialRule:PROJECT0550_PART_B_MODEL.B1.commercialRule,
   },
-  "B3": serviceTrace("Training"),
-  "B4": serviceTrace("Specialist Field Assistance / FAT / SAT / Commissioning",[
-    "GEQ-001 Applicability",
-    "GEQ-004 Activity Quantity Driver",
-    "GEQ-005 Role Man-hours",
-    "GEQ-006 Activity Duration",
-    "GEQ-007 Required / Feasible Headcount",
-    "GEQ-013…017 Mobilization",
-    "GEQ-018 Direct Activity Cost",
-    "GEQ-023 Stage Cost / Reconciliation",
-    "GEQ-033 Commercial-treatment Line Cost",
-  ]),
-  "B5": goodsTrace("Pre-commissioning / Commissioning / Start-up Spares"),
-  "B6": goodsTrace("Special Tools for O&M"),
-  "B7": serviceTrace("Site Survey and Existing Condition Verification"),
+  "B2": {
+    ...goodsTrace("Goods Freight / Insurance / Logistics"),
+    modelClass:"GOODS LOGISTICS / PARTIAL KNOWN + OPEN ROUTE",
+    sourceBasis:"09_Logistics_Spares + 13_CNEEC_Map. Old PAGA percentage logistics proxy removed because selected INDUSTRONIC basis is FCA Germany.",
+    quantityDriver:"Shipment / origin / Incoterm / cargo dimensions / delivery point / customs / inland route. People travel is excluded from B2 and remains B4.",
+    costObject:"Known non-PAGA procured logistics cost THB "+PROJECT0550_PART_B_MODEL.B2.knownProcuredCostThb.toLocaleString("en-US")+" → goods commercial rule → known customer portion THB "+PROJECT0550_PART_B_MODEL.B2.customerPriceThb.toLocaleString("en-US",{maximumFractionDigits:2})+"; PAGA FCA onward logistics remains TBC.",
+    commercialRule:PROJECT0550_PART_B_MODEL.B2.commercialRule,
+    releaseState:"PARTIAL / HOLD — known non-PAGA amount available; PAGA FCA logistics open",
+  },
+  "B3": {
+    ...serviceTrace("Training"),
+    sourceBasis:"05_Service_Parametric controlled training work objects.",
+    costObject:"ADVALUE training service THB "+PROJECT0550_PART_B_MODEL.B3.addvalueSellThb.toLocaleString("en-US",{maximumFractionDigits:2})+" → SAMTEL +5% → THB "+PROJECT0550_PART_B_MODEL.B3.customerPriceThb.toLocaleString("en-US",{maximumFractionDigits:2})+".",
+    commercialRule:PROJECT0550_PART_B_MODEL.B3.commercialRule,
+  },
+  "B4": {
+    ...serviceTrace("Specialist Field Assistance / FAT / SAT / Commissioning",[
+      "GEQ-001 Applicability",
+      "GEQ-004 Activity Quantity Driver",
+      "GEQ-005 Role Man-hours",
+      "GEQ-006 Activity Duration",
+      "GEQ-007 Required / Feasible Headcount",
+      "GEQ-013…017 Mobilization",
+      "GEQ-018 Direct Activity Cost",
+      "GEQ-023 Stage Cost / Reconciliation",
+      "GEQ-033 Commercial-treatment Line Cost",
+    ]),
+    sourceBasis:"05_Service_Parametric + 08_Common_Project with old PAGA OEM service/FAT removed to avoid double count against selected INDUSTRONIC factory FAT.",
+    costObject:"Known retained ADDVALUE B4 THB "+PROJECT0550_PART_B_MODEL.B4.addvalueSellThb.toLocaleString("en-US",{maximumFractionDigits:2})+" → SAMTEL +5% → known customer portion THB "+PROJECT0550_PART_B_MODEL.B4.customerPriceThb.toLocaleString("en-US",{maximumFractionDigits:2})+"; PAGA site OEM attendance remains TBC.",
+    commercialRule:PROJECT0550_PART_B_MODEL.B4.commercialRule,
+    releaseState:"PARTIAL / HOLD — retained service known; PAGA site OEM scope open",
+  },
+  "B5": {
+    ...goodsTrace("Pre-commissioning / Commissioning / Start-up Spares"),
+    sourceBasis:"09_Logistics_Spares with superseded PAGA percentage spare proxy removed.",
+    costObject:"Known non-PAGA startup spare cost THB "+PROJECT0550_PART_B_MODEL.B5.knownProcuredCostThb.toLocaleString("en-US")+" → goods rule → THB "+PROJECT0550_PART_B_MODEL.B5.customerPriceThb.toLocaleString("en-US",{maximumFractionDigits:2})+"; PAGA startup spares TBC.",
+    commercialRule:PROJECT0550_PART_B_MODEL.B5.commercialRule,
+    releaseState:"PARTIAL / HOLD — PAGA startup spares open",
+  },
+  "B6": {
+    ...goodsTrace("Special Tools for O&M"),
+    sourceBasis:"09_Logistics_Spares; PAGA tool allowance removed because selected INDUSTRONIC quote already includes PAGA tools.",
+    costObject:"Known non-PAGA tool cost THB "+PROJECT0550_PART_B_MODEL.B6.knownProcuredCostThb.toLocaleString("en-US")+" → goods rule → THB "+PROJECT0550_PART_B_MODEL.B6.customerPriceThb.toLocaleString("en-US",{maximumFractionDigits:2})+".",
+    commercialRule:PROJECT0550_PART_B_MODEL.B6.commercialRule,
+  },
+  "B7": {
+    ...serviceTrace("Site Survey and Existing Condition Verification"),
+    sourceBasis:"16_Site_Survey integrated campaign model — planning + APF + ACP + ABV01/AMS01 + Yangon + specialist measurements + report closeout.",
+    quantityDriver:"Integrated survey campaigns / field days / retained crew / specialist measurement need; no 19× travel duplication.",
+    costObject:"B7 customer working price THB "+PROJECT0550_PART_B_MODEL.B7.customerPriceThb.toLocaleString("en-US",{maximumFractionDigits:2})+".",
+    commercialRule:PROJECT0550_PART_B_MODEL.B7.commercialRule,
+  },
   "B8": {
     ...serviceTrace("Permit / Licence / Import-Export / Regulatory Coordination"),
-    modelClass:"REGULATORY / PASS-THROUGH + SERVICE",
-    commercialRule:"Official fees and reimbursable cash remain pass-through unless contract/policy says otherwise; professional coordination effort follows the service pricing rule.",
+    modelClass:"REGULATORY SERVICE + PASS-THROUGH",
+    sourceBasis:"17_Permits_Licences + 20_Profitability + 21_Commercial_Summary.",
+    costObject:"Professional service customer layer THB "+PROJECT0550_PART_B_MODEL.B8.serviceCustomerThb.toLocaleString("en-US",{maximumFractionDigits:2})+" + pass-through authority/agent cash THB "+PROJECT0550_PART_B_MODEL.B8.passThroughCashThb.toLocaleString("en-US")+" = THB "+PROJECT0550_PART_B_MODEL.B8.customerPriceThb.toLocaleString("en-US",{maximumFractionDigits:2})+".",
+    commercialRule:PROJECT0550_PART_B_MODEL.B8.commercialRule,
   },
   "B9": {
     ...serviceTrace("Project & Personnel Insurance / Risk Transfer"),
-    modelClass:"INSURANCE / PASS-THROUGH + ADMIN",
-    commercialRule:"Insurance premium cash remains pass-through unless policy says otherwise; incremental administration/service is separated from the premium.",
+    modelClass:"INSURANCE PASS-THROUGH + ADMIN SERVICE",
+    sourceBasis:"18_Insurance + 20_Profitability + 21_Commercial_Summary.",
+    costObject:"Pass-through premium THB "+PROJECT0550_PART_B_MODEL.B9.passThroughPremiumThb.toLocaleString("en-US",{maximumFractionDigits:2})+" + admin service customer layer THB "+PROJECT0550_PART_B_MODEL.B9.adminServiceCustomerThb.toLocaleString("en-US",{maximumFractionDigits:2})+" = THB "+PROJECT0550_PART_B_MODEL.B9.customerPriceThb.toLocaleString("en-US",{maximumFractionDigits:2})+".",
+    commercialRule:PROJECT0550_PART_B_MODEL.B9.commercialRule,
   },
 
   "C1": {
