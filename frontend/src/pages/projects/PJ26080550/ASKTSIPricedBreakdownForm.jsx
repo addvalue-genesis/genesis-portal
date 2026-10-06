@@ -654,6 +654,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
 function numericSubtotal(lines,codes,currency,eurThbFx,usdThbFx,cnyThbFx){
   return codes.reduce((sum,code)=>{
     const line=rowValue(lines,code);
+    if(line.includeInKnownCustomerSubtotal===false) return sum;
     let v=lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice");
     if(!Number.isFinite(v)) v=convertedAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
     return Number.isFinite(v) ? sum+v : sum;
@@ -778,7 +779,7 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                 );
               })}
               <tr className="ask-total-row">
-                <td colSpan="5"><strong>Part A Known Priced Subtotal</strong><small>Open/TBC items excluded from this numeric subtotal</small></td>
+                <td colSpan="5"><strong>Part A Known Customer-Priced Portion</strong><small>Vendor-cost-only / unreleased selling lines such as open PAGA are excluded</small></td>
                 <td></td>
                 <td><strong>{money(aKnown,currency)}</strong></td>
                 <td>{aHold ? <Status state="PART A TOTAL = HOLD"/> : <Status state="PART A TOTAL READY"/>}</td>
@@ -810,7 +811,7 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                 );
               })}
               <tr className="ask-total-row">
-                <td colSpan="5"><strong>Part B Known Priced Subtotal</strong><small>Open/TBC items excluded from this numeric subtotal</small></td>
+                <td colSpan="5"><strong>Part B Known Customer-Priced Portion</strong><small>Known numeric portions are included; open/TBC remainder keeps Part B on HOLD</small></td>
                 <td></td>
                 <td><strong>{money(bKnown,currency)}</strong></td>
                 <td>{bHold ? <Status state="PART B TOTAL = HOLD"/> : <Status state="PART B TOTAL READY"/>}</td>
