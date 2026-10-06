@@ -8,31 +8,74 @@ Move PJ2608-0550 from React-owned static values toward:
 
 `Engineering Excel / Project Sources → Controlled JSON/SQL Data Layer → TPP → UI/UX`
 
-without redesigning the existing UI and without replacing the validated GENESS runtime baseline.
+without replacing the validated GENESS runtime baseline.
 
-## Current implementation (Rev04 migration step)
+## Current implementation — Rev07 baseline
 
 ```text
-Engineering Excel / Project Sources
+PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_INDUSTRONIC-ONLY_20261006.xlsx
         │
-        │  controlled ingestion / reconciliation (next step)
+        │  controlled manual sync / reconciliation
         ▼
-src/project0550/data/snapshots/pj2608-0550.rev04.json
+src/project0550/data/snapshots/pj2608-0550.rev07.json
         │
         ├─ runtime validation: validateDataset.js
+        ├─ CI validation: scripts/validate-pj2608-0550-data.cjs
         ├─ adapter: controlledSnapshotAdapter.js
         └─ repository: repository.js
         ▼
-src/project0550/data.js   ← compatibility facade; old export names retained
+src/project0550/data.js
         ▼
 PJ26080550.jsx
 ```
 
-The browser does **not** read Excel directly. Excel remains upstream engineering/commercial evidence. Only a controlled, validated dataset is allowed to reach the TPP UI.
+The browser does **not** read Excel directly. Excel remains upstream engineering/commercial evidence. Only a controlled, validated dataset reaches the TPP UI.
+
+## Rev07 PAGA decision
+
+PAGA is controlled as:
+
+`Requirement → Constraint → CAL/Study/RPT → Engineering Proof → Architecture → Required Quantity → Cost → Vendor Selection`
+
+Current selected technical + pricing basis:
+
+- Vendor: **INDUSTRONIC**
+- Offer: **A20261632**
+- Base net: **EUR 226,454.05**
+- Priced requirement additions currently carried:
+  - AP712 Access Panel +1 = EUR 3,210.00
+  - XBC Beacon Control = EUR 2,014.00
+- Known selected subtotal: **EUR 231,678.05**
+- EUR/THB conversion: **TBC**
+- Overall project total: **HOLD**
+
+Open PAGA items remain explicit:
+- ACT-IP activation
+- complete speaker-circuit monitoring
+- 6-hour UPS/autonomy completion
+- final cabinet/loop/MTO confirmation
+- site commissioning/SAT
+- startup/capital/2-year spares
+- FCA Germany onward freight/import/logistics
+
+No alternative PAGA vendor price is carried in the current controlled dataset.
+
+## Current pricing state
+
+- Known Part A+B subset excluding open PAGA = USD 4,231,051.57 / THB 133,278,124.54
+- C2 known non-PAGA = USD 225,967.40 / THB 7,117,973.05 + PAGA TBC
+- C3 known non-PAGA = USD 163,097.82 / THB 5,137,581.47 + PAGA TBC
+- Known Base+C2+C3 subset excluding open PAGA = USD 4,620,116.79 / THB 145,533,679.06
+- C1 = NOT PRICED / CNEEC optional installation
+- Final numeric project total = **HOLD**
 
 ## Preservation / rollback
 
-The pre-migration Rev04 module is preserved byte-for-byte at:
+Historical snapshot remains available:
+
+`src/project0550/data/snapshots/pj2608-0550.rev04.json`
+
+The pre-migration Rev04 module remains preserved at:
 
 `src/project0550/legacy/data.rev04.20261005.js`
 
@@ -44,63 +87,25 @@ The earlier GENESS runtime release remains a separate compatibility boundary and
 - runtime DATA: `ASK_TCP_LIS-0001_RevA1.data.json`
 - working-only: `ASK_MR-0001_RevA1_Mindmap.jsx`
 
-## Contract
-
-The JSON snapshot stores:
-
-- metadata / provenance / integration state
-- project headline and FX
-- commercial policy
-- 19-system grouped model
-- First-Principles chain
-- execution campaigns
-- protected core-team rates
-- priced breakdown
-- options
-- logistics/regulatory gates
-- risk scenarios
-- source register
-- hard control rules
-
-`SYSTEMS` remains a derived view from `systemGroups`; it is not duplicated in JSON.
-
 ## Fail-closed checks
 
-Runtime and CI checks reject the dataset when:
-
+Runtime and CI reject the dataset when:
 - project code is not PJ2608-0550
 - system count is not 19
 - system number/token is duplicated
-- source/proof/quantity/cost-state fields are missing
-- Part A+B does not reconcile to the headline
-- Base + C2 + C3 does not reconcile
-- C1 is encoded as numeric zero instead of explicit NOT PRICED / null
+- traceability/proof/quantity/cost-state fields are missing
+- known A+B subset does not reconcile
+- PAGA is not INDUSTRONIC selected
+- PAGA USD/THB is populated while EUR conversion remains TBC
+- project Base or Total is numeric while pricing status is HOLD
+- C1 is encoded as numeric zero
+- removed PAGA vendor references reappear in the active Rev07 dataset
 
 Run:
 
 `npm run validate:pj0550-data`
 
 `npm run build` also runs the validator first.
-
-## Next integration step
-
-Do not bind the browser directly to `.xlsx`.
-
-Recommended pipeline:
-
-```text
-0550 Excel / source documents
-  → importer/staging
-  → schema validation
-  → source/evidence reconciliation
-  → controlled JSON snapshot
-  → optional SQL persistence/version history
-  → AGERP API/service
-  → TPP repository adapter
-  → existing UI
-```
-
-A future SQL/AGERP adapter should implement the same repository contract as the current JSON adapter. This allows the UI to remain unchanged while the backend source changes.
 
 ## Authority rules
 
