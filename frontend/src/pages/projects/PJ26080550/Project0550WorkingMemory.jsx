@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261006-02",
+  syncRevision: "SYNC-20261006-03",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -60,6 +60,8 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     "Project0550WorkingMemory.jsx",
     "Project0550EngineeringDoctrine.js",
     "Project0550SmartControlEngine.js",
+    "Project0550EvidenceMemory.json",
+    "Project0550EvidenceReasoner.js",
     "current module .jsx",
     "controlled JSON / DB state",
     "0550 source evidence as needed"
@@ -96,11 +98,14 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     decorativeMethodTextOnly: false,
     requiredBehavior: [
       "read controlled project facts/state",
+      "ingest new source evidence as structured assertions",
+      "detect stale state / source conflict / superseded data before output",
       "apply First Principles",
       "evaluate technical and non-technical constraints",
       "require CAL/Study/RPT proof where applicable",
       "derive required objects/quantity/work",
       "reconcile vendor offer against required quantity",
+      "propose controlled updates from new evidence without silent auto-apply",
       "run parametric workload/cost logic",
       "check lifecycle/regulatory/commercial gates",
       "return blocker/warning/readiness and required next action"
