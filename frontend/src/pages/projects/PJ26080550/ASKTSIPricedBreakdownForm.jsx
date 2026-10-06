@@ -196,13 +196,68 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             <Status state={trace.releaseState}/>
           </div>
           {audit ? (
-            <div className="ask-price-audit">
-              <div><b>GDrive Price Audit</b><span>{audit.grade}</span></div>
-              <div><b>Verdict</b><span>{audit.verdict}</span></div>
-              <div><b>Basis</b><span>{audit.basis}</span></div>
-              <div><b>Primary source</b><span>{audit.source}</span></div>
-              <div><b>Closure</b><span>{audit.action}</span></div>
-            </div>
+            <>
+              <div className="ask-price-audit">
+                <div><b>GDrive Price Audit</b><span>{audit.grade}</span></div>
+                <div><b>Verdict</b><span>{audit.verdict}</span></div>
+                <div><b>Vendor</b><span>{audit.vendor || "NO CURRENT VENDOR QUOTE IDENTIFIED"}</span></div>
+                <div><b>Quote / Source Ref</b><span>{audit.quoteRef || audit.source}</span></div>
+                <div><b>CBE / Parametric Status</b><span>{audit.modelStatus || "CONTROLLED BASELINE / MATURITY VARIES"}</span></div>
+              </div>
+
+              <div className="ask-price-source-detail">
+                <div>
+                  <b>Basis</b>
+                  <span>{audit.basis}</span>
+                </div>
+                <div>
+                  <b>Primary source</b>
+                  <span>{audit.source}</span>
+                </div>
+                <div>
+                  <b>Closure</b>
+                  <span>{audit.action}</span>
+                </div>
+              </div>
+
+              {audit.quantityBasis?.length ? (
+                <div className="ask-quantity-basis">
+                  <b>Project Quantity Basis</b>
+                  <div>{audit.quantityBasis.map(x=><span key={x}>{x}</span>)}</div>
+                </div>
+              ) : null}
+
+              {audit.buildUp?.length ? (
+                <div className="ask-build-up">
+                  <div className="ask-build-up-head">
+                    <b>Vendor → Completion → Bulk → Commercial Build-up</b>
+                    <span>THB</span>
+                  </div>
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Class</th>
+                        <th>Item</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {audit.buildUp.map((row,idx)=>(
+                        <tr key={row.priceClass+"-"+row.item+"-"+idx}>
+                          <td>{row.priceClass}</td>
+                          <td>{row.item}</td>
+                          <td>{row.qty || ""}</td>
+                          <td>{Number.isFinite(row.unitPriceThb) ? money(row.unitPriceThb,"THB") : "—"}</td>
+                          <td>{Number.isFinite(row.amountThb) ? money(row.amountThb,"THB") : "—"}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
+            </>
           ) : null}
           <div className="ask-engineering-trace-chain">
             {nodes.map(([label,value],idx)=>(
