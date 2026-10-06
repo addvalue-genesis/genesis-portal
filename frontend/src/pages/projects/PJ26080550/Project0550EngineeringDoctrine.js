@@ -1,6 +1,6 @@
 export const PROJECT0550_ENGINEERING_DOCTRINE = {
   id: "PJ2608-0550-ENGINEERING-DOCTRINE",
-  revision: "Rev01",
+  revision: "Rev02",
   status: "CONTROLLED WORKING BASELINE",
   name: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   projectCode: "PJ2608-0550",
@@ -81,7 +81,9 @@ export const PROJECT0550_ENGINEERING_DOCTRINE = {
     ["R-007","SOURCE CONFLICT => NO SILENT SELECTION"],
     ["R-008","ONE PHYSICAL TRIP / COST OBJECT => COUNT ONCE"],
     ["R-009","0553 MAY SUPPLY METHOD ONLY; 0550 FACTS REQUIRE 0550 EVIDENCE"],
-    ["R-010","NON-TECHNICAL CONSTRAINTS CAN BLOCK TECHNICAL / COMMERCIAL RELEASE"]
+    ["R-010","NON-TECHNICAL CONSTRAINTS CAN BLOCK TECHNICAL / COMMERCIAL RELEASE"],
+    ["R-011","NEW EVIDENCE MUST BE STRUCTURED / TRACEABLE BEFORE IT CHANGES CONTROLLED STATE"],
+    ["R-012","STALE / SUPERSEDED SOURCE MUST NOT GENERATE A CURRENT OUTPUT"]
   ],
   releaseIntents: {
     BUDGETARY: "Allows explicit assumptions and preliminary quantities/costs if gaps remain visible and non-zero treatment is controlled.",
@@ -95,7 +97,7 @@ export const PROJECT0550_CONTROL_POLICY = {
   teamWorkingRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   teamReadFirst: true,
   dataArchitecture: "JSX USER SURFACE → API/SERVICE → MariaDB + JSON in parallel → controlled project/source evidence",
-  learningMode: "CONTROLLED_CALIBRATION_ONLY",
+  learningMode: "CONTROLLED_EVIDENCE_ASSIMILATION + APPROVED_CALIBRATION",
   autoChangeProjectFacts: false,
   autoChangeCommercialRate: false,
   autoRelease: false,
