@@ -27,6 +27,10 @@ export const PROJECT0550_PRICING_BASELINE = {
   fx: {
     thbPerUsd: 31.50,
     thbPerEur: null,
+    workingEurThb: 37.713,
+    workingEurThbBasis: "MARKET WORKING REFERENCE · 2026-10-06 14:15 ICT · NOT FIRM PROJECT FX",
+    workingCnyThb: 5.01585,
+    workingCnyThbBasis: "MARKET WORKING REFERENCE · 2026-10-06 14:38 ICT · NOT FIRM PROJECT FX",
   },
   paga: {
     vendor: "INDUSTRONIC",
