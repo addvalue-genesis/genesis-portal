@@ -424,3 +424,104 @@ body{margin:0;background:#f4f7fb;color:var(--bid-ink)}
 @media(max-width:1100px){
   .ask-price-audit{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
+
+
+/* Price source / model maturity / build-up */
+.ask-price-source-detail{
+  display:grid;
+  grid-template-columns:1.1fr 1.1fr 1fr;
+  gap:6px;
+  margin-top:6px;
+}
+.ask-price-source-detail>div,
+.ask-quantity-basis,
+.ask-build-up{
+  border:1px solid #d7e0e8;
+  border-radius:8px;
+  background:#fff;
+}
+.ask-price-source-detail>div{
+  padding:7px;
+}
+.ask-price-source-detail b,
+.ask-quantity-basis>b,
+.ask-build-up-head b{
+  display:block;
+  color:#315b80;
+  font-size:6.8px;
+  text-transform:uppercase;
+  letter-spacing:.04em;
+}
+.ask-price-source-detail span{
+  display:block;
+  margin-top:4px;
+  color:#4f5f70;
+  font-size:7.2px;
+  line-height:1.4;
+}
+.ask-quantity-basis{
+  margin-top:6px;
+  padding:8px;
+}
+.ask-quantity-basis>div{
+  display:flex;
+  gap:5px;
+  flex-wrap:wrap;
+  margin-top:6px;
+}
+.ask-quantity-basis span{
+  display:inline-flex;
+  padding:4px 6px;
+  border-radius:5px;
+  background:#eef4fb;
+  color:#315b80;
+  font-size:7px;
+  font-weight:700;
+}
+.ask-build-up{
+  margin-top:6px;
+  overflow:hidden;
+}
+.ask-build-up-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:8px;
+  background:#17324d;
+  color:#fff;
+}
+.ask-build-up-head b{
+  color:#fff;
+}
+.ask-build-up-head span{
+  font-size:7px;
+  font-weight:800;
+}
+.ask-build-up table{
+  width:100%;
+  border-collapse:collapse;
+}
+.ask-build-up th,
+.ask-build-up td{
+  padding:6px 7px!important;
+  border:1px solid #dfe6ed!important;
+  font-size:7px!important;
+  line-height:1.3!important;
+}
+.ask-build-up th{
+  background:#edf2f7!important;
+  color:#41556c!important;
+}
+.ask-build-up td:nth-child(4),
+.ask-build-up td:nth-child(5){
+  text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+.ask-build-up tbody tr:last-child td{
+  background:#eaf3fb!important;
+  font-weight:800;
+}
+@media(max-width:1000px){
+  .ask-price-source-detail{grid-template-columns:1fr}
+}
