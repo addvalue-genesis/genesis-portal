@@ -42,12 +42,46 @@ export const PROJECT0550_PRICING_BASELINE = {
     state: "SELECTED / OPEN GAPS / EUR FX TBC",
   },
   knownBaseExPaga: {
-    usd: 4231051.57,
-    thb: 133278124.54,
+    usd: 3587308.92,
+    thb: 113000231.06,
   },
   knownBasePlusC2C3ExPaga: {
-    usd: 4620116.79,
-    thb: 145533679.06,
+    usd: 3976374.15,
+    thb: 125255785.58,
+  },
+  cctvMarketSanity: {
+    status: "BUDGETARY MARKET-SANITY / PRELIMINARY",
+    quantityBasis: {
+      exPtz: 6,
+      exFixed: 2,
+      indoorPtz: 6,
+      indoorFixedDome: 41,
+      knownCameraTotal: 55,
+      ams01: "TBC"
+    },
+    marketUnitBasisThb: {
+      exPtz: 125000,
+      exFixed: 95000,
+      indoorPtz: 22000,
+      indoorFixedDome: 5000,
+      nvr64ch: 100000,
+      storage10tb: 20000
+    },
+    allowanceThb: {
+      nvr64ch: 100000,
+      storage60tb: 120000,
+      monitors: 220000,
+      switchesPatchOdf: 270000,
+      fiberMediaAccessories: 160000,
+      vmsCabinetMountsAccessories: 600000
+    },
+    rawMarketEquipmentCostThb: 2747000.00,
+    designMarketUncertaintyPct: 0.20,
+    controlledCostBeforeCommercialThb: 3296400.00,
+    goodsCommercialFactor: 1.2631578947,
+    budgetaryCustomerSellThb: 4163873.68,
+    budgetaryCustomerSellUsd: 132186.47,
+    note: "Replaces superseded historical CCTV proxy that used 24 Ex PTZ cameras at THB 500,000 each. Current 0550 known camera population is materially lower. AMS01, final coverage, storage days/bitrate, exact Ex certification and vendor quote remain OPEN/TBC."
   },
   lines: {
     "A1-01": { unitPriceByCurrency:{USD:862084.14,THB:27155650.44}, subtotalByCurrency:{USD:862084.14,THB:27155650.44}, state:"WORKING", internalTrace:"Current controlled 0550 baseline." },
@@ -62,7 +96,14 @@ export const PROJECT0550_PRICING_BASELINE = {
       internalTrace:"Selected Technical + Pricing Basis = INDUSTRONIC. Base net EUR 226,454.05 + AP712 +1 EUR 3,210 + XBC EUR 2,014 = known selected subtotal EUR 231,678.05. USD/THB intentionally HOLD pending EUR FX and remaining PAGA closure.",
       openItems:["ACT-IP activation","complete speaker-circuit monitoring","6-hour UPS/autonomy","final cabinet/loop/MTO","site commissioning/SAT","startup/capital/2Y spares","FCA Germany onward logistics"]
     },
-    "A1-06": { unitPriceByCurrency:{USD:775929.12,THB:24441767.16}, subtotalByCurrency:{USD:775929.12,THB:24441767.16}, state:"PRELIMINARY", internalTrace:"Current controlled 0550 baseline." },
+    "A1-06": {
+      unitPriceByCurrency:{USD:132186.47,THB:4163873.68},
+      subtotalByCurrency:{USD:132186.47,THB:4163873.68},
+      state:"BUDGETARY MARKET-SANITY / PRELIMINARY",
+      tagNo:"HIKVISION / PROJECT-APPROVED EQUIVALENT",
+      internalTrace:"Current 0550 known quantity basis: Ex PTZ 6, Ex Fixed 2, Indoor PTZ 6, Indoor Fixed/Dome 41 = 55 known cameras. Market sanity basis uses current industrial/enterprise CCTV references, NVR/storage/accessory allowances and 20% design/market uncertainty before applying the project goods commercial factor. AMS01 quantity, final coverage, recording days/bitrate/storage, exact Ex certification and vendor quotation remain OPEN/TBC. Supersedes historical proxy that used 24 Ex PTZ cameras at THB 500,000 each.",
+      openItems:["AMS01 camera quantity","coverage / lens / scene study","recording days / bitrate / storage calculation","exact ATEX/IECEx model selection","current project vendor quotation","dedicated switch/media-converter boundary"]
+    },
     "A1-07": { unitPriceByCurrency:{USD:441182.66,THB:13897253.89}, subtotalByCurrency:{USD:441182.66,THB:13897253.89}, state:"PRELIMINARY", internalTrace:"Current controlled 0550 baseline." },
     "A1-08": { unitPriceByCurrency:{USD:67950.84,THB:2140451.37}, subtotalByCurrency:{USD:67950.84,THB:2140451.37}, state:"PARTIAL QUOTE", internalTrace:"Current controlled 0550 baseline." },
     "A1-09": { unitPriceByCurrency:{USD:16015.40,THB:504485.05}, subtotalByCurrency:{USD:16015.40,THB:504485.05}, state:"PARTIAL QUOTE", internalTrace:"Current controlled 0550 baseline." },
