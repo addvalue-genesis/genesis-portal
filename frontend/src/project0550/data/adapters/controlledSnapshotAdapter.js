@@ -1,4 +1,4 @@
-import snapshot from "../snapshots/pj2608-0550.rev04.json";
+import snapshot from "../snapshots/pj2608-0550.rev07.json";
 import { validateProject0550Dataset } from "../validateDataset";
 
 let cached;
