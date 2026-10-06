@@ -330,16 +330,24 @@ function PriceView() {
 
         <div className="bid-control-grid">
           <div>
+            <strong>BASE OFFER · A + B</strong>
+            <span>HOLD · known excluding open PAGA = USD {p.knownBaseExPaga.usd.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {p.knownBaseExPaga.thb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+          </div>
+          <div>
+            <strong>PROJECT OFFER AMOUNT</strong>
+            <span>HOLD until INDUSTRONIC PAGA is fully converted/closed. This is the amount that will be submitted.</span>
+          </div>
+          <div>
+            <strong>PART C · OPTIONS</strong>
+            <span>Separate from Base Offer. Included only when the option is selected/required.</span>
+          </div>
+          <div>
             <strong>PAGA Selected</strong>
-            <span>{p.paga.vendor} · {p.paga.offer}</span>
+            <span>{p.paga.vendor} · {p.paga.offer} · EUR {p.paga.knownSelectedSubtotalEur.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · FX TBC</span>
           </div>
           <div>
-            <strong>PAGA Known Subtotal</strong>
-            <span>EUR {p.paga.knownSelectedSubtotalEur.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
-          </div>
-          <div>
-            <strong>Known A+B excl. open PAGA</strong>
-            <span>USD {p.knownBaseExPaga.usd.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {p.knownBaseExPaga.thb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+            <strong>Offer Composition</strong>
+            <span>{p.offerComposition.baseOffer} · {p.offerComposition.partC}</span>
           </div>
           <div>
             <strong>FX Control</strong>
