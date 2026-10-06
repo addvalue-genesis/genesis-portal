@@ -15,53 +15,17 @@ import { traceForPriceLine } from "./Project0550PriceTrace";
 import { auditForPriceLine } from "./Project0550A1PriceAudit";
 import { vendorOfferForPriceLine } from "./Project0550VendorOfferRegister";
 import { runProject0550EvidenceReasoning } from "./Project0550SmartControlEngine";
+import {
+  classifyProject0550PriceLine,
+  summarizeProject0550PriceSources,
+  PROJECT0550_PRICE_SOURCE_CLASSES
+} from "./Project0550PriceSourceModel";
+import {
+  ASKTSI_PRICED_BREAKDOWN_TEMPLATE,
+  PROJECT0550_OUTPUT_PROFILES
+} from "./Project0550OutputContract";
 
-export const ASKTSI_PRICED_BREAKDOWN_TEMPLATE = {
-  id: "ASK-TSI-PRICED-BREAKDOWN",
-  sourceFile: "ASK-TSI Priced Breakdown List.xlsx",
-  sheet: "PriceBreakdown",
-  range: "A1:H80",
-  columns: ["S.N","Tag No.","Description","Qty","Unit","Unit Price","Sub-Total","Remark"],
-  partA: [
-    ["A1-01",1,"Network System (KU Band Internet)"],
-    ["A1-02",2,"VSAT System"],
-    ["A1-03",3,"Video Conference System (VCS)"],
-    ["A1-04",4,"IP Telephony and PABX"],
-    ["A1-05",5,"Public Address and General Alarm (PAGA)"],
-    ["A1-06",6,"Closed Circuit Television (CCTV) System"],
-    ["A1-07",7,"VHF DMR Radio System"],
-    ["A1-08",8,"VHF-FM Marine Radio"],
-    ["A1-09",9,"VHF-AM Aeronautical Radio"],
-    ["A1-10",10,"MF/HF SSB Radio"],
-    ["A1-11",11,"Microwave System (Telecommunication Tower)"],
-    ["A1-12",12,"Entertainment System"],
-    ["A1-13",13,"Fiber Optic Communication and Installation"],
-    ["A1-14",14,"Meteorological System"],
-    ["A1-15",15,"Non-Directional Beacon (NDB) System"]
-  ],
-  partB: [
-    ["B1","Detail Design Engineering includes but not limited: Detail Design Architecture and Topology Dwg; Detail Design IFC Dwg; Calculation Sheet; Simulation Analysis; Technical Manuals and etc."],
-    ["B2","Transportation to FOB PURCHASER'PORT"],
-    ["B3","Training for Enduser / PURCHASER personnel"],
-    ["B4","Specialist field assistance as per specification"],
-    ["B5","Pre-commissioning, Commissioning and Start-up Spares"],
-    ["B6","Special Tools for operation and maintenance"],
-    ["B7",null],
-    ["B8",null],
-    ["B9",null]
-  ],
-  partC: [
-    ["C1","On-site installation construction"],
-    ["C2","Capital Spares For Ten Years"],
-    ["C3","2 years normal operation spare parts"]
-  ],
-  sourceRemarks: {
-    A_DEFAULT: "Details shall be included not limit to Bulk Materials etc. Main Equipment Brands shall be provided.",
-    B2: "IF Over-sea TSI- CIF Yangon, Myanmar / IF China TSI -FOB any major port in China",
-    C1: "Optional Item Undertaken by CNEEC",
-    FINAL: "Delivery term shall follow program logistic proposal and fixed by each cluster per equipment cargo size."
-  }
-};
+export { ASKTSI_PRICED_BREAKDOWN_TEMPLATE };
 
 function money(value,currency="USD"){
   if(value===null || value===undefined || value==="") return "—";
@@ -143,6 +107,88 @@ function Status({state}){
   return <span className={"bid-status "+stateTone(text)}>{text}</span>;
 }
 
+function SourceChip({info}){
+  if(!info) return null;
+  return (
+    <span className={"ask-source-chip "+(info.tone||"neutral")} title={info.meaning}>
+      {info.short}
+    </span>
+  );
+}
+
+function PriceSourceOverview({lines,codes}){
+  const summary=summarizeProject0550PriceSources(lines,codes);
+  const order=[
+    "CURRENT_SELECTED_QUOTE",
+    "CURRENT_PARTIAL_QUOTE",
+    "MARKET_SANITY",
+    "PARAMETRIC_MODEL",
+    "HISTORICAL_PROXY",
+    "DUMMY_ALLOWANCE",
+    "OPTION_HOLD"
+  ];
+
+  return (
+    <div className="ask-source-overview">
+      <div className="ask-source-overview-head">
+        <div>
+          <small>PRICE SOURCE COMPOSITION · A1</small>
+          <strong>ตัวเลขในตารางไม่ได้มีความน่าเชื่อถือเท่ากันทุกบรรทัด</strong>
+          <span>แยก Current Quote / Partial Quote / Market Sanity / Parametric / Historical / Dummy ให้เห็นก่อนดูยอดรวม</span>
+        </div>
+        <div className="ask-source-overview-rule">
+          <b>{summary.vendorBoundLines}</b>
+          <span>price lines มี vendor offer register</span>
+        </div>
+      </div>
+      <div className="ask-source-overview-grid">
+        {order.map(key=>{
+          const meta=PROJECT0550_PRICE_SOURCE_CLASSES[key];
+          const count=summary.groups[key]||0;
+          return (
+            <div className={"ask-source-summary-card "+meta.tone} key={key}>
+              <small>{meta.label}</small>
+              <strong>{count}</strong>
+              <span>{meta.meaning}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="ask-source-overview-note">
+        <strong>อ่านยอดรวมอย่างไร:</strong>
+        <span>ยอดที่แสดงใน UI เป็น controlled working model ซึ่งอาจประกอบด้วย vendor quote + historical/proxy + parametric completion. คลิก “View details” เพื่อดูสิ่งที่อยู่ข้างในแต่ละบรรทัด.</span>
+      </div>
+    </div>
+  );
+}
+
+function OutputContractStrip(){
+  const profiles=[
+    PROJECT0550_OUTPUT_PROFILES.XLSX_CUSTOMER,
+    PROJECT0550_OUTPUT_PROFILES.XLSX_INTERNAL,
+    PROJECT0550_OUTPUT_PROFILES.DOCX_INTERNAL,
+    PROJECT0550_OUTPUT_PROFILES.PDF_INTERNAL
+  ];
+  return (
+    <div className="ask-output-contract-strip">
+      <div className="ask-output-contract-title">
+        <small>ONE CONTROLLED MODEL → MANY OUTPUTS</small>
+        <strong>React = working view · Export = fixed document contract</strong>
+        <span>XLSX จะเติมลง original ASK-TSI template A1:H80; Word/PDF ใช้ document model เดียวกัน ไม่ดึงข้อมูลจากหน้าจอแบบ copy/paste.</span>
+      </div>
+      <div className="ask-output-profile-list">
+        {profiles.map(profile=>(
+          <div key={profile.id}>
+            <b>{profile.label}</b>
+            <span>{profile.renderer}</span>
+            <small>{profile.status}</small>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function rowValue(lines,code){
   return lines?.[code] || {};
 }
@@ -174,7 +220,8 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const audit=auditForPriceLine(code);
   const vendorOffer=vendorOfferForPriceLine(code);
   const displayed=displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
-  const [traceTab,setTraceTab]=useState("ENGINEERING");
+  const [traceTab,setTraceTab]=useState("OVERVIEW");
+  const sourceInfo=classifyProject0550PriceLine(code,line);
 
   const nodes=[
     ["Requirement",trace.requirement],
@@ -188,6 +235,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
   ];
 
   const tabs=[
+    ["OVERVIEW","Overview"],
     ["ENGINEERING","Engineering Trace"],
     ["VENDOR","Vendor Offer"],
     ["RECON","Reconciliation"],
@@ -220,6 +268,78 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
               </button>
             ))}
           </div>
+
+          {traceTab==="OVERVIEW" ? (
+            <div className="ask-line-overview">
+              <div className="ask-overview-grid">
+                <div>
+                  <small>Displayed line</small>
+                  <strong>{displayed}</strong>
+                  <span>{line.state || "TBC"}</span>
+                </div>
+                <div>
+                  <small>Primary price basis</small>
+                  <strong><SourceChip info={sourceInfo}/></strong>
+                  <span>{sourceInfo.confidence}</span>
+                </div>
+                <div>
+                  <small>Vendor / source</small>
+                  <strong>{sourceInfo.vendor || "No current vendor quote bound"}</strong>
+                  <span>{sourceInfo.quoteRef || audit?.source || "Source closure required"}</span>
+                </div>
+                <div>
+                  <small>Nested detail</small>
+                  <strong>{sourceInfo.detailCount}</strong>
+                  <span>{sourceInfo.vendorItemCount} vendor items · {sourceInfo.reconciliationCount} reconciliation · {sourceInfo.openGapCount} gaps</span>
+                </div>
+              </div>
+
+              <div className="ask-overview-explain">
+                <div>
+                  <b>What this number means</b>
+                  <span>{audit?.basis || trace.costObject}</span>
+                </div>
+                <div>
+                  <b>Why it is not final yet</b>
+                  <span>{audit?.action || line.openItems?.join("; ") || trace.releaseState}</span>
+                </div>
+              </div>
+
+              {vendorOffer?.vendorItems?.length ? (
+                <div className="ask-overview-children">
+                  <div className="ask-overview-children-head">
+                    <b>Quoted child items</b>
+                    <span>{vendorOffer.vendorItems.length} item(s) · source preserved AS QUOTED</span>
+                  </div>
+                  <div className="ask-child-list">
+                    {vendorOffer.vendorItems.slice(0,8).map((item,idx)=>(
+                      <div key={item.item+"-"+idx}>
+                        <span>{item.group}</span>
+                        <strong>{item.item}</strong>
+                        <em>{item.qty} {item.unit} · {Number.isFinite(item.total) ? money(item.total,vendorOffer.currency) : "Option / TBC"}</em>
+                      </div>
+                    ))}
+                  </div>
+                  {vendorOffer.vendorItems.length>8 ? <small className="ask-more-note">+ {vendorOffer.vendorItems.length-8} more — open Vendor Offer tab for the full list</small> : null}
+                </div>
+              ) : null}
+
+              {audit?.buildUp?.length ? (
+                <div className="ask-overview-build">
+                  <b>Modeled completion inside this selling line</b>
+                  <div>
+                    {audit.buildUp.map((item,idx)=>(
+                      <span key={item.item+"-"+idx}>
+                        <small>{item.priceClass}</small>
+                        <strong>{item.item}</strong>
+                        <em>{Number.isFinite(item.amountThb) ? money(item.amountThb,"THB") : "TBC"}</em>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
+          ) : null}
 
           {traceTab==="ENGINEERING" ? (
             <>
@@ -477,7 +597,10 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
         <p>
           Form นี้รับค่าจาก controlled engineering / cost / commercial model.
           ช่องว่าง/TBC ต้องคงสถานะไว้และห้ามถูกแปลงเป็นศูนย์โดยอัตโนมัติ.
+          หน้าจอเป็น rich working view; customer export ยังคงรูปแบบ ASK-TSI ต้นฉบับ.
         </p>
+        {mode==="INTERNAL" ? <PriceSourceOverview lines={lines} codes={aCodes}/> : null}
+        {mode==="INTERNAL" ? <OutputContractStrip/> : null}
         <div className="ask-price-audit">
           <div><b>Evidence Gate</b><span>{evidenceGate.status}</span></div>
           <div><b>Memory</b><span>{evidenceGate.memoryRevision}</span></div>
@@ -519,6 +642,7 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
               <tr className="ask-part-head"><td colSpan="8"><strong>Part A: BASIC PRICE / A1. Main Equipment Price</strong></td></tr>
               {t.partA.map(([code,sn,description])=>{
                 const line=rowValue(lines,code);
+                const sourceInfo=classifyProject0550PriceLine(code,line);
                 return (
                   <React.Fragment key={code}>
                     <tr className={traceCode===code ? "ask-price-line is-trace-open" : "ask-price-line"}>
@@ -526,10 +650,18 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                       <td>{line.tagNo || ""}</td>
                       <td>
                         <strong>{description}</strong>
+                        {mode==="INTERNAL" ? (
+                          <div className="ask-row-source-line">
+                            <SourceChip info={sourceInfo}/>
+                            {sourceInfo.vendor ? <span className="ask-row-vendor">{sourceInfo.vendor}</span> : null}
+                          </div>
+                        ) : null}
                         {line.state?<><br/><Status state={line.state}/></>:null}
-                        <button type="button" className="ask-trace-btn" onClick={()=>toggleTrace(code)}>
-                          {traceCode===code ? "Close trace" : "Trace price"}
-                        </button>
+                        {mode==="INTERNAL" ? (
+                          <button type="button" className="ask-trace-btn" onClick={()=>toggleTrace(code)}>
+                            {traceCode===code ? "▾ Close details" : `▸ View details${sourceInfo.detailCount ? " · "+sourceInfo.detailCount : ""}`}
+                          </button>
+                        ) : null}
                       </td>
                       <td>{line.qty ?? 1}</td>
                       <td>{line.unit || "Lot"}</td>
