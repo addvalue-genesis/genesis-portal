@@ -86,14 +86,14 @@ export function classifyProject0550PriceLine(code,line={}){
     sourceClass="CURRENT_PARTIAL_QUOTE";
   }else if(has(corpus,/MARKET.SANITY/i)){
     sourceClass="MARKET_SANITY";
+  }else if(has(corpus,/DUMMY|NO CURRENT QUOTE|WORKING ALLOWANCE/i)){
+    sourceClass="DUMMY_ALLOWANCE";
+  }else if(has(corpus,/OPTION|HOLD|NOT PRICED/i)){
+    sourceClass="OPTION_HOLD";
   }else if(has(corpus,/PARAMETRIC|RESOURCE.PROTECTED|PASS.THROUGH|LOGISTICS|INSURANCE/i)){
     sourceClass="PARAMETRIC_MODEL";
   }else if(has(corpus,/HISTORICAL|PROXY|REPRICE/i)){
     sourceClass="HISTORICAL_PROXY";
-  }else if(has(corpus,/DUMMY|ALLOWANCE/i)){
-    sourceClass="DUMMY_ALLOWANCE";
-  }else if(has(corpus,/OPTION|HOLD|NOT PRICED/i)){
-    sourceClass="OPTION_HOLD";
   }
 
   const meta=PROJECT0550_PRICE_SOURCE_CLASSES[sourceClass];
