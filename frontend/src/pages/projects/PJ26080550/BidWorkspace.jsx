@@ -319,26 +319,26 @@ function PriceView() {
   const [currency,setCurrency] = useState("USD");
   const [eurThbFx,setEurThbFx] = useState(() => {
     if(typeof window==="undefined") return String(p.fx.workingEurThb ?? "");
-    return window.localStorage.getItem("pj2608-0550-eur-thb-working-fx") || String(p.fx.workingEurThb ?? "");
+    return window.localStorage.getItem("pj2608-0550-eur-thb-bot-mid-20261006") || String(p.fx.workingEurThb ?? "");
   });
   const [cnyThbFx,setCnyThbFx] = useState(() => {
     if(typeof window==="undefined") return String(p.fx.workingCnyThb ?? "");
-    return window.localStorage.getItem("pj2608-0550-cny-thb-working-fx") || String(p.fx.workingCnyThb ?? "");
+    return window.localStorage.getItem("pj2608-0550-cny-thb-bot-mid-20261006") || String(p.fx.workingCnyThb ?? "");
   });
 
   function updateEurThbFx(value){
     setEurThbFx(value);
     if(typeof window!=="undefined"){
-      if(value) window.localStorage.setItem("pj2608-0550-eur-thb-working-fx",value);
-      else window.localStorage.removeItem("pj2608-0550-eur-thb-working-fx");
+      if(value) window.localStorage.setItem("pj2608-0550-eur-thb-bot-mid-20261006",value);
+      else window.localStorage.removeItem("pj2608-0550-eur-thb-bot-mid-20261006");
     }
   }
 
   function updateCnyThbFx(value){
     setCnyThbFx(value);
     if(typeof window!=="undefined"){
-      if(value) window.localStorage.setItem("pj2608-0550-cny-thb-working-fx",value);
-      else window.localStorage.removeItem("pj2608-0550-cny-thb-working-fx");
+      if(value) window.localStorage.setItem("pj2608-0550-cny-thb-bot-mid-20261006",value);
+      else window.localStorage.removeItem("pj2608-0550-cny-thb-bot-mid-20261006");
     }
   }
 
@@ -421,8 +421,8 @@ function PriceView() {
             <span>{p.offerComposition.baseOffer} · {p.offerComposition.partC}</span>
           </div>
           <div>
-            <strong>FX Control</strong>
-            <span>USD/THB = {p.fx.thbPerUsd.toFixed(2)} · EUR/THB = {eurThbFx || "TBC"} · CNY/THB = {cnyThbFx || "TBC"}</span>
+            <strong>FX Control · Bank of Thailand</strong>
+            <span>{p.fx.sourceReport} · {p.fx.rateType} · {p.fx.sourceDate} · USD/THB = {p.fx.thbPerUsd.toFixed(4)} · EUR/THB = {Number(eurThbFx).toFixed(4)} · CNY/THB = {Number(cnyThbFx).toFixed(4)}</span>
           </div>
         </div>
 
@@ -433,7 +433,7 @@ function PriceView() {
             ))}
           </div>
           <label className="bid-fx-input">
-            <span>EUR/THB Working FX</span>
+            <span>EUR/THB BOT Mid Rate · {p.fx.sourceDate}</span>
             <input
               type="number"
               step="0.01"
@@ -442,11 +442,12 @@ function PriceView() {
               value={eurThbFx}
               onChange={(e)=>updateEurThbFx(e.target.value)}
               placeholder="1 EUR = ? THB"
+              readOnly
             />
-            <small>{eurThbFx ? "Working conversion only · not firm project FX" : "Required for EUR conversion / PAGA THB"}</small>
+            <small>Bank of Thailand {p.fx.sourceReport} · MID RATE · reference/display conversion only</small>
           </label>
           <label className="bid-fx-input">
-            <span>CNY/THB Working FX</span>
+            <span>CNY/THB BOT Mid Rate · {p.fx.sourceDate}</span>
             <input
               type="number"
               step="0.0001"
@@ -455,8 +456,9 @@ function PriceView() {
               value={cnyThbFx}
               onChange={(e)=>updateCnyThbFx(e.target.value)}
               placeholder="1 CNY = ? THB"
+              readOnly
             />
-            <small>{cnyThbFx ? "Working conversion only · not firm project FX" : "Required to display project price in CNY/RMB"}</small>
+            <small>Bank of Thailand {p.fx.sourceReport} · MID RATE · reference/display conversion only</small>
           </label>
         </div>
       </section>
