@@ -1,7 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 import "./ControlSpine.css";
+import { PROJECT0550_ENGINEERING_DOCTRINE } from "./Project0550EngineeringDoctrine";
+import { PROJECT0550_CONTROL_OBJECTS } from "./Project0550ControlObjects";
+import { evaluateProject0550Portfolio } from "./Project0550SmartControlEngine";
 
-const TRACE_ROWS = [
+const LEGACY_TRACE_ROWS_UNUSED = [
   {
     id:"CTRL-PAGA-001",
     object:"PAGA Sound Coverage Study",
@@ -114,6 +117,8 @@ export function ControlSpine(){
   const [q,setQ]=useState("");
   const [liveData,setLiveData]=useState(null);
   const [apiMode,setApiMode]=useState("PREVIEW");
+  const [releaseIntent,setReleaseIntent]=useState("PRICE_FREEZE");
+  const smart=useMemo(()=>evaluateProject0550Portfolio(PROJECT0550_CONTROL_OBJECTS,{releaseIntent}),[releaseIntent]);
 
   useEffect(()=>{
     let active=true;
@@ -137,19 +142,19 @@ export function ControlSpine(){
 
   const rows=useMemo(()=>{
     const s=q.trim().toLowerCase();
-    if(!s) return TRACE_ROWS;
-    return TRACE_ROWS.filter(x=>Object.values(x).join(" ").toLowerCase().includes(s));
+    if(!s) return smart.objects;
+    return smart.objects.filter(x=>Object.values(x).filter(v=>typeof v!=="object").join(" ").toLowerCase().includes(s));
   },[q]);
 
   return (
     <div className="cs-shell">
       <section className="cs-hero">
         <div>
-          <small>0550 CONTROL SPINE · METHOD REUSED, PARTICULAR INPUTS REBOUND</small>
-          <h2>Requirement → Proof → Quantity / Work → Cost Owner → Commercial Treatment → Price Line</h2>
+          <small>0550 SMART ENGINEERING CONTROL · ${PROJECT0550_ENGINEERING_DOCTRINE.revision}</small>
+          <h2>{PROJECT0550_ENGINEERING_DOCTRINE.name}</h2>
           <p>
-            หน้านี้ไม่สร้าง requirement หรือราคาใหม่ แต่ทำหน้าที่บังคับ traceability ระหว่าง Engineering, VDRL,
-            Lifecycle, Cost และ Customer Quotation. ค่าไม่ทราบยังคงเป็น TBC / OPEN จนกว่าจะมีหลักฐานของ 0550.
+            Code ประมวลผลข้อมูล 0550 ตาม First Principles, technical/non-technical constraints, proof gates,
+            quantity drivers, lifecycle obligations และ parametric cost rules เพื่อหา gap / blocker / release readiness — ไม่ใช่แค่แสดงหลักการให้อ่าน.
           </p>
         </div>
         <div className="cs-hard-rules">
@@ -158,20 +163,31 @@ export function ControlSpine(){
             <span className={apiMode==="LIVE DB"?"live":"preview"}>{apiMode}</span>
           </div>
           <strong>HARD CONTROLS</strong>
-          <span>NOT FOUND ≠ ZERO SCOPE</span>
-          <span>TBC ≠ ZERO COST</span>
-          <span>VENDOR BOM ≠ PROJECT REQUIREMENT</span>
+          {PROJECT0550_ENGINEERING_DOCTRINE.hardRules.slice(0,5).map(rule=><span key={rule[0]}>{rule[1]}</span>)}
         </div>
       </section>
 
       <div className="cs-route">
-        {["Requirement","Applicability","Driver","CAL / SDY / RPT","Required MTO / Work","Cost","Cost Owner","Commercial Treatment","Exhibit C"].map((x,i)=>(
+        {PROJECT0550_ENGINEERING_DOCTRINE.uiChain.map((x,i)=>(
           <React.Fragment key={x}>
             <div><b>{String(i+1).padStart(2,"0")}</b><span>{x}</span></div>
-            {i<8&&<em>→</em>}
+            {i<PROJECT0550_ENGINEERING_DOCTRINE.uiChain.length-1&&<em>→</em>}
           </React.Fragment>
         ))}
       </div>
+
+      <div className="cs-live-grid">
+        <div><small>SMART STATUS</small><strong>{smart.status}</strong><span>{releaseIntent}</span></div>
+        <div><small>BLOCKERS</small><strong>{smart.summary.blockers}</strong><span>must close / disposition</span></div>
+        <div><small>WARNINGS</small><strong>{smart.summary.warnings}</strong><span>visible uncertainty</span></div>
+        <div><small>CONFIDENCE</small><strong>{smart.summary.averageConfidence}%</strong><span>review priority only</span></div>
+      </div>
+
+      <nav className="cs-tabs">
+        {Object.keys(PROJECT0550_ENGINEERING_DOCTRINE.releaseIntents).map(intent=>(
+          <button key={intent} className={releaseIntent===intent?"active":""} onClick={()=>setReleaseIntent(intent)}>{intent}</button>
+        ))}
+      </nav>
 
       {liveData?.summary && (
         <div className="cs-live-grid">
@@ -190,6 +206,7 @@ export function ControlSpine(){
         <button className={mode==="schema"?"active":""} onClick={()=>setMode("schema")}>DB Control Fields</button>
         <button className={mode==="double"?"active":""} onClick={()=>setMode("double")}>Anti-Double-Count</button>
         <button className={mode==="state"?"active":""} onClick={()=>setMode("state")}>Evidence / State Model</button>
+        <button className={mode==="smart"?"active":""} onClick={()=>setMode("smart")}>Smart Engine Findings</button>
       </nav>
 
       {mode==="trace" && (
@@ -220,7 +237,7 @@ export function ControlSpine(){
           <div className="cs-card-grid">
             {rows.map(r=>(
               <article className="cs-card" key={r.id}>
-                <div className="cs-card-top"><code>{r.id}</code><State text={r.state}/></div>
+                <div className="cs-card-top"><code>{r.id}</code><State text={r.evaluation?.status || r.state}/></div>
                 <h3>{r.object}</h3>
                 <dl>
                   <div><dt>Source</dt><dd>{r.source}</dd></div>
@@ -232,7 +249,11 @@ export function ControlSpine(){
                   <div><dt>Cost owner</dt><dd>{r.owner}</dd></div>
                   <div><dt>Commercial</dt><dd>{r.treatment}</dd></div>
                 </dl>
-                <footer><strong>Next closure action</strong><span>{r.next}</span></footer>
+                <div className="cs-state-rule">
+                  <strong>Smart gate</strong>
+                  <span>{r.evaluation?.blockers || 0} blocker / {r.evaluation?.warnings || 0} warning · confidence {r.evaluation?.confidence || 0}%</span>
+                </div>
+                <footer><strong>Next closure action</strong><span>{r.evaluation?.findings?.[0]?.action || r.next}</span></footer>
               </article>
             ))}
           </div>
@@ -265,6 +286,31 @@ export function ControlSpine(){
         </section>
       )}
 
+      {mode==="smart" && (
+        <section className="cs-panel">
+          <div className="cs-panel-head">
+            <div><small>ALGORITHM OUTPUT</small><h2>เงื่อนไขที่ code ตรวจพบจากข้อมูลปัจจุบัน</h2></div>
+            <State text={smart.status}/>
+          </div>
+          <p className="cs-muted">Release intent: {releaseIntent}. Confidence ใช้จัดลำดับ review เท่านั้นและไม่สามารถ override blocker หรือ auto-release.</p>
+          <div className="cs-table-wrap">
+            <table className="cs-table">
+              <thead><tr><th>Severity</th><th>Object</th><th>Stage</th><th>Rule</th><th>Finding</th><th>Required action</th></tr></thead>
+              <tbody>{smart.findings.map((f,idx)=>(
+                <tr key={f.objectId+"-"+f.code+"-"+idx}>
+                  <td><State text={f.severity}/></td>
+                  <td><strong>{f.object}</strong><br/><code>{f.objectId}</code></td>
+                  <td>{f.stage}</td>
+                  <td><code>{f.code}</code></td>
+                  <td>{f.message}</td>
+                  <td>{f.action}</td>
+                </tr>
+              ))}</tbody>
+            </table>
+          </div>
+        </section>
+      )}
+
       {mode==="state" && (
         <section className="cs-panel">
           <small>STATE DISCIPLINE</small>
@@ -286,7 +332,7 @@ function State({text}){
   const s=String(text||"").toLowerCase();
   let tone="neutral";
   if(s.includes("ready")||s==="fact"||s==="derived"||s.includes("structure")) tone="good";
-  else if(s.includes("open")||s.includes("tbc")||s.includes("assumption")||s.includes("context")) tone="warn";
+  else if(s.includes("warn")||s.includes("conditional")||s.includes("open")||s.includes("tbc")||s.includes("assumption")||s.includes("context")) tone="warn";
   else if(s.includes("block")||s.includes("conflict")) tone="bad";
   return <span className={"cs-state "+tone}>{text}</span>;
 }

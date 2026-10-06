@@ -122,7 +122,7 @@ const WORKFLOW = [
   ["1", "Read Bid Pack", "Contract + technical + clarification sources"],
   ["2", "Extract Obligations", "Each clause becomes a traceable bid requirement"],
   ["3", "Decide Response", "Comply / Clarify / Technical Deviation / Commercial Deviation / Option / Exclusion"],
-  ["4", "Engineer & Quantify", "First Principles + CAL/SDY/RPT → Required MTO / Work / MH"],
+  ["4", "Engineer & Quantify", "First Principles + Constraints + CAL/SDY/RPT → Required MTO / Bulk / Work / MH"],
   ["5", "Price", "Map cost into Exhibit C schedules and lifecycle services"],
   ["6", "Generate Submission", "Price schedules + deviation lists + technical/VDRL/schedule outputs"],
 ];
@@ -259,17 +259,19 @@ function Overview() {
 
       <section className="bid-panel bid-highlight">
         <small>1.3 · REQUIREMENT-TO-SUBMISSION LOGIC</small>
-        <h2>First Principles เป็น “เครื่องมือหลังบ้าน” เพื่อให้เราตอบเอกสารเสนอราคาได้อย่างมีหลักฐาน</h2>
+        <h2>First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model เป็นกลไกประมวลผลของงาน ไม่ใช่ข้อความประกอบ UI</h2>
         <div className="bid-connection">
-          <div><span>Contract / Technical Requirement</span><strong>What must we accept?</strong></div>
+          <div><span>Source / Requirement</span><strong>What must we achieve?</strong></div>
           <em>→</em>
-          <div><span>First Principles / Engineering Proof</span><strong>What is actually required?</strong></div>
+          <div><span>Fundamental Need / Constraints</span><strong>What controls the solution?</strong></div>
           <em>→</em>
-          <div><span>MTO / Work / MH / Lifecycle</span><strong>What must we buy and do?</strong></div>
+          <div><span>CAL / Study / RPT / Proof</span><strong>What can be released?</strong></div>
           <em>→</em>
-          <div><span>Cost / Deviation</span><strong>What is our price / exception?</strong></div>
+          <div><span>Required MTO / Work / Lifecycle</span><strong>What must we buy and do?</strong></div>
           <em>→</em>
-          <div><span>Bid Submission</span><strong>What do we send back?</strong></div>
+          <div><span>Parametric Cost / Risk</span><strong>What does it really cost?</strong></div>
+          <em>→</em>
+          <div><span>Commercial / Submission</span><strong>What do we offer?</strong></div>
         </div>
       </section>
     </div>

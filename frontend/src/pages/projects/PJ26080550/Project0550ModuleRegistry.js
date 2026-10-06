@@ -13,12 +13,12 @@ export const PROJECT0550_MODULES = [
   { id:"2.4", key:"profit-policy", title:"Profit Policy", parent:"2.0", kind:"EXECUTIVE", authority:"EXECUTIVE_DECISION", purpose:"Margin/markup/partner layer, minimum and target return." },
   { id:"2.5", key:"authorised-offer", title:"Authorised Offer", parent:"2.0", kind:"EXECUTIVE", authority:"EXECUTIVE_DECISION", purpose:"Strategic price position and final authorization." },
 
-  { id:"3.0", key:"model", title:"First Principles / Evidence Logic", parent:null, kind:"KNOWLEDGE", authority:"SYSTEM_RESOLUTION", purpose:"Understand what is required, why, where it comes from and how it is proven." },
+  { id:"3.0", key:"model", title:"First Principles / Constraint / Parametric Model", parent:null, kind:"KNOWLEDGE", authority:"SYSTEM_RESOLUTION", purpose:"Execute the controlled method: Source/Requirement → Need/Constraint → Proof → Required Quantity/Work → Parametric Cost → Release." },
   { id:"3.1", key:"evidence-chain", title:"Evidence Chain", parent:"3.0", kind:"SOURCE", authority:"SYSTEM_RESOLUTION", purpose:"Source → requirement → fundamental need → interpretation → answer." },
   { id:"3.2", key:"technical-proof", title:"Technical Proof Tools", parent:"3.0", kind:"TECHNICAL", authority:"SYSTEM_RESOLUTION", purpose:"CAL/SDY/RPT/equations only where proof is actually needed." },
   { id:"3.3", key:"method-library", title:"Reusable Method Library", parent:"3.0", kind:"METHOD", authority:"SYSTEM_RESOLUTION", purpose:"Controlled reusable methods without importing project facts." },
 
-  { id:"4.0", key:"control", title:"Knowledge / Control Spine", parent:null, kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"Trace evidence, responsibility, state, closure and price/output bindings." },
+  { id:"4.0", key:"control", title:"Smart Engineering Control Spine", parent:null, kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"Algorithmically evaluate evidence, constraints, proof gates, quantity/vendor gaps, lifecycle, cost completeness and release readiness." },
 
   { id:"5.0", key:"form", title:"Bid Form Tracker", parent:null, kind:"OUTPUT", authority:"SYSTEM_RESOLUTION", purpose:"Customer response form control." },
   { id:"6.0", key:"scope", title:"Scope / Compliance", parent:null, kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"Resolve obligations and compliance from governing sources." },
