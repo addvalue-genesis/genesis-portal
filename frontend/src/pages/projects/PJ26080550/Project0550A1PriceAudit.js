@@ -6,6 +6,9 @@ This registry does not upgrade a historical/proxy input into a current quote.
 
 export const PROJECT0550_A1_PRICE_AUDIT = {
   "A1-01":{
+    vendor:"NO CURRENT VENDOR QUOTE IDENTIFIED",
+    quoteRef:"Rev04 model + historical cost library",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL",
     grade:"HISTORICAL / PROXY",
     verdict:"USE AS BUDGETARY ONLY",
     basis:"Current 0550 quantities mapped to historical LAN/KU/AIS unit rates and completion allowances in Rev04 model.",
@@ -13,6 +16,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Obtain current Cisco/network + KU equipment quote; keep airtime/OPEX separate."
   },
   "A1-02":{
+    vendor:"THAICOM / VSAT PROVIDER — COMMERCIAL QUOTE NOT FOUND",
+    quoteRef:"Technical/RFQ documents only",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL / DUMMY COMMERCIAL INPUT",
     grade:"DUMMY / NO CURRENT QUOTE",
     verdict:"REPRICE REQUIRED",
     basis:"Non-free-issued VSAT accessories/cable/interface completion allowance.",
@@ -20,6 +26,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Replace with current THAICOM / nominated VSAT commercial quotation and free-issue inventory."
   },
   "A1-03":{
+    vendor:"NO CURRENT VCS VENDOR QUOTE IDENTIFIED",
+    quoteRef:"Rev04 historical unit-rate basis",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL",
     grade:"HISTORICAL UNIT RATE",
     verdict:"USE AS BUDGETARY ONLY",
     basis:"4 working VCS locations × historical system rate.",
@@ -27,6 +36,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Confirm 4th location, Teams-room BOM/licenses and obtain current quote."
   },
   "A1-04":{
+    vendor:"AVAYA REQUIREMENT / CURRENT COMMERCIAL QUOTE NOT FOUND",
+    quoteRef:"Rev04 historical unit-rate basis",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL",
     grade:"HISTORICAL UNIT RATE",
     verdict:"USE AS BUDGETARY ONLY",
     basis:"Current MR phone/PBX quantities mapped to historical IP phone / PBX / Ex-phone unit rates.",
@@ -34,6 +46,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Obtain current Avaya phones/server/licenses/gateway/trunk quote and Ex-phone completion."
   },
   "A1-05":{
+    vendor:"INDUSTRONIC",
+    quoteRef:"A20261632 · 03-Sep-2026",
+    modelStatus:"CBE = ADVANCED / VENDOR SELECTED / OPEN ENGINEERING & LIFECYCLE GAPS",
     grade:"CURRENT QUOTE / SELECTED",
     verdict:"VALID SOURCE — OPEN GAPS",
     basis:"INDUSTRONIC Offer A20261632; selected PAGA basis.",
@@ -41,6 +56,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Close sound/loading/loop/autonomy/interface proof, site service, spares and FCA onward logistics before firm customer sell."
   },
   "A1-06":{
+    vendor:"HIKVISION / PROJECT-APPROVED EQUIVALENT — CURRENT PROJECT QUOTE NOT FOUND",
+    quoteRef:"MR App1.3 + market-sanity basis",
+    modelStatus:"CBE = PARTIAL / CURRENT QTY BOUND / COVERAGE-STORAGE PROOF OPEN",
     grade:"CURRENT QTY + MARKET SANITY",
     verdict:"REVISED BUDGETARY",
     basis:"Current 0550 known quantity = 55 cameras; market sanity for Ex/indoor cameras, NVR/storage/monitor/network accessories.",
@@ -48,6 +66,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Replace with current project Hikvision quote after coverage/lens/storage/certification/AMS01 closure."
   },
   "A1-07":{
+    vendor:"MOTOROLA / HYTERA CANDIDATE — CURRENT QUOTE NOT FOUND",
+    quoteRef:"Rev04 current-qty × historical-rate basis",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL / RF PROOF OPEN",
     grade:"HISTORICAL CURRENT-QTY",
     verdict:"REPRICE REQUIRED",
     basis:"Current MR DMR quantities applied to historical radio unit rates.",
@@ -79,6 +100,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Replace historical and proxy rows with a complete current Marine vendor BOM/quote and close RF, feeder, licensing and commissioning scope."
   },
   "A1-09":{
+    vendor:"JASON ELECTRONICS (THAILAND) CO., LTD.",
+    quoteRef:"QT2026-160 · 16-Sep-2026",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL / DCA & COMPLETE BOM OPEN",
     grade:"CURRENT QUOTE PARTIAL",
     verdict:"BUDGETARY WITH COMPLETION PROXY",
     basis:"Jason aeronautical fixed radio + antenna + lightning anchor; handheld/gateway completion remains historical/working.",
@@ -86,6 +110,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Close DCA / 1+1 architecture / handheld / gateway / certification."
   },
   "A1-10":{
+    vendor:"JASON ELECTRONICS (THAILAND) CO., LTD.",
+    quoteRef:"QT2026-160 · 16-Sep-2026",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL / FREQUENCY & COMPLETE BOM OPEN",
     grade:"CURRENT QUOTE PARTIAL",
     verdict:"BUDGETARY WITH COMPLETION PROXY",
     basis:"Jason MF/HF 150W radio/ATU/power/antenna hardware anchor plus historical IP-gateway/site completion.",
@@ -93,6 +120,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Confirm exact site quantity, gateway, licence/frequency and feeder/mounting."
   },
   "A1-11":{
+    vendor:"TOWER: CURRENT LOCAL QUOTE / MW-WBB: CURRENT OEM QUOTE NOT FOUND",
+    quoteRef:"Tower 2609.95.1 + 2609.95.2 · 22-Sep-2026; MW/WBB Rev04 proxy",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL / LINK PROOF & MW-WBB OEM PRICE OPEN",
     grade:"PARTIAL CURRENT QUOTE + HISTORICAL MW/WBB",
     verdict:"REVISED BUDGETARY",
     basis:"Current 30m+60m tower supply portion THB 3.9425M + MW/WBB historical/current-topology equipment allowance THB 3.0M.",
@@ -100,6 +130,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Replace THB 3.0M MW/WBB proxy with current Ceragon/RADWIN/MGW quotation after link-budget proof."
   },
   "A1-12":{
+    vendor:"NO CURRENT ENTERTAINMENT VENDOR QUOTE IDENTIFIED",
+    quoteRef:"Rev04 historical current-qty basis",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL",
     grade:"HISTORICAL CURRENT-QTY",
     verdict:"USE AS BUDGETARY ONLY",
     basis:"Current MR AV quantities × historical rates + completion allowance.",
@@ -107,6 +140,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Obtain current TV/AV/TVRO/projector/STB/audio quote and reconcile VCS overlap."
   },
   "A1-13":{
+    vendor:"NO CURRENT FOC MATERIAL QUOTE IDENTIFIED",
+    quoteRef:"Historical route proxy / current MTO pending",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL / ROUTE-MTO-LOSS PROOF OPEN",
     grade:"HISTORICAL ROUTE PROXY",
     verdict:"HOLD FOR CURRENT MTO",
     basis:"Historical FO route quantities/rates; exact current route MTO is not yet bound.",
@@ -114,6 +150,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Rebuild from current LIS/MTO/DWG/route length/core/termination/splice/test requirements."
   },
   "A1-14":{
+    vendor:"JASON ELECTRONICS (THAILAND) CO., LTD. — SENSOR ANCHOR ONLY",
+    quoteRef:"QT2026-160 · 16-Sep-2026",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL / FULL MET PACKAGE OPEN",
     grade:"CURRENT QUOTE PARTIAL + HISTORICAL COMPLETION",
     verdict:"BUDGETARY ONLY",
     basis:"Jason RM YOUNG anemometer THB 120k is a current sensor anchor; full 2-station MET package remains historical working allowance.",
@@ -121,14 +160,139 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Obtain complete MET package quote incl sensors, logger/server/monitor/cabinet/interface/calibration."
   },
   "A1-15":{
+    vendor:"JASON ELECTRONICS (THAILAND) CO., LTD.",
+    quoteRef:"QT2026-160 · 16-Sep-2026",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL / NDB COMPLETE SYSTEM & DCA OPEN",
     grade:"CURRENT QUOTE PARTIAL",
     verdict:"BUDGETARY WITH COMPLETION ALLOWANCE",
     basis:"Jason FLUGCOM Dual NDB125 rack THB 2.45M is current quote; working complete-system allowance remains above quoted transmitter package.",
     source:"QT2026-160 dated 16-Sep-2026 + MR App1.7 / NDB requirement.",
     action:"Close NDB coverage criterion, antenna/counterpoise, DCA/regulatory, remote monitoring and commissioning."
+  },
+  "B1":{
+    grade:"PARAMETRIC PROFESSIONAL SERVICE",
+    verdict:"CONTROLLED WORKING SELL",
+    vendor:"ADDVALUE / OEM DOCUMENT INPUT",
+    quoteRef:"Rev04 service engine + current 0550 VDRL / engineering obligations",
+    modelStatus:"CBE / PARAMETRIC = ACTIVE / RESOURCE-PROTECTED",
+    basis:"Requirement extraction, design/proof, MTO/vendor reconciliation, VDRL/PM and document lifecycle workload.",
+    source:"Rev04 First-Principles Resource-Protected Budget Model.",
+    action:"Close final deliverable count, revision cycles, OEM overlap and approved resource plan."
+  },
+  "B2":{
+    grade:"LOGISTICS / MIXED COST",
+    verdict:"WORKING / PAGA FCA LOGISTICS OPEN",
+    vendor:"FORWARDER / LOGISTICS PROVIDER NOT YET LOCKED",
+    quoteRef:"Rev04 logistics basis + current vendor Incoterms",
+    modelStatus:"PARAMETRIC / PASS-THROUGH = PARTIAL",
+    basis:"Known non-PAGA logistics plus route/Incoterm/insurance/import assumptions; PAGA FCA Germany onward logistics remains open.",
+    source:"Rev04 logistics model + vendor quotations + Myanmar Logistics Instruction.",
+    action:"Bind actual shipment route, forwarder quote, cargo insurance, import/export fees and project handoff point."
+  },
+  "B3":{
+    grade:"PARAMETRIC TRAINING SERVICE",
+    verdict:"WORKING",
+    vendor:"ADDVALUE + OEM TRAINERS AS APPLICABLE",
+    quoteRef:"Rev04 service engine / training obligations",
+    modelStatus:"CBE / PARAMETRIC = ACTIVE",
+    basis:"Training sessions, trainer-days, preparation, handover and documentation workload.",
+    source:"Rev04 service model + MR/STD training requirements.",
+    action:"Close course count, participants, venue, OEM trainer responsibility and travel."
+  },
+  "B4":{
+    grade:"RESOURCE-PROTECTED SERVICE",
+    verdict:"WORKING / OEM GAPS OPEN",
+    vendor:"ADDVALUE + SELECTED OEM SPECIALISTS",
+    quoteRef:"Rev04 protected resource model",
+    modelStatus:"CBE / PARAMETRIC = ACTIVE / EVENT-BASED",
+    basis:"FAT/IFAT, pre-com, SAT, integration, commissioning, punch/handover and travel/event workload.",
+    source:"Rev04 service model + vendor FAT/SAT responsibilities.",
+    action:"Close OEM attendance, event count/duration, travel plan and site schedule."
+  },
+  "B5":{
+    grade:"SPARES / MIXED BASIS",
+    verdict:"PARTIAL",
+    vendor:"SYSTEM OEMS / CURRENT SPARE QUOTES INCOMPLETE",
+    quoteRef:"Rev04 spares model",
+    modelStatus:"PARAMETRIC = PARTIAL",
+    basis:"Known non-PAGA start-up spares plus open selected-vendor PAGA start-up spare requirement.",
+    source:"Rev04 spares model + vendor recommendations where available.",
+    action:"Replace allowances with OEM start-up spare lists and quotations."
+  },
+  "B6":{
+    grade:"TOOLS / MIXED BASIS",
+    verdict:"PARTIAL",
+    vendor:"SYSTEM OEMS / ADDVALUE TEST TOOLS",
+    quoteRef:"Rev04 tools model",
+    modelStatus:"PARAMETRIC = PARTIAL",
+    basis:"Non-PAGA special-tool allowances; PAGA tools already included in selected quote where applicable.",
+    source:"Rev04 tools model + vendor quote inclusions.",
+    action:"Close tool ownership, calibration/test-equipment requirements and duplicate inclusions."
+  },
+  "B7":{
+    grade:"PARAMETRIC SITE SURVEY",
+    verdict:"WORKING",
+    vendor:"ADDVALUE / LOCAL SURVEY SUPPORT",
+    quoteRef:"Rev04 site-survey model",
+    modelStatus:"CBE / PARAMETRIC = ACTIVE",
+    basis:"Survey crew, travel, site-days, evidence capture and reporting.",
+    source:"Rev04 lifecycle/service model.",
+    action:"Close survey locations, access plan, crew composition and travel."
+  },
+  "B8":{
+    grade:"REGULATORY + PASS-THROUGH",
+    verdict:"WORKING / OFFICIAL FEES OPEN",
+    vendor:"AUTHORITIES / AGENT / ADDVALUE COORDINATION",
+    quoteRef:"Rev04 permit-regulatory model",
+    modelStatus:"PARAMETRIC + PASS-THROUGH = PARTIAL",
+    basis:"Technical dossier/coordination effort plus official/agent/import/export/licence fees as applicable.",
+    source:"Rev04 lifecycle model + Myanmar logistics/regulatory requirements.",
+    action:"Bind exact licence/permit list, authority fees, agent fees and responsibility."
+  },
+  "B9":{
+    grade:"INSURANCE / PASS-THROUGH",
+    verdict:"WORKING / PREMIUM QUOTE OPEN",
+    vendor:"INSURER / BROKER NOT YET LOCKED",
+    quoteRef:"Rev04 insurance-risk model",
+    modelStatus:"PARAMETRIC + PASS-THROUGH = PARTIAL",
+    basis:"Project/personnel insurance and risk-transfer allowance excluding duplicated cargo/CAR-EAR cover.",
+    source:"Rev04 lifecycle model.",
+    action:"Obtain actual policy/broker quote and confirm exclusions/deductibles/owner-paid cover."
+  },
+  "C1":{
+    grade:"OPTION / NOT PRICED",
+    verdict:"CNEEC OPTIONAL",
+    vendor:"CNEEC / SITE CONSTRUCTION CONTRACTOR",
+    quoteRef:"ASK-TSI form option boundary",
+    modelStatus:"OUTSIDE CURRENT BASE OFFER",
+    basis:"On-site installation construction is an option and is not encoded as zero.",
+    source:"ASK-TSI price form + current responsibility split.",
+    action:"Price only if commercial boundary changes or CNEEC requests this option."
+  },
+  "C2":{
+    grade:"CAPITAL SPARES / PARTIAL",
+    verdict:"OPTION / PAGA SPARES OPEN",
+    vendor:"SYSTEM OEMS",
+    quoteRef:"Rev04 spare model + available vendor recommendations",
+    modelStatus:"PARAMETRIC = PARTIAL",
+    basis:"Known non-PAGA capital spares plus PAGA 10-year capital-spares requirement still open.",
+    source:"Rev04 spares model.",
+    action:"Replace allowances with complete OEM 10-year spare lists and quotations."
+  },
+  "C3":{
+    grade:"2-YEAR SPARES / PARTIAL",
+    verdict:"OPTION / PAGA SPARES OPEN",
+    vendor:"SYSTEM OEMS",
+    quoteRef:"Rev04 spare model + available vendor recommendations",
+    modelStatus:"PARAMETRIC = PARTIAL",
+    basis:"Known non-PAGA 2-year operating spares plus selected PAGA spare requirement still open.",
+    source:"Rev04 spares model.",
+    action:"Replace allowances with complete OEM 2-year spare lists and quotations."
   }
 };
 
-export function auditForA1(code){
+export function auditForPriceLine(code){
   return PROJECT0550_A1_PRICE_AUDIT[code] || null;
 }
+
+export const auditForA1 = auditForPriceLine;
