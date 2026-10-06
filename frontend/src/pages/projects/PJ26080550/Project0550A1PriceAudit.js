@@ -4,6 +4,35 @@ Audit priority: Google Drive project evidence first.
 This registry does not upgrade a historical/proxy input into a current quote.
 */
 
+import { PROJECT0550_PART_B_MODEL } from "./Project0550PartBModel";
+
+function partBAudit(code){
+  const row=PROJECT0550_PART_B_MODEL[code];
+  return {
+    grade:row.priceClass.replaceAll("_"," "),
+    verdict:/TBC|OPEN/.test(row.state) ? "KNOWN PORTION / FINAL LINE HOLD" : "CONTROLLED WORKING",
+    vendor:code==="B8" ? "ADDVALUE + AUTHORITIES / AGENT" :
+      code==="B9" ? "ADDVALUE + INSURER / BROKER" :
+      code==="B2" ? "LOGISTICS / FORWARDER + ADDVALUE COMMERCIAL MODEL" :
+      "ADDVALUE / OEM INPUT AS APPLICABLE",
+    quoteRef:"Controlled Part B Parametric Model · REV04 current adaptation",
+    modelStatus:"FIRST PRINCIPLES / CBE / PARAMETRIC — CONTROLLED LINE MODEL",
+    basis:row.title,
+    source:row.sourceSheets.join(" + "),
+    quantityBasis:row.components.filter(x=>/SURVEY|SYSTEM|INTERFACE|VDRL|COMMON|PROFESSIONAL|PASS-THROUGH|KNOWN PROCURED|REV04/.test(x.class)).map(x=>x.item),
+    buildUp:row.components.map(x=>({
+      priceClass:x.class,
+      item:x.item,
+      qty:"",
+      amountThb:Number.isFinite(x.amountThb)?x.amountThb:undefined,
+      amountText:x.amountText,
+      note:x.note
+    })),
+    action:row.openItems.join("; "),
+    commercialRule:row.commercialRule
+  };
+}
+
 export const PROJECT0550_A1_PRICE_AUDIT = {
   "A1-01":{
     vendor:"MIXED SOURCE — JASON AIS COMPONENT / NETWORK-KU CURRENT QUOTE NOT FOUND",
@@ -218,96 +247,15 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     source:"QT2026-160 dated 16-Sep-2026 + MR App1.7 / NDB requirement.",
     action:"Close NDB coverage criterion, antenna/counterpoise, DCA/regulatory, remote monitoring and commissioning."
   },
-  "B1":{
-    grade:"PARAMETRIC PROFESSIONAL SERVICE",
-    verdict:"CONTROLLED WORKING SELL",
-    vendor:"ADDVALUE / OEM DOCUMENT INPUT",
-    quoteRef:"Rev04 service engine + current 0550 VDRL / engineering obligations",
-    modelStatus:"CBE / PARAMETRIC = ACTIVE / RESOURCE-PROTECTED",
-    basis:"Requirement extraction, design/proof, MTO/vendor reconciliation, VDRL/PM and document lifecycle workload.",
-    source:"Rev04 First-Principles Resource-Protected Budget Model.",
-    action:"Close final deliverable count, revision cycles, OEM overlap and approved resource plan."
-  },
-  "B2":{
-    grade:"LOGISTICS / MIXED COST",
-    verdict:"WORKING / PAGA FCA LOGISTICS OPEN",
-    vendor:"FORWARDER / LOGISTICS PROVIDER NOT YET LOCKED",
-    quoteRef:"Rev04 logistics basis + current vendor Incoterms",
-    modelStatus:"PARAMETRIC / PASS-THROUGH = PARTIAL",
-    basis:"Known non-PAGA logistics plus route/Incoterm/insurance/import assumptions; PAGA FCA Germany onward logistics remains open.",
-    source:"Rev04 logistics model + vendor quotations + Myanmar Logistics Instruction.",
-    action:"Bind actual shipment route, forwarder quote, cargo insurance, import/export fees and project handoff point."
-  },
-  "B3":{
-    grade:"PARAMETRIC TRAINING SERVICE",
-    verdict:"WORKING",
-    vendor:"ADDVALUE + OEM TRAINERS AS APPLICABLE",
-    quoteRef:"Rev04 service engine / training obligations",
-    modelStatus:"CBE / PARAMETRIC = ACTIVE",
-    basis:"Training sessions, trainer-days, preparation, handover and documentation workload.",
-    source:"Rev04 service model + MR/STD training requirements.",
-    action:"Close course count, participants, venue, OEM trainer responsibility and travel."
-  },
-  "B4":{
-    grade:"RESOURCE-PROTECTED SERVICE",
-    verdict:"WORKING / OEM GAPS OPEN",
-    vendor:"ADDVALUE + SELECTED OEM SPECIALISTS",
-    quoteRef:"Rev04 protected resource model",
-    modelStatus:"CBE / PARAMETRIC = ACTIVE / EVENT-BASED",
-    basis:"FAT/IFAT, pre-com, SAT, integration, commissioning, punch/handover and travel/event workload.",
-    source:"Rev04 service model + vendor FAT/SAT responsibilities.",
-    action:"Close OEM attendance, event count/duration, travel plan and site schedule."
-  },
-  "B5":{
-    grade:"SPARES / MIXED BASIS",
-    verdict:"PARTIAL",
-    vendor:"SYSTEM OEMS / CURRENT SPARE QUOTES INCOMPLETE",
-    quoteRef:"Rev04 spares model",
-    modelStatus:"PARAMETRIC = PARTIAL",
-    basis:"Known non-PAGA start-up spares plus open selected-vendor PAGA start-up spare requirement.",
-    source:"Rev04 spares model + vendor recommendations where available.",
-    action:"Replace allowances with OEM start-up spare lists and quotations."
-  },
-  "B6":{
-    grade:"TOOLS / MIXED BASIS",
-    verdict:"PARTIAL",
-    vendor:"SYSTEM OEMS / ADDVALUE TEST TOOLS",
-    quoteRef:"Rev04 tools model",
-    modelStatus:"PARAMETRIC = PARTIAL",
-    basis:"Non-PAGA special-tool allowances; PAGA tools already included in selected quote where applicable.",
-    source:"Rev04 tools model + vendor quote inclusions.",
-    action:"Close tool ownership, calibration/test-equipment requirements and duplicate inclusions."
-  },
-  "B7":{
-    grade:"PARAMETRIC SITE SURVEY",
-    verdict:"WORKING",
-    vendor:"ADDVALUE / LOCAL SURVEY SUPPORT",
-    quoteRef:"Rev04 site-survey model",
-    modelStatus:"CBE / PARAMETRIC = ACTIVE",
-    basis:"Survey crew, travel, site-days, evidence capture and reporting.",
-    source:"Rev04 lifecycle/service model.",
-    action:"Close survey locations, access plan, crew composition and travel."
-  },
-  "B8":{
-    grade:"REGULATORY + PASS-THROUGH",
-    verdict:"WORKING / OFFICIAL FEES OPEN",
-    vendor:"AUTHORITIES / AGENT / ADDVALUE COORDINATION",
-    quoteRef:"Rev04 permit-regulatory model",
-    modelStatus:"PARAMETRIC + PASS-THROUGH = PARTIAL",
-    basis:"Technical dossier/coordination effort plus official/agent/import/export/licence fees as applicable.",
-    source:"Rev04 lifecycle model + Myanmar logistics/regulatory requirements.",
-    action:"Bind exact licence/permit list, authority fees, agent fees and responsibility."
-  },
-  "B9":{
-    grade:"INSURANCE / PASS-THROUGH",
-    verdict:"WORKING / PREMIUM QUOTE OPEN",
-    vendor:"INSURER / BROKER NOT YET LOCKED",
-    quoteRef:"Rev04 insurance-risk model",
-    modelStatus:"PARAMETRIC + PASS-THROUGH = PARTIAL",
-    basis:"Project/personnel insurance and risk-transfer allowance excluding duplicated cargo/CAR-EAR cover.",
-    source:"Rev04 lifecycle model.",
-    action:"Obtain actual policy/broker quote and confirm exclusions/deductibles/owner-paid cover."
-  },
+  "B1":partBAudit("B1"),
+  "B2":partBAudit("B2"),
+  "B3":partBAudit("B3"),
+  "B4":partBAudit("B4"),
+  "B5":partBAudit("B5"),
+  "B6":partBAudit("B6"),
+  "B7":partBAudit("B7"),
+  "B8":partBAudit("B8"),
+  "B9":partBAudit("B9"),
   "C1":{
     grade:"OPTION / NOT PRICED",
     verdict:"CNEEC OPTIONAL",
