@@ -37,6 +37,26 @@ function money(value,currency="USD"){
   }
 }
 
+function buildUpAmount(row){
+  if(row?.amountText) return row.amountText;
+  if(Number.isFinite(row?.amount)) return money(row.amount,row.currency||"THB");
+  if(Number.isFinite(row?.amountThb)) return money(row.amountThb,"THB");
+  return "TBC";
+}
+
+function buildUpUnitPrice(row){
+  if(Number.isFinite(row?.unitPrice)) return money(row.unitPrice,row.currency||"THB");
+  if(Number.isFinite(row?.unitPriceThb)) return money(row.unitPriceThb,"THB");
+  return "—";
+}
+
+function displaySourceValue(value,sourceCurrency,targetCurrency,eurThbFx,usdThbFx,cnyThbFx){
+  if(!Number.isFinite(value)) return "—";
+  if(sourceCurrency===targetCurrency) return money(value,sourceCurrency);
+  const line={subtotalByCurrency:{[sourceCurrency]:value}};
+  return displayAmount(line,targetCurrency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
+}
+
 function sourceAmountToThb(line,field,eurThbFx,usdThbFx,cnyThbFx){
   const map = field==="unitPrice" ? line.unitPriceByCurrency : line.subtotalByCurrency;
   if(!map) return null;
@@ -369,7 +389,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                       <span key={item.item+"-"+idx}>
                         <small>{item.priceClass}</small>
                         <strong>{item.item}</strong>
-                        <em>{Number.isFinite(item.amountThb) ? money(item.amountThb,"THB") : "TBC"}</em>
+                        <em>{buildUpAmount(item)}</em>
                       </span>
                     ))}
                   </div>
@@ -525,6 +545,41 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                 <div><b>Displayed controlled line</b><span>{displayed} · {commercialStatus.state}</span></div>
               </div>
 
+              {audit?.commercialPreview ? (
+                <div className="ask-price-ladder">
+                  <div>
+                    <small>1 · Vendor net cost</small>
+                    <strong>{money(audit.commercialPreview.sourceCostEur,"EUR")}</strong>
+                    <span>Source quotation cost</span>
+                  </div>
+                  <em>→</em>
+                  <div>
+                    <small>2 · Known selected cost</small>
+                    <strong>{money(audit.commercialPreview.knownSelectedCostEur,"EUR")}</strong>
+                    <span>Vendor cost + controlled priced additions</span>
+                  </div>
+                  <em>→</em>
+                  <div className="preview">
+                    <small>3 · Indicative sell · known cost only</small>
+                    <strong>{money(audit.commercialPreview.indicativeKnownCostSellEur,"EUR")}</strong>
+                    <span>{displaySourceValue(audit.commercialPreview.indicativeKnownCostSellEur,"EUR",currency,eurThbFx,usdThbFx,cnyThbFx)} · {audit.commercialPreview.formula}</span>
+                  </div>
+                  <em>→</em>
+                  <div className="hold">
+                    <small>4 · Final customer sell</small>
+                    <strong>HOLD</strong>
+                    <span>Open completion cost must be closed first</span>
+                  </div>
+                </div>
+              ) : null}
+
+              {audit?.commercialPreview ? (
+                <div className="ask-commercial-preview-note">
+                  <strong>สำคัญ:</strong>
+                  <span>ราคา {money(audit.commercialPreview.indicativeKnownCostSellEur,"EUR")} เป็นเพียงราคาขายเชิงพาณิชย์บน “known selected cost” ที่ปิดแล้วเท่านั้น ยังไม่รวม {audit.commercialPreview.openCompletion.join(", ")} จึงห้ามใช้เป็น Final Customer Selling Price.</span>
+                </div>
+              ) : null}
+
               {audit?.quantityBasis?.length ? (
                 <div className="ask-quantity-basis">
                   <b>Project Quantity Basis</b>
@@ -535,8 +590,8 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
               {audit?.buildUp?.length ? (
                 <div className="ask-build-up">
                   <div className="ask-build-up-head">
-                    <b>Vendor → Completion → Bulk → Commercial Build-up</b>
-                    <span>THB</span>
+                    <b>Vendor Cost → Completion → Controlled Cost → Commercial Preview / Sell</b>
+                    <span>SOURCE / MODEL CURRENCY</span>
                   </div>
                   <table>
                     <thead>
@@ -554,8 +609,8 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                           <td>{row.priceClass}</td>
                           <td>{row.item}</td>
                           <td>{row.qty || ""}</td>
-                          <td>{Number.isFinite(row.unitPriceThb) ? money(row.unitPriceThb,"THB") : "—"}</td>
-                          <td>{Number.isFinite(row.amountThb) ? money(row.amountThb,"THB") : "—"}</td>
+                          <td>{buildUpUnitPrice(row)}</td>
+                          <td>{buildUpAmount(row)}</td>
                         </tr>
                       ))}
                     </tbody>
