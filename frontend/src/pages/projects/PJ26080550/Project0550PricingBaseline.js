@@ -105,7 +105,16 @@ export const PROJECT0550_PRICING_BASELINE = {
       openItems:["AMS01 camera quantity","coverage / lens / scene study","recording days / bitrate / storage calculation","exact ATEX/IECEx model selection","current project vendor quotation","dedicated switch/media-converter boundary"]
     },
     "A1-07": { unitPriceByCurrency:{USD:441182.66,THB:13897253.89}, subtotalByCurrency:{USD:441182.66,THB:13897253.89}, state:"HISTORICAL CURRENT-QTY — CURRENT DMR QUOTE NOT FOUND", internalTrace:"GDrive audit: current MR DMR quantities applied to historical radio unit rates. Jason QT2026-160 does not include the VHF DMR package." },
-    "A1-08": { unitPriceByCurrency:{USD:67950.84,THB:2140451.37}, subtotalByCurrency:{USD:67950.84,THB:2140451.37}, state:"CURRENT QUOTE PARTIAL + COMPLETION PROXY", internalTrace:"GDrive audit: Jason QT2026-160 is a current fixed-radio hardware anchor; full project quantity still needs gateways, handhelds, mounts/feeders and site completion." },
+    "A1-08": {
+      unitPriceByCurrency:{USD:67950.84,THB:2140451.37},
+      subtotalByCurrency:{USD:67950.84,THB:2140451.37},
+      state:"CURRENT QUOTE PARTIAL + MIXED-SOURCE COMPLETION",
+      tagNo:"JASON · QT2026-160",
+      vendor:"JASON ELECTRONICS (THAILAND) CO., LTD.",
+      quoteRef:"QT2026-160 · 16-Sep-2026",
+      internalTrace:"THB 2,140,451.37 is not a direct vendor total. Current quoted portion is mapped from Jason equipment prices; the balance includes historical antenna/gateway/handheld completion, feeder/common-bulk allocation and the project goods commercial rule. CBE/parametric maturity remains PARTIAL until a complete current BOM and RF/feeder/licensing scope are closed.",
+      openItems:["complete Marine vendor BOM","current antenna price","current IP gateway price","current handheld price","feeder/mounting take-off","RF verification","licensing","commissioning responsibility"]
+    },
     "A1-09": { unitPriceByCurrency:{USD:16015.40,THB:504485.05}, subtotalByCurrency:{USD:16015.40,THB:504485.05}, state:"CURRENT QUOTE PARTIAL + COMPLETION PROXY", internalTrace:"GDrive audit: Jason QT2026-160 covers current fixed-radio/antenna/lightning anchors; gateway/handheld/redundancy/DCA completion remains working." },
     "A1-10": { unitPriceByCurrency:{USD:40612.41,THB:1279290.95}, subtotalByCurrency:{USD:40612.41,THB:1279290.95}, state:"CURRENT QUOTE PARTIAL + COMPLETION PROXY", internalTrace:"GDrive audit: Jason QT2026-160 covers current MF/HF radio/ATU/power/antenna hardware; gateway/site quantity/licence/feeder completion remains open." },
     "A1-11": { unitPriceByCurrency:{USD:278395.99,THB:8769473.68}, subtotalByCurrency:{USD:278395.99,THB:8769473.68}, state:"PARTIAL CURRENT QUOTE + HISTORICAL MW/WBB", internalTrace:"GDrive audit corrected this line: current 30m+60m tower supply portion = THB 3.9425M from quotations 2609.95.1/2609.95.2; MW/WBB equipment remains THB 3.0M historical/current-topology proxy. Budgetary customer sell applies goods factor 1.20/0.95. Civil/erection remains C1; engineering/logistics remain B1/B2." },
