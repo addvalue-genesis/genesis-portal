@@ -10,6 +10,7 @@ import { BID_NAV_MODULES } from "./Project0550ModuleRegistry";
 import { Project0550WorkingMemoryPanel, PROJECT0550_TEAM_WORKING_MEMORY } from "./Project0550WorkingMemory";
 import { ASKTSIPricedBreakdownForm } from "./ASKTSIPricedBreakdownForm";
 import { PROJECT0550_PRICING_BASELINE } from "./Project0550PricingBaseline";
+import { summarizeProject0550PriceSources } from "./Project0550PriceSourceModel";
 
 const SOURCE_GROUPS = [
   {
@@ -341,6 +342,9 @@ function PriceView() {
     }
   }
 
+  const a1Codes=Object.keys(p.lines).filter(code=>/^A1-/.test(code));
+  const sourceSummary=useMemo(()=>summarizeProject0550PriceSources(p.lines,a1Codes),[p]);
+
   function knownBaseIn(currencyCode){
     const thb=p.knownBaseExPaga.thb;
     if(currencyCode==="THB") return "THB "+thb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -370,9 +374,11 @@ function PriceView() {
             <span>Base Offer = Part A + Part B. This is the project selling price that will be submitted when all price gates are closed.</span>
           </div>
           <div>
-            <small>Known customer-priced subset · excludes open PAGA</small>
+            <small>WORKING PRICED MODEL · MIXED SOURCES · EXCLUDES OPEN PAGA</small>
             <strong>{knownBaseIn(currency)}</strong>
-            <span>PAGA selected vendor input is EUR {p.paga.knownSelectedSubtotalEur.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}, but its final customer selling line is not released yet.</span>
+            <span>
+              This is NOT an all-vendor-quoted total. A1 source mix: {sourceSummary.selectedQuoteLines} selected current quote · {sourceSummary.partialQuoteLines} partial/mixed current quote · {sourceSummary.marketSanityLines} market sanity · {sourceSummary.historicalProxyLines} historical/proxy · {sourceSummary.dummyAllowanceLines} dummy.
+            </span>
           </div>
           <div>
             <small>PART C</small>
@@ -383,8 +389,8 @@ function PriceView() {
 
         <div className="bid-control-grid">
           <div>
-            <strong>BASE OFFER · A + B</strong>
-            <span>HOLD · known excluding open PAGA = USD {p.knownBaseExPaga.usd.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {p.knownBaseExPaga.thb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</span>
+            <strong>WORKING BASE MODEL · A + B</strong>
+            <span>HOLD · mixed-source priced model excluding open PAGA = USD {p.knownBaseExPaga.usd.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {p.knownBaseExPaga.thb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. Use source-confidence view before treating this as a vendor-supported amount.</span>
           </div>
           <div>
             <strong>PROJECT OFFER AMOUNT</strong>
