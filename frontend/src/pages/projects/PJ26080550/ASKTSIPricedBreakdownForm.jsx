@@ -98,7 +98,7 @@ function displayAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx){
   if(value!==null && value!==undefined && value!=="") return money(value,currency);
 
   const converted=convertedAmount(line,currency,field,eurThbFx,usdThbFx,cnyThbFx);
-  if(Number.isFinite(converted)) return money(converted,currency)+" · Working FX";
+  if(Number.isFinite(converted)) return money(converted,currency)+" · BOT MID FX";
 
   const map = field==="unitPrice" ? line.unitPriceByCurrency : line.subtotalByCurrency;
   if(map && Number.isFinite(map.EUR)){
@@ -562,7 +562,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                   <div className="preview">
                     <small>3 · Indicative sell · known cost only</small>
                     <strong>{money(audit.commercialPreview.indicativeKnownCostSellEur,"EUR")}</strong>
-                    <span>{displaySourceValue(audit.commercialPreview.indicativeKnownCostSellEur,"EUR",currency,eurThbFx,usdThbFx,cnyThbFx)} · {audit.commercialPreview.formula}</span>
+                    <span>{displaySourceValue(audit.commercialPreview.indicativeKnownCostSellEur,"EUR",currency,eurThbFx,usdThbFx,cnyThbFx)} · BOT MID FX · {audit.commercialPreview.formula}</span>
                   </div>
                   <em>→</em>
                   <div className="hold">
