@@ -55,11 +55,28 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
     action:"Obtain current Motorola/Hytera DMR quote incl repeaters, mobiles, 98 Ex/UL handhelds, gateways/consoles/antenna system."
   },
   "A1-08":{
-    grade:"CURRENT QUOTE PARTIAL",
-    verdict:"BUDGETARY WITH COMPLETION PROXY",
-    basis:"Jason fixed marine-radio hardware anchor plus current required quantity / historical gateway-handheld completion.",
-    source:"QT2026-160 dated 16-Sep-2026 + MR App1.1.",
-    action:"Confirm all site quantities, handhelds, gateways, mounts, feeders and commissioning."
+    grade:"CURRENT QUOTE PARTIAL + MIXED-SOURCE COMPLETION",
+    verdict:"BUDGETARY ONLY — NOT FIRM",
+    vendor:"JASON ELECTRONICS (THAILAND) CO., LTD.",
+    quoteRef:"QT2026-160 · 16-Sep-2026",
+    modelStatus:"CBE / PARAMETRIC = PARTIAL",
+    basis:"Project quantity is mapped to current Jason equipment prices, then completed with historical antenna/gateway/handheld rates, bulk proxy and commercial rule.",
+    source:"QT2026-160 + MR App1.1 + Rev04 First-Principles Budget Model.",
+    quantityBasis:["Fixed radio sets 6","Antennas 6","IP gateways 6","Handheld radios 10"],
+    buildUp:[
+      {priceClass:"CURRENT QUOTE",item:"SAILOR 7222",qty:"6",unitPriceThb:80500,amountThb:483000},
+      {priceClass:"CURRENT QUOTE",item:"U-mount bracket",qty:"6",unitPriceThb:2300,amountThb:13800},
+      {priceClass:"CURRENT QUOTE",item:"N163S PSU",qty:"6",unitPriceThb:15350,amountThb:92100},
+      {priceClass:"HISTORICAL COMPLETION",item:"Marine antenna",qty:"6",unitPriceThb:20000,amountThb:120000},
+      {priceClass:"HISTORICAL COMPLETION",item:"IP gateway",qty:"6",unitPriceThb:50000,amountThb:300000},
+      {priceClass:"HISTORICAL COMPLETION",item:"Handheld radio",qty:"10",unitPriceThb:45000,amountThb:450000},
+      {priceClass:"A1 EQUIPMENT SUBTOTAL",item:"A1-024 equipment",qty:"1 lot",amountThb:1458900},
+      {priceClass:"HISTORICAL BULK PROXY",item:"BLK-005 feeder allocation",qty:"1 lot",amountThb:205000},
+      {priceClass:"COMMON BULK ALLOCATION",item:"Shared support / tags / completion",qty:"1 lot",amountThb:30624},
+      {priceClass:"CONTROLLED COST",item:"Before commercial rule",qty:"",amountThb:1694524},
+      {priceClass:"SELLING PRICE",item:"Cost x 1.20 / 0.95",qty:"",amountThb:2140451.37}
+    ],
+    action:"Replace historical and proxy rows with a complete current Marine vendor BOM/quote and close RF, feeder, licensing and commissioning scope."
   },
   "A1-09":{
     grade:"CURRENT QUOTE PARTIAL",
