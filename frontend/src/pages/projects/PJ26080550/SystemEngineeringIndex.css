@@ -167,3 +167,121 @@
   .sys-group-meta{grid-column:1/-1;justify-content:flex-start;padding-left:50px}
   .sys-focus-head{flex-direction:column}
 }
+
+
+/* Common 19-system scope taxonomy — ruled table presentation */
+.sys-scope-master,
+.sys-scope-focus{
+  margin-top:16px;
+  border:1px solid #cfdbe5;
+  border-radius:12px;
+  background:#fff;
+  overflow:hidden;
+}
+.sys-scope-focus{margin-top:12px}
+.sys-scope-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding:13px 15px;
+  border-bottom:1px solid #dbe4eb;
+  background:#f4f8fb;
+}
+.sys-scope-head small{
+  display:block;
+  color:#60788b;
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:.06em;
+}
+.sys-scope-head h2,
+.sys-scope-head h3{
+  margin:4px 0 0;
+  color:#173e61;
+  line-height:1.35;
+}
+.sys-scope-head h2{font-size:16px}
+.sys-scope-head h3{font-size:14px}
+.sys-scope-head>span{
+  padding:5px 8px;
+  border:1px solid #c7d4df;
+  border-radius:999px;
+  background:#fff;
+  color:#506b82;
+  font-size:9px;
+  font-weight:900;
+  white-space:nowrap;
+}
+.sys-scope-table-wrap{
+  width:100%;
+  overflow:auto;
+}
+.sys-scope-table{
+  width:100%;
+  min-width:1180px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.sys-scope-table th,
+.sys-scope-table td{
+  border-right:1px solid #d1dbe3;
+  border-bottom:1px solid #dce4ea;
+  padding:9px 10px;
+  vertical-align:top;
+  text-align:left;
+  color:#465e72;
+  font-size:11px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.sys-scope-table th:last-child,
+.sys-scope-table td:last-child{border-right:0}
+.sys-scope-table tbody tr:last-child td{border-bottom:0}
+.sys-scope-table thead th{
+  background:#eaf2f7;
+  color:#2d5575;
+  font-size:9.5px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.025em;
+}
+.sys-scope-table tbody tr:nth-child(even){background:#fbfcfd}
+.sys-scope-table tbody tr:hover{background:#f3f8fb}
+.sys-scope-table th:nth-child(1){width:70px}
+.sys-scope-table th:nth-child(2){width:250px}
+.sys-scope-table th:nth-child(3){width:250px}
+.sys-scope-table th:nth-child(4){width:330px}
+.sys-scope-table th:nth-child(5){width:auto}
+.sys-scope-table.focused th:nth-child(1){width:70px}
+.sys-scope-table.focused th:nth-child(2){width:270px}
+.sys-scope-table.focused th:nth-child(3){width:280px}
+.sys-scope-table.focused th:nth-child(4){width:160px}
+.sys-scope-table.focused th:nth-child(5){width:auto}
+.sys-scope-table td.num{
+  text-align:center;
+  color:#315d80;
+  font-weight:900;
+  font-variant-numeric:tabular-nums;
+}
+.sys-scope-table td strong{
+  display:block;
+  color:#264e70;
+  font-size:11.3px;
+}
+.sys-scope-table td code{
+  display:block;
+  margin-top:3px;
+  color:#6b7e8f;
+  font-size:9px;
+  white-space:normal;
+}
+.sys-scope-note{
+  margin:0;
+  padding:10px 14px 12px;
+  border-top:1px solid #e2e8ed;
+  background:#fbfcfd;
+  color:#6b7d8e;
+  font-size:10px;
+  line-height:1.5;
+}
