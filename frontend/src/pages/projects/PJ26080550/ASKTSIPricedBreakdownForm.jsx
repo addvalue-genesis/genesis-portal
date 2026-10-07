@@ -312,122 +312,148 @@ function RequirementBasisView({code,trace}){
   if(code==="A1-05"){
     const summary=pagaRequirementSummary();
     return (
-      <div className="ask-digital-thread">
+      <div className="ask-digital-thread compact">
         <div className="ask-thread-banner">
           <div>
-            <small>REQUIREMENT FOUNDATION · BIDIRECTIONAL TRACE</small>
+            <small>PAGA · CONTROLLED METHOD BINDING</small>
             <strong>First Principles → Constraint-Based Engineering → Parametric Cost → Commercial / Release</strong>
-            <span>ลำดับคำนวณจริงอ้างอิง Engineering Doctrine fullChain เท่านั้น; Group View เป็นเพียงการจัดหน้าจอ. Vendor BOM เป็น offered evidence และไม่สามารถแทน Fundamental Need / Required MTO ได้.</span>
+            <span>หน้านี้เป็น projection ของข้อมูลหลัก ไม่ใช่ logic ชุดใหม่. เปิดเฉพาะบรรทัดที่ต้องการตรวจด้วย + / −.</span>
           </div>
           <div>
             <b>{summary.sources}</b><span>sources</span>
-            <b>{summary.requirements}</b><span>requirement threads</span>
+            <b>{summary.requirements}</b><span>requirements</span>
             <b>{summary.particularEquations}</b><span>particular equations</span>
           </div>
         </div>
 
-        <div className="ask-source-set-note">
-          <strong>Source Set — not contractual precedence</strong>
-          <span>MR / PHI / BOD / SPE / STD / DWG / Vendor evidence เป็น source families ที่ bind เข้าข้อกำหนด; ลำดับการอ่านหรือการวางการ์ดไม่ใช่ order of precedence เว้นแต่ contract ระบุ.</span>
-        </div>
-        <div className="ask-thread-source-chain">
-          {PROJECT0550_PAGA_SOURCE_CHAIN.map((s)=>(
-            <div className={"ask-thread-source "+String(s.state).toLowerCase().replaceAll("_","-")} key={s.code}>
-              <small>{s.class}</small>
-              <strong>{s.code}</strong>
-              <span>{s.document}</span>
-              <em>{s.locator}</em>
-              <p>{s.role}</p>
+        <details className="ask-thread-detail">
+          <summary>
+            <span className="ask-detail-toggle"></span>
+            <strong>Method binding · Canonical 25-stage chain</strong>
+            <small>{PROJECT0550_PAGA_CANONICAL_THREAD.length} stages · Engineering Doctrine fullChain · presentation only</small>
+            <em>DO NOT REORDER</em>
+          </summary>
+          <div className="ask-detail-body">
+            <div className="ask-method-groups">
+              {PROJECT0550_PAGA_METHOD_GROUPS.map((group)=>(
+                <section key={group.id}>
+                  <div className="ask-method-group-title">
+                    <b>{group.id}</b>
+                    <strong>{group.label}</strong>
+                  </div>
+                  <div className="ask-method-group-stages">
+                    {group.stages.map(stage=>(
+                      <div key={stage.id} className={"ask-method-stage "+String(stage.state).toLowerCase().replaceAll(" ","-").replaceAll("/","-")}>
+                        <code>{String(stage.order).padStart(2,"0")}</code>
+                        <strong>{stage.label}</strong>
+                        <span>{stage.state}</span>
+                        <small>{stage.detail}</small>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))}
             </div>
-          ))}
-        </div>
-
-        <div className="ask-method-spine">
-          <div className="ask-method-spine-head">
-            <small>CANONICAL METHOD SPINE · DO NOT REORDER</small>
-            <strong>Full First-Principles + CBE + Parametric Cost dependency chain</strong>
-            <span>{PROJECT0550_PAGA_CANONICAL_THREAD.length} controlled stages · UI groups below are presentation only</span>
           </div>
-          <div className="ask-method-groups">
-            {PROJECT0550_PAGA_METHOD_GROUPS.map((group)=>(
-              <section key={group.id}>
-                <div className="ask-method-group-title">
-                  <b>{group.id}</b>
-                  <strong>{group.label}</strong>
-                </div>
-                <div className="ask-method-group-stages">
-                  {group.stages.map(stage=>(
-                    <div key={stage.id} className={"ask-method-stage "+String(stage.state).toLowerCase().replaceAll(" ","-").replaceAll("/","-")}>
-                      <code>{String(stage.order).padStart(2,"0")}</code>
-                      <strong>{stage.label}</strong>
-                      <span>{stage.state}</span>
-                      <small>{stage.detail}</small>
-                    </div>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        </div>
+        </details>
 
-        <div className="ask-thread-requirements">
+        <details className="ask-thread-detail">
+          <summary>
+            <span className="ask-detail-toggle"></span>
+            <strong>Source set · MR / PHI / BOD / SPE / STD / DWG / Vendor</strong>
+            <small>{PROJECT0550_PAGA_SOURCE_CHAIN.length} controlled source objects · not contractual precedence</small>
+            <em>SOURCE BINDING</em>
+          </summary>
+          <div className="ask-detail-body">
+            <div className="ask-source-set-note">
+              <strong>Source Set — not contractual precedence</strong>
+              <span>Source family แต่ละตัว bind เข้าข้อกำหนดตาม clause/role. ลำดับบนหน้าจอไม่ใช่ order of precedence เว้นแต่ contract ระบุ.</span>
+            </div>
+            <div className="ask-thread-source-chain">
+              {PROJECT0550_PAGA_SOURCE_CHAIN.map((s)=>(
+                <div className={"ask-thread-source "+String(s.state).toLowerCase().replaceAll("_","-")} key={s.code}>
+                  <small>{s.class}</small>
+                  <strong>{s.code}</strong>
+                  <span>{s.document}</span>
+                  <em>{s.locator}</em>
+                  <p>{s.role}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </details>
+
+        <div className="ask-thread-requirement-lines">
+          <div className="ask-line-section-head">
+            <strong>Requirement threads</strong>
+            <span>แต่ละบรรทัด trace จาก Source → Need → Constraint/Input → Proof → Object/Qty → Equation/Driver</span>
+          </div>
           {PROJECT0550_PAGA_REQUIREMENTS.map(req=>{
             const method=pagaRequirementMethodDetail(req.id);
             return (
-              <article key={req.id}>
-                <div className="ask-thread-req-head">
+              <details className="ask-thread-detail requirement" key={req.id}>
+                <summary>
+                  <span className="ask-detail-toggle"></span>
                   <code>{req.id}</code>
                   <strong>{req.title}</strong>
-                  <span>{req.state}</span>
+                  <small>{req.requirement}</small>
+                  <em>{req.state}</em>
+                </summary>
+                <div className="ask-detail-body">
+                  <div className="ask-thread-flow canonical">
+                    <div><b>01 · Source / Evidence</b><span>{req.source.join(" · ")}</span></div>
+                    <div><b>02 · Fundamental Need</b><span>{method?.fundamentalNeed || "TBC"}</span></div>
+                    <div><b>03 · Constraint / Context</b><span>{req.constraints.join("; ")}{method?.interfaceContext?.length ? " | "+method.interfaceContext.join(", ") : ""}</span></div>
+                    <div><b>04 · Engineering Input</b><span>{method?.engineeringInputs?.join(" · ") || "TBC"}</span></div>
+                    <div><b>05 · CAL / Study / RPT → Proof</b><span>{req.proof.join(" · ")}</span></div>
+                    <div><b>06 · Architecture / Object / Qty</b><span>{method?.architecture || "TBC"} | {req.objects.join(", ")} | {method?.requiredMtoState || req.drives.join(", ")}</span></div>
+                    <div><b>07 · Equation / Downstream Driver</b><span>{req.equations.join(" · ")} → {req.drives.join(", ")}</span></div>
+                  </div>
                 </div>
-                <p>{req.requirement}</p>
-                <div className="ask-thread-flow canonical">
-                  <div><b>01 · Source / Evidence</b><span>{req.source.join(" · ")}</span></div>
-                  <i>→</i>
-                  <div><b>02 · Fundamental Need</b><span>{method?.fundamentalNeed || "TBC"}</span></div>
-                  <i>→</i>
-                  <div><b>03 · Constraint / Context</b><span>{req.constraints.join("; ")}{method?.interfaceContext?.length ? " | "+method.interfaceContext.join(", ") : ""}</span></div>
-                  <i>→</i>
-                  <div><b>04 · Engineering Input</b><span>{method?.engineeringInputs?.join(" · ") || "TBC"}</span></div>
-                  <i>→</i>
-                  <div><b>05 · CAL / Study / RPT → Proof</b><span>{req.proof.join(" · ")}</span></div>
-                  <i>→</i>
-                  <div><b>06 · Architecture / Object / Qty</b><span>{method?.architecture || "TBC"} | {req.objects.join(", ")} | {method?.requiredMtoState || req.drives.join(", ")}</span></div>
-                  <i>→</i>
-                  <div><b>07 · Equation / Downstream Driver</b><span>{req.equations.join(" · ")} → {req.drives.join(", ")}</span></div>
-                </div>
-              </article>
+              </details>
             );
           })}
         </div>
 
-        <div className="ask-particular-equations">
-          <div className="ask-particular-equations-head">
-            <b>PAGA Particular Engineering Equations</b>
-            <span>COMMON / GENERIC GEQ ถูก reuse; สูตรที่เกิดจาก physics / requirement ของ PAGA อยู่ชั้น Particular</span>
-          </div>
-          {PROJECT0550_PAGA_PARTICULAR_EQUATIONS.map(eq=>(
-            <div key={eq.code}>
-              <code>{eq.code}</code>
-              <strong>{eq.name}</strong>
-              <span>{eq.expression}</span>
-              <small>Input: {eq.input.join(" · ")} | Output: {eq.output.join(" · ")} | State: {eq.state}</small>
+        <details className="ask-thread-detail">
+          <summary>
+            <span className="ask-detail-toggle"></span>
+            <strong>PAGA Particular Equations</strong>
+            <small>{PROJECT0550_PAGA_PARTICULAR_EQUATIONS.length} system-specific engineering equations / studies</small>
+            <em>PARTICULAR</em>
+          </summary>
+          <div className="ask-detail-body">
+            <div className="ask-particular-equations">
+              {PROJECT0550_PAGA_PARTICULAR_EQUATIONS.map(eq=>(
+                <div key={eq.code}>
+                  <code>{eq.code}</code>
+                  <strong>{eq.name}</strong>
+                  <span>{eq.expression}</span>
+                  <small>Input: {eq.input.join(" · ")} | Output: {eq.output.join(" · ")} | State: {eq.state}</small>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        </details>
 
-        <div className="ask-output-thread-note">
-          <b>Presentation groups only</b>
-          <span>ด้านล่างย่อ 25 canonical stages เป็นกลุ่มให้อ่านง่าย; computation/release dependency ยังใช้ fullChain เดิม.</span>
-        </div>
-        <div className="ask-output-thread">
-          {PROJECT0550_PAGA_OUTPUT_CHAIN.map((x,idx)=>(
-            <React.Fragment key={x.step}>
-              <div><b>{x.step}</b><strong>{x.label}</strong><span>{x.output}</span></div>
-              {idx<PROJECT0550_PAGA_OUTPUT_CHAIN.length-1 ? <i>→</i> : null}
-            </React.Fragment>
-          ))}
-        </div>
+        <details className="ask-thread-detail">
+          <summary>
+            <span className="ask-detail-toggle"></span>
+            <strong>Downstream work / output groups</strong>
+            <small>ย่อ canonical chain เพื่อดูผลกระทบไป MTO / Work / Cost / Commercial / Release</small>
+            <em>PROJECTION</em>
+          </summary>
+          <div className="ask-detail-body">
+            <div className="ask-output-thread">
+              {PROJECT0550_PAGA_OUTPUT_CHAIN.map((x,idx)=>(
+                <React.Fragment key={x.step}>
+                  <div><b>{x.step}</b><strong>{x.label}</strong><span>{x.output}</span></div>
+                  {idx<PROJECT0550_PAGA_OUTPUT_CHAIN.length-1 ? <i>→</i> : null}
+                </React.Fragment>
+              ))}
+            </div>
+          </div>
+        </details>
       </div>
     );
   }
