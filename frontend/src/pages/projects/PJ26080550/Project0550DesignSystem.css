@@ -1366,3 +1366,138 @@
     grid-column:auto;
   }
 }
+
+
+/* Canonical First-Principles / CBE / Parametric method spine */
+.bid-shell .ask-source-set-note,
+.bid-shell .ask-output-thread-note{
+  display:flex;
+  gap:7px;
+  align-items:flex-start;
+  padding:9px 11px;
+  border-left:4px solid #587f9f;
+  background:#f3f8fb;
+  color:#566b7d;
+  font-size:10.5px;
+  line-height:1.45;
+}
+.bid-shell .ask-source-set-note strong,
+.bid-shell .ask-output-thread-note b{
+  white-space:nowrap;
+  color:#244f72;
+}
+.bid-shell .ask-method-spine{
+  border:1px solid #c9d7e2;
+  border-radius:10px;
+  overflow:hidden;
+  background:#fff;
+}
+.bid-shell .ask-method-spine-head{
+  padding:11px 13px;
+  background:linear-gradient(180deg,#edf5fa 0%,#e6f0f7 100%);
+}
+.bid-shell .ask-method-spine-head small{
+  display:block;
+  color:#55738d;
+  font-size:9.5px!important;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+.bid-shell .ask-method-spine-head strong{
+  display:block;
+  margin-top:4px;
+  color:#173e61;
+  font-size:13px;
+}
+.bid-shell .ask-method-spine-head span{
+  display:block;
+  margin-top:3px;
+  color:#64798b;
+  font-size:10.5px;
+}
+.bid-shell .ask-method-groups{
+  display:grid;
+  gap:0;
+}
+.bid-shell .ask-method-groups>section{
+  padding:10px 11px 11px;
+  border-top:1px solid #e1e8ee;
+}
+.bid-shell .ask-method-groups>section:first-child{border-top:0}
+.bid-shell .ask-method-group-title{
+  display:flex;
+  gap:7px;
+  align-items:center;
+  margin-bottom:7px;
+}
+.bid-shell .ask-method-group-title b{
+  padding:3px 6px;
+  border-radius:5px;
+  background:#eaf1f7;
+  color:#315d81;
+  font-size:9px;
+}
+.bid-shell .ask-method-group-title strong{
+  color:#334f69;
+  font-size:11px;
+}
+.bid-shell .ask-method-group-stages{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:7px;
+}
+.bid-shell .ask-method-stage{
+  min-width:0;
+  padding:8px 9px;
+  border:1px solid #dce5ec;
+  border-radius:8px;
+  background:#fbfcfd;
+}
+.bid-shell .ask-method-stage code{
+  font-size:9.5px!important;
+}
+.bid-shell .ask-method-stage strong{
+  display:block;
+  margin-top:3px;
+  color:#264e70;
+  font-size:10.8px;
+  line-height:1.3;
+}
+.bid-shell .ask-method-stage>span{
+  display:inline-flex;
+  margin-top:5px;
+  padding:3px 6px;
+  border:1px solid #ced9e2;
+  border-radius:999px;
+  background:#f5f8fa;
+  color:#5f7386;
+  font-size:9px;
+  font-weight:900;
+}
+.bid-shell .ask-method-stage small{
+  display:block;
+  margin-top:5px;
+  color:#6d7e8e;
+  font-size:9.8px!important;
+  line-height:1.4;
+  text-transform:none!important;
+  letter-spacing:0!important;
+}
+.bid-shell .ask-method-stage.open,
+.bid-shell .ask-method-stage.tbc,
+.bid-shell .ask-method-stage.blocked{
+  border-left:3px solid #c15d51;
+  background:#fff9f8;
+}
+.bid-shell .ask-method-stage.partial,
+.bid-shell .ask-method-stage.preliminary,
+.bid-shell .ask-method-stage.working,
+.bid-shell .ask-method-stage.working---hold,
+.bid-shell .ask-method-stage.controlled---partial{
+  border-left:3px solid #cf952f;
+  background:#fffaf2;
+}
+.bid-shell .ask-method-stage.controlled{
+  border-left:3px solid #4d9569;
+  background:#f6fbf8;
+}
