@@ -4,6 +4,10 @@ import {
   ingestProject0550EvidencePacket,
   project0550EvidenceMemoryFromApi
 } from "./Project0550EvidenceReasoner";
+import {
+  buildProject0550ResolutionPlan,
+  firstBlockingStage
+} from "./Project0550GapResolutionEngine";
 
 const CLOSED = new Set(["FACT","DERIVED","PASS","APPROVED","CONTROLLED","READY","NOT_APPLICABLE"]);
 const SOFT = new Set(["WORKING","PARTIAL","PRELIMINARY","ASSUMPTION"]);
@@ -296,16 +300,26 @@ export function evaluateProject0550SmartState(records,options={}){
   const evidence = runProject0550EvidenceReasoning();
   const blockers = portfolio.summary.blockers + evidence.summary.blockers;
   const warnings = portfolio.summary.warnings + evidence.summary.warnings;
+  const resolution = buildProject0550ResolutionPlan(portfolio.findings,{
+    systemToken:options.systemToken||null,
+    requirementCode:options.requirementCode||null,
+    searchHints:options.searchHints||[]
+  });
+  const firstBlocker = firstBlockingStage(portfolio.findings);
   return {
     status:blockers ? "BLOCKED" : warnings ? "CONDITIONAL" : "READY",
     portfolio,
     evidence,
+    resolution,
+    firstBlockingStage:firstBlocker,
     summary:{
       blockers,
       warnings,
       portfolioObjects:portfolio.summary.objects,
       evidenceSources:evidence.summary.sources,
-      evidenceAssertions:evidence.summary.assertions
-    }
+      evidenceAssertions:evidence.summary.assertions,
+      resolutionJobs:resolution.summary.total
+    },
+    controlRule:"OPEN finding -> internal evidence search -> external authority if internal evidence is insufficient -> proposal -> human gate -> controlled state -> downstream recalculation. No silent auto-apply."
   };
 }
