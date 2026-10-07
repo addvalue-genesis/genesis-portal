@@ -10,6 +10,7 @@ import {
 } from "./ASKTSIPricedBreakdownForm";
 import { convertFx } from "./Project0550FxControl";
 import { PROJECT0550_PAGA_DIRECT_SERVICE_MODEL } from "./Project0550PagaDigitalThread";
+import { PROJECT0550_PAGA_LIFECYCLE_PLAN } from "./Project0550LifecycleExecutionModel";
 import { PROJECT0550_PART_A_LEGACY_PROXY_RULE } from "./Project0550CommercialAllocationPolicy";
 
 function money(value,currency="USD"){
@@ -116,6 +117,60 @@ function rowStateTone(text){
   if(/HOLD|OPEN|TBC|BLOCK|NOT READY/.test(s)) return "bad";
   if(/PARTIAL|WORKING|PRELIM|PROXY|MARKET/.test(s)) return "warn";
   return "good";
+}
+
+function PagaLifecycleResponsibilityView({currency}){
+  return (
+    <div className="ica-lifecycle">
+      <div className="ica-subhead">
+        <strong>PAGA lifecycle responsibility · Vendor vs ADDVALUE</strong>
+        <span>Derived from A20261632 + retained service model · no duplicate event/work object</span>
+      </div>
+      <div className="ica-lifecycle-head">
+        <span>Event</span>
+        <span>Vendor / OEM</span>
+        <span>ADDVALUE retained role</span>
+        <span>Commercial treatment</span>
+        <span>Gap / release condition</span>
+      </div>
+      {PROJECT0550_PAGA_LIFECYCLE_PLAN.map(row=>{
+        const v=row.vendorCoverage||{};
+        const a=row.addvalueCoverage||{};
+        const vendorAmount=Number.isFinite(Number(v.total))
+          ? money(convertFx(Number(v.total),String(v.currency||"EUR").toUpperCase(),currency),currency)
+          : "TBC / not quoted";
+        return (
+          <div className="ica-lifecycle-row" key={row.eventCode}>
+            <div>
+              <code>{row.eventCode}</code>
+              <strong>{row.eventName}</strong>
+              <small>{row.location}</small>
+            </div>
+            <div>
+              <strong>{v.role||"TBC"}</strong>
+              <span>{v.state||"TBC"}</span>
+              <em>{vendorAmount}</em>
+            </div>
+            <div>
+              <strong>{(a.roles||[]).join(" · ") || "TBC"}</strong>
+              <span>{a.workloadSource?.join(" · ") || "No retained activity bound"}</span>
+              <em>{Number.isFinite(Number(a.mhPool)) ? a.mhPool.toLocaleString("en-US",{maximumFractionDigits:1})+" MH shared pool" : "MH TBC"}</em>
+            </div>
+            <div>
+              <strong>{row.strategy}</strong>
+              <span>Vendor: {row.commercialLineVendor}</span>
+              <span>ADDVALUE: {row.commercialLineAddvalue}</span>
+            </div>
+            <div>
+              <strong>{row.vendorSelection}</strong>
+              <span>{row.releaseNote}</span>
+              {row.travel?.rule ? <small>{row.travel.rule}</small> : null}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
 }
 
 function InternalAnalysisRow({
@@ -258,6 +313,8 @@ function InternalAnalysisRow({
               </div>
             )) : <div className="ica-empty">No detailed cost binding is controlled yet. Keep TBC; do not derive a fake breakdown.</div>}
           </div>
+
+          {group.lineCode==="A1-05" ? <PagaLifecycleResponsibilityView currency={currency}/> : null}
 
           {(associatedBindings.length || group.lineCode==="A1-05") ? (
             <div className="ica-associated-cost">
