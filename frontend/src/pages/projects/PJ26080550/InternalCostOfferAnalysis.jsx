@@ -31,11 +31,16 @@ function systemByToken(token){
 function lineAmountIn(line,targetCurrency){
   if(!line) return null;
   const map=line.subtotalByCurrency||line.unitPriceByCurrency||{};
-  if(Number.isFinite(Number(map[targetCurrency]))) return Number(map[targetCurrency]);
+  const explicitSource=String(line.sourceCurrency||"").toUpperCase();
+  const sourceOrder=explicitSource
+    ? [explicitSource,...["THB","EUR","USD","CNY"].filter(x=>x!==explicitSource)]
+    : ["THB","EUR","USD","CNY"];
 
-  for(const sourceCurrency of ["THB","USD","EUR","CNY"]){
+  for(const sourceCurrency of sourceOrder){
     if(Number.isFinite(Number(map[sourceCurrency]))){
-      return convertFx(Number(map[sourceCurrency]),sourceCurrency,targetCurrency);
+      return sourceCurrency===targetCurrency
+        ? Number(map[sourceCurrency])
+        : convertFx(Number(map[sourceCurrency]),sourceCurrency,targetCurrency);
     }
   }
   return null;
