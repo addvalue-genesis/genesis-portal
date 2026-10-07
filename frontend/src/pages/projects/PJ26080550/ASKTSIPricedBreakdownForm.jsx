@@ -167,7 +167,7 @@ function SourceChip({info}){
   );
 }
 
-function PriceSourceOverview({lines,codes}){
+export function PriceSourceOverview({lines,codes}){
   const summary=summarizeProject0550PriceSources(lines,codes);
   const order=[
     "CURRENT_SELECTED_QUOTE",
@@ -213,7 +213,7 @@ function PriceSourceOverview({lines,codes}){
   );
 }
 
-function OutputContractStrip(){
+export function OutputContractStrip(){
   const profiles=[
     PROJECT0550_OUTPUT_PROFILES.XLSX_CUSTOMER,
     PROJECT0550_OUTPUT_PROFILES.XLSX_INTERNAL,
@@ -1274,8 +1274,6 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
           ช่องว่าง/TBC ต้องคงสถานะไว้และห้ามถูกแปลงเป็นศูนย์โดยอัตโนมัติ.
           หน้าจอเป็น rich working view; customer export ยังคงรูปแบบ ASK-TSI ต้นฉบับ.
         </p>
-        {mode==="INTERNAL" ? <PriceSourceOverview lines={lines} codes={aCodes}/> : null}
-        {mode==="INTERNAL" ? <OutputContractStrip/> : null}
         <div className="ask-price-audit">
           <div><b>Evidence Gate</b><span>{evidenceGate.status}</span></div>
           <div><b>Memory</b><span>{evidenceGate.memoryRevision}</span></div>
