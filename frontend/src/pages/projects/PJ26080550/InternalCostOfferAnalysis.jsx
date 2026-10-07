@@ -607,11 +607,13 @@ function InternalAnalysisRow({
 
   const priceLayers=priceLayersForLine(group.lineCode,line,canonical.data?.priceLayers||[]);
   const displayLayer=(layer)=>{
-    if(!layer || !Number.isFinite(Number(layer.amount))) return null;
+    if(!layer || layer.amount===null || layer.amount===undefined || layer.amount==="") return null;
+    const amount=Number(layer.amount);
+    if(!Number.isFinite(amount)) return null;
     const sourceCurrency=String(layer.currency||currency).toUpperCase();
     return sourceCurrency===currency
-      ? Number(layer.amount)
-      : convertFx(Number(layer.amount),sourceCurrency,currency);
+      ? amount
+      : convertFx(amount,sourceCurrency,currency);
   };
   const sourceCostValue=displayLayer(priceLayers.SOURCE_COST);
   const internalCostValue=displayLayer(priceLayers.INTERNAL_COST);
