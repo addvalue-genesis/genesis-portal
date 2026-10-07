@@ -15,17 +15,19 @@ export function useProject0550CanonicalState(){
       .then(async payload=>{
         if(!payload.ok) throw new Error(payload.message||payload.error||"Canonical-state API error");
         let bulkMto=[];
-        try{
-          const br=await fetch("/backend/api/etm/bulk-state.php?project=PJ2608-0550&system=TEL-PAGA");
-          if(br.ok){
-            const bp=await br.json();
-            if(bp.ok && Array.isArray(bp.rows)) bulkMto=bp.rows;
-          }
-        }catch{
-          bulkMto=[];
+        let priceLayers=[];
+        const [bulkResult,priceLayerResult]=await Promise.allSettled([
+          fetch("/backend/api/etm/bulk-state.php?project=PJ2608-0550&system=TEL-PAGA").then(async r=>r.ok?await r.json():null),
+          fetch("/backend/api/etm/pricing-layers.php?project=PJ2608-0550").then(async r=>r.ok?await r.json():null)
+        ]);
+        if(bulkResult.status==="fulfilled" && bulkResult.value?.ok && Array.isArray(bulkResult.value.rows)){
+          bulkMto=bulkResult.value.rows;
+        }
+        if(priceLayerResult.status==="fulfilled" && priceLayerResult.value?.ok && Array.isArray(priceLayerResult.value.rows)){
+          priceLayers=priceLayerResult.value.rows;
         }
         if(active){
-          setData({...payload,bulkMto});
+          setData({...payload,bulkMto,priceLayers});
           setStatus("LIVE_DB");
           setError(null);
         }
