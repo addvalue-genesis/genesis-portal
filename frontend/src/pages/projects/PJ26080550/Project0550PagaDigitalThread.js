@@ -234,6 +234,34 @@ export const PROJECT0550_PAGA_PARTICULAR_EQUATIONS = [
   }
 ];
 
+export const PROJECT0550_PAGA_DIRECT_SERVICE_MODEL = {
+  sourceWorkbook:"PJ2608-0550_First-Principles_Resource-Protected_Budget_Model_Rev04_20261005.xlsx",
+  sourceSheets:["05_Service_Parametric","07_VDRL"],
+  rule:"Direct PAGA service rows only. Shared/common campaigns (e.g. multi-system survey/travel) are not forced into PAGA without a controlled allocation driver.",
+  rows:[
+    {code:"SVC-025",commercialMap:"B1",category:"ENGINEERING",workObject:"Requirement / constraint extraction & control",role:"LEAD",mh:16,internalCostThb:12000,baseSellThb:37035.35},
+    {code:"SVC-026",commercialMap:"B1",category:"ENGINEERING",workObject:"Engineering proof / CAL-STUDY-RPT development-review",role:"DESIGN",mh:60,internalCostThb:33750,baseSellThb:106055.775},
+    {code:"SVC-027",commercialMap:"B1",category:"ENGINEERING",workObject:"Physical object / MTO / vendor BOM reconciliation",role:"DESIGN",mh:24,internalCostThb:13500,baseSellThb:42422.31},
+    {code:"SVC-028",commercialMap:"B4",category:"FAT / IFAT",workObject:"FAT / IFAT retained preparation, witness and close-out",role:"SITE",mh:48,internalCostThb:36000,baseSellThb:134674.0067337},
+    {code:"SVC-029",commercialMap:"B4",category:"SITE / COMMISSIONING",workObject:"Pre-commissioning + SAT + integration + commissioning/start-up",role:"SITE",mh:120,internalCostThb:90000,baseSellThb:336685.01683425},
+    {code:"SVC-030",commercialMap:"B3",category:"TRAINING",workObject:"Training + handover technical delivery",role:"SITE",mh:24,internalCostThb:18000,baseSellThb:67337.00336685},
+    {code:"VDRL-013",commercialMap:"B1",category:"VDRL",workObject:"Engineering document review / revision / DC lifecycle",role:"DOCUMENT",mh:67.5,internalCostThb:27000,baseSellThb:102268.06875},
+    {code:"VDRL-014",commercialMap:"B1",category:"VDRL",workObject:"Quality / test document lifecycle",role:"DOCUMENT",mh:37,internalCostThb:14800,baseSellThb:56058.0525},
+    {code:"VDRL-015",commercialMap:"B1",category:"VDRL",workObject:"O&M / handover document lifecycle",role:"DOCUMENT",mh:36,internalCostThb:14400,baseSellThb:54542.97}
+  ],
+  totals:{
+    directMh:432.5,
+    internalCostThb:259450,
+    baseSellThb:937078.5531848
+  },
+  exclusions:[
+    "Shared multi-system survey / specialist measurement campaign",
+    "Common PM / document-control pools not yet causally allocated to PAGA",
+    "INDUSTRONIC / other OEM site attendance not yet quoted/closed",
+    "Physical installation C1 option"
+  ]
+};
+
 export const PROJECT0550_PAGA_OUTPUT_CHAIN = [
   {step:1,label:"Source requirement",output:"Controlled requirement / constraint register"},
   {step:2,label:"Proof / Particular engineering",output:"CAL / SDY / RPT / source-conflict closure"},
