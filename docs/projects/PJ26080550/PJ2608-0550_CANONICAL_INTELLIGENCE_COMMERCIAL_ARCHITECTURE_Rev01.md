@@ -55,6 +55,19 @@ PJ2608-0550-specific facts remain outside the kernel, including commercial line/
 
 This boundary is mandatory for future refactors: a new vendor quote, datasheet or system source must first update PARTICULAR state. It must not add a vendor/model/0550 line code directly into the COMMON / GENERIC kernel.
 
+## 2.2 Pricing-layer executable separation — Refactor 2026-10-07
+
+The four commercial semantic layers are now also separated physically in code:
+
+- `CanonicalPricingLayerKernel.js` = COMMON / GENERIC layer semantics, live-layer overlay, projection rules and release gating.
+- `Project0550PricingLayerModel.js` = PJ2608-0550 PARTICULAR fallback/source adapter.
+
+The generic pricing kernel does not contain A1 line IDs, PAGA assumptions, vendor names, project price baselines or system-specific commercial facts.
+
+The 0550 adapter retains the controlled PAGA working-sell fallback and project source mapping until the live canonical DB/derivation state supersedes those fallback snapshots.
+
+Compatibility exports remain unchanged so 7.1 and 7.0 continue to consume the same project-level API while the reusable semantics are no longer duplicated inside the project adapter.
+
 ## 3. PARTICULAR vs COMMON / GENERIC
 
 A project Requirement Thread is PARTICULAR: it states what PJ2608-0550 must solve.
