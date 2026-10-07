@@ -12,7 +12,7 @@ import { ASKTSIPricedBreakdownForm } from "./ASKTSIPricedBreakdownForm";
 import { InternalCostOfferAnalysis } from "./InternalCostOfferAnalysis";
 import { PROJECT0550_PRICING_BASELINE } from "./Project0550PricingBaseline";
 import { useProject0550CanonicalState, overlayControlledPriceLines } from "./useProject0550CanonicalState";
-import { releasedCustomerLines } from "./Project0550PricingLayerModel";
+import { workingPreviewLines, releasedCustomerLines } from "./Project0550PricingLayerModel";
 
 const SOURCE_GROUPS = [
   {
@@ -371,6 +371,10 @@ function PriceView() {
     ()=>overlayControlledPriceLines(p.lines,canonical.priceLineMap),
     [p.lines,canonical.priceLineMap]
   );
+  const workingPreviewPriceLines=useMemo(
+    ()=>workingPreviewLines(currentLines,canonical.data?.priceLayers||[]),
+    [currentLines,canonical.data?.priceLayers]
+  );
   const customerReleasedLines=useMemo(
     ()=>releasedCustomerLines(currentLines,canonical.data?.priceLayers||[]),
     [currentLines,canonical.data?.priceLayers]
@@ -401,10 +405,10 @@ function PriceView() {
     }
   }
 
-  const a1Codes=Object.keys(currentLines).filter(code=>/^A1-/.test(code));
+  const a1Codes=Object.keys(workingPreviewPriceLines).filter(code=>/^A1-/.test(code));
   const bCodes=["B1","B2","B3","B4","B5","B6","B7","B8","B9"];
 
-  function sumKnownThb(codes,sourceLines=currentLines){
+  function sumKnownThb(codes,sourceLines=workingPreviewPriceLines){
     return codes.reduce((sum,code)=>{
       const value=sourceLines?.[code]?.subtotalByCurrency?.THB;
       return sum+(Number.isFinite(value)?Number(value):0);
@@ -459,7 +463,7 @@ function PriceView() {
             onClick={()=>setFormPriceMode("WORKING_PREVIEW")}
           >
             <b>Working Preview</b>
-            <span>Current controlled prices · internal only</span>
+            <span>7.1 WORKING_SELL projection · internal only</span>
           </button>
           <button
             type="button"
@@ -500,7 +504,7 @@ function PriceView() {
               <div>
                 <small>INTERNAL WORKING BASE OFFER · NOT CUSTOMER RELEASED</small>
                 <strong>{knownBaseIn(currency)}</strong>
-                <span>Shows current controlled working prices so management can review the ASK-TSI form shape before release. Open/TBC scope remains visible and the total is not an authorised offer.</span>
+                <span>Consumes the same WORKING_SELL layer processed/reviewed in 7.1 so management can review the ASK-TSI form shape before release. Open/TBC scope remains visible and the total is not an authorised offer.</span>
               </div>
               <div>
                 <small>KNOWN PART A / PART B WORKING VALUES</small>
@@ -539,7 +543,7 @@ function PriceView() {
             <div>
               <strong>{formPriceMode==="WORKING_PREVIEW" ? "A + B WORKING PREVIEW" : "A + B RELEASE CONTROL"}</strong>
               <span>{formPriceMode==="WORKING_PREVIEW"
-                ? "Working preview uses current controlled price-line values for form review only. It is not a customer-authorised offer."
+                ? "Working preview is a downstream projection of the 7.1 WORKING_SELL semantic layer. It does not calculate engineering cost or customer price independently."
                 : "Customer Base Offer = Σ AUTHORISED RELEASED_SELL Part A + Σ AUTHORISED RELEASED_SELL Part B. Current release state = "+(releasedBaseReady ? "READY" : "HOLD")+"."}</span>
             </div>
             <div>
@@ -606,7 +610,7 @@ function PriceView() {
 
       {priceSurface==="FORM" ? (
         <ASKTSIPricedBreakdownForm
-          lines={formPriceMode==="WORKING_PREVIEW" ? currentLines : customerReleasedLines}
+          lines={formPriceMode==="WORKING_PREVIEW" ? workingPreviewPriceLines : customerReleasedLines}
           currency={currency}
           mode={formPriceMode==="WORKING_PREVIEW" ? "INTERNAL" : "CUSTOMER_RELEASE_PROJECTION"}
           eurThbFx={eurThbFx}
