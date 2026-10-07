@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261007-04",
+  syncRevision: "SYNC-20261007-05",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -60,6 +60,8 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     fxControl: "GEQ-034 COMMON/GENERIC Controlled Currency Conversion: P_to = P_from × R_from,THB / R_to,THB. Cross-currency display uses Bank of Thailand FM_FX_001_S3 MID RATE from the controlled rate date/type. Current basis 06-Oct-2026: USD/THB 33.6643, EUR/THB 37.7629, CNY/THB 5.0217. Source/vendor currency remains authoritative; converted value is DERIVED working/reference only.",
     uiReadabilityControl: "PTTEP 10008-STD-6-GEN-003 was reviewed for document presentation; no explicit web/UI font-size rule was identified. 0550 UI therefore applies its controlled readability standard: trace body >=12.5px, tabs ~13px, equation chips >=11.5px, two-column engineering trace, and no micro-text to fit density.",
     presentationLayerRule: "UI presentation may change without changing the controlled engineering/commercial model. Current prototype defaults to Hierarchical Outline / Group View with +/- expand-collapse; Detailed Tabs remain available as fallback. Both consume the same trace, evidence, DB/JSON state, equations and output contracts.",
+    digitalThreadRule: "Requirement is an executable trace layer, not a prose summary: Customer/Company Source -> Requirement -> Constraint -> Proof -> Required Object/Quantity Driver -> COMMON/GENERIC + PARTICULAR Equation -> Work/Lifecycle -> Cost Object -> Commercial Output. PAGA is the first fully detailed pilot; the same schema is intended for all 19 systems.",
+    commercialAnalyticsRule: "Commercial visualization is presentation only and must reuse controlled price/cost state. The 19 engineering systems roll into 15 ASK-TSI A1 commercial groups; composite lines must remain explicitly composite until a defensible allocation driver exists. Graphs must distinguish source cost, controlled/budgetary sell, commercial uplift and OPEN/TBC cost.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
     jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
   },
@@ -70,6 +72,8 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     "Project0550EvidenceMemory.json",
     "Project0550EvidenceReasoner.js",
     "Project0550PriceSourceModel.js",
+    "Project0550CommercialModel.js",
+    "Project0550PagaDigitalThread.js",
     "Project0550PartBModel.js",
     "Project0550FxControl.js",
     "Project0550OutputContract.js",
