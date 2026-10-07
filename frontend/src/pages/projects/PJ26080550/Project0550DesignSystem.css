@@ -2443,3 +2443,209 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* Rev15 — ruled line-table presentation for engineering trace.
+   Presentation only: consumes the same controlled PAGA digital-thread objects. */
+.bid-shell .ask-line-table-wrap{
+  width:100%;
+  overflow:auto;
+  border:1px solid #bfcdd8;
+  border-radius:6px;
+  background:#fff;
+}
+.bid-shell .ask-line-table{
+  width:100%;
+  min-width:980px;
+  border-collapse:collapse;
+  table-layout:fixed;
+  background:#fff;
+}
+.bid-shell .ask-line-table th,
+.bid-shell .ask-line-table td{
+  border-right:1px solid #cfd9e1;
+  border-bottom:1px solid #d7e0e7;
+  padding:9px 10px;
+  vertical-align:top;
+  text-align:left;
+  color:#455d70;
+  font-size:12px!important;
+  line-height:1.48;
+  overflow-wrap:anywhere;
+}
+.bid-shell .ask-line-table th:last-child,
+.bid-shell .ask-line-table td:last-child{border-right:0}
+.bid-shell .ask-line-table tbody tr:last-child td{border-bottom:0}
+.bid-shell .ask-line-table thead th{
+  position:sticky;
+  top:0;
+  z-index:2;
+  background:#eaf2f7;
+  color:#294f6e;
+  font-size:10.5px!important;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.025em;
+}
+.bid-shell .ask-line-table tbody tr:nth-child(even):not(.ask-expanded-row){
+  background:#fbfcfd;
+}
+.bid-shell .ask-line-table tbody tr:hover:not(.ask-expanded-row){
+  background:#f4f8fb;
+}
+.bid-shell .ask-line-table td strong{
+  display:block;
+  color:#294e6d;
+  font-size:12px;
+  line-height:1.4;
+}
+.bid-shell .ask-line-table td small{
+  display:block;
+  margin-top:3px;
+  color:#718394;
+  font-size:10.5px!important;
+  line-height:1.4;
+}
+.bid-shell .ask-line-table td code{
+  display:block;
+  color:#345f82;
+  font-size:10.5px!important;
+  line-height:1.4;
+  white-space:normal;
+}
+.bid-shell .ask-line-table .seq{
+  width:54px;
+  text-align:center;
+  color:#365e80;
+  font-weight:900;
+}
+.bid-shell .ask-line-table.method th:nth-child(1){width:54px}
+.bid-shell .ask-line-table.method th:nth-child(2){width:165px}
+.bid-shell .ask-line-table.method th:nth-child(3){width:220px}
+.bid-shell .ask-line-table.method th:nth-child(4){width:155px}
+.bid-shell .ask-line-table.sources th:nth-child(1){width:135px}
+.bid-shell .ask-line-table.sources th:nth-child(2){width:170px}
+.bid-shell .ask-line-table.sources th:nth-child(3){width:260px}
+.bid-shell .ask-line-table.sources th:nth-child(4){width:210px}
+.bid-shell .ask-line-table.sources th:nth-child(6){width:165px}
+.bid-shell .ask-line-table.requirements th:nth-child(1){width:42px}
+.bid-shell .ask-line-table.requirements th:nth-child(2){width:155px}
+.bid-shell .ask-line-table.requirements th:nth-child(3){width:300px}
+.bid-shell .ask-line-table.requirements th:nth-child(4){width:190px}
+.bid-shell .ask-line-table.requirements th:nth-child(5){width:190px}
+.bid-shell .ask-line-table.requirements th:nth-child(6){width:250px}
+.bid-shell .ask-line-table.requirements th:nth-child(7){width:120px}
+.bid-shell .ask-line-table.equations th:nth-child(1){width:160px}
+.bid-shell .ask-line-table.equations th:nth-child(2){width:220px}
+.bid-shell .ask-line-table.equations th:nth-child(3){width:330px}
+.bid-shell .ask-line-table.equations th:nth-child(4){width:260px}
+.bid-shell .ask-line-table.equations th:nth-child(5){width:250px}
+.bid-shell .ask-line-table.equations th:nth-child(6){width:130px}
+.bid-shell .ask-line-table.outputs th:nth-child(1){width:70px}
+.bid-shell .ask-line-table.outputs th:nth-child(2){width:220px}
+
+.bid-shell .ask-line-state{
+  display:inline-block;
+  max-width:100%;
+  padding:4px 7px;
+  border:1px solid #cbd5dd;
+  border-radius:999px;
+  background:#f6f8fa;
+  color:#607487;
+  font-size:9.5px;
+  font-weight:900;
+  line-height:1.25;
+  text-align:center;
+}
+.bid-shell .ask-line-state.good{
+  border-color:#9fcbb0;
+  background:#eef8f1;
+  color:#286541;
+}
+.bid-shell .ask-line-state.warn{
+  border-color:#e2c47e;
+  background:#fff8e9;
+  color:#805a0c;
+}
+.bid-shell .ask-line-state.open{
+  border-color:#e1b382;
+  background:#fff5e9;
+  color:#8a5220;
+}
+.bid-shell .ask-line-state.bad{
+  border-color:#dda8a0;
+  background:#fff1ef;
+  color:#923f37;
+}
+
+.bid-shell .ask-table-toggle{
+  display:flex;
+  width:25px;
+  height:25px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #94aabd;
+  border-radius:4px;
+  background:#fff;
+  color:#173e61;
+  font-size:16px!important;
+  font-weight:900;
+  line-height:1;
+  cursor:pointer;
+}
+.bid-shell .ask-line-table.requirements tr.is-open>td{
+  background:#eef5fa;
+}
+.bid-shell .ask-expanded-row>td{
+  padding:0!important;
+  background:#f8fafc!important;
+}
+.bid-shell .ask-subtable{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.bid-shell .ask-subtable th,
+.bid-shell .ask-subtable td{
+  border-right:1px solid #dde5eb;
+  border-bottom:1px solid #e1e7ec;
+  padding:8px 10px;
+  font-size:11.5px!important;
+  line-height:1.5;
+}
+.bid-shell .ask-subtable th{
+  width:230px;
+  background:#f1f6f9;
+  color:#315b7d;
+  font-size:10.5px!important;
+  text-transform:none;
+  letter-spacing:0;
+}
+.bid-shell .ask-subtable tr:last-child th,
+.bid-shell .ask-subtable tr:last-child td{border-bottom:0}
+
+.bid-shell .ask-thread-detail>summary{
+  border-bottom:1px solid transparent;
+}
+.bid-shell .ask-thread-detail[open]>summary{
+  border-bottom-color:#bdcbd6;
+}
+.bid-shell .ask-detail-body{
+  padding:8px!important;
+  background:#fff;
+}
+.bid-shell .ask-line-section-head{
+  border:1px solid #c9d6df;
+  border-bottom:0;
+  border-left:3px solid #507c9d;
+  border-radius:6px 6px 0 0;
+}
+
+@media(max-width:900px){
+  .bid-shell .ask-line-table{
+    min-width:860px;
+  }
+  .bid-shell .ask-subtable th{
+    width:180px;
+  }
+}
