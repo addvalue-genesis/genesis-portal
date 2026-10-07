@@ -86,6 +86,12 @@ export const PROJECT0550_COMMERCIAL_ALLOCATION_POLICY = {
   }
 };
 
+export const PROJECT0550_PART_A_LEGACY_PROXY_RULE = {
+  status:"REVIEW_REQUIRED",
+  rule:"Historical/proxy Part A rates must be checked for embedded ADDVALUE labor/service before reuse. If the old lump sum contains ADDVALUE engineering/site/training/document work, strip and reallocate that work to Part B/C before using the Part A basis.",
+  reason:"A legacy lump-sum rate can hide service cost and cause Part A + Part B double counting."
+};
+
 export const PROJECT0550_COST_FAMILY_TO_LINE = {
   ADDVALUE_ENGINEERING:"B1",
   ADDVALUE_DOCUMENT_CONTROL:"B1",
