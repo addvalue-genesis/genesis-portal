@@ -15,6 +15,10 @@ import { PROJECT0550_PAGA_LIFECYCLE_PLAN } from "./Project0550LifecycleExecution
 import { PROJECT0550_PART_A_LEGACY_PROXY_RULE } from "./Project0550CommercialAllocationPolicy";
 import { priceLayersForLine } from "./Project0550PricingLayerModel";
 import {
+  project0550PartBDerivationRows,
+  PROJECT0550_PART_B_DERIVATION_RULE
+} from "./Project0550PartBDerivationModel";
+import {
   PROJECT0550_PAGA_BULK_ROWS,
   PROJECT0550_PAGA_BULK_SUMMARY,
   PROJECT0550_PAGA_ANALYSIS_GROUPS,
@@ -452,6 +456,130 @@ function PagaLifecycleResponsibilityView({currency}){
   );
 }
 
+function PartBDerivationView({currency}){
+  const [open,setOpen]=useState(()=>new Set(["B1","B4"]));
+  const rows=project0550PartBDerivationRows();
+
+  const amountIn=(thb)=>{
+    if(!Number.isFinite(Number(thb))) return null;
+    return currency==="THB" ? Number(thb) : convertFx(Number(thb),"THB",currency);
+  };
+  const toggle=(code)=>setOpen(current=>{
+    const next=new Set(current);
+    if(next.has(code)) next.delete(code); else next.add(code);
+    return next;
+  });
+
+  return (
+    <div className="ica-partb">
+      <div className="ica-subhead">
+        <strong>Part B · First Principles / CBE / Parametric Cost Equation Trace</strong>
+        <span>Uses existing COMMON/GENERIC equations + controlled Rev04 Part B model; no new pricing engine</span>
+      </div>
+      <div className="ica-partb-rule">{PROJECT0550_PART_B_DERIVATION_RULE}</div>
+      <div className="ica-table-wrap">
+        <table className="ica-partb-table">
+          <thead>
+            <tr>
+              <th></th><th>Line</th><th>Scope / Obligation</th><th>Driver Basis</th>
+              <th>Common / Generic Equation Chain</th><th>Controlled Working Price</th><th>State</th>
+            </tr>
+          </thead>
+          <tbody>
+            {rows.map(row=>{
+              const isOpen=open.has(row.code);
+              const customer=amountIn(row.customerPriceThb);
+              return (
+                <React.Fragment key={row.code}>
+                  <tr className={isOpen?"is-open":""}>
+                    <td><button type="button" className="ica-table-toggle" onClick={()=>toggle(row.code)}>{isOpen?"−":"+"}</button></td>
+                    <td><code>{row.code}</code><small>{row.priceClass}</small></td>
+                    <td><strong>{row.title}</strong><small>{row.requirementBasis}</small></td>
+                    <td>{row.driverBasis}</td>
+                    <td><code>{row.equationIds.join(" → ")}</code><small>{row.commercialFormula}</small></td>
+                    <td className="num"><strong>{Number.isFinite(customer)?money(customer,currency):"TBC"}</strong><small>Working customer price / known portion</small></td>
+                    <td><span className={"ica-state "+rowStateTone(row.state)}>{row.state}</span></td>
+                  </tr>
+                  {isOpen ? (
+                    <tr className="ica-expanded-row">
+                      <td></td>
+                      <td colSpan="6">
+                        <div className="ica-partb-detail">
+                          <section>
+                            <h4>1 · Source / Driver Basis</h4>
+                            <table>
+                              <tbody>
+                                <tr><th>Source sheets</th><td>{row.sourceSheets.join(" · ")}</td></tr>
+                                <tr><th>Requirement / obligation</th><td>{row.requirementBasis}</td></tr>
+                                <tr><th>Quantity / work driver</th><td>{row.driverBasis}</td></tr>
+                                <tr><th>Value basis</th><td>{row.valueBasis}</td></tr>
+                              </tbody>
+                            </table>
+                          </section>
+
+                          <section>
+                            <h4>2 · COMMON / GENERIC Equations Used</h4>
+                            <table className="equations">
+                              <thead><tr><th>Equation</th><th>Name</th><th>Controlled Expression</th><th>Input / Calibration State</th><th>Use in 0550</th></tr></thead>
+                              <tbody>
+                                {row.equations.map(eq=>(
+                                  <tr key={eq.id}>
+                                    <td><code>{eq.id}</code></td>
+                                    <td><strong>{eq.name}</strong></td>
+                                    <td><code>{eq.expression}</code></td>
+                                    <td>{eq.inputState}</td>
+                                    <td>{eq.meaning}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </section>
+
+                          <section>
+                            <h4>3 · Controlled Cost / Price Components</h4>
+                            <table className="components">
+                              <thead><tr><th>Class</th><th>Component</th><th>Amount</th><th>Meaning</th></tr></thead>
+                              <tbody>
+                                {row.controlledComponents.map((c,idx)=>{
+                                  const amount=amountIn(c.amountThb);
+                                  return (
+                                    <tr key={c.class+"-"+idx}>
+                                      <td>{c.class}</td>
+                                      <td><strong>{c.item}</strong></td>
+                                      <td className="num">{Number.isFinite(amount)?money(amount,currency):(c.amountText||"TBC")}</td>
+                                      <td>{/CUSTOMER PRICE/i.test(c.class) ? "Commercial output / working price" : /REMOVE/i.test(c.class) ? "Deduction to prevent obsolete/double-counted cost" : "Controlled cost/service component"}</td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                          </section>
+
+                          <section>
+                            <h4>4 · Commercial Treatment</h4>
+                            <table>
+                              <tbody>
+                                <tr><th>Project formula / policy</th><td><code>{row.commercialFormula}</code></td></tr>
+                                <tr><th>Current line rule</th><td>{row.commercialRule}</td></tr>
+                                <tr><th>Current working price</th><td><strong>{Number.isFinite(customer)?money(customer,currency):"TBC"}</strong></td></tr>
+                                <tr><th>Open / closure</th><td>{row.openItems.length?row.openItems.join(" · "):"No open item listed"}</td></tr>
+                              </tbody>
+                            </table>
+                          </section>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : null}
+                </React.Fragment>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function InternalAnalysisRow({
   group,
   line,
@@ -698,6 +826,7 @@ export function InternalCostOfferAnalysis({
         <div>
           <button className={view==="OUTLINE"?"active":""} onClick={()=>setView("OUTLINE")}>Outline / + −</button>
           <button className={view==="CHART"?"active":""} onClick={()=>setView("CHART")}>Graph</button>
+          <button className={view==="PART_B"?"active":""} onClick={()=>setView("PART_B")}>Part B / Equation Trace</button>
           <button className={view==="SOURCE"?"active":""} onClick={()=>setView("SOURCE")}>Source / Output Control</button>
         </div>
         {view==="OUTLINE" ? (
@@ -738,6 +867,8 @@ export function InternalCostOfferAnalysis({
           cnyThbFx={cnyThbFx}
         />
       ) : null}
+
+      {view==="PART_B" ? <PartBDerivationView currency={currency}/> : null}
 
       {view==="SOURCE" ? (
         <>
