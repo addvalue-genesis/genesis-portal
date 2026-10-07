@@ -19,9 +19,14 @@ export const PROJECT0550_EVIDENCE_MEMORY = EVIDENCE_MEMORY;
 const SOURCE_PRIORITY = {
   APPROVED_HUMAN_DECISION: 100,
   GOVERNING_PROJECT_SOURCE: 90,
+  COMPANY_STANDARD: 88,
+  CURRENT_OEM_DATASHEET: 84,
+  CURRENT_VENDOR_TECHNICAL_SUBMISSION: 82,
   CURRENT_VENDOR_QUOTE: 80,
   CURRENT_PROJECT_CALCULATION: 75,
+  INTERNATIONAL_STANDARD: 70,
   CURRENT_MARKET_SANITY: 60,
+  RECOGNISED_RESEARCH: 50,
   HISTORICAL_REFERENCE: 35,
   ASSUMPTION: 10
 };
@@ -78,6 +83,10 @@ export function project0550EvidenceMemoryFromApi(payload,base=PROJECT0550_EVIDEN
       priceLine:row.price_line_code || null,
       location:row.location_code || null,
       object:row.object_key || null,
+      productId:row.product_id || null,
+      productCode:row.product_code || null,
+      targetObjectType:row.target_object_type || null,
+      targetObjectRef:row.target_object_ref || null,
       state:row.assertion_state || "TBC",
       value:Object.prototype.hasOwnProperty.call(value,"value") ? value.value : null,
       qty:Object.prototype.hasOwnProperty.call(value,"qty") ? value.qty : null,
@@ -252,7 +261,11 @@ export function ingestProject0550EvidencePacket(packet,memory=PROJECT0550_EVIDEN
       EXCLUSION:"PROPOSE_SCOPE_GAP_UPDATE",
       PROOF:"PROPOSE_PROOF_STATE_UPDATE",
       COST_INPUT:"PROPOSE_COST_INPUT_UPDATE",
-      COMMERCIAL:"PROPOSE_COMMERCIAL_REVIEW"
+      COMMERCIAL:"PROPOSE_COMMERCIAL_REVIEW",
+      PRODUCT_IDENTITY:"PROPOSE_PRODUCT_IDENTITY_BINDING",
+      PRODUCT_CAPABILITY:"PROPOSE_PRODUCT_CAPABILITY_UPDATE",
+      VENDOR_CONDITION:"PROPOSE_VENDOR_CONDITION_IMPACT_REVIEW",
+      METHOD_CANDIDATE:"PROPOSE_METHOD_PROMOTION_REVIEW"
     };
 
     const proposal = {
@@ -265,9 +278,18 @@ export function ingestProject0550EvidencePacket(packet,memory=PROJECT0550_EVIDEN
       disposition,
       currentAssertionId:existing?.assertionId || null,
       currentSourceId:existing?.sourceId || null,
+      productCode:incoming.productCode || null,
+      targetObjectType:incoming.targetObjectType || null,
+      targetObjectRef:incoming.targetObjectRef || null,
+      promotionScope:incoming.domain==="METHOD_CANDIDATE" || incoming.reusableMethodCandidate===true
+        ? "GENERIC_CANDIDATE"
+        : "PARTICULAR_ONLY",
+      methodChangeRequiresNewVersion:incoming.domain==="METHOD_CANDIDATE" || incoming.reusableMethodCandidate===true,
       autoApply:false,
       approvalRequired:true,
-      reason:"New evidence is converted into a reviewable proposal; project facts and release gates are never silently rewritten."
+      reason:incoming.domain==="METHOD_CANDIDATE" || incoming.reusableMethodCandidate===true
+        ? "Reusable method finding stays a REVIEW_REQUIRED promotion candidate. Approval must create a new controlled COMMON/GENERIC method version; project evidence cannot mutate the registry silently."
+        : "New evidence is converted into a PARTICULAR reviewable proposal first; project facts and release gates are never silently rewritten."
     };
     proposals.push(proposal);
 
