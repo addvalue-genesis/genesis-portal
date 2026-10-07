@@ -17,7 +17,7 @@ import { vendorOfferForPriceLine } from "./Project0550VendorOfferRegister";
 export const PROJECT0550_PRICE_LAYER_TYPES = ["SOURCE_COST","INTERNAL_COST","WORKING_SELL","RELEASED_SELL"];
 
 function knownAmount(value){
-  return value!==null && value!==undefined && value!=="" && knownAmount(value);
+  return value!==null && value!==undefined && value!=="" && Number.isFinite(Number(value));
 }
 
 function firstFiniteCurrency(map={},preferred){
