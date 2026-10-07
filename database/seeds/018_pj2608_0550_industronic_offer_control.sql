@@ -37,12 +37,7 @@ ON DUPLICATE KEY UPDATE
 
 SET @o=(SELECT id FROM etm_vendor_offers WHERE project_id=@p AND vendor_id=@v AND offer_code='A20261632' ORDER BY id DESC LIMIT 1);
 
--- Re-runnable seed: remove only this controlled source offer's item rows/bindings before rebuilding.
-DELETE b FROM etm_vendor_offer_item_bindings b
-JOIN etm_vendor_offer_items i ON i.id=b.vendor_offer_item_id
-WHERE i.vendor_offer_id=@o;
-DELETE FROM etm_vendor_offer_items WHERE vendor_offer_id=@o;
-
+-- Re-runnable source seed: preserve item identity by (vendor_offer_id,item_no).
 INSERT INTO etm_vendor_offer_items
 (vendor_offer_id,item_no,description,offered_qty,unit,unit_price,amount,metadata_json)
 VALUES
@@ -69,7 +64,14 @@ VALUES
 (@o,'5040','XBC Beacon Control Module',1,'U',2014,2014,JSON_OBJECT('group','OPTION','inFinal',false)),
 (@o,'11020','AP Additional Keypad',1,'U',681,681,JSON_OBJECT('group','OPTION','inFinal',false)),
 (@o,'14010','HP8T Horn Speaker',1,'U',97,97,JSON_OBJECT('group','OPTION','inFinal',false)),
-(@o,'18040','XST Pro Activation Key',1,'U',400,400,JSON_OBJECT('group','OPTION','inFinal',false));
+(@o,'18040','XST Pro Activation Key',1,'U',400,400,JSON_OBJECT('group','OPTION','inFinal',false))
+ON DUPLICATE KEY UPDATE
+ description=VALUES(description),
+ offered_qty=VALUES(offered_qty),
+ unit=VALUES(unit),
+ unit_price=VALUES(unit_price),
+ amount=VALUES(amount),
+ metadata_json=VALUES(metadata_json);
 
 SET @a105=(
  SELECT psi.id
