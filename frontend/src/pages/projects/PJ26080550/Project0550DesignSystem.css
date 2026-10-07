@@ -360,3 +360,296 @@
     grid-column:auto;
   }
 }
+
+
+/* Hierarchical Outline / Group View — default engineering trace presentation */
+.bid-shell .ask-trace-mode-switch{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:14px;
+  padding:8px;
+  border:1px solid #cbd8e4;
+  border-radius:10px;
+  background:#eef4f8;
+}
+.bid-shell .ask-trace-mode-switch>button{
+  border:1px solid #b8c9d8;
+  border-radius:7px;
+  padding:9px 13px;
+  background:#fff;
+  color:#315b80;
+  font-size:13px;
+  font-weight:900;
+  cursor:pointer;
+}
+.bid-shell .ask-trace-mode-switch>button.active{
+  background:#173b5d;
+  color:#fff;
+  border-color:#173b5d;
+}
+.bid-shell .ask-outline-actions{
+  display:flex;
+  gap:6px;
+  flex-wrap:wrap;
+  margin-left:auto;
+}
+.bid-shell .ask-outline-actions button{
+  border:1px solid #c8d5df;
+  border-radius:7px;
+  padding:7px 10px;
+  background:#fff;
+  color:#4d6478;
+  font-size:11.5px;
+  font-weight:800;
+  cursor:pointer;
+}
+.bid-shell .ask-outline-view{
+  display:grid;
+  gap:10px;
+  margin-top:12px;
+}
+.bid-shell .ask-outline-summary{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;
+}
+.bid-shell .ask-outline-summary>div{
+  min-width:0;
+  padding:12px 13px;
+  border:1px solid #d3dee8;
+  border-radius:9px;
+  background:#fff;
+}
+.bid-shell .ask-outline-summary small{
+  display:block;
+  color:#647a8d;
+  font-size:10px!important;
+  font-weight:900;
+}
+.bid-shell .ask-outline-summary strong{
+  display:block;
+  margin-top:5px;
+  color:#173e61;
+  font-size:14px;
+  line-height:1.3;
+  overflow-wrap:anywhere;
+}
+.bid-shell .ask-outline-summary span{
+  display:block;
+  margin-top:4px;
+  color:#65788a;
+  font-size:11.5px;
+  line-height:1.45;
+}
+
+.bid-shell .ask-outline-section{
+  border:1px solid #cfdbe5;
+  border-radius:10px;
+  overflow:hidden;
+  background:#fff;
+}
+.bid-shell .ask-outline-section.is-cost{
+  border-left:4px solid #d0962e;
+}
+.bid-shell .ask-outline-section.is-gaps{
+  border-left:4px solid #c85c50;
+}
+.bid-shell .ask-outline-head{
+  width:100%;
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr) auto;
+  gap:10px;
+  align-items:center;
+  padding:12px 14px;
+  border:0;
+  background:#f7fafc;
+  color:#173e61;
+  text-align:left;
+  cursor:pointer;
+}
+.bid-shell .ask-outline-section.is-open .ask-outline-head{
+  background:#eef5fa;
+  border-bottom:1px solid #d7e1e9;
+}
+.bid-shell .ask-outline-toggle{
+  display:flex;
+  width:28px;
+  height:28px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #9eb4c6;
+  border-radius:6px;
+  background:#fff;
+  color:#173e61;
+  font-size:20px;
+  font-weight:900;
+  line-height:1;
+}
+.bid-shell .ask-outline-title-wrap strong{
+  display:block;
+  font-size:14px;
+  line-height:1.3;
+}
+.bid-shell .ask-outline-title-wrap small{
+  display:block;
+  margin-top:3px;
+  color:#6a7d8f;
+  font-size:11.5px!important;
+  font-weight:500;
+  line-height:1.4;
+  text-transform:none!important;
+  letter-spacing:0!important;
+}
+.bid-shell .ask-outline-status{
+  justify-self:end;
+  max-width:340px;
+  padding:5px 8px;
+  border:1px solid #d0dae3;
+  border-radius:999px;
+  background:#fff;
+  color:#5c7083;
+  font-size:10.5px!important;
+  font-weight:900;
+  line-height:1.25;
+  text-align:right;
+}
+.bid-shell .ask-outline-body{
+  padding:12px 14px 14px;
+}
+.bid-shell .ask-outline-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+}
+.bid-shell .ask-outline-grid article{
+  min-width:0;
+  padding:11px 12px;
+  border:1px solid #dde5ec;
+  border-radius:8px;
+  background:#fbfcfd;
+}
+.bid-shell .ask-outline-grid b{
+  display:block;
+  color:#315b80;
+  font-size:10.5px;
+  text-transform:uppercase;
+  letter-spacing:.03em;
+}
+.bid-shell .ask-outline-grid span{
+  display:block;
+  margin-top:5px;
+  color:#516579;
+  font-size:12px;
+  line-height:1.55;
+  overflow-wrap:anywhere;
+}
+.bid-shell .ask-outline-source-head{
+  display:grid;
+  grid-template-columns:1.4fr .65fr 1fr;
+  gap:8px;
+}
+.bid-shell .ask-outline-source-head>div{
+  padding:11px 12px;
+  border:1px solid #dbe4eb;
+  border-radius:8px;
+  background:#fbfcfd;
+}
+.bid-shell .ask-outline-source-head small{
+  display:block;
+  color:#64798d;
+  font-size:9.5px!important;
+  font-weight:900;
+}
+.bid-shell .ask-outline-source-head strong{
+  display:block;
+  margin-top:4px;
+  color:#173e61;
+  font-size:12.5px;
+}
+.bid-shell .ask-outline-source-head span{
+  display:block;
+  margin-top:4px;
+  color:#667a8c;
+  font-size:11px;
+  line-height:1.4;
+}
+.bid-shell .ask-outline-list{
+  margin-top:9px;
+  border:1px solid #dbe3ea;
+  border-radius:8px;
+  overflow:hidden;
+}
+.bid-shell .ask-outline-list>div{
+  display:grid;
+  grid-template-columns:minmax(110px,.7fr) minmax(220px,1.6fr) minmax(190px,1fr);
+  gap:9px;
+  align-items:start;
+  padding:9px 11px;
+  border-top:1px solid #e8edf2;
+  background:#fff;
+}
+.bid-shell .ask-outline-list>div:first-child{border-top:0}
+.bid-shell .ask-outline-list span{
+  color:#6b7f91;
+  font-size:10px;
+  font-weight:900;
+}
+.bid-shell .ask-outline-list strong{
+  color:#334f69;
+  font-size:11.5px;
+  line-height:1.4;
+}
+.bid-shell .ask-outline-list em{
+  color:#536a7e;
+  font-size:11px;
+  line-height:1.4;
+  font-style:normal;
+  text-align:right;
+}
+.bid-shell .ask-outline-list.compact>div{
+  padding:7px 10px;
+}
+.bid-shell .ask-outline-empty{
+  padding:12px;
+  border:1px dashed #c8d3dd;
+  border-radius:8px;
+  background:#fafcfd;
+  color:#667a8b;
+  font-size:12px;
+  line-height:1.5;
+}
+
+@media(max-width:1200px){
+  .bid-shell .ask-outline-summary{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+  }
+  .bid-shell .ask-outline-source-head{
+    grid-template-columns:1fr;
+  }
+}
+@media(max-width:900px){
+  .bid-shell .ask-outline-actions{
+    width:100%;
+    margin-left:0;
+  }
+  .bid-shell .ask-outline-summary,
+  .bid-shell .ask-outline-grid{
+    grid-template-columns:1fr;
+  }
+  .bid-shell .ask-outline-head{
+    grid-template-columns:34px minmax(0,1fr);
+  }
+  .bid-shell .ask-outline-status{
+    grid-column:2;
+    justify-self:start;
+    text-align:left;
+  }
+  .bid-shell .ask-outline-list>div{
+    grid-template-columns:1fr;
+  }
+  .bid-shell .ask-outline-list em{
+    text-align:left;
+  }
+}
