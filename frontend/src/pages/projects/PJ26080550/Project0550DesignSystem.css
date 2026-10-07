@@ -3212,3 +3212,145 @@
       minmax(140px,.7fr)!important;
   }
 }
+
+
+/* Rev22 — Part B first-principles / equation trace table */
+.bid-shell .ica-partb{
+  border:1px solid #d6e0e8;
+  border-radius:8px;
+  overflow:hidden;
+  background:#fff;
+}
+.bid-shell .ica-partb-rule{
+  padding:9px 11px;
+  border-bottom:1px solid #dde5eb;
+  background:#fffaf0;
+  color:#655b49;
+  font-size:10.5px;
+  line-height:1.5;
+}
+.bid-shell .ica-partb-table{
+  width:100%;
+  min-width:1520px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.bid-shell .ica-partb-table th,
+.bid-shell .ica-partb-table td{
+  border-right:1px solid #d1dbe3;
+  border-bottom:1px solid #dde5eb;
+  padding:8px 9px;
+  text-align:left;
+  vertical-align:top;
+  color:#465e72;
+  font-size:10.5px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.bid-shell .ica-partb-table th:last-child,
+.bid-shell .ica-partb-table td:last-child{border-right:0}
+.bid-shell .ica-partb-table thead th{
+  background:#eaf2f7;
+  color:#2e5676;
+  font-size:9.3px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.bid-shell .ica-partb-table th:nth-child(1){width:42px}
+.bid-shell .ica-partb-table th:nth-child(2){width:80px}
+.bid-shell .ica-partb-table th:nth-child(3){width:330px}
+.bid-shell .ica-partb-table th:nth-child(4){width:330px}
+.bid-shell .ica-partb-table th:nth-child(5){width:360px}
+.bid-shell .ica-partb-table th:nth-child(6){width:190px}
+.bid-shell .ica-partb-table th:nth-child(7){width:180px}
+.bid-shell .ica-partb-table tbody tr:nth-child(even):not(.ica-expanded-row){background:#fbfcfd}
+.bid-shell .ica-partb-table tr.is-open td{background:#eef5fa}
+.bid-shell .ica-partb-table td strong{
+  display:block;
+  color:#2b506e;
+  font-size:10.8px;
+}
+.bid-shell .ica-partb-table td small{
+  display:block;
+  margin-top:3px;
+  color:#718394;
+  font-size:9.3px!important;
+  line-height:1.4;
+}
+.bid-shell .ica-partb-table td code{
+  color:#315d80;
+  font-size:9.5px!important;
+  white-space:normal;
+}
+.bid-shell .ica-partb-table td.num{
+  text-align:right;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+.bid-shell .ica-partb-detail{
+  display:grid;
+  gap:10px;
+  padding:10px 12px 12px;
+}
+.bid-shell .ica-partb-detail section{
+  border:1px solid #dce4ea;
+  border-radius:7px;
+  overflow:hidden;
+  background:#fff;
+}
+.bid-shell .ica-partb-detail h4{
+  margin:0;
+  padding:8px 10px;
+  border-bottom:1px solid #dce4ea;
+  background:#f1f6f9;
+  color:#315b7d;
+  font-size:10.2px;
+  line-height:1.35;
+}
+.bid-shell .ica-partb-detail table{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.bid-shell .ica-partb-detail th,
+.bid-shell .ica-partb-detail td{
+  border-right:1px solid #dde5eb;
+  border-bottom:1px solid #e2e8ed;
+  padding:8px 9px;
+  vertical-align:top;
+  text-align:left;
+  color:#4a6174;
+  font-size:10.2px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.bid-shell .ica-partb-detail th:last-child,
+.bid-shell .ica-partb-detail td:last-child{border-right:0}
+.bid-shell .ica-partb-detail tbody tr:last-child th,
+.bid-shell .ica-partb-detail tbody tr:last-child td{border-bottom:0}
+.bid-shell .ica-partb-detail table:not(.equations):not(.components) th{
+  width:230px;
+  background:#f8fafc;
+  color:#315b7d;
+  font-weight:900;
+}
+.bid-shell .ica-partb-detail .equations th:nth-child(1){width:105px}
+.bid-shell .ica-partb-detail .equations th:nth-child(2){width:190px}
+.bid-shell .ica-partb-detail .equations th:nth-child(3){width:420px}
+.bid-shell .ica-partb-detail .equations th:nth-child(4){width:170px}
+.bid-shell .ica-partb-detail .equations th:nth-child(5){width:auto}
+.bid-shell .ica-partb-detail .components th:nth-child(1){width:210px}
+.bid-shell .ica-partb-detail .components th:nth-child(2){width:auto}
+.bid-shell .ica-partb-detail .components th:nth-child(3){width:190px}
+.bid-shell .ica-partb-detail .components th:nth-child(4){width:300px}
+.bid-shell .ica-partb-detail .components td.num{
+  text-align:right;
+  white-space:nowrap;
+  font-variant-numeric:tabular-nums;
+}
+
+@media(max-width:950px){
+  .bid-shell .ica-partb-detail{
+    padding:8px;
+  }
+}
