@@ -1694,7 +1694,7 @@
 }
 .bid-shell .ica-columns{
   display:grid;
-  grid-template-columns:34px 70px minmax(240px,1.4fr) minmax(170px,.9fr) minmax(170px,.9fr) minmax(145px,.7fr) minmax(160px,.8fr);
+  grid-template-columns:34px 70px minmax(240px,1.35fr) minmax(150px,.8fr) minmax(150px,.8fr) minmax(150px,.8fr) minmax(165px,.85fr) minmax(150px,.75fr);
   gap:8px;
   align-items:center;
   padding:8px 11px;
@@ -1962,7 +1962,7 @@
 @media(max-width:1300px){
   .bid-shell .ica-columns,
   .bid-shell .ica-row-head{
-    grid-template-columns:34px 60px minmax(220px,1.4fr) minmax(150px,.8fr) minmax(150px,.8fr) minmax(130px,.65fr) minmax(140px,.7fr);
+    grid-template-columns:34px 60px minmax(220px,1.25fr) minmax(135px,.75fr) minmax(135px,.75fr) minmax(135px,.75fr) minmax(150px,.8fr) minmax(140px,.7fr);
   }
   .bid-shell .ica-detail-grid{
     grid-template-columns:repeat(2,minmax(0,1fr));
@@ -2782,4 +2782,17 @@
   .bid-shell .ask-subtable col.ask-subtable-label-col{
     width:210px!important;
   }
+}
+
+
+/* Rev17 — 7.1 four-layer commercial analysis */
+.bid-shell .ica-columns,
+.bid-shell .ica-row-head{
+  min-width:1380px;
+}
+.bid-shell .ica-value strong{
+  font-variant-numeric:tabular-nums;
+}
+.bid-shell .ica-row-head .ica-state{
+  align-self:center;
 }
