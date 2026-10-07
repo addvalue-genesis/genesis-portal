@@ -385,7 +385,7 @@ function PagaRequirementTraceTable({requirements}){
       <table className="ask-line-table requirements">
         <thead>
           <tr>
-            <th></th><th>Requirement ID</th><th>Requirement</th><th>Source</th><th>Proof</th><th>Downstream driver</th><th>Status</th>
+            <th></th><th>Requirement ID</th><th>Requirement</th><th>Source</th><th>Proof</th><th>Downstream driver</th><th>Smart Resolution</th><th>Status</th>
           </tr>
         </thead>
         <tbody>
@@ -400,12 +400,20 @@ function PagaRequirementTraceTable({requirements}){
                   <td>{req.source.join(" · ")}</td>
                   <td>{req.proof.join(" · ")}</td>
                   <td>{req.drives.join(" · ")}</td>
+                  <td>
+                    {req.resolutionCases?.length ? (
+                      <>
+                        <strong>{req.resolutionCases[0].blocking_stage}</strong>
+                        <small>{req.resolutionCases[0].resolution_status} · Internal {req.resolutionCases[0].internal_search_status} · External {req.resolutionCases[0].external_search_status}</small>
+                      </>
+                    ) : <span>NO PERSISTED CASE</span>}
+                  </td>
                   <td><span className={"ask-line-state "+traceTone(req.state)}>{req.state}</span></td>
                 </tr>
                 {isOpen ? (
                   <tr className="ask-expanded-row">
                     <td></td>
-                    <td colSpan="6">
+                    <td colSpan="7">
                       <table className="ask-subtable">
                         <colgroup><col className="ask-subtable-label-col"/><col/></colgroup>
                         <tbody>
@@ -416,6 +424,11 @@ function PagaRequirementTraceTable({requirements}){
                           <tr><th>05 · CAL / Study / RPT → Proof</th><td>{req.proof.join(" · ")}</td></tr>
                           <tr><th>06 · Architecture / Object / Qty</th><td>{req.architecture || "TBC"} | {req.objects.join(", ")} | {req.requiredMtoState || req.drives.join(", ")}</td></tr>
                           <tr><th>07 · Equation / Driver</th><td>{req.equations.join(" · ")} → {req.drives.join(", ")}</td></tr>
+                          <tr><th>08 · Smart Resolution</th><td>{
+                            req.resolutionCases?.length
+                              ? req.resolutionCases.map(x=>x.case_code+" · "+x.blocking_stage+" · "+x.resolution_status+" · "+(x.recommended_action||"")).join(" | ")
+                              : "No persisted resolution case yet. SmartControl may generate an internal-first research job when a controlled gap is detected."
+                          }</td></tr>
                         </tbody>
                       </table>
                     </td>
