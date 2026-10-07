@@ -39,6 +39,7 @@ import {
   pagaRequirementSummary
 } from "./Project0550PagaDigitalThread";
 import { pagaRequirementMethodDetail } from "./Project0550PagaRequirementMethodDetail";
+import { useProject0550RequirementThreads } from "./useProject0550RequirementThreads";
 
 export { ASKTSI_PRICED_BREAKDOWN_TEMPLATE };
 
@@ -370,7 +371,7 @@ function PagaSourceTable(){
   );
 }
 
-function PagaRequirementTraceTable(){
+function PagaRequirementTraceTable({requirements}){
   const [open,setOpen]=useState(()=>new Set(["REQ-PAGA-001"]));
   function toggle(id){
     setOpen(current=>{
@@ -388,8 +389,7 @@ function PagaRequirementTraceTable(){
           </tr>
         </thead>
         <tbody>
-          {PROJECT0550_PAGA_REQUIREMENTS.map(req=>{
-            const method=pagaRequirementMethodDetail(req.id);
+          {(requirements||[]).map(req=>{
             const isOpen=open.has(req.id);
             return (
               <React.Fragment key={req.id}>
@@ -410,11 +410,11 @@ function PagaRequirementTraceTable(){
                         <colgroup><col className="ask-subtable-label-col"/><col/></colgroup>
                         <tbody>
                           <tr><th>01 · Source / Evidence</th><td>{req.source.join(" · ")}</td></tr>
-                          <tr><th>02 · Fundamental Need</th><td>{method?.fundamentalNeed || "TBC"}</td></tr>
-                          <tr><th>03 · Constraint / Context</th><td>{req.constraints.join("; ")}{method?.interfaceContext?.length ? " | "+method.interfaceContext.join(", ") : ""}</td></tr>
-                          <tr><th>04 · Engineering Input</th><td>{method?.engineeringInputs?.join(" · ") || "TBC"}</td></tr>
+                          <tr><th>02 · Fundamental Need</th><td>{req.fundamentalNeed || "TBC"}</td></tr>
+                          <tr><th>03 · Constraint / Context</th><td>{req.constraints.join("; ")}{req.interfaceContext?.length ? " | "+method.interfaceContext.join(", ") : ""}</td></tr>
+                          <tr><th>04 · Engineering Input</th><td>{req.engineeringInputs?.join(" · ") || "TBC"}</td></tr>
                           <tr><th>05 · CAL / Study / RPT → Proof</th><td>{req.proof.join(" · ")}</td></tr>
-                          <tr><th>06 · Architecture / Object / Qty</th><td>{method?.architecture || "TBC"} | {req.objects.join(", ")} | {method?.requiredMtoState || req.drives.join(", ")}</td></tr>
+                          <tr><th>06 · Architecture / Object / Qty</th><td>{req.architecture || "TBC"} | {req.objects.join(", ")} | {req.requiredMtoState || req.drives.join(", ")}</td></tr>
                           <tr><th>07 · Equation / Driver</th><td>{req.equations.join(" · ")} → {req.drives.join(", ")}</td></tr>
                         </tbody>
                       </table>
@@ -430,7 +430,7 @@ function PagaRequirementTraceTable(){
   );
 }
 
-function PagaEquationTable(){
+function PagaEquationTable({equations}) {
   return (
     <div className="ask-line-table-wrap">
       <table className="ask-line-table equations">
@@ -440,13 +440,13 @@ function PagaEquationTable(){
           </tr>
         </thead>
         <tbody>
-          {PROJECT0550_PAGA_PARTICULAR_EQUATIONS.map(eq=>(
+          {(equations||[]).map(eq=>(
             <tr key={eq.code}>
               <td><code>{eq.code}</code></td>
               <td><strong>{eq.name}</strong></td>
               <td><code>{eq.expression}</code></td>
-              <td>{eq.input.join(" · ")}</td>
-              <td>{eq.output.join(" · ")}</td>
+              <td>{(eq.input||[]).length ? eq.input.join(" · ") : "Bound by requirement / input objects"}</td>
+              <td>{(eq.output||[]).length ? eq.output.join(" · ") : "Bound output object / proof"}</td>
               <td><span className={"ask-line-state "+traceTone(eq.state)}>{eq.state}</span></td>
             </tr>
           ))}
@@ -624,9 +624,31 @@ function CostBuildRuledTable({audit}){
 function RequirementBasisView({code,trace}){
   const commercialGroup=commercialGroupForLine(code);
   const systems=(commercialGroup?.systemTokens||[]).map(systemByToken).filter(Boolean);
+  const threadState=useProject0550RequirementThreads(code==="A1-05" ? "PAGA" : null);
 
   if(code==="A1-05"){
-    const summary=pagaRequirementSummary();
+    const fallbackRequirements=PROJECT0550_PAGA_REQUIREMENTS.map(req=>({
+      ...req,
+      ...(pagaRequirementMethodDetail(req.id)||{}),
+      dataOrigin:"CONTROLLED_FALLBACK"
+    }));
+    const requirements=threadState.rows.length ? threadState.rows : fallbackRequirements;
+    const summary={
+      ...pagaRequirementSummary(),
+      requirements:requirements.length
+    };
+    const liveParticularEquations=threadState.isLive
+      ? [...new Map((threadState.payload?.equationBindings||[])
+          .filter(x=>String(x.equation_code||"").startsWith("PAGA-"))
+          .map(x=>[x.equation_code,{
+            code:x.equation_code,
+            name:x.equation_name,
+            expression:x.expression_text,
+            input:[],
+            output:[],
+            state:x.input_state||x.binding_status||"WORKING"
+          }])).values()]
+      : PROJECT0550_PAGA_PARTICULAR_EQUATIONS;
     return (
       <div className="ask-digital-thread compact">
         <div className="ask-thread-banner">
@@ -673,17 +695,17 @@ function RequirementBasisView({code,trace}){
             <strong>Requirement threads</strong>
             <span>แสดงเป็นตารางรายบรรทัด; กด + / − เพื่อเปิด Source → Need → Constraint/Input → Proof → Object/Qty → Equation/Driver</span>
           </div>
-          <PagaRequirementTraceTable/>
+          <PagaRequirementTraceTable requirements={requirements}/>
         </div>
 
         <details className="ask-thread-detail">
           <summary>
             <span className="ask-detail-toggle"></span>
             <strong>PAGA Particular Equations</strong>
-            <small>{PROJECT0550_PAGA_PARTICULAR_EQUATIONS.length} system-specific engineering equations / studies</small>
+            <small>{liveParticularEquations.length} system-specific engineering equations / studies · {threadState.isLive ? "LIVE DB REGISTRY" : "CONTROLLED FALLBACK"}</small>
             <em>PARTICULAR</em>
           </summary>
-          <div className="ask-detail-body"><PagaEquationTable/></div>
+          <div className="ask-detail-body"><PagaEquationTable equations={liveParticularEquations}/></div>
         </details>
 
         <details className="ask-thread-detail">
