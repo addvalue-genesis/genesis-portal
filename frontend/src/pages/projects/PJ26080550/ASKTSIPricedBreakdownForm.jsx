@@ -382,19 +382,19 @@ function RequirementBasisView({code,trace}){
                 </div>
                 <p>{req.requirement}</p>
                 <div className="ask-thread-flow canonical">
-                  <div><b>Source / Evidence</b><span>{req.source.join(" · ")}</span></div>
+                  <div><b>01 · Source / Evidence</b><span>{req.source.join(" · ")}</span></div>
                   <i>→</i>
-                  <div><b>Fundamental Need</b><span>{method?.fundamentalNeed || "TBC"}</span></div>
+                  <div><b>02 · Fundamental Need</b><span>{method?.fundamentalNeed || "TBC"}</span></div>
                   <i>→</i>
-                  <div><b>Constraint / Context</b><span>{req.constraints.join("; ")}{method?.interfaceContext?.length ? " | "+method.interfaceContext.join(", ") : ""}</span></div>
+                  <div><b>03 · Constraint / Context</b><span>{req.constraints.join("; ")}{method?.interfaceContext?.length ? " | "+method.interfaceContext.join(", ") : ""}</span></div>
                   <i>→</i>
-                  <div><b>Engineering Input</b><span>{method?.engineeringInputs?.join(" · ") || "TBC"}</span></div>
+                  <div><b>04 · Engineering Input</b><span>{method?.engineeringInputs?.join(" · ") || "TBC"}</span></div>
                   <i>→</i>
-                  <div><b>CAL / Study / RPT → Proof</b><span>{req.proof.join(" · ")}</span></div>
+                  <div><b>05 · CAL / Study / RPT → Proof</b><span>{req.proof.join(" · ")}</span></div>
                   <i>→</i>
-                  <div><b>Architecture / Object / Qty</b><span>{method?.architecture || "TBC"} | {req.objects.join(", ")} | {method?.requiredMtoState || req.drives.join(", ")}</span></div>
+                  <div><b>06 · Architecture / Object / Qty</b><span>{method?.architecture || "TBC"} | {req.objects.join(", ")} | {method?.requiredMtoState || req.drives.join(", ")}</span></div>
                   <i>→</i>
-                  <div><b>Equation / Downstream Driver</b><span>{req.equations.join(" · ")} → {req.drives.join(", ")}</span></div>
+                  <div><b>07 · Equation / Downstream Driver</b><span>{req.equations.join(" · ")} → {req.drives.join(", ")}</span></div>
                 </div>
               </article>
             );
