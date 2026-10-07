@@ -41,6 +41,20 @@ JSON must not become a competing master state when canonical DB state exists.
 Deterministic engine / validation / reconciliation / selector / projection logic.
 Controlled JS fact snapshots are migration/fallback compatibility only while live DB state is unavailable.
 
+## 2.1 Executable code separation — Refactor 2026-10-07
+
+The derivation layer is now physically separated in code:
+
+- `CanonicalCommercialDerivationKernel.js` = COMMON / GENERIC reusable algorithms only.
+- `Project0550CanonicalDerivationEngine.js` = PJ2608-0550 PARTICULAR adapter / bindings only.
+- 7.1 and 7.0 continue to consume the existing project adapter API; UI behavior is not allowed to become a second calculation engine.
+
+The COMMON / GENERIC kernel owns only reusable semantics such as currency-normalised amount handling, internal-cost precedence, calculation-run state classification, and the standard commercial derivation trace.
+
+PJ2608-0550-specific facts remain outside the kernel, including commercial line/system mapping, source classification, controlled fallback audit facts, product/vendor selection and project evidence.
+
+This boundary is mandatory for future refactors: a new vendor quote, datasheet or system source must first update PARTICULAR state. It must not add a vendor/model/0550 line code directly into the COMMON / GENERIC kernel.
+
 ## 3. PARTICULAR vs COMMON / GENERIC
 
 A project Requirement Thread is PARTICULAR: it states what PJ2608-0550 must solve.
