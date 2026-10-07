@@ -31,6 +31,8 @@ import {
 } from "./Project0550CommercialModel";
 import {
   PROJECT0550_PAGA_SOURCE_CHAIN,
+  PROJECT0550_PAGA_CANONICAL_THREAD,
+  PROJECT0550_PAGA_METHOD_GROUPS,
   PROJECT0550_PAGA_REQUIREMENTS,
   PROJECT0550_PAGA_PARTICULAR_EQUATIONS,
   PROJECT0550_PAGA_DIRECT_SERVICE_MODEL,
@@ -313,8 +315,8 @@ function RequirementBasisView({code,trace}){
         <div className="ask-thread-banner">
           <div>
             <small>REQUIREMENT FOUNDATION · BIDIRECTIONAL TRACE</small>
-            <strong>Customer / Company Source → Requirement → Proof → Required Object → Equation → Cost / Commercial</strong>
-            <span>นี่คือฐานคิดของข้อ 2–7; Vendor BOM เป็น evidence ฝั่ง offered และไม่สามารถแทน required scope ได้.</span>
+            <strong>First Principles → Constraint-Based Engineering → Parametric Cost → Commercial / Release</strong>
+            <span>ลำดับคำนวณจริงอ้างอิง Engineering Doctrine fullChain เท่านั้น; Group View เป็นเพียงการจัดหน้าจอ. Vendor BOM เป็น offered evidence และไม่สามารถแทน Fundamental Need / Required MTO ได้.</span>
           </div>
           <div>
             <b>{summary.sources}</b><span>sources</span>
@@ -323,19 +325,48 @@ function RequirementBasisView({code,trace}){
           </div>
         </div>
 
+        <div className="ask-source-set-note">
+          <strong>Source Set — not contractual precedence</strong>
+          <span>MR / PHI / BOD / SPE / STD / DWG / Vendor evidence เป็น source families ที่ bind เข้าข้อกำหนด; ลำดับการอ่านหรือการวางการ์ดไม่ใช่ order of precedence เว้นแต่ contract ระบุ.</span>
+        </div>
         <div className="ask-thread-source-chain">
-          {PROJECT0550_PAGA_SOURCE_CHAIN.map((s,idx)=>(
-            <React.Fragment key={s.code}>
-              <div className={"ask-thread-source "+String(s.state).toLowerCase().replaceAll("_","-")}>
-                <small>{s.class}</small>
-                <strong>{s.code}</strong>
-                <span>{s.document}</span>
-                <em>{s.locator}</em>
-                <p>{s.role}</p>
-              </div>
-              {idx<PROJECT0550_PAGA_SOURCE_CHAIN.length-1 ? <i>→</i> : null}
-            </React.Fragment>
+          {PROJECT0550_PAGA_SOURCE_CHAIN.map((s)=>(
+            <div className={"ask-thread-source "+String(s.state).toLowerCase().replaceAll("_","-")} key={s.code}>
+              <small>{s.class}</small>
+              <strong>{s.code}</strong>
+              <span>{s.document}</span>
+              <em>{s.locator}</em>
+              <p>{s.role}</p>
+            </div>
           ))}
+        </div>
+
+        <div className="ask-method-spine">
+          <div className="ask-method-spine-head">
+            <small>CANONICAL METHOD SPINE · DO NOT REORDER</small>
+            <strong>Full First-Principles + CBE + Parametric Cost dependency chain</strong>
+            <span>{PROJECT0550_PAGA_CANONICAL_THREAD.length} controlled stages · UI groups below are presentation only</span>
+          </div>
+          <div className="ask-method-groups">
+            {PROJECT0550_PAGA_METHOD_GROUPS.map((group)=>(
+              <section key={group.id}>
+                <div className="ask-method-group-title">
+                  <b>{group.id}</b>
+                  <strong>{group.label}</strong>
+                </div>
+                <div className="ask-method-group-stages">
+                  {group.stages.map(stage=>(
+                    <div key={stage.id} className={"ask-method-stage "+String(stage.state).toLowerCase().replaceAll(" ","-").replaceAll("/","-")}>
+                      <code>{String(stage.order).padStart(2,"0")}</code>
+                      <strong>{stage.label}</strong>
+                      <span>{stage.state}</span>
+                      <small>{stage.detail}</small>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
         </div>
 
         <div className="ask-thread-requirements">
@@ -377,6 +408,10 @@ function RequirementBasisView({code,trace}){
           ))}
         </div>
 
+        <div className="ask-output-thread-note">
+          <b>Presentation groups only</b>
+          <span>ด้านล่างย่อ 25 canonical stages เป็นกลุ่มให้อ่านง่าย; computation/release dependency ยังใช้ fullChain เดิม.</span>
+        </div>
         <div className="ask-output-thread">
           {PROJECT0550_PAGA_OUTPUT_CHAIN.map((x,idx)=>(
             <React.Fragment key={x.step}>
