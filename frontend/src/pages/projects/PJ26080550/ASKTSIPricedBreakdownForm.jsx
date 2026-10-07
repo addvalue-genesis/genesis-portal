@@ -33,6 +33,7 @@ import {
   PROJECT0550_PAGA_SOURCE_CHAIN,
   PROJECT0550_PAGA_REQUIREMENTS,
   PROJECT0550_PAGA_PARTICULAR_EQUATIONS,
+  PROJECT0550_PAGA_DIRECT_SERVICE_MODEL,
   PROJECT0550_PAGA_OUTPUT_CHAIN,
   pagaRequirementSummary
 } from "./Project0550PagaDigitalThread";
@@ -451,6 +452,57 @@ function PagaCommercialComposition({audit,currency,eurThbFx,usdThbFx,cnyThbFx}){
   );
 }
 
+function PagaServiceAnalytics(){
+  const model=PROJECT0550_PAGA_DIRECT_SERVICE_MODEL;
+  const maxSell=Math.max(...model.rows.map(x=>x.baseSellThb),1);
+  const maxMh=Math.max(...model.rows.map(x=>x.mh),1);
+  return (
+    <div className="ask-service-analytics">
+      <div className="ask-service-analytics-head">
+        <div>
+          <small>PAGA DIRECT SERVICE / LABOR · CONTROLLED REV04</small>
+          <strong>ดู workload, internal labor cost และ base service sell แยกตามงาน</strong>
+          <span>{model.rule}</span>
+        </div>
+        <div>
+          <b>{model.totals.directMh.toLocaleString("en-US",{maximumFractionDigits:1})} MH</b><span>direct modeled workload</span>
+          <b>{money(model.totals.internalCostThb,"THB")}</b><span>internal direct labor cost</span>
+          <b>{money(model.totals.baseSellThb,"THB")}</b><span>base service sell before shared/common allocation</span>
+        </div>
+      </div>
+      <div className="ask-service-bars">
+        {model.rows.map(row=>(
+          <div key={row.code} className="ask-service-row">
+            <div className="ask-service-label">
+              <code>{row.code}</code>
+              <strong>{row.workObject}</strong>
+              <span>{row.category} · {row.role} · {row.commercialMap}</span>
+            </div>
+            <div className="ask-service-metric">
+              <small>Workload</small>
+              <div className="ask-service-track mh"><i style={{width:(row.mh/maxMh*100)+"%"}}></i></div>
+              <strong>{row.mh.toLocaleString("en-US",{maximumFractionDigits:1})} MH</strong>
+            </div>
+            <div className="ask-service-metric">
+              <small>Internal Cost</small>
+              <strong>{money(row.internalCostThb,"THB")}</strong>
+            </div>
+            <div className="ask-service-metric">
+              <small>Base Service Sell</small>
+              <div className="ask-service-track sell"><i style={{width:(row.baseSellThb/maxSell*100)+"%"}}></i></div>
+              <strong>{money(row.baseSellThb,"THB")}</strong>
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="ask-service-exclusions">
+        <b>Not forced into PAGA yet:</b>
+        <span>{model.exclusions.join(" · ")}</span>
+      </div>
+    </div>
+  );
+}
+
 function CommercialPortfolioView({lines,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const rows=PROJECT0550_COMMERCIAL_GROUPS.map(group=>{
     const line=rowValue(lines,group.lineCode);
@@ -700,13 +752,16 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                   <article><b>Commercial Rule</b><span>{trace.commercialRule}</span></article>
                 </div>
                 {code==="A1-05" ? (
-                  <PagaCommercialComposition
-                    audit={audit}
-                    currency={currency}
-                    eurThbFx={eurThbFx}
-                    usdThbFx={usdThbFx}
-                    cnyThbFx={cnyThbFx}
-                  />
+                  <>
+                    <PagaCommercialComposition
+                      audit={audit}
+                      currency={currency}
+                      eurThbFx={eurThbFx}
+                      usdThbFx={usdThbFx}
+                      cnyThbFx={cnyThbFx}
+                    />
+                    <PagaServiceAnalytics/>
+                  </>
                 ) : null}
                 {audit?.commercialPreview ? (
                   <div className="ask-price-ladder">
