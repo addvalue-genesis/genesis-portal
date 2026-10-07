@@ -12,6 +12,7 @@ import { convertFx } from "./Project0550FxControl";
 import { PROJECT0550_PAGA_DIRECT_SERVICE_MODEL } from "./Project0550PagaDigitalThread";
 import { PROJECT0550_PAGA_LIFECYCLE_PLAN } from "./Project0550LifecycleExecutionModel";
 import { PROJECT0550_PART_A_LEGACY_PROXY_RULE } from "./Project0550CommercialAllocationPolicy";
+import { priceLayersForLine } from "./Project0550PricingLayerModel";
 import {
   PROJECT0550_PAGA_BULK_ROWS,
   PROJECT0550_PAGA_BULK_SUMMARY
@@ -295,15 +296,23 @@ function InternalAnalysisRow({
     ? "CANONICAL COST-PRICE BINDINGS"
     : fallback.label;
 
-  const offer=fallbackOffer(line,audit,currency);
-  const offerValue=offer.finalValue;
-  const indicativeValue=offer.indicativeValue;
-  const spread=Number.isFinite(costValue)&&Number.isFinite(offerValue)
-    ? offerValue-costValue
-    : null;
+  const priceLayers=priceLayersForLine(group.lineCode,line,canonical.data?.priceLayers||[]);
+  const displayLayer=(layer)=>{
+    if(!layer || !Number.isFinite(Number(layer.amount))) return null;
+    const sourceCurrency=String(layer.currency||currency).toUpperCase();
+    return sourceCurrency===currency
+      ? Number(layer.amount)
+      : convertFx(Number(layer.amount),sourceCurrency,currency);
+  };
+  const sourceCostValue=displayLayer(priceLayers.SOURCE_COST);
+  const internalCostValue=displayLayer(priceLayers.INTERNAL_COST);
+  const workingSellValue=displayLayer(priceLayers.WORKING_SELL);
+  const releasedSellValue=displayLayer(priceLayers.RELEASED_SELL);
 
   const openItems=line?.openItems||[];
-  const status=offer.finalValue===null ? offer.state : (line?.state||"CONTROLLED");
+  const status=priceLayers.RELEASED_SELL?.state==="AUTHORISED"
+    ? "AUTHORISED CUSTOMER SELL"
+    : (line?.state||"HOLD / WORKING");
   const detailRows=bindings.length
     ? bindings.map(x=>({
         className:x.cost_category||"COST",
@@ -331,25 +340,24 @@ function InternalAnalysisRow({
           <small>{systems.map(x=>x.token).join(" · ")}</small>
         </span>
         <span className="ica-value">
-          <small>Cost / known basis</small>
-          <strong>{Number.isFinite(costValue)?money(costValue,currency):"TBC"}</strong>
-          <em>{costBasis}</em>
+          <small>Source / Vendor Cost</small>
+          <strong>{Number.isFinite(sourceCostValue)?money(sourceCostValue,currency):"TBC"}</strong>
+          <em>{priceLayers.SOURCE_COST?.state||"TBC"}</em>
         </span>
         <span className="ica-value">
-          <small>{Number.isFinite(offerValue)?"Controlled offer / sell":"Working / indicative sell"}</small>
-          <strong>{
-            Number.isFinite(offerValue)
-              ? money(offerValue,currency)
-              : Number.isFinite(indicativeValue)
-                ? money(indicativeValue,currency)
-                : "HOLD / TBC"
-          }</strong>
-          <em>{offer.label}</em>
+          <small>Internal Cost</small>
+          <strong>{Number.isFinite(internalCostValue)?money(internalCostValue,currency):Number.isFinite(costValue)?money(costValue,currency):"TBC"}</strong>
+          <em>{Number.isFinite(internalCostValue)?priceLayers.INTERNAL_COST?.state:(Number.isFinite(costValue)?"KNOWN PARTIAL COST · "+costBasis:"TBC")}</em>
         </span>
         <span className="ica-value">
-          <small>Visible spread</small>
-          <strong>{Number.isFinite(spread)?money(spread,currency):"—"}</strong>
-          <em>{Number.isFinite(spread)?"Not automatically profit":"Needs closed cost + sell"}</em>
+          <small>Working Sell</small>
+          <strong>{Number.isFinite(workingSellValue)?money(workingSellValue,currency):"TBC"}</strong>
+          <em>{priceLayers.WORKING_SELL?.state||"TBC"}</em>
+        </span>
+        <span className="ica-value">
+          <small>Released Customer Sell</small>
+          <strong>{Number.isFinite(releasedSellValue)?money(releasedSellValue,currency):"HOLD"}</strong>
+          <em>{priceLayers.RELEASED_SELL?.state||"HOLD"}</em>
         </span>
         <span className={"ica-state "+rowStateTone(status)}>{status}</span>
       </button>
@@ -483,8 +491,8 @@ export function InternalCostOfferAnalysis({
     <div className="ica-shell">
       <div className="ica-hero">
         <div>
-          <small>7.1 · INTERNAL COST / OFFER ANALYSIS · PROJECTION ONLY</small>
-          <h2>ดู Cost → Offer → Gap แบบบรรทัด และกด + / − เพื่อลงรายละเอียดต่อระบบ</h2>
+          <small>7.1 · INTERNAL COST / COMMERCIAL ANALYSIS · PROJECTION ONLY</small>
+          <h2>ดู Source Cost → Internal Cost → Working Sell → Released Sell แบบบรรทัด และกด + / − เพื่อลงรายละเอียดต่อระบบ</h2>
           <p>
             หน้านี้ไม่สร้างราคาใหม่และไม่สร้าง engineering logic ใหม่.
             ใช้ canonical DB/control state ชุดเดียวกับ 7.0; ถ้า DB ยังไม่พร้อมจะแสดง controlled code snapshot พร้อมสถานะให้เห็นชัด.
@@ -522,7 +530,7 @@ export function InternalCostOfferAnalysis({
         <div className="ica-outline">
           <div className="ica-columns">
             <span></span><span>Line</span><span>System / Group</span>
-            <span>Cost</span><span>Offer / Sell</span><span>Spread</span><span>State</span>
+            <span>Source Cost</span><span>Internal Cost</span><span>Working Sell</span><span>Released Sell</span><span>State</span>
           </div>
           {rows.map(({group,line})=>(
             <InternalAnalysisRow
