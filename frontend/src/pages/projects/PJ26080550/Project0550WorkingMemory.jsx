@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261007-09",
+  syncRevision: "SYNC-20261007-10",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -65,6 +65,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     pagaPilotAnalytics: "PAGA pilot now binds direct service/labor rows from Rev04 05_Service_Parametric + 07_VDRL: 432.5 direct MH, THB 259,450 internal direct labor cost, THB 937,078.55 base service sell before shared/common allocation. Shared survey/common pools and OEM site attendance remain separate until causally allocated/quoted.",
     singleSourceModuleRule: "No module owns independent project truth. 1.0 is overview projection; 2.0 writes approved commercial policy only; 3.0 is reusable method/equation engine; 4.0 is orchestrator/control; 5.0/6.0 are controlled projections/disposition views. True downstream output modules are 7.0/8.0/9.0/10.0, with 8.0/9.0 carrying their own closure/revision workflow while still linked to originating canonical requirements. Graphs/charts are projections only.",
     revisionPropagationRule: "A source revision (e.g. MR revision) is registered as a new document revision with supersession; create change event; traverse existing etm_trace_edges; mark affected requirement/proof/MTO/work/VDRL/cost/commercial/output objects REVIEW/RECALCULATE/REGENERATE/STALE; preserve history; issue a new output revision only after revalidation. No silent overwrite and no manual independent module refresh.",
+    internalAnalysisRule: "7.1 Internal Cost / Offer Analysis is a projection only. Default view is line-based +/- drilldown by 15 commercial groups mapped to 19 engineering systems. Cost reads etm_cost_price_bindings/etm_cost_items when live; offer/sell reads the same canonical price-schedule state as 7.0. Composite system allocation stays OPEN until a controlled causal driver exists. Graph view and source-confidence view reuse the same state; no independent analysis data is persisted.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
     jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
   },
