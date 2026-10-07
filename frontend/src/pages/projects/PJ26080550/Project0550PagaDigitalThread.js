@@ -1,3 +1,5 @@
+import { PROJECT0550_ENGINEERING_DOCTRINE } from "./Project0550EngineeringDoctrine";
+
 /*
 PJ2608-0550 — PAGA DIGITAL THREAD / REQUIREMENT BASIS PILOT
 
@@ -5,7 +7,11 @@ Purpose:
 Make the "Requirement" layer executable and reviewable, not merely prose.
 
 Professional method alignment:
-- Source requirement -> derived/allocated requirement -> proof/verification -> design object -> cost/commercial output.
+- Canonical method authority = PROJECT0550_ENGINEERING_DOCTRINE.fullChain.
+- First Principles resolves fundamental need before solution / quantity / price.
+- Constraint-Based Engineering resolves feasible context, inputs, proof, architecture and quantity.
+- Parametric Cost converts controlled quantity/work drivers into MH, material, lifecycle, risk and commercial outputs.
+- UI groups are presentation only; they must not reorder dependencies.
 - Maintain bidirectional traceability; do not let vendor BOM redefine the customer requirement.
 - COMMON/GENERIC equations are reused from GEQ registry.
 - PAGA-specific calculations / studies are PARTICULAR bindings.
@@ -87,6 +93,46 @@ export const PROJECT0550_PAGA_SOURCE_CHAIN = [
     state:"CONTROLLED_VENDOR_EVIDENCE"
   }
 ];
+
+export const PROJECT0550_PAGA_CANONICAL_STAGE_STATE = {
+  SOURCE_EVIDENCE:{state:"CONTROLLED",detail:"MR / PHI / BOD / SPE / STD + project drawings + selected vendor evidence are registered with authority/state."},
+  REQUIREMENT:{state:"CONTROLLED / PARTIAL",detail:"Source-backed PAGA requirement threads are explicit; remaining TBC inputs stay open."},
+  FUNDAMENTAL_NEED:{state:"CONTROLLED",detail:"People must receive intelligible public address / alarm indication and the system must integrate / be testable across the required lifecycle."},
+  CONSTRAINT:{state:"PARTIAL",detail:"Acoustic, loading, redundancy, Ex, topology, power, interface and responsibility constraints include open items."},
+  INTERFACE_CONTEXT:{state:"PARTIAL",detail:"Fire & Gas, PABX, Entertainment, building/location and vendor/EPC boundaries are identified but not all closed."},
+  ENGINEERING_INPUT:{state:"PARTIAL",detail:"Ambient noise, geometry, cable route/type, topology and autonomy inputs remain partly open."},
+  CAL_STUDY_RPT:{state:"OPEN",detail:"RPT-0005 and PAGA particular CAL/SDY objects must be completed / source-bound."},
+  PROOF:{state:"OPEN",detail:"Coverage, amplifier loading, loop/loss, autonomy and interface proof must pass before engineering release."},
+  ARCHITECTURE:{state:"PRELIMINARY",detail:"INDUSTRONIC architecture is offered evidence; final required architecture remains proof-driven."},
+  PHYSICAL_OBJECT:{state:"PRELIMINARY",detail:"Cabinet, amplifier, AP712, speaker, beacon, I/O, cable/bulk and accessories are known object families; final required set is not frozen."},
+  QUANTITY_DRIVER:{state:"PARTIAL",detail:"Coverage + load + topology + loss + redundancy + location/interface requirements drive required quantities."},
+  REQUIRED_MTO:{state:"TBC",detail:"Final required quantities remain TBC until proof/input chain closes."},
+  BULK:{state:"WORKING",detail:"Cable / JB / terminations / supports / glands / connectors are working/open by route and final quantity."},
+  VENDOR_RECONCILIATION:{state:"PARTIAL",detail:"INDUSTRONIC offered BOM can be reconciled, but offered quantity cannot substitute for required MTO."},
+  WORK_RESOURCE:{state:"WORKING",detail:"Direct PAGA engineering/FAT/SAT/training/VDRL workload model is bound; shared/common allocation remains controlled separately."},
+  DOCUMENT_QA:{state:"WORKING",detail:"Engineering / test / O&M VDRL lifecycle modeled; final deliverable applicability/revisions require closure."},
+  FAT_IFAT:{state:"WORKING",detail:"FAT/IFAT required; factory/vendor and retained ADDVALUE scope must avoid double count."},
+  LOGISTICS_REGULATORY:{state:"OPEN",detail:"FCA Germany onward logistics, import, AVL/type approval and responsibility remain open."},
+  SITE_READINESS:{state:"OPEN",detail:"Site access, interfaces, ambient/geometry/route inputs and readiness are not fully controlled."},
+  INSTALL_PRECOM:{state:"OPEN",detail:"Physical installation is separate C1 option while retained pre-commissioning support remains to be closed."},
+  SAT_COMMISSIONING:{state:"OPEN",detail:"Site OEM/ADVALUE SAT/integration/commissioning ownership and effort remain open."},
+  HANDOVER_WARRANTY:{state:"OPEN",detail:"Spares, O&M handover and warranty obligations remain partly open."},
+  COST_SCHEDULE_RISK:{state:"WORKING",detail:"Vendor cost + direct service cost known in part; open completion cost remains TBC and not zero."},
+  COMMERCIAL_TREATMENT:{state:"WORKING / HOLD",detail:"Indicative known-cost commercial preview is available; final customer sell is not released."},
+  RELEASE:{state:"BLOCKED",detail:"Mandatory upstream proof / quantity / lifecycle / commercial gates are not closed."}
+};
+
+export const PROJECT0550_PAGA_CANONICAL_THREAD = PROJECT0550_ENGINEERING_DOCTRINE.fullChain.map(([id,label],index)=>({
+  order:index+1,
+  id,
+  label,
+  ...(PROJECT0550_PAGA_CANONICAL_STAGE_STATE[id] || {state:"TBC",detail:"Stage not yet bound."})
+}));
+
+export const PROJECT0550_PAGA_METHOD_GROUPS = PROJECT0550_ENGINEERING_DOCTRINE.presentationGroups.map(group=>({
+  ...group,
+  stages:group.stages.map(stageId=>PROJECT0550_PAGA_CANONICAL_THREAD.find(x=>x.id===stageId)).filter(Boolean)
+}));
 
 export const PROJECT0550_PAGA_REQUIREMENTS = [
   {
@@ -262,15 +308,12 @@ export const PROJECT0550_PAGA_DIRECT_SERVICE_MODEL = {
   ]
 };
 
-export const PROJECT0550_PAGA_OUTPUT_CHAIN = [
-  {step:1,label:"Source requirement",output:"Controlled requirement / constraint register"},
-  {step:2,label:"Proof / Particular engineering",output:"CAL / SDY / RPT / source-conflict closure"},
-  {step:3,label:"Required physical objects",output:"Required MTO / topology / interface objects"},
-  {step:4,label:"Vendor reconciliation",output:"Matched / missing / excess / deviation / option"},
-  {step:5,label:"Work & lifecycle",output:"Engineering / VDRL / FAT / IFAT / SAT / commissioning workload"},
-  {step:6,label:"Cost object",output:"Material + bulk + service + logistics + spares + pass-through"},
-  {step:7,label:"Commercial output",output:"Controlled customer selling price / HOLD / option state"}
-];
+export const PROJECT0550_PAGA_OUTPUT_CHAIN = PROJECT0550_PAGA_METHOD_GROUPS.map((group,index)=>({
+  step:index+1,
+  label:group.label,
+  output:group.stages.map(x=>x.label).join(" → "),
+  canonicalStages:group.stages.map(x=>x.id)
+}));
 
 export function pagaRequirementSummary(){
   return {
