@@ -2534,7 +2534,8 @@
 .bid-shell .ask-line-table.requirements th:nth-child(4){width:190px}
 .bid-shell .ask-line-table.requirements th:nth-child(5){width:190px}
 .bid-shell .ask-line-table.requirements th:nth-child(6){width:250px}
-.bid-shell .ask-line-table.requirements th:nth-child(7){width:120px}
+.bid-shell .ask-line-table.requirements th:nth-child(7){width:230px}
+.bid-shell .ask-line-table.requirements th:nth-child(8){width:120px}
 .bid-shell .ask-line-table.equations th:nth-child(1){width:160px}
 .bid-shell .ask-line-table.equations th:nth-child(2){width:220px}
 .bid-shell .ask-line-table.equations th:nth-child(3){width:330px}
@@ -2900,4 +2901,23 @@
   .bid-shell .ica-vendor-summary{
     grid-template-columns:repeat(2,minmax(0,1fr));
   }
+}
+
+
+/* Rev19 — Smart Resolution column in requirement threads */
+.bid-shell .ask-line-table.requirements{
+  min-width:1450px;
+}
+.bid-shell .ask-line-table.requirements td:nth-child(7) strong{
+  display:block;
+  color:#315b7d;
+  font-size:10.5px;
+}
+.bid-shell .ask-line-table.requirements td:nth-child(7) small,
+.bid-shell .ask-line-table.requirements td:nth-child(7) span{
+  display:block;
+  margin-top:3px;
+  color:#6d7f90;
+  font-size:9.5px!important;
+  line-height:1.4;
 }
