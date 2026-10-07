@@ -20,17 +20,22 @@ export const PROJECT0550_CANONICAL_DOMAINS = [
   "DOCUMENT_REVISION",
   "EVIDENCE_ASSERTION",
   "REQUIREMENT",
+  "REQUIREMENT_RESOLUTION_RESEARCH",
+  "EQUATION_REGISTRY_BINDING",
   "CONSTRAINT_INTERFACE_CONTEXT",
   "ENGINEERING_INPUT",
   "CAL_STUDY_RPT_PROOF",
   "ARCHITECTURE_OBJECT_QUANTITY",
   "REQUIRED_MTO_BULK",
   "VENDOR_OFFER_RECONCILIATION",
+  "VENDOR_OFFER_ITEM_BINDING",
+  "VENDOR_OFFER_CONDITION",
   "WORK_RESOURCE_ACTIVITY",
   "VDRL_DOCUMENT_QA",
   "TEST_LIFECYCLE_LOGISTICS_REGULATORY",
   "COST_RISK_SCHEDULE",
   "COMMERCIAL_POLICY_TREATMENT",
+  "PRICE_LAYER_STATE",
   "BID_RESPONSE_DEVIATION",
   "OUTPUT_REVISION"
 ];
@@ -56,17 +61,17 @@ export const PROJECT0550_MODULE_CONTRACTS = {
     role:"ENGINE",
     writesCanonical:false,
     purpose:"Reusable First-Principles / CBE / Parametric methods and equations.",
-    reads:["EVIDENCE_ASSERTION","REQUIREMENT","CONSTRAINT_INTERFACE_CONTEXT","ENGINEERING_INPUT"],
+    reads:["EVIDENCE_ASSERTION","REQUIREMENT","EQUATION_REGISTRY_BINDING","CONSTRAINT_INTERFACE_CONTEXT","ENGINEERING_INPUT"],
     writes:[],
-    rule:"Method library defines how to derive; project facts stay outside the method definition."
+    rule:"Canonical equation truth is etm_equation_registry; requirement threads bind reusable equations/methods rather than copying or recreating them."
   },
   "4.0":{
     role:"ORCHESTRATOR",
     writesCanonical:true,
     purpose:"Evaluate canonical dependencies, blockers, stale state and release readiness.",
     reads:PROJECT0550_CANONICAL_DOMAINS.filter(x=>x!=="OUTPUT_REVISION"),
-    writes:["BID_RESPONSE_DEVIATION"],
-    rule:"May create findings/proposals/readiness/impact states; must not silently rewrite upstream facts."
+    writes:["REQUIREMENT_RESOLUTION_RESEARCH","BID_RESPONSE_DEVIATION"],
+    rule:"May create findings/research jobs/proposals/readiness/impact states; search internal evidence first, then external authority if needed. It must not silently rewrite upstream facts or auto-approve research."
   },
   "5.0":{
     role:"CONTROL_VIEW",
@@ -88,17 +93,17 @@ export const PROJECT0550_MODULE_CONTRACTS = {
     role:"OUTPUT",
     writesCanonical:false,
     purpose:"ASK-TSI priced breakdown renderer/export.",
-    reads:["REQUIRED_MTO_BULK","VENDOR_OFFER_RECONCILIATION","WORK_RESOURCE_ACTIVITY","VDRL_DOCUMENT_QA","TEST_LIFECYCLE_LOGISTICS_REGULATORY","COST_RISK_SCHEDULE","COMMERCIAL_POLICY_TREATMENT","OUTPUT_REVISION"],
+    reads:["REQUIRED_MTO_BULK","VENDOR_OFFER_RECONCILIATION","VENDOR_OFFER_CONDITION","WORK_RESOURCE_ACTIVITY","VDRL_DOCUMENT_QA","TEST_LIFECYCLE_LOGISTICS_REGULATORY","COST_RISK_SCHEDULE","COMMERCIAL_POLICY_TREATMENT","PRICE_LAYER_STATE","OUTPUT_REVISION"],
     writes:[],
-    rule:"No independent cost/price logic. Render mapped controlled price state only."
+    rule:"Customer price form consumes AUTHORISED RELEASED_SELL only. SOURCE_COST / INTERNAL_COST / WORKING_SELL remain internal and must never be substituted into 7.0."
   },
   "7.1":{
     role:"PROJECTION",
     writesCanonical:false,
     purpose:"Internal cost / commercial analysis, system drilldown and graphs.",
-    reads:["ARCHITECTURE_OBJECT_QUANTITY","REQUIRED_MTO_BULK","VENDOR_OFFER_RECONCILIATION","WORK_RESOURCE_ACTIVITY","VDRL_DOCUMENT_QA","TEST_LIFECYCLE_LOGISTICS_REGULATORY","COST_RISK_SCHEDULE","COMMERCIAL_POLICY_TREATMENT","OUTPUT_REVISION"],
+    reads:["ARCHITECTURE_OBJECT_QUANTITY","REQUIRED_MTO_BULK","VENDOR_OFFER_RECONCILIATION","VENDOR_OFFER_ITEM_BINDING","VENDOR_OFFER_CONDITION","WORK_RESOURCE_ACTIVITY","VDRL_DOCUMENT_QA","TEST_LIFECYCLE_LOGISTICS_REGULATORY","COST_RISK_SCHEDULE","COMMERCIAL_POLICY_TREATMENT","PRICE_LAYER_STATE","OUTPUT_REVISION"],
     writes:[],
-    rule:"Read the same canonical cost/price bindings as 7.0. Charts and outline rows are views only; no independent cost, price or allocation facts."
+    rule:"Internal management projection may show SOURCE_COST / INTERNAL_COST / WORKING_SELL / RELEASED_SELL side-by-side. It reads the same canonical layers as 7.0; charts and drilldowns are views only."
   },
   "8.0":{
     role:"OUTPUT",
