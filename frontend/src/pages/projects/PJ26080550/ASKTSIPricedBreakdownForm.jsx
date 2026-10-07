@@ -411,7 +411,7 @@ function PagaRequirementTraceTable({requirements}){
                         <tbody>
                           <tr><th>01 · Source / Evidence</th><td>{req.source.join(" · ")}</td></tr>
                           <tr><th>02 · Fundamental Need</th><td>{req.fundamentalNeed || "TBC"}</td></tr>
-                          <tr><th>03 · Constraint / Context</th><td>{req.constraints.join("; ")}{req.interfaceContext?.length ? " | "+method.interfaceContext.join(", ") : ""}</td></tr>
+                          <tr><th>03 · Constraint / Context</th><td>{req.constraints.join("; ")}{req.interfaceContext?.length ? " | "+req.interfaceContext.join(", ") : ""}</td></tr>
                           <tr><th>04 · Engineering Input</th><td>{req.engineeringInputs?.join(" · ") || "TBC"}</td></tr>
                           <tr><th>05 · CAL / Study / RPT → Proof</th><td>{req.proof.join(" · ")}</td></tr>
                           <tr><th>06 · Architecture / Object / Qty</th><td>{req.architecture || "TBC"} | {req.objects.join(", ")} | {req.requiredMtoState || req.drives.join(", ")}</td></tr>
