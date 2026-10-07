@@ -1298,6 +1298,7 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
   const aHold=hasOpenTotal(lines,aCodes,currency);
   const bHold=hasOpenTotal(lines,bCodes,currency);
   const evidenceGate=runProject0550EvidenceReasoning(undefined,{candidateLines:lines});
+  const customerReleaseMode=mode==="CUSTOMER_RELEASE_PROJECTION";
   const outputHold=aHold || bHold || evidenceGate.status==="BLOCKED";
 
   return (
@@ -1308,10 +1309,11 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
             <small>OUTPUT CONTRACT · {t.sourceFile} · {t.sheet}!{t.range}</small>
             <h2>ASK-TSI Priced Breakdown List</h2>
           </div>
-          <Status state={mode==="INTERNAL"?"CONTROLLED INTERNAL VIEW":"CUSTOMER FORM VIEW"}/>
+          <Status state={mode==="INTERNAL"?"CONTROLLED INTERNAL VIEW":customerReleaseMode?"RELEASED SELL ONLY":"CUSTOMER FORM VIEW"}/>
         </div>
         <p>
           Form นี้รับค่าจาก controlled engineering / cost / commercial model.
+          {customerReleaseMode ? " Customer projection ใช้เฉพาะ RELEASED_SELL ที่ได้รับอนุมัติ; Source Cost / Internal Cost / Working Sell จะไม่ถูกนำมาแทนช่องราคาขาย." : ""}
           ช่องว่าง/TBC ต้องคงสถานะไว้และห้ามถูกแปลงเป็นศูนย์โดยอัตโนมัติ.
           หน้าจอเป็น rich working view; customer export ยังคงรูปแบบ ASK-TSI ต้นฉบับ.
         </p>
@@ -1390,7 +1392,7 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
               <tr className="ask-total-row">
                 <td colSpan="5"><strong>Part A Known Customer-Priced Portion</strong><small>Vendor-cost-only / unreleased selling lines such as open PAGA are excluded</small></td>
                 <td></td>
-                <td><strong>{money(aKnown,currency)}</strong></td>
+                <td><strong>{aHold ? "HOLD / TBC" : money(aKnown,currency)}</strong></td>
                 <td>{aHold ? <Status state="PART A TOTAL = HOLD"/> : <Status state="PART A TOTAL READY"/>}</td>
               </tr>
 
@@ -1432,7 +1434,7 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
               <tr className="ask-total-row">
                 <td colSpan="5"><strong>Part B Known Customer-Priced Portion</strong><small>Known numeric portions are included; open/TBC remainder keeps Part B on HOLD</small></td>
                 <td></td>
-                <td><strong>{money(bKnown,currency)}</strong></td>
+                <td><strong>{bHold ? "HOLD / TBC" : money(bKnown,currency)}</strong></td>
                 <td>{bHold ? <Status state="PART B TOTAL = HOLD"/> : <Status state="PART B TOTAL READY"/>}</td>
               </tr>
               <tr className="ask-base-total">
@@ -1453,9 +1455,11 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                       <td>{description}</td>
                       <td>
                         {line.tagNo || ""}
-                        <button type="button" className="ask-trace-btn" onClick={()=>toggleTrace(code)}>
-                          {traceCode===code ? "Close trace" : "Trace price"}
-                        </button>
+                        {mode==="INTERNAL" ? (
+                          <button type="button" className="ask-trace-btn" onClick={()=>toggleTrace(code)}>
+                            {traceCode===code ? "Close trace" : "Trace price"}
+                          </button>
+                        ) : null}
                       </td>
                       <td>{line.qty ?? "1 lot"}</td>
                       <td>{line.unit || ""}</td>
@@ -1468,9 +1472,9 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
                 );
               })}
               <tr className="ask-option-total">
-                <td colSpan="5"><strong>Part C Known Options Subtotal</strong><small>For reference only; not included in Base Offer automatically.</small></td>
+                <td colSpan="5"><strong>Part C Released Options Subtotal</strong><small>Only authorised option sell values are shown in customer release projection.</small></td>
                 <td></td>
-                <td><strong>{money(cKnown,currency)}</strong></td>
+                <td><strong>{hasOpenTotal(lines,cCodes,currency) ? "HOLD / TBC" : money(cKnown,currency)}</strong></td>
                 <td><Status state="OPTIONS / SEPARATE"/></td>
               </tr>
               <tr><td colSpan="8"><strong>Remark:</strong> {t.sourceRemarks.FINAL}</td></tr>
