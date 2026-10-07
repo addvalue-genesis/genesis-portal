@@ -506,6 +506,86 @@ function PartBDerivationView({currency}){
   );
 }
 
+function DerivationArchitectureView({canonical}){
+  const state=canonical?.data?.derivationState;
+  const summary=state?.summary||{};
+  const rows=[
+    ["01","Source / Evidence","etm_documents / etm_evidence / assertions","MR / PHI / BOD / SPE / STD / DWG / TC / Quote / Datasheet","Source revision is preserved; new evidence never overwrites released downstream truth silently."],
+    ["02","Particular Canonical State","Requirement / Product / MTO / Bulk / Work / Vendor Condition","Project/system-specific facts and working state","New quote/datasheet enters PARTICULAR state first."],
+    ["03","Common / Generic Method","etm_equation_registry","Reusable equations, algorithms and cost families","Method is referenced by binding; it is not copied into each system."],
+    ["04","Particular Binding","etm_equation_bindings",summary.equationBindings??"TBC","Requirement/input/proof binds the reusable method to 0550."],
+    ["05","Derivation / Reconciliation","etm_calculation_runs",summary.currentCalculationRuns??"TBC","Engine records input/output snapshot and stale/recompute state; React does not own the math."],
+    ["06","Canonical Product Identity","etm_products + offer-item product binding",summary.canonicalProducts??"TBC","Same OEM model from different sellers maps to one product identity; price/terms remain offer-specific."],
+    ["07","Cost / Price State","cost items + cost-price bindings + four price layers","SOURCE_COST → INTERNAL_COST → WORKING_SELL → RELEASED_SELL","TBC/HOLD never becomes zero. Working Sell is not Released Sell."],
+    ["08","7.1 Management Workbench","Projection of canonical derivation state","Analysis / trace / reconciliation / management review","7.1 may trigger/process through the engine but does not create a second truth dataset."],
+    ["09","7.0 ASK-TSI","Customer-form projection","Working Preview / Released Customer Output","Working Preview consumes current controlled working state; customer release consumes AUTHORISED RELEASED_SELL only."]
+  ];
+  return (
+    <div className="ica-architecture">
+      <div className="ica-subhead">
+        <strong>{PROJECT0550_DERIVATION_ARCHITECTURE.id}</strong>
+        <span>{state?.architectureStatus||"CONTROLLED FALLBACK / DB MIGRATION 016 NOT YET CONFIRMED"}</span>
+      </div>
+
+      <div className="ica-architecture-summary">
+        <div><small>Equation bindings</small><strong>{summary.equationBindings??"TBC"}</strong></div>
+        <div><small>Current derivation runs</small><strong>{summary.currentCalculationRuns??"TBC"}</strong></div>
+        <div><small>Stale runs</small><strong>{summary.staleRuns??"TBC"}</strong></div>
+        <div><small>Canonical products</small><strong>{summary.canonicalProducts??"TBC"}</strong></div>
+        <div><small>Product-bound offer items</small><strong>{summary.productBoundOfferItems??"TBC"}</strong></div>
+        <div><small>Method promotion candidates</small><strong>{summary.methodPromotionCandidates??"TBC"}</strong></div>
+      </div>
+
+      <div className="ica-table-wrap">
+        <table className="ica-architecture-table">
+          <thead><tr><th>No.</th><th>Layer</th><th>Canonical Owner</th><th>Current Role / State</th><th>Control Rule</th></tr></thead>
+          <tbody>
+            {rows.map(row=>(
+              <tr key={row[0]}>
+                <td className="num">{row[0]}</td>
+                <td><strong>{row[1]}</strong></td>
+                <td><code>{row[2]}</code></td>
+                <td>{row[3]}</td>
+                <td>{row[4]}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="ica-promotion-rule">
+        <strong>New vendor quote / datasheet / system evidence</strong>
+        <span>Evidence → PARTICULAR object/capability → dependency impact → re-run affected bindings. A reusable finding becomes COMMON/GENERIC only through a REVIEW_REQUIRED promotion proposal and a new controlled method version.</span>
+      </div>
+
+      {state?.productOfferItems?.length ? (
+        <div className="ica-product-map">
+          <div className="ica-subhead">
+            <strong>Canonical Product ↔ Offer Item Mapping</strong>
+            <span>Technical identity is shared; commercial offer remains vendor/quotation-specific</span>
+          </div>
+          <div className="ica-table-wrap">
+            <table>
+              <thead><tr><th>Product</th><th>Manufacturer / Model</th><th>Selling Vendor / Offer</th><th>Offer Item</th><th>Commercial Binding</th></tr></thead>
+              <tbody>
+                {state.productOfferItems.slice(0,40).map((row,idx)=>(
+                  <tr key={(row.vendor_offer_item_id||idx)+"-"+(row.binding_code||"")}>
+                    <td><code>{row.product_code}</code><strong>{row.product_name}</strong></td>
+                    <td>{row.manufacturer_name||"TBC"}<small>{row.canonical_model||row.manufacturer_part_no||"Model TBC"}</small></td>
+                    <td>{row.selling_vendor_name||"TBC"}<small>{row.offer_code} · {row.offer_currency||""}</small></td>
+                    <td>{row.item_no||"—"} · {row.offer_description}</td>
+                    <td>{row.line_code||"TBC"} · {row.system_code||"TBC"}<small>{row.binding_state||"TBC"}</small></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 function InternalAnalysisRow({
   group,
   line,
@@ -726,11 +806,11 @@ export function InternalCostOfferAnalysis({
     <div className="ica-shell">
       <div className="ica-hero">
         <div>
-          <small>7.1 · INTERNAL COST / COMMERCIAL ANALYSIS · PROJECTION ONLY</small>
-          <h2>ดู Source Cost → Internal Cost → Working Sell → Released Sell แบบบรรทัด และกด + / − เพื่อลงรายละเอียดต่อระบบ</h2>
+          <small>7.1 · INTERNAL COST / COMMERCIAL ANALYSIS · MANAGEMENT DERIVATION WORKBENCH</small>
+          <h2>พื้นที่วิเคราะห์/ประมวลผลก่อนส่งผลไป 7.0 · Source Cost → Internal Cost → Working Sell → Released Sell</h2>
           <p>
-            หน้านี้ไม่สร้างราคาใหม่และไม่สร้าง engineering logic ใหม่.
-            ใช้ canonical DB/control state ชุดเดียวกับ 7.0; ถ้า DB ยังไม่พร้อมจะแสดง controlled code snapshot พร้อมสถานะให้เห็นชัด.
+            React หน้านี้ไม่เป็นเจ้าของสูตรหรือ project truth. 7.1 เรียกใช้ Canonical Derivation Engine ซึ่ง bind Particular 0550 data เข้ากับ COMMON/GENERIC method,
+            แล้วแสดงผล/trace/reconciliation สำหรับ management review. 7.0 เป็น downstream form projection ของ state เดียวกัน.
           </p>
         </div>
         <div className="ica-origin">
@@ -749,6 +829,7 @@ export function InternalCostOfferAnalysis({
       <div className="ica-toolbar">
         <div>
           <button className={view==="OUTLINE"?"active":""} onClick={()=>setView("OUTLINE")}>Outline / + −</button>
+          <button className={view==="DERIVATION"?"active":""} onClick={()=>setView("DERIVATION")}>Derivation Spine</button>
           <button className={view==="CHART"?"active":""} onClick={()=>setView("CHART")}>Graph</button>
           <button className={view==="PART_B"?"active":""} onClick={()=>setView("PART_B")}>Part B / Equation Trace</button>
           <button className={view==="SOURCE"?"active":""} onClick={()=>setView("SOURCE")}>Source / Output Control</button>
@@ -781,6 +862,8 @@ export function InternalCostOfferAnalysis({
           ))}
         </div>
       ) : null}
+
+      {view==="DERIVATION" ? <DerivationArchitectureView canonical={canonical}/> : null}
 
       {view==="CHART" ? (
         <CommercialPortfolioView
