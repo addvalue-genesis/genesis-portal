@@ -59,6 +59,26 @@ A finding may only be promoted to COMMON / GENERIC through:
 
 No vendor datasheet or project-specific fact may silently mutate a generic method used by other systems/projects.
 
+## 3.1 Source / evidence ingestion
+
+Controlled evidence packets now distinguish source classes including:
+- governing project source,
+- company standard,
+- OEM datasheet,
+- vendor technical submission,
+- vendor quotation,
+- project calculation,
+- international standard,
+- recognised research,
+- historical calibration/reference,
+- explicit assumption.
+
+Assertion domains include PRODUCT_IDENTITY, PRODUCT_CAPABILITY, VENDOR_CONDITION and METHOD_CANDIDATE in addition to requirement/quantity/proof/cost/commercial domains.
+
+After migration 016, evidence assertions may bind directly to canonical product_id and a target object reference. Unknown product codes remain review items; ingestion does not auto-create or silently map a product.
+
+METHOD_CANDIDATE or reusableMethodCandidate stays a PARTICULAR proposal until reviewed. Promotion to COMMON/GENERIC requires a new controlled method/equation version.
+
 ## 4. Canonical product identity
 
 Migration 016 adds:
