@@ -135,6 +135,23 @@ try {
       ORDER BY c.id
     ",[$projectId]);
 
+    $costPriceBindings=etm_fetch_all($db,"
+      SELECT
+        b.binding_code,b.allocation_basis,b.allocated_quantity,b.allocated_amount,
+        b.currency binding_currency,b.binding_state,b.note_text,
+        c.id cost_item_id,c.cost_code,c.cost_category,c.description cost_description,
+        c.quantity cost_quantity,c.unit cost_unit,c.unit_cost,c.currency cost_currency,
+        c.amount cost_amount,c.cost_status,
+        psi.id price_line_id,psi.line_code,psi.description price_line_description,
+        s.system_code,s.system_name
+      FROM etm_cost_price_bindings b
+      JOIN etm_cost_items c ON c.id=b.cost_item_id
+      JOIN etm_bid_price_schedule_items psi ON psi.id=b.bid_price_schedule_item_id
+      LEFT JOIN etm_systems s ON s.id=c.system_id
+      WHERE b.project_id=?
+      ORDER BY psi.line_code,c.cost_category,c.id
+    ",[$projectId]);
+
     $openChanges=etm_fetch_all($db,"
       SELECT id,change_code,source_object_type,source_object_id,source_document_id,
              previous_revision,new_revision,change_type,change_summary,event_status,created_at
@@ -205,6 +222,7 @@ try {
       'priceLines'=>$priceLines,
       'vdrl'=>$vdrl,
       'costItems'=>$costItems,
+      'costPriceBindings'=>$costPriceBindings,
       'submissionItems'=>$submissionItems,
       'priceDecision'=>$priceDecision,
       'acceptedConditions'=>$acceptedConditions,
