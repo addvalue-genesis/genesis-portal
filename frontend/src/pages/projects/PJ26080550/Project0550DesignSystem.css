@@ -2969,3 +2969,246 @@
     min-width:0;
   }
 }
+
+
+/* Rev21 — generic system-scope + grouped bulk ruled tables.
+   Presentation only; canonical objects remain unchanged. */
+
+/* Fix 7.1 header grid: 8 visible columns after toggle/id/system. */
+.bid-shell .ica-columns,
+.bid-shell .ica-row-head{
+  grid-template-columns:
+    34px
+    70px
+    minmax(240px,1.35fr)
+    minmax(150px,.8fr)
+    minmax(150px,.8fr)
+    minmax(150px,.8fr)
+    minmax(165px,.85fr)
+    minmax(150px,.75fr)!important;
+  gap:8px;
+}
+.bid-shell .ica-row{
+  overflow:visible;
+}
+.bid-shell .ica-row-head{
+  overflow:visible;
+}
+.bid-shell .ica-state{
+  position:static!important;
+  max-width:150px;
+  overflow-wrap:anywhere;
+}
+
+/* Generic/PAGA scope hierarchy table */
+.bid-shell .ica-scope-hierarchy{
+  border:1px solid #d6e0e8;
+  border-radius:8px;
+  overflow:hidden;
+  background:#fff;
+}
+.bid-shell .ica-scope-table{
+  width:100%;
+  min-width:1250px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.bid-shell .ica-scope-table th,
+.bid-shell .ica-scope-table td{
+  border-right:1px solid #d0dbe3;
+  border-bottom:1px solid #dce4ea;
+  padding:8px 9px;
+  text-align:left;
+  vertical-align:top;
+  color:#465e72;
+  font-size:10.5px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.bid-shell .ica-scope-table th:last-child,
+.bid-shell .ica-scope-table td:last-child{border-right:0}
+.bid-shell .ica-scope-table tbody tr:last-child td{border-bottom:0}
+.bid-shell .ica-scope-table thead th{
+  background:#eaf2f7;
+  color:#2e5676;
+  font-size:9.3px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.bid-shell .ica-scope-table tbody tr:nth-child(even){background:#fbfcfd}
+.bid-shell .ica-scope-table th:nth-child(1){width:65px}
+.bid-shell .ica-scope-table th:nth-child(2){width:280px}
+.bid-shell .ica-scope-table th:nth-child(3){width:300px}
+.bid-shell .ica-scope-table th:nth-child(4){width:190px}
+.bid-shell .ica-scope-table th:nth-child(5){width:auto}
+.bid-shell .ica-scope-table td.num{
+  text-align:center;
+  font-weight:900;
+  color:#315d80;
+}
+.bid-shell .ica-scope-table td strong{
+  display:block;
+  color:#284f6f;
+  font-size:10.8px;
+}
+.bid-shell .ica-scope-table td code{
+  display:block;
+  margin-top:2px;
+  color:#738596;
+  font-size:9px!important;
+}
+
+/* Bulk grouped table */
+.bid-shell .ica-bulk .ica-table-wrap{
+  border-top:1px solid #dce5ec;
+}
+.bid-shell .ica-bulk-table,
+.bid-shell .ica-reclass-table{
+  width:100%;
+  min-width:1280px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.bid-shell .ica-bulk-table th,
+.bid-shell .ica-bulk-table td,
+.bid-shell .ica-reclass-table th,
+.bid-shell .ica-reclass-table td{
+  border-right:1px solid #d1dbe3;
+  border-bottom:1px solid #dde5eb;
+  padding:8px 9px;
+  text-align:left;
+  vertical-align:top;
+  color:#465e72;
+  font-size:10.4px;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+}
+.bid-shell .ica-bulk-table th:last-child,
+.bid-shell .ica-bulk-table td:last-child,
+.bid-shell .ica-reclass-table th:last-child,
+.bid-shell .ica-reclass-table td:last-child{border-right:0}
+.bid-shell .ica-bulk-table thead th,
+.bid-shell .ica-reclass-table thead th{
+  background:#eaf2f7;
+  color:#2e5676;
+  font-size:9.2px;
+  font-weight:900;
+  text-transform:uppercase;
+}
+.bid-shell .ica-bulk-table th:nth-child(1){width:42px}
+.bid-shell .ica-bulk-table th:nth-child(2){width:65px}
+.bid-shell .ica-bulk-table th:nth-child(3){width:330px}
+.bid-shell .ica-bulk-table th:nth-child(4){width:190px}
+.bid-shell .ica-bulk-table th:nth-child(5){width:210px}
+.bid-shell .ica-bulk-table th:nth-child(6){width:260px}
+.bid-shell .ica-bulk-table th:nth-child(7){width:230px}
+.bid-shell .ica-bulk-table td strong,
+.bid-shell .ica-reclass-table td strong{
+  display:block;
+  color:#2d506d;
+  font-size:10.7px;
+}
+.bid-shell .ica-bulk-table td small{
+  display:block;
+  margin-top:2px;
+  color:#718394;
+  font-size:9.2px!important;
+}
+.bid-shell .ica-bulk-table td code,
+.bid-shell .ica-reclass-table td code{
+  font-size:9.3px!important;
+  color:#315d80;
+}
+.bid-shell .ica-group-row td{
+  padding:7px 9px!important;
+  background:#f2f7fa!important;
+  border-top:2px solid #9fb5c6;
+  color:#244e70;
+}
+.bid-shell .ica-group-row td strong{
+  display:inline-block;
+  margin-right:10px;
+  color:#244e70;
+  font-size:10.8px;
+}
+.bid-shell .ica-group-row td span{
+  color:#718394;
+  font-size:9.3px;
+}
+.bid-shell .ica-table-toggle{
+  display:flex;
+  width:24px;
+  height:24px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #98aebf;
+  border-radius:4px;
+  background:#fff;
+  color:#173e61;
+  font-size:15px;
+  font-weight:900;
+  cursor:pointer;
+}
+.bid-shell .ica-bulk-table tr.is-open td{
+  background:#eef5fa;
+}
+.bid-shell .ica-expanded-row>td{
+  padding:0!important;
+  background:#fafcfd!important;
+}
+.bid-shell .ica-detail-subtable{
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.bid-shell .ica-detail-subtable th,
+.bid-shell .ica-detail-subtable td{
+  padding:8px 10px;
+  border-right:1px solid #dde5eb;
+  border-bottom:1px solid #e3e9ee;
+  font-size:10.3px;
+  line-height:1.45;
+}
+.bid-shell .ica-detail-subtable th{
+  width:245px;
+  background:#f2f6f9;
+  color:#315b7d;
+  font-size:9.5px;
+  font-weight:900;
+}
+.bid-shell .ica-detail-subtable tr:last-child th,
+.bid-shell .ica-detail-subtable tr:last-child td{border-bottom:0}
+.bid-shell .ica-reclass-table th:nth-child(1){width:100px}
+.bid-shell .ica-reclass-table th:nth-child(2){width:320px}
+.bid-shell .ica-reclass-table th:nth-child(3){width:250px}
+.bid-shell .ica-reclass-table th:nth-child(4){width:auto}
+.bid-shell .ica-reclass-table tbody tr{
+  background:#fffaf0;
+}
+
+/* Consistent font floor for internal analysis tables */
+.bid-shell .ica-control-table,
+.bid-shell .ica-scope-table,
+.bid-shell .ica-bulk-table,
+.bid-shell .ica-reclass-table,
+.bid-shell .ica-detail-subtable{
+  font-family:inherit;
+}
+.bid-shell .ica-control-table td,
+.bid-shell .ica-scope-table td,
+.bid-shell .ica-bulk-table td,
+.bid-shell .ica-reclass-table td,
+.bid-shell .ica-detail-subtable td{
+  font-size:10.5px!important;
+}
+
+@media(max-width:1300px){
+  .bid-shell .ica-columns,
+  .bid-shell .ica-row-head{
+    grid-template-columns:
+      34px 60px minmax(220px,1.25fr)
+      minmax(135px,.75fr) minmax(135px,.75fr)
+      minmax(135px,.75fr) minmax(150px,.8fr)
+      minmax(140px,.7fr)!important;
+  }
+}
