@@ -2,31 +2,31 @@ import { PROJECT0550_SYSTEMS } from "./Project0550SystemRegistry";
 import { moduleContract } from "./Project0550ModuleContract";
 
 const BASE_MODULES = [
-  { id:"1.0", key:"overview", title:"Bid Overview", parent:null, kind:"KNOWLEDGE", authority:"SYSTEM_RESOLUTION", purpose:"Understand the bid, source pack, obligations and required outputs." },
+  { id:"1.0", key:"overview", title:"Bid Overview", parent:null, kind:"PROJECTION", authority:"SYSTEM_RESOLUTION", purpose:"Read-only summary projection of the current canonical bid state; no independent project truth." },
   { id:"1.1", key:"bid-input", title:"Bid Input Pack", parent:"1.0", kind:"SOURCE", authority:"SYSTEM_RESOLUTION", purpose:"Controlled source groups and document authority." },
   { id:"1.2", key:"bid-output", title:"Required Submission Outputs", parent:"1.0", kind:"OUTPUT", authority:"SYSTEM_RESOLUTION", purpose:"What the customer must receive." },
   { id:"1.3", key:"bid-logic", title:"Requirement-to-Submission Logic", parent:"1.0", kind:"KNOWLEDGE", authority:"SYSTEM_RESOLUTION", purpose:"Connect source, need, response, work, deviation and submission." },
 
-  { id:"2.0", key:"strategy", title:"Executive Commercial Strategy", parent:null, kind:"EXECUTIVE", authority:"EXECUTIVE_DECISION", purpose:"Profit policy, risk appetite, target return, bid position and offer authorization." },
+  { id:"2.0", key:"strategy", title:"Executive Commercial Strategy", parent:null, kind:"POLICY", authority:"EXECUTIVE_DECISION", purpose:"Human-approved commercial policy/authority applied to canonical cost truth; no duplicate cost model." },
   { id:"2.1", key:"commercial-basis", title:"Commercial Basis", parent:"2.0", kind:"COMMERCIAL", authority:"SYSTEM_RESOLUTION", purpose:"Incoterm, tax, payment, warranty and scope basis from documents." },
   { id:"2.2", key:"cost-truth", title:"Cost Truth", parent:"2.0", kind:"COMMERCIAL", authority:"SYSTEM_RESOLUTION", purpose:"Controlled project cost and economic exposure." },
   { id:"2.3", key:"risk-finance", title:"Risk & Financing", parent:"2.0", kind:"COMMERCIAL", authority:"SYSTEM_RESOLUTION", purpose:"Cash carry, accepted conditions and residual exposure." },
   { id:"2.4", key:"profit-policy", title:"Profit Policy", parent:"2.0", kind:"EXECUTIVE", authority:"EXECUTIVE_DECISION", purpose:"Margin/markup/partner layer, minimum and target return." },
   { id:"2.5", key:"authorised-offer", title:"Authorised Offer", parent:"2.0", kind:"EXECUTIVE", authority:"EXECUTIVE_DECISION", purpose:"Strategic price position and final authorization." },
 
-  { id:"3.0", key:"model", title:"First Principles / Constraint / Parametric Model", parent:null, kind:"KNOWLEDGE", authority:"SYSTEM_RESOLUTION", purpose:"Execute the controlled method: Source/Requirement → Need/Constraint → Proof → Required Quantity/Work → Parametric Cost → Release." },
+  { id:"3.0", key:"model", title:"First Principles / Constraint / Parametric Model", parent:null, kind:"ENGINE", authority:"SYSTEM_RESOLUTION", purpose:"Reusable method/equation engine; project facts remain in canonical controlled state." },
   { id:"3.1", key:"evidence-chain", title:"Evidence Chain", parent:"3.0", kind:"SOURCE", authority:"SYSTEM_RESOLUTION", purpose:"Source → requirement → fundamental need → interpretation → answer." },
   { id:"3.2", key:"technical-proof", title:"Technical Proof Tools", parent:"3.0", kind:"TECHNICAL", authority:"SYSTEM_RESOLUTION", purpose:"CAL/SDY/RPT/equations only where proof is actually needed." },
   { id:"3.3", key:"method-library", title:"Reusable Method Library", parent:"3.0", kind:"METHOD", authority:"SYSTEM_RESOLUTION", purpose:"Controlled reusable methods without importing project facts." },
 
-  { id:"4.0", key:"control", title:"Smart Engineering Control Spine", parent:null, kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"Algorithmically evaluate evidence, constraints, proof gates, quantity/vendor gaps, lifecycle, cost completeness and release readiness." },
+  { id:"4.0", key:"control", title:"Smart Engineering Control Spine", parent:null, kind:"ORCHESTRATOR", authority:"SYSTEM_RESOLUTION", purpose:"Evaluate canonical dependencies, stale state, blockers and release readiness; create findings/proposals, not duplicate facts." },
 
-  { id:"5.0", key:"form", title:"Bid Form Tracker", parent:null, kind:"OUTPUT", authority:"SYSTEM_RESOLUTION", purpose:"Customer response form control." },
-  { id:"6.0", key:"scope", title:"Scope / Compliance", parent:null, kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"Resolve obligations and compliance from governing sources." },
-  { id:"7.0", key:"price", title:"ASK-TSI Priced Breakdown", parent:null, kind:"COMMERCIAL", authority:"SYSTEM_RESOLUTION", purpose:"Generate/map the controlled engineering and commercial result into ASK-TSI Priced Breakdown List.xlsx form structure." },
-  { id:"8.0", key:"deviation", title:"Deviation Control", parent:null, kind:"DEVIATION", authority:"MIXED", purpose:"Technical/commercial deviation after evidence-based resolution is exhausted." },
-  { id:"9.0", key:"vdrl", title:"VDRL / Document Production", parent:null, kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"Document obligation, workload, revision and issue control." },
-  { id:"10.0", key:"submission", title:"Submission Outputs", parent:null, kind:"OUTPUT", authority:"SYSTEM_RESOLUTION", purpose:"Ready-to-submit controlled bid package." },
+  { id:"5.0", key:"form", title:"Bid Form Tracker", parent:null, kind:"CONTROL_VIEW", authority:"SYSTEM_RESOLUTION", purpose:"Projection of canonical requirement/response state; only response/disposition state is editable." },
+  { id:"6.0", key:"scope", title:"Scope / Compliance", parent:null, kind:"CONTROL_VIEW", authority:"SYSTEM_RESOLUTION", purpose:"Compliance/disposition projection over canonical requirements/evidence; no independent scope list." },
+  { id:"7.0", key:"price", title:"ASK-TSI Priced Breakdown", parent:null, kind:"OUTPUT", authority:"SYSTEM_RESOLUTION", purpose:"Generated price output from canonical cost/commercial state; no independent pricing logic." },
+  { id:"8.0", key:"deviation", title:"Deviation Control", parent:null, kind:"OUTPUT_CONTROL", authority:"MIXED", purpose:"Exception/deviation output and closure workflow linked to canonical originating requirements." },
+  { id:"9.0", key:"vdrl", title:"VDRL / Document Production", parent:null, kind:"OUTPUT_CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"Derived document obligation/workload/revision control; source requirement remains canonical." },
+  { id:"10.0", key:"submission", title:"Submission Outputs", parent:null, kind:"OUTPUT", authority:"SYSTEM_RESOLUTION", purpose:"Assemble released output revisions into the controlled submission package; no new truth is created here." },
   { id:"11.0", key:"access", title:"Team Access / Governance", parent:null, kind:"GOVERNANCE", authority:"EXECUTIVE_POLICY", purpose:"Access, roles, permissions and governance policy." },
 
   { id:"12.0", key:"systems", title:"System Engineering — 19 Systems", parent:null, kind:"TECHNICAL", authority:"SYSTEM_RESOLUTION", purpose:"Per-system evidence-controlled engineering using the GDrive 19-System Master as the internal sequence and RFQ documents as governing evidence." },
