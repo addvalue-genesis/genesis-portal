@@ -87,19 +87,21 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
       "AP712 additional access panel +1 = EUR 3,210.00",
       "XBC beacon control module = EUR 2,014.00",
       "Known selected cost subtotal = EUR 231,678.05",
-      "Remaining A1 goods completion = bulk / accessories / goods-compliance OPEN; logistics, site service, startup spares, capital spares and 2Y spares are routed to B/C lines"
+      "Vendor package already includes Documentation/PM, Special Tools and factory FAT 3 days; remaining direct A1 goods completion = bulk / accessories / goods-compliance OPEN. ADDVALUE retained work stays in Part B; site OEM commissioning is not quoted."
     ],
     buildUp:[
       {priceClass:"CURRENT VENDOR QUOTE",item:"INDUSTRONIC base net offer",qty:"1 lot",amount:226454.05,currency:"EUR"},
       {priceClass:"CONTROLLED REQUIREMENT ADDITION",item:"AP712 additional access panel +1",qty:"1",unitPrice:3210.00,amount:3210.00,currency:"EUR"},
       {priceClass:"CONTROLLED REQUIREMENT ADDITION",item:"XBC beacon control module",qty:"1",unitPrice:2014.00,amount:2014.00,currency:"EUR"},
       {priceClass:"KNOWN SELECTED COST",item:"Known selected vendor subtotal",qty:"",amount:231678.05,currency:"EUR"},
+      {priceClass:"VENDOR PACKAGE SERVICE · INCLUDED",item:"INDUSTRONIC Documentation & Project Management",qty:"1 lot",amount:16000,currency:"EUR",note:"Included in vendor package; do not recreate the same OEM work in Part B. ADDVALUE B1 work remains a separate retained work object."},
+      {priceClass:"VENDOR PACKAGE SERVICE · INCLUDED",item:"INDUSTRONIC FAT at Wertheim, Germany",qty:"3 day",unitPrice:1020,amount:3060,currency:"EUR",note:"OEM executes FAT; up to 3 purchaser/end-user attendees. ADDVALUE FAT lead/witness/travel is separate retained B4 work."},
       {priceClass:"OPEN A1 GOODS COMPLETION",item:"Directly attributable PAGA bulk / accessories / goods-compliance closure",qty:"",amountText:"TBC — Part A goods only",currency:"EUR"},
-      {priceClass:"ROUTED TO B2",item:"FCA Germany onward transportation / freight / logistics",qty:"",amountText:"TBC — Part B2",currency:"EUR"},
-      {priceClass:"ROUTED TO B4",item:"OEM site specialist assistance / SAT / commissioning attendance",qty:"",amountText:"TBC — Part B4",currency:"EUR"},
-      {priceClass:"ROUTED TO B5",item:"Startup / pre-commissioning / commissioning spares",qty:"",amountText:"TBC — Part B5",currency:"EUR"},
-      {priceClass:"ROUTED TO C2",item:"10-year capital spares",qty:"",amountText:"TBC — Part C2",currency:"EUR"},
-      {priceClass:"ROUTED TO C3",item:"2-year normal operation spares",qty:"",amountText:"TBC — Part C3",currency:"EUR"},
+      {priceClass:"SEPARATE PROJECT LOGISTICS",item:"FCA Germany onward transportation / freight / logistics",qty:"",amountText:"TBC — B2/project logistics",currency:"EUR"},
+      {priceClass:"SITE OEM SERVICE · NOT QUOTED",item:"INDUSTRONIC authorised site commissioning / support",qty:"",amountText:"TBC — separate service quote required",currency:"EUR",note:"Current offer states commissioning should be by INDUSTRONIC authorised personnel; no site rate is quoted."},
+      {priceClass:"SEPARATE LIFECYCLE ITEM",item:"Startup / pre-commissioning / commissioning spares",qty:"",amountText:"TBC — B5",currency:"EUR"},
+      {priceClass:"SEPARATE OPTION",item:"10-year capital spares",qty:"",amountText:"TBC — C2",currency:"EUR"},
+      {priceClass:"SEPARATE OPTION",item:"2-year normal operation spares",qty:"",amountText:"TBC — C3",currency:"EUR"},
       {priceClass:"WORKING COMMERCIAL PREVIEW",item:"Known selected cost × 1.20 / 0.95",qty:"",amount:292645.96,currency:"EUR",note:"Indicative sell on KNOWN selected cost only; excludes all open completion cost and is NOT the final customer sell."},
       {priceClass:"FINAL CUSTOMER SELL",item:"Released PAGA selling price",qty:"",amountText:"HOLD",currency:"EUR",note:"Release only after open lifecycle/scope cost and commercial gates are closed."}
     ],
@@ -110,9 +112,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
       formula:"Known selected cost × 1.20 / 0.95",
       indicativeKnownCostSellEur:292645.96,
       status:"INDICATIVE ONLY / FINAL SELL HOLD",
-      openCompletion:["A1 goods bulk/accessories/compliance","B2 logistics","B4 OEM site service","B5 startup/commissioning spares","C2 10Y capital spares","C3 2Y operation spares"]
+      openCompletion:["A1 goods bulk/accessories/compliance","B2 logistics","site OEM commissioning/service quote","B5 startup/commissioning spares","C2 10Y capital spares","C3 2Y operation spares"]
     },
-    action:"Close PAGA proof and A1 goods completion; route logistics to B2, site/OEM assistance to B4, startup spares to B5, 10Y capital spares to C2 and 2Y operation spares to C3. ADDVALUE labor must stay in Part B."
+    action:"Keep quoted INDUSTRONIC FAT inside the selected vendor package unless management explicitly remaps it. Do not duplicate that OEM FAT cost in B4. Price ADDVALUE FAT lead/witness/travel as separate B4 retained work; ADDVALUE then covers retained Pre-Com/SAT activities. Obtain separate INDUSTRONIC authorised site commissioning terms because current offer has no site rate and warns that independent commissioning may affect warranty."
   },
   "A1-06":{
     vendor:"HIKVISION / PROJECT-APPROVED EQUIVALENT — CURRENT PROJECT QUOTE NOT FOUND",
