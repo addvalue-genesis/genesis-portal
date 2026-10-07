@@ -300,7 +300,11 @@ export function evaluateProject0550SmartState(records,options={}){
   const evidence = runProject0550EvidenceReasoning();
   const blockers = portfolio.summary.blockers + evidence.summary.blockers;
   const warnings = portfolio.summary.warnings + evidence.summary.warnings;
-  const resolution = buildProject0550ResolutionPlan(portfolio.findings,{
+  const resolutionFindings=[
+    ...portfolio.findings,
+    ...(evidence.findings||[]).map(f=>({...f,stage:f.stage||"SOURCE_EVIDENCE"}))
+  ];
+  const resolution = buildProject0550ResolutionPlan(resolutionFindings,{
     systemToken:options.systemToken||null,
     requirementCode:options.requirementCode||null,
     searchHints:options.searchHints||[]
