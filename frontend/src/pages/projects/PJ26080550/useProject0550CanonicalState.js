@@ -17,10 +17,12 @@ export function useProject0550CanonicalState(){
         let bulkMto=[];
         let priceLayers=[];
         let vendorOfferControl=null;
-        const [bulkResult,priceLayerResult,vendorOfferResult]=await Promise.allSettled([
+        let derivationState=null;
+        const [bulkResult,priceLayerResult,vendorOfferResult,derivationResult]=await Promise.allSettled([
           fetch("/backend/api/etm/bulk-state.php?project=PJ2608-0550&system=TEL-PAGA").then(async r=>r.ok?await r.json():null),
           fetch("/backend/api/etm/pricing-layers.php?project=PJ2608-0550").then(async r=>r.ok?await r.json():null),
-          fetch("/backend/api/etm/vendor-offer-control.php?project=PJ2608-0550&system=PAGA").then(async r=>r.ok?await r.json():null)
+          fetch("/backend/api/etm/vendor-offer-control.php?project=PJ2608-0550&system=PAGA").then(async r=>r.ok?await r.json():null),
+          fetch("/backend/api/etm/derivation-state.php?project=PJ2608-0550").then(async r=>r.ok?await r.json():null)
         ]);
         if(bulkResult.status==="fulfilled" && bulkResult.value?.ok && Array.isArray(bulkResult.value.rows)){
           bulkMto=bulkResult.value.rows;
@@ -31,8 +33,11 @@ export function useProject0550CanonicalState(){
         if(vendorOfferResult.status==="fulfilled" && vendorOfferResult.value?.ok){
           vendorOfferControl=vendorOfferResult.value;
         }
+        if(derivationResult.status==="fulfilled" && derivationResult.value?.ok){
+          derivationState=derivationResult.value;
+        }
         if(active){
-          setData({...payload,bulkMto,priceLayers,vendorOfferControl});
+          setData({...payload,bulkMto,priceLayers,vendorOfferControl,derivationState});
           setStatus("LIVE_DB");
           setError(null);
         }
