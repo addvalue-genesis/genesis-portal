@@ -218,9 +218,35 @@ export function BidWorkspace() {
 }
 
 function Overview() {
+  const canonical=useProject0550CanonicalState();
+  const sourceGroups=useMemo(()=>{
+    if(!canonical.data?.sourceGroups?.length) return SOURCE_GROUPS;
+    const docs=canonical.data.sourceDocuments||[];
+    return canonical.data.sourceGroups.map(g=>({
+      key:g.group_code,
+      title:g.group_name,
+      detail:g.source_domain,
+      status:g.status,
+      items:docs.filter(d=>Number(d.source_group_id)===Number(g.id)).map(d=>d.source_title)
+    }));
+  },[canonical.data]);
+  const outputs=useMemo(()=>{
+    if(!canonical.data?.submissionItems?.length) return OUTPUTS;
+    return canonical.data.submissionItems.map(x=>[
+      x.submission_code,
+      x.title,
+      x.source_template || x.submission_type,
+      x.readiness_status
+    ]);
+  },[canonical.data]);
   return (
     <div className="bid-stack">
       <Project0550WorkingMemoryPanel />
+      <div className="bid-canonical-state-banner">
+        <strong>{canonical.isLive ? "LIVE DB BID OVERVIEW PROJECTION" : "CONTROLLED FALLBACK PREVIEW"}</strong>
+        <span>1.0 summarizes canonical source, requirement and submission state. It does not own a separate bid dataset.</span>
+        {canonical.data?.openChanges?.length ? <em>{canonical.data.openChanges.length} open source/revision impact event(s)</em> : null}
+      </div>
       <section className="bid-panel">
         <div className="bid-panel-head">
           <div>
@@ -230,7 +256,7 @@ function Overview() {
           <span className="bid-chip">4 SOURCE GROUPS</span>
         </div>
         <div className="bid-source-grid">
-          {SOURCE_GROUPS.map((g) => (
+          {sourceGroups.map((g) => (
             <article key={g.key} className="bid-source-card">
               <div className="bid-source-top">
                 <strong>{g.title}</strong>
@@ -252,7 +278,7 @@ function Overview() {
           <span className="bid-chip">SUBMISSION CONTROL</span>
         </div>
         <div className="bid-output-grid">
-          {OUTPUTS.map(([code, title, basis, state]) => (
+          {outputs.map(([code, title, basis, state]) => (
             <div key={code} className="bid-output-card">
               <b>{code}</b>
               <h3>{title}</h3>
