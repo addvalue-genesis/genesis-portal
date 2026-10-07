@@ -81,8 +81,8 @@ export function overlayControlledPriceLines(fallbackLines={},livePriceLineMap={}
     const unitPriceByCurrency={...(prior.unitPriceByCurrency||{})};
     const subtotalByCurrency={...(prior.subtotalByCurrency||{})};
 
-    const unitRate=Number(row.unit_rate);
-    const amount=Number(row.amount);
+    const unitRate=row.unit_rate===null||row.unit_rate===undefined||row.unit_rate==="" ? null : Number(row.unit_rate);
+    const amount=row.amount===null||row.amount===undefined||row.amount==="" ? null : Number(row.amount);
     if(Number.isFinite(unitRate)) unitPriceByCurrency[currency]=unitRate;
     if(Number.isFinite(amount)) subtotalByCurrency[currency]=amount;
 
