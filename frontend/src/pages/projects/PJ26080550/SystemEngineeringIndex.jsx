@@ -1,6 +1,10 @@
 import React, { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { PROJECT0550_SYSTEMS } from "./Project0550SystemRegistry";
+import {
+  PROJECT0550_SYSTEM_SCOPE_GROUPS,
+  project0550SystemScopeSkeleton
+} from "./Project0550SystemScopeTaxonomy";
 import "./SystemEngineeringIndex.css";
 
 const UI_GROUPS = [
@@ -70,9 +74,45 @@ function SystemCard({s}){
         <span>{s.workbook}</span>
         {s.no===7
           ? <Link to="/projects/pj2608-0550/paga">Open 12.7 PAGA →</Link>
-          : <span className="sys-future">Same architecture · not yet expanded</span>}
+          : <span className="sys-future">Common x.1–x.7 architecture active · detailed evidence binding in progress</span>}
       </footer>
     </article>
+  );
+}
+
+function SystemScopeTable({system}){
+  const rows=project0550SystemScopeSkeleton(system.token);
+  return (
+    <section className="sys-scope-focus">
+      <div className="sys-scope-head">
+        <div>
+          <small>{system.moduleId} · {system.token} · SYSTEM SCOPE STRUCTURE</small>
+          <h3>หัวข้องานมาตรฐานของระบบนี้</h3>
+        </div>
+        <span>{system.state}</span>
+      </div>
+      <div className="sys-scope-table-wrap">
+        <table className="sys-scope-table focused">
+          <thead>
+            <tr><th>No.</th><th>Scope Group</th><th>Commercial Route</th><th>Current State</th><th>Meaning</th></tr>
+          </thead>
+          <tbody>
+            {rows.map(row=>(
+              <tr key={row.code}>
+                <td className="num">{row.order}</td>
+                <td><strong>{row.title}</strong><code>{row.code}</code></td>
+                <td>{row.commercialRoute}</td>
+                <td><State text={row.state}/></td>
+                <td>{row.purpose}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="sys-scope-note">
+        ตารางนี้ไม่สร้าง scope ใหม่. ทุกแถวเป็น projection category เดียวกันสำหรับ 19 ระบบ; เมื่อ canonical Requirement / MTO / Vendor / Work / Cost ถูก bind แล้ว state และจำนวนรายการของแต่ละระบบจะเปลี่ยนตามข้อมูลจริง.
+      </p>
+    </section>
   );
 }
 
@@ -155,6 +195,7 @@ export function SystemEngineeringIndex(){
             <button type="button" onClick={()=>setSelectedSystem("ALL")}>← Back to all systems</button>
           </div>
           <SystemCard s={selected}/>
+          <SystemScopeTable system={selected}/>
         </section>
       ) : (
         <div className="sys-group-list">
@@ -191,6 +232,34 @@ export function SystemEngineeringIndex(){
           })}
         </div>
       )}
+
+      <section className="sys-scope-master">
+        <div className="sys-scope-head">
+          <div>
+            <small>COMMON SYSTEM SCOPE TAXONOMY · ALL 19 SYSTEMS</small>
+            <h2>ทุกระบบใช้หัวข้อควบคุมเดียวกัน — ข้อมูลจริงของแต่ละระบบ bind จาก canonical state</h2>
+          </div>
+          <span>TABLE VIEW · PRESENTATION ONLY</span>
+        </div>
+        <div className="sys-scope-table-wrap">
+          <table className="sys-scope-table">
+            <thead>
+              <tr><th>No.</th><th>Scope Group</th><th>Customer / Commercial Route</th><th>Canonical Domains</th><th>Purpose / Control Rule</th></tr>
+            </thead>
+            <tbody>
+              {PROJECT0550_SYSTEM_SCOPE_GROUPS.map(row=>(
+                <tr key={row.code}>
+                  <td className="num">{row.order}</td>
+                  <td><strong>{row.title}</strong><code>{row.code}</code></td>
+                  <td>{row.commercialRoute}</td>
+                  <td>{row.canonicalDomains.join(" · ")}</td>
+                  <td>{row.purpose}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <section className="sys-pattern">
         <small>COMMON SUB-MODULE PATTERN</small>
