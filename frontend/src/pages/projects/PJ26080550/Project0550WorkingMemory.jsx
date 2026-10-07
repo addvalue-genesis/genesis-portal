@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261007-12",
+  syncRevision: "SYNC-20261007-13",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -68,6 +68,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     internalAnalysisRule: "7.1 Internal Cost / Offer Analysis is a projection only. Default view is line-based +/- drilldown by 15 commercial groups mapped to 19 engineering systems. Cost reads etm_cost_price_bindings/etm_cost_items when live; offer/sell reads the same canonical price-schedule state as 7.0. Composite system allocation stays OPEN until a controlled causal driver exists. Graph view and source-confidence view reuse the same state; no independent analysis data is persisted.",
     partABAllocationRule: "ASK-TSI Part A may contain selected vendor/OEM package cost including vendor labor/service if management keeps that service inside the vendor package. ADDVALUE labor/professional work must not be buried in A1 and normally maps to Part B/C. A vendor service may alternatively be exposed separately in B/C, but one service cost may exist in only one customer-price location. Complementary roles are separate work objects, e.g. OEM executes FAT while ADDVALUE leads/witnesses/close-outs.",
     pagaLifecycleResponsibility: "A20261632 explicitly quotes INDUSTRONIC FAT at Wertheim, Germany: 3 days × EUR 1,020/day = EUR 3,060, OEM executes FAT/TPI and up to 3 purchaser/end-user persons may attend; purchaser/end-user travel/accommodation are excluded. No site service rate is quoted. The offer states commissioning should be performed by INDUSTRONIC authorised personnel and independent commissioning may affect warranty. Current pilot therefore uses HYBRID FAT (OEM execute + ADDVALUE lead/witness/travel/closeout), ADDVALUE retained Pre-Com/SAT, and keeps OEM-authorised site commissioning as a separate TBC/quote/authorisation gate.",
+    serviceBulkArchitecture: "Part B is derived from source-backed lifecycle/service obligations, not a standalone labor table. B1-B9 use MR/PHI/BOD/SPE/STD/Contract/TC/vendor evidence according to domain. Bulk is modeled now as a canonical required-MTO/material class: system-dedicated bulk remains attached to the system; shared/common bulk remains a common pool until causal allocation. Commercially, system bulk normally rolls into the applicable A1 line because the customer form expects bulk materials with the system package, while installation labor maps C1, logistics B2, startup spares B5, tools B6, capital spares C2 and 2Y operating spares C3. No /19 allocation by default.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
     jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
   },
@@ -81,6 +82,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     "Project0550CommercialModel.js",
     "Project0550CommercialAllocationPolicy.js",
     "Project0550LifecycleExecutionModel.js",
+    "Project0550ServiceBulkPolicy.js",
     "Project0550ModuleContract.js",
     "Project0550RevisionImpactModel.js",
     "Project0550PagaDigitalThread.js",
