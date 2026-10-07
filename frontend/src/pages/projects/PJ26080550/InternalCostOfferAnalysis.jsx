@@ -16,7 +16,9 @@ import { PROJECT0550_PART_A_LEGACY_PROXY_RULE } from "./Project0550CommercialAll
 import { priceLayersForLine } from "./Project0550PricingLayerModel";
 import {
   PROJECT0550_PAGA_BULK_ROWS,
-  PROJECT0550_PAGA_BULK_SUMMARY
+  PROJECT0550_PAGA_BULK_SUMMARY,
+  PROJECT0550_PAGA_ANALYSIS_GROUPS,
+  pagaBulkDisplayGroup
 } from "./Project0550PagaBulkModel";
 
 function money(value,currency="USD"){
@@ -131,7 +133,48 @@ function parseMeta(value){
   try{return JSON.parse(value);}catch{return {};}
 }
 
+function PagaScopeHierarchyTable({canonical}){
+  const liveRows=canonical?.data?.bulkMto||[];
+  const sourceRows=liveRows.length ? liveRows : PROJECT0550_PAGA_BULK_ROWS;
+  const vendorItems=canonical?.data?.vendorOfferControl?.items||[];
+  const serviceRows=PROJECT0550_PAGA_DIRECT_SERVICE_MODEL.rows||[];
+  const counts={
+    MAIN_EQUIPMENT:vendorItems.length || (vendorOfferForPriceLine("A1-05")?.vendorItems||[]).length,
+    BULK_MATERIAL:sourceRows.filter(x=>["BULK","ACCESSORY"].includes(x.object_class||x.objectClass)).length,
+    SYSTEM_COMPLETION:sourceRows.filter(x=>(x.object_class||x.objectClass)==="ACCESSORY").length,
+    ENGINEERING_DOCUMENTS:serviceRows.filter(x=>String(x.commercialMap||"").includes("B1")).length + PROJECT0550_PAGA_BULK_ROWS.filter(x=>x.id==="B23").length,
+    FIELD_LIFECYCLE:serviceRows.filter(x=>String(x.commercialMap||"").includes("B4")).length + PROJECT0550_PAGA_LIFECYCLE_PLAN.length,
+    INSTALLATION:PROJECT0550_PAGA_BULK_ROWS.filter(x=>String(x.installRoute||"").includes("C1")).length,
+    COMMERCIAL_SUMMARY:1
+  };
+  return (
+    <div className="ica-scope-hierarchy">
+      <div className="ica-subhead">
+        <strong>PAGA system scope hierarchy · same taxonomy used by all 19 systems</strong>
+        <span>Table is a projection/index only; canonical Requirement / MTO / Work / Cost objects remain the source of truth</span>
+      </div>
+      <div className="ica-table-wrap">
+        <table className="ica-scope-table">
+          <thead><tr><th>No.</th><th>Scope Group</th><th>Commercial Route</th><th>Current Content</th><th>Control Meaning</th></tr></thead>
+          <tbody>
+            {PROJECT0550_PAGA_ANALYSIS_GROUPS.map(group=>(
+              <tr key={group.code}>
+                <td className="num">{group.order}</td>
+                <td><strong>{group.title}</strong><code>{group.code}</code></td>
+                <td><strong>{group.commercialRoute}</strong></td>
+                <td>{counts[group.code] ? counts[group.code]+" controlled/working object(s)" : "TBC / no system-specific object bound yet"}</td>
+                <td>{group.purpose}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function PagaBulkMtoView({canonical}){
+  const [openRows,setOpenRows]=useState(()=>new Set());
   const liveRows=canonical?.data?.bulkMto||[];
   const materialSnapshot=PROJECT0550_PAGA_BULK_ROWS.filter(x=>x.objectClass!=="SERVICE");
   const serviceSnapshot=PROJECT0550_PAGA_BULK_ROWS.filter(x=>x.objectClass==="SERVICE");
@@ -157,60 +200,99 @@ function PagaBulkMtoView({canonical}){
       })
     : materialSnapshot.map(r=>({...r,requiredQty:null,source:"CONTROLLED SOURCE SNAPSHOT"}));
 
+  const grouped=useMemo(()=>{
+    const map=new Map();
+    for(const row of rows){
+      const g=pagaBulkDisplayGroup(row);
+      if(!map.has(g.code)) map.set(g.code,{...g,rows:[]});
+      map.get(g.code).rows.push(row);
+    }
+    return [...map.values()].sort((a,b)=>String(a.order).localeCompare(String(b.order),undefined,{numeric:true}));
+  },[rows]);
+
+  function toggleRow(id){
+    setOpenRows(current=>{
+      const next=new Set(current);
+      if(next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+
   return (
     <div className="ica-bulk">
       <div className="ica-subhead">
-        <strong>PAGA Bulk / MTO · Engineering object first, commercial roll-up second</strong>
-        <span>{liveRows.length ? "LIVE DB canonical MTO" : PROJECT0550_PAGA_BULK_SOURCE_LABEL} · required qty is not released unless explicitly controlled</span>
+        <strong>02 · Bulk / Material — grouped engineering MTO</strong>
+        <span>{liveRows.length ? "LIVE DB canonical MTO" : PROJECT0550_PAGA_BULK_SOURCE_LABEL} · Ref/scenario qty is not released order qty</span>
       </div>
 
       <div className="ica-bulk-summary">
         <div><b>{PROJECT0550_PAGA_BULK_SUMMARY.materialAccessoryRows}</b><span>material/accessory source rows</span></div>
-        <div><b>{PROJECT0550_PAGA_BULK_SUMMARY.serviceRows}</b><span>service rows reclassified out of bulk</span></div>
+        <div><b>{PROJECT0550_PAGA_BULK_SUMMARY.serviceRows}</b><span>source rows reclassified out of bulk</span></div>
         <div><b>{PROJECT0550_PAGA_BULK_SUMMARY.releasedQuantityRows}</b><span>released order-quantity rows in source pilot</span></div>
       </div>
 
-      <div className="ica-bulk-columns">
-        <span></span><span>ID</span><span>Bulk / material object</span><span>Qty basis</span><span>Engineering ownership</span><span>Commercial route</span>
+      <div className="ica-table-wrap">
+        <table className="ica-bulk-table">
+          <thead>
+            <tr><th></th><th>Ref</th><th>Bulk / Material Object</th><th>Qty Basis</th><th>Engineering Ownership</th><th>A/B/C Commercial Route</th><th>Installation / Work Route</th></tr>
+          </thead>
+          <tbody>
+            {grouped.map(group=>(
+              <React.Fragment key={group.code}>
+                <tr className="ica-group-row">
+                  <td colSpan="7"><strong>{group.order} · {group.title}</strong><span>{group.rows.length} row(s)</span></td>
+                </tr>
+                {group.rows.map(row=>{
+                  const isOpen=openRows.has(row.id);
+                  return (
+                    <React.Fragment key={row.id}>
+                      <tr className={isOpen?"is-open":""}>
+                        <td><button type="button" className="ica-table-toggle" onClick={()=>toggleRow(row.id)}>{isOpen?"−":"+"}</button></td>
+                        <td><code>{row.id}</code></td>
+                        <td><strong>{row.item}</strong><small>{row.family||row.objectClass}</small></td>
+                        <td><strong>{row.requiredQty!==null && row.requiredQty!==undefined ? row.requiredQty+" "+(row.unit||"") : row.refQty!==null && row.refQty!==undefined ? "Ref "+row.refQty+" "+(row.unit||"") : "TBC"}</strong><small>{row.qtyState}</small></td>
+                        <td><strong>{row.ownership}</strong><small>{row.source}</small></td>
+                        <td><strong>{row.route}</strong></td>
+                        <td>{row.installRoute||"TBC"}</td>
+                      </tr>
+                      {isOpen ? (
+                        <tr className="ica-expanded-row">
+                          <td></td>
+                          <td colSpan="6">
+                            <table className="ica-detail-subtable">
+                              <tbody>
+                                <tr><th>Specification / object class</th><td>{row.spec||row.objectClass||"TBC"}</td></tr>
+                                <tr><th>Quantity / evidence basis</th><td>{row.basis||"TBC"}</td></tr>
+                                <tr><th>Installation linkage</th><td>{row.labour||row.installRoute||"TBC"}</td></tr>
+                                <tr><th>Control</th><td>Material quantity remains separate from C1 installation labor and B2 logistics. Vendor inclusion must be reconciled before adding cost.</td></tr>
+                              </tbody>
+                            </table>
+                          </td>
+                        </tr>
+                      ) : null}
+                    </React.Fragment>
+                  );
+                })}
+              </React.Fragment>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      <div className="ica-bulk-lines">
-        {rows.map(row=>(
-          <details key={row.id} className="ica-bulk-line">
-            <summary>
-              <span className="ica-bulk-toggle"></span>
-              <code>{row.id}</code>
-              <span className="ica-bulk-name"><strong>{row.item}</strong><small>{row.family||row.objectClass}</small></span>
-              <span className="ica-bulk-qty">
-                <strong>{row.requiredQty!==null && row.requiredQty!==undefined ? row.requiredQty+" "+(row.unit||"") : row.refQty!==null && row.refQty!==undefined ? "Ref "+row.refQty+" "+(row.unit||"") : "TBC"}</strong>
-                <small>{row.qtyState}</small>
-              </span>
-              <span className="ica-bulk-owner"><strong>{row.ownership}</strong><small>{row.source}</small></span>
-              <span className="ica-bulk-route"><strong>{row.route}</strong><small>{row.installRoute}</small></span>
-            </summary>
-            <div className="ica-bulk-detail">
-              <div><b>Specification / object class</b><span>{row.spec||row.objectClass||"TBC"}</span></div>
-              <div><b>Quantity / evidence basis</b><span>{row.basis||"TBC"}</span></div>
-              <div><b>Installation linkage</b><span>{row.labour||row.installRoute||"TBC"}</span></div>
-              <div><b>Control</b><span>Material quantity remains separate from C1 installation labor and B2 logistics. Vendor inclusion must be reconciled before adding cost.</span></div>
-            </div>
-          </details>
-        ))}
-      </div>
-
-      <div className="ica-bulk-service-routing">
-        <div className="ica-subhead">
-          <strong>Rows found in the bulk pilot that are NOT bulk material</strong>
-          <span>Reclassified to the correct service/commercial work object to avoid double count</span>
-        </div>
-        {serviceSnapshot.map(row=>(
-          <div key={row.id}>
-            <code>{row.id}</code>
-            <strong>{row.item}</strong>
-            <span>{row.route}</span>
-            <em>{row.basis}</em>
-          </div>
-        ))}
+      <div className="ica-table-wrap">
+        <table className="ica-reclass-table">
+          <thead><tr><th>Source Ref</th><th>Not-Bulk Source Row</th><th>Correct Commercial Route</th><th>Reason / Basis</th></tr></thead>
+          <tbody>
+            {serviceSnapshot.map(row=>(
+              <tr key={row.id}>
+                <td><code>{row.id}</code></td>
+                <td><strong>{row.item}</strong></td>
+                <td><strong>{row.route}</strong></td>
+                <td>{row.basis}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
@@ -520,6 +602,7 @@ function InternalAnalysisRow({
 
           {group.lineCode==="A1-05" ? (
             <>
+              <PagaScopeHierarchyTable canonical={canonical}/>
               <PagaVendorOfferControlView canonical={canonical} currency={currency}/>
               <PagaBulkMtoView canonical={canonical}/>
               <PagaLifecycleResponsibilityView currency={currency}/>
