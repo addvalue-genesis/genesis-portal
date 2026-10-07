@@ -11,6 +11,7 @@ import { Project0550WorkingMemoryPanel, PROJECT0550_TEAM_WORKING_MEMORY } from "
 import { ASKTSIPricedBreakdownForm } from "./ASKTSIPricedBreakdownForm";
 import { PROJECT0550_PRICING_BASELINE } from "./Project0550PricingBaseline";
 import { summarizeProject0550PriceSources } from "./Project0550PriceSourceModel";
+import { useProject0550CanonicalState, overlayControlledPriceLines } from "./useProject0550CanonicalState";
 
 const SOURCE_GROUPS = [
   {
@@ -316,6 +317,11 @@ function ScopeView() {
 
 function PriceView() {
   const p = PROJECT0550_PRICING_BASELINE;
+  const canonical=useProject0550CanonicalState();
+  const currentLines=useMemo(
+    ()=>overlayControlledPriceLines(p.lines,canonical.priceLineMap),
+    [p.lines,canonical.priceLineMap]
+  );
   const [currency,setCurrency] = useState("USD");
   const [eurThbFx,setEurThbFx] = useState(() => {
     if(typeof window==="undefined") return String(p.fx.workingEurThb ?? "");
@@ -342,13 +348,13 @@ function PriceView() {
     }
   }
 
-  const a1Codes=Object.keys(p.lines).filter(code=>/^A1-/.test(code));
+  const a1Codes=Object.keys(currentLines).filter(code=>/^A1-/.test(code));
   const bCodes=["B1","B2","B3","B4","B5","B6","B7","B8","B9"];
-  const sourceSummary=useMemo(()=>summarizeProject0550PriceSources(p.lines,a1Codes),[p]);
+  const sourceSummary=useMemo(()=>summarizeProject0550PriceSources(currentLines,a1Codes),[currentLines]);
 
   function sumKnownThb(codes){
     return codes.reduce((sum,code)=>{
-      const value=p.lines?.[code]?.subtotalByCurrency?.THB;
+      const value=currentLines?.[code]?.subtotalByCurrency?.THB;
       return sum+(Number.isFinite(value)?Number(value):0);
     },0);
   }
@@ -377,6 +383,16 @@ function PriceView() {
             <h2>ASK-TSI Priced Breakdown — Current Controlled Price View</h2>
           </div>
           <span className="bid-status bad">PROJECT TOTAL: HOLD</span>
+        </div>
+
+        <div className="bid-canonical-state-banner">
+          <strong>{canonical.isLive ? "LIVE DB CANONICAL STATE" : "CONTROLLED CODE FALLBACK"}</strong>
+          <span>
+            {canonical.isLive
+              ? "Price table, commercial graphs and ASK-TSI form are reading the same canonical DB price-schedule state."
+              : "DB projection is unavailable; UI is using the controlled code snapshot. Do not treat fallback as a separate source of truth."}
+          </span>
+          {canonical.data?.openChanges?.length ? <em>{canonical.data.openChanges.length} open revision/change event(s)</em> : null}
         </div>
 
         <div className="bid-offer-summary">
@@ -464,7 +480,7 @@ function PriceView() {
       </section>
 
       <ASKTSIPricedBreakdownForm
-        lines={p.lines}
+        lines={currentLines}
         currency={currency}
         mode="INTERNAL"
         eurThbFx={eurThbFx}
