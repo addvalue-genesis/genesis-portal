@@ -2264,3 +2264,182 @@
     grid-template-columns:1fr;
   }
 }
+
+
+/* PAGA Bulk / MTO controlled line view */
+.bid-shell .ica-bulk{
+  border:1px solid #d7e1e9;
+  border-radius:8px;
+  overflow:hidden;
+  background:#fff;
+}
+.bid-shell .ica-bulk-summary{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  padding:9px 10px;
+  background:#fbfcfd;
+  border-bottom:1px solid #e3e9ee;
+}
+.bid-shell .ica-bulk-summary>div{
+  display:flex;
+  gap:7px;
+  align-items:center;
+  padding:7px 9px;
+  border:1px solid #e0e7ed;
+  border-radius:7px;
+  background:#fff;
+}
+.bid-shell .ica-bulk-summary b{
+  color:#173e61;
+  font-size:15px;
+}
+.bid-shell .ica-bulk-summary span{
+  color:#697d8f;
+  font-size:9.8px;
+}
+.bid-shell .ica-bulk-columns,
+.bid-shell .ica-bulk-line>summary{
+  display:grid;
+  grid-template-columns:28px 48px minmax(240px,1.6fr) minmax(165px,.8fr) minmax(160px,.75fr) minmax(210px,1fr);
+  gap:8px;
+  align-items:center;
+}
+.bid-shell .ica-bulk-columns{
+  padding:7px 10px;
+  background:#f5f8fa;
+  color:#6b7f91;
+  font-size:9.5px;
+  font-weight:900;
+  text-transform:uppercase;
+  border-bottom:1px solid #e4eaef;
+}
+.bid-shell .ica-bulk-line{
+  border-top:1px solid #edf1f4;
+  background:#fff;
+}
+.bid-shell .ica-bulk-line:first-child{border-top:0}
+.bid-shell .ica-bulk-line>summary{
+  list-style:none;
+  padding:9px 10px;
+  cursor:pointer;
+}
+.bid-shell .ica-bulk-line>summary::-webkit-details-marker{display:none}
+.bid-shell .ica-bulk-line[open]>summary{
+  background:#eef5fa;
+}
+.bid-shell .ica-bulk-toggle{
+  display:flex;
+  width:22px;
+  height:22px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #9fb5c6;
+  border-radius:5px;
+  background:#fff;
+}
+.bid-shell .ica-bulk-toggle::before{
+  content:"+";
+  color:#173e61;
+  font-size:16px;
+  font-weight:900;
+}
+.bid-shell .ica-bulk-line[open] .ica-bulk-toggle::before{content:"−"}
+.bid-shell .ica-bulk-line code{
+  font-size:9.8px!important;
+}
+.bid-shell .ica-bulk-name strong,
+.bid-shell .ica-bulk-qty strong,
+.bid-shell .ica-bulk-owner strong,
+.bid-shell .ica-bulk-route strong{
+  display:block;
+  color:#2b4f6d;
+  font-size:10.7px;
+  line-height:1.35;
+}
+.bid-shell .ica-bulk-name small,
+.bid-shell .ica-bulk-qty small,
+.bid-shell .ica-bulk-owner small,
+.bid-shell .ica-bulk-route small{
+  display:block;
+  margin-top:2px;
+  color:#728394;
+  font-size:9.3px!important;
+  line-height:1.35;
+}
+.bid-shell .ica-bulk-detail{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:7px;
+  padding:9px 10px 11px 86px;
+  background:#fbfcfd;
+  border-top:1px solid #e6edf2;
+}
+.bid-shell .ica-bulk-detail>div{
+  padding:8px 9px;
+  border:1px solid #e0e7ed;
+  border-radius:7px;
+  background:#fff;
+}
+.bid-shell .ica-bulk-detail b{
+  display:block;
+  color:#315d80;
+  font-size:9.5px;
+  text-transform:uppercase;
+}
+.bid-shell .ica-bulk-detail span{
+  display:block;
+  margin-top:4px;
+  color:#617486;
+  font-size:10.5px;
+  line-height:1.45;
+}
+.bid-shell .ica-bulk-service-routing{
+  border-top:1px solid #dce5ec;
+  background:#fffaf2;
+}
+.bid-shell .ica-bulk-service-routing>div:not(.ica-subhead){
+  display:grid;
+  grid-template-columns:55px minmax(230px,1fr) minmax(160px,.65fr) minmax(280px,1.35fr);
+  gap:8px;
+  align-items:start;
+  padding:8px 10px;
+  border-top:1px solid #eee4d2;
+}
+.bid-shell .ica-bulk-service-routing code{
+  font-size:9.5px!important;
+}
+.bid-shell .ica-bulk-service-routing strong{
+  color:#4c5965;
+  font-size:10.6px;
+}
+.bid-shell .ica-bulk-service-routing span{
+  color:#7a5d22;
+  font-size:10px;
+  font-weight:900;
+}
+.bid-shell .ica-bulk-service-routing em{
+  color:#71685a;
+  font-size:9.8px;
+  line-height:1.4;
+  font-style:normal;
+}
+
+@media(max-width:1100px){
+  .bid-shell .ica-bulk-columns{display:none}
+  .bid-shell .ica-bulk-line>summary{
+    grid-template-columns:28px 48px minmax(200px,1fr);
+  }
+  .bid-shell .ica-bulk-qty,
+  .bid-shell .ica-bulk-owner,
+  .bid-shell .ica-bulk-route{
+    grid-column:3;
+  }
+  .bid-shell .ica-bulk-detail{
+    padding-left:10px;
+    grid-template-columns:1fr;
+  }
+  .bid-shell .ica-bulk-service-routing>div:not(.ica-subhead){
+    grid-template-columns:1fr;
+  }
+}
