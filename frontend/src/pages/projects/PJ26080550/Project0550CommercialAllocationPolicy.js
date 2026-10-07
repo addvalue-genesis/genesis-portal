@@ -24,17 +24,25 @@ ADDVALUE labor/work must NOT be buried inside Part A equipment cost.
 It maps to the applicable Part B/C line.
 
 Vendor/OEM labor:
-- if separately identifiable as engineering/training/field/site service, map to the
-  applicable Part B/C line;
-- if genuinely inseparable and embedded inside an OEM package price, keep the
-  source vendor package cost intact in Part A but flag it as VENDOR_EMBEDDED_SERVICE
-  and do not add the same service again in Part B.
+- remains vendor-source cost evidence;
+- may stay in Part A when management selects it as part of the vendor package;
+- may instead be mapped to the applicable Part B/C line when the customer/commercial
+  presentation requires separate service pricing;
+- must never be duplicated in both places;
+- complementary ADDVALUE work is allowed only when it is a different controlled
+  role/work object (e.g. ADDVALUE FAT lead/witness while OEM executes FAT).
 
 Part A may contain:
 - vendor/OEM equipment;
 - vendor-supplied accessories / directly attributable bulk;
-- inseparable vendor package services explicitly included in the quoted package,
-  provided no duplicate Part B charge is created.
+- vendor/OEM labor/service selected as part of the vendor package;
+- inseparable vendor package services explicitly included in the quoted package.
+
+Vendor service is NOT forced to Part B. Its customer-form treatment is selectable:
+- keep inside Part A vendor package;
+- expose separately in the applicable Part B/C line;
+- exclude / do not select;
+- TBC pending scope/price clarification.
 
 Part A must not contain:
 - ADDVALUE engineering MH;
@@ -92,6 +100,28 @@ export const PROJECT0550_PART_A_LEGACY_PROXY_RULE = {
   reason:"A legacy lump-sum rate can hide service cost and cause Part A + Part B double counting."
 };
 
+export const PROJECT0550_VENDOR_SERVICE_SELECTION = [
+  "SELECT_VENDOR_IN_PART_A",
+  "SELECT_VENDOR_SEPARATE_BC",
+  "ADDVALUE_EXECUTES",
+  "HYBRID_VENDOR_PLUS_ADDVALUE",
+  "NOT_SELECTED",
+  "TBC"
+];
+
+export const PROJECT0550_LIFECYCLE_ROLE_TYPES = [
+  "CONTRACT_LEAD",
+  "TECHNICAL_EXECUTE",
+  "OEM_SUPERVISE",
+  "PREPARE_PROCEDURE",
+  "WITNESS",
+  "PUNCH_CLOSEOUT",
+  "SITE_PRECOM",
+  "SITE_SAT",
+  "COMMISSION_STARTUP",
+  "APPROVE_ACCEPT"
+];
+
 export const PROJECT0550_COST_FAMILY_TO_LINE = {
   ADDVALUE_ENGINEERING:"B1",
   ADDVALUE_DOCUMENT_CONTROL:"B1",
@@ -122,15 +152,18 @@ export function expectedCommercialLine(costFamily){
 export function validatePartAAllocation({
   originParty,
   costFamily,
-  embeddedInVendorPackage=false,
+  vendorServiceSelection,
   commercialLine
 }={}){
   const origin=String(originParty||"").toUpperCase();
   const family=String(costFamily||"").toUpperCase();
   const isAddvalue=origin.includes("ADDVALUE");
+  const isVendor=/VENDOR|OEM|INDUSTRONIC|JASON|SUPPLIER/.test(origin);
   const expected=expectedCommercialLine(family);
+  const line=String(commercialLine||"");
+  const selection=String(vendorServiceSelection||"TBC").toUpperCase();
 
-  if(isAddvalue && String(commercialLine||"").startsWith("A1-")){
+  if(isAddvalue && line.startsWith("A1-")){
     return {
       status:"BLOCK",
       code:"ALLOC-A-ADDVALUE-LABOR",
@@ -139,23 +172,48 @@ export function validatePartAAllocation({
     };
   }
 
-  if(expected && String(commercialLine||"").startsWith("A1-") && !embeddedInVendorPackage){
+  if(isVendor && line.startsWith("A1-")){
+    if(selection==="SELECT_VENDOR_SEPARATE_BC"){
+      return {
+        status:"BLOCK",
+        code:"ALLOC-A-VENDOR-SELECTED-SEPARATE",
+        message:"Vendor service is selected for separate Part B/C pricing, so it must not remain in Part A.",
+        expectedLine:expected || "PART_B_OR_C"
+      };
+    }
     return {
-      status:"BLOCK",
-      code:"ALLOC-A-LIFECYCLE-DUPLICATION",
-      message:"This cost family has a dedicated Part B/C commercial line and must not be buried in Part A.",
-      expectedLine:expected
-    };
-  }
-
-  if(expected && String(commercialLine||"").startsWith("A1-") && embeddedInVendorPackage){
-    return {
-      status:"WARN",
-      code:"ALLOC-A-VENDOR-EMBEDDED",
-      message:"Vendor service is embedded in the package cost. Keep source cost intact but prevent duplicate Part B/C charge.",
+      status:selection==="TBC" ? "WARN" : "PASS",
+      code:selection==="TBC" ? "ALLOC-A-VENDOR-SELECTION-TBC" : "ALLOC-A-VENDOR-PACKAGE",
+      message:"Vendor/OEM service may stay in Part A when selected as vendor-package scope, provided the same service is not charged again in Part B/C.",
       expectedLine:expected
     };
   }
 
   return {status:"PASS",code:"ALLOC-OK",expectedLine:expected};
+}
+
+export function validateLifecycleRoleOverlap(assignments=[]){
+  const seen=new Map();
+  const findings=[];
+  for(const row of assignments){
+    const event=String(row.eventCode||row.eventType||"");
+    const role=String(row.role||"");
+    const party=String(row.party||"");
+    const key=event+"::"+role;
+    if(!seen.has(key)) seen.set(key,[]);
+    seen.get(key).push(party);
+  }
+  for(const [key,parties] of seen){
+    const unique=[...new Set(parties.filter(Boolean))];
+    if(unique.length>1 && !/WITNESS|APPROVE_ACCEPT|CONTRACT_LEAD/.test(key)){
+      findings.push({
+        status:"REVIEW",
+        code:"ROLE-OVERLAP",
+        key,
+        parties:unique,
+        message:"More than one party is assigned to the same executable lifecycle role. Confirm complementary scope or remove duplicate workload."
+      });
+    }
+  }
+  return findings;
 }
