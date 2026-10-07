@@ -26,8 +26,12 @@ import {
   pagaBulkDisplayGroup
 } from "./Project0550PagaBulkModel";
 
+function knownNumber(value){
+  return value!==null && value!==undefined && value!=="" && Number.isFinite(Number(value));
+}
+
 function money(value,currency="USD"){
-  if(!Number.isFinite(Number(value))) return "TBC";
+  if(!knownNumber(value)) return "TBC";
   try{
     return new Intl.NumberFormat("en-US",{
       style:"currency",
@@ -294,11 +298,14 @@ function PagaVendorOfferControlView({canonical,currency}){
             {items.map(row=>(
               <tr key={row.vendor_offer_item_id||row.item_no||row.description}>
                 <td><code>{row.item_no||"—"}</code></td>
-                <td><strong>{row.description}</strong></td>
+                <td>
+                  <strong>{row.description}</strong>
+                  <small>{row.product_code ? "Product: "+row.product_code+" · "+(row.canonical_model||row.manufacturer_part_no||"model TBC") : "Canonical product identity TBC"}</small>
+                </td>
                 <td className="num">{row.offered_qty??"TBC"}</td>
                 <td>{row.unit||""}</td>
-                <td className="num">{Number.isFinite(Number(row.unit_price))?money(Number(row.unit_price),offerCurrency):"—"}</td>
-                <td className="num">{Number.isFinite(Number(row.amount))?money(Number(row.amount),offerCurrency):"—"}</td>
+                <td className="num">{knownNumber(row.unit_price)?money(Number(row.unit_price),offerCurrency):"—"}</td>
+                <td className="num">{knownNumber(row.amount)?money(Number(row.amount),offerCurrency):"—"}</td>
                 <td>{(row.bindings||[]).length ? row.bindings.map((b,idx)=><span key={(b.binding_code||idx)}>{b.system_code||"COMMON"} · {b.line_code||"UNMAPPED"} · {b.binding_role||"TBC"} · {b.binding_state||"TBC"}</span>) : <span>UNMAPPED / REVIEW</span>}</td>
               </tr>
             ))}
@@ -345,7 +352,7 @@ function PagaLifecycleResponsibilityView({currency}){
       {PROJECT0550_PAGA_LIFECYCLE_PLAN.map(row=>{
         const v=row.vendorCoverage||{};
         const a=row.addvalueCoverage||{};
-        const vendorAmount=Number.isFinite(Number(v.total))
+        const vendorAmount=knownNumber(v.total)
           ? money(convertFx(Number(v.total),String(v.currency||"EUR").toUpperCase(),currency),currency)
           : "TBC / not quoted";
         return (
@@ -363,7 +370,7 @@ function PagaLifecycleResponsibilityView({currency}){
             <div>
               <strong>{(a.roles||[]).join(" · ") || "TBC"}</strong>
               <span>{a.workloadSource?.join(" · ") || "No retained activity bound"}</span>
-              <em>{Number.isFinite(Number(a.mhPool)) ? a.mhPool.toLocaleString("en-US",{maximumFractionDigits:1})+" MH shared pool" : "MH TBC"}</em>
+              <em>{knownNumber(a.mhPool) ? Number(a.mhPool).toLocaleString("en-US",{maximumFractionDigits:1})+" MH shared pool" : "MH TBC"}</em>
             </div>
             <div>
               <strong>{row.strategy}</strong>
@@ -387,7 +394,7 @@ function PartBDerivationView({currency}){
   const rows=project0550PartBDerivationRows();
 
   const amountIn=(thb)=>{
-    if(!Number.isFinite(Number(thb))) return null;
+    if(!knownNumber(thb)) return null;
     return currency==="THB" ? Number(thb) : convertFx(Number(thb),"THB",currency);
   };
   const toggle=(code)=>setOpen(current=>{
