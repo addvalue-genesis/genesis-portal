@@ -1,6 +1,7 @@
 import { PROJECT0550_SYSTEMS } from "./Project0550SystemRegistry";
+import { moduleContract } from "./Project0550ModuleContract";
 
-export const PROJECT0550_MODULES = [
+const BASE_MODULES = [
   { id:"1.0", key:"overview", title:"Bid Overview", parent:null, kind:"KNOWLEDGE", authority:"SYSTEM_RESOLUTION", purpose:"Understand the bid, source pack, obligations and required outputs." },
   { id:"1.1", key:"bid-input", title:"Bid Input Pack", parent:"1.0", kind:"SOURCE", authority:"SYSTEM_RESOLUTION", purpose:"Controlled source groups and document authority." },
   { id:"1.2", key:"bid-output", title:"Required Submission Outputs", parent:"1.0", kind:"OUTPUT", authority:"SYSTEM_RESOLUTION", purpose:"What the customer must receive." },
@@ -48,6 +49,11 @@ export const PROJECT0550_MODULES = [
 
   { id:"13.0", key:"review", title:"Independent Review / Audit", parent:null, kind:"REVIEW", authority:"REVIEW_CONTROL", purpose:"Claude/Grok/ChatGPT challenge, audit comments and dispositions." }
 ];
+
+export const PROJECT0550_MODULES = BASE_MODULES.map(m=>({
+  ...m,
+  contract:moduleContract(m.id)
+}));
 
 export const BID_NAV_MODULES = [
   "1.0","2.0","3.0","4.0","5.0","6.0","7.0","8.0","9.0","10.0"
