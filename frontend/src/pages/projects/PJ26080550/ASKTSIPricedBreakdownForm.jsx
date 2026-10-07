@@ -307,9 +307,9 @@ function systemByToken(token){
 
 function traceTone(state){
   const s=String(state||"TBC").toUpperCase();
-  if(/BLOCK|CONFLICT|HOLD/.test(s)) return "bad";
-  if(/OPEN|TBC/.test(s)) return "open";
-  if(/PARTIAL|PRELIMINARY|WORKING|APPLICABILITY/.test(s)) return "warn";
+  if(/BLOCK|CONFLICT|HOLD|REJECT|FAIL/.test(s)) return "bad";
+  if(/OPEN|TBC|NOT QUOTED|NOT IN BASE|GAP/.test(s)) return "open";
+  if(/PARTIAL|PRELIMINARY|WORKING|APPLICABILITY|OPTION|REVIEW/.test(s)) return "warn";
   return "good";
 }
 
@@ -408,6 +408,7 @@ function PagaRequirementTraceTable(){
                     <td></td>
                     <td colSpan="6">
                       <table className="ask-subtable">
+                        <colgroup><col className="ask-subtable-label-col"/><col/></colgroup>
                         <tbody>
                           <tr><th>01 · Source / Evidence</th><td>{req.source.join(" · ")}</td></tr>
                           <tr><th>02 · Fundamental Need</th><td>{method?.fundamentalNeed || "TBC"}</td></tr>
