@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
+import { useProject0550CanonicalState } from "./useProject0550CanonicalState";
 
-const ROWS = [
+const FALLBACK_ROWS = [
   ["VDRL-001","PROJECT DOSSIER","Vendor document schedule","MR-0001 Rev.A1 App.3 pp38–40","A1","NOT ISSUED","0","VERIFY","ADDVALUE PREP","Not started","GENESS Register"],
   ["VDRL-002","PROJECT DOSSIER","Bought out items list","MR-0001 Rev.A1 App.3 pp38–40","A1","NOT ISSUED","0","VERIFY","JOINT","In progress","GENESS List"],
   ["VDRL-003","ENGINEERING DOSSIER","RF path and coverage study report","MR App.3 pp38–40","A1","NOT ISSUED","0","VERIFY","JOINT / ENGINEERING","In progress","Study / RPT"],
@@ -40,22 +41,45 @@ const WORKLOAD_MODEL = [
 ];
 
 export function VdrlProduction(){
+  const canonical=useProject0550CanonicalState();
+  const sourceRows=useMemo(()=>{
+    if(!canonical.data?.vdrl?.length) return FALLBACK_ROWS;
+    return canonical.data.vdrl.map(r=>[
+      r.occurrence_code,
+      r.dossier_group || "TBC",
+      r.deliverable_title,
+      [r.source_authority,r.source_row_ref].filter(Boolean).join(" · "),
+      r.source_sdrl_code || r.source_mapping_status || "TBC",
+      "CURRENT",
+      "DB",
+      r.with_bid_status || "VERIFY",
+      r.owner_basis || r.owner_basis_class || "TBC",
+      String(r.status||"NOT_STARTED").replaceAll("_"," ").toLowerCase().replace(/\b\w/g,m=>m.toUpperCase()),
+      r.generator_profile || r.evidence_ref || "CONTROLLED STATE",
+      r.calculated_mh,
+      r.next_action || ""
+    ]);
+  },[canonical.data]);
   const [status,setStatus]=useState("All");
   const [dossier,setDossier]=useState("All");
   const [q,setQ]=useState("");
 
-  const dossiers=useMemo(()=>["All",...Array.from(new Set(ROWS.map(r=>r[1])))],[]);
-  const data=useMemo(()=>ROWS.filter(r=>
+  const dossiers=useMemo(()=>["All",...Array.from(new Set(sourceRows.map(r=>r[1])))],[sourceRows]);
+  const data=useMemo(()=>sourceRows.filter(r=>
     (status==="All"||r[9]===status) &&
     (dossier==="All"||r[1]===dossier) &&
     (!q||r.join(" ").toLowerCase().includes(q.toLowerCase()))
-  ),[status,dossier,q]);
+  ),[sourceRows,status,dossier,q]);
 
-  const ready=ROWS.filter(r=>r[9]==="Ready").length;
-  const inprog=ROWS.filter(r=>r[9]==="In progress"||r[9]==="Partial").length;
+  const ready=sourceRows.filter(r=>r[9]==="Ready").length;
+  const inprog=sourceRows.filter(r=>r[9]==="In Progress"||r[9]==="Partial").length;
 
   return (
     <div className="vdrl-shell">
+      <div className="bid-canonical-state-banner">
+        <strong>{canonical.isLive ? "LIVE DB CANONICAL VDRL / DOCUMENT STATE" : "CONTROLLED FALLBACK PREVIEW"}</strong>
+        <span>VDRL is derived from controlled document obligations and revision state; this module does not own a separate document truth set.</span>
+      </div>
       <div className="vdrl-history-note">
         <strong>Reuse pattern found</strong>
         <span>
@@ -66,7 +90,7 @@ export function VdrlProduction(){
       </div>
 
       <div className="vdrl-stats">
-        <div><strong>{ROWS.length}</strong><span>Source-driven / particular deliverables</span></div>
+        <div><strong>{sourceRows.length}</strong><span>Source-driven / particular deliverables</span></div>
         <div><strong>{inprog}</strong><span>In progress / partial</span></div>
         <div><strong>{ready}</strong><span>Ready</span></div>
         <div><strong>TBC</strong><span>Document MH until UMH approved</span></div>
@@ -140,10 +164,10 @@ export function VdrlProduction(){
                 <td><Status status={r[9]}/></td>
                 <td>{r[10]}</td>
                 <td>
-                  <code>Q_issue × (setup + Q_content × UMH)</code>
-                  <small>+ check / DC / review / revise / final · inputs TBC</small>
+                  {Number.isFinite(Number(r[11])) ? <strong>{Number(r[11]).toLocaleString("en-US",{maximumFractionDigits:1})} MH</strong> : <code>Q_issue × (setup + Q_content × UMH)</code>}
+                  <small>+ check / DC / review / revise / final · controlled workload state</small>
                 </td>
-                <td><input placeholder="Assignee / evidence / gap / due…" /></td>
+                <td>{r[12] || <input placeholder="Assignee / evidence / gap / due…" />}</td>
               </tr>
             ))}
           </tbody>
