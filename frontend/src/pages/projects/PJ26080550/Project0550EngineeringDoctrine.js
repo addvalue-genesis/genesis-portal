@@ -1,6 +1,6 @@
 export const PROJECT0550_ENGINEERING_DOCTRINE = {
   id: "PJ2608-0550-ENGINEERING-DOCTRINE",
-  revision: "Rev02",
+  revision: "Rev03",
   status: "CONTROLLED WORKING BASELINE",
   name: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   projectCode: "PJ2608-0550",
@@ -62,6 +62,56 @@ export const PROJECT0550_ENGINEERING_DOCTRINE = {
     "Commercial Treatment",
     "Release"
   ],
+  presentationGroups: [
+    {
+      id:"G1_FOUNDATION",
+      label:"Foundation",
+      stages:["SOURCE_EVIDENCE","REQUIREMENT","FUNDAMENTAL_NEED"]
+    },
+    {
+      id:"G2_CONTEXT",
+      label:"Constraint / Interface / Input",
+      stages:["CONSTRAINT","INTERFACE_CONTEXT","ENGINEERING_INPUT"]
+    },
+    {
+      id:"G3_PROOF_DESIGN",
+      label:"Engineering Proof / Design",
+      stages:["CAL_STUDY_RPT","PROOF","ARCHITECTURE"]
+    },
+    {
+      id:"G4_QUANTITY",
+      label:"Physical Object / Quantity",
+      stages:["PHYSICAL_OBJECT","QUANTITY_DRIVER","REQUIRED_MTO","BULK"]
+    },
+    {
+      id:"G5_VENDOR",
+      label:"Vendor Reconciliation",
+      stages:["VENDOR_RECONCILIATION"]
+    },
+    {
+      id:"G6_EXECUTION",
+      label:"Work / Lifecycle",
+      stages:["WORK_RESOURCE","DOCUMENT_QA","FAT_IFAT","LOGISTICS_REGULATORY","SITE_READINESS","INSTALL_PRECOM","SAT_COMMISSIONING","HANDOVER_WARRANTY"]
+    },
+    {
+      id:"G7_COST",
+      label:"Cost / Schedule / Risk",
+      stages:["COST_SCHEDULE_RISK"]
+    },
+    {
+      id:"G8_COMMERCIAL_RELEASE",
+      label:"Commercial / Release",
+      stages:["COMMERCIAL_TREATMENT","RELEASE"]
+    }
+  ],
+  methodControl: {
+    canonicalOrder:"fullChain",
+    presentationMayGroup:true,
+    presentationMayReorder:false,
+    sourceReadingOrderIsNotContractualPrecedence:true,
+    parametricCostStartsFromControlledDrivers:true,
+    note:"UI may collapse stages into groups for readability, but computation/release logic must follow fullChain dependencies."
+  },
   evidenceStates: {
     FACT: "0550 source fact or approved human decision",
     DERIVED: "Result from controlled source-bound equation or rule",
@@ -83,7 +133,11 @@ export const PROJECT0550_ENGINEERING_DOCTRINE = {
     ["R-009","0553 MAY SUPPLY METHOD ONLY; 0550 FACTS REQUIRE 0550 EVIDENCE"],
     ["R-010","NON-TECHNICAL CONSTRAINTS CAN BLOCK TECHNICAL / COMMERCIAL RELEASE"],
     ["R-011","NEW EVIDENCE MUST BE STRUCTURED / TRACEABLE BEFORE IT CHANGES CONTROLLED STATE"],
-    ["R-012","STALE / SUPERSEDED SOURCE MUST NOT GENERATE A CURRENT OUTPUT"]
+    ["R-012","STALE / SUPERSEDED SOURCE MUST NOT GENERATE A CURRENT OUTPUT"],
+    ["R-013","UI GROUPING / VIEW ORDER MUST NOT CHANGE CANONICAL METHOD DEPENDENCIES"],
+    ["R-014","SOURCE READING ORDER != CONTRACTUAL ORDER OF PRECEDENCE"],
+    ["R-015","PARAMETRIC COST REQUIRES CONTROLLED QUANTITY / WORK / OWNERSHIP DRIVERS; NO DRIVER => OPEN/TBC"],
+    ["R-016","VENDOR OFFER / BOM IS EVIDENCE OF OFFERED SOLUTION; IT MUST NOT DEFINE THE FUNDAMENTAL NEED OR REQUIRED QUANTITY"]
   ],
   releaseIntents: {
     BUDGETARY: "Allows explicit assumptions and preliminary quantities/costs if gaps remain visible and non-zero treatment is controlled.",
