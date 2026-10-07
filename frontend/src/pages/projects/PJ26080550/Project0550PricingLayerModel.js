@@ -7,7 +7,7 @@ Canonical semantic layers:
 3 WORKING_SELL  = internal management / budgetary / target sell; not customer-released.
 4 RELEASED_SELL = authorised customer selling price only.
 
-7.1 may show all four layers. 7.0 may consume RELEASED_SELL only.
+7.1 may show all four layers. 7.0 Working Preview consumes WORKING_SELL; Released Customer Output consumes RELEASED_SELL only.
 Unknown layers stay TBC/HOLD; values are never copied across semantic layers just to fill a blank.
 */
 
