@@ -48,9 +48,9 @@ function systemByToken(token){
 }
 
 function convertBindingAmount(row,targetCurrency){
+  if(!knownNumber(row?.allocated_amount)) return null;
   const amount=Number(row.allocated_amount);
   const currency=String(row.binding_currency||row.cost_currency||"THB").toUpperCase();
-  if(!Number.isFinite(amount)) return null;
   return convertFx(amount,currency,targetCurrency);
 }
 
