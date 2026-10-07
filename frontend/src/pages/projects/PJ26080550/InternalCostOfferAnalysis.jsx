@@ -715,8 +715,8 @@ function InternalAnalysisRow({
 
           <div className="ica-cost-lines">
             <div className="ica-subhead">
-              <strong>Cost / price build-up from controlled source</strong>
-              <span>{bindings.length?"LIVE DB binding rows":"Controlled code snapshot rows"}</span>
+              <strong>Controlled Cost Build-up / Derivation</strong>
+              <span>{bindings.length?"LIVE DB binding rows":"Controlled component rows · aggregated result, not an independent price source"}</span>
             </div>
             {detailRows.length ? detailRows.map((r,idx)=>(
               <div key={(r.source||"row")+"-"+idx}>
