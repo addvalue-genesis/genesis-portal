@@ -285,12 +285,30 @@ function RemarkCell({base,line,mode}){
   );
 }
 
+function OutlineSection({title,summary,status,open,onToggle,children,className=""}){
+  return (
+    <section className={"ask-outline-section "+className+(open?" is-open":"")}>
+      <button type="button" className="ask-outline-head" onClick={onToggle}>
+        <span className="ask-outline-toggle">{open ? "−" : "+"}</span>
+        <span className="ask-outline-title-wrap">
+          <strong>{title}</strong>
+          {summary ? <small>{summary}</small> : null}
+        </span>
+        {status ? <span className="ask-outline-status">{status}</span> : null}
+      </button>
+      {open ? <div className="ask-outline-body">{children}</div> : null}
+    </section>
+  );
+}
+
 function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const trace=traceForPriceLine(code,line);
   const audit=auditForPriceLine(code);
   const vendorOffer=vendorOfferForPriceLine(code);
   const displayed=displayAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
   const [traceTab,setTraceTab]=useState("OVERVIEW");
+  const [traceMode,setTraceMode]=useState("OUTLINE");
+  const [outlineOpen,setOutlineOpen]=useState(()=>new Set(["engineering","cost","gaps"]));
   const sourceInfo=classifyProject0550PriceLine(code,line);
   const vendorCost=vendorQuotedCost(vendorOffer);
   const commercialStatus=commercialLayerStatus(code,audit,trace,line);
@@ -302,6 +320,19 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
       ? ["GEQ-034 Controlled Currency Conversion"]
       : [])
   ];
+
+  const outlineKeys=["engineering","vendor","reconciliation","cost","gaps","equations","source"];
+  function setOutlinePreset(keys){
+    setOutlineOpen(new Set(keys));
+  }
+  function toggleOutline(key){
+    setOutlineOpen(current=>{
+      const next=new Set(current);
+      if(next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  }
 
   const nodes=[
     ["Requirement",trace.requirement],
@@ -336,20 +367,208 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             <Status state={trace.releaseState}/>
           </div>
 
-          <div className="ask-trace-subtabs">
-            {tabs.map(([key,label])=>(
-              <button
-                key={key}
-                type="button"
-                className={traceTab===key ? "active" : ""}
-                onClick={()=>setTraceTab(key)}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="ask-trace-mode-switch">
+            <button type="button" className={traceMode==="OUTLINE"?"active":""} onClick={()=>setTraceMode("OUTLINE")}>
+              Outline / Group View
+            </button>
+            <button type="button" className={traceMode==="DETAIL"?"active":""} onClick={()=>setTraceMode("DETAIL")}>
+              Detailed Tabs
+            </button>
+            {traceMode==="OUTLINE" ? (
+              <div className="ask-outline-actions">
+                <button type="button" onClick={()=>setOutlinePreset(outlineKeys)}>Expand all</button>
+                <button type="button" onClick={()=>setOutlinePreset([])}>Collapse all</button>
+                <button type="button" onClick={()=>setOutlinePreset(["engineering","cost","gaps"])}>Working view</button>
+                <button type="button" onClick={()=>setOutlinePreset(["gaps"])}>Open gaps only</button>
+              </div>
+            ) : null}
           </div>
 
-          {traceTab==="OVERVIEW" ? (
+          {traceMode==="OUTLINE" ? (
+            <div className="ask-outline-view">
+              <div className="ask-outline-summary">
+                <div>
+                  <small>DISPLAYED LINE</small>
+                  <strong>{displayed}</strong>
+                  <span>{trace.releaseState}</span>
+                </div>
+                <div>
+                  <small>PRICE BASIS</small>
+                  <strong><SourceChip info={sourceInfo}/></strong>
+                  <span>{sourceInfo.confidence}</span>
+                </div>
+                <div>
+                  <small>VENDOR / SOURCE</small>
+                  <strong>{sourceInfo.vendor || "No current vendor quote bound"}</strong>
+                  <span>{sourceInfo.quoteRef || audit?.source || "Source closure required"}</span>
+                </div>
+                <div>
+                  <small>OPEN GAPS</small>
+                  <strong>{(line.openItems||[]).length}</strong>
+                  <span>{commercialStatus.state}</span>
+                </div>
+              </div>
+
+              <OutlineSection
+                title="1 · Engineering & Proof"
+                summary="Requirement → Constraint → CAL / Study / RPT → Quantity Driver"
+                status={trace.releaseState}
+                open={outlineOpen.has("engineering")}
+                onToggle={()=>toggleOutline("engineering")}
+              >
+                <div className="ask-outline-grid">
+                  <article><b>Requirement</b><span>{trace.requirement}</span></article>
+                  <article><b>Constraint</b><span>{trace.constraint}</span></article>
+                  <article><b>CAL / Study / RPT</b><span>{trace.proof}</span></article>
+                  <article><b>Quantity Driver</b><span>{trace.quantityDriver}</span></article>
+                </div>
+              </OutlineSection>
+
+              <OutlineSection
+                title="2 · Vendor Offer"
+                summary={vendorOffer ? `${vendorOffer.vendor} · ${vendorOffer.vendorItems?.length||0} quoted item(s)` : "No current vendor offer registered"}
+                status={vendorOffer?.status || audit?.grade || "OPEN"}
+                open={outlineOpen.has("vendor")}
+                onToggle={()=>toggleOutline("vendor")}
+              >
+                {vendorOffer ? (
+                  <>
+                    <div className="ask-outline-source-head">
+                      <div><small>AS QUOTED</small><strong>{vendorOffer.vendor}</strong><span>{vendorOffer.quoteRef} · {vendorOffer.quoteDate || "Date TBC"}</span></div>
+                      <div><small>CURRENCY</small><strong>{vendorOffer.currency || "TBC"}</strong><span>{vendorOffer.incoterm || ""}</span></div>
+                      <div><small>VENDOR COST INPUT</small><strong>{Number.isFinite(vendorOffer.quotedFinal) ? money(vendorOffer.quotedFinal,vendorOffer.currency) : (Number.isFinite(vendorCost) ? money(vendorCost,vendorOffer.currency) : "PARTIAL / TBC")}</strong><span>Before project commercial treatment</span></div>
+                    </div>
+                    <div className="ask-outline-list">
+                      {(vendorOffer.vendorItems||[]).map((item,idx)=>(
+                        <div key={item.item+"-"+idx}>
+                          <span>{item.group}</span>
+                          <strong>{item.item}</strong>
+                          <em>{item.qty} {item.unit} · {Number.isFinite(item.total) ? money(item.total,vendorOffer.currency) : "TBC"}</em>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <div className="ask-outline-empty">No current vendor offer bound to this price line.</div>
+                )}
+              </OutlineSection>
+
+              <OutlineSection
+                title="3 · Required vs Offered"
+                summary={vendorOffer?.reconciliation?.length ? `${vendorOffer.reconciliation.length} controlled reconciliation row(s)` : "Reconciliation not available yet"}
+                status={vendorOffer?.reconciliation?.length ? "REVIEW" : "OPEN"}
+                open={outlineOpen.has("reconciliation")}
+                onToggle={()=>toggleOutline("reconciliation")}
+              >
+                {vendorOffer?.reconciliation?.length ? (
+                  <div className="ask-outline-list">
+                    {vendorOffer.reconciliation.map((row,idx)=>(
+                      <div key={row.object+"-"+idx}>
+                        <span>{row.status}</span>
+                        <strong>{row.object}</strong>
+                        <em>Required {String(row.required)} · Offered {String(row.offered)} · Gap {String(row.gap)}</em>
+                      </div>
+                    ))}
+                  </div>
+                ) : <div className="ask-outline-empty">{audit?.basis || trace.quantityDriver}</div>}
+              </OutlineSection>
+
+              <OutlineSection
+                title="4 · Cost & Selling Price"
+                summary="Source cost → completion / landed / lifecycle → commercial rule → customer sell"
+                status={commercialStatus.state}
+                open={outlineOpen.has("cost")}
+                onToggle={()=>toggleOutline("cost")}
+                className="is-cost"
+              >
+                <div className="ask-outline-grid">
+                  <article><b>Cost Object</b><span>{trace.costObject}</span></article>
+                  <article><b>Commercial Rule</b><span>{trace.commercialRule}</span></article>
+                </div>
+                {audit?.commercialPreview ? (
+                  <div className="ask-price-ladder">
+                    <div><small>1 · Vendor net cost</small><strong>{money(audit.commercialPreview.sourceCostEur,"EUR")}</strong><span>Source quotation cost</span></div>
+                    <em>→</em>
+                    <div><small>2 · Known selected cost</small><strong>{money(audit.commercialPreview.knownSelectedCostEur,"EUR")}</strong><span>Vendor cost + controlled priced additions</span></div>
+                    <em>→</em>
+                    <div className="preview"><small>3 · Indicative sell</small><strong>{money(audit.commercialPreview.indicativeKnownCostSellEur,"EUR")}</strong><span>{displaySourceValue(audit.commercialPreview.indicativeKnownCostSellEur,"EUR",currency,eurThbFx,usdThbFx,cnyThbFx)} · {audit.commercialPreview.formula}</span></div>
+                    <em>→</em>
+                    <div className="hold"><small>4 · Final customer sell</small><strong>HOLD</strong><span>Open completion cost must be closed first</span></div>
+                  </div>
+                ) : null}
+                {audit?.buildUp?.length ? (
+                  <div className="ask-outline-list compact">
+                    {audit.buildUp.map((row,idx)=>(
+                      <div key={row.priceClass+"-"+row.item+"-"+idx}>
+                        <span>{row.priceClass}</span>
+                        <strong>{row.item}</strong>
+                        <em>{buildUpAmount(row)}</em>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </OutlineSection>
+
+              <OutlineSection
+                title="5 · Open Gaps / Next Closure"
+                summary={(line.openItems||[]).length ? `${line.openItems.length} open item(s)` : "No itemized open-gap list"}
+                status={(line.openItems||[]).length ? "OPEN" : "CHECK"}
+                open={outlineOpen.has("gaps")}
+                onToggle={()=>toggleOutline("gaps")}
+                className="is-gaps"
+              >
+                <div className="ask-gap-list">
+                  {(line.openItems||[]).length
+                    ? line.openItems.map(x=><span key={x}>{x}</span>)
+                    : <span>{audit?.action || "Close source / proof / quantity / commercial gaps."}</span>}
+                </div>
+              </OutlineSection>
+
+              <OutlineSection
+                title="6 · Equations Used"
+                summary={`${equationsForDisplay.length} controlled equation(s)`}
+                status="COMMON / GENERIC + PARTICULAR"
+                open={outlineOpen.has("equations")}
+                onToggle={()=>toggleOutline("equations")}
+              >
+                <div className="ask-equation-tags">
+                  {equationsForDisplay.map(x=><code key={x}>{x}</code>)}
+                </div>
+              </OutlineSection>
+
+              <OutlineSection
+                title="7 · Source / Evidence"
+                summary={audit?.quoteRef || sourceInfo.quoteRef || "Controlled project source chain"}
+                status={audit?.grade || "CONTROLLED TRACE"}
+                open={outlineOpen.has("source")}
+                onToggle={()=>toggleOutline("source")}
+              >
+                <div className="ask-outline-grid">
+                  <article><b>Primary Source</b><span>{audit?.source || trace.sourceBasis}</span></article>
+                  <article><b>Audit Verdict</b><span>{audit?.verdict || "TBC"}</span></article>
+                  <article><b>CBE / Parametric Status</b><span>{audit?.modelStatus || "CONTROLLED BASELINE / MATURITY VARIES"}</span></article>
+                  <article><b>Internal Trace</b><span>{line.internalTrace || "No additional internal trace."}</span></article>
+                </div>
+              </OutlineSection>
+            </div>
+          ) : null}
+
+          {traceMode==="DETAIL" ? (
+            <div className="ask-trace-subtabs">
+              {tabs.map(([key,label])=>(
+                <button
+                  key={key}
+                  type="button"
+                  className={traceTab===key ? "active" : ""}
+                  onClick={()=>setTraceTab(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          ) : null}
+
+          {traceMode==="DETAIL" && traceTab==="OVERVIEW" ? (
             <div className="ask-line-overview">
               <div className="ask-overview-grid">
                 <div>
@@ -421,7 +640,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             </div>
           ) : null}
 
-          {traceTab==="ENGINEERING" ? (
+          {traceMode==="DETAIL" && traceTab==="ENGINEERING" ? (
             <>
               <div className="ask-price-audit">
                 <div><b>GDrive Price Audit</b><span>{audit?.grade || "NOT AUDITED"}</span></div>
@@ -451,7 +670,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             </>
           ) : null}
 
-          {traceTab==="VENDOR" ? (
+          {traceMode==="DETAIL" && traceTab==="VENDOR" ? (
             <div className="ask-vendor-view">
               {vendorOffer ? (
                 <>
@@ -530,7 +749,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             </div>
           ) : null}
 
-          {traceTab==="RECON" ? (
+          {traceMode==="DETAIL" && traceTab==="RECON" ? (
             <div className="ask-recon-view">
               {vendorOffer?.reconciliation?.length ? (
                 <table className="ask-recon-table">
@@ -567,7 +786,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             </div>
           ) : null}
 
-          {traceTab==="BUILDUP" ? (
+          {traceMode==="DETAIL" && traceTab==="BUILDUP" ? (
             <div className="ask-build-view">
               <div className="ask-price-source-detail">
                 <div><b>Basis</b><span>{audit?.basis || trace.costObject}</span></div>
@@ -656,7 +875,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
             </div>
           ) : null}
 
-          {traceTab==="GAPS" ? (
+          {traceMode==="DETAIL" && traceTab==="GAPS" ? (
             <div className="ask-gaps-view">
               <div className="ask-price-source-detail">
                 <div><b>Release State</b><span>{trace.releaseState}</span></div>
