@@ -16,12 +16,16 @@ import { vendorOfferForPriceLine } from "./Project0550VendorOfferRegister";
 
 export const PROJECT0550_PRICE_LAYER_TYPES = ["SOURCE_COST","INTERNAL_COST","WORKING_SELL","RELEASED_SELL"];
 
+function knownAmount(value){
+  return value!==null && value!==undefined && value!=="" && knownAmount(value);
+}
+
 function firstFiniteCurrency(map={},preferred){
   const order=[preferred,"THB","EUR","USD","CNY"].filter(Boolean);
   for(const currency of [...new Set(order)]){
     const value=map?.[currency];
     if(value===null || value===undefined || value==="") continue;
-    if(Number.isFinite(Number(value))) return {amount:Number(value),currency};
+    if(knownAmount(value)) return {amount:Number(value),currency};
   }
   return {amount:null,currency:preferred||null};
 }
@@ -33,13 +37,13 @@ function layer(type,{amount=null,currency=null,state="TBC",basis="",origin="CONT
 export function fallbackPriceLayersForLine(lineCode,line={}){
   const vendor=vendorOfferForPriceLine(lineCode);
   const sourceCurrency=vendor?.currency || line.sourceCurrency || null;
-  const sourceFromVendor=vendor?.quotedFinal!==null && vendor?.quotedFinal!==undefined && vendor?.quotedFinal!=="" && Number.isFinite(Number(vendor.quotedFinal))
+  const sourceFromVendor=knownAmount(vendor?.quotedFinal)
     ? {amount:Number(vendor.quotedFinal),currency:vendor.currency}
     : /VENDOR_COST_INPUT/i.test(String(line.priceRole||""))
       ? firstFiniteCurrency(line.subtotalByCurrency||line.unitPriceByCurrency,sourceCurrency)
       : {amount:null,currency:sourceCurrency};
 
-  let working=line?.workingSellAmount!==null && line?.workingSellAmount!==undefined && line?.workingSellAmount!=="" && Number.isFinite(Number(line.workingSellAmount))
+  let working=knownAmount(line?.workingSellAmount)
     ? {amount:Number(line.workingSellAmount),currency:line.workingSellCurrency||sourceCurrency}
     : firstFiniteCurrency(line.subtotalByCurrency||line.unitPriceByCurrency,sourceCurrency);
 
@@ -51,7 +55,7 @@ export function fallbackPriceLayersForLine(lineCode,line={}){
 
   const releasedMap=line.releasedSellByCurrency||{};
   const released=firstFiniteCurrency(releasedMap,line.releasedSellCurrency||sourceCurrency);
-  const releasedState=Number.isFinite(released.amount) && /AUTHORISED|RELEASED|APPROVED/i.test(String(line.releasedSellState||"")) ? "AUTHORISED" : "HOLD";
+  const releasedState=knownAmount(released.amount) && /AUTHORISED|RELEASED|APPROVED/i.test(String(line.releasedSellState||"")) ? "AUTHORISED" : "HOLD";
 
   return {
     lineCode,
@@ -113,7 +117,7 @@ export function workingPreviewLines(lines={},liveRows=[]){
   const out={};
   for(const [code,line] of Object.entries(lines||{})){
     const working=layers[code]?.WORKING_SELL;
-    const known=working && Number.isFinite(Number(working.amount));
+    const known=working && knownAmount(working.amount);
     const currency=working?.currency||line.sourceCurrency||"USD";
     out[code]={
       ...line,
@@ -138,7 +142,7 @@ export function releasedCustomerLines(lines={},liveRows=[]){
   const out={};
   for(const [code,line] of Object.entries(lines||{})){
     const released=layers[code]?.RELEASED_SELL;
-    const authorised=released && released.state==="AUTHORISED" && Number.isFinite(Number(released.amount));
+    const authorised=released && released.state==="AUTHORISED" && knownAmount(released.amount);
     const currency=released?.currency||line.sourceCurrency||"USD";
     out[code]={
       ...line,
