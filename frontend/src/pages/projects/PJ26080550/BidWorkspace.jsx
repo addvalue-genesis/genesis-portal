@@ -290,6 +290,27 @@ function Overview() {
         </div>
       </section>
 
+      {priceSurface==="FORM" ? (
+        <nav className="bid-price-mode-nav">
+          <button
+            type="button"
+            className={formPriceMode==="WORKING_PREVIEW"?"active":""}
+            onClick={()=>setFormPriceMode("WORKING_PREVIEW")}
+          >
+            <b>Working Preview</b>
+            <span>Current controlled prices · internal only</span>
+          </button>
+          <button
+            type="button"
+            className={formPriceMode==="RELEASED_OUTPUT"?"active":""}
+            onClick={()=>setFormPriceMode("RELEASED_OUTPUT")}
+          >
+            <b>Released Customer Output</b>
+            <span>Authorised RELEASED_SELL only</span>
+          </button>
+        </nav>
+      ) : null}
+
       <section className="bid-panel bid-highlight">
         <small>1.3 · REQUIREMENT-TO-SUBMISSION LOGIC</small>
         <h2>First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model เป็นกลไกประมวลผลของงาน ไม่ใช่ข้อความประกอบ UI</h2>
@@ -366,6 +387,7 @@ function PriceView() {
   const p = PROJECT0550_PRICING_BASELINE;
   const canonical=useProject0550CanonicalState();
   const [priceSurface,setPriceSurface]=useState("FORM");
+  const [formPriceMode,setFormPriceMode]=useState("WORKING_PREVIEW");
   const currentLines=useMemo(
     ()=>overlayControlledPriceLines(p.lines,canonical.priceLineMap),
     [p.lines,canonical.priceLineMap]
@@ -454,7 +476,9 @@ function PriceView() {
         <div className="bid-panel-head">
           <div>
             <small>CURRENT 0550 PRICING BASELINE · {p.revision} · {p.date}</small>
-            <h2>{priceSurface==="FORM" ? "ASK-TSI Priced Breakdown — Customer Form Projection" : "Internal Cost / Commercial Analysis — Management Projection"}</h2>
+            <h2>{priceSurface==="FORM"
+              ? (formPriceMode==="WORKING_PREVIEW" ? "ASK-TSI Priced Breakdown — Internal Working Preview" : "ASK-TSI Priced Breakdown — Released Customer Output")
+              : "Internal Cost / Commercial Analysis — Management Projection"}</h2>
           </div>
           <span className="bid-status bad">PROJECT TOTAL: HOLD</span>
         </div>
@@ -471,34 +495,56 @@ function PriceView() {
 
         {priceSurface==="FORM" ? (
           <>
-          <div className="bid-offer-summary">
-            <div>
-              <small>RELEASED CUSTOMER BASE OFFER</small>
-              <strong>{releasedBaseReady ? "THB "+releasedBaseThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}) : "HOLD"}</strong>
-              <span>7.0 uses RELEASED_SELL only. Source Cost, Internal Cost and Working Sell stay internal and are never substituted into the customer form.</span>
+          {formPriceMode==="WORKING_PREVIEW" ? (
+            <div className="bid-offer-summary">
+              <div>
+                <small>INTERNAL WORKING BASE OFFER · NOT CUSTOMER RELEASED</small>
+                <strong>{knownBaseIn(currency)}</strong>
+                <span>Shows current controlled working prices so management can review the ASK-TSI form shape before release. Open/TBC scope remains visible and the total is not an authorised offer.</span>
+              </div>
+              <div>
+                <small>KNOWN PART A / PART B WORKING VALUES</small>
+                <strong>INTERNAL ONLY</strong>
+                <span>Part A known = THB {partAKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · Part B known = THB {partBKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. These may mix maturity states and are not RELEASED_SELL.</span>
+              </div>
+              <div>
+                <small>PART C</small>
+                <strong>OPTIONS / WORKING VIEW</strong>
+                <span>Options remain separate from the Base Offer and are shown for internal review only.</span>
+              </div>
             </div>
-            <div>
-              <small>RELEASED PART A / PART B</small>
-              <strong>{releasedBaseReady ? "AUTHORISED" : "NOT YET AUTHORISED"}</strong>
-              <span>{releasedBaseReady
-                ? "Part A released = THB "+releasedPartAThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" · Part B released = THB "+releasedPartBThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+"."
-                : "Released subtotal is intentionally not published while any Part A/B line is unauthorised. HOLD/TBC is not zero."}</span>
+          ) : (
+            <div className="bid-offer-summary">
+              <div>
+                <small>RELEASED CUSTOMER BASE OFFER</small>
+                <strong>{releasedBaseReady ? "THB "+releasedBaseThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}) : "HOLD"}</strong>
+                <span>Released mode uses AUTHORISED RELEASED_SELL only. Source Cost, Internal Cost and Working Sell are never substituted into customer output.</span>
+              </div>
+              <div>
+                <small>RELEASED PART A / PART B</small>
+                <strong>{releasedBaseReady ? "AUTHORISED" : "NOT YET AUTHORISED"}</strong>
+                <span>{releasedBaseReady
+                  ? "Part A released = THB "+releasedPartAThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" · Part B released = THB "+releasedPartBThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+"."
+                  : "Released subtotal is intentionally not published while any Part A/B line is unauthorised. HOLD/TBC is not zero."}</span>
+              </div>
+              <div>
+                <small>PART C</small>
+                <strong>OPTIONS / RELEASE GATED</strong>
+                <span>Part C options are shown only when separately authorised/selected; they are not included in the Base Offer automatically.</span>
+              </div>
             </div>
-            <div>
-              <small>PART C</small>
-              <strong>OPTIONS / RELEASE GATED</strong>
-              <span>Part C options are shown only when separately authorised/selected; they are not included in the Base Offer automatically.</span>
-            </div>
-          </div>
+          )}
   
           <div className="bid-control-grid">
             <div>
-              <strong>A + B RELEASE CONTROL</strong>
-              <span>Customer Base Offer = Σ AUTHORISED RELEASED_SELL Part A + Σ AUTHORISED RELEASED_SELL Part B. Current release state = {releasedBaseReady ? "READY" : "HOLD"}.</span>
+              <strong>{formPriceMode==="WORKING_PREVIEW" ? "A + B WORKING PREVIEW" : "A + B RELEASE CONTROL"}</strong>
+              <span>{formPriceMode==="WORKING_PREVIEW"
+                ? "Working preview uses current controlled price-line values for form review only. It is not a customer-authorised offer."
+                : "Customer Base Offer = Σ AUTHORISED RELEASED_SELL Part A + Σ AUTHORISED RELEASED_SELL Part B. Current release state = "+(releasedBaseReady ? "READY" : "HOLD")+"."}</span>
             </div>
             <div>
-              <strong>INTERNAL VALUES LOCATION</strong>
-              <span>Source Cost / Internal Cost / Working Sell are available only in 7.1 Internal Cost / Commercial Analysis. 7.0 is customer-release projection.</span>
+              <strong>COMMERCIAL LAYERS</strong>
+              <span>7.1 shows Source Cost / Internal Cost / Working Sell / Released Sell side-by-side. 7.0 Working Preview shows the current form-shaped working values; Released Customer Output remains release-gated.</span>
             </div>
             <div>
               <strong>PART C · OPTIONS</strong>
@@ -560,9 +606,9 @@ function PriceView() {
 
       {priceSurface==="FORM" ? (
         <ASKTSIPricedBreakdownForm
-          lines={customerReleasedLines}
+          lines={formPriceMode==="WORKING_PREVIEW" ? currentLines : customerReleasedLines}
           currency={currency}
-          mode="CUSTOMER_RELEASE_PROJECTION"
+          mode={formPriceMode==="WORKING_PREVIEW" ? "INTERNAL" : "CUSTOMER_RELEASE_PROJECTION"}
           eurThbFx={eurThbFx}
           usdThbFx={p.fx.thbPerUsd}
           cnyThbFx={cnyThbFx}
