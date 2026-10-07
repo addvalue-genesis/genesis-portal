@@ -514,58 +514,34 @@ function InternalAnalysisRow({
   open,
   onToggle
 }){
-  const audit=auditForPriceLine(group.lineCode);
-  const sourceInfo=classifyProject0550PriceLine(group.lineCode,line);
+  const analysis=deriveProject0550CommercialLine({
+    lineCode:group.lineCode,
+    line,
+    canonicalData:canonical?.data||{},
+    currency
+  });
+  const audit=analysis.audit;
+  const sourceInfo=analysis.sourceInfo;
   const systems=group.systemTokens.map(systemByToken).filter(Boolean);
-  const bindings=(canonical.data?.costPriceBindings||[]).filter(x=>x.line_code===group.lineCode);
-  const systemTokens=new Set(systems.map(x=>x.token));
-  const associatedBindings=(canonical.data?.costPriceBindings||[]).filter(
-    x=>systemTokens.has(x.system_code) && x.line_code!==group.lineCode
+  const bindings=analysis.costBindings;
+  const systemKeys=new Set();
+  systems.forEach(system=>{
+    systemKeys.add(String(system.token||"").toUpperCase());
+    systemKeys.add(String(system.token||"").replace(/^TEL-/i,"").toUpperCase());
+  });
+  const associatedBindings=(canonical?.data?.costPriceBindings||[]).filter(
+    x=>systemKeys.has(String(x.system_code||"").toUpperCase()) && x.line_code!==group.lineCode
   );
 
-  const dbCostValues=bindings.map(x=>convertBindingAmount(x,currency)).filter(Number.isFinite);
-  const dbCost=dbCostValues.length ? dbCostValues.reduce((a,b)=>a+b,0) : null;
-  const fallback=fallbackCostBasis(audit,currency);
-  const costValue=Number.isFinite(dbCost)?dbCost:fallback.value;
-  const costBasis=Number.isFinite(dbCost)
-    ? "CANONICAL COST-PRICE BINDINGS"
-    : fallback.label;
-
-  const priceLayers=priceLayersForLine(group.lineCode,line,canonical.data?.priceLayers||[]);
-  const displayLayer=(layer)=>{
-    if(!layer || layer.amount===null || layer.amount===undefined || layer.amount==="") return null;
-    const amount=Number(layer.amount);
-    if(!Number.isFinite(amount)) return null;
-    const sourceCurrency=String(layer.currency||currency).toUpperCase();
-    return sourceCurrency===currency
-      ? amount
-      : convertFx(amount,sourceCurrency,currency);
-  };
-  const sourceCostValue=displayLayer(priceLayers.SOURCE_COST);
-  const internalCostValue=displayLayer(priceLayers.INTERNAL_COST);
-  const workingSellValue=displayLayer(priceLayers.WORKING_SELL);
-  const releasedSellValue=displayLayer(priceLayers.RELEASED_SELL);
-
-  const openItems=line?.openItems||[];
-  const status=priceLayers.RELEASED_SELL?.state==="AUTHORISED"
-    ? "AUTHORISED CUSTOMER SELL"
-    : (line?.state||"HOLD / WORKING");
-  const detailRows=bindings.length
-    ? bindings.map(x=>({
-        className:x.cost_category||"COST",
-        item:x.cost_description,
-        amount:convertBindingAmount(x,currency),
-        state:x.binding_state||x.cost_status||"TBC",
-        source:x.binding_code
-      }))
-    : (audit?.buildUp||[]).map(x=>({
-        className:x.priceClass,
-        item:x.item,
-        amount:amountFromBuildRow(x,currency),
-        amountText:x.amountText,
-        state:x.note||"",
-        source:"CONTROLLED CODE SNAPSHOT"
-      }));
+  const priceLayers=analysis.priceLayers;
+  const sourceCostValue=analysis.values.sourceCost;
+  const internalCostValue=analysis.values.internalCost;
+  const workingSellValue=analysis.values.workingSell;
+  const releasedSellValue=analysis.values.releasedSell;
+  const costBasis=analysis.states.internalCost;
+  const openItems=analysis.openItems;
+  const status=analysis.states.line;
+  const detailRows=analysis.detailRows;
 
   return (
     <section className={"ica-row "+(open?"is-open":"")}>
@@ -583,8 +559,8 @@ function InternalAnalysisRow({
         </span>
         <span className="ica-value">
           <small>Internal Cost</small>
-          <strong>{Number.isFinite(internalCostValue)?money(internalCostValue,currency):Number.isFinite(costValue)?money(costValue,currency):"TBC"}</strong>
-          <em>{Number.isFinite(internalCostValue)?priceLayers.INTERNAL_COST?.state:(Number.isFinite(costValue)?"KNOWN PARTIAL COST · "+costBasis:"TBC")}</em>
+          <strong>{Number.isFinite(internalCostValue)?money(internalCostValue,currency):"TBC"}</strong>
+          <em>{costBasis}</em>
         </span>
         <span className="ica-value">
           <small>Working Sell</small>
@@ -617,13 +593,33 @@ function InternalAnalysisRow({
             <article>
               <small>Cost basis / completeness</small>
               <strong>{costBasis}</strong>
-              <span>{fallback.basis}</span>
+              <span>{priceLayers.INTERNAL_COST?.basis||audit?.basis||analysis.provenance.internalCost}</span>
             </article>
             <article>
               <small>Open / release</small>
               <strong>{openItems.length} open item(s)</strong>
               <span>{audit?.action||line?.state||"Review controlled state"}</span>
             </article>
+          </div>
+
+          <div className="ica-derivation-spine">
+            <div className="ica-subhead">
+              <strong>Canonical Derivation Spine</strong>
+              <span>{analysis.states.derivation} · calculations run outside the React view</span>
+            </div>
+            <div className="ica-derivation-grid">
+              {analysis.derivationTrace.map((step,idx)=>(
+                <React.Fragment key={step.stage}>
+                  <div className="ica-derivation-step">
+                    <small>{String(idx+1).padStart(2,"0")}</small>
+                    <strong>{step.stage.replaceAll("_"," ")}</strong>
+                    <span>{step.detail}</span>
+                    <em className={"ica-state "+rowStateTone(step.state)}>{step.state}</em>
+                  </div>
+                  {idx<analysis.derivationTrace.length-1 ? <b>→</b> : null}
+                </React.Fragment>
+              ))}
+            </div>
           </div>
 
           <div className="ica-system-children">
@@ -644,7 +640,7 @@ function InternalAnalysisRow({
           <div className="ica-cost-lines">
             <div className="ica-subhead">
               <strong>Controlled Cost Build-up / Derivation</strong>
-              <span>{bindings.length?"LIVE DB binding rows":"Controlled component rows · aggregated result, not an independent price source"}</span>
+              <span>{bindings.length?"LIVE DB binding rows":"Controlled fallback component rows · engine projection, not an independent price source"}</span>
             </div>
             {detailRows.length ? detailRows.map((r,idx)=>(
               <div key={(r.source||"row")+"-"+idx}>
