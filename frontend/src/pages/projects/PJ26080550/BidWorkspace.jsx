@@ -403,9 +403,9 @@ function PriceView() {
   const a1Codes=Object.keys(currentLines).filter(code=>/^A1-/.test(code));
   const bCodes=["B1","B2","B3","B4","B5","B6","B7","B8","B9"];
 
-  function sumKnownThb(codes){
+  function sumKnownThb(codes,sourceLines=currentLines){
     return codes.reduce((sum,code)=>{
-      const value=currentLines?.[code]?.subtotalByCurrency?.THB;
+      const value=sourceLines?.[code]?.subtotalByCurrency?.THB;
       return sum+(Number.isFinite(value)?Number(value):0);
     },0);
   }
@@ -413,6 +413,10 @@ function PriceView() {
   const partAKnownThb=sumKnownThb(a1Codes);
   const partBKnownThb=sumKnownThb(bCodes);
   const knownBaseThb=partAKnownThb+partBKnownThb;
+  const releasedPartAThb=sumKnownThb(a1Codes,customerReleasedLines);
+  const releasedPartBThb=sumKnownThb(bCodes,customerReleasedLines);
+  const releasedBaseThb=releasedPartAThb+releasedPartBThb;
+  const releasedBaseReady=[...a1Codes,...bCodes].every(code=>customerReleasedLines?.[code]?.state==="AUTHORISED CUSTOMER SELL");
 
   function knownBaseIn(currencyCode){
     const thb=knownBaseThb;
@@ -469,32 +473,30 @@ function PriceView() {
           <>
           <div className="bid-offer-summary">
             <div>
-              <small>PROJECT SELLING PRICE / BASE OFFER</small>
-              <strong>HOLD</strong>
-              <span>Base Offer = Part A + Part B. This is the project selling price that will be submitted when all price gates are closed.</span>
+              <small>RELEASED CUSTOMER BASE OFFER</small>
+              <strong>{releasedBaseReady ? "THB "+releasedBaseThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}) : "HOLD"}</strong>
+              <span>7.0 uses RELEASED_SELL only. Source Cost, Internal Cost and Working Sell stay internal and are never substituted into the customer form.</span>
             </div>
             <div>
-              <small>KNOWN NUMERIC PORTION OF A + B · MIXED SOURCES · FINAL BASE OFFER STILL HOLD</small>
-              <strong>{knownBaseIn(currency)}</strong>
-              <span>
-                Dynamic from current controlled lines — not a hard-coded project total. Part A known = THB {partAKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · Part B known = THB {partBKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. Open/TBC portions such as PAGA remain outside the final released Base Offer.
-              </span>
+              <small>RELEASED PART A / PART B</small>
+              <strong>{releasedBaseReady ? "AUTHORISED" : "NOT YET AUTHORISED"}</strong>
+              <span>Part A released = THB {releasedPartAThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · Part B released = THB {releasedPartBThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. Any unreleased line remains HOLD/TBC.</span>
             </div>
             <div>
               <small>PART C</small>
-              <strong>OPTIONS</strong>
-              <span>Not included in Base Offer unless specifically selected/required.</span>
+              <strong>OPTIONS / RELEASE GATED</strong>
+              <span>Part C options are shown only when separately authorised/selected; they are not included in the Base Offer automatically.</span>
             </div>
           </div>
   
           <div className="bid-control-grid">
             <div>
-              <strong>A + B CONTROL</strong>
-              <span>Formula = Σ known numeric Part A + Σ known numeric Part B. Current known numeric portion = USD {(knownBaseThb/p.fx.thbPerUsd).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {knownBaseThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. BASE OFFER remains HOLD until all open/TBC portions are closed.</span>
+              <strong>A + B RELEASE CONTROL</strong>
+              <span>Customer Base Offer = Σ AUTHORISED RELEASED_SELL Part A + Σ AUTHORISED RELEASED_SELL Part B. Current release state = {releasedBaseReady ? "READY" : "HOLD"}.</span>
             </div>
             <div>
-              <strong>PROJECT OFFER AMOUNT</strong>
-              <span>HOLD until INDUSTRONIC PAGA is fully converted/closed. This is the amount that will be submitted.</span>
+              <strong>INTERNAL VALUES LOCATION</strong>
+              <span>Source Cost / Internal Cost / Working Sell are available only in 7.1 Internal Cost / Commercial Analysis. 7.0 is customer-release projection.</span>
             </div>
             <div>
               <strong>PART C · OPTIONS</strong>
