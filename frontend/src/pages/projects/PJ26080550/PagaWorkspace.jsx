@@ -577,32 +577,6 @@ export function PagaWorkspace() {
         ))}
       </section>
 
-      {selectedLocation.code === "APF-CATERING" && (
-        <section className="etm-decision-panel">
-          <div className="etm-panel-head">
-            <div>
-              <div className="etm-section-kicker">12.7.7 · TECHNICAL RESOLUTION QUEUE</div>
-              <h2>สิ่งที่ระบบต้องค้นหลักฐานและปิดคำตอบเอง — ไม่โยน Technical choice ให้ Jack เดา</h2>
-            </div>
-            <span className="etm-preview-action-note">Actions below are Rev0 UI preview</span>
-          </div>
-          <div className="etm-decision-grid">
-            {RESOLUTION_QUEUE.map((d) => (
-              <article key={d.id} className="etm-decision-card">
-                <div className="etm-decision-top">
-                  <code>{d.id}</code>
-                  <StatusPill status={d.state} small />
-                </div>
-                <h3>{d.topic}</h3>
-                <p><strong>System action:</strong> {d.systemAction}</p>
-                <p><strong>Current basis:</strong> {d.currentBasis}</p>
-                <small>{d.escalation}</small>
-              </article>
-            ))}
-          </div>
-        </section>
-      )}
-
       {selectedLocation.code !== "APF-CATERING" ? (
         <section className="etm-panel etm-coming">
           <div>
@@ -623,6 +597,7 @@ export function PagaWorkspace() {
           {view === "mto" && <MtoView />}
           {view === "vdrl" && <VdrlView />}
           {view === "lifecycle" && <LifecycleView />}
+          {view === "resolution" && <ResolutionView />}
         </>
       )}
     </div>
@@ -1075,6 +1050,42 @@ function LifecycleView() {
         </section>
       </div>
     </div>
+  );
+}
+
+function ResolutionView(){
+  return (
+    <section className="etm-panel">
+      <div className="etm-panel-head">
+        <div>
+          <div className="etm-section-kicker">12.7.7 · TECHNICAL RESOLUTION QUEUE</div>
+          <h2>สิ่งที่ระบบต้องค้นหลักฐานและปิดคำตอบเอง</h2>
+          <p>Internal evidence first → external authority if needed → proposal → review. Technical choice must not be pushed to the user without evidence.</p>
+        </div>
+        <StatusPill status="SYSTEM RESOLUTION" />
+      </div>
+      <div className="etm-table-wrap">
+        <table className="etm-data-table paga-resolution-table">
+          <thead>
+            <tr>
+              <th>ID</th><th>Topic</th><th>System Action</th><th>Current Basis</th><th>State</th><th>Escalation / Closure</th>
+            </tr>
+          </thead>
+          <tbody>
+            {RESOLUTION_QUEUE.map(row=>(
+              <tr key={row.id}>
+                <td><code>{row.id}</code></td>
+                <td><strong>{row.topic}</strong></td>
+                <td>{row.systemAction}</td>
+                <td>{row.currentBasis}</td>
+                <td><StatusPill status={row.state} small /></td>
+                <td>{row.escalation}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </section>
   );
 }
 
