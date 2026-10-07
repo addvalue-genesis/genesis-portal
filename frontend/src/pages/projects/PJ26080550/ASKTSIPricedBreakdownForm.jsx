@@ -477,6 +477,150 @@ function PagaOutputTable(){
   );
 }
 
+function VendorOfferMetaTable({vendorOffer,vendorCost}){
+  if(!vendorOffer) return null;
+  const quoted=Number.isFinite(vendorOffer.quotedFinal)
+    ? money(vendorOffer.quotedFinal,vendorOffer.currency)
+    : Number.isFinite(vendorCost)
+      ? money(vendorCost,vendorOffer.currency)+" · mapped quoted items"
+      : "PARTIAL / TBC";
+  return (
+    <div className="ask-line-table-wrap compact">
+      <table className="ask-line-table meta">
+        <tbody>
+          <tr><th>Vendor / source</th><td><strong>{vendorOffer.vendor}</strong><small>{vendorOffer.quoteRef} · {vendorOffer.quoteDate || "Date TBC"}</small></td></tr>
+          <tr><th>Currency / Incoterm</th><td><strong>{vendorOffer.currency || "TBC"}</strong><small>{vendorOffer.incoterm || vendorOffer.status || ""}</small></td></tr>
+          <tr><th>Vendor cost input</th><td><strong>{quoted}</strong><small>Source/procurement cost before project commercial treatment</small></td></tr>
+          {Number.isFinite(vendorOffer.quotedTotalBeforeDiscount) ? (
+            <tr><th>Gross / Discount</th><td>{money(vendorOffer.quotedTotalBeforeDiscount,vendorOffer.currency)} · Discount {money(vendorOffer.discount,vendorOffer.currency)}</td></tr>
+          ) : null}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function VendorOfferRuledTable({vendorOffer}){
+  if(!vendorOffer?.vendorItems?.length) return null;
+  return (
+    <div className="ask-line-table-wrap">
+      <table className="ask-line-table vendor">
+        <thead>
+          <tr>
+            <th>Group</th><th>Vendor Item — As Quoted</th><th>Qty</th><th>Unit</th><th>Unit Price</th><th>Total</th><th>Base / Option</th>
+          </tr>
+        </thead>
+        <tbody>
+          {vendorOffer.vendorItems.map((row,idx)=>(
+            <tr key={row.group+"-"+row.item+"-"+idx}>
+              <td>{row.group}</td>
+              <td><strong>{row.item}</strong>{row.note ? <small>{row.note}</small> : null}</td>
+              <td className="num">{row.qty}</td>
+              <td>{row.unit}</td>
+              <td className="num">{Number.isFinite(row.unitPrice) ? money(row.unitPrice,vendorOffer.currency) : "—"}</td>
+              <td className="num">{Number.isFinite(row.total) ? money(row.total,vendorOffer.currency) : "—"}</td>
+              <td><span className={"ask-line-state "+(row.inFinal ? "good" : "warn")}>{row.inFinal ? "IN QUOTED BASE" : "OPTION / NOT IN BASE"}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function ReconciliationRuledTable({vendorOffer}){
+  if(!vendorOffer?.reconciliation?.length) return null;
+  return (
+    <div className="ask-line-table-wrap">
+      <table className="ask-line-table reconcile">
+        <thead>
+          <tr><th>Status</th><th>Required Object</th><th>Required</th><th>Offered</th><th>Unit</th><th>Gap</th></tr>
+        </thead>
+        <tbody>
+          {vendorOffer.reconciliation.map((row,idx)=>(
+            <tr key={row.object+"-"+idx}>
+              <td><span className={"ask-line-state "+traceTone(row.status)}>{row.status}</span></td>
+              <td><strong>{row.object}</strong></td>
+              <td className="num">{String(row.required)}</td>
+              <td className="num">{String(row.offered)}</td>
+              <td>{row.unit}</td>
+              <td className="num">{String(row.gap)}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function CostContextTable({trace,commercialStatus}){
+  return (
+    <div className="ask-line-table-wrap compact">
+      <table className="ask-line-table meta">
+        <tbody>
+          <tr><th>Cost Object</th><td>{trace.costObject}</td></tr>
+          <tr><th>Commercial Rule</th><td>{trace.commercialRule}</td></tr>
+          <tr><th>Commercial State</th><td><span className={"ask-line-state "+traceTone(commercialStatus.state)}>{commercialStatus.state}</span><small>{commercialStatus.detail}</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function CommercialLadderTable({audit,currency,eurThbFx,usdThbFx,cnyThbFx}){
+  const p=audit?.commercialPreview;
+  if(!p) return null;
+  const rows=[
+    ["01","Vendor net cost",money(p.sourceCostEur,"EUR"),"Source quotation cost","CONTROLLED"],
+    ["02","Known selected cost",money(p.knownSelectedCostEur,"EUR"),"Vendor cost + controlled priced additions","CONTROLLED"],
+    ["03","Indicative sell · known cost only",money(p.indicativeKnownCostSellEur,"EUR"),displaySourceValue(p.indicativeKnownCostSellEur,"EUR",currency,eurThbFx,usdThbFx,cnyThbFx)+" · "+p.formula,"WORKING / HOLD"],
+    ["04","Final customer sell","HOLD","Open completion cost must be closed first","HOLD"]
+  ];
+  return (
+    <div className="ask-line-table-wrap">
+      <table className="ask-line-table ladder">
+        <thead><tr><th>Step</th><th>Commercial Layer</th><th>Amount</th><th>Basis / Meaning</th><th>State</th></tr></thead>
+        <tbody>
+          {rows.map(row=>(
+            <tr key={row[0]}>
+              <td className="seq">{row[0]}</td>
+              <td><strong>{row[1]}</strong></td>
+              <td className="num"><strong>{row[2]}</strong></td>
+              <td>{row[3]}</td>
+              <td><span className={"ask-line-state "+traceTone(row[4])}>{row[4]}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function CostBuildRuledTable({audit}){
+  if(!audit?.buildUp?.length) return null;
+  return (
+    <div className="ask-line-table-wrap">
+      <table className="ask-line-table buildup">
+        <thead>
+          <tr><th>Class / Route</th><th>Item</th><th>Qty</th><th>Unit Price</th><th>Amount / State</th><th>Control Note</th></tr>
+        </thead>
+        <tbody>
+          {audit.buildUp.map((row,idx)=>(
+            <tr key={row.priceClass+"-"+row.item+"-"+idx}>
+              <td><strong>{row.priceClass}</strong></td>
+              <td>{row.item}</td>
+              <td>{row.qty || ""}</td>
+              <td className="num">{buildUpUnitPrice(row)}</td>
+              <td className="num">{buildUpAmount(row)}</td>
+              <td>{row.note || row.amountText || ""}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function RequirementBasisView({code,trace}){
   const commercialGroup=commercialGroupForLine(code);
   const systems=(commercialGroup?.systemTokens||[]).map(systemByToken).filter(Boolean);
@@ -864,22 +1008,10 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                 onToggle={()=>toggleOutline("vendor")}
               >
                 {vendorOffer ? (
-                  <>
-                    <div className="ask-outline-source-head">
-                      <div><small>AS QUOTED</small><strong>{vendorOffer.vendor}</strong><span>{vendorOffer.quoteRef} · {vendorOffer.quoteDate || "Date TBC"}</span></div>
-                      <div><small>CURRENCY</small><strong>{vendorOffer.currency || "TBC"}</strong><span>{vendorOffer.incoterm || ""}</span></div>
-                      <div><small>VENDOR COST INPUT</small><strong>{Number.isFinite(vendorOffer.quotedFinal) ? money(vendorOffer.quotedFinal,vendorOffer.currency) : (Number.isFinite(vendorCost) ? money(vendorCost,vendorOffer.currency) : "PARTIAL / TBC")}</strong><span>Before project commercial treatment</span></div>
-                    </div>
-                    <div className="ask-outline-list">
-                      {(vendorOffer.vendorItems||[]).map((item,idx)=>(
-                        <div key={item.item+"-"+idx}>
-                          <span>{item.group}</span>
-                          <strong>{item.item}</strong>
-                          <em>{item.qty} {item.unit} · {Number.isFinite(item.total) ? money(item.total,vendorOffer.currency) : "TBC"}</em>
-                        </div>
-                      ))}
-                    </div>
-                  </>
+                  <div className="ask-table-stack">
+                    <VendorOfferMetaTable vendorOffer={vendorOffer} vendorCost={vendorCost}/>
+                    <VendorOfferRuledTable vendorOffer={vendorOffer}/>
+                  </div>
                 ) : (
                   <div className="ask-outline-empty">No current vendor offer bound to this price line.</div>
                 )}
@@ -893,15 +1025,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                 onToggle={()=>toggleOutline("reconciliation")}
               >
                 {vendorOffer?.reconciliation?.length ? (
-                  <div className="ask-outline-list">
-                    {vendorOffer.reconciliation.map((row,idx)=>(
-                      <div key={row.object+"-"+idx}>
-                        <span>{row.status}</span>
-                        <strong>{row.object}</strong>
-                        <em>Required {String(row.required)} · Offered {String(row.offered)} · Gap {String(row.gap)}</em>
-                      </div>
-                    ))}
-                  </div>
+                  <ReconciliationRuledTable vendorOffer={vendorOffer}/>
                 ) : <div className="ask-outline-empty">{audit?.basis || trace.quantityDriver}</div>}
               </OutlineSection>
 
@@ -913,44 +1037,17 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                 onToggle={()=>toggleOutline("cost")}
                 className="is-cost"
               >
-                <div className="ask-outline-grid">
-                  <article><b>Cost Object</b><span>{trace.costObject}</span></article>
-                  <article><b>Commercial Rule</b><span>{trace.commercialRule}</span></article>
+                <div className="ask-table-stack">
+                  <CostContextTable trace={trace} commercialStatus={commercialStatus}/>
+                  <CommercialLadderTable
+                    audit={audit}
+                    currency={currency}
+                    eurThbFx={eurThbFx}
+                    usdThbFx={usdThbFx}
+                    cnyThbFx={cnyThbFx}
+                  />
+                  <CostBuildRuledTable audit={audit}/>
                 </div>
-                {code==="A1-05" ? (
-                  <>
-                    <PagaCommercialComposition
-                      audit={audit}
-                      currency={currency}
-                      eurThbFx={eurThbFx}
-                      usdThbFx={usdThbFx}
-                      cnyThbFx={cnyThbFx}
-                    />
-                    <PagaServiceAnalytics/>
-                  </>
-                ) : null}
-                {audit?.commercialPreview ? (
-                  <div className="ask-price-ladder">
-                    <div><small>1 · Vendor net cost</small><strong>{money(audit.commercialPreview.sourceCostEur,"EUR")}</strong><span>Source quotation cost</span></div>
-                    <em>→</em>
-                    <div><small>2 · Known selected cost</small><strong>{money(audit.commercialPreview.knownSelectedCostEur,"EUR")}</strong><span>Vendor cost + controlled priced additions</span></div>
-                    <em>→</em>
-                    <div className="preview"><small>3 · Indicative sell</small><strong>{money(audit.commercialPreview.indicativeKnownCostSellEur,"EUR")}</strong><span>{displaySourceValue(audit.commercialPreview.indicativeKnownCostSellEur,"EUR",currency,eurThbFx,usdThbFx,cnyThbFx)} · {audit.commercialPreview.formula}</span></div>
-                    <em>→</em>
-                    <div className="hold"><small>4 · Final customer sell</small><strong>HOLD</strong><span>Open completion cost must be closed first</span></div>
-                  </div>
-                ) : null}
-                {audit?.buildUp?.length ? (
-                  <div className="ask-outline-list compact">
-                    {audit.buildUp.map((row,idx)=>(
-                      <div key={row.priceClass+"-"+row.item+"-"+idx}>
-                        <span>{row.priceClass}</span>
-                        <strong>{row.item}</strong>
-                        <em>{buildUpAmount(row)}</em>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
               </OutlineSection>
 
               <OutlineSection
@@ -1130,53 +1227,9 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                       <span>{commercialStatus.detail}</span>
                     </div>
                   </div>
-                  <div className="ask-vendor-head">
-                    <div>
-                      <small>AS-QUOTED SOURCE</small>
-                      <strong>{vendorOffer.vendor}</strong>
-                      <span>{vendorOffer.quoteRef} · {vendorOffer.quoteDate || "Date TBC"}</span>
-                    </div>
-                    <div>
-                      <small>Currency</small>
-                      <strong>{vendorOffer.currency || "TBC"}</strong>
-                      <span>{vendorOffer.incoterm || vendorOffer.status || ""}</span>
-                    </div>
-                    <div>
-                      <small>Vendor Net / Quoted Final · Cost Input</small>
-                      <strong>{Number.isFinite(vendorOffer.quotedFinal) ? money(vendorOffer.quotedFinal,vendorOffer.currency) : (Number.isFinite(vendorCost) ? money(vendorCost,vendorOffer.currency)+" · mapped quoted items" : "PARTIAL / NO SINGLE PACKAGE TOTAL")}</strong>
-                      {Number.isFinite(vendorOffer.quotedTotalBeforeDiscount) ? (
-                        <span>Before discount {money(vendorOffer.quotedTotalBeforeDiscount,vendorOffer.currency)} · Discount {money(vendorOffer.discount,vendorOffer.currency)}</span>
-                      ) : null}
-                    </div>
-                  </div>
-
-                  <div className="ask-vendor-table-wrap">
-                    <table className="ask-vendor-table">
-                      <thead>
-                        <tr>
-                          <th>Group</th>
-                          <th>Vendor Item — As Quoted</th>
-                          <th>Qty</th>
-                          <th>Unit</th>
-                          <th>Vendor Unit Price · Cost</th>
-                          <th>Vendor Total · Cost</th>
-                          <th>Base / Option</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {vendorOffer.vendorItems.map((row,idx)=>(
-                          <tr key={row.group+"-"+row.item+"-"+idx}>
-                            <td>{row.group}</td>
-                            <td>{row.item}{row.note ? <small>{row.note}</small> : null}</td>
-                            <td>{row.qty}</td>
-                            <td>{row.unit}</td>
-                            <td>{Number.isFinite(row.unitPrice) ? money(row.unitPrice,vendorOffer.currency) : "—"}</td>
-                            <td>{Number.isFinite(row.total) ? money(row.total,vendorOffer.currency) : "—"}</td>
-                            <td><Status state={row.inFinal ? "IN QUOTED BASE" : "OPTION / NOT IN BASE"}/></td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
+                  <div className="ask-table-stack">
+                    <VendorOfferMetaTable vendorOffer={vendorOffer} vendorCost={vendorCost}/>
+                    <VendorOfferRuledTable vendorOffer={vendorOffer}/>
                   </div>
                   <div className="ask-source-lock">
                     <strong>Source lock:</strong>
@@ -1196,30 +1249,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
           {traceMode==="DETAIL" && traceTab==="RECON" ? (
             <div className="ask-recon-view">
               {vendorOffer?.reconciliation?.length ? (
-                <table className="ask-recon-table">
-                  <thead>
-                    <tr>
-                      <th>Required Object</th>
-                      <th>Required</th>
-                      <th>Vendor Offered</th>
-                      <th>Unit</th>
-                      <th>Gap</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {vendorOffer.reconciliation.map((row,idx)=>(
-                      <tr key={row.object+"-"+idx}>
-                        <td>{row.object}</td>
-                        <td>{String(row.required)}</td>
-                        <td>{String(row.offered)}</td>
-                        <td>{row.unit}</td>
-                        <td>{String(row.gap)}</td>
-                        <td><Status state={row.status}/></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <ReconciliationRuledTable vendorOffer={vendorOffer}/>
               ) : (
                 <div className="ask-empty-source">
                   <strong>REQUIRED VS OFFERED MATRIX NOT AVAILABLE YET</strong>
@@ -1238,33 +1268,13 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                 <div><b>Displayed controlled line</b><span>{displayed} · {commercialStatus.state}</span></div>
               </div>
 
-              {audit?.commercialPreview ? (
-                <div className="ask-price-ladder">
-                  <div>
-                    <small>1 · Vendor net cost</small>
-                    <strong>{money(audit.commercialPreview.sourceCostEur,"EUR")}</strong>
-                    <span>Source quotation cost</span>
-                  </div>
-                  <em>→</em>
-                  <div>
-                    <small>2 · Known selected cost</small>
-                    <strong>{money(audit.commercialPreview.knownSelectedCostEur,"EUR")}</strong>
-                    <span>Vendor cost + controlled priced additions</span>
-                  </div>
-                  <em>→</em>
-                  <div className="preview">
-                    <small>3 · Indicative sell · known cost only</small>
-                    <strong>{money(audit.commercialPreview.indicativeKnownCostSellEur,"EUR")}</strong>
-                    <span>{displaySourceValue(audit.commercialPreview.indicativeKnownCostSellEur,"EUR",currency,eurThbFx,usdThbFx,cnyThbFx)} · BOT MID FX · {audit.commercialPreview.formula}</span>
-                  </div>
-                  <em>→</em>
-                  <div className="hold">
-                    <small>4 · Final customer sell</small>
-                    <strong>HOLD</strong>
-                    <span>Open completion cost must be closed first</span>
-                  </div>
-                </div>
-              ) : null}
+              <CommercialLadderTable
+                audit={audit}
+                currency={currency}
+                eurThbFx={eurThbFx}
+                usdThbFx={usdThbFx}
+                cnyThbFx={cnyThbFx}
+              />
 
               {audit?.commercialPreview ? (
                 <div className="ask-commercial-preview-note">
@@ -1281,34 +1291,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
               ) : null}
 
               {audit?.buildUp?.length ? (
-                <div className="ask-build-up">
-                  <div className="ask-build-up-head">
-                    <b>Vendor Cost → Completion → Controlled Cost → Commercial Preview / Sell</b>
-                    <span>SOURCE / MODEL CURRENCY</span>
-                  </div>
-                  <table>
-                    <thead>
-                      <tr>
-                        <th>Class</th>
-                        <th>Item</th>
-                        <th>Qty</th>
-                        <th>Unit Price</th>
-                        <th>Amount</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {audit.buildUp.map((row,idx)=>(
-                        <tr key={row.priceClass+"-"+row.item+"-"+idx}>
-                          <td>{row.priceClass}</td>
-                          <td>{row.item}</td>
-                          <td>{row.qty || ""}</td>
-                          <td>{buildUpUnitPrice(row)}</td>
-                          <td>{buildUpAmount(row)}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <CostBuildRuledTable audit={audit}/>
               ) : (
                 <div className="ask-empty-source">
                   <strong>DETAILED NUMERIC BUILD-UP NOT MIGRATED YET</strong>
