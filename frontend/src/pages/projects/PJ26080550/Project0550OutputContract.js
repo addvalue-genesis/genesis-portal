@@ -11,6 +11,8 @@ Sheet: PriceBreakdown
 Controlled range: A1:H80
 */
 
+import { releasedCustomerLines } from "./Project0550PricingLayerModel";
+
 export const ASKTSI_PRICED_BREAKDOWN_TEMPLATE = {
   id:"ASK-TSI-PRICED-BREAKDOWN",
   sourceFile:"ASK-TSI Priced Breakdown List.xlsx",
@@ -130,12 +132,15 @@ function outputRows(template=ASKTSI_PRICED_BREAKDOWN_TEMPLATE){
 
 export function buildProject0550OutputDocumentModel({
   lines={},
+  priceLayers=[],
   pricingRevision="TBC",
   mode="INTERNAL",
   currency="USD"
 }={}){
+  const customerMode=/CUSTOMER/i.test(String(mode));
+  const outputLines=customerMode ? releasedCustomerLines(lines,priceLayers) : lines;
   const rows=outputRows().map(row=>{
-    const line=lines[row.code]||{};
+    const line=outputLines[row.code]||{};
     return {
       ...row,
       tagNo:line.tagNo||"",
@@ -168,7 +173,7 @@ export function buildProject0550OutputDocumentModel({
       sourceOfTruth:"CONTROLLED DB/JSON/JS STATE",
       reactRole:"RICH WORKING VIEW",
       exportRule:"FORMAT RENDERERS CONSUME THIS DOCUMENT MODEL; DO NOT SCRAPE REACT DOM",
-      customerRule:"CUSTOMER OUTPUT EXCLUDES INTERNAL TRACE / ASSUMPTION / GAP DETAIL"
+      customerRule:"CUSTOMER OUTPUT EXCLUDES INTERNAL TRACE / ASSUMPTION / GAP DETAIL AND CONSUMES AUTHORISED RELEASED_SELL ONLY"
     }
   };
 }
