@@ -4,13 +4,29 @@ declare(strict_types=1);
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/auth.php';
 
+function etm_evidence_table_exists(PDO $db,string $table): bool {
+    $q=$db->prepare("SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=?");
+    $q->execute([$table]);
+    return ((int)$q->fetchColumn())>0;
+}
+function etm_evidence_column_exists(PDO $db,string $table,string $column): bool {
+    $q=$db->prepare("SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME=? AND COLUMN_NAME=?");
+    $q->execute([$table,$column]);
+    return ((int)$q->fetchColumn())>0;
+}
+
 function etm_evidence_priority(string $sourceType): int {
     $map = [
         'APPROVED_HUMAN_DECISION' => 100,
         'GOVERNING_PROJECT_SOURCE' => 90,
+        'COMPANY_STANDARD' => 88,
+        'CURRENT_OEM_DATASHEET' => 84,
+        'CURRENT_VENDOR_TECHNICAL_SUBMISSION' => 82,
         'CURRENT_VENDOR_QUOTE' => 80,
         'CURRENT_PROJECT_CALCULATION' => 75,
+        'INTERNATIONAL_STANDARD' => 70,
         'CURRENT_MARKET_SANITY' => 60,
+        'RECOGNISED_RESEARCH' => 50,
         'HISTORICAL_REFERENCE' => 35,
         'ASSUMPTION' => 10,
     ];
