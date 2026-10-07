@@ -285,8 +285,28 @@ function Overview() {
 }
 
 function ScopeView() {
+  const canonical=useProject0550CanonicalState();
+  const rows=useMemo(()=>{
+    if(!canonical.data?.requirements?.length) return SCOPE_ROWS;
+    return canonical.data.requirements.map(r=>[
+      r.requirement_domain || "OTHER",
+      r.requirement_text,
+      r.response_status || r.requirement_status || "OPEN",
+      [
+        r.price_impact_flag ? "Price impact" : null,
+        r.schedule_impact_flag ? "Schedule impact" : null,
+        r.linked_proof_id ? "Proof" : null,
+        r.linked_mto_id ? "MTO" : null,
+        r.linked_cost_item_id ? "Cost" : null
+      ].filter(Boolean).join(" + ") || "Controlled response / compliance"
+    ]);
+  },[canonical.data]);
   return (
     <section className="bid-panel">
+      <div className="bid-canonical-state-banner">
+        <strong>{canonical.isLive ? "LIVE DB SCOPE / COMPLIANCE PROJECTION" : "CONTROLLED FALLBACK PREVIEW"}</strong>
+        <span>Scope / Compliance reads canonical requirements and response state; it does not maintain a separate scope list.</span>
+      </div>
       <div className="bid-panel-head">
         <div>
           <small>EXHIBIT A → BID OBLIGATION MATRIX</small>
@@ -298,8 +318,8 @@ function ScopeView() {
         <table className="bid-table">
           <thead><tr><th>Scope group</th><th>Obligation / basis</th><th>Status</th><th>What it drives</th></tr></thead>
           <tbody>
-            {SCOPE_ROWS.map(([group, basis, state, drives]) => (
-              <tr key={group}><td><strong>{group}</strong></td><td>{basis}</td><td><Status status={state} /></td><td>{drives}</td></tr>
+            {rows.map(([group, basis, state, drives],idx) => (
+              <tr key={group+"-"+idx}><td><strong>{group}</strong></td><td>{basis}</td><td><Status status={state} /></td><td>{drives}</td></tr>
             ))}
           </tbody>
         </table>
@@ -510,8 +530,24 @@ function PriceView() {
 }
 
 function DeviationView({ filter, setFilter, rows }) {
+  const canonical=useProject0550CanonicalState();
+  const sourceRows=useMemo(()=>{
+    if(!canonical.data?.deviations?.length) return rows;
+    return canonical.data.deviations.map(d=>({
+      type:d.deviation_type,
+      source:d.deviation_code+" · "+(d.source_doc_para_description||""),
+      issue:d.vendor_deviation || d.reason_justification || "Deviation detail TBC",
+      response:d.resolution || d.final_closure || "OPEN / RESPONSE REQUIRED",
+      state:d.closure_status || d.status || "OPEN"
+    }));
+  },[canonical.data,rows]);
+  const filteredRows=filter==="ALL" ? sourceRows : sourceRows.filter(x=>x.type===filter);
   return (
     <section className="bid-panel">
+      <div className="bid-canonical-state-banner">
+        <strong>{canonical.isLive ? "LIVE DB DEVIATION PROJECTION" : "CONTROLLED FALLBACK PREVIEW"}</strong>
+        <span>Deviation output is generated from canonical requirement/response exceptions; closure remains linked to the originating requirement.</span>
+      </div>
       <div className="bid-panel-head">
         <div>
           <small>ATTACHMENT 3 + ATTACHMENT 4</small>
@@ -539,7 +575,7 @@ function DeviationView({ filter, setFilter, rows }) {
         <table className="bid-table">
           <thead><tr><th>Type</th><th>Source / issue</th><th>Bid response</th><th>Status</th></tr></thead>
           <tbody>
-            {rows.map((x, idx) => (
+            {filteredRows.map((x, idx) => (
               <tr key={idx}>
                 <td><span className={"bid-dev-type " + x.type.toLowerCase()}>{x.type}</span></td>
                 <td><strong>{x.source}</strong><br/><span>{x.issue}</span></td>
@@ -555,18 +591,34 @@ function DeviationView({ filter, setFilter, rows }) {
 }
 
 function SubmissionView() {
+  const canonical=useProject0550CanonicalState();
+  const outputs=useMemo(()=>{
+    if(!canonical.data?.submissionItems?.length) return OUTPUTS;
+    return canonical.data.submissionItems.map(x=>[
+      x.submission_code,
+      x.title,
+      x.source_template || x.submission_type,
+      x.readiness_status
+    ]);
+  },[canonical.data]);
+  const blocked=outputs.some(x=>["OPEN","NOT_READY","BLOCKED","PARTIAL"].includes(String(x[3]).toUpperCase()));
   return (
     <div className="bid-stack">
+      <div className="bid-canonical-state-banner">
+        <strong>{canonical.isLive ? "LIVE DB SUBMISSION PACKAGE PROJECTION" : "CONTROLLED FALLBACK PREVIEW"}</strong>
+        <span>Submission module assembles released outputs only; it does not create engineering, scope, deviation or price truth.</span>
+        {canonical.data?.openChanges?.length ? <em>{canonical.data.openChanges.length} open change event(s) may stale downstream outputs</em> : null}
+      </div>
       <section className="bid-panel">
         <div className="bid-panel-head">
           <div>
             <small>READY-TO-SUBMIT PACKAGE</small>
             <h2>Definition of Done ของงานเสนอราคา</h2>
           </div>
-          <Status status="NOT READY" />
+          <Status status={blocked ? "NOT READY" : "READY"} />
         </div>
         <div className="bid-submit-grid">
-          {OUTPUTS.map(([code, title, basis, state], idx) => (
+          {outputs.map(([code, title, basis, state], idx) => (
             <article key={code}>
               <span>{String(idx + 1).padStart(2, "0")}</span>
               <div><strong>{title}</strong><small>{basis}</small></div>
