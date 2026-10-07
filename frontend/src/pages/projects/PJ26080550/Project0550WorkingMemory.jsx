@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261007-06",
+  syncRevision: "SYNC-20261007-07",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -60,7 +60,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     fxControl: "GEQ-034 COMMON/GENERIC Controlled Currency Conversion: P_to = P_from × R_from,THB / R_to,THB. Cross-currency display uses Bank of Thailand FM_FX_001_S3 MID RATE from the controlled rate date/type. Current basis 06-Oct-2026: USD/THB 33.6643, EUR/THB 37.7629, CNY/THB 5.0217. Source/vendor currency remains authoritative; converted value is DERIVED working/reference only.",
     uiReadabilityControl: "PTTEP 10008-STD-6-GEN-003 was reviewed for document presentation; no explicit web/UI font-size rule was identified. 0550 UI therefore applies its controlled readability standard: trace body >=12.5px, tabs ~13px, equation chips >=11.5px, two-column engineering trace, and no micro-text to fit density.",
     presentationLayerRule: "UI presentation may change without changing the controlled engineering/commercial model. Current prototype defaults to Hierarchical Outline / Group View with +/- expand-collapse; Detailed Tabs remain available as fallback. Both consume the same trace, evidence, DB/JSON state, equations and output contracts.",
-    digitalThreadRule: "Requirement is an executable trace layer, not a prose summary: Customer/Company Source -> Requirement -> Constraint -> Proof -> Required Object/Quantity Driver -> COMMON/GENERIC + PARTICULAR Equation -> Work/Lifecycle -> Cost Object -> Commercial Output. PAGA is the first fully detailed pilot; the same schema is intended for all 19 systems.",
+    digitalThreadRule: "Canonical execution authority = Project0550EngineeringDoctrine.fullChain. First Principles: SOURCE/EVIDENCE -> REQUIREMENT -> FUNDAMENTAL NEED. Constraint-Based Engineering: CONSTRAINT -> INTERFACE/CONTEXT -> ENGINEERING INPUT -> CAL/STUDY/RPT -> PROOF -> ARCHITECTURE -> PHYSICAL OBJECT -> QUANTITY DRIVER -> REQUIRED MTO -> BULK -> VENDOR RECONCILIATION. Parametric Cost/Lifecycle: WORK/RESOURCE -> DOCUMENT/VDRL/QA -> FAT/IFAT -> LOGISTICS/REGULATORY -> SITE READINESS -> INSTALL/PRECOM -> SAT/INTEGRATION/COMMISSIONING -> HANDOVER/WARRANTY -> COST/SCHEDULE/RISK -> COMMERCIAL TREATMENT -> RELEASE. UI groups may collapse these stages but may not change dependency order.",
     commercialAnalyticsRule: "Commercial visualization is presentation only and must reuse controlled price/cost state. The 19 engineering systems roll into 15 ASK-TSI A1 commercial groups; composite lines must remain explicitly composite until a defensible allocation driver exists. Graphs must distinguish source cost, controlled/budgetary sell, commercial uplift and OPEN/TBC cost.",
     pagaPilotAnalytics: "PAGA pilot now binds direct service/labor rows from Rev04 05_Service_Parametric + 07_VDRL: 432.5 direct MH, THB 259,450 internal direct labor cost, THB 937,078.55 base service sell before shared/common allocation. Shared survey/common pools and OEM site attendance remain separate until causally allocated/quoted.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
