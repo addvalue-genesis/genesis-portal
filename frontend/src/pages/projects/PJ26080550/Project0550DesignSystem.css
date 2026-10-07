@@ -3354,3 +3354,166 @@
     padding:8px;
   }
 }
+
+
+/* Rev23 — 7.1 canonical derivation workbench */
+.bid-shell .ica-architecture,
+.bid-shell .ica-derivation-spine{
+  border:1px solid #d6e0e8;
+  border-radius:8px;
+  background:#fff;
+  overflow:hidden;
+}
+.bid-shell .ica-architecture{
+  margin-top:12px;
+}
+.bid-shell .ica-architecture-summary{
+  display:grid;
+  grid-template-columns:repeat(6,minmax(0,1fr));
+  border-bottom:1px solid #dce4ea;
+}
+.bid-shell .ica-architecture-summary>div{
+  padding:10px 11px;
+  border-right:1px solid #e0e7ec;
+  min-width:0;
+}
+.bid-shell .ica-architecture-summary>div:last-child{border-right:0}
+.bid-shell .ica-architecture-summary small{
+  display:block;
+  color:#748696;
+  font-size:9px;
+  text-transform:uppercase;
+  font-weight:800;
+  margin-bottom:3px;
+}
+.bid-shell .ica-architecture-summary strong{
+  color:#2d5675;
+  font-size:15px;
+  font-variant-numeric:tabular-nums;
+}
+.bid-shell .ica-architecture-table{
+  width:100%;
+  min-width:1200px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.bid-shell .ica-architecture-table th,
+.bid-shell .ica-architecture-table td,
+.bid-shell .ica-product-map table th,
+.bid-shell .ica-product-map table td{
+  border-right:1px solid #d8e1e8;
+  border-bottom:1px solid #e0e6eb;
+  padding:8px 9px;
+  vertical-align:top;
+  text-align:left;
+  font-size:10.3px;
+  line-height:1.45;
+  color:#496175;
+  overflow-wrap:anywhere;
+}
+.bid-shell .ica-architecture-table th,
+.bid-shell .ica-product-map table th{
+  background:#eaf2f7;
+  color:#2f5675;
+  font-size:9.2px;
+  text-transform:uppercase;
+  font-weight:900;
+}
+.bid-shell .ica-architecture-table th:nth-child(1){width:55px}
+.bid-shell .ica-architecture-table th:nth-child(2){width:220px}
+.bid-shell .ica-architecture-table th:nth-child(3){width:300px}
+.bid-shell .ica-architecture-table th:nth-child(4){width:300px}
+.bid-shell .ica-architecture-table td strong,
+.bid-shell .ica-product-map td strong{
+  display:block;
+  color:#2d526f;
+}
+.bid-shell .ica-architecture-table code,
+.bid-shell .ica-product-map code{
+  font-size:9.5px;
+  color:#315e80;
+  white-space:normal;
+}
+.bid-shell .ica-promotion-rule{
+  display:grid;
+  grid-template-columns:260px 1fr;
+  gap:12px;
+  padding:10px 12px;
+  background:#fff8e9;
+  border-top:1px solid #eadcb7;
+  color:#675a3f;
+  font-size:10.4px;
+  line-height:1.5;
+}
+.bid-shell .ica-promotion-rule strong{color:#5b4c2f}
+.bid-shell .ica-product-map{
+  border-top:1px solid #dce4ea;
+}
+.bid-shell .ica-product-map table{
+  width:100%;
+  min-width:1250px;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+.bid-shell .ica-product-map th:nth-child(1){width:220px}
+.bid-shell .ica-product-map th:nth-child(2){width:280px}
+.bid-shell .ica-product-map th:nth-child(3){width:300px}
+.bid-shell .ica-product-map th:nth-child(4){width:auto}
+.bid-shell .ica-product-map th:nth-child(5){width:230px}
+.bid-shell .ica-product-map td small{
+  display:block;
+  margin-top:3px;
+  color:#718494;
+  font-size:9.2px!important;
+}
+.bid-shell .ica-derivation-spine{
+  margin:10px 0;
+}
+.bid-shell .ica-derivation-grid{
+  display:grid;
+  grid-template-columns:repeat(13,max-content);
+  align-items:stretch;
+  overflow-x:auto;
+  padding:10px;
+  gap:6px;
+}
+.bid-shell .ica-derivation-grid>b{
+  align-self:center;
+  color:#8aa0b2;
+  font-size:14px;
+}
+.bid-shell .ica-derivation-step{
+  min-width:185px;
+  max-width:240px;
+  border:1px solid #dbe4ea;
+  border-radius:6px;
+  padding:8px;
+  background:#fbfcfd;
+}
+.bid-shell .ica-derivation-step>small{
+  color:#80909e;
+  font-size:8.8px;
+  font-weight:900;
+}
+.bid-shell .ica-derivation-step>strong{
+  display:block;
+  margin:2px 0 4px;
+  color:#2e5776;
+  font-size:9.8px;
+}
+.bid-shell .ica-derivation-step>span{
+  display:block;
+  min-height:38px;
+  color:#5d7080;
+  font-size:9.1px;
+  line-height:1.35;
+}
+.bid-shell .ica-derivation-step>em{
+  display:inline-block;
+  margin-top:6px;
+}
+
+@media(max-width:1050px){
+  .bid-shell .ica-architecture-summary{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .bid-shell .ica-architecture-summary>div:nth-child(3){border-right:0}
+}
