@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261007-14",
+  syncRevision: "SYNC-20261007-15",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -70,6 +70,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     pagaLifecycleResponsibility: "A20261632 explicitly quotes INDUSTRONIC FAT at Wertheim, Germany: 3 days × EUR 1,020/day = EUR 3,060, OEM executes FAT/TPI and up to 3 purchaser/end-user persons may attend; purchaser/end-user travel/accommodation are excluded. No site service rate is quoted. The offer states commissioning should be performed by INDUSTRONIC authorised personnel and independent commissioning may affect warranty. Current pilot therefore uses HYBRID FAT (OEM execute + ADDVALUE lead/witness/travel/closeout), ADDVALUE retained Pre-Com/SAT, and keeps OEM-authorised site commissioning as a separate TBC/quote/authorisation gate.",
     serviceBulkArchitecture: "Part B is derived from source-backed lifecycle/service obligations, not a standalone labor table. B1-B9 use MR/PHI/BOD/SPE/STD/Contract/TC/vendor evidence according to domain. Bulk is modeled now as a canonical required-MTO/material class: system-dedicated bulk remains attached to the system; shared/common bulk remains a common pool until causal allocation. Commercially, system bulk normally rolls into the applicable A1 line because the customer form expects bulk materials with the system package, while installation labor maps C1, logistics B2, startup spares B5, tools B6, capital spares C2 and 2Y operating spares C3. No /19 allocation by default.",
     pagaBulkPilot: "PAGA Bulk Pilot Rev00 is now bound as B01-B24. B01-B22 are material/accessory source rows; no source reference quantity is treated as released order quantity. Canonical DB seed stores reference quantities only in metadata and leaves required_qty NULL until proof/topology releases them. B23 VDRL/SDRL gap service is reclassified to B1; B24 onshore installation/SAT/commissioning is split by work object between B4 and C1. 7.1 displays the same bulk objects as expandable lines and prefers LIVE DB bulk-state when available.",
+    engineeringTableViewRule: "PAGA engineering trace presentation defaults to ruled line tables. Canonical 25-stage chain, source set, requirement threads, particular equations and downstream outputs all render from the existing digital-thread objects. Requirement rows support +/- expansion into a subtable of Source -> Fundamental Need -> Constraint/Context -> Engineering Input -> CAL/Study/RPT -> Architecture/Object/Qty -> Equation/Driver. This is presentation-only; doctrine, DB/JSON state and calculation dependencies are unchanged.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
     jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
   },
