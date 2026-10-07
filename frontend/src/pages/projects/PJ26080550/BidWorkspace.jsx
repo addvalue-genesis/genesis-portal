@@ -290,27 +290,6 @@ function Overview() {
         </div>
       </section>
 
-      {priceSurface==="FORM" ? (
-        <nav className="bid-price-mode-nav">
-          <button
-            type="button"
-            className={formPriceMode==="WORKING_PREVIEW"?"active":""}
-            onClick={()=>setFormPriceMode("WORKING_PREVIEW")}
-          >
-            <b>Working Preview</b>
-            <span>Current controlled prices · internal only</span>
-          </button>
-          <button
-            type="button"
-            className={formPriceMode==="RELEASED_OUTPUT"?"active":""}
-            onClick={()=>setFormPriceMode("RELEASED_OUTPUT")}
-          >
-            <b>Released Customer Output</b>
-            <span>Authorised RELEASED_SELL only</span>
-          </button>
-        </nav>
-      ) : null}
-
       <section className="bid-panel bid-highlight">
         <small>1.3 · REQUIREMENT-TO-SUBMISSION LOGIC</small>
         <h2>First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model เป็นกลไกประมวลผลของงาน ไม่ใช่ข้อความประกอบ UI</h2>
@@ -471,6 +450,27 @@ function PriceView() {
           <span>Internal Cost / Commercial Analysis</span>
         </button>
       </nav>
+
+      {priceSurface==="FORM" ? (
+        <nav className="bid-price-mode-nav">
+          <button
+            type="button"
+            className={formPriceMode==="WORKING_PREVIEW"?"active":""}
+            onClick={()=>setFormPriceMode("WORKING_PREVIEW")}
+          >
+            <b>Working Preview</b>
+            <span>Current controlled prices · internal only</span>
+          </button>
+          <button
+            type="button"
+            className={formPriceMode==="RELEASED_OUTPUT"?"active":""}
+            onClick={()=>setFormPriceMode("RELEASED_OUTPUT")}
+          >
+            <b>Released Customer Output</b>
+            <span>Authorised RELEASED_SELL only</span>
+          </button>
+        </nav>
+      ) : null}
 
       <section className="bid-panel bid-highlight">
         <div className="bid-panel-head">
