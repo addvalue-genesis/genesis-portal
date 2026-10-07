@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import "./EquationKernel.css";
 
-const KERNEL = [
+const CONTROLLED_FALLBACK_SNAPSHOT = [
   ["GEQ-001","Applicability","I_i = Applicable(Requirement, Scope, Phase, Context, Interface) ∈ {0,1}","STRUCTURAL_RULE","CONTROLLED","Does this obligation/activity apply to 0550?"],
   ["GEQ-002","Installed Quantity","Q_installed,e = Σ_f I[f,e] × q[f,e]","MATHEMATICAL_IDENTITY","CONTROLLED","Installed equipment / device quantity by location"],
   ["GEQ-004","Activity Quantity Driver","Q_i = Driver(B_i, Context)","STRUCTURAL_RULE","CONTROLLED","Turns physical/document/event basis into work quantity"],
@@ -85,15 +85,51 @@ const BINDING = [
 export function EquationKernel(){
   const [q,setQ]=useState("");
   const [view,setView]=useState("binding");
-  const rows=useMemo(()=>KERNEL.filter(r=>!q||r.join(" ").toLowerCase().includes(q.toLowerCase())),[q]);
+  const [registry,setRegistry]=useState(null);
+  const [registryState,setRegistryState]=useState("LOADING");
+
+  useEffect(()=>{
+    let active=true;
+    fetch("/backend/api/etm/equation-registry.php?project=PJ2608-0550")
+      .then(r=>{
+        if(!r.ok) throw new Error("HTTP "+r.status);
+        return r.json();
+      })
+      .then(payload=>{
+        if(!payload.ok || !Array.isArray(payload.equations)) throw new Error(payload.message||payload.error||"Equation registry unavailable");
+        if(active){
+          setRegistry(payload);
+          setRegistryState("LIVE_DB");
+        }
+      })
+      .catch(()=>{
+        if(active) setRegistryState("CONTROLLED_FALLBACK");
+      });
+    return ()=>{active=false;};
+  },[]);
+
+  const kernelRows=useMemo(()=>{
+    if(registryState!=="LIVE_DB" || !registry?.equations?.length) return CONTROLLED_FALLBACK_SNAPSHOT;
+    return registry.equations.map(r=>[
+      r.equation_code,
+      r.equation_name,
+      r.expression_text,
+      r.model_class || r.equation_layer,
+      r.calibration_state || r.control_status,
+      r.control_note || r.evidence_basis || r.equation_domain
+    ]);
+  },[registry,registryState]);
+
+  const rows=useMemo(()=>kernelRows.filter(r=>!q||r.join(" ").toLowerCase().includes(q.toLowerCase())),[q,kernelRows]);
 
   return (
     <div className="eq-shell">
       <section className="eq-banner">
         <div>
-          <small>CONTROLLED METHOD REUSE — NOT NEW THEORY</small>
-          <h2>0550 ใช้สมการและวิธีที่เคยควบคุมจาก 0553/0541 แล้ว “bind” ด้วยข้อมูลจริงของ 0550</h2>
+          <small>CONTROLLED METHOD REUSE — NOT NEW THEORY · {registryState==="LIVE_DB" ? "LIVE DB REGISTRY" : "CONTROLLED FALLBACK SNAPSHOT"}</small>
+          <h2>0550 ใช้สมการจาก Canonical Equation Registry แล้ว bind ด้วย Requirement / Input / Proof ของ 0550</h2>
           <p>
+            Canonical equation truth = etm_equation_registry; หน้านี้เป็น projection เท่านั้น.
             เราไม่ยก quantity, rate, crew หรือ commercial parameter ของโครงการเก่ามาเป็น fact ของ 0550.
             สิ่งที่ reuse คือ mathematical form, workflow logic, anti-double-count rule และ research/standards grounding.
           </p>
