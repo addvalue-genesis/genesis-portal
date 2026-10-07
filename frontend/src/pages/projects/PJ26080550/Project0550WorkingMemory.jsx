@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261007-24",
+  syncRevision: "SYNC-20261007-25",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -79,6 +79,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     pricingLayerArchitecture: "Every commercial line has four semantic layers: SOURCE_COST -> INTERNAL_COST -> WORKING_SELL -> RELEASED_SELL. 7.1 Internal Cost / Commercial Analysis may show all four. 7.0 ASK-TSI has two UI modes over the same state: Working Preview consumes the same WORKING_SELL layer processed/reviewed in 7.1, while Released Customer Output consumes AUTHORISED RELEASED_SELL only. Customer export remains released-sell-only; unreleased lines remain HOLD/TBC and must never be filled from source cost or working sell.",
     canonicalDerivationSpine: "Foundation Rev016: DB is canonical truth; JSON is exchange/snapshot; JS is deterministic derivation/rule/projection. Flow = Source/Evidence -> Particular Canonical State -> COMMON/GENERIC Equation Binding -> etm_calculation_runs audit/recompute -> canonical cost/price state -> 7.1 management workbench -> management release -> 7.0 Working Preview/Released Output. New evidence enters Particular first. Particular findings may promote to COMMON/GENERIC only via REVIEW_REQUIRED proposal and new method version.",
     canonicalProductIdentity: "Foundation Rev016 adds etm_products / etm_product_aliases and vendor-offer-item product binding. Same OEM model from different reseller/vendor quotes maps to one product identity; price, incoterm, lead time, warranty and quote conditions stay with each offer. PAGA INDUSTRONIC product identities seeded in 019 as the pilot.",
+    evidenceIngestionRule: "Evidence packet now accepts OEM datasheet/vendor technical submission/international-standard/research source classes and PRODUCT_IDENTITY / PRODUCT_CAPABILITY / VENDOR_CONDITION / METHOD_CANDIDATE domains. Product/datasheet assertions can bind to canonical product_id after migration 016. Every new source enters PARTICULAR review first. reusableMethodCandidate never edits COMMON/GENERIC directly; it creates a review-required promotion candidate and a new controlled method version is required.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
     jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
   },
@@ -87,6 +88,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     "Project0550EngineeringDoctrine.js",
     "Project0550SmartControlEngine.js",
     "Project0550EvidenceMemory.json",
+    "Project0550EvidencePacket.schema.json",
     "Project0550EvidenceReasoner.js",
     "Project0550PriceSourceModel.js",
     "Project0550CommercialModel.js",
