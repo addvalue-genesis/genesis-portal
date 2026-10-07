@@ -2118,3 +2118,51 @@
     grid-column:2;
   }
 }
+
+
+.bid-shell .ica-associated-cost{
+  border:1px solid #d8e2ea;
+  border-radius:8px;
+  overflow:hidden;
+  background:#fffdf8;
+}
+.bid-shell .ica-associated-cost>div:not(.ica-subhead){
+  display:grid;
+  grid-template-columns:minmax(145px,.8fr) minmax(250px,1.5fr) minmax(190px,1fr) minmax(210px,1fr);
+  gap:8px;
+  align-items:start;
+  padding:8px 10px;
+  border-top:1px solid #eee8da;
+}
+.bid-shell .ica-associated-cost span{
+  color:#7a6b4f;
+  font-size:9.8px;
+  font-weight:900;
+}
+.bid-shell .ica-associated-cost strong{
+  color:#4d5660;
+  font-size:10.8px;
+  line-height:1.4;
+}
+.bid-shell .ica-associated-cost em{
+  color:#173e61;
+  font-size:10.5px;
+  line-height:1.4;
+  font-style:normal;
+  text-align:right;
+}
+.bid-shell .ica-associated-cost small{
+  color:#786f61;
+  font-size:9.5px!important;
+  line-height:1.4;
+  text-align:right;
+}
+@media(max-width:950px){
+  .bid-shell .ica-associated-cost>div:not(.ica-subhead){
+    grid-template-columns:1fr;
+  }
+  .bid-shell .ica-associated-cost em,
+  .bid-shell .ica-associated-cost small{
+    text-align:left;
+  }
+}
