@@ -10,6 +10,7 @@ import {
 } from "./ASKTSIPricedBreakdownForm";
 import { convertFx } from "./Project0550FxControl";
 import { PROJECT0550_PAGA_DIRECT_SERVICE_MODEL } from "./Project0550PagaDigitalThread";
+import { PROJECT0550_PART_A_LEGACY_PROXY_RULE } from "./Project0550CommercialAllocationPolicy";
 
 function money(value,currency="USD"){
   if(!Number.isFinite(Number(value))) return "TBC";
@@ -335,6 +336,12 @@ export function InternalCostOfferAnalysis({
           <span>{currency}</span>
           <small>{canonical?.data?.openChanges?.length||0} open change/revision event(s)</small>
         </div>
+      </div>
+
+      <div className="ica-allocation-rule">
+        <strong>Commercial allocation control</strong>
+        <span>Part A = equipment / vendor package. ADDVALUE engineering, VDRL, training, FAT/SAT/commissioning, survey and other professional labor route to Part B/C. Vendor/OEM service with a dedicated B/C line must not be charged twice.</span>
+        <em>{PROJECT0550_PART_A_LEGACY_PROXY_RULE.rule}</em>
       </div>
 
       <div className="ica-toolbar">
