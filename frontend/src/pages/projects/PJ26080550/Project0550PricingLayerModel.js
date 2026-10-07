@@ -107,6 +107,31 @@ export function buildPriceLayerMap(lines={},liveRows=[]){
   return out;
 }
 
+export function workingPreviewLines(lines={},liveRows=[]){
+  const layers=buildPriceLayerMap(lines,liveRows);
+  const out={};
+  for(const [code,line] of Object.entries(lines||{})){
+    const working=layers[code]?.WORKING_SELL;
+    const known=working && Number.isFinite(Number(working.amount));
+    const currency=working?.currency||line.sourceCurrency||"USD";
+    out[code]={
+      ...line,
+      unitPriceByCurrency:known?{[currency]:Number(working.amount)}:{},
+      subtotalByCurrency:known?{[currency]:Number(working.amount)}:{},
+      sourceCurrency:currency,
+      state:known
+        ? "INTERNAL WORKING PREVIEW · "+String(working.state||"WORKING")
+        : "TBC — WORKING SELL NOT DERIVED",
+      priceRole:"WORKING_SELL_PROJECTION",
+      includeInKnownCustomerSubtotal:known,
+      internalTrace:known
+        ? "7.0 Working Preview consumes the same WORKING_SELL semantic layer shown in 7.1. It is not a customer-authorised offer."
+        : "No controlled WORKING_SELL amount is available. TBC remains visible and is not replaced by source cost or zero."
+    };
+  }
+  return out;
+}
+
 export function releasedCustomerLines(lines={},liveRows=[]){
   const layers=buildPriceLayerMap(lines,liveRows);
   const out={};
