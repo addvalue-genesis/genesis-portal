@@ -35,7 +35,6 @@ import {
   PROJECT0550_PAGA_METHOD_GROUPS,
   PROJECT0550_PAGA_REQUIREMENTS,
   PROJECT0550_PAGA_PARTICULAR_EQUATIONS,
-  PROJECT0550_PAGA_DIRECT_SERVICE_MODEL,
   PROJECT0550_PAGA_OUTPUT_CHAIN,
   pagaRequirementSummary
 } from "./Project0550PagaDigitalThread";
@@ -722,93 +721,6 @@ function RequirementBasisView({code,trace}){
             </dl>
           </article>
         ))}
-      </div>
-    </div>
-  );
-}
-
-function PagaCommercialComposition({audit,currency,eurThbFx,usdThbFx,cnyThbFx}){
-  const p=audit?.commercialPreview;
-  if(!p) return null;
-  const additions=p.knownSelectedCostEur-p.sourceCostEur;
-  const uplift=p.indicativeKnownCostSellEur-p.knownSelectedCostEur;
-  const total=p.indicativeKnownCostSellEur;
-  const pct=v=>total>0 ? Math.max(0,(v/total)*100) : 0;
-  return (
-    <div className="ask-commercial-decomp">
-      <div className="ask-commercial-decomp-head">
-        <div>
-          <small>COMMERCIAL DECOMPOSITION · PAGA PILOT</small>
-          <strong>Known numeric composition before unresolved completion cost</strong>
-          <span>Final selling price remains HOLD; open completion items are shown separately and never treated as zero.</span>
-        </div>
-        <div>
-          <small>INDICATIVE KNOWN-COST SELL</small>
-          <strong>{money(p.indicativeKnownCostSellEur,"EUR")}</strong>
-          <span>{displaySourceValue(p.indicativeKnownCostSellEur,"EUR",currency,eurThbFx,usdThbFx,cnyThbFx)}</span>
-        </div>
-      </div>
-      <div className="ask-commercial-stack" aria-label="PAGA known commercial composition">
-        <div className="vendor" style={{width:pct(p.sourceCostEur)+"%"}} title={"Vendor net "+money(p.sourceCostEur,"EUR")}></div>
-        <div className="addition" style={{width:pct(additions)+"%"}} title={"Requirement additions "+money(additions,"EUR")}></div>
-        <div className="uplift" style={{width:pct(uplift)+"%"}} title={"Commercial uplift "+money(uplift,"EUR")}></div>
-      </div>
-      <div className="ask-commercial-legend">
-        <div><i className="vendor"></i><span>Vendor net cost</span><strong>{money(p.sourceCostEur,"EUR")}</strong><em>{pct(p.sourceCostEur).toFixed(1)}%</em></div>
-        <div><i className="addition"></i><span>Controlled requirement additions</span><strong>{money(additions,"EUR")}</strong><em>{pct(additions).toFixed(1)}%</em></div>
-        <div><i className="uplift"></i><span>Commercial uplift on known cost</span><strong>{money(uplift,"EUR")}</strong><em>{pct(uplift).toFixed(1)}%</em></div>
-        <div className="tbc"><i></i><span>Open completion / lifecycle cost</span><strong>TBC</strong><em>not zero</em></div>
-      </div>
-    </div>
-  );
-}
-
-function PagaServiceAnalytics(){
-  const model=PROJECT0550_PAGA_DIRECT_SERVICE_MODEL;
-  const maxSell=Math.max(...model.rows.map(x=>x.baseSellThb),1);
-  const maxMh=Math.max(...model.rows.map(x=>x.mh),1);
-  return (
-    <div className="ask-service-analytics">
-      <div className="ask-service-analytics-head">
-        <div>
-          <small>PAGA DIRECT SERVICE / LABOR · CONTROLLED REV04</small>
-          <strong>ดู workload, internal labor cost และ base service sell แยกตามงาน</strong>
-          <span>{model.rule}</span>
-        </div>
-        <div>
-          <b>{model.totals.directMh.toLocaleString("en-US",{maximumFractionDigits:1})} MH</b><span>direct modeled workload</span>
-          <b>{money(model.totals.internalCostThb,"THB")}</b><span>internal direct labor cost</span>
-          <b>{money(model.totals.baseSellThb,"THB")}</b><span>base service sell before shared/common allocation</span>
-        </div>
-      </div>
-      <div className="ask-service-bars">
-        {model.rows.map(row=>(
-          <div key={row.code} className="ask-service-row">
-            <div className="ask-service-label">
-              <code>{row.code}</code>
-              <strong>{row.workObject}</strong>
-              <span>{row.category} · {row.role} · {row.commercialMap}</span>
-            </div>
-            <div className="ask-service-metric">
-              <small>Workload</small>
-              <div className="ask-service-track mh"><i style={{width:(row.mh/maxMh*100)+"%"}}></i></div>
-              <strong>{row.mh.toLocaleString("en-US",{maximumFractionDigits:1})} MH</strong>
-            </div>
-            <div className="ask-service-metric">
-              <small>Internal Cost</small>
-              <strong>{money(row.internalCostThb,"THB")}</strong>
-            </div>
-            <div className="ask-service-metric">
-              <small>Base Service Sell</small>
-              <div className="ask-service-track sell"><i style={{width:(row.baseSellThb/maxSell*100)+"%"}}></i></div>
-              <strong>{money(row.baseSellThb,"THB")}</strong>
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="ask-service-exclusions">
-        <b>Not forced into PAGA yet:</b>
-        <span>{model.exclusions.join(" · ")}</span>
       </div>
     </div>
   );
