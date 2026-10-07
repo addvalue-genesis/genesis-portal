@@ -305,6 +305,178 @@ function systemByToken(token){
   return PROJECT0550_SYSTEMS.find(x=>x.token===token) || null;
 }
 
+function traceTone(state){
+  const s=String(state||"TBC").toUpperCase();
+  if(/BLOCK|CONFLICT|HOLD/.test(s)) return "bad";
+  if(/OPEN|TBC/.test(s)) return "open";
+  if(/PARTIAL|PRELIMINARY|WORKING|APPLICABILITY/.test(s)) return "warn";
+  return "good";
+}
+
+function PagaMethodTable(){
+  const groupByStage=new Map();
+  PROJECT0550_PAGA_METHOD_GROUPS.forEach(group=>{
+    group.stages.forEach(stage=>groupByStage.set(stage.id,group));
+  });
+  return (
+    <div className="ask-line-table-wrap">
+      <table className="ask-line-table method">
+        <thead>
+          <tr>
+            <th>Seq</th><th>Group</th><th>Node</th><th>Status</th><th>Current controlled meaning</th>
+          </tr>
+        </thead>
+        <tbody>
+          {PROJECT0550_PAGA_CANONICAL_THREAD.map(stage=>{
+            const group=groupByStage.get(stage.id);
+            return (
+              <tr key={stage.id}>
+                <td className="seq">{String(stage.order).padStart(2,"0")}</td>
+                <td><strong>{group?.label||"—"}</strong><small>{group?.id||""}</small></td>
+                <td><strong>{stage.label}</strong><code>{stage.id}</code></td>
+                <td><span className={"ask-line-state "+traceTone(stage.state)}>{stage.state}</span></td>
+                <td>{stage.detail}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function PagaSourceTable(){
+  return (
+    <div className="ask-line-table-wrap">
+      <table className="ask-line-table sources">
+        <thead>
+          <tr>
+            <th>Source ID</th><th>Class</th><th>Document</th><th>Locator</th><th>Role / use</th><th>State</th>
+          </tr>
+        </thead>
+        <tbody>
+          {PROJECT0550_PAGA_SOURCE_CHAIN.map(s=>(
+            <tr key={s.code}>
+              <td><code>{s.code}</code></td>
+              <td>{s.class}</td>
+              <td><strong>{s.document}</strong></td>
+              <td>{s.locator}</td>
+              <td>{s.role}</td>
+              <td><span className={"ask-line-state "+traceTone(s.state)}>{s.state}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function PagaRequirementTraceTable(){
+  const [open,setOpen]=useState(()=>new Set(["REQ-PAGA-001"]));
+  function toggle(id){
+    setOpen(current=>{
+      const next=new Set(current);
+      if(next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  }
+  return (
+    <div className="ask-line-table-wrap">
+      <table className="ask-line-table requirements">
+        <thead>
+          <tr>
+            <th></th><th>Requirement ID</th><th>Requirement</th><th>Source</th><th>Proof</th><th>Downstream driver</th><th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {PROJECT0550_PAGA_REQUIREMENTS.map(req=>{
+            const method=pagaRequirementMethodDetail(req.id);
+            const isOpen=open.has(req.id);
+            return (
+              <React.Fragment key={req.id}>
+                <tr className={isOpen?"is-open":""}>
+                  <td><button type="button" className="ask-table-toggle" onClick={()=>toggle(req.id)}>{isOpen?"−":"+"}</button></td>
+                  <td><code>{req.id}</code><small>{req.title}</small></td>
+                  <td>{req.requirement}</td>
+                  <td>{req.source.join(" · ")}</td>
+                  <td>{req.proof.join(" · ")}</td>
+                  <td>{req.drives.join(" · ")}</td>
+                  <td><span className={"ask-line-state "+traceTone(req.state)}>{req.state}</span></td>
+                </tr>
+                {isOpen ? (
+                  <tr className="ask-expanded-row">
+                    <td></td>
+                    <td colSpan="6">
+                      <table className="ask-subtable">
+                        <tbody>
+                          <tr><th>01 · Source / Evidence</th><td>{req.source.join(" · ")}</td></tr>
+                          <tr><th>02 · Fundamental Need</th><td>{method?.fundamentalNeed || "TBC"}</td></tr>
+                          <tr><th>03 · Constraint / Context</th><td>{req.constraints.join("; ")}{method?.interfaceContext?.length ? " | "+method.interfaceContext.join(", ") : ""}</td></tr>
+                          <tr><th>04 · Engineering Input</th><td>{method?.engineeringInputs?.join(" · ") || "TBC"}</td></tr>
+                          <tr><th>05 · CAL / Study / RPT → Proof</th><td>{req.proof.join(" · ")}</td></tr>
+                          <tr><th>06 · Architecture / Object / Qty</th><td>{method?.architecture || "TBC"} | {req.objects.join(", ")} | {method?.requiredMtoState || req.drives.join(", ")}</td></tr>
+                          <tr><th>07 · Equation / Driver</th><td>{req.equations.join(" · ")} → {req.drives.join(", ")}</td></tr>
+                        </tbody>
+                      </table>
+                    </td>
+                  </tr>
+                ) : null}
+              </React.Fragment>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function PagaEquationTable(){
+  return (
+    <div className="ask-line-table-wrap">
+      <table className="ask-line-table equations">
+        <thead>
+          <tr>
+            <th>Equation</th><th>Name</th><th>Expression</th><th>Input</th><th>Output</th><th>State</th>
+          </tr>
+        </thead>
+        <tbody>
+          {PROJECT0550_PAGA_PARTICULAR_EQUATIONS.map(eq=>(
+            <tr key={eq.code}>
+              <td><code>{eq.code}</code></td>
+              <td><strong>{eq.name}</strong></td>
+              <td><code>{eq.expression}</code></td>
+              <td>{eq.input.join(" · ")}</td>
+              <td>{eq.output.join(" · ")}</td>
+              <td><span className={"ask-line-state "+traceTone(eq.state)}>{eq.state}</span></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
+function PagaOutputTable(){
+  return (
+    <div className="ask-line-table-wrap">
+      <table className="ask-line-table outputs">
+        <thead>
+          <tr><th>Step</th><th>Group</th><th>Controlled downstream output</th></tr>
+        </thead>
+        <tbody>
+          {PROJECT0550_PAGA_OUTPUT_CHAIN.map(x=>(
+            <tr key={x.step}>
+              <td className="seq">{String(x.step).padStart(2,"0")}</td>
+              <td><strong>{x.label}</strong></td>
+              <td>{x.output}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function RequirementBasisView({code,trace}){
   const commercialGroup=commercialGroupForLine(code);
   const systems=(commercialGroup?.systemTokens||[]).map(systemByToken).filter(Boolean);
@@ -333,28 +505,7 @@ function RequirementBasisView({code,trace}){
             <small>{PROJECT0550_PAGA_CANONICAL_THREAD.length} stages · Engineering Doctrine fullChain · presentation only</small>
             <em>DO NOT REORDER</em>
           </summary>
-          <div className="ask-detail-body">
-            <div className="ask-method-groups">
-              {PROJECT0550_PAGA_METHOD_GROUPS.map((group)=>(
-                <section key={group.id}>
-                  <div className="ask-method-group-title">
-                    <b>{group.id}</b>
-                    <strong>{group.label}</strong>
-                  </div>
-                  <div className="ask-method-group-stages">
-                    {group.stages.map(stage=>(
-                      <div key={stage.id} className={"ask-method-stage "+String(stage.state).toLowerCase().replaceAll(" ","-").replaceAll("/","-")}>
-                        <code>{String(stage.order).padStart(2,"0")}</code>
-                        <strong>{stage.label}</strong>
-                        <span>{stage.state}</span>
-                        <small>{stage.detail}</small>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          </div>
+          <div className="ask-detail-body"><PagaMethodTable/></div>
         </details>
 
         <details className="ask-thread-detail">
@@ -369,50 +520,16 @@ function RequirementBasisView({code,trace}){
               <strong>Source Set — not contractual precedence</strong>
               <span>Source family แต่ละตัว bind เข้าข้อกำหนดตาม clause/role. ลำดับบนหน้าจอไม่ใช่ order of precedence เว้นแต่ contract ระบุ.</span>
             </div>
-            <div className="ask-thread-source-chain">
-              {PROJECT0550_PAGA_SOURCE_CHAIN.map((s)=>(
-                <div className={"ask-thread-source "+String(s.state).toLowerCase().replaceAll("_","-")} key={s.code}>
-                  <small>{s.class}</small>
-                  <strong>{s.code}</strong>
-                  <span>{s.document}</span>
-                  <em>{s.locator}</em>
-                  <p>{s.role}</p>
-                </div>
-              ))}
-            </div>
+            <PagaSourceTable/>
           </div>
         </details>
 
         <div className="ask-thread-requirement-lines">
           <div className="ask-line-section-head">
             <strong>Requirement threads</strong>
-            <span>แต่ละบรรทัด trace จาก Source → Need → Constraint/Input → Proof → Object/Qty → Equation/Driver</span>
+            <span>แสดงเป็นตารางรายบรรทัด; กด + / − เพื่อเปิด Source → Need → Constraint/Input → Proof → Object/Qty → Equation/Driver</span>
           </div>
-          {PROJECT0550_PAGA_REQUIREMENTS.map(req=>{
-            const method=pagaRequirementMethodDetail(req.id);
-            return (
-              <details className="ask-thread-detail requirement" key={req.id}>
-                <summary>
-                  <span className="ask-detail-toggle"></span>
-                  <code>{req.id}</code>
-                  <strong>{req.title}</strong>
-                  <small>{req.requirement}</small>
-                  <em>{req.state}</em>
-                </summary>
-                <div className="ask-detail-body">
-                  <div className="ask-thread-flow canonical">
-                    <div><b>01 · Source / Evidence</b><span>{req.source.join(" · ")}</span></div>
-                    <div><b>02 · Fundamental Need</b><span>{method?.fundamentalNeed || "TBC"}</span></div>
-                    <div><b>03 · Constraint / Context</b><span>{req.constraints.join("; ")}{method?.interfaceContext?.length ? " | "+method.interfaceContext.join(", ") : ""}</span></div>
-                    <div><b>04 · Engineering Input</b><span>{method?.engineeringInputs?.join(" · ") || "TBC"}</span></div>
-                    <div><b>05 · CAL / Study / RPT → Proof</b><span>{req.proof.join(" · ")}</span></div>
-                    <div><b>06 · Architecture / Object / Qty</b><span>{method?.architecture || "TBC"} | {req.objects.join(", ")} | {method?.requiredMtoState || req.drives.join(", ")}</span></div>
-                    <div><b>07 · Equation / Downstream Driver</b><span>{req.equations.join(" · ")} → {req.drives.join(", ")}</span></div>
-                  </div>
-                </div>
-              </details>
-            );
-          })}
+          <PagaRequirementTraceTable/>
         </div>
 
         <details className="ask-thread-detail">
@@ -422,18 +539,7 @@ function RequirementBasisView({code,trace}){
             <small>{PROJECT0550_PAGA_PARTICULAR_EQUATIONS.length} system-specific engineering equations / studies</small>
             <em>PARTICULAR</em>
           </summary>
-          <div className="ask-detail-body">
-            <div className="ask-particular-equations">
-              {PROJECT0550_PAGA_PARTICULAR_EQUATIONS.map(eq=>(
-                <div key={eq.code}>
-                  <code>{eq.code}</code>
-                  <strong>{eq.name}</strong>
-                  <span>{eq.expression}</span>
-                  <small>Input: {eq.input.join(" · ")} | Output: {eq.output.join(" · ")} | State: {eq.state}</small>
-                </div>
-              ))}
-            </div>
-          </div>
+          <div className="ask-detail-body"><PagaEquationTable/></div>
         </details>
 
         <details className="ask-thread-detail">
@@ -443,16 +549,7 @@ function RequirementBasisView({code,trace}){
             <small>ย่อ canonical chain เพื่อดูผลกระทบไป MTO / Work / Cost / Commercial / Release</small>
             <em>PROJECTION</em>
           </summary>
-          <div className="ask-detail-body">
-            <div className="ask-output-thread">
-              {PROJECT0550_PAGA_OUTPUT_CHAIN.map((x,idx)=>(
-                <React.Fragment key={x.step}>
-                  <div><b>{x.step}</b><strong>{x.label}</strong><span>{x.output}</span></div>
-                  {idx<PROJECT0550_PAGA_OUTPUT_CHAIN.length-1 ? <i>→</i> : null}
-                </React.Fragment>
-              ))}
-            </div>
-          </div>
+          <div className="ask-detail-body"><PagaOutputTable/></div>
         </details>
       </div>
     );
