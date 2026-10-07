@@ -92,6 +92,14 @@ export const PROJECT0550_MODULE_CONTRACTS = {
     writes:[],
     rule:"No independent cost/price logic. Render mapped controlled price state only."
   },
+  "7.1":{
+    role:"PROJECTION",
+    writesCanonical:false,
+    purpose:"Internal cost-versus-offer analysis, system drilldown and graphs.",
+    reads:["ARCHITECTURE_OBJECT_QUANTITY","REQUIRED_MTO_BULK","VENDOR_OFFER_RECONCILIATION","WORK_RESOURCE_ACTIVITY","VDRL_DOCUMENT_QA","TEST_LIFECYCLE_LOGISTICS_REGULATORY","COST_RISK_SCHEDULE","COMMERCIAL_POLICY_TREATMENT","OUTPUT_REVISION"],
+    writes:[],
+    rule:"Read the same canonical cost/price bindings as 7.0. Charts and outline rows are views only; no independent cost, price or allocation facts."
+  },
   "8.0":{
     role:"OUTPUT",
     writesCanonical:true,
@@ -143,7 +151,7 @@ export const PROJECT0550_MODULE_CONTRACTS = {
 };
 
 export const PROJECT0550_OUTPUT_MODULES = ["7.0","8.0","9.0","10.0"];
-export const PROJECT0550_PROJECTION_MODULES = ["1.0","5.0","6.0","7.0","8.0","9.0","10.0"];
+export const PROJECT0550_PROJECTION_MODULES = ["1.0","5.0","6.0","7.0","7.1","8.0","9.0","10.0"];
 
 export const PROJECT0550_GRAPH_POLICY = {
   role:"PROJECTION",
