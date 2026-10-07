@@ -48,11 +48,23 @@ function etm_read_json_body(): array {
 try {
     $db = etm_db();
     $user = etm_require_user($db);
+    $hasProductLink = etm_evidence_column_exists($db,'etm_evidence_assertions','product_id')
+      && etm_evidence_column_exists($db,'etm_evidence_assertions','target_object_type')
+      && etm_evidence_table_exists($db,'etm_products');
 
     if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $projectCode = $_GET['project'] ?? 'PJ2608-0550';
         $ctx = etm_project_access_context($db,(int)$user['id'],$projectCode);
         etm_require_permission($ctx,'engineering.view');
+
+        $productSelect = $hasProductLink
+          ? ",ea.product_id,ea.target_object_type,ea.target_object_ref,
+             pr.product_code,pr.product_family,pr.product_name,pr.canonical_model,pr.manufacturer_part_no"
+          : ",NULL product_id,NULL target_object_type,NULL target_object_ref,
+             NULL product_code,NULL product_family,NULL product_name,NULL canonical_model,NULL manufacturer_part_no";
+        $productJoin = $hasProductLink
+          ? " LEFT JOIN etm_products pr ON pr.id=ea.product_id "
+          : "";
 
         $q = $db->prepare("
           SELECT
@@ -76,8 +88,10 @@ try {
             e.metadata_json evidence_metadata_json,
             ea.created_at,
             ea.updated_at
+            ".$productSelect."
           FROM etm_evidence_assertions ea
           JOIN etm_evidence e ON e.id=ea.evidence_id
+          ".$productJoin."
           WHERE ea.project_id=?
           ORDER BY ea.updated_at DESC, ea.id DESC
           LIMIT 500
@@ -100,7 +114,7 @@ try {
             'project'=>['code'=>$ctx['project_code'],'name'=>$ctx['project_name']],
             'summary'=>$summaryQ->fetch() ?: ['assertion_count'=>0,'source_count'=>0,'review_open'=>0],
             'assertions'=>$rows,
-            'architectureStatus'=>'EVIDENCE_INTELLIGENCE_011'
+            'architectureStatus'=>$hasProductLink ? 'EVIDENCE_INTELLIGENCE_016_PRODUCT_LINK' : 'EVIDENCE_INTELLIGENCE_011_COMPATIBILITY'
         ]);
     }
 
@@ -164,28 +178,57 @@ try {
     ]);
     $evidenceId = (int)$db->lastInsertId();
 
-    $upsert = $db->prepare("
-      INSERT INTO etm_evidence_assertions(
-        project_id,evidence_id,assertion_code,assertion_domain,system_token,price_line_code,
-        location_code,object_key,assertion_state,value_json,unit,source_priority,
-        extractor_type,review_state,assertion_hash,metadata_json
-      ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,'REVIEW_REQUIRED',?,?)
-      ON DUPLICATE KEY UPDATE
-        evidence_id=VALUES(evidence_id),
-        assertion_domain=VALUES(assertion_domain),
-        system_token=VALUES(system_token),
-        price_line_code=VALUES(price_line_code),
-        location_code=VALUES(location_code),
-        object_key=VALUES(object_key),
-        assertion_state=VALUES(assertion_state),
-        value_json=VALUES(value_json),
-        unit=VALUES(unit),
-        source_priority=VALUES(source_priority),
-        extractor_type=VALUES(extractor_type),
-        review_state='REVIEW_REQUIRED',
-        assertion_hash=VALUES(assertion_hash),
-        metadata_json=VALUES(metadata_json)
-    ");
+    if ($hasProductLink) {
+      $upsert = $db->prepare("
+        INSERT INTO etm_evidence_assertions(
+          project_id,evidence_id,assertion_code,assertion_domain,system_token,price_line_code,
+          location_code,object_key,product_id,target_object_type,target_object_ref,
+          assertion_state,value_json,unit,source_priority,
+          extractor_type,review_state,assertion_hash,metadata_json
+        ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,'REVIEW_REQUIRED',?,?)
+        ON DUPLICATE KEY UPDATE
+          evidence_id=VALUES(evidence_id),
+          assertion_domain=VALUES(assertion_domain),
+          system_token=VALUES(system_token),
+          price_line_code=VALUES(price_line_code),
+          location_code=VALUES(location_code),
+          object_key=VALUES(object_key),
+          product_id=VALUES(product_id),
+          target_object_type=VALUES(target_object_type),
+          target_object_ref=VALUES(target_object_ref),
+          assertion_state=VALUES(assertion_state),
+          value_json=VALUES(value_json),
+          unit=VALUES(unit),
+          source_priority=VALUES(source_priority),
+          extractor_type=VALUES(extractor_type),
+          review_state='REVIEW_REQUIRED',
+          assertion_hash=VALUES(assertion_hash),
+          metadata_json=VALUES(metadata_json)
+      ");
+    } else {
+      $upsert = $db->prepare("
+        INSERT INTO etm_evidence_assertions(
+          project_id,evidence_id,assertion_code,assertion_domain,system_token,price_line_code,
+          location_code,object_key,assertion_state,value_json,unit,source_priority,
+          extractor_type,review_state,assertion_hash,metadata_json
+        ) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,'REVIEW_REQUIRED',?,?)
+        ON DUPLICATE KEY UPDATE
+          evidence_id=VALUES(evidence_id),
+          assertion_domain=VALUES(assertion_domain),
+          system_token=VALUES(system_token),
+          price_line_code=VALUES(price_line_code),
+          location_code=VALUES(location_code),
+          object_key=VALUES(object_key),
+          assertion_state=VALUES(assertion_state),
+          value_json=VALUES(value_json),
+          unit=VALUES(unit),
+          source_priority=VALUES(source_priority),
+          extractor_type=VALUES(extractor_type),
+          review_state='REVIEW_REQUIRED',
+          assertion_hash=VALUES(assertion_hash),
+          metadata_json=VALUES(metadata_json)
+      ");
+    }
 
     $written = 0;
     foreach ($assertions as $a) {
@@ -217,18 +260,38 @@ try {
             'priceLine'=>$a['priceLine'] ?? null,
             'location'=>$a['location'] ?? null,
             'object'=>$a['object'] ?? null,
+            'productCode'=>$a['productCode'] ?? null,
+            'targetObjectType'=>$a['targetObjectType'] ?? null,
+            'targetObjectRef'=>$a['targetObjectRef'] ?? null,
+            'reusableMethodCandidate'=>$a['reusableMethodCandidate'] ?? false,
             'state'=>$state,
             'value'=>$valuePayload,
         ];
         $hash = hash('sha256',json_encode($hashPayload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES));
 
+        $productId = null;
+        if ($hasProductLink && !empty($a['productCode'])) {
+            $productQ=$db->prepare("SELECT id FROM etm_products WHERE product_code=? LIMIT 1");
+            $productQ->execute([(string)$a['productCode']]);
+            $productId=$productQ->fetchColumn();
+            $productId=$productId===false ? null : (int)$productId;
+        }
+
         $meta = [
             'sourceType'=>$sourceType,
             'sourceRef'=>$packet['sourceRef'] ?? null,
+            'productCode'=>$a['productCode'] ?? null,
+            'manufacturer'=>$a['manufacturer'] ?? null,
+            'model'=>$a['model'] ?? null,
+            'partNo'=>$a['partNo'] ?? null,
+            'reusableMethodCandidate'=>$a['reusableMethodCandidate'] ?? false,
+            'promotionRule'=>($a['reusableMethodCandidate'] ?? false)
+              ? 'REVIEW_REQUIRED_NEW_COMMON_GENERIC_VERSION'
+              : 'PARTICULAR_FIRST',
             'rawAssertion'=>$a,
         ];
 
-        $upsert->execute([
+        $baseParams=[
             (int)$ctx['project_id'],
             $evidenceId,
             $assertionId,
@@ -237,6 +300,13 @@ try {
             $a['priceLine'] ?? null,
             $a['location'] ?? null,
             $a['object'] ?? ($a['key'] ?? null),
+        ];
+        if ($hasProductLink) {
+            $baseParams[]=$productId;
+            $baseParams[]=$a['targetObjectType'] ?? null;
+            $baseParams[]=$a['targetObjectRef'] ?? null;
+        }
+        $upsert->execute(array_merge($baseParams,[
             $state,
             json_encode($valuePayload,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
             $a['unit'] ?? null,
@@ -244,7 +314,7 @@ try {
             $extractorType,
             $hash,
             json_encode($meta,JSON_UNESCAPED_UNICODE|JSON_UNESCAPED_SLASHES),
-        ]);
+        ]));
         $written++;
     }
 
@@ -257,8 +327,8 @@ try {
         'evidenceId'=>$evidenceId,
         'assertionsWritten'=>$written,
         'reviewState'=>'REVIEW_REQUIRED',
-        'next'=>'Run controlled evidence reasoning and approve/reject proposals before mutating released project facts.',
-        'architectureStatus'=>'EVIDENCE_INTELLIGENCE_011'
+        'next'=>'Run controlled evidence reasoning. New evidence remains PARTICULAR; reusable-method candidates require explicit promotion review/new method version before mutating COMMON/GENERIC state.',
+        'architectureStatus'=>$hasProductLink ? 'EVIDENCE_INTELLIGENCE_016_PRODUCT_LINK' : 'EVIDENCE_INTELLIGENCE_011_COMPATIBILITY'
     ],201);
 
 } catch (Throwable $e) {
