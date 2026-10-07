@@ -24,7 +24,8 @@ export const PROJECT0550_CONTROL_OBJECTS = [
       ],
       interfaceContext: { state:"PARTIAL" },
       engineeringInputs: { state:"PARTIAL" },
-      proof: { required:true, state:"NOT_FOUND", objects:["RPT-0005","supporting CAL/SDY"] },
+      calStudyRpt: { required:true, state:"OPEN", objects:["RPT-0005","PAGA-CAL-COVER-001","PAGA-CAL-AMP-001","PAGA-CAL-LOSS-001","PAGA-CAL-UPS-001","PAGA-SDY-IF-001"] },
+      proof: { required:true, state:"OPEN", objects:["coverage acceptance","loading acceptance","loss/topology acceptance","UPS/autonomy acceptance","interface verification"] },
       architecture: { state:"PRELIMINARY" },
       physicalObjects: { state:"PRELIMINARY", classes:["speaker","beacon","amplifier","cable","I/O","accessories"] },
       quantityDriver: { state:"PARTIAL", value:"coverage + load + topology + loss + redundancy" },
@@ -41,7 +42,8 @@ export const PROJECT0550_CONTROL_OBJECTS = [
       satCommissioning: { state:"OPEN" },
       handoverWarranty: { state:"OPEN" },
       costScheduleRisk: { state:"WORKING", costValue:1509940.27, currency:"USD", costBasis:"BUDGETARY / CURRENT QUOTE + WORKING BULK" },
-      commercialTreatment: { state:"WORKING", priceLine:"A1-05" }
+      commercialTreatment: { state:"WORKING", priceLine:"A1-05" },
+      release: { state:"OPEN", reason:"Required proof, final required MTO, bulk, lifecycle completion and final commercial treatment remain open." }
     }
   },
   {
