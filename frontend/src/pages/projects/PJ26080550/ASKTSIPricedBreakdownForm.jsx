@@ -24,6 +24,18 @@ import {
   ASKTSI_PRICED_BREAKDOWN_TEMPLATE,
   PROJECT0550_OUTPUT_PROFILES
 } from "./Project0550OutputContract";
+import { PROJECT0550_SYSTEMS } from "./Project0550SystemRegistry";
+import {
+  PROJECT0550_COMMERCIAL_GROUPS,
+  commercialGroupForLine
+} from "./Project0550CommercialModel";
+import {
+  PROJECT0550_PAGA_SOURCE_CHAIN,
+  PROJECT0550_PAGA_REQUIREMENTS,
+  PROJECT0550_PAGA_PARTICULAR_EQUATIONS,
+  PROJECT0550_PAGA_OUTPUT_CHAIN,
+  pagaRequirementSummary
+} from "./Project0550PagaDigitalThread";
 
 export { ASKTSI_PRICED_BREAKDOWN_TEMPLATE };
 
@@ -285,6 +297,213 @@ function RemarkCell({base,line,mode}){
   );
 }
 
+function systemByToken(token){
+  return PROJECT0550_SYSTEMS.find(x=>x.token===token) || null;
+}
+
+function RequirementBasisView({code,trace}){
+  const commercialGroup=commercialGroupForLine(code);
+  const systems=(commercialGroup?.systemTokens||[]).map(systemByToken).filter(Boolean);
+
+  if(code==="A1-05"){
+    const summary=pagaRequirementSummary();
+    return (
+      <div className="ask-digital-thread">
+        <div className="ask-thread-banner">
+          <div>
+            <small>REQUIREMENT FOUNDATION · BIDIRECTIONAL TRACE</small>
+            <strong>Customer / Company Source → Requirement → Proof → Required Object → Equation → Cost / Commercial</strong>
+            <span>นี่คือฐานคิดของข้อ 2–7; Vendor BOM เป็น evidence ฝั่ง offered และไม่สามารถแทน required scope ได้.</span>
+          </div>
+          <div>
+            <b>{summary.sources}</b><span>sources</span>
+            <b>{summary.requirements}</b><span>requirement threads</span>
+            <b>{summary.particularEquations}</b><span>particular equations</span>
+          </div>
+        </div>
+
+        <div className="ask-thread-source-chain">
+          {PROJECT0550_PAGA_SOURCE_CHAIN.map((s,idx)=>(
+            <React.Fragment key={s.code}>
+              <div className={"ask-thread-source "+String(s.state).toLowerCase().replaceAll("_","-")}>
+                <small>{s.class}</small>
+                <strong>{s.code}</strong>
+                <span>{s.document}</span>
+                <em>{s.locator}</em>
+                <p>{s.role}</p>
+              </div>
+              {idx<PROJECT0550_PAGA_SOURCE_CHAIN.length-1 ? <i>→</i> : null}
+            </React.Fragment>
+          ))}
+        </div>
+
+        <div className="ask-thread-requirements">
+          {PROJECT0550_PAGA_REQUIREMENTS.map(req=>(
+            <article key={req.id}>
+              <div className="ask-thread-req-head">
+                <code>{req.id}</code>
+                <strong>{req.title}</strong>
+                <span>{req.state}</span>
+              </div>
+              <p>{req.requirement}</p>
+              <div className="ask-thread-flow">
+                <div><b>Source</b><span>{req.source.join(" · ")}</span></div>
+                <i>→</i>
+                <div><b>Constraint</b><span>{req.constraints.join("; ")}</span></div>
+                <i>→</i>
+                <div><b>Proof</b><span>{req.proof.join(" · ")}</span></div>
+                <i>→</i>
+                <div><b>Required object / driver</b><span>{req.objects.join(", ")} → {req.drives.join(", ")}</span></div>
+                <i>→</i>
+                <div><b>Equation</b><span>{req.equations.join(" · ")}</span></div>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="ask-particular-equations">
+          <div className="ask-particular-equations-head">
+            <b>PAGA Particular Engineering Equations</b>
+            <span>COMMON / GENERIC GEQ ถูก reuse; สูตรที่เกิดจาก physics / requirement ของ PAGA อยู่ชั้น Particular</span>
+          </div>
+          {PROJECT0550_PAGA_PARTICULAR_EQUATIONS.map(eq=>(
+            <div key={eq.code}>
+              <code>{eq.code}</code>
+              <strong>{eq.name}</strong>
+              <span>{eq.expression}</span>
+              <small>Input: {eq.input.join(" · ")} | Output: {eq.output.join(" · ")} | State: {eq.state}</small>
+            </div>
+          ))}
+        </div>
+
+        <div className="ask-output-thread">
+          {PROJECT0550_PAGA_OUTPUT_CHAIN.map((x,idx)=>(
+            <React.Fragment key={x.step}>
+              <div><b>{x.step}</b><strong>{x.label}</strong><span>{x.output}</span></div>
+              {idx<PROJECT0550_PAGA_OUTPUT_CHAIN.length-1 ? <i>→</i> : null}
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="ask-digital-thread generic">
+      <div className="ask-thread-banner">
+        <div>
+          <small>RFQ BINDING · GENERIC 19-SYSTEM PATTERN</small>
+          <strong>Source binding exists now; detailed requirement threads migrate system-by-system using the same PAGA pilot schema.</strong>
+          <span>{trace.requirement}</span>
+        </div>
+      </div>
+      <div className="ask-generic-system-bindings">
+        {systems.map(system=>(
+          <article key={system.token}>
+            <div><code>{system.moduleId}</code><strong>{system.token}</strong><span>{system.name}</span></div>
+            <dl>
+              <div><dt>MR</dt><dd>{system.rfq?.mr}</dd></div>
+              <div><dt>PHI</dt><dd>{system.rfq?.phi}</dd></div>
+              <div><dt>BOD</dt><dd>{system.rfq?.bod}</dd></div>
+              <div><dt>SPE</dt><dd>{system.rfq?.spe}</dd></div>
+              <div><dt>STD</dt><dd>{system.rfq?.std}</dd></div>
+            </dl>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function PagaCommercialComposition({audit,currency,eurThbFx,usdThbFx,cnyThbFx}){
+  const p=audit?.commercialPreview;
+  if(!p) return null;
+  const additions=p.knownSelectedCostEur-p.sourceCostEur;
+  const uplift=p.indicativeKnownCostSellEur-p.knownSelectedCostEur;
+  const total=p.indicativeKnownCostSellEur;
+  const pct=v=>total>0 ? Math.max(0,(v/total)*100) : 0;
+  return (
+    <div className="ask-commercial-decomp">
+      <div className="ask-commercial-decomp-head">
+        <div>
+          <small>COMMERCIAL DECOMPOSITION · PAGA PILOT</small>
+          <strong>Known numeric composition before unresolved completion cost</strong>
+          <span>Final selling price remains HOLD; open completion items are shown separately and never treated as zero.</span>
+        </div>
+        <div>
+          <small>INDICATIVE KNOWN-COST SELL</small>
+          <strong>{money(p.indicativeKnownCostSellEur,"EUR")}</strong>
+          <span>{displaySourceValue(p.indicativeKnownCostSellEur,"EUR",currency,eurThbFx,usdThbFx,cnyThbFx)}</span>
+        </div>
+      </div>
+      <div className="ask-commercial-stack" aria-label="PAGA known commercial composition">
+        <div className="vendor" style={{width:pct(p.sourceCostEur)+"%"}} title={"Vendor net "+money(p.sourceCostEur,"EUR")}></div>
+        <div className="addition" style={{width:pct(additions)+"%"}} title={"Requirement additions "+money(additions,"EUR")}></div>
+        <div className="uplift" style={{width:pct(uplift)+"%"}} title={"Commercial uplift "+money(uplift,"EUR")}></div>
+      </div>
+      <div className="ask-commercial-legend">
+        <div><i className="vendor"></i><span>Vendor net cost</span><strong>{money(p.sourceCostEur,"EUR")}</strong><em>{pct(p.sourceCostEur).toFixed(1)}%</em></div>
+        <div><i className="addition"></i><span>Controlled requirement additions</span><strong>{money(additions,"EUR")}</strong><em>{pct(additions).toFixed(1)}%</em></div>
+        <div><i className="uplift"></i><span>Commercial uplift on known cost</span><strong>{money(uplift,"EUR")}</strong><em>{pct(uplift).toFixed(1)}%</em></div>
+        <div className="tbc"><i></i><span>Open completion / lifecycle cost</span><strong>TBC</strong><em>not zero</em></div>
+      </div>
+    </div>
+  );
+}
+
+function CommercialPortfolioView({lines,currency,eurThbFx,usdThbFx,cnyThbFx}){
+  const rows=PROJECT0550_COMMERCIAL_GROUPS.map(group=>{
+    const line=rowValue(lines,group.lineCode);
+    let value=lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice");
+    if(!Number.isFinite(value)) value=convertedAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
+    const info=classifyProject0550PriceLine(group.lineCode,line);
+    const costInput=line.includeInKnownCustomerSubtotal===false || /COST_INPUT/i.test(String(line.priceRole||""));
+    return {
+      ...group,
+      line,
+      info,
+      value:Number.isFinite(value)?value:null,
+      costInput,
+      systems:group.systemTokens.map(systemByToken).filter(Boolean)
+    };
+  }).sort((a,b)=>(b.value||0)-(a.value||0));
+  const max=Math.max(...rows.map(x=>x.value||0),1);
+  return (
+    <div className="ask-commercial-portfolio">
+      <div className="ask-commercial-portfolio-head">
+        <div>
+          <small>SYSTEM / COMMERCIAL GROUP ANALYTICS</small>
+          <strong>มองราคาแพง–ถูกก่อน แล้วค่อย drill down ไป Cost / Labor / Vendor / Gap</strong>
+          <span>15 customer price groups roll up 19 engineering systems. Composite lines are not arbitrarily split until a controlled allocation driver exists.</span>
+        </div>
+        <div>
+          <b>19</b><span>engineering systems</span>
+          <b>15</b><span>A1 commercial groups</span>
+        </div>
+      </div>
+      <div className="ask-commercial-bars">
+        {rows.map(row=>(
+          <div className={"ask-commercial-bar-row "+(row.costInput?"is-cost-input":"")} key={row.lineCode}>
+            <div className="ask-commercial-bar-label">
+              <code>{row.lineCode}</code>
+              <strong>{row.label}</strong>
+              <span>{row.systems.map(x=>x.token).join(" · ")}</span>
+            </div>
+            <div className="ask-commercial-bar-track">
+              <div style={{width:((row.value||0)/max*100)+"%"}}></div>
+            </div>
+            <div className="ask-commercial-bar-value">
+              <strong>{row.value===null ? "TBC" : money(row.value,currency)}</strong>
+              <span>{row.costInput ? "SOURCE COST INPUT / SELL HOLD" : row.info.short}</span>
+              {row.allocation!=="1:1" ? <small>{row.allocation}</small> : null}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function OutlineSection({title,summary,status,open,onToggle,children,className=""}){
   return (
     <section className={"ask-outline-section "+className+(open?" is-open":"")}>
@@ -416,12 +635,7 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                 open={outlineOpen.has("engineering")}
                 onToggle={()=>toggleOutline("engineering")}
               >
-                <div className="ask-outline-grid">
-                  <article><b>Requirement</b><span>{trace.requirement}</span></article>
-                  <article><b>Constraint</b><span>{trace.constraint}</span></article>
-                  <article><b>CAL / Study / RPT</b><span>{trace.proof}</span></article>
-                  <article><b>Quantity Driver</b><span>{trace.quantityDriver}</span></article>
-                </div>
+                <RequirementBasisView code={code} trace={trace}/>
               </OutlineSection>
 
               <OutlineSection
@@ -485,6 +699,15 @@ function PriceTraceDetail({code,line,currency,eurThbFx,usdThbFx,cnyThbFx}){
                   <article><b>Cost Object</b><span>{trace.costObject}</span></article>
                   <article><b>Commercial Rule</b><span>{trace.commercialRule}</span></article>
                 </div>
+                {code==="A1-05" ? (
+                  <PagaCommercialComposition
+                    audit={audit}
+                    currency={currency}
+                    eurThbFx={eurThbFx}
+                    usdThbFx={usdThbFx}
+                    cnyThbFx={cnyThbFx}
+                  />
+                ) : null}
                 {audit?.commercialPreview ? (
                   <div className="ask-price-ladder">
                     <div><small>1 · Vendor net cost</small><strong>{money(audit.commercialPreview.sourceCostEur,"EUR")}</strong><span>Source quotation cost</span></div>
@@ -954,6 +1177,15 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
           หน้าจอเป็น rich working view; customer export ยังคงรูปแบบ ASK-TSI ต้นฉบับ.
         </p>
         {mode==="INTERNAL" ? <PriceSourceOverview lines={lines} codes={aCodes}/> : null}
+        {mode==="INTERNAL" ? (
+          <CommercialPortfolioView
+            lines={lines}
+            currency={currency}
+            eurThbFx={eurThbFx}
+            usdThbFx={usdThbFx}
+            cnyThbFx={cnyThbFx}
+          />
+        ) : null}
         {mode==="INTERNAL" ? <OutputContractStrip/> : null}
         <div className="ask-price-audit">
           <div><b>Evidence Gate</b><span>{evidenceGate.status}</span></div>
