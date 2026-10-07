@@ -11,7 +11,6 @@ import { Project0550WorkingMemoryPanel, PROJECT0550_TEAM_WORKING_MEMORY } from "
 import { ASKTSIPricedBreakdownForm } from "./ASKTSIPricedBreakdownForm";
 import { InternalCostOfferAnalysis } from "./InternalCostOfferAnalysis";
 import { PROJECT0550_PRICING_BASELINE } from "./Project0550PricingBaseline";
-import { summarizeProject0550PriceSources } from "./Project0550PriceSourceModel";
 import { useProject0550CanonicalState, overlayControlledPriceLines } from "./useProject0550CanonicalState";
 
 const SOURCE_GROUPS = [
@@ -398,7 +397,6 @@ function PriceView() {
 
   const a1Codes=Object.keys(currentLines).filter(code=>/^A1-/.test(code));
   const bCodes=["B1","B2","B3","B4","B5","B6","B7","B8","B9"];
-  const sourceSummary=useMemo(()=>summarizeProject0550PriceSources(currentLines,a1Codes),[currentLines]);
 
   function sumKnownThb(codes){
     return codes.reduce((sum,code)=>{
@@ -447,7 +445,7 @@ function PriceView() {
         <div className="bid-panel-head">
           <div>
             <small>CURRENT 0550 PRICING BASELINE · {p.revision} · {p.date}</small>
-            <h2>ASK-TSI Priced Breakdown — Current Controlled Price View</h2>
+            <h2>{priceSurface==="FORM" ? "ASK-TSI Priced Breakdown — Customer Form Projection" : "Internal Cost / Offer Analysis — Management Projection"}</h2>
           </div>
           <span className="bid-status bad">PROJECT TOTAL: HOLD</span>
         </div>
@@ -462,52 +460,57 @@ function PriceView() {
           {canonical.data?.openChanges?.length ? <em>{canonical.data.openChanges.length} open revision/change event(s)</em> : null}
         </div>
 
-        <div className="bid-offer-summary">
-          <div>
-            <small>PROJECT SELLING PRICE / BASE OFFER</small>
-            <strong>HOLD</strong>
-            <span>Base Offer = Part A + Part B. This is the project selling price that will be submitted when all price gates are closed.</span>
+        {priceSurface==="FORM" ? (
+          <>
+          <div className="bid-offer-summary">
+            <div>
+              <small>PROJECT SELLING PRICE / BASE OFFER</small>
+              <strong>HOLD</strong>
+              <span>Base Offer = Part A + Part B. This is the project selling price that will be submitted when all price gates are closed.</span>
+            </div>
+            <div>
+              <small>KNOWN NUMERIC PORTION OF A + B · MIXED SOURCES · FINAL BASE OFFER STILL HOLD</small>
+              <strong>{knownBaseIn(currency)}</strong>
+              <span>
+                Dynamic from current controlled lines — not a hard-coded project total. Part A known = THB {partAKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · Part B known = THB {partBKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. Open/TBC portions such as PAGA remain outside the final released Base Offer.
+              </span>
+            </div>
+            <div>
+              <small>PART C</small>
+              <strong>OPTIONS</strong>
+              <span>Not included in Base Offer unless specifically selected/required.</span>
+            </div>
           </div>
-          <div>
-            <small>KNOWN NUMERIC PORTION OF A + B · MIXED SOURCES · FINAL BASE OFFER STILL HOLD</small>
-            <strong>{knownBaseIn(currency)}</strong>
-            <span>
-              Dynamic from current controlled lines — not a hard-coded project total. Part A known = THB {partAKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · Part B known = THB {partBKnownThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. Open/TBC portions such as PAGA remain outside the final released Base Offer.
-            </span>
+  
+          <div className="bid-control-grid">
+            <div>
+              <strong>A + B CONTROL</strong>
+              <span>Formula = Σ known numeric Part A + Σ known numeric Part B. Current known numeric portion = USD {(knownBaseThb/p.fx.thbPerUsd).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {knownBaseThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. BASE OFFER remains HOLD until all open/TBC portions are closed.</span>
+            </div>
+            <div>
+              <strong>PROJECT OFFER AMOUNT</strong>
+              <span>HOLD until INDUSTRONIC PAGA is fully converted/closed. This is the amount that will be submitted.</span>
+            </div>
+            <div>
+              <strong>PART C · OPTIONS</strong>
+              <span>Separate from Base Offer. Included only when the option is selected/required.</span>
+            </div>
+            <div>
+              <strong>PAGA Selected</strong>
+              <span>{p.paga.vendor} · {p.paga.offer} · EUR {p.paga.knownSelectedSubtotalEur.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · FX TBC</span>
+            </div>
+            <div>
+              <strong>Offer Composition</strong>
+              <span>{p.offerComposition.baseOffer} · {p.offerComposition.partC}</span>
+            </div>
+            <div>
+              <strong>FX Control · Bank of Thailand</strong>
+              <span>{p.fx.sourceReport} · {p.fx.rateType} · {p.fx.sourceDate} · USD/THB = {p.fx.thbPerUsd.toFixed(4)} · EUR/THB = {Number(eurThbFx).toFixed(4)} · CNY/THB = {Number(cnyThbFx).toFixed(4)}</span>
+            </div>
           </div>
-          <div>
-            <small>PART C</small>
-            <strong>OPTIONS</strong>
-            <span>Not included in Base Offer unless specifically selected/required.</span>
-          </div>
-        </div>
-
-        <div className="bid-control-grid">
-          <div>
-            <strong>A + B CONTROL</strong>
-            <span>Formula = Σ known numeric Part A + Σ known numeric Part B. Current known numeric portion = USD {(knownBaseThb/p.fx.thbPerUsd).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} / THB {knownBaseThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. BASE OFFER remains HOLD until all open/TBC portions are closed.</span>
-          </div>
-          <div>
-            <strong>PROJECT OFFER AMOUNT</strong>
-            <span>HOLD until INDUSTRONIC PAGA is fully converted/closed. This is the amount that will be submitted.</span>
-          </div>
-          <div>
-            <strong>PART C · OPTIONS</strong>
-            <span>Separate from Base Offer. Included only when the option is selected/required.</span>
-          </div>
-          <div>
-            <strong>PAGA Selected</strong>
-            <span>{p.paga.vendor} · {p.paga.offer} · EUR {p.paga.knownSelectedSubtotalEur.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · FX TBC</span>
-          </div>
-          <div>
-            <strong>Offer Composition</strong>
-            <span>{p.offerComposition.baseOffer} · {p.offerComposition.partC}</span>
-          </div>
-          <div>
-            <strong>FX Control · Bank of Thailand</strong>
-            <span>{p.fx.sourceReport} · {p.fx.rateType} · {p.fx.sourceDate} · USD/THB = {p.fx.thbPerUsd.toFixed(4)} · EUR/THB = {Number(eurThbFx).toFixed(4)} · CNY/THB = {Number(cnyThbFx).toFixed(4)}</span>
-          </div>
-        </div>
+  
+            </>
+        ) : null}
 
         <div className="bid-price-controls">
           <div className="bid-filter">
