@@ -54,7 +54,7 @@ export function VdrlProduction(){
       "DB",
       r.with_bid_status || "VERIFY",
       r.owner_basis || r.owner_basis_class || "TBC",
-      String(r.status||"NOT_STARTED").replaceAll("_"," ").toLowerCase().replace(/\b\w/g,m=>m.toUpperCase()),
+      ({NOT_STARTED:"Not started",IN_PROGRESS:"In progress",PARTIAL:"Partial",READY:"Ready",BLOCKED:"Blocked",HOLD:"Hold",NA:"N/A"}[String(r.status||"NOT_STARTED").toUpperCase()] || String(r.status||"TBC")),
       r.generator_profile || r.evidence_ref || "CONTROLLED STATE",
       r.calculated_mh,
       r.next_action || ""
