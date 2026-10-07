@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { PROJECT0550_COMMERCIAL_GROUPS } from "./Project0550CommercialModel";
 import { PROJECT0550_SYSTEMS } from "./Project0550SystemRegistry";
 import { auditForPriceLine } from "./Project0550A1PriceAudit";
+import { vendorOfferForPriceLine } from "./Project0550VendorOfferRegister";
 import { classifyProject0550PriceLine } from "./Project0550PriceSourceModel";
 import {
   CommercialPortfolioView,
@@ -217,6 +218,104 @@ function PagaBulkMtoView({canonical}){
 
 const PROJECT0550_PAGA_BULK_SOURCE_LABEL="PAGA Bulk Pilot Rev00 / controlled source snapshot";
 
+function PagaVendorOfferControlView({canonical,currency}){
+  const live=canonical?.data?.vendorOfferControl;
+  const fallback=vendorOfferForPriceLine("A1-05");
+
+  const liveOffer=live?.offers?.find(x=>x.offer_code==="A20261632") || live?.offers?.[0] || null;
+  const liveItems=live?.items||[];
+  const itemMap=new Map();
+  for(const row of liveItems){
+    const key=row.vendor_offer_item_id||row.item_no||row.description;
+    if(!itemMap.has(key)) itemMap.set(key,{...row,bindings:[]});
+    if(row.binding_code) itemMap.get(key).bindings.push(row);
+  }
+  const items=itemMap.size
+    ? [...itemMap.values()]
+    : (fallback?.vendorItems||[]).map((x,idx)=>({
+        vendor_offer_item_id:"fallback-"+idx,
+        item_no:null,
+        description:x.item,
+        offered_qty:x.qty,
+        unit:x.unit,
+        unit_price:x.unitPrice,
+        amount:x.total,
+        bindings:[{system_code:"PAGA",line_code:"A1-05",binding_role:x.inFinal===false?"OPTION":"DIRECT_SYSTEM_ITEM",binding_state:"CONTROLLED_FALLBACK"}]
+      }));
+
+  const conditions=(live?.conditions||[]).length
+    ? live.conditions
+    : [
+        {condition_code:"FALLBACK-INCOTERM",condition_type:"INCOTERM",raw_text:fallback?.incoterm||"TBC",cost_impact_state:"POTENTIAL",schedule_impact_state:"POTENTIAL",risk_impact_state:"POTENTIAL",warranty_impact_state:"NONE",acceptance_state:"OPEN"},
+        {condition_code:"FALLBACK-VALIDITY",condition_type:"VALIDITY",raw_text:fallback?.validity ? "Validity: "+fallback.validity : "TBC",cost_impact_state:"NONE",schedule_impact_state:"POTENTIAL",risk_impact_state:"POTENTIAL",warranty_impact_state:"NONE",acceptance_state:"OPEN"},
+        ...(fallback?.serviceScope||[]).map(x=>({
+          condition_code:"FALLBACK-"+x.serviceCode,
+          condition_type:x.eventType==="FAT"?"FAT":"COMMISSIONING",
+          raw_text:(x.eventName||"Service")+" · "+(x.quoteState||"TBC")+" · "+(x.participantBoundary||x.excludedCost||""),
+          cost_impact_state:x.total?"CONFIRMED":"POTENTIAL",
+          schedule_impact_state:"POTENTIAL",
+          risk_impact_state:"POTENTIAL",
+          warranty_impact_state:x.eventType==="SITE_COMMISSIONING"?"CONFIRMED":"NONE",
+          acceptance_state:"OPEN"
+        }))
+      ];
+
+  const offerCurrency=liveOffer?.currency||fallback?.currency||"EUR";
+  return (
+    <div className="ica-vendor-control">
+      <div className="ica-subhead">
+        <strong>Vendor Offer Source · whole offer → item binding → condition impact</strong>
+        <span>{liveOffer ? "LIVE DB canonical offer" : "CONTROLLED FALLBACK"} · source offer is preserved whole; system views filter through bindings</span>
+      </div>
+
+      <div className="ica-vendor-summary">
+        <div><small>Offer</small><strong>{liveOffer?.offer_code||fallback?.quoteRef||"TBC"}</strong><span>{liveOffer?.vendor_name||fallback?.vendor||""}</span></div>
+        <div><small>Currency</small><strong>{offerCurrency}</strong><span>Source currency stays authoritative</span></div>
+        <div><small>Items bound to PAGA</small><strong>{items.length}</strong><span>Vendor offered ≠ Required MTO</span></div>
+        <div><small>Conditions</small><strong>{conditions.length}</strong><span>Cost / schedule / risk / warranty impacts</span></div>
+      </div>
+
+      <div className="ica-table-wrap">
+        <table className="ica-control-table">
+          <thead><tr><th>Item</th><th>Description</th><th>Qty</th><th>Unit</th><th>Unit Price</th><th>Total</th><th>System / Commercial Binding</th></tr></thead>
+          <tbody>
+            {items.map(row=>(
+              <tr key={row.vendor_offer_item_id||row.item_no||row.description}>
+                <td><code>{row.item_no||"—"}</code></td>
+                <td><strong>{row.description}</strong></td>
+                <td className="num">{row.offered_qty??"TBC"}</td>
+                <td>{row.unit||""}</td>
+                <td className="num">{Number.isFinite(Number(row.unit_price))?money(Number(row.unit_price),offerCurrency):"—"}</td>
+                <td className="num">{Number.isFinite(Number(row.amount))?money(Number(row.amount),offerCurrency):"—"}</td>
+                <td>{(row.bindings||[]).length ? row.bindings.map((b,idx)=><span key={(b.binding_code||idx)}>{b.system_code||"COMMON"} · {b.line_code||"UNMAPPED"} · {b.binding_role||"TBC"} · {b.binding_state||"TBC"}</span>) : <span>UNMAPPED / REVIEW</span>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div className="ica-table-wrap">
+        <table className="ica-control-table conditions">
+          <thead><tr><th>Condition Type</th><th>Vendor Condition</th><th>Cost</th><th>Schedule</th><th>Risk</th><th>Warranty</th><th>Disposition</th></tr></thead>
+          <tbody>
+            {conditions.map(row=>(
+              <tr key={row.condition_code}>
+                <td><strong>{row.condition_type}</strong></td>
+                <td>{row.raw_text}</td>
+                <td>{row.cost_impact_state||"TBC"}</td>
+                <td>{row.schedule_impact_state||"TBC"}</td>
+                <td>{row.risk_impact_state||"TBC"}</td>
+                <td>{row.warranty_impact_state||"TBC"}</td>
+                <td>{row.acceptance_state||"OPEN"}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
 function PagaLifecycleResponsibilityView({currency}){
   return (
     <div className="ica-lifecycle">
@@ -421,6 +520,7 @@ function InternalAnalysisRow({
 
           {group.lineCode==="A1-05" ? (
             <>
+              <PagaVendorOfferControlView canonical={canonical} currency={currency}/>
               <PagaBulkMtoView canonical={canonical}/>
               <PagaLifecycleResponsibilityView currency={currency}/>
             </>
