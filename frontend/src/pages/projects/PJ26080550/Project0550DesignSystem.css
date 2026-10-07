@@ -1998,3 +1998,123 @@
     text-align:left;
   }
 }
+
+
+/* Compact expandable PAGA method / requirement lines */
+.bid-shell .ask-digital-thread.compact{
+  display:grid;
+  gap:8px;
+}
+.bid-shell .ask-thread-detail{
+  border:1px solid #d5e0e8;
+  border-radius:8px;
+  overflow:hidden;
+  background:#fff;
+}
+.bid-shell .ask-thread-detail>summary{
+  list-style:none;
+  display:grid;
+  grid-template-columns:28px minmax(160px,.7fr) minmax(260px,1.8fr) minmax(120px,.5fr);
+  gap:8px;
+  align-items:center;
+  padding:10px 12px;
+  background:#f8fafc;
+  cursor:pointer;
+}
+.bid-shell .ask-thread-detail>summary::-webkit-details-marker{display:none}
+.bid-shell .ask-thread-detail[open]>summary{
+  background:#eef5fa;
+  border-bottom:1px solid #dce5ec;
+}
+.bid-shell .ask-detail-toggle{
+  display:flex;
+  width:24px;
+  height:24px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #9fb5c6;
+  border-radius:5px;
+  background:#fff;
+  color:#173e61;
+}
+.bid-shell .ask-detail-toggle::before{
+  content:"+";
+  font-size:17px;
+  font-weight:900;
+}
+.bid-shell .ask-thread-detail[open] .ask-detail-toggle::before{
+  content:"−";
+}
+.bid-shell .ask-thread-detail>summary strong{
+  color:#244e70;
+  font-size:11.5px;
+  line-height:1.3;
+}
+.bid-shell .ask-thread-detail>summary small{
+  color:#667a8c;
+  font-size:10.5px!important;
+  line-height:1.4;
+}
+.bid-shell .ask-thread-detail>summary em{
+  justify-self:end;
+  padding:4px 7px;
+  border:1px solid #cbd7e0;
+  border-radius:999px;
+  background:#fff;
+  color:#65788a;
+  font-size:9.5px;
+  font-style:normal;
+  font-weight:900;
+}
+.bid-shell .ask-thread-detail.requirement>summary{
+  grid-template-columns:28px 110px minmax(180px,.65fr) minmax(300px,1.7fr) 90px;
+}
+.bid-shell .ask-thread-detail.requirement>summary code{
+  font-size:10px!important;
+}
+.bid-shell .ask-thread-detail.requirement>summary em{
+  justify-self:end;
+}
+.bid-shell .ask-detail-body{
+  padding:10px 12px 12px;
+}
+.bid-shell .ask-thread-requirement-lines{
+  display:grid;
+  gap:6px;
+}
+.bid-shell .ask-line-section-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  padding:8px 10px;
+  border-left:3px solid #507c9d;
+  background:#f4f8fb;
+}
+.bid-shell .ask-line-section-head strong{
+  color:#244f72;
+  font-size:11px;
+}
+.bid-shell .ask-line-section-head span{
+  color:#687b8d;
+  font-size:10.5px;
+  line-height:1.4;
+}
+.bid-shell .ask-particular-equations{
+  border:0!important;
+  border-radius:0!important;
+}
+@media(max-width:1000px){
+  .bid-shell .ask-thread-detail>summary,
+  .bid-shell .ask-thread-detail.requirement>summary{
+    grid-template-columns:28px 1fr;
+  }
+  .bid-shell .ask-thread-detail>summary small,
+  .bid-shell .ask-thread-detail>summary em{
+    grid-column:2;
+    justify-self:start;
+  }
+  .bid-shell .ask-thread-detail.requirement>summary code{
+    grid-column:2;
+  }
+}
