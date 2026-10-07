@@ -109,12 +109,17 @@ try {
           vo.id vendor_offer_id,vo.offer_code,vo.offer_revision,vo.offer_date,vo.currency offer_currency,
           sv.vendor_code selling_vendor_code,sv.vendor_name selling_vendor_name,
           voi.id vendor_offer_item_id,voi.item_no,voi.vendor_part_no,voi.vendor_model,
-          voi.description offer_description,voi.offered_qty,voi.unit,voi.unit_price,voi.amount
+          voi.description offer_description,voi.offered_qty,voi.unit,voi.unit_price,voi.amount,
+          b.binding_code,b.binding_role,b.binding_state,
+          s.system_code,s.system_name,psi.line_code
         FROM etm_vendor_offers vo
         JOIN etm_vendors sv ON sv.id=vo.vendor_id
         JOIN etm_vendor_offer_items voi ON voi.vendor_offer_id=vo.id
         JOIN etm_products pr ON pr.id=voi.product_id
         LEFT JOIN etm_vendors mv ON mv.id=pr.manufacturer_vendor_id
+        LEFT JOIN etm_vendor_offer_item_bindings b ON b.vendor_offer_item_id=voi.id AND b.project_id=vo.project_id
+        LEFT JOIN etm_systems s ON s.id=b.system_id
+        LEFT JOIN etm_bid_price_schedule_items psi ON psi.id=b.bid_price_schedule_item_id
         WHERE vo.project_id=?
         ORDER BY pr.product_code,vo.offer_date,vo.id,voi.item_no
       ",[$projectId]);
