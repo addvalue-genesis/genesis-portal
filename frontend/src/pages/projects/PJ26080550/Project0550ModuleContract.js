@@ -142,7 +142,8 @@ export const PROJECT0550_MODULE_CONTRACTS = {
   }
 };
 
-export const PROJECT0550_OUTPUT_SURFACES = ["5.0","7.0","8.0","9.0","10.0"];
+export const PROJECT0550_OUTPUT_MODULES = ["7.0","8.0","9.0","10.0"];
+export const PROJECT0550_PROJECTION_MODULES = ["1.0","5.0","6.0","7.0","8.0","9.0","10.0"];
 
 export const PROJECT0550_GRAPH_POLICY = {
   role:"PROJECTION",
