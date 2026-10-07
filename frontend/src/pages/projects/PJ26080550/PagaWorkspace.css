@@ -273,3 +273,31 @@ body{margin:0;background:#f4f7fb;color:var(--ink)}
 @media(max-width:520px){.etm-rpt-flow{grid-template-columns:1fr}}
 
 .etm-back-link{display:inline-flex;align-items:center;justify-content:center;border:1px solid #cad8e8;background:#fff;border-radius:999px;padding:7px 10px;color:#355a86;text-decoration:none;font-size:12px;font-weight:800;white-space:nowrap}
+
+
+/* Common ruled resolution table */
+.paga-resolution-table{
+  min-width:1280px;
+  table-layout:fixed;
+}
+.paga-resolution-table th,
+.paga-resolution-table td{
+  border-right:1px solid #d7e0e7;
+  border-bottom:1px solid #e0e7ec;
+  padding:9px 10px;
+  vertical-align:top;
+  font-size:10.5px;
+  line-height:1.45;
+}
+.paga-resolution-table th:last-child,
+.paga-resolution-table td:last-child{border-right:0}
+.paga-resolution-table th:nth-child(1){width:120px}
+.paga-resolution-table th:nth-child(2){width:220px}
+.paga-resolution-table th:nth-child(3){width:320px}
+.paga-resolution-table th:nth-child(4){width:300px}
+.paga-resolution-table th:nth-child(5){width:150px}
+.paga-resolution-table th:nth-child(6){width:auto}
+.paga-resolution-table code{
+  font-size:9.5px;
+  color:#315d80;
+}
