@@ -9,6 +9,7 @@ import {
   OutputContractStrip
 } from "./ASKTSIPricedBreakdownForm";
 import { convertFx } from "./Project0550FxControl";
+import { PROJECT0550_PAGA_DIRECT_SERVICE_MODEL } from "./Project0550PagaDigitalThread";
 
 function money(value,currency="USD"){
   if(!Number.isFinite(Number(value))) return "TBC";
@@ -123,6 +124,10 @@ function InternalAnalysisRow({
   const sourceInfo=classifyProject0550PriceLine(group.lineCode,line);
   const systems=group.systemTokens.map(systemByToken).filter(Boolean);
   const bindings=(canonical.data?.costPriceBindings||[]).filter(x=>x.line_code===group.lineCode);
+  const systemTokens=new Set(systems.map(x=>x.token));
+  const associatedBindings=(canonical.data?.costPriceBindings||[]).filter(
+    x=>systemTokens.has(x.system_code) && x.line_code!==group.lineCode
+  );
 
   const dbCostValues=bindings.map(x=>convertBindingAmount(x,currency)).filter(Number.isFinite);
   const dbCost=dbCostValues.length ? dbCostValues.reduce((a,b)=>a+b,0) : null;
@@ -247,6 +252,30 @@ function InternalAnalysisRow({
               </div>
             )) : <div className="ica-empty">No detailed cost binding is controlled yet. Keep TBC; do not derive a fake breakdown.</div>}
           </div>
+
+          {(associatedBindings.length || group.lineCode==="A1-05") ? (
+            <div className="ica-associated-cost">
+              <div className="ica-subhead">
+                <strong>Associated system service / lifecycle cost</strong>
+                <span>Separate commercial lines · shown for analysis only · not added into A1 equipment row here</span>
+              </div>
+              {associatedBindings.length ? associatedBindings.map((r,idx)=>(
+                <div key={(r.binding_code||"assoc")+"-"+idx}>
+                  <span>{r.line_code} · {r.cost_category||"COST"}</span>
+                  <strong>{r.cost_description}</strong>
+                  <em>{Number.isFinite(convertBindingAmount(r,currency))?money(convertBindingAmount(r,currency),currency):"TBC"}</em>
+                  <small>{r.binding_state||r.cost_status||"TBC"}</small>
+                </div>
+              )) : PROJECT0550_PAGA_DIRECT_SERVICE_MODEL.rows.map(r=>(
+                <div key={r.code}>
+                  <span>{r.commercialMap} · {r.category}</span>
+                  <strong>{r.workObject}</strong>
+                  <em>{r.mh.toLocaleString("en-US",{maximumFractionDigits:1})} MH · {money(r.internalCostThb,"THB")} internal</em>
+                  <small>{money(r.baseSellThb,"THB")} base service sell · controlled Rev04 snapshot</small>
+                </div>
+              ))}
+            </div>
+          ) : null}
 
           {openItems.length ? (
             <div className="ica-open-items">
