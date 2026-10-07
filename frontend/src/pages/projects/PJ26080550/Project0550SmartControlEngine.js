@@ -72,17 +72,32 @@ export function evaluateProject0550Object(record,{releaseIntent="PRICE_FREEZE"}=
       constraints.open+" technical/non-technical constraint(s) remain open or preliminary.",
       "Close or explicitly disposition each constraint before the selected release intent.");
   }
+  if(isOpen(c.interfaceContext) || isSoft(c.interfaceContext)){
+    add(findings,severityFor(intent,false),"CTX-001","INTERFACE_CONTEXT",
+      "Interface / physical context is open or preliminary.",
+      "Bind system boundaries, locations, adjacent systems, physical context and responsibility interfaces before design release.");
+  }
 
-  // Engineering inputs / proof
-  if(isOpen(c.engineeringInputs)){
+  // Engineering inputs / CAL-STUDY-RPT / proof
+  if(isOpen(c.engineeringInputs) || isSoft(c.engineeringInputs)){
     add(findings,severityFor(intent,false),"INP-001","ENGINEERING_INPUT",
-      "Required engineering inputs are open.",
+      "Required engineering inputs are open or preliminary.",
       "Complete controlled inputs or retain an explicit assumption for budgetary use only.");
+  }
+  if(c.calStudyRpt && c.calStudyRpt.required && !isClosed(c.calStudyRpt)){
+    add(findings,severityFor(intent,false),"CAL-001","CAL_STUDY_RPT",
+      "Required CAL / Study / RPT object is not controlled.",
+      "Create / obtain the applicable calculation, study or report and bind its inputs/results to the requirement.");
   }
   if(c.proof?.required && !isClosed(c.proof)){
     add(findings,severityFor(intent,false),"PRF-001","PROOF",
-      "Required CAL / Study / RPT proof has not passed.",
-      "Complete the required proof before engineering/final release.");
+      "Required engineering proof has not passed.",
+      "Close the proof result after the applicable CAL / Study / RPT is controlled.");
+  }
+  if(isOpen(c.architecture) || isSoft(c.architecture)){
+    add(findings,severityFor(intent,false),"ARC-001","ARCHITECTURE",
+      "Architecture is open or preliminary.",
+      "Resolve the feasible architecture from requirement + constraints + proof before final physical-object/quantity release.");
   }
 
   // Physical object / quantity logic
@@ -108,6 +123,11 @@ export function evaluateProject0550Object(record,{releaseIntent="PRICE_FREEZE"}=
     add(findings,"BLOCKER","QTY-003","REQUIRED_MTO",
       "Unknown quantity is encoded as numeric zero.",
       "Replace zero with null/TBC and preserve the open scope.");
+  }
+  if(isOpen(c.bulk) || (intent!=="BUDGETARY" && isSoft(c.bulk))){
+    add(findings,severityFor(intent,false),"BLK-001","BULK",
+      "Bulk / accessory quantity basis is open or preliminary.",
+      "Bind cable, JB, termination, support, gland, connector and other applicable bulk drivers before price freeze.");
   }
 
   // Vendor reconciliation
@@ -173,6 +193,11 @@ export function evaluateProject0550Object(record,{releaseIntent="PRICE_FREEZE"}=
       "Commercial treatment is still working/preliminary.",
       "Approve the final customer treatment before price freeze.");
   }
+  if(c.release && !isClosed(c.release)){
+    add(findings,intent==="BUDGETARY"?"WARN":"BLOCKER","REL-001","RELEASE",
+      "Release gate is not closed.",
+      "Release only after all mandatory upstream dependencies for the selected intent are closed or formally dispositioned.");
+  }
 
   const blockers = findings.filter(f=>f.severity==="BLOCKER");
   const warnings = findings.filter(f=>f.severity==="WARN");
@@ -180,7 +205,7 @@ export function evaluateProject0550Object(record,{releaseIntent="PRICE_FREEZE"}=
   // Evidence confidence informs review priority only; it never auto-releases.
   const confidenceSignals = [
     c.sourceEvidence,c.requirement,c.fundamentalNeed,c.interfaceContext,c.engineeringInputs,
-    c.proof,c.architecture,c.physicalObjects,c.quantityDriver,c.requiredMto,c.workResource,
+    c.calStudyRpt,c.proof,c.architecture,c.physicalObjects,c.quantityDriver,c.requiredMto,c.bulk,c.workResource,
     c.documentQa,c.logisticsRegulatory,c.costScheduleRisk,c.commercialTreatment
   ].map(stateOf);
   const scoreMap = {FACT:1,DERIVED:.9,PASS:1,APPROVED:1,CONTROLLED:1,READY:1,NOT_APPLICABLE:1,WORKING:.65,PARTIAL:.5,PRELIMINARY:.4,ASSUMPTION:.35,TBC:.1,OPEN:.1,NOT_FOUND:0,SOURCE_CONFLICT:0,MISSING:0};
