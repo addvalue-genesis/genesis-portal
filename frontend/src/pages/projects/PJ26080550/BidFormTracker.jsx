@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
+import { useProject0550CanonicalState } from "./useProject0550CanonicalState";
 
-const ROWS = [
+const FALLBACK_ROWS = [
   {
     id:"BID-001", source:"Exhibit A §4.1–4.3", group:"Contract",
     requirement:"Meet or exceed applicable codes, standards and project specifications; resolve conflicts before design/procurement.",
@@ -88,25 +89,44 @@ const ROWS = [
 ];
 
 export function BidFormTracker(){
+  const canonical=useProject0550CanonicalState();
+  const sourceRows=useMemo(()=>{
+    if(!canonical.data?.requirements?.length) return FALLBACK_ROWS;
+    return canonical.data.requirements.map(r=>({
+      id:r.requirement_code,
+      source:[r.source_code,r.clause_ref].filter(Boolean).join(" · ") || r.source_title || "SOURCE TBC",
+      group:r.requirement_domain || "OTHER",
+      requirement:r.requirement_text,
+      response:r.response_text || r.response_type || "TBC",
+      ref:[r.linked_proof_id&&"PROOF",r.linked_mto_id&&"MTO",r.linked_cost_item_id&&"COST"].filter(Boolean).join(" / ") || "CONTROLLED STATE",
+      status:r.response_status || r.requirement_status || "OPEN",
+      deviation:/DEVIATION/.test(String(r.response_type||"")) ? r.response_type : "—",
+      internal:r.reason_justification || "Derived from canonical bid requirement / response state."
+    }));
+  },[canonical.data]);
   const [mode,setMode]=useState("internal");
   const [group,setGroup]=useState("ALL");
   const [q,setQ]=useState("");
 
-  const groups=useMemo(()=>["ALL",...Array.from(new Set(ROWS.map(x=>x.group)))],[]);
-  const rows=useMemo(()=>ROWS.filter(x=>
+  const groups=useMemo(()=>["ALL",...Array.from(new Set(sourceRows.map(x=>x.group)))],[]);
+  const rows=useMemo(()=>sourceRows.filter(x=>
     (group==="ALL"||x.group===group) &&
     (!q||Object.values(x).join(" ").toLowerCase().includes(q.toLowerCase()))
-  ),[group,q]);
+  ),[sourceRows,group,q]);
 
   const counts=useMemo(()=>({
-    total:ROWS.length,
-    open:ROWS.filter(x=>["OPEN","REVIEW"].includes(x.status)).length,
-    partial:ROWS.filter(x=>x.status==="PARTIAL").length,
-    ready:ROWS.filter(x=>x.status.includes("READY")).length
-  }),[]);
+    total:sourceRows.length,
+    open:sourceRows.filter(x=>["OPEN","REVIEW","DRAFT"].includes(String(x.status).toUpperCase())).length,
+    partial:sourceRows.filter(x=>String(x.status).toUpperCase()==="PARTIAL").length,
+    ready:sourceRows.filter(x=>String(x.status).toUpperCase().includes("READY")).length
+  }),[sourceRows]);
 
   return (
     <div className="bid-form-shell">
+      <div className="bid-canonical-state-banner">
+        <strong>{canonical.isLive ? "LIVE DB CANONICAL REQUIREMENTS / RESPONSES" : "CONTROLLED FALLBACK PREVIEW"}</strong>
+        <span>Bid Form Tracker is a projection of canonical requirement/response state; it does not own a separate requirement list.</span>
+      </div>
       <div className="bid-form-toolbar">
         <div className="bid-view-mode">
           <span>View mode</span>
