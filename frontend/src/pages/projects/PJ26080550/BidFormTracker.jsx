@@ -108,7 +108,7 @@ export function BidFormTracker(){
   const [group,setGroup]=useState("ALL");
   const [q,setQ]=useState("");
 
-  const groups=useMemo(()=>["ALL",...Array.from(new Set(sourceRows.map(x=>x.group)))],[]);
+  const groups=useMemo(()=>["ALL",...Array.from(new Set(sourceRows.map(x=>x.group)))],[sourceRows]);
   const rows=useMemo(()=>sourceRows.filter(x=>
     (group==="ALL"||x.group===group) &&
     (!q||Object.values(x).join(" ").toLowerCase().includes(q.toLowerCase()))
