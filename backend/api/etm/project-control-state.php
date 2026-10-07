@@ -40,8 +40,24 @@ try {
     $deviations=[];
     $priceLines=[];
     $submissionItems=[];
+    $sourceGroups=[];
+    $sourceDocuments=[];
     if($bid){
         $bidId=(int)$bid['id'];
+
+        $sourceGroups=etm_fetch_all($db,"
+          SELECT id,group_code,group_name,source_domain,status
+          FROM etm_bid_source_groups
+          WHERE bid_package_id=?
+          ORDER BY id
+        ",[$bidId]);
+
+        $sourceDocuments=etm_fetch_all($db,"
+          SELECT source_code,source_title,source_role,precedence_order,status,document_id,source_group_id
+          FROM etm_bid_source_documents
+          WHERE bid_package_id=?
+          ORDER BY id
+        ",[$bidId]);
 
         $requirements=etm_fetch_all($db,"
           SELECT
@@ -143,6 +159,31 @@ try {
       ORDER BY module_id
     ",[$projectId]);
 
+    $priceDecision=etm_fetch_one($db,"
+      SELECT decision_code,price_state,cost_internal,cost_accept,financing_cost,risk_reserve,
+             currency,floor_price,target_price,offer_price,rationale_text,buyer_gate_status,
+             authorized_by,authorized_at,input_snapshot_json
+      FROM etm_bid_price_decisions
+      WHERE project_id=?
+      ORDER BY id DESC LIMIT 1
+    ",[$projectId]);
+
+    $acceptedConditions=etm_fetch_all($db,"
+      SELECT condition_code,source_ref,condition_text,acceptance_state,cost_class,
+             equation_code,input_state,amount_native,currency,zero_reason,evidence_ref,status
+      FROM etm_accepted_conditions
+      WHERE project_id=?
+      ORDER BY id
+    ",[$projectId]);
+
+    $buyerChecks=etm_fetch_all($db,"
+      SELECT check_code,check_group,check_text,severity,source_ref,check_state,
+             evidence_ref,action_text,hypothesis_flag
+      FROM etm_buyer_view_checks
+      WHERE project_id=?
+      ORDER BY id
+    ",[$projectId]);
+
     $traceSummary=etm_fetch_one($db,"
       SELECT COUNT(*) total_edges,
              COALESCE(SUM(stale_on_upstream_change=1),0) propagating_edges,
@@ -156,6 +197,8 @@ try {
       'architectureStatus'=>'CANONICAL_STATE_REVISION_CONTROL_013',
       'project'=>$project,
       'bidPackage'=>$bid,
+      'sourceGroups'=>$sourceGroups,
+      'sourceDocuments'=>$sourceDocuments,
       'documents'=>$documents,
       'requirements'=>$requirements,
       'deviations'=>$deviations,
@@ -163,6 +206,9 @@ try {
       'vdrl'=>$vdrl,
       'costItems'=>$costItems,
       'submissionItems'=>$submissionItems,
+      'priceDecision'=>$priceDecision,
+      'acceptedConditions'=>$acceptedConditions,
+      'buyerChecks'=>$buyerChecks,
       'openChanges'=>$openChanges,
       'outputRevisions'=>$outputRevisions,
       'projectionState'=>$projectionState,
