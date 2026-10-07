@@ -16,9 +16,11 @@ export function useProject0550CanonicalState(){
         if(!payload.ok) throw new Error(payload.message||payload.error||"Canonical-state API error");
         let bulkMto=[];
         let priceLayers=[];
-        const [bulkResult,priceLayerResult]=await Promise.allSettled([
+        let vendorOfferControl=null;
+        const [bulkResult,priceLayerResult,vendorOfferResult]=await Promise.allSettled([
           fetch("/backend/api/etm/bulk-state.php?project=PJ2608-0550&system=TEL-PAGA").then(async r=>r.ok?await r.json():null),
-          fetch("/backend/api/etm/pricing-layers.php?project=PJ2608-0550").then(async r=>r.ok?await r.json():null)
+          fetch("/backend/api/etm/pricing-layers.php?project=PJ2608-0550").then(async r=>r.ok?await r.json():null),
+          fetch("/backend/api/etm/vendor-offer-control.php?project=PJ2608-0550&system=PAGA").then(async r=>r.ok?await r.json():null)
         ]);
         if(bulkResult.status==="fulfilled" && bulkResult.value?.ok && Array.isArray(bulkResult.value.rows)){
           bulkMto=bulkResult.value.rows;
@@ -26,8 +28,11 @@ export function useProject0550CanonicalState(){
         if(priceLayerResult.status==="fulfilled" && priceLayerResult.value?.ok && Array.isArray(priceLayerResult.value.rows)){
           priceLayers=priceLayerResult.value.rows;
         }
+        if(vendorOfferResult.status==="fulfilled" && vendorOfferResult.value?.ok){
+          vendorOfferControl=vendorOfferResult.value;
+        }
         if(active){
-          setData({...payload,bulkMto,priceLayers});
+          setData({...payload,bulkMto,priceLayers,vendorOfferControl});
           setStatus("LIVE_DB");
           setError(null);
         }
