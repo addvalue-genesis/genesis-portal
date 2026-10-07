@@ -9,6 +9,7 @@ import { ControlSpine } from "./ControlSpine";
 import { BID_NAV_MODULES } from "./Project0550ModuleRegistry";
 import { Project0550WorkingMemoryPanel, PROJECT0550_TEAM_WORKING_MEMORY } from "./Project0550WorkingMemory";
 import { ASKTSIPricedBreakdownForm } from "./ASKTSIPricedBreakdownForm";
+import { InternalCostOfferAnalysis } from "./InternalCostOfferAnalysis";
 import { PROJECT0550_PRICING_BASELINE } from "./Project0550PricingBaseline";
 import { summarizeProject0550PriceSources } from "./Project0550PriceSourceModel";
 import { useProject0550CanonicalState, overlayControlledPriceLines } from "./useProject0550CanonicalState";
@@ -364,6 +365,7 @@ function ScopeView() {
 function PriceView() {
   const p = PROJECT0550_PRICING_BASELINE;
   const canonical=useProject0550CanonicalState();
+  const [priceSurface,setPriceSurface]=useState("FORM");
   const currentLines=useMemo(
     ()=>overlayControlledPriceLines(p.lines,canonical.priceLineMap),
     [p.lines,canonical.priceLineMap]
@@ -422,6 +424,25 @@ function PriceView() {
 
   return (
     <div className="bid-stack">
+      <nav className="bid-price-subnav">
+        <button
+          type="button"
+          className={priceSurface==="FORM"?"active":""}
+          onClick={()=>setPriceSurface("FORM")}
+        >
+          <b>7.0</b>
+          <span>ASK-TSI Priced Breakdown</span>
+        </button>
+        <button
+          type="button"
+          className={priceSurface==="ANALYSIS"?"active":""}
+          onClick={()=>setPriceSurface("ANALYSIS")}
+        >
+          <b>7.1</b>
+          <span>Internal Cost / Offer Analysis</span>
+        </button>
+      </nav>
+
       <section className="bid-panel bid-highlight">
         <div className="bid-panel-head">
           <div>
@@ -525,15 +546,27 @@ function PriceView() {
         </div>
       </section>
 
-      <ASKTSIPricedBreakdownForm
-        lines={currentLines}
-        currency={currency}
-        mode="INTERNAL"
-        eurThbFx={eurThbFx}
-        usdThbFx={p.fx.thbPerUsd}
-        cnyThbFx={cnyThbFx}
-      />
+      {priceSurface==="FORM" ? (
+        <ASKTSIPricedBreakdownForm
+          lines={currentLines}
+          currency={currency}
+          mode="INTERNAL"
+          eurThbFx={eurThbFx}
+          usdThbFx={p.fx.thbPerUsd}
+          cnyThbFx={cnyThbFx}
+        />
+      ) : (
+        <InternalCostOfferAnalysis
+          lines={currentLines}
+          currency={currency}
+          canonical={canonical}
+          eurThbFx={eurThbFx}
+          usdThbFx={p.fx.thbPerUsd}
+          cnyThbFx={cnyThbFx}
+        />
+      )}
 
+      {priceSurface==="FORM" ? (
       <section className="bid-panel bid-formula-panel">
         <small>PARAMETRIC COST ENGINEERING → CUSTOMER FORM</small>
         <h2>Form เป็น output ของ Engineering Truth ไม่ใช่แหล่งกำเนิดราคา</h2>
@@ -551,6 +584,7 @@ function PriceView() {
           จนกว่า EUR conversion และ OPEN/TBC ของ PAGA จะถูกปิดด้วย source-backed evidence.
         </p>
       </section>
+      ) : null}
     </div>
   );
 }
