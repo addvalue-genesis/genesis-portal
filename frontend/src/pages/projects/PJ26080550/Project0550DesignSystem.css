@@ -1519,3 +1519,38 @@
     grid-template-columns:1fr!important;
   }
 }
+
+
+/* Canonical-state projection banner */
+.bid-canonical-state-banner{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+  margin:0 0 10px;
+  padding:9px 11px;
+  border:1px solid #c8d8e5;
+  border-left:4px solid #2f6f9f;
+  border-radius:8px;
+  background:#f4f9fc;
+  color:#52697d;
+}
+.bid-canonical-state-banner strong{
+  color:#173e61;
+  font-size:11px;
+}
+.bid-canonical-state-banner span{
+  flex:1 1 420px;
+  font-size:11px;
+  line-height:1.45;
+}
+.bid-canonical-state-banner em{
+  padding:4px 7px;
+  border:1px solid #e0b2aa;
+  border-radius:999px;
+  background:#fff3f1;
+  color:#8d463d;
+  font-size:10px;
+  font-style:normal;
+  font-weight:800;
+}
