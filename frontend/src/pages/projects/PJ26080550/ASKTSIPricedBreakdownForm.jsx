@@ -546,7 +546,7 @@ function PagaServiceAnalytics(){
   );
 }
 
-function CommercialPortfolioView({lines,currency,eurThbFx,usdThbFx,cnyThbFx}){
+export function CommercialPortfolioView({lines,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const rows=PROJECT0550_COMMERCIAL_GROUPS.map(group=>{
     const line=rowValue(lines,group.lineCode);
     let value=convertedAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
@@ -1275,15 +1275,6 @@ export function ASKTSIPricedBreakdownForm({lines={},currency="USD",mode="INTERNA
           หน้าจอเป็น rich working view; customer export ยังคงรูปแบบ ASK-TSI ต้นฉบับ.
         </p>
         {mode==="INTERNAL" ? <PriceSourceOverview lines={lines} codes={aCodes}/> : null}
-        {mode==="INTERNAL" ? (
-          <CommercialPortfolioView
-            lines={lines}
-            currency={currency}
-            eurThbFx={eurThbFx}
-            usdThbFx={usdThbFx}
-            cnyThbFx={cnyThbFx}
-          />
-        ) : null}
         {mode==="INTERNAL" ? <OutputContractStrip/> : null}
         <div className="ask-price-audit">
           <div><b>Evidence Gate</b><span>{evidenceGate.status}</span></div>
