@@ -20,13 +20,17 @@ Trace edges determine actual impact.
 */
 
 import { PROJECT0550_ENGINEERING_DOCTRINE } from "./Project0550EngineeringDoctrine";
-import { PROJECT0550_OUTPUT_SURFACES } from "./Project0550ModuleContract";
+import {
+  PROJECT0550_OUTPUT_MODULES,
+  PROJECT0550_PROJECTION_MODULES
+} from "./Project0550ModuleContract";
 
 export const PROJECT0550_REVISION_PROPAGATION = {
   canonicalStages:PROJECT0550_ENGINEERING_DOCTRINE.fullChain.map(([id,label],index)=>({
     order:index+1,id,label
   })),
-  outputSurfaces:PROJECT0550_OUTPUT_SURFACES,
+  outputModules:PROJECT0550_OUTPUT_MODULES,
+  projectionModules:PROJECT0550_PROJECTION_MODULES,
   sourceChangePolicy:{
     createChangeEvent:true,
     preserveOldRevision:true,
@@ -79,7 +83,8 @@ export function impactPlanForSourceRevision({
   return {
     source:{type:sourceType,ref:sourceRef||null,previousRevision:previousRevision||null,newRevision:newRevision||null},
     impactedDomains:impacted,
-    outputModules:PROJECT0550_OUTPUT_SURFACES,
+    outputModules:PROJECT0550_OUTPUT_MODULES,
+    projectionModules:PROJECT0550_PROJECTION_MODULES,
     actions:[
       "REGISTER_NEW_REVISION_AND_PRESERVE_SUPERSEDED_REVISION",
       "CREATE_CHANGE_EVENT",
