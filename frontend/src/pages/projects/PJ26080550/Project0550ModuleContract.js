@@ -95,7 +95,7 @@ export const PROJECT0550_MODULE_CONTRACTS = {
   "7.1":{
     role:"PROJECTION",
     writesCanonical:false,
-    purpose:"Internal cost-versus-offer analysis, system drilldown and graphs.",
+    purpose:"Internal cost / commercial analysis, system drilldown and graphs.",
     reads:["ARCHITECTURE_OBJECT_QUANTITY","REQUIRED_MTO_BULK","VENDOR_OFFER_RECONCILIATION","WORK_RESOURCE_ACTIVITY","VDRL_DOCUMENT_QA","TEST_LIFECYCLE_LOGISTICS_REGULATORY","COST_RISK_SCHEDULE","COMMERCIAL_POLICY_TREATMENT","OUTPUT_REVISION"],
     writes:[],
     rule:"Read the same canonical cost/price bindings as 7.0. Charts and outline rows are views only; no independent cost, price or allocation facts."
