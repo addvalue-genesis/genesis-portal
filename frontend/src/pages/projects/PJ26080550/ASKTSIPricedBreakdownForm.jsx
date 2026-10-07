@@ -489,7 +489,7 @@ function RequirementBasisView({code,trace}){
           <div>
             <small>PAGA · CONTROLLED METHOD BINDING</small>
             <strong>First Principles → Constraint-Based Engineering → Parametric Cost → Commercial / Release</strong>
-            <span>หน้านี้เป็น projection ของข้อมูลหลัก ไม่ใช่ logic ชุดใหม่. เปิดเฉพาะบรรทัดที่ต้องการตรวจด้วย + / −.</span>
+            <span>Table / line view จาก controlled state เดิม ไม่สร้าง logic หรือข้อมูลใหม่. Requirement กด + / − เพื่อเปิด trace รายละเอียด.</span>
           </div>
           <div>
             <b>{summary.sources}</b><span>sources</span>
@@ -498,7 +498,7 @@ function RequirementBasisView({code,trace}){
           </div>
         </div>
 
-        <details className="ask-thread-detail">
+        <details className="ask-thread-detail" open>
           <summary>
             <span className="ask-detail-toggle"></span>
             <strong>Method binding · Canonical 25-stage chain</strong>
