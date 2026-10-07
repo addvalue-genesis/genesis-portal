@@ -47,6 +47,7 @@ function assertionKey(a){
     a.systemToken || "COMMON",
     a.priceLine || "NO_PRICE_LINE",
     a.location || "ALL",
+    a.productCode || a.productId || "NO_PRODUCT",
     a.object || a.key || "UNNAMED"
   ].join("|");
 }
