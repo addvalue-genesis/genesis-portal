@@ -1,17 +1,18 @@
 /*
-PJ2608-0550 — CANONICAL DERIVATION ENGINE
+PJ2608-0550 — PARTICULAR CANONICAL DERIVATION ADAPTER
 
-Purpose
--------
-Provide one deterministic processing layer between canonical DB/source state and
-7.1/7.0 UI projections.
+Role
+----
+Bind PJ2608-0550 PARTICULAR state to the reusable COMMON/GENERIC commercial
+derivation kernel.
 
-React components must not invent pricing logic. They ask this engine for:
-Source Cost -> Internal Cost -> Working Sell -> Released Sell,
-plus derivation/equation/product/recompute trace.
+This module may know:
+- 0550 commercial lines / system groups,
+- 0550 source classification,
+- 0550 controlled fallback audit snapshots,
+- 0550 price-layer selectors.
 
-DB remains canonical truth when live. Controlled JS snapshots are compatibility
-fallbacks only until migration/ingestion is complete.
+This module must not duplicate generic derivation algorithms.
 */
 
 import { convertFx } from "./Project0550FxControl";
@@ -19,28 +20,27 @@ import { auditForPriceLine } from "./Project0550A1PriceAudit";
 import { classifyProject0550PriceLine } from "./Project0550PriceSourceModel";
 import { priceLayersForLine } from "./Project0550PricingLayerModel";
 import { commercialGroupForLine } from "./Project0550CommercialModel";
-
-function finite(value){
-  return value!==null && value!==undefined && value!=="" && Number.isFinite(Number(value));
-}
+import {
+  amountFromCanonicalBinding,
+  amountFromCanonicalCostRow,
+  amountFromCanonicalLayer,
+  buildCanonicalCommercialTrace,
+  classifyCanonicalDerivationState,
+  convertCanonicalAmount,
+  finiteCanonicalValue,
+  resolveCanonicalInternalCost,
+  sumFiniteCanonicalValues
+} from "./CanonicalCommercialDerivationKernel";
 
 export function convertControlledAmount(value,fromCurrency,toCurrency){
-  if(!finite(value)) return null;
-  const from=String(fromCurrency||toCurrency||"THB").toUpperCase();
-  const to=String(toCurrency||from).toUpperCase();
-  return from===to ? Number(value) : convertFx(Number(value),from,to);
-}
-
-function amountFromBuildRow(row,targetCurrency){
-  if(!row) return null;
-  if(finite(row.amount)) return convertControlledAmount(row.amount,row.currency||"THB",targetCurrency);
-  if(finite(row.amountThb)) return convertControlledAmount(row.amountThb,"THB",targetCurrency);
-  return null;
+  return convertCanonicalAmount(value,fromCurrency,toCurrency,convertFx);
 }
 
 function fallbackCostBasis(audit,targetCurrency){
-  if(!audit) return {value:null,label:"COST TBC",basis:"No explicit controlled cost row",origin:"CONTROLLED_FALLBACK"};
-  if(finite(audit.commercialPreview?.knownSelectedCostEur)){
+  if(!audit){
+    return {value:null,label:"COST TBC",basis:"No explicit controlled cost row",origin:"CONTROLLED_FALLBACK"};
+  }
+  if(finiteCanonicalValue(audit.commercialPreview?.knownSelectedCostEur)){
     return {
       value:convertControlledAmount(audit.commercialPreview.knownSelectedCostEur,"EUR",targetCurrency),
       label:"KNOWN SELECTED COST",
@@ -50,27 +50,13 @@ function fallbackCostBasis(audit,targetCurrency){
   }
   const priority=[/^CONTROLLED COST$/i,/^KNOWN SELECTED COST$/i,/^KNOWN PROCURED COST$/i,/^RAW MARKET COST$/i];
   for(const pattern of priority){
-    const row=(audit.buildUp||[]).find(x=>pattern.test(String(x.priceClass||"")));
-    const value=amountFromBuildRow(row,targetCurrency);
+    const row=(audit.buildUp||[]).find(item=>pattern.test(String(item.priceClass||"")));
+    const value=amountFromCanonicalCostRow(row,targetCurrency,convertFx);
     if(Number.isFinite(value)){
       return {value,label:row.priceClass,basis:row.item||audit.basis,origin:"CONTROLLED_FALLBACK"};
     }
   }
   return {value:null,label:"COST TBC",basis:audit.basis||"No explicit controlled cost row",origin:"CONTROLLED_FALLBACK"};
-}
-
-function bindingAmount(row,targetCurrency){
-  if(!finite(row?.allocated_amount)) return null;
-  return convertControlledAmount(
-    row.allocated_amount,
-    row.binding_currency||row.cost_currency||"THB",
-    targetCurrency
-  );
-}
-
-function layerAmount(layer,targetCurrency){
-  if(!layer || !finite(layer.amount)) return null;
-  return convertControlledAmount(layer.amount,layer.currency||targetCurrency,targetCurrency);
 }
 
 function systemKeys(lineCode){
@@ -96,77 +82,89 @@ export function deriveProject0550CommercialLine({
   canonicalData={},
   currency="USD"
 }={}){
+  // PARTICULAR selectors / controlled facts.
+  const group=commercialGroupForLine(lineCode);
   const audit=auditForPriceLine(lineCode);
   const sourceInfo=classifyProject0550PriceLine(lineCode,line);
   const keys=systemKeys(lineCode);
 
-  const costBindings=(canonicalData.costPriceBindings||[]).filter(x=>x.line_code===lineCode);
-  const liveCostValues=costBindings.map(x=>bindingAmount(x,currency)).filter(Number.isFinite);
-  const liveKnownInternalCost=liveCostValues.length ? liveCostValues.reduce((a,b)=>a+b,0) : null;
+  const costBindings=(canonicalData.costPriceBindings||[]).filter(row=>row.line_code===lineCode);
+  const liveKnownInternalCost=sumFiniteCanonicalValues(
+    costBindings.map(row=>amountFromCanonicalBinding(row,currency,convertFx))
+  );
   const fallback=fallbackCostBasis(audit,currency);
-
   const layers=priceLayersForLine(lineCode,line,canonicalData.priceLayers||[]);
-  const sourceCost=layerAmount(layers.SOURCE_COST,currency);
-  const dbInternalCost=layerAmount(layers.INTERNAL_COST,currency);
-  const internalCost=Number.isFinite(dbInternalCost)
-    ? dbInternalCost
-    : Number.isFinite(liveKnownInternalCost)
-      ? liveKnownInternalCost
-      : fallback.value;
-  const workingSell=layerAmount(layers.WORKING_SELL,currency);
-  const releasedSell=layerAmount(layers.RELEASED_SELL,currency);
 
+  // COMMON / GENERIC amount resolution.
+  const sourceCost=amountFromCanonicalLayer(layers.SOURCE_COST,currency,convertFx);
+  const dbInternalCost=amountFromCanonicalLayer(layers.INTERNAL_COST,currency,convertFx);
+  const workingSell=amountFromCanonicalLayer(layers.WORKING_SELL,currency,convertFx);
+  const releasedSell=amountFromCanonicalLayer(layers.RELEASED_SELL,currency,convertFx);
+
+  const internalCostResolution=resolveCanonicalInternalCost({
+    dbInternalCost,
+    bindingInternalCost:liveKnownInternalCost,
+    fallbackInternalCost:fallback.value,
+    dbState:layers.INTERNAL_COST?.state||"CONTROLLED",
+    fallbackState:Number.isFinite(fallback.value) ? "KNOWN PARTIAL COST · "+fallback.label : "TBC",
+    fallbackOrigin:fallback.origin
+  });
+
+  // PARTICULAR relationship filtering over canonical DB state.
   const derivation=canonicalData.derivationState||{};
-  const equationBindings=(derivation.equationBindings||[]).filter(x=>rowMatchesLineOrSystem(x,lineCode,keys));
-  const calculationRuns=(derivation.calculationRuns||[]).filter(x=>rowMatchesLineOrSystem(x,lineCode,keys));
-  const productOfferItems=(derivation.productOfferItems||[]).filter(x=>rowMatchesLineOrSystem(x,lineCode,keys));
+  const equationBindings=(derivation.equationBindings||[]).filter(row=>rowMatchesLineOrSystem(row,lineCode,keys));
+  const calculationRuns=(derivation.calculationRuns||[]).filter(row=>rowMatchesLineOrSystem(row,lineCode,keys));
+  const productOfferItems=(derivation.productOfferItems||[]).filter(row=>rowMatchesLineOrSystem(row,lineCode,keys));
 
-  const staleRuns=calculationRuns.filter(x=>Number(x.stale_flag)===1 || String(x.result_state||"").toUpperCase()==="STALE");
-  const blockedRuns=calculationRuns.filter(x=>["TBC","BLOCKED","ERROR"].includes(String(x.result_state||"").toUpperCase()));
+  // COMMON / GENERIC run-state semantics.
+  const runState=classifyCanonicalDerivationState({calculationRuns,equationBindings});
+  const derivationState=runState.state;
+  const staleRuns=runState.staleRuns;
+  const blockedRuns=runState.blockedRuns;
 
   const detailRows=costBindings.length
-    ? costBindings.map(x=>({
-        className:x.cost_category||"COST",
-        item:x.cost_description,
-        amount:bindingAmount(x,currency),
-        state:x.binding_state||x.cost_status||"TBC",
-        source:x.binding_code,
+    ? costBindings.map(row=>({
+        className:row.cost_category||"COST",
+        item:row.cost_description,
+        amount:amountFromCanonicalBinding(row,currency,convertFx),
+        state:row.binding_state||row.cost_status||"TBC",
+        source:row.binding_code,
         origin:"LIVE_DB"
       }))
-    : (audit?.buildUp||[]).map(x=>({
-        className:x.priceClass,
-        item:x.item,
-        amount:amountFromBuildRow(x,currency),
-        amountText:x.amountText,
-        state:x.note||"",
+    : (audit?.buildUp||[]).map(row=>({
+        className:row.priceClass,
+        item:row.item,
+        amount:amountFromCanonicalCostRow(row,currency,convertFx),
+        amountText:row.amountText,
+        state:row.note||"",
         source:"CONTROLLED CODE SNAPSHOT",
         origin:"CONTROLLED_FALLBACK"
       }));
 
-  const internalCostState=Number.isFinite(dbInternalCost)
-    ? layers.INTERNAL_COST?.state||"CONTROLLED"
-    : Number.isFinite(liveKnownInternalCost)
-      ? "KNOWN PARTIAL COST · CANONICAL COST BINDINGS"
-      : Number.isFinite(fallback.value)
-        ? "KNOWN PARTIAL COST · "+fallback.label
-        : "TBC";
-
+  const internalCost=internalCostResolution.value;
+  const internalCostState=internalCostResolution.state;
   const releaseState=layers.RELEASED_SELL?.state||"HOLD";
   const lineState=releaseState==="AUTHORISED" ? "AUTHORISED CUSTOMER SELL" : (line.state||"HOLD / WORKING");
-  const derivationState=staleRuns.length
-    ? "STALE / RECALCULATE"
-    : blockedRuns.length
-      ? "BLOCKED / TBC INPUT"
-      : calculationRuns.length
-        ? "DERIVED / CURRENT"
-        : equationBindings.length
-          ? "BOUND / RUN TBC"
-          : "FALLBACK / BINDING TBC";
+
+  const derivationTrace=buildCanonicalCommercialTrace({
+    sourceState:sourceInfo?.status||line.state||"TBC",
+    sourceDetail:sourceInfo?.short||"Source classification",
+    particularBound:Boolean(productOfferItems.length||costBindings.length),
+    particularDetail:String(productOfferItems.length)+" product-bound offer item(s) · "+String(costBindings.length)+" cost-price binding(s)",
+    genericBound:Boolean(equationBindings.length),
+    genericDetail:String(equationBindings.length)+" equation binding(s)",
+    derivationState,
+    derivationDetail:String(calculationRuns.length)+" current run(s) · "+String(staleRuns.length)+" stale · "+String(blockedRuns.length)+" blocked/TBC",
+    internalCostState,
+    internalCostKnown:Number.isFinite(internalCost),
+    workingSellState:layers.WORKING_SELL?.state||"TBC",
+    releaseState
+  });
 
   return {
     lineCode,
     currency,
-    group:commercialGroupForLine(lineCode),
+    group,
     sourceInfo,
     audit,
     priceLayers:layers,
@@ -181,10 +179,11 @@ export function deriveProject0550CommercialLine({
     },
     provenance:{
       sourceCost:layers.SOURCE_COST?.origin||"CONTROLLED_FALLBACK",
-      internalCost:Number.isFinite(dbInternalCost)?"LIVE_DB_PRICE_LAYER":Number.isFinite(liveKnownInternalCost)?"LIVE_DB_COST_BINDING":fallback.origin,
+      internalCost:internalCostResolution.origin,
       workingSell:layers.WORKING_SELL?.origin||"CONTROLLED_FALLBACK",
       releasedSell:layers.RELEASED_SELL?.origin||"CONTROLLED_FALLBACK"
     },
+    resolution:{internalCost:internalCostResolution.resolution},
     costBindings,
     detailRows,
     equationBindings,
@@ -193,15 +192,7 @@ export function deriveProject0550CommercialLine({
     staleRuns,
     blockedRuns,
     openItems:line.openItems||[],
-    derivationTrace:[
-      {stage:"SOURCE_EVIDENCE",state:sourceInfo?.status||line.state||"TBC",detail:sourceInfo?.short||"Source classification"},
-      {stage:"PARTICULAR_STATE",state:productOfferItems.length||costBindings.length?"BOUND":"PARTIAL",detail:`${productOfferItems.length} product-bound offer item(s) · ${costBindings.length} cost-price binding(s)`},
-      {stage:"COMMON_GENERIC_BINDING",state:equationBindings.length?"BOUND":"TBC",detail:`${equationBindings.length} equation binding(s)`},
-      {stage:"DERIVATION_RUN",state:derivationState,detail:`${calculationRuns.length} current run(s) · ${staleRuns.length} stale · ${blockedRuns.length} blocked/TBC`},
-      {stage:"INTERNAL_COST",state:internalCostState,detail:Number.isFinite(internalCost)?"Known/derived amount available":"Completion cost remains TBC"},
-      {stage:"COMMERCIAL_TREATMENT",state:layers.WORKING_SELL?.state||"TBC",detail:"Working sell is internal management state only"},
-      {stage:"RELEASE",state:releaseState,detail:releaseState==="AUTHORISED"?"Customer release authorised":"7.0 Released Customer Output remains HOLD"}
-    ]
+    derivationTrace
   };
 }
 
@@ -213,26 +204,31 @@ export function deriveProject0550Portfolio({
 }={}){
   const codes=lineCodes.length ? lineCodes : Object.keys(lines||{});
   const rows=codes.map(lineCode=>deriveProject0550CommercialLine({
-    lineCode,line:lines?.[lineCode]||{},canonicalData,currency
+    lineCode,
+    line:lines?.[lineCode]||{},
+    canonicalData,
+    currency
   }));
   return {
     rows,
     summary:{
       rows:rows.length,
-      stale:rows.filter(x=>x.staleRuns.length).length,
-      blocked:rows.filter(x=>x.blockedRuns.length).length,
-      released:rows.filter(x=>x.states.releasedSell==="AUTHORISED").length,
+      stale:rows.filter(row=>row.staleRuns.length).length,
+      blocked:rows.filter(row=>row.blockedRuns.length).length,
+      released:rows.filter(row=>row.states.releasedSell==="AUTHORISED").length,
       derivationArchitecture:canonicalData.derivationState?.architectureStatus||"CONTROLLED_FALLBACK"
     }
   };
 }
 
 export const PROJECT0550_DERIVATION_ARCHITECTURE = {
-  id:"PJ2608-0550-CANONICAL-DERIVATION-SPINE-REV00",
+  id:"PJ2608-0550-CANONICAL-DERIVATION-SPINE-REV01",
+  commonGenericKernel:"CanonicalCommercialDerivationKernel.js",
+  particularAdapter:"Project0550CanonicalDerivationEngine.js",
   flow:[
     "SOURCE / EVIDENCE",
     "PARTICULAR CANONICAL STATE",
-    "COMMON / GENERIC EQUATION BINDING",
+    "COMMON / GENERIC EQUATION + ALGORITHM BINDING",
     "DERIVATION / RECONCILIATION ENGINE",
     "CANONICAL COST / PRICE LAYERS",
     "7.1 MANAGEMENT ANALYSIS WORKBENCH",
@@ -241,6 +237,7 @@ export const PROJECT0550_DERIVATION_ARCHITECTURE = {
   ],
   rules:[
     "React UI does not own engineering or pricing math.",
+    "COMMON/GENERIC derivation algorithms must not contain PJ2608-0550 facts.",
     "New quote/datasheet evidence updates PARTICULAR state first.",
     "Same OEM model across different sellers maps to one canonical product identity; offer price/terms stay offer-specific.",
     "Particular findings can become COMMON/GENERIC only through reviewed promotion and a new controlled method version.",
