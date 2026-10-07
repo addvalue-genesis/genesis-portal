@@ -12,6 +12,10 @@ import { convertFx } from "./Project0550FxControl";
 import { PROJECT0550_PAGA_DIRECT_SERVICE_MODEL } from "./Project0550PagaDigitalThread";
 import { PROJECT0550_PAGA_LIFECYCLE_PLAN } from "./Project0550LifecycleExecutionModel";
 import { PROJECT0550_PART_A_LEGACY_PROXY_RULE } from "./Project0550CommercialAllocationPolicy";
+import {
+  PROJECT0550_PAGA_BULK_ROWS,
+  PROJECT0550_PAGA_BULK_SUMMARY
+} from "./Project0550PagaBulkModel";
 
 function money(value,currency="USD"){
   if(!Number.isFinite(Number(value))) return "TBC";
@@ -118,6 +122,99 @@ function rowStateTone(text){
   if(/PARTIAL|WORKING|PRELIM|PROXY|MARKET/.test(s)) return "warn";
   return "good";
 }
+
+function parseMeta(value){
+  if(!value) return {};
+  if(typeof value==="object") return value;
+  try{return JSON.parse(value);}catch{return {};}
+}
+
+function PagaBulkMtoView({canonical}){
+  const liveRows=canonical?.data?.bulkMto||[];
+  const materialSnapshot=PROJECT0550_PAGA_BULK_ROWS.filter(x=>x.objectClass!=="SERVICE");
+  const serviceSnapshot=PROJECT0550_PAGA_BULK_ROWS.filter(x=>x.objectClass==="SERVICE");
+
+  const rows=liveRows.length
+    ? liveRows.map(r=>{
+        const meta=parseMeta(r.metadata_json);
+        return {
+          id:String(r.mto_code||"").replace(/^PAGA-/,""),
+          item:r.description,
+          objectClass:r.object_class,
+          family:r.material_family,
+          ownership:r.ownership_class,
+          refQty:meta.reference_qty ?? null,
+          requiredQty:r.required_qty ?? null,
+          unit:r.unit,
+          qtyState:r.quantity_status,
+          basis:meta.reference_basis||"Canonical DB MTO state",
+          route:r.commercial_treatment,
+          installRoute:r.object_class==="BULK"||r.object_class==="ACCESSORY" ? "C1 physical installation labor" : "TBC",
+          source:"LIVE DB"
+        };
+      })
+    : materialSnapshot.map(r=>({...r,requiredQty:null,source:"CONTROLLED SOURCE SNAPSHOT"}));
+
+  return (
+    <div className="ica-bulk">
+      <div className="ica-subhead">
+        <strong>PAGA Bulk / MTO · Engineering object first, commercial roll-up second</strong>
+        <span>{liveRows.length ? "LIVE DB canonical MTO" : PROJECT0550_PAGA_BULK_SOURCE_LABEL} · required qty is not released unless explicitly controlled</span>
+      </div>
+
+      <div className="ica-bulk-summary">
+        <div><b>{PROJECT0550_PAGA_BULK_SUMMARY.materialAccessoryRows}</b><span>material/accessory source rows</span></div>
+        <div><b>{PROJECT0550_PAGA_BULK_SUMMARY.serviceRows}</b><span>service rows reclassified out of bulk</span></div>
+        <div><b>{PROJECT0550_PAGA_BULK_SUMMARY.releasedQuantityRows}</b><span>released order-quantity rows in source pilot</span></div>
+      </div>
+
+      <div className="ica-bulk-columns">
+        <span></span><span>ID</span><span>Bulk / material object</span><span>Qty basis</span><span>Engineering ownership</span><span>Commercial route</span>
+      </div>
+
+      <div className="ica-bulk-lines">
+        {rows.map(row=>(
+          <details key={row.id} className="ica-bulk-line">
+            <summary>
+              <span className="ica-bulk-toggle"></span>
+              <code>{row.id}</code>
+              <span className="ica-bulk-name"><strong>{row.item}</strong><small>{row.family||row.objectClass}</small></span>
+              <span className="ica-bulk-qty">
+                <strong>{row.requiredQty!==null && row.requiredQty!==undefined ? row.requiredQty+" "+(row.unit||"") : row.refQty!==null && row.refQty!==undefined ? "Ref "+row.refQty+" "+(row.unit||"") : "TBC"}</strong>
+                <small>{row.qtyState}</small>
+              </span>
+              <span className="ica-bulk-owner"><strong>{row.ownership}</strong><small>{row.source}</small></span>
+              <span className="ica-bulk-route"><strong>{row.route}</strong><small>{row.installRoute}</small></span>
+            </summary>
+            <div className="ica-bulk-detail">
+              <div><b>Specification / object class</b><span>{row.spec||row.objectClass||"TBC"}</span></div>
+              <div><b>Quantity / evidence basis</b><span>{row.basis||"TBC"}</span></div>
+              <div><b>Installation linkage</b><span>{row.labour||row.installRoute||"TBC"}</span></div>
+              <div><b>Control</b><span>Material quantity remains separate from C1 installation labor and B2 logistics. Vendor inclusion must be reconciled before adding cost.</span></div>
+            </div>
+          </details>
+        ))}
+      </div>
+
+      <div className="ica-bulk-service-routing">
+        <div className="ica-subhead">
+          <strong>Rows found in the bulk pilot that are NOT bulk material</strong>
+          <span>Reclassified to the correct service/commercial work object to avoid double count</span>
+        </div>
+        {serviceSnapshot.map(row=>(
+          <div key={row.id}>
+            <code>{row.id}</code>
+            <strong>{row.item}</strong>
+            <span>{row.route}</span>
+            <em>{row.basis}</em>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const PROJECT0550_PAGA_BULK_SOURCE_LABEL="PAGA Bulk Pilot Rev00 / controlled source snapshot";
 
 function PagaLifecycleResponsibilityView({currency}){
   return (
@@ -314,7 +411,12 @@ function InternalAnalysisRow({
             )) : <div className="ica-empty">No detailed cost binding is controlled yet. Keep TBC; do not derive a fake breakdown.</div>}
           </div>
 
-          {group.lineCode==="A1-05" ? <PagaLifecycleResponsibilityView currency={currency}/> : null}
+          {group.lineCode==="A1-05" ? (
+            <>
+              <PagaBulkMtoView canonical={canonical}/>
+              <PagaLifecycleResponsibilityView currency={currency}/>
+            </>
+          ) : null}
 
           {(associatedBindings.length || group.lineCode==="A1-05") ? (
             <div className="ica-associated-cost">
