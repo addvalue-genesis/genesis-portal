@@ -12,6 +12,7 @@ import { ASKTSIPricedBreakdownForm } from "./ASKTSIPricedBreakdownForm";
 import { InternalCostOfferAnalysis } from "./InternalCostOfferAnalysis";
 import { PROJECT0550_PRICING_BASELINE } from "./Project0550PricingBaseline";
 import { useProject0550CanonicalState, overlayControlledPriceLines } from "./useProject0550CanonicalState";
+import { releasedCustomerLines } from "./Project0550PricingLayerModel";
 
 const SOURCE_GROUPS = [
   {
@@ -369,6 +370,10 @@ function PriceView() {
     ()=>overlayControlledPriceLines(p.lines,canonical.priceLineMap),
     [p.lines,canonical.priceLineMap]
   );
+  const customerReleasedLines=useMemo(
+    ()=>releasedCustomerLines(currentLines,canonical.data?.priceLayers||[]),
+    [currentLines,canonical.data?.priceLayers]
+  );
   const [currency,setCurrency] = useState("USD");
   const [eurThbFx,setEurThbFx] = useState(() => {
     if(typeof window==="undefined") return String(p.fx.workingEurThb ?? "");
@@ -437,7 +442,7 @@ function PriceView() {
           onClick={()=>setPriceSurface("ANALYSIS")}
         >
           <b>7.1</b>
-          <span>Internal Cost / Offer Analysis</span>
+          <span>Internal Cost / Commercial Analysis</span>
         </button>
       </nav>
 
@@ -445,7 +450,7 @@ function PriceView() {
         <div className="bid-panel-head">
           <div>
             <small>CURRENT 0550 PRICING BASELINE · {p.revision} · {p.date}</small>
-            <h2>{priceSurface==="FORM" ? "ASK-TSI Priced Breakdown — Customer Form Projection" : "Internal Cost / Offer Analysis — Management Projection"}</h2>
+            <h2>{priceSurface==="FORM" ? "ASK-TSI Priced Breakdown — Customer Form Projection" : "Internal Cost / Commercial Analysis — Management Projection"}</h2>
           </div>
           <span className="bid-status bad">PROJECT TOTAL: HOLD</span>
         </div>
@@ -551,9 +556,9 @@ function PriceView() {
 
       {priceSurface==="FORM" ? (
         <ASKTSIPricedBreakdownForm
-          lines={currentLines}
+          lines={customerReleasedLines}
           currency={currency}
-          mode="INTERNAL"
+          mode="CUSTOMER_RELEASE_PROJECTION"
           eurThbFx={eurThbFx}
           usdThbFx={p.fx.thbPerUsd}
           cnyThbFx={cnyThbFx}
