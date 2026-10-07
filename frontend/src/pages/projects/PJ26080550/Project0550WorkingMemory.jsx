@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261007-05",
+  syncRevision: "SYNC-20261007-06",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -62,6 +62,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     presentationLayerRule: "UI presentation may change without changing the controlled engineering/commercial model. Current prototype defaults to Hierarchical Outline / Group View with +/- expand-collapse; Detailed Tabs remain available as fallback. Both consume the same trace, evidence, DB/JSON state, equations and output contracts.",
     digitalThreadRule: "Requirement is an executable trace layer, not a prose summary: Customer/Company Source -> Requirement -> Constraint -> Proof -> Required Object/Quantity Driver -> COMMON/GENERIC + PARTICULAR Equation -> Work/Lifecycle -> Cost Object -> Commercial Output. PAGA is the first fully detailed pilot; the same schema is intended for all 19 systems.",
     commercialAnalyticsRule: "Commercial visualization is presentation only and must reuse controlled price/cost state. The 19 engineering systems roll into 15 ASK-TSI A1 commercial groups; composite lines must remain explicitly composite until a defensible allocation driver exists. Graphs must distinguish source cost, controlled/budgetary sell, commercial uplift and OPEN/TBC cost.",
+    pagaPilotAnalytics: "PAGA pilot now binds direct service/labor rows from Rev04 05_Service_Parametric + 07_VDRL: 432.5 direct MH, THB 259,450 internal direct labor cost, THB 937,078.55 base service sell before shared/common allocation. Shared survey/common pools and OEM site attendance remain separate until causally allocated/quoted.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
     jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
   },
