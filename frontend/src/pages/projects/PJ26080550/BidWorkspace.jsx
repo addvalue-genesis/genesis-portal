@@ -480,7 +480,9 @@ function PriceView() {
             <div>
               <small>RELEASED PART A / PART B</small>
               <strong>{releasedBaseReady ? "AUTHORISED" : "NOT YET AUTHORISED"}</strong>
-              <span>Part A released = THB {releasedPartAThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} · Part B released = THB {releasedPartBThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}. Any unreleased line remains HOLD/TBC.</span>
+              <span>{releasedBaseReady
+                ? "Part A released = THB "+releasedPartAThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" · Part B released = THB "+releasedPartBThb.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+"."
+                : "Released subtotal is intentionally not published while any Part A/B line is unauthorised. HOLD/TBC is not zero."}</span>
             </div>
             <div>
               <small>PART C</small>
