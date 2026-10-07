@@ -1501,3 +1501,21 @@
   border-left:3px solid #4d9569;
   background:#f6fbf8;
 }
+
+
+/* Canonical requirement mini-thread: numbered two-column reading order, no arrow maze */
+.bid-shell .ask-thread-flow.canonical{
+  grid-template-columns:repeat(2,minmax(0,1fr))!important;
+  gap:7px!important;
+}
+.bid-shell .ask-thread-flow.canonical>i{
+  display:none!important;
+}
+.bid-shell .ask-thread-flow.canonical>div{
+  min-height:92px;
+}
+@media(max-width:900px){
+  .bid-shell .ask-thread-flow.canonical{
+    grid-template-columns:1fr!important;
+  }
+}
