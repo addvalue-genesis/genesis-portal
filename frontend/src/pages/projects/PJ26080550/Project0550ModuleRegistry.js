@@ -1,5 +1,6 @@
 import { PROJECT0550_SYSTEMS } from "./Project0550SystemRegistry";
 import { moduleContract } from "./Project0550ModuleContract";
+import { PROJECT0550_SYSTEM_SCOPE_GROUPS } from "./Project0550SystemScopeTaxonomy";
 
 const BASE_MODULES = [
   { id:"1.0", key:"overview", title:"Bid Overview", parent:null, kind:"PROJECTION", authority:"SYSTEM_RESOLUTION", purpose:"Read-only summary projection of the current canonical bid state; no independent project truth." },
@@ -31,22 +32,35 @@ const BASE_MODULES = [
   { id:"11.0", key:"access", title:"Team Access / Governance", parent:null, kind:"GOVERNANCE", authority:"EXECUTIVE_POLICY", purpose:"Access, roles, permissions and governance policy." },
 
   { id:"12.0", key:"systems", title:"System Engineering — 19 Systems", parent:null, kind:"TECHNICAL", authority:"SYSTEM_RESOLUTION", purpose:"Per-system evidence-controlled engineering using the GDrive 19-System Master as the internal sequence and RFQ documents as governing evidence." },
-  ...PROJECT0550_SYSTEMS.map(s=>({
-    id:s.moduleId,
-    key:s.key,
-    title:s.name,
-    parent:"12.0",
-    kind:"TECHNICAL",
-    authority:"SYSTEM_RESOLUTION",
-    purpose:`System ${String(s.no).padStart(2,"0")} · ${s.token} · RFQ-bound engineering resolution`
-  })),
-  { id:"12.7.1", key:"paga-system", title:"System Picture", parent:"12.7", kind:"TECHNICAL", authority:"SYSTEM_RESOLUTION", purpose:"PAGA system context and architecture." },
-  { id:"12.7.2", key:"paga-trace", title:"Requirement / Evidence", parent:"12.7", kind:"SOURCE", authority:"SYSTEM_RESOLUTION", purpose:"What PAGA requires, why and from where." },
-  { id:"12.7.3", key:"paga-proof", title:"Engineering Proof", parent:"12.7", kind:"TECHNICAL", authority:"SYSTEM_RESOLUTION", purpose:"PAGA CAL/SDY/RPT proof objects where technical proof is required." },
-  { id:"12.7.4", key:"paga-mto", title:"Required MTO / Vendor", parent:"12.7", kind:"TECHNICAL", authority:"SYSTEM_RESOLUTION", purpose:"PAGA required design vs vendor offered evidence." },
-  { id:"12.7.5", key:"paga-vdrl", title:"VDRL / Workload", parent:"12.7", kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"PAGA deliverables and engineering/document workload." },
-  { id:"12.7.6", key:"paga-lifecycle", title:"Lifecycle / Cost", parent:"12.7", kind:"CONTROL", authority:"SYSTEM_RESOLUTION", purpose:"PAGA FAT/IFAT/logistics/site/commissioning/SAT/cost chain." },
-  { id:"12.7.7", key:"paga-resolution", title:"Technical Resolution Queue", parent:"12.7", kind:"TECHNICAL", authority:"SYSTEM_RESOLUTION", purpose:"Resolve PAGA technical questions from RFQ/STD/PHI/BOD/SPE/DWG/TC/vendor evidence before any executive escalation." },
+  ...PROJECT0550_SYSTEMS.flatMap(s=>{
+    const base={
+      id:s.moduleId,
+      key:s.key,
+      title:s.name,
+      parent:"12.0",
+      kind:"TECHNICAL",
+      authority:"SYSTEM_RESOLUTION",
+      purpose:`System ${String(s.no).padStart(2,"0")} · ${s.token} · RFQ-bound engineering resolution using the common system architecture`
+    };
+    const children=[
+      {suffix:"1",key:"system",title:"System Picture",kind:"TECHNICAL",purpose:"System context / architecture / interfaces."},
+      {suffix:"2",key:"trace",title:"Requirement / Evidence",kind:"SOURCE",purpose:"Requirement threads, source authority and unresolved inputs."},
+      {suffix:"3",key:"proof",title:"Engineering Proof",kind:"TECHNICAL",purpose:"CAL / SDY / RPT and proof objects where technically required."},
+      {suffix:"4",key:"mto",title:"Required MTO / Vendor",kind:"TECHNICAL",purpose:"Required design / MTO / bulk versus vendor offered evidence."},
+      {suffix:"5",key:"vdrl",title:"VDRL / Workload",kind:"CONTROL",purpose:"Deliverables, engineering/document workload and B1 service drivers."},
+      {suffix:"6",key:"lifecycle",title:"Lifecycle / Cost",kind:"CONTROL",purpose:"Vendor/package, bulk, logistics, training, FAT/IFAT, site work, SAT/commissioning, spares/tools and cost layers."},
+      {suffix:"7",key:"resolution",title:"Technical Resolution Queue",kind:"TECHNICAL",purpose:"Internal-first research / resolution of open technical and commercial-impact questions."}
+    ].map(child=>({
+      id:`${s.moduleId}.${child.suffix}`,
+      key:`${s.key}-${child.key}`,
+      title:child.title,
+      parent:s.moduleId,
+      kind:child.kind,
+      authority:"SYSTEM_RESOLUTION",
+      purpose:`${s.token} · ${child.purpose}`
+    }));
+    return [base,...children];
+  }),
 
   { id:"13.0", key:"review", title:"Independent Review / Audit", parent:null, kind:"REVIEW", authority:"REVIEW_CONTROL", purpose:"Claude/Grok/ChatGPT challenge, audit comments and dispositions." }
 ];
@@ -60,9 +74,20 @@ export const BID_NAV_MODULES = [
   "1.0","2.0","3.0","4.0","5.0","6.0","7.0","8.0","9.0","10.0"
 ].map(id=>PROJECT0550_MODULES.find(x=>x.id===id));
 
-export const PAGA_VIEW_MODULES = [
-  ["system","12.7.1"],["trace","12.7.2"],["proof","12.7.3"],["mto","12.7.4"],["vdrl","12.7.5"],["lifecycle","12.7.6"]
-].map(([key,id])=>({key,...PROJECT0550_MODULES.find(x=>x.id===id)}));
+export const PROJECT0550_SYSTEM_VIEW_PATTERN = [
+  ["system","1"],["trace","2"],["proof","3"],["mto","4"],["vdrl","5"],["lifecycle","6"],["resolution","7"]
+];
+
+export function systemViewModules(moduleId){
+  return PROJECT0550_SYSTEM_VIEW_PATTERN.map(([key,suffix])=>({
+    key,
+    ...PROJECT0550_MODULES.find(x=>x.id===`${moduleId}.${suffix}`)
+  }));
+}
+
+export const PAGA_VIEW_MODULES = systemViewModules("12.7");
+
+export const PROJECT0550_SYSTEM_SCOPE_PATTERN = PROJECT0550_SYSTEM_SCOPE_GROUPS;
 
 export function moduleById(id){
   return PROJECT0550_MODULES.find(x=>x.id===id);
