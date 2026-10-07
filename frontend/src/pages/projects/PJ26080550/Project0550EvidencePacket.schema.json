@@ -1,52 +1,115 @@
 {
   "title": "PJ2608-0550 Controlled Evidence Packet",
   "type": "object",
-  "required": ["projectCode", "sourceId", "sourceType", "evidenceClass", "assertions"],
+  "required": [
+    "projectCode",
+    "sourceId",
+    "sourceType",
+    "evidenceClass",
+    "assertions"
+  ],
   "properties": {
-    "projectCode": { "const": "PJ2608-0550" },
-    "sourceId": { "type": "string" },
+    "projectCode": {
+      "const": "PJ2608-0550"
+    },
+    "sourceId": {
+      "type": "string"
+    },
     "sourceType": {
       "type": "string",
       "enum": [
         "APPROVED_HUMAN_DECISION",
         "GOVERNING_PROJECT_SOURCE",
+        "COMPANY_STANDARD",
+        "CURRENT_OEM_DATASHEET",
+        "CURRENT_VENDOR_TECHNICAL_SUBMISSION",
         "CURRENT_VENDOR_QUOTE",
         "CURRENT_PROJECT_CALCULATION",
+        "INTERNATIONAL_STANDARD",
+        "RECOGNISED_RESEARCH",
         "CURRENT_MARKET_SANITY",
         "HISTORICAL_REFERENCE",
         "ASSUMPTION"
       ]
     },
-    "evidenceClass": { "type": "string", "enum": ["A", "B", "C", "D"] },
-    "title": { "type": ["string", "null"] },
-    "sourceRef": { "type": ["string", "null"] },
+    "evidenceClass": {
+      "type": "string",
+      "enum": [
+        "A",
+        "B",
+        "C",
+        "D"
+      ]
+    },
+    "title": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "sourceRef": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
     "assertions": {
       "type": "array",
       "minItems": 1,
       "items": {
         "type": "object",
-        "required": ["assertionId", "domain", "state"],
+        "required": [
+          "assertionId",
+          "domain",
+          "state"
+        ],
         "properties": {
-          "assertionId": { "type": "string" },
+          "assertionId": {
+            "type": "string"
+          },
           "domain": {
             "type": "string",
             "enum": [
               "REQUIREMENT",
               "REQUIRED_QUANTITY",
               "VENDOR_OFFER",
+              "VENDOR_CONDITION",
+              "PRODUCT_IDENTITY",
+              "PRODUCT_CAPABILITY",
               "EXCLUSION",
               "PROOF",
               "COST_INPUT",
               "COMMERCIAL",
               "INTERFACE",
               "CONSTRAINT",
+              "METHOD_CANDIDATE",
               "OTHER"
             ]
           },
-          "systemToken": { "type": ["string", "null"] },
-          "priceLine": { "type": ["string", "null"] },
-          "location": { "type": ["string", "null"] },
-          "object": { "type": ["string", "null"] },
+          "systemToken": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "priceLine": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "object": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
           "state": {
             "type": "string",
             "enum": [
@@ -60,12 +123,84 @@
             ]
           },
           "value": {},
-          "qty": { "type": ["number", "null"] },
-          "unit": { "type": ["string", "null"] },
-          "unitPrice": { "type": ["number", "null"] },
-          "total": { "type": ["number", "null"] },
-          "currency": { "type": ["string", "null"] },
-          "note": { "type": ["string", "null"] }
+          "qty": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "unit": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unitPrice": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "total": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "currency": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "productCode": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "manufacturer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "partNo": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "targetObjectType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "targetObjectRef": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reusableMethodCandidate": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
         }
       }
     }
