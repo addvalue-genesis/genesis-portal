@@ -87,14 +87,19 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
       "AP712 additional access panel +1 = EUR 3,210.00",
       "XBC beacon control module = EUR 2,014.00",
       "Known selected cost subtotal = EUR 231,678.05",
-      "Remaining bulk / logistics / site OEM service / spares / compliance = OPEN"
+      "Remaining A1 goods completion = bulk / accessories / goods-compliance OPEN; logistics, site service, startup spares, capital spares and 2Y spares are routed to B/C lines"
     ],
     buildUp:[
       {priceClass:"CURRENT VENDOR QUOTE",item:"INDUSTRONIC base net offer",qty:"1 lot",amount:226454.05,currency:"EUR"},
       {priceClass:"CONTROLLED REQUIREMENT ADDITION",item:"AP712 additional access panel +1",qty:"1",unitPrice:3210.00,amount:3210.00,currency:"EUR"},
       {priceClass:"CONTROLLED REQUIREMENT ADDITION",item:"XBC beacon control module",qty:"1",unitPrice:2014.00,amount:2014.00,currency:"EUR"},
       {priceClass:"KNOWN SELECTED COST",item:"Known selected vendor subtotal",qty:"",amount:231678.05,currency:"EUR"},
-      {priceClass:"OPEN COMPLETION COST",item:"Bulk / FCA onward logistics / site OEM service / startup + capital + 2Y spares / compliance closure",qty:"",amountText:"TBC — not yet added",currency:"EUR"},
+      {priceClass:"OPEN A1 GOODS COMPLETION",item:"Directly attributable PAGA bulk / accessories / goods-compliance closure",qty:"",amountText:"TBC — Part A goods only",currency:"EUR"},
+      {priceClass:"ROUTED TO B2",item:"FCA Germany onward transportation / freight / logistics",qty:"",amountText:"TBC — Part B2",currency:"EUR"},
+      {priceClass:"ROUTED TO B4",item:"OEM site specialist assistance / SAT / commissioning attendance",qty:"",amountText:"TBC — Part B4",currency:"EUR"},
+      {priceClass:"ROUTED TO B5",item:"Startup / pre-commissioning / commissioning spares",qty:"",amountText:"TBC — Part B5",currency:"EUR"},
+      {priceClass:"ROUTED TO C2",item:"10-year capital spares",qty:"",amountText:"TBC — Part C2",currency:"EUR"},
+      {priceClass:"ROUTED TO C3",item:"2-year normal operation spares",qty:"",amountText:"TBC — Part C3",currency:"EUR"},
       {priceClass:"WORKING COMMERCIAL PREVIEW",item:"Known selected cost × 1.20 / 0.95",qty:"",amount:292645.96,currency:"EUR",note:"Indicative sell on KNOWN selected cost only; excludes all open completion cost and is NOT the final customer sell."},
       {priceClass:"FINAL CUSTOMER SELL",item:"Released PAGA selling price",qty:"",amountText:"HOLD",currency:"EUR",note:"Release only after open lifecycle/scope cost and commercial gates are closed."}
     ],
@@ -105,9 +110,9 @@ export const PROJECT0550_A1_PRICE_AUDIT = {
       formula:"Known selected cost × 1.20 / 0.95",
       indicativeKnownCostSellEur:292645.96,
       status:"INDICATIVE ONLY / FINAL SELL HOLD",
-      openCompletion:["bulk","FCA onward logistics","site OEM service","startup spares","10Y capital spares","2Y operation spares","compliance / proof closure"]
+      openCompletion:["A1 goods bulk/accessories/compliance","B2 logistics","B4 OEM site service","B5 startup/commissioning spares","C2 10Y capital spares","C3 2Y operation spares"]
     },
-    action:"Close sound/loading/loop/autonomy/interface proof, bulk, site service, spares and FCA onward logistics before firm customer sell."
+    action:"Close PAGA proof and A1 goods completion; route logistics to B2, site/OEM assistance to B4, startup spares to B5, 10Y capital spares to C2 and 2Y operation spares to C3. ADDVALUE labor must stay in Part B."
   },
   "A1-06":{
     vendor:"HIKVISION / PROJECT-APPROVED EQUIVALENT — CURRENT PROJECT QUOTE NOT FOUND",
