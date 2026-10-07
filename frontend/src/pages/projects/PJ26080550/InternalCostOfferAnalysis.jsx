@@ -1,19 +1,20 @@
 import React, { useMemo, useState } from "react";
 import { PROJECT0550_COMMERCIAL_GROUPS } from "./Project0550CommercialModel";
 import { PROJECT0550_SYSTEMS } from "./Project0550SystemRegistry";
-import { auditForPriceLine } from "./Project0550A1PriceAudit";
 import { vendorOfferForPriceLine } from "./Project0550VendorOfferRegister";
-import { classifyProject0550PriceLine } from "./Project0550PriceSourceModel";
 import {
   CommercialPortfolioView,
   PriceSourceOverview,
   OutputContractStrip
 } from "./ASKTSIPricedBreakdownForm";
 import { convertFx } from "./Project0550FxControl";
+import {
+  deriveProject0550CommercialLine,
+  PROJECT0550_DERIVATION_ARCHITECTURE
+} from "./Project0550CanonicalDerivationEngine";
 import { PROJECT0550_PAGA_DIRECT_SERVICE_MODEL } from "./Project0550PagaDigitalThread";
 import { PROJECT0550_PAGA_LIFECYCLE_PLAN } from "./Project0550LifecycleExecutionModel";
 import { PROJECT0550_PART_A_LEGACY_PROXY_RULE } from "./Project0550CommercialAllocationPolicy";
-import { priceLayersForLine } from "./Project0550PricingLayerModel";
 import {
   project0550PartBDerivationRows,
   PROJECT0550_PART_B_DERIVATION_RULE
@@ -40,81 +41,6 @@ function money(value,currency="USD"){
 
 function systemByToken(token){
   return PROJECT0550_SYSTEMS.find(x=>x.token===token) || null;
-}
-
-function lineAmountIn(line,targetCurrency){
-  if(!line) return null;
-  const map=line.subtotalByCurrency||line.unitPriceByCurrency||{};
-  const explicitSource=String(line.sourceCurrency||"").toUpperCase();
-  const sourceOrder=explicitSource
-    ? [explicitSource,...["THB","EUR","USD","CNY"].filter(x=>x!==explicitSource)]
-    : ["THB","EUR","USD","CNY"];
-
-  for(const sourceCurrency of sourceOrder){
-    if(Number.isFinite(Number(map[sourceCurrency]))){
-      return sourceCurrency===targetCurrency
-        ? Number(map[sourceCurrency])
-        : convertFx(Number(map[sourceCurrency]),sourceCurrency,targetCurrency);
-    }
-  }
-  return null;
-}
-
-function amountFromBuildRow(row,targetCurrency){
-  if(!row) return null;
-  if(Number.isFinite(Number(row.amount))){
-    return convertFx(Number(row.amount),String(row.currency||"THB").toUpperCase(),targetCurrency);
-  }
-  if(Number.isFinite(Number(row.amountThb))){
-    return convertFx(Number(row.amountThb),"THB",targetCurrency);
-  }
-  return null;
-}
-
-function fallbackCostBasis(audit,targetCurrency){
-  if(!audit) return {value:null,label:"COST TBC",basis:"No explicit controlled cost row"};
-  if(audit.commercialPreview?.knownSelectedCostEur){
-    return {
-      value:convertFx(Number(audit.commercialPreview.knownSelectedCostEur),"EUR",targetCurrency),
-      label:"KNOWN SELECTED COST",
-      basis:"Controlled selected vendor cost; open completion cost remains separate"
-    };
-  }
-  const priority=[
-    /^CONTROLLED COST$/i,
-    /^KNOWN SELECTED COST$/i,
-    /^KNOWN PROCURED COST$/i,
-    /^RAW MARKET COST$/i
-  ];
-  for(const pattern of priority){
-    const row=(audit.buildUp||[]).find(x=>pattern.test(String(x.priceClass||"")));
-    const value=amountFromBuildRow(row,targetCurrency);
-    if(Number.isFinite(value)){
-      return {value,label:row.priceClass,basis:row.item||audit.basis};
-    }
-  }
-  return {value:null,label:"COST TBC",basis:audit.basis||"No explicit controlled cost row"};
-}
-
-function fallbackOffer(line,audit,targetCurrency){
-  if(line?.includeInKnownCustomerSubtotal===false){
-    const indicative=audit?.commercialPreview?.indicativeKnownCostSellEur;
-    return {
-      finalValue:null,
-      indicativeValue:Number.isFinite(Number(indicative))
-        ? convertFx(Number(indicative),"EUR",targetCurrency)
-        : null,
-      state:"FINAL SELL HOLD",
-      label:"Indicative only"
-    };
-  }
-  const value=lineAmountIn(line,targetCurrency);
-  return {
-    finalValue:Number.isFinite(value)?value:null,
-    indicativeValue:null,
-    state:line?.state||"TBC",
-    label:"Controlled displayed line"
-  };
 }
 
 function convertBindingAmount(row,targetCurrency){
