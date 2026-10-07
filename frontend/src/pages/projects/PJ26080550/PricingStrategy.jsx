@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import "./PricingStrategy.css";
+import { useProject0550CanonicalState } from "./useProject0550CanonicalState";
 
 const GATES = [
   {
@@ -120,14 +121,43 @@ const RESEARCH = [
 const PRICE_STATES = ["MODEL_ONLY","INTERNAL_HOLD","AUTHORISATION_PENDING","AUTHORISED_OFFER"];
 
 export function PricingStrategy(){
-  const [state,setState]=useState("INTERNAL_HOLD");
+  const canonical=useProject0550CanonicalState();
+  const [previewState,setPreviewState]=useState("INTERNAL_HOLD");
   const [mode,setMode]=useState("overview");
 
+  const effectiveState=canonical.data?.priceDecision?.price_state || previewState;
+
+  const gates=useMemo(()=>{
+    if(!canonical.isLive) return GATES;
+
+    const costs=canonical.data?.costItems||[];
+    const conditions=canonical.data?.acceptedConditions||[];
+    const buyer=canonical.data?.buyerChecks||[];
+    const sourceGroups=canonical.data?.sourceGroups||[];
+
+    const costOpen=!costs.length || costs.some(x=>/TBC|OPEN|PARTIAL|WORKING|NOT_READY/i.test(String(x.cost_status||"")));
+    const conditionOpen=!conditions.length || conditions.some(x=>
+      /OPEN|TBC|PARTIAL/i.test(String(x.acceptance_state||"")+" "+String(x.input_state||""))
+    );
+    const buyerFail=buyer.some(x=>String(x.check_state).toUpperCase()==="FAIL");
+    const buyerOpen=!buyer.length || buyer.some(x=>["HOLD"].includes(String(x.check_state).toUpperCase()));
+    const basisOpen=!sourceGroups.length || sourceGroups.some(x=>/OPEN|PARTIAL|TBC/i.test(String(x.status||"")));
+
+    const states={
+      G1:basisOpen ? "OPEN" : "PARTIAL",
+      G2:costOpen ? "PARTIAL" : "PASS",
+      G3:conditionOpen ? "OPEN" : "PASS",
+      G4:buyerFail ? "BLOCKED" : buyerOpen ? "OPEN" : "PASS",
+      G5:effectiveState==="AUTHORISED_OFFER" ? "PASS" : "BLOCKED"
+    };
+    return GATES.map(g=>({...g,state:states[g.id]||g.state}));
+  },[canonical.isLive,canonical.data,effectiveState]);
+
   const gateCounts=useMemo(()=>({
-    pass:GATES.filter(x=>x.state==="PASS").length,
-    blocked:GATES.filter(x=>x.state==="BLOCKED").length,
-    open:GATES.filter(x=>x.state!=="PASS"&&x.state!=="BLOCKED").length
-  }),[]);
+    pass:gates.filter(x=>x.state==="PASS").length,
+    blocked:gates.filter(x=>x.state==="BLOCKED").length,
+    open:gates.filter(x=>x.state!=="PASS"&&x.state!=="BLOCKED").length
+  }),[gates]);
 
   return (
     <div className="ps-shell">
@@ -143,12 +173,21 @@ export function PricingStrategy(){
         </div>
         <div className="ps-state">
           <span>PRICE STATE</span>
-          <select value={state} onChange={e=>setState(e.target.value)}>
+          <select value={effectiveState} onChange={e=>setPreviewState(e.target.value)} disabled={canonical.isLive}>
             {PRICE_STATES.map(x=><option key={x}>{x}</option>)}
           </select>
-          <b>{state==="AUTHORISED_OFFER"?"CUSTOMER ISSUE ALLOWED":"CUSTOMER ISSUE BLOCKED"}</b>
+          <b>{effectiveState==="AUTHORISED_OFFER"?"CUSTOMER ISSUE ALLOWED":"CUSTOMER ISSUE BLOCKED"}</b>
         </div>
       </section>
+
+      <div className="bid-canonical-state-banner">
+        <strong>{canonical.isLive ? "LIVE DB PRICING POLICY / GATE STATE" : "CONTROLLED METHOD FALLBACK"}</strong>
+        <span>
+          Pricing Strategy does not own project cost truth. Gate status reads canonical cost / accepted-condition / buyer-check / price-decision state;
+          only approved commercial policy/authority belongs to this module.
+        </span>
+        {canonical.isLive ? <em>Price state is DB-controlled; selector is read-only here</em> : null}
+      </div>
 
       <nav className="ps-tabs">
         {[
@@ -170,7 +209,7 @@ export function PricingStrategy(){
               </div>
             </div>
             <div className="ps-gates">
-              {GATES.map((g,i)=>(
+              {gates.map((g,i)=>(
                 <React.Fragment key={g.id}>
                   <article>
                     <div><b>{g.id}</b><State text={g.state}/></div>
@@ -178,7 +217,7 @@ export function PricingStrategy(){
                     <p>{g.question}</p>
                     <span>{g.output}</span>
                   </article>
-                  {i<GATES.length-1&&<i>→</i>}
+                  {i<gates.length-1&&<i>→</i>}
                 </React.Fragment>
               ))}
             </div>
