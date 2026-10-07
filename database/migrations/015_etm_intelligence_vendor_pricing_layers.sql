@@ -91,6 +91,9 @@ CREATE TABLE IF NOT EXISTS etm_research_candidates (
  FOREIGN KEY(evidence_id) REFERENCES etm_evidence(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+ALTER TABLE etm_vendor_offer_items
+  ADD UNIQUE INDEX IF NOT EXISTS uq_vendor_offer_item_no (vendor_offer_id,item_no);
+
 CREATE TABLE IF NOT EXISTS etm_vendor_offer_item_bindings (
  id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
  project_id BIGINT UNSIGNED NOT NULL,
