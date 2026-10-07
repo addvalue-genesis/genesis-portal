@@ -12,10 +12,20 @@ export function useProject0550CanonicalState(){
         if(!r.ok) throw new Error("HTTP "+r.status);
         return r.json();
       })
-      .then(payload=>{
+      .then(async payload=>{
         if(!payload.ok) throw new Error(payload.message||payload.error||"Canonical-state API error");
+        let bulkMto=[];
+        try{
+          const br=await fetch("/backend/api/etm/bulk-state.php?project=PJ2608-0550&system=TEL-PAGA");
+          if(br.ok){
+            const bp=await br.json();
+            if(bp.ok && Array.isArray(bp.rows)) bulkMto=bp.rows;
+          }
+        }catch{
+          bulkMto=[];
+        }
         if(active){
-          setData(payload);
+          setData({...payload,bulkMto});
           setStatus("LIVE_DB");
           setError(null);
         }
