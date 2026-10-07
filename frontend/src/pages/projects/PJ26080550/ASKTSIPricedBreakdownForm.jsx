@@ -506,8 +506,8 @@ function PagaServiceAnalytics(){
 function CommercialPortfolioView({lines,currency,eurThbFx,usdThbFx,cnyThbFx}){
   const rows=PROJECT0550_COMMERCIAL_GROUPS.map(group=>{
     const line=rowValue(lines,group.lineCode);
-    let value=lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice");
-    if(!Number.isFinite(value)) value=convertedAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
+    let value=convertedAmount(line,currency,"subtotal",eurThbFx,usdThbFx,cnyThbFx);
+    if(!Number.isFinite(value)) value=lineAmount(line,currency,"subtotal") ?? lineAmount(line,currency,"unitPrice");
     const info=classifyProject0550PriceLine(group.lineCode,line);
     const costInput=line.includeInKnownCustomerSubtotal===false || /COST_INPUT/i.test(String(line.priceRole||""));
     return {
