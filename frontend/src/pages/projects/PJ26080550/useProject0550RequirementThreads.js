@@ -12,6 +12,11 @@ export function useProject0550RequirementThreads(systemCode="PAGA"){
 
   useEffect(()=>{
     let active=true;
+    if(!systemCode){
+      setPayload(null);
+      setStatus("DISABLED");
+      return ()=>{active=false;};
+    }
     const url="/backend/api/etm/requirement-threads.php?project=PJ2608-0550&system="+encodeURIComponent(systemCode);
     fetch(url)
       .then(r=>{ if(!r.ok) throw new Error("HTTP "+r.status); return r.json(); })
