@@ -2166,3 +2166,29 @@
     text-align:left;
   }
 }
+
+
+.bid-shell .ica-allocation-rule{
+  display:grid;
+  gap:4px;
+  padding:10px 12px;
+  border:1px solid #e0c998;
+  border-left:4px solid #c8912e;
+  border-radius:8px;
+  background:#fffaf1;
+}
+.bid-shell .ica-allocation-rule strong{
+  color:#745109;
+  font-size:11px;
+}
+.bid-shell .ica-allocation-rule span{
+  color:#665c49;
+  font-size:11px;
+  line-height:1.45;
+}
+.bid-shell .ica-allocation-rule em{
+  color:#836b3c;
+  font-size:10px;
+  line-height:1.4;
+  font-style:normal;
+}
