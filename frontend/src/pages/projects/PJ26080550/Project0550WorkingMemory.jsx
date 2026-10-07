@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261007-16",
+  syncRevision: "SYNC-20261007-17",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -71,6 +71,9 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     serviceBulkArchitecture: "Part B is derived from source-backed lifecycle/service obligations, not a standalone labor table. B1-B9 use MR/PHI/BOD/SPE/STD/Contract/TC/vendor evidence according to domain. Bulk is modeled now as a canonical required-MTO/material class: system-dedicated bulk remains attached to the system; shared/common bulk remains a common pool until causal allocation. Commercially, system bulk normally rolls into the applicable A1 line because the customer form expects bulk materials with the system package, while installation labor maps C1, logistics B2, startup spares B5, tools B6, capital spares C2 and 2Y operating spares C3. No /19 allocation by default.",
     pagaBulkPilot: "PAGA Bulk Pilot Rev00 is now bound as B01-B24. B01-B22 are material/accessory source rows; no source reference quantity is treated as released order quantity. Canonical DB seed stores reference quantities only in metadata and leaves required_qty NULL until proof/topology releases them. B23 VDRL/SDRL gap service is reclassified to B1; B24 onshore installation/SAT/commissioning is split by work object between B4 and C1. 7.1 displays the same bulk objects as expandable lines and prefers LIVE DB bulk-state when available.",
     engineeringTableViewRule: "PAGA engineering trace presentation defaults to ruled line tables. Canonical 25-stage chain, source set, requirement threads, particular equations and downstream outputs all render from the existing digital-thread objects. Requirement rows support +/- expansion into a stable two-column subtable of Source -> Fundamental Need -> Constraint/Context -> Engineering Input -> CAL/Study/RPT -> Architecture/Object/Qty -> Equation/Driver. Vendor Offer, Required-vs-Offered and Cost/Selling-Price outline sections reuse the same ruled table components as Detailed Tabs, with numeric columns right-aligned and fixed widths. Obsolete card/bar analytics were removed from the price form. This is presentation-only; doctrine, DB/JSON state and calculation dependencies are unchanged.",
+    canonicalIntelligenceArchitecture: "Requirement Thread is a PARTICULAR project instance, not a copy of MAIN/COMMON/GENERIC method. Canonical equations live in etm_equation_registry and are bound via etm_equation_bindings. SmartControl findings generate internal-first resolution jobs; external standards/OEM/research are searched only when current project/company/vendor evidence is insufficient, and proposals require human review before controlled-state mutation.",
+    vendorOfferArchitecture: "Vendor quotation remains a whole source offer in etm_vendor_offers + etm_vendor_offer_items. Multi-system use is expressed through etm_vendor_offer_item_bindings; commercial/technical terms are first-class etm_vendor_offer_conditions with cost/schedule/risk/warranty impact states. System views filter bindings; they do not copy or redefine the quote.",
+    pricingLayerArchitecture: "Every commercial line has four semantic layers: SOURCE_COST -> INTERNAL_COST -> WORKING_SELL -> RELEASED_SELL. 7.1 Internal Cost / Commercial Analysis may show all four. 7.0 ASK-TSI customer price breakdown consumes AUTHORISED RELEASED_SELL only; unreleased lines remain HOLD/TBC and must never be filled from source cost or working sell.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
     jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
   },
@@ -83,6 +86,8 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     "Project0550PriceSourceModel.js",
     "Project0550CommercialModel.js",
     "Project0550CommercialAllocationPolicy.js",
+    "Project0550PricingLayerModel.js",
+    "Project0550GapResolutionEngine.js",
     "Project0550LifecycleExecutionModel.js",
     "Project0550ServiceBulkPolicy.js",
     "Project0550PagaBulkModel.js",
