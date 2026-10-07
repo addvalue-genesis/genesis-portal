@@ -47,7 +47,7 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
   projectCode: "PJ2608-0550",
   projectName: "SAM PTTEPI MY ASK TEL [MMC24-5002]",
   baseline: "CURRENT 0550 CONTROLLED WORKING BASELINE",
-  syncRevision: "SYNC-20261007-07",
+  syncRevision: "SYNC-20261007-08",
   governingMethod: "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
   closeRule: "MATERIAL CHAT CONCLUSION NOT SYNCED TO CONTROLLED CODE/STATE => NOT CLOSED",
   currentPricingControl: {
@@ -63,6 +63,8 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     digitalThreadRule: "Canonical execution authority = Project0550EngineeringDoctrine.fullChain. First Principles: SOURCE/EVIDENCE -> REQUIREMENT -> FUNDAMENTAL NEED. Constraint-Based Engineering: CONSTRAINT -> INTERFACE/CONTEXT -> ENGINEERING INPUT -> CAL/STUDY/RPT -> PROOF -> ARCHITECTURE -> PHYSICAL OBJECT -> QUANTITY DRIVER -> REQUIRED MTO -> BULK -> VENDOR RECONCILIATION. Parametric Cost/Lifecycle: WORK/RESOURCE -> DOCUMENT/VDRL/QA -> FAT/IFAT -> LOGISTICS/REGULATORY -> SITE READINESS -> INSTALL/PRECOM -> SAT/INTEGRATION/COMMISSIONING -> HANDOVER/WARRANTY -> COST/SCHEDULE/RISK -> COMMERCIAL TREATMENT -> RELEASE. UI groups may collapse these stages but may not change dependency order.",
     commercialAnalyticsRule: "Commercial visualization is presentation only and must reuse controlled price/cost state. The 19 engineering systems roll into 15 ASK-TSI A1 commercial groups; composite lines must remain explicitly composite until a defensible allocation driver exists. Graphs must distinguish source cost, controlled/budgetary sell, commercial uplift and OPEN/TBC cost.",
     pagaPilotAnalytics: "PAGA pilot now binds direct service/labor rows from Rev04 05_Service_Parametric + 07_VDRL: 432.5 direct MH, THB 259,450 internal direct labor cost, THB 937,078.55 base service sell before shared/common allocation. Shared survey/common pools and OEM site attendance remain separate until causally allocated/quoted.",
+    singleSourceModuleRule: "No module owns independent project truth. 1.0 is overview projection; 2.0 writes approved commercial policy only; 3.0 is reusable method/equation engine; 4.0 is orchestrator/control; 5.0/6.0 are controlled projections/disposition views; 7.0/8.0/9.0/10.0 are output or output-control surfaces driven from the same canonical DB state. Graphs/charts are projections only.",
+    revisionPropagationRule: "A source revision (e.g. MR revision) is registered as a new document revision with supersession; create change event; traverse existing etm_trace_edges; mark affected requirement/proof/MTO/work/VDRL/cost/commercial/output objects REVIEW/RECALCULATE/REGENERATE/STALE; preserve history; issue a new output revision only after revalidation. No silent overwrite and no manual independent module refresh.",
     currentPricedBreakdown: "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_CODE-SYNC_20261006.xlsx · Drive file 1S-0tkA5AQ1eRp45RT0T-lNic7_On-_Mq",
     jasonQT2026160: "Maps to A1-08 Marine, A1-09 Aero, A1-10 SSB, A1-14 MET, A1-15 NDB and an AIS component inside composite A1-01; total source quote THB 3,507,650 excl. VAT."
   },
@@ -74,6 +76,8 @@ export const PROJECT0550_TEAM_WORKING_MEMORY = {
     "Project0550EvidenceReasoner.js",
     "Project0550PriceSourceModel.js",
     "Project0550CommercialModel.js",
+    "Project0550ModuleContract.js",
+    "Project0550RevisionImpactModel.js",
     "Project0550PagaDigitalThread.js",
     "Project0550PartBModel.js",
     "Project0550FxControl.js",
