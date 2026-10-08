@@ -409,15 +409,16 @@
   ],
   "firstPrinciplesChain": [
     "Source / Evidence",
-    "Requirement",
+    "Atomic Requirement",
     "Fundamental Need",
     "Constraint",
+    "Engineering Law / Math Model",
+    "Measured / Source Inputs",
     "Interface / Physical Context",
-    "Engineering Input",
     "CAL / Study / RPT",
     "Engineering Proof",
     "Architecture",
-    "Physical Object",
+    "Physical / Software Object",
     "Quantity Driver",
     "Required MTO",
     "Bulk",
@@ -428,7 +429,7 @@
     "FAT / IFAT",
     "Logistics / Regulatory",
     "Site Readiness",
-    "Installation",
+    "Installation / Technical Termination",
     "Pre-Commissioning",
     "SAT / Integration",
     "Commissioning / Start-up",
@@ -2081,6 +2082,476 @@
         "name": "Meteorological System",
         "auditState": "NOT_YET_AUDITED",
         "knownFinding": null
+      }
+    ]
+  },
+  "engineeringLawLibrary": {
+    "schemaVersion": "0.1.0",
+    "state": "COMMON_GENERIC_KERNEL",
+    "purpose": "Reusable physics, mathematics and engineering equations used to test feasibility, derive quantity and expose assumptions before cost. Equations do not upgrade weak inputs into confirmed facts.",
+    "evidenceRule": "Every calculation must retain formula/model ID, input value, unit, source, assumption, result, engineering margin, confidence, revision and replacement trigger.",
+    "kernels": [
+      {
+        "id": "RF-PROP",
+        "name": "RF Propagation / Attenuation",
+        "domain": "Electromagnetics",
+        "appliesTo": [
+          "TEL-VSAT",
+          "TEL-VSAT-KU",
+          "TEL-RADIO-DTRS",
+          "TEL-RADIO-MARINE",
+          "TEL-RADIO-AERO",
+          "TEL-RADIO-SSB",
+          "TEL-DMR",
+          "TEL-NDB"
+        ],
+        "equations": [
+          {
+            "name": "Free Space Path Loss",
+            "formula": "FSPL(dB) = 32.44 + 20log10(f_MHz) + 20log10(d_km)",
+            "role": "Base propagation loss"
+          },
+          {
+            "name": "Feeder Loss",
+            "formula": "L_feeder(dB) = α(dB/m) × length(m)",
+            "role": "Cable / feeder attenuation"
+          },
+          {
+            "name": "Received Level",
+            "formula": "P_Rx = P_Tx + G_Tx + G_Rx − ΣLosses",
+            "role": "End-to-end RF link balance"
+          },
+          {
+            "name": "Fade Margin",
+            "formula": "FM = P_Rx − Receiver Threshold",
+            "role": "Link robustness margin"
+          },
+          {
+            "name": "Fresnel Radius",
+            "formula": "F1 = sqrt(λ d1 d2 / (d1 + d2))",
+            "role": "Path-clearance constraint"
+          }
+        ],
+        "controls": [
+          "Frequency and distance units must be explicit",
+          "Include feeder/connector/filter losses",
+          "Add terrain/clutter/building loss when applicable",
+          "Rain/gaseous attenuation where material",
+          "Final model must match applicable system/frequency and project standard"
+        ],
+        "output": "Coverage / link feasibility / antenna-height and gain drivers / RF equipment quantity"
+      },
+      {
+        "id": "ACOUSTIC",
+        "name": "Acoustic / PAGA Coverage",
+        "domain": "Acoustics",
+        "appliesTo": [
+          "TEL-PAGA"
+        ],
+        "equations": [
+          {
+            "name": "Required SPL",
+            "formula": "SPL_required = Ambient_Noise + Required_SNR_Margin",
+            "role": "Audibility target"
+          },
+          {
+            "name": "Distance Attenuation",
+            "formula": "ΔSPL ≈ 20log10(r2/r1)",
+            "role": "Free-field preliminary propagation"
+          },
+          {
+            "name": "Amplifier Balance",
+            "formula": "Σ Speaker_Tap_Load ≤ Usable_Amplifier_Capacity",
+            "role": "Electrical loading constraint"
+          }
+        ],
+        "controls": [
+          "Ambient-noise source required",
+          "Free-field equation is preliminary where reflections/obstructions dominate",
+          "Speaker directivity and mounting height matter",
+          "OEM/CAL/RPT confirmation required before final quantity"
+        ],
+        "output": "Speaker spacing / tapping / amplifier loading / cabinet-node quantity / sound coverage proof"
+      },
+      {
+        "id": "OPTICAL",
+        "name": "Fiber / Optical Power & Route",
+        "domain": "Optics + Geometry",
+        "appliesTo": [
+          "TEL-FO",
+          "TEL-LAN"
+        ],
+        "equations": [
+          {
+            "name": "Optical Loss",
+            "formula": "L_total = L_fiber + L_splice + L_connector + L_passive + Margin",
+            "role": "Optical power budget"
+          },
+          {
+            "name": "Receiver Check",
+            "formula": "P_Rx = P_Tx − L_total; PASS if P_Rx ≥ Receiver_Sensitivity",
+            "role": "Feasibility"
+          },
+          {
+            "name": "Procurement Length",
+            "formula": "L_procure = L_route × F_routing + L_vertical + L_termination + L_spare",
+            "role": "Cable quantity derivation"
+          }
+        ],
+        "controls": [
+          "Route source and revision required",
+          "Core allocation and spare-core requirement retained",
+          "Splice/connector counts must trace to topology",
+          "OTDR/test requirement linked to final route"
+        ],
+        "output": "Cable length / core count / active-interface requirement / optical margin"
+      },
+      {
+        "id": "POWER",
+        "name": "Power / UPS / Energy Balance",
+        "domain": "Electrical + Energy",
+        "appliesTo": [
+          "TEL-LAN",
+          "TEL-PAGA",
+          "TEL-CCTV",
+          "TEL-RADIO-DTRS",
+          "TEL-DMR",
+          "TEL-NDB"
+        ],
+        "equations": [
+          {
+            "name": "Energy Demand",
+            "formula": "E = P_load × t_autonomy",
+            "role": "Base autonomy requirement"
+          },
+          {
+            "name": "Adjusted Capacity",
+            "formula": "E_required = E / (η × DoD × Derating)",
+            "role": "Battery/UPS capacity driver"
+          },
+          {
+            "name": "Load Balance",
+            "formula": "Σ Connected_Load ≤ Rated_Usable_Capacity",
+            "role": "Capacity constraint"
+          }
+        ],
+        "controls": [
+          "Autonomy duration must come from requirement",
+          "Efficiency/DoD/aging/temperature assumptions must be explicit",
+          "Redundancy philosophy applied separately"
+        ],
+        "output": "UPS/battery capacity / PSU quantity / redundancy check"
+      },
+      {
+        "id": "VIDEO",
+        "name": "CCTV Geometry / Bandwidth / Storage",
+        "domain": "Optics + Data",
+        "appliesTo": [
+          "TEL-CCTV"
+        ],
+        "equations": [
+          {
+            "name": "Field of View",
+            "formula": "FoV = geometry(sensor, focal_length, distance)",
+            "role": "Coverage / lens selection"
+          },
+          {
+            "name": "Pixel Density",
+            "formula": "Pixel_Density = Horizontal_Pixels / Scene_Width",
+            "role": "Image-detail criterion"
+          },
+          {
+            "name": "Storage",
+            "formula": "Storage = Σ Bitrate × Retention_Time × Recording_Factor",
+            "role": "NVR/VMS capacity"
+          }
+        ],
+        "controls": [
+          "Target identification criterion required",
+          "Scene distance and lens source required",
+          "Codec/FPS/recording mode retained as inputs",
+          "RAID/usable-storage overhead handled explicitly"
+        ],
+        "output": "Camera/lens quantity / bandwidth / effective storage requirement"
+      },
+      {
+        "id": "NET-CAP",
+        "name": "Network / NMS Capacity",
+        "domain": "Discrete Mathematics + Capacity",
+        "appliesTo": [
+          "TEL-LAN",
+          "TEL-LAN-VCS",
+          "TEL-CCTV",
+          "TEL-PABX"
+        ],
+        "equations": [
+          {
+            "name": "Port Capacity",
+            "formula": "Installed_Ports ≥ Required_Ports + Spare_Ports",
+            "role": "Switch sizing"
+          },
+          {
+            "name": "PoE Balance",
+            "formula": "Σ Endpoint_PoE_Load ≤ Usable_PoE_Budget",
+            "role": "Power-capacity check"
+          },
+          {
+            "name": "NMS Licence Capacity",
+            "formula": "Licensed_Objects ≥ Managed_Nodes/Sensors/Interfaces",
+            "role": "NMS sizing"
+          },
+          {
+            "name": "Bandwidth Balance",
+            "formula": "Σ Peak_or_Engineered_Traffic ≤ Usable_Link_Capacity",
+            "role": "Capacity constraint"
+          }
+        ],
+        "controls": [
+          "Define what the NMS licence counts: node/device/sensor/interface",
+          "Avoid double counting stacked/chassis logical objects",
+          "Growth/spare policy explicit",
+          "QoS and redundancy handled by architecture"
+        ],
+        "output": "Switch/NMS licence/controller quantity / bandwidth and port headroom"
+      },
+      {
+        "id": "RELIABILITY",
+        "name": "Reliability / Availability / Redundancy",
+        "domain": "Probability",
+        "appliesTo": [
+          "TEL-LAN",
+          "TEL-VSAT",
+          "TEL-PABX",
+          "TEL-PAGA",
+          "TEL-CCTV",
+          "TEL-RADIO-DTRS",
+          "TEL-DMR",
+          "TEL-NDB"
+        ],
+        "equations": [
+          {
+            "name": "Component Availability",
+            "formula": "A = MTBF / (MTBF + MTTR)",
+            "role": "Availability estimate"
+          },
+          {
+            "name": "Series Availability",
+            "formula": "A_series = Π A_i",
+            "role": "Series-path availability"
+          },
+          {
+            "name": "Parallel Redundancy",
+            "formula": "A_parallel = 1 − Π(1 − A_i)",
+            "role": "Independent redundant-path estimate"
+          }
+        ],
+        "controls": [
+          "Independence assumption must be stated",
+          "Common-mode failures handled separately",
+          "Project/OEM availability criteria override generic assumptions"
+        ],
+        "output": "Redundancy requirement / spare module / architecture and risk decisions"
+      },
+      {
+        "id": "MECH",
+        "name": "Mechanical / Tower Preliminary Load",
+        "domain": "Mechanics",
+        "appliesTo": [
+          "TEL-TELT",
+          "TEL-DMR",
+          "TEL-RADIO-DTRS",
+          "TEL-RADIO-MARINE",
+          "TEL-RADIO-AERO"
+        ],
+        "equations": [
+          {
+            "name": "Dynamic Pressure",
+            "formula": "q = 0.5 × ρ × V²",
+            "role": "Physics basis for wind action"
+          },
+          {
+            "name": "Force",
+            "formula": "F = q × C_d × A",
+            "role": "Preliminary antenna/equipment wind force"
+          },
+          {
+            "name": "Moment",
+            "formula": "M = F × lever_arm",
+            "role": "Preliminary tower-load driver"
+          }
+        ],
+        "controls": [
+          "Final structural design must use governing project/code wind provisions",
+          "Antenna projected area and mounting elevation required",
+          "Geotechnical/foundation design remains separate"
+        ],
+        "output": "Preliminary antenna-load schedule / tower capacity input / structural-design trigger"
+      }
+    ],
+    "systemKernelMap": [
+      {
+        "token": "TEL-LAN",
+        "name": "Network System",
+        "kernelIds": [
+          "OPTICAL",
+          "POWER",
+          "NET-CAP",
+          "RELIABILITY"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-LAN-VCS",
+        "name": "Video Conference System",
+        "kernelIds": [
+          "NET-CAP"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-VSAT",
+        "name": "VSAT Communications",
+        "kernelIds": [
+          "RF-PROP",
+          "RELIABILITY"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-VSAT-KU",
+        "name": "KU-Band Satellite Internet",
+        "kernelIds": [
+          "RF-PROP"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-PABX",
+        "name": "IP Telephony / PABX",
+        "kernelIds": [
+          "NET-CAP",
+          "RELIABILITY"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-IPP",
+        "name": "Hazardous Area Telephone",
+        "kernelIds": [],
+        "auditState": "KERNEL_REVIEW_REQUIRED"
+      },
+      {
+        "token": "TEL-PAGA",
+        "name": "Public Address & General Alarm",
+        "kernelIds": [
+          "ACOUSTIC",
+          "POWER",
+          "RELIABILITY"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-CCTV",
+        "name": "CCTV",
+        "kernelIds": [
+          "POWER",
+          "VIDEO",
+          "NET-CAP",
+          "RELIABILITY"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-RADIO-DTRS",
+        "name": "VHF DMR Radio",
+        "kernelIds": [
+          "RF-PROP",
+          "POWER",
+          "RELIABILITY",
+          "MECH"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-RADIO-MARINE",
+        "name": "VHF-FM Marine Radio",
+        "kernelIds": [
+          "RF-PROP",
+          "MECH"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-RADIO-AERO",
+        "name": "VHF-AM Aeronautical Radio",
+        "kernelIds": [
+          "RF-PROP",
+          "MECH"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-RADIO-SSB",
+        "name": "MF/HF SSB Radio",
+        "kernelIds": [
+          "RF-PROP"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-NDB",
+        "name": "Non-Directional Beacon",
+        "kernelIds": [
+          "RF-PROP",
+          "POWER",
+          "RELIABILITY"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-AIS",
+        "name": "AIS Monitoring",
+        "kernelIds": [],
+        "auditState": "KERNEL_REVIEW_REQUIRED"
+      },
+      {
+        "token": "TEL-DMR",
+        "name": "Digital Microwave + WBB",
+        "kernelIds": [
+          "RF-PROP",
+          "POWER",
+          "RELIABILITY",
+          "MECH"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-FO",
+        "name": "Fiber Optic Network",
+        "kernelIds": [
+          "OPTICAL"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-TELT",
+        "name": "Telecommunication Towers",
+        "kernelIds": [
+          "MECH"
+        ],
+        "auditState": "MAPPED_PRELIMINARY"
+      },
+      {
+        "token": "TEL-ES",
+        "name": "Entertainment System",
+        "kernelIds": [],
+        "auditState": "KERNEL_REVIEW_REQUIRED"
+      },
+      {
+        "token": "TEL-MET",
+        "name": "Meteorological System",
+        "kernelIds": [],
+        "auditState": "KERNEL_REVIEW_REQUIRED"
       }
     ]
   }
