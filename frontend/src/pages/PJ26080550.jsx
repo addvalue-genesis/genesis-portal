@@ -106,39 +106,63 @@ function Overview() {
   const openProofs = SYSTEMS.filter(
     (s) => s.proofState.includes("PRELIMINARY") || s.proofState.includes("CONFLICT") || s.proofState.includes("NOT FOUND")
   ).length;
-  const quoted = SYSTEMS.filter((s) => s.costBasis.includes("CURRENT_QUOTE")).length;
   const paga = PROJECT_0550.selectedPaga;
+  const submission = BUDGETARY_SUBMISSION;
 
   return (
     <div className="p55-stack">
       <SectionTitle
         eyebrow="Management view"
         title="Project control spine"
-        text="Current 0550 baseline is evidence-controlled. PAGA is selected on INDUSTRONIC, while the overall project price remains HOLD until the selected package is commercially normalized."
+        text="Engineering/commercial closure and customer budgetary submission are controlled as separate states. Final RELEASED_SELL remains HOLD, while the emergency SAMTEL Rev00 budgetary snapshot was issued on 08-Oct-2026."
       />
 
+      <div className="p55-grid p55-grid--2">
+        <section className="p55-callout p55-callout--warning">
+          <strong>Engineering / Final Customer Release</strong>
+          <p>
+            <strong>HOLD / CONTROLLED.</strong> Open engineering proofs, vendor/OEM closures, quantity reconciliation and final commercial authorization remain before a formal Released Customer Output can be issued.
+          </p>
+        </section>
+
+        <section className="p55-callout">
+          <strong>Emergency Budgetary Submission</strong>
+          <p>
+            <strong>ISSUED — {submission?.revision || "SAMTEL FINAL Rev00"}.</strong> Frozen preliminary USD snapshot for ADDVALUE → SAMTEL → CNEEC. It is historical evidence of what was sent and must not be overwritten by later working-price updates.
+          </p>
+        </section>
+      </div>
+
       <div className="p55-metric-grid">
-        <MetricCard label="Systems" value="19" sub="Controlled project spine" />
+        <MetricCard label="Systems" value="19" sub="Controlled engineering spine" />
         <MetricCard
-          label="Part A+B"
+          label="Final release"
           value="HOLD"
-          sub={"Known subset excl. PAGA: " + compactMoney(PROJECT_0550.knownBaseExPagaUsd, "USD") + " / " + compactMoney(PROJECT_0550.knownBaseExPagaThb, "THB")}
+          sub="RELEASED_SELL not yet authorized"
           tone="warn"
         />
         <MetricCard
-          label="PAGA selected"
-          value={compactMoney(paga.knownSelectedSubtotalEur, "EUR")}
-          sub={paga.vendor + " · " + paga.offer + " · EUR FX TBC"}
+          label="Budgetary base"
+          value={compactMoney(submission?.baseBeforeOptionsUsd || 0, "USD")}
+          sub="Part A + customer B1-B6 · issued 08-Oct-2026"
           tone="good"
         />
         <MetricCard
-          label="Base + C2 + C3"
-          value="HOLD"
-          sub={"Known subset excl. PAGA: " + compactMoney(PROJECT_0550.knownBasePlusC2C3ExPagaThb, "THB")}
+          label="C2 + C3 options"
+          value={compactMoney(submission?.optionsC2C3Usd || 0, "USD")}
+          sub="C1 physical installation excluded"
+        />
+        <MetricCard
+          label="Management envelope"
+          value={compactMoney(submission?.managementEnvelopeUsd || 0, "USD")}
+          sub="Budgetary reference only · do not back-solve"
           tone="warn"
         />
-        <MetricCard label="Open / preliminary proofs" value={String(openProofs)} sub="Engineering closure required" tone="warn" />
-        <MetricCard label="FX control" value="31.50" sub="THB/USD · EUR/THB = TBC" />
+        <MetricCard
+          label="FX snapshot"
+          value={String(submission?.fxThbUsd || PROJECT_0550.fxThbUsd)}
+          sub="THB/USD used for SAMTEL Rev00"
+        />
       </div>
 
       <div className="p55-grid p55-grid--2">
@@ -191,17 +215,17 @@ function Overview() {
       <section className="p55-panel">
         <SectionTitle
           eyebrow="Release controls"
-          title="What management should watch before price release"
-          text="High-impact dependencies that can move cost, schedule or margin."
+          title="What management should watch before final price release"
+          text={"Emergency budgetary has already been issued; these are the main closures before it can become a formal Released Customer Output. Open/preliminary proof count: " + openProofs + "."}
         />
         <div className="p55-control-grid">
           {[
-            ["PAGA proof", "Sound coverage / amplifier loading / cabinet and loop reconciliation", "HIGH"],
-            ["PAGA commercial closure", "ACT-IP, monitoring, UPS 6h, selected-vendor spares, site service and FCA logistics", "HIGH"],
+            ["Vendor/OEM quote replacement", "Replace working allowances with current quotations through revision control", "HIGH"],
+            ["PAGA engineering proof", "Sound coverage / amplifier loading / cabinet and loop reconciliation", "HIGH"],
             ["CCTV proof", "Coverage, lens, bandwidth and storage closure", "HIGH"],
             ["FO / bulk MTO", "Replace historical route proxy with current quantity take-off", "HIGH"],
-            ["Myanmar permits", "Equipment freeze, MOTC / frequency / DCA / import licence path", "HIGH"],
-            ["Resource continuity", "External replacement cover for PM / Chief / Sr / Tech", "PROTECTED"],
+            ["Myanmar permits", "Equipment freeze, frequency / DCA / import / type-approval path", "HIGH"],
+            ["Resource continuity", "Call-off external specialist cover for FAT / IFAT / SAT Deploy / commissioning", "PROTECTED"],
           ].map(([name, text, state]) => (
             <div className="p55-control" key={name}>
               <div className="p55-control__dot" />
