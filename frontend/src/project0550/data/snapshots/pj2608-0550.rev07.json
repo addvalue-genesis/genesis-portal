@@ -1855,5 +1855,233 @@
       }
     ],
     "replacementRule": "Replace a working allowance only when current vendor/OEM evidence or a controlled quantity/engineering update is received. Never back-solve the lines to force the management envelope."
+  },
+  "requirementCompleteness": {
+    "schemaVersion": "0.1.0",
+    "state": "AUDIT_IN_PROGRESS",
+    "doctrine": "Fail closed: a named system is not complete merely because a price or main equipment line exists. Every source requirement must map to a controlled thread or an approved exception.",
+    "auditDimensions": [
+      "Requirement / function",
+      "Subsystem / software / licence",
+      "Interface / protocol",
+      "Capacity / quantity driver",
+      "CAL / Study / RPT / engineering proof",
+      "Physical object / MTO / bulk",
+      "Power / UPS / redundancy",
+      "Certification / hazardous-area compliance",
+      "VDRL / drawings / manuals",
+      "FAT / IFAT / SAT / integration test",
+      "Configuration / commissioning / training",
+      "Permit / frequency / authority",
+      "Startup / 2Y / 10Y spares",
+      "Special tools",
+      "Warranty / support",
+      "Cost coverage / schedule / risk"
+    ],
+    "releaseRules": [
+      "BLOCK final release when an extracted mandatory requirement has no system/common mapping.",
+      "BLOCK final release when a mandatory requirement has no cost coverage or approved explicit exception.",
+      "BLOCK final release when a required CAL/Study/RPT has neither evidence nor an approved preliminary basis.",
+      "BLOCK final release when scope ownership is unresolved for work that can change cost or schedule.",
+      "Budgetary issue may proceed only with a frozen exception record, allowance basis and replacement trigger."
+    ],
+    "seedFindings": [
+      {
+        "id": "RC-0550-001",
+        "systemToken": "TEL-LAN",
+        "title": "NMS (PRTG) requirement thread",
+        "source": "RFQ Summary Report §3 / Network System",
+        "sourceFact": "Network System includes NMS (PRTG) together with core/MPLS/distribution/access switches, WiFi controller and firewall.",
+        "mappingState": "MAPPED_TO_SYSTEM",
+        "threadState": "INCOMPLETE",
+        "missingControls": [
+          "NMS architecture / deployment basis",
+          "managed-device / node / sensor licence quantity driver",
+          "interfaces/protocols to managed equipment",
+          "FAT/SAT alarm and performance-monitoring test coverage",
+          "cost coverage for software/licence/integration"
+        ],
+        "releaseEffect": "OPEN — must be closed or explicitly excepted before final RELEASED_SELL"
+      }
+    ],
+    "crossSystemObligations": [
+      {
+        "id": "COMMON-ENG",
+        "title": "Detailed design / calculations / coverage studies",
+        "source": "RFQ Summary Report §3 Part B1",
+        "mappingState": "SYSTEM_MAPPING_REQUIRED"
+      },
+      {
+        "id": "COMMON-TRANSPORT",
+        "title": "International transportation to contractual delivery point",
+        "source": "RFQ Summary Report §3 Part B2 + §5 Incoterms",
+        "mappingState": "BOUNDARY_RECONCILIATION_REQUIRED"
+      },
+      {
+        "id": "COMMON-TRAINING",
+        "title": "Training",
+        "source": "RFQ Summary Report §3 Part B3",
+        "mappingState": "SYSTEM_MAPPING_REQUIRED"
+      },
+      {
+        "id": "COMMON-SAT",
+        "title": "Installation instruction / pre-commissioning / commissioning / SAT leadership",
+        "source": "RFQ Summary Report §3 Part B4 + §4 Scope Split",
+        "mappingState": "SYSTEM_MAPPING_REQUIRED"
+      },
+      {
+        "id": "COMMON-PERMIT",
+        "title": "Telecom/frequency permit process and authority fees",
+        "source": "RFQ Summary Report §5 Licenses & Frequency Permits",
+        "mappingState": "SYSTEM_MAPPING_REQUIRED"
+      },
+      {
+        "id": "COMMON-WARRANTY",
+        "title": "24-month warranty from PAC to FAC",
+        "source": "RFQ Summary Report §5 Warranty Period",
+        "mappingState": "LIFECYCLE_COST_MAPPING_REQUIRED"
+      },
+      {
+        "id": "COMMON-COMMERCIAL",
+        "title": "USD Firm Fixed Lump Sum / 180-day validity",
+        "source": "RFQ Summary Report §5 Currency and validity",
+        "mappingState": "COMMERCIAL_CONTROL_REQUIRED"
+      }
+    ],
+    "systemAudit": [
+      {
+        "no": 1,
+        "token": "TEL-LAN",
+        "name": "Network System",
+        "auditState": "AUDIT_STARTED",
+        "knownFinding": "NMS (PRTG) detailed requirement thread incomplete"
+      },
+      {
+        "no": 2,
+        "token": "TEL-LAN-VCS",
+        "name": "Video Conference System",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 3,
+        "token": "TEL-VSAT",
+        "name": "VSAT Communications",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 4,
+        "token": "TEL-VSAT-KU",
+        "name": "KU-Band Satellite Internet",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 5,
+        "token": "TEL-PABX",
+        "name": "IP Telephony / PABX",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 6,
+        "token": "TEL-IPP",
+        "name": "Hazardous Area Telephone",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 7,
+        "token": "TEL-PAGA",
+        "name": "Public Address & General Alarm",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 8,
+        "token": "TEL-CCTV",
+        "name": "CCTV",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 9,
+        "token": "TEL-RADIO-DTRS",
+        "name": "VHF DMR Radio",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 10,
+        "token": "TEL-RADIO-MARINE",
+        "name": "VHF-FM Marine Radio",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 11,
+        "token": "TEL-RADIO-AERO",
+        "name": "VHF-AM Aeronautical Radio",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 12,
+        "token": "TEL-RADIO-SSB",
+        "name": "MF/HF SSB Radio",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 18,
+        "token": "TEL-NDB",
+        "name": "Non-Directional Beacon",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 19,
+        "token": "TEL-AIS",
+        "name": "AIS Monitoring",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 13,
+        "token": "TEL-DMR",
+        "name": "Digital Microwave + WBB",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 15,
+        "token": "TEL-FO",
+        "name": "Fiber Optic Network",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 16,
+        "token": "TEL-TELT",
+        "name": "Telecommunication Towers",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 14,
+        "token": "TEL-ES",
+        "name": "Entertainment System",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      },
+      {
+        "no": 17,
+        "token": "TEL-MET",
+        "name": "Meteorological System",
+        "auditState": "NOT_YET_AUDITED",
+        "knownFinding": null
+      }
+    ]
   }
 }
