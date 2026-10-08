@@ -24,3 +24,4 @@ export const RISK_SCENARIOS = DATASET.riskScenarios;
 export const SOURCE_REGISTER = DATASET.sourceRegister;
 export const CONTROL_RULES = DATASET.controlRules;
 export const BUDGETARY_ESTIMATE = DATASET.budgetaryEstimate;
+export const BUDGETARY_SUBMISSION = DATASET.budgetarySubmission;
