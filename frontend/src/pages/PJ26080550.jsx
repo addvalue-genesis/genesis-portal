@@ -7,6 +7,7 @@ import {
   CONTROL_RULES,
   CORE_TEAM,
   EXECUTION_CAMPAIGNS,
+  ENGINEERING_LAW_LIBRARY,
   FIRST_PRINCIPLES_CHAIN,
   LOGISTICS_GATES,
   OPTIONS,
@@ -403,6 +404,7 @@ function SystemsView() {
 
 function EngineeringView() {
   const completeness = REQUIREMENT_COMPLETENESS;
+  const lawLibrary = ENGINEERING_LAW_LIBRARY;
   const audited = (completeness?.systemAudit || []).filter((row) => row.auditState !== "NOT_YET_AUDITED").length;
   const notAudited = (completeness?.systemAudit || []).filter((row) => row.auditState === "NOT_YET_AUDITED").length;
 
@@ -536,6 +538,64 @@ function EngineeringView() {
         </div>
       </section>
 
+      <SectionTitle
+        eyebrow="Engineering Law Library"
+        title="Physics + Mathematics kernels"
+        text="Reusable COMMON/GENERIC equations sit between requirement constraints and engineering proof. They derive feasibility and quantity, but never turn weak assumptions into confirmed facts."
+      />
+
+      <section className="p55-callout">
+        <strong>{lawLibrary?.state || "COMMON_GENERIC_KERNEL"}</strong>
+        <p>{lawLibrary?.evidenceRule}</p>
+      </section>
+
+      <div className="p55-grid p55-grid--2">
+        {(lawLibrary?.kernels || []).map((kernel) => (
+          <section className="p55-panel" key={kernel.id}>
+            <div className="p55-panel__head">
+              <div>
+                <div className="p55-eyebrow">{kernel.domain} · {kernel.id}</div>
+                <h3>{kernel.name}</h3>
+              </div>
+              <Badge tone="neutral">{kernel.appliesTo.length} mappings</Badge>
+            </div>
+            <div className="p55-equations">
+              {kernel.equations.map((eq) => (
+                <code key={eq.name}>
+                  <strong>{eq.name}</strong>{" — "}{eq.formula}
+                </code>
+              ))}
+            </div>
+            <p className="p55-note"><strong>Output:</strong> {kernel.output}</p>
+            <ul className="p55-rule-list">
+              {kernel.controls.map((rule) => <li key={rule}>{rule}</li>)}
+            </ul>
+          </section>
+        ))}
+      </div>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="System-to-kernel map"
+          title="Which physics/math model checks each system"
+          text="MAPPED_PRELIMINARY means the generic kernel applies; project inputs, standards and source evidence still need system-by-system audit."
+        />
+        <div className="p55-table-wrap">
+          <table className="p55-table">
+            <thead><tr><th>System</th><th>Engineering kernels</th><th>State</th></tr></thead>
+            <tbody>
+              {(lawLibrary?.systemKernelMap || []).map((row) => (
+                <tr key={row.token}>
+                  <td><strong>{row.name}</strong><small>{row.token}</small></td>
+                  <td>{row.kernelIds.length ? row.kernelIds.join(" · ") : "—"}</td>
+                  <td><Badge>{row.auditState}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
       <div className="p55-grid p55-grid--2">
         <section className="p55-panel">
           <SectionTitle eyebrow="Control doctrine" title="No-guess rules" />
@@ -545,7 +605,7 @@ function EngineeringView() {
         </section>
 
         <section className="p55-panel">
-          <SectionTitle eyebrow="Equation kernel" title="Reusable cost-engineering logic" />
+          <SectionTitle eyebrow="Parametric Cost Kernel" title="Math after engineering quantity" />
           <div className="p55-equations">
             <code>MH = I × Q × UMH × F</code>
             <code>Duration = MH / (Persons × H/day × η)</code>
