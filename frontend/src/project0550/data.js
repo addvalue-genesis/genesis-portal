@@ -27,3 +27,5 @@ export const BUDGETARY_ESTIMATE = DATASET.budgetaryEstimate;
 export const BUDGETARY_SUBMISSION = DATASET.budgetarySubmission;
 
 export const REQUIREMENT_COMPLETENESS = DATASET.requirementCompleteness;
+
+export const ENGINEERING_LAW_LIBRARY = DATASET.engineeringLawLibrary;
