@@ -10,6 +10,7 @@ import {
   ENGINEERING_LAW_LIBRARY,
   FIRST_PRINCIPLES_CHAIN,
   LOGISTICS_GATES,
+  KNOWLEDGE_KERNEL_DOMAINS,
   OPTIONS,
   PROJECT_0550,
   REQUIREMENT_COMPLETENESS,
@@ -539,14 +540,35 @@ function EngineeringView() {
       </section>
 
       <SectionTitle
-        eyebrow="Engineering Law Library"
-        title="Physics + Mathematics kernels"
-        text="Reusable COMMON/GENERIC equations sit between requirement constraints and engineering proof. They derive feasibility and quantity, but never turn weak assumptions into confirmed facts."
+        eyebrow="Knowledge Kernels"
+        title="Multidisciplinary decision kernels"
+        text="COMMON knowledge is separated from project facts. Mathematics, physics, telecom, network, power, economics, commercial, logistics, project management and governance are invoked only where the requirement needs them."
       />
 
       <section className="p55-callout">
         <strong>{lawLibrary?.state || "COMMON_GENERIC_KERNEL"}</strong>
         <p>{lawLibrary?.evidenceRule}</p>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Knowledge architecture"
+          title="COMMON → GENERIC DOMAIN → PARTICULAR PROJECT"
+          text="The common layer contains reusable knowledge and equations; PJ2608-0550 contains only project evidence, requirements, constraints, inputs and system bindings."
+        />
+        <div className="p55-control-grid">
+          {(KNOWLEDGE_KERNEL_DOMAINS || []).map((domain) => (
+            <div className="p55-control" key={domain.id}>
+              <div className="p55-control__dot" />
+              <div>
+                <strong>{domain.name}</strong>
+                <p>{domain.purpose}</p>
+                <small>{domain.topics.join(" · ")}</small>
+              </div>
+              <Badge tone="neutral">{domain.id}</Badge>
+            </div>
+          ))}
+        </div>
       </section>
 
       <div className="p55-grid p55-grid--2">
