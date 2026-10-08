@@ -1273,3 +1273,56 @@
 .p55-export-button:active {
   transform: translateY(0);
 }
+
+.p55-row-toggle {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #cbd6e0;
+  border-radius: 6px;
+  background: #f4f8fb;
+  color: var(--p55-blue);
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.p55-row-toggle:hover {
+  background: #eaf3f8;
+}
+
+.p55-budget-detail-row > td {
+  padding: 0 !important;
+  background: #f7fafc;
+}
+
+.p55-budget-detail {
+  padding: 14px 18px 18px 52px;
+  border-bottom: 1px solid #e4e9ee;
+}
+
+.p55-budget-detail__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.p55-budget-detail__head strong {
+  font-size: 12px;
+}
+
+.p55-budget-detail__head span {
+  color: var(--p55-muted);
+  font-size: 10px;
+}
+
+@media (max-width: 900px) {
+  .p55-budget-detail {
+    padding-left: 14px;
+  }
+
+  .p55-budget-detail__head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
