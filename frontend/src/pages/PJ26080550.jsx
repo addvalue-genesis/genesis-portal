@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import {
+  BUDGETARY_ESTIMATE,
   CNEEC_BREAKDOWN,
   COMMERCIAL_POLICY,
   CONTROL_RULES,
@@ -14,6 +15,7 @@ import {
   SYSTEM_GROUPS,
   SYSTEMS,
 } from "../project0550/data";
+import { exportOriginalPriceFormXlsx } from "../project0550/exportOriginalPriceForm";
 import "../project0550/project0550.css";
 
 const TABS = [
@@ -531,17 +533,24 @@ function ExecutionView() {
 }
 
 function BudgetView() {
-  const [currency, setCurrency] = useState("USD");
+  const [currency, setCurrency] = useState("THB");
   const [part, setPart] = useState("ALL");
+  const [budgetMode, setBudgetMode] = useState("7.2");
   const rows = CNEEC_BREAKDOWN.filter((row) => part === "ALL" || row.code.startsWith(part));
   const paga = PROJECT_0550.selectedPaga;
+  const budget = BUDGETARY_ESTIMATE;
+
+  const directTotal = budget?.directDeliveryBasisThb || 0;
+  const recommended = budget?.recommendedCustomerThb || 0;
+  const calculated = budget?.calculatedCustomerBeforeRoundingThb || 0;
+  const airtime = budget?.airtimeCustomerThb || 0;
 
   return (
     <div className="p55-stack">
       <SectionTitle
-        eyebrow="SAMTEL → CNEEC budgetary output"
-        title="Priced breakdown control"
-        text="Current Rev07 baseline: INDUSTRONIC is the selected PAGA technical/pricing basis. Project headline remains HOLD until EUR conversion and open PAGA scope are closed."
+        eyebrow="SAMTEL → CNEEC commercial control"
+        title="Priced breakdown / internal analysis / budgetary submission"
+        text="7.0 preserves the controlled Rev07 customer-form baseline. 7.1 keeps internal commercial logic separate. 7.2 is the current management budgetary estimate for immediate submission."
         action={
           <div className="p55-segmented">
             <button className={currency === "USD" ? "is-active" : ""} onClick={() => setCurrency("USD")} type="button">USD</button>
@@ -551,125 +560,224 @@ function BudgetView() {
         }
       />
 
-      <div className="p55-metric-grid">
-        <MetricCard
-          label="Part A + B Base"
-          value="HOLD"
-          sub={"Known excl. PAGA: " + money(PROJECT_0550.knownBaseExPagaUsd, "USD") + " / " + money(PROJECT_0550.knownBaseExPagaThb, "THB")}
-          tone="warn"
-        />
-        <MetricCard
-          label="PAGA selected"
-          value={money(paga.knownSelectedSubtotalEur, "EUR")}
-          sub={paga.vendor + " · " + paga.offer}
-          tone="good"
-        />
-        <MetricCard
-          label="C2 known non-PAGA"
-          value={currency === "THB" ? money(PROJECT_0550.c2Thb, "THB") : currency === "EUR" ? "PAGA TBC" : money(PROJECT_0550.c2Usd, "USD")}
-          sub="PAGA capital spares remain TBC"
-        />
-        <MetricCard
-          label="C3 known non-PAGA"
-          value={currency === "THB" ? money(PROJECT_0550.c3Thb, "THB") : currency === "EUR" ? "PAGA TBC" : money(PROJECT_0550.c3Usd, "USD")}
-          sub="PAGA 2-year spares remain TBC"
-        />
-        <MetricCard
-          label="Project Total"
-          value="HOLD"
-          sub="C1 unpriced · PAGA open · EUR/THB TBC"
-          tone="warn"
-        />
-        <MetricCard
-          label="FX"
-          value="31.50"
-          sub="THB/USD locked · EUR/THB TBC"
-        />
-      </div>
-
-      <section className="p55-callout p55-callout--warning">
-        <strong>Selected PAGA commercial gate</strong>
-        <p>
-          INDUSTRONIC base net {money(paga.baseNetEur, "EUR")} plus currently priced requirement additions gives {money(paga.knownSelectedSubtotalEur, "EUR")}. The project total must remain HOLD until the remaining PAGA compliance gaps, selected-vendor spares, site service, FCA logistics and EUR conversion are source-backed.
-        </p>
-      </section>
-
       <div className="p55-filterbar p55-filterbar--simple">
         <div className="p55-segmented">
-          {["ALL", "A1", "B"].map((key) => (
-            <button key={key} className={part === key ? "is-active" : ""} onClick={() => setPart(key)} type="button">
-              {key === "ALL" ? "All Base" : key === "A1" ? "Part A1" : "Part B"}
+          {[
+            ["7.0", "7.0 Released / Customer Form"],
+            ["7.1", "7.1 Internal Commercial"],
+            ["7.2", "7.2 Budgetary Estimate"],
+          ].map(([id, label]) => (
+            <button key={id} className={budgetMode === id ? "is-active" : ""} onClick={() => setBudgetMode(id)} type="button">
+              {label}
             </button>
           ))}
         </div>
-        <Badge tone="warn">REV07 · TOTAL HOLD</Badge>
+        {budgetMode === "7.2" ? <Badge tone="warn">{budget?.revision || "BUDGETARY"}</Badge> : <Badge tone="warn">REV07 · CONTROLLED</Badge>}
       </div>
 
-      <section className="p55-panel p55-panel--flush">
-        <div className="p55-table-wrap">
-          <table className="p55-table p55-table--budget">
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Description</th>
-                <th className="is-number">USD</th>
-                <th className="is-number">THB @ 31.50</th>
-                <th className="is-number">EUR</th>
-                <th>State</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row) => (
-                <tr key={row.code}>
-                  <td><strong>{row.code}</strong></td>
-                  <td>
-                    {row.description}
-                    {row.vendor ? <small>{row.vendor}{row.offer ? " · " + row.offer : ""}</small> : null}
-                  </td>
-                  <td className="is-number">{priceCell(row, "USD")}</td>
-                  <td className="is-number">{priceCell(row, "THB")}</td>
-                  <td className="is-number">{priceCell(row, "EUR")}</td>
-                  <td><Badge>{row.state}</Badge></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+      {budgetMode === "7.0" ? (
+        <>
+          <div className="p55-metric-grid">
+            <MetricCard
+              label="Part A + B Base"
+              value="HOLD"
+              sub={"Known excl. PAGA: " + money(PROJECT_0550.knownBaseExPagaUsd, "USD") + " / " + money(PROJECT_0550.knownBaseExPagaThb, "THB")}
+              tone="warn"
+            />
+            <MetricCard
+              label="PAGA selected"
+              value={money(paga.knownSelectedSubtotalEur, "EUR")}
+              sub={paga.vendor + " · " + paga.offer}
+              tone="good"
+            />
+            <MetricCard
+              label="C2 known non-PAGA"
+              value={currency === "THB" ? money(PROJECT_0550.c2Thb, "THB") : currency === "EUR" ? "PAGA TBC" : money(PROJECT_0550.c2Usd, "USD")}
+              sub="PAGA capital spares remain TBC"
+            />
+            <MetricCard
+              label="C3 known non-PAGA"
+              value={currency === "THB" ? money(PROJECT_0550.c3Thb, "THB") : currency === "EUR" ? "PAGA TBC" : money(PROJECT_0550.c3Usd, "USD")}
+              sub="PAGA 2-year spares remain TBC"
+            />
+            <MetricCard label="Project Total" value="HOLD" sub="C1 unpriced · PAGA open · EUR/THB TBC" tone="warn" />
+            <MetricCard label="FX" value="31.50" sub="THB/USD locked · EUR/THB TBC" />
+          </div>
 
-      <section className="p55-panel">
-        <SectionTitle eyebrow="Part C" title="Options / spares" />
-        <div className="p55-option-grid">
-          {OPTIONS.map((option) => (
-            <div className="p55-option" key={option.code}>
-              <div><span>{option.code}</span><strong>{option.description}</strong></div>
-              <div className="p55-option__price">
-                <strong>
-                  {option.code === "C1"
-                    ? "NOT PRICED"
-                    : currency === "THB"
-                      ? money(option.thb, "THB")
-                      : currency === "EUR"
-                        ? "PAGA TBC"
-                        : money(option.usd, "USD")}
-                </strong>
-                <Badge>{option.state}</Badge>
+          <section className="p55-callout p55-callout--warning">
+            <strong>Selected PAGA commercial gate</strong>
+            <p>
+              INDUSTRONIC base net {money(paga.baseNetEur, "EUR")} plus currently priced requirement additions gives {money(paga.knownSelectedSubtotalEur, "EUR")}. The controlled 7.0 baseline remains HOLD until selected-vendor gaps, spares, site service, logistics and FX are source-backed.
+            </p>
+          </section>
+
+          <div className="p55-filterbar p55-filterbar--simple">
+            <div className="p55-segmented">
+              {["ALL", "A1", "B"].map((key) => (
+                <button key={key} className={part === key ? "is-active" : ""} onClick={() => setPart(key)} type="button">
+                  {key === "ALL" ? "All Base" : key === "A1" ? "Part A1" : "Part B"}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <section className="p55-panel p55-panel--flush">
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--budget">
+                <thead><tr><th>Code</th><th>Description</th><th className="is-number">USD</th><th className="is-number">THB @ 31.50</th><th className="is-number">EUR</th><th>State</th></tr></thead>
+                <tbody>
+                  {rows.map((row) => (
+                    <tr key={row.code}>
+                      <td><strong>{row.code}</strong></td>
+                      <td>{row.description}{row.vendor ? <small>{row.vendor}{row.offer ? " · " + row.offer : ""}</small> : null}</td>
+                      <td className="is-number">{priceCell(row, "USD")}</td>
+                      <td className="is-number">{priceCell(row, "THB")}</td>
+                      <td className="is-number">{priceCell(row, "EUR")}</td>
+                      <td><Badge>{row.state}</Badge></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      ) : null}
+
+      {budgetMode === "7.1" && budget ? (
+        <>
+          <div className="p55-metric-grid">
+            <MetricCard label="Direct delivery basis" value={compactMoney(directTotal, "THB")} sub="A + B + C direct / procurement basis" tone="good" />
+            <MetricCard label="Calculated customer" value={compactMoney(calculated, "THB")} sub="Commercialized before budgetary rounding" />
+            <MetricCard label="Airtime customer allowance" value={compactMoney(airtime, "THB")} sub="Recurring VSAT / Ku provision" />
+            <MetricCard label="Recommended envelope" value={compactMoney(recommended, "THB")} sub="Excluding VAT · C1 excluded" tone="warn" />
+            <MetricCard label="Goods formula" value="×1.20 / 0.95" sub="SAMTEL goods layer + ADDVALUE eligible-sales provision" />
+            <MetricCard label="Service formula" value="×1.05" sub="Working service / handling layer" />
+          </div>
+
+          <section className="p55-panel">
+            <SectionTitle
+              eyebrow="Resource substitution protection"
+              title="External specialist = call-off, not full-project FTE"
+              text="Use specialists only for the work and event window that requires their competency. SAT Deploy / IFAT / commissioning are the peak call-off periods."
+            />
+            <div className="p55-grid p55-grid--2">
+              <div className="p55-evidence-card">
+                <Badge tone="good">USD {budget.externalSpecialistPolicy.basisUsdPerWorkingDay.toLocaleString("en-US")} / working day</Badge>
+                <p>{budget.externalSpecialistPolicy.usage}</p>
+              </div>
+              <div className="p55-evidence-card">
+                <Badge tone="warn">SEPARATE CASH COST</Badge>
+                <p>{budget.externalSpecialistPolicy.excludedFromDayRate.join(" · ")}</p>
               </div>
             </div>
-          ))}
-        </div>
-      </section>
+            <p className="p55-note p55-note--top"><strong>Peak:</strong> {budget.externalSpecialistPolicy.keyPeak}</p>
+          </section>
 
-      <section className="p55-callout p55-callout--warning">
-        <strong>Budget release note</strong>
-        <p>
-          Current project total is intentionally HOLD. The UI must not recreate the superseded numeric headline from the previous PAGA basis. Only source-backed selected-vendor amounts may be promoted into the final customer price.
-        </p>
-      </section>
+          <section className="p55-panel">
+            <SectionTitle eyebrow="Commercial bridge" title="Direct basis → customer budget" />
+            <div className="p55-policy-list">
+              <div className="p55-policy"><div><strong>Part A direct</strong><p>{money(budget.partADirectThb, "THB")} · equipment/vendor/bulk · no spares duplicated</p></div><Badge>DIRECT</Badge></div>
+              <div className="p55-policy"><div><strong>Part B direct</strong><p>{money(budget.partBDirectThb, "THB")} · engineering/services/logistics/specialist</p></div><Badge>DIRECT</Badge></div>
+              <div className="p55-policy"><div><strong>Part C direct</strong><p>{money(budget.partCDirectThb, "THB")} · C2/C3 spares; C1 excluded</p></div><Badge>OPTION / BUDGET</Badge></div>
+              <div className="p55-policy"><div><strong>Calculated customer</strong><p>{money(calculated, "THB")}</p></div><Badge>DERIVED</Badge></div>
+              <div className="p55-policy"><div><strong>Recommended budgetary</strong><p>{money(recommended, "THB")}</p></div><Badge tone="warn">SUBMISSION</Badge></div>
+            </div>
+          </section>
+        </>
+      ) : null}
+
+      {budgetMode === "7.2" && budget ? (
+        <>
+          <div className="p55-metric-grid">
+            <MetricCard label="Part A" value={compactMoney(budget.partADirectThb, "THB")} sub="Equipment / vendor package / bulk · spare excluded" tone="good" />
+            <MetricCard label="Part B" value={compactMoney(budget.partBDirectThb, "THB")} sub="Engineering / logistics / specialist / permits / risk" />
+            <MetricCard label="Part C" value={compactMoney(budget.partCDirectThb, "THB")} sub="C2 + C3 spares · C1 excluded" />
+            <MetricCard label="Direct basis" value={compactMoney(directTotal, "THB")} sub="Before commercial layers" />
+            <MetricCard label="Calculated customer" value={compactMoney(calculated, "THB")} sub="Before budgetary rounding" />
+            <MetricCard label="Recommended to CNEEC" value={compactMoney(recommended, "THB")} sub="Excluding VAT · current budgetary envelope" tone="warn" />
+          </div>
+
+          <section className="p55-callout p55-callout--warning">
+            <strong>Immediate submission basis</strong>
+            <p>
+              Preliminary Budgetary Estimate = {money(recommended, "THB")} excluding VAT. C1 physical installation construction is excluded under the current working boundary. MGW/CERAGON quotation is pending and will replace the current microwave/WBB budgetary basis when received.
+            </p>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle
+              eyebrow="Part A"
+              title="19-system budgetary basis"
+              text="Part A is complete working-system equipment/vendor/bulk only. B5/C2/C3 spares stay outside A to prevent double count."
+              action={<button className="p55-export-button" type="button" onClick={() => exportOriginalPriceFormXlsx(budget)}>Export Original XLSX</button>}
+            />
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--budget">
+                <thead><tr><th>No.</th><th>System</th><th>Budgetary basis</th><th className="is-number">Direct THB</th></tr></thead>
+                <tbody>
+                  {budget.partA.map((row) => (
+                    <tr key={row.token}>
+                      <td>{String(row.no).padStart(2, "0")}</td>
+                      <td><strong>{row.system}</strong><small>{row.token}</small></td>
+                      <td>{row.basis}</td>
+                      <td className="is-number">{money(row.directThb, "THB")}</td>
+                    </tr>
+                  ))}
+                  <tr><td colSpan="3"><strong>Part A Direct Total</strong></td><td className="is-number"><strong>{money(budget.partADirectThb, "THB")}</strong></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle eyebrow="Part B" title="Engineering / execution / specialist budget" text="External specialists are call-off resources. USD 1,000/working-day is a minimum working basis where used; MOB/DEMOB and other cash costs are separate." />
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--budget">
+                <thead><tr><th>Code</th><th>Description</th><th>Pricing class</th><th className="is-number">Direct THB</th><th>Control note</th></tr></thead>
+                <tbody>
+                  {budget.partB.map((row) => (
+                    <tr key={row.code}>
+                      <td><strong>{row.code}</strong></td>
+                      <td>{row.description}</td>
+                      <td><Badge>{row.pricingClass}</Badge></td>
+                      <td className="is-number">{money(row.directThb, "THB")}</td>
+                      <td>{row.note}</td>
+                    </tr>
+                  ))}
+                  <tr><td colSpan="3"><strong>Part B Direct Total</strong></td><td className="is-number"><strong>{money(budget.partBDirectThb, "THB")}</strong></td><td /></tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle eyebrow="Part C" title="Options / spares" />
+            <div className="p55-option-grid">
+              {budget.partC.map((option) => (
+                <div className="p55-option" key={option.code}>
+                  <div><span>{option.code}</span><strong>{option.description}</strong></div>
+                  <div className="p55-option__price">
+                    <strong>{Number.isFinite(option.directThb) ? money(option.directThb, "THB") : "EXCLUDED"}</strong>
+                    <Badge>{option.state}</Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle eyebrow="Original CNEEC output" title="Export mapping control" text="The XLSX export preserves the original bilingual 8-column CNEEC price-breakdown structure and maps the 19 internal systems back into the 15 customer Part-A lines." />
+            <div className="p55-policy-list">
+              <div className="p55-policy"><div><strong>Source form</strong><p>{budget.sourceOriginalForm.name}</p></div><Badge>CUSTOMER FORM</Badge></div>
+              <div className="p55-policy"><div><strong>Calculated total</strong><p>{money(calculated, "THB")}</p></div><Badge>DERIVED</Badge></div>
+              <div className="p55-policy"><div><strong>Budgetary envelope</strong><p>{money(recommended, "THB")}</p></div><Badge tone="warn">EXPORT TOTAL</Badge></div>
+            </div>
+          </section>
+        </>
+      ) : null}
     </div>
   );
 }
-
 function RiskView() {
   const maxExposure = Math.max(...RISK_SCENARIOS.map((r) => r.exposureThb));
 
