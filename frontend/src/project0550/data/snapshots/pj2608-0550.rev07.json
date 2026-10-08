@@ -987,133 +987,939 @@
         "token": "TEL-LAN",
         "system": "Network / LAN / Cybersecurity",
         "basis": "CISCO + PALO ALTO · LOCKED",
-        "directThb": 32000000
+        "directThb": 32000000,
+        "components": [
+          {
+            "id": "TEL-LAN-C01",
+            "item": "Core / backbone switching",
+            "category": "Equipment",
+            "source": "RFQ/MR",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-LAN-C02",
+            "item": "MPLS / distribution / access switching",
+            "category": "Equipment",
+            "source": "RFQ/MR",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-LAN-C03",
+            "item": "WiFi 6 access points + controller",
+            "category": "Equipment / Software",
+            "source": "RFQ/MR",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-LAN-C04",
+            "item": "Firewall / IT-OT cybersecurity",
+            "category": "Equipment / Licence",
+            "source": "Controlled budget basis",
+            "state": "OPEN BOM"
+          },
+          {
+            "id": "TEL-LAN-C05",
+            "item": "NMS / monitoring (PRTG requirement thread)",
+            "category": "Software / Licence",
+            "source": "RFQ",
+            "state": "AUDIT OPEN"
+          },
+          {
+            "id": "TEL-LAN-C06",
+            "item": "SFP / optical interfaces / network accessories",
+            "category": "Bulk / Interface",
+            "source": "Derived from architecture",
+            "state": "OPEN QTY"
+          },
+          {
+            "id": "TEL-LAN-C07",
+            "item": "Configuration / integration / FAT-SAT support",
+            "category": "Service",
+            "source": "Project lifecycle",
+            "state": "MAP TO B1/B4"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 2,
         "token": "TEL-LAN-VCS",
         "system": "Video Conference",
         "basis": "Enterprise VCS · compliant",
-        "directThb": 8000000
+        "directThb": 8000000,
+        "components": [
+          {
+            "id": "TEL-LAN-VCS-C01",
+            "item": "Video conference endpoints / codec",
+            "category": "Equipment",
+            "source": "RFQ/MR",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-LAN-VCS-C02",
+            "item": "Display / room AV equipment",
+            "category": "Equipment",
+            "source": "RFQ/MR",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-LAN-VCS-C03",
+            "item": "Microphones / audio interface",
+            "category": "Equipment",
+            "source": "RFQ/MR",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-LAN-VCS-C04",
+            "item": "LAN / bandwidth / licence integration",
+            "category": "Interface / Licence",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 3,
         "token": "TEL-VSAT",
         "system": "VSAT C-Band",
         "basis": "THAICOM · LOCKED",
-        "directThb": 14000000
+        "directThb": 14000000,
+        "components": [
+          {
+            "id": "TEL-VSAT-C01",
+            "item": "3.8 m antenna system",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-VSAT-C02",
+            "item": "Redundant LNB / BUC chain",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-VSAT-C03",
+            "item": "VSAT modem / indoor unit",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-VSAT-C04",
+            "item": "APF ↔ Yangon link interface",
+            "category": "Interface",
+            "source": "RFQ/BOD",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-VSAT-C05",
+            "item": "RF cable / waveguide / grounding accessories",
+            "category": "Bulk",
+            "source": "Derived",
+            "state": "OPEN QTY"
+          },
+          {
+            "id": "TEL-VSAT-C06",
+            "item": "Link budget / rain-fade engineering",
+            "category": "CAL/RPT",
+            "source": "Engineering requirement",
+            "state": "REQUIRED"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 4,
         "token": "TEL-VSAT-KU",
         "system": "Ku-Band Internet Equipment",
         "basis": "THAICOM · LOCKED · airtime separate",
-        "directThb": 9000000
+        "directThb": 9000000,
+        "components": [
+          {
+            "id": "TEL-VSAT-KU-C01",
+            "item": "Ku-band terminal / antenna hardware",
+            "category": "Equipment",
+            "source": "Internal 19-system split",
+            "state": "OPEN QUOTE"
+          },
+          {
+            "id": "TEL-VSAT-KU-C02",
+            "item": "Modem / router / network interface",
+            "category": "Equipment / Interface",
+            "source": "Derived",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-VSAT-KU-C03",
+            "item": "Internet service / airtime",
+            "category": "Recurring service",
+            "source": "Commercial model",
+            "state": "SEPARATE ANALYSIS"
+          },
+          {
+            "id": "TEL-VSAT-KU-C04",
+            "item": "Link/service-capacity engineering",
+            "category": "CAL / Service",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 5,
         "token": "TEL-PABX",
         "system": "PABX / IP Phone",
         "basis": "AVAYA · turnkey basis · LOCKED",
-        "directThb": 18000000
+        "directThb": 18000000,
+        "components": [
+          {
+            "id": "TEL-PABX-C01",
+            "item": "IP-PABX core / call server",
+            "category": "Equipment / Software",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-PABX-C02",
+            "item": "IP phones",
+            "category": "Equipment",
+            "source": "RFQ/MR",
+            "state": "QTY DERIVED"
+          },
+          {
+            "id": "TEL-PABX-C03",
+            "item": "Gateways / trunks / licences",
+            "category": "Equipment / Licence",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-PABX-C04",
+            "item": "QoS / redundancy / dial-plan integration",
+            "category": "Engineering / Interface",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 6,
         "token": "TEL-IPP",
         "system": "Ex / ATEX Telephone",
         "basis": "Compliant Ex package incl. hood/JB/media converter",
-        "directThb": 5000000
+        "directThb": 5000000,
+        "components": [
+          {
+            "id": "TEL-IPP-C01",
+            "item": "Explosion-proof telephones",
+            "category": "Equipment",
+            "source": "RFQ/MR",
+            "state": "QTY DERIVED"
+          },
+          {
+            "id": "TEL-IPP-C02",
+            "item": "Hoods / weather protection",
+            "category": "Accessories",
+            "source": "Internal basis",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-IPP-C03",
+            "item": "JB / media conversion / interface accessories",
+            "category": "Interface / Bulk",
+            "source": "Internal basis",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-IPP-C04",
+            "item": "Ex certificates / hazardous-area compliance",
+            "category": "Compliance",
+            "source": "Project requirement",
+            "state": "REQUIRED"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 7,
         "token": "TEL-PAGA",
         "system": "PAGA",
         "basis": "INDUSTRONIC A20261632 · LOCKED",
-        "directThb": 16000000
+        "directThb": 16000000,
+        "components": [
+          {
+            "id": "TEL-PAGA-C01",
+            "item": "Central / remote PAGA nodes and controllers",
+            "category": "Equipment",
+            "source": "INDUSTRONIC offer + project requirements",
+            "state": "RECONCILE"
+          },
+          {
+            "id": "TEL-PAGA-C02",
+            "item": "Power amplifiers / redundancy modules",
+            "category": "Equipment",
+            "source": "INDUSTRONIC offer",
+            "state": "LOAD CAL REQUIRED"
+          },
+          {
+            "id": "TEL-PAGA-C03",
+            "item": "Operator access panels / field call stations",
+            "category": "Equipment",
+            "source": "Offer / MR",
+            "state": "RECONCILE QTY"
+          },
+          {
+            "id": "TEL-PAGA-C04",
+            "item": "Indoor / Ex outdoor loudspeakers",
+            "category": "Equipment",
+            "source": "MR / Offer",
+            "state": "COVERAGE CAL REQUIRED"
+          },
+          {
+            "id": "TEL-PAGA-C05",
+            "item": "Warning beacons / control",
+            "category": "Equipment / Interface",
+            "source": "MR / Offer",
+            "state": "OPEN MONITORING"
+          },
+          {
+            "id": "TEL-PAGA-C06",
+            "item": "SIP / system activation / monitoring interfaces",
+            "category": "Software / Licence",
+            "source": "Vendor / interface requirement",
+            "state": "AUDIT OPEN"
+          },
+          {
+            "id": "TEL-PAGA-C07",
+            "item": "Sound coverage + amplifier/loop loading",
+            "category": "CAL/RPT",
+            "source": "RPT-0005 requirement",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-PAGA-C08",
+            "item": "UPS / autonomy completion",
+            "category": "Power",
+            "source": "Project requirement",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-PAGA-C09",
+            "item": "FAT / SAT / commissioning",
+            "category": "Test / Service",
+            "source": "Lifecycle",
+            "state": "MAP A/B4"
+          },
+          {
+            "id": "TEL-PAGA-C10",
+            "item": "Spares / special tools",
+            "category": "Spares / Tools",
+            "source": "Commercial structure",
+            "state": "MAP B5/B6/C2/C3"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 8,
         "token": "TEL-CCTV",
         "system": "CCTV",
         "basis": "HIKVISION · LOCKED",
-        "directThb": 18000000
+        "directThb": 18000000,
+        "components": [
+          {
+            "id": "TEL-CCTV-C01",
+            "item": "Ex PTZ / Ex fixed cameras",
+            "category": "Equipment",
+            "source": "RFQ/MR",
+            "state": "QTY DERIVED"
+          },
+          {
+            "id": "TEL-CCTV-C02",
+            "item": "Indoor fixed / dome / PTZ cameras",
+            "category": "Equipment",
+            "source": "RFQ/MR",
+            "state": "QTY DERIVED"
+          },
+          {
+            "id": "TEL-CCTV-C03",
+            "item": "NVR / VMS / recording servers",
+            "category": "Equipment / Software",
+            "source": "RFQ",
+            "state": "OPEN BOM"
+          },
+          {
+            "id": "TEL-CCTV-C04",
+            "item": "Storage capacity",
+            "category": "Data / Storage",
+            "source": "RFQ + calculation",
+            "state": "CAL REQUIRED"
+          },
+          {
+            "id": "TEL-CCTV-C05",
+            "item": "Displays / operator viewing",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-CCTV-C06",
+            "item": "Coverage / lens / FoV engineering",
+            "category": "CAL/RPT",
+            "source": "Engineering requirement",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-CCTV-C07",
+            "item": "Network bandwidth / PoE / interface",
+            "category": "Network / Power",
+            "source": "Derived",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 9,
         "token": "TEL-RADIO-DTRS",
         "system": "VHF DMR Trunked Radio",
         "basis": "MOTOROLA · LOCKED",
-        "directThb": 25000000
+        "directThb": 25000000,
+        "components": [
+          {
+            "id": "TEL-RADIO-DTRS-C01",
+            "item": "DMR repeaters",
+            "category": "Equipment",
+            "source": "MR",
+            "state": "QTY DERIVED"
+          },
+          {
+            "id": "TEL-RADIO-DTRS-C02",
+            "item": "Mobile / vehicle radios",
+            "category": "Equipment",
+            "source": "MR",
+            "state": "QTY DERIVED"
+          },
+          {
+            "id": "TEL-RADIO-DTRS-C03",
+            "item": "ATEX/UL handheld radios",
+            "category": "Equipment",
+            "source": "MR",
+            "state": "QTY DERIVED"
+          },
+          {
+            "id": "TEL-RADIO-DTRS-C04",
+            "item": "Dispatch console / management",
+            "category": "Equipment / Software",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-RADIO-DTRS-C05",
+            "item": "Antennas / feeders / RF accessories",
+            "category": "RF / Bulk",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-RADIO-DTRS-C06",
+            "item": "RF coverage / channel / frequency study",
+            "category": "CAL/RPT",
+            "source": "Engineering requirement",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-RADIO-DTRS-C07",
+            "item": "Myanmar frequency / type approval",
+            "category": "Regulatory",
+            "source": "RFQ/TC",
+            "state": "REQUIRED"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 10,
         "token": "TEL-RADIO-MARINE",
         "system": "VHF-FM Marine Radio",
         "basis": "Jason current partial quote + turnkey completion",
-        "directThb": 8000000
+        "directThb": 8000000,
+        "components": [
+          {
+            "id": "TEL-RADIO-MARINE-C01",
+            "item": "VHF-FM marine base radio",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "PARTIAL QUOTE"
+          },
+          {
+            "id": "TEL-RADIO-MARINE-C02",
+            "item": "Antenna / feeder / mounting accessories",
+            "category": "RF / Bulk",
+            "source": "RFQ",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-RADIO-MARINE-C03",
+            "item": "IP gateway / network interface",
+            "category": "Interface",
+            "source": "RFQ",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-RADIO-MARINE-C04",
+            "item": "Ex handheld radios",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN QTY"
+          },
+          {
+            "id": "TEL-RADIO-MARINE-C05",
+            "item": "RF / permit verification",
+            "category": "CAL / Regulatory",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 11,
         "token": "TEL-RADIO-AERO",
         "system": "VHF-AM Aeronautical Radio",
         "basis": "Specialist aviation package",
-        "directThb": 6000000
+        "directThb": 6000000,
+        "components": [
+          {
+            "id": "TEL-RADIO-AERO-C01",
+            "item": "VHF-AM aeronautical base radio",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-RADIO-AERO-C02",
+            "item": "Antenna / feeder / mounting accessories",
+            "category": "RF / Bulk",
+            "source": "RFQ",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-RADIO-AERO-C03",
+            "item": "IP gateway",
+            "category": "Interface",
+            "source": "RFQ",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-RADIO-AERO-C04",
+            "item": "Handheld units",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN QTY"
+          },
+          {
+            "id": "TEL-RADIO-AERO-C05",
+            "item": "Aviation / DCA compliance and RF verification",
+            "category": "CAL / Regulatory",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 12,
         "token": "TEL-RADIO-SSB",
         "system": "MF/HF SSB Radio",
         "basis": "Jason current partial quote + turnkey completion",
-        "directThb": 8000000
+        "directThb": 8000000,
+        "components": [
+          {
+            "id": "TEL-RADIO-SSB-C01",
+            "item": "MF/HF SSB transceiver",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "PARTIAL QUOTE"
+          },
+          {
+            "id": "TEL-RADIO-SSB-C02",
+            "item": "Automatic tuning unit (ATU)",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "PARTIAL QUOTE"
+          },
+          {
+            "id": "TEL-RADIO-SSB-C03",
+            "item": "HF antenna / feeder / grounding",
+            "category": "RF / Bulk",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-RADIO-SSB-C04",
+            "item": "IP gateway / interface",
+            "category": "Interface",
+            "source": "RFQ",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-RADIO-SSB-C05",
+            "item": "Frequency / link verification + permit",
+            "category": "CAL / Regulatory",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 13,
         "token": "TEL-DMR",
         "system": "Microwave / WBB",
         "basis": "CERAGON MW · LOCKED; MGW quote pending",
-        "directThb": 10000000
+        "directThb": 10000000,
+        "components": [
+          {
+            "id": "TEL-DMR-C01",
+            "item": "Microwave IDU / ODU",
+            "category": "Equipment",
+            "source": "RFQ / CERAGON basis",
+            "state": "QUOTE PENDING"
+          },
+          {
+            "id": "TEL-DMR-C02",
+            "item": "Microwave antennas",
+            "category": "RF Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-DMR-C03",
+            "item": "WBB equipment / interfaces",
+            "category": "Equipment",
+            "source": "Internal scope",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-DMR-C04",
+            "item": "RF feeders / jumpers / mounting accessories",
+            "category": "Bulk",
+            "source": "Derived",
+            "state": "OPEN QTY"
+          },
+          {
+            "id": "TEL-DMR-C05",
+            "item": "Path profile / link budget / Fresnel / availability",
+            "category": "CAL/RPT",
+            "source": "Engineering requirement",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-DMR-C06",
+            "item": "Frequency licensing",
+            "category": "Regulatory",
+            "source": "Project requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 14,
         "token": "TEL-ES",
         "system": "Entertainment",
         "basis": "Complete AV package",
-        "directThb": 6000000
+        "directThb": 6000000,
+        "components": [
+          {
+            "id": "TEL-ES-C01",
+            "item": "Smart TV / displays",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-ES-C02",
+            "item": "TV receiver / distribution equipment",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-ES-C03",
+            "item": "Karaoke / AV equipment",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-ES-C04",
+            "item": "Projector / presentation equipment",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-ES-C05",
+            "item": "Ku-band TVRO antenna / receiver",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-ES-C06",
+            "item": "Room/device schedule + interfaces",
+            "category": "Engineering",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 15,
         "token": "TEL-FO",
         "system": "Fiber Optic Network / Bulk",
         "basis": "AVL/compliant · no brand lock",
-        "directThb": 22000000
+        "directThb": 22000000,
+        "components": [
+          {
+            "id": "TEL-FO-C01",
+            "item": "12C / 24C single-mode armoured fiber cable",
+            "category": "Bulk",
+            "source": "RFQ",
+            "state": "ROUTE QTY OPEN"
+          },
+          {
+            "id": "TEL-FO-C02",
+            "item": "ODF / LIU / patch panels",
+            "category": "Equipment / Bulk",
+            "source": "RFQ",
+            "state": "OPEN QTY"
+          },
+          {
+            "id": "TEL-FO-C03",
+            "item": "Joint closures / JBs / patch cords / accessories",
+            "category": "Bulk",
+            "source": "RFQ",
+            "state": "OPEN QTY"
+          },
+          {
+            "id": "TEL-FO-C04",
+            "item": "Duct / route-related materials where TSI supply",
+            "category": "Bulk",
+            "source": "Scope split",
+            "state": "OPEN BOUNDARY"
+          },
+          {
+            "id": "TEL-FO-C05",
+            "item": "Active optical interfaces where required",
+            "category": "Equipment / Interface",
+            "source": "Derived",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-FO-C06",
+            "item": "Core allocation / optical loss budget",
+            "category": "CAL/RPT",
+            "source": "Engineering requirement",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-FO-C07",
+            "item": "Splicing / OTDR / sweep test",
+            "category": "Technical service",
+            "source": "Scope split",
+            "state": "TSI"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 16,
         "token": "TEL-TELT",
         "system": "Telecom Towers",
         "basis": "MASTER TOWER COMPANY · LOCKED",
-        "directThb": 16000000
+        "directThb": 16000000,
+        "components": [
+          {
+            "id": "TEL-TELT-C01",
+            "item": "60 m APF self-support tower",
+            "category": "Structure",
+            "source": "RFQ",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-TELT-C02",
+            "item": "30 m ACP self-support tower",
+            "category": "Structure",
+            "source": "RFQ",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-TELT-C03",
+            "item": "Anchor bolts / bolt template",
+            "category": "Structure / Bulk",
+            "source": "Scope split",
+            "state": "TSI SUPPLY"
+          },
+          {
+            "id": "TEL-TELT-C04",
+            "item": "Antenna mounting provisions",
+            "category": "Mechanical interface",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-TELT-C05",
+            "item": "Structural / antenna load / foundation inputs",
+            "category": "CAL/RPT",
+            "source": "Engineering requirement",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-TELT-C06",
+            "item": "Tower erection / lifting",
+            "category": "Construction",
+            "source": "Scope split",
+            "state": "C1 / CNEEC"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 17,
         "token": "TEL-MET",
         "system": "Meteorological",
         "basis": "VAISALA · LOCKED",
-        "directThb": 8000000
+        "directThb": 8000000,
+        "components": [
+          {
+            "id": "TEL-MET-C01",
+            "item": "Meteorological station / controller",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-MET-C02",
+            "item": "Wind / weather sensors",
+            "category": "Equipment",
+            "source": "RFQ",
+            "state": "OPEN DETAIL"
+          },
+          {
+            "id": "TEL-MET-C03",
+            "item": "Logging / display / data interface",
+            "category": "Software / Interface",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-MET-C04",
+            "item": "Siting / calibration / export verification",
+            "category": "CAL/Test",
+            "source": "Engineering requirement",
+            "state": "REQUIRED"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 18,
         "token": "TEL-NDB",
         "system": "NDB",
         "basis": "NAUTEL / SDA Thailand turnkey · LOCKED",
-        "directThb": 15000000
+        "directThb": 15000000,
+        "components": [
+          {
+            "id": "TEL-NDB-C01",
+            "item": "NDB transmitter system",
+            "category": "Equipment",
+            "source": "RFQ / locked basis",
+            "state": "OPEN FINAL BOM"
+          },
+          {
+            "id": "TEL-NDB-C02",
+            "item": "Redundant / hot-standby architecture",
+            "category": "Equipment / Reliability",
+            "source": "Project requirement",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-NDB-C03",
+            "item": "Antenna / matching / counterpoise system",
+            "category": "RF / Site",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-NDB-C04",
+            "item": "Monitoring / remote interface",
+            "category": "Interface",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-NDB-C05",
+            "item": "Coverage / siting / performance study",
+            "category": "CAL/RPT",
+            "source": "Engineering requirement",
+            "state": "REQUIRED"
+          },
+          {
+            "id": "TEL-NDB-C06",
+            "item": "DCA / authority compliance",
+            "category": "Regulatory",
+            "source": "Project requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       },
       {
         "no": 19,
         "token": "TEL-AIS",
         "system": "AIS Monitoring",
         "basis": "Jason/Furuno equipment anchor + integration",
-        "directThb": 2000000
+        "directThb": 2000000,
+        "components": [
+          {
+            "id": "TEL-AIS-C01",
+            "item": "AIS transponder / monitoring equipment",
+            "category": "Equipment",
+            "source": "RFQ / current anchor",
+            "state": "PARTIAL"
+          },
+          {
+            "id": "TEL-AIS-C02",
+            "item": "VHF / GPS antenna interfaces",
+            "category": "RF / Interface",
+            "source": "Derived",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-AIS-C03",
+            "item": "Network / data handoff",
+            "category": "Interface",
+            "source": "Engineering requirement",
+            "state": "OPEN"
+          },
+          {
+            "id": "TEL-AIS-C04",
+            "item": "Onshore / offshore responsibility boundary",
+            "category": "Scope",
+            "source": "Project requirement",
+            "state": "OPEN"
+          }
+        ],
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
       }
     ],
     "partB": [
