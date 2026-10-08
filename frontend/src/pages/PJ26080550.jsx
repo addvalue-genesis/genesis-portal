@@ -11,6 +11,7 @@ import {
   LOGISTICS_GATES,
   OPTIONS,
   PROJECT_0550,
+  REQUIREMENT_COMPLETENESS,
   RISK_SCENARIOS,
   SOURCE_REGISTER,
   SYSTEM_GROUPS,
@@ -401,12 +402,124 @@ function SystemsView() {
 }
 
 function EngineeringView() {
+  const completeness = REQUIREMENT_COMPLETENESS;
+  const audited = (completeness?.systemAudit || []).filter((row) => row.auditState !== "NOT_YET_AUDITED").length;
+  const notAudited = (completeness?.systemAudit || []).filter((row) => row.auditState === "NOT_YET_AUDITED").length;
+
   return (
     <div className="p55-stack">
       <SectionTitle
+        eyebrow="First Principles + Completeness Control"
+        title="Requirement threads before release"
+        text="The chain remains the governing method, but release control now starts from source requirements. A system is not complete merely because a main equipment line or price exists."
+      />
+
+      <div className="p55-grid p55-grid--2">
+        <section className="p55-callout p55-callout--warning">
+          <strong>Completeness audit: {completeness?.state || "AUDIT REQUIRED"}</strong>
+          <p>{completeness?.doctrine}</p>
+        </section>
+        <section className="p55-callout">
+          <strong>Audit coverage</strong>
+          <p>{audited} system(s) started · {notAudited} system(s) still NOT_YET_AUDITED. No 100% completeness claim is allowed until source extraction and thread mapping are finished.</p>
+        </section>
+      </div>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Known gap caught by the new control"
+          title="Seed requirement finding"
+          text="NMS is the first proof that system-level pricing alone is not a sufficient completeness check."
+        />
+        {(completeness?.seedFindings || []).map((finding) => (
+          <div className="p55-open-item" key={finding.id}>
+            <span>{finding.id}</span>
+            <div>
+              <strong>{finding.title} · {finding.systemToken}</strong>
+              <p className="p55-note p55-note--top">{finding.sourceFact}</p>
+              <div className="p55-system__badges" style={{justifyContent:"flex-start"}}>
+                <Badge>{finding.mappingState}</Badge>
+                <Badge>{finding.threadState}</Badge>
+              </div>
+              <ul className="p55-rule-list" style={{marginTop:10}}>
+                {finding.missingControls.map((item) => <li key={item}>{item}</li>)}
+              </ul>
+              <p className="p55-note"><strong>Release effect:</strong> {finding.releaseEffect}</p>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="19-system audit"
+          title="Requirement completeness state"
+          text="NOT_YET_AUDITED means unknown completeness, not zero gaps."
+        />
+        <div className="p55-table-wrap">
+          <table className="p55-table">
+            <thead>
+              <tr><th>No.</th><th>System</th><th>Audit state</th><th>Known finding</th></tr>
+            </thead>
+            <tbody>
+              {(completeness?.systemAudit || []).map((row) => (
+                <tr key={row.token}>
+                  <td>{String(row.no).padStart(2, "0")}</td>
+                  <td><strong>{row.name}</strong><small>{row.token}</small></td>
+                  <td><Badge>{row.auditState}</Badge></td>
+                  <td>{row.knownFinding || "— audit not yet performed —"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div className="p55-grid p55-grid--2">
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Cross-system obligations" title="Common / shared mapping queue" />
+          <div className="p55-policy-list">
+            {(completeness?.crossSystemObligations || []).map((item) => (
+              <div className="p55-policy" key={item.id}>
+                <div>
+                  <strong>{item.title}</strong>
+                  <p>{item.source}</p>
+                </div>
+                <Badge>{item.mappingState}</Badge>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Fail-closed release gate" title="Final release rules" />
+          <ul className="p55-rule-list">
+            {(completeness?.releaseRules || []).map((rule) => <li key={rule}>{rule}</li>)}
+          </ul>
+        </section>
+      </div>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Audit dimensions"
+          title="What must be checked for every extracted requirement"
+          text="These dimensions are an audit checklist, not an assertion that every dimension applies to every system."
+        />
+        <div className="p55-control-grid">
+          {(completeness?.auditDimensions || []).map((item) => (
+            <div className="p55-control" key={item}>
+              <div className="p55-control__dot" />
+              <div><strong>{item}</strong></div>
+              <Badge tone="neutral">CHECK</Badge>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <SectionTitle
         eyebrow="Governing method"
         title="First-Principles engineering chain"
-        text="Every system should move through the same controlled causal chain. A formula producing a number does not upgrade evidence status."
+        text="Every mapped requirement then moves through the same controlled causal chain. A formula producing a number does not upgrade evidence status."
       />
 
       <section className="p55-panel">
