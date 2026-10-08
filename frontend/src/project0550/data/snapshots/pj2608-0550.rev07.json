@@ -1,12 +1,12 @@
 {
   "meta": {
-    "schemaVersion": "1.1.0",
-    "datasetId": "PJ2608-0550_TPP_CONTROLLED_SNAPSHOT_REV07_20261006",
+    "schemaVersion": "1.2.0",
+    "datasetId": "PJ2608-0550_TPP_CONTROLLED_SNAPSHOT_REV10_BUDGETARY_20261008",
     "projectCode": "PJ2608-0550",
     "projectGroup": "ASK",
-    "status": "CONTROLLED_SNAPSHOT / PAGA_SELECTED / TOTAL_HOLD",
-    "snapshotDate": "2026-10-06",
-    "createdFor": "TPP UI sync to Rev07 INDUSTRONIC-only current 0550 baseline",
+    "status": "CONTROLLED_SNAPSHOT / EMERGENCY_BUDGETARY_ISSUED / FINAL_RELEASE_SEPARATE",
+    "snapshotDate": "2026-10-08",
+    "createdFor": "TPP UI sync after SAMTEL emergency budgetary submission Rev00; internal derivation retained separately from customer release.",
     "sourcePolicy": {
       "projectFacts": "PJ2608-0550 sources only",
       "methodologyReference": "PJ2608-0553 may be used only as methodology/reference, never as 0550 project facts",
@@ -18,10 +18,16 @@
     },
     "upstream": [
       {
-        "id": "PRICE-INTERNAL-REV07",
-        "name": "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_Rev07_INDUSTRONIC-ONLY_20261006.xlsx",
-        "role": "Current internal priced-breakdown baseline; INDUSTRONIC selected for PAGA; project total HOLD",
+        "id": "PRICE-INTERNAL-BUDGETARY-REV10",
+        "name": "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_BUDGETARY_Rev10_20261008.xlsx",
+        "role": "Internal derivation, vendor/evidence basis, replacement triggers and emergency submission trace",
         "integration": "MANUAL_CONTROLLED_SNAPSHOT"
+      },
+      {
+        "id": "SAMTEL-BUDGETARY-REV00",
+        "name": "ASK-TSI Priced Breakdown List - SAMTEL FINAL Rev00.xlsx",
+        "role": "Emergency customer-facing budgetary issue to SAMTEL; USD; no internal/vendor detail in remarks",
+        "integration": "FROZEN_CUSTOMER_ARTIFACT"
       },
       {
         "id": "INTERNAL-WORK-MANIFEST-REV01",
@@ -62,11 +68,11 @@
     "id": "PJ2608-0550",
     "shortName": "ASK Onshore Telecom",
     "title": "SAMTEL - PTTEPI Myanmar ASK TEL [MMC24-5002]",
-    "state": "BUDGETARY / WORKING / HOLD - PAGA OPEN",
+    "state": "BUDGETARY SUBMISSION ISSUED / FINAL RELEASE STILL CONTROLLED",
     "method": "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
-    "fxThbUsd": 31.5,
+    "fxThbUsd": 33.6335,
     "systemCount": 19,
-    "priceDate": "06 Oct 2026",
+    "priceDate": "08 Oct 2026",
     "baseUsd": null,
     "baseThb": null,
     "c2Usd": 225967.4,
@@ -76,9 +82,9 @@
     "totalWithOptionsUsd": null,
     "totalWithOptionsThb": null,
     "c1State": "NOT PRICED - CNEEC OPTIONAL INSTALLATION",
-    "opexState": "VSAT/KU recurring service remains separate from project CAPEX",
+    "opexState": "Recurring VSAT/Ku service is included only in the emergency budgetary snapshot mapping; keep analytically separate internally.",
     "pricingStatus": "HOLD",
-    "pricingHoldReason": "Selected INDUSTRONIC PAGA still requires EUR conversion plus source-backed compliance/logistics/site-service/spares closure.",
+    "pricingHoldReason": "Emergency SAMTEL Rev00 is a frozen preliminary budgetary snapshot, not the final contractual release. Final vendor/OEM quotations and engineering closures continue through revision control.",
     "knownBaseExPagaUsd": 4231051.57,
     "knownBaseExPagaThb": 133278124.54,
     "knownBasePlusC2C3ExPagaUsd": 4620116.79,
@@ -908,8 +914,20 @@
     },
     {
       "id": "S10",
+      "name": "PJ2608-0550_ASK-TSI_Priced-Breakdown_INTERNAL_BUDGETARY_Rev10_20261008.xlsx",
+      "use": "Internal derivation, vendor/evidence basis, B/C logic, replacement triggers and emergency submission history.",
+      "state": "CURRENT INTERNAL BUDGETARY TRACE"
+    },
+    {
+      "id": "S11",
+      "name": "ASK-TSI Priced Breakdown List - SAMTEL FINAL Rev00.xlsx",
+      "use": "Frozen emergency customer-facing budgetary issue; USD; vendor-neutral remarks; internal sheets removed.",
+      "state": "EMERGENCY CUSTOMER BUDGETARY SNAPSHOT"
+    },
+    {
+      "id": "S12",
       "name": "Management Budgetary Decisions 08-Oct-2026",
-      "use": "Vendor locks, THB 580m budgetary envelope, external specialist USD1,000/working-day call-off rule and A/B/C cost separation.",
+      "use": "Vendor locks, call-off specialist basis, A/B/C boundaries and emergency submission decision.",
       "state": "INTERNAL MANAGEMENT DECISION"
     }
   ],
@@ -925,10 +943,10 @@
     "0553 facts never become 0550 facts; only reusable methodology may transfer"
   ],
   "budgetaryEstimate": {
-    "revision": "BUDGETARY_REV01_20261008",
-    "status": "PRELIMINARY BUDGETARY / NOT FINAL OFFER",
-    "currency": "THB",
-    "fxThbUsdWorking": 31.5,
+    "revision": "INTERNAL_BUDGETARY_REV10_20261008",
+    "status": "INTERNAL WORKING DERIVATION / EMERGENCY SUBMISSION TRACE / NOT FINAL OFFER",
+    "currency": "THB DIRECT BASIS / USD CUSTOMER SNAPSHOT",
+    "fxThbUsdWorking": 33.6335,
     "partADirectThb": 246000000,
     "partBDirectThb": 121000000,
     "partCDirectThb": 50000000,
@@ -1408,6 +1426,434 @@
       "Recurring VSAT/Ku airtime is separated analytically and mapped into the original A1-01 line only for customer-form export.",
       "MGW/CERAGON current quotation is pending; replace the budgetary line when received.",
       "Unknown/TBC scope is not zero. Final release requires vendor quote and engineering closure."
-    ]
+    ],
+    "recommendedCustomerUsd": 17250000,
+    "customerBaseUsd": 15191100,
+    "customerOptionsUsd": 1877800,
+    "customerCalculatedInclOptionsUsd": 17068900
+  },
+  "budgetarySubmission": {
+    "id": "SAMTEL_BUDGETARY_REV00_20261008",
+    "revision": "SAMTEL FINAL Rev00",
+    "status": "EMERGENCY BUDGETARY / PRELIMINARY / FROZEN SNAPSHOT",
+    "frozenSnapshot": true,
+    "submittedDate": "2026-10-08",
+    "route": "ADDVALUE → SAMTEL → CNEEC",
+    "reason": "Urgent budgetary issue while several vendor/OEM quotations remained outstanding. This snapshot must stay separate from both the evolving internal working model and the final released customer output.",
+    "currency": "USD",
+    "fxThbUsd": 33.6335,
+    "vatIncluded": false,
+    "c1Included": false,
+    "customerFileName": "ASK-TSI Priced Breakdown List - SAMTEL FINAL Rev00.xlsx",
+    "baseBeforeOptionsUsd": 15191100,
+    "optionsC2C3Usd": 1877800,
+    "calculatedInclOptionsUsd": 17068900,
+    "managementEnvelopeUsd": 17250000,
+    "customerRows": [
+      {
+        "code": "A1-01",
+        "sn": 1,
+        "description": "Network System (KU Band Internet)",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 3600300,
+        "remark": "Complete network and satellite internet package including core/distribution/access equipment, security functions, wireless access, interfaces, licences and associated bulk materials as applicable."
+      },
+      {
+        "code": "A1-02",
+        "sn": 2,
+        "description": "VSAT System",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 525800,
+        "remark": "Complete VSAT package including terminal equipment, interfaces, accessories and associated cabling. Final configuration and any confirmed free-issued items are subject to project clarification."
+      },
+      {
+        "code": "A1-03",
+        "sn": 3,
+        "description": "Video Conference System (VCS)",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 300500,
+        "remark": "Complete video conference package including codec, camera, audio, display/control equipment, licences and required accessories."
+      },
+      {
+        "code": "A1-04",
+        "sn": 4,
+        "description": "IP Telephony and PABX",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 863800,
+        "remark": "Complete IP telephony and PABX package including servers/gateways, indoor and hazardous-area telephone interfaces, licences and required accessories."
+      },
+      {
+        "code": "A1-05",
+        "sn": 5,
+        "description": "Public Address and General Alarm (PAGA)",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 600900,
+        "remark": "Complete PAGA package including system cabinets, amplifiers, access stations, speakers/beacons, interfaces and associated bulk materials."
+      },
+      {
+        "code": "A1-06",
+        "sn": 6,
+        "description": "Closed Circuit Television (CCTV) System",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 676000,
+        "remark": "Complete CCTV package including indoor/outdoor and hazardous-area cameras, recording/storage, monitoring, cabinets, network interfaces and accessories."
+      },
+      {
+        "code": "A1-07",
+        "sn": 7,
+        "description": "VHF DMR Radio System",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 938900,
+        "remark": "Complete VHF DMR trunked radio package including repeaters, fixed/mobile/portable radios, gateways, consoles, antennas, licences and accessories."
+      },
+      {
+        "code": "A1-08",
+        "sn": 8,
+        "description": "VHF-FM Marine Radio",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 375600,
+        "remark": "Complete VHF-FM Marine Radio package including fixed/portable radios, gateways, antennas, monitoring/interface equipment and required accessories."
+      },
+      {
+        "code": "A1-09",
+        "sn": 9,
+        "description": "VHF-AM Aeronautical Radio",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 225300,
+        "remark": "Complete VHF-AM Aeronautical Radio package including fixed/portable radios, gateways, antennas, protection and required accessories."
+      },
+      {
+        "code": "A1-10",
+        "sn": 10,
+        "description": "MF/HF SSB Radio",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 300500,
+        "remark": "Complete MF/HF SSB Radio package including transceivers, antenna tuning units, antennas, gateways, power supplies and required accessories."
+      },
+      {
+        "code": "A1-11",
+        "sn": 11,
+        "description": "Microwave System (Telecommunication Tower)",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 976500,
+        "remark": "Complete microwave/wireless broadband and telecommunication tower package including radio equipment, antennas, tower structures, interfaces and required accessories."
+      },
+      {
+        "code": "A1-12",
+        "sn": 12,
+        "description": "Entertainment System",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 225300,
+        "remark": "Complete entertainment and AV package including satellite TV interfaces, displays, projector, set-top boxes, audio/video conference equipment and accessories."
+      },
+      {
+        "code": "A1-13",
+        "sn": 13,
+        "description": "Fiber Optic Communication and Installation",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 826200,
+        "remark": "Complete fiber optic communication package including indoor/outdoor cables, ODF/termination, closures, ducts, patching, interfaces and testing accessories as applicable."
+      },
+      {
+        "code": "A1-14",
+        "sn": 14,
+        "description": "Meteorological System",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 300500,
+        "remark": "Complete meteorological package including sensors, server, monitors, system cabinet, interfaces and required accessories."
+      },
+      {
+        "code": "A1-15",
+        "sn": 15,
+        "description": "Non-Directional Beacon (NDB) System",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 563300,
+        "remark": "Complete NDB package including transmitter system, redundancy/changeover, antenna tuning, antenna system, remote monitoring/control and required accessories."
+      },
+      {
+        "code": "B1",
+        "description": "Detail Design Engineering includes architecture/topology, IFC drawings, calculations/studies, simulation and technical documentation",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 1248800,
+        "remark": "Detailed design and engineering including system architecture, IFC drawings, calculations/studies, interface coordination, technical documentation, surveys and required project permits/technical submissions."
+      },
+      {
+        "code": "B2",
+        "description": "Transportation to FOB/CIF Purchaser Port",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 874200,
+        "remark": "Transportation, freight, forwarding, packing and shipment-related costs in accordance with the applicable delivery basis, including associated insurance allowance."
+      },
+      {
+        "code": "B3",
+        "description": "Training for End User / Purchaser Personnel",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 218500,
+        "remark": "Training for end-user / purchaser personnel including course preparation, training materials and specialist trainer attendance as required."
+      },
+      {
+        "code": "B4",
+        "description": "Specialist Field Assistance as per Specification",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 874100,
+        "remark": "Specialist assistance for FAT/IFAT, site deployment, SAT, pre-commissioning, commissioning, start-up and technical support as required by the specifications."
+      },
+      {
+        "code": "B5",
+        "description": "Pre-commissioning, Commissioning and Start-up Spares",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 375600,
+        "remark": "Pre-commissioning, commissioning and start-up spares as required for the offered systems. Long-term operational spares are excluded and priced separately under Part C."
+      },
+      {
+        "code": "B6",
+        "description": "Special Tools for Operation and Maintenance",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 300500,
+        "remark": "Special tools, proprietary software/configuration tools and dedicated test equipment required for operation and maintenance."
+      },
+      {
+        "code": "C1",
+        "description": "On-site Installation Construction",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 0,
+        "remark": "Optional item undertaken by CNEEC unless otherwise instructed."
+      },
+      {
+        "code": "C2",
+        "description": "Capital Spares For Ten Years",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 1201800,
+        "remark": "Budgetary allowance for ten-year capital spares; final list and quantities subject to OEM recommendation and purchaser approval."
+      },
+      {
+        "code": "C3",
+        "description": "2 years Normal Operation Spare Parts",
+        "qty": 1,
+        "unit": "Lot",
+        "customerUsd": 676000,
+        "remark": "Budgetary allowance for two-year normal operation spares; final list and quantities subject to OEM recommendation and purchaser approval."
+      }
+    ],
+    "internalTrace": [
+      {
+        "customerLine": "A1-01",
+        "internalSystems": "S01 Network/LAN/Cyber + S04 Ku equipment + recurring satellite service",
+        "directThb": 41000000,
+        "customerUsd": 3600300,
+        "basis": "CISCO / PALO ALTO / THAICOM",
+        "evidence": "MR network BOM + IT/OT firewall + Ku equipment + airtime allowance",
+        "confidence": "WORKING",
+        "replaceWhen": "Exact network/security models + current satellite equipment/service quote"
+      },
+      {
+        "customerLine": "A1-02",
+        "internalSystems": "S03 VSAT C-band",
+        "directThb": 14000000,
+        "customerUsd": 525800,
+        "basis": "THAICOM",
+        "evidence": "MR VSAT terminal/interface scope; complete-new-equipment working basis",
+        "confidence": "WORKING",
+        "replaceWhen": "Current equipment quote + confirmed free-issued inventory"
+      },
+      {
+        "customerLine": "A1-03",
+        "internalSystems": "S02 VCS",
+        "directThb": 8000000,
+        "customerUsd": 300500,
+        "basis": "Enterprise compliant / vendor open",
+        "evidence": "MR working quantity + complete-room/package allowance",
+        "confidence": "OPEN",
+        "replaceWhen": "Vendor/configuration quote"
+      },
+      {
+        "customerLine": "A1-04",
+        "internalSystems": "S05 PABX + S06 Ex/ATEX telephone",
+        "directThb": 23000000,
+        "customerUsd": 863800,
+        "basis": "AVAYA + compliant hazardous-area telephone package",
+        "evidence": "MR + Aura alignment + hazardous-area phone/JB allowance",
+        "confidence": "WORKING",
+        "replaceWhen": "Turnkey integrator quote + confirmed Ex/JB quantity"
+      },
+      {
+        "customerLine": "A1-05",
+        "internalSystems": "S07 PAGA",
+        "directThb": 16000000,
+        "customerUsd": 600900,
+        "basis": "INDUSTRONIC A20261632",
+        "evidence": "Current offer + bulk/interface completion allowance",
+        "confidence": "STRONG PARTIAL",
+        "replaceWhen": "Site/SAT/bulk completion quote"
+      },
+      {
+        "customerLine": "A1-06",
+        "internalSystems": "S08 CCTV",
+        "directThb": 18000000,
+        "customerUsd": 676000,
+        "basis": "HIKVISION",
+        "evidence": "MR camera/storage/network package working budget",
+        "confidence": "WORKING",
+        "replaceWhen": "Final BOM/quote"
+      },
+      {
+        "customerLine": "A1-07",
+        "internalSystems": "S09 DMR trunked radio",
+        "directThb": 25000000,
+        "customerUsd": 938900,
+        "basis": "MOTOROLA",
+        "evidence": "MR repeaters/mobile/handheld/core/gateway/accessories",
+        "confidence": "WORKING",
+        "replaceWhen": "Final trunk/core/licence quote"
+      },
+      {
+        "customerLine": "A1-08",
+        "internalSystems": "S10 Marine + S19 AIS",
+        "directThb": 10000000,
+        "customerUsd": 375600,
+        "basis": "Current partial vendor quote + complete package allowance",
+        "evidence": "QT2026-160 + project-scope completion",
+        "confidence": "PARTIAL QUOTE",
+        "replaceWhen": "Complete MR-compliant Marine/AIS package quote"
+      },
+      {
+        "customerLine": "A1-09",
+        "internalSystems": "S11 Aero VHF",
+        "directThb": 6000000,
+        "customerUsd": 225300,
+        "basis": "Specialist aviation package / partial current quote",
+        "evidence": "QT2026-160 + MR completion",
+        "confidence": "PARTIAL QUOTE",
+        "replaceWhen": "Complete aviation package quote"
+      },
+      {
+        "customerLine": "A1-10",
+        "internalSystems": "S12 MF/HF",
+        "directThb": 8000000,
+        "customerUsd": 300500,
+        "basis": "Current partial vendor quote + turnkey completion",
+        "evidence": "QT2026-160 + APF/ACP scope completion",
+        "confidence": "PARTIAL QUOTE",
+        "replaceWhen": "Complete MR-compliant package quote"
+      },
+      {
+        "customerLine": "A1-11",
+        "internalSystems": "S13 Microwave/WBB + S16 Towers",
+        "directThb": 26000000,
+        "customerUsd": 976500,
+        "basis": "CERAGON + MASTER TOWER COMPANY; WBB TBC",
+        "evidence": "MR + tower quote history + working MW allowance",
+        "confidence": "WORKING",
+        "replaceWhen": "MGW/CERAGON/WBB current quote"
+      },
+      {
+        "customerLine": "A1-12",
+        "internalSystems": "S14 Entertainment",
+        "directThb": 6000000,
+        "customerUsd": 225300,
+        "basis": "Compliant AV package",
+        "evidence": "MR equipment quantities",
+        "confidence": "OPEN",
+        "replaceWhen": "Vendor package quote"
+      },
+      {
+        "customerLine": "A1-13",
+        "internalSystems": "S15 Fiber",
+        "directThb": 22000000,
+        "customerUsd": 826200,
+        "basis": "AVL-compliant / brand open",
+        "evidence": "MR/MTO/STD + O&G-grade component classes",
+        "confidence": "WORKING",
+        "replaceWhen": "Confirmed route/MTO + vendor quotes"
+      },
+      {
+        "customerLine": "A1-14",
+        "internalSystems": "S17 MET",
+        "directThb": 8000000,
+        "customerUsd": 300500,
+        "basis": "VAISALA",
+        "evidence": "MR sensors/server/cabinet + complete package allowance",
+        "confidence": "WORKING",
+        "replaceWhen": "Turnkey package quote"
+      },
+      {
+        "customerLine": "A1-15",
+        "internalSystems": "S18 NDB",
+        "directThb": 15000000,
+        "customerUsd": 563300,
+        "basis": "NAUTEL via SDA Thailand",
+        "evidence": "MR/STD redundant NDB package + turnkey allowance",
+        "confidence": "WORKING",
+        "replaceWhen": "SDA turnkey NAUTEL quote"
+      }
+    ],
+    "partBInternal": [
+      {
+        "code": "B1",
+        "directThb": 24000000,
+        "logic": "Core PM/engineering + CAL/RPT/VDRL/interfaces + call-off specialist review",
+        "externalSpecialist": "USD 1,000/working MD minimum where external",
+        "customerFormTreatment": "Customer B1; internal survey/regulatory support aggregated for the emergency customer form."
+      },
+      {
+        "code": "B2",
+        "directThb": 20000000,
+        "logic": "Freight/logistics/forwarding/shipment basis",
+        "externalSpecialist": "N/A",
+        "customerFormTreatment": "Customer B2; shipment-risk/insurance allowance aggregated for the emergency customer form."
+      },
+      {
+        "code": "B3",
+        "directThb": 7000000,
+        "logic": "OEM/end-user training campaign",
+        "externalSpecialist": "External trainer/OEM actual rate if higher",
+        "customerFormTreatment": "Customer B3."
+      },
+      {
+        "code": "B4",
+        "directThb": 28000000,
+        "logic": "FAT/IFAT/SAT Deploy/Pre-Com/Commissioning/Punch call-off campaigns",
+        "externalSpecialist": "USD 1,000/working MD minimum; OEM actual rate overrides",
+        "customerFormTreatment": "Customer B4. MOB/DEMOB, airfare, accommodation, per diem, permit, insurance and standby remain separate internal cost drivers."
+      },
+      {
+        "code": "B5",
+        "directThb": 10000000,
+        "logic": "Startup/pre-commissioning/commissioning spares",
+        "externalSpecialist": "N/A",
+        "customerFormTreatment": "Customer B5; no duplication with A/C."
+      },
+      {
+        "code": "B6",
+        "directThb": 8000000,
+        "logic": "Special tools/software/test equipment",
+        "externalSpecialist": "OEM actual price",
+        "customerFormTreatment": "Customer B6; deduct proven vendor-package inclusions."
+      }
+    ],
+    "replacementRule": "Replace a working allowance only when current vendor/OEM evidence or a controlled quantity/engineering update is received. Never back-solve the lines to force the management envelope."
   }
 }
