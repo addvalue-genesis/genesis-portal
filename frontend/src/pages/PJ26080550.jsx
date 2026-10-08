@@ -756,6 +756,7 @@ function BudgetView() {
   const [currency, setCurrency] = useState("USD");
   const [part, setPart] = useState("ALL");
   const [budgetMode, setBudgetMode] = useState("budgetary");
+  const [expandedBudgetSystems, setExpandedBudgetSystems] = useState(() => new Set());
 
   const rows = CNEEC_BREAKDOWN.filter((row) => part === "ALL" || row.code.startsWith(part));
   const paga = PROJECT_0550.selectedPaga;
@@ -839,19 +840,106 @@ function BudgetView() {
           </section>
 
           <section className="p55-panel">
-            <SectionTitle eyebrow="Part A internal derivation" title="19-system direct budget basis" text="Vendor / evidence detail stays internal. Part A excludes B5/C2/C3 spare duplication." />
+            <SectionTitle
+              eyebrow="Part A internal derivation"
+              title="19-system direct budget basis + component breakdown"
+              text="Expand each system to see the internal equipment / subsystem / software / interface / bulk / engineering / test composition. Detail remains working-controlled and is revalidated against source evidence."
+              action={
+                <div className="p55-segmented">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedBudgetSystems(new Set(budget.partA.map((row) => row.token)))}
+                  >
+                    Expand all
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setExpandedBudgetSystems(new Set())}
+                  >
+                    Collapse all
+                  </button>
+                </div>
+              }
+            />
             <div className="p55-table-wrap">
               <table className="p55-table p55-table--budget">
-                <thead><tr><th>No.</th><th>System</th><th>Internal basis</th><th className="is-number">Direct THB</th></tr></thead>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>No.</th>
+                    <th>System</th>
+                    <th>Internal basis</th>
+                    <th>Detail state</th>
+                    <th className="is-number">Direct THB</th>
+                  </tr>
+                </thead>
                 <tbody>
-                  {budget.partA.map((row) => (
-                    <tr key={row.token}>
-                      <td>{String(row.no).padStart(2, "0")}</td>
-                      <td><strong>{row.system}</strong><small>{row.token}</small></td>
-                      <td>{row.basis}</td>
-                      <td className="is-number">{money(row.directThb, "THB")}</td>
-                    </tr>
-                  ))}
+                  {budget.partA.map((row) => {
+                    const isOpen = expandedBudgetSystems.has(row.token);
+                    return (
+                      <React.Fragment key={row.token}>
+                        <tr>
+                          <td>
+                            <button
+                              className="p55-row-toggle"
+                              type="button"
+                              aria-label={(isOpen ? "Collapse " : "Expand ") + row.system}
+                              onClick={() => setExpandedBudgetSystems((current) => {
+                                const next = new Set(current);
+                                if (next.has(row.token)) next.delete(row.token);
+                                else next.add(row.token);
+                                return next;
+                              })}
+                            >
+                              {isOpen ? "−" : "+"}
+                            </button>
+                          </td>
+                          <td>{String(row.no).padStart(2, "0")}</td>
+                          <td><strong>{row.system}</strong><small>{row.token}</small></td>
+                          <td>{row.basis}</td>
+                          <td><Badge>{row.detailState || "WORKING"}</Badge></td>
+                          <td className="is-number">{money(row.directThb, "THB")}</td>
+                        </tr>
+                        {isOpen ? (
+                          <tr className="p55-budget-detail-row">
+                            <td colSpan="6">
+                              <div className="p55-budget-detail">
+                                <div className="p55-budget-detail__head">
+                                  <strong>{row.system} — internal composition</strong>
+                                  <span>{(row.components || []).length} controlled working items</span>
+                                </div>
+                                <div className="p55-table-wrap">
+                                  <table className="p55-table p55-table--compact">
+                                    <thead>
+                                      <tr>
+                                        <th>Item</th>
+                                        <th>Category</th>
+                                        <th>Source / basis</th>
+                                        <th>State</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {(row.components || []).map((component) => (
+                                        <tr key={component.id}>
+                                          <td><strong>{component.item}</strong><small>{component.id}</small></td>
+                                          <td>{component.category}</td>
+                                          <td>{component.source}</td>
+                                          <td><Badge>{component.state}</Badge></td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <p className="p55-note">
+                                  Component rows explain scope composition only. The THB value above remains the current system-level budgetary allowance until quantity, quotation and engineering-kernel revalidation closes each component.
+                                </p>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : null}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
