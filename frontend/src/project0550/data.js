@@ -23,3 +23,4 @@ export const LOGISTICS_GATES = DATASET.logisticsGates;
 export const RISK_SCENARIOS = DATASET.riskScenarios;
 export const SOURCE_REGISTER = DATASET.sourceRegister;
 export const CONTROL_RULES = DATASET.controlRules;
+export const BUDGETARY_ESTIMATE = DATASET.budgetaryEstimate;
