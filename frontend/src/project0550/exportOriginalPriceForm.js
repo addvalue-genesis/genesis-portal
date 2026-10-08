@@ -89,59 +89,60 @@ function cellXml(value, row, col, style = 0) {
   return `<c r="${ref}" s="${style}" t="inlineStr"><is><t xml:space="preserve">${esc(value)}</t></is></c>`;
 }
 
-function sheetRows(budget) {
-  const byCode = Object.fromEntries((budget.customerFormRows || []).map((row) => [row.code, row]));
+function sheetRows(submission) {
+  const byCode = Object.fromEntries((submission.customerRows || []).map((row) => [row.code, row]));
   const rows = [];
   const blank = () => ["", "", "", "", "", "", "", ""];
 
   rows.push(["Price Breakdown\n价格明细", "", "", "", "", "", "", ""]);
-  rows.push(["S.N\n序号", "Tag No.\n位号", "Description\n名称", "Qty\n数量", "Unit\n单位", "Unit Price\n单价", "Sub-Total\n小计", "Remark\n备注"]);
+  rows.push(["PRELIMINARY BUDGETARY PRICE BREAKDOWN | ASK PHASE 1A TELECOMMUNICATION & SECURITY SYSTEM | CURRENCY: USD | EXCLUDING VAT", "", "", "", "", "", "", ""]);
+  rows.push(["S.N\n序号", "Tag No.\n位号", "Description\n名称", "Qty\n数量", "Unit\n单位", "Unit Price (USD)\n单价", "Sub-Total (USD)\n小计", "Remark\n备注"]);
   rows.push(["Part A: BASIC PRICE\nA部分：基本价格", "", "", "", "", "", "", ""]);
   rows.push(["A1. Main Equipment Price", "", "", "", "", "", "", ""]);
 
-  const aCodes = Array.from({ length: 15 }, (_, i) => `A1-${String(i + 1).padStart(2, "0")}`);
+  const aCodes = Array.from({ length: 15 }, (_, i) => "A1-" + String(i + 1).padStart(2, "0"));
   aCodes.forEach((code) => {
     const r = byCode[code] || {};
-    rows.push([r.sn || "", "", r.description || code, 1, "Lot", r.customerThb || "", r.customerThb || "", r.remark || ""]);
+    rows.push([r.sn || "", "", r.description || code, r.qty || 1, r.unit || "Lot", r.customerUsd ?? "", r.customerUsd ?? "", r.remark || ""]);
     rows.push(blank());
     rows.push(blank());
   });
 
   rows.push(blank());
   rows.push(["Part B: OTHERS\nB部分：其它", "", "", "", "", "", "", ""]);
-
-  const bCodes = ["B1","B2","B3","B4","B5","B6","B7","B8","B9"];
-  bCodes.forEach((code) => {
+  ["B1","B2","B3","B4","B5","B6"].forEach((code) => {
     const r = byCode[code] || {};
-    rows.push([code, "", r.description || code, 1, "Lot", r.customerThb || "", r.customerThb || "", r.remark || ""]);
+    rows.push([code, "", r.description || code, r.qty || 1, r.unit || "Lot", r.customerUsd ?? "", r.customerUsd ?? "", r.remark || ""]);
     rows.push(blank());
   });
 
-  rows.push(["Total 合计", "", "", "", "", "", budget.recommendedCustomerThb, "Preliminary Budgetary Estimate; excluding VAT."]);
+  rows.push(["Total 合计", "", "", "", "", "", submission.baseBeforeOptionsUsd || "", "Total excludes Part C optional items and VAT."]);
   rows.push(["Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.\n价格应包括技术请购单中所要求的供货范围和工作范围，并不仅限于上面这些项。", "", "", "", "", "", "", ""]);
   rows.push(["Part C: OPTIONS\n选项", "", "", "", "", "", "", ""]);
 
   ["C1","C2","C3"].forEach((code) => {
     const r = byCode[code] || {};
-    rows.push([code, "", r.description || code, 1, "lot", r.customerThb || "", r.customerThb || "", r.remark || ""]);
+    rows.push([code, "", r.description || code, r.qty || 1, r.unit || "Lot", r.customerUsd ?? "", r.customerUsd ?? "", r.remark || ""]);
   });
 
   rows.push(["", "", "Remark: Delivery term shall follow program logistic proposal and fixed by each cluster per equipment cargo size.", "", "", "", "", ""]);
   return rows;
 }
 
-function worksheetXml(budget) {
-  const rows = sheetRows(budget);
+function worksheetXml(submission) {
+  const rows = sheetRows(submission);
   const xmlRows = rows.map((values, idx) => {
     const r = idx + 1;
     const first = String(values[0] || "");
     const isTitle = r === 1;
-    const isHeader = r === 2;
+    const isStatus = r === 2;
+    const isHeader = r === 3;
     const isSection = first.startsWith("Part A") || first.startsWith("Part B") || first.startsWith("Part C") || first.startsWith("A1.");
     const isTotal = first.startsWith("Total ");
     return `<row r="${r}" ht="${isTitle ? 30 : 22}" customHeight="1">${values.map((v,c) => {
       let style = 0;
       if (isTitle) style = 1;
+      else if (isStatus) style = 3;
       else if (isHeader) style = 2;
       else if (isSection) style = 3;
       else if (isTotal) style = 5;
@@ -197,8 +198,8 @@ function stylesXml() {
 </styleSheet>`;
 }
 
-export function exportOriginalPriceFormXlsx(budget) {
-  if (!budget) return;
+export function exportOriginalPriceFormXlsx(submission) {
+  if (!submission) return;
 
   const files = {
     "[Content_Types].xml": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`,
@@ -206,7 +207,7 @@ export function exportOriginalPriceFormXlsx(budget) {
     "xl/workbook.xml": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Price Breakdown" sheetId="1" r:id="rId1"/></sheets></workbook>`,
     "xl/_rels/workbook.xml.rels": `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
     "xl/styles.xml": stylesXml(),
-    "xl/worksheets/sheet1.xml": worksheetXml(budget),
+    "xl/worksheets/sheet1.xml": worksheetXml(submission),
   };
 
   const zip = zipStore(files);
@@ -214,7 +215,7 @@ export function exportOriginalPriceFormXlsx(budget) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "ASK-TSI_Priced_Breakdown_List_Budgetary_Rev01_20261008.xlsx";
+  a.download = submission.customerFileName || "ASK-TSI Priced Breakdown List - SAMTEL FINAL Rev00.xlsx";
   document.body.appendChild(a);
   a.click();
   a.remove();
