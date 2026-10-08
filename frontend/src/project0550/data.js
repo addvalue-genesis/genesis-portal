@@ -2,6 +2,7 @@
 // UI imports intentionally remain stable while the underlying project data moves
 // behind a controlled JSON/repository boundary.
 import { getProject0550Dataset, getProject0550DataLayerStatus } from "./data/repository";
+import { buildProject0550KnowledgeKernelLibrary } from "./knowledgeKernelBinding";
 
 const DATASET = getProject0550Dataset();
 
@@ -28,4 +29,6 @@ export const BUDGETARY_SUBMISSION = DATASET.budgetarySubmission;
 
 export const REQUIREMENT_COMPLETENESS = DATASET.requirementCompleteness;
 
-export const ENGINEERING_LAW_LIBRARY = DATASET.engineeringLawLibrary;
+export const ENGINEERING_LAW_LIBRARY = buildProject0550KnowledgeKernelLibrary(SYSTEMS);
+export const KNOWLEDGE_KERNEL_LIBRARY = ENGINEERING_LAW_LIBRARY;
+export const KNOWLEDGE_KERNEL_DOMAINS = ENGINEERING_LAW_LIBRARY.domains;
