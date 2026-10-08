@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from "react";
 import {
   BUDGETARY_ESTIMATE,
+  BUDGETARY_SUBMISSION,
   CNEEC_BREAKDOWN,
   COMMERCIAL_POLICY,
   CONTROL_RULES,
@@ -533,50 +534,255 @@ function ExecutionView() {
 }
 
 function BudgetView() {
-  const [currency, setCurrency] = useState("THB");
+  const [currency, setCurrency] = useState("USD");
   const [part, setPart] = useState("ALL");
-  const [budgetMode, setBudgetMode] = useState("7.2");
+  const [budgetMode, setBudgetMode] = useState("budgetary");
+
   const rows = CNEEC_BREAKDOWN.filter((row) => part === "ALL" || row.code.startsWith(part));
   const paga = PROJECT_0550.selectedPaga;
   const budget = BUDGETARY_ESTIMATE;
+  const submission = BUDGETARY_SUBMISSION;
 
   const directTotal = budget?.directDeliveryBasisThb || 0;
-  const recommended = budget?.recommendedCustomerThb || 0;
   const calculated = budget?.calculatedCustomerBeforeRoundingThb || 0;
-  const airtime = budget?.airtimeCustomerThb || 0;
+
+  const submissionBaseRows = (submission?.customerRows || []).filter(
+    (row) => row.code.startsWith("A1-") || ["B1","B2","B3","B4","B5","B6"].includes(row.code)
+  );
+  const submissionOptions = (submission?.customerRows || []).filter(
+    (row) => ["C1","C2","C3"].includes(row.code)
+  );
 
   return (
     <div className="p55-stack">
       <SectionTitle
-        eyebrow="SAMTEL → CNEEC commercial control"
-        title="Priced breakdown / internal analysis / budgetary submission"
-        text="7.0 preserves the controlled Rev07 customer-form baseline. 7.1 keeps internal commercial logic separate. 7.2 is the current management budgetary estimate for immediate submission."
+        eyebrow="Commercial state control"
+        title="Working / emergency budgetary / released customer output"
+        text="Keep the evolving internal model, the 08-Oct emergency SAMTEL budgetary snapshot and the final released customer output as three different states. A later working-price change must never rewrite what was already issued."
         action={
-          <div className="p55-segmented">
-            <button className={currency === "USD" ? "is-active" : ""} onClick={() => setCurrency("USD")} type="button">USD</button>
-            <button className={currency === "THB" ? "is-active" : ""} onClick={() => setCurrency("THB")} type="button">THB</button>
-            <button className={currency === "EUR" ? "is-active" : ""} onClick={() => setCurrency("EUR")} type="button">EUR</button>
-          </div>
+          budgetMode === "released" ? (
+            <div className="p55-segmented">
+              <button className={currency === "USD" ? "is-active" : ""} onClick={() => setCurrency("USD")} type="button">USD</button>
+              <button className={currency === "THB" ? "is-active" : ""} onClick={() => setCurrency("THB")} type="button">THB</button>
+              <button className={currency === "EUR" ? "is-active" : ""} onClick={() => setCurrency("EUR")} type="button">EUR</button>
+            </div>
+          ) : <Badge tone={budgetMode === "budgetary" ? "warn" : "neutral"}>{budgetMode === "budgetary" ? "FROZEN SNAPSHOT" : "INTERNAL ONLY"}</Badge>
         }
       />
 
       <div className="p55-filterbar p55-filterbar--simple">
-        <div className="p55-segmented">
+        <div className="p55-segmented p55-segmented--commercial">
           {[
-            ["7.0", "7.0 Released / Customer Form"],
-            ["7.1", "7.1 Internal Commercial"],
-            ["7.2", "7.2 Budgetary Estimate"],
+            ["working", "Working Preview"],
+            ["budgetary", "Budgetary Submission"],
+            ["released", "Released Customer Output"],
           ].map(([id, label]) => (
             <button key={id} className={budgetMode === id ? "is-active" : ""} onClick={() => setBudgetMode(id)} type="button">
               {label}
             </button>
           ))}
         </div>
-        {budgetMode === "7.2" ? <Badge tone="warn">{budget?.revision || "BUDGETARY"}</Badge> : <Badge tone="warn">REV07 · CONTROLLED</Badge>}
+        <div className="p55-commercial-state">
+          {budgetMode === "working" ? <><strong>7.1 WORKING_SELL projection</strong><span>internal only</span></> : null}
+          {budgetMode === "budgetary" ? <><strong>{submission?.revision || "SAMTEL Rev00"}</strong><span>Emergency / Preliminary · 08-Oct-2026</span></> : null}
+          {budgetMode === "released" ? <><strong>Authorized RELEASED_SELL only</strong><span>budgetary snapshot is not final release</span></> : null}
+        </div>
       </div>
 
-      {budgetMode === "7.0" ? (
+      {budgetMode === "working" && budget ? (
         <>
+          <div className="p55-metric-grid">
+            <MetricCard label="Part A direct" value={compactMoney(budget.partADirectThb, "THB")} sub="Equipment / vendor / attributable bulk" tone="good" />
+            <MetricCard label="Part B direct" value={compactMoney(budget.partBDirectThb, "THB")} sub="Engineering / execution / logistics / specialist" />
+            <MetricCard label="Part C direct" value={compactMoney(budget.partCDirectThb, "THB")} sub="C2 + C3; C1 excluded" />
+            <MetricCard label="Direct delivery basis" value={compactMoney(directTotal, "THB")} sub="Internal working basis" />
+            <MetricCard label="Commercialized working" value={compactMoney(calculated, "THB")} sub="Before management envelope / quote replacement" />
+            <MetricCard label="FX working" value="33.6335" sub="THB/USD used for 08-Oct snapshot; refresh for next issue" />
+          </div>
+
+          <section className="p55-panel">
+            <SectionTitle
+              eyebrow="Resource substitution protection"
+              title="External specialist = call-off, not full-project FTE"
+              text="Specialists are loaded only against the design/FAT/IFAT/SAT/commissioning window that requires their competency. SAT Deploy is the peak field call-off period."
+            />
+            <div className="p55-grid p55-grid--2">
+              <div className="p55-evidence-card">
+                <Badge tone="good">USD {budget.externalSpecialistPolicy.basisUsdPerWorkingDay.toLocaleString("en-US")} / working MD minimum</Badge>
+                <p>{budget.externalSpecialistPolicy.usage}</p>
+              </div>
+              <div className="p55-evidence-card">
+                <Badge tone="warn">SEPARATE TRIP / CASH COST</Badge>
+                <p>{budget.externalSpecialistPolicy.excludedFromDayRate.join(" · ")}</p>
+              </div>
+            </div>
+            <p className="p55-note"><strong>Peak:</strong> {budget.externalSpecialistPolicy.keyPeak}</p>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle eyebrow="Part A internal derivation" title="19-system direct budget basis" text="Vendor / evidence detail stays internal. Part A excludes B5/C2/C3 spare duplication." />
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--budget">
+                <thead><tr><th>No.</th><th>System</th><th>Internal basis</th><th className="is-number">Direct THB</th></tr></thead>
+                <tbody>
+                  {budget.partA.map((row) => (
+                    <tr key={row.token}>
+                      <td>{String(row.no).padStart(2, "0")}</td>
+                      <td><strong>{row.system}</strong><small>{row.token}</small></td>
+                      <td>{row.basis}</td>
+                      <td className="is-number">{money(row.directThb, "THB")}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle eyebrow="Part B internal derivation" title="Service / logistics / specialist working basis" />
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--budget">
+                <thead><tr><th>Code</th><th>Description</th><th>Class</th><th className="is-number">Direct THB</th><th>Control note</th></tr></thead>
+                <tbody>
+                  {budget.partB.map((row) => (
+                    <tr key={row.code}>
+                      <td><strong>{row.code}</strong></td>
+                      <td>{row.description}</td>
+                      <td><Badge>{row.pricingClass}</Badge></td>
+                      <td className="is-number">{money(row.directThb, "THB")}</td>
+                      <td>{row.note}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      ) : null}
+
+      {budgetMode === "budgetary" && submission ? (
+        <>
+          <section className="p55-callout p55-callout--warning">
+            <strong>Emergency budgetary snapshot — frozen</strong>
+            <p>
+              {submission.reason} Customer-facing file: <strong>{submission.customerFileName}</strong>. This state is read-only by policy and is not the final contractual release.
+            </p>
+          </section>
+
+          <div className="p55-metric-grid">
+            <MetricCard label="Currency" value="USD" sub={"FX working basis: " + submission.fxThbUsd + " THB/USD"} />
+            <MetricCard label="Base before Part C" value={compactMoney(submission.baseBeforeOptionsUsd, "USD")} sub="Part A + customer B1-B6" tone="good" />
+            <MetricCard label="C2 + C3 options" value={compactMoney(submission.optionsC2C3Usd, "USD")} sub="C1 excluded" />
+            <MetricCard label="Calculated incl. options" value={compactMoney(submission.calculatedInclOptionsUsd, "USD")} sub="Snapshot arithmetic" />
+            <MetricCard label="Management envelope" value={compactMoney(submission.managementEnvelopeUsd, "USD")} sub="Do not back-solve lines to this value" tone="warn" />
+            <MetricCard label="Release state" value="PRELIMINARY" sub="ADDVALUE → SAMTEL → CNEEC · 08-Oct-2026" tone="warn" />
+          </div>
+
+          <section className="p55-panel">
+            <SectionTitle
+              eyebrow="Frozen customer-facing snapshot"
+              title="SAMTEL Rev00 price breakdown"
+              text="Vendor names and internal commercial derivation are deliberately excluded from this customer view."
+              action={<button className="p55-export-button" type="button" onClick={() => exportOriginalPriceFormXlsx(submission)}>Export SAMTEL Rev00 XLSX</button>}
+            />
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--budget">
+                <thead><tr><th>Code</th><th>Description</th><th className="is-number">USD</th><th>Remark</th></tr></thead>
+                <tbody>
+                  {submissionBaseRows.map((row) => (
+                    <tr key={row.code}>
+                      <td><strong>{row.code}</strong></td>
+                      <td>{row.description}</td>
+                      <td className="is-number">{money(row.customerUsd, "USD")}</td>
+                      <td>{row.remark}</td>
+                    </tr>
+                  ))}
+                  <tr>
+                    <td colSpan="2"><strong>Base Total before Part C Options</strong></td>
+                    <td className="is-number"><strong>{money(submission.baseBeforeOptionsUsd, "USD")}</strong></td>
+                    <td>Excluding VAT.</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle eyebrow="Part C options" title="Frozen option values" />
+            <div className="p55-option-grid">
+              {submissionOptions.map((row) => (
+                <div className="p55-option" key={row.code}>
+                  <div><span>{row.code}</span><strong>{row.description}</strong></div>
+                  <div className="p55-option__price">
+                    <strong>{row.code === "C1" ? "EXCLUDED / CNEEC" : money(row.customerUsd, "USD")}</strong>
+                    <Badge>{row.code === "C1" ? "EXCLUDED" : "BUDGETARY OPTION"}</Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle
+              eyebrow="Internal trace — not customer output"
+              title="Where each emergency budget line came from"
+              text="This trace is kept so a later engineer can identify the internal system mapping, cost basis, evidence strength and the quotation that must replace each allowance."
+            />
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--budget">
+                <thead><tr><th>Line</th><th>Internal mapping</th><th className="is-number">Direct THB</th><th>Internal basis</th><th>Evidence / driver</th><th>Confidence</th><th>Replace when</th></tr></thead>
+                <tbody>
+                  {submission.internalTrace.map((row) => (
+                    <tr key={row.customerLine}>
+                      <td><strong>{row.customerLine}</strong></td>
+                      <td>{row.internalSystems}</td>
+                      <td className="is-number">{money(row.directThb, "THB")}</td>
+                      <td>{row.basis}</td>
+                      <td>{row.evidence}</td>
+                      <td><Badge>{row.confidence}</Badge></td>
+                      <td>{row.replaceWhen}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="p55-callout p55-callout--warning">
+              <strong>Revision rule</strong>
+              <p>{submission.replacementRule}</p>
+            </div>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle eyebrow="Part B trace" title="Why specialist / deployment allowances exist" text="B4 is event/campaign-based, not a full-project specialist FTE assumption." />
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--compact">
+                <thead><tr><th>Code</th><th className="is-number">Direct THB</th><th>Internal cost logic</th><th>Specialist rule</th><th>Emergency customer-form treatment</th></tr></thead>
+                <tbody>
+                  {submission.partBInternal.map((row) => (
+                    <tr key={row.code}>
+                      <td><strong>{row.code}</strong></td>
+                      <td className="is-number">{money(row.directThb, "THB")}</td>
+                      <td>{row.logic}</td>
+                      <td>{row.externalSpecialist}</td>
+                      <td>{row.customerFormTreatment}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </>
+      ) : null}
+
+      {budgetMode === "released" ? (
+        <>
+          <section className="p55-callout">
+            <strong>Released Customer Output remains a separate authorization state</strong>
+            <p>
+              The 08-Oct SAMTEL emergency budgetary issue is intentionally not promoted into RELEASED_SELL. This view continues to show the controlled customer-form baseline and its HOLD/open items until a formal customer release is authorized.
+            </p>
+          </section>
+
           <div className="p55-metric-grid">
             <MetricCard
               label="Part A + B Base"
@@ -584,32 +790,10 @@ function BudgetView() {
               sub={"Known excl. PAGA: " + money(PROJECT_0550.knownBaseExPagaUsd, "USD") + " / " + money(PROJECT_0550.knownBaseExPagaThb, "THB")}
               tone="warn"
             />
-            <MetricCard
-              label="PAGA selected"
-              value={money(paga.knownSelectedSubtotalEur, "EUR")}
-              sub={paga.vendor + " · " + paga.offer}
-              tone="good"
-            />
-            <MetricCard
-              label="C2 known non-PAGA"
-              value={currency === "THB" ? money(PROJECT_0550.c2Thb, "THB") : currency === "EUR" ? "PAGA TBC" : money(PROJECT_0550.c2Usd, "USD")}
-              sub="PAGA capital spares remain TBC"
-            />
-            <MetricCard
-              label="C3 known non-PAGA"
-              value={currency === "THB" ? money(PROJECT_0550.c3Thb, "THB") : currency === "EUR" ? "PAGA TBC" : money(PROJECT_0550.c3Usd, "USD")}
-              sub="PAGA 2-year spares remain TBC"
-            />
-            <MetricCard label="Project Total" value="HOLD" sub="C1 unpriced · PAGA open · EUR/THB TBC" tone="warn" />
-            <MetricCard label="FX" value="31.50" sub="THB/USD locked · EUR/THB TBC" />
+            <MetricCard label="PAGA selected" value={money(paga.knownSelectedSubtotalEur, "EUR")} sub={paga.vendor + " · " + paga.offer} tone="good" />
+            <MetricCard label="Project Total" value="HOLD" sub="Final release requires controlled closure / authorization" tone="warn" />
+            <MetricCard label="Emergency snapshot" value={money(submission?.baseBeforeOptionsUsd || 0, "USD")} sub="Budgetary only — not RELEASED_SELL" />
           </div>
-
-          <section className="p55-callout p55-callout--warning">
-            <strong>Selected PAGA commercial gate</strong>
-            <p>
-              INDUSTRONIC base net {money(paga.baseNetEur, "EUR")} plus currently priced requirement additions gives {money(paga.knownSelectedSubtotalEur, "EUR")}. The controlled 7.0 baseline remains HOLD until selected-vendor gaps, spares, site service, logistics and FX are source-backed.
-            </p>
-          </section>
 
           <div className="p55-filterbar p55-filterbar--simple">
             <div className="p55-segmented">
@@ -619,12 +803,13 @@ function BudgetView() {
                 </button>
               ))}
             </div>
+            <Badge tone="warn">CONTROLLED · HOLD</Badge>
           </div>
 
           <section className="p55-panel p55-panel--flush">
             <div className="p55-table-wrap">
               <table className="p55-table p55-table--budget">
-                <thead><tr><th>Code</th><th>Description</th><th className="is-number">USD</th><th className="is-number">THB @ 31.50</th><th className="is-number">EUR</th><th>State</th></tr></thead>
+                <thead><tr><th>Code</th><th>Description</th><th className="is-number">USD</th><th className="is-number">THB</th><th className="is-number">EUR</th><th>State</th></tr></thead>
                 <tbody>
                   {rows.map((row) => (
                     <tr key={row.code}>
@@ -642,142 +827,10 @@ function BudgetView() {
           </section>
         </>
       ) : null}
-
-      {budgetMode === "7.1" && budget ? (
-        <>
-          <div className="p55-metric-grid">
-            <MetricCard label="Direct delivery basis" value={compactMoney(directTotal, "THB")} sub="A + B + C direct / procurement basis" tone="good" />
-            <MetricCard label="Calculated customer" value={compactMoney(calculated, "THB")} sub="Commercialized before budgetary rounding" />
-            <MetricCard label="Airtime customer allowance" value={compactMoney(airtime, "THB")} sub="Recurring VSAT / Ku provision" />
-            <MetricCard label="Recommended envelope" value={compactMoney(recommended, "THB")} sub="Excluding VAT · C1 excluded" tone="warn" />
-            <MetricCard label="Goods formula" value="×1.20 / 0.95" sub="SAMTEL goods layer + ADDVALUE eligible-sales provision" />
-            <MetricCard label="Service formula" value="×1.05" sub="Working service / handling layer" />
-          </div>
-
-          <section className="p55-panel">
-            <SectionTitle
-              eyebrow="Resource substitution protection"
-              title="External specialist = call-off, not full-project FTE"
-              text="Use specialists only for the work and event window that requires their competency. SAT Deploy / IFAT / commissioning are the peak call-off periods."
-            />
-            <div className="p55-grid p55-grid--2">
-              <div className="p55-evidence-card">
-                <Badge tone="good">USD {budget.externalSpecialistPolicy.basisUsdPerWorkingDay.toLocaleString("en-US")} / working day</Badge>
-                <p>{budget.externalSpecialistPolicy.usage}</p>
-              </div>
-              <div className="p55-evidence-card">
-                <Badge tone="warn">SEPARATE CASH COST</Badge>
-                <p>{budget.externalSpecialistPolicy.excludedFromDayRate.join(" · ")}</p>
-              </div>
-            </div>
-            <p className="p55-note p55-note--top"><strong>Peak:</strong> {budget.externalSpecialistPolicy.keyPeak}</p>
-          </section>
-
-          <section className="p55-panel">
-            <SectionTitle eyebrow="Commercial bridge" title="Direct basis → customer budget" />
-            <div className="p55-policy-list">
-              <div className="p55-policy"><div><strong>Part A direct</strong><p>{money(budget.partADirectThb, "THB")} · equipment/vendor/bulk · no spares duplicated</p></div><Badge>DIRECT</Badge></div>
-              <div className="p55-policy"><div><strong>Part B direct</strong><p>{money(budget.partBDirectThb, "THB")} · engineering/services/logistics/specialist</p></div><Badge>DIRECT</Badge></div>
-              <div className="p55-policy"><div><strong>Part C direct</strong><p>{money(budget.partCDirectThb, "THB")} · C2/C3 spares; C1 excluded</p></div><Badge>OPTION / BUDGET</Badge></div>
-              <div className="p55-policy"><div><strong>Calculated customer</strong><p>{money(calculated, "THB")}</p></div><Badge>DERIVED</Badge></div>
-              <div className="p55-policy"><div><strong>Recommended budgetary</strong><p>{money(recommended, "THB")}</p></div><Badge tone="warn">SUBMISSION</Badge></div>
-            </div>
-          </section>
-        </>
-      ) : null}
-
-      {budgetMode === "7.2" && budget ? (
-        <>
-          <div className="p55-metric-grid">
-            <MetricCard label="Part A" value={compactMoney(budget.partADirectThb, "THB")} sub="Equipment / vendor package / bulk · spare excluded" tone="good" />
-            <MetricCard label="Part B" value={compactMoney(budget.partBDirectThb, "THB")} sub="Engineering / logistics / specialist / permits / risk" />
-            <MetricCard label="Part C" value={compactMoney(budget.partCDirectThb, "THB")} sub="C2 + C3 spares · C1 excluded" />
-            <MetricCard label="Direct basis" value={compactMoney(directTotal, "THB")} sub="Before commercial layers" />
-            <MetricCard label="Calculated customer" value={compactMoney(calculated, "THB")} sub="Before budgetary rounding" />
-            <MetricCard label="Recommended to CNEEC" value={compactMoney(recommended, "THB")} sub="Excluding VAT · current budgetary envelope" tone="warn" />
-          </div>
-
-          <section className="p55-callout p55-callout--warning">
-            <strong>Immediate submission basis</strong>
-            <p>
-              Preliminary Budgetary Estimate = {money(recommended, "THB")} excluding VAT. C1 physical installation construction is excluded under the current working boundary. MGW/CERAGON quotation is pending and will replace the current microwave/WBB budgetary basis when received.
-            </p>
-          </section>
-
-          <section className="p55-panel">
-            <SectionTitle
-              eyebrow="Part A"
-              title="19-system budgetary basis"
-              text="Part A is complete working-system equipment/vendor/bulk only. B5/C2/C3 spares stay outside A to prevent double count."
-              action={<button className="p55-export-button" type="button" onClick={() => exportOriginalPriceFormXlsx(budget)}>Export Original XLSX</button>}
-            />
-            <div className="p55-table-wrap">
-              <table className="p55-table p55-table--budget">
-                <thead><tr><th>No.</th><th>System</th><th>Budgetary basis</th><th className="is-number">Direct THB</th></tr></thead>
-                <tbody>
-                  {budget.partA.map((row) => (
-                    <tr key={row.token}>
-                      <td>{String(row.no).padStart(2, "0")}</td>
-                      <td><strong>{row.system}</strong><small>{row.token}</small></td>
-                      <td>{row.basis}</td>
-                      <td className="is-number">{money(row.directThb, "THB")}</td>
-                    </tr>
-                  ))}
-                  <tr><td colSpan="3"><strong>Part A Direct Total</strong></td><td className="is-number"><strong>{money(budget.partADirectThb, "THB")}</strong></td></tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section className="p55-panel">
-            <SectionTitle eyebrow="Part B" title="Engineering / execution / specialist budget" text="External specialists are call-off resources. USD 1,000/working-day is a minimum working basis where used; MOB/DEMOB and other cash costs are separate." />
-            <div className="p55-table-wrap">
-              <table className="p55-table p55-table--budget">
-                <thead><tr><th>Code</th><th>Description</th><th>Pricing class</th><th className="is-number">Direct THB</th><th>Control note</th></tr></thead>
-                <tbody>
-                  {budget.partB.map((row) => (
-                    <tr key={row.code}>
-                      <td><strong>{row.code}</strong></td>
-                      <td>{row.description}</td>
-                      <td><Badge>{row.pricingClass}</Badge></td>
-                      <td className="is-number">{money(row.directThb, "THB")}</td>
-                      <td>{row.note}</td>
-                    </tr>
-                  ))}
-                  <tr><td colSpan="3"><strong>Part B Direct Total</strong></td><td className="is-number"><strong>{money(budget.partBDirectThb, "THB")}</strong></td><td /></tr>
-                </tbody>
-              </table>
-            </div>
-          </section>
-
-          <section className="p55-panel">
-            <SectionTitle eyebrow="Part C" title="Options / spares" />
-            <div className="p55-option-grid">
-              {budget.partC.map((option) => (
-                <div className="p55-option" key={option.code}>
-                  <div><span>{option.code}</span><strong>{option.description}</strong></div>
-                  <div className="p55-option__price">
-                    <strong>{Number.isFinite(option.directThb) ? money(option.directThb, "THB") : "EXCLUDED"}</strong>
-                    <Badge>{option.state}</Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <section className="p55-panel">
-            <SectionTitle eyebrow="Original CNEEC output" title="Export mapping control" text="The XLSX export preserves the original bilingual 8-column CNEEC price-breakdown structure and maps the 19 internal systems back into the 15 customer Part-A lines." />
-            <div className="p55-policy-list">
-              <div className="p55-policy"><div><strong>Source form</strong><p>{budget.sourceOriginalForm.name}</p></div><Badge>CUSTOMER FORM</Badge></div>
-              <div className="p55-policy"><div><strong>Calculated total</strong><p>{money(calculated, "THB")}</p></div><Badge>DERIVED</Badge></div>
-              <div className="p55-policy"><div><strong>Budgetary envelope</strong><p>{money(recommended, "THB")}</p></div><Badge tone="warn">EXPORT TOTAL</Badge></div>
-            </div>
-          </section>
-        </>
-      ) : null}
     </div>
   );
 }
+
 function RiskView() {
   const maxExposure = Math.max(...RISK_SCENARIOS.map((r) => r.exposureThb));
 
