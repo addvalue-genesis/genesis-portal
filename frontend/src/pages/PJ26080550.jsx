@@ -18,6 +18,8 @@ import {
   PROJECT_0550,
   REQUIREMENT_COMPLETENESS,
   RISK_SCENARIOS,
+  SERVICE_EQUATION_SOURCE,
+  SERVICE_LINE_DERIVATION,
   SOURCE_REGISTER,
   SYSTEM_GROUPS,
   SYSTEMS,
@@ -105,6 +107,70 @@ function MetricCard({ label, value, sub, tone = "default" }) {
       <div className="p55-metric__label">{label}</div>
       <div className="p55-metric__value">{value}</div>
       {sub ? <div className="p55-metric__sub">{sub}</div> : null}
+    </div>
+  );
+}
+
+function DerivationBasisTable({ code, directThb }) {
+  const model = SERVICE_LINE_DERIVATION[code];
+  if (!model) return null;
+
+  return (
+    <div className="p55-derivation-block">
+      <div className="p55-eyebrow" style={{ marginBottom: 8 }}>Cost derivation / method recovered from prior model</div>
+
+      <div className="p55-table-wrap">
+        <table className="p55-table p55-table--compact p55-table--derivation">
+          <thead>
+            <tr>
+              <th>Control field</th>
+              <th>Recovered basis / meaning</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>Current direct allowance</strong></td><td>{directThb === null ? "EXCLUDED" : money(directThb, "THB")}</td></tr>
+            <tr><td><strong>Source model</strong></td><td>{model.sourceModel}</td></tr>
+            <tr><td><strong>Recovered structure</strong></td><td>{model.recoveredStructure}</td></tr>
+            <tr><td><strong>Driver / calculation inputs</strong></td><td>{model.sourceColumns}</td></tr>
+            <tr><td><strong>Derivation principle</strong></td><td>{model.driverSummary}</td></tr>
+            <tr><td><strong>What the current total means</strong></td><td>{model.currentAllowanceMeaning}</td></tr>
+            <tr><td><strong>Reconciliation state</strong></td><td><Badge>{model.currentStatus}</Badge></td></tr>
+            <tr><td><strong>Recovered source file</strong></td><td>{SERVICE_EQUATION_SOURCE.file} · {SERVICE_EQUATION_SOURCE.date}</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      {(model.methods || []).length ? (
+        <>
+          <div className="p55-eyebrow" style={{ marginTop: 14, marginBottom: 8 }}>Equation / calculation logic</div>
+          <div className="p55-table-wrap">
+            <table className="p55-table p55-table--compact p55-table--derivation">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Purpose</th>
+                  <th>Equation</th>
+                  <th>Counting / control rule</th>
+                </tr>
+              </thead>
+              <tbody>
+                {model.methods.map((method) => (
+                  <tr key={method.id}>
+                    <td><strong>{method.id}</strong></td>
+                    <td>{method.purpose}</td>
+                    <td><code>{method.equation}</code></td>
+                    <td>{method.control}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      ) : null}
+
+      <p className="p55-note">
+        <strong>Control:</strong> {SERVICE_EQUATION_SOURCE.keyRule}
+      </p>
     </div>
   );
 }
@@ -1244,6 +1310,8 @@ function BudgetView() {
                                   <strong>{row.code} — activity / work-package breakdown</strong>
                                   <span>{(row.details || []).length} controlled detail items</span>
                                 </div>
+                                <DerivationBasisTable code={row.code} directThb={row.directThb} />
+                                <div className="p55-eyebrow" style={{ marginTop: 16, marginBottom: 8 }}>Activity / component scope</div>
                                 <div className="p55-table-wrap">
                                   <table className="p55-table p55-table--compact p55-table--scope">
                                     <thead><tr><th>Activity / cost component</th><th>Category</th><th>Source / basis</th><th className="is-number">Allocated THB</th><th>State</th></tr></thead>
@@ -1328,6 +1396,8 @@ function BudgetView() {
                                   <strong>{row.code} — scope / option breakdown</strong>
                                   <span>{(row.details || []).length} controlled detail items</span>
                                 </div>
+                                <DerivationBasisTable code={row.code} directThb={row.directThb} />
+                                <div className="p55-eyebrow" style={{ marginTop: 16, marginBottom: 8 }}>Scope / spare-list composition</div>
                                 <div className="p55-table-wrap">
                                   <table className="p55-table p55-table--compact p55-table--scope">
                                     <thead><tr><th>Scope / spare component</th><th>Category</th><th>Source / basis</th><th className="is-number">Allocated THB</th><th>State</th></tr></thead>
