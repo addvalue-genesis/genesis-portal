@@ -44,3 +44,5 @@ export { B1_COST_LINEAGE } from "./b1CostLineage";
 
 export { PROJECT_0550_REGULATORY_BINDING } from "./regulatoryBinding";
 export { MYANMAR_REGULATORY_KNOWLEDGE } from "../knowledge-kernels/regulatoryMyanmar";
+
+export { PROJECT_0550_FACTS } from "./projectFacts";
