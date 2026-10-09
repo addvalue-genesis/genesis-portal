@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { ProjectWorkspaceShell } from "../common/ui/ProjectWorkspaceShell";
 import { PROJECT_0553_FACTS } from "../project0553/projectFacts";
 import { PROJECT_0553_EVIDENCE, TECHNICAL_HOLDS } from "../project0553/evidenceRegistry";
 import { BID_0553_SOURCES, BID_0553_GATES, validateBidReview } from "../project0553/bidReview";
@@ -21,26 +22,15 @@ const sourceLinks = ids => ids.map(id => {
 });
 
 export function PJ26080553() {
- const [tab,setTab]=useState("overview");
  const [opened,setOpened]=useState(null);
  const [selectedMr,setSelectedMr]=useState("ALL");
  const p=getProject0553Dataset().project;
  const visibleGates=useMemo(()=>BID_0553_GATES.filter(g=>selectedMr==="ALL"||g.system==="ALL"||g.system===selectedMr),[selectedMr]);
  const blocked=BID_0553_GATES.filter(g=>g.status!=="CLOSED_VERIFIED").length;
  const systemTable=<Table headers={["MR","System","Current evidence state","Technical review"]} rows={p.systems.map(s=>[
-  s.mr,<strong>{s.name}</strong>,<Badge key={s.id}>{s.status}</Badge>,<button key={"b"+s.id} className="p553-detail-button" onClick={()=>setOpened(opened===s.mr?null:s.mr)}>{opened===s.mr?"− Hide":"＋ Detail"}</button>
- ])}/>;
- return <div className="p55 p553-dashboard">
-   <header className="p55-hero">
-     <div className="p55-hero__top"><div>
-       <div className="p55-kicker">GENESS / TPP · INTERNAL PROJECT CONTROL · NOT CUSTOMER RELEASE</div>
-       <h1>PJ2608-0553 <span>Zawtika Phase 1F Telecom</span></h1>
-       <p>JUTAL · {p.packageId} · Technical UNPRICED / Priced Commercial Bid</p>
-     </div><div className="p55-hero__status"><Badge>WORKING REVIEW REV01 / RELEASE HOLD</Badge><span>Closing amendment verification OPEN</span></div></div>
-     <div className="p55-hero__method"><span>METHOD</span> First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model + Evidence Control</div>
-     <ProjectTabs tabs={TABS} selected={tab} onSelect={setTab}/>
-   </header>
-   <main className="p55-main">
+  s.mr,<strong>{s.name}</strong>,<Badge key={s.id}>{s.status}</Badge>,<button key={"b"+s.id} className="p553-detail-button" onClick={()=>setOpened(ope const shellProject = {id:p.projectId,shortName:"Zawtika Phase 1F Telecom",title:"JUTAL · "+p.packageId+" · Technical UNPRICED / Priced Commercial Bid",state:"WORKING REVIEW / RELEASE HOLD",statusDetail:"Closing amendment verification OPEN",method:p.method};
+ return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} className="p553-dashboard" renderContent={(tab)=><>
+
    {tab==="overview"&&<div className="p55-stack">
      <div className="p55-section-title"><div><div className="p55-eyebrow">MANAGEMENT VIEW</div><h2>Project control spine</h2><p>0553 controlled bid inputs, deliverable gates and technical-commercial evidence. No 0550 quantities or pricing inherited.</p></div></div>
      <div className="p553-alerts"><div className="p553-alert"><strong>Customer release — HOLD</strong><p>Original Instruction to Bidder and later tender update disagree. Confirm authorized closing/submission instruction before release.</p></div><div className="p553-alert"><strong>Bid preparation — ACTIVE</strong><p>MTO Rev04, SAMTEL TC 05-Oct and CCL Rev04 located; all four MRs require trace and quote reconciliation.</p></div></div>
@@ -76,6 +66,6 @@ export function PJ26080553() {
 </Section><p className="p55-note">Rev09 INTERNAL is an estimating source, not a confirmed, itemized or balanced customer offer. No invented zero/balancing lines.</p></Section></div>}
    {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
    {tab==="documents"&&<div className="p55-stack"><Section title="0553 Source Register"><Table headers={["ID","Document / location","Revision","Control state","Meaning"]} rows={BID_0553_SOURCES.map(s=>[s.id,<a key={s.id} href={s.url} target="_blank" rel="noreferrer">{s.name}</a>,s.revision,<Badge key={s.id}>{s.status}</Badge>,s.note])}/></Section><Section title="Vendor / OEM Source Index"><Table headers={["MR","Supplier","Source type","Link","Review status"]} rows={VENDOR_0553_SOURCES.map(v=>[v.mr,v.supplier,v.type,<a key={v.id} href={v.url} target="_blank" rel="noreferrer">{v.document}</a>,<Badge key={v.id}>{v.status}</Badge>])}/></Section><Section title="Evidence classification"><Table headers={["Evidence","Revision","State"]} rows={PROJECT_0553_EVIDENCE.map(e=>[e.title,e.revision,<Badge key={e.id}>{e.state}</Badge>])}/></Section></div>}
-   </main>
- </div>;
+
+ </>}/>;
 }
