@@ -1472,7 +1472,17 @@
             "state": "SELECTED / OPEN GAPS"
           }
         ],
-        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again.",
+        "commercialSourceIds": [
+          "VQ-PAGA-INDUSTRONIC-A20261632"
+        ],
+        "budgetBridge": {
+          "currentSystemAllowanceThb": 16000000,
+          "quoteFinalPriceEur": 226454.05,
+          "relationship": "NOT_A_DIRECT_FX_CONVERSION",
+          "explanation": "The THB 16.0M internal allowance is a management working system allowance. The selected vendor quote is one source anchor only; open compliance, quantity, logistics, site-service, spares/tools and FX closures remain controlled separately. Do not infer a conversion rate from these two values.",
+          "replacementRule": "Replace the system allowance only when the selected quote, approved additions, project-scope gaps and conversion basis are fully normalized."
+        }
       },
       {
         "no": 8,
@@ -3755,5 +3765,270 @@
         "auditState": "KERNEL_REVIEW_REQUIRED"
       }
     ]
-  }
+  },
+  "commercialSources": [
+    {
+      "id": "VQ-PAGA-INDUSTRONIC-A20261632",
+      "sourceRegisterId": "S08",
+      "systemToken": "TEL-PAGA",
+      "sourceType": "VENDOR_QUOTATION",
+      "vendor": "INDUSTRONIC Industrie-Electronic GmbH & Co. KG",
+      "offerNo": "A20261632",
+      "inquiryNo": "RQ2608-1181",
+      "inquiryDate": "31-Aug-2026",
+      "offerDate": "03-Sep-2026",
+      "project": "PTTEP - Thailand - Aung Sinkha Development Project (ASK Project) / PAGA System",
+      "currency": "EUR",
+      "grossTotal": 255115,
+      "discountPercent": 15,
+      "discountBasis": 191073,
+      "discountAmount": 28660.95,
+      "finalPrice": 226454.05,
+      "commercialTerms": {
+        "validity": "31-Dec-2026",
+        "deliveryTerm": "FCA Wertheim/Germany, INCOTERMS 2020",
+        "paymentTerm": "Advance payment net",
+        "deliveryTime": "Approx. 6 months after receipt of order and clearing up all details",
+        "warranty": "12 months after despatch",
+        "netWeight": "Approx. 1,179 kg",
+        "partialShipment": "Supplier reserves right of partial shipments and partial invoicing",
+        "standardsBasis": "German / European codes and standards unless otherwise confirmed",
+        "vat": "Tax-free export delivery assumed; German VAT may apply depending on final pickup/delivery arrangement",
+        "withholdingTax": "Buyer to pay without deduction of local taxes/fees; statutory deductions are for buyer account"
+      },
+      "scopeAndConditions": [
+        "Attached project-related technical clarifications/deviations form part of the offer.",
+        "Cross references to documents/specifications not provided with the inquiry are not considered.",
+        "Commissioning should be carried out by INDUSTRONIC authorised personnel; independent commissioning is not covered by warranty in the event of damage.",
+        "Critical spare parts are recommended to be ordered directly.",
+        "Export/shipment remains subject to required authorisations and sanctions/export-control restrictions.",
+        "Supplier notes possible delivery/price uncertainty from component scarcity, logistics bottlenecks and political impacts."
+      ],
+      "priceGroups": [
+        {
+          "code": "1010",
+          "description": "INTRON-X Node — APF Control Building",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 40062,
+          "total": 40062,
+          "state": "QUOTED"
+        },
+        {
+          "code": "2010",
+          "description": "INTRON-X Node — ACP Office/Guard House + Truck Loading",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 33790,
+          "total": 33790,
+          "state": "QUOTED"
+        },
+        {
+          "code": "3010",
+          "description": "Remote Amplifier Node — APF Accommodation Building",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 22229,
+          "total": 22229,
+          "state": "QUOTED"
+        },
+        {
+          "code": "4010",
+          "description": "Remote Amplifier Node — Catering / Store / Office / Security",
+          "qty": 4,
+          "unit": "U",
+          "unitPrice": 15944,
+          "total": 63776,
+          "state": "QUOTED"
+        },
+        {
+          "code": "11010",
+          "description": "12 AP 712 Access Panel",
+          "qty": 4,
+          "unit": "U",
+          "unitPrice": 3210,
+          "total": 12840,
+          "state": "QUOTED"
+        },
+        {
+          "code": "12020",
+          "description": "2 DX 705 Ex Field Call Station",
+          "qty": 2,
+          "unit": "U",
+          "unitPrice": 2367,
+          "total": 4734,
+          "state": "QUOTED"
+        },
+        {
+          "code": "14020",
+          "description": "LD 8 UE/IP54 EN54 ceiling speaker",
+          "qty": 124,
+          "unit": "U",
+          "unitPrice": 75,
+          "total": 9300,
+          "state": "QUOTED"
+        },
+        {
+          "code": "14030",
+          "description": "DSP 15 25W Ex horn speaker",
+          "qty": 57,
+          "unit": "U",
+          "unitPrice": 295,
+          "total": 16815,
+          "state": "QUOTED"
+        },
+        {
+          "code": "15010",
+          "description": "GNExB2X21 230VAC red Ex beacon",
+          "qty": 9,
+          "unit": "U",
+          "unitPrice": 910,
+          "total": 8190,
+          "state": "QUOTED"
+        },
+        {
+          "code": "15020",
+          "description": "MBX21 230VAC red beacon",
+          "qty": 4,
+          "unit": "U",
+          "unitPrice": 798,
+          "total": 3192,
+          "state": "QUOTED"
+        },
+        {
+          "code": "18010",
+          "description": "INTRON-X service kit",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 257,
+          "total": 257,
+          "state": "QUOTED"
+        },
+        {
+          "code": "18020",
+          "description": "INTRON-X commissioning kit",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 160,
+          "total": 160,
+          "state": "QUOTED"
+        },
+        {
+          "code": "18050",
+          "description": "Config Manager X / 1 USB",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 2485,
+          "total": 2485,
+          "state": "QUOTED"
+        },
+        {
+          "code": "20010",
+          "description": "INTRON-X Activation bundle",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 13225,
+          "total": 13225,
+          "state": "QUOTED"
+        },
+        {
+          "code": "22030",
+          "description": "Documentation & Project Management",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 16000,
+          "total": 16000,
+          "state": "QUOTED"
+        },
+        {
+          "code": "23010",
+          "description": "FAT Wertheim, Germany",
+          "qty": 3,
+          "unit": "day",
+          "unitPrice": 1020,
+          "total": 3060,
+          "state": "QUOTED"
+        },
+        {
+          "code": "24010",
+          "description": "Packing Charges",
+          "qty": 1,
+          "unit": "x",
+          "unitPrice": 5000,
+          "total": 5000,
+          "state": "QUOTED"
+        }
+      ],
+      "optionalItems": [
+        {
+          "code": "5010",
+          "description": "Redundant XCO controller module",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 3328,
+          "currency": "EUR"
+        },
+        {
+          "code": "5020",
+          "description": "Redundant managed FE switch",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 3408,
+          "currency": "EUR"
+        },
+        {
+          "code": "5030",
+          "description": "Engineering Test Panel / 10 NER 001",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 1894,
+          "currency": "EUR"
+        },
+        {
+          "code": "5040",
+          "description": "XBC Beacon Control Module",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 2014,
+          "currency": "EUR"
+        },
+        {
+          "code": "11020",
+          "description": "24 APK 02 additional keypad",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 681,
+          "currency": "EUR"
+        },
+        {
+          "code": "18040",
+          "description": "Activation key XST Pro",
+          "qty": 1,
+          "unit": "U",
+          "unitPrice": 400,
+          "currency": "EUR"
+        }
+      ],
+      "activationDetail": [
+        "2 × ACT-Controller XCO",
+        "3 × ACT-X Interface Device",
+        "18 × ACT-IP Device",
+        "4 × ACT-NPA Speaker Circuit Monitoring",
+        "3 × ACT-XPA Speaker Circuit Monitoring",
+        "1 × ACT-AP 10 Operating Layers",
+        "1 × ACT-Warning Control 10",
+        "2 × ACT-2 IAP VoIP Channels",
+        "1 × ACT-SIP Interface",
+        "1 × ACT-SIP VoIP Channel Telephony",
+        "1 × ACT-SNMP Interface (free of charge test version noted)",
+        "1 × ACT-DUSTRON Demo 4000"
+      ],
+      "sourceLocation": {
+        "driveFileId": "1NEcP1nIYqQN8sJMef0ks6WsLntaOCETr",
+        "driveFolderId": "1tkzR7ebLJwrlYFNtylKmz_0cykzb0wui",
+        "fileName": "A20261632.pdf"
+      },
+      "controlState": "SOURCE_INGESTED / TERMS_AND_LINE_ITEMS_AVAILABLE"
+    }
+  ]
 }
