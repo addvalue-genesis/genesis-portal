@@ -1,22 +1,29 @@
 import React, { useState } from "react";
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Employees } from "./pages/Employees";
+import { PJ26080550 } from "./pages/PJ26080550";
 
 const STRINGS = {
   th: {
-    appTitle: "GENESIS Portal",
+    appTitle: "GENESIS",
+    subtitle: "ADDVALUE Digital Backbone",
     home: "หน้าแรก",
+    project0550: "PJ2608-0550 TPP",
     employees: "พนักงาน",
-    language: "ภาษา",
   },
   en: {
-    appTitle: "GENESIS Portal",
+    appTitle: "GENESIS",
+    subtitle: "ADDVALUE Digital Backbone",
     home: "Home",
+    project0550: "PJ2608-0550 TPP",
     employees: "Employees",
-    language: "Language",
   },
 };
+
+function navClass({ isActive }) {
+  return isActive ? "active" : "";
+}
 
 export function App() {
   const [lang, setLang] = useState("th");
@@ -24,38 +31,40 @@ export function App() {
 
   return (
     <BrowserRouter>
-      <div style={{ fontFamily: "sans-serif" }}>
-        <header
-          style={{
-            padding: "0.75rem 1.5rem",
-            borderBottom: "1px solid #eee",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ fontWeight: "bold" }}>{t.appTitle}</div>
-          <nav style={{ display: "flex", gap: "1rem", alignItems: "center" }}>
-            <Link to="/">{t.home}</Link>
-            <Link to="/employees">{t.employees}</Link>
-            <span>
-              {t.language}:{" "}
-              <select
-                value={lang}
-                onChange={(e) => setLang(e.target.value)}
-                style={{ padding: "0.15rem 0.35rem" }}
-              >
-                <option value="th">TH</option>
-                <option value="en">EN</option>
-              </select>
+      <div className="genesis-shell">
+        <header className="genesis-topbar">
+          <NavLink to="/" className="genesis-brand">
+            <span className="genesis-brand__mark">G</span>
+            <span className="genesis-brand__text">
+              <strong>{t.appTitle}</strong>
+              <span>{t.subtitle}</span>
             </span>
+          </NavLink>
+
+          <nav className="genesis-nav" aria-label="Primary navigation">
+            <NavLink to="/" end className={navClass}>{t.home}</NavLink>
+            <NavLink to="/projects/pj2608-0550" className={navClass}>{t.project0550}</NavLink>
+            <NavLink to="/employees" className={navClass}>{t.employees}</NavLink>
           </nav>
+
+          <div className="genesis-tools">
+            <select
+              className="genesis-lang"
+              value={lang}
+              onChange={(e) => setLang(e.target.value)}
+              aria-label="Language"
+            >
+              <option value="th">TH</option>
+              <option value="en">EN</option>
+            </select>
+          </div>
         </header>
 
-        <main style={{ padding: "1.5rem" }}>
+        <main className="genesis-main">
           <Routes>
-            <Route path="/" element={<Home lang={lang} />} />
-            <Route path="/employees" element={<Employees lang={lang} />} />
+            <Route path="/" element={<div className="genesis-main--padded"><Home lang={lang} /></div>} />
+            <Route path="/projects/pj2608-0550" element={<PJ26080550 lang={lang} />} />
+            <Route path="/employees" element={<div className="genesis-main--padded"><Employees lang={lang} /></div>} />
           </Routes>
         </main>
       </div>

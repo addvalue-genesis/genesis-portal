@@ -1,0 +1,256 @@
+:root {
+  color-scheme: light;
+  font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans Thai", Arial, sans-serif;
+  background: #f4f7fa;
+  color: #122033;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  min-width: 320px;
+  background: #f4f7fa;
+}
+
+a {
+  color: inherit;
+}
+
+.genesis-shell {
+  min-height: 100vh;
+  background: #f4f7fa;
+}
+
+.genesis-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 0 22px;
+  color: #eaf1f7;
+  background: #081f37;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  box-shadow: 0 4px 16px rgba(7, 29, 51, 0.18);
+}
+
+.genesis-brand {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.genesis-brand__mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #1b6da7, #0a8a8f);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.genesis-brand__text {
+  display: grid;
+  line-height: 1.05;
+}
+
+.genesis-brand__text strong {
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+
+.genesis-brand__text span {
+  margin-top: 3px;
+  font-size: 8px;
+  color: rgba(255,255,255,0.55);
+}
+
+.genesis-nav {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow-x: auto;
+}
+
+.genesis-nav a {
+  padding: 8px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  color: rgba(255,255,255,0.65);
+  font-size: 11px;
+  font-weight: 750;
+  white-space: nowrap;
+}
+
+.genesis-nav a:hover {
+  color: #fff;
+  background: rgba(255,255,255,0.07);
+}
+
+.genesis-nav a.active {
+  color: #fff;
+  background: rgba(48, 143, 195, 0.2);
+  box-shadow: inset 0 0 0 1px rgba(108, 190, 231, 0.24);
+}
+
+.genesis-tools {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.genesis-lang {
+  border: 1px solid rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.07);
+  color: #fff;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 10px;
+  outline: none;
+}
+
+.genesis-lang option {
+  color: #122033;
+}
+
+.genesis-main {
+  min-height: calc(100vh - 56px);
+}
+
+.genesis-main--padded {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 28px;
+}
+
+.home-hero {
+  padding: 34px;
+  border-radius: 14px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.04), transparent 40%),
+    linear-gradient(135deg, #0b3157, #145785);
+  box-shadow: 0 16px 42px rgba(19, 63, 95, 0.16);
+}
+
+.home-hero small {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(255,255,255,0.62);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.home-hero h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 44px);
+  letter-spacing: -0.04em;
+}
+
+.home-hero p {
+  max-width: 760px;
+  margin: 12px 0 0;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.74);
+}
+
+.home-section {
+  margin-top: 22px;
+}
+
+.home-section h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
+}
+
+.home-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.home-card {
+  display: block;
+  min-height: 170px;
+  padding: 18px;
+  border-radius: 12px;
+  text-decoration: none;
+  background: #fff;
+  border: 1px solid #dbe2e9;
+  box-shadow: 0 7px 20px rgba(20,45,75,0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.home-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(20,45,75,0.09);
+}
+
+.home-card__tag {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 4px 7px;
+  background: #eaf3f9;
+  color: #185b89;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.home-card h3 {
+  margin: 13px 0 6px;
+  font-size: 15px;
+}
+
+.home-card p {
+  margin: 0;
+  color: #687586;
+  font-size: 11px;
+  line-height: 1.55;
+}
+
+.home-card__meta {
+  margin-top: 16px;
+  color: #244962;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+@media (max-width: 820px) {
+  .genesis-topbar {
+    height: auto;
+    min-height: 56px;
+    flex-wrap: wrap;
+    padding: 10px 14px;
+  }
+
+  .genesis-nav {
+    order: 3;
+    width: 100%;
+  }
+
+  .genesis-main--padded {
+    padding: 18px 14px;
+  }
+
+  .home-card-grid {
+    grid-template-columns: 1fr;
+  }
+}

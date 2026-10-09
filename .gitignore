@@ -1,0 +1,6 @@
+# Generated frontend dependencies/build output
+frontend/node_modules/
+frontend/dist/
+
+# Generated PJ2608-0550 handoff packages
+handoff-out/

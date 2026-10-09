@@ -1,0 +1,28 @@
+{
+  "schema": "pj2608-0550-handoff/1.0",
+  "generatedDate": "2026-10-09",
+  "repo": "addvalue-genesis/genesis-portal",
+  "branch": "feat/pj2608-0550-tpp-ui-rev04",
+  "pr": 2,
+  "mergePolicy": "DO_NOT_MERGE_WITHOUT_EXPLICIT_APPROVAL",
+  "method": "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
+  "localRoute": "http://localhost:3000/projects/pj2608-0550",
+  "build": {
+    "command": "npm run build",
+    "dev": "npm start",
+    "lastKnownFix": "PROJECT_0550_FACTS facade export fixed in 208c6be8"
+  },
+  "b1": {
+    "controlAllowanceThb": 24000000,
+    "recoveredBottomUpThb": 11155029.32325,
+    "unreconciledGapThb": 12844970.67675,
+    "rule": "NO_FORCED_RECONCILIATION"
+  },
+  "nextTask": "SECURE_STAGING_FOR_MOBILE_IPAD",
+  "preferredDeployment": "GitHub branch -> Cloudflare Pages -> Cloudflare Access",
+  "environments": [
+    "LOCAL",
+    "STAGING",
+    "RELEASED"
+  ]
+}
