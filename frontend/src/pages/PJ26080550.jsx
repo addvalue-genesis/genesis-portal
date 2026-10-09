@@ -964,6 +964,36 @@ function BudgetView() {
               </table>
             </div>
           </section>
+
+          <section className="p55-panel">
+            <SectionTitle
+              eyebrow="Part C internal derivation"
+              title="Options / long-term spares working basis"
+              text="C1 remains outside the current ADDVALUE base boundary; C2 and C3 are separate budgetary spare allowances and must not be duplicated in Part A or B5."
+            />
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--budget">
+                <thead><tr><th>Code</th><th>Description</th><th className="is-number">Direct THB</th><th>State</th><th>Boundary / control</th></tr></thead>
+                <tbody>
+                  {budget.partC.map((row) => (
+                    <tr key={row.code}>
+                      <td><strong>{row.code}</strong></td>
+                      <td>{row.description}</td>
+                      <td className="is-number">{row.directThb === null ? "—" : money(row.directThb, "THB")}</td>
+                      <td><Badge>{row.state}</Badge></td>
+                      <td>
+                        {row.code === "C1"
+                          ? "Physical installation construction / civil / pulling-blowing / erection remains CNEEC working boundary unless scope changes."
+                          : row.code === "C2"
+                            ? "10-year capital spares; final OEM-recommended list and quantities to replace the allowance."
+                            : "2-year normal operation spares; final OEM-recommended list and quantities to replace the allowance."}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </>
       ) : null}
 
@@ -1074,6 +1104,39 @@ function BudgetView() {
                       <td>{row.customerFormTreatment}</td>
                     </tr>
                   ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          <section className="p55-panel">
+            <SectionTitle
+              eyebrow="Part C trace"
+              title="Why C1 / C2 / C3 are kept separate"
+              text="Part C is option scope, not part of the base A+B total. C1 is excluded under the current working boundary; C2/C3 remain separate long-term spare allowances."
+            />
+            <div className="p55-table-wrap">
+              <table className="p55-table p55-table--compact">
+                <thead><tr><th>Code</th><th>Description</th><th className="is-number">Internal direct THB</th><th className="is-number">Issued customer USD</th><th>Control treatment</th></tr></thead>
+                <tbody>
+                  {budget.partC.map((row) => {
+                    const issued = submissionOptions.find((option) => option.code === row.code);
+                    return (
+                      <tr key={row.code}>
+                        <td><strong>{row.code}</strong></td>
+                        <td>{row.description}</td>
+                        <td className="is-number">{row.directThb === null ? "—" : money(row.directThb, "THB")}</td>
+                        <td className="is-number">{row.code === "C1" ? "EXCLUDED" : money(issued?.customerUsd || 0, "USD")}</td>
+                        <td>
+                          {row.code === "C1"
+                            ? "CNEEC optional physical installation boundary; reopen only by controlled scope change."
+                            : row.code === "C2"
+                              ? "10-year capital spares; replace allowance with final OEM list."
+                              : "2-year operational spares; replace allowance with final OEM list."}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
