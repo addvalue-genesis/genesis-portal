@@ -17,6 +17,7 @@ import {
   KNOWLEDGE_KERNEL_DOMAINS,
   OPTIONS,
   PROJECT_0550,
+  PROJECT_0550_FACTS,
   REQUIREMENT_COMPLETENESS,
   RISK_SCENARIOS,
   SERVICE_EQUATION_SOURCE,
@@ -1861,40 +1862,193 @@ function RiskView() {
 }
 
 function DocumentsView() {
+  const facts = PROJECT_0550_FACTS;
+
   return (
     <div className="p55-stack">
       <SectionTitle
         eyebrow="Evidence control"
-        title="Source register & traceability"
-        text="Project facts stay separate from methodology references. Internal calculations should always point back to a source, driver or explicit assumption."
+        title="Project facts, source register & traceability"
+        text="Project facts are stored as structured records with evidence state, source and downstream cost/schedule impact. Methodology remains separate from project facts."
       />
 
-      <div className="p55-source-grid">
-        {SOURCE_REGISTER.map((source) => (
-          <article className="p55-source" key={source.id}>
-            <div className="p55-source__id">{source.id}</div>
-            <div>
-              <strong>{source.name}</strong>
-              <p>{source.use}</p>
-            </div>
-            <Badge>{source.state}</Badge>
-          </article>
-        ))}
-      </div>
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Particular project facts"
+          title="Stakeholders / contractual roles"
+          text="Contract/legal roles are not broadened beyond the controlling source."
+        />
+        <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact">
+            <thead><tr><th>Role</th><th>Organisation</th><th>Source</th><th>Evidence state</th><th>Control note</th></tr></thead>
+            <tbody>
+              {(facts.stakeholders || []).map((row) => (
+                <tr key={row.id}>
+                  <td><strong>{row.role}</strong><small>{row.id}</small></td>
+                  <td>{row.organisation}</td>
+                  <td>{row.source}</td>
+                  <td><Badge>{row.evidenceState}</Badge></td>
+                  <td>{row.note || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle eyebrow="Location register" title="Project sites / route references" />
+        <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact">
+            <thead><tr><th>Code</th><th>Name</th><th>Aliases</th><th>Type</th><th>Source</th><th>Evidence state</th></tr></thead>
+            <tbody>
+              {(facts.locations || []).map((row) => (
+                <tr key={row.code}>
+                  <td><strong>{row.code}</strong></td>
+                  <td>{row.name}</td>
+                  <td>{(row.aliases || []).join(", ") || "—"}</td>
+                  <td>{row.type}</td>
+                  <td>{row.source || "—"}</td>
+                  <td><Badge>{row.evidenceState}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle eyebrow="Schedule evidence" title="Milestones and source maturity" />
+        <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact">
+            <thead><tr><th>ID</th><th>Date / target</th><th>Event</th><th>Source</th><th>Evidence state</th></tr></thead>
+            <tbody>
+              {(facts.milestones || []).map((row) => (
+                <tr key={row.id}>
+                  <td><strong>{row.id}</strong></td>
+                  <td>{row.date}</td>
+                  <td>{row.event}</td>
+                  <td>{row.source || "—"}</td>
+                  <td><Badge>{row.evidenceState}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Accepted clarification"
+          title="Clarification → cost / delivery impact"
+          text="These rows are project-specific constraints that downstream engineering, budget and schedule modules should consume."
+        />
+        <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact">
+            <thead><tr><th>Topic</th><th>Accepted / controlled fact</th><th>Source</th><th>Cost impact</th><th>Delivery impact</th><th>Evidence</th></tr></thead>
+            <tbody>
+              {(facts.clarifications || []).map((row) => (
+                <tr key={row.id}>
+                  <td><strong>{row.topic}</strong><small>{row.id}</small></td>
+                  <td>{row.fact}</td>
+                  <td>{row.source}</td>
+                  <td>{row.costImpact}</td>
+                  <td>{row.deliveryImpact}</td>
+                  <td><Badge>{row.evidenceState}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle eyebrow="Customer commercial structure" title="Part A / B / C mapping" />
+        <div className="p55-grid p55-grid--3">
+          <div className="p55-table-wrap">
+            <table className="p55-table p55-table--compact">
+              <thead><tr><th>Part A — Customer 15 lines</th></tr></thead>
+              <tbody>{(facts.customerCommercialStructure?.partA15 || []).map((x, i) => <tr key={x}><td><strong>{String(i+1).padStart(2,"0")}</strong> · {x}</td></tr>)}</tbody>
+            </table>
+          </div>
+          <div className="p55-table-wrap">
+            <table className="p55-table p55-table--compact">
+              <thead><tr><th>Code</th><th>Part B treatment</th></tr></thead>
+              <tbody>{(facts.customerCommercialStructure?.partB || []).map((x) => <tr key={x.code}><td><strong>{x.code}</strong></td><td>{x.title}<small>{x.treatment}</small></td></tr>)}</tbody>
+            </table>
+          </div>
+          <div className="p55-table-wrap">
+            <table className="p55-table p55-table--compact">
+              <thead><tr><th>Code</th><th>Part C treatment</th></tr></thead>
+              <tbody>{(facts.customerCommercialStructure?.partC || []).map((x) => <tr key={x.code}><td><strong>{x.code}</strong></td><td>{x.title}<small>{x.treatment}</small></td></tr>)}</tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle eyebrow="Submission structure" title="Required proposal volumes" />
+        <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact">
+            <thead><tr><th>Volume</th><th>Title</th><th>Contents</th><th>Evidence state</th></tr></thead>
+            <tbody>
+              {(facts.submissionStructure || []).map((row) => (
+                <tr key={row.volume}>
+                  <td><strong>Volume {row.volume}</strong></td>
+                  <td>{row.title}</td>
+                  <td>{row.contents.join(" · ")}</td>
+                  <td><Badge>{row.evidenceState}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
 
       <section className="p55-panel">
         <SectionTitle eyebrow="Evidence states" title="Interpretation rule" />
-        <div className="p55-grid p55-grid--3">
-          {[
-            ["Source fact", "Direct statement / quantity / requirement from current 0550 project evidence.", "good"],
-            ["Derived engineering rule", "Calculated from source-bound engineering drivers; derivation remains auditable.", "neutral"],
-            ["Assumption / TBC", "Used so the budget remains complete, but closure action must stay visible.", "warn"],
-          ].map(([title, text, tone]) => (
-            <div className="p55-evidence-card" key={title}>
-              <Badge tone={tone}>{title}</Badge>
-              <p>{text}</p>
-            </div>
-          ))}
+        <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact">
+            <thead><tr><th>State</th><th>Meaning</th></tr></thead>
+            <tbody>
+              {Object.entries(facts.evidenceStates || {}).map(([state, meaning]) => (
+                <tr key={state}><td><Badge>{state}</Badge></td><td>{meaning}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle eyebrow="Source priority" title="Which evidence governs first" />
+        <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact">
+            <thead><tr><th>Priority</th><th>Evidence class</th></tr></thead>
+            <tbody>
+              {(facts.sourcePriority || []).map((item, i) => (
+                <tr key={item}><td><strong>{i+1}</strong></td><td>{item}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle eyebrow="Source register" title="Controlled source inventory" />
+        <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact">
+            <thead><tr><th>ID</th><th>Source</th><th>Use</th><th>State</th></tr></thead>
+            <tbody>
+              {SOURCE_REGISTER.map((source) => (
+                <tr key={source.id}>
+                  <td><strong>{source.id}</strong></td>
+                  <td>{source.name}</td>
+                  <td>{source.use}</td>
+                  <td><Badge>{source.state}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
     </div>
