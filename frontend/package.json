@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npm run validate:pj0550-data && webpack --mode production",
-    "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs"
+    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && webpack --mode production",
+    "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs",
+    "validate:pj0553-isolation": "node scripts/validate-pj2608-0553-isolation.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
