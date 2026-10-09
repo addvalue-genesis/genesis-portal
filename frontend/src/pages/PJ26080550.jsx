@@ -282,6 +282,25 @@ function ArchitectureView() {
       </div>
 
       <section className="p55-panel">
+        <SectionTitle eyebrow="Evolution policy" title="Preserve knowledge — not necessarily implementation" />
+        <div className="p55-grid p55-grid--2">
+          <div className="p55-evidence-card">
+            <div className="p55-eyebrow">Allowed architectural change</div>
+            <ul className="p55-rule-list">
+              {manifest.evolutionPolicy.allowedChanges.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </div>
+          <div className="p55-evidence-card">
+            <div className="p55-eyebrow">Required controls</div>
+            <ul className="p55-rule-list">
+              {manifest.evolutionPolicy.requiredControls.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </div>
+        </div>
+        <p className="p55-note"><strong>Principle:</strong> {manifest.evolutionPolicy.principle}</p>
+      </section>
+
+      <section className="p55-panel">
         <SectionTitle
           eyebrow="Module registry"
           title="What we have, what it does, and why"
@@ -292,6 +311,7 @@ function ArchitectureView() {
             <thead>
               <tr>
                 <th>Module</th>
+                <th>Lifecycle</th>
                 <th>Layer</th>
                 <th>Purpose</th>
                 <th>Why</th>
@@ -304,6 +324,7 @@ function ArchitectureView() {
               {MODULE_REGISTRY.map((module) => (
                 <tr key={module.id}>
                   <td><strong>{module.name}</strong><small>{module.id}</small></td>
+                  <td><Badge>{module.lifecycleStatus}</Badge></td>
                   <td><Badge tone="neutral">{module.layer}</Badge></td>
                   <td>{module.purpose}</td>
                   <td>{module.why}</td>
@@ -319,9 +340,9 @@ function ArchitectureView() {
 
       <section className="p55-panel">
         <SectionTitle
-          eyebrow="Refactor protection"
-          title="Invariants that must survive UI/code changes"
-          text="A refactor is not successful if the build passes but traceability, source detail, decision history or reviewability disappears."
+          eyebrow="Refactor / evolution governance"
+          title="What may change, what must be migrated, and why"
+          text="Architecture is allowed to evolve. A change is controlled when the rationale, impact, migration/replacement decision and historical evidence are explicit."
         />
         <div className="p55-groups">
           {MODULE_REGISTRY.map((module) => (
