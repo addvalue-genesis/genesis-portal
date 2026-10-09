@@ -1,12 +1,13 @@
 // PJ2608-0550 Smart-Code Module Registry
 // Self-describing registry: what each module is, why it exists, what it consumes,
-// what it produces, and what must remain true during refactor.
+// what it produces, its lifecycle state, and what must be preserved or deliberately migrated during refactor.
 
 export const MODULE_REGISTRY = [
   {
     id: "MOD-PROJECT-SHELL",
     name: "PJ2608-0550 TPP Project Shell",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "ACTIVE_EVOLVING",
     purpose: "Provide the project UI/control spine for management, engineering, execution, budget, risk and evidence.",
     why: "Keep all project decisions and views in one controlled workspace without mixing customer output and internal analysis.",
     inputs: ["Controlled project dataset", "Knowledge-kernel bindings", "Commercial sources"],
@@ -14,7 +15,7 @@ export const MODULE_REGISTRY = [
     implementation: ["frontend/src/pages/PJ26080550.jsx"],
     invariants: [
       "Do not merge frozen customer submission with evolving working state.",
-      "Do not remove traceability/detail modules during UI simplification.",
+      "Traceability/detail capability may be redesigned or replaced, but any removal requires an explicit migration/replacement decision.",
       "Unknown/TBC must never silently become zero."
     ]
   },
@@ -22,6 +23,7 @@ export const MODULE_REGISTRY = [
     id: "MOD-DATA-REPOSITORY",
     name: "Controlled Data Repository",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "ACTIVE",
     purpose: "Load the active project dataset behind a stable repository interface.",
     why: "Allow JSON today and SQL/AGERP later without forcing the UI to know storage details.",
     inputs: ["Controlled snapshot adapter"],
@@ -32,24 +34,26 @@ export const MODULE_REGISTRY = [
     ],
     invariants: [
       "UI imports through facade/repository, not directly from arbitrary files.",
-      "Storage replacement must preserve schema and evidence semantics."
+      "Storage/schema may evolve; evidence meaning and migration of authoritative data must be explicit."
     ]
   },
   {
     id: "MOD-DATA-FACADE",
     name: "Project Data Facade",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "ACTIVE",
     purpose: "Expose stable project objects to UI modules.",
     why: "Prevent UI regressions when storage/schema evolves.",
     inputs: ["Repository dataset", "Knowledge kernel binding"],
     outputs: ["SYSTEMS", "BUDGETARY_ESTIMATE", "BUDGETARY_SUBMISSION", "COMMERCIAL_SOURCES", "REQUIREMENT_COMPLETENESS"],
     implementation: ["frontend/src/project0550/data.js"],
-    invariants: ["Existing exports should remain backward-compatible unless a controlled migration is made."]
+    invariants: ["Exports may change when architecture improves, provided dependent modules receive an explicit controlled migration."]
   },
   {
     id: "MOD-KNOWLEDGE-COMMON",
     name: "GENESS Knowledge Kernels",
     layer: "COMMON",
+    lifecycleStatus: "ACTIVE_EVOLVING",
     purpose: "Provide reusable multidisciplinary laws, equations and domain knowledge.",
     why: "Avoid rewriting RF, acoustics, optics, power, reliability and business logic project by project.",
     inputs: ["Scientific/engineering/business rules"],
@@ -64,6 +68,7 @@ export const MODULE_REGISTRY = [
     id: "MOD-KNOWLEDGE-BINDING",
     name: "0550 Knowledge Kernel Binding",
     layer: "GENERIC_TO_PARTICULAR",
+    lifecycleStatus: "ACTIVE_EVOLVING",
     purpose: "Map each of the 19 project systems to applicable COMMON engineering kernels.",
     why: "Separate reusable knowledge from project-specific applicability.",
     inputs: ["19-system list", "COMMON knowledge kernels"],
@@ -75,13 +80,14 @@ export const MODULE_REGISTRY = [
     id: "MOD-REQ-COMPLETENESS",
     name: "Requirement Completeness Control",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "EXPERIMENTAL_TO_ACTIVE",
     purpose: "Detect missing requirement threads and unsupported solution claims.",
     why: "A priced system is not necessarily a complete system.",
     inputs: ["RFQ/MR/SPE/BOD/TC requirements", "System model", "Commercial/engineering outputs"],
     outputs: ["MAPPED / ORPHAN / OPEN / CONFLICT / UNSUPPORTED states", "Fail-closed release rules"],
     implementation: ["requirementCompleteness in controlled project dataset"],
     invariants: [
-      "No requirement may disappear.",
+      "A requirement may be superseded, merged or removed only with traceable rationale and source/revision impact.",
       "No solution element may become a project fact without traceable evidence."
     ]
   },
@@ -89,6 +95,7 @@ export const MODULE_REGISTRY = [
     id: "MOD-COMMERCIAL-SOURCE",
     name: "Commercial Source Registry",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "ACTIVE_EVOLVING",
     purpose: "Preserve vendor quotation truth including itemization and commercial conditions.",
     why: "Price, payment, delivery, warranty, validity, tax and logistics terms can all change project cost and delivery.",
     inputs: ["Original vendor quotations", "Commercial clarifications"],
@@ -103,6 +110,7 @@ export const MODULE_REGISTRY = [
     id: "MOD-BUDGET-WORKING",
     name: "7.1 Working Budget / Internal Derivation",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "ACTIVE_EVOLVING",
     purpose: "Maintain evolving internal A/B/C cost and price derivation.",
     why: "Management needs a controllable working model before final vendor and engineering closure.",
     inputs: ["19-system scope", "Commercial sources", "Engineering quantities", "Service/logistics/resource assumptions"],
@@ -118,6 +126,7 @@ export const MODULE_REGISTRY = [
     id: "MOD-BUDGET-FROZEN",
     name: "Budgetary Submission Snapshot",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "FROZEN_HISTORY",
     purpose: "Preserve exactly what was issued externally at a point in time.",
     why: "Historical commercial truth must not be rewritten by later working changes.",
     inputs: ["Authorized budgetary issue"],
@@ -129,6 +138,7 @@ export const MODULE_REGISTRY = [
     id: "MOD-RELEASED-SELL",
     name: "Released Customer Output",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "CONTROLLED_HOLD",
     purpose: "Represent formally authorized final customer pricing only.",
     why: "Budgetary/preliminary output must not be mistaken for final contractual release.",
     inputs: ["Closed engineering/commercial gates", "Release authorization"],
@@ -140,6 +150,7 @@ export const MODULE_REGISTRY = [
     id: "MOD-EXECUTION",
     name: "Execution / Resource / Logistics Model",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "ACTIVE_EVOLVING",
     purpose: "Translate technical scope into campaigns, manpower, FAT/SAT, logistics and deployment activities.",
     why: "Equipment price alone cannot represent project delivery cost.",
     inputs: ["System lifecycle", "Resource rates", "Logistics gates", "Scope boundary"],
@@ -151,6 +162,7 @@ export const MODULE_REGISTRY = [
     id: "MOD-RISK",
     name: "Risk & Recovery Control",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "ACTIVE_EVOLVING",
     purpose: "Model cost exposure separately from commercial recovery.",
     why: "Risk exposure is not automatically a base-price addition.",
     inputs: ["Risk scenarios", "Contract entitlement", "Insurance/mitigation"],
@@ -162,6 +174,7 @@ export const MODULE_REGISTRY = [
     id: "MOD-SOURCE-REGISTER",
     name: "Source Register / Evidence",
     layer: "PARTICULAR_PROJECT",
+    lifecycleStatus: "ACTIVE",
     purpose: "Record authoritative project and vendor sources used by the model.",
     why: "Every important requirement, quantity, term and decision must be traceable.",
     inputs: ["RFQ/MR/SPE/BOD/TC/vendor/source artifacts"],
@@ -174,3 +187,35 @@ export const MODULE_REGISTRY = [
 export function getModuleById(id) {
   return MODULE_REGISTRY.find((module) => module.id === id) || null;
 }
+
+
+export const MODULE_LIFECYCLE_STATES = [
+  "EXPERIMENTAL",
+  "EXPERIMENTAL_TO_ACTIVE",
+  "ACTIVE",
+  "ACTIVE_EVOLVING",
+  "CONTROLLED_HOLD",
+  "FROZEN_HISTORY",
+  "SUPERSEDED",
+  "DEPRECATED",
+  "REMOVE_PLANNED"
+];
+
+export const REFACTOR_EVOLUTION_POLICY = {
+  principle: "Preserve knowledge, evidence and decision history; allow implementation and architecture to evolve.",
+  allowedChanges: [
+    "Replace or redesign UI/UX",
+    "Merge or split modules",
+    "Change data model or storage",
+    "Replace algorithms and equations when a better controlled method is adopted",
+    "Deprecate or remove obsolete capabilities",
+    "Introduce experimental modules and promote them after validation"
+  ],
+  requiredControls: [
+    "State why the change is needed",
+    "Assess impact on data, evidence, calculations, interfaces and outputs",
+    "Define migration/replacement for affected useful capability",
+    "Retain historical decisions/source truth where needed for audit",
+    "Re-run validation/build and relevant regression checks"
+  ]
+};
