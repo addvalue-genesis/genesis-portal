@@ -107,6 +107,22 @@ export const MODULE_REGISTRY = [
     ]
   },
   {
+    id: "MOD-SERVICE-EQUATION",
+    name: "0550 Service / Cost Equation Model",
+    layer: "GENERIC_TO_PARTICULAR",
+    lifecycleStatus: "ACTIVE_EVOLVING",
+    purpose: "Recover and bind the bottom-up B/C workload, event, trip and service-cost methodology to current 0550 budget controls.",
+    why: "A parent allowance is not auditable unless management can see the work objects, drivers, equations, rates/cash-cost basis, source model and reconciliation state behind it.",
+    inputs: ["19-system work objects", "Document lifecycle", "Event/campaign plan", "Trip/cash costs", "Role/rate basis", "OEM/vendor evidence"],
+    outputs: ["Man-hour/day derivation", "Service cost basis", "Training/FAT/SAT logic", "Allowance-vs-bottom-up reconciliation state"],
+    implementation: ["frontend/src/project0550/serviceEquationModel.js", "Budget → Part B/C drill-down"],
+    invariants: [
+      "Do not replace a recovered bottom-up model with a generic list of activities.",
+      "Do not fabricate sub-line allocation merely to reconcile to a parent allowance.",
+      "Show source model, drivers, formula, current total meaning and open inputs in table form for review."
+    ]
+  },
+  {
     id: "MOD-BUDGET-WORKING",
     name: "7.1 Working Budget / Internal Derivation",
     layer: "PARTICULAR_PROJECT",
