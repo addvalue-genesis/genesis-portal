@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import {
+  ARCHITECTURE_MANIFEST,
   BUDGETARY_ESTIMATE,
   BUDGETARY_SUBMISSION,
   CNEEC_BREAKDOWN,
@@ -11,6 +12,7 @@ import {
   ENGINEERING_LAW_LIBRARY,
   FIRST_PRINCIPLES_CHAIN,
   LOGISTICS_GATES,
+  MODULE_REGISTRY,
   KNOWLEDGE_KERNEL_DOMAINS,
   OPTIONS,
   PROJECT_0550,
@@ -25,6 +27,7 @@ import "../project0550/project0550.css";
 
 const TABS = [
   { id: "overview", label: "Executive" },
+  { id: "architecture", label: "Architecture" },
   { id: "systems", label: "19 Systems" },
   { id: "engineering", label: "First Principles" },
   { id: "execution", label: "Execution" },
@@ -239,6 +242,103 @@ function Overview() {
               </div>
               <Badge>{state}</Badge>
             </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function ArchitectureView() {
+  const manifest = ARCHITECTURE_MANIFEST;
+
+  return (
+    <div className="p55-stack">
+      <SectionTitle
+        eyebrow="Smart Code / Self-Describing Architecture"
+        title={manifest.title}
+        text={manifest.background}
+      />
+
+      <section className="p55-callout">
+        <strong>{manifest.governingMethod}</strong>
+        <p>{manifest.architecture}</p>
+      </section>
+
+      <div className="p55-grid p55-grid--2">
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Why this code exists" title="Smart-code principles" />
+          <ul className="p55-rule-list">
+            {manifest.smartCodePrinciples.map((rule) => <li key={rule}>{rule}</li>)}
+          </ul>
+        </section>
+
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Review contract" title="Questions every module must answer" />
+          <ul className="p55-rule-list">
+            {manifest.reviewQuestions.map((rule) => <li key={rule}>{rule}</li>)}
+          </ul>
+        </section>
+      </div>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Module registry"
+          title="What we have, what it does, and why"
+          text="This registry is part of the codebase so a new engineer or external AI reviewer can understand the architecture without relying on chat history."
+        />
+        <div className="p55-table-wrap">
+          <table className="p55-table">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>Layer</th>
+                <th>Purpose</th>
+                <th>Why</th>
+                <th>Inputs</th>
+                <th>Outputs</th>
+                <th>Implementation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MODULE_REGISTRY.map((module) => (
+                <tr key={module.id}>
+                  <td><strong>{module.name}</strong><small>{module.id}</small></td>
+                  <td><Badge tone="neutral">{module.layer}</Badge></td>
+                  <td>{module.purpose}</td>
+                  <td>{module.why}</td>
+                  <td>{module.inputs.join(" · ")}</td>
+                  <td>{module.outputs.join(" · ")}</td>
+                  <td>{module.implementation.join(" · ")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Refactor protection"
+          title="Invariants that must survive UI/code changes"
+          text="A refactor is not successful if the build passes but traceability, source detail, decision history or reviewability disappears."
+        />
+        <div className="p55-groups">
+          {MODULE_REGISTRY.map((module) => (
+            <section className="p55-group" key={module.id}>
+              <div className="p55-group__head">
+                <div>
+                  <strong>{module.name}</strong>
+                  <span>{module.id}</span>
+                </div>
+                <Badge tone="neutral">{module.invariants.length} invariants</Badge>
+              </div>
+              <div className="p55-system__detail">
+                <ul className="p55-rule-list">
+                  {module.invariants.map((rule) => <li key={rule}>{rule}</li>)}
+                </ul>
+              </div>
+            </section>
           ))}
         </div>
       </section>
@@ -1482,6 +1582,7 @@ export function PJ26080550({ lang = "th" }) {
 
       <main className="p55-main">
         {activeTab === "overview" ? <Overview /> : null}
+        {activeTab === "architecture" ? <ArchitectureView /> : null}
         {activeTab === "systems" ? <SystemsView /> : null}
         {activeTab === "engineering" ? <EngineeringView /> : null}
         {activeTab === "execution" ? <ExecutionView /> : null}
