@@ -879,6 +879,8 @@ function BudgetView() {
   const [part, setPart] = useState("ALL");
   const [budgetMode, setBudgetMode] = useState("budgetary");
   const [expandedBudgetSystems, setExpandedBudgetSystems] = useState(() => new Set());
+  const [expandedBudgetB, setExpandedBudgetB] = useState(() => new Set());
+  const [expandedBudgetC, setExpandedBudgetC] = useState(() => new Set());
 
   const rows = CNEEC_BREAKDOWN.filter((row) => part === "ALL" || row.code.startsWith(part));
   const paga = PROJECT_0550.selectedPaga;
@@ -1193,20 +1195,79 @@ function BudgetView() {
           </section>
 
           <section className="p55-panel">
-            <SectionTitle eyebrow="Part B internal derivation" title="Service / logistics / specialist working basis" />
+            <SectionTitle
+              eyebrow="Part B internal derivation"
+              title="Service / logistics / specialist working basis"
+              text="Expand B1-B9 to see the activity/work-package composition behind each direct allowance. Detailed cost allocation remains TBC until resource, vendor, travel, permit and logistics evidence closes."
+              action={
+                <div className="p55-segmented">
+                  <button type="button" onClick={() => setExpandedBudgetB(new Set(budget.partB.map((row) => row.code)))}>Expand all</button>
+                  <button type="button" onClick={() => setExpandedBudgetB(new Set())}>Collapse all</button>
+                </div>
+              }
+            />
             <div className="p55-table-wrap">
               <table className="p55-table p55-table--budget">
-                <thead><tr><th>Code</th><th>Description</th><th>Class</th><th className="is-number">Direct THB</th><th>Control note</th></tr></thead>
+                <thead><tr><th></th><th>Code</th><th>Description</th><th>Class</th><th className="is-number">Direct THB</th><th>Detail state</th><th>Control note</th></tr></thead>
                 <tbody>
-                  {budget.partB.map((row) => (
-                    <tr key={row.code}>
-                      <td><strong>{row.code}</strong></td>
-                      <td>{row.description}</td>
-                      <td><Badge>{row.pricingClass}</Badge></td>
-                      <td className="is-number">{money(row.directThb, "THB")}</td>
-                      <td>{row.note}</td>
-                    </tr>
-                  ))}
+                  {budget.partB.map((row) => {
+                    const isOpen = expandedBudgetB.has(row.code);
+                    return (
+                      <React.Fragment key={row.code}>
+                        <tr>
+                          <td>
+                            <button
+                              className="p55-row-toggle"
+                              type="button"
+                              onClick={() => setExpandedBudgetB((current) => {
+                                const next = new Set(current);
+                                if (next.has(row.code)) next.delete(row.code);
+                                else next.add(row.code);
+                                return next;
+                              })}
+                            >
+                              {isOpen ? "−" : "+"}
+                            </button>
+                          </td>
+                          <td><strong>{row.code}</strong></td>
+                          <td>{row.description}</td>
+                          <td><Badge>{row.pricingClass}</Badge></td>
+                          <td className="is-number">{money(row.directThb, "THB")}</td>
+                          <td><Badge>{row.detailState || "WORKING"}</Badge></td>
+                          <td>{row.note}</td>
+                        </tr>
+                        {isOpen ? (
+                          <tr className="p55-budget-detail-row">
+                            <td colSpan="7">
+                              <div className="p55-budget-detail">
+                                <div className="p55-budget-detail__head">
+                                  <strong>{row.code} — activity / work-package breakdown</strong>
+                                  <span>{(row.details || []).length} controlled detail items</span>
+                                </div>
+                                <div className="p55-table-wrap">
+                                  <table className="p55-table p55-table--compact p55-table--scope">
+                                    <thead><tr><th>Activity / cost component</th><th>Category</th><th>Source / basis</th><th className="is-number">Allocated THB</th><th>State</th></tr></thead>
+                                    <tbody>
+                                      {(row.details || []).map((detail) => (
+                                        <tr key={detail.id}>
+                                          <td><strong>{detail.item}</strong><small>{detail.id}</small></td>
+                                          <td>{detail.category}</td>
+                                          <td>{detail.source}</td>
+                                          <td className="is-number">{Number.isFinite(detail.directThb) ? money(detail.directThb, "THB") : "TBC"}</td>
+                                          <td><Badge>{detail.state}</Badge></td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <p className="p55-note">The parent B-line allowance remains the current control total. Sub-line THB allocation stays TBC until a defensible bottom-up basis is available; it is not force-allocated to match the parent total.</p>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : null}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -1216,27 +1277,81 @@ function BudgetView() {
             <SectionTitle
               eyebrow="Part C internal derivation"
               title="Options / long-term spares working basis"
-              text="C1 remains outside the current ADDVALUE base boundary; C2 and C3 are separate budgetary spare allowances and must not be duplicated in Part A or B5."
+              text="Expand C1-C3 to see the scope boundary or spare-list composition. C2/C3 remain separate from Part A and B5; detailed OEM quantities/prices replace the allowances when available."
+              action={
+                <div className="p55-segmented">
+                  <button type="button" onClick={() => setExpandedBudgetC(new Set(budget.partC.map((row) => row.code)))}>Expand all</button>
+                  <button type="button" onClick={() => setExpandedBudgetC(new Set())}>Collapse all</button>
+                </div>
+              }
             />
             <div className="p55-table-wrap">
               <table className="p55-table p55-table--budget">
-                <thead><tr><th>Code</th><th>Description</th><th className="is-number">Direct THB</th><th>State</th><th>Boundary / control</th></tr></thead>
+                <thead><tr><th></th><th>Code</th><th>Description</th><th className="is-number">Direct THB</th><th>State</th><th>Detail state</th><th>Boundary / control</th></tr></thead>
                 <tbody>
-                  {budget.partC.map((row) => (
-                    <tr key={row.code}>
-                      <td><strong>{row.code}</strong></td>
-                      <td>{row.description}</td>
-                      <td className="is-number">{row.directThb === null ? "—" : money(row.directThb, "THB")}</td>
-                      <td><Badge>{row.state}</Badge></td>
-                      <td>
-                        {row.code === "C1"
-                          ? "Physical installation construction / civil / pulling-blowing / erection remains CNEEC working boundary unless scope changes."
-                          : row.code === "C2"
-                            ? "10-year capital spares; final OEM-recommended list and quantities to replace the allowance."
-                            : "2-year normal operation spares; final OEM-recommended list and quantities to replace the allowance."}
-                      </td>
-                    </tr>
-                  ))}
+                  {budget.partC.map((row) => {
+                    const isOpen = expandedBudgetC.has(row.code);
+                    const boundary = row.code === "C1"
+                      ? "Physical installation construction / civil / pulling-blowing / erection remains CNEEC working boundary unless scope changes."
+                      : row.code === "C2"
+                        ? "10-year capital spares; final OEM-recommended list and quantities to replace the allowance."
+                        : "2-year normal operation spares; final OEM-recommended list and quantities to replace the allowance.";
+                    return (
+                      <React.Fragment key={row.code}>
+                        <tr>
+                          <td>
+                            <button
+                              className="p55-row-toggle"
+                              type="button"
+                              onClick={() => setExpandedBudgetC((current) => {
+                                const next = new Set(current);
+                                if (next.has(row.code)) next.delete(row.code);
+                                else next.add(row.code);
+                                return next;
+                              })}
+                            >
+                              {isOpen ? "−" : "+"}
+                            </button>
+                          </td>
+                          <td><strong>{row.code}</strong></td>
+                          <td>{row.description}</td>
+                          <td className="is-number">{row.directThb === null ? "—" : money(row.directThb, "THB")}</td>
+                          <td><Badge>{row.state}</Badge></td>
+                          <td><Badge>{row.detailState || "WORKING"}</Badge></td>
+                          <td>{boundary}</td>
+                        </tr>
+                        {isOpen ? (
+                          <tr className="p55-budget-detail-row">
+                            <td colSpan="7">
+                              <div className="p55-budget-detail">
+                                <div className="p55-budget-detail__head">
+                                  <strong>{row.code} — scope / option breakdown</strong>
+                                  <span>{(row.details || []).length} controlled detail items</span>
+                                </div>
+                                <div className="p55-table-wrap">
+                                  <table className="p55-table p55-table--compact p55-table--scope">
+                                    <thead><tr><th>Scope / spare component</th><th>Category</th><th>Source / basis</th><th className="is-number">Allocated THB</th><th>State</th></tr></thead>
+                                    <tbody>
+                                      {(row.details || []).map((detail) => (
+                                        <tr key={detail.id}>
+                                          <td><strong>{detail.item}</strong><small>{detail.id}</small></td>
+                                          <td>{detail.category}</td>
+                                          <td>{detail.source}</td>
+                                          <td className="is-number">{Number.isFinite(detail.directThb) ? money(detail.directThb, "THB") : "TBC"}</td>
+                                          <td><Badge>{detail.state}</Badge></td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <p className="p55-note">{row.code === "C1" ? "C1 detail is a scope-boundary map, not a priced ADDVALUE package under the current basis." : "C2/C3 sub-line quantities and prices remain TBC until OEM-recommended spare lists are normalized system by system; no arbitrary allocation is made."}</p>
+                              </div>
+                            </td>
+                          </tr>
+                        ) : null}
+                      </React.Fragment>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
