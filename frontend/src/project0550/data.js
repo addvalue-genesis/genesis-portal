@@ -41,3 +41,6 @@ export { MODULE_REGISTRY } from "./moduleRegistry";
 export { SERVICE_EQUATION_SOURCE, SERVICE_EQUATIONS, SERVICE_LINE_DERIVATION, getServiceLineDerivation } from "./serviceEquationModel";
 
 export { B1_COST_LINEAGE } from "./b1CostLineage";
+
+export { PROJECT_0550_REGULATORY_BINDING } from "./regulatoryBinding";
+export { MYANMAR_REGULATORY_KNOWLEDGE } from "../knowledge-kernels/regulatoryMyanmar";
