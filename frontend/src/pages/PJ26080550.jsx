@@ -4,6 +4,7 @@ import {
   BUDGETARY_SUBMISSION,
   CNEEC_BREAKDOWN,
   COMMERCIAL_POLICY,
+  COMMERCIAL_SOURCES,
   CONTROL_RULES,
   CORE_TEAM,
   EXECUTION_CAMPAIGNS,
@@ -909,7 +910,90 @@ function BudgetView() {
                                   <span>{(row.components || []).length} scope items · {(row.pricingTrace || []).length} price/source trace rows</span>
                                 </div>
 
-                                <div className="p55-eyebrow" style={{marginBottom:8}}>Cost / price trace</div>
+                                {(row.commercialSourceIds || []).map((sourceId) => {
+                                  const source = COMMERCIAL_SOURCES.find((item) => item.id === sourceId);
+                                  if (!source) return null;
+                                  const terms = source.commercialTerms || {};
+                                  return (
+                                    <section className="p55-source-detail" key={source.id}>
+                                      <div className="p55-source-detail__head">
+                                        <div>
+                                          <div className="p55-eyebrow">Source quotation / evidence</div>
+                                          <h4>{source.vendor} — {source.offerNo}</h4>
+                                          <p>{source.project}</p>
+                                        </div>
+                                        <Badge tone="good">{source.controlState}</Badge>
+                                      </div>
+
+                                      <div className="p55-source-facts">
+                                        <div><span>Offer date</span><strong>{source.offerDate}</strong></div>
+                                        <div><span>Inquiry</span><strong>{source.inquiryNo}</strong></div>
+                                        <div><span>Currency</span><strong>{source.currency}</strong></div>
+                                        <div><span>Gross total</span><strong>{money(source.grossTotal, source.currency)}</strong></div>
+                                        <div><span>Discount</span><strong>{source.discountPercent}% / {money(source.discountAmount, source.currency)}</strong></div>
+                                        <div><span>Final price</span><strong>{money(source.finalPrice, source.currency)}</strong></div>
+                                      </div>
+
+                                      <div className="p55-grid p55-grid--2">
+                                        <div className="p55-evidence-card">
+                                          <div className="p55-eyebrow">Commercial conditions</div>
+                                          <dl className="p55-source-terms">
+                                            <div><dt>Validity</dt><dd>{terms.validity || "TBC"}</dd></div>
+                                            <div><dt>Delivery</dt><dd>{terms.deliveryTerm || "TBC"}</dd></div>
+                                            <div><dt>Payment</dt><dd>{terms.paymentTerm || "TBC"}</dd></div>
+                                            <div><dt>Delivery time</dt><dd>{terms.deliveryTime || "TBC"}</dd></div>
+                                            <div><dt>Warranty</dt><dd>{terms.warranty || "TBC"}</dd></div>
+                                            <div><dt>Net weight</dt><dd>{terms.netWeight || "TBC"}</dd></div>
+                                            <div><dt>VAT / tax</dt><dd>{terms.vat || "TBC"}</dd></div>
+                                            <div><dt>Partial shipment</dt><dd>{terms.partialShipment || "TBC"}</dd></div>
+                                          </dl>
+                                        </div>
+                                        <div className="p55-evidence-card">
+                                          <div className="p55-eyebrow">Contract / offer controls</div>
+                                          <ul className="p55-rule-list">
+                                            {(source.scopeAndConditions || []).map((item) => <li key={item}>{item}</li>)}
+                                          </ul>
+                                        </div>
+                                      </div>
+
+                                      <div className="p55-eyebrow" style={{marginTop:16, marginBottom:8}}>Quoted item detail</div>
+                                      <div className="p55-table-wrap">
+                                        <table className="p55-table p55-table--compact">
+                                          <thead>
+                                            <tr><th>Code</th><th>Description</th><th className="is-number">Qty</th><th>Unit</th><th className="is-number">Unit price</th><th className="is-number">Total</th><th>State</th></tr>
+                                          </thead>
+                                          <tbody>
+                                            {(source.priceGroups || []).map((line) => (
+                                              <tr key={line.code}>
+                                                <td><strong>{line.code}</strong></td>
+                                                <td>{line.description}</td>
+                                                <td className="is-number">{line.qty}</td>
+                                                <td>{line.unit}</td>
+                                                <td className="is-number">{money(line.unitPrice, source.currency)}</td>
+                                                <td className="is-number">{money(line.total, source.currency)}</td>
+                                                <td><Badge>{line.state}</Badge></td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+
+                                      {(source.activationDetail || []).length ? (
+                                        <div className="p55-evidence-card" style={{marginTop:12}}>
+                                          <div className="p55-eyebrow">Activation / software detail included in quoted bundle</div>
+                                          <p>{source.activationDetail.join(" · ")}</p>
+                                        </div>
+                                      ) : null}
+
+                                      <div className="p55-evidence-card" style={{marginTop:12}}>
+                                        <div className="p55-eyebrow">Source location</div>
+                                        <p><strong>{source.sourceLocation?.fileName}</strong> · Drive file ID {source.sourceLocation?.driveFileId}</p>
+                                      </div>
+                                    </section>
+                                  );
+                                })}
+
+                                <div className="p55-eyebrow" style={{marginTop:18, marginBottom:8}}>Internal budget bridge</div>
                                 <div className="p55-table-wrap">
                                   <table className="p55-table p55-table--compact">
                                     <thead>
@@ -917,9 +1001,8 @@ function BudgetView() {
                                         <th>Cost line</th>
                                         <th className="is-number">Qty</th>
                                         <th>Unit</th>
-                                        <th className="is-number">Unit price</th>
+                                        <th className="is-number">Value</th>
                                         <th>Curr.</th>
-                                        <th className="is-number">Extended</th>
                                         <th>Role</th>
                                         <th>Source / basis</th>
                                         <th>State</th>
@@ -931,13 +1014,8 @@ function BudgetView() {
                                           <td><strong>{line.description}</strong>{line.id ? <small>{line.id}</small> : null}</td>
                                           <td className="is-number">{line.qty ?? "—"}</td>
                                           <td>{line.unit || "—"}</td>
-                                          <td className="is-number">
-                                            {Number.isFinite(line.unitPrice) ? money(line.unitPrice, line.currency || "THB") : "TBC"}
-                                          </td>
+                                          <td className="is-number">{Number.isFinite(line.extended) ? money(line.extended, line.currency || "THB") : "TBC"}</td>
                                           <td>{line.currency || "—"}</td>
-                                          <td className="is-number">
-                                            {Number.isFinite(line.extended) ? money(line.extended, line.currency || "THB") : "TBC"}
-                                          </td>
                                           <td><Badge tone={String(line.role).includes("ADDITIVE") && !String(line.role).includes("NON_ADDITIVE") ? "good" : "neutral"}>{line.role}</Badge></td>
                                           <td>{line.source}</td>
                                           <td><Badge>{line.state}</Badge></td>
@@ -946,6 +1024,13 @@ function BudgetView() {
                                     </tbody>
                                   </table>
                                 </div>
+                                {row.budgetBridge ? (
+                                  <div className="p55-callout p55-callout--warning" style={{marginTop:12}}>
+                                    <strong>Why the internal allowance is not the same as the vendor quotation</strong>
+                                    <p>{row.budgetBridge.explanation}</p>
+                                    <p><strong>Replacement rule:</strong> {row.budgetBridge.replacementRule}</p>
+                                  </div>
+                                ) : null}
                                 <p className="p55-note"><strong>Price trace rule:</strong> {row.priceTraceRule}</p>
 
                                 <div className="p55-eyebrow" style={{marginTop:18, marginBottom:8}}>Scope composition / completeness</div>
