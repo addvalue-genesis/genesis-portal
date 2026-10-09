@@ -1,3 +1,4 @@
+import { ProjectWorkspaceShell } from "../common/ui/ProjectWorkspaceShell";
 import React, { useMemo, useState } from "react";
 import {
   ARCHITECTURE_MANIFEST,
@@ -2056,57 +2057,23 @@ function DocumentsView() {
 }
 
 export function PJ26080550({ lang = "th" }) {
-  const [activeTab, setActiveTab] = useState("overview");
-
-  return (
-    <div className="p55">
-      <header className="p55-hero">
-        <div className="p55-hero__top">
-          <div>
-            <div className="p55-kicker">GENESS / TPP · INTERNAL PROJECT CONTROL</div>
-            <h1>{PROJECT_0550.id} <span>{PROJECT_0550.shortName}</span></h1>
-            <p>{PROJECT_0550.title}</p>
-          </div>
-          <div className="p55-hero__status">
-            <Badge tone="warn">{PROJECT_0550.state}</Badge>
-            <span>Price date {PROJECT_0550.priceDate}</span>
-          </div>
-        </div>
-
-        <div className="p55-hero__method">
-          <span>METHOD</span>
-          <strong>{PROJECT_0550.method}</strong>
-        </div>
-
-        <nav className="p55-tabs" aria-label="PJ2608-0550 sections">
-          {TABS.map((tab) => (
-            <button
-              key={tab.id}
-              type="button"
-              className={activeTab === tab.id ? "is-active" : ""}
-              onClick={() => setActiveTab(tab.id)}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </nav>
-      </header>
-
-      <main className="p55-main">
-        {activeTab === "overview" ? <Overview /> : null}
-        {activeTab === "architecture" ? <ArchitectureView /> : null}
-        {activeTab === "systems" ? <SystemsView /> : null}
-        {activeTab === "engineering" ? <EngineeringView /> : null}
-        {activeTab === "execution" ? <ExecutionView /> : null}
-        {activeTab === "budget" ? <BudgetView /> : null}
-        {activeTab === "risk" ? <RiskView /> : null}
-        {activeTab === "documents" ? <DocumentsView /> : null}
-      </main>
-
-      <footer className="p55-footer">
-        <span>{PROJECT_0550.id} · Internal working control</span>
-        <span>{lang === "th" ? "ข้อมูลที่เป็น TBC/OPEN ต้องไม่ถูกตีความเป็นศูนย์" : "TBC / OPEN inputs must never be interpreted as zero."}</span>
-      </footer>
-    </div>
-  );
+  const project = {
+    id: PROJECT_0550.id,
+    shortName: PROJECT_0550.shortName,
+    title: PROJECT_0550.title,
+    state: PROJECT_0550.state,
+    statusDetail: "Price date " + PROJECT_0550.priceDate,
+    method: PROJECT_0550.method
+  };
+  const views = {
+    overview: <Overview />,
+    architecture: <ArchitectureView />,
+    systems: <SystemsView />,
+    engineering: <EngineeringView />,
+    execution: <ExecutionView />,
+    budget: <BudgetView />,
+    risk: <RiskView />,
+    documents: <DocumentsView />
+  };
+  return <ProjectWorkspaceShell project={project} lang={lang} tabs={TABS} views={views} />;
 }
