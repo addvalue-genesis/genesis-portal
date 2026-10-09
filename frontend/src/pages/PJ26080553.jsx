@@ -4,22 +4,17 @@ import { PROJECT_0553_EVIDENCE, TECHNICAL_HOLDS } from "../project0553/evidenceR
 import { BID_0553_SOURCES, BID_0553_GATES, validateBidReview } from "../project0553/bidReview";
 import { VENDOR_0553_SOURCES } from "../project0553/vendorEvidence";
 import { ARCHITECTURE_0553 } from "../project0553/architectureManifest";
-import { deriveManHours, deriveLaborCost } from "../project0553/derivationKernel";
+import { deriveManHours, deriveLaborCost } from "../common/cost/derivationKernel";
+import { STANDARD_PROJECT_TABS, AuditBadge, AuditMetric, AuditTable, AuditSection, ProjectTabs } from "../common/ui/ProjectAuditPrimitives";
+import { getProject0553Dataset } from "../project0553/data/repository";
 import "../project0550/project0550.css"; // Reuse existing 0550 presentation primitives, never project facts.
 import "../project0553/project0553.css";
 
-const TABS = [
-  ["overview","Executive"],["architecture","Architecture"],["systems","4 MR Systems"],
-  ["engineering","First Principles"],["execution","Execution"],["budget","Budget"],
-  ["risk","Risk & Controls"],["documents","Evidence"]
-];
-const Badge = ({children}) => {
-  const v=String(children).toUpperCase();
-  const tone = /HOLD|FAIL|CONFLICT|BLOCK|NOT SEND/.test(v)?"danger":/OPEN|REVIEW|PREPARED|TBC/.test(v)?"warn":"neutral";
-  return <span className={"p55-badge p55-badge--"+tone}>{children}</span>;
-};
-const Metric = ({label,value,sub}) => <div className="p55-metric"><div className="p55-metric__label">{label}</div><div className="p55-metric__value">{value}</div><div className="p55-metric__sub">{sub}</div></div>;
-const Table = ({headers,rows}) => <div className="p55-table-wrap"><table className="p55-table"><thead><tr>{headers.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{rows.map((r,i)=><tr key={i}>{r.map((c,j)=><td key={j}>{c}</td>)}</tr>)}</tbody></table></div>;
+const TABS = STANDARD_PROJECT_TABS.map(([id,label]) => [id, id === "systems" ? "4 MR Systems" : label]);
+const Badge = AuditBadge;
+const Metric = AuditMetric;
+const Table = AuditTable;
+const Section = AuditSection;
 const sourceLinks = ids => ids.map(id => {
   const s=BID_0553_SOURCES.find(x=>x.id===id);
   return s?<a key={id} href={s.url} target="_blank" rel="noreferrer" style={{display:"block"}}>{id}</a>:id;
@@ -30,7 +25,7 @@ export function PJ26080553() {
  const [tab,setTab]=useState("overview");
  const [opened,setOpened]=useState(null);
  const [selectedMr,setSelectedMr]=useState("ALL");
- const p=PROJECT_0553_FACTS;
+ const p=getProject0553Dataset().project;
  const visibleGates=useMemo(()=>BID_0553_GATES.filter(g=>selectedMr==="ALL"||g.system==="ALL"||g.system===selectedMr),[selectedMr]);
  const blocked=BID_0553_GATES.filter(g=>g.status!=="CLOSED_VERIFIED").length;
  const systemTable=<Table headers={["MR","System","Current evidence state","Technical review"]} rows={p.systems.map(s=>[
@@ -44,7 +39,7 @@ export function PJ26080553() {
        <p>JUTAL · {p.packageId} · Technical UNPRICED / Priced Commercial Bid</p>
      </div><div className="p55-hero__status"><Badge>WORKING REVIEW REV01 / RELEASE HOLD</Badge><span>Closing amendment verification OPEN</span></div></div>
      <div className="p55-hero__method"><span>METHOD</span> First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model + Evidence Control</div>
-     <nav className="p55-tabs" aria-label="0553 workspace sections">{TABS.map(([id,name])=><button key={id} className={tab===id?"is-active":""} onClick={()=>setTab(id)}>{name}</button>)}</nav>
+     <ProjectTabs tabs={TABS} selected={tab} onSelect={setTab}/>
    </header>
    <main className="p55-main">
    {tab==="overview"&&<div className="p55-stack">
