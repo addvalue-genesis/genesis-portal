@@ -1079,7 +1079,7 @@ function BudgetView() {
 
                                       <div className="p55-eyebrow" style={{marginTop:16, marginBottom:8}}>Quoted item detail</div>
                                       <div className="p55-table-wrap">
-                                        <table className="p55-table p55-table--compact">
+                                        <table className="p55-table p55-table--compact p55-table--quoted">
                                           <thead>
                                             <tr><th>Code</th><th>Description</th><th className="is-number">Qty</th><th>Unit</th><th className="is-number">Unit price</th><th className="is-number">Total</th><th>State</th></tr>
                                           </thead>
@@ -1156,7 +1156,7 @@ function BudgetView() {
 
                                 <div className="p55-eyebrow" style={{marginTop:18, marginBottom:8}}>Scope composition / completeness</div>
                                 <div className="p55-table-wrap">
-                                  <table className="p55-table p55-table--compact">
+                                  <table className="p55-table p55-table--compact p55-table--scope">
                                     <thead>
                                       <tr>
                                         <th>Item</th>
