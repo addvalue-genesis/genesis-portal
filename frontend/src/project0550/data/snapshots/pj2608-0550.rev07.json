@@ -2333,63 +2333,482 @@
         "description": "Detail Design / PM / Engineering / CAL-RPT / VDRL / Cybersecurity / Interfaces",
         "directThb": 24000000,
         "pricingClass": "SERVICE",
-        "note": "Core team + external specialist call-off when competency/capacity is unavailable."
+        "note": "Core team + external specialist call-off when competency/capacity is unavailable.",
+        "details": [
+          {
+            "id": "B1-D01",
+            "item": "Project management / engineering coordination",
+            "category": "Engineering",
+            "source": "Core PM/engineering basis",
+            "state": "WORKING",
+            "directThb": null
+          },
+          {
+            "id": "B1-D02",
+            "item": "Detail design engineering",
+            "category": "Engineering",
+            "source": "RFQ / project engineering scope",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B1-D03",
+            "item": "CAL / Study / RPT preparation and review",
+            "category": "Engineering proof",
+            "source": "Project deliverables / system proof needs",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B1-D04",
+            "item": "VDRL / VDRS / technical document control",
+            "category": "Documentation",
+            "source": "Project document requirements",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B1-D05",
+            "item": "Interface engineering / integration coordination",
+            "category": "Interface",
+            "source": "Cross-system project scope",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B1-D06",
+            "item": "Cybersecurity / network engineering support",
+            "category": "Engineering",
+            "source": "Network/cyber system requirements",
+            "state": "AS APPLICABLE",
+            "directThb": null
+          },
+          {
+            "id": "B1-D07",
+            "item": "External specialist technical review call-off",
+            "category": "Specialist",
+            "source": "USD 1,000/working MD minimum policy",
+            "state": "CALL-OFF",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED ACTIVITY BREAKDOWN / COST ALLOCATION TBC"
       },
       {
         "code": "B2",
         "description": "Transportation / Freight / Logistics / Export-side charges / Forwarding",
         "directThb": 20000000,
         "pricingClass": "SERVICE",
-        "note": "Multiple origins; final Incoterm and route remain package-controlled."
+        "note": "Multiple origins; final Incoterm and route remain package-controlled.",
+        "details": [
+          {
+            "id": "B2-D01",
+            "item": "International freight / shipment",
+            "category": "Logistics",
+            "source": "Multiple vendor origins",
+            "state": "WORKING",
+            "directThb": null
+          },
+          {
+            "id": "B2-D02",
+            "item": "Export-side handling / origin charges",
+            "category": "Logistics",
+            "source": "Vendor delivery terms / export side",
+            "state": "WORKING",
+            "directThb": null
+          },
+          {
+            "id": "B2-D03",
+            "item": "Freight forwarding / consolidation",
+            "category": "Logistics",
+            "source": "Package-controlled route",
+            "state": "WORKING",
+            "directThb": null
+          },
+          {
+            "id": "B2-D04",
+            "item": "Cargo insurance / shipment risk where applicable",
+            "category": "Insurance / Logistics",
+            "source": "Commercial/logistics treatment",
+            "state": "OPEN",
+            "directThb": null
+          },
+          {
+            "id": "B2-D05",
+            "item": "Route / Incoterm normalization",
+            "category": "Commercial logistics",
+            "source": "Vendor quotations + project logistics",
+            "state": "REQUIRED",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED ACTIVITY BREAKDOWN / COST ALLOCATION TBC"
       },
       {
         "code": "B3",
         "description": "Training for Enduser / PURCHASER personnel",
         "directThb": 7000000,
         "pricingClass": "SERVICE",
-        "note": "OEM + operator/maintenance training, materials and trainer travel."
+        "note": "OEM + operator/maintenance training, materials and trainer travel.",
+        "details": [
+          {
+            "id": "B3-D01",
+            "item": "OEM training",
+            "category": "Training",
+            "source": "Vendor/OEM package",
+            "state": "WORKING",
+            "directThb": null
+          },
+          {
+            "id": "B3-D02",
+            "item": "End-user / purchaser operation training",
+            "category": "Training",
+            "source": "RFQ requirement",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B3-D03",
+            "item": "Maintenance training",
+            "category": "Training",
+            "source": "RFQ / lifecycle requirement",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B3-D04",
+            "item": "Training materials / documentation",
+            "category": "Documentation",
+            "source": "OEM/end-user training package",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B3-D05",
+            "item": "Trainer travel / accommodation / local cost",
+            "category": "Travel",
+            "source": "Training campaign",
+            "state": "WORKING",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED ACTIVITY BREAKDOWN / COST ALLOCATION TBC"
       },
       {
         "code": "B4",
         "description": "Specialist field assistance / FAT / IFAT / SAT Deploy / Pre-Com / Commissioning",
         "directThb": 28000000,
         "pricingClass": "SERVICE",
-        "note": "Event/campaign call-off, not full-project FTE. External specialist working basis USD 1,000/working day minimum; MOB/DEMOB, airfare, accommodation, per diem, permits, insurance and standby are separate."
+        "note": "Event/campaign call-off, not full-project FTE. External specialist working basis USD 1,000/working day minimum; MOB/DEMOB, airfare, accommodation, per diem, permits, insurance and standby are separate.",
+        "details": [
+          {
+            "id": "B4-D01",
+            "item": "FAT / TPI technical support",
+            "category": "Specialist / Test",
+            "source": "Vendor/OEM FAT campaign",
+            "state": "CALL-OFF",
+            "directThb": null
+          },
+          {
+            "id": "B4-D02",
+            "item": "IFAT / integration test support",
+            "category": "Specialist / Test",
+            "source": "Cross-system integration campaign",
+            "state": "CALL-OFF",
+            "directThb": null
+          },
+          {
+            "id": "B4-D03",
+            "item": "SAT Deploy / site acceptance support",
+            "category": "Specialist / Test",
+            "source": "Peak field campaign",
+            "state": "CALL-OFF",
+            "directThb": null
+          },
+          {
+            "id": "B4-D04",
+            "item": "Pre-commissioning support",
+            "category": "Specialist / Field",
+            "source": "Project lifecycle",
+            "state": "CALL-OFF",
+            "directThb": null
+          },
+          {
+            "id": "B4-D05",
+            "item": "Commissioning support",
+            "category": "Specialist / Field",
+            "source": "Project lifecycle",
+            "state": "CALL-OFF",
+            "directThb": null
+          },
+          {
+            "id": "B4-D06",
+            "item": "Punch / retest / closeout support",
+            "category": "Specialist / Field",
+            "source": "Acceptance closeout",
+            "state": "CALL-OFF",
+            "directThb": null
+          },
+          {
+            "id": "B4-D07",
+            "item": "MOB / DEMOB / airfare",
+            "category": "Travel",
+            "source": "Specialist campaign",
+            "state": "SEPARATE CASH COST",
+            "directThb": null
+          },
+          {
+            "id": "B4-D08",
+            "item": "Accommodation / per diem / local transport",
+            "category": "Travel",
+            "source": "Specialist campaign",
+            "state": "SEPARATE CASH COST",
+            "directThb": null
+          },
+          {
+            "id": "B4-D09",
+            "item": "Visa / work permit / insurance / medical",
+            "category": "Personnel logistics",
+            "source": "Specialist campaign",
+            "state": "SEPARATE CASH COST",
+            "directThb": null
+          },
+          {
+            "id": "B4-D10",
+            "item": "Standby / rest / rotation exposure",
+            "category": "Personnel logistics",
+            "source": "Field deployment policy",
+            "state": "WORKING",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED ACTIVITY BREAKDOWN / COST ALLOCATION TBC"
       },
       {
         "code": "B5",
         "description": "Pre-commissioning / Commissioning / Start-up Spares",
         "directThb": 10000000,
         "pricingClass": "GOODS",
-        "note": "Separate from Part A and from C2/C3."
+        "note": "Separate from Part A and from C2/C3.",
+        "details": [
+          {
+            "id": "B5-D01",
+            "item": "Startup spares",
+            "category": "Spares",
+            "source": "Project startup requirement",
+            "state": "ALLOWANCE",
+            "directThb": null
+          },
+          {
+            "id": "B5-D02",
+            "item": "Pre-commissioning spares",
+            "category": "Spares",
+            "source": "Execution requirement",
+            "state": "ALLOWANCE",
+            "directThb": null
+          },
+          {
+            "id": "B5-D03",
+            "item": "Commissioning spares",
+            "category": "Spares",
+            "source": "Execution requirement",
+            "state": "ALLOWANCE",
+            "directThb": null
+          },
+          {
+            "id": "B5-D04",
+            "item": "Deduct vendor-package included spares",
+            "category": "Control",
+            "source": "Avoid duplication with Part A",
+            "state": "REQUIRED CONTROL",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED ACTIVITY BREAKDOWN / COST ALLOCATION TBC"
       },
       {
         "code": "B6",
         "description": "Special Tools / Proprietary Software / Test Equipment",
         "directThb": 8000000,
         "pricingClass": "GOODS",
-        "note": "RF/FO/NDB/PAGA/network configuration, alignment and calibrated test-tool exposure."
+        "note": "RF/FO/NDB/PAGA/network configuration, alignment and calibrated test-tool exposure.",
+        "details": [
+          {
+            "id": "B6-D01",
+            "item": "Special tools",
+            "category": "Tools",
+            "source": "System/OEM-specific",
+            "state": "ALLOWANCE",
+            "directThb": null
+          },
+          {
+            "id": "B6-D02",
+            "item": "Proprietary software / service tools",
+            "category": "Software / Tools",
+            "source": "Vendor/OEM package needs",
+            "state": "ALLOWANCE",
+            "directThb": null
+          },
+          {
+            "id": "B6-D03",
+            "item": "Test equipment / adapters",
+            "category": "Test equipment",
+            "source": "Engineering / FAT / SAT needs",
+            "state": "ALLOWANCE",
+            "directThb": null
+          },
+          {
+            "id": "B6-D04",
+            "item": "Calibration / certification exposure",
+            "category": "Test equipment",
+            "source": "Applicable calibrated-tool requirement",
+            "state": "OPEN",
+            "directThb": null
+          },
+          {
+            "id": "B6-D05",
+            "item": "Deduct proven vendor-package inclusions",
+            "category": "Control",
+            "source": "Avoid duplication with Part A",
+            "state": "REQUIRED CONTROL",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED ACTIVITY BREAKDOWN / COST ALLOCATION TBC"
       },
       {
         "code": "B7",
         "description": "Site Survey / Existing-condition / Readiness Verification",
         "directThb": 6000000,
         "pricingClass": "SERVICE",
-        "note": "Call-off survey teams; specialist competency where required."
+        "note": "Call-off survey teams; specialist competency where required.",
+        "details": [
+          {
+            "id": "B7-D01",
+            "item": "Site survey",
+            "category": "Survey",
+            "source": "Existing-condition verification",
+            "state": "CALL-OFF",
+            "directThb": null
+          },
+          {
+            "id": "B7-D02",
+            "item": "Existing-condition verification",
+            "category": "Survey",
+            "source": "Site / interface readiness",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B7-D03",
+            "item": "Readiness verification",
+            "category": "Survey",
+            "source": "Pre-execution gate",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B7-D04",
+            "item": "Specialist survey competency call-off",
+            "category": "Specialist",
+            "source": "System-specific where required",
+            "state": "CALL-OFF",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED ACTIVITY BREAKDOWN / COST ALLOCATION TBC"
       },
       {
         "code": "B8",
         "description": "Permit / Frequency / Type Approval / Import-Export / Regulatory Coordination",
         "directThb": 10000000,
         "pricingClass": "SERVICE",
-        "note": "Radio, VSAT, NDB and controlled-equipment pathways; authority fees/agent support subject to actual assignment."
+        "note": "Radio, VSAT, NDB and controlled-equipment pathways; authority fees/agent support subject to actual assignment.",
+        "details": [
+          {
+            "id": "B8-D01",
+            "item": "Frequency licence / authority coordination",
+            "category": "Regulatory",
+            "source": "Radio / VSAT / NDB pathways",
+            "state": "REQUIRED",
+            "directThb": null
+          },
+          {
+            "id": "B8-D02",
+            "item": "Type approval",
+            "category": "Regulatory",
+            "source": "Controlled telecom equipment",
+            "state": "AS APPLICABLE",
+            "directThb": null
+          },
+          {
+            "id": "B8-D03",
+            "item": "Import / export regulatory support",
+            "category": "Regulatory",
+            "source": "Project logistics / controlled equipment",
+            "state": "WORKING",
+            "directThb": null
+          },
+          {
+            "id": "B8-D04",
+            "item": "Permit / licence application support",
+            "category": "Regulatory",
+            "source": "Project requirement",
+            "state": "WORKING",
+            "directThb": null
+          },
+          {
+            "id": "B8-D05",
+            "item": "Authority / agent fees",
+            "category": "Regulatory cost",
+            "source": "Subject to actual assignment",
+            "state": "OPEN",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED ACTIVITY BREAKDOWN / COST ALLOCATION TBC"
       },
       {
         "code": "B9",
         "description": "Project & Personnel Insurance / Risk Transfer",
         "directThb": 8000000,
         "pricingClass": "SERVICE",
-        "note": "Project/personnel/work-risk/medevac and applicable shipment coverage."
+        "note": "Project/personnel/work-risk/medevac and applicable shipment coverage.",
+        "details": [
+          {
+            "id": "B9-D01",
+            "item": "Project insurance",
+            "category": "Insurance",
+            "source": "Project risk transfer",
+            "state": "WORKING",
+            "directThb": null
+          },
+          {
+            "id": "B9-D02",
+            "item": "Personnel / work-risk cover",
+            "category": "Insurance",
+            "source": "Field personnel exposure",
+            "state": "WORKING",
+            "directThb": null
+          },
+          {
+            "id": "B9-D03",
+            "item": "Medevac / medical-related cover",
+            "category": "Insurance",
+            "source": "Deployment risk",
+            "state": "AS APPLICABLE",
+            "directThb": null
+          },
+          {
+            "id": "B9-D04",
+            "item": "Shipment-related insurance where applicable",
+            "category": "Insurance",
+            "source": "Cargo/logistics exposure",
+            "state": "OPEN",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED ACTIVITY BREAKDOWN / COST ALLOCATION TBC"
       }
     ],
     "partC": [
@@ -2397,19 +2816,132 @@
         "code": "C1",
         "description": "On-site installation construction",
         "directThb": null,
-        "state": "EXCLUDED / CNEEC WORKING BOUNDARY"
+        "state": "EXCLUDED / CNEEC WORKING BOUNDARY",
+        "details": [
+          {
+            "id": "C1-D01",
+            "item": "Equipment mounting / physical installation",
+            "category": "Construction",
+            "source": "Current CNEEC working boundary",
+            "state": "EXCLUDED / CNEEC",
+            "directThb": null
+          },
+          {
+            "id": "C1-D02",
+            "item": "Cable tray / physical cable installation",
+            "category": "Construction",
+            "source": "Current CNEEC working boundary",
+            "state": "EXCLUDED / CNEEC",
+            "directThb": null
+          },
+          {
+            "id": "C1-D03",
+            "item": "FO cable pulling / blowing",
+            "category": "Construction",
+            "source": "Current CNEEC working boundary",
+            "state": "EXCLUDED / CNEEC",
+            "directThb": null
+          },
+          {
+            "id": "C1-D04",
+            "item": "Tower erection / lifting / rigging",
+            "category": "Construction",
+            "source": "Current CNEEC working boundary",
+            "state": "EXCLUDED / CNEEC",
+            "directThb": null
+          },
+          {
+            "id": "C1-D05",
+            "item": "Civil / foundations / trench-related work",
+            "category": "Construction",
+            "source": "Current CNEEC working boundary",
+            "state": "EXCLUDED / CNEEC",
+            "directThb": null
+          }
+        ],
+        "detailState": "BOUNDARY BREAKDOWN / EXCLUDED"
       },
       {
         "code": "C2",
         "description": "10-year Capital Spares",
         "directThb": 32000000,
-        "state": "BUDGETARY ALLOWANCE"
+        "state": "BUDGETARY ALLOWANCE",
+        "details": [
+          {
+            "id": "C2-D01",
+            "item": "10-year capital spares — system-by-system OEM list",
+            "category": "Capital spares",
+            "source": "Final OEM recommendation required",
+            "state": "ALLOWANCE / DETAIL TBC",
+            "directThb": null
+          },
+          {
+            "id": "C2-D02",
+            "item": "Major replaceable assemblies / modules",
+            "category": "Capital spares",
+            "source": "System criticality + OEM recommendation",
+            "state": "TBC",
+            "directThb": null
+          },
+          {
+            "id": "C2-D03",
+            "item": "Long-lead / obsolescence-sensitive spares",
+            "category": "Capital spares",
+            "source": "Lifecycle / lead-time risk",
+            "state": "TBC",
+            "directThb": null
+          },
+          {
+            "id": "C2-D04",
+            "item": "Quantity and pricing normalization by 19 systems",
+            "category": "Control",
+            "source": "Replace lump-sum allowance with approved spare list",
+            "state": "REQUIRED",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED SPARES BREAKDOWN / OEM DETAIL TBC"
       },
       {
         "code": "C3",
         "description": "2-year Operational Spares",
         "directThb": 18000000,
-        "state": "BUDGETARY ALLOWANCE"
+        "state": "BUDGETARY ALLOWANCE",
+        "details": [
+          {
+            "id": "C3-D01",
+            "item": "2-year normal operation spares — system-by-system OEM list",
+            "category": "Operational spares",
+            "source": "Final OEM recommendation required",
+            "state": "ALLOWANCE / DETAIL TBC",
+            "directThb": null
+          },
+          {
+            "id": "C3-D02",
+            "item": "Consumable / normal replacement items",
+            "category": "Operational spares",
+            "source": "OEM maintenance recommendation",
+            "state": "TBC",
+            "directThb": null
+          },
+          {
+            "id": "C3-D03",
+            "item": "Routine maintenance replacement items",
+            "category": "Operational spares",
+            "source": "Lifecycle / maintenance basis",
+            "state": "TBC",
+            "directThb": null
+          },
+          {
+            "id": "C3-D04",
+            "item": "Quantity and pricing normalization by 19 systems",
+            "category": "Control",
+            "source": "Replace lump-sum allowance with approved spare list",
+            "state": "REQUIRED",
+            "directThb": null
+          }
+        ],
+        "detailState": "CONTROLLED SPARES BREAKDOWN / OEM DETAIL TBC"
       }
     ],
     "customerFormRows": [
