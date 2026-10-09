@@ -2,6 +2,7 @@ import React from "react";
 import { PROJECT_0553_FACTS } from "../project0553/projectFacts";
 import { PROJECT_0553_EVIDENCE, TECHNICAL_HOLDS } from "../project0553/evidenceRegistry";
 import "../project0553/project0553.css";
+import { BID_0553_SOURCES, BID_0553_GATES, validateBidReview } from "../project0553/bidReview";
 
 const Badge = ({ children, tone = "open" }) => <span className={`p553-badge p553-badge--${tone}`}>{children}</span>;
 
@@ -48,6 +49,19 @@ export function PJ26080553() {
           </article>
         </section>
 
+        <section className="p553-panel">
+          <h2>Working Review Rev01 — Bid readiness & blockers</h2>
+          <p>Source-linked audit only. Release permitted: <strong>{validateBidReview().releaseAllowed ? "YES" : "NO — blocked"}</strong>. These records do not declare compliance or commitment.</p>
+          <div className="p553-table-wrap">
+            <table className="p553-table"><thead><tr><th>ID</th><th>Priority</th><th>System</th><th>Check / Action</th><th>State</th><th>Source</th></tr></thead>
+              <tbody>{BID_0553_GATES.map(g => <tr key={g.id}><td>{g.id}</td><td>{g.priority}</td><td>{g.system}</td><td><strong>{g.title}</strong><div>{g.detail}</div></td><td><Badge tone={g.status === "CONFLICT" || g.status === "HOLD" ? "danger" : "open"}>{g.status}</Badge></td><td>{g.sources.join(", ")}</td></tr>)}</tbody>
+            </table>
+          </div>
+        </section>
+        <section className="p553-panel">
+          <h2>0553 Source Register — active review inputs</h2>
+          <div className="p553-table-wrap"><table className="p553-table"><thead><tr><th>ID</th><th>Original / Working file</th><th>Revision</th><th>Stage</th><th>Control note</th></tr></thead><tbody>{BID_0553_SOURCES.map(s => <tr key={s.id}><td>{s.id}</td><td><a href={s.url} target="_blank" rel="noreferrer">{s.name}</a></td><td>{s.revision}</td><td>{s.status}</td><td>{s.note}</td></tr>)}</tbody></table></div>
+        </section>
         <section className="p553-panel">
           <h2>0553 systems — source-controlled only</h2>
           <div className="p553-table-wrap">
