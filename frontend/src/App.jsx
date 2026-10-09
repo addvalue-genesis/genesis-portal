@@ -3,6 +3,7 @@ import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import { Home } from "./pages/Home";
 import { Employees } from "./pages/Employees";
 import { PJ26080550 } from "./pages/PJ26080550";
+import { PJ26080553 } from "./pages/PJ26080553";
 
 const STRINGS = {
   th: {
@@ -10,6 +11,7 @@ const STRINGS = {
     subtitle: "ADDVALUE Digital Backbone",
     home: "หน้าแรก",
     project0550: "PJ2608-0550 TPP",
+    project0553: "PJ2608-0553 Bid",
     employees: "พนักงาน",
   },
   en: {
@@ -44,6 +46,7 @@ export function App() {
           <nav className="genesis-nav" aria-label="Primary navigation">
             <NavLink to="/" end className={navClass}>{t.home}</NavLink>
             <NavLink to="/projects/pj2608-0550" className={navClass}>{t.project0550}</NavLink>
+            <NavLink to="/projects/pj2608-0553" className={navClass}>{t.project0553}</NavLink>
             <NavLink to="/employees" className={navClass}>{t.employees}</NavLink>
           </nav>
 
@@ -64,6 +67,7 @@ export function App() {
           <Routes>
             <Route path="/" element={<div className="genesis-main--padded"><Home lang={lang} /></div>} />
             <Route path="/projects/pj2608-0550" element={<PJ26080550 lang={lang} />} />
+            <Route path="/projects/pj2608-0553" element={<PJ26080553 lang={lang} />} />
             <Route path="/employees" element={<div className="genesis-main--padded"><Employees lang={lang} /></div>} />
           </Routes>
         </main>
