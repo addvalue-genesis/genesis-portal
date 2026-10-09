@@ -98,3 +98,16 @@ P4: UI enhancement/exports, validation, review, local run, immutable customer re
 
 ## 9. New chat work instructions
 Use `11_NEW_CHAT_RESUME_PROMPT.md`. Start with an audit that identifies exact reuse candidates, 0553 sources, deadline blockers, and specific next code edits. Prioritize submission deliverables. Keep architecture and history documented and update this handoff after material changes.
+
+
+## 10-Oct-2026 Working Review Rev01 — new chat continuation
+- Source root verified: https://drive.google.com/drive/folders/1TlSeRQuYAUjhYI3Yt7y47TdW7A9JSSiv
+- Original JUTAL `0-Instruction to Bidder.docx` located at Drive ID `1dyMxfGxL7k9JvxeaRk2oN5HEdMtP44Rl`. It states 08-Sep-2026 17:00 deadline, TECHNICAL + UNPRICED FIRST, and priced hold pending further notice. Later tender screenshot summarized in this handoff says 14-Oct-2026 17:00 Beijing and priced + technical; original amendment/new email **NOT YET AUTHENTICATED**, so this conflict blocks release.
+- Latest located working MTO: `PJ2608-0553_MTO_MR0001-0004_SUBMIT_Rev04_20261006-Update.xlsx` Drive ID `1o1UIsUw8JQtUt2yk4S8graNpIkNQCq8h`, four system tabs and delivery/FAT basis.
+- Latest located SAMTEL TC follow-ups: TC-0001..0004 dated 05-Oct-2026 in Drive folder `1DC7PcYSgSkrISy_Q2055Nl93M3TxxS5g`.
+- SAMTEL commercial checklist working file Drive ID `1yxRC5iCIKolXHHi_R0qsrE2_4wAJzzXT` contains 40-week overall delivery and CIF Zhuhai; MTO Rev04 contains per-MR DAP Nonthaburi and varying supplier lead times. This is a reconciliation item, not an assumed binding commitment.
+- Existing Rev09 unpriced package is PREPARED NOT SENT; priced package HOLD DO NOT SEND. Internal pricing Rev09 remains estimate-only, no automatic customer release.
+- Added isolated files `frontend/src/project0553/projectFacts.js`, `evidenceRegistry.js`, `bidReview.js`, `project0553.css`, `frontend/src/pages/PJ26080553.jsx`, and only additive 0553 route/nav in `frontend/src/App.jsx`.
+- UI route: `/projects/pj2608-0553`; review gates G-01..G-12 show open/hold/conflict and source locators; no amounts or inferred compliance. Code readback verified, source-branch compare ahead/0 behind; local webpack build and end-to-end validation **NOT YET RUN**.
+- Priorities: authenticate latest JUTAL email/amendment and submission routing; line-level MTO/TC/CCL reconcile; manufacturer authority and spare pricing; generate technically screened UNPRICED and controlled PRICED bid; execute validation and build before any release.
+- Do not merge PR #2, submit email, deploy or release without approval.
