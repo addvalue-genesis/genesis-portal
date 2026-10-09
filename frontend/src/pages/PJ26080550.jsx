@@ -3,6 +3,7 @@ import {
   ARCHITECTURE_MANIFEST,
   BUDGETARY_ESTIMATE,
   BUDGETARY_SUBMISSION,
+  B1_COST_LINEAGE,
   CNEEC_BREAKDOWN,
   COMMERCIAL_POLICY,
   COMMERCIAL_SOURCES,
@@ -107,6 +108,156 @@ function MetricCard({ label, value, sub, tone = "default" }) {
       <div className="p55-metric__label">{label}</div>
       <div className="p55-metric__value">{value}</div>
       {sub ? <div className="p55-metric__sub">{sub}</div> : null}
+    </div>
+  );
+}
+
+function B1CostLineageTable() {
+  const [groupId, setGroupId] = useState("SYSTEM_ENGINEERING");
+  const lineage = B1_COST_LINEAGE;
+  const selected = lineage.groups.find((g) => g.id === groupId) || lineage.groups[0];
+
+  return (
+    <div className="p55-derivation-block">
+      <div className="p55-eyebrow" style={{ marginBottom: 8 }}>B1 — 24M control total reconciliation</div>
+
+      <div className="p55-table-wrap">
+        <table className="p55-table p55-table--compact p55-table--derivation">
+          <thead>
+            <tr>
+              <th>Layer</th>
+              <th className="is-number">MH</th>
+              <th className="is-number">Equivalent person-days @ 8h</th>
+              <th className="is-number">THB</th>
+              <th>Evidence state</th>
+            </tr>
+          </thead>
+          <tbody>
+            {lineage.groups.map((g) => (
+              <tr key={g.id}>
+                <td><strong>{g.label}</strong><small>{g.id}</small></td>
+                <td className="is-number">{g.mh.toLocaleString("en-US", { maximumFractionDigits: 2 })}</td>
+                <td className="is-number">{g.eqDays.toLocaleString("en-US", { maximumFractionDigits: 2 })}</td>
+                <td className="is-number">{money(g.baseThb, "THB")}</td>
+                <td><Badge tone="good">RECOVERED BOTTOM-UP</Badge></td>
+              </tr>
+            ))}
+            <tr>
+              <td><strong>Recovered bottom-up subtotal</strong></td>
+              <td />
+              <td />
+              <td className="is-number"><strong>{money(lineage.recoveredBottomUpThb, "THB")}</strong></td>
+              <td><Badge tone="good">TRACEABLE</Badge></td>
+            </tr>
+            <tr>
+              <td><strong>Unattributed reconciliation gap</strong><small>Current Rev10 allowance minus latest traceable Rev04 bottom-up model</small></td>
+              <td>—</td>
+              <td>—</td>
+              <td className="is-number"><strong>{money(lineage.reconciliationGapThb, "THB")}</strong></td>
+              <td><Badge tone="danger">NOT YET DERIVED</Badge></td>
+            </tr>
+            <tr>
+              <td><strong>Current B1 control total</strong></td>
+              <td />
+              <td />
+              <td className="is-number"><strong>{money(lineage.currentAllowanceThb, "THB")}</strong></td>
+              <td><Badge tone="warn">WORKING ALLOWANCE</Badge></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p className="p55-note">
+        <strong>Audit conclusion:</strong> {lineage.interpretation}
+      </p>
+
+      <div className="p55-filterbar p55-filterbar--simple" style={{ marginTop: 14 }}>
+        <label>
+          <span>Breakdown group</span>
+          <select value={groupId} onChange={(e) => setGroupId(e.target.value)}>
+            {lineage.groups.map((g) => <option value={g.id} key={g.id}>{g.label}</option>)}
+          </select>
+        </label>
+        <Badge tone="neutral">{selected.rows.length} detail rows</Badge>
+      </div>
+
+      <div className="p55-table-wrap" style={{ marginTop: 10 }}>
+        {selected.id === "COMMON_PROJECT" ? (
+          <table className="p55-table p55-table--compact p55-table--derivation">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Work / cost object</th>
+                <th className="is-number">Driver qty</th>
+                <th>Unit</th>
+                <th>Role</th>
+                <th className="is-number">USD/h</th>
+                <th className="is-number">MH</th>
+                <th className="is-number">Eq. person-days</th>
+                <th className="is-number">Base THB</th>
+                <th>Source / formula basis</th>
+                <th>State</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selected.rows.map((r) => (
+                <tr key={r.id}>
+                  <td><strong>{r.id}</strong></td>
+                  <td>{r.item}<small>{r.note}</small></td>
+                  <td className="is-number">{r.driverQty ?? "—"}</td>
+                  <td>{r.unit || "—"}</td>
+                  <td>{r.role}</td>
+                  <td className="is-number">{Number.isFinite(r.rateUsdH) ? money(r.rateUsdH, "USD") : "FIXED QUOTE"}</td>
+                  <td className="is-number">{r.mh || "—"}</td>
+                  <td className="is-number">{Number.isFinite(r.eqDays) ? r.eqDays.toFixed(2) : "—"}</td>
+                  <td className="is-number">{money(r.baseThb, "THB")}</td>
+                  <td>{r.source}</td>
+                  <td><Badge>{r.state}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <table className="p55-table p55-table--compact p55-table--derivation">
+            <thead>
+              <tr>
+                <th>System / Token</th>
+                <th className="is-number">Underlying rows</th>
+                <th className="is-number">MH</th>
+                <th className="is-number">Eq. person-days @ 8h</th>
+                <th className="is-number">Model base THB</th>
+                <th className="is-number">Internal cost THB</th>
+                <th>People / crew interpretation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {selected.rows.map((r) => (
+                <tr key={r.token}>
+                  <td><strong>{SYSTEMS.find((s) => s.token === r.token)?.name || r.token}</strong><small>{r.token}</small></td>
+                  <td className="is-number">{r.rows}</td>
+                  <td className="is-number">{r.mh.toLocaleString("en-US", { maximumFractionDigits: 2 })}</td>
+                  <td className="is-number">{r.eqDays.toLocaleString("en-US", { maximumFractionDigits: 2 })}</td>
+                  <td className="is-number">{money(r.baseThb, "THB")}</td>
+                  <td className="is-number">{money(r.internalCostThb, "THB")}</td>
+                  <td>Workload is expressed as person-hours/person-days; actual concurrent headcount is TBC until the resource-loaded schedule is approved.</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+
+      <div className="p55-table-wrap" style={{ marginTop: 10 }}>
+        <table className="p55-table p55-table--compact p55-table--derivation">
+          <thead><tr><th>Source</th><th>Drive ID</th><th>Date</th><th>Controlled sheets used</th></tr></thead>
+          <tbody><tr>
+            <td><strong>{lineage.source.file}</strong></td>
+            <td>{lineage.source.driveId}</td>
+            <td>{lineage.source.date}</td>
+            <td>{lineage.source.sheets.join(" · ")}</td>
+          </tr></tbody>
+        </table>
+      </div>
     </div>
   );
 }
@@ -1310,6 +1461,7 @@ function BudgetView() {
                                   <strong>{row.code} — activity / work-package breakdown</strong>
                                   <span>{(row.details || []).length} controlled detail items</span>
                                 </div>
+                                {row.code === "B1" ? <B1CostLineageTable /> : null}
                                 <DerivationBasisTable code={row.code} directThb={row.directThb} />
                                 <div className="p55-eyebrow" style={{ marginTop: 16, marginBottom: 8 }}>Activity / component scope</div>
                                 <div className="p55-table-wrap">
