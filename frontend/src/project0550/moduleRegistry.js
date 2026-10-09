@@ -187,6 +187,22 @@ export const MODULE_REGISTRY = [
     invariants: ["Cost exposure ≠ customer recovery."]
   },
   {
+    id: "MOD-REGULATORY-KNOWLEDGE",
+    name: "Myanmar Regulatory / Import Knowledge",
+    layer: "GENERIC_TO_PARTICULAR",
+    lifecycleStatus: "ACTIVE_EVOLVING",
+    purpose: "Store reusable Myanmar import/telecom regulatory knowledge separately from PJ2608-0550 customer/project instructions.",
+    why: "Permit, duty, tax, customs and telecom approval rules can materially change both cost and delivery; they must be queryable data rather than prose lost in chat.",
+    inputs: ["Myanmar regulatory/public sources", "PTTEPI logistics instruction", "User-researched working data pending verification"],
+    outputs: ["B8 regulatory cost drivers", "B2 logistics/formality drivers", "Schedule gates", "Verification/open states"],
+    implementation: ["frontend/src/knowledge-kernels/regulatoryMyanmar.js", "frontend/src/project0550/regulatoryBinding.js"],
+    invariants: [
+      "Generic country knowledge and project/customer instructions remain separate.",
+      "Unverified fee/rate research remains UNVERIFIED and is never silently promoted to project fact.",
+      "Every regulatory record carries cost impact and delivery impact for downstream use."
+    ]
+  },
+  {
     id: "MOD-SOURCE-REGISTER",
     name: "Source Register / Evidence",
     layer: "PARTICULAR_PROJECT",
