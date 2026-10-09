@@ -868,9 +868,33 @@
   width: 18%;
 }
 
+.p55-table--budget {
+  border: 1px solid #bcc9d6;
+}
+
+.p55-table--budget th,
+.p55-table--budget td {
+  border-color: #cbd6e1;
+}
+
+.p55-table--budget th {
+  background: #e7eef5;
+  color: #183a58;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.p55-table--budget td {
+  font-size: 12px;
+}
+
 .p55-table--budget tbody td:nth-child(3),
 .p55-table--budget tbody td:nth-child(4) {
   font-weight: 750;
+}
+
+.p55-table--budget tbody tr:hover {
+  background: #eef5fb;
 }
 
 .p55-timeline {
