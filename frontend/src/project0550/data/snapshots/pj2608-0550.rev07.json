@@ -1039,7 +1039,22 @@
             "state": "MAP TO B1/B4"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-LAN-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 32000000,
+            "currency": "THB",
+            "extended": 32000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "CISCO + PALO ALTO · LOCKED · PHI 7.3.1 / MR App 1.3",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 2,
@@ -1077,7 +1092,22 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-LAN-VCS-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 8000000,
+            "currency": "THB",
+            "extended": 8000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "Enterprise VCS · compliant · PHI 7.3.2 / MR App 1.3",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 3,
@@ -1129,7 +1159,22 @@
             "state": "REQUIRED"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-VSAT-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 14000000,
+            "currency": "THB",
+            "extended": 14000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "THAICOM · LOCKED · PHI 7.3.6 / MR App 1.2",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 4,
@@ -1167,7 +1212,22 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-VSAT-KU-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 9000000,
+            "currency": "THB",
+            "extended": 9000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "THAICOM · LOCKED · airtime separate · PHI 7.3.18 / MR App 1.2",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 5,
@@ -1205,7 +1265,22 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-PABX-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 18000000,
+            "currency": "THB",
+            "extended": 18000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "AVAYA · turnkey basis · LOCKED · PHI 7.3.3 / MR App 1.3",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 6,
@@ -1243,7 +1318,22 @@
             "state": "REQUIRED"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-IPP-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 5000000,
+            "currency": "THB",
+            "extended": 5000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "Compliant Ex package incl. hood/JB/media converter · PHI 7.3.3 / MR App 1.3",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 7,
@@ -1323,7 +1413,66 @@
             "state": "MAP B5/B6/C2/C3"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-PAGA-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 16000000,
+            "currency": "THB",
+            "extended": 16000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "INDUSTRONIC A20261632 · LOCKED · PHI 7.3.4 / MR App 1.4",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          },
+          {
+            "description": "INDUSTRONIC base net package",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 226454.05,
+            "currency": "EUR",
+            "extended": 226454.05,
+            "role": "EVIDENCE_ANCHOR_NON_ADDITIVE",
+            "source": "INDUSTRONIC Offer A20261632",
+            "state": "CURRENT QUOTE / SELECTED"
+          },
+          {
+            "description": "AP712 Access Panel +1",
+            "qty": 1,
+            "unit": "Pc",
+            "unitPrice": 3210,
+            "currency": "EUR",
+            "extended": 3210,
+            "role": "EVIDENCE_ANCHOR_NON_ADDITIVE",
+            "source": "INDUSTRONIC Offer A20261632 / controlled addition",
+            "state": "PRICED ADDITION"
+          },
+          {
+            "description": "XBC Beacon Control",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 2014,
+            "currency": "EUR",
+            "extended": 2014,
+            "role": "EVIDENCE_ANCHOR_NON_ADDITIVE",
+            "source": "INDUSTRONIC Offer A20261632 / controlled addition",
+            "state": "PRICED ADDITION"
+          },
+          {
+            "description": "Known selected subtotal",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 231678.05,
+            "currency": "EUR",
+            "extended": 231678.05,
+            "role": "REFERENCE_SUBTOTAL_NON_ADDITIVE",
+            "source": "226,454.05 + 3,210 + 2,014",
+            "state": "SELECTED / OPEN GAPS"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 8,
@@ -1382,7 +1531,22 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-CCTV-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 18000000,
+            "currency": "THB",
+            "extended": 18000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "HIKVISION · LOCKED · PHI 7.3.5 / MR App 1.3",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 9,
@@ -1441,7 +1605,22 @@
             "state": "REQUIRED"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-RADIO-DTRS-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 25000000,
+            "currency": "THB",
+            "extended": 25000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "MOTOROLA · LOCKED · PHI 7.3.7 / MR App 1.1",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 10,
@@ -1486,7 +1665,33 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-RADIO-MARINE-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 8000000,
+            "currency": "THB",
+            "extended": 8000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "Jason current partial quote + turnkey completion · PHI 7.3.8 / MR App 1.1",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          },
+          {
+            "description": "Current vendor quote anchor — Marine equipment portion",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 98150,
+            "currency": "THB",
+            "extended": 98150,
+            "role": "EVIDENCE_ANCHOR_NON_ADDITIVE",
+            "source": "Jason QT2026-160",
+            "state": "CURRENT PARTIAL QUOTE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 11,
@@ -1531,7 +1736,33 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-RADIO-AERO-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 6000000,
+            "currency": "THB",
+            "extended": 6000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "Specialist aviation package · PHI 7.3.9 / MR App 1.1",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          },
+          {
+            "description": "Current vendor quote anchor — Aero fixed radio/antenna/lightning portion",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 212500,
+            "currency": "THB",
+            "extended": 212500,
+            "role": "EVIDENCE_ANCHOR_NON_ADDITIVE",
+            "source": "Jason QT2026-160",
+            "state": "CURRENT PARTIAL QUOTE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 12,
@@ -1576,7 +1807,33 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-RADIO-SSB-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 8000000,
+            "currency": "THB",
+            "extended": 8000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "Jason current partial quote + turnkey completion · PHI 7.3.10 / MR App 1.1",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          },
+          {
+            "description": "Current vendor quote anchor — MF/HF radio/ATU/power/antenna portion",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 447000,
+            "currency": "THB",
+            "extended": 447000,
+            "role": "EVIDENCE_ANCHOR_NON_ADDITIVE",
+            "source": "Jason QT2026-160",
+            "state": "CURRENT PARTIAL QUOTE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 13,
@@ -1628,7 +1885,22 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-DMR-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 10000000,
+            "currency": "THB",
+            "extended": 10000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "CERAGON MW · LOCKED; MGW quote pending · PHI 7.3.11 / MR App 1.5",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 14,
@@ -1680,7 +1952,22 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-ES-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 6000000,
+            "currency": "THB",
+            "extended": 6000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "Complete AV package · PHI 7.3.12 / MR App 1.6",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 15,
@@ -1739,7 +2026,22 @@
             "state": "TSI"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-FO-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 22000000,
+            "currency": "THB",
+            "extended": 22000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "AVL/compliant · no brand lock · PHI 7.3.13 / SPE / DTS / LIS",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 16,
@@ -1791,7 +2093,33 @@
             "state": "C1 / CNEEC"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-TELT-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 16000000,
+            "currency": "THB",
+            "extended": 16000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "MASTER TOWER COMPANY · LOCKED · PHI 7.3.14 / MR App 1.1",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          },
+          {
+            "description": "Current tower supply quote anchor — 30m + 60m towers",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 3942500,
+            "currency": "THB",
+            "extended": 3942500,
+            "role": "EVIDENCE_ANCHOR_NON_ADDITIVE",
+            "source": "Tower quotations 2609.95.1 / 2609.95.2",
+            "state": "CURRENT QUOTE ANCHOR"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 17,
@@ -1829,7 +2157,33 @@
             "state": "REQUIRED"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-MET-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 8000000,
+            "currency": "THB",
+            "extended": 8000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "VAISALA · LOCKED · PHI 7.3.15 / MR App 1.3",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          },
+          {
+            "description": "Current sensor quote anchor — ultrasonic anemometer",
+            "qty": 1,
+            "unit": "Pc",
+            "unitPrice": 120000,
+            "currency": "THB",
+            "extended": 120000,
+            "role": "EVIDENCE_ANCHOR_NON_ADDITIVE",
+            "source": "Jason QT2026-160",
+            "state": "CURRENT PARTIAL QUOTE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 18,
@@ -1881,7 +2235,33 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-NDB-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 15000000,
+            "currency": "THB",
+            "extended": 15000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "NAUTEL / SDA Thailand turnkey · LOCKED · PHI 7.3.17 / MR App 1.7",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          },
+          {
+            "description": "Lower comparator / quote anchor — dual NDB rack package",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 2450000,
+            "currency": "THB",
+            "extended": 2450000,
+            "role": "EVIDENCE_ANCHOR_NON_ADDITIVE",
+            "source": "Jason QT2026-160 — not selected NAUTEL basis",
+            "state": "COMPARATOR ONLY"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       },
       {
         "no": 19,
@@ -1919,7 +2299,22 @@
             "state": "OPEN"
           }
         ],
-        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE"
+        "detailState": "CONTROLLED WORKING BREAKDOWN / REVALIDATE",
+        "pricingTrace": [
+          {
+            "id": "TEL-AIS-P00",
+            "description": "Current internal system-level budgetary allowance",
+            "qty": 1,
+            "unit": "Lot",
+            "unitPrice": 2000000,
+            "currency": "THB",
+            "extended": 2000000,
+            "role": "ADDITIVE_CONTROL_TOTAL",
+            "source": "Jason/Furuno equipment anchor + integration · PHI 7.3.16",
+            "state": "WORKING SYSTEM ALLOWANCE"
+          }
+        ],
+        "priceTraceRule": "Only ADDITIVE_CONTROL_TOTAL contributes to the current 19-system direct budget. Quote anchors/subtotals are evidence references and must not be added again."
       }
     ],
     "partB": [
