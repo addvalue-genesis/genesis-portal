@@ -32,3 +32,5 @@ export const REQUIREMENT_COMPLETENESS = DATASET.requirementCompleteness;
 export const ENGINEERING_LAW_LIBRARY = buildProject0550KnowledgeKernelLibrary(SYSTEMS);
 export const KNOWLEDGE_KERNEL_LIBRARY = ENGINEERING_LAW_LIBRARY;
 export const KNOWLEDGE_KERNEL_DOMAINS = ENGINEERING_LAW_LIBRARY.domains;
+
+export const COMMERCIAL_SOURCES = DATASET.commercialSources || [];
