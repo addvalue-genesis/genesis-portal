@@ -6,9 +6,9 @@ export const WORKSPACE_TABS = [
  {id:"risk",label:"Risk & Controls"},{id:"documents",label:"Evidence"}
 ];
 // Project-agnostic shell extracted from PJ26080550's behavior and CSS class contract.
-export function ProjectWorkspaceShell({project,lang="th",tabs=WORKSPACE_TABS,views}) {
+export function ProjectWorkspaceShell({project,lang="th",tabs=WORKSPACE_TABS,views={},renderContent,className=""}) {
  const [activeTab,setActiveTab]=useState("overview");
- return <div className="p55">
+ return <div className={"p55 "+className}>
   <header className="p55-hero">
    <div className="p55-hero__top">
     <div><div className="p55-kicker">GENESS / TPP · INTERNAL PROJECT CONTROL</div>
@@ -22,7 +22,7 @@ export function ProjectWorkspaceShell({project,lang="th",tabs=WORKSPACE_TABS,vie
     {tabs.map(t=><button key={t.id} type="button" className={activeTab===t.id?"is-active":""} onClick={()=>setActiveTab(t.id)}>{t.label}</button>)}
    </nav>
   </header>
-  <main className="p55-main">{views[activeTab]||null}</main>
+  <main className="p55-main">{renderContent ? renderContent(activeTab) : (views[activeTab]||null)}</main>
   <footer className="p55-footer"><span>{project.id} · Internal working control</span>
    <span>{lang==="th"?"ข้อมูลที่เป็น TBC/OPEN ต้องไม่ถูกตีความเป็นศูนย์":"TBC / OPEN inputs must never be interpreted as zero."}</span></footer>
  </div>;
