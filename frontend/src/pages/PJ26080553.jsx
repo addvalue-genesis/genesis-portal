@@ -19,7 +19,6 @@ const sourceLinks = ids => ids.map(id => {
   const s=BID_0553_SOURCES.find(x=>x.id===id);
   return s?<a key={id} href={s.url} target="_blank" rel="noreferrer" style={{display:"block"}}>{id}</a>:id;
 });
-const Section = ({title,children,subtitle}) => <section className="p55-panel"><div className="p55-panel__head"><div><h3>{title}</h3>{subtitle&&<p className="p55-note">{subtitle}</p>}</div></div>{children}</section>;
 
 export function PJ26080553() {
  const [tab,setTab]=useState("overview");
