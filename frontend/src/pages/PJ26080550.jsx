@@ -905,9 +905,50 @@ function BudgetView() {
                             <td colSpan="6">
                               <div className="p55-budget-detail">
                                 <div className="p55-budget-detail__head">
-                                  <strong>{row.system} — internal composition</strong>
-                                  <span>{(row.components || []).length} controlled working items</span>
+                                  <strong>{row.system} — detailed internal breakdown</strong>
+                                  <span>{(row.components || []).length} scope items · {(row.pricingTrace || []).length} price/source trace rows</span>
                                 </div>
+
+                                <div className="p55-eyebrow" style={{marginBottom:8}}>Cost / price trace</div>
+                                <div className="p55-table-wrap">
+                                  <table className="p55-table p55-table--compact">
+                                    <thead>
+                                      <tr>
+                                        <th>Cost line</th>
+                                        <th className="is-number">Qty</th>
+                                        <th>Unit</th>
+                                        <th className="is-number">Unit price</th>
+                                        <th>Curr.</th>
+                                        <th className="is-number">Extended</th>
+                                        <th>Role</th>
+                                        <th>Source / basis</th>
+                                        <th>State</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody>
+                                      {(row.pricingTrace || []).map((line) => (
+                                        <tr key={line.id || line.description}>
+                                          <td><strong>{line.description}</strong>{line.id ? <small>{line.id}</small> : null}</td>
+                                          <td className="is-number">{line.qty ?? "—"}</td>
+                                          <td>{line.unit || "—"}</td>
+                                          <td className="is-number">
+                                            {Number.isFinite(line.unitPrice) ? money(line.unitPrice, line.currency || "THB") : "TBC"}
+                                          </td>
+                                          <td>{line.currency || "—"}</td>
+                                          <td className="is-number">
+                                            {Number.isFinite(line.extended) ? money(line.extended, line.currency || "THB") : "TBC"}
+                                          </td>
+                                          <td><Badge tone={String(line.role).includes("ADDITIVE") && !String(line.role).includes("NON_ADDITIVE") ? "good" : "neutral"}>{line.role}</Badge></td>
+                                          <td>{line.source}</td>
+                                          <td><Badge>{line.state}</Badge></td>
+                                        </tr>
+                                      ))}
+                                    </tbody>
+                                  </table>
+                                </div>
+                                <p className="p55-note"><strong>Price trace rule:</strong> {row.priceTraceRule}</p>
+
+                                <div className="p55-eyebrow" style={{marginTop:18, marginBottom:8}}>Scope composition / completeness</div>
                                 <div className="p55-table-wrap">
                                   <table className="p55-table p55-table--compact">
                                     <thead>
@@ -931,7 +972,7 @@ function BudgetView() {
                                   </table>
                                 </div>
                                 <p className="p55-note">
-                                  Component rows explain scope composition only. The THB value above remains the current system-level budgetary allowance until quantity, quotation and engineering-kernel revalidation closes each component.
+                                  Scope rows show what the system must contain. Price/source rows show what is actually priced or used as evidence. Unknown component quantities or unit prices remain TBC rather than being allocated by guess.
                                 </p>
                               </div>
                             </td>
