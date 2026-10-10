@@ -20,7 +20,8 @@
     "aviatReviewValidation": "HOTFIX_PENDING_USER_BUILD",
     "aviatReviewLastFailure": "UNCLASSIFIED_NG_D-1_TEST_INCOMPLETE_MAPPING",
     "packageCompositionValidation": "PENDING_USER_LOCAL_BUILD",
-    "topologyValidation": "PENDING_LOCAL_BUILD"
+    "topologyValidation": "PENDING_LOCAL_BUILD",
+    "radioRoleMatrix": "PENDING_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -108,6 +109,15 @@
       "radioQuantities": "OPEN",
       "model": "frontend/src/project0553/data/mr0001TopologyQuantityAudit.js",
       "state": "GRAPH_REFERENCE_NOT_EQUIPMENT_APPROVAL"
+    },
+    "mr0001RadioRoles": {
+      "rptLinks": 5,
+      "endpointRoleCandidates": 10,
+      "sites": 7,
+      "approvedRadioQty": null,
+      "allocatedOfferQty": null,
+      "source": "RPT-0001-C1",
+      "status": "ROLE_CANDIDATES_ENG_REVIEW"
     }
   },
   "sourceConflicts": [
