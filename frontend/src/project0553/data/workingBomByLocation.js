@@ -6,6 +6,7 @@
 import { MR0001_WORKING_PRICED_BOM } from "./mr0001WorkingPricedBom";
 import { MR0001_FIRST_PRINCIPLES_DERIVATION } from "./mr0001FirstPrinciplesDerivation";
 import { MR0001_PRELIMINARY_LINK_BUDGET } from "./mr0001PreliminaryLinkBudget";
+import { MR0001_SITE_CLASSIFICATION } from "./mr0001SiteClassification";
 import { MR0001_ENGINEERING_REQUIRED_BOM } from "./mr0001RequiredBomDerivation";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./supplierQuoteLines";
 const quotesById=new Map(SUPPLIER_QUOTE_LINES_0553.map(q=>[q.id,q]));
@@ -27,7 +28,7 @@ const items=MR0001_WORKING_PRICED_BOM.items.map(item=>({
  workingPriceStatus:Number.isFinite(item.indicativePackageCostTHB)?"PRELIMINARY_SCENARIO":"SOURCE_PRICE_ONLY_OR_NOT_MAPPED"
 }));
 const locations=[...new Set(items.map(item=>item.site))].map(site=>({
- site,items:items.filter(item=>item.site===site),
+ site,siteClass:MR0001_SITE_CLASSIFICATION.sites[site],items:items.filter(item=>item.site===site),
   rfDemand:MR0001_FIRST_PRINCIPLES_DERIVATION.locations.find(x=>x.site===site),
   rfProof:MR0001_PRELIMINARY_LINK_BUDGET.links.filter(x=>x.from===site||x.to===site)
 }));
