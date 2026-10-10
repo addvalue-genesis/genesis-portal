@@ -22,7 +22,8 @@
     "packageCompositionValidation": "PENDING_USER_LOCAL_BUILD",
     "topologyValidation": "PENDING_LOCAL_BUILD",
     "radioRoleMatrix": "PENDING_LOCAL_BUILD",
-    "scopeOwnershipValidation": "PENDING_USER_LOCAL_BUILD"
+    "scopeOwnershipValidation": "PENDING_USER_LOCAL_BUILD",
+    "offerAllocationValidation": "PENDING_USER_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -130,6 +131,15 @@
       "reuseQty": null,
       "serviceMH": null,
       "releaseAllowed": false
+    },
+    "mr0001OfferAllocation": {
+      "quoteLines": 53,
+      "base": 37,
+      "spares": 16,
+      "status": "CANDIDATE_COVERAGE_WITHOUT_SITE_ALLOCATIONS",
+      "acceptedQty": null,
+      "acceptedCost": null,
+      "model": "frontend/src/project0553/data/mr0001OfferAllocationAudit.js"
     }
   },
   "sourceConflicts": [
