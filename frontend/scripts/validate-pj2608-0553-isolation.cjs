@@ -19,4 +19,11 @@ assert(page.includes('common/cost/derivationKernel'),"0553 UI must use shared co
 assert(!page.includes('from "../project0550/data"'),"0553 UI imports particular 0550 data");
 assert(app.includes('path="/projects/pj2608-0550"')&&app.includes('path="/projects/pj2608-0553"'),"Project routes not isolated");
 assert(p0550.includes('from "../project0550/data"'),"0550 regression guard: original facade not found");
+const engineering=read("common/ui/EngineeringView.jsx");
+const binding=read("project0553/engineeringViewModel.js");
+assert(p0550.includes("SharedEngineeringView") && page.includes("SharedEngineeringView"),"First Principles must use the same shared component for 0550 and 0553");
+assert(!/PROJECT_0550|REQUIREMENT_COMPLETENESS|PJ2608-0550 contains/.test(engineering),"Shared First Principles has 0550 particular dependencies");
+assert(!/project0550\/data|TEL-LAN|RC-0550-001/.test(binding),"0553 First Principles binding inherited 0550 particular facts");
+assert(binding.includes("BID_0553_GATES")&&binding.includes("TECHNICAL_HOLDS"),"0553 requirement control must be evidence-bound");
+assert(page.includes("<MR0001RFProofPilot/>"),"0553 First Principles must retain live RF pilot");
 console.log("PASS PJ2608-0553 shared/particular isolation and 0550 facade regression guards");
