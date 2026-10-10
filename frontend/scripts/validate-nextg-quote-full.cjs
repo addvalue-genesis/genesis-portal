@@ -1,0 +1,12 @@
+const fs=require("fs"),path=require("path"),assert=require("node:assert/strict");
+const q=JSON.parse(fs.readFileSync(path.join(__dirname,"../src/project0553/data/quotes/NG-260916-ADV-DAP1.full.json"),"utf8"));
+assert.equal(q.lines.length,53);
+assert.deepEqual(["A","B","C","D","E"].map(k=>q.lines.filter(x=>x.group===k).length),[12,13,12,8,8]);
+assert.equal(new Set(q.lines.map(x=>x.code)).size,53);
+assert.ok(q.lines.every(x=>x.description&&x.partNumber&&x.qty>0&&x.sourcePage));
+const sum=Math.round(q.lines.reduce((s,x)=>s+(x.quotedTotal??0),0)*100)/100;
+assert.equal(sum,191610.15);
+assert.equal(q.lines.filter(x=>x.unitPrice===null).length,4);
+const registry=fs.readFileSync(path.join(__dirname,"../src/project0553/data/supplierQuoteLines.js"),"utf8");
+assert.ok(registry.includes("NG-260916-ADV-DAP1.full.json")&&registry.includes("NEXT_G_FULL_BOQ.lines.map"));
+console.log("PASS Next G 53 of 53 lines A12 B13 C12 D8 E8; quoted total USD 191610.15 reconciles");
