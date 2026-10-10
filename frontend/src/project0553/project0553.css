@@ -23,3 +23,14 @@
 .p553-dashboard .p55-table small{display:block;margin-top:5px;font-weight:400}
 @media(max-width:1050px){.p553-dashboard .p55-metric-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:720px){.p553-alerts,.p553-dashboard .p55-grid--2{grid-template-columns:1fr}.p553-dashboard .p55-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Supplier quote detail: fixed minimum usable widths; horizontal scroll on narrow screens. */
+.p553-dashboard .p553-quoted-lines{width:100%;min-width:950px;table-layout:fixed;border-collapse:collapse;font-size:12px}
+.p553-dashboard .p553-quoted-lines th:nth-child(1),.p553-dashboard .p553-quoted-lines td:nth-child(1){width:7%}
+.p553-dashboard .p553-quoted-lines th:nth-child(2),.p553-dashboard .p553-quoted-lines td:nth-child(2){width:22%;overflow-wrap:anywhere;word-break:normal}
+.p553-dashboard .p553-quoted-lines th:nth-child(3),.p553-dashboard .p553-quoted-lines td:nth-child(3){width:39%;white-space:normal;overflow-wrap:break-word;line-height:1.4;font-weight:400}
+.p553-dashboard .p553-quoted-lines th:nth-child(4),.p553-dashboard .p553-quoted-lines td:nth-child(4){width:6%;text-align:right}
+.p553-dashboard .p553-quoted-lines th:nth-child(5),.p553-dashboard .p553-quoted-lines td:nth-child(5){width:13%;text-align:right;font-variant-numeric:tabular-nums;white-space:normal}
+.p553-dashboard .p553-quoted-lines th:nth-child(6),.p553-dashboard .p553-quoted-lines td:nth-child(6){width:13%;text-align:right;font-variant-numeric:tabular-nums;white-space:normal}
+.p553-dashboard .p553-quoted-lines td,.p553-dashboard .p553-quoted-lines th{padding:8px 10px;vertical-align:top}
