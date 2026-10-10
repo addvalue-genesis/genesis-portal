@@ -46,15 +46,18 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
      <tbody>{s.equipmentFamilies.map((family,j)=><tr key={j}><td>{j+1}</td><td>{family}</td><td>{s.facilities.join(", ")}</td><td>UNVERIFIED</td><td>OPEN</td><td><span className="p55-badge">MTO FAMILY ONLY</span></td></tr>)}</tbody>
     </table></div>
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Source quotation / evidence — vendor candidates and terms</div>
-    {s.sources.map(v=><section className="p55-source-detail" key={v.id}>
-     <div className="p55-source-detail__head"><div><h4>{v.supplier}</h4><p>{v.document}</p></div><span className="p55-badge">{v.status}</span></div>
-     <div className="p55-source-facts">
-      <div><span>Source type</span><strong>{v.type}</strong></div>
-      <div><span>Revision</span><strong>{v.revision||"OPEN"}</strong></div>
-      <div><span>Quoted total</span><strong>{Number.isFinite(v.quotedTotal)?shown(v.quotedTotal,v.currency||"USD")+" / MULTI-MR · NOT ALLOCATED":"NOT EXTRACTED"}</strong></div>
-      <div><span>Evidence</span><strong><a href={v.url} target="_blank" rel="noreferrer">Open source</a></strong></div>
-     </div><p className="p55-note">{v.next}</p>
-    </section>)}
+    <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
+     <thead><tr><th>No.</th><th>Vendor / Supplier</th><th>Document / Scope</th><th>Type / Revision</th><th>Quoted Total ({displayCurrency})</th><th>Evidence Status</th><th>Source / Next Action</th></tr></thead>
+     <tbody>{s.sources.map((v,i)=><tr key={v.id}>
+      <td>{i+1}</td>
+      <td><strong>{v.supplier}</strong></td>
+      <td>{v.document}<small>{v.mr}</small></td>
+      <td>{v.type}<small>Rev: {v.revision||"OPEN"}</small></td>
+      <td className="is-number">{Number.isFinite(v.quotedTotal)?shown(v.quotedTotal,v.currency||"USD"):"NOT EXTRACTED"}{v.mr==="MULTI"&&<small>MULTI-MR / NOT ALLOCATED</small>}</td>
+      <td><span className="p55-badge">{v.status}</span></td>
+      <td><a href={v.url} target="_blank" rel="noreferrer">Open source</a><small>{v.next}</small></td>
+     </tr>)}</tbody>
+    </table></div>
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Detailed source quotation items — supplier price / currency as quoted</div>
     {SUPPLIER_QUOTE_LINES_0553.filter(q=>q.mr.split("/").includes(s.mr)).map(q=><section key={q.id} className="p55-source-detail">
      <div className="p55-source-detail__head"><div><h4>{q.vendor} — {q.quotation}</h4><p>{q.source} · {q.scope}</p></div><span className="p55-badge">{q.status}</span></div>
