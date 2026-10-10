@@ -1,3 +1,4 @@
+import {SUPPLIER_QUOTE_LINES_0553} from "./data/supplierQuoteLines";
 import React,{useState} from "react";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import MTO from "./data/snapshots/mto.rev04.summary.json";
@@ -51,6 +52,20 @@ export function CommercialSystemBreakdown0553(){
       <div><span>Quoted total</span><strong>{Number.isFinite(v.quotedTotal)?money(v.quotedTotal)+" / MULTI-MR · NOT ALLOCATED":"NOT EXTRACTED"}</strong></div>
       <div><span>Evidence</span><strong><a href={v.url} target="_blank" rel="noreferrer">Open source</a></strong></div>
      </div><p className="p55-note">{v.next}</p>
+    </section>)}
+    <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Detailed source quotation items — supplier price / currency as quoted</div>
+    {SUPPLIER_QUOTE_LINES_0553.filter(q=>q.mr.split("/").includes(s.mr)).map(q=><section key={q.id} className="p55-source-detail">
+     <div className="p55-source-detail__head"><div><h4>{q.vendor} — {q.quotation}</h4><p>{q.source} · {q.scope}</p></div><span className="p55-badge">{q.status}</span></div>
+     <div className="p55-source-facts">
+      <div><span>Offer date</span><strong>{q.date}</strong></div>
+      <div><span>Currency</span><strong>{q.currency}</strong></div>
+      <div><span>Quoted total</span><strong>{q.currency} {q.quotedTotal.toLocaleString("en-US",{minimumFractionDigits:2})}</strong></div>
+      <div><span>Valid through</span><strong>{q.validUntil||"HISTORICAL / EXPIRED"}</strong></div>
+     </div>
+     <p className="p55-note">{q.terms} · Price evidence only; verify site applicability, quote expiry, and whether lines are optional/spares before inclusion.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--quoted"><thead><tr><th>Code</th><th>Part Number</th><th>Description</th><th>Qty</th><th>Unit price</th><th>Extended (indicative)</th></tr></thead>
+     <tbody>{q.lines.map(([code,pn,description,qty,unitPrice])=><tr key={code}><td>{code}</td><td>{pn}</td><td>{description}</td><td className="is-number">{qty}</td><td className="is-number">{q.currency} {unitPrice.toLocaleString("en-US",{minimumFractionDigits:2})}</td><td className="is-number">{q.currency} {(qty*unitPrice).toLocaleString("en-US",{minimumFractionDigits:2})}</td></tr>)}</tbody></table></div>
+     <p className="p55-note">{q.id==="NG-260916"?"Selected quoted lines only; the full package quote is NOT the sum of the displayed lines.":"Document detail is historical/source evidence, not automatically required Z1F BOM."}</p>
     </section>)}
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Internal budget bridge — no fabricated allocations</div>
     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
