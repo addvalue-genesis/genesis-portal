@@ -1,0 +1,10 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const model=fs.readFileSync(path.join(root,"src/project0553/data/mr0001AntennaDownsizeStudy.js"),"utf8");
+const ui=fs.readFileSync(path.join(root,"src/project0553/MR0001RFProofPilot.jsx"),"utf8");
+const delta=20*Math.log10(4/6);
+assert(Math.abs(delta+3.521825181)<0.00001);
+assert(Math.abs(40.9+delta-37.378174819)<0.00001);
+for(const x of ["sourceLinkId:link.id","sourceRxLevelDbm=null","requiredAvailability:null","availabilityPass:null","approvedFourFootSku:null","releaseAllowed:false"])assert(model.includes(x),x);
+assert(ui.includes("downsizing.estimatedSingleEndRslDeltaDb.toFixed")&&ui.includes("NOT ESTABLISHED"));
+console.log("PASS 0553 JUTAL antenna 6->4ft aperture sensitivity: -3.52dB single-end, availability/OEM confirmation remains OPEN");
