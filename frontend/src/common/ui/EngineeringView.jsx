@@ -1,3 +1,4 @@
+import { LinkedEngineeringHierarchy } from "./LinkedEngineeringHierarchy";
 import { ExpandableFormulaTable } from "./ExpandableFormulaTable";
 import { MASTER_FORMULA_INVENTORY, FORMULA_COVERAGE_SUMMARY, PRELIMINARY_METHODS_REQUIRING_SPECIALIST_MODELS } from "../engineering/masterFormulaInventory";
 import React from "react";
@@ -101,99 +102,8 @@ export function EngineeringView({model,children}) {
         </section>
       </div>
 
-      <section className="p55-panel">
-        <SectionTitle
-          eyebrow="Audit dimensions"
-          title="What must be checked for every extracted requirement"
-          text="These dimensions are an audit checklist, not an assertion that every dimension applies to every system."
-        />
-        <div className="p55-control-grid">
-          {(completeness?.auditDimensions || []).map((item) => (
-            <div className="p55-control" key={item}>
-              <div className="p55-control__dot" />
-              <div><strong>{item}</strong></div>
-              <Badge tone="neutral">CHECK</Badge>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <SectionTitle
-        eyebrow="Governing method"
-        title="First-Principles engineering chain"
-        text="Every mapped requirement then moves through the same controlled causal chain. A formula producing a number does not upgrade evidence status."
-      />
-
-      <section className="p55-panel">
-        <div className="p55-chain p55-chain--full">
-          {chain.map((step, index) => (
-            <React.Fragment key={step}>
-              <div className="p55-chain__node">
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <strong>{step}</strong>
-              </div>
-              {index < chain.length - 1 ? <div className="p55-chain__line" /> : null}
-            </React.Fragment>
-          ))}
-        </div>
-      </section>
-
-      <SectionTitle
-        eyebrow="Knowledge Kernels"
-        title="Multidisciplinary decision kernels"
-        text="COMMON knowledge is separated from project facts. Mathematics, physics, telecom, network, power, economics, commercial, logistics, project management and governance are invoked only where the requirement needs them."
-      />
-
-      <section className="p55-callout">
-        <strong>{lawLibrary?.state || "COMMON_GENERIC_KERNEL"}</strong>
-        <p>{lawLibrary?.evidenceRule}</p>
-      </section>
-
-      <section className="p55-panel">
-        <SectionTitle
-          eyebrow="Knowledge architecture"
-          title="COMMON → GENERIC DOMAIN → PARTICULAR PROJECT"
-          text="The common layer contains reusable knowledge and equations; {projectId} contains only project evidence, requirements, constraints, inputs and system bindings."
-        />
-        <div className="p55-control-grid">
-          {(domains || []).map((domain) => (
-            <div className="p55-control" key={domain.id}>
-              <div className="p55-control__dot" />
-              <div>
-                <strong>{domain.name}</strong>
-                <p>{domain.purpose}</p>
-                <small>{domain.topics.join(" · ")}</small>
-              </div>
-              <Badge tone="neutral">{domain.id}</Badge>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <div className="p55-grid p55-grid--2">
-        {(lawLibrary?.kernels || []).map((kernel) => (
-          <section className="p55-panel" key={kernel.id}>
-            <div className="p55-panel__head">
-              <div>
-                <div className="p55-eyebrow">{kernel.domain} · {kernel.id}</div>
-                <h3>{kernel.name}</h3>
-              </div>
-              <Badge tone="neutral">{kernel.appliesTo.length} mappings</Badge>
-            </div>
-            <div className="p55-equations">
-              {kernel.equations.map((eq) => (
-                <code key={eq.name}>
-                  <strong>{eq.name}</strong>{" — "}{eq.formula}
-                </code>
-              ))}
-            </div>
-            <p className="p55-note"><strong>Output:</strong> {kernel.output}</p>
-            <ul className="p55-rule-list">
-              {kernel.controls.map((rule) => <li key={rule}>{rule}</li>)}
-            </ul>
-          </section>
-        ))}
-      </div>
+      <LinkedEngineeringHierarchy auditDimensions={completeness?.auditDimensions||[]} chain={chain} domains={domains} kernels={lawLibrary?.kernels||[]} systemKernelMap={lawLibrary?.systemKernelMap||[]} projectId={projectId}/>
+      <section className="p55-callout"><strong>{lawLibrary?.state||"COMMON_GENERIC_KERNEL"}</strong><p>{lawLibrary?.evidenceRule}</p></section>
 
       <section className="p55-panel">
         <SectionTitle
