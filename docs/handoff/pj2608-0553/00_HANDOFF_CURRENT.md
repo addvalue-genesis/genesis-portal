@@ -247,3 +247,9 @@ This audit is additive and controls where it is more specific than earlier histo
 - WBS service candidates cover RF engineering, interfaces, FAT/SAT and logistics/licences with equations and null MH/cost until evidence is confirmed.
 - Added `validate:0553-package-composition` static guard to build; real OEM compliance and numeric engineering derivation remain open. This stage provides auditable FUNCTION candidates, not a complete engineered physical BOM or approved price.
 - Next: verify native MTO grouped rows, one-to-many exact equipment composition, site-link-to-OEM role, CAL/RPT, antenna sizing, RF cables/interfaces, field/service MH/rates and supplier quotes; record gap, overlap, acceptance decisions with sources. No 0550 modification, release, deployment or submission. Build pending user's local verification.
+
+
+## 2026-10-10 MR0001 topology quantity audit
+- Added `data/mr0001TopologyQuantityAudit.js`, derived from five RPT-0001 Rev.C1 links: ten logical link endpoints at seven distinct sites. These are graph counts, NOT ten purchasable radios.
+- Site table appears before package composition; radio, antenna, diversity, licence, cost and sell remain OPEN pending OEM/BLD/MTO/CAL proof. Four TOPO holds address PTMP sharing, multi-link sites, source grouping, 60/90-degree conflict.
+- Added `validate:0553-topology` static guard to frontend build. Run local build before claiming PASS. No customer release, no protected 0550 changes.
