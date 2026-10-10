@@ -15,7 +15,8 @@
     "validationScriptsPassedBeforeWebpack": 14,
     "hotfixCommit": "57db7b0e910d568a157bd1dce1f1cedbb31ea745",
     "hotfixVerification": "PENDING_USER_LOCAL_BUILD",
-    "secondHotfixCommit": "87c92e1568ecc6fbbf4879d2400d7b0798516dd1"
+    "secondHotfixCommit": "87c92e1568ecc6fbbf4879d2400d7b0798516dd1",
+    "requiredBomGuard": "ADDED_PENDING_USER_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -64,8 +65,8 @@
   },
   "engineering": {
     "requiredMTO": "MR0001_42_SOURCE_ROWS_INGESTED_ENGINEERING_REVIEW_OPEN",
-    "requiredVsOffered": "GENERIC_ENGINE_PARTIAL",
-    "mr0001": "SOURCE_ROWS_42_PLATFORM_GROUPED_SKU_REQUIRED_QTY_OPEN",
+    "requiredVsOffered": "REQUIRED_SCOPE_UI_BEFORE_VENDOR_QUOTE_ENGINEERING_APPROVAL_OPEN",
+    "mr0001": "SOURCE_DRIVEN_42_MTO_ROWS_7_SITES_5_LINKS_PRELIMINARY_REQUIRED_BOM_CANDIDATES_SKU_OPEN",
     "mr0002": "LNA_PRELIMINARY_ONLY",
     "mr0003": "REVIEW_OPEN",
     "mr0004": "REVIEW_OPEN"
