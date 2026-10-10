@@ -1,5 +1,6 @@
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { InternalBudgetShortcut0553 } from "./InternalBudgetShortcut0553";
+import { ScopeSheetsDetail0553 } from "./ScopeSheetsDetail0553";
 import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { SimpleBom0553 } from "./SimpleBom0553";
@@ -41,6 +42,7 @@ export function CommercialWorkspace0553({focusedLocation=null}){
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  return <div className="p55-stack">
  <InternalBudgetShortcut0553/>
+ <ScopeSheetsDetail0553/>
  <section className="p55-panel">
   <div className="p55-eyebrow">0553 / REUSE 0550 COMMERCIAL STATE DOCTRINE</div>
   <h2>Engineering → BOM/MTO → Cost → Customer Scope of Supply</h2>
