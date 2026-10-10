@@ -1,4 +1,5 @@
 import React,{useState} from "react";
+import {BulkTakeoff0553} from "./BulkTakeoff0553";
 import { REV08_BASELINE,getBaselineReview } from "./data/rev08CommercialBaseline";
 import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 // Read-only decision shortcut. Historical customer amounts and vendor costs are
@@ -40,6 +41,7 @@ export function InternalBudgetShortcut0553(){
   <tr><td>MR-0002</td><td>RFI LNA RX3852-2002-11 (product-only)</td><td className="is-number"></td><td>No source quotation received. Datasheet-only: 380–520 MHz, SMA(F), 11–28 VDC. Connector accessories, cable and enclosure require physical design. Blank is unknown, not zero.</td></tr>
   <tr><td>ALL</td><td>Shared bulk A5</td><td className="is-number">{usd(historical("A5"))}</td><td>Source workbook has shared bulk; split quantities by MR using BLD/LAY/DWG, count common items once, preserve historic A5 without double counting</td></tr>
   </tbody></table></div>
+  <BulkTakeoff0553/>
   <button type="button" className="p553-detail-button" onClick={()=>setDetails(v=>!v)} aria-expanded={details}>{details?"− Hide":"＋ Show"} mandatory processing 01–08</button>
   {details&&<div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Step</th><th>Module</th><th>Required evidence before revised budget</th></tr></thead><tbody>
    {steps.map(([n,title,description])=><tr key={n}><td>{n}</td><td>{title}</td><td>{description}</td></tr>)}
