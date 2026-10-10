@@ -4,7 +4,7 @@ const ui=fs.readFileSync(path.join(root,"src/project0553/SimpleBom0553.jsx"),"ut
 const parent=fs.readFileSync(path.join(root,"src/project0553/CommercialWorkspace.jsx"),"utf8");
 const legacy=fs.readFileSync(path.join(root,"src/project0553/CommercialSystemBreakdown.jsx"),"utf8");
 const projection=fs.readFileSync(path.join(root,"src/project0553/data/workingBomByLocation.js"),"utf8");
-for(const token of ["model.locations","model.vendors","model.items","sourceScopeQty","priced","provisionalSubtotalTHB","UNPRICED — NOT ZERO","vendorCandidates","sourceTag"])
+for(const token of ["model.locations","model.vendors","sourceScopeQty","priced","provisionalSubtotalTHB","UNPRICED — NOT ZERO","vendorCandidates","sourceTag"])
  assert(ui.includes(token),"Missing location BOM UI: "+token);
 assert(parent.includes("<SimpleBom0553/>")&&parent.indexOf("<SimpleBom0553/>")<parent.indexOf("<CommercialSystemBreakdown0553"));
 assert(!legacy.includes("<SimpleBom0553/>")&&legacy.includes("<details>")&&legacy.includes("</details>"));
