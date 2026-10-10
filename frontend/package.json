@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && npm run validate:lna-cascade && npm run validate:physical-bom && npm run validate:commercial-workbook && npm run validate:commercial-drilldown && npm run validate:supplier-quotes && npm run validate:commercial-currency && npm run validate:nextg-full && npm run validate:0553-json-repository && npm run validate:0553-reconciliation && npm run validate:0553-required-bom && npm run validate:0553-aviat-review && npm run validate:0553-package-composition && npm run validate:0553-topology && npm run validate:0553-radio-roles && npm run validate:0553-scope-ownership && npm run validate:0553-offer-allocation && npm run validate:0553-gap && npm run validate:0553-requirement-evidence && npm run validate:0553-innova-budget && npm run validate:0553-innova-cost-bridge && npm run validate:0553-source-quote-completeness && npm run validate:0553-working-fx-default && npm run validate:0553-closure-progress && npm run validate:0553-working-priced-bom && webpack --mode production",
+    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && npm run validate:lna-cascade && npm run validate:physical-bom && npm run validate:commercial-workbook && npm run validate:commercial-drilldown && npm run validate:supplier-quotes && npm run validate:commercial-currency && npm run validate:nextg-full && npm run validate:0553-json-repository && npm run validate:0553-reconciliation && npm run validate:0553-required-bom && npm run validate:0553-aviat-review && npm run validate:0553-package-composition && npm run validate:0553-topology && npm run validate:0553-radio-roles && npm run validate:0553-scope-ownership && npm run validate:0553-offer-allocation && npm run validate:0553-gap && npm run validate:0553-requirement-evidence && npm run validate:0553-innova-budget && npm run validate:0553-innova-cost-bridge && npm run validate:0553-source-quote-completeness && npm run validate:0553-working-fx-default && npm run validate:0553-closure-progress && npm run validate:0553-working-priced-bom && npm run validate:0553-simple-bom && webpack --mode production",
     "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs",
     "validate:pj0553-isolation": "node scripts/validate-pj2608-0553-isolation.cjs",
     "validate:rf-prop": "node scripts/validate-rf-propagation.cjs",
@@ -33,7 +33,8 @@
     "validate:0553-source-quote-completeness": "node scripts/validate-0553-source-quote-completeness.cjs",
     "validate:0553-working-fx-default": "node scripts/validate-0553-working-fx-default.cjs",
     "validate:0553-closure-progress": "node scripts/validate-0553-closure-progress.cjs",
-    "validate:0553-working-priced-bom": "node scripts/validate-0553-working-priced-bom.cjs"
+    "validate:0553-working-priced-bom": "node scripts/validate-0553-working-priced-bom.cjs",
+    "validate:0553-simple-bom": "node scripts/validate-0553-simple-bom.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
