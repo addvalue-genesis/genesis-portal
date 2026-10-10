@@ -321,3 +321,9 @@ This audit is additive and controls where it is more specific than earlier histo
 - Root cause: Cisco 11 coded source lines were stored as 5-column `[code,sku,description,qty,unitPrice]`, whereas runtime `validateProject0553Dataset` only summed sixth-column quoted line totals, producing zero for Cisco against THB 2,117,650 manifest reference.
 - Patched `validateDataset.js` to use explicit quoted line total when numeric, otherwise compute `qty * unitPrice` only when both numeric, while preserving null/N/A as unpriced. Added validator-string guard to `validate-0553-source-quote-completeness.cjs`.
 - User should git pull and refresh running webpack dev server (or restart 0553 on 3001 if needed). Local runtime confirmation PENDING. No protected 0550 changes.
+
+
+## 2026-10-10 Working Preview FX convenience default
+- User requested working FX rate/date/source persist on tab switch and reopening. `CommercialWorkspace.jsx` now defaults display THB, 31.5 THB/USD, 2026-10-10, source `INTERNAL PLANNING ASSUMPTION — UNVERIFIED`; this is user screenshot working assumption and **NOT claimed as sourced BOT rate** or 0550 source fact.
+- React state writes any edits to namespaced browser localStorage and reads them back when the component remounts/reopens in same browser; reset button restores working defaults. Browser clearing/private mode falls back to defaults. No source vendor currency mutation, server DB write, accepted cost or customer release.
+- Added `validate:0553-working-fx-default` structural guard to build. Local build pending. Warning: release requires verified actual rate, date and source instead of unverified assumption.
