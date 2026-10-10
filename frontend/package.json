@@ -4,9 +4,10 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && webpack --mode production",
+    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && webpack --mode production",
     "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs",
-    "validate:pj0553-isolation": "node scripts/validate-pj2608-0553-isolation.cjs"
+    "validate:pj0553-isolation": "node scripts/validate-pj2608-0553-isolation.cjs",
+    "validate:rf-prop": "node scripts/validate-rf-propagation.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
