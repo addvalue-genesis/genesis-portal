@@ -3,7 +3,7 @@ import NEXT_G_FULL_BOQ from "./quotes/NG-260916-ADV-DAP1.full.json";
 // The 2024 quotations are REFERENCE_ONLY from Zawtika 1E; they are NOT adopted 0553 project prices.
 // Units and currencies are retained. No unsupported FX conversion or customer markup.
 export const SUPPLIER_QUOTE_LINES_0553=[
- {id:"NG-260916",vendor:"Next G Solution",quotation:"NG/260916-ADV-DAP1",date:"2026-09-16",validUntil:"2026-10-01",currency:"USD",terms:"100% advance; DAP Ranong; 22–24 weeks",mr:"MR-0001",status:"2026_QUOTE_EXPIRED_RECONFIRM",source:"NG Price Proposal - ADV Z1F as of 16Sep26.pdf",scope:"Zawtika Phase 1F",quotedTotal:191610.15,lines:NEXT_G_FULL_BOQ.lines.map(x=>[x.code,x.partNumber,x.description,x.qty,x.unitPrice,x.quotedTotal,x.group,x.sourcePage,x.pricingState]),
+ {id:"NG-260916",vendor:"Next G Solution",quotation:"NG/260916-ADV-DAP1",date:"2026-09-16",validUntil:"2026-10-01",currency:"USD",terms:"100% advance; DAP Ranong; 22–24 weeks",mr:"MR-0001",status:"2026_QUOTE_EXPIRED_RECONFIRM",source:"NG Price Proposal - ADV Z1F as of 16Sep26.pdf",scope:"Zawtika Phase 1F",quotedTotal:191610.15,lines:NEXT_G_FULL_BOQ.lines.map(x=>[x.code,x.partNumber,x.description,x.qty,x.unitPrice,x.quotedTotal,x.group,x.sourcePage,x.pricingState])},
  {id:"VST-0048-RE1",vendor:"VST ECS (Thailand) / Cisco",quotation:"A-0048/2026_Re1",date:"2026-09-09",validUntil:"2026-09-30",currency:"THB",terms:"Delivery 60–75 days; quote validity end of issue month; VAT 7% separately",mr:"MR-0001",status:"2026_QUOTE_EXPIRED_RECONFIRM",source:"A-0048_Add Value System_PTTEP_Re1.pdf",scope:"PTTEP / verify Z1F MTO",quotedTotal:2117650,lines:[
  ["1.0","IE-3400-8P2S-E","Cisco Catalyst IE3400 8GE PoE, 2GE SFP",5,242460],
  ["1.0.1","CON-SNT-IE34008E","Cisco SmartNet 3 years",5,100930],
