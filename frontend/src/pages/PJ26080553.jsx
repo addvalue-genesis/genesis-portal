@@ -7,6 +7,7 @@ import { MODULE_REGISTRY_0553 } from "../project0553/moduleRegistry";
 import { ExecutiveView } from "../common/ui/ExecutiveView";
 import { MR0001RFProofPilot } from "../project0553/MR0001RFProofPilot";
 import { ScadaSchematic0553 } from "../project0553/ScadaSchematic0553";
+import { DataCodeRegistry0553 } from "../project0553/DataCodeRegistry0553";
 import { MR0002LNACalculation } from "../project0553/MR0002LNACalculation";
 import { MR0002PhysicalBom } from "../project0553/MR0002PhysicalBom";
 import { EngineeringView as SharedEngineeringView } from "../common/ui/EngineeringView";
@@ -36,11 +37,12 @@ const TABS = [
  ["risk","06 Risk & Controls"],
  ["documents","07 Evidence"],
  ["schematic","08 Schematic"],
- ["budget","09 Budget"]
+ ["registry","09 Data & Code"],
+ ["budget","10 Budget"]
 ];
 const TAB_GROUPS = [
  {id:"define",title:"DEFINE · กำหนดงาน",tabs:["overview","architecture","systems"]},
- {id:"engineer",title:"ENGINEER · วิเคราะห์และพิสูจน์",tabs:["engineering","execution","risk","documents","schematic"]},
+ {id:"engineer",title:"ENGINEER · วิเคราะห์และพิสูจน์",tabs:["engineering","execution","risk","documents","schematic","registry"]},
  {id:"commercial",title:"COMMERCIAL · สรุปต้นทุน",tabs:["budget"]}
 ];
 const Badge = AuditBadge;
@@ -69,6 +71,7 @@ export function PJ26080553() {
  return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} tabGroups={TAB_GROUPS} className="p553-dashboard" activeTab={workspaceTab} onTabChange={setWorkspaceTab} renderContent={(tab)=><>
 
    {tab==="schematic"&&<ScadaSchematic0553 onOpenLocationBom={openLocationBom}/>}
+   {tab==="registry"&&<DataCodeRegistry0553/>}
    {tab==="overview"&&<ExecutiveView model={EXECUTIVE_0553}/>}
    {tab==="architecture"&&<SharedArchitectureView manifest={ARCHITECTURE_MANIFEST_0553} modules={MODULE_REGISTRY_0553}/>}
    {tab==="systems"&&<SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Same group/focus/search/expand behavior as PJ2608-0550; all facts come from 0553 controlled MTO and RFQ."/>}
