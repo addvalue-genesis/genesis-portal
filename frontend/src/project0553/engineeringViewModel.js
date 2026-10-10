@@ -1,4 +1,5 @@
 import { SERVICE_EQUATIONS } from "../common/cost/serviceEquations";
+import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 // 0553 project adapter for the COMMON First-Principles View.
 // Same review method as 0550; no 0550 project facts, prices, or system records.
 import { KNOWLEDGE_KERNEL_DOMAINS, ENGINEERING_LAW_KERNELS, KNOWLEDGE_KERNEL_POLICY } from "../knowledge-kernels/library";
@@ -52,5 +53,6 @@ export const ENGINEERING_VIEW_MODEL_0553={
   kernels:ENGINEERING_LAW_KERNELS.map(k=>({...k,appliesTo:SYSTEMS_0553.filter(s=>(kernelIdsByMr[s.token]||[]).includes(k.id)).map(s=>s.token)})),
   systemKernelMap:SYSTEMS_0553.map(s=>({token:s.token,name:s.name,kernelIds:kernelIdsByMr[s.token]||[],auditState:"MAPPED_PRELIMINARY"}))
  },
+ costSpine:{id:BID_COST_SPINE_0553.id,knownPreliminaryCost:BID_COST_SPINE_0553.knownPreliminaryCost,unpricedRows:BID_COST_SPINE_0553.unpricedRows,outputTemplate:BID_COST_SPINE_0553.outputTemplate},
  pilotLinksCount:SCADA_LINKS_0553.length
 };
