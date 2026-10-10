@@ -1,9 +1,14 @@
 import React,{useState} from "react";
 import { preliminaryLinkBalance, fresnelRadius } from "../common/engineering/rfPropagation";
+import { assessTideScenarios } from "../common/engineering/seaReflection";
 const fields=[["frequencyMHz","Frequency (MHz)"],["distanceKm","Path distance (km)"],["txPowerDbm","Tx power (dBm)"],["txGainDbi","Tx antenna gain (dBi)"],["rxGainDbi","Rx antenna gain (dBi)"],["otherLossDb","Other losses (dB)"],["rxThresholdDbm","Receiver threshold (dBm)"]];
 export function MR0001RFProofPilot(){
  const [inputs,setInputs]=useState({}),[source,setSource]=useState("");
  const [d1,setD1]=useState(""),[d2,setD2]=useState("");
+ const [sea,setSea]=useState({});
+ const changeSea=(key,value)=>setSea(prev=>({...prev,[key]:value}));
+ const sn=key=>sea[key]===undefined||sea[key]===""?null:Number(sea[key]);
+ const seaReport=assessTideScenarios({distanceKm:num("distanceKm"),frequencyMHz:num("frequencyMHz"),txElevationM:sn("txElevationM"),rxElevationM:sn("rxElevationM"),tideScenarios:[{name:"LOW",tideElevationM:sn("low")},{name:"MEAN",tideElevationM:sn("mean")},{name:"HIGH",tideElevationM:sn("high")}],evidence});
  const evidence=source.trim()?{sourceId:source.trim(),state:"USER_ENTERED_UNVERIFIED"}:null;
  const num=k=>inputs[k]===""||inputs[k]===undefined?null:Number(inputs[k]);
  const balanced=preliminaryLinkBalance({frequencyMHz:num("frequencyMHz"),distanceKm:num("distanceKm"),txPowerDbm:num("txPowerDbm"),txGainDbi:num("txGainDbi"),rxGainDbi:num("rxGainDbi"),otherLossDb:num("otherLossDb"),rxThresholdDbm:num("rxThresholdDbm"),evidence});
@@ -23,6 +28,13 @@ export function MR0001RFProofPilot(){
   <tr><td>Fade margin</td><td>{balanced.status==="OPEN_INPUT"?"OPEN":v(balanced.fadeMarginDb)+" dB"}</td><td>Not availability or compliance proof</td></tr>
   <tr><td>First Fresnel radius</td><td>{fresnel.status==="OPEN_INPUT"?"OPEN":v(fresnel.value)+" m"}</td><td>{fresnel.status==="OPEN_INPUT"?fresnel.missing.join(", "):"PRELIMINARY_CALCULATED"}</td></tr>
   </tbody></table></div>
+  <div className="p55-eyebrow" style={{marginTop:"18px"}}>TIDE + SEA REFLECTION / GEOMETRY ONLY</div>
+  <p className="p55-note">ความสูงเสาอากาศและระดับน้ำทั้งหมดต้องอ้างอิง Vertical Datum เดียวกัน เช่น MSL ที่ตรวจยืนยันแล้ว ห้ามใช้ Elevation คนละ Datum หรือถือว่า Sea Level = 0 เอง</p>
+  <div className="p55-grid p55-grid--2">{[["txElevationM","TX antenna elevation (m, shared datum)"],["rxElevationM","RX antenna elevation (m, shared datum)"],["low","LOW tide elevation (m)"],["mean","MEAN tide elevation (m)"],["high","HIGH tide elevation (m)"]].map(([key,label])=><label key={key}>{label}<input type="number" step="any" value={sea[key]??""} onChange={e=>changeSea(key,e.target.value)} placeholder="OPEN" style={{display:"block",width:"100%",padding:"8px"}}/></label>)}</div>
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Tide</th><th>Tx/Rx above water (m)</th><th>Reflection point (m from Tx)</th><th>Path difference (m)</th><th>Phase difference (deg)</th><th>State</th></tr></thead><tbody>
+  {seaReport.scenarios.map((r,i)=><tr key={i}><td>{r.name}</td><td>{r.status==="OPEN_INPUT"?"OPEN":v(r.txHeightM)+" / "+v(r.rxHeightM)}</td><td>{r.status==="OPEN_INPUT"?"OPEN":v(r.reflectionPointFromTxM)}</td><td>{r.status==="OPEN_INPUT"?"OPEN":v(r.pathDifferenceM)}</td><td>{r.status==="OPEN_INPUT"?"OPEN":v(r.phaseDifferenceDeg)}</td><td>{r.status==="OPEN_INPUT"?r.missing.join(", "):r.status}</td></tr>)}
+  </tbody></table></div>
+  <p className="p55-note">Two-ray flat-sea sensitivity only; no reflection coefficient, multipath fade, k-factor, sea roughness, obstructions or availability prediction. Pathloss 5 and OEM remain required.</p>
   <p className="p55-note"><strong>Outstanding:</strong> Path profile, tide/reflection, clearance, climate/rain and ITU-R P.530 availability, regulatory applicability, PTTEP STD clause check, independent engineering verification and manufacturer CAL/RPT. No automatic Equipment Quantity or Budget release.</p>
  </section>;
 }
