@@ -1,8 +1,8 @@
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
-import {SUPPLIER_QUOTE_LINES_0553} from "./data/supplierQuoteLines";
+import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
 import React,{useState} from "react";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
-import MTO from "./data/snapshots/mto.rev04.summary.json";
+
 import {VENDOR_0553_SOURCES} from "./vendorEvidence";
 
 const CODES={"MR-0001":"A1","MR-0002":"A2","MR-0003":"A3","MR-0004":"A4"};
@@ -12,7 +12,7 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
  const shown=(amount,source="USD")=>formatCommercialAmount(amount,source,displayCurrency,fx);
  const [expanded,setExpanded]=useState(new Set());
  const toggle=id=>setExpanded(old=>{const n=new Set(old);n.has(id)?n.delete(id):n.add(id);return n;});
- const systems=MTO.systems.map(s=>({
+ const systems=getProject0553Dataset().mto.systems.map(s=>({
   ...s,code:CODES[s.mr],
   baseline:REV08_BASELINE.summary.find(x=>x[0]===CODES[s.mr]),
   sources:VENDOR_0553_SOURCES.filter(v=>v.mr===s.mr||v.mr==="MULTI")
@@ -59,7 +59,7 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
      </tr>)}</tbody>
     </table></div>
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Detailed source quotation items — supplier price / currency as quoted</div>
-    {SUPPLIER_QUOTE_LINES_0553.filter(q=>q.mr.split("/").includes(s.mr)).map(q=><section key={q.id} className="p55-source-detail">
+    {getProject0553SupplierQuotes().filter(q=>q.mr.split("/").includes(s.mr)).map(q=><section key={q.id} className="p55-source-detail">
      <div className="p55-source-detail__head"><div><h4>{q.vendor} — {q.quotation}</h4><p>{q.source} · {q.scope}</p></div><span className="p55-badge">{q.status}</span></div>
      <div className="p55-source-facts">
       <div><span>Offer date</span><strong>{q.date}</strong></div>
