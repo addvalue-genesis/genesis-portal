@@ -2,6 +2,7 @@ import { SCADA_0553_RECONCILIATION } from "./data/scadaOfferReconciliation";
 import { AVIAT_0553_TECHNICAL_EVALUATION } from "./data/aviatTechnicalBidEvaluation";
 import { MR0001_PACKAGE_COMPOSITION, summarizeMR0001Composition } from "./data/mr0001PackageComposition";
 import { MR0001_TOPOLOGY_QUANTITY_AUDIT } from "./data/mr0001TopologyQuantityAudit";
+import { MR0001_RADIO_ROLE_MATRIX } from "./data/mr0001RadioRoleMatrix";
 import { MR0001_ENGINEERING_REQUIRED_BOM, summarizeMR0001RequiredBom } from "./data/mr0001RequiredBomDerivation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
@@ -93,6 +94,27 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
      <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>ID</th><th>Missing engineering proof</th><th>Source</th><th>State</th></tr></thead><tbody>
      {MR0001_TOPOLOGY_QUANTITY_AUDIT.outstanding.map(x=><tr key={x.id}><td>{x.id}</td><td>{x.reason}</td><td>{x.source}</td><td>{x.state}</td></tr>)}
      </tbody></table></div>
+    </section>}
+    {s.mr==="MR-0001"&&<section className="p55-panel">
+     <div className="p55-eyebrow">PHYSICAL RADIO ROLE MATRIX · SITE / LINK / MR / OEM OFFER</div>
+     <h4>RPT inferred roles — not approved hardware quantities</h4>
+     <p className="p55-note">PTMP FROM/TO roles below are directional interpretations of existing RPT links. PTP peers are kept separate. They cannot define a base station quantity without BLD/OEM validation; multiple links, antennas and shared sectors may alter physical counts.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Site</th><th>RPT link / peer</th><th>Role candidate</th><th>RPT antenna</th><th>MTO source rows</th><th>Physical radio / antenna</th></tr></thead>
+      <tbody>{MR0001_RADIO_ROLE_MATRIX.sites.flatMap(site=>site.roles.map(r=><tr key={r.id}>
+       <td><strong>{r.site}</strong></td><td>{r.linkId}<small>Peer: {r.peer}, {r.frequencyMHz} MHz</small></td>
+       <td>{r.inferredRole}</td><td>{r.antennaReference}</td>
+       <td>{site.mtoRows.map(x=>x.sourceRowIndex).join(", ")}</td><td>OPEN / OEM HOLD</td>
+      </tr>))}</tbody></table></div>
+     <h4>Offered radio and antenna families — site allocation pending</h4>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Next G line</th><th>Role</th><th>Part Number</th><th>Offer total Qty</th><th>Site allocation</th></tr></thead>
+      <tbody>{MR0001_RADIO_ROLE_MATRIX.quoteRoles.map(x=><tr key={x.quoteLine}>
+       <td>{x.quoteLine}</td><td>{x.role}</td><td>{x.partNumber}</td><td>{x.offeredQty}</td><td>OPEN</td>
+      </tr>)}</tbody></table></div>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Control</th><th>Engineering question</th><th>Status</th></tr></thead>
+      <tbody>{MR0001_RADIO_ROLE_MATRIX.engineeringQuestions.map(x=><tr key={x.id}><td>{x.id}</td><td>{x.question}</td><td>{x.state}</td></tr>)}</tbody></table></div>
     </section>}
     {s.mr==="MR-0001"&&<section className="p55-panel">
      <div className="p55-eyebrow">ENGINEERING PACKAGE COMPOSITION · MR ITEM → FUNCTIONS → QUOTE CANDIDATES</div>
