@@ -8,9 +8,21 @@ const positions={ZWP20:[85,90],ZWP22:[85,260],ZWP8:[285,170],ZWP11:[285,350],ZWP
 export function ScadaSchematic0553({onOpenLocationBom}){
  const [selected,setSelected]=useState(null);
  const [showLabels,setShowLabels]=useState(true);
+ const [overviewOpen,setOverviewOpen]=useState(true);
  const active=SCADA_LINKS_0553.find(l=>l.id===selected)||null;
  const vendor=MR0001_NEXTG_LINK_RECONCILIATION.links.find(l=>l.id===selected);
  return <section className="p55-panel">
+  <section className="p55-panel">
+   <div className="p55-eyebrow">FIELD OVERVIEW · REFERENCE IMAGE</div>
+   <h2>Overall Field Schematic · Zawtika Phase 1F</h2>
+   <p className="p55-note">ภาพรวม Phase 1A–1E (เดิม) และ Phase 1F (ใหม่) จากแผนภาพที่ให้ไว้ใน Eng Cal; ใช้เพื่อเข้าใจทั้ง Field ไม่ใช่เพื่อกำหนดระยะทาง RF หรือ BOM</p>
+   <button type="button" className="p553-detail-button" onClick={()=>setOverviewOpen(x=>!x)}>{overviewOpen?"− Hide Overall":"＋ Show Overall"}</button>
+   {overviewOpen&&<div style={{marginTop:12,maxWidth:1100}}>
+    <iframe title="Zawtika Phase 1F original overall field schematic" src="https://drive.google.com/file/d/1E_OVhaZg--yvVMiHm8lumPvvlelRSV4L/preview" loading="lazy" style={{width:"100%",height:"min(73vw,760px)",minHeight:330,border:"1px solid #c8d8e5",borderRadius:10,background:"#fff"}} />
+    <p className="p55-note">Original reference image from Eng Cal · <a href="https://drive.google.com/file/d/1E_OVhaZg--yvVMiHm8lumPvvlelRSV4L/view?usp=drivesdk" target="_blank" rel="noreferrer">Open original image in Google Drive</a>. หาก Drive Preview ไม่แสดง ให้เปิดภาพต้นฉบับจากลิงก์นี้</p>
+   </div>}
+  </section>
+  <div className="p55-eyebrow" style={{marginTop:16}}>INTERACTIVE WORKING SCHEMATIC · CONTROLLED JSON</div>
   <div className="p55-eyebrow">PJ2608-0553 / SCADA RADIO / SOURCE-DRIVEN SCHEMATIC</div>
   <h2>Schematic — 5 RPT links / 7 sites</h2>
   <p className="p55-note"><strong>คลิกชื่อ Location เพื่อเปิด BOM ของ Location นั้นใน Budget → Working Preview</strong></p>
