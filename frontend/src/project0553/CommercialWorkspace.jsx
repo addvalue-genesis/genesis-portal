@@ -2,7 +2,8 @@ import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import React,{useState} from "react";
-import {COMMERCIAL_TEMPLATE_0553 as template,commercialTransition} from "./commercialWorkbookControl";
+import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
+import { BID_0553_GATES, BID_0553_SOURCES } from "./bidReview";
 export function CommercialWorkspace0553(){
  const [mode,setMode]=useState("working");
  const [recipient,setRecipient]=useState("INTERNAL");
@@ -29,6 +30,7 @@ export function CommercialWorkspace0553(){
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
   </div>
   <p className="p55-note"><strong>Current display:</strong> {mode.toUpperCase()} · {recipient}. {mode==="working"?"Editable commercial derivation is pending source reconciliation.":mode==="budgetary"?"Frozen snapshot required; do not overwrite prior submissions.":"Customer release remains HOLD until written authorization and all gates pass."}</p>
+  {mode==="working"&&<>
   <section className="p55-panel">
    <div className="p55-eyebrow">CURRENCY VIEW / ORIGINAL CURRENCY RETAINED</div>
    <div className="p55-filterbar p55-filterbar--simple">
@@ -81,6 +83,26 @@ export function CommercialWorkspace0553(){
   </table></div>
   <p><strong>Workbook source:</strong> {template.sourceName} · {template.revision} · 6 sheets. <strong>Export status:</strong> HOLD — original template fidelity and cross-sheet reconciliation not yet validated.</p>
  </section>
+ </>}
+ {mode==="budgetary"&&<section className="p55-panel">
+   <div className="p55-eyebrow">BUDGETARY SUBMISSION · SNAPSHOT REGISTRY</div>
+   <h3>Frozen Budgetary Issue — Verification Required</h3>
+   <p className="p55-note"><strong>NO VERIFIED ISSUED SNAPSHOT REGISTERED.</strong> A historical Rev08 workbook is available but its exact SAMTEL-issued revision and recipients are still unverified. It is not promoted to Budgetary Submission.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Candidate evidence</th><th>Source</th><th>Issue / approval status</th></tr></thead><tbody>
+    <tr><td>4-Scope of Supply.xlsx · Rev08</td><td><a href={"https://drive.google.com/file/d/"+template.sourceId+"/view"} target="_blank" rel="noreferrer">Historical customer workbook</a></td><td>HISTORICAL BASELINE / ISSUED REVISION UNVERIFIED</td></tr>
+    <tr><td>Internal Pricing Rev09</td><td><a href={BID_0553_SOURCES.find(x=>x.id==="INT-PRICE-R09")?.url} target="_blank" rel="noreferrer">Source file</a></td><td>INTERNAL ONLY / HOLD</td></tr>
+   </tbody></table></div>
+   <p className="p55-note"><strong>Required before freeze:</strong> confirmed issued document, recipient, revision, approved commercial amount, source hash, issue timestamp, and management authorization. Working price changes must not rewrite an issued snapshot.</p>
+   <p><strong>Customer export:</strong> DISABLED — no authenticated frozen budgetary snapshot.</p>
+ </section>}
+ {mode==="released"&&<section className="p55-panel">
+   <div className="p55-eyebrow">RELEASED CUSTOMER OUTPUT · APPROVAL GATE</div>
+   <h3>Customer Release — HOLD</h3>
+   <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Gate</th><th>Required check</th><th>Current status</th></tr></thead>
+   <tbody>{BID_0553_GATES.map(g=><tr key={g.id}><td><strong>{g.id}</strong></td><td>{g.title}<small>{g.detail}</small></td><td><span className="p55-badge">{g.status}</span></td></tr>)}</tbody></table></div>
+   <p><strong>Price / Approved XLSX / Submission:</strong> HOLD — final technical, commercial, six-sheet reconciliation, authenticated ITB amendment and written approval required.</p>
+ </section>}
  <section className="p55-panel"><h3>Release & integrity checklist</h3>
  <p>1. Source MR/MTO/TC/vendor revision → 2. Engineering quantity → 3. Vendor cost & service MH → 4. Summary A/B/C ↔ detail sheets → 5. Freeze per recipient → 6. Approved XLSX export.</p>
  <p className="p55-note">0550 source code remains untouched. State control is based on the reused three-state doctrine, not an independent 0553 pricing policy.</p>
