@@ -231,3 +231,10 @@ This audit is additive and controls where it is more specific than earlier histo
 - `validate-0553-aviat-review.cjs` added to build chain: source quote line coverage and fail-closed statuses; **this is a static regression guard, not OEM acceptance**.
 - Source: `NG-260916-ADV-DAP1.full.json`, `scadaLinkEvidence.js`, MR0001 MTO Rev04. Required qty, accepted equipment, services MH, internal cost and sell remain OPEN/HOLD. JUTAL technical and commercial release prohibited pending gates and written approval.
 - User-local `npm run build` pending for this commit. Protected 0550 untouched.
+
+
+## 2026-10-10 AVIAT D/E Spare Validation Hotfix
+- User build failed in `validate:0553-aviat-review`: `Unclassified NG quotation line: D-1`. The prior validator incorrectly required a literal quote-line code in the base function map, while groups D/E intentionally represent spare copies of original A/B/C equipment.
+- Corrected OEM evaluation to inherit *function labels* for 16 D/E spare lines by exact `partNumber` matching against the 37 A/B/C lines. Spare quantity, allocation, technical acceptance, and cost remain independent and HOLD; no base-cost double count.
+- Corrected validator: explicitly checks the 37 base line codes and requires all 16 spare SKUs to match a base-source SKU; checks that classifier uses the exact-SKU approach. Connector-side data check: 53 total, 37 base, 16 spare, 0 unmapped spare SKUs, 0 unmapped base codes.
+- Commit `75045be` corrects model and `71e2a38` corrects test. **Local npm build remains pending** for updated branch; no customer release or 0550 modification.
