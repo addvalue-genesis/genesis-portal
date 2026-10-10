@@ -6,6 +6,7 @@ import { MR0001_RADIO_ROLE_MATRIX } from "./data/mr0001RadioRoleMatrix";
 import { MR0001_SCOPE_OWNERSHIP_AUDIT } from "./data/mr0001ScopeOwnershipAudit";
 import { MR0001_OFFER_ALLOCATION_AUDIT } from "./data/mr0001OfferAllocationAudit";
 import { MR0001_GAP_ASSESSMENT } from "./data/mr0001GapAssessment";
+import { MR0001_REQUIREMENT_EVIDENCE_MATRIX } from "./data/mr0001RequirementEvidenceMatrix";
 import { MR0001_ENGINEERING_REQUIRED_BOM, summarizeMR0001RequiredBom } from "./data/mr0001RequiredBomDerivation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
@@ -222,6 +223,23 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
      </tr>)}</tbody></table></div>
      <p className="p55-note">Unknown quantities stay null (not zero). The supplier-line ledger above holds 53 original quote quantities once each; this requirement view never multiplies them by possible consumers.</p>
     </section>}
+    {s.mr==="MR-0001"&&<section className="p55-panel">
+      <div className="p55-eyebrow">ENGINEERING PROOF · MR / BLD / RPT → REQUIRED FUNCTION</div>
+      <h4>Requirement Evidence Matrix — source locators and unresolved proof</h4>
+      <p className="p55-note">The linked excerpts support specific requirements, but are not OEM certificates or native drawing takeoff. MTO Set/Lot, installed/purchase qty, licence and price remain OPEN. An unmapped clause means review pending, not compliance.</p>
+      <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+       <thead><tr><th>Evidence ID</th><th>Document locator</th><th>Source-derived requirement</th><th>Next proof</th><th>Status</th></tr></thead>
+       <tbody>{MR0001_REQUIREMENT_EVIDENCE_MATRIX.sources.map(e=><tr key={e.id}>
+        <td><strong>{e.id}</strong></td><td><a href={e.url} target="_blank" rel="noreferrer">{e.locator}</a></td>
+        <td>{e.fact}</td><td>{e.proof}</td><td>{e.state}</td>
+       </tr>)}</tbody></table></div>
+      <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+       <thead><tr><th>MTO row / site</th><th>Required function</th><th>Evidence links</th><th>Exact clause proof</th><th>Approved Qty/Cost</th></tr></thead>
+       <tbody>{MR0001_REQUIREMENT_EVIDENCE_MATRIX.requirementRows.map(r=><tr key={r.id}>
+        <td>{r.mtoRow} · {r.site}</td><td>{r.functionId}</td><td>{r.evidenceIds.join(", ")||"UNMAPPED — REVIEW"}</td>
+        <td>{r.exactClauseVerification}</td><td>OPEN / HOLD</td>
+       </tr>)}</tbody></table></div>
+     </section>}
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Source quotation / evidence — vendor candidates and terms</div>
     <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
      <thead><tr><th>No.</th><th>Vendor / Supplier</th><th>Document / Scope</th><th>Type / Revision</th><th>Quoted Total ({displayCurrency})</th><th>Evidence Status</th><th>Source / Next Action</th></tr></thead>
