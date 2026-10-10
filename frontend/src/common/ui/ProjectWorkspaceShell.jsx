@@ -6,7 +6,7 @@ export const WORKSPACE_TABS = [
  {id:"risk",label:"Risk & Controls"},{id:"documents",label:"Evidence"}
 ];
 // Project-agnostic shell extracted from PJ26080550's behavior and CSS class contract.
-export function ProjectWorkspaceShell({project,lang="th",tabs=WORKSPACE_TABS,views={},renderContent,className="",activeTab:controlledTab,onTabChange}) {
+export function ProjectWorkspaceShell({project,lang="th",tabs=WORKSPACE_TABS,views={},renderContent,className="",activeTab:controlledTab,onTabChange,tabGroups=null}) {
  const [internalTab,setInternalTab]=useState("overview");
  const activeTab=controlledTab??internalTab;
  const changeTab=next=>{if(onTabChange)onTabChange(next);else setInternalTab(next);};
@@ -21,7 +21,12 @@ export function ProjectWorkspaceShell({project,lang="th",tabs=WORKSPACE_TABS,vie
    </div>
    <div className="p55-hero__method"><span>METHOD</span><strong>{project.method}</strong></div>
    <nav className="p55-tabs" aria-label={project.id+" sections"}>
-    {tabs.map(t=><button key={t.id} type="button" className={activeTab===t.id?"is-active":""} onClick={()=>changeTab(t.id)}>{t.label}</button>)}
+    {tabGroups ? tabGroups.map(group=><div className={"p55-tabgroup p55-tabgroup--"+group.id} key={group.id}>
+      <span className="p55-tabgroup__label">{group.title}</span>
+      <div className="p55-tabgroup__items">{tabs.filter(t=>group.tabs.includes(t.id)).map(t=><button key={t.id} type="button" className={activeTab===t.id?"is-active":""} onClick={()=>changeTab(t.id)} aria-current={activeTab===t.id?"page":undefined}>
+       <span className="p55-tab__number">{t.label.split(" ")[0]}</span><span>{t.label.substring(t.label.indexOf(" ")+1)}</span>
+      </button>)}</div>
+     </div>) : tabs.map(t=><button key={t.id} type="button" className={activeTab===t.id?"is-active":""} onClick={()=>changeTab(t.id)}>{t.label}</button>)}
    </nav>
   </header>
   <main className="p55-main">{renderContent ? renderContent(activeTab) : (views[activeTab]||null)}</main>
