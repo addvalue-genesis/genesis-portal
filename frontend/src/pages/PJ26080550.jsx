@@ -588,7 +588,7 @@ function ArchitectureView() {
 }
 
 function SystemsView() {
- return <SharedSystemsView systems={SYSTEMS} systemGroups={SYSTEM_GROUPS} title="System group view" description="Expand by discipline, or switch to a single-system focus view. Each system keeps proof state, quantity state, commercial basis and closure action visible." />;
+ return <SharedSystemsView initialExpandedTokens={["TEL-PAGA"]} systems={SYSTEMS} systemGroups={SYSTEM_GROUPS} title="System group view" description="Expand by discipline, or switch to a single-system focus view. Each system keeps proof state, quantity state, commercial basis and closure action visible." />;
 }
 
 function EngineeringView() {
