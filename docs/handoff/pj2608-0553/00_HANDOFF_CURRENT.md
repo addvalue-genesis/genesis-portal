@@ -185,3 +185,12 @@ This audit is additive and controls where it is more specific than earlier histo
 5. Extend the same method to MR0002–MR0004.
 6. Authenticate the later JUTAL amendment before changing release/submission rules.
 7. Only after engineering reconciliation: derive current cost, sourced FX, margin/sell and the six-sheet workbook. No forced balancing, no phantom zero, no automatic release.
+
+
+## 2026-10-10 P0-MTO MR0001 ingestion checkpoint
+- Direct Drive Rev04 SCADA Radio worksheet text imported into `frontend/src/project0553/data/snapshots/mr0001.mto.rev04.sourceRows.json` as **42 actual source item rows**, with original item/quantity/description, site, delivery/licence/approvals metadata and source extraction row index. Platform breakdown: ZWP20 8, ZWP21 8, ZWP22 8, ZWP23 6, ZPQ 3, ZWP8 5, ZWP11 4.
+- Source data is **not yet accepted Required SKU BOM**: set/lot counts do not certify physical component counts. Grouped multi-code source rows 31,39,43,45,49 require engineering split and validation against native workbook. In particular, keep every `skuRequiredQty:null`.
+- Bound source rows to the existing controlled snapshot/repository; added fail-closed dataset checks (42 rows, source lineage, no guessed SKU quantities).
+- No Next G/Cisco accepted allocation or current sell was created, no customer artefact released, no 0550 branch modification.
+- Need user local `npm run build` after pull; do not claim build or validators were executed for this new commit.
+- Next: native worksheet physical-row check, group split, requirement links/site/CAL/BLD/TC mapping, exact vendor quote reconciliation and gap approval.
