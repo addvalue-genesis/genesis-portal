@@ -21,6 +21,7 @@ export function VendorProductCatalog0553(){
  const chooseQuote=value=>{setChosenQuote(value);if(value&&view==="quote"){const q=quoteById.get(value);if(q)setVendor(String(q.vendor).trim().toLowerCase());}};
  const rows=catalog.relationships.filter(x=>{
   if(view==="supplier" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
+  if(view==="supplier" && chosenQuote&&x.quoteId!==chosenQuote)return false;
   if(view==="quote" && chosenQuote&&x.quoteId!==chosenQuote)return false;
   if(view==="product"&&chosenQuote&&x.quoteId!==chosenQuote)return false;
   if(view==="mr"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
