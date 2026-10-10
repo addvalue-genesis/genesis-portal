@@ -238,3 +238,12 @@ This audit is additive and controls where it is more specific than earlier histo
 - Corrected OEM evaluation to inherit *function labels* for 16 D/E spare lines by exact `partNumber` matching against the 37 A/B/C lines. Spare quantity, allocation, technical acceptance, and cost remain independent and HOLD; no base-cost double count.
 - Corrected validator: explicitly checks the 37 base line codes and requires all 16 spare SKUs to match a base-source SKU; checks that classifier uses the exact-SKU approach. Connector-side data check: 53 total, 37 base, 16 spare, 0 unmapped spare SKUs, 0 unmapped base codes.
 - Commit `75045be` corrects model and `71e2a38` corrects test. **Local npm build remains pending** for updated branch; no customer release or 0550 modification.
+
+ 
+## 2026-10-10 MR0001 Equipment Package Composition phase
+- Added `data/mr0001PackageComposition.js`: a 1:M functional-composition candidate model for each of the 42 MTO source rows, referencing existing source-first MR BOM and all Next G A/B/C candidate function labels. 1 MR Set/Lot is NOT 1 OEM SKU; no adopted selected offer, item quantity, cost or sell.
+- `CommercialSystemBreakdown.jsx` now has a +/- MR Package Composition table before the older family-only reconciliation and supplier quotation. Site, source codes, source Set/Lot, engineering functional components, quantity drivers, possible Next G quote lines, quote-wide quantities and review gaps are visible.
+- Component candidates are non-exclusive and intentionally **NOT allocated** to packages/site/interfaces; displaying a quote line more than once does not duplicate cost. Shared physical ownership and interface-level requirements remain OPEN.
+- WBS service candidates cover RF engineering, interfaces, FAT/SAT and logistics/licences with equations and null MH/cost until evidence is confirmed.
+- Added `validate:0553-package-composition` static guard to build; real OEM compliance and numeric engineering derivation remain open. This stage provides auditable FUNCTION candidates, not a complete engineered physical BOM or approved price.
+- Next: verify native MTO grouped rows, one-to-many exact equipment composition, site-link-to-OEM role, CAL/RPT, antenna sizing, RF cables/interfaces, field/service MH/rates and supplier quotes; record gap, overlap, acceptance decisions with sources. No 0550 modification, release, deployment or submission. Build pending user's local verification.
