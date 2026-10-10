@@ -1,39 +1,72 @@
 import React,{useState} from "react";
+import { WORKING_BOM_BY_LOCATION_0553 as model } from "./data/workingBomByLocation";
 import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom";
-// Default operational view: one row per MTO tag/site, no fabricated SKU quantities.
+
+// One operational BOM surface. All Source/Engineering/Vendor links derive from existing registries.
 export function SimpleBom0553(){
  const [site,setSite]=useState("ALL");
- const [detail,setDetail]=useState(null);
- const sites=[...new Set(bom.items.map(x=>x.site))];
- const rows=bom.items.filter(x=>site==="ALL"||x.site===site);
- const priced=rows.filter(x=>Number.isFinite(x.indicativePackageCostTHB));
- const pricedTotal=priced.reduce((sum,x)=>sum+x.indicativePackageCostTHB,0);
+ const [vendor,setVendor]=useState("ALL");
+ const [system,setSystem]=useState("MR-0001");
+ const [expanded,setExpanded]=useState({});
+ const groups=model.locations.filter(g=>site==="ALL"||g.site===site).map(g=>({
+  ...g,items:g.items.filter(i=>vendor==="ALL"||
+   i.pricedVendor===vendor||i.vendorCandidates.some(v=>v.vendor===vendor))
+ }));
+ const visible=groups.flatMap(g=>g.items);
+ const priced=visible.filter(x=>Number.isFinite(x.indicativePackageCostTHB));
+ const provisionalSubtotalTHB=priced.reduce((sum,x)=>sum+x.indicativePackageCostTHB,0);
+ const open=k=>setExpanded(old=>({...old,[k]:!old[k]}));
+ const money=(v,currency)=>Number.isFinite(v)?currency+" "+v.toLocaleString("en-US",{maximumFractionDigits:2}):"—";
  return <section className="p55-panel">
-  <div className="p55-eyebrow">SIMPLE BOM · MR0001 · WORKING PREVIEW</div>
-  <h3>รายการอุปกรณ์ / จำนวน / ราคาต่อหน่วย / ราคารวม</h3>
-  <p className="p55-note">จำนวนที่แสดงเป็น Set/Lot จาก MTO Rev04; ยังไม่ใช่ OEM SKU take-off. ราคาที่คำนวณได้เป็น Cisco preliminary package เท่านั้น ส่วนที่ยังไม่มีราคาไม่ถูกนับเป็นศูนย์</p>
+  <div className="p55-eyebrow">BUDGET → WORKING PREVIEW → ENGINEERING BOM</div>
+  <h3>BOM ตาม Location · อุปกรณ์ · จำนวน · Vendor · ราคา</h3>
+  <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
   <div className="p55-filterbar p55-filterbar--simple">
-   <label>Site <select value={site} onChange={e=>setSite(e.target.value)}><option value="ALL">All 7 sites</option>{sites.map(x=><option key={x} value={x}>{x}</option>)}</select></label>
-   <span>รายการ {rows.length} · มีราคาชั่วคราว {priced.length} · ราคายังไม่ครบ {rows.length-priced.length}</span>
+   <label>System <select value={system} onChange={e=>setSystem(e.target.value)}>
+    <option value="MR-0001">MR0001 · SCADA Radio</option>
+    <option value="MR-0002">MR0002 · DMR (full BOM pending)</option>
+    <option value="MR-0003">MR0003 · Ex Telephone (full BOM pending)</option>
+    <option value="MR-0004">MR0004 · RACON (full BOM pending)</option>
+   </select></label>
+   <label>Location <select value={site} onChange={e=>setSite(e.target.value)}><option value="ALL">All locations</option>{model.locations.map(x=><option key={x.site} value={x.site}>{x.site}</option>)}</select></label>
+   <label>Vendor / Company <select value={vendor} onChange={e=>setVendor(e.target.value)}><option value="ALL">All vendors</option>{model.vendors.map(v=><option key={v} value={v}>{v}</option>)}</select></label>
   </div>
+  {system!=="MR-0001"?<p className="p55-note">ระบบ {system} ยังไม่มี Item-Level BOM ที่เชื่อม MTO/Engineering/Vendor ครบใน Controlled Repository: ไม่แสดงจำนวนหรือราคาจำลอง โปรดตรวจ Scope ใน 4 MR Systems ก่อน</p>:<>
   <div className="p55-source-facts">
-   <div><span>Known preliminary cost (shown sites)</span><strong>THB {pricedTotal.toLocaleString("en-US")}</strong></div>
-   <div><span>Coverage</span><strong>{priced.length} / {rows.length} priced</strong></div>
-   <div><span>Total BOM Cost</span><strong>NOT YET COMPLETE</strong></div>
+   <div><span>Locations with source data</span><strong>{groups.filter(g=>g.items.length).length}</strong></div>
+   <div><span>Visible MTO item tags</span><strong>{visible.length}</strong></div>
+   <div><span>Provisional priced items</span><strong>{priced.length} / {visible.length}</strong></div>
+   <div><span>Known cost subtotal (THB)</span><strong>{money(provisionalSubtotalTHB,"THB")}</strong></div>
   </div>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget">
-   <thead><tr><th>No.</th><th>Site</th><th>MTO Tag / Description</th><th>Qty</th><th>Unit</th><th>Unit Price</th><th>Extended Cost</th><th>Status</th><th>Detail</th></tr></thead>
-   <tbody>{rows.map((x,i)=><React.Fragment key={x.id}><tr>
-    <td>{i+1}</td><td>{x.site}</td><td><strong>{x.sourceTag}</strong><small>{x.description}</small></td>
-    <td className="is-number">{x.sourceScopeQty??"OPEN"}</td><td>{x.sourceScopeUnit||"REVIEW"}</td>
-    <td className="is-number">{Number.isFinite(x.indicativePackageCostTHB)?"THB "+bom.cisco.unitPackageQuotedSumTHB.toLocaleString("en-US"):"—"}</td>
-    <td className="is-number">{Number.isFinite(x.indicativePackageCostTHB)?"THB "+x.indicativePackageCostTHB.toLocaleString("en-US"):"UNPRICED"}</td>
-    <td>{Number.isFinite(x.indicativePackageCostTHB)?"PRELIMINARY PRICED":"QTY/PRICE REVIEW"}</td>
-    <td>{x.configuration.length?<button type="button" className="p55-row-toggle" onClick={()=>setDetail(detail===x.id?null:x.id)}>{detail===x.id?"−":"+"}</button>:"—"}</td>
-   </tr>
-   {detail===x.id&&<tr><td colSpan={9}><div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Vendor SKU</th><th>Role / Description</th><th>Quoted unit THB</th><th>Reference</th></tr></thead><tbody>{x.configuration.map(y=><tr key={y.quoteLine}><td>{y.sku}</td><td>{y.description}</td><td>{Number.isFinite(y.unitPrice)?y.unitPrice.toLocaleString("en-US"):"N/A"}</td><td>{y.quoteId} / {y.quoteLine}</td></tr>)}</tbody></table></div></td></tr>}
-   </React.Fragment>)}</tbody>
-  </table></div>
-  <p className="p55-note">ราคาชั่วคราว THB 2,117,650 ของ Cisco ทั้ง 5 MTO Sets เป็นเพียงส่วนที่มีราคา ไม่ใช่ยอดรวมทั้ง MR0001 และยังต้องยืนยัน OEM Configuration ก่อน Customer Release</p>
+  {groups.filter(g=>g.items.length).map(g=><section key={g.site} className="p55-panel">
+   <button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={expanded["site:"+g.site]!==false}>{expanded["site:"+g.site]===false?"+":"−"}</button>
+   <strong> {g.site} </strong><span> · {g.items.length} items · {g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length} preliminary priced</span>
+   {expanded["site:"+g.site]!==false&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget">
+    <thead><tr><th>+</th><th>MTO Item / Equipment</th><th>Required Scope Qty</th><th>Vendor / SKU Candidate</th><th>Unit price / source currency</th><th>Extended cost</th><th>Engineering status</th></tr></thead>
+    <tbody>{g.items.map(x=><React.Fragment key={x.id}>
+     <tr><td><button type="button" className="p55-row-toggle" onClick={()=>open("item:"+x.id)}>{expanded["item:"+x.id]?"−":"+"}</button></td>
+      <td><strong>{x.sourceTag}</strong><small>{x.description}</small></td>
+      <td>{x.sourceScopeQty??"REVIEW"} {x.sourceScopeUnit||""}<small>{x.sourceState}</small></td>
+      <td>{x.pricedVendor||"Candidate / selection OPEN"}<small>{x.vendorCandidates.length?x.vendorCandidates.length+" vendor offer candidates":"Unmapped to priced supplier line"}</small></td>
+      <td>{x.pricedVendor?money(bom.cisco.unitPackageQuotedSumTHB,"THB"):"See available source prices (+)"}</td>
+      <td>{Number.isFinite(x.indicativePackageCostTHB)?money(x.indicativePackageCostTHB,"THB"):"UNPRICED — NOT ZERO"}</td>
+      <td>{x.workingPriceStatus}<small>{x.costStatus}</small></td>
+     </tr>
+     {expanded["item:"+x.id]&&<tr><td colSpan={7}>
+      <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Vendor</th><th>SKU / Offer line</th><th>Quoted qty (whole offer)</th><th>Quoted unit price</th><th>Use decision</th></tr></thead><tbody>
+      {x.configuration.concat(x.vendorCandidates).map((v,i)=><tr key={i}>
+       <td>{v.vendor||"VST ECS / Cisco"}</td><td>{v.sku}<small>{v.quoteId} · {v.quoteLine}</small></td>
+       <td>{v.offeredQuoteQty??v.quoteQty??"—"}</td>
+       <td>{money(v.originalUnitPrice??v.unitPrice,v.originalCurrency||v.currency)}</td>
+       <td>{x.pricedVendor?"Cisco working bundle / OEM review":"SOURCE QUOTE ONLY — ALLOCATION OPEN"}</td>
+      </tr>)}
+      {!x.configuration.length&&!x.vendorCandidates.length&&<tr><td colSpan={5}>No priced source mapped to this physical object yet; do not assume zero cost</td></tr>}
+      </tbody></table></div>
+     </td></tr>}
+    </React.Fragment>)}</tbody></table></div>}
+  </section>)}
+  <p className="p55-note">Subtotal is for priced working items only. It excludes non-priced MR0001 equipment, bulk, spares and services. Customer A+B+C total and selling price remain separate; 4-Scope of Supply.xlsx is the controlled output template.</p>
+  </>}
  </section>;
 }
