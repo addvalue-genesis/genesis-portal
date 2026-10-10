@@ -5,6 +5,7 @@
 // Downstream: Budget Working Preview only; original document/revisions and cost spine unchanged.
 import { MR0001_WORKING_PRICED_BOM } from "./mr0001WorkingPricedBom";
 import { MR0001_FIRST_PRINCIPLES_DERIVATION } from "./mr0001FirstPrinciplesDerivation";
+import { MR0001_PRELIMINARY_LINK_BUDGET } from "./mr0001PreliminaryLinkBudget";
 import { MR0001_ENGINEERING_REQUIRED_BOM } from "./mr0001RequiredBomDerivation";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./supplierQuoteLines";
 const quotesById=new Map(SUPPLIER_QUOTE_LINES_0553.map(q=>[q.id,q]));
@@ -27,7 +28,8 @@ const items=MR0001_WORKING_PRICED_BOM.items.map(item=>({
 }));
 const locations=[...new Set(items.map(item=>item.site))].map(site=>({
  site,items:items.filter(item=>item.site===site),
-  rfDemand:MR0001_FIRST_PRINCIPLES_DERIVATION.locations.find(x=>x.site===site)
+  rfDemand:MR0001_FIRST_PRINCIPLES_DERIVATION.locations.find(x=>x.site===site),
+  rfProof:MR0001_PRELIMINARY_LINK_BUDGET.links.filter(x=>x.from===site||x.to===site)
 }));
 const vendorNames=[...new Set(SUPPLIER_QUOTE_LINES_0553.filter(q=>q.mr.split("/").includes("MR-0001")).map(q=>q.vendor))];
 export const WORKING_BOM_BY_LOCATION_0553=Object.freeze({
