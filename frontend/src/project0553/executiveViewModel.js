@@ -1,4 +1,5 @@
 import { getProject0553Dataset } from "./data/repository";
+import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 const d=getProject0553Dataset();
 const gates=d.gates;
 export const EXECUTIVE_0553={
@@ -10,7 +11,8 @@ export const EXECUTIVE_0553={
  metrics:[
  {label:"Systems",value:String(d.project.systems.length),sub:"MR0001–MR0004; controlled engineering spine"},
  {label:"Final release",value:"HOLD",sub:"RELEASED_SELL not authorized",tone:"warn"},
- {label:"Budgetary base",value:"OPEN",sub:"Rev09 internal estimates require reconciliation"},
+ {label:"Known preliminary equipment cost",value:"THB "+BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US"),sub:"Cisco source scenario only; "+BID_COST_SPINE_0553.unpricedRows+" MR0001 items unpriced"},
+ {label:"Budgetary base",value:"OPEN",sub:"A+B+C full estimate still requires reconciliation"},
  {label:"Spares / options",value:"OPEN",sub:"Vendor-backed inventory and pricing required"},
  {label:"Priced proposal",value:"HOLD",sub:"Itemized customer quotation not approved",tone:"warn"},
  {label:"Closing instruction",value:"VERIFY",sub:"Original amendment / routing still open"}
