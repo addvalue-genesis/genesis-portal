@@ -1,4 +1,5 @@
 import { SCADA_0553_RECONCILIATION } from "./data/scadaOfferReconciliation";
+import { InnovaBudgetEvidence0553 } from "./InnovaBudgetEvidence";
 import { AVIAT_0553_TECHNICAL_EVALUATION } from "./data/aviatTechnicalBidEvaluation";
 import { MR0001_PACKAGE_COMPOSITION, summarizeMR0001Composition } from "./data/mr0001PackageComposition";
 import { MR0001_TOPOLOGY_QUANTITY_AUDIT } from "./data/mr0001TopologyQuantityAudit";
@@ -240,6 +241,7 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
         <td>{r.exactClauseVerification}</td><td>OPEN / HOLD</td>
        </tr>)}</tbody></table></div>
      </section>}
+    {s.mr==="MR-0001"&&<InnovaBudgetEvidence0553/>}
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Source quotation / evidence — vendor candidates and terms</div>
     <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
      <thead><tr><th>No.</th><th>Vendor / Supplier</th><th>Document / Scope</th><th>Type / Revision</th><th>Quoted Total ({displayCurrency})</th><th>Evidence Status</th><th>Source / Next Action</th></tr></thead>
