@@ -4,12 +4,14 @@ import { assessTideScenarios } from "../common/engineering/seaReflection";
 import { SCADA_LINKS_0553,SCADA_RADIO_PATH_REPORT,SCADA_LINK_SOURCE_REFS } from "./data/scadaLinkEvidence";
 import { MR0001_ANTENNA_DOWNSIZE_STUDY as downsizing } from "./data/mr0001AntennaDownsizeStudy";
 import { MR0001_TIDAL_BUDGET_STUDY } from "./data/mr0001TidalBudgetStudy";
+import { MR0001_NEXTG_LINK_RECONCILIATION } from "./data/mr0001NextGLinkReconciliation";
 
 // Read-only baseline sourced from RPT-0001 C1; user does not enter engineering parameters.
 export function MR0001RFProofPilot(){
  const [selected,setSelected]=useState(SCADA_LINKS_0553[0].id);
  const link=SCADA_LINKS_0553.find(x=>x.id===selected)||SCADA_LINKS_0553[0];
  const derivedTide=MR0001_TIDAL_BUDGET_STUDY.links.find(x=>x.id===selected);
+ const nextg=MR0001_NEXTG_LINK_RECONCILIATION.links.find(x=>x.id===selected);
  const evidence={sourceId:"RPT-0001-C1",revision:"C1",state:"EXISTING_DESIGN_ASSUMPTION_NOT_OEM_VERIFIED"};
  const fspl=freeSpacePathLoss({frequencyMHz:link.frequencyMHz,distanceKm:link.distanceKm,evidence});
  const half=link.distanceKm/2;
@@ -46,6 +48,12 @@ export function MR0001RFProofPilot(){
  ["Reported availability",link.reportAvailability,"RPT C1 · project STD applicability / OEM recheck"]
  ].map(([a,b,c])=><tr key={a}><td>{a}</td><td>{b}</td><td>{c}</td></tr>)}
  </tbody></table></div>
+ <section className="p55-panel">
+ <div className="p55-eyebrow">NEXT G / RPT / DRAWING · EVIDENCE RECONCILIATION</div>
+ <h4>{nextg.from} → {nextg.to} · Vendor Engineering Scenario</h4>
+ <p className="p55-note">Next G: {nextg.aModel} ({nextg.aGainDbi} dBi, {nextg.aHeightAglM}m) → {nextg.bModel} ({nextg.bGainDbi} dBi, {nextg.bHeightAglM}m). Distance {nextg.distanceKm} km. RPT Rev.C1 is preserved independently; approved BLD C1 and LAY C1 constrain reuse and placement.</p>
+ <p className="p55-note"><strong>STD qualification:</strong> {nextg.stdPass===true?"PASS":nextg.stdPass===false?"FAIL":"UNPROVEN"} · Radio RSL, threshold, tide-aware availability and final OEM radio configuration are not yet verified. 4ft is a possible BID CANDIDATE only, never automatically approved.</p>
+ </section>
  <div className="p55-eyebrow" style={{marginTop:20}}>TIDE / REFLECTION — RELATIVE SENSITIVITY</div>
  <p className="p55-note">BOD §7.2 กล่าวถึง Sea Tidal Variation ±3m ตารางนี้ใช้ระดับเสาอากาศใน RPT เป็นจุดอ้างอิงสมมติ เพื่อดูความไวทางเรขาคณิตเท่านั้น ไม่ใช่ Tide Level จริงจาก Chart Datum หรือผล Pathloss Reflection/Fading</p>
  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Relative scenario</th><th>Effective Tx / Rx height (m)</th><th>Reflection point from Tx (km)</th><th>Path difference (m)</th><th>Relative phase (°)</th><th>Status</th></tr></thead><tbody>
