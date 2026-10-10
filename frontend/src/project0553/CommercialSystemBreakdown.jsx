@@ -69,15 +69,16 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
       <div><span>Accepted SKU/Cost/Sell</span><strong>OPEN / HOLD</strong></div>
      </div>
      <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget">
-      <thead><tr><th>Source row</th><th>Platform / link</th><th>MR item / requirement</th><th>MR Qty</th><th>Required SKU Qty</th><th>Engineering proof / missing driver</th><th>Services / Cost / Sell</th></tr></thead>
+      <thead><tr><th>Source row</th><th>Platform / link</th><th>MR item / requirement</th><th>MR Qty / source state</th><th>Required SKU Qty</th><th>Vendor Unit Price Evidence</th><th>Specific blocker</th><th>Services / Cost / Sell</th></tr></thead>
       <tbody>{MR0001_ENGINEERING_REQUIRED_BOM.rows.map(r=><tr key={r.id}>
        <td>{r.sourceRowIndex}<small><a href={r.sourceUrl} target="_blank" rel="noreferrer">MTO Rev04</a></small></td>
        <td><strong>{r.platform}</strong><small>{r.relatedLinks.join(" · ")||"SITE / NO LINK MAPPED"}</small></td>
        <td><strong>{r.sourcePartText}</strong><small>{r.sourceDescription}</small></td>
-       <td>{r.sourceQuantityText}</td>
+       <td><strong>{r.sourceQuantityText}</strong><small>{r.scopeQuantityState}</small></td>
        <td><strong>OPEN</strong><small>{r.groupedRow?"MULTI-CODE SPLIT REQUIRED":"SET ≠ OEM SKU QTY"}</small></td>
-       <td><strong>{r.status}</strong><small>{r.missing.join(" · ")}</small></td>
-       <td>MH OPEN / COST OPEN / SELL HOLD</td>
+       <td>{r.vendorPriceCandidates.length?r.vendorPriceCandidates.map(q=><div key={q.quoteId+q.quoteLine}><strong>{q.sku}</strong><small>{q.vendor} · {q.quoteLine} · {Number.isFinite(q.sourceUnitPrice)?shown(q.sourceUnitPrice,q.currency):"N/A AS QUOTED"} / quoted unit · Qty {q.quotedQty} OFFER ONLY</small></div>):"VENDOR ITEM MATCH OPEN"}<small>Quote candidate ≠ accepted cost</small></td>
+       <td><strong>{r.blockerCategory}</strong><small>{r.missing.join(" · ")}</small></td>
+       <td>MH OPEN / EXTENDED COST HOLD / SELL HOLD</td>
       </tr>)}</tbody>
      </table></div>
      <p className="p55-note">RPT topology is a preliminary reference, not acceptance of antenna selection, radio compatibility, availability or Myanmar licence. NG/Cisco offers remain comparison evidence only. This table intentionally cannot produce customer pricing until required quantities, proof, WBS drivers and source-based rates are verified.</p>
