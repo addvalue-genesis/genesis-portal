@@ -34,11 +34,11 @@ export function SystemCard({ system, expanded, onToggle }) {
   );
 }
 
-export function SystemsView({systems,systemGroups,title,description}) {
+export function SystemsView({systems,systemGroups,title,description,initialExpandedTokens=[]}) {
   const [viewMode, setViewMode] = useState("group");
   const [selectedToken, setSelectedToken] = useState("ALL");
   const [query, setQuery] = useState("");
-  const [expanded, setExpanded] = useState(() => new Set([]));
+  const [expanded, setExpanded] = useState(() => new Set(initialExpandedTokens));
   const [openGroups, setOpenGroups] = useState(() => new Set(systemGroups.map((g) => g.id)));
 
   const filtered = useMemo(() => {
