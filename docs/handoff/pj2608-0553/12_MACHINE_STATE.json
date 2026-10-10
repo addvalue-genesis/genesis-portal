@@ -32,7 +32,8 @@
     "workingFxDefault": "PENDING_LOCAL_BUILD",
     "closureProgress": "PENDING_LOCAL_BUILD",
     "workingPricedBom": "PENDING_LOCAL_BUILD",
-    "simpleBom": "PENDING_USER_LOCAL_BUILD"
+    "simpleBom": "PENDING_USER_LOCAL_BUILD",
+    "costSpine": "PENDING_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -240,6 +241,15 @@
       "knownCiscoPreliminaryTHB": 2117650,
       "completeTotal": false,
       "customerReleaseAllowed": false
+    },
+    "bidCostSpine": {
+      "id": "P553-COST-SPINE",
+      "source": "MR0001 MTO Rev04 / VST A-0048-2026 Re1",
+      "knownPreliminaryCostTHB": 2117650,
+      "fullCost": null,
+      "customerSell": null,
+      "template": "4-Scope of Supply.xlsx",
+      "state": "INTEGRATED_ACROSS_EXECUTIVE_ARCHITECTURE_ENGINEERING_COMMERCIAL"
     }
   },
   "sourceConflicts": [
