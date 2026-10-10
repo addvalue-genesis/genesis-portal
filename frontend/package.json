@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && npm run validate:lna-cascade && npm run validate:physical-bom && npm run validate:commercial-workbook && npm run validate:commercial-drilldown && npm run validate:supplier-quotes && npm run validate:commercial-currency && npm run validate:nextg-full && npm run validate:0553-json-repository && npm run validate:0553-reconciliation && npm run validate:0553-required-bom && npm run validate:0553-aviat-review && npm run validate:0553-package-composition && npm run validate:0553-topology && npm run validate:0553-radio-roles && npm run validate:0553-scope-ownership && npm run validate:0553-offer-allocation && npm run validate:0553-gap && npm run validate:0553-requirement-evidence && webpack --mode production",
+    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && npm run validate:lna-cascade && npm run validate:physical-bom && npm run validate:commercial-workbook && npm run validate:commercial-drilldown && npm run validate:supplier-quotes && npm run validate:commercial-currency && npm run validate:nextg-full && npm run validate:0553-json-repository && npm run validate:0553-reconciliation && npm run validate:0553-required-bom && npm run validate:0553-aviat-review && npm run validate:0553-package-composition && npm run validate:0553-topology && npm run validate:0553-radio-roles && npm run validate:0553-scope-ownership && npm run validate:0553-offer-allocation && npm run validate:0553-gap && npm run validate:0553-requirement-evidence && npm run validate:0553-innova-budget && webpack --mode production",
     "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs",
     "validate:pj0553-isolation": "node scripts/validate-pj2608-0553-isolation.cjs",
     "validate:rf-prop": "node scripts/validate-rf-propagation.cjs",
@@ -27,7 +27,8 @@
     "validate:0553-scope-ownership": "node scripts/validate-0553-scope-ownership.cjs",
     "validate:0553-offer-allocation": "node scripts/validate-0553-offer-allocation.cjs",
     "validate:0553-gap": "node scripts/validate-0553-gap-assessment.cjs",
-    "validate:0553-requirement-evidence": "node scripts/validate-0553-requirement-evidence.cjs"
+    "validate:0553-requirement-evidence": "node scripts/validate-0553-requirement-evidence.cjs",
+    "validate:0553-innova-budget": "node scripts/validate-0553-innova-budget.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
