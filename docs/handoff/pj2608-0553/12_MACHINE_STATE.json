@@ -29,7 +29,8 @@
     "innovaBudgetValidation": "PENDING_USER_BUILD",
     "innovaCostBridge": "PENDING_LOCAL_BUILD",
     "sourceQuoteCompleteness": "PENDING_USER_LOCAL_BUILD",
-    "workingFxDefault": "PENDING_LOCAL_BUILD"
+    "workingFxDefault": "PENDING_LOCAL_BUILD",
+    "closureProgress": "PENDING_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -206,6 +207,17 @@
       "source": "INTERNAL PLANNING ASSUMPTION — UNVERIFIED",
       "persistent": "BROWSER_LOCAL_STORAGE",
       "customerReleaseAllowed": false
+    },
+    "mr0001ClosureProgress": {
+      "sourceQty": "MTO_SOURCE_SET_LOT_RECORDED",
+      "quotedUnitPrices": "VENDOR_CANDIDATES_VISIBLE",
+      "requiredSkuQty": null,
+      "approvedExtendedCost": null,
+      "priority": [
+        "MR-502-001/ZWP20",
+        "LAN-502-001/ZWP20"
+      ],
+      "releaseAllowed": false
     }
   },
   "sourceConflicts": [
