@@ -11,26 +11,6 @@
   },
   "itemRows": [
     {
-      "sourceRowIndex": 2,
-      "platform": null,
-      "groupItemNo": "SL.\nNO.",
-      "sourcePartText": "ITEM NO.",
-      "sourceQuantityText": "QUANTITY",
-      "sourceDescription": "DESCRIPTION",
-      "deliveryAndLicences": "Lead time\nEngineering, manufacture, transport and licences",
-      "installationBasis": "Installation location\nGreenfield / Brownfield",
-      "chinaApprovals": "China import\nCertificates / approvals",
-      "myanmarApprovals": "Myanmar import\nCertificates / approvals",
-      "chinaSoftwareLicence": "Software licence — China\nPurpose / validity",
-      "myanmarSoftwareLicence": "Software licence — Myanmar\nPurpose / validity",
-      "sourceQty": null,
-      "sourceUnit": null,
-      "sourceItemCodes": [],
-      "groupedRow": false,
-      "skuRequiredQty": null,
-      "skuQuantityStatus": "ENGINEERING_SPLIT_AND_PROOF_PENDING"
-    },
-    {
       "sourceRowIndex": 4,
       "platform": "ZWP20",
       "groupItemNo": null,
@@ -966,5 +946,24 @@
     "requiredSkuQtyNotApproved": true,
     "sourcePreserved": true,
     "releaseAllowed": false
+  },
+  "sourceRowCount": 42,
+  "review": {
+    "groupedRows": [
+      31,
+      39,
+      43,
+      45,
+      49
+    ],
+    "sourceUnitNotSkuQty": true,
+    "missingProof": [
+      "exact SKU allocation per grouped source row",
+      "MTO quantities versus physical required BOM",
+      "CAL/RPT vs link/site design",
+      "technical acceptance of quote models/licences",
+      "vendor quote line coverage and priced validity"
+    ],
+    "status": "HOLD_ENGINEERING"
   }
 }
