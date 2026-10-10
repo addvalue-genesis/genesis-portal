@@ -6,6 +6,7 @@ import { ARCHITECTURE_MANIFEST_0553 } from "../project0553/architectureManifest"
 import { MODULE_REGISTRY_0553 } from "../project0553/moduleRegistry";
 import { ExecutiveView } from "../common/ui/ExecutiveView";
 import { MR0001RFProofPilot } from "../project0553/MR0001RFProofPilot";
+import { ScadaSchematic0553 } from "../project0553/ScadaSchematic0553";
 import { MR0002LNACalculation } from "../project0553/MR0002LNACalculation";
 import { MR0002PhysicalBom } from "../project0553/MR0002PhysicalBom";
 import { EngineeringView as SharedEngineeringView } from "../common/ui/EngineeringView";
@@ -24,7 +25,7 @@ import { getProject0553Dataset } from "../project0553/data/repository";
 import "../project0550/project0550.css"; // Reuse existing 0550 presentation primitives, never project facts.
 import "../project0553/project0553.css";
 
-const TABS = STANDARD_PROJECT_TABS.map(([id,label]) => [id, id === "systems" ? "4 MR Systems" : label]);
+const TABS = [...STANDARD_PROJECT_TABS.map(([id,label]) => [id, id === "systems" ? "4 MR Systems" : label]), ["schematic","Schematic"]];
 const Badge = AuditBadge;
 const Metric = AuditMetric;
 const Table = AuditTable;
@@ -47,6 +48,7 @@ export function PJ26080553() {
  const shellProject = {id:p.projectId,shortName:"Zawtika Phase 1F Telecom",title:"JUTAL · "+p.packageId+" · Technical UNPRICED / Priced Commercial Bid",state:"WORKING REVIEW / RELEASE HOLD",statusDetail:"Closing amendment verification OPEN",method:p.method};
  return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} className="p553-dashboard" renderContent={(tab)=><>
 
+   {tab==="schematic"&&<ScadaSchematic0553/>}
    {tab==="overview"&&<ExecutiveView model={EXECUTIVE_0553}/>}
    {tab==="architecture"&&<SharedArchitectureView manifest={ARCHITECTURE_MANIFEST_0553} modules={MODULE_REGISTRY_0553}/>}
    {tab==="systems"&&<SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Same group/focus/search/expand behavior as PJ2608-0550; all facts come from 0553 controlled MTO and RFQ."/>}
