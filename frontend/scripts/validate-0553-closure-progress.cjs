@@ -4,6 +4,10 @@ const model=fs.readFileSync(path.join(root,"src/project0553/data/mr0001RequiredB
 const ui=fs.readFileSync(path.join(root,"src/project0553/CommercialSystemBreakdown.jsx"),"utf8");
 const q=fs.readFileSync(path.join(root,"src/project0553/data/supplierQuoteLines.js"),"utf8");
 for(const token of ["sourceScopeQty:sourceSetCount","scopeQuantityState:","vendorPriceCandidates:quoteCandidatesFor(equipmentFamily)","blockerCategory:","requiredSkuQty:null","acceptedUnitCost:null","sourceUnitPrice:unitPrice","UNALLOCATED_CANDIDATE_NOT_ACCEPTED"])assert(model.includes(token),token);
-for(const token of ["VST-0048-RE1","NG-260916","INNOVA-QA24-0605","INNOVA-QA24-0606"])assert(model.includes(token)&&q.includes(token),token);
+for(const token of ["VST-0048-RE1","NG-260916","INNOVA-QA24-0605","INNOVA-QA24-0606"])assert(model.includes(token),"Model quote mapping missing: "+token);
+assert(q.includes('id:"INNOVA-"+q.number'),"Supplier registry must dynamically derive INNOVA quote IDs");
+const innova=fs.readFileSync(path.join(root,"src/project0553/data/innovaHistoricalBudgetPrices.js"),"utf8");
+for(const code of ["QA24-0605","QA24-0606"])assert(innova.includes('number:"'+code+'"'),"INNOVA source quote missing: "+code);
+for(const token of ["VST-0048-RE1","NG-260916"])assert(q.includes(token),"Direct supplier quote missing: "+token);
 assert(ui.includes("r.scopeQuantityState")&&ui.includes("r.vendorPriceCandidates.map")&&ui.includes("r.blockerCategory"));
 console.log("PASS 0553 MR0001 closure progress: MTO quantity recorded, vendor source prices visible, SKU quantity and extended cost still gated");
