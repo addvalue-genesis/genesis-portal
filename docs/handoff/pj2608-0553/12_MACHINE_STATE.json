@@ -33,7 +33,8 @@
     "closureProgress": "PENDING_LOCAL_BUILD",
     "workingPricedBom": "PENDING_LOCAL_BUILD",
     "simpleBom": "PENDING_USER_LOCAL_BUILD",
-    "costSpine": "PENDING_LOCAL_BUILD"
+    "costSpine": "PENDING_LOCAL_BUILD",
+    "locationWorkingBom": "PENDING_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -250,6 +251,19 @@
       "customerSell": null,
       "template": "4-Scope of Supply.xlsx",
       "state": "INTEGRATED_ACROSS_EXECUTIVE_ARCHITECTURE_ENGINEERING_COMMERCIAL"
+    },
+    "locationWorkingBom": {
+      "source": "MR0001 MTO Rev04 / Engineering Required BOM / Source Supplier Registry",
+      "surface": "Budget > Working Preview",
+      "grouping": "LOCATION > MTO TAG",
+      "filters": [
+        "System",
+        "Location",
+        "Vendor"
+      ],
+      "pricing": "SOURCE_ORIGINAL_CURRENCY_WITH_ONLY_CISCO_PRELIMINARY_EXTENDED",
+      "mr2to4": "AWAITING_FULL_ITEM_BINDING",
+      "releaseAllowed": false
     }
   },
   "sourceConflicts": [
