@@ -12,6 +12,6 @@ assert(page.includes("<ScadaSchematic0553 onOpenLocationBom={openLocationBom}/>"
 assert(page.includes("<CommercialWorkspace0553 focusedLocation={focusedBomLocation}/>"));
 assert(schematic.includes("onOpenLocationBom?.(site)"));
 assert(commercial.includes("<SimpleBom0553 focusedLocation={focusedLocation}/>"));
-assert(bom.includes("focusedLocation")&&bom.includes("site===site")===false);
+assert(bom.includes("focusedLocation")&&bom.includes("changeSite(value)")===false);
 assert(bom.includes('site==="ALL"||x.site===site'));
 console.log("PASS 0553 Schematic location click routes to existing Budget Working Preview BOM with site filter");
