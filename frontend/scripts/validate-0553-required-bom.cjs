@@ -1,0 +1,18 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const source=JSON.parse(fs.readFileSync(path.join(root,"src/project0553/data/snapshots/mr0001.mto.rev04.sourceRows.json"),"utf8"));
+const model=fs.readFileSync(path.join(root,"src/project0553/data/mr0001RequiredBomDerivation.js"),"utf8");
+const ui=fs.readFileSync(path.join(root,"src/project0553/CommercialSystemBreakdown.jsx"),"utf8");
+assert.equal(source.projectId,"PJ2608-0553");
+assert.equal(source.itemRows.length,42);
+assert.equal(new Set(source.itemRows.map(x=>x.platform)).size,7);
+assert.equal(source.itemRows.filter(x=>x.groupedRow).length,5);
+assert(source.itemRows.every(x=>x.skuRequiredQty===null));
+assert(model.includes("requiredSkuQty:null")&&model.includes("customerSell:null"));
+assert(model.includes("sourceRowIndex:r.sourceRowIndex")&&model.includes("SCADA_LINKS_0553"));
+assert(ui.includes("MR0001_ENGINEERING_REQUIRED_BOM.rows.map"));
+assert(ui.includes("SET ≠ OEM SKU QTY"));
+assert(ui.includes("MH OPEN / COST OPEN / SELL HOLD"));
+console.log("PASS 0553 MR0001 42 source rows / 7 sites / 5 multi-code rows; required SKU, MH, cost and sell fail closed");
