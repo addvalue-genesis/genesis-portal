@@ -1,0 +1,17 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const shell=read("src/common/ui/ProjectWorkspaceShell.jsx");
+const page=read("src/pages/PJ26080553.jsx");
+const schematic=read("src/project0553/ScadaSchematic0553.jsx");
+const commercial=read("src/project0553/CommercialWorkspace.jsx");
+const bom=read("src/project0553/SimpleBom0553.jsx");
+assert(shell.includes("controlledTab??internalTab")&&shell.includes("onTabChange"));
+assert(page.includes('setWorkspaceTab("budget")')&&page.includes("setFocusedBomLocation(site)"));
+assert(page.includes("<ScadaSchematic0553 onOpenLocationBom={openLocationBom}/>"));
+assert(page.includes("<CommercialWorkspace0553 focusedLocation={focusedBomLocation}/>"));
+assert(schematic.includes("onOpenLocationBom?.(site)"));
+assert(commercial.includes("<SimpleBom0553 focusedLocation={focusedLocation}/>"));
+assert(bom.includes("focusedLocation")&&bom.includes("site===site")===false);
+assert(bom.includes('site==="ALL"||x.site===site'));
+console.log("PASS 0553 Schematic location click routes to existing Budget Working Preview BOM with site filter");
