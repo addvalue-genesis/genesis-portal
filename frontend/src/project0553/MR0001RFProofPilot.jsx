@@ -8,9 +8,9 @@ export function MR0001RFProofPilot(){
  const [sea,setSea]=useState({});
  const changeSea=(key,value)=>setSea(prev=>({...prev,[key]:value}));
  const sn=key=>sea[key]===undefined||sea[key]===""?null:Number(sea[key]);
- const seaReport=assessTideScenarios({distanceKm:num("distanceKm"),frequencyMHz:num("frequencyMHz"),txElevationM:sn("txElevationM"),rxElevationM:sn("rxElevationM"),tideScenarios:[{name:"LOW",tideElevationM:sn("low")},{name:"MEAN",tideElevationM:sn("mean")},{name:"HIGH",tideElevationM:sn("high")}],evidence});
  const evidence=source.trim()?{sourceId:source.trim(),state:"USER_ENTERED_UNVERIFIED"}:null;
  const num=k=>inputs[k]===""||inputs[k]===undefined?null:Number(inputs[k]);
+ const seaReport=assessTideScenarios({distanceKm:num("distanceKm"),frequencyMHz:num("frequencyMHz"),txElevationM:sn("txElevationM"),rxElevationM:sn("rxElevationM"),tideScenarios:[{name:"LOW",tideElevationM:sn("low")},{name:"MEAN",tideElevationM:sn("mean")},{name:"HIGH",tideElevationM:sn("high")}],evidence});
  const balanced=preliminaryLinkBalance({frequencyMHz:num("frequencyMHz"),distanceKm:num("distanceKm"),txPowerDbm:num("txPowerDbm"),txGainDbi:num("txGainDbi"),rxGainDbi:num("rxGainDbi"),otherLossDb:num("otherLossDb"),rxThresholdDbm:num("rxThresholdDbm"),evidence});
  const fresnel=fresnelRadius({frequencyMHz:num("frequencyMHz"),d1Km:d1===""?null:Number(d1),d2Km:d2===""?null:Number(d2),evidence});
  const v=n=>Number.isFinite(n)?n.toFixed(3):"OPEN";
