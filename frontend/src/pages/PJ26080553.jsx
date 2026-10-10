@@ -1,4 +1,5 @@
 import { CommercialWorkspace0553 } from "../project0553/CommercialWorkspace";
+import { O_G_LIFECYCLE_0553, L3_TABS_0553, L3_TAB_GROUPS_0553 } from "../project0553/lifecycleNavigation";
 import { DocumentReferenceControl0553 } from "../project0553/DocumentReferenceControl0553";
 import React, { useMemo, useState } from "react";
 import { ProjectWorkspaceShell } from "../common/ui/ProjectWorkspaceShell";
@@ -29,23 +30,9 @@ import "../project0553/project0553.css";
 
 // IDs are stable application route keys. Display order follows the project
 // engineering workflow; Budget is the final workbench after all upstream views.
-const TABS = [
- ["overview","01 Executive"],
- ["architecture","02 Architecture"],
- ["systems","03 4 MR Systems"],
- ["engineering","04 First Principles"],
- ["execution","05 Execution"],
- ["risk","06 Risk & Controls"],
- ["documents","07 Evidence"],
- ["schematic","08 Schematic"],
- ["registry","09 Data & Code"],
- ["budget","10 Budget"]
-];
-const TAB_GROUPS = [
- {id:"define",title:"DEFINE · กำหนดงาน",tabs:["overview","architecture","systems"]},
- {id:"engineer",title:"ENGINEER · วิเคราะห์และพิสูจน์",tabs:["engineering","execution","risk","documents","schematic","registry"]},
- {id:"commercial",title:"COMMERCIAL · สรุปต้นทุน",tabs:["budget"]}
-];
+// Lifecycle hierarchy is a navigation layer; route keys and workbench components are preserved.
+const TABS = L3_TABS_0553;
+const TAB_GROUPS = L3_TAB_GROUPS_0553;
 const Badge = AuditBadge;
 const Metric = AuditMetric;
 const Table = AuditTable;
@@ -58,6 +45,7 @@ const sourceLinks = ids => ids.map(id => {
 export function PJ26080553() {
  const [opened,setOpened]=useState(null);
  const [workspaceTab,setWorkspaceTab]=useState("overview");
+ const [lifecycleStage,setLifecycleStage]=useState("L3");
  const [focusedBomLocation,setFocusedBomLocation]=useState(null);
  const openLocationBom=site=>{setFocusedBomLocation(site);setWorkspaceTab("budget");};
  const [selectedMr,setSelectedMr]=useState("ALL");
@@ -69,7 +57,15 @@ export function PJ26080553() {
   <button key={"b"+s.id} className="p553-detail-button" onClick={()=>setOpened(opened===s.mr?null:s.mr)}>{opened===s.mr?"− Hide":"＋ Detail"}</button>
  ])}/>;
  const shellProject = {id:p.projectId,shortName:"Zawtika Phase 1F Telecom",title:"JUTAL · "+p.packageId+" · Technical UNPRICED / Priced Commercial Bid",state:"WORKING REVIEW / RELEASE HOLD",statusDetail:"Closing amendment verification OPEN",method:p.method};
- return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} tabGroups={TAB_GROUPS} className="p553-dashboard" activeTab={workspaceTab} onTabChange={setWorkspaceTab} renderContent={(tab)=><>
+ const activeLifecycle=O_G_LIFECYCLE_0553.find(x=>x.id===lifecycleStage);
+ const lifecycleHeader=<section className="p55-section" style={{padding:"12px 16px",marginBottom:14}}>
+  <label htmlFor="p553-lifecycle" style={{fontWeight:700,display:"block",marginBottom:8}}>O&G PROJECT LIFECYCLE — Master stage</label>
+  <select id="p553-lifecycle" style={{width:"100%",maxWidth:620,padding:10,fontSize:15}} value={lifecycleStage} onChange={e=>setLifecycleStage(e.target.value)}>
+   {O_G_LIFECYCLE_0553.map(s=><option key={s.id} value={s.id}>{s.id} — {s.title}{s.id==="L3"?" · CURRENT":""}</option>)}
+  </select>
+  <p style={{marginTop:8}}>{activeLifecycle.title} · {activeLifecycle.state} · 0553 has 4 MR systems. Historical source files, legacy route IDs and pricing logic are unchanged.</p>
+ </section>;
+ return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} tabGroups={TAB_GROUPS} className="p553-dashboard" activeTab={workspaceTab} onTabChange={setWorkspaceTab} renderContent={(tab)=><>{lifecycleHeader}{lifecycleStage!=="L3"?<section className="p55-section"><h2>{activeLifecycle.id} — {activeLifecycle.title}</h2><p>This lifecycle stage is a navigation placeholder. The current project is L3 Tendering & Bidding. Its upstream references and downstream scope forecasts remain preserved in the L3 workbench; no project data was migrated or reclassified automatically.</p><button type="button" onClick={()=>setLifecycleStage("L3")}>Back to L3 Tendering & Bidding</button></section>:< >
 
    {tab==="schematic"&&<ScadaSchematic0553 onOpenLocationBom={openLocationBom}/>}
    {tab==="registry"&&<DataCodeRegistry0553/>}
@@ -82,5 +78,5 @@ export function PJ26080553() {
    {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
    {tab==="documents"&&<div className="p55-stack"><Section title="0553 Source Register"><Table headers={["ID","Document / location","Revision","Control state","Meaning"]} rows={BID_0553_SOURCES.map(s=>[s.id,<a key={s.id} href={s.url} target="_blank" rel="noreferrer">{s.name}</a>,s.revision,<Badge key={s.id}>{s.status}</Badge>,s.note])}/></Section><Section title="Vendor / OEM Source Index"><Table headers={["MR","Supplier","Source type","Link","Review status"]} rows={VENDOR_0553_SOURCES.map(v=>[v.mr,v.supplier,v.type,<a key={v.id} href={v.url} target="_blank" rel="noreferrer">{v.document}</a>,<Badge key={v.id}>{v.status}</Badge>])}/></Section><Section title="Evidence classification"><Table headers={["Evidence","Revision","State"]} rows={PROJECT_0553_EVIDENCE.map(e=>[e.title,e.revision,<Badge key={e.id}>{e.state}</Badge>])}/></Section></div>}
 
- </>}/>;
+ </>}</>}/>;
 }
