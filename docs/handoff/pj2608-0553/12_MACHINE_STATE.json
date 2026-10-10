@@ -17,7 +17,8 @@
     "hotfixVerification": "PENDING_USER_LOCAL_BUILD",
     "secondHotfixCommit": "87c92e1568ecc6fbbf4879d2400d7b0798516dd1",
     "requiredBomGuard": "ADDED_PENDING_USER_BUILD",
-    "aviatReviewValidation": "ADDED_PENDING_USER_BUILD"
+    "aviatReviewValidation": "HOTFIX_PENDING_USER_BUILD",
+    "aviatReviewLastFailure": "UNCLASSIFIED_NG_D-1_TEST_INCOMPLETE_MAPPING"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -86,7 +87,8 @@
         "bulk-duplication",
         "quote-validity"
       ],
-      "build": "PENDING_USER_RUN"
+      "build": "PENDING_USER_RUN_AFTER_HOTFIX",
+      "spareFunctionMatching": "D_E_BY_EXACT_SKU_16_OF_16_SOURCE_CHECK"
     }
   },
   "sourceConflicts": [
