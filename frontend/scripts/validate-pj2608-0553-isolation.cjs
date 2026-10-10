@@ -32,4 +32,8 @@ const p0553Methods=read("project0553/engineeringViewModel.js");
 for(let i=1;i<=18;i++)assert(equationDefinitions.includes('id:"E'+String(i).padStart(2,"0")+'"'),"Missing original E"+i+" equation");
 assert(p0553Methods.includes("serviceEquations:SERVICE_EQUATIONS"),"0553 must receive full shared service method definitions");
 assert(engineeringView.includes("serviceEquations.map"),"Shared First Principles must render all service equations");
+const formulaInventory=read("common/engineering/masterFormulaInventory.js");
+assert(formulaInventory.includes("ENGINEERING_LAW_KERNELS")&&formulaInventory.includes("SERVICE_EQUATIONS"),"Master inventory must reuse canonical law and E01-E18 formula definitions");
+assert(engineeringView.includes("MASTER_FORMULA_INVENTORY.map"),"All canonical formulas must be visible in shared First Principles");
+assert(!/project0550\/|project0553\//.test(formulaInventory),"Master formula inventory cannot depend on particular project data");
 console.log("PASS PJ2608-0553 shared/particular isolation and 0550 facade regression guards");
