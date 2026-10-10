@@ -2,6 +2,7 @@ import React,{useState} from "react";
 import { freeSpacePathLoss,fresnelRadius } from "../common/engineering/rfPropagation";
 import { assessTideScenarios } from "../common/engineering/seaReflection";
 import { SCADA_LINKS_0553,SCADA_RADIO_PATH_REPORT,SCADA_LINK_SOURCE_REFS } from "./data/scadaLinkEvidence";
+import { MR0001_ANTENNA_DOWNSIZE_STUDY as downsizing } from "./data/mr0001AntennaDownsizeStudy";
 
 // Read-only baseline sourced from RPT-0001 C1; user does not enter engineering parameters.
 export function MR0001RFProofPilot(){
@@ -48,6 +49,16 @@ export function MR0001RFProofPilot(){
  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Relative scenario</th><th>Effective Tx / Rx height (m)</th><th>Reflection point from Tx (km)</th><th>Path difference (m)</th><th>Relative phase (°)</th><th>Status</th></tr></thead><tbody>
  {tide.scenarios.map(r=><tr key={r.name}><td>{r.name}</td><td>{r.status==="OPEN_INPUT"?"OPEN":format(r.txHeightM,2)+" / "+format(r.rxHeightM,2)}</td><td>{r.status==="OPEN_INPUT"?"OPEN":format(r.reflectionPointFromTxM/1000)}</td><td>{format(r.pathDifferenceM,5)}</td><td>{format(r.phaseDifferenceDeg,1)}</td><td>{r.status}</td></tr>)}
  </tbody></table></div>
+ {selected===downsizing.sourceLinkId&&<div className="p55-panel">
+ <div className="p55-eyebrow">JUTAL CHANGE REQUEST · 6ft → 4ft · PRELIMINARY RF PROOF</div>
+ <h4>Receiver-side antenna downsizing — RPT-based sensitivity</h4>
+ <p className="p55-note">RPT gain {downsizing.originalGainDbi} dBi with {downsizing.originalDiameterFt}ft receive dish; at equal aperture efficiency and frequency, {downsizing.requestedDiameterFt}ft gives {downsizing.estimatedNewGainDbi.toFixed(2)} dBi (estimated). Single-end margin change {downsizing.estimatedSingleEndRslDeltaDb.toFixed(2)} dB. This is not an OEM availability pass.</p>
+ <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Check</th><th>Preliminary result</th><th>Engineering proof</th></tr></thead><tbody>
+ <tr><td>Link</td><td>{downsizing.from} → {downsizing.to}</td><td>RPT C1, {downsizing.frequencyMHz} MHz</td></tr>
+ <tr><td>Delta Gain</td><td>{downsizing.estimatedGainDeltaDb.toFixed(2)} dB</td><td>20 log10(4/6), equal efficiency assumption</td></tr>
+ <tr><td>Rx level / fade margin</td><td>INPUT REQUIRED</td><td>OEM radio configuration, receiver threshold and feeder loss</td></tr>
+ <tr><td>Availability pass</td><td>NOT ESTABLISHED</td><td>Link budget, tide/multipath, project standard and OEM confirmation</td></tr>
+ </tbody></table></div></div>}
  <p className="p55-note"><strong>Remaining engineering verification:</strong> true tidal datum, geodetic/terrain path, Earth curvature and k-factor, reflection coefficient, sea multipath, rain, ITU-R P.530 link availability, antenna model and OEM recalculation. RPT used Pathloss 6.0; no fabricated Pathloss output. No release to MTO/Budget yet.</p>
  <p className="p55-note"><strong>Documents:</strong> {SCADA_LINK_SOURCE_REFS.map((x,i)=><React.Fragment key={x.id}>{i?" · ":""}<a href={x.url} target="_blank" rel="noreferrer">{x.id}</a></React.Fragment>)}</p>
  </section>;
