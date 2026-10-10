@@ -34,7 +34,8 @@
     "workingPricedBom": "PENDING_LOCAL_BUILD",
     "simpleBom": "PENDING_USER_LOCAL_BUILD",
     "costSpine": "PENDING_LOCAL_BUILD",
-    "locationWorkingBom": "PENDING_LOCAL_BUILD"
+    "locationWorkingBom": "PENDING_LOCAL_BUILD",
+    "firstPrinciplesDemand": "PENDING_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -263,6 +264,15 @@
       ],
       "pricing": "SOURCE_ORIGINAL_CURRENCY_WITH_ONLY_CISCO_PRELIMINARY_EXTENDED",
       "mr2to4": "AWAITING_FULL_ITEM_BINDING",
+      "releaseAllowed": false
+    },
+    "firstPrinciplesDemand": {
+      "source": "RPT-0001 Rev.C1",
+      "links": 5,
+      "radioLinkEndpoints": 10,
+      "antennaDemand": "DERIVED_REFERENCE_COUNTS_WITH_DIVERSITY_NOT_PURCHASE",
+      "vendorSkuQty": null,
+      "model": "frontend/src/project0553/data/mr0001FirstPrinciplesDerivation.js",
       "releaseAllowed": false
     }
   },
