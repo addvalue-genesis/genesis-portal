@@ -15,4 +15,7 @@ for(const [id,count,total] of [["VST-0048-RE1",11,2117650],["INNOVA-QA24-0604",4
 assert(inn.includes("unitPriceExVat:null")&&q.includes("Number.isFinite(l.unitPriceExVat)"));
 assert(vendors.includes("V-SCADA-INNOVA"));
 assert.equal(300*524+1020+10*3100,189220);
+
+const validation=fs.readFileSync(path.join(root,"src/project0553/data/validateDataset.js"),"utf8");
+assert(validation.includes("Number.isFinite(x[3])&&Number.isFinite(x[4])?x[3]*x[4]:0"),"Runtime validator must reconcile missing line totals via qty times unit price");
 console.log("PASS 0553 supplier source completeness: Cisco 11 coded lines, INNOVA 4/1/2 lines, null N/A, THB subtotals reconcile");
