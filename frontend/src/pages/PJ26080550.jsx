@@ -1,3 +1,4 @@
+import { SERVICE_EQUATIONS as COMMON_SERVICE_EQUATIONS } from "../common/cost/serviceEquations";
 import { EngineeringView as SharedEngineeringView } from "../common/ui/EngineeringView";
 import { ArchitectureView as SharedArchitectureView } from "../common/ui/ArchitectureView";
 import { SystemsView as SharedSystemsView } from "../common/ui/SystemsView";
@@ -477,7 +478,7 @@ function SystemsView() {
  return <SharedSystemsView initialExpandedTokens={["TEL-PAGA"]} systems={SYSTEMS} systemGroups={SYSTEM_GROUPS} title="System group view" description="Expand by discipline, or switch to a single-system focus view. Each system keeps proof state, quantity state, commercial basis and closure action visible." />;
 }
 
-function EngineeringView(){return <SharedEngineeringView model={{projectId:"PJ2608-0550",completeness:REQUIREMENT_COMPLETENESS,lawLibrary:ENGINEERING_LAW_LIBRARY,systems:SYSTEMS,chain:FIRST_PRINCIPLES_CHAIN,domains:KNOWLEDGE_KERNEL_DOMAINS,controlRules:CONTROL_RULES,costEquations:["Customer Service = ADDVALUE Sell × 1.05","Goods Customer = Cost × 1.20 / 0.95"]}}/>;}
+function EngineeringView(){return <SharedEngineeringView model={{serviceEquations:COMMON_SERVICE_EQUATIONS,projectId:"PJ2608-0550",completeness:REQUIREMENT_COMPLETENESS,lawLibrary:ENGINEERING_LAW_LIBRARY,systems:SYSTEMS,chain:FIRST_PRINCIPLES_CHAIN,domains:KNOWLEDGE_KERNEL_DOMAINS,controlRules:CONTROL_RULES,costEquations:["Customer Service = ADDVALUE Sell × 1.05","Goods Customer = Cost × 1.20 / 0.95"]}}/>;}
 
 function ExecutionView() {
   return (
