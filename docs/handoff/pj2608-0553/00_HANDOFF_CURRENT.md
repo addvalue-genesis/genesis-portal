@@ -253,3 +253,10 @@ This audit is additive and controls where it is more specific than earlier histo
 - Added `data/mr0001TopologyQuantityAudit.js`, derived from five RPT-0001 Rev.C1 links: ten logical link endpoints at seven distinct sites. These are graph counts, NOT ten purchasable radios.
 - Site table appears before package composition; radio, antenna, diversity, licence, cost and sell remain OPEN pending OEM/BLD/MTO/CAL proof. Four TOPO holds address PTMP sharing, multi-link sites, source grouping, 60/90-degree conflict.
 - Added `validate:0553-topology` static guard to frontend build. Run local build before claiming PASS. No customer release, no protected 0550 changes.
+
+
+## 2026-10-10 MR0001 radio physical-role matrix checkpoint
+- Added `data/mr0001RadioRoleMatrix.js`: each of five RPT Rev.C1 links now has two *candidate functional endpoint roles*, PTMP base/remote (directional inference) or PTP peer. Ten endpoint roles at seven sites are NOT approved physical radio counts; sharing, diversity, resilience, frequency and roles require BLD/MR/OEM corroboration.
+- Site view traces RPT role/link/peer/antenna reference to associated MR MTO rows and displays the relevant Next G radio/antenna offered quantity at quote-wide level, without any site or package allocation. No inference that an offered quantity is a required quantity.
+- `CommercialSystemBreakdown.jsx` shows the new physical-radio role grid before package composition. Added `validate:0553-radio-roles` static fail-closed guard to build chain.
+- Need to verify directional roles, especially PTMP base sharing and PTP peers, against original block diagram and OEM equipment design; confirm antenna size, RF margins, power/Ex and licence, then approve physical installed/purchase quantities. No commercial release. Local npm build for this commit pending.
