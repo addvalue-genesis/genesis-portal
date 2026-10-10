@@ -17,3 +17,11 @@ Continue **PJ2608-0553 only**, using GitHub `addvalue-genesis/genesis-portal`, b
 **NEXT TASK (urgent):** ingest complete MTO Rev04 item rows and map each to MR0001 link/site tags, BOM requirements, licence, enclosure, cable/connector/gland/surge/bulk and vendor items. Reconcile NG 53 lines and complete Cisco lines; then extend MR0002–0004. Only derive current Cost/Sell after verification and sourced FX. Produce clear table columns Required / Offered / Gap / Source / Proof / Unit Cost / Sell with +/− drilldown. Verify actual tender amendment/deadline; original ITB 08-Sep conflicts with reported 14-Oct deadline.
 
 Run `git rev-parse HEAD`, `npm run build`, report exact commits/results. Preserve full technical detail in handoff, update machine state and handoff together after every major working change. Never claim a ZIP exists until it is actually created and verified.
+
+
+## Resume verification note — 2026-10-10
+Direct connector re-check confirms:
+- Original ITB still says 08-Sep-2026 17:00, technical + unpriced first, priced HOLD; the reported 14-Oct instruction remains unauthenticated and MUST NOT be treated as release authority.
+- MTO Rev04 contains line-level rows and detailed scope beyond `mto.rev04.summary.json`. The next task is to ingest those existing rows into a controlled Required BOM; do not infer missing quantities from quote quantities.
+- Current MR0001 reconciliation is intentionally fail-closed (`requiredQty:null`) until that ingestion is complete.
+- Branch comparison from checkpoint `5aa4267` showed ahead 1 / behind 0 before this documentation update; after pulling, always run `git rev-parse HEAD` and `npm run build` locally to record the exact machine HEAD and validator result.
