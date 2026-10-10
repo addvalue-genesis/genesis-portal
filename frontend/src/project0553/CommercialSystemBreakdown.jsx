@@ -1,4 +1,5 @@
 import { SCADA_0553_RECONCILIATION } from "./data/scadaOfferReconciliation";
+import { WorkingPricedBom0553 } from "./WorkingPricedBom0553";
 import { InnovaBudgetEvidence0553 } from "./InnovaBudgetEvidence";
 import { AVIAT_0553_TECHNICAL_EVALUATION } from "./data/aviatTechnicalBidEvaluation";
 import { MR0001_PACKAGE_COMPOSITION, summarizeMR0001Composition } from "./data/mr0001PackageComposition";
@@ -53,6 +54,7 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
      <div><span>Customer Rev08 Sell</span><strong>{shown(s.baseline?.[2])}</strong></div>
      <div><span>Verified Direct Cost</span><strong>OPEN</strong></div>
     </div>
+    {s.mr==="MR-0001"&&<WorkingPricedBom0553/>}
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Physical / equipment scope — source MTO Rev04</div>
     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
      <thead><tr><th>No.</th><th>Equipment family</th><th>Platform scope</th><th>Installed qty</th><th>Unit cost</th><th>State</th></tr></thead>
