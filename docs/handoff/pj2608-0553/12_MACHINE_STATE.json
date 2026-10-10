@@ -18,7 +18,8 @@
     "secondHotfixCommit": "87c92e1568ecc6fbbf4879d2400d7b0798516dd1",
     "requiredBomGuard": "ADDED_PENDING_USER_BUILD",
     "aviatReviewValidation": "HOTFIX_PENDING_USER_BUILD",
-    "aviatReviewLastFailure": "UNCLASSIFIED_NG_D-1_TEST_INCOMPLETE_MAPPING"
+    "aviatReviewLastFailure": "UNCLASSIFIED_NG_D-1_TEST_INCOMPLETE_MAPPING",
+    "packageCompositionValidation": "PENDING_USER_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -89,6 +90,15 @@
       ],
       "build": "PENDING_USER_RUN_AFTER_HOTFIX",
       "spareFunctionMatching": "D_E_BY_EXACT_SKU_16_OF_16_SOURCE_CHECK"
+    },
+    "mr0001Composition": {
+      "state": "FUNCTIONAL_CANDIDATE_ONE_TO_MANY_42_MTO_ROWS",
+      "model": "frontend/src/project0553/data/mr0001PackageComposition.js",
+      "acceptedQuantities": "OPEN",
+      "offerAllocation": "OPEN",
+      "servicesMH": "OPEN",
+      "costAndSell": "HOLD",
+      "staticValidator": "ADDED_PENDING_LOCAL_BUILD"
     }
   },
   "sourceConflicts": [
