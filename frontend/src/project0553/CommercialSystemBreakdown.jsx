@@ -1,3 +1,4 @@
+import { SCADA_0553_RECONCILIATION } from "./data/scadaOfferReconciliation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
 import React,{useState} from "react";
@@ -45,6 +46,11 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
      <thead><tr><th>No.</th><th>Equipment family</th><th>Platform scope</th><th>Installed qty</th><th>Unit cost</th><th>State</th></tr></thead>
      <tbody>{s.equipmentFamilies.map((family,j)=><tr key={j}><td>{j+1}</td><td>{family}</td><td>{s.facilities.join(", ")}</td><td>UNVERIFIED</td><td>OPEN</td><td><span className="p55-badge">MTO FAMILY ONLY</span></td></tr>)}</tbody>
     </table></div>
+    {s.mr==="MR-0001"&&<><div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>FIRST PRINCIPLES → REQUIRED vs OFFERED → COST GATE</div>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
+      <thead><tr><th>Equipment family</th><th>Required Qty</th><th>NG quoted lines</th><th>Engineering decision</th><th>Cost readiness</th><th>Source</th></tr></thead>
+      <tbody>{SCADA_0553_RECONCILIATION.rows.map(r=><tr key={r.equipmentFamily}><td>{r.equipmentFamily}</td><td>DERIVATION PENDING</td><td>{SCADA_0553_RECONCILIATION.unmappedOffered.filter(x=>x.description?.toLowerCase().includes(r.equipmentFamily.toLowerCase())).length} preliminary text matches (not approved)</td><td>{r.decision.state}<small>{r.decision.reason}</small></td><td>HOLD</td><td>MTO Rev04 → MR0001 CAL/DWG/OEM</td></tr>)}</tbody>
+     </table></div><p className="p55-note">Vendor quote 53 lines are preserved as evidence. Required SKU, licence, enclosure and bulk quantities need full MR/DWG/MTO extraction before technical acceptance or repricing.</p></>}
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Source quotation / evidence — vendor candidates and terms</div>
     <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
      <thead><tr><th>No.</th><th>Vendor / Supplier</th><th>Document / Scope</th><th>Type / Revision</th><th>Quoted Total ({displayCurrency})</th><th>Evidence Status</th><th>Source / Next Action</th></tr></thead>
