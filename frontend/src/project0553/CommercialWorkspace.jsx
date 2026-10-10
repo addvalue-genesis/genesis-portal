@@ -1,6 +1,7 @@
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
+import { SimpleBom0553 } from "./SimpleBom0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import React,{useState} from "react";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
@@ -61,6 +62,7 @@ export function CommercialWorkspace0553(){
    </div>
    <p className="p55-note"><strong>{isPlanningFx?"WORKING ASSUMPTION (NOT VERIFIED BOT RATE)":"USER-ENTERED FX — VERIFY SOURCE BEFORE RELEASE"}:</strong> Default 31.5 THB/USD dated 2026-10-10 is a budget display assumption only, not an authenticated BOT rate. Original vendor currencies and amounts remain unchanged. Edits persist in this browser; they do not modify controlled source data. <button type="button" onClick={resetFx}>Reset working default</button></p>
   </section>
+  <SimpleBom0553/>
   <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
   <section className="p55-panel">
    <div className="p55-eyebrow">REV08 EXISTING COMMERCIAL BASELINE · PRICES FROM CUSTOMER WORKBOOK</div>
