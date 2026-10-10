@@ -9,7 +9,12 @@
     "userVerified": true,
     "testsPass": 14,
     "webpackWarnings": 3,
-    "engineeringValidatedForCustomer": false
+    "engineeringValidatedForCustomer": false,
+    "lastUserBuildCommit": "4e731c3787288e93945259dd299d2d3c2037af66",
+    "lastUserBuildResult": "FAILED_JSX_COMMERCIAL_WORKSPACE_AT_LINE_85",
+    "validationScriptsPassedBeforeWebpack": 14,
+    "hotfixCommit": "57db7b0e910d568a157bd1dce1f1cedbb31ea745",
+    "hotfixVerification": "PENDING_USER_NPM_RUN_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -53,7 +58,7 @@
       "budgetary": "NO_VERIFIED_FROZEN_ISSUE_REGISTERED",
       "released": "GATES_HOLD_NO_SELL_VALUES",
       "modeSelectionIssuesDocument": false,
-      "buildAfterChange": "PENDING_USER_LOCAL_BUILD"
+      "buildAfterChange": "PENDING_HOTFIX_BUILD"
     }
   },
   "engineering": {
