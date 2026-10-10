@@ -4,6 +4,7 @@ import { MR0001_PACKAGE_COMPOSITION, summarizeMR0001Composition } from "./data/m
 import { MR0001_TOPOLOGY_QUANTITY_AUDIT } from "./data/mr0001TopologyQuantityAudit";
 import { MR0001_RADIO_ROLE_MATRIX } from "./data/mr0001RadioRoleMatrix";
 import { MR0001_SCOPE_OWNERSHIP_AUDIT } from "./data/mr0001ScopeOwnershipAudit";
+import { MR0001_OFFER_ALLOCATION_AUDIT } from "./data/mr0001OfferAllocationAudit";
 import { MR0001_ENGINEERING_REQUIRED_BOM, summarizeMR0001RequiredBom } from "./data/mr0001RequiredBomDerivation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
@@ -185,6 +186,27 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
       <tbody>{AVIAT_0553_TECHNICAL_EVALUATION.holds.map(g=><tr key={g.id}><td>{g.id}</td><td>{g.issue}</td><td>{g.decision}</td><td><span className="p55-badge">{g.state}</span></td></tr>)}</tbody>
       </table></div>
       <p className="p55-note">Financial exposure remains OPEN; no guessed cost or automatic acceptance. Vendor may be correct based on an incomplete RFQ — source omissions and bid deviations must be tracked separately.</p>
+    </section>}
+    {s.mr==="MR-0001"&&<section className="p55-panel">
+     <div className="p55-eyebrow">SOURCE QUOTE → POSSIBLE MR CONSUMERS → VERIFIED ALLOCATION</div>
+     <h4>Next G Quote Allocation Ledger — Prevent Shared SKU Double Counting</h4>
+     <p className="p55-note">The quantities below are total quantities in the supplier quotation, never per-site assignments. The same SKU may appear for several MR functional packages. No site purchase quantity is accepted until engineering allocates it once, with BLD / MTO / OEM proof.</p>
+     <div className="p55-source-facts">
+      <div><span>Quote lines audited</span><strong>{MR0001_OFFER_ALLOCATION_AUDIT.sourceLineCount}</strong></div>
+      <div><span>Base A/B/C</span><strong>{MR0001_OFFER_ALLOCATION_AUDIT.sourceBaseLines}</strong></div>
+      <div><span>Spares D/E</span><strong>{MR0001_OFFER_ALLOCATION_AUDIT.sourceSpareLines} · ISOLATED</strong></div>
+      <div><span>Accepted allocations / cost</span><strong>OPEN / HOLD</strong></div>
+     </div>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget">
+       <thead><tr><th>Quote line / SKU</th><th>Offered qty (quote total)</th><th>Possible MR sites/functions</th><th>Allocation state</th><th>Approved site qty</th><th>Cost use</th></tr></thead>
+       <tbody>{MR0001_OFFER_ALLOCATION_AUDIT.candidates.map(q=><tr key={q.quoteLine}>
+        <td><strong>{q.quoteLine}</strong><small>{q.partNumber}</small></td>
+        <td>{q.offeredQty}<small>{q.group} · {q.offeredRole}</small></td>
+        <td>{q.possibleConsumers.length?q.possibleConsumers.map(x=>x.site+" / "+x.functionId).filter((v,i,a)=>a.indexOf(v)===i).join(" · "):"NOT ALLOCATED / SPARE / OTHER SOURCE"}</td>
+        <td>{q.state}</td><td>OPEN</td><td>HOLD</td>
+       </tr>)}</tbody>
+     </table></div>
+     <p className="p55-note">Rule: sum of VERIFIED site allocations must not exceed a quote line's offered quantity. Repeated candidate consumers are not purchase quantities. Supplier offered qty, approved required qty and accepted cost remain separate.</p>
     </section>}
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Source quotation / evidence — vendor candidates and terms</div>
     <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
