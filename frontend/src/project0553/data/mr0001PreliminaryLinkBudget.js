@@ -7,6 +7,15 @@ import {MR0001_NEXTG_LINK_RECONCILIATION} from "./mr0001NextGLinkReconciliation"
 import {MR0001_ANTENNA_DOWNSIZE_STUDY} from "./mr0001AntennaDownsizeStudy";
 const n=x=>typeof x==="number"&&Number.isFinite(x);
 const db=(d,f)=>32.44+20*Math.log10(d)+20*Math.log10(f); // km, MHz
+const bidCalculationBaseline={
+ document:"MM-ZTK-1F-GEN-SCADA-TEL-CAL-0001",revision:"A1",date:"2026-09-21",
+ stage:"ISSUED_FOR_BIDDING",supplier:"Samart Telcoms",
+ sourceUrl:"https://drive.google.com/file/d/1ZLRFfvk9uR_Ky3IxN_FnpkWfQyRToLn5/view",
+ linksCovered:5,baselineAntennaCondition:"PREVIOUS_DESIGN_BEFORE_4FT_CHANGE",
+ originalCalculatedRslDbm:null,originalCalculatedFadeMarginDb:null,
+ originalAvailabilityPercent:null,
+ evidenceState:"SOURCE_CAL_IDENTIFIED__EMBEDDED_GRAPHICAL_RESULTS_NOT_YET_VERIFIED"
+};
 const target={source:"RPT C1 reports >99.99%; PTTEP TEL-004 §7.1.1 99.995% needs project applicability confirmation",
  availabilityPercent:null,criterionState:"STD_HIERARCHY_UNRESOLVED"};
 const links=MR0001_NEXTG_LINK_RECONCILIATION.links.map(v=>{
@@ -35,7 +44,7 @@ const links=MR0001_NEXTG_LINK_RECONCILIATION.links.map(v=>{
 });
 export const MR0001_PRELIMINARY_LINK_BUDGET=Object.freeze({
  id:"P553-MR0001-RF-LINK-BUDGET",method:"PtRx=PtTx+Gt+Gr-FSPL-Ltx-Lrx-Lmisc; FadeMargin=PtRx-OEM_Threshold",
- links,standard:target,source:"NEXTG image + RPT C1 + AVIAT datasheet + BLD/LAY C1",
+ links,standard:target,bidCalculationBaseline,source:"NEXTG image + RPT C1 + AVIAT datasheet + BLD/LAY C1",
  costRule:"No approved four-foot SKU or vendor extended cost unless STD pass, exact quoted SKU matched, installation ownership and quote validities reconciled",
  releaseAllowed:false
 });
