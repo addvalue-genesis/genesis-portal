@@ -19,7 +19,8 @@ export function SimpleBom0553(){
  const money=(v,currency)=>Number.isFinite(v)?currency+" "+v.toLocaleString("en-US",{maximumFractionDigits:2}):"—";
  return <section className="p55-panel">
   <div className="p55-eyebrow">BUDGET → WORKING PREVIEW → ENGINEERING BOM</div>
-  <h3>BOM ตาม Location · อุปกรณ์ · จำนวน · Vendor · ราคา</h3>
+  <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
+  <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
   <div className="p55-filterbar p55-filterbar--simple">
    <label>System <select value={system} onChange={e=>setSystem(e.target.value)}>
@@ -36,13 +37,13 @@ export function SimpleBom0553(){
    <div><span>Locations with source data</span><strong>{groups.filter(g=>g.items.length).length}</strong></div>
    <div><span>Visible MTO item tags</span><strong>{visible.length}</strong></div>
    <div><span>Provisional priced items</span><strong>{priced.length} / {visible.length}</strong></div>
-   <div><span>Known cost subtotal (THB)</span><strong>{money(provisionalSubtotalTHB,"THB")}</strong></div>
+   <div><span>Source-priced scenario subtotal (THB)</span><strong>{money(provisionalSubtotalTHB,"THB")}</strong></div>
   </div>
   {groups.filter(g=>g.items.length).map(g=><section key={g.site} className="p55-panel">
    <button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={expanded["site:"+g.site]!==false}>{expanded["site:"+g.site]===false?"+":"−"}</button>
-   <strong> {g.site} </strong><span> · {g.items.length} items · {g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length} preliminary priced</span>
+   <strong> {g.site} </strong><span> · {g.items.length} requirement items · {g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length} source-priced scenarios</span>
    {expanded["site:"+g.site]!==false&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget">
-    <thead><tr><th>+</th><th>MTO Item / Equipment</th><th>Required Scope Qty</th><th>Vendor / SKU Candidate</th><th>Unit price / source currency</th><th>Extended cost</th><th>Engineering status</th></tr></thead>
+    <thead><tr><th>+</th><th>MTO Item / Equipment</th><th>MR/MTO Qty (input)</th><th>Vendor / SKU Candidate</th><th>Unit price / source currency</th><th>Extended cost</th><th>First Principles / Qty proof</th></tr></thead>
     <tbody>{g.items.map(x=><React.Fragment key={x.id}>
      <tr><td><button type="button" className="p55-row-toggle" onClick={()=>open("item:"+x.id)}>{expanded["item:"+x.id]?"−":"+"}</button></td>
       <td><strong>{x.sourceTag}</strong><small>{x.description}</small></td>
