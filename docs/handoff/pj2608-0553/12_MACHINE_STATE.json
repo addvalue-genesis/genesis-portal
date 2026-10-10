@@ -30,7 +30,8 @@
     "innovaCostBridge": "PENDING_LOCAL_BUILD",
     "sourceQuoteCompleteness": "PENDING_USER_LOCAL_BUILD",
     "workingFxDefault": "PENDING_LOCAL_BUILD",
-    "closureProgress": "PENDING_LOCAL_BUILD"
+    "closureProgress": "PENDING_LOCAL_BUILD",
+    "workingPricedBom": "PENDING_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -218,6 +219,17 @@
         "LAN-502-001/ZWP20"
       ],
       "releaseAllowed": false
+    },
+    "workingPricedBom": {
+      "source": "MR0001 MTO Rev04",
+      "sourceRows": 42,
+      "ciscoLanMtoSets": 5,
+      "ciscoBudgetTHB": 2117650,
+      "ciscoUnitPackageTHB": 423530,
+      "vatExcluded": true,
+      "status": "PRELIMINARY_WORKING_BOM_NOT_OEM_APPROVED",
+      "otherSystemItems": "UNPRICED_PENDING_DERIVATION",
+      "customerReleaseAllowed": false
     }
   },
   "sourceConflicts": [
