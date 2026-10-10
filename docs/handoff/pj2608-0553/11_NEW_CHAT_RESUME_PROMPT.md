@@ -1,26 +1,19 @@
-# New Chat Resume Prompt — PJ2608-0553 (Urgent Bid)
-Continue **PJ2608-0553 only**.
+# New Chat Resume Prompt — PJ2608-0553 (Living Handoff 2026-10-10)
 
-Repository: `addvalue-genesis/genesis-portal`
-Working branch: `feat/pj2608-0553-tpp-bid-handoff`
-Parent/reference branch: `feat/pj2608-0550-tpp-ui-rev04` (reference code only, NEVER use its 0550 project facts as 0553 facts).
-Do not use default branch as your working baseline. Do not merge PR #2 or redesign from scratch.
+Continue **PJ2608-0553 only**, using GitHub `addvalue-genesis/genesis-portal`, branch `feat/pj2608-0553-tpp-bid-handoff`. Do not use main or accidentally work on the `feat/pj2608-0550-tpp-ui-rev04` source branch. Do not merge/deploy/submit offers without explicit approval.
 
-**First read:** `docs/handoff/pj2608-0553/00_HANDOFF_CURRENT.md` in the working branch.
-Then follow its exact full source-of-truth reading order, including the 0550 architecture/code references, and next find and inspect actual 0553 RFQ/TC/vendor/scope sources. If a document is unavailable, list the exact missing evidence instead of inventing project data.
+**READ FIRST**, in this order:
+1. `docs/handoff/pj2608-0553/00_HANDOFF_CURRENT.md` — read the final **2026-10-10 Living Handoff Update** as controlling; earlier sections include stale initial status and remain historical.
+2. `docs/handoff/pj2608-0553/12_MACHINE_STATE.json`.
+3. `frontend/src/project0553/data/repository.js`, `data/adapters/controlledSnapshotAdapter.js`, `data/validateDataset.js`, `data/controlledSnapshot.js`, `data/snapshots/pj2608-0553.working.json`.
+4. `frontend/src/project0553/data/snapshots/mto.rev04.summary.json`, `data/quotes/NG-260916-ADV-DAP1.full.json`, `data/supplierQuoteLines.js`, `vendorEvidence.js`.
+5. `frontend/src/common/engineering/requiredOfferedReconciliation.js`, `frontend/src/project0553/data/scadaOfferReconciliation.js`, common engineering/cost methods, `CommercialSystemBreakdown.jsx`, `CommercialWorkspace.jsx`, `commercialWorkbookControl.js`, `data/rev08CommercialBaseline.js`, 0553 page and project/source registries.
+6. For proven 0550 techniques, read `frontend/src/project0550/data/repository.js`, `data/adapters/controlledSnapshotAdapter.js`, `data/validateDataset.js`, `frontend/src/pages/PJ26080550.jsx` and its PAGA quote detail; reuse COMMON methodology/UI only, never PARTICULAR 0550 vendor/rate/quantity/FX.
 
-Method: **First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model + Evidence Control**.
+**Mission:** finish evidence-backed 0553 MR0001–0004 requirement→physics/constraint→required BOM→vendor quote gap→parametric cost→customer selling price→6-sheet `4-Scope of Supply.xlsx`, with separately frozen historic SAMTEL issue and working JUTAL candidate. No unsupported pricing, phantom zero, compliance, licence or release.
 
-Immediate priority is preparing the JUTAL ZM169 Telecom Package technical (UNPRICED) and priced commercial bid with controlling source evidence. Current screenshot says bid closing **14 Oct 2026 17:00 Beijing time**; confirm with original current instructions and amendments before treating deadline or email details as final. Keep required submission terms, authorization, delivery/spares and one-round restriction visible in the bid checklist.
+**Current checkpoint:** 0553 route and Budget drilldown operational; full Next G 53-line quote is JSON and USD 191,610.15 reconciles; 4 MRs MTO Rev04 imported only as SUMMARY (not full line takeoff); required-vs-offered engine is registered but MR0001 required SKU quantities still OPEN; quote for Cisco partial; 2024 BARTEC/MTL references are not Z1F current quotes; SQL and AGERP adapter not connected; 0553 Rev08 base USD 1,684,901.16 is historical customer sell, not current cost. Most recent verified user build is code `73ffda7`, all validators PASS with only bundle-size warnings; current handoff commits are documentation changes and must be pulled/validated normally.
 
-Execution:
-1. Audit existing repo and any existing 0553 implementation; DO NOT overwrite any existing 0553 work.
-2. Confirm 0553 RFQ document revisions and source locations; build indexed requirement/scope/system/evidence matrix with OPEN flags.
-3. Identify safe-to-reuse COMMON/GENERIC code and isolate 0553 particular project facts/data/UI.
-4. Prioritize generating compliant Technical Proposal, Priced Commercial Proposal, spare list, itemized quotation and manufacturer-authority evidence before interface polish.
-5. Refactor/implement in isolated branch, preserve 0550 behavior, run validations/build/tests, then commit and report exact SHA, remaining gaps and local pull/run instructions.
-6. No email sending, customer release, production deployment or PR merging without explicit approval.
+**NEXT TASK (urgent):** ingest complete MTO Rev04 item rows and map each to MR0001 link/site tags, BOM requirements, licence, enclosure, cable/connector/gland/surge/bulk and vendor items. Reconcile NG 53 lines and complete Cisco lines; then extend MR0002–0004. Only derive current Cost/Sell after verification and sourced FX. Produce clear table columns Required / Offered / Gap / Source / Proof / Unit Cost / Sell with +/− drilldown. Verify actual tender amendment/deadline; original ITB 08-Sep conflicts with reported 14-Oct deadline.
 
-Never convert TBC/OPEN to zero. Never invent prices, quantities, resources, compliance, OEM authorization or reconcile via fabricated balancing lines. Keep source-backed trace, versioning, internal vs issued states and audit grid UI.
-
-**Respond initially with:** confirmed code baseline, source inventory, 0553-vs-0550 isolation plan, blockers before tender cutoff, and first implementation steps. Then proceed with authorized code changes.
+Run `git rev-parse HEAD`, `npm run build`, report exact commits/results. Preserve full technical detail in handoff, update machine state and handoff together after every major working change. Never claim a ZIP exists until it is actually created and verified.
