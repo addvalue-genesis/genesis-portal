@@ -1,3 +1,4 @@
+import { ExpandableFormulaTable } from "./ExpandableFormulaTable";
 import { MASTER_FORMULA_INVENTORY, FORMULA_COVERAGE_SUMMARY, PRELIMINARY_METHODS_REQUIRING_SPECIALIST_MODELS } from "../engineering/masterFormulaInventory";
 import React from "react";
 function Badge({children,tone="neutral"}) { return <span className={"p55-badge p55-badge--"+tone}>{children}</span>; }
@@ -245,9 +246,7 @@ export function EngineeringView({model,children}) {
       <section className="p55-panel">
         <SectionTitle eyebrow="Master Formula Inventory" title="Engineering + Service / Cost Equation Coverage" text="One canonical inventory references existing law and service definitions. EXECUTABLE means partial preliminary function coverage, not automatic compliance or OEM certification."/>
         <p className="p55-note">{FORMULA_COVERAGE_SUMMARY.engineeringDefinitions} engineering equations + {FORMULA_COVERAGE_SUMMARY.serviceDefinitions} service/cost equations = {FORMULA_COVERAGE_SUMMARY.total} registered equations. Executable/partial implementations: {FORMULA_COVERAGE_SUMMARY.executableCoverage}. Remaining entries require controlled implementation and verification.</p>
-        <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Equation ID</th><th>Domain / Method</th><th>Canonical equation</th><th>Code coverage</th></tr></thead><tbody>
-         {MASTER_FORMULA_INVENTORY.map(eq=><tr key={eq.id}><td>{eq.id}</td><td><strong>{eq.name}</strong><small>{eq.domain}</small></td><td><code>{eq.formula}</code></td><td><Badge>{eq.implementationState}</Badge></td></tr>)}
-        </tbody></table></div>
+        <ExpandableFormulaTable rows={MASTER_FORMULA_INVENTORY}/>
         <p className="p55-note"><strong>Specialist method controls:</strong> {PRELIMINARY_METHODS_REQUIRING_SPECIALIST_MODELS.map(x=>x.id+" — "+x.state).join(" · ")}. Project-specific STD applicability and CAL/RPT evidence are reviewed separately.</p>
       </section>
       {children}
