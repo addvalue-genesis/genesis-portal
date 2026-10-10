@@ -111,3 +111,47 @@ Use `11_NEW_CHAT_RESUME_PROMPT.md`. Start with an audit that identifies exact re
 - UI route: `/projects/pj2608-0553`; review gates G-01..G-12 show open/hold/conflict and source locators; no amounts or inferred compliance. Code readback verified, source-branch compare ahead/0 behind; local webpack build and end-to-end validation **NOT YET RUN**.
 - Priorities: authenticate latest JUTAL email/amendment and submission routing; line-level MTO/TC/CCL reconcile; manufacturer authority and spare pricing; generate technically screened UNPRICED and controlled PRICED bid; execute validation and build before any release.
 - Do not merge PR #2, submit email, deploy or release without approval.
+
+
+---
+## 2026-10-10 Living Handoff Update — ACTIVE CURRENT STATE (supersedes outdated status claims above)
+
+**Branch:** `feat/pj2608-0553-tpp-bid-handoff`; **code baseline / last verified user build:** `73ffda7579e806d73e92ed1e21ecf8e703253912` (latest engineering reconciliation commit). The exact HEAD after this documentation update is a later commit; run `git rev-parse HEAD` after pull to capture it. **DO NOT** treat historic statements above such as "0553 UI not implemented" or "build not run" as current.
+
+**User verification:** User ran `npm run build` on 10 Oct 2026, all 14 sequential validators reported PASS, webpack 5.111.1 compiled with 3 non-blocking bundle-size warnings; JS about 579 KiB and CSS about 29.8 KiB. This verifies code/test execution, NOT complete customer engineering compliance, all-vendor quotation completeness or customer-ready release.
+
+### Architecture / module registry (actual paths on branch)
+- UI: `frontend/src/pages/PJ26080553.jsx` -> `frontend/src/project0553/CommercialWorkspace.jsx` -> `CommercialSystemBreakdown.jsx`; 0550-style collapsible 4 MR groups and quote/equipment drilldown. Tabs via common project shell. 0553 at `/projects/pj2608-0553` (local Port 3001); 0550 independent Port 3000.
+- Data read: `frontend/src/project0553/data/repository.js` -> `adapters/controlledSnapshotAdapter.js` -> `validateDataset.js` -> combined `data/controlledSnapshot.js`, `data/snapshots/pj2608-0553.working.json`, `mto.rev04.summary.json`, `data/supplierQuoteLines.js`, `data/quotes/NG-260916-ADV-DAP1.full.json`.
+- The 0553 runtime is **CONTROLLED JSON + JS Snapshot**. `sql=NOT_YET_CONNECTED`, `agerp=NOT_YET_CONNECTED`. Never claim MariaDB persistence or sync. GitHub JSON is source-controlled; original PDF/Excel from project Drive remains authoritative evidence.
+- COMMON calculations: `frontend/src/common/engineering/rfPropagation.js`, `seaReflection.js`, `lnaCascade.js`, `physicalBomDerivation.js`, `requiredOfferedReconciliation.js`; `frontend/src/common/cost/derivationKernel.js`, `commercialCurrency.js`, `serviceEquations.js`. Master inventory includes 27 engineering law definitions + 18 service equations, but execution coverage is partial.
+- 0553 project bindings: `project0553/data/scadaLinkEvidence.js` (RPT Rev.C1 five links), `MR0001RFProofPilot.jsx`, `MR0002LNACalculation.jsx`, `MR0002PhysicalBom.jsx`, `data/layoutGeometryEvidence.js`, `data/scadaOfferReconciliation.js`.
+- Commercial: `commercialWorkbookControl.js`, `data/rev08CommercialBaseline.js`, `CommercialWorkspace.jsx`; three-state doctrine WORKING/BUDGETARY/RELEASED + recipient separate. No JUTAL released offer, no live XLSX 6-sheet export yet.
+- Reference 0550 architecture: `frontend/src/project0550/data/snapshots/pj2608-0550.rev07.json` (internal dataset ID Rev10), `data/adapters/controlledSnapshotAdapter.js`, `data/repository.js`, `data/validateDataset.js`, `data.js`; 0550 original branch MUST remain untouched. 0550 cost rates, pricing, PAGA vendor data, quantity and currency are forbidden as 0553 facts.
+
+### Vendor / commercial source truth and decisions
+- Next G quote `NG/260916-ADV-DAP1`, 16 Sep 2026, DAP Ranong, 100% advance, 22–24 weeks; quoted total USD **191,610.15**. All **53 BOQ rows** now in `NG-260916-ADV-DAP1.full.json` (groups A12/B13/C12/D8/E8). Group D/E spare, do not double count. Five Region Code prices are source dashes and stored as null, not zero. Quote validity expired 01 Oct 2026; refresh. Source PDF Drive ID `1dwU6mkjm0JOKvbw3fMeCH8alQtKufEyd`.
+- VST ECS Cisco `A-0048/2026_Re1` dated 09 Sep 2026: THB **2,117,650 before VAT**; line source register presently partial. Quote validity ended Sep. PDF Drive ID `1uURv0sg0joJlnKXi3Wdv3cGmOB1fWVYC`.
+- Prosper E&T `Q-PROSRY-24051`, THB 2,286,700 ex VAT; **Zawtika 1E 2024 historical reference only**, not 1F price. PDF `1QMh4V9S7FxnwkpRO7BQ_jThDlDS-qfpD`.
+- Simplicity `ST2407073`, THB 11,750 ex VAT, MTL ZB24597; **2024 historical reference only**, PDF `1I1vNvzP3oSaOaD8Fn3bOSd6N8CVjcizi`.
+- MGW cross-system P26-058 USD 273,519 is **multi-MR, unallocated**, cannot assign full price to any one MR. Additional MRs 0002–0004 vendor sourcing remains incomplete.
+- `4-Scope of Supply.xlsx` Rev08 is customer-selling **historical baseline**, 6 sheets: Scope of supply, B10 CommSpares, B11 SpecialTool, B13 Consumerables, C1 CapitalSpares, C2 2Y-Spares. Base A+B USD **1,684,901.16**, optional C1+C2 USD **151,465.27**, not adopted current revised JUTAL selling price. Source Drive ID `1KSfxvPfgS8XcvwaQUeacmgdX32yobwVk`. Detail/summary controls presently preliminary, original SAMTEL-issued revision still must be authenticated.
+- FX: USD/THB view implemented; conversion only when numeric THB/USD, date and attributed source exist. Original currency and quote line totals never overwritten. Unverified 31.5 is working-only, NOT certified BOT FX. Avoid applying 0550 FX to 0553.
+
+### Engineering source and required decisions
+- MR0001 SCADA radio: MTO Rev04 source Drive ID `1o1UIsUw8JQtUt2yk4S8graNpIkNQCq8h`; current repository has only **42-row summary / equipment families**, not full SKU/Tag quantities. Five paths from RPT-0001 Rev.C1 / Pathloss 6: ZWP8→ZWP20, ZWP11→ZWP21, ZWP8→ZWP22, ZPQ→ZWP23, ZPQ→ZWP8; independent FSPL and preliminary sea-tide geometry are NOT OEM Pathloss availability certifications. Check base/subscriber/PTP Qty, 90° vs 60° sector, antenna frequency/model, Myanmar region licence/options, 12/48-month warranties, Zone 2, enclosure, surge, feeder/cable/bulk, spares, brownfield ownership.
+- `requiredOfferedReconciliation.js` + `scadaOfferReconciliation.js` only demonstrate controlled model/quantity comparison. Because required itemized MTO has NOT been extracted, requiredQty and accepted cost remain OPEN/HOLD. Test gates pass synthetically; do NOT advertise real SKU reconciliation.
+- MR0002 DMR LNA: RFI RX3852 candidate 380–520 MHz, ≤2 dB NF and up to 40 dB gain; Friis calculation implemented but receiver/cable/filter inputs and vendor approval missing. LAY Rev.C1 has reference elevations 21.1/21.3 vs 18.3 m (2.8/3.0 m difference) only, NOT certified cable routes. Complete cable/connector/JB/gland/Ex certification and quantity derivation still pending.
+- Engineering discipline: source 0553 project MR/BOD/SPE/DTS/RPT/CAL/BLD/LAY/MTO/TC first; reuse other projects as METHOD/reference only; use formulas, standards, OEM documentation and explicit uncertainty; never guess absent quantities or equate 'OPEN' to zero. Maintain Source→REQ→Constraint→CAL/Proof→Object/Interface→Required Qty→Offer Mapping→Cost→Sell→Workbook Cell.
+
+### Urgent next tasks, in dependency order
+1. Authenticate current JUTAL ITB amendments and closing/submission directions (original 08 Sep instruction conflicts with reported 14 Oct Beijing extension). No release without confirmation.
+2. Parse ALL individual rows of 0553 MTO Rev04, MR0001 equipment and platform locations, BLD/LAY/STD for licences/enclosures/cable/bulk; create **Required BOM controlled JSON** and quantify with First Principles. No arbitrary required quantity.
+3. Map all 53 NG BOQ rows and full Cisco (incl zero-price tracking/licence lines) and remaining supplier offers to required objects; audit include/exclude/alternate/spare/duplicate and technical licence, bands, Ex requirements.
+4. Complete vendor quotation ingestion for MR0002–MR0004; verify expired quotes and external engineering cost. Reconcile engineering deliverables and scope ownership.
+5. Derive costs using COMMON equations, trace FX source/date, scoped MH, transport and margins; isolate price Rev08 as history, calculate working revised sell without forced balancing.
+6. Reconcile all six 0553 customer workbook sheets; implement validated six-sheet Excel customer export, preserve SAMTEL historical issue; explicit approval gate before JUTAL release.
+7. Prioritize submission deliverables over UI polish. Standard display is bordered hierarchical tables with +/− and USD/THB; no long vendor card stacks.
+
+### Validation / worktree
+`J:\\DEV\\GitHub\\addvalue-genesis\\genesis-portal` uses 0553 branch and Port 3001; `genesis-portal-0550` uses 0550 branch and Port 3000. Latest user build after `73ffda7`: 14 validation scripts PASS and webpack compiled with 3 size warnings. Command: `cd frontend; npm run build`. Release gates not met. Commit and revalidate after edits.
