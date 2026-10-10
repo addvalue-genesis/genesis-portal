@@ -26,4 +26,10 @@ assert(!/PROJECT_0550|REQUIREMENT_COMPLETENESS|PJ2608-0550 contains/.test(engine
 assert(!/project0550\/data|TEL-LAN|RC-0550-001/.test(binding),"0553 First Principles binding inherited 0550 particular facts");
 assert(binding.includes("BID_0553_GATES")&&binding.includes("TECHNICAL_HOLDS"),"0553 requirement control must be evidence-bound");
 assert(page.includes("<MR0001RFProofPilot/>"),"0553 First Principles must retain live RF pilot");
+const equationDefinitions=read("common/cost/serviceEquations.js");
+const engineeringView=read("common/ui/EngineeringView.jsx");
+const p0553Methods=read("project0553/engineeringViewModel.js");
+for(let i=1;i<=18;i++)assert(equationDefinitions.includes('id:"E'+String(i).padStart(2,"0")+'"'),"Missing original E"+i+" equation");
+assert(p0553Methods.includes("serviceEquations:SERVICE_EQUATIONS"),"0553 must receive full shared service method definitions");
+assert(engineeringView.includes("serviceEquations.map"),"Shared First Principles must render all service equations");
 console.log("PASS PJ2608-0553 shared/particular isolation and 0550 facade regression guards");
