@@ -1,4 +1,5 @@
 import NEXT_G_FULL_BOQ from "./quotes/NG-260916-ADV-DAP1.full.json";
+import { INNOVA_0553_PROVISIONAL_PRICES } from "./innovaHistoricalBudgetPrices";
 // 0553 supplier quotation evidence from user-provided PDF sources.
 // The 2024 quotations are REFERENCE_ONLY from Zawtika 1E; they are NOT adopted 0553 project prices.
 // Units and currencies are retained. No unsupported FX conversion or customer markup.
@@ -8,10 +9,17 @@ export const SUPPLIER_QUOTE_LINES_0553=[
  ["1.0","IE-3400-8P2S-E","Cisco Catalyst IE3400 8GE PoE, 2GE SFP",5,242460],
  ["1.0.1","CON-SNT-IE34008E","Cisco SmartNet 3 years",5,100930],
  ["1.1","PWR-IE65W-PC-DC","Cisco PoE DC input power module",5,13930],
+ ["1.2","IOT-OTHER","Not related to IoT Solution; tracking only",5,0],
+ ["1.3","NO-IOT-SOLUTION","Not related to IoT Solution; tracking only",5,0],
+ ["1.4","IE3X00_SW","Software for Catalyst IE3x00 rugged series",5,0],
+ ["1.5","DIGITAL-DL-CODE","Digital download code for software licence",5,0],
+ ["1.6","IE3400-DNA-E","Cisco DNA Essentials licence parent item",5,0],
  ["1.6.1","IE3400-DNA-E-3Y","Cisco DNA Essentials 3-year license",5,14260],
  ["2.0","IEM-3300-8T=","Cisco IE3300 8-port expansion module",5,45630],
+
  ["2.0.1","CON-SNT-IEM3308T","Cisco SmartNet expansion module 1 year",5,6320]
  ]},
+ ...INNOVA_0553_PROVISIONAL_PRICES.quotations.map(q=>({id:"INNOVA-"+q.number,vendor:INNOVA_0553_PROVISIONAL_PRICES.supplier,quotation:q.number,date:INNOVA_0553_PROVISIONAL_PRICES.sourceDate,currency:"THB",terms:"Historical 2024 quote / authorized provisional budget / requote pending; VAT 7% separately",mr:"MR-0001",status:"2024_PROVISIONAL_BUDGET_REQUOTE_PENDING",source:q.url,scope:q.scope,quotedTotal:q.originalSubtotalExVat,lines:(q.lines||[]).map((l,i)=>[String(i+1),l.partNumber||l.description,l.description||l.cable||l.partNumber,l.qty,l.unitPriceExVat,l.qty*l.unitPriceExVat]),sourceLineCompleteness:q.number==="QA24-0604"?"PARTIAL_PRICE_EXTRACTION":"SOURCE_LINES_VERIFIED"})),
  {id:"PROSPER-24051",vendor:"Prosper E&T / BARTEC",quotation:"Q-PROSRY-24051 Rev0",date:"2024-07-12",currency:"THB",terms:"10–12 weeks; 30% down, 70% PDC 30 days; validity 30 days; free-issue exclusion",mr:"MR-0001/MR-0002/MR-0003",status:"2024_REFERENCE_ONLY_REQUOTE",source:"Q-PROSRY-24051 Add Value Zawtika 1E_Communication.pdf",scope:"Zawtika 1E — NOT 1F",quotedTotal:2286700,lines:[
  ["1","A7-3136-4121/Bxxx","Ex Zone 2 SCADA control panel / 1E site group",4,39200],
  ["2","A7-3136-4121/Bxxx","Ex Zone 2 SCADA control panel / 1E second site group",4,38800],
