@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && webpack --mode production",
+    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && npm run validate:lna-cascade && webpack --mode production",
     "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs",
     "validate:pj0553-isolation": "node scripts/validate-pj2608-0553-isolation.cjs",
     "validate:rf-prop": "node scripts/validate-rf-propagation.cjs",
     "validate:sea-reflection": "node scripts/validate-sea-reflection.cjs",
-    "validate:scada-path-baseline": "node scripts/validate-scada-path-baseline.cjs"
+    "validate:scada-path-baseline": "node scripts/validate-scada-path-baseline.cjs",
+    "validate:lna-cascade": "node scripts/validate-lna-cascade.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
