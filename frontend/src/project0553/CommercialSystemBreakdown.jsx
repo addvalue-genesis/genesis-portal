@@ -1,5 +1,6 @@
 import { SCADA_0553_RECONCILIATION } from "./data/scadaOfferReconciliation";
 import { WorkingPricedBom0553 } from "./WorkingPricedBom0553";
+import { SimpleBom0553 } from "./SimpleBom0553";
 import { InnovaBudgetEvidence0553 } from "./InnovaBudgetEvidence";
 import { AVIAT_0553_TECHNICAL_EVALUATION } from "./data/aviatTechnicalBidEvaluation";
 import { MR0001_PACKAGE_COMPOSITION, summarizeMR0001Composition } from "./data/mr0001PackageComposition";
@@ -32,6 +33,8 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
   sources:VENDOR_0553_SOURCES.filter(v=>v.mr===s.mr||v.mr==="MULTI")
  }));
  return <section className="p55-panel">
+  <SimpleBom0553/>
+  <details><summary style={{cursor:"pointer",fontWeight:600,padding:"12px 0"}}>รายละเอียดวิศวกรรม / Vendor Evidence / Gap Assessment (คลิกเพื่อขยาย)</summary>
   <div className="p55-eyebrow">PART A INTERNAL DERIVATION · 0550 STRUCTURE REUSED / 0553 DATA ONLY</div>
   <div className="p55-budget-detail__head">
    <div><h3>4 MR Systems — Equipment / Vendor Evidence / Commercial Breakdown</h3>
@@ -280,5 +283,6 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
    </div></td></tr>}
   </React.Fragment>)}</tbody></table></div>
   <p className="p55-note">Source: MTO Rev04 (4 MRs), REV08 Customer Workbook, Vendor Evidence Registry. Unlike 0550's quoted PAGA item detail, 0553's vendor line items are not yet extracted into the controlled dataset; DO NOT treat equipment-family headings as priced BOM rows.</p>
+  </details>
  </section>;
 }
