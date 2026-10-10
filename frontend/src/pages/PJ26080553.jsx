@@ -1,5 +1,7 @@
 import React, { useMemo, useState } from "react";
 import { ProjectWorkspaceShell } from "../common/ui/ProjectWorkspaceShell";
+import { ExecutiveView } from "../common/ui/ExecutiveView";
+import { EXECUTIVE_0553 } from "../project0553/executiveViewModel";
 import { SystemsView as SharedSystemsView } from "../common/ui/SystemsView";
 import { SYSTEMS_0553, SYSTEM_GROUPS_0553 } from "../project0553/systemsBinding";
 import { PROJECT_0553_FACTS } from "../project0553/projectFacts";
@@ -36,23 +38,7 @@ export function PJ26080553() {
  const shellProject = {id:p.projectId,shortName:"Zawtika Phase 1F Telecom",title:"JUTAL · "+p.packageId+" · Technical UNPRICED / Priced Commercial Bid",state:"WORKING REVIEW / RELEASE HOLD",statusDetail:"Closing amendment verification OPEN",method:p.method};
  return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} className="p553-dashboard" renderContent={(tab)=><>
 
-   {tab==="overview"&&<div className="p55-stack">
-     <div className="p55-section-title"><div><div className="p55-eyebrow">MANAGEMENT VIEW</div><h2>Project control spine</h2><p>0553 controlled bid inputs, deliverable gates and technical-commercial evidence. No 0550 quantities or pricing inherited.</p></div></div>
-     <div className="p553-alerts"><div className="p553-alert"><strong>Customer release — HOLD</strong><p>Original Instruction to Bidder and later tender update disagree. Confirm authorized closing/submission instruction before release.</p></div><div className="p553-alert"><strong>Bid preparation — ACTIVE</strong><p>MTO Rev04, SAMTEL TC 05-Oct and CCL Rev04 located; all four MRs require trace and quote reconciliation.</p></div></div>
-     <div className="p55-metric-grid">
-       <Metric label="Systems" value={p.systems.length} sub="MR0001–MR0004, 0553 only"/>
-       <Metric label="Bid release" value="HOLD" sub="No customer submission approved"/>
-       <Metric label="Review gates" value={BID_0553_GATES.length} sub="Tracked bid readiness issues"/>
-       <Metric label="Gates outstanding" value={blocked} sub="OPEN / HOLD / CONFLICT"/>
-       <Metric label="Commercial" value="HOLD" sub="Priced proposal not authorized"/>
-       <Metric label="Deadline" value="VERIFY" sub="14 Oct working input; amendment OPEN"/>
-     </div>
-     <div className="p55-grid p55-grid--2"><Section title="First Principles → Constraint → Proof → Quantity → Cost">
-       <div className="p553-methodchain">{["Source / Evidence","Requirement","Constraint","CAL / RPT","Quantity / MTO","Work / Rate","Commercial"].map((x,i)=><React.Fragment key={x}>{i>0&&<span>→</span>}<strong>{x}</strong></React.Fragment>)}</div>
-       <p className="p55-note">0553 Architecture Manifest now binds common engineering domains to 0553 evidence and source IDs; inputs and results remain project-particular.</p>
-     </Section><Section title="Bid packages / release controls"><Table headers={["Package","Working status"]} rows={p.bidControl.requiredPackages.map(x=>[x,<Badge key={x}>REVIEW OPEN</Badge>])}/></Section></div>
-     <Section title="Critical bid issues"><Table headers={["ID","Review issue","State"]} rows={BID_0553_GATES.filter(g=>g.priority==="P0").map(g=>[g.id,<strong key={g.id}>{g.title}</strong>,<Badge key={g.status}>{g.status}</Badge>])}/></Section>
-   </div>}
+   {tab==="overview"&&<ExecutiveView model={EXECUTIVE_0553}/>}
    {tab==="architecture"&&<Section title="GENESS/TPP Architecture — controlled 0553 binding"><div className="p553-methodchain">{ARCHITECTURE_0553.layers.map(x=><strong key={x}>{x.replaceAll("_"," ")}</strong>)}</div><p className="p55-note">{p.isolationRule}</p><p className="p55-note">Current data is Git-versioned registry + stable 0553 bindings. No direct imports from 0550 project data.</p></Section>}
    {tab==="systems"&&<SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Same group/focus/search/expand behavior as PJ2608-0550; all facts come from 0553 controlled MTO and RFQ."/>}
    {tab==="engineering"&&<div className="p55-stack"><Section title="Engineering proof and compliance HOLDs" subtitle="Do not equate document mapping with compliance."><Table headers={["ID","MR","Engineering issue","State"]} rows={TECHNICAL_HOLDS.map(h=>[h.id,h.system,h.issue,<Badge key={h.id}>{h.state}</Badge>])}/></Section><Section title="Requirement → Variable → Proof Control"><p>No automatically confirmed design values. Reconcile the four MRs with MTO Rev04, latest TC and vendor datasheets before selecting models and issuing proof.</p><Table headers={["Equation","Result","Reason"]} rows={[[deriveManHours({}).equation,"OPEN",deriveManHours({}).missing.join(", ")],[deriveLaborCost({}).equation,"OPEN",deriveLaborCost({}).missing.join(", ")]]}/></Section></div>}
