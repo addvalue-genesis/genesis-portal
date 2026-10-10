@@ -28,7 +28,8 @@
     "requirementEvidence": "PENDING_USER_BUILD",
     "innovaBudgetValidation": "PENDING_USER_BUILD",
     "innovaCostBridge": "PENDING_LOCAL_BUILD",
-    "sourceQuoteCompleteness": "PENDING_USER_LOCAL_BUILD"
+    "sourceQuoteCompleteness": "PENDING_USER_LOCAL_BUILD",
+    "workingFxDefault": "PENDING_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -197,6 +198,14 @@
       ],
       "status": "SOURCE_LINES_RECONCILED_LOCAL_BUILD_PENDING",
       "acceptedCost": null
+    },
+    "workingFxDefault": {
+      "displayCurrency": "THB",
+      "thbPerUsd": 31.5,
+      "date": "2026-10-10",
+      "source": "INTERNAL PLANNING ASSUMPTION — UNVERIFIED",
+      "persistent": "BROWSER_LOCAL_STORAGE",
+      "customerReleaseAllowed": false
     }
   },
   "sourceConflicts": [
