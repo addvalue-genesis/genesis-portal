@@ -16,7 +16,8 @@
     "hotfixCommit": "57db7b0e910d568a157bd1dce1f1cedbb31ea745",
     "hotfixVerification": "PENDING_USER_LOCAL_BUILD",
     "secondHotfixCommit": "87c92e1568ecc6fbbf4879d2400d7b0798516dd1",
-    "requiredBomGuard": "ADDED_PENDING_USER_BUILD"
+    "requiredBomGuard": "ADDED_PENDING_USER_BUILD",
+    "aviatReviewValidation": "ADDED_PENDING_USER_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -69,7 +70,24 @@
     "mr0001": "SOURCE_DRIVEN_42_MTO_ROWS_7_SITES_5_LINKS_PRELIMINARY_REQUIRED_BOM_CANDIDATES_SKU_OPEN",
     "mr0002": "LNA_PRELIMINARY_ONLY",
     "mr0003": "REVIEW_OPEN",
-    "mr0004": "REVIEW_OPEN"
+    "mr0004": "REVIEW_OPEN",
+    "aviatBidEvaluation": {
+      "source": "NG-260916-ADV-DAP1.full.json",
+      "quoteLines": 53,
+      "state": "FUNCTION_CANDIDATES_OEM_APPROVAL_OPEN",
+      "requiredSkuQty": "OPEN",
+      "acceptedCost": "OPEN",
+      "review": [
+        "sector-angle",
+        "Myanmar-region",
+        "radio-topology",
+        "power",
+        "warranty",
+        "bulk-duplication",
+        "quote-validity"
+      ],
+      "build": "PENDING_USER_RUN"
+    }
   },
   "sourceConflicts": [
     "Original ITB 08-Sep deadline vs later reported 14-Oct deadline, amendment not authenticated",
