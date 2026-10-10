@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && npm run validate:lna-cascade && npm run validate:physical-bom && npm run validate:commercial-workbook && npm run validate:commercial-drilldown && npm run validate:supplier-quotes && npm run validate:commercial-currency && npm run validate:nextg-full && npm run validate:0553-json-repository && npm run validate:0553-reconciliation && npm run validate:0553-required-bom && webpack --mode production",
+    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && npm run validate:lna-cascade && npm run validate:physical-bom && npm run validate:commercial-workbook && npm run validate:commercial-drilldown && npm run validate:supplier-quotes && npm run validate:commercial-currency && npm run validate:nextg-full && npm run validate:0553-json-repository && npm run validate:0553-reconciliation && npm run validate:0553-required-bom && npm run validate:0553-aviat-review && webpack --mode production",
     "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs",
     "validate:pj0553-isolation": "node scripts/validate-pj2608-0553-isolation.cjs",
     "validate:rf-prop": "node scripts/validate-rf-propagation.cjs",
@@ -19,7 +19,8 @@
     "validate:nextg-full": "node scripts/validate-nextg-quote-full.cjs",
     "validate:0553-json-repository": "node scripts/validate-0553-json-repository.cjs",
     "validate:0553-reconciliation": "node scripts/validate-0553-reconciliation.cjs",
-    "validate:0553-required-bom": "node scripts/validate-0553-required-bom.cjs"
+    "validate:0553-required-bom": "node scripts/validate-0553-required-bom.cjs",
+    "validate:0553-aviat-review": "node scripts/validate-0553-aviat-review.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
