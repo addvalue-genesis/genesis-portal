@@ -222,3 +222,12 @@ This audit is additive and controls where it is more specific than earlier histo
 - Reused existing project-specific RF link evidence and shared methodology without modifying protected 0550 branch. No invented radio/antenna SKU selection, RF licence, service rate, MH, FX or price; NG/Cisco remains separate quoted evidence. The model does **not** yet prove complete MR compliance or enough scope for customer pricing.
 - Next: authenticate native MTO row indices and split multi-code rows; link specific MR/SPE/DTS/BOD/STD/BLD/CAL/TC requirements with precedence; derive functional installed objects + full cable/connector/gland/Ex and service WBS quantities; reconcile quoted items and commercial rules, then release only after engineering and management signoff.
 - GitHub readback only; new user's `npm run build` required before claiming validation PASS.
+
+ 
+## 2026-10-10 Next G / AVIAT OEM-level bid evaluation checkpoint
+- Added `data/aviatTechnicalBidEvaluation.js`: bidirectional technical-review candidates for all 53 original Next G lines, including function/possible scope owner, offered qty, spare separation, hold and missing approval. **No manufacturer compatibility verification has been claimed**; rows remain candidate mappings.
+- Integrated reverse technical evaluation ahead of vendor priced BOQ in `CommercialSystemBreakdown.jsx`. Existing source-first MR0001 Required BOM remains authoritative; offered quantities cannot set required quantities.
+- Key independent review flags: RPT 60-degree sector vs BOD / vendor 90-degree sector, region code Myanmar applicability, two base stations vs five links and capacity, site PoE/power, North America cord applicability, 12/48-month warranty overlap, RF filter/mount/surge/cable double-counting boundaries, expired quote and delivery term.
+- `validate-0553-aviat-review.cjs` added to build chain: source quote line coverage and fail-closed statuses; **this is a static regression guard, not OEM acceptance**.
+- Source: `NG-260916-ADV-DAP1.full.json`, `scadaLinkEvidence.js`, MR0001 MTO Rev04. Required qty, accepted equipment, services MH, internal cost and sell remain OPEN/HOLD. JUTAL technical and commercial release prohibited pending gates and written approval.
+- User-local `npm run build` pending for this commit. Protected 0550 untouched.
