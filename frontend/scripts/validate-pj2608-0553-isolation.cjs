@@ -36,7 +36,7 @@ const formulaInventory=read("common/engineering/masterFormulaInventory.js");
 assert(formulaInventory.includes("ENGINEERING_LAW_KERNELS")&&formulaInventory.includes("SERVICE_EQUATIONS"),"Master inventory must reuse canonical law and E01-E18 formula definitions");
 assert(engineeringView.includes("<ExpandableFormulaTable rows={MASTER_FORMULA_INVENTORY}/>"),"All canonical formulas must be passed to shared expandable table");
 const formulaUi=read("common/ui/ExpandableFormulaTable.jsx");
-assert(formulaUi.includes("Expand all")&&formulaUi.includes("Collapse all")&&formulaUi.includes("aria-expanded"),"Hierarchical formula table must support real expand/collapse");
+assert(formulaUi.includes("aria-expanded")&&formulaUi.includes("onClick={expandAll}")&&formulaUi.includes("onClick={collapseAll}")&&formulaUi.includes("onClick={()=>toggle(group.domain,setExpanded)}")&&formulaUi.includes("onClick={()=>toggle(eq.id,setDetails)}"),"Hierarchical formula table must support real expand/collapse at group and equation level");
 assert(!/project0550\/|project0553\//.test(formulaInventory),"Master formula inventory cannot depend on particular project data");
 const linkedHierarchy=read("common/ui/LinkedEngineeringHierarchy.jsx");
 assert(engineeringView.includes("<LinkedEngineeringHierarchy"),"First Principles must use shared reference-coded hierarchy");
