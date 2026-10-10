@@ -28,7 +28,10 @@ export function PJ26080553() {
  const visibleGates=useMemo(()=>BID_0553_GATES.filter(g=>selectedMr==="ALL"||g.system==="ALL"||g.system===selectedMr),[selectedMr]);
  const blocked=BID_0553_GATES.filter(g=>g.status!=="CLOSED_VERIFIED").length;
  const systemTable=<Table headers={["MR","System","Current evidence state","Technical review"]} rows={p.systems.map(s=>[
-  s.mr,<strong>{s.name}</strong>,<Badge key={s.id}>{s.status}</Badge>,<button key={"b"+s.id} className="p553-detail-button" onClick={()=>setOpened(ope const shellProject = {id:p.projectId,shortName:"Zawtika Phase 1F Telecom",title:"JUTAL · "+p.packageId+" · Technical UNPRICED / Priced Commercial Bid",state:"WORKING REVIEW / RELEASE HOLD",statusDetail:"Closing amendment verification OPEN",method:p.method};
+  s.mr,<strong>{s.name}</strong>,<Badge key={s.id}>{s.status}</Badge>,
+  <button key={"b"+s.id} className="p553-detail-button" onClick={()=>setOpened(opened===s.mr?null:s.mr)}>{opened===s.mr?"− Hide":"＋ Detail"}</button>
+ ])}/>;
+ const shellProject = {id:p.projectId,shortName:"Zawtika Phase 1F Telecom",title:"JUTAL · "+p.packageId+" · Technical UNPRICED / Priced Commercial Bid",state:"WORKING REVIEW / RELEASE HOLD",statusDetail:"Closing amendment verification OPEN",method:p.method};
  return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} className="p553-dashboard" renderContent={(tab)=><>
 
    {tab==="overview"&&<div className="p55-stack">
