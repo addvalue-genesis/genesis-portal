@@ -1,5 +1,8 @@
-import { PROJECT_0553_SNAPSHOT } from "./controlledSnapshot";
-export function getProject0553Dataset() { return PROJECT_0553_SNAPSHOT; }
-export function getProject0553DataLayerStatus() {
- return {projectId:"PJ2608-0553",revision:PROJECT_0553_SNAPSHOT.revision,storage:"JS_CONTROLLED_SNAPSHOT",future:"AGERP_SQL_ADAPTER",issuePermission:false};
+import { controlledSnapshotAdapter } from "./adapters/controlledSnapshotAdapter";
+const activeAdapter=controlledSnapshotAdapter;
+export function getProject0553Dataset(){return activeAdapter.load();}
+export function getProject0553DataLayerStatus(){
+ const m=activeAdapter.describe();
+ return {projectId:m.projectCode,revision:getProject0553Dataset().revision,storage:"CONTROLLED_JSON_SNAPSHOT",adapter:m.adapter,datasetId:m.datasetId,integrationState:m.integrationState,issuePermission:false};
 }
+export function getProject0553SupplierQuotes(){return getProject0553Dataset().supplierQuotes;}
