@@ -5,6 +5,7 @@ import { ARCHITECTURE_MANIFEST_0553 } from "../project0553/architectureManifest"
 import { MODULE_REGISTRY_0553 } from "../project0553/moduleRegistry";
 import { ExecutiveView } from "../common/ui/ExecutiveView";
 import { MR0001RFProofPilot } from "../project0553/MR0001RFProofPilot";
+import { MR0002LNACalculation } from "../project0553/MR0002LNACalculation";
 import { EngineeringView as SharedEngineeringView } from "../common/ui/EngineeringView";
 import { ENGINEERING_VIEW_MODEL_0553 } from "../project0553/engineeringViewModel";
 import { EXECUTIVE_0553 } from "../project0553/executiveViewModel";
@@ -47,7 +48,7 @@ export function PJ26080553() {
    {tab==="overview"&&<ExecutiveView model={EXECUTIVE_0553}/>}
    {tab==="architecture"&&<SharedArchitectureView manifest={ARCHITECTURE_MANIFEST_0553} modules={MODULE_REGISTRY_0553}/>}
    {tab==="systems"&&<SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Same group/focus/search/expand behavior as PJ2608-0550; all facts come from 0553 controlled MTO and RFQ."/>}
-   {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/></SharedEngineeringView>}
+   {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/><MR0002LNACalculation/></SharedEngineeringView>}
    {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
    {tab==="budget"&&<div className="p55-stack"><Section title="Part A / B / C — Internal cost versus customer selling price" subtitle="Price records are not released to customer from this workspace."><Table headers={["Group","Contents","Cost status","Sell price status"]} rows={[["A","Equipment and vendor packages"],["B","Engineering, documents, FAT/SAT, logistics, spares and services"],["C","Any separately scoped installation / options only when RFQ confirms"]].map(r=>[...r,<Badge key={r[0]+"c"}>RECONCILIATION OPEN</Badge>,<Badge key={r[0]+"s"}>HOLD</Badge>])}/><Section title="Vendor Quotation / Cost Evidence — source alternatives" subtitle="Vendor total, currency and quoted scope must reconcile before using them in Part A/B/C.">
 <Table headers={["MR","Vendor","Document","Evidence state","Next action"]} rows={VENDOR_0553_SOURCES.map(v=>[v.mr,v.supplier,<a href={v.url} target="_blank" rel="noreferrer" key={v.id}>{v.document}</a>,<Badge key={v.id}>{v.status}</Badge>,v.next])}/>
