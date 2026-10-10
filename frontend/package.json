@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && npm run validate:lna-cascade && npm run validate:physical-bom && npm run validate:commercial-workbook && npm run validate:commercial-drilldown && npm run validate:supplier-quotes && npm run validate:commercial-currency && webpack --mode production",
+    "build": "npm run validate:pj0550-data && npm run validate:pj0553-isolation && npm run validate:rf-prop && npm run validate:sea-reflection && npm run validate:scada-path-baseline && npm run validate:lna-cascade && npm run validate:physical-bom && npm run validate:commercial-workbook && npm run validate:commercial-drilldown && npm run validate:supplier-quotes && npm run validate:commercial-currency && npm run validate:nextg-full && webpack --mode production",
     "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs",
     "validate:pj0553-isolation": "node scripts/validate-pj2608-0553-isolation.cjs",
     "validate:rf-prop": "node scripts/validate-rf-propagation.cjs",
@@ -15,7 +15,8 @@
     "validate:commercial-workbook": "node scripts/validate-commercial-workbook.cjs",
     "validate:commercial-drilldown": "node scripts/validate-0553-commercial-drilldown.cjs",
     "validate:supplier-quotes": "node scripts/validate-0553-supplier-quotes.cjs",
-    "validate:commercial-currency": "node scripts/validate-commercial-currency.cjs"
+    "validate:commercial-currency": "node scripts/validate-commercial-currency.cjs",
+    "validate:nextg-full": "node scripts/validate-nextg-quote-full.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
