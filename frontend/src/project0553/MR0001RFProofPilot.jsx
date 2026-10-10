@@ -3,11 +3,13 @@ import { freeSpacePathLoss,fresnelRadius } from "../common/engineering/rfPropaga
 import { assessTideScenarios } from "../common/engineering/seaReflection";
 import { SCADA_LINKS_0553,SCADA_RADIO_PATH_REPORT,SCADA_LINK_SOURCE_REFS } from "./data/scadaLinkEvidence";
 import { MR0001_ANTENNA_DOWNSIZE_STUDY as downsizing } from "./data/mr0001AntennaDownsizeStudy";
+import { MR0001_TIDAL_BUDGET_STUDY } from "./data/mr0001TidalBudgetStudy";
 
 // Read-only baseline sourced from RPT-0001 C1; user does not enter engineering parameters.
 export function MR0001RFProofPilot(){
  const [selected,setSelected]=useState(SCADA_LINKS_0553[0].id);
  const link=SCADA_LINKS_0553.find(x=>x.id===selected)||SCADA_LINKS_0553[0];
+ const derivedTide=MR0001_TIDAL_BUDGET_STUDY.links.find(x=>x.id===selected);
  const evidence={sourceId:"RPT-0001-C1",revision:"C1",state:"EXISTING_DESIGN_ASSUMPTION_NOT_OEM_VERIFIED"};
  const fspl=freeSpacePathLoss({frequencyMHz:link.frequencyMHz,distanceKm:link.distanceKm,evidence});
  const half=link.distanceKm/2;
@@ -59,6 +61,7 @@ export function MR0001RFProofPilot(){
  <tr><td>Rx level / fade margin</td><td>INPUT REQUIRED</td><td>OEM radio configuration, receiver threshold and feeder loss</td></tr>
  <tr><td>Availability pass</td><td>NOT ESTABLISHED</td><td>Link budget, tide/multipath, project standard and OEM confirmation</td></tr>
  </tbody></table></div></div>}
+ <p className="p55-note"><strong>Budget Tidal Proof Status:</strong> {derivedTide.proofStatus} · 3 relative water levels (−3/0/+3m) sourced from BOD. {derivedTide.downsizing?"4ft antenna -3.52dB antenna gain sensitivity included; ":""}RSL, fade margin and availability are NOT established from flat-sea geometry. This scenario cannot authorize a vendor SKU or an equipment quantity.</p>
  <p className="p55-note"><strong>Remaining engineering verification:</strong> true tidal datum, geodetic/terrain path, Earth curvature and k-factor, reflection coefficient, sea multipath, rain, ITU-R P.530 link availability, antenna model and OEM recalculation. RPT used Pathloss 6.0; no fabricated Pathloss output. No release to MTO/Budget yet.</p>
  <p className="p55-note"><strong>Documents:</strong> {SCADA_LINK_SOURCE_REFS.map((x,i)=><React.Fragment key={x.id}>{i?" · ":""}<a href={x.url} target="_blank" rel="noreferrer">{x.id}</a></React.Fragment>)}</p>
  </section>;
