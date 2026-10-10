@@ -1,6 +1,7 @@
 import { SCADA_0553_RECONCILIATION } from "./data/scadaOfferReconciliation";
 import { AVIAT_0553_TECHNICAL_EVALUATION } from "./data/aviatTechnicalBidEvaluation";
 import { MR0001_PACKAGE_COMPOSITION, summarizeMR0001Composition } from "./data/mr0001PackageComposition";
+import { MR0001_TOPOLOGY_QUANTITY_AUDIT } from "./data/mr0001TopologyQuantityAudit";
 import { MR0001_ENGINEERING_REQUIRED_BOM, summarizeMR0001RequiredBom } from "./data/mr0001RequiredBomDerivation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
@@ -74,6 +75,24 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
       </tr>)}</tbody>
      </table></div>
      <p className="p55-note">RPT topology is a preliminary reference, not acceptance of antenna selection, radio compatibility, availability or Myanmar licence. NG/Cisco offers remain comparison evidence only. This table intentionally cannot produce customer pricing until required quantities, proof, WBS drivers and source-based rates are verified.</p>
+    </section>}
+    {s.mr==="MR-0001"&&<section className="p55-panel">
+     <div className="p55-eyebrow">FIRST PRINCIPLES · RPT TOPOLOGY → PHYSICAL QUANTITY PROOF</div>
+     <h4>SCADA Link Endpoint and Site Audit — Radio Quantity Not Yet Approved</h4>
+     <p className="p55-note">The five RPT Rev.C1 paths give ten logical link endpoints at seven locations. This is a verified graph count from the registered report data, NOT ten radios, and NOT a purchase BOM. PTMP radio sharing, diversity, PTP roles and antenna options require engineering approval.</p>
+     <div className="p55-source-facts">
+      <div><span>RPT links</span><strong>{MR0001_TOPOLOGY_QUANTITY_AUDIT.linkCount}</strong></div>
+      <div><span>Logical endpoints</span><strong>{MR0001_TOPOLOGY_QUANTITY_AUDIT.endpointCount} · NOT EQUIPMENT</strong></div>
+      <div><span>Distinct sites</span><strong>{MR0001_TOPOLOGY_QUANTITY_AUDIT.siteCount}</strong></div>
+      <div><span>Accepted radio qty</span><strong>OPEN</strong></div>
+     </div>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
+     <thead><tr><th>Site</th><th>Link endpoints</th><th>RPT link IDs</th><th>Frequencies MHz</th><th>MTO package rows</th><th>Required base / remote / antenna</th></tr></thead>
+     <tbody>{MR0001_TOPOLOGY_QUANTITY_AUDIT.sites.map(x=><tr key={x.site}><td><strong>{x.site}</strong></td><td>{x.linkEndpointCount}</td><td>{x.linkIds.join(" · ")}</td><td>{x.frequencyMHz.join(" / ")}</td><td>{x.mtoPackageRows}</td><td>OPEN / OPEN / OPEN</td></tr>)}</tbody></table></div>
+     <h4>OEM role and quantity blockers</h4>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>ID</th><th>Missing engineering proof</th><th>Source</th><th>State</th></tr></thead><tbody>
+     {MR0001_TOPOLOGY_QUANTITY_AUDIT.outstanding.map(x=><tr key={x.id}><td>{x.id}</td><td>{x.reason}</td><td>{x.source}</td><td>{x.state}</td></tr>)}
+     </tbody></table></div>
     </section>}
     {s.mr==="MR-0001"&&<section className="p55-panel">
      <div className="p55-eyebrow">ENGINEERING PACKAGE COMPOSITION · MR ITEM → FUNCTIONS → QUOTE CANDIDATES</div>
