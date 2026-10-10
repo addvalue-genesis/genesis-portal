@@ -14,5 +14,6 @@ assert(model.includes("requiredSkuQty:null")&&model.includes("customerSell:null"
 assert(model.includes("sourceRowIndex:r.sourceRowIndex")&&model.includes("SCADA_LINKS_0553"));
 assert(ui.includes("MR0001_ENGINEERING_REQUIRED_BOM.rows.map"));
 assert(ui.includes("SET ≠ OEM SKU QTY"));
-assert(ui.includes("MH OPEN / COST OPEN / SELL HOLD"));
+assert(ui.includes("MH OPEN / EXTENDED COST HOLD / SELL HOLD"));
+assert(model.includes("requiredServiceMH:null")&&model.includes("serviceCost:null")&&model.includes("acceptedUnitCost:null"));
 console.log("PASS 0553 MR0001 42 source rows / 7 sites / 5 multi-code rows; required SKU, MH, cost and sell fail closed");
