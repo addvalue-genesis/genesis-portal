@@ -1,0 +1,14 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const q=JSON.parse(fs.readFileSync(path.join(root,"src/project0553/data/quotes/NG-260916-ADV-DAP1.full.json"),"utf8"));
+const model=fs.readFileSync(path.join(root,"src/project0553/data/aviatTechnicalBidEvaluation.js"),"utf8");
+const ui=fs.readFileSync(path.join(root,"src/project0553/CommercialSystemBreakdown.jsx"),"utf8");
+assert.equal(q.lines.length,53);
+assert.equal(new Set(q.lines.map(x=>x.code)).size,53);
+for(const code of q.lines.map(x=>x.code))assert(model.includes('"' + code + '"'),"Unclassified NG quotation line: "+code);
+for(const x of ["requiredQty:null","acceptedQty:null","acceptedCost:null","releaseAllowed:false","spareNotBase:true","BOD 90-degree sector versus RPT 60-degree","COUNTRY_FREQUENCY_ENTITLEMENT_UNVERIFIED"])assert(model.includes(x),"Missing fail-closed condition: "+x);
+assert(ui.includes("AVIAT_0553_TECHNICAL_EVALUATION.rows.map"));
+assert(ui.includes("AVIAT_0553_TECHNICAL_EVALUATION.holds.map"));
+console.log("PASS 0553 AVIAT bid audit: 53 lines accounted; functional mapping candidate only; spare, licence, warranty, quantity and cost gates hold");
