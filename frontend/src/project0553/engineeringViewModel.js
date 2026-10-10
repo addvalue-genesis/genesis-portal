@@ -1,3 +1,4 @@
+import { SERVICE_EQUATIONS } from "../common/cost/serviceEquations";
 // 0553 project adapter for the COMMON First-Principles View.
 // Same review method as 0550; no 0550 project facts, prices, or system records.
 import { KNOWLEDGE_KERNEL_DOMAINS, ENGINEERING_LAW_KERNELS, KNOWLEDGE_KERNEL_POLICY } from "../knowledge-kernels/library";
@@ -27,7 +28,7 @@ const seeded=TECHNICAL_HOLDS.map(h=>({
  releaseEffect:"OPEN — customer release requires evidence/approval or controlled exception"
 }));
 export const ENGINEERING_VIEW_MODEL_0553={
- projectId:"PJ2608-0553",systems:SYSTEMS_0553,chain,domains:KNOWLEDGE_KERNEL_DOMAINS,
+ projectId:"PJ2608-0553",serviceEquations:SERVICE_EQUATIONS,systems:SYSTEMS_0553,chain,domains:KNOWLEDGE_KERNEL_DOMAINS,
  controlRules:["NO SOURCE ≠ ZERO SCOPE","NO FINAL QUANTITY ≠ ZERO QUANTITY","TBC ≠ ZERO COST","Document mapping does not prove technical compliance","Vendor quoted model does not prove RFQ acceptance","OEM final link result does not replace independent engineering review","Risk exceptions and budgetary releases require controlled authorization"],
  costEquations:["No project commercial markup adopted pending controlled 0553 policy","Vendor unit cost × accepted MTO quantity = Equipment Cost (when verified)"],
  completeness:{
