@@ -213,3 +213,12 @@ This audit is additive and controls where it is more specific than earlier histo
 - User's build log confirms the `CommercialWorkspace.jsx` line 85 parse failure persisted following first hotfix. GitHub readback proved the premature `</section>` was still present immediately before `</>}`. First hotfix `57db7b0` was insufficient.
 - Corrected exact line by removing the stray closing `</section>` after the Workbook source paragraph, leaving `</>}` to close the Working fragment and the two legitimate closing sections at the end. Fix commit `87c92e1568ecc6fbbf4879d2400d7b0798516dd1`; GitHub readback verified the exact adjacent lines.
 - Full webpack build after the second hotfix is **PENDING USER LOCAL RUN**. Do not assert PASS until tested. No protected 0550 changes, no commercial release or price changes.
+
+
+## 2026-10-10 MR0001 Source-First Required BOM Derivation — Working Implementation
+- Added `frontend/src/project0553/data/mr0001RequiredBomDerivation.js` to bind MTO Rev04 source item rows (42), seven platforms, RPT Rev.C1 five topology links, and explicit engineering proof/missing drivers. Output is **requirement/BOM candidates**, NOT accepted manufacturer SKU quantities.
+- Added an expandable engineering requirement table in `CommercialSystemBreakdown.jsx` BEFORE vendor quote comparisons. Per-row source, original MR Set/Lot, platform/links, grouped multi-code flag, unresolved engineering proof, MH/Cost/Sell HOLD are exposed.
+- Added `scripts/validate-0553-required-bom.cjs` and wired it into `frontend/package.json` build chain. This guard verifies source row count/platform count/multi-code markers and fail-closed cost/SKU semantics. It is not an RF engineering compliance test.
+- Reused existing project-specific RF link evidence and shared methodology without modifying protected 0550 branch. No invented radio/antenna SKU selection, RF licence, service rate, MH, FX or price; NG/Cisco remains separate quoted evidence. The model does **not** yet prove complete MR compliance or enough scope for customer pricing.
+- Next: authenticate native MTO row indices and split multi-code rows; link specific MR/SPE/DTS/BOD/STD/BLD/CAL/TC requirements with precedence; derive functional installed objects + full cable/connector/gland/Ex and service WBS quantities; reconcile quoted items and commercial rules, then release only after engineering and management signoff.
+- GitHub readback only; new user's `npm run build` required before claiming validation PASS.
