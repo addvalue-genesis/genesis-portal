@@ -1,5 +1,6 @@
 import React,{useMemo,useState} from "react";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./data/supplierQuoteLines";
+import { VENDOR_0553_SOURCES } from "./vendorEvidence";
 import { buildVendorProductCatalog } from "../common/engineering/vendorProductCatalog";
 import { buildQuotationCommercialRegister } from "../common/engineering/quotationCommercialRecord";
 
@@ -14,6 +15,13 @@ export function VendorProductCatalog0553(){
  const selectedCommercial=commercial.find(q=>q.quoteId===chosenQuote);
  const catalog=useMemo(()=>buildVendorProductCatalog(SUPPLIER_QUOTE_LINES_0553),[]);
  const suppliersById=new Map(catalog.suppliers.map(v=>[v.id,v]));
+ const datasheets=VENDOR_0553_SOURCES.filter(v=>v.type==="DATASHEET_ONLY");
+ const dataSheetProducts=datasheets.map(v=>({
+   id:v.id,partNumber:v.document.match(/RX[0-9-]+/)?.[0]||v.document,
+   description:v.document,supplier:v.supplier,mr:v.mr==="MR-0001"&&v.id==="V-RFI-LNA"?"MR-0002 (engineering mapping review)":v.mr,
+   url:v.url,price:null,quotation:null,status:v.status
+ }));
+
  const productsById=new Map(catalog.products.map(p=>[p.id,p]));
  const quoteById=new Map(commercial.map(q=>[q.quoteId,q]));
  const allowedQuotes=commercial.filter(q=>vendor==="ALL"||String(q.vendor).trim().toLowerCase()===vendor);
@@ -30,8 +38,8 @@ export function VendorProductCatalog0553(){
   return [x.productKey,x.mr,x.quotation,productsById.get(x.productKey)?.description,suppliersById.get(x.vendorId)?.name].join(" ").toLowerCase().includes(search.toLowerCase());
  }).slice(0,150);
  return <section className="p55-section" style={{marginTop:18}}>
-  <h2>Internal Vendor–Product Catalog · Quotation Evidence</h2>
-  <p>บริษัทหนึ่งมีสินค้าได้หลายรายการ และสินค้าหนึ่งรุ่นอาจมาจากหลาย Supplier ข้อมูลด้านล่างอ่านจาก quotation records เดิมของ 0553 โดยยังไม่เลือกเข้า Project BOM และไม่รับรองราคา</p>
+  <h2>Vendor Products · Datasheets · Quotations</h2>
+  <p>แสดงเฉพาะเอกสารที่ได้รับจริง: Quotation แสดงราคาและเงื่อนไข Vendor; Datasheet ที่ไม่มีราคาให้เว้นว่าง โดยไม่มีการเพิ่มสินค้าเข้า BOM อัตโนมัติ</p>
   <div className="p55-filterbar"><label>View <select value={view} onChange={e=>{setView(e.target.value);setVendor("ALL");setChosenQuote("");setMr("ALL");setSearch("");}}>
    <option value="supplier">Supplier View</option><option value="quote">Quotation View</option><option value="product">Product View</option><option value="mr">MR / System View</option><option value="compare">TBE / CBE Candidate Comparison</option>
   </select></label>
@@ -53,6 +61,12 @@ export function VendorProductCatalog0553(){
    <p><strong>Commercial verification:</strong> {selectedCommercial.verification}. Delivery, incoterm, payment, warranty, taxes, exclusions, freight and certifications must be verified against the original PDF before project-cost adoption.</p>
    <p className="p55-note">This is a read-only quotation-header view. Original quote lines and cost calculations have not changed.</p>
   </div>}
+  {dataSheetProducts.length>0&&<div className="p55-panel" style={{marginBottom:14,padding:14}}>
+    <h3>Product Datasheets (no quotation recorded)</h3>
+    <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Supplier / Source</th><th>Product / Model</th><th>MR</th><th>Datasheet</th><th>Unit Price</th></tr></thead><tbody>
+     {dataSheetProducts.map(x=><tr key={x.id}><td>{x.supplier}</td><td>{x.partNumber}<div>{x.description}</div></td><td>{x.mr}</td><td><a href={x.url} target="_blank" rel="noreferrer">Open original</a></td><td></td></tr>)}
+    </tbody></table></div><p className="p55-note">Product Datasheet = manufacturer evidence; Project DTS = client requirement. Compare the two in TBE before selecting a product. Blank price is not zero.</p>
+   </div>}
   <p className="p55-note">{catalog.relationships.length} source quotation lines · {rows.length} displayed (max 150). Quote-line identity is retained; duplicate SKUs across suppliers are not merged into costs.</p>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr>
    <th>Supplier</th><th>Product / Model</th><th>MR</th><th>Quotation</th><th>Qty / Unit Rate</th><th>Project Selection</th>
