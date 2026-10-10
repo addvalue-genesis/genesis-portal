@@ -267,3 +267,10 @@ This audit is additive and controls where it is more specific than earlier histo
 - Added `data/mr0001ScopeOwnershipAudit.js` with 5 source-linked gates for existing reuse, new supply, owner/others, Ex enclosure, spares and vendor documentation. Original drawing symbols and site-specific equipment composition still require graphical/native engineering review; extracted PDF text alone cannot certify physical quantities.
 - Added panel to `CommercialSystemBreakdown.jsx` before Package Composition and `validate:0553-scope-ownership` static build guard.
 - New supply, reused equipment, interface MH, OEM accepted BOM and cost remain OPEN/HOLD. No quote or customer release and no 0550 branch modifications. Local production build PENDING.
+
+
+## 2026-10-10 MR0001 Vendor Offer Allocation Ledger
+- Added `data/mr0001OfferAllocationAudit.js` to preserve 53 original Next G quotation line quantities and map each line to multiple *possible* MR functional consumers without duplicating allocation/cost. 37 base A/B/C and 16 D/E spares are isolated. All approved site allocations, accepted costs and selling prices remain null.
+- Added fail-closed `validateAllocatedQuoteLines` for approved allocation shape, nonnegative integer quantity, site/component/source engineering verification, total allocated qty not exceeding each quote line, and preventing spares from installed scope. This validator returns REVIEW_REQUIRED even when structural checks pass; it never itself authorizes customer release.
+- Added visible expandable MR0001 Next G allocation ledger to Breakdown UI, before raw quotation evidence. This is candidate coverage not a fulfilled BOM, since physical owner, role, licence and Native BLD/MTO/CAL acceptance remain OPEN.
+- Added `validate:0553-offer-allocation` static regression in build pipeline. Build after this commit pending local user verification. Protected 0550 branch untouched and no customer output released.
