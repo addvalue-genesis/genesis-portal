@@ -1,4 +1,5 @@
 import { SCADA_0553_RECONCILIATION } from "./data/scadaOfferReconciliation";
+import { AVIAT_0553_TECHNICAL_EVALUATION } from "./data/aviatTechnicalBidEvaluation";
 import { MR0001_ENGINEERING_REQUIRED_BOM, summarizeMR0001RequiredBom } from "./data/mr0001RequiredBomDerivation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
@@ -76,6 +77,27 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
       <thead><tr><th>Equipment family</th><th>Required Qty</th><th>NG quoted lines</th><th>Engineering decision</th><th>Cost readiness</th><th>Source</th></tr></thead>
       <tbody>{SCADA_0553_RECONCILIATION.rows.map(r=><tr key={r.equipmentFamily}><td>{r.equipmentFamily}</td><td>DERIVATION PENDING</td><td>{SCADA_0553_RECONCILIATION.unmappedOffered.filter(x=>x.description?.toLowerCase().includes(r.equipmentFamily.toLowerCase())).length} preliminary text matches (not approved)</td><td>{r.decision.state}<small>{r.decision.reason}</small></td><td>HOLD</td><td>MTO Rev04 → MR0001 CAL/DWG/OEM</td></tr>)}</tbody>
      </table></div><p className="p55-note">Vendor quote 53 lines are preserved as evidence. Required SKU, licence, enclosure and bulk quantities need full MR/DWG/MTO extraction before technical acceptance or repricing.</p></>}
+    {s.mr==="MR-0001"&&<section className="p55-panel">
+      <div className="p55-eyebrow">OEM-LEVEL TECHNICAL BID EVALUATION · NEXT G / AVIAT</div>
+      <h4>Reverse vendor verification — quotation SKU → function → MR allocation → engineering decision</h4>
+      <p className="p55-note">This audit covers all 53 Next G lines including separately identified spare groups D/E. Candidate matching is NOT an approved required BOM. Engineering must verify the exact installation allocation, frequency licence, OEM compatibility, power, antenna and duplicate/scope boundaries before acceptance.</p>
+      <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget">
+      <thead><tr><th>Quote line / SKU</th><th>Engineering function</th><th>Qty offered</th><th>MR owner / allocation boundary</th><th>OEM/technical state</th><th>Required / accepted qty</th><th>Decision / proof</th></tr></thead>
+      <tbody>{AVIAT_0553_TECHNICAL_EVALUATION.rows.map(r=><tr key={r.quoteLine}>
+        <td><strong>{r.quoteLine}</strong><small>{r.partNumber}</small></td>
+        <td><strong>{r.functionId}</strong><small>{r.functionRequirement}</small></td>
+        <td>{r.sourceQty}<small>{r.offeredRole}</small></td>
+        <td>{r.allocationBoundary}</td>
+        <td><span className="p55-badge">{r.classification}</span></td>
+        <td>OPEN / OPEN</td><td>{r.issues.join(" · ")||"OEM technical proof / MR mapping OPEN"}</td>
+      </tr>)}</tbody></table></div>
+      <h4>High-priority engineering queries / commercial exposure</h4>
+      <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>ID</th><th>Technical / scope gap</th><th>Required action</th><th>State</th></tr></thead>
+      <tbody>{AVIAT_0553_TECHNICAL_EVALUATION.holds.map(g=><tr key={g.id}><td>{g.id}</td><td>{g.issue}</td><td>{g.decision}</td><td><span className="p55-badge">{g.state}</span></td></tr>)}</tbody>
+      </table></div>
+      <p className="p55-note">Financial exposure remains OPEN; no guessed cost or automatic acceptance. Vendor may be correct based on an incomplete RFQ — source omissions and bid deviations must be tracked separately.</p>
+    </section>}
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Source quotation / evidence — vendor candidates and terms</div>
     <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
      <thead><tr><th>No.</th><th>Vendor / Supplier</th><th>Document / Scope</th><th>Type / Revision</th><th>Quoted Total ({displayCurrency})</th><th>Evidence Status</th><th>Source / Next Action</th></tr></thead>
