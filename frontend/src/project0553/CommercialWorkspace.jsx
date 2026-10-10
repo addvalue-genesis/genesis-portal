@@ -12,11 +12,29 @@ export function CommercialWorkspace0553(){
  const rows=template.sheets;
  const baseline=getBaselineReview();
  
- const [displayCurrency,setDisplayCurrency]=useState("USD");
- const [fxRate,setFxRate]=useState("");
- const [fxDate,setFxDate]=useState("");
- const [fxSource,setFxSource]=useState("");
- const fx=fxRate&&fxDate&&fxSource?{thbPerUsd:Number(fxRate),date:fxDate,source:fxSource}:null;
+ // Working display defaults only. Never represent the 31.5 planning rate as a BOT quote.
+ const DEFAULT_FX={displayCurrency:"THB",fxRate:"31.5",fxDate:"2026-10-10",fxSource:"INTERNAL PLANNING ASSUMPTION — UNVERIFIED"};
+ const STORAGE_KEY="pj2608-0553-working-fx-v1";
+ const readSettings=()=>{
+  try{
+   const saved=JSON.parse(window.localStorage.getItem(STORAGE_KEY)||"null");
+   if(saved&&["USD","THB"].includes(saved.displayCurrency)&&
+     /^\\d+(?:\\.\\d+)?$/.test(String(saved.fxRate))&&Number(saved.fxRate)>0&&
+     /^\\d{4}-\\d{2}-\\d{2}$/.test(String(saved.fxDate))&&
+     typeof saved.fxSource==="string"&&saved.fxSource.trim())return saved;
+  }catch(e){/* Private browsing or storage unavailable: use defaults. */}
+  return DEFAULT_FX;
+ };
+ const [fxSettings,setFxSettings]=useState(readSettings);
+ const persistSettings=next=>{
+  setFxSettings(next);
+  try{window.localStorage.setItem(STORAGE_KEY,JSON.stringify(next));}catch(e){/* Session still works. */}
+ };
+ const displayCurrency=fxSettings.displayCurrency,fxRate=fxSettings.fxRate,fxDate=fxSettings.fxDate,fxSource=fxSettings.fxSource;
+ const fx=Number(fxRate)>0&&fxDate&&fxSource.trim()?{thbPerUsd:Number(fxRate),date:fxDate,source:fxSource}:null;
+ const isPlanningFx=fxSource===DEFAULT_FX.fxSource;
+ const updateFx=(key,value)=>persistSettings({...fxSettings,[key]:value});
+ const resetFx=()=>persistSettings({...DEFAULT_FX});
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  return <div className="p55-stack">
  <section className="p55-panel">
@@ -34,12 +52,12 @@ export function CommercialWorkspace0553(){
   <section className="p55-panel">
    <div className="p55-eyebrow">CURRENCY VIEW / ORIGINAL CURRENCY RETAINED</div>
    <div className="p55-filterbar p55-filterbar--simple">
-    <label>Display currency <select value={displayCurrency} onChange={e=>setDisplayCurrency(e.target.value)}><option value="USD">USD</option><option value="THB">THB</option></select></label>
-    <label>FX THB per USD (source-controlled) <input type="number" min="0.000001" step="any" value={fxRate} onChange={e=>setFxRate(e.target.value)} placeholder="Rate from verified source"/></label>
-    <label>FX date <input type="date" value={fxDate} onChange={e=>setFxDate(e.target.value)}/></label>
-    <label>FX source <input value={fxSource} onChange={e=>setFxSource(e.target.value)} placeholder="BOT publication / reference"/></label>
+    <label>Display currency <select value={displayCurrency} onChange={e=>updateFx("displayCurrency",e.target.value)}><option value="USD">USD</option><option value="THB">THB</option></select></label>
+    <label>FX THB per USD (source-controlled) <input type="number" min="0.000001" step="any" value={fxRate} onChange={e=>updateFx("fxRate",e.target.value)} placeholder="Rate from verified source"/></label>
+    <label>FX date <input type="date" value={fxDate} onChange={e=>updateFx("fxDate",e.target.value)}/></label>
+    <label>FX source <input value={fxSource} onChange={e=>updateFx("fxSource",e.target.value)} placeholder="BOT publication / reference"/></label>
    </div>
-   <p className="p55-note">แสดง USD หรือ THB ด้วย FX ที่มี Rate + Date + Source เท่านั้น; เมื่อยังไม่มีหลักฐานจะขึ้น FX OPEN ไม่ใช้ Rate จากโครงการ 0550 หรือค่าเดา และราคาต้นฉบับไม่เปลี่ยน</p>
+   <p className="p55-note"><strong>{isPlanningFx?"WORKING ASSUMPTION (NOT VERIFIED BOT RATE)":"USER-ENTERED FX — VERIFY SOURCE BEFORE RELEASE"}:</strong> Default 31.5 THB/USD dated 2026-10-10 is a budget display assumption only, not an authenticated BOT rate. Original vendor currencies and amounts remain unchanged. Edits persist in this browser; they do not modify controlled source data. <button type="button" onClick={resetFx}>Reset working default</button></p>
   </section>
   <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
   <section className="p55-panel">
