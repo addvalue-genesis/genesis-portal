@@ -68,7 +68,7 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
       <div><span>Valid through</span><strong>{q.validUntil||"HISTORICAL / EXPIRED"}</strong></div>
      </div>
      <p className="p55-note">{q.terms} · Price evidence only; verify site applicability, quote expiry, and whether lines are optional/spares before inclusion.</p>
-     <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--quoted"><thead><tr><th>Code</th><th>Part Number</th><th>Description</th><th>Qty</th><th>Unit price</th><th>Extended (indicative)</th></tr></thead>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--quoted p553-quoted-lines"><thead><tr><th>Code</th><th>Part Number</th><th>Description</th><th>Qty</th><th>Unit Price</th><th>Quoted Total</th></tr></thead>
      <tbody>{q.lines.map(([code,pn,description,qty,unitPrice,quotedTotal,group,page,pricingState])=><tr key={code}><td>{code}</td><td>{pn}</td><td>{description}</td><td className="is-number">{qty}</td><td className="is-number">{Number.isFinite(unitPrice)?shown(unitPrice,q.currency):"— (AS QUOTED)"}</td><td className="is-number">{Number.isFinite(quotedTotal)?shown(quotedTotal,q.currency):Number.isFinite(unitPrice)?shown(qty*unitPrice,q.currency):"— (AS QUOTED)"}</td></tr>)}</tbody></table></div>
      <p className="p55-note">{q.id==="NG-260916"?"All 53 original BOQ lines (A–E) preserved in JSON. Vendor quoted line totals reconcile to the PDF quote; Group D/E are spares and must not automatically enter base equipment.":"Document detail is historical/source evidence, not automatically required Z1F BOM."}</p>
     </section>)}
