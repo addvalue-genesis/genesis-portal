@@ -1,0 +1,5 @@
+{
+ "meta":{"schemaVersion":"1.0.0","datasetId":"PJ2608-0553_TPP_WORKING_JSON_REV01","projectCode":"PJ2608-0553","status":"WORKING / NOT_RELEASED","snapshotDate":"2026-10-10","integrationState":{"controlledJson":"ACTIVE","sql":"NOT_YET_CONNECTED","agerp":"NOT_YET_CONNECTED","ui":"READS_THROUGH_REPOSITORY"}},
+ "quoteReferences":[{"id":"NG-260916","path":"../quotes/NG-260916-ADV-DAP1.full.json","expectedLineCount":53,"expectedQuotedTotal":191610.15,"currency":"USD"}],
+ "sourcePolicy":{"particularOnly":true,"missingDoesNotMeanZero":true,"historicalQuotesNotCurrentCost":true}
+}
