@@ -34,6 +34,8 @@ assert(p0553Methods.includes("serviceEquations:SERVICE_EQUATIONS"),"0553 must re
 assert(engineeringView.includes("serviceEquations.map"),"Shared First Principles must render all service equations");
 const formulaInventory=read("common/engineering/masterFormulaInventory.js");
 assert(formulaInventory.includes("ENGINEERING_LAW_KERNELS")&&formulaInventory.includes("SERVICE_EQUATIONS"),"Master inventory must reuse canonical law and E01-E18 formula definitions");
-assert(engineeringView.includes("MASTER_FORMULA_INVENTORY.map"),"All canonical formulas must be visible in shared First Principles");
+assert(engineeringView.includes("<ExpandableFormulaTable rows={MASTER_FORMULA_INVENTORY}/>"),"All canonical formulas must be passed to shared expandable table");
+const formulaUi=read("common/ui/ExpandableFormulaTable.jsx");
+assert(formulaUi.includes("Expand all")&&formulaUi.includes("Collapse all")&&formulaUi.includes("aria-expanded"),"Hierarchical formula table must support real expand/collapse");
 assert(!/project0550\/|project0553\//.test(formulaInventory),"Master formula inventory cannot depend on particular project data");
 console.log("PASS PJ2608-0553 shared/particular isolation and 0550 facade regression guards");
