@@ -27,7 +27,8 @@
     "gapAssessment": "PENDING_USER_LOCAL_BUILD",
     "requirementEvidence": "PENDING_USER_BUILD",
     "innovaBudgetValidation": "PENDING_USER_BUILD",
-    "innovaCostBridge": "PENDING_LOCAL_BUILD"
+    "innovaCostBridge": "PENDING_LOCAL_BUILD",
+    "sourceQuoteCompleteness": "PENDING_USER_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -180,6 +181,22 @@
       "quantity": null,
       "acceptedCost": null,
       "customerReleaseAllowed": false
+    },
+    "sourceQuoteCompleteness": {
+      "ciscoLines": 11,
+      "ciscoTotalTHB": 2117650,
+      "innovaLines": [
+        4,
+        1,
+        2
+      ],
+      "innovaTotalsTHB": [
+        189220,
+        46000,
+        2705
+      ],
+      "status": "SOURCE_LINES_RECONCILED_LOCAL_BUILD_PENDING",
+      "acceptedCost": null
     }
   },
   "sourceConflicts": [
