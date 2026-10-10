@@ -8,5 +8,5 @@ export function convertCommercialAmount(amount,source,target,fx){
 }
 export function formatCommercialAmount(amount,source,target,fx){
  const v=convertCommercialAmount(amount,source,target,fx);
- return v.amount===null?"FX OPEN ("+source+")":target+" "+v.amount.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+ return v.amount===null?(Number.isFinite(amount)?source+" "+amount.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" · FX to "+target+" pending":"OPEN AMOUNT"):target+" "+v.amount.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 }
