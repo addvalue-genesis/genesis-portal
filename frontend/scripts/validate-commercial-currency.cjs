@@ -1,0 +1,17 @@
+const fs=require("node:fs"),path=require("node:path"),assert=require("node:assert/strict");
+(async()=>{
+const s=fs.readFileSync(path.join(__dirname,"../src/common/cost/commercialCurrency.js"),"utf8");
+const {convertCommercialAmount:c}=await import("data:text/javascript;base64,"+Buffer.from(s).toString("base64"));
+assert.equal(c(100,"USD","THB",null).status,"FX_SOURCE_REQUIRED");
+assert.equal(c(100,"USD","USD",null).amount,100);
+const fx={thbPerUsd:35,date:"2026-10-09",source:"TEST_RATE"};
+assert.equal(c(100,"USD","THB",fx).amount,3500);
+assert.equal(c(3500,"THB","USD",fx).amount,100);
+assert.equal(c(100,"USD","THB",{thbPerUsd:35}).status,"FX_SOURCE_REQUIRED");
+const ui=fs.readFileSync(path.join(__dirname,"../src/project0553/CommercialWorkspace.jsx"),"utf8");
+const sys=fs.readFileSync(path.join(__dirname,"../src/project0553/CommercialSystemBreakdown.jsx"),"utf8");
+assert.ok(ui.includes("displayCurrency={displayCurrency} fx={fx}"));
+assert.ok(sys.includes("shown(unitPrice,q.currency)"));
+assert.ok(!sys.includes("{{shown("));
+console.log("PASS sourced USD/THB conversion, original FX isolation and price-view bindings");
+})().catch(e=>{console.error(e);process.exitCode=1});
