@@ -274,3 +274,11 @@ This audit is additive and controls where it is more specific than earlier histo
 - Added fail-closed `validateAllocatedQuoteLines` for approved allocation shape, nonnegative integer quantity, site/component/source engineering verification, total allocated qty not exceeding each quote line, and preventing spares from installed scope. This validator returns REVIEW_REQUIRED even when structural checks pass; it never itself authorizes customer release.
 - Added visible expandable MR0001 Next G allocation ledger to Breakdown UI, before raw quotation evidence. This is candidate coverage not a fulfilled BOM, since physical owner, role, licence and Native BLD/MTO/CAL acceptance remain OPEN.
 - Added `validate:0553-offer-allocation` static regression in build pipeline. Build after this commit pending local user verification. Protected 0550 branch untouched and no customer output released.
+
+
+## 2026-10-10 MR0001 preliminary Required/Offered Gap Register
+- Added `data/mr0001GapAssessment.js`, deriving requirement-function rows from the 42-source-row Package Composition and supplier-side rows from the 53-line Quote Allocation Ledger. Candidate matches are non-exclusive and not accepted BOM.
+- New `CommercialSystemBreakdown.jsx` gap table shows MTO/site, functional requirement, possible supplier lines, source-independent required quantity OPEN, site-allocated offered quantity OPEN and exposure HOLD. Missing candidate, multiple consumers, separate spare, ownership and technical risk labels remain explicit.
+- Function `assessApprovedQuantityGap` computes numeric shortfall/surplus ONLY when both integer quantities and engineering/scope approvals are VERIFIED. No automatic customer release or compliance declaration.
+- Added `validate:0553-gap` static regression. This is a structural guard, not engineering certification. Build after current changes pending user's `npm run build`.
+- Next substantive task: trace each candidate function to original MR/SPE/DTS/BOD/BLD/TC exact clauses, verify physical quantity drivers and supported equipment allocation, then derive numeric cost/services. No 0550 changes.
