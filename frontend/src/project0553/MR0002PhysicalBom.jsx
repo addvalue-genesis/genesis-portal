@@ -1,3 +1,4 @@
+import { LAYOUT_GEOMETRY_0553, MEZZ_TO_LOWER_REFERENCE } from "./data/layoutGeometryEvidence";
 import React from "react";
 import {deriveCable,deriveTerminationAccessories,deriveInstalledAndPurchaseQty} from "../common/engineering/physicalBomDerivation";
 import {LNA_0553_BASIS} from "./data/lnaEvidence";
@@ -28,6 +29,11 @@ export function MR0002PhysicalBom(){
   ["BULK-EARTH","Grounding / surge bonding kit","OPEN","Grounding routing and vendor kit required"]
   ].map(([id,name,q,note])=><tr key={id}><td>MR-0002 / {id}</td><td>{name}</td><td>{q}</td><td>{note}</td></tr>)}
   </tbody></table></div>
+  <div className="p55-eyebrow">DWG-DERIVED GEOMETRY / NOT YET ROUTED CABLE</div>
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>DWG Reference</th><th>Drawing levels</th><th>Calculated delta</th><th>Use / limitation</th></tr></thead><tbody>
+  {MEZZ_TO_LOWER_REFERENCE.map(x=><tr key={x.from}><td>{x.from} → {x.to}</td><td>{LAYOUT_GEOMETRY_0553.elevationDatum} datum</td><td>{x.differenceM.toFixed(3)} m</td><td>GEOMETRIC_REFERENCE_ONLY — not a cable route</td></tr>)}
+  </tbody></table></div>
+  <p className="p55-note">Source: <a href={LAYOUT_GEOMETRY_0553.url} target="_blank" rel="noreferrer">{LAYOUT_GEOMETRY_0553.sourceId} Rev.{LAYOUT_GEOMETRY_0553.revision}</a> · Drawing dimensions in {LAYOUT_GEOMETRY_0553.dimensionsUnit} · Equipment tags: {LAYOUT_GEOMETRY_0553.identifiedTags.join(", ")}. No verified route endpoints/segments yet.</p>
   <p className="p55-note"><strong>Calculation lineage:</strong> MR-0002 → Physical Tags → EQ-002 Installed Qty → EQ-003 Purchase Qty → RF-PROP-02 Feeder Loss → MTO / Installation MH (pending route topology). No released BOM or quotation yet.</p>
   <p className="p55-note"><strong>Source:</strong> <a target="_blank" rel="noreferrer" href={LNA_0553_BASIS.sources[0].url}>MR0002 Rev.C1</a>. Quantity per tag is provisional pending MTO Rev04 reconciliation, duplicates/bulk and scope ownership.</p>
  </section>;
