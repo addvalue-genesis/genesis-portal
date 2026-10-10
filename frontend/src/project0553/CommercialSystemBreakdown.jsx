@@ -3,6 +3,7 @@ import { AVIAT_0553_TECHNICAL_EVALUATION } from "./data/aviatTechnicalBidEvaluat
 import { MR0001_PACKAGE_COMPOSITION, summarizeMR0001Composition } from "./data/mr0001PackageComposition";
 import { MR0001_TOPOLOGY_QUANTITY_AUDIT } from "./data/mr0001TopologyQuantityAudit";
 import { MR0001_RADIO_ROLE_MATRIX } from "./data/mr0001RadioRoleMatrix";
+import { MR0001_SCOPE_OWNERSHIP_AUDIT } from "./data/mr0001ScopeOwnershipAudit";
 import { MR0001_ENGINEERING_REQUIRED_BOM, summarizeMR0001RequiredBom } from "./data/mr0001RequiredBomDerivation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
@@ -115,6 +116,19 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
      <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
       <thead><tr><th>Control</th><th>Engineering question</th><th>Status</th></tr></thead>
       <tbody>{MR0001_RADIO_ROLE_MATRIX.engineeringQuestions.map(x=><tr key={x.id}><td>{x.id}</td><td>{x.question}</td><td>{x.state}</td></tr>)}</tbody></table></div>
+    </section>}
+    {s.mr==="MR-0001"&&<section className="p55-panel">
+     <div className="p55-eyebrow">BLD / MR REV.C1 · OWNERSHIP AND BROWNFIELD TIE-IN</div>
+     <h4>New Supply vs Existing Reuse vs Interfaces — engineering controls</h4>
+     <p className="p55-note">BLD drawing symbols require native diagram confirmation; existing ZWP8–ZPQ reuse does not establish that no added radio, licence, accessory or integration work is needed. Unknown reuse quantities are not zero.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Gate / Site</th><th>Source evidence</th><th>Required engineering action</th><th>State</th></tr></thead>
+      <tbody>{MR0001_SCOPE_OWNERSHIP_AUDIT.checks.map(x=><tr key={x.id}>
+       <td><strong>{x.id}</strong><small>{x.site}</small></td>
+       <td>{x.description}<small><a href={x.sourceUrl} target="_blank" rel="noreferrer">{x.source} · Read original</a></small></td>
+       <td>{x.requiredDecision}</td><td>{x.state}</td>
+      </tr>)}</tbody></table></div>
+     <p className="p55-note"><strong>Supply Qty / Reused Qty / Installation MH:</strong> OPEN. Determine ownership from original BLD linework, MR and field verification before BOM allocation or sell pricing.</p>
     </section>}
     {s.mr==="MR-0001"&&<section className="p55-panel">
      <div className="p55-eyebrow">ENGINEERING PACKAGE COMPOSITION · MR ITEM → FUNCTIONS → QUOTE CANDIDATES</div>
