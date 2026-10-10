@@ -5,6 +5,7 @@ import { MR0001_TOPOLOGY_QUANTITY_AUDIT } from "./data/mr0001TopologyQuantityAud
 import { MR0001_RADIO_ROLE_MATRIX } from "./data/mr0001RadioRoleMatrix";
 import { MR0001_SCOPE_OWNERSHIP_AUDIT } from "./data/mr0001ScopeOwnershipAudit";
 import { MR0001_OFFER_ALLOCATION_AUDIT } from "./data/mr0001OfferAllocationAudit";
+import { MR0001_GAP_ASSESSMENT } from "./data/mr0001GapAssessment";
 import { MR0001_ENGINEERING_REQUIRED_BOM, summarizeMR0001RequiredBom } from "./data/mr0001RequiredBomDerivation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
@@ -207,6 +208,19 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
        </tr>)}</tbody>
      </table></div>
      <p className="p55-note">Rule: sum of VERIFIED site allocations must not exceed a quote line's offered quantity. Repeated candidate consumers are not purchase quantities. Supplier offered qty, approved required qty and accepted cost remain separate.</p>
+    </section>}
+    {s.mr==="MR-0001"&&<section className="p55-panel">
+     <div className="p55-eyebrow">REQUIRED ↔ OFFERED · QUANTITY GAP / OWNERSHIP / EXPOSURE</div>
+     <h4>Requirement & Supplier Gap Register — source-driven, not a compliance approval</h4>
+     <p className="p55-note">Missing vendor candidate is not evidence that a product is unnecessary; multiple possible consumers are not independent purchases. Accepted Qty, gap and exposure cannot be calculated until engineering proof, ownership, licence and allocations pass.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget">
+     <thead><tr><th>MTO / Site</th><th>Required function</th><th>Candidate quote lines</th><th>Required Qty</th><th>Allocated Offered Qty</th><th>Gap / Exposure</th><th>Decision</th></tr></thead>
+     <tbody>{MR0001_GAP_ASSESSMENT.requirements.map(r=><tr key={r.id}>
+      <td>{r.mtoRow} · {r.site}</td><td><strong>{r.functionId}</strong></td>
+      <td>{r.offerLines.join(", ")||"NONE FOUND IN NEXT G"}</td>
+      <td>OPEN</td><td>OPEN</td><td>OPEN / HOLD</td><td><span className="p55-badge">{r.issueStatus}</span></td>
+     </tr>)}</tbody></table></div>
+     <p className="p55-note">Unknown quantities stay null (not zero). The supplier-line ledger above holds 53 original quote quantities once each; this requirement view never multiplies them by possible consumers.</p>
     </section>}
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Source quotation / evidence — vendor candidates and terms</div>
     <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
