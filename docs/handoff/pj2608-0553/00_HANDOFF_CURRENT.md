@@ -194,3 +194,10 @@ This audit is additive and controls where it is more specific than earlier histo
 - No Next G/Cisco accepted allocation or current sell was created, no customer artefact released, no 0550 branch modification.
 - Need user local `npm run build` after pull; do not claim build or validators were executed for this new commit.
 - Next: native worksheet physical-row check, group split, requirement links/site/CAL/BLD/TC mapping, exact vendor quote reconciliation and gap approval.
+
+
+## 2026-10-10 Commercial UI state separation refactor
+- `CommercialWorkspace.jsx` now conditionally displays **Working** engineering/cost/Rev08 historical detail ONLY in Working Preview; **Budgetary** displays an explicit unverified/frozen-snapshot registry, not live Rev08 prices; **Released** displays G-01..G-12 release gates and HOLD, with working prices hidden.
+- View-mode selection remains read-only; selecting Budgetary or Released does not issue a snapshot or invoke a commercial approval transition.
+- No price, quote, FX, workbook release or customer-issued revision invented. The original 0553 commercial transition function remains intact for a later controlled approval workflow.
+- 0550 branch and source data not modified. New commit requires user-local `npm run build`; no current-build PASS claimed for this change.
