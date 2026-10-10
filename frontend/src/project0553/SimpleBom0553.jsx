@@ -3,8 +3,11 @@ import { WORKING_BOM_BY_LOCATION_0553 as model } from "./data/workingBomByLocati
 import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom";
 
 // One operational BOM surface. All Source/Engineering/Vendor links derive from existing registries.
-export function SimpleBom0553(){
- const [site,setSite]=useState("ALL");
+export function SimpleBom0553({focusedLocation=null}){
+ const [manualSite,setManualSite]=useState("ALL");
+ const [focusSeen,setFocusSeen]=useState(null);
+ const site=focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite;
+ const changeSite=value=>{setManualSite(value);setFocusSeen(focusedLocation);};
  const [vendor,setVendor]=useState("ALL");
  const [system,setSystem]=useState("MR-0001");
  const [expanded,setExpanded]=useState({});
@@ -29,7 +32,7 @@ export function SimpleBom0553(){
     <option value="MR-0003">MR0003 · Ex Telephone (full BOM pending)</option>
     <option value="MR-0004">MR0004 · RACON (full BOM pending)</option>
    </select></label>
-   <label>Location <select value={site} onChange={e=>setSite(e.target.value)}><option value="ALL">All locations</option>{model.locations.map(x=><option key={x.site} value={x.site}>{x.site}</option>)}</select></label>
+   <label>Location <select value={site} onChange={e=>changeSite(e.target.value)}><option value="ALL">All locations</option>{model.locations.map(x=><option key={x.site} value={x.site}>{x.site}</option>)}</select></label>
    <label>Vendor / Company <select value={vendor} onChange={e=>setVendor(e.target.value)}><option value="ALL">All vendors</option>{model.vendors.map(v=><option key={v} value={v}>{v}</option>)}</select></label>
   </div>
   {system!=="MR-0001"?<p className="p55-note">ระบบ {system} ยังไม่มี Item-Level BOM ที่เชื่อม MTO/Engineering/Vendor ครบใน Controlled Repository: ไม่แสดงจำนวนหรือราคาจำลอง โปรดตรวจ Scope ใน 4 MR Systems ก่อน</p>:<>
