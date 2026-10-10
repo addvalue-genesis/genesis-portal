@@ -41,8 +41,8 @@ export function SimpleBom0553(){
   </div>
   {groups.filter(g=>g.items.length).map(g=><section key={g.site} className="p55-panel">
    <button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={expanded["site:"+g.site]!==false}>{expanded["site:"+g.site]===false?"+":"−"}</button>
-   <strong> {g.site} </strong><span> · {g.items.length} MTO items · {g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length} source-priced scenarios</span><small> · RPT functional link endpoints: {g.rfDemand?.linkEndpointDemand??"NO RPT LINK"} · Antenna references: {g.rfDemand?.antennaReferenceDemand??"NO RPT LINK"} (NOT purchase qty)</small>
-   {expanded["site:"+g.site]!==false&&<div className="p55-table-wrap">
+   <strong> {g.site} · {g.siteClass?.type||"UNCLASSIFIED"} ({g.siteClass?.thai||"ตรวจสอบ"}) </strong><span> · {g.items.length} MTO items · {g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length} source-priced scenarios</span><small> · RPT functional link endpoints: {g.rfDemand?.linkEndpointDemand??"NO RPT LINK"} · Antenna references: {g.rfDemand?.antennaReferenceDemand??"NO RPT LINK"} (NOT purchase qty)</small>
+   {expanded["site:"+g.site]!==false&&<div className="p55-table-wrap"><p className="p55-note"><strong>Site Scope:</strong> {g.siteClass?.note} · Equipment ownership: NEW / REUSE / BY OTHERS ต้องตรวจ BLD/MR ทีละรายการ ไม่สรุปจากประเภทแท่น</p>
     <table className="p55-table p55-table--compact"><thead><tr><th>Link / First Principles</th><th>FSPL</th><th>Gt + Gr</th><th>Ideal RSL offset</th><th>STD / BOM</th></tr></thead>
      <tbody>{g.rfProof.map(p=><tr key={p.id}><td>{p.from} → {p.to}</td><td>{p.fsplDb.toFixed(2)} dB</td><td>{p.gainSumDbi.toFixed(2)} dBi</td><td>{p.idealRslOffsetDb.toFixed(2)} dB<small>Rx = Tx + offset − losses</small></td><td>HOLD · CAL/OEM proof required{p.change&&<small>4ft candidate: {p.change.gainChangeDb.toFixed(2)} dB vs Next G baseline</small>}</td></tr>)}</tbody>
     </table>
