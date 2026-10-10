@@ -38,4 +38,9 @@ assert(engineeringView.includes("<ExpandableFormulaTable rows={MASTER_FORMULA_IN
 const formulaUi=read("common/ui/ExpandableFormulaTable.jsx");
 assert(formulaUi.includes("Expand all")&&formulaUi.includes("Collapse all")&&formulaUi.includes("aria-expanded"),"Hierarchical formula table must support real expand/collapse");
 assert(!/project0550\/|project0553\//.test(formulaInventory),"Master formula inventory cannot depend on particular project data");
+const linkedHierarchy=read("common/ui/LinkedEngineeringHierarchy.jsx");
+assert(engineeringView.includes("<LinkedEngineeringHierarchy"),"First Principles must use shared reference-coded hierarchy");
+assert(linkedHierarchy.includes("aria-expanded")&&linkedHierarchy.includes("Expand all")&&linkedHierarchy.includes("Collapse all"),"Hierarchy toggles must work");
+for(const prefix of ["AUD","STEP","DOM-","KERNEL-"])assert(linkedHierarchy.includes(prefix),"Missing reference prefix "+prefix);
+assert(!/from ["'].*project0550|from ["'].*project0553/.test(linkedHierarchy),"COMMON hierarchy must not import project facts");
 console.log("PASS PJ2608-0553 shared/particular isolation and 0550 facade regression guards");
