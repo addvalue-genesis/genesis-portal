@@ -22,24 +22,34 @@ const steps=[
 ];
 export function InternalBudgetShortcut0553(){
  const [details,setDetails]=useState(false);
+ const [currency,setCurrency]=useState("USD");
+ const [rates,setRates]=useState({THB:"",CNY:""});
+ const [showHistorical,setShowHistorical]=useState(false);
  const baseline=getBaselineReview();
  const historical=(code)=>REV08_BASELINE.summary.find(r=>r[0]===code)?.[2]??null;
- const usd=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+ const usd=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"";
+ const displayHistorical=n=>{if(!Number.isFinite(n))return "";if(currency==="USD")return usd(n);const rate=Number(rates[currency]);return rates[currency]&&Number.isFinite(rate)&&rate>0?usd(n*rate):"";};
+ const currencyReady=currency==="USD"||(rates[currency]&&Number(rates[currency])>0);
  return <section className="p55-panel" style={{border:"2px solid #a5c7d3"}}>
   <div className="p55-eyebrow">L3.B / 10 · INTERNAL BUDGET SHORTCUT · SOURCE-CONTROLLED</div>
   <h2>Budgetary Internal — 4-System Quick View</h2>
-  <p className="p55-note">Historical Rev08 customer baseline only. Not a newly reconciled 0553 bid, approved vendor cost or customer release. Existing vendor quotations, A/B/C costing and calculations remain unchanged.</p>
-  <div className="p55-metric-grid">
-   <div><span>Historical Base A+B (USD)</span><strong>{usd(baseline.base)}</strong></div>
-   <div><span>Historical Part A (USD)</span><strong>{usd(baseline.partA)}</strong></div>
-   <div><span>Historical Part B (USD)</span><strong>{usd(baseline.partB)}</strong></div>
+  <p className="p55-note">CURRENT RECONCILED BID: not yet calculated. Do not mistake historical Rev08 selling amounts for current costs or new proposal prices. Missing values are blank, never zero.</p>
+  <div className="p55-filterbar"><label>Display currency <select value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD</option><option value="THB">THB — Thai baht</option><option value="CNY">CNY — Chinese yuan (RMB)</option></select></label>
+  {currency!=="USD"&&<label>1 USD = <input type="number" min="0.000001" step="any" value={rates[currency]} onChange={e=>setRates(old=>({...old,[currency]:e.target.value}))} placeholder={"Verified "+currency+" rate"}/> {currency}</label>}</div>
+  {!currencyReady&&<p className="p55-note">No verified USD/{currency} FX rate supplied. Converted amounts deliberately blank; source USD data remains unchanged. Record source/date before relying on any conversion.</p>}
+  <div className="p55-metric-grid"><div><span>New reconciled budgetary internal ({currency})</span><strong>NOT YET ESTABLISHED</strong></div></div>
+  <button type="button" className="p553-detail-button" onClick={()=>setShowHistorical(v=>!v)}>{showHistorical?"− Hide":"＋ Show"} historical Rev08 comparison (not current offer)</button>
+  {showHistorical&&<div className="p55-metric-grid">
+   <div><span>Historical Base A+B ({currency})</span><strong>{displayHistorical(baseline.base)}</strong></div>
+   <div><span>Historical Part A ({currency})</span><strong>{displayHistorical(baseline.partA)}</strong></div>
+   <div><span>Historical Part B ({currency})</span><strong>{displayHistorical(baseline.partB)}</strong></div>
    <div><span>Known Cisco working vendor cost (THB)</span><strong>{usd(BID_COST_SPINE_0553.knownPreliminaryCost.THB)}</strong></div>
-  </div>
+  </div>}
   <p className="p55-note">Do not sum the Cisco vendor cost into Rev08: overlapping scope, different currency and quote validity require reconciliation. Optional C1/C2 excluded from base.</p>
-  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>MR</th><th>System</th><th>Rev08 historical system sell (USD) — NOT LNA/unit cost</th><th>Engineering / cost reconciliation</th></tr></thead><tbody>
-  {systems.map(([code,mr,name,note])=><tr key={mr}><td>{mr}</td><td>{name}</td><td className="is-number">{usd(historical(code))}</td><td>{note}</td></tr>)}
-  <tr><td>MR-0002</td><td>RFI LNA RX3852-2002-11 (product-only)</td><td className="is-number"></td><td>No source quotation received. Datasheet-only: 380–520 MHz, SMA(F), 11–28 VDC. Connector accessories, cable and enclosure require physical design. Blank is unknown, not zero.</td></tr>
-  <tr><td>ALL</td><td>Shared bulk A5</td><td className="is-number">{usd(historical("A5"))}</td><td>Source workbook has shared bulk; split quantities by MR using BLD/LAY/DWG, count common items once, preserve historic A5 without double counting</td></tr>
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>MR</th><th>System</th><th>Current reconciled budget ({currency})</th><th>Rev08 historical sell ({currency}) — comparison only</th><th>Engineering / cost reconciliation</th></tr></thead><tbody>
+  {systems.map(([code,mr,name,note])=><tr key={mr}><td>{mr}</td><td>{name}</td><td className="is-number"></td><td className="is-number">{showHistorical?displayHistorical(historical(code)):""}</td><td>{note}</td></tr>)}
+  <tr><td>MR-0002</td><td>RFI LNA RX3852-2002-11 (product-only)</td><td className="is-number"></td><td className="is-number"></td><td>No source quotation received. Datasheet-only: 380–520 MHz, SMA(F), 11–28 VDC. Connector accessories, cable and enclosure require physical design. Blank is unknown, not zero.</td></tr>
+  <tr><td>ALL</td><td>Shared bulk A5</td><td className="is-number"></td><td className="is-number">{showHistorical?displayHistorical(historical("A5")):""}</td><td>Source workbook has shared bulk; split quantities by MR using BLD/LAY/DWG, count common items once, preserve historic A5 without double counting</td></tr>
   </tbody></table></div>
   <BulkTakeoff0553/>
   <button type="button" className="p553-detail-button" onClick={()=>setDetails(v=>!v)} aria-expanded={details}>{details?"− Hide":"＋ Show"} mandatory processing 01–08</button>
