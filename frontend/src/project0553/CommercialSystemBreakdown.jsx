@@ -69,8 +69,8 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
      </div>
      <p className="p55-note">{q.terms} · Price evidence only; verify site applicability, quote expiry, and whether lines are optional/spares before inclusion.</p>
      <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--quoted"><thead><tr><th>Code</th><th>Part Number</th><th>Description</th><th>Qty</th><th>Unit price</th><th>Extended (indicative)</th></tr></thead>
-     <tbody>{q.lines.map(([code,pn,description,qty,unitPrice])=><tr key={code}><td>{code}</td><td>{pn}</td><td>{description}</td><td className="is-number">{qty}</td><td className="is-number">{shown(unitPrice,q.currency)}</td><td className="is-number">{shown(qty*unitPrice,q.currency)}</td></tr>)}</tbody></table></div>
-     <p className="p55-note">{q.id==="NG-260916"?"Selected quoted lines only; the full package quote is NOT the sum of the displayed lines.":"Document detail is historical/source evidence, not automatically required Z1F BOM."}</p>
+     <tbody>{q.lines.map(([code,pn,description,qty,unitPrice,quotedTotal,group,page,pricingState])=><tr key={code}><td>{code}</td><td>{pn}</td><td>{description}</td><td className="is-number">{qty}</td><td className="is-number">{Number.isFinite(unitPrice)?shown(unitPrice,q.currency):"— (AS QUOTED)"}</td><td className="is-number">{Number.isFinite(quotedTotal)?shown(quotedTotal,q.currency):Number.isFinite(unitPrice)?shown(qty*unitPrice,q.currency):"— (AS QUOTED)"}</td></tr>)}</tbody></table></div>
+     <p className="p55-note">{q.id==="NG-260916"?"All 53 original BOQ lines (A–E) preserved in JSON. Vendor quoted line totals reconcile to the PDF quote; Group D/E are spares and must not automatically enter base equipment.":"Document detail is historical/source evidence, not automatically required Z1F BOM."}</p>
     </section>)}
     <div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>Internal budget bridge — no fabricated allocations</div>
     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
