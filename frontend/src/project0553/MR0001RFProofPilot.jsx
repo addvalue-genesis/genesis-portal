@@ -1,14 +1,17 @@
 import React,{useState} from "react";
 import { preliminaryLinkBalance, fresnelRadius } from "../common/engineering/rfPropagation";
 import { assessTideScenarios } from "../common/engineering/seaReflection";
+import { SCADA_LINKS_0553, SCADA_RADIO_PATH_REPORT, SCADA_LINK_SOURCE_REFS } from "./data/scadaLinkEvidence";
 const fields=[["frequencyMHz","Frequency (MHz)"],["distanceKm","Path distance (km)"],["txPowerDbm","Tx power (dBm)"],["txGainDbi","Tx antenna gain (dBi)"],["rxGainDbi","Rx antenna gain (dBi)"],["otherLossDb","Other losses (dB)"],["rxThresholdDbm","Receiver threshold (dBm)"]];
 export function MR0001RFProofPilot(){
- const [inputs,setInputs]=useState({}),[source,setSource]=useState("");
+ const [inputs,setInputs]=useState({}),[source,setSource]=useState(""),[selectedLink,setSelectedLink]=useState("");
  const [d1,setD1]=useState(""),[d2,setD2]=useState("");
  const [sea,setSea]=useState({});
  const changeSea=(key,value)=>setSea(prev=>({...prev,[key]:value}));
  const sn=key=>sea[key]===undefined||sea[key]===""?null:Number(sea[key]);
- const evidence=source.trim()?{sourceId:source.trim(),state:"USER_ENTERED_UNVERIFIED"}:null;
+ const chosen=SCADA_LINKS_0553.find(l=>l.id===selectedLink);
+ const evidence=source.trim()?{sourceId:source.trim(),state:"SOURCE_REFERENCED_PENDING_VERIFICATION",referenceLinkId:selectedLink||null}:null;
+ const loadLink=id=>{setSelectedLink(id);const l=SCADA_LINKS_0553.find(x=>x.id===id);if(l){setInputs(p=>({...p,frequencyMHz:String(l.frequencyMHz),distanceKm:String(l.distanceKm)}));setSource("RPT-0001-C1");}else{setSource("");setInputs(p=>({...p,frequencyMHz:"",distanceKm:""}));}};
  const num=k=>inputs[k]===""||inputs[k]===undefined?null:Number(inputs[k]);
  const seaReport=assessTideScenarios({distanceKm:num("distanceKm"),frequencyMHz:num("frequencyMHz"),txElevationM:sn("txElevationM"),rxElevationM:sn("rxElevationM"),tideScenarios:[{name:"LOW",tideElevationM:sn("low")},{name:"MEAN",tideElevationM:sn("mean")},{name:"HIGH",tideElevationM:sn("high")}],evidence});
  const balanced=preliminaryLinkBalance({frequencyMHz:num("frequencyMHz"),distanceKm:num("distanceKm"),txPowerDbm:num("txPowerDbm"),txGainDbi:num("txGainDbi"),rxGainDbi:num("rxGainDbi"),otherLossDb:num("otherLossDb"),rxThresholdDbm:num("rxThresholdDbm"),evidence});
@@ -16,6 +19,10 @@ export function MR0001RFProofPilot(){
  const v=n=>Number.isFinite(n)?n.toFixed(3):"OPEN";
  return <section className="p55-panel"><div className="p55-eyebrow">EXECUTABLE RF-PROP / 0553 MR0001 PILOT</div>
   <h3>Preliminary free-space link calculation</h3>
+  <label>Existing SCADA Link — RPT Rev.C1 / Pathloss 6.0<select value={selectedLink} onChange={e=>loadLink(e.target.value)} style={{display:"block",padding:"8px",width:"100%"}}><option value="">Choose a documented link (or enter manually)</option>{SCADA_LINKS_0553.map(l=><option key={l.id} value={l.id}>{l.from} → {l.to} ({l.mode})</option>)}</select></label>
+  {chosen&&<p className="p55-note">RPT C1 basis: {chosen.distanceKm} km · {chosen.frequencyMHz} MHz · FSPL {chosen.reportFsplDb} dB · Antenna CL {chosen.txAntennaHeightReportM}m / {chosen.rxAntennaHeightReportM}m (RPT reported heights only, NOT tidal datum). Reported availability: {chosen.reportAvailability}. Final vendor/configuration revalidation remains OPEN.</p>}
+  <p className="p55-note"><strong>Source register:</strong> {SCADA_LINK_SOURCE_REFS.map((x,i)=><React.Fragment key={x.id}>{i?" · ":""}<a href={x.url} target="_blank" rel="noreferrer">{x.id}</a></React.Fragment>)}</p>
+  <p className="p55-note">BOD Sec.7.2 requires consideration of tide variation ±{SCADA_RADIO_PATH_REPORT.referenceTideVariationM}m, but without a verified reference sea-level/datum this tool does NOT automatically populate absolute LOW/MEAN/HIGH water elevations.</p>
   <p className="p55-note">ใช้ COMMON Calculation Function จริง · Input เป็นค่าที่ผู้ใช้กรอกเพื่อทดลอง ยังไม่บันทึกลง RFQ/MTO และยังไม่ใช่ PTTEP/OEM compliance</p>
   <div className="p55-grid p55-grid--2">{fields.map(([id,label])=><label key={id}>{label}<input type="number" step="any" value={inputs[id]??""} placeholder="OPEN" onChange={e=>setInputs(p=>({...p,[id]:e.target.value}))} style={{display:"block",width:"100%",padding:"8px"}}/></label>)}
    <label>Input source / document reference<input value={source} onChange={e=>setSource(e.target.value)} placeholder="Required (unverified user entry)" style={{display:"block",width:"100%",padding:"8px"}}/></label>
