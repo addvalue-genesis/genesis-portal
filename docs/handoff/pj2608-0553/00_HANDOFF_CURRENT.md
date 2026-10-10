@@ -314,3 +314,10 @@ This audit is additive and controls where it is more specific than earlier histo
 - Re-checked original INNOVA PDFs QA24-0604/05/06. QA24-0604 has four source rows: TECKNIKABEL CAT6A 300m at 524/m, Weidmuller RJ45 1 at 1020, Hawke M20 N/A quoted, Crouse Hinds adaptor 10 at 3100; totals THB 189,220 ex VAT. QA24-0605 has one CAT6A 305m box THB 46,000. QA24-0606 has two RF glands THB 690/2015, total THB 2,705.
 - Registered all 3 INNOVA offers in `data/supplierQuoteLines.js` so they appear with Cisco/Next G in Source Quotation Detailed Source Items; preserved N/A as null, zero-cost Cisco source items as 0. Registered INNOVA folder in `vendorEvidence.js` for source summary. Source working manifest `pj2608-0553.working.json` now validates Cisco 11 and INNOVA 4/1/2 line counts and original totals.
 - Added `validate:0553-source-quote-completeness` structural regression to build pipeline. Price evidence remains 2024 user-authorized provisional, not engineering accepted or customer sell. Local npm build pending; protected 0550 untouched.
+
+
+## 2026-10-10 18:xx Bangkok — 0553 blank page runtime hotfix
+- Chrome Console exposed exact crash: `PJ2608-0553 controlled dataset invalid: quote total: VST-0048-RE1` at `validateDataset.js:43` before React renders. Port, HTML, JS bundle and webpack compilation were otherwise healthy.
+- Root cause: Cisco 11 coded source lines were stored as 5-column `[code,sku,description,qty,unitPrice]`, whereas runtime `validateProject0553Dataset` only summed sixth-column quoted line totals, producing zero for Cisco against THB 2,117,650 manifest reference.
+- Patched `validateDataset.js` to use explicit quoted line total when numeric, otherwise compute `qty * unitPrice` only when both numeric, while preserving null/N/A as unpriced. Added validator-string guard to `validate-0553-source-quote-completeness.cjs`.
+- User should git pull and refresh running webpack dev server (or restart 0553 on 3001 if needed). Local runtime confirmation PENDING. No protected 0550 changes.
