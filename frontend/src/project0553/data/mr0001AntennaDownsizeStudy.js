@@ -8,13 +8,14 @@ const originalDiameterFt=6,requestedDiameterFt=4;
 const originalGainDbi=40.9; // RPT C1 receive antenna reference
 const estimatedGainDeltaDb=20*Math.log10(requestedDiameterFt/originalDiameterFt);
 const estimatedNewGainDbi=originalGainDbi+estimatedGainDeltaDb;
+// OEM documents: APD-DB-05-6ft-01 = 37.9dBi, APD-DB-05-4FT-01 = 34.9dBi; RPT 6ft=40.9dBi is inconsistent.\nconst oemSixFootGainDbi=37.9, oemFourFootGainDbi=34.9;\nconst oemToOemDeltaDb=oemFourFootGainDbi-oemSixFootGainDbi;\nconst rptToOemFourFootDeltaDb=oemFourFootGainDbi-originalGainDbi;
 const sourceThresholdDbm=null; // OEM RSL threshold at selected modulation
 const sourceRxLevelDbm=null; // actual budget incl radio Ptx, all feeder/filter losses
 export const MR0001_ANTENNA_DOWNSIZE_STUDY=Object.freeze({
  id:"MR0001-ANT-6FT-TO-4FT",requestedBy:"JUTAL (user-reported change; written TC revision verification pending)",
  sourceId:SCADA_RADIO_PATH_REPORT.id,sourceRevision:SCADA_RADIO_PATH_REPORT.revision,
  sourceLinkId:link.id,from:link.from,to:link.to,distanceKm:link.distanceKm,frequencyMHz:link.frequencyMHz,
- originalAntenna:link.reportRxAntenna,originalDiameterFt,requestedDiameterFt,originalGainDbi,
+ originalAntenna:link.reportRxAntenna,originalDiameterFt,requestedDiameterFt,originalGainDbi,\n  oemSixFootGainDbi,oemFourFootGainDbi,oemToOemDeltaDb,rptToOemFourFootDeltaDb,\n  gainEvidenceConflict:"RPT labels 6ft 40.9dBi, but AVIAT family datasheet states 6ft 37.9dBi and 8ft 40.9dBi. Reconcile antenna model before availability decision.",\n  oemEvidence:[{sku:"APD-DB-05-4FT-01",url:"https://drive.google.com/file/d/1HhSB4jJIzyNMxdrTq1jFY7H7U22VHqvW/view",gainDbi:34.9},{sku:"APD-DB-05-6ft-01",url:"https://drive.google.com/file/d/1ZLBPWn0Ua3RWZ2hODtGZA7rSj5ptb1JO/view",gainDbi:37.9},{sku:"APD-DB-05-xft-RAD-01",url:"https://drive.google.com/file/d/16AMzl9qxi1WXEJ36h8MxdoLNq95u9oYm/view"}],
  assumption:"Same aperture efficiency, frequency, polarization and antenna family; diameter-only preliminary sensitivity",
  equation:"Delta G = 20 log10(D_new / D_old)",
  estimatedGainDeltaDb,estimatedNewGainDbi,
