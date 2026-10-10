@@ -2,7 +2,7 @@ import React from "react";
 function Badge({children,tone="neutral"}) { return <span className={"p55-badge p55-badge--"+tone}>{children}</span>; }
 function SectionTitle({eyebrow,title,text}) { return <div className="p55-section-title"><div>{eyebrow&&<div className="p55-eyebrow">{eyebrow}</div>}<h2>{title}</h2>{text&&<p>{text}</p>}</div></div>; }
 export function EngineeringView({model,children}) {
-  const {completeness,lawLibrary,systems,chain,domains,controlRules,costEquations,projectId}=model;
+  const {completeness,lawLibrary,systems,chain,domains,controlRules,costEquations,projectId,serviceEquations=[]}=model;
   const audited = (completeness?.systemAudit || []).filter((row) => row.auditState !== "NOT_YET_AUDITED").length;
   const notAudited = (completeness?.systemAudit || []).filter((row) => row.auditState === "NOT_YET_AUDITED").length;
 
@@ -235,6 +235,12 @@ export function EngineeringView({model,children}) {
         </section>
       </div>
 
+      <section className="p55-panel">
+        <SectionTitle eyebrow="COMMON method registry" title="Service / Cost Equations E01–E18" text="Original 0550 equations and constraints are shared methods, not 0550 rates or adopted 0553 costs. Formula registration is not evidence of automatic execution."/>
+        <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>ID</th><th>Purpose</th><th>Formula</th><th>Control / limitation</th></tr></thead><tbody>
+          {serviceEquations.map(eq=><tr key={eq.id}><td>{eq.id}</td><td>{eq.purpose}</td><td><code>{eq.equation}</code></td><td>{eq.control}</td></tr>)}
+        </tbody></table></div>
+      </section>
       {children}
       <section className="p55-panel">
         <SectionTitle
