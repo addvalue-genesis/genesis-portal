@@ -17,10 +17,18 @@ const functions={
  "ANTENNA_SECTOR":{codes:["A-12"],requirement:"Sector azimuth/gain/pattern and link availability",owner:"ANT MTO; BOD 90° vs RPT 60° conflict"},
  "ANTENNA_PARABOLIC":{codes:["B-11","B-12","B-13","C-11","C-12"],requirement:"Diameter, gain, frequency, polarisation, wind loading and radome",owner:"ANT MTO; exact link/site assignment OPEN"}
 };
+// Spare D/E lines use the same source part numbers as base A/B/C lines.
+ // Inherit only a FUNCTION label, never the base allocation, approval or quantity.
+const baseFunctionByPart=new Map(NEXTG.lines.filter(q=>!["D","E"].includes(q.group)).map(q=>{
+ const entry=Object.entries(functions).find(([,x])=>x.codes.includes(q.code));
+ return [q.partNumber,entry?.[0]||"UNMAPPED"];
+}));
+const spareFunctionByPart=(q)=>baseFunctionByPart.get(q.partNumber)||"UNMAPPED";
 const rows=NEXTG.lines.map(q=>{
- const grp=Object.entries(functions).find(([,x])=>x.codes.includes(q.code));
- const func=grp?.[0]||"UNMAPPED";
  const spare=["D","E"].includes(q.group);
+ const family=spare?spareFunctionByPart(q):null;
+ const grp=Object.entries(functions).find(([key,x])=>x.codes.includes(q.code)||(spare&&key===family));
+ const func=grp?.[0]||"UNMAPPED";
  const explicitConflict=q.code==="A-12"?"BOD_90_DEG_VS_RPT_60_DEG_NEEDS_RF_RECALC":null;
  const licence=/REGION_KEY/.test(func)?"COUNTRY_FREQUENCY_ENTITLEMENT_UNVERIFIED":null;
  const warranty=func==="WARRANTY"?"12_AND_48_MONTH_ALTERNATE_OR_CUMULATIVE_CONFIRM":null;
