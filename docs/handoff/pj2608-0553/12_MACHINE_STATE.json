@@ -47,7 +47,14 @@
       "totalBeforeVAT": 2117650,
       "ingestion": "PARTIAL"
     },
-    "fx": "REQUIRES_RATE_DATE_SOURCE"
+    "fx": "REQUIRES_RATE_DATE_SOURCE",
+    "viewSeparation": {
+      "working": "DERIVATION_AND_HISTORICAL_REV08",
+      "budgetary": "NO_VERIFIED_FROZEN_ISSUE_REGISTERED",
+      "released": "GATES_HOLD_NO_SELL_VALUES",
+      "modeSelectionIssuesDocument": false,
+      "buildAfterChange": "PENDING_USER_LOCAL_BUILD"
+    }
   },
   "engineering": {
     "requiredMTO": "MR0001_42_SOURCE_ROWS_INGESTED_ENGINEERING_REVIEW_OPEN",
