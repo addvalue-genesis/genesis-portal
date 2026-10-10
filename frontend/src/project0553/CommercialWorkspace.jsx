@@ -1,3 +1,4 @@
+import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import React,{useState} from "react";
 import {COMMERCIAL_TEMPLATE_0553 as template,commercialTransition} from "./commercialWorkbookControl";
@@ -22,6 +23,7 @@ export function CommercialWorkspace0553(){
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
   </div>
   <p className="p55-note"><strong>Current display:</strong> {mode.toUpperCase()} · {recipient}. {mode==="working"?"Editable commercial derivation is pending source reconciliation.":mode==="budgetary"?"Frozen snapshot required; do not overwrite prior submissions.":"Customer release remains HOLD until written authorization and all gates pass."}</p>
+  <CommercialSystemBreakdown0553/>
   <section className="p55-panel">
    <div className="p55-eyebrow">REV08 EXISTING COMMERCIAL BASELINE · PRICES FROM CUSTOMER WORKBOOK</div>
    <h3>Detailed Cost / Selling Price Breakdown — USD</h3>
