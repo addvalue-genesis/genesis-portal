@@ -54,7 +54,7 @@ export function MR0001RFProofPilot(){
  {selected===downsizing.sourceLinkId&&<div className="p55-panel">
  <div className="p55-eyebrow">JUTAL CHANGE REQUEST · 6ft → 4ft · PRELIMINARY RF PROOF</div>
  <h4>Receiver-side antenna downsizing — RPT-based sensitivity</h4>
- <p className="p55-note">RPT gain {downsizing.originalGainDbi} dBi with {downsizing.originalDiameterFt}ft receive dish; at equal aperture efficiency and frequency, {downsizing.requestedDiameterFt}ft gives {downsizing.estimatedNewGainDbi.toFixed(2)} dBi (estimated). Single-end margin change {downsizing.estimatedSingleEndRslDeltaDb.toFixed(2)} dB. This is not an OEM availability pass.</p>
+ <p className="p55-note">RPT gain {downsizing.originalGainDbi} dBi with {downsizing.originalDiameterFt}ft receive dish; at equal aperture efficiency and frequency, {downsizing.requestedDiameterFt}ft gives {downsizing.estimatedNewGainDbi.toFixed(2)} dBi (estimated). Single-end margin change {downsizing.estimatedSingleEndRslDeltaDb.toFixed(2)} dB. OEM datasheets now show 6ft 37.9 dBi and 4ft 34.9 dBi (−3.0 dB), while RPT lists 6ft 40.9 dBi; relative to the RPT the 4ft is −6.0 dB. Resolve this conflict before using fade margin. This is not an OEM availability pass.</p>
  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Check</th><th>Preliminary result</th><th>Engineering proof</th></tr></thead><tbody>
  <tr><td>Link</td><td>{downsizing.from} → {downsizing.to}</td><td>RPT C1, {downsizing.frequencyMHz} MHz</td></tr>
  <tr><td>Delta Gain</td><td>{downsizing.estimatedGainDeltaDb.toFixed(2)} dB</td><td>20 log10(4/6), equal efficiency assumption</td></tr>
