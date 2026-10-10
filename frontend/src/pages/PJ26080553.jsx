@@ -1,5 +1,8 @@
 import React, { useMemo, useState } from "react";
 import { ProjectWorkspaceShell } from "../common/ui/ProjectWorkspaceShell";
+import { ArchitectureView as SharedArchitectureView } from "../common/ui/ArchitectureView";
+import { ARCHITECTURE_MANIFEST_0553 } from "../project0553/architectureManifest";
+import { MODULE_REGISTRY_0553 } from "../project0553/moduleRegistry";
 import { ExecutiveView } from "../common/ui/ExecutiveView";
 import { EXECUTIVE_0553 } from "../project0553/executiveViewModel";
 import { SystemsView as SharedSystemsView } from "../common/ui/SystemsView";
@@ -39,7 +42,7 @@ export function PJ26080553() {
  return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} className="p553-dashboard" renderContent={(tab)=><>
 
    {tab==="overview"&&<ExecutiveView model={EXECUTIVE_0553}/>}
-   {tab==="architecture"&&<Section title="GENESS/TPP Architecture — controlled 0553 binding"><div className="p553-methodchain">{ARCHITECTURE_0553.layers.map(x=><strong key={x}>{x.replaceAll("_"," ")}</strong>)}</div><p className="p55-note">{p.isolationRule}</p><p className="p55-note">Current data is Git-versioned registry + stable 0553 bindings. No direct imports from 0550 project data.</p></Section>}
+   {tab==="architecture"&&<SharedArchitectureView manifest={ARCHITECTURE_MANIFEST_0553} modules={MODULE_REGISTRY_0553}/>}
    {tab==="systems"&&<SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Same group/focus/search/expand behavior as PJ2608-0550; all facts come from 0553 controlled MTO and RFQ."/>}
    {tab==="engineering"&&<div className="p55-stack"><Section title="Engineering proof and compliance HOLDs" subtitle="Do not equate document mapping with compliance."><Table headers={["ID","MR","Engineering issue","State"]} rows={TECHNICAL_HOLDS.map(h=>[h.id,h.system,h.issue,<Badge key={h.id}>{h.state}</Badge>])}/></Section><Section title="Requirement → Variable → Proof Control"><p>No automatically confirmed design values. Reconcile the four MRs with MTO Rev04, latest TC and vendor datasheets before selecting models and issuing proof.</p><Table headers={["Equation","Result","Reason"]} rows={[[deriveManHours({}).equation,"OPEN",deriveManHours({}).missing.join(", ")],[deriveLaborCost({}).equation,"OPEN",deriveLaborCost({}).missing.join(", ")]]}/></Section></div>}
    {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
