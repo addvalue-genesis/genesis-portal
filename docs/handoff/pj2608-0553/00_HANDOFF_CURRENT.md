@@ -201,3 +201,9 @@ This audit is additive and controls where it is more specific than earlier histo
 - View-mode selection remains read-only; selecting Budgetary or Released does not issue a snapshot or invoke a commercial approval transition.
 - No price, quote, FX, workbook release or customer-issued revision invented. The original 0553 commercial transition function remains intact for a later controlled approval workflow.
 - 0550 branch and source data not modified. New commit requires user-local `npm run build`; no current-build PASS claimed for this change.
+
+
+## 2026-10-10 JSX build failure hotfix
+- User's `npm run build` on branch HEAD `4e731c3` ran all 14 validation scripts PASS but webpack **FAILED** on `CommercialWorkspace.jsx` line 85: unmatched JSX Fragment `<>` / section closing tag. This overrides any older claims of successful build for that commit.
+- Hotfix commit `57db7b0e910d568a157bd1dce1f1cedbb31ea745` removes the premature `</section>` before `</>}` and closes the outer workspace section after the release checklist; no changes to prices, data, commercial states, or protected 0550 branch.
+- Build for this hotfix is **PENDING LOCAL VERIFICATION**, not yet PASS. User has unrelated unstaged modification `frontend/package-lock.json`; do not discard it without inspection/approval.
