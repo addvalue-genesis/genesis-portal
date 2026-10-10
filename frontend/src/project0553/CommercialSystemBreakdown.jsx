@@ -1,5 +1,6 @@
 import { SCADA_0553_RECONCILIATION } from "./data/scadaOfferReconciliation";
 import { AVIAT_0553_TECHNICAL_EVALUATION } from "./data/aviatTechnicalBidEvaluation";
+import { MR0001_PACKAGE_COMPOSITION, summarizeMR0001Composition } from "./data/mr0001PackageComposition";
 import { MR0001_ENGINEERING_REQUIRED_BOM, summarizeMR0001RequiredBom } from "./data/mr0001RequiredBomDerivation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
@@ -14,6 +15,8 @@ const CODES={"MR-0001":"A1","MR-0002":"A2","MR-0003":"A3","MR-0004":"A4"};
 export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
  const shown=(amount,source="USD")=>formatCommercialAmount(amount,source,displayCurrency,fx);
  const [expanded,setExpanded]=useState(new Set());
+ const [expandedPackages,setExpandedPackages]=useState(new Set());
+ const togglePackage=id=>setExpandedPackages(old=>{const n=new Set(old);n.has(id)?n.delete(id):n.add(id);return n;});
  const toggle=id=>setExpanded(old=>{const n=new Set(old);n.has(id)?n.delete(id):n.add(id);return n;});
  const systems=getProject0553Dataset().mto.systems.map(s=>({
   ...s,code:CODES[s.mr],
@@ -71,6 +74,36 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
       </tr>)}</tbody>
      </table></div>
      <p className="p55-note">RPT topology is a preliminary reference, not acceptance of antenna selection, radio compatibility, availability or Myanmar licence. NG/Cisco offers remain comparison evidence only. This table intentionally cannot produce customer pricing until required quantities, proof, WBS drivers and source-based rates are verified.</p>
+    </section>}
+    {s.mr==="MR-0001"&&<section className="p55-panel">
+     <div className="p55-eyebrow">ENGINEERING PACKAGE COMPOSITION · MR ITEM → FUNCTIONS → QUOTE CANDIDATES</div>
+     <h4>Required functional BOM and service work packages (source-first)</h4>
+     <p className="p55-note">จำนวนใน MTO คือ Set/Lot; Quantity ที่ต้องซื้อจริงจะแยกตาม Functional Component และ Site/Link หลังตรวจ CAL, Layout, Power, RF and OEM. Vendor SKU เป็น candidate เท่านั้น; ไม่ใช้ vendor-offered quantity กำหนด Required Quantity.</p>
+     <div className="p55-source-facts">
+      <div><span>MR source packages</span><strong>{summarizeMR0001Composition().packages}</strong></div>
+      <div><span>Functional component rows</span><strong>{summarizeMR0001Composition().functionRows}</strong></div>
+      <div><span>Source quote candidates</span><strong>{summarizeMR0001Composition().candidateFunctionRows} functional rows</strong></div>
+      <div><span>Accepted required BOM</span><strong>OPEN / HOLD</strong></div>
+     </div>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
+      <thead><tr><th>+/−</th><th>Platform</th><th>MR Tag / Package</th><th>MR Qty</th><th>Functions</th><th>Required SKU Qty</th><th>Cost/Sell</th></tr></thead>
+      <tbody>{MR0001_PACKAGE_COMPOSITION.packages.map(p=><React.Fragment key={p.id}>
+       <tr><td><button type="button" className="p55-row-toggle" onClick={()=>togglePackage(p.id)} aria-expanded={expandedPackages.has(p.id)}>{expandedPackages.has(p.id)?"−":"+"}</button></td>
+       <td>{p.platform}</td><td><strong>{p.sourceCodes.join(" / ")||"BULK / REVIEW"}</strong><small>{p.sourceDescription} · MTO row {p.sourceRowIndex}</small></td>
+       <td>{p.sourceQuantityText}</td><td>{p.components.length}</td><td>OPEN / Engineering</td><td>HOLD</td></tr>
+       {expandedPackages.has(p.id)&&<tr><td colSpan={7}><div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+        <thead><tr><th>Functional component</th><th>Quantity driver</th><th>Required qty</th><th>Next G possible SKU(s)</th><th>Vendor offered total</th><th>Engineering/Gap</th><th>Cost</th></tr></thead>
+        <tbody>{p.components.map(x=><tr key={x.id}>
+         <td><strong>{x.functionId}</strong></td><td>{x.quantityDriver}</td><td>OPEN</td>
+         <td>{x.candidateQuotes.length?x.candidateQuotes.map(y=><div key={y.quoteLine}>{y.quoteLine} · {y.partNumber}</div>):"NOT MAPPED / OTHER SUPPLIER"}</td>
+         <td>{x.candidateQuotes.map(y=>y.quoteLine+": "+y.offeredTotalQty).join(" · ")||"—"}<small>Quote-wide totals, NOT site allocated</small></td>
+         <td>{x.gapState}<small>{x.technicalState}</small></td><td>HOLD</td>
+        </tr>)}</tbody></table></div></td></tr>}
+      </React.Fragment>)}</tbody></table></div>
+     <h4>Services derived from WBS / engineering drivers — not quotation assumptions</h4>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Service</th><th>Quantity / workload driver</th><th>Equation</th><th>MH / Cost</th><th>Evidence</th></tr></thead>
+     <tbody>{MR0001_PACKAGE_COMPOSITION.services.map(x=><tr key={x.id}><td>{x.name}</td><td>{x.driver}</td><td>{x.equation}</td><td>OPEN / HOLD</td><td>{x.source}</td></tr>)}</tbody></table></div>
+     <p className="p55-note">Shared RF filters, power, surge and accessories may serve distinct physical interfaces. Their candidate appearance under several MR packages does not allocate or duplicate quote cost. Only an approved physical owner/interface can carry accepted quantities or cost.</p>
     </section>}
     {s.mr==="MR-0001"&&<><div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>FIRST PRINCIPLES → REQUIRED vs OFFERED → COST GATE</div>
      <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
