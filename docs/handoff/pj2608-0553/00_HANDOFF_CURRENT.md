@@ -301,3 +301,9 @@ This audit is additive and controls where it is more specific than earlier histo
 - User explicitly instructed to use INNOVA 2024 prices for now. Added `data/innovaHistoricalBudgetPrices.js` and `InnovaBudgetEvidence.jsx` integrated into MR0001 Breakdown, with QA24-0604 THB 189,220 pre-VAT basket, QA24-0605 THB 46,000 pre-VAT 305m cable box, and QA24-0606 THB 2,705 pre-VAT (Hawke glands 690 / 2,015 THB each). Source quotation URLs, 2024 date and THB preserved.
 - Treat as PROVISIONAL_BUDGET_REFERENCE_REQUOTE_PENDING for CAT6A / cable glands / bulk only; do not add overlapping alternative baskets, infer installed quantity, or accept technical compatibility by price. Customer release remains HOLD.
 - Added `validate:0553-innova-budget` to frontend build. User-local build pending. No 0550 modification.
+
+
+## 2026-10-10 INNOVA provisional functional cost bridge
+- Created `frontend/src/project0553/data/mr0001InnovaCostBridge.js` for user-authorized budgetary rates: QA24-0605 CAT6A 305 m/box THB 46,000; QA24-0606 Hawke 501/421/B/M25 THB 690/set and 501/421/C2/M40 THB 2,015/set; all ex VAT. QA24-0604 THB 189,220 is a mixed basket, **NOT one per-SKU unit rate**. Original quotations remain 2024 and requote pending.
+- Linked Glands and CAT6A cable function candidates to 42-MTO-row Package Composition without allocating prices to more than one site. CAT6A and RF coax are separate cable types; glands M25 and M40 require cable OD and certification evidence. Calculation function `calculateProvisionalInnovaLine` requires integer qty, identical verified purchase unit, and `ENGINEERING_QUANTITY_VERIFIED` scope state; result is always PROVISIONAL_BUDGET_ONLY, never accepted sell.
+- `InnovaBudgetEvidence.jsx` now displays candidate functions, original rate and unit tables. Added `validate:0553-innova-cost-bridge` static guard. Local npm build pending user run. Protected 0550 untouched; no customer submission.
