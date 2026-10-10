@@ -21,7 +21,8 @@
     "aviatReviewLastFailure": "UNCLASSIFIED_NG_D-1_TEST_INCOMPLETE_MAPPING",
     "packageCompositionValidation": "PENDING_USER_LOCAL_BUILD",
     "topologyValidation": "PENDING_LOCAL_BUILD",
-    "radioRoleMatrix": "PENDING_LOCAL_BUILD"
+    "radioRoleMatrix": "PENDING_LOCAL_BUILD",
+    "scopeOwnershipValidation": "PENDING_USER_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -118,6 +119,17 @@
       "allocatedOfferQty": null,
       "source": "RPT-0001-C1",
       "status": "ROLE_CANDIDATES_ENG_REVIEW"
+    },
+    "mr0001Ownership": {
+      "source": [
+        "BLD-0001-C1",
+        "MR-0001-C1"
+      ],
+      "gates": 5,
+      "newSupplyQty": null,
+      "reuseQty": null,
+      "serviceMH": null,
+      "releaseAllowed": false
     }
   },
   "sourceConflicts": [
