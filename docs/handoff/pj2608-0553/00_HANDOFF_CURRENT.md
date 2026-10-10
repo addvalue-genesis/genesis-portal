@@ -347,3 +347,10 @@ This audit is additive and controls where it is more specific than earlier histo
 - Made Simple BOM the first/default component in `CommercialSystemBreakdown.jsx`. All legacy engineering/quote/audit submodules are now in a collapsed `<details>` advanced section, not deleted. This stops the user having to navigate many repeated OPEN/HOLD tables just to see BOM.
 - Only Cisco working bundle at five LAN MTO sets is currently numerically priced THB 2,117,650 before VAT; other requirements are UNPRICED, not zero. Never present the subtotal as total MR0001 cost. This is a preliminary quotation scenario only, not signed-off system design.
 - Added `validate:0553-simple-bom` static guard. User-local build and UI runtime verification pending. Protected PJ2608-0550 unchanged.
+
+
+## 2026-10-10 Governing-method cost-spine refactor (no new costing theory)
+- User clarified the governing process: Executive, Architecture, First Principles and Commercial are cooperating views over the same controlled MR/engineering/vendor evidence, with the original 6-sheet `4-Scope of Supply.xlsx` as customer output contract. Eliminate separate mutually inconsistent financial truths.
+- Added `frontend/src/project0553/data/bidCostSpine.js` as a thin read-only self-describing derivation over existing `mr0001WorkingPricedBom.js` and `supplierQuoteLines.js`: Cisco preliminary source-reconciled cost THB 2,117,650 before VAT; priced/unpriced MR0001 tag count; full equipment/services/A+B+C and customer sell NULL rather than phantom zero. Does NOT migrate 0550 costs or claim fully priced proposal.
+- Bound the exact same cost spine to `executiveViewModel.js`, `architectureManifest.js`, `engineeringViewModel.js` and `CommercialWorkspace.jsx`. All older audit/code modules preserved for drilldown; no change to historical customer-issued workbook or release gates.
+- Added `validate:0553-cost-spine` in build. Local build/runtime remains PENDING. Next deliverable is actual evidence-derived complete A+B+C estimate and 6-sheet customer output; not additional dashboard modules.
