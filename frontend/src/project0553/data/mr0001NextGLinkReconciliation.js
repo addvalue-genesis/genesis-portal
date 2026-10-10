@@ -10,6 +10,7 @@ const rows=NEXTG_LINK_SUMMARY_0553.links.map(v=>{
  const bRPT=sameOrder?rpt.reportRxAntenna:rpt.reportTxAntenna;
  const aHeightRPT=sameOrder?rpt.txAntennaHeightReportM:rpt.rxAntennaHeightReportM;
  const bHeightRPT=sameOrder?rpt.rxAntennaHeightReportM:rpt.txAntennaHeightReportM;
+ const drawingEvidence={bld:{revision:"C1",url:"https://drive.google.com/file/d/1FZUqKAXBybGkaxeR4CUOH3OaIb2edmt3/view",scope:"SCADA telecom topology and reuse to verify"},lay:{revision:"C1",url:"https://drive.google.com/file/d/1PStua_5EmygpXpT2wMB3Jlj-Sq7syETA/view",scope:"SCADA antenna at E&I room rooftop/mezzanine reference; placement and heights verify"}};
  const conflicts=[
   ...(Math.abs(rpt.distanceKm-v.distanceKm)>eps?[{field:"PATH_KM",report:rpt.distanceKm,vendor:v.distanceKm}]:[]),
   ...(Math.abs(aHeightRPT-v.aHeightAglM)>eps?[{field:"A_HEIGHT_AGL",report:aHeightRPT,vendor:v.aHeightAglM}]:[]),
@@ -20,7 +21,7 @@ const rows=NEXTG_LINK_SUMMARY_0553.links.map(v=>{
  // Reporting a difference in manufacturer link inputs does NOT itself classify non-compliance.
  return {...v,rpt:{distanceKm:rpt.distanceKm,aAntenna:aRPT,bAntenna:bRPT,
   aHeightAglM:aHeightRPT,bHeightAglM:bHeightRPT},
-  conflicts,radioRslDbm:null,receiverThresholdDbm:null,
+  conflicts,drawingEvidence,radioRslDbm:null,receiverThresholdDbm:null,
   fadeMarginDb:null,availabilityPercent:null,tidalAvailabilityPercent:null,
   stdPass:null,provisionalBudgetChoice:"HOLD_PROOF",manufacturerFinalApproval:false};
 });
