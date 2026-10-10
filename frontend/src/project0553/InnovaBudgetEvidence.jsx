@@ -11,7 +11,7 @@ export function InnovaBudgetEvidence0553(){
    <tbody>{data.quotations.map(q=><tr key={q.number}>
     <td><a href={q.url} target="_blank" rel="noreferrer">{q.number}</a><small>{data.sourceDate}</small></td>
     <td>{q.scope}</td><td className="is-number">{q.originalSubtotalExVat.toLocaleString("en-US",{minimumFractionDigits:2})} THB</td>
-    <td>{q.lines?.map(l=><div key={l.partNumber||l.description}>{l.partNumber||l.description}: {l.unitPriceExVat.toLocaleString("en-US")} THB / {l.unit}</div>)||"Basket price: item allocation pending"}</td>
+    <td>{q.lines?.map(l=><div key={l.partNumber||l.description}>{l.partNumber||l.description}: {(Number.isFinite(l.unitPriceExVat)?l.unitPriceExVat.toLocaleString("en-US"):"N/A (UNPRICED)")} THB / {l.unit}</div>)||"Basket price: item allocation pending"}</td>
     <td>PROVISIONAL BUDGET / REQUOTE PENDING<small>Required Qty / Accepted Cost: OPEN</small></td>
    </tr>)}</tbody>
   </table></div>
