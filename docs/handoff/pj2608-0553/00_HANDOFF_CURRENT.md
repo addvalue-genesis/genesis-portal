@@ -282,3 +282,9 @@ This audit is additive and controls where it is more specific than earlier histo
 - Function `assessApprovedQuantityGap` computes numeric shortfall/surplus ONLY when both integer quantities and engineering/scope approvals are VERIFIED. No automatic customer release or compliance declaration.
 - Added `validate:0553-gap` static regression. This is a structural guard, not engineering certification. Build after current changes pending user's `npm run build`.
 - Next substantive task: trace each candidate function to original MR/SPE/DTS/BOD/BLD/TC exact clauses, verify physical quantity drivers and supported equipment allocation, then derive numeric cost/services. No 0550 changes.
+
+
+## 2026-10-10 MR0001 Phase 7 source-located requirement evidence
+- Re-read Google Drive MR-0001 Rev.C1 and BLD-0001 Rev.C1 text. Evidence: MR review comments require supply (not only list) of commissioning spares/special tools; operating-country applicable laws at precedence; BLD notes identify dashed existing installation, reuse of ZWP8–ZPQ path for ZWP20 and new IDU/surge in Ex 'e' enclosure.
+- Added `data/mr0001RequirementEvidenceMatrix.js` connecting these source locators plus RPT radio link references to each functional row in existing gap assessment. References identify potentially applicable proof; neither exact native symbol-to-row matching nor OEM certificates are asserted.
+- Added evidence grid to `CommercialSystemBreakdown.jsx`, regression `validate:0553-requirement-evidence` to production build. Required qty, accepted part number/cost and customer release all HOLD. User-local build pending. No protected 0550 changes.
