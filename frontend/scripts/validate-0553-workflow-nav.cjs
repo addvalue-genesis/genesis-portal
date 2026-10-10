@@ -4,7 +4,7 @@ const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 const page=read("src/pages/PJ26080553.jsx"),shell=read("src/common/ui/ProjectWorkspaceShell.jsx"),css=read("src/project0553/project0553.css");
 for(const name of ['id:"define"','id:"engineer"','id:"commercial"'])assert(page.includes(name),name);
 assert(page.includes("tabGroups={TAB_GROUPS}"));
-assert(page.includes('["budget","09 Budget"]')&&page.includes('setWorkspaceTab("budget")'));
+assert(page.includes('["budget","10 Budget"]')&&page.includes('setWorkspaceTab("budget")'));
 assert(shell.includes("tabGroups ? tabGroups.map")&&shell.includes("group.tabs.includes(t.id)"));
 assert(css.includes(".p55-tabgroup--commercial"));
 console.log("PASS 0553 grouped stage navigation; numbered tabs, Budget last, schematic BOM deep-link intact");
