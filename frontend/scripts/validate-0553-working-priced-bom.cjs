@@ -1,0 +1,15 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const mto=JSON.parse(fs.readFileSync(path.join(root,"src/project0553/data/snapshots/mr0001.mto.rev04.sourceRows.json"),"utf8"));
+const model=fs.readFileSync(path.join(root,"src/project0553/data/mr0001WorkingPricedBom.js"),"utf8");
+const view=fs.readFileSync(path.join(root,"src/project0553/CommercialSystemBreakdown.jsx"),"utf8");
+const ui=fs.readFileSync(path.join(root,"src/project0553/WorkingPricedBom0553.jsx"),"utf8");
+assert.equal(mto.itemRows.length,42);
+const lan=mto.itemRows.filter(r=>r.sourceItemCodes.some(c=>["LAN-502-001","LAN-502-002"].includes(c)));
+assert.equal(lan.length,5);
+assert(lan.every(r=>r.sourceQty===1&&r.sourceUnit==="Set"));
+const bundle=[242460,100930,13930,0,0,0,0,0,14260,45630,6320].reduce((a,b)=>a+b,0);
+assert.equal(bundle,423530);assert.equal(bundle*5,2117650);
+for(const t of ["sourceScopeQty:quantity","sourceScopeUnit:unit","requiredPackageQty:quantity","engineeringRequiredSkuQty:null","indicativePackageCostTHB","customerReleaseAllowed:false","GROUPED_MTO_SPLIT_PRELIMINARY"])assert(model.includes(t),"Missing model guard "+t);
+assert(view.includes("<WorkingPricedBom0553/>")&&ui.includes("bom.items.map")&&ui.includes("bom.cisco.items.map"));
+console.log("PASS MR0001 working priced BOM: 42 original MTO rows, five LAN sets, Cisco provisional THB 2,117,650 ex-VAT; OEM approval gated");
