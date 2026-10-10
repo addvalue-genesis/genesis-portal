@@ -5,6 +5,8 @@ export function validateProject0553Dataset(data){
  if(data?.issuePermission!==false)errors.push("release must remain disabled");
  if(data?.meta?.integrationState?.controlledJson!=="ACTIVE")errors.push("controlled JSON is not active");
  if(!Array.isArray(data?.mto?.systems)||data.mto.systems.length!==4)errors.push("expected four MR systems");
+ if(data?.mr0001SourceRows?.projectId!=="PJ2608-0553"||data?.mr0001SourceRows?.mr!=="MR-0001"||data?.mr0001SourceRows?.itemRows?.length!==42)errors.push("MR0001 Rev04 source row count / project mismatch");
+ if(data?.mr0001SourceRows?.itemRows?.some(x=>!x.platform||!Number.isInteger(x.sourceRowIndex)||x.skuRequiredQty!==null))errors.push("MR0001 source lineage or unsupported SKU quantity");
  if(!Array.isArray(data?.supplierQuotes))errors.push("supplier quote registry missing");
  if(!Array.isArray(data?.quoteReferences))errors.push("quote manifest missing");
  for(const ref of data.quoteReferences||[]){
