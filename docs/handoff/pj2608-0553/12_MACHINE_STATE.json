@@ -18,7 +18,8 @@
     "sources": [
       "frontend/src/project0553/data/snapshots/pj2608-0553.working.json",
       "frontend/src/project0553/data/snapshots/mto.rev04.summary.json",
-      "frontend/src/project0553/data/quotes/NG-260916-ADV-DAP1.full.json"
+      "frontend/src/project0553/data/quotes/NG-260916-ADV-DAP1.full.json",
+      "frontend/src/project0553/data/snapshots/mr0001.mto.rev04.sourceRows.json"
     ]
   },
   "commercial": {
@@ -49,9 +50,9 @@
     "fx": "REQUIRES_RATE_DATE_SOURCE"
   },
   "engineering": {
-    "requiredMTO": "SOURCE_HAS_LINE_ROWS_CODE_SNAPSHOT_SUMMARY_ONLY",
+    "requiredMTO": "MR0001_42_SOURCE_ROWS_INGESTED_ENGINEERING_REVIEW_OPEN",
     "requiredVsOffered": "GENERIC_ENGINE_PARTIAL",
-    "mr0001": "REQUIRED_QUANTITIES_OPEN_PENDING_REV04_LINE_INGESTION",
+    "mr0001": "SOURCE_ROWS_42_PLATFORM_GROUPED_SKU_REQUIRED_QTY_OPEN",
     "mr0002": "LNA_PRELIMINARY_ONLY",
     "mr0003": "REVIEW_OPEN",
     "mr0004": "REVIEW_OPEN"
@@ -118,6 +119,29 @@
       "mtoRev04Reverified": true,
       "mtoRev04ContainsLineLevelRowsBeyondCodeSummary": true
     },
-    "controlDecision": "INGEST_EXISTING_MTO_ROWS_BEFORE_REQUIRED_BOM_QUANTITY_OR_COST_ACCEPTANCE"
+    "controlDecision": "INGEST_EXISTING_MTO_ROWS_BEFORE_REQUIRED_BOM_QUANTITY_OR_COST_ACCEPTANCE",
+    "mtoRev04Ingestion": {
+      "mr": "MR-0001",
+      "sourceRows": 42,
+      "platforms": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23",
+        "ZPQ",
+        "ZWP8",
+        "ZWP11"
+      ],
+      "groupedRowsRequiringSplit": [
+        31,
+        39,
+        43,
+        45,
+        49
+      ],
+      "source": "1o1UIsUw8JQtUt2yk4S8graNpIkNQCq8h",
+      "buildAfterChange": "NOT_YET_RUN",
+      "customerReleaseAllowed": false
+    }
   }
 }
