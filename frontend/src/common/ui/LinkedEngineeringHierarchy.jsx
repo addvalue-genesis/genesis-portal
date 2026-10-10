@@ -26,7 +26,8 @@ export function LinkedEngineeringHierarchy({auditDimensions=[],chain=[],domains=
     {g.id==="AUDIT"&&open.has(g.id)&&auditDimensions.map((x,i)=><tr key={id("AUD",i)}><td></td><td>{id("AUD",i)}</td><td>{x}</td><td>REQ-ID → AUD-ID (mapping pending)</td><td>CHECK_REQUIRED</td></tr>)}
     {g.id==="CHAIN"&&open.has(g.id)&&chain.map((x,i)=><tr key={id("STEP",i)}><td></td><td>{id("STEP",i)}</td><td>{x}</td><td>{i? id("STEP",i-1)+" → ":"SOURCE → "}{id("STEP",i)}</td><td>METHOD_DEFINED</td></tr>)}
     {g.id==="KNOWLEDGE"&&open.has(g.id)&&domains.map(d=>{
-     const matching=kernels.filter(k=>{const domainText=(k.domain||"").toLowerCase();const keys={MATH:["mathemat"],PHYSICS:["electromagnet","acoust","optic","mechanic","probab"],TELECOM:[],NETWORK:["capacity"],ELECTRICAL:["electrical","energy"],ECON:[],ACCOUNTING:[],LOGISTICS:[],PM:[],GOV:[]};return (keys[d.id]||[]).some(x=>domainText.includes(x))});
+     const owners={"RF-PROP":"PHYSICS","ACOUSTIC":"PHYSICS","OPTICAL":"PHYSICS","POWER":"ELECTRICAL","VIDEO":"PHYSICS","NET-CAP":"NETWORK","RELIABILITY":"MATH","MECH":"PHYSICS"};
+     const matching=kernels.filter(k=>owners[k.id]===d.id);
      return <React.Fragment key={d.id}><tr><td>{btn("DOM-"+d.id)}</td><td>{"DOM-"+d.id}</td><td><strong>{d.name}</strong><small>{d.purpose}</small></td><td>KNOWLEDGE</td><td>DOMAIN</td></tr>
      {open.has("DOM-"+d.id)&&<tr><td></td><td></td><td colSpan={3}><strong>Topics:</strong> {d.topics.join(" · ")}<p className="p55-note">Kernel association below uses explicit KERNEL IDs in the separate registry; topic classification alone does not prove mapping.</p></td></tr>}
      {open.has("DOM-"+d.id)&&matching.map(k=><React.Fragment key={k.id}><tr><td>{btn("KERNEL-"+k.id)}</td><td>{"KERNEL-"+k.id}</td><td><strong>{k.name}</strong></td><td>{"DOM-"+d.id+" / STEP-05"}</td><td>{k.appliesTo?.length||0} SYSTEM BINDINGS</td></tr>
