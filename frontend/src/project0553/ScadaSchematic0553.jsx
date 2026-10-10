@@ -18,8 +18,9 @@ export function ScadaSchematic0553({onOpenLocationBom}){
    <p className="p55-note">ภาพรวม Phase 1A–1E (เดิม) และ Phase 1F (ใหม่) จากแผนภาพที่ให้ไว้ใน Eng Cal; ใช้เพื่อเข้าใจทั้ง Field ไม่ใช่เพื่อกำหนดระยะทาง RF หรือ BOM</p>
    <button type="button" className="p553-detail-button" onClick={()=>setOverviewOpen(x=>!x)}>{overviewOpen?"− Hide Overall":"＋ Show Overall"}</button>
    {overviewOpen&&<div style={{marginTop:12,maxWidth:1100}}>
-    <iframe title="Zawtika Phase 1F original overall field schematic" src="https://drive.google.com/file/d/1E_OVhaZg--yvVMiHm8lumPvvlelRSV4L/preview" loading="lazy" style={{width:"100%",height:"min(73vw,760px)",minHeight:330,border:"1px solid #c8d8e5",borderRadius:10,background:"#fff"}} />
-    <p className="p55-note">Original reference image from Eng Cal · <a href="https://drive.google.com/file/d/1E_OVhaZg--yvVMiHm8lumPvvlelRSV4L/view?usp=drivesdk" target="_blank" rel="noreferrer">Open original image in Google Drive</a>. หาก Drive Preview ไม่แสดง ให้เปิดภาพต้นฉบับจากลิงก์นี้</p>
+    <img src="/assets/pj2608-0553/zawtika-phase1f-overall.png" alt="Field Schematic for Zawtika Phase 1F Development — overall reference" loading="lazy" style={{display:"block",width:"100%",height:"auto",border:"1px solid #c8d8e5",borderRadius:10,background:"#fff"}} onError={e=>{e.currentTarget.style.display="none";e.currentTarget.nextElementSibling.style.display="block";}}/>
+    <p className="p55-note" style={{display:"none"}}>Overall image asset is not installed. Copy the supplied PNG to frontend/public/assets/pj2608-0553/zawtika-phase1f-overall.png.</p>
+    <p className="p55-note">Design overview provided by user · NOT TO SCALE · Illustrative only. Controlled RF links, exact distances and Engineering BOM come from the interactive model below, not from this image.</p>
    </div>}
   </section>
   <div className="p55-eyebrow" style={{marginTop:16}}>INTERACTIVE WORKING SCHEMATIC · CONTROLLED JSON</div>
