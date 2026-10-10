@@ -1528,3 +1528,29 @@
     gap: 2px;
   }
 }
+
+
+/* Shared formula inventory: readable 2-level hierarchy, both 0550/0553. */
+.p55-formula-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 14px;background:#f3f7fb;border:1px solid #d9e4ef;border-radius:9px;margin:10px 0}
+.p55-formula-toolbar strong{display:block;font-size:15px;color:#143957}
+.p55-formula-toolbar small{display:block;margin-top:5px;font-size:12px;color:#45637a}
+.p55-formula-actions{display:flex;gap:7px}
+.p55-formula-actions button{border:1px solid #adc1d1;background:#fff;color:#184466;border-radius:6px;padding:7px 12px;font-weight:650;cursor:pointer}
+.p55-formula-table td,.p55-formula-table th{vertical-align:top}
+.p55-formula-table .p55-formula-group td{background:#dfeaf4;border-top:2px solid #92b2ce;padding-top:12px;padding-bottom:12px}
+.p55-formula-group td strong{font-size:15px;color:#0d3555;display:block}
+.p55-formula-group small,.p55-formula-item small{display:block;color:#4e697d;font-size:11px;margin-top:5px;line-height:1.5}
+.p55-formula-count{font-weight:700;color:#174363}
+.p55-formula-category{display:inline-block;background:#c2d8e9;border:1px solid #91b2cb;border-radius:5px;color:#133d5c;padding:3px 7px;font-weight:700;font-size:11px}
+.p55-formula-table .p55-formula-item td{background:#fff;padding-top:11px;padding-bottom:11px}
+.p55-formula-table .p55-formula-item:nth-of-type(2n) td{background:#f8fafc}
+.p55-formula-subtitle{font-size:13px;color:#234962;display:block;line-height:1.5}
+.p55-formula-expression{white-space:normal;overflow-wrap:anywhere;font-size:12px}
+.p55-formula-state{font-size:12px;font-weight:700;color:#1e4f71}
+.p55-formula-table .p55-formula-detail td{background:#f3f8fc!important;padding:16px}
+.p55-formula-detail-title{font-size:14px;font-weight:750;color:#173c59;margin-bottom:12px}
+.p55-formula-dl{display:grid;grid-template-columns:minmax(100px,160px) 1fr;gap:12px;margin:0 0 10px}
+.p55-formula-dl dt{font-weight:700;color:#244d69}
+.p55-formula-dl dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.p55-formula-dl ul{margin:0;padding-left:20px}
+@media(max-width:760px){.p55-formula-dl{grid-template-columns:1fr;gap:5px}.p55-formula-table{min-width:780px}}
