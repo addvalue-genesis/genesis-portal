@@ -295,3 +295,9 @@ This audit is additive and controls where it is more specific than earlier histo
 - Added `data/mr0001VendorPriceEvidence.js`: all 53 Next G source unit/line amounts, original currency, matching functional candidates and separate null approved cost. Added `validate-0553-vendor-price-evidence.cjs` static source regression.
 - Important blocker: attempted GitHub UI replacement for `CommercialSystemBreakdown.jsx` rejected twice by tool safety checks. Thus **price evidence model is committed but NOT wired into UI**, and build pipeline does not yet include new validation. Do not claim UI changed or local Build PASS.
 - Next: short-range safe UI edit or local patch; add original USD source-price fields to Gap and clear label SOURCE PRICE vs APPROVED COST. Display Cisco / other supplier original THB price evidence separately, no automatic cross-vendor price blending or wrong 2024 expired quote equivalence.
+
+
+## 2026-10-10 INNOVA 2024 pricing user approval for provisional budget
+- User explicitly instructed to use INNOVA 2024 prices for now. Added `data/innovaHistoricalBudgetPrices.js` and `InnovaBudgetEvidence.jsx` integrated into MR0001 Breakdown, with QA24-0604 THB 189,220 pre-VAT basket, QA24-0605 THB 46,000 pre-VAT 305m cable box, and QA24-0606 THB 2,705 pre-VAT (Hawke glands 690 / 2,015 THB each). Source quotation URLs, 2024 date and THB preserved.
+- Treat as PROVISIONAL_BUDGET_REFERENCE_REQUOTE_PENDING for CAT6A / cable glands / bulk only; do not add overlapping alternative baskets, infer installed quantity, or accept technical compatibility by price. Customer release remains HOLD.
+- Added `validate:0553-innova-budget` to frontend build. User-local build pending. No 0550 modification.
