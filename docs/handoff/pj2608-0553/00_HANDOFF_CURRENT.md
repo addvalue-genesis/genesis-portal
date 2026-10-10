@@ -155,3 +155,33 @@ Use `11_NEW_CHAT_RESUME_PROMPT.md`. Start with an audit that identifies exact re
 
 ### Validation / worktree
 `J:\\DEV\\GitHub\\addvalue-genesis\\genesis-portal` uses 0553 branch and Port 3001; `genesis-portal-0550` uses 0550 branch and Port 3000. Latest user build after `73ffda7`: 14 validation scripts PASS and webpack compiled with 3 size warnings. Command: `cd frontend; npm run build`. Release gates not met. Commit and revalidate after edits.
+
+
+---
+## 2026-10-10 Resume Audit — code + Drive source re-verified
+
+This audit is additive and controls where it is more specific than earlier historical notes.
+
+### GitHub/runtime verification
+- Working branch remains `feat/pj2608-0553-tpp-bid-handoff`; no 0550 branch was modified.
+- Compared with checkpoint commit `5aa426762a932a86d0ec66f0fa7d69f6ef708122`, the branch is **ahead by 1 / behind by 0**. The only changed file reported by the compare was `docs/handoff/pj2608-0553/12_MACHINE_STATE.json`.
+- Connector review confirms the active data path is still `repository.js -> controlledSnapshotAdapter.js -> validateDataset.js -> controlledSnapshot.js`, with `CONTROLLED_JSON_SNAPSHOT`; SQL and AGERP are not connected.
+- `scadaOfferReconciliation.js` deliberately carries `requiredQty:null` and `selectedPartNumber:null` for MR0001 because the code snapshot still contains only MTO equipment-family summary. This is a fail-closed control, not missing logic to be replaced by guessed quantities.
+- `CommercialSystemBreakdown.jsx` correctly displays Rev08 only as historical customer sell and keeps Verified Direct Cost = OPEN.
+- `requiredOfferedReconciliation.js` blocks accepted quote cost until engineering state is `ACCEPTED_ENGINEERING` and technical approval is `VERIFIED`.
+
+### Authoritative Drive evidence re-verified
+- Original `0-Instruction to Bidder.docx` (Drive ID `1dyMxfGxL7k9JvxeaRk2oN5HEdMtP44Rl`) was re-read directly. It states closing **08-Sep-2026 17:00**, submit **technical bid including unpriced commercial bid**, and **do not submit priced bid until further notice**. It also requires DDP Zhuhai Jutal Yard pricing under Incoterms 2020, minimum 90-day price validity, four-year spare-price validity, site-service rates where required, explicit deviations, and manufacturer identification for non-self-produced items.
+- This direct read does **not** authenticate the later reported **14-Oct-2026 17:00 Beijing** instruction. P0-ITB therefore remains OPEN and customer release remains blocked until the later email/amendment is authenticated from the original thread/attachment.
+- `PJ2608-0553_MTO_MR0001-0004_SUBMIT_Rev04_20261006-Update.xlsx` (Drive ID `1o1UIsUw8JQtUt2yk4S8graNpIkNQCq8h`) was re-read directly. The workbook contains actual line-level/item rows and scope text beyond the source-controlled summary JSON; therefore the next engineering task is **ingestion/reconciliation of existing source rows**, not invention of quantities.
+- The Rev04 delivery/FAT basis in the workbook is MR-specific: MR0001 22–24 weeks DAP Nonthaburi; MR0002 delivery TBC pending formal supplier quote; MR0003 16 weeks ARO DDP Nonthaburi subject to supplier shutdown condition; MR0004 8 weeks if stock / 28–30 weeks if not, FCA factory with onward freight separate. These are working supplier-backed bases and must not be silently replaced by the CCL 40-week/CIF-Zhuhai draft.
+- The MTO scope text explicitly includes spares, special tools, inspection/testing, VDRL documentation, packing/transport, warranty, import/type approvals and licence responsibilities as applicable. These must be mapped through Requirement -> Physical Object/Work -> Qty -> Offer -> Cost -> workbook lines, not treated as generic zero-cost inclusions.
+
+### Immediate resume point
+1. Preserve the current fail-closed architecture.
+2. Parse the complete Rev04 workbook rows for MR0001 first, retaining row/tag/platform/source references.
+3. Build a controlled Required BOM JSON with explicit source lineage; derive quantities only from source rows + engineering constraints/proofs.
+4. Reconcile NG 53 lines and complete Cisco quote ingestion against that Required BOM; keep alternatives/spares/licences separate.
+5. Extend the same method to MR0002–MR0004.
+6. Authenticate the later JUTAL amendment before changing release/submission rules.
+7. Only after engineering reconciliation: derive current cost, sourced FX, margin/sell and the six-sheet workbook. No forced balancing, no phantom zero, no automatic release.
