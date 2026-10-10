@@ -38,6 +38,11 @@ const TABS = [
  ["schematic","08 Schematic"],
  ["budget","09 Budget"]
 ];
+const TAB_GROUPS = [
+ {id:"define",title:"DEFINE · กำหนดงาน",tabs:["overview","architecture","systems"]},
+ {id:"engineer",title:"ENGINEER · วิเคราะห์และพิสูจน์",tabs:["engineering","execution","risk","documents","schematic"]},
+ {id:"commercial",title:"COMMERCIAL · สรุปต้นทุน",tabs:["budget"]}
+];
 const Badge = AuditBadge;
 const Metric = AuditMetric;
 const Table = AuditTable;
@@ -61,7 +66,7 @@ export function PJ26080553() {
   <button key={"b"+s.id} className="p553-detail-button" onClick={()=>setOpened(opened===s.mr?null:s.mr)}>{opened===s.mr?"− Hide":"＋ Detail"}</button>
  ])}/>;
  const shellProject = {id:p.projectId,shortName:"Zawtika Phase 1F Telecom",title:"JUTAL · "+p.packageId+" · Technical UNPRICED / Priced Commercial Bid",state:"WORKING REVIEW / RELEASE HOLD",statusDetail:"Closing amendment verification OPEN",method:p.method};
- return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} className="p553-dashboard" activeTab={workspaceTab} onTabChange={setWorkspaceTab} renderContent={(tab)=><>
+ return <ProjectWorkspaceShell project={shellProject} tabs={TABS.map(([id,label])=>({id,label}))} tabGroups={TAB_GROUPS} className="p553-dashboard" activeTab={workspaceTab} onTabChange={setWorkspaceTab} renderContent={(tab)=><>
 
    {tab==="schematic"&&<ScadaSchematic0553 onOpenLocationBom={openLocationBom}/>}
    {tab==="overview"&&<ExecutiveView model={EXECUTIVE_0553}/>}
