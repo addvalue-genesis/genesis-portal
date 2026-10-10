@@ -1,0 +1,102 @@
+{
+  "projectId": "PJ2608-0553",
+  "asOf": "2026-10-10",
+  "branch": "feat/pj2608-0553-tpp-bid-handoff",
+  "codeBaselineVerified": "73ffda7579e806d73e92ed1e21ecf8e703253912",
+  "checkpointUpdateCommit": "5aa426762a932a86d0ec66f0fa7d69f6ef708122",
+  "headCheck": "git rev-parse HEAD after pull",
+  "build": {
+    "userVerified": true,
+    "testsPass": 14,
+    "webpackWarnings": 3,
+    "engineeringValidatedForCustomer": false
+  },
+  "data": {
+    "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
+    "mariadb": "NOT_CONNECTED",
+    "agerp": "NOT_CONNECTED",
+    "sources": [
+      "frontend/src/project0553/data/snapshots/pj2608-0553.working.json",
+      "frontend/src/project0553/data/snapshots/mto.rev04.summary.json",
+      "frontend/src/project0553/data/quotes/NG-260916-ADV-DAP1.full.json"
+    ]
+  },
+  "commercial": {
+    "customerBaselineRevision": "Rev08",
+    "baseAandBUSD": 1684901.16,
+    "optionalCUSD": 151465.27,
+    "customerWorkbookSheets": [
+      "Scope of supply",
+      "B10 CommSpares",
+      "B11 SpecialTool",
+      "B13 Consumerables",
+      "C1 CapitalSpares",
+      "C2 2Y-Spares"
+    ],
+    "sixSheetExportReady": false,
+    "jutalReleased": false,
+    "samtelHistoricalIssueNeedsRevisionVerification": true,
+    "ngQuote": {
+      "lines": 53,
+      "totalUSD": 191610.15,
+      "expiry": "2026-10-01"
+    },
+    "ciscoQuote": {
+      "currency": "THB",
+      "totalBeforeVAT": 2117650,
+      "ingestion": "PARTIAL"
+    },
+    "fx": "REQUIRES_RATE_DATE_SOURCE"
+  },
+  "engineering": {
+    "requiredMTO": "SUMMARY_ONLY",
+    "requiredVsOffered": "GENERIC_ENGINE_PARTIAL",
+    "mr0001": "REQUIRED_QUANTITIES_OPEN",
+    "mr0002": "LNA_PRELIMINARY_ONLY",
+    "mr0003": "REVIEW_OPEN",
+    "mr0004": "REVIEW_OPEN"
+  },
+  "sourceConflicts": [
+    "Original ITB 08-Sep deadline vs later reported 14-Oct deadline, amendment not authenticated",
+    "Rev08 historical vs actual SAMTEL sent file may differ",
+    "Next G and Cisco expired quotes; 2024 quotes other project only"
+  ],
+  "tasks": [
+    {
+      "priority": 0,
+      "id": "P0-ITB",
+      "action": "Verify current JUTAL amendment and submission requirements"
+    },
+    {
+      "priority": 0,
+      "id": "P0-MTO",
+      "action": "Extract complete 0553 MTO Rev04 line quantities and MR1 engineering link/site mapping"
+    },
+    {
+      "priority": 0,
+      "id": "P0-QUOTES",
+      "action": "Reconcile all NG 53 quotation lines with required BOM and complete Cisco quote"
+    },
+    {
+      "priority": 1,
+      "id": "P1-MR2-4",
+      "action": "Complete vendor data, constraints and BOM on remaining MRs"
+    },
+    {
+      "priority": 1,
+      "id": "P1-COST",
+      "action": "Derive evidence-backed cost, FX and selling prices"
+    },
+    {
+      "priority": 1,
+      "id": "P1-EXPORT",
+      "action": "Validate and produce six-sheet customer workbook without releasing"
+    }
+  ],
+  "guardrails": [
+    "0550 branch untouched",
+    "OPEN is not zero",
+    "no invented cost/reconciliation",
+    "no release/merge/deploy without approval"
+  ]
+}
