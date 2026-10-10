@@ -19,7 +19,8 @@
     "requiredBomGuard": "ADDED_PENDING_USER_BUILD",
     "aviatReviewValidation": "HOTFIX_PENDING_USER_BUILD",
     "aviatReviewLastFailure": "UNCLASSIFIED_NG_D-1_TEST_INCOMPLETE_MAPPING",
-    "packageCompositionValidation": "PENDING_USER_LOCAL_BUILD"
+    "packageCompositionValidation": "PENDING_USER_LOCAL_BUILD",
+    "topologyValidation": "PENDING_LOCAL_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -99,6 +100,14 @@
       "servicesMH": "OPEN",
       "costAndSell": "HOLD",
       "staticValidator": "ADDED_PENDING_LOCAL_BUILD"
+    },
+    "mr0001Topology": {
+      "links": 5,
+      "logicalEndpoints": 10,
+      "sites": 7,
+      "radioQuantities": "OPEN",
+      "model": "frontend/src/project0553/data/mr0001TopologyQuantityAudit.js",
+      "state": "GRAPH_REFERENCE_NOT_EQUIPMENT_APPROVAL"
     }
   },
   "sourceConflicts": [
