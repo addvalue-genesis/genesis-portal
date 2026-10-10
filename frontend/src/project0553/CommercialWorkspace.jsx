@@ -1,4 +1,5 @@
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
+import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import React,{useState} from "react";
@@ -40,6 +41,7 @@ export function CommercialWorkspace0553(){
  <section className="p55-panel">
   <div className="p55-eyebrow">0553 / REUSE 0550 COMMERCIAL STATE DOCTRINE</div>
   <h2>Engineering → BOM/MTO → Cost → Customer Scope of Supply</h2>
+  <p className="p55-note"><strong>Shared Cost Spine:</strong> Known preliminary equipment THB {BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US")} · {BID_COST_SPINE_0553.pricedRows} priced MTO items / {BID_COST_SPINE_0553.unpricedRows} unpriced · full A+B+C and customer sell not complete. Source: {BID_COST_SPINE_0553.source}</p>
   <p className="p55-note">This is a controlled WORKSPACE, not a price release. The previously issued SAMTEL file is historical evidence; its exact issued revision must be verified before snapshot registration. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
     <div className="p55-segmented p55-segmented--commercial">
