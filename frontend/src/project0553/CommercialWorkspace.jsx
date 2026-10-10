@@ -82,7 +82,6 @@ export function CommercialWorkspace0553(){
     </td></tr>}</React.Fragment>)}</tbody>
   </table></div>
   <p><strong>Workbook source:</strong> {template.sourceName} · {template.revision} · 6 sheets. <strong>Export status:</strong> HOLD — original template fidelity and cross-sheet reconciliation not yet validated.</p>
- </section>
  </>}
  {mode==="budgetary"&&<section className="p55-panel">
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · SNAPSHOT REGISTRY</div>
