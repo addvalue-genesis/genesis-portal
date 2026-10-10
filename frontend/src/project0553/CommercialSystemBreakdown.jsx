@@ -1,4 +1,5 @@
 import { SCADA_0553_RECONCILIATION } from "./data/scadaOfferReconciliation";
+import { MR0001_ENGINEERING_REQUIRED_BOM, summarizeMR0001RequiredBom } from "./data/mr0001RequiredBomDerivation";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { getProject0553Dataset, getProject0553SupplierQuotes } from "./data/repository";
 import React,{useState} from "react";
@@ -46,6 +47,30 @@ export function CommercialSystemBreakdown0553({displayCurrency="USD",fx=null}){
      <thead><tr><th>No.</th><th>Equipment family</th><th>Platform scope</th><th>Installed qty</th><th>Unit cost</th><th>State</th></tr></thead>
      <tbody>{s.equipmentFamilies.map((family,j)=><tr key={j}><td>{j+1}</td><td>{family}</td><td>{s.facilities.join(", ")}</td><td>UNVERIFIED</td><td>OPEN</td><td><span className="p55-badge">MTO FAMILY ONLY</span></td></tr>)}</tbody>
     </table></div>
+    {s.mr==="MR-0001"&&<section className="p55-panel">
+     <div className="p55-eyebrow">MR0001 · REQUIREMENT → PHYSICS/CONSTRAINT → REQUIRED BOM → SERVICES</div>
+     <h4>Engineering-required scope from original MTO Rev04 (not vendor BOM)</h4>
+     <p className="p55-note">ต้นทางคือ MTO จริง 42 แถว ครอบคลุมทั้ง Greenfield/Brownfield 7 Sites และอ้างอิง 5 Links จาก RPT Rev.C1. จำนวน Set/Lot จาก MR ไม่ใช่จำนวนชิ้นตาม SKU; ข้อมูลการรับรองวิศวกรรม, Cable/Bulk, Licence, Service MH และราคายัง OPEN</p>
+     <div className="p55-source-facts">
+      <div><span>Source item rows</span><strong>{summarizeMR0001RequiredBom().rowCount}</strong></div>
+      <div><span>Locations</span><strong>{summarizeMR0001RequiredBom().siteCount}</strong></div>
+      <div><span>Multi-code source rows</span><strong>{summarizeMR0001RequiredBom().groupedRowCount} · SPLIT OPEN</strong></div>
+      <div><span>Accepted SKU/Cost/Sell</span><strong>OPEN / HOLD</strong></div>
+     </div>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget">
+      <thead><tr><th>Source row</th><th>Platform / link</th><th>MR item / requirement</th><th>MR Qty</th><th>Required SKU Qty</th><th>Engineering proof / missing driver</th><th>Services / Cost / Sell</th></tr></thead>
+      <tbody>{MR0001_ENGINEERING_REQUIRED_BOM.rows.map(r=><tr key={r.id}>
+       <td>{r.sourceRowIndex}<small><a href={r.sourceUrl} target="_blank" rel="noreferrer">MTO Rev04</a></small></td>
+       <td><strong>{r.platform}</strong><small>{r.relatedLinks.join(" · ")||"SITE / NO LINK MAPPED"}</small></td>
+       <td><strong>{r.sourcePartText}</strong><small>{r.sourceDescription}</small></td>
+       <td>{r.sourceQuantityText}</td>
+       <td><strong>OPEN</strong><small>{r.groupedRow?"MULTI-CODE SPLIT REQUIRED":"SET ≠ OEM SKU QTY"}</small></td>
+       <td><strong>{r.status}</strong><small>{r.missing.join(" · ")}</small></td>
+       <td>MH OPEN / COST OPEN / SELL HOLD</td>
+      </tr>)}</tbody>
+     </table></div>
+     <p className="p55-note">RPT topology is a preliminary reference, not acceptance of antenna selection, radio compatibility, availability or Myanmar licence. NG/Cisco offers remain comparison evidence only. This table intentionally cannot produce customer pricing until required quantities, proof, WBS drivers and source-based rates are verified.</p>
+    </section>}
     {s.mr==="MR-0001"&&<><div className="p55-eyebrow" style={{marginTop:14,marginBottom:8}}>FIRST PRINCIPLES → REQUIRED vs OFFERED → COST GATE</div>
      <div className="p55-table-wrap"><table className="p55-table p55-table--budget p55-table--compact">
       <thead><tr><th>Equipment family</th><th>Required Qty</th><th>NG quoted lines</th><th>Engineering decision</th><th>Cost readiness</th><th>Source</th></tr></thead>
