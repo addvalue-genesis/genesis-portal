@@ -207,3 +207,9 @@ This audit is additive and controls where it is more specific than earlier histo
 - User's `npm run build` on branch HEAD `4e731c3` ran all 14 validation scripts PASS but webpack **FAILED** on `CommercialWorkspace.jsx` line 85: unmatched JSX Fragment `<>` / section closing tag. This overrides any older claims of successful build for that commit.
 - Hotfix commit `57db7b0e910d568a157bd1dce1f1cedbb31ea745` removes the premature `</section>` before `</>}` and closes the outer workspace section after the release checklist; no changes to prices, data, commercial states, or protected 0550 branch.
 - Build for this hotfix is **PENDING LOCAL VERIFICATION**, not yet PASS. User has unrelated unstaged modification `frontend/package-lock.json`; do not discard it without inspection/approval.
+
+
+## 2026-10-10 Commercial JSX correction (second hotfix)
+- User's build log confirms the `CommercialWorkspace.jsx` line 85 parse failure persisted following first hotfix. GitHub readback proved the premature `</section>` was still present immediately before `</>}`. First hotfix `57db7b0` was insufficient.
+- Corrected exact line by removing the stray closing `</section>` after the Workbook source paragraph, leaving `</>}` to close the Working fragment and the two legitimate closing sections at the end. Fix commit `87c92e1568ecc6fbbf4879d2400d7b0798516dd1`; GitHub readback verified the exact adjacent lines.
+- Full webpack build after the second hotfix is **PENDING USER LOCAL RUN**. Do not assert PASS until tested. No protected 0550 changes, no commercial release or price changes.
