@@ -6,7 +6,7 @@ import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaselin
 import React,{useState} from "react";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
 import { BID_0553_GATES, BID_0553_SOURCES } from "./bidReview";
-export function CommercialWorkspace0553(){
+export function CommercialWorkspace0553({focusedLocation=null}){
  const [mode,setMode]=useState("working");
  const [recipient,setRecipient]=useState("INTERNAL");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
@@ -66,7 +66,7 @@ export function CommercialWorkspace0553(){
    <div className="p55-eyebrow">GOVERNING METHOD · WORKING PREVIEW IS THE ENGINEERING WORKBENCH</div>
    <p className="p55-note"><strong>INPUT:</strong> RFQ/MR/MTO/BLD/DTS/RPT/Standards · <strong>DERIVE:</strong> Link/Capacity/Interface Constraints → Physical BOM and quantity → Vendor technical evaluation → WBS Services → Equipment/Service Cost and risk · <strong>OUTPUT:</strong> reviewed engineering working cost. Current MTO sets and quoted vendor quantities are input evidence, NOT verified physical SKU quantities.</p>
   </section>
-  <SimpleBom0553/>
+  <SimpleBom0553 focusedLocation={focusedLocation}/>
   <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
   <section className="p55-panel">
    <div className="p55-eyebrow">REV08 EXISTING COMMERCIAL BASELINE · PRICES FROM CUSTOMER WORKBOOK</div>
