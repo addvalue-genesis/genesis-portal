@@ -24,7 +24,8 @@
     "radioRoleMatrix": "PENDING_LOCAL_BUILD",
     "scopeOwnershipValidation": "PENDING_USER_LOCAL_BUILD",
     "offerAllocationValidation": "PENDING_USER_LOCAL_BUILD",
-    "gapAssessment": "PENDING_USER_LOCAL_BUILD"
+    "gapAssessment": "PENDING_USER_LOCAL_BUILD",
+    "requirementEvidence": "PENDING_USER_BUILD"
   },
   "data": {
     "active": "CONTROLLED_JSON_PLUS_JS_SNAPSHOT",
@@ -148,6 +149,13 @@
       "allocatedOfferedQty": null,
       "exposure": null,
       "source": "MR0001 MTO Rev04 / Next G 53-line quote",
+      "releaseAllowed": false
+    },
+    "mr0001RequirementEvidence": {
+      "sourceEvidence": 5,
+      "status": "SOURCE_LOCATORS_MAPPED_FUNCTIONAL_PROOF_OPEN",
+      "acceptedQty": null,
+      "acceptedCost": null,
       "releaseAllowed": false
     }
   },
