@@ -340,3 +340,10 @@ This audit is additive and controls where it is more specific than earlier histo
 - Quantitative pilot: `LAN-502-001` at ZWP20/21/22/23 and `LAN-502-002` at ZWP8 = five *MTO Set scope candidates*. Cisco VST A-0048/2026_Re1 contains 11 coded quote lines at Qty 5; per-set quote configuration priced THB 423,530 and five-set indicative budget THB 2,117,650 ex VAT, preserving all zero-price source tracking/licence parents. This is a WORKING package scenario, not confirmed device/port capacity, licence compliance or accepted supplier cost.
 - No unsupported RF ODU/IDU SKU split, antenna diversity quantity, CAT6A route or RF gland quantity fabricated. Those remain itemized source requirements and engineering blockers, NOT zero-cost entries. Customer sell/release HOLD.
 - `validate:0553-working-priced-bom` guards five actual LAN source rows and quote totals; local build/runtime pending. The legacy evidence tables remain for traceability but this deliverable appears before them. Protected 0550 untouched.
+
+
+## 2026-10-10 Simple BOM default UX (user-requested simplification)
+- Added `frontend/src/project0553/SimpleBom0553.jsx` for one table per site/MTO tag with Qty/Unit, unit source cost, preliminary extended cost and brief status. Site filter, priced-only subtotal THB and optional Cisco SKU drilldown. Original MTO source grouped splits and physical SKU acceptance remain as before.
+- Made Simple BOM the first/default component in `CommercialSystemBreakdown.jsx`. All legacy engineering/quote/audit submodules are now in a collapsed `<details>` advanced section, not deleted. This stops the user having to navigate many repeated OPEN/HOLD tables just to see BOM.
+- Only Cisco working bundle at five LAN MTO sets is currently numerically priced THB 2,117,650 before VAT; other requirements are UNPRICED, not zero. Never present the subtotal as total MR0001 cost. This is a preliminary quotation scenario only, not signed-off system design.
+- Added `validate:0553-simple-bom` static guard. User-local build and UI runtime verification pending. Protected PJ2608-0550 unchanged.
