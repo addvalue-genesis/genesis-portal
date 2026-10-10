@@ -25,7 +25,19 @@ import { getProject0553Dataset } from "../project0553/data/repository";
 import "../project0550/project0550.css"; // Reuse existing 0550 presentation primitives, never project facts.
 import "../project0553/project0553.css";
 
-const TABS = [...STANDARD_PROJECT_TABS.map(([id,label]) => [id, id === "systems" ? "4 MR Systems" : label]), ["schematic","Schematic"]];
+// IDs are stable application route keys. Display order follows the project
+// engineering workflow; Budget is the final workbench after all upstream views.
+const TABS = [
+ ["overview","01 Executive"],
+ ["architecture","02 Architecture"],
+ ["systems","03 4 MR Systems"],
+ ["engineering","04 First Principles"],
+ ["execution","05 Execution"],
+ ["risk","06 Risk & Controls"],
+ ["documents","07 Evidence"],
+ ["schematic","08 Schematic"],
+ ["budget","09 Budget"]
+];
 const Badge = AuditBadge;
 const Metric = AuditMetric;
 const Table = AuditTable;
