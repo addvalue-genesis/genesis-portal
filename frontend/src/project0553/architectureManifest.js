@@ -1,4 +1,5 @@
 import { MODULE_REGISTRY_0553, EVOLUTION_POLICY_0553 } from "./moduleRegistry";
+import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 import { KNOWLEDGE_KERNEL_DOMAINS } from "../knowledge-kernels/library";
 import { PROJECT_0553_FACTS } from "./projectFacts";
 import { BID_0553_SOURCES, BID_0553_GATES } from "./bidReview";
@@ -28,6 +29,7 @@ export const ARCHITECTURE_MANIFEST_0553 = {
  title:"PJ2608-0553 Smart Code / TPP Architecture Manifest",
  background:"PJ2608-0553 is a telecom-system-integrator bid workspace built to connect JUTAL requirement evidence, multidisciplinary engineering proof, MTO, execution, commercial vendor truth, cost, risk and controlled bid release.",
  governingMethod:ARCHITECTURE_0553.method,
+ activeCostSpine:{id:BID_COST_SPINE_0553.id,source:BID_COST_SPINE_0553.source,output:BID_COST_SPINE_0553.outputTemplate,releaseAllowed:false},
  architecture:"COMMON Knowledge → GENERIC DOMAIN → PARTICULAR PROJECT → Evidence/Requirement → Engineering Proof → Quantity/MTO → Execution → Cost/Risk → Budgetary/Release",
  smartCodePrinciples:[
  "Self-describing: every module states what it is and why it exists.",
