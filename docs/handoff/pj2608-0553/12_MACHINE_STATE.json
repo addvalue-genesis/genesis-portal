@@ -49,9 +49,9 @@
     "fx": "REQUIRES_RATE_DATE_SOURCE"
   },
   "engineering": {
-    "requiredMTO": "SUMMARY_ONLY",
+    "requiredMTO": "SOURCE_HAS_LINE_ROWS_CODE_SNAPSHOT_SUMMARY_ONLY",
     "requiredVsOffered": "GENERIC_ENGINE_PARTIAL",
-    "mr0001": "REQUIRED_QUANTITIES_OPEN",
+    "mr0001": "REQUIRED_QUANTITIES_OPEN_PENDING_REV04_LINE_INGESTION",
     "mr0002": "LNA_PRELIMINARY_ONLY",
     "mr0003": "REVIEW_OPEN",
     "mr0004": "REVIEW_OPEN"
@@ -59,7 +59,9 @@
   "sourceConflicts": [
     "Original ITB 08-Sep deadline vs later reported 14-Oct deadline, amendment not authenticated",
     "Rev08 historical vs actual SAMTEL sent file may differ",
-    "Next G and Cisco expired quotes; 2024 quotes other project only"
+    "Next G and Cisco expired quotes; 2024 quotes other project only",
+    "Original ITB directly reverified at 08-Sep-2026; reported 14-Oct instruction still requires original amendment/email authentication",
+    "MTO Rev04 source contains item rows not yet represented in controlled Required BOM JSON"
   ],
   "tasks": [
     {
@@ -98,5 +100,24 @@
     "OPEN is not zero",
     "no invented cost/reconciliation",
     "no release/merge/deploy without approval"
-  ]
+  ],
+  "resumeAudit": {
+    "verifiedAt": "2026-10-10",
+    "github": {
+      "comparedFromCheckpoint": "5aa426762a932a86d0ec66f0fa7d69f6ef708122",
+      "aheadBeforeDocUpdate": 1,
+      "behindBeforeDocUpdate": 0,
+      "note": "Exact local HEAD must be recorded with git rev-parse HEAD after pull; connector compare verified branch state but local worktree was not executed here."
+    },
+    "drive": {
+      "originalItbReverified": true,
+      "originalItbDueDate": "2026-09-08 17:00",
+      "originalItbSubmission": "TECHNICAL_PLUS_UNPRICED_FIRST_PRICED_HOLD",
+      "laterReportedClosing": "2026-10-14 17:00 Beijing",
+      "laterAmendmentAuthenticated": false,
+      "mtoRev04Reverified": true,
+      "mtoRev04ContainsLineLevelRowsBeyondCodeSummary": true
+    },
+    "controlDecision": "INGEST_EXISTING_MTO_ROWS_BEFORE_REQUIRED_BOM_QUANTITY_OR_COST_ACCEPTANCE"
+  }
 }
