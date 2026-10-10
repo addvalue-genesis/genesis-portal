@@ -41,7 +41,7 @@ export function SimpleBom0553(){
   </div>
   {groups.filter(g=>g.items.length).map(g=><section key={g.site} className="p55-panel">
    <button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={expanded["site:"+g.site]!==false}>{expanded["site:"+g.site]===false?"+":"−"}</button>
-   <strong> {g.site} </strong><span> · {g.items.length} requirement items · {g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length} source-priced scenarios</span>
+   <strong> {g.site} </strong><span> · {g.items.length} MTO items · {g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length} source-priced scenarios</span><small> · RPT functional link endpoints: {g.rfDemand?.linkEndpointDemand??"NO RPT LINK"} · Antenna references: {g.rfDemand?.antennaReferenceDemand??"NO RPT LINK"} (NOT purchase qty)</small>
    {expanded["site:"+g.site]!==false&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget">
     <thead><tr><th>+</th><th>MTO Item / Equipment</th><th>MR/MTO Qty (input)</th><th>Vendor / SKU Candidate</th><th>Unit price / source currency</th><th>Extended cost</th><th>First Principles / Qty proof</th></tr></thead>
     <tbody>{g.items.map(x=><React.Fragment key={x.id}>
