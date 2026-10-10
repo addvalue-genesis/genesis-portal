@@ -260,3 +260,10 @@ This audit is additive and controls where it is more specific than earlier histo
 - Site view traces RPT role/link/peer/antenna reference to associated MR MTO rows and displays the relevant Next G radio/antenna offered quantity at quote-wide level, without any site or package allocation. No inference that an offered quantity is a required quantity.
 - `CommercialSystemBreakdown.jsx` shows the new physical-radio role grid before package composition. Added `validate:0553-radio-roles` static fail-closed guard to build chain.
 - Need to verify directional roles, especially PTMP base sharing and PTP peers, against original block diagram and OEM equipment design; confirm antenna size, RF margins, power/Ex and licence, then approve physical installed/purchase quantities. No commercial release. Local npm build for this commit pending.
+
+
+## 2026-10-10 MR0001 BLD/MR scope ownership review
+- Re-read actual project BLD-0001 Rev.C1 and MR-0001 Rev.C1 from Drive. BLD text references existing ZWP8–ZPQ link reused to communicate with ZWP20/ZWP22 and new IDU/surge protection in Ex 'e' enclosure; MR review comments clarify commissioning spares and special tools must be supplied, not merely listed.
+- Added `data/mr0001ScopeOwnershipAudit.js` with 5 source-linked gates for existing reuse, new supply, owner/others, Ex enclosure, spares and vendor documentation. Original drawing symbols and site-specific equipment composition still require graphical/native engineering review; extracted PDF text alone cannot certify physical quantities.
+- Added panel to `CommercialSystemBreakdown.jsx` before Package Composition and `validate:0553-scope-ownership` static build guard.
+- New supply, reused equipment, interface MH, OEM accepted BOM and cost remain OPEN/HOLD. No quote or customer release and no 0550 branch modifications. Local production build PENDING.
