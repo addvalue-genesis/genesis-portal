@@ -1,4 +1,5 @@
 import { CommercialWorkspace0553 } from "../project0553/CommercialWorkspace";
+import { DocumentReferenceControl0553 } from "../project0553/DocumentReferenceControl0553";
 import React, { useMemo, useState } from "react";
 import { ProjectWorkspaceShell } from "../common/ui/ProjectWorkspaceShell";
 import { ArchitectureView as SharedArchitectureView } from "../common/ui/ArchitectureView";
@@ -74,7 +75,7 @@ export function PJ26080553() {
    {tab==="registry"&&<DataCodeRegistry0553/>}
    {tab==="overview"&&<ExecutiveView model={EXECUTIVE_0553}/>}
    {tab==="architecture"&&<SharedArchitectureView manifest={ARCHITECTURE_MANIFEST_0553} modules={MODULE_REGISTRY_0553}/>}
-   {tab==="systems"&&<SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Same group/focus/search/expand behavior as PJ2608-0550; all facts come from 0553 controlled MTO and RFQ."/>}
+   {tab==="systems"&&<><SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Four 0553 MR systems; project-specific engineering and cost evidence."/><DocumentReferenceControl0553/></>}
    {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/><MR0002LNACalculation/><MR0002PhysicalBom/></SharedEngineeringView>}
    {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
    {tab==="budget"&&<CommercialWorkspace0553 focusedLocation={focusedBomLocation}/>}
