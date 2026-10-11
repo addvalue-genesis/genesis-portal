@@ -33,7 +33,7 @@ export const COST_INTEGRITY_0553 = Object.freeze((()=>{
  const physicalAccepted=MR0001_ENGINEERING_REQUIRED_BOM.rows.filter(r=>Number.isFinite(r.requiredSkuQty)&&r.selectedVendorSku);
  const reported=BID_COST_SPINE_0553.knownPreliminaryCost.THB;
  const v=rows.find(q=>q.id==="VST-0048-RE1");
- const ciscoQuoteAmount=v?.quotedTotal??null;
+ const ciscoQuoteAmount=v?.amount??null;
  const ciscoVarianceTHB=Number.isFinite(ciscoQuoteAmount)&&Number.isFinite(reported)?reported-ciscoQuoteAmount:null;
  const reconciliationPassed=ciscoVarianceTHB===0;
  const integrityIssues=[...quoteDataIssues.map(id=>"Missing quote amount/currency: "+id),...missingCostSourceIds.map(id=>"Missing cost source: "+id),...(!reconciliationPassed?["Cisco source subtotal differs from working BOM cost; investigate quote-line allocation and scope before use"]:[])];
