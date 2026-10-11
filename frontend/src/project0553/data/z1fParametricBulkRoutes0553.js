@@ -4,6 +4,19 @@ import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 // diagonal shortest path; actual cable-tray obstacles and penetrations may exceed it.
 // Source WP bay dimension 9144 mm, ZWP20 mezzanine 21.1/21.3m,
 // lower 18.3m, upper 24.5m. Horizontal paths are not surveyed.
+export const DTRS_HISTORICAL_FEEDER_EVIDENCE_0553=Object.freeze({
+ source:"BOQ_AWP36 Radio Project Rv.2_31-1-2025.pdf",project:"AWP36, not Z1F",
+ use:"HISTORICAL_BUDGETARY_CANDIDATE_ONLY",
+ radio:{sku:"XiR M8668i",system:"DMR Tier III",bandMHz:[350,400],sourcePackage:"One AWP36 DMR fixed station reference"},
+ feeder:{sku:"LDF4RK-50A",brand:"CommScope",nominalSize:"1/2-inch coaxial",lengthM:50,
+  connectorIncluded:true,quotedAssemblyCostTHB:50000,ratePerMComparableTHB:1000,
+  rateWarning:"Quoted 50m connectorized assembly; implied 1000 THB/m cannot be extrapolated as approved raw-cable unit rate"},
+ protector:{sku:"APG-BNFNF-350",quotedCostTHB:20000,
+  scope:"RF Lightning Arrester and Grounding Kit, separate from feeder assembly"},
+ qualification:["Not confirmed for Z1F DTRS","Selected radio frequency and antenna RF port/connector match",
+ "Calculate feeder attenuation and link loss at selected frequency","Power/VSWR, Ex, earthing and offshore cable fire requirements",
+ "Separate VHF Marine and DMR radio quotes; no 50m multiplied from quotation without physical run count"]
+});
 export const Z1F_BULK_ROUTE_PARAMETERS_0553=Object.freeze({
  baySpanM:9.144,horizontalSiteAllowanceM:15,
  lowerElevationM:18.3,mezzanineElevationM:21.2,upperElevationM:24.5,
@@ -51,7 +64,7 @@ export function deriveZ1FTelBulkRoutes0553(params=Z1F_BULK_ROUTE_PARAMETERS_0553
   const budgetBaselineM=Math.max(geometricProxyM,r.managementMinimumM);
   const scenarios=Object.fromEntries(Object.entries(params.scenarioFactors).map(([name,factor])=>[name,round(budgetBaselineM*factor)]));
   const canCostCable=r.cableKind==="CAT6A_DATA";
-  const rfSpecificationGate=r.system==="DTRS_TRUNK_RADIO"?{status:"DTS_REQUIRED_BEFORE_FEEDER_SELECTION",required:["Selected Motorola radio/repeater model and TX/RX frequency band","Antenna RF connectors and count of feed lines","DTS maximum feeder insertion loss / receiver sensitivity / transmit path loss budget","Connector types, lightning protector, rated power, Ex requirements","Feeder family 1/2in, 7/8in or other chosen by loss calculation, NOT assumption"],calculation:"L_loss_dB = (cable_attenuation_dB_per_100m_at_frequency)*(run_length_m/100) + connector_loss + lightning_protector_loss; compare with DTS link budget."}:null;
+  const rfSpecificationGate=r.system==="DTRS_TRUNK_RADIO"?{status:"DTS_REQUIRED_BEFORE_FEEDER_SELECTION",historicalCandidate:DTRS_HISTORICAL_FEEDER_EVIDENCE_0553,required:["Selected Motorola radio/repeater model and TX/RX frequency band","Antenna RF connectors and count of feed lines","DTS maximum feeder insertion loss / receiver sensitivity / transmit path loss budget","Connector types, lightning protector, rated power, Ex requirements","Feeder family 1/2in, 7/8in or other chosen by loss calculation, NOT assumption"],calculation:"L_loss_dB = (cable_attenuation_dB_per_100m_at_frequency)*(run_length_m/100) + connector_loss + lightning_protector_loss; compare with DTS link budget."}:null;
   return {...r,geometricProxyM:round(geometricProxyM),budgetBaselineM,scenarios,rfSpecificationGate,
    rateTHBPerM:canCostCable?params.quoteRateTHBPerM:null,
    materialBaseTHB:canCostCable?round(scenarios.base*params.quoteRateTHBPerM):null,
