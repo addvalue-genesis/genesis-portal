@@ -6,7 +6,7 @@ import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 // lower 18.3m, upper 24.5m. Horizontal paths are not surveyed.
 export const DTRS_SELECTED_LNA_EVIDENCE_0553=Object.freeze({
  supplier:"MOT",manufacturer:"RF Industries (RFI)",model:"RX3852-2002-11",
- function:"DTRS_LOW_NOISE_AMPLIFIER",allocation:"TCAB-508-001 RF LNA enclosure",
+ function:"DTRS_LOW_NOISE_AMPLIFIER",allocation:"TCAB-508-002 RF LNA enclosure",
  source:"RFI Low Noise Amplifier, RX3852-2002-11.pdf",
  sourceUrl:"https://drive.google.com/file/d/1dAnYkC2r2hyYEgUuN-xA0xAvq-zG2iTA/view",
  frequencyMHz:[380,520],impedanceOhms:50,connector:"SMA female",
@@ -67,7 +67,7 @@ export function deriveZ1FTelBulkRoutes0553(params=Z1F_BULK_ROUTE_PARAMETERS_0553
   if(scada)routeRows.push(determineRoute(wp.wp,"SCADA_RADIO",scada.tag,scada.deck,"INDOOR_POE_TC_ROOM","CAT6A_DATA"));
   const racon=select("MARINE_RACON","TCAB-514-001");
   if(racon)routeRows.push(determineRoute(wp.wp,"MARINE_RACON",racon.tag,racon.deck,"TC_ROOM_INTERFACE","RACON_POWER_CONTROL_UNSPECIFIED"));
-  const trunk=select("DTRS_TRUNK_RADIO","TCAB-508-001");
+  const trunk=select("DTRS_TRUNK_RADIO","TCAB-508-002");
   if(trunk)routeRows.push(determineRoute(wp.wp,"DTRS_TRUNK_RADIO",trunk.tag,trunk.deck,"TC_ROOM_RADIO_INTERFACE","RF_FEEDER_UNSPECIFIED"));
   // EX IP Phone: no invented route until distinct tag and terminal can be located.
  }
