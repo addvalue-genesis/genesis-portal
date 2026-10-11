@@ -29,4 +29,7 @@ assert(ui.includes('money(engineeringCost.budgetaryItemTotalUSD,"USD")'),"Main B
 assert(model.includes('budgetaryState=budgetaryCoverage?"CALCULATED_WITH_ASSUMPTIONS"'),"Budgetary state must be separate from final approval");
 assert(model.includes("budgetarySelectedOffer"),"Budgetary SKU decision must exist");
 assert(ui.includes("Final Approved Cost:"),"Final state must be separate");
+assert(ui.includes("<strong>Budgetary Calculation:</strong>"),"Budgetary calculation must be primary status");
+assert(ui.includes("PENDING FINAL VERIFICATION"),"Final approval belongs to secondary state");
+assert(!ui.includes('c.unitPrice===null?"NOT APPROVED"'),"Do not obscure budgetary rate behind final approval");
 console.log("PASS 0553 Engineering controls required function quantity before vendor rate extension; one-each vendor basket is non-authoritative.");
