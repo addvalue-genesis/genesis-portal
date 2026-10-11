@@ -20,8 +20,8 @@ export const Z1F_TEL_LAYOUT_INDEX_0553=Object.freeze({
     {tag:"ANT-502-001",system:"SCADA_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"SCADA parabolic antenna"},
     {tag:"ANT-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"Outdoor Yagi antenna"},
     {tag:"ANT-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"Outdoor omni antenna"},
-    {tag:"TCAB-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"RF LNA enclosure"},
-    {tag:"TCAB-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"RF surge Ex d enclosure"},
+    {tag:"TCAB-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"RF surge Ex d enclosure"},
+    {tag:"TCAB-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"RF low noise amplifier enclosure"},
     {tag:"LSE-504-001",system:"EX_SOUNDER_NOT_IP_PHONE",deck:"LOWER",sheet:5,description:"Outdoor Ex sounder"}
    ],
    indoor:{place:"E&I Room on Lower Deck",sheet:5,reference:"MM-ZTK-1F-ZWPX-ELE-LAY-0002",roomEquipmentLocations:"REFERENCED_ELSEWHERE"},
