@@ -19,6 +19,7 @@ const determineRoute=(wp,system,tag,deck,end,kind)=>({
  id:`${wp}:${system}:${tag}->${end}`,
  wp,system,from:tag,to:end,sourceDeck:deck,destinationDeck:"TC_ROOM",
  cableKind:kind,
+ cableSpecificationSource:kind==="RF_FEEDER_UNSPECIFIED"?"SELECTED_TRUNK_RADIO_DTS_REQUIRED":null,
  evidence:"LAY_TAG_POSITION_AND_DECK; CABLE_TRAY_PATH_NOT_SHOWN",
  quantityOwnership:"ONE_DISTINCT_PHYSICAL_CABLE; VERIFY_WIRING_AND_PACKAGE_INCLUDED",
  horizontalAllowanceM:15,verticalReferenceM:round(distance(deck,"TC_ROOM")),
@@ -50,10 +51,11 @@ export function deriveZ1FTelBulkRoutes0553(params=Z1F_BULK_ROUTE_PARAMETERS_0553
   const budgetBaselineM=Math.max(geometricProxyM,r.managementMinimumM);
   const scenarios=Object.fromEntries(Object.entries(params.scenarioFactors).map(([name,factor])=>[name,round(budgetBaselineM*factor)]));
   const canCostCable=r.cableKind==="CAT6A_DATA";
-  return {...r,geometricProxyM:round(geometricProxyM),budgetBaselineM,scenarios,
+  const rfSpecificationGate=r.system==="DTRS_TRUNK_RADIO"?{status:"DTS_REQUIRED_BEFORE_FEEDER_SELECTION",required:["Selected Motorola radio/repeater model and TX/RX frequency band","Antenna RF connectors and count of feed lines","DTS maximum feeder insertion loss / receiver sensitivity / transmit path loss budget","Connector types, lightning protector, rated power, Ex requirements","Feeder family 1/2in, 7/8in or other chosen by loss calculation, NOT assumption"],calculation:"L_loss_dB = (cable_attenuation_dB_per_100m_at_frequency)*(run_length_m/100) + connector_loss + lightning_protector_loss; compare with DTS link budget."}:null;
+  return {...r,geometricProxyM:round(geometricProxyM),budgetBaselineM,scenarios,rfSpecificationGate,
    rateTHBPerM:canCostCable?params.quoteRateTHBPerM:null,
    materialBaseTHB:canCostCable?round(scenarios.base*params.quoteRateTHBPerM):null,
-   rateState:canCostCable?"PROVISIONAL_INNOVA_CABLE_RATE":"CABLE_TYPE_RATE_NOT_SELECTED",
+   rateState:canCostCable?"PROVISIONAL_INNOVA_CABLE_RATE":r.system==="DTRS_TRUNK_RADIO"?"WAIT_SELECTED_OEM_DTS_RF_FEEDER_QUALIFICATION":"CABLE_TYPE_RATE_NOT_SELECTED",
    installationBasis:"PARAMETRIC_BUDGET_ONLY_NOT_MEASURED"};
  });
  const byWP=Z1F_TEL_LAYOUT_INDEX_0553.byWP.map(w=>{
