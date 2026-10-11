@@ -6,6 +6,15 @@ import {AVIAT_0553_TECHNICAL_EVALUATION} from "./aviatTechnicalBidEvaluation";
 const quotes=new Map(AVIAT_0553_TECHNICAL_EVALUATION.rows.map(q=>[q.quoteLine,q]));
 const validQty=q=>Number.isFinite(q)&&q>=0;
 const ZWP20_RADIO_TAG="MR-502-001";
+// Budgetary allowance, NOT a quotation or list price for OPK-REGION-3000-04.
+// Historical Redline 2018 MSRP for a DIFFERENT software key: OPK-3K-REM-UNLMBPS-01 at USD 495.
+// https://www.jts.net/wp-content/uploads/contracts/Redline_MSRP.pdf (p.3, historical).
+// Does not imply Myanmar authorization, accepted OEM key, or supplier pricing.
+const REGION_ENTITLEMENT_PROXY={usd:495,comparatorSku:"OPK-3K-REM-UNLMBPS-01",
+ source:"https://www.jts.net/wp-content/uploads/contracts/Redline_MSRP.pdf",
+ status:"HISTORICAL_DIFFERENT_LICENSE_CATEGORY_PROXY__NOT_VENDOR_QUOTE",
+ constraints:"OPK-REGION-3000-04 is US/Canada/Oman, not approved Myanmar; OEM region entitlement and regulatory authorization require separate qualification"};
+
 function engineeringQuantity(item,component,packageRow){
  const recorded=validQty(component.requiredQty)?component.requiredQty:null;
  if(recorded!==null)return {qty:recorded,state:"ENGINEERING_SOURCE",proof:"Controlled Engineering BOM"};
@@ -40,13 +49,16 @@ export function deriveEngineeringOwnedCost0553(item){
     &&item.sourceScopeQty===1&&remoteTopology&&!standardWarranty;
   const budgetaryCandidate=budgetaryEligible
     ?matches.find(q=>q.quoteLine===budgetaryCodes[c.functionId]&&Number.isFinite(q.unitPrice)):null;
-  const budgetaryExtended=qty!==null&&Number.isFinite(budgetaryCandidate?.unitPrice)
-   ?Math.round(qty*budgetaryCandidate.unitPrice*100)/100:null;
+  const proxyAllowance=budgetaryEligible&&c.functionId==="REGION_KEY"&&qty!==null
+    &&budgetaryCandidate===null?REGION_ENTITLEMENT_PROXY:null;
+  const budgetaryRate=budgetaryCandidate?.unitPrice??proxyAllowance?.usd??null;
+  const budgetaryExtended=qty!==null&&Number.isFinite(budgetaryRate)
+   ?Math.round(qty*budgetaryRate*100)/100:null;
   const price=standardWarranty?null:selected&&Number.isFinite(selected.unitPrice)?selected.unitPrice:null;
   const extended=qty!==null&&price!==null?Math.round(qty*price*100)/100:null;
   return {id:c.id,functionId:c.functionId,nonCostedIncluded:standardWarranty,driver:c.quantityDriver,requiredQty:qty,quantityState:derivation.state,quantityProof:derivation.proof,selectedOffer:c.selectedOffer,
-   vendorCandidates:matches,budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryCandidate?.unitPrice??null,budgetaryExtended,
-   budgetaryDecision:budgetaryCandidate?"ENGINEERING_REMOTE_ROLE_MATCH__OEM_REVIEW":"NO_BUDGETARY_MATCH",
+   vendorCandidates:matches,budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryRate,budgetaryExtended,priceEvidenceType:proxyAllowance?"HISTORICAL_COMPARATOR_ALLOWANCE":"NEXTG_QUOTED_UNIT_RATE",priceEvidence:proxyAllowance||null,
+   budgetaryDecision:proxyAllowance?"REGION_LICENSE_HISTORICAL_PROXY__OEM_REVIEW":budgetaryCandidate?"ENGINEERING_REMOTE_ROLE_MATCH__OEM_REVIEW":"NO_BUDGETARY_MATCH",
    unitPrice:price,currency:selected?.currency||null,
    extended,technicalState:c.technicalState,
    state:standardWarranty?"INCLUDED_STANDARD_WARRANTY_NO_EXTRA_COST":extended!==null?"COSTED_FROM_ENGINEERING_QTY":qty!==null?"QTY_DERIVED_VENDOR_SELECTION_REQUIRED":"ENGINEERING_QTY_REQUIRED"};
@@ -58,7 +70,7 @@ export function deriveEngineeringOwnedCost0553(item){
  const budgetaryDecision={basis:"MTO Rev04 ZWP20 row4 + RPT-0001 C1 PTMP remote endpoint",selectedVendor:"Next G",configuration:"Remote Group B",
    quotation:"NG/260916-ADV-DAP1",scope:"MR-502-001 radio ODU function subset, not antenna/bulk/site totals",
    qtySource:"ENGINEERING_TOPOLOGY_AND_EXPLICIT_PARAMETRIC_ASSUMPTIONS",
-   requiredDeviationReview:["RF capacity/throughput entitlement","Myanmar region/frequency entitlement","Power cord/site DC interface","RF filter and mounting ownership"],
+   requiredDeviationReview:["RF capacity/throughput entitlement","Myanmar region/frequency entitlement: Region 04 is US/Canada/Oman, not established as permitted for Myanmar","Power cord/site DC interface","RF filter and mounting ownership"],
    standardWarranty:"INCLUDED",state:budgetaryCoverage?"BUDGETARY_FUNCTION_ESTIMATE__NOT_RELEASED":"BUDGETARY_PARTIAL__GAPS_RECORDED"};
  const ready=components.length>0&&components.every(c=>c.nonCostedIncluded||c.extended!==null);
  const currencySet=[...new Set(components.filter(c=>c.extended!==null).map(c=>c.currency))];
