@@ -1,4 +1,5 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
+import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
 import { deriveEngineeringOwnedCost0553 } from "./data/engineeringOwnedCost0553";
 import { deriveZWP20VendorFunctionCosts, getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
 import {ZWP8_ROW43_COST_TRACE} from "./data/zwp8Row43CostTrace";
@@ -66,6 +67,11 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  <label>Display currency <select aria-label="BOM display currency" value={activeCurrency} onChange={e=>setCurrencyOverride(e.target.value)}><option value="THB">THB — Thai Baht</option><option value="USD">USD — US Dollar</option></select></label>
  <small>FX: {fx?.thbPerUsd??"NOT SET"} THB/USD · {fx?.date||"No date"} · {fx?.source||"No source"} · Display conversion only; original quotation rates unchanged</small>
  </div>
+  <details className="p55-panel"><summary>LAY Rev.C1 · WP / Deck / System / Equipment Location Evidence</summary>
+  <p className="p55-note">AFC drawing controls equipment location. These are location evidence rows, NOT confirmed individual CAT6/Coax routes; E&I room internal details are referenced to ELE-LAY-0002. EX sounder does not equal EX IP Phone.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Deck</th><th>System</th><th>Tag</th><th>LAY Sheet</th></tr></thead><tbody>
+  {Z1F_TEL_LAYOUT_INDEX_0553.byWP.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.equipment.map((e,i)=><tr key={w.wp+"-"+e.tag+"-"+e.sheet+"-"+i}><td>{w.wp}</td><td>{e.deck}</td><td>{e.system}</td><td>{e.tag}</td><td>{e.sheet}</td></tr>))}
+  </tbody></table></div></details>
   <SourceCoverage0553/>
   <SiteSystemCostReconciliation0553/>
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
