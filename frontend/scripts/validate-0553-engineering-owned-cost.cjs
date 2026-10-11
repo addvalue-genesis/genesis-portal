@@ -8,4 +8,9 @@ assert(!model.includes("sourceQty:1"),"Vendor or MTO qty must not create physica
 assert(ui.includes("deriveEngineeringOwnedCost0553(x)"));
 assert(ui.includes("Engineering Required BOM → Vendor Rate → Cost"));
 assert(ui.includes("Legacy vendor one-each rate basket — comparison only"));
+assert(model.includes('SCADA_LINKS_0553.filter(link=>link.to==="ZWP20"'));
+assert(model.includes('component.functionId==="RADIO_EQUIPMENT"'));
+assert(model.includes('quantityState:derivation.state'));
+assert(model.includes("budgetaryExtended=qty!==null"));
+assert(ui.includes("Derived budgetary partial:"));
 console.log("PASS 0553 Engineering controls required function quantity before vendor rate extension; one-each vendor basket is non-authoritative.");
