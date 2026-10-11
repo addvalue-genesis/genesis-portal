@@ -1,0 +1,13 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const mapping=fs.readFileSync(path.join(root,"src/project0553/estimateToBidMapping.js"),"utf8");
+const view=fs.readFileSync(path.join(root,"src/project0553/EstimateToBidMapping0553.jsx"),"utf8");
+const cost=fs.readFileSync(path.join(root,"src/common/cost/derivationKernel.js"),"utf8");
+assert(mapping.includes("READ_ONLY_ALLOCATION_REFERENCES"));
+assert(mapping.includes("UPSTREAM_ENGINEERING_AND_COST_MODEL"));
+assert(mapping.includes("UNAUTHORIZED_DERIVATION:"));
+assert(mapping.includes("estimateLineIds:Object.freeze([])"));
+assert(mapping.includes('releaseAllowed:false'));
+assert(view.includes("validateEstimateToBid0553"));
+assert(cost.includes("deriveManHours")&&cost.includes("deriveLaborCost"));
+console.log("PASS 0553 mapping remains read-only; engineering and parametric cost model retain calculation ownership");
