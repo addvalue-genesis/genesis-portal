@@ -38,4 +38,9 @@ assert(innova.includes('partNumber:"IE-PS-RJ45-FH-BK",description:"Weidmuller RJ
 assert(innova.includes('partNumber:"501/453/UNIV/A/M20",description:"Hawke M20 gland",qty:1,unit:"set",unitPriceExVat:1020'));
 assert(model.includes("MANAGEMENT_TEMPORARY_ZERO__SOURCE_QUOTE_NA"));
 assert(vendorDocs.includes("INNOVA_QA24-0604_ITEM2_NA__BUDGETARY_TEMP_ZERO"));
+assert(ui.includes("displaySiteTotal(g.site)"));
+assert(ui.includes("Bulk Row 11 · Engineering Quantity × INNOVA Unit Rates"));
+assert(ui.includes('FX REQUIRED'));
+const workspace=fs.readFileSync(path.join(src,"CommercialWorkspace.jsx"),"utf8");
+assert(workspace.includes('fx={fx} displayCurrency={displayCurrency}'));
 console.log("PASS ZWP20 8 MTO rows: known USD 13,283.89 / THB 464,630 including THB 1,900 partial DATO reference; 4 unresolved/partial scope rows; no cross-currency addition.");
