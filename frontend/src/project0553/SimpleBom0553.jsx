@@ -62,21 +62,21 @@ export function SimpleBom0553({focusedLocation=null}){
      <tbody>{g.rfProof.map(p=><tr key={p.id}><td>{p.from} → {p.to}</td><td>{p.fsplDb.toFixed(2)} dB</td><td>{p.gainSumDbi.toFixed(2)} dBi</td><td>{p.idealRslOffsetDb.toFixed(2)} dB<small>Rx = Tx + offset − losses</small></td><td>HOLD · CAL/OEM proof required{p.change&&<small>4ft candidate: {p.change.gainChangeDb.toFixed(2)} dB vs Next G baseline</small>}</td></tr>)}</tbody>
     </table>
     <table className="p55-table p55-table--compact p55-table--budget">
-    <thead><tr><th>+</th><th>MTO Item / Equipment</th><th>MR/MTO Qty (input)</th><th>Vendor / SKU Candidate</th><th>Unit price / source currency</th><th>Extended cost</th><th>First Principles / Qty proof</th></tr></thead>
+    <thead><tr><th>+</th><th>MTO Item / Equipment / Copy ID</th><th>MR/MTO Qty (input)</th><th>Vendor / SKU Candidate</th><th>Unit price / source currency</th><th>Extended cost</th><th>First Principles / Qty proof</th></tr></thead>
     <tbody>{g.items.map(x=><React.Fragment key={x.id}>
      <tr><td><button type="button" className="p55-row-toggle" onClick={()=>open("item:"+x.id)}>{expanded["item:"+x.id]?"−":"+"}</button></td>
-      <td><strong>{x.sourceTag}</strong><small>{x.description}</small></td>
-      <td>{x.sourceScopeQty??"REVIEW"} {x.sourceScopeUnit||""}<small>{x.sourceState}</small></td>
+      <td><strong>{x.sourceTag}</strong><small>{x.description}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)}/></td>
+      <td>{x.sourceScopeQty??"REVIEW"} {x.sourceScopeUnit||""}<small>{x.sourceState}</small><small>Engineering SKU Qty: {x.engineeringRequiredSkuQty??"NOT DERIVED"}</small></td>
       <td>{x.pricedVendor||"Candidate / selection OPEN"}<small>{x.vendorCandidates.length?x.vendorCandidates.length+" vendor offer candidates":"Unmapped to priced supplier line"}</small></td>
       <td>{x.pricedVendor?money(bom.cisco.unitPackageQuotedSumTHB,"THB"):"See available source prices (+)"}</td>
       <td>{Number.isFinite(x.indicativePackageCostTHB)?money(x.indicativePackageCostTHB,"THB"):"UNPRICED — NOT ZERO"}</td>
-      <td>{x.workingPriceStatus}<small>{x.costStatus}</small></td>
+      <td>{x.workingPriceStatus}<small>{x.costStatus}</small><small>Accepted unit cost: {Number.isFinite(x.acceptedPrice)?money(x.acceptedPrice,"THB"):"NOT VERIFIED"}</small></td>
      </tr>
      {expanded["item:"+x.id]&&<tr><td colSpan={7}>
       <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
       <thead><tr><th>Vendor</th><th>SKU / Offer line</th><th>Quoted qty (whole offer)</th><th>Quoted unit price</th><th>Use decision</th></tr></thead><tbody>
       {x.configuration.concat(x.vendorCandidates).map((v,i)=><tr key={i}>
-       <td>{v.vendor||"VST ECS / Cisco"}</td><td>{v.sku}<small>{v.quoteId} · {v.quoteLine}</small></td>
+       <td>{v.vendor||"VST ECS / Cisco"}</td><td>{v.sku}<small>{v.quoteId} · {v.quoteLine}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)+".quote."+String(v.quoteId||"candidate").toLowerCase()+"."+String(v.quoteLine||i).toLowerCase().replace(/[^a-z0-9-]/g,"-")}/></td>
        <td>{v.offeredQuoteQty??v.quoteQty??"—"}</td>
        <td>{money(v.originalUnitPrice??v.unitPrice,v.originalCurrency||v.currency)}</td>
        <td>{x.pricedVendor?"Cisco working bundle / OEM review":"SOURCE QUOTE ONLY — ALLOCATION OPEN"}</td>
