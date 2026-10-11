@@ -148,14 +148,14 @@ function rowCost(item){
     orientation:"ZWP20 source direction",quantityBasis:"MANAGEMENT_BASELINE",baseAllowanceM:APPROVED_0553_BUDGET_BASIS.greenfield.baseRouteM,
     additionalMeasuredRouteM:0,sharedInfrastructureM:0}
    // A distinct direction requires a new route record with evidence-based length,
-   // not an automatic multiplication of the existing 50m allocation.
+   // not an automatic multiplication of the 60m allowance.
   ];
   const effectiveLength=route=>route.baseAllowanceM+Math.max(0,route.additionalMeasuredRouteM);
   const budgetRoute={routes:cableRoutes,minimumBudgetaryLengthM:60,
     totalM:cableRoutes.reduce((n,route)=>n+approvedCablePurchaseM(effectiveLength(route)),0),
     routeBaseM:cableRoutes.reduce((n,route)=>n+effectiveLength(route),0),procurementAllowancePct:15,
     runCount:cableRoutes.length,additionalDirectionsPending:true,
-    formula:"Sum of each distinct direction's 50m minimum plus verified additional route length; shared cable segments counted per physical cable, not as a common extra lump sum",
+    formula:"Sum CEIL((60m per confirmed physical run + verified extra route) * 1.15); shared pathways are not extra purchased conductors",
     classification:"MANAGEMENT_APPROVED_MINIMUM_BUDGETARY_ALLOWANCE",
     source:"Management-approved 2026-10-11: 60m per greenfield field-to-TC-room run plus 15% purchasing allowance",
     caveat:"60m plus 15% is a commercial purchasing assumption, not drawing-measured. Check actual routing, cable specification and 80m Ethernet constraint before design release"};
