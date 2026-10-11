@@ -15,9 +15,9 @@ export const ZWP20_GA_BULK_RECONCILIATION=Object.freeze({
   rule:"Entries/locknuts/blanking plugs are included in historical panel assembly, not a requirement to purchase 16 new glands."
  },
  functions:[
-  {id:"ETH_CABLE_RUN",kind:"FIELD_CABLE",currentQty:50,unit:"m",scope:"One management-budget CAT6A ODU-to-indoor run; 50m minimum",
+  {id:"ETH_CABLE_RUN",kind:"FIELD_CABLE",currentQty:69,unit:"m",scope:"One management-budget CAT6A ODU-to-indoor run; 60m base plus 15% purchasing allowance",
    source:"Z1F LAY C1 + Z1D geometric comparison + 1E GA p6",owner:"BULK_ROW_11",priceState:"COSTED_BUDGETARY_524_THB_PER_M",
-   technicalChecks:["Outdoor/UV, fire rating and Ex penetration requirements","50m is management allowance, not a measured route; confirm independent circuits"]},
+   technicalChecks:["Outdoor/UV, fire rating and Ex penetration requirements","69m is approved purchasing allowance, not a measured route; confirm independent circuits"]},
   {id:"OUTDOOR_RADIO_INGRESS",kind:"EX_INTERFACE",currentQty:null,unit:"set",
    scope:"Radio Ethernet ingress shown as 3/4in NPT union, certified gland, cold shrink and RJ45 CAT6 plug on 1E GA p6",
    source:"SAMART-CUEL 1E GA p6",owner:"BULK_ROW_11_IF_NOT_INCLUDED_WITH_ODU",
