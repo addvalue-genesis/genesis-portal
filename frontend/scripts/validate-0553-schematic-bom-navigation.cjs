@@ -13,5 +13,6 @@ assert(page.includes("<CommercialWorkspace0553 focusedLocation={focusedBomLocati
 assert(schematic.includes("onOpenLocationBom?.(site)"));
 assert(commercial.includes("<SimpleBom0553 focusedLocation={focusedLocation}/>"));
 assert(bom.includes("focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite"));
-assert(bom.includes('site==="ALL"||x.site===site'));
+assert(bom.includes('model.locations.filter(g=>site==="ALL"||g.site===site'),"location filter must use current group records");
+assert(bom.includes("const site=focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite"),"selected schematic site must drive BOM focus");
 console.log("PASS 0553 Schematic location click routes to existing Budget Working Preview BOM with site filter");
