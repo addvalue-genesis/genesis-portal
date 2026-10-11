@@ -11,6 +11,23 @@ const groupCodes={
 // ZWP20 is the TO end of the ZWP8→ZWP20 PTMP link: infer remote role for
 // working budget only. Group B and C have identical quoted assembly unit rates.
 // This is a reversible preliminary choice, not MCDA/OEM acceptance.
+export function deriveZWP20VendorFunctionCosts(item){
+ const choice=getZWP20RemoteBudgetChoice(item);
+ if(!choice)return null;
+ const keys=groupCodes[choice.group];
+ const rows=keys.map(code=>{
+  const source=byCode.get(code);
+  const quantity=1; // explicit preliminary one remote assembly, NOT quote-wide quantity
+  const subtotal=Number.isFinite(source?.unitPrice)?Math.round(quantity*source.unitPrice*100)/100:null;
+  return {code,sku:source?.partNumber||null,functionId:code==="B-1"?"RADIO_EQUIPMENT":code==="B-2"?"RF_FILTER":code==="B-3"?"CAPACITY_KEY":code==="B-5"?"MOUNT_FEEDER":code==="B-6"?"POWER":code==="B-7"?"POWER_CORD":"ETHERNET_SURGE",
+    quantity,quantityBasis:"ONE_REMOTE_PRELIMINARY__NOT_ENGINEERING_APPROVED",sourceQuoteQty:source?.qty,
+    unitUSD:source?.unitPrice??null,extendedUSD:subtotal,sourceId:choice.source};
+ });
+ const partialUSD=rows.every(r=>r.extendedUSD!==null)?Math.round(rows.reduce((n,r)=>n+r.extendedUSD,0)*100)/100:null;
+ return {rows,partialUSD,status:"PROVISIONAL_FUNCTION_COST__NOT_COMPLETE_PACKAGE",excluded:choice.exclusions,
+  quote:choice.source,alternativeOptionsExcluded:["A","C"],
+  verifiedPackageUSD:null};
+}
 export function getZWP20RemoteBudgetChoice(item){
  if(item.site!=="ZWP20"||item.sourceTag!=="MR-502-001"||item.sourceRow!==4)return null;
  const choices=getMR502BudgetaryScenarios(item);
