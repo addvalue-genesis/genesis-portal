@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import {BulkTakeoff0553} from "./BulkTakeoff0553";
+import {BULK_TAKEOFF_0553} from "./data/bulkTakeoff0553";
 import { REV08_BASELINE,getBaselineReview } from "./data/rev08CommercialBaseline";
 import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 // Read-only decision shortcut. Historical customer amounts and vendor costs are
@@ -22,6 +23,8 @@ const steps=[
 ];
 export function InternalBudgetShortcut0553(){
  const [details,setDetails]=useState(false);
+ const [openedSystems,setOpenedSystems]=useState(new Set());
+ const toggleSystem=mr=>setOpenedSystems(old=>{const next=new Set(old);next.has(mr)?next.delete(mr):next.add(mr);return next;});
  const [currency,setCurrency]=useState("USD");
  const [rates,setRates]=useState({THB:"",CNY:""});
  const [showHistorical,setShowHistorical]=useState(false);
@@ -46,10 +49,15 @@ export function InternalBudgetShortcut0553(){
    <div><span>Known Cisco working vendor cost (THB)</span><strong>{usd(BID_COST_SPINE_0553.knownPreliminaryCost.THB)}</strong></div>
   </div>}
   <p className="p55-note">Do not sum the Cisco vendor cost into Rev08: overlapping scope, different currency and quote validity require reconciliation. Optional C1/C2 excluded from base.</p>
-  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>MR</th><th>System</th><th>Current reconciled budget ({currency})</th><th>Rev08 historical sell ({currency}) — comparison only</th><th>Engineering / cost reconciliation</th></tr></thead><tbody>
-  {systems.map(([code,mr,name,note])=><tr key={mr}><td>{mr}</td><td>{name}</td><td className="is-number"></td><td className="is-number">{showHistorical?displayHistorical(historical(code)):""}</td><td>{note}</td></tr>)}
-  <tr><td>MR-0002</td><td>RFI LNA RX3852-2002-11 (product-only)</td><td className="is-number"></td><td className="is-number"></td><td>No source quotation received. Datasheet-only: 380–520 MHz, SMA(F), 11–28 VDC. Connector accessories, cable and enclosure require physical design. Blank is unknown, not zero.</td></tr>
-  <tr><td>ALL</td><td>Shared bulk A5</td><td className="is-number"></td><td className="is-number">{showHistorical?displayHistorical(historical("A5")):""}</td><td>Source workbook has shared bulk; split quantities by MR using BLD/LAY/DWG, count common items once, preserve historic A5 without double counting</td></tr>
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>＋/−</th><th>MR</th><th>System</th><th>Current reconciled budget ({currency})</th><th>Rev08 historical sell ({currency}) — comparison only</th><th>Engineering / cost reconciliation</th></tr></thead><tbody>
+  {systems.map(([code,mr,name,note])=><React.Fragment key={mr}><tr><td><button type="button" className="p55-row-toggle" onClick={()=>toggleSystem(mr)} aria-expanded={openedSystems.has(mr)}>{openedSystems.has(mr)?"−":"+"}</button></td><td>{mr}</td><td>{name}</td><td className="is-number"></td><td className="is-number">{showHistorical?displayHistorical(historical(code)):""}</td><td>{note}</td></tr>
+  {openedSystems.has(mr)&&<tr><td></td><td colSpan={5}><strong>{mr} — System composition / cost trace</strong>
+   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Component group</th><th>Engineering scope</th><th>Quantity driver / source</th><th>Qty</th><th>Price</th></tr></thead><tbody>
+    {BULK_TAKEOFF_0553.filter(r=>r.mr===mr).map((r,i)=><tr key={i}><td>{r.category}</td><td>{r.item}</td><td>{r.source}<small>{r.driver}</small></td><td>{r.qty??""}</td><td>{r.rate??""}</td></tr>)}
+   </tbody></table></div><p className="p55-note">Working engineering components only. Open the expandable Bulk Take-off below for individual accessory/check details. Vendor selection and system total remain unapproved.</p>
+  </td></tr>}</React.Fragment>)}
+  <tr><td></td><td>MR-0002</td><td>RFI LNA RX3852-2002-11 (product-only)</td><td className="is-number"></td><td className="is-number"></td><td>No source quotation received. Datasheet-only: 380–520 MHz, SMA(F), 11–28 VDC. Connector accessories, cable and enclosure require physical design. Blank is unknown, not zero.</td></tr>
+  <tr><td></td><td>ALL</td><td>Shared bulk A5</td><td className="is-number"></td><td className="is-number">{showHistorical?displayHistorical(historical("A5")):""}</td><td>Source workbook has shared bulk; split quantities by MR using BLD/LAY/DWG, count common items once, preserve historic A5 without double counting</td></tr>
   </tbody></table></div>
   <BulkTakeoff0553/>
   <button type="button" className="p553-detail-button" onClick={()=>setDetails(v=>!v)} aria-expanded={details}>{details?"− Hide":"＋ Show"} mandatory processing 01–08</button>
