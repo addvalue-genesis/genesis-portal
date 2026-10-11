@@ -11,9 +11,28 @@ import { MR0001_ENGINEERING_REQUIRED_BOM } from "./mr0001RequiredBomDerivation";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./supplierQuoteLines";
 const quotesById=new Map(SUPPLIER_QUOTE_LINES_0553.map(q=>[q.id,q]));
 const sourceRows=new Map(MR0001_ENGINEERING_REQUIRED_BOM.rows.map(r=>[r.sourceRowIndex,r]));
+// Grouped MTO source rows contain separate radio/antenna tags, not one OEM family.
+const groupedTagFamily=tag=>{
+ const t=String(tag||"").toUpperCase();
+ if(t.startsWith("ANT-"))return "ANTENNA";
+ if(t.startsWith("MR-")&&t.endsWith("A"))return "IDU";
+ if(t.startsWith("MR-"))return "ODU";
+ return null;
+};
+const leafQuoteLines={
+ ODU:["A-1","B-1","C-1"],
+ ANTENNA:["A-12","B-11","B-12","B-13","C-11","C-12"]
+};
 const vendorEvidenceFor=(item)=>{
  const source=sourceRows.get(item.sourceRow);
- const options=source?.vendorPriceCandidates||[];
+ const family=source?.groupedRow?groupedTagFamily(item.sourceTag):null;
+ const options=family?(leafQuoteLines[family]||[]).flatMap(code=>{
+  const q=quotesById.get("NG-260916");
+  const line=q?.lines?.find(v=>v[0]===code);
+  return line?[{quoteId:q.id,quoteLine:code,vendor:q.vendor,sku:line[1],currency:q.currency,
+   sourceUnitPrice:Number.isFinite(line[4])?line[4]:null,quotedQty:line[3],
+   quotedSourceStatus:q.status}]:[];
+ }):source?.vendorPriceCandidates||[];
  return options.map(v=>{
   const q=quotesById.get(v.quoteId);
   return {quoteId:v.quoteId,quoteLine:v.quoteLine,vendor:q?.vendor||v.vendor,
