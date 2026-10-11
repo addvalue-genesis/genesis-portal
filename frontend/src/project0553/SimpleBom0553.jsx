@@ -1,3 +1,4 @@
+import { getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
 import { NEXTG_CANDIDATE_ESTIMATE_0553 } from "./data/nextgCandidateEstimate0553";
 import { ITEM_DECISION_PIPELINE_0553 } from "./data/itemDecisionPipeline0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
@@ -94,6 +95,17 @@ export function SimpleBom0553({focusedLocation=null}){
       <div className="p55-panel" style={{marginBottom:10}}>
        <strong>Item-level First Principles → Engineering Constraints → Parametric Cost</strong>
        <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)+".derivation"}/>
+       {getMR502BudgetaryScenarios(x).length>0&&<div className="p55-table-wrap">
+        <strong>MR-502-001.4 · Budgetary unit assembly cost scenarios (Next G · USD)</strong>
+        <p className="p55-note">Preliminary quotation-based cost for ONE hypothetical radio assembly, not ZWP20's accepted radio quantity or total package price. A/B/C configurations are mutually exclusive choices for this calculation, NOT additive.</p>
+        <table className="p55-table p55-table--compact"><thead><tr><th>Option</th><th>Assumed assembly qty</th><th>Source radio quote qty</th><th>Unit assembly reference USD</th><th>Scenario partial extended USD</th><th>Scope / approval</th></tr></thead><tbody>
+        {getMR502BudgetaryScenarios(x).map(scenario=><tr key={scenario.group}>
+         <td>Next G {scenario.group} · candidate</td><td className="is-number">{scenario.illustrativeAssemblyQty}</td><td className="is-number">{scenario.quotationWideGroupQty}</td>
+         <td className="is-number">{money(scenario.unitAssemblyReferenceUSD,"USD")}</td><td className="is-number">{money(scenario.unitAssemblyReferenceUSD*scenario.illustrativeAssemblyQty,"USD")}</td>
+         <td>{scenario.status}<small>{scenario.exclusions}</small></td>
+        </tr>)}</tbody></table>
+        <p className="p55-note">Source = Next G 16-Sep-2026 unit rates, one each of radio, filter, throughput key, mount, power, cord and Ethernet surge. Antenna, licensed region, NMS, warranty, bulk and service are NOT included. Quote expired; OEM compliance and site radio role unresolved. Neither this partial figure nor A+B+C is approved.</p>
+       </div>}
        <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
         <thead><tr><th>Stage</th><th>Evidence / calculation</th><th>Result</th></tr></thead><tbody>
         <tr><td>01 Source</td><td>MTO Rev04 · source row {x.sourceRow} · {x.sourceTag}</td><td>{x.sourceScopeQty??"UNRESOLVED"} {x.sourceScopeUnit||""} (scope quantity only)</td></tr>
