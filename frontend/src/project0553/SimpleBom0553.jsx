@@ -1,4 +1,5 @@
 import { getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
+import {SourceCoverage0553} from "./SourceCoverage0553";
 import {SiteSystemCostReconciliation0553} from "./SiteSystemCostReconciliation0553";
 import { NEXTG_CANDIDATE_ESTIMATE_0553 } from "./data/nextgCandidateEstimate0553";
 import { ITEM_DECISION_PIPELINE_0553 } from "./data/itemDecisionPipeline0553";
@@ -35,6 +36,7 @@ export function SimpleBom0553({focusedLocation=null}){
  return <section className="p55-panel">
   <div className="p55-eyebrow">ENGINEERING WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom"/></div>
   <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
+  <SourceCoverage0553/>
   <SiteSystemCostReconciliation0553/>
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
