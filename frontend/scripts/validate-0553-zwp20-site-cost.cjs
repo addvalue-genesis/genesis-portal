@@ -24,6 +24,7 @@ const quoteRegistry=fs.readFileSync(path.join(src,"data/supplierQuoteLines.js"),
 assert(vendorDocs.includes("V-DATO-SONIC-2024"));
 assert(vendorDocs.includes("V-DATO-WEIDMULLER-DS"));
 assert(quoteRegistry.includes("SONIC-CCY24-PXC-633"));
-assert(model.includes("BUDGETARY_PARTIAL_FUNCTION_EQUIVALENCE_NOT_EX_APPROVED"));
+assert(model.includes("MANAGEMENT_APPROVED_BUDGETARY_BASIS"));
+assert(model.includes("technical Ex compliance is a separate qualification"));
 assert(model.includes("DATO-507-001 1 Set"));
 console.log("PASS ZWP20 8 MTO rows: known USD 13,283.89 / THB 425,430 including THB 1,900 partial DATO reference; 4 unresolved/partial scope rows; no cross-currency addition.");
