@@ -21,10 +21,16 @@ function rowCost(item){
    status:d.budgetaryCoverage?"BUDGETARY_CALCULATED":"BUDGETARY_PARTIAL",
    assumptions:["Region key B-4 USD0 incremental assumption; no supplier rate","Radio ODU only: separate MTO surge, antenna and enclosure are not counted here"]};
  }
- if(item.sourceRow===5)return {...base,vendor:"Next G / Aviat (interface-equivalent qualification)",sku:"Dedicated IDU or compliant indoor interface module — engineering required",
-  quantityBasis:"MTO Rev04 row 5: 1 IDU Set; AFC BLD-0001 Rev.C1 sheet 3/7 Note 8: NEW IDU AND SURGE ARRESTOR WILL BE INSTALLED IN NEW Ex e ENCLOSURE",
-  status:"ENGINEERING_QTY_DERIVED_PRICE_TO_MATCH",
-  assumptions:["First Principles: 1 remote ODU endpoint requires one indoor network/power interface at the Ex e Telecom Enclosure","BLD AFC explicitly requires a NEW IDU, not an optional omission","If selected outdoor radio integrates the IDU functions, map equivalent hardware, qualify architecture and register technical deviation before claiming zero incremental cost","Price matched physical IDU/interface functions; do not duplicate ODU integrated components or surge row 10"]};
+ if(item.sourceRow===5){
+  const odU=WORKING_BOM_BY_LOCATION_0553.locations.find(l=>l.site==="ZWP20")?.items.find(x=>x.sourceRow===4);
+  const engineering=odU?deriveEngineeringOwnedCost0553(odU):null;
+  const functionalCost=engineering?.budgetaryIndoorInterfaceUSD??null;
+  return {...base,vendor:"Next G / Aviat",sku:"PS-DCDC-HAZ-POE-IND-01 + PPT-B (indoor PoE interface only)",
+   currency:"USD",unitCost:functionalCost,extended:functionalCost,
+   quantityBasis:"MTO Rev04 row 5: IDU function 1 Set; AFC BLD-0001 Rev.C1 sheet 3/7 Note 8: new IDU + surge in new Ex e enclosure",
+   status:"BUDGETARY_PARTIAL_INTERFACE_ONLY",
+   assumptions:["USD 667.67 + USD 3.60: sourced PoE supply and cord only, allocated from Radio ODU exactly once","Not a separately offered or technically proven complete IDU: dedicated IDU/equivalent functionality remains an explicitly qualified scope gap","AFC BLD requires new IDU; if using an integrated outdoor-radio design, document compliant indoor interface equivalence and deviation","Surge remains solely at MTO row 10; Ex e enclosure remains row 9"]};
+ }
  if(item.sourceRow===6){
   const vendor=lineByCode.get("B-12");
   // User-directed budgetary 4ft option at ZWP20 RX end, pending RF availability recheck.
@@ -61,9 +67,9 @@ export function deriveZWP20SiteCost0553(){
  const rows=(site?.items||[]).map(rowCost);
  const currencies=["USD","THB"];
  const subtotals=Object.fromEntries(currencies.map(currency=>[currency,Math.round(rows.filter(r=>r.currency===currency&&Number.isFinite(r.extended)).reduce((n,r)=>n+r.extended,0)*100)/100]));
- const gaps=rows.filter(r=>r.extended===null);
+ const gaps=rows.filter(r=>r.extended===null||r.status==="BUDGETARY_PARTIAL_INTERFACE_ONLY");
  return {site:"ZWP20",moduleId:"PJ2608-0553 / bid.budget.bom.zwp20",system:"MR-0001",rows,subtotals,gaps,
-  pricedRows:rows.length-gaps.length,totalRows:rows.length,
+  pricedRows:rows.filter(r=>Number.isFinite(r.extended)).length,totalRows:rows.length,
   status:gaps.length?"PRICED_SUBTOTAL_WITH_EXPLICIT_SCOPE_GAPS":"BUDGETARY_SCOPE_COSTED",
   fxStatus:"NO_UNSUPPORTED_CURRENCY_CONVERSION",releaseAllowed:false};
 }
