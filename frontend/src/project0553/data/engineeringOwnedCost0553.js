@@ -55,10 +55,11 @@ export function deriveEngineeringOwnedCost0553(item){
   const budgetarySelectedSKU=budgetaryEligible&&Number.isFinite(budgetaryRate)?budgetaryCandidate?.sku??includedAssumption?.sku??null:null;
   const budgetaryExtended=qty!==null&&Number.isFinite(budgetaryRate)
    ?Math.round(qty*budgetaryRate*100)/100:null;
+  const allocationOwner=budgetaryEligible&&["POWER","POWER_CORD"].includes(c.functionId)?"MR-502-001A.5":"MR-502-001.4";
   const price=standardWarranty?null:selected&&Number.isFinite(selected.unitPrice)?selected.unitPrice:null;
   const extended=qty!==null&&price!==null?Math.round(qty*price*100)/100:null;
   return {id:c.id,functionId:c.functionId,nonCostedIncluded:standardWarranty,driver:c.quantityDriver,requiredQty:qty,quantityState:derivation.state,quantityProof:derivation.proof,selectedOffer:c.selectedOffer,
-   vendorCandidates:matches,budgetarySelectedOffer,budgetarySelectedSKU,budgetarySelectionState:budgetarySelectedOffer?"BUDGETARY_SELECTED_WITH_QUALIFICATIONS":"NOT_SELECTED",budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryRate,budgetaryExtended,priceEvidenceType:includedAssumption?"ASSUMED_INCLUDED_NO_SEPARATE_CHARGE":"NEXTG_QUOTED_UNIT_RATE",priceEvidence:includedAssumption||null,
+   vendorCandidates:matches,allocationOwner,budgetarySelectedOffer,budgetarySelectedSKU,budgetarySelectionState:budgetarySelectedOffer?"BUDGETARY_SELECTED_WITH_QUALIFICATIONS":"NOT_SELECTED",budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryRate,budgetaryExtended,priceEvidenceType:includedAssumption?"ASSUMED_INCLUDED_NO_SEPARATE_CHARGE":"NEXTG_QUOTED_UNIT_RATE",priceEvidence:includedAssumption||null,
    budgetaryDecision:includedAssumption?"REGION_KEY_INCLUDED_ASSUMPTION__OEM_REVIEW":budgetaryCandidate?"ENGINEERING_REMOTE_ROLE_MATCH__OEM_REVIEW":"NO_BUDGETARY_MATCH",
    unitPrice:price,currency:selected?.currency||null,
    extended,technicalState:c.technicalState,
@@ -67,7 +68,12 @@ export function deriveEngineeringOwnedCost0553(item){
  const preliminaryRows=components.filter(c=>c.budgetaryExtended!==null);
  const budgetaryPartialUSD=preliminaryRows.length?Math.round(preliminaryRows.reduce((n,c)=>n+c.budgetaryExtended,0)*100)/100:null;
  const budgetaryCoverage=components.length>0&&components.filter(c=>!c.nonCostedIncluded).every(c=>c.budgetaryExtended!==null);
- const budgetaryItemTotalUSD=budgetaryCoverage?budgetaryPartialUSD:null;
+ // One function may belong to only one physical MTO cost owner.
+ // The industrial PoE power interface is installed at the indoor Ex e enclosure,
+ // assigned to MR-502-001A row 5; this is NOT proof it fulfils standalone IDU functionality.
+ const budgetaryODUSubtotalUSD=budgetaryCoverage?Math.round(components.filter(c=>c.allocationOwner==="MR-502-001.4"&&Number.isFinite(c.budgetaryExtended)).reduce((n,c)=>n+c.budgetaryExtended,0)*100)/100:null;
+ const budgetaryIndoorInterfaceUSD=budgetaryCoverage?Math.round(components.filter(c=>c.allocationOwner==="MR-502-001A.5"&&Number.isFinite(c.budgetaryExtended)).reduce((n,c)=>n+c.budgetaryExtended,0)*100)/100:null;
+ const budgetaryItemTotalUSD=budgetaryODUSubtotalUSD;
  const budgetaryState=budgetaryCoverage?"CALCULATED_WITH_ASSUMPTIONS":"INCOMPLETE_FUNCTION_COST";
  const budgetaryDecision={basis:"MTO Rev04 ZWP20 row4 + RPT-0001 C1 PTMP remote endpoint",selectedVendor:"Next G",configuration:"Remote Group B",
    quotation:"NG/260916-ADV-DAP1",scope:"MR-502-001 radio ODU function subset, not antenna/bulk/site totals",
@@ -79,7 +85,7 @@ export function deriveEngineeringOwnedCost0553(item){
  const amount=ready&&currencySet.length===1?Math.round(components.reduce((n,c)=>n+c.extended,0)*100)/100:null;
  return {site:item.site,tag:item.sourceTag,sourceRow:item.sourceRow,components,
   requiredFunctionCount:components.filter(c=>!c.nonCostedIncluded).length,qtyDerivedCount:components.filter(c=>!c.nonCostedIncluded&&c.requiredQty!==null).length,
-  costedFunctionCount:components.filter(c=>!c.nonCostedIncluded&&c.extended!==null).length,budgetaryCostedCount:preliminaryRows.length,budgetaryPartialUSD,budgetaryItemTotalUSD,budgetaryCoverage,budgetaryState,
+  costedFunctionCount:components.filter(c=>!c.nonCostedIncluded&&c.extended!==null).length,budgetaryCostedCount:preliminaryRows.length,budgetaryPartialUSD,budgetaryItemTotalUSD,budgetaryIndoorInterfaceUSD,budgetaryCoverage,budgetaryState,
   amount,currency:amount!==null?currencySet[0]:null,budgetaryDecision,
   state:budgetaryState,approvedState:amount!==null?"ENGINEERING_BOM_COSTED_REQUIRES_APPROVAL":"NOT_APPROVED",
   rule:"Engineering requiredQty is authoritative. Vendor quotedQty is price evidence only. No synthetic quantity or false aggregate."};
