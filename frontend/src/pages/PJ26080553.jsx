@@ -1,6 +1,6 @@
 import { CommercialWorkspace0553 } from "../project0553/CommercialWorkspace";
 import { WorkflowNavigator0553 } from "../project0553/WorkflowNavigator0553";
-import { O_G_LIFECYCLE_0553, L3_TABS_0553, L3_TAB_GROUPS_0553 } from "../project0553/lifecycleNavigation";
+import { O_G_LIFECYCLE_0553, L3_TABS_0553, L3_TAB_GROUPS_0553, TAB_IDENTITY_0553 } from "../project0553/lifecycleNavigation";
 import { DocumentReferenceControl0553 } from "../project0553/DocumentReferenceControl0553";
 import { VendorProductCatalog0553 } from "../project0553/VendorProductCatalog0553";
 import React, { useMemo, useState } from "react";
@@ -33,7 +33,7 @@ import "../project0553/project0553.css";
 // IDs are stable application route keys. Display order follows the project
 // engineering workflow; Budget is the final workbench after all upstream views.
 // Lifecycle hierarchy is a navigation layer; route keys and workbench components are preserved.
-const TABS = L3_TABS_0553;
+const TABS = L3_TABS_0553.map(([id,label])=>[id,`${TAB_IDENTITY_0553.tabs.find(t=>t.route===id)?.displayCode||"L3-B"} · ${label}`]);
 const TAB_GROUPS = L3_TAB_GROUPS_0553;
 const Badge = AuditBadge;
 const Metric = AuditMetric;
