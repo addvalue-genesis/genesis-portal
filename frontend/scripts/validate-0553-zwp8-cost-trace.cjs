@@ -13,4 +13,18 @@ const ui=fs.readFileSync(path.join(root,"src/project0553/SimpleBom0553.jsx"),"ut
 assert(model.includes("allocatedSiteTotalUSD:null"));
 assert(model.includes("physicalQty:null"));
 assert(ui.includes("ZWP8_ROW43_COST_TRACE.items.map"));
+const quotedUnit=code=>quote.lines.find(x=>x.code===code)?.unitPrice;
+const radioCodes=["B-1","B-2","B-3","B-5","B-6","B-7","B-8"];
+const eachRadio=radioCodes.reduce((sum,c)=>sum+quotedUnit(c),0);
+assert(Number.isFinite(eachRadio));
+for(const c of ["B-11","B-12"]){
+ const partial=Math.round((2*eachRadio+2*quotedUnit(c))*100)/100;
+ assert(partial>0);
+}
+assert(model.includes("referenceScenarios"));
+assert(model.includes("assumedRadioAssemblies:2"));
+assert(model.includes("assumedAntennas:2"));
+assert(ui.includes("referenceScenarios.map"));
+assert(ui.includes("NOT full ZWP8 cost"));
+
 console.log("PASS ZWP8 row43: 6 source tags, six 1 Set scope quantities, vendor quote candidate trace; no invented site allocation.");
