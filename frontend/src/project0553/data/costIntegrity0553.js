@@ -28,14 +28,18 @@ export const COST_INTEGRITY_0553 = Object.freeze((()=>{
  }));
  const quoteIds=new Set(rows.map(r=>r.id));
  const covered=new Set(["VST-0048-RE1"]);
- if(rows.some(q=>!q.currency||!Number.isFinite(q.amount)))throw Error("0553 quote registry missing currency or numeric total");
- if([...covered].some(id=>!quoteIds.has(id)))throw Error("0553 cost spine missing its source quotation");
+ const quoteDataIssues=rows.filter(q=>!q.currency||!Number.isFinite(q.amount)).map(q=>q.id);
+ const missingCostSourceIds=[...covered].filter(id=>!quoteIds.has(id));
  const physicalAccepted=MR0001_ENGINEERING_REQUIRED_BOM.rows.filter(r=>Number.isFinite(r.requiredSkuQty)&&r.selectedVendorSku);
  const reported=BID_COST_SPINE_0553.knownPreliminaryCost.THB;
  const v=rows.find(q=>q.id==="VST-0048-RE1");
- if(!v||v.quotedTotal!==reported)throw Error("0553 Cisco source subtotal mismatch");
+ const ciscoQuoteAmount=v?.quotedTotal??null;
+ const ciscoVarianceTHB=Number.isFinite(ciscoQuoteAmount)&&Number.isFinite(reported)?reported-ciscoQuoteAmount:null;
+ const reconciliationPassed=ciscoVarianceTHB===0;
+ const integrityIssues=[...quoteDataIssues.map(id=>"Missing quote amount/currency: "+id),...missingCostSourceIds.map(id=>"Missing cost source: "+id),...(!reconciliationPassed?["Cisco source subtotal differs from working BOM cost; investigate quote-line allocation and scope before use"]:[])];
  return {
   steps:COST_PIPELINE_STEPS_0553,quotes:rows,sourceQuoteCount:rows.length,
+  reconciliationPassed,ciscoQuoteAmount,ciscoVarianceTHB,integrityIssues,
   includedQuoteIds:[...covered],unallocatedQuoteCount:rows.length-covered.size,
   knownCiscoSubtotalTHB:reported,knownSubtotalScope:"MR0001 / Cisco five LAN Set working scenario ONLY",
   mr0001RequiredSourceRows:MR0001_ENGINEERING_REQUIRED_BOM.rows.length,
