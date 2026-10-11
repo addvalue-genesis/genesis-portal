@@ -125,6 +125,19 @@ function rowCost(item){
    dimensionedPathAvailable:false,
    classification:"DRAWING_GEOMETRY_PRELIMINARY__NOT_CABLE_MTO"
   };
+  const historicalWiring={
+   source:"Z1D Wiring Brownfield_ - 2021-12-22.pdf",project:"Zawtika Phase 1D",
+   sourcePages:[3,4,5],status:"HISTORICAL_TOPOLOGY_REFERENCE_ONLY",
+   functionTrace:[
+    {id:"ODU_ANT_RF",from:"Outdoor radio RF ports",to:"RF antenna",medium:"Coax jumper / feeder",quantityDriver:"RF port count + actual routing",costOwner:"ODU kit / conditional bulk",sourcePage:3},
+    {id:"ODU_INDOOR_DATA",from:"Outdoor radio Ethernet",to:"Indoor PoE / surge interface",medium:"Outdoor-rated CAT6A",quantityDriver:"one verified run per physical Ethernet path × route length",costOwner:"Bulk row 11",sourcePage:3},
+    {id:"INDOOR_NETWORK",from:"PoE / surge interface",to:"Cisco switch / data termination",medium:"RJ45 patch cable",quantityDriver:"port and termination mapping",costOwner:"IDU/DATO/Bulk by nonduplicate interface",sourcePage:4},
+    {id:"INDOOR_POWER",from:"DC supply / terminals",to:"PoE injector",medium:"DC wiring",quantityDriver:"terminal count and power interface",costOwner:"BARTEC assembly vs bulk interface check",sourcePage:5},
+    {id:"EARTHING",from:"Outdoor radio / surge / panel",to:"Earthing termination",medium:"Earth conductor",quantityDriver:"bonding points and measured length",costOwner:"mounting kit / BARTEC / bulk (single owner)",sourcePage:5}
+   ],
+   routeLengthM:null,interfaceCountsApproved:false,
+   caveat:"Historical Z1D schematic has connectivity, not dimensioned Z1F cable routes or approved Z1F quantities"
+  };
   const options=[
    {sku:"TECKNIKABEL CAT6A S/FTP",unit:"m",rateTHB:cable?.unitPriceExVat??null,quantity:null,
     source:"QA24-0604 / line1",driver:"TPP-EQ-003: sum measured route segments + termination allowances + service loops; SPE §6.6 ethernet <80m is a constraint NOT a takeoff",selection:"REQUIRES_DIMENSIONED_EI_ROUTE"},
@@ -136,7 +149,7 @@ function rowCost(item){
   ];
   const components=options.map(v=>({...v,extended:Number.isFinite(v.quantity)&&Number.isFinite(v.rateTHB)?money(v.quantity,v.rateTHB):null}));
   return {...base,vendor:"INNOVA (historical rate evidence)",sku:"CAT6A + certified entry fittings (engineering takeoff)",
-   quotedRateCandidates:components,components,layoutTakeoff,currency:"THB",unitCost:null,extended:null,
+   quotedRateCandidates:components,components,layoutTakeoff,historicalWiring,currency:"THB",unitCost:null,extended:null,
    quantityBasis:"AFC LAY-0001 C1 sheet4 scale 1:100: ODU/antenna plan proximity ~0.5-1.0m; mezzanine +21.100/+21.300m vs lower +18.300m = 2.8-3.0m deck elevation difference (NOT cable length). BID-FPR TPP-EQ-003 still requires measured indoor endpoint and routed cable segments.",
    status:"ENGINEERING_ROUTE_LENGTH_NOT_DOCUMENTED",
    assumptions:["Plan proximity, deck elevation and quoted cable unit rate have evidence; physical route with E&I room cabinet entry and service loops is not dimensioned by this TEL drawing", "Earlier 20m CAT6A + 1 gland / THB 11,500 was an unsupported scenario and is excluded from evidence-based WP total",
