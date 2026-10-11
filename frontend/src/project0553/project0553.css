@@ -101,3 +101,12 @@
 .p553-dashboard .p55-tabgroup__items>button.is-active .p55-tab__number{background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.35)}
 .p553-dashboard .p55-tabgroup__items>button:focus-visible{outline:3px solid #df920e;outline-offset:2px}
 @media(max-width:850px){.p553-dashboard .p55-tabgroup{grid-template-columns:1fr}}
+
+
+/* Canonical component ID control; project 0553 pilot only. */
+.p553-dashboard .gns-copy-id{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap;margin:2px 0 2px 8px;vertical-align:middle;font-size:11px;letter-spacing:normal;text-transform:none}
+.p553-dashboard .gns-copy-id code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px;font-weight:700;background:#eff4f8;color:#244762;border:1px solid #d5e1ea;border-radius:4px;padding:3px 6px;user-select:all}
+.p553-dashboard .gns-copy-id button{font-size:11px;font-weight:750;background:#fff;color:#1e577c;border:1px solid #a9c3d5;border-radius:5px;padding:4px 8px;cursor:pointer;min-height:27px}
+.p553-dashboard .gns-copy-id button:hover{background:#eaf6fc;border-color:#4b9ab9}
+.p553-dashboard .gns-copy-id button:focus-visible{outline:2px solid #bb7300;outline-offset:2px}
+.p553-dashboard .gns-copy-id input{max-width:300px;font-size:12px;padding:4px}
