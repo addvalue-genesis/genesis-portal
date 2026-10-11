@@ -83,6 +83,9 @@ export function SimpleBom0553({focusedLocation=null}){
          {pricedOffers.map(q=><small key={q.quoteLine}>{q.quoteLine} · {q.sku}: USD {q.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</small>)}
         </div>:<small>No priced Next G line mapped to this item</small>}
         {uniqueOffers.some(q=>!Number.isFinite(q.unitPrice))&&<small>Additional quote line(s) marked N/A (not zero)</small>}
+        {x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice)).length>0&&<div><strong>Other source unit rates</strong>
+         {x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice)).map((v,i)=><small key={(v.quoteId||"other")+":"+(v.quoteLine||i)}>{v.vendor} · {v.quoteLine} · {v.sku}: {v.originalCurrency} {v.originalUnitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</small>)}
+        </div>}
        </td>
        <td>{Number.isFinite(x.indicativePackageCostTHB)?<>{money(x.indicativePackageCostTHB,"THB")}<small>Cisco scenario ONLY</small></>:<strong>NOT ALLOCATED</strong>}
         {pricedOffers.length>0&&<small>Next G unit prices available — site qty / extended cost not yet verified</small>}
