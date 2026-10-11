@@ -1,3 +1,4 @@
+import { createComponentRegistry } from "../common/governance/componentRegistry";
 // O&G lifecycle master navigation for PJ2608-0553.
 // Stage mappings are additive: legacy route IDs and dataset locations remain untouched.
 export const O_G_LIFECYCLE_0553 = Object.freeze([
@@ -32,3 +33,6 @@ export const L3_TAB_GROUPS_0553 = [
  {id:"analyse",title:"ANALYSE · Engineering & Delivery",tabs:["systems","schematic","execution","documents","risk"]},
  {id:"manage",title:"MANAGE · ข้อมูลและต้นทุน",tabs:["registry","budget"]}
 ];
+
+// Global generic identity engine, applied here only to PJ2608-0553.
+export const TAB_IDENTITY_0553=createComponentRegistry({projectId:"PJ2608-0553",stage:"L3",area:"B",tabs:L3_TABS_0553});
