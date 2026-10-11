@@ -141,13 +141,24 @@ function rowCost(item){
   };
   // Internal budgetary quantity allowance derived from LAY geometry and Z1D comparable,
   // never presented as a dimensioned or approved cable takeoff.
-  const budgetRoute={minimumBudgetaryLengthM:50,totalM:50,runCount:1,
+  const cableRoutes=[
+   {routeId:"ZWP20-ODU-TO-TC-ROOM-01",from:"MR-502-001 outdoor installation",to:"TC Room indoor PoE panel",
+    orientation:"ZWP20 source direction",quantityBasis:"MANAGEMENT_BASELINE",baseAllowanceM:50,
+    additionalMeasuredRouteM:0,sharedInfrastructureM:0}
+   // A distinct direction requires a new route record with evidence-based length,
+   // not an automatic multiplication of the existing 50m allocation.
+  ];
+  const effectiveLength=route=>route.baseAllowanceM+Math.max(0,route.additionalMeasuredRouteM);
+  const budgetRoute={routes:cableRoutes,minimumBudgetaryLengthM:50,
+    totalM:cableRoutes.reduce((n,route)=>n+effectiveLength(route),0),
+    runCount:cableRoutes.length,additionalDirectionsPending:true,
+    formula:"Sum of each distinct direction's 50m minimum plus verified additional route length; shared cable segments counted per physical cable, not as a common extra lump sum",
     classification:"MANAGEMENT_APPROVED_MINIMUM_BUDGETARY_ALLOWANCE",
     source:"Management 2026-10-11: assume at least 50m per cable run from WP installation point to TC Room",
     caveat:"50m is a commercial estimating minimum, not drawing-measured. Check actual routing, cable specification and 80m Ethernet constraint before design release"};
   const options=[
    {sku:"TECKNIKABEL CAT6A S/FTP",unit:"m",rateTHB:cable?.unitPriceExVat??null,quantity:budgetRoute.totalM,
-    source:"QA24-0604 / line1",driver:"One ZWP20 field-to-TC-Room CAT6A run × management minimum 50m including route and service allowance; NOT measured from LAY",selection:"BUDGETARY_ENGINEERING_ALLOWANCE"},
+    source:"QA24-0604 / line1",driver:"50m minimum for first ODU–TC Room run; each different-direction installation is a separate route plus its measured additional run length. Quantity is sum of route records, not quotation quantity.",selection:"BUDGETARY_ENGINEERING_ALLOWANCE"},
    {sku:"501/453/UNIV/A/M20",unit:"set",rateTHB:gland?.unitPriceExVat??null,quantity:1,
     source:"QA24-0604 / line4",driver:"One M20 indoor Ex e panel-entry allowance only; verify cable diameter and vendor-fitted gland. NOT 3/4in NPT outdoor radio entry shown by SAMART 1E GA",selection:"BUDGETARY_ENGINEERING_ALLOWANCE"},
    ...[...(q0604?.lines||[]).filter(v=>v.partNumber==="AFU113030"),...(q0606?.lines||[])].map(v=>({
@@ -160,7 +171,7 @@ function rowCost(item){
    quotedRateCandidates:components,components,layoutTakeoff,historicalWiring,gaReconciliation:ZWP20_GA_BULK_RECONCILIATION,budgetRoute,currency:"THB",unitCost:budgetaryTotal,extended:budgetaryTotal,
    quantityBasis:"AFC LAY-0001 C1 sheet4 scale 1:100: ODU/antenna plan proximity ~0.5-1.0m; mezzanine +21.100/+21.300m vs lower +18.300m = 2.8-3.0m deck elevation difference (NOT cable length). BID-FPR TPP-EQ-003 still requires measured indoor endpoint and routed cable segments.",
    status:"BUDGETARY_MANAGEMENT_MINIMUM_50M_NOT_MEASURED",
-   assumptions:["Management-approved estimating minimum 50m per CAT6A run from field point to TC Room; actual routed cable length not measured and must be reconciled with design", "One M20 indoor-panel gland budgetary allowance only; BARTEC includes 16 blanking plugs but not necessarily commissioned glands. 1E GA outdoor radio 3/4in NPT union/gland may need a different selected item; not proven included or priced, so document conditional additional exposure",
+   assumptions:["Management minimum 50m applies to initial physical route. Equipment in other directions needs an additional individually measured route/quantity, not covered by the first 50m; no separate direction has been entered into this estimate yet","Avoid duplicating cost of common pathways or counting link count as cable run count without distinct physical wiring", "One M20 indoor-panel gland budgetary allowance only; BARTEC includes 16 blanking plugs but not necessarily commissioned glands. 1E GA outdoor radio 3/4in NPT union/gland may need a different selected item; not proven included or priced, so document conditional additional exposure",
     "SPE §6.6 ethernet run <80m is a design constraint; it cannot be converted to an assumed purchase quantity",
     "Cable entry quantities require confirmed Ex cable/entry/interface schedule, accounting for BARTEC included components and B-5 two short RF jumpers",
     "QA24-0604 THB 524/m, THB 1,020/gland; QA24-0606 alternatives remain unit-rate evidence, not selected quantities"]};
