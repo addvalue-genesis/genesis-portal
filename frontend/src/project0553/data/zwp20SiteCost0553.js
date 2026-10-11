@@ -113,6 +113,18 @@ function rowCost(item){
   // no dimensioned cable-route measurement was established in available evidence.
   const cable=q0604?.lines.find(v=>v.description?.includes("TECKNIKABEL"));
   const gland=q0604?.lines.find(v=>v.partNumber==="501/453/UNIV/A/M20");
+  const layoutTakeoff={
+   drawing:"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 AFC",sheet:4,
+   scale:"1:100 at A1",gridSpanM:9.144,
+   radioAntennaPlanSeparationM:{min:0.5,max:1.0,method:"Scale-based visual approximation, not as-built cable route"},
+   mezzanineLevelM:[21.1,21.3],lowerDeckLevelM:18.3,
+   levelDifferenceM:[2.8,3.0],
+   endPoints:["MR-502-001 outdoor radio on E&I room rooftop","ANT-502-001 rooftop antenna","Indoor PoE / SCADA Ex e panel position not drawn here"],
+   relevantNotes:["Sheet 4 equipment tags MR-502-001 and ANT-502-001","Sheet 5 says detailed telecom equipment inside E&I room belongs to MM-ZTK-1F-ZWPX-ELE-LAY-0002"],
+   actualRoutedCableLengthM:null,
+   dimensionedPathAvailable:false,
+   classification:"DRAWING_GEOMETRY_PRELIMINARY__NOT_CABLE_MTO"
+  };
   const options=[
    {sku:"TECKNIKABEL CAT6A S/FTP",unit:"m",rateTHB:cable?.unitPriceExVat??null,quantity:null,
     source:"QA24-0604 / line1",driver:"TPP-EQ-003: sum measured route segments + termination allowances + service loops; SPE §6.6 ethernet <80m is a constraint NOT a takeoff",selection:"REQUIRES_DIMENSIONED_EI_ROUTE"},
@@ -124,10 +136,10 @@ function rowCost(item){
   ];
   const components=options.map(v=>({...v,extended:Number.isFinite(v.quantity)&&Number.isFinite(v.rateTHB)?money(v.quantity,v.rateTHB):null}));
   return {...base,vendor:"INNOVA (historical rate evidence)",sku:"CAT6A + certified entry fittings (engineering takeoff)",
-   quotedRateCandidates:components,components,currency:"THB",unitCost:null,extended:null,
-   quantityBasis:"BID-FPR TPP-EQ-003: Q_cable = sum(measured runs + termination allowance + service loop). AFC LAY-0001 shows rooftop ODU/antenna and indoor E&I enclosure but not a measured cable route.",
+   quotedRateCandidates:components,components,layoutTakeoff,currency:"THB",unitCost:null,extended:null,
+   quantityBasis:"AFC LAY-0001 C1 sheet4 scale 1:100: ODU/antenna plan proximity ~0.5-1.0m; mezzanine +21.100/+21.300m vs lower +18.300m = 2.8-3.0m deck elevation difference (NOT cable length). BID-FPR TPP-EQ-003 still requires measured indoor endpoint and routed cable segments.",
    status:"ENGINEERING_ROUTE_LENGTH_NOT_DOCUMENTED",
-   assumptions:["Earlier 20m CAT6A + 1 gland / THB 11,500 was an unsupported scenario and is excluded from evidence-based WP total",
+   assumptions:["Plan proximity, deck elevation and quoted cable unit rate have evidence; physical route with E&I room cabinet entry and service loops is not dimensioned by this TEL drawing", "Earlier 20m CAT6A + 1 gland / THB 11,500 was an unsupported scenario and is excluded from evidence-based WP total",
     "SPE §6.6 ethernet run <80m is a design constraint; it cannot be converted to an assumed purchase quantity",
     "Cable entry quantities require confirmed Ex cable/entry/interface schedule, accounting for BARTEC included components and B-5 two short RF jumpers",
     "QA24-0604 THB 524/m, THB 1,020/gland; QA24-0606 alternatives remain unit-rate evidence, not selected quantities"]};
