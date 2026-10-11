@@ -7,7 +7,10 @@ for(const key of ["c.requiredQty","c.selectedOffer","candidateQuotes","extended"
 assert(!model.includes("sourceQty:1"),"Vendor or MTO qty must not create physical required qty");
 assert(ui.includes("deriveEngineeringOwnedCost0553(x)"));
 assert(ui.includes("Engineering Required BOM → Vendor Rate → Cost"));
-assert(ui.includes("Legacy vendor one-each rate basket — comparison only"));
+assert(ui.includes("Engineering-Derived BOM → Selected Vendor/SKU → Parametric Cost"));
+assert(ui.includes("Copy Module Table (Excel TSV)"));
+assert(ui.includes("Module ID:"));
+assert(!ui.includes("Legacy vendor one-each rate basket — comparison only"));
 assert(model.includes('SCADA_LINKS_0553.filter(link=>link.to==="ZWP20"'));
 assert(model.includes('component.functionId==="RADIO_EQUIPMENT"'));
 assert(model.includes('quantityState:derivation.state'));
