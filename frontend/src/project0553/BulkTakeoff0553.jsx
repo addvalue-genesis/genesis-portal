@@ -1,3 +1,4 @@
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {BULK_TAKEOFF_0553,BULK_TAKEOFF_POLICY_0553} from "./data/bulkTakeoff0553";
 // Expandable engineering candidate detail, not yet approved engineering quantity or selected vendor.
@@ -16,7 +17,7 @@ export function BulkTakeoff0553(){
  const toggle=k=>setOpen(old=>{const next=new Set(old);next.has(k)?next.delete(k):next.add(k);return next;});
  const expandAll=()=>setOpen(new Set(BULK_TAKEOFF_0553.map((_,i)=>i)));
  return <section className="p55-panel">
-  <div className="p55-eyebrow">BID-BUD-BLK · bid.budget.bulk · ENGINEERING → COST</div>
+  <div className="p55-eyebrow">ENGINEERING → COST <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bulk"/></div>
   <h3>Bulk, Enclosure & ATEX JB — Engineering Take-off</h3>
   <p className="p55-note">กด + เพื่อดู Sub-items, Constraints และ Evidence ของแต่ละรายการ ยังไม่ใช่ Selected BOM; ช่องปริมาณหรือราคาว่าง = ไม่ได้ยืนยัน ไม่ใช่ศูนย์</p>
   <div style={{display:"flex",gap:8,marginBottom:12}}><button className="p553-detail-button" type="button" onClick={expandAll}>＋ Expand all</button><button className="p553-detail-button" type="button" onClick={()=>setOpen(new Set())}>− Collapse all</button></div>
