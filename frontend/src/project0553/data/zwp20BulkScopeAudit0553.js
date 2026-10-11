@@ -5,7 +5,7 @@ export const ZWP20_BULK_SCOPE_AUDIT_0553=Object.freeze({
  status:"PARTIAL_PRICED__NOT_COMPLETE",
  source:"Z1F LAY-0001 C1 sheet 4-5; BLD-0001 C1 sheet3 note8; historical BARTEC GA-1001 and SAMART-CUEL 1E GA; Next G quote; INNOVA quote",
  checks:[
-  {id:"ODU_CAT6A",group:"Field cable",item:"Outdoor-rated shielded CAT6A ODU to PoE/TC room",owner:"ROW11",basis:"50m one-run management minimum; count independent physical cables and verify route",qty:50,unit:"m",rateTHB:524,pricing:"BUDGET_ONLY"},
+  {id:"ODU_CAT6A",group:"Field cable",item:"Outdoor-rated shielded CAT6A ODU to PoE/TC room",owner:"ROW11",basis:"60m per confirmed run plus 15% purchasing allowance; count independent physical cables and verify route",qty:69,unit:"m",rateTHB:524,pricing:"BUDGET_ONLY"},
   {id:"PANEL_M20",group:"Ex entries",item:"Certified indoor M20 cable gland",owner:"ROW11_CONDITIONAL",basis:"One provisional entry, deduct supplier-fitted cable glands",qty:1,unit:"set",rateTHB:1020,pricing:"BUDGET_ONLY"},
   {id:"ODU_NPT",group:"Ex entries",item:"Radio-side 3/4in NPT union/gland/cold shrink",owner:"ROW11_IF_NOT_ODU_PACKAGE",basis:"SAMART 1E GA p6 is comparable only; verify exact OEM interface",qty:null,unit:"set",rateTHB:null,pricing:"PACKAGE_CHECK"},
   {id:"ODU_RJ45",group:"Termination",item:"Certified weatherproof RJ45/ODU Ethernet plug and boots",owner:"ROW11_IF_NOT_ODU_PACKAGE",basis:"One mating termination per physical ODU Ethernet port",qty:null,unit:"set",rateTHB:null,pricing:"PACKAGE_CHECK"},
@@ -22,5 +22,5 @@ export const ZWP20_BULK_SCOPE_AUDIT_0553=Object.freeze({
   {id:"CABLE_TEST",group:"Testing boundary",item:"Cable certification and insulation tests",owner:"B4_PRECOM",basis:"Test count by installed runs; not a duplicate material component",qty:null,unit:"test",rateTHB:null,pricing:"SERVICE_NOT_ROW11"},
   {id:"START_SPARES",group:"Spares boundary",item:"Commissioning/startup replacement consumables",owner:"B5_STARTUP_SPARES",basis:"OEM spares schedule, separate from purchased installation materials",qty:null,unit:"set",rateTHB:null,pricing:"SEPARATE_LIFECYCLE"}
  ],
- control:"Row11 currently prices only CAT6A 50m and M20 1 set. Do not claim complete. Avoid multiplying 50m by number of equipment tags; validate independent cable circuits, then revise allowance."
+ control:"Row11 currently prices only CAT6A 69m and M20 1 set. Do not claim complete. Avoid multiplying 69m by number of equipment tags; validate independent cable circuits, then revise allowance."
 });
