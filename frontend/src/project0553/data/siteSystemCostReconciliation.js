@@ -1,4 +1,5 @@
 // Reconciliation-first cost overview across site and MR. No invented quote allocation.
+import {ZWP8_ROW43_COST_TRACE} from "./zwp8Row43CostTrace";
 import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {MGW_P26_058_0553} from "./mgwP26058";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
@@ -25,6 +26,17 @@ const derivedRows=sites.flatMap(site=>mrSystems.map(mr=>{
   const matches=MR0001_WORKING_PRICED_BOM.items.filter(x=>x.site===site&&Number.isFinite(x.indicativePackageCostTHB));
   for(const x of matches)evidence.push({source:"VST-0048-RE1",line:x.sourceTag,description:"Cisco LAN working package",sourceQty:x.sourceScopeQty,assumedQty:x.sourceScopeQty,currency:"THB",unit:MR0001_WORKING_PRICED_BOM.cisco.unitPackageQuotedSumTHB,extended:x.indicativePackageCostTHB,kind:"PROVISIONAL_SITE_QUOTE_BUNDLE"});
  }
+ // Management-selected four-foot scenario for ZWP8 row 43 only.
+ // This is one partial equipment allowance; no separate row-level radio/antenna
+ // amounts may be added again without reversing this bundle.
+ if(site==="ZWP8"&&mr.id==="MR-0001"){
+  const chosen=ZWP8_ROW43_COST_TRACE.referenceScenarios.find(x=>x.id===ZWP8_ROW43_COST_TRACE.preferredScenarioId);
+  if(chosen&&Number.isFinite(chosen.partialEquipmentUSD)){
+   evidence.push({source:"NG-260916",line:"MTO43:4FT",description:"Two remote-radio assemblies + two 4ft antenna candidates (partial only)",
+    sourceQty:null,assumedQty:1,currency:"USD",unit:chosen.partialEquipmentUSD,
+    extended:chosen.partialEquipmentUSD,kind:"BUDGETARY_PREFERRED_PARTIAL__NOT_APPROVED"});
+  }
+ }
  // MGW offer scope expressly lists ZWP20,21,22. One per site is a working
  // equal-distribution ASSUMPTION, not signed OEM site allocation.
  if(["ZWP20","ZWP21","ZWP22"].includes(site)&&mgwBySystem[mr.id]){
@@ -40,7 +52,7 @@ const derivedRows=sites.flatMap(site=>mrSystems.map(mr=>{
  const gaps=mr.id==="MR-0001"?["Next G radio/antenna/throughput/NMS allocation","Enclosure, DATO, surge and physical bulk","RF/CAL/OEM quantity and scope ownership"]:mr.id==="MR-0002"?["RFI LNA not included in MGW BDA","Site RF topology, feeder and enclosure take-off"]:mr.id==="MR-0003"?["Check vendor phone package already includes sounder, JB and glands","Installation cable/terminations"]:["RACON installation accessories, Ex/certification and test"];
  return {site,mr:mr.id,name:mr.name,evidence,subtotals,gaps,
   completeness:"PARTIAL_NOT_APPROVED",verifiedTotal:null,
-  sourceNote:mr.id==="MR-0001"?"Cisco 5-site quote scenario only; Next G global quote unallocated":"MGW 3-unit quotation split equally across ZWP20-22 only as reversible budgetary assumption"};
+  sourceNote:mr.id==="MR-0001"?site==="ZWP8"?"Cisco scenario plus preferred 4ft row43 partial radio/antenna; all remaining Next G quote allocations open":"Cisco 5-site quote scenario only; Next G global quote unallocated":"MGW 3-unit quotation split equally across ZWP20-22 only as reversible budgetary assumption"};
 }));
 const mgwSharedAmount=sharedMGW.reduce((sum,r)=>sum+checkedAmount(r),0);
 const mgwProductQuotedAmount=normalizedMGW.filter(x=>!x.id.startsWith("SERV-")).reduce((sum,r)=>sum+checkedAmount(r),0);
@@ -52,6 +64,7 @@ export const SITE_SYSTEM_COST_RECONCILIATION_0553=Object.freeze({
  mgwQuoteUSD:MGW_P26_058_0553.quotedTotal,
  nextGQuoteUSD:sourcePrice("NG-260916")?.quotedTotal??null,
  nextGSiteAllocatedUSD:null,siteFinalTotals:null,projectFinalTotal:null,
+ zwp8PreferredAntenna:ZWP8_ROW43_COST_TRACE.preferredBudgetaryAntenna,
  exclusions:["Never add quotation-wide Next G to individual sites","MGW engineering/FAT/packing is shared and not allocated twice",
  "MGW BDA is NOT the missing RFI LNA","MGW telephone package already includes JB/sounder/glands",
  "Do not equate site scenario with verified A+B+C or customer sell",
