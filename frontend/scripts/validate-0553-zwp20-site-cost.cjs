@@ -79,4 +79,8 @@ assert(fs.readFileSync(path.join(src,"data/sevenLocationCostCalculations0553.js"
 assert(ui.includes("Lifecycle Cost Calculation"));
 assert(ui.includes("ZWP20 Bulk Completeness Audit"));
 assert(fs.readFileSync(path.join(src,"data/zwp20BulkScopeAudit0553.js"),"utf8").includes("START_SPARES"));
+assert(ui.includes('"sysbulk:"+g.site')));
+assert(ui.includes("System Bulk / รายการย่อยตามระบบ"));
+assert(ui.includes('x.sourceRow===11&&<div className="p55-panel"'));
+assert(!ui.includes('<th>MTO / Module</th>'));
 console.log("PASS ZWP20 bulk base THB 37,176: 60m plus 15% purchase allowance + 1 gland. Different directions require additional distinct route records.");
