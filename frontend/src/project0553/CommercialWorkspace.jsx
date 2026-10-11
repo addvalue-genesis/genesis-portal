@@ -49,7 +49,7 @@ export function CommercialWorkspace0553({focusedLocation=null}){
  <section className="p55-panel">
   <div className="p55-eyebrow">COMMERCIAL WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing"/></div>
   <h2>Engineering → BOM/MTO → Cost → Customer Scope of Supply</h2>
-  <p className="p55-note"><strong>Shared Cost Spine:</strong> Known preliminary equipment THB {BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US")} · {BID_COST_SPINE_0553.pricedRows} priced MTO items / {BID_COST_SPINE_0553.unpricedRows} unpriced · full A+B+C and customer sell not complete. Source: {BID_COST_SPINE_0553.source}</p>
+  <p className="p55-note"><strong>MR0001 Cisco-only preliminary subtotal (NOT total project cost):</strong> THB {BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US")} · {BID_COST_SPINE_0553.pricedRows} provisionally priced source items / {BID_COST_SPINE_0553.unpricedRows} unpriced · Next G / MGW / other vendors / bulk / A+B+C / customer sell NOT included. Source: {BID_COST_SPINE_0553.source}</p>
   <p className="p55-note">This is a controlled WORKSPACE, not a price release. The previously issued SAMTEL file is historical evidence; its exact issued revision must be verified before snapshot registration. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
     <div className="p55-segmented p55-segmented--commercial">
