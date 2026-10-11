@@ -10,6 +10,9 @@ for(const t of ["rowCost(item)","item.sourceRow===4","item.sourceRow===5","item.
 const rate=c=>{const row=ng.lines.find(x=>x.code===c);assert(row&&Number.isFinite(row.unitPrice));return row.unitPrice;};
 assert.equal(Math.round((7288.65+671.27+rate("B-12")+rate("B-8"))*100)/100,13283.89);
 assert(model.includes("BUDGETARY_PARTIAL_INTERFACE_ONLY"));
+assert(model.includes("BUDGETARY_HISTORICAL_COMPARABLE_SELECTED"));
+assert(model.includes("THB 39,200/set"));
+assert(model.includes("row 5, 7, 10 and 8 own those costs"));
 assert(model.includes("budgetaryIndoorInterfaceUSD"));
 assert(model.includes("standalone IDU"));
 assert(ui.includes("Indoor Interface allocated to Row 5:"));
@@ -35,4 +38,4 @@ assert(innova.includes('partNumber:"IE-PS-RJ45-FH-BK",description:"Weidmuller RJ
 assert(innova.includes('partNumber:"501/453/UNIV/A/M20",description:"Hawke M20 gland",qty:1,unit:"set",unitPriceExVat:1020'));
 assert(model.includes("MANAGEMENT_TEMPORARY_ZERO__SOURCE_QUOTE_NA"));
 assert(vendorDocs.includes("INNOVA_QA24-0604_ITEM2_NA__BUDGETARY_TEMP_ZERO"));
-console.log("PASS ZWP20 8 MTO rows: known USD 13,283.89 / THB 425,430 including THB 1,900 partial DATO reference; 4 unresolved/partial scope rows; no cross-currency addition.");
+console.log("PASS ZWP20 8 MTO rows: known USD 13,283.89 / THB 464,630 including THB 1,900 partial DATO reference; 4 unresolved/partial scope rows; no cross-currency addition.");
