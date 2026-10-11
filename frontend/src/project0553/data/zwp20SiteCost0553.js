@@ -48,8 +48,19 @@ function rowCost(item){
    quantityBasis:"1 LAN Set in ZWP20 MTO, reconciled with 5-switch vendor quote across five locations",
    assumptions:["Current quote expired; included SmartNet/subscription terms per offered package","Zero-priced source software lines are included, not separately charged"]};
  }
- if(item.sourceRow===8)return {...base,quantityBasis:"MTO 1 Set EX Ethernet quick disconnect; verify Ex zone, connectors and location",
-  assumptions:["No 0553 verified DATO item unit price in selected-source ledger"]};
+ if(item.sourceRow===8){
+  const quote=SUPPLIER_QUOTE_LINES_0553.find(v=>v.id==="SONIC-CCY24-PXC-633");
+  const source=quote?.lines.find(v=>v[1]==="FL-PP-RJ45-SC");
+  const rate=Number.isFinite(source?.[4])?source[4]:null;
+  return {...base,vendor:"Sonic Automation / Phoenix Contact (historical candidate)",sku:"FL-PP-RJ45-SC — RJ45 patch panel, functional candidate only",
+   currency:rate!==null?"THB":null,unitCost:rate,extended:money(q,rate),
+   quantityBasis:"MTO Rev04 DATO-507-001 1 Set; assumed one RJ45 patch panel as provisional budgetary interface equivalent; actual Ex-rated disconnect composition must be checked",
+   status:"BUDGETARY_PARTIAL_FUNCTION_EQUIVALENCE_NOT_EX_APPROVED",
+   assumptions:["Historical Sonic CCY24-PXC-633 11-Jul-2024 THB 1,900 / EA ex VAT; quotation validity expired",
+    "Weidmuller IE-PS-RJ45-FH-BK datasheet is Cat6A RJ45 plug IP20 and has no price; NOT automatically Ex quick-disconnect",
+    "Phoenix FL-PP-RJ45-SC has quoted price but is NOT established as full DATO Ex-rated socket and plug. Keep technical gap, hazardous-area certification and accessory assembly as separate unresolved scope",
+    "Estimate quantity 1 Set is provisional; do not use vendor quoted quantity"]};
+ }
  if(item.sourceRow===9)return {...base,bartecMapping:ZWP20_BARTEC_NEXTG_REFERENCE_MAP.entries.filter(e=>e.allocation.includes("TCAB-500-001 row9")),quantityBasis:"MTO 1 Telecom Enclosure; verify SCADA panel Ex rating, cut-outs, cooling and mounting",
   assumptions:["Do not substitute Ex Telephone JB or Zawtika 1E panel historical price without technical scope reconciliation"]};
  if(item.sourceRow===10){
@@ -68,7 +79,7 @@ export function deriveZWP20SiteCost0553(){
  const rows=(site?.items||[]).map(rowCost);
  const currencies=["USD","THB"];
  const subtotals=Object.fromEntries(currencies.map(currency=>[currency,Math.round(rows.filter(r=>r.currency===currency&&Number.isFinite(r.extended)).reduce((n,r)=>n+r.extended,0)*100)/100]));
- const gaps=rows.filter(r=>r.extended===null||r.status==="BUDGETARY_PARTIAL_INTERFACE_ONLY");
+ const gaps=rows.filter(r=>r.extended===null||r.status==="BUDGETARY_PARTIAL_INTERFACE_ONLY"||r.status==="BUDGETARY_PARTIAL_FUNCTION_EQUIVALENCE_NOT_EX_APPROVED");
  return {site:"ZWP20",moduleId:"PJ2608-0553 / bid.budget.bom.zwp20",system:"MR-0001",rows,subtotals,gaps,
   pricedRows:rows.filter(r=>Number.isFinite(r.extended)).length,totalRows:rows.length,
   status:gaps.length?"PRICED_SUBTOTAL_WITH_EXPLICIT_SCOPE_GAPS":"BUDGETARY_SCOPE_COSTED",
