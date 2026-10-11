@@ -71,7 +71,7 @@ assert(bulkAll.includes('DTRS_TRUNK_RADIO'));
 assert(dtrsBulk.includes('"LNA","TCAB-508-001"'));
 assert(dtrsBulk.includes('"RF surge and grounding","TCAB-508-002"'));
 assert(ui.includes("WP System Bulk"));
-assert(bulkAll.includes('wp==="ZWP20"?50'));
+assert(bulkAll.includes("approvedCablePurchaseM"));
 assert(bulkAll.includes('APPROVED_60M_PLUS_15PCT_BUDGETARY'));
 assert(ui.includes('Working priced bulk summary'));
 assert(ui.includes('ALREADY_IN_ZWP20_ROW11'));
