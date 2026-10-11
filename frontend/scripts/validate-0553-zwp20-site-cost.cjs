@@ -8,11 +8,15 @@ const site=source.itemRows.filter(r=>r.platform==="ZWP20");
 assert.deepEqual(site.map(r=>r.sourceRowIndex),[4,5,6,7,8,9,10,11]);
 for(const t of ["rowCost(item)","item.sourceRow===4","item.sourceRow===5","item.sourceRow===6","item.sourceRow===7","item.sourceRow===8","item.sourceRow===9","item.sourceRow===10","item.sourceRow===11","gaps=rows.filter","subtotals"]){assert(model.includes(t),"Missing source allocation: "+t);}
 const rate=c=>{const row=ng.lines.find(x=>x.code===c);assert(row&&Number.isFinite(row.unitPrice));return row.unitPrice;};
-assert.equal(Math.round((7959.92+rate("B-12")+rate("B-8"))*100)/100,13283.89);
+assert.equal(Math.round((7288.65+671.27+rate("B-12")+rate("B-8"))*100)/100,13283.89);
+assert(model.includes("BUDGETARY_PARTIAL_INTERFACE_ONLY"));
+assert(model.includes("budgetaryIndoorInterfaceUSD"));
+assert(model.includes("standalone IDU"));
+assert(ui.includes("Indoor Interface allocated to Row 5:"));
 assert.equal(rate("B-12"),4709.77);
 assert.equal(rate("B-8"),614.2);
 assert(model.includes("MTO 1 Set + RPT topology"));
 assert(ui.includes("Copy ZWP20 BOM Table (Excel)"));
 assert(ui.includes("zwp20Cost.subtotals.USD"));
 assert(ui.includes("zwp20Cost.subtotals.THB"));
-console.log("PASS ZWP20 8 MTO rows: known USD 13,283.89 / Cisco THB 423,530; 4 scope gaps; no cross-currency addition.");
+console.log("PASS ZWP20 8 MTO rows: known USD 13,283.89 / Cisco THB 423,530; Row5 partial interface and 4 unresolved/partial gaps; no cross-currency addition.");
