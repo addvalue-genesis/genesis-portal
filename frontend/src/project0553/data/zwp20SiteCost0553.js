@@ -108,32 +108,29 @@ function rowCost(item){
  if(item.sourceRow===11){
   const q0604=INNOVA_0553_PROVISIONAL_PRICES.quotations.find(v=>v.number==="QA24-0604");
   const q0606=INNOVA_0553_PROVISIONAL_PRICES.quotations.find(v=>v.number==="QA24-0606");
-  // Engineering scenario, NOT supplier quoted basket quantities:
-  // one outdoor-to-indoor CAT6 route, 20m planning length to be replaced by
-  // actual E&I room/roof routed cable measurement; one external M20 gland.
-  // OEM B-5 includes two short RF jumpers; do not duplicate those here.
+  // BID-FPR TPP-EQ-003 forbids fabricated route lengths / wastage factors.
+  // LAY-0001 Rev C1 positions ODU/antenna and points to separate E&I layout;
+  // no dimensioned cable-route measurement was established in available evidence.
   const cable=q0604?.lines.find(v=>v.description?.includes("TECKNIKABEL"));
   const gland=q0604?.lines.find(v=>v.partNumber==="501/453/UNIV/A/M20");
   const options=[
-   {sku:"TECKNIKABEL CAT6A S/FTP",unit:"m",rateTHB:cable?.unitPriceExVat??null,quantity:20,
-    source:"QA24-0604 / line1",driver:"1 outdoor ODU to indoor Ex e enclosure × 20m provisional route; replace with LAY/E&I measured run",selection:"BUDGETARY_ASSUMED_ROUTE"},
-   {sku:"501/453/UNIV/A/M20",unit:"set",rateTHB:gland?.unitPriceExVat??null,quantity:1,
-    source:"QA24-0604 / line4",driver:"One provisional cable entry from field route, excluding cabinet-supplied stopping plugs",selection:"BUDGETARY_ASSUMED_ENTRY"},
+   {sku:"TECKNIKABEL CAT6A S/FTP",unit:"m",rateTHB:cable?.unitPriceExVat??null,quantity:null,
+    source:"QA24-0604 / line1",driver:"TPP-EQ-003: sum measured route segments + termination allowances + service loops; SPE §6.6 ethernet <80m is a constraint NOT a takeoff",selection:"REQUIRES_DIMENSIONED_EI_ROUTE"},
+   {sku:"501/453/UNIV/A/M20",unit:"set",rateTHB:gland?.unitPriceExVat??null,quantity:null,
+    source:"QA24-0604 / line4",driver:"Count certified used cable entries by cable diameter, deduct included entries/plug items in BARTEC TCAB; check actual electrical interface",selection:"REQUIRES_ENTRY_SCHEDULE"},
    ...[...(q0604?.lines||[]).filter(v=>v.partNumber==="AFU113030"),...(q0606?.lines||[])].map(v=>({
     sku:v.partNumber,unit:v.unit,rateTHB:v.unitPriceExVat,quantity:null,source:v.partNumber==="AFU113030"?"QA24-0604 / line3":"QA24-0606",
-    driver:"RF connector/adapter compatibility and Ex interface not yet derived",selection:"UNSELECTED_ALTERNATIVE"}))
+    driver:"RF/Ex interface and connector compatibility not yet selected",selection:"UNSELECTED_ALTERNATIVE"}))
   ];
   const components=options.map(v=>({...v,extended:Number.isFinite(v.quantity)&&Number.isFinite(v.rateTHB)?money(v.quantity,v.rateTHB):null}));
-  const calculated=components.filter(v=>Number.isFinite(v.extended));
-  const amount=calculated.length===2?Math.round(calculated.reduce((n,v)=>n+v.extended,0)*100)/100:null;
-  return {...base,vendor:"INNOVA (historical rate evidence)",sku:"CAT6A routed cable + M20 gland scenario",quotedRateCandidates:components,
-   components,currency:"THB",unitCost:amount,extended:amount,
-   quantityBasis:"First Principles: 1 ODU-to-indoor PoE Ethernet route. Working 20m route + 1 M20 gland; source MTO is 1 Lot, not purchasing quantity",
-   status:"BUDGETARY_BULK_SCENARIO_WITH_ASSUMPTIONS",
-   assumptions:["Route 20m is a reversible engineering planning allowance, NOT measured from LAY; update after E&I detailed routing",
-    "One external gland provisional. Verify enclosure cable entries and Ex certification; do not count included panel stopping plugs twice",
-    "QA24-0604 rates: CAT6A THB 524/m + M20 gland THB 1,020/set. Alternative Ex adapters and RF glands excluded, not zero",
-    "Radio kit B-5 includes 2 short coax jumpers, avoid duplicate charge; remaining bulk may need separate estimate"]};
+  return {...base,vendor:"INNOVA (historical rate evidence)",sku:"CAT6A + certified entry fittings (engineering takeoff)",
+   quotedRateCandidates:components,components,currency:"THB",unitCost:null,extended:null,
+   quantityBasis:"BID-FPR TPP-EQ-003: Q_cable = sum(measured runs + termination allowance + service loop). AFC LAY-0001 shows rooftop ODU/antenna and indoor E&I enclosure but not a measured cable route.",
+   status:"ENGINEERING_ROUTE_LENGTH_NOT_DOCUMENTED",
+   assumptions:["Earlier 20m CAT6A + 1 gland / THB 11,500 was an unsupported scenario and is excluded from evidence-based WP total",
+    "SPE §6.6 ethernet run <80m is a design constraint; it cannot be converted to an assumed purchase quantity",
+    "Cable entry quantities require confirmed Ex cable/entry/interface schedule, accounting for BARTEC included components and B-5 two short RF jumpers",
+    "QA24-0604 THB 524/m, THB 1,020/gland; QA24-0606 alternatives remain unit-rate evidence, not selected quantities"]};
  }
  return base;
 }
@@ -142,7 +139,7 @@ export function deriveZWP20SiteCost0553(){
  const rows=(site?.items||[]).map(rowCost);
  const currencies=["USD","THB"];
  const subtotals=Object.fromEntries(currencies.map(currency=>[currency,Math.round(rows.filter(r=>r.currency===currency&&Number.isFinite(r.extended)).reduce((n,r)=>n+r.extended,0)*100)/100]));
- const gaps=rows.filter(r=>r.extended===null||r.status==="BUDGETARY_PARTIAL_INTERFACE_ONLY"||r.status==="BUDGETARY_BULK_SCENARIO_WITH_ASSUMPTIONS");
+ const gaps=rows.filter(r=>r.extended===null||r.status==="BUDGETARY_PARTIAL_INTERFACE_ONLY");
  return {site:"ZWP20",moduleId:"PJ2608-0553 / bid.budget.bom.zwp20",system:"MR-0001",rows,subtotals,gaps,
   pricedRows:rows.filter(r=>Number.isFinite(r.extended)).length,totalRows:rows.length,
   status:gaps.length?"PRICED_SUBTOTAL_WITH_EXPLICIT_SCOPE_GAPS":"BUDGETARY_SCOPE_COSTED",
