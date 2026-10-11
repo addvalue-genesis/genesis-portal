@@ -89,6 +89,7 @@ export function SimpleBom0553({focusedLocation=null}){
        const otherPriced=x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice));
        const isCisco=Number.isFinite(x.indicativePackageCostTHB);
        const remoteBudget=getZWP20RemoteBudgetChoice(x);
+       const engineeringCost=deriveEngineeringOwnedCost0553(x);
        return <>
        <td><strong>{isCisco?x.pricedVendor:remoteBudget?"Next G · provisional remote B":"NO SELECTED VENDOR"}</strong>
         <small>Next G: {nextgPriced.length} priced quote option(s)</small>
@@ -96,7 +97,7 @@ export function SimpleBom0553({focusedLocation=null}){
         <small>กด + ตรวจ Vendor / MCDA / Quantity</small></td>
        <td>{isCisco?<><strong>{money(bom.cisco.unitPackageQuotedSumTHB,"THB")}</strong><small>Cisco package scenario per MTO Set — NOT accepted SKU rate</small></>:remoteBudget?<><strong>NOT SELECTED</strong><small>Next G B comparison basket USD {remoteBudget.unitUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}; not a physical SKU unit price</small></>:
         <><strong>NOT SELECTED</strong><small>{nextgPriced.length+otherPriced.length} unit-price evidence line(s) in expanded quote table</small><small>ไม่ใช่ผลรวมของราคา Vendor ทุกทางเลือก</small></>}</td>
-       <td>{isCisco?<><strong>{money(x.indicativePackageCostTHB,"THB")}</strong><small>Provisional Cisco bundle only</small></>:remoteBudget?<><strong>PACKAGE TOTAL NOT DERIVED</strong><small>Next G Group B reference USD {remoteBudget.partialUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} — 7-line comparison basket, not selected BOM cost</small><small>Requires deduplicated selected component ledger</small></>:
+       <td>{isCisco?<><strong>{money(x.indicativePackageCostTHB,"THB")}</strong><small>Provisional Cisco bundle only</small></>:remoteBudget?<><strong>{engineeringCost.budgetaryItemTotalUSD!==null?money(engineeringCost.budgetaryItemTotalUSD,"USD"):"BUDGETARY COST INCOMPLETE"}</strong><small>Engineering-derived functions: {engineeringCost.budgetaryCostedCount}/{engineeringCost.requiredFunctionCount} · {engineeringCost.budgetaryDecision.state}</small><small>Radio ODU functional subtotal only; antenna, independent surge, enclosure, bulk and services are separate scope, not included</small></>:
         <><strong>NOT CALCULATED</strong><small>Physical Qty × Selected Unit Rate + attributable accessories</small><small>No site allocation approved</small>
 
          </>}</td>
@@ -114,7 +115,7 @@ export function SimpleBom0553({focusedLocation=null}){
         <table className="p55-table p55-table--compact"><thead><tr><th>Engineering Function</th><th>Quantity Driver</th><th>Required Qty</th><th>Selected SKU</th><th>Vendor Unit Rate</th><th>Extended Cost</th><th>State</th></tr></thead><tbody>
         {result.components.map(c=><tr key={c.id}><td>{c.functionId}</td><td>{c.driver}</td><td>{c.nonCostedIncluded?"INCLUDED · N/A":c.requiredQty??"NOT DERIVED"}<small>{c.quantityState}</small><small>{c.quantityProof}</small></td><td>{c.selectedOffer??"NOT SELECTED"}<small>{c.budgetaryQuoteLine?"Budgetary reference: Next G "+c.budgetaryQuoteLine:""}</small></td><td>{c.unitPrice===null?"NOT APPROVED":money(c.unitPrice,c.currency)}<small>{Number.isFinite(c.budgetaryUnitPrice)?"Budgetary source: "+money(c.budgetaryUnitPrice,"USD"):""}</small></td><td>{c.extended===null?"NOT VERIFIED":money(c.extended,c.currency)}<small>{Number.isFinite(c.budgetaryExtended)?"Budgetary partial: "+money(c.budgetaryExtended,"USD"):""}</small></td><td>{c.state}</td></tr>)}
         </tbody></table><p className="p55-note"><strong>Budgetary Engineering Decision:</strong> {result.budgetaryDecision.configuration} · {result.budgetaryDecision.basis} · {result.budgetaryDecision.state}. Standard warranty: included. Qualification/deviation review: {result.budgetaryDecision.requiredDeviationReview.join("; ")}. No approval or registered deviation is implied.</p>
-        <p className="p55-note"><strong>Item Cost:</strong> {result.amount===null?"NOT ESTABLISHED":money(result.amount,result.currency)} · <strong>Derived budgetary partial:</strong> {money(result.budgetaryPartialUSD,"USD")} (quantity proof shown per function; standard warranty included in radio base rate; excludes ethernet surge, antenna, enclosure, bulk and services) · {result.state}. MTO Set, vendor offered Qty and comparison scenarios remain evidence, not the Engineering BOM quantity.</p>
+        <p className="p55-note"><strong>Approved Item Cost:</strong> {result.amount===null?"NOT ESTABLISHED":money(result.amount,result.currency)} · <strong>Calculated budgetary radio functional subtotal:</strong> {money(result.budgetaryPartialUSD,"USD")} (quantity proof shown per function; standard warranty included in radio base rate; excludes ethernet surge, antenna, enclosure, bulk and services) · {result.state}. MTO Set, vendor offered Qty and comparison scenarios remain evidence, not the Engineering BOM quantity.</p>
        </div>})()}
 
        {x.site==="ZWP8"&&x.sourceRow===43&&<div className="p55-table-wrap">
