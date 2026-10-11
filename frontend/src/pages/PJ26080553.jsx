@@ -1,4 +1,5 @@
 import { CommercialWorkspace0553 } from "../project0553/CommercialWorkspace";
+import { WorkflowNavigator0553 } from "../project0553/WorkflowNavigator0553";
 import { O_G_LIFECYCLE_0553, L3_TABS_0553, L3_TAB_GROUPS_0553 } from "../project0553/lifecycleNavigation";
 import { DocumentReferenceControl0553 } from "../project0553/DocumentReferenceControl0553";
 import { VendorProductCatalog0553 } from "../project0553/VendorProductCatalog0553";
@@ -82,6 +83,7 @@ export function PJ26080553() {
  {l3Area==="A"&&<div className="p55-stack"><Section title="L3.A — Original / Received Documents"><p>เอกสารต้นทางจาก RFQ / Client เก็บอ้างอิงไฟล์เดิม ไม่ถือว่าการลงทะเบียนเป็นการอนุมัติ</p><Table headers={["ID","Document / location","Revision","Control state","Meaning"]} rows={sourceRows(originalSources)}/></Section><Section title="Project Engineering References"><p>MR, DTS, BOD, SPE, DWG, CAL/RPT และเอกสารที่ถูกอ้างอิง ตรวจรายละเอียดและ Revision ใน 04 Document Intelligence โดยใช้ต้นฉบับชุดเดิม</p><DocumentReferenceControl0553/></Section></div>}
  {l3Area==="C"&&<div className="p55-stack"><Section title="L3.C — Communications & Submissions"><p>ทะเบียนเอกสารสื่อสารกับ SAMTEL / JUTAL และเอกสารเสนอราคา ไม่ถือว่ารายการที่ INDEXED หรือ PREPARED ได้ส่งแล้ว</p><Table headers={["ID","Document / location","Revision","Control state","Meaning"]} rows={sourceRows(communications)}/></Section><Section title="Submission Control"><p>TC/TQ, technical bid, commercial priced/unpriced, transmittals, comments และ responses ต้องตรวจหลักฐานผู้ส่ง ผู้รับ วันที่ และ Revision ก่อนเปลี่ยนสถานะเป็น SUBMITTED. TBE ภายในไม่ใช่ Submission อัตโนมัติ</p></Section></div>}
  {l3Area==="B"&&<>
+ {tab==="overview"&&<WorkflowNavigator0553 onNavigate={setWorkspaceTab}/> }
 
    {tab==="schematic"&&<ScadaSchematic0553 onOpenLocationBom={openLocationBom}/>}
    {tab==="registry"&&<DataCodeRegistry0553/>}
