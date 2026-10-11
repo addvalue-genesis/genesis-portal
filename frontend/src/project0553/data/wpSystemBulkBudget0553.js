@@ -19,10 +19,10 @@ export function deriveWpSystemBulkBudget0553(){
      note:w.wp==="ZWP20"?"Active ZWP20 working Row 11 owns 50m. This detail is a mirrored allocation, never additive.":"Parametric planning base at 60m per unique physical run; no package purchase commitment"}]},
    {id:"EX_IP_PHONE",name:"EX IP Phone",equipment:found("EX_IP_PHONE"),
     route:null,items:[
-     {id:"EX-PHONE-JB",item:"Dedicated certified Ex e Telephone Junction Box assembly, terminals, earth studs, bracket, labels and blanking plugs",unit:"set",qty:null,rateTHB:null,
-      source:"MR0003 MTO/DTS + Z1F LAY/BLD; historical BARTEC GA-1004 / SAMART-CUEL 1E telephone JB",
-      owner:"EX_PHONE_JB_ASSEMBLY",status:"JB_REQUIRED__QUANTITY_BY_PHONE_LOCATION_AND_TERMINATION",
-      note:"Ex Phone JB separate from SCADA Ex e TCAB and DTRS Ex d; historical BARTEC 300x300x160 or 1E 200x200x120 sizes are alternatives, not Z1F certified selection"},
+     {id:"EX-PHONE-JB",item:"Dedicated certified Ex e Telephone Junction Box assembly, terminals, earth studs, bracket, labels and blanking plugs",unit:"set",qty:null,rateTHB:24500,
+      source:"Prosper Q-PROSRY-24051 Rev0 2024-07-12 item3 Exe JB for Telephone 300x300x160, THB24500/set; historical Zawtika 1E only",
+      owner:"EX_PHONE_JB_ASSEMBLY",status:"HISTORICAL_UNIT_RATE_VERIFIED__QUANTITY_BY_PHONE_LOCATION",
+      note:"Historical 300x300x160 Ex e JB has 4 M20 stopping plugs and patch panels customer free-issued. Alternative item4 200x200x120 telephone terminal box with relay is THB22000/set, NOT same specification. Do not multiply original 4 quoted units into Z1F."},
      {id:"EX-PHONE-JB-ENTRIES",item:"Certified glands, stopping plugs and interface accessories for telephone JB",unit:"entry",qty:null,rateTHB:null,
       source:"BARTEC telephone JB historical GA and IEC/EN 60079-14 installation requirement",owner:"EX_PHONE_JB_ASSEMBLY_OR_EXTERNAL_BULK",
       status:"DEDUCT_VENDOR_INCLUDED_FITTINGS",note:"Count cable entries by incoming/outgoing telephone and sounder circuits; never multiply historical blanking plug count"},
@@ -36,7 +36,7 @@ export function deriveWpSystemBulkBudget0553(){
    {id:"MARINE_RACON",name:"Marine RACON",equipment:found("MARINE_RACON"),route:cableRoute("MARINE_RACON"),
     items:found("MARINE_RACON").length?[{id:"RACON-POWER-CONTROL",item:"Power/control interface cable to RACON DB/JB",unit:"route",qty:null,rateTHB:null,
      source:"LAY sheet "+w.sheets.upper+" tags MAR-514-001, TCAB-514-001/002",owner:"RACON_BULK",
-     status:"POWER_CONTROL_DTS_REQUIRED",note:"Do not use SCADA CAT6A rate; verify box interconnections and power supply"}]:[]}
+     status:"POWER_CONTROL_DTS_REQUIRED",note:"Vendor RACON assembly includes enclosures per supplier GA; only field power/control cables, Ex certified terminations and external connections excluded from offer may be separate bulk"}]:[]}
   ];
   return {wp:w.wp,systems:systems.map(sys=>({...sys,items:sys.items.map(it=>({
    ...it,extendedTHB:Number.isFinite(it.qty)&&Number.isFinite(it.rateTHB)?Math.round(it.qty*it.rateTHB*100)/100:null
