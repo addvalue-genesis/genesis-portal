@@ -1,3 +1,4 @@
+import {ZWP20_BARTEC_NEXTG_REFERENCE_MAP} from "./zwp20BartecNextgMap";
 // ZWP20 SCADA MR0001 single allocation ledger: never add vendor alternatives or quote-wide quantities.
 // Each MTO source row owns its cost once. A/B/C classifications and missing sources stay explicit.
 import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
@@ -28,7 +29,7 @@ function rowCost(item){
   return {...base,vendor:"Next G / Aviat",sku:"PS-DCDC-HAZ-POE-IND-01 + PPT-B (indoor PoE interface only)",
    currency:"USD",unitCost:functionalCost,extended:functionalCost,
    quantityBasis:"MTO Rev04 row 5: IDU function 1 Set; AFC BLD-0001 Rev.C1 sheet 3/7 Note 8: new IDU + surge in new Ex e enclosure",
-   status:"BUDGETARY_PARTIAL_INTERFACE_ONLY",
+   status:"BUDGETARY_PARTIAL_INTERFACE_ONLY",bartecMapping:ZWP20_BARTEC_NEXTG_REFERENCE_MAP.entries.filter(e=>e.allocation==="MR-502-001A row5"),
    assumptions:["USD 667.67 + USD 3.60: sourced PoE supply and cord only, allocated from Radio ODU exactly once","Not a separately offered or technically proven complete IDU: dedicated IDU/equivalent functionality remains an explicitly qualified scope gap","AFC BLD requires new IDU; if using an integrated outdoor-radio design, document compliant indoor interface equivalence and deviation","Surge remains solely at MTO row 10; Ex e enclosure remains row 9"]};
  }
  if(item.sourceRow===6){
@@ -49,7 +50,7 @@ function rowCost(item){
  }
  if(item.sourceRow===8)return {...base,quantityBasis:"MTO 1 Set EX Ethernet quick disconnect; verify Ex zone, connectors and location",
   assumptions:["No 0553 verified DATO item unit price in selected-source ledger"]};
- if(item.sourceRow===9)return {...base,quantityBasis:"MTO 1 Telecom Enclosure; verify SCADA panel Ex rating, cut-outs, cooling and mounting",
+ if(item.sourceRow===9)return {...base,bartecMapping:ZWP20_BARTEC_NEXTG_REFERENCE_MAP.entries.filter(e=>e.allocation.includes("TCAB-500-001 row9")),quantityBasis:"MTO 1 Telecom Enclosure; verify SCADA panel Ex rating, cut-outs, cooling and mounting",
   assumptions:["Do not substitute Ex Telephone JB or Zawtika 1E panel historical price without technical scope reconciliation"]};
  if(item.sourceRow===10){
   const vendor=lineByCode.get("B-8");
