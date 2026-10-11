@@ -142,25 +142,31 @@ export function SimpleBom0553({focusedLocation=null}){
         <tr><td>05 Cost formula</td><td>Physical Qty × Accepted Unit Rate + attributable bulk / work / risk</td><td>{Number.isFinite(x.acceptedPrice)&&Number.isFinite(x.engineeringRequiredSkuQty)?money(x.acceptedPrice*x.engineeringRequiredSkuQty,"THB"):"Verified extended cost NOT ESTABLISHED"}</td></tr>
         <tr><td>06 Budgetary evidence</td><td>Source scenario shown separately; pricing requires quantity driver, currency/FX, validity and risk basis</td><td>{Number.isFinite(x.indicativePackageCostTHB)?money(x.indicativePackageCostTHB,"THB")+" — SCENARIO ONLY":"SOURCE PRICE NOT ALLOCATED"}</td></tr>
         </tbody></table></div>
-       {(()=>{const estimate=NEXTG_CANDIDATE_ESTIMATE_0553.estimateFor(x);
-       return <div className="p55-table-wrap"><strong>Next G Vendor Source → Function → Rate Evidence</strong>
-       <p className="p55-note">Quote: {NEXTG_CANDIDATE_ESTIMATE_0553.sourceQuote} · Source currency USD · Offered quantity is whole-quotation quantity, NOT the quantity allocated to {g.site}. {deriveZWP20VendorFunctionCosts(x)? ""Engineering-calculated budgetary result shown above (single cost authority). Historical USD "+deriveZWP20VendorFunctionCosts(x).partialUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" vendor basket retained as NON-ADDITIVE comparison, not derived item cost.":"Site-allocated equipment cost NOT ESTABLISHED."}</p>
-       {deriveZWP20VendorFunctionCosts(x)&&<details><summary>Legacy vendor one-each rate basket — comparison only, NOT Engineering Qty</summary><table className="p55-table p55-table--compact"><thead><tr><th>Selected preliminary function</th><th>Next G quote line</th><th>Derived budgetary Qty</th><th>Source unit USD</th><th>Derived extended USD</th><th>Evidence / constraint</th></tr></thead><tbody>
-        {deriveZWP20VendorFunctionCosts(x).rows.map(r=><tr key={r.code}><td>{r.functionId}</td><td>{r.code} · {r.sku}</td><td>{r.quantity}</td><td>{money(r.unitUSD,"USD")}</td><td>{money(r.extendedUSD,"USD")}</td><td>{r.quantityBasis}<small>Whole quote Qty: {r.sourceQuoteQty}; no site approval</small></td></tr>)}
-        <tr><td colSpan={4}><strong>Partial function subtotal — does not include excluded scope</strong></td><td><strong>{money(deriveZWP20VendorFunctionCosts(x).partialUSD,"USD")}</strong></td><td>NOT APPROVED · NOT FULL PACKAGE COST</td></tr>
-       </tbody></table></details>}
-       <table className="p55-table p55-table--compact"><thead><tr><th>Function / Quantity Driver</th><th>Quote line / SKU</th><th>Offer Qty</th><th>Source Unit USD</th><th>Source Extended USD</th><th>Qualification</th><th>Site Qty / Cost</th></tr></thead><tbody>
-        {estimate.functions.flatMap(fn=>fn.candidates.length?fn.candidates.map(q=><tr key={q.id}>
-         <td>{fn.functionId}<small>{fn.quantityDriver}</small></td>
-         <td>{q.quoteLine} · {q.sku}<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase()+".ng."+q.quoteLine.toLowerCase()}/></td>
-         <td className="is-number">{q.offeredQty??"—"}</td>
-         <td className="is-number">{Number.isFinite(q.unitPrice)?q.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"N/A AS QUOTED"}</td>
-         <td className="is-number">{Number.isFinite(q.quotedExtended)?q.quotedExtended.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"N/A AS QUOTED"}</td>
-         <td>{q.technicalState}<small>{q.issues.join("; ")||"OEM/engineering review required"}</small></td>
-         <td>NOT ALLOCATED</td>
-        </tr>):[<tr key={fn.id}><td>{fn.functionId}<small>{fn.quantityDriver}</small></td><td colSpan={5}>No matching Next G source quote line</td><td>NOT ALLOCATED</td></tr>])}
-       </tbody></table>
-       <p className="p55-note"><strong>Quantity derivation:</strong> {estimate.roleEvidence?JSON.stringify(estimate.roleEvidence):"No role evidence for site"}. These are candidate link roles, not approved purchase quantities. Resolve location, licensed throughput, NMS, antenna RF proof, site Ex requirements, inclusion boundaries and shared accessories before choosing cost. Source quote value must not be summed across candidate consumers.</p></div>})()}
+       {(()=>{const result=deriveEngineeringOwnedCost0553(x);
+        const moduleId="PJ2608-0553 / bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)+".derivation";
+        const lines=[["Module ID","Engineering Function","Engineering Qty","Quantity Basis","Budgetary Vendor","Selected SKU","Vendor Quote Line","Unit Price USD","Extended USD","Price Basis"],
+          ...result.components.map(c=>[moduleId,c.functionId,c.nonCostedIncluded?"Included":c.requiredQty??"",c.quantityState,c.nonCostedIncluded?"OEM Included":c.budgetarySelectedOffer?"Next G":"Not selected",c.budgetarySelectedSKU||"",c.budgetarySelectedOffer||"",c.budgetaryUnitPrice??"",c.budgetaryExtended??"",c.priceEvidenceType||""]),
+          [moduleId,"BUDGETARY RADIO FUNCTIONAL TOTAL","","",result.budgetaryDecision.selectedVendor,"","","",result.budgetaryItemTotalUSD??"","CALCULATED_WITH_ASSUMPTIONS"]];
+        const tsv=lines.map(a=>a.map(v=>String(v??"").replace(/\\t|\\r?\\n/g," ")).join("\\t")).join("\\n");
+        return <div className="p55-table-wrap">
+         <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",justifyContent:"space-between"}}>
+          <strong>Engineering-Derived BOM → Selected Vendor/SKU → Parametric Cost</strong>
+          <button type="button" className="p553-detail-button" onClick={()=>{if(typeof navigator!=="undefined"&&navigator.clipboard?.writeText){navigator.clipboard.writeText(tsv).catch(()=>window.prompt("Copy engineering BOM TSV",tsv));}else if(typeof window!=="undefined"){window.prompt("Copy engineering BOM TSV",tsv);}}}>Copy Module Table (Excel TSV)</button>
+         </div>
+         <p className="p55-note"><strong>Module ID:</strong> {moduleId} <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)+".derivation"}/></p>
+         <p className="p55-note">Root = Engineering Requirements, Topology, Constraints and derived quantities. Next G / {result.budgetaryDecision.quotation} supplies product and unit-rate evidence only, not purchase quantities. All vendor alternatives and whole-offer quantities are excluded from this total.</p>
+         <table className="p55-table p55-table--compact"><thead><tr><th>Required Engineering Function</th><th>Qty / Basis</th><th>Budgetary Selected Vendor / SKU</th><th>Source Line</th><th>Unit USD</th><th>Extended USD</th><th>Decision</th></tr></thead><tbody>
+          {result.components.map(c=><tr key={c.id}><td>{c.functionId}</td><td>{c.nonCostedIncluded?"Included":c.requiredQty??"Not derived"}<small>{c.quantityState}</small></td><td>{c.nonCostedIncluded?"Included in OEM base":c.budgetarySelectedSKU??"Not selected"}<small>{c.budgetarySelectedOffer?"Next G · budgetary selected":""}</small></td><td>{c.budgetarySelectedOffer||"—"}</td><td>{Number.isFinite(c.budgetaryUnitPrice)?money(c.budgetaryUnitPrice,"USD"):"—"}</td><td>{Number.isFinite(c.budgetaryExtended)?money(c.budgetaryExtended,"USD"):"Included / Not priced"}</td><td>{c.priceEvidenceType==="ASSUMED_INCLUDED_NO_SEPARATE_CHARGE"?"USD 0 incremental assumption; Myanmar entitlement review":c.budgetaryDecision}<small>Final approval separate</small></td></tr>)}
+          <tr><td colSpan={5}><strong>Engineering Budgetary Radio Functional Cost</strong></td><td><strong>{money(result.budgetaryItemTotalUSD,"USD")}</strong></td><td>{result.budgetaryState}</td></tr>
+         </tbody></table>
+         <p className="p55-note">Scope boundary: Radio ODU functional package only; antenna, independent surge, enclosure, bulk and services belong to separately traced MTO/CBS lines. Standard warranty included. Region entitlement USD 0 is a working assumption, not OEM-confirmed pricing.</p>
+         <details><summary>Vendor alternative price evidence (reference only; excluded from selected cost)</summary>
+         <p className="p55-note">Vendor candidate rates are reference evidence. No quotation-wide offered quantity determines the Engineering BOM quantity.</p>
+         <table className="p55-table p55-table--compact"><thead><tr><th>Engineering Function</th><th>Vendor SKU / Quote</th><th>Quoted Qty (whole quote)</th><th>Unit Rate</th></tr></thead><tbody>
+         {result.components.flatMap(c=>c.vendorCandidates.map(v=><tr key={c.id+"-"+v.quoteLine}><td>{c.functionId}</td><td>{v.sku} / {v.quoteLine}</td><td>{v.offeredQty??"—"}</td><td>{Number.isFinite(v.unitPrice)?money(v.unitPrice,v.currency||"USD"):"No separate rate"}</td></tr>))}
+         </tbody></table></details>
+        </div>;
+       })()}
        {(()=>{const decision=ITEM_DECISION_PIPELINE_0553.evaluate(x);return <div className="p55-table-wrap">
        <strong>Stage-gated qualification / MCDA / CBS trace</strong>
        <table className="p55-table p55-table--compact"><thead><tr><th>Gate</th><th>Result</th><th>Evidence / decision rule</th></tr></thead><tbody>
