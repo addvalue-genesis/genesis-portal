@@ -4,6 +4,7 @@ import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { InternalBudgetShortcut0553 } from "./InternalBudgetShortcut0553";
 import { ScopeSheetsDetail0553 } from "./ScopeSheetsDetail0553";
 import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
+import { CostIntegrityReview0553 } from "./CostIntegrityReview0553";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { SimpleBom0553 } from "./SimpleBom0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
@@ -73,6 +74,7 @@ export function CommercialWorkspace0553({focusedLocation=null}){
    <p className="p55-note"><strong>INPUT:</strong> RFQ/MR/MTO/BLD/DTS/RPT/Standards · <strong>DERIVE:</strong> Link/Capacity/Interface Constraints → Physical BOM and quantity → Vendor technical evaluation → WBS Services → Equipment/Service Cost and risk · <strong>OUTPUT:</strong> reviewed engineering working cost. Current MTO sets and quoted vendor quantities are input evidence, NOT verified physical SKU quantities.</p>
   </section>
   <details className="p553-budget-phase" open><summary><strong>Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
+   <CostIntegrityReview0553/>
    <SimpleBom0553 focusedLocation={focusedLocation}/>
   </details>
   <details className="p553-budget-phase"><summary><strong>Scope of Supply & Bulk Reconciliation</strong><small>bid.budget.scope · bid.budget.bulk · A/B/C</small></summary>
