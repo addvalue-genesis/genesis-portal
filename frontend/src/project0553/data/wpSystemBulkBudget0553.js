@@ -13,10 +13,10 @@ export function deriveWpSystemBulkBudget0553(){
   const cableRoute=(sys)=>routeModel.rows.find(r=>r.wp===w.wp&&r.system===sys);
   const systems=[
    {id:"SCADA_RADIO",name:"SCADA Radio",equipment:found("SCADA_RADIO"),route:cableRoute("SCADA_RADIO"),
-    items:[{id:"SCADA-CAT6A",item:"Outdoor CAT6A S/FTP",unit:"m",qty:wp==="ZWP20"?50:(cableRoute("SCADA_RADIO")?.scenarios.base??null),
+    items:[{id:"SCADA-CAT6A",item:"Outdoor CAT6A S/FTP",unit:"m",qty:w.wp==="ZWP20"?50:(cableRoute("SCADA_RADIO")?.scenarios.base??null),
      rateTHB:524,source:"INNOVA QA24-0604, historical; scenario base",owner:"BULK_ROW11",
-     status:wp==="ZWP20"?"EXISTING_ZWP20_ROW11_COST_OWNER":"PARAMETRIC_60M_BASE__NOT_VENDOR_CONFIRMED",
-     note:wp==="ZWP20"?"Active ZWP20 working Row 11 owns 50m. This detail is a mirrored allocation, never additive.":"Parametric planning base at 60m per unique physical run; no package purchase commitment"}]},
+     status:w.wp==="ZWP20"?"EXISTING_ZWP20_ROW11_COST_OWNER":"PARAMETRIC_60M_BASE__NOT_VENDOR_CONFIRMED",
+     note:w.wp==="ZWP20"?"Active ZWP20 working Row 11 owns 50m. This detail is a mirrored allocation, never additive.":"Parametric planning base at 60m per unique physical run; no package purchase commitment"}]},
    {id:"EX_IP_PHONE",name:"EX IP Phone",equipment:found("EX_IP_PHONE"),
     route:null,items:[{id:"EX-PHONE-CABLE",item:"Phone network cable / PoE or manufacturer specified",unit:"route",qty:null,
      rateTHB:null,source:"TEL-LAY symbol and Z1F MR plus phone DTS needed",owner:"PHONE_BULK",
