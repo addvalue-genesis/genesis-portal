@@ -112,6 +112,12 @@ export function SimpleBom0553({focusedLocation=null}){
        {x.site==="ZWP8"&&x.sourceRow===43&&<div className="p55-table-wrap">
         <strong>ZWP8 Row 43 — six original MTO tags, exact quotation candidates</strong>
         <p className="p55-note">The current source item is {x.sourceTag}. The complete source row includes six distinct equipment functions. Quoted prices are evidence, not selected site rates; source sets are not validated physical SKU counts.</p>
+        <div className="p55-table-wrap"><strong>Budgetary reference — two radio assemblies and two antennas (source-backed assumptions, NOT full ZWP8 cost)</strong>
+        <table className="p55-table p55-table--compact"><thead><tr><th>Antenna option</th><th>Assumed radio assemblies</th><th>Radio USD/unit</th><th>Assumed antennas</th><th>Antenna USD/unit</th><th>Partial equipment USD</th><th>Decision</th></tr></thead><tbody>
+        {ZWP8_ROW43_COST_TRACE.referenceScenarios.map(v=><tr key={v.id}><td>{v.antennaLabel} · {v.antennaQuoteLine}</td><td>{v.assumedRadioAssemblies}</td><td>{money(v.radioAssemblyUnitUSD,"USD")}</td><td>{v.assumedAntennas}</td><td>{money(v.antennaUnitUSD,"USD")}</td><td><strong>{money(v.partialEquipmentUSD,"USD")}</strong></td><td>{v.state}<small>{v.assumption}</small></td></tr>)}
+        </tbody></table>
+        <p className="p55-note">These are alternative estimates; never add 4ft and 6ft scenarios together. Excludes separate IDU treatment, region/NMS licensing, warranty, enclosure, cable, gland, bulk, services and risk. No scenario is an approved ZWP8 or MR0001 total.</p></div>
+
         <table className="p55-table p55-table--compact"><thead><tr><th>Tag / leaf ID</th><th>MTO qty</th><th>Function</th><th>Vendor rate candidates (USD/unit)</th><th>Required physical qty</th><th>Extended ZWP8 cost</th></tr></thead><tbody>
         {ZWP8_ROW43_COST_TRACE.items.map(item=><tr key={item.tag}><td>{item.tag}<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.zwp8."+item.tag.toLowerCase()+".43"}/></td><td>{item.sourceScopeText}</td><td>{item.role}</td><td>{item.candidates.length?item.candidates.map(v=><small key={v.quoteLine}>{v.quoteLine} · {v.sku}: {money(v.unitPriceUSD,"USD")} (offer qty {v.quoteQty})</small>):"No separate priced OEM IDU line identified"}</td><td>NOT DERIVED</td><td>NOT ALLOCATED</td></tr>)}
         </tbody></table><p className="p55-note">Antenna selection 4ft versus 6ft requires CAL/RPT; do not sum alternative antenna quotes. IDU integration must be checked before assigning additional cost.</p>
