@@ -17,7 +17,7 @@ export function ScopeSheetsDetail0553(){
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
  const details=REV08_BASELINE.detail[category[1]]||[];
  return <section className="p55-panel">
-  <div className="p55-eyebrow">L3.B / 10 · ALL 6 ORIGINAL SCOPE OF SUPPLY SHEETS</div>
+  <div className="p55-eyebrow">BID-BUD-SOS · bid.budget.scope · 6 ORIGINAL SHEETS</div>
   <h3>Scope of Supply — Linked Internal Detail</h3>
   <p className="p55-note">Original uploaded workbook has 6 tabs, including unpriced template cells. Historical Rev08 amounts below are kept separate from original cells, current vendor cost and new bid selling price.</p>
   <div className="p55-filterbar"><label>Customer Workbook Sheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{SHEETS.map(v=><option value={v[0]} key={v[0]}>{v[0]}</option>)}</select></label></div>
