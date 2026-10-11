@@ -1,4 +1,4 @@
-import { getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
+import { deriveZWP20VendorFunctionCosts, getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
 import {ZWP8_ROW43_COST_TRACE} from "./data/zwp8Row43CostTrace";
 import {SourceCoverage0553} from "./SourceCoverage0553";
 import {SiteSystemCostReconciliation0553} from "./SiteSystemCostReconciliation0553";
@@ -133,7 +133,11 @@ export function SimpleBom0553({focusedLocation=null}){
         </tbody></table></div>
        {(()=>{const estimate=NEXTG_CANDIDATE_ESTIMATE_0553.estimateFor(x);
        return <div className="p55-table-wrap"><strong>Next G Vendor Source → Function → Rate Evidence</strong>
-       <p className="p55-note">Quote: {NEXTG_CANDIDATE_ESTIMATE_0553.sourceQuote} · Source currency USD · Offered quantity is whole-quotation quantity, NOT quantity allocated to {g.site}. Selected cost for this location: NOT ESTABLISHED.</p>
+       <p className="p55-note">Quote: {NEXTG_CANDIDATE_ESTIMATE_0553.sourceQuote} · Source currency USD · Offered quantity is whole-quotation quantity, NOT the quantity allocated to {g.site}. {deriveZWP20VendorFunctionCosts(x)? "Derived preliminary functional subtotal USD "+deriveZWP20VendorFunctionCosts(x).partialUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" — NOT complete/verified package cost.":"Site-allocated equipment cost NOT ESTABLISHED."}</p>
+       {deriveZWP20VendorFunctionCosts(x)&&<table className="p55-table p55-table--compact"><thead><tr><th>Selected preliminary function</th><th>Next G quote line</th><th>Derived budgetary Qty</th><th>Source unit USD</th><th>Derived extended USD</th><th>Evidence / constraint</th></tr></thead><tbody>
+        {deriveZWP20VendorFunctionCosts(x).rows.map(r=><tr key={r.code}><td>{r.functionId}</td><td>{r.code} · {r.sku}</td><td>{r.quantity}</td><td>{money(r.unitUSD,"USD")}</td><td>{money(r.extendedUSD,"USD")}</td><td>{r.quantityBasis}<small>Whole quote Qty: {r.sourceQuoteQty}; no site approval</small></td></tr>)}
+        <tr><td colSpan={4}><strong>Partial function subtotal — does not include excluded scope</strong></td><td><strong>{money(deriveZWP20VendorFunctionCosts(x).partialUSD,"USD")}</strong></td><td>NOT APPROVED · NOT FULL PACKAGE COST</td></tr>
+       </tbody></table>}
        <table className="p55-table p55-table--compact"><thead><tr><th>Function / Quantity Driver</th><th>Quote line / SKU</th><th>Offer Qty</th><th>Source Unit USD</th><th>Source Extended USD</th><th>Qualification</th><th>Site Qty / Cost</th></tr></thead><tbody>
         {estimate.functions.flatMap(fn=>fn.candidates.length?fn.candidates.map(q=><tr key={q.id}>
          <td>{fn.functionId}<small>{fn.quantityDriver}</small></td>
