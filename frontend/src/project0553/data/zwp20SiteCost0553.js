@@ -5,6 +5,7 @@ import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
 import {deriveEngineeringOwnedCost0553} from "./engineeringOwnedCost0553";
 import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
+import {INNOVA_0553_PROVISIONAL_PRICES} from "./innovaHistoricalBudgetPrices";
 const lineByCode=new Map(NEXTG.lines.map(q=>[q.code,q]));
 const cisco=SUPPLIER_QUOTE_LINES_0553.find(q=>q.id==="VST-0048-RE1");
 const money=(q,p)=>Number.isFinite(q)&&Number.isFinite(p)?Math.round(q*p*100)/100:null;
@@ -52,15 +53,25 @@ function rowCost(item){
   const quote=SUPPLIER_QUOTE_LINES_0553.find(v=>v.id==="SONIC-CCY24-PXC-633");
   const source=quote?.lines.find(v=>v[1]==="FL-PP-RJ45-SC");
   const rate=Number.isFinite(source?.[4])?source[4]:null;
+  // Use the controlled INNOVA quotation registry as the only source for quoted unit rates.
+  // N/A remains null in the registry; management's temporary 0 applies only to budgetary estimate.
+  const innova=INNOVA_0553_PROVISIONAL_PRICES.quotations.find(v=>v.number==="QA24-0604");
+  const plugQuote=innova?.lines.find(v=>v.partNumber==="IE-PS-RJ45-FH-BK");
+  const plugQuotedRate=Number.isFinite(plugQuote?.unitPriceExVat)?plugQuote.unitPriceExVat:null;
+  const plugQty=1; // ZWP20 engineering budget assumption; never copied from vendor quote qty
+  const plugBudgetRate=plugQuotedRate===null?0:plugQuotedRate;
   const weidmuellerPlug={functionId:"DATO_RJ45_FIELD_PLUG",vendor:"INNOVA / Weidmüller",
-    sku:"IE-PS-RJ45-FH-BK",orderNo:"1963600000",qty:1,currency:"THB",
-    unitPrice:0,extended:0,priceBasis:"INNOVA_QA24-0604_ITEM2_NA_AS_QUOTED__MANAGEMENT_TEMPORARY_ZERO",
-    source:"INNOVA QA24-0604 dated 15-Jul-2024 Item 2 (quoted N/A); technical datasheet 1963600000_IE-PS-RJ45-FH-BK_en.pdf",exStatus:"IP20_DATASHEET__EX_COMPLIANCE_NOT_ESTABLISHED"};
+    sku:"IE-PS-RJ45-FH-BK",orderNo:"1963600000",qty:plugQty,currency:"THB",
+    quotedUnitPrice:plugQuotedRate,unitPrice:plugBudgetRate,extended:money(plugQty,plugBudgetRate),
+    priceBasis:plugQuotedRate===null?"MANAGEMENT_TEMPORARY_ZERO__SOURCE_QUOTE_NA":"INNOVA_QUOTED_PRICE_EX_VAT",
+    quote:"QA24-0604",quoteItem:2,source:innova?.url||null,
+    exStatus:"IP20_DATASHEET__EX_COMPLIANCE_NOT_ESTABLISHED"};
+  const budgetaryDATO=money(q,rate)!==null?Math.round((money(q,rate)+weidmuellerPlug.extended)*100)/100:null;
   return {...base,vendor:"Sonic Automation / Phoenix Contact + Weidmüller (INNOVA pending)",sku:"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK (budgetary DATO components)",components:[
     {functionId:"DATO_RJ45_PANEL_INTERFACE",vendor:"Sonic Automation / Phoenix Contact",sku:"FL-PP-RJ45-SC",qty:q,currency:"THB",unitPrice:rate,extended:money(q,rate),priceBasis:"CCY24-PXC-633 historical quotation"},
     weidmuellerPlug
    ],
-   currency:rate!==null?"THB":null,unitCost:rate,extended:money(q,rate),
+   currency:rate!==null?"THB":null,unitCost:rate,extended:budgetaryDATO,
    quantityBasis:"MTO Rev04 DATO-507-001 1 Set; assumed one RJ45 patch panel as provisional budgetary interface equivalent; actual Ex-rated disconnect composition must be checked",
    status:"MANAGEMENT_APPROVED_BUDGETARY_BASIS",decision:"Management accepted FL-PP-RJ45-SC THB 1,900 and temporary Weidmüller RJ45 plug THB 0 as ZWP20 DATO budget components; INNOVA QA24-0604 Item 2 confirms offered SKU but Unit Price N/A; a new priced quote will replace zero; technical Ex compliance remains separate",
    assumptions:["Historical Sonic CCY24-PXC-633 11-Jul-2024 THB 1,900 / EA ex VAT; quotation validity expired",
