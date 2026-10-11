@@ -1,0 +1,17 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const root=path.resolve(__dirname,"../src/project0553");
+const mto=JSON.parse(fs.readFileSync(path.join(root,"data/snapshots/mr0001.mto.rev04.sourceRows.json"),"utf8"));
+const quote=JSON.parse(fs.readFileSync(path.join(root,"data/quotes/NG-260916-ADV-DAP1.full.json"),"utf8"));
+const item=mto.itemRows.find(r=>r.platform==="ZWP20"&&r.sourceRowIndex===4);
+assert(item&&item.sourceItemCodes.includes("MR-502-001"),"ZWP20 row4 MTO identity");
+const codes=["B-1","B-2","B-3","B-5","B-6","B-7","B-8"];
+const unit=Math.round(codes.reduce((n,c)=>{const line=quote.lines.find(q=>q.code===c);assert(line&&Number.isFinite(line.unitPrice));return n+line.unitPrice;},0)*100)/100;
+assert.equal(unit,8574.12);
+const model=fs.readFileSync(path.join(root,"data/mr502BudgetaryScenarios.js"),"utf8");
+const ui=fs.readFileSync(path.join(root,"SimpleBom0553.jsx"),"utf8");
+assert(model.includes('getZWP20RemoteBudgetChoice(item)'));
+assert(model.includes('item.sourceRow!==4'));
+assert(model.includes('assumedAssemblies:1'));
+assert(ui.includes('const remoteBudget=getZWP20RemoteBudgetChoice(x)'));
+assert(ui.includes('money(remoteBudget.partialUSD,"USD")'));
+console.log("PASS ZWP20 MR-502-001 Row4: provisional one-remote assembly USD 8574.12; not complete item cost or final engineering acceptance.");
