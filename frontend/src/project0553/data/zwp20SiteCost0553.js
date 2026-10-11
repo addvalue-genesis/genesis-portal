@@ -108,16 +108,32 @@ function rowCost(item){
  if(item.sourceRow===11){
   const q0604=INNOVA_0553_PROVISIONAL_PRICES.quotations.find(v=>v.number==="QA24-0604");
   const q0606=INNOVA_0553_PROVISIONAL_PRICES.quotations.find(v=>v.number==="QA24-0606");
-  const rateEvidence=[...(q0604?.lines||[]).filter(v=>v.description?.includes("TECKNIKABEL")||["AFU113030","501/453/UNIV/A/M20"].includes(v.partNumber))
-    .map(v=>({sku:v.partNumber||"TECKNIKABEL CAT6A S/FTP",unit:v.unit,rateTHB:v.unitPriceExVat,quantity:null,source:q0604.number})),
-    ...(q0606?.lines||[]).map(v=>({sku:v.partNumber,unit:v.unit,rateTHB:v.unitPriceExVat,quantity:null,source:q0606.number}))];
-  return {...base,vendor:"INNOVA (historical quote rate library)",quotedRateCandidates:rateEvidence,
-   quantityBasis:"MTO 1 Lot only establishes scope. Engineering quantities require measured cable routing, count of Ex entry interfaces and RF feeder terminations",
-   status:"ENGINEERING_BULK_TAKEOFF_REQUIRED",
-   assumptions:["QA24-0604 cable rate THB 524/m, Ex adaptor THB 3,100/ea (MOQ 10), Hawke gland THB 1,020/set — evidence, not ZWP20 procurement quantities",
-    "QA24-0606 has alternative RF gland rates; only interfaces actually requiring each gland are counted",
-    "No use of radio path distance as physical cable length. Avoid double-counting accessories included in row4/radio mounting kit and row9 enclosure",
-    "Coax/Ethernet fire performance TC-0001 items 7–8; verify take-off"]};
+  // Engineering scenario, NOT supplier quoted basket quantities:
+  // one outdoor-to-indoor CAT6 route, 20m planning length to be replaced by
+  // actual E&I room/roof routed cable measurement; one external M20 gland.
+  // OEM B-5 includes two short RF jumpers; do not duplicate those here.
+  const cable=q0604?.lines.find(v=>v.description?.includes("TECKNIKABEL"));
+  const gland=q0604?.lines.find(v=>v.partNumber==="501/453/UNIV/A/M20");
+  const options=[
+   {sku:"TECKNIKABEL CAT6A S/FTP",unit:"m",rateTHB:cable?.unitPriceExVat??null,quantity:20,
+    source:"QA24-0604 / line1",driver:"1 outdoor ODU to indoor Ex e enclosure × 20m provisional route; replace with LAY/E&I measured run",selection:"BUDGETARY_ASSUMED_ROUTE"},
+   {sku:"501/453/UNIV/A/M20",unit:"set",rateTHB:gland?.unitPriceExVat??null,quantity:1,
+    source:"QA24-0604 / line4",driver:"One provisional cable entry from field route, excluding cabinet-supplied stopping plugs",selection:"BUDGETARY_ASSUMED_ENTRY"},
+   ...[...(q0604?.lines||[]).filter(v=>v.partNumber==="AFU113030"),...(q0606?.lines||[])].map(v=>({
+    sku:v.partNumber,unit:v.unit,rateTHB:v.unitPriceExVat,quantity:null,source:v.partNumber==="AFU113030"?"QA24-0604 / line3":"QA24-0606",
+    driver:"RF connector/adapter compatibility and Ex interface not yet derived",selection:"UNSELECTED_ALTERNATIVE"}))
+  ];
+  const components=options.map(v=>({...v,extended:Number.isFinite(v.quantity)&&Number.isFinite(v.rateTHB)?money(v.quantity,v.rateTHB):null}));
+  const calculated=components.filter(v=>Number.isFinite(v.extended));
+  const amount=calculated.length===2?Math.round(calculated.reduce((n,v)=>n+v.extended,0)*100)/100:null;
+  return {...base,vendor:"INNOVA (historical rate evidence)",sku:"CAT6A routed cable + M20 gland scenario",quotedRateCandidates:components,
+   components,currency:"THB",unitCost:amount,extended:amount,
+   quantityBasis:"First Principles: 1 ODU-to-indoor PoE Ethernet route. Working 20m route + 1 M20 gland; source MTO is 1 Lot, not purchasing quantity",
+   status:"BUDGETARY_BULK_SCENARIO_WITH_ASSUMPTIONS",
+   assumptions:["Route 20m is a reversible engineering planning allowance, NOT measured from LAY; update after E&I detailed routing",
+    "One external gland provisional. Verify enclosure cable entries and Ex certification; do not count included panel stopping plugs twice",
+    "QA24-0604 rates: CAT6A THB 524/m + M20 gland THB 1,020/set. Alternative Ex adapters and RF glands excluded, not zero",
+    "Radio kit B-5 includes 2 short coax jumpers, avoid duplicate charge; remaining bulk may need separate estimate"]};
  }
  return base;
 }
