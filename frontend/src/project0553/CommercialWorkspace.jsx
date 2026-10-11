@@ -40,11 +40,12 @@ export function CommercialWorkspace0553({focusedLocation=null}){
  const updateFx=(key,value)=>persistSettings({...fxSettings,[key]:value});
  const resetFx=()=>persistSettings({...DEFAULT_FX});
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
- return <div className="p55-stack">
+ return <div className="p55-stack" data-component-key="bid.budget">
+ <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <code>bid.budget</code><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
  <InternalBudgetShortcut0553/>
  <ScopeSheetsDetail0553/>
  <section className="p55-panel">
-  <div className="p55-eyebrow">0553 / REUSE 0550 COMMERCIAL STATE DOCTRINE</div>
+  <div className="p55-eyebrow">BID-BUD-PRC · bid.budget.pricing · COMMERCIAL WORKING PREVIEW</div>
   <h2>Engineering → BOM/MTO → Cost → Customer Scope of Supply</h2>
   <p className="p55-note"><strong>Shared Cost Spine:</strong> Known preliminary equipment THB {BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US")} · {BID_COST_SPINE_0553.pricedRows} priced MTO items / {BID_COST_SPINE_0553.unpricedRows} unpriced · full A+B+C and customer sell not complete. Source: {BID_COST_SPINE_0553.source}</p>
   <p className="p55-note">This is a controlled WORKSPACE, not a price release. The previously issued SAMTEL file is historical evidence; its exact issued revision must be verified before snapshot registration. No 0550 rates or facts transferred.</p>
