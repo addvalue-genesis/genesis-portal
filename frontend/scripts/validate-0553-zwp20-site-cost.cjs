@@ -29,6 +29,6 @@ assert(model.includes("technical Ex compliance is a separate qualification"));
 assert(model.includes("DATO-507-001 1 Set"));
 assert(model.includes('orderNo:"1963600000"'));
 assert(model.includes('unitPrice:0,extended:0'));
-assert(model.includes("INNOVA_QUOTATION_TO_FOLLOW"));
-assert(vendorDocs.includes("BUDGETARY_TEMP_ZERO__INNOVA_PRICE_PENDING"));
+assert(model.includes("INNOVA_QA24-0604_ITEM2_NA_AS_QUOTED__MANAGEMENT_TEMPORARY_ZERO"));
+assert(vendorDocs.includes("INNOVA_QA24-0604_ITEM2_NA__BUDGETARY_TEMP_ZERO"));
 console.log("PASS ZWP20 8 MTO rows: known USD 13,283.89 / THB 425,430 including THB 1,900 partial DATO reference; 4 unresolved/partial scope rows; no cross-currency addition.");
