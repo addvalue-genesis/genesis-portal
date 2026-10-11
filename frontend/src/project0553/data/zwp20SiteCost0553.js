@@ -1,3 +1,4 @@
+import {ZWP20_BULK_SCOPE_AUDIT_0553} from "./zwp20BulkScopeAudit0553";
 import {ZWP20_GA_BULK_RECONCILIATION} from "./zwp20GaBulkReconciliation";
 import {ZWP20_BARTEC_NEXTG_REFERENCE_MAP} from "./zwp20BartecNextgMap";
 // ZWP20 SCADA MR0001 single allocation ledger: never add vendor alternatives or quote-wide quantities.
@@ -168,9 +169,9 @@ function rowCost(item){
   const components=options.map(v=>({...v,extended:Number.isFinite(v.quantity)&&Number.isFinite(v.rateTHB)?money(v.quantity,v.rateTHB):null}));
   const budgetaryTotal=components.filter(v=>Number.isFinite(v.extended)).reduce((n,v)=>n+v.extended,0);
   return {...base,vendor:"INNOVA (historical rate evidence)",sku:"CAT6A + certified entry fittings (engineering takeoff)",
-   quotedRateCandidates:components,components,layoutTakeoff,historicalWiring,gaReconciliation:ZWP20_GA_BULK_RECONCILIATION,budgetRoute,currency:"THB",unitCost:budgetaryTotal,extended:budgetaryTotal,
+   quotedRateCandidates:components,components,layoutTakeoff,historicalWiring,gaReconciliation:ZWP20_GA_BULK_RECONCILIATION,scopeAudit:ZWP20_BULK_SCOPE_AUDIT_0553,budgetRoute,currency:"THB",unitCost:budgetaryTotal,extended:budgetaryTotal,
    quantityBasis:"AFC LAY-0001 C1 sheet4 scale 1:100: ODU/antenna plan proximity ~0.5-1.0m; mezzanine +21.100/+21.300m vs lower +18.300m = 2.8-3.0m deck elevation difference (NOT cable length). BID-FPR TPP-EQ-003 still requires measured indoor endpoint and routed cable segments.",
-   status:"BUDGETARY_MANAGEMENT_MINIMUM_50M_NOT_MEASURED",
+   status:"PARTIAL_BULK_2_OF_16_FUNCTIONS_PRICED_50M_BASELINE",
    assumptions:["Management minimum 50m applies to initial physical route. Equipment in other directions needs an additional individually measured route/quantity, not covered by the first 50m; no separate direction has been entered into this estimate yet","Avoid duplicating cost of common pathways or counting link count as cable run count without distinct physical wiring", "One M20 indoor-panel gland budgetary allowance only; BARTEC includes 16 blanking plugs but not necessarily commissioned glands. 1E GA outdoor radio 3/4in NPT union/gland may need a different selected item; not proven included or priced, so document conditional additional exposure",
     "SPE §6.6 ethernet run <80m is a design constraint; it cannot be converted to an assumed purchase quantity",
     "Cable entry quantities require confirmed Ex cable/entry/interface schedule, accounting for BARTEC included components and B-5 two short RF jumpers",
