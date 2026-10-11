@@ -32,27 +32,40 @@ export function deriveEngineeringOwnedCost0553(item){
   const qty=derivation.qty;
   const selected=standardWarranty?null:c.selectedOffer?matches.find(x=>x.quoteLine===c.selectedOffer||x.sku===c.selectedOffer):null;
   const budgetaryCodes={RADIO_EQUIPMENT:"B-1",RF_FILTER:"B-2",CAPACITY_KEY:"B-3",REGION_KEY:"B-4",MOUNT_FEEDER:"B-5",POWER:"B-6",POWER_CORD:"B-7"};
-  const budgetaryCandidate=item.site==="ZWP20"&&item.sourceTag==="MR-502-001"&&item.sourceRow===4
-   ?matches.find(q=>q.quoteLine===budgetaryCodes[c.functionId]):null;
+  // Budgetary selection follows the Engineering topology decision; never offered quantity.
+  // ZWP20 has a single remote endpoint in RPT/MTO, hence Group B remote candidate.
+  // Each function may be costed once, while OEM approval and deviations remain tracked.
+  const remoteTopology=SCADA_LINKS_0553.some(l=>l.from==="ZWP8"&&l.to===item.site&&l.mode==="PTMP");
+  const budgetaryEligible=item.site==="ZWP20"&&item.sourceTag==="MR-502-001"&&item.sourceRow===4
+    &&item.sourceScopeQty===1&&remoteTopology&&!standardWarranty;
+  const budgetaryCandidate=budgetaryEligible
+    ?matches.find(q=>q.quoteLine===budgetaryCodes[c.functionId]&&Number.isFinite(q.unitPrice)):null;
   const budgetaryExtended=qty!==null&&Number.isFinite(budgetaryCandidate?.unitPrice)
    ?Math.round(qty*budgetaryCandidate.unitPrice*100)/100:null;
   const price=standardWarranty?null:selected&&Number.isFinite(selected.unitPrice)?selected.unitPrice:null;
   const extended=qty!==null&&price!==null?Math.round(qty*price*100)/100:null;
   return {id:c.id,functionId:c.functionId,nonCostedIncluded:standardWarranty,driver:c.quantityDriver,requiredQty:qty,quantityState:derivation.state,quantityProof:derivation.proof,selectedOffer:c.selectedOffer,
    vendorCandidates:matches,budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryCandidate?.unitPrice??null,budgetaryExtended,
+   budgetaryDecision:budgetaryCandidate?"ENGINEERING_REMOTE_ROLE_MATCH__OEM_REVIEW":"NO_BUDGETARY_MATCH",
    unitPrice:price,currency:selected?.currency||null,
    extended,technicalState:c.technicalState,
    state:standardWarranty?"INCLUDED_STANDARD_WARRANTY_NO_EXTRA_COST":extended!==null?"COSTED_FROM_ENGINEERING_QTY":qty!==null?"QTY_DERIVED_VENDOR_SELECTION_REQUIRED":"ENGINEERING_QTY_REQUIRED"};
  });
  const preliminaryRows=components.filter(c=>c.budgetaryExtended!==null);
  const budgetaryPartialUSD=preliminaryRows.length?Math.round(preliminaryRows.reduce((n,c)=>n+c.budgetaryExtended,0)*100)/100:null;
+ const budgetaryCoverage=components.filter(c=>!c.nonCostedIncluded).every(c=>c.budgetaryExtended!==null);
+ const budgetaryDecision={basis:"MTO Rev04 ZWP20 row4 + RPT-0001 C1 PTMP remote endpoint",selectedVendor:"Next G",configuration:"Remote Group B",
+   quotation:"NG/260916-ADV-DAP1",scope:"MR-502-001 radio ODU function subset, not antenna/bulk/site totals",
+   qtySource:"ENGINEERING_TOPOLOGY_AND_EXPLICIT_PARAMETRIC_ASSUMPTIONS",
+   requiredDeviationReview:["RF capacity/throughput entitlement","Myanmar region/frequency entitlement","Power cord/site DC interface","RF filter and mounting ownership"],
+   standardWarranty:"INCLUDED",state:budgetaryCoverage?"BUDGETARY_FUNCTION_ESTIMATE__NOT_RELEASED":"BUDGETARY_PARTIAL__GAPS_RECORDED"};
  const ready=components.length>0&&components.every(c=>c.nonCostedIncluded||c.extended!==null);
  const currencySet=[...new Set(components.filter(c=>c.extended!==null).map(c=>c.currency))];
  const amount=ready&&currencySet.length===1?Math.round(components.reduce((n,c)=>n+c.extended,0)*100)/100:null;
  return {site:item.site,tag:item.sourceTag,sourceRow:item.sourceRow,components,
   requiredFunctionCount:components.filter(c=>!c.nonCostedIncluded).length,qtyDerivedCount:components.filter(c=>!c.nonCostedIncluded&&c.requiredQty!==null).length,
   costedFunctionCount:components.filter(c=>!c.nonCostedIncluded&&c.extended!==null).length,budgetaryCostedCount:preliminaryRows.length,budgetaryPartialUSD,
-  amount,currency:amount!==null?currencySet[0]:null,
+  amount,currency:amount!==null?currencySet[0]:null,budgetaryDecision,
   state:amount!==null?"ENGINEERING_BOM_COSTED_REQUIRES_APPROVAL":"DERIVATION_INCOMPLETE",
   rule:"Engineering requiredQty is authoritative. Vendor quotedQty is price evidence only. No synthetic quantity or false aggregate."};
 }
