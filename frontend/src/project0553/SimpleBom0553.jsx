@@ -1,4 +1,4 @@
-import { getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
+import { getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
 import {ZWP8_ROW43_COST_TRACE} from "./data/zwp8Row43CostTrace";
 import {SourceCoverage0553} from "./SourceCoverage0553";
 import {SiteSystemCostReconciliation0553} from "./SiteSystemCostReconciliation0553";
@@ -87,14 +87,15 @@ export function SimpleBom0553({focusedLocation=null}){
        const nextgPriced=candidates.filter(q=>Number.isFinite(q.unitPrice));
        const otherPriced=x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice));
        const isCisco=Number.isFinite(x.indicativePackageCostTHB);
+       const remoteBudget=getZWP20RemoteBudgetChoice(x);
        return <>
-       <td><strong>{isCisco?x.pricedVendor:"NO SELECTED VENDOR"}</strong>
+       <td><strong>{isCisco?x.pricedVendor:remoteBudget?"Next G · provisional remote B":"NO SELECTED VENDOR"}</strong>
         <small>Next G: {nextgPriced.length} priced quote option(s)</small>
         <small>Others: {otherPriced.length} source rate(s)</small>
         <small>กด + ตรวจ Vendor / MCDA / Quantity</small></td>
-       <td>{isCisco?<><strong>{money(bom.cisco.unitPackageQuotedSumTHB,"THB")}</strong><small>Cisco package scenario per MTO Set — NOT accepted SKU rate</small></>:
+       <td>{isCisco?<><strong>{money(bom.cisco.unitPackageQuotedSumTHB,"THB")}</strong><small>Cisco package scenario per MTO Set — NOT accepted SKU rate</small></>:remoteBudget?<><strong>{money(remoteBudget.unitUSD,"USD")}</strong><small>1 remote assembly · provisional composite unit reference, NOT accepted SKU rate</small></>:
         <><strong>NOT SELECTED</strong><small>{nextgPriced.length+otherPriced.length} unit-price evidence line(s) in expanded quote table</small><small>ไม่ใช่ผลรวมของราคา Vendor ทุกทางเลือก</small></>}</td>
-       <td>{isCisco?<><strong>{money(x.indicativePackageCostTHB,"THB")}</strong><small>Provisional Cisco bundle only</small></>:
+       <td>{isCisco?<><strong>{money(x.indicativePackageCostTHB,"THB")}</strong><small>Provisional Cisco bundle only</small></>:remoteBudget?<><strong>{money(remoteBudget.partialUSD,"USD")}</strong><small>Budgetary partial: 1 assumed remote assembly × source bundle rate</small><small>Not the complete MR-502-001 or ZWP20 cost</small></>:
         <><strong>NOT CALCULATED</strong><small>Physical Qty × Selected Unit Rate + attributable accessories</small><small>No site allocation approved</small>
 
          </>}</td>
@@ -125,7 +126,8 @@ export function SimpleBom0553({focusedLocation=null}){
         <tr><td>02 First Principles</td><td>Site {g.site}; requirement object {x.bomType}; source demand is not physical SKU quantity</td><td>{x.engineeringRequiredSkuQty==null?"SKU quantity requires configuration, interface and location take-off":x.engineeringRequiredSkuQty}</td></tr>
         <tr><td>03 Constraints / CAL-RPT</td><td>{g.rfProof.length?g.rfProof.map(r=>r.id).join(", "):"No linked RF calculation for this item"} · verify capacity, power, Ex rating, licences and interfaces as applicable</td><td>ENGINEERING REVIEW REQUIRED</td></tr>
         <tr><td>04 Vendor fit</td><td>{x.vendorCandidates.length} matched offer candidates; {x.configuration.length} bundled offer lines</td><td>{x.pricedVendor?"WORKING BUNDLE — OEM NOT APPROVED":"NOT SELECTED"}</td></tr>
-        {getMR502BudgetaryScenarios(x).length>0&&<tr><td>05a Cost scenario evidence</td><td>Next G A/B/C are alternative, unselected assembly rate references; not additive. Confirm radio role, quantity, licence and excluded bulk before using in budget.</td><td>NOT SELECTED — {getMR502BudgetaryScenarios(x).map(v=>v.group+": "+money(v.unitAssemblyReferenceUSD,"USD")).join(" | ")}</td></tr>}
+        {getZWP20RemoteBudgetChoice(x)&&<tr><td>05a Working budget choice</td><td>{getZWP20RemoteBudgetChoice(x).rationale}</td><td>{money(getZWP20RemoteBudgetChoice(x).partialUSD,"USD")} · partial / provisional only</td></tr>}
+       {getMR502BudgetaryScenarios(x).length>0&&<tr><td>05a Cost scenario evidence</td><td>Next G A/B/C are alternative, unselected assembly rate references; not additive. Confirm radio role, quantity, licence and excluded bulk before using in budget.</td><td>NOT SELECTED — {getMR502BudgetaryScenarios(x).map(v=>v.group+": "+money(v.unitAssemblyReferenceUSD,"USD")).join(" | ")}</td></tr>}
         <tr><td>05 Cost formula</td><td>Physical Qty × Accepted Unit Rate + attributable bulk / work / risk</td><td>{Number.isFinite(x.acceptedPrice)&&Number.isFinite(x.engineeringRequiredSkuQty)?money(x.acceptedPrice*x.engineeringRequiredSkuQty,"THB"):"Verified extended cost NOT ESTABLISHED"}</td></tr>
         <tr><td>06 Budgetary evidence</td><td>Source scenario shown separately; pricing requires quantity driver, currency/FX, validity and risk basis</td><td>{Number.isFinite(x.indicativePackageCostTHB)?money(x.indicativePackageCostTHB,"THB")+" — SCENARIO ONLY":"SOURCE PRICE NOT ALLOCATED"}</td></tr>
         </tbody></table></div>
