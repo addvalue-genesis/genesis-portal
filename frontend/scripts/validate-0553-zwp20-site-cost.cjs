@@ -1,0 +1,18 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const src=path.resolve(__dirname,"../src/project0553");
+const source=JSON.parse(fs.readFileSync(path.join(src,"data/snapshots/mr0001.mto.rev04.sourceRows.json"),"utf8"));
+const ng=JSON.parse(fs.readFileSync(path.join(src,"data/quotes/NG-260916-ADV-DAP1.full.json"),"utf8"));
+const model=fs.readFileSync(path.join(src,"data/zwp20SiteCost0553.js"),"utf8");
+const ui=fs.readFileSync(path.join(src,"SimpleBom0553.jsx"),"utf8");
+const site=source.itemRows.filter(r=>r.platform==="ZWP20");
+assert.deepEqual(site.map(r=>r.sourceRowIndex),[4,5,6,7,8,9,10,11]);
+for(const t of ["rowCost(item)","item.sourceRow===4","item.sourceRow===5","item.sourceRow===6","item.sourceRow===7","item.sourceRow===8","item.sourceRow===9","item.sourceRow===10","item.sourceRow===11","gaps=rows.filter","subtotals"]){assert(model.includes(t),"Missing source allocation: "+t);}
+const rate=c=>{const row=ng.lines.find(x=>x.code===c);assert(row&&Number.isFinite(row.unitPrice));return row.unitPrice;};
+assert.equal(Math.round((7959.92+rate("B-12")+rate("B-8"))*100)/100,13283.89);
+assert.equal(rate("B-12"),4709.77);
+assert.equal(rate("B-8"),614.2);
+assert(model.includes("MTO 1 Set + RPT topology"));
+assert(ui.includes("Copy ZWP20 BOM Table (Excel)"));
+assert(ui.includes("zwp20Cost.subtotals.USD"));
+assert(ui.includes("zwp20Cost.subtotals.THB"));
+console.log("PASS ZWP20 8 MTO rows: known USD 13,283.89 / Cisco THB 423,530; 4 scope gaps; no cross-currency addition.");
