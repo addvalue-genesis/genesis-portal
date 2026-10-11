@@ -75,4 +75,6 @@ assert(bulkAll.includes('wp==="ZWP20"?50'));
 assert(bulkAll.includes('PARAMETRIC_60M_BASE__NOT_VENDOR_CONFIRMED'));
 assert(ui.includes('Working priced bulk summary'));
 assert(ui.includes('ALREADY_IN_ZWP20_ROW11'));
+assert(fs.readFileSync(path.join(src,"data/sevenLocationCostCalculations0553.js"),"utf8").includes("lifecycleCostCalculation"));
+assert(ui.includes("Lifecycle Cost Calculation"));
 console.log("PASS ZWP20 bulk base THB 27,220: 50m first-run allowance + 1 gland. Different directions require additional distinct route records.");
