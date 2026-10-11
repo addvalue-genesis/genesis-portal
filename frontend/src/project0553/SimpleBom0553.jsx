@@ -1,5 +1,6 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
+import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
 import { deriveEngineeringOwnedCost0553 } from "./data/engineeringOwnedCost0553";
 import { deriveZWP20VendorFunctionCosts, getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
 import {ZWP8_ROW43_COST_TRACE} from "./data/zwp8Row43CostTrace";
@@ -15,6 +16,7 @@ import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom"
 // One operational BOM surface. All Source/Engineering/Vendor links derive from existing registries.
 export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB"}){
  const zwp20Cost=deriveZWP20SiteCost0553();
+ const layoutRouteEstimates=deriveZ1FTelBulkRoutes0553();
  const [manualSite,setManualSite]=useState("ALL");
  const [focusSeen,setFocusSeen]=useState(null);
  const site=focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite;
@@ -71,6 +73,11 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <p className="p55-note">AFC drawing controls equipment location. These are location evidence rows, NOT confirmed individual CAT6/Coax routes; E&I room internal details are referenced to ELE-LAY-0002. EX sounder does not equal EX IP Phone.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Deck</th><th>System</th><th>Tag</th><th>LAY Sheet</th></tr></thead><tbody>
   {Z1F_TEL_LAYOUT_INDEX_0553.byWP.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.equipment.map((e,i)=><tr key={w.wp+"-"+e.tag+"-"+e.sheet+"-"+i}><td>{w.wp}</td><td>{e.deck}</td><td>{e.system}</td><td>{e.tag}</td><td>{e.sheet}</td></tr>))}
+  </tbody></table></div></details>
+  <details className="p55-panel"><summary>Parametric Bulk Cable Routes — WP × System (estimate, not additional BOM cost)</summary>
+  <p className="p55-note">Equation: Lproxy = assumed rectilinear horizontal (15m) + deck elevation delta + termination loop (3m); Lbudget = max(50m, Lproxy). Short = 1×, Base = 1.2×, Long = 1.5×. These are parametric scenarios NOT measured routes. CAT6A historical THB524/m used for SCADA only. No RF/Trunk/RACON CAT6A substitution; EX IP Phone awaits phone tags/cable interfaces. No double count with active BOM row11.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP / System</th><th>Physical cable route evidence</th><th>Deck</th><th>Geometry proxy</th><th>Short / Base / Long (m)</th><th>Base material cost</th><th>Cost gate</th></tr></thead><tbody>
+  {layoutRouteEstimates.rows.filter(r=>site==="ALL"||r.wp===site).map(r=><tr key={r.id}><td>{r.wp}<small>{r.system}</small></td><td>{r.from} → {r.to}</td><td>{r.sourceDeck}</td><td>{r.geometricProxyM} m (assumed)</td><td>{r.scenarios.short} / {r.scenarios.base} / {r.scenarios.long}</td><td>{money(r.materialBaseTHB,"THB")}</td><td>{r.rateState}<small>Not included in active WP total</small></td></tr>)}
   </tbody></table></div></details>
   <SourceCoverage0553/>
   <SiteSystemCostReconciliation0553/>
