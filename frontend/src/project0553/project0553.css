@@ -110,3 +110,16 @@
 .p553-dashboard .gns-copy-id button:hover{background:#eaf6fc;border-color:#4b9ab9}
 .p553-dashboard .gns-copy-id button:focus-visible{outline:2px solid #bb7300;outline-offset:2px}
 .p553-dashboard .gns-copy-id input{max-width:300px;font-size:12px;padding:4px}
+
+
+/* BID-BUD workflow sections — 0553 only. Underlying data/components unchanged. */
+.p553-dashboard .p553-budget-phase{background:#fff;border:1px solid #d1dce6;border-radius:9px;margin:6px 0;overflow:visible}
+.p553-dashboard .p553-budget-phase>summary{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;cursor:pointer;padding:12px 15px;background:#eff4f8;color:#193a54;list-style:none;border-radius:8px;font-size:14px}
+.p553-dashboard .p553-budget-phase>summary::-webkit-details-marker{display:none}
+.p553-dashboard .p553-budget-phase>summary:before{content:"+";font-weight:800;color:#1d5d86;border:1px solid #afc6d6;border-radius:4px;padding:1px 7px}
+.p553-dashboard .p553-budget-phase[open]>summary:before{content:"−"}
+.p553-dashboard .p553-budget-phase>summary strong{flex:1;font-size:14px}
+.p553-dashboard .p553-budget-phase>summary small{font-family:ui-monospace,Consolas,monospace;color:#506d81;font-size:11px}
+.p553-dashboard .p553-budget-phase>summary:focus-visible{outline:3px solid #c78724;outline-offset:2px}
+.p553-dashboard .p553-budget-phase>.p55-panel,.p553-dashboard .p553-budget-phase>.p55-stack{margin:10px;border-radius:7px}
+@media(max-width:700px){.p553-dashboard .p553-budget-phase>summary{align-items:flex-start}.p553-dashboard .p553-budget-phase>summary small{width:100%;padding-left:28px}}
