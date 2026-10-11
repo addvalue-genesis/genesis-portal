@@ -53,7 +53,8 @@ export function deriveEngineeringOwnedCost0553(item){
  });
  const preliminaryRows=components.filter(c=>c.budgetaryExtended!==null);
  const budgetaryPartialUSD=preliminaryRows.length?Math.round(preliminaryRows.reduce((n,c)=>n+c.budgetaryExtended,0)*100)/100:null;
- const budgetaryCoverage=components.filter(c=>!c.nonCostedIncluded).every(c=>c.budgetaryExtended!==null);
+ const budgetaryCoverage=components.length>0&&components.filter(c=>!c.nonCostedIncluded).every(c=>c.budgetaryExtended!==null);
+ const budgetaryItemTotalUSD=budgetaryCoverage?budgetaryPartialUSD:null;
  const budgetaryDecision={basis:"MTO Rev04 ZWP20 row4 + RPT-0001 C1 PTMP remote endpoint",selectedVendor:"Next G",configuration:"Remote Group B",
    quotation:"NG/260916-ADV-DAP1",scope:"MR-502-001 radio ODU function subset, not antenna/bulk/site totals",
    qtySource:"ENGINEERING_TOPOLOGY_AND_EXPLICIT_PARAMETRIC_ASSUMPTIONS",
@@ -64,7 +65,7 @@ export function deriveEngineeringOwnedCost0553(item){
  const amount=ready&&currencySet.length===1?Math.round(components.reduce((n,c)=>n+c.extended,0)*100)/100:null;
  return {site:item.site,tag:item.sourceTag,sourceRow:item.sourceRow,components,
   requiredFunctionCount:components.filter(c=>!c.nonCostedIncluded).length,qtyDerivedCount:components.filter(c=>!c.nonCostedIncluded&&c.requiredQty!==null).length,
-  costedFunctionCount:components.filter(c=>!c.nonCostedIncluded&&c.extended!==null).length,budgetaryCostedCount:preliminaryRows.length,budgetaryPartialUSD,
+  costedFunctionCount:components.filter(c=>!c.nonCostedIncluded&&c.extended!==null).length,budgetaryCostedCount:preliminaryRows.length,budgetaryPartialUSD,budgetaryItemTotalUSD,budgetaryCoverage,
   amount,currency:amount!==null?currencySet[0]:null,budgetaryDecision,
   state:amount!==null?"ENGINEERING_BOM_COSTED_REQUIRES_APPROVAL":"DERIVATION_INCOMPLETE",
   rule:"Engineering requiredQty is authoritative. Vendor quotedQty is price evidence only. No synthetic quantity or false aggregate."};
