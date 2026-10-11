@@ -34,7 +34,7 @@ export function InternalBudgetShortcut0553(){
  const displayHistorical=n=>{if(!Number.isFinite(n))return "";if(currency==="USD")return usd(n);const rate=Number(rates[currency]);return rates[currency]&&Number.isFinite(rate)&&rate>0?usd(n*rate):"";};
  const currencyReady=currency==="USD"||(rates[currency]&&Number(rates[currency])>0);
  return <section className="p55-panel" style={{border:"2px solid #a5c7d3"}}>
-  <div className="p55-eyebrow">L3.B / 10 · INTERNAL BUDGET SHORTCUT · SOURCE-CONTROLLED</div>
+  <div className="p55-eyebrow">BID-BUD-SUM · bid.budget.internal · SOURCE-CONTROLLED</div>
   <h2>Budgetary Internal — 4-System Quick View</h2>
   <p className="p55-note">CURRENT RECONCILED BID: not yet calculated. Do not mistake historical Rev08 selling amounts for current costs or new proposal prices. Missing values are blank, never zero.</p>
   <div className="p55-filterbar"><label>Display currency <select value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD</option><option value="THB">THB — Thai baht</option><option value="CNY">CNY — Chinese yuan (RMB)</option></select></label>
@@ -49,6 +49,7 @@ export function InternalBudgetShortcut0553(){
    <div><span>Known Cisco working vendor cost (THB)</span><strong>{usd(BID_COST_SPINE_0553.knownPreliminaryCost.THB)}</strong></div>
   </div>}
   <p className="p55-note">Do not sum the Cisco vendor cost into Rev08: overlapping scope, different currency and quote validity require reconciliation. Optional C1/C2 excluded from base.</p>
+  <div className="p55-note"><strong>bid.budget.summary</strong> · MR system budget reconciliation</div>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>＋/−</th><th>MR</th><th>System</th><th>Current reconciled budget ({currency})</th><th>Rev08 historical sell ({currency}) — comparison only</th><th>Engineering / cost reconciliation</th></tr></thead><tbody>
   {systems.map(([code,mr,name,note])=><React.Fragment key={mr}><tr><td><button type="button" className="p55-row-toggle" onClick={()=>toggleSystem(mr)} aria-expanded={openedSystems.has(mr)}>{openedSystems.has(mr)?"−":"+"}</button></td><td>{mr}</td><td>{name}</td><td className="is-number"></td><td className="is-number">{showHistorical?displayHistorical(historical(code)):""}</td><td>{note}</td></tr>
   {openedSystems.has(mr)&&<tr><td></td><td colSpan={5}><strong>{mr} — System composition / cost trace</strong>
