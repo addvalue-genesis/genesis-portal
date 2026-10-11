@@ -13,10 +13,10 @@ export function deriveWpSystemBulkBudget0553(){
   const cableRoute=(sys)=>routeModel.rows.find(r=>r.wp===w.wp&&r.system===sys);
   const systems=[
    {id:"SCADA_RADIO",name:"SCADA Radio",equipment:found("SCADA_RADIO"),route:cableRoute("SCADA_RADIO"),
-    items:[{id:"SCADA-CAT6A",item:"Outdoor CAT6A S/FTP",unit:"m",qty:cableRoute("SCADA_RADIO")?.scenarios.base??null,
+    items:[{id:"SCADA-CAT6A",item:"Outdoor CAT6A S/FTP",unit:"m",qty:wp==="ZWP20"?50:(cableRoute("SCADA_RADIO")?.scenarios.base??null),
      rateTHB:524,source:"INNOVA QA24-0604, historical; scenario base",owner:"BULK_ROW11",
-     status:"PARAMETRIC_BASE_ONLY__NOT_VENDOR_CONFIRMED",
-     note:"SCADA route from ODU to TC Room; scenario base of 60m is NOT ZWP20 active BOM 50m"}]},
+     status:wp==="ZWP20"?"EXISTING_ZWP20_ROW11_COST_OWNER":"PARAMETRIC_60M_BASE__NOT_VENDOR_CONFIRMED",
+     note:wp==="ZWP20"?"Active ZWP20 working Row 11 owns 50m. This detail is a mirrored allocation, never additive.":"Parametric planning base at 60m per unique physical run; no package purchase commitment"}]},
    {id:"EX_IP_PHONE",name:"EX IP Phone",equipment:found("EX_IP_PHONE"),
     route:null,items:[{id:"EX-PHONE-CABLE",item:"Phone network cable / PoE or manufacturer specified",unit:"route",qty:null,
      rateTHB:null,source:"TEL-LAY symbol and Z1F MR plus phone DTS needed",owner:"PHONE_BULK",
@@ -33,7 +33,7 @@ export function deriveWpSystemBulkBudget0553(){
   return {wp:w.wp,systems:systems.map(sys=>({...sys,items:sys.items.map(it=>({
    ...it,extendedTHB:Number.isFinite(it.qty)&&Number.isFinite(it.rateTHB)?Math.round(it.qty*it.rateTHB*100)/100:null
   }))})),source:"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 AFC",
-   warning:"Scenario amounts displayed for planning only. Not additive with current ZWP20 working BOM or other vendor package costs."};
+   warning:"ZWP20 SCADA cable mirrors active Row11 (50m), never add twice. Other WP cable costs are new planning projections, not included in existing allocated location cost."};
  });
  const brownfieldSites=["ZPQ","ZWP8","ZWP11"].map(wp=>({
   wp,siteClass:"BROWNFIELD",
