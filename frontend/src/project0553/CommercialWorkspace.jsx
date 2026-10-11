@@ -43,8 +43,7 @@ export function CommercialWorkspace0553({focusedLocation=null}){
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  return <div className="p55-stack" data-component-key="bid.budget">
  <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget"/><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
- <InternalBudgetShortcut0553/>
- <ScopeSheetsDetail0553/>
+ <div className="p55-note" style={{margin:"0 2px"}}><strong>Workflow:</strong> Engineering basis → Required BOM → Scope & Bulk → Cost / Pricing → Internal Summary · ขยายเฉพาะกลุ่มที่ต้องตรวจสอบ</div>
  <section className="p55-panel">
   <div className="p55-eyebrow">COMMERCIAL WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing"/></div>
   <h2>Engineering → BOM/MTO → Cost → Customer Scope of Supply</h2>
@@ -72,8 +71,14 @@ export function CommercialWorkspace0553({focusedLocation=null}){
    <div className="p55-eyebrow">GOVERNING METHOD · WORKING PREVIEW IS THE ENGINEERING WORKBENCH</div>
    <p className="p55-note"><strong>INPUT:</strong> RFQ/MR/MTO/BLD/DTS/RPT/Standards · <strong>DERIVE:</strong> Link/Capacity/Interface Constraints → Physical BOM and quantity → Vendor technical evaluation → WBS Services → Equipment/Service Cost and risk · <strong>OUTPUT:</strong> reviewed engineering working cost. Current MTO sets and quoted vendor quantities are input evidence, NOT verified physical SKU quantities.</p>
   </section>
-  <SimpleBom0553 focusedLocation={focusedLocation}/>
-  <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
+  <details className="p553-budget-phase" open><summary><strong>Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
+   <SimpleBom0553 focusedLocation={focusedLocation}/>
+  </details>
+  <details className="p553-budget-phase"><summary><strong>Scope of Supply & Bulk Reconciliation</strong><small>bid.budget.scope · bid.budget.bulk · A/B/C</small></summary>
+   <ScopeSheetsDetail0553/>
+  </details>
+  <details className="p553-budget-phase"><summary><strong>Cost & Commercial Pricing</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
+   <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
   <section className="p55-panel">
    <div className="p55-eyebrow">REV08 EXISTING COMMERCIAL BASELINE · PRICES FROM CUSTOMER WORKBOOK</div>
    <h3>Detailed Cost / Selling Price Breakdown — {displayCurrency}</h3>
@@ -114,6 +119,7 @@ export function CommercialWorkspace0553({focusedLocation=null}){
     </td></tr>}</React.Fragment>)}</tbody>
   </table></div>
   <p><strong>Workbook source:</strong> {template.sourceName} · {template.revision} · 6 sheets. <strong>Export status:</strong> HOLD — original template fidelity and cross-sheet reconciliation not yet validated.</p>
+  </details>
  </>}
  {mode==="budgetary"&&<section className="p55-panel">
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · SNAPSHOT REGISTRY</div>
@@ -139,5 +145,8 @@ export function CommercialWorkspace0553({focusedLocation=null}){
  <p className="p55-note">0550 source code remains untouched. State control is based on the reused three-state doctrine, not an independent 0553 pricing policy.</p>
  </section>
  </section>
+ <details className="p553-budget-phase" open><summary><strong>Internal Budget Summary & Review</strong><small>bid.budget.internal · 4 MR systems · historical separation</small></summary>
+  <InternalBudgetShortcut0553/>
+ </details>
  </div>;
 }
