@@ -75,7 +75,7 @@ export function CommercialWorkspace0553({focusedLocation=null}){
   </section>
   <details className="p553-budget-phase" open><summary><strong>Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
    <CostIntegrityReview0553/>
-   <SimpleBom0553 focusedLocation={focusedLocation}/>
+   <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency}/>
   </details>
   <details className="p553-budget-phase"><summary><strong>Scope of Supply & Bulk Reconciliation</strong><small>bid.budget.scope · bid.budget.bulk · A/B/C</small></summary>
    <ScopeSheetsDetail0553/>
