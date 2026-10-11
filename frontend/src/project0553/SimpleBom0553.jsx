@@ -117,7 +117,15 @@ export function SimpleBom0553({focusedLocation=null}){
       <div className="p55-panel" style={{marginBottom:10}}>
        <strong>Item-level First Principles → Engineering Constraints → Parametric Cost</strong>
        <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)+".derivation"}/>
-       {(()=>{const result=deriveEngineeringOwnedCost0553(x);return <div className="p55-table-wrap">
+       {g.site==="ZWP20"&&x.sourceRow!==4&&(()=>{const r=zwp20Cost.rows.find(v=>v.row===x.sourceRow&&v.tag===x.sourceTag);if(!r)return null;return <div className="p55-table-wrap">
+       <h4>Engineering Derivation → Physical Function → Budgetary SKU & Cost</h4>
+       <p className="p55-note"><strong>Module:</strong> PJ2608-0553 / bid.budget.bom.zwp20.{String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")}.{x.sourceRow}.derivation · <strong>Source Quantity:</strong> {r.sourceQty} {r.sourceUnit} · <strong>Cost:</strong> {money(r.extended,r.currency)} · <strong>State:</strong> {r.status}</p>
+       <table className="p55-table p55-table--compact"><thead><tr><th>Engineering / Quantity Basis</th><th>Vendor / Selected product</th><th>Unit Cost</th><th>Extended Cost</th></tr></thead><tbody>
+       <tr><td>{r.quantityBasis}</td><td>{r.vendor||"Engineering takeoff"}<small>{r.sku||"No selected SKU"}</small></td><td>{money(r.unitCost,r.currency)}</td><td>{money(r.extended,r.currency)}</td></tr>
+       {(r.components||[]).map((v,i)=><tr key={i}><td>{v.functionId} · Engineering Qty {v.qty}</td><td>{v.vendor}<small>{v.sku}</small></td><td>{money(v.unitPrice,v.currency)}</td><td>{money(v.extended,v.currency)}</td></tr>)}
+       </tbody></table><p className="p55-note">{r.assumptions.map((v,i)=><small key={i}>{v} </small>)}</p>
+       </div>})()}
+       {x.sourceRow===4&&(()=>{const result=deriveEngineeringOwnedCost0553(x);return <div className="p55-table-wrap">
         <h4>Engineering Required BOM → Vendor Rate → Budgetary Cost</h4>
         <p className="p55-note"><strong>Budgetary Calculation:</strong> {result.budgetaryState} · <strong>Budgetary Item Cost:</strong> {money(result.budgetaryItemTotalUSD,"USD")} · <strong>Vendor:</strong> {result.budgetaryDecision.selectedVendor} · <strong>Scope:</strong> Radio ODU allocated functions; indoor PoE interface allocated to Row 5.</p>
         <p className="p55-note">Only Engineering Required Qty can drive Cost. Vendor quotation quantity and one-per-function demonstration cannot set purchase quantity. {result.qtyDerivedCount}/{result.requiredFunctionCount} function quantities derived; {result.costedFunctionCount} verified costed; {result.budgetaryCostedCount} provisional priced.</p>
