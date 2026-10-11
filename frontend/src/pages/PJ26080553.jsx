@@ -33,7 +33,7 @@ import "../project0553/project0553.css";
 // IDs are stable application route keys. Display order follows the project
 // engineering workflow; Budget is the final workbench after all upstream views.
 // Lifecycle hierarchy is a navigation layer; route keys and workbench components are preserved.
-const TABS = L3_TABS_0553.map(([id,label])=>[id,`${TAB_IDENTITY_0553.tabs.find(t=>t.route===id)?.displayCode||"L3-B"} · ${label}`]);
+const TABS = L3_TABS_0553.map(([id,label])=>[id,`${TAB_IDENTITY_0553.tabs.find(t=>t.route===id)?.semanticCode||"BID-UNKNOWN"} · ${label}`]);
 const TAB_GROUPS = L3_TAB_GROUPS_0553;
 const Badge = AuditBadge;
 const Metric = AuditMetric;
