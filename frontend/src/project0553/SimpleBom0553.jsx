@@ -1,4 +1,5 @@
 import { getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
+import {ZWP8_ROW43_COST_TRACE} from "./data/zwp8Row43CostTrace";
 import {SourceCoverage0553} from "./SourceCoverage0553";
 import {SiteSystemCostReconciliation0553} from "./SiteSystemCostReconciliation0553";
 import { NEXTG_CANDIDATE_ESTIMATE_0553 } from "./data/nextgCandidateEstimate0553";
@@ -108,6 +109,13 @@ export function SimpleBom0553({focusedLocation=null}){
       <div className="p55-panel" style={{marginBottom:10}}>
        <strong>Item-level First Principles → Engineering Constraints → Parametric Cost</strong>
        <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)+".derivation"}/>
+       {x.site==="ZWP8"&&x.sourceRow===43&&<div className="p55-table-wrap">
+        <strong>ZWP8 Row 43 — six original MTO tags, exact quotation candidates</strong>
+        <p className="p55-note">The current source item is {x.sourceTag}. The complete source row includes six distinct equipment functions. Quoted prices are evidence, not selected site rates; source sets are not validated physical SKU counts.</p>
+        <table className="p55-table p55-table--compact"><thead><tr><th>Tag / leaf ID</th><th>MTO qty</th><th>Function</th><th>Vendor rate candidates (USD/unit)</th><th>Required physical qty</th><th>Extended ZWP8 cost</th></tr></thead><tbody>
+        {ZWP8_ROW43_COST_TRACE.items.map(item=><tr key={item.tag}><td>{item.tag}<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.zwp8."+item.tag.toLowerCase()+".43"}/></td><td>{item.sourceScopeText}</td><td>{item.role}</td><td>{item.candidates.length?item.candidates.map(v=><small key={v.quoteLine}>{v.quoteLine} · {v.sku}: {money(v.unitPriceUSD,"USD")} (offer qty {v.quoteQty})</small>):"No separate priced OEM IDU line identified"}</td><td>NOT DERIVED</td><td>NOT ALLOCATED</td></tr>)}
+        </tbody></table><p className="p55-note">Antenna selection 4ft versus 6ft requires CAL/RPT; do not sum alternative antenna quotes. IDU integration must be checked before assigning additional cost.</p>
+       </div>}
        {getMR502BudgetaryScenarios(x).length>0&&<div className="p55-table-wrap">
         <strong>MR-502-001.4 · Budgetary unit assembly cost scenarios (Next G · USD)</strong>
         <p className="p55-note">Preliminary quotation-based cost for ONE hypothetical radio assembly, not ZWP20's accepted radio quantity or total package price. A/B/C configurations are mutually exclusive choices for this calculation, NOT additive.</p>
