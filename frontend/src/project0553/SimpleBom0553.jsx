@@ -44,7 +44,7 @@ export function SimpleBom0553({focusedLocation=null}){
   <div className="p55-source-facts">
    <div><span>Locations with source data</span><strong>{groups.filter(g=>g.items.length).length}</strong></div>
    <div><span>Visible MTO item tags</span><strong>{visible.length}</strong></div>
-   <div><span>Provisional priced items</span><strong>{priced.length} / {visible.length}</strong></div>
+   <div><span>Source items with Cisco scenario only</span><strong>{priced.length} / {visible.length}</strong></div>
    <div><span>{site==="ALL"?"All locations":"Location "+site} — priced Cisco items ONLY (THB), not location total</span><strong>{money(provisionalSubtotalTHB,"THB")}</strong></div>
   </div>
   <div className="p55-filterbar" style={{display:"flex",gap:8,margin:"12px 0"}}><button type="button" className="p553-detail-button" onClick={expandAll}>＋ Expand all</button><button type="button" className="p553-detail-button" onClick={collapseAll}>− Collapse all</button><span className="p55-note">เริ่มต้นแสดงภาพรวมทุกแท่น คลิก + เพื่อดู MTO, Calculation, Vendor และ Cost</span></div>
@@ -56,7 +56,7 @@ export function SimpleBom0553({focusedLocation=null}){
    <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()}/></td>
    <td className="is-number">{g.items.length}</td><td className="is-number">{g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length}</td>
    <td className="is-number">{g.rfDemand?.linkEndpointDemand??"—"}</td><td className="is-number">{g.rfDemand?.antennaReferenceDemand??"—"}</td>
-   <td className="is-number">{money(g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0),"THB")}</td><td>NOT ESTABLISHED</td></tr>
+   <td className="is-number">{g.items.some(x=>Number.isFinite(x.indicativePackageCostTHB))?money(g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0),"THB"):"NO CISCO PRICED ITEM"}</td><td>NOT ESTABLISHED</td></tr>
    {siteExpanded(g.site)&&<tr><td colSpan={9}><div className="p55-table-wrap"><p className="p55-note"><strong>Site Scope:</strong> {g.siteClass?.note} · Equipment ownership: NEW / REUSE / BY OTHERS ต้องตรวจ BLD/MR ทีละรายการ ไม่สรุปจากประเภทแท่น</p>
     <table className="p55-table p55-table--compact"><thead><tr><th>Link / First Principles</th><th>FSPL</th><th>Gt + Gr</th><th>Ideal RSL offset</th><th>STD / BOM</th></tr></thead>
      <tbody>{g.rfProof.map(p=><tr key={p.id}><td>{p.from} → {p.to}</td><td>{p.fsplDb.toFixed(2)} dB</td><td>{p.gainSumDbi.toFixed(2)} dBi</td><td>{p.idealRslOffsetDb.toFixed(2)} dB<small>Rx = Tx + offset − losses</small></td><td>HOLD · CAL/OEM proof required{p.change&&<small>4ft candidate: {p.change.gainChangeDb.toFixed(2)} dB vs Next G baseline</small>}</td></tr>)}</tbody>
