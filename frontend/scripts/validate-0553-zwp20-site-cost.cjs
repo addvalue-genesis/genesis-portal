@@ -43,8 +43,10 @@ assert(ui.includes("Bulk Row 11 · Engineering Quantity × INNOVA Unit Rates"));
 assert(ui.includes('FX REQUIRED'));
 const workspace=fs.readFileSync(path.join(src,"CommercialWorkspace.jsx"),"utf8");
 assert(workspace.includes('fx={fx} displayCurrency={displayCurrency}'));
-assert(model.includes("quantity:20"));
-assert(model.includes("BUDGETARY_BULK_SCENARIO_WITH_ASSUMPTIONS"));
+assert(model.includes("totalM:10"));
+assert(model.includes("budgetaryTotal"));
+assert.equal(10*524+1020,6260);
+assert(model.includes("BUDGETARY_ESTIMATED_ROUTE_NOT_VERIFIED"));
 assert(ui.includes("Number.isFinite(v.quantity)"));
-assert.equal(20*524+1020,11500);
-console.log("PASS ZWP20 bulk budgetary scenario THB 11,500 added: 20m CAT6A + 1 gland, explicit assumptions, alternatives excluded.");
+
+console.log("PASS ZWP20 bulk budgetary scenario THB 6,260: 10m CAT6A + 1 gland, explicit assumptions, alternatives excluded.");
