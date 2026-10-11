@@ -71,4 +71,8 @@ assert(bulkAll.includes('DTRS_TRUNK_RADIO'));
 assert(dtrsBulk.includes('"LNA","TCAB-508-001"'));
 assert(dtrsBulk.includes('"RF surge and grounding","TCAB-508-002"'));
 assert(ui.includes("WP System Bulk"));
+assert(bulkAll.includes('wp==="ZWP20"?50'));
+assert(bulkAll.includes('PARAMETRIC_60M_BASE__NOT_VENDOR_CONFIRMED'));
+assert(ui.includes('Working priced bulk summary'));
+assert(ui.includes('ALREADY_IN_ZWP20_ROW11'));
 console.log("PASS ZWP20 bulk base THB 27,220: 50m first-run allowance + 1 gland. Different directions require additional distinct route records.");
