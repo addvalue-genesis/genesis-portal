@@ -48,10 +48,16 @@ export function SimpleBom0553({focusedLocation=null}){
    <div><span>{site==="ALL"?"All locations":"Location "+site} — priced Cisco items ONLY (THB), not location total</span><strong>{money(provisionalSubtotalTHB,"THB")}</strong></div>
   </div>
   <div className="p55-filterbar" style={{display:"flex",gap:8,margin:"12px 0"}}><button type="button" className="p553-detail-button" onClick={expandAll}>＋ Expand all</button><button type="button" className="p553-detail-button" onClick={collapseAll}>− Collapse all</button><span className="p55-note">เริ่มต้นแสดงภาพรวมทุกแท่น คลิก + เพื่อดู MTO, Calculation, Vendor และ Cost</span></div>
-  {groups.filter(g=>g.items.length).map(g=><section key={g.site} className="p55-panel">
-   <button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={siteExpanded(g.site)}>{siteExpanded(g.site)?"−":"+"}</button>
-   <strong> {g.site} · {g.siteClass?.type||"UNCLASSIFIED"} ({g.siteClass?.thai||"ตรวจสอบ"}) </strong><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()}/><span> · Cisco-priced subtotal: {money(g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0),"THB")} (partial only)</span><span> · {g.items.length} MTO items · {g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length} source-priced scenarios</span><small> · RPT functional link endpoints: {g.rfDemand?.linkEndpointDemand??"NO RPT LINK"} · Antenna references: {g.rfDemand?.antennaReferenceDemand??"NO RPT LINK"} (NOT purchase qty)</small>
-   {siteExpanded(g.site)&&<div className="p55-table-wrap"><p className="p55-note"><strong>Site Scope:</strong> {g.siteClass?.note} · Equipment ownership: NEW / REUSE / BY OTHERS ต้องตรวจ BLD/MR ทีละรายการ ไม่สรุปจากประเภทแท่น</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget" style={{width:"100%",borderCollapse:"collapse"}}>
+  <thead><tr><th>+/−</th><th>Location / ประเภทแท่น</th><th>Module ID</th><th>MTO items</th><th>Priced</th><th>RPT links</th><th>Antenna refs</th><th>Cisco subtotal (THB)</th><th>Total location</th></tr></thead><tbody>
+  {groups.filter(g=>g.items.length).map(g=><React.Fragment key={g.site}>
+   <tr><td><button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={siteExpanded(g.site)}>{siteExpanded(g.site)?"−":"+"}</button></td>
+   <td><strong>{g.site}</strong><small>{g.siteClass?.type||"UNCLASSIFIED"} · {g.siteClass?.thai||"ตรวจสอบ"}</small></td>
+   <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()}/></td>
+   <td className="is-number">{g.items.length}</td><td className="is-number">{g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length}</td>
+   <td className="is-number">{g.rfDemand?.linkEndpointDemand??"—"}</td><td className="is-number">{g.rfDemand?.antennaReferenceDemand??"—"}</td>
+   <td className="is-number">{money(g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0),"THB")}</td><td>NOT ESTABLISHED</td></tr>
+   {siteExpanded(g.site)&&<tr><td colSpan={9}><div className="p55-table-wrap"><p className="p55-note"><strong>Site Scope:</strong> {g.siteClass?.note} · Equipment ownership: NEW / REUSE / BY OTHERS ต้องตรวจ BLD/MR ทีละรายการ ไม่สรุปจากประเภทแท่น</p>
     <table className="p55-table p55-table--compact"><thead><tr><th>Link / First Principles</th><th>FSPL</th><th>Gt + Gr</th><th>Ideal RSL offset</th><th>STD / BOM</th></tr></thead>
      <tbody>{g.rfProof.map(p=><tr key={p.id}><td>{p.from} → {p.to}</td><td>{p.fsplDb.toFixed(2)} dB</td><td>{p.gainSumDbi.toFixed(2)} dBi</td><td>{p.idealRslOffsetDb.toFixed(2)} dB<small>Rx = Tx + offset − losses</small></td><td>HOLD · CAL/OEM proof required{p.change&&<small>4ft candidate: {p.change.gainChangeDb.toFixed(2)} dB vs Next G baseline</small>}</td></tr>)}</tbody>
     </table>
@@ -78,8 +84,9 @@ export function SimpleBom0553({focusedLocation=null}){
       {!x.configuration.length&&!x.vendorCandidates.length&&<tr><td colSpan={5}>No priced source mapped to this physical object yet; do not assume zero cost</td></tr>}
       </tbody></table></div>
      </td></tr>}
-    </React.Fragment>)}</tbody></table></div>}
-  </section>)}
+    </React.Fragment>)}</tbody></table></div></td></tr>}
+  </React.Fragment>)}
+  </tbody></table></div>
   <p className="p55-note">ZWP20 GREENFIELD total across all equipment, vendor packages and bulk is NOT ESTABLISHED; Cisco-only priced subtotal must never be labelled total location cost. Subtotal is for priced working items only. It excludes non-priced MR0001 equipment, bulk, spares and services. Customer A+B+C total and selling price remain separate; 4-Scope of Supply.xlsx is the controlled output template.</p>
   </>}
  </section>;
