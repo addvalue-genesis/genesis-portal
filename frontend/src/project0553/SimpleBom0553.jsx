@@ -1,6 +1,7 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
+import {DTRS_RFI_BULK_0553} from "./data/dtrsRfiBulk0553";
 import { deriveEngineeringOwnedCost0553 } from "./data/engineeringOwnedCost0553";
 import { deriveZWP20VendorFunctionCosts, getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
 import {ZWP8_ROW43_COST_TRACE} from "./data/zwp8Row43CostTrace";
@@ -78,6 +79,11 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <p className="p55-note">Equation: Lproxy = assumed rectilinear horizontal (15m) + deck elevation delta + termination loop (3m); Lbudget = max(50m, Lproxy). Short = 1×, Base = 1.2×, Long = 1.5×. These are parametric scenarios NOT measured routes. CAT6A historical THB524/m used for SCADA only. No RF/Trunk/RACON CAT6A substitution; EX IP Phone awaits phone tags/cable interfaces. No double count with active BOM row11.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP / System</th><th>Physical cable route evidence</th><th>Deck</th><th>Geometry proxy</th><th>Short / Base / Long (m)</th><th>Base material cost</th><th>Cost gate</th></tr></thead><tbody>
   {layoutRouteEstimates.rows.filter(r=>site==="ALL"||r.wp===site).map(r=><tr key={r.id}><td>{r.wp}<small>{r.system}</small></td><td>{r.from} → {r.to}</td><td>{r.sourceDeck}</td><td>{r.geometricProxyM} m (assumed)</td><td>{r.scenarios.short} / {r.scenarios.base} / {r.scenarios.long}</td><td>{money(r.materialBaseTHB,"THB")}</td><td>{r.rateState}<small>Not included in active WP total</small></td></tr>)}
+  </tbody></table></div></details>
+  <details className="p55-panel"><summary>MOT / RFI Trunk Radio — RF, DC & Alarm Bulk Functions</summary>
+  <p className="p55-note">RFI RX3852-2002-11 LNA 380–520 MHz, 50 ohm, SMA(F). Sources: MOT Datasheet and Z1F LAY. Quantities are candidate functions, not approved cable procurement. No Motorola baseline and no CAT6A unit rates for RF/DC/Alarm.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Function</th><th>Interface / Tag</th><th>Candidate Product</th><th>Qty</th><th>Cost</th></tr></thead><tbody>
+  {DTRS_RFI_BULK_0553.byWP.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.functions.map((f,i)=><tr key={w.wp+f.fn+i}><td>{w.wp}</td><td>{f.fn}</td><td>{f.tag}</td><td>{f.sku}<small>{f.source}</small></td><td>{f.qty===null?"DERIVE":f.qty+" "+f.unit}</td><td>Rate required</td></tr>))}
   </tbody></table></div></details>
   <SourceCoverage0553/>
   <SiteSystemCostReconciliation0553/>
