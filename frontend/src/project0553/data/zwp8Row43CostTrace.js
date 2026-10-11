@@ -51,6 +51,8 @@ export const ZWP8_ROW43_COST_TRACE=Object.freeze({
   state:"REQUIRES_ENGINEERING_ALLOCATION"
  })),
  quotedTotalUSD:NEXTG.quotedGrandTotal,allocatedSiteTotalUSD:null,
+ preferredBudgetaryAntenna:"4FT",preferredScenarioId:"ZWP8-ROW43-4FT",
+ preferenceBasis:"Management budgetary preference 2026-10-11; link-specific antenna assignments and OEM/CAL approval remain unverified",
  referenceScenarios,
  caution:"Quote group quantities are global, not per-ZWP8 site; candidate antenna diameters are mutually exclusive."
 });
