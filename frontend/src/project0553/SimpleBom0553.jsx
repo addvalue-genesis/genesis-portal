@@ -67,38 +67,25 @@ export function SimpleBom0553({focusedLocation=null}){
      <tbody>{g.rfProof.map(p=><tr key={p.id}><td>{p.from} → {p.to}</td><td>{p.fsplDb.toFixed(2)} dB</td><td>{p.gainSumDbi.toFixed(2)} dBi</td><td>{p.idealRslOffsetDb.toFixed(2)} dB<small>Rx = Tx + offset − losses</small></td><td>HOLD · CAL/OEM proof required{p.change&&<small>4ft candidate: {p.change.gainChangeDb.toFixed(2)} dB vs Next G baseline</small>}</td></tr>)}</tbody>
     </table>
     <table className="p55-table p55-table--compact p55-table--budget">
-    <thead><tr><th>+</th><th>MTO Item / Equipment / Copy ID</th><th>MR/MTO Qty (input)</th><th>Vendor / SKU Candidate</th><th>Unit price / source currency</th><th>Extended cost</th><th>First Principles / Qty proof</th></tr></thead>
+    <thead><tr><th>+</th><th>MTO Item / Equipment / Copy ID</th><th>MR/MTO Qty (input)</th><th>Vendor / SKU Candidate</th><th>Selected unit / package price (source currency)</th><th>Item extended cost (not sum of alternatives)</th><th>First Principles / Qty proof</th></tr></thead>
     <tbody>{g.items.map(x=><React.Fragment key={x.id}>
      <tr><td><button type="button" className="p55-row-toggle" onClick={()=>open("item:"+x.id)}>{expanded["item:"+x.id]?"−":"+"}</button></td>
       <td><strong>{x.sourceTag}</strong><small>{x.description}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)}/></td>
       <td>{x.sourceScopeQty??"REVIEW"} {x.sourceScopeUnit||""}<small>{x.sourceState}</small><small>Engineering SKU Qty: {x.engineeringRequiredSkuQty??"NOT DERIVED"}</small></td>
       {(()=>{const estimate=NEXTG_CANDIDATE_ESTIMATE_0553.estimateFor(x);
-       const offerLines=estimate.functions.flatMap(fn=>fn.candidates);
-       const uniqueOffers=[...new Map(offerLines.map(q=>[q.quoteLine,q])).values()];
-       const pricedOffers=uniqueOffers.filter(q=>Number.isFinite(q.unitPrice));
+       const candidates=[...new Map(estimate.functions.flatMap(fn=>fn.candidates).map(q=>[q.quoteLine,q])).values()];
+       const nextgPriced=candidates.filter(q=>Number.isFinite(q.unitPrice));
+       const otherPriced=x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice));
+       const isCisco=Number.isFinite(x.indicativePackageCostTHB);
        return <>
-       <td><strong>{x.pricedVendor||"Vendor candidate review"}</strong>
-        <small>Next G: {uniqueOffers.length} function-matched quote line(s)</small>
-        {uniqueOffers.length>0&&<small>{uniqueOffers.slice(0,5).map(q=>q.quoteLine).join(", ")}{uniqueOffers.length>5?" …":""}</small>}
-        <small>{x.vendorCandidates.length} other source candidate(s) · none automatically approved</small></td>
-       <td>
-        {Number.isFinite(x.indicativePackageCostTHB)&&<div><strong>{money(bom.cisco.unitPackageQuotedSumTHB,"THB")}</strong><small>Cisco 1 working Set (scenario)</small></div>}
-        {pricedOffers.length>0&&<div>
-          <strong>Next G quote: Qty × Unit = Amount (USD)</strong>
-          <table className="p55-table p55-table--compact" style={{fontSize:"inherit"}}><thead><tr><th>Line / SKU</th><th>Quote Qty</th><th>Unit USD</th><th>Quote total USD</th></tr></thead>
-           <tbody>{pricedOffers.map(q=><tr key={q.quoteLine}><td>{q.quoteLine}<small>{q.sku}</small></td><td className="is-number">{q.offeredQty??"—"}</td><td className="is-number">{q.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td className="is-number">{Number.isFinite(q.quotedExtended)?q.quotedExtended.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—"}</td></tr>)}</tbody>
-          </table>
-          <small>Quotation-wide quantities only. ZWP20 required/allocated Qty still needs engineering decision. A/B/C alternatives are not additive.</small>
-        </div>}
-        {uniqueOffers.some(q=>!Number.isFinite(q.unitPrice))&&<small>Unpriced source quote lines (N/A, not zero): {uniqueOffers.filter(q=>!Number.isFinite(q.unitPrice)).map(q=>q.quoteLine).join(", ")}</small>}
-        {x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice)).length>0&&<div><strong>Other vendor quotation unit rates</strong>
-          {x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice)).map((v,i)=><small key={(v.quoteId||"other")+":"+(v.quoteLine||i)}>{v.vendor} · {v.quoteLine} · {v.sku} · quoted qty {v.offeredQuoteQty??"—"} × {v.originalCurrency} {v.originalUnitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</small>)}
-        </div>}
-        {pricedOffers.length===0&&!Number.isFinite(x.indicativePackageCostTHB)&&!x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice))&&<small>No mapped priced vendor line</small>}
-       </td>
-       <td>{Number.isFinite(x.indicativePackageCostTHB)?<>{money(x.indicativePackageCostTHB,"THB")}<small>Cisco scenario ONLY</small></>:<strong>NOT ALLOCATED</strong>}
-        {pricedOffers.length>0&&<small>Next G unit prices available — site qty / extended cost not yet verified</small>}
-       </td>
+       <td><strong>{isCisco?x.pricedVendor:"NO SELECTED VENDOR"}</strong>
+        <small>Next G: {nextgPriced.length} priced quote option(s)</small>
+        <small>Others: {otherPriced.length} source rate(s)</small>
+        <small>กด + ตรวจ Vendor / MCDA / Quantity</small></td>
+       <td>{isCisco?<><strong>{money(bom.cisco.unitPackageQuotedSumTHB,"THB")}</strong><small>Cisco package scenario per MTO Set — NOT accepted SKU rate</small></>:
+        <><strong>NOT SELECTED</strong><small>{nextgPriced.length+otherPriced.length} unit-price evidence line(s) in expanded quote table</small><small>ไม่ใช่ผลรวมของราคา Vendor ทุกทางเลือก</small></>}</td>
+       <td>{isCisco?<><strong>{money(x.indicativePackageCostTHB,"THB")}</strong><small>Provisional Cisco bundle only</small></>:
+        <><strong>NOT CALCULATED</strong><small>Physical Qty × Selected Unit Rate + attributable accessories</small><small>No site allocation approved</small></>}</td>
        </>;
       })()}
       <td>{x.workingPriceStatus}<small>{x.costStatus}</small><small>Accepted unit cost: {Number.isFinite(x.acceptedPrice)?money(x.acceptedPrice,"THB"):"NOT VERIFIED"}</small></td>
