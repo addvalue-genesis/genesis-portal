@@ -96,10 +96,7 @@ export function SimpleBom0553({focusedLocation=null}){
         <><strong>NOT SELECTED</strong><small>{nextgPriced.length+otherPriced.length} unit-price evidence line(s) in expanded quote table</small><small>ไม่ใช่ผลรวมของราคา Vendor ทุกทางเลือก</small></>}</td>
        <td>{isCisco?<><strong>{money(x.indicativePackageCostTHB,"THB")}</strong><small>Provisional Cisco bundle only</small></>:
         <><strong>NOT CALCULATED</strong><small>Physical Qty × Selected Unit Rate + attributable accessories</small><small>No site allocation approved</small>
-          {getMR502BudgetaryScenarios(x).length>0&&<div><strong>Budgetary partial: ONE radio assembly</strong>
-           {getMR502BudgetaryScenarios(x).map(a=><small key={a.group}>Option {a.group}: {money(a.unitAssemblyReferenceUSD,"USD")} (not additive)</small>)}
-           <small>NOT complete ZWP20 package cost; physical Qty and RF/licence verification pending</small>
-          </div>}
+
          </>}</td>
        </>;
       })()}
@@ -122,23 +119,13 @@ export function SimpleBom0553({focusedLocation=null}){
         {ZWP8_ROW43_COST_TRACE.items.map(item=><tr key={item.tag}><td>{item.tag}<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.zwp8."+item.tag.toLowerCase()+".43"}/></td><td>{item.sourceScopeText}</td><td>{item.role}</td><td>{item.candidates.length?item.candidates.map(v=><small key={v.quoteLine}>{v.quoteLine} · {v.sku}: {money(v.unitPriceUSD,"USD")} (offer qty {v.quoteQty})</small>):"No separate priced OEM IDU line identified"}</td><td>NOT DERIVED</td><td>NOT ALLOCATED</td></tr>)}
         </tbody></table><p className="p55-note">Antenna selection 4ft versus 6ft requires CAL/RPT; do not sum alternative antenna quotes. IDU integration must be checked before assigning additional cost.</p>
        </div>}
-       {getMR502BudgetaryScenarios(x).length>0&&<div className="p55-table-wrap">
-        <strong>MR-502-001.4 · Budgetary unit assembly cost scenarios (Next G · USD)</strong>
-        <p className="p55-note">Preliminary quotation-based cost for ONE hypothetical radio assembly, not ZWP20's accepted radio quantity or total package price. A/B/C configurations are mutually exclusive choices for this calculation, NOT additive.</p>
-        <table className="p55-table p55-table--compact"><thead><tr><th>Option</th><th>Assumed assembly qty</th><th>Source radio quote qty</th><th>Unit assembly reference USD</th><th>Scenario partial extended USD</th><th>Scope / approval</th></tr></thead><tbody>
-        {getMR502BudgetaryScenarios(x).map(scenario=><tr key={scenario.group}>
-         <td>Next G {scenario.group} · candidate</td><td className="is-number">{scenario.illustrativeAssemblyQty}</td><td className="is-number">{scenario.quotationWideGroupQty}</td>
-         <td className="is-number">{money(scenario.unitAssemblyReferenceUSD,"USD")}</td><td className="is-number">{money(scenario.unitAssemblyReferenceUSD*scenario.illustrativeAssemblyQty,"USD")}</td>
-         <td>{scenario.status}<small>{scenario.exclusions}</small></td>
-        </tr>)}</tbody></table>
-        <p className="p55-note">Source = Next G 16-Sep-2026 unit rates, one each of radio, filter, throughput key, mount, power, cord and Ethernet surge. Antenna, licensed region, NMS, warranty, bulk and service are NOT included. Quote expired; OEM compliance and site radio role unresolved. Neither this partial figure nor A+B+C is approved.</p>
-       </div>}
        <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
         <thead><tr><th>Stage</th><th>Evidence / calculation</th><th>Result</th></tr></thead><tbody>
         <tr><td>01 Source</td><td>MTO Rev04 · source row {x.sourceRow} · {x.sourceTag}</td><td>{x.sourceScopeQty??"UNRESOLVED"} {x.sourceScopeUnit||""} (scope quantity only)</td></tr>
         <tr><td>02 First Principles</td><td>Site {g.site}; requirement object {x.bomType}; source demand is not physical SKU quantity</td><td>{x.engineeringRequiredSkuQty==null?"SKU quantity requires configuration, interface and location take-off":x.engineeringRequiredSkuQty}</td></tr>
         <tr><td>03 Constraints / CAL-RPT</td><td>{g.rfProof.length?g.rfProof.map(r=>r.id).join(", "):"No linked RF calculation for this item"} · verify capacity, power, Ex rating, licences and interfaces as applicable</td><td>ENGINEERING REVIEW REQUIRED</td></tr>
         <tr><td>04 Vendor fit</td><td>{x.vendorCandidates.length} matched offer candidates; {x.configuration.length} bundled offer lines</td><td>{x.pricedVendor?"WORKING BUNDLE — OEM NOT APPROVED":"NOT SELECTED"}</td></tr>
+        {getMR502BudgetaryScenarios(x).length>0&&<tr><td>05a Cost scenario evidence</td><td>Next G A/B/C are alternative, unselected assembly rate references; not additive. Confirm radio role, quantity, licence and excluded bulk before using in budget.</td><td>NOT SELECTED — {getMR502BudgetaryScenarios(x).map(v=>v.group+": "+money(v.unitAssemblyReferenceUSD,"USD")).join(" | ")}</td></tr>}
         <tr><td>05 Cost formula</td><td>Physical Qty × Accepted Unit Rate + attributable bulk / work / risk</td><td>{Number.isFinite(x.acceptedPrice)&&Number.isFinite(x.engineeringRequiredSkuQty)?money(x.acceptedPrice*x.engineeringRequiredSkuQty,"THB"):"Verified extended cost NOT ESTABLISHED"}</td></tr>
         <tr><td>06 Budgetary evidence</td><td>Source scenario shown separately; pricing requires quantity driver, currency/FX, validity and risk basis</td><td>{Number.isFinite(x.indicativePackageCostTHB)?money(x.indicativePackageCostTHB,"THB")+" — SCENARIO ONLY":"SOURCE PRICE NOT ALLOCATED"}</td></tr>
         </tbody></table></div>
