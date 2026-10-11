@@ -8,6 +8,21 @@ const groupCodes={
  B:["B-1","B-2","B-3","B-5","B-6","B-7","B-8"],
  C:["C-1","C-2","C-3","C-5","C-6","C-7","C-8"]
 };
+// ZWP20 is the TO end of the ZWP8→ZWP20 PTMP link: infer remote role for
+// working budget only. Group B and C have identical quoted assembly unit rates.
+// This is a reversible preliminary choice, not MCDA/OEM acceptance.
+export function getZWP20RemoteBudgetChoice(item){
+ if(item.site!=="ZWP20"||item.sourceTag!=="MR-502-001"||item.sourceRow!==4)return null;
+ const choices=getMR502BudgetaryScenarios(item);
+ const remote=choices.find(c=>c.group==="B");
+ if(!remote||!Number.isFinite(remote.unitAssemblyReferenceUSD))return null;
+ return {source:"NG-260916",group:"B",role:"PTMP_REMOTE_CANDIDATE",
+  assumedAssemblies:1,unitUSD:remote.unitAssemblyReferenceUSD,
+  partialUSD:remote.unitAssemblyReferenceUSD,
+  currency:"USD",state:"BUDGETARY_PARTIAL_ASSUMPTION_NOT_VERIFIED",
+  rationale:"ZWP8→ZWP20 inferred PTMP remote endpoint, one MTO Set. B and C quote reference rates match; only B is used to avoid double-counting.",
+  exclusions:"No antenna, GPS, region entitlement, NMS, warranty, enclosure, cable/gland/bulk, services or risk; not complete MR-502-001 cost."};
+}
 export function getMR502BudgetaryScenarios(item){
  if(item.site!=="ZWP20"||!/^MR-502-001(?:[A-Z])?$/.test(item.sourceTag))return [];
  return Object.entries(groupCodes).map(([group,codes])=>{
