@@ -4,9 +4,21 @@ import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 // diagonal shortest path; actual cable-tray obstacles and penetrations may exceed it.
 // Source WP bay dimension 9144 mm, ZWP20 mezzanine 21.1/21.3m,
 // lower 18.3m, upper 24.5m. Horizontal paths are not surveyed.
+export const DTRS_SELECTED_LNA_EVIDENCE_0553=Object.freeze({
+ supplier:"MOT",manufacturer:"RF Industries (RFI)",model:"RX3852-2002-11",
+ function:"DTRS_LOW_NOISE_AMPLIFIER",allocation:"TCAB-508-001 RF LNA enclosure",
+ source:"RFI Low Noise Amplifier, RX3852-2002-11.pdf",
+ sourceUrl:"https://drive.google.com/file/d/1dAnYkC2r2hyYEgUuN-xA0xAvq-zG2iTA/view",
+ frequencyMHz:[380,520],impedanceOhms:50,connector:"SMA female",
+ maxGainDb:40,noiseFigureDbMax:2,dcVoltageV:[11,28],
+ dcMatingPlug:"A2671, 2 pin, separately ordered if required",
+ alarmMatingPlug:"A2881, 3 pin, separately ordered if required",
+ note:"RFI is confirmed for offered LNA only; do not infer full radio/repeater OEM or feeder cable SKU from this LNA datasheet",
+ state:"VENDOR_DTS_EVIDENCE__FEEDER_MATCH_PENDING"
+});
 export const DTRS_HISTORICAL_FEEDER_EVIDENCE_0553=Object.freeze({
  source:"BOQ_AWP36 Radio Project Rv.2_31-1-2025.pdf",project:"AWP36, not Z1F",
- use:"HISTORICAL_BUDGETARY_CANDIDATE_ONLY",
+ use:"OTHER_PROJECT_HISTORY_ONLY__NOT_SELECTED_OEM_OR_BUDGET_RATE_FOR_Z1F",
  radio:{sku:"XiR M8668i",system:"DMR Tier III",bandMHz:[350,400],sourcePackage:"One AWP36 DMR fixed station reference"},
  feeder:{sku:"LDF4RK-50A",brand:"CommScope",nominalSize:"1/2-inch coaxial",lengthM:50,
   connectorIncluded:true,quotedAssemblyCostTHB:50000,ratePerMComparableTHB:1000,
@@ -64,11 +76,11 @@ export function deriveZ1FTelBulkRoutes0553(params=Z1F_BULK_ROUTE_PARAMETERS_0553
   const budgetBaselineM=Math.max(geometricProxyM,r.managementMinimumM);
   const scenarios=Object.fromEntries(Object.entries(params.scenarioFactors).map(([name,factor])=>[name,round(budgetBaselineM*factor)]));
   const canCostCable=r.cableKind==="CAT6A_DATA";
-  const rfSpecificationGate=r.system==="DTRS_TRUNK_RADIO"?{status:"DTS_REQUIRED_BEFORE_FEEDER_SELECTION",historicalCandidate:DTRS_HISTORICAL_FEEDER_EVIDENCE_0553,required:["Selected Motorola radio/repeater model and TX/RX frequency band","Antenna RF connectors and count of feed lines","DTS maximum feeder insertion loss / receiver sensitivity / transmit path loss budget","Connector types, lightning protector, rated power, Ex requirements","Feeder family 1/2in, 7/8in or other chosen by loss calculation, NOT assumption"],calculation:"L_loss_dB = (cable_attenuation_dB_per_100m_at_frequency)*(run_length_m/100) + connector_loss + lightning_protector_loss; compare with DTS link budget."}:null;
+  const rfSpecificationGate=r.system==="DTRS_TRUNK_RADIO"?{status:"RFI_LNA_DTS_FOUND__FEEDER_SPEC_STILL_REQUIRED",offeredLna:DTRS_SELECTED_LNA_EVIDENCE_0553,historicalRejectedAsSelection:DTRS_HISTORICAL_FEEDER_EVIDENCE_0553,required:["Selected Motorola radio/repeater model and TX/RX frequency band","Antenna RF connectors and count of feed lines","DTS maximum feeder insertion loss / receiver sensitivity / transmit path loss budget","Connector types, lightning protector, rated power, Ex requirements","Feeder family 1/2in, 7/8in or other chosen by loss calculation, NOT assumption"],calculation:"L_loss_dB = (cable_attenuation_dB_per_100m_at_frequency)*(run_length_m/100) + connector_loss + lightning_protector_loss; compare with DTS link budget."}:null;
   return {...r,geometricProxyM:round(geometricProxyM),budgetBaselineM,scenarios,rfSpecificationGate,
    rateTHBPerM:canCostCable?params.quoteRateTHBPerM:null,
    materialBaseTHB:canCostCable?round(scenarios.base*params.quoteRateTHBPerM):null,
-   rateState:canCostCable?"PROVISIONAL_INNOVA_CABLE_RATE":r.system==="DTRS_TRUNK_RADIO"?"WAIT_SELECTED_OEM_DTS_RF_FEEDER_QUALIFICATION":"CABLE_TYPE_RATE_NOT_SELECTED",
+   rateState:canCostCable?"PROVISIONAL_INNOVA_CABLE_RATE":r.system==="DTRS_TRUNK_RADIO"?"RFI_LNA_IDENTIFIED__RF_FEEDER_SELECTION_PENDING":"CABLE_TYPE_RATE_NOT_SELECTED",
    installationBasis:"PARAMETRIC_BUDGET_ONLY_NOT_MEASURED"};
  });
  const byWP=Z1F_TEL_LAYOUT_INDEX_0553.byWP.map(w=>{
