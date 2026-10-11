@@ -12,6 +12,29 @@ const families={
  "ANT-502-003":{role:"Antenna; 4ft/6ft design conflict",codes:["B-11","B-12","B-13","C-11","C-12"]}
 };
 if(!source||source.sourceItemCodes.length!==6)throw Error("ZWP8 source row 43 must have six codes");
+const radioCodes=["B-1","B-2","B-3","B-5","B-6","B-7","B-8"];
+const antennaAlternatives=[["4FT","B-12"],["6FT","B-11"]];
+const quoteUnit=code=>{
+ const line=lines.get(code);
+ return line&&Number.isFinite(line.unitPrice)?line.unitPrice:null;
+};
+const radioEach=radioCodes.every(code=>quoteUnit(code)!==null)?
+ Math.round(radioCodes.reduce((sum,code)=>sum+quoteUnit(code),0)*100)/100:null;
+// Two MTO ODU Sets and two MTO antenna Sets are explicitly registered,
+// but their equivalence to two physical installed OEM assemblies is an ASSUMPTION.
+const referenceScenarios=antennaAlternatives.map(([label,code])=>{
+ const antennaEach=quoteUnit(code);
+ const subtotal=radioEach!==null&&antennaEach!==null?
+ Math.round((2*radioEach+2*antennaEach)*100)/100:null;
+ return {id:"ZWP8-ROW43-"+label,antennaLabel:label,antennaQuoteLine:code,
+  assumedRadioAssemblies:2,assumedAntennas:2,radioCodes,
+  radioAssemblyUnitUSD:radioEach,antennaUnitUSD:antennaEach,
+  partialEquipmentUSD:subtotal,currency:"USD",
+  assumption:"Two ODU sets and two antenna sets provisionally treated as two physical remote radio assemblies and two matching antennas; NOT engineering accepted",
+  excluded:"Separate IDU/feature integration proof, licensing region, NMS, warranty, cable, feeder, gland, enclosure, FAT/SAT, site services and risk",
+  state:"BUDGETARY_PARTIAL_REFERENCE_ONLY"};
+});
+
 export const ZWP8_ROW43_COST_TRACE=Object.freeze({
  site:"ZWP8",mr:"MR-0001",sourceRow:43,sourceQtyText:source.sourceQuantityText,
  sourceRevision:"MTO Rev04",quote:NEXTG.quoteNumber,
@@ -28,5 +51,6 @@ export const ZWP8_ROW43_COST_TRACE=Object.freeze({
   state:"REQUIRES_ENGINEERING_ALLOCATION"
  })),
  quotedTotalUSD:NEXTG.quotedGrandTotal,allocatedSiteTotalUSD:null,
+ referenceScenarios,
  caution:"Quote group quantities are global, not per-ZWP8 site; candidate antenna diameters are mutually exclusive."
 });
