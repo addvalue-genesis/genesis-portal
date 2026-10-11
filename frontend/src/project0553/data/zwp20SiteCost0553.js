@@ -52,19 +52,19 @@ function rowCost(item){
   const quote=SUPPLIER_QUOTE_LINES_0553.find(v=>v.id==="SONIC-CCY24-PXC-633");
   const source=quote?.lines.find(v=>v[1]==="FL-PP-RJ45-SC");
   const rate=Number.isFinite(source?.[4])?source[4]:null;
-  const weidmuellerPlug={functionId:"DATO_RJ45_FIELD_PLUG",vendor:"Weidmüller / INNOVA quotation expected",
+  const weidmuellerPlug={functionId:"DATO_RJ45_FIELD_PLUG",vendor:"INNOVA / Weidmüller",
     sku:"IE-PS-RJ45-FH-BK",orderNo:"1963600000",qty:1,currency:"THB",
-    unitPrice:0,extended:0,priceBasis:"MANAGEMENT_APPROVED_TEMPORARY_ZERO__INNOVA_QUOTATION_TO_FOLLOW",
-    source:"1963600000_IE-PS-RJ45-FH-BK_en.pdf",exStatus:"IP20_DATASHEET__EX_COMPLIANCE_NOT_ESTABLISHED"};
+    unitPrice:0,extended:0,priceBasis:"INNOVA_QA24-0604_ITEM2_NA_AS_QUOTED__MANAGEMENT_TEMPORARY_ZERO",
+    source:"INNOVA QA24-0604 dated 15-Jul-2024 Item 2 (quoted N/A); technical datasheet 1963600000_IE-PS-RJ45-FH-BK_en.pdf",exStatus:"IP20_DATASHEET__EX_COMPLIANCE_NOT_ESTABLISHED"};
   return {...base,vendor:"Sonic Automation / Phoenix Contact + Weidmüller (INNOVA pending)",sku:"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK (budgetary DATO components)",components:[
     {functionId:"DATO_RJ45_PANEL_INTERFACE",vendor:"Sonic Automation / Phoenix Contact",sku:"FL-PP-RJ45-SC",qty:q,currency:"THB",unitPrice:rate,extended:money(q,rate),priceBasis:"CCY24-PXC-633 historical quotation"},
     weidmuellerPlug
    ],
    currency:rate!==null?"THB":null,unitCost:rate,extended:money(q,rate),
    quantityBasis:"MTO Rev04 DATO-507-001 1 Set; assumed one RJ45 patch panel as provisional budgetary interface equivalent; actual Ex-rated disconnect composition must be checked",
-   status:"MANAGEMENT_APPROVED_BUDGETARY_BASIS",decision:"Management accepted FL-PP-RJ45-SC THB 1,900 and temporary Weidmüller RJ45 plug THB 0 as ZWP20 DATO budget components; INNOVA quote will replace zero; technical Ex compliance remains separate",
+   status:"MANAGEMENT_APPROVED_BUDGETARY_BASIS",decision:"Management accepted FL-PP-RJ45-SC THB 1,900 and temporary Weidmüller RJ45 plug THB 0 as ZWP20 DATO budget components; INNOVA QA24-0604 Item 2 confirms offered SKU but Unit Price N/A; a new priced quote will replace zero; technical Ex compliance remains separate",
    assumptions:["Historical Sonic CCY24-PXC-633 11-Jul-2024 THB 1,900 / EA ex VAT; quotation validity expired",
-    "Weidmüller IE-PS-RJ45-FH-BK (Order No. 1963600000), 1 provisional plug × THB 0 temporary management allowance; replace with INNOVA quotation rate when supplied. IP20 datasheet is NOT Ex certification",
+    "Weidmüller IE-PS-RJ45-FH-BK (Order No. 1963600000), 1 provisional plug × THB 0 temporary management allowance; INNOVA QA24-0604 Item 2 is N/A (not THB 0); update when priced revision arrives. IP20 datasheet is NOT Ex certification",
     "Phoenix FL-PP-RJ45-SC has quoted price but is NOT established as full DATO Ex-rated socket and plug. Keep technical gap, hazardous-area certification and accessory assembly as separate unresolved scope",
     "Estimate quantity 1 Set is provisional; do not use vendor quoted quantity"]};
  }
