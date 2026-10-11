@@ -1,4 +1,5 @@
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {EstimateToBidMapping0553} from "./EstimateToBidMapping0553";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { InternalBudgetShortcut0553 } from "./InternalBudgetShortcut0553";
 import { ScopeSheetsDetail0553 } from "./ScopeSheetsDetail0553";
@@ -76,6 +77,9 @@ export function CommercialWorkspace0553({focusedLocation=null}){
   </details>
   <details className="p553-budget-phase"><summary><strong>Scope of Supply & Bulk Reconciliation</strong><small>bid.budget.scope · bid.budget.bulk · A/B/C</small></summary>
    <ScopeSheetsDetail0553/>
+  </details>
+  <details className="p553-budget-phase"><summary><strong>Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
+   <EstimateToBidMapping0553/>
   </details>
   <details className="p553-budget-phase"><summary><strong>Cost & Commercial Pricing</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
    <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
