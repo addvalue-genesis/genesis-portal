@@ -1,3 +1,4 @@
+import {APPROVED_0553_BUDGET_BASIS,approvedCablePurchaseM} from "./approvedBudgetBasis0553";
 import {RACON_VENDOR_SCOPE_0553} from "./raconVendorScope0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./z1fParametricBulkRoutes0553";
@@ -14,10 +15,10 @@ export function deriveWpSystemBulkBudget0553(){
   const cableRoute=(sys)=>routeModel.rows.find(r=>r.wp===w.wp&&r.system===sys);
   const systems=[
    {id:"SCADA_RADIO",name:"SCADA Radio",equipment:found("SCADA_RADIO"),route:cableRoute("SCADA_RADIO"),
-    items:[{id:"SCADA-CAT6A",item:"Outdoor CAT6A S/FTP",unit:"m",qty:w.wp==="ZWP20"?50:(cableRoute("SCADA_RADIO")?.scenarios.base??null),
+    items:[{id:"SCADA-CAT6A",item:"Outdoor CAT6A S/FTP",unit:"m",qty:cableRoute("SCADA_RADIO")?approvedCablePurchaseM(APPROVED_0553_BUDGET_BASIS.greenfield.baseRouteM):null,
      rateTHB:524,source:"INNOVA QA24-0604, historical; scenario base",owner:"BULK_ROW11",
-     status:w.wp==="ZWP20"?"EXISTING_ZWP20_ROW11_COST_OWNER":"PARAMETRIC_60M_BASE__NOT_VENDOR_CONFIRMED",
-     note:w.wp==="ZWP20"?"Active ZWP20 working Row 11 owns 50m. This detail is a mirrored allocation, never additive.":"Parametric planning base at 60m per unique physical run; no package purchase commitment"}]},
+     status:w.wp==="ZWP20"?"MIRROR_ZWP20_ROW11_69M":"APPROVED_60M_PLUS_15PCT_BUDGETARY",
+     note:w.wp==="ZWP20"?"Active ZWP20 Row 11 owns 69m (60m + 15pct): this row mirrors cost, do not add twice.":"60m budget base + 15pct purchasing allowance = 69m per evidenced physical field-to-TC-room run"}]},
    {id:"EX_IP_PHONE",name:"EX IP Phone",equipment:found("EX_IP_PHONE"),
     route:null,items:[
      {id:"EX-PHONE-JB",item:"Dedicated certified Ex e Telephone Junction Box assembly, terminals, earth studs, bracket, labels and blanking plugs",unit:"set",qty:null,rateTHB:24500,
@@ -42,7 +43,7 @@ export function deriveWpSystemBulkBudget0553(){
   return {wp:w.wp,systems:systems.map(sys=>({...sys,items:sys.items.map(it=>({
    ...it,extendedTHB:Number.isFinite(it.qty)&&Number.isFinite(it.rateTHB)?Math.round(it.qty*it.rateTHB*100)/100:null
   }))})),source:"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 AFC",raconPackage:RACON_VENDOR_SCOPE_0553,
-   warning:"ZWP20 SCADA cable mirrors active Row11 (50m), never add twice. Other WP cable costs are new planning projections, not included in existing allocated location cost."};
+   warning:"ZWP20 SCADA cable mirrors active Row11 (69m), never add twice. Other WP cable costs are new planning projections, not included in existing allocated location cost."};
  });
  const brownfieldSites=["ZPQ","ZWP8","ZWP11"].map(wp=>({
   wp,siteClass:"BROWNFIELD",
