@@ -1,9 +1,23 @@
 // Engineering owns the required functions and quantities; suppliers only supply compatible rates.
 // Never derive purchase quantities from supplier offer quantities or default missing values to 1.
+import {SCADA_LINKS_0553} from "./scadaLinkEvidence";
 import {MR0001_PACKAGE_COMPOSITION} from "./mr0001PackageComposition";
 import {AVIAT_0553_TECHNICAL_EVALUATION} from "./aviatTechnicalBidEvaluation";
 const quotes=new Map(AVIAT_0553_TECHNICAL_EVALUATION.rows.map(q=>[q.quoteLine,q]));
 const validQty=q=>Number.isFinite(q)&&q>=0;
+const ZWP20_RADIO_TAG="MR-502-001";
+function engineeringQuantity(item,component,packageRow){
+ const recorded=validQty(component.requiredQty)?component.requiredQty:null;
+ if(recorded!==null)return {qty:recorded,state:"ENGINEERING_SOURCE",proof:"Controlled Engineering BOM"};
+ if(item.site!=="ZWP20"||item.sourceTag!==ZWP20_RADIO_TAG||item.sourceRow!==4)return {qty:null,state:"TOPOLOGY_REVIEW",proof:"Site interface not yet reconciled"};
+ const links=SCADA_LINKS_0553.filter(link=>link.to==="ZWP20"&&link.from==="ZWP8");
+ const anchored=links.length===1&&item.sourceScopeQty===1&&packageRow?.sourceCodes?.length===1;
+ if(!anchored)return {qty:null,state:"MTO_TOPOLOGY_CONFLICT",proof:"One-to-one source / link verification failed"};
+ if(component.functionId==="RADIO_EQUIPMENT")return {qty:1,state:"DOCUMENT_DERIVED_PRELIMINARY",proof:"MTO Rev04 ZWP20 row4: 1 radio ODU Set; RPT-0001 C1 ZWP8→ZWP20: one remote endpoint; redundancy unverified"};
+ if(["RF_FILTER","CAPACITY_KEY","REGION_KEY","POWER","POWER_CORD","MOUNT_FEEDER"].includes(component.functionId))
+   return {qty:1,state:"PARAMETRIC_1_PER_RADIO_ASSUMPTION",proof:"1 radio endpoint × 1 "+component.functionId+" per radio candidate; confirm actual function requirement, licensing, shared mount and power design; not approved"};
+ return {qty:null,state:"CONTRACTUAL_OR_INTERFACE_INPUT_REQUIRED",proof:"Warranty period/entitlement cannot be derived as a physical unit from radio count"};
+}
 export function deriveEngineeringOwnedCost0553(item){
  const packageRow=MR0001_PACKAGE_COMPOSITION.packages.find(p=>p.platform===item.site&&p.sourceRowIndex===item.sourceRow);
  const components=(packageRow?.components||[]).map(c=>{
@@ -13,14 +27,15 @@ export function deriveEngineeringOwnedCost0553(item){
     currency:q?.currency||v.currency,unitPrice:Number.isFinite(q?.unitPrice)?q.unitPrice:null,
     candidateStatus:q?.classification||"UNREVIEWED"};
   });
-  const qty=validQty(c.requiredQty)?c.requiredQty:null;
+  const derivation=engineeringQuantity(item,c,packageRow);
+  const qty=derivation.qty;
   const selected=c.selectedOffer?matches.find(x=>x.quoteLine===c.selectedOffer||x.sku===c.selectedOffer):null;
   const price=selected&&Number.isFinite(selected.unitPrice)?selected.unitPrice:null;
   const extended=qty!==null&&price!==null?Math.round(qty*price*100)/100:null;
-  return {id:c.id,functionId:c.functionId,driver:c.quantityDriver,requiredQty:qty,selectedOffer:c.selectedOffer,
+  return {id:c.id,functionId:c.functionId,driver:c.quantityDriver,requiredQty:qty,quantityState:derivation.state,quantityProof:derivation.proof,selectedOffer:c.selectedOffer,
    vendorCandidates:matches,unitPrice:price,currency:selected?.currency||null,
    extended,technicalState:c.technicalState,
-   state:extended!==null?"COSTED_FROM_ENGINEERING_QTY":"ENGINEERING_QTY_OR_SELECTION_REQUIRED"};
+   state:extended!==null?"COSTED_FROM_ENGINEERING_QTY":qty!==null?"QTY_DERIVED_VENDOR_SELECTION_REQUIRED":"ENGINEERING_QTY_REQUIRED"};
  });
  const ready=components.length>0&&components.every(c=>c.extended!==null);
  const currencySet=[...new Set(components.filter(c=>c.extended!==null).map(c=>c.currency))];
