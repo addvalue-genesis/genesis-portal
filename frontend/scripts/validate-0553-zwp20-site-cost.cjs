@@ -49,4 +49,9 @@ assert.equal(10*524+1020,6260);
 assert(model.includes("BUDGETARY_ESTIMATED_ROUTE_NOT_VERIFIED"));
 assert(ui.includes("Number.isFinite(v.quantity)"));
 
+assert(ui.includes('aria-label="BOM display currency"'));
+assert(ui.includes('const activeCurrency=currencyOverride||displayCurrency'));
+assert(ui.includes('Display conversion only; original quotation rates unchanged'));
+assert(ui.includes('Original Extended Cost'));
+assert(ui.includes('Display Extended Cost'));
 console.log("PASS ZWP20 bulk budgetary scenario THB 6,260: 10m CAT6A + 1 gland, explicit assumptions, alternatives excluded.");
