@@ -1,3 +1,4 @@
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import { WORKING_BOM_BY_LOCATION_0553 as model } from "./data/workingBomByLocation";
 import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom";
@@ -21,7 +22,7 @@ export function SimpleBom0553({focusedLocation=null}){
  const open=k=>setExpanded(old=>({...old,[k]:!old[k]}));
  const money=(v,currency)=>Number.isFinite(v)?currency+" "+v.toLocaleString("en-US",{maximumFractionDigits:2}):"—";
  return <section className="p55-panel">
-  <div className="p55-eyebrow">BID-BUD-BOM · bid.budget.bom · ENGINEERING WORKING PREVIEW</div>
+  <div className="p55-eyebrow">ENGINEERING WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom"/></div>
   <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
