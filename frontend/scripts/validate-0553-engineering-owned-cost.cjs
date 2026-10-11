@@ -12,7 +12,7 @@ assert(model.includes('SCADA_LINKS_0553.filter(link=>link.to==="ZWP20"'));
 assert(model.includes('component.functionId==="RADIO_EQUIPMENT"'));
 assert(model.includes('quantityState:derivation.state'));
 assert(model.includes("budgetaryExtended=qty!==null"));
-assert(ui.includes("Derived budgetary partial:"));
+assert(ui.includes("Budgetary Item Cost:"));
 const quote=JSON.parse(fs.readFileSync(path.join(root,"data/quotes/NG-260916-ADV-DAP1.full.json"),"utf8"));
 const codes=["B-1","B-2","B-3","B-5","B-6","B-7"];
 const subtotal=Math.round(codes.reduce((n,k)=>{const q=quote.lines.find(r=>r.code===k);assert(Number.isFinite(q?.unitPrice));return n+q.unitPrice;},0)*100)/100;
@@ -22,5 +22,8 @@ assert(model.includes("REGION_INCLUDED_ASSUMPTION={usd:0"),"Working scenario sho
 assert(model.includes("ASSUMED_INCLUDED_NO_SEPARATE_CHARGE"));
 assert(!model.includes("REGION_ENTITLEMENT_PROXY"),"Unrelated license proxy must be removed");
 assert(ui.includes("NOT supplier-confirmed free of charge"));
-assert(ui.includes('money(engineeringCost.budgetaryPartialUSD,"USD")'),"Main BOM must show engineering-derived priced subtotal");
+assert(ui.includes('money(engineeringCost.budgetaryItemTotalUSD,"USD")'),"Main BOM must show engineering-derived priced total");
+assert(model.includes('budgetaryState=budgetaryCoverage?"CALCULATED_WITH_ASSUMPTIONS"'),"Budgetary state must be separate from final approval");
+assert(model.includes("budgetarySelectedOffer"),"Budgetary SKU decision must exist");
+assert(ui.includes("Final Approved Cost:"),"Final state must be separate");
 console.log("PASS 0553 Engineering controls required function quantity before vendor rate extension; one-each vendor basket is non-authoritative.");
