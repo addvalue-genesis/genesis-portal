@@ -144,6 +144,8 @@ export function SimpleBom0553({focusedLocation=null}){
        </div>})()}
        <p className="p55-note">Budgetary assumption may be used only when explicitly recorded and traceable; missing physical quantities or accepted rates never become zero. Source MTO Set/Lot is not SKU count.</p>
       </div>
+      <details className="p553-budget-phase"><summary><strong>Source Quotation Evidence / หลักฐานใบเสนอราคา</strong> · {x.configuration.length+x.vendorCandidates.length} referenced lines · expand to inspect original quantities and prices</summary>
+      <p className="p55-note">Source quote quantities are for the entire supplier offer and are not the physical quantity installed at {g.site}. Alternatives and repeated vendor candidates must not be added into BOM cost.</p>
       <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
       <thead><tr><th>Vendor</th><th>SKU / Offer line</th><th>Quoted qty (whole offer)</th><th>Quoted unit price</th><th>Use decision</th></tr></thead><tbody>
       {x.configuration.concat(x.vendorCandidates).map((v,i)=><tr key={i}>
@@ -153,7 +155,7 @@ export function SimpleBom0553({focusedLocation=null}){
        <td>{x.pricedVendor?"Cisco working bundle / OEM review":"SOURCE QUOTE ONLY — ALLOCATION OPEN"}</td>
       </tr>)}
       {!x.configuration.length&&!x.vendorCandidates.length&&<tr><td colSpan={5}>No priced source mapped to this physical object yet; do not assume zero cost</td></tr>}
-      </tbody></table></div>
+      </tbody></table></div></details>
      </td></tr>}
     </React.Fragment>)}</tbody></table></div></td></tr>}
   </React.Fragment>)}
