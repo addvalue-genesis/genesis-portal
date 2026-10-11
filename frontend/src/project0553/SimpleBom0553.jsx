@@ -1,3 +1,4 @@
+import { ITEM_DECISION_PIPELINE_0553 } from "./data/itemDecisionPipeline0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import { WORKING_BOM_BY_LOCATION_0553 as model } from "./data/workingBomByLocation";
@@ -85,6 +86,13 @@ export function SimpleBom0553({focusedLocation=null}){
         <tr><td>05 Cost formula</td><td>Physical Qty × Accepted Unit Rate + attributable bulk / work / risk</td><td>{Number.isFinite(x.acceptedPrice)&&Number.isFinite(x.engineeringRequiredSkuQty)?money(x.acceptedPrice*x.engineeringRequiredSkuQty,"THB"):"Verified extended cost NOT ESTABLISHED"}</td></tr>
         <tr><td>06 Budgetary evidence</td><td>Source scenario shown separately; pricing requires quantity driver, currency/FX, validity and risk basis</td><td>{Number.isFinite(x.indicativePackageCostTHB)?money(x.indicativePackageCostTHB,"THB")+" — SCENARIO ONLY":"SOURCE PRICE NOT ALLOCATED"}</td></tr>
         </tbody></table></div>
+       {(()=>{const decision=ITEM_DECISION_PIPELINE_0553.evaluate(x);return <div className="p55-table-wrap">
+       <strong>Stage-gated qualification / MCDA / CBS trace</strong>
+       <table className="p55-table p55-table--compact"><thead><tr><th>Gate</th><th>Result</th><th>Evidence / decision rule</th></tr></thead><tbody>
+        {decision.stages.map(gate=><tr key={gate.id}><td>{gate.label}</td><td>{gate.passed?"EVIDENCE COMPLETE":"REVIEW REQUIRED"}</td><td>{gate.detail}</td></tr>)}
+       </tbody></table>
+       <p className="p55-note">Functional decomposition: {decision.functions.length} required function(s); vendor quote candidate lines: {decision.candidateLines.join(", ")||"none mapped"}. MCDA is NOT_RANKED until safety/technical qualification and weights are verified. CBS allocation: {decision.stages.find(v=>v.id==="CBS")?.passed?"MAPPED":"NOT MAPPED"}.</p>
+       </div>})()}
        <p className="p55-note">Budgetary assumption may be used only when explicitly recorded and traceable; missing physical quantities or accepted rates never become zero. Source MTO Set/Lot is not SKU count.</p>
       </div>
       <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
