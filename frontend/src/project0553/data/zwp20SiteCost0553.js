@@ -79,8 +79,21 @@ function rowCost(item){
     "Phoenix FL-PP-RJ45-SC has quoted price but is NOT established as full DATO Ex-rated socket and plug. Keep technical gap, hazardous-area certification and accessory assembly as separate unresolved scope",
     "Estimate quantity 1 Set is provisional; do not use vendor quoted quantity"]};
  }
- if(item.sourceRow===9)return {...base,bartecMapping:ZWP20_BARTEC_NEXTG_REFERENCE_MAP.entries.filter(e=>e.allocation.includes("TCAB-500-001 row9")),quantityBasis:"MTO 1 Telecom Enclosure; verify SCADA panel Ex rating, cut-outs, cooling and mounting",
-  assumptions:["Do not substitute Ex Telephone JB or Zawtika 1E panel historical price without technical scope reconciliation"]};
+ if(item.sourceRow===9){
+  const bartecQuote=SUPPLIER_QUOTE_LINES_0553.find(v=>v.id==="PROSPER-24051");
+  const panelRefs=(bartecQuote?.lines||[]).filter(v=>["1","2"].includes(v[0])).map(v=>({
+    quoteLine:v[0],sku:v[1],sourceUnitTHB:v[4],description:v[2],historicalProject:"Zawtika 1E",budgetarySelected:false
+  }));
+  return {...base,bartecMapping:ZWP20_BARTEC_NEXTG_REFERENCE_MAP.entries.filter(e=>e.allocation.includes("TCAB-500-001 row9")),
+   vendor:"BARTEC / Prosper E&T (historical panel reference, not selected)",
+   quotedRateCandidates:panelRefs,
+   quantityBasis:"MTO Rev04 ZWP20 TCAB-500-001 1 Set; BLD AFC sheet 3 Note 8 NEW Ex e enclosure; physical assembly qty from selected configuration",
+   status:"ENGINEERING_ENCLOSURE_ASSEMBLY_TAKEOFF_REQUIRED",
+   assumptions:["PROSPER Q-PROSRY-24051 quote lines 1/2 are Zawtika 1E Ex Zone 2 panel comparators, NOT adopted ZWP20 package price",
+    "Historical BARTEC GA-1001/1002 is a mechanical/termination reference; do not assume its included components or quantity from 2022 is transferable",
+    "Remove IDU PoE (row5), LAN switch (row7) and surge (row10) from enclosure cost to prevent double counting",
+    "Ex e certification, SS316L size, thermal/heat load, terminal count, gland entries, internal wiring and assembly labour must be checked"]};
+ }
  if(item.sourceRow===10){
   const vendor=lineByCode.get("B-8");
   return {...base,vendor:"Next G / Aviat",sku:vendor.partNumber,currency:"USD",unitCost:vendor.unitPrice,
@@ -88,8 +101,20 @@ function rowCost(item){
    quantityBasis:"MTO SA-502-001 1 Set, allocated exclusively to this row, not Radio ODU",
    assumptions:["Check industrial PoE surge technology and earthing/Ex scope with selected system"]};
  }
- if(item.sourceRow===11)return {...base,quantityBasis:"MTO 1 Lot bulk; derive cable lengths, glands, earthing and routes from LAY/BLD/DWG",
-  assumptions:["A Lot cannot be priced by treating one lot as one cable, gland or accessory","Coax/Ethernet fire performance TC-0001 items 7–8; verify take-off"]};
+ if(item.sourceRow===11){
+  const q0604=INNOVA_0553_PROVISIONAL_PRICES.quotations.find(v=>v.number==="QA24-0604");
+  const q0606=INNOVA_0553_PROVISIONAL_PRICES.quotations.find(v=>v.number==="QA24-0606");
+  const rateEvidence=[...(q0604?.lines||[]).filter(v=>v.description?.includes("TECKNIKABEL")||["AFU113030","501/453/UNIV/A/M20"].includes(v.partNumber))
+    .map(v=>({sku:v.partNumber||"TECKNIKABEL CAT6A S/FTP",unit:v.unit,rateTHB:v.unitPriceExVat,quantity:null,source:q0604.number})),
+    ...(q0606?.lines||[]).map(v=>({sku:v.partNumber,unit:v.unit,rateTHB:v.unitPriceExVat,quantity:null,source:q0606.number}))];
+  return {...base,vendor:"INNOVA (historical quote rate library)",quotedRateCandidates:rateEvidence,
+   quantityBasis:"MTO 1 Lot only establishes scope. Engineering quantities require measured cable routing, count of Ex entry interfaces and RF feeder terminations",
+   status:"ENGINEERING_BULK_TAKEOFF_REQUIRED",
+   assumptions:["QA24-0604 cable rate THB 524/m, Ex adaptor THB 3,100/ea (MOQ 10), Hawke gland THB 1,020/set — evidence, not ZWP20 procurement quantities",
+    "QA24-0606 has alternative RF gland rates; only interfaces actually requiring each gland are counted",
+    "No use of radio path distance as physical cable length. Avoid double-counting accessories included in row4/radio mounting kit and row9 enclosure",
+    "Coax/Ethernet fire performance TC-0001 items 7–8; verify take-off"]};
+ }
  return base;
 }
 export function deriveZWP20SiteCost0553(){
