@@ -1,3 +1,4 @@
+import { deriveEngineeringOwnedCost0553 } from "./data/engineeringOwnedCost0553";
 import { deriveZWP20VendorFunctionCosts, getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
 import {ZWP8_ROW43_COST_TRACE} from "./data/zwp8Row43CostTrace";
 import {SourceCoverage0553} from "./SourceCoverage0553";
@@ -107,6 +108,14 @@ export function SimpleBom0553({focusedLocation=null}){
       <div className="p55-panel" style={{marginBottom:10}}>
        <strong>Item-level First Principles → Engineering Constraints → Parametric Cost</strong>
        <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)+".derivation"}/>
+       {(()=>{const result=deriveEngineeringOwnedCost0553(x);return <div className="p55-table-wrap">
+        <h4>Engineering Required BOM → Vendor Rate → Cost (authoritative path)</h4>
+        <p className="p55-note">Only Engineering Required Qty can drive Cost. Vendor quotation quantity and one-per-function demonstration cannot set purchase quantity. {result.qtyDerivedCount}/{result.requiredFunctionCount} function quantities derived; {result.costedFunctionCount} costed.</p>
+        <table className="p55-table p55-table--compact"><thead><tr><th>Engineering Function</th><th>Quantity Driver</th><th>Required Qty</th><th>Selected SKU</th><th>Vendor Unit Rate</th><th>Extended Cost</th><th>State</th></tr></thead><tbody>
+        {result.components.map(c=><tr key={c.id}><td>{c.functionId}</td><td>{c.driver}</td><td>{c.requiredQty??"NOT DERIVED"}</td><td>{c.selectedOffer??"NOT SELECTED"}</td><td>{c.unitPrice===null?"PRICE CANDIDATE ONLY":money(c.unitPrice,c.currency)}</td><td>{c.extended===null?"NOT CALCULATED":money(c.extended,c.currency)}</td><td>{c.state}</td></tr>)}
+        </tbody></table><p className="p55-note"><strong>Item Cost:</strong> {result.amount===null?"NOT ESTABLISHED":money(result.amount,result.currency)} · {result.state}. MTO Set, vendor offered Qty and comparison scenarios remain evidence, not the Engineering BOM quantity.</p>
+       </div>})()}
+
        {x.site==="ZWP8"&&x.sourceRow===43&&<div className="p55-table-wrap">
         <strong>ZWP8 Row 43 — six original MTO tags, exact quotation candidates</strong>
         <p className="p55-note">The current source item is {x.sourceTag}. The complete source row includes six distinct equipment functions. Quoted prices are evidence, not selected site rates; source sets are not validated physical SKU counts.</p>
@@ -134,10 +143,10 @@ export function SimpleBom0553({focusedLocation=null}){
        {(()=>{const estimate=NEXTG_CANDIDATE_ESTIMATE_0553.estimateFor(x);
        return <div className="p55-table-wrap"><strong>Next G Vendor Source → Function → Rate Evidence</strong>
        <p className="p55-note">Quote: {NEXTG_CANDIDATE_ESTIMATE_0553.sourceQuote} · Source currency USD · Offered quantity is whole-quotation quantity, NOT the quantity allocated to {g.site}. {deriveZWP20VendorFunctionCosts(x)? "Derived preliminary functional subtotal USD "+deriveZWP20VendorFunctionCosts(x).partialUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" — NOT complete/verified package cost.":"Site-allocated equipment cost NOT ESTABLISHED."}</p>
-       {deriveZWP20VendorFunctionCosts(x)&&<table className="p55-table p55-table--compact"><thead><tr><th>Selected preliminary function</th><th>Next G quote line</th><th>Derived budgetary Qty</th><th>Source unit USD</th><th>Derived extended USD</th><th>Evidence / constraint</th></tr></thead><tbody>
+       {deriveZWP20VendorFunctionCosts(x)&&<details><summary>Legacy vendor one-each rate basket — comparison only, NOT Engineering Qty</summary><table className="p55-table p55-table--compact"><thead><tr><th>Selected preliminary function</th><th>Next G quote line</th><th>Derived budgetary Qty</th><th>Source unit USD</th><th>Derived extended USD</th><th>Evidence / constraint</th></tr></thead><tbody>
         {deriveZWP20VendorFunctionCosts(x).rows.map(r=><tr key={r.code}><td>{r.functionId}</td><td>{r.code} · {r.sku}</td><td>{r.quantity}</td><td>{money(r.unitUSD,"USD")}</td><td>{money(r.extendedUSD,"USD")}</td><td>{r.quantityBasis}<small>Whole quote Qty: {r.sourceQuoteQty}; no site approval</small></td></tr>)}
         <tr><td colSpan={4}><strong>Partial function subtotal — does not include excluded scope</strong></td><td><strong>{money(deriveZWP20VendorFunctionCosts(x).partialUSD,"USD")}</strong></td><td>NOT APPROVED · NOT FULL PACKAGE COST</td></tr>
-       </tbody></table>}
+       </tbody></table></details>}
        <table className="p55-table p55-table--compact"><thead><tr><th>Function / Quantity Driver</th><th>Quote line / SKU</th><th>Offer Qty</th><th>Source Unit USD</th><th>Source Extended USD</th><th>Qualification</th><th>Site Qty / Cost</th></tr></thead><tbody>
         {estimate.functions.flatMap(fn=>fn.candidates.length?fn.candidates.map(q=><tr key={q.id}>
          <td>{fn.functionId}<small>{fn.quantityDriver}</small></td>
