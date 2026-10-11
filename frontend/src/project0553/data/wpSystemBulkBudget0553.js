@@ -1,13 +1,14 @@
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./z1fParametricBulkRoutes0553";
 import {DTRS_RFI_BULK_0553} from "./dtrsRfiBulk0553";
+import {MR0001_SITE_CLASSIFICATION} from "./mr0001SiteClassification";
 
 // Working budget allocation; not a final measured cable schedule or customer priced BOM.
 // A priced row requires a compatible unit rate. Enclosure and specialist equipment costs
 // remain with their existing MTO owners and must not be added to this Bulk view twice.
 export function deriveWpSystemBulkBudget0553(){
  const routeModel=deriveZ1FTelBulkRoutes0553();
- return Z1F_TEL_LAYOUT_INDEX_0553.byWP.map(w=>{
+ const newSites=Z1F_TEL_LAYOUT_INDEX_0553.byWP.map(w=>{
   const found=(sys)=>w.equipment.filter(e=>e.system===sys);
   const cableRoute=(sys)=>routeModel.rows.find(r=>r.wp===w.wp&&r.system===sys);
   const systems=[
@@ -34,4 +35,18 @@ export function deriveWpSystemBulkBudget0553(){
   }))})),source:"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 AFC",
    warning:"Scenario amounts displayed for planning only. Not additive with current ZWP20 working BOM or other vendor package costs."};
  });
+ const brownfieldSites=["ZPQ","ZWP8","ZWP11"].map(wp=>({
+  wp,siteClass:"BROWNFIELD",
+  systems:["SCADA_RADIO","EX_IP_PHONE","DTRS_TRUNK_RADIO","MARINE_RACON"].map(id=>({
+   id,name:id.replaceAll("_"," "),equipment:[],route:null,
+   items:[{id:id+"-BF-SURVEY",item:"Existing/new/reuse tie-in and cable interface survey",unit:"interface",
+     qty:null,rateTHB:null,extendedTHB:null,source:"BLD-0001 Rev.C1 + MR0001 MTO Rev04; individual tie-in schedule required",
+     owner:"BROWNFIELD_SCOPE_BY_SYSTEM",status:"BROWNFIELD_NEW_REUSE_BY_OTHERS_UNRESOLVED",
+     note:"No automatic 50m greenfield cable; separate added branch length, existing cable testing, termination, demolition and outage requirements"}]
+  })),
+  source:"BLD-0001 Rev.C1 + MR0001 MTO Rev04; no Brownfield dimensioned route proven here",
+  warning:"Brownfield tie-in allowance requires field endpoint and ownership review. No invented supplier rates, no add-on to Cisco-only site totals."
+ }));
+ return [...newSites.map(w=>({...w,siteClass:"GREENFIELD"})),...brownfieldSites];
+
 }
