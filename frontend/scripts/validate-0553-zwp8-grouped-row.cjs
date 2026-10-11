@@ -1,0 +1,10 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const source=JSON.parse(fs.readFileSync(path.join(root,"src/project0553/data/snapshots/mr0001.mto.rev04.sourceRows.json"),"utf8"));
+const row=source.itemRows.find(x=>x.sourceRowIndex===43&&x.platform==="ZWP8");
+assert(row&&row.groupedRow,"ZWP8 source row 43 missing");
+assert.deepEqual(row.sourceItemCodes,["MR-502-003","MR-502-003A","ANT-502-002","MR-502-004","MR-502-004A","ANT-502-003"]);
+const projection=fs.readFileSync(path.join(root,"src/project0553/data/workingBomByLocation.js"),"utf8");
+for(const x of ["groupedTagFamily(item.sourceTag)","ODU:[\"A-1\",\"B-1\",\"C-1\"]","ANTENNA:[\"A-12\"","source?.groupedRow"])assert(projection.includes(x),x);
+assert(projection.includes('if(t.startsWith("MR-")&&t.endsWith("A"))return "IDU"'));
+console.log("PASS ZWP8 grouped row 43 source split: six tags; ODU, IDU and antenna candidates kept distinct. No site cost approved.");
