@@ -30,8 +30,9 @@ export const L3_TABS_0553 = Object.freeze([
 // No recalculation, pricing, import, or engineering assumptions are changed.
 export const L3_TAB_GROUPS_0553 = [
  {id:"govern",title:"GOVERN · หลักการและโครงสร้าง",tabs:["overview","engineering","architecture"]},
- {id:"analyse",title:"ANALYSE · Engineering & Delivery",tabs:["systems","schematic","execution","documents","risk"]},
- {id:"manage",title:"MANAGE · ข้อมูลและต้นทุน",tabs:["registry","budget"]}
+ {id:"analyse",title:"ENGINEER & ANALYSE · วิศวกรรมและการวิเคราะห์",tabs:["systems","schematic","execution","risk"]},
+ {id:"commercial",title:"SOURCE & COMMERCIAL · ผู้ขายและงบประมาณ",tabs:["documents","budget"]},
+ {id:"control",title:"CONTROL · ข้อมูลและการติดตาม",tabs:["registry"]}
 ];
 
 // Global generic identity engine, applied here only to PJ2608-0553.
