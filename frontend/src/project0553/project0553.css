@@ -80,3 +80,24 @@
  .p553-dashboard .p55-tabgroup__items>button{flex:1 1 100%;min-height:36px}
  .p553-dashboard .p55-hero__method{flex-wrap:wrap}
 }
+
+
+/* GNS-CHG-000007 — Simple Light navigation, scoped to PJ2608-0553 only. */
+.p553-dashboard .p55-hero{background:#f7fafc;color:#16324a;box-shadow:none;border-bottom:1px solid #d9e4ee}
+.p553-dashboard .p55-kicker{color:#567086;opacity:1}
+.p553-dashboard .p55-hero h1{color:#16324a}
+.p553-dashboard .p55-hero h1 span{color:#47657b;opacity:1}
+.p553-dashboard .p55-hero p{color:#526e83}
+.p553-dashboard .p55-hero__status{color:#365066}
+.p553-dashboard .p55-hero__method{background:#fff;border:1px solid #d6e2ec;color:#16324a}
+.p553-dashboard .p55-hero__method span{color:#627e92;opacity:1}
+.p553-dashboard .p55-tabs{gap:6px;padding-bottom:10px}
+.p553-dashboard .p55-tabgroup{background:#eef4f8;border:1px solid #d5e1ea;border-radius:7px;padding:6px 9px}
+.p553-dashboard .p55-tabgroup__label{color:#28465d;font-size:11px;font-weight:800;line-height:1.25;letter-spacing:0}
+.p553-dashboard .p55-tabgroup__items>button{background:#fff;color:#1d3b55;border:1px solid #c9d7e3;border-radius:6px;min-height:34px;padding:7px 10px;font-size:12px;font-weight:700}
+.p553-dashboard .p55-tabgroup__items>button:hover{background:#f7fbff;color:#123d5e;border-color:#89b8d8}
+.p553-dashboard .p55-tabgroup__items>button.is-active{background:#1d5d86;color:#fff;border-color:#1d5d86;box-shadow:none}
+.p553-dashboard .p55-tab__number{background:#edf3f7;color:#35536a;border:1px solid #c5d4de;opacity:1;font-size:10px}
+.p553-dashboard .p55-tabgroup__items>button.is-active .p55-tab__number{background:rgba(255,255,255,.18);color:#fff;border-color:rgba(255,255,255,.35)}
+.p553-dashboard .p55-tabgroup__items>button:focus-visible{outline:3px solid #df920e;outline-offset:2px}
+@media(max-width:850px){.p553-dashboard .p55-tabgroup{grid-template-columns:1fr}}
