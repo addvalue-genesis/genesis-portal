@@ -1,3 +1,4 @@
+import { NEXTG_CANDIDATE_ESTIMATE_0553 } from "./data/nextgCandidateEstimate0553";
 import { ITEM_DECISION_PIPELINE_0553 } from "./data/itemDecisionPipeline0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
@@ -86,6 +87,21 @@ export function SimpleBom0553({focusedLocation=null}){
         <tr><td>05 Cost formula</td><td>Physical Qty × Accepted Unit Rate + attributable bulk / work / risk</td><td>{Number.isFinite(x.acceptedPrice)&&Number.isFinite(x.engineeringRequiredSkuQty)?money(x.acceptedPrice*x.engineeringRequiredSkuQty,"THB"):"Verified extended cost NOT ESTABLISHED"}</td></tr>
         <tr><td>06 Budgetary evidence</td><td>Source scenario shown separately; pricing requires quantity driver, currency/FX, validity and risk basis</td><td>{Number.isFinite(x.indicativePackageCostTHB)?money(x.indicativePackageCostTHB,"THB")+" — SCENARIO ONLY":"SOURCE PRICE NOT ALLOCATED"}</td></tr>
         </tbody></table></div>
+       {(()=>{const estimate=NEXTG_CANDIDATE_ESTIMATE_0553.estimateFor(x);
+       return <div className="p55-table-wrap"><strong>Next G Vendor Source → Function → Rate Evidence</strong>
+       <p className="p55-note">Quote: {NEXTG_CANDIDATE_ESTIMATE_0553.sourceQuote} · Source currency USD · Offered quantity is whole-quotation quantity, NOT quantity allocated to {g.site}. Selected cost for this location: NOT ESTABLISHED.</p>
+       <table className="p55-table p55-table--compact"><thead><tr><th>Function / Quantity Driver</th><th>Quote line / SKU</th><th>Offer Qty</th><th>Source Unit USD</th><th>Source Extended USD</th><th>Qualification</th><th>Site Qty / Cost</th></tr></thead><tbody>
+        {estimate.functions.flatMap(fn=>fn.candidates.length?fn.candidates.map(q=><tr key={q.id}>
+         <td>{fn.functionId}<small>{fn.quantityDriver}</small></td>
+         <td>{q.quoteLine} · {q.sku}<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase()+".ng."+q.quoteLine.toLowerCase()}/></td>
+         <td className="is-number">{q.offeredQty??"—"}</td>
+         <td className="is-number">{Number.isFinite(q.unitPrice)?q.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"N/A AS QUOTED"}</td>
+         <td className="is-number">{Number.isFinite(q.quotedExtended)?q.quotedExtended.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"N/A AS QUOTED"}</td>
+         <td>{q.technicalState}<small>{q.issues.join("; ")||"OEM/engineering review required"}</small></td>
+         <td>NOT ALLOCATED</td>
+        </tr>):[<tr key={fn.id}><td>{fn.functionId}<small>{fn.quantityDriver}</small></td><td colSpan={5}>No matching Next G source quote line</td><td>NOT ALLOCATED</td></tr>])}
+       </tbody></table>
+       <p className="p55-note"><strong>Quantity derivation:</strong> {estimate.roleEvidence?JSON.stringify(estimate.roleEvidence):"No role evidence for site"}. These are candidate link roles, not approved purchase quantities. Resolve location, licensed throughput, NMS, antenna RF proof, site Ex requirements, inclusion boundaries and shared accessories before choosing cost. Source quote value must not be summed across candidate consumers.</p></div>})()}
        {(()=>{const decision=ITEM_DECISION_PIPELINE_0553.evaluate(x);return <div className="p55-table-wrap">
        <strong>Stage-gated qualification / MCDA / CBS trace</strong>
        <table className="p55-table p55-table--compact"><thead><tr><th>Gate</th><th>Result</th><th>Evidence / decision rule</th></tr></thead><tbody>
