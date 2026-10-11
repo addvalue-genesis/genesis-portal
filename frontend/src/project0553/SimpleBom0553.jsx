@@ -5,13 +5,17 @@ import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom"
 
 // One operational BOM surface. All Source/Engineering/Vendor links derive from existing registries.
 export function SimpleBom0553({focusedLocation=null}){
- const [manualSite,setManualSite]=useState("ZWP20");
+ const [manualSite,setManualSite]=useState("ALL");
  const [focusSeen,setFocusSeen]=useState(null);
  const site=focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite;
  const changeSite=value=>{setManualSite(value);setFocusSeen(focusedLocation);};
  const [vendor,setVendor]=useState("ALL");
  const [system,setSystem]=useState("MR-0001");
  const [expanded,setExpanded]=useState({});
+ const [allSitesExpanded,setAllSitesExpanded]=useState(false);
+ const siteExpanded=siteId=>expanded["site:"+siteId]??allSitesExpanded;
+ const expandAll=()=>{setAllSitesExpanded(true);setExpanded({});};
+ const collapseAll=()=>{setAllSitesExpanded(false);setExpanded({});};
  const groups=model.locations.filter(g=>site==="ALL"||g.site===site).map(g=>({
   ...g,items:g.items.filter(i=>vendor==="ALL"||
    i.pricedVendor===vendor||i.vendorCandidates.some(v=>v.vendor===vendor))
@@ -19,7 +23,7 @@ export function SimpleBom0553({focusedLocation=null}){
  const visible=groups.flatMap(g=>g.items);
  const priced=visible.filter(x=>Number.isFinite(x.indicativePackageCostTHB));
  const provisionalSubtotalTHB=priced.reduce((sum,x)=>sum+x.indicativePackageCostTHB,0);
- const open=k=>setExpanded(old=>({...old,[k]:!old[k]}));
+ const open=k=>setExpanded(old=>({...old,[k]:k.startsWith("site:")?!(old[k]??allSitesExpanded):!old[k]}));
  const money=(v,currency)=>Number.isFinite(v)?currency+" "+v.toLocaleString("en-US",{maximumFractionDigits:2}):"—";
  return <section className="p55-panel">
   <div className="p55-eyebrow">ENGINEERING WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom"/></div>
@@ -43,10 +47,11 @@ export function SimpleBom0553({focusedLocation=null}){
    <div><span>Provisional priced items</span><strong>{priced.length} / {visible.length}</strong></div>
    <div><span>{site==="ALL"?"All locations":"Location "+site} — priced Cisco items ONLY (THB), not location total</span><strong>{money(provisionalSubtotalTHB,"THB")}</strong></div>
   </div>
+  <div className="p55-filterbar" style={{display:"flex",gap:8,margin:"12px 0"}}><button type="button" className="p553-detail-button" onClick={expandAll}>＋ Expand all</button><button type="button" className="p553-detail-button" onClick={collapseAll}>− Collapse all</button><span className="p55-note">เริ่มต้นแสดงภาพรวมทุกแท่น คลิก + เพื่อดู MTO, Calculation, Vendor และ Cost</span></div>
   {groups.filter(g=>g.items.length).map(g=><section key={g.site} className="p55-panel">
-   <button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={expanded["site:"+g.site]!==false}>{expanded["site:"+g.site]===false?"+":"−"}</button>
+   <button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={siteExpanded(g.site)}>{siteExpanded(g.site)?"−":"+"}</button>
    <strong> {g.site} · {g.siteClass?.type||"UNCLASSIFIED"} ({g.siteClass?.thai||"ตรวจสอบ"}) </strong><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()}/><span> · Cisco-priced subtotal: {money(g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0),"THB")} (partial only)</span><span> · {g.items.length} MTO items · {g.items.filter(x=>Number.isFinite(x.indicativePackageCostTHB)).length} source-priced scenarios</span><small> · RPT functional link endpoints: {g.rfDemand?.linkEndpointDemand??"NO RPT LINK"} · Antenna references: {g.rfDemand?.antennaReferenceDemand??"NO RPT LINK"} (NOT purchase qty)</small>
-   {expanded["site:"+g.site]!==false&&<div className="p55-table-wrap"><p className="p55-note"><strong>Site Scope:</strong> {g.siteClass?.note} · Equipment ownership: NEW / REUSE / BY OTHERS ต้องตรวจ BLD/MR ทีละรายการ ไม่สรุปจากประเภทแท่น</p>
+   {siteExpanded(g.site)&&<div className="p55-table-wrap"><p className="p55-note"><strong>Site Scope:</strong> {g.siteClass?.note} · Equipment ownership: NEW / REUSE / BY OTHERS ต้องตรวจ BLD/MR ทีละรายการ ไม่สรุปจากประเภทแท่น</p>
     <table className="p55-table p55-table--compact"><thead><tr><th>Link / First Principles</th><th>FSPL</th><th>Gt + Gr</th><th>Ideal RSL offset</th><th>STD / BOM</th></tr></thead>
      <tbody>{g.rfProof.map(p=><tr key={p.id}><td>{p.from} → {p.to}</td><td>{p.fsplDb.toFixed(2)} dB</td><td>{p.gainSumDbi.toFixed(2)} dBi</td><td>{p.idealRslOffsetDb.toFixed(2)} dB<small>Rx = Tx + offset − losses</small></td><td>HOLD · CAL/OEM proof required{p.change&&<small>4ft candidate: {p.change.gainChangeDb.toFixed(2)} dB vs Next G baseline</small>}</td></tr>)}</tbody>
     </table>
