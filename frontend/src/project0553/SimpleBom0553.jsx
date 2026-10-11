@@ -86,7 +86,12 @@ export function SimpleBom0553({focusedLocation=null}){
        <td>{isCisco?<><strong>{money(bom.cisco.unitPackageQuotedSumTHB,"THB")}</strong><small>Cisco package scenario per MTO Set — NOT accepted SKU rate</small></>:
         <><strong>NOT SELECTED</strong><small>{nextgPriced.length+otherPriced.length} unit-price evidence line(s) in expanded quote table</small><small>ไม่ใช่ผลรวมของราคา Vendor ทุกทางเลือก</small></>}</td>
        <td>{isCisco?<><strong>{money(x.indicativePackageCostTHB,"THB")}</strong><small>Provisional Cisco bundle only</small></>:
-        <><strong>NOT CALCULATED</strong><small>Physical Qty × Selected Unit Rate + attributable accessories</small><small>No site allocation approved</small></>}</td>
+        <><strong>NOT CALCULATED</strong><small>Physical Qty × Selected Unit Rate + attributable accessories</small><small>No site allocation approved</small>
+          {getMR502BudgetaryScenarios(x).length>0&&<div><strong>Budgetary partial: ONE radio assembly</strong>
+           {getMR502BudgetaryScenarios(x).map(a=><small key={a.group}>Option {a.group}: {money(a.unitAssemblyReferenceUSD,"USD")} (not additive)</small>)}
+           <small>NOT complete ZWP20 package cost; physical Qty and RF/licence verification pending</small>
+          </div>}
+         </>}</td>
        </>;
       })()}
       <td>{x.workingPriceStatus}<small>{x.costStatus}</small><small>Accepted unit cost: {Number.isFinite(x.acceptedPrice)?money(x.acceptedPrice,"THB"):"NOT VERIFIED"}</small></td>
