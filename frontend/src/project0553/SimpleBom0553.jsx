@@ -18,6 +18,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  const [focusSeen,setFocusSeen]=useState(null);
  const site=focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite;
  const changeSite=value=>{setManualSite(value);setFocusSeen(focusedLocation);};
+ const [currencyOverride,setCurrencyOverride]=useState(null);
+ const activeCurrency=currencyOverride||displayCurrency;
  const [vendor,setVendor]=useState("ALL");
  const [system,setSystem]=useState("MR-0001");
  const [expanded,setExpanded]=useState({});
@@ -39,19 +41,31 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  const coverageCount=visible.filter(vendorCovered).length;
  const provisionalSubtotalTHB=priced.reduce((sum,x)=>sum+x.indicativePackageCostTHB,0);
  const open=k=>setExpanded(old=>({...old,[k]:k.startsWith("site:")?!(old[k]??allSitesExpanded):!old[k]}));
- const money=(v,currency)=>Number.isFinite(v)?currency+" "+v.toLocaleString("en-US",{maximumFractionDigits:2}):"—";
+ const money=(v,currency)=>{if(!Number.isFinite(v))return "—";
+  if(!["USD","THB"].includes(currency))return currency+" "+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+  if(currency!==activeCurrency&&!(fx?.thbPerUsd>0))return "FX REQUIRED · "+currency+" "+v.toFixed(2);
+  const value=currency===activeCurrency?v:activeCurrency==="THB"?v*fx.thbPerUsd:v/fx.thbPerUsd;
+  return activeCurrency+" "+value.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+ };
+ const originalMoney=(v,currency)=>Number.isFinite(v)?currency+" "+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
  const wpSummary=siteName=>{
   if(siteName==="ZWP20")return {usd:zwp20Cost.subtotals.USD,thb:zwp20Cost.subtotals.THB,costed:zwp20Cost.pricedRows,total:zwp20Cost.totalRows,gaps:zwp20Cost.gaps.length};
   const source=model.locations.find(v=>v.site===siteName)?.items||[];
   const costed=source.filter(v=>Number.isFinite(v.indicativePackageCostTHB));
   return {usd:0,thb:costed.reduce((n,v)=>n+v.indicativePackageCostTHB,0),costed:costed.length,total:source.length,gaps:source.length-costed.length};
  };
- const thbEquivalent=sum=>fx?.thbPerUsd>0?Math.round((sum.thb+sum.usd*fx.thbPerUsd)*100)/100:null;
- const displaySiteTotal=siteName=>{const sum=wpSummary(siteName),total=thbEquivalent(sum);return total===null?"FX REQUIRED · "+money(sum.usd,"USD")+" + "+money(sum.thb,"THB"):money(total,"THB");};
+ const displaySiteTotal=siteName=>{const sum=wpSummary(siteName);
+  if(!(fx?.thbPerUsd>0))return "FX REQUIRED · "+originalMoney(sum.usd,"USD")+" + "+originalMoney(sum.thb,"THB");
+  const amount=activeCurrency==="THB"?sum.thb+sum.usd*fx.thbPerUsd:sum.usd+sum.thb/fx.thbPerUsd;
+  return money(amount,activeCurrency);
+ };
 
  return <section className="p55-panel">
   <div className="p55-eyebrow">ENGINEERING WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom"/></div>
-  <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
+  <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3><div className="p55-filterbar" style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+ <label>Display currency <select aria-label="BOM display currency" value={activeCurrency} onChange={e=>setCurrencyOverride(e.target.value)}><option value="THB">THB — Thai Baht</option><option value="USD">USD — US Dollar</option></select></label>
+ <small>FX: {fx?.thbPerUsd??"NOT SET"} THB/USD · {fx?.date||"No date"} · {fx?.source||"No source"} · Display conversion only; original quotation rates unchanged</small>
+ </div>
   <SourceCoverage0553/>
   <SiteSystemCostReconciliation0553/>
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
@@ -85,7 +99,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <td className="is-number">{g.rfDemand?.linkEndpointDemand??"—"}</td><td className="is-number">{g.rfDemand?.antennaReferenceDemand??"—"}</td>
    <td>{g.items.some(x=>Number.isFinite(x.indicativePackageCostTHB))&&<small>Cisco scenario THB {g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0).toLocaleString("en-US")}</small>}{g.items.some(x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice)))&&<small>Next G USD source rates mapped</small>}{g.items.some(x=>x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice)))&&<small>Other vendor source rates mapped</small>}</td><td><strong>{displaySiteTotal(g.site)}</strong><small>{wpSummary(g.site).costed}/{wpSummary(g.site).total} MTO priced · {wpSummary(g.site).gaps} unresolved</small><small>{g.site==="ZWP20"?"USD "+zwp20Cost.subtotals.USD.toFixed(2)+" + THB "+zwp20Cost.subtotals.THB.toFixed(2):"Cisco provisional source only · remaining scope not yet priced"}</small></td></tr>
    {siteExpanded(g.site)&&<tr><td colSpan={9}><div className="p55-table-wrap"><p className="p55-note"><strong>Site Scope:</strong> {g.siteClass?.note} · Equipment ownership: NEW / REUSE / BY OTHERS ต้องตรวจ BLD/MR ทีละรายการ ไม่สรุปจากประเภทแท่น</p>
-    {g.site==="ZWP20"&&<div className="p55-panel"><div style={{display:"flex",gap:8,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}><strong>ZWP20 · SCADA Engineering-Derived Site Cost Summary</strong><button type="button" className="p553-detail-button" onClick={()=>{const header=["Module ID","MTO Row","Item Tag","Source Qty","Engineering Quantity Basis","Vendor","SKU","Currency","Unit Cost","Extended Cost","State"];const rows=[header,...zwp20Cost.rows.map(v=>[zwp20Cost.moduleId+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row,v.row,v.tag,v.sourceQty+" "+(v.sourceUnit||""),v.quantityBasis,v.vendor||"",v.sku||"",v.currency||"",v.unitCost??"",v.extended??"",v.status]),["SITE TOTAL","","","","","","","USD","",zwp20Cost.subtotals.USD,zwp20Cost.status],["SITE TOTAL","","","","","","","THB","",zwp20Cost.subtotals.THB,zwp20Cost.status]];const tsv=rows.map(r=>r.map(v=>String(v??"").replaceAll(String.fromCharCode(9)," ").replaceAll(String.fromCharCode(10)," ")).join(String.fromCharCode(9))).join(String.fromCharCode(10));if(typeof navigator!=="undefined"&&navigator.clipboard?.writeText)navigator.clipboard.writeText(tsv).catch(()=>window.prompt("Copy site BOM",tsv));else window.prompt("Copy site BOM",tsv);}}>Copy ZWP20 BOM Table (Excel)</button></div>
+    {g.site==="ZWP20"&&<div className="p55-panel"><div style={{display:"flex",gap:8,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}><strong>ZWP20 · SCADA Engineering-Derived Site Cost Summary</strong><button type="button" className="p553-detail-button" onClick={()=>{const header=["Module ID","MTO Row","Item Tag","Source Qty","Engineering Quantity Basis","Vendor","SKU","Original Currency","Original Unit Cost","Original Extended Cost","Display Currency","Display Extended Cost","State"];const rows=[header,...zwp20Cost.rows.map(v=>[zwp20Cost.moduleId+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row,v.row,v.tag,v.sourceQty+" "+(v.sourceUnit||""),v.quantityBasis,v.vendor||"",v.sku||"",v.currency||"",v.unitCost??"",v.extended??"",activeCurrency,money(v.extended,v.currency),v.status]),["SITE TOTAL","","","","","","","USD","",zwp20Cost.subtotals.USD,zwp20Cost.status],["SITE TOTAL","","","","","","","THB","",zwp20Cost.subtotals.THB,zwp20Cost.status]];const tsv=rows.map(r=>r.map(v=>String(v??"").replaceAll(String.fromCharCode(9)," ").replaceAll(String.fromCharCode(10)," ")).join(String.fromCharCode(9))).join(String.fromCharCode(10));if(typeof navigator!=="undefined"&&navigator.clipboard?.writeText)navigator.clipboard.writeText(tsv).catch(()=>window.prompt("Copy site BOM",tsv));else window.prompt("Copy site BOM",tsv);}}>Copy ZWP20 BOM Table (Excel)</button></div>
       <p className="p55-note">Module ID: {zwp20Cost.moduleId} · Source: MTO Rev04, Engineering Topology/Derivation → Vendor selected rate; one row per MTO allocation. No USD/THB mixing without sourced FX.</p>
       <p><strong>ZWP20 Budgetary Priced Total: {displaySiteTotal("ZWP20")}</strong> <small>FX {fx?.thbPerUsd??"not set"} THB/USD · {fx?.date||"no date"} · {fx?.source||"no source"}</small><small>Source subtotals {money(zwp20Cost.subtotals.USD,"USD")} + {money(zwp20Cost.subtotals.THB,"THB")}; {zwp20Cost.pricedRows}/{zwp20Cost.totalRows} MTO rows priced. This is NOT the full WP budget until bulk/services are complete.</small></p>
       <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>MTO / Module</th><th>Engineering Quantity / Basis</th><th>Budgetary Selected Product / Vendor</th><th>Unit Cost</th><th>Extended Cost</th><th>Assumptions / Status</th></tr></thead><tbody>{zwp20Cost.rows.map(v=><tr key={v.id}><td><strong>{v.tag||"BULK"}</strong><small>Row {v.row}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.zwp20."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row}/></td><td>{v.sourceQty??"REVIEW"} {v.sourceUnit}<small>{v.quantityBasis}</small></td><td>{v.vendor||"Vendor selection / source rate needed"}<small>{v.sku||"Engineering take-off required"}</small></td><td>{money(v.unitCost,v.currency)}</td><td><strong>{money(v.extended,v.currency)}</strong></td><td>{v.status}{v.assumptions.map((a,i)=><small key={i}>{a}</small>)}</td></tr>)}</tbody></table></div>
