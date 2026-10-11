@@ -69,9 +69,26 @@ export function SimpleBom0553({focusedLocation=null}){
      <tr><td><button type="button" className="p55-row-toggle" onClick={()=>open("item:"+x.id)}>{expanded["item:"+x.id]?"−":"+"}</button></td>
       <td><strong>{x.sourceTag}</strong><small>{x.description}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(x.sourceTag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+String(x.sourceRow)}/></td>
       <td>{x.sourceScopeQty??"REVIEW"} {x.sourceScopeUnit||""}<small>{x.sourceState}</small><small>Engineering SKU Qty: {x.engineeringRequiredSkuQty??"NOT DERIVED"}</small></td>
-      <td>{x.pricedVendor||"Candidate / selection OPEN"}<small>{x.vendorCandidates.length?x.vendorCandidates.length+" vendor offer candidates":"Unmapped to priced supplier line"}</small></td>
-      <td>{x.pricedVendor?money(bom.cisco.unitPackageQuotedSumTHB,"THB"):"See available source prices (+)"}</td>
-      <td>{Number.isFinite(x.indicativePackageCostTHB)?money(x.indicativePackageCostTHB,"THB"):"UNPRICED — NOT ZERO"}</td>
+      {(()=>{const estimate=NEXTG_CANDIDATE_ESTIMATE_0553.estimateFor(x);
+       const offerLines=estimate.functions.flatMap(fn=>fn.candidates);
+       const uniqueOffers=[...new Map(offerLines.map(q=>[q.quoteLine,q])).values()];
+       const pricedOffers=uniqueOffers.filter(q=>Number.isFinite(q.unitPrice));
+       return <>
+       <td><strong>{x.pricedVendor||"Vendor candidate review"}</strong>
+        <small>Next G: {uniqueOffers.length} function-matched quote line(s)</small>
+        {uniqueOffers.length>0&&<small>{uniqueOffers.slice(0,5).map(q=>q.quoteLine).join(", ")}{uniqueOffers.length>5?" …":""}</small>}
+        <small>{x.vendorCandidates.length} other source candidate(s) · none automatically approved</small></td>
+       <td>{Number.isFinite(x.indicativePackageCostTHB)&&<div>{money(bom.cisco.unitPackageQuotedSumTHB,"THB")}<small>Cisco working set only</small></div>}
+        {pricedOffers.length>0?<div><strong>Next G source unit rates (USD)</strong>
+         {pricedOffers.map(q=><small key={q.quoteLine}>{q.quoteLine} · {q.sku}: USD {q.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</small>)}
+        </div>:<small>No priced Next G line mapped to this item</small>}
+        {uniqueOffers.some(q=>!Number.isFinite(q.unitPrice))&&<small>Additional quote line(s) marked N/A (not zero)</small>}
+       </td>
+       <td>{Number.isFinite(x.indicativePackageCostTHB)?<>{money(x.indicativePackageCostTHB,"THB")}<small>Cisco scenario ONLY</small></>:<strong>NOT ALLOCATED</strong>}
+        {pricedOffers.length>0&&<small>Next G unit prices available — site qty / extended cost not yet verified</small>}
+       </td>
+       </>;
+      })()}
       <td>{x.workingPriceStatus}<small>{x.costStatus}</small><small>Accepted unit cost: {Number.isFinite(x.acceptedPrice)?money(x.acceptedPrice,"THB"):"NOT VERIFIED"}</small></td>
      </tr>
      {expanded["item:"+x.id]&&<tr><td colSpan={7}>
