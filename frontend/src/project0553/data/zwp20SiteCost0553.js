@@ -55,7 +55,7 @@ function rowCost(item){
   return {...base,vendor:"Sonic Automation / Phoenix Contact (historical candidate)",sku:"FL-PP-RJ45-SC — RJ45 patch panel, functional candidate only",
    currency:rate!==null?"THB":null,unitCost:rate,extended:money(q,rate),
    quantityBasis:"MTO Rev04 DATO-507-001 1 Set; assumed one RJ45 patch panel as provisional budgetary interface equivalent; actual Ex-rated disconnect composition must be checked",
-   status:"BUDGETARY_PARTIAL_FUNCTION_EQUIVALENCE_NOT_EX_APPROVED",
+   status:"MANAGEMENT_APPROVED_BUDGETARY_BASIS",decision:"Management accepted FL-PP-RJ45-SC THB 1,900 as ZWP20 DATO working budget basis; technical Ex compliance is a separate qualification, not certified by this decision",
    assumptions:["Historical Sonic CCY24-PXC-633 11-Jul-2024 THB 1,900 / EA ex VAT; quotation validity expired",
     "Weidmuller IE-PS-RJ45-FH-BK datasheet is Cat6A RJ45 plug IP20 and has no price; NOT automatically Ex quick-disconnect",
     "Phoenix FL-PP-RJ45-SC has quoted price but is NOT established as full DATO Ex-rated socket and plug. Keep technical gap, hazardous-area certification and accessory assembly as separate unresolved scope",
@@ -79,7 +79,7 @@ export function deriveZWP20SiteCost0553(){
  const rows=(site?.items||[]).map(rowCost);
  const currencies=["USD","THB"];
  const subtotals=Object.fromEntries(currencies.map(currency=>[currency,Math.round(rows.filter(r=>r.currency===currency&&Number.isFinite(r.extended)).reduce((n,r)=>n+r.extended,0)*100)/100]));
- const gaps=rows.filter(r=>r.extended===null||r.status==="BUDGETARY_PARTIAL_INTERFACE_ONLY"||r.status==="BUDGETARY_PARTIAL_FUNCTION_EQUIVALENCE_NOT_EX_APPROVED");
+ const gaps=rows.filter(r=>r.extended===null||r.status==="BUDGETARY_PARTIAL_INTERFACE_ONLY");
  return {site:"ZWP20",moduleId:"PJ2608-0553 / bid.budget.bom.zwp20",system:"MR-0001",rows,subtotals,gaps,
   pricedRows:rows.filter(r=>Number.isFinite(r.extended)).length,totalRows:rows.length,
   status:gaps.length?"PRICED_SUBTOTAL_WITH_EXPLICIT_SCOPE_GAPS":"BUDGETARY_SCOPE_COSTED",
