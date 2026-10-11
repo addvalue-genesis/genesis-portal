@@ -47,16 +47,18 @@ export function deriveEngineeringOwnedCost0553(item){
   const budgetaryEligible=item.site==="ZWP20"&&item.sourceTag==="MR-502-001"&&item.sourceRow===4
     &&item.sourceScopeQty===1&&remoteTopology&&!standardWarranty;
   const budgetaryCandidate=budgetaryEligible
-    ?matches.find(q=>q.quoteLine===budgetaryCodes[c.functionId]&&Number.isFinite(q.unitPrice)):null;
+    ?matches.find(q=>q.quoteLine===budgetaryCodes[c.functionId]):null;
   const includedAssumption=budgetaryEligible&&c.functionId==="REGION_KEY"&&qty!==null
-    &&budgetaryCandidate===null?REGION_INCLUDED_ASSUMPTION:null;
+    &&!Number.isFinite(budgetaryCandidate?.unitPrice)?REGION_INCLUDED_ASSUMPTION:null;
   const budgetaryRate=budgetaryCandidate?.unitPrice??includedAssumption?.usd??null;
+  const budgetarySelectedOffer=budgetaryEligible&&Number.isFinite(budgetaryRate)?budgetaryCandidate?.quoteLine??includedAssumption?.quoteLine??null:null;
+  const budgetarySelectedSKU=budgetaryEligible&&Number.isFinite(budgetaryRate)?budgetaryCandidate?.sku??includedAssumption?.sku??null:null;
   const budgetaryExtended=qty!==null&&Number.isFinite(budgetaryRate)
    ?Math.round(qty*budgetaryRate*100)/100:null;
   const price=standardWarranty?null:selected&&Number.isFinite(selected.unitPrice)?selected.unitPrice:null;
   const extended=qty!==null&&price!==null?Math.round(qty*price*100)/100:null;
   return {id:c.id,functionId:c.functionId,nonCostedIncluded:standardWarranty,driver:c.quantityDriver,requiredQty:qty,quantityState:derivation.state,quantityProof:derivation.proof,selectedOffer:c.selectedOffer,
-   vendorCandidates:matches,budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryRate,budgetaryExtended,priceEvidenceType:includedAssumption?"ASSUMED_INCLUDED_NO_SEPARATE_CHARGE":"NEXTG_QUOTED_UNIT_RATE",priceEvidence:includedAssumption||null,
+   vendorCandidates:matches,budgetarySelectedOffer,budgetarySelectedSKU,budgetarySelectionState:budgetarySelectedOffer?"BUDGETARY_SELECTED_WITH_QUALIFICATIONS":"NOT_SELECTED",budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryRate,budgetaryExtended,priceEvidenceType:includedAssumption?"ASSUMED_INCLUDED_NO_SEPARATE_CHARGE":"NEXTG_QUOTED_UNIT_RATE",priceEvidence:includedAssumption||null,
    budgetaryDecision:includedAssumption?"REGION_KEY_INCLUDED_ASSUMPTION__OEM_REVIEW":budgetaryCandidate?"ENGINEERING_REMOTE_ROLE_MATCH__OEM_REVIEW":"NO_BUDGETARY_MATCH",
    unitPrice:price,currency:selected?.currency||null,
    extended,technicalState:c.technicalState,
@@ -66,6 +68,7 @@ export function deriveEngineeringOwnedCost0553(item){
  const budgetaryPartialUSD=preliminaryRows.length?Math.round(preliminaryRows.reduce((n,c)=>n+c.budgetaryExtended,0)*100)/100:null;
  const budgetaryCoverage=components.length>0&&components.filter(c=>!c.nonCostedIncluded).every(c=>c.budgetaryExtended!==null);
  const budgetaryItemTotalUSD=budgetaryCoverage?budgetaryPartialUSD:null;
+ const budgetaryState=budgetaryCoverage?"CALCULATED_WITH_ASSUMPTIONS":"INCOMPLETE_FUNCTION_COST";
  const budgetaryDecision={basis:"MTO Rev04 ZWP20 row4 + RPT-0001 C1 PTMP remote endpoint",selectedVendor:"Next G",configuration:"Remote Group B",
    quotation:"NG/260916-ADV-DAP1",scope:"MR-502-001 radio ODU function subset, not antenna/bulk/site totals",
    qtySource:"ENGINEERING_TOPOLOGY_AND_EXPLICIT_PARAMETRIC_ASSUMPTIONS",
@@ -76,8 +79,8 @@ export function deriveEngineeringOwnedCost0553(item){
  const amount=ready&&currencySet.length===1?Math.round(components.reduce((n,c)=>n+c.extended,0)*100)/100:null;
  return {site:item.site,tag:item.sourceTag,sourceRow:item.sourceRow,components,
   requiredFunctionCount:components.filter(c=>!c.nonCostedIncluded).length,qtyDerivedCount:components.filter(c=>!c.nonCostedIncluded&&c.requiredQty!==null).length,
-  costedFunctionCount:components.filter(c=>!c.nonCostedIncluded&&c.extended!==null).length,budgetaryCostedCount:preliminaryRows.length,budgetaryPartialUSD,budgetaryItemTotalUSD,budgetaryCoverage,
+  costedFunctionCount:components.filter(c=>!c.nonCostedIncluded&&c.extended!==null).length,budgetaryCostedCount:preliminaryRows.length,budgetaryPartialUSD,budgetaryItemTotalUSD,budgetaryCoverage,budgetaryState,
   amount,currency:amount!==null?currencySet[0]:null,budgetaryDecision,
-  state:amount!==null?"ENGINEERING_BOM_COSTED_REQUIRES_APPROVAL":"DERIVATION_INCOMPLETE",
+  state:budgetaryState,approvedState:amount!==null?"ENGINEERING_BOM_COSTED_REQUIRES_APPROVAL":"NOT_APPROVED",
   rule:"Engineering requiredQty is authoritative. Vendor quotedQty is price evidence only. No synthetic quantity or false aggregate."};
 }
