@@ -27,30 +27,31 @@ export function deriveEngineeringOwnedCost0553(item){
     currency:q?.currency||v.currency,unitPrice:Number.isFinite(q?.unitPrice)?q.unitPrice:null,
     candidateStatus:q?.classification||"UNREVIEWED"};
   });
-  const derivation=engineeringQuantity(item,c,packageRow);
+  const standardWarranty=c.functionId==="WARRANTY";
+  const derivation=standardWarranty?{qty:null,state:"STANDARD_INCLUDED_NO_INCREMENTAL_COST",proof:"Standard OEM warranty is included in equipment base price. Extended warranty is separate optional scope, not a required radio hardware BOM quantity."}:engineeringQuantity(item,c,packageRow);
   const qty=derivation.qty;
-  const selected=c.selectedOffer?matches.find(x=>x.quoteLine===c.selectedOffer||x.sku===c.selectedOffer):null;
+  const selected=standardWarranty?null:c.selectedOffer?matches.find(x=>x.quoteLine===c.selectedOffer||x.sku===c.selectedOffer):null;
   const budgetaryCodes={RADIO_EQUIPMENT:"B-1",RF_FILTER:"B-2",CAPACITY_KEY:"B-3",REGION_KEY:"B-4",MOUNT_FEEDER:"B-5",POWER:"B-6",POWER_CORD:"B-7"};
   const budgetaryCandidate=item.site==="ZWP20"&&item.sourceTag==="MR-502-001"&&item.sourceRow===4
    ?matches.find(q=>q.quoteLine===budgetaryCodes[c.functionId]):null;
   const budgetaryExtended=qty!==null&&Number.isFinite(budgetaryCandidate?.unitPrice)
    ?Math.round(qty*budgetaryCandidate.unitPrice*100)/100:null;
-  const price=selected&&Number.isFinite(selected.unitPrice)?selected.unitPrice:null;
+  const price=standardWarranty?null:selected&&Number.isFinite(selected.unitPrice)?selected.unitPrice:null;
   const extended=qty!==null&&price!==null?Math.round(qty*price*100)/100:null;
-  return {id:c.id,functionId:c.functionId,driver:c.quantityDriver,requiredQty:qty,quantityState:derivation.state,quantityProof:derivation.proof,selectedOffer:c.selectedOffer,
+  return {id:c.id,functionId:c.functionId,nonCostedIncluded:standardWarranty,driver:c.quantityDriver,requiredQty:qty,quantityState:derivation.state,quantityProof:derivation.proof,selectedOffer:c.selectedOffer,
    vendorCandidates:matches,budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryCandidate?.unitPrice??null,budgetaryExtended,
    unitPrice:price,currency:selected?.currency||null,
    extended,technicalState:c.technicalState,
-   state:extended!==null?"COSTED_FROM_ENGINEERING_QTY":qty!==null?"QTY_DERIVED_VENDOR_SELECTION_REQUIRED":"ENGINEERING_QTY_REQUIRED"};
+   state:standardWarranty?"INCLUDED_STANDARD_WARRANTY_NO_EXTRA_COST":extended!==null?"COSTED_FROM_ENGINEERING_QTY":qty!==null?"QTY_DERIVED_VENDOR_SELECTION_REQUIRED":"ENGINEERING_QTY_REQUIRED"};
  });
  const preliminaryRows=components.filter(c=>c.budgetaryExtended!==null);
  const budgetaryPartialUSD=preliminaryRows.length?Math.round(preliminaryRows.reduce((n,c)=>n+c.budgetaryExtended,0)*100)/100:null;
- const ready=components.length>0&&components.every(c=>c.extended!==null);
+ const ready=components.length>0&&components.every(c=>c.nonCostedIncluded||c.extended!==null);
  const currencySet=[...new Set(components.filter(c=>c.extended!==null).map(c=>c.currency))];
  const amount=ready&&currencySet.length===1?Math.round(components.reduce((n,c)=>n+c.extended,0)*100)/100:null;
  return {site:item.site,tag:item.sourceTag,sourceRow:item.sourceRow,components,
-  requiredFunctionCount:components.length,qtyDerivedCount:components.filter(c=>c.requiredQty!==null).length,
-  costedFunctionCount:components.filter(c=>c.extended!==null).length,budgetaryCostedCount:preliminaryRows.length,budgetaryPartialUSD,
+  requiredFunctionCount:components.filter(c=>!c.nonCostedIncluded).length,qtyDerivedCount:components.filter(c=>!c.nonCostedIncluded&&c.requiredQty!==null).length,
+  costedFunctionCount:components.filter(c=>!c.nonCostedIncluded&&c.extended!==null).length,budgetaryCostedCount:preliminaryRows.length,budgetaryPartialUSD,
   amount,currency:amount!==null?currencySet[0]:null,
   state:amount!==null?"ENGINEERING_BOM_COSTED_REQUIRES_APPROVAL":"DERIVATION_INCOMPLETE",
   rule:"Engineering requiredQty is authoritative. Vendor quotedQty is price evidence only. No synthetic quantity or false aggregate."};
