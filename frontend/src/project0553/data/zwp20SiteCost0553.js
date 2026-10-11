@@ -138,21 +138,28 @@ function rowCost(item){
    routeLengthM:null,interfaceCountsApproved:false,
    caveat:"Historical Z1D schematic has connectivity, not dimensioned Z1F cable routes or approved Z1F quantities"
   };
+  // Internal budgetary quantity allowance derived from LAY geometry and Z1D comparable,
+  // never presented as a dimensioned or approved cable takeoff.
+  const budgetRoute={horizontalM:4,verticalM:3,terminationAndServiceLoopM:3,
+    totalM:10,classification:"INTERNAL_BUDGETARY_GEOMETRY_ALLOWANCE",
+    source:"Z1F LAY-0001 C1 sheets 4-5; Z1D ZWP14 PIP-LAY-0006 As-Built reference",
+    caveat:"4m horizontal, 3m vertical, 3m slack are assumptions, not measured installation path; check E&I panel location and routing"};
   const options=[
-   {sku:"TECKNIKABEL CAT6A S/FTP",unit:"m",rateTHB:cable?.unitPriceExVat??null,quantity:null,
-    source:"QA24-0604 / line1",driver:"TPP-EQ-003: sum measured route segments + termination allowances + service loops; SPE §6.6 ethernet <80m is a constraint NOT a takeoff",selection:"REQUIRES_DIMENSIONED_EI_ROUTE"},
-   {sku:"501/453/UNIV/A/M20",unit:"set",rateTHB:gland?.unitPriceExVat??null,quantity:null,
-    source:"QA24-0604 / line4",driver:"Count certified used cable entries by cable diameter, deduct included entries/plug items in BARTEC TCAB; check actual electrical interface",selection:"REQUIRES_ENTRY_SCHEDULE"},
+   {sku:"TECKNIKABEL CAT6A S/FTP",unit:"m",rateTHB:cable?.unitPriceExVat??null,quantity:budgetRoute.totalM,
+    source:"QA24-0604 / line1",driver:"One ODU–indoor PoE CAT6A run: 4m horizontal + 3m vertical + 3m termination/service loop (preliminary geometry allowance)",selection:"BUDGETARY_ENGINEERING_ALLOWANCE"},
+   {sku:"501/453/UNIV/A/M20",unit:"set",rateTHB:gland?.unitPriceExVat??null,quantity:1,
+    source:"QA24-0604 / line4",driver:"One external cable-entry gland allowance; check Ex suitability and already-included BARTEC fittings",selection:"BUDGETARY_ENGINEERING_ALLOWANCE"},
    ...[...(q0604?.lines||[]).filter(v=>v.partNumber==="AFU113030"),...(q0606?.lines||[])].map(v=>({
     sku:v.partNumber,unit:v.unit,rateTHB:v.unitPriceExVat,quantity:null,source:v.partNumber==="AFU113030"?"QA24-0604 / line3":"QA24-0606",
-    driver:"RF/Ex interface and connector compatibility not yet selected",selection:"UNSELECTED_ALTERNATIVE"}))
+    driver:"Unselected alternatives: confirm RF/Ex interfaces before adding",selection:"UNSELECTED_ALTERNATIVE"}))
   ];
   const components=options.map(v=>({...v,extended:Number.isFinite(v.quantity)&&Number.isFinite(v.rateTHB)?money(v.quantity,v.rateTHB):null}));
+  const budgetaryTotal=components.filter(v=>Number.isFinite(v.extended)).reduce((n,v)=>n+v.extended,0);
   return {...base,vendor:"INNOVA (historical rate evidence)",sku:"CAT6A + certified entry fittings (engineering takeoff)",
-   quotedRateCandidates:components,components,layoutTakeoff,historicalWiring,currency:"THB",unitCost:null,extended:null,
+   quotedRateCandidates:components,components,layoutTakeoff,historicalWiring,budgetRoute,currency:"THB",unitCost:budgetaryTotal,extended:budgetaryTotal,
    quantityBasis:"AFC LAY-0001 C1 sheet4 scale 1:100: ODU/antenna plan proximity ~0.5-1.0m; mezzanine +21.100/+21.300m vs lower +18.300m = 2.8-3.0m deck elevation difference (NOT cable length). BID-FPR TPP-EQ-003 still requires measured indoor endpoint and routed cable segments.",
-   status:"ENGINEERING_ROUTE_LENGTH_NOT_DOCUMENTED",
-   assumptions:["Plan proximity, deck elevation and quoted cable unit rate have evidence; physical route with E&I room cabinet entry and service loops is not dimensioned by this TEL drawing", "Earlier 20m CAT6A + 1 gland / THB 11,500 was an unsupported scenario and is excluded from evidence-based WP total",
+   status:"BUDGETARY_ESTIMATED_ROUTE_NOT_VERIFIED",
+   assumptions:["10m total = 4m horizontal + 3m vertical + 3m loop/termination allowance based on Z1F layout and Z1D analogue; not a verified measured route", "One Hawke gland budgetary allowance subject to Ex interface check and BARTEC package no-double-count; unselected alternatives are excluded",
     "SPE §6.6 ethernet run <80m is a design constraint; it cannot be converted to an assumed purchase quantity",
     "Cable entry quantities require confirmed Ex cable/entry/interface schedule, accounting for BARTEC included components and B-5 two short RF jumpers",
     "QA24-0604 THB 524/m, THB 1,020/gland; QA24-0606 alternatives remain unit-rate evidence, not selected quantities"]};
