@@ -3,6 +3,7 @@ import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
 import {DTRS_RFI_BULK_0553} from "./data/dtrsRfiBulk0553";
 import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
+import {deriveSevenLocationCostLedger0553} from "./data/sevenLocationCostCalculations0553";
 import { deriveEngineeringOwnedCost0553 } from "./data/engineeringOwnedCost0553";
 import { deriveZWP20VendorFunctionCosts, getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
 import {ZWP8_ROW43_COST_TRACE} from "./data/zwp8Row43CostTrace";
@@ -19,6 +20,7 @@ import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom"
 export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB"}){
  const zwp20Cost=deriveZWP20SiteCost0553();
  const wpSystemBulk=deriveWpSystemBulkBudget0553();
+ const lifecycleLedger=deriveSevenLocationCostLedger0553();
  const bulkBudgetSummary=wpSystemBulk.map(w=>{
   const rows=w.systems.flatMap(sys=>sys.items);
   return {wp:w.wp,siteClass:w.siteClass,pricedRows:rows.filter(it=>it.extendedTHB!==null).length,
@@ -101,6 +103,11 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <p className="p55-note">System-specific preliminary material takeoff. Brownfield ZPQ/ZWP8/ZWP11 require cable reuse, tie-in and shutdown review; no automatic 50m cable. These scenarios do not add to existing allocated location totals.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Site</th><th>System</th><th>Bulk material / interface</th><th>Quantity</th><th>Rate THB</th><th>Budget THB</th><th>Evidence / state</th></tr></thead><tbody>
   {wpSystemBulk.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.systems.flatMap(sys=>sys.items.map((item,i)=><tr key={w.wp+sys.id+item.id+i}><td>{w.wp}</td><td>{w.siteClass}</td><td>{sys.name}</td><td>{item.item}</td><td>{item.qty===null?"DERIVE":item.qty+" "+item.unit}</td><td>{money(item.rateTHB,"THB")}</td><td>{money(item.extendedTHB,"THB")}</td><td>{item.status}<small>{item.source}</small></td></tr>)))}
+  </tbody></table></div></details>
+  <details className="p55-panel"><summary>Lifecycle Cost Calculation — B4 Pre-commissioning &amp; Commissioning / B5 Startup Spares / C2 Capital Spares</summary>
+  <p className="p55-note">Spare Qty = MAX(RFQ/OEM minimum, CEIL(installed Qty × approved spare ratio)); Work MH = number of evidenced tests × evidenced unit MH + mobilization MH. Costs remain unpriced until RFQ/OEM spares ratios, test WBS and supplier/labor rates are supplied. This scope is not hidden inside equipment/bulk cost.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WH</th><th>System</th><th>Cost Class</th><th>Phase</th><th>Quantity Driver</th><th>Cost State</th></tr></thead><tbody>
+  {lifecycleLedger.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.b4b5c2.map(x=><tr key={x.id}><td>{w.wp}</td><td>{x.system}</td><td>{x.costClass}</td><td>{x.activity}</td><td>{x.driver}<small>{x.description}</small></td><td>{x.priceStatus}</td></tr>))}
   </tbody></table></div></details>
   <SourceCoverage0553/>
   <SiteSystemCostReconciliation0553/>
