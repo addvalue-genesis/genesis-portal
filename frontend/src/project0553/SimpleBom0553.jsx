@@ -81,14 +81,20 @@ export function SimpleBom0553({focusedLocation=null}){
         <small>Next G: {uniqueOffers.length} function-matched quote line(s)</small>
         {uniqueOffers.length>0&&<small>{uniqueOffers.slice(0,5).map(q=>q.quoteLine).join(", ")}{uniqueOffers.length>5?" …":""}</small>}
         <small>{x.vendorCandidates.length} other source candidate(s) · none automatically approved</small></td>
-       <td>{Number.isFinite(x.indicativePackageCostTHB)&&<div>{money(bom.cisco.unitPackageQuotedSumTHB,"THB")}<small>Cisco working set only</small></div>}
-        {pricedOffers.length>0?<div><strong>Next G source unit rates (USD)</strong>
-         {pricedOffers.map(q=><small key={q.quoteLine}>{q.quoteLine} · {q.sku}: USD {q.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</small>)}
-        </div>:<small>No priced Next G line mapped to this item</small>}
-        {uniqueOffers.some(q=>!Number.isFinite(q.unitPrice))&&<small>Additional quote line(s) marked N/A (not zero)</small>}
-        {x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice)).length>0&&<div><strong>Other source unit rates</strong>
-         {x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice)).map((v,i)=><small key={(v.quoteId||"other")+":"+(v.quoteLine||i)}>{v.vendor} · {v.quoteLine} · {v.sku}: {v.originalCurrency} {v.originalUnitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</small>)}
+       <td>
+        {Number.isFinite(x.indicativePackageCostTHB)&&<div><strong>{money(bom.cisco.unitPackageQuotedSumTHB,"THB")}</strong><small>Cisco 1 working Set (scenario)</small></div>}
+        {pricedOffers.length>0&&<div>
+          <strong>Next G quote: Qty × Unit = Amount (USD)</strong>
+          <table className="p55-table p55-table--compact" style={{fontSize:"inherit"}}><thead><tr><th>Line / SKU</th><th>Quote Qty</th><th>Unit USD</th><th>Quote total USD</th></tr></thead>
+           <tbody>{pricedOffers.map(q=><tr key={q.quoteLine}><td>{q.quoteLine}<small>{q.sku}</small></td><td className="is-number">{q.offeredQty??"—"}</td><td className="is-number">{q.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</td><td className="is-number">{Number.isFinite(q.quotedExtended)?q.quotedExtended.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—"}</td></tr>)}</tbody>
+          </table>
+          <small>Quotation-wide quantities only. ZWP20 required/allocated Qty still needs engineering decision. A/B/C alternatives are not additive.</small>
         </div>}
+        {uniqueOffers.some(q=>!Number.isFinite(q.unitPrice))&&<small>Unpriced source quote lines (N/A, not zero): {uniqueOffers.filter(q=>!Number.isFinite(q.unitPrice)).map(q=>q.quoteLine).join(", ")}</small>}
+        {x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice)).length>0&&<div><strong>Other vendor quotation unit rates</strong>
+          {x.vendorCandidates.filter(v=>Number.isFinite(v.originalUnitPrice)).map((v,i)=><small key={(v.quoteId||"other")+":"+(v.quoteLine||i)}>{v.vendor} · {v.quoteLine} · {v.sku} · quoted qty {v.offeredQuoteQty??"—"} × {v.originalCurrency} {v.originalUnitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</small>)}
+        </div>}
+        {pricedOffers.length===0&&!Number.isFinite(x.indicativePackageCostTHB)&&!x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice))&&<small>No mapped priced vendor line</small>}
        </td>
        <td>{Number.isFinite(x.indicativePackageCostTHB)?<>{money(x.indicativePackageCostTHB,"THB")}<small>Cisco scenario ONLY</small></>:<strong>NOT ALLOCATED</strong>}
         {pricedOffers.length>0&&<small>Next G unit prices available — site qty / extended cost not yet verified</small>}
