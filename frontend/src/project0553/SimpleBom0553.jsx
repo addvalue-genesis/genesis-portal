@@ -147,7 +147,7 @@ export function SimpleBom0553({focusedLocation=null}){
         const lines=[["Module ID","Engineering Function","Engineering Qty","Quantity Basis","Budgetary Vendor","Selected SKU","Vendor Quote Line","Unit Price USD","Extended USD","Price Basis"],
           ...result.components.map(c=>[moduleId,c.functionId,c.nonCostedIncluded?"Included":c.requiredQty??"",c.quantityState,c.nonCostedIncluded?"OEM Included":c.budgetarySelectedOffer?"Next G":"Not selected",c.budgetarySelectedSKU||"",c.budgetarySelectedOffer||"",c.budgetaryUnitPrice??"",c.budgetaryExtended??"",c.priceEvidenceType||""]),
           [moduleId,"BUDGETARY RADIO FUNCTIONAL TOTAL","","",result.budgetaryDecision.selectedVendor,"","","",result.budgetaryItemTotalUSD??"","CALCULATED_WITH_ASSUMPTIONS"]];
-        const tsv=lines.map(a=>a.map(v=>String(v??"").replace(/\\t|\\r?\\n/g," ")).join("\\t")).join("\\n");
+        const tsv=lines.map(row=>row.map(value=>String(value??"").replaceAll(String.fromCharCode(9)," ").replaceAll(String.fromCharCode(10)," ")).join(String.fromCharCode(9))).join(String.fromCharCode(10));
         return <div className="p55-table-wrap">
          <div style={{display:"flex",gap:8,alignItems:"center",flexWrap:"wrap",justifyContent:"space-between"}}>
           <strong>Engineering-Derived BOM → Selected Vendor/SKU → Parametric Cost</strong>
