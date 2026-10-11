@@ -84,14 +84,18 @@ function rowCost(item){
   const panelRefs=(bartecQuote?.lines||[]).filter(v=>["1","2"].includes(v[0])).map(v=>({
     quoteLine:v[0],sku:v[1],sourceUnitTHB:v[4],description:v[2],historicalProject:"Zawtika 1E",budgetarySelected:false
   }));
+  const choice=panelRefs.find(v=>v.quoteLine==="1");
+  const unitPrice=Number.isFinite(choice?.sourceUnitTHB)?choice.sourceUnitTHB:null;
   return {...base,bartecMapping:ZWP20_BARTEC_NEXTG_REFERENCE_MAP.entries.filter(e=>e.allocation.includes("TCAB-500-001 row9")),
-   vendor:"BARTEC / Prosper E&T (historical panel reference, not selected)",
+   currency:"THB",unitCost:unitPrice,extended:money(q,unitPrice),budgetarySelectedQuoteLine:choice?.quoteLine||null,
+   sku:choice?.sku||null,
+   vendor:"BARTEC / Prosper E&T (2024 historical comparable for working budget)",
    quotedRateCandidates:panelRefs,
    quantityBasis:"MTO Rev04 ZWP20 TCAB-500-001 1 Set; BLD AFC sheet 3 Note 8 NEW Ex e enclosure; physical assembly qty from selected configuration",
-   status:"ENGINEERING_ENCLOSURE_ASSEMBLY_TAKEOFF_REQUIRED",
-   assumptions:["PROSPER Q-PROSRY-24051 quote lines 1/2 are Zawtika 1E Ex Zone 2 panel comparators, NOT adopted ZWP20 package price",
+   status:"BUDGETARY_HISTORICAL_COMPARABLE_SELECTED",
+   assumptions:["Prosper Q-PROSRY-24051 item 1 is a 2024 Zawtika 1E SCADA Ex e control panel THB 39,200/set; item 2 THB 38,800 is an alternative; conservative item 1 adopted as internal 0553 budgetary comparable, not a current quotation",
     "Historical BARTEC GA-1001/1002 is a mechanical/termination reference; do not assume its included components or quantity from 2022 is transferable",
-    "Remove IDU PoE (row5), LAN switch (row7) and surge (row10) from enclosure cost to prevent double counting",
+    "Original quote identifies PoE injector, Cisco switch, surge and Phoenix patch panel as customer free-issued: row 5, 7, 10 and 8 own those costs; enclosure quote only covers BARTEC panel assembly and its supplied internal fittings",
     "Ex e certification, SS316L size, thermal/heat load, terminal count, gland entries, internal wiring and assembly labour must be checked"]};
  }
  if(item.sourceRow===10){
