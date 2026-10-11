@@ -21,9 +21,10 @@ function rowCost(item){
    status:d.budgetaryCoverage?"BUDGETARY_CALCULATED":"BUDGETARY_PARTIAL",
    assumptions:["Region key B-4 USD0 incremental assumption; no supplier rate","Radio ODU only: separate MTO surge, antenna and enclosure are not counted here"]};
  }
- if(item.sourceRow===5)return {...base,vendor:"Next G / Aviat",sku:"IDU function to integrate with ODU",
-  quantityBasis:"1 source IDU Set; verify whether integrated / separate physical IDU is required",
-  assumptions:["Do not invent a separate IDU price or assert included without OEM design evidence"]};
+ if(item.sourceRow===5)return {...base,vendor:"Next G / Aviat (interface-equivalent qualification)",sku:"Dedicated IDU or compliant indoor interface module — engineering required",
+  quantityBasis:"MTO Rev04 row 5: 1 IDU Set; AFC BLD-0001 Rev.C1 sheet 3/7 Note 8: NEW IDU AND SURGE ARRESTOR WILL BE INSTALLED IN NEW Ex e ENCLOSURE",
+  status:"ENGINEERING_QTY_DERIVED_PRICE_TO_MATCH",
+  assumptions:["First Principles: 1 remote ODU endpoint requires one indoor network/power interface at the Ex e Telecom Enclosure","BLD AFC explicitly requires a NEW IDU, not an optional omission","If selected outdoor radio integrates the IDU functions, map equivalent hardware, qualify architecture and register technical deviation before claiming zero incremental cost","Price matched physical IDU/interface functions; do not duplicate ODU integrated components or surge row 10"]};
  if(item.sourceRow===6){
   const vendor=lineByCode.get("B-12");
   // User-directed budgetary 4ft option at ZWP20 RX end, pending RF availability recheck.
