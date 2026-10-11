@@ -9,9 +9,9 @@ export const ZWP20_BARTEC_NEXTG_REFERENCE_MAP=Object.freeze({
    bld:"MM-ZTK-1F-ZWPX-TEL-BLD-0001 Rev C1 AFC sheet 3 Note 8: NEW IDU AND SURGE ARRESTOR installed in NEW Ex e ENCLOSURE"},
  entries:[
   {functionId:"INDOOR_POE_INJECTOR",legacyVendor:"REDLINE",legacySku:"RPM-POEINJ-DC",legacyDrawing:"GA-1001 p2 line 1B; GA-1002 p5 line 1B",
-   candidateVendor:"Next G / Aviat",candidateQuote:"NG/260916-ADV-DAP1",candidateLine:"B-6",candidateSku:"PS-DCDC-HAZ-POE-IND-01",
-   estimatedUnitUSD:667.67,allocation:"MR-502-001A row5",status:"FUNCTION_CANDIDATE_NOT_PART_NUMBER_EQUIVALENCE",
-   checks:["DC feed, PoE budget, Zone 2 Ex suitability and internal wiring","Not proof that a separate IDU function is fully covered"]},
+   candidateVendor:"Next G / Aviat",candidateQuote:"NG/260916-ADV-DAP1",candidateLine:"B-6",alternativeQuoteLine:"A-6",candidateSku:"PS-DCDC-HAZ-POE-IND-01",
+   estimatedUnitUSD:667.67,allocation:"MR-502-001A row5",status:"BUDGETARY_FUNCTIONAL_IDU_INTERFACE_SELECTION",
+   checks:["DC feed, PoE budget, Zone 2 Ex suitability and internal wiring","Customer IDU is a functional label: PoE injector/power interface is a suitable budgetary interpretation, pending OEM interface compliance; A-6 and B-6 same SKU and not additive"]},
   {functionId:"INDOOR_POWER_CORD",legacyVendor:"BARTEC",legacySku:"INTERNAL_WIRING_PVC",legacyDrawing:"GA-1001 p2 line 22",
    candidateVendor:"Next G / Aviat",candidateQuote:"NG/260916-ADV-DAP1",candidateLine:"B-7",candidateSku:"PPT-B",
    estimatedUnitUSD:3.6,allocation:"MR-502-001A row5",status:"ELECTRICAL_INTERFACE_REVIEW",
