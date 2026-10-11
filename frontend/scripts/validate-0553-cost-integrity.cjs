@@ -15,5 +15,6 @@ assert(workspace.indexOf("<CostIntegrityReview0553/>")<workspace.indexOf("<Simpl
 assert(workspace.includes("NOT total project cost"),"Cisco subtotal must be qualified in commercial summary");
 assert(view.includes("NOT a project or all-system BOM total"));
 assert(spine.includes("fullEquipmentCost:null")&&spine.includes("customerSell:null"));
-for(const q of ["id:\"NG-260916\"","id:\"VST-0048-RE1\"","id:\"MGW-P26-058\""])assert(registry.includes(q),"Vendor quote missing: "+q);
+for(const q of ["id:\"NG-260916\"","id:\"VST-0048-RE1\""])assert(registry.includes(q),"Vendor quote missing: "+q);
+assert(read("data/mgwP26058.js").includes('id:"MGW-P26-058"'),"MGW source quote missing");
 console.log("PASS 0553: 8-step integrity review and quote reconciliation are visible; Cisco subtotal cannot masquerade as A+B+C.");
