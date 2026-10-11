@@ -1,0 +1,26 @@
+// PJ2608-0553 lifecycle scope register. This does not replace RFQ scope, VDRL, WBS or vendor quotations.
+// B/C cost-category names are working A/B/C crosswalk and require customer template verification.
+export const LIFECYCLE_COST_CLASSES_0553=Object.freeze([
+ {code:"A",name:"Equipment and directly attributable package/bulk",scope:"Installation material and normal package accessories",exclusion:"Do not hide startup or long-term spares inside untraceable bulk"},
+ {code:"B4",name:"Specialist support, FAT / IFAT / SAT / Pre-commissioning / Commissioning",scope:"Vendor and ADDVALUE activities separately owned",exclusion:"Do not double bill OEM included FAT or commissioning labor"},
+ {code:"B5",name:"Startup / Pre-commissioning / Commissioning Spares",scope:"Consumables, initial replacements and spares consumed or required during energization and acceptance",exclusion:"Not 10-year operating spares or spare installed assemblies"},
+ {code:"C1",name:"Site installation and construction",scope:"Pull, mount, gland, terminate and label physical equipment/cables",exclusion:"Exclude separate SAT or commissioning manpower"},
+ {code:"C2",name:"Capital / long-term operational spares",scope:"RFQ-specified capital spares, e.g. 10-year inventory where applicable",exclusion:"Separate physical inventory and delivery from B5"}
+]);
+const fn={
+ SCADA_RADIO:{pre:"Power/PoE and enclosure checks; Cat6A continuity/certification; Ethernet and RF interfaces",com:"Link alignment, throughput/license enablement, NMS integration, redundancy and SAT",startup:["Approved OEM transceiver/PoE spare strategy","Surge module and SFP / RJ45 interface spares","Replacement glands/termination consumables"],capital:["Radio module/ODU strategy","PoE/IDU and industrial switch spare strategy","Certified surge and antenna RF accessories"]},
+ EX_IP_PHONE:{pre:"Check Ex JB, gland entries, power/PoE, insulation and cable certification",com:"Call routing, PA/sounder interface and emergency call SAT",startup:["Certified glands/stopping plugs/terminals","Replacement telephone interface accessories"],capital:["Ex telephone/handset and electronics","Certified JB components"]},
+ DTRS_TRUNK_RADIO:{pre:"RF feeder sweep/VSWR, cable grounding, RFI LNA supply/alarm and surge inspection",com:"RX sensitivity, gain/alarm, coverage, RF path loss and trunk-radio integration",startup:["RFI A2671/A2881 mating connectors if separately supplied","SMA/adaptor and jumper replacement allowance","RF grounding and surge replacement allowance"],capital:["RFI RX3852-2002-11 LNA module strategy","RF surge device and antenna/feeder accessory inventory"]},
+ MARINE_RACON:{pre:"Power/control wiring verification, Ex d/Ex e box inspection and earthing",com:"RACON triggering/function, marine interface and acceptance tests",startup:["Certified cable entries and wiring termination spares","OEM power/control interface replacements"],capital:["OEM RACON serviceable modules","Control box and power supply spare strategy"]}
+};
+const whs=["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11"];
+export const LIFECYCLE_SPARES_0553=Object.freeze({
+ costClasses:LIFECYCLE_COST_CLASSES_0553,
+ rows:whs.flatMap(wp=>Object.entries(fn).flatMap(([system,value])=>[
+  {id:wp+"-"+system+"-PRECOM",wp,system,costClass:"B4",activity:"PRE_COMMISSIONING",description:value.pre,qty:null,unit:"activity package",unitRateTHB:null,extendedTHB:null,driver:"WBS test points, circuits and vendor responsibility",priceStatus:"DERIVE_TEST_WBS"},
+  {id:wp+"-"+system+"-COM",wp,system,costClass:"B4",activity:"COMMISSIONING_SAT",description:value.com,qty:null,unit:"activity package",unitRateTHB:null,extendedTHB:null,driver:"Test procedure, SAT and interface matrix",priceStatus:"DERIVE_TEST_WBS"},
+  {id:wp+"-"+system+"-START",wp,system,costClass:"B5",activity:"STARTUP_SPARES",description:value.startup.join("; "),qty:null,unit:"spares schedule",unitRateTHB:null,extendedTHB:null,driver:"OEM recommended startup spare list + installed count + commissioning failure risk",priceStatus:"VENDOR_SPARES_LIST_REQUIRED"},
+  {id:wp+"-"+system+"-CAPITAL",wp,system,costClass:"C2",activity:"CAPITAL_SPARES",description:value.capital.join("; "),qty:null,unit:"capital spare schedule",unitRateTHB:null,extendedTHB:null,driver:"RFQ spare horizon and reliability/maintainability requirements",priceStatus:"RFQ_OEM_CAPITAL_SPARES_REQUIRED"}
+ ])),
+ controls:["A+B+C line ownership must follow 0553 RFQ scope; this is a project working crosswalk","No percentage of equipment value is silently counted as spare cost","Spare units require a separate deliverable and must not double count standard OEM package spare accessories","Brownfield quantities only for new supplied and owner-required spare coverage; reuse without independent replacement is not new supply","B4 effort must be derived from WBS, test counts, mobilization and vendor responsibility, not guessing manhours","Budgetary reserve may be added separately from confirmed vendor rates once management scenario is approved"]
+});
