@@ -142,7 +142,7 @@ export function deriveZWP20SiteCost0553(){
  const rows=(site?.items||[]).map(rowCost);
  const currencies=["USD","THB"];
  const subtotals=Object.fromEntries(currencies.map(currency=>[currency,Math.round(rows.filter(r=>r.currency===currency&&Number.isFinite(r.extended)).reduce((n,r)=>n+r.extended,0)*100)/100]));
- const gaps=rows.filter(r=>r.extended===null||r.status==="BUDGETARY_PARTIAL_INTERFACE_ONLY");
+ const gaps=rows.filter(r=>r.extended===null||r.status==="BUDGETARY_PARTIAL_INTERFACE_ONLY"||r.status==="BUDGETARY_BULK_SCENARIO_WITH_ASSUMPTIONS");
  return {site:"ZWP20",moduleId:"PJ2608-0553 / bid.budget.bom.zwp20",system:"MR-0001",rows,subtotals,gaps,
   pricedRows:rows.filter(r=>Number.isFinite(r.extended)).length,totalRows:rows.length,
   status:gaps.length?"PRICED_SUBTOTAL_WITH_EXPLICIT_SCOPE_GAPS":"BUDGETARY_SCOPE_COSTED",
