@@ -1,6 +1,7 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {MR0002WorkingBom0553} from "./MR0002WorkingBom0553";
 import {LocationBomDetail0553} from "./LocationBomDetail0553";
+import {MR0001CostCloseout0553} from "./MR0001CostCloseout0553";
 import {getMR0001LocationCost0553} from "./data/mr0001LocationCostSummary0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
 import {BOM_READ_MODEL_0553} from "./data/bomReadModel0553";
@@ -98,6 +99,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <div ref={el=>{targetRefs.current.working=el;}} style={{scrollMarginTop:90}}></div>
   <div className="p55-eyebrow">ENGINEERING WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom"/></div>
   <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
+  <MR0001CostCloseout0553/>
   <nav className="p55-panel" aria-label="Working Preview module navigator" style={{padding:14,marginBottom:16}}>
    <h4>ค้นหา Module / Find Working Preview Module</h4>
    <div className="p55-filterbar">
