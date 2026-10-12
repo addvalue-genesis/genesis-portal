@@ -9,9 +9,12 @@ assert(central.includes("MGW_P26_058_0553")&&central.includes("deriveDtrsRfiBudg
 assert(central.includes("sourceQuoteQty:quotedQty"));
 assert(central.includes("countedInWorkingTotal:false"));
 assert(central.includes('selectedManufacturer:"RFI"'));
-assert(central.includes('"MGW_SELECTED_ANTENNA"'));
+assert(central.includes('"MGW_SELECTED_RF_PACKAGE"'));
 assert(central.includes("controlledTotalUSD:equipment.filter(x=>x.countedInWorkingTotal)"));
 assert(central.includes("countedInWorkingTotal:[\"UHF-2\",\"UHF-3\"].includes(id)"));
+assert(central.includes("priorBulk?.rows||[]"));
+assert(central.includes("INCLUDED_IN_MGW_UHF4__NOT_ADDITIVE"));
+assert(central.includes("controlledTotalTHB:"));
 assert(viewer.includes("MR0002_WORKING_BOM_0553")&&viewer.includes("rows:unifiedRows"));
 assert(editor.includes("<MR0002WorkingBom0553/>"));
 assert(a1.includes("item.countedInWorkingTotal===false?null:item.extended"));
