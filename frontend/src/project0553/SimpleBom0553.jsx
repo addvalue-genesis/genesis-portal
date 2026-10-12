@@ -271,7 +271,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
      <tbody>{g.rfProof.map(p=><tr key={p.id}><td>{p.from} → {p.to}</td><td>{p.fsplDb.toFixed(2)} dB</td><td>{p.gainSumDbi.toFixed(2)} dBi</td><td>{p.idealRslOffsetDb.toFixed(2)} dB<small>Rx = Tx + offset − losses</small></td><td>HOLD · CAL/OEM proof required{p.change&&<small>4ft candidate: {p.change.gainChangeDb.toFixed(2)} dB vs Next G baseline</small>}</td></tr>)}</tbody>
     </table>
     <p className="p55-note">Equipment Tag / Cost Ledger: ดูที่ SCADA Engineering-Derived Site Cost Summary ด้านบน (ข้อมูลเดียวกัน ไม่แสดงตาราง BOM ซ้ำ). Link/RF First Principles และ Vendor Evidence ยังอยู่ในรายละเอียดของแต่ละ Tag.</p>
-</td></tr>}
+</div></td></tr>}
   </React.Fragment>)}
   </tbody></table></div>
   <p className="p55-note">Missing price is not missing scope: {missingSourceRows.length} source rows in the chosen location still lack a Cisco-priced scenario, and may have other vendor price evidence. Detailed physical quantities, bulk and services must be derived separately.</p>
