@@ -2,7 +2,7 @@
 // No customer sell prices are created here. No historical Rev08 substitution.
 import {BOM_READ_MODEL_0553,bomItems0553} from "./bomReadModel0553";
 import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
-import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./siteSystemCostReconciliation";
+import {ZWP8_TAG_WORKING_LEDGER_0553} from "./mr0001TagCostLedger0553";
 export function deriveA1EquipmentCoverage0553(){
  const seen=new Set(),items=[];
  for(const group of BOM_READ_MODEL_0553.rows){
@@ -20,26 +20,15 @@ export function deriveA1EquipmentCoverage0553(){
   for(const item of location.items){
    const key=location.site+"|MR-0001|"+item.sourceRow+"|"+item.sourceTag;
    if(seen.has(key))continue;seen.add(key);
+   const allocated=location.site==="ZWP8"?ZWP8_TAG_WORKING_LEDGER_0553.find(x=>x.tag===item.sourceTag&&x.row===item.sourceRow):null;
    items.push({site:location.site,mr:"MR-0001",tag:item.sourceTag,row:item.sourceRow,
     description:item.description,qty:item.sourceScopeQty,unit:item.sourceScopeUnit,
-    currency:Number.isFinite(item.indicativePackageCostTHB)?"THB":null,
-    unitCost:Number.isFinite(item.indicativePackageCostTHB)&&Number.isFinite(item.sourceScopeQty)&&item.sourceScopeQty>0?item.indicativePackageCostTHB/item.sourceScopeQty:null,
-    extended:item.indicativePackageCostTHB,status:item.workingPriceStatus,
+    currency:allocated?.countedInWorkingTotal?"USD":Number.isFinite(item.indicativePackageCostTHB)?"THB":null,
+    unitCost:allocated?.countedInWorkingTotal?allocated.unitCost:Number.isFinite(item.indicativePackageCostTHB)&&Number.isFinite(item.sourceScopeQty)&&item.sourceScopeQty>0?item.indicativePackageCostTHB/item.sourceScopeQty:null,
+    extended:allocated?.countedInWorkingTotal?allocated.extended:item.indicativePackageCostTHB,status:allocated?.status||item.workingPriceStatus,
     priceCandidates:(item.vendorCandidates||[]).filter(v=>Number.isFinite(v.originalUnitPrice)).map(v=>({quote:v.quoteId,line:v.quoteLine,sku:v.sku,currency:v.originalCurrency,unitPrice:v.originalUnitPrice,selected:v.selected})),
-    source:"MTO_WORKING_SCOPE"});
+    source:allocated?.countedInWorkingTotal?allocated.source:"MTO_WORKING_SCOPE"});
   }
- }
- // Show existing source-backed ZWP8 radio/antenna scenario from the Working Reconciliation.
- // This is a separate partial scenario, never the site-approved full BOM.
- const zwp8=SITE_SYSTEM_COST_RECONCILIATION_0553.rows.find(x=>x.site==="ZWP8"&&x.mr==="MR-0001");
- for(const e of zwp8?.evidence||[]){
-  if(e.kind!=="BUDGETARY_PREFERRED_PARTIAL__NOT_APPROVED"||!Number.isFinite(e.extended))continue;
-  const key="ZWP8|MR-0001|SCENARIO|"+e.line;
-  if(seen.has(key))continue;seen.add(key);
-  items.push({site:"ZWP8",mr:"MR-0001",tag:"BUDGETARY-4FT-SCENARIO",row:null,
-   description:e.description,qty:e.assumedQty,unit:"scenario",currency:e.currency,
-   unitCost:e.unit,extended:e.extended,status:e.kind,source:e.source,
-   allocationClass:"PARTIAL_SCENARIO_NOT_APPROVED",priceCandidates:[]});
  }
  const currencies=[...new Set(items.filter(x=>Number.isFinite(x.extended)&&x.currency).map(x=>x.currency))];
  const knownCost=currencies.map(currency=>({currency,amount:Math.round(items.filter(x=>x.currency===currency&&Number.isFinite(x.extended)).reduce((v,x)=>v+x.extended,0)*100)/100}));
