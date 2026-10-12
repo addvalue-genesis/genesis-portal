@@ -3,6 +3,7 @@
 import {BOM_READ_MODEL_0553,bomItems0553} from "./bomReadModel0553";
 import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
 import {RFI_LNA_PRICE_DECISION_0553} from "./rfiLnaPriceDecision0553";
+import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./siteSystemCostReconciliation";
 export function deriveA1EquipmentCoverage0553(){
  const seen=new Set(),items=[];
  for(const group of BOM_READ_MODEL_0553.rows){
@@ -23,8 +24,21 @@ export function deriveA1EquipmentCoverage0553(){
     currency:Number.isFinite(item.indicativePackageCostTHB)?"THB":null,
     unitCost:Number.isFinite(item.indicativePackageCostTHB)&&Number.isFinite(item.sourceScopeQty)&&item.sourceScopeQty>0?item.indicativePackageCostTHB/item.sourceScopeQty:null,
     extended:item.indicativePackageCostTHB,status:item.workingPriceStatus,
+    priceCandidates:(item.vendorCandidates||[]).filter(v=>Number.isFinite(v.originalUnitPrice)).map(v=>({quote:v.quoteId,line:v.quoteLine,sku:v.sku,currency:v.originalCurrency,unitPrice:v.originalUnitPrice,selected:v.selected})),
     source:"MTO_WORKING_SCOPE"});
   }
+ }
+ // Show existing source-backed ZWP8 radio/antenna scenario from the Working Reconciliation.
+ // This is a separate partial scenario, never the site-approved full BOM.
+ const zwp8=SITE_SYSTEM_COST_RECONCILIATION_0553.rows.find(x=>x.site==="ZWP8"&&x.mr==="MR-0001");
+ for(const e of zwp8?.evidence||[]){
+  if(e.kind!=="BUDGETARY_PREFERRED_PARTIAL__NOT_APPROVED"||!Number.isFinite(e.extended))continue;
+  const key="ZWP8|MR-0001|SCENARIO|"+e.line;
+  if(seen.has(key))continue;seen.add(key);
+  items.push({site:"ZWP8",mr:"MR-0001",tag:"BUDGETARY-4FT-SCENARIO",row:null,
+   description:e.description,qty:e.assumedQty,unit:"scenario",currency:e.currency,
+   unitCost:e.unit,extended:e.extended,status:e.kind,source:e.source,
+   allocationClass:"PARTIAL_SCENARIO_NOT_APPROVED",priceCandidates:[]});
  }
  // User-approved temporary zero for missing RFI LNA vendor price. 
  // Keep as an unallocated control row until MR-0002 site quantity is reconciled.
