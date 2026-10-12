@@ -84,4 +84,12 @@ assert(ui.includes("System Bulk / รายการย่อยตามระ�
 assert(ui.includes('<th>MTO / Module</th>'));
 assert(ui.includes('g.site!=="ZWP20"&&<div className="p55-panel"'));
 assert(ui.includes('expanded["item:"+x.id]'));
+const rfLedger=fs.readFileSync(path.join(src,"data/dtrsRfiBudgetCalculation0553.js"),"utf8");
+assert(rfLedger.includes("deriveDtrsRfiBudget0553"));
+assert(rfLedger.includes("procurementAllowancePct:15"));
+assert(rfLedger.includes("standardGridSpanM:9.144"));
+assert(rfLedger.includes("erpPriceUnitVerified:false"));
+assert(ui.includes("DTRS / RFI LNA · RF Feeder Engineering"));
+assert.equal(Math.ceil((9.144+3)*1.15),14);
+assert.equal(14*631+2*835.15+902.23+2014.96,13421.49);
 console.log("PASS ZWP20 bulk base THB 37,176: 60m plus 15% purchase allowance + 1 gland. Different directions require additional distinct route records.");
