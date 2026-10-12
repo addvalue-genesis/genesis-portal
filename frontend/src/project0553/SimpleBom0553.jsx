@@ -15,7 +15,7 @@ import {SiteSystemCostReconciliation0553} from "./SiteSystemCostReconciliation05
 import { NEXTG_CANDIDATE_ESTIMATE_0553 } from "./data/nextgCandidateEstimate0553";
 import { ITEM_DECISION_PIPELINE_0553 } from "./data/itemDecisionPipeline0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
-import React,{useState} from "react";
+import React,{useRef,useState} from "react";
 import { WORKING_BOM_BY_LOCATION_0553 as model } from "./data/workingBomByLocation";
 import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom";
 
@@ -33,6 +33,16 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    costTreatment:w.wp==="ZWP20"?"ALREADY_IN_ZWP20_ROW11":"SEPARATE_PLANNING_PROJECTION"};
  });
  const layoutRouteEstimates=deriveZ1FTelBulkRoutes0553();
+ const [moduleSearch,setModuleSearch]=useState("");
+ const targetRefs=useRef({});
+ const moduleIndex=[
+  {id:"bid.budget.bom.mr0002",label:"MR-0002 · Trunk Radio Working BOM",key:"mr0002",keywords:"rfi mgw dmr trunk radio"},
+  {id:"bid.budget.bom.source-coverage",label:"Source Coverage · MR / Location",key:"coverage",keywords:"source evidence mto"},
+  {id:"bid.budget.bom.reconciliation",label:"Site / System Cost Reconciliation",key:"reconciliation",keywords:"cost comparison location"},
+  {id:"bid.budget.bom",label:"Working BOM · MR-0001 / Equipment",key:"working",keywords:"working preview mr0001"}
+ ];
+ const matches=moduleIndex.filter(x=>(x.id+" "+x.label+" "+x.keywords).toLowerCase().includes(moduleSearch.trim().toLowerCase()));
+ const navigateToModule=key=>targetRefs.current[key]?.scrollIntoView({behavior:"smooth",block:"start"});
  const [manualSite,setManualSite]=useState("ALL");
  const [focusSeen,setFocusSeen]=useState(null);
  const site=focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite;
@@ -82,7 +92,21 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  return <section className="p55-panel">
   <div className="p55-eyebrow">ENGINEERING WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom"/></div>
   <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
-  <MR0002WorkingBom0553/><div className="p55-filterbar" style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+  <nav className="p55-panel" aria-label="Working Preview module navigator" style={{padding:14,marginBottom:16}}>
+   <h4>ค้นหา Module / Find Working Preview Module</h4>
+   <div className="p55-filterbar">
+    <label>Module ID / System / Keyword <input aria-label="ค้นหา Module ID" value={moduleSearch} onChange={e=>setModuleSearch(e.target.value)} placeholder="เช่น bid.budget.bom.mr0002, Trunk Radio, MR-0002"/></label>
+    <button type="button" onClick={()=>setModuleSearch("")}>Clear</button>
+   </div>
+   <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
+    {matches.map(m=><button type="button" key={m.id} className="p553-detail-button" onClick={()=>navigateToModule(m.key)}>
+     {m.label} <small>{m.id}</small>
+    </button>)}
+    {!matches.length&&<span role="status">ไม่พบ Module ใน Working Preview สำหรับคำค้นนี้</span>}
+   </div>
+  </nav>
+  <div ref={el=>{targetRefs.current.mr0002=el;}} style={{scrollMarginTop:90}}><MR0002WorkingBom0553/></div>
+  <div className="p55-filterbar" style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
  <label>Display currency <select aria-label="BOM display currency" value={activeCurrency} onChange={e=>setCurrencyOverride(e.target.value)}><option value="THB">THB — Thai Baht</option><option value="USD">USD — US Dollar</option></select></label>
  <small>FX: {fx?.thbPerUsd??"NOT SET"} THB/USD · {fx?.date||"No date"} · {fx?.source||"No source"} · Display conversion only; original quotation rates unchanged</small>
  </div>
@@ -133,8 +157,9 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WH</th><th>System</th><th>Cost Class</th><th>Phase</th><th>Quantity Driver</th><th>Cost State</th></tr></thead><tbody>
   {lifecycleLedger.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.b4b5c2.map(x=><tr key={x.id}><td>{w.wp}</td><td>{x.system}</td><td>{x.costClass}</td><td>{x.activity}</td><td>{x.driver}<small>{x.description}</small></td><td>{x.priceStatus}</td></tr>))}
   </tbody></table></div></details>
-  <SourceCoverage0553/>
-  <SiteSystemCostReconciliation0553/>
+  <div ref={el=>{targetRefs.current.coverage=el;}} style={{scrollMarginTop:90}}><SourceCoverage0553/></div>
+  <div ref={el=>{targetRefs.current.reconciliation=el;}} style={{scrollMarginTop:90}}><SiteSystemCostReconciliation0553/></div>
+  <div ref={el=>{targetRefs.current.working=el;}} style={{scrollMarginTop:90}}></div>
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
   <div className="p55-filterbar p55-filterbar--simple">
