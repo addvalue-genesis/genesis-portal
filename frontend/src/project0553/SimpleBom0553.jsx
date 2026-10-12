@@ -79,6 +79,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   const value=currency===activeCurrency?v:activeCurrency==="THB"?v*fx.thbPerUsd:v/fx.thbPerUsd;
   return activeCurrency+" "+value.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
  };
+ const thbMoney=(v,currency)=>{if(!Number.isFinite(v))return "—";if(currency==="THB")return "THB "+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});if(currency==="USD"&&fx?.thbPerUsd>0)return "THB "+(v*fx.thbPerUsd).toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});return "FX REQUIRED · "+currency+" "+v.toFixed(2);};
+ const originalWithThb=(v,currency)=>Number.isFinite(v)?<><strong>{thbMoney(v,currency)}</strong><small>Original: {currency} {v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</small></>:"—";
  const originalMoney=(v,currency)=>Number.isFinite(v)?currency+" "+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
  const wpSummary=siteName=>{
   const cost=getMR0001LocationCost0553(siteName);
@@ -195,29 +197,30 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   </div>
   {system==="MR-0002"?<section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.mr0002">
    <h4>MR-0002 · Trunk Radio — Source-linked BOM by Location <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.system-location-mto.mr0002"/></h4>
-   <p className="p55-note">This is a read-only table projection of the same central MR-0002 Working BOM. One tagged RFI LNA per site is a budget assumption. USD vendor and THB allowance costs stay separate; excluded items do not enter site totals.</p>
+   <p className="p55-note">This is a read-only table projection of the same central MR-0002 Working BOM. One tagged RFI LNA per site is a budget assumption. THB shown first using Working FX; original vendor currencies retained for audit. Excluded items do not enter site totals.</p>
    {MR0002_WORKING_BOM_0553.sites.filter(g=>site==="ALL"||g.site===site).map(g=><details key={g.site} className="p55-panel">
-    <summary style={{cursor:"pointer"}}><strong>{g.site}</strong> · USD {g.controlledTotalUSD.toLocaleString("en-US",{minimumFractionDigits:2})} + THB {g.controlledTotalTHB.toLocaleString("en-US",{minimumFractionDigits:2})} · <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+g.site.toLowerCase()}/></summary>
-    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Equipment Tag</th><th>Model / Description</th><th>Qty</th><th>Currency</th><th>Unit Cost</th><th>Extended</th><th>Cost treatment</th><th>Item ID</th></tr></thead><tbody>
-     {g.items.map(x=><tr key={x.id}><td>{x.tag}</td><td>{x.sku||"—"}<small>{x.description}</small></td><td>{x.qty??"TBC"} {x.unit}</td><td>{x.currency}</td><td>{Number.isFinite(x.unitCost)?x.unitCost.toLocaleString("en-US",{minimumFractionDigits:2}):"TBC"}</td><td>{x.countedInWorkingTotal&&Number.isFinite(x.extended)?x.extended.toLocaleString("en-US",{minimumFractionDigits:2}):"Excluded / pending"}</td><td>{x.status}</td><td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+g.site.toLowerCase()+"."+x.id.toLowerCase()}/></td></tr>)}
+    <summary style={{cursor:"pointer"}}><strong>{g.site}</strong> · {thbMoney(g.controlledTotalTHB+(fx?.thbPerUsd>0?g.controlledTotalUSD*fx.thbPerUsd:0),"THB")}{!(fx?.thbPerUsd>0)?" (USD portion not converted)":""} <small>Original USD {g.controlledTotalUSD.toLocaleString("en-US",{minimumFractionDigits:2})} + THB {g.controlledTotalTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</small> · <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+g.site.toLowerCase()}/></summary>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Equipment Tag</th><th>Model / Description</th><th>Qty</th><th>Currency</th><th>Unit Cost (THB first)</th><th>Extended (THB first)</th><th>Cost treatment</th><th>Item ID</th></tr></thead><tbody>
+     {g.items.map(x=><tr key={x.id}><td>{x.tag}</td><td>{x.sku||"—"}<small>{x.description}</small></td><td>{x.qty??"TBC"} {x.unit}</td><td>{x.currency}</td><td>{originalWithThb(x.unitCost,x.currency)}</td><td>{x.countedInWorkingTotal&&Number.isFinite(x.extended)?originalWithThb(x.extended,x.currency):"Excluded / pending"}</td><td>{x.status}</td><td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+g.site.toLowerCase()+"."+x.id.toLowerCase()}/></td></tr>)}
     </tbody></table></div>
    </details>)}
    {!MR0002_WORKING_BOM_0553.sites.some(g=>site==="ALL"||g.site===site)&&<p className="p55-note">No MR-0002 source-backed items at {site}. Select All locations or ZWP20, ZWP21, ZWP22.</p>}
   </section>:["MR-0003","MR-0004"].includes(system)?<section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.legacy-evidence">
    <h4>{system} · {system==="MR-0003"?"Ex IP Telephone":"Marine RACON — MDS / ORGA"} — Source-backed Working Evidence</h4>
-   <p className="p55-note">MR-0003 shows MGW phone quotation evidence. MR-0004 uses MDS / ORGA SeaBeacon-2 evidence ONLY; ORGA package USD 75,000 is unallocated, NOT USD 75,000 per WP. Location tags are source-backed but site quantities and cost allocation require review.</p>
+   <p className="p55-note">MR-0003 shows MGW phone quotation evidence. MR-0004 uses MDS / ORGA SeaBeacon-2 evidence ONLY; ORGA package budgeting uses the MR location allocation; vendor quote quantity reconfirmation remains required. Location tags are source-backed but site quantities and cost allocation require review.</p>
    {BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system&&(site==="ALL"||r.site===site)&&r.evidence?.length).map(g=><details key={g.site} className="p55-panel">
     <summary style={{cursor:"pointer"}}><strong>{g.site}</strong> · {g.evidence.length} source-priced candidate(s) · <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")+"."+g.site.toLowerCase()}/></summary>
-    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Quote line / tag</th><th>Description</th><th>Budget Qty</th><th>Currency</th><th>Source unit rate</th><th>Provisional extension</th><th>Evidence status</th><th>Item ID</th></tr></thead><tbody>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Quote line / tag</th><th>Description</th><th>Budget Qty</th><th>Currency</th><th>Unit rate (THB first)</th><th>Provisional extension (THB first)</th><th>Evidence status</th><th>Item ID</th></tr></thead><tbody>
      {g.evidence.map((x,i)=><tr key={x.line+"-"+i}><td>{x.line}</td><td>{x.description}</td><td>{x.assumedQty??"UNALLOCATED"}</td><td>{x.currency}</td>
-      <td>{Number.isFinite(x.unit)?x.unit.toLocaleString("en-US",{minimumFractionDigits:2}):"NO PRICE"}</td>
-      <td>{Number.isFinite(x.extended)?x.extended.toLocaleString("en-US",{minimumFractionDigits:2}):"PENDING"}</td><td>{x.kind}<small>{x.source}</small></td>
+      <td>{originalWithThb(x.unit,x.currency)}</td>
+      <td>{originalWithThb(x.extended,x.currency)}</td><td>{x.kind}<small>{x.source}</small></td>
       <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")+"."+g.site.toLowerCase()+"."+String(x.line).toLowerCase()}/></td></tr>)}
     </tbody></table></div>
     <p className="p55-note">Outstanding: {(g.gaps||[]).join(" · ")}. No customer release.</p>
    </details>)}
    {!BOM_READ_MODEL_0553.rows.some(r=>r.mr===system&&(site==="ALL"||r.site===site)&&r.evidence?.length)&&<p className="p55-note">No source-backed vendor equipment package mapped to this Location. Select All locations to view the ZWP20–22 provisional evidence. Missing evidence is not zero cost.</p>}
   </section>:<>
+  <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
   <p className="p55-note"><strong>Source row completeness:</strong> {displayedCount} displayed / {sourceCount} registered MTO item tags. {vendor!=="ALL"?"Vendor filter hides some source rows; select All vendors for the full BOM.":"All source rows remain visible, including items lacking price."} Source item coverage does not mean a complete physical SKU take-off.</p>
   <div className="p55-source-facts">
    <div><span>Locations with source data</span><strong>{groups.filter(g=>g.items.length).length}</strong></div>
