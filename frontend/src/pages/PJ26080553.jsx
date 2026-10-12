@@ -52,7 +52,10 @@ export function PJ26080553() {
   {id:"bid.architecture",name:"Architecture / Module Registry",tab:"architecture",keywords:"structure architecture"},
   {id:"bid.systems",name:"All MR Systems",tab:"systems",keywords:"mr0001 mr0002 mr0003 mr0004 system"},
   {id:"bid.engineering",name:"Engineering / First Principles",tab:"engineering",keywords:"calculation mr engineering"},
+  {id:"bid.engineering.mr0001",name:"MR-0001 SCADA / RF Engineering",tab:"engineering",keywords:"radio link calculation"},
   {id:"bid.engineering.mr0002",name:"MR-0002 RFI LNA / Physical BOM",tab:"engineering",keywords:"rfi trunk radio"},
+  {id:"bid.systems.mr0003",name:"MR-0003 IP Phone",tab:"systems",keywords:"phone telephony"},
+  {id:"bid.systems.mr0004",name:"MR-0004 Marine RACON",tab:"systems",keywords:"navigation beacon racon"},
   {id:"bid.documents",name:"Vendor Documents / Product Register",tab:"documents",keywords:"vendor supplier quote"},
   {id:"bid.vendor.products.supplier.quote-lines",name:"Vendor Products / Supplier Quote Lines",tab:"documents",keywords:"supplier mgw rfi cost"},
   {id:"bid.budget",name:"Budget Workspace",tab:"budget",keywords:"working costing"},
@@ -67,7 +70,8 @@ export function PJ26080553() {
   {id:"bid.schematic",name:"SCADA / Telecom Schematic",tab:"schematic",keywords:"radio"}
  ];
  const searchMatches=moduleQuery.trim()?mainModuleIndex.filter(m=>(m.id+" "+m.name+" "+m.keywords).toLowerCase().includes(moduleQuery.trim().toLowerCase())):mainModuleIndex;
- const jumpModule=m=>{setLifecycleStage("L3");setL3Area("B");setWorkspaceTab(m.tab);setModuleQuery(m.id);};
+ const jumpModule=m=>{setLifecycleStage("L3");setL3Area("B");setWorkspaceTab(m.tab);setModuleQuery(m.id);setNavTarget(m.id);};
+ const [navTarget,setNavTarget]=useState(null);
  const [opened,setOpened]=useState(null);
  const [workspaceTab,setWorkspaceTab]=useState("overview");
  const [lifecycleStage,setLifecycleStage]=useState("L3");
@@ -129,7 +133,7 @@ export function PJ26080553() {
    {tab==="systems"&&<><SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Four 0553 MR systems; project-specific engineering and cost evidence."/><DocumentReferenceControl0553/></>}
    {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/><MR0002LNACalculation/><MR0002PhysicalBom/></SharedEngineeringView>}
    {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
-   {tab==="budget"&&<CommercialWorkspace0553 focusedLocation={focusedBomLocation}/>}
+   {tab==="budget"&&<CommercialWorkspace0553 key={navTarget||"budget"} focusedLocation={focusedBomLocation} initialMode={navTarget?.startsWith("bid.budget.summary.workbook")?"budgetary":"working"}/>}
    {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
    {tab==="documents"&&<div className="p55-stack"><Section title="Vendor / OEM Source Index"><Table headers={["MR","Supplier","Source type","Link","Review status"]} rows={VENDOR_0553_SOURCES.map(v=>[v.mr,v.supplier,v.type,<a key={v.id} href={v.url} target="_blank" rel="noreferrer">{v.document}</a>,<Badge key={v.id}>{v.status}</Badge>])}/></Section><Section title="Evidence classification"><Table headers={["Evidence","Revision","State"]} rows={PROJECT_0553_EVIDENCE.map(e=>[e.title,e.revision,<Badge key={e.id}>{e.state}</Badge>])}/></Section><VendorProductCatalog0553/></div>}
 
