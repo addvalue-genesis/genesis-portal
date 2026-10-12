@@ -3,7 +3,6 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {MR0001_MODULE_CROSSMAP_0553} from "./data/mr0001ModuleCrossmap0553";
 import {selectMR0001TagCostRows0553,summarizeMR0001TagCost0553} from "./data/mr0001TagCostLedger0553";
 import {deriveSevenLocationCostLedger0553} from "./data/sevenLocationCostCalculations0553";
-import {deriveMR0001EightFunctionCoverage0553} from "./data/mr0001EightFunctionCoverage0553";
 const fmt=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"PENDING";
 export function LocationBomDetail0553({site,fx}){
  const [expanded,setExpanded]=useState({});
@@ -30,15 +29,6 @@ export function LocationBomDetail0553({site,fx}){
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix}/> · MTO Rev04 → Engineering Tag → Site Function / Quantity → Vendor evidence → Working Cost. Same ledger rules as ZWP20; NO blind copying of ZWP20 radio configuration or prices.</p>
   <p><strong>{site} Working Priced Subtotal: {Number.isFinite(totalTHB)?"THB "+fmt(totalTHB):"FX REQUIRED"}</strong>
    <small>Original USD {fmt(ledger.subtotals.USD)} + THB {fmt(ledger.subtotals.THB)} · {ledger.costedRows}/{ledger.totalRows} tagged rows priced · {ledger.unresolvedRows.length} unresolved · FX {fx?.thbPerUsd??"NOT SET"} THB/USD</small></p>
-  <h4>MR-0001 — 8 Functional BOM Groups (ZWP20 Standard)</h4>
-  <p className="p55-note">ทุกแท่นมี 8 Function Groups เหมือนกัน แต่ Equipment Tags / MTO Row ต้องเป็นของแต่ละแท่นจริง หาก MTO ไม่มี Tag จะระบุขาด/Reuse/By Others ไม่สร้าง Item หรือราคาเทียม</p>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-   <thead><tr><th>No.</th><th>Function / Module</th><th>Actual MTO Tag / Copy ID</th><th>Cost Coverage</th><th>Engineering Status</th></tr></thead><tbody>
-   {deriveMR0001EightFunctionCoverage0553(site).map(g=><tr key={g.id}>
-    <td>{g.ordinal}</td><td><strong>{g.label}</strong><small>{g.id}</small></td>
-    <td>{g.rows.length?g.rows.map(r=><div key={r.row+"-"+r.tag}>{r.tag} · Row {r.row} <ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix+"."+String(r.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+r.row}/></div>):"NO MATCHING MTO TAG"}</td>
-    <td>{g.costCompleteness}</td><td>{g.state}</td></tr>)}
-   </tbody></table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>MTO / Module</th><th>Engineering Quantity / Basis</th><th>Budgetary Selected Product / Vendor</th><th>Unit Cost (THB)</th><th>Extended Cost (THB)</th><th>Assumptions / Status</th></tr></thead><tbody>
    {rows.map(v=><React.Fragment key={v.row+"-"+v.tag}>
@@ -51,7 +41,7 @@ export function LocationBomDetail0553({site,fx}){
      <td>{v.status}<small>{v.source||"MTO Rev04"}</small>{(v.assumptions||[]).map((x,i)=><small key={i}>{x}</small>)}</td>
     </tr>
     {expanded[v.tag]&&<tr><td colSpan={6}><div className="p55-panel">
-     <strong>{v.tag} — Evidence / Derivation</strong>
+     <strong>{v.tag} · Row {v.row} — Engineering Derivation / Vendor Breakdown</strong><p><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row+".derivation"}/></p>
      <p className="p55-note">Quantity owner: MR/MTO · Cost owner: {v.source} · {v.status} · Selected vendor cost is not customer selling price.</p>
      {v.tag==="MR-502-001"&&site==="ZWP21"&&<p className="p55-note"><strong>Functional mapping from ZWP20 reference:</strong> ZWP20 MR-502-001 Row 4 (PTMP remote) → ZWP21 MR-502-001 Row 13 (PTP peer). Matching child functions: Radio hardware, RF filter, throughput/capacity entitlement and RF mounting. Different RPT role / quote group; no automatic SKU or region entitlement transfer. Separate power/IDU and surge owners must remain separate.</p>}
      {v.tag==="MR-502-001"&&site==="ZWP21"&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
@@ -62,6 +52,7 @@ export function LocationBomDetail0553({site,fx}){
       <thead><tr><th>Engineering Function / Quote Line</th><th>Required Qty / Basis</th><th>Selected Budgetary SKU</th><th>Original Rate</th><th>Extended (THB)</th><th>Evidence / Owner / Status</th></tr></thead><tbody>
        {(v.detail||v.components||[]).map((c,i)=><tr key={c.functionId||i}><td>{c.functionId}</td><td>{c.requiredQty??c.qty??"PENDING"}<small>{c.quantityState||c.quantityBasis||"Engineering confirmation required"}</small></td><td>{c.budgetarySelectedSKU||c.sku||"NOT SELECTED"}</td><td>{c.currency||v.currency||"USD"} {fmt(c.budgetaryUnitPrice??c.unitPrice)}</td><td>{thb(c.budgetaryExtended??c.extended,c.currency||v.currency)}</td><td>{c.allocationOwner||v.tag+"."+v.row}<small>{c.budgetarySelectionState||c.status||c.state}</small></td></tr>)}
       </tbody></table></div>}
+     {(v.quotedRateCandidates||[]).length>0&&<div className="p55-table-wrap"><strong>Vendor alternative quotation evidence (not additive)</strong><table className="p55-table"><thead><tr><th>Quote line</th><th>SKU</th><th>Original Unit Rate</th><th>Selected</th></tr></thead><tbody>{v.quotedRateCandidates.map((c,i)=><tr key={i}><td>{c.quoteLine}</td><td>{c.sku}</td><td>{fmt(c.unitPriceTHB??c.sourceUnitTHB)}</td><td>{c.selected?"WORKING COMPARABLE":"ALTERNATIVE"}</td></tr>)}</tbody></table></div>}
      {(v.candidates||[]).map((c,i)=><p key={i} className="p55-note">{c.vendor||"Supplier"} · {c.sku} · {c.originalCurrency} {fmt(c.originalUnitPrice)} · candidate only, NOT additional booked cost</p>)}
     </div></td></tr>}
    </React.Fragment>)}
