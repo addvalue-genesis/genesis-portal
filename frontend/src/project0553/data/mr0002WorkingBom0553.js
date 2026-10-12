@@ -6,9 +6,8 @@ import {RFI_LNA_PRICE_DECISION_0553} from "./rfiLnaPriceDecision0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {deriveDtrsRfiBudget0553} from "./dtrsRfiBudgetCalculation0553";
 const p=RFI_LNA_PRICE_DECISION_0553;
-const round=n=>Math.round(n*100)/100;
 const mgwLines=MGW_P26_058_0553.lines.filter(x=>x[0].startsWith("UHF-"));
-// MGW HYTERA quotation is retained ONLY as an unselected alternative; do not book as chosen RFI equipment.
+// MGW UHF-2 Yagi and UHF-3 Omni are selected; HYTERA BDA UHF-1 is not selected. UHF-4 remains pending scope overlap.
 const budgetBulk=deriveDtrsRfiBudget0553();
 const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
  .filter(w=>w.equipment.some(x=>x.system==="DTRS_TRUNK_RADIO"))
@@ -19,8 +18,9 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    id:site+"-"+id,site,mr:"MR-0002",tag:mappings[id],quoteLine:id,sku,description,
    qty:1,unit:"set",currency:"USD",unitCost:unitPrice,extended:unitPrice,
    source:"MGW-P26-058",sourceQuoteQty:quotedQty,
-   status:"UNSELECTED_MGW_HYTERA_ALTERNATIVE_NOT_RFI",owner:"VENDOR_EVIDENCE_ONLY",
-   countedInWorkingTotal:false
+   status:["UHF-2","UHF-3"].includes(id)?"MANAGEMENT_SELECTED_MGW_ANTENNA_PROVISIONAL_SITE_QTY":"UNSELECTED_OR_SCOPE_REVIEW",
+   owner:["UHF-2","UHF-3"].includes(id)?"MGW_SELECTED_ANTENNA":"VENDOR_EVIDENCE_ONLY",
+   countedInWorkingTotal:["UHF-2","UHF-3"].includes(id)
   }));
   const lna={id:site+"-RFI-LNA",site,mr:"MR-0002",tag:"TCAB-508-001/RFI-LNA",sku:p.model,
    description:p.product,qty:null,unit:"unit",currency:p.currency,unitCost:p.unitBudgetAllowance,
@@ -37,9 +37,9 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    countedInWorkingTotal:false
   }));
   return {site,source:Z1F_TEL_LAYOUT_INDEX_0553.source,siteTags:[...siteTags],
-   items:[lna,...fieldBulk,...equipment],quoteAllocation:"RFI_SELECTED_MGW_ALTERNATIVES_NOT_COSTED",
-   controlledTotalUSD:0,
-   scopeWarnings:["RFI is the selected MR-0002 manufacturer; HYTERA is not selected","All MGW UHF quote lines remain alternative evidence only and are excluded from working totals",
+   items:[lna,...fieldBulk,...equipment],quoteAllocation:"RFI_LNA_MGW_YAGI_OMNI_SELECTED",
+   controlledTotalUSD:equipment.filter(x=>x.countedInWorkingTotal).reduce((sum,x)=>sum+x.extended,0),
+   scopeWarnings:["RFI is the selected MR-0002 manufacturer; HYTERA is not selected","MGW UHF-2 Yagi and UHF-3 Omni selected; provisional 1 per ZWP20/ZWP21/ZWP22, reconcile site MTO","HYTERA UHF-1 BDA excluded; UHF-4 feeder kit awaiting overlap review",
     "Management LNA THB500000 rate has no approved site quantity",
     "Field bulk remains separate conditional non-additive scenario"]};
  });
@@ -47,5 +47,5 @@ export const MR0002_WORKING_BOM_0553=Object.freeze({
  id:"P553-MR0002-WORKING-BOM",mr:"MR-0002",sites:bySite,
  workingRateSource:p,quotation:MGW_P26_058_0553.id,
  quoteTotalUSD:MGW_P26_058_0553.quotedTotal,
- selectedManufacturer:"RFI",status:"RFI_SELECTED_MGW_HYTERA_EXCLUDED_NO_CUSTOMER_RELEASE"
+ selectedManufacturer:"RFI",status:"RFI_LNA_MGW_YAGI_OMNI_SELECTED_HYTERA_EXCLUDED_NO_CUSTOMER_RELEASE"
 });
