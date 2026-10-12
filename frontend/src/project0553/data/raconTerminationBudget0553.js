@@ -43,8 +43,8 @@ export function deriveRaconTerminationBudget0553(){
     procurementM:totalProcurementM,vendorIncludedM:includedM,extensionShortfallM:shortfallM,replacementFullRunM,additionalPurchaseM:additionalM,
     vendorIncludedBasis:provided?"ORGA_QUOTE_P4_INCLUSION_PROVISIONAL":"NO_QUOTED_VENDOR_CABLE",
     cableUseRule:provided&&shortfallM>0?"REPLACE_FULL_RUN_UNLESS_ENGINEERED_JOIN_APPROVED":"NO_JOIN_REQUIRED",
-    unitRateTHB:p.webBudgetRates[v.kind]?.thbPerM??null,extendedTHB:Number.isFinite(p.webBudgetRates[v.kind]?.thbPerM)?Math.round(additionalM*p.webBudgetRates[v.kind].thbPerM*100)/100:null,workingZeroDisplayTHB:0,
-    costOwner:"FIELD_RACON_BULK_NET_OF_VENDOR_INCLUSION",state:additionalM?(Number.isFinite(p.webBudgetRates[v.kind]?.thbPerM)?"WEB_BUDGET_RATE_EX_WORKS_NOT_LANDED":"ADDITIONAL_CABLE_RATE_PENDING"):"VENDOR_INCLUDED_ONLY"};
+    unitRateTHB:p.webBudgetRates?.[v.kind]?.thbPerM??null,extendedTHB:Number.isFinite(p.webBudgetRates?.[v.kind]?.thbPerM)?Math.round(additionalM*p.webBudgetRates[v.kind].thbPerM*100)/100:null,workingZeroDisplayTHB:0,
+    costOwner:"FIELD_RACON_BULK_NET_OF_VENDOR_INCLUSION",state:additionalM?(Number.isFinite(p.webBudgetRates?.[v.kind]?.thbPerM)?"WEB_BUDGET_RATE_EX_WORKS_NOT_LANDED":"ADDITIONAL_CABLE_RATE_PENDING"):"VENDOR_INCLUDED_ONLY"};
   });
   const types=[...new Set(lines.map(x=>x.kind))].map(kind=>({kind,
    distinctRuns:lines.filter(x=>x.kind===kind).reduce((n,x)=>n+x.circuits,0),
