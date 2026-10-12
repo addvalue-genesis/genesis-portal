@@ -4,6 +4,8 @@ import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {BULK_TAKEOFF_0553} from "./data/bulkTakeoff0553";
 import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
 import {deriveScadaBudgetEnvelope0553} from "./data/scadaBudgetEnvelope0553";
+import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
+import {MR0004_WORKING_BOM_0553} from "./data/mr0004WorkingBom0553";
 const SHEETS=[
  ["Scope of supply","A/B/C","A1–A5 equipment+bulk, B1–B14 services, C1/C2 options"],
  ["B10 CommSpares","B10","Erection, pre-commissioning, commissioning and start-up spare parts"],
@@ -24,15 +26,29 @@ export function ScopeSheetsDetail0553({fx=null}){
  const category=SHEETS.find(x=>x[0]===sheet);
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
  const details=REV08_BASELINE.detail[category[1]]||[];
+ const workingMR2USD=MR0002_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
+ const workingMR2THB=MR0002_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalTHB,0);
+ const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
+ // Working figures are live provisional cost evidence, not customer sell / released A1-A5.
+ // A1 currently has SCADA field bulk embedded in tag ledger; it cannot be split blindly into A5.
+ const workingA1=scadaEnvelope.locations.every(s=>Number.isFinite(s.baseBudgetTHB))
+    ?scadaEnvelope.locations.reduce((sum,s)=>sum+s.baseBudgetTHB,0):null;
+ const workingSummary={
+   A1:{amount:workingA1,source:"MR0001 Tag Cost Ledger + mapped base field bulk",status:"PARTIAL COST, NOT SELL; includes embedded SCADA bulk"},
+   A2:{amount:fx?.thbPerUsd>0?workingMR2THB+workingMR2USD*fx.thbPerUsd:null,source:"MR0002 canonical Working BOM",status:"PROVISIONAL EQUIPMENT+SELECTED BULK"},
+   A3:{amount:null,source:"MR0003 source evidence only",status:"NO VERIFIED CANONICAL PRICED TOTAL"},
+   A4:{amount:fx?.thbPerUsd>0?workingMR4USD*fx.thbPerUsd:null,source:"MR0004 ORGA canonical Working BOM",status:"PROVISIONAL 3-SITE SCENARIO"},
+   A5:{amount:null,source:"Cross-system physical bulk; SCADA bulk already partially included in A1",status:"NOT ALLOCATED — prevent A1/A5 double count"}
+ };
  return <section className="p55-panel">
   <div className="p55-eyebrow">6 ORIGINAL SHEETS <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
   <h3>Scope of Supply — Linked Internal Detail</h3>
   <p className="p55-note">Original uploaded workbook has 6 tabs, including unpriced template cells. Historical Rev08 amounts below are kept separate from original cells, current vendor cost and new bid selling price.</p>
   <div className="p55-filterbar"><label>Customer Workbook Sheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{SHEETS.map(v=><option value={v[0]} key={v[0]}>{v[0]}</option>)}</select></label></div>
   <p className="p55-note">{category[2]}</p>
-  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description / Historical Detail</th><th>Qty</th><th>Unit Price USD</th><th>Historical Amount USD</th><th>Source / Gate</th></tr></thead>
-  <tbody>{sheet==="Scope of supply"?summary.map(([id,desc,amount])=><tr key={id}><td>{id}</td><td>{desc}</td><td>1 LS (summary)</td><td></td><td className="is-number">{usd(amount)}</td><td>Historical Rev08; reconcile MR/DTS, scope, quantities and vendor terms</td></tr>):
-   details.map(([desc,qty,price],i)=><tr key={i}><td>{category[1]}-{i+1}</td><td>{desc}</td><td>{qty}</td><td className="is-number">{usd(price)}</td><td className="is-number">{usd(qty*price)}</td><td>Historical Rev08 detail, not a current supplier quotation</td></tr>)}
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description / Historical Detail</th><th>Qty</th><th>Unit Price USD</th><th>Historical Amount USD</th><th>Working Budgetary Cost THB</th><th>Source / Gate</th></tr></thead>
+  <tbody>{sheet==="Scope of supply"?summary.map(([id,desc,amount])=><tr key={id}><td>{id}</td><td>{desc}</td><td>1 LS (summary)</td><td></td><td className="is-number">{usd(amount)}</td><td className="is-number">{workingSummary[id]?cash(workingSummary[id].amount):"—"}</td><td>{workingSummary[id]?<>{workingSummary[id].status}<small>{workingSummary[id].source}</small></>:"Historical Rev08 only; no linked current Working Cost"}</td></tr>):
+   details.map(([desc,qty,price],i)=><tr key={i}><td>{category[1]}-{i+1}</td><td>{desc}</td><td>{qty}</td><td className="is-number">{usd(price)}</td><td className="is-number">{usd(qty*price)}</td><td>—</td><td>Historical Rev08 detail, not a current supplier quotation</td></tr>)}
   </tbody></table></div>
   {sheet==="Scope of supply"&&<section className="p55-panel" data-component-key="bid.budget.scope.scada-working">
    <h4>MR-0001 SCADA — Engineering BOM &amp; Bulk Budgetary Working Projection</h4>
