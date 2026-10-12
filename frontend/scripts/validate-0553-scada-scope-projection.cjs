@@ -1,0 +1,17 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
+const scope=read("ScopeSheetsDetail0553.jsx"),workspace=read("CommercialWorkspace.jsx");
+const budget=read("data/scadaBudgetEnvelope0553.js"),bulk=read("data/scadaBulkQuantityVerification0553.js");
+assert(scope.includes('data-component-key="bid.budget.scope.scada-working"'));
+assert(scope.includes("deriveScadaBudgetEnvelope0553({thbPerUsd:fx?.thbPerUsd})"));
+assert(scope.includes("deriveScadaBulkVerification0553()"));
+assert(workspace.includes("<ScopeSheetsDetail0553 fx={fx}/>"));
+assert(scope.includes("scadaEnvelope.locations.map"));
+assert(scope.includes("s.unpricedLedgerRows.length"));
+assert(scope.includes("s.unresolvedAccessoryFunctions.length"));
+assert(scope.includes("s.pricedConditionalFloorTHB"));
+assert(scope.includes("s.pricedEnvelopeTHB"));
+assert(budget.includes("bulkBookedUnverifiable?null:round"));
+assert(bulk.includes("budgetBucket:ACCESSORY_IDS.has"));
+assert(!scope.includes("window.localStorage.setItem"),"scope projection must not create independent cost state");
+console.log("PASS SCADA Scope projection linkage/FX/source ownership guards; run webpack build separately");
