@@ -38,15 +38,15 @@ export function SourceCoverage0553(){
   </div>
   <p className="p55-note"><strong>Visible view subtotal by original currency:</strong> {groupTotal(filtered)}. Never add currencies or quote-wide evidence into totals without allocation and approved FX.</p>
   {groups.map(g=><div key={g.key} className="p55-panel">
-   <h4><button type="button" className="p55-row-toggle" onClick={()=>toggle("group:"+g.key)}>{expanded["group:"+g.key]?"−":"+"}</button> {g.key} · {mode==="MR"?(ledger.systems.find(s=>s.id===g.key)?.name||""):"Location"} · {groupTotal(g.rows)}</h4>
+   <h4><button type="button" className="p55-row-toggle" onClick={()=>toggle("group:"+g.key)}>{expanded["group:"+g.key]?"−":"+"}</button> {g.key} · {mode==="MR"?(ledger.systems.find(s=>s.id===g.key)?.name||""):"Location"} · {groupTotal(g.rows)} <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+(mode==="MR"?"mr."+g.key.toLowerCase().replace("-",""):"location."+g.key.toLowerCase())}/></h4>
    {mode==="MR"&&ledger.systems.find(s=>s.id===g.key)?.rfqSource&&<p className="p55-note">RFQ MR: <a target="_blank" rel="noreferrer" href={RFQ_URL(ledger.systems.find(s=>s.id===g.key).rfqSource.driveId)}>{ledger.systems.find(s=>s.id===g.key).rfqSource.title} · {ledger.systems.find(s=>s.id===g.key).rfqSource.revision}</a></p>}
    {expanded["group:"+g.key]&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget"><thead><tr><th>+</th><th>MR</th><th>Location</th><th>Lines</th><th>Subtotal (original currency)</th><th>Coverage / source</th></tr></thead><tbody>
     {g.rows.map(r=>{const key="row:"+r.mr+":"+r.site;const lines=detail(r);return <React.Fragment key={key}>
      <tr><td><button type="button" className="p55-row-toggle" onClick={()=>toggle(key)}>{expanded[key]?"−":"+"}</button></td>
-      <td>{r.mr}</td><td>{r.site}</td><td>{lines.length}</td><td>{r.subtotals.map(s=><div key={s.currency}>{s.currency} {fmt(s.amount)}</div>)}</td>
+      <td>{r.mr} <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr."+r.mr.toLowerCase().replace("-","")}/></td><td>{r.site} <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+r.site.toLowerCase()+"."+r.mr.toLowerCase().replace("-","")}/></td><td>{lines.length}</td><td>{r.subtotals.map(s=><div key={s.currency}>{s.currency} {fmt(s.amount)}</div>)}</td>
       <td>{r.projectionSource}<small>{r.completeness}</small></td></tr>
      {expanded[key]&&<tr><td colSpan={6}><table className="p55-table p55-table--compact"><thead><tr><th>MTO row / Tag</th><th>Physical object / Description</th><th>Qty / Unit</th><th>Vendor / SKU</th><th>Unit Price</th><th>Extended</th><th>Trace / Decision</th></tr></thead><tbody>
-     {lines.map((x,i)=><tr key={x.id||i}><td>{x.row??x.sourceRow??"—"}<small>{x.tag||x.sourceTag||""}</small></td>
+     {lines.map((x,i)=><tr key={x.id||i}><td>{x.row??x.sourceRow??"—"}<small>{x.tag||x.sourceTag||""}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+r.site.toLowerCase()+"."+(x.tag||x.sourceTag||("row-"+(x.row??x.sourceRow??i))).toLowerCase().replace(/[^a-z0-9-]/g,"-")}/></td>
       <td>{x.description}</td><td>{x.sourceQty??x.sourceScopeQty??"UNKNOWN"} {x.sourceUnit||x.sourceScopeUnit||""}</td>
       <td>{x.vendor||"—"}<small>{x.sku||""}</small></td><td>{x.currency||"—"} {fmt(x.unitCost)}</td>
       <td>{x.currency||"—"} {fmt(x.extended)}</td><td>{x.basis||"Source unassigned"}<small>{x.status||""}</small><small>{(x.assumptions||[]).join(" · ")}</small></td></tr>)}
