@@ -1,5 +1,6 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {MR0002WorkingBom0553} from "./MR0002WorkingBom0553";
+import {getMR0001LocationCost0553} from "./data/mr0001LocationCostSummary0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
 import {BOM_READ_MODEL_0553} from "./data/bomReadModel0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
@@ -80,12 +81,12 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  };
  const originalMoney=(v,currency)=>Number.isFinite(v)?currency+" "+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
  const wpSummary=siteName=>{
-  if(siteName==="ZWP20")return {usd:zwp20Cost.subtotals.USD,thb:zwp20Cost.subtotals.THB,costed:zwp20Cost.pricedRows,total:zwp20Cost.totalRows,gaps:zwp20Cost.gaps.length};
-  const source=model.locations.find(v=>v.site===siteName)?.items||[];
-  const costed=source.filter(v=>Number.isFinite(v.indicativePackageCostTHB));
-  return {usd:0,thb:costed.reduce((n,v)=>n+v.indicativePackageCostTHB,0),costed:costed.length,total:source.length,gaps:source.length-costed.length};
+  const cost=getMR0001LocationCost0553(siteName);
+  return {usd:cost.allocatedUSD,thb:cost.allocatedTHB,costed:cost.costedRows,
+   total:cost.sourceCount,gaps:cost.remaining,scenarios:cost.additionalScenarios,basis:cost.selectedBasis};
  };
- const displaySiteTotal=siteName=>{const sum=wpSummary(siteName);
+ const displaySiteTotal=siteName=>{
+  const sum=wpSummary(siteName);
   if(!(fx?.thbPerUsd>0))return "FX REQUIRED · "+originalMoney(sum.usd,"USD")+" + "+originalMoney(sum.thb,"THB");
   const amount=activeCurrency==="THB"?sum.thb+sum.usd*fx.thbPerUsd:sum.usd+sum.thb/fx.thbPerUsd;
   return money(amount,activeCurrency);
@@ -233,7 +234,9 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()}/></td>
    <td className="is-number">{g.items.length}</td><td className="is-number">{g.items.filter(vendorCovered).length} / {g.items.length}</td>
    <td className="is-number">{g.rfDemand?.linkEndpointDemand??"—"}</td><td className="is-number">{g.rfDemand?.antennaReferenceDemand??"—"}</td>
-   <td>{g.items.some(x=>Number.isFinite(x.indicativePackageCostTHB))&&<small>Cisco scenario THB {g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0).toLocaleString("en-US")}</small>}{g.items.some(x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice)))&&<small>Next G USD source rates mapped</small>}{g.items.some(x=>x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice)))&&<small>Other vendor source rates mapped</small>}</td><td><strong>{displaySiteTotal(g.site)}</strong><small>{wpSummary(g.site).costed}/{wpSummary(g.site).total} MTO priced · {wpSummary(g.site).gaps} unresolved</small><small>{g.site==="ZWP20"?"USD "+zwp20Cost.subtotals.USD.toFixed(2)+" + THB "+zwp20Cost.subtotals.THB.toFixed(2):"Cisco provisional source only · remaining scope not yet priced"}</small></td></tr>
+   <td>{g.items.some(x=>Number.isFinite(x.indicativePackageCostTHB))&&<small>Cisco scenario THB {g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0).toLocaleString("en-US")}</small>}{g.items.some(x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice)))&&<small>Next G USD source rates mapped</small>}{g.items.some(x=>x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice)))&&<small>Other vendor source rates mapped</small>}</td><td><strong>{displaySiteTotal(g.site)}</strong><small>{wpSummary(g.site).costed}/{wpSummary(g.site).total} MTO priced · {wpSummary(g.site).gaps} unresolved</small><small>{"Basis: "+wpSummary(g.site).basis}
+    {(wpSummary(g.site).scenarios||[]).map(v=><small key={v.name}>Additional, NOT included in allocated cost: {v.name} · {v.currency} {v.amount.toLocaleString("en-US",{minimumFractionDigits:2})} · {v.status}</small>)}
+    <small>Incomplete equipment / A+B+C; unmapped source rows are not zero-cost approvals</small></small></td></tr>
    {siteExpanded(g.site)&&<tr><td colSpan={9}><div className="p55-table-wrap"><p className="p55-note"><strong>Site Scope:</strong> {g.siteClass?.note} · Equipment ownership: NEW / REUSE / BY OTHERS ต้องตรวจ BLD/MR ทีละรายการ ไม่สรุปจากประเภทแท่น</p>
     {g.site!=="ZWP20"&&<div className="p55-panel"><strong>{g.site} · System Bulk / รายการย่อยตามระบบ</strong><small>กด + ที่แต่ละระบบเพื่อดูรายละเอียด Qty, Unit Rate, Extended Cost และเจ้าของต้นทุน (ยังไม่ใช่ Released Cost)</small>
     {(wpSystemBulk.find(w=>w.wp===g.site)?.systems||[]).map(sys=><div key={sys.id}>
