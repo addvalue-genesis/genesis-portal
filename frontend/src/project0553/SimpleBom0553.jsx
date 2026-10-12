@@ -203,8 +203,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    </details>)}
    {!MR0002_WORKING_BOM_0553.sites.some(g=>site==="ALL"||g.site===site)&&<p className="p55-note">No MR-0002 source-backed items at {site}. Select All locations or ZWP20, ZWP21, ZWP22.</p>}
   </section>:["MR-0003","MR-0004"].includes(system)?<section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.legacy-evidence">
-   <h4>{system} · {system==="MR-0003"?"Ex IP Telephone":"Marine RACON"} — Source-backed Working Evidence</h4>
-   <p className="p55-note">Existing MGW quotation evidence is shown by location without making a second BOM. One package per ZWP20–22 is a reversible budgetary allocation, NOT a verified physical BOM, vendor selection or completed A+B+C cost.</p>
+   <h4>{system} · {system==="MR-0003"?"Ex IP Telephone":"Marine RACON — MDS / ORGA"} — Source-backed Working Evidence</h4>
+   <p className="p55-note">MR-0003 shows MGW phone quotation evidence. MR-0004 uses MDS / ORGA SeaBeacon-2 evidence ONLY; ORGA package USD 75,000 is unallocated, NOT USD 75,000 per WP. Location tags are source-backed but site quantities and cost allocation require review.</p>
    {BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system&&(site==="ALL"||r.site===site)&&r.evidence?.length).map(g=><details key={g.site} className="p55-panel">
     <summary style={{cursor:"pointer"}}><strong>{g.site}</strong> · {g.evidence.length} source-priced candidate(s) · <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")+"."+g.site.toLowerCase()}/></summary>
     <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Quote line / tag</th><th>Description</th><th>Budget Qty</th><th>Currency</th><th>Source unit rate</th><th>Provisional extension</th><th>Evidence status</th><th>Item ID</th></tr></thead><tbody>
