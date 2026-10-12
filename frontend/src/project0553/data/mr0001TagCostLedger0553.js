@@ -3,7 +3,11 @@
 import {ZWP8_ROW43_COST_TRACE} from "./zwp8Row43CostTrace";
 import {deriveZWP20SiteCost0553} from "./zwp20SiteCost0553";
 import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
+import {SCADA_LINKS_0553} from "./scadaLinkEvidence";
+import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
 const round=n=>Math.round(n*100)/100;
+const quoteLines=new Map(NEXTG.lines.map(x=>[x.code,x]));
+const costFunctions=(codes)=>codes.map(code=>quoteLines.get(code)).filter(Boolean).map(q=>({functionId:q.code,sku:q.partNumber,qty:1,unitPrice:q.unitPrice,currency:"USD",extended:Number.isFinite(q.unitPrice)?q.unitPrice:null,source:NEXTG.quoteNumber,status:q.pricingState}));
 const zwp8=ZWP8_ROW43_COST_TRACE;
 const scenario=zwp8.referenceScenarios.find(x=>x.id===zwp8.preferredScenarioId);
 const radioTags=["MR-502-003","MR-502-004"];
@@ -35,6 +39,38 @@ export function selectMR0001TagCostRows0553(site){
  return original.map(item=>{
   const selected=byKey.get(item.sourceRow+"|"+item.sourceTag);
   if(selected)return selected;
+  // ZWP21 has one source-evidenced PTP peer to ZWP11 in RPT-0001.
+  // Group C (remote terminal) is a reversible management working configuration,
+  // NOT an OEM-accepted PTP solution. Cost functions are owned by distinct MTO tags.
+  const ptp=site==="ZWP21"&&SCADA_LINKS_0553.some(l=>l.mode==="PTP"&&l.from==="ZWP11"&&l.to==="ZWP21");
+  const oneSet=item.sourceScopeQty===1;
+  let functions=[];
+  let workingStatus=null;
+  if(ptp&&oneSet&&item.sourceTag==="MR-502-001"){
+   functions=costFunctions(["C-1","C-2","C-3","C-5"]);
+   workingStatus="PTP_PEER_GROUP_C_PROVISIONAL_RADIO_FUNCTIONS__OEM_TO_CONFIRM";
+  }else if(ptp&&oneSet&&item.sourceTag==="MR-502-001A"){
+   functions=costFunctions(["C-6","C-7"]);
+   workingStatus="PTP_INDOOR_POWER_INTERFACE_ONLY__IDU_FUNCTION_OPEN";
+  }else if(ptp&&oneSet&&/^ANT-502-/.test(item.sourceTag)){
+   functions=costFunctions(["C-11"]);
+   workingStatus="PTP_3FT_ANTENNA_RPT_REFERENCE__OEM_TO_CONFIRM";
+  }else if(ptp&&oneSet&&/^SA-502-/.test(item.sourceTag)){
+   functions=costFunctions(["C-8"]);
+   workingStatus="ETHERNET_SURGE_CANDIDATE_INTERFACE__VERIFY_EX";
+  }
+  const pricedFunctions=functions.length>0&&functions.every(x=>Number.isFinite(x.extended));
+  const functionCost=pricedFunctions?round(functions.reduce((n,x)=>n+x.extended,0)):null;
+  if(functionCost!==null)return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,
+   description:item.description,sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,
+   currency:"USD",unitCost:functionCost,extended:functionCost,
+   vendor:"Next G / Aviat",sku:functions.map(x=>x.sku).join(" + "),
+   status:workingStatus,source:"RPT-0001 C1 ZWP11↔ZWP21 PTP / "+NEXTG.quoteNumber,
+   quantityBasis:"MTO Rev04 1 Set and one PTP ZWP11–ZWP21 RPT endpoint; provisional one-per-function",
+   components:functions,assumptions:["Group C is a provisional budget cost composition, not selected/approved OEM design",
+    "Region license C-4 has no quote rate; not treated as zero or complete",
+    "The separately required IDU functional compliance, antenna gain and Ex interface must be checked"],
+   countedInWorkingTotal:true};
   const priced=Number.isFinite(item.indicativePackageCostTHB);
   return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,
    description:item.description,sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,
