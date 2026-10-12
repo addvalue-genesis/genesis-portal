@@ -162,6 +162,15 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <div ref={el=>{targetRefs.current.reconciliation=el;}} style={{scrollMarginTop:90}}><SiteSystemCostReconciliation0553/></div>
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
+  <div className="p55-panel" style={{padding:12,margin:"10px 0",border:"1px solid #b8ccd9"}} data-component-key="bid.budget.bom.system-location-mto">
+   <strong>BOM Working Table — Module ID</strong>
+   <div style={{display:"flex",flexWrap:"wrap",gap:14,alignItems:"center",marginTop:8}}>
+    <span>Table <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.system-location-mto"/></span>
+    <span>System <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")}/></span>
+    <span>Location <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+(site==="ALL"?"all-locations":site.toLowerCase())}/></span>
+   </div>
+   <p className="p55-note" style={{marginTop:7}}>Module ID ระบุหน้าจอ/ระบบ/Location และ Copy ได้ทันที; เมื่อกด + ที่ Location จะเห็น Equipment Tag และ Item ID แต่ละแถว</p>
+  </div>
   <div className="p55-filterbar p55-filterbar--simple">
    <label>System <select value={system} onChange={e=>setSystem(e.target.value)}>
     <option value="MR-0001">MR0001 · SCADA Radio</option>
@@ -182,7 +191,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   </div>
   <div className="p55-filterbar" style={{display:"flex",gap:8,margin:"12px 0"}}><button type="button" className="p553-detail-button" onClick={expandAll}>＋ Expand all</button><button type="button" className="p553-detail-button" onClick={collapseAll}>− Collapse all</button><span className="p55-note">เริ่มต้นแสดงภาพรวมทุกแท่น คลิก + เพื่อดู MTO, Calculation, Vendor และ Cost</span></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget" style={{width:"100%",borderCollapse:"collapse"}}>
-  <thead><tr><th>+/−</th><th>Location / ประเภทแท่น</th><th>Module ID</th><th>MTO items</th><th>Vendor-rate coverage</th><th>RPT links</th><th>Antenna refs</th><th>Vendor evidence / currency</th><th>Allocated location cost</th></tr></thead><tbody>
+  <thead><tr><th>+/−</th><th>Location / ประเภทแท่น</th><th>Module ID (Copy)</th><th>MTO items</th><th>Vendor-rate coverage</th><th>RPT links</th><th>Antenna refs</th><th>Vendor evidence / currency</th><th>Allocated location cost</th></tr></thead><tbody>
   {groups.filter(g=>g.items.length).map(g=><React.Fragment key={g.site}>
    <tr><td><button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={siteExpanded(g.site)}>{siteExpanded(g.site)?"−":"+"}</button></td>
    <td><strong>{g.site}</strong><small>{g.siteClass?.type||"UNCLASSIFIED"} · {g.siteClass?.thai||"ตรวจสอบ"}</small></td>
