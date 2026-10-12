@@ -3,6 +3,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
+import {PartAWorkingBomReadOnly0553} from "./PartAWorkingBomReadOnly0553";
 
 // Workbook-driven navigation, not an editable BOM and not a released quote.
 // The historical Rev08 amounts are source evidence ONLY; never promote them
@@ -103,7 +104,7 @@ export function BudgetaryWorkbookPreview0553(){
        </td>;
       })}
       <td>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/>}</td>
-     </tr></React.Fragment>;
+     </tr>{sheet==="Scope of supply"&&rowNum===7&&<tr key="part-a-bom"><td colSpan={layout.columns+2}><PartAWorkingBomReadOnly0553/></td></tr>}</React.Fragment>;
     })}</tbody>
    </table></div>
    <p className="p55-note">Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
