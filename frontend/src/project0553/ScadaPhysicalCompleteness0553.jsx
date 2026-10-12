@@ -7,6 +7,7 @@ import {selectMR0001TagCostRows0553} from "./data/mr0001TagCostLedger0553";
 import {ZWP20_BULK_SCOPE_AUDIT_0553} from "./data/zwp20BulkScopeAudit0553";
 import {MR0001_FUNCTIONS_0553} from "./data/mr0001EightFunctionCoverage0553";
 import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
+import {deriveScadaBudgetEnvelope0553,SCADA_CONTINGENCY_SCENARIO_PCT} from "./data/scadaBudgetEnvelope0553";
 
 const families=[
  ["RADIO","Radio / ODU / IDU",/^MR-/i,["RF filter","Power adaptor / DC mating","Throughput / region / NMS entitlements","Radio mount and RF jumpers"]],
@@ -20,13 +21,16 @@ const families=[
 const controlFor=site=>["ZPQ","ZWP8","ZWP11"].includes(site)?"NEW_REUSE_MODIFY_BY_OTHERS_REVIEW":"NEW_PACKAGE_COMPOSITION_REVIEW";
 const formatted=n=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:2}):"Not established";
 const knownBulk=ZWP20_BULK_SCOPE_AUDIT_0553.checks;
-export function ScadaPhysicalCompleteness0553({site="ALL"}){
+export function ScadaPhysicalCompleteness0553({site="ALL",fx=null}){
  const [showChildren,setShowChildren]=useState(true);
  const sites=WORKING_BOM_BY_LOCATION_0553.locations.filter(g=>site==="ALL"||g.site===site);
  const bulkBySite=deriveScadaBulkVerification0553();
+ const envelope=deriveScadaBudgetEnvelope0553({thbPerUsd:fx?.thbPerUsd});
+ const money=n=>Number.isFinite(n)?"THB "+formatted(n):"FX / pricing evidence required";
  return <details className="p55-panel" data-component-key="bid.budget.bom.scada-physical-completeness">
   <summary style={{cursor:"pointer",fontWeight:700,padding:10}}>＋ / − SCADA SI Equipment &amp; Bulk Completeness — 7 locations (verification, not extra cost)</summary>
   <p className="p55-note">Customer MTO tags are preserved. Child functions display whether a vendor package must include them, not an instruction to purchase twice. Derived quantities require verified physical interfaces, routes, supplier inclusions and Ex/technical constraints. Existing cost ledger remains the sole price owner.</p>
+  <p className="p55-note"><strong>Approved Management Scenario:</strong> Brownfield = full new replacement; all accessories reserved independently in Conditional Allowance; Ethernet = 60m + 15% per derived run; comparable rates only; Base + Conditional + separate 10% illustrative contingency. Missing rates remain uncovered exposure, not zero. 10% is an editable scenario assumption in code, not management-approved percentage.</p>
   <label><input type="checkbox" checked={showChildren} onChange={e=>setShowChildren(e.target.checked)}/> Show vendor-package child functions and interface obligations</label>
   {sites.map(g=>{
    const ledger=selectMR0001TagCostRows0553(g.site);
@@ -34,6 +38,7 @@ export function ScadaPhysicalCompleteness0553({site="ALL"}){
    const priced=ledger.filter(x=>x.countedInWorkingTotal).length;
    return <details key={g.site} className="p55-panel">
     <summary><strong>{g.site}</strong> — {g.items.length} MTO tag records · {priced}/{ledger.length} working priced tag rows · {controls.filter(x=>x.present).length}/8 functional tag categories present</summary>
+    {(()=>{const e=envelope.locations.find(x=>x.site===g.site);return <p className="p55-note"><strong>Management Budgetary Envelope:</strong> Base {money(e.baseBudgetTHB)} + Conditional {money(e.conditionalAllowanceTHB)} + Contingency ({e.contingencyPct}% scenario) {money(e.contingencyTHB)} = <strong>{money(e.pricedEnvelopeTHB)} (PRICED FLOOR ONLY)</strong>. Original THB {formatted(e.baseSourceTHB)} / USD {formatted(e.baseSourceUSD)}. Accessory priced coverage {e.accessoryCoverage}; unresolved: {e.unresolvedAccessoryFunctions.join(", ")||"none in priced subset"}. {e.replacementBasis}. {e.warning}</p>})()}
     <p className="p55-note">Ownership: {controlFor(g.site)}. Tag coverage and price coverage do not certify installed quantity, Ex suitability, RF performance or completeness.</p>
     <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Physical family / Source tags</th><th>Child components / bulk obligations</th><th>Quantity derivation</th><th>Procurement &amp; cost boundary</th><th>SI verification</th></tr></thead><tbody>
       {families.map(([key,label,test,children])=>{
@@ -55,6 +60,7 @@ export function ScadaPhysicalCompleteness0553({site="ALL"}){
     <p className="p55-note">Checks before completeness: radio topology and licences; exact antenna count and RF path; independent ODU-to-indoor Ethernet runs; DC/patching; external earth; Ex gland sizing/entry count; vendor-supplied bracket, jumpers and panel internals; test/termination interface. No additional amount is added here.</p>
    </details>;
   })}
+  {site==="ALL"&&<p className="p55-note"><strong>Project total (partial priced floor):</strong> Base {money(envelope.totals.baseBudgetTHB)} + Conditional {money(envelope.totals.conditionalAllowanceTHB)} + {SCADA_CONTINGENCY_SCENARIO_PCT}% scenario contingency {money(envelope.totals.contingencyTHB)} = {money(envelope.totals.pricedEnvelopeTHB)}. NOT a full SCADA procurement/selling price; unresolved accessories, services and spare exposure remains.</p>}
   {site==="ALL"&&<details className="p55-panel"><summary>Bulk functional checks (ZWP20 reference methodology, not copied as quantities across WPs)</summary>
     <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Function</th><th>Reference / Budget quantity</th><th>Cost treatment</th><th>Required independent proof</th></tr></thead><tbody>
      {knownBulk.map(x=><tr key={x.id}><td>{x.item}</td><td>{x.qty===null?"Derived from interface/route":formatted(x.qty)+" "+x.unit}</td><td>{x.pricing} · {x.owner}</td><td>{x.basis}</td></tr>)}
