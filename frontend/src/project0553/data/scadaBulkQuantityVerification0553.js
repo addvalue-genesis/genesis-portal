@@ -28,18 +28,18 @@ export function deriveScadaBulkVerification0553(){
   const {qty:odu}=radioDemand,{qty:antenna}=antennaDemand,{qty:panel}=panelDemand;
   const unresolvedQuantityTags=[...radioDemand.unresolvedTags,...antennaDemand.unresolvedTags,...panelDemand.unresolvedTags];
   // One assumed routed Ethernet run per ODU is a budgetary driver, not a verified cable schedule.
-  const runCount=unresolvedQuantityTags.length?null:odu;
+  const runCount=radioDemand.unresolvedTags.length?null:odu;
   const routeBaseM=60,procurementPct=15;
   const rows=controls.map(b=>{
    const rates=candidateRates[b.id];
    const quantities={
     ODU_CAT6A:runCount!==null&&runCount>0?Math.ceil(runCount*routeBaseM*(1+procurementPct/100)):null,
-    PANEL_M20:panel||null,
-    ODU_NPT:odu||null,ODU_RJ45:odu||null,
-    PANEL_RJ45:panel||null,RF_JUMPER:antenna||null,
-    ANT_MOUNT:antenna||null,ODU_MOUNT:odu||null,
-    RF_SURGE:null,EARTH:odu+antenna+panel||null,
-    SUPPORT:null,GLAND_PLUG:null,POWER:panel||null,
+    PANEL_M20:panelDemand.unresolvedTags.length?null:(panel||null),
+    ODU_NPT:radioDemand.unresolvedTags.length?null:(odu||null),ODU_RJ45:radioDemand.unresolvedTags.length?null:(odu||null),
+    PANEL_RJ45:panelDemand.unresolvedTags.length?null:(panel||null),RF_JUMPER:antennaDemand.unresolvedTags.length?null:(antenna||null),
+    ANT_MOUNT:antennaDemand.unresolvedTags.length?null:(antenna||null),ODU_MOUNT:radioDemand.unresolvedTags.length?null:(odu||null),
+    RF_SURGE:null,EARTH:unresolvedQuantityTags.length?null:(odu+antenna+panel||null),
+    SUPPORT:null,GLAND_PLUG:null,POWER:panelDemand.unresolvedTags.length?null:(panel||null),
     LABEL:null,CABLE_TEST:runCount||null,START_SPARES:null
    };
    const qty=quantities[b.id]??null;
