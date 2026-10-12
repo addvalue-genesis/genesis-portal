@@ -15,7 +15,7 @@ export function BudgetaryWorkbookPreview0553(){
  const [showHistorical,setShowHistorical]=useState(true);
  const [showEmptyRows,setShowEmptyRows]=useState(false);
  const [collapsed,setCollapsed]=useState({});
- const sectionForRow=(n)=>sheet==="Scope of supply"?(n<=5?null:n<=22?"PART_A":n<=39?"PART_B":"PART_C"):(n>=6&&n<=18?"ITEMS":null);
+ const sectionForRow=(n)=>sheet==="Scope of supply"?(n<=5?null:n<=22?"PART_A":n<=39?"PART_B":"PART_C"):(layout.sections.items.start<=n&&n<=layout.sections.items.end?"ITEMS":null);
  const labels=sheet==="Scope of supply"?{PART_A:"Part A — Basic Equipment",PART_B:"Part B — Services / Spares",PART_C:"Part C — Options"}:{ITEMS:"Detailed item schedule / รายการย่อย"};
  const toggleSection=(key)=>setCollapsed(v=>({...v,[sheet+":"+key]:!v[sheet+":"+key]}));
  const [currency,setCurrency]=useState("USD");
@@ -42,6 +42,7 @@ export function BudgetaryWorkbookPreview0553(){
    <p className="p55-note"><strong>Currency: {currency}</strong> · {currency==="USD"?"Historical source values in original USD; no conversion.":fxReady?"Indicative converted display only, using user-entered "+rate+" "+currency+"/USD on "+fxDate+" · Source: "+fxSource+". Not a verified or approved customer rate.":"Conversion unavailable: enter rate, date and source. USD source amounts are retained unchanged; no implied FX."}</p>
    <label><input type="checkbox" checked={showHistorical} onChange={e=>setShowHistorical(e.target.checked)}/> Show historical Rev08 price comparison (not current bid)</label>
    <label><input type="checkbox" checked={showEmptyRows} onChange={e=>setShowEmptyRows(e.target.checked)}/> Show empty template rows (original Excel layout)</label>
+   <p className="p55-note"><strong>Sheet-specific layout:</strong> {layout.leadTime?"Lead time (ARO) column · ":""}{layout.sourceNotQuote?"Original Not quote cells · ":""}{layout.sections?.remark?"Original remark row "+layout.sections.remark.start:"No remark row in source"}</p>
    <p className="p55-note"><strong>Original worksheet cell layout:</strong> {layout.columns} columns × {layout.maxRow} rows. Blank cells are preserved; historically labelled cells are reference only. Current BOM-derived customer selling prices are not approved and remain blank.</p>
    <div className="p55-panel">
     <strong>{sheet}</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)}/>
