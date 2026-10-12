@@ -5,7 +5,7 @@ import {WORKING_BOM_BY_LOCATION_0553} from "./data/workingBomByLocation";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED";
 const formatKey=x=>String(x||"").toLowerCase().replace(/[^a-z0-9-]/g,"-");
 export function PartAWorkingBomReadOnly0553(){
- const [showInternalCost,setShowInternalCost]=useState(false);
+ const [showInternalCost,setShowInternalCost]=useState(true);
  const [selectedSite,setSelectedSite]=useState("ALL");
  const [open,setOpen]=useState({});
  const sites=[...new Set([...BOM_READ_MODEL_0553.sites,...WORKING_BOM_BY_LOCATION_0553.locations.map(l=>l.site)])].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
@@ -19,7 +19,7 @@ export function PartAWorkingBomReadOnly0553(){
    .filter(x=>!canonicalIds.has(String(x.sourceRow??"")+"|"+String(x.sourceTag??"")))
    .map(x=>({mr:"MR-0001",row:x.sourceRow,tag:x.sourceTag,description:x.description,
     qty:x.sourceScopeQty,unit:x.sourceScopeUnit,currency:Number.isFinite(x.indicativePackageCostTHB)?"THB":null,
-    unitCost:null,extended:x.indicativePackageCostTHB,status:x.workingPriceStatus||x.sourceState,
+    unitCost:Number.isFinite(x.indicativePackageCostTHB)&&Number.isFinite(x.sourceScopeQty)&&x.sourceScopeQty>0?x.indicativePackageCostTHB/x.sourceScopeQty:null,extended:x.indicativePackageCostTHB,status:x.workingPriceStatus||x.sourceState,
     source:"WORKING_MTO_SCOPE_PROVISIONAL",id:x.id}));
   const mrGaps=BOM_READ_MODEL_0553.systems.filter(s=>s.id!=="MR-0001").map(mr=>({
    mr:mr.id,name:mr.name,ready:BOM_READ_MODEL_0553.rows.some(r=>r.site===site&&r.mr===mr.id&&bomItems0553(r).length)
@@ -28,10 +28,10 @@ export function PartAWorkingBomReadOnly0553(){
  });
  return <div className="p55-panel" data-component-key="bid.budget.summary.workbook.scope-of-supply.part_a.bom-detail">
   <h4>Part A — All Locations · BOM Working Scope <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.summary.workbook.scope-of-supply.part_a.bom-detail"/></h4>
-  <p className="p55-note">Read-only from Working BOM. All indexed locations remain visible. Detailed cost rows take priority; other sites show source MTO working rows without inventing unit prices. This is INTERNAL REVIEW, not customer selling price or approved Excel mapping.</p>
+  <p className="p55-note">Read-only from Working BOM. All indexed locations remain visible. Detailed cost rows take priority; other sites show source MTO working rows without inventing unit prices. Working costs are visible by default only in this INTERNAL REVIEW. They are not customer selling prices or approved Excel mapping.</p>
   <div className="p55-filterbar">
    <label>Location <select value={selectedSite} onChange={e=>setSelectedSite(e.target.value)}><option value="ALL">ALL LOCATIONS ({sites.length})</option>{sites.map(s=><option key={s} value={s}>{s}</option>)}</select></label>
-   <label><input type="checkbox" checked={showInternalCost} onChange={e=>setShowInternalCost(e.target.checked)}/> Show confidential working cost</label>
+   <label><input type="checkbox" checked={showInternalCost} onChange={e=>setShowInternalCost(e.target.checked)}/> Show confidential working cost (internal only)</label>
   </div>
   {groups.map(group=><div className="p55-panel" key={group.site}>
    <h4><button type="button" className="p55-row-toggle" aria-expanded={open[group.site]!==false} onClick={()=>setOpen(o=>({...o,[group.site]:o[group.site]===false}))}>{open[group.site]===false?"+":"−"}</button> {group.site} · {group.items.length} MTO / detailed scope rows <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook.scope-of-supply.part_a."+formatKey(group.site)}/></h4>
