@@ -75,6 +75,8 @@ export function VendorProductCatalog0553(){
   </tr></tbody></table></div></div>
   <div className="p55-panel" style={{padding:14,marginBottom:12}}>
   <h3>Historical Procurement · CAT6A Patch Cord &amp; RF Interface</h3>
+  <p><strong>Selected internal Budgetary Price Reference — BISMON</strong> · CommScope 1933882-4 / web part NPC6ASZDB-BL0000 · Cat6A F/UTP shielded 4ft (1.22m), THB {RF_AND_PATCH_REFERENCE_0553.cat6PatchBismon.unitRateTHB}/pc as web-displayed price. <a href={RF_AND_PATCH_REFERENCE_0553.cat6PatchBismon.sourceUrl} target="_blank" rel="noreferrer">View vendor page</a>. Pricing VAT status requires reconfirmation. F/UTP 1.22m is not identical to the historical S/FTP exact 1m SKU; check acceptance before cost posting.</p>
+  <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.budgetary-reference.bismon-cat6a-4ft"/>
   <p><strong>CommScope LDF4RK-50A (1/2-inch RF Feeder)</strong> — Dolibarr cost THB {RF_AND_PATCH_REFERENCE_0553.rfFeederHistorical.dolibarrCostTHB}; weighted average THB {RF_AND_PATCH_REFERENCE_0553.rfFeederHistorical.weightedAverageTHB}; best buying THB {RF_AND_PATCH_REFERENCE_0553.rfFeederHistorical.bestBuyingTHB} (CSS Thai). Royaltec supplier record THB 631; purchase reference PO2402-0816. Unit of measure must be checked in ERP before applying a per-meter cost. Not selected Z1F RF cable yet.</p>
   <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.commscope-ldf4rk-50a"/>
   <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.rf-and-cat6a"/>
