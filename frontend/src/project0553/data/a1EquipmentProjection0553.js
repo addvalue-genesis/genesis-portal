@@ -32,7 +32,7 @@ export function deriveA1EquipmentCoverage0553(){
  items.push({site:"UNALLOCATED",mr:lna.mr,tag:lna.model,row:null,
   description:lna.product,qty:lna.quantity,unit:"set",currency:lna.currency,
   unitCost:lna.unitBudgetAllowance,extended:null,status:lna.status,
-  source:lna.decisionSource,temporaryZero:true});
+  source:lna.decisionSource,managementAllowance:true});
  const currencies=[...new Set(items.filter(x=>Number.isFinite(x.extended)&&x.currency).map(x=>x.currency))];
  const knownCost=currencies.map(currency=>({currency,amount:Math.round(items.filter(x=>x.currency===currency&&Number.isFinite(x.extended)).reduce((v,x)=>v+x.extended,0)*100)/100}));
  return {items,knownCost,siteCount:new Set(items.filter(x=>x.site!=="UNALLOCATED").map(x=>x.site)).size,
