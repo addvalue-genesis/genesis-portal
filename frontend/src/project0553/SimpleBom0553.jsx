@@ -158,7 +158,10 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WH</th><th>System</th><th>Cost Class</th><th>Phase</th><th>Quantity Driver</th><th>Cost State</th></tr></thead><tbody>
   {lifecycleLedger.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.b4b5c2.map(x=><tr key={x.id}><td>{w.wp}</td><td>{x.system}</td><td>{x.costClass}</td><td>{x.activity}</td><td>{x.driver}<small>{x.description}</small></td><td>{x.priceStatus}</td></tr>))}
   </tbody></table></div></details>
-  <div ref={el=>{targetRefs.current.coverage=el;}} style={{scrollMarginTop:90}}><SourceCoverage0553/></div>
+  <details ref={el=>{targetRefs.current.coverage=el;}} className="p55-panel" style={{scrollMarginTop:90}} data-component-key="bid.budget.bom.source-coverage">
+   <summary style={{cursor:"pointer",fontWeight:700,padding:10}}>＋ / − BOM Source Coverage — ตรวจความครบถ้วนของข้อมูลต้นทาง · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.source-coverage"/></summary>
+   <SourceCoverage0553/>
+  </details>
   <details ref={el=>{targetRefs.current.reconciliation=el;}} className="p55-panel" style={{scrollMarginTop:90}} data-component-key="bid.budget.bom.reconciliation">
    <summary style={{cursor:"pointer",fontWeight:700,padding:10}}>＋ / − Site / System Cost Reconciliation · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.reconciliation"/></summary>
    <SiteSystemCostReconciliation0553/>
