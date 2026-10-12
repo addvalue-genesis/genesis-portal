@@ -2,6 +2,7 @@
 // No blind quote-wide multiplication or conversion of candidate prices to approved costs.
 import {ZWP8_ROW43_COST_TRACE} from "./zwp8Row43CostTrace";
 import {deriveZWP20SiteCost0553} from "./zwp20SiteCost0553";
+import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
 const round=n=>Math.round(n*100)/100;
 const zwp8=ZWP8_ROW43_COST_TRACE;
 const scenario=zwp8.referenceScenarios.find(x=>x.id===zwp8.preferredScenarioId);
@@ -24,9 +25,34 @@ if(Number.isFinite(scenario?.partialEquipmentUSD)){
  const sum=round(zwp8Rows.filter(r=>r.countedInWorkingTotal).reduce((n,r)=>n+r.extended,0));
  if(sum!==round(scenario.partialEquipmentUSD))throw Error("ZWP8 MTO-row43 allocations do not reconcile to preferred source scenario");
 }
+// The same lineage applies to ALL seven sites. A row with source evidence but no
+// selected engineering configuration is NOT priced, regardless of quote candidates.
 export function selectMR0001TagCostRows0553(site){
- if(site==="ZWP20")return deriveZWP20SiteCost0553().rows;
- if(site==="ZWP8")return zwp8Rows;
- return [];
+ const original=WORKING_BOM_BY_LOCATION_0553.locations.find(x=>x.site===site)?.items||[];
+ if(site==="ZWP20")return deriveZWP20SiteCost0553().rows.map(x=>({...x,mr:"MR-0001",countedInWorkingTotal:Number.isFinite(x.extended)}));
+ const detailed=site==="ZWP8"?zwp8Rows:[];
+ const byKey=new Map(detailed.map(x=>[x.row+"|"+x.tag,x]));
+ return original.map(item=>{
+  const selected=byKey.get(item.sourceRow+"|"+item.sourceTag);
+  if(selected)return selected;
+  const priced=Number.isFinite(item.indicativePackageCostTHB);
+  return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,
+   description:item.description,sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,
+   currency:priced?"THB":null,unitCost:priced&&item.sourceScopeQty>0?round(item.indicativePackageCostTHB/item.sourceScopeQty):null,
+   extended:priced?round(item.indicativePackageCostTHB):null,
+   status:priced?"CISCO_PRELIMINARY_WORKING_BUNDLE":"ENGINEERING_SELECTION_OR_PRICE_MAPPING_REQUIRED",
+   source:priced?"VST-0048-RE1 / MTO Rev04":"MTO Rev04 / vendor candidates only",
+   candidates:item.vendorCandidates||[],countedInWorkingTotal:priced,
+   note:priced?"Cisco source quote is not OEM-accepted system BOM":"Selection must follow site-specific BLD/RPT/topology, not nearest vendor rate"};
+ });
+}
+export function summarizeMR0001TagCost0553(site){
+ const rows=selectMR0001TagCostRows0553(site);
+ const subtotals={USD:0,THB:0};
+ for(const x of rows)if(x.countedInWorkingTotal&&Number.isFinite(x.extended)&&x.currency in subtotals)
+  subtotals[x.currency]=round(subtotals[x.currency]+x.extended);
+ return {site,rows,subtotals,costedRows:rows.filter(x=>x.countedInWorkingTotal).length,
+  unresolvedRows:rows.filter(x=>!x.countedInWorkingTotal),
+  totalRows:rows.length,status:rows.some(x=>!x.countedInWorkingTotal)?"PARTIAL_ENGINEERING_COST_LEDGER":"BUDGETARY_PRICED_NOT_RELEASED"};
 }
 export const ZWP8_TAG_WORKING_LEDGER_0553=Object.freeze(zwp8Rows);
