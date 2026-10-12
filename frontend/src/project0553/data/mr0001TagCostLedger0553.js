@@ -6,6 +6,7 @@ import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
 import {SCADA_LINKS_0553} from "./scadaLinkEvidence";
 import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
+import {deriveMR0001MissingBudget0553} from "./mr0001BudgetFill0553";
 const round=n=>Math.round(n*100)/100;
 const quoteLines=new Map(NEXTG.lines.map(x=>[x.code,x]));
 const costFunctions=(codes)=>codes.map(code=>quoteLines.get(code)).filter(Boolean).map(q=>({functionId:q.code,sku:q.partNumber,qty:1,unitPrice:q.unitPrice,currency:"USD",extended:Number.isFinite(q.unitPrice)?q.unitPrice:null,source:NEXTG.quoteNumber,status:q.pricingState}));
@@ -194,6 +195,8 @@ export function selectMR0001TagCostRows0553(site){
     components:lines,
     assumptions:["ZWP20 methodology only; separate site routes and cable counts unverified","Remaining RF, glands and grounding functions outside this partial cost","Do not add separate SCADA bulk scenario again"]};
   }
+  const managementAllowance=deriveMR0001MissingBudget0553(item);
+  if(managementAllowance)return managementAllowance;
   // Brownfield reuse/tie-in: same engineering-detail contract, but the cost
   // owner cannot be NEW until MTO/BLD assigns equipment replacement explicitly.
   // Existing site Tags and their rate evidence are retained for budget comparison.
