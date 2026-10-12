@@ -10,9 +10,9 @@ const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigit
 export function BudgetaryWorkbookPreview0553(){
  const [sheet,setSheet]=useState(template.sheets[0].name);
  const [currency,setCurrency]=useState("USD");
- const [fx,setFx]=useState({THB:"",CNY:""});
- const [fxDate,setFxDate]=useState("");
- const [fxSource,setFxSource]=useState("");
+ const [fx,setFx]=useState({THB:"31.5",CNY:""});
+ const [fxDate,setFxDate]=useState("2026-10-12");
+ const [fxSource,setFxSource]=useState("MANAGEMENT WORKING BUDGET FX — NOT BOT VERIFIED");
  const rate=currency==="USD"?1:Number(fx[currency]);
  const fxReady=currency==="USD"||(fx[currency]!==""&&Number.isFinite(rate)&&rate>0&&fxDate.trim()&&fxSource.trim());
  const converted=n=>fxReady?money(n*rate):"—";
