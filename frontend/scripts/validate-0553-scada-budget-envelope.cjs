@@ -1,0 +1,12 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
+const m=read("data/scadaBudgetEnvelope0553.js"),q=read("data/scadaBulkQuantityVerification0553.js"),v=read("ScadaPhysicalCompleteness0553.jsx"),ui=read("SimpleBom0553.jsx");
+for(const k of ["baseSourceTHB","baseSourceUSD","conditionalAllowanceTHB","contingencyTHB","pricedEnvelopeTHB","unresolvedAccessoryFunctions","completeEnvelope:false","amountNotComplete:true"])assert(m.includes(k),k);
+assert(m.includes("allocatedBulkInSource?0"),"no duplicate existing source bulk");
+assert(m.includes("validFX||originalUSD===0"),"require FX for USD");
+assert(q.includes("BUDGET_AS_NEW_REPLACEMENT__NOT_APPROVED_PROCUREMENT"),"brownfield management direction");
+assert(q.includes("CONDITIONAL_ACCESSORY_ALLOWANCE"),"accessory bucket");
+assert(q.includes("60"),"parametric 60m driver");assert(q.includes("15"),"15 percent procurement allowance");
+assert(v.includes("deriveScadaBudgetEnvelope0553"),"render site and project envelope");
+assert(ui.includes("<ScadaPhysicalCompleteness0553 site={site} fx={fx}/>"),"pass existing FX");
+console.log("PASS static SCADA budget-envelope wiring; DOES NOT establish runtime build or full accessory pricing");
