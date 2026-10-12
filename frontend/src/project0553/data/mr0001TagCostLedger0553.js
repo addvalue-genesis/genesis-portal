@@ -66,6 +66,7 @@ export function selectMR0001TagCostRows0553(site){
    currency:"USD",unitCost:functionCost,extended:functionCost,
    vendor:"Next G / Aviat",sku:functions.map(x=>x.sku).join(" + "),
    status:workingStatus,source:"RPT-0001 C1 ZWP11↔ZWP21 PTP / "+NEXTG.quoteNumber,
+   detail:functions.map(c=>({...c,requiredQty:c.qty,budgetaryUnitPrice:c.unitPrice,budgetaryExtended:c.extended,budgetarySelectedSKU:c.sku,allocationOwner:item.sourceTag+"."+item.sourceRow,quantityState:"MTO_ONE_SET_PRELIMINARY",budgetarySelectionState:"PROVISIONAL_QUOTE_RATE"})),
    quantityBasis:"MTO Rev04 1 Set and one PTP ZWP11–ZWP21 RPT endpoint; provisional one-per-function",
    components:functions,assumptions:["Group C is a provisional budget cost composition, not selected/approved OEM design",
     "Region license C-4 has no quote rate; not treated as zero or complete",
