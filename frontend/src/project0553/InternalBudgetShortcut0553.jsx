@@ -50,7 +50,7 @@ export function InternalBudgetShortcut0553(){
    <div><span>Known Cisco working vendor cost (THB)</span><strong>{usd(BID_COST_SPINE_0553.knownPreliminaryCost.THB)}</strong></div>
   </div>}
   <p className="p55-note">Do not sum the Cisco vendor cost into Rev08: overlapping scope, different currency and quote validity require reconciliation. Optional C1/C2 excluded from base.</p>
-  <div className="p55-note">MR system budget reconciliation <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.summary"/></div>
+  <div className="p55-note">MR system budget reconciliation <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.internal.summary"/></div>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>＋/−</th><th>MR</th><th>System</th><th>Current reconciled budget ({currency})</th><th>Rev08 historical sell ({currency}) — comparison only</th><th>Engineering / cost reconciliation</th></tr></thead><tbody>
   {systems.map(([code,mr,name,note])=><React.Fragment key={mr}><tr><td><button type="button" className="p55-row-toggle" onClick={()=>toggleSystem(mr)} aria-expanded={openedSystems.has(mr)}>{openedSystems.has(mr)?"−":"+"}</button></td><td>{mr}</td><td>{name}</td><td className="is-number"></td><td className="is-number">{showHistorical?displayHistorical(historical(code)):""}</td><td>{note}</td></tr>
   {openedSystems.has(mr)&&<tr><td></td><td colSpan={5}><strong>{mr} — System composition / cost trace</strong>
