@@ -15,6 +15,8 @@ assert(central.includes("countedInWorkingTotal:[\"UHF-2\",\"UHF-3\"].includes(id
 assert(central.includes("priorBulk?.rows||[]"));
 assert(central.includes("INCLUDED_IN_MGW_UHF4__NOT_ADDITIVE"));
 assert(central.includes("controlledTotalTHB:"));
+for(const id of ["RF-SMA","LNA-POWER","LNA-ALARM","EX-SURGE","LNA-BOX"]) assert(central.includes(`"${id}":{qty:`));
+assert(central.includes("WEB_PRICE_ANALOG_SIZE_NOT_MATCHED"));
 assert(viewer.includes("MR0002_WORKING_BOM_0553")&&viewer.includes("rows:unifiedRows"));
 assert(editor.includes("<MR0002WorkingBom0553/>"));
 assert(a1.includes("item.countedInWorkingTotal===false?null:item.extended"));
