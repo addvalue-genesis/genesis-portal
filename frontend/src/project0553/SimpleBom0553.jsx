@@ -1,4 +1,5 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
+import {MR0002WorkingBom0553} from "./MR0002WorkingBom0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
 import {DTRS_RFI_BULK_0553} from "./data/dtrsRfiBulk0553";
@@ -80,7 +81,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
 
  return <section className="p55-panel">
   <div className="p55-eyebrow">ENGINEERING WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom"/></div>
-  <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3><div className="p55-filterbar" style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
+  <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
+  <MR0002WorkingBom0553/><div className="p55-filterbar" style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
  <label>Display currency <select aria-label="BOM display currency" value={activeCurrency} onChange={e=>setCurrencyOverride(e.target.value)}><option value="THB">THB — Thai Baht</option><option value="USD">USD — US Dollar</option></select></label>
  <small>FX: {fx?.thbPerUsd??"NOT SET"} THB/USD · {fx?.date||"No date"} · {fx?.source||"No source"} · Display conversion only; original quotation rates unchanged</small>
  </div>
