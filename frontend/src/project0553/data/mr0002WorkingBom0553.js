@@ -9,6 +9,17 @@ const p=RFI_LNA_PRICE_DECISION_0553;
 const mgwLines=MGW_P26_058_0553.lines.filter(x=>x[0].startsWith("UHF-"));
 // MGW UHF-2 Yagi, UHF-3 Omni and UHF-4 100m feeder/6 connectors are budget selections; UHF-1 BDA excluded.
 const budgetBulk=deriveDtrsRfiBudget0553();
+// Explicit, replaceable management planning allowances for accessory gaps, not OEM quotes.
+// RF SMA benchmark: DigiKey Thailand Crystek RG316 12in at THB 1,138.31/pc.
+// Ex enclosure benchmark: RS Thailand Rittal EX wall box THB 57,939.81
+// (size/certification NOT matched; only a risk-level proxy, not selected equipment).
+const accessoryAllowances={
+ "RF-SMA":{qty:2,unit:"pc",rate:1138.31,basis:"WEB_PRICE_ANALOG",source:"https://www.digikey.co.th/en/products/detail/crystek-corporation/CCSMA-MM-RG316DS-12/1867560"},
+ "LNA-POWER":{qty:1,unit:"lot",rate:3500,basis:"MANAGEMENT_PARAMETRIC_ALLOWANCE_UNVERIFIED",source:"RFI A2671 + DC field-cable interface; engineering lot assumption"},
+ "LNA-ALARM":{qty:1,unit:"lot",rate:3500,basis:"MANAGEMENT_PARAMETRIC_ALLOWANCE_UNVERIFIED",source:"RFI A2881 + alarm cable interface; engineering lot assumption"},
+ "EX-SURGE":{qty:1,unit:"lot",rate:25000,basis:"MANAGEMENT_PARAMETRIC_EX_CERTIFIED_PACKAGE_ALLOWANCE",source:"TCAB-508-002 Ex surge protection; model/certification not selected"},
+ "LNA-BOX":{qty:1,unit:"lot",rate:57939.81,basis:"WEB_PRICE_ANALOG_SIZE_NOT_MATCHED",source:"https://th.rs-online.com/web/p/wall-boxes/2289468"}
+};
 const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
  .filter(w=>w.equipment.some(x=>x.system==="DTRS_TRUNK_RADIO"))
  .map(w=>{
@@ -19,8 +30,8 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    qty:1,unit:"set",currency:"USD",unitCost:unitPrice,extended:unitPrice,
    source:"MGW-P26-058",sourceQuoteQty:quotedQty,
    status:["UHF-2","UHF-3","UHF-4"].includes(id)?"MANAGEMENT_SELECTED_MGW_RF_PACKAGE_PROVISIONAL_SITE_QTY":"UNSELECTED_OR_SCOPE_REVIEW",
-   owner:["UHF-2","UHF-3"].includes(id)?"MGW_SELECTED_RF_PACKAGE":"VENDOR_EVIDENCE_ONLY",
-   countedInWorkingTotal:["UHF-2","UHF-3"].includes(id)
+   owner:["UHF-2","UHF-3","UHF-4"].includes(id)?"MGW_SELECTED_RF_PACKAGE":"VENDOR_EVIDENCE_ONLY",
+   countedInWorkingTotal:["UHF-2","UHF-3","UHF-4"].includes(id)
   }));
   const lna={id:site+"-RFI-LNA",site,mr:"MR-0002",tag:"TCAB-508-001/RFI-LNA",sku:p.model,
    description:p.product,qty:siteTags.has("TCAB-508-001")?1:null,unit:"unit",currency:p.currency,unitCost:p.unitBudgetAllowance,
@@ -33,11 +44,13 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
   const overlapping=new Set(["RF-FEEDER","RF-CONNECTOR"]);
   const fieldBulk=(priorBulk?.rows||[]).map(b=>{
    const duplicate=overlapping.has(b.id);
-   const priceKnown=Number.isFinite(b.amount);
+   const allowance=accessoryAllowances[b.id];
+   const priceKnown=Number.isFinite(b.amount)||Boolean(allowance);
    return {id:site+"-BULK-"+b.id,site,mr:"MR-0002",tag:"BULK-"+b.id,
-    description:b.item,qty:b.qty,unit:b.unit,currency:"THB",unitCost:b.rate,
-    extended:b.amount??null,source:b.source,
-    status:duplicate?"INCLUDED_IN_MGW_UHF4__NOT_ADDITIVE":b.state,
+    description:b.item,qty:allowance?.qty??b.qty,unit:allowance?.unit??b.unit,currency:"THB",unitCost:allowance?.rate??b.rate,
+    extended:allowance?Math.round(allowance.qty*allowance.rate*100)/100:b.amount??null,source:allowance?.source??b.source,
+    priceBasis:allowance?.basis??"EXISTING_PRIOR_BULK_CALCULATION",
+    status:duplicate?"INCLUDED_IN_MGW_UHF4__NOT_ADDITIVE":allowance?"BUDGETARY_ALLOWANCE_SUBJECT_TO_INTERFACE_CONFIRMATION":b.state,
     owner:duplicate?"MGW_UHF4_INCLUDED":"FIELD_BULK_PREVIOUS_BUDGET",
     countedInWorkingTotal:!duplicate&&priceKnown,
     costGap:!duplicate&&!priceKnown?"ACCESSORY_ALLOWANCE_REQUIRES_BASIS":null};
@@ -49,7 +62,7 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    scopeWarnings:["RFI is the selected MR-0002 manufacturer; HYTERA is not selected","MGW UHF-2 Yagi and UHF-3 Omni selected; provisional 1 per ZWP20/ZWP21/ZWP22, reconcile site MTO","HYTERA UHF-1 BDA excluded; UHF-4 100m feeder + six connectors selected as one vendor kit",
     "One RFI LNA per tagged site is a budgetary MR C1 assumption, not procurement-approved",
     "Prior DTRS bulk reused; RF-FEEDER / RF-CONNECTOR excluded to prevent overlap with MGW UHF-4",
-    "Unpriced SMA/DC/alarm/Ex interface accessories require engineering-based allowances before final total"]};
+    "SMA, DC/alarm, surge and enclosure have explicit unverified budgetary allowances; verify Ex approval and supply boundaries before release"]};
  });
 export const MR0002_WORKING_BOM_0553=Object.freeze({
  id:"P553-MR0002-WORKING-BOM",mr:"MR-0002",sites:bySite,
