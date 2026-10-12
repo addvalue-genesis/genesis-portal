@@ -36,10 +36,13 @@ export function deriveRaconTerminationBudget0553(){
    const totalProcurementM=ceilPurchase(budgetLengthM)*v.circuits;
    const provided=p.quotation.cablesIncluded.find(c=>c.id===v.id);
    const includedM=provided?.lengthM??0;
-   const additionalM=Math.max(0,totalProcurementM-includedM);
+   const shortfallM=Math.max(0,totalProcurementM-includedM);
+   const replacementFullRunM=provided&&shortfallM>0?totalProcurementM:0;
+   const additionalM=provided?replacementFullRunM:totalProcurementM;
    return {id:v.id,wp:w.wp,...v,designBudgetM:budgetLengthM,
-    procurementM:totalProcurementM,vendorIncludedM:includedM,additionalPurchaseM:additionalM,
+    procurementM:totalProcurementM,vendorIncludedM:includedM,extensionShortfallM:shortfallM,replacementFullRunM,additionalPurchaseM:additionalM,
     vendorIncludedBasis:provided?"ORGA_QUOTE_P4_INCLUSION_PROVISIONAL":"NO_QUOTED_VENDOR_CABLE",
+    cableUseRule:provided&&shortfallM>0?"REPLACE_FULL_RUN_UNLESS_ENGINEERED_JOIN_APPROVED":"NO_JOIN_REQUIRED",
     unitRateTHB:null,extendedTHB:null,workingZeroDisplayTHB:0,
     costOwner:"FIELD_RACON_BULK_NET_OF_VENDOR_INCLUSION",state:additionalM?"ADDITIONAL_CABLE_RATE_PENDING":"VENDOR_INCLUDED_ONLY"};
   });
@@ -50,6 +53,8 @@ export function deriveRaconTerminationBudget0553(){
    procurementTotalM:lines.reduce((n,x)=>n+x.procurementM,0),
    vendorIncludedCableM:lines.reduce((n,x)=>n+x.vendorIncludedM,0),
    additionalCablePurchaseM:lines.reduce((n,x)=>n+x.additionalPurchaseM,0),
+   extensionShortfallOnlyM:lines.reduce((n,x)=>n+x.extensionShortfallM,0),
+   supplyRisk:"ORGA included short pre-cut cable runs cannot be combined or extended without approved certified joints; purchasing full replacement length is a conservative separate scenario, not a confirmed necessary purchase",
    fieldGlandCandidateQty:lines.length*2,vendorIncludedGlandQty:p.quotation.glandsIncluded,
    additionalGlandCandidateQty:Math.max(0,lines.length*2-p.quotation.glandsIncluded),
    glandState:"6 CMP T3CDS GLANDS PROVISIONALLY QUOTED INCLUDED; ONLY UNMATCHED EX FIELD ENTRIES MAY REQUIRE PURCHASE",
@@ -57,6 +62,6 @@ export function deriveRaconTerminationBudget0553(){
    pricedSubtotalTHB:null,displayWorkingTHB:0,
    completionState:"NET_OF_VENDOR_INCLUDED__PRICE_AND_COMMERCIAL_CLARIFICATION_PENDING",
    quotation:p.quotation,
-   caveat:"60m field control-box-to-indoor DB and 6m local runs are assumptions, not measured routes. ORGA supplies 5m+5m+10m BFOU 12C and six glands per quoted package. These are provisional credits; p8 exclusions and p5/p7 FAT contradiction must be clarified."};
+   caveat:"Conservative full replacement of any quoted pre-cut run shorter than target is separately shown. Direct splice/extension of certified cable is NOT assumed. 60m field control-box-to-indoor DB and 6m local runs are assumptions, not measured routes. ORGA supplies 5m+5m+10m BFOU 12C and six glands per quoted package. These are provisional credits; p8 exclusions and p5/p7 FAT contradiction must be clarified."};
  });
 }
