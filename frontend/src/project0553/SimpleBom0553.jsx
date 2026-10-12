@@ -90,6 +90,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  };
 
  return <section className="p55-panel">
+  <div ref={el=>{targetRefs.current.working=el;}} style={{scrollMarginTop:90}}></div>
   <div className="p55-eyebrow">ENGINEERING WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom"/></div>
   <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
   <nav className="p55-panel" aria-label="Working Preview module navigator" style={{padding:14,marginBottom:16}}>
@@ -159,7 +160,6 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   </tbody></table></div></details>
   <div ref={el=>{targetRefs.current.coverage=el;}} style={{scrollMarginTop:90}}><SourceCoverage0553/></div>
   <div ref={el=>{targetRefs.current.reconciliation=el;}} style={{scrollMarginTop:90}}><SiteSystemCostReconciliation0553/></div>
-  <div ref={el=>{targetRefs.current.working=el;}} style={{scrollMarginTop:90}}></div>
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
   <div className="p55-filterbar p55-filterbar--simple">
