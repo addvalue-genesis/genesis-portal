@@ -3,6 +3,8 @@ const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8"
 const m=read("data/scadaBudgetEnvelope0553.js"),q=read("data/scadaBulkQuantityVerification0553.js"),v=read("ScadaPhysicalCompleteness0553.jsx"),ui=read("SimpleBom0553.jsx");
 for(const k of ["baseSourceTHB","baseSourceUSD","conditionalAllowanceTHB","contingencyTHB","pricedEnvelopeTHB","unresolvedAccessoryFunctions","completeEnvelope:false","amountNotComplete:true"])assert(m.includes(k),k);
 assert(m.includes("allocatedBulkInSource?0"),"no duplicate existing source bulk");
+assert(m.includes("conditionalComplete?conditionalPricedFloor:null"),"incomplete allowance must not masquerade as complete");
+assert(m.includes("pricedConditionalFloorTHB"),"show partial priced floor separately");
 assert(m.includes("validFX||originalUSD===0"),"require FX for USD");
 assert(q.includes("BUDGET_AS_NEW_REPLACEMENT__NOT_APPROVED_PROCUREMENT"),"brownfield management direction");
 assert(q.includes("CONDITIONAL_ACCESSORY_ALLOWANCE"),"accessory bucket");
