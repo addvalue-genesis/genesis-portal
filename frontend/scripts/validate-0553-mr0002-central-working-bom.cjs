@@ -1,0 +1,16 @@
+const assert=require("node:assert/strict");const fs=require("node:fs");const path=require("node:path");
+const src=path.join(__dirname,"../src/project0553");const read=p=>fs.readFileSync(path.join(src,p),"utf8");
+const central=read("data/mr0002WorkingBom0553.js");
+const viewer=read("data/bomReadModel0553.js");
+const editor=read("SimpleBom0553.jsx");
+const a1=read("data/a1EquipmentProjection0553.js");
+const lna=read("data/rfiLnaPriceDecision0553.js");
+assert(central.includes("MGW_P26_058_0553")&&central.includes("deriveDtrsRfiBudget0553"));
+assert(central.includes("sourceQuoteQty:quotedQty"));
+assert(central.includes("countedInWorkingTotal:false"));
+assert(central.includes("MGW UHF-1 is BDA, NOT RFI LNA"));
+assert(viewer.includes("MR0002_WORKING_BOM_0553")&&viewer.includes("rows:unifiedRows"));
+assert(editor.includes("<MR0002WorkingBom0553/>"));
+assert(a1.includes("item.countedInWorkingTotal===false?null:item.extended"));
+assert(lna.includes("unitBudgetAllowance:500000,currency:\"THB\""));
+console.log("PASS MR0002 canonical working BOM is mounted and read-model aligned; conditional costs excluded");
