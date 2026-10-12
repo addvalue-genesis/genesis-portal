@@ -42,7 +42,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   {id:"bid.budget.bom",label:"Working BOM · MR-0001 / Equipment",key:"working",keywords:"working preview mr0001"}
  ];
  const matches=moduleIndex.filter(x=>(x.id+" "+x.label+" "+x.keywords).toLowerCase().includes(moduleSearch.trim().toLowerCase()));
- const navigateToModule=key=>targetRefs.current[key]?.scrollIntoView({behavior:"smooth",block:"start"});
+ const navigateToModule=key=>{const target=targetRefs.current[key];if(!target)return;if(target.tagName==="DETAILS")target.open=true;target.scrollIntoView({behavior:"smooth",block:"start"});};
  const [manualSite,setManualSite]=useState("ALL");
  const [focusSeen,setFocusSeen]=useState(null);
  const site=focusedLocation&&focusedLocation!==focusSeen?focusedLocation:manualSite;
