@@ -19,7 +19,7 @@ const sites=[...new Set([
 ])].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
 const sourcePrice=(id)=>SUPPLIER_QUOTE_LINES_0553.find(q=>q.id===id);
 const mgwBySystem={"MR-0002":["UHF-1","UHF-2","UHF-3","UHF-4"],
- "MR-0003":["PHONE-1"],"MR-0004":["RACON-1"]};
+ "MR-0003":["PHONE-1"]};
 const normalizedMGW=MGW_P26_058_0553.lines.map(([id,sku,description,qty,unit,extended,group])=>({id,sku,description,qty,unit,extended,group}));
 const sharedMGW=normalizedMGW.filter(x=>x.id.startsWith("SERV-"));
 const checkedAmount=(row)=>row.qty*row.unit;
