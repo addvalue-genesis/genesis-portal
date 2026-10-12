@@ -8,6 +8,7 @@ import { CostIntegrityReview0553 } from "./CostIntegrityReview0553";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { SimpleBom0553 } from "./SimpleBom0553";
 import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
+import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import React,{useState} from "react";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
@@ -128,7 +129,7 @@ export function CommercialWorkspace0553({focusedLocation=null}){
   <p><strong>Workbook source:</strong> {template.sourceName} · {template.revision} · 6 sheets. <strong>Export status:</strong> HOLD — original template fidelity and cross-sheet reconciliation not yet validated.</p>
   </details>
  </>}
- {mode==="budgetary"&&<section className="p55-panel">
+ {mode==="budgetary"&&<><BudgetaryWorkbookPreview0553/><section className="p55-panel">
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · SNAPSHOT REGISTRY</div>
    <h3>Frozen Budgetary Issue — Verification Required</h3>
    <p className="p55-note"><strong>NO VERIFIED ISSUED SNAPSHOT REGISTERED.</strong> A historical Rev08 workbook is available but its exact SAMTEL-issued revision and recipients are still unverified. It is not promoted to Budgetary Submission.</p>
@@ -138,7 +139,7 @@ export function CommercialWorkspace0553({focusedLocation=null}){
    </tbody></table></div>
    <p className="p55-note"><strong>Required before freeze:</strong> confirmed issued document, recipient, revision, approved commercial amount, source hash, issue timestamp, and management authorization. Working price changes must not rewrite an issued snapshot.</p>
    <p><strong>Customer export:</strong> DISABLED — no authenticated frozen budgetary snapshot.</p>
- </section>}
+ </section></>}
  {mode==="released"&&<section className="p55-panel">
    <div className="p55-eyebrow">RELEASED CUSTOMER OUTPUT · APPROVAL GATE</div>
    <h3>Customer Release — HOLD</h3>
