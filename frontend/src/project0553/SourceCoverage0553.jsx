@@ -1,7 +1,6 @@
 import React,{useMemo,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {SITE_SYSTEM_COST_RECONCILIATION_0553 as ledger} from "./data/siteSystemCostReconciliation";
-import {SUPPLIER_QUOTE_LINES_0553} from "./data/supplierQuoteLines";
 
 // ONE ledger, multiple projections. No independent category-to-MTO matching or pricing here.
 const fmt=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED";
@@ -23,13 +22,14 @@ export function SourceCoverage0553(){
  const [mode,setMode]=useState("MR");
  const [mr,setMr]=useState("ALL");
  const [site,setSite]=useState("ALL");
- const [expanded,setExpanded]=useState({});
+ const [expanded,setExpanded]=useState({"group:MR-0001":true,"row:MR-0001:ZWP20":true});
  const filtered=useMemo(()=>ledger.rows.filter(r=>(mr==="ALL"||r.mr===mr)&&(site==="ALL"||r.site===site)),[mr,site]);
  const groupKey=r=>mode==="MR"?r.mr:r.site;
  const groups=[...new Set(filtered.map(groupKey))].map(key=>({key,rows:filtered.filter(r=>groupKey(r)===key)}));
  const toggle=key=>setExpanded(old=>({...old,[key]:!old[key]}));
  return <section className="p55-panel" data-component-key="bid.budget.bom.source-coverage">
   <h3>BOM Source Coverage · MR / Location / Official Projection <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.source-coverage"/></h3>
+  <p className="p55-note"><strong>Working Preview is retained as the detailed engineering and cost workbench.</strong> Switch MR / Location below to review the same source rows from another perspective. Edits and persistent live synchronization are not yet enabled here.</p>
   <p className="p55-note"><strong>Single Source of Truth:</strong> This page uses exactly the reconciliation rows and the ZWP20 detailed ledger, without separate price calculation. The official Excel template is a release/export layout, not a second cost database. Other sites/MRs retain clearly labelled legacy provisional evidence until migrated into a detailed ledger.</p>
   <div className="p55-filterbar">
    <label>View <select value={mode} onChange={e=>setMode(e.target.value)}><option value="MR">Per MR → Location</option><option value="LOCATION">Per Location → MR</option></select></label>
@@ -58,6 +58,7 @@ export function SourceCoverage0553(){
     </React.Fragment>})}
    </tbody></table></div>}
   </div>)}
+  <p className="p55-note"><strong>Working Preview remains the editable-design target.</strong> This source-coverage projection is currently read-only and recalculates from imported ledger data when the app loads; it is not yet a backend realtime subscription.</p>
   <p className="p55-note"><strong>Official Excel:</strong> preserve the uploaded six-sheet 4-Scope of Supply template and its Part A/B/C and spares categories. Source coverage is INTERNAL and must not be exported into customer-priced sheets. A template-accurate exporter with selected revision, price currency and customer release gate is a separate implementation step; no live Excel export is claimed by this page.</p>
  </section>;
 }
