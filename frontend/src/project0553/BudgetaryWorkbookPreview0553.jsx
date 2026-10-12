@@ -13,6 +13,7 @@ const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigit
 export function BudgetaryWorkbookPreview0553(){
  const [sheet,setSheet]=useState(template.sheets[0].name);
  const [showHistorical,setShowHistorical]=useState(true);
+ const [showEmptyRows,setShowEmptyRows]=useState(false);
  const [currency,setCurrency]=useState("USD");
  const [fx,setFx]=useState({THB:"31.5",CNY:""});
  const [fxDate,setFxDate]=useState("2026-10-12");
@@ -36,6 +37,7 @@ export function BudgetaryWorkbookPreview0553(){
     <label>Original worksheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{template.sheets.map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</select></label></div>
    <p className="p55-note"><strong>Currency: {currency}</strong> · {currency==="USD"?"Historical source values in original USD; no conversion.":fxReady?"Indicative converted display only, using user-entered "+rate+" "+currency+"/USD on "+fxDate+" · Source: "+fxSource+". Not a verified or approved customer rate.":"Conversion unavailable: enter rate, date and source. USD source amounts are retained unchanged; no implied FX."}</p>
    <label><input type="checkbox" checked={showHistorical} onChange={e=>setShowHistorical(e.target.checked)}/> Show historical Rev08 price comparison (not current bid)</label>
+   <label><input type="checkbox" checked={showEmptyRows} onChange={e=>setShowEmptyRows(e.target.checked)}/> Show empty template rows (original Excel layout)</label>
    <p className="p55-note"><strong>Original worksheet cell layout:</strong> {layout.columns} columns × {layout.maxRow} rows. Blank cells are preserved; historically labelled cells are reference only. Current BOM-derived customer selling prices are not approved and remain blank.</p>
    <div className="p55-panel">
     <strong>{sheet}</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)}/>
@@ -61,8 +63,10 @@ export function BudgetaryWorkbookPreview0553(){
        row[2]=index+1;row[4]=desc;row[7]=qty;row[8]=converted(unit);row[9]=converted(qty*unit);
       }
      }
+     const visibleContent=row.slice(1).some(value=>value!==null&&value!==undefined&&String(value).trim()!=="");
+     if(!showEmptyRows&&!visibleContent)return null;
      return <tr key={rowNum} style={overlay?{background:"rgba(36,111,184,0.07)"}:{}}>
-      <td><strong>{rowNum}</strong><div><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/></div></td>
+      <td><strong>{rowNum}</strong>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<div><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/></div>}</td>
       {Array.from({length:layout.columns},(_,col)=>{
        const value=row[col+1]??"";
        const isPrice=overlay&&(active?.kind==="SUMMARY"?col===6:(col===7||col===8));
@@ -74,7 +78,7 @@ export function BudgetaryWorkbookPreview0553(){
     })}</tbody>
    </table></div>
    <p className="p55-note">Historical Rev08 overlay is controlled by the checkbox above. Prices appear in the main worksheet grid only; no second price table. Some A1–A5 rows are provisional visual placements pending exact native cell mapping. Current approved selling price remains unavailable.</p>
-   <p className="p55-note">Full-grid JSX view shows every original worksheet row and column, including blank spaces. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
+   <p className="p55-note">The native XLSX retains all rows and columns. The JSX hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
  </section>;
 }
