@@ -15,7 +15,7 @@ export function deriveWpSystemBulkBudget0553(){
   const cableRoute=(sys)=>routeModel.rows.find(r=>r.wp===w.wp&&r.system===sys);
   const systems=[
    {id:"SCADA_RADIO",name:"SCADA Radio",equipment:found("SCADA_RADIO"),route:cableRoute("SCADA_RADIO"),
-    items:[{id:"SCADA-CAT6A",item:"Outdoor CAT6A S/FTP",unit:"m",qty:cableRoute("SCADA_RADIO")?approvedCablePurchaseM(APPROVED_0553_BUDGET_BASIS.greenfield.baseRouteM):null,
+    items:[{id:"SCADA-RF-JUMPER",item:"ODU to antenna RF jumper",unit:"set",qty:found("SCADA_RADIO").filter(e=>/^MR-502-/.test(e.tag)).length||null,rateTHB:null,source:"Z1F layout ODU tags; Next G B-5 package check",owner:"ODU_ROW4_PACKAGE_FIRST",status:"ONE_PER_ODU_PROVISIONAL_INCLUDED_KIT_CHECK",note:"Count one per ODU provisionally; verify physical RF port count. If included in ODU kit do not charge twice."},{id:"SCADA-CAT6A",item:"Outdoor CAT6A S/FTP",unit:"m",qty:cableRoute("SCADA_RADIO")?approvedCablePurchaseM(APPROVED_0553_BUDGET_BASIS.greenfield.baseRouteM):null,
      rateTHB:524,source:"INNOVA QA24-0604, historical; scenario base",owner:"BULK_ROW11",
      status:w.wp==="ZWP20"?"MIRROR_ZWP20_ROW11_69M":"APPROVED_60M_PLUS_15PCT_BUDGETARY",
      note:w.wp==="ZWP20"?"Active ZWP20 Row 11 owns 69m (60m + 15pct): this row mirrors cost, do not add twice.":"60m budget base + 15pct purchasing allowance = 69m per evidenced physical field-to-TC-room run"}]},
