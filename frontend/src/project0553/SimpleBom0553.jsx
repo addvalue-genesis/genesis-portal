@@ -1,6 +1,7 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {MR0002WorkingBom0553} from "./MR0002WorkingBom0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
+import {BOM_READ_MODEL_0553} from "./data/bomReadModel0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
 import {DTRS_RFI_BULK_0553} from "./data/dtrsRfiBulk0553";
@@ -201,7 +202,21 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     </tbody></table></div>
    </details>)}
    {!MR0002_WORKING_BOM_0553.sites.some(g=>site==="ALL"||g.site===site)&&<p className="p55-note">No MR-0002 source-backed items at {site}. Select All locations or ZWP20, ZWP21, ZWP22.</p>}
-  </section>:system!=="MR-0001"?<p className="p55-note">{system}: Item-level central Working BOM mapping has not been implemented in this table. Existing source evidence remains available in the respective engineering and source registers; no estimated prices or quantities have been inserted here.</p>:<>
+  </section>:["MR-0003","MR-0004"].includes(system)?<section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.legacy-evidence">
+   <h4>{system} · {system==="MR-0003"?"Ex IP Telephone":"Marine RACON"} — Source-backed Working Evidence</h4>
+   <p className="p55-note">Existing MGW quotation evidence is shown by location without making a second BOM. One package per ZWP20–22 is a reversible budgetary allocation, NOT a verified physical BOM, vendor selection or completed A+B+C cost.</p>
+   {BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system&&(site==="ALL"||r.site===site)&&r.evidence?.length).map(g=><details key={g.site} className="p55-panel">
+    <summary style={{cursor:"pointer"}}><strong>{g.site}</strong> · {g.evidence.length} source-priced candidate(s) · <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")+"."+g.site.toLowerCase()}/></summary>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Quote line / tag</th><th>Description</th><th>Budget Qty</th><th>Currency</th><th>Source unit rate</th><th>Provisional extension</th><th>Evidence status</th><th>Item ID</th></tr></thead><tbody>
+     {g.evidence.map((x,i)=><tr key={x.line+"-"+i}><td>{x.line}</td><td>{x.description}</td><td>{x.assumedQty??"UNALLOCATED"}</td><td>{x.currency}</td>
+      <td>{Number.isFinite(x.unit)?x.unit.toLocaleString("en-US",{minimumFractionDigits:2}):"NO PRICE"}</td>
+      <td>{Number.isFinite(x.extended)?x.extended.toLocaleString("en-US",{minimumFractionDigits:2}):"PENDING"}</td><td>{x.kind}<small>{x.source}</small></td>
+      <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")+"."+g.site.toLowerCase()+"."+String(x.line).toLowerCase()}/></td></tr>)}
+    </tbody></table></div>
+    <p className="p55-note">Outstanding: {(g.gaps||[]).join(" · ")}. No customer release.</p>
+   </details>)}
+   {!BOM_READ_MODEL_0553.rows.some(r=>r.mr===system&&(site==="ALL"||r.site===site)&&r.evidence?.length)&&<p className="p55-note">No source-backed vendor equipment package mapped to this Location. Select All locations to view the ZWP20–22 provisional evidence. Missing evidence is not zero cost.</p>}
+  </section>:<>
   <p className="p55-note"><strong>Source row completeness:</strong> {displayedCount} displayed / {sourceCount} registered MTO item tags. {vendor!=="ALL"?"Vendor filter hides some source rows; select All vendors for the full BOM.":"All source rows remain visible, including items lacking price."} Source item coverage does not mean a complete physical SKU take-off.</p>
   <div className="p55-source-facts">
    <div><span>Locations with source data</span><strong>{groups.filter(g=>g.items.length).length}</strong></div>
