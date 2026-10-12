@@ -106,5 +106,8 @@ assert(raconLedger.includes('cableSpec:"BFOU 12C x 1.5mm2"'));
 assert(raconLedger.includes("fatCommercialConflict"));
 assert(ui.includes("Vendor included"));
 assert(ui.includes("Extra purchase"));
-assert.equal((7-5)+(7-5)+(69-10)+7+7+7,84);
+assert.equal(7+7+69+7+7+7,104); // whole-run replacement scenario if supplied pre-cut runs are too short
+assert(raconLedger.includes("replacementFullRunM"));
+assert(raconLedger.includes("extensionShortfallM"));
+assert(ui.includes("Replacement purchase"));
 console.log("PASS ZWP20 bulk base THB 37,176: 60m plus 15% purchase allowance + 1 gland. Different directions require additional distinct route records.");
