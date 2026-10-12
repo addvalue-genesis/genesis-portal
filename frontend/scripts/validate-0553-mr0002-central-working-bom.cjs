@@ -9,7 +9,7 @@ const rates=read("data/mr0002PriceRegistry0553.js");
 const catalog=read("VendorProductCatalog0553.jsx");
 assert(central.includes("MGW_P26_058_0553")&&central.includes("deriveDtrsRfiBudget0553"));
 assert(central.includes("sourceQuoteQty:quotedQty"));
-assert(central.includes("countedInWorkingTotal:false"));
+assert(central.includes("countedInWorkingTotal:!duplicate&&priceKnown"));
 assert(central.includes('selectedManufacturer:"RFI"'));
 assert(central.includes('"MGW_SELECTED_RF_PACKAGE"'));
 assert(central.includes("controlledTotalUSD:equipment.filter(x=>x.countedInWorkingTotal)"));
