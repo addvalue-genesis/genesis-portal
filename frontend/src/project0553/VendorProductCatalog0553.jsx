@@ -1,4 +1,5 @@
 import React,{useMemo,useState} from "react";
+import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./data/supplierQuoteLines";
 import { VENDOR_0553_SOURCES } from "./vendorEvidence";
@@ -72,6 +73,12 @@ export function VendorProductCatalog0553(){
    <td><a href="https://th.rs-online.com/web/p/ethernet-couplers/7417317" target="_blank" rel="noreferrer">RS item 7417317</a><small>Retail evidence only; quantity-break price and availability subject to supplier confirmation</small></td>
    <td>ZWP20 DATO-507-001 Row 8; included once in working budget; not additional Row 11 cost</td>
   </tr></tbody></table></div></div>
+  <div className="p55-panel" style={{padding:14,marginBottom:12}}>
+  <h3>Historical Procurement · CAT6A Patch Cord &amp; RF Interface</h3>
+  <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.rf-and-cat6a"/>
+  <p>CommScope NETCONNECT Cat6A S/FTP LSZH 1m blue · SKU CSS BL001M · Supplier CSS Thai · AGERP PO2406-0845 · THB {RF_AND_PATCH_REFERENCE_0553.cat6Patch.historicalUnitRateTHB}/pc (ex VAT) · historical purchase reference, not current offer. Quantity follows indoor port/patch map.</p>
+  <p>RF jumper: factory included in selected ODU supply per management confirmation. Field-terminated RF feeder connector: select part number and quantity only after matching cable type, RF ports and installation condition.</p>
+  </div>
   {dataSheetProducts.length>0&&<div className="p55-panel" style={{marginBottom:14,padding:14}}>
     <h3>Product Datasheets (no quotation recorded)</h3><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.datasheets"/>
     <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Supplier / Source</th><th>Product / Model</th><th>MR</th><th>Datasheet</th><th>Unit Price</th></tr></thead><tbody>
