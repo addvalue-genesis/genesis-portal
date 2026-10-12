@@ -79,6 +79,43 @@ export function selectMR0001TagCostRows0553(site){
     countedInWorkingTotal:Number.isFinite(rate),
     quotedRateCandidates:(historical?.lines||[]).filter(x=>["1","2"].includes(x[0])).map(x=>({quoteLine:x[0],sku:x[1],unitPriceTHB:x[4],selected:x[0]==="1"}))};
   }
+  if(site==="ZWP21"&&oneSet&&item.sourceTag==="DATO-507-001"&&item.sourceRow===17){
+   const quote=SUPPLIER_QUOTE_LINES_0553.find(x=>x.id==="SONIC-CCY24-PXC-633");
+   const line=quote?.lines.find(x=>x[1]==="FL-PP-RJ45-SC");
+   const panel=Number.isFinite(line?.[4])?line[4]:null;
+   const plug=1176.68; // Existing ZWP20 budget retail reference, NOT a vendor quote.
+   const total=Number.isFinite(panel)?round(item.sourceScopeQty*(panel+plug)):null;
+   return {site,mr:"MR-0001",row:17,tag:item.sourceTag,description:item.description,
+    sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,currency:"THB",
+    vendor:"Sonic / Phoenix Contact + RS Thailand / Weidmüller",
+    sku:"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK",
+    unitCost:Number.isFinite(panel)?round(panel+plug):null,extended:total,
+    countedInWorkingTotal:Number.isFinite(total),
+    source:"SONIC-CCY24-PXC-633 / RS Thailand indicative / MTO Rev04 ZWP21 Row17",
+    status:"PRELIMINARY_DATO_INTERFACE__EX_CERTIFICATION_REVIEW",
+    quantityBasis:"1 Set per ZWP21 MTO row17; 1 panel connector and 1 field plug budgetary",
+    components:[{functionId:"DATO_RJ45_PANEL_INTERFACE",sku:"FL-PP-RJ45-SC",qty:1,currency:"THB",unitPrice:panel,extended:panel,source:"SONIC-CCY24-PXC-633"},
+     {functionId:"DATO_RJ45_FIELD_PLUG",sku:"IE-PS-RJ45-FH-BK",qty:1,currency:"THB",unitPrice:plug,extended:plug,source:"RS Thailand indicative"}],
+    assumptions:["ZWP20 DATO budgeting method reused, but ZWP21 technical Ex compliance not verified",
+     "IP20 retail plug is a price analogue only; do not release as certified Ex disconnect","Not additional to a vendor-free-issued package if included"]};
+  }
+  if(site==="ZWP21"&&item.sourceRow===20&&item.sourcePartText==="Bulk Material"){
+   const rate=524,baseM=60,allowance=0.15,purchaseM=Math.ceil(baseM*(1+allowance));
+   const gland=1020;
+   const components=[{functionId:"SCADA_CAT6A_FIELD_RUN",sku:"TECKNIKABEL CAT6A S/FTP",qty:purchaseM,currency:"THB",unitPrice:rate,extended:round(purchaseM*rate),source:"INNOVA QA24-0604 historical"},
+    {functionId:"SCADA_INDOOR_ENTRY",sku:"501/453/UNIV/A/M20",qty:1,currency:"THB",unitPrice:gland,extended:gland,source:"INNOVA QA24-0604 historical"}];
+   const total=round(components.reduce((n,c)=>n+c.extended,0));
+   return {site,mr:"MR-0001",row:20,tag:"BULK-MATERIAL",description:item.description,
+    sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,currency:"THB",
+    unitCost:total,extended:total,countedInWorkingTotal:true,
+    vendor:"INNOVA historical / Engineering allowance",sku:"SCADA CAT6A + indoor certified entry candidate",
+    source:"MTO Rev04 ZWP21 Row20 / INNOVA QA24-0604 / Approved greenfield base",
+    status:"PARTIAL_BULK_BUDGETARY__NOT_MEASURED",
+    quantityBasis:"One assumed SCADA field route 60m + 15% purchasing allowance = 69m; one indoor M20 entry only",
+    components,
+    assumptions:["Uses ZWP20 budget method, not an as-built route measurement","Exclude duplicate SCADA cable from standalone bulk projection",
+     "Other coax, glands, grounding and distinct runs remain unpriced until interface takeoff"]};
+  }
   const pricedFunctions=functions.length>0&&functions.every(x=>Number.isFinite(x.extended));
   const functionCost=pricedFunctions?round(functions.reduce((n,x)=>n+x.extended,0)):null;
   if(functionCost!==null)return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,
