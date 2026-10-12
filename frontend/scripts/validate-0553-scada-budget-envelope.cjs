@@ -6,6 +6,10 @@ assert(m.includes("allocatedBulkInSource?0"),"no duplicate existing source bulk"
 assert(m.includes("validFX||originalUSD===0"),"require FX for USD");
 assert(q.includes("BUDGET_AS_NEW_REPLACEMENT__NOT_APPROVED_PROCUREMENT"),"brownfield management direction");
 assert(q.includes("CONDITIONAL_ACCESSORY_ALLOWANCE"),"accessory bucket");
+assert(q.includes("unresolvedQuantityTags"),"unknown MTO quantity must be surfaced");
+assert(!q.includes("sourceScopeQty:1"),"no implicit one-unit assumption");
+assert(!q.includes("x.sourceScopeQty:1"),"no fallback to one unit for unresolved MTO");
+assert(q.includes("runCount=unresolvedQuantityTags.length?null:odu"),"unresolved radio quantity cannot create inferred cable runs");
 assert(q.includes("60"),"parametric 60m driver");assert(q.includes("15"),"15 percent procurement allowance");
 assert(v.includes("deriveScadaBudgetEnvelope0553"),"render site and project envelope");
 assert(ui.includes("<ScadaPhysicalCompleteness0553 site={site} fx={fx}/>"),"pass existing FX");
