@@ -28,7 +28,7 @@ export function deriveScadaBudgetEnvelope0553({thbPerUsd=null,contingencyPct=SCA
   const allocatedBulkInSource=bulkBookedComponents.has("SCADA_FIELD_CAT6A")&&bulkBookedComponents.has("INDOOR_M20_GLAND");
   const bulkBookedUnverifiable=ledger.some(x=>/bulk material/i.test(String(x.tag||""))&&x.countedInWorkingTotal&&!allocatedBulkInSource);
   const missingBaseBulk=(bulk?.rows||[]).filter(x=>x.budgetBucket==="BASE_FIELD_BULK"&&Number.isFinite(x.provisionalExtendedTHB));
-  const incrementalBase=round(missingBaseBulk
+  const incrementalBase=bulkBookedUnverifiable?null:round(missingBaseBulk
    .filter(x=>!(x.id==="ODU_CAT6A"&&bulkBookedComponents.has("SCADA_FIELD_CAT6A")))
    .filter(x=>!(x.id==="PANEL_M20"&&bulkBookedComponents.has("INDOOR_M20_GLAND")))
    .reduce((s,x)=>s+x.provisionalExtendedTHB,0));
@@ -36,13 +36,14 @@ export function deriveScadaBudgetEnvelope0553({thbPerUsd=null,contingencyPct=SCA
   const pricedConditional=conditionalRows.filter(x=>Number.isFinite(x.provisionalExtendedTHB));
   const conditionalPricedFloor=round(pricedConditional.reduce((s,x)=>s+x.provisionalExtendedTHB,0));
   const unresolved=conditionalRows.filter(x=>!Number.isFinite(x.provisionalExtendedTHB)).map(x=>x.id);
-  const baseTHB=round(originalTHB+incrementalBase+(validFX?originalUSD*thbPerUsd:0));
-  const baseComplete=validFX||originalUSD===0;
+  const baseTHB=incrementalBase===null?null:round(originalTHB+incrementalBase+(validFX?originalUSD*thbPerUsd:0));
+  const baseComplete=(validFX||originalUSD===0)&&incrementalBase!==null;
   const conditionalComplete=unresolved.length===0;
   const riskBase=baseComplete?round(baseTHB+conditionalPricedFloor):null;
   const contingency=riskBase!==null&&pct!==null?round(riskBase*pct/100):null;
   const pricedEnvelope=riskBase!==null&&contingency!==null?round(riskBase+contingency):null;
-  const completeEnvelope=baseComplete&&conditionalComplete&&bulk?.unresolvedQuantityTags?.length===0;
+  const unpricedLedgerRows=ledger.filter(x=>!x.countedInWorkingTotal||!Number.isFinite(x.extended)).map(x=>({row:x.row,tag:x.tag,status:x.status}));
+  const completeEnvelope=baseComplete&&conditionalComplete&&unpricedLedgerRows.length===0&&bulk?.unresolvedQuantityTags?.length===0;
   return {site,baseSourceTHB:originalTHB,baseSourceUSD:originalUSD,incrementalBaseBulkTHB:incrementalBase,
    baseBudgetTHB:baseComplete?baseTHB:null,conditionalAllowanceTHB:conditionalComplete?conditionalPricedFloor:null,
    pricedConditionalFloorTHB:conditionalPricedFloor,
@@ -50,8 +51,8 @@ export function deriveScadaBudgetEnvelope0553({thbPerUsd=null,contingencyPct=SCA
    unresolvedAccessoryFunctions:unresolved,accessoryCoverage:pricedConditional.length+"/"+conditionalRows.length,
    replacementBasis:["ZPQ","ZWP8","ZWP11"].includes(site)?"ALL_NEW_REPLACEMENT_MANAGEMENT_SCENARIO":"GREENFIELD_SOURCE_SCOPE",
    includedBulkNotAdded:allocatedBulkInSource,bulkBookedUnverifiable,completeEnvelope,
-   unresolvedQuantityTags:bulk?.unresolvedQuantityTags||[],
-   warning:"Priced envelope is a FLOOR, NOT full budget: unresolved accessories, Ex approvals, final cable routes and separately scoped services/spares remain excluded."};
+   unresolvedQuantityTags:bulk?.unresolvedQuantityTags||[],unpricedLedgerRows,
+   warning:bulkBookedUnverifiable?"Existing bulk row cannot be decomposed by physical function: incremental base blocked to prevent duplicate booking.": "Priced envelope is a FLOOR, NOT full budget: unresolved accessories, Ex approvals, final cable routes and separately scoped services/spares remain excluded."};
  });
  const total=(key)=>locations.every(x=>Number.isFinite(x[key]))?round(locations.reduce((s,x)=>s+x[key],0)):null;
  return {locations,totals:{baseBudgetTHB:total("baseBudgetTHB"),conditionalAllowanceTHB:total("conditionalAllowanceTHB"),
