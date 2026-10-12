@@ -6,7 +6,6 @@ import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerificat
 import {deriveScadaBudgetEnvelope0553} from "./data/scadaBudgetEnvelope0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
 import {MR0004_WORKING_BOM_0553} from "./data/mr0004WorkingBom0553";
-import {MGW_P26_058_0553} from "./data/mgwP26058";
 import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
 const SHEETS=[
  ["Scope of supply","A/B/C","A1–A5 equipment+bulk, B1–B14 services, C1/C2 options"],
@@ -28,8 +27,6 @@ export function ScopeSheetsDetail0553({fx=null}){
  const category=SHEETS.find(x=>x[0]===sheet);
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
  const details=REV08_BASELINE.detail[category[1]]||[];
- const workingMR2USD=MR0002_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
- const workingMR2THB=MR0002_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalTHB,0);
  const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
  // Working figures are live provisional cost evidence, not customer sell / released A1-A5.
  // A1 currently has SCADA field bulk embedded in tag ledger; it cannot be split blindly into A5.
@@ -41,11 +38,6 @@ export function ScopeSheetsDetail0553({fx=null}){
  const scadaSourceUSD=round(scadaEnvelope.locations.reduce((n,s)=>n+s.baseSourceUSD,0));
  const scadaIncrementalBulk=round(scadaEnvelope.locations.reduce((n,s)=>n+(Number.isFinite(s.incrementalBaseBulkTHB)?s.incrementalBaseBulkTHB:0),0));
  const workingScadaFloor=fxValid?round(scadaSourceTHB+scadaSourceUSD*fx.thbPerUsd+scadaIncrementalBulk):null;
- // MR0003 RFQ four WPs: MGW originally quoted only three packages.
- // Fourth package is an explicitly labelled one-unit management extrapolation.
- const phoneLine=MGW_P26_058_0553.lines.find(x=>x[0]==="PHONE-1");
- const phoneQty=4;
- const phoneBudgetUSD=Number.isFinite(phoneLine?.[4])?phoneLine[4]*phoneQty:null;
  const allSystemBulk=deriveWpSystemBulkBudget0553().flatMap(w=>w.systems.flatMap(s=>
    s.items.map(x=>({...x,wp:w.wp,system:s.id}))));
  const additionalBulk=allSystemBulk.filter(x=>x.owner!=="DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE" &&
@@ -55,8 +47,8 @@ export function ScopeSheetsDetail0553({fx=null}){
  const a5Unpriced=allSystemBulk.filter(x=>!Number.isFinite(x.extendedTHB)&&x.owner!=="DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE").length;
  const workingSummary={
    A1:{amount:workingScadaFloor,source:"MR0001 Tag Cost Ledger + separated incremental SCADA bulk",status:"PRELIMINARY PRICED FLOOR; unpriced equipment/accessories excluded"},
-   A2:{amount:fx?.thbPerUsd>0?workingMR2THB+workingMR2USD*fx.thbPerUsd:null,source:"MR0002 canonical Working BOM",status:"PROVISIONAL EQUIPMENT+SELECTED BULK"},
-   A3:{amount:fxValid&&phoneBudgetUSD!==null?round(phoneBudgetUSD*fx.thbPerUsd):null,source:"MGW P26-058 PHONE-1 USD 11,152/set × 4 WPs; original quotation for 3 only",status:"FOURTH UNIT EXTRAPOLATION; phone/sounder/JB included, installation bulk excluded"},
+   A2:{amount:null,source:"MR0002 requires accepted non-MGW manufacturer/vendor rate selection",status:"MGW PRICE EXCLUDED BY MANAGEMENT; SOURCE RATE REQUIRED"},
+   A3:{amount:null,source:"MR0003 Ex Telephone + Sounder + Ex e JB, 4 WPs; require selected non-MGW price evidence",status:"MGW PRICE EXCLUDED BY MANAGEMENT; NO FOURTH-UNIT EXTRAPOLATION"},
    A4:{amount:fx?.thbPerUsd>0?workingMR4USD*fx.thbPerUsd:null,source:"MR0004 ORGA canonical Working BOM",status:"PROVISIONAL 3-SITE SCENARIO"},
    A5:{amount:a5Known>0?a5Known:null,source:"Separate system physical bulk ledger excluding SCADA-CAT6A and DATO already allocated in A1",status:"PARTIAL PRICED FLOOR; "+a5Unpriced+" other field-bulk items remain without rates"}
  };
@@ -69,7 +61,7 @@ export function ScopeSheetsDetail0553({fx=null}){
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Unit Price THB</th><th>Working Budgetary Cost THB</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
   <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
    const item=workingSummary[id],amount=item?.amount;
-   const unavailable=id==="A5"?"Unpriced bulk exposure":fxValid?"Cost source pending":"Awaiting FX";
+   const unavailable=id==="A5"?"Unpriced bulk exposure":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>1 LS</td>
     <td className="is-number">{Number.isFinite(amount)?cash(amount):unavailable}</td>
     <td className="is-number">{Number.isFinite(amount)?cash(amount):"Awaiting FX"}</td>
