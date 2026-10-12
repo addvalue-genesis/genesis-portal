@@ -1,0 +1,12 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
+const scope=read("ScopeSheetsDetail0553.jsx");
+assert(scope.includes("workingSummary[id]?cash(workingSummary[id].amount)"),"A1-A5 need live cost columns");
+assert(scope.includes("MR0002_WORKING_BOM_0553.sites"),"MR0002 canonical projection");
+assert(scope.includes("MR0004_WORKING_BOM_0553.sites"),"MR0004 canonical projection");
+assert(scope.includes("scadaEnvelope.locations.reduce"),"MR0001 SCADA projection");
+assert(scope.includes("A3:{amount:null"),"unverified MR0003 not fabricated");
+assert(scope.includes("A5:{amount:null"),"cross system bulk not double counted");
+assert(scope.includes("Historical Amount USD"),"historical comparison preserved");
+assert(scope.includes("Working Budgetary Cost THB"),"working column visible");
+console.log("PASS static Scope A1-A5 live projection and no invented MR0003/A5 prices; npm build pending");
