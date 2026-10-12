@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {recoverMR0001Evidence0553} from "./data/mr0001EvidenceRecovery0553";
 import {MR0001_MODULE_CROSSMAP_0553} from "./data/mr0001ModuleCrossmap0553";
 import {selectMR0001TagCostRows0553,summarizeMR0001TagCost0553} from "./data/mr0001TagCostLedger0553";
 import {deriveSevenLocationCostLedger0553} from "./data/sevenLocationCostCalculations0553";
@@ -52,6 +53,15 @@ export function LocationBomDetail0553({site,fx}){
       <thead><tr><th>Engineering Function / Quote Line</th><th>Required Qty / Basis</th><th>Selected Budgetary SKU</th><th>Original Rate</th><th>Extended (THB)</th><th>Evidence / Owner / Status</th></tr></thead><tbody>
        {(v.detail||v.components||[]).map((c,i)=><tr key={c.functionId||i}><td>{c.functionId}</td><td>{c.requiredQty??c.qty??"PENDING"}<small>{c.quantityState||c.quantityBasis||"Engineering confirmation required"}</small></td><td>{c.budgetarySelectedSKU||c.sku||"NOT SELECTED"}</td><td>{c.currency||v.currency||"USD"} {fmt(c.budgetaryUnitPrice??c.unitPrice)}</td><td>{thb(c.budgetaryExtended??c.extended,c.currency||v.currency)}</td><td>{c.allocationOwner||v.tag+"."+v.row}<small>{c.budgetarySelectionState||c.status||c.state}</small></td></tr>)}
       </tbody></table></div>}
+     {(()=>{const recovered=recoverMR0001Evidence0553(site,v.row,v.tag);return <details className="p55-panel">
+      <summary>Recovered Engineering Source / First Principles / Scope Owner ({recovered.functions.length} function records)</summary>
+      <p className="p55-note">Original package: {recovered.sourcePackage||"No package mapping"} · Family: {recovered.family||"Not classified"} · Cost ownership: {recovered.ownershipStatus}</p>
+      <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Original Engineering Function</th><th>Quantity Driver / Proof</th><th>Vendor Quote Candidates</th><th>Original Decision</th></tr></thead><tbody>
+       {recovered.functions.map(fn=><tr key={fn.id}><td>{fn.functionId}</td><td>{fn.quantityDriver}<small>{fn.proofRequired?.join(" · ")}</small></td>
+        <td>{fn.candidateQuotes.map(q=>q.quoteLine+" / "+q.partNumber).join(" · ")||"NO SOURCE RATE"}</td><td>{fn.technicalState} · {fn.selectedOffer||"NOT SELECTED"} · Qty {fn.requiredQty??"NOT VERIFIED"}</td></tr>)}
+      </tbody></table></div>
+      {recovered.ownershipChecks.map(c=><p className="p55-note" key={c.id}>{c.id}: {c.description} — {c.state}</p>)}
+     </details>})()}
      {(v.quotedRateCandidates||[]).length>0&&<div className="p55-table-wrap"><strong>Vendor alternative quotation evidence (not additive)</strong><table className="p55-table"><thead><tr><th>Quote line</th><th>SKU</th><th>Original Unit Rate</th><th>Selected</th></tr></thead><tbody>{v.quotedRateCandidates.map((c,i)=><tr key={i}><td>{c.quoteLine}</td><td>{c.sku}</td><td>{fmt(c.unitPriceTHB??c.sourceUnitTHB)}</td><td>{c.selected?"WORKING COMPARABLE":"ALTERNATIVE"}</td></tr>)}</tbody></table></div>}
      {(v.candidates||[]).map((c,i)=><p key={i} className="p55-note">{c.vendor||"Supplier"} · {c.sku} · {c.originalCurrency} {fmt(c.originalUnitPrice)} · candidate only, NOT additional booked cost</p>)}
     </div></td></tr>}
