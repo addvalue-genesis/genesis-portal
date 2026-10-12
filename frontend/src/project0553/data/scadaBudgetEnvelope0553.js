@@ -19,9 +19,19 @@ export function deriveScadaBudgetEnvelope0553({thbPerUsd=null,contingencyPct=SCA
   const bulk=siteBulk.find(x=>x.site===site);
   // ZWP20 CAT6A and M20 are ALREADY in source row11. Other WP ledgers
   // may book 69m+M20 via previous management allowance: never add the same physical function twice.
-  const allocatedBulkInSource=ledger.some(x=>/bulk material/i.test(String(x.tag||""))&&x.countedInWorkingTotal);
+  // A priced bulk row is NOT proof that all field bulk functions were included.
+  // Match the two historically booked line components by explicit function ID.
+  const bulkBookedComponents=new Set(ledger
+   .filter(x=>x.countedInWorkingTotal)
+   .flatMap(x=>x.components||[])
+   .map(x=>String(x.functionId||"")));
+  const allocatedBulkInSource=bulkBookedComponents.has("SCADA_FIELD_CAT6A")&&bulkBookedComponents.has("INDOOR_M20_GLAND");
+  const bulkBookedUnverifiable=ledger.some(x=>/bulk material/i.test(String(x.tag||""))&&x.countedInWorkingTotal&&!allocatedBulkInSource);
   const missingBaseBulk=(bulk?.rows||[]).filter(x=>x.budgetBucket==="BASE_FIELD_BULK"&&Number.isFinite(x.provisionalExtendedTHB));
-  const incrementalBase=allocatedBulkInSource?0:round(missingBaseBulk.reduce((s,x)=>s+x.provisionalExtendedTHB,0));
+  const incrementalBase=round(missingBaseBulk
+   .filter(x=>!(x.id==="ODU_CAT6A"&&bulkBookedComponents.has("SCADA_FIELD_CAT6A")))
+   .filter(x=>!(x.id==="PANEL_M20"&&bulkBookedComponents.has("INDOOR_M20_GLAND")))
+   .reduce((s,x)=>s+x.provisionalExtendedTHB,0));
   const conditionalRows=(bulk?.rows||[]).filter(x=>x.budgetBucket==="CONDITIONAL_ACCESSORY_ALLOWANCE");
   const pricedConditional=conditionalRows.filter(x=>Number.isFinite(x.provisionalExtendedTHB));
   const conditionalPricedFloor=round(pricedConditional.reduce((s,x)=>s+x.provisionalExtendedTHB,0));
@@ -39,7 +49,7 @@ export function deriveScadaBudgetEnvelope0553({thbPerUsd=null,contingencyPct=SCA
    contingencyPct:pct,contingencyTHB:contingency,pricedEnvelopeTHB:pricedEnvelope,
    unresolvedAccessoryFunctions:unresolved,accessoryCoverage:pricedConditional.length+"/"+conditionalRows.length,
    replacementBasis:["ZPQ","ZWP8","ZWP11"].includes(site)?"ALL_NEW_REPLACEMENT_MANAGEMENT_SCENARIO":"GREENFIELD_SOURCE_SCOPE",
-   includedBulkNotAdded:allocatedBulkInSource,completeEnvelope,
+   includedBulkNotAdded:allocatedBulkInSource,bulkBookedUnverifiable,completeEnvelope,
    unresolvedQuantityTags:bulk?.unresolvedQuantityTags||[],
    warning:"Priced envelope is a FLOOR, NOT full budget: unresolved accessories, Ex approvals, final cable routes and separately scoped services/spares remain excluded."};
  });
