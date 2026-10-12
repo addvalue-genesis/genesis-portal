@@ -186,8 +186,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <label>System <select value={system} onChange={e=>setSystem(e.target.value)}>
     <option value="MR-0001">MR0001 · SCADA Radio</option>
     <option value="MR-0002">MR0002 · DMR (full BOM pending)</option>
-    <option value="MR-0003">MR0003 · Ex Telephone (full BOM pending)</option>
-    <option value="MR-0004">MR0004 · RACON (full BOM pending)</option>
+    <option value="MR-0003">MR0003 · Ex Telephone (priced source evidence)</option>
+    <option value="MR-0004">MR0004 · RACON (priced source evidence)</option>
    </select></label>
    <label>Location <select value={site} onChange={e=>changeSite(e.target.value)}><option value="ALL">All locations</option>{model.locations.map(x=><option key={x.site} value={x.site}>{x.site}</option>)}</select></label>
    <label>Vendor / Company <select value={vendor} onChange={e=>setVendor(e.target.value)}><option value="ALL">All vendors</option>{model.vendors.map(v=><option key={v} value={v}>{v}</option>)}</select></label>
