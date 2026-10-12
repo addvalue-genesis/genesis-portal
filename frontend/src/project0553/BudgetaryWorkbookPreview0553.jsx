@@ -10,6 +10,7 @@ import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate05
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 export function BudgetaryWorkbookPreview0553(){
  const [sheet,setSheet]=useState(template.sheets[0].name);
+ const [showHistorical,setShowHistorical]=useState(true);
  const [currency,setCurrency]=useState("USD");
  const [fx,setFx]=useState({THB:"31.5",CNY:""});
  const [fxDate,setFxDate]=useState("2026-10-12");
@@ -32,6 +33,7 @@ export function BudgetaryWorkbookPreview0553(){
     {currency!=="USD"&&<label>FX source <input value={fxSource} onChange={e=>setFxSource(e.target.value)} placeholder="Source/reference"/></label>}
     <label>Original worksheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{template.sheets.map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</select></label></div>
    <p className="p55-note"><strong>Currency: {currency}</strong> · {currency==="USD"?"Historical source values in original USD; no conversion.":fxReady?"Indicative converted display only, using user-entered "+rate+" "+currency+"/USD on "+fxDate+" · Source: "+fxSource+". Not a verified or approved customer rate.":"Conversion unavailable: enter rate, date and source. USD source amounts are retained unchanged; no implied FX."}</p>
+   <label><input type="checkbox" checked={showHistorical} onChange={e=>setShowHistorical(e.target.checked)}/> Show historical Rev08 price comparison (not current bid)</label>
    <p className="p55-note"><strong>Original worksheet cell layout:</strong> {layout.columns} columns × {layout.maxRow} rows. Blank cells are preserved; historically labelled cells are reference only. Current BOM-derived customer selling prices are not approved and remain blank.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
     <thead><tr><th>Row</th>{Array.from({length:layout.columns},(_,i)=><th key={i}>{String.fromCharCode(65+i)}</th>)}</tr></thead>
@@ -40,6 +42,13 @@ export function BudgetaryWorkbookPreview0553(){
      return <tr key={rowNum}><td><strong>{rowNum}</strong></td>{Array.from({length:layout.columns},(_,col)=><td key={col} style={{whiteSpace:"pre-wrap",minWidth:col===0?65:95}}>{row[col+1]??""}</td>)}</tr>;
     })}</tbody>
    </table></div>
+   {showHistorical&&<div className="p55-table-wrap"><h4>Historical Rev08 · Price Reference (NOT current customer sell)</h4>
+    <table className="p55-table p55-table--budget"><thead><tr><th>Item</th><th>Description</th>{active?.kind!=="SUMMARY"&&<th>Qty</th>}<th>Unit ({currency})</th><th>Amount ({currency})</th></tr></thead><tbody>
+     {active?.kind==="SUMMARY"?lines.map(([id,label,amount])=><tr key={id}><td>{id}</td><td>{label}</td><td>—</td><td>{converted(amount)}</td></tr>):
+     lines.map(([description,qty,unit],i)=><tr key={i}><td>{i+1}</td><td>{description}</td><td>{qty}</td><td>{converted(unit)}</td><td>{converted(qty*unit)}</td></tr>)}
+    </tbody></table>
+    <p className="p55-note">Historical amount comparison is not injected into current template price cells. Blank current prices mean no approved current commercial mapping, not zero.</p>
+   </div>}
    <p className="p55-note">Full-grid JSX view shows every original worksheet row and column, including blank spaces. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
  </section>;
