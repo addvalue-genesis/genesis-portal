@@ -1,6 +1,6 @@
 import React,{useMemo,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
-import {SITE_SYSTEM_COST_RECONCILIATION_0553 as ledger} from "./data/siteSystemCostReconciliation";
+import {BOM_READ_MODEL_0553 as ledger,selectBomRows0553} from "./data/bomReadModel0553";
 
 // ONE ledger, multiple projections. No independent category-to-MTO matching or pricing here.
 const fmt=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED";
@@ -23,7 +23,7 @@ export function SourceCoverage0553(){
  const [mr,setMr]=useState("ALL");
  const [site,setSite]=useState("ALL");
  const [expanded,setExpanded]=useState({"group:MR-0001":true,"row:MR-0001:ZWP20":true});
- const filtered=useMemo(()=>ledger.rows.filter(r=>(mr==="ALL"||r.mr===mr)&&(site==="ALL"||r.site===site)),[mr,site]);
+ const filtered=useMemo(()=>selectBomRows0553({mr,site}),[mr,site]);
  const groupKey=r=>mode==="MR"?r.mr:r.site;
  const groups=[...new Set(filtered.map(groupKey))].map(key=>({key,rows:filtered.filter(r=>groupKey(r)===key)}));
  const toggle=key=>setExpanded(old=>({...old,[key]:!old[key]}));
