@@ -1,5 +1,6 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {MR0002WorkingBom0553} from "./MR0002WorkingBom0553";
+import {LocationBomDetail0553} from "./LocationBomDetail0553";
 import {getMR0001LocationCost0553} from "./data/mr0001LocationCostSummary0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
 import {BOM_READ_MODEL_0553} from "./data/bomReadModel0553";
@@ -250,6 +251,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
       </tbody></table><p className="p55-note">{g.site==="ZWP20"&&sys.id==="SCADA_RADIO"?"ZWP20 Row11 cost already allocated; displayed detail is a mirror, NOT additional cost.":"Budgetary scope only: don't post into existing site total until source and duplicate control are reconciled."}</p></div>}
     </div>)}
     </div>}
+
+    {g.site!=="ZWP20"&&<LocationBomDetail0553 site={g.site} fx={fx}/>}
 
     {g.site==="ZWP20"&&<div className="p55-panel"><div style={{display:"flex",gap:8,justifyContent:"space-between",alignItems:"center",flexWrap:"wrap"}}><strong>ZWP20 · SCADA Engineering-Derived Site Cost Summary</strong><button type="button" className="p553-detail-button" onClick={()=>{const header=["Module ID","MTO Row","Item Tag","Source Qty","Engineering Quantity Basis","Vendor","SKU","Original Currency","Original Unit Cost","Original Extended Cost","Display Currency","Display Extended Cost","State"];const rows=[header,...zwp20Cost.rows.map(v=>[zwp20Cost.moduleId+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row,v.row,v.tag,v.sourceQty+" "+(v.sourceUnit||""),v.quantityBasis,v.vendor||"",v.sku||"",v.currency||"",v.unitCost??"",v.extended??"",activeCurrency,money(v.extended,v.currency),v.status]),["SITE TOTAL","","","","","","","USD","",zwp20Cost.subtotals.USD,zwp20Cost.status],["SITE TOTAL","","","","","","","THB","",zwp20Cost.subtotals.THB,zwp20Cost.status]];const tsv=rows.map(r=>r.map(v=>String(v??"").replaceAll(String.fromCharCode(9)," ").replaceAll(String.fromCharCode(10)," ")).join(String.fromCharCode(9))).join(String.fromCharCode(10));if(typeof navigator!=="undefined"&&navigator.clipboard?.writeText)navigator.clipboard.writeText(tsv).catch(()=>window.prompt("Copy site BOM",tsv));else window.prompt("Copy site BOM",tsv);}}>Copy ZWP20 BOM Table (Excel)</button></div>
       <p className="p55-note">Module ID: {zwp20Cost.moduleId} · Source: MTO Rev04, Engineering Topology/Derivation → Vendor selected rate; one row per MTO allocation. No USD/THB mixing without sourced FX.</p>
