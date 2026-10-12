@@ -6,6 +6,7 @@ import {WORKING_BOM_BY_LOCATION_0553} from "./data/workingBomByLocation";
 import {selectMR0001TagCostRows0553} from "./data/mr0001TagCostLedger0553";
 import {ZWP20_BULK_SCOPE_AUDIT_0553} from "./data/zwp20BulkScopeAudit0553";
 import {MR0001_FUNCTIONS_0553} from "./data/mr0001EightFunctionCoverage0553";
+import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
 
 const families=[
  ["RADIO","Radio / ODU / IDU",/^MR-/i,["RF filter","Power adaptor / DC mating","Throughput / region / NMS entitlements","Radio mount and RF jumpers"]],
@@ -22,6 +23,7 @@ const knownBulk=ZWP20_BULK_SCOPE_AUDIT_0553.checks;
 export function ScadaPhysicalCompleteness0553({site="ALL"}){
  const [showChildren,setShowChildren]=useState(true);
  const sites=WORKING_BOM_BY_LOCATION_0553.locations.filter(g=>site==="ALL"||g.site===site);
+ const bulkBySite=deriveScadaBulkVerification0553();
  return <details className="p55-panel" data-component-key="bid.budget.bom.scada-physical-completeness">
   <summary style={{cursor:"pointer",fontWeight:700,padding:10}}>＋ / − SCADA SI Equipment &amp; Bulk Completeness — 7 locations (verification, not extra cost)</summary>
   <p className="p55-note">Customer MTO tags are preserved. Child functions display whether a vendor package must include them, not an instruction to purchase twice. Derived quantities require verified physical interfaces, routes, supplier inclusions and Ex/technical constraints. Existing cost ledger remains the sole price owner.</p>
@@ -44,6 +46,12 @@ export function ScadaPhysicalCompleteness0553({site="ALL"}){
         <td>{tags.length?"PACKAGE_COMPOSITION_AND_INTERFACE_PROOF_REQUIRED":"MISSING_TAG_OR_NOT_APPLICABLE_DECISION_REQUIRED"}</td></tr>;
       })}
     </tbody></table></div>
+    <details className="p55-panel"><summary>16 physical bulk functions — derived quantities and budget-rate evidence</summary>
+      <p className="p55-note">No new cost has been booked. CAT6A historical rate 524 THB/m and M20 gland 1,020 THB/ea are comparable only. IP67 RJ45 rate is reference-only, not Ex acceptance. Brownfield NEW/REUSE remains a separate decision.</p>
+      <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Function</th><th>Derived Qty / Basis</th><th>Source Rate</th><th>Unposted Budget Reference (THB)</th><th>Ownership / Verification</th></tr></thead><tbody>
+      {(bulkBySite.find(x=>x.site===g.site)?.rows||[]).map(b=><tr key={b.id}><td>{b.id}<small>{b.item}</small></td><td>{b.derivedQty??"DERIVATION REQUIRED"} {b.unit}<small>{b.quantityState}</small></td><td>{Number.isFinite(b.unitRateTHB)?"THB "+formatted(b.unitRateTHB):"Rate research required"}<small>{b.rateSource||b.priceBasis}</small></td><td>{Number.isFinite(b.provisionalExtendedTHB)?"THB "+formatted(b.provisionalExtendedTHB):"Not booked / supplier inclusion or rate needed"}</td><td>{b.decision}<small>{b.caveat}</small></td></tr>)}
+      </tbody></table></div>
+    </details>
     <p className="p55-note">Checks before completeness: radio topology and licences; exact antenna count and RF path; independent ODU-to-indoor Ethernet runs; DC/patching; external earth; Ex gland sizing/entry count; vendor-supplied bracket, jumpers and panel internals; test/termination interface. No additional amount is added here.</p>
    </details>;
   })}
