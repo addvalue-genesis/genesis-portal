@@ -7,6 +7,7 @@ import {deriveScadaBudgetEnvelope0553} from "./data/scadaBudgetEnvelope0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
 import {MR0004_WORKING_BOM_0553} from "./data/mr0004WorkingBom0553";
 import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
+import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./data/siteSystemCostReconciliation";
 const SHEETS=[
  ["Scope of supply","A/B/C","A1–A5 equipment+bulk, B1–B14 services, C1/C2 options"],
  ["B10 CommSpares","B10","Erection, pre-commissioning, commissioning and start-up spare parts"],
@@ -45,10 +46,13 @@ export function ScopeSheetsDetail0553({fx=null}){
   Number.isFinite(x.extendedTHB));
  const a5Known=round(additionalBulk.reduce((n,x)=>n+x.extendedTHB,0));
  const a5Unpriced=allSystemBulk.filter(x=>!Number.isFinite(x.extendedTHB)&&x.owner!=="DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE").length;
+ const phoneRows=SITE_SYSTEM_COST_RECONCILIATION_0553.rows.filter(r=>r.mr==="MR-0003"&&["ZWP20","ZWP21","ZWP22"].includes(r.site));
+ const phoneRateLines=phoneRows.flatMap(r=>r.evidence||[]).filter(x=>["PHONE-1","SOUNDER-1","JB-1"].includes(x.line)&&x.currency==="THB"&&Number.isFinite(x.extended));
+ const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
  const workingSummary={
    A1:{amount:workingScadaFloor,source:"MR0001 Tag Cost Ledger + separated incremental SCADA bulk",status:"PRELIMINARY PRICED FLOOR; unpriced equipment/accessories excluded"},
    A2:{amount:null,source:"MR0002 requires accepted non-MGW manufacturer/vendor rate selection",status:"MGW PRICE EXCLUDED BY MANAGEMENT; SOURCE RATE REQUIRED"},
-   A3:{amount:null,source:"MR0003 Ex Telephone + Sounder + Ex e JB, 4 WPs; require selected non-MGW price evidence",status:"MGW PRICE EXCLUDED BY MANAGEMENT; NO FOURTH-UNIT EXTRAPOLATION"},
+   A3:{amount:a3PricedFloor,source:"EXION THAI QT1260576 Phone + Sounder; PROSPER Q-PROSRY-24051 historical Ex e JB; 3 allocated locations only",status:"PRELIMINARY 3-LOCATION FLOOR; 4th EXION quoted set UNALLOCATED, JB REQUOTE AND BULK NOT INCLUDED"},
    A4:{amount:fx?.thbPerUsd>0?workingMR4USD*fx.thbPerUsd:null,source:"MR0004 ORGA canonical Working BOM",status:"PROVISIONAL 3-SITE SCENARIO"},
    A5:{amount:a5Known>0?a5Known:null,source:"Separate system physical bulk ledger excluding SCADA-CAT6A and DATO already allocated in A1",status:"PARTIAL PRICED FLOOR; "+a5Unpriced+" other field-bulk items remain without rates"}
  };
