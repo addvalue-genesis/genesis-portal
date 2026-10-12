@@ -99,7 +99,7 @@ export function selectMR0001TagCostRows0553(site){
     assumptions:["ZWP20 DATO budgeting method reused, but ZWP21 technical Ex compliance not verified",
      "IP20 retail plug is a price analogue only; do not release as certified Ex disconnect","Not additional to a vendor-free-issued package if included"]};
   }
-  if(site==="ZWP21"&&item.sourceRow===20&&item.sourcePartText==="Bulk Material"){
+  if(site==="ZWP21"&&item.sourceRow===20&&/bulk material/i.test(item.sourceTag)){
    const rate=524,baseM=60,allowance=0.15,purchaseM=Math.ceil(baseM*(1+allowance));
    const gland=1020;
    const components=[{functionId:"SCADA_CAT6A_FIELD_RUN",sku:"TECKNIKABEL CAT6A S/FTP",qty:purchaseM,currency:"THB",unitPrice:rate,extended:round(purchaseM*rate),source:"INNOVA QA24-0604 historical"},
