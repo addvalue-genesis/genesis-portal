@@ -29,6 +29,13 @@ export function ScopeSheetsDetail0553({fx=null}){
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
  const details=REV08_BASELINE.detail[category[1]]||[];
  const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
+ // A2 is sourced from the SAME MR0002 per-site Working BOM, including the RFI-LNA.
+ // Management excluded MGW rates: omit MGW vendor rows, never erase independently
+ // evidenced RFI-LNA and THB field allowance entries.
+ const a2Eligible=MR0002_WORKING_BOM_0553.sites.flatMap(s=>s.items)
+  .filter(x=>x.countedInWorkingTotal&&Number.isFinite(x.extended)&&x.source!=="MGW-P26-058"&&!String(x.owner||"").startsWith("MGW_"));
+ const a2THB=a2Eligible.filter(x=>x.currency==="THB").reduce((n,x)=>n+x.extended,0);
+ const a2USD=a2Eligible.filter(x=>x.currency==="USD").reduce((n,x)=>n+x.extended,0);
  // Working figures are live provisional cost evidence, not customer sell / released A1-A5.
  // A1 currently has SCADA field bulk embedded in tag ledger; it cannot be split blindly into A5.
  const round=n=>Math.round(n*100)/100;
@@ -51,7 +58,9 @@ export function ScopeSheetsDetail0553({fx=null}){
  const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
  const workingSummary={
    A1:{amount:workingScadaFloor,source:"MR0001 Tag Cost Ledger + separated incremental SCADA bulk",status:"PRELIMINARY PRICED FLOOR; unpriced equipment/accessories excluded"},
-   A2:{amount:null,source:"MR0002 requires accepted non-MGW manufacturer/vendor rate selection",status:"MGW PRICE EXCLUDED BY MANAGEMENT; SOURCE RATE REQUIRED"},
+   A2:{amount:fxValid?round(a2THB+a2USD*fx.thbPerUsd):a2USD===0?round(a2THB):null,
+   source:"MR0002_WORKING_BOM_0553 per-site rows: RFI-LNA and non-MGW priced allowances only",
+   status:"PARTIAL WORKING FLOOR; MGW rates excluded, remaining DMR equipment and unpriced bulk not included"},
    A3:{amount:a3PricedFloor,source:"EXION THAI QT1260576 Phone + Sounder; PROSPER Q-PROSRY-24051 historical Ex e JB; 3 allocated locations only",status:"PRELIMINARY 3-LOCATION FLOOR; 4th EXION quoted set UNALLOCATED, JB REQUOTE AND BULK NOT INCLUDED"},
    A4:{amount:fx?.thbPerUsd>0?workingMR4USD*fx.thbPerUsd:null,source:"MR0004 ORGA canonical Working BOM",status:"PROVISIONAL 3-SITE SCENARIO"},
    A5:{amount:a5Known>0?a5Known:null,source:"Separate system physical bulk ledger excluding SCADA-CAT6A and DATO already allocated in A1",status:"PARTIAL PRICED FLOOR; "+a5Unpriced+" other field-bulk items remain without rates"}
