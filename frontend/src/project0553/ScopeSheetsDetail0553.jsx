@@ -33,8 +33,6 @@ export function ScopeSheetsDetail0553({fx=null}){
  const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
  // Working figures are live provisional cost evidence, not customer sell / released A1-A5.
  // A1 currently has SCADA field bulk embedded in tag ledger; it cannot be split blindly into A5.
- const workingA1=scadaEnvelope.locations.every(s=>Number.isFinite(s.baseBudgetTHB))
-    ?scadaEnvelope.locations.reduce((sum,s)=>sum+s.baseBudgetTHB,0):null;
  const round=n=>Math.round(n*100)/100;
  const fxValid=Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0;
  // Working budget estimate: source-priced equipment plus explicitly separated bulk.
@@ -60,7 +58,7 @@ export function ScopeSheetsDetail0553({fx=null}){
    A2:{amount:fx?.thbPerUsd>0?workingMR2THB+workingMR2USD*fx.thbPerUsd:null,source:"MR0002 canonical Working BOM",status:"PROVISIONAL EQUIPMENT+SELECTED BULK"},
    A3:{amount:fxValid&&phoneBudgetUSD!==null?round(phoneBudgetUSD*fx.thbPerUsd):null,source:"MGW P26-058 PHONE-1 USD 11,152/set × 4 WPs; original quotation for 3 only",status:"FOURTH UNIT EXTRAPOLATION; phone/sounder/JB included, installation bulk excluded"},
    A4:{amount:fx?.thbPerUsd>0?workingMR4USD*fx.thbPerUsd:null,source:"MR0004 ORGA canonical Working BOM",status:"PROVISIONAL 3-SITE SCENARIO"},
-   A5:{amount:a5Known,source:"Separate system physical bulk ledger excluding SCADA-CAT6A and DATO already allocated in A1",status:"PARTIAL PRICED FLOOR; "+a5Unpriced+" other field-bulk items remain without rates"}
+   A5:{amount:a5Known>0?a5Known:null,source:"Separate system physical bulk ledger excluding SCADA-CAT6A and DATO already allocated in A1",status:"PARTIAL PRICED FLOOR; "+a5Unpriced+" other field-bulk items remain without rates"}
  };
  return <section className="p55-panel">
   <div className="p55-eyebrow">6 ORIGINAL SHEETS <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
@@ -71,8 +69,9 @@ export function ScopeSheetsDetail0553({fx=null}){
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Unit Price THB</th><th>Working Budgetary Cost THB</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
   <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
    const item=workingSummary[id],amount=item?.amount;
+   const unavailable=id==="A5"?"Unpriced bulk exposure":fxValid?"Cost source pending":"Awaiting FX";
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>1 LS</td>
-    <td className="is-number">{Number.isFinite(amount)?cash(amount):"Awaiting FX"}</td>
+    <td className="is-number">{Number.isFinite(amount)?cash(amount):unavailable}</td>
     <td className="is-number">{Number.isFinite(amount)?cash(amount):"Awaiting FX"}</td>
     <td>{item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(([desc,qty,price],i)=>{
