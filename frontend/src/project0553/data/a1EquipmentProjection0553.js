@@ -10,7 +10,9 @@ export function deriveA1EquipmentCoverage0553(){
    const key=group.site+"|"+group.mr+"|"+item.row+"|"+item.tag;
    if(seen.has(key))continue;seen.add(key);
    items.push({site:group.site,mr:group.mr,tag:item.tag,row:item.row,description:item.description,
-    qty:item.sourceQty,unit:item.sourceUnit,currency:item.currency,unitCost:item.unitCost,extended:item.extended,
+    qty:item.sourceQty,unit:item.sourceUnit,currency:item.currency,unitCost:item.unitCost,extended:item.countedInWorkingTotal===false?null:item.extended,
+    referenceExtended:item.countedInWorkingTotal===false?item.extended:null,
+    countedInWorkingTotal:item.countedInWorkingTotal!==false,
     status:item.status,source:"DETAILED_COST_LEDGER"});
   }
  }
