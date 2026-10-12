@@ -1,6 +1,7 @@
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
+import {derivePartBcWorkingWbs0553} from "./data/partBCWorkingWbs0553";
 import {BULK_TAKEOFF_0553} from "./data/bulkTakeoff0553";
 import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
 import {deriveScadaBudgetEnvelope0553} from "./data/scadaBudgetEnvelope0553";
@@ -56,6 +57,7 @@ export function ScopeSheetsDetail0553({fx=null}){
  const phoneRows=SITE_SYSTEM_COST_RECONCILIATION_0553.rows.filter(r=>r.mr==="MR-0003"&&["ZWP20","ZWP21","ZWP22"].includes(r.site));
  const phoneRateLines=phoneRows.flatMap(r=>r.evidence||[]).filter(x=>["PHONE-1","SOUNDER-1","JB-1"].includes(x.line)&&x.currency==="THB"&&Number.isFinite(x.extended));
  const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
+ const partBC=derivePartBcWorkingWbs0553();
  const workingSummary={
    A1:{amount:workingScadaFloor,source:"MR0001 Tag Cost Ledger + separated incremental SCADA bulk",status:"PRELIMINARY PRICED FLOOR; unpriced equipment/accessories excluded"},
    A2:{amount:fxValid?round(a2THB+a2USD*fx.thbPerUsd):a2USD===0?round(a2THB):null,
@@ -73,11 +75,12 @@ export function ScopeSheetsDetail0553({fx=null}){
   <p className="p55-note">{category[2]}</p>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Unit Price THB</th><th>Working Budgetary Cost THB</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
   <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
-   const item=workingSummary[id],amount=item?.amount;
+   const control=partBC.rows.find(r=>r.code===id);
+   const item=workingSummary[id]||(control?{amount:control.sellTHB,status:control.state,source:control.driver+" · "+control.owner+" · "+control.source}:null),amount=item?.amount;
    const unavailable=id==="A5"?"Unpriced bulk exposure":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
-   return <tr key={id}><td>{id}</td><td>{desc}</td><td>1 LS</td>
-    <td className="is-number">{Number.isFinite(amount)?cash(amount):unavailable}</td>
-    <td className="is-number">{Number.isFinite(amount)?cash(amount):"Awaiting FX"}</td>
+   return <tr key={id}><td>{id}</td><td>{desc}</td><td>{control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (unpriced scope)"}</td>
+    <td className="is-number">{Number.isFinite(control?.unitPriceTHB)?cash(control.unitPriceTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
+    <td className="is-number">{Number.isFinite(amount)?cash(amount):control?"Owner / OEM quotation required":unavailable}</td>
     <td>{item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(([desc,qty,price],i)=>{
    // Historical template numbers are customer-facing Rev08 prices, not present-day supplier cost.
@@ -87,6 +90,7 @@ export function ScopeSheetsDetail0553({fx=null}){
     <td className="is-number">{Number.isFinite(rate)?cash(round(qty*rate)):"Awaiting FX"}</td>
     <td>Rev08 customer-price equivalent converted to THB — historical comparison ONLY, not working supplier cost</td></tr>;
   })}</tbody></table></div>
+  {sheet==="Scope of supply"&&<p className="p55-note"><strong>Part B ADDVALUE Working Sell:</strong> {cash(partBC.subtotalTHB)} from Rev05 WBS, not internal direct cost or full SAMTEL client price. B4–B7, B10–B14 and C1–C2 are owner-controlled excluded/optional lines; unresolved owner quotation must NOT be interpreted as zero. <a href={partBC.sourceUrl} target="_blank" rel="noreferrer">WBS Rev05 original</a>.</p>}
   {sheet==="Scope of supply"&&<section className="p55-panel" data-component-key="bid.budget.scope.scada-working">
    <h4>MR-0001 SCADA — Engineering BOM &amp; Bulk Budgetary Working Projection</h4>
    <p className="p55-note"><strong>Live derivation:</strong> existing MR0001 tag Cost Ledger → 16-function bulk verification → budget envelope. This is not a new cost ledger and does not modify customer Rev08. Original currencies retained; FX {fx?.thbPerUsd??"REQUIRED"} THB/USD, source {fx?.source||"not entered"}. Brownfield is budgeted as new replacement only. Accessories are segregated from Base, not silently merged or double counted.</p>
