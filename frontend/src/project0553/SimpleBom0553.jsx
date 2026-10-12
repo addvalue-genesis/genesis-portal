@@ -90,8 +90,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  const displaySiteTotal=siteName=>{
   const sum=wpSummary(siteName);
   if(!(fx?.thbPerUsd>0))return "FX REQUIRED · "+originalMoney(sum.usd,"USD")+" + "+originalMoney(sum.thb,"THB");
-  const amount=activeCurrency==="THB"?sum.thb+sum.usd*fx.thbPerUsd:sum.usd+sum.thb/fx.thbPerUsd;
-  return money(amount,activeCurrency);
+  return thbMoney(sum.thb+sum.usd*fx.thbPerUsd,"THB");
  };
 
  return <section className="p55-panel">
