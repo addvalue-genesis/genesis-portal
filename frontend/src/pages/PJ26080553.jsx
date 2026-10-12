@@ -46,6 +46,28 @@ const sourceLinks = ids => ids.map(id => {
 });
 
 export function PJ26080553() {
+ const [moduleQuery,setModuleQuery]=useState("");
+ const mainModuleIndex=[
+  {id:"bid.overview",name:"Project Overview / Workflow",tab:"overview",keywords:"main dashboard"},
+  {id:"bid.architecture",name:"Architecture / Module Registry",tab:"architecture",keywords:"structure architecture"},
+  {id:"bid.systems",name:"All MR Systems",tab:"systems",keywords:"mr0001 mr0002 mr0003 mr0004 system"},
+  {id:"bid.engineering",name:"Engineering / First Principles",tab:"engineering",keywords:"calculation mr engineering"},
+  {id:"bid.engineering.mr0002",name:"MR-0002 RFI LNA / Physical BOM",tab:"engineering",keywords:"rfi trunk radio"},
+  {id:"bid.documents",name:"Vendor Documents / Product Register",tab:"documents",keywords:"vendor supplier quote"},
+  {id:"bid.vendor.products.supplier.quote-lines",name:"Vendor Products / Supplier Quote Lines",tab:"documents",keywords:"supplier mgw rfi cost"},
+  {id:"bid.budget",name:"Budget Workspace",tab:"budget",keywords:"working costing"},
+  {id:"bid.budget.bom",name:"Engineering BOM Working Preview",tab:"budget",keywords:"working preview equipment"},
+  {id:"bid.budget.bom.mr0002",name:"MR-0002 Trunk Radio Working BOM",tab:"budget",keywords:"rfi dmr antenna feeder"},
+  {id:"bid.budget.bom.source-coverage",name:"BOM Source Coverage",tab:"budget",keywords:"source evidence"},
+  {id:"bid.budget.bom.reconciliation",name:"BOM Cost Reconciliation",tab:"budget",keywords:"site cost"},
+  {id:"bid.budget.summary.workbook",name:"Budgetary Summary Workbook",tab:"budget",keywords:"scope of supply a b c"},
+  {id:"bid.execution",name:"Execution & Delivery",tab:"execution",keywords:"vdr fat sat"},
+  {id:"bid.risk",name:"Risk / Compliance",tab:"risk",keywords:"release gates"},
+  {id:"bid.registry",name:"Data Code Registry",tab:"registry",keywords:"module ids"},
+  {id:"bid.schematic",name:"SCADA / Telecom Schematic",tab:"schematic",keywords:"radio"}
+ ];
+ const searchMatches=moduleQuery.trim()?mainModuleIndex.filter(m=>(m.id+" "+m.name+" "+m.keywords).toLowerCase().includes(moduleQuery.trim().toLowerCase())):mainModuleIndex;
+ const jumpModule=m=>{setLifecycleStage("L3");setL3Area("B");setWorkspaceTab(m.tab);setModuleQuery(m.id);};
  const [opened,setOpened]=useState(null);
  const [workspaceTab,setWorkspaceTab]=useState("overview");
  const [lifecycleStage,setLifecycleStage]=useState("L3");
@@ -83,6 +105,19 @@ export function PJ26080553() {
  return <ProjectWorkspaceShell project={shellProject} tabs={l3Area==="B"?TABS.map(([id,label])=>({id,label})):[]} tabGroups={l3Area==="B"?TAB_GROUPS:[]} className="p553-dashboard" activeTab={workspaceTab} onTabChange={setWorkspaceTab} renderContent={(tab)=><>{lifecycleHeader}{lifecycleStage!=="L3"?<section className="p55-section"><h2>{activeLifecycle.id} — {activeLifecycle.title}</h2><p>This lifecycle stage is a navigation placeholder. The current project is L3 Tendering & Bidding. Its upstream references and downstream scope forecasts remain preserved in the L3 workbench; no project data was migrated or reclassified automatically.</p><button type="button" onClick={()=>setLifecycleStage("L3")}>Back to L3 Tendering & Bidding</button></section>:<>
  {l3Area==="A"&&<div className="p55-stack"><section className="p55-panel"><ComponentCopyId projectId="PJ2608-0553" componentKey="l3.original"/></section><Section title="L3.A — Original / Received Documents"><p>เอกสารต้นทางจาก RFQ / Client เก็บอ้างอิงไฟล์เดิม ไม่ถือว่าการลงทะเบียนเป็นการอนุมัติ</p><Table headers={["ID","Document / location","Revision","Control state","Meaning"]} rows={sourceRows(originalSources)}/></Section><Section title="Project Engineering References"><p>MR, DTS, BOD, SPE, DWG, CAL/RPT และเอกสารที่ถูกอ้างอิง ตรวจรายละเอียดและ Revision ใน 04 Document Intelligence โดยใช้ต้นฉบับชุดเดิม</p><DocumentReferenceControl0553/></Section></div>}
  {l3Area==="C"&&<div className="p55-stack"><section className="p55-panel"><ComponentCopyId projectId="PJ2608-0553" componentKey="l3.submissions"/></section><Section title="L3.C — Communications & Submissions"><p>ทะเบียนเอกสารสื่อสารกับ SAMTEL / JUTAL และเอกสารเสนอราคา ไม่ถือว่ารายการที่ INDEXED หรือ PREPARED ได้ส่งแล้ว</p><Table headers={["ID","Document / location","Revision","Control state","Meaning"]} rows={sourceRows(communications)}/></Section><Section title="Submission Control"><p>TC/TQ, technical bid, commercial priced/unpriced, transmittals, comments และ responses ต้องตรวจหลักฐานผู้ส่ง ผู้รับ วันที่ และ Revision ก่อนเปลี่ยนสถานะเป็น SUBMITTED. TBE ภายในไม่ใช่ Submission อัตโนมัติ</p></Section></div>}
+ {l3Area==="B"&&<section className="p55-panel" style={{padding:14,marginBottom:16}}>
+  <h3>ค้นหา Module ทั้งโครงการ / Project Module Navigator</h3>
+  <p className="p55-note">ค้นหาจาก Module ID, System, MR หรือชื่อหน้าจอ แล้วคลิกเพื่อเปิดแท็บหลักที่เกี่ยวข้อง ไม่จำกัดเฉพาะ Trunk Radio</p>
+  <div className="p55-filterbar"><label>Search Module <input value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} placeholder="เช่น bid.budget.bom.mr0002, Vendor, MR-0001, Summary Workbook" aria-label="ค้นหา Module ทั้งโครงการ"/></label>
+   <button type="button" onClick={()=>setModuleQuery("")}>Clear</button>
+  </div>
+  <div style={{maxHeight:moduleQuery.trim()?320:150,overflowY:"auto",display:"flex",flexWrap:"wrap",gap:8}}>
+   {searchMatches.map(m=><button key={m.id} type="button" className="p553-detail-button" onClick={()=>jumpModule(m)}>
+    <strong>{m.name}</strong><small style={{display:"block"}}>{m.id} · Open {m.tab}</small>
+   </button>)}
+   {!searchMatches.length&&<span role="status">ไม่พบ Module ที่ตรงกับคำค้น</span>}
+  </div>
+ </section>}
  {l3Area==="B"&&<>
  <section className="p55-panel"><strong>Current module / รหัสอ้างอิงสำหรับสั่งแก้ไข</strong> <ComponentCopyId key={tab} projectId="PJ2608-0553" componentKey={"bid."+tab}/></section>
  {tab==="overview"&&<WorkflowNavigator0553 onNavigate={setWorkspaceTab}/> }
