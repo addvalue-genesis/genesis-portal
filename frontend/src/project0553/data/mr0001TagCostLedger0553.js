@@ -105,7 +105,7 @@ export function selectMR0001TagCostRows0553(site){
    const components=[{functionId:"SCADA_CAT6A_FIELD_RUN",sku:"TECKNIKABEL CAT6A S/FTP",qty:purchaseM,currency:"THB",unitPrice:rate,extended:round(purchaseM*rate),source:"INNOVA QA24-0604 historical"},
     {functionId:"SCADA_INDOOR_ENTRY",sku:"501/453/UNIV/A/M20",qty:1,currency:"THB",unitPrice:gland,extended:gland,source:"INNOVA QA24-0604 historical"}];
    const total=round(components.reduce((n,c)=>n+c.extended,0));
-   return {site,mr:"MR-0001",row:20,tag:"BULK-MATERIAL",description:item.description,
+   return {site,mr:"MR-0001",row:20,tag:item.sourceTag,description:item.description,
     sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,currency:"THB",
     unitCost:total,extended:total,countedInWorkingTotal:true,
     vendor:"INNOVA historical / Engineering allowance",sku:"SCADA CAT6A + indoor certified entry candidate",
@@ -155,7 +155,7 @@ export function selectMR0001TagCostRows0553(site){
    const lines=[{functionId:"SCADA_CAT6A_FIELD_RUN",sku:"TECKNIKABEL CAT6A S/FTP",qty:purchaseM,currency:"THB",unitPrice:rate,extended:purchaseM*rate},
     {functionId:"SCADA_INDOOR_ENTRY",sku:"501/453/UNIV/A/M20",qty:1,currency:"THB",unitPrice:gland,extended:gland}];
    const total=round(lines.reduce((n,x)=>n+x.extended,0));
-   return {site,mr:"MR-0001",row:item.sourceRow,tag:"BULK-MATERIAL",description:item.description,
+   return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,description:item.description,
     sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,currency:"THB",unitCost:total,extended:total,
     vendor:"INNOVA historical / engineering route allowance",sku:"CAT6A plus single M20 entry candidate",
     source:"MTO Rev04 / INNOVA QA24-0604 / approved greenfield budget basis",
@@ -163,6 +163,32 @@ export function selectMR0001TagCostRows0553(site){
     quantityBasis:"One assumed route 60m + 15% purchasing = 69m and one panel gland, subject to actual routing",
     components:lines,
     assumptions:["ZWP20 methodology only; separate site routes and cable counts unverified","Remaining RF, glands and grounding functions outside this partial cost","Do not add separate SCADA bulk scenario again"]};
+  }
+  // Brownfield reuse/tie-in: same engineering-detail contract, but the cost
+  // owner cannot be NEW until MTO/BLD assigns equipment replacement explicitly.
+  // Existing site Tags and their rate evidence are retained for budget comparison.
+  if(["ZPQ","ZWP8","ZWP11"].includes(site)&&!selected){
+   const family=/^MR-|^ANT-/.test(item.sourceTag)?"RADIO_OR_ANTENNA":
+    /^SA-/.test(item.sourceTag)?"SURGE":
+    /^TCAB-/.test(item.sourceTag)?"ENCLOSURE":
+    /bulk material/i.test(item.sourceTag)?"BULK_TIE_IN":
+    /^LAN-/.test(item.sourceTag)?"NETWORK":"UNCLASSIFIED";
+   if(family!=="UNCLASSIFIED"&&!Number.isFinite(item.indicativePackageCostTHB)){
+    const evidence=item.vendorCandidates||[];
+    return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,
+     description:item.description,sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,
+     currency:null,unitCost:null,extended:null,countedInWorkingTotal:false,
+     vendor:null,sku:null,source:"MTO Rev04 / BLD-0001 C1 brownfield tie-in and vendor rate candidates",
+     status:"BROWNFIELD_"+family+"_NEW_REUSE_BY_OTHERS_NOT_CONFIRMED",
+     quantityBasis:"MTO Set/Lot only; existing, reuse, replace, and extra tie-in quantity require engineering decision",
+     candidates:evidence,
+     components:evidence.filter(x=>Number.isFinite(x.originalUnitPrice)).map(x=>({
+       functionId:family+"_PRICE_CANDIDATE",sku:x.sku,qty:null,currency:x.originalCurrency,
+       unitPrice:x.originalUnitPrice,extended:null,status:"VENDOR_RATE_ONLY_NOT_ALLOCATED",source:x.quoteId
+     })),
+     assumptions:["Apply ZWP20 function/quantity/cost-owner validation; do not infer NEW procurement from brownfield MTO",
+      "Quote rate is not selected quantity, so cost stays unallocated until BLD and scope are reconciled"]};
+   }
   }
   const pricedFunctions=functions.length>0&&functions.every(x=>Number.isFinite(x.extended));
   const functionCost=pricedFunctions?round(functions.reduce((n,x)=>n+x.extended,0)):null;
