@@ -36,8 +36,8 @@ export function LocationBomDetail0553({site,fx}){
      <td><button type="button" className="p55-row-toggle" onClick={()=>setExpanded(o=>({...o,[v.tag]:!o[v.tag]}))}>{expanded[v.tag]?"−":"+"}</button> <strong>{v.tag}</strong><small>Row {v.row}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row}/></td>
      <td>{v.sourceQty??"REVIEW"} {v.sourceUnit||""}<small>{v.quantityBasis||v.note||"Engineering quantity and physical SKU to verify"}</small></td>
      <td>{v.vendor||"Vendor / Configuration not selected"}<small>{v.sku||v.description||"Engineering takeoff required"}</small></td>
-     <td>{thb(v.unitCost,v.currency)}<small>{v.currency||"—"} {fmt(v.unitCost)}</small></td>
-     <td><strong>{thb(v.extended,v.currency)}</strong><small>{v.currency||"—"} {fmt(v.extended)}</small></td>
+     <td>{thb(v.unitCost,v.currency)}<small>{v.currency||"—"} {fmt(v.unitCost)}</small>{!v.countedInWorkingTotal&&Number.isFinite(v.referenceExtended)&&<small>REFERENCE ONLY — NOT SELECTED</small>}</td>
+     <td><strong>{v.countedInWorkingTotal?thb(v.extended,v.currency):Number.isFinite(v.referenceExtended)?thb(v.referenceExtended,v.currency)+" (reference only)":"NOT ALLOCATED"}</strong><small>{v.countedInWorkingTotal?`${v.currency||"—"} ${fmt(v.extended)}`:"Excluded from booked site cost until owner/quantity decision"}</small></td>
      <td>{v.status}<small>{v.source||"MTO Rev04"}</small>{(v.assumptions||[]).map((x,i)=><small key={i}>{x}</small>)}</td>
     </tr>
     {expanded[v.tag]&&<tr><td colSpan={6}><div className="p55-panel">
