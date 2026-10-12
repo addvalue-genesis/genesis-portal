@@ -1,3 +1,4 @@
+import {deriveRaconTerminationBudget0553} from "./raconTerminationBudget0553";
 import {APPROVED_0553_BUDGET_BASIS,approvedCablePurchaseM} from "./approvedBudgetBasis0553";
 import {RACON_VENDOR_SCOPE_0553} from "./raconVendorScope0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
@@ -36,9 +37,13 @@ export function deriveWpSystemBulkBudget0553(){
      id:"DTRS-"+i,item:v.fn,unit:v.unit,qty:v.qty,rateTHB:null,source:v.source,owner:v.tag,
      status:"MOT_RFI_LNA_INTERFACE__NO_MATCHED_RATE",note:"RFI LNA 380-520MHz; 50 ohm SMA(F). Feeder requires RF attenuation and proper topology"}))},
    {id:"MARINE_RACON",name:"Marine RACON",equipment:found("MARINE_RACON"),route:cableRoute("MARINE_RACON"),
-    items:found("MARINE_RACON").length?[{id:"RACON-POWER-CONTROL",item:"Power/control interface cable to RACON DB/JB",unit:"route",qty:null,rateTHB:null,
-     source:"LAY sheet "+w.sheets.upper+"; Orga SO1067286 GA / SEABEACON 2 termination, vendor enclosures included",owner:"RACON_BULK",
-     status:"VENDOR_ENCLOSURES_INCLUDED__FIELD_BULK_ONLY",note:"Vendor RACON assembly includes enclosures per supplier GA; only field power/control cables, Ex certified terminations and external connections excluded from offer may be separate bulk"}]:[]}
+    items:(raconBudget.find(x=>x.wp===w.wp)?.rows||[]).map(v=>({
+     id:"RACON-"+v.id,item:v.from+" to "+v.to+" / "+v.kind,unit:"m",qty:v.additionalPurchaseM,
+     rateTHB:null,source:"ORGA QTORG2609244 p4 included 5m/5m/10m and CMP glands; Tideland 070.1016-DWG p3",
+     owner:"FIELD_RACON_BULK_NET_OF_VENDOR_INCLUSION",
+     status:"REPLACEMENT_SCENARIO__RATE_PENDING",
+     note:"Gross "+v.procurementM+"m; ORGA cut length "+v.vendorIncludedM+"m; shortfall "+v.extensionShortfallM+"m; full-run replacement "+v.replacementFullRunM+"m. No field splice presumed."
+    }))}
   ];
   return {wp:w.wp,systems:systems.map(sys=>({...sys,items:sys.items.map(it=>({
    ...it,extendedTHB:it.owner==="DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE"?null:Number.isFinite(it.qty)&&Number.isFinite(it.rateTHB)?Math.round(it.qty*it.rateTHB*100)/100:null
