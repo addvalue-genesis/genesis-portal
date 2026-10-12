@@ -18,8 +18,9 @@ const sites=[...new Set([
  ..."ZWP20 ZWP21 ZWP22".split(" ")
 ])].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true}));
 const sourcePrice=(id)=>SUPPLIER_QUOTE_LINES_0553.find(q=>q.id===id);
-const mgwBySystem={"MR-0002":["UHF-1","UHF-2","UHF-3","UHF-4"],
- "MR-0003":["PHONE-1"]};
+const mgwBySystem={"MR-0002":["UHF-1","UHF-2","UHF-3","UHF-4"]};
+// EXION THAI QT 1260576 (4 quoted each); PROSPER JB is 2024 historical Zawtika 1E comparator, not a current 1F firm quote.
+export const MR0003_SELECTED_RATE_EVIDENCE_0553=Object.freeze({phone:{sku:"212-02-6008-510",rateTHB:145000,quotedQty:4},sounder:{sku:"DB3BDG048N2BNR",rateTHB:62000,quotedQty:4},jb:{sku:"BARTEC-EX-E-TELEPHONE-JB",rateTHB:24500,quotedQty:4,referenceOnly:true},siteBudgetQty:1,assignedSites:["ZWP20","ZWP21","ZWP22"],unallocatedExionQty:1,exionQuote:"1260576",prosperQuote:"Q-PROSRY-24051"});
 const normalizedMGW=MGW_P26_058_0553.lines.map(([id,sku,description,qty,unit,extended,group])=>({id,sku,description,qty,unit,extended,group}));
 const sharedMGW=normalizedMGW.filter(x=>x.id.startsWith("SERV-"));
 const checkedAmount=(row)=>row.qty*row.unit;
@@ -45,16 +46,24 @@ const legacyRows=sites.flatMap(site=>systems.map(mr=>{
     currency:"USD",unit:v.unit,extended:v.unit,kind:"PROVISIONAL_EQUAL_SPLIT_3_SITES"});
   }
  }
+ if(mr.id==="MR-0003"&&MR0003_SELECTED_RATE_EVIDENCE_0553.assignedSites.includes(site)){
+  const e=MR0003_SELECTED_RATE_EVIDENCE_0553;
+  for(const x of [
+   {line:"EXION-PHONE",description:"GAI-TRONICS Auteldac 6 Ex VoIP Phone / "+e.phone.sku,rate:e.phone.rateTHB,source:"EXION THAI QT "+e.exionQuote,kind:"2026_QUOTED_RATE__ONE_PER_SITE_PROVISIONAL"},
+   {line:"EXION-SOUNDER",description:"Ex sounder / "+e.sounder.sku,rate:e.sounder.rateTHB,source:"EXION THAI QT "+e.exionQuote,kind:"2026_QUOTED_RATE__ONE_PER_SITE_PROVISIONAL"},
+   {line:"PROSPER-EX-JB",description:"BARTEC Ex e Telephone Junction Box assembly, historical 1E analogue",rate:e.jb.rateTHB,source:"PROSPER "+e.prosperQuote+" 2024 (historical Zawtika 1E)",kind:"HISTORICAL_COMPARABLE_1E_NOT_1F_VENDOR_CONFIRMATION"}
+  ])evidence.push({source:x.source,line:x.line,description:x.description,sourceQty:x.line==="PROSPER-EX-JB"?4:4,assumedQty:1,currency:"THB",unit:x.rate,extended:x.rate,kind:x.kind});
+ }
  const currencies=[...new Set(evidence.map(e=>e.currency))];
  const subtotals=currencies.map(currency=>({currency,amount:Math.round(evidence.filter(e=>e.currency===currency).reduce((n,e)=>n+e.extended,0)*100)/100}));
  const gaps=mr.id==="MR-0001"?["Detailed site ledger not yet implemented for this location","RF/CAL/OEM quantity and scope ownership must remain source-linked"]:
   mr.id==="MR-0002"?["RFI LNA not included in MGW BDA","Site RF topology, feeder and enclosure take-off"]:
-  mr.id==="MR-0003"?["Verify phone package vs sounder/JB/gland scope","Installation cable/terminations"]:
+  mr.id==="MR-0003"?["EXION quoted 4 phones and 4 sounders; only 3 are provisionally allocated here, fourth is UNALLOCATED","PROSPER JB THB 24,500 is 2024 Zawtika 1E comparator, requote required","Confirm site tag allocation, Ex JB configuration and installation cable/terminations"]:
   ["RACON installation accessories, Ex/certification and test"];
  return {site,mr:mr.id,name:mr.name,rfqSource:mr.rfqSource,evidence,subtotals,gaps,
   detailRows:[],projectionSource:"LEGACY_SOURCE_EVIDENCE_NOT_DETAILED_SITE_LEDGER",
   completeness:"PARTIAL_NOT_APPROVED",verifiedTotal:null,
-  sourceNote:mr.id==="MR-0001"?"Legacy site evidence pending migration to controlled detailed site ledger":"MGW 3-unit quotation split equally across ZWP20-22 only as reversible budgetary assumption"};
+  sourceNote:mr.id==="MR-0001"?"Legacy site evidence pending migration to controlled detailed site ledger":mr.id==="MR-0003"?"EXION THAI 2026 telephone/sounder rates + PROSPER 2024 JB comparable. Fourth EXION set not allocated. MGW excluded from selected MR0003 pricing.":"MR-specific evidence projection, not final release"};
 }));
 
 // Canonical ZWP20 source: this is EXACTLY the same derived ledger rendered by bid.budget.bom.zwp20.
