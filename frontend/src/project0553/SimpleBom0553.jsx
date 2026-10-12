@@ -4,6 +4,7 @@ import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
 import {DTRS_RFI_BULK_0553} from "./data/dtrsRfiBulk0553";
 import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
 import {deriveDtrsRfiBudget0553} from "./data/dtrsRfiBudgetCalculation0553";
+import {deriveRaconTerminationBudget0553} from "./data/raconTerminationBudget0553";
 import {deriveSevenLocationCostLedger0553} from "./data/sevenLocationCostCalculations0553";
 import { deriveEngineeringOwnedCost0553 } from "./data/engineeringOwnedCost0553";
 import { deriveZWP20VendorFunctionCosts, getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
@@ -22,6 +23,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  const zwp20Cost=deriveZWP20SiteCost0553();
  const wpSystemBulk=deriveWpSystemBulkBudget0553();
  const dtrsRfiSites=deriveDtrsRfiBudget0553();
+ const raconBudgetSites=deriveRaconTerminationBudget0553();
  const lifecycleLedger=deriveSevenLocationCostLedger0553();
  const bulkBudgetSummary=wpSystemBulk.map(w=>{
   const rows=w.systems.flatMap(sys=>sys.items);
@@ -106,6 +108,15 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Site</th><th>System</th><th>Bulk material / interface</th><th>Quantity</th><th>Rate THB</th><th>Budget THB</th><th>Evidence / state</th></tr></thead><tbody>
   {wpSystemBulk.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.systems.flatMap(sys=>sys.items.map((item,i)=><tr key={w.wp+sys.id+item.id+i}><td>{w.wp}</td><td>{w.siteClass}</td><td>{sys.name}</td><td>{item.item}</td><td>{item.qty===null?"DERIVE":item.qty+" "+item.unit}</td><td>{money(item.rateTHB,"THB")}</td><td>{money(item.extendedTHB,"THB")}</td><td>{item.status}<small>{item.source}</small></td></tr>)))}
   </tbody></table></div></details>
+  <details className="p55-panel"><summary>RACON · SEABEACON-2 Termination-Based Bulk · ZWP20/21/22</summary>
+   <p className="p55-note">Source: Tideland 070.1016-DWG Rev.C, application diagram p3. The drawing explicitly excludes field cables and cable glands from Tideland scope. RACON/Control Box/JB are vendor-package owned; no second enclosure cost. Cable sizes in drawing are for reference. Budgetary quantities only and working zero is NOT zero cost.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Location</th><th>Circuits / Routes</th><th>Procurement Qty</th><th>Price state</th><th>Derivation</th></tr></thead><tbody>
+   {raconBudgetSites.filter(w=>site==="ALL"||site===w.wp).map(w=><React.Fragment key={w.wp}><tr><td><button type="button" className="p55-row-toggle" aria-expanded={Boolean(expanded["raconbulk:"+w.wp])} onClick={()=>open("raconbulk:"+w.wp)}>{expanded["raconbulk:"+w.wp]?"−":"+"}</button> {w.wp}</td><td>{w.routedRunCount} distinct circuit rows</td><td>{w.procurementTotalM} m across cable types<small>Do NOT combine different wire specifications as one SKU</small></td><td>THB 0 working display · RATE PENDING<small>Verified cost: NOT CALCULATED</small></td><td>{w.completionState}</td></tr>
+   {expanded["raconbulk:"+w.wp]&&<tr><td colSpan={5}><div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Circuit / From → To</th><th>Cable Type</th><th>Budget Route (m)</th><th>Purchase incl. 15% (m)</th><th>Unit Rate</th><th>Cost Owner / Evidence</th></tr></thead><tbody>
+   {w.rows.map(x=><tr key={x.id}><td>{x.id}<small>{x.from} → {x.to}</small></td><td>{x.kind}</td><td>{x.designBudgetM}</td><td>{x.procurementM}</td><td>THB 0 · PRICE PENDING</td><td>{x.costOwner}<small>{x.evidence}</small></td></tr>)}
+   </tbody></table><p className="p55-note">Ex field glands: starting interface count {w.fieldGlandCandidateQty} cable ends; deduct vendor-included entries and select verified Ex size. {w.caveat}</p></div></td></tr>}</React.Fragment>)}
+   </tbody></table></div>
+  </details>
   <details className="p55-panel"><summary>DTRS / RFI LNA · RF Feeder Engineering + Cost Breakdown by ZWP20–22</summary>
    <p className="p55-note">Management-approved 2026-10-12: CommScope LDF4RK-50A 50-ohm feeder candidate; estimate separately per WP from layout with 15% material allowance. AFC LAY does not dimension cable route; 9.144m grid comparator + 3m routing/termination is assumption only. Connector, grounding, weatherproofing quotes use web-retail rates. The 631 THB assumed per metre feeder rate is NOT UOM verified. No committed RF cost or customer release is implied.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Budget Route</th><th>Procurement</th><th>450MHz Feeder Loss</th><th>Illustrative Material THB</th><th>Engineering Status</th></tr></thead><tbody>
