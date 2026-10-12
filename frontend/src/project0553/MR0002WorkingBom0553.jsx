@@ -6,15 +6,15 @@ export function MR0002WorkingBom0553(){
  const [open,setOpen]=useState(Object.fromEntries(model.sites.map(x=>[x.site,true])));
  return <section className="p55-panel" data-component-key="bid.budget.bom.mr0002">
   <h3>MR-0002 · DMR Trunk Radio Working BOM <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.mr0002"/></h3>
-  <p className="p55-note">Working source: MGW P26-058 UHF package + management RFI LNA THB 500,000 per unit + controlled DTRS bulk calculation. Vendor UHF equipment is provisionally split one set per ZWP20–22. LNA rate does not imply approved quantity. MGW 100m feeder kit and proposed extra field bulk are NOT additive without physical scope reconciliation.</p>
+  <p className="p55-note">Working source: RFI selected equipment; MGW/HYTERA quotation retained as unselected reference + management RFI LNA THB 500,000 per unit + controlled DTRS bulk calculation. MGW UHF/HYTERA lines are NOT selected and do not enter the working total. LNA rate does not imply approved quantity. MGW feeder kit is unselected; field bulk still requires interface takeoff without physical scope reconciliation.</p>
   {model.sites.map(group=><div className="p55-panel" key={group.site}>
-   <h4><button type="button" className="p55-row-toggle" onClick={()=>setOpen(x=>({...x,[group.site]:!x[group.site]}))}>{open[group.site]?"−":"+"}</button> {group.site} · MGW Working Package USD {money(group.controlledTotalUSD)}
+   <h4><button type="button" className="p55-row-toggle" onClick={()=>setOpen(x=>({...x,[group.site]:!x[group.site]}))}>{open[group.site]?"−":"+"}</button> {group.site} · RFI working cost pending quantity · MGW/HYTERA excluded
    <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+group.site.toLowerCase()}/></h4>
    {open[group.site]&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Tag / Item</th><th>SKU / Description</th><th>Qty</th><th>Original Currency</th><th>Unit Rate</th><th>Extended</th><th>Owner / Evidence</th><th>Status</th><th>Copy ID</th></tr></thead>
     <tbody>{group.items.map(item=><tr key={item.id}><td>{item.tag}</td><td>{item.sku||"—"}<small>{item.description}</small></td>
      <td>{item.qty??"PENDING"} {item.unit}</td><td>{item.currency||"TBC"}</td><td>{money(item.unitCost)}</td>
-     <td>{item.countedInWorkingTotal?money(item.extended):"0.00 (EXCLUDED)"}</td><td>{item.owner}<small>{item.source}</small></td><td>{item.status}</td>
+     <td>{item.countedInWorkingTotal?money(item.extended):"EXCLUDED / PENDING"}</td><td>{item.owner}<small>{item.source}</small></td><td>{item.status}</td>
      <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+group.site.toLowerCase()+"."+item.id.toLowerCase()}/></td></tr>)}</tbody></table></div>}
    <p className="p55-note">{group.scopeWarnings.join(" · ")}</p>
   </div>)}
