@@ -6,6 +6,8 @@ import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerificat
 import {deriveScadaBudgetEnvelope0553} from "./data/scadaBudgetEnvelope0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
 import {MR0004_WORKING_BOM_0553} from "./data/mr0004WorkingBom0553";
+import {MGW_P26_058_0553} from "./data/mgwP26058";
+import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
 const SHEETS=[
  ["Scope of supply","A/B/C","A1–A5 equipment+bulk, B1–B14 services, C1/C2 options"],
  ["B10 CommSpares","B10","Erection, pre-commissioning, commissioning and start-up spare parts"],
@@ -33,12 +35,32 @@ export function ScopeSheetsDetail0553({fx=null}){
  // A1 currently has SCADA field bulk embedded in tag ledger; it cannot be split blindly into A5.
  const workingA1=scadaEnvelope.locations.every(s=>Number.isFinite(s.baseBudgetTHB))
     ?scadaEnvelope.locations.reduce((sum,s)=>sum+s.baseBudgetTHB,0):null;
+ const round=n=>Math.round(n*100)/100;
+ const fxValid=Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0;
+ // Working budget estimate: source-priced equipment plus explicitly separated bulk.
+ // Incomplete scopes remain flagged, not mislabelled as accepted cost.
+ const scadaSourceTHB=round(scadaEnvelope.locations.reduce((n,s)=>n+s.baseSourceTHB,0));
+ const scadaSourceUSD=round(scadaEnvelope.locations.reduce((n,s)=>n+s.baseSourceUSD,0));
+ const scadaIncrementalBulk=round(scadaEnvelope.locations.reduce((n,s)=>n+(Number.isFinite(s.incrementalBaseBulkTHB)?s.incrementalBaseBulkTHB:0),0));
+ const workingScadaFloor=fxValid?round(scadaSourceTHB+scadaSourceUSD*fx.thbPerUsd+scadaIncrementalBulk):null;
+ // MR0003 RFQ four WPs: MGW originally quoted only three packages.
+ // Fourth package is an explicitly labelled one-unit management extrapolation.
+ const phoneLine=MGW_P26_058_0553.lines.find(x=>x[0]==="PHONE-1");
+ const phoneQty=4;
+ const phoneBudgetUSD=Number.isFinite(phoneLine?.[4])?phoneLine[4]*phoneQty:null;
+ const allSystemBulk=deriveWpSystemBulkBudget0553().flatMap(w=>w.systems.flatMap(s=>
+   s.items.map(x=>({...x,wp:w.wp,system:s.id}))));
+ const additionalBulk=allSystemBulk.filter(x=>x.owner!=="DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE" &&
+  !(x.system==="SCADA_RADIO" && x.id==="SCADA-CAT6A") &&
+  Number.isFinite(x.extendedTHB));
+ const a5Known=round(additionalBulk.reduce((n,x)=>n+x.extendedTHB,0));
+ const a5Unpriced=allSystemBulk.filter(x=>!Number.isFinite(x.extendedTHB)&&x.owner!=="DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE").length;
  const workingSummary={
-   A1:{amount:workingA1,source:"MR0001 Tag Cost Ledger + mapped base field bulk",status:"PARTIAL COST, NOT SELL; includes embedded SCADA bulk"},
+   A1:{amount:workingScadaFloor,source:"MR0001 Tag Cost Ledger + separated incremental SCADA bulk",status:"PRELIMINARY PRICED FLOOR; unpriced equipment/accessories excluded"},
    A2:{amount:fx?.thbPerUsd>0?workingMR2THB+workingMR2USD*fx.thbPerUsd:null,source:"MR0002 canonical Working BOM",status:"PROVISIONAL EQUIPMENT+SELECTED BULK"},
-   A3:{amount:null,source:"MR0003 source evidence only",status:"NO VERIFIED CANONICAL PRICED TOTAL"},
+   A3:{amount:fxValid&&phoneBudgetUSD!==null?round(phoneBudgetUSD*fx.thbPerUsd):null,source:"MGW P26-058 PHONE-1 USD 11,152/set × 4 WPs; original quotation for 3 only",status:"FOURTH UNIT EXTRAPOLATION; phone/sounder/JB included, installation bulk excluded"},
    A4:{amount:fx?.thbPerUsd>0?workingMR4USD*fx.thbPerUsd:null,source:"MR0004 ORGA canonical Working BOM",status:"PROVISIONAL 3-SITE SCENARIO"},
-   A5:{amount:null,source:"Cross-system physical bulk; SCADA bulk already partially included in A1",status:"NOT ALLOCATED — prevent A1/A5 double count"}
+   A5:{amount:a5Known,source:"Separate system physical bulk ledger excluding SCADA-CAT6A and DATO already allocated in A1",status:"PARTIAL PRICED FLOOR; "+a5Unpriced+" other field-bulk items remain without rates"}
  };
  return <section className="p55-panel">
   <div className="p55-eyebrow">6 ORIGINAL SHEETS <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
@@ -46,10 +68,21 @@ export function ScopeSheetsDetail0553({fx=null}){
   <p className="p55-note">Original uploaded workbook has 6 tabs, including unpriced template cells. Historical Rev08 amounts below are kept separate from original cells, current vendor cost and new bid selling price.</p>
   <div className="p55-filterbar"><label>Customer Workbook Sheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{SHEETS.map(v=><option value={v[0]} key={v[0]}>{v[0]}</option>)}</select></label></div>
   <p className="p55-note">{category[2]}</p>
-  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description / Historical Detail</th><th>Qty</th><th>Unit Price USD</th><th>Historical Amount USD</th><th>Working Budgetary Cost THB</th><th>Source / Gate</th></tr></thead>
-  <tbody>{sheet==="Scope of supply"?summary.map(([id,desc,amount])=><tr key={id}><td>{id}</td><td>{desc}</td><td>1 LS (summary)</td><td></td><td className="is-number">{usd(amount)}</td><td className="is-number">{workingSummary[id]?cash(workingSummary[id].amount):"—"}</td><td>{workingSummary[id]?<>{workingSummary[id].status}<small>{workingSummary[id].source}</small></>:"Historical Rev08 only; no linked current Working Cost"}</td></tr>):
-   details.map(([desc,qty,price],i)=><tr key={i}><td>{category[1]}-{i+1}</td><td>{desc}</td><td>{qty}</td><td className="is-number">{usd(price)}</td><td className="is-number">{usd(qty*price)}</td><td>—</td><td>Historical Rev08 detail, not a current supplier quotation</td></tr>)}
-  </tbody></table></div>
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Unit Price THB</th><th>Working Budgetary Cost THB</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
+  <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
+   const item=workingSummary[id],amount=item?.amount;
+   return <tr key={id}><td>{id}</td><td>{desc}</td><td>1 LS</td>
+    <td className="is-number">{Number.isFinite(amount)?cash(amount):"Awaiting FX"}</td>
+    <td className="is-number">{Number.isFinite(amount)?cash(amount):"Awaiting FX"}</td>
+    <td>{item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
+  }):details.map(([desc,qty,price],i)=>{
+   // Historical template numbers are customer-facing Rev08 prices, not present-day supplier cost.
+   const rate=fxValid?round(price*fx.thbPerUsd):null;
+   return <tr key={i}><td>{category[1]}-{i+1}</td><td>{desc}</td><td>{qty}</td>
+    <td className="is-number">{Number.isFinite(rate)?cash(rate):"Awaiting FX"}</td>
+    <td className="is-number">{Number.isFinite(rate)?cash(round(qty*rate)):"Awaiting FX"}</td>
+    <td>Rev08 customer-price equivalent converted to THB — historical comparison ONLY, not working supplier cost</td></tr>;
+  })}</tbody></table></div>
   {sheet==="Scope of supply"&&<section className="p55-panel" data-component-key="bid.budget.scope.scada-working">
    <h4>MR-0001 SCADA — Engineering BOM &amp; Bulk Budgetary Working Projection</h4>
    <p className="p55-note"><strong>Live derivation:</strong> existing MR0001 tag Cost Ledger → 16-function bulk verification → budget envelope. This is not a new cost ledger and does not modify customer Rev08. Original currencies retained; FX {fx?.thbPerUsd??"REQUIRED"} THB/USD, source {fx?.source||"not entered"}. Brownfield is budgeted as new replacement only. Accessories are segregated from Base, not silently merged or double counted.</p>
