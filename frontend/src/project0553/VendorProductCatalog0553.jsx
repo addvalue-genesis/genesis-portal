@@ -1,5 +1,6 @@
 import React,{useMemo,useState} from "react";
 import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
+import {RFI_LNA_PRICE_DECISION_0553} from "./data/rfiLnaPriceDecision0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./data/supplierQuoteLines";
 import { VENDOR_0553_SOURCES } from "./vendorEvidence";
@@ -89,6 +90,20 @@ export function VendorProductCatalog0553(){
     <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Supplier / Source</th><th>Product / Model</th><th>MR</th><th>Datasheet</th><th>Unit Price</th></tr></thead><tbody>
      {dataSheetProducts.map(x=><tr key={x.id}><td>{x.supplier}</td><td>{x.partNumber}<div>{x.description}</div><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.datasheet."+x.id}/></td><td>{x.mr}</td><td><a href={x.url} target="_blank" rel="noreferrer">Open original</a></td><td></td></tr>)}
     </tbody></table></div><p className="p55-note">Product Datasheet = manufacturer evidence; Project DTS = client requirement. Compare the two in TBE before selecting a product. Blank price is not zero.</p>
+   </div>}
+  {(view==="supplier"||view==="quote"||view==="mr")&&
+     (vendor==="ALL"||/MGW/i.test(String(suppliersById.get(vendor)?.name||vendor)))&&
+     (mr==="ALL"||mr==="MR-0002")&&
+     (!search||["MGW","RFI","LNA",RFI_LNA_PRICE_DECISION_0553.model,"MR-0002"].some(q=>q.toLowerCase().includes(search.toLowerCase())))&&
+   <div className="p55-panel" data-component-key="bid.vendor.products.supplier.quote-lines.mgw-rfi-lna">
+    <h3>MGW — RFI LNA · Working Budget Reference</h3>
+    <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.supplier.quote-lines.mgw-rfi-lna"/>
+    <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Assigned supplier</th><th>MR / Model</th><th>Qty</th><th>Working unit rate</th><th>Extended cost</th><th>Price basis</th></tr></thead><tbody><tr>
+     <td>MGW (provisional)</td><td>MR-0002 · {RFI_LNA_PRICE_DECISION_0553.model}</td>
+     <td>Pending allocation</td><td>THB {RFI_LNA_PRICE_DECISION_0553.unitBudgetAllowance.toLocaleString("en-US",{minimumFractionDigits:2})}</td><td>0.00 (pending quantity)</td>
+     <td>Management budgetary estimate; vendor quotation pending</td>
+    </tr></tbody></table></div>
+    <p className="p55-note">Not an MGW quoted item. Excluded from MGW quotation total and Part A site totals until quantity and supplier quotation are reconciled. Change the working rate in the management decision data, not this read-only view.</p>
    </div>}
   <p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products."+view+".quote-lines"}/></p>
   <p className="p55-note">{catalog.relationships.length} source quotation lines · {rows.length} displayed (max 150). Quote-line identity is retained; duplicate SKUs across suppliers are not merged into costs.</p>
