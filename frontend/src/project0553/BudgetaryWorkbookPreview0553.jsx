@@ -14,6 +14,10 @@ export function BudgetaryWorkbookPreview0553(){
  const [sheet,setSheet]=useState(template.sheets[0].name);
  const [showHistorical,setShowHistorical]=useState(true);
  const [showEmptyRows,setShowEmptyRows]=useState(false);
+ const [collapsed,setCollapsed]=useState({});
+ const sectionForRow=(n)=>sheet==="Scope of supply"?(n<=5?null:n<=22?"PART_A":n<=39?"PART_B":"PART_C"):(n<=5?"HEADER":n<=18?"ITEMS":"FOOTER");
+ const labels=sheet==="Scope of supply"?{PART_A:"Part A — Basic Equipment",PART_B:"Part B — Services / Spares",PART_C:"Part C — Options"}:{HEADER:"Original worksheet header / หัวตาราง",ITEMS:"Detailed item schedule / รายการย่อย",FOOTER:"Total / Remarks / หมายเหตุ"};
+ const toggleSection=(key)=>setCollapsed(v=>({...v,[sheet+":"+key]:!v[sheet+":"+key]}));
  const [currency,setCurrency]=useState("USD");
  const [fx,setFx]=useState({THB:"31.5",CNY:""});
  const [fxDate,setFxDate]=useState("2026-10-12");
@@ -43,6 +47,7 @@ export function BudgetaryWorkbookPreview0553(){
     <strong>{sheet}</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)}/>
     <p className="p55-note">Price cells marked REV08 are historical comparison values only, displayed in the official-style grid for review. They are NOT approved customer selling prices and will NOT be exported as the current bid.</p>
    </div>
+   <p className="p55-note">กด + / − ที่หัวข้อเพื่อเปิดหรือยุบรายการย่อย โดยข้อมูล Excel ต้นฉบับยังคงครบทุกแถว</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
     <thead><tr><th style={{width:45}}>Row</th>{Array.from({length:layout.columns},(_,i)=><th key={i}>{String.fromCharCode(65+i)}</th>)}<th style={{width:85}}>Copy ID</th></tr></thead>
     <tbody>{Array.from({length:layout.maxRow},(_,i)=>i+1).map(rowNum=>{
@@ -64,8 +69,17 @@ export function BudgetaryWorkbookPreview0553(){
       }
      }
      const visibleContent=row.slice(1).some(value=>value!==null&&value!==undefined&&String(value).trim()!=="");
-     if(!showEmptyRows&&!visibleContent)return null;
-     return <tr key={rowNum} style={overlay?{background:"rgba(36,111,184,0.07)"}:{}}>
+     const section=sectionForRow(rowNum);
+     const previous=sectionForRow(rowNum-1);
+     const sectionStart=section&&section!==previous;
+     const header=sectionStart?<tr key={"group:"+section} className="p55-group-heading"><td colSpan={layout.columns+2}>
+      <button type="button" className="p55-row-toggle" aria-expanded={!collapsed[sheet+":"+section]} onClick={()=>toggleSection(section)}>{collapsed[sheet+":"+section]?"+":"−"}</button>
+      <strong style={{marginLeft:8}}>{labels[section]}</strong>
+      <span style={{marginLeft:12}}><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+"."+section.toLowerCase()}/></span>
+     </td></tr>:null;
+     const hidden=section&&collapsed[sheet+":"+section];
+     if(hidden||(!showEmptyRows&&!visibleContent))return header;
+     return <React.Fragment key={rowNum}>{header}<tr style={overlay?{background:"rgba(36,111,184,0.07)"}:{}}>
       <td><strong>{rowNum}</strong></td>
       {Array.from({length:layout.columns},(_,col)=>{
        const value=row[col+1]??"";
@@ -75,7 +89,7 @@ export function BudgetaryWorkbookPreview0553(){
        </td>;
       })}
       <td>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/>}</td>
-     </tr>;
+     </tr></React.Fragment>;
     })}</tbody>
    </table></div>
    <p className="p55-note">Historical Rev08 overlay is controlled by the checkbox above. Prices appear in the main worksheet grid only; no second price table. Some A1–A5 rows are provisional visual placements pending exact native cell mapping. Current approved selling price remains unavailable.</p>
