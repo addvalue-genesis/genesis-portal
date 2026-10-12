@@ -3,6 +3,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {MR0001_MODULE_CROSSMAP_0553} from "./data/mr0001ModuleCrossmap0553";
 import {selectMR0001TagCostRows0553,summarizeMR0001TagCost0553} from "./data/mr0001TagCostLedger0553";
 import {deriveSevenLocationCostLedger0553} from "./data/sevenLocationCostCalculations0553";
+import {deriveMR0001EightFunctionCoverage0553} from "./data/mr0001EightFunctionCoverage0553";
 const fmt=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"PENDING";
 export function LocationBomDetail0553({site,fx}){
  const [expanded,setExpanded]=useState({});
@@ -29,6 +30,15 @@ export function LocationBomDetail0553({site,fx}){
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix}/> · MTO Rev04 → Engineering Tag → Site Function / Quantity → Vendor evidence → Working Cost. Same ledger rules as ZWP20; NO blind copying of ZWP20 radio configuration or prices.</p>
   <p><strong>{site} Working Priced Subtotal: {Number.isFinite(totalTHB)?"THB "+fmt(totalTHB):"FX REQUIRED"}</strong>
    <small>Original USD {fmt(ledger.subtotals.USD)} + THB {fmt(ledger.subtotals.THB)} · {ledger.costedRows}/{ledger.totalRows} tagged rows priced · {ledger.unresolvedRows.length} unresolved · FX {fx?.thbPerUsd??"NOT SET"} THB/USD</small></p>
+  <h4>MR-0001 — 8 Functional BOM Groups (ZWP20 Standard)</h4>
+  <p className="p55-note">ทุกแท่นมี 8 Function Groups เหมือนกัน แต่ Equipment Tags / MTO Row ต้องเป็นของแต่ละแท่นจริง หาก MTO ไม่มี Tag จะระบุขาด/Reuse/By Others ไม่สร้าง Item หรือราคาเทียม</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>No.</th><th>Function / Module</th><th>Actual MTO Tag / Copy ID</th><th>Cost Coverage</th><th>Engineering Status</th></tr></thead><tbody>
+   {deriveMR0001EightFunctionCoverage0553(site).map(g=><tr key={g.id}>
+    <td>{g.ordinal}</td><td><strong>{g.label}</strong><small>{g.id}</small></td>
+    <td>{g.rows.length?g.rows.map(r=><div key={r.row+"-"+r.tag}>{r.tag} · Row {r.row} <ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix+"."+String(r.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+r.row}/></div>):"NO MATCHING MTO TAG"}</td>
+    <td>{g.costCompleteness}</td><td>{g.state}</td></tr>)}
+   </tbody></table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>MTO / Module</th><th>Engineering Quantity / Basis</th><th>Budgetary Selected Product / Vendor</th><th>Unit Cost (THB)</th><th>Extended Cost (THB)</th><th>Assumptions / Status</th></tr></thead><tbody>
    {rows.map(v=><React.Fragment key={v.row+"-"+v.tag}>
