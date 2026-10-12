@@ -15,8 +15,8 @@ export function BudgetaryWorkbookPreview0553(){
  const [showHistorical,setShowHistorical]=useState(true);
  const [showEmptyRows,setShowEmptyRows]=useState(false);
  const [collapsed,setCollapsed]=useState({});
- const sectionForRow=(n)=>sheet==="Scope of supply"?(n<=5?null:n<=22?"PART_A":n<=39?"PART_B":"PART_C"):(n<=5?"HEADER":n<=18?"ITEMS":"FOOTER");
- const labels=sheet==="Scope of supply"?{PART_A:"Part A — Basic Equipment",PART_B:"Part B — Services / Spares",PART_C:"Part C — Options"}:{HEADER:"Original worksheet header / หัวตาราง",ITEMS:"Detailed item schedule / รายการย่อย",FOOTER:"Total / Remarks / หมายเหตุ"};
+ const sectionForRow=(n)=>sheet==="Scope of supply"?(n<=5?null:n<=22?"PART_A":n<=39?"PART_B":"PART_C"):(n>=6&&n<=18?"ITEMS":null);
+ const labels=sheet==="Scope of supply"?{PART_A:"Part A — Basic Equipment",PART_B:"Part B — Services / Spares",PART_C:"Part C — Options"}:{ITEMS:"Detailed item schedule / รายการย่อย"};
  const toggleSection=(key)=>setCollapsed(v=>({...v,[sheet+":"+key]:!v[sheet+":"+key]}));
  const [currency,setCurrency]=useState("USD");
  const [fx,setFx]=useState({THB:"31.5",CNY:""});
@@ -47,7 +47,7 @@ export function BudgetaryWorkbookPreview0553(){
     <strong>{sheet}</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)}/>
     <p className="p55-note">Price cells marked REV08 are historical comparison values only, displayed in the official-style grid for review. They are NOT approved customer selling prices and will NOT be exported as the current bid.</p>
    </div>
-   <p className="p55-note">กด + / − ที่หัวข้อเพื่อเปิดหรือยุบรายการย่อย โดยข้อมูล Excel ต้นฉบับยังคงครบทุกแถว</p>
+   <p className="p55-note">กด + / − เพื่อยุบเฉพาะรายการย่อย (แถว 6–18) โดยหัวเอกสาร หัวตาราง Total และ Remark จะแสดงเสมอ; Excel ต้นฉบับไม่ถูกแก้ไข</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
     <thead><tr><th style={{width:45}}>Row</th>{Array.from({length:layout.columns},(_,i)=><th key={i}>{String.fromCharCode(65+i)}</th>)}<th style={{width:85}}>Copy ID</th></tr></thead>
     <tbody>{Array.from({length:layout.maxRow},(_,i)=>i+1).map(rowNum=>{
@@ -93,7 +93,7 @@ export function BudgetaryWorkbookPreview0553(){
     })}</tbody>
    </table></div>
    <p className="p55-note">Historical Rev08 overlay is controlled by the checkbox above. Prices appear in the main worksheet grid only; no second price table. Some A1–A5 rows are provisional visual placements pending exact native cell mapping. Current approved selling price remains unavailable.</p>
-   <p className="p55-note">The native XLSX retains all rows and columns. The JSX hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
+   <p className="p55-note">The native XLSX retains all rows and columns. The JSX keeps worksheet header, totals and remarks visible while item rows can collapse. It hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
  </section>;
 }
