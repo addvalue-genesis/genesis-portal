@@ -5,6 +5,7 @@ import {deriveZWP20SiteCost0553} from "./zwp20SiteCost0553";
 import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
 import {SCADA_LINKS_0553} from "./scadaLinkEvidence";
 import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
+import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 const round=n=>Math.round(n*100)/100;
 const quoteLines=new Map(NEXTG.lines.map(x=>[x.code,x]));
 const costFunctions=(codes)=>codes.map(code=>quoteLines.get(code)).filter(Boolean).map(q=>({functionId:q.code,sku:q.partNumber,qty:1,unitPrice:q.unitPrice,currency:"USD",extended:Number.isFinite(q.unitPrice)?q.unitPrice:null,source:NEXTG.quoteNumber,status:q.pricingState}));
@@ -58,6 +59,25 @@ export function selectMR0001TagCostRows0553(site){
   }else if(ptp&&oneSet&&/^SA-502-/.test(item.sourceTag)){
    functions=costFunctions(["C-8"]);
    workingStatus="ETHERNET_SURGE_CANDIDATE_INTERFACE__VERIFY_EX";
+  }
+  // ZWP20 TCAB-500-001 row 9 and ZWP21 row 18 share an enclosure
+  // function, but retain site-specific source quantity and Ex/thermal review.
+  if(site==="ZWP21"&&oneSet&&item.sourceTag==="TCAB-500-001"&&item.sourceRow===18){
+   const historical=SUPPLIER_QUOTE_LINES_0553.find(q=>q.id==="PROSPER-24051");
+   const line=historical?.lines.find(v=>v[0]==="1");
+   const rate=Number.isFinite(line?.[4])?line[4]:null;
+   return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,
+    description:item.description,sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,
+    currency:"THB",unitCost:rate,extended:Number.isFinite(rate)?round(rate*item.sourceScopeQty):null,
+    vendor:"BARTEC / Prosper E&T (historical comparable)",sku:line?.[1]||null,
+    source:"PROSPER-24051 / 2024 Zawtika 1E / MTO Rev04 ZWP21 Row 18",
+    status:"BUDGETARY_HISTORICAL_COMPARABLE__ZWP21_EX_SCOPE_REVIEW",
+    quantityBasis:"ZWP21 MTO Rev04 row 18, TCAB-500-001 1 Set; enclosure separately owned from radio, IDU, surge and LAN",
+    assumptions:["Same enclosure cost-estimation method as ZWP20 TCAB-500-001 row 9; NOT a verified 1F vendor quote",
+     "THB 39,200/set is 2024 historical BARTEC SCADA Ex e panel comparable; item 2 THB 38,800 is alternative only",
+     "Verify Ex e certification, panel sizing, heat load, entries, gland and free-issued equipment boundaries for ZWP21"],
+    countedInWorkingTotal:Number.isFinite(rate),
+    quotedRateCandidates:(historical?.lines||[]).filter(x=>["1","2"].includes(x[0])).map(x=>({quoteLine:x[0],sku:x[1],unitPriceTHB:x[4],selected:x[0]==="1"}))};
   }
   const pricedFunctions=functions.length>0&&functions.every(x=>Number.isFinite(x.extended));
   const functionCost=pricedFunctions?round(functions.reduce((n,x)=>n+x.extended,0)):null;
