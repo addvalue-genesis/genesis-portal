@@ -3,31 +3,19 @@
 // No price, quantity, FX or sell amount is created in this file.
 import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./siteSystemCostReconciliation";
 import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
-import {RACON_TERMINATION_POLICY_0553} from "./raconTerminationBudget0553";
-import {RACON_VENDOR_SCOPE_0553} from "./raconVendorScope0553";
+import {MR0004_WORKING_BOM_0553} from "./mr0004WorkingBom0553";
 const source=SITE_SYSTEM_COST_RECONCILIATION_0553;
 const mr0002=MR0002_WORKING_BOM_0553.sites.map(s=>({site:s.site,mr:"MR-0002",name:"DMR Trunk Radio",detailRows:s.items.map(item=>({...item,row:item.quoteLine||item.id,sourceQty:item.qty,sourceUnit:item.unit})),
  subtotals:[{currency:"USD",amount:s.controlledTotalUSD}],gaps:s.scopeWarnings,
  projectionSource:"MR0002_WORKING_BOM_CANONICAL",completeness:"PROVISIONAL_SOME_COSTS_EXCLUDED",
  rfqSource:source.systems.find(x=>x.id==="MR-0002")?.rfqSource||null}));
-const orga=RACON_TERMINATION_POLICY_0553.quotation;
-const mr0004Sites=["ZWP20","ZWP21","ZWP22"];
-const mr0004=mr0004Sites.map(site=>({
- site,mr:"MR-0004",name:"Marine RACON — MDS / ORGA",
- detailRows:RACON_VENDOR_SCOPE_0553.include.map((item,i)=>({
-  id:site+"-ORGA-"+i,site,tag:item.tag,description:item.item,
-  sourceQty:null,sourceUnit:"set",unitCost:null,extended:null,currency:"USD",
-  status:"MDS_ORGA_VENDOR_PACKAGE__SITE_QTY_NOT_ALLOCATED",
-  source:"ORGA-"+orga.number,countedInWorkingTotal:false
- })),
- evidence:[{source:"MDS / ORGA — "+orga.number,line:"ORGA-PACKAGE",
-  description:"SeaBeacon-2 System 6 Ex RACON vendor package; site allocation pending",
-  sourceQty:null,assumedQty:null,currency:"USD",unit:orga.packageUSD,extended:null,
-  kind:"ORGA_QUOTED_PACKAGE_UNALLOCATED_NOT_SITE_COST"}],
- subtotals:[],gaps:["ORGA USD "+orga.packageUSD+" quote is ONE package reference, not automatically allocated to each WP",
-  "Confirm MDS/ORGA quotation package count and per-WP scope",
-  "Cable/gland inclusion conflict and field bulk reconciliation pending"],
- projectionSource:"MDS_ORGA_RACON_EVIDENCE",completeness:"SITE_ALLOCATION_PENDING",
+const mr0004=MR0004_WORKING_BOM_0553.sites.map(site=>({
+ site:site.site,mr:"MR-0004",name:"Marine RACON — MDS / ORGA",
+ detailRows:site.items.map(item=>({...item,row:item.id})),
+ evidence:site.evidence,
+ subtotals:[{currency:"USD",amount:site.controlledTotalUSD}],gaps:site.gaps,
+ projectionSource:"MR0004_WORKING_BOM_CANONICAL",
+ completeness:"BUDGETARY_QUOTE_RATE_PER_SITE__VENDOR_QTY_RECONFIRM",
  rfqSource:source.systems.find(x=>x.id==="MR-0004")?.rfqSource||null
 }));
 const unifiedRows=source.rows.map(r=>mr0002.find(x=>x.site===r.site&&x.mr===r.mr)||mr0004.find(x=>x.site===r.site&&x.mr===r.mr)||r);
@@ -39,7 +27,7 @@ export const BOM_READ_MODEL_0553=Object.freeze({
  sites:source.sites,
  rows:unifiedRows,
  byMr:source.systems.map(s=>({...s,rows:unifiedRows.filter(r=>r.mr===s.id)})),
- completeness:"MR0001_PARTIAL_MR0002_PROVISIONAL_MR0003_LEGACY_MR0004_ORGA_UNALLOCATED",
+ completeness:"MR0001_PARTIAL_MR0002_PROVISIONAL_MR0003_LEGACY_MR0004_ORGA_BUDGET_SITE_ALLOCATED",
  releaseAllowed:false
 });
 export const bomItems0553=row=>row.detailRows?.length?row.detailRows:[];
