@@ -1,6 +1,7 @@
 import React,{useMemo,useState} from "react";
 import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
 import {RFI_LNA_PRICE_DECISION_0553} from "./data/rfiLnaPriceDecision0553";
+import {MR0002_PRICE_REGISTRY_0553} from "./data/mr0002PriceRegistry0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./data/supplierQuoteLines";
 import { VENDOR_0553_SOURCES } from "./vendorEvidence";
@@ -105,6 +106,18 @@ export function VendorProductCatalog0553(){
     </tr></tbody></table></div>
     <p className="p55-note">Not an MGW quoted item. Excluded from MGW quotation total and Part A site totals until quantity and supplier quotation are reconciled. Change the working rate in the management decision data, not this read-only view.</p>
    </div>}
+  <div className="p55-panel" style={{padding:14,marginBottom:12}}>
+   <h3>MR-0002 · Selected Vendor Products &amp; Budgetary Price Register</h3>
+   <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.supplier.quote-lines.mr0002-working-rates"/>
+   <p className="p55-note">Source-controlled working rate index shared with bid.budget.bom.mr0002. Supplier quotation prices, web analogs and management allowances are separately labeled. HYTERA BDA is unselected; HYTERA-branded Omni antenna from MGW remains selected.</p>
+   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Supplier</th><th>Manufacturer / SKU</th><th>Equipment / Accessories</th><th>Currency</th><th>Unit Rate</th><th>Basis / Source</th><th>Selection</th></tr></thead><tbody>
+    {MR0002_PRICE_REGISTRY_0553.filter(x=>(vendor==="ALL"||String(x.supplier).toLowerCase().includes(String(vendor).toLowerCase()))&&(!search||[x.id,x.model,x.description,x.supplier].join(" ").toLowerCase().includes(search.toLowerCase()))).map(x=><tr key={x.id}>
+     <td>{x.supplier}</td><td>{x.manufacturer} · {x.model}</td><td>{x.description}</td><td>{x.currency}</td>
+     <td>{x.unitRate.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</td>
+     <td>{x.priceType}<small>{x.source}</small></td><td>{x.selectionStatus}</td>
+    </tr>)}
+   </tbody></table></div>
+  </div>
   <p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products."+view+".quote-lines"}/></p>
   <p className="p55-note">{catalog.relationships.length} source quotation lines · {rows.length} displayed (max 150). Quote-line identity is retained; duplicate SKUs across suppliers are not merged into costs.</p>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr>
