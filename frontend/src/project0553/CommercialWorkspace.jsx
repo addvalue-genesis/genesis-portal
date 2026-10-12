@@ -80,7 +80,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency}/>
   </details>
   <details className="p553-budget-phase"><summary><strong>Scope of Supply & Bulk Reconciliation</strong><small>bid.budget.scope · bid.budget.bulk · A/B/C</small></summary>
-   <ScopeSheetsDetail0553/>
+   <ScopeSheetsDetail0553 fx={fx}/>
   </details>
   <details className="p553-budget-phase"><summary><strong>Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
    <EstimateToBidMapping0553/>
