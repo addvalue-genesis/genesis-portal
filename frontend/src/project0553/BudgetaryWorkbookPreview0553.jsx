@@ -100,10 +100,12 @@ export function BudgetaryWorkbookPreview0553(){
       <td><strong>{rowNum}</strong></td>
       {Array.from({length:layout.columns},(_,col)=>{
        const a1Cell=sheet==="Scope of supply"&&rowNum===7;
-       const value=a1Cell&&col===6?"SELL PRICE PENDING":row[col+1]??"";
+       const value=a1Cell&&col===6
+         ?(a1Coverage.knownCost.length?a1Coverage.knownCost.map(x=>"WORKING COST "+x.currency+" "+money(x.amount)).join(" / "):"NO WORKING COST")
+         :row[col+1]??"";
        const isPrice=overlay&&(active?.kind==="SUMMARY"?col===6:(col===7||col===8));
        return <td key={col} style={{whiteSpace:"pre-wrap",minWidth:col===0?65:95}}>
-        {value}{a1Cell&&col===6&&<small style={{display:"block"}}>A1 mapping: {a1Coverage.pricedCount} costed / {a1Coverage.unpricedCount} unpriced · {a1Coverage.siteCount} locations · NOT APPROVED</small>}{a1Cell&&col===7&&<small style={{display:"block"}}>Working cost reference: {a1Coverage.knownCost.map(x=>x.currency+" "+money(x.amount)).join(" · ")||"NONE"} (not sell)</small>}{isPrice&&<small style={{display:"block"}}>REV08 · historical {fxReady?currency:"FX MISSING"} · {refCode}</small>}
+        {value}{a1Cell&&col===6&&<small style={{display:"block"}}>COST ONLY · NOT CUSTOMER SELL · A1: {a1Coverage.pricedCount} costed / {a1Coverage.unpricedCount} unpriced · {a1Coverage.siteCount} locations · NOT APPROVED</small>}{a1Cell&&col===7&&<small style={{display:"block"}}>SOURCE: bid.budget.bom · PRELIMINARY · SELL PRICE NOT APPROVED</small>}{isPrice&&<small style={{display:"block"}}>REV08 · historical {fxReady?currency:"FX MISSING"} · {refCode}</small>}
        </td>;
       })}
       <td>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/>}</td>
