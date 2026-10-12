@@ -2,7 +2,6 @@
 // No customer sell prices are created here. No historical Rev08 substitution.
 import {BOM_READ_MODEL_0553,bomItems0553} from "./bomReadModel0553";
 import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
-import {RFI_LNA_PRICE_DECISION_0553} from "./rfiLnaPriceDecision0553";
 import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./siteSystemCostReconciliation";
 export function deriveA1EquipmentCoverage0553(){
  const seen=new Set(),items=[];
@@ -40,13 +39,6 @@ export function deriveA1EquipmentCoverage0553(){
    unitCost:e.unit,extended:e.extended,status:e.kind,source:e.source,
    allocationClass:"PARTIAL_SCENARIO_NOT_APPROVED",priceCandidates:[]});
  }
- // User-approved temporary zero for missing RFI LNA vendor price. 
- // Keep as an unallocated control row until MR-0002 site quantity is reconciled.
- const lna=RFI_LNA_PRICE_DECISION_0553;
- items.push({site:"UNALLOCATED",mr:lna.mr,tag:lna.model,row:null,
-  description:lna.product,qty:lna.quantity,unit:"set",currency:lna.currency,
-  unitCost:lna.unitBudgetAllowance,extended:null,status:lna.status,
-  source:lna.decisionSource,managementAllowance:true});
  const currencies=[...new Set(items.filter(x=>Number.isFinite(x.extended)&&x.currency).map(x=>x.currency))];
  const knownCost=currencies.map(currency=>({currency,amount:Math.round(items.filter(x=>x.currency===currency&&Number.isFinite(x.extended)).reduce((v,x)=>v+x.extended,0)*100)/100}));
  return {items,knownCost,siteCount:new Set(items.filter(x=>x.site!=="UNALLOCATED").map(x=>x.site)).size,
