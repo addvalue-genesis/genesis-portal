@@ -11,6 +11,7 @@ import {MR0001_SITE_CLASSIFICATION} from "./mr0001SiteClassification";
 // remain with their existing MTO owners and must not be added to this Bulk view twice.
 export function deriveWpSystemBulkBudget0553(){
  const routeModel=deriveZ1FTelBulkRoutes0553();
+ const raconBudget=deriveRaconTerminationBudget0553();
  const newSites=Z1F_TEL_LAYOUT_INDEX_0553.byWP.map(w=>{
   const found=(sys)=>w.equipment.filter(e=>e.system===sys);
   const cableRoute=(sys)=>routeModel.rows.find(r=>r.wp===w.wp&&r.system===sys);
