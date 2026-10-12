@@ -1,6 +1,6 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
-import {SITE_SYSTEM_COST_RECONCILIATION_0553 as ledger} from "./data/siteSystemCostReconciliation";
+import {BOM_READ_MODEL_0553 as ledger,selectBomRows0553} from "./data/bomReadModel0553";
 
 // Customer-facing scope preview. Does not copy or recalculate the engineering BOM.
 // Commercial sell prices are intentionally unavailable until an approved
@@ -9,7 +9,7 @@ export function CustomerProposalPreview0553(){
  const [mr,setMr]=useState("ALL");
  const [site,setSite]=useState("ALL");
  const [expanded,setExpanded]=useState({});
- const rows=ledger.rows.filter(r=>(mr==="ALL"||mr===r.mr)&&(site==="ALL"||site===r.site));
+ const rows=selectBomRows0553({mr,site});
  const groups=ledger.systems.filter(s=>mr==="ALL"||s.id===mr);
  const toggle=id=>setExpanded(x=>({...x,[id]:!x[id]}));
  return <section className="p55-panel" data-component-key="bid.budget.summary">
