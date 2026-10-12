@@ -15,6 +15,7 @@ const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function summarizeWorkingItems0553(items,displayCurrency="THB",fx=WORKING_FX_POLICY_0553){
  const original=new Map();let pending=0,unconverted=0,converted=0,known=0;
  for(const item of items){
+  if(item.allocationClass==="PARTIAL_SCENARIO_NOT_APPROVED"){pending++;continue;}
   if(!Number.isFinite(item.extended)||!item.currency||item.currency==="UNASSIGNED"){pending++;continue;}
   known++;original.set(item.currency,round((original.get(item.currency)||0)+item.extended));
   const v=convertWorkingAmount0553(item.extended,item.currency,displayCurrency,fx);
