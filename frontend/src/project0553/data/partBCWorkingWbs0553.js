@@ -11,7 +11,7 @@ export const PART_BC_WBS_SOURCE_0553=Object.freeze({
  summary:[
   {code:"B1",sellTHB:510000,driver:"964 role MH × calibrated office rate",qty:964,unit:"MH",owner:"ADDVALUE",state:"WORKING_PROPOSAL",equations:["GEQ-005","GEQ-008","GEQ-018"]},
   {code:"B2",sellTHB:580000,driver:"143 VDRL rows / 38 unique titles, lifecycle MH + document control, current controlled working quotation",qty:143,unit:"VDRL row",owner:"ADDVALUE",state:"CURRENT_WORKING",equations:["GEQ-009","GEQ-024"]},
-  {code:"B3",sellTHB:2109600,driver:"8 Thailand FAT team-days + 5-trip / 39 offshore team-days × 2 = 78 MD; offshore USD800/MD at working FX 31.5",qty:78,unit:"offshore MD + FAT",owner:"ADDVALUE",state:"WORKING_BASE_HOLD_SAT_SCHEDULE",equations:["GEQ-005","GEQ-013","GEQ-016","GEQ-018"]},
+  {code:"B3",sellTHB:2109600,driver:"8 Thailand FAT team-days + 5-trip / 39 offshore team-days × 2 = 78 MD; offshore USD800/MD at working FX 31.5",qty:1,unit:"LS (FAT + 78 offshore MD)",owner:"ADDVALUE",state:"WORKING_BASE_HOLD_SAT_SCHEDULE",equations:["GEQ-005","GEQ-013","GEQ-016","GEQ-018"]},
   {code:"B4",sellTHB:null,driver:"Painting / coating by OEM/SAMTEL, if applicable",qty:null,unit:"scope",owner:"SAMTEL/OEM",state:"OUTSIDE_ADDVALUE_SCOPE_PRICE_REQUIRED_IF_APPLICABLE"},
   {code:"B5",sellTHB:null,driver:"Packing and marking vendor package",qty:null,unit:"package",owner:"SAMTEL/OEM",state:"OUTSIDE_ADDVALUE_SCOPE"},
   {code:"B6",sellTHB:null,driver:"CIF JUTAL-nominated China port and customs responsibility",qty:null,unit:"shipment",owner:"SAMTEL",state:"OUTSIDE_ADDVALUE_SCOPE_LOGISTICS_RATE_REQUIRED"},
