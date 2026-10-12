@@ -60,6 +60,36 @@ export function selectMR0001TagCostRows0553(site){
    functions=costFunctions(["C-8"]);
    workingStatus="ETHERNET_SURGE_CANDIDATE_INTERFACE__VERIFY_EX";
   }
+  // ZWP23 RPT-0001 C1: one PTMP remote link from ZPQ with 2ft x2
+  // parabolic diversity references. MTO row31 supplies four explicit tag sets.
+  // Budgetary only: diversity receiver configuration and OEM approval remain open.
+  const zwp23Link=site==="ZWP23"&&SCADA_LINKS_0553.find(l=>l.from==="ZPQ"&&l.to==="ZWP23"&&l.mode==="PTMP");
+  if(zwp23Link&&oneSet&&item.sourceRow===31){
+   const tag=item.sourceTag;
+   const codes=tag==="MR-502-001"?["B-1","B-2","B-3","B-5"]:
+     tag==="MR-502-001A"?["B-6","B-7"]:
+     ["ANT-502-001","ANT-502-002"].includes(tag)?["B-13"]:[];
+   if(codes.length){
+    const components=costFunctions(codes);
+    const priced=components.every(x=>Number.isFinite(x.extended));
+    const amount=priced?round(components.reduce((n,x)=>n+x.extended,0)):null;
+    return {site,mr:"MR-0001",row:item.sourceRow,tag,description:item.description,
+     sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,
+     currency:"USD",unitCost:amount,extended:amount,
+     vendor:"Next G / Aviat",sku:components.map(x=>x.sku).join(" + "),
+     status:"ZWP23_PTMP_DIVERSITY_PRELIMINARY_FUNCTION_BUDGET_OEM_REVIEW",
+     source:"RPT-0001 C1 ZPQ→ZWP23 + MTO Rev04 row31 + "+NEXTG.quoteNumber,
+     quantityBasis:"MTO one Set per tag; two independent 2ft antenna references, not two full radio systems",
+     detail:components.map(c=>({...c,requiredQty:c.qty,budgetaryUnitPrice:c.unitPrice,budgetaryExtended:c.extended,
+      budgetarySelectedSKU:c.sku,allocationOwner:tag+".31",quantityState:"MTO_TAG_PRELIMINARY",
+      budgetarySelectionState:"PRELIMINARY_VENDOR_RATE"})),
+     components,countedInWorkingTotal:priced,
+     assumptions:["Radio group B is one preliminary remote terminal; diversity receive functionality must be confirmed by OEM",
+      "Two 2ft antenna tags costed separately; not two radio package allocations",
+      "Region, NMS, throughput and diversity entitlement must be confirmed; unresolved cost is not included",
+      "The indoor power subset is not evidence of complete standalone IDU function"]};
+   }
+  }
   // ZWP20 TCAB-500-001 row 9 and ZWP21 row 18 share an enclosure
   // function, but retain site-specific source quantity and Ex/thermal review.
   if(site==="ZWP21"&&oneSet&&item.sourceTag==="TCAB-500-001"&&item.sourceRow===18){
