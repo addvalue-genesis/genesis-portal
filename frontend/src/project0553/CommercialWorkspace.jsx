@@ -7,6 +7,7 @@ import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 import { CostIntegrityReview0553 } from "./CostIntegrityReview0553";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { SimpleBom0553 } from "./SimpleBom0553";
+import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import React,{useState} from "react";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
