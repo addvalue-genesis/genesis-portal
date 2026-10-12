@@ -13,8 +13,8 @@ import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaselin
 import React,{useState} from "react";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
 import { BID_0553_GATES, BID_0553_SOURCES } from "./bidReview";
-export function CommercialWorkspace0553({focusedLocation=null}){
- const [mode,setMode]=useState("working");
+export function CommercialWorkspace0553({focusedLocation=null,initialMode="working"}){
+ const [mode,setMode]=useState(initialMode);
  const [recipient,setRecipient]=useState("INTERNAL");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
  const toggle=k=>setExpanded(a=>{const n=new Set(a);n.has(k)?n.delete(k):n.add(k);return n;});
