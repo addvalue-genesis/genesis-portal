@@ -1,5 +1,6 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {MR0002WorkingBom0553} from "./MR0002WorkingBom0553";
+import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
 import {DTRS_RFI_BULK_0553} from "./data/dtrsRfiBulk0553";
@@ -190,7 +191,17 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <label>Location <select value={site} onChange={e=>changeSite(e.target.value)}><option value="ALL">All locations</option>{model.locations.map(x=><option key={x.site} value={x.site}>{x.site}</option>)}</select></label>
    <label>Vendor / Company <select value={vendor} onChange={e=>setVendor(e.target.value)}><option value="ALL">All vendors</option>{model.vendors.map(v=><option key={v} value={v}>{v}</option>)}</select></label>
   </div>
-  {system!=="MR-0001"?<p className="p55-note">ระบบ {system} ยังไม่มี Item-Level BOM ที่เชื่อม MTO/Engineering/Vendor ครบใน Controlled Repository: ไม่แสดงจำนวนหรือราคาจำลอง โปรดตรวจ Scope ใน 4 MR Systems ก่อน</p>:<>
+  {system==="MR-0002"?<section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.mr0002">
+   <h4>MR-0002 · Trunk Radio — Source-linked BOM by Location <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.system-location-mto.mr0002"/></h4>
+   <p className="p55-note">This is a read-only table projection of the same central MR-0002 Working BOM. One tagged RFI LNA per site is a budget assumption. USD vendor and THB allowance costs stay separate; excluded items do not enter site totals.</p>
+   {MR0002_WORKING_BOM_0553.sites.filter(g=>site==="ALL"||g.site===site).map(g=><details key={g.site} className="p55-panel">
+    <summary style={{cursor:"pointer"}}><strong>{g.site}</strong> · USD {g.controlledTotalUSD.toLocaleString("en-US",{minimumFractionDigits:2})} + THB {g.controlledTotalTHB.toLocaleString("en-US",{minimumFractionDigits:2})} · <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+g.site.toLowerCase()}/></summary>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Equipment Tag</th><th>Model / Description</th><th>Qty</th><th>Currency</th><th>Unit Cost</th><th>Extended</th><th>Cost treatment</th><th>Item ID</th></tr></thead><tbody>
+     {g.items.map(x=><tr key={x.id}><td>{x.tag}</td><td>{x.sku||"—"}<small>{x.description}</small></td><td>{x.qty??"TBC"} {x.unit}</td><td>{x.currency}</td><td>{Number.isFinite(x.unitCost)?x.unitCost.toLocaleString("en-US",{minimumFractionDigits:2}):"TBC"}</td><td>{x.countedInWorkingTotal&&Number.isFinite(x.extended)?x.extended.toLocaleString("en-US",{minimumFractionDigits:2}):"Excluded / pending"}</td><td>{x.status}</td><td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+g.site.toLowerCase()+"."+x.id.toLowerCase()}/></td></tr>)}
+    </tbody></table></div>
+   </details>)}
+   {!MR0002_WORKING_BOM_0553.sites.some(g=>site==="ALL"||g.site===site)&&<p className="p55-note">No MR-0002 source-backed items at {site}. Select All locations or ZWP20, ZWP21, ZWP22.</p>}
+  </section>:system!=="MR-0001"?<p className="p55-note">{system}: Item-level central Working BOM mapping has not been implemented in this table. Existing source evidence remains available in the respective engineering and source registers; no estimated prices or quantities have been inserted here.</p>:<>
   <p className="p55-note"><strong>Source row completeness:</strong> {displayedCount} displayed / {sourceCount} registered MTO item tags. {vendor!=="ALL"?"Vendor filter hides some source rows; select All vendors for the full BOM.":"All source rows remain visible, including items lacking price."} Source item coverage does not mean a complete physical SKU take-off.</p>
   <div className="p55-source-facts">
    <div><span>Locations with source data</span><strong>{groups.filter(g=>g.items.length).length}</strong></div>
