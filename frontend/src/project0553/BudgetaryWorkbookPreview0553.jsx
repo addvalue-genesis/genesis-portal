@@ -12,7 +12,7 @@ const summaryCellRow={A1:9,A2:10,A3:11,A4:12,A5:13,B1:24,B2:25,B3:26,B4:27,B5:28
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 export function BudgetaryWorkbookPreview0553(){
  const [sheet,setSheet]=useState(template.sheets[0].name);
- const [showHistorical,setShowHistorical]=useState(true);
+ const [showHistorical,setShowHistorical]=useState(false);
  const [showEmptyRows,setShowEmptyRows]=useState(false);
  const [collapsed,setCollapsed]=useState({});
  const sectionForRow=(n)=>sheet==="Scope of supply"?(n<=5?null:n<=22?"PART_A":n<=39?"PART_B":"PART_C"):(layout.sections.items.start<=n&&n<=layout.sections.items.end?"ITEMS":null);
@@ -58,13 +58,14 @@ export function BudgetaryWorkbookPreview0553(){
       const match=REV08_BASELINE.summary.find(([code])=>summaryCellRow[code]===rowNum);
       if(match){
        const [code,desc,amount]=match;refCode=code;overlay=true;
-       if(code.startsWith("A")){row[1]=code;row[3]=desc;row[5]=1;}
-       row[7]=converted(amount);
+       // Do not invent missing A-section row placements or overwrite original template formulas.
+       if(!code.startsWith("A"))row[7]=converted(amount);
+       else overlay=false;
       }
      }else if(showHistorical){
       const index=rowNum-6;
       const line=REV08_BASELINE.detail[active?.code]?.[index];
-      if(index>=0&&line){
+      if(index>=0&&line&&!layout.sourceNotQuote){
        const [desc,qty,unit]=line;refCode=active.code+"-"+(index+1);overlay=true;
        row[2]=index+1;row[4]=desc;row[7]=qty;row[8]=converted(unit);row[9]=converted(qty*unit);
       }
@@ -93,7 +94,7 @@ export function BudgetaryWorkbookPreview0553(){
      </tr></React.Fragment>;
     })}</tbody>
    </table></div>
-   <p className="p55-note">Historical Rev08 overlay is controlled by the checkbox above. Prices appear in the main worksheet grid only; no second price table. Some A1–A5 rows are provisional visual placements pending exact native cell mapping. Current approved selling price remains unavailable.</p>
+   <p className="p55-note">Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
    <p className="p55-note">The native XLSX retains all rows and columns. The JSX keeps worksheet header, totals and remarks visible while item rows can collapse. It hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
  </section>;
