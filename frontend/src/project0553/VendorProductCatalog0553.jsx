@@ -79,6 +79,7 @@ export function VendorProductCatalog0553(){
   <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.commscope-ldf4rk-50a"/>
   <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.rf-and-cat6a"/>
   <p>CommScope NETCONNECT Cat6A S/FTP LSZH 1m blue · SKU CSS BL001M · Supplier CSS Thai · AGERP PO2406-0845 · THB {RF_AND_PATCH_REFERENCE_0553.cat6Patch.historicalUnitRateTHB}/pc (ex VAT) · historical purchase reference, not current offer. Quantity follows indoor port/patch map.</p>
+  <p><strong>Additional 2m CAT6A patch cord:</strong> {RF_AND_PATCH_REFERENCE_0553.cat6Patch2m.product} · Yellow, S/FTP LSZH · CSS Thai historical ERP best buying THB {RF_AND_PATCH_REFERENCE_0553.cat6Patch2m.historicalERPBestBuyingTHB}/pc ex VAT, applied from 15-Feb-2020. Length and quantity must follow indoor patch schedule; not additive to 1m version.</p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.commscope-npc6aszdb-yl002m"/>
   <p>RF jumper: factory included in selected ODU supply per management confirmation. Field-terminated RF feeder connector: select part number and quantity only after matching cable type, RF ports and installation condition.</p>
   </div>
   {dataSheetProducts.length>0&&<div className="p55-panel" style={{marginBottom:14,padding:14}}>
