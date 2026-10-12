@@ -42,6 +42,10 @@ export function LocationBomDetail0553({site,fx}){
     {expanded[v.tag]&&<tr><td colSpan={6}><div className="p55-panel">
      <strong>{v.tag} — Evidence / Derivation</strong>
      <p className="p55-note">Quantity owner: MR/MTO · Cost owner: {v.source} · {v.status} · Selected vendor cost is not customer selling price.</p>
+     {(v.components||[]).length>0&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Engineering Function / Quote Line</th><th>Required Qty</th><th>Selected Budgetary SKU</th><th>Original Rate</th><th>Extended (THB)</th><th>Basis</th></tr></thead><tbody>
+       {v.components.map((c,i)=><tr key={c.functionId||i}><td>{c.functionId}</td><td>{c.qty}</td><td>{c.sku}</td><td>{c.currency} {fmt(c.unitPrice)}</td><td>{thb(c.extended,c.currency)}</td><td>{c.status} · {c.source}</td></tr>)}
+      </tbody></table></div>}
      {(v.candidates||[]).map((c,i)=><p key={i} className="p55-note">{c.vendor||"Supplier"} · {c.sku} · {c.originalCurrency} {fmt(c.originalUnitPrice)} · candidate only, NOT additional booked cost</p>)}
     </div></td></tr>}
    </React.Fragment>)}
