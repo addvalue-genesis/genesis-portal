@@ -4,7 +4,7 @@
 import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./siteSystemCostReconciliation";
 import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
 const source=SITE_SYSTEM_COST_RECONCILIATION_0553;
-const mr0002=MR0002_WORKING_BOM_0553.sites.map(s=>({site:s.site,mr:"MR-0002",name:"DMR Trunk Radio",detailRows:s.items,
+const mr0002=MR0002_WORKING_BOM_0553.sites.map(s=>({site:s.site,mr:"MR-0002",name:"DMR Trunk Radio",detailRows:s.items.map(item=>({...item,row:item.quoteLine||item.id,sourceQty:item.qty,sourceUnit:item.unit})),
  subtotals:[{currency:"USD",amount:s.controlledTotalUSD}],gaps:s.scopeWarnings,
  projectionSource:"MR0002_WORKING_BOM_CANONICAL",completeness:"PROVISIONAL_SOME_COSTS_EXCLUDED",
  rfqSource:source.systems.find(x=>x.id==="MR-0002")?.rfqSource||null}));
