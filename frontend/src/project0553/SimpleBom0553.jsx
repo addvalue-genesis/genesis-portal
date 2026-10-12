@@ -3,6 +3,7 @@ import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
 import {DTRS_RFI_BULK_0553} from "./data/dtrsRfiBulk0553";
 import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
+import {deriveDtrsRfiBudget0553} from "./data/dtrsRfiBudgetCalculation0553";
 import {deriveSevenLocationCostLedger0553} from "./data/sevenLocationCostCalculations0553";
 import { deriveEngineeringOwnedCost0553 } from "./data/engineeringOwnedCost0553";
 import { deriveZWP20VendorFunctionCosts, getZWP20RemoteBudgetChoice, getMR502BudgetaryScenarios } from "./data/mr502BudgetaryScenarios";
@@ -20,6 +21,7 @@ import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom"
 export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB"}){
  const zwp20Cost=deriveZWP20SiteCost0553();
  const wpSystemBulk=deriveWpSystemBulkBudget0553();
+ const dtrsRfiSites=deriveDtrsRfiBudget0553();
  const lifecycleLedger=deriveSevenLocationCostLedger0553();
  const bulkBudgetSummary=wpSystemBulk.map(w=>{
   const rows=w.systems.flatMap(sys=>sys.items);
@@ -104,6 +106,15 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Site</th><th>System</th><th>Bulk material / interface</th><th>Quantity</th><th>Rate THB</th><th>Budget THB</th><th>Evidence / state</th></tr></thead><tbody>
   {wpSystemBulk.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.systems.flatMap(sys=>sys.items.map((item,i)=><tr key={w.wp+sys.id+item.id+i}><td>{w.wp}</td><td>{w.siteClass}</td><td>{sys.name}</td><td>{item.item}</td><td>{item.qty===null?"DERIVE":item.qty+" "+item.unit}</td><td>{money(item.rateTHB,"THB")}</td><td>{money(item.extendedTHB,"THB")}</td><td>{item.status}<small>{item.source}</small></td></tr>)))}
   </tbody></table></div></details>
+  <details className="p55-panel"><summary>DTRS / RFI LNA · RF Feeder Engineering + Cost Breakdown by ZWP20–22</summary>
+   <p className="p55-note">Management-approved 2026-10-12: CommScope LDF4RK-50A 50-ohm feeder candidate; estimate separately per WP from layout with 15% material allowance. AFC LAY does not dimension cable route; 9.144m grid comparator + 3m routing/termination is assumption only. Connector, grounding, weatherproofing quotes use web-retail rates. The 631 THB assumed per metre feeder rate is NOT UOM verified. No committed RF cost or customer release is implied.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Budget Route</th><th>Procurement</th><th>450MHz Feeder Loss</th><th>Illustrative Material THB</th><th>Engineering Status</th></tr></thead><tbody>
+   {dtrsRfiSites.filter(w=>site==="ALL"||site===w.wp).map(w=><React.Fragment key={w.wp}><tr><td><button type="button" className="p55-row-toggle" aria-expanded={Boolean(expanded["dtrsrf:"+w.wp])} onClick={()=>open("dtrsrf:"+w.wp)}>{expanded["dtrsrf:"+w.wp]?"−":"+"}</button> {w.wp}</td><td>{w.assumedRouteM} m · proxy</td><td>{w.procurementM} m + selected fittings</td><td>{w.cableLossDb450} dB cable only</td><td>{money(w.illustrativeRFMaterialTHB,"THB")}</td><td>{w.scenarioState}<small>Not posted; ERP feeder UOM unverified</small></td></tr>
+   {expanded["dtrsrf:"+w.wp]&&<tr><td colSpan={6}><div className="p55-table-wrap"><p className="p55-note">{w.drawingEvidence}. {w.rfTopology} {w.priceCaveat}</p>
+   <table className="p55-table p55-table--compact"><thead><tr><th>Function / SKU</th><th>Qty</th><th>Unit</th><th>Budget Rate THB</th><th>Illustrative Cost THB</th><th>Evidence &amp; Gate</th></tr></thead><tbody>{w.rows.map(x=><tr key={x.id}><td>{x.item}</td><td>{x.qty??"ENGINEERING"}</td><td>{x.unit}</td><td>{Number.isFinite(x.rate)?money(x.rate,"THB"):"RATE REQUIRED"}</td><td>{Number.isFinite(x.amount)?money(x.amount,"THB"):"NOT COSTED"}</td><td>{x.state}<small>{x.source}</small></td></tr>)}</tbody></table><p className="p55-note">{w.extraCostNotIncluded}. {w.note}</p>
+   </div></td></tr>}</React.Fragment>)}
+   </tbody></table></div>
+  </details>
   <details className="p55-panel"><summary>Lifecycle Cost Calculation — B4 Pre-commissioning &amp; Commissioning / B5 Startup Spares / C2 Capital Spares</summary>
   <p className="p55-note">Spare Qty = MAX(RFQ/OEM minimum, CEIL(installed Qty × approved spare ratio)); Work MH = number of evidenced tests × evidenced unit MH + mobilization MH. Costs remain unpriced until RFQ/OEM spares ratios, test WBS and supplier/labor rates are supplied. This scope is not hidden inside equipment/bulk cost.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WH</th><th>System</th><th>Cost Class</th><th>Phase</th><th>Quantity Driver</th><th>Cost State</th></tr></thead><tbody>
