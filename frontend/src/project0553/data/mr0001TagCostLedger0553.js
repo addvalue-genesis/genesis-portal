@@ -208,11 +208,16 @@ export function selectMR0001TagCostRows0553(site){
     /^LAN-/.test(item.sourceTag)?"NETWORK":"UNCLASSIFIED";
    if(family!=="UNCLASSIFIED"&&!Number.isFinite(item.indicativePackageCostTHB)){
     const evidence=item.vendorCandidates||[];
+    const candidate=evidence.find(x=>Number.isFinite(x.originalUnitPrice)&&["USD","THB"].includes(x.originalCurrency));
+    const referenceUnitCost=candidate?.originalUnitPrice??null;
+    const referenceExtended=Number.isFinite(referenceUnitCost)&&Number.isFinite(item.sourceScopeQty)
+     ?round(referenceUnitCost*item.sourceScopeQty):null;
     return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,
      description:item.description,sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,
-     currency:null,unitCost:null,extended:null,countedInWorkingTotal:false,
-     vendor:null,sku:null,source:"MTO Rev04 / BLD-0001 C1 brownfield tie-in and vendor rate candidates",
-     status:"BROWNFIELD_"+family+"_NEW_REUSE_BY_OTHERS_NOT_CONFIRMED",
+     currency:candidate?.originalCurrency||null,unitCost:referenceUnitCost,extended:null,
+     referenceExtended,countedInWorkingTotal:false,
+     vendor:candidate?.vendor||null,sku:candidate?.sku||null,source:"MTO Rev04 / BLD-0001 C1 brownfield tie-in and vendor rate candidates",
+     status:"BROWNFIELD_"+family+"_REPLACEMENT_REFERENCE_ONLY__OWNERSHIP_REVIEW",
      quantityBasis:"MTO Set/Lot only; existing, reuse, replace, and extra tie-in quantity require engineering decision",
      candidates:evidence,
      components:evidence.filter(x=>Number.isFinite(x.originalUnitPrice)).map(x=>({
