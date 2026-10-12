@@ -110,4 +110,9 @@ assert.equal(7+7+69+7+7+7,104); // whole-run replacement scenario if supplied pr
 assert(raconLedger.includes("replacementFullRunM"));
 assert(raconLedger.includes("extensionShortfallM"));
 assert(ui.includes("Replacement purchase"));
+assert(raconLedger.includes("webBudgetRates"));
+assert(raconLedger.includes("3C x 2.5mm2"));
+assert(raconLedger.includes("pricedCoverageCount"));
+assert(ui.includes("Rate THB/m"));
+assert(ui.includes("w.unpricedCoverageCount"));
 console.log("PASS ZWP20 bulk base THB 37,176: 60m plus 15% purchase allowance + 1 gland. Different directions require additional distinct route records.");
