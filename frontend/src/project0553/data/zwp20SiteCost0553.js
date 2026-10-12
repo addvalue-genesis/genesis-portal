@@ -62,15 +62,16 @@ function rowCost(item){
   const plugQuote=innova?.lines.find(v=>v.partNumber==="IE-PS-RJ45-FH-BK");
   const plugQuotedRate=Number.isFinite(plugQuote?.unitPriceExVat)?plugQuote.unitPriceExVat:null;
   const plugQty=1; // ZWP20 engineering budget assumption; never copied from vendor quote qty
-  const plugBudgetRate=plugQuotedRate===null?0:plugQuotedRate;
-  const weidmuellerPlug={functionId:"DATO_RJ45_FIELD_PLUG",vendor:"INNOVA / Weidmüller",
+  const plugRsRetailRate=1176.68; // RS Thailand stock 741-7317, indicative online ex-VAT price, checked 2026-10-12
+  const plugBudgetRate=plugQuotedRate===null?plugRsRetailRate:plugQuotedRate;
+  const weidmuellerPlug={functionId:"DATO_RJ45_FIELD_PLUG",vendor:"RS Thailand / Weidmüller",
     sku:"IE-PS-RJ45-FH-BK",orderNo:"1963600000",qty:plugQty,currency:"THB",
     quotedUnitPrice:plugQuotedRate,unitPrice:plugBudgetRate,extended:money(plugQty,plugBudgetRate),
-    priceBasis:plugQuotedRate===null?"MANAGEMENT_TEMPORARY_ZERO__SOURCE_QUOTE_NA":"INNOVA_QUOTED_PRICE_EX_VAT",
-    quote:"QA24-0604",quoteItem:2,source:innova?.url||null,
+    priceBasis:plugQuotedRate===null?"RS_ONLINE_RETAIL_INDICATIVE_EX_VAT_NOT_VENDOR_RFQ":"INNOVA_QUOTED_PRICE_EX_VAT",
+    quote:"QA24-0604 (N/A)",quoteItem:2,source:plugQuotedRate===null?"https://th.rs-online.com/web/p/ethernet-couplers/7417317":innova?.url||null,
     exStatus:"IP20_DATASHEET__EX_COMPLIANCE_NOT_ESTABLISHED"};
   const budgetaryDATO=money(q,rate)!==null?Math.round((money(q,rate)+weidmuellerPlug.extended)*100)/100:null;
-  return {...base,vendor:"Sonic Automation / Phoenix Contact + Weidmüller (INNOVA pending)",sku:"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK (budgetary DATO components)",components:[
+  return {...base,vendor:"Sonic Automation / Phoenix Contact + RS Thailand / Weidmüller (online indicative)",sku:"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK (budgetary DATO components)",components:[
     {functionId:"DATO_RJ45_PANEL_INTERFACE",vendor:"Sonic Automation / Phoenix Contact",sku:"FL-PP-RJ45-SC",qty:q,currency:"THB",unitPrice:rate,extended:money(q,rate),priceBasis:"CCY24-PXC-633 historical quotation"},
     weidmuellerPlug
    ],
