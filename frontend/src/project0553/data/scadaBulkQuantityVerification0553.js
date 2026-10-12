@@ -7,6 +7,7 @@ import {ZWP20_BULK_SCOPE_AUDIT_0553} from "./zwp20BulkScopeAudit0553";
 const brownfield=new Set(["ZPQ","ZWP8","ZWP11"]);
 const count=(rows,re)=>rows.filter(x=>re.test(String(x.sourceTag||""))).reduce((n,x)=>n+(Number.isFinite(x.sourceScopeQty)?x.sourceScopeQty:1),0);
 const controls=ZWP20_BULK_SCOPE_AUDIT_0553.checks;
+const ACCESSORY_IDS=new Set(["ODU_NPT","ODU_RJ45","PANEL_RJ45","RF_JUMPER","ANT_MOUNT","ODU_MOUNT","RF_SURGE","EARTH","SUPPORT","GLAND_PLUG","POWER","LABEL"]);
 const candidateRates={
  ODU_CAT6A:{rateTHB:524,source:"INNOVA QA24-0604 line 1 / historical THB per m",priceBasis:"HISTORICAL_COMPARABLE"},
  PANEL_M20:{rateTHB:1020,source:"INNOVA QA24-0604 line 4 / historical per gland",priceBasis:"HISTORICAL_COMPARABLE"},
@@ -43,10 +44,12 @@ export function deriveScadaBulkVerification0553(){
    return {...b,site:g.site,derivedQty:qty,unitRateTHB:rates?.rateTHB??null,
     provisionalExtendedTHB:estimate,rateSource:rates?.source||null,
     priceBasis:rates?.priceBasis||"PRICE_RESEARCH_OR_VENDOR_PACKAGE_ALLOCATION_REQUIRED",
-    decision:boundary,siteOwnership:brownfield.has(g.site)?"NEW_REUSE_BY_OTHERS_VERIFY":"NEW_OR_VENDOR_INCLUDED_VERIFY",
+    decision:boundary,siteOwnership:brownfield.has(g.site)?"BUDGET_AS_NEW_REPLACEMENT__NOT_APPROVED_PROCUREMENT":"NEW_OR_VENDOR_INCLUDED_VERIFY",
+    budgetBucket:ACCESSORY_IDS.has(b.id)?"CONDITIONAL_ACCESSORY_ALLOWANCE":b.id==="ODU_CAT6A"||b.id==="PANEL_M20"?"BASE_FIELD_BULK":"SERVICE_SPARES_SEPARATE",
     quantityState:qty===null?"UNDETERMINED_PHYSICAL_ROUTE_OR_OEM_CONFIGURATION":
      "SI_PARAMETRIC_PRELIMINARY_NOT_MEASURED",
     quoteIncludedNotCounted:b.id==="ODU_RJ45"||boundary==="VENDOR_INCLUDED_FIRST_CHECK",
+    independentAllowanceRequired:ACCESSORY_IDS.has(b.id),
     caveat:retailOnly?"IP67 retail candidate is not Ex-approved/OEM-confirmed; reference rate only":
      b.id==="ODU_CAT6A"?"60m baseline × 15% per assumed ODU Ethernet route, not drawing-measured":
      "Site demand derived from MTO family counts; not approved installation procurement"};
@@ -57,6 +60,7 @@ export function deriveScadaBulkVerification0553(){
    pricedFunctionCount:rows.filter(r=>r.provisionalExtendedTHB!==null).length,
    outstandingFunctionCount:rows.filter(r=>r.provisionalExtendedTHB===null).length,
    totalBudgetComplete:false,postedToCostLedger:false,
+   decisionPolicy:"Brownfield FULL NEW replacement equivalent; accessories independently reserved in Conditional not double-posted to Base; project contingency separate",
    note:"This is an independent engineering/rate-coverage review. Already booked ZWP20 cable/gland must not be added twice; other location provisional quantities are sensitivity cases only."};
  });
 }
