@@ -9,5 +9,11 @@ for(const x of ["WORKING_BOM_BY_LOCATION_0553","deriveZWP20SiteCost0553","derive
 assert(ui.includes("getMR0001LocationCost0553(siteName)"));
 assert(ui.includes("Additional, NOT included in allocated cost"));
 assert(model.includes("SEPARATE_BULK_PROJECTION_NOT_POSTED_TO_EQUIPMENT"));
-assert(model.includes("PREFERRED_BUDGETARY_PARTIAL_NOT_APPROVED"));
+assert(model.includes("ZWP8_TAG_WORKING_LEDGER_0553"));
+const tags=read("data/mr0001TagCostLedger0553.js");
+assert(tags.includes("sum!==round(scenario.partialEquipmentUSD)"));
+assert(tags.includes("MR-502-003")&&tags.includes("ANT-502-003"));
+const a1=read("data/a1EquipmentProjection0553.js");
+assert(a1.includes("ZWP8_TAG_WORKING_LEDGER_0553"));
+assert(!a1.includes("BUDGETARY-4FT-SCENARIO"));
 console.log("PASS MR0001 per-location summary uses shared cost sources with nonadditive scenarios");
