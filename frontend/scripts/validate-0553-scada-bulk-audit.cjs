@@ -1,0 +1,14 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
+const audit=read("ScadaPhysicalCompleteness0553.jsx");
+const model=read("data/scadaBulkQuantityVerification0553.js");
+const simple=read("SimpleBom0553.jsx");
+const reference=read("data/zwp20BulkScopeAudit0553.js");
+assert(audit.includes("deriveScadaBulkVerification0553"));
+assert(audit.includes("bulkBySite.find(x=>x.site===g.site)"));
+assert(simple.includes("<ScadaPhysicalCompleteness0553 site={site}/>"));
+for (const id of ["ODU_CAT6A","PANEL_M20","ODU_NPT","ODU_RJ45","PANEL_RJ45","RF_JUMPER","ANT_MOUNT","ODU_MOUNT","RF_SURGE","EARTH","SUPPORT","GLAND_PLUG","POWER","LABEL","CABLE_TEST","START_SPARES"])assert(reference.includes('id:"'+id+'"'));
+assert(model.includes("postedToCostLedger:false"));
+assert(model.includes("totalBudgetComplete:false"));
+assert(model.includes("quoteIncludedNotCounted"));
+console.log("PASS SCADA 16-function seven-location non-additive verification wiring");
