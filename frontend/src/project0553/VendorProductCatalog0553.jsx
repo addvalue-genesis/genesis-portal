@@ -75,6 +75,8 @@ export function VendorProductCatalog0553(){
   </tr></tbody></table></div></div>
   <div className="p55-panel" style={{padding:14,marginBottom:12}}>
   <h3>Historical Procurement · CAT6A Patch Cord &amp; RF Interface</h3>
+  <p><strong>CommScope LDF4RK-50A (1/2-inch RF Feeder)</strong> — Dolibarr cost THB {RF_AND_PATCH_REFERENCE_0553.rfFeederHistorical.dolibarrCostTHB}; weighted average THB {RF_AND_PATCH_REFERENCE_0553.rfFeederHistorical.weightedAverageTHB}; best buying THB {RF_AND_PATCH_REFERENCE_0553.rfFeederHistorical.bestBuyingTHB} (CSS Thai). Royaltec supplier record THB 631; purchase reference PO2402-0816. Unit of measure must be checked in ERP before applying a per-meter cost. Not selected Z1F RF cable yet.</p>
+  <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.commscope-ldf4rk-50a"/>
   <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.rf-and-cat6a"/>
   <p>CommScope NETCONNECT Cat6A S/FTP LSZH 1m blue · SKU CSS BL001M · Supplier CSS Thai · AGERP PO2406-0845 · THB {RF_AND_PATCH_REFERENCE_0553.cat6Patch.historicalUnitRateTHB}/pc (ex VAT) · historical purchase reference, not current offer. Quantity follows indoor port/patch map.</p>
   <p>RF jumper: factory included in selected ODU supply per management confirmation. Field-terminated RF feeder connector: select part number and quantity only after matching cable type, RF ports and installation condition.</p>
