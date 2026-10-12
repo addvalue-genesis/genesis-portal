@@ -30,7 +30,7 @@ export function PartAWorkingBomReadOnly0553(){
      <tbody>{group.items.map((x,i)=><tr key={x.mr+":"+x.id+":"+i}>
       <td>{x.mr}</td><td>{x.row??"—"}</td><td>{x.tag||"—"}</td><td>{x.description}</td><td>{x.qty??"UNKNOWN"}</td><td>{x.unit||"—"}</td>
       {showInternalCost&&<><td>{x.currency==="UNASSIGNED"?"TBC":x.currency||"—"}</td><td>{money(x.unitCost)}{!Number.isFinite(x.unitCost)&&<small>DISPLAY 0 · RATE NOT MAPPED</small>}</td><td>{money(x.extended)}{!Number.isFinite(x.extended)&&<small>DISPLAY 0 · SOURCE NOT MAPPED</small>}</td></>}
-      <td>{x.source}<small>{x.status}</small>{x.temporaryZero&&<small>MANAGEMENT ZERO ALLOWANCE · NOT VENDOR QUOTED · QTY PENDING</small>}</td><td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+formatKey(group.site)+"."+formatKey(x.tag||x.id||"row-"+i)}/></td>
+      <td>{x.source}<small>{x.status}</small>{x.managementAllowance&&<small>MANAGEMENT THB 500,000 / UNIT · NOT VENDOR QUOTED · QTY PENDING</small>}</td><td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+formatKey(group.site)+"."+formatKey(x.tag||x.id||"row-"+i)}/></td>
      </tr>)}
      {!group.items.length&&<tr><td colSpan={showInternalCost?11:8}>No indexed source MTO scope for this location; not zero quantity.</td></tr>}
      </tbody></table></div>
