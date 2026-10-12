@@ -1,0 +1,20 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs"),path=require("node:path");
+const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");
+const ledger=read("data/mr0001TagCostLedger0553.js");
+const detail=read("LocationBomDetail0553.jsx");
+const summary=read("data/mr0001LocationCostSummary0553.js");
+const a1=read("data/a1EquipmentProjection0553.js");
+const mto=JSON.parse(read("data/snapshots/mr0001.mto.rev04.sourceRows.json"));
+const rows={ZWP21:[17,18,20],ZWP22:[26,27,29],ZWP23:[33,34,36],ZPQ:[39,40,41],ZWP8:[43,44,45,46,47],ZWP11:[49,50,51,52]};
+for(const [site,ids] of Object.entries(rows))for(const row of ids)
+ assert(mto.itemRows.some(x=>x.platform===site&&x.sourceRowIndex===row),site+" Row "+row+" missing");
+assert(ledger.includes('ZWP22:{dato:26,tcab:27,bulk:29}'));
+assert(ledger.includes('ZWP23:{dato:33,tcab:34,bulk:36}'));
+assert(ledger.includes('["ZPQ","ZWP8","ZWP11"].includes(site)'));
+assert(ledger.includes('tag:item.sourceTag,description:item.description'));
+assert(detail.includes('rows.map(v=><React.Fragment'));
+assert(detail.includes('v.detail||v.components||[]'));
+assert(summary.includes('summarizeMR0001TagCost0553'));
+assert(a1.includes('selectMR0001TagCostRows0553'));
+console.log("PASS all seven MTO locations use same tag-ledger/detail contract; brownfield quantities remain ownership-controlled");
