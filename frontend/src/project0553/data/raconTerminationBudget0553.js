@@ -43,7 +43,7 @@ export function deriveRaconTerminationBudget0553(){
     procurementM:totalProcurementM,vendorIncludedM:includedM,extensionShortfallM:shortfallM,replacementFullRunM,additionalPurchaseM:additionalM,
     vendorIncludedBasis:provided?"ORGA_QUOTE_P4_INCLUSION_PROVISIONAL":"NO_QUOTED_VENDOR_CABLE",
     cableUseRule:provided&&shortfallM>0?"REPLACE_FULL_RUN_UNLESS_ENGINEERED_JOIN_APPROVED":"NO_JOIN_REQUIRED",
-    unitRateTHB:null,extendedTHB:null,workingZeroDisplayTHB:0,
+    unitRateTHB:p.webBudgetRates[v.kind]?.thbPerM??null,extendedTHB:Number.isFinite(p.webBudgetRates[v.kind]?.thbPerM)?Math.round(additionalM*p.webBudgetRates[v.kind].thbPerM*100)/100:null,workingZeroDisplayTHB:0,
     costOwner:"FIELD_RACON_BULK_NET_OF_VENDOR_INCLUSION",state:additionalM?"ADDITIONAL_CABLE_RATE_PENDING":"VENDOR_INCLUDED_ONLY"};
   });
   const types=[...new Set(lines.map(x=>x.kind))].map(kind=>({kind,
@@ -59,7 +59,8 @@ export function deriveRaconTerminationBudget0553(){
    additionalGlandCandidateQty:Math.max(0,lines.length*2-p.quotation.glandsIncluded),
    glandState:"6 CMP T3CDS GLANDS PROVISIONALLY QUOTED INCLUDED; ONLY UNMATCHED EX FIELD ENTRIES MAY REQUIRE PURCHASE",
    knownVendorEnclosureCostExtraTHB:0,
-   pricedSubtotalTHB:null,displayWorkingTHB:0,
+   pricedSubtotalTHB:lines.some(x=>x.extendedTHB!==null)?Math.round(lines.reduce((n,x)=>n+(x.extendedTHB??0),0)*100)/100:null,displayWorkingTHB:0,
+   pricedCoverageCount:lines.filter(x=>x.extendedTHB!==null).length,unpricedCoverageCount:lines.filter(x=>x.extendedTHB===null).length,
    completionState:"NET_OF_VENDOR_INCLUDED__PRICE_AND_COMMERCIAL_CLARIFICATION_PENDING",
    quotation:p.quotation,
    caveat:"Conservative full replacement of any quoted pre-cut run shorter than target is separately shown. Direct splice/extension of certified cable is NOT assumed. 60m field control-box-to-indoor DB and 6m local runs are assumptions, not measured routes. ORGA supplies 5m+5m+10m BFOU 12C and six glands per quoted package. These are provisional credits; p8 exclusions and p5/p7 FAT contradiction must be clarified."};
