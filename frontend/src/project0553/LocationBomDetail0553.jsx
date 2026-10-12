@@ -42,9 +42,10 @@ export function LocationBomDetail0553({site,fx}){
     {expanded[v.tag]&&<tr><td colSpan={6}><div className="p55-panel">
      <strong>{v.tag} — Evidence / Derivation</strong>
      <p className="p55-note">Quantity owner: MR/MTO · Cost owner: {v.source} · {v.status} · Selected vendor cost is not customer selling price.</p>
-     {(v.components||[]).length>0&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-      <thead><tr><th>Engineering Function / Quote Line</th><th>Required Qty</th><th>Selected Budgetary SKU</th><th>Original Rate</th><th>Extended (THB)</th><th>Basis</th></tr></thead><tbody>
-       {v.components.map((c,i)=><tr key={c.functionId||i}><td>{c.functionId}</td><td>{c.qty}</td><td>{c.sku}</td><td>{c.currency} {fmt(c.unitPrice)}</td><td>{thb(c.extended,c.currency)}</td><td>{c.status} · {c.source}</td></tr>)}
+     {v.tag==="MR-502-001"&&site==="ZWP21"&&<p className="p55-note"><strong>Functional mapping from ZWP20 reference:</strong> ZWP20 MR-502-001 Row 4 (PTMP remote) → ZWP21 MR-502-001 Row 13 (PTP peer). Matching child functions: Radio hardware, RF filter, throughput/capacity entitlement and RF mounting. Different RPT role / quote group; no automatic SKU or region entitlement transfer. Separate power/IDU and surge owners must remain separate.</p>}
+     {(v.detail||v.components||[]).length>0&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Engineering Function / Quote Line</th><th>Required Qty / Basis</th><th>Selected Budgetary SKU</th><th>Original Rate</th><th>Extended (THB)</th><th>Evidence / Owner / Status</th></tr></thead><tbody>
+       {(v.detail||v.components||[]).map((c,i)=><tr key={c.functionId||i}><td>{c.functionId}</td><td>{c.requiredQty??c.qty??"PENDING"}<small>{c.quantityState||c.quantityBasis||"Engineering confirmation required"}</small></td><td>{c.budgetarySelectedSKU||c.sku||"NOT SELECTED"}</td><td>{c.currency||v.currency||"USD"} {fmt(c.budgetaryUnitPrice??c.unitPrice)}</td><td>{thb(c.budgetaryExtended??c.extended,c.currency||v.currency)}</td><td>{c.allocationOwner||v.tag+"."+v.row}<small>{c.budgetarySelectionState||c.status||c.state}</small></td></tr>)}
       </tbody></table></div>}
      {(v.candidates||[]).map((c,i)=><p key={i} className="p55-note">{c.vendor||"Supplier"} · {c.sku} · {c.originalCurrency} {fmt(c.originalUnitPrice)} · candidate only, NOT additional booked cost</p>)}
     </div></td></tr>}
