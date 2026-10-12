@@ -3,7 +3,7 @@
 import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
 import {deriveZWP20SiteCost0553} from "./zwp20SiteCost0553";
 import {deriveSevenLocationCostLedger0553} from "./sevenLocationCostCalculations0553";
-import {ZWP8_ROW43_COST_TRACE} from "./zwp8Row43CostTrace";
+import {ZWP8_TAG_WORKING_LEDGER_0553} from "./mr0001TagCostLedger0553";
 const site20=deriveZWP20SiteCost0553();
 const bulk=deriveSevenLocationCostLedger0553();
 const round=v=>Math.round(v*100)/100;
@@ -18,18 +18,15 @@ export function getMR0001LocationCost0553(site){
  const costed=items.filter(x=>Number.isFinite(x.indicativePackageCostTHB));
  const allocatedTHB=round(costed.reduce((n,x)=>n+x.indicativePackageCostTHB,0));
  const scenarios=[];
- if(site==="ZWP8"){
-  const choice=ZWP8_ROW43_COST_TRACE.referenceScenarios.find(x=>x.id===ZWP8_ROW43_COST_TRACE.preferredScenarioId);
-  if(Number.isFinite(choice?.partialEquipmentUSD))
-   scenarios.push({name:"ZWP8 selected 4ft radio/antenna reference",currency:"USD",amount:choice.partialEquipmentUSD,
-    status:"PREFERRED_BUDGETARY_PARTIAL_NOT_APPROVED",source:"ZWP8_ROW43_COST_TRACE"});
- }
+ const itemAllocations=site==="ZWP8"?ZWP8_TAG_WORKING_LEDGER_0553.filter(x=>x.countedInWorkingTotal):[];
+ const allocatedUSD=round(itemAllocations.reduce((n,x)=>n+x.extended,0));
  const siteBulk=bulk.find(x=>x.wp===site);
  const scadaBulk=siteBulk?.rows.filter(x=>x.system==="SCADA_RADIO"&&Number.isFinite(x.extendedTHB))||[];
  if(scadaBulk.length)scenarios.push({name:"SCADA field bulk planning (separate)",currency:"THB",
   amount:round(scadaBulk.reduce((n,x)=>n+x.extendedTHB,0)),
   status:"SEPARATE_BULK_PROJECTION_NOT_POSTED_TO_EQUIPMENT",source:"SEVEN_LOCATION_BULK_LEDGER"});
- return {site,sourceCount,costedRows:costed.length,remaining:sourceCount-costed.length,
-  allocatedUSD:0,allocatedTHB,selectedBasis:"MTO_CISCO_PROVISIONAL_ALLOCATION",
+ return {site,sourceCount,costedRows:costed.length+itemAllocations.length,remaining:Math.max(0,sourceCount-costed.length-itemAllocations.length),
+  allocatedUSD,allocatedTHB,selectedBasis:site==="ZWP8"?"ZWP8_MTO_ROW43_TAG_LEVEL_PRELIMINARY":"MTO_CISCO_PROVISIONAL_ALLOCATION",
+  itemAllocations,
   additionalScenarios:scenarios,completeness:"PARTIAL_VENDOR_EVIDENCE_NOT_SELECTED"};
 }
