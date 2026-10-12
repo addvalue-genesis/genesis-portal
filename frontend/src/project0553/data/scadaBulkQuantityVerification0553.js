@@ -5,7 +5,13 @@
 import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
 import {ZWP20_BULK_SCOPE_AUDIT_0553} from "./zwp20BulkScopeAudit0553";
 const brownfield=new Set(["ZPQ","ZWP8","ZWP11"]);
-const count=(rows,re)=>rows.filter(x=>re.test(String(x.sourceTag||""))).reduce((n,x)=>n+(Number.isFinite(x.sourceScopeQty)?x.sourceScopeQty:1),0);
+// Never transform an unknown MTO Set quantity into one piece. Expose an unresolved driver.
+const count=(rows,re)=>{
+ const matched=rows.filter(x=>re.test(String(x.sourceTag||"")));
+ const unresolved=matched.filter(x=>!Number.isFinite(x.sourceScopeQty)||x.sourceScopeQty<0);
+ return {qty:matched.reduce((n,x)=>n+(Number.isFinite(x.sourceScopeQty)&&x.sourceScopeQty>=0?x.sourceScopeQty:0),0),
+   unresolvedTags:unresolved.map(x=>x.sourceTag),tagCount:matched.length};
+};
 const controls=ZWP20_BULK_SCOPE_AUDIT_0553.checks;
 const ACCESSORY_IDS=new Set(["ODU_NPT","ODU_RJ45","PANEL_RJ45","RF_JUMPER","ANT_MOUNT","ODU_MOUNT","RF_SURGE","EARTH","SUPPORT","GLAND_PLUG","POWER","LABEL"]);
 const candidateRates={
@@ -17,15 +23,17 @@ const round=n=>Math.round(n*100)/100;
 export function deriveScadaBulkVerification0553(){
  return WORKING_BOM_BY_LOCATION_0553.locations.map(g=>{
   const tags=g.items;
-  const odu=count(tags,/^MR-(502|LQM)-(?!.*[AB]$)/i);
-  const antenna=count(tags,/^ANT-/i),panel=count(tags,/^TCAB-/i);
+  const radioDemand=count(tags,/^MR-(502|LQM)-(?!.*[AB]$)/i);
+  const antennaDemand=count(tags,/^ANT-/i),panelDemand=count(tags,/^TCAB-/i);
+  const {qty:odu}=radioDemand,{qty:antenna}=antennaDemand,{qty:panel}=panelDemand;
+  const unresolvedQuantityTags=[...radioDemand.unresolvedTags,...antennaDemand.unresolvedTags,...panelDemand.unresolvedTags];
   // One assumed routed Ethernet run per ODU is a budgetary driver, not a verified cable schedule.
-  const runCount=odu;
+  const runCount=unresolvedQuantityTags.length?null:odu;
   const routeBaseM=60,procurementPct=15;
   const rows=controls.map(b=>{
    const rates=candidateRates[b.id];
    const quantities={
-    ODU_CAT6A:runCount?Math.ceil(runCount*routeBaseM*(1+procurementPct/100)):null,
+    ODU_CAT6A:runCount!==null&&runCount>0?Math.ceil(runCount*routeBaseM*(1+procurementPct/100)):null,
     PANEL_M20:panel||null,
     ODU_NPT:odu||null,ODU_RJ45:odu||null,
     PANEL_RJ45:panel||null,RF_JUMPER:antenna||null,
@@ -54,7 +62,7 @@ export function deriveScadaBulkVerification0553(){
      b.id==="ODU_CAT6A"?"60m baseline × 15% per assumed ODU Ethernet route, not drawing-measured":
      "Site demand derived from MTO family counts; not approved installation procurement"};
   });
-  return {site:g.site,mtoTagCount:tags.length,odu,antenna,panel,
+  return {site:g.site,mtoTagCount:tags.length,odu,antenna,panel,unresolvedQuantityTags,
    runCount,bulkFunctions:rows.length,rows,
    selectedBudgetSubtotalTHB:round(rows.reduce((n,r)=>n+(r.provisionalExtendedTHB||0),0)),
    pricedFunctionCount:rows.filter(r=>r.provisionalExtendedTHB!==null).length,
