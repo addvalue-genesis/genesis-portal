@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {MR0001_MODULE_CROSSMAP_0553} from "./data/mr0001ModuleCrossmap0553";
 import {selectMR0001TagCostRows0553,summarizeMR0001TagCost0553} from "./data/mr0001TagCostLedger0553";
 import {deriveSevenLocationCostLedger0553} from "./data/sevenLocationCostCalculations0553";
 const fmt=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"PENDING";
@@ -43,6 +44,10 @@ export function LocationBomDetail0553({site,fx}){
      <strong>{v.tag} — Evidence / Derivation</strong>
      <p className="p55-note">Quantity owner: MR/MTO · Cost owner: {v.source} · {v.status} · Selected vendor cost is not customer selling price.</p>
      {v.tag==="MR-502-001"&&site==="ZWP21"&&<p className="p55-note"><strong>Functional mapping from ZWP20 reference:</strong> ZWP20 MR-502-001 Row 4 (PTMP remote) → ZWP21 MR-502-001 Row 13 (PTP peer). Matching child functions: Radio hardware, RF filter, throughput/capacity entitlement and RF mounting. Different RPT role / quote group; no automatic SKU or region entitlement transfer. Separate power/IDU and surge owners must remain separate.</p>}
+     {v.tag==="MR-502-001"&&site==="ZWP21"&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Function</th><th>ZWP20 Reference</th><th>ZWP21 Budgetary</th><th>Cost Owner</th><th>Engineering Control</th></tr></thead><tbody>
+       {MR0001_MODULE_CROSSMAP_0553.functions.map(x=><tr key={x.id}><td>{x.id}</td><td>{x.zwp20}</td><td>{x.zwp21}</td><td>{x.owner}</td><td>{x.rule}</td></tr>)}
+      </tbody></table><p className="p55-note">ZWP20: {MR0001_MODULE_CROSSMAP_0553.sourceModule} → ZWP21: {MR0001_MODULE_CROSSMAP_0553.targetModule}. Functional mapping only; quotation and technical approval remain site-specific.</p></div>}
      {(v.detail||v.components||[]).length>0&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
       <thead><tr><th>Engineering Function / Quote Line</th><th>Required Qty / Basis</th><th>Selected Budgetary SKU</th><th>Original Rate</th><th>Extended (THB)</th><th>Evidence / Owner / Status</th></tr></thead><tbody>
        {(v.detail||v.components||[]).map((c,i)=><tr key={c.functionId||i}><td>{c.functionId}</td><td>{c.requiredQty??c.qty??"PENDING"}<small>{c.quantityState||c.quantityBasis||"Engineering confirmation required"}</small></td><td>{c.budgetarySelectedSKU||c.sku||"NOT SELECTED"}</td><td>{c.currency||v.currency||"USD"} {fmt(c.budgetaryUnitPrice??c.unitPrice)}</td><td>{thb(c.budgetaryExtended??c.extended,c.currency||v.currency)}</td><td>{c.allocationOwner||v.tag+"."+v.row}<small>{c.budgetarySelectionState||c.status||c.state}</small></td></tr>)}
