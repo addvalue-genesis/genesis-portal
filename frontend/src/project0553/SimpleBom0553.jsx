@@ -1,6 +1,7 @@
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {MR0002WorkingBom0553} from "./MR0002WorkingBom0553";
 import {LocationBomDetail0553} from "./LocationBomDetail0553";
+import {ScadaPhysicalCompleteness0553} from "./ScadaPhysicalCompleteness0553";
 import {MR0001CostCloseout0553} from "./MR0001CostCloseout0553";
 import {getMR0001LocationCost0553} from "./data/mr0001LocationCostSummary0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
@@ -178,6 +179,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   </details>
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
+  <ScadaPhysicalCompleteness0553 site={site}/>
   <div className="p55-panel" style={{padding:12,margin:"10px 0",border:"1px solid #b8ccd9"}} data-component-key="bid.budget.bom.system-location-mto">
    <strong>BOM Working Table — Module ID</strong>
    <div style={{display:"flex",flexWrap:"wrap",gap:14,alignItems:"center",marginTop:8}}>
