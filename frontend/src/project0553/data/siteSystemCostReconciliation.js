@@ -49,10 +49,10 @@ const legacyRows=sites.flatMap(site=>systems.map(mr=>{
  if(mr.id==="MR-0003"&&MR0003_SELECTED_RATE_EVIDENCE_0553.assignedSites.includes(site)){
   const e=MR0003_SELECTED_RATE_EVIDENCE_0553;
   for(const x of [
-   {line:"EXION-PHONE",description:"GAI-TRONICS Auteldac 6 Ex VoIP Phone / "+e.phone.sku,rate:e.phone.rateTHB,source:"EXION THAI QT "+e.exionQuote,kind:"2026_QUOTED_RATE__ONE_PER_SITE_PROVISIONAL"},
-   {line:"EXION-SOUNDER",description:"Ex sounder / "+e.sounder.sku,rate:e.sounder.rateTHB,source:"EXION THAI QT "+e.exionQuote,kind:"2026_QUOTED_RATE__ONE_PER_SITE_PROVISIONAL"},
-   {line:"PROSPER-EX-JB",description:"BARTEC Ex e Telephone Junction Box assembly, historical 1E analogue",rate:e.jb.rateTHB,source:"PROSPER "+e.prosperQuote+" 2024 (historical Zawtika 1E)",kind:"HISTORICAL_COMPARABLE_1E_NOT_1F_VENDOR_CONFIRMATION"}
-  ])evidence.push({source:x.source,line:x.line,description:x.description,sourceQty:x.line==="PROSPER-EX-JB"?4:4,assumedQty:1,currency:"THB",unit:x.rate,extended:x.rate,kind:x.kind});
+   {line:"PHONE-1",description:"GAI-TRONICS Auteldac 6 Ex VoIP Phone / "+e.phone.sku,rate:e.phone.rateTHB,source:"EXION THAI QT "+e.exionQuote,kind:"2026_QUOTED_RATE__ONE_PER_SITE_PROVISIONAL"},
+   {line:"SOUNDER-1",description:"Ex sounder / "+e.sounder.sku,rate:e.sounder.rateTHB,source:"EXION THAI QT "+e.exionQuote,kind:"2026_QUOTED_RATE__ONE_PER_SITE_PROVISIONAL"},
+   {line:"JB-1",description:"BARTEC Ex e Telephone Junction Box assembly, historical 1E analogue",rate:e.jb.rateTHB,source:"PROSPER "+e.prosperQuote+" 2024 (historical Zawtika 1E)",kind:"HISTORICAL_COMPARABLE_1E_NOT_1F_VENDOR_CONFIRMATION"}
+  ])evidence.push({source:x.source,line:x.line,description:x.description,sourceQty:4,assumedQty:1,currency:"THB",unit:x.rate,extended:x.rate,kind:x.kind});
  }
  const currencies=[...new Set(evidence.map(e=>e.currency))];
  const subtotals=currencies.map(currency=>({currency,amount:Math.round(evidence.filter(e=>e.currency===currency).reduce((n,e)=>n+e.extended,0)*100)/100}));
