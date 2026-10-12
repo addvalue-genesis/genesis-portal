@@ -159,7 +159,10 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   {lifecycleLedger.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.b4b5c2.map(x=><tr key={x.id}><td>{w.wp}</td><td>{x.system}</td><td>{x.costClass}</td><td>{x.activity}</td><td>{x.driver}<small>{x.description}</small></td><td>{x.priceStatus}</td></tr>))}
   </tbody></table></div></details>
   <div ref={el=>{targetRefs.current.coverage=el;}} style={{scrollMarginTop:90}}><SourceCoverage0553/></div>
-  <div ref={el=>{targetRefs.current.reconciliation=el;}} style={{scrollMarginTop:90}}><SiteSystemCostReconciliation0553/></div>
+  <details ref={el=>{targetRefs.current.reconciliation=el;}} className="p55-panel" style={{scrollMarginTop:90}} data-component-key="bid.budget.bom.reconciliation">
+   <summary style={{cursor:"pointer",fontWeight:700,padding:10}}>＋ / − Site / System Cost Reconciliation · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.reconciliation"/></summary>
+   <SiteSystemCostReconciliation0553/>
+  </details>
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
   <div className="p55-panel" style={{padding:12,margin:"10px 0",border:"1px solid #b8ccd9"}} data-component-key="bid.budget.bom.system-location-mto">
