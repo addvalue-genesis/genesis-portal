@@ -151,7 +151,10 @@ export function CommercialWorkspace0553({focusedLocation=null}){
  <p className="p55-note">0550 source code remains untouched. State control is based on the reused three-state doctrine, not an independent 0553 pricing policy.</p>
  </section>
  </section>
- <details className="p553-budget-phase" open><summary><strong>Internal Budget Summary & Review</strong><small>bid.budget.internal · 4 MR systems · historical separation</small></summary>
+ <details className="p553-budget-phase" open><summary><strong>Customer Proposal Preview · Scope of Supply</strong><small>bid.budget.summary · Customer review layout · no release</small></summary>
+  <CustomerProposalPreview0553/>
+ </details>
+ <details className="p553-budget-phase"><summary><strong>Internal Budget Summary & Review</strong><small>bid.budget.internal · 4 MR systems · historical separation</small></summary>
   <InternalBudgetShortcut0553/>
  </details>
  </div>;
