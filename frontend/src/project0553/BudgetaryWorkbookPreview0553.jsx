@@ -29,7 +29,7 @@ export function BudgetaryWorkbookPreview0553(){
  const converted=n=>fxReady?money(n*rate):"—";
  const active=template.sheets.find(s=>s.name===sheet);
  const layout=OFFICIAL_WORKBOOK_TEMPLATE_0553.sheets.find(s=>s.name===sheet);
- const currentFx={thbPerUsd:31.5,cnyPerUsd:fx.CNY&&Number(fx.CNY)>0?Number(fx.CNY):null};
+ const currentFx={thbPerUsd:fx.THB&&Number(fx.THB)>0?Number(fx.THB):null,cnyPerUsd:fx.CNY&&Number(fx.CNY)>0?Number(fx.CNY):null};
  const a1Review=deriveWorkingCostReview0553(currency,currentFx);
  const a1Coverage={...a1Review.partA,siteCount:a1Review.bySite.filter(s=>s.site!=="UNALLOCATED").length,pricedCount:a1Review.partA.known,unpricedCount:a1Review.partA.pending,knownCost:a1Review.partA.original};
  const lines=active?.kind==="SUMMARY"?REV08_BASELINE.summary:
