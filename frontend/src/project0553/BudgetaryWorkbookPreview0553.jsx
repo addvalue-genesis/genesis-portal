@@ -4,6 +4,7 @@ import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl"
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
 import {PartAWorkingBomReadOnly0553} from "./PartAWorkingBomReadOnly0553";
+import {deriveA1EquipmentCoverage0553} from "./data/a1EquipmentProjection0553";
 
 // Workbook-driven navigation, not an editable BOM and not a released quote.
 // The historical Rev08 amounts are source evidence ONLY; never promote them
@@ -28,6 +29,7 @@ export function BudgetaryWorkbookPreview0553(){
  const converted=n=>fxReady?money(n*rate):"—";
  const active=template.sheets.find(s=>s.name===sheet);
  const layout=OFFICIAL_WORKBOOK_TEMPLATE_0553.sheets.find(s=>s.name===sheet);
+ const a1Coverage=deriveA1EquipmentCoverage0553();
  const lines=active?.kind==="SUMMARY"?REV08_BASELINE.summary:
   REV08_BASELINE.detail[active?.code]||[];
  return <section className="p55-panel" data-component-key="bid.budget.summary.workbook">
@@ -97,10 +99,11 @@ export function BudgetaryWorkbookPreview0553(){
      return <React.Fragment key={rowNum}>{header}<tr style={overlay?{background:"rgba(36,111,184,0.07)"}:{}}>
       <td><strong>{rowNum}</strong></td>
       {Array.from({length:layout.columns},(_,col)=>{
-       const value=row[col+1]??"";
+       const a1Cell=sheet==="Scope of supply"&&rowNum===7;
+       const value=a1Cell&&col===6?"SELL PRICE PENDING":row[col+1]??"";
        const isPrice=overlay&&(active?.kind==="SUMMARY"?col===6:(col===7||col===8));
        return <td key={col} style={{whiteSpace:"pre-wrap",minWidth:col===0?65:95}}>
-        {value}{isPrice&&<small style={{display:"block"}}>REV08 · historical {fxReady?currency:"FX MISSING"} · {refCode}</small>}
+        {value}{a1Cell&&col===6&&<small style={{display:"block"}}>A1 mapping: {a1Coverage.pricedCount} costed / {a1Coverage.unpricedCount} unpriced · {a1Coverage.siteCount} locations · NOT APPROVED</small>}{a1Cell&&col===7&&<small style={{display:"block"}}>Working cost reference: {a1Coverage.knownCost.map(x=>x.currency+" "+money(x.amount)).join(" · ")||"NONE"} (not sell)</small>}{isPrice&&<small style={{display:"block"}}>REV08 · historical {fxReady?currency:"FX MISSING"} · {refCode}</small>}
        </td>;
       })}
       <td>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/>}</td>
