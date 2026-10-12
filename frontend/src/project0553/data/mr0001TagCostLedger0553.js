@@ -116,6 +116,54 @@ export function selectMR0001TagCostRows0553(site){
     assumptions:["Uses ZWP20 budget method, not an as-built route measurement","Exclude duplicate SCADA cable from standalone bulk projection",
      "Other coax, glands, grounding and distinct runs remain unpriced until interface takeoff"]};
   }
+  // Cross-location matching to ZWP20 method: compare the MTO Tag and location scope.
+  // Greenfield site-specific rows only. Brownfield equipment ownership remains
+  // unallocated pending NEW/REUSE scope; never assume a replacement is required.
+  const fullGreenfield=["ZWP22","ZWP23"].includes(site);
+  const siteRows={ZWP22:{dato:26,tcab:27,bulk:29},ZWP23:{dato:33,tcab:34,bulk:36}};
+  const rowMap=siteRows[site];
+  if(fullGreenfield&&rowMap&&oneSet&&item.sourceTag==="DATO-507-001"&&item.sourceRow===rowMap.dato){
+   const q=SUPPLIER_QUOTE_LINES_0553.find(x=>x.id==="SONIC-CCY24-PXC-633")?.lines.find(x=>x[1]==="FL-PP-RJ45-SC");
+   const panel=Number.isFinite(q?.[4])?q[4]:null;
+   const plug=1176.68;
+   const unit=Number.isFinite(panel)?round(panel+plug):null;
+   return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,description:item.description,
+    sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,currency:"THB",
+    unitCost:unit,extended:Number.isFinite(unit)?round(unit*item.sourceScopeQty):null,
+    vendor:"Sonic / Phoenix Contact + RS Thailand / Weidmüller",sku:"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK",
+    source:"SONIC-CCY24-PXC-633 + RS retail analogue / MTO Rev04",
+    status:"BUDGETARY_DATO_ASSEMBLY_EX_COMPLIANCE_NOT_VERIFIED",countedInWorkingTotal:Number.isFinite(unit),
+    quantityBasis:"MTO one DATO set; one panel interface and one field plug as budgetary comparison",
+    components:[{functionId:"RJ45_PANEL",sku:"FL-PP-RJ45-SC",qty:1,currency:"THB",unitPrice:panel,extended:panel},
+      {functionId:"FIELD_PLUG",sku:"IE-PS-RJ45-FH-BK",qty:1,currency:"THB",unitPrice:plug,extended:plug}],
+    assumptions:["ZWP20 costing method only; Ex-rated quick disconnect not technically confirmed","Free-issued and vendor-included interfaces must not be counted twice"]};
+  }
+  if(fullGreenfield&&rowMap&&oneSet&&item.sourceTag==="TCAB-500-001"&&item.sourceRow===rowMap.tcab){
+   const q=SUPPLIER_QUOTE_LINES_0553.find(x=>x.id==="PROSPER-24051")?.lines.find(x=>x[0]==="1");
+   const rate=Number.isFinite(q?.[4])?q[4]:null;
+   return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,description:item.description,
+    sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,currency:"THB",unitCost:rate,
+    extended:Number.isFinite(rate)?round(rate*item.sourceScopeQty):null,
+    vendor:"BARTEC / Prosper E&T historical comparable",sku:q?.[1]||null,
+    source:"PROSPER-24051 / historical Zawtika 1E",
+    status:"BUDGETARY_ENCLOSURE_HISTORICAL_ANALOGUE",countedInWorkingTotal:Number.isFinite(rate),
+    quantityBasis:"MTO one enclosure set; internal components owned by their own MTO rows",
+    assumptions:["ZWP20 method, not a verified Phase 1F quotation","Ex e enclosure dimensions, thermal load, entries and installation certificate require confirmation"]};
+  }
+  if(fullGreenfield&&rowMap&&item.sourceRow===rowMap.bulk&&/bulk material/i.test(item.sourceTag)){
+   const purchaseM=69,rate=524,gland=1020;
+   const lines=[{functionId:"SCADA_CAT6A_FIELD_RUN",sku:"TECKNIKABEL CAT6A S/FTP",qty:purchaseM,currency:"THB",unitPrice:rate,extended:purchaseM*rate},
+    {functionId:"SCADA_INDOOR_ENTRY",sku:"501/453/UNIV/A/M20",qty:1,currency:"THB",unitPrice:gland,extended:gland}];
+   const total=round(lines.reduce((n,x)=>n+x.extended,0));
+   return {site,mr:"MR-0001",row:item.sourceRow,tag:"BULK-MATERIAL",description:item.description,
+    sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,currency:"THB",unitCost:total,extended:total,
+    vendor:"INNOVA historical / engineering route allowance",sku:"CAT6A plus single M20 entry candidate",
+    source:"MTO Rev04 / INNOVA QA24-0604 / approved greenfield budget basis",
+    status:"PARTIAL_BULK_ROUTE_ALLOWANCE_NOT_MEASURED",countedInWorkingTotal:true,
+    quantityBasis:"One assumed route 60m + 15% purchasing = 69m and one panel gland, subject to actual routing",
+    components:lines,
+    assumptions:["ZWP20 methodology only; separate site routes and cable counts unverified","Remaining RF, glands and grounding functions outside this partial cost","Do not add separate SCADA bulk scenario again"]};
+  }
   const pricedFunctions=functions.length>0&&functions.every(x=>Number.isFinite(x.extended));
   const functionCost=pricedFunctions?round(functions.reduce((n,x)=>n+x.extended,0)):null;
   if(functionCost!==null)return {site,mr:"MR-0001",row:item.sourceRow,tag:item.sourceTag,
