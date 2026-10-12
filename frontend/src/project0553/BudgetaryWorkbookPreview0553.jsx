@@ -15,7 +15,7 @@ export function BudgetaryWorkbookPreview0553(){
  const [showHistorical,setShowHistorical]=useState(false);
  const [showEmptyRows,setShowEmptyRows]=useState(false);
  const [collapsed,setCollapsed]=useState({});
- const sectionForRow=(n)=>sheet==="Scope of supply"?(n<=5?null:n<=22?"PART_A":n<=39?"PART_B":"PART_C"):(layout.sections.items.start<=n&&n<=layout.sections.items.end?"ITEMS":null);
+ const sectionForRow=(n)=>sheet==="Scope of supply"?(n>=7&&n<=22?"PART_A":n>=24&&n<=37?"PART_B":n>=41&&n<=42?"PART_C":null):(layout.sections.items.start<=n&&n<=layout.sections.items.end?"ITEMS":null);
  const labels=sheet==="Scope of supply"?{PART_A:"Part A — Basic Equipment",PART_B:"Part B — Services / Spares",PART_C:"Part C — Options"}:{ITEMS:"Detailed item schedule / รายการย่อย"};
  const toggleSection=(key)=>setCollapsed(v=>({...v,[sheet+":"+key]:!v[sheet+":"+key]}));
  const [currency,setCurrency]=useState("USD");
@@ -39,6 +39,13 @@ export function BudgetaryWorkbookPreview0553(){
     {currency!=="USD"&&<label>FX date <input type="date" value={fxDate} onChange={e=>setFxDate(e.target.value)}/></label>}
     {currency!=="USD"&&<label>FX source <input value={fxSource} onChange={e=>setFxSource(e.target.value)} placeholder="Source/reference"/></label>}
     <label>Original worksheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{template.sheets.map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</select></label></div>
+   <div className="p55-filterbar" role="group" aria-label="Workbook worksheets">
+    {template.sheets.map(item=><button type="button" key={item.name}
+      className={"p553-detail-button"+(sheet===item.name?" is-active":"")}
+      aria-pressed={sheet===item.name} onClick={()=>setSheet(item.name)}
+      style={{fontWeight:sheet===item.name?700:400,border:sheet===item.name?"2px solid #07729a":"1px solid #b7c7d5"}}>
+      {item.name}</button>)}
+   </div>
    <p className="p55-note"><strong>Currency: {currency}</strong> · {currency==="USD"?"Historical source values in original USD; no conversion.":fxReady?"Indicative converted display only, using user-entered "+rate+" "+currency+"/USD on "+fxDate+" · Source: "+fxSource+". Not a verified or approved customer rate.":"Conversion unavailable: enter rate, date and source. USD source amounts are retained unchanged; no implied FX."}</p>
    <label><input type="checkbox" checked={showHistorical} onChange={e=>setShowHistorical(e.target.checked)}/> Show historical Rev08 price comparison (not current bid)</label>
    <label><input type="checkbox" checked={showEmptyRows} onChange={e=>setShowEmptyRows(e.target.checked)}/> Show empty template rows (original Excel layout)</label>
@@ -47,6 +54,11 @@ export function BudgetaryWorkbookPreview0553(){
    <div className="p55-panel">
     <strong>{sheet}</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)}/>
     <p className="p55-note">Price cells marked REV08 are historical comparison values only, displayed in the official-style grid for review. They are NOT approved customer selling prices and will NOT be exported as the current bid.</p>
+   </div>
+   <div className="p55-filterbar">
+    <button type="button" className="p553-detail-button" onClick={()=>setCollapsed(old=>({...old,...Object.fromEntries((sheet==="Scope of supply"?["PART_A","PART_B","PART_C"]:["ITEMS"]).map(key=>[sheet+":"+key,false]))}))}>− Expand all details</button>
+    <button type="button" className="p553-detail-button" onClick={()=>setCollapsed(old=>({...old,...Object.fromEntries((sheet==="Scope of supply"?["PART_A","PART_B","PART_C"]:["ITEMS"]).map(key=>[sheet+":"+key,true]))}))}>+ Collapse all details</button>
+    <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)}/>
    </div>
    <p className="p55-note">กด + / − เพื่อยุบเฉพาะรายการย่อย (แถว 6–18) โดยหัวเอกสาร หัวตาราง Total และ Remark จะแสดงเสมอ; Excel ต้นฉบับไม่ถูกแก้ไข</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
