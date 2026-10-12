@@ -8,6 +8,7 @@ import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {MGW_P26_058_0553} from "./mgwP26058";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 import {MR0001_RADIO_ROLE_MATRIX} from "./mr0001RadioRoleMatrix";
+import {deriveWpSystemBulkBudget0553} from "./wpSystemBulkBudget0553";
 
 const systems=PROJECT_0553_FACTS.systems.map(s=>({
  id:s.mr,name:s.name,rfqSource:s.rfqSource||null
@@ -54,8 +55,21 @@ const legacyRows=sites.flatMap(site=>systems.map(mr=>{
    {line:"JB-1",description:"BARTEC Ex e Telephone Junction Box assembly, historical 1E analogue",rate:e.jb.rateTHB,source:"PROSPER "+e.prosperQuote+" 2024 (historical Zawtika 1E)",kind:"HISTORICAL_COMPARABLE_1E_NOT_1F_VENDOR_CONFIRMATION"}
   ])evidence.push({source:x.source,line:x.line,description:x.description,sourceQty:4,assumedQty:1,currency:"THB",unit:x.rate,extended:x.rate,kind:x.kind});
  }
- const currencies=[...new Set(evidence.map(e=>e.currency))];
- const subtotals=currencies.map(currency=>({currency,amount:Math.round(evidence.filter(e=>e.currency===currency).reduce((n,e)=>n+e.extended,0)*100)/100}));
+ if(mr.id==="MR-0003"&&["ZWP20","ZWP21","ZWP22"].includes(site)){
+  const phoneBulk=deriveWpSystemBulkBudget0553().find(w=>w.wp===site)?.systems.find(s=>s.id==="EX_IP_PHONE")?.items||[];
+  // Existing PROSPER JB-1 is the price owner. Expose only external field bulk as
+  // distinct unresolved engineering lines; no false zero cost or duplicate JB.
+  for(const b of phoneBulk.filter(x=>x.id!=="EX-PHONE-JB")){
+   evidence.push({source:b.source,line:b.id,description:b.item,
+    sourceQty:null,assumedQty:Number.isFinite(b.qty)?b.qty:null,
+    currency:"THB",unit:Number.isFinite(b.rateTHB)?b.rateTHB:null,
+    extended:Number.isFinite(b.extendedTHB)?b.extendedTHB:null,
+    kind:b.status+"__FIELD_BULK_PRICE_OR_ROUTE_PENDING",
+    costOwner:b.owner,notes:b.note});
+  }
+ }
+ const currencies=[...new Set(evidence.filter(e=>Number.isFinite(e.extended)).map(e=>e.currency))];
+ const subtotals=currencies.map(currency=>({currency,amount:Math.round(evidence.filter(e=>e.currency===currency&&Number.isFinite(e.extended)).reduce((n,e)=>n+e.extended,0)*100)/100}));
  const gaps=mr.id==="MR-0001"?["Detailed site ledger not yet implemented for this location","RF/CAL/OEM quantity and scope ownership must remain source-linked"]:
   mr.id==="MR-0002"?["RFI LNA not included in MGW BDA","Site RF topology, feeder and enclosure take-off"]:
   mr.id==="MR-0003"?["EXION quoted 4 phones and 4 sounders; only 3 are provisionally allocated here, fourth is UNALLOCATED","PROSPER JB THB 24,500 is 2024 Zawtika 1E comparator, requote required","Confirm site tag allocation, Ex JB configuration and installation cable/terminations"]:
