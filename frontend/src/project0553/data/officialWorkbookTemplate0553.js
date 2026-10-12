@@ -31,28 +31,34 @@ const summaryRows=[
  [42,"C2","2 years normal operation spare parts",null,null,"1 lot","refer to Annex C2"],
  [43,null,"Remark: Delivery term shall follow program logistic"]
 ];
+// These are intentionally separate worksheet definitions, never one generic annex.
+// Row positions describe the source template. Visual collapse applies only to item rows.
 const annexSpecs=[
- ["B10 CommSpares","ERECTION, PRECOMMISSIONING, COMMISSIONING, START UP SPARES",22,9],
- ["B11 SpecialTool","SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS",22,9],
- ["B13 Consumerables","SUPPLIER RECOMMENDATION FOR CONSUMABLES",22,9],
- ["C1 CapitalSpares","SUPPLIER RECOMMENDATION FOR CAPITAL SPARE PARTS",21,10],
- ["C2 2Y-Spares","SUPPLIER RECOMMENDATION FOR 2 YEARS OPERATION SPARE PARTS",23,10]
+ {name:"B10 CommSpares",title:"ERECTION, PRECOMMISSIONING, COMMISSIONING, START UP SPARE PARTS LISTS",maxRow:22,columns:9,items:[6,18],total:19,remark:20,leadTime:false,sourceNotQuote:false,remarkText:"Remark: Please include the costs for installation, commissioning, and spare parts and special tool in the total price, and provide a detailed breakdown"},
+ {name:"B11 SpecialTool",title:"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS",maxRow:22,columns:9,items:[6,18],total:19,remark:20,leadTime:false,sourceNotQuote:false,remarkText:"Remark: Please include the costs for installation, commissioning, and spare parts and special tool in the total price, and provide a detailed breakdown"},
+ {name:"B13 Consumerables",title:"SUPPLIER RECOMMENDATION FOR CONSUMABLES",maxRow:22,columns:9,items:[6,18],total:19,remark:null,leadTime:false,sourceNotQuote:false},
+ {name:"C1 CapitalSpares",title:"SUPPLIER RECOMMENDATION FOR CAPITAL SPARE PARTS",maxRow:21,columns:10,items:[6,18],total:19,remark:21,leadTime:true,sourceNotQuote:false,remarkText:"Remark: Above Price of spare parts is valid up to Two years after Delivery date of purchase order"},
+ {name:"C2 2Y-Spares",title:"SUPPLIER RECOMMENDATION FOR 2 YEARS OPERATION SPARE PARTS",maxRow:23,columns:10,items:[6,18],total:19,remark:21,leadTime:true,sourceNotQuote:true,remarkText:"Remark: Above Price of spare parts is valid up to Two years after Delivery date of purchase order"}
 ];
-const annexSheet=([name,title,maxRow,cols])=>{
+const annexSheet=(spec)=>{
+ const {name,title,maxRow,columns,items,total,remark,leadTime,sourceNotQuote,remarkText}=spec;
  const cellRows=[
   [2,null,title],
   [4,null,"Item / 序号","Tag No / 位号","Description / 描述","Detail Specification / 详细规格","Materials / 材质","QTY / 数量","DDP site / DDP现场交货"],
   [5,null,null,null,null,null,null,null,"UNIT PRICE (CURRENCY) / 单价","TOTAL PRICE (CURRENCY) / 总价"]
  ];
- if(cols===10)cellRows[2].push("Lead time (ARO) / 交货期");
- for(let r=6;r<=18;r++){
-  const row=[r];if(name==="C2 2Y-Spares"){row[8]="Not quote";row[9]="Not quote";}
+ if(leadTime)cellRows[2].push("Lead time (ARO) / 交货期");
+ for(let r=items[0];r<=items[1];r++){
+  const row=[r];
+  if(sourceNotQuote){row[8]="Not quote";row[9]="Not quote";}
   cellRows.push(row);
  }
- cellRows.push([19,null,"Total Price DDP PURCHASER'S YARD:",null,null,null,null,null,"Not quote"]);
- if(name==="C1 CapitalSpares"||name==="C2 2Y-Spares")cellRows.push([21,null,"Remark: Above Price of spare parts is valid up to"]);
- else if(name!=="B13 Consumerables")cellRows.push([20,null,"Remark: Please include installation and commissioning costs"]);
- return {name,title,maxRow,columns:cols,rows:cellRows};
+ cellRows.push([total,null,"Total Price DDP PURCHASER'S YARD:",null,null,null,null,null,"Not quote"]);
+ if(remark!==null)cellRows.push([remark,null,remarkText]);
+ return {name,title,maxRow,columns,rows:cellRows,sections:{
+  header:{start:2,end:5,collapsible:false},items:{start:items[0],end:items[1],collapsible:true},
+  total:{start:total,end:total,collapsible:false},remark:remark===null?null:{start:remark,end:remark,collapsible:false}
+ },leadTime,sourceNotQuote};
 };
 export const OFFICIAL_WORKBOOK_TEMPLATE_0553=Object.freeze({
  id:"4-Scope of Supply.xlsx",source:"USER_UPLOADED_OFFICIAL_TEMPLATE",currencyLabel:"CURRENCY",
