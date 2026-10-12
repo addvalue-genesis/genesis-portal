@@ -44,7 +44,7 @@ export function BudgetaryWorkbookPreview0553(){
     <p className="p55-note">Price cells marked REV08 are historical comparison values only, displayed in the official-style grid for review. They are NOT approved customer selling prices and will NOT be exported as the current bid.</p>
    </div>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
-    <thead><tr><th>Row / Copy ID</th>{Array.from({length:layout.columns},(_,i)=><th key={i}>{String.fromCharCode(65+i)}</th>)}</tr></thead>
+    <thead><tr><th style={{width:45}}>Row</th>{Array.from({length:layout.columns},(_,i)=><th key={i}>{String.fromCharCode(65+i)}</th>)}<th style={{width:85}}>Copy ID</th></tr></thead>
     <tbody>{Array.from({length:layout.maxRow},(_,i)=>i+1).map(rowNum=>{
      const row=[...(layout.rows.find(r=>r[0]===rowNum)||[rowNum])];
      let overlay=false,refCode="";
@@ -66,7 +66,7 @@ export function BudgetaryWorkbookPreview0553(){
      const visibleContent=row.slice(1).some(value=>value!==null&&value!==undefined&&String(value).trim()!=="");
      if(!showEmptyRows&&!visibleContent)return null;
      return <tr key={rowNum} style={overlay?{background:"rgba(36,111,184,0.07)"}:{}}>
-      <td><strong>{rowNum}</strong>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<div><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/></div>}</td>
+      <td><strong>{rowNum}</strong></td>
       {Array.from({length:layout.columns},(_,col)=>{
        const value=row[col+1]??"";
        const isPrice=overlay&&(active?.kind==="SUMMARY"?col===6:(col===7||col===8));
@@ -74,6 +74,7 @@ export function BudgetaryWorkbookPreview0553(){
         {value}{isPrice&&<small style={{display:"block"}}>REV08 · historical {fxReady?currency:"FX MISSING"} · {refCode}</small>}
        </td>;
       })}
+      <td>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/>}</td>
      </tr>;
     })}</tbody>
    </table></div>
