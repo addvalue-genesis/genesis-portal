@@ -106,7 +106,10 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     {!matches.length&&<span role="status">ไม่พบ Module ใน Working Preview สำหรับคำค้นนี้</span>}
    </div>
   </nav>
-  <div ref={el=>{targetRefs.current.mr0002=el;}} style={{scrollMarginTop:90}}><MR0002WorkingBom0553/></div>
+  <details ref={el=>{targetRefs.current.mr0002=el;}} className="p55-panel" style={{scrollMarginTop:90}} data-component-key="bid.budget.bom.mr0002">
+   <summary style={{cursor:"pointer",fontWeight:700,padding:10}}>MR-0002 · DMR Trunk Radio Working BOM — ZWP20 / ZWP21 / ZWP22 · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.mr0002"/></summary>
+   <MR0002WorkingBom0553/>
+  </details>
   <div className="p55-filterbar" style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
  <label>Display currency <select aria-label="BOM display currency" value={activeCurrency} onChange={e=>setCurrencyOverride(e.target.value)}><option value="THB">THB — Thai Baht</option><option value="USD">USD — US Dollar</option></select></label>
  <small>FX: {fx?.thbPerUsd??"NOT SET"} THB/USD · {fx?.date||"No date"} · {fx?.source||"No source"} · Display conversion only; original quotation rates unchanged</small>
