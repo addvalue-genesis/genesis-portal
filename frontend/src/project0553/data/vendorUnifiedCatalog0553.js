@@ -4,6 +4,8 @@
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 import {VENDOR_EXTERNAL_EVIDENCE_0553} from "./vendorExternalEvidence0553";
 import HISTORICAL_VENDOR from "./historicalVendorEvidence0553.json";
+import EXION_REFERENCE from "./quotes/EXION-1240515-R0.reference.json";
+import KNOWLEDGE_PRODUCTS from "./vendorKnowledgeProducts0553.json";
 import {buildVendorProductCatalog} from "../../common/engineering/vendorProductCatalog";
 const quoted=buildVendorProductCatalog(SUPPLIER_QUOTE_LINES_0553);
 const suppliers=new Map(quoted.suppliers.map(x=>[x.id,{...x,quoteIds:[...x.quoteIds]}]));
@@ -50,6 +52,40 @@ for(const quote of HISTORICAL_VENDOR.quotes){
    approvedForBudget:false});
  }
 }
+
+// Ingest an independently preserved historical quotation into the same catalog.
+// The source quotation identity is not equivalent to a selected project cost.
+const exion={id:EXION_REFERENCE.id,vendor:EXION_REFERENCE.vendor,quotation:EXION_REFERENCE.quotation,
+ mr:EXION_REFERENCE.mrCandidate,currency:EXION_REFERENCE.currency,source:EXION_REFERENCE.document,
+ status:EXION_REFERENCE.priceState};
+const exionId=exion.vendor.trim().toLowerCase();
+if(!suppliers.has(exionId))suppliers.set(exionId,{id:exionId,name:exion.vendor,quoteIds:[]});
+suppliers.get(exionId).quoteIds.push(exion.id);
+EXION_REFERENCE.lines.forEach((line,i)=>{
+ const key=line.sku;
+ if(!products.has(key))products.set(key,{id:key,partNumber:key,description:line.product});
+ relationships.push({id:exion.id+":"+i,vendorId:exionId,productKey:key,
+  description:line.product,quoteId:exion.id,quotation:exion.quotation,originalQuoteId:exion.id,
+  mr:exion.mr,quantity:line.qty,unitPrice:line.rate,currency:exion.currency,
+  pricingUnit:line.unit,sourceClass:"HISTORICAL_SUPPLIER_QUOTE",priceStatus:exion.status,
+  source:exion.source,referenceFrom:exion.source,selectionStatus:"UNREVIEWED",
+  technicalCompliance:"NOT_VERIFIED_FOR_Z1F",approvedForBudget:false,
+  sourceLine:i+1,scopeDriver:"Historical MR-0003 reference; sounder separate from telephone"});
+});
+// Manufacturer records have technical specifications but no implied quotation or price.
+KNOWLEDGE_PRODUCTS.records.forEach((p,i)=>{
+ const supplierId=p.manufacturer.trim().toLowerCase(),key=p.model||p.id;
+ if(!suppliers.has(supplierId))suppliers.set(supplierId,{id:supplierId,name:p.manufacturer,quoteIds:[]});
+ if(!products.has(key))products.set(key,{id:key,partNumber:key,description:p.product});
+ relationships.push({id:p.id,vendorId:supplierId,productKey:key,description:p.product,
+  quoteId:null,quotation:null,mr:p.projectCandidate?.startsWith("MR-0004")?"MR-0004":"ALL",
+  quantity:null,unitPrice:null,currency:null,pricingUnit:null,
+  sourceClass:p.sourceType,priceStatus:"NO_QUOTATION",source:p.sourceUrl,sourceUrl:p.sourceUrl,
+  referenceFrom:p.sourceDocument,referenceDocument:p.sourceDocument,
+  technicalCompliance:p.technicalAssessment,selectionStatus:"UNREVIEWED",
+  scopeDriver:p.category,approvedForBudget:false,
+  specifications:p.specifications,sourceLine:i+1});
+});
 export const VENDOR_UNIFIED_CATALOG_0553=Object.freeze({
  suppliers:[...suppliers.values()],products:[...products.values()],relationships,
  sourceClassRule:"Supplier quotations, web retail, historic ERP and manufacturer evidence do not gain equivalent approvals by being shown in one table",
