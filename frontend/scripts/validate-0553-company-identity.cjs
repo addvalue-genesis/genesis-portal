@@ -29,7 +29,7 @@ assert.notEqual(id("RF Parts"),"css thai","Independent vendor must not be merged
 assert(ui.includes('canonicalCompanyId0553(q.vendor)===vendor'),"Quotation filter still using raw vendor name");
 assert(ui.includes('setVendor(canonicalCompanyId0553(q.vendor))'),"Quote selection not canonical");
 assert(ui.includes("x.sourceSupplierLabel")&&ui.includes("sourceThirdParty"),"Search must include source identity and company role");
-assert(ui.includes("Original: {r.sourceSupplierLabel}"),"UI has lost original source name");
+assert(ui.includes("Source / assignment: {r.sourceSupplierLabel}"),"UI has lost original source name");
 assert(catalog.includes("resolvedRelationships")&&catalog.includes("resolvedSuppliers"),"Unified catalog not canonicalized");
 assert(catalog.includes("originalVendorId:row.vendorId"),"Original vendor ID not preserved");
 assert(catalog.includes("quoteIds:[]"),"Company quote history lost");
