@@ -245,7 +245,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     </colgroup>
     <thead><tr>
      <th>+/−</th><th>Location</th><th>Module ID / Copy</th><th>MTO</th>
-     <th>Vendor rates</th><th>RPT / ANT</th><th>Vendor evidence</th><th>Allocated working cost</th>
+     <th>Price evidence<small>covered / MTO</small></th><th>RPT / ANT</th><th>Vendor evidence</th><th>Allocated working cost</th>
     </tr></thead>
     <tbody>
     {groups.filter(g=>g.items.length).map(g=>{
@@ -278,20 +278,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
        <div className="p553-location-details">
         <p className="p55-note"><strong>{g.site} / Engineering Detail:</strong> {g.siteClass?.note} · Equipment ownership NEW / REUSE / BY OTHERS must be checked against current BLD/MR. The overview above contains no hidden cost additions.</p>
         <details className="p55-panel" open>
-         <summary><strong>Cost Allocation by TAG ({allocatedRows.length} source allocations)</strong> · one item per row</summary>
-         <div className="p55-table-wrap">
-          <table className="p55-table p55-table--compact p553-location-line-detail">
-           <thead><tr><th>TAG / MTO source</th><th>Qty</th><th>Currency</th><th>Unit rate</th><th>Extended cost</th><th>Source / status</th></tr></thead>
-           <tbody>{allocatedRows.map((a,i)=><tr key={a.tag+"-"+i}>
-            <td><strong>{a.tag}</strong></td>
-            <td className="is-number">{a.sourceQty??"—"}</td>
-            <td>{a.currency||"UNVERIFIED"}</td>
-            <td className="is-number">{Number.isFinite(a.unitCost)?a.unitCost.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"}</td>
-            <td className="is-number">{Number.isFinite(a.extended)?a.extended.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"}</td>
-            <td>{a.status||"Source qualification required"}</td>
-           </tr>)}</tbody>
-          </table>
-         </div>
+         <summary><strong>Cost Allocation by TAG ({financial.costed} priced / {financial.total} source TAGs)</strong> · กด + ในแต่ละ TAG เพื่อดูรายละเอียดและ Copy Module ID</summary>
+         <LocationBomDetail0553 site={g.site} fx={fx}/>
          <p className="p55-note">Basis: {financial.basis}. {financial.costed}/{financial.total} MTO items priced; {financial.gaps} remaining. Each original currency is retained. Unpriced rows are not treated as zero.</p>
         </details>
         <details className="p55-panel">
@@ -329,10 +317,6 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
           </tr>)}</tbody>
          </table></div>
         </details>}
-        <details className="p55-panel">
-         <summary><strong>Engineering MTO / Function / Price Drill-down</strong> · original TAG view</summary>
-         <LocationBomDetail0553 site={g.site} fx={fx}/>
-        </details>
         <details className="p55-panel">
          <summary><strong>RPT / Link-Budget Evidence ({g.rfProof.length})</strong></summary>
          <div className="p55-table-wrap">
