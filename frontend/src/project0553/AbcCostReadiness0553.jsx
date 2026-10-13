@@ -17,7 +17,7 @@ export function AbcCostReadiness0553({site="ALL",fx=null,priceEvidence=null,snap
    <thead><tr><th>Part / Basis</th><th>Current Source-Backed Cost</th><th>Coverage / Status</th><th>Next Engineering / Commercial Action</th></tr></thead><tbody>
     <tr><td><strong>A — Equipment / Attributable Bulk</strong><small>MR-0001 selected Location(s), internal working cost</small></td>
      <td><strong>{Number.isFinite(A.knownWorkingTHB)?thb(A.knownWorkingTHB):"USD "+fmt(A.originalUSD)+" + THB "+fmt(A.originalTHB)}</strong><small>Original USD {fmt(A.originalUSD)} + THB {fmt(A.originalTHB)}. {model.fx.thbPerUsd?"THB display via working FX "+model.fx.thbPerUsd+" (source unverified)":"FX required to convert USD portion"}.</small></td>
-     <td>{A.postedRows}/{A.totalRows} TAGs carry an allocated working amount · {A.unpostedRows} unresolved<small>{A.complete?"All current TAG rows priced; OEM approval still pending":"PARTIAL — not full Part A price"}</small></td>
+     <td>{A.postedRows}/{A.totalRows} TAGs carry an allocated working amount · {A.unpostedRows} unresolved<small>{A.allocatedTagCoverageComplete?"All current TAG rows costed; Part A still requires OEM/project-wide approval":"PARTIAL — not full Part A price"}</small></td>
      <td>{A.action}</td></tr>
     <tr><td><strong>B — Services / Other B1–B14</strong><small>Cost basis (NOT sell)</small></td>
      <td><strong>{thb(B.costTHB)}</strong><small>Project-wide WBS Rev05 working SELL (separate basis): {thb(B.workingSellTHB)}</small></td>
