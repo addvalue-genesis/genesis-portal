@@ -238,6 +238,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    {!BOM_READ_MODEL_0553.rows.some(r=>r.mr===system&&(site==="ALL"||r.site===site)&&r.evidence?.length)&&<p className="p55-note">No source-backed vendor equipment package mapped to this Location. Select All locations to view the ZWP20–22 provisional evidence. Missing evidence is not zero cost.</p>}
   </section>:<>
   <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
+  {system==="MR-0001"&&<>
   <p className="p55-note"><strong>Source row completeness:</strong> {displayedCount} displayed / {sourceCount} registered MTO item tags. {vendor!=="ALL"?"Vendor filter hides some source rows; select All vendors for the full BOM.":"All source rows remain visible, including items lacking price."} Source item coverage does not mean a complete physical SKU take-off.</p>
   <div className="p55-source-facts">
    <div><span>Locations with source data</span><strong>{groups.filter(g=>g.items.length).length}</strong></div>
@@ -250,7 +251,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     <small><strong>A+B+C: NOT ESTABLISHED</strong> · A booked {abcReadiness.A.postedRows}/{abcReadiness.A.totalRows} TAGs · view A/B/C action breakdown below</small>
    </div>
   </div>
-  {system==="MR-0001"&&<AbcCostReadiness0553 site={site} fx={fx} snapshot={abcReadiness} priceEvidence={{covered:coverageCount,total:visible.length,filtered:vendor!=="ALL",uncovered:uncoveredRateTags}}/>}
+  {<AbcCostReadiness0553 site={site} fx={fx} snapshot={abcReadiness} priceEvidence={{covered:coverageCount,total:visible.length,filtered:vendor!=="ALL",uncovered:uncoveredRateTags}}/>}
+  </>}
   <div className="p55-filterbar" style={{display:"flex",gap:8,margin:"12px 0"}}><button type="button" className="p553-detail-button" onClick={expandAll}>＋ Expand all</button><button type="button" className="p553-detail-button" onClick={collapseAll}>− Collapse all</button><span className="p55-note">เริ่มต้นแสดงภาพรวมทุกแท่น คลิก + เพื่อดู MTO, Calculation, Vendor และ Cost</span></div>
   <div className="p55-table-wrap">
    <table className="p55-table p55-table--compact p55-table--budget p553-location-overview" style={{width:"100%",borderCollapse:"collapse",tableLayout:"fixed",minWidth:1060}}>
