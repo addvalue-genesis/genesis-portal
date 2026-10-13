@@ -1,0 +1,76 @@
+{
+  "projectId": "PJ2608-0553",
+  "version": "CompanyIdentity_Rev01",
+  "policy": "EXACT_EVIDENCE_BACKED_ALIAS_ONLY",
+  "companies": [
+    {
+      "id": "css thai",
+      "displayName": "CSS Thai",
+      "legalName": null,
+      "verification": "CANONICAL_UI_GROUP_PENDING_LEGAL_NAME_EVIDENCE",
+      "roles": [
+        "SUPPLIER",
+        "HISTORICAL_PROCUREMENT_SOURCE"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "CSS Thai",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "CSS Thai / CommScope",
+          "relation": "SUPPLIER_WITH_MANUFACTURER_LABEL",
+          "thirdParty": "CommScope"
+        },
+        {
+          "sourceLabel": "CSS Thai / Royaltec customer reference",
+          "relation": "SUPPLIER_WITH_CUSTOMER_REFERENCE",
+          "thirdParty": "Royaltec"
+        },
+        {
+          "sourceLabel": "CSS Thai / Royaltec",
+          "relation": "SUPPLIER_WITH_CUSTOMER_REFERENCE",
+          "thirdParty": "Royaltec"
+        },
+        {
+          "sourceLabel": "CSS Thai / Phelps Dodge",
+          "relation": "SUPPLIER_WITH_BRAND_LABEL",
+          "thirdParty": "Phelps Dodge"
+        },
+        {
+          "sourceLabel": "CSS Thai / BCC",
+          "relation": "SUPPLIER_WITH_BRAND_LABEL",
+          "thirdParty": "BCC"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "Quoted source labels are retained verbatim on every relationship",
+        "CommScope and Royaltec are independent third-party roles, not CSS aliases when named without CSS Thai",
+        "Never infer purchasing relationship or AVL approval from matching names"
+      ]
+    },
+    {
+      "id": "exion (thailand)",
+      "displayName": "EXION (Thailand)",
+      "legalName": "EXION (Thailand) Company Limited",
+      "verification": "SOURCE_QUOTATION_NAMES",
+      "aliases": [
+        {
+          "sourceLabel": "EXION (Thailand)",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "EXION (Thailand) Company Limited",
+          "relation": "SUPPLIER"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED"
+    }
+  ],
+  "noAutomaticCostSelection": true,
+  "noAutomaticProjectAVLApproval": true,
+  "sourceLabelPreservation": true
+}
