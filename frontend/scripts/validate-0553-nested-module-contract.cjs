@@ -26,7 +26,7 @@ for(const name of ["derivation","particular-evidence","particular-evidence.direc
  "recovered-engineering","vendor-alternatives","scada-bulk"]){
  assert(ui.includes('".'+name+'"'),"Missing TAG nested controlled module: "+name);
 }
-for(const name of [".stages",".equations",".vendor-quote-lines",
+for(const name of [".cost-scope-comparison",".stages",".equations",".vendor-quote-lines",
  ".technical-constraints",".cost-owner-reconciliation"]){
  assert(auditUI.includes('root+"'+name+'"'),"Missing audit module with Copy ID: "+name);
 }
