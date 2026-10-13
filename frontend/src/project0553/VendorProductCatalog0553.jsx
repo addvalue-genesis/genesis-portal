@@ -5,7 +5,6 @@ import {MR0002_PRICE_REGISTRY_0553} from "./data/mr0002PriceRegistry0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./data/supplierQuoteLines";
 import { VENDOR_0553_SOURCES } from "./vendorEvidence";
-import { buildVendorProductCatalog } from "../common/engineering/vendorProductCatalog";
 import { buildQuotationCommercialRegister } from "../common/engineering/quotationCommercialRecord";
 
 // Read-only quotation-to-product index. Never silently promotes a quote line into BOM.
@@ -35,11 +34,12 @@ export function VendorProductCatalog0553(){
   if(view==="supplier" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
   if(view==="supplier" && chosenQuote&&x.quoteId!==chosenQuote)return false;
   if(view==="quote" && chosenQuote&&x.quoteId!==chosenQuote)return false;
+  if(view==="quote" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
   if(view==="product"&&chosenQuote&&x.quoteId!==chosenQuote)return false;
   if(view==="mr"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
   if(view==="compare"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
   if(!search)return true;
-  return [x.productKey,x.mr,x.quotation,productsById.get(x.productKey)?.description,suppliersById.get(x.vendorId)?.name].join(" ").toLowerCase().includes(search.toLowerCase());
+  return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,productsById.get(x.productKey)?.description,suppliersById.get(x.vendorId)?.name].join(" ").toLowerCase().includes(search.toLowerCase());
  }).slice(0,150);
  return <section className="p55-section" style={{marginTop:18}}>
   <h2>Vendor Products · Datasheets · Quotations</h2>
