@@ -1,4 +1,11 @@
 const assert=require("node:assert/strict");const fs=require("node:fs");const path=require("node:path");const read=p=>fs.readFileSync(path.join(__dirname,"../src/project0553",p),"utf8");const d=read("LocationBomDetail0553.jsx"),ui=read("SimpleBom0553.jsx");for(const k of ["selectMR0001TagCostRows0553","summarizeMR0001TagCost0553","deriveSevenLocationCostLedger0553","Engineering Quantity / Basis","Budgetary Selected Product / Vendor","Assumptions / Status","Copy","Bulk / Installation Material Basis"])assert(d.includes(k),k);assert(!d.includes("8 Functional BOM Groups"));
 assert(d.includes("Engineering Derivation / Vendor Breakdown"));
 assert(d.includes(".derivation"));
-assert(ui.includes('g.site!=="ZWP20"&&<LocationBomDetail0553 site={g.site} fx={fx}/>'));assert(ui.includes('g.site==="ZWP20"&&<div className="p55-panel">'));console.log("PASS ZWP20 original retained; six other location detail views use shared site ledger and same detailed table headings");
+assert(ui.includes('<LocationBomDetail0553 site={g.site} fx={fx}/>'),"All WP sites must render the canonical TAG drill-down");
+assert(ui.indexOf('<LocationBomDetail0553 site={g.site} fx={fx}/>')>ui.indexOf("Cost Allocation by TAG"),"TAG drill-down should appear inside Cost Allocation");
+assert(!ui.includes("Engineering MTO / Function / Price Drill-down"),"Duplicate hidden TAG drill-down must not reappear");
+assert(d.includes("tagKey=v=>")&&d.includes("site.toLowerCase()"),"Unique Site + TAG + row Module ID required");
+assert(d.includes("aria-expanded={Boolean(expanded[tagKey(v)])}"),"Each TAG must expose its own accessible toggle state");
+assert(d.includes("data-component-key={tagKey(v)}")&&d.includes("componentKey={tagKey(v)}"),"Each TAG needs its own copyable module identity");
+assert(d.includes('componentKey={tagKey(v)+".derivation"}')&&d.includes('componentKey={tagKey(v)+".function."'),"Engineering breakdown and child functions need traceable module IDs");
+console.log("PASS 0553 TAG details: shared ledger for every site, per-TAG expand/collapse, unique Site/TAG/MTO-row Copy IDs, function IDs and engineering evidence, no duplicate detail panel");
