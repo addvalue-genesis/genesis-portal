@@ -29,6 +29,7 @@ assert.equal(project.A.originalUSD,knownUSD);
 assert.equal(project.A.originalTHB,knownTHB);
 assert.equal(project.A.knownWorkingTHB,money(knownTHB+knownUSD*31.5));
 assert.equal(project.A.postedRows+project.A.unpostedRows,project.A.totalRows);
+assert.equal(project.A.fullCostTHB,null,"Numerically booked TAGs must never imply complete approved Part A across all four MRs");
 assert.equal(project.B.sourceWbsRows.length,14,"B1–B14 must remain visible");
 assert.equal(project.C.sourceWbsRows.length,2,"C1 and C2 must remain visible");
 assert.equal(project.B.workingSellTHB,3804160,"Current B Rev05 is working SELL, not cost");
