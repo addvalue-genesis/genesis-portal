@@ -177,7 +177,11 @@
         "description": "2 years normal operation spare parts"
       }
     ],
-    "caution": "Buyer Scope Template Part C is not a generic condition bucket. Engineering cost category and commercial quotation category are separate taxonomies."
+    "caution": "Buyer Scope Template Part C is not a generic condition bucket. Engineering cost category and commercial quotation category are separate taxonomies.",
+    "templateRowsAreNotEngineeringMto": true,
+    "templatePlaceholderNote": "Part A A1 contains xxx placeholders and a quantity 8 demonstration entry; not verified MTO quantity and never used to generate hardware counts.",
+    "nmsCommercialRouting": "If separately priced, NMS entitlement/extension is a software cost in supplied equipment scope and NMS engineering/configuration/services attach to B1 and/or B9 per actual work; commercial qualification is in offer remarks or matched existing deviations, NOT in Part C spares options.",
+    "scopeRule": "Template remark requires prices for entire MR scope, not limited to named lines. The internal CBS may be mapped via a separate crosswalk, but source template codes must remain unchanged."
   },
   "controls": {
     "noAutomaticRepricing": true,
