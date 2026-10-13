@@ -63,6 +63,34 @@ export function VendorProductCatalog0553(){
  rows.forEach(r=>{const k=String(groupKey(r)||"UNASSIGNED");if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);});
  const grouped=[...groups.entries()].map(([id,items])=>({id,items,title:groupLabel(id)}))
   .sort((a,b)=>String(a.title).localeCompare(String(b.title),"en"));
+ // Rendering is shared by Company / Quote / Product / MR grouping; never duplicate the underlying source lines.
+ const renderLines=items=>(<>
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr>
+   <th>Supplier / Source Class</th><th>Product / Model &amp; Function</th><th>MR</th><th>Quotation / Reference From</th><th>Qty / Unit Price / UOM</th><th>Technical / Budgetary Gate</th>
+  </tr></thead><tbody>{items.map(r=>{
+    const p=productsById.get(r.productKey);
+    const isQuote=Boolean(r.quoteId);
+    return <tr key={r.id}>
+     <td><strong>{suppliersById.get(r.vendorId)?.name}</strong><small>Source / assignment: {r.sourceSupplierLabel}</small>{r.sourceClass==="DATASHEET_ONLY"&&<small>Relationship: {r.relationshipRole||"DATA_SOURCE_ASSOCIATION"}</small>}{r.sourceThirdParty&&<small>{r.sourceSupplierRole}: {r.sourceThirdParty}</small>}<small>{r.sourceClass||"SUPPLIER_QUOTATION"}</small></td>
+     <td><strong>{p?.partNumber||"UNIDENTIFIED"}</strong><div>{r.description||p?.description}</div>{r.manufacturer&&<small>Manufacturer: {r.manufacturer}</small>}{r.manufacturerOrderNo&&<small>Order No.: {r.manufacturerOrderNo}</small>}{r.tagCandidate&&<small>Candidate TAG: {r.tagCandidate}</small>}<ComponentCopyId projectId="PJ2608-0553" componentKey={isQuote?"bid.vendor.products.quote-line."+r.id:r.sourceClass==="DATASHEET_ONLY"?"bid.vendor.products.datasheet."+r.id:"bid.vendor.products.evidence."+moduleSegment(r.id)} componentName={p?.partNumber||r.description||r.id}/></td>
+     <td>{r.mr}</td>
+     <td>{isQuote?<><button type="button" className="p553-detail-button" onClick={()=>{setView("quote");setVendor(r.vendorId);setChosenQuote(r.quoteId);}}>{r.quotation}</button><small>{r.priceStatus}</small></>:<><strong>Reference From</strong><small>{r.referenceFrom}</small><small>{r.referenceDocument||""}</small></>}
+      {(r.sourceUrl||(!isQuote&&r.source))&&<small><a href={r.sourceUrl||r.source} target="_blank" rel="noreferrer">Open original source</a></small>}</td>
+     <td>{r.quantity??"—"} / {Number.isFinite(r.unitPrice)?r.currency+" "+r.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"} / {r.pricingUnit||"SOURCE UOM / REVIEW"}<small>{r.vat||""}</small></td>
+     <td><strong>{r.approvedForBudget?"SOURCE ELIGIBLE / ENGINEERING CHECK":"REFERENCE_ONLY / NOT SELECTED"}</strong><small>{r.technicalCompliance||"NOT VERIFIED"}</small><small>{r.scopeDriver||""}</small>{r.relatedRetailEvidenceId&&<small>Linked retail evidence: {r.relatedRetailEvidenceId}</small>}{r.relatedBudgetBasis&&<small>Internal budget only: {r.relatedBudgetBasis}</small>}</td>
+    </tr>})}</tbody></table></div>
+ </>);
+ const groupQuotes=items=>{
+  const byQuote=new Map(),unquoted=[];
+  items.forEach(item=>{
+   if(!item.quoteId){unquoted.push(item);return;}
+   if(!byQuote.has(item.quoteId))byQuote.set(item.quoteId,[]);
+   byQuote.get(item.quoteId).push(item);
+  });
+  const quotations=[...byQuote.entries()].map(([id,lines])=>({id,lines,header:quoteById.get(id)}))
+   .sort((a,b)=>String(b.header?.date||"").localeCompare(String(a.header?.date||""))||companyCollator.compare(a.header?.quotationNo||a.id,b.header?.quotationNo||b.id));
+  return {quotations,unquoted};
+ };
  return <section className="p55-section" style={{marginTop:18}}>
   <h2>Vendor Products · Datasheets · Quotations</h2>
   <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products"/></p>
@@ -120,26 +148,37 @@ export function VendorProductCatalog0553(){
   </div>}
   <p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products."+view+".quote-lines"}/></p>
   <p className="p55-note">{catalog.relationships.length} supplier quote lines and external/historical product references · {rows.length} displayed (all matching entries, no hidden 150-row cap). All evidence classes share this product table; reference records are not supplier quotations. Original source quote-line identities are preserved.</p>
-  {grouped.map(g=><SmartDataGroup key={g.id}
-    projectId="PJ2608-0553" moduleKey={"bid.vendor.products."+view+".group."+moduleSegment(g.id)}
+  {grouped.map(g=><SmartDataGroup key={g.id} projectId="PJ2608-0553"
+    moduleKey={"bid.vendor.products."+view+".group."+moduleSegment(g.id)}
     title={g.title} count={g.items.length}
-    description={view==="supplier"?"Original source labels: "+(suppliersById.get(g.id)?.sourceSupplierLabels||[]).join(" · "):null}
-    defaultOpen={Boolean(search)||Boolean(chosenQuote)||grouped.length===1}>
-  <div className="p55-table-wrap"><table className="p55-table"><thead><tr>
-   <th>Supplier / Source Class</th><th>Product / Model &amp; Function</th><th>MR</th><th>Quotation / Reference From</th><th>Qty / Unit Price / UOM</th><th>Technical / Budgetary Gate</th>
-  </tr></thead><tbody>{g.items.map(r=>{
-    const p=productsById.get(r.productKey);
-    const isQuote=Boolean(r.quoteId);
-    return <tr key={r.id}>
-     <td><strong>{suppliersById.get(r.vendorId)?.name}</strong><small>Source / assignment: {r.sourceSupplierLabel}</small>{r.sourceClass==="DATASHEET_ONLY"&&<small>Relationship: {r.relationshipRole||"DATA_SOURCE_ASSOCIATION"}</small>}{r.sourceThirdParty&&<small>{r.sourceSupplierRole}: {r.sourceThirdParty}</small>}<small>{r.sourceClass||"SUPPLIER_QUOTATION"}</small></td>
-     <td><strong>{p?.partNumber||"UNIDENTIFIED"}</strong><div>{r.description||p?.description}</div>{r.manufacturer&&<small>Manufacturer: {r.manufacturer}</small>}{r.manufacturerOrderNo&&<small>Order No.: {r.manufacturerOrderNo}</small>}{r.tagCandidate&&<small>Candidate TAG: {r.tagCandidate}</small>}<ComponentCopyId projectId="PJ2608-0553" componentKey={isQuote?"bid.vendor.products.quote-line."+r.id:r.sourceClass==="DATASHEET_ONLY"?"bid.vendor.products.datasheet."+r.id:"bid.vendor.products.evidence."+moduleSegment(r.id)} componentName={p?.partNumber||r.description||r.id}/></td>
-     <td>{r.mr}</td>
-     <td>{isQuote?<><button type="button" className="p553-detail-button" onClick={()=>{setView("quote");setVendor(r.vendorId);setChosenQuote(r.quoteId);}}>{r.quotation}</button><small>{r.priceStatus}</small></>:<><strong>Reference From</strong><small>{r.referenceFrom}</small><small>{r.referenceDocument||""}</small></>}
-      {(r.sourceUrl||(!isQuote&&r.source))&&<small><a href={r.sourceUrl||r.source} target="_blank" rel="noreferrer">Open original source</a></small>}</td>
-     <td>{r.quantity??"—"} / {Number.isFinite(r.unitPrice)?r.currency+" "+r.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"} / {r.pricingUnit||"SOURCE UOM / REVIEW"}<small>{r.vat||""}</small></td>
-     <td><strong>{r.approvedForBudget?"SOURCE ELIGIBLE / ENGINEERING CHECK":"REFERENCE_ONLY / NOT SELECTED"}</strong><small>{r.technicalCompliance||"NOT VERIFIED"}</small><small>{r.scopeDriver||""}</small>{r.relatedRetailEvidenceId&&<small>Linked retail evidence: {r.relatedRetailEvidenceId}</small>}{r.relatedBudgetBasis&&<small>Internal budget only: {r.relatedBudgetBasis}</small>}</td>
-    </tr>})}</tbody></table></div>
-
+    description={view==="supplier"?"Company 360 · Quotation history and other evidence (datasheets, web, ERP) grouped separately. Original source labels: "+(suppliersById.get(g.id)?.sourceSupplierLabels||[]).join(" · "):null}
+    defaultOpen={Boolean(search)||Boolean(companyQuery)||Boolean(chosenQuote)||grouped.length===1}>
+    {view==="supplier"?(()=>{
+     const sections=groupQuotes(g.items);
+     return <>
+      {sections.quotations.map(q=><SmartDataGroup key={q.id} projectId="PJ2608-0553"
+        moduleKey={"bid.vendor.products.supplier.group."+moduleSegment(g.id)+".quotation."+moduleSegment(q.id)}
+        title={(q.header?.quotationNo||q.lines[0]?.quotation||q.id)+" · "+(q.header?.date||"Date not recorded")}
+        count={q.lines.length}
+        description={(q.header?.quoteStatus||q.lines[0]?.priceStatus||"SOURCE_QUOTATION")+
+          " · Original currency: "+(q.header?.currency||q.lines[0]?.currency||"UNVERIFIED")+
+          " · Original vendor: "+(q.header?.vendor||g.title)}
+        defaultOpen={Boolean(search)||Boolean(companyQuery)||Boolean(chosenQuote)}>
+        {q.header&&<div className="p55-filterbar">
+         <button type="button" className="p553-detail-button" onClick={()=>chooseQuote(q.id)}>Inspect quotation &amp; commercial conditions</button>
+         <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+q.id}
+          componentName={q.header.quotationNo}/>
+        </div>}
+        {renderLines(q.lines)}
+       </SmartDataGroup>)}
+      {sections.unquoted.length>0&&<SmartDataGroup projectId="PJ2608-0553"
+         moduleKey={"bid.vendor.products.supplier.group."+moduleSegment(g.id)+".other-evidence"}
+         title="Other evidence · Datasheets / Web / ERP / Manufacturer" count={sections.unquoted.length}
+         defaultOpen={Boolean(search)||Boolean(companyQuery)||Boolean(chosenQuote)}>
+          {renderLines(sections.unquoted)}
+       </SmartDataGroup>}
+     </>;
+    })():renderLines(g.items)}
   </SmartDataGroup>)}
   {!grouped.length&&<p role="status" className="p55-note">No matching Vendor evidence. Clear filters or broaden the search.</p>}
   {view==="compare"&&<p className="p55-note"><strong>Candidate comparison only:</strong> not a completed TBE/CBE. Review MR compliance and quote conditions before recommending an offer.</p>}
