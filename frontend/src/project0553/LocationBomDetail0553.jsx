@@ -1,6 +1,7 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
+import {TagFourStageWorkbench0553} from "./TagFourStageWorkbench0553";
 import {traceTagParticular0553} from "./data/documentParticularTrace0553";
 import {TagMappingAudit0553} from "./TagMappingAudit0553";
 import WORKING_POLICY from "./data/siProceedWithQualifications0553.json";
@@ -55,6 +56,7 @@ export function LocationBomDetail0553({site,fx}){
      {(site==="ZWP20"&&v.tag==="ANT-502-001")&&<p className="p55-note"><strong>SI Management Working Basis:</strong> {WORKING_POLICY.workingDecisions[0].state}. 4ft is the preferred budgetary alternative, subject to link and reflection proof. Same Customer TAG applies; any changes to mounting/route are tracked through installation drawings and cost drivers.</p>}
      {(site==="ZWP20"&&["MR-502-001","MR-502-001A","LAN-502-001"].includes(v.tag))&&<p className="p55-note"><strong>ZPQ Existing NMS Interface:</strong> {WORKING_POLICY.workingDecisions[2].state}. Existing NMS assumed; available licences are not verified. Configure and test extension as scope; any incremental entitlements require a sourced scenario or documented commercial qualification, not an assumed zero rate.</p>}
 
+     <TagFourStageWorkbench0553 site={site} tagRow={v} moduleKey={tagKey(v)}>
      {site==="ZWP20"&&v.tag==="MR-502-001"&&v.row===4&&<TagMappingAudit0553/>}
      {(()=>{const trace=traceTagParticular0553(site,v.tag);const rows=[...trace.direct,...trace.siteSpecific];return <ControlledModuleSection0553 moduleKey={tagKey(v)+".particular-evidence"} title={"RFQ Particular Evidence / SI Engineering Proof — "+trace.direct.length+" TAG + "+trace.siteSpecific.length+" Site + "+trace.common.length+" Common; "+trace.conflicts.length+" Conflict Gates"}>
       <p className="p55-note">Requirements derive from MR/BOD/DTS/SPE/RPT/BLD. Clause evidence is independent from existing priced vendor/quantity ledger. Review every linked note, comment and attachment; show applicable common constraints in 04 Documents.</p>
@@ -103,6 +105,7 @@ export function LocationBomDetail0553({site,fx}){
      </ControlledModuleSection0553>})()}
      {(v.quotedRateCandidates||[]).length>0&&<ControlledModuleSection0553 moduleKey={tagKey(v)+".vendor-alternatives"} title="Vendor alternative quotation evidence (not additive)"><div className="p55-table-wrap p553-module-scroll"><table className="p55-table"><thead><tr><th>Quote line</th><th>SKU</th><th>Original Unit Rate</th><th>Selected</th></tr></thead><tbody>{v.quotedRateCandidates.map((c,i)=><tr key={i}><td>{c.quoteLine}</td><td>{c.sku}</td><td>{fmt(c.unitPriceTHB??c.sourceUnitTHB)}</td><td>{c.selected?"WORKING COMPARABLE":"ALTERNATIVE"}</td></tr>)}</tbody></table></div></ControlledModuleSection0553>}
      {(v.candidates||[]).map((c,i)=><p key={i} className="p55-note">{c.vendor||"Supplier"} · {c.sku} · {c.originalCurrency} {fmt(c.originalUnitPrice)} · candidate only, NOT additional booked cost</p>)}
+     </TagFourStageWorkbench0553>
     </ControlledModuleSection0553></td></tr>}
    </React.Fragment>)}
    </tbody></table></div>
