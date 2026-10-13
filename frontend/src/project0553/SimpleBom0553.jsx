@@ -21,6 +21,7 @@ import {SiteSystemCostReconciliation0553} from "./SiteSystemCostReconciliation05
 import { NEXTG_CANDIDATE_ESTIMATE_0553 } from "./data/nextgCandidateEstimate0553";
 import { ITEM_DECISION_PIPELINE_0553 } from "./data/itemDecisionPipeline0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {SmartFilterBar} from "../common/ui/SmartDataExplorer";
 import React,{useRef,useState} from "react";
 import { WORKING_BOM_BY_LOCATION_0553 as model } from "./data/workingBomByLocation";
 import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom";
@@ -102,15 +103,14 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
   <MR0001CostCloseout0553/>
   <nav className="p55-panel" aria-label="Working Preview module navigator" style={{padding:14,marginBottom:16}}>
-   <h4>ค้นหา Module / Find Working Preview Module</h4>
-   <div className="p55-filterbar">
-    <label>Module ID / System / Keyword <input aria-label="ค้นหา Module ID" value={moduleSearch} onChange={e=>setModuleSearch(e.target.value)} placeholder="เช่น bid.budget.bom.mr0002, Trunk Radio, MR-0002"/></label>
-    <button type="button" onClick={()=>setModuleSearch("")}>Clear</button>
-   </div>
+   <SmartFilterBar moduleKey="bid.budget.bom.module-search" title="Find Working Preview Module"
+    total={moduleIndex.length} shown={matches.length} onReset={()=>setModuleSearch("")}
+    controls={[{key:"module",label:"Module ID / System / Keyword",type:"search",value:moduleSearch,onChange:setModuleSearch,placeholder:"bid.budget.bom.mr0002, Trunk Radio, MR-0002"}]}/>
    <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
-    {matches.map(m=><button type="button" key={m.id} className="p553-detail-button" onClick={()=>navigateToModule(m.key)}>
-     {m.label} <small>{m.id}</small>
-    </button>)}
+    {matches.map(m=><div key={m.id} style={{display:"flex",gap:5,alignItems:"center",flexWrap:"wrap"}}>
+      <button type="button" className="p553-detail-button" onClick={()=>navigateToModule(m.key)}>{m.label}</button>
+      <ComponentCopyId projectId="PJ2608-0553" componentKey={m.id}/>
+    </div>)}
     {!matches.length&&<span role="status">ไม่พบ Module ใน Working Preview สำหรับคำค้นนี้</span>}
    </div>
   </nav>
@@ -189,16 +189,19 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    </div>
    <p className="p55-note" style={{marginTop:7}}>Module ID ระบุหน้าจอ/ระบบ/Location และ Copy ได้ทันที; เมื่อกด + ที่ Location จะเห็น Equipment Tag และ Item ID แต่ละแถว</p>
   </div>
-  <div className="p55-filterbar p55-filterbar--simple">
-   <label>System <select value={system} onChange={e=>setSystem(e.target.value)}>
-    <option value="MR-0001">MR0001 · SCADA Radio</option>
-    <option value="MR-0002">MR0002 · DMR (full BOM pending)</option>
-    <option value="MR-0003">MR0003 · Ex Telephone (priced source evidence)</option>
-    <option value="MR-0004">MR0004 · RACON (priced source evidence)</option>
-   </select></label>
-   <label>Location <select value={site} onChange={e=>changeSite(e.target.value)}><option value="ALL">All locations</option>{model.locations.map(x=><option key={x.site} value={x.site}>{x.site}</option>)}</select></label>
-   <label>Vendor / Company <select value={vendor} onChange={e=>setVendor(e.target.value)}><option value="ALL">All vendors</option>{model.vendors.map(v=><option key={v} value={v}>{v}</option>)}</select></label>
-  </div>
+  <SmartFilterBar moduleKey="bid.budget.bom.filters" title="Engineering BOM · Filter by System / Site / Vendor"
+   total={sourceCount} shown={displayedCount} onReset={()=>{setSystem("MR-0001");changeSite("ALL");setVendor("ALL");}}
+   controls={[
+    {key:"system",label:"System",type:"select",value:system,onChange:setSystem,options:[
+      {value:"MR-0001",label:"MR0001 · SCADA Radio"},
+      {value:"MR-0002",label:"MR0002 · DMR"},
+      {value:"MR-0003",label:"MR0003 · Ex Telephone"},
+      {value:"MR-0004",label:"MR0004 · RACON"}]},
+    {key:"location",label:"Location",type:"select",value:site,onChange:changeSite,
+     options:[{value:"ALL",label:"All locations"},...model.locations.map(x=>({value:x.site,label:x.site}))]},
+    {key:"vendor",label:"Vendor / Company",type:"select",value:vendor,onChange:setVendor,
+     options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}
+   ]}/>
   {system==="MR-0002"?<section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.mr0002">
    <h4>MR-0002 · Trunk Radio — Source-linked BOM by Location <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.system-location-mto.mr0002"/></h4>
    <p className="p55-note">This is a read-only table projection of the same central MR-0002 Working BOM. One tagged RFI LNA per site is a budget assumption. THB shown first using Working FX; original vendor currencies retained for audit. Excluded items do not enter site totals.</p>
