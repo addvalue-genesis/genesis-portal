@@ -706,6 +706,99 @@
       "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
       "sourceLineSum": 8610,
       "totalReconciled": null
+    },
+    {
+      "id": "DEUGRO-SVB-SKL",
+      "quotation": "DOCUMENT_REF_CUST_TRNS_SVB-SKL-SHIPMENT2-3",
+      "date": null,
+      "vendor": "deugro Projects (Thailand) Co., Ltd.",
+      "currency": "THB",
+      "quotedTotal": 41500,
+      "source": "CUST_TRNS_SVB-SKL-SHIPMENT2-3.pdf",
+      "sourceUrl": null,
+      "scope": "Historical SVB Suvarnabhumi to MML Freezone Songkhla DDP customs and transport; not route-equivalent to Z1F",
+      "validUntil": null,
+      "terms": "Rate for general non-dangerous cargo 82x80x84cm, gross 61kg chargeable 100kg. Subject to sailing schedule, packing, weight and customs conditions; insurance excluded; duties/CIQ/storage/overtime/surcharges extra; 7% VAT extra; conditional document charges. No source date or quote validity reliably captured.",
+      "mr": "MR-0001/MR-0002/MR-0003/MR-0004",
+      "status": "HISTORICAL_CONDITIONAL_LOGISTICS_REFERENCE_ONLY",
+      "sourceClass": "HISTORICAL_SERVICE_QUOTE",
+      "lines": [
+        {
+          "sku": "SVB-CUSTOMS",
+          "description": "Customs clearance Suvarnabhumi max 200 HS codes / entry",
+          "qty": 1,
+          "unit": "ENTRY",
+          "unitPrice": 2500,
+          "lineTotal": 2500
+        },
+        {
+          "sku": "SKL-CUSTOMS",
+          "description": "Customs clearance Songkhla free zone / entry",
+          "qty": 1,
+          "unit": "ENTRY",
+          "unitPrice": 5000,
+          "lineTotal": 5000
+        },
+        {
+          "sku": "OWNERSHIP-TRANSFER",
+          "description": "Transfer ownership / entry",
+          "qty": 1,
+          "unit": "ENTRY",
+          "unitPrice": 3500,
+          "lineTotal": 3500
+        },
+        {
+          "sku": "DO-ENDORSE",
+          "description": "Bank D/O endorsement / trip",
+          "qty": 1,
+          "unit": "TRIP",
+          "unitPrice": 1000,
+          "lineTotal": 1000
+        },
+        {
+          "sku": "SVB-SKL-TRANSPORT",
+          "description": "SVB to SKL transportation / trip",
+          "qty": 1,
+          "unit": "TRIP",
+          "unitPrice": 26000,
+          "lineTotal": 26000
+        },
+        {
+          "sku": "DO-RELEASE",
+          "description": "D/O release / set",
+          "qty": 1,
+          "unit": "SET",
+          "unitPrice": 500,
+          "lineTotal": 500
+        },
+        {
+          "sku": "DEUGRO-IMPORT-EXPORT",
+          "description": "Import/export under deugro name / entry",
+          "qty": 1,
+          "unit": "ENTRY",
+          "unitPrice": 3000,
+          "lineTotal": 3000
+        },
+        {
+          "sku": "FREEZONE-WAREHOUSE",
+          "description": "Warehouse receipts plus 10% advance fee",
+          "qty": null,
+          "unit": "ACTUAL",
+          "unitPrice": null,
+          "lineTotal": null
+        },
+        {
+          "sku": "OTHER-RECEIPTS",
+          "description": "Other charges at actual receipt plus 10%",
+          "qty": null,
+          "unit": "ACTUAL",
+          "unitPrice": null,
+          "lineTotal": null
+        }
+      ],
+      "lineCompleteness": "NINE_SOURCE_ROWS_SEVEN_PRICEABLE_TWO_VARIABLE",
+      "sourceLineSum": 41500,
+      "totalReconciled": true
     }
   ]
 }
