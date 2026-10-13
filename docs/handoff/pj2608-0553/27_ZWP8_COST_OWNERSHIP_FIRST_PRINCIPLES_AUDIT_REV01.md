@@ -53,3 +53,11 @@ Unpriced physical owner/source TAGs: MR-502-003A and MR-502-004A (separately req
 - `scripts/validate-0553-zwp8-cost-ownership.cjs`: checks 1,375,485.67 existing, duplicate B8 38,694.60, shifted B6/B7 42,290.01, de-duplicated comparison 1,336,791.07, nine of eleven booked, three links, source currency/ledger immutable.
 
 **Status**: GitHub source inspection and arithmetic checks complete. JS/webpack/browser test on user checkout pending. NO source/ledger prices or quantity altered. NO technical acceptance or customer release.
+
+## Correction 2026-10-13 — ZPQ–ZWP8 PTP is EXISTING baseline
+
+**User-confirmed and source-checked:** The ZPQ↔ZWP8 PTP communication link is EXISTING. BLD-0001 Rev.C1 Sheet 7/7 graphically distinguishes existing (dash-line) infrastructure and BLD notes on ZWP20/22 explicitly call for the existing communication link between ZWP8 and ZPQ to be used. Do not label the pre-existing link "NEW PTP" or assume its existing radio and parabolic antenna must be purchased a second time.
+
+**Separate contractual scope requiring engineering resolution:** BOD-0001 Rev.C2 §7.2 records insufficient surveyed capacity on that existing link and states an **additional new link** shall be provided; SPE-0001 Rev.C2 §6.1.3 also uses language for new PTP base radios at both endpoints. This is a possible expansion/parallel link (or another approved engineering arrangement), **not proof that the original installed link ceased being existing**. Drawing/source discrepancy is a controlled interface/quantity gate: exact new hardware, physical endpoints, installed cable/enclosure reuse, frequency entitlement and OEM CAL must be reconciled before any additional procurement cost.
+
+**Cost-model action:** Existing PTP baseline is NEVER automatically priced as new. The current two-ODU/two-antenna working scenario stays a management scenario only until line/function ownership is verified (PTMP base sector vs PTP endpoint/augmentation); the duplicate B-8, B-6/7 ownership defects are independent and remain open. No source Cost Ledger or vendor quote has been changed in this correction. Link status is carried in `data/scadaLinkEvidence.js` and the ZWP8 audit/UI, and checked by `validate-0553-zwp8-cost-ownership.cjs`.
