@@ -28,10 +28,11 @@ export function auditZWP8CostOwnership0553({thbPerUsd=null}={}){
  const radioSourcesValid=radios.length===2&&radios.every(r=>r.countedInWorkingTotal&&r.currency==="USD"&&r.extended===ZWP8_ROW43_COST_TRACE.ownerCosts[r.tag]);
  const surgeSourcesValid=surge.length===2&&surge.every(r=>r.countedInWorkingTotal&&r.currency==="USD"&&r.extended===units.surge);
  const iduSourcesUnpriced=idu.length===2&&idu.every(r=>!r.countedInWorkingTotal);
+ const ownersVerified=ZWP8_ROW43_COST_TRACE.items.every(x=>get(x.tag)?.extended===ZWP8_ROW43_COST_TRACE.ownerCosts[x.tag]);
  const canQuantifyOverlap=radioSourcesValid&&surgeSourcesValid&&
   radios.some(x=>x.detail?.some(f=>f.functionId==="B-8"))&&Number.isFinite(units.surge);
- const sourceOverlapUSD=canQuantifyOverlap?round(radios.length*units.surge):null;
- const wrongOwnerPOEUSD=radioSourcesValid&&quoteRadioCodes.includes("B-6")&&quoteRadioCodes.includes("B-7")?
+ const sourceOverlapUSD=ownersVerified&&surgeSourcesValid?0:canQuantifyOverlap?round(radios.length*units.surge):null;
+ const wrongOwnerPOEUSD=radioSourcesValid&&radios.some(x=>x.detail?.some(f=>f.functionId==="B-6"))&&radios.some(x=>x.detail?.some(f=>f.functionId==="B-7"))?
   round(radios.length*units.poe):null;
  // This is a what-if read-only correction: remove the duplicated surge B-8
  // from ODU, and move B-6/B-7 to the two separately required IDU TAGs.
@@ -80,8 +81,8 @@ export function auditZWP8CostOwnership0553({thbPerUsd=null}={}){
   ledgerCoverage:{costed:ledger.costedRows,total:ledger.totalRows,unpricedTags:ledger.unresolvedRows.map(x=>x.tag)},
   otherSites,issues,
   calculation:"Current quoted ZWP8 ledger = 2×(B1+B2+B3+B5+B6+B7+B8)+2×B12+2×B8+LAN+TCAB+Bulk; unique-owner what-if = current − 2×B8",
-  flags:{verifiedArithmetic:canQuantifyOverlap,uniqueCostOwnerPassed:canQuantifyOverlap&&sourceOverlapUSD===0,
-   vendorTechApproved:false,physicalNewReuseApproved:false,customerReleased:false},
+  flags:{verifiedArithmetic:canQuantifyOverlap,uniqueCostOwnerPassed:ownersVerified&&surgeSourcesValid&&sourceOverlapUSD===0,
+   vendorTechApproved:false,baseStationLicenceApproved:false,nmsEntitlementVerified:false,physicalNewReuseApproved:false,customerReleased:false},
   policy:"AUDIT_ONLY_DO_NOT_MUTATE_LOCKED_LEDGER_OR_AUTO_APPROVE_DESIGN"
  };
 }
