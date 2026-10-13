@@ -289,7 +289,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
        <td className="is-number">{g.rfDemand?.linkEndpointDemand??"—"} / {g.rfDemand?.antennaReferenceDemand??"—"}</td>
        <td><span className="p553-vendor-brief">{vendorFlags.length?vendorFlags.join(" · "):"Source review"}</span></td>
        <td className="p553-location-total"><strong>{displaySiteTotal(g.site)}</strong>
-        <small>{financial.costed}/{financial.total} costed · {financial.gaps} pending</small></td>
+        <small>{financial.costed}/{financial.total} costed · {financial.gaps} pending</small>
+        {g.site==="ZWP8"&&<small><strong>OWNER AUDIT: B-8 surge counted twice; open ZWP8 for evidence. Working total not corrected.</strong></small>}</td>
       </tr>
       {siteExpanded(g.site)&&<tr className="p553-location-expanded"><td colSpan={8}>
        <div className="p553-location-details">
