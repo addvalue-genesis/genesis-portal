@@ -48,3 +48,12 @@ An exported code manifest includes GitHub *paths*, not full text of .jsx source 
 
 ## Resume prompt to share
 > Continue PJ2608-0553 only in repository addvalue-genesis/genesis-portal. Read docs/handoff/pj2608-0553/11_NEW_CHAT_RESUME_PROMPT.md, then 00_HANDOFF_CURRENT.md latest dated section, 12_MACHINE_STATE.json and 13_TEAM_DEVELOPER_HANDOFF.md. Preserve original evidence/quotes and 0550 isolation. Implement only the scoped task using First Principles + constraint-based engineering + parametric costing; list assumptions and blocked proofs, run npm run build, and submit a PR with changed files and evidence. Do not invent PASS STD, OEM approval or customer sell.
+
+
+## Four-stage TAG BOM interface contract (2026-10-13)
+- Required reading for Budgetary/TAG changes: `docs/handoff/pj2608-0553/24_MODULE_DISCLOSURE_ID_CONTRACT_REV01.md` and **Thai/user walkthrough** `docs/handoff/pj2608-0553/25_TAG_BOM_FOUR_STAGE_USER_GUIDE_REV01.md`.
+- All MR0001 location TAGs now render four ordered, collapsible child modules: `.required-bom`, `.working-priced-bom`, `.vendor-comparison`, `.engineering-verification`. Original `.derivation`, `.mapping-audit`, RFQ source/technical diagnostics and Copy IDs remain stable.
+- Read model `frontend/src/project0553/data/tagBomFourStageReadModel0553.js` does not own required BOM, vendor quotation or cost; it binds existing MR0001 function requirements, verified source candidate quote registry, original TAG ledger and independently reconciled cost owner audit. The UI is `TagFourStageWorkbench0553.jsx`.
+- Never merge supplier Quoted Qty with Engineering Qty, sum unlike currencies, move B-6/B-7 from IDU to ODU, turn B-4 supplier NULL into a quote price, auto-select OEM physical SKU or mark technical compliance on an audit source match.
+- Validation: `npm run validate:0553-tag-four-stage-bom` and `npm run build`, then browser QA of ODU/IDU/ANT/SURGE at ZWP20, all four stages, visible Module IDs, scroll and formula/owner summaries. Local/browser results must be reported, not assumed.
+- Other MR0002/3/4 read models do NOT automatically inherit MR0001 factual requirements; adapt the common stage UI only after reviewing particular MR/source quantity/cost ownership first.
