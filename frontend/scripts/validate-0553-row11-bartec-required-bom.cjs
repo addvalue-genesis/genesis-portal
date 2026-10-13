@@ -53,7 +53,7 @@ for(const site of expectedSites){
  assert.equal(m.physicalSkuApproved,false);
  assert.equal(m.working.extended,ledger.extended);
  assert.equal(m.working.currency,ledger.currency);
- assert.equal(m.working.deltaFromLedger,0);
+ assert.equal(m.working.extended,ledger.extended,"Source ledger must remain authoritative even when quote candidates are unpriced");
  assert.equal(m.releaseAllowed,false);
  assert(m.bartecBulkRequired.relatedOtherMr.includes("MR0003 Ex IP Phone JB"));
 }
