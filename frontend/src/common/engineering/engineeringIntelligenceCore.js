@@ -6,7 +6,7 @@ const simple=value=>clean(value).toUpperCase();
 const hasValue=value=>value!==null&&value!==undefined&&value!=="";
 const result=(state,proof,why,extra={})=>({state,proof:proof||null,reason:why,...extra});
 export const FUNCTION_MATCH_STATES=Object.freeze(["FUNCTION_MATCH","FUNCTION_MISMATCH","FUNCTION_UNKNOWN"]);
-export const PROOF_STATES=Object.freeze(["VERIFIED","UNVERIFIED","CONFLICT","NOT_APPLICABLE"]);
+export const PROOF_STATES=Object.freeze(["SOURCE_MATCH","UNVERIFIED","CONFLICT","NOT_APPLICABLE"]);
 export const CANDIDATE_STATES=Object.freeze(["SOURCE_ONLY","HARD_CONFLICT","QUALIFIED_REVIEW","EVIDENCE_MATCH_NOT_APPROVED"]);
 
 /** Controlled aliases only. Similar words never authorize an equivalence. */
@@ -40,8 +40,12 @@ const compare=(operator,actual,expected)=>{
 export function evaluateEngineeringConstraint({constraint,propertyEvidence,approvedNotApplicable=false}){
  const c=constraint||{};
  if(!c.id||!c.property)return result("UNVERIFIED",null,"Constraint ID/property not traceable", {constraintId:c.id||null});
- if(approvedNotApplicable===true && c.applicabilityProofRef)
-  return result("NOT_APPLICABLE",c.applicabilityProofRef,"Explicit applicability disposition", {constraintId:c.id});
+ // A caller boolean cannot waive a mandatory RFQ requirement. Waiver demands
+ // a controlled, externally recorded disposition reference on this exact requirement.
+ if(approvedNotApplicable===true && c.applicabilityProofRef && c.approvedDispositionRef &&
+    c.approvalState==="APPROVED_NOT_APPLICABLE")
+  return result("NOT_APPLICABLE",c.applicabilityProofRef,
+   "Explicit current-project approved applicability disposition (still not product approval)", {constraintId:c.id,decisionRef:c.approvedDispositionRef});
  const evidence=propertyEvidence||null;
  if(!evidence||!hasValue(evidence.value))
   return result("UNVERIFIED",evidence?.sourceRef||null,"Candidate property not documented",{constraintId:c.id});
@@ -51,8 +55,8 @@ export function evaluateEngineeringConstraint({constraint,propertyEvidence,appro
   return result("UNVERIFIED",null,"Vendor claim lacks traceable source/evidence",{constraintId:c.id});
  const ok=compare(c.operator,evidence.value,c.expected);
  if(ok===null)return result("UNVERIFIED",evidence.sourceRef,"Unknown constraint operator; cannot declare PASS",{constraintId:c.id});
- return result(ok?"VERIFIED":"CONFLICT",evidence.sourceRef,
-  ok?"Documented candidate property satisfies this stated comparison":"Vendor property contradicts stated mandatory constraint",
+ return result(ok?"SOURCE_MATCH":"CONFLICT",evidence.sourceRef,
+  ok?"Sourced vendor PROPERTY CLAIM matches the comparison; not an OEM technical approval":"Sourced vendor property contradicts stated mandatory constraint",
   {constraintId:c.id,property:c.property,operator:c.operator,expected:c.expected,actual:evidence.value,unit:c.unit||null});
 }
 /** Explicitly prohibits automatic selection, including preferred/non-AVL products. */
