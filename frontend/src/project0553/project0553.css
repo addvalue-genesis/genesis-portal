@@ -300,3 +300,37 @@
   .p553-dashboard .p553-contract-module__summary{align-items:flex-start}
   .p553-dashboard .p553-contract-module__identity{flex:1 1 100%}
 }
+
+
+/* 0553 A/B/C executive summary evidence/cost visibility */
+.p553-dashboard .p553-abc-readiness .p553-module-scroll {
+  display:block;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow-x:auto;
+  overscroll-behavior-x:contain;
+  border:1px solid #b7cadb;
+  border-radius:5px;
+}
+.p553-dashboard .p553-abc-readiness .p55-table {
+  width:100%;
+  min-width:820px;
+  table-layout:fixed;
+}
+.p553-dashboard .p553-abc-readiness .p55-table td,
+.p553-dashboard .p553-abc-readiness .p55-table th {
+  white-space:normal;
+  overflow-wrap:anywhere;
+  vertical-align:top;
+}
+.p553-dashboard .p55-source-facts > div {
+  min-width:0;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+.p553-dashboard .p55-source-facts strong,
+.p553-dashboard .p55-source-facts small {
+  overflow-wrap:anywhere;
+  white-space:normal;
+}
