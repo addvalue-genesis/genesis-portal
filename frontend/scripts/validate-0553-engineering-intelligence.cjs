@@ -16,8 +16,8 @@ const model=require(path.join(root,"project0553/data/engineeringIntelligenceRead
 const source=fs.readFileSync(path.join(root,"common/engineering/engineeringIntelligenceCore.js"),"utf8");
 assert(!source.includes("project0553")&&!source.includes("project0550"),"Common Engine must never contain project facts");
 assert(!source.includes("unitPrice*")&&!source.includes("priceScore"),"Source price must not decide technical compliance");
-assert.equal(core.canonicalFunction0553Agnostic("remote terminal",{"REMOTE TERMINAL":"RADIO_REMOTE"}),"RADIO_REMOTE");
-assert.equal(core.canonicalFunction0553Agnostic("Remote Radio"),"REMOTE RADIO","No fuzzy supplier-function inference");
+assert.equal(core.canonicalEngineeringFunction("remote terminal",{"REMOTE TERMINAL":"RADIO_REMOTE"}),"RADIO_REMOTE");
+assert.equal(core.canonicalEngineeringFunction("Remote Radio"),"REMOTE RADIO","No fuzzy supplier-function inference");
 const basicReq={id:"TECH-CHECK",functionId:"RADIO_REMOTE",constraints:[
  {id:"REGION",property:"country",operator:"equals",expected:"Myanmar",mandatory:true},
  {id:"POWER",property:"dcVoltage",operator:"rangeIncludes",expected:24,unit:"V",mandatory:true}
