@@ -1,4 +1,5 @@
 import React from "react";
+import {ParticularRequirementMatrix0553} from "./ParticularRequirementMatrix0553";
 import {assessVendorEvidenceForBudget0553} from "./data/vendorExternalEvidence0553";
 import { buildReferenceRegister, assessReferenceReadiness, REFERENCE_STATES } from "../common/engineering/documentReferences";
 
@@ -36,6 +37,7 @@ export function DocumentReferenceControl0553() {
       <td style={{border:"1px solid #ccd5de",padding:9}}>{e.technicalState} · {e.budgetaryRateStatus}</td>
      </tr>)}</tbody></table></div>
    </details>
+   <ParticularRequirementMatrix0553/>
    <details open><summary><strong>BOD §4 — Reference Documents ({result.total})</strong></summary>
    <div style={{overflowX:"auto"}}>
    <table style={{width:"100%",borderCollapse:"collapse",fontSize:14}}>
