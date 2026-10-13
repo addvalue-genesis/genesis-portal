@@ -18,16 +18,25 @@ assert(!source.includes("project0553")&&!source.includes("project0550"),"Common 
 assert(!source.includes("unitPrice*")&&!source.includes("priceScore"),"Source price must not decide technical compliance");
 assert.equal(core.canonicalEngineeringFunction("remote terminal",{"REMOTE TERMINAL":"RADIO_REMOTE"}),"RADIO_REMOTE");
 assert.equal(core.canonicalEngineeringFunction("Remote Radio"),"REMOTE RADIO","No fuzzy supplier-function inference");
-const basicReq={id:"TECH-CHECK",functionId:"RADIO_REMOTE",constraints:[
+const basicReq={id:"TECH-CHECK",sourceRefs:["RFQ:TECH-CHECK"],functionId:"RADIO_REMOTE",constraints:[
  {id:"REGION",property:"country",operator:"equals",expected:"Myanmar",mandatory:true},
  {id:"POWER",property:"dcVoltage",operator:"rangeIncludes",expected:24,unit:"V",mandatory:true}
 ]};
-const offered={id:"SAMPLE-1",functions:["RADIO_REMOTE"],preferredByManagement:true,avlStatus:"NOT_ON_AVL",
+const offered={id:"SAMPLE-1",quotationRef:"VENDOR:OFFER:SAMPLE-1",functions:["RADIO_REMOTE"],preferredByManagement:true,avlStatus:"NOT_ON_AVL",
  properties:{country:{value:"Myanmar",sourceRef:"OEM:001"},dcVoltage:{value:{min:11,max:28},unit:"V",sourceRef:"OEM:002"}}};
 const candidate=core.evaluateEngineeringCandidate({requirement:basicReq,candidate:offered});
 assert.equal(candidate.status,"EVIDENCE_MATCH_NOT_APPROVED");
 assert.equal(candidate.preference,"MANAGEMENT_PREFERRED_NOT_APPROVED");
 assert.equal(candidate.selectionApproved,false);
+assert.equal(candidate.requirementSourceTraceValid,true);
+assert.equal(candidate.candidateSourceTraceValid,true);
+assert(candidate.constraints.every(x=>x.state==="SOURCE_MATCH"),
+ "Matching vendor source properties are SOURCE_MATCH, never technical approval");
+const untraced=core.evaluateEngineeringCandidate({requirement:{...basicReq,sourceRefs:[]},candidate:offered});
+assert.equal(untraced.status,"QUALIFIED_REVIEW","Missing RFQ provenance cannot generate a valid recommendation");
+const noVendorLink=core.evaluateEngineeringCandidate({requirement:basicReq,candidate:{...offered,quotationRef:null}});
+assert.equal(noVendorLink.status,"QUALIFIED_REVIEW","Missing OEM source link cannot become matched evidence");
+
 assert.equal(candidate.customerReleaseAllowed,false);
 const countryMismatch=core.evaluateEngineeringCandidate({requirement:basicReq,
  candidate:{...offered,properties:{...offered.properties,country:{value:"Oman",sourceRef:"QUOTE:B4"}}}});
