@@ -7,7 +7,7 @@ const css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
 const compiled=babel.transformSync(src,{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
 assert(compiled?.code?.length>0,"SimpleBom JSX did not compile");
-const index=src.indexOf('className="p553-location-overview"');
+const index=src.indexOf('p553-location-overview" style=');
 assert(src.includes("p553-location-overview"),"Compact table style missing");
 const start=src.indexOf('<tr className="p553-location-summary">');
 const end=src.indexOf('<tr className="p553-location-expanded">',start);
@@ -21,7 +21,7 @@ assert(!overview.includes("itemAllocations?.map")&&!overview.includes("extraScen
 const detail=src.slice(end,src.indexOf("</React.Fragment>",end));
 assert(src.includes('moduleKey="bid.budget.bom.system-location-mto"'),"Master System-Location MTO table must have its own module ID");
 assert(src.includes('title={"BOM Working Table — "+system+'),"Master table needs its own visible descriptive title");
-assert(src.indexOf('moduleKey="bid.budget.bom.system-location-mto"')<src.indexOf('className="p553-location-overview"'),"Master module must wrap, not merely precede, the overview table");
+assert(src.indexOf('moduleKey="bid.budget.bom.system-location-mto"')<src.indexOf('p553-location-overview" style='),"Master module must wrap, not merely precede, the overview table");
 assert(src.includes("</ControlledModuleSection0553>\n </section>;"),"Master BOM module should contain the full system-dependent table");
 assert(!src.includes('.engineering-detail"}'),"Do not misattribute the master module ID to a ZWP child detail");
 assert(detail.includes("<LocationBomDetail0553 site={g.site} fx={fx}/>"),"Canonical per-TAG cost/engineering drill-down missing from Cost Allocation");
