@@ -1,0 +1,669 @@
+{
+  "project": "PJ2608-0553",
+  "kind": "HISTORICAL_VENDOR_SOURCE_LIBRARY",
+  "currencyPolicy": "Do not auto convert",
+  "missingPolicy": "null not zero",
+  "repricePolicy": "Never overwrite quote originals or post budget automatically",
+  "quotes": [
+    {
+      "id": "VAS-CMP-2603-149",
+      "quotation": "QT2603-149",
+      "date": "2026-03-20",
+      "vendor": "Versed Automation System / CMP",
+      "currency": "THB",
+      "quotedTotal": 336265,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "CMP cable entries/Ex installation consumables",
+      "validUntil": "2026-04-20",
+      "terms": "Cash; free delivery Bangkok for order > THB 5000; 9-11 working weeks from PO excluding festive holidays after down payment; standard documentation; pricing subject stock/GST changes; optional inspections/FAT extra; cancellation up to 100%; VAT 7%; see PDF pp2-3 for all conditions",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "PROJECT_OTHER_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "40SS2KIRA4",
+          "description": "40 SS2K stainless steel gland",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 8368,
+          "lineTotal": 167360
+        },
+        {
+          "sku": "40LN4",
+          "description": "40mm SS locknut",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 200,
+          "lineTotal": 4000
+        },
+        {
+          "sku": "40ET4",
+          "description": "40mm SS earth tag",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 202,
+          "lineTotal": 4040
+        },
+        {
+          "sku": "40ETS2",
+          "description": "40mm nylon ETS2",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 17,
+          "lineTotal": 340
+        },
+        {
+          "sku": "PVC13",
+          "description": "PVC 13 shroud",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 56,
+          "lineTotal": 1120
+        },
+        {
+          "sku": "20STEFUIRA4",
+          "description": "M20S TE1FU stainless cable gland",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 2439,
+          "lineTotal": 48780
+        },
+        {
+          "sku": "20LN4",
+          "description": "20mm SS locknut",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 64,
+          "lineTotal": 1280
+        },
+        {
+          "sku": "20ET4",
+          "description": "20mm SS earth tag",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 149,
+          "lineTotal": 2980
+        },
+        {
+          "sku": "20ETS2",
+          "description": "20mm nylon ETS2",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 4,
+          "lineTotal": 80
+        },
+        {
+          "sku": "PVC04",
+          "description": "PVC 04 shroud",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 22,
+          "lineTotal": 440
+        },
+        {
+          "sku": "20TE1FUIRA4",
+          "description": "20 TE1FU stainless steel gland",
+          "qty": 25,
+          "unit": "EA",
+          "unitPrice": 3162,
+          "lineTotal": 79050
+        },
+        {
+          "sku": "20LN4",
+          "description": "20mm SS locknut",
+          "qty": 25,
+          "unit": "EA",
+          "unitPrice": 64,
+          "lineTotal": 1600
+        },
+        {
+          "sku": "20ET4",
+          "description": "20mm SS earth tag",
+          "qty": 25,
+          "unit": "EA",
+          "unitPrice": 149,
+          "lineTotal": 3725
+        },
+        {
+          "sku": "20ETS2",
+          "description": "20mm nylon ETS2",
+          "qty": 25,
+          "unit": "EA",
+          "unitPrice": 4,
+          "lineTotal": 100
+        },
+        {
+          "sku": "PVC06",
+          "description": "PVC-06 shroud",
+          "qty": 25,
+          "unit": "EA",
+          "unitPrice": 22,
+          "lineTotal": 550
+        },
+        {
+          "sku": "757DM24",
+          "description": "757 M20 Ex d/Ex e SS hex head stopping plug",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 973,
+          "lineTotal": 19460
+        },
+        {
+          "sku": "20LN4-2",
+          "description": "20mm SS locknut",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 64,
+          "lineTotal": 1280
+        },
+        {
+          "sku": "20ETS2-2",
+          "description": "20mm nylon ETS2",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 4,
+          "lineTotal": 80
+        }
+      ]
+    },
+    {
+      "id": "CSS-690009052",
+      "quotation": "QT-H690009052",
+      "date": "2026-03-25",
+      "vendor": "CSS Thai / CommScope",
+      "currency": "THB",
+      "quotedTotal": 565900,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "RF feeder / connector / grounding / jumper",
+      "validUntil": "2026-04-01",
+      "terms": "Cash, wait goods 90 days, ex VAT 7%; quoted feeder UOM EA, do not automatically interpret as meter",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "AVA5RK-50",
+          "description": "7/8 inch black non-halogenated fire retardant corrugated copper RF feeder",
+          "qty": 1300,
+          "unit": "EA",
+          "unitPrice": 360,
+          "lineTotal": 468000
+        },
+        {
+          "sku": "AL5DM-PSA",
+          "description": "7-16 DIN male for 7/8 AVA5-50",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 455,
+          "lineTotal": 9100
+        },
+        {
+          "sku": "AL5NM-PSA",
+          "description": "N male positive stop for 7/8 AVA5-50",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 690,
+          "lineTotal": 13800
+        },
+        {
+          "sku": "CSG78-12B2U",
+          "description": "SureGround universal 7/8 coax grounding kit",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 950,
+          "lineTotal": 19000
+        },
+        {
+          "sku": "F1A-PSMSM-1M",
+          "description": "FSJ1-50A SMA M/SMA M jumper 1m",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 1350,
+          "lineTotal": 27000
+        },
+        {
+          "sku": "F4CR-HPDMDF-3M",
+          "description": "1/2 inch SureFlex 7-16 DIN male/female jumper 3m",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 1450,
+          "lineTotal": 29000
+        }
+      ]
+    },
+    {
+      "id": "CSS-670003342",
+      "quotation": "QT-H670003342",
+      "date": "2024-01-30",
+      "vendor": "CSS Thai / Royaltec customer reference",
+      "currency": "THB",
+      "quotedTotal": 218950,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "CommScope RF feeder exact-meter priced historical comparator",
+      "validUntil": "2024-02-06",
+      "terms": "Leadtime 90-120 days; payment DAYS not specified; VAT 7% excluded",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "LDF4RK-50A",
+          "description": "CommScope HELIAX low-density foam copper 1/2 inch black coax feeder",
+          "qty": 305,
+          "unit": "MT",
+          "unitPrice": 550,
+          "lineTotal": 167750
+        },
+        {
+          "sku": "L4HM-F",
+          "description": "4.3-10 male connector for 1/2 inch LDF4-50A",
+          "qty": 40,
+          "unit": "EA",
+          "unitPrice": 1280,
+          "lineTotal": 51200
+        }
+      ]
+    },
+    {
+      "id": "CSS-670004188",
+      "quotation": "QT-H670004188",
+      "date": "2024-02-06",
+      "vendor": "CSS Thai",
+      "currency": "THB",
+      "quotedTotal": 15216,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "LAN rack / patch / accessories",
+      "validUntil": "2024-02-13",
+      "terms": "Cash before collection; 2-3 days from PO; VAT 7% excluded",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "760237040",
+          "description": "SL UTP 1U 24-port distribution panel",
+          "qty": 1,
+          "unit": "EA",
+          "unitPrice": 1190,
+          "lineTotal": 1190
+        },
+        {
+          "sku": "1375191-1",
+          "description": "Cat5e RJ45 modular jack",
+          "qty": 48,
+          "unit": "EA",
+          "unitPrice": 67,
+          "lineTotal": 3216
+        },
+        {
+          "sku": "NPC06UVDB-BL004F",
+          "description": "Cat6 CM PVC patch cord 4ft blue",
+          "qty": 48,
+          "unit": "EA",
+          "unitPrice": 115,
+          "lineTotal": 5520
+        },
+        {
+          "sku": "272353-1",
+          "description": "Horizontal cable management 1U",
+          "qty": 2,
+          "unit": "EA",
+          "unitPrice": 440,
+          "lineTotal": 880
+        },
+        {
+          "sku": "D1-60506",
+          "description": "19 inch wall rack 6U 60x50x32",
+          "qty": 1,
+          "unit": "EA",
+          "unitPrice": 2550,
+          "lineTotal": 2550
+        },
+        {
+          "sku": "D7-00004",
+          "description": "AC PDU 4U outlets surge protect",
+          "qty": 1,
+          "unit": "EA",
+          "unitPrice": 870,
+          "lineTotal": 870
+        },
+        {
+          "sku": "D7-05002",
+          "description": "Heavy duty rack fan",
+          "qty": 1,
+          "unit": "EA",
+          "unitPrice": 990,
+          "lineTotal": 990
+        }
+      ]
+    },
+    {
+      "id": "CSS-650044674",
+      "quotation": "QT-H650044674",
+      "date": "2022-12-19",
+      "vendor": "CSS Thai / Phelps Dodge",
+      "currency": "THB",
+      "quotedTotal": 224400,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "Armoured power cable",
+      "validUntil": "2022-12-26",
+      "terms": "Lead time 150 days after confirmed PO and cutting length; payment PDC 30 days; VAT 7% excluded",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "PD-CU-EPR-LSHF-SWA-2X6+6",
+          "description": "0.6/1kV tinned Cu EPR/LSHF/SWA/LSHF Cat A 2x6+6 mm2 oil/UV resistant cable",
+          "qty": 1200,
+          "unit": "MT",
+          "unitPrice": 187,
+          "lineTotal": 224400
+        }
+      ]
+    },
+    {
+      "id": "CSS-660039376",
+      "quotation": "QT-H660039376",
+      "date": "2023-11-20",
+      "vendor": "CSS Thai / BCC",
+      "currency": "THB",
+      "quotedTotal": 31320,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "Armoured power cable",
+      "validUntil": "2023-11-27",
+      "terms": "CASH before collection; minimum manufacturing 200m, production ~90 days; VAT 7% excluded",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "BCC-XLPE-SWA-LSHF-3C4",
+          "description": "0.6/1kV XLPE/SWA/LSHF 3C x 4sqmm cable",
+          "qty": 200,
+          "unit": "MT",
+          "unitPrice": 156.6,
+          "lineTotal": 31320
+        }
+      ]
+    },
+    {
+      "id": "MOT-EN019-65",
+      "quotation": "EN019-65",
+      "date": "2022-06-28",
+      "vendor": "MOT RADIO",
+      "currency": "THB",
+      "quotedTotal": 300000,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "Trunk radio historical handheld comparable; not Z1F RFI system equivalent",
+      "validUntil": null,
+      "terms": "VAT 7%; 120-180 days delivery; warranty 1 year; payment 50/50 after PO and delivery",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "XIR-P6620I",
+          "description": "Motorola XiR P6620i VHF 136-174 MHz intrinsically safe handheld (256CH), TIA4950 package incl. PMNN4490, antenna, charger",
+          "qty": 10,
+          "unit": "EA",
+          "unitPrice": 30000,
+          "lineTotal": 300000
+        }
+      ]
+    },
+    {
+      "id": "NETONE-2009-543",
+      "quotation": "QT2009-543",
+      "date": "2020-10-07",
+      "vendor": "NetONE / Palo Alto Networks",
+      "currency": "THB",
+      "quotedTotal": 1300000,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "Historical firewall package reference, not decomposed unit-SKU pricing",
+      "validUntil": null,
+      "terms": "30 day quote validity; Net 30 invoice; warranty 3 yrs support 24x7 no spare/PM; delivery 60 days; installed Bangkok only; VAT 7% excluded",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "PAN-PA-850",
+          "description": "PA-850 hardware with support/security subscription/bundle and installation",
+          "qty": 1,
+          "unit": "LOT",
+          "unitPrice": 1300000,
+          "lineTotal": 1300000
+        }
+      ]
+    },
+    {
+      "id": "WINNCOM-206003",
+      "quotation": "206003",
+      "date": "2013-11-19",
+      "vendor": "Winncom Technologies",
+      "currency": "USD",
+      "quotedTotal": 15869.9,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "Historical radio alternatives; OEM/platform differs from Next G",
+      "validUntil": null,
+      "terms": "EXW Solon Ohio prepaid; freight additional; terms contradict validity 30 vs 60 days; cash in advance; lead 4-6 weeks from payment; returned goods subject to conditions",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "E5820A1",
+          "description": "EX-r 5GHz tri-band ODU 220Mbps expandable to 440Mbps, accessories and PoE",
+          "qty": 2,
+          "unit": "EA",
+          "unitPrice": 6244.7,
+          "lineTotal": 12489.4
+        },
+        {
+          "sku": "K00J5820A1",
+          "description": "Capacity upgrade key 220 to 440Mbps",
+          "qty": 2,
+          "unit": "EA",
+          "unitPrice": 1305,
+          "lineTotal": 2610
+        },
+        {
+          "sku": "A205856",
+          "description": "PoE lightning and surge protection",
+          "qty": 2,
+          "unit": "EA",
+          "unitPrice": 385.25,
+          "lineTotal": 770.5
+        }
+      ]
+    },
+    {
+      "id": "SPS-QUOTE9",
+      "quotation": "9",
+      "date": "2026-03-13",
+      "vendor": "SPS Inter Technology / PolyPhaser",
+      "currency": "THB",
+      "quotedTotal": 63600,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "RF surge arrester comparable; check exact connector/RF/Ex need",
+      "validUntil": null,
+      "terms": "15-day price validity; cash on delivery; delivery within 7 days after PO; VAT 7% excluded",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "CTH-NFF-AL",
+          "description": "DC-6 GHz Type N female/female bulkhead coax surge protector, IP67 20kA GDT",
+          "qty": 20,
+          "unit": "EA",
+          "unitPrice": 3180,
+          "lineTotal": 63600
+        }
+      ]
+    },
+    {
+      "id": "MEASURETRONIX-22601400",
+      "quotation": "226-01400",
+      "date": "2026-04-02",
+      "vendor": "Measuretronix / Fluke Networks",
+      "currency": "THB",
+      "quotedTotal": 342936,
+      "source": null,
+      "sourceUrl": null,
+      "scope": "Special Tools/B6 test equipment historical candidate",
+      "validUntil": null,
+      "terms": "Net 30; delivery 30-60 days; price valid 2026-05-02; VAT 7% excluded",
+      "mr": "MR-0001",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "LIQ-100-IE",
+          "description": "Fluke Networks LinkIQ cable+network tester with industrial Ethernet adapter kit; discounted 25% from THB 152416 list",
+          "qty": 3,
+          "unit": "EA",
+          "unitPrice": 114312,
+          "lineTotal": 342936
+        }
+      ]
+    },
+    {
+      "id": "BARTEC-26024-R1",
+      "quotation": "Q-PROSRY-26024 Rev 1",
+      "date": "2026-05-09",
+      "vendor": "Prosper E&T / BARTEC",
+      "currency": "THB",
+      "quotedTotal": 396000,
+      "source": "Q-PROSRY-26024 Rev 1_Add Value.pdf",
+      "sourceUrl": "https://drive.google.com/file/d/1Gp22DDzaQCgmtSciBJjh0dcLWhYMK2rf/view",
+      "scope": "Ex IP Phone JB vs SCADA communications enclosure must remain distinct",
+      "validUntil": null,
+      "terms": "10-12 weeks; 30% down PO, 70% PDC 30 days post delivery; 30-day validity; free-issued items excluded; VAT 7% excluded",
+      "mr": "MR-0001/MR-0003",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "A7-3132-3016/P015",
+          "description": "Ex e Telephone Junction Box SS316L IP66, 300x300x160 mm, terminals/relay, without internal wiring",
+          "qty": 5,
+          "unit": "SET",
+          "unitPrice": 31600,
+          "lineTotal": 158000
+        },
+        {
+          "sku": "A7-3136-xxxx/P015",
+          "description": "Zone 2 Communication Box SS316L IP66, 600x600x210 mm, terminals, internal wiring by others",
+          "qty": 5,
+          "unit": "SET",
+          "unitPrice": 47600,
+          "lineTotal": 238000
+        }
+      ]
+    },
+    {
+      "id": "CES-240145",
+      "quotation": "CES.PP.240145-Royeltec",
+      "date": "2024-04-19",
+      "vendor": "CES Engineering & Maintenance Services",
+      "currency": "THB",
+      "quotedTotal": 63500,
+      "source": null,
+      "sourceUrl": "https://drive.google.com/file/d/1iLA5J_FhAo2Bl3PPOe9jBRSr8QtQ9Yxy/view",
+      "scope": "B2 and FAT preparatory services historical benchmark",
+      "validUntil": null,
+      "terms": "Ex VAT 7%; validity 30 days; 30 days invoice; extras chargeable",
+      "mr": "MR-0001/MR-0002/MR-0003/MR-0004",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "PRE-FAT-YARD",
+          "description": "6x12m workshop room for Pre-FAT, 13-15 days",
+          "qty": 1,
+          "unit": "LS",
+          "unitPrice": 25000,
+          "lineTotal": 25000
+        },
+        {
+          "sku": "TRANSPORT-SKL-YARD",
+          "description": "Free Zone Songkhla to CES yard return trip with handling",
+          "qty": 1,
+          "unit": "LS",
+          "unitPrice": 13500,
+          "lineTotal": 13500
+        },
+        {
+          "sku": "TRANSPORT-CES-KRABI",
+          "description": "CES to Krabi with driver and pickup truck, quoted 2 roundtrips",
+          "qty": 1,
+          "unit": "LS",
+          "unitPrice": 25000,
+          "lineTotal": 25000
+        }
+      ]
+    },
+    {
+      "id": "LS-QLS-2021-0009",
+      "quotation": "QLS-2021-0009-ADVS",
+      "date": "2021-02-05",
+      "vendor": "LS Engineering & Construction",
+      "currency": "THB",
+      "quotedTotal": null,
+      "source": null,
+      "sourceUrl": "https://drive.google.com/file/d/1vEO-eKgrSKV7tgCl3SAX8WRu3S2QsVsx/view",
+      "scope": "C1/B4 historical manpower driver only",
+      "validUntil": null,
+      "terms": "Approved timesheets; 30% advance deposit; invoice 7 days; standby reimbursable; VAT 7% excluded; 15-day validity",
+      "mr": "MR-0001/MR-0002/MR-0003/MR-0004",
+      "status": "HISTORICAL_REFERENCE_REQUOTE_AND_TECH_REVIEW",
+      "sourceClass": "HISTORICAL_SUPPLIER_QUOTE",
+      "lines": [
+        {
+          "sku": "CRAFT-HELPER",
+          "description": "Offshore craft helper day rate",
+          "qty": 1,
+          "unit": "PAX-DAY",
+          "unitPrice": 2875,
+          "lineTotal": 2875
+        },
+        {
+          "sku": "MOB-DEMOB",
+          "description": "Mobilization/demobilization trip",
+          "qty": 1,
+          "unit": "TRIP",
+          "unitPrice": 2500,
+          "lineTotal": 2500
+        },
+        {
+          "sku": "STANDBY",
+          "description": "Weather standby day rate",
+          "qty": 1,
+          "unit": "PAX-DAY",
+          "unitPrice": 2875,
+          "lineTotal": 2875
+        },
+        {
+          "sku": "OVERTIME",
+          "description": "Craft helper overtime hourly rate",
+          "qty": 1,
+          "unit": "HOUR",
+          "unitPrice": 360,
+          "lineTotal": 360
+        }
+      ]
+    }
+  ]
+}
