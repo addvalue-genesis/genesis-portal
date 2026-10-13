@@ -24,7 +24,7 @@ for(const e of VENDOR_EXTERNAL_EVIDENCE_0553){
  const key=e.sku;
  if(!products.has(key))products.set(key,{id:key,partNumber:key,description:e.description});
  relationships.push({
-  id:e.id,vendorId:supplierId,productKey:key,description:e.description,quoteId:null,quotation:null,
+  id:e.id,vendorId:supplierId,productKey:key,description:e.description,manufacturer:e.manufacturer||null,quoteId:null,quotation:null,
   mr:e.budgetDependency?.startsWith("DTRS")?"MR-0002":"MR-0001",
   quantity:null,unitPrice:e.unitPrice,currency:e.currency,priceStatus:e.sourceClass,
   selectionStatus:"UNREVIEWED",technicalCompliance:e.technicalState,source:e.url||e.reference,
