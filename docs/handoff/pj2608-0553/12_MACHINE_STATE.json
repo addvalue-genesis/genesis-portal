@@ -509,6 +509,25 @@
       "userGuide": "docs/handoff/pj2608-0553/26_ABC_COST_READINESS_USER_GUIDE_REV01.md",
       "sourceCBSConflict": "Rev05 B4/B5/C1/C2 definitions differ from lifecycle working crosswalk; require RFQ Template CBS mapping before line-level posting",
       "sourceStaticChecks": "PASS; local runtime PENDING"
+    },
+    {
+      "id": "ALL_LOCATION_SINGLE_WORKING_TOTAL_20261013",
+      "date": "2026-10-13",
+      "module": "bid.budget.bom.system-location-mto",
+      "uiDecision": "Only original 4th source-facts summary card shows one summed allocated working total for ALL locations; extra ABC readiness dashboard unmounted",
+      "source": "getMR0001LocationCost0553 for each of all 7 locations; same as per-WP rendered ledger",
+      "currency": "Separate original USD/THB; THB converted only with configured positive FX",
+      "semanticScope": "MR0001 allocated working equipment and attributable bulk only; full all-MR A+B+C remains not established",
+      "doesNotInclude": [
+        "Part B Working Sell",
+        "Part C Spares",
+        "Other MR totals",
+        "Standalone Bulk Scenarios",
+        "Unselected Vendor Quotes"
+      ],
+      "costLedgerMutation": false,
+      "verification": "Static source code checked; local Node/Webpack/browser PENDING",
+      "userAcceptance": "PENDING_BROWSER_QA"
     }
   ]
 }
