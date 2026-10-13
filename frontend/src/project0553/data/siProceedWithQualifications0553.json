@@ -1,0 +1,192 @@
+{
+  "projectId": "PJ2608-0553",
+  "revision": "Rev01-2026-10-13",
+  "policy": "PROCEED_WITH_QUALIFIED_BUDGETARY_BASIS",
+  "releaseCondition": "TECHNICAL_COMPLIANCE_AND_PROJECT_APPROVAL_BEFORE_FINAL_RELEASE",
+  "sourceArtifacts": [
+    {
+      "name": "4-Scope of Supply.xlsx",
+      "kind": "CUSTOMER_COMMERCIAL_TEMPLATE",
+      "state": "SOURCE_SHEETS_READ",
+      "reference": "Part A Basic; B1-B14 Others; Part C Options C1 Capital Spares C2 Two-year Operation Spares"
+    },
+    {
+      "name": "5-Deviation List.xls.csv",
+      "kind": "DEVIATION_FILE_LEGACY_XLS",
+      "state": "ORIGINAL_ROWS_NOT_YET_PARSED",
+      "reference": "Uploaded extension .csv but bytes are OLE2 Excel XLS. No deviation ID or acceptance invented"
+    },
+    {
+      "name": "Prior ADDVALUE customer deviation submission",
+      "kind": "USER_REPORTED_ISSUED_SUBMISSION",
+      "state": "SUBMITTED_PER_USER_NOT_INDEPENDENTLY_RECONCILED",
+      "reference": "Do not produce duplicate deviation or assume approval"
+    }
+  ],
+  "workingDecisions": [
+    {
+      "id": "WD-ANT-ZWP20-4FT",
+      "relatedConflictIds": [
+        "CFG-03"
+      ],
+      "scope": "ZWP20/ANT-502-001",
+      "state": "PROCEED_4FT_PREFERRED_BUDGETARY_ALTERNATIVE",
+      "customerBaseline": "6ft, 40.9dBi, antenna center 21.5m, azimuth toward ZWP8 94.32deg, RPT/BOD",
+      "offerBasis": "4ft candidate is deliberately preferred by ADDVALUE management IF feasible. Keep distinct vendor 4ft source and chosen cost for internal working budget.",
+      "engineeringProof": [
+        "OEM 4ft realized gain, EIRP and RF output",
+        "Independent FSPL, link fade/availability >=99.99% and actual throughput/QoS",
+        "Antenna height/reflection by tidal variation, antenna polarization and spatial clearance",
+        "Mounting/structure wind load, access, Ex RF safety and regulatory licence"
+      ],
+      "failAction": "If 4ft cannot meet mandatory functions, evaluate feasible antenna/configuration alternatives and quantify cost delta; do not assume unconditional approval",
+      "mrTagChange": "NO_AUTOMATIC_CHANGE_TO_MR_TAG_OR_LIS",
+      "drawingImpact": "GA/LAY/RPT/BOM route lengths/supports may change; submit required design revision/deviation when departure from specified size is confirmed",
+      "commercialTreatment": "USE_PRESENT_4FT_INTERNAL_BUDGET_PRICE_WITH_CONDITIONAL_NOTE",
+      "externalDeviationLink": "SUBMITTED_BY_ADDVALUE_ROW_LINK_UNVERIFIED"
+    },
+    {
+      "id": "WD-ANT-LOCATION",
+      "relatedConflictIds": [
+        "CFG-03"
+      ],
+      "scope": "ZWP20/ANT-502-001",
+      "state": "RETAIN_CUSTOMER_TAG_REDESIGN_LOCATION_WITHIN_TAG_SCOPE",
+      "offerBasis": "Antenna site mounting point and azimuth are physical design attributes, not the customer TAG identity. Retain TAG unless function, count, scope ownership or approved customer requirement changes.",
+      "engineeringProof": [
+        "Location safe area/access and correct 94.32deg orientation basis",
+        "Unobstructed antenna swing and actual mounting height",
+        "Layout/cable tray route & penetrations, grounding, supports, RF cable type and loss",
+        "New link and hazardous area study if relocation affects them"
+      ],
+      "changeTrigger": "If relocation materially changes scope, performance, zone, existing tie-in, antenna count, approved location or cost, issue LAY/GA/CAL/MTO revision and necessary client clarification; request MR/TAG revision only if client-defined equipment identity or scope itself changes",
+      "commercialTreatment": "PRICE_DIRECT_INSTALLATION_AND_BULK_DELTA_USING_EVIDENCE_NOT_NEW_TAG",
+      "externalDeviationLink": "DO_NOT_REISSUE_PRIOR_DEVIATION_BLINDLY"
+    },
+    {
+      "id": "WD-NMS-ZPQ",
+      "relatedConflictIds": [],
+      "scope": "ZPQ/SCADA_NMS_EXISTING_INTERFACES",
+      "state": "PROCEED_AS_EXISTING_NMS_EXTENSION_WITH_CAPACITY_UNVERIFIED",
+      "customerBaseline": "BOD 7.2 existing ZPQ NMS and SPE 6.1.7 extension to existing NMS, valid licence through equipment life.",
+      "offerBasis": "Existing Z1A-Z1E NMS platform assumed available; not proven that free monitoring channels, nodes, sensors or OEM licences are sufficient for new/brownfield devices.",
+      "engineeringProof": [
+        "Existing NMS vendor/version, serial/host and admin access",
+        "Licence family and licensed/consumed/free sensor/port/node count",
+        "SNMP version, alarms, severity mapping, network reachability, cyber requirements",
+        "OEM compatibility and additional licences/evergreen rights",
+        "Site engineering/FAT/SAT and ZPQ integration workload"
+      ],
+      "scenarios": [
+        {
+          "id": "A",
+          "condition": "Existing licensed node/sensor capacity sufficient and compatible",
+          "hardwareCostBasis": "No replacement server presumed",
+          "licenceIncrementBasis": "Only if explicitly verified not required; no blind USD0 in quote",
+          "services": "Engineering, configuration, test, document and travel still costed"
+        },
+        {
+          "id": "B",
+          "condition": "Existing platform supports extension but extra seats/nodes/sensors required",
+          "hardwareCostBasis": "Use existing platform",
+          "licenceIncrementBasis": "Price OEM extension from documented node/sensor delta, source unit rate, perpetual term",
+          "services": "NMS change, engineering, integration/FAT/SAT work"
+        },
+        {
+          "id": "C",
+          "condition": "Existing NMS incompatible or insufficient; separate upgrade/change beyond base assumption",
+          "hardwareCostBasis": "Conditional separate scope/variation after existing system review",
+          "licenceIncrementBasis": "Vendor upgrade/new entitlement priced independently; not hidden in workbook Part C spares",
+          "services": "Integration/upgrade/configuration and schedule risk"
+        }
+      ],
+      "quantityDriver": "NMS_licences_required = MAX(0,new_supported_endpoint_or_sensor_demand - verified_reusable_existing_capacity) using equal licence units",
+      "costPostingRule": "Do not zero licence cost when remaining capacity is unknown; use conditional commercial qualification and an explicitly sourced provisional allowance only if an evidential driver/rate exists",
+      "commercialTreatment": "BASIS_AND_CONDITIONS_IN_PROPOSAL_REMARK_OR_DEVIATION_LIST__NOT_WORKBOOK_PART_C_SPARES",
+      "externalDeviationLink": "USER_REPORTS_SUBMITTED_ROW_LINK_UNVERIFIED"
+    }
+  ],
+  "sourceTemplate": {
+    "description": "4-Scope of Supply.xlsx (provided template, preserve its original numbering and separate internal CBS)",
+    "partA": "BASIC / A1 Main Equipment",
+    "partBOthers": [
+      {
+        "code": "B1",
+        "description": "Engineering and design"
+      },
+      {
+        "code": "B2",
+        "description": "DDP delivery of Documentation"
+      },
+      {
+        "code": "B3",
+        "description": "Inspection, Testing and Certification"
+      },
+      {
+        "code": "B4",
+        "description": "Painting / Protective coating"
+      },
+      {
+        "code": "B5",
+        "description": "Packing and Marking"
+      },
+      {
+        "code": "B6",
+        "description": "Transportation to DDP purchaser yard"
+      },
+      {
+        "code": "B7",
+        "description": "3 months Free Storage at vendor workshop"
+      },
+      {
+        "code": "B8",
+        "description": "Training for Enduser/Purchaser"
+      },
+      {
+        "code": "B9",
+        "description": "Specialist field assistance"
+      },
+      {
+        "code": "B10",
+        "description": "Erection, Pre-commissioning, Commissioning and Start-up Spares"
+      },
+      {
+        "code": "B11",
+        "description": "Special Tools"
+      },
+      {
+        "code": "B12",
+        "description": "First Filling"
+      },
+      {
+        "code": "B13",
+        "description": "Consumables for preservation, operation and maintenance"
+      },
+      {
+        "code": "B14",
+        "description": "Commercial Bonds & Insurance"
+      }
+    ],
+    "partCOptions": [
+      {
+        "code": "C1",
+        "description": "Capital Spares"
+      },
+      {
+        "code": "C2",
+        "description": "2 years normal operation spare parts"
+      }
+    ],
+    "caution": "Buyer Scope Template Part C is not a generic condition bucket. Engineering cost category and commercial quotation category are separate taxonomies."
+  },
+  "controls": {
+    "noAutomaticRepricing": true,
+    "noAutomaticMRTagMutation": true,
+    "noDeviationDuplicateWithoutSourceMatch": true,
+    "conflictsRemainVisible": true,
+    "submittedIsNotAccepted": true,
+    "unverifiedIsNotZeroCost": true,
+    "continuationStatus": "BUDGETARY_PROCEED_WITH_QUALIFICATIONS",
+    "sourceOfTruth": "Client approved document revision, submitted deviation register and written reply when available"
+  }
+}
