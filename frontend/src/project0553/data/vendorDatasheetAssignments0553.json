@@ -1,0 +1,63 @@
+{
+  "projectId": "PJ2608-0553",
+  "version": "R01-2026-10-13",
+  "notes": [
+    "Original V-DATO-WEIDMULLER-DS and V-RFI-LNA source records preserved in vendorEvidence.js",
+    "Display these two original datasheet records inside the unified supplier/company registry, not a second standalone datasheet list",
+    "Retail discovery/source is not proof of an OEM distribution appointment",
+    "Management supplier assignment is not a supplier quotation; internal allowance is not a supplier quoted rate",
+    "Technical compliance, AVL and budget posting remain independently gated"
+  ],
+  "records": [
+    {
+      "id": "V-DATO-WEIDMULLER-DS",
+      "company": "RS Thailand",
+      "companyRelationship": "WEB_RETAIL_DISCOVERY_SOURCE_NOT_CONFIRMED_AUTHORIZED_DISTRIBUTOR",
+      "manufacturer": "Weidmüller",
+      "partNumber": "IE-PS-RJ45-FH-BK",
+      "manufacturerOrderNo": "1963600000",
+      "productFunction": "CAT6A_SHIELDED_RJ45_FIELD_ASSEMBLED_PLUG",
+      "mr": "MR-0001",
+      "tagCandidate": "DATO-507-001",
+      "sourceClass": "DATASHEET_ONLY",
+      "originalSource": "https://drive.google.com/file/d/17VMKPqnD7nZyxarCcMrOpMoKsS3hMCQX/view",
+      "relatedRetailEvidenceId": "WEB-RS-WEIDMULLER-1963600000",
+      "relatedHistoricalOffer": "INNOVA QA24-0604 Item 2, N/A source price",
+      "technicalFeatures": {
+        "category": "CAT6A",
+        "ip": "IP20",
+        "shielding": "360-degree shield",
+        "poe": "IEEE 802.3at",
+        "ethernetSpeed": "10 GBit/s",
+        "certification": "No Ex certification shown in original manufacturer datasheet"
+      },
+      "technicalState": "DATA_ONLY__NO_ATEX_OR_IECEX_CERTIFICATION_FOR_QUICK_DISCONNECT",
+      "priceSourceStatus": "DATASHEET_NO_PRICE__RS_RETAIL_PRICE_SEPARATE",
+      "approvalStatus": "REFERENCE_ONLY"
+    },
+    {
+      "id": "V-RFI-LNA",
+      "company": "MGW Technologies Pte Ltd",
+      "companyRelationship": "MANAGEMENT_PROVISIONAL_SUPPLIER_ASSIGNMENT__NOT_MGW_QUOTED_SKU",
+      "manufacturer": "RFI (RF Industries Pty Ltd)",
+      "partNumber": "RX3852-2002-11",
+      "productFunction": "380_520_MHZ_DMR_LOW_NOISE_AMPLIFIER",
+      "mr": "MR-0002",
+      "tagCandidate": "TCAB-508-001 / RFI LNA",
+      "sourceClass": "DATASHEET_ONLY",
+      "originalSource": "https://drive.google.com/file/d/1dAnYkC2r2hyYEgUuN-xA0xAvq-zG2iTA/view",
+      "technicalFeatures": {
+        "band": "380-520 MHz",
+        "maxGain": "40 dB",
+        "noiseFigure": "<=2 dB",
+        "power": "11-28 VDC",
+        "rfConnector": "SMA female",
+        "dcAlarmMating": "A2671 and A2881 not included with manufacturer module"
+      },
+      "technicalState": "RFI_MODEL_REFERENCE__EX_AND_PACKAGE_INTEGRATION_NEED_ENGINEERING_PROOF",
+      "relatedBudgetBasis": "rfiLnaPriceDecision0553.js (THB 500000/unit management allowance, not MGW quoted rate)",
+      "priceSourceStatus": "MGW_P26-058_DOES_NOT_QUOTE_RFI_LNA__INTERNAL_ALLOWANCE_ONLY",
+      "approvalStatus": "WORKING_BUDGET_ONLY_NOT_CUSTOMER_RELEASE"
+    }
+  ]
+}
