@@ -7,6 +7,8 @@ import HISTORICAL_VENDOR from "./historicalVendorEvidence0553.json";
 import EXION_REFERENCE from "./quotes/EXION-1240515-R0.reference.json";
 import EXION_LATEST from "./quotes/EXION-1260576-R0.current.json";
 import KNOWLEDGE_PRODUCTS from "./vendorKnowledgeProducts0553.json";
+import DATASHEET_ASSIGNMENTS from "./vendorDatasheetAssignments0553.json";
+import {VENDOR_0553_SOURCES} from "../vendorEvidence";
 import {buildVendorProductCatalog} from "../../common/engineering/vendorProductCatalog";
 import {resolveCompany0553,resolveCompanySummary0553} from "./companyIdentity0553";
 const quoted=buildVendorProductCatalog(SUPPLIER_QUOTE_LINES_0553);
@@ -99,6 +101,32 @@ EXION_LATEST.lines.forEach((l,i)=>{
  pricingUnit:l.unit,sourceClass:EXION_LATEST.sourceClass,priceStatus:EXION_LATEST.status,
  source:EXION_LATEST.source,referenceFrom:EXION_LATEST.source,approvedForBudget:false});
 });
+// Existing RFQ datasheets now share the SAME company/product relationship index.
+// Supplier association is explicitly classified; never convert a datasheet into a quotation.
+for(const mapping of DATASHEET_ASSIGNMENTS.records){
+ const source=VENDOR_0553_SOURCES.find(s=>s.id===mapping.id);
+ if(!source)throw Error("Missing historical datasheet source "+mapping.id);
+ const vendorId=mapping.company.trim().toLowerCase();
+ if(!suppliers.has(vendorId))suppliers.set(vendorId,{id:vendorId,name:mapping.company,quoteIds:[]});
+ const productKey=mapping.partNumber;
+ if(!products.has(productKey))products.set(productKey,{id:productKey,partNumber:productKey,description:source.document});
+ if(relationships.some(x=>x.id===mapping.id))throw Error("Duplicate vendor datasource ID "+mapping.id);
+ relationships.push({
+  id:mapping.id,vendorId,productKey,description:source.document,
+  quoteId:null,quotation:null,originalQuoteId:null,quantity:null,unitPrice:null,currency:null,pricingUnit:null,
+  mr:mapping.mr,tagCandidate:mapping.tagCandidate,manufacturer:mapping.manufacturer,
+  sourceClass:"DATASHEET_ONLY",priceStatus:mapping.priceSourceStatus,
+  selectionStatus:"UNREVIEWED",technicalCompliance:mapping.technicalState,approvedForBudget:false,
+  source:source.url,sourceUrl:source.url,referenceFrom:"bid.vendor.products.datasheet."+source.id,
+  referenceDocument:source.document,sourceRecordId:source.id,
+  sourceSupplierRole:mapping.companyRelationship,manufacturerSpecification:mapping.technicalFeatures,
+  relatedRetailEvidenceId:mapping.relatedRetailEvidenceId||null,
+  relatedBudgetBasis:mapping.relatedBudgetBasis||null,
+  scopeDriver:mapping.productFunction,
+  mappingState:mapping.approvalStatus,
+  manufacturerOrderNo:mapping.manufacturerOrderNo||null
+ });
+}
 // Company 360 projection: collapse documented source-name variants to a stable company
 // without altering any source quote, source SKU, original supplier label, rate or link.
 const resolvedSuppliers=new Map();
