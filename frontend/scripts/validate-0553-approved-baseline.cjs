@@ -17,5 +17,7 @@ for(const entry of manifest.lockedCostFiles){
  assert.equal(sha,entry.gitBlobSha,
   "PROTECTED 0553 COST FILE MODIFIED: "+entry.path+
   ". Do not auto-refresh manifest. Obtain authorized change control, run reconciliation and create Rev02 baseline.");
+ const tamper=Buffer.from(raw.toString("utf8")+"\n//deliberate-negative-test","utf8");
+ assert.notEqual(getGitBlobSha(tamper),entry.gitBlobSha,"Simulated silent cost edit was not detected");
 }
 console.log("PASS approved 0553 Architecture Baseline: all 3 protected original cost derivation files match locked Git blob SHA; no silent repricing.");
