@@ -18,6 +18,12 @@ System must show why an item is suitable, unsuitable, missing evidence, assumed,
 - W3C SHACL graph validation is an option, not a requirement to introduce an RDF backend immediately — https://www.w3.org/TR/shacl/
 - INCOSE semi-automatic requirements trace links using embeddings + LLM classification (2024) — https://incose.onlinelibrary.wiley.com/doi/10.1002/iis2.13285
 
+- Case-Based Reasoning (CBR) for product BOM reuse: https://www.sciencedirect.com/science/article/abs/pii/S0957417405001144
+- Combining CBR + constraint-satisfaction for process engineering design: https://www.sciencedirect.com/science/article/abs/pii/S0952197615000263
+- Rule-based + case-based engineering knowledge models for design reuse: https://www.sciencedirect.com/science/article/abs/pii/S1474034611000954
+
+**CBR workflow:** retrieve past comparable engineering cases → compare source evidence and contract context → adapt only under current constraints → test changed configuration and owner totals → qualified human approves → retain revised case/rule with its regression fixtures. This is structured organizational learning. It is NOT uncontrolled AI self-training or unverified memory recall.
+
 These publications do NOT themselves prescribe a single ready-made telecom estimator or prove GENESS compliance.
 
 ## Technical technique selected
