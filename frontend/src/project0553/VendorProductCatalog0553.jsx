@@ -15,6 +15,7 @@ export function VendorProductCatalog0553(){
  const [mr,setMr]=useState("ALL");
  const [vendor,setVendor]=useState("ALL");
  const [search,setSearch]=useState("");
+ const [evidenceClass,setEvidenceClass]=useState("ALL");
  const [chosenQuote,setChosenQuote]=useState("");
  const commercial=useMemo(()=>buildQuotationCommercialRegister([...SUPPLIER_QUOTE_LINES_0553,...HISTORICAL_VENDOR.quotes.map(q=>({...q,terms:q.terms,source:q.sourceUrl||q.source}))]),[]);
  const selectedCommercial=commercial.find(q=>q.quoteId===chosenQuote);
@@ -33,6 +34,7 @@ export function VendorProductCatalog0553(){
  const chooseVendor=value=>{setVendor(value);setChosenQuote("");};
  const chooseQuote=value=>{setChosenQuote(value);if(value&&view==="quote"){const q=quoteById.get(value);if(q)setVendor(String(q.vendor).trim().toLowerCase());}};
  const rows=catalog.relationships.filter(x=>{
+  if(evidenceClass!=="ALL"&&(evidenceClass==="CURRENT"?x.sourceClass!=="SUPPLIER_QUOTATION":evidenceClass==="HISTORICAL"?!String(x.sourceClass||"").includes("HISTORICAL"):evidenceClass==="DATASHEET"?!["MANUFACTURER_BROCHURE","DATASHEET_ONLY"].includes(x.sourceClass):!String(x.sourceClass||"").startsWith("WEB")))return false;
   if(view==="supplier" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
   if(view==="supplier" && chosenQuote&&x.quoteId!==chosenQuote)return false;
   if(view==="quote" && !x.quoteId)return false;
@@ -42,7 +44,7 @@ export function VendorProductCatalog0553(){
   if(view==="mr"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
   if(view==="compare"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
   if(!search)return true;
-  return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,productsById.get(x.productKey)?.description,suppliersById.get(x.vendorId)?.name].join(" ").toLowerCase().includes(search.toLowerCase());
+  return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,x.description,productsById.get(x.productKey)?.description,suppliersById.get(x.vendorId)?.name].join(" ").toLowerCase().includes(search.toLowerCase());
  });
  return <section className="p55-section" style={{marginTop:18}}>
   <h2>Vendor Products · Datasheets · Quotations</h2>
@@ -57,6 +59,7 @@ export function VendorProductCatalog0553(){
    {catalog.suppliers.map(v=><option key={v.id} value={v.id}>{v.name} ({catalog.relationships.filter(r=>r.vendorId===v.id).length} lines)</option>)}
   </select></label>}
   {(view==="mr"||view==="compare")&&<label>MR / System <select value={mr} onChange={e=>setMr(e.target.value)}><option value="ALL">All MR Systems</option>{["MR-0001","MR-0002","MR-0003","MR-0004"].map(v=><option key={v} value={v}>{v}</option>)}</select></label>}
+  <label>Evidence class <select value={evidenceClass} onChange={e=>setEvidenceClass(e.target.value)}><option value="ALL">All evidence</option><option value="CURRENT">Project supplier quotations</option><option value="HISTORICAL">Historical quotations / ERP</option><option value="WEB">Web price references</option><option value="DATASHEET">Manufacturer datasheets</option></select></label>
   <label>Search Product / Model / Quote <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Model, MR, supplier, quotation" /></label></div>
   {(view==="supplier"||view==="quote")&&<div className="p55-filterbar"><label>Quotation & commercial conditions <select value={chosenQuote} onChange={e=>chooseQuote(e.target.value)}>
    <option value="">All quotations / Select to inspect</option>
@@ -85,16 +88,6 @@ export function VendorProductCatalog0553(){
     </section>}
    <p className="p55-note">This is a read-only quotation-header view. Original quote lines and cost calculations have not changed.</p>
   </div>}
-  <details className="p55-panel" data-component-key="bid.vendor.products.knowledge" style={{padding:14,marginBottom:12}}>
-   <summary><strong>Manufacturer Knowledge Products ({VENDOR_KNOWLEDGE.records.length}) — Datasheet source records</strong></summary>
-   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Manufacturer / Product</th><th>Technical functions</th><th>Original Reference</th><th>RFQ Mapping / Cost</th></tr></thead><tbody>
-    {VENDOR_KNOWLEDGE.records.map(v=><tr key={v.id}><td><strong>{v.manufacturer}</strong><small>{v.product}</small><small>{v.category}</small></td>
-     <td>{v.specifications.hazardousArea} · {v.specifications.ingressProtection}<small>{v.specifications.frequencyMHz.xBand[0]}–{v.specifications.frequencyMHz.xBand[1]} MHz X band · {v.specifications.frequencyMHz.sBand[0]}–{v.specifications.frequencyMHz.sBand[1]} MHz S band</small><small>Input {v.specifications.dcInputVoltageV.min}–{v.specifications.dcInputVoltageV.max} VDC · Avg {v.specifications.averagePowerW}W</small><small>ATEX / IECEx cert: {v.specifications.certifications.join(" · ")}</small></td>
-     <td><a href={v.sourceUrl} target="_blank" rel="noreferrer">{v.sourceDocument}</a><small>{v.sourceState}</small></td>
-     <td>{v.projectCandidate} — {v.technicalAssessment}<small>Source price: NOT QUOTED · NOT BOOKED IN BUDGET</small></td>
-    </tr>)}
-   </tbody></table></div>
-  </details>
   {dataSheetProducts.length>0&&<div className="p55-panel" style={{marginBottom:14,padding:14}}>
     <h3>Product Datasheets (no quotation recorded)</h3><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.datasheets"/>
     <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Supplier / Source</th><th>Product / Model</th><th>MR</th><th>Datasheet</th><th>Unit Price</th></tr></thead><tbody>
