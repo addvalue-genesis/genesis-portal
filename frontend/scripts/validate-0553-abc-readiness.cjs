@@ -64,4 +64,11 @@ for(const token of ["A — Equipment","B — Services","C — C1/C2","A+B+C","wo
 assert(parent.includes('<AbcCostReadiness0553 site={site} fx={fx} snapshot={abcReadiness}'),
  "A/B/C rollout must be placed alongside the MR0001 location MTO overview");
 assert(!parent.includes("Select WP to see total"),"False no-total placeholder must not return");
+assert(view.includes('moduleKey={root+".price-evidence-gaps"}'),"Missing-price TAGs must be navigable as their own module");
+assert(view.includes('priceEvidence.uncovered.map(')&&view.includes("g.workingCostAllocated"),"37/55 price-evidence gaps must show every TAG and whether a working cost is already allocated");
+assert(parent.includes("uncoveredRateTags=visible.filter(x=>!vendorCovered(x))"),"Rate-evidence gaps must derive from the same metric denominator as the summary");
+assert(parent.includes("postedTagByKey"),"Missing rate evidence is independent of booking state");
+assert(parent.includes("B cost: NOT ESTABLISHED")&&parent.includes("C cost: NOT ESTABLISHED"),"Executive row must display B/C cost explicitly rather than blank values");
+assert(parent.includes("A+B+C: NOT ESTABLISHED"),"No incomplete cost may be presented as a full ABC total");
+
 console.log("PASS 0553 A/B/C readiness: 7 location source ledgers; verified USD/THB A working allocation, B1-B14 WBS Rev05 SELL THB 3,804,160 NOT COST, C1/C2 unpriced, A+B+C incomplete, FX and site boundaries, source ledger unchanged and JSX valid.");
