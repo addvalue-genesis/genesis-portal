@@ -5,6 +5,7 @@ import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 import {VENDOR_EXTERNAL_EVIDENCE_0553} from "./vendorExternalEvidence0553";
 import HISTORICAL_VENDOR from "./historicalVendorEvidence0553.json";
 import EXION_REFERENCE from "./quotes/EXION-1240515-R0.reference.json";
+import EXION_LATEST from "./quotes/EXION-1260576-R0.current.json";
 import KNOWLEDGE_PRODUCTS from "./vendorKnowledgeProducts0553.json";
 import {buildVendorProductCatalog} from "../../common/engineering/vendorProductCatalog";
 const quoted=buildVendorProductCatalog(SUPPLIER_QUOTE_LINES_0553);
@@ -85,6 +86,17 @@ KNOWLEDGE_PRODUCTS.records.forEach((p,i)=>{
   technicalCompliance:p.technicalAssessment,selectionStatus:"UNREVIEWED",
   scopeDriver:p.category,approvedForBudget:false,
   specifications:p.specifications,sourceLine:i+1});
+});
+const latestVendorId=EXION_LATEST.vendor.toLowerCase();
+if(!suppliers.has(latestVendorId))suppliers.set(latestVendorId,{id:latestVendorId,name:EXION_LATEST.vendor,quoteIds:[]});
+suppliers.get(latestVendorId).quoteIds.push(EXION_LATEST.id);
+EXION_LATEST.lines.forEach((l,i)=>{
+ if(!products.has(l.sku))products.set(l.sku,{id:l.sku,partNumber:l.sku,description:l.description});
+ relationships.push({id:EXION_LATEST.id+":"+i,vendorId:latestVendorId,productKey:l.sku,
+ description:l.description,quoteId:EXION_LATEST.id,quotation:EXION_LATEST.quotation,
+ mr:EXION_LATEST.mr,quantity:l.qty,unitPrice:l.unitPrice,currency:EXION_LATEST.currency,
+ pricingUnit:l.unit,sourceClass:EXION_LATEST.sourceClass,priceStatus:EXION_LATEST.status,
+ source:EXION_LATEST.source,referenceFrom:EXION_LATEST.source,approvedForBudget:false});
 });
 export const VENDOR_UNIFIED_CATALOG_0553=Object.freeze({
  suppliers:[...suppliers.values()],products:[...products.values()],relationships,
