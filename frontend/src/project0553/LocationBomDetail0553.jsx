@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
 import {traceTagParticular0553} from "./data/documentParticularTrace0553";
 import {TagMappingAudit0553} from "./TagMappingAudit0553";
 import WORKING_POLICY from "./data/siProceedWithQualifications0553.json";
@@ -27,7 +28,7 @@ export function LocationBomDetail0553({site,fx}){
   if(typeof navigator!=="undefined"&&navigator.clipboard?.writeText)navigator.clipboard.writeText(value).catch(()=>window.prompt("Copy BOM",value));
   else if(typeof window!=="undefined")window.prompt("Copy BOM",value);
  };
- return <section className="p55-panel" data-component-key={keyPrefix}>
+ return <section className="p55-panel p553-tag-workbench" data-component-key={keyPrefix}>
   <div style={{display:"flex",justifyContent:"space-between",gap:8,flexWrap:"wrap",alignItems:"center"}}>
    <strong>{site} · SCADA Engineering-Derived Site Cost Summary</strong>
    <button type="button" className="p553-detail-button" onClick={copyTable}>Copy {site} BOM Table (Excel)</button>
@@ -36,7 +37,7 @@ export function LocationBomDetail0553({site,fx}){
   <p><strong>{site} Working Priced Subtotal: {Number.isFinite(totalTHB)?"THB "+fmt(totalTHB):"FX REQUIRED"}</strong>
    <small>Original USD {fmt(ledger.subtotals.USD)} + THB {fmt(ledger.subtotals.THB)} · {ledger.costedRows}/{ledger.totalRows} tagged rows priced · {ledger.unresolvedRows.length} unresolved · FX {fx?.thbPerUsd??"NOT SET"} THB/USD</small></p>
   <p className="p55-note">กด + ที่ TAG เพื่อดู Engineering derivation, MR/BLD/RPT requirements, Vendor quotation functions, assumptions และ Cost ownership; Copy ID ใช้อ้างอิง TAG แยกตาม Location / MTO row ได้โดยตรง</p>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+  <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact p553-mto-summary-table">
    <thead><tr><th>MTO / Module</th><th>Engineering Quantity / Basis</th><th>Budgetary Selected Product / Vendor</th><th>Unit Cost (THB)</th><th>Extended Cost (THB)</th><th>Assumptions / Status</th></tr></thead><tbody>
    {rows.map(v=><React.Fragment key={v.row+"-"+v.tag}>
     <tr data-component-key={tagKey(v)}>
@@ -47,29 +48,28 @@ export function LocationBomDetail0553({site,fx}){
      <td><strong>{v.countedInWorkingTotal?thb(v.extended,v.currency):Number.isFinite(v.referenceExtended)?thb(v.referenceExtended,v.currency)+" (reference only)":"NOT ALLOCATED"}</strong><small>{v.countedInWorkingTotal?`${v.currency||"—"} ${fmt(v.extended)}`:"Excluded from booked site cost until owner/quantity decision"}</small></td>
      <td>{v.status}<small>{v.source||"MTO Rev04"}</small>{(v.assumptions||[]).map((x,i)=><small key={i}>{x}</small>)}</td>
     </tr>
-    {expanded[tagKey(v)]&&<tr id={tagPanelId(v)} data-component-key={tagKey(v)+".derivation"}><td colSpan={6}><div className="p55-panel">
-     <strong>{v.tag} · Row {v.row} — Engineering Derivation / Vendor Breakdown</strong><p><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)+".derivation"}/></p>
+    {expanded[tagKey(v)]&&<tr id={tagPanelId(v)} data-component-key={tagKey(v)+".derivation"} className="p553-mto-drilldown-row"><td colSpan={6}>
+     <ControlledModuleSection0553 moduleKey={tagKey(v)+".derivation"} title={v.tag+" · Row "+v.row+" — Engineering Derivation / Vendor Breakdown"} defaultOpen>
      <p className="p55-note">Original MTO: {site} / row {v.row} / {v.sourceQty??"REVIEW"} {v.sourceUnit||""}. Cost basis: {v.currency||"UNVERIFIED"} {fmt(v.unitCost)} per source unit; extended: {v.countedInWorkingTotal?fmt(v.extended):"NOT ALLOCATED"}. Vendor / SKU: {v.vendor||"Not selected"} / {v.sku||"Not selected"}. No candidate rate is added automatically.</p>
      <p className="p55-note">Quantity owner: MR/MTO · Cost owner: {v.source} · {v.status} · Selected vendor cost is not customer selling price.</p>
      {(site==="ZWP20"&&v.tag==="ANT-502-001")&&<p className="p55-note"><strong>SI Management Working Basis:</strong> {WORKING_POLICY.workingDecisions[0].state}. 4ft is the preferred budgetary alternative, subject to link and reflection proof. Same Customer TAG applies; any changes to mounting/route are tracked through installation drawings and cost drivers.</p>}
      {(site==="ZWP20"&&["MR-502-001","MR-502-001A","LAN-502-001"].includes(v.tag))&&<p className="p55-note"><strong>ZPQ Existing NMS Interface:</strong> {WORKING_POLICY.workingDecisions[2].state}. Existing NMS assumed; available licences are not verified. Configure and test extension as scope; any incremental entitlements require a sourced scenario or documented commercial qualification, not an assumed zero rate.</p>}
 
      {site==="ZWP20"&&v.tag==="MR-502-001"&&v.row===4&&<TagMappingAudit0553/>}
-     {(()=>{const trace=traceTagParticular0553(site,v.tag);const rows=[...trace.direct,...trace.siteSpecific];return <details className="p55-panel" data-component-key={tagKey(v)+".particular-evidence"}>
-      <summary><strong>RFQ Particular Evidence / SI Engineering Proof — {trace.direct.length} TAG + {trace.siteSpecific.length} Site + {trace.common.length} Common; {trace.conflicts.length} Conflict Gates</strong></summary>
+     {(()=>{const trace=traceTagParticular0553(site,v.tag);const rows=[...trace.direct,...trace.siteSpecific];return <ControlledModuleSection0553 moduleKey={tagKey(v)+".particular-evidence"} title={"RFQ Particular Evidence / SI Engineering Proof — "+trace.direct.length+" TAG + "+trace.siteSpecific.length+" Site + "+trace.common.length+" Common; "+trace.conflicts.length+" Conflict Gates"}>
       <p className="p55-note">Requirements derive from MR/BOD/DTS/SPE/RPT/BLD. Clause evidence is independent from existing priced vendor/quantity ledger. Review every linked note, comment and attachment; show applicable common constraints in 04 Documents.</p>
       <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Document / Clause</th><th>Customer Requirement</th><th>SI Proof / Design Task</th><th>Cost Driver</th></tr></thead><tbody>
-       {rows.map(r=><tr key={r.id}><td><strong>{r.document} · {r.section}</strong><small>p.{r.page} · {r.type} · {r.id}</small></td><td>{r.topic}<small>{r.requirement}</small></td><td>{r.siAction}</td><td>{r.costDriver}<small>Review before price release</small></td></tr>)}
+       {rows.map(r=><tr key={r.id}><td><strong>{r.document} · {r.section}</strong><small>p.{r.page} · {r.type} · {r.id}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)+".particular-evidence.clause."+String(r.id).toLowerCase().replace(/[^a-z0-9-]/g,"-")} componentName={r.document+" "+r.section}/></td><td>{r.topic}<small>{r.requirement}</small></td><td>{r.siAction}</td><td>{r.costDriver}<small>Review before price release</small></td></tr>)}
       </tbody></table></div>
       {trace.conflicts.length>0&&<p className="p55-note"><strong>Unresolved cross-document gates:</strong> {trace.conflicts.map(r=>r.id+" "+r.topic).join(" · ")}</p>}
       <p className="p55-note">This trace is advisory only and does not change current quantities, selected products, A/B/C, or working totals.</p>
-     </details>})()}
+     </ControlledModuleSection0553>})()}
      {v.tag==="MR-502-001"&&site==="ZWP21"&&<p className="p55-note"><strong>Functional mapping from ZWP20 reference:</strong> ZWP20 MR-502-001 Row 4 (PTMP remote) → ZWP21 MR-502-001 Row 13 (PTP peer). Matching child functions: Radio hardware, RF filter, throughput/capacity entitlement and RF mounting. Different RPT role / quote group; no automatic SKU or region entitlement transfer. Separate power/IDU and surge owners must remain separate.</p>}
-     {v.tag==="MR-502-001"&&site==="ZWP21"&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+     {v.tag==="MR-502-001"&&site==="ZWP21"&&<ControlledModuleSection0553 moduleKey={tagKey(v)+".ptp-function-crossmap"} title="ZWP20 → ZWP21 PTP Functional Mapping"><div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
       <thead><tr><th>Function</th><th>ZWP20 Reference</th><th>ZWP21 Budgetary</th><th>Cost Owner</th><th>Engineering Control</th></tr></thead><tbody>
        {MR0001_MODULE_CROSSMAP_0553.functions.map(x=><tr key={x.id}><td>{x.id}</td><td>{x.zwp20}</td><td>{x.zwp21}</td><td>{x.owner}</td><td>{x.rule}</td></tr>)}
-      </tbody></table><p className="p55-note">ZWP20: {MR0001_MODULE_CROSSMAP_0553.sourceModule} → ZWP21: {MR0001_MODULE_CROSSMAP_0553.targetModule}. Functional mapping only; quotation and technical approval remain site-specific.</p></div>}
-     {(v.detail||v.components||[]).length>0&&<div className="p55-table-wrap"><p className="p55-note"><strong>Function-level derivation mapped to Supplier Quote Lines:</strong> Product / Model is interpreted by its quoted function before cost allocation. Supplier quoted quantity remains quotation evidence only; Engineering Required Qty controls the budget quantity. A separate MTO owner is not double-counted in MR-502-001.4.</p><table className="p55-table p55-table--compact">
+      </tbody></table><p className="p55-note">ZWP20: {MR0001_MODULE_CROSSMAP_0553.sourceModule} → ZWP21: {MR0001_MODULE_CROSSMAP_0553.targetModule}. Functional mapping only; quotation and technical approval remain site-specific.</p></div></ControlledModuleSection0553>}
+     {(v.detail||v.components||[]).length>0&&<ControlledModuleSection0553 moduleKey={tagKey(v)+".function-breakdown"} title={"Function-level derivation / Supplier Quote Lines ("+(v.detail||v.components||[]).length+")"}><p className="p55-note"><strong>Function-level derivation mapped to Supplier Quote Lines:</strong> Product / Model is interpreted by its quoted function before cost allocation. Supplier quoted quantity remains quotation evidence only; Engineering Required Qty controls the budget quantity. A separate MTO owner is not double-counted in MR-502-001.4.</p><div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
       <thead><tr><th>Engineering Function / Quote Line</th><th>Required Qty / Basis</th><th>Product / Model · What it does</th><th>Supplier Quote Evidence</th><th>Cost Allocation Owner</th><th>Working Extended (THB)</th><th>Engineering / Commercial State</th></tr></thead><tbody>
        {(v.detail||v.components||[]).map((c,i)=><tr key={c.functionId||i}>
         <td><strong>{c.functionId}</strong><small>{c.budgetaryQuoteLine||c.budgetarySelectedOffer||"NO SELECTED QUOTE LINE"}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)+".function."+String(c.functionId||i).toLowerCase().replace(/[^a-z0-9-]/g,"-")} componentName={v.tag+" / "+(c.functionId||"function "+i)}/></td>
@@ -80,25 +80,25 @@ export function LocationBomDetail0553({site,fx}){
         <td>{c.nonCostedIncluded?"INCLUDED / NO EXTRA":thb(c.budgetaryExtended??c.extended,c.currency||v.currency)}</td>
         <td>{c.budgetarySelectionState||c.status||c.state}<small>{c.budgetaryDecision||c.technicalState||""}</small>{c.priceEvidence?.constraints&&<small>{c.priceEvidence.constraints}</small>}</td>
        </tr>)}
-      </tbody></table></div>}
-     {(()=>{const recovered=recoverMR0001Evidence0553(site,v.row,v.tag);return <details className="p55-panel">
-      <summary>Recovered Engineering Source / First Principles / Scope Owner ({recovered.functions.length} function records)</summary>
+      </tbody></table></div></ControlledModuleSection0553>}
+     {(()=>{const recovered=recoverMR0001Evidence0553(site,v.row,v.tag);return <ControlledModuleSection0553 moduleKey={tagKey(v)+".recovered-engineering"} title={"Recovered Engineering Source / First Principles / Scope Owner ("+recovered.functions.length+" function records)"}>
       <p className="p55-note">Original package: {recovered.sourcePackage||"No package mapping"} · Family: {recovered.family||"Not classified"} · Cost ownership: {recovered.ownershipStatus}</p>
-      <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Original Engineering Function</th><th>Quantity Driver / Proof</th><th>Vendor Quote Candidates</th><th>Original Decision</th></tr></thead><tbody>
+      <div className="p55-table-wrap p553-module-scroll"><table className="p55-table"><thead><tr><th>Original Engineering Function</th><th>Quantity Driver / Proof</th><th>Vendor Quote Candidates</th><th>Original Decision</th></tr></thead><tbody>
        {recovered.functions.map(fn=><tr key={fn.id}><td>{fn.functionId}</td><td>{fn.quantityDriver}<small>{fn.proofRequired?.join(" · ")}</small></td>
         <td>{fn.candidateQuotes.map(q=>q.quoteLine+" / "+q.partNumber).join(" · ")||"NO SOURCE RATE"}</td><td>{fn.technicalState} · {fn.selectedOffer||"NOT SELECTED"} · Qty {fn.requiredQty??"NOT VERIFIED"}</td></tr>)}
       </tbody></table></div>
       {recovered.ownershipChecks.map(c=><p className="p55-note" key={c.id}>{c.id}: {c.description} — {c.state}</p>)}
-     </details>})()}
-     {(v.quotedRateCandidates||[]).length>0&&<div className="p55-table-wrap"><strong>Vendor alternative quotation evidence (not additive)</strong><table className="p55-table"><thead><tr><th>Quote line</th><th>SKU</th><th>Original Unit Rate</th><th>Selected</th></tr></thead><tbody>{v.quotedRateCandidates.map((c,i)=><tr key={i}><td>{c.quoteLine}</td><td>{c.sku}</td><td>{fmt(c.unitPriceTHB??c.sourceUnitTHB)}</td><td>{c.selected?"WORKING COMPARABLE":"ALTERNATIVE"}</td></tr>)}</tbody></table></div>}
+     </ControlledModuleSection0553>})()}
+     {(v.quotedRateCandidates||[]).length>0&&<ControlledModuleSection0553 moduleKey={tagKey(v)+".vendor-alternatives"} title="Vendor alternative quotation evidence (not additive)"><div className="p55-table-wrap p553-module-scroll"><table className="p55-table"><thead><tr><th>Quote line</th><th>SKU</th><th>Original Unit Rate</th><th>Selected</th></tr></thead><tbody>{v.quotedRateCandidates.map((c,i)=><tr key={i}><td>{c.quoteLine}</td><td>{c.sku}</td><td>{fmt(c.unitPriceTHB??c.sourceUnitTHB)}</td><td>{c.selected?"WORKING COMPARABLE":"ALTERNATIVE"}</td></tr>)}</tbody></table></div></ControlledModuleSection0553>}
      {(v.candidates||[]).map((c,i)=><p key={i} className="p55-note">{c.vendor||"Supplier"} · {c.sku} · {c.originalCurrency} {fmt(c.originalUnitPrice)} · candidate only, NOT additional booked cost</p>)}
-    </div></td></tr>}
+    </ControlledModuleSection0553></td></tr>}
    </React.Fragment>)}
    </tbody></table></div>
-  <h4>{site} · SCADA Bulk / Installation Material Basis (separate scope)</h4>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Bulk / Function</th><th>Qty</th><th>Rate (THB)</th><th>Extended (THB)</th><th>Owner / Status</th></tr></thead><tbody>
+  <ControlledModuleSection0553 moduleKey={keyPrefix+".scada-bulk"} title={site+" · SCADA Bulk / Installation Material Basis (separate scope)"}>
+  <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact"><thead><tr><th>Bulk / Function</th><th>Qty</th><th>Rate (THB)</th><th>Extended (THB)</th><th>Owner / Status</th></tr></thead><tbody>
    {bulkRows.map(v=><tr key={v.id}><td>{v.item}</td><td>{v.qty??"DERIVE"} {v.unit}</td><td>{fmt(v.rateTHB)}</td><td>{fmt(v.extendedTHB)}</td><td>{v.owner}<small>{v.status}</small><small>{v.source}</small></td></tr>)}
   </tbody></table></div>
   <p className="p55-note">Bulk shown separately, not automatically additive to equipment subtotal. New/Reuse and source quantity are assessed per site. Missing pricing stays PENDING. Customer A+B+C release not approved.</p>
+  </ControlledModuleSection0553>
  </section>;
 }
