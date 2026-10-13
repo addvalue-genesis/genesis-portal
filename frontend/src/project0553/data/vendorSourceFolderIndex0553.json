@@ -210,6 +210,20 @@
       ],
       "budgetImpact": "NONE",
       "releaseAllowed": false
+    },
+    {
+      "id": "EX_PHONE_REFERENCE",
+      "url": "https://drive.google.com/drive/folders/1PIj3MeZ2zvW8jmMB2jiGiFrdjW6FFnIm",
+      "itemsSeen": 2,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "EX_TELEPHONE_AND_SOUNDER_HISTORICAL_BID",
+      "ingestionState": "REFERENCE_ONLY_NOT_YET_USED",
+      "sourceFileNames": [
+        "V5_RQ2603-1139_ADD VALUE_PTTP_070526.pdf",
+        "Samart_PTTEP_120724_Template_Costsheet.pdf"
+      ],
+      "budgetImpact": "NONE",
+      "releaseAllowed": false
     }
   ],
   "deduplication": [
