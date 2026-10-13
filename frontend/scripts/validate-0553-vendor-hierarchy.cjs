@@ -27,6 +27,14 @@ assert(vendor.includes('q.header?.quoteStatus')&&vendor.includes('q.header?.curr
 assert(vendor.includes('onClick={()=>setInspectedQuote(q.id)}'),"Quote commercial inspector not connected");
 assert(vendor.includes('const [inspectedQuote,setInspectedQuote]=useState("")'),"Independent read-only inspection state missing");
 assert(vendor.includes("chosenQuote||inspectedQuote"),"Quotation detail no longer accessible");
+assert(vendor.includes('moduleKey={"bid.vendor.products."+view+".quote-lines"}'),"Parent quote-lines Module ID missing");
+const quoteModuleAt=vendor.indexOf('moduleKey={"bid.vendor.products."+view+".quote-lines"}');
+const companyGroupAt=vendor.indexOf('grouped.map(g=><SmartDataGroup');
+const quoteModuleEnd=vendor.indexOf('  </SmartDataGroup>\n  {view==="compare"',companyGroupAt);
+assert(quoteModuleAt>0 && companyGroupAt>quoteModuleAt && quoteModuleEnd>companyGroupAt,"Company groups must live inside collapsible quote-lines module");
+assert(vendor.includes('key={"quote-lines-"+view}'),"Parent group should have view-isolated disclosure state");
+assert(vendor.includes('defaultOpen={Boolean(search.trim())||Boolean(companyQuery.trim())'),"Searching must automatically expand parent quote-lines module");
+assert(vendor.includes('title={"Supplier / Product / Source Lines — "'),"Parent label should identify module content");
 assert(vendor.includes('moduleKey={"bid.vendor.products."+view+".group."+moduleSegment(g.id)}'),"Existing company group module ID lost");
 assert(vendor.includes('componentKey={isQuote?"bid.vendor.products.quote-line."'),"Original line Copy ID lost");
 assert(page.includes('<SmartDataGroup moduleKey="bid.documents"'),"Entire Documents module must collapse");
