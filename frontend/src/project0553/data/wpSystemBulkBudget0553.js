@@ -6,6 +6,7 @@ import {deriveZ1FTelBulkRoutes0553} from "./z1fParametricBulkRoutes0553";
 import {DTRS_RFI_BULK_0553} from "./dtrsRfiBulk0553";
 import {MR0001_SITE_CLASSIFICATION} from "./mr0001SiteClassification";
 import {deriveBartecGlandBulkSchedule0553} from "./bartecGlandBulkSchedule0553";
+import {findZwp20WebRate0553} from "./zwp20WebBulkRates0553";
 
 // Working budget allocation; not a final measured cable schedule or customer priced BOM.
 // A priced row requires a compatible unit rate. Enclosure and specialist equipment costs
@@ -24,11 +25,15 @@ export function deriveWpSystemBulkBudget0553(){
      rateTHB:524,source:"INNOVA QA24-0604, historical; scenario base",owner:"BULK_ROW11",
      status:w.wp==="ZWP20"?"MIRROR_ZWP20_ROW11_69M":"APPROVED_60M_PLUS_15PCT_BUDGETARY",
      note:w.wp==="ZWP20"?"Active ZWP20 Row 11 owns 69m (60m + 15pct): this row mirrors cost, do not add twice.":"60m budget base + 15pct purchasing allowance = 69m per evidenced physical field-to-TC-room run"},
-     {id:"SCADA-BARTEC-M20-GLAND-SIZE-QTY",item:"BARTEC SCADA enclosure M20 glands — certified size and qty by field cable OD",unit:"pcs",qty:getGland(w.wp,"SCADA_RADIO")?.verifiedActiveGlands??null,rateTHB:null,
+     {id:"SCADA-BARTEC-M20-GLAND-SIZE-QTY",item:"BARTEC SCADA enclosure M20 glands — certified size and qty by field cable OD",unit:"pcs",qty:getGland(w.wp,"SCADA_RADIO")?.verifiedActiveGlands??null,rateTHB:w.wp==="ZWP20"?findZwp20WebRate0553("HAWKE-A").rateTHB:null,
       source:"BARTEC 21G1048t GA-1001/2/3 / Z1F MR0001 / cable end register; 16 existing M20 holes per enclosure, drain separate",
       owner:"SCADA_TCAB_ASSEMBLY_OR_FIELD_BULK__NON_ADDITIVE_PENDING",
       status:"16_DRILLED_M20_HOLES_CONFIRMED__CABLE_OD_GLAND_SKU_QTY_OPEN__DTS_18_CONFLICT",
-      note:"16 holes/16 original plugs are physical capacity, NOT 16 glands; original 1 priced gland/site remains provisional ledger allowance. Need cable OD, sealing range, armouring, Ex cert, vendor-included fittings and client disposition for DTS 18-hole minimum."}]},
+      note:"16 holes/16 original plugs are physical capacity, NOT 16 glands; original 1 priced gland/site remains provisional ledger allowance. Online Hawke A M20 retail candidate THB1925.10/ea, seal 8.4–14.3mm; not a finalized cable OD/Ex selection."},
+     ...(w.wp==="ZWP20"?[
+      {id:"SCADA-EXTERNAL-EARTH-WIRE-6MM",item:"6mm2 green/yellow tinned copper bonding wire — external field earthing",unit:"m",qty:null,rateTHB:findZwp20WebRate0553("EARTH-6MM").rateTHB,source:findZwp20WebRate0553("EARTH-6MM").url,owner:"BULK_EXTERNAL_EARTHING_ONLY__PANEL_EARTH_TERMINALS_INCLUDED",status:"RETAIL_RATE_VERIFIED__ROUTE_QTY_PENDING",note:"LAPP 100m reel retail price; not guaranteed O&G project-spec/fire suitability; no automatic qty or cost posted"},
+      {id:"SCADA-SS316-CABLE-TIES",item:"SS316 marine cable support ties 300mm",unit:"ea",qty:null,rateTHB:findZwp20WebRate0553("TIE-316").rateTHB,source:findZwp20WebRate0553("TIE-316").url,owner:"BULK_EXTERNAL_SUPPORT__VENDOR_PACKAGE_DEDUCT",status:"RETAIL_RATE_VERIFIED__INSTALLATION_SPACING_QTY_PENDING",note:"RS 100pc package; actual installation quantity from cable supports and tray routing, not guessed"}
+     ]:[])]},
    {id:"EX_IP_PHONE",name:"EX IP Phone",equipment:found("EX_IP_PHONE"),
     route:null,items:[
      {id:"EX-PHONE-JB",item:"Dedicated certified Ex e Telephone Junction Box assembly, terminals, earth studs, bracket, labels and blanking plugs",unit:"set",qty:null,rateTHB:24500,
