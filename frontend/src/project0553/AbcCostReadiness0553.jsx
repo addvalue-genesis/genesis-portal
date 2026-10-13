@@ -33,6 +33,18 @@ export function AbcCostReadiness0553({site="ALL",fx=null,priceEvidence=null,snap
      <td>Reconcile cost ownership once per function, close RFQ/WBS and FX requirements, then compute actual A+B+C</td></tr>
    </tbody></table></div>
   <p className="p55-note"><strong>Important:</strong> The B1/B2/B3/B8/B9 working sell values cannot be added to Part A vendor cost: cost ≠ selling price. The current 31.5 FX setting may be an INTERNAL PLANNING ASSUMPTION, not a verified BOT rate. Null values mean unknown, never zero.</p>
+  {priceEvidence?.uncovered?.length>0&&<ControlledModuleSection0553 moduleKey={root+".price-evidence-gaps"} title={"Price Evidence Gaps ("+priceEvidence.uncovered.length+" MTO TAGs)"} >
+   <p className="p55-note"><strong>หลักการ:</strong> These are the TAGs without a currently matched Vendor Rate Evidence under the visible filter. A TAG may still have an internal budgetary cost posted from a separate controlled source; price-evidence coverage is NOT the same as Engineering or Cost approval.</p>
+   <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Location / TAG / Module ID</th><th>MTO Scope Qty</th><th>Budgetary Working Allocation</th><th>Next Source / Engineering Action</th></tr></thead><tbody>
+    {priceEvidence.uncovered.map((g,i)=><tr key={g.site+"|"+g.row+"|"+g.tag+"|"+i}><td><strong>{g.site} / {g.tag}</strong><small>MTO Row {g.row}</small>
+     <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()+"."+String(g.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+g.row} componentName={g.tag+" / "+g.site+" MTO Row "+g.row}/></td>
+     <td>{g.scopeQty??"NOT VERIFIED"} {g.scopeUnit||""}</td>
+     <td>{g.workingCostAllocated?"Working amount exists — RATE EVIDENCE MATCH REVIEW":"No allocated TAG working cost"}<small>{g.workingState}</small></td>
+     <td>Map original RFQ function → approved physical Quantity → compatible SKU → supplier quotation/currency/validity → unique TAG cost owner</td>
+    </tr>)}
+    </tbody></table></div>
+  </ControlledModuleSection0553>}
   <ControlledModuleSection0553 moduleKey={root+".part-a-gaps"} title={"A · Location / TAG Cost Gaps ("+A.unpostedRows+" unresolved)"} >
    <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
     <thead><tr><th>Location</th><th>Allocated Working Cost in Source Currency</th><th>Costed / MTO</th><th>Unpriced / Unallocated TAGs</th></tr></thead><tbody>
