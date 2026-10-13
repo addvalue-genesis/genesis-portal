@@ -163,7 +163,7 @@ export function VendorProductCatalog0553(){
         description={(q.header?.quoteStatus||q.lines[0]?.priceStatus||"SOURCE_QUOTATION")+
           " · Original currency: "+(q.header?.currency||q.lines[0]?.currency||"UNVERIFIED")+
           " · Original vendor: "+(q.header?.vendor||g.title)}
-        defaultOpen={Boolean(search)||Boolean(companyQuery)||Boolean(chosenQuote)}>
+        defaultOpen={Boolean(search)||chosenQuote===q.id}>
         {q.header&&<div className="p55-filterbar">
          <button type="button" className="p553-detail-button" onClick={()=>chooseQuote(q.id)}>Inspect quotation &amp; commercial conditions</button>
          <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+q.id}
@@ -174,7 +174,7 @@ export function VendorProductCatalog0553(){
       {sections.unquoted.length>0&&<SmartDataGroup projectId="PJ2608-0553"
          moduleKey={"bid.vendor.products.supplier.group."+moduleSegment(g.id)+".other-evidence"}
          title="Other evidence · Datasheets / Web / ERP / Manufacturer" count={sections.unquoted.length}
-         defaultOpen={Boolean(search)||Boolean(companyQuery)||Boolean(chosenQuote)}>
+         defaultOpen={Boolean(search)||["WEB","HISTORICAL","DATASHEET"].includes(evidenceClass)}>
           {renderLines(sections.unquoted)}
        </SmartDataGroup>}
      </>;
