@@ -40,7 +40,13 @@ assert(audit.issues.some(x=>x.id==="ZWP8-OWN-01"&&x.level==="ERROR"));
 assert(audit.issues.some(x=>x.id==="ZWP8-OWN-02"&&x.level==="ERROR"));
 assert.equal(audit.siteLinks.length,3);
 assert(audit.siteLinks.filter(x=>x.mode==="PTMP").length===2);
-assert(SCADA_LINKS_0553.some(x=>x.from==="ZPQ"&&x.to==="ZWP8"&&x.mode==="PTP"),"Brownfield ZPQ–ZWP8 link evidence missing");
+const existing=SCADA_LINKS_0553.find(x=>x.from==="ZPQ"&&x.to==="ZWP8"&&x.mode==="PTP");
+assert(existing,"ZPQ–ZWP8 existing physical link evidence missing");
+assert.equal(existing.installedLinkState,"EXISTING_BASELINE","Do not silently reclassify PTP baseline as new");
+assert.equal(existing.newReplacementAutomaticallyRequired,false,"Existing link is not an automatic procurement obligation");
+assert(existing.capacityScope.includes("ADDITIONAL NEW LINK"),"Retain separate BOD added-link capacity obligation");
+assert(audit.siteLinks.find(x=>x.id==="SCADA-ZPQ-ZWP8")?.installedLinkState==="EXISTING_BASELINE","ZWP8 audit must retain original PTP status");
+assert(audit.issues.some(x=>x.id==="ZWP8-ENG-06"&&x.details.includes("EXISTING communication link")),"Engineering conflict must remain explicit");
 assert.equal(audit.flags.vendorTechApproved,false);
 assert.equal(audit.flags.customerReleased,false);
 const withoutFx=auditZWP8CostOwnership0553();
@@ -53,6 +59,7 @@ const overview=fs.readFileSync(path.join(root,"project0553/SimpleBom0553.jsx"),"
 assert(view.includes('id="bid.budget.bom.zwp8.cost-ownership-audit"'));
 assert(view.includes('<ControlledModuleSection0553 moduleKey={id}')&&view.includes('moduleKey={id+".issues"}'));
 assert(host.includes('site==="ZWP8"&&<ZWP8CostOwnershipAudit0553 fx={fx}/>'));
+assert(view.includes("PTP ZPQ ↔ ZWP8 = EXISTING baseline link"),"Existing link must be prominently labeled for project executive");
 assert(overview.includes("OWNER AUDIT: B-8 surge counted twice"),"Do not hide source duplication behind working total");
 assert(!view.includes("setCost")&&!view.includes("updateLedger"));
 const compiled=babel.transformSync(view,{babelrc:false,configFile:false,
