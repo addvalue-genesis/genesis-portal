@@ -455,10 +455,22 @@
       "baselineODUCostUSD": 7288.65,
       "vendorQuotedQtyNotEngineeringQty": true,
       "quoteRegionB4Rate": null,
-      "independentV8ModelSmoke": "PASSED_WITH_CONTROLLED_MTO_AND_QUOTE_FIXTURE_NOT_FULL_MODULE_GRAPH",
+      "independentV8ModelSmoke": "PASS__ALL_4_OWNERS_CONTROLLED_MTO_NEXTG_QUOTE_AND_MAP09_RECONCILIATION_FIXTURE",
       "nodeBuild": "PENDING_USER_RUN",
       "browserAcceptance": "PENDING",
-      "approvedCustomerRelease": false
+      "approvedCustomerRelease": false,
+      "ownerScopedAdditionalProof": {
+        "source": "CONTROLLED_TAG_MAP09_AUDIT_READ_ONLY",
+        "ownerTotalsUSD": {
+          "MR-502-001.4": 7288.65,
+          "MR-502-001A.5": 671.27,
+          "ANT-502-001.6": 4709.77,
+          "SA-502-001.10": 614.2
+        },
+        "assertFailClosedOnMismatch": true,
+        "foreignCurrencySumRejected": true
+      },
+      "realNodeBabelWebpackBrowser": "PENDING_LOCAL_USER_CHECK"
     }
   ]
 }
