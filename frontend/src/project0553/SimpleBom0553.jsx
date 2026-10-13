@@ -251,7 +251,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     <small><strong>A+B+C: NOT ESTABLISHED</strong> · A booked {abcReadiness.A.postedRows}/{abcReadiness.A.totalRows} TAGs · view A/B/C action breakdown below</small>
    </div>
   </div>
-  {<AbcCostReadiness0553 site={site} fx={fx} snapshot={abcReadiness} priceEvidence={{covered:coverageCount,total:visible.length,filtered:vendor!=="ALL",uncovered:uncoveredRateTags}}/>}
+  <AbcCostReadiness0553 site={site} fx={fx} snapshot={abcReadiness} priceEvidence={{covered:coverageCount,total:visible.length,filtered:vendor!=="ALL",uncovered:uncoveredRateTags}}/>
   </>}
   <div className="p55-filterbar" style={{display:"flex",gap:8,margin:"12px 0"}}><button type="button" className="p553-detail-button" onClick={expandAll}>＋ Expand all</button><button type="button" className="p553-detail-button" onClick={collapseAll}>− Collapse all</button><span className="p55-note">เริ่มต้นแสดงภาพรวมทุกแท่น คลิก + เพื่อดู MTO, Calculation, Vendor และ Cost</span></div>
   <div className="p55-table-wrap">
