@@ -19,15 +19,18 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,children}){
     <p className="p55-note"><strong>GA evidence:</strong> {m.bartecBulkRequired.source}. <strong>Contractual conflict:</strong> {m.bartecBulkRequired.deviation}. <strong>Other system:</strong> {m.bartecBulkRequired.relatedOtherMr}</p>
    </div>}
 
+   {m.budgetBridge&&<p className="p55-note"><strong>ZWP20 Row11 internal budgetary scenario:</strong> THB {fmt(m.budgetBridge.scenarioTHB)} vs booked THB {fmt(m.budgetBridge.previousTHB)} (difference THB {fmt(m.budgetBridge.deltaTHB)}). F01 is the one-Lot subtotal/roll-up and must NOT be summed again with F03/F04. This is a priced partial scope, NOT final RFQ compliance or confirmed gland fit. Unpriced Earthing/Supports/MCT/other interfaces are risk exposure.</p>}
    <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
-    <thead><tr><th>Required Engineering Function / ID</th><th>Quantity Driver & Proof</th><th>GA Documented Qty / Unit</th><th>Working Qty (NOT approved)</th><th>Approved SKU Qty</th><th>Technical / Selection State</th></tr></thead><tbody>
+    <thead><tr><th>Required Engineering Function / ID</th><th>Quantity Driver & Proof</th><th>GA Documented Qty / Unit</th><th>Working Estimate Qty</th><th>Unit Rate THB</th><th>Working Budget THB</th><th>Approved SKU Qty</th><th>Technical / Selection State</th></tr></thead><tbody>
     {m.required.map(r=><tr key={r.id}><td><strong>{r.functionId}</strong><ComponentCopyId projectId="PJ2608-0553" componentKey={id+".required-bom.function."+r.id.toLowerCase()} componentName={r.functionId}/></td>
      <td>{r.quantityDriver}<small>{r.qtyProof}</small>{r.quantityEvidence&&<small>Evidence: {r.quantityEvidence}</small>}</td>
      <td>{r.documentedQty??"—"} {r.documentedQty!==null&&r.documentedQty!==undefined?r.documentedUnit||"":""}<small>{r.qtyClass||"NOT YET DERIVED FROM SOURCE"}</small></td>
-     <td>{r.derivedWorkingQty??"NOT DERIVED"}<small>{r.qtyState}</small></td>
-     <td>{r.approvedSkuQty??"NOT APPROVED"}</td><td>{r.requirementState}<small>{r.selectionStatus}</small>{r.costOwner&&<small>Working owner: {r.costOwner}</small>}</td>
+     <td>{r.derivedWorkingQty??"SOURCE QTY TO ASSESS"} {r.budgetUnit||""}<small>{r.qtyState}</small></td>
+     <td>{Number.isFinite(r.budgetRateTHB)?fmt(r.budgetRateTHB):"No independent rate"}<small>{r.budgetSource||"Engineering source review"}</small></td>
+     <td>{Number.isFinite(r.budgetAmountTHB)?fmt(r.budgetAmountTHB):"Unpriced risk exposure"}<small>{r.budgetPosting||"Source not costed"} {r.budgetBasis||""}</small></td>
+     <td>{r.approvedSkuQty??"OEM approval pending"}</td><td>{r.requirementState}<small>{r.selectionStatus}</small>{r.costOwner&&<small>Working owner: {r.costOwner}</small>}</td>
     </tr>)}
-    {m.required.length===0&&<tr><td colSpan={6}>Functional decomposition has not been mapped to this MTO TAG. Preserve source scope and request engineering proof; do not infer a physical SKU BOM.</td></tr>}
+    {m.required.length===0&&<tr><td colSpan={8}>Functional decomposition has not been mapped to this MTO TAG. Preserve source scope and request engineering proof; do not infer a physical SKU BOM.</td></tr>}
     </tbody></table></div>
   </ControlledModuleSection0553>
 
