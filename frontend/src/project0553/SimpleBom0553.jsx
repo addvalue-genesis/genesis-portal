@@ -274,8 +274,9 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
         <small>{financial.costed}/{financial.total} costed · {financial.gaps} pending</small></td>
       </tr>
       {siteExpanded(g.site)&&<tr className="p553-location-expanded"><td colSpan={8}>
+       <ControlledModuleSection0553 moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".engineering-detail"} title={g.site+" / Engineering Detail — MTO, Cost, Vendor & RPT"} description="Location-level engineering detail; all subordinate TAG and evidence modules have independent IDs" defaultOpen>
        <div className="p553-location-details">
-        <p className="p55-note"><strong>{g.site} / Engineering Detail:</strong> {g.siteClass?.note} · Equipment ownership NEW / REUSE / BY OTHERS must be checked against current BLD/MR. The overview above contains no hidden cost additions.</p>
+        <p className="p55-note"><strong>Engineering Scope Note:</strong> {g.siteClass?.note} · Equipment ownership NEW / REUSE / BY OTHERS must be checked against current BLD/MR. The overview above contains no hidden cost additions.</p>
         <ControlledModuleSection0553 moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".cost-allocation"} title={"Cost Allocation by TAG ("+financial.costed+" priced / "+financial.total+" source TAGs)"} description="กด + ในแต่ละ TAG เพื่อดูรายละเอียดและ Copy Module ID" defaultOpen>
          <LocationBomDetail0553 site={g.site} fx={fx}/>
          <p className="p55-note">Basis: {financial.basis}. {financial.costed}/{financial.total} MTO items priced; {financial.gaps} remaining. Each original currency is retained. Unpriced rows are not treated as zero.</p>
@@ -328,6 +329,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
         </ControlledModuleSection0553>
         <p className="p55-note">Incomplete equipment / A+B+C: {financial.gaps} unresolved; unpriced source rows are not zero-cost approvals. All detailed source values remain accessible in expanded TAG modules.</p>
        </div>
+       </ControlledModuleSection0553>
       </td></tr>}
      </React.Fragment>;
     })}
