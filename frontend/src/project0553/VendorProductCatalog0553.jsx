@@ -1,5 +1,6 @@
 import React,{useMemo,useState} from "react";
 import {VENDOR_UNIFIED_CATALOG_0553} from "./data/vendorUnifiedCatalog0553";
+import {canonicalCompanyId0553,resolveCompany0553} from "./data/companyIdentity0553";
 import HISTORICAL_VENDOR from "./data/historicalVendorEvidence0553.json";
 import EXION_REFERENCE from "./data/quotes/EXION-1240515-R0.reference.json";
 import EXION_LATEST from "./data/quotes/EXION-1260576-R0.current.json";
@@ -32,9 +33,9 @@ export function VendorProductCatalog0553(){
 
  const productsById=new Map(catalog.products.map(p=>[p.id,p]));
  const quoteById=new Map(commercial.map(q=>[q.quoteId,q]));
- const allowedQuotes=commercial.filter(q=>vendor==="ALL"||String(q.vendor).trim().toLowerCase()===vendor);
+ const allowedQuotes=commercial.filter(q=>vendor==="ALL"||canonicalCompanyId0553(q.vendor)===vendor);
  const chooseVendor=value=>{setVendor(value);setChosenQuote("");};
- const chooseQuote=value=>{setChosenQuote(value);if(value){const q=quoteById.get(value);if(q)setVendor(String(q.vendor).trim().toLowerCase());}};
+ const chooseQuote=value=>{setChosenQuote(value);if(value){const q=quoteById.get(value);if(q)setVendor(canonicalCompanyId0553(q.vendor));}};
  const rows=catalog.relationships.filter(x=>{
   if(evidenceClass!=="ALL"&&(evidenceClass==="CURRENT"?x.sourceClass!=="SUPPLIER_QUOTATION":evidenceClass==="HISTORICAL"?!String(x.sourceClass||"").includes("HISTORICAL"):evidenceClass==="DATASHEET"?!["MANUFACTURER_BROCHURE","DATASHEET_ONLY"].includes(x.sourceClass):!String(x.sourceClass||"").startsWith("WEB")))return false;
   if(view==="supplier" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
@@ -46,13 +47,13 @@ export function VendorProductCatalog0553(){
   if(view==="mr"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
   if(view==="compare"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
   if(!search)return true;
-  return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,x.description,productsById.get(x.productKey)?.description,suppliersById.get(x.vendorId)?.name].join(" ").toLowerCase().includes(search.toLowerCase());
+  return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,x.description,productsById.get(x.productKey)?.description,x.sourceSupplierLabel,x.sourceThirdParty,x.sourceSupplierRole,suppliersById.get(x.vendorId)?.name,...(suppliersById.get(x.vendorId)?.aliases||[])].join(" ").toLowerCase().includes(search.toLowerCase());
  });
  const resetSearch=()=>{setView("supplier");setMr("ALL");setVendor("ALL");setSearch("");setEvidenceClass("ALL");setChosenQuote("");};
  const groups=new Map();
  const groupKey=r=>view==="quote"?(r.quoteId||"NO_QUOTE"):view==="product"?r.productKey:(view==="mr"||view==="compare")?(r.mr||"NO_MR"):r.vendorId;
  const groupLabel=id=>{
-  if(view==="quote"){const item=commercial.find(q=>q.quoteId===id);return item?item.vendor+" · "+item.quotationNo:id;}
+  if(view==="quote"){const item=commercial.find(q=>q.quoteId===id);return item?resolveCompany0553(item.vendor).name+" · "+item.quotationNo:id;}
   if(view==="product")return productsById.get(id)?.partNumber||id;
   if(view==="mr"||view==="compare")return id;
   return suppliersById.get(id)?.name||id;
@@ -82,7 +83,7 @@ export function VendorProductCatalog0553(){
   {(view==="supplier"||view==="quote")&&<div className="p55-filterbar">
     <label>Quotation &amp; commercial conditions <select value={chosenQuote} onChange={e=>chooseQuote(e.target.value)}>
      <option value="">All quotations / Select to inspect</option>
-     {allowedQuotes.map(q=><option key={q.quoteId} value={q.quoteId}>{q.vendor} · {q.quotationNo}</option>)}
+     {allowedQuotes.map(q=><option key={q.quoteId} value={q.quoteId}>{resolveCompany0553(q.vendor).name} · {q.quotationNo}</option>)}
     </select></label>
     <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.quotation-selector"/>
   </div>}
@@ -120,6 +121,7 @@ export function VendorProductCatalog0553(){
   {grouped.map(g=><SmartDataGroup key={g.id}
     projectId="PJ2608-0553" moduleKey={"bid.vendor.products."+view+".group."+moduleSegment(g.id)}
     title={g.title} count={g.items.length}
+    description={view==="supplier"?"Original source labels: "+(suppliersById.get(g.id)?.sourceSupplierLabels||[]).join(" · "):null}
     defaultOpen={Boolean(search)||Boolean(chosenQuote)||grouped.length===1}>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr>
    <th>Supplier / Source Class</th><th>Product / Model &amp; Function</th><th>MR</th><th>Quotation / Reference From</th><th>Qty / Unit Price / UOM</th><th>Technical / Budgetary Gate</th>
@@ -127,7 +129,7 @@ export function VendorProductCatalog0553(){
     const p=productsById.get(r.productKey);
     const isQuote=Boolean(r.quoteId);
     return <tr key={r.id}>
-     <td><strong>{suppliersById.get(r.vendorId)?.name}</strong><small>{r.sourceClass||"SUPPLIER_QUOTATION"}</small></td>
+     <td><strong>{suppliersById.get(r.vendorId)?.name}</strong><small>Original: {r.sourceSupplierLabel}</small>{r.sourceThirdParty&&<small>{r.sourceSupplierRole}: {r.sourceThirdParty}</small>}<small>{r.sourceClass||"SUPPLIER_QUOTATION"}</small></td>
      <td><strong>{p?.partNumber||"UNIDENTIFIED"}</strong><div>{r.description||p?.description}</div><ComponentCopyId projectId="PJ2608-0553" componentKey={isQuote?"bid.vendor.products.quote-line."+r.id:"bid.vendor.products.evidence."+moduleSegment(r.id)} componentName={p?.partNumber||r.description||r.id}/></td>
      <td>{r.mr}</td>
      <td>{isQuote?<><button type="button" className="p553-detail-button" onClick={()=>{setView("quote");setVendor(r.vendorId);setChosenQuote(r.quoteId);}}>{r.quotation}</button><small>{r.priceStatus}</small></>:<><strong>Reference From</strong><small>{r.referenceFrom}</small><small>{r.referenceDocument||""}</small></>}
