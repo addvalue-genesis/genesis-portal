@@ -19,13 +19,15 @@ assert(overview.includes('aria-expanded={siteExpanded(g.site)}'),"Accessible exp
 assert(overview.includes("financial.costed")&&overview.includes("financial.total"),"Cost coverage summary missing");
 assert(!overview.includes("itemAllocations?.map")&&!overview.includes("extraScenarios.map")&&!overview.includes("getMR0001LocationCost0553(g.site).itemAllocations?.map"),"Long source/cost narratives leak into compact WP row");
 const detail=src.slice(end,src.indexOf("</React.Fragment>",end));
-assert(detail.includes("allocatedRows.map((a,i)=><tr"),"All original tag cost allocations must have independent lines");
+assert(detail.includes("<LocationBomDetail0553 site={g.site} fx={fx}/>"),"Canonical per-TAG cost/engineering drill-down missing from Cost Allocation");
+assert(!detail.includes("Engineering MTO / Function / Price Drill-down"),"Duplicate hidden TAG drill-down should not be reintroduced");
 assert(detail.includes("extraScenarios.map((v,i)=><tr"),"Additional scenarios missing");
 assert(detail.includes("Vendor Rate Evidence &amp; Currency"),"Original vendor source classes missing");
-assert(detail.includes('<LocationBomDetail0553 site={g.site} fx={fx}/>'),"Source-tag drilldown removed");
+assert(detail.includes("financial.costed")&&detail.includes("financial.total"),"TAG priced/total coverage missing from summary");
+assert(src.includes("Price evidence<small>covered / MTO</small>"),"Vendor rate coverage must be labelled as evidence, not approved rates");
 assert(detail.includes("g.rfProof.map(p=><tr"),"Original RF/Link evidence removed");
 assert(detail.includes("colSpan={8}"),"Detail column span must match 8-column header");
 assert(src.includes('style={{width:"100%",borderCollapse:"collapse",tableLayout:"fixed",minWidth:1060}}'),"Fixed column width budget presentation missing");
 assert(css.includes("p553-location-overview")&&css.includes("p553-location-line-detail"),"Scoped compact styles absent");
 assert(!src.includes('<small>{"Basis: "+wpSummary(g.site).basis}'),"Long narrative reintroduced into site summary");
-console.log("PASS 0553 compact BOM layout: one row per WP, expandable per-TAG cost table/source evidence/RF detail, unchanged site totals and Copy IDs, Babel JSX valid.");
+console.log("PASS 0553 compact BOM layout: one row per WP, directly expandable tagged engineering cost source, no duplicate hidden detail, traceable copy IDs, unchanged site totals, Babel JSX valid.");
