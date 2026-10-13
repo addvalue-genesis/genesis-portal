@@ -32,7 +32,7 @@ export function auditZWP8CostOwnership0553({thbPerUsd=null}={}){
  const canQuantifyOverlap=radioSourcesValid&&surgeSourcesValid&&
   radios.some(x=>x.detail?.some(f=>f.functionId==="B-8"))&&Number.isFinite(units.surge);
  const sourceOverlapUSD=ownersVerified&&surgeSourcesValid?0:canQuantifyOverlap?round(radios.length*units.surge):null;
- const wrongOwnerPOEUSD=radioSourcesValid&&radios.some(x=>x.detail?.some(f=>f.functionId==="B-6"))&&radios.some(x=>x.detail?.some(f=>f.functionId==="B-7"))?
+ const wrongOwnerPOEUSD=ownersVerified?0:radioSourcesValid&&radios.some(x=>x.detail?.some(f=>f.functionId==="B-6"))&&radios.some(x=>x.detail?.some(f=>f.functionId==="B-7"))?
   round(radios.length*units.poe):null;
  // This is a what-if read-only correction: remove the duplicated surge B-8
  // from ODU, and move B-6/B-7 to the two separately required IDU TAGs.
