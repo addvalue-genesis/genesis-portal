@@ -45,11 +45,17 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
  const itemRows=overrides.mtoRows??MTO.itemRows;
  const sourceMatches=itemRows.filter(r=>r.platform===PILOT.site&&r.sourceRowIndex===PILOT.row&&keyOf(r)===PILOT.tag);
  const source=sourceMatches[0]||null;
+ const blocked=(source=null,details=[])=>{
+  for(const eq of EQ.equations)if(!stages.some(x=>x.id===eq.id))stages.push({id:eq.id,name:eq.name,status:"SKIPPED",details:"Previous mandatory mapping stage failed; no downstream result evaluated"});
+  return {pilot:PILOT,equations:EQ.equations,stages,errors,details,status:"MAPPING_BLOCKED",
+   source,ownerReconciliation:[],technical:[],budgetaryProceed:false,
+   ledgerMutation:false,approvedVendorSelection:false,technicalCompliancePassed:false,releaseAllowed:false};
+ };
  const sourceOK=sourceMatches.length===1&&source.sourceQty===1&&source.sourceUnit==="Set"&&!source.groupedRow;
  push("MAP-01",sourceOK,
   sourceOK?"One exact MTO row: ZWP20 MR-502-001 Row 4, Rev04, 1 Set":"Missing/duplicate MTO row or non-1-Set quantity: strict tag identity failed");
  // Stage-order rule: if source fails, no downstream candidate is promoted as a mapping.
- if(!sourceOK)return {pilot:PILOT,equations:EQ.equations,stages,errors,details:[],status:"MAPPING_BLOCKED",source:null,ledgerMutation:false,releaseAllowed:false};
+ if(!sourceOK)return blocked();
  const packageRows=MR0001_PACKAGE_COMPOSITION.packages.filter(p=>p.platform===PILOT.site&&p.sourceRowIndex===PILOT.row);
  const linkMatches=SCADA_LINKS_0553.filter(x=>x.from==="ZWP8"&&x.to===PILOT.site&&x.mode==="PTMP");
  const requirements=traceTagParticular0553(PILOT.site,PILOT.tag);
@@ -57,13 +63,13 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
  push("MAP-02",docOK,docOK?
   "RPT topology ZWP8→ZWP20 PTMP; "+requirements.direct.length+" direct TAG clauses, "+requirements.siteSpecific.length+" site clauses; original document revision stays authoritative":
   "Package row, radio topology or direct/site particular requirements are not uniquely traceable");
- if(!docOK)return {pilot:PILOT,equations:EQ.equations,stages,errors,details:[],status:"MAPPING_BLOCKED",source,ledgerMutation:false,releaseAllowed:false};
+ if(!docOK)return blocked(source);
  const packageRow=packageRows[0];
  const expected=new Set(["RADIO_EQUIPMENT","RF_FILTER","CAPACITY_KEY","REGION_KEY","MOUNT_FEEDER","POWER","POWER_CORD"]);
  const actual=new Set(packageRow.components.map(x=>x.functionId));
  const fOK=[...expected].every(x=>actual.has(x))&&source.sourceItemCodes.length===1&&source.sourceItemCodes[0]===PILOT.tag;
  push("MAP-03",fOK,fOK?"Engineering functions decomposed; IDU power and surge/antenna assigned separately":"Missing required engineering function or incorrect grouped MTO identity");
- if(!fOK)return {pilot:PILOT,equations:EQ.equations,stages,errors,details:[],status:"MAPPING_BLOCKED",source,ledgerMutation:false,releaseAllowed:false};
+ if(!fOK)return blocked(source);
  const siteRows=overrides.ledgerRows??detailedLedger();
  const row4=siteRows.find(x=>x.row===4&&x.tag===PILOT.tag);
  const details=[];
@@ -101,18 +107,28 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
  push("MAP-04",joinsOK,joinsOK?
   "9 unique quote-code/SKU/price/currency/qty joins verified against 07 Vendor registry and original NG-260916; no quote-wide multiplication":
   "At least one selected quote code failed original vendor-source join: do not map or price");
- if(!joinsOK)return {pilot:PILOT,equations:EQ.equations,stages,errors,details,status:"MAPPING_BLOCKED",source,ledgerMutation:false,releaseAllowed:false};
+ if(!joinsOK)return blocked(source,details);
+ const quotedDescription=code=>String(originalQuote.lines.find(r=>r.code===code)?.description||"");
+ const regionDescription=quotedDescription("B-4");
+ const countryExplicit=/\bUS\b|Canada|Oman/i.test(regionDescription);
+ const actualMyanmar=/Myanmar/i.test(regionDescription);
  const technical=[
-  {id:"TECH-RADIO-ROLE",result:"CANDIDATE",evidence:"ZWP8→ZWP20 PTMP remote role and NG B-1 remote description; not OEM final selection"},
-  {id:"TECH-EX-ZONE2",result:"UNVERIFIED",evidence:"Quote B-1 claims HAZ Zone-2; full Ex assembly certificate and installation proof required"},
-  {id:"TECH-CAPACITY",result:"UNVERIFIED",evidence:"B-3 Unlimited Mbps marketing option does not prove required end-to-end throughput, QoS, licensing or NMS entitlement"},
-  {id:"TECH-COUNTRY-REGION",result:"CONFLICT",evidence:"B-4 Region 04 explicitly US/Canada/Oman; Myanmar entitlement and radio licences must be identified and verified. Source price NULL, never zero."},
-  {id:"TECH-POWER-INTERFACE",result:"UNVERIFIED",evidence:"B-6 PoE 25W max and B-7 North America cord require proof against 24V IT/unearthed system and actual indoor/ex interface"},
-  {id:"TECH-INCLUDED-FITTINGS",result:"UNVERIFIED",evidence:"B-5 includes two 2m coax jumpers; mounting/route/antenna/feeder/glands require no-overlap verification"}
+  {id:"TECH-RADIO-ROLE",result:/Remote Terminal/i.test(quotedDescription("B-1"))?"CANDIDATE":"CONFLICT",
+   evidence:"ZWP8→ZWP20 PTMP remote role requires a compatible remote unit; B-1 supplier description: "+quotedDescription("B-1")},
+  {id:"TECH-EX-ZONE2",result:/HAZ Zone-2/i.test(quotedDescription("B-1"))?"UNVERIFIED":"CONFLICT",
+   evidence:"B-1 claimed hazardous-area scope is source text, not complete Ex-certified assembly proof"},
+  {id:"TECH-CAPACITY",result:"UNVERIFIED",
+   evidence:"B-3 "+quotedDescription("B-3")+"; throughput/QoS/NMS and perpetual entitlement remain unverified"},
+  {id:"TECH-COUNTRY-REGION",result:countryExplicit&&!actualMyanmar?"CONFLICT":"UNVERIFIED",
+   evidence:"B-4 original source: "+regionDescription+". Requires Myanmar operating entitlement; source price NULL, not vendor-confirmed zero."},
+  {id:"TECH-POWER-INTERFACE",result:"UNVERIFIED",
+   evidence:"B-6 "+quotedDescription("B-6")+"; B-7 "+quotedDescription("B-7")+"; site 24V IT interface proof required"},
+  {id:"TECH-INCLUDED-FITTINGS",result:"UNVERIFIED",
+   evidence:"B-5 "+quotedDescription("B-5")+"; RF mounts/jumpers must be counted once against physical interface/Bulk"}
  ];
- push("MAP-05",true,"Six technical checkpoints recorded (country code conflict + unresolved OEM/Ex/throughput/power proof). NOT technical compliance approval.",true);
+ push("MAP-05",true,"Six evidence-derived technical checkpoints documented; "+technical.filter(x=>x.result==="CONFLICT").length+" conflicting/unresolved product claims. Compliance is NOT approved.",true);
  const qOK=details.filter(x=>["B-1","B-2","B-3","B-4","B-5","B-6","B-7"].includes(x.quoteLine))
- .every(x=>x.engineeringQty===1&&x.engineeringState&&x.sourceQuoteQty!==x.engineeringQty);
+ .every(x=>x.engineeringQty===1&&["DOCUMENT_DERIVED_PRELIMINARY","PARAMETRIC_1_PER_RADIO_ASSUMPTION","ENGINEERING_SOURCE"].includes(x.engineeringState));
  // Vendor source rate must remain NULL for region, no fabricated zero quoted rate.
  push("MAP-06",Boolean(qOK),"Quantity one per applicable working function has separate MTO/Topology basis; NG quoted quantity three remains evidence only");
  const ownerIds=new Set(details.map(x=>x.quoteLine));
