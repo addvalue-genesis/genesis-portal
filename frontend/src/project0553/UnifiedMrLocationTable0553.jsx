@@ -19,6 +19,7 @@ const moduleItem=(mr,site,item)=>moduleBase(mr,site)+"."+String(item.id).toLower
 const budgetRateOwner=(mr,x)=>mr==="MR-0002"?(String(x.id).includes("RFI-LNA")?"RFI · LNA":String(x.quoteLine||"").match(/^UHF-[234]$/)?"MGW · Antenna / Feeder":String(x.quoteLine||"")==="UHF-1"?"HYTERA BDA · excluded":x.owner||"Field bulk"):x.owner||"Evidence candidate";
 export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
  const [expanded,setExpanded]=useState({});
+ const [expandedItems,setExpandedItems]=useState({});
  const selected=BOM_READ_MODEL_0553.rows.filter(r=>r.mr===mr&&(site==="ALL"||r.site===site));
  const rows=selected.map(r=>({...r,items:r.detailRows?.length?r.detailRows.map(canonicalRow):(r.evidence||[]).map(evidenceToRow)}));
  const withRows=rows.filter(r=>r.items.length);
@@ -58,7 +59,7 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
       <td>{Object.entries(sub).map(([c,v])=>money(v,c)).join(" + ")||"PENDING"}</td>
       <td>{r.projectionSource||"SOURCE_EVIDENCE_ONLY"}<small>{r.completeness||""}</small></td></tr>
      {open&&<tr><td colSpan={7}><div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Tag / line</th><th>SKU / Description</th><th>Qty</th><th>Unit rate</th><th>Extension</th><th>Ownership / Evidence</th><th>Status / Copy ID</th></tr></thead><tbody>
-      {r.items.map((x,i)=><tr key={x.id+"-"+i}><td>{x.tag||x.id}</td><td>{x.sku||"—"}<small>{x.description}</small></td>
+      {r.items.map((x,i)=><tr key={x.id+"-"+i}><td><button type="button" className="p55-row-toggle" aria-expanded={!!expandedItems[moduleItem(mr,r.site,x)]} onClick={()=>setExpandedItems(o=>({...o,[moduleItem(mr,r.site,x)]:!o[moduleItem(mr,r.site,x)]}))}>{expandedItems[moduleItem(mr,r.site,x)]?"−":"+"}</button> {x.tag||x.id}</td><td>{x.sku||"—"}<small>{x.description}</small>{expandedItems[moduleItem(mr,r.site,x)]&&<div className="p55-note"><strong>Requirement → Location → Function → Quantity → Vendor → Cost:</strong> {mr} → {r.site} → {x.tag||x.id} → {x.qty??"NOT VERIFIED"} {x.unit||""} → {budgetRateOwner(mr,x)} → {isCounted(x)?money(x.extended,x.currency||""):"UNPRICED / EXCLUDED"}.<p>Source: {x.source||r.rfqSource||"RFQ cross-reference pending"} · Price basis: {x.priceBasis||r.projectionSource||"Evidence only"} · Cost owner: {x.owner||"Unassigned"} · {x.note||x.costGap||"Engineering verification required before release"}</p><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleItem(mr,r.site,x)+".evidence"} componentName={(x.tag||x.id)+" / Engineering & Cost Evidence"}/></div>}</td>
        <td>{x.qty??"PENDING"} {x.unit||""}</td><td>{money(x.unitCost,x.currency||"")}</td>
        <td>{isCounted(x)?money(x.extended,x.currency||""):"NOT COUNTED / PENDING"}</td>
        <td>{budgetRateOwner(mr,x)}<small>{x.source||"Source trace pending"}</small></td>
