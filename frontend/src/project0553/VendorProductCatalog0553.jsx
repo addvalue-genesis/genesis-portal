@@ -59,7 +59,7 @@ export function VendorProductCatalog0553(){
    {catalog.suppliers.map(v=><option key={v.id} value={v.id}>{v.name} ({catalog.relationships.filter(r=>r.vendorId===v.id).length} lines)</option>)}
   </select></label>}
   {(view==="mr"||view==="compare")&&<label>MR / System <select value={mr} onChange={e=>setMr(e.target.value)}><option value="ALL">All MR Systems</option>{["MR-0001","MR-0002","MR-0003","MR-0004"].map(v=><option key={v} value={v}>{v}</option>)}</select></label>}
-  <label>Evidence class <select value={evidenceClass} onChange={e=>setEvidenceClass(e.target.value)}><option value="ALL">All evidence</option><option value="CURRENT">Project supplier quotations</option><option value="HISTORICAL">Historical quotations / ERP</option><option value="WEB">Web price references</option><option value="DATASHEET">Manufacturer datasheets</option></select></label>
+  <label>Evidence class <select value={evidenceClass} onChange={e=>setEvidenceClass(e.target.value)}><option value="ALL">All evidence</option><option value="CURRENT">Original supplier quotation registry (all years)</option><option value="HISTORICAL">Historical quotations / ERP</option><option value="WEB">Web price references</option><option value="DATASHEET">Manufacturer datasheets</option></select></label>
   <label>Search Product / Model / Quote <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Model, MR, supplier, quotation" /></label></div>
   {(view==="supplier"||view==="quote")&&<div className="p55-filterbar"><label>Quotation & commercial conditions <select value={chosenQuote} onChange={e=>chooseQuote(e.target.value)}>
    <option value="">All quotations / Select to inspect</option>
