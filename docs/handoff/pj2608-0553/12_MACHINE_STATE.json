@@ -471,6 +471,19 @@
         "foreignCurrencySumRejected": true
       },
       "realNodeBabelWebpackBrowser": "PENDING_LOCAL_USER_CHECK"
+    },
+    {
+      "id": "MASTER_SYSTEM_LOCATION_MTO_DISCLOSURE_20261013",
+      "date": "2026-10-13",
+      "correctModuleId": "bid.budget.bom.system-location-mto",
+      "previousIncorrectInterpretation": "ZWP8 Engineering Detail was wrongly considered the missing master module",
+      "fixed": "Real ControlledModuleSection with visible Copy ID and +/- wrapping the entire conditional system/location MTO table after filters",
+      "zwp8RowIdUnchanged": true,
+      "misplacedDetailWrapperReverted": true,
+      "costOrDataChanged": false,
+      "sourceChecks": "COMPLETED",
+      "localBuild": "PENDING",
+      "browserAcceptance": "PENDING"
     }
   ]
 }
