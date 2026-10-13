@@ -236,28 +236,126 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <div><span>{site==="ALL"?"All locations":"Location "+site} — allocated total equipment / A+B+C</span><strong>{site==="ALL"?"Select WP to see total":displaySiteTotal(site)}</strong><small>{site==="ALL"?"Per-WP budgetary priced totals below; missing rows never valued zero":wpSummary(site).costed+"/"+wpSummary(site).total+" costed; "+wpSummary(site).gaps+" unresolved; "+(fx?.source||"FX unavailable")}</small></div>
   </div>
   <div className="p55-filterbar" style={{display:"flex",gap:8,margin:"12px 0"}}><button type="button" className="p553-detail-button" onClick={expandAll}>＋ Expand all</button><button type="button" className="p553-detail-button" onClick={collapseAll}>− Collapse all</button><span className="p55-note">เริ่มต้นแสดงภาพรวมทุกแท่น คลิก + เพื่อดู MTO, Calculation, Vendor และ Cost</span></div>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact p55-table--budget" style={{width:"100%",borderCollapse:"collapse"}}>
-  <thead><tr><th>+/−</th><th>Location / ประเภทแท่น</th><th>Module ID (Copy)</th><th>MTO items</th><th>Vendor-rate coverage</th><th>RPT links</th><th>Antenna refs</th><th>Vendor evidence / currency</th><th>Allocated location cost</th></tr></thead><tbody>
-  {groups.filter(g=>g.items.length).map(g=><React.Fragment key={g.site}>
-   <tr><td><button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)} aria-expanded={siteExpanded(g.site)}>{siteExpanded(g.site)?"−":"+"}</button></td>
-   <td><strong>{g.site}</strong><small>{g.siteClass?.type||"UNCLASSIFIED"} · {g.siteClass?.thai||"ตรวจสอบ"}</small></td>
-   <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+g.site.toLowerCase()} componentName={g.site+" / SCADA Engineering BOM"}/></td>
-   <td className="is-number">{g.items.length}</td><td className="is-number">{g.items.filter(vendorCovered).length} / {g.items.length}</td>
-   <td className="is-number">{g.rfDemand?.linkEndpointDemand??"—"}</td><td className="is-number">{g.rfDemand?.antennaReferenceDemand??"—"}</td>
-   <td>{g.items.some(x=>Number.isFinite(x.indicativePackageCostTHB))&&<small>Cisco scenario THB {g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0).toLocaleString("en-US")}</small>}{g.items.some(x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice)))&&<small>Next G USD source rates mapped</small>}{g.items.some(x=>x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice)))&&<small>Other vendor source rates mapped</small>}</td><td><strong>{displaySiteTotal(g.site)}</strong><small>{wpSummary(g.site).costed}/{wpSummary(g.site).total} MTO priced · {wpSummary(g.site).gaps} unresolved</small><small>{"Basis: "+wpSummary(g.site).basis}
-    {getMR0001LocationCost0553(g.site).itemAllocations?.map(a=><small key={a.tag}>Allocated MTO Tag {a.tag} · Qty {a.sourceQty} × {a.currency} {a.unitCost.toFixed(2)} = {a.currency} {a.extended.toFixed(2)} · {a.status}</small>)}
-    {(wpSummary(g.site).scenarios||[]).map(v=><small key={v.name}>Additional, NOT included in allocated cost: {v.name} · {v.currency} {v.amount.toLocaleString("en-US",{minimumFractionDigits:2})} · {v.status}</small>)}
-    <small>Tag ledger: {wpSummary(g.site).costed} / {wpSummary(g.site).total} priced · {wpSummary(g.site).gaps} awaiting engineering/price mapping</small>
-    <small>Incomplete equipment / A+B+C; unmapped source rows are not zero-cost approvals</small></small></td></tr>
-   {siteExpanded(g.site)&&<tr><td colSpan={9}><div className="p55-table-wrap"><p className="p55-note"><strong>Site Scope:</strong> {g.siteClass?.note} · Equipment ownership: NEW / REUSE / BY OTHERS ต้องตรวจ BLD/MR ทีละรายการ ไม่สรุปจากประเภทแท่น</p>
-    <LocationBomDetail0553 site={g.site} fx={fx}/>
-    <table className="p55-table p55-table--compact"><thead><tr><th>Link / First Principles</th><th>FSPL</th><th>Gt + Gr</th><th>Ideal RSL offset</th><th>STD / BOM</th></tr></thead>
-     <tbody>{g.rfProof.map(p=><tr key={p.id}><td>{p.from} → {p.to}</td><td>{p.fsplDb.toFixed(2)} dB</td><td>{p.gainSumDbi.toFixed(2)} dBi</td><td>{p.idealRslOffsetDb.toFixed(2)} dB<small>Rx = Tx + offset − losses</small></td><td>HOLD · CAL/OEM proof required{p.change&&<small>4ft candidate: {p.change.gainChangeDb.toFixed(2)} dB vs Next G baseline</small>}</td></tr>)}</tbody>
-    </table>
-    <p className="p55-note">Equipment Tag / Cost Ledger: ดูที่ SCADA Engineering-Derived Site Cost Summary ด้านบน (ข้อมูลเดียวกัน ไม่แสดงตาราง BOM ซ้ำ). Link/RF First Principles และ Vendor Evidence ยังอยู่ในรายละเอียดของแต่ละ Tag.</p>
-</div></td></tr>}
-  </React.Fragment>)}
-  </tbody></table></div>
+  <div className="p55-table-wrap">
+   <table className="p55-table p55-table--compact p55-table--budget p553-location-overview" style={{width:"100%",borderCollapse:"collapse",tableLayout:"fixed",minWidth:1060}}>
+    <colgroup>
+     <col style={{width:"4%"}}/><col style={{width:"11%"}}/><col style={{width:"25%"}}/>
+     <col style={{width:"7%"}}/><col style={{width:"9%"}}/><col style={{width:"10%"}}/>
+     <col style={{width:"13%"}}/><col style={{width:"21%"}}/>
+    </colgroup>
+    <thead><tr>
+     <th>+/−</th><th>Location</th><th>Module ID / Copy</th><th>MTO</th>
+     <th>Priced</th><th>RPT / ANT</th><th>Vendor evidence</th><th>Allocated working cost</th>
+    </tr></thead>
+    <tbody>
+    {groups.filter(g=>g.items.length).map(g=>{
+     const financial=wpSummary(g.site);
+     const actual=getMR0001LocationCost0553(g.site);
+     const vendorFlags=[
+      g.items.some(x=>Number.isFinite(x.indicativePackageCostTHB))?"Cisco":null,
+      g.items.some(x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice)))?"Next G":null,
+      g.items.some(x=>x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice)))?"Other":null
+     ].filter(Boolean);
+     const allocatedRows=actual.itemAllocations||[];
+     const extraScenarios=financial.scenarios||[];
+     return <React.Fragment key={g.site}>
+      <tr className="p553-location-summary">
+       <td><button type="button" className="p55-row-toggle" onClick={()=>open("site:"+g.site)}
+          aria-expanded={siteExpanded(g.site)} aria-label={(siteExpanded(g.site)?"Collapse ":"Expand ")+g.site+" location details"}>
+          {siteExpanded(g.site)?"−":"+"}</button></td>
+       <td><strong>{g.site}</strong><small>{g.siteClass?.type||"UNCLASSIFIED"}</small></td>
+       <td><ComponentCopyId projectId="PJ2608-0553"
+          componentKey={"bid.budget.bom."+g.site.toLowerCase()}
+          componentName={g.site+" / SCADA Engineering BOM"}/></td>
+       <td className="is-number">{g.items.length}</td>
+       <td className="is-number"><strong>{financial.costed}/{financial.total}</strong>
+        {financial.gaps>0&&<small>{financial.gaps} pending</small>}</td>
+       <td className="is-number">{g.rfDemand?.linkEndpointDemand??"—"} / {g.rfDemand?.antennaReferenceDemand??"—"}</td>
+       <td><span className="p553-vendor-brief">{vendorFlags.length?vendorFlags.join(" · "):"Source review"}</span></td>
+       <td className="p553-location-total"><strong>{displaySiteTotal(g.site)}</strong>
+        <small>Working allocation · not A+B+C sell</small></td>
+      </tr>
+      {siteExpanded(g.site)&&<tr className="p553-location-expanded"><td colSpan={8}>
+       <div className="p553-location-details">
+        <p className="p55-note"><strong>{g.site} / Engineering Detail:</strong> {g.siteClass?.note} · Equipment ownership NEW / REUSE / BY OTHERS must be checked against current BLD/MR. The overview above contains no hidden cost additions.</p>
+        <details className="p55-panel" open>
+         <summary><strong>Cost Allocation by TAG ({allocatedRows.length} source allocations)</strong> · one item per row</summary>
+         <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact p553-location-line-detail">
+           <thead><tr><th>TAG / MTO source</th><th>Qty</th><th>Currency</th><th>Unit rate</th><th>Extended cost</th><th>Source / status</th></tr></thead>
+           <tbody>{allocatedRows.map((a,i)=><tr key={a.tag+"-"+i}>
+            <td><strong>{a.tag}</strong></td>
+            <td className="is-number">{a.sourceQty??"—"}</td>
+            <td>{a.currency||"UNVERIFIED"}</td>
+            <td className="is-number">{Number.isFinite(a.unitCost)?a.unitCost.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"}</td>
+            <td className="is-number">{Number.isFinite(a.extended)?a.extended.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"}</td>
+            <td>{a.status||"Source qualification required"}</td>
+           </tr>)}</tbody>
+          </table>
+         </div>
+         <p className="p55-note">Basis: {financial.basis}. {financial.costed}/{financial.total} MTO items priced; {financial.gaps} remaining. Each original currency is retained. Unpriced rows are not treated as zero.</p>
+        </details>
+        <details className="p55-panel">
+         <summary><strong>Vendor Rate Evidence &amp; Currency</strong> · source classes and candidate details</summary>
+         <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact p553-location-line-detail">
+           <thead><tr><th>Evidence class</th><th>Working reference</th><th>Allocation treatment</th></tr></thead>
+           <tbody>
+            {g.items.some(x=>Number.isFinite(x.indicativePackageCostTHB))&&<tr>
+             <td>Cisco / THB</td>
+             <td>Scenario THB {g.items.reduce((n,x)=>n+(Number.isFinite(x.indicativePackageCostTHB)?x.indicativePackageCostTHB:0),0).toLocaleString("en-US")}</td>
+             <td>Source quotation scenario, not a confirmed OEM or customer price</td>
+            </tr>}
+            {g.items.some(x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice)))&&<tr>
+             <td>Next G / USD</td><td>Quotation unit rates mapped to functional candidates</td>
+             <td>Follow current TAG-specific Engineering Quantity / Cost Owner</td>
+            </tr>}
+            {g.items.some(x=>x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice)))&&<tr>
+             <td>Other vendor source</td><td>Original priced candidate records</td>
+             <td>Rate evidence only; never automatically added to TAG cost</td>
+            </tr>}
+            {vendorFlags.length===0&&<tr><td colSpan={3}>No priced vendor reference; source items remain visible in TAG detail below.</td></tr>}
+           </tbody>
+          </table>
+         </div>
+        </details>
+        {extraScenarios.length>0&&<details className="p55-panel">
+         <summary><strong>Other Scenarios — NOT Included in Allocated Cost ({extraScenarios.length})</strong></summary>
+         <div className="p55-table-wrap"><table className="p55-table p55-table--compact p553-location-line-detail">
+          <thead><tr><th>Scenario</th><th>Currency</th><th>Amount</th><th>Status / Scope</th></tr></thead>
+          <tbody>{extraScenarios.map((v,i)=><tr key={v.name+"-"+i}>
+           <td>{v.name}</td><td>{v.currency}</td>
+           <td className="is-number">{Number.isFinite(v.amount)?v.amount.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"}</td>
+           <td>{v.status}</td>
+          </tr>)}</tbody>
+         </table></div>
+        </details>}
+        <details className="p55-panel">
+         <summary><strong>Engineering MTO / Function / Price Drill-down</strong> · original TAG view</summary>
+         <LocationBomDetail0553 site={g.site} fx={fx}/>
+        </details>
+        <details className="p55-panel">
+         <summary><strong>RPT / Link-Budget Evidence ({g.rfProof.length})</strong></summary>
+         <div className="p55-table-wrap">
+          <table className="p55-table p55-table--compact p553-location-line-detail">
+           <thead><tr><th>Link / First Principles</th><th>FSPL</th><th>Gt + Gr</th><th>Ideal RSL offset</th><th>STD / BOM</th></tr></thead>
+           <tbody>{g.rfProof.map(p=><tr key={p.id}>
+            <td>{p.from} → {p.to}</td><td>{p.fsplDb.toFixed(2)} dB</td>
+            <td>{p.gainSumDbi.toFixed(2)} dBi</td>
+            <td>{p.idealRslOffsetDb.toFixed(2)} dB<small>Rx = Tx + offset − losses</small></td>
+            <td>CAL/OEM proof required{p.change&&<small>4ft candidate: {p.change.gainChangeDb.toFixed(2)} dB vs Next G baseline</small>}</td>
+           </tr>)}</tbody>
+          </table>
+         </div>
+        </details>
+        <p className="p55-note">Incomplete equipment / A+B+C: {financial.gaps} unresolved; unpriced source rows are not zero-cost approvals. All detailed source values remain accessible in expanded TAG modules.</p>
+       </div>
+      </td></tr>}
+     </React.Fragment>;
+    })}
+    </tbody>
+   </table>
+  </div>
   <p className="p55-note">Missing price is not missing scope: {missingSourceRows.length} source rows in the chosen location still lack a Cisco-priced scenario, and may have other vendor price evidence. Detailed physical quantities, bulk and services must be derived separately.</p>
   <p className="p55-note">ZWP20 GREENFIELD total across all equipment, vendor packages and bulk is NOT ESTABLISHED; Cisco-only priced subtotal must never be labelled total location cost. Subtotal is for priced working items only. It excludes non-priced MR0001 equipment, bulk, spares and services. Customer A+B+C total and selling price remain separate; 4-Scope of Supply.xlsx is the controlled output template.</p>
   </>}
