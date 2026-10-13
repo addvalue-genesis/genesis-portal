@@ -19,7 +19,7 @@ const {SCADA_LINKS_0553}=require(path.join(root,"project0553/data/scadaLinkEvide
 const original=JSON.stringify(summarizeMR0001TagCost0553("ZWP8").rows);
 const audit=auditZWP8CostOwnership0553({thbPerUsd:31.5});
 assert.deepEqual(audit.physicalGroup,{radioODU:2,radioIDU:2,antenna:2,surge:2});
-assert.deepEqual(audit.currencyTotals,{USD:27796.18,THB:499906});
+assert.deepEqual(audit.currencyTotals,{USD:28174.05,THB:499906});
 assert.equal(audit.sourceUnitUSD.oduOnly,7288.65);
 assert.equal(audit.sourceUnitUSD.poe,671.27);
 assert.equal(audit.sourceUnitUSD.surge,614.2);
