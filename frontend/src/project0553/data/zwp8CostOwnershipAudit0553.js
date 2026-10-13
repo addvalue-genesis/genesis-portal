@@ -50,21 +50,21 @@ export function auditZWP8CostOwnership0553({thbPerUsd=null}={}){
  const zwp8Links=SCADA_LINKS_0553.filter(x=>x.to===site||x.from===site);
  const physicalGroup={radioODU:radios.length,radioIDU:idu.length,antenna:antennas.length,surge:surge.length};
  const issues=[
-  {id:"ZWP8-OWN-01",level:canQuantifyOverlap?"ERROR":"REVIEW",title:"Ethernet Surge B-8 posted twice",
+  {id:"ZWP8-OWN-01",level:sourceOverlapUSD===0?"RECONCILED":"ERROR",title:"B-8 surge source ownership after role allocation",
    amountUSD:sourceOverlapUSD,
-   details:"Both radio ODU scenario prices contain B-8 (USD "+units.surge+" each) and SA-502-002/003 each book the same B-8 as a separate surge cost owner. Remove from ODU only after controlled owner allocation; never delete the required surge scope."},
-  {id:"ZWP8-OWN-02",level:radioSourcesValid&&iduSourcesUnpriced?"ERROR":"REVIEW",title:"B-6/B-7 indoor PoE booked under ODU while IDU TAGs remain unpriced",
+   details:"Current A/B radio allocations exclude surge lines A-8 and B-8. Two separate SA physical owners retain their source rate once each; previous double charge is historical only."},
+  {id:"ZWP8-OWN-02",level:ownersVerified&&!iduSourcesUnpriced?"RECONCILED":"ERROR",title:"A-6/A-7 and B-6/B-7 PoE now assigned to independent IDU TAGs",
    amountUSD:wrongOwnerPOEUSD,
-   details:"ODU bundle includes B-6/B-7 USD "+units.poe+" each; two source IDU TAGs are recorded but not separately allocated. Move PoE interface value to IDU only once; this does NOT establish a compliant standalone IDU."},
+   details:"ODU working functions exclude PoE. Each IDU TAG is costed as industrial PoE plus cord only; still does not prove a complete certified IDU."},
   {id:"ZWP8-ENG-03",level:"REVIEW",title:"Two radio and two antenna NEW/reuse decisions not source-confirmed",
    amountUSD:null,
    details:"MTO Rev04 grouped row43 lists 2 ODU + 2 IDU + 2 antenna Set scopes for functional engineering. The ZPQ↔ZWP8 PTP connection is an EXISTING BASELINE link in BLD-0001 Rev.C1. BOD Rev.C2 §7.2 calls for an additional new capacity link after site survey, but does not turn the existing baseline link into two automatically replaceable radio/antenna assemblies. Confirm exact added hardware, reused interfaces and scope before procurement."},
-  {id:"ZWP8-ENG-04",level:"REVIEW",title:"4ft antenna alternative vs RPT/TC/CAL not reconciled",
+  {id:"ZWP8-ENG-04",level:"REVIEW",title:"PTMP 90-degree sector + PTP 4ft parabolic roles require RF confirmation",
    amountUSD:null,
-   details:"RPT ZWP8 connects ZWP20 and ZWP22 as PTMP sector endpoints and ZPQ as PTP parabolic. MTO row43 TC cites 6ft/6ft, CAL cites 4ft/4ft; quoting B-12 x2 4ft is a provisional cost scenario, not verified RF requirement."},
+   details:"PTMP uses ONE A-12 90-degree sector at ZWP8 shared by ZWP20 and ZWP22; angular geometry passes but vendor radiation pattern/calculation proof remains OPEN. The separate added PTP path has ONE B-12 parabolic candidate; existing PTP unchanged."},
   {id:"ZWP8-COM-05",level:"REVIEW",title:"Vendor source quoted quantity is not ZWP8 engineering purchase quantity",
    amountUSD:null,
-   details:"Next G original B-12 quotedQty="+(line("B-12")?.qty??"NA")+" globally while ZWP8 scenario assumes 2 antennas; B group radio lines quotedQty="+(line("B-1")?.qty??"NA")+" globally across possible sites. The original quote is not a supplier-confirmed ZWP8 quantity allocation."},
+   details:"One A-12 sector and one B-12 PTP parabolic are separately allocated; Vendor global quoted quantities do not determine ZWP8 procurement quantities. Licence A-3/B-4, NMS capacity and OEM acceptance remain unknown."},
   {id:"ZWP8-ENG-06",level:"REVIEW",title:"Existing PTP ZPQ–ZWP8 baseline versus BOD additional new link",amountUSD:null,
    details:"BLD Rev.C1 Sheet7/Notes9 depict/use the EXISTING communication link. BOD Rev.C2 §7.2 and SPE Rev.C2 §6.1.3 separately call for additional/new capacity after site survey. Existing physical link is not NEW procurement: identify whether the additional installation is parallel link/upgrade, its exact endpoints, equipment owner, antenna and cable before posting new hardware cost."}
  ];
@@ -80,7 +80,7 @@ export function auditZWP8CostOwnership0553({thbPerUsd=null}={}){
   adjustedOwnerTotalTHB:adjustedTHB,
   ledgerCoverage:{costed:ledger.costedRows,total:ledger.totalRows,unpricedTags:ledger.unresolvedRows.map(x=>x.tag)},
   otherSites,issues,
-  calculation:"Current quoted ZWP8 ledger = 2×(B1+B2+B3+B5+B6+B7+B8)+2×B12+2×B8+LAN+TCAB+Bulk; unique-owner what-if = current − 2×B8",
+  calculation:"ZWP8 working = A1+A2+A4+A5 (one PTMP base) + A6+A7 (one IDU interface) + A12 (one 90° sector) + B1+B2+B3+B5 (one additional PTP candidate) + B6+B7 (one PTP IDU interface) + B12 (one PTP parabolic) + two individually owned surge rates + separately posted LAN/TCAB/Bulk. Existing assets excluded as new purchases.",
   flags:{verifiedArithmetic:canQuantifyOverlap,uniqueCostOwnerPassed:ownersVerified&&surgeSourcesValid&&sourceOverlapUSD===0,
    vendorTechApproved:false,baseStationLicenceApproved:false,nmsEntitlementVerified:false,physicalNewReuseApproved:false,customerReleased:false},
   policy:"AUDIT_ONLY_DO_NOT_MUTATE_LOCKED_LEDGER_OR_AUTO_APPROVE_DESIGN"
