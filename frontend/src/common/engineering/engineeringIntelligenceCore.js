@@ -62,6 +62,8 @@ export function evaluateEngineeringConstraint({constraint,propertyEvidence,appro
 /** Explicitly prohibits automatic selection, including preferred/non-AVL products. */
 export function evaluateEngineeringCandidate({requirement,candidate,aliases={},approvedNotApplicable=[]}){
  const r=requirement||{},p=candidate||{};
+ const requirementSourceTraceValid=Boolean(r.id&&Array.isArray(r.sourceRefs)&&r.sourceRefs.some(ref=>clean(ref)));
+ const candidateSourceTraceValid=Boolean(p.id&&clean(p.quotationRef));
  const functionMatch=classifyFunctionMatch({
   requiredFunction:r.functionId,candidateFunctions:p.functions,aliases
  });
@@ -78,10 +80,13 @@ export function evaluateEngineeringCandidate({requirement,candidate,aliases={},a
  else if(functionMatch.state==="FUNCTION_MATCH"&&hard.length>0&&unknown.length===0)
   status="EVIDENCE_MATCH_NOT_APPROVED";
  else status="QUALIFIED_REVIEW";
- if(!r.functionId||!Array.isArray(r.constraints)||r.constraints.length===0)status="QUALIFIED_REVIEW";
+ if(!r.functionId||!Array.isArray(r.constraints)||r.constraints.length===0||!requirementSourceTraceValid||!candidateSourceTraceValid){
+  if(status!=="HARD_CONFLICT")status="QUALIFIED_REVIEW";
+ }
  return {
   kernelVersion:INTELLIGENCE_RULE_VERSION,requirementId:r.id||null,candidateId:p.id||null,
   sourceQuoteRef:p.quotationRef||null,manufacturer:p.manufacturer||null,
+  requirementSourceTraceValid,candidateSourceTraceValid,
   functionMatch,hardConstraintCount:hard.length,constraints,unverified:unknown.map(x=>x.constraintId),
   conflicts:conflicts.map(x=>x.constraintId),notApplicable:knownNonApplicable.map(x=>x.constraintId),
   preference:p.preferredByManagement===true?"MANAGEMENT_PREFERRED_NOT_APPROVED":"NO_PREFERENCE",
