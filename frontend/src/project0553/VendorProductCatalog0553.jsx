@@ -64,6 +64,21 @@ export function VendorProductCatalog0553(){
    <p><strong>Source:</strong> {selectedCommercial.sourceUrl?<a href={selectedCommercial.sourceUrl} target="_blank" rel="noreferrer">Open source document</a>:selectedCommercial.source||"NOT CAPTURED"}</p>
    <p>Scope: {selectedCommercial.scope||"OPEN"} · Currency: {selectedCommercial.currency||"OPEN"} · Valid until: {selectedCommercial.validUntil||"NOT RECORDED"} · Quote status: {selectedCommercial.quoteStatus}</p>
    <p><strong>Commercial verification:</strong> {selectedCommercial.verification}. Delivery, incoterm, payment, warranty, taxes, exclusions, freight and certifications must be verified against the original PDF before project-cost adoption.</p>
+   {selectedCommercial.originalQuote?.commercialTerms&&<section className="p55-panel" data-component-key="bid.vendor.products.quotation.NG-260916" style={{padding:14}}>
+     <h4>Next G · Complete Original Quotation Conditions / เงื่อนไขต้นฉบับ</h4>
+     <p><strong>Supplier:</strong> {selectedCommercial.originalQuote.commercialTerms.supplier.name} · {selectedCommercial.originalQuote.commercialTerms.supplier.address} · Tax ID {selectedCommercial.originalQuote.commercialTerms.supplier.taxId}</p>
+     <p><strong>Customer:</strong> {selectedCommercial.originalQuote.commercialTerms.customer.name} · {selectedCommercial.originalQuote.commercialTerms.customer.address}</p>
+     <p><strong>Quoted system:</strong> {selectedCommercial.originalQuote.commercialTerms.quotationHeading.scope} · USD {selectedCommercial.originalQuote.commercialTerms.quotationHeading.grandTotal.toLocaleString("en-US",{minimumFractionDigits:2})} · {selectedCommercial.originalQuote.commercialTerms.quotationHeading.originalBOQLineCount} original BOQ lines</p>
+     <p><a href={selectedCommercial.originalQuote.commercialTerms.sourceUrl} target="_blank" rel="noreferrer">Original supplier PDF</a> · <a href={selectedCommercial.originalQuote.commercialTerms.rfqFolder} target="_blank" rel="noreferrer">Client RFQ/TC folder</a></p>
+     <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Clause ID / Topic</th><th>Original supplier text</th><th>Recorded meaning</th><th>RFQ / TC comparison and action</th></tr></thead><tbody>
+      {selectedCommercial.originalQuote.commercialTerms.sourceTermRecords.map(t=><tr key={t.id}><td><strong>{t.id}</strong><small>{t.topic}</small></td><td>{t.originalText}</td><td>{t.value}</td><td>{t.implication}<small>{t.verification}</small></td></tr>)}
+     </tbody></table></div>
+     <h4>Not explicitly committed in the supplier quotation — clarification register</h4>
+     <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Subject</th><th>Evidence classification</th><th>Question / control</th></tr></thead><tbody>
+      {selectedCommercial.originalQuote.commercialTerms.sourceNotStated.map(t=><tr key={t.topic}><td>{t.topic}</td><td>{t.state}</td><td>{t.note}</td></tr>)}
+     </tbody></table></div>
+     <p className="p55-note"><strong>Preservation rule:</strong> Original 53 BOQ lines, quoted currency, source null/dashes and original supplier terms are retained. These terms are separate from RFQ requirements, technical acceptance, site allocation and customer pricing; no silent override.</p>
+    </section>}
    <p className="p55-note">This is a read-only quotation-header view. Original quote lines and cost calculations have not changed.</p>
   </div>}
   <div className="p55-panel" style={{marginBottom:12,padding:14}}>
