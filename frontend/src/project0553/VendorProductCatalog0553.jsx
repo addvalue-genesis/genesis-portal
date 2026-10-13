@@ -16,6 +16,7 @@ export function VendorProductCatalog0553(){
  const [view,setView]=useState("supplier");
  const [mr,setMr]=useState("ALL");
  const [vendor,setVendor]=useState("ALL");
+ const [companyQuery,setCompanyQuery]=useState("");
  const [search,setSearch]=useState("");
  const [evidenceClass,setEvidenceClass]=useState("ALL");
  const [chosenQuote,setChosenQuote]=useState("");
@@ -25,11 +26,20 @@ export function VendorProductCatalog0553(){
  const suppliersById=new Map(catalog.suppliers.map(v=>[v.id,v]));
  const productsById=new Map(catalog.products.map(p=>[p.id,p]));
  const quoteById=new Map(commercial.map(q=>[q.quoteId,q]));
- const allowedQuotes=commercial.filter(q=>vendor==="ALL"||canonicalCompanyId0553(q.vendor)===vendor);
+ const companyCollator=new Intl.Collator("en",{sensitivity:"base",numeric:true});
+ const sortedSuppliers=[...catalog.suppliers].sort((a,b)=>companyCollator.compare(a.name,b.name));
+ const matchingSuppliers=sortedSuppliers.filter(company=>[company.name,...(company.aliases||[]),...(company.sourceSupplierLabels||[])].join(" ").toLocaleLowerCase().includes(companyQuery.trim().toLocaleLowerCase()));
+ const sortedQuotes=[...commercial].sort((a,b)=>companyCollator.compare(resolveCompany0553(a.vendor).name,resolveCompany0553(b.vendor).name)||companyCollator.compare(a.quotationNo||"",b.quotationNo||""));
+ const allowedQuotes=sortedQuotes.filter(q=>(vendor==="ALL"||canonicalCompanyId0553(q.vendor)===vendor)&&(!companyQuery||matchingSuppliers.some(s=>s.id===canonicalCompanyId0553(q.vendor))));
  const chooseVendor=value=>{setVendor(value);setChosenQuote("");};
  const chooseQuote=value=>{setChosenQuote(value);if(value){const q=quoteById.get(value);if(q)setVendor(canonicalCompanyId0553(q.vendor));}};
  const rows=catalog.relationships.filter(x=>{
   if(evidenceClass!=="ALL"&&(evidenceClass==="CURRENT"?x.sourceClass!=="SUPPLIER_QUOTATION":evidenceClass==="HISTORICAL"?!String(x.sourceClass||"").includes("HISTORICAL"):evidenceClass==="DATASHEET"?!["MANUFACTURER_BROCHURE","DATASHEET_ONLY"].includes(x.sourceClass):!String(x.sourceClass||"").startsWith("WEB")))return false;
+  if((view==="supplier"||view==="quote")&&companyQuery.trim()){
+   const selected=suppliersById.get(x.vendorId);
+   const source=[selected?.name,...(selected?.aliases||[]),...(selected?.sourceSupplierLabels||[])].join(" ").toLocaleLowerCase();
+   if(!source.includes(companyQuery.trim().toLocaleLowerCase()))return false;
+  }
   if(view==="supplier" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
   if(view==="supplier" && chosenQuote&&x.quoteId!==chosenQuote)return false;
   if(view==="quote" && !x.quoteId)return false;
@@ -41,7 +51,7 @@ export function VendorProductCatalog0553(){
   if(!search)return true;
   return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,x.description,productsById.get(x.productKey)?.description,x.sourceSupplierLabel,x.sourceThirdParty,x.sourceSupplierRole,suppliersById.get(x.vendorId)?.name,...(suppliersById.get(x.vendorId)?.aliases||[])].join(" ").toLowerCase().includes(search.toLowerCase());
  });
- const resetSearch=()=>{setView("supplier");setMr("ALL");setVendor("ALL");setSearch("");setEvidenceClass("ALL");setChosenQuote("");};
+ const resetSearch=()=>{setView("supplier");setMr("ALL");setVendor("ALL");setCompanyQuery("");setSearch("");setEvidenceClass("ALL");setChosenQuote("");};
  const groups=new Map();
  const groupKey=r=>view==="quote"?(r.quoteId||"NO_QUOTE"):view==="product"?r.productKey:(view==="mr"||view==="compare")?(r.mr||"NO_MR"):r.vendorId;
  const groupLabel=id=>{
@@ -62,10 +72,16 @@ export function VendorProductCatalog0553(){
     total={catalog.relationships.length} shown={rows.length} onReset={resetSearch}
     description="Search known companies, manufacturers, part numbers, functions, MR and historical quotations; matches do not imply AVL approval."
     controls={[
-     {key:"view",label:"View / Group By",type:"select",value:view,onChange:value=>{setView(value);setVendor("ALL");setChosenQuote("");setMr("ALL");},
+     {key:"view",label:"View / Group By",type:"select",value:view,onChange:value=>{setView(value);setVendor("ALL");setCompanyQuery("");setChosenQuote("");setMr("ALL");},
        options:[{value:"supplier",label:"Company / Supplier"},{value:"quote",label:"Quotation"},{value:"product",label:"Product / Model"},{value:"mr",label:"MR / System"},{value:"compare",label:"TBE / CBE Candidates"}]},
-     ...(view==="supplier"||view==="quote"?[{key:"vendor",label:"Supplier",type:"select",value:vendor,onChange:chooseVendor,
-       options:[{value:"ALL",label:"All Suppliers ("+catalog.suppliers.length+")"},...catalog.suppliers.map(v=>({value:v.id,label:v.name}))]}]:[]),
+     ...(view==="supplier"||view==="quote"?[
+       {key:"companyQuery",label:"Type company / ค้นหาบริษัท (A–Z)",type:"search",value:companyQuery,
+        onChange:value=>{setCompanyQuery(value);setVendor("ALL");setChosenQuote("");},
+        placeholder:"CSS, EXION, MGW, RS, CommScope"},
+       {key:"vendor",label:"Supplier (alphabetical)",type:"select",value:vendor,onChange:chooseVendor,
+        options:[{value:"ALL",label:"All suppliers ("+matchingSuppliers.length+" / "+sortedSuppliers.length+")"},
+        ...matchingSuppliers.map(v=>({value:v.id,label:v.name}))]}
+     ]:[]),
      ...(view==="mr"||view==="compare"?[{key:"mr",label:"MR / System",type:"select",value:mr,onChange:setMr,
        options:[{value:"ALL",label:"All MR Systems"},...["MR-0001","MR-0002","MR-0003","MR-0004"].map(v=>({value:v,label:v}))]}]:[]),
      {key:"evidence",label:"Evidence class",type:"select",value:evidenceClass,onChange:setEvidenceClass,
