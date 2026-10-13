@@ -46,10 +46,10 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
  const itemRows=overrides.mtoRows??MTO.itemRows;
  const sourceMatches=itemRows.filter(r=>r.platform===PILOT.site&&r.sourceRowIndex===PILOT.row&&keyOf(r)===PILOT.tag);
  const source=sourceMatches[0]||null;
- const blocked=(source=null,details=[])=>{
+ const blocked=(source=null,details=[],extra={})=>{
   for(const eq of EQ.equations)if(!stages.some(x=>x.id===eq.id))stages.push({id:eq.id,name:eq.name,status:"SKIPPED",details:"Previous mandatory mapping stage failed; no downstream result evaluated"});
   return {pilot:PILOT,equations:EQ.equations,stages,errors,details,status:"MAPPING_BLOCKED",
-   source,ownerReconciliation:[],technical:[],budgetaryProceed:false,
+   source,ownerReconciliation:extra.ownerReconciliation||[],technical:extra.technical||[],budgetaryProceed:false,
    ledgerMutation:false,approvedVendorSelection:false,technicalCompliancePassed:false,releaseAllowed:false};
  };
  const sourceOK=sourceMatches.length===1&&source.sourceQty===1&&source.sourceUnit==="Set"&&!source.groupedRow;
@@ -132,7 +132,8 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
  const qOK=details.every(x=>x.engineeringQty===1&&
   ["DOCUMENT_DERIVED_PRELIMINARY","PARAMETRIC_1_PER_RADIO_ASSUMPTION","ENGINEERING_SOURCE","MTO_SEPARATE_TAG_QTY"].includes(x.engineeringState));
  // Vendor source rate must remain NULL for region, no fabricated zero quoted rate.
- push("MAP-06",Boolean(qOK),"Quantity one per applicable working function has separate MTO/Topology basis; NG quoted quantity three remains evidence only");
+ push("MAP-06",Boolean(qOK),"Every physical function has quantity derived from its TAG or RPT topology, not from supplier offered quantity");
+ if(!qOK)return blocked(source,details,{technical});
  const ownerIds=new Set(details.map(x=>x.quoteLine));
  const ownersOK=ownerIds.size===details.length&&
   FINANCIAL_CODES.every(c=>!!COST_OWNER[c])&&
@@ -140,6 +141,7 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
   details.find(d=>d.quoteLine==="B-8")?.costOwner==="SA-502-001.10"&&
   details.find(d=>d.quoteLine==="B-12")?.costOwner==="ANT-502-001.6";
  push("MAP-07",Boolean(ownersOK),"Every named quote line has exactly one intended TAG+row owner; power IDU row5, surge row10, antenna row6");
+ if(!ownersOK)return blocked(source,details,{technical});
  // MAP-08: independently calculate every physical function using the shared equation kernel.
  // The vendor B-4 source rate is NULL; the ZERO incremental management scenario is SEPARATE,
  // identified and never represented as a confirmed supplier rate.
@@ -163,6 +165,7 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
  });
  push("MAP-08",Boolean(ratesOK),
   "Independent quantity × original currency unit rate; B-4 retains vendor NULL with named incremental management assumption only");
+ if(!ratesOK)return blocked(source,details,{technical});
  const ledgerForAudit=[
   {ownerId:"MR-502-001.4",row:4,tag:"MR-502-001"},
   {ownerId:"MR-502-001A.5",row:5,tag:"MR-502-001A"},
@@ -189,6 +192,7 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
  push("MAP-09",reconOK,
   reconOK?"Four physical TAG owners reconciled to unchanged source ledger with USD0.01 tolerance; distinct source-line allocation verified":
    "Owner, TAG identity, source quantity, rate, currency or cost does not match frozen ZWP20 ledger; no repricing");
+ if(!reconOK)return blocked(source,details,{technical,ownerReconciliation:checkOwners});
  const internalProceed=stages.filter(x=>x.id!=="MAP-05").every(x=>x.status==="PASS");
  push("MAP-10",internalProceed,
   internalProceed?"Internal budget may proceed under recorded qualification; release remains forbidden until technical certificates, Myanmar entitlement, NMS, validity and OEM proof":
