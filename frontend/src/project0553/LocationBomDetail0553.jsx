@@ -1,5 +1,6 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {traceTagParticular0553} from "./data/documentParticularTrace0553";
 import {recoverMR0001Evidence0553} from "./data/mr0001EvidenceRecovery0553";
 import {MR0001_MODULE_CROSSMAP_0553} from "./data/mr0001ModuleCrossmap0553";
 import {selectMR0001TagCostRows0553,summarizeMR0001TagCost0553} from "./data/mr0001TagCostLedger0553";
@@ -44,6 +45,15 @@ export function LocationBomDetail0553({site,fx}){
     {expanded[v.tag]&&<tr><td colSpan={6}><div className="p55-panel">
      <strong>{v.tag} · Row {v.row} — Engineering Derivation / Vendor Breakdown</strong><p><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row+".derivation"}/></p>
      <p className="p55-note">Quantity owner: MR/MTO · Cost owner: {v.source} · {v.status} · Selected vendor cost is not customer selling price.</p>
+     {(()=>{const trace=traceTagParticular0553(site,v.tag);const rows=[...trace.direct,...trace.siteSpecific];return <details className="p55-panel" data-component-key={keyPrefix+"."+String(v.tag).toLowerCase()+".particular-evidence"}>
+      <summary><strong>RFQ Particular Evidence / SI Engineering Proof — {trace.direct.length} TAG + {trace.siteSpecific.length} Site + {trace.common.length} Common; {trace.conflicts.length} Conflict Gates</strong></summary>
+      <p className="p55-note">Requirements derive from MR/BOD/DTS/SPE/RPT/BLD. Clause evidence is independent from existing priced vendor/quantity ledger. Review every linked note, comment and attachment; show applicable common constraints in 04 Documents.</p>
+      <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Document / Clause</th><th>Customer Requirement</th><th>SI Proof / Design Task</th><th>Cost Driver</th></tr></thead><tbody>
+       {rows.map(r=><tr key={r.id}><td><strong>{r.document} · {r.section}</strong><small>p.{r.page} · {r.type} · {r.id}</small></td><td>{r.topic}<small>{r.requirement}</small></td><td>{r.siAction}</td><td>{r.costDriver}<small>Review before price release</small></td></tr>)}
+      </tbody></table></div>
+      {trace.conflicts.length>0&&<p className="p55-note"><strong>Unresolved cross-document gates:</strong> {trace.conflicts.map(r=>r.id+" "+r.topic).join(" · ")}</p>}
+      <p className="p55-note">This trace is advisory only and does not change current quantities, selected products, A/B/C, or working totals.</p>
+     </details>})()}
      {v.tag==="MR-502-001"&&site==="ZWP21"&&<p className="p55-note"><strong>Functional mapping from ZWP20 reference:</strong> ZWP20 MR-502-001 Row 4 (PTMP remote) → ZWP21 MR-502-001 Row 13 (PTP peer). Matching child functions: Radio hardware, RF filter, throughput/capacity entitlement and RF mounting. Different RPT role / quote group; no automatic SKU or region entitlement transfer. Separate power/IDU and surge owners must remain separate.</p>}
      {v.tag==="MR-502-001"&&site==="ZWP21"&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
       <thead><tr><th>Function</th><th>ZWP20 Reference</th><th>ZWP21 Budgetary</th><th>Cost Owner</th><th>Engineering Control</th></tr></thead><tbody>
