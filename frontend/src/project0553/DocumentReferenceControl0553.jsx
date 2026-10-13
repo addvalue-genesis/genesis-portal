@@ -1,4 +1,5 @@
 import React from "react";
+import {assessVendorEvidenceForBudget0553} from "./data/vendorExternalEvidence0553";
 import { buildReferenceRegister, assessReferenceReadiness, REFERENCE_STATES } from "../common/engineering/documentReferences";
 
 // Transcribed from user-provided BOD-0001 Rev.C2 page 10, §4.1.
@@ -23,6 +24,18 @@ export function DocumentReferenceControl0553() {
  return <section className="p55-section" style={{marginTop:20}}>
    <h2>Document references / Notes / Comments — 0553</h2>
    <p>เอกสารอ้างอิงจาก BOD Rev.C2 §4.1 หน้า 10 จำนวน {result.total} รายการ ยังไม่ยืนยันว่าไฟล์ต้นฉบับหรือ Revision ที่ใช้ในสัญญาถูกต้องครบถ้วน</p>
+   <details style={{marginBottom:12}} data-component-key="bid.documents.vendor-source-index">
+    <summary><strong>Vendor / Manufacturer / Web / Historical Procurement Evidence ({assessVendorEvidenceForBudget0553().count})</strong></summary>
+    <p>ข้อมูลภายนอกเหล่านี้เป็นเอกสาร/หน้าสินค้าอ้างอิง ไม่ใช่ Customer RFQ และไม่ใช่ Approved BOM. จัดทะเบียนร่วมกับ Vendor Products เพื่อให้ตรวจสอบ Technical Datasheet / Price / UOM ได้โดยไม่สร้างแหล่งข้อมูลซ้ำ</p>
+    <div style={{overflowX:"auto"}}><table style={{width:"100%",borderCollapse:"collapse",fontSize:14}}><thead><tr>{["Evidence ID","Supplier / SKU","Evidence Type","Source / Original","Engineering / Budget Gate"].map(h=><th key={h} style={{border:"1px solid #b7c7d5",padding:9,textAlign:"left"}}>{h}</th>)}</tr></thead>
+     <tbody>{assessVendorEvidenceForBudget0553().rows.map(e=><tr key={e.id}>
+      <td style={{border:"1px solid #ccd5de",padding:9}}>{e.id}</td>
+      <td style={{border:"1px solid #ccd5de",padding:9}}>{e.supplier} · {e.sku}</td>
+      <td style={{border:"1px solid #ccd5de",padding:9}}>{e.sourceClass}</td>
+      <td style={{border:"1px solid #ccd5de",padding:9}}>{e.url?<a href={e.url} target="_blank" rel="noreferrer">Original website</a>:e.reference}</td>
+      <td style={{border:"1px solid #ccd5de",padding:9}}>{e.technicalState} · {e.budgetaryRateStatus}</td>
+     </tr>)}</tbody></table></div>
+   </details>
    <details open><summary><strong>BOD §4 — Reference Documents ({result.total})</strong></summary>
    <div style={{overflowX:"auto"}}>
    <table style={{width:"100%",borderCollapse:"collapse",fontSize:14}}>
