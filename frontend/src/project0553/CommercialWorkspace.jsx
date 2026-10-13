@@ -1,6 +1,7 @@
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import PARTICULAR from "./data/documentParticularRequirements0553.json";
 import PARTICULAR_CONFLICTS from "./data/documentParticularConflicts0553.json";
+import WORKING_DECISIONS from "./data/siProceedWithQualifications0553.json";
 import {EstimateToBidMapping0553} from "./EstimateToBidMapping0553";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { InternalBudgetShortcut0553 } from "./InternalBudgetShortcut0553";
@@ -53,6 +54,10 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  <details className="p55-panel" data-component-key="bid.budget.particular-source-gates">
   <summary><strong>Budgetary 10 — RFQ Particular Scope &amp; Conflict Gates</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.particular-source-gates"/></summary>
   <p className="p55-note">The 04 Documents particular matrix holds {PARTICULAR.records.length} source-linked engineering requirements and {PARTICULAR_CONFLICTS.records.length} cross-document review issues. This budget view references that same source, not a copied rate table or new costing model.</p>
+  <p className="p55-note">Working basis: {WORKING_DECISIONS.controls.continuationStatus}. Internal budget proceeds using documented assumptions; original customer scope and prices are unchanged.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Decision</th><th>Budget Basis</th></tr></thead><tbody>
+    {WORKING_DECISIONS.workingDecisions.map(d=><tr key={d.id}><td>{d.id}<small>{d.scope}</small></td><td>{d.commercialTreatment}<small>{d.offerBasis}</small></td></tr>)}
+  </tbody></table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Engineering Issue</th><th>Budgetary Requirement / Gate</th></tr></thead>
   <tbody>{PARTICULAR_CONFLICTS.records.filter(r=>r.severity==="CRITICAL"||r.severity==="HIGH").map(r=><tr key={r.id}><td>{r.id} · {r.topic}</td><td>{r.siDecisionGate}<small>Engineering Review · No automatic repricing</small></td></tr>)}</tbody></table></div>
   <p className="p55-note">Before adopting a source into Cost: requirement → TAG/site → SI function → physical quantity → vendor proof/AVL → exactly one CBS cost owner. Source notes/comments/appendices and RPT/BLD must be checked as well as MR MTO.</p>
