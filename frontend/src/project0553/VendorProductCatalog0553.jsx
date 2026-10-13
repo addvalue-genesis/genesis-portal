@@ -1,6 +1,7 @@
 import React,{useMemo,useState} from "react";
 import {VENDOR_UNIFIED_CATALOG_0553} from "./data/vendorUnifiedCatalog0553";
 import HISTORICAL_VENDOR from "./data/historicalVendorEvidence0553.json";
+import VENDOR_KNOWLEDGE from "./data/vendorKnowledgeProducts0553.json";
 import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
 import {MR0002_PRICE_REGISTRY_0553} from "./data/mr0002PriceRegistry0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
@@ -84,6 +85,16 @@ export function VendorProductCatalog0553(){
     </section>}
    <p className="p55-note">This is a read-only quotation-header view. Original quote lines and cost calculations have not changed.</p>
   </div>}
+  <details className="p55-panel" data-component-key="bid.vendor.products.knowledge" style={{padding:14,marginBottom:12}}>
+   <summary><strong>Manufacturer Knowledge Products ({VENDOR_KNOWLEDGE.records.length}) — Datasheet source records</strong></summary>
+   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Manufacturer / Product</th><th>Technical functions</th><th>Original Reference</th><th>RFQ Mapping / Cost</th></tr></thead><tbody>
+    {VENDOR_KNOWLEDGE.records.map(v=><tr key={v.id}><td><strong>{v.manufacturer}</strong><small>{v.product}</small><small>{v.category}</small></td>
+     <td>{v.specifications.hazardousArea} · {v.specifications.ingressProtection}<small>{v.specifications.frequencyMHz.xBand[0]}–{v.specifications.frequencyMHz.xBand[1]} MHz X band · {v.specifications.frequencyMHz.sBand[0]}–{v.specifications.frequencyMHz.sBand[1]} MHz S band</small><small>Input {v.specifications.dcInputVoltageV.min}–{v.specifications.dcInputVoltageV.max} VDC · Avg {v.specifications.averagePowerW}W</small><small>ATEX / IECEx cert: {v.specifications.certifications.join(" · ")}</small></td>
+     <td><a href={v.sourceUrl} target="_blank" rel="noreferrer">{v.sourceDocument}</a><small>{v.sourceState}</small></td>
+     <td>{v.projectCandidate} — {v.technicalAssessment}<small>Source price: NOT QUOTED · NOT BOOKED IN BUDGET</small></td>
+    </tr>)}
+   </tbody></table></div>
+  </details>
   {dataSheetProducts.length>0&&<div className="p55-panel" style={{marginBottom:14,padding:14}}>
     <h3>Product Datasheets (no quotation recorded)</h3><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.datasheets"/>
     <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Supplier / Source</th><th>Product / Model</th><th>MR</th><th>Datasheet</th><th>Unit Price</th></tr></thead><tbody>
