@@ -44,8 +44,8 @@ export function deriveAbcWorkingReadiness0553({site="ALL",thbPerUsd=null}={}){
   priceEvidenceCoverageNotApproval:true,
   A:{originalUSD:subtotalUSD,originalTHB:subtotalTHB,knownWorkingTHB,
     postedRows,totalRows,unpostedRows:totalRows-postedRows,currencyIssues,
-    complete:currentAComplete,knownBasis:"MR0001_TAG_LEDGER_EQUIPMENT_AND_ATTRIBUTABLE_BULK",
-    fullCostTHB:currentAComplete?knownWorkingTHB:null,
+    allocatedTagCoverageComplete:currentAComplete,knownBasis:"MR0001_TAG_LEDGER_EQUIPMENT_AND_ATTRIBUTABLE_BULK",
+    fullCostTHB:null, // Physical/OEM approval and other MR A remain outside this projection.
     action:totalRows===postedRows?"Check physical SKU/CAL/OEM/scope approval; source-priced is not acceptance":
     "Close unposted MTO TAGs and engineering/bulk/quotation ownership before certifying Part A"},
   B:{costTHB:null,costMappedRows:bCostsMapped.length,sourceWbsRows:bRows,
