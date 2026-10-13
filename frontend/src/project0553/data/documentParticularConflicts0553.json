@@ -1,0 +1,230 @@
+{
+  "projectId": "PJ2608-0553",
+  "revision": "ParticularConflictRegister_Rev01",
+  "records": [
+    {
+      "id": "CFG-01",
+      "severity": "CRITICAL",
+      "topic": "ZPQ–ZWP8 link",
+      "sourceA": "BOD C2 §7.2 says existing link is insufficient and new PTP required",
+      "sourceB": "BLD C1 sheet3 note9 says existing ZPQ–ZWP8 link shall be used",
+      "siDecisionGate": "Preserve both; the explicit post-survey link addition must be priced pending clarification of BLD note",
+      "tags": [
+        "ZPQ",
+        "ZWP8",
+        "ZWP20",
+        "ZWP22"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-02",
+      "severity": "HIGH",
+      "topic": "VHF Marine Radio scope",
+      "sourceA": "BOD C2 review comment states remove VHF Marine Radio; SPE C2 comment agrees",
+      "sourceB": "BLD C1 note6 still describes VHF FM marine radio",
+      "siDecisionGate": "Treat as inconsistent residual note; do not assume a VHF purchase",
+      "tags": [
+        "MR0002",
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-03",
+      "severity": "HIGH",
+      "topic": "ZWP20 antenna 6ft vs management 4ft",
+      "sourceA": "BOD C2 §7.2 and RPT C1 §6.1.1 identify 6ft, 40.9dBi, antenna center 21.5m",
+      "sourceB": "Earlier internal provisional cost scenario considers 4ft alternative",
+      "siDecisionGate": "4ft is an alternative not released requirement; new path/RF reflection/availability proof and company approval needed",
+      "tags": [
+        "ZWP20",
+        "ANT-502-001"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-04",
+      "severity": "HIGH",
+      "topic": "SCADA encryption",
+      "sourceA": "BOD C2 §7.1 states AES128 in process data network",
+      "sourceB": "DTS C1 sheet4 item32 states AES256",
+      "siDecisionGate": "Compare actual equipment cipher capability, seek approved interpretation; no automatic downgrade",
+      "tags": [
+        "MR-502-001",
+        "ZWP20"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-05",
+      "severity": "MEDIUM",
+      "topic": "Latency",
+      "sourceA": "BOD C2 §7.2 gives max20ms per-hop link and <=150ms VoIP",
+      "sourceB": "DTS C1 sheet4 item34 says <10ms",
+      "siDecisionGate": "Use separate metrics and demonstrate <10ms radio where applicable; submit discrepancy as clarification if infeasible",
+      "tags": [
+        "MR-502-001",
+        "ZWP20"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-06",
+      "severity": "HIGH",
+      "topic": "Telephone architecture",
+      "sourceA": "BOD C2 §7.3 specifies VoIP/SIP via existing PABX FXS/gateway",
+      "sourceB": "SPE C2 §6.2 says Explosion proof Analogue Telephone while also specifying SIP/IP",
+      "siDecisionGate": "Vendor Gai-Tronics SIP model cannot be treated as auto-complying with analogue wording; confirm PABX/FXS/gateway interface",
+      "tags": [
+        "MR0003",
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-07",
+      "severity": "MEDIUM",
+      "topic": "Test witness notice",
+      "sourceA": "MR C1 §7.2 and BOD C2 §10 specify >=30 days",
+      "sourceB": "SPE C2 §7.3 specifies >=14 calendar days",
+      "siDecisionGate": "Budget/schedule >=30 days unless written contract clarification says otherwise",
+      "tags": [
+        "SYSTEM"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-08",
+      "severity": "HIGH",
+      "topic": "Cabling trays",
+      "sourceA": "BOD C2 §7.7 mentions instrument cable trays/ladders with separate coax tray",
+      "sourceB": "SPE C2 §6.6.5 restricts telecom cables to telecom trays, no sharing, 30cm separation",
+      "siDecisionGate": "Create cable route scope and confirm available tray use; do not assume free tie-in to existing instrument tray",
+      "tags": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-09",
+      "severity": "HIGH",
+      "topic": "RACON alternative compliance",
+      "sourceA": "SPE C2 §6.4 requires -50dBm sensitivity, RS232, copper-free aluminum, 18–32V nominal",
+      "sourceB": "Stored Phalcon-EX brochure states -40dBm, RS485-USB, SS316L base, 9–36V",
+      "siDecisionGate": "Functionally related only; technical equivalence NOT established; request OEM package details and deviation",
+      "tags": [
+        "MR0004",
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-10",
+      "severity": "HIGH",
+      "topic": "RF feeder sizing",
+      "sourceA": "DTS C1 sheet6 describes nominal 1/2in feeder as reference",
+      "sourceB": "SPE C2 §6.6 requires 7/8in if antenna and ODU separated by >5m",
+      "siDecisionGate": "Evaluate actual route length by site; specific rule may require 7/8in with 1/2in jumper; verify connector set",
+      "tags": [
+        "ANT-502-001",
+        "MR-502-001"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-11",
+      "severity": "HIGH",
+      "topic": "IDU presence",
+      "sourceA": "MR C1 §5 lists physically separate Subscriber Radio IDU TAG",
+      "sourceB": "Next G quote B1 is outdoor remote, B6 PoE power only; no standalone IDU proven",
+      "siDecisionGate": "Prove architectural equivalence and full Ex installation package; maintain IDU function/cost gap until accepted",
+      "tags": [
+        "MR-502-001A",
+        "ZWP20"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-12",
+      "severity": "MEDIUM",
+      "topic": "Enclosure IP and entries",
+      "sourceA": "SPE §6.1.4 specifies minimum IP55 for IDU housing and §6.5 often expects IP66 and 20% spare entries",
+      "sourceB": "DTS C1 sheet4 lists IP66 and min18 cable entries",
+      "siDecisionGate": "Check complete enclosure against location and all constraints; do not silently pick weakest minimum",
+      "tags": [
+        "TCAB-500-001"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-13",
+      "severity": "HIGH",
+      "topic": "RPT link budget formula transcription",
+      "sourceA": "RPT C1 §4.4 text displays malformed FSL mathematical expression (parentheses/log layout)",
+      "sourceB": "First-principle FSPL needs separate validated equation and units",
+      "siDecisionGate": "Do not transcribe malformed formula into costing/calculation code; verify standard FSPL and recompute",
+      "tags": [
+        "MR-502-001",
+        "ANT-502-001"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    },
+    {
+      "id": "CFG-14",
+      "severity": "MEDIUM",
+      "topic": "Supplier AVL vs relationships",
+      "sourceA": "SPE C2 §12 requires COMPANY approved vendor list or approval of other subvendors",
+      "sourceB": "07 Vendor includes ADDVALUE quotation history and unapproved manufacturer/product records",
+      "siDecisionGate": "Historical/known is not project AVL approved; capture approval scope and evidence before selection",
+      "tags": [
+        "SYSTEM"
+      ],
+      "resolution": "REVIEW_REQUIRED",
+      "closedByCompany": false,
+      "budgetMutationAllowed": false
+    }
+  ],
+  "notes": [
+    "Conflict entries are engineering interpretation and questions, not contractual conclusions",
+    "Written client approval/revision control needed before accepting alternatives",
+    "Already-closed historical reviewer comments do not automatically close these cross-document implementation questions"
+  ],
+  "releaseAllowed": false
+}
