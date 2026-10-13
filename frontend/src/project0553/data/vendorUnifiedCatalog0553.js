@@ -151,6 +151,7 @@ const resolvedRelationships=relationships.map(row=>{
  return {...row,vendorId:company.id,companyId:company.id,
   originalVendorId:row.vendorId,sourceSupplierLabel:sourceName,
   sourceSupplierRole:company.relation,sourceThirdParty:company.thirdParty,
+  relationshipRole:row.sourceSupplierRole||company.relation,
   companyQualification:company.qualification};
 });
 export const VENDOR_UNIFIED_CATALOG_0553=Object.freeze({
