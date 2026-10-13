@@ -77,6 +77,14 @@ Implementation:
 - `validate-0553-tag-four-stage-bom.cjs`: ตรวจ Required 8 functions, ODU 5 quoted codes, IDU cost owner split, B-4 supplier NULL, unchanged frozen cost ledger, 4 stage IDs and JSX.
 - โค้ดไปรันผ่าน `npm run validate:0553-tag-four-stage-bom` และ `npm run build` บนเครื่องผู้ใช้.
 
+### วิธีแสดงฟังก์ชันของ IDU / Surge / Antenna โดยไม่สร้าง Cost Ledger ซ้ำ
+สำหรับ ZWP20 `MR-502-001A.5`, `SA-502-001.10`, และ `ANT-502-001.6` หาก TAG Ledger เดิมมีเฉพาะยอดรวม ระบบแสดง Function Source Lines โดย **อ่านผลที่ผ่าน MAP-09 Cost Owner Reconciliation แล้วเท่านั้น**:
+- IDU: B-6/B-7 = USD 671.27
+- Surge: B-8 = USD 614.20
+- Antenna: B-12 = USD 4,709.77
+- หาก Audit ไม่ผ่าน, TAG Owner ไม่ตรง หรือยอดไม่ตรงกับ Ledger จะไม่แสดงว่า Reconciled โดยอัตโนมัติ
+- การแสดงราคาได้ **ไม่ใช่** การยืนยันว่า IDU/Ex/antenna/technical function ผ่านการออกแบบแล้ว
+
 ## 4) วิธีคุยกับทีมจากหน้าจอ
 Copy ID ของ TAG หรือขั้นตอนย่อย เช่น:
 - `PJ2608-0553 / bid.budget.bom.zwp20.mr-502-001.4.required-bom` — ต้องการตรวจ Required Physical Function/Qty
