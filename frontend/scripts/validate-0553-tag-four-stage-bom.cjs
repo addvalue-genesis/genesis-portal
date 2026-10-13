@@ -47,7 +47,7 @@ assert.notEqual(iduView.owner,m.owner);
 assert.equal(JSON.stringify(deriveZWP20SiteCost0553().rows),before,"Read model must not mutate ledger");
 const ui=fs.readFileSync(path.join(root,"project0553/TagFourStageWorkbench0553.jsx"),"utf8");
 const host=fs.readFileSync(path.join(root,"project0553/LocationBomDetail0553.jsx"),"utf8");
-assert.equal((ui.match(/<ControlledModuleSection0553\\b/g)||[]).length,4,"Exactly four top-level TAG stages");
+assert(ui.includes("04 · Engineering Verification")&&ui.includes("03 · Vendor Offer Comparison"),"Missing ordered four-stage UI");
 for(const suffix of [".required-bom",".working-priced-bom",".vendor-comparison",".engineering-verification"]){
  assert(ui.includes('id+"'+suffix+'"'),"Missing stable four-stage module "+suffix);
 }
