@@ -4,10 +4,31 @@
 import {MR0001_PACKAGE_COMPOSITION} from "./mr0001PackageComposition";
 import {MR0001_ENGINEERING_REQUIRED_BOM} from "./mr0001RequiredBomDerivation";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
+import {auditZWP20RadioVendorMapping0553} from "./controlledTagMappingPilot0553";
 
 const rounded=n=>Math.round(n*100)/100;
 const ownedBy=(c,owner)=>!c.allocationOwner||c.allocationOwner===owner;
 const candidateLookup=new Map(SUPPLIER_QUOTE_LINES_0553.map(quote=>[quote.id,quote]));
+
+// If the canonical TAG Ledger does not expose function rows directly, recover
+// ONLY the matching Cost Owner from the existing independent SOURCE audit.
+// Required/OEM quantities remain owned by Engineering, never by this projection.
+const auditedOwnerDetail=(site,tagRow,owner)=>{
+ if(site!=="ZWP20"||![5,6,10].includes(tagRow.row)||!Number.isFinite(tagRow.extended))return [];
+ const audit=auditZWP20RadioVendorMapping0553();
+ const proof=(audit.ownerReconciliation||[]).find(x=>x.id===owner);
+ if(audit.status!=="BUDGETARY_RECONCILED_WITH_QUALIFICATIONS"||!proof?.pass||
+    proof.currency&&proof.currency!=="USD"||Math.abs(proof.ledgerUSD-tagRow.extended)>0.01)return [];
+ return audit.details.filter(x=>x.costOwner===owner&&x.sourceMatch&&Number.isFinite(x.mappingExtendedUSD)).map(x=>({
+  id:"AUDITED_SOURCE_"+x.quoteLine,functionId:x.functionId,
+  allocationOwner:x.costOwner,requiredQty:x.engineeringQty,
+  budgetaryQuoteLine:x.quoteLine,budgetarySelectedSKU:x.partNumber,
+  budgetaryUnitPrice:x.mappingRateUSD,budgetaryExtended:x.mappingExtendedUSD,
+  currency:"USD",offeredQuoteQty:x.sourceQuoteQty,
+  priceEvidenceType:"AUDITED_VENDOR_SOURCE_NOT_APPROVED_OEM",
+  budgetaryDecision:"INDEPENDENT_MAP09_COST_OWNER_RECONCILED__TECHNICAL_PROOF_OPEN"
+ }));
+};
 
 export function getTagBomFourStage0553(site,tagRow){
  const owner=String(tagRow.tag||"")+"."+String(tagRow.row??"");
@@ -16,7 +37,8 @@ export function getTagBomFourStage0553(site,tagRow){
  const pkg=MR0001_PACKAGE_COMPOSITION.packages.find(p=>p.platform===site&&p.sourceRowIndex===tagRow.row);
  const matchingTag=Boolean(source?.sourceCodes?.includes(tagRow.tag)||
    (source?.sourcePartText||"").includes(tagRow.tag)||String(tagRow.tag).toLowerCase().includes("bulk"));
- const detail=tagRow.detail||tagRow.components||[];
+ const detail=tagRow.detail?.length?tagRow.detail:tagRow.components?.length?tagRow.components:
+  auditedOwnerDetail(site,tagRow,owner);
  const byFunction=new Map(detail.map(c=>[c.functionId,c]));
  const required=(pkg?.components||[]).map(functionRow=>{
   const c=byFunction.get(functionRow.functionId);
