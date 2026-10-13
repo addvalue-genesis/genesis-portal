@@ -37,6 +37,14 @@ assert.equal(mapped.technicalCompliancePassed,false);
 assert.equal(mapped.ledgerMutation,false);
 assert.equal(before,after,"Audit mutated existing ZWP20 Ledger");
 assert.equal(mapped.details.length,9);
+// Positive exact join: B-1 is an offered REMOTE radio subtype of the broader MTO RADIO_EQUIPMENT function.
+// This must not be confused with approval of OEM role, country entitlements or price release.
+const b1=mapped.details.find(x=>x.quoteLine==="B-1");
+assert.equal(b1.functionId,"RADIO_REMOTE","Vendor join must use the exact Technical Evaluation role");
+assert.equal(b1.partNumber,"CONN-OW-HAZ-4958ER-01");
+assert.equal(b1.sourceMatch,true,JSON.stringify(b1.sourceJoinIssues));
+assert(mapped.details.every(x=>x.sourceMatch),JSON.stringify(mapped.details.filter(x=>!x.sourceMatch)));
+assert(mapped.details.every(x=>x.sourceJoinIssues.length===0),"Quote source joins must have zero unresolved issues");
 assert(mapped.details.find(x=>x.quoteLine==="B-8").engineeringQty===1,"Surge quantity must come from its own MTO TAG");
 assert(mapped.details.find(x=>x.quoteLine==="B-12").engineeringQty===1,"Antenna quantity must come from its own MTO TAG");
 assert.equal(kernel.deriveSourcedExtended({quantity:1,sourceUnitRate:null,currency:"USD"}).amount,null,"Unquoted rate must stay UNKNOWN");
