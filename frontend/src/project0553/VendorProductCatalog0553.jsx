@@ -6,6 +6,7 @@ import EXION_LATEST from "./data/quotes/EXION-1260576-R0.current.json";
 import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
 import {MR0002_PRICE_REGISTRY_0553} from "./data/mr0002PriceRegistry0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {SmartFilterBar,SmartDataGroup,moduleSegment} from "../common/ui/SmartDataExplorer";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./data/supplierQuoteLines";
 import { VENDOR_0553_SOURCES } from "./vendorEvidence";
 import { buildQuotationCommercialRegister } from "../common/engineering/quotationCommercialRecord";
@@ -47,70 +48,26 @@ export function VendorProductCatalog0553(){
   if(!search)return true;
   return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,x.description,productsById.get(x.productKey)?.description,suppliersById.get(x.vendorId)?.name].join(" ").toLowerCase().includes(search.toLowerCase());
  });
- return <section className="p55-section" style={{marginTop:18}}>
-  <h2>Vendor Products · Datasheets · Quotations</h2>
-  <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products"/></p>
-  <p><strong>Active View Module</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products."+view}/></p>
-  <p>แสดงเฉพาะเอกสารที่ได้รับจริง: Quotation แสดงราคาและเงื่อนไข Vendor; Datasheet ที่ไม่มีราคาให้เว้นว่าง โดยไม่มีการเพิ่มสินค้าเข้า BOM อัตโนมัติ</p>
-  <div className="p55-filterbar"><label>View <select value={view} onChange={e=>{setView(e.target.value);setVendor("ALL");setChosenQuote("");setMr("ALL");setSearch("");}}>
-   <option value="supplier">Supplier View</option><option value="quote">Quotation View</option><option value="product">Product View</option><option value="mr">MR / System View</option><option value="compare">TBE / CBE Candidate Comparison</option>
-  </select></label>
-  {(view==="supplier"||view==="quote")&&<label>Supplier <select value={vendor} onChange={e=>chooseVendor(e.target.value)}>
-   <option value="ALL">All suppliers ({catalog.suppliers.length})</option>
-   {catalog.suppliers.map(v=><option key={v.id} value={v.id}>{v.name} ({catalog.relationships.filter(r=>r.vendorId===v.id).length} lines)</option>)}
-  </select></label>}
-  {(view==="mr"||view==="compare")&&<label>MR / System <select value={mr} onChange={e=>setMr(e.target.value)}><option value="ALL">All MR Systems</option>{["MR-0001","MR-0002","MR-0003","MR-0004"].map(v=><option key={v} value={v}>{v}</option>)}</select></label>}
-  <label>Evidence class <select value={evidenceClass} onChange={e=>setEvidenceClass(e.target.value)}><option value="ALL">All evidence</option><option value="CURRENT">Original supplier quotation registry (all years)</option><option value="HISTORICAL">Historical quotations / ERP</option><option value="WEB">Web price references</option><option value="DATASHEET">Manufacturer datasheets</option></select></label>
-  <label>Search Product / Model / Quote <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Model, MR, supplier, quotation" /></label></div>
-  {(view==="supplier"||view==="quote")&&<div className="p55-filterbar"><label>Quotation & commercial conditions <select value={chosenQuote} onChange={e=>chooseQuote(e.target.value)}>
-   <option value="">All quotations / Select to inspect</option>
-   {allowedQuotes.map(q=><option key={q.quoteId} value={q.quoteId}>{q.vendor} · {q.quotationNo}</option>)}
-  </select></label></div>}
-  {(view==="supplier"||view==="quote")&&selectedCommercial&&<div className="p55-panel" style={{padding:14,marginBottom:12}}>
-   <h3>{selectedCommercial.vendor} — {selectedCommercial.quotationNo}</h3><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+selectedCommercial.quoteId}/>
-   <p><strong>Original terms (working transcription):</strong> {selectedCommercial.sourceTermsRaw||"NOT CAPTURED — verify original"}</p>
-   <p><strong>Source:</strong> {selectedCommercial.sourceUrl?<a href={selectedCommercial.sourceUrl} target="_blank" rel="noreferrer">Open source document</a>:selectedCommercial.source||"NOT CAPTURED"}</p>
-   <p>Scope: {selectedCommercial.scope||"OPEN"} · Currency: {selectedCommercial.currency||"OPEN"} · Valid until: {selectedCommercial.validUntil||"NOT RECORDED"} · Quote status: {selectedCommercial.quoteStatus}</p>
-   <p><strong>Commercial verification:</strong> {selectedCommercial.verification}. Delivery, incoterm, payment, warranty, taxes, exclusions, freight and certifications must be verified against the original PDF before project-cost adoption.</p>
-   {selectedCommercial.originalQuote?.commercialTerms&&<section className="p55-panel" data-component-key="bid.vendor.products.quotation.NG-260916" style={{padding:14}}>
-     <h4>Next G · Complete Original Quotation Conditions / เงื่อนไขต้นฉบับ</h4>
-     <p><strong>Supplier:</strong> {selectedCommercial.originalQuote.commercialTerms.supplier.name} · {selectedCommercial.originalQuote.commercialTerms.supplier.address} · Tax ID {selectedCommercial.originalQuote.commercialTerms.supplier.taxId}</p>
-     <p><strong>Customer:</strong> {selectedCommercial.originalQuote.commercialTerms.customer.name} · {selectedCommercial.originalQuote.commercialTerms.customer.address}</p>
-     <p><strong>Quoted system:</strong> {selectedCommercial.originalQuote.commercialTerms.quotationHeading.scope} · USD {selectedCommercial.originalQuote.commercialTerms.quotationHeading.grandTotal.toLocaleString("en-US",{minimumFractionDigits:2})} · {selectedCommercial.originalQuote.commercialTerms.quotationHeading.originalBOQLineCount} original BOQ lines</p>
-     <p><a href={selectedCommercial.originalQuote.commercialTerms.sourceUrl} target="_blank" rel="noreferrer">Original supplier PDF</a> · <a href={selectedCommercial.originalQuote.commercialTerms.rfqFolder} target="_blank" rel="noreferrer">Client RFQ/TC folder</a></p>
-     <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Clause ID / Topic</th><th>Original supplier text</th><th>Recorded meaning</th><th>RFQ / TC comparison and action</th></tr></thead><tbody>
-      {selectedCommercial.originalQuote.commercialTerms.sourceTermRecords.map(t=><tr key={t.id}><td><strong>{t.id}</strong><small>{t.topic}</small></td><td>{t.originalText}</td><td>{t.value}</td><td>{t.implication}<small>{t.verification}</small></td></tr>)}
-     </tbody></table></div>
-     <h4>Not explicitly committed in the supplier quotation — clarification register</h4>
-     <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Subject</th><th>Evidence classification</th><th>Question / control</th></tr></thead><tbody>
-      {selectedCommercial.originalQuote.commercialTerms.sourceNotStated.map(t=><tr key={t.topic}><td>{t.topic}</td><td>{t.state}</td><td>{t.note}</td></tr>)}
-     </tbody></table></div>
-     <p className="p55-note"><strong>Preservation rule:</strong> Original 53 BOQ lines, quoted currency, source null/dashes and original supplier terms are retained. These terms are separate from RFQ requirements, technical acceptance, site allocation and customer pricing; no silent override.</p>
-    </section>}
-   <p className="p55-note">This is a read-only quotation-header view. Original quote lines and cost calculations have not changed.</p>
-  </div>}
-  {dataSheetProducts.length>0&&<div className="p55-panel" style={{marginBottom:14,padding:14}}>
-    <h3>Product Datasheets (no quotation recorded)</h3><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.datasheets"/>
-    <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Supplier / Source</th><th>Product / Model</th><th>MR</th><th>Datasheet</th><th>Unit Price</th></tr></thead><tbody>
-     {dataSheetProducts.map(x=><tr key={x.id}><td>{x.supplier}</td><td>{x.partNumber}<div>{x.description}</div><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.datasheet."+x.id}/></td><td>{x.mr}</td><td><a href={x.url} target="_blank" rel="noreferrer">Open original</a></td><td></td></tr>)}
-    </tbody></table></div><p className="p55-note">Product Datasheet = manufacturer evidence; Project DTS = client requirement. Compare the two in TBE before selecting a product. Blank price is not zero.</p>
-   </div>}
-  <p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products."+view+".quote-lines"}/></p>
-  <p className="p55-note">{catalog.relationships.length} supplier quote lines and external/historical product references · {rows.length} displayed (all matching entries, no hidden 150-row cap). All evidence classes share this product table; reference records are not supplier quotations. Original source quote-line identities are preserved.</p>
-  <div className="p55-table-wrap"><table className="p55-table"><thead><tr>
-   <th>Supplier / Source Class</th><th>Product / Model &amp; Function</th><th>MR</th><th>Quotation / Reference From</th><th>Qty / Unit Price / UOM</th><th>Technical / Budgetary Gate</th>
-  </tr></thead><tbody>{rows.map(r=>{
-    const p=productsById.get(r.productKey);
-    const isQuote=Boolean(r.quoteId);
-    return <tr key={r.id}>
-     <td><strong>{suppliersById.get(r.vendorId)?.name}</strong><small>{r.sourceClass||"SUPPLIER_QUOTATION"}</small></td>
-     <td><strong>{p?.partNumber||"UNIDENTIFIED"}</strong><div>{r.description||p?.description}</div><ComponentCopyId projectId="PJ2608-0553" componentKey={isQuote?"bid.vendor.products.quote-line."+r.id:r.referenceFrom}/></td>
-     <td>{r.mr}</td>
-     <td>{isQuote?<><button type="button" className="p553-detail-button" onClick={()=>{setView("quote");setVendor(r.vendorId);setChosenQuote(r.quoteId);}}>{r.quotation}</button><small>{r.priceStatus}</small></>:<><strong>Reference From</strong><small>{r.referenceFrom}</small><small>{r.referenceDocument||""}</small></>}
-      {(r.sourceUrl||(!isQuote&&r.source))&&<small><a href={r.sourceUrl||r.source} target="_blank" rel="noreferrer">Open original source</a></small>}</td>
-     <td>{r.quantity??"—"} / {Number.isFinite(r.unitPrice)?r.currency+" "+r.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"} / {r.pricingUnit||"SOURCE UOM / REVIEW"}<small>{r.vat||""}</small></td>
-     <td><strong>{r.approvedForBudget?"SOURCE ELIGIBLE / ENGINEERING CHECK":"REFERENCE_ONLY / NOT SELECTED"}</strong><small>{r.technicalCompliance||"NOT VERIFIED"}</small><small>{r.scopeDriver||""}</small></td>
-    </tr>})}</tbody></table></div>
+ const resetSearch=()=>{setView("supplier");setMr("ALL");setVendor("ALL");setSearch("");setEvidenceClass("ALL");setChosenQuote("");};
+ const groups=new Map();
+ const groupKey=r=>view==="quote"?(r.quoteId||"NO_QUOTE"):view==="product"?r.productKey:(view==="mr"||view==="compare")?(r.mr||"NO_MR"):r.vendorId;
+ const groupLabel=(id,items)=>{
+  if(view==="quote")return commercial.find(q=>q.quoteId===id)?.vendor+" · "+(commercial.find(q=>q.quoteId===id)?.quotationNo||id);
+  if(view==="product")return productsById.get(id)?.partNumber||id;
+  if(view==="mr"||view==="compare")return id;
+  return suppliersById.get(id)?.name||id;
+ };
+ rows.forEach(r=>{const k=String(groupKey(r)||"UNASSIGNED");if(!groups.has(k))groups.set(k,[]);groups.get(k).push(r);});
+ const grouped=[...groups.entries()].map(([id,items])=>({id,items,title:groupLabel(id,items)}))
+  .sort((a,b)=>String(a.title).localeCompare(String(b.title),"en"));
+ const renderVendorTable=items=><>
+  {grouped.map(g=><SmartDataGroup key={g.id}
+    projectId="PJ2608-0553" moduleKey={"bid.vendor.products."+view+".group."+moduleSegment(g.id)}
+    title={g.title} count={g.items.length}
+    defaultOpen={Boolean(search)||Boolean(chosenQuote)||grouped.length===1}>
+    {renderVendorTable(g.items)}
+  </SmartDataGroup>)}
+  {!grouped.length&&<p role="status" className="p55-note">No matching Vendor evidence. Clear filters or broaden the keyword.</p>}
   {view==="compare"&&<p className="p55-note"><strong>Candidate comparison only:</strong> not a completed TBE/CBE. Review MR compliance and quote conditions before recommending an offer.</p>}
   <p className="p55-note"><strong>Release gate:</strong> Product selection requires MR/DTS compliance, datasheet/certification, configuration, supplier price validity and approved project decision. Historical/expired/alternative quotations never enter costing automatically.</p>
  </section>;
