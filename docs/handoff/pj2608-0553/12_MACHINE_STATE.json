@@ -362,5 +362,23 @@
       "buildAfterChange": "NOT_YET_RUN",
       "customerReleaseAllowed": false
     }
-  }
+  },
+  "postSnapshotUpdates": [
+    {
+      "id": "MAP04_B1_TECH_FUNCTION_MISMATCH_20261013",
+      "date": "2026-10-13",
+      "scope": "ZWP20 MR-502-001 row4 source mapping audit only",
+      "rootCause": "B-1 expected RADIO_EQUIPMENT but original quote technical role classified RADIO_REMOTE",
+      "fixedFiles": [
+        "frontend/src/project0553/data/controlledTagMappingPilot0553.js",
+        "frontend/scripts/validate-0553-controlled-tag-mapping.cjs"
+      ],
+      "sourceJoinFunctionAfterFix": "RADIO_REMOTE",
+      "sourceQuoteAndLockedLedgerChanged": false,
+      "staticJoinCheck": "ALL_9_QUOTE_FUNCTIONS_MATCH",
+      "localBuild": "PENDING_USER_EXECUTION",
+      "customerReleaseAllowed": false,
+      "handoffRef": "docs/handoff/pj2608-0553/00_HANDOFF_CURRENT.md#2026-10-13--zwp20-mr-502-001-row4-map-04-source-join-incident--correction"
+    }
+  ]
 }
