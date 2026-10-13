@@ -9,6 +9,7 @@ import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
 import {MR0004_WORKING_BOM_0553} from "./data/mr0004WorkingBom0553";
 import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
 import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./data/siteSystemCostReconciliation";
+import {deriveA5BulkAttribution0553} from "./data/a5BulkAttribution0553";
 const SHEETS=[
  ["Scope of supply","A/B/C","A1–A5 equipment+bulk, B1–B14 services, C1/C2 options"],
  ["B10 CommSpares","B10","Erection, pre-commissioning, commissioning and start-up spare parts"],
@@ -45,27 +46,29 @@ export function ScopeSheetsDetail0553({fx=null}){
  // Incomplete scopes remain flagged, not mislabelled as accepted cost.
  const scadaSourceTHB=round(scadaEnvelope.locations.reduce((n,s)=>n+s.baseSourceTHB,0));
  const scadaSourceUSD=round(scadaEnvelope.locations.reduce((n,s)=>n+s.baseSourceUSD,0));
- const scadaIncrementalBulk=round(scadaEnvelope.locations.reduce((n,s)=>n+(Number.isFinite(s.incrementalBaseBulkTHB)?s.incrementalBaseBulkTHB:0),0));
- const workingScadaFloor=fxValid?round(scadaSourceTHB+scadaSourceUSD*fx.thbPerUsd+scadaIncrementalBulk):null;
- const allSystemBulk=deriveWpSystemBulkBudget0553().flatMap(w=>w.systems.flatMap(s=>
-   s.items.map(x=>({...x,wp:w.wp,system:s.id}))));
- const additionalBulk=allSystemBulk.filter(x=>x.owner!=="DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE" &&
-  !(x.system==="SCADA_RADIO" && x.id==="SCADA-CAT6A") &&
-  Number.isFinite(x.extendedTHB));
- const a5Known=round(additionalBulk.reduce((n,x)=>n+x.extendedTHB,0));
- const a5Unpriced=allSystemBulk.filter(x=>!Number.isFinite(x.extendedTHB)&&x.owner!=="DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE").length;
+ // Source Ledger is already priced by the MTO's Bulk Material cost owners.
+ // The separate SCADA envelope / WP planning routes are scenario views, not additive invoices.
+ const a5=deriveA5BulkAttribution0553();
+ const scadaLedgerCostTHB=fxValid?round(scadaSourceTHB+scadaSourceUSD*fx.thbPerUsd):null;
+ const workingScadaEquipment=Number.isFinite(scadaLedgerCostTHB)&&Number.isFinite(a5.a1CostToReclassifyTHB)?
+  round(scadaLedgerCostTHB-a5.a1CostToReclassifyTHB):scadaLedgerCostTHB;
+ const a5Unpriced=a5.unresolved.length+a5.unknownScadaAccessories.length;
+ const a5LedgerReconciled=Number.isFinite(scadaLedgerCostTHB)&&
+  Number.isFinite(workingScadaEquipment)&&Number.isFinite(a5.a5PriceTHB)&&
+  Math.abs(round(workingScadaEquipment+a5.a5PriceTHB-scadaLedgerCostTHB))<=0.01;
  const phoneRows=SITE_SYSTEM_COST_RECONCILIATION_0553.rows.filter(r=>r.mr==="MR-0003"&&["ZWP20","ZWP21","ZWP22"].includes(r.site));
  const phoneRateLines=phoneRows.flatMap(r=>r.evidence||[]).filter(x=>["PHONE-1","SOUNDER-1","JB-1"].includes(x.line)&&x.currency==="THB"&&Number.isFinite(x.extended));
  const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
  const partBC=derivePartBcWorkingWbs0553();
  const workingSummary={
-   A1:{amount:workingScadaFloor,source:"MR0001 Tag Cost Ledger + separated incremental SCADA bulk",status:"PRELIMINARY PRICED FLOOR; unpriced equipment/accessories excluded"},
+   A1:{amount:workingScadaEquipment,source:"MR0001 site TAG Cost Ledger less eligible source MTO Bulk rows attributed to A5 (display only; no ledger posting)",status:"PRELIMINARY SCADA EQUIPMENT FLOOR EXCLUDING A5 ATTRIBUTED BULK; no new rate or FX assumed"},
    A2:{amount:fxValid?round(a2THB+a2USD*fx.thbPerUsd):a2USD===0?round(a2THB):null,
    source:"MR0002_WORKING_BOM_0553 per-site rows: RFI-LNA and non-MGW priced allowances only",
    status:"PARTIAL WORKING FLOOR; MGW rates excluded, remaining DMR equipment and unpriced bulk not included"},
    A3:{amount:a3PricedFloor,source:"EXION THAI QT1260576 Phone + Sounder; PROSPER Q-PROSRY-24051 historical Ex e JB; 3 allocated locations only",status:"PRELIMINARY 3-LOCATION FLOOR; 4th EXION quoted set UNALLOCATED, JB REQUOTE AND BULK NOT INCLUDED"},
    A4:{amount:fx?.thbPerUsd>0?workingMR4USD*fx.thbPerUsd:null,source:"MR0004 ORGA canonical Working BOM",status:"PROVISIONAL 3-SITE SCENARIO"},
-   A5:{amount:a5Known>0?a5Known:null,source:"Separate system physical bulk ledger excluding SCADA-CAT6A and DATO already allocated in A1",status:"PARTIAL PRICED FLOOR; "+a5Unpriced+" other field-bulk items remain without rates"}
+   A5:{amount:a5.a5PriceTHB,source:a5.source+"; exact "+a5.rowCount+" source MTO Bulk cost-owner rows; A1→A5 presentation reclassification only",
+   status:a5.state+"; "+a5Unpriced+" remaining field-bulk/accessory evidence gaps; no customer sell approval"}
  };
  return <section className="p55-panel">
   <div className="p55-eyebrow">6 ORIGINAL SHEETS <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
@@ -73,12 +76,14 @@ export function ScopeSheetsDetail0553({fx=null}){
   <p className="p55-note">Original uploaded workbook has 6 tabs, including unpriced template cells. Historical Rev08 amounts below are kept separate from original cells, current vendor cost and new bid selling price.</p>
   <div className="p55-filterbar"><label>Customer Workbook Sheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{SHEETS.map(v=><option value={v[0]} key={v[0]}>{v[0]}</option>)}</select></label></div>
   <p className="p55-note">{category[2]}</p>
-  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Unit Price THB</th><th>Working Budgetary Cost THB</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Working Unit Cost THB / LS</th><th>Working Budgetary Cost THB</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
   <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
    const control=partBC.rows.find(r=>r.code===id);
    const item=workingSummary[id]||(control?{amount:control.sellTHB,status:control.state,source:control.driver+" · "+control.owner+" · "+control.source}:null),amount=item?.amount;
-   const unavailable=id==="A5"?"Unpriced bulk exposure":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
-   return <tr key={id}><td>{id}</td><td>{desc}</td><td>{control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (unpriced scope)"}</td>
+   const unavailable=id==="A5"?"A5 source/ledger reconciliation required":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
+   const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
+    control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (working basis)";
+   return <tr key={id}><td>{id}</td><td>{desc}</td><td>{qtyDisplay}</td>
     <td className="is-number">{Number.isFinite(control?.unitPriceTHB)?cash(control.unitPriceTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
     <td className="is-number">{Number.isFinite(amount)?cash(amount):control?"Owner / OEM quotation required":unavailable}</td>
     <td>{item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
@@ -90,6 +95,38 @@ export function ScopeSheetsDetail0553({fx=null}){
     <td className="is-number">{Number.isFinite(rate)?cash(round(qty*rate)):"Awaiting FX"}</td>
     <td>Rev08 customer-price equivalent converted to THB — historical comparison ONLY, not working supplier cost</td></tr>;
   })}</tbody></table></div>
+  {sheet==="Scope of supply"&&<details className="p55-panel" data-component-key="bid.budget.scope.a5" open={false}>
+   <summary style={{cursor:"pointer",fontWeight:700}}>A5 Bulk Materials — Source-MTO Price Attribution / Drill-down ({a5.rowCount} lots)</summary>
+   <p className="p55-note">A5 Working Priced Floor: <strong>{cash(a5.a5PriceTHB)}</strong>.
+    From existing MR0001 Bulk MTO cost owners, not new vendor charges. Displayed A1 deducts exactly this amount to prevent double counting; original working ledgers and quotations remain unchanged.
+    Original customer scope remains 1 LS. All sites priced only for 69m CAT6A + 1 M20 gland per priced management route assumption, not a complete O&G bulk take-off.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Site / Original MTO</th><th>TAG / Engineering quantity</th><th>Priced Cost Evidence</th><th>Working Amount THB</th><th>Owner / Qualification</th></tr></thead><tbody>
+    {a5.rows.map(row=><tr key={row.site+"-"+row.sourceRow}>
+     <td><strong>{row.site}</strong><small>MTO extract index {row.sourceRow}; native workbook row number must be verified</small></td>
+     <td><strong>{row.tag} · 1 Lot</strong><small>{row.components.map(c=>c.qty+" "+c.unit+" "+c.sku).join(" + ")}</small></td>
+     <td>{row.components.map((c,i)=><small key={i}>{c.sku}: {c.qty} × THB {usd(c.rateTHB)} = THB {usd(c.extendedTHB)}</small>)}<small>{row.source}</small></td>
+     <td className="is-number"><strong>{cash(row.workingCostTHB)}</strong></td>
+     <td><strong>{row.status}</strong><small>{row.costOwner} → A5 display only</small></td>
+    </tr>)}
+    </tbody></table></div>
+   <p className="p55-note"><strong>Source Ledger reconciliation:</strong>
+    {a5LedgerReconciled?" PASS — A1 displayed + A5 = original MR0001 working ledger THB equivalent (no additional booking)":
+      !fxValid?" FX required to verify displayed A1+A5 in THB":
+      " NOT RECONCILED — do not release A5 or Grand Total"}
+    . Missing physical functions/rates: {a5Unpriced} observations; standalone SCADA CAT6A mirrors and DATO already-owned price are not added.
+    Other-system rate evidence (if any): {a5.otherPricedCandidates.length} candidates held for cost owner review.
+   </p>
+   {a5.problems.length>0&&<p role="alert">A5 attribution ERROR: {a5.problems.map(x=>x.site+" "+x.message).join("; ")}</p>}
+   <details><summary>Unpriced system bulk / accessories ({a5Unpriced})</summary>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Site</th><th>System</th><th>Item / Function</th><th>Quantity</th><th>Rate</th><th>Missing evidence / owner</th></tr></thead><tbody>
+    {[...a5.unresolved,...a5.unknownScadaAccessories].map((row,i)=><tr key={row.site+"-"+row.system+"-"+row.id+"-"+i}>
+     <td>{row.site}</td><td>{row.system}</td><td>{row.id}<small>{row.item}</small></td><td>{row.qty??"NOT VERIFIED"}</td><td>{Number.isFinite(row.rateTHB)?cash(row.rateTHB):"NOT PRICED"}</td>
+     <td>{row.status}<small>{row.source||""}</small></td>
+    </tr>)}
+    </tbody></table></div>
+   </details>
+  </details>}
   {sheet==="Scope of supply"&&<p className="p55-note"><strong>Part B ADDVALUE Working Sell:</strong> {cash(partBC.subtotalTHB)} from Rev05 WBS, not internal direct cost or full SAMTEL client price. B4–B7, B10–B14 and C1–C2 are owner-controlled excluded/optional lines; unresolved owner quotation must NOT be interpreted as zero. <a href={partBC.sourceUrl} target="_blank" rel="noreferrer">WBS Rev05 original</a>.</p>}
   {sheet==="Scope of supply"&&<section className="p55-panel" data-component-key="bid.budget.scope.scada-working">
    <h4>MR-0001 SCADA — Engineering BOM &amp; Bulk Budgetary Working Projection</h4>
