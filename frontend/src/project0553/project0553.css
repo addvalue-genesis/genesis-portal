@@ -123,3 +123,23 @@
 .p553-dashboard .p553-budget-phase>summary:focus-visible{outline:3px solid #c78724;outline-offset:2px}
 .p553-dashboard .p553-budget-phase>.p55-panel,.p553-dashboard .p553-budget-phase>.p55-stack{margin:10px;border-radius:7px}
 @media(max-width:700px){.p553-dashboard .p553-budget-phase>summary{align-items:flex-start}.p553-dashboard .p553-budget-phase>summary small{width:100%;padding-left:28px}}
+
+
+/* GENESS Smart Filter & Hierarchical Data Grid — common read-only UI pilot */
+.p553-dashboard .gns-smart-filter{background:#f8fbfd;border:1px solid #cbdde9;border-radius:8px}
+.p553-dashboard .gns-smart-filter .p55-filterbar{display:flex;gap:10px;flex-wrap:wrap;align-items:end}
+.p553-dashboard .gns-smart-filter .p55-filterbar>label{display:flex;flex:1 1 190px;min-width:170px;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:#284559}
+.p553-dashboard .gns-smart-filter .p55-filterbar select,
+.p553-dashboard .gns-smart-filter .p55-filterbar input{width:100%;min-height:38px;font-size:14px;padding:7px 9px;border:1px solid #adc2d3;border-radius:6px}
+.p553-dashboard .gns-smart-filter button{min-height:34px}
+.p553-dashboard .gns-smart-group{border:1px solid #cfdae5;background:#fff;border-radius:8px}
+.p553-dashboard .gns-smart-group>summary{padding:10px 8px;font-size:14px;background:#f3f7fa;border-radius:6px;list-style:none}
+.p553-dashboard .gns-smart-group>summary::-webkit-details-marker{display:none}
+.p553-dashboard .gns-smart-group>summary:focus-visible{outline:3px solid #ca852c;outline-offset:2px}
+.p553-dashboard .gns-smart-group>summary .gns-copy-id{margin-left:auto}
+.p553-dashboard .gns-smart-group .p55-table{font-size:13px}
+@media(max-width:720px){
+ .p553-dashboard .gns-smart-filter .p55-filterbar>label{flex-basis:100%;min-width:0}
+ .p553-dashboard .gns-smart-group>summary{align-items:flex-start}
+ .p553-dashboard .gns-smart-group>summary .gns-copy-id{margin-left:0}
+}
