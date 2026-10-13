@@ -49,7 +49,8 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
  const sourceMatches=itemRows.filter(r=>r.platform===PILOT.site&&r.sourceRowIndex===PILOT.row&&keyOf(r)===PILOT.tag);
  const source=sourceMatches[0]||null;
  const blocked=(source=null,details=[],extra={})=>{
-  for(const eq of EQ.equations)if(!stages.some(x=>x.id===eq.id))stages.push({id:eq.id,name:eq.name,status:"SKIPPED",details:"Previous mandatory mapping stage failed; no downstream result evaluated"});
+  const failedStage=stages.findLast(x=>x.status==="ERROR");
+  for(const eq of EQ.equations)if(!stages.some(x=>x.id===eq.id))stages.push({id:eq.id,name:eq.name,status:"SKIPPED",details:"Blocked by "+(failedStage?.id||"earlier mapping error")+": "+(failedStage?.details||"source evidence check failed")+"; no downstream result evaluated"});
   return {pilot:PILOT,equations:EQ.equations,stages,errors,details,status:"MAPPING_BLOCKED",
    source,ownerReconciliation:extra.ownerReconciliation||[],technical:extra.technical||[],budgetaryProceed:false,
    ledgerMutation:false,approvedVendorSelection:false,technicalCompliancePassed:false,releaseAllowed:false};
@@ -107,10 +108,12 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
    sourcePage:original?.sourcePage??null,
    technicalApproval:"NOT_ISSUED",mappingStatus:sourceMatch?"FUNCTION_CANDIDATE":"SOURCE_JOIN_ERROR"});
  }
- const joinsOK=details.every(x=>x.sourceMatch)&&new Set(details.map(x=>x.catalogRelationshipId)).size===details.length;
+ const duplicateJoinIds=details.map(x=>x.catalogRelationshipId).filter((id,i,a)=>a.indexOf(id)!==i);
+ const joinFailures=details.filter(x=>!x.sourceMatch).map(x=>x.quoteLine+" ("+x.partNumber+"): "+x.sourceJoinIssues.join(", "));
+ const joinsOK=joinFailures.length===0&&duplicateJoinIds.length===0;
  push("MAP-04",joinsOK,joinsOK?
-  "9 unique quote-code/SKU/price/currency/qty joins verified against 07 Vendor registry and original NG-260916; no quote-wide multiplication":
-  "At least one selected quote code failed original vendor-source join: do not map or price");
+  "9 unique quote-code/SKU/price/currency/qty/function joins verified against 07 Vendor registry and original NG-260916; no quote-wide multiplication":
+  "Source join failed: "+[...joinFailures,...duplicateJoinIds.map(id=>"DUPLICATE_RELATIONSHIP_ID "+id)].join("; ")+"; do not map or price");
  if(!joinsOK)return blocked(source,details);
  const quotedDescription=code=>String(originalQuote.lines.find(r=>r.code===code)?.description||"");
  const regionDescription=quotedDescription("B-4");
