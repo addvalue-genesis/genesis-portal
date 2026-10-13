@@ -9,6 +9,7 @@ export function ZWP8CostOwnershipAudit0553({fx=null}){
  return <ControlledModuleSection0553 moduleKey={id}
   title="ZWP8 · Cost Ownership Audit — duplicate B-8 / Brownfield quantity review"
   description="Existing ledger unchanged; use this independent engineering reconciliation before accepting the ZWP8 subtotal">
+  <p className="p55-note"><strong>PTP ZPQ ↔ ZWP8 = EXISTING baseline link (BLD C1).</strong> BOD C2 §7.2 separately requests added capacity/new link; this must NOT convert the existing link into a second NEW radio procurement without scope/endpoint proof.</p>
   <p className="p55-note"><strong>Finding: {audit.flags.verifiedArithmetic?"DUPLICATE COST OWNER DETECTED":"SOURCE OWNERSHIP REVIEW REQUIRED"}.</strong> ZWP8 Brownfield amount is a budgetary replacement-equivalent assumption, not approved new procurement. MTO row43 has {audit.physicalGroup.radioODU} ODU, {audit.physicalGroup.radioIDU} IDU, {audit.physicalGroup.antenna} antenna source tags.</p>
   <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
    <thead><tr><th>Controlled Working Cost Basis</th><th>Original / Corrective USD</th><th>THB (Working FX)</th><th>Scope / Engineering Gate</th></tr></thead><tbody>
@@ -29,8 +30,8 @@ export function ZWP8CostOwnershipAudit0553({fx=null}){
   </ControlledModuleSection0553>
   <ControlledModuleSection0553 moduleKey={id+".rpt-topology"} title={"RPT Rev.C1 Topology Evidence — "+audit.siteLinks.length+" link(s)"}>
    <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
-    <thead><tr><th>RPT Link</th><th>Mode</th><th>Report Antenna at Ends</th><th>Engineering Proof</th></tr></thead><tbody>
-    {audit.siteLinks.map(link=><tr key={link.id}><td>{link.from} → {link.to}</td><td>{link.mode}</td><td>{link.txAntenna} / {link.rxAntenna}</td><td>Confirm Reuse / NEW, common PTMP sector, antenna count/diameter and vendor OEM CAL before procurement</td></tr>)}
+    <thead><tr><th>RPT Link</th><th>Mode / Installed Lifecycle</th><th>Report Antenna at Ends</th><th>Engineering Scope / Cost Gate</th></tr></thead><tbody>
+    {audit.siteLinks.map(link=><tr key={link.id}><td>{link.from} → {link.to}</td><td>{link.mode}<small><strong>{link.installedLinkState}</strong></small></td><td>{link.txAntenna} / {link.rxAntenna}</td><td>{link.capacityScope}<small>{link.newReplacementAutomaticallyRequired===false?"Existing equipment replacement NOT inferred from link identity":"Confirm new/reuse physical items, number of radios/antennas and OEM CAL"}</small></td></tr>)}
     </tbody></table></div>
   </ControlledModuleSection0553>
   <p className="p55-note"><strong>Original source:</strong> {audit.basis}. <strong>No price mutation:</strong> source ledger, quotation, management scenario and full A+B+C remain unchanged pending architecture/engineering Change Control.</p>
