@@ -505,7 +505,10 @@
       "sourceOrCostLedgerMutated": false,
       "localBuild": "PENDING_USER_EXECUTION",
       "browserAcceptance": "PENDING",
-      "customerRelease": false
+      "customerRelease": false,
+      "userGuide": "docs/handoff/pj2608-0553/26_ABC_COST_READINESS_USER_GUIDE_REV01.md",
+      "sourceCBSConflict": "Rev05 B4/B5/C1/C2 definitions differ from lifecycle working crosswalk; require RFQ Template CBS mapping before line-level posting",
+      "sourceStaticChecks": "PASS; local runtime PENDING"
     }
   ]
 }
