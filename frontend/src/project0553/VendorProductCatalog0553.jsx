@@ -10,6 +10,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {SmartFilterBar,SmartDataGroup,moduleSegment} from "../common/ui/SmartDataExplorer";
 import { SUPPLIER_QUOTE_LINES_0553 } from "./data/supplierQuoteLines";
 import { buildQuotationCommercialRegister } from "../common/engineering/quotationCommercialRecord";
+import {QuotationTermsDetail0553} from "./QuotationTermsDetail0553";
 
 // Read-only quotation-to-product index. Never silently promotes a quote line into BOM.
 export function VendorProductCatalog0553(){
@@ -21,7 +22,7 @@ export function VendorProductCatalog0553(){
  const [evidenceClass,setEvidenceClass]=useState("ALL");
  const [chosenQuote,setChosenQuote]=useState("");
  const [inspectedQuote,setInspectedQuote]=useState("");
- const commercial=useMemo(()=>buildQuotationCommercialRegister([{id:EXION_LATEST.id,vendor:"EXION (Thailand)",quotation:EXION_LATEST.quotation,source:EXION_LATEST.source,scope:EXION_LATEST.scope,date:EXION_LATEST.date,currency:EXION_LATEST.currency,quotedTotal:EXION_LATEST.quotedTotal,status:EXION_LATEST.status,validUntil:EXION_LATEST.validUntil,terms:EXION_LATEST.terms.map(x=>x.topic+": "+x.value).join(" | ")},...SUPPLIER_QUOTE_LINES_0553,...HISTORICAL_VENDOR.quotes.map(q=>({...q,terms:q.terms,source:q.sourceUrl||q.source})),{id:EXION_REFERENCE.id,vendor:EXION_REFERENCE.vendor,quotation:EXION_REFERENCE.quotation,date:EXION_REFERENCE.date,currency:EXION_REFERENCE.currency,quotedTotal:EXION_REFERENCE.totalExVat,scope:"MR-0003 historical telephone/sounder reference",status:EXION_REFERENCE.priceState,source:EXION_REFERENCE.document,terms:EXION_REFERENCE.terms.map(x=>x.join(": ")).join(" | ")}]),[]);
+ const commercial=useMemo(()=>buildQuotationCommercialRegister([{id:EXION_LATEST.id,vendor:"EXION (Thailand)",quotation:EXION_LATEST.quotation,source:EXION_LATEST.source,scope:EXION_LATEST.scope,date:EXION_LATEST.date,currency:EXION_LATEST.currency,quotedTotal:EXION_LATEST.quotedTotal,status:EXION_LATEST.status,validUntil:EXION_LATEST.validUntil,terms:EXION_LATEST.terms},...SUPPLIER_QUOTE_LINES_0553,...HISTORICAL_VENDOR.quotes.map(q=>({...q,terms:q.terms,source:q.sourceUrl||q.source})),{id:EXION_REFERENCE.id,vendor:EXION_REFERENCE.vendor,quotation:EXION_REFERENCE.quotation,date:EXION_REFERENCE.date,currency:EXION_REFERENCE.currency,quotedTotal:EXION_REFERENCE.totalExVat,scope:"MR-0003 historical telephone/sounder reference",status:EXION_REFERENCE.priceState,source:EXION_REFERENCE.document,terms:EXION_REFERENCE.terms}]),[]);
  const selectedCommercial=commercial.find(q=>q.quoteId===(chosenQuote||inspectedQuote));
  const catalog=VENDOR_UNIFIED_CATALOG_0553;
  const suppliersById=new Map(catalog.suppliers.map(v=>[v.id,v]));
@@ -126,7 +127,7 @@ export function VendorProductCatalog0553(){
   </div>}
   {(view==="supplier"||view==="quote")&&selectedCommercial&&<div className="p55-panel" style={{padding:14,marginBottom:12}}>
    <h3>{resolveCompany0553(selectedCommercial.vendor).name} — {selectedCommercial.quotationNo}</h3>{inspectedQuote&&!chosenQuote&&<button type="button" className="p553-detail-button" onClick={()=>setInspectedQuote("")}>Close details</button>}<p className="p55-note">Original source supplier label: {selectedCommercial.vendor}</p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+selectedCommercial.quoteId}/>
-   <p><strong>Original terms (working transcription):</strong> {selectedCommercial.sourceTermsRaw||"NOT CAPTURED — verify original"}</p>
+   <QuotationTermsDetail0553 quote={selectedCommercial}/>
    <p><strong>Source:</strong> {selectedCommercial.sourceUrl?<a href={selectedCommercial.sourceUrl} target="_blank" rel="noreferrer">Open source document</a>:selectedCommercial.source||"NOT CAPTURED"}</p>
    <p>Scope: {selectedCommercial.scope||"OPEN"} · Currency: {selectedCommercial.currency||"OPEN"} · Valid until: {selectedCommercial.validUntil||"NOT RECORDED"} · Quote status: {selectedCommercial.quoteStatus}</p>
    <p><strong>Commercial verification:</strong> {selectedCommercial.verification}. Delivery, incoterm, payment, warranty, taxes, exclusions, freight and certifications must be verified against the original PDF before project-cost adoption.</p>
@@ -171,10 +172,11 @@ export function VendorProductCatalog0553(){
           " · Original vendor: "+(q.header?.vendor||g.title)}
         defaultOpen={Boolean(search)||chosenQuote===q.id}>
         {q.header&&<div className="p55-filterbar">
-         <button type="button" className="p553-detail-button" onClick={()=>setInspectedQuote(q.id)}>Inspect quotation &amp; commercial conditions</button>
+         <button type="button" className="p553-detail-button" onClick={()=>setInspectedQuote(q.id)}>Inspect quotation header / source</button>
          <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+q.id}
           componentName={q.header.quotationNo}/>
         </div>}
+        <QuotationTermsDetail0553 quote={q.header}/>
         {renderLines(q.lines)}
        </SmartDataGroup>)}
       {sections.unquoted.length>0&&<SmartDataGroup projectId="PJ2608-0553"
