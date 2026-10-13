@@ -33,6 +33,7 @@ export function VendorProductCatalog0553(){
  const rows=catalog.relationships.filter(x=>{
   if(view==="supplier" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
   if(view==="supplier" && chosenQuote&&x.quoteId!==chosenQuote)return false;
+  if(view==="quote" && !x.quoteId)return false;
   if(view==="quote" && chosenQuote&&x.quoteId!==chosenQuote)return false;
   if(view==="quote" && vendor!=="ALL"&&x.vendorId!==vendor)return false;
   if(view==="product"&&chosenQuote&&x.quoteId!==chosenQuote)return false;
@@ -97,7 +98,7 @@ export function VendorProductCatalog0553(){
     const isQuote=Boolean(r.quoteId);
     return <tr key={r.id}>
      <td><strong>{suppliersById.get(r.vendorId)?.name}</strong><small>{r.sourceClass||"SUPPLIER_QUOTATION"}</small></td>
-     <td><strong>{p?.partNumber||"UNIDENTIFIED"}</strong><div>{p?.description}</div><ComponentCopyId projectId="PJ2608-0553" componentKey={isQuote?"bid.vendor.products.quote-line."+r.id:r.referenceFrom}/></td>
+     <td><strong>{p?.partNumber||"UNIDENTIFIED"}</strong><div>{r.description||p?.description}</div><ComponentCopyId projectId="PJ2608-0553" componentKey={isQuote?"bid.vendor.products.quote-line."+r.id:r.referenceFrom}/></td>
      <td>{r.mr}</td>
      <td>{isQuote?<><button type="button" className="p553-detail-button" onClick={()=>{setView("quote");setVendor(r.vendorId);setChosenQuote(r.quoteId);}}>{r.quotation}</button><small>{r.priceStatus}</small></>:<><strong>Reference From</strong><small>{r.referenceFrom}</small><small>{r.referenceDocument||""}</small></>}
       {(r.sourceUrl||(!isQuote&&r.source))&&<small><a href={r.sourceUrl||r.source} target="_blank" rel="noreferrer">Open original source</a></small>}</td>
