@@ -31,8 +31,10 @@ export function deriveEngineeringOwnedCost0553(item){
  const components=(packageRow?.components||[]).map(c=>{
   const matches=c.candidateQuotes.map(v=>{
    const q=quotes.get(v.quoteLine);
-   return {quoteLine:v.quoteLine,sku:q?.partNumber||v.partNumber,offeredQty:q?.sourceQty??null,
+   return {quoteLine:v.quoteLine,sku:q?.partNumber||v.partNumber,description:q?.description||null,offeredQty:q?.sourceQty??null,
     currency:q?.currency||v.currency,unitPrice:Number.isFinite(q?.unitPrice)?q.unitPrice:null,
+    quotedTotal:Number.isFinite(q?.quotedTotal)?q.quotedTotal:null,
+    productFunction:q?.functionRequirement||null,allocationBoundary:q?.allocationBoundary||null,
     candidateStatus:q?.classification||"UNREVIEWED"};
   });
   const standardWarranty=c.functionId==="WARRANTY";
@@ -59,7 +61,13 @@ export function deriveEngineeringOwnedCost0553(item){
   const price=standardWarranty?null:selected&&Number.isFinite(selected.unitPrice)?selected.unitPrice:null;
   const extended=qty!==null&&price!==null?Math.round(qty*price*100)/100:null;
   return {id:c.id,functionId:c.functionId,nonCostedIncluded:standardWarranty,driver:c.quantityDriver,requiredQty:qty,quantityState:derivation.state,quantityProof:derivation.proof,selectedOffer:c.selectedOffer,
-   vendorCandidates:matches,allocationOwner,budgetarySelectedOffer,budgetarySelectedSKU,budgetarySelectionState:budgetarySelectedOffer?"BUDGETARY_SELECTED_WITH_QUALIFICATIONS":"NOT_SELECTED",budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryRate,budgetaryExtended,priceEvidenceType:includedAssumption?"ASSUMED_INCLUDED_NO_SEPARATE_CHARGE":"NEXTG_QUOTED_UNIT_RATE",priceEvidence:includedAssumption||null,
+   vendorCandidates:matches,allocationOwner,budgetarySelectedOffer,budgetarySelectedSKU,
+   budgetarySelectedDescription:budgetaryCandidate?.description||null,
+   productFunction:budgetaryCandidate?.productFunction||c.quantityDriver,
+   sourceAllocationBoundary:budgetaryCandidate?.allocationBoundary||null,
+   offeredQuoteQty:budgetaryCandidate?.offeredQty??null,
+   quotedSourceTotal:budgetaryCandidate?.quotedTotal??null,
+   budgetarySelectionState:budgetarySelectedOffer?"BUDGETARY_SELECTED_WITH_QUALIFICATIONS":"NOT_SELECTED",budgetaryQuoteLine:budgetaryCandidate?.quoteLine||null,budgetaryUnitPrice:budgetaryRate,budgetaryExtended,priceEvidenceType:includedAssumption?"ASSUMED_INCLUDED_NO_SEPARATE_CHARGE":"NEXTG_QUOTED_UNIT_RATE",priceEvidence:includedAssumption||null,
    budgetaryDecision:includedAssumption?"REGION_KEY_INCLUDED_ASSUMPTION__OEM_REVIEW":budgetaryCandidate?"ENGINEERING_REMOTE_ROLE_MATCH__OEM_REVIEW":"NO_BUDGETARY_MATCH",
    unitPrice:price,currency:selected?.currency||null,
    extended,technicalState:c.technicalState,
