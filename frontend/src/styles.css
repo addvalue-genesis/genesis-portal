@@ -284,7 +284,12 @@ a {
 }
 .p553-location-overview .p553-location-summary .gns-copy-id code {
   font-size: 10px;
+  display: inline-block;
+  max-width: 125px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   white-space: nowrap;
+  vertical-align: middle;
 }
 .p553-location-overview .p553-location-summary .gns-copy-id button {
   font-size: 10px;
