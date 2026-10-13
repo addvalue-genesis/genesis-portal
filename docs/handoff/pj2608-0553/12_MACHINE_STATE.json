@@ -528,6 +528,58 @@
       "costLedgerMutation": false,
       "verification": "Static source code checked; local Node/Webpack/browser PENDING",
       "userAcceptance": "PENDING_BROWSER_QA"
+    },
+    {
+      "id": "ZWP8_COST_OWNERSHIP_AUDIT_20261013",
+      "date": "2026-10-13",
+      "moduleId": "bid.budget.bom.zwp8.cost-ownership-audit",
+      "issue": "ZWP8 Brownfield internally budgeted as two new radios/antennas with double-charged B-8 surge, and B-6/B-7 PoE misallocated to ODU while two IDU TAGs unpriced",
+      "sourceMto": "MR0001 Rev04 grouped row43, SA grouped row45, LAN44, TCAB46, bulk47",
+      "sourceLinks": [
+        "ZWP8-ZWP20 PTMP",
+        "ZWP8-ZWP22 PTMP",
+        "ZPQ-ZWP8 PTP"
+      ],
+      "currentWorking": {
+        "USD": 27796.18,
+        "THB": 499906,
+        "totalAtFX31_5THB": 1375485.67,
+        "pricedTags": 9,
+        "totalTags": 11
+      },
+      "identifiedDuplicate": {
+        "nextGLine": "B-8",
+        "count": 2,
+        "amountUSD": 1228.4,
+        "amountTHBAt31_5": 38694.6
+      },
+      "misplacedButNotExtra": {
+        "nextGLines": [
+          "B-6",
+          "B-7"
+        ],
+        "twoIDUTags": [
+          "MR-502-003A",
+          "MR-502-004A"
+        ],
+        "amountUSD": 1342.54
+      },
+      "illustrativeUniqueOwner": {
+        "USD": 26567.78,
+        "THB": 499906,
+        "totalAtFX31_5THB": 1336791.07
+      },
+      "workingScenarioStatus": "2 radio + 2 4ft antenna NEW/REUSE & OEM review pending",
+      "auditFile": "frontend/src/project0553/data/zwp8CostOwnershipAudit0553.js",
+      "rendererFile": "frontend/src/project0553/ZWP8CostOwnershipAudit0553.jsx",
+      "regression": "frontend/scripts/validate-0553-zwp8-cost-ownership.cjs",
+      "memo": "docs/handoff/pj2608-0553/27_ZWP8_COST_OWNERSHIP_FIRST_PRINCIPLES_AUDIT_REV01.md",
+      "lockedLedgerChanged": false,
+      "sourceQuoteChanged": false,
+      "managementAntennaDecisionChanged": false,
+      "correctiveChangeRequiresApproval": true,
+      "localRuntime": "PENDING",
+      "customerReleaseAllowed": false
     }
   ]
 }
