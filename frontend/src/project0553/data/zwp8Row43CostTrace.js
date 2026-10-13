@@ -44,7 +44,7 @@ const referenceScenarios=[{
  preferredOwnerCodes:ownerCodes,preferredOwnerCostsUSD:ownerCosts,
  partialEquipmentUSD:workingEquipmentUSD,
  assumption:"ONE new PTMP Base+90° sector to serve ZWP20/22; ONE additional PTP endpoint candidate at ZWP8 while the existing ZPQ-ZWP8 link is retained",
- excluded:"REGION A-3/B-4 prices NULL; OEM/AFC RF pattern gain, throughput, GPS/A-11 choice, complete IDU function and contract acceptance remain OPEN",
+ excluded:"REGION A-3/B-4 quoted rate NULL; Base Station A-4 PMP MAX option quoted but OEM entitlement and simultaneous 2-subscriber/sector throughput proof OPEN; B-3 is REMOTE licence only. ZPQ existing NMS server/interface must be checked for node/port and monitoring licence (incremental NMS cost UNKNOWN, not free). GPS/A-11 sync, complete IDU, RF pattern and contract acceptance OPEN",
  state:"BUDGETARY_PARTIAL__AFC_ROLE_ALIGNED__OEM_NOT_APPROVED"
 }];
 
