@@ -18,9 +18,11 @@ export function LocationBomDetail0553({site,fx}){
  const thb=(n,c)=>!Number.isFinite(n)?"PENDING":c==="THB"?"THB "+fmt(n):c==="USD"&&fxValid?"THB "+fmt(n*fx.thbPerUsd):"FX REQUIRED";
  const totalTHB=fxValid?ledger.subtotals.THB+ledger.subtotals.USD*fx.thbPerUsd:null;
  const keyPrefix="bid.budget.bom."+site.toLowerCase();
+ const tagKey=v=>keyPrefix+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row;
+ const tagPanelId=v=>"p553-tag-detail-"+site.toLowerCase()+"-"+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"-"+v.row;
  const copyTable=()=>{
   const lines=[["Module ID","MTO Row","Tag","Quantity","Unit","Original Currency","Unit Cost","Extended Cost","Displayed THB","Basis","Status"],
-   ...rows.map(v=>[keyPrefix+"."+String(v.tag).toLowerCase()+"."+v.row,v.row,v.tag,v.sourceQty??"",v.sourceUnit??"",v.currency??"",v.unitCost??"",v.extended??"",thb(v.extended,v.currency),v.source??"",v.status])];
+   ...rows.map(v=>[tagKey(v),v.row,v.tag,v.sourceQty??"",v.sourceUnit??"",v.currency??"",v.unitCost??"",v.extended??"",thb(v.extended,v.currency),v.source??"",v.status])];
   const value=lines.map(row=>row.map(v=>String(v??"").replaceAll("\t"," ").replaceAll("\n"," ")).join("\t")).join("\n");
   if(typeof navigator!=="undefined"&&navigator.clipboard?.writeText)navigator.clipboard.writeText(value).catch(()=>window.prompt("Copy BOM",value));
   else if(typeof window!=="undefined")window.prompt("Copy BOM",value);
@@ -33,25 +35,27 @@ export function LocationBomDetail0553({site,fx}){
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix}/> · MTO Rev04 → Engineering Tag → Site Function / Quantity → Vendor evidence → Working Cost. Same ledger rules as ZWP20; NO blind copying of ZWP20 radio configuration or prices.</p>
   <p><strong>{site} Working Priced Subtotal: {Number.isFinite(totalTHB)?"THB "+fmt(totalTHB):"FX REQUIRED"}</strong>
    <small>Original USD {fmt(ledger.subtotals.USD)} + THB {fmt(ledger.subtotals.THB)} · {ledger.costedRows}/{ledger.totalRows} tagged rows priced · {ledger.unresolvedRows.length} unresolved · FX {fx?.thbPerUsd??"NOT SET"} THB/USD</small></p>
+  <p className="p55-note">กด + ที่ TAG เพื่อดู Engineering derivation, MR/BLD/RPT requirements, Vendor quotation functions, assumptions และ Cost ownership; Copy ID ใช้อ้างอิง TAG แยกตาม Location / MTO row ได้โดยตรง</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>MTO / Module</th><th>Engineering Quantity / Basis</th><th>Budgetary Selected Product / Vendor</th><th>Unit Cost (THB)</th><th>Extended Cost (THB)</th><th>Assumptions / Status</th></tr></thead><tbody>
    {rows.map(v=><React.Fragment key={v.row+"-"+v.tag}>
-    <tr>
-     <td><button type="button" className="p55-row-toggle" onClick={()=>setExpanded(o=>({...o,[v.tag]:!o[v.tag]}))}>{expanded[v.tag]?"−":"+"}</button> <strong>{v.tag}</strong><small>Row {v.row}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row} componentName={v.tag+" — "+(v.description||"Engineering BOM")+" / MTO row "+v.row}/></td>
+    <tr data-component-key={tagKey(v)}>
+     <td><button type="button" className="p55-row-toggle" aria-expanded={Boolean(expanded[tagKey(v)])} aria-label={(expanded[tagKey(v)]?"Collapse ":"Expand ")+v.tag+" engineering cost details at "+site+" MTO row "+v.row} onClick={()=>setExpanded(o=>({...o,[tagKey(v)]:!o[tagKey(v)]}))}>{expanded[tagKey(v)]?"−":"+"}</button> <strong>{v.tag}</strong><small>Row {v.row} · {v.description||"Engineering BOM"}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)} componentName={v.tag+" — "+(v.description||"Engineering BOM")+" / MTO row "+v.row}/></td>
      <td>{v.sourceQty??"REVIEW"} {v.sourceUnit||""}<small>{v.quantityBasis||v.note||"Engineering quantity and physical SKU to verify"}</small></td>
      <td>{v.vendor||"Vendor / Configuration not selected"}<small>{v.sku||v.description||"Engineering takeoff required"}</small></td>
      <td>{thb(v.unitCost,v.currency)}<small>{v.currency||"—"} {fmt(v.unitCost)}</small>{!v.countedInWorkingTotal&&Number.isFinite(v.referenceExtended)&&<small>REFERENCE ONLY — NOT SELECTED</small>}</td>
      <td><strong>{v.countedInWorkingTotal?thb(v.extended,v.currency):Number.isFinite(v.referenceExtended)?thb(v.referenceExtended,v.currency)+" (reference only)":"NOT ALLOCATED"}</strong><small>{v.countedInWorkingTotal?`${v.currency||"—"} ${fmt(v.extended)}`:"Excluded from booked site cost until owner/quantity decision"}</small></td>
      <td>{v.status}<small>{v.source||"MTO Rev04"}</small>{(v.assumptions||[]).map((x,i)=><small key={i}>{x}</small>)}</td>
     </tr>
-    {expanded[v.tag]&&<tr><td colSpan={6}><div className="p55-panel">
-     <strong>{v.tag} · Row {v.row} — Engineering Derivation / Vendor Breakdown</strong><p><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row+".derivation"}/></p>
+    {expanded[tagKey(v)]&&<tr id={tagPanelId(v)} data-component-key={tagKey(v)+".derivation"}><td colSpan={6}><div className="p55-panel">
+     <strong>{v.tag} · Row {v.row} — Engineering Derivation / Vendor Breakdown</strong><p><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)+".derivation"}/></p>
+     <p className="p55-note">Original MTO: {site} / row {v.row} / {v.sourceQty??"REVIEW"} {v.sourceUnit||""}. Cost basis: {v.currency||"UNVERIFIED"} {fmt(v.unitCost)} per source unit; extended: {v.countedInWorkingTotal?fmt(v.extended):"NOT ALLOCATED"}. Vendor / SKU: {v.vendor||"Not selected"} / {v.sku||"Not selected"}. No candidate rate is added automatically.</p>
      <p className="p55-note">Quantity owner: MR/MTO · Cost owner: {v.source} · {v.status} · Selected vendor cost is not customer selling price.</p>
      {(site==="ZWP20"&&v.tag==="ANT-502-001")&&<p className="p55-note"><strong>SI Management Working Basis:</strong> {WORKING_POLICY.workingDecisions[0].state}. 4ft is the preferred budgetary alternative, subject to link and reflection proof. Same Customer TAG applies; any changes to mounting/route are tracked through installation drawings and cost drivers.</p>}
      {(site==="ZWP20"&&["MR-502-001","MR-502-001A","LAN-502-001"].includes(v.tag))&&<p className="p55-note"><strong>ZPQ Existing NMS Interface:</strong> {WORKING_POLICY.workingDecisions[2].state}. Existing NMS assumed; available licences are not verified. Configure and test extension as scope; any incremental entitlements require a sourced scenario or documented commercial qualification, not an assumed zero rate.</p>}
 
      {site==="ZWP20"&&v.tag==="MR-502-001"&&v.row===4&&<TagMappingAudit0553/>}
-     {(()=>{const trace=traceTagParticular0553(site,v.tag);const rows=[...trace.direct,...trace.siteSpecific];return <details className="p55-panel" data-component-key={keyPrefix+"."+String(v.tag).toLowerCase()+".particular-evidence"}>
+     {(()=>{const trace=traceTagParticular0553(site,v.tag);const rows=[...trace.direct,...trace.siteSpecific];return <details className="p55-panel" data-component-key={tagKey(v)+".particular-evidence"}>
       <summary><strong>RFQ Particular Evidence / SI Engineering Proof — {trace.direct.length} TAG + {trace.siteSpecific.length} Site + {trace.common.length} Common; {trace.conflicts.length} Conflict Gates</strong></summary>
       <p className="p55-note">Requirements derive from MR/BOD/DTS/SPE/RPT/BLD. Clause evidence is independent from existing priced vendor/quantity ledger. Review every linked note, comment and attachment; show applicable common constraints in 04 Documents.</p>
       <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Document / Clause</th><th>Customer Requirement</th><th>SI Proof / Design Task</th><th>Cost Driver</th></tr></thead><tbody>
@@ -68,7 +72,7 @@ export function LocationBomDetail0553({site,fx}){
      {(v.detail||v.components||[]).length>0&&<div className="p55-table-wrap"><p className="p55-note"><strong>Function-level derivation mapped to Supplier Quote Lines:</strong> Product / Model is interpreted by its quoted function before cost allocation. Supplier quoted quantity remains quotation evidence only; Engineering Required Qty controls the budget quantity. A separate MTO owner is not double-counted in MR-502-001.4.</p><table className="p55-table p55-table--compact">
       <thead><tr><th>Engineering Function / Quote Line</th><th>Required Qty / Basis</th><th>Product / Model · What it does</th><th>Supplier Quote Evidence</th><th>Cost Allocation Owner</th><th>Working Extended (THB)</th><th>Engineering / Commercial State</th></tr></thead><tbody>
        {(v.detail||v.components||[]).map((c,i)=><tr key={c.functionId||i}>
-        <td><strong>{c.functionId}</strong><small>{c.budgetaryQuoteLine||c.budgetarySelectedOffer||"NO SELECTED QUOTE LINE"}</small></td>
+        <td><strong>{c.functionId}</strong><small>{c.budgetaryQuoteLine||c.budgetarySelectedOffer||"NO SELECTED QUOTE LINE"}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)+".function."+String(c.functionId||i).toLowerCase().replace(/[^a-z0-9-]/g,"-")} componentName={v.tag+" / "+(c.functionId||"function "+i)}/></td>
         <td>{c.requiredQty??c.qty??"PENDING"}<small>{c.quantityState||c.quantityBasis||"Engineering confirmation required"}</small><small>{c.quantityProof||""}</small></td>
         <td><strong>{c.budgetarySelectedSKU||c.sku||"NOT SELECTED"}</strong><small>{c.budgetarySelectedDescription||c.description||c.productFunction||"Product function requires engineering review"}</small><small>{c.productFunction||""}</small></td>
         <td>{c.currency||v.currency||"USD"} {fmt(c.budgetaryUnitPrice??c.unitPrice)}<small>Supplier quoted Qty: {c.offeredQuoteQty??"—"} · quoted line total: {c.currency||v.currency||"USD"} {fmt(c.quotedSourceTotal)}</small><small>{c.priceEvidenceType||"SOURCE PRICE EVIDENCE"}</small></td>
