@@ -6,6 +6,7 @@ import {MR0001_ENGINEERING_REQUIRED_BOM} from "./mr0001RequiredBomDerivation";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 import {auditZWP20RadioVendorMapping0553} from "./controlledTagMappingPilot0553";
 import {deriveBartecTagRequiredBulkProjection0553} from "./bartecTagRequiredBulkProjection0553";
+import {deriveZwp20BulkPricingBridge0553} from "./zwp20BulkPricingBridge0553";
 
 const rounded=n=>Math.round(n*100)/100;
 const ownedBy=(c,owner)=>!c.allocationOwner||c.allocationOwner===owner;
@@ -46,13 +47,22 @@ export function getTagBomFourStage0553(site,tagRow){
  // Bridge the previously isolated BARTEC manufacturer geometry + source MTO
  // into THIS TAG's Stage 01 Required view. No read-model cost mutation.
  const bartecBulkRequired=deriveBartecTagRequiredBulkProjection0553(site,tagRow.tag,source);
+ const budgetBridge=site==="ZWP20"&&tagRow.row===11&&/bulk material/i.test(tagRow.tag)?deriveZwp20BulkPricingBridge0553():null;
  const required=(pkg?.components||[]).map(functionRow=>{
   const c=byFunction.get(functionRow.functionId);
+  const budget=budgetBridge?.entries.find(x=>x.functionId===functionRow.functionId);
+  const aggregate=functionRow.functionId==="MOUNT_FEEDER"&&budgetBridge;
   return {id:functionRow.id,functionId:functionRow.functionId,
    requirementState:functionRow.technicalState,quantityDriver:functionRow.quantityDriver,
    approvedSkuQty:functionRow.requiredQty, // remains null until approved by Engineering
-   derivedWorkingQty:Number.isFinite(c?.requiredQty)?c.requiredQty:Number.isFinite(c?.qty)?c.qty:null,
-   qtyState:c?.quantityState||"ENGINEERING_PHYSICAL_QTY_NOT_VERIFIED",
+   derivedWorkingQty:budget?.qty??(aggregate?1:Number.isFinite(c?.requiredQty)?c.requiredQty:Number.isFinite(c?.qty)?c.qty:null),
+   budgetRateTHB:budget?.unitRateTHB??(aggregate?budgetBridge.scenarioTHB:null),
+   budgetAmountTHB:budget?.extendedTHB??(aggregate?budgetBridge.scenarioTHB:null),
+   budgetUnit:budget?.unit??(aggregate?"lot":null),
+   budgetBasis:budget?.quantityBasis??(aggregate?"ONE source MTO Bulk lot, aggregate scenario total; DO NOT add to individual child amounts":null),
+   budgetSource:budget?.source??(aggregate?budgetBridge.source:null),
+   budgetPosting:aggregate?"ROLLUP_TOTAL_ONLY_NOT_ADDITIVE":budget?"SOURCE_RATE_BUDGET_ESTIMATE_NOT_ADDITIVE":"NO_SOURCE_RATE_YET",
+   qtyState:budget?"WORKING_BUDGET_QUANTITY_WITH_OPEN_TECHNICAL_PROOF":aggregate?"WORKING_BUDGET_LOT_ROLLUP":c?.quantityState||"ENGINEERING_PHYSICAL_QTY_NOT_VERIFIED",
    qtyProof:c?.quantityProof||functionRow.proofRequired?.join("; ")||"REVIEW",
    costOwner:c?.allocationOwner||null,selectionStatus:c?.budgetarySelectionState||"NOT_SELECTED",
    candidateCount:functionRow.candidateQuotes?.length||0};
@@ -110,7 +120,7 @@ export function getTagBomFourStage0553(site,tagRow){
   sourceId:source?.id||null,sourceMatched:matchingTag,sourceQuantityText:source?.sourceQuantityText||null,
   scopeQty:tagRow.sourceQty??null,scopeUnit:tagRow.sourceUnit||null,
   packageFamily:pkg?.equipmentFamily||"SOURCE_MAPPING_REVIEW",
-  required,bartecBulkRequired,physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
+  required,bartecBulkRequired,budgetBridge,physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
   working:{status:tagRow.status||"REVIEW",currency:tagRow.currency||null,extended:ledgerTotal,
    selectedVendor:tagRow.vendor||null,selectedSku:tagRow.sku||null,
    source:tagRow.source||null,functions:pricedFunctions,
