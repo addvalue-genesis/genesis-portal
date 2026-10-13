@@ -1,3 +1,4 @@
+import {BARTEC_ENCLOSURE_BASIS_0553} from "./data/bartecEnclosureBasis0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {BULK_TAKEOFF_0553,BULK_TAKEOFF_POLICY_0553} from "./data/bulkTakeoff0553";
@@ -19,7 +20,20 @@ export function BulkTakeoff0553(){
  return <section className="p55-panel">
   <div className="p55-eyebrow">ENGINEERING → COST <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bulk"/></div>
   <h3>Bulk, Enclosure & ATEX JB — Engineering Take-off</h3>
-  <p className="p55-note">กด + เพื่อดู Sub-items, Constraints และ Evidence ของแต่ละรายการ ยังไม่ใช่ Selected BOM; ช่องปริมาณหรือราคาว่าง = ไม่ได้ยืนยัน ไม่ใช่ศูนย์</p>
+  <p className="p55-note">BARTEC enclosure models and drilled-hole patterns are user-confirmed as the engineering basis. Cable-end quantities, certified active glands, fitted plug replacements and procurement quantities remain separately derived. Blank bulk quantity/rate does not mean zero.</p>
+  <details className="p55-panel"><summary style={{cursor:"pointer",fontWeight:700}}>＋ / − BARTEC selected enclosure holes / cable entry capacity (2026-10-13 decision)</summary>
+   <p className="p55-note">Source BARTEC GA 21G1048t-BA-GA-100X_Z0 (2022 as-built). Hole counts are PER ENCLOSURE, not site quantities and not purchased cable glands. Drain holes are separate; legacy TETRA enclosures do not establish current DTRS allocation.</p>
+   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Enclosure type</th><th>Reference model</th><th>M20 entry holes</th><th>Position</th><th>Original stopping plugs</th><th>Planning spare / max active</th><th>Engineering / RFQ gate</th></tr></thead><tbody>
+    {BARTEC_ENCLOSURE_BASIS_0553.products.map(p=><tr key={p.id}>
+     <td><strong>{p.label}</strong><small>{p.intendedZ1f}</small></td>
+     <td>{p.model}<small>{p.drawing}</small></td><td>{p.entryCount}</td>
+     <td>Top {p.entries.top} / L {p.entries.left} / R {p.entries.right} / Bottom {p.entries.bottom}<small>Drain: {p.drainEntryCount} separate</small></td>
+     <td>{p.originalStoppingPlugs}</td><td>{p.spareEntryPlanningQty} spare / {p.maxActiveEntryPlanningQty} active<small>Conservative planning only, verify cable-end schedule</small></td>
+     <td>{p.requirementConflict||"Verify actual Z1F allocation and vendor-included fittings"}</td>
+    </tr>)}
+   </tbody></table></div>
+   <p className="p55-note"><strong>Deviation:</strong> {BARTEC_ENCLOSURE_BASIS_0553.customerDeviationStatus}. SCADA BARTEC 16 M20 holes conflicts with Z1F DTS minimum 18; user-selected physical basis does not constitute client-approved technical deviation. No A1/A5 booked cost or customer price is changed.</p>
+  </details>
   <div style={{display:"flex",gap:8,marginBottom:12}}><button className="p553-detail-button" type="button" onClick={expandAll}>＋ Expand all</button><button className="p553-detail-button" type="button" onClick={()=>setOpen(new Set())}>− Collapse all</button></div>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>＋/−</th><th>MR</th><th>Category</th><th>Required candidate</th><th>Quantity basis / Source</th><th>Qty</th><th>Unit Cost</th></tr></thead><tbody>
    {BULK_TAKEOFF_0553.map((r,i)=><React.Fragment key={r.mr+"-"+i}>
