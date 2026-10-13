@@ -78,6 +78,12 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  const getVendorLines=x=>[...new Map(NEXTG_CANDIDATE_ESTIMATE_0553.estimateFor(x).functions.flatMap(fn=>fn.candidates).map(q=>[q.quoteLine,q])).values()];
  const vendorCovered=x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice))||x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice))||Number.isFinite(x.indicativePackageCostTHB);
  const coverageCount=visible.filter(vendorCovered).length;
+ const postedTagByKey=new Map(groups.flatMap(g=>getMR0001LocationCost0553(g.site).itemAllocations.map(x=>[g.site+"|"+x.row+"|"+x.tag,x])));
+ const uncoveredRateTags=visible.filter(x=>!vendorCovered(x)).map(x=>{
+  const booked=postedTagByKey.get(x.site+"|"+x.sourceRow+"|"+x.sourceTag);
+  return {site:x.site,tag:x.sourceTag,row:x.sourceRow,scopeQty:x.sourceScopeQty,scopeUnit:x.sourceScopeUnit,
+   workingCostAllocated:Boolean(booked),workingState:booked?.status||"NO_BOOKED_TAG_ALLOCATION"};
+ });
  const abcReadiness=deriveAbcWorkingReadiness0553({site,thbPerUsd:fx?.thbPerUsd??null});
  const provisionalSubtotalTHB=priced.reduce((sum,x)=>sum+x.indicativePackageCostTHB,0);
  const open=k=>setExpanded(old=>({...old,[k]:k.startsWith("site:")?!(old[k]??allSitesExpanded):!old[k]}));
@@ -244,7 +250,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     <small><strong>A+B+C: NOT ESTABLISHED</strong> · A booked {abcReadiness.A.postedRows}/{abcReadiness.A.totalRows} TAGs · view A/B/C action breakdown below</small>
    </div>
   </div>
-  {system==="MR-0001"&&<AbcCostReadiness0553 site={site} fx={fx} snapshot={abcReadiness} priceEvidence={{covered:coverageCount,total:visible.length,filtered:vendor!=="ALL"}}/>}
+  {system==="MR-0001"&&<AbcCostReadiness0553 site={site} fx={fx} snapshot={abcReadiness} priceEvidence={{covered:coverageCount,total:visible.length,filtered:vendor!=="ALL",uncovered:uncoveredRateTags}}/>}
   <div className="p55-filterbar" style={{display:"flex",gap:8,margin:"12px 0"}}><button type="button" className="p553-detail-button" onClick={expandAll}>＋ Expand all</button><button type="button" className="p553-detail-button" onClick={collapseAll}>− Collapse all</button><span className="p55-note">เริ่มต้นแสดงภาพรวมทุกแท่น คลิก + เพื่อดู MTO, Calculation, Vendor และ Cost</span></div>
   <div className="p55-table-wrap">
    <table className="p55-table p55-table--compact p55-table--budget p553-location-overview" style={{width:"100%",borderCollapse:"collapse",tableLayout:"fixed",minWidth:1060}}>
