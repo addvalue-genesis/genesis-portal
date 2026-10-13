@@ -5,7 +5,14 @@ const money=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFracti
 const fmt=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 const state=(s)=>s==="ERROR"?"ERROR — CHECK REQUIRED":s==="QUALIFIED"?"QUALIFIED (NOT TECHNICAL PASS)":s==="PASS"?"PASS — EVIDENCE TRACE":"SKIPPED";
 export function TagMappingAudit0553(){
- const result=useMemo(()=>auditZWP20RadioVendorMapping0553(),[]);
+ const result=useMemo(()=>{
+  try{return auditZWP20RadioVendorMapping0553();}
+  catch(error){
+   return {status:"MAPPING_RUNTIME_ERROR",budgetaryProceed:false,technicalCompliancePassed:false,
+    releaseAllowed:false,equations:[],stages:[],details:[],technical:[],ownerReconciliation:[],requirements:null,
+    errors:[{equationId:"RUNTIME",message:String(error?.message||error)}]};
+  }
+ },[]);
  const root="bid.budget.bom.zwp20.mr-502-001.4.mapping-audit";
  return <section className="p55-panel" style={{padding:14,marginTop:12}} data-component-key={root}>
   <h4>Controlled TAG → Vendor Mapping / สมการตรวจสอบทีละขั้น</h4>
