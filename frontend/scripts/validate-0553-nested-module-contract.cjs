@@ -6,10 +6,11 @@ const babel=require("@babel/core");
 const root=path.resolve(__dirname,"../src");
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 const ui=read("project0553/LocationBomDetail0553.jsx");
+const working=read("project0553/SimpleBom0553.jsx");
 const auditUI=read("project0553/TagMappingAudit0553.jsx");
 const shell=read("project0553/ControlledModuleSection0553.jsx");
 const css=read("project0553/project0553.css");
-for(const [name,src] of [["Location TAG",ui],["Mapping Audit",auditUI],["Controlled shell",shell]]){
+for(const [name,src] of [["Location TAG",ui],["Mapping Audit",auditUI],["Controlled shell",shell],["Working Preview",working]]){
  const compiled=babel.transformSync(src,{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
  assert(compiled?.code?.length>0,name+" failed Babel JSX compilation");
@@ -28,6 +29,14 @@ for(const name of ["derivation","particular-evidence","particular-evidence.direc
 for(const name of [".stages",".equations",".vendor-quote-lines",
  ".technical-constraints",".cost-owner-reconciliation"]){
  assert(auditUI.includes('root+"'+name+'"'),"Missing audit module with Copy ID: "+name);
+}
+for(const key of ["source-layout","parametric-bulk-routes","mr0002.rf-dc-alarm-bulk",
+ "wp-system-bulk","mr0004.racon-termination-bulk","mr0002.rfi-feeder-bulk",
+ "lifecycle-b4-b5-c2"]){
+ assert(working.includes('moduleKey="bid.budget.bom.'+key+'"'),"Working Preview module missing Copy ID: "+key);
+}
+for(const key of [".cost-allocation",".vendor-rate-evidence",".unallocated-scenarios",".rpt-link-budget"]){
+ assert(working.includes('g.site.toLowerCase()+"'+key+'"'),"WP location module missing Copy ID: "+key);
 }
 assert(ui.includes("trace.common.map(")&&ui.includes("trace.conflicts.map("),
  "RFQ module must show actual common and conflict details, not just counts");
