@@ -78,7 +78,7 @@ export function auditZWP8CostOwnership0553({thbPerUsd=null}={}){
   ledgerCoverage:{costed:ledger.costedRows,total:ledger.totalRows,unpricedTags:ledger.unresolvedRows.map(x=>x.tag)},
   otherSites,issues,
   calculation:"Current quoted ZWP8 ledger = 2×(B1+B2+B3+B5+B6+B7+B8)+2×B12+2×B8+LAN+TCAB+Bulk; unique-owner what-if = current − 2×B8",
-  flags:{verifiedArithmetic:canQuantifyOverlap,uniqueCostOwnerPassed:!canQuantifyOverlap,
+  flags:{verifiedArithmetic:canQuantifyOverlap,uniqueCostOwnerPassed:canQuantifyOverlap&&sourceOverlapUSD===0,
    vendorTechApproved:false,physicalNewReuseApproved:false,customerReleased:false},
   policy:"AUDIT_ONLY_DO_NOT_MUTATE_LOCKED_LEDGER_OR_AUTO_APPROVE_DESIGN"
  };
