@@ -68,6 +68,53 @@
       ],
       "approvedAVL": false,
       "approvedStatus": "NOT_VERIFIED"
+    },
+    {
+      "id": "rs thailand",
+      "displayName": "RS Thailand",
+      "legalName": null,
+      "verification": "PUBLIC_WEB_PRICE_DISCOVERY_ONLY__NO_PROJECT_PURCHASE_OR_AVL_VERIFIED",
+      "roles": [
+        "WEB_RETAIL_PRICE_SOURCE"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "RS Thailand",
+          "relation": "RETAIL_PRICE_REFERENCE_ONLY"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "Weidmüller is manufacturer, RS Thailand is a retail source link, not confirmed authorized distributor or awarded supplier",
+        "No automatic adoption of listed web rates"
+      ]
+    },
+    {
+      "id": "mgw technologies pte ltd",
+      "displayName": "MGW Technologies Pte Ltd",
+      "legalName": "MGW Technologies Pte Ltd",
+      "verification": "SOURCE_MGW_P26_058_PLUS_MANAGEMENT_WORKING_ASSIGNMENT",
+      "roles": [
+        "QUOTED_SUPPLIER",
+        "RFI_LNA_MANAGEMENT_WORKING_SUPPLIER_ASSIGNMENT"
+      ],
+      "aliases": [
+        {
+          "sourceLabel": "MGW Technologies Pte Ltd",
+          "relation": "SUPPLIER"
+        },
+        {
+          "sourceLabel": "MGW",
+          "relation": "SHORT_FORM_NAME"
+        }
+      ],
+      "approvedAVL": false,
+      "approvedStatus": "NOT_VERIFIED",
+      "notes": [
+        "P26-058 quotes UHF antennas/feeder and other systems; it does not quote RFI RX3852-2002-11 directly",
+        "RFI LNA THB500000/unit is management budgetary allowance and not MGW firm price"
+      ]
     }
   ],
   "noAutomaticCostSelection": true,
