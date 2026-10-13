@@ -8,6 +8,7 @@ import EXION_REFERENCE from "./quotes/EXION-1240515-R0.reference.json";
 import EXION_LATEST from "./quotes/EXION-1260576-R0.current.json";
 import KNOWLEDGE_PRODUCTS from "./vendorKnowledgeProducts0553.json";
 import {buildVendorProductCatalog} from "../../common/engineering/vendorProductCatalog";
+import {resolveCompany0553,resolveCompanySummary0553} from "./companyIdentity0553";
 const quoted=buildVendorProductCatalog(SUPPLIER_QUOTE_LINES_0553);
 const suppliers=new Map(quoted.suppliers.map(x=>[x.id,{...x,quoteIds:[...x.quoteIds]}]));
 const products=new Map(quoted.products.map(x=>[x.id,{...x}]));
@@ -98,8 +99,34 @@ EXION_LATEST.lines.forEach((l,i)=>{
  pricingUnit:l.unit,sourceClass:EXION_LATEST.sourceClass,priceStatus:EXION_LATEST.status,
  source:EXION_LATEST.source,referenceFrom:EXION_LATEST.source,approvedForBudget:false});
 });
+// Company 360 projection: collapse documented source-name variants to a stable company
+// without altering any source quote, source SKU, original supplier label, rate or link.
+const resolvedSuppliers=new Map();
+const originalSupplierById=new Map([...suppliers.values()].map(s=>[s.id,s]));
+const resolvedRelationships=relationships.map(row=>{
+ const sourceName=originalSupplierById.get(row.vendorId)?.name||row.vendorId;
+ const company=resolveCompany0553(sourceName);
+ if(!resolvedSuppliers.has(company.id)){
+  const summary=resolveCompanySummary0553(company.id);
+  resolvedSuppliers.set(company.id,{
+   id:company.id,name:company.name,quoteIds:[],
+   aliases:summary.aliases,sourceSupplierLabels:[],
+   qualification:summary.qualification,roles:summary.roles
+  });
+ }
+ const supplier=resolvedSuppliers.get(company.id);
+ if(!supplier.sourceSupplierLabels.includes(sourceName))supplier.sourceSupplierLabels.push(sourceName);
+ const original=originalSupplierById.get(row.vendorId);
+ for(const qid of original?.quoteIds||[]){
+  if(!supplier.quoteIds.includes(qid))supplier.quoteIds.push(qid);
+ }
+ return {...row,vendorId:company.id,companyId:company.id,
+  originalVendorId:row.vendorId,sourceSupplierLabel:sourceName,
+  sourceSupplierRole:company.relation,sourceThirdParty:company.thirdParty,
+  companyQualification:company.qualification};
+});
 export const VENDOR_UNIFIED_CATALOG_0553=Object.freeze({
- suppliers:[...suppliers.values()],products:[...products.values()],relationships,
+ suppliers:[...resolvedSuppliers.values()],products:[...products.values()],relationships:resolvedRelationships,
  sourceClassRule:"Supplier quotations, web retail, historic ERP and manufacturer evidence do not gain equivalent approvals by being shown in one table",
  storage:"GITHUB_CONTROLLED_JS_JSON_SNAPSHOT__SQL_NOT_CONNECTED",releaseAllowed:false
 });
