@@ -49,9 +49,11 @@ assert.equal(withoutFx.adjustedOwnerTotalTHB,null,"Corrections must retain origi
 assert.equal(JSON.stringify(summarizeMR0001TagCost0553("ZWP8").rows),original,"Audit may not mutate any source ledger lines");
 const view=fs.readFileSync(path.join(root,"project0553/ZWP8CostOwnershipAudit0553.jsx"),"utf8");
 const host=fs.readFileSync(path.join(root,"project0553/LocationBomDetail0553.jsx"),"utf8");
+const overview=fs.readFileSync(path.join(root,"project0553/SimpleBom0553.jsx"),"utf8");
 assert(view.includes('id="bid.budget.bom.zwp8.cost-ownership-audit"'));
 assert(view.includes('<ControlledModuleSection0553 moduleKey={id}')&&view.includes('moduleKey={id+".issues"}'));
 assert(host.includes('site==="ZWP8"&&<ZWP8CostOwnershipAudit0553 fx={fx}/>'));
+assert(overview.includes("OWNER AUDIT: B-8 surge counted twice"),"Do not hide source duplication behind working total");
 assert(!view.includes("setCost")&&!view.includes("updateLedger"));
 const compiled=babel.transformSync(view,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
