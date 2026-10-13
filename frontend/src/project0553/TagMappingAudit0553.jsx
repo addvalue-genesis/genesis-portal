@@ -19,6 +19,23 @@ export function TagMappingAudit0553(){
    <tbody>{result.stages.map(x=><tr key={x.id}><td><strong>{x.id}</strong><small>{x.name}</small></td>
     <td><strong>{state(x.status)}</strong></td><td>{x.details}</td></tr>)}</tbody>
   </table></div>
+  <details className="p55-panel" style={{padding:10}}>
+   <summary style={{cursor:"pointer",fontWeight:700}}>Controlled Equation Register / สมการ MAP-01 ถึง MAP-10</summary>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Equation / Copy ID</th><th>Derivation Rule</th><th>Purpose / Failure Gate</th></tr></thead>
+    <tbody>{result.equations.map(eq=><tr key={eq.id}>
+     <td><strong>{eq.id} · {eq.name}</strong>
+      <ComponentCopyId projectId="PJ2608-0553" componentKey={root+".equation."+eq.id.toLowerCase()} componentName={eq.name}/></td>
+     <td><code>{eq.expression}</code></td>
+     <td>{eq.purpose}<small>{eq.failState}</small></td>
+    </tr>)}</tbody></table></div>
+  </details>
+  {result.requirements&&<p className="p55-note"><strong>Source Requirements:</strong>
+   {" Direct "+result.requirements.direct.join(", ")}
+   {" · Site "+result.requirements.site.join(", ")}
+   {" · Common "+result.requirements.common}
+   {" · Conflicts "+result.requirements.conflicts.join(", ")}
+  </p>}
   {result.errors.length>0&&<p role="alert" className="p55-note"><strong>MAPPING ERROR — source cost NOT safe to promote:</strong>{" "}
    {result.errors.map(x=>x.equationId+": "+x.message).join("; ")}</p>}
   {result.details.length>0&&<details className="p55-panel" style={{padding:10}}>
