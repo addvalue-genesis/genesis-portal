@@ -20,8 +20,9 @@ export function VendorProductCatalog0553(){
  const [search,setSearch]=useState("");
  const [evidenceClass,setEvidenceClass]=useState("ALL");
  const [chosenQuote,setChosenQuote]=useState("");
+ const [inspectedQuote,setInspectedQuote]=useState("");
  const commercial=useMemo(()=>buildQuotationCommercialRegister([{id:EXION_LATEST.id,vendor:"EXION (Thailand)",quotation:EXION_LATEST.quotation,source:EXION_LATEST.source,scope:EXION_LATEST.scope,date:EXION_LATEST.date,currency:EXION_LATEST.currency,quotedTotal:EXION_LATEST.quotedTotal,status:EXION_LATEST.status,validUntil:EXION_LATEST.validUntil,terms:EXION_LATEST.terms.map(x=>x.topic+": "+x.value).join(" | ")},...SUPPLIER_QUOTE_LINES_0553,...HISTORICAL_VENDOR.quotes.map(q=>({...q,terms:q.terms,source:q.sourceUrl||q.source})),{id:EXION_REFERENCE.id,vendor:EXION_REFERENCE.vendor,quotation:EXION_REFERENCE.quotation,date:EXION_REFERENCE.date,currency:EXION_REFERENCE.currency,quotedTotal:EXION_REFERENCE.totalExVat,scope:"MR-0003 historical telephone/sounder reference",status:EXION_REFERENCE.priceState,source:EXION_REFERENCE.document,terms:EXION_REFERENCE.terms.map(x=>x.join(": ")).join(" | ")}]),[]);
- const selectedCommercial=commercial.find(q=>q.quoteId===chosenQuote);
+ const selectedCommercial=commercial.find(q=>q.quoteId===(chosenQuote||inspectedQuote));
  const catalog=VENDOR_UNIFIED_CATALOG_0553;
  const suppliersById=new Map(catalog.suppliers.map(v=>[v.id,v]));
  const productsById=new Map(catalog.products.map(p=>[p.id,p]));
@@ -31,8 +32,8 @@ export function VendorProductCatalog0553(){
  const matchingSuppliers=sortedSuppliers.filter(company=>[company.name,...(company.aliases||[]),...(company.sourceSupplierLabels||[])].join(" ").toLocaleLowerCase().includes(companyQuery.trim().toLocaleLowerCase()));
  const sortedQuotes=[...commercial].sort((a,b)=>companyCollator.compare(resolveCompany0553(a.vendor).name,resolveCompany0553(b.vendor).name)||companyCollator.compare(a.quotationNo||"",b.quotationNo||""));
  const allowedQuotes=sortedQuotes.filter(q=>(vendor==="ALL"||canonicalCompanyId0553(q.vendor)===vendor)&&(!companyQuery||matchingSuppliers.some(s=>s.id===canonicalCompanyId0553(q.vendor))));
- const chooseVendor=value=>{setVendor(value);setChosenQuote("");};
- const chooseQuote=value=>{setChosenQuote(value);if(value){const q=quoteById.get(value);if(q)setVendor(canonicalCompanyId0553(q.vendor));}};
+ const chooseVendor=value=>{setVendor(value);setChosenQuote("");setInspectedQuote("");};
+ const chooseQuote=value=>{setChosenQuote(value);setInspectedQuote("");if(value){const q=quoteById.get(value);if(q)setVendor(canonicalCompanyId0553(q.vendor));}};
  const rows=catalog.relationships.filter(x=>{
   if(evidenceClass!=="ALL"&&(evidenceClass==="CURRENT"?x.sourceClass!=="SUPPLIER_QUOTATION":evidenceClass==="HISTORICAL"?!String(x.sourceClass||"").includes("HISTORICAL"):evidenceClass==="DATASHEET"?!["MANUFACTURER_BROCHURE","DATASHEET_ONLY"].includes(x.sourceClass):!String(x.sourceClass||"").startsWith("WEB")))return false;
   if((view==="supplier"||view==="quote")&&companyQuery.trim()){
@@ -51,7 +52,7 @@ export function VendorProductCatalog0553(){
   if(!search)return true;
   return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,x.description,productsById.get(x.productKey)?.description,x.sourceSupplierLabel,x.sourceThirdParty,x.sourceSupplierRole,suppliersById.get(x.vendorId)?.name,...(suppliersById.get(x.vendorId)?.aliases||[])].join(" ").toLowerCase().includes(search.toLowerCase());
  });
- const resetSearch=()=>{setView("supplier");setMr("ALL");setVendor("ALL");setCompanyQuery("");setSearch("");setEvidenceClass("ALL");setChosenQuote("");};
+ const resetSearch=()=>{setView("supplier");setMr("ALL");setVendor("ALL");setCompanyQuery("");setSearch("");setEvidenceClass("ALL");setChosenQuote("");setInspectedQuote("");};
  const groups=new Map();
  const groupKey=r=>view==="quote"?(r.quoteId||"NO_QUOTE"):view==="product"?r.productKey:(view==="mr"||view==="compare")?(r.mr||"NO_MR"):r.vendorId;
  const groupLabel=id=>{
@@ -100,7 +101,7 @@ export function VendorProductCatalog0553(){
     total={catalog.relationships.length} shown={rows.length} onReset={resetSearch}
     description="Search known companies, manufacturers, part numbers, functions, MR and historical quotations; matches do not imply AVL approval."
     controls={[
-     {key:"view",label:"View / Group By",type:"select",value:view,onChange:value=>{setView(value);setVendor("ALL");setCompanyQuery("");setChosenQuote("");setMr("ALL");},
+     {key:"view",label:"View / Group By",type:"select",value:view,onChange:value=>{setView(value);setVendor("ALL");setCompanyQuery("");setChosenQuote("");setInspectedQuote("");setMr("ALL");},
        options:[{value:"supplier",label:"Company / Supplier"},{value:"quote",label:"Quotation"},{value:"product",label:"Product / Model"},{value:"mr",label:"MR / System"},{value:"compare",label:"TBE / CBE Candidates"}]},
      ...(view==="supplier"||view==="quote"?[
        {key:"companyQuery",label:"Type company / ค้นหาบริษัท (A–Z)",type:"search",value:companyQuery,
@@ -124,7 +125,7 @@ export function VendorProductCatalog0553(){
     <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.quotation-selector"/>
   </div>}
   {(view==="supplier"||view==="quote")&&selectedCommercial&&<div className="p55-panel" style={{padding:14,marginBottom:12}}>
-   <h3>{resolveCompany0553(selectedCommercial.vendor).name} — {selectedCommercial.quotationNo}</h3><p className="p55-note">Original source supplier label: {selectedCommercial.vendor}</p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+selectedCommercial.quoteId}/>
+   <h3>{resolveCompany0553(selectedCommercial.vendor).name} — {selectedCommercial.quotationNo}</h3>{inspectedQuote&&!chosenQuote&&<button type="button" className="p553-detail-button" onClick={()=>setInspectedQuote("")}>Close details</button>}<p className="p55-note">Original source supplier label: {selectedCommercial.vendor}</p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+selectedCommercial.quoteId}/>
    <p><strong>Original terms (working transcription):</strong> {selectedCommercial.sourceTermsRaw||"NOT CAPTURED — verify original"}</p>
    <p><strong>Source:</strong> {selectedCommercial.sourceUrl?<a href={selectedCommercial.sourceUrl} target="_blank" rel="noreferrer">Open source document</a>:selectedCommercial.source||"NOT CAPTURED"}</p>
    <p>Scope: {selectedCommercial.scope||"OPEN"} · Currency: {selectedCommercial.currency||"OPEN"} · Valid until: {selectedCommercial.validUntil||"NOT RECORDED"} · Quote status: {selectedCommercial.quoteStatus}</p>
@@ -165,7 +166,7 @@ export function VendorProductCatalog0553(){
           " · Original vendor: "+(q.header?.vendor||g.title)}
         defaultOpen={Boolean(search)||chosenQuote===q.id}>
         {q.header&&<div className="p55-filterbar">
-         <button type="button" className="p553-detail-button" onClick={()=>chooseQuote(q.id)}>Inspect quotation &amp; commercial conditions</button>
+         <button type="button" className="p553-detail-button" onClick={()=>setInspectedQuote(q.id)}>Inspect quotation &amp; commercial conditions</button>
          <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+q.id}
           componentName={q.header.quotationNo}/>
         </div>}
