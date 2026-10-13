@@ -43,7 +43,20 @@ const idu=rows.find(x=>x.row===5&&x.tag==="MR-502-001A");
 assert(idu,"Separate IDU cost owner must remain present");
 const iduView=getTagBomFourStage0553("ZWP20",{...idu,countedInWorkingTotal:true});
 assert.equal(iduView.working.extended,671.27);
+assert.equal(iduView.working.derivedFunctionSubtotal,671.27,"Existing MAP-09 owner B-6/B-7 must reconstruct IDU subset");
+assert.deepEqual(iduView.offered.map(x=>x.code),["B-6","B-7"],"IDU must show only source lines with IDU cost owner");
+assert.equal(iduView.working.deltaFromLedger,0);
 assert.notEqual(iduView.owner,m.owner);
+for(const check of [{row:6,tag:"ANT-502-001",code:"B-12",usd:4709.77},{row:10,tag:"SA-502-001",code:"B-8",usd:614.2}]){
+ const tag=rows.find(x=>x.row===check.row&&x.tag===check.tag);
+ assert(tag,"Missing TAG: "+check.tag);
+ const view=getTagBomFourStage0553("ZWP20",{...tag,countedInWorkingTotal:true});
+ assert.equal(view.working.extended,check.usd);
+ assert.equal(view.working.derivedFunctionSubtotal,check.usd);
+ assert.equal(view.working.deltaFromLedger,0);
+ assert.deepEqual(view.offered.map(x=>x.code),[check.code],"TAG line not separated correctly: "+check.tag);
+}
+
 assert.equal(JSON.stringify(deriveZWP20SiteCost0553().rows),before,"Read model must not mutate ledger");
 const ui=fs.readFileSync(path.join(root,"project0553/TagFourStageWorkbench0553.jsx"),"utf8");
 const host=fs.readFileSync(path.join(root,"project0553/LocationBomDetail0553.jsx"),"utf8");
@@ -59,4 +72,4 @@ assert(host.includes("<TagMappingAudit0553/>")&&host.includes('moduleKey={tagKey
 const compiled=babel.transformSync(ui,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
 assert(compiled.code.length>0,"Four-stage JSX compile failed");
-console.log("PASS 0553 TAG four-stage read model: 8 engineering-required functions (no approved SKU), 5 ODU quote codes, USD 7,288.65 owner-only reconciliation, IDU USD 671.27 separate, B-4 supplier NULL, zero ledger mutation; all four module contracts and JSX compile.");
+console.log("PASS 0553 TAG four-stage read model: 8 engineering-required functions (no approved SKU), 5 ODU quote codes, USD 7,288.65 owner-only reconciliation, IDU USD 671.27 separate, B-4 supplier NULL, zero ledger mutation; four TAG owners' source lines, all four module contracts and JSX compile.");
