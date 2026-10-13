@@ -1,0 +1,31 @@
+// UI regression for compact one-row-per-location BOM. Does not modify source data or cost.
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const babel=require("@babel/core");
+const root=path.resolve(__dirname,"../src");
+const src=fs.readFileSync(path.join(root,"project0553/SimpleBom0553.jsx"),"utf8");
+const css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
+const compiled=babel.transformSync(src,{babelrc:false,configFile:false,
+  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
+assert(compiled?.code?.length>0,"SimpleBom JSX did not compile");
+const index=src.indexOf('className="p553-location-overview"');
+assert(src.includes("p553-location-overview"),"Compact table style missing");
+const start=src.indexOf('<tr className="p553-location-summary">');
+const end=src.indexOf('<tr className="p553-location-expanded">',start);
+assert(start>0&&end>start,"Per-WP summary/details split missing");
+const overview=src.slice(start,end);
+assert(overview.includes("displaySiteTotal(g.site)"),"Original site total must stay visible");
+assert(overview.includes('componentKey={"bid.budget.bom."+g.site.toLowerCase()}'),"Original module IDs and Copy controls missing");
+assert(overview.includes('aria-expanded={siteExpanded(g.site)}'),"Accessible expand/collapse state missing");
+assert(overview.includes("financial.costed")&&overview.includes("financial.total"),"Cost coverage summary missing");
+assert(!overview.includes("itemAllocations?.map")&&!overview.includes("extraScenarios.map")&&!overview.includes("getMR0001LocationCost0553(g.site).itemAllocations?.map"),"Long source/cost narratives leak into compact WP row");
+const detail=src.slice(end,src.indexOf("</React.Fragment>",end));
+assert(detail.includes("allocatedRows.map((a,i)=><tr"),"All original tag cost allocations must have independent lines");
+assert(detail.includes("extraScenarios.map((v,i)=><tr"),"Additional scenarios missing");
+assert(detail.includes("Vendor Rate Evidence &amp; Currency"),"Original vendor source classes missing");
+assert(detail.includes('<LocationBomDetail0553 site={g.site} fx={fx}/>'),"Source-tag drilldown removed");
+assert(detail.includes("g.rfProof.map(p=><tr"),"Original RF/Link evidence removed");
+assert(detail.includes("colSpan={8}"),"Detail column span must match 8-column header");
+assert(src.includes('style={{width:"100%",borderCollapse:"collapse",tableLayout:"fixed",minWidth:1060}}'),"Fixed column width budget presentation missing");
+assert(css.includes("p553-location-overview")&&css.includes("p553-location-line-detail"),"Scoped compact styles absent");
+assert(!src.includes('<small>{"Basis: "+wpSummary(g.site).basis}'),"Long narrative reintroduced into site summary");
+console.log("PASS 0553 compact BOM layout: one row per WP, expandable per-TAG cost table/source evidence/RF detail, unchanged site totals and Copy IDs, Babel JSX valid.");
