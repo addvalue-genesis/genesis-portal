@@ -10,16 +10,16 @@ export const PROOF_STATES=Object.freeze(["VERIFIED","UNVERIFIED","CONFLICT","NOT
 export const CANDIDATE_STATES=Object.freeze(["SOURCE_ONLY","HARD_CONFLICT","QUALIFIED_REVIEW","EVIDENCE_MATCH_NOT_APPROVED"]);
 
 /** Controlled aliases only. Similar words never authorize an equivalence. */
-export function canonicalFunction0553Agnostic(value,aliases={}){
+export function canonicalEngineeringFunction(value,aliases={}){
  const name=simple(value);
  const exact=Object.entries(aliases).find(([alias])=>simple(alias)===name);
  return exact?simple(exact[1]):name;
 }
 export function classifyFunctionMatch({requiredFunction,candidateFunctions=[],aliases={}}){
- const req=canonicalFunction0553Agnostic(requiredFunction,aliases);
+ const req=canonicalEngineeringFunction(requiredFunction,aliases);
  if(!req)return result("FUNCTION_UNKNOWN",null,"Required engineering function absent");
  if(!Array.isArray(candidateFunctions)||candidateFunctions.length===0)return result("FUNCTION_UNKNOWN",null,"No vendor function classification in evidence");
- const offered=candidateFunctions.map(v=>canonicalFunction0553Agnostic(v,aliases));
+ const offered=candidateFunctions.map(v=>canonicalEngineeringFunction(v,aliases));
  return offered.includes(req)?
   result("FUNCTION_MATCH",null,"Controlled function identity matched"):
   result("FUNCTION_MISMATCH",null,"Vendor function set does not contain required function");
