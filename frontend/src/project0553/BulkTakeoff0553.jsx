@@ -1,4 +1,5 @@
 import {BARTEC_ENCLOSURE_BASIS_0553} from "./data/bartecEnclosureBasis0553";
+import {deriveBartecGlandBulkSchedule0553} from "./data/bartecGlandBulkSchedule0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {BULK_TAKEOFF_0553,BULK_TAKEOFF_POLICY_0553} from "./data/bulkTakeoff0553";
@@ -14,6 +15,7 @@ const components={
  "RACON installation bulk":["Mounting and support","Power/control cabling","Earthing, glands and connectors","OEM-supplied versus ADDVALUE bulk check"]
 };
 export function BulkTakeoff0553(){
+ const glandSchedule=deriveBartecGlandBulkSchedule0553();
  const [open,setOpen]=useState(new Set());
  const toggle=k=>setOpen(old=>{const next=new Set(old);next.has(k)?next.delete(k):next.add(k);return next;});
  const expandAll=()=>setOpen(new Set(BULK_TAKEOFF_0553.map((_,i)=>i)));
@@ -33,6 +35,34 @@ export function BulkTakeoff0553(){
     </tr>)}
    </tbody></table></div>
    <p className="p55-note"><strong>Deviation:</strong> {BARTEC_ENCLOSURE_BASIS_0553.customerDeviationStatus}. SCADA BARTEC 16 M20 holes conflicts with Z1F DTS minimum 18; user-selected physical basis does not constitute client-approved technical deviation. No A1/A5 booked cost or customer price is changed.</p>
+  </details>
+  <details className="p55-panel" open data-component-key="bid.budget.bulk.bartec-gland-size-quantity">
+   <summary style={{cursor:"pointer",fontWeight:700}}>＋ / − BULK · Cable Gland Sizing &amp; Quantity — SCADA Enclosures + Ex IP Phone JB / Per WP</summary>
+   <p className="p55-note"><strong>Engineering basis:</strong> BARTEC M20 drilled hole counts confirmed. Gland thread M20 is NOT cable outside diameter. To select a purchasable gland by size and quantity, reconcile each physical cable end with cable OD (mm), armour, gland seal range, Ex certificate, and exact vendor-included fittings. No zero assumption for unresolved source quantities.</p>
+   <p className="p55-note"><strong>MR physical capacity (not purchased quantity):</strong> SCADA {glandSchedule.rollup.scadaEnclosuresByMr} enclosures × 16 M20; Ex IP Phone {glandSchedule.rollup.phoneJbSystemsByMr} JB systems × 8 M20; total {glandSchedule.rollup.knownEntryCapacityForScope} M20 available holes before installed spare reservation. Active glands, purchased glands and OD-size breakdown = <strong>not verified</strong>. Drain-valve holes excluded.</p>
+   {glandSchedule.sites.map(g=><details key={g.site} className="p55-panel" open={g.site==="ZWP20"}>
+    <summary style={{cursor:"pointer",fontWeight:700}}>{g.site} — {g.enclosures.length} BARTEC enclosure family / gland registers</summary>
+    {g.enclosures.map(box=><details key={box.id} className="p55-panel" open={g.site==="ZWP20"}>
+     <summary style={{cursor:"pointer"}}><strong>{box.mr} · {box.system==="EX_IP_PHONE"?"Ex IP Phone JB":"SCADA Ex e Panel"} · {box.enclosureTag}</strong> — {box.holeCapacity} M20 holes, {box.initialStoppingPlugs} factory plugs</summary>
+     <p className="p55-note"><strong>BARTEC model:</strong> {box.model}; <strong>physical holes:</strong> {box.holeCapacity} × M20; <strong>drain:</strong> {box.drainSeparate} separate; <strong>reserved entries for budget planning:</strong> {box.spareEntryPlanningQty}; <strong>max planned active:</strong> {box.plannedMaximumActive}. Existing plugs are assembly parts, not an additional purchase. {box.enclosureQtyBasis}.</p>
+     <p className="p55-note"><strong>Supplier scope:</strong> {box.includedPackageSource}</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Cable / interface</th><th>From → To</th><th>Cable specification &amp; source</th><th>Cable OD (mm)</th><th>Entry thread</th><th>Gland seal range / SKU / Ex</th><th>Active Gland Qty</th><th>Included / New Purchase Qty</th></tr></thead>
+      <tbody>{box.interfaceRows.map(c=><tr key={box.id+":"+c.id}>
+       <td><strong>{c.id}</strong><small>{c.description}</small></td>
+       <td>{c.from} → {c.to}</td>
+       <td>{c.cableType}<small>{c.designSource}</small></td>
+       <td>{Number.isFinite(c.cableOuterDiameterMm)?c.cableOuterDiameterMm:"OD not evidenced"}</td>
+       <td>{c.entryThread} (BARTEC hole)</td>
+       <td>{c.glandPartNumber||"Select from cable OD + armouring"}<small>Sealing range and Ex certification pending</small></td>
+       <td>{Number.isFinite(c.activeGlandQty)?c.activeGlandQty:"Cable-end takeoff required"}</td>
+       <td>{Number.isFinite(c.purchaseGlandQty)?c.purchaseGlandQty:"Package inclusion / count pending"}<small>{c.ownership}</small></td>
+      </tr>)}</tbody>
+     </table></div>
+     <p className="p55-note"><strong>Installed totals:</strong> Verified active gland qty: {box.verifiedActiveGlands??"pending"}; vendor-included qty: pending; Gland purchase by size: {box.purchaseGlandsBySize??"pending"}. This is a SOURCE-DRIVEN BULK takeoff, not a vendor quotation or posted A5 cost.</p>
+    </details>)}
+   </details>)}
+   <p className="p55-note"><strong>Technical gates:</strong> {glandSchedule.policy.deviation} For Ex IP Phone, MGW PHONE-1 quotes WAROM JB with certified gland, whereas the selected design uses BARTEC: vendor make and package equivalence must be resolved before any deduction or additive pricing.</p>
   </details>
   <div style={{display:"flex",gap:8,marginBottom:12}}><button className="p553-detail-button" type="button" onClick={expandAll}>＋ Expand all</button><button className="p553-detail-button" type="button" onClick={()=>setOpen(new Set())}>− Collapse all</button></div>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>＋/−</th><th>MR</th><th>Category</th><th>Required candidate</th><th>Quantity basis / Source</th><th>Qty</th><th>Unit Cost</th></tr></thead><tbody>
