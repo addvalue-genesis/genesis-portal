@@ -254,3 +254,54 @@ a {
     grid-template-columns: 1fr;
   }
 }
+
+
+/* 0553 / Working BOM: one compact overview row per WP; detail stays in its own lines. */
+.p553-location-overview { table-layout: fixed; min-width: 1060px; }
+.p553-location-overview > thead > tr > th,
+.p553-location-overview > tbody > .p553-location-summary > td {
+  padding: 9px 8px;
+  vertical-align: middle;
+  line-height: 1.35;
+  font-size: 12px;
+}
+.p553-location-overview > thead > tr > th { white-space: nowrap; }
+.p553-location-overview .p553-location-summary > td { height: 52px; }
+.p553-location-overview .p553-location-summary small {
+  display: block;
+  margin-top: 3px;
+  font-size: 10.5px;
+  line-height: 1.3;
+  color: #65768b;
+}
+.p553-location-overview .p553-location-summary .gns-copy-id {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 3px;
+  max-width: 100%;
+  vertical-align: middle;
+}
+.p553-location-overview .p553-location-summary .gns-copy-id code {
+  font-size: 10px;
+  white-space: nowrap;
+}
+.p553-location-overview .p553-location-summary .gns-copy-id button {
+  font-size: 10px;
+  white-space: nowrap;
+  padding: 4px 5px;
+}
+.p553-location-overview .p553-vendor-brief { white-space: nowrap; font-size: 11.5px; }
+.p553-location-overview .p553-location-total > strong {
+  display: block;
+  white-space: nowrap;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+.p553-location-overview .p553-location-expanded > td { padding: 10px; }
+.p553-location-details { display: grid; gap: 10px; min-width: 0; }
+.p553-location-details > .p55-panel { margin: 0; }
+.p553-location-details > details > summary { cursor: pointer; padding: 5px 2px; }
+.p553-location-line-detail th,
+.p553-location-line-detail td { padding: 7px 9px; vertical-align: top; font-size: 12px; }
+.p553-location-line-detail .is-number { font-variant-numeric: tabular-nums; white-space: nowrap; }
