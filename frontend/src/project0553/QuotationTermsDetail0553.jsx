@@ -98,7 +98,7 @@ export function QuotationTermsDetail0553({quote}){
     <td><strong>{r.topic}</strong></td><td>{r.value}</td><td>{r.page==null?"Not indexed":"p."+r.page}</td>
     <td>{r.comment||"Original quotation condition"}{r.verification&&<small>{r.verification}</small>}</td>
    </tr>)}</tbody>
-  </table></div>:
+  </table></div>:structuredTerms.length>0?null:
    <p className="p55-note"><strong>Recorded terms:</strong> {typeof raw==="string"?raw:raw?JSON.stringify(raw):"NOT CAPTURED — inspect original supplier quotation."}</p>}
   {sourceNotStated.length>0&&<details className="p55-panel" style={{padding:10}}>
    <summary><strong>Commercial clarification / Not expressly committed ({sourceNotStated.length})</strong></summary>
