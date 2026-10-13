@@ -22,7 +22,10 @@ assert(page.includes("<VendorProductCatalog0553/>")&&page.includes("<VendorSourc
 assert(page.indexOf("<VendorProductCatalog0553/>")<page.indexOf("<VendorSourceRegister0553/>"),"Source register obstructs primary Vendor products");
 assert(page.includes('name:"Source Documents / Evidence Register"'),"bid.documents navigation misleading");
 assert(!page.includes('Section title="Vendor / OEM Source Index"'),"Duplicate source table not removed");
-assert(docs.includes('data-component-key="bid.documents"'),"Legacy document module ID lost");
+assert(page.includes('moduleKey="bid.documents"'),"Legacy document module ID lost");
+assert(page.includes('<SmartDataGroup moduleKey="bid.documents"'),"Documents top-level cannot collapse");
+assert(docs.includes('data-component-key="bid.documents.vendor-sources"'),"Original source evidence not under documents");
+assert(docs.includes('label:"MR / System"')&&docs.includes('label:"Evidence Type"'),"Document facets missing");
 assert(docs.includes('moduleKey="bid.documents.source-filter"'),"Original sources not searchable");
 assert(docs.includes('VENDOR_0553_SOURCES.map')&&docs.includes('rows.map(s=><tr'),"Source registry must render every original source");
 assert(docs.includes("bid.documents.source."), "Copyable source IDs lost");
