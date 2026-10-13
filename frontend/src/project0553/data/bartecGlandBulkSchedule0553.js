@@ -49,7 +49,7 @@ export const BARTEC_GLAND_BULK_POLICY_0553=Object.freeze({
  exclusion:"Drain entry and factory stopping plugs do not become additional active cable glands. Vendor-supplied gland shall be deducted only after exact inclusion is proven.",
  sparePolicy:"Keep 20%/min 2 entries as conservative capacity planning per previous approved internal model; validate final SPE interpretation by engineering.",
  prices:"No provisional gland retail price is applied without a selected model compatible with cable OD and hazardous-area classification.",
- freeze:"No change to original A1/A5 cost ledger; historical SCADA one-M20-price/site is an incomplete partial allowance, NOT final requirement.",
+ freeze:"No change to original A1/A5 booked 69m CAT6A and 1 M20 gland allowance per site; historical SCADA one-M20-price/site is an incomplete partial allowance, NOT final requirement.",
  deviation:"SCADA 16 pre-drilled holes vs Z1F DTS-0001 C1 minimum 18: formal client disposition required; not approved compliance."
 });
 export function deriveBartecGlandBulkSchedule0553(){
