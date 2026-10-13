@@ -9,6 +9,7 @@ const suppliers=new Map(quoted.suppliers.map(x=>[x.id,{...x,quoteIds:[...x.quote
 const products=new Map(quoted.products.map(x=>[x.id,{...x}]));
 const relationships=quoted.relationships.map(x=>({...x,sourceClass:"SUPPLIER_QUOTATION",referenceFrom:x.source,
  originalQuoteId:x.quoteId,sourceUrl:SUPPLIER_QUOTE_LINES_0553.find(q=>q.id===x.quoteId)?.sourceUrl||null,
+ description:products.get(x.productKey)?.description||null,
  approvedForBudget:false}));
 for(const e of VENDOR_EXTERNAL_EVIDENCE_0553){
  const supplierId=e.supplier.trim().toLowerCase();
@@ -16,7 +17,7 @@ for(const e of VENDOR_EXTERNAL_EVIDENCE_0553){
  const key=e.sku;
  if(!products.has(key))products.set(key,{id:key,partNumber:key,description:e.description});
  relationships.push({
-  id:e.id,vendorId:supplierId,productKey:key,quoteId:null,quotation:null,
+  id:e.id,vendorId:supplierId,productKey:key,description:e.description,quoteId:null,quotation:null,
   mr:e.budgetDependency?.startsWith("DTRS")?"MR-0002":"MR-0001",
   quantity:null,unitPrice:e.unitPrice,currency:e.currency,priceStatus:e.sourceClass,
   selectionStatus:"UNREVIEWED",technicalCompliance:e.technicalState,source:e.url||e.reference,
