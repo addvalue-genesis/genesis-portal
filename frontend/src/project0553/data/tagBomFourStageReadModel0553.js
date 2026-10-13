@@ -18,12 +18,14 @@ const auditedOwnerDetail=(site,tagRow,owner)=>{
  const audit=auditZWP20RadioVendorMapping0553();
  const proof=(audit.ownerReconciliation||[]).find(x=>x.id===owner);
  if(audit.status!=="BUDGETARY_RECONCILED_WITH_QUALIFICATIONS"||!proof?.pass||
-    proof.currency&&proof.currency!=="USD"||Math.abs(proof.ledgerUSD-tagRow.extended)>0.01)return [];
- return audit.details.filter(x=>x.costOwner===owner&&x.sourceMatch&&Number.isFinite(x.mappingExtendedUSD)).map(x=>({
+    Math.abs(proof.ledgerUSD-tagRow.extended)>0.01)return [];
+ return audit.details.filter(x=>x.costOwner===owner&&x.sourceMatch&&
+   Number.isFinite(x.engineeringQty)&&Number.isFinite(x.sourceUnitPriceUSD)).map(x=>({
   id:"AUDITED_SOURCE_"+x.quoteLine,functionId:x.functionId,
   allocationOwner:x.costOwner,requiredQty:x.engineeringQty,
   budgetaryQuoteLine:x.quoteLine,budgetarySelectedSKU:x.partNumber,
-  budgetaryUnitPrice:x.mappingRateUSD,budgetaryExtended:x.mappingExtendedUSD,
+  budgetaryUnitPrice:Number.isFinite(x.mappingRateUSD)?x.mappingRateUSD:x.sourceUnitPriceUSD,
+  budgetaryExtended:Number.isFinite(x.mappingExtendedUSD)?x.mappingExtendedUSD:rounded(x.engineeringQty*x.sourceUnitPriceUSD),
   currency:"USD",offeredQuoteQty:x.sourceQuoteQty,
   priceEvidenceType:"AUDITED_VENDOR_SOURCE_NOT_APPROVED_OEM",
   budgetaryDecision:"INDEPENDENT_MAP09_COST_OWNER_RECONCILED__TECHNICAL_PROOF_OPEN"
