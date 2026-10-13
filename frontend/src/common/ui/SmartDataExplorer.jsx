@@ -42,7 +42,9 @@ export function SmartFilterBar({
 
 /** Native details remains keyboard accessible; defaultOpen preserves user toggle state. */
 export function SmartDataGroup({projectId="PJ2608-0553",moduleKey,title,count=null,defaultOpen=false,children,description=null}){
- return <details className="p55-panel gns-smart-group" data-component-key={moduleKey} defaultOpen={defaultOpen} style={{padding:12,marginBottom:9}}>
+ const [opened,setOpened]=React.useState(Boolean(defaultOpen));
+ React.useEffect(()=>{if(defaultOpen)setOpened(true);},[defaultOpen]);
+ return <details className="p55-panel gns-smart-group" data-component-key={moduleKey} open={opened} onToggle={e=>setOpened(e.currentTarget.open)} style={{padding:12,marginBottom:9}}>
   <summary style={{cursor:"pointer",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",fontWeight:700}}>
    <span>{title}</span>{count!==null&&<small>({count})</small>}
   </summary>
