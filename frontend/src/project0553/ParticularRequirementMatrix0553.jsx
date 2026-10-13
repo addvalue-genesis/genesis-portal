@@ -57,7 +57,7 @@ export function ParticularRequirementMatrix0553({compact=false}){
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Source / Ref.</th><th>Customer Particular Requirement</th><th>TAG / Site</th><th>SI First Principles &amp; Proof To Perform</th><th>Cost Driver / Status</th></tr></thead>
    <tbody>{group.items.map(r=>{const source=PARTICULAR.sourceDocuments[r.document];return <tr key={r.id}>
-    <td><strong>{r.document} {source.revision}</strong><small>§ {r.section} · p.{r.page}</small><small>{r.type}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.documents.particular-requirement-matrix.rule."+moduleSegment(r.id)}/>{source.sourceUrl?<a href={source.sourceUrl} target="_blank" rel="noreferrer">Open original</a>:<small>{source.filename}</small>}</td>
+    <td><strong>{r.document} {source.revision}</strong><small>§ {r.section} · p.{r.page}</small><small>{r.type}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.documents.particular-requirement-matrix.rule."+moduleSegment(r.id)} componentName={r.topic}/>{source.sourceUrl?<a href={source.sourceUrl} target="_blank" rel="noreferrer">Open original</a>:<small>{source.filename}</small>}</td>
     <td><strong>{r.topic}</strong><div>{r.requirement}</div></td>
     <td>{r.tags.join(" · ")}</td><td>{r.siAction}</td>
     <td>{r.costDriver}<small>{r.decisionStatus}</small><small>Never post automatically</small></td>
