@@ -11,6 +11,7 @@ import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import React,{useState} from "react";
+import {assessVendorEvidenceForBudget0553} from "./data/vendorExternalEvidence0553";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
 import { BID_0553_GATES, BID_0553_SOURCES } from "./bidReview";
 export function CommercialWorkspace0553({focusedLocation=null,initialMode="working"}){
@@ -47,6 +48,14 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  return <div className="p55-stack" data-component-key="bid.budget">
  <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget"/><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
+ <details className="p55-panel" data-component-key="bid.budget.vendor-evidence-impact">
+  <summary><strong>Budgetary 10 · Supplier / Internet / ERP source readiness</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.vendor-evidence-impact"/></summary>
+  <p className="p55-note">Same read-only source register as Vendor Products; no separate budget-only price master. Unapproved evidence remains reference only and cannot silently overwrite A/B/C.</p>
+  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Product / Evidence</th><th>Source unit rate</th><th>Budgetary dependency</th><th>Gate</th></tr></thead><tbody>
+   {assessVendorEvidenceForBudget0553().rows.map(e=><tr key={e.id}><td><strong>{e.sku}</strong><small>{e.sourceClass} · {e.supplier}</small></td><td>{Number.isFinite(e.unitPrice)?e.currency+" "+e.unitPrice+" / "+(e.unit||"UOM UNVERIFIED"):"NOT VERIFIED"}</td><td>{e.budgetDependency}</td><td>{e.budgetaryRateStatus}<small>{e.technicalState}</small></td></tr>)}
+  </tbody></table></div>
+  <p className="p55-note">Existing budget projections and historical approved assumptions remain unchanged until explicit engineering/quantity/UOM evidence supports repricing. Missing evidence is not zero cost.</p>
+ </details>
  <div className="p55-note" style={{margin:"0 2px"}}><strong>Workflow:</strong> Engineering basis → Required BOM → Scope & Bulk → Cost / Pricing → Internal Summary · ขยายเฉพาะกลุ่มที่ต้องตรวจสอบ</div>
  <section className="p55-panel">
   <div className="p55-eyebrow">COMMERCIAL WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing"/></div>
