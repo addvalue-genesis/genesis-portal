@@ -147,7 +147,12 @@ export function VendorProductCatalog0553(){
     </section>}
    <p className="p55-note">This is a read-only quotation-header view. Original quote lines and cost calculations have not changed.</p>
   </div>}
-  <p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products."+view+".quote-lines"}/></p>
+  <SmartDataGroup key={"quote-lines-"+view} projectId="PJ2608-0553"
+   moduleKey={"bid.vendor.products."+view+".quote-lines"}
+   title={"Supplier / Product / Source Lines — "+(view==="supplier"?"Company → Quotation → Product":view==="quote"?"Quotation → Product":view==="product"?"Product → Vendor":view==="mr"?"MR → Product":"Technical/Commercial Candidates")}
+   count={rows.length}
+   defaultOpen={Boolean(search.trim())||Boolean(companyQuery.trim())||vendor!=="ALL"||Boolean(chosenQuote)||evidenceClass!=="ALL"||mr!=="ALL"}
+   description="07 Vendor → Source Line Registry. Expand this group to view companies, their quotation history and individual products. Each group and quote line has a separate Copy ID; this is one source dataset, not a second BOM.">
   <p className="p55-note">{catalog.relationships.length} supplier quote lines and external/historical product references · {rows.length} displayed (all matching entries, no hidden 150-row cap). All evidence classes share this product table; reference records are not supplier quotations. Original source quote-line identities are preserved.</p>
   {grouped.map(g=><SmartDataGroup key={g.id} projectId="PJ2608-0553"
     moduleKey={"bid.vendor.products."+view+".group."+moduleSegment(g.id)}
@@ -182,6 +187,7 @@ export function VendorProductCatalog0553(){
     })():renderLines(g.items)}
   </SmartDataGroup>)}
   {!grouped.length&&<p role="status" className="p55-note">No matching Vendor evidence. Clear filters or broaden the search.</p>}
+  </SmartDataGroup>
   {view==="compare"&&<p className="p55-note"><strong>Candidate comparison only:</strong> not a completed TBE/CBE. Review MR compliance and quote conditions before recommending an offer.</p>}
   <p className="p55-note"><strong>Release gate:</strong> Product selection requires MR/DTS compliance, datasheet/certification, configuration, supplier price validity and approved project decision. Historical/expired/alternative quotations never enter costing automatically.</p>
  </section>;
