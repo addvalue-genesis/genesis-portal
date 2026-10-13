@@ -25,6 +25,7 @@ assert.equal(eq.equations.length,10);
 assert.deepEqual(eq.equations.map(x=>x.id),Array.from({length:10},(_,i)=>"MAP-"+String(i+1).padStart(2,"0")));
 const before=JSON.stringify(siteCost().rows);
 const mapped=audit();
+const compare=require(path.join(root,"project0553/data/zwp20TagCostComparison0553.js")).summarizeZWP20TagCostComparison0553;
 const after=JSON.stringify(siteCost().rows);
 assert.equal(mapped.status,"BUDGETARY_RECONCILED_WITH_QUALIFICATIONS",JSON.stringify(mapped.errors));
 assert.equal(mapped.stages.length,10);
@@ -37,6 +38,24 @@ assert.equal(mapped.technicalCompliancePassed,false);
 assert.equal(mapped.ledgerMutation,false);
 assert.equal(before,after,"Audit mutated existing ZWP20 Ledger");
 assert.equal(mapped.details.length,9);
+// Positive numerical source-vs-ledger reconciliation: 9 vendor lines -> 4 cost owners.
+const comparison=compare(mapped);
+assert.equal(comparison.selectedTagOwner,"MR-502-001.4");
+assert.equal(comparison.selectedTagUSD,7288.65,"ODU must include B-1..B-5 only");
+assert.equal(comparison.otherTagsUSD,5995.24,"B-6/B-7/B-8/B-12 belong to three other TAGs");
+assert.equal(comparison.all9USD,13283.89,"Four physical owners must sum to one-site 9-line amount");
+assert.equal(comparison.sourceWidePricedUSD,30432.13,"Source quote-wide extension uses original offered quantities; NULL B-4 excluded");
+assert.deepEqual(comparison.vendorUnpriced,["B-4"],"Vendor has not quoted Myanmar region licensing rate");
+assert.equal(comparison.sourceComplete,false,"Management incremental zero is not supplier source pricing");
+assert.equal(comparison.reconciled,true,"Four owners must exactly reconcile to frozen site ledger");
+const requiredOwners={"MR-502-001.4":7288.65,"MR-502-001A.5":671.27,"SA-502-001.10":614.2,"ANT-502-001.6":4709.77};
+for(const group of comparison.owners){
+ assert.equal(group.computedUSD,requiredOwners[group.ownerId],"Wrong grouped source function sum: "+group.ownerId);
+ assert.equal(group.ledgerUSD,requiredOwners[group.ownerId],"Wrong frozen ledger: "+group.ownerId);
+ assert.equal(group.differenceUSD,0,"Owner delta is nonzero: "+group.ownerId);
+}
+assert.equal(compare({...mapped,status:"MAPPING_BLOCKED"}).reconciled,false,"Mapping error must not surface as PASS just because arithmetic matches");
+assert(auditUi.includes("comparison.owners.map")&&auditUi.includes("sourceQuotedLineTotalUSD")&&auditUi.includes("cost-scope-comparison"),"UI must expose owner-vs-source sums, not bury them in generic vendor table");
 // Positive exact join: B-1 is an offered REMOTE radio subtype of the broader MTO RADIO_EQUIPMENT function.
 // This must not be confused with approval of OEM role, country entitlements or price release.
 const b1=mapped.details.find(x=>x.quoteLine==="B-1");
@@ -95,4 +114,4 @@ assert.equal(unbalanced.budgetaryProceed,false);
 assert(ui.includes('<TagMappingAudit0553/>')&&ui.includes('v.row===4'));
 assert(auditUi.includes('result.stages.map')&&auditUi.includes('result.ownerReconciliation.map'));
 assert(auditUi.includes('result.technical.map')&&auditUi.includes('result.details.map'));
-console.log("PASS 0553 controlled TAG mapping runtime: 10 sequential equations, 9 source-matched functions, ODU 7288.65 / IDU 671.27 / ANT 4709.77 / SURGE 614.20 USD, zero booked delta, 3 fail-closed negative tests; no ledger mutation.");
+console.log("PASS 0553 controlled TAG mapping: 9 quote lines / 4 cost owners, ODU USD 7,288.65; other TAGs USD 5,995.24; single-site USD 13,283.89 vs quote-wide partially priced USD 30,432.13, B-4 remains NULL; all owner deltas zero, 3 negative tests; no ledger mutation.");
