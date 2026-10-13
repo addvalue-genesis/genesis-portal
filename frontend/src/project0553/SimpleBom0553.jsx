@@ -22,6 +22,8 @@ import { NEXTG_CANDIDATE_ESTIMATE_0553 } from "./data/nextgCandidateEstimate0553
 import { ITEM_DECISION_PIPELINE_0553 } from "./data/itemDecisionPipeline0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
+import {AbcCostReadiness0553} from "./AbcCostReadiness0553";
+import {deriveAbcWorkingReadiness0553} from "./data/abcWorkingReadiness0553";
 import {SmartFilterBar} from "../common/ui/SmartDataExplorer";
 import React,{useRef,useState} from "react";
 import { WORKING_BOM_BY_LOCATION_0553 as model } from "./data/workingBomByLocation";
@@ -76,6 +78,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  const getVendorLines=x=>[...new Map(NEXTG_CANDIDATE_ESTIMATE_0553.estimateFor(x).functions.flatMap(fn=>fn.candidates).map(q=>[q.quoteLine,q])).values()];
  const vendorCovered=x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice))||x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice))||Number.isFinite(x.indicativePackageCostTHB);
  const coverageCount=visible.filter(vendorCovered).length;
+ const abcReadiness=deriveAbcWorkingReadiness0553({site,thbPerUsd:fx?.thbPerUsd??null});
  const provisionalSubtotalTHB=priced.reduce((sum,x)=>sum+x.indicativePackageCostTHB,0);
  const open=k=>setExpanded(old=>({...old,[k]:k.startsWith("site:")?!(old[k]??allSitesExpanded):!old[k]}));
  const money=(v,currency)=>{if(!Number.isFinite(v))return "—";
@@ -234,8 +237,14 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <div><span>Locations with source data</span><strong>{groups.filter(g=>g.items.length).length}</strong></div>
    <div><span>Visible MTO item tags</span><strong>{visible.length}</strong></div>
    <div><span>Items with mapped vendor rate evidence (not approved)</span><strong>{coverageCount} / {visible.length}</strong></div>
-   <div><span>{site==="ALL"?"All locations":"Location "+site} — allocated total equipment / A+B+C</span><strong>{site==="ALL"?"Select WP to see total":displaySiteTotal(site)}</strong><small>{site==="ALL"?"Per-WP budgetary priced totals below; missing rows never valued zero":wpSummary(site).costed+"/"+wpSummary(site).total+" costed; "+wpSummary(site).gaps+" unresolved; "+(fx?.source||"FX unavailable")}</small></div>
+   <div><span>A / B / C — {site==="ALL"?"MR0001 All Locations":"MR0001 "+site} Working Readiness</span>
+    <strong>A cost (known): {Number.isFinite(abcReadiness.A.knownWorkingTHB)?thbMoney(abcReadiness.A.knownWorkingTHB,"THB"):"USD "+abcReadiness.A.originalUSD.toFixed(2)+" + THB "+abcReadiness.A.originalTHB.toFixed(2)}</strong>
+    <small>B cost: NOT ESTABLISHED · Rev05 working SELL THB {abcReadiness.B.workingSellTHB.toLocaleString("en-US")} (different basis)</small>
+    <small>C cost: NOT ESTABLISHED · C1/C2 OEM spares pending</small>
+    <small><strong>A+B+C: NOT ESTABLISHED</strong> · A booked {abcReadiness.A.postedRows}/{abcReadiness.A.totalRows} TAGs · view A/B/C action breakdown below</small>
+   </div>
   </div>
+  {system==="MR-0001"&&<AbcCostReadiness0553 site={site} fx={fx} snapshot={abcReadiness} priceEvidence={{covered:coverageCount,total:visible.length,filtered:vendor!=="ALL"}}/>}
   <div className="p55-filterbar" style={{display:"flex",gap:8,margin:"12px 0"}}><button type="button" className="p553-detail-button" onClick={expandAll}>＋ Expand all</button><button type="button" className="p553-detail-button" onClick={collapseAll}>− Collapse all</button><span className="p55-note">เริ่มต้นแสดงภาพรวมทุกแท่น คลิก + เพื่อดู MTO, Calculation, Vendor และ Cost</span></div>
   <div className="p55-table-wrap">
    <table className="p55-table p55-table--compact p55-table--budget p553-location-overview" style={{width:"100%",borderCollapse:"collapse",tableLayout:"fixed",minWidth:1060}}>
