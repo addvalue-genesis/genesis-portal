@@ -24,7 +24,7 @@ export function auditZWP8CostOwnership0553({thbPerUsd=null}={}){
  const units={oduOnly:sum(["B-1","B-2","B-3","B-5"].map(x=>line(x)?.unitPrice??0)),
   poe:sum(["B-6","B-7"].map(x=>line(x)?.unitPrice??0)),
   surge:line("B-8")?.unitPrice??null,antenna:line("B-12")?.unitPrice??null};
- const radioUnitFromScenario=ZWP8_ROW43_COST_TRACE.referenceScenarios.find(x=>x.id===ZWP8_ROW43_COST_TRACE.preferredScenarioId)?.radioAssemblyUnitUSD??null;
+ const radioUnitFromScenario=ZWP8_ROW43_COST_TRACE.ownerCosts["MR-502-003"]??null;
  const radioSourcesValid=radios.length===2&&radios.every(r=>r.countedInWorkingTotal&&r.currency==="USD"&&r.extended===radioUnitFromScenario);
  const surgeSourcesValid=surge.length===2&&surge.every(r=>r.countedInWorkingTotal&&r.currency==="USD"&&r.extended===units.surge);
  const iduSourcesUnpriced=idu.length===2&&idu.every(r=>!r.countedInWorkingTotal);
