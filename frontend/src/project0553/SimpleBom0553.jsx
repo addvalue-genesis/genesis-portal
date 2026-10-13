@@ -250,13 +250,11 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     <tbody>
     {groups.filter(g=>g.items.length).map(g=>{
      const financial=wpSummary(g.site);
-     const actual=getMR0001LocationCost0553(g.site);
      const vendorFlags=[
       g.items.some(x=>Number.isFinite(x.indicativePackageCostTHB))?"Cisco":null,
       g.items.some(x=>getVendorLines(x).some(q=>Number.isFinite(q.unitPrice)))?"Next G":null,
       g.items.some(x=>x.vendorCandidates.some(v=>Number.isFinite(v.originalUnitPrice)))?"Other":null
      ].filter(Boolean);
-     const allocatedRows=actual.itemAllocations||[];
      const extraScenarios=financial.scenarios||[];
      return <React.Fragment key={g.site}>
       <tr className="p553-location-summary">
