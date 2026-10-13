@@ -146,6 +146,70 @@
       "category": "OTHER_QUOTE",
       "ingestionState": "INDEXED_SELECTIVE_REVIEW",
       "releaseAllowed": false
+    },
+    {
+      "id": "AIS-SDA",
+      "url": "https://drive.google.com/drive/folders/18QcrJrPVaD_D9vXRLwkn2LiJWfVm9AYa",
+      "itemsSeen": 3,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "AIS_SDA_VENDOR_REFERENCE",
+      "ingestionState": "REFERENCE_ONLY_NOT_YET_USED",
+      "contentReviewStatus": "NOT_REVIEWED",
+      "sourceFileNames": [
+        "SQT-250204002 REV1.pdf",
+        "SQT-250204002.pdf",
+        "SQT-241210002 บริษัท แอดแวลู ซิสเต็ม จำกัด.pdf"
+      ],
+      "budgetImpact": "NONE",
+      "releaseAllowed": false
+    },
+    {
+      "id": "RFS-ANTENNA",
+      "url": "https://drive.google.com/drive/folders/1Vl93ejMrldfQ3I3CJFFRK4XdyMu0e7w0",
+      "itemsSeen": 7,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "ANTENNA_RFS_COM_SOLUTION_REFERENCE",
+      "ingestionState": "REFERENCE_ONLY_NOT_YET_USED",
+      "contentReviewStatus": "NOT_REVIEWED",
+      "sourceFileNames": [
+        "AVSC-220909-01.xls",
+        "AVSC-110309-01.xls",
+        "AVSC-110309-01_R1.xls",
+        "AVSC-110309-01_R2.xls",
+        "AVSC-110309-01_R3.xls",
+        "AVSC-110309-01_R4.xls",
+        "AVSC-300409-01.xls"
+      ],
+      "budgetImpact": "NONE",
+      "releaseAllowed": false
+    },
+    {
+      "id": "PAGA-INDUSTRONIC",
+      "url": "https://drive.google.com/drive/folders/1F1lXK2YtpUbw8xzIcJKYbeA92AnrqHRr",
+      "itemsSeen": 1,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "PAGA_INDUSTRONIC_REFERENCE",
+      "ingestionState": "REFERENCE_ONLY_NOT_YET_USED",
+      "contentReviewStatus": "NOT_REVIEWED",
+      "sourceFileNames": [
+        "A20250274.pdf"
+      ],
+      "budgetImpact": "NONE",
+      "releaseAllowed": false
+    },
+    {
+      "id": "RACON-PHALCON",
+      "url": "https://drive.google.com/drive/folders/1wkIEceKKB6wnQJm5gGpd-XPDKhijht2E",
+      "itemsSeen": 1,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "RACON_PHALCON_REFERENCE",
+      "ingestionState": "REFERENCE_ONLY_NOT_YET_USED",
+      "contentReviewStatus": "NOT_REVIEWED",
+      "sourceFileNames": [
+        "PMAPI-Phalcon-EX-Stainless-Steel-RACON-051018.pdf"
+      ],
+      "budgetImpact": "NONE",
+      "releaseAllowed": false
     }
   ],
   "deduplication": [
