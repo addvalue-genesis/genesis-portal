@@ -123,22 +123,22 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  <label>Display currency <select aria-label="BOM display currency" value={activeCurrency} onChange={e=>setCurrencyOverride(e.target.value)}><option value="THB">THB — Thai Baht</option><option value="USD">USD — US Dollar</option></select></label>
  <small>FX: {fx?.thbPerUsd??"NOT SET"} THB/USD · {fx?.date||"No date"} · {fx?.source||"No source"} · Display conversion only; original quotation rates unchanged</small>
  </div>
-  <details className="p55-panel"><summary>LAY Rev.C1 · WP / Deck / System / Equipment Location Evidence</summary>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.source-layout" title="LAY Rev.C1 · WP / Deck / System / Equipment Location Evidence">
   <p className="p55-note">AFC drawing controls equipment location. These are location evidence rows, NOT confirmed individual CAT6/Coax routes; E&I room internal details are referenced to ELE-LAY-0002. EX sounder does not equal EX IP Phone.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Deck</th><th>System</th><th>Tag</th><th>LAY Sheet</th></tr></thead><tbody>
   {Z1F_TEL_LAYOUT_INDEX_0553.byWP.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.equipment.map((e,i)=><tr key={w.wp+"-"+e.tag+"-"+e.sheet+"-"+i}><td>{w.wp}</td><td>{e.deck}</td><td>{e.system}</td><td>{e.tag}</td><td>{e.sheet}</td></tr>))}
-  </tbody></table></div></details>
-  <details className="p55-panel"><summary>Parametric Bulk Cable Routes — WP × System (estimate, not additional BOM cost)</summary>
+  </tbody></table></div></ControlledModuleSection0553>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.parametric-bulk-routes" title="Parametric Bulk Cable Routes — WP × System (estimate, not additional BOM cost)">
   <p className="p55-note">Equation: Lproxy = assumed rectilinear horizontal (15m) + deck elevation delta + termination loop (3m); Lbudget = max(50m, Lproxy). Short = 1×, Base = 1.2×, Long = 1.5×. These are parametric scenarios NOT measured routes. CAT6A historical THB524/m used for SCADA only. No RF/Trunk/RACON CAT6A substitution; EX IP Phone awaits phone tags/cable interfaces. No double count with active BOM row11.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP / System</th><th>Physical cable route evidence</th><th>Deck</th><th>Geometry proxy</th><th>Short / Base / Long (m)</th><th>Base material cost</th><th>Cost gate</th></tr></thead><tbody>
   {layoutRouteEstimates.rows.filter(r=>site==="ALL"||r.wp===site).map(r=><tr key={r.id}><td>{r.wp}<small>{r.system}</small></td><td>{r.from} → {r.to}</td><td>{r.sourceDeck}</td><td>{r.geometricProxyM} m (assumed)</td><td>{r.scenarios.short} / {r.scenarios.base} / {r.scenarios.long}</td><td>{money(r.materialBaseTHB,"THB")}</td><td>{r.rateState}<small>Not included in active WP total</small></td></tr>)}
-  </tbody></table></div></details>
-  <details className="p55-panel"><summary>MOT / RFI Trunk Radio — RF, DC & Alarm Bulk Functions</summary>
+  </tbody></table></div></ControlledModuleSection0553>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.mr0002.rf-dc-alarm-bulk" title="MOT / RFI Trunk Radio — RF, DC & Alarm Bulk Functions">
   <p className="p55-note">RFI RX3852-2002-11 LNA 380–520 MHz, 50 ohm, SMA(F). Sources: MOT Datasheet and Z1F LAY. Quantities are candidate functions, not approved cable procurement. No Motorola baseline and no CAT6A unit rates for RF/DC/Alarm.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Function</th><th>Interface / Tag</th><th>Candidate Product</th><th>Qty</th><th>Cost</th></tr></thead><tbody>
   {DTRS_RFI_BULK_0553.byWP.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.functions.map((f,i)=><tr key={w.wp+f.fn+i}><td>{w.wp}</td><td>{f.fn}</td><td>{f.tag}</td><td>{f.sku}<small>{f.source}</small></td><td>{f.qty===null?"DERIVE":f.qty+" "+f.unit}</td><td>Rate required</td></tr>))}
-  </tbody></table></div></details>
-  <details className="p55-panel"><summary>WP System Bulk — SCADA / EX IP Phone / DTRS / RACON · New &amp; Brownfield</summary>
+  </tbody></table></div></ControlledModuleSection0553>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.wp-system-bulk" title="WP System Bulk — SCADA / EX IP Phone / DTRS / RACON · New & Brownfield">
   <p className="p55-note"><strong>Working priced bulk summary</strong> · Only CAT6A has a matched historical THB 524/m rate. DTRS RF/DC/Alarm, RACON power/control and EX IP Phone are not priced at CAT6A rates. This table is a scope ledger, not proof of complete bulk pricing.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WH</th><th>Class</th><th>Priced / Total Function Lines</th><th>Provisional Cable THB</th><th>Cost treatment</th></tr></thead><tbody>
   {bulkBudgetSummary.filter(w=>site==="ALL"||w.wp===site).map(w=><tr key={w.wp}><td>{w.wp}</td><td>{w.siteClass}</td><td>{w.pricedRows} / {w.totalRows}</td><td>{money(w.estimatedTHB,"THB")}</td><td>{w.costTreatment}</td></tr>)}
@@ -146,8 +146,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <p className="p55-note">System-specific preliminary material takeoff. Brownfield ZPQ/ZWP8/ZWP11 require cable reuse, tie-in and shutdown review; no automatic 50m cable. These scenarios do not add to existing allocated location totals.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Site</th><th>System</th><th>Bulk material / interface</th><th>Quantity</th><th>Rate THB</th><th>Budget THB</th><th>Evidence / state</th></tr></thead><tbody>
   {wpSystemBulk.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.systems.flatMap(sys=>sys.items.map((item,i)=><tr key={w.wp+sys.id+item.id+i}><td>{w.wp}</td><td>{w.siteClass}</td><td>{sys.name}</td><td>{item.item}</td><td>{item.qty===null?"DERIVE":item.qty+" "+item.unit}</td><td>{money(item.rateTHB,"THB")}</td><td>{money(item.extendedTHB,"THB")}</td><td>{item.status}<small>{item.source}</small></td></tr>)))}
-  </tbody></table></div></details>
-  <details className="p55-panel"><summary>RACON · SEABEACON-2 Termination-Based Bulk · ZWP20/21/22</summary>
+  </tbody></table></div></ControlledModuleSection0553>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.mr0004.racon-termination-bulk" title="RACON · SEABEACON-2 Termination-Based Bulk · ZWP20/21/22">
    <p className="p55-note">Source: Tideland 070.1016-DWG Rev.C, application diagram p3. ORGA QTORG2609244 p4 includes BFOU 12C × 1.5mm² runs (5m + 5m + 10m) and 6 CMP T3CDS glands. Its p8 general exclusion contradicts this and must be clarified. RACON, Control Box, DB-5P are package owned and never added as extra enclosures. Cable sizes in drawing are for reference. Budgetary quantities only and working zero is NOT zero cost.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Location</th><th>Circuits / Routes</th><th>Gross / ORGA supplied / Full-run replacement case</th><th>Price state</th><th>Derivation</th></tr></thead><tbody>
    {raconBudgetSites.filter(w=>site==="ALL"||site===w.wp).map(w=><React.Fragment key={w.wp}><tr><td><button type="button" className="p55-row-toggle" aria-expanded={Boolean(expanded["raconbulk:"+w.wp])} onClick={()=>open("raconbulk:"+w.wp)}>{expanded["raconbulk:"+w.wp]?"−":"+"}</button> {w.wp}</td><td>{w.routedRunCount} distinct circuit rows</td><td>{w.procurementTotalM} m / {w.vendorIncludedCableM} m / <strong>{w.additionalCablePurchaseM} m</strong><small>Cut lengths cannot automatically be spliced; replacement is a conservative purchase scenario. Group by cable type</small></td><td>{Number.isFinite(w.pricedSubtotalTHB)?money(w.pricedSubtotalTHB,"THB"):"NOT COSTED"}<small>{w.pricedCoverageCount} priced / {w.unpricedCoverageCount} unpriced cable lines · incomplete, not site total</small></td><td>{w.completionState}</td></tr>
@@ -155,8 +155,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    {w.rows.map(x=><tr key={x.id}><td>{x.id}<small>{x.from} → {x.to}</small></td><td>{x.kind}</td><td>{x.designBudgetM}</td><td>{x.procurementM} m</td><td>{x.vendorIncludedM} m</td><td>{x.extensionShortfallM} m</td><td>{x.additionalPurchaseM} m</td><td>{Number.isFinite(x.unitRateTHB)?money(x.unitRateTHB,"THB")+"/m":"RATE PENDING"}<small>{x.state}</small></td><td>{Number.isFinite(x.extendedTHB)?money(x.extendedTHB,"THB"):"NOT COSTED"}<small>{x.costOwner}</small><small>{x.evidence}</small></td></tr>)}
    </tbody></table><p className="p55-note">No installed-ex-entry location or gland fit verified yet. Ex field gland candidate ends: {w.fieldGlandCandidateQty}; supplier included {w.vendorIncludedGlandQty} CMP T3CDS sets PER QUOTED PACKAGE; unmatched candidate {w.additionalGlandCandidateQty}, subject to gland size, fitting and delivery scope. Quote price USD 75,000 for one quoted package, NOT automatically all WHs. FAT p5 INCLUDED vs p7 EXCLUDED; p4 cables IN vs p8 exclusion. {w.caveat}</p></div></td></tr>}</React.Fragment>)}
    </tbody></table></div>
-  </details>
-  <details className="p55-panel"><summary>DTRS / RFI LNA · RF Feeder Engineering + Cost Breakdown by ZWP20–22</summary>
+  </ControlledModuleSection0553>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.mr0002.rfi-feeder-bulk" title="DTRS / RFI LNA · RF Feeder Engineering + Cost Breakdown by ZWP20–22">
    <p className="p55-note">Management-approved 2026-10-12: CommScope LDF4RK-50A 50-ohm feeder candidate; estimate separately per WP from layout with 15% material allowance. AFC LAY does not dimension cable route; 9.144m grid comparator + 3m routing/termination is assumption only. Connector, grounding, weatherproofing quotes use web-retail rates. The 631 THB assumed per metre feeder rate is NOT UOM verified. No committed RF cost or customer release is implied.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Budget Route</th><th>Procurement</th><th>450MHz Feeder Loss</th><th>Illustrative Material THB</th><th>Engineering Status</th></tr></thead><tbody>
    {dtrsRfiSites.filter(w=>site==="ALL"||site===w.wp).map(w=><React.Fragment key={w.wp}><tr><td><button type="button" className="p55-row-toggle" aria-expanded={Boolean(expanded["dtrsrf:"+w.wp])} onClick={()=>open("dtrsrf:"+w.wp)}>{expanded["dtrsrf:"+w.wp]?"−":"+"}</button> {w.wp}</td><td>{w.assumedRouteM} m · proxy</td><td>{w.procurementM} m + selected fittings</td><td>{w.cableLossDb450} dB cable only</td><td>{money(w.illustrativeRFMaterialTHB,"THB")}</td><td>{w.scenarioState}<small>Not posted; ERP feeder UOM unverified</small></td></tr>
@@ -164,12 +164,12 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <table className="p55-table p55-table--compact"><thead><tr><th>Function / SKU</th><th>Qty</th><th>Unit</th><th>Budget Rate THB</th><th>Illustrative Cost THB</th><th>Evidence &amp; Gate</th></tr></thead><tbody>{w.rows.map(x=><tr key={x.id}><td>{x.item}</td><td>{x.qty??"ENGINEERING"}</td><td>{x.unit}</td><td>{Number.isFinite(x.rate)?money(x.rate,"THB"):"RATE REQUIRED"}</td><td>{Number.isFinite(x.amount)?money(x.amount,"THB"):"NOT COSTED"}</td><td>{x.state}<small>{x.source}</small></td></tr>)}</tbody></table><p className="p55-note">{w.extraCostNotIncluded}. {w.note}</p>
    </div></td></tr>}</React.Fragment>)}
    </tbody></table></div>
-  </details>
-  <details className="p55-panel"><summary>Lifecycle Cost Calculation — B4 Pre-commissioning &amp; Commissioning / B5 Startup Spares / C2 Capital Spares</summary>
+  </ControlledModuleSection0553>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.lifecycle-b4-b5-c2" title="Lifecycle Cost Calculation — B4 Pre-commissioning & Commissioning / B5 Startup Spares / C2 Capital Spares">
   <p className="p55-note">Spare Qty = MAX(RFQ/OEM minimum, CEIL(installed Qty × approved spare ratio)); Work MH = number of evidenced tests × evidenced unit MH + mobilization MH. Costs remain unpriced until RFQ/OEM spares ratios, test WBS and supplier/labor rates are supplied. This scope is not hidden inside equipment/bulk cost.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WH</th><th>System</th><th>Cost Class</th><th>Phase</th><th>Quantity Driver</th><th>Cost State</th></tr></thead><tbody>
   {lifecycleLedger.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.b4b5c2.map(x=><tr key={x.id}><td>{w.wp}</td><td>{x.system}</td><td>{x.costClass}</td><td>{x.activity}</td><td>{x.driver}<small>{x.description}</small></td><td>{x.priceStatus}</td></tr>))}
-  </tbody></table></div></details>
+  </tbody></table></div></ControlledModuleSection0553>
   <details ref={el=>{targetRefs.current.coverage=el;}} className="p55-panel" style={{scrollMarginTop:90}} data-component-key="bid.budget.bom.source-coverage">
    <summary style={{cursor:"pointer",fontWeight:700,padding:10}}>＋ / − BOM Source Coverage — ตรวจความครบถ้วนของข้อมูลต้นทาง · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.source-coverage"/></summary>
    <SourceCoverage0553/>
