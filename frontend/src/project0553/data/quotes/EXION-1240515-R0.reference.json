@@ -1,0 +1,98 @@
+{
+  "id": "EXION-1240515-R0",
+  "vendor": "EXION (Thailand)",
+  "quotation": "1240515 Rev.0",
+  "date": "2024-07-09",
+  "currency": "THB",
+  "totalExVat": 824000,
+  "document": "QT _1240515 Rev.0.pdf",
+  "priceState": "HISTORICAL_EXPIRED",
+  "mrCandidate": "MR-0003",
+  "lines": [
+    {
+      "sku": "212-02-6008-510",
+      "product": "Gai-Tronics Auteldac 6 Zone 1 SIP VoIP telephone",
+      "qty": 4,
+      "unit": "UNIT",
+      "rate": 130000,
+      "total": 520000
+    },
+    {
+      "sku": "BExS110DFDC024AS2ALR",
+      "product": "Ex d alarm horn sounder 24 V DC",
+      "qty": 4,
+      "unit": "UNIT",
+      "rate": 76000,
+      "total": 304000
+    },
+    {
+      "sku": "WARRANTY-OPTION",
+      "product": "24-month-from-SAT option, phone and sounder",
+      "qty": 4,
+      "unit": "OPTION",
+      "rate": 11500,
+      "total": null
+    }
+  ],
+  "terms": [
+    [
+      "Delivery",
+      "20-22 weeks ARO/ARAD, December two-week holiday shutdown excluded"
+    ],
+    [
+      "Incoterm",
+      "DDP Nonthaburi"
+    ],
+    [
+      "Payment",
+      "50% advance, 50% before delivery"
+    ],
+    [
+      "VAT",
+      "7% excluded"
+    ],
+    [
+      "Validity",
+      "30 days"
+    ],
+    [
+      "FX",
+      "46.94 THB/GBP reference; >5% PO FX difference price adjustment"
+    ],
+    [
+      "Cancellation",
+      "20%, 50%, 80%, 100% by production stage"
+    ],
+    [
+      "Storage",
+      "0.5% per week where collection delayed"
+    ],
+    [
+      "Included warranty",
+      "12 months from ex-works"
+    ],
+    [
+      "Optional warranty",
+      "24 months after SAT; not in base price"
+    ],
+    [
+      "Scope",
+      "spares, installation, commissioning and training not included"
+    ],
+    [
+      "Inspection",
+      "third-party certification/inspection excluded"
+    ]
+  ],
+  "sourcePages": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "notes": [
+    "Historical only. Separate phone from sounder.",
+    "Quoted quantity does not establish Z1F required quantity.",
+    "Commercial terms retained for future cross-reference."
+  ]
+}
