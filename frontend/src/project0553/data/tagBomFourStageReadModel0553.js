@@ -34,9 +34,10 @@ export function getTagBomFourStage0553(site,tagRow){
  const ownerDetail=detail.filter(c=>ownedBy(c,owner));
  const pricedFunctions=ownerDetail.map(c=>{
   const sourceId=c.budgetaryQuoteLine||c.budgetarySelectedOffer||c.source||null;
-  const qty=Number.isFinite(c.requiredQty)?c.requiredQty:Number.isFinite(c.qty)?c.qty:null;
+  const qty=Number.isFinite(c.requiredQty)?c.requiredQty:Number.isFinite(c.qty)?c.qty:
+   Number.isFinite(c.quantity)?c.quantity:null;
   const unit=Number.isFinite(c.budgetaryUnitPrice)?c.budgetaryUnitPrice:
-   Number.isFinite(c.unitPrice)?c.unitPrice:null;
+   Number.isFinite(c.unitPrice)?c.unitPrice:Number.isFinite(c.rateTHB)?c.rateTHB:null;
   const originalExtended=Number.isFinite(c.budgetaryExtended)?c.budgetaryExtended:
    Number.isFinite(c.extended)?c.extended:null;
   return {id:c.id||c.functionId,functionId:c.functionId,quoteCode:sourceId,qty,unit,
