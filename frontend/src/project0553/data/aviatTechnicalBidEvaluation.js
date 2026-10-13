@@ -33,7 +33,7 @@ const rows=NEXTG.lines.map(q=>{
  const licence=/REGION_KEY/.test(func)?"COUNTRY_FREQUENCY_ENTITLEMENT_UNVERIFIED":null;
  const warranty=func==="WARRANTY"?"12_AND_48_MONTH_ALTERNATE_OR_CUMULATIVE_CONFIRM":null;
  const status=explicitConflict?"CONFLICT":licence||warranty?"CLARIFY":"TECHNICAL_REVIEW";
- return {quoteLine:q.code,partNumber:q.partNumber,group:q.group,sourceQty:q.qty,unitPrice:q.unitPrice,
+ return {quoteLine:q.code,partNumber:q.partNumber,description:q.description,group:q.group,sourceQty:q.qty,unitPrice:q.unitPrice,
   quotedTotal:q.quotedTotal,currency:NEXTG.currency,functionId:func,functionRequirement:grp?.[1].requirement||"Unmapped product purpose",
   allocationBoundary:grp?.[1].owner||"Technical ownership OPEN",
   offeredRole:spare?"SPARE_OPTION_SEPARATE":"BASE_CANDIDATE_NOT_ACCEPTED",
