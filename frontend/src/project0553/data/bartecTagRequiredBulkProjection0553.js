@@ -22,8 +22,7 @@ const row=(id,fn,qty,unit,qtyClass,source,owner,driver,proof,status="DOCUMENTED_
 });
 export function deriveBartecTagRequiredBulkProjection0553(site,tag,sourceRow){
  if(!site||!/^bulk material$/i.test(String(tag||"").trim())||
-    sourceRow?.equipmentFamily!=="Bulk Materials"||sourceRow.platform!==site||
-    sourceRow.sourceRowIndex!==sourceRow?.sourceRowIndex)return null;
+    sourceRow?.equipmentFamily!=="Bulk Materials"||sourceRow.platform!==site)return null;
  const schedule=deriveBartecGlandBulkSchedule0553();
  const assembly=schedule.allEnclosures.find(x=>x.site===site&&x.system==="SCADA_RADIO");
  const p=selectBartecEnclosureBasis0553("SCADA_EXE_TYPE_1_2_3");
@@ -43,6 +42,12 @@ export function deriveBartecTagRequiredBulkProjection0553(site,tag,sourceRow){
    "Factory supplied PLG1MON stopping plugs","Initially fitted; used entries replace plugs, remaining plugs must be re-counted"),
   row("M20-LOCKNUT","BARTEC_SCADA_M20_FACTORY_LOCKNUTS",p.originalLocknuts,"pcs","GA_FACTORY_INCLUDED_ACCESSORY",bartecSource,factoryOwner,
    "Factory supplied DL1MON locknuts","As-built BARTEC assembled supply; verify replacement gland/thread requirements"),
+  row("SCADA-EARTH-TERMINALS","BARTEC_SCADA_FACTORY_EX_EARTH_TERMINALS",10,"pcs","GA_FACTORY_INCLUDED_ACCESSORY",bartecSource,factoryOwner,
+   "Common across BARTEC SCADA GA-1001/2/3: 10 Phoenix AKG4 GNYE-EX earth connection terminals per enclosure","Factory panel component, NOT 10 new loose field bulk terminals"),
+  row("SCADA-EARTH-BUSBAR","BARTEC_SCADA_FACTORY_EARTH_BUSBAR",1,"pcs","GA_FACTORY_INCLUDED_ACCESSORY",bartecSource,factoryOwner,
+   "One Phoenix earth busbar per SCADA assembly (GA BOM line 10)","Already included inside the BARTEC assembly; external earthing kit remains to size"),
+  row("SCADA-MOUNT","BARTEC_SCADA_FACTORY_MOUNTING_BRACKET_SET",1,"set","GA_FACTORY_INCLUDED_ACCESSORY",bartecSource,factoryOwner,
+   "One mounting bracket set per factory enclosure","Field supports/extra stainless hardware are a separate route/takeoff requirement"),
   row("M20-DRAIN","BARTEC_SCADA_SEPARATE_M20_DRAIN_VALVE",p.drainValveCount,"set","GA_FACTORY_INCLUDED_ACCESSORY",bartecSource,factoryOwner,
    "One additional bottom drain valve ECDE1MX per enclosure","Dedicated extra drain hole is not available for cable entries"),
   row("M20-SPARE","BARTEC_SCADA_RESERVED_CABLE_ENTRY_CAPACITY",p.spareEntryPlanningQty,"hole","PARAMETRIC_SPARE_CAPACITY_NOT_PURCHASE",mrSource,factoryOwner,
