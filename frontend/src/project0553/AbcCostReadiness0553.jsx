@@ -5,8 +5,8 @@ import {deriveAbcWorkingReadiness0553} from "./data/abcWorkingReadiness0553";
 
 const fmt=x=>Number.isFinite(x)?x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const thb=x=>Number.isFinite(x)?"THB "+fmt(x):"NOT ESTABLISHED";
-export function AbcCostReadiness0553({site="ALL",fx=null,priceEvidence=null}){
- const model=useMemo(()=>deriveAbcWorkingReadiness0553({site,thbPerUsd:fx?.thbPerUsd??null}),[site,fx?.thbPerUsd]);
+export function AbcCostReadiness0553({site="ALL",fx=null,priceEvidence=null,snapshot=null}){
+ const model=useMemo(()=>snapshot||deriveAbcWorkingReadiness0553({site,thbPerUsd:fx?.thbPerUsd??null}),[snapshot,site,fx?.thbPerUsd]);
  const root="bid.budget.bom.system-location-mto.abc-readiness";
  const A=model.A,B=model.B,C=model.C,ABC=model.ABC;
  return <ControlledModuleSection0553 moduleKey={root} title={"A / B / C — Cost Readiness & Next Actions · "+(site==="ALL"?"MR0001 All Locations":site)} defaultOpen
