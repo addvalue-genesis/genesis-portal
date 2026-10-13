@@ -21,6 +21,7 @@ import {SiteSystemCostReconciliation0553} from "./SiteSystemCostReconciliation05
 import { NEXTG_CANDIDATE_ESTIMATE_0553 } from "./data/nextgCandidateEstimate0553";
 import { ITEM_DECISION_PIPELINE_0553 } from "./data/itemDecisionPipeline0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
 import {SmartFilterBar} from "../common/ui/SmartDataExplorer";
 import React,{useRef,useState} from "react";
 import { WORKING_BOM_BY_LOCATION_0553 as model } from "./data/workingBomByLocation";
@@ -275,13 +276,11 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
       {siteExpanded(g.site)&&<tr className="p553-location-expanded"><td colSpan={8}>
        <div className="p553-location-details">
         <p className="p55-note"><strong>{g.site} / Engineering Detail:</strong> {g.siteClass?.note} · Equipment ownership NEW / REUSE / BY OTHERS must be checked against current BLD/MR. The overview above contains no hidden cost additions.</p>
-        <details className="p55-panel" open>
-         <summary><strong>Cost Allocation by TAG ({financial.costed} priced / {financial.total} source TAGs)</strong> · กด + ในแต่ละ TAG เพื่อดูรายละเอียดและ Copy Module ID</summary>
+        <ControlledModuleSection0553 moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".cost-allocation"} title={"Cost Allocation by TAG ("+financial.costed+" priced / "+financial.total+" source TAGs)"} description="กด + ในแต่ละ TAG เพื่อดูรายละเอียดและ Copy Module ID" defaultOpen>
          <LocationBomDetail0553 site={g.site} fx={fx}/>
          <p className="p55-note">Basis: {financial.basis}. {financial.costed}/{financial.total} MTO items priced; {financial.gaps} remaining. Each original currency is retained. Unpriced rows are not treated as zero.</p>
-        </details>
-        <details className="p55-panel">
-         <summary><strong>Vendor Rate Evidence &amp; Currency</strong> · source classes and candidate details</summary>
+        </ControlledModuleSection0553>
+        <ControlledModuleSection0553 moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".vendor-rate-evidence"} title="Vendor Rate Evidence & Currency" description="Source classes and candidate details">
          <div className="p55-table-wrap">
           <table className="p55-table p55-table--compact p553-location-line-detail">
            <thead><tr><th>Evidence class</th><th>Working reference</th><th>Allocation treatment</th></tr></thead>
@@ -303,9 +302,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
            </tbody>
           </table>
          </div>
-        </details>
-        {extraScenarios.length>0&&<details className="p55-panel">
-         <summary><strong>Other Scenarios — NOT Included in Allocated Cost ({extraScenarios.length})</strong></summary>
+        </ControlledModuleSection0553>
+        {extraScenarios.length>0&&<ControlledModuleSection0553 moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".unallocated-scenarios"} title={"Other Scenarios — NOT Included in Allocated Cost ("+extraScenarios.length+")"}>
          <div className="p55-table-wrap"><table className="p55-table p55-table--compact p553-location-line-detail">
           <thead><tr><th>Scenario</th><th>Currency</th><th>Amount</th><th>Status / Scope</th></tr></thead>
           <tbody>{extraScenarios.map((v,i)=><tr key={v.name+"-"+i}>
@@ -314,9 +312,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
            <td>{v.status}</td>
           </tr>)}</tbody>
          </table></div>
-        </details>}
-        <details className="p55-panel">
-         <summary><strong>RPT / Link-Budget Evidence ({g.rfProof.length})</strong></summary>
+        </ControlledModuleSection0553>}
+        <ControlledModuleSection0553 moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".rpt-link-budget"} title={"RPT / Link-Budget Evidence ("+g.rfProof.length+")"}>
          <div className="p55-table-wrap">
           <table className="p55-table p55-table--compact p553-location-line-detail">
            <thead><tr><th>Link / First Principles</th><th>FSPL</th><th>Gt + Gr</th><th>Ideal RSL offset</th><th>STD / BOM</th></tr></thead>
@@ -328,7 +325,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
            </tr>)}</tbody>
           </table>
          </div>
-        </details>
+        </ControlledModuleSection0553>
         <p className="p55-note">Incomplete equipment / A+B+C: {financial.gaps} unresolved; unpriced source rows are not zero-cost approvals. All detailed source values remain accessible in expanded TAG modules.</p>
        </div>
       </td></tr>}
