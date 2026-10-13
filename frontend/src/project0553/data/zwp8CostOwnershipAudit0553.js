@@ -57,19 +57,21 @@ export function auditZWP8CostOwnership0553({thbPerUsd=null}={}){
    details:"ODU bundle includes B-6/B-7 USD "+units.poe+" each; two source IDU TAGs are recorded but not separately allocated. Move PoE interface value to IDU only once; this does NOT establish a compliant standalone IDU."},
   {id:"ZWP8-ENG-03",level:"REVIEW",title:"Two radio and two antenna NEW/reuse decisions not source-confirmed",
    amountUSD:null,
-   details:"MTO Rev04 grouped row43 explicitly lists 2 ODU + 2 IDU + 2 antenna Set scopes. ZWP8 is BROWNFIELD, and BLD describes ZWP8-ZPQ reuse; a budgetary 2 × NEW replacement-equivalent assumption is not technical procurement approval."},
+   details:"MTO Rev04 grouped row43 lists 2 ODU + 2 IDU + 2 antenna Set scopes for functional engineering. The ZPQ↔ZWP8 PTP connection is an EXISTING BASELINE link in BLD-0001 Rev.C1. BOD Rev.C2 §7.2 calls for an additional new capacity link after site survey, but does not turn the existing baseline link into two automatically replaceable radio/antenna assemblies. Confirm exact added hardware, reused interfaces and scope before procurement."},
   {id:"ZWP8-ENG-04",level:"REVIEW",title:"4ft antenna alternative vs RPT/TC/CAL not reconciled",
    amountUSD:null,
    details:"RPT ZWP8 connects ZWP20 and ZWP22 as PTMP sector endpoints and ZPQ as PTP parabolic. MTO row43 TC cites 6ft/6ft, CAL cites 4ft/4ft; quoting B-12 x2 4ft is a provisional cost scenario, not verified RF requirement."},
   {id:"ZWP8-COM-05",level:"REVIEW",title:"Vendor source quoted quantity is not ZWP8 engineering purchase quantity",
    amountUSD:null,
-   details:"Next G original B-12 quotedQty="+(line("B-12")?.qty??"NA")+" globally while ZWP8 scenario assumes 2 antennas; B group radio lines quotedQty="+(line("B-1")?.qty??"NA")+" globally across possible sites. The original quote is not a supplier-confirmed ZWP8 quantity allocation."}
+   details:"Next G original B-12 quotedQty="+(line("B-12")?.qty??"NA")+" globally while ZWP8 scenario assumes 2 antennas; B group radio lines quotedQty="+(line("B-1")?.qty??"NA")+" globally across possible sites. The original quote is not a supplier-confirmed ZWP8 quantity allocation."},
+  {id:"ZWP8-ENG-06",level:"REVIEW",title:"Existing PTP ZPQ–ZWP8 baseline versus BOD additional new link",amountUSD:null,
+   details:"BLD Rev.C1 Sheet7/Notes9 depict/use the EXISTING communication link. BOD Rev.C2 §7.2 and SPE Rev.C2 §6.1.3 separately call for additional/new capacity after site survey. Existing physical link is not NEW procurement: identify whether the additional installation is parallel link/upgrade, its exact endpoints, equipment owner, antenna and cable before posting new hardware cost."}
  ];
  return {
   site,fx:{thbPerUsd:fxReady?thbPerUsd:null},
   basis:"MTO Rev04 row43–47 + RPT-0001 Rev.C1 + BLD/TC/CAL + NG/260916-ADV-DAP1 + canonical TAG Ledger",
   sourceClassification:MR0001_SITE_CLASSIFICATION.sites[site],
-  siteLinks:zwp8Links.map(x=>({id:x.id,from:x.from,to:x.to,mode:x.mode,txAntenna:x.reportTxAntenna,rxAntenna:x.reportRxAntenna})),
+  siteLinks:zwp8Links.map(x=>({id:x.id,from:x.from,to:x.to,mode:x.mode,txAntenna:x.reportTxAntenna,rxAntenna:x.reportRxAntenna,installedLinkState:x.installedLinkState||"NEW_DESIGN_INTERFACE",capacityScope:x.capacityScope||"Phase 1F planned link, technical/OEM confirmation required",newReplacementAutomaticallyRequired:x.newReplacementAutomaticallyRequired??null})),
   physicalGroup,sourceUnitUSD:{...units,oduScenarioWithAccessories:radioUnitFromScenario},
   currencyTotals:{USD:quotedUSD,THB:quotedTHB},
   currentWorkingTHB:displayedTHB,duplicatedSurgeUSD:sourceOverlapUSD,
