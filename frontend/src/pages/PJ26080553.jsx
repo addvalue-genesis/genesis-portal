@@ -4,6 +4,7 @@ import { WorkflowNavigator0553 } from "../project0553/WorkflowNavigator0553";
 import { O_G_LIFECYCLE_0553, L3_TABS_0553, L3_TAB_GROUPS_0553, TAB_IDENTITY_0553 } from "../project0553/lifecycleNavigation";
 import { DocumentReferenceControl0553 } from "../project0553/DocumentReferenceControl0553";
 import { VendorProductCatalog0553 } from "../project0553/VendorProductCatalog0553";
+import { VendorSourceRegister0553 } from "../project0553/VendorSourceRegister0553";
 import React, { useMemo, useState } from "react";
 import { ProjectWorkspaceShell } from "../common/ui/ProjectWorkspaceShell";
 import { ArchitectureView as SharedArchitectureView } from "../common/ui/ArchitectureView";
@@ -56,7 +57,7 @@ export function PJ26080553() {
   {id:"bid.engineering.mr0002",name:"MR-0002 RFI LNA / Physical BOM",tab:"engineering",keywords:"rfi trunk radio"},
   {id:"bid.systems.mr0003",name:"MR-0003 IP Phone",tab:"systems",keywords:"phone telephony"},
   {id:"bid.systems.mr0004",name:"MR-0004 Marine RACON",tab:"systems",keywords:"navigation beacon racon"},
-  {id:"bid.documents",name:"Vendor Documents / Product Register",tab:"documents",keywords:"vendor supplier quote"},
+  {id:"bid.documents",name:"Source Documents / Evidence Register",tab:"documents",keywords:"source documents original vendor supplier quote"},
   {id:"bid.vendor.products.supplier.quote-lines",name:"Vendor Products / Supplier Quote Lines",tab:"documents",keywords:"supplier mgw rfi cost"},
   {id:"bid.budget",name:"Budget Workspace",tab:"budget",keywords:"working costing"},
   {id:"bid.budget.bom",name:"Engineering BOM Working Preview",tab:"budget",keywords:"working preview equipment"},
@@ -135,7 +136,15 @@ export function PJ26080553() {
    {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
    {tab==="budget"&&<CommercialWorkspace0553 key={navTarget||"budget"} focusedLocation={focusedBomLocation} initialMode={navTarget?.startsWith("bid.budget.summary.workbook")?"budgetary":"working"}/>}
    {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
-   {tab==="documents"&&<div className="p55-stack"><Section title="Vendor / OEM Source Index"><Table headers={["MR","Supplier","Source type","Link","Review status"]} rows={VENDOR_0553_SOURCES.map(v=>[v.mr,v.supplier,v.type,<a key={v.id} href={v.url} target="_blank" rel="noreferrer">{v.document}</a>,<Badge key={v.id}>{v.status}</Badge>])}/></Section><Section title="Evidence classification"><Table headers={["Evidence","Revision","State"]} rows={PROJECT_0553_EVIDENCE.map(e=>[e.title,e.revision,<Badge key={e.id}>{e.state}</Badge>])}/></Section><VendorProductCatalog0553/></div>}
+   {tab==="documents"&&<div className="p55-stack">
+    <VendorProductCatalog0553/>
+    <VendorSourceRegister0553/>
+    <details className="p55-panel" data-component-key="bid.documents.evidence-classification" style={{padding:12}}>
+      <summary style={{cursor:"pointer",fontWeight:700}}>Document Evidence Classification / ทะเบียนสถานะเอกสารต้นฉบับ</summary>
+      <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.documents.evidence-classification"/></p>
+      <Table headers={["Evidence","Revision","State"]} rows={PROJECT_0553_EVIDENCE.map(e=>[e.title,e.revision,<Badge key={e.id}>{e.state}</Badge>])}/>
+    </details>
+   </div>}
 
  </>}</>}</>}/>;
 }
