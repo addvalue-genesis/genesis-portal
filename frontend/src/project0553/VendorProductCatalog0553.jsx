@@ -88,7 +88,7 @@ export function VendorProductCatalog0553(){
     <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.quotation-selector"/>
   </div>}
   {(view==="supplier"||view==="quote")&&selectedCommercial&&<div className="p55-panel" style={{padding:14,marginBottom:12}}>
-   <h3>{selectedCommercial.vendor} — {selectedCommercial.quotationNo}</h3><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+selectedCommercial.quoteId}/>
+   <h3>{resolveCompany0553(selectedCommercial.vendor).name} — {selectedCommercial.quotationNo}</h3><p className="p55-note">Original source supplier label: {selectedCommercial.vendor}</p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quotation."+selectedCommercial.quoteId}/>
    <p><strong>Original terms (working transcription):</strong> {selectedCommercial.sourceTermsRaw||"NOT CAPTURED — verify original"}</p>
    <p><strong>Source:</strong> {selectedCommercial.sourceUrl?<a href={selectedCommercial.sourceUrl} target="_blank" rel="noreferrer">Open source document</a>:selectedCommercial.source||"NOT CAPTURED"}</p>
    <p>Scope: {selectedCommercial.scope||"OPEN"} · Currency: {selectedCommercial.currency||"OPEN"} · Valid until: {selectedCommercial.validUntil||"NOT RECORDED"} · Quote status: {selectedCommercial.quoteStatus}</p>
