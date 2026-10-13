@@ -1,4 +1,5 @@
 import React,{useState} from "react";
+import {RfFeederEvidence0553} from "./RfFeederEvidence0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {MR0002_WORKING_BOM_0553 as model} from "./data/mr0002WorkingBom0553";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"0.00";
@@ -28,6 +29,7 @@ export function MR0002WorkingBom0553(){
      <td>{item.qty??"PENDING"} {item.unit}</td><td>{item.currency||"TBC"}</td><td>{money(item.unitCost)}</td>
      <td>{item.countedInWorkingTotal?money(item.extended):"EXCLUDED / PENDING"}</td><td>{item.owner}<small>{item.source}</small></td><td>{item.status}</td>
      <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+group.site.toLowerCase()+"."+item.id.toLowerCase()}/></td></tr>)}</tbody></table></div>}
+   <RfFeederEvidence0553 group={group}/>
    <p className="p55-note">{group.scopeWarnings.join(" · ")}</p>
   </div>)}
   <p className="p55-note">This is the controlled derivation workbench, not a persisted in-browser price editor. Changes to supplier rate, approved site quantity and configuration must update source-controlled inputs; downstream views read this same dataset. No customer release.</p>
