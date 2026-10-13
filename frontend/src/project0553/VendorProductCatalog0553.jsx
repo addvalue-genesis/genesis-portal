@@ -42,7 +42,7 @@ export function VendorProductCatalog0553(){
   if(view==="compare"&&mr!=="ALL"&&!String(x.mr).split("/").includes(mr))return false;
   if(!search)return true;
   return [x.productKey,x.mr,x.quotation,x.sourceClass,x.referenceFrom,x.referenceDocument,productsById.get(x.productKey)?.description,suppliersById.get(x.vendorId)?.name].join(" ").toLowerCase().includes(search.toLowerCase());
- }).slice(0,150);
+ });
  return <section className="p55-section" style={{marginTop:18}}>
   <h2>Vendor Products · Datasheets · Quotations</h2>
   <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products"/></p>
@@ -91,7 +91,7 @@ export function VendorProductCatalog0553(){
     </tbody></table></div><p className="p55-note">Product Datasheet = manufacturer evidence; Project DTS = client requirement. Compare the two in TBE before selecting a product. Blank price is not zero.</p>
    </div>}
   <p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products."+view+".quote-lines"}/></p>
-  <p className="p55-note">{catalog.relationships.length} supplier quote lines and external/historical product references · {rows.length} displayed (max 150). All evidence classes share this product table; reference records are not supplier quotations. Original source quote-line identities are preserved.</p>
+  <p className="p55-note">{catalog.relationships.length} supplier quote lines and external/historical product references · {rows.length} displayed (all matching entries, no hidden 150-row cap). All evidence classes share this product table; reference records are not supplier quotations. Original source quote-line identities are preserved.</p>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr>
    <th>Supplier / Source Class</th><th>Product / Model &amp; Function</th><th>MR</th><th>Quotation / Reference From</th><th>Qty / Unit Price / UOM</th><th>Technical / Budgetary Gate</th>
   </tr></thead><tbody>{rows.map(r=>{
