@@ -401,6 +401,37 @@
       "sourceOrLedgerChanged": false,
       "customerReleaseAllowed": false,
       "otherModules01To10Inventory": "NOT_FULLY_AUDITED"
+    },
+    {
+      "id": "ZWP20_ODU_9_VENDOR_LINES_4_COST_OWNERS_20261013",
+      "date": "2026-10-13",
+      "affectedComponent": "bid.budget.bom.zwp20.mr-502-001.4.mapping-audit.vendor-quote-lines",
+      "sourceQuote": "NG/260916-ADV-DAP1",
+      "quotedFunctionCount": 9,
+      "ownerCount": 4,
+      "oduSubset": [
+        "B-1",
+        "B-2",
+        "B-3",
+        "B-4",
+        "B-5"
+      ],
+      "oduWorkingUSD": 7288.65,
+      "iduPoEUSD": 671.27,
+      "surgeUSD": 614.2,
+      "antennaUSD": 4709.77,
+      "nonOduSubtotalUSD": 5995.24,
+      "allNineWorkingUSD": 13283.89,
+      "originalQuoteWidePricedLinesUSD": 30432.13,
+      "sourceUnpriced": [
+        "B-4"
+      ],
+      "underlyingLedgerChanged": false,
+      "uiFix": "Controlled owner-grouped reconciliation/read-only source evidence",
+      "testGuard": "validate:0553-controlled-tag-mapping + validate:0553-nested-module-contract",
+      "localRuntime": "PENDING",
+      "engineeringApproval": false,
+      "releaseAllowed": false
     }
   ]
 }
