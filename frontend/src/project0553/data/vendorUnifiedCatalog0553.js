@@ -87,7 +87,7 @@ KNOWLEDGE_PRODUCTS.records.forEach((p,i)=>{
   scopeDriver:p.category,approvedForBudget:false,
   specifications:p.specifications,sourceLine:i+1});
 });
-const latestVendorId=EXION_LATEST.vendor.toLowerCase();
+const latestVendorId="exion (thailand)";
 if(!suppliers.has(latestVendorId))suppliers.set(latestVendorId,{id:latestVendorId,name:EXION_LATEST.vendor,quoteIds:[]});
 suppliers.get(latestVendorId).quoteIds.push(EXION_LATEST.id);
 EXION_LATEST.lines.forEach((l,i)=>{
