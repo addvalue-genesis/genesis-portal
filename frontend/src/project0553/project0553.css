@@ -143,3 +143,160 @@
  .p553-dashboard .gns-smart-group>summary{align-items:flex-start}
  .p553-dashboard .gns-smart-group>summary .gns-copy-id{margin-left:0}
 }
+
+/* 0553 controlled nested engineering module / responsive data grid contract */
+.p553-dashboard .p553-contract-module,
+.p553-dashboard .p553-tag-workbench,
+.p553-dashboard .p553-contract-module__content {
+  min-width:0;
+  max-width:100%;
+}
+.p553-dashboard .p553-contract-module {
+  margin:8px 0;
+  padding:10px 12px;
+  overflow:visible;
+}
+.p553-dashboard .p553-contract-module__summary {
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px 12px;
+  width:100%;
+  min-width:0;
+  cursor:pointer;
+  list-style:none;
+  overflow-wrap:anywhere;
+  line-height:1.4;
+}
+.p553-dashboard .p553-contract-module__summary::-webkit-details-marker {display:none}
+.p553-dashboard .p553-contract-module__summary::before {
+  content:"+";
+  display:inline-grid;
+  flex:0 0 19px;
+  width:19px;
+  height:19px;
+  place-items:center;
+  border:1px solid #7ea5c1;
+  border-radius:4px;
+  color:#184965;
+  background:#f1f8fc;
+  font-weight:800;
+}
+.p553-dashboard .p553-contract-module[open]>.p553-contract-module__summary::before {content:"−"}
+.p553-dashboard .p553-contract-module__title {
+  flex:1 1 250px;
+  min-width:0;
+  overflow-wrap:anywhere;
+}
+.p553-dashboard .p553-contract-module__title small {display:block}
+.p553-dashboard .p553-contract-module__identity {
+  flex:0 1 auto;
+  min-width:0;
+  max-width:100%;
+}
+.p553-dashboard .p553-contract-module__summary .gns-copy-id {
+  display:flex;
+  flex-wrap:wrap;
+  margin:0;
+  max-width:100%;
+  min-width:0;
+}
+.p553-dashboard .p553-contract-module__summary .gns-copy-id code {
+  display:block;
+  max-width:100%;
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.p553-dashboard .p553-contract-module__content {
+  padding-top:9px;
+  width:100%;
+}
+.p553-dashboard .p553-contract-module__content .gns-copy-id {
+  max-width:100%;
+  flex-wrap:wrap;
+}
+.p553-dashboard .p553-contract-module__content .gns-copy-id code {
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  max-width:100%;
+}
+.p553-dashboard .p553-tag-workbench .p553-module-scroll,
+.p553-dashboard .p553-tag-mapping-audit .p553-module-scroll {
+  display:block;
+  width:100%;
+  min-width:0;
+  max-width:100%;
+  overflow-x:auto;
+  overflow-y:visible;
+  overscroll-behavior-x:contain;
+  border:1px solid #b7cadb;
+  border-radius:5px;
+}
+.p553-dashboard .p553-tag-workbench .p553-mto-summary-table {
+  table-layout:fixed;
+  width:100%;
+  min-width:1040px;
+}
+.p553-dashboard .p553-mto-summary-table>thead>tr>th:nth-child(1) {width:23%}
+.p553-dashboard .p553-mto-summary-table>thead>tr>th:nth-child(2) {width:15%}
+.p553-dashboard .p553-mto-summary-table>thead>tr>th:nth-child(3) {width:23%}
+.p553-dashboard .p553-mto-summary-table>thead>tr>th:nth-child(4) {width:12%}
+.p553-dashboard .p553-mto-summary-table>thead>tr>th:nth-child(5) {width:12%}
+.p553-dashboard .p553-mto-summary-table>thead>tr>th:nth-child(6) {width:15%}
+.p553-dashboard .p553-mto-summary-table > tbody > tr > td {
+  min-width:0;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+.p553-dashboard .p553-mto-summary-table > tbody > .p553-mto-drilldown-row > td {
+  max-width:0;
+  min-width:0;
+  padding:8px;
+}
+.p553-dashboard .p553-tag-workbench .p553-mto-drilldown-row .p553-contract-module {
+  width:100%;
+  max-width:100%;
+  min-width:0;
+}
+.p553-dashboard .p553-contract-module__content .p55-table {
+  width:100%;
+  min-width:740px;
+  table-layout:fixed;
+}
+.p553-dashboard .p553-contract-module__content .p55-table th,
+.p553-dashboard .p553-contract-module__content .p55-table td {
+  white-space:normal;
+  overflow-wrap:anywhere;
+  word-break:normal;
+  line-height:1.4;
+}
+.p553-dashboard .p553-contract-module__content .p55-table code {
+  white-space:pre-wrap;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+.p553-dashboard .p553-tag-mapping-audit .p553-audit-stages-table {min-width:670px}
+.p553-dashboard .p553-tag-mapping-audit .p553-audit-stages-table th:first-child {width:24%}
+.p553-dashboard .p553-tag-mapping-audit .p553-audit-stages-table th:nth-child(2) {width:20%}
+.p553-dashboard .p553-tag-mapping-audit .p553-audit-stages-table th:nth-child(3) {width:56%}
+.p553-dashboard .p553-tag-mapping-audit .p553-audit-equations-table {min-width:680px}
+.p553-dashboard .p553-tag-mapping-audit .p553-audit-equations-table th:first-child {width:30%}
+.p553-dashboard .p553-tag-mapping-audit .p553-audit-equations-table th:nth-child(2) {width:34%}
+.p553-dashboard .p553-tag-mapping-audit .p553-audit-equations-table th:nth-child(3) {width:36%}
+.p553-dashboard .p553-tag-mapping-audit .p553-audit-vendor-table {min-width:850px}
+.p553-dashboard .p553-tag-workbench .p553-mto-summary-table .gns-copy-id {
+  max-width:100%;
+  flex-wrap:wrap;
+}
+.p553-dashboard .p553-tag-workbench .p553-mto-summary-table .gns-copy-id code {
+  max-width:100%;
+  white-space:normal;
+  overflow-wrap:anywhere;
+}
+@media(max-width:820px){
+  .p553-dashboard .p553-contract-module{padding:8px}
+  .p553-dashboard .p553-contract-module__summary{align-items:flex-start}
+  .p553-dashboard .p553-contract-module__identity{flex:1 1 100%}
+}
