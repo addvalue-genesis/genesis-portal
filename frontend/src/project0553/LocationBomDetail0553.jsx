@@ -1,6 +1,7 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {traceTagParticular0553} from "./data/documentParticularTrace0553";
+import {TagMappingAudit0553} from "./TagMappingAudit0553";
 import WORKING_POLICY from "./data/siProceedWithQualifications0553.json";
 import {recoverMR0001Evidence0553} from "./data/mr0001EvidenceRecovery0553";
 import {MR0001_MODULE_CROSSMAP_0553} from "./data/mr0001ModuleCrossmap0553";
@@ -49,6 +50,7 @@ export function LocationBomDetail0553({site,fx}){
      {(site==="ZWP20"&&v.tag==="ANT-502-001")&&<p className="p55-note"><strong>SI Management Working Basis:</strong> {WORKING_POLICY.workingDecisions[0].state}. 4ft is the preferred budgetary alternative, subject to link and reflection proof. Same Customer TAG applies; any changes to mounting/route are tracked through installation drawings and cost drivers.</p>}
      {(site==="ZWP20"&&["MR-502-001","MR-502-001A","LAN-502-001"].includes(v.tag))&&<p className="p55-note"><strong>ZPQ Existing NMS Interface:</strong> {WORKING_POLICY.workingDecisions[2].state}. Existing NMS assumed; available licences are not verified. Configure and test extension as scope; any incremental entitlements require a sourced scenario or documented commercial qualification, not an assumed zero rate.</p>}
 
+     {site==="ZWP20"&&v.tag==="MR-502-001"&&v.row===4&&<TagMappingAudit0553/>}
      {(()=>{const trace=traceTagParticular0553(site,v.tag);const rows=[...trace.direct,...trace.siteSpecific];return <details className="p55-panel" data-component-key={keyPrefix+"."+String(v.tag).toLowerCase()+".particular-evidence"}>
       <summary><strong>RFQ Particular Evidence / SI Engineering Proof — {trace.direct.length} TAG + {trace.siteSpecific.length} Site + {trace.common.length} Common; {trace.conflicts.length} Conflict Gates</strong></summary>
       <p className="p55-note">Requirements derive from MR/BOD/DTS/SPE/RPT/BLD. Clause evidence is independent from existing priced vendor/quantity ledger. Review every linked note, comment and attachment; show applicable common constraints in 04 Documents.</p>
