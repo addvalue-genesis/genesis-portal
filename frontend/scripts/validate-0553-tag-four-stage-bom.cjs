@@ -39,6 +39,10 @@ assert.equal(region.quotedUnit,null,"Vendor B-4 source MUST remain NULL");
 assert.equal(region.workingAssumedZero,true,"USD 0 management assumption must be qualified");
 assert.equal(region.quotedTotal,null,"Vendor original quote B-4 has no total");
 assert.equal(m.releaseAllowed,false);
+const unlike=getTagBomFourStage0553("ZWP20",{...odu,countedInWorkingTotal:true,
+ detail:odu.detail.map(x=>x.functionId==="RADIO_EQUIPMENT"?{...x,currency:"THB"}:x)});
+assert.equal(unlike.working.derivedFunctionSubtotal,null,"Never add mixed currency function rates");
+assert.equal(unlike.working.completeness,"MIXED_OR_UNVERIFIED_FUNCTION_CURRENCIES");
 const idu=rows.find(x=>x.row===5&&x.tag==="MR-502-001A");
 assert(idu,"Separate IDU cost owner must remain present");
 const iduView=getTagBomFourStage0553("ZWP20",{...idu,countedInWorkingTotal:true});
