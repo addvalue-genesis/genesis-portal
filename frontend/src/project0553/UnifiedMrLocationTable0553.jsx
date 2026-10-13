@@ -14,6 +14,9 @@ const evidenceToRow=(x,i)=>({
 });
 const canonicalRow=(x)=>({...x,scenarioEvidence:false});
 const isCounted=x=>x.countedInWorkingTotal===true&&Number.isFinite(x.extended);
+const moduleBase=(mr,site)=>"bid.budget.bom."+mr.toLowerCase().replace("-","")+(site?"."+site.toLowerCase():"");
+const moduleItem=(mr,site,item)=>moduleBase(mr,site)+"."+String(item.id).toLowerCase();
+const budgetRateOwner=(mr,x)=>mr==="MR-0002"?(String(x.id).includes("RFI-LNA")?"RFI · LNA":String(x.quoteLine||"").match(/^UHF-[234]$/)?"MGW · Antenna / Feeder":String(x.quoteLine||"")==="UHF-1"?"HYTERA BDA · excluded":x.owner||"Field bulk"):x.owner||"Evidence candidate";
 export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
  const [expanded,setExpanded]=useState({});
  const selected=BOM_READ_MODEL_0553.rows.filter(r=>r.mr===mr&&(site==="ALL"||r.site===site));
@@ -50,7 +53,7 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
     const open=!!expanded[r.site];
     return <React.Fragment key={r.site}>
      <tr><td><button type="button" className="p55-row-toggle" aria-expanded={open} onClick={()=>setExpanded(o=>({...o,[r.site]:!o[r.site]}))}>{open?"−":"+"}</button></td>
-      <td><strong>{r.site}</strong></td><td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+mr.toLowerCase().replace("-","")+"."+r.site.toLowerCase()}/></td>
+      <td><strong>{r.site}</strong></td><td><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleBase(mr,r.site)} componentName={r.site+" / "+mr+" Engineering BOM"}/></td>
       <td>{r.items.length}</td><td>{r.items.filter(isCounted).length}/{r.items.length}</td>
       <td>{Object.entries(sub).map(([c,v])=>money(v,c)).join(" + ")||"PENDING"}</td>
       <td>{r.projectionSource||"SOURCE_EVIDENCE_ONLY"}<small>{r.completeness||""}</small></td></tr>
@@ -58,8 +61,8 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
       {r.items.map((x,i)=><tr key={x.id+"-"+i}><td>{x.tag||x.id}</td><td>{x.sku||"—"}<small>{x.description}</small></td>
        <td>{x.qty??"PENDING"} {x.unit||""}</td><td>{money(x.unitCost,x.currency||"")}</td>
        <td>{isCounted(x)?money(x.extended,x.currency||""):"NOT COUNTED / PENDING"}</td>
-       <td>{x.owner||"—"}<small>{x.source||"Source trace pending"}</small></td>
-       <td>{x.status||"—"}<small><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+mr.toLowerCase().replace("-","")+"."+r.site.toLowerCase()+"."+String(x.id).toLowerCase()}/></small></td></tr>)}
+       <td>{budgetRateOwner(mr,x)}<small>{x.source||"Source trace pending"}</small></td>
+       <td>{x.status||"—"}<small><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleItem(mr,r.site,x)}/></small></td></tr>)}
      </tbody></table></div><p className="p55-note">Open constraints: {(r.gaps||[]).join(" · ")||"See RFQ / engineering evidence trace"}</p></td></tr>}
     </React.Fragment>;
    })}
