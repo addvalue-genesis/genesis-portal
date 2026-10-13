@@ -9,6 +9,7 @@ import {SCADA_LINKS_0553} from "./scadaLinkEvidence";
 import {traceTagParticular0553} from "./documentParticularTrace0553";
 import {deriveZWP20SiteCost0553} from "./zwp20SiteCost0553";
 import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
+import {deriveSourcedExtended,matchQuotedSourceLine,reconcileTagCostOwners,normalizedEquipmentTag} from "../../common/engineering/controlledTagMappingKernel";
 
 const PILOT=Object.freeze({projectId:"PJ2608-0553",mr:"MR-0001",site:"ZWP20",tag:"MR-502-001",row:4});
 const COST_OWNER=Object.freeze({
@@ -82,20 +83,21 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
   const tech=techByLine.get(code);
   const ledgerComponent=(row4?.detail||[]).find(x=>x.budgetaryQuoteLine===code||
      x.budgetarySelectedOffer===code);
+  const separateOwnerRow=code==="B-8"?siteRows.find(r=>r.row===10):
+   code==="B-12"?siteRows.find(r=>r.row===6):null;
   // B-8 and B-12 are attached to their own customer TAGs, so not in ODU derivation.
-  const sourceMatch=Boolean(original&&inCatalog&&tech
-   &&original.partNumber===inCatalog.productKey&&original.unitPrice===inCatalog.unitPrice
-   &&inCatalog.quantity===original.qty
-   &&inCatalog.currency===originalQuote.currency
-   &&tech.partNumber===original.partNumber
-   &&tech.functionId===(code==="B-12"?"ANTENNA_PARABOLIC":FUNCTION[code]));
+  const joined=matchQuotedSourceLine({offer:originalQuote,line:original,index:idx,
+   catalogRelationship:inCatalog,technicalRecord:tech,
+   expectedFunction:code==="B-12"?"ANTENNA_PARABOLIC":FUNCTION[code]});
+  const sourceMatch=joined.matched;
   details.push({quoteLine:code,partNumber:original?.partNumber||null,
    sourceQuoteId:originalQuote.id,catalogRelationshipId:stableId,catalogCompanyId:inCatalog?.companyId||null,
    manufacturerEvidence:"NEXTG_VENDOR_QUOTED_MODEL_UNVERIFIED_OEM_CERTIFICATION",
    functionId:FUNCTION[code],costOwner:costOwnerFrom(code),sourceMatch,
    sourceQuoteQty:original?.qty??null,sourceUnitPriceUSD:original?.unitPrice??null,sourceCurrency:originalQuote.currency,
-   quotePricingState:original?.pricingState||null,engineeringQty:ledgerComponent?.requiredQty??null,
-   engineeringState:ledgerComponent?.quantityState||null,
+   quotePricingState:original?.pricingState||null,sourceJoinIssues:joined.issues,
+   engineeringQty:ledgerComponent?.requiredQty??separateOwnerRow?.sourceQty??null,
+   engineeringState:ledgerComponent?.quantityState||(separateOwnerRow?"MTO_SEPARATE_TAG_QTY":null),
    mappingRateUSD:ledgerComponent?.budgetaryUnitPrice??null,
    mappingExtendedUSD:ledgerComponent?.budgetaryExtended??null,
    supplierQuotedAsZero:original?.unitPrice===0,
@@ -127,8 +129,8 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
    evidence:"B-5 "+quotedDescription("B-5")+"; RF mounts/jumpers must be counted once against physical interface/Bulk"}
  ];
  push("MAP-05",true,"Six evidence-derived technical checkpoints documented; "+technical.filter(x=>x.result==="CONFLICT").length+" conflicting/unresolved product claims. Compliance is NOT approved.",true);
- const qOK=details.filter(x=>["B-1","B-2","B-3","B-4","B-5","B-6","B-7"].includes(x.quoteLine))
- .every(x=>x.engineeringQty===1&&["DOCUMENT_DERIVED_PRELIMINARY","PARAMETRIC_1_PER_RADIO_ASSUMPTION","ENGINEERING_SOURCE"].includes(x.engineeringState));
+ const qOK=details.every(x=>x.engineeringQty===1&&
+  ["DOCUMENT_DERIVED_PRELIMINARY","PARAMETRIC_1_PER_RADIO_ASSUMPTION","ENGINEERING_SOURCE","MTO_SEPARATE_TAG_QTY"].includes(x.engineeringState));
  // Vendor source rate must remain NULL for region, no fabricated zero quoted rate.
  push("MAP-06",Boolean(qOK),"Quantity one per applicable working function has separate MTO/Topology basis; NG quoted quantity three remains evidence only");
  const ownerIds=new Set(details.map(x=>x.quoteLine));
@@ -138,34 +140,55 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
   details.find(d=>d.quoteLine==="B-8")?.costOwner==="SA-502-001.10"&&
   details.find(d=>d.quoteLine==="B-12")?.costOwner==="ANT-502-001.6";
  push("MAP-07",Boolean(ownersOK),"Every named quote line has exactly one intended TAG+row owner; power IDU row5, surge row10, antenna row6");
- const rateRows=details.filter(x=>["B-1","B-2","B-3","B-4","B-5","B-6","B-7"].includes(x.quoteLine));
- const ratesOK=rateRows.every(x=>x.engineeringQty===1&&
-  (x.quoteLine==="B-4"?
-   (x.sourceUnitPriceUSD===null&&x.managementZeroAssumption&&x.mappingRateUSD===0):
-   (Number.isFinite(x.sourceUnitPriceUSD)&&x.mappingRateUSD===x.sourceUnitPriceUSD
-    &&x.mappingExtendedUSD===cents(x.sourceUnitPriceUSD*x.engineeringQty))));
- push("MAP-08",Boolean(ratesOK),
-  "Original B-4 source is NULL and separate management incremental assumption is 0; sourced B-1/B-2/B-3/B-5/B-6/B-7 rates match exact USD amounts");
- const mappedOduUSD=cents(rateRows.filter(x=>x.costOwner==="MR-502-001.4")
-  .reduce((n,x)=>n+(Number.isFinite(x.mappingExtendedUSD)?x.mappingExtendedUSD:0),0));
- const mappedIndoorUSD=cents(rateRows.filter(x=>x.costOwner==="MR-502-001A.5")
-  .reduce((n,x)=>n+(Number.isFinite(x.mappingExtendedUSD)?x.mappingExtendedUSD:0),0));
- const checkOwners=[
-  {id:"MR-502-001.4",row:4,mappedUSD:mappedOduUSD},
-  {id:"MR-502-001A.5",row:5,mappedUSD:mappedIndoorUSD},
-  {id:"SA-502-001.10",row:10,mappedUSD:details.find(x=>x.quoteLine==="B-8")?.sourceUnitPriceUSD??null},
-  {id:"ANT-502-001.6",row:6,mappedUSD:details.find(x=>x.quoteLine==="B-12")?.sourceUnitPriceUSD??null}
- ].map(owner=>{
-  const old=siteRows.find(r=>r.row===owner.row);
-  const compatible=old?.currency==="USD"&&Number.isFinite(old.extended)&&Number.isFinite(owner.mappedUSD);
-  return {...owner,sourceTag:old?.tag||null,ledgerUSD:old?.extended??null,
-   deltaUSD:compatible?cents(owner.mappedUSD-old.extended):null,
-   pass:compatible&&Math.abs(cents(owner.mappedUSD-old.extended))<=0.01};
+ // MAP-08: independently calculate every physical function using the shared equation kernel.
+ // The vendor B-4 source rate is NULL; the ZERO incremental management scenario is SEPARATE,
+ // identified and never represented as a confirmed supplier rate.
+ const costEntries=details.map(x=>{
+  const assumption=x.quoteLine==="B-4"?{
+   unitRate:0,sourceId:"USER_MANAGEMENT_BUDGETARY_INCLUDED_ASSUMPTION",
+   status:"UNVERIFIED_MYANMAR_REGION_ENTITLEMENT_NOT_VENDOR_QUOTE"}:null;
+  const derived=deriveSourcedExtended({quantity:x.engineeringQty,sourceUnitRate:x.sourceUnitPriceUSD,
+   currency:x.sourceCurrency,assumption});
+  return {sourceUsageKey:x.sourceQuoteId+":"+x.quoteLine,ownerId:x.costOwner,
+   currency:x.sourceCurrency,amount:derived.amount,derivedState:derived.state,
+   quoteLine:x.quoteLine,originalSourceUnitPrice:derived.sourceRate};
  });
- const reconOK=checkOwners.every(x=>x.pass)&&row4?.detail?.length>=7;
+ const ratesOK=costEntries.every(line=>{
+  const x=details.find(d=>d.quoteLine===line.quoteLine);
+  const expected=Number.isFinite(x.mappingExtendedUSD)?x.mappingExtendedUSD:line.amount;
+  const managementOK=line.quoteLine!=="B-4"||
+   (x.sourceUnitPriceUSD===null&&x.mappingRateUSD===0
+    &&line.derivedState==="MANAGEMENT_ASSUMPTION_NOT_VENDOR_QUOTE");
+  return managementOK&&Number.isFinite(line.amount)&&line.amount===expected;
+ });
+ push("MAP-08",Boolean(ratesOK),
+  "Independent quantity × original currency unit rate; B-4 retains vendor NULL with named incremental management assumption only");
+ const ledgerForAudit=[
+  {ownerId:"MR-502-001.4",row:4,tag:"MR-502-001"},
+  {ownerId:"MR-502-001A.5",row:5,tag:"MR-502-001A"},
+  {ownerId:"ANT-502-001.6",row:6,tag:"ANT-502-001"},
+  {ownerId:"SA-502-001.10",row:10,tag:"SA-502-001"}
+ ].map(x=>{
+  const r=siteRows.find(row=>row.row===x.row);
+  return {...x,currency:r?.currency||null,extended:r?.extended??null,
+   sourceTag:r?.tag||null,sourceQty:r?.sourceQty??null,
+   sourceTagMatch:normalizedEquipmentTag(r?.tag)===x.tag,
+   sourceQtyMatch:r?.sourceQty===1};
+ });
+ const costReconciliation=reconcileTagCostOwners({
+  items:costEntries,ledger:ledgerForAudit.map(l=>({ownerId:l.ownerId,currency:l.currency,extended:l.extended}))
+ });
+ const checkOwners=costReconciliation.ownerResults.map(r=>{
+  const sourceRecord=ledgerForAudit.find(l=>l.ownerId===r.ownerId);
+  return {id:r.ownerId,row:sourceRecord.row,
+   sourceTag:sourceRecord.sourceTag,mappedUSD:r.mappedAmount,
+   ledgerUSD:r.extended,deltaUSD:r.delta,
+   pass:r.pass&&sourceRecord.sourceTagMatch&&sourceRecord.sourceQtyMatch&&r.currency==="USD"};
+ });
+ const reconOK=costReconciliation.pass&&checkOwners.every(x=>x.pass)&&row4?.detail?.length>=7;
  push("MAP-09",reconOK,
-  reconOK?"All 4 separate owner totals reconciled to immutable ZWP20 Ledger at USD0.01 tolerance (ODU/IDU/Surge/Antenna)":
-   "Cost owner allocation differs from the original ledger, is missing, or has currency mismatch; do not update");
+  reconOK?"Four physical TAG owners reconciled to unchanged source ledger with USD0.01 tolerance; distinct source-line allocation verified":
+   "Owner, TAG identity, source quantity, rate, currency or cost does not match frozen ZWP20 ledger; no repricing");
  const internalProceed=stages.filter(x=>x.id!=="MAP-05").every(x=>x.status==="PASS");
  push("MAP-10",internalProceed,
   internalProceed?"Internal budget may proceed under recorded qualification; release remains forbidden until technical certificates, Myanmar entitlement, NMS, validity and OEM proof":
