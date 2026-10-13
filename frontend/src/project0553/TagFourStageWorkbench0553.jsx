@@ -13,14 +13,21 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,children}){
   <ControlledModuleSection0553 moduleKey={id+".required-bom"} title="01 · Required Engineering BOM — สิ่งที่ Engineering ต้องการ" defaultOpen>
    <p className="p55-note"><strong>Requirement source:</strong> MR0001 MTO Rev04 → MR0001 Engineering Required BOM → Functional Package Composition. {m.site} / {m.tag} / source row {m.row} = {m.scopeQty??"REVIEW"} {m.scopeUnit||"Set/Lot"} · {m.packageFamily}. Physical SKU Qty is NOT equal to 1 MTO Set automatically.</p>
    <p className="p55-note"><strong>Source identity:</strong> {m.sourceId||"MTO TAG not uniquely mapped"} · {m.sourceMatched?"Source TAG cross-reference found":"Source TAG identity needs review"}. <strong>Accepted Physical SKU BOM:</strong> {m.physicalSkuApproved?"PARTIAL / VERIFY PER FUNCTION":"NOT YET ENGINEERING APPROVED"}.</p>
+   {m.bartecBulkRequired&&<div className="p55-panel" data-component-key={id+".required-bom.bartec-quantity"}>
+    <p className="p55-note"><strong>BARTEC SCADA Enclosure — verified manufacturer GA quantities for this working design:</strong> 12 M20 top holes + 2 left + 2 right = <strong>{m.bartecBulkRequired.holeCount} M20 cable-entry holes</strong>. Initially supplied: <strong>{m.bartecBulkRequired.initialFactoryPlugs} M20 stopping plugs</strong> and 16 locknuts; one drain valve uses a separate hole. These components are within the BARTEC TCAB factory assembly, NOT 16 separately required cable glands.</p>
+    <p className="p55-note"><strong>Actual active cable glands by OD / certified SKU:</strong> {m.bartecBulkRequired.installedGlandRequired??"CABLE-END TAKEOFF REQUIRED"} · <strong>Additional gland purchase:</strong> {m.bartecBulkRequired.netAdditionalGlandPurchase??"VENDOR INCLUSION / OD REQUIRED"} · <strong>Current separately booked working allowance:</strong> {m.bartecBulkRequired.recordedActiveGlandAllowance} M20 gland (provisional) + CAT6A 69m (budgetary route). Factory Included, Required, and Purchase quantities are different.</p>
+    <p className="p55-note"><strong>GA evidence:</strong> {m.bartecBulkRequired.source}. <strong>Contractual conflict:</strong> {m.bartecBulkRequired.deviation}. <strong>Other system:</strong> {m.bartecBulkRequired.relatedOtherMr}</p>
+   </div>
+
    <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
-    <thead><tr><th>Required Engineering Function / ID</th><th>Quantity Driver & Proof</th><th>Working Qty (NOT approved)</th><th>Approved SKU Qty</th><th>Technical / Selection State</th></tr></thead><tbody>
+    <thead><tr><th>Required Engineering Function / ID</th><th>Quantity Driver & Proof</th><th>GA Documented Qty / Unit</th><th>Working Qty (NOT approved)</th><th>Approved SKU Qty</th><th>Technical / Selection State</th></tr></thead><tbody>
     {m.required.map(r=><tr key={r.id}><td><strong>{r.functionId}</strong><ComponentCopyId projectId="PJ2608-0553" componentKey={id+".required-bom.function."+r.id.toLowerCase()} componentName={r.functionId}/></td>
-     <td>{r.quantityDriver}<small>{r.qtyProof}</small></td>
+     <td>{r.quantityDriver}<small>{r.qtyProof}</small>{r.quantityEvidence&&<small>Evidence: {r.quantityEvidence}</small>}</td>
+     <td>{r.documentedQty??"—"} {r.documentedQty!==null&&r.documentedQty!==undefined?r.documentedUnit||"":""}<small>{r.qtyClass||"NOT YET DERIVED FROM SOURCE"}</small></td>
      <td>{r.derivedWorkingQty??"NOT DERIVED"}<small>{r.qtyState}</small></td>
      <td>{r.approvedSkuQty??"NOT APPROVED"}</td><td>{r.requirementState}<small>{r.selectionStatus}</small>{r.costOwner&&<small>Working owner: {r.costOwner}</small>}</td>
     </tr>)}
-    {m.required.length===0&&<tr><td colSpan={5}>Functional decomposition has not been mapped to this MTO TAG. Preserve source scope and request engineering proof; do not infer a physical SKU BOM.</td></tr>}
+    {m.required.length===0&&<tr><td colSpan={6}>Functional decomposition has not been mapped to this MTO TAG. Preserve source scope and request engineering proof; do not infer a physical SKU BOM.</td></tr>}
     </tbody></table></div>
   </ControlledModuleSection0553>
 
