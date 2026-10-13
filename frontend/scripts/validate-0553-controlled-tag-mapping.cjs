@@ -14,6 +14,7 @@ require.extensions[".js"]=(mod,filename)=>{
  }else oldJs(mod,filename);
 };
 const audit=require(path.join(root,"project0553/data/controlledTagMappingPilot0553.js")).auditZWP20RadioVendorMapping0553;
+const kernel=require(path.join(root,"common/engineering/controlledTagMappingKernel.js"));
 const siteCost=require(path.join(root,"project0553/data/zwp20SiteCost0553.js")).deriveZWP20SiteCost0553;
 const QUOTE=require(path.join(root,"project0553/data/quotes/NG-260916-ADV-DAP1.full.json"));
 const MTO=require(path.join(root,"project0553/data/snapshots/mr0001.mto.rev04.sourceRows.json"));
@@ -36,6 +37,21 @@ assert.equal(mapped.technicalCompliancePassed,false);
 assert.equal(mapped.ledgerMutation,false);
 assert.equal(before,after,"Audit mutated existing ZWP20 Ledger");
 assert.equal(mapped.details.length,9);
+assert(mapped.details.find(x=>x.quoteLine==="B-8").engineeringQty===1,"Surge quantity must come from its own MTO TAG");
+assert(mapped.details.find(x=>x.quoteLine==="B-12").engineeringQty===1,"Antenna quantity must come from its own MTO TAG");
+assert.equal(kernel.deriveSourcedExtended({quantity:1,sourceUnitRate:null,currency:"USD"}).amount,null,"Unquoted rate must stay UNKNOWN");
+assert.equal(kernel.deriveSourcedExtended({quantity:1,sourceUnitRate:null,currency:"USD"}).state,"UNKNOWN_VENDOR_RATE");
+assert.equal(kernel.deriveSourcedExtended({quantity:1,sourceUnitRate:null,currency:"USD",assumption:{unitRate:0}}).amount,null,"Assumed zero requires proof ID/status");
+const qualifiedZero=kernel.deriveSourcedExtended({quantity:1,sourceUnitRate:null,currency:"USD",assumption:{unitRate:0,sourceId:"MANAGEMENT_TEST",status:"QUALIFIED"}});
+assert.equal(qualifiedZero.amount,0);
+assert.equal(qualifiedZero.sourceRate,null);
+assert.equal(qualifiedZero.state,"MANAGEMENT_ASSUMPTION_NOT_VENDOR_QUOTE");
+const duplicateCostOwner=kernel.reconcileTagCostOwners({
+ items:[{sourceUsageKey:"Q:B-1",ownerId:"TAG.4",currency:"USD",amount:10},{sourceUsageKey:"Q:B-1",ownerId:"TAG.4",currency:"USD",amount:10}],
+ ledger:[{ownerId:"TAG.4",currency:"USD",extended:20}]
+});
+assert.equal(duplicateCostOwner.pass,false,"Duplicate source line must not reconcile");
+
 assert.equal(new Set(mapped.details.map(x=>x.catalogRelationshipId)).size,9);
 assert.equal(mapped.sourceQuoteRegionRate,null);
 const region=mapped.details.find(x=>x.quoteLine==="B-4");
