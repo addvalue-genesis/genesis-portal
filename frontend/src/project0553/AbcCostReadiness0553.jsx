@@ -9,7 +9,7 @@ export function AbcCostReadiness0553({site="ALL",fx=null,priceEvidence=null,snap
  const model=useMemo(()=>snapshot||deriveAbcWorkingReadiness0553({site,thbPerUsd:fx?.thbPerUsd??null}),[snapshot,site,fx?.thbPerUsd]);
  const root="bid.budget.bom.system-location-mto.abc-readiness";
  const A=model.A,B=model.B,C=model.C,ABC=model.ABC;
- return <ControlledModuleSection0553 moduleKey={root} title={"A / B / C — Cost Readiness & Next Actions · "+(site==="ALL"?"MR0001 All Locations":site)} defaultOpen
+ return <ControlledModuleSection0553 moduleKey={root} title={"A / B / C — Cost Readiness & Next Actions · "+(site==="ALL"?"MR0001 All Locations":site)} defaultOpen className="p553-abc-readiness"
   description="Source-backed working cost and B/C WBS sell evidence are different bases; final A+B+C is not yet established">
   <p className="p55-note"><strong>วิธีอ่าน:</strong> A = รายการอุปกรณ์/วัสดุที่บันทึก Working Cost ได้จริงจาก TAG Ledger; B = งานบริการและ WBS ที่ต้องหาต้นทุนภายใน; C = Spare Options ที่ต้องมี OEM Qty/Rate. <strong>37/55 เป็นหลักฐานราคา ไม่ใช่จำนวนผ่าน Engineering Approval.</strong></p>
   {priceEvidence&&<p className="p55-note">Price evidence: {priceEvidence.covered}/{priceEvidence.total} visible MTO TAGs have candidate rate evidence; {priceEvidence.total-priceEvidence.covered} do not yet have matched price evidence.{priceEvidence.filtered?" Vendor filter is active; cost roll-up always uses the full canonical ledger, not filtered visible rows.":""} Price evidence, posted working cost and technical approval are three independent controls.</p>}
