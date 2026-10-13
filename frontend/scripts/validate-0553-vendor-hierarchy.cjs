@@ -24,7 +24,9 @@ assert(vendor.includes('renderLines(sections.unquoted)'),"Other evidence section
 assert(vendor.includes('moduleKey={"bid.vendor.products.supplier.group."+moduleSegment(g.id)+".quotation."+moduleSegment(q.id)}'),"Nested stable quote module ID missing");
 assert(vendor.includes('componentKey={"bid.vendor.products.quotation."+q.id}'),"Quote-specific Copy ID missing");
 assert(vendor.includes('q.header?.quoteStatus')&&vendor.includes('q.header?.currency'),"Original quote metadata absent");
-assert(vendor.includes('onClick={()=>chooseQuote(q.id)}'),"Quote commercial inspector not connected");
+assert(vendor.includes('onClick={()=>setInspectedQuote(q.id)}'),"Quote commercial inspector not connected");
+assert(vendor.includes('const [inspectedQuote,setInspectedQuote]=useState("")'),"Independent read-only inspection state missing");
+assert(vendor.includes("chosenQuote||inspectedQuote"),"Quotation detail no longer accessible");
 assert(vendor.includes('moduleKey={"bid.vendor.products."+view+".group."+moduleSegment(g.id)}'),"Existing company group module ID lost");
 assert(vendor.includes('componentKey={isQuote?"bid.vendor.products.quote-line."'),"Original line Copy ID lost");
 assert(page.includes('<SmartDataGroup moduleKey="bid.documents"'),"Entire Documents module must collapse");
