@@ -181,14 +181,13 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <p className="p55-note"><strong>ENGINEERING DERIVATION INCOMPLETE:</strong> This is the MTO source and vendor quote comparison, NOT an accepted First-Principles-derived equipment BOM. Physical SKU quantities, OEM RF proof and scope allocation must be solved here before a budgetary snapshot can be created.</p>
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
   <ScadaPhysicalCompleteness0553 site={site} fx={fx}/>
-  <div className="p55-panel" style={{padding:12,margin:"10px 0",border:"1px solid #b8ccd9"}} data-component-key="bid.budget.bom.system-location-mto">
-   <strong>BOM Working Table — Module ID</strong>
+  <div className="p55-panel" style={{padding:12,margin:"10px 0",border:"1px solid #b8ccd9"}}>
+   <strong>BOM Working Table — Filter Context</strong>
    <div style={{display:"flex",flexWrap:"wrap",gap:14,alignItems:"center",marginTop:8}}>
-    <span>Table <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.system-location-mto"/></span>
     <span>System <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")}/></span>
     <span>Location <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+(site==="ALL"?"all-locations":site.toLowerCase())}/></span>
    </div>
-   <p className="p55-note" style={{marginTop:7}}>Module ID ระบุหน้าจอ/ระบบ/Location และ Copy ได้ทันที; เมื่อกด + ที่ Location จะเห็น Equipment Tag และ Item ID แต่ละแถว</p>
+   <p className="p55-note" style={{marginTop:7}}>System / Location context above; the whole table below carries its own collapsible Module ID and Copy control.</p>
   </div>
   <SmartFilterBar moduleKey="bid.budget.bom.filters" title="Engineering BOM · Filter by System / Site / Vendor"
    total={sourceCount} shown={displayedCount} onReset={()=>{setSystem("MR-0001");changeSite("ALL");setVendor("ALL");}}
@@ -203,6 +202,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     {key:"vendor",label:"Vendor / Company",type:"select",value:vendor,onChange:setVendor,
      options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}
    ]}/>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"BOM Working Table — "+system+" / "+(site==="ALL"?"All Locations":site)} description="System × Location × MTO summary, source evidence and working cost" defaultOpen>
   {system==="MR-0002"?<section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.mr0002">
    <h4>MR-0002 · Trunk Radio — Source-linked BOM by Location <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.system-location-mto.mr0002"/></h4>
    <p className="p55-note">This is a read-only table projection of the same central MR-0002 Working BOM. One tagged RFI LNA per site is a budget assumption. THB shown first using Working FX; original vendor currencies retained for audit. Excluded items do not enter site totals.</p>
@@ -274,9 +274,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
         <small>{financial.costed}/{financial.total} costed · {financial.gaps} pending</small></td>
       </tr>
       {siteExpanded(g.site)&&<tr className="p553-location-expanded"><td colSpan={8}>
-       <ControlledModuleSection0553 moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".engineering-detail"} title={g.site+" / Engineering Detail — MTO, Cost, Vendor & RPT"} description="Location-level engineering detail; all subordinate TAG and evidence modules have independent IDs" defaultOpen>
        <div className="p553-location-details">
-        <p className="p55-note"><strong>Engineering Scope Note:</strong> {g.siteClass?.note} · Equipment ownership NEW / REUSE / BY OTHERS must be checked against current BLD/MR. The overview above contains no hidden cost additions.</p>
+        <p className="p55-note"><strong>{g.site} / Engineering Detail:</strong> {g.siteClass?.note} · Equipment ownership NEW / REUSE / BY OTHERS must be checked against current BLD/MR. The overview above contains no hidden cost additions.</p>
         <ControlledModuleSection0553 moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".cost-allocation"} title={"Cost Allocation by TAG ("+financial.costed+" priced / "+financial.total+" source TAGs)"} description="กด + ในแต่ละ TAG เพื่อดูรายละเอียดและ Copy Module ID" defaultOpen>
          <LocationBomDetail0553 site={g.site} fx={fx}/>
          <p className="p55-note">Basis: {financial.basis}. {financial.costed}/{financial.total} MTO items priced; {financial.gaps} remaining. Each original currency is retained. Unpriced rows are not treated as zero.</p>
@@ -329,7 +328,6 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
         </ControlledModuleSection0553>
         <p className="p55-note">Incomplete equipment / A+B+C: {financial.gaps} unresolved; unpriced source rows are not zero-cost approvals. All detailed source values remain accessible in expanded TAG modules.</p>
        </div>
-       </ControlledModuleSection0553>
       </td></tr>}
      </React.Fragment>;
     })}
@@ -339,5 +337,6 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <p className="p55-note">Missing price is not missing scope: {missingSourceRows.length} source rows in the chosen location still lack a Cisco-priced scenario, and may have other vendor price evidence. Detailed physical quantities, bulk and services must be derived separately.</p>
   <p className="p55-note">ZWP20 GREENFIELD total across all equipment, vendor packages and bulk is NOT ESTABLISHED; Cisco-only priced subtotal must never be labelled total location cost. Subtotal is for priced working items only. It excludes non-priced MR0001 equipment, bulk, spares and services. Customer A+B+C total and selling price remain separate; 4-Scope of Supply.xlsx is the controlled output template.</p>
   </>}
+  </ControlledModuleSection0553>
  </section>;
 }
