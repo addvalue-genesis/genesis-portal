@@ -7,14 +7,14 @@ import {RFI_LNA_PRICE_DECISION_0553} from "./rfiLnaPriceDecision0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {deriveDtrsRfiBudget0553} from "./dtrsRfiBudgetCalculation0553";
 const p=RFI_LNA_PRICE_DECISION_0553;
-const mgwLines=MGW_P26_058_0553.lines.filter(x=>x[0].startsWith("UHF-"));
+const mgwLines=MGW_P26_058_0553.lines.filter(x=>["UHF-2","UHF-3","UHF-4"].includes(x[0]));
 // MGW UHF-2 Yagi, UHF-3 Omni and UHF-4 100m feeder/6 connectors are budget selections; UHF-1 BDA excluded.
 const budgetBulk=deriveDtrsRfiBudget0553();
 const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
  .filter(w=>w.equipment.some(x=>x.system==="DTRS_TRUNK_RADIO"))
  .map(w=>{
   const site=w.wp,siteTags=new Set(w.equipment.filter(x=>x.system==="DTRS_TRUNK_RADIO").map(x=>x.tag));
-  const mappings={"UHF-1":"TCAB-508-001","UHF-2":"ANT-508-001","UHF-3":"ANT-508-002","UHF-4":"DTRS-RF-FEEDER-KIT"};
+  const mappings={"UHF-2":"ANT-508-001","UHF-3":"ANT-508-002","UHF-4":"DTRS-RF-FEEDER-KIT"};
   const equipment=mgwLines.map(([id,sku,description,quotedQty,unitPrice,,group])=>({
    id:site+"-"+id,site,mr:"MR-0002",tag:mappings[id],quoteLine:id,sku,description,
    qty:1,unit:"set",currency:"USD",unitCost:selectMR0002Rate0553(id)?.unitRate??null,extended:selectMR0002Rate0553(id)?.unitRate??null,
@@ -49,7 +49,7 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    items:[lna,...fieldBulk,...equipment],quoteAllocation:"RFI_LNA_MGW_YAGI_OMNI_FEEDER_SELECTED_AND_PRIOR_BULK",
    controlledTotalUSD:equipment.filter(x=>x.countedInWorkingTotal).reduce((sum,x)=>sum+x.extended,0),
    controlledTotalTHB:[lna,...fieldBulk].filter(x=>x.countedInWorkingTotal).reduce((sum,x)=>sum+x.extended,0),
-   scopeWarnings:["RFI is the selected MR-0002 manufacturer; HYTERA is not selected","MGW UHF-2 Yagi and UHF-3 Omni selected; provisional 1 per ZWP20/ZWP21/ZWP22, reconcile site MTO","HYTERA UHF-1 BDA excluded; UHF-4 100m feeder + six connectors selected as one vendor kit",
+   scopeWarnings:["RFI is selected for LNA; MGW UHF-1 HYTERA TS-9200 BDA is excluded from active BOM","MGW UHF-2 Yagi and UHF-3 Omni selected; provisional 1 per ZWP20/ZWP21/ZWP22, reconcile site MTO","MGW UHF-3 HYTERA Omni antenna remains selected separately from excluded UHF-1 BDA; UHF-4 includes 100m feeder + six connectors",
     "One RFI LNA per tagged site is a budgetary MR C1 assumption, not procurement-approved",
     "Prior DTRS bulk reused; RF-FEEDER / RF-CONNECTOR excluded to prevent overlap with MGW UHF-4",
     "SMA, DC/alarm, surge and enclosure have explicit unverified budgetary allowances; verify Ex approval and supply boundaries before release"]};
