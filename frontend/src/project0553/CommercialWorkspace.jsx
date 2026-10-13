@@ -1,4 +1,6 @@
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import PARTICULAR from "./data/documentParticularRequirements0553.json";
+import PARTICULAR_CONFLICTS from "./data/documentParticularConflicts0553.json";
 import {EstimateToBidMapping0553} from "./EstimateToBidMapping0553";
 import { formatCommercialAmount } from "../common/cost/commercialCurrency";
 import { InternalBudgetShortcut0553 } from "./InternalBudgetShortcut0553";
@@ -48,6 +50,13 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  return <div className="p55-stack" data-component-key="bid.budget">
  <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget"/><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
+ <details className="p55-panel" data-component-key="bid.budget.particular-source-gates">
+  <summary><strong>Budgetary 10 — RFQ Particular Scope &amp; Conflict Gates</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.particular-source-gates"/></summary>
+  <p className="p55-note">The 04 Documents particular matrix holds {PARTICULAR.records.length} source-linked engineering requirements and {PARTICULAR_CONFLICTS.records.length} cross-document review issues. This budget view references that same source, not a copied rate table or new costing model.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Engineering Issue</th><th>Budgetary Requirement / Gate</th></tr></thead>
+  <tbody>{PARTICULAR_CONFLICTS.records.filter(r=>r.severity==="CRITICAL"||r.severity==="HIGH").map(r=><tr key={r.id}><td>{r.id} · {r.topic}</td><td>{r.siDecisionGate}<small>Engineering Review · No automatic repricing</small></td></tr>)}</tbody></table></div>
+  <p className="p55-note">Before adopting a source into Cost: requirement → TAG/site → SI function → physical quantity → vendor proof/AVL → exactly one CBS cost owner. Source notes/comments/appendices and RPT/BLD must be checked as well as MR MTO.</p>
+ </details>
  <details className="p55-panel" data-component-key="bid.budget.vendor-evidence-impact">
   <summary><strong>Budgetary 10 · Supplier / Internet / ERP source readiness</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.vendor-evidence-impact"/></summary>
   <p className="p55-note">Same read-only source register as Vendor Products; no separate budget-only price master. Unapproved evidence remains reference only and cannot silently overwrite A/B/C.</p>
