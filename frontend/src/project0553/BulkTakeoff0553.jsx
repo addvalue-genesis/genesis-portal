@@ -1,5 +1,6 @@
 import {BARTEC_ENCLOSURE_BASIS_0553} from "./data/bartecEnclosureBasis0553";
 import {deriveBartecGlandBulkSchedule0553} from "./data/bartecGlandBulkSchedule0553";
+import {deriveIntegratedBulkMaster0553} from "./data/integratedBulkMaster0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {BULK_TAKEOFF_0553,BULK_TAKEOFF_POLICY_0553} from "./data/bulkTakeoff0553";
@@ -16,12 +17,39 @@ const components={
 };
 export function BulkTakeoff0553(){
  const glandSchedule=deriveBartecGlandBulkSchedule0553();
+ const integrated=deriveIntegratedBulkMaster0553();
  const [open,setOpen]=useState(new Set());
  const toggle=k=>setOpen(old=>{const next=new Set(old);next.has(k)?next.delete(k):next.add(k);return next;});
  const expandAll=()=>setOpen(new Set(BULK_TAKEOFF_0553.map((_,i)=>i)));
  return <section className="p55-panel">
   <div className="p55-eyebrow">ENGINEERING → COST <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bulk"/></div>
   <h3>Bulk, Enclosure & ATEX JB — Engineering Take-off</h3>
+  <details className="p55-panel" open data-component-key="bid.budget.bulk.integrated-mr0001-0004">
+   <summary style={{fontWeight:700,cursor:"pointer"}}>＋ / − Integrated BULK Master — MR0001–MR0004 / All WPs</summary>
+   <p className="p55-note">One integrated read model of existing WP/system bulk, physical BARTEC Cable Gland Register and original A5 cost owner. Detailed candidate rows are NOT automatically additive. A/B/C customer totals require separate released cost and service/installation ledgers.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead>
+    <tr><th>WP</th><th>MR / System</th><th>Bulk Function Count</th><th>Qty / Price Gaps</th><th>Original Posted A5 (THB)</th><th>Candidate only (THB)</th><th>Engineering State</th></tr></thead><tbody>
+    {integrated.locations.flatMap(w=>w.groups.map(g=><tr key={w.wp+g.mr}>
+     <td><strong>{w.wp}</strong><small>{w.siteClass}</small></td><td>{g.mr}<small>{g.name}</small></td>
+     <td>{g.items.length}</td><td>{g.unresolved}</td>
+     <td>{Number.isFinite(g.postedA5THB)?g.postedA5THB.toLocaleString("en-US",{maximumFractionDigits:2}):"No A5 booking"}</td>
+     <td>{Number.isFinite(g.pricedCandidateSubtotalTHB)?g.pricedCandidateSubtotalTHB.toLocaleString("en-US",{maximumFractionDigits:2}):"Not fully priced"}</td>
+     <td>{g.enclosure?g.enclosure.holeCapacity+" M20 drilled entries; active glands / OD not closed":"Vendor package / physical routes not closed"}<small>{g.allocationRule}</small></td>
+    </tr>))}</tbody></table></div>
+   <p className="p55-note"><strong>Original A5 booked source:</strong> THB {Number.isFinite(integrated.originalA5SourceTHB)?integrated.originalA5SourceTHB.toLocaleString("en-US"):"Source reconciliation pending"} · <strong>new cost posted:</strong> THB {integrated.postedExtraTHB} · <strong>BARTEC known capacity:</strong> {integrated.glandCapacity} M20 pre-drilled holes across modelled site/enclosure assemblies, not glands purchased. Missing cost is never assumed zero.</p>
+   {integrated.locations.map(w=><details key={w.wp} className="p55-panel">
+    <summary style={{cursor:"pointer"}}>{w.wp} — detailed per-MR bulk and cost ownership</summary>
+    {w.groups.map(g=><details key={g.mr} className="p55-panel">
+     <summary style={{cursor:"pointer"}}>{g.mr} · {g.name} · {g.items.length} functions</summary>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Function / ID</th><th>Engineering quantity</th><th>Source Unit Rate THB</th><th>Candidate Extended THB</th><th>Cost Owner / Evidence</th></tr></thead><tbody>
+     {g.items.map((i,k)=><tr key={i.id+"-"+k}><td><strong>{i.id}</strong><small>{i.item}</small></td>
+      <td>{i.qty??"Not derived"} {i.unit||""}</td><td>{Number.isFinite(i.rateTHB)?i.rateTHB.toLocaleString("en-US"):"Not sourced"}</td>
+      <td>{Number.isFinite(i.budgetCandidateTHB)?i.budgetCandidateTHB.toLocaleString("en-US"):"Not booked"}</td>
+      <td>{i.owner}<small>{i.status}</small><small>{i.source}</small></td></tr>)}
+     </tbody></table></div>
+    </details>)}
+   </details>)}
+  </details>
   <p className="p55-note">BARTEC enclosure models and drilled-hole patterns are user-confirmed as the engineering basis. Cable-end quantities, certified active glands, fitted plug replacements and procurement quantities remain separately derived. Blank bulk quantity/rate does not mean zero.</p>
   <details className="p55-panel"><summary style={{cursor:"pointer",fontWeight:700}}>＋ / − BARTEC selected enclosure holes / cable entry capacity (2026-10-13 decision)</summary>
    <p className="p55-note">Source BARTEC GA 21G1048t-BA-GA-100X_Z0 (2022 as-built). Hole counts are PER ENCLOSURE, not site quantities and not purchased cable glands. Drain holes are separate; legacy TETRA enclosures do not establish current DTRS allocation.</p>
