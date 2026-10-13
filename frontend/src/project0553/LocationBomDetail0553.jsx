@@ -4,6 +4,7 @@ import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
 import {TagFourStageWorkbench0553} from "./TagFourStageWorkbench0553";
 import {traceTagParticular0553} from "./data/documentParticularTrace0553";
 import {TagMappingAudit0553} from "./TagMappingAudit0553";
+import {ZWP8CostOwnershipAudit0553} from "./ZWP8CostOwnershipAudit0553";
 import WORKING_POLICY from "./data/siProceedWithQualifications0553.json";
 import {recoverMR0001Evidence0553} from "./data/mr0001EvidenceRecovery0553";
 import {MR0001_MODULE_CROSSMAP_0553} from "./data/mr0001ModuleCrossmap0553";
@@ -38,6 +39,7 @@ export function LocationBomDetail0553({site,fx}){
   <p><strong>{site} Working Priced Subtotal: {Number.isFinite(totalTHB)?"THB "+fmt(totalTHB):"FX REQUIRED"}</strong>
    <small>Original USD {fmt(ledger.subtotals.USD)} + THB {fmt(ledger.subtotals.THB)} · {ledger.costedRows}/{ledger.totalRows} tagged rows priced · {ledger.unresolvedRows.length} unresolved · FX {fx?.thbPerUsd??"NOT SET"} THB/USD</small></p>
   <p className="p55-note">กด + ที่ TAG เพื่อดู Engineering derivation, MR/BLD/RPT requirements, Vendor quotation functions, assumptions และ Cost ownership; Copy ID ใช้อ้างอิง TAG แยกตาม Location / MTO row ได้โดยตรง</p>
+  {site==="ZWP8"&&<ZWP8CostOwnershipAudit0553 fx={fx}/>}
   <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact p553-mto-summary-table">
    <thead><tr><th>MTO / Module</th><th>Engineering Quantity / Basis</th><th>Budgetary Selected Product / Vendor</th><th>Unit Cost (THB)</th><th>Extended Cost (THB)</th><th>Assumptions / Status</th></tr></thead><tbody>
    {rows.map(v=><React.Fragment key={v.row+"-"+v.tag}>
