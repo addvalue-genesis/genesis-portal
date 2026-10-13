@@ -35,7 +35,10 @@ for(const key of ["source-layout","parametric-bulk-routes","mr0002.rf-dc-alarm-b
  "lifecycle-b4-b5-c2"]){
  assert(working.includes('moduleKey="bid.budget.bom.'+key+'"'),"Working Preview module missing Copy ID: "+key);
 }
-assert(working.includes('moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".engineering-detail"}'),"Expanded Location Engineering Detail requires a visible Copy ID");
+assert(working.includes('moduleKey="bid.budget.bom.system-location-mto"'),"Master location/MTO table must have one collapsible Copy ID");
+assert(working.includes('title={"BOM Working Table — "+system+'),"Table title should expose the system/location context");
+assert(!working.includes('.engineering-detail"}'),"Do not add the master table identity to a child ZWP detail");
+
 for(const key of [".cost-allocation",".vendor-rate-evidence",".unallocated-scenarios",".rpt-link-budget"]){
  assert(working.includes('g.site.toLowerCase()+"'+key+'"'),"WP location module missing Copy ID: "+key);
 }
