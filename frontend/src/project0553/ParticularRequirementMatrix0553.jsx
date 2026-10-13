@@ -1,6 +1,7 @@
 import React,{useMemo,useState} from "react";
 import PARTICULAR from "./data/documentParticularRequirements0553.json";
 import CONFLICTS from "./data/documentParticularConflicts0553.json";
+import CONTINUE_POLICY from "./data/siProceedWithQualifications0553.json";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 
 // Read-only evidence trace: no modification of Budgetary, supplier selections or TAG cost ledger.
@@ -23,6 +24,7 @@ export function ParticularRequirementMatrix0553({compact=false}){
   return !keyword||n(hay).includes(n(keyword));
  }),[site,doc,kind,keyword]);
  const conflicts=useMemo(()=>CONFLICTS.records.filter(r=>siteMatch(r.tags,site)),[site]);
+ const decisions=CONTINUE_POLICY.workingDecisions.filter(x=>site===ALL||x.scope.includes(site)||x.id==="WD-NMS-ZPQ");
  const counts=Object.keys(PARTICULAR.sourceDocuments).map(d=>({doc:d,count:PARTICULAR.records.filter(r=>r.document===d).length}));
  return <section className="p55-panel" data-component-key="bid.documents.particular-requirement-matrix" style={{padding:14,marginTop:12}}>
   <h3>Particular Engineering Requirement Matrix · MR / BOD / DTS / SPE / RPT / BLD</h3>
@@ -44,6 +46,14 @@ export function ParticularRequirementMatrix0553({compact=false}){
     <td>{r.siAction}</td>
     <td>{r.costDriver}<small>{r.decisionStatus}</small><small>Never post automatically</small></td>
    </tr>})}</tbody></table></div>}
+  <details open className="p55-panel" data-component-key="bid.documents.si-proceed-decisions" style={{padding:12,marginTop:12}}>
+   <summary><strong>SI Working Decisions — Proceed with Qualifications ({decisions.length})</strong></summary>
+   <p className="p55-note">Submitted deviation history is reported by ADDVALUE and must be cross-referenced to the original register; this page does not reissue deviations, assume their acceptance, or stop budgetary work.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Working Decision</th><th>Accepted Internal Budgetary Basis</th><th>Proof / Change Trigger</th><th>Commercial Treatment</th></tr></thead><tbody>
+    {decisions.map(d=><tr key={d.id}><td><strong>{d.id}</strong><small>{d.scope}</small><small>{d.state}</small></td><td>{d.offerBasis}</td><td>{d.engineeringProof.join(" · ")}<small>{d.changeTrigger||d.mrTagChange||""}</small></td><td>{d.commercialTreatment}<small>{d.externalDeviationLink}</small></td></tr>)}
+   </tbody></table></div>
+   <p className="p55-note"><strong>Customer Template:</strong> Part C = C1 Capital Spares / C2 Two-year Operation Spares. NMS commercial qualification is a separate proposal remark or existing deviation, never Part C spares. Part B in this template is B1–B14, with different semantics from internal CBS group names.</p>
+  </details>
   <details open={showConflicts} onToggle={e=>setShowConflicts(e.currentTarget.open)} style={{marginTop:12}}>
    <summary><strong>Cross-document inconsistencies / approval gates ({conflicts.length} for {site})</strong></summary>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
