@@ -7,5 +7,5 @@ assert(!ui.includes("Engineering MTO / Function / Price Drill-down"),"Duplicate 
 assert(d.includes("tagKey=v=>")&&d.includes("site.toLowerCase()"),"Unique Site + TAG + row Module ID required");
 assert(d.includes("aria-expanded={Boolean(expanded[tagKey(v)])}"),"Each TAG must expose its own accessible toggle state");
 assert(d.includes("data-component-key={tagKey(v)}")&&d.includes("componentKey={tagKey(v)}"),"Each TAG needs its own copyable module identity");
-assert(d.includes('componentKey={tagKey(v)+".derivation"}')&&d.includes('componentKey={tagKey(v)+".function."'),"Engineering breakdown and child functions need traceable module IDs");
+assert(d.includes('moduleKey={tagKey(v)+".derivation"}')&&d.includes('componentKey={tagKey(v)+".function."'),"Engineering breakdown and child functions need traceable module IDs");
 console.log("PASS 0553 TAG details: shared ledger for every site, per-TAG expand/collapse, unique Site/TAG/MTO-row Copy IDs, function IDs and engineering evidence, no duplicate detail panel");
