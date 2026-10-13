@@ -29,7 +29,7 @@ export function auditZWP8CostOwnership0553({thbPerUsd=null}={}){
  const surgeSourcesValid=surge.length===2&&surge.every(r=>r.countedInWorkingTotal&&r.currency==="USD"&&r.extended===units.surge);
  const iduSourcesUnpriced=idu.length===2&&idu.every(r=>!r.countedInWorkingTotal);
  const canQuantifyOverlap=radioSourcesValid&&surgeSourcesValid&&
-  quoteRadioCodes.includes("B-8")&&Number.isFinite(units.surge);
+  radios.some(x=>x.detail?.some(f=>f.functionId==="B-8"))&&Number.isFinite(units.surge);
  const sourceOverlapUSD=canQuantifyOverlap?round(radios.length*units.surge):null;
  const wrongOwnerPOEUSD=radioSourcesValid&&quoteRadioCodes.includes("B-6")&&quoteRadioCodes.includes("B-7")?
   round(radios.length*units.poe):null;
