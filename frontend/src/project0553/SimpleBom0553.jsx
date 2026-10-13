@@ -109,7 +109,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
     {matches.map(m=><div key={m.id} style={{display:"flex",gap:5,alignItems:"center",flexWrap:"wrap"}}>
       <button type="button" className="p553-detail-button" onClick={()=>navigateToModule(m.key)}>{m.label}</button>
-      <ComponentCopyId projectId="PJ2608-0553" componentKey={m.id}/>
+      <ComponentCopyId projectId="PJ2608-0553" componentKey={m.id} componentName={m.label}/>
     </div>)}
     {!matches.length&&<span role="status">ไม่พบ Module ใน Working Preview สำหรับคำค้นนี้</span>}
    </div>
