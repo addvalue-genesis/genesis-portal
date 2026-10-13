@@ -379,6 +379,28 @@
       "localBuild": "PENDING_USER_EXECUTION",
       "customerReleaseAllowed": false,
       "handoffRef": "docs/handoff/pj2608-0553/00_HANDOFF_CURRENT.md#2026-10-13--zwp20-mr-502-001-row4-map-04-source-join-incident--correction"
+    },
+    {
+      "id": "NESTED_MODULE_ID_OVERFLOW_20261013",
+      "date": "2026-10-13",
+      "projectId": "PJ2608-0553",
+      "affectedArea": "10 Budgetary Working Preview: TAG drilldown, mapping audit, RFQ particular evidence, source-bulk-lifecycle tables",
+      "issue": "Some nested modules had no visible ID on their collapsed summary and nested tables overflowed desktop width; RFQ Common and Conflict counts lacked full visible rows.",
+      "implementation": [
+        "ControlledModuleSection0553.jsx",
+        "LocationBomDetail0553.jsx",
+        "TagMappingAudit0553.jsx",
+        "SimpleBom0553.jsx",
+        "project0553.css"
+      ],
+      "contract": "docs/handoff/pj2608-0553/24_MODULE_DISCLOSURE_ID_CONTRACT_REV01.md",
+      "regression": "frontend/scripts/validate-0553-nested-module-contract.cjs",
+      "status": "CODE_COMMITTED_STATIC_REVIEW_ONLY",
+      "localBuild": "PENDING_USER_EXECUTION",
+      "browserVerification": "PENDING",
+      "sourceOrLedgerChanged": false,
+      "customerReleaseAllowed": false,
+      "otherModules01To10Inventory": "NOT_FULLY_AUDITED"
     }
   ]
 }
