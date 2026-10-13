@@ -1,0 +1,160 @@
+{
+  "projectId": "PJ2608-0553",
+  "moduleId": "bid.documents.vendor-source-index",
+  "status": "FOLDER_LISTED_NOT_CONTENT_REVIEWED",
+  "folders": [
+    {
+      "id": "CMP",
+      "url": "https://drive.google.com/drive/folders/1NQyZjqb-3YBo3JQ_dX-GwZ0x4vKjSMbk",
+      "itemsSeen": 9,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "GLAND_AND_CABLE",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "CSS",
+      "url": "https://drive.google.com/drive/folders/1rXKkZpsdVVSfRxEBsEk4pgiPRgyL0KhI",
+      "itemsSeen": 100,
+      "listCompleteness": "AT_LEAST_100_FOLDER_RESPONSE_PARTIAL",
+      "category": "RF_FEEDER_LAN_POWER",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "ENCLOSURE",
+      "url": "https://drive.google.com/drive/folders/1FIJhf-0uEvZGBcoOLYKPjZ_vqg1V7exI",
+      "itemsSeen": 10,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "ATEX_IECEX_ENCLOSURE",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "SOUNDER",
+      "url": "https://drive.google.com/drive/folders/1Yb7sUIuS4vNfCtZnyDySpFKG44RXFly8",
+      "itemsSeen": 4,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "EX_SOUNDER_NOT_LOGISTICS",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "TEST_SUPPLIER",
+      "url": "https://drive.google.com/drive/folders/1Icq7w7ThghZ7g1B00a1afiBepZguzFhd",
+      "itemsSeen": 2,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "TEST_AND_INSTRUMENT",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "CES_MANPOWER",
+      "url": "https://drive.google.com/drive/folders/1lfGFs72d8xlOVYPegZVv5iSKYm7WP3kH",
+      "itemsSeen": 3,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "FAT_YARD_TRANSPORT_SERVICE",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "MOT_RADIO_A",
+      "url": "https://drive.google.com/drive/folders/1azcajrO8rMUVAqWhELpBa_sR_1H44tOE",
+      "itemsSeen": 8,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "MOTOROLA_RADIO",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "MOT_RADIO_B",
+      "url": "https://drive.google.com/drive/folders/1e_GKTre7ypPovrhL_oBnw0CvGULvo7W5",
+      "itemsSeen": 7,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "RF_PROTECTION_ADDITIONAL",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "SURGE",
+      "url": "https://drive.google.com/drive/folders/1D_N_6lIU88Keou2HF77Tr_k-oAUXOs1a",
+      "itemsSeen": 7,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "RS_SURGE_AND_RF",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "SURVEY_SERVICES",
+      "url": "https://drive.google.com/drive/folders/1o8puTBCqKJMozs424TA5IiaXzL0tnLrQ",
+      "itemsSeen": 2,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "SITE_SURVEY_MANPOWER",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "MANPOWER_SCAFFOLD",
+      "url": "https://drive.google.com/drive/folders/1-PbS5HJ0rc7pxhGYWFbneIjh9Oym5V4q",
+      "itemsSeen": 17,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "MANPOWER_SCAFFOLDING",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "OTHER_VENDOR_3",
+      "url": "https://drive.google.com/drive/folders/1gIhhQHXldiY-QPNv6mJOZyapy79JUNPE",
+      "itemsSeen": 3,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "OTHER_QUOTE",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "OTHER_VENDOR_4",
+      "url": "https://drive.google.com/drive/folders/185oAcTgdyn-m2hBe7GV_GLH3iu1J22aw",
+      "itemsSeen": 4,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "OTHER_QUOTE",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "OTHER_VENDOR_5",
+      "url": "https://drive.google.com/drive/folders/1H1N3P_0yi2ViVHfIY4Td5ZWOZXu3QtO5",
+      "itemsSeen": 2,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "OTHER_QUOTE",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "RS_QUOTATIONS",
+      "url": "https://drive.google.com/drive/folders/15GK5kCoal9fj40Snk21nDm39ttBeIIqy",
+      "itemsSeen": 7,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "DUPLICATE_POSSIBLE_OF_SURGE",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    },
+    {
+      "id": "OTHER_VENDOR_7",
+      "url": "https://drive.google.com/drive/folders/1rIsKFhyu95KmItUiQ86Jt8b63WbmqXHW",
+      "itemsSeen": 5,
+      "listCompleteness": "DIRECT_CHILDREN_LISTED",
+      "category": "OTHER_QUOTE",
+      "ingestionState": "INDEXED_SELECTIVE_REVIEW",
+      "releaseAllowed": false
+    }
+  ],
+  "deduplication": [
+    "SURGE vs RS_QUOTATIONS likely contain duplicate source filenames; compare Drive file ID and document hash before adding",
+    "Repeated user supplied folder 185oAcT... indexed once"
+  ],
+  "constraints": [
+    "Never represent folder listing as reviewed quote price",
+    "Only quoted source lines in historicalVendorEvidence0553.json are transcribed",
+    "Physical RFQ tag and manufacturer datasheet needed before project cost posting"
+  ]
+}
