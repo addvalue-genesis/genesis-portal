@@ -1,3 +1,4 @@
+import {UnifiedMrLocationTable0553} from "./UnifiedMrLocationTable0553";
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {MR0002WorkingBom0553} from "./MR0002WorkingBom0553";
 import {LocationBomDetail0553} from "./LocationBomDetail0553";
@@ -216,31 +217,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
      options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}
    ]}/>
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"BOM Working Table — "+system+" / "+(site==="ALL"?"All Locations":site)} description="System × Location × MTO summary, source evidence and working cost" defaultOpen>
-  {system==="MR-0002"?<section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.mr0002">
-   <h4>MR-0002 · Trunk Radio — Source-linked BOM by Location <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.system-location-mto.mr0002"/></h4>
-   <p className="p55-note">This is a read-only table projection of the same central MR-0002 Working BOM. One tagged RFI LNA per site is a budget assumption. THB shown first using Working FX; original vendor currencies retained for audit. Excluded items do not enter site totals.</p>
-   {MR0002_WORKING_BOM_0553.sites.filter(g=>site==="ALL"||g.site===site).map(g=><details key={g.site} className="p55-panel">
-    <summary style={{cursor:"pointer"}}><strong>{g.site}</strong> · {thbMoney(g.controlledTotalTHB+(fx?.thbPerUsd>0?g.controlledTotalUSD*fx.thbPerUsd:0),"THB")}{!(fx?.thbPerUsd>0)?" (USD portion not converted)":""} <small>Original USD {g.controlledTotalUSD.toLocaleString("en-US",{minimumFractionDigits:2})} + THB {g.controlledTotalTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</small> · <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+g.site.toLowerCase()}/></summary>
-    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Equipment Tag</th><th>Model / Description</th><th>Qty</th><th>Currency</th><th>Unit Cost (THB first)</th><th>Extended (THB first)</th><th>Cost treatment</th><th>Item ID</th></tr></thead><tbody>
-     {g.items.map(x=><tr key={x.id}><td>{x.tag}</td><td>{x.sku||"—"}<small>{x.description}</small></td><td>{x.qty??"TBC"} {x.unit}</td><td>{x.currency}</td><td>{originalWithThb(x.unitCost,x.currency)}</td><td>{x.countedInWorkingTotal&&Number.isFinite(x.extended)?originalWithThb(x.extended,x.currency):"Excluded / pending"}</td><td>{x.status}</td><td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+g.site.toLowerCase()+"."+x.id.toLowerCase()}/></td></tr>)}
-    </tbody></table></div>
-   </details>)}
-   {!MR0002_WORKING_BOM_0553.sites.some(g=>site==="ALL"||g.site===site)&&<p className="p55-note">No MR-0002 source-backed items at {site}. Select All locations or ZWP20, ZWP21, ZWP22.</p>}
-  </section>:["MR-0003","MR-0004"].includes(system)?<section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.legacy-evidence">
-   <h4>{system} · {system==="MR-0003"?"Ex IP Telephone":"Marine RACON — MDS / ORGA"} — Source-backed Working Evidence</h4>
-   <p className="p55-note">MR-0003 uses EXION THAI QT 1260576 phone/sounder and PROSPER historical Ex e JB comparable; MGW is excluded. External field bulk is separately listed with unresolved quantity/rate, never a zero-priced item. Three provisional site sets are shown (ZWP20–22), with one of the four quoted EXION sets unallocated pending MR location proof. MR-0004 uses MDS / ORGA SeaBeacon-2 evidence ONLY; ORGA package budgeting uses the MR location allocation; vendor quote quantity reconfirmation remains required. Location tags are source-backed but site quantities and cost allocation require review.</p>
-   {BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system&&(site==="ALL"||r.site===site)&&r.evidence?.length).map(g=><details key={g.site} className="p55-panel">
-    <summary style={{cursor:"pointer"}}><strong>{g.site}</strong> · {g.evidence.length} source-priced candidate(s) · <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")+"."+g.site.toLowerCase()}/></summary>
-    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Quote line / tag</th><th>Description</th><th>Budget Qty</th><th>Currency</th><th>Unit rate (THB first)</th><th>Provisional extension (THB first)</th><th>Evidence status</th><th>Item ID</th></tr></thead><tbody>
-     {g.evidence.map((x,i)=><tr key={x.line+"-"+i}><td>{x.line}</td><td>{x.description}</td><td>{x.assumedQty??"UNALLOCATED"}</td><td>{x.currency}</td>
-      <td>{originalWithThb(x.unit,x.currency)}</td>
-      <td>{Number.isFinite(x.extended)?originalWithThb(x.extended,x.currency):"Bulk pending route/rate"}</td><td>{x.kind}<small>{x.source}</small></td>
-      <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")+"."+g.site.toLowerCase()+"."+String(x.line).toLowerCase()}/></td></tr>)}
-    </tbody></table></div>
-    <p className="p55-note">Outstanding: {(g.gaps||[]).join(" · ")}. No customer release.</p>
-   </details>)}
-   {!BOM_READ_MODEL_0553.rows.some(r=>r.mr===system&&(site==="ALL"||r.site===site)&&r.evidence?.length)&&<p className="p55-note">No source-backed vendor equipment package mapped to this Location. Select All locations to view the ZWP20–22 provisional evidence. Missing evidence is not zero cost.</p>}
-  </section>:<>
+  {["MR-0002","MR-0003","MR-0004"].includes(system)?<UnifiedMrLocationTable0553 mr={system} site={site} fx={fx}/>:<>
   <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
   {system==="MR-0001"&&<>
   <p className="p55-note"><strong>Source row completeness:</strong> {displayedCount} displayed / {sourceCount} registered MTO item tags. {vendor!=="ALL"?"Vendor filter hides some source rows; select All vendors for the full BOM.":"All source rows remain visible, including items lacking price."} Source item coverage does not mean a complete physical SKU take-off.</p>
