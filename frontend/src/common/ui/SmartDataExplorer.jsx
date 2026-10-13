@@ -16,7 +16,7 @@ export function SmartFilterBar({
  return <section className="p55-panel gns-smart-filter" data-component-key={moduleKey} style={{padding:12,marginBottom:12}}>
   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap",marginBottom:8}}>
    <strong>{title}</strong>
-   {moduleKey&&<ComponentCopyId projectId={projectId} componentKey={moduleKey}/>}
+   {moduleKey&&<ComponentCopyId projectId={projectId} componentKey={moduleKey} componentName={title}/>}
   </div>
   {description&&<p className="p55-note">{description}</p>}
   <div className="p55-filterbar" role="search" aria-label={title}>
@@ -46,11 +46,12 @@ export function SmartDataGroup({projectId="PJ2608-0553",moduleKey,title,count=nu
  React.useEffect(()=>{if(defaultOpen)setOpened(true);},[defaultOpen]);
  return <details className="p55-panel gns-smart-group" data-component-key={moduleKey} open={opened} onToggle={e=>setOpened(e.currentTarget.open)} style={{padding:12,marginBottom:9}}>
   <summary style={{cursor:"pointer",display:"flex",alignItems:"center",gap:8,flexWrap:"wrap",fontWeight:700}}>
+   <span aria-hidden="true" style={{fontWeight:900}}>{opened?"−":"+"}</span>
    <span>{title}</span>{count!==null&&<small>({count})</small>}
+   {moduleKey&&<span onClick={e=>e.stopPropagation()} onKeyDown={e=>e.stopPropagation()}>
+    <ComponentCopyId projectId={projectId} componentKey={moduleKey} componentName={title}/></span>}
   </summary>
   <div style={{marginTop:8}}>
-   {moduleKey&&<div onClick={e=>e.stopPropagation()} onKeyDown={e=>e.stopPropagation()}>
-    <ComponentCopyId projectId={projectId} componentKey={moduleKey}/></div>}
    {description&&<p className="p55-note">{description}</p>}
    {children}
   </div>
