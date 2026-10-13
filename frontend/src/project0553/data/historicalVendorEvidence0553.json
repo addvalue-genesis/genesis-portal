@@ -12,7 +12,7 @@
       "vendor": "Versed Automation System / CMP",
       "currency": "THB",
       "quotedTotal": 336265,
-      "source": null,
+      "source": "QT2603-149 Add Value CMP.pdf",
       "sourceUrl": null,
       "scope": "CMP cable entries/Ex installation consumables",
       "validUntil": "2026-04-20",
@@ -165,7 +165,10 @@
           "unitPrice": 4,
           "lineTotal": 80
         }
-      ]
+      ],
+      "lineCompleteness": "18_ORIGINAL_QUOTE_LINES_TRANSCRIBED_IMAGE",
+      "sourceLineSum": 336265,
+      "totalReconciled": true
     },
     {
       "id": "CSS-690009052",
@@ -174,8 +177,8 @@
       "vendor": "CSS Thai / CommScope",
       "currency": "THB",
       "quotedTotal": 565900,
-      "source": null,
-      "sourceUrl": null,
+      "source": "QT-H690009052-แอดแวลู ซิสเต็ม.pdf",
+      "sourceUrl": "https://drive.google.com/file/d/1-mLhCdnEfRXKaHlsPF8TTCa5EZW-rcX3/view",
       "scope": "RF feeder / connector / grounding / jumper",
       "validUntil": "2026-04-01",
       "terms": "Cash, wait goods 90 days, ex VAT 7%; quoted feeder UOM EA, do not automatically interpret as meter",
@@ -231,7 +234,10 @@
           "unitPrice": 1450,
           "lineTotal": 29000
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 565900,
+      "totalReconciled": true
     },
     {
       "id": "CSS-670003342",
@@ -240,8 +246,8 @@
       "vendor": "CSS Thai / Royaltec customer reference",
       "currency": "THB",
       "quotedTotal": 218950,
-      "source": null,
-      "sourceUrl": null,
+      "source": "QT-H670003342 รอยัลเทค.pdf",
+      "sourceUrl": "https://drive.google.com/file/d/1HkwJ0RBHshez5wLWcWoyECxzR-JlDf6b/view",
       "scope": "CommScope RF feeder exact-meter priced historical comparator",
       "validUntil": "2024-02-06",
       "terms": "Leadtime 90-120 days; payment DAYS not specified; VAT 7% excluded",
@@ -265,7 +271,10 @@
           "unitPrice": 1280,
           "lineTotal": 51200
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 218950,
+      "totalReconciled": true
     },
     {
       "id": "CSS-670004188",
@@ -274,8 +283,8 @@
       "vendor": "CSS Thai",
       "currency": "THB",
       "quotedTotal": 15216,
-      "source": null,
-      "sourceUrl": null,
+      "source": "QT-H670004188แอดแวลู.pdf",
+      "sourceUrl": "https://drive.google.com/file/d/1J7KSdL6pzPEGRuXYnoVf_AyWj_i77z8l/view",
       "scope": "LAN rack / patch / accessories",
       "validUntil": "2024-02-13",
       "terms": "Cash before collection; 2-3 days from PO; VAT 7% excluded",
@@ -339,7 +348,10 @@
           "unitPrice": 990,
           "lineTotal": 990
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 15216,
+      "totalReconciled": true
     },
     {
       "id": "CSS-650044674",
@@ -348,8 +360,8 @@
       "vendor": "CSS Thai / Phelps Dodge",
       "currency": "THB",
       "quotedTotal": 224400,
-      "source": null,
-      "sourceUrl": null,
+      "source": "แอดแวลู ซิสเต็ม 44674.pdf",
+      "sourceUrl": "https://drive.google.com/file/d/1-YVW4neTLDIOxpYZqaGIlwju8MapMewq/view",
       "scope": "Armoured power cable",
       "validUntil": "2022-12-26",
       "terms": "Lead time 150 days after confirmed PO and cutting length; payment PDC 30 days; VAT 7% excluded",
@@ -365,7 +377,10 @@
           "unitPrice": 187,
           "lineTotal": 224400
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 224400,
+      "totalReconciled": true
     },
     {
       "id": "CSS-660039376",
@@ -374,8 +389,8 @@
       "vendor": "CSS Thai / BCC",
       "currency": "THB",
       "quotedTotal": 31320,
-      "source": null,
-      "sourceUrl": null,
+      "source": "QT-H660039376.pdf",
+      "sourceUrl": "https://drive.google.com/file/d/155Df0e6rsGwr6n4WIrgipEX1_UA004Si/view",
       "scope": "Armoured power cable",
       "validUntil": "2023-11-27",
       "terms": "CASH before collection; minimum manufacturing 200m, production ~90 days; VAT 7% excluded",
@@ -391,7 +406,10 @@
           "unitPrice": 156.6,
           "lineTotal": 31320
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 31320,
+      "totalReconciled": true
     },
     {
       "id": "MOT-EN019-65",
@@ -400,7 +418,7 @@
       "vendor": "MOT RADIO",
       "currency": "THB",
       "quotedTotal": 300000,
-      "source": null,
+      "source": "17_MOT_PP_EN019-65_XiR P6620i_บริษัท แอดแวลู ซิสเต็ม จำกัด_28-6-65.pdf",
       "sourceUrl": null,
       "scope": "Trunk radio historical handheld comparable; not Z1F RFI system equivalent",
       "validUntil": null,
@@ -417,7 +435,10 @@
           "unitPrice": 30000,
           "lineTotal": 300000
         }
-      ]
+      ],
+      "lineCompleteness": "ONE_VENDOR_BUNDLE_WITH_COMPONENTS_NOT_UNIT_PRICED",
+      "sourceLineSum": 300000,
+      "totalReconciled": true
     },
     {
       "id": "NETONE-2009-543",
@@ -426,7 +447,7 @@
       "vendor": "NetONE / Palo Alto Networks",
       "currency": "THB",
       "quotedTotal": 1300000,
-      "source": null,
+      "source": "QT2010-543_Transport_PaloFW_7Oct20.pdf",
       "sourceUrl": null,
       "scope": "Historical firewall package reference, not decomposed unit-SKU pricing",
       "validUntil": null,
@@ -443,7 +464,10 @@
           "unitPrice": 1300000,
           "lineTotal": 1300000
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 1300000,
+      "totalReconciled": true
     },
     {
       "id": "WINNCOM-206003",
@@ -452,7 +476,7 @@
       "vendor": "Winncom Technologies",
       "currency": "USD",
       "quotedTotal": 15869.9,
-      "source": null,
+      "source": "Quote Add Value 19.11.13.pdf",
       "sourceUrl": null,
       "scope": "Historical radio alternatives; OEM/platform differs from Next G",
       "validUntil": null,
@@ -485,7 +509,10 @@
           "unitPrice": 385.25,
           "lineTotal": 770.5
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 15869.9,
+      "totalReconciled": true
     },
     {
       "id": "SPS-QUOTE9",
@@ -494,7 +521,7 @@
       "vendor": "SPS Inter Technology / PolyPhaser",
       "currency": "THB",
       "quotedTotal": 63600,
-      "source": null,
+      "source": "Quotation _Addvalue surge 20p_Sign.pdf",
       "sourceUrl": null,
       "scope": "RF surge arrester comparable; check exact connector/RF/Ex need",
       "validUntil": null,
@@ -511,7 +538,10 @@
           "unitPrice": 3180,
           "lineTotal": 63600
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 63600,
+      "totalReconciled": true
     },
     {
       "id": "MEASURETRONIX-22601400",
@@ -520,7 +550,7 @@
       "vendor": "Measuretronix / Fluke Networks",
       "currency": "THB",
       "quotedTotal": 342936,
-      "source": null,
+      "source": "แอดแวลู ซิสเต็ม-22601400.pdf",
       "sourceUrl": null,
       "scope": "Special Tools/B6 test equipment historical candidate",
       "validUntil": null,
@@ -537,7 +567,10 @@
           "unitPrice": 114312,
           "lineTotal": 342936
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 342936,
+      "totalReconciled": true
     },
     {
       "id": "BARTEC-26024-R1",
@@ -571,7 +604,10 @@
           "unitPrice": 47600,
           "lineTotal": 238000
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 396000,
+      "totalReconciled": true
     },
     {
       "id": "CES-240145",
@@ -613,7 +649,10 @@
           "unitPrice": 25000,
           "lineTotal": 25000
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 63500,
+      "totalReconciled": true
     },
     {
       "id": "LS-QLS-2021-0009",
@@ -663,7 +702,10 @@
           "unitPrice": 360,
           "lineTotal": 360
         }
-      ]
+      ],
+      "lineCompleteness": "TRANSCRIBED_SOURCE_ROWS",
+      "sourceLineSum": 8610,
+      "totalReconciled": null
     }
   ]
 }
