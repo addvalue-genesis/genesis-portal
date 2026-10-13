@@ -19,7 +19,9 @@ const COST_OWNER=Object.freeze({
  "B-8":"SA-502-001.10","B-12":"ANT-502-001.6"
 });
 const FUNCTION=Object.freeze({
- "B-1":"RADIO_EQUIPMENT","B-2":"RF_FILTER","B-3":"CAPACITY_KEY",
+ // Quote-level join uses the specific offered radio role (RADIO_REMOTE).
+ // MR Package Composition retains its broader RADIO_EQUIPMENT requirement at MAP-03.
+ "B-1":"RADIO_REMOTE","B-2":"RF_FILTER","B-3":"CAPACITY_KEY",
  "B-4":"REGION_KEY","B-5":"MOUNT_FEEDER","B-6":"POWER","B-7":"POWER_CORD",
  "B-8":"ETHERNET_SURGE","B-12":"ANTENNA_RF"
 });
