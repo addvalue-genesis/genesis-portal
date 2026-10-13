@@ -17,7 +17,7 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,children}){
     <p className="p55-note"><strong>BARTEC SCADA Enclosure — verified manufacturer GA quantities for this working design:</strong> 12 M20 top holes + 2 left + 2 right = <strong>{m.bartecBulkRequired.holeCount} M20 cable-entry holes</strong>. Initially supplied: <strong>{m.bartecBulkRequired.initialFactoryPlugs} M20 stopping plugs</strong> and 16 locknuts; one drain valve uses a separate hole. These components are within the BARTEC TCAB factory assembly, NOT 16 separately required cable glands.</p>
     <p className="p55-note"><strong>Actual active cable glands by OD / certified SKU:</strong> {m.bartecBulkRequired.installedGlandRequired??"CABLE-END TAKEOFF REQUIRED"} · <strong>Additional gland purchase:</strong> {m.bartecBulkRequired.netAdditionalGlandPurchase??"VENDOR INCLUSION / OD REQUIRED"} · <strong>Current separately booked working allowance:</strong> {m.bartecBulkRequired.recordedActiveGlandAllowance} M20 gland (provisional) + CAT6A 69m (budgetary route). Factory Included, Required, and Purchase quantities are different.</p>
     <p className="p55-note"><strong>GA evidence:</strong> {m.bartecBulkRequired.source}. <strong>Contractual conflict:</strong> {m.bartecBulkRequired.deviation}. <strong>Other system:</strong> {m.bartecBulkRequired.relatedOtherMr}</p>
-   </div>
+   </div>}
 
    <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
     <thead><tr><th>Required Engineering Function / ID</th><th>Quantity Driver & Proof</th><th>GA Documented Qty / Unit</th><th>Working Qty (NOT approved)</th><th>Approved SKU Qty</th><th>Technical / Selection State</th></tr></thead><tbody>
