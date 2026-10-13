@@ -1,5 +1,6 @@
 import React,{useMemo,useState} from "react";
 import {VENDOR_UNIFIED_CATALOG_0553} from "./data/vendorUnifiedCatalog0553";
+import HISTORICAL_VENDOR from "./data/historicalVendorEvidence0553.json";
 import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
 import {MR0002_PRICE_REGISTRY_0553} from "./data/mr0002PriceRegistry0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
@@ -14,7 +15,7 @@ export function VendorProductCatalog0553(){
  const [vendor,setVendor]=useState("ALL");
  const [search,setSearch]=useState("");
  const [chosenQuote,setChosenQuote]=useState("");
- const commercial=useMemo(()=>buildQuotationCommercialRegister(SUPPLIER_QUOTE_LINES_0553),[]);
+ const commercial=useMemo(()=>buildQuotationCommercialRegister([...SUPPLIER_QUOTE_LINES_0553,...HISTORICAL_VENDOR.quotes.map(q=>({...q,terms:q.terms,source:q.sourceUrl||q.source}))]),[]);
  const selectedCommercial=commercial.find(q=>q.quoteId===chosenQuote);
  const catalog=VENDOR_UNIFIED_CATALOG_0553;
  const suppliersById=new Map(catalog.suppliers.map(v=>[v.id,v]));
