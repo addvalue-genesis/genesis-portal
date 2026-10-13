@@ -11,6 +11,7 @@ import {SmartFilterBar,SmartDataGroup,moduleSegment} from "../common/ui/SmartDat
 import { SUPPLIER_QUOTE_LINES_0553 } from "./data/supplierQuoteLines";
 import { buildQuotationCommercialRegister } from "../common/engineering/quotationCommercialRecord";
 import {QuotationTermsDetail0553} from "./QuotationTermsDetail0553";
+import {EngineeringIntelligencePreview0553} from "./EngineeringIntelligencePreview0553";
 
 // Read-only quotation-to-product index. Never silently promotes a quote line into BOM.
 export function VendorProductCatalog0553(){
@@ -191,6 +192,7 @@ export function VendorProductCatalog0553(){
   {!grouped.length&&<p role="status" className="p55-note">No matching Vendor evidence. Clear filters or broaden the search.</p>}
   </SmartDataGroup>
   {view==="compare"&&<p className="p55-note"><strong>Candidate comparison only:</strong> not a completed TBE/CBE. Review MR compliance and quote conditions before recommending an offer.</p>}
+  <EngineeringIntelligencePreview0553/>
   <p className="p55-note"><strong>Release gate:</strong> Product selection requires MR/DTS compliance, datasheet/certification, configuration, supplier price validity and approved project decision. Historical/expired/alternative quotations never enter costing automatically.</p>
  </section>;
 }
