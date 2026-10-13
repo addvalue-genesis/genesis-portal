@@ -36,7 +36,7 @@ export function LocationBomDetail0553({site,fx}){
    <thead><tr><th>MTO / Module</th><th>Engineering Quantity / Basis</th><th>Budgetary Selected Product / Vendor</th><th>Unit Cost (THB)</th><th>Extended Cost (THB)</th><th>Assumptions / Status</th></tr></thead><tbody>
    {rows.map(v=><React.Fragment key={v.row+"-"+v.tag}>
     <tr>
-     <td><button type="button" className="p55-row-toggle" onClick={()=>setExpanded(o=>({...o,[v.tag]:!o[v.tag]}))}>{expanded[v.tag]?"−":"+"}</button> <strong>{v.tag}</strong><small>Row {v.row}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row}/></td>
+     <td><button type="button" className="p55-row-toggle" onClick={()=>setExpanded(o=>({...o,[v.tag]:!o[v.tag]}))}>{expanded[v.tag]?"−":"+"}</button> <strong>{v.tag}</strong><small>Row {v.row}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={keyPrefix+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row} componentName={v.tag+" — "+(v.description||"Engineering BOM")+" / MTO row "+v.row}/></td>
      <td>{v.sourceQty??"REVIEW"} {v.sourceUnit||""}<small>{v.quantityBasis||v.note||"Engineering quantity and physical SKU to verify"}</small></td>
      <td>{v.vendor||"Vendor / Configuration not selected"}<small>{v.sku||v.description||"Engineering takeoff required"}</small></td>
      <td>{thb(v.unitCost,v.currency)}<small>{v.currency||"—"} {fmt(v.unitCost)}</small>{!v.countedInWorkingTotal&&Number.isFinite(v.referenceExtended)&&<small>REFERENCE ONLY — NOT SELECTED</small>}</td>
