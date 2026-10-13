@@ -1,0 +1,114 @@
+{
+  "id": "EXION-1260576-R0",
+  "vendor": "EXION (Thailand) Company Limited",
+  "quotation": "1260576",
+  "revision": "Rev.0",
+  "date": "2026-09-04",
+  "currency": "THB",
+  "quotedTotal": 828000,
+  "validUntil": "2026-10-04",
+  "status": "2026_PROJECT_QUOTE_EXPIRED_RECONFIRM",
+  "source": "Exion QT_1260576.pdf",
+  "mr": "MR-0003",
+  "scope": "Gai-Tronics Paging System / TN26032 (page 1); TN26008 (page 2) — source inconsistency",
+  "sourceClass": "CURRENT_PROJECT_QUOTE_EVIDENCE",
+  "lines": [
+    {
+      "code": "1",
+      "sku": "212-02-6008-510",
+      "description": "Auteldac 6 Zone 1 VoIP (SIP) Hazardous Area Phone; IP66; PoE or 24–52 VDC; Ex e ib mb IIC T4 Gb",
+      "qty": 4,
+      "unit": "UNIT",
+      "unitPrice": 145000,
+      "quotedTotal": 580000,
+      "function": "EX_VOIP_PHONE"
+    },
+    {
+      "code": "2",
+      "sku": "DB3BDG048N2BNR",
+      "description": "Explosion-proof sounder GRP Ex chamber thermoplastic flare SIL2; Ex d IIC T4/T5/T6 Gb; IP66/67; 12–48 VDC; 2×M20",
+      "qty": 4,
+      "unit": "UNIT",
+      "unitPrice": 62000,
+      "quotedTotal": 248000,
+      "function": "EX_ALARM_SOUNDER"
+    }
+  ],
+  "terms": [
+    {
+      "topic": "Tax",
+      "value": "THB excluded VAT 7%",
+      "page": 2
+    },
+    {
+      "topic": "Incoterm",
+      "value": "DDP Nonthaburi Incoterms 2020",
+      "page": 2
+    },
+    {
+      "topic": "Delivery",
+      "value": "16 weeks after ARO; December shutdown 2 weeks excluded",
+      "page": 2
+    },
+    {
+      "topic": "Payment",
+      "value": "50% down and 50% cash on delivery",
+      "page": 2
+    },
+    {
+      "topic": "Validity",
+      "value": "30 days",
+      "page": 2
+    },
+    {
+      "topic": "Lot rule",
+      "value": "Special lot price; partial order cannot be accepted",
+      "page": 2
+    },
+    {
+      "topic": "FX",
+      "value": "43.72 THB/GBP reference dated 2026-02-05; >5% at PO triggers adjustment",
+      "page": 2
+    },
+    {
+      "topic": "Cancellation",
+      "value": "0–2 weeks 20%; >2–6 weeks 50%; >6–10 weeks 80%; >10 weeks 100%",
+      "page": 2
+    },
+    {
+      "topic": "Storage",
+      "value": "0.5% weekly / 2% monthly if collection delayed",
+      "page": 2
+    },
+    {
+      "topic": "Standard warranty",
+      "value": "12 months from ex-works, services excluded",
+      "page": 3
+    },
+    {
+      "topic": "Third-party inspection",
+      "value": "Excluded unless expressly specified",
+      "page": 3
+    },
+    {
+      "topic": "Liability",
+      "value": "Aggregate liability limited to total payment received",
+      "page": 3
+    }
+  ],
+  "technicalGates": [
+    "MR0003 phone quantity distinct from sounder quantity",
+    "Verify phone Zone1/SIP PoE and interface",
+    "Verify sounder distinct model and 12–48 VDC circuit",
+    "Resolve inconsistent TN26032/TN26008 subject between quote pages",
+    "Reconfirm price expiry",
+    "Compare MR0003 actual required phone/sounder quantity"
+  ],
+  "budgetPostingAllowed": false,
+  "historyReference": "EXION-1240515-R0",
+  "sourcePages": [
+    1,
+    2,
+    3
+  ]
+}
