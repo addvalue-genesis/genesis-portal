@@ -54,7 +54,7 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
  };
  const sourceOK=sourceMatches.length===1&&source.sourceQty===1&&source.sourceUnit==="Set"&&!source.groupedRow;
  push("MAP-01",sourceOK,
-  sourceOK?"One exact MTO row: ZWP20 MR-502-001 Row 4, Rev04, 1 Set":"Missing/duplicate MTO row or non-1-Set quantity: strict tag identity failed");
+  sourceOK?"Exactly one SOURCE SNAPSHOT identity: ZWP20 MR-502-001 index 4, Rev04, 1 Set. Native Excel physical cell row number remains unverified.":"Missing/duplicate MTO row or non-1-Set quantity: strict tag identity failed");
  // Stage-order rule: if source fails, no downstream candidate is promoted as a mapping.
  if(!sourceOK)return blocked();
  const packageRows=MR0001_PACKAGE_COMPOSITION.packages.filter(p=>p.platform===PILOT.site&&p.sourceRowIndex===PILOT.row);
@@ -151,7 +151,7 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
    status:"UNVERIFIED_MYANMAR_REGION_ENTITLEMENT_NOT_VENDOR_QUOTE"}:null;
   const derived=deriveSourcedExtended({quantity:x.engineeringQty,sourceUnitRate:x.sourceUnitPriceUSD,
    currency:x.sourceCurrency,assumption});
-  return {sourceUsageKey:x.sourceQuoteId+":"+x.quoteLine,ownerId:x.costOwner,
+  return {sourceUsageKey:PILOT.site+":"+x.sourceQuoteId+":"+x.quoteLine,ownerId:x.costOwner,
    currency:x.sourceCurrency,amount:derived.amount,derivedState:derived.state,
    quoteLine:x.quoteLine,originalSourceUnitPrice:derived.sourceRate};
  });
@@ -198,7 +198,7 @@ export function auditZWP20RadioVendorMapping0553(overrides={}){
   internalProceed?"Internal budget may proceed under recorded qualification; release remains forbidden until technical certificates, Myanmar entitlement, NMS, validity and OEM proof":
   "Mapping invariants unresolved; internal budget result must not be adopted");
  return {pilot:PILOT,equations:EQ.equations,
-  source:{id:MTO.source.driveId,file:MTO.source.file,revision:MTO.source.revision,site:PILOT.site,
+  source:{id:MTO.source.driveId,file:MTO.source.file,revision:MTO.source.revision,rowNumbering:MTO.source.rowNumbering,site:PILOT.site,
    tag:PILOT.tag,row:source.sourceRowIndex,qty:source.sourceQty,unit:source.sourceUnit},
   quote:{id:NEXTG.id,number:NEXTG.quoteNumber,currency:NEXTG.currency,originalQuoteTotal:NEXTG.quotedGrandTotal},
   stages,errors,requirements:{direct:requirements.direct.map(x=>x.id),site:requirements.siteSpecific.map(x=>x.id),
