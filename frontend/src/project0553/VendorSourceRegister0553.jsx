@@ -1,7 +1,7 @@
 import React,{useMemo,useState} from "react";
 import {VENDOR_0553_SOURCES} from "./vendorEvidence";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
-import {SmartFilterBar,SmartDataGroup,moduleSegment} from "../common/ui/SmartDataExplorer";
+import {SmartFilterBar,moduleSegment} from "../common/ui/SmartDataExplorer";
 
 // Source-document register only: the Company/Product view is the catalog.
 // This register exposes every original source, including those not yet mapped to quote lines.
@@ -15,9 +15,11 @@ export function VendorSourceRegister0553(){
   (kind==="ALL"||s.type===kind)&&(mr==="ALL"||s.mr===mr)&&
   [s.id,s.mr,s.supplier,s.manufacturer,s.document,s.status,s.type,s.next].join(" ").toLocaleLowerCase().includes(term.trim().toLocaleLowerCase())
  ),[kind,mr,term]);
- return <SmartDataGroup moduleKey="bid.documents" title="Source Documents / เอกสารต้นฉบับ Vendor & OEM"
-   count={VENDOR_0553_SOURCES.length} defaultOpen={false}
-   description="Original source register remains complete even when source quotation/products have not yet been mapped. Search by Source ID, Company, MR, document title or evidence type.">
+ return <section className="p55-panel" data-component-key="bid.documents.vendor-sources" style={{padding:12}}>
+  <h4>Vendor / OEM Original Source Index ({VENDOR_0553_SOURCES.length})</h4>
+  <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.documents.vendor-sources"
+   componentName="Vendor / OEM Original Source Index"/></p>
+  <p className="p55-note">All original sources remain available, including documents not yet mapped to products. This is a read-only source document register, not an additional vendor pricing master.</p>
   <SmartFilterBar moduleKey="bid.documents.source-filter" title="Document Source Search"
    total={VENDOR_0553_SOURCES.length} shown={rows.length}
    onReset={()=>{setTerm("");setKind("ALL");setMr("ALL");}}
@@ -41,5 +43,5 @@ export function VendorSourceRegister0553(){
    </table>
   </div>
   {!rows.length&&<p className="p55-note" role="status">No source matches. Clear filters to show all originals.</p>}
- </SmartDataGroup>;
+ </section>;
 }
