@@ -40,7 +40,7 @@ export const BARTEC_ENCLOSURE_BASIS_0553=Object.freeze({
       historicalQtyOnly:4,requirementConflict:null}),
     enclosure({id:"HISTORICAL_TETRA_SELECTOR",group:"Historical TETRA selector",label:"BARTEC selector enclosure (reference only)",
       model:"07-56B1-0211",material:"SS316L",sizeMm:[150,150,100],drawing:"GA-1006",sourcePages:[15,16],
-      entryCount:4,entries:{top:4,left:0,right:0,bottom:0},originalStoppingPlugs:4,originalLocknuts:4,
+      entryCount:4,entries:{top:0,left:0,right:0,bottom:4},originalStoppingPlugs:4,originalLocknuts:4,
       drainEntryCount:0,drainValveCount:0,intendedZ1f:"DO NOT auto-map selector to Z1F unless explicitly required",
       historicalQtyOnly:4,requirementConflict:null})
   ]),
