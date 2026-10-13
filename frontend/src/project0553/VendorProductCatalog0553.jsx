@@ -1,4 +1,5 @@
 import React,{useMemo,useState} from "react";
+import {assessVendorEvidenceForBudget0553} from "./data/vendorExternalEvidence0553";
 import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
 import {MR0002_PRICE_REGISTRY_0553} from "./data/mr0002PriceRegistry0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
@@ -81,6 +82,19 @@ export function VendorProductCatalog0553(){
     </section>}
    <p className="p55-note">This is a read-only quotation-header view. Original quote lines and cost calculations have not changed.</p>
   </div>}
+  <details className="p55-panel" open data-component-key="bid.vendor.products.external-evidence" style={{padding:14,marginBottom:12}}>
+   <summary><strong>Unified External / Historical Vendor Evidence → Budgetary 10 impact</strong></summary>
+   <p className="p55-note">Only registry evidence. Web price, ERP history and supplier quotations remain separate classes; none automatically overwrites existing budgeting or an issued customer price.</p>
+   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Source / Module</th><th>Product / Function</th><th>Quoted unit price</th><th>Document</th><th>Budgetary 10 gate / status</th></tr></thead><tbody>
+    {assessVendorEvidenceForBudget0553().rows.map(e=><tr key={e.id}>
+     <td>{e.supplier}<small>{e.sourceClass}</small><small>{e.module}</small></td>
+     <td><strong>{e.sku}</strong><small>{e.description}</small><small>{e.technicalState}</small></td>
+     <td>{Number.isFinite(e.unitPrice)?e.currency+" "+e.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" / "+(e.unit||"UNVERIFIED UOM"):"PRICE NOT VERIFIED"}<small>VAT: {e.vat||"N/A"} · {e.checkedDate||"Historical"}</small></td>
+     <td>{e.url?<a href={e.url} target="_blank" rel="noreferrer">Source page</a>:e.reference}<small>{e.reference||""}</small></td>
+     <td><strong>{e.budgetaryRateStatus}</strong><small>{e.budgetDependency}</small></td>
+    </tr>)}
+   </tbody></table></div>
+  </details>
   <div className="p55-panel" style={{marginBottom:12,padding:14}}>
   <h3>Online Retail Price Evidence — separate from supplier quotations</h3>
   <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.price-reference.weidmuller-1963600000"/>
