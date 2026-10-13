@@ -580,6 +580,27 @@
       "correctiveChangeRequiresApproval": true,
       "localRuntime": "PENDING",
       "customerReleaseAllowed": false
+    },
+    {
+      "id": "ZPQ_ZWP8_PTP_EXISTING_CORRECTION_20261013",
+      "date": "2026-10-13",
+      "existingLink": "SCADA-ZPQ-ZWP8 PTP",
+      "installedState": "EXISTING_BASELINE",
+      "source": "BLD-0001 Rev.C1 Sheet7 Notes9",
+      "otherSource": "BOD-0001 Rev.C2 §7.2 and SPE-0001 Rev.C2 §6.1.3 propose ADDITIONAL NEW LINK after capacity review",
+      "scopeInterpretation": "Existing link != unapproved additional new equipment; confirm separate physical new scopes and endpoints",
+      "auditStatus": "LINK_LIFECYCLE_CORRECTED__NEW_CAPACITY_REQUIREMENT_REQUIRES_PHYSICAL_PROOF",
+      "sourceDataFilesModified": [
+        "frontend/src/project0553/data/scadaLinkEvidence.js",
+        "frontend/src/project0553/data/zwp8CostOwnershipAudit0553.js",
+        "frontend/src/project0553/ZWP8CostOwnershipAudit0553.jsx",
+        "frontend/scripts/validate-0553-zwp8-cost-ownership.cjs"
+      ],
+      "vendorPriceChanged": false,
+      "originalWorkingLedgerChanged": false,
+      "localBuild": "PENDING",
+      "browserAcceptance": "PENDING",
+      "customerReleaseAllowed": false
     }
   ]
 }
