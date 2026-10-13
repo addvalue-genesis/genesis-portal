@@ -16,6 +16,13 @@ const {auditZWP8CostOwnership0553}=require(path.join(root,"project0553/data/zwp8
 const {summarizeMR0001TagCost0553}=require(path.join(root,"project0553/data/mr0001TagCostLedger0553.js"));
 const {ZWP8_ROW43_COST_TRACE}=require(path.join(root,"project0553/data/zwp8Row43CostTrace.js"));
 const {SCADA_LINKS_0553}=require(path.join(root,"project0553/data/scadaLinkEvidence.js"));
+const zwp11Enclosure=summarizeMR0001TagCost0553("ZWP11").rows.find(x=>x.row===51&&x.tag==="TCAB-500-003");
+assert(zwp11Enclosure,"ZWP11 original MR0001 enclosure TAG missing");
+assert.equal(zwp11Enclosure.sourceQty,1,"Preserve MTO Row51 original one Set");
+assert.equal(zwp11Enclosure.procurementQty,0,"ZWP11 existing enclosure requires no new purchase");
+assert.equal(zwp11Enclosure.extended,0,"Existing cabinet not a 39,200 THB new equipment purchase");
+assert.equal(zwp11Enclosure.referenceExtended,39200,"Retain historical analogue as unselected reference");
+assert(zwp11Enclosure.status.includes("MODIFICATION_NOT_ESTABLISHED"),"Do not mark unpriced Ex modification as free");
 const original=JSON.stringify(summarizeMR0001TagCost0553("ZWP8").rows);
 const audit=auditZWP8CostOwnership0553({thbPerUsd:31.5});
 assert.deepEqual(audit.physicalGroup,{radioODU:2,radioIDU:2,antenna:2,surge:2});
