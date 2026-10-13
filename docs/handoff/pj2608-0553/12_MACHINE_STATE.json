@@ -432,6 +432,33 @@
       "localRuntime": "PENDING",
       "engineeringApproval": false,
       "releaseAllowed": false
+    },
+    {
+      "id": "FOUR_STAGE_TAG_BOM_20261013",
+      "date": "2026-10-13",
+      "project": "PJ2608-0553",
+      "scope": "Budget Working Preview MR0001 location TAGs",
+      "fourStages": [
+        "required-bom",
+        "working-priced-bom",
+        "vendor-comparison",
+        "engineering-verification"
+      ],
+      "modelFile": "frontend/src/project0553/data/tagBomFourStageReadModel0553.js",
+      "uiFile": "frontend/src/project0553/TagFourStageWorkbench0553.jsx",
+      "parentFile": "frontend/src/project0553/LocationBomDetail0553.jsx",
+      "acceptanceScript": "frontend/scripts/validate-0553-tag-four-stage-bom.cjs",
+      "guide": "docs/handoff/pj2608-0553/25_TAG_BOM_FOUR_STAGE_USER_GUIDE_REV01.md",
+      "sourceDataMutation": false,
+      "lockedCostFilesChanged": false,
+      "engineeringPhysicalSkuApproved": false,
+      "baselineODUCostUSD": 7288.65,
+      "vendorQuotedQtyNotEngineeringQty": true,
+      "quoteRegionB4Rate": null,
+      "independentV8ModelSmoke": "PASSED_WITH_CONTROLLED_MTO_AND_QUOTE_FIXTURE_NOT_FULL_MODULE_GRAPH",
+      "nodeBuild": "PENDING_USER_RUN",
+      "browserAcceptance": "PENDING",
+      "approvedCustomerRelease": false
     }
   ]
 }
