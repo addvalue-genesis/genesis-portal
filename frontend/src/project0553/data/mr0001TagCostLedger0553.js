@@ -197,6 +197,29 @@ export function selectMR0001TagCostRows0553(site){
     components:lines,
     assumptions:["ZWP20 methodology only; separate site routes and cable counts unverified","Remaining RF, glands and grounding functions outside this partial cost","Do not add separate SCADA bulk scenario again"]};
   }
+  // ZWP11 brownfield: BOD Rev.C2 section 8 expressly reuses TCAB-WP11-500-003
+  // for new IDU and surge. MTO Rev04 row51 remains a required functional TAG,
+  // but no new full enclosure procurement is justified. The 2024 price is
+  // preserved as unselected reference, not quietly converted to new scope.
+  if(site==="ZWP11"&&item.sourceRow===51&&item.sourceTag==="TCAB-500-003"){
+   const historic=SUPPLIER_QUOTE_LINES_0553.find(q=>q.id==="PROSPER-24051")?.lines.find(v=>v[0]==="1");
+   const referenceRate=Number.isFinite(historic?.[4])?historic[4]:null;
+   return {site,mr:"MR-0001",row:51,tag:item.sourceTag,description:item.description,
+    sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,
+    procurementQty:0,procurementUnit:"Set",currency:"THB",
+    unitCost:0,extended:0,countedInWorkingTotal:true,
+    referenceUnitCost:referenceRate,referenceExtended:referenceRate,
+    vendor:"EXISTING OWNER ASSET; historical BARTEC/Prosper reference only",
+    source:"MTO Rev04 row51 + BOD-0001 Rev.C2 section 8 + PROSPER-24051 historic analogue",
+    status:"BROWNFIELD_EXISTING_ENCLOSURE_REUSE__NEW_PROCUREMENT_QTY_ZERO__MODIFICATION_NOT_ESTABLISHED",
+    quantityBasis:"MTO source 1 Set remains unchanged; new enclosure purchase 0 Sets because BOD reuses TCAB-WP11-500-003",
+    assumptions:[
+     "BOD Rev.C2 section 8: fit new IDU and surge in existing TCAB-WP11-500-003; connect CAT6A to existing switch in TCAB-WP11-500-002",
+     "No new Cisco switch procurement is listed for ZWP11 in MR0001 Rev04",
+     "Modification labor, Ex integrity review, thermal/space study, power/circuit and termination are separate unpriced obligations, NOT zero-cost engineering",
+     "Preserve historical full-enclosure THB 39,200 as reference only, never additional to the zero new purchase"
+    ],releaseAllowed:false};
+  }
   const managementAllowance=deriveMR0001MissingBudget0553(item);
   if(managementAllowance)return managementAllowance;
   // Brownfield reuse/tie-in: same engineering-detail contract, but the cost
