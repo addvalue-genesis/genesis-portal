@@ -5,6 +5,7 @@ import { O_G_LIFECYCLE_0553, L3_TABS_0553, L3_TAB_GROUPS_0553, TAB_IDENTITY_0553
 import { DocumentReferenceControl0553 } from "../project0553/DocumentReferenceControl0553";
 import { VendorProductCatalog0553 } from "../project0553/VendorProductCatalog0553";
 import { VendorSourceRegister0553 } from "../project0553/VendorSourceRegister0553";
+import {SmartDataGroup} from "../common/ui/SmartDataExplorer";
 import React, { useMemo, useState } from "react";
 import { ProjectWorkspaceShell } from "../common/ui/ProjectWorkspaceShell";
 import { ArchitectureView as SharedArchitectureView } from "../common/ui/ArchitectureView";
@@ -138,12 +139,16 @@ export function PJ26080553() {
    {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
    {tab==="documents"&&<div className="p55-stack">
     <VendorProductCatalog0553/>
-    <VendorSourceRegister0553/>
-    <details className="p55-panel" data-component-key="bid.documents.evidence-classification" style={{padding:12}}>
-      <summary style={{cursor:"pointer",fontWeight:700}}>Document Evidence Classification / ทะเบียนสถานะเอกสารต้นฉบับ</summary>
-      <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.documents.evidence-classification"/></p>
-      <Table headers={["Evidence","Revision","State"]} rows={PROJECT_0553_EVIDENCE.map(e=>[e.title,e.revision,<Badge key={e.id}>{e.state}</Badge>])}/>
-    </details>
+    <SmartDataGroup moduleKey="bid.documents" projectId="PJ2608-0553"
+      title="Documents · RFQ / Original Vendor Sources / Evidence Classification" defaultOpen={false}
+      description="Documents preserve originals and revisions; Vendor Products above displays derived company, products and quotations from the same source evidence.">
+      <VendorSourceRegister0553/>
+      <details className="p55-panel" data-component-key="bid.documents.evidence-classification" style={{padding:12}}>
+        <summary style={{cursor:"pointer",fontWeight:700}}>Document Evidence Classification / ทะเบียนสถานะเอกสารต้นฉบับ</summary>
+        <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.documents.evidence-classification"/></p>
+        <Table headers={["Evidence","Revision","State"]} rows={PROJECT_0553_EVIDENCE.map(e=>[e.title,e.revision,<Badge key={e.id}>{e.state}</Badge>])}/>
+      </details>
+    </SmartDataGroup>
    </div>}
 
  </>}</>}</>}/>;
