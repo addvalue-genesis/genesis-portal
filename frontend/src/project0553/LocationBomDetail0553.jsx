@@ -58,10 +58,22 @@ export function LocationBomDetail0553({site,fx}){
      {site==="ZWP20"&&v.tag==="MR-502-001"&&v.row===4&&<TagMappingAudit0553/>}
      {(()=>{const trace=traceTagParticular0553(site,v.tag);const rows=[...trace.direct,...trace.siteSpecific];return <ControlledModuleSection0553 moduleKey={tagKey(v)+".particular-evidence"} title={"RFQ Particular Evidence / SI Engineering Proof — "+trace.direct.length+" TAG + "+trace.siteSpecific.length+" Site + "+trace.common.length+" Common; "+trace.conflicts.length+" Conflict Gates"}>
       <p className="p55-note">Requirements derive from MR/BOD/DTS/SPE/RPT/BLD. Clause evidence is independent from existing priced vendor/quantity ledger. Review every linked note, comment and attachment; show applicable common constraints in 04 Documents.</p>
-      <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Document / Clause</th><th>Customer Requirement</th><th>SI Proof / Design Task</th><th>Cost Driver</th></tr></thead><tbody>
-       {rows.map(r=><tr key={r.id}><td><strong>{r.document} · {r.section}</strong><small>p.{r.page} · {r.type} · {r.id}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)+".particular-evidence.clause."+String(r.id).toLowerCase().replace(/[^a-z0-9-]/g,"-")} componentName={r.document+" "+r.section}/></td><td>{r.topic}<small>{r.requirement}</small></td><td>{r.siAction}</td><td>{r.costDriver}<small>Review before price release</small></td></tr>)}
-      </tbody></table></div>
-      {trace.conflicts.length>0&&<p className="p55-note"><strong>Unresolved cross-document gates:</strong> {trace.conflicts.map(r=>r.id+" "+r.topic).join(" · ")}</p>}
+      <ControlledModuleSection0553 moduleKey={tagKey(v)+".particular-evidence.direct-site"} title={"TAG / Site Particular Clauses ("+rows.length+")"} defaultOpen>
+       <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact"><thead><tr><th>Document / Clause</th><th>Customer Requirement</th><th>SI Proof / Design Task</th><th>Cost Driver</th></tr></thead><tbody>
+        {rows.map(r=><tr key={r.id}><td><strong>{r.document} · {r.section}</strong><small>p.{r.page} · {r.type} · {r.id}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)+".particular-evidence.clause."+String(r.id).toLowerCase().replace(/[^a-z0-9-]/g,"-")} componentName={r.document+" "+r.section}/></td><td>{r.topic}<small>{r.requirement}</small></td><td>{r.siAction}</td><td>{r.costDriver}<small>Review before price release</small></td></tr>)}
+       </tbody></table></div>
+      </ControlledModuleSection0553>
+      <ControlledModuleSection0553 moduleKey={tagKey(v)+".particular-evidence.common"} title={"Common / System Requirements ("+trace.common.length+")"}>
+       <p className="p55-note">Shared clauses are applicable project constraints, not automatically accepted technical compliance or additional posted costs.</p>
+       <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact"><thead><tr><th>Document / Clause</th><th>Common Requirement</th><th>Engineering Proof / Action</th><th>Cost Driver</th></tr></thead><tbody>
+        {trace.common.map(r=><tr key={r.id}><td><strong>{r.document} · {r.section}</strong><small>p.{r.page} · {r.id}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)+".particular-evidence.clause."+String(r.id).toLowerCase().replace(/[^a-z0-9-]/g,"-")} componentName={r.document+" "+r.section}/></td><td>{r.topic}<small>{r.requirement}</small></td><td>{r.siAction}</td><td>{r.costDriver}</td></tr>)}
+       </tbody></table></div>
+      </ControlledModuleSection0553>
+      <ControlledModuleSection0553 moduleKey={tagKey(v)+".particular-evidence.conflicts"} title={"Cross-document Conflict Gates ("+trace.conflicts.length+")"}>
+       <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact"><thead><tr><th>Conflict / Severity</th><th>Source A</th><th>Source B</th><th>Required SI Decision / Status</th></tr></thead><tbody>
+        {trace.conflicts.map(r=><tr key={r.id}><td><strong>{r.id} · {r.topic}</strong><small>{r.severity}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={tagKey(v)+".particular-evidence.conflicts."+String(r.id).toLowerCase()} componentName={r.id+" "+r.topic}/></td><td>{r.sourceA}</td><td>{r.sourceB}</td><td>{r.siDecisionGate}<small>{r.resolution}</small></td></tr>)}
+       </tbody></table></div>
+      </ControlledModuleSection0553>
       <p className="p55-note">This trace is advisory only and does not change current quantities, selected products, A/B/C, or working totals.</p>
      </ControlledModuleSection0553>})()}
      {v.tag==="MR-502-001"&&site==="ZWP21"&&<p className="p55-note"><strong>Functional mapping from ZWP20 reference:</strong> ZWP20 MR-502-001 Row 4 (PTMP remote) → ZWP21 MR-502-001 Row 13 (PTP peer). Matching child functions: Radio hardware, RF filter, throughput/capacity entitlement and RF mounting. Different RPT role / quote group; no automatic SKU or region entitlement transfer. Separate power/IDU and surge owners must remain separate.</p>}
