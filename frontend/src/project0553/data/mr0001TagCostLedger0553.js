@@ -15,17 +15,19 @@ const scenario=zwp8.referenceScenarios.find(x=>x.id===zwp8.preferredScenarioId);
 const radioTags=["MR-502-003","MR-502-004"];
 const antennaTags=["ANT-502-002","ANT-502-003"];
 const zwp8Rows=zwp8.items.map(item=>{
- const radio=radioTags.includes(item.tag),antenna=antennaTags.includes(item.tag);
- const rate=radio?scenario?.radioAssemblyUnitUSD:antenna?scenario?.antennaUnitUSD:null;
+ const codes=zwp8.ownerCodes[item.tag]||[];
+ const rate=zwp8.ownerCosts[item.tag];
+ const functions=costFunctions(codes);
  const extended=Number.isFinite(rate)?round(item.sourceQty*rate):null;
  return {site:"ZWP8",mr:"MR-0001",row:43,tag:item.tag,description:item.role,
   sourceQty:item.sourceQty,sourceUnit:item.sourceUnit,currency:"USD",unitCost:rate,
-  extended,status:extended===null?"NO_SELECTED_BUDGET_RATE":"MANAGEMENT_PREFERRED_4FT_PRELIMINARY__OEM_TO_CONFIRM",
+  extended,status:extended===null?"NO_SELECTED_BUDGET_RATE":"ZWP8_AFC_FUNCTION_WORKING_BUDGET__OEM_TO_CONFIRM",
   source:"ZWP8_ROW43_COST_TRACE / "+zwp8.quote,selectedScenario:zwp8.preferredScenarioId,
   countedInWorkingTotal:Number.isFinite(extended),
-  note:radio?"Remote radio functional assembly; IDU and OEM entitlement remain to confirm":
-    antenna?"4ft antenna budget preference, final RPT/OEM approval pending":
-    "Separate IDU function not costed by this scenario"};
+  vendor:"Next G / Aviat candidate",sku:functions.map(x=>x.sku).join(" + "),
+  detail:functions.map(x=>({...x,requiredQty:1,budgetaryQuoteLine:x.functionId,budgetaryUnitPrice:x.unitPrice,budgetaryExtended:x.extended,budgetarySelectedSKU:x.sku,allocationOwner:item.tag+".43"})),
+  assumptions:["PTMP base/sector and additional PTP roles per AFC; existing PTP remains existing","IDU is PoE interface only; complete IDU proof pending","A-3/B-4 licence NULL; OEM and RF 90-degree pattern unverified","A-8/B-8 surge cost belongs to independent SA owners"],
+  note:"AFC function/quantity working allocation. Cable glands untouched."};
 });
 if(Number.isFinite(scenario?.partialEquipmentUSD)){
  const sum=round(zwp8Rows.filter(r=>r.countedInWorkingTotal).reduce((n,r)=>n+r.extended,0));
