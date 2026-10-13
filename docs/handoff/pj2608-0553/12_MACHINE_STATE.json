@@ -601,6 +601,42 @@
       "localBuild": "PENDING",
       "browserAcceptance": "PENDING",
       "customerReleaseAllowed": false
+    },
+    {
+      "id": "ZWP8_AFC_ROLE_COST_REALLOCATION_20261013",
+      "date": "2026-10-13",
+      "scope": "ZWP8 only; MR0001 Row43 and dependent audit/status; excluded cable glands",
+      "status": "COMMITTED_SOURCE__LOCAL_RUNTIME_QA_PENDING",
+      "roleCounts": {
+        "PTMPBase": 1,
+        "PTMPSector90": 1,
+        "PTPAdditionalEndpointCandidate": 1,
+        "PTPParabolicCandidate": 1,
+        "IDUPowerInterfaces": 2,
+        "SurgeOwners": 2
+      },
+      "tagRateUSD": {
+        "MR-502-003": 13002,
+        "MR-502-003A": 671.27,
+        "ANT-502-002": 602.69,
+        "MR-502-004": 7288.65,
+        "MR-502-004A": 671.27,
+        "ANT-502-003": 4709.77,
+        "SA-502-002": 614.2,
+        "SA-502-003": 614.2
+      },
+      "totalUSD": 28174.05,
+      "unchangedTHBCost": 499906,
+      "planningFx31_5TotalTHB": 1387388.58,
+      "noCurrentDuplicatedSurge": true,
+      "BSLicence": "A-4 PMP MAX QUOTED; OEM CAPACITY OPEN",
+      "NMS": "Existing ZPQ NMS incremental node/port licence unknown",
+      "countryRegionLicence": "A-3/B-4 source rates NULL",
+      "enclosure": "New TCAB-500-003 retained, existing TCAB-WP8-500 procurement zero outside row list",
+      "LAN": "Existing switch tie-in; working Cisco LAN TAG not zeroed because new enclosure has L3 switch and scope needs reconciliation",
+      "cableGland": "NOT TOUCHED; other chat",
+      "customerReleaseAllowed": false,
+      "verification": "Source equations manually checked; user local npm/webpack/browser not yet run"
     }
   ]
 }
