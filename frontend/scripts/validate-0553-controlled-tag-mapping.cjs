@@ -83,6 +83,8 @@ const adulteratedQuote={...QUOTE,lines:QUOTE.lines.map(x=>x.code==="B-1"?{...x,u
 const tampered=audit({quote:adulteratedQuote});
 assert.equal(tampered.status,"MAPPING_BLOCKED");
 assert.equal(tampered.stages.find(x=>x.id==="MAP-04").status,"ERROR");
+assert(tampered.stages.find(x=>x.id==="MAP-04").details.includes("B-1 (CONN-OW-HAZ-4958ER-01): SOURCE_RATE_MISMATCH"),"MAP-04 must expose the exact quote code, SKU and rate mismatch");
+assert(tampered.stages.find(x=>x.id==="MAP-05").details.includes("Blocked by MAP-04"),"Skipped stages must identify their failed prerequisite");
 assert(tampered.stages.filter(x=>Number(x.id.slice(4))>4).every(x=>x.status==="SKIPPED"));
 // Negative test 3: a changed existing ledger amount must fail reconciliation.
 const changedLedger=siteCost().rows.map(x=>x.row===4?{...x,extended:x.extended+1}:x);
