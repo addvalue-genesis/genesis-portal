@@ -19,9 +19,12 @@ assert(overview.includes('aria-expanded={siteExpanded(g.site)}'),"Accessible exp
 assert(overview.includes("financial.costed")&&overview.includes("financial.total"),"Cost coverage summary missing");
 assert(!overview.includes("itemAllocations?.map")&&!overview.includes("extraScenarios.map")&&!overview.includes("getMR0001LocationCost0553(g.site).itemAllocations?.map"),"Long source/cost narratives leak into compact WP row");
 const detail=src.slice(end,src.indexOf("</React.Fragment>",end));
-assert(detail.includes('moduleKey={"bid.budget.bom."+g.site.toLowerCase()+".engineering-detail"}'),"Expanded WP Engineering Detail missing stable Module ID");
-assert(detail.includes('title={g.site+" / Engineering Detail'),"Expanded WP Engineering Detail missing descriptive module header");
-assert(detail.indexOf('.engineering-detail"}')<detail.indexOf('<LocationBomDetail0553 site={g.site} fx={fx}/>'),"Engineering Detail must own its location-level TAG details");assert(detail.includes("<LocationBomDetail0553 site={g.site} fx={fx}/>"),"Canonical per-TAG cost/engineering drill-down missing from Cost Allocation");
+assert(src.includes('moduleKey="bid.budget.bom.system-location-mto"'),"Master System-Location MTO table must have its own module ID");
+assert(src.includes('title={"BOM Working Table — "+system+'),"Master table needs its own visible descriptive title");
+assert(src.indexOf('moduleKey="bid.budget.bom.system-location-mto"')<src.indexOf('className="p553-location-overview"'),"Master module must wrap, not merely precede, the overview table");
+assert(src.includes("</ControlledModuleSection0553>\n </section>;"),"Master BOM module should contain the full system-dependent table");
+assert(!src.includes('.engineering-detail"}'),"Do not misattribute the master module ID to a ZWP child detail");
+assert(detail.includes("<LocationBomDetail0553 site={g.site} fx={fx}/>"),"Canonical per-TAG cost/engineering drill-down missing from Cost Allocation");
 assert(!detail.includes("Engineering MTO / Function / Price Drill-down"),"Duplicate hidden TAG drill-down should not be reintroduced");
 assert(detail.includes("extraScenarios.map((v,i)=><tr"),"Additional scenarios missing");
 assert(detail.includes("Vendor Rate Evidence & Currency"),"Original vendor source classes missing");
