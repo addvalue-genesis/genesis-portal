@@ -484,6 +484,28 @@
       "sourceChecks": "COMPLETED",
       "localBuild": "PENDING",
       "browserAcceptance": "PENDING"
+    },
+    {
+      "id": "ABC_READINESS_37_OF_55_PRICE_EVIDENCE_20261013",
+      "date": "2026-10-13",
+      "moduleId": "bid.budget.bom.system-location-mto.abc-readiness",
+      "scope": "MR0001 7 locations A working cost; Part B Rev05 project-wide Working SELL reference; C1/C2 spare option source",
+      "priceEvidenceCoverageExample": "37/55 means rate evidence candidate only, not 37 approved items",
+      "ABCAudit": "A cost current-source MR0001 only; B cost NULL; C cost NULL; A+B+C complete NULL; do not add B working sell THB 3804160 to A cost",
+      "BWorkingSellTHB": 3804160,
+      "detailModules": [
+        "price-evidence-gaps",
+        "part-a-gaps",
+        "part-b-wbs",
+        "part-c-spares"
+      ],
+      "model": "frontend/src/project0553/data/abcWorkingReadiness0553.js",
+      "renderer": "frontend/src/project0553/AbcCostReadiness0553.jsx",
+      "regression": "frontend/scripts/validate-0553-abc-readiness.cjs",
+      "sourceOrCostLedgerMutated": false,
+      "localBuild": "PENDING_USER_EXECUTION",
+      "browserAcceptance": "PENDING",
+      "customerRelease": false
     }
   ]
 }
