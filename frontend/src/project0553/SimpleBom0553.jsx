@@ -245,7 +245,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     </colgroup>
     <thead><tr>
      <th>+/−</th><th>Location</th><th>Module ID / Copy</th><th>MTO</th>
-     <th>Priced</th><th>RPT / ANT</th><th>Vendor evidence</th><th>Allocated working cost</th>
+     <th>Vendor rates</th><th>RPT / ANT</th><th>Vendor evidence</th><th>Allocated working cost</th>
     </tr></thead>
     <tbody>
     {groups.filter(g=>g.items.length).map(g=>{
@@ -268,12 +268,11 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
           componentKey={"bid.budget.bom."+g.site.toLowerCase()}
           componentName={g.site+" / SCADA Engineering BOM"}/></td>
        <td className="is-number">{g.items.length}</td>
-       <td className="is-number"><strong>{financial.costed}/{financial.total}</strong>
-        {financial.gaps>0&&<small>{financial.gaps} pending</small>}</td>
+       <td className="is-number"><strong>{g.items.filter(vendorCovered).length}/{g.items.length}</strong></td>
        <td className="is-number">{g.rfDemand?.linkEndpointDemand??"—"} / {g.rfDemand?.antennaReferenceDemand??"—"}</td>
        <td><span className="p553-vendor-brief">{vendorFlags.length?vendorFlags.join(" · "):"Source review"}</span></td>
        <td className="p553-location-total"><strong>{displaySiteTotal(g.site)}</strong>
-        <small>Working allocation · not A+B+C sell</small></td>
+        <small>{financial.costed}/{financial.total} costed · {financial.gaps} pending</small></td>
       </tr>
       {siteExpanded(g.site)&&<tr className="p553-location-expanded"><td colSpan={8}>
        <div className="p553-location-details">
