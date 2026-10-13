@@ -1,0 +1,55 @@
+{
+  "projectId": "PJ2608-0553",
+  "baselineId": "0553-ENGINEERING-INTELLIGENCE-BASELINE-R01",
+  "baselineDate": "2026-10-13",
+  "approvalScope": "ARCHITECTURE_FREEZE_AND_ADDITIVE_READ_ONLY_COMMON_ENGINEERING_INTELLIGENCE",
+  "branchAtApproval": "feat/pj2608-0553-tpp-bid-handoff",
+  "approvalMeaning": "Approval to preserve existing architecture and extend a shared rules layer. Not authorization to change commercial ledger, vendor selection, compliance, released bid or existing MR/TAG quantities.",
+  "controls": {
+    "unchangedCoreModuleIds": true,
+    "noAutomaticVendorApproval": true,
+    "noAutomaticCustomerRelease": true,
+    "noAutomaticCostPosting": true,
+    "quantityAndCurrencySourceRequired": true,
+    "engineeringEvidenceFirst": true,
+    "automaticRuntimeBaselineCheck": "LOCKED_COST_CRITICAL_FILES_ONLY",
+    "releaseGate": "New Common Intelligence output is recommendation/evidence only until expert rule validation and project-specific acceptance",
+    "rules": "User-authorized baseline change requires new manifest revision and positive+negative regression fixtures. No silent SHA refresh."
+  },
+  "lockedCostFiles": [
+    {
+      "path": "frontend/src/project0553/data/mr0001TagCostLedger0553.js",
+      "gitBlobSha": "ec222963670a5cfdf5e8f4b850d33c4de01afba1"
+    },
+    {
+      "path": "frontend/src/project0553/data/engineeringOwnedCost0553.js",
+      "gitBlobSha": "f29b8d3705fd8bee0d72ddeb1349b80d9b28d760"
+    },
+    {
+      "path": "frontend/src/project0553/data/zwp20SiteCost0553.js",
+      "gitBlobSha": "58fa2ea25bf799c2cd5368c51b26557ccb29f229"
+    }
+  ],
+  "interfaceReferenceFiles": [
+    {
+      "path": "frontend/src/project0553/data/vendorUnifiedCatalog0553.js",
+      "gitBlobShaAtApproval": "d1a71e237f88f1cb2cb9d697fb7d116433f2cfe8",
+      "status": "CONTROLLED_INTERFACE_REFERENCE_NOT_IMMUTABLE"
+    },
+    {
+      "path": "frontend/src/project0553/data/controlledTagMappingPilot0553.js",
+      "gitBlobShaAtApproval": "e08ccad797bce898bddd1b4dd0b763ac0a4d6801",
+      "status": "READ_ONLY_PILOT"
+    },
+    {
+      "path": "frontend/src/pages/PJ26080553.jsx",
+      "gitBlobShaAtApproval": "bf280487ebd8d60f291faaa902a6e077a379ef0b",
+      "status": "PRESERVE_UI_ROUTE_MODULE_IDENTITIES"
+    }
+  ],
+  "knownLimits": [
+    "GitHub-only code source verification does not establish local npm or browser PASS",
+    "Current 0553 cost owner prices are budgetary working estimates with technical qualifications",
+    "Full RFQ/MR/BOD/DTS/SPE/STD/O&G constraints are not all machine-structured; do not assert complete automated engineering review"
+  ]
+}
