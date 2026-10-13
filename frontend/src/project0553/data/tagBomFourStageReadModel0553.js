@@ -5,6 +5,7 @@ import {MR0001_PACKAGE_COMPOSITION} from "./mr0001PackageComposition";
 import {MR0001_ENGINEERING_REQUIRED_BOM} from "./mr0001RequiredBomDerivation";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 import {auditZWP20RadioVendorMapping0553} from "./controlledTagMappingPilot0553";
+import {deriveBartecTagRequiredBulkProjection0553} from "./bartecTagRequiredBulkProjection0553";
 
 const rounded=n=>Math.round(n*100)/100;
 const ownedBy=(c,owner)=>!c.allocationOwner||c.allocationOwner===owner;
@@ -42,6 +43,9 @@ export function getTagBomFourStage0553(site,tagRow){
  const detail=tagRow.detail?.length?tagRow.detail:tagRow.components?.length?tagRow.components:
   auditedOwnerDetail(site,tagRow,owner);
  const byFunction=new Map(detail.map(c=>[c.functionId,c]));
+ // Bridge the previously isolated BARTEC manufacturer geometry + source MTO
+ // into THIS TAG's Stage 01 Required view. No read-model cost mutation.
+ const bartecBulkRequired=deriveBartecTagRequiredBulkProjection0553(site,tagRow.tag,source);
  const required=(pkg?.components||[]).map(functionRow=>{
   const c=byFunction.get(functionRow.functionId);
   return {id:functionRow.id,functionId:functionRow.functionId,
@@ -53,6 +57,10 @@ export function getTagBomFourStage0553(site,tagRow){
    costOwner:c?.allocationOwner||null,selectionStatus:c?.budgetarySelectionState||"NOT_SELECTED",
    candidateCount:functionRow.candidateQuotes?.length||0};
  });
+ // Generic "GLANDS" stays as an unverified installed physical requirement; append
+ // distinct GA documented capacity/accessories and the separately priced 1-gland
+ // allowance without replacing the original MTO-required functional composition.
+ if(bartecBulkRequired)required.push(...bartecBulkRequired.requirements);
  // Working functions and pricing originate exclusively from the existing TAG cost ledger.
  // For ODU row4 B-6/B-7 are required functions but belong to IDU row5; do NOT sum them.
  const ownerDetail=detail.filter(c=>ownedBy(c,owner));
@@ -102,7 +110,7 @@ export function getTagBomFourStage0553(site,tagRow){
   sourceId:source?.id||null,sourceMatched:matchingTag,sourceQuantityText:source?.sourceQuantityText||null,
   scopeQty:tagRow.sourceQty??null,scopeUnit:tagRow.sourceUnit||null,
   packageFamily:pkg?.equipmentFamily||"SOURCE_MAPPING_REVIEW",
-  required,physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
+  required,bartecBulkRequired,physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
   working:{status:tagRow.status||"REVIEW",currency:tagRow.currency||null,extended:ledgerTotal,
    selectedVendor:tagRow.vendor||null,selectedSku:tagRow.sku||null,
    source:tagRow.source||null,functions:pricedFunctions,
