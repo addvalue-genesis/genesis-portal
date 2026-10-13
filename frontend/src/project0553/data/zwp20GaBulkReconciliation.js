@@ -1,6 +1,13 @@
+import {selectBartecEnclosureBasis0553} from "./bartecEnclosureBasis0553";
 // Historical GA component evidence for ZWP20 SCADA, not approved Z1F takeoff.
 // Source references are kept at the level of physical interface and cost owner.
 export const ZWP20_GA_BULK_RECONCILIATION=Object.freeze({
+ // Current user's selected physical BARTEC panel hole pattern is 16 M20 entries,
+ // not the former default of one gland and not the DTS 18-hole requirement.
+ selectedBartecModelAndHoles:selectBartecEnclosureBasis0553("SCADA_EXE_TYPE_1_2_3"),
+ selectedHoleBasis:"USER_CONFIRMED_2026-10-13__BARTEC_16_PRE_DRILLED_M20__DRAIN_SEPARATE",
+ customerDeviationGate:"Z1F DTS-0001 C1 SCADA enclosure minimum 18 entries vs selected BARTEC 16; do not mark technical compliance until customer disposition.",
+
  sourceGAs:[
   {file:"21G1048t-BA-GA-100X_Z0.pdf",project:"Zawtika historical BARTEC",status:"AS_BUILT_2022",
    pages:[1,2,3,4,5,6,7,8,9],use:"Indoor Ex e telecom panel composition"},
@@ -47,5 +54,5 @@ export const ZWP20_GA_BULK_RECONCILIATION=Object.freeze({
    technicalChecks:["Count only additional external equipotential bonding/earthing in bulk after topology and field routes are determined"]}
  ],
  separateSystemsNotApplicable:["GA-1004 Ex e telephone JB","GA-1005 Ex d TETRA modem panel","GA-1006 TETRA selector station"],
- sourceOfTruth:"Z1F MR, BLD and LAY take precedence; historical GA supplies function, component and package inclusion evidence, not Z1F procurement quantity"
+ sourceOfTruth:"User confirms BARTEC model and as-drawn 16 M20 field-entry holes as Z1F working physical basis; current Z1F MR controls location/quantity, cable-end schedule controls active glands, vendor inclusion controls purchase. Historical 2022 site quantities are NOT Z1F procurement. DTS 18-hole conflict remains open."
 });
