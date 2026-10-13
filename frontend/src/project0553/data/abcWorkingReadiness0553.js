@@ -24,7 +24,8 @@ export function deriveAbcWorkingReadiness0553({site="ALL",thbPerUsd=null}={}){
  const subtotalUSD=sum(locationRows.map(x=>x.originalUSD));
  const subtotalTHB=sum(locationRows.map(x=>x.originalTHB));
  const fxUsable=Number.isFinite(thbPerUsd)&&thbPerUsd>0;
- const knownWorkingTHB=fxUsable?round(subtotalTHB+subtotalUSD*thbPerUsd):
+ const hasBookedA=locationRows.some(x=>x.postedCount>0);
+ const knownWorkingTHB=!hasBookedA?null:fxUsable?round(subtotalTHB+subtotalUSD*thbPerUsd):
   subtotalUSD===0?subtotalTHB:null;
  const totalRows=locationRows.reduce((n,x)=>n+x.sourceCount,0);
  const postedRows=locationRows.reduce((n,x)=>n+x.postedCount,0);
