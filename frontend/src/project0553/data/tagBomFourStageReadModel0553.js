@@ -74,8 +74,12 @@ export function getTagBomFourStage0553(site,tagRow){
  const otherOwnerFunctions=detail.filter(c=>c.allocationOwner&&!ownedBy(c,owner)).map(c=>({
   functionId:c.functionId,owner:c.allocationOwner,quoteCode:c.budgetaryQuoteLine||c.budgetarySelectedOffer||null
  }));
- const numericallyComplete=pricedFunctions.length>0&&pricedFunctions.filter(c=>!c.includedWithoutExtra).every(c=>Number.isFinite(c.extended));
- const workingTotal=numericallyComplete?rounded(pricedFunctions.filter(c=>!c.includedWithoutExtra).reduce((sum,c)=>sum+c.extended,0)):null;
+ const costed=pricedFunctions.filter(c=>!c.includedWithoutExtra);
+ const workingCurrencies=new Set(costed.map(c=>c.currency).filter(Boolean));
+ const currencyValid=workingCurrencies.size===1&&workingCurrencies.has(tagRow.currency);
+ const numericallyComplete=costed.length>0&&currencyValid&&costed.every(c=>Number.isFinite(c.extended));
+ // Never sum USD, THB, EUR or null-currency components together by accident.
+ const workingTotal=numericallyComplete?rounded(costed.reduce((sum,c)=>sum+c.extended,0)):null;
  const ledgerTotal=tagRow.countedInWorkingTotal&&Number.isFinite(tagRow.extended)?tagRow.extended:null;
  const delta=numericallyComplete&&Number.isFinite(ledgerTotal)?rounded(workingTotal-ledgerTotal):null;
  // Vendor proof belongs in the vendor registry. Show the exact quoted source rows
@@ -105,6 +109,7 @@ export function getTagBomFourStage0553(site,tagRow){
    otherOwnerFunctions,derivedFunctionSubtotal:workingTotal,
    deltaFromLedger:delta,assumptions:tagRow.assumptions||[],
    completeness:pricedFunctions.length===0?"TAG_TOTAL_ONLY__NO_FUNCTION_COMPOSITION":
+    !currencyValid?"MIXED_OR_UNVERIFIED_FUNCTION_CURRENCIES":
     !numericallyComplete?"FUNCTION_PRICES_PARTIAL":delta===null?"LEDGER_OR_RATE_REVIEW":
     Math.abs(delta)<=0.01?"WORKING_FUNCTIONS_RECONCILED":"COST_OWNER_MISMATCH"},
   offered,otherSupplierEvidence,releaseAllowed:false
