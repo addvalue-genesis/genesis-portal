@@ -15,9 +15,9 @@ export function VendorSourceRegister0553(){
  ),[kind,term]);
  return <details className="p55-panel" data-component-key="bid.documents" style={{padding:14,marginTop:12}}>
   <summary style={{cursor:"pointer",fontWeight:700}}>
-   Source Documents & Original Evidence Register / เอกสารต้นฉบับ ({VENDOR_0553_SOURCES.length}) — click to inspect
+   Vendor / OEM Source Documents / เอกสารต้นทาง Vendor ({VENDOR_0553_SOURCES.length}) — click to inspect
   </summary>
-  <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.documents" componentName="Source Documents & Original Evidence Register"/></p>
+  <p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.documents" componentName="Vendor / OEM Source Documents"/></p>
   <p className="p55-note">Distinct responsibility from 07 Vendor. Documents store original PDFs, folders and their evidence status; Vendor Products displays normalized companies, products and quotations. Original sources not mapped to an individual SKU remain visible here.</p>
   <SmartFilterBar moduleKey="bid.documents.source-filter" title="Document Source Search"
    total={VENDOR_0553_SOURCES.length} shown={rows.length}
