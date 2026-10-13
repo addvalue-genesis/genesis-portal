@@ -213,8 +213,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
       {value:"MR-0004",label:"MR0004 · RACON"}]},
     {key:"location",label:"Location",type:"select",value:site,onChange:changeSite,
      options:[{value:"ALL",label:"All locations"},...model.locations.map(x=>({value:x.site,label:x.site}))]},
-    {key:"vendor",label:"Vendor / Company (MR0001 only)",type:"select",value:vendor,onChange:setVendor,
-     options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}
+    ...(system==="MR-0001"?[{key:"vendor",label:"Vendor / Company",type:"select",value:vendor,onChange:setVendor,
+     options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}]:[])
    ]}/>
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"BOM Working Table — "+system+" / "+(site==="ALL"?"All Locations":site)} description="System × Location × MTO summary, source evidence and working cost" defaultOpen>
   {["MR-0002","MR-0003","MR-0004"].includes(system)?<UnifiedMrLocationTable0553 mr={system} site={site} fx={fx}/>:<>
