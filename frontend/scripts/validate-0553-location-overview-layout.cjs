@@ -14,6 +14,12 @@ const end=src.indexOf('<tr className="p553-location-expanded">',start);
 assert(start>0&&end>start,"Per-WP summary/details split missing");
 const overview=src.slice(start,end);
 assert(overview.includes("displaySiteTotal(g.site)"),"Original site total must stay visible");
+assert(src.includes('const allLocationAllocated=model.locations.reduce('),"Missing ALL-location cost rollup from same canonical WP ledgers");
+assert(src.includes('const wp=wpSummary(g.site);'),"All-location total must reuse the individual WP's source cost");
+assert(src.includes('site==="ALL"?displayAllLocationTotal():displaySiteTotal(site)'),"Source facts card must show total for ALL, WP total for one WP");
+assert(!src.includes("<AbcCostReadiness0553"),"Keep dashboard compact; no standalone ABC panel");
+assert(src.includes("full A+B+C NOT ESTABLISHED"),"Do not misrepresent partial Working Cost as complete A+B+C");
+
 assert(overview.includes('componentKey={"bid.budget.bom."+g.site.toLowerCase()}'),"Original module IDs and Copy controls missing");
 assert(overview.includes('aria-expanded={siteExpanded(g.site)}'),"Accessible expand/collapse state missing");
 assert(overview.includes("financial.costed")&&overview.includes("financial.total"),"Cost coverage summary missing");
