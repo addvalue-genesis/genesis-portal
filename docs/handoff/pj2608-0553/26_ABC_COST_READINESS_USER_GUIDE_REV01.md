@@ -1,4 +1,7 @@
 # PJ2608-0553 — คู่มืออ่าน A / B / C Cost Readiness (Internal Working) Rev01
+
+> **UI scope superseded (2026-10-13):** User requested ONLY the single original `All Locations — Allocated Total Equipment / A+B+C` card to show one aggregate allocated working amount. The detailed `AbcCostReadiness0553` widget described below is **no longer mounted** in `SimpleBom0553.jsx` (source files preserved for possible separate later review). The visible number is MR0001 TAG-ledger known working allocation only, NOT complete project A+B+C. See latest `00_HANDOFF_CURRENT.md` for authoritative current UI.
+
 วันที่ 13 October 2026 • เป็นคู่มือการอ่านข้อมูล ไม่ใช่การอนุมัติราคา
 
 ## เข้าใช้งาน
