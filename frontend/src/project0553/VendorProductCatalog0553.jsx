@@ -2,6 +2,7 @@ import React,{useMemo,useState} from "react";
 import {VENDOR_UNIFIED_CATALOG_0553} from "./data/vendorUnifiedCatalog0553";
 import HISTORICAL_VENDOR from "./data/historicalVendorEvidence0553.json";
 import EXION_REFERENCE from "./data/quotes/EXION-1240515-R0.reference.json";
+import EXION_LATEST from "./data/quotes/EXION-1260576-R0.current.json";
 import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
 import {MR0002_PRICE_REGISTRY_0553} from "./data/mr0002PriceRegistry0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
@@ -17,7 +18,7 @@ export function VendorProductCatalog0553(){
  const [search,setSearch]=useState("");
  const [evidenceClass,setEvidenceClass]=useState("ALL");
  const [chosenQuote,setChosenQuote]=useState("");
- const commercial=useMemo(()=>buildQuotationCommercialRegister([...SUPPLIER_QUOTE_LINES_0553,...HISTORICAL_VENDOR.quotes.map(q=>({...q,terms:q.terms,source:q.sourceUrl||q.source})),{id:EXION_REFERENCE.id,vendor:EXION_REFERENCE.vendor,quotation:EXION_REFERENCE.quotation,date:EXION_REFERENCE.date,currency:EXION_REFERENCE.currency,quotedTotal:EXION_REFERENCE.totalExVat,scope:"MR-0003 historical telephone/sounder reference",status:EXION_REFERENCE.priceState,source:EXION_REFERENCE.document,terms:EXION_REFERENCE.terms.map(x=>x.join(": ")).join(" | ")}]),[]);
+ const commercial=useMemo(()=>buildQuotationCommercialRegister([{id:EXION_LATEST.id,vendor:EXION_LATEST.vendor,quotation:EXION_LATEST.quotation,source:EXION_LATEST.source,scope:EXION_LATEST.scope,date:EXION_LATEST.date,currency:EXION_LATEST.currency,quotedTotal:EXION_LATEST.quotedTotal,status:EXION_LATEST.status,validUntil:EXION_LATEST.validUntil,terms:EXION_LATEST.terms.map(x=>x.topic+": "+x.value).join(" | ")},...SUPPLIER_QUOTE_LINES_0553,...HISTORICAL_VENDOR.quotes.map(q=>({...q,terms:q.terms,source:q.sourceUrl||q.source})),{id:EXION_REFERENCE.id,vendor:EXION_REFERENCE.vendor,quotation:EXION_REFERENCE.quotation,date:EXION_REFERENCE.date,currency:EXION_REFERENCE.currency,quotedTotal:EXION_REFERENCE.totalExVat,scope:"MR-0003 historical telephone/sounder reference",status:EXION_REFERENCE.priceState,source:EXION_REFERENCE.document,terms:EXION_REFERENCE.terms.map(x=>x.join(": ")).join(" | ")}]),[]);
  const selectedCommercial=commercial.find(q=>q.quoteId===chosenQuote);
  const catalog=VENDOR_UNIFIED_CATALOG_0553;
  const suppliersById=new Map(catalog.suppliers.map(v=>[v.id,v]));
