@@ -204,7 +204,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <p className="p55-note" style={{marginTop:7}}>System / Location context above; the whole table below carries its own collapsible Module ID and Copy control.</p>
   </div>
   <SmartFilterBar moduleKey="bid.budget.bom.filters" title="Engineering BOM · Filter by System / Site / Vendor"
-   total={sourceCount} shown={displayedCount} onReset={()=>{setSystem("MR-0001");changeSite("ALL");setVendor("ALL");}}
+   total={system==="MR-0001"?sourceCount:BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system).reduce((n,r)=>n+(r.detailRows?.length||r.evidence?.length||0),0)} shown={system==="MR-0001"?displayedCount:BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system&&(site==="ALL"||r.site===site)).reduce((n,r)=>n+(r.detailRows?.length||r.evidence?.length||0),0)} onReset={()=>{setSystem("MR-0001");changeSite("ALL");setVendor("ALL");}}
    controls={[
     {key:"system",label:"System",type:"select",value:system,onChange:setSystem,options:[
       {value:"MR-0001",label:"MR0001 · SCADA Radio"},
@@ -213,7 +213,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
       {value:"MR-0004",label:"MR0004 · RACON"}]},
     {key:"location",label:"Location",type:"select",value:site,onChange:changeSite,
      options:[{value:"ALL",label:"All locations"},...model.locations.map(x=>({value:x.site,label:x.site}))]},
-    {key:"vendor",label:"Vendor / Company",type:"select",value:vendor,onChange:setVendor,
+    {key:"vendor",label:"Vendor / Company (MR0001 only)",type:"select",value:vendor,onChange:setVendor,
      options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}
    ]}/>
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"BOM Working Table — "+system+" / "+(site==="ALL"?"All Locations":site)} description="System × Location × MTO summary, source evidence and working cost" defaultOpen>
