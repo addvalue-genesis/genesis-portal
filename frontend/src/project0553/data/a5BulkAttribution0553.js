@@ -30,7 +30,10 @@ export function deriveA5BulkAttribution0553({ledgers=null,bulkSources=null}={}){
    registerError(sourceRow,"Bulk MTO row lacks a booked, THB-denominated working cost");
    continue;
   }
-  const pricedComponents=(ledger.components||[]).filter(c=>Number.isFinite(c.extended));
+  // ZWP20 source uses quantity/rateTHB; other ledgers use qty/unitPrice.
+  // Normalize read-only and compare every original extended amount before reclassification.
+  const pricedComponents=(ledger.components||[]).filter(c=>Number.isFinite(c.extended))
+   .map(c=>({...c,qty:c.qty??c.quantity??null,unitPrice:c.unitPrice??c.rateTHB??null}));
   const knownSku=component=>String(component.sku||"").toUpperCase();
   const cat6=pricedComponents.filter(c=>(/CAT6A|TECKNIKABEL/.test(knownSku(c)))&&c.qty===69&&c.unitPrice===524&&c.extended===36156);
   const gland=pricedComponents.filter(c=>/501\/453\/UNIV\/A\/M20/.test(knownSku(c))&&c.qty===1&&c.unitPrice===1020&&c.extended===1020);
