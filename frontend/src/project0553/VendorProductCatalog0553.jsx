@@ -1,5 +1,5 @@
 import React,{useMemo,useState} from "react";
-import {assessVendorEvidenceForBudget0553} from "./data/vendorExternalEvidence0553";
+import {VENDOR_UNIFIED_CATALOG_0553} from "./data/vendorUnifiedCatalog0553";
 import {RF_AND_PATCH_REFERENCE_0553} from "./data/rfAndPatchReference0553";
 import {MR0002_PRICE_REGISTRY_0553} from "./data/mr0002PriceRegistry0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
@@ -17,7 +17,7 @@ export function VendorProductCatalog0553(){
  const [chosenQuote,setChosenQuote]=useState("");
  const commercial=useMemo(()=>buildQuotationCommercialRegister(SUPPLIER_QUOTE_LINES_0553),[]);
  const selectedCommercial=commercial.find(q=>q.quoteId===chosenQuote);
- const catalog=useMemo(()=>buildVendorProductCatalog(SUPPLIER_QUOTE_LINES_0553),[]);
+ const catalog=VENDOR_UNIFIED_CATALOG_0553;
  const suppliersById=new Map(catalog.suppliers.map(v=>[v.id,v]));
  const datasheets=VENDOR_0553_SOURCES.filter(v=>v.type==="DATASHEET_ONLY");
  const dataSheetProducts=datasheets.map(v=>({
@@ -82,38 +82,6 @@ export function VendorProductCatalog0553(){
     </section>}
    <p className="p55-note">This is a read-only quotation-header view. Original quote lines and cost calculations have not changed.</p>
   </div>}
-  <details className="p55-panel" open data-component-key="bid.vendor.products.external-evidence" style={{padding:14,marginBottom:12}}>
-   <summary><strong>Unified External / Historical Vendor Evidence → Budgetary 10 impact</strong></summary>
-   <p className="p55-note">Only registry evidence. Web price, ERP history and supplier quotations remain separate classes; none automatically overwrites existing budgeting or an issued customer price.</p>
-   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Source / Module</th><th>Product / Function</th><th>Quoted unit price</th><th>Document</th><th>Budgetary 10 gate / status</th></tr></thead><tbody>
-    {assessVendorEvidenceForBudget0553().rows.map(e=><tr key={e.id}>
-     <td>{e.supplier}<small>{e.sourceClass}</small><small>{e.module}</small></td>
-     <td><strong>{e.sku}</strong><small>{e.description}</small><small>{e.technicalState}</small></td>
-     <td>{Number.isFinite(e.unitPrice)?e.currency+" "+e.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})+" / "+(e.unit||"UNVERIFIED UOM"):"PRICE NOT VERIFIED"}<small>VAT: {e.vat||"N/A"} · {e.checkedDate||"Historical"}</small></td>
-     <td>{e.url?<a href={e.url} target="_blank" rel="noreferrer">Source page</a>:e.reference}<small>{e.reference||""}</small></td>
-     <td><strong>{e.budgetaryRateStatus}</strong><small>{e.budgetDependency}</small></td>
-    </tr>)}
-   </tbody></table></div>
-  </details>
-  <div className="p55-panel" style={{marginBottom:12,padding:14}}>
-  <h3>Online Retail Price Evidence — separate from supplier quotations</h3>
-  <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.price-reference.weidmuller-1963600000"/>
-  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Retail Supplier</th><th>Manufacturer / Product</th><th>Unit Rate (THB, ex VAT)</th><th>Evidence</th><th>Cost Owner</th></tr></thead><tbody><tr>
-   <td>RS Thailand</td><td>Weidmüller IE-PS-RJ45-FH-BK / Order No. 1963600000</td><td>1,176.68 per pc (indicative)</td>
-   <td><a href="https://th.rs-online.com/web/p/ethernet-couplers/7417317" target="_blank" rel="noreferrer">RS item 7417317</a><small>Retail evidence only; quantity-break price and availability subject to supplier confirmation</small></td>
-   <td>ZWP20 DATO-507-001 Row 8; included once in working budget; not additional Row 11 cost</td>
-  </tr></tbody></table></div></div>
-  <div className="p55-panel" style={{padding:14,marginBottom:12}}>
-  <h3>Historical Procurement · CAT6A Patch Cord &amp; RF Interface</h3><p><strong>RF Budgetary Web Price Evidence:</strong> L4TNM-PSA N-Male <a href={RF_AND_PATCH_REFERENCE_0553.webRFPrices.connector.source} target="_blank" rel="noreferrer">RF Parts</a> THB {RF_AND_PATCH_REFERENCE_0553.webRFPrices.connector.thbBudget}/pc; SG12-12B2U grounding <a href={RF_AND_PATCH_REFERENCE_0553.webRFPrices.grounding.source} target="_blank" rel="noreferrer">RF Parts</a> THB {RF_AND_PATCH_REFERENCE_0553.webRFPrices.grounding.thbBudget}/kit; 3M 2228 <a href={RF_AND_PATCH_REFERENCE_0553.webRFPrices.weatherproof.source} target="_blank" rel="noreferrer">element14</a> THB {RF_AND_PATCH_REFERENCE_0553.webRFPrices.weatherproof.thbBudget}/roll. Converted USD quotes at planning FX 33.54, excluding imported delivery/taxes. Do not duplicate weatherproofing included with SG12-12B2U. Feeder ERP unit not verified.</p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.rf-bulk-web-price-evidence"/>
-  <p><strong>Selected internal Budgetary Price Reference — BISMON</strong> · CommScope 1933882-4 / web part NPC6ASZDB-BL0000 · Cat6A F/UTP shielded 4ft (1.22m), THB {RF_AND_PATCH_REFERENCE_0553.cat6PatchBismon.unitRateTHB}/pc as web-displayed price. <a href={RF_AND_PATCH_REFERENCE_0553.cat6PatchBismon.sourceUrl} target="_blank" rel="noreferrer">View vendor page</a>. Pricing VAT status requires reconfirmation. F/UTP 1.22m is not identical to the historical S/FTP exact 1m SKU; check acceptance before cost posting.</p>
-  <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.budgetary-reference.bismon-cat6a-4ft"/>
-  <p><strong>CommScope LDF4RK-50A (1/2-inch RF Feeder)</strong> — Dolibarr cost THB {RF_AND_PATCH_REFERENCE_0553.rfFeederHistorical.dolibarrCostTHB}; weighted average THB {RF_AND_PATCH_REFERENCE_0553.rfFeederHistorical.weightedAverageTHB}; best buying THB {RF_AND_PATCH_REFERENCE_0553.rfFeederHistorical.bestBuyingTHB} (CSS Thai). Royaltec supplier record THB 631; purchase reference PO2402-0816. Unit of measure must be checked in ERP before applying a per-meter cost. Not selected Z1F RF cable yet.</p>
-  <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.commscope-ldf4rk-50a"/>
-  <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.rf-and-cat6a"/>
-  <p>CommScope NETCONNECT Cat6A S/FTP LSZH 1m blue · SKU CSS BL001M · Supplier CSS Thai · AGERP PO2406-0845 · THB {RF_AND_PATCH_REFERENCE_0553.cat6Patch.historicalUnitRateTHB}/pc (ex VAT) · historical purchase reference, not current offer. Quantity follows indoor port/patch map.</p>
-  <p><strong>Additional 2m CAT6A patch cord:</strong> {RF_AND_PATCH_REFERENCE_0553.cat6Patch2m.product} · Yellow, S/FTP LSZH · CSS Thai historical ERP best buying THB {RF_AND_PATCH_REFERENCE_0553.cat6Patch2m.historicalERPBestBuyingTHB}/pc ex VAT, applied from 15-Feb-2020. Length and quantity must follow indoor patch schedule; not additive to 1m version.</p><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.historical-procurement.commscope-npc6aszdb-yl002m"/>
-  <p>RF jumper: factory included in selected ODU supply per management confirmation. Field-terminated RF feeder connector: select part number and quantity only after matching cable type, RF ports and installation condition.</p>
-  </div>
   {dataSheetProducts.length>0&&<div className="p55-panel" style={{marginBottom:14,padding:14}}>
     <h3>Product Datasheets (no quotation recorded)</h3><ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.datasheets"/>
     <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Supplier / Source</th><th>Product / Model</th><th>MR</th><th>Datasheet</th><th>Unit Price</th></tr></thead><tbody>
@@ -121,14 +89,21 @@ export function VendorProductCatalog0553(){
     </tbody></table></div><p className="p55-note">Product Datasheet = manufacturer evidence; Project DTS = client requirement. Compare the two in TBE before selecting a product. Blank price is not zero.</p>
    </div>}
   <p><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products."+view+".quote-lines"}/></p>
-  <p className="p55-note">{catalog.relationships.length} source quotation lines · {rows.length} displayed (max 150). Quote-line identity is retained; duplicate SKUs across suppliers are not merged into costs.</p>
+  <p className="p55-note">{catalog.relationships.length} supplier quote lines and external/historical product references · {rows.length} displayed (max 150). All evidence classes share this product table; reference records are not supplier quotations. Original source quote-line identities are preserved.</p>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr>
-   <th>Supplier</th><th>Product / Model</th><th>MR</th><th>Quotation</th><th>Qty / Unit Rate</th><th>Project Selection</th>
+   <th>Supplier / Source Class</th><th>Product / Model &amp; Function</th><th>MR</th><th>Quotation / Reference From</th><th>Qty / Unit Price / UOM</th><th>Technical / Budgetary Gate</th>
   </tr></thead><tbody>{rows.map(r=>{
     const p=productsById.get(r.productKey);
-    return <tr key={r.id}><td>{suppliersById.get(r.vendorId)?.name}</td><td><strong>{p?.partNumber||"UNIDENTIFIED"}</strong><div>{p?.description}</div><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.vendor.products.quote-line."+r.id}/></td><td>{r.mr}</td>
-    <td><button type="button" className="p553-detail-button" onClick={()=>{setView("quote");setVendor(r.vendorId);setChosenQuote(r.quoteId);}}>{r.quotation}</button><div style={{fontSize:12}}>{r.priceStatus}</div></td><td>{r.quantity??"OPEN"} / {r.unitPrice??"OPEN"} {r.currency}</td><td>UNREVIEWED / NOT IN BOM</td></tr>
-   })}</tbody></table></div>
+    const isQuote=Boolean(r.quoteId);
+    return <tr key={r.id}>
+     <td><strong>{suppliersById.get(r.vendorId)?.name}</strong><small>{r.sourceClass||"SUPPLIER_QUOTATION"}</small></td>
+     <td><strong>{p?.partNumber||"UNIDENTIFIED"}</strong><div>{p?.description}</div><ComponentCopyId projectId="PJ2608-0553" componentKey={isQuote?"bid.vendor.products.quote-line."+r.id:r.referenceFrom}/></td>
+     <td>{r.mr}</td>
+     <td>{isQuote?<><button type="button" className="p553-detail-button" onClick={()=>{setView("quote");setVendor(r.vendorId);setChosenQuote(r.quoteId);}}>{r.quotation}</button><small>{r.priceStatus}</small></>:<><strong>Reference From</strong><small>{r.referenceFrom}</small><small>{r.referenceDocument||""}</small></>}
+      {(r.sourceUrl||(!isQuote&&r.source))&&<small><a href={r.sourceUrl||r.source} target="_blank" rel="noreferrer">Open original source</a></small>}</td>
+     <td>{r.quantity??"—"} / {Number.isFinite(r.unitPrice)?r.currency+" "+r.unitPrice.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT PRICED"} / {r.pricingUnit||"SOURCE UOM / REVIEW"}<small>{r.vat||""}</small></td>
+     <td><strong>{r.approvedForBudget?"SOURCE ELIGIBLE / ENGINEERING CHECK":"REFERENCE_ONLY / NOT SELECTED"}</strong><small>{r.technicalCompliance||"NOT VERIFIED"}</small><small>{r.scopeDriver||""}</small></td>
+    </tr>})}</tbody></table></div>
   {view==="compare"&&<p className="p55-note"><strong>Candidate comparison only:</strong> not a completed TBE/CBE. Review MR compliance and quote conditions before recommending an offer.</p>}
   <p className="p55-note"><strong>Release gate:</strong> Product selection requires MR/DTS compliance, datasheet/certification, configuration, supplier price validity and approved project decision. Historical/expired/alternative quotations never enter costing automatically.</p>
  </section>;
