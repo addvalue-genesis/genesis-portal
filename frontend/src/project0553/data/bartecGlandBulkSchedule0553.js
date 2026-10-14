@@ -5,13 +5,13 @@ import {selectBartecEnclosureBasis0553} from "./bartecEnclosureBasis0553";
 
 const SCADA_SITES=["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11"];
 const PHONE_SITES=["ZWP20","ZWP21","ZWP22","ZWP23"];
-const PHONE_MGW_QUOTED_SITES=new Set(["ZWP20","ZWP21","ZWP22"]);
+
 const EVIDENCE=Object.freeze({
  scadaMR:"MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 / MTO Rev04",
  phoneMR:"MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 / MTO Rev04",
  bartec:"21G1048t-BA-GA-100X_Z0.pdf (GA-1001/1002/1003 and GA-1004, 2022 as-built)",
  cable:"MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §6.6.2/6.6.3/6.6.4/6.6.5",
- supplier:"MGW P26-058 PHONE-1 (3 original ZWP20/21/22 package lines)"
+ supplier:"Selected EXION QT_1260576 + PROSPER Q-PROSRY-24051 item3 historical; MGW PHONE-1 excluded"
 });
 const cableCandidate=(id,description,from,to,cableType,designSource,ownership)=>Object.freeze({
  id,description,from,to,cableType,designSource,ownership,
@@ -83,11 +83,9 @@ export function deriveBartecGlandBulkSchedule0553(){
    interfaceRows:PHONE_CABLES,
    verifiedUsedEntries:null,verifiedActiveGlands:null,verifiedSparePlugs:null,
    requiredGlandsBySize:null,purchaseGlandsBySize:null,
-   includedPackageSource:PHONE_MGW_QUOTED_SITES.has(site)
-    ?"MGW PHONE-1 for ZWP20–22 includes a WAROM JB and CERTIFIED GLAND, but BARTEC selected JB differs; do not claim equivalent/included quantity until scope/brand reconciliation."
-    :"No MGW PHONE-1 ZWP23 line evidenced; do not assume vendor-included gland.",
-   source:EVIDENCE.phoneMR+" + "+EVIDENCE.bartec+(PHONE_MGW_QUOTED_SITES.has(site)?" + "+EVIDENCE.supplier:""),
-   status:"8_M20_HOLES_CONFIRMED__PHONE_SOUNDER_UPLINK_ENDS_PENDING__VENDOR_INCLUSION_GATED"
+   includedPackageSource:"PROSPER item3 historical BARTEC Ex e JB includes four M20 stopping plugs but does not prove three selected certified active glands; EXION phone/sounder separate; MGW WAROM JB/gland excluded.",
+   source:EVIDENCE.phoneMR+" + "+EVIDENCE.bartec+" + "+EVIDENCE.supplier,
+   status:"BUDGETARY_3_ENDS__PROSPER_4_M20_VS_GA_8_CONFLICT__GLAND_SKU_PENDING"
   });
   return {site,enclosures:rows};
  });
