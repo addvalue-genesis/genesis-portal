@@ -9,6 +9,11 @@ export const MR0003_PHONE_BULK_BASIS_0553=Object.freeze({
  historicalQuotedJbM20Entries:4,historicalQuotedJbStoppingPlugs:4,
  gaSelectedM20Entries:8,gaSelectedStoppingPlugs:8,
  sparePolicy:{minimumEntries:2,percentOfCapacity:20,ga1004SpareAtThreeActive:5},
+ vendorRateEvidence:{
+  m20Hawke:{sku:"501/453/UNIV/A/M20",supplier:"INNOVA",quotation:"QA24-0604 2024-07-15",rateTHB:1020,unit:"set",included:"locknut, earth tag, black nylon washer",compatibility:"CANDIDATE_ONLY__CABLE_OD_ARMOUR_EX_CERT_NOT_VERIFIED",url:"https://drive.google.com/file/d/1I4LhJY-heANsoV21uWMO6kUVioeokMUS/view"},
+  cat6aArmoured:{description:"TECKNIKABEL CAT6A S/FTP 4P23/7AWG GSWB SHF1",supplier:"INNOVA",quotation:"QA24-0604 2024-07-15",rateTHBPerM:524,compatibility:"SCADA_CABLE_PRICE_REFERENCE__NOT_ALL_MR0003_ROUTES",url:"https://drive.google.com/file/d/1I4LhJY-heANsoV21uWMO6kUVioeokMUS/view"},
+  cat6aUftp:{description:"APS AME LabLan U/FTP CAT6A 4P LSZH",quotation:"QA24-0605 2024-07-15",boxLengthM:305,rateTHBPerBox:46000,compatibility:"NOT_ARMOURED_EQUIVALENT_WITHOUT_SPEC_CHECK",url:"https://drive.google.com/file/d/1aynKyn90ucGBTDaDG_mYXMHJaowyBF6M/view"}
+ },
  accessories:[
   {id:"M20-ACTIVE-GLAND",qty:3,unit:"candidate pcs",costOwner:"FIELD_BULK",note:"OD, armour, Ex eb certificate and sealing range must match; no SKU selected"},
   {id:"M20-STOPPING-PLUG",qty:5,unit:"remaining fitted pcs",costOwner:"JB_PACKAGE",note:"GA-1004 includes 8 factory plugs; replace three positions only if three glands verified; no additive purchase"},
