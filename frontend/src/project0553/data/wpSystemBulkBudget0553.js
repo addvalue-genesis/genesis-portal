@@ -39,7 +39,7 @@ export function deriveWpSystemBulkBudget0553(){
     route:null,items:[
      {id:"EX-PHONE-JB",item:"Dedicated certified Ex e Telephone Junction Box assembly, terminals, earth studs, bracket, labels and blanking plugs",unit:"set",qty:phoneDerivation(w.wp)?1:null,rateTHB:22000,
       source:"Prosper Q-PROSRY-24051 Rev0 2024-07-12 item4 Telephone Terminal Box Zone1/2 07-56D2-0411 200x200x120, THB22000/set; historical Zawtika 1E only",
-      owner:"EX_PHONE_JB_ASSEMBLY",status:"MR0003_C1_1_JB_PER_SITE__PROSPER_ITEM4_HISTORICAL_COMPARABLE",
+      owner:"EX_PHONE_JB_SELECTED_PART_A_EQUIPMENT__NOT_ADDITIVE_BULK",status:"MR0003_C1_1_JB_PER_SITE__PROSPER_ITEM4_HISTORICAL_COMPARABLE",
       note:"Historical PROSPER item4 includes 3 M20 bottom cable entries plus separate drain, relay 07-7311-6371/3000, fuse terminals and internal wiring. GA-1004 is a different 8-top-entry configuration. Historical item4 quoted 3 sets in 1E; Z1F requires 4 — internal comparable price only. MGW PHONE-1 not selected."},
      {id:"EX-PHONE-JB-ENTRIES",item:"Certified glands, stopping plugs and interface accessories for telephone JB",unit:"candidate active entry",qty:phoneDerivation(w.wp)?.estimatedJbEntries??null,rateTHB:null,
       source:"BARTEC telephone JB historical GA and IEC/EN 60079-14 installation requirement",owner:"EX_PHONE_JB_ASSEMBLY_OR_EXTERNAL_BULK",
@@ -66,7 +66,7 @@ export function deriveWpSystemBulkBudget0553(){
     }))}
   ];
   return {wp:w.wp,systems:systems.map(sys=>({...sys,items:sys.items.map(it=>({
-   ...it,extendedTHB:it.owner==="DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE"?null:Number.isFinite(it.qty)&&Number.isFinite(it.rateTHB)?Math.round(it.qty*it.rateTHB*100)/100:null
+   ...it,extendedTHB:["DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE","EX_PHONE_JB_SELECTED_PART_A_EQUIPMENT__NOT_ADDITIVE_BULK"].includes(it.owner)?null:Number.isFinite(it.qty)&&Number.isFinite(it.rateTHB)?Math.round(it.qty*it.rateTHB*100)/100:null
   }))})),source:"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 AFC",raconPackage:RACON_VENDOR_SCOPE_0553,
    warning:"ZWP20 SCADA cable mirrors active Row11 (69m), never add twice. Other WP cable costs are new planning projections, not included in existing allocated location cost."};
  });
