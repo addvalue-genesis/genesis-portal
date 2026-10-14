@@ -38,8 +38,8 @@ export const MR0002_PRICE_REGISTRY_0553=Object.freeze([
  ...mgw.map(x=>({...x,id:"HISTORICAL-"+x.id,selected:false,selectionStatus:"SUPERSEDED_BY_MGW_P26_058_R2",priceType:"HISTORICAL_SUPERSEDED_QUOTATION"})),
  ...allowance.map(([id,qty,unit,unitRate,priceType,source,description])=>({
   id,supplier:"MANAGEMENT / WEB REFERENCE",manufacturer:"TO_BE_SELECTED",model:id,description,
-  currency:"THB",unitRate,qty,unit,source,priceType,selected:!["LNA-POWER","LNA-ALARM","RF-SMA","LNA-BOX"].includes(id),
-  selectionStatus:["LNA-POWER","LNA-ALARM","RF-SMA","LNA-BOX"].includes(id)?"SUPERSEDED_LNA_ONLY":"BUDGETARY_ONLY_OEM_CERTIFICATION_PENDING"
+  currency:"THB",unitRate,qty,unit,source,priceType,selected:!["LNA-POWER","LNA-ALARM","RF-SMA","LNA-BOX","EX-SURGE"].includes(id),
+  selectionStatus:id==="EX-SURGE"?"HISTORICAL_ALLOWANCE_SUPERSEDED_BY_UHF2_INCLUDED_POLYPHASER__EX_COMPLIANCE_UNVERIFIED":["LNA-POWER","LNA-ALARM","RF-SMA","LNA-BOX"].includes(id)?"SUPERSEDED_LNA_ONLY":"BUDGETARY_ONLY_OEM_CERTIFICATION_PENDING"
  }))
 ]);
 export const selectMR0002Rate0553=id=>MR0002_PRICE_REGISTRY_0553.find(x=>x.id===id);
