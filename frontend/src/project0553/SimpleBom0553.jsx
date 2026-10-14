@@ -8,6 +8,7 @@ import {ScadaPhysicalCompleteness0553} from "./ScadaPhysicalCompleteness0553";
 import {MR0001CostCloseout0553} from "./MR0001CostCloseout0553";
 import {getMR0001LocationCost0553} from "./data/mr0001LocationCostSummary0553";
 import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
+import {MGW_P26_058_R2_UHF_0553} from "./data/mgwP26058R2Uhf0553";
 import {BOM_READ_MODEL_0553} from "./data/bomReadModel0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
@@ -220,6 +221,17 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     ...(system==="MR-0001"?[{key:"vendor",label:"Vendor / Company",type:"select",value:vendor,onChange:setVendor,
      options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}]:[])
    ]}/>
+  {system==="MR-0002"&&<div className="p55-panel" data-component-key="bid.budget.bom.filters.mgw-r2" style={{padding:12,margin:"10px 0"}}>
+   <strong>UHF Vendor Evidence — MGW P26-058_R2</strong>
+   <p className="p55-note">Manufacturer/model from OEM datasheets; supplier package price from MGW R2 quotation. Quoted 3 sets allocated one each to ZWP20 / ZWP21 / ZWP22 for internal review. No separate component rate may be inferred from a bundled price.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Package</th><th>Manufacturer / Model (Datasheet)</th><th>Included scope</th><th>Quote Qty</th><th>USD / Set</th><th>USD Total</th></tr></thead><tbody>
+   {MGW_P26_058_R2_UHF_0553.lines.map(line=><tr key={line.id}><td>{line.id}</td><td>{line.manufacturer} / {line.model}</td><td>{line.componentInclusions.join("; ")}</td><td>{line.quantity}</td><td>{line.unitPriceUSD.toLocaleString("en-US",{minimumFractionDigits:2})}</td><td>{line.extendedUSD.toLocaleString("en-US",{minimumFractionDigits:2})}</td></tr>)}
+   <tr><td colSpan={5}><strong>UHF equipment (three sites)</strong></td><td><strong>{MGW_P26_058_R2_UHF_0553.equipmentTotalUSD.toLocaleString("en-US",{minimumFractionDigits:2})}</strong></td></tr>
+   <tr><td colSpan={5}>MGW services — separately scoped; not included in equipment allocation</td><td>{MGW_P26_058_R2_UHF_0553.servicesTotalUSD.toLocaleString("en-US",{minimumFractionDigits:2})}</td></tr>
+   <tr><td colSpan={5}><strong>Overall R2 quotation (USD)</strong></td><td><strong>{MGW_P26_058_R2_UHF_0553.overallTotalUSD.toLocaleString("en-US",{minimumFractionDigits:2})}</strong></td></tr>
+   </tbody></table></div>
+   <p className="p55-note">Selected location: {site==="ALL"?"All 3 quoted sites":site}. {["ZWP20","ZWP21","ZWP22"].includes(site)?"Allocated UHF equipment USD "+(MGW_P26_058_R2_UHF_0553.equipmentTotalUSD/3).toLocaleString("en-US",{minimumFractionDigits:2}):"No additional UHF equipment allocation outside the 3 quoted sites."} Existing MR0002 site ledger must reconcile separately; this is quotation evidence, not an extra additive total. Ex d enclosure, surge protector, clamps, feeder and connectors included in their respective packages must not be posted twice.</p>
+  </div>}
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"BOM Working Table — "+system+" / "+(site==="ALL"?"All Locations":site)} description="System × Location × MTO summary, source evidence and working cost" defaultOpen>
   {["MR-0002","MR-0003","MR-0004"].includes(system)?<UnifiedMrLocationTable0553 mr={system} site={site} fx={fx}/>:<>
   <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
