@@ -1,0 +1,18 @@
+const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
+const root=path.resolve(__dirname,"..");
+const read=p=>fs.readFileSync(path.join(root,"src/project0553",p),"utf8");
+const engine=read("data/workingBomAggregation0553.js");
+const location=read("UnifiedMrLocationTable0553.jsx");
+const mapping=read("EstimateToBidMapping0553.jsx");
+assert(engine.includes('import {BOM_READ_MODEL_0553}'));
+assert(engine.includes("r.detailRows?.length?r.detailRows.map"));
+assert(engine.includes("(r.evidence||[]).map"));
+assert(engine.includes("item.countedInWorkingTotal===true&&Number.isFinite(item.extended)"));
+assert(engine.includes("MR-0001")&&engine.includes("MR-0004"));
+assert(location.includes("selectWorkingBomProjection0553({mr,site})"));
+assert(mapping.includes("workingBomByCustomerA0553()"));
+assert(mapping.includes("compareAEquipmentToLocation0553()"));
+assert(!mapping.includes("grossTHB-a5"));
+assert(mapping.includes("NOT ADDITIVE"));
+console.log("PASS 0553 shared aggregation plumbing: per-MR/per-location parity and no blind A5 subtraction");
+console.log("NOTE dynamic totals, underlying evidence and FX require npm/build and reconciliation runtime verification.");
