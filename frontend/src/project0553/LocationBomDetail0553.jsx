@@ -60,7 +60,7 @@ export function LocationBomDetail0553({site,fx}){
      {(site==="ZWP20"&&v.tag==="ANT-502-001")&&<p className="p55-note"><strong>SI Management Working Basis:</strong> {WORKING_POLICY.workingDecisions[0].state}. 4ft is the preferred budgetary alternative, subject to link and reflection proof. Same Customer TAG applies; any changes to mounting/route are tracked through installation drawings and cost drivers.</p>}
      {(site==="ZWP20"&&["MR-502-001","MR-502-001A","LAN-502-001"].includes(v.tag))&&<p className="p55-note"><strong>ZPQ Existing NMS Interface:</strong> {WORKING_POLICY.workingDecisions[2].state}. Existing NMS assumed; available licences are not verified. Configure and test extension as scope; any incremental entitlements require a sourced scenario or documented commercial qualification, not an assumed zero rate.</p>}
 
-     <TagFourStageWorkbench0553 site={site} tagRow={v} moduleKey={tagKey(v)}>
+     <TagFourStageWorkbench0553 site={site} tagRow={v} moduleKey={tagKey(v)} fx={fx}>
      {site==="ZWP20"&&v.tag==="MR-502-001"&&v.row===4&&<TagMappingAudit0553/>}
      {(()=>{const trace=traceTagParticular0553(site,v.tag);const rows=[...trace.direct,...trace.siteSpecific];return <ControlledModuleSection0553 moduleKey={tagKey(v)+".particular-evidence"} title={"RFQ Particular Evidence / SI Engineering Proof — "+trace.direct.length+" TAG + "+trace.siteSpecific.length+" Site + "+trace.common.length+" Common; "+trace.conflicts.length+" Conflict Gates"}>
       <p className="p55-note">Requirements derive from MR/BOD/DTS/SPE/RPT/BLD. Clause evidence is independent from existing priced vendor/quantity ledger. Review every linked note, comment and attachment; show applicable common constraints in 04 Documents.</p>
