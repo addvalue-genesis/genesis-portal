@@ -11,7 +11,7 @@ const EVIDENCE=Object.freeze({
  phoneMR:"MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 / MTO Rev04",
  bartec:"21G1048t-BA-GA-100X_Z0.pdf (GA-1001/1002/1003 and GA-1004, 2022 as-built)",
  cable:"MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §6.6.2/6.6.3/6.6.4/6.6.5",
- supplier:"Selected EXION QT_1260576 + PROSPER Q-PROSRY-24051 item3 historical; MGW PHONE-1 excluded"
+ supplier:"Selected EXION QT_1260576 + PROSPER Q-PROSRY-24051 item4 historical; MGW PHONE-1 excluded"
 });
 const cableCandidate=(id,description,from,to,cableType,designSource,ownership)=>Object.freeze({
  id,description,from,to,cableType,designSource,ownership,
@@ -83,9 +83,9 @@ export function deriveBartecGlandBulkSchedule0553(){
    interfaceRows:PHONE_CABLES,
    verifiedUsedEntries:null,verifiedActiveGlands:null,verifiedSparePlugs:null,
    requiredGlandsBySize:null,purchaseGlandsBySize:null,
-   includedPackageSource:"PROSPER item3 historical BARTEC Ex e JB includes four M20 stopping plugs but does not prove three selected certified active glands; EXION phone/sounder separate; MGW WAROM JB/gland excluded.",
+   includedPackageSource:"Selected PROSPER historical item4 07-56D2-0411 has 3 M20 bottom entries + 3 factory stopping plugs and separate drain; fitted active Ex glands NOT quoted as separate equipment. GA-1004 eight top-hole drawing is a distinct conflicting arrangement. EXION phone/sounder separate; MGW excluded.",
    source:EVIDENCE.phoneMR+" + "+EVIDENCE.bartec+" + "+EVIDENCE.supplier,
-   status:"BUDGETARY_3_ENDS__PROSPER_4_M20_VS_GA_8_CONFLICT__GLAND_SKU_PENDING"
+   status:"BUDGETARY_3_ENDS__PROSPER_ITEM4_3_BOTTOM_M20_VS_GA_8_TOP_M20_CONFLICT__GLAND_SKU_PENDING"
   });
   return {site,enclosures:rows};
  });
