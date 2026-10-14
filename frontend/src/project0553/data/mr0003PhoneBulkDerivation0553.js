@@ -28,7 +28,7 @@ export const MR0003_PHONE_BULK_BASIS_0553=Object.freeze({
  provisionalJbCableEntryCount:3,
  provisionalJbGlandCount:3,
  provisionalUnoccupiedEntriesOnQuotedJb:1,
- provisionalUnoccupiedEntriesOnGaAlternative:5,
+ provisionalUnoccupiedEntriesOnSelectedGa:5,
  qualification:"Only when each of 3 candidate routes is a single cable entering selected TCAB-504-001. Additional separated DC, Ethernet, relay or sounder returns increase the number; direct field wiring may decrease JB count.",
  procurementGlandQty:null,
  verifiedGlandSku:null,
@@ -37,7 +37,7 @@ export const MR0003_PHONE_BULK_BASIS_0553=Object.freeze({
  pricedMaterialTHB:null,
  vendorIncludedActiveGlands:null,
  rule:"Count distinct cable ends physically entering JB; choose certified Ex gland by actual cable OD/armouring/Ex e assembly and supplier-provided gland list; do not price stopping plugs or drilled capacity as active glands",
- conflictWithPrevious:"MGW PHONE-1/WAROM JB not selected. No deduction of MGW included gland for PROSPER-selected BARTEC JB. Item4 includes relay, fuse terminals, stopping plugs and internal wiring; do not separately price these package components."
+ conflictWithPrevious:"MGW PHONE-1/WAROM JB not selected. No deduction of MGW included gland for PROSPER-selected BARTEC JB. PROSPER Item3 historical includes two UT2.5 terminal blocks, PE terminal, four fitted plugs and drain valve; GA-1004 has eight factory plugs, locknuts and terminals. Do not double-count those inclusions, and do not treat 4-entry quote rate as confirmed 8-entry configuration pricing."
 });
 export function deriveMR0003PhoneBulk0553(site){
  if(!MR0003_PHONE_BULK_BASIS_0553.scopeSites.includes(site))return null;
