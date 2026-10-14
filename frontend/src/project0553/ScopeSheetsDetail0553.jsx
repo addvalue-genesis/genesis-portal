@@ -74,7 +74,10 @@ export function ScopeSheetsDetail0553({fx=null}){
   <div className="p55-eyebrow">6 ORIGINAL SHEETS <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
   <h3>Scope of Supply — Linked Internal Detail</h3>
   <p className="p55-note">Original uploaded workbook has 6 tabs, including unpriced template cells. Historical Rev08 amounts below are kept separate from original cells, current vendor cost and new bid selling price.</p>
-  <div className="p55-filterbar"><label>Customer Workbook Sheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{SHEETS.map(v=><option value={v[0]} key={v[0]}>{v[0]}</option>)}</select></label></div>
+  <div className="p55-filterbar" role="group" aria-label="Customer Workbook Sub-modules">
+   {SHEETS.map(([name,code,description])=><button key={name} type="button" className={sheet===name?"is-active":""} onClick={()=>setSheet(name)} title={description} aria-pressed={sheet===name}>{name}</button>)}
+  </div>
+  <p className="p55-note"><strong>Selected sheet:</strong> {sheet} · <ComponentCopyId projectId="PJ2608-0553" componentKey={sheet==="Scope of supply"?"bid.budget.scope":"bid.budget.scope."+category[1].toLowerCase()}/> · Rev08 historical detail is reference only, not current vendor cost or an authorized sell price.</p>
   <p className="p55-note">{category[2]}</p>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Working Unit Cost THB / LS</th><th>Working Budgetary Cost THB</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
   <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
