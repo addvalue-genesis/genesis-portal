@@ -25,10 +25,12 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    countedInWorkingTotal:["UHF-2","UHF-3","UHF-4"].includes(id)
   }));
   const r2Bda=selectMR0002Rate0553("UHF-1");
-  const rfiBda={id:site+"-RFI-BDA",site,mr:"MR-0002",tag:"TCAB-508-001",
+  const quoteUhf1=MGW_P26_058_R2_UHF_0553.lines.find(x=>x.id==="UHF-1");
+  if(!quoteUhf1||!r2Bda||r2Bda.unitRate!==quoteUhf1.unitPriceUSD||r2Bda.unitRate!==31474||r2Bda.source!==MGW_P26_058_R2_UHF_0553.id)throw Error("MR0002 RFI-BDA must match MGW P26-058_R2 UHF-1 supplier quote");
+  const rfiBda={id:site+"-RFI-BDA",site,mr:"MR-0002",tag:"TCAB-508-001",quoteLine:"UHF-1",
    sku:r2Bda.model,description:r2Bda.description,
    qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:"USD",
-   unitCost:r2Bda.unitRate,extended:siteTags.has("TCAB-508-001")?r2Bda.unitRate:null,
+   unitCost:quoteUhf1.unitPriceUSD,extended:siteTags.has("TCAB-508-001")?quoteUhf1.unitPriceUSD:null,
    source:MGW_P26_058_R2_UHF_0553.id,sourceQuoteQty:r2Bda.quoteQty,
    status:"MGW_R2_QUOTED_RFI_BDA_AND_WAROM_EXD_BUNDLE__FINAL_TECHNICAL_REVIEW_REQUIRED",
    owner:"MGW_UHF1_RFI_WAROM_BUNDLED_PACKAGE",countedInWorkingTotal:true,
