@@ -34,11 +34,11 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    referenceSiteQty:3,referenceQtyBasis:"MR0002 C1 one set each ZWP20/21/22; not a confirmed RFI purchase quantity",
    note:"RFI BD Series is Base Offer. BD3840-0000-24 is conditional ordering candidate, not fixed SKU. Ex d IP66 full assembly and RF/thermal certification mandatory. MGW HYTERA USD13674 is OTHER-BRAND benchmark, not RFI quote. RX3852 LNA is non-additive superseded reference."};
   const enclosure={id:site+"-RFI-BDA-EXD-ENCLOSURE",site,mr:"MR-0002",tag:"TCAB-508-001",sku:null,
-   description:"BARTEC EJB-7 Ex d IP66 assembly budget reference (RF feedthroughs not costed)",qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:"THB",unitCost:selectMR0002Rate0553("RFI-BDA-EXD-ENCLOSURE").unitRate,extended:siteTags.has("TCAB-508-001")?selectMR0002Rate0553("RFI-BDA-EXD-ENCLOSURE").unitRate:null,
+   description:"BARTEC EJB-7 Ex d IP66 assembly budget reference (RF feedthroughs not costed)",qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:"THB",unitCost:null,extended:null,
    source:"DTS-0002 C1 sheets 4/6; SPE-0001 C2; BDA size 620x450x270 mm",
-   status:"ACTIVE_HISTORICAL_BUDGET_PROXY__EXD_ASSEMBLY_SIZE_AND_HEAT_UNVERIFIED",owner:"BARTEC_BDA_ENCLOSURE_BUDGET_OWNER",countedInWorkingTotal:true,
-   referenceMarketEUR:RFI_BDA_SELECTION_0553.pricingBenchmark.exDEnclosureMarketEUR,
-   note:"Benchmarked EUR price is not a selected compatible enclosure. Confirm internal clearances, 24V load, thermal rating, certified RF and DC penetrations, glands, stopping plugs, IP66 and assembly certificate."};
+   status:"SELECTED_EJB7_ENCLOSURE__PRICE_UNVERIFIED__HISTORICAL_PANEL_THB436100_NOT_COMPARABLE",owner:"BARTEC_BDA_ENCLOSURE_BUDGET_OWNER",countedInWorkingTotal:false,
+   referenceMarketEUR:RFI_BDA_SELECTION_0553.pricingBenchmark.exDEnclosureMarketEUR,historicalProsperAssembledPanelTHB:436100,
+   note:"Do not use historical THB436100 TETRA assembled panel as EJB7 empty enclosure cost. BARTEC EJB7 is 248kg class and needs a separately scoped engineered assembly quote; exact price not verified. Confirm internal clearances, 24V load, thermal rating, certified penetrations, glands, IP66 and assembly certificate."};
   const glandBasis=RFI_BDA_SELECTION_0553.glandBudgetDesign;
   const gland={id:site+"-BDA-M20-GLANDS",site,mr:"MR-0002",tag:"TCAB-508-001-M20",sku:glandBasis.model,
    description:"M20 Ex-rated Hawke armoured-cable gland, including locknut earth tag washer",
