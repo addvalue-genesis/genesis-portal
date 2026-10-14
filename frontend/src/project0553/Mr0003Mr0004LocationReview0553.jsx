@@ -5,6 +5,7 @@ import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
 import {deriveRaconTerminationBudget0553} from "./data/raconTerminationBudget0553";
 import {MR0003_MR0004_SCOPE_C1,mrScopeAt0553} from "./data/mr0003Mr0004ScopeC1";
 import {MR0003_SELECTED_PRICE_0553} from "./data/mr0003SelectedPrice0553";
+import {deriveMR0003ProductLedger0553} from "./data/mr0003ProductCostLedger0553";
 import {MR0004_SELECTED_PRICE_0553} from "./data/mr0004SelectedPrice0553";
 
 const SITES=["ZWP20","ZWP21","ZWP22","ZWP23"];
@@ -12,10 +13,12 @@ const fmt=v=>Number.isFinite(v)?v.toLocaleString("en-US",{minimumFractionDigits:
 export function Mr0003Mr0004LocationReview0553(){
  const bulk=deriveWpSystemBulkBudget0553(),racon=deriveRaconTerminationBudget0553();
  const phoneBasis=MR0003_SELECTED_PRICE_0553;
+ const phoneLedger=deriveMR0003ProductLedger0553();
  const raconBasis=MR0004_SELECTED_PRICE_0553;
  return <section className="p55-panel" data-component-key="bid.budget.bom.mr0003-mr0004.zwp20-21-22-23" style={{padding:14}}>
   <h3>MR0003 / MR0004 — ZWP20 Reference → ZWP21, ZWP22, ZWP23 <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.mr0003-mr0004.zwp20-21-22-23"/></h3>
   <p className="p55-note">MR0001 is management-reviewed and unchanged. Source facts and budget assumptions are distinct. MR0003 C1 requires 4 telephone systems including ZWP23; MR0004 C1 requires RACON only on ZWP20/21/22. Layout absence is not a scope exclusion.</p>
+  <p className="p55-note"><strong>MR0003 Part A equipment budgetary subtotal: THB {fmt(phoneLedger.equipmentReferenceTHB)} across four platforms.</strong> EXION phone/sounder quoted, PROSPER Item 3 historical four-entry JB reference for eight-entry GA-1004. Cable/gland/accessories unpriced: TOTAL PART A NOT CLOSED. JB bulk mirror is non-additive.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Location</th><th>MR</th><th>AFC evidence</th><th>Vendor price evidence</th><th>Cost ownership / missing proof</th></tr></thead><tbody>
    {SITES.flatMap(site=>{
     const w=Z1F_TEL_LAYOUT_INDEX_0553.byWP.find(x=>x.wp===site);
