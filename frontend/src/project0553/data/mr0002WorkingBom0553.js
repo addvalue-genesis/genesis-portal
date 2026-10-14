@@ -33,7 +33,11 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    sku:RFI_BDA_SELECTION_0553.model,description:"RFI BD Series UHF Bi-Directional Amplifier 380-520 MHz; exact subband/options unresolved",
    qty:null,unit:"set",currency:null,unitCost:null,extended:null,source:RFI_BDA_SELECTION_0553.document,
    status:RFI_BDA_SELECTION_0553.status,owner:"RFI_BDA_NEW_SELECTED_FAMILY_NOT_HYTERA_UHF1",countedInWorkingTotal:false,
-   note:"New BDA family replaces excluded MGW UHF-1 HYTERA model. Exact variant, RF topology, quantity, hazardous-area suitability and current quote must be checked. Separate RFI LNA retained without double count."};
+   benchmarkUSDPerSite:RFI_BDA_SELECTION_0553.pricingBenchmark.historicalMGWHyteraUSD,
+   benchmarkSource:RFI_BDA_SELECTION_0553.pricingBenchmark.basis,
+   enclosureMarketReferenceEUR:RFI_BDA_SELECTION_0553.pricingBenchmark.exDEnclosureMarketEUR,
+   referenceSiteQty:3,referenceQtyBasis:"MR0002 C1 one set each ZWP20/21/22; not a confirmed RFI purchase quantity",
+   note:"Candidate RFI BD3840-0000-24 only if real TX/RX plan permits; Ex d IP66 certified assembly and RF thermal assessment required. MGW HYTERA USD13674 is OTHER-BRAND benchmark, not selected RFI vendor price. Separate LNA retained pending RF topology."};
   // Reuse prior bulk calculation; never create a second cost model.
   // MGW UHF-4 includes 100m feeder and six connectors per set; exclude overlapping field cable/connectors.
   const priorBulk=budgetBulk.find(x=>x.wp===site);
