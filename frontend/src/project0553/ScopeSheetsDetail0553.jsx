@@ -2,6 +2,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {derivePartBcWorkingWbs0553} from "./data/partBCWorkingWbs0553";
+import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {BULK_TAKEOFF_0553} from "./data/bulkTakeoff0553";
 import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
 import {deriveScadaBudgetEnvelope0553} from "./data/scadaBudgetEnvelope0553";
@@ -67,6 +68,7 @@ export function ScopeSheetsDetail0553({fx=null}){
  const phoneRateLines=phoneRows.flatMap(r=>r.evidence||[]).filter(x=>["PHONE-1","SOUNDER-1","JB-1"].includes(x.line)&&x.currency==="THB"&&Number.isFinite(x.extended));
  const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
  const partBC=derivePartBcWorkingWbs0553();
+ const scopeBC=selectScopePartBcWorking0553();
  // All four Scope A lines read the very same projection used by the
  // System x Location x MTO Working BOM screen. No parallel supplier-rate path.
  const sourceMrProjection={
@@ -120,14 +122,16 @@ export function ScopeSheetsDetail0553({fx=null}){
   <p className="p55-note">{category[2]}</p>
   <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Working Unit Cost THB / LS</th><th>Working Budgetary Cost THB</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
   <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
-   const control=partBC.rows.find(r=>r.code===id);
-   const item=workingSummary[id]||(control?{amount:control.sellTHB,status:control.state,source:control.driver+" · "+control.owner+" · "+control.source}:null),amount=item?.amount;
+   const control=scopeBC.lines[id]||null;
+   const item=workingSummary[id]||(control?{amount:control.amountTHB,
+    status:control.priceType+" · "+control.priceStatus+" · "+control.requirement,
+    source:control.basis+" · OWNER: "+control.owner+" · "+control.source+" · EQUATIONS: "+(control.equations.join(", ")||"source schedule required")}:null),amount=item?.amount;
    const unavailable=id==="A5"?"A5 source/ledger reconciliation required":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
-    control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (working basis)";
+    control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>{qtyDisplay}</td>
-    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitPriceTHB)?cash(control.unitPriceTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
-    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(amount)?cash(amount):control?"Owner / OEM quotation required":unavailable}</td>
+    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
+    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(amount)?(control?"WORKING SELL "+cash(amount):cash(amount)):control?"Current owner / OEM price not established":unavailable}</td>
     <td>{item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(([desc,qty,price],i)=>{
    // Historical template numbers are customer-facing Rev08 prices, not present-day supplier cost.
@@ -135,7 +139,7 @@ export function ScopeSheetsDetail0553({fx=null}){
    return <tr key={i}><td>{category[1]}-{i+1}</td><td>{desc}</td><td>{qty}</td>
     <td className="is-number">{Number.isFinite(rate)?cash(rate):"Awaiting FX"}</td>
     <td className="is-number">{Number.isFinite(rate)?cash(round(qty*rate)):"Awaiting FX"}</td>
-    <td>Rev08 customer-price equivalent converted to THB — historical comparison ONLY, not working supplier cost</td></tr>;
+    <td>HISTORICAL Rev08 customer-price equivalent only; current B/C supplier price and SKU/quantity reconciliation NOT ESTABLISHED</td></tr>;
   })}</tbody></table></div>
   {sheet==="Scope of supply"&&<details className="p55-panel" data-component-key="bid.budget.scope.a5" open={false}>
    <summary style={{cursor:"pointer",fontWeight:700}}>A5 Bulk Materials — Source-MTO Price Attribution / Drill-down ({a5.rowCount} lots)</summary>
@@ -169,7 +173,7 @@ export function ScopeSheetsDetail0553({fx=null}){
     </tbody></table></div>
    </details>
   </details>}
-  {sheet==="Scope of supply"&&<p className="p55-note"><strong>Part B ADDVALUE Working Sell:</strong> {cash(partBC.subtotalTHB)} from Rev05 WBS, not internal direct cost or full SAMTEL client price. B4–B7, B10–B14 and C1–C2 are owner-controlled excluded/optional lines; unresolved owner quotation must NOT be interpreted as zero. <a href={partBC.sourceUrl} target="_blank" rel="noreferrer">WBS Rev05 original</a>.</p>}
+  {sheet==="Scope of supply"&&<p className="p55-note"><strong>Part B ADDVALUE Working Sell (B1/B2/B3/B8/B9 only):</strong> {cash(scopeBC.knownAddvalueWorkingSellTHB)} from source-linked Rev05 WBS, not internal direct cost or full SAMTEL client price. Unpriced B/C amounts are unknown, never zero. B4–B7, B10–B14 and C1–C2 are owner-controlled excluded/optional lines; unresolved owner quotation must NOT be interpreted as zero. <a href={partBC.sourceUrl} target="_blank" rel="noreferrer">WBS Rev05 original</a>.</p>}
   {sheet==="Scope of supply"&&<section className="p55-panel" data-component-key="bid.budget.scope.scada-working">
    <h4>MR-0001 SCADA — Engineering BOM &amp; Bulk Budgetary Working Projection</h4>
    <p className="p55-note"><strong>Live derivation:</strong> existing MR0001 tag Cost Ledger → 16-function bulk verification → budget envelope. This is not a new cost ledger and does not modify customer Rev08. Original currencies retained; FX {fx?.thbPerUsd??"REQUIRED"} THB/USD, source {fx?.source||"not entered"}. Brownfield is budgeted as new replacement only. Accessories are segregated from Base, not silently merged or double counted.</p>
