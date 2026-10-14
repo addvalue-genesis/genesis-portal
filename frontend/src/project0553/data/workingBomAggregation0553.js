@@ -32,7 +32,7 @@ export function selectWorkingBomProjection0553({mr="ALL",site="ALL"}={}){
   tag:item.tag||item.id||null,currency:item.currency||null,
   extended:item.extended,source:item.source||null,owner:item.owner||null,
   scenarioEvidence:Boolean(item.scenarioEvidence),
-  counted:item.countedInWorkingTotal===true&&Number.isFinite(item.extended),
+  counted:item.countedInWorkingTotal===true&&Number.isFinite(item.extended)&&!item.priceInclusion&&!item.parentPackage,
   item
  })));
  const currencies={};
@@ -41,7 +41,8 @@ export function selectWorkingBomProjection0553({mr="ALL",site="ALL"}={}){
   if(!x.currency)continue;
   currencies[x.currency]=Math.round(((currencies[x.currency]||0)+x.extended)*100)/100;
  }
- return {rows,lines,currencies,priced:lines.filter(x=>x.counted).length,
+ const invalidPosting=lines.filter(x=>x.item.countedInWorkingTotal===true&&(!Number.isFinite(x.extended)||!x.currency||Boolean(x.item.priceInclusion)));
+ return {rows,lines,currencies,invalidPosting,priced:lines.filter(x=>x.counted).length,
   unresolved:lines.filter(x=>!x.counted||!x.currency).length,
   scenario:lines.some(x=>x.scenarioEvidence),
   orphanCurrency:lines.filter(x=>x.counted&&!x.currency).length,
