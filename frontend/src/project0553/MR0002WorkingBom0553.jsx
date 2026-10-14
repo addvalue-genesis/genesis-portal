@@ -32,7 +32,7 @@ export function MR0002WorkingBom0553({fx=null}){
     <thead><tr><th>Tag / Item</th><th>SKU / Description</th><th>Qty</th><th>Original Currency</th><th>Unit Rate (THB)</th><th>Extended (THB)</th><th>Owner / Evidence</th><th>Status</th><th>Copy ID</th></tr></thead>
     <tbody>{group.items.map(item=><tr key={item.id}><td>{item.tag}<small>{itemModuleId(item)}</small></td><td>{item.sku||"—"}<small>{item.description}</small></td>
      <td>{item.qty??"PENDING"} {item.unit}</td><td>{item.currency||"TBC"}</td><td>{thb(item.unitCost,item.currency)}<small>{Number.isFinite(item.unitCost)?"Original: "+(item.currency||"—")+" "+money(item.unitCost):item.priceInclusion?"Included in parent package — no separate vendor rate":"No sourced unit rate"}</small></td>
-     <td>{item.countedInWorkingTotal?thb(item.extended,item.currency):(item.displayPrice||"NOT ADDITIVE / TECHNICAL REVIEW")}</td><td>{item.owner}<small>{item.source}</small></td><td>{item.status}{item.note&&<small>{item.note}</small>}</td>
+     <td>{item.countedInWorkingTotal?thb(item.extended,item.currency):includedPrice(item)}</td><td>{item.owner}<small>{item.source}</small></td><td>{item.status}{item.note&&<small>{item.note}</small>}</td>
      <td><ComponentCopyId projectId="PJ2608-0553" componentKey={itemModuleId(item)+".evidence"}/></td></tr>)}</tbody></table></div>}
    <p className="p55-note">THB conversion: {validFx?fx.thbPerUsd+" THB/USD · "+(fx.date||"DATE NOT VERIFIED")+" · "+(fx.source||"SOURCE NOT VERIFIED"):"FX REQUIRED"}; original supplier USD values are preserved for evidence. Included packages are not additive.</p>
    <RfFeederEvidence0553 group={group}/>
