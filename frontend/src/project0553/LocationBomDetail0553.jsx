@@ -1,4 +1,5 @@
 import React,{useState} from "react";
+import {bomPriceTHB0553} from "./bomPresentationContract0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
 import {TagFourStageWorkbench0553} from "./TagFourStageWorkbench0553";
@@ -19,7 +20,7 @@ export function LocationBomDetail0553({site,fx}){
  const bulk=deriveSevenLocationCostLedger0553().find(v=>v.wp===site);
  const bulkRows=(bulk?.rows||[]).filter(v=>v.system==="SCADA_RADIO");
  const fxValid=fx?.thbPerUsd>0;
- const thb=(n,c)=>!Number.isFinite(n)?"PENDING":c==="THB"?"THB "+fmt(n):c==="USD"&&fxValid?"THB "+fmt(n*fx.thbPerUsd):"FX REQUIRED";
+ const thb=(n,c)=>bomPriceTHB0553(n,c,fx).label;
  const totalTHB=fxValid?ledger.subtotals.THB+ledger.subtotals.USD*fx.thbPerUsd:null;
  const keyPrefix="bid.budget.bom."+site.toLowerCase();
  const tagKey=v=>keyPrefix+"."+String(v.tag).toLowerCase().replace(/[^a-z0-9-]/g,"-")+"."+v.row;
