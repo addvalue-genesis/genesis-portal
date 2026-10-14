@@ -44,10 +44,24 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    status:"BASE_OFFER_REQUIRED__ENCLOSURE_EXD_ASSEMBLY_SIZING_HEAT_AND_OEM_QUOTE_PENDING",owner:"RFI_BDA_ENCLOSURE_ASSEMBLY__NON_ADDITIVE_UNTIL_PACKAGE_RECONCILED",countedInWorkingTotal:false,
    referenceMarketEUR:RFI_BDA_SELECTION_0553.pricingBenchmark.exDEnclosureMarketEUR,
    note:"Benchmarked EUR price is not a selected compatible enclosure. Confirm internal clearances, 24V load, thermal rating, certified RF and DC penetrations, glands, stopping plugs, IP66 and assembly certificate."};
+  const glandBasis=RFI_BDA_SELECTION_0553.glandBudgetDesign;
+  const gland={id:site+"-BDA-M20-GLANDS",site,mr:"MR-0002",tag:"TCAB-508-001-M20",sku:glandBasis.model,
+   description:"M20 Ex-rated Hawke armoured-cable gland, including locknut earth tag washer",
+   qty:siteTags.has("TCAB-508-001")?glandBasis.estimatedActivePerSite:null,unit:"set",currency:"THB",unitCost:glandBasis.ratePerSet,
+   extended:siteTags.has("TCAB-508-001")?glandBasis.indicativeRatePerSiteTHB:null,source:glandBasis.source,
+   priceBasis:"HISTORICAL_BUDGETARY_MATCH_PENDING",status:glandBasis.status,
+   owner:"BDA_FIELD_GLAND_BUDGET_SCENARIO__VENDOR_PACKAGE_DEDUCTION_REQUIRED",countedInWorkingTotal:false,
+   entryCapacity:glandBasis.dtsNominalM20EntryCapacity,spareStoppingPlugs:glandBasis.estimatedSparePlugsPerSite,
+   note:"2 active M20 DC/control candidate entries + 2 spare certified plugs (not 4 glands); indicative THB2040/WP. Ex d, cable OD, installed gland certificates and BARTEC inclusions must be checked. RF N-type ports require separately qualified RF feedthroughs."};
+  const rfFeedthrough={id:site+"-BDA-RF-FEEDTHROUGHS",site,mr:"MR-0002",tag:"TCAB-508-001-RF",sku:null,
+   description:"Ex d assembly-approved N-type RF feedthroughs and RF surge/interconnect package",qty:siteTags.has("TCAB-508-001")?2:null,unit:"candidate RF ports",currency:null,unitCost:null,extended:null,
+   source:"RFI BD Series N(f) RF ports; DTS-0002 C1 Ex d and two RF surge paths",status:"TWO_RF_PATHS_DERIVED__OEM_CERTIFIED_PENETRATION_SKU_PRICE_OPEN",owner:"BDA_RF_FEEDTHROUGH__PACKAGE_INCLUSION_CHECK",countedInWorkingTotal:false,
+   note:"Two donor/service RF ports are budgetary interface basis, not confirmed enclosure penetrations. Account for Ex d approved coupling, RF SPD and no duplication with TCAB-508-002 or MGW UHF-4 feeder kit."};
   // Reuse prior bulk calculation; never create a second cost model.
   // MGW UHF-4 includes 100m feeder and six connectors per set; exclude overlapping field cable/connectors.
   const priorBulk=budgetBulk.find(x=>x.wp===site);
   const overlapping=new Set(["RF-FEEDER","RF-CONNECTOR"]);
+  const obsoleteLnaBulk=new Set(["RF-SMA","LNA-POWER","LNA-ALARM"]);
   const fieldBulk=(priorBulk?.rows||[]).filter(b=>!overlapping.has(b.id)).map(b=>{
    const duplicate=overlapping.has(b.id);
    const allowance=selectMR0002Rate0553(b.id);
@@ -56,19 +70,21 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
     description:b.item,qty:allowance?.qty??b.qty,unit:allowance?.unit??b.unit,currency:"THB",unitCost:allowance?.unitRate??b.rate,
     extended:allowance?Math.round(allowance.qty*allowance.unitRate*100)/100:b.amount??null,source:allowance?.source??b.source,
     priceBasis:allowance?.priceType??"EXISTING_PRIOR_BULK_CALCULATION",
-    status:duplicate?"INCLUDED_IN_MGW_UHF4__NOT_ADDITIVE":allowance?"BUDGETARY_ALLOWANCE_SUBJECT_TO_INTERFACE_CONFIRMATION":b.state,
-    owner:duplicate?"MGW_UHF4_INCLUDED":"FIELD_BULK_PREVIOUS_BUDGET",
-    countedInWorkingTotal:!duplicate&&priceKnown,
+    status:obsoleteLnaBulk.has(b.id)?"SUPERSEDED_LNA_INTERFACE__BDA_REDESIGN_REQUIRED":duplicate?"INCLUDED_IN_MGW_UHF4__NOT_ADDITIVE":allowance?"BUDGETARY_ALLOWANCE_SUBJECT_TO_INTERFACE_CONFIRMATION":b.state,
+    owner:obsoleteLnaBulk.has(b.id)?"HISTORICAL_LNA_BULK_NOT_ADDITIVE":duplicate?"MGW_UHF4_INCLUDED":"FIELD_BULK_PREVIOUS_BUDGET",
+    countedInWorkingTotal:!duplicate&&!obsoleteLnaBulk.has(b.id)&&priceKnown,
     costGap:!duplicate&&!priceKnown?"ACCESSORY_ALLOWANCE_REQUIRES_BASIS":null};
   });
   return {site,source:Z1F_TEL_LAYOUT_INDEX_0553.source,siteTags:[...siteTags],
-   items:[rfiBda,enclosure,lna,...fieldBulk,...equipment],quoteAllocation:"RFI_BDA_BASE_OFFER_WITH_EXD_ENCLOSURE_MGW_YAGI_OMNI_FEEDER_SELECTED_LNA_EVIDENCE_ONLY",
+   items:[rfiBda,enclosure,gland,rfFeedthrough,lna,...fieldBulk,...equipment],quoteAllocation:"RFI_BDA_BASE_OFFER_WITH_EXD_ENCLOSURE_MGW_YAGI_OMNI_FEEDER_SELECTED_LNA_EVIDENCE_ONLY",
    controlledTotalUSD:equipment.filter(x=>x.countedInWorkingTotal).reduce((sum,x)=>sum+x.extended,0),
    controlledTotalTHB:[lna,...fieldBulk].filter(x=>x.countedInWorkingTotal).reduce((sum,x)=>sum+x.extended,0),
    scopeWarnings:["RFI BD Series newly selected BDA product family replaces MGW UHF-1 HYTERA TS-9200; exact SKU, vendor quote, quantity and LNA coexistence not approved for cost posting","MGW UHF-2 Yagi and UHF-3 Omni selected; provisional 1 per ZWP20/ZWP21/ZWP22, reconcile site MTO","MGW UHF-3 HYTERA Omni antenna remains selected separately from excluded UHF-1 BDA; UHF-4 includes 100m feeder + six connectors",
     "RFI RX3852 LNA is historical/non-additive; RFI BDA is the selected system basis, subject to approved technical deviation",
     "Prior DTRS bulk reused; RF-FEEDER / RF-CONNECTOR excluded to prevent overlap with MGW UHF-4",
-    "SMA, DC/alarm, surge and enclosure have explicit unverified budgetary allowances; verify Ex approval and supply boundaries before release"]};
+    "Legacy RX3852 SMA/LNA-specific DC and alarm allowances must not be automatically applied to N-type BDA; verify RF feeder kit against BDA interfaces",
+    "DTS requires 4 M20 entries; budget assumes 2 active certified glands and 2 spare stopping plugs per WP. Hawke historical THB1020 per set is rate evidence, not an OEM-approved Ex d SKU",
+    "Two RF paths require separate certified assembly treatment and no duplication with original RF surge enclosure"]};
  });
 export const MR0002_WORKING_BOM_0553=Object.freeze({
  id:"P553-MR0002-WORKING-BOM",mr:"MR-0002",sites:bySite,
