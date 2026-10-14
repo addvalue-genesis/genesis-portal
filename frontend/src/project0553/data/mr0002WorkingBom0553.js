@@ -32,7 +32,7 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
   // MGW UHF-4 includes 100m feeder and six connectors per set; exclude overlapping field cable/connectors.
   const priorBulk=budgetBulk.find(x=>x.wp===site);
   const overlapping=new Set(["RF-FEEDER","RF-CONNECTOR"]);
-  const fieldBulk=(priorBulk?.rows||[]).map(b=>{
+  const fieldBulk=(priorBulk?.rows||[]).filter(b=>!overlapping.has(b.id)).map(b=>{
    const duplicate=overlapping.has(b.id);
    const allowance=selectMR0002Rate0553(b.id);
    const priceKnown=Number.isFinite(b.amount)||Boolean(allowance);
