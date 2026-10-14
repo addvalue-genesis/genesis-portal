@@ -68,7 +68,7 @@ assert(ui.includes("04 · Engineering Verification")&&ui.includes("03 · Vendor 
 for(const suffix of [".required-bom",".working-priced-bom",".vendor-comparison",".engineering-verification"]){
  assert(ui.includes('id+"'+suffix+'"'),"Missing stable four-stage module "+suffix);
 }
-assert(host.includes("<TagFourStageWorkbench0553 site={site} tagRow={v} moduleKey={tagKey(v)}>"),
+assert(host.includes("<TagFourStageWorkbench0553 site={site} tagRow={v} moduleKey={tagKey(v)} fx={fx}>"),
  "The existing TAG Derivation module must contain the four-stage workbench");
 assert(host.includes('moduleKey={tagKey(v)+".derivation"}'),"Legacy TAG derivation ID preserved");
 assert(host.includes("<TagMappingAudit0553/>")&&host.includes('moduleKey={tagKey(v)+".particular-evidence"}'),
