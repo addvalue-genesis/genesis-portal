@@ -2,6 +2,7 @@
 // Quote-wide MGW quantities are never multiplied by guessed site quantities.
 // Site equipment is an explicit management provisional 1-per-WP distribution.
 import {MGW_P26_058_0553} from "./mgwP26058";
+import {RFI_BDA_SELECTION_0553} from "./rfiBdaSelected0553";
 import {selectMR0002Rate0553} from "./mr0002PriceRegistry0553";
 import {RFI_LNA_PRICE_DECISION_0553} from "./rfiLnaPriceDecision0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
@@ -28,6 +29,11 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    extended:siteTags.has("TCAB-508-001")?selectMR0002Rate0553("RFI-LNA").unitRate:null,source:p.decisionSource,status:"BUDGETARY_ONE_LNA_PER_TAG_FROM_MR_C1_NOT_PROCUREMENT_APPROVED",
    owner:"RFI_LNA_NOT_MGW_BDA",countedInWorkingTotal:siteTags.has("TCAB-508-001"),
    note:"One per tagged TCAB-508-001 provisional MR C1 allowance; confirm exact LNA vs enclosure supply boundary"};
+  const rfiBda={id:site+"-RFI-BDA",site,mr:"MR-0002",tag:"RFI-BDA/LOCATION_TO_VERIFY",
+   sku:RFI_BDA_SELECTION_0553.model,description:"RFI BD Series UHF Bi-Directional Amplifier 380-520 MHz; exact subband/options unresolved",
+   qty:null,unit:"set",currency:null,unitCost:null,extended:null,source:RFI_BDA_SELECTION_0553.document,
+   status:RFI_BDA_SELECTION_0553.status,owner:"RFI_BDA_NEW_SELECTED_FAMILY_NOT_HYTERA_UHF1",countedInWorkingTotal:false,
+   note:"New BDA family replaces excluded MGW UHF-1 HYTERA model. Exact variant, RF topology, quantity, hazardous-area suitability and current quote must be checked. Separate RFI LNA retained without double count."};
   // Reuse prior bulk calculation; never create a second cost model.
   // MGW UHF-4 includes 100m feeder and six connectors per set; exclude overlapping field cable/connectors.
   const priorBulk=budgetBulk.find(x=>x.wp===site);
@@ -46,10 +52,10 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
     costGap:!duplicate&&!priceKnown?"ACCESSORY_ALLOWANCE_REQUIRES_BASIS":null};
   });
   return {site,source:Z1F_TEL_LAYOUT_INDEX_0553.source,siteTags:[...siteTags],
-   items:[lna,...fieldBulk,...equipment],quoteAllocation:"RFI_LNA_MGW_YAGI_OMNI_FEEDER_SELECTED_AND_PRIOR_BULK",
+   items:[lna,rfiBda,...fieldBulk,...equipment],quoteAllocation:"RFI_LNA_MGW_YAGI_OMNI_FEEDER_SELECTED_AND_PRIOR_BULK",
    controlledTotalUSD:equipment.filter(x=>x.countedInWorkingTotal).reduce((sum,x)=>sum+x.extended,0),
    controlledTotalTHB:[lna,...fieldBulk].filter(x=>x.countedInWorkingTotal).reduce((sum,x)=>sum+x.extended,0),
-   scopeWarnings:["RFI is selected for LNA; MGW UHF-1 HYTERA TS-9200 BDA is excluded from active BOM","MGW UHF-2 Yagi and UHF-3 Omni selected; provisional 1 per ZWP20/ZWP21/ZWP22, reconcile site MTO","MGW UHF-3 HYTERA Omni antenna remains selected separately from excluded UHF-1 BDA; UHF-4 includes 100m feeder + six connectors",
+   scopeWarnings:["RFI BD Series newly selected BDA product family replaces MGW UHF-1 HYTERA TS-9200; exact SKU, vendor quote, quantity and LNA coexistence not approved for cost posting","MGW UHF-2 Yagi and UHF-3 Omni selected; provisional 1 per ZWP20/ZWP21/ZWP22, reconcile site MTO","MGW UHF-3 HYTERA Omni antenna remains selected separately from excluded UHF-1 BDA; UHF-4 includes 100m feeder + six connectors",
     "One RFI LNA per tagged site is a budgetary MR C1 assumption, not procurement-approved",
     "Prior DTRS bulk reused; RF-FEEDER / RF-CONNECTOR excluded to prevent overlap with MGW UHF-4",
     "SMA, DC/alarm, surge and enclosure have explicit unverified budgetary allowances; verify Ex approval and supply boundaries before release"]};
@@ -58,5 +64,5 @@ export const MR0002_WORKING_BOM_0553=Object.freeze({
  id:"P553-MR0002-WORKING-BOM",mr:"MR-0002",sites:bySite,
  workingRateSource:p,quotation:MGW_P26_058_0553.id,
  quoteTotalUSD:MGW_P26_058_0553.quotedTotal,
- selectedManufacturer:"RFI",status:"RFI_LNA_MGW_ANTENNAS_FEEDER_PRIOR_BULK_BUDGETARY_NOT_CUSTOMER_RELEASE"
+ selectedManufacturer:"RFI",selectedBda:RFI_BDA_SELECTION_0553,status:"RFI_BD_BDA_FAMILY_SELECTED__LNA_MGW_ANTENNAS_FEEDER_PRIOR_BULK__NOT_CUSTOMER_RELEASE"
 });
