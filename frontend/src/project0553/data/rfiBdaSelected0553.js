@@ -17,6 +17,25 @@ export const RFI_BDA_SELECTION_0553=Object.freeze({
  connector:"N-female",powerOptions:["12VDC","24VDC","48VDC","90-264VAC"],
  protection:"IP65",mount:"wall or pole",
  RFoverFibre:["none","single WDM","dual simplex","single alternative WDM wavelength"],
+ technicalReconciliation:{
+  references:["BOD-0001 C2 sections 6.2/6.3/7.4","SPE-0001 C2 sections 5.2/5.4/5.6/6.3","DTS-0002 C1 sheets 4-6","MR-0002 C1 section 5"],
+  sites:["ZWP20","ZWP21","ZWP22"],siteUnitBasis:1,exclude:"ZWP23",
+  supply:"24 VDC floating IT",zone:"Zone 2 IIA T3",installedMinimumIP:"IP66",
+  bdaNativeIP:"IP65",bdaSizeMm:[620,450,270],amplifierRF:"N female",
+  originalLnaRF:"SMA female",dtsGainDB:40,dtsOutputDBm:22,
+  dtsNoiseFigureDBMax:2,dtsYagiMHz:[380,400],
+  provisionalOrder:"BD3840-0000-24 ONLY IF 380-400MHz and 5MHz fixed passband work with actual duplex plan",
+  enclosure:"Certified Ex d IIA or superior IP66 enclosure for complete RFI BDA assembly, require internal clearance, thermal and RF feedthrough approval",
+  caution:"RFI BDA datasheet does not establish 2dB noise figure, 24V current, or completed hazardous area assembly compliance"
+ },
+ pricingBenchmark:{
+  historicalMGWHyteraUSD:13674,
+  basis:"MGW P26-058 UHF-1 HYTERA per-set price: DIFFERENT BRAND alternative, not RFI quotation",
+  exDEnclosureMarketEUR:3622.50,
+  enclosureSource:"ATEXShop EEx d IIC/IIB SS316 TNCD public list price, size not verified",
+  doubleCountGate:"Do not sum standalone enclosure onto a package quote without scope reconciliation",
+  chosenRfiEquipmentQuote:null,chosenEnclosureQuote:null
+ },
  requiredDecisions:["operating frequencies UL/DL and duplex separation","off-air versus RF over Fibre / donor-service antenna topology","BD subband and full ordering code","required standard/high power gain, isolation and donor/service antenna design","DC/AC site supply, current draw and hazardous-area suitability","vendor package rate and field bulk inclusions","RFI LNA coexistence / replacement topology approval"],
  status:"SELECTED_RFI_BD_FAMILY__EXACT_MODEL_COMPLIANCE_AND_PRICE_PENDING",
  pricingPolicy:"Missing model/quote is unknown, never zero; no automatic transfer of excluded HYTERA BDA price.",
