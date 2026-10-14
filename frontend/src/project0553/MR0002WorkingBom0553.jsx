@@ -1,4 +1,6 @@
 import React,{useState} from "react";
+import {bomModuleId0553,bomPriceTHB0553,bomEvidenceDisplay0553} from "./bomPresentationContract0553";
+import {MGW_P26_058_R2_UHF_0553} from "./data/mgwP26058R2Uhf0553";
 import {RfFeederEvidence0553} from "./RfFeederEvidence0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {MR0002_WORKING_BOM_0553 as model} from "./data/mr0002WorkingBom0553";
@@ -6,10 +8,10 @@ const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigit
 export function MR0002WorkingBom0553({fx=null}){
  const [open,setOpen]=useState({});
  const validFx=Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0;
- const thb=(n,c)=>!Number.isFinite(n)?"PENDING":c==="THB"?"THB "+money(n):c==="USD"&&validFx?"THB "+money(n*fx.thbPerUsd):"FX REQUIRED";
+ const thb=(n,c)=>bomPriceTHB0553(n,c,fx).label;
  const siteThb=g=>validFx?g.controlledTotalTHB+g.controlledTotalUSD*fx.thbPerUsd:null;
- const itemModuleId=item=>"bid.budget.bom.mr0002."+item.site.toLowerCase()+"."+item.id.toLowerCase();
- const includedPrice=item=>item.priceInclusion&&item.parentPackage?("INCLUDED IN "+(item.quoteLine||"VENDOR PACKAGE")+" · "+(validFx?"Package THB "+money((item.quoteLine==="UHF-1"?31474:227)*fx.thbPerUsd):"PACKAGE FX REQUIRED")+" · No additional cost"):(item.displayPrice||"NOT ADDITIVE / TECHNICAL REVIEW");
+ const itemModuleId=item=>bomModuleId0553({mr:"MR-0002",site:item.site,itemId:item.id});
+ const includedPrice=item=>bomEvidenceDisplay0553(item,fx,MGW_P26_058_R2_UHF_0553.lines);
  const [selectedSite,setSelectedSite]=useState("ALL");
  const visibleSites=model.sites.filter(g=>selectedSite==="ALL"||g.site===selectedSite);
  return <section className="p55-panel" data-component-key="bid.budget.bom.mr0002">
