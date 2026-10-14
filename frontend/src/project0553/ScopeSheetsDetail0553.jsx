@@ -62,7 +62,7 @@ export function ScopeSheetsDetail0553({fx=null}){
  const a5Unpriced=a5.unresolved.length+a5.unknownScadaAccessories.length;
  const a5LedgerReconciled=Number.isFinite(scadaLedgerCostTHB)&&
   Number.isFinite(workingScadaEquipment)&&Number.isFinite(a5.a5PriceTHB)&&
-  Math.abs(round(workingScadaEquipment+a5.a5PriceTHB-scadaLedgerCostTHB))<=0.01;
+  Math.abs(round(workingScadaEquipment-scadaLedgerCostTHB))<=0.01 && a5.a5PriceTHB<=scadaLedgerCostTHB;
  const phoneRows=SITE_SYSTEM_COST_RECONCILIATION_0553.rows.filter(r=>r.mr==="MR-0003"&&["ZWP20","ZWP21","ZWP22"].includes(r.site));
  const phoneRateLines=phoneRows.flatMap(r=>r.evidence||[]).filter(x=>["PHONE-1","SOUNDER-1","JB-1"].includes(x.line)&&x.currency==="THB"&&Number.isFinite(x.extended));
  const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
@@ -83,8 +83,9 @@ export function ScopeSheetsDetail0553({fx=null}){
   return usd&&!fxValid?null:round(thb+usd*(fx?.thbPerUsd||0));
  };
  const a1Combined=projectionTHB(sourceMrProjection.A1);
- const a1Equipment=Number.isFinite(a1Combined)&&Number.isFinite(a5.a5PriceTHB)?
-  round(a1Combined-a5.a5PriceTHB):null;
+ // A1 shows the full MR0001 canonical allocated BOM amount, including embedded bulk.
+ // A5 is a non-additive disclosure of that included portion (not another charge).
+ const a1Equipment=a1Combined;
  const sourceLine=(code,description,candidate=false)=>({
   amount:projectionTHB(sourceMrProjection[code]),
   source:"bid.budget.bom.system-location-mto → selectWorkingBomProjection0553("+sourceMrProjection[code].rows[0]?.mr+")",
@@ -94,13 +95,13 @@ export function ScopeSheetsDetail0553({fx=null}){
  });
  const workingSummary={
   A1:{amount:a1Equipment,
-   source:"MR0001 TAG Cost Ledger → system-location-mto → Scope (A1+A5 equals one allocated ledger subtotal)",
-   status:"WORKING EQUIPMENT EXCLUDING A5 DISPLAY RECLASSIFICATION; no additional cost booked"},
+   source:"MR0001 TAG Cost Ledger → system-location-mto; A1 is the full allocated amount including bulk. A5 is a non-additive disclosure only",
+   status:"WORKING ALLOCATED EQUIPMENT/BULK — INCLUDES A5; same MR0001 BOM total; NOT full A+B+C"},
   A2:sourceLine("A2","MR0002 vendor working lines; engineering/source gates retained"),
   A3:sourceLine("A3","MR0003 preliminary phone/sounder/JB scenario",true),
   A4:sourceLine("A4","MR0004 ORGA provisional three-location equipment scenario"),
   A5:{amount:a5.a5PriceTHB,source:a5.source+"; exact "+a5.rowCount+" source MTO Bulk cost-owner rows; A1→A5 display reclassification only",
-   status:a5.state+"; "+a5Unpriced+" remaining field-bulk/accessory evidence gaps; no customer sell approval"}
+   status:"INCLUDED IN A1 — NON-ADDITIVE MEMO ONLY; "+a5.state+"; "+a5Unpriced+" remaining field-bulk/accessory evidence gaps"}
  };
  // Fail visibly rather than silently subtract unrelated or excess A5 rates.
  if(Number.isFinite(a1Combined)&&Number.isFinite(a5.a5PriceTHB)&&a5.a5PriceTHB>a1Combined){
@@ -125,8 +126,8 @@ export function ScopeSheetsDetail0553({fx=null}){
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
     control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (working basis)";
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>{qtyDisplay}</td>
-    <td className="is-number">{Number.isFinite(control?.unitPriceTHB)?cash(control.unitPriceTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
-    <td className="is-number">{Number.isFinite(amount)?cash(amount):control?"Owner / OEM quotation required":unavailable}</td>
+    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitPriceTHB)?cash(control.unitPriceTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
+    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(amount)?cash(amount):control?"Owner / OEM quotation required":unavailable}</td>
     <td>{item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(([desc,qty,price],i)=>{
    // Historical template numbers are customer-facing Rev08 prices, not present-day supplier cost.
@@ -139,7 +140,7 @@ export function ScopeSheetsDetail0553({fx=null}){
   {sheet==="Scope of supply"&&<details className="p55-panel" data-component-key="bid.budget.scope.a5" open={false}>
    <summary style={{cursor:"pointer",fontWeight:700}}>A5 Bulk Materials — Source-MTO Price Attribution / Drill-down ({a5.rowCount} lots)</summary>
    <p className="p55-note">A5 Working Priced Floor: <strong>{cash(a5.a5PriceTHB)}</strong>.
-    From existing MR0001 Bulk MTO cost owners, not new vendor charges. Displayed A1 deducts exactly this amount to prevent double counting; original working ledgers and quotations remain unchanged.
+    From existing MR0001 Bulk MTO cost owners, not new vendor charges. A1 already includes this A5 amount; A5 is shown for attribution only and MUST NOT be summed into A1 or A+B+C again. Original working ledgers and quotations remain unchanged.
     Original customer scope remains 1 LS. All sites priced only for 69m CAT6A + 1 M20 gland per priced management route assumption, not a complete O&G bulk take-off.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Site / Original MTO</th><th>TAG / Engineering quantity</th><th>Priced Cost Evidence</th><th>Working Amount THB</th><th>Owner / Qualification</th></tr></thead><tbody>
@@ -152,7 +153,7 @@ export function ScopeSheetsDetail0553({fx=null}){
     </tr>)}
     </tbody></table></div>
    <p className="p55-note"><strong>Source Ledger reconciliation:</strong>
-    {a5LedgerReconciled?" PASS — A1 displayed + A5 = original MR0001 working ledger THB equivalent (no additional booking)":
+    {a5LedgerReconciled?" PASS — A1 displayed equals original MR0001 working ledger THB equivalent; A5 is INCLUDED (no additional booking)":
       !fxValid?" FX required to verify displayed A1+A5 in THB":
       " NOT RECONCILED — do not release A5 or Grand Total"}
     . Missing physical functions/rates: {a5Unpriced} observations; standalone SCADA CAT6A mirrors and DATO already-owned price are not added.
