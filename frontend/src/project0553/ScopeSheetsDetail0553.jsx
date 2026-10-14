@@ -10,6 +10,8 @@ import {MR0004_WORKING_BOM_0553} from "./data/mr0004WorkingBom0553";
 import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
 import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./data/siteSystemCostReconciliation";
 import {deriveA5BulkAttribution0553} from "./data/a5BulkAttribution0553";
+import {getMR0001LocationCost0553} from "./data/mr0001LocationCostSummary0553";
+import {WORKING_BOM_BY_LOCATION_0553} from "./data/workingBomByLocation";
 const SHEETS=[
  ["Scope of supply","A/B/C","A1–A5 equipment+bulk, B1–B14 services, C1/C2 options"],
  ["B10 CommSpares","B10","Erection, pre-commissioning, commissioning and start-up spare parts"],
@@ -44,8 +46,12 @@ export function ScopeSheetsDetail0553({fx=null}){
  const fxValid=Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0;
  // Working budget estimate: source-priced equipment plus explicitly separated bulk.
  // Incomplete scopes remain flagged, not mislabelled as accepted cost.
- const scadaSourceTHB=round(scadaEnvelope.locations.reduce((n,s)=>n+s.baseSourceTHB,0));
- const scadaSourceUSD=round(scadaEnvelope.locations.reduce((n,s)=>n+s.baseSourceUSD,0));
+ // Source of truth: identical seven-location allocated TAG ledger used by
+ // bid.budget.bom.system-location-mto (SimpleBom0553), NOT the separate
+ // engineering envelope/scenario projection.
+ const scadaLocationCosts=WORKING_BOM_BY_LOCATION_0553.locations.map(location=>getMR0001LocationCost0553(location.site));
+ const scadaSourceTHB=round(scadaLocationCosts.reduce((n,s)=>n+s.allocatedTHB,0));
+ const scadaSourceUSD=round(scadaLocationCosts.reduce((n,s)=>n+s.allocatedUSD,0));
  // Source Ledger is already priced by the MTO's Bulk Material cost owners.
  // The separate SCADA envelope / WP planning routes are scenario views, not additive invoices.
  const a5=deriveA5BulkAttribution0553();
@@ -61,7 +67,7 @@ export function ScopeSheetsDetail0553({fx=null}){
  const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
  const partBC=derivePartBcWorkingWbs0553();
  const workingSummary={
-   A1:{amount:workingScadaEquipment,source:"MR0001 site TAG Cost Ledger less eligible source MTO Bulk rows attributed to A5 (display only; no ledger posting)",status:"PRELIMINARY SCADA EQUIPMENT FLOOR EXCLUDING A5 ATTRIBUTED BULK; no new rate or FX assumed"},
+   A1:{amount:workingScadaEquipment,source:"MR0001 seven-location allocated TAG Cost Ledger (same as bid.budget.bom.system-location-mto), less eligible source MTO Bulk rows attributed to A5 (display only; no ledger posting)",status:"PRELIMINARY SCADA EQUIPMENT FLOOR EXCLUDING A5 ATTRIBUTED BULK; no new rate or FX assumed"},
    A2:{amount:fxValid?round(a2THB+a2USD*fx.thbPerUsd):a2USD===0?round(a2THB):null,
    source:"MR0002_WORKING_BOM_0553 per-site rows: RFI-LNA and non-MGW priced allowances only",
    status:"PARTIAL WORKING FLOOR; MGW rates excluded, remaining DMR equipment and unpriced bulk not included"},
