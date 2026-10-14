@@ -1,10 +1,20 @@
 // Shared, read-only aggregation for System × Location and customer A1–A4 projections.
 // This is NOT a second engineering derivation, customer price, or released A+B+C.
 import {BOM_READ_MODEL_0553} from "./bomReadModel0553";
+import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
+import {selectMR0001TagCostRows0553} from "./mr0001TagCostLedger0553";
 const MRS=["MR-0001","MR-0002","MR-0003","MR-0004"];
 export const CUSTOMER_EQUIPMENT_MR_0553=Object.freeze({"A1":"MR-0001","A2":"MR-0002","A3":"MR-0003","A4":"MR-0004"});
 export function selectWorkingBomProjection0553({mr="ALL",site="ALL"}={}){
- const source=BOM_READ_MODEL_0553.rows.filter(r=>(mr==="ALL"||r.mr===mr)&&(site==="ALL"||r.site===site));
+ const nonMr1=BOM_READ_MODEL_0553.rows.filter(r=>r.mr!=="MR-0001"&&(mr==="ALL"||r.mr===mr)&&(site==="ALL"||r.site===site));
+ // Use controlled MR0001 TAG ledger, not legacy evidence or duplicate source rows.
+ const mr1=(mr==="ALL"||mr==="MR-0001")?WORKING_BOM_BY_LOCATION_0553.locations
+  .filter(x=>site==="ALL"||x.site===site)
+  .map(x=>({site:x.site,mr:"MR-0001",name:"SCADA Radio / Telecom",
+   detailRows:selectMR0001TagCostRows0553(x.site),
+   projectionSource:"MR0001_TAG_COST_LEDGER",completeness:"WORKING_UNRELEASED",
+   gaps:[]})):[];
+ const source=[...mr1,...nonMr1];
  const rows=source.map(r=>{
   // Mirror the current System-Location MTO precisely: detailRows first,
   // otherwise legacy evidence converted to a display/projection line.
@@ -35,7 +45,7 @@ export function selectWorkingBomProjection0553({mr="ALL",site="ALL"}={}){
   unresolved:lines.filter(x=>!x.counted||!x.currency).length,
   scenario:lines.some(x=>x.scenarioEvidence),
   orphanCurrency:lines.filter(x=>x.counted&&!x.currency).length,
-  basis:"BOM_READ_MODEL_0553 / same rows and filters as System-Location MTO",
+  basis:"MR0001_TAG_COST_LEDGER + BOM_READ_MODEL_0553; same shared view projection",
   releaseAllowed:false};
 }
 export function workingBomByCustomerA0553(){
