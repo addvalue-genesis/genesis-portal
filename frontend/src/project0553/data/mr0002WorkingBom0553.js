@@ -4,10 +4,10 @@
 import {MGW_P26_058_0553} from "./mgwP26058";
 import {RFI_BDA_SELECTION_0553} from "./rfiBdaSelected0553";
 import {selectMR0002Rate0553} from "./mr0002PriceRegistry0553";
-import {RFI_LNA_PRICE_DECISION_0553} from "./rfiLnaPriceDecision0553";
+
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {deriveDtrsRfiBudget0553} from "./dtrsRfiBudgetCalculation0553";
-const p=RFI_LNA_PRICE_DECISION_0553;
+const p=RFI_BDA_SELECTION_0553;
 const mgwLines=MGW_P26_058_0553.lines.filter(x=>["UHF-2","UHF-3","UHF-4"].includes(x[0]));
 // MGW UHF-2 Yagi, UHF-3 Omni and UHF-4 100m feeder/6 connectors are budget selections; UHF-1 BDA excluded.
 const budgetBulk=deriveDtrsRfiBudget0553();
@@ -24,24 +24,19 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    owner:["UHF-2","UHF-3","UHF-4"].includes(id)?"MGW_SELECTED_RF_PACKAGE":"VENDOR_EVIDENCE_ONLY",
    countedInWorkingTotal:["UHF-2","UHF-3","UHF-4"].includes(id)
   }));
-  const lna={id:site+"-RFI-LNA",site,mr:"MR-0002",tag:"TCAB-508-001/RFI-LNA",sku:p.model,
-   description:p.product,qty:siteTags.has("TCAB-508-001")?1:null,unit:"unit",currency:p.currency,unitCost:selectMR0002Rate0553("RFI-LNA").unitRate,
-   extended:siteTags.has("TCAB-508-001")?selectMR0002Rate0553("RFI-LNA").unitRate:null,source:p.decisionSource,status:"SUPERSEDED_BY_RFI_BDA_BASE_OFFER__HISTORICAL_PRICE_EVIDENCE_ONLY",
-   owner:"HISTORICAL_LNA_EVIDENCE__NON_ADDITIVE",countedInWorkingTotal:false,
-   note:"One per tagged TCAB-508-001 provisional MR C1 allowance; confirm exact LNA vs enclosure supply boundary"};
   const rfiBda={id:site+"-RFI-BDA",site,mr:"MR-0002",tag:"RFI-BDA/LOCATION_TO_VERIFY",
    sku:RFI_BDA_SELECTION_0553.model,description:"RFI BD Series UHF Bi-Directional Amplifier 380-520 MHz; exact subband/options unresolved",
-   qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:null,unitCost:null,extended:null,source:RFI_BDA_SELECTION_0553.document,
-   status:RFI_BDA_SELECTION_0553.status,owner:"RFI_BDA_NEW_SELECTED_FAMILY_NOT_HYTERA_UHF1",countedInWorkingTotal:false,
+   qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:"USD",unitCost:selectMR0002Rate0553("RFI-BDA").unitRate,extended:siteTags.has("TCAB-508-001")?selectMR0002Rate0553("RFI-BDA").unitRate:null,source:"MGW P26-058 UHF-1 DIFFERENT BRAND PROXY; "+RFI_BDA_SELECTION_0553.document,
+   status:"ACTIVE_BUDGETARY_PROXY__NOT_RFI_VENDOR_QUOTE__TECHNICAL_DEVIATION_REQUIRED",owner:"RFI_BDA_BASE_OFFER",countedInWorkingTotal:true,
    benchmarkUSDPerSite:RFI_BDA_SELECTION_0553.pricingBenchmark.historicalMGWHyteraUSD,
    benchmarkSource:RFI_BDA_SELECTION_0553.pricingBenchmark.basis,
    enclosureMarketReferenceEUR:RFI_BDA_SELECTION_0553.pricingBenchmark.exDEnclosureMarketEUR,
    referenceSiteQty:3,referenceQtyBasis:"MR0002 C1 one set each ZWP20/21/22; not a confirmed RFI purchase quantity",
    note:"RFI BD Series is Base Offer. BD3840-0000-24 is conditional ordering candidate, not fixed SKU. Ex d IP66 full assembly and RF/thermal certification mandatory. MGW HYTERA USD13674 is OTHER-BRAND benchmark, not RFI quote. RX3852 LNA is non-additive superseded reference."};
   const enclosure={id:site+"-RFI-BDA-EXD-ENCLOSURE",site,mr:"MR-0002",tag:"TCAB-508-001",sku:null,
-   description:"Certified Ex d IP66 hazardous-area BDA enclosure assembly incl mounting and qualified RF feedthroughs",qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:null,unitCost:null,extended:null,
+   description:"BARTEC EJB-7 Ex d IP66 assembly budget reference (RF feedthroughs not costed)",qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:"THB",unitCost:selectMR0002Rate0553("RFI-BDA-EXD-ENCLOSURE").unitRate,extended:siteTags.has("TCAB-508-001")?selectMR0002Rate0553("RFI-BDA-EXD-ENCLOSURE").unitRate:null,
    source:"DTS-0002 C1 sheets 4/6; SPE-0001 C2; BDA size 620x450x270 mm",
-   status:"BASE_OFFER_REQUIRED__ENCLOSURE_EXD_ASSEMBLY_SIZING_HEAT_AND_OEM_QUOTE_PENDING",owner:"RFI_BDA_ENCLOSURE_ASSEMBLY__NON_ADDITIVE_UNTIL_PACKAGE_RECONCILED",countedInWorkingTotal:false,
+   status:"ACTIVE_HISTORICAL_BUDGET_PROXY__EXD_ASSEMBLY_SIZE_AND_HEAT_UNVERIFIED",owner:"BARTEC_BDA_ENCLOSURE_BUDGET_OWNER",countedInWorkingTotal:true,
    referenceMarketEUR:RFI_BDA_SELECTION_0553.pricingBenchmark.exDEnclosureMarketEUR,
    note:"Benchmarked EUR price is not a selected compatible enclosure. Confirm internal clearances, 24V load, thermal rating, certified RF and DC penetrations, glands, stopping plugs, IP66 and assembly certificate."};
   const glandBasis=RFI_BDA_SELECTION_0553.glandBudgetDesign;
@@ -76,11 +71,11 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
     costGap:!duplicate&&!priceKnown?"ACCESSORY_ALLOWANCE_REQUIRES_BASIS":null};
   });
   return {site,source:Z1F_TEL_LAYOUT_INDEX_0553.source,siteTags:[...siteTags],
-   items:[rfiBda,enclosure,gland,rfFeedthrough,lna,...fieldBulk,...equipment],quoteAllocation:"RFI_BDA_BASE_OFFER_WITH_EXD_ENCLOSURE_MGW_YAGI_OMNI_FEEDER_SELECTED_LNA_EVIDENCE_ONLY",
-   controlledTotalUSD:equipment.filter(x=>x.countedInWorkingTotal).reduce((sum,x)=>sum+x.extended,0),
-   controlledTotalTHB:[lna,...fieldBulk].filter(x=>x.countedInWorkingTotal).reduce((sum,x)=>sum+x.extended,0),
+   items:[rfiBda,enclosure,gland,rfFeedthrough,...fieldBulk.filter(x=>x.owner!=="HISTORICAL_LNA_BULK_NOT_ADDITIVE"),...equipment],quoteAllocation:"RFI_BDA_BASE_OFFER_WITH_EXD_ENCLOSURE_MGW_YAGI_OMNI_FEEDER_SELECTED_LNA_EVIDENCE_ONLY",
+   controlledTotalUSD:[rfiBda,...equipment].filter(x=>x.countedInWorkingTotal&&Number.isFinite(x.extended)).reduce((sum,x)=>sum+x.extended,0),
+   controlledTotalTHB:[enclosure,...fieldBulk].filter(x=>x.countedInWorkingTotal&&Number.isFinite(x.extended)).reduce((sum,x)=>sum+x.extended,0),
    scopeWarnings:["RFI BD Series newly selected BDA product family replaces MGW UHF-1 HYTERA TS-9200; exact SKU, vendor quote, quantity and LNA coexistence not approved for cost posting","MGW UHF-2 Yagi and UHF-3 Omni selected; provisional 1 per ZWP20/ZWP21/ZWP22, reconcile site MTO","MGW UHF-3 HYTERA Omni antenna remains selected separately from excluded UHF-1 BDA; UHF-4 includes 100m feeder + six connectors",
-    "RFI RX3852 LNA is historical/non-additive; RFI BDA is the selected system basis, subject to approved technical deviation",
+    "RFI RX3852 LNA removed from ACTIVE BOM; its historical data is retained separately in price registry, subject to approved BDA technical deviation",
     "Prior DTRS bulk reused; RF-FEEDER / RF-CONNECTOR excluded to prevent overlap with MGW UHF-4",
     "Legacy RX3852 SMA/LNA-specific DC and alarm allowances must not be automatically applied to N-type BDA; verify RF feeder kit against BDA interfaces",
     "DTS requires 4 M20 entries; budget assumes 2 active certified glands and 2 spare stopping plugs per WP. Hawke historical THB1020 per set is rate evidence, not an OEM-approved Ex d SKU",
