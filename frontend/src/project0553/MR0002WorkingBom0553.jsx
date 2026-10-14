@@ -9,7 +9,7 @@ export function MR0002WorkingBom0553({fx=null}){
  const thb=(n,c)=>!Number.isFinite(n)?"PENDING":c==="THB"?"THB "+money(n):c==="USD"&&validFx?"THB "+money(n*fx.thbPerUsd):"FX REQUIRED";
  const siteThb=g=>validFx?g.controlledTotalTHB+g.controlledTotalUSD*fx.thbPerUsd:null;
  const itemModuleId=item=>"bid.budget.bom.mr0002."+item.site.toLowerCase()+"."+item.id.toLowerCase();
- const includedPrice=item=>item.priceInclusion&&item.parentPackage?("INCLUDED IN "+(item.quoteLine||"VENDOR PACKAGE")+" · "+(validFx?"Package THB "+money((item.quoteLine==="UHF-1"?31474:227)*fx.thbPerUsd):"PACKAGE FX REQUIRED")+" · No additional cost"):includedPrice(item);
+ const includedPrice=item=>item.priceInclusion&&item.parentPackage?("INCLUDED IN "+(item.quoteLine||"VENDOR PACKAGE")+" · "+(validFx?"Package THB "+money((item.quoteLine==="UHF-1"?31474:227)*fx.thbPerUsd):"PACKAGE FX REQUIRED")+" · No additional cost"):(item.displayPrice||"NOT ADDITIVE / TECHNICAL REVIEW");
  const [selectedSite,setSelectedSite]=useState("ALL");
  const visibleSites=model.sites.filter(g=>selectedSite==="ALL"||g.site===selectedSite);
  return <section className="p55-panel" data-component-key="bid.budget.bom.mr0002">
