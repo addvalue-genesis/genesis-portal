@@ -5,6 +5,7 @@ import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {derivePartBcWorkingWbs0553} from "./data/partBCWorkingWbs0553";
 import {compareAEquipmentToLocation0553} from "./data/workingBomAggregation0553";
 import {selectCustomerEquipmentDisplay0553} from "./data/customerEquipmentDisplay0553";
+import {mappingDisplaySummary0553,grossMr0001Bridge0553} from "./data/mappingDisplaySummary0553";
 
 export function EstimateToBidMapping0553(){
  const [open,setOpen]=useState(null);
@@ -16,7 +17,9 @@ export function EstimateToBidMapping0553(){
  const equipment=selectCustomerEquipmentDisplay0553();
  const reconciliation=compareAEquipmentToLocation0553();
  const checks=new Map(result.checks.map(x=>[x.customerLine,x]));
- const shown=ESTIMATE_TO_BID_0553.records.filter(x=>(partFilter==="ALL"||x.customerLine.startsWith(partFilter))&&(!query||[x.customerLine,x.description,x.engineeringSource,x.customerSheet].some(v=>String(v||"").toLowerCase().includes(query.trim().toLowerCase()))));
+ const {shown,cost,sell}=mappingDisplaySummary0553(ESTIMATE_TO_BID_0553.records,equipment,working,{part:partFilter,query});
+ const bridge=grossMr0001Bridge0553(equipment);
+ const showMoney=x=>Number.isFinite(x)?x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
  const price=(amount,currency)=>Number.isFinite(amount)?currency+" "+amount.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
  return <section className="p55-panel" data-component-key="bid.budget.mapping">
   <div className="p55-eyebrow">ESTIMATE → CUSTOMER BID <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.mapping"/></div>
@@ -26,6 +29,13 @@ export function EstimateToBidMapping0553(){
   <p className="p55-note"><strong>Price recovery:</strong> Historical Rev08 customer workbook prices and existing ADDVALUE Part B working sell are shown for traceability only. They are NOT current vendor costs, approved selling prices, or proof of allocation. Distinct currencies are never summed.</p>
   <p className="p55-note"><strong>MR ↔ Location reconciliation (same underlying ledger):</strong> {reconciliation.map(r=>r.customerLine+" / "+r.mr+": "+Object.entries(r.currencies).map(([currency,value])=>currency+" "+value.toLocaleString("en-US")).join(" + ")+"; "+r.priced+" counted, "+r.unresolved+" unresolved"+(r.scenario?" [SCENARIO]":"")).join(" · ")}. MR0001 gross includes its original Bulk MTO rows; A1 shown below is net of verified A5 transfer, so compare gross MR0001 against A1 + A5 (by currency), NOT A1 alone. Parity does not certify source completeness.</p>
   <div className="p55-filterbar"><label>Cost Part <select value={partFilter} onChange={e=>setPartFilter(e.target.value)}><option value="ALL">A + B + C (all lines)</option><option value="A">Part A</option><option value="B">Part B</option><option value="C">Part C</option></select></label><label>Search Code / Description <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="A1, B10, C2, system..." /></label><button type="button" onClick={()=>{setPartFilter("ALL");setQuery("");setOpen(null);}}>Reset</button></div>
+  <div className="p55-source-facts" data-component-key="bid.budget.mapping.filtered-summary">
+   <div><span>Selected view</span><strong>{partFilter==="ALL"?"All A+B+C":("Part "+partFilter)}</strong><small>{shown.length} customer lines{query?" · search filtered":""}</small></div>
+   <div><span>Equipment working cost (known THB only)</span><strong>THB {showMoney(cost.THB)}</strong><small>Original USD {showMoney(cost.USD)} · never added without sourced FX</small></div>
+   <div><span>ADDVALUE working sell (known THB only)</span><strong>THB {showMoney(sell.THB)}</strong><small>Separate selling basis — NOT added to equipment cost</small></div>
+   <div><span>Completeness / release</span><strong>{cost.complete?"Cost lines evidenced":"PARTIAL / NOT RELEASED"}</strong><small>{cost.missing.length} lines without mapped equipment cost · A+B+C not established</small></div>
+  </div>
+  {(partFilter==="A"||partFilter==="ALL")&&<p className="p55-note" data-component-key="bid.budget.mapping.a1-reconciliation"><strong>MR0001 gross → A1 + A5:</strong> THB {showMoney(bridge.grossTHB)} → THB {showMoney(bridge.allocatedTHB)} · Variance THB {showMoney(bridge.varianceTHB)} · {bridge.status}. The MR0001 gross is equipment/bulk working cost only, NOT full project A+B+C. The 31.5 working FX shown elsewhere is an unverified planning assumption and is not silently applied here.</p>}
   <p className="p55-note"><strong>Coverage:</strong> {shown.length} / {ESTIMATE_TO_BID_0553.records.length} customer lines · A1–A5, B1–B14, C1–C2. Historical prices do not prove a cost owner or complete Stage 01–08.</p>
   <p className="p55-note"><strong>State:</strong> {ESTIMATE_TO_BID_0553.state} · {result.unreconciled} mapping targets require evidence · Customer Release: HOLD</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
