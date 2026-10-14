@@ -12,6 +12,12 @@ export const MR0004_SELECTED_PRICE_0553=Object.freeze({
  excludedAlternative:"MGW RACON-1 MSM-RBM04-EX / USD 60667 not selected — keep original vendor evidence only",
  packageIncluded:["RACON","RACON junction box","Ex control box","DB-5P","Purge kit","Programming cable","Packing","Documentation"],
  phaseItems:[{id:"ADAPTER_CHARGING",required:1,unit:"set per phase",includedInVendorQuote:null,gate:"Programming cable is not evidence of complete adapter/charging kit"},{id:"SPECIAL_TOOLS",required:1,unit:"set per phase",includedInVendorQuote:null,gate:"Confirm vendor contents and Annex-8"}],
+ revisionC1BlueRequirements:[
+  {clause:"Section 5 p10",category:"MANDATORY",text:"Offshore commissioning and startup spare parts — 1 set per platform",qty:3,unit:"set",costOwner:"STARTUP_SPARES",note:"Reconcile with commissioning/startup spares line above; do not automatically buy two sets per platform"},
+  {clause:"Section 5 p11 a",category:"MANDATORY_REGULATORY",text:"Vendor responsible for Myanmar import/operating radio equipment licences and Myanmar telecom authority approvals",costOwner:"REGULATORY",amount:null},
+  {clause:"Section 5 p11 b",category:"MANDATORY_REGULATORY",text:"Vendor responsible for necessary Thailand import approvals for assembly/FAT and export of complete telecom equipment to China construction yard",costOwner:"REGULATORY_LOGISTICS",amount:null},
+  {clause:"Section 5 p12 Optional a",category:"OPTIONAL",text:"Vendor responsible for necessary approvals for import into China fabrication yard and export from China to Myanmar",costOwner:"OPTIONAL_REGULATORY",amount:null}
+ ],
  supplyGates:["ORGA p4 quotes 5m+5m+10m BFOU cable and six glands; p8 general exclusion conflicts — seek written reconciliation",
   "FAT listed as included p5 but excluded p7 — vendor clarification",
   "Commissioning/start-up spare set per platform and two-year operating spares quote require separate tracking",
