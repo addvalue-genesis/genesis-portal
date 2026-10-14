@@ -10,6 +10,9 @@ import {MR0004_WORKING_BOM_0553} from "./data/mr0004WorkingBom0553";
 import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
 import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./data/siteSystemCostReconciliation";
 import {deriveA5BulkAttribution0553} from "./data/a5BulkAttribution0553";
+import {getMR0001LocationCost0553} from "./data/mr0001LocationCostSummary0553";
+import {WORKING_BOM_BY_LOCATION_0553} from "./data/workingBomByLocation";
+import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
 const SHEETS=[
  ["Scope of supply","A/B/C","A1–A5 equipment+bulk, B1–B14 services, C1/C2 options"],
  ["B10 CommSpares","B10","Erection, pre-commissioning, commissioning and start-up spare parts"],
@@ -44,8 +47,12 @@ export function ScopeSheetsDetail0553({fx=null}){
  const fxValid=Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0;
  // Working budget estimate: source-priced equipment plus explicitly separated bulk.
  // Incomplete scopes remain flagged, not mislabelled as accepted cost.
- const scadaSourceTHB=round(scadaEnvelope.locations.reduce((n,s)=>n+s.baseSourceTHB,0));
- const scadaSourceUSD=round(scadaEnvelope.locations.reduce((n,s)=>n+s.baseSourceUSD,0));
+ // Source of truth: identical seven-location allocated TAG ledger used by
+ // bid.budget.bom.system-location-mto (SimpleBom0553), NOT the separate
+ // engineering envelope/scenario projection.
+ const scadaLocationCosts=WORKING_BOM_BY_LOCATION_0553.locations.map(location=>getMR0001LocationCost0553(location.site));
+ const scadaSourceTHB=round(scadaLocationCosts.reduce((n,s)=>n+s.allocatedTHB,0));
+ const scadaSourceUSD=round(scadaLocationCosts.reduce((n,s)=>n+s.allocatedUSD,0));
  // Source Ledger is already priced by the MTO's Bulk Material cost owners.
  // The separate SCADA envelope / WP planning routes are scenario views, not additive invoices.
  const a5=deriveA5BulkAttribution0553();
@@ -60,16 +67,47 @@ export function ScopeSheetsDetail0553({fx=null}){
  const phoneRateLines=phoneRows.flatMap(r=>r.evidence||[]).filter(x=>["PHONE-1","SOUNDER-1","JB-1"].includes(x.line)&&x.currency==="THB"&&Number.isFinite(x.extended));
  const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
  const partBC=derivePartBcWorkingWbs0553();
+ // All four Scope A lines read the very same projection used by the
+ // System x Location x MTO Working BOM screen. No parallel supplier-rate path.
+ const sourceMrProjection={
+  A1:selectWorkingBomProjection0553({mr:"MR-0001"}),
+  A2:selectWorkingBomProjection0553({mr:"MR-0002"}),
+  A3:selectWorkingBomProjection0553({mr:"MR-0003"}),
+  A4:selectWorkingBomProjection0553({mr:"MR-0004"})
+ };
+ const projectionTHB=projection=>{
+  if(projection.orphanCurrency)return null;
+  const other=Object.keys(projection.currencies).filter(key=>key!=="THB"&&key!=="USD");
+  if(other.length)return null;
+  const thb=projection.currencies.THB||0,usd=projection.currencies.USD||0;
+  return usd&&!fxValid?null:round(thb+usd*(fx?.thbPerUsd||0));
+ };
+ const a1Combined=projectionTHB(sourceMrProjection.A1);
+ const a1Equipment=Number.isFinite(a1Combined)&&Number.isFinite(a5.a5PriceTHB)?
+  round(a1Combined-a5.a5PriceTHB):null;
+ const sourceLine=(code,description,candidate=false)=>({
+  amount:projectionTHB(sourceMrProjection[code]),
+  source:"bid.budget.bom.system-location-mto → selectWorkingBomProjection0553("+sourceMrProjection[code].rows[0]?.mr+")",
+  status:(candidate?"CANDIDATE EVIDENCE ONLY — NOT BOOKED / NOT RELEASED; ":"CONTROLLED WORKING EQUIPMENT/BULK, NOT FULL A+B+C; ")+
+   sourceMrProjection[code].priced+" lines with numeric extended evidence; "+
+   sourceMrProjection[code].unresolved+" unresolved; "+description
+ });
  const workingSummary={
-   A1:{amount:workingScadaEquipment,source:"MR0001 site TAG Cost Ledger less eligible source MTO Bulk rows attributed to A5 (display only; no ledger posting)",status:"PRELIMINARY SCADA EQUIPMENT FLOOR EXCLUDING A5 ATTRIBUTED BULK; no new rate or FX assumed"},
-   A2:{amount:fxValid?round(a2THB+a2USD*fx.thbPerUsd):a2USD===0?round(a2THB):null,
-   source:"MR0002_WORKING_BOM_0553 per-site rows: RFI-LNA and non-MGW priced allowances only",
-   status:"PARTIAL WORKING FLOOR; MGW rates excluded, remaining DMR equipment and unpriced bulk not included"},
-   A3:{amount:a3PricedFloor,source:"EXION THAI QT1260576 Phone + Sounder; PROSPER Q-PROSRY-24051 historical Ex e JB; 3 allocated locations only",status:"PRELIMINARY 3-LOCATION FLOOR; 4th EXION quoted set UNALLOCATED, JB REQUOTE AND BULK NOT INCLUDED"},
-   A4:{amount:fx?.thbPerUsd>0?workingMR4USD*fx.thbPerUsd:null,source:"MR0004 ORGA canonical Working BOM",status:"PROVISIONAL 3-SITE SCENARIO"},
-   A5:{amount:a5.a5PriceTHB,source:a5.source+"; exact "+a5.rowCount+" source MTO Bulk cost-owner rows; A1→A5 presentation reclassification only",
+  A1:{amount:a1Equipment,
+   source:"MR0001 TAG Cost Ledger → system-location-mto → Scope (A1+A5 equals one allocated ledger subtotal)",
+   status:"WORKING EQUIPMENT EXCLUDING A5 DISPLAY RECLASSIFICATION; no additional cost booked"},
+  A2:sourceLine("A2","MR0002 vendor working lines; engineering/source gates retained"),
+  A3:sourceLine("A3","MR0003 preliminary phone/sounder/JB scenario",true),
+  A4:sourceLine("A4","MR0004 ORGA provisional three-location equipment scenario"),
+  A5:{amount:a5.a5PriceTHB,source:a5.source+"; exact "+a5.rowCount+" source MTO Bulk cost-owner rows; A1→A5 display reclassification only",
    status:a5.state+"; "+a5Unpriced+" remaining field-bulk/accessory evidence gaps; no customer sell approval"}
  };
+ // Fail visibly rather than silently subtract unrelated or excess A5 rates.
+ if(Number.isFinite(a1Combined)&&Number.isFinite(a5.a5PriceTHB)&&a5.a5PriceTHB>a1Combined){
+  workingSummary.A1={amount:null,source:workingSummary.A1.source,
+   status:"RECONCILIATION ERROR — A5 exceeds MR0001 source allocated ledger"};
+ }
+
  return <section className="p55-panel">
   <div className="p55-eyebrow">6 ORIGINAL SHEETS <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
   <h3>Scope of Supply — Linked Internal Detail</h3>
