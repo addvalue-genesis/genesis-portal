@@ -1,4 +1,5 @@
 import {deriveRaconTerminationBudget0553} from "./raconTerminationBudget0553";
+import {deriveMR0003PhoneBulk0553} from "./mr0003PhoneBulkDerivation0553";
 import {APPROVED_0553_BUDGET_BASIS,approvedCablePurchaseM} from "./approvedBudgetBasis0553";
 import {RACON_VENDOR_SCOPE_0553} from "./raconVendorScope0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
@@ -40,17 +41,17 @@ export function deriveWpSystemBulkBudget0553(){
       source:"Prosper Q-PROSRY-24051 Rev0 2024-07-12 item3 Exe JB for Telephone 300x300x160, THB24500/set; historical Zawtika 1E only",
       owner:"EX_PHONE_JB_ASSEMBLY",status:"HISTORICAL_UNIT_RATE_VERIFIED__QUANTITY_BY_PHONE_LOCATION",
       note:"Selected BARTEC GA-1004 (300x300x160) has 8 M20 drilled cable entries and 8 fitted stopping plugs; historic Prosper Q-PROSRY-24051 may describe a different 4-plug assembly. Reconcile quote/GA before mapping. MGW PHONE-1 package includes a WAROM JB/gland, NOT BARTEC; exclude or resolve variant, do not double count."},
-     {id:"EX-PHONE-JB-ENTRIES",item:"Certified glands, stopping plugs and interface accessories for telephone JB",unit:"entry",qty:null,rateTHB:null,
+     {id:"EX-PHONE-JB-ENTRIES",item:"Certified glands, stopping plugs and interface accessories for telephone JB",unit:"candidate active entry",qty:phoneDerivation(w.wp)?.estimatedJbEntries??null,rateTHB:null,
       source:"BARTEC telephone JB historical GA and IEC/EN 60079-14 installation requirement",owner:"EX_PHONE_JB_ASSEMBLY_OR_EXTERNAL_BULK",
-      status:"BARTEC_GA_8_HOLES__ACTIVE_GLAND_SIZE_QTY_PENDING",note:"Confirmed BARTEC 8×M20 top holes with 8 factory stopping plugs; gland model and count must follow cable-end schedule for TPH-504, LSE-504 and JB uplink. MGW PHONE-1 includes WAROM JB and a certified gland, no automatic credit against BARTEC."},
-     {id:"EX-PHONE-BARTEC-M20-GLAND-SIZE-QTY",item:"BARTEC Ex Telephone JB certified M20 glands, selected by actual cable OD",unit:"pcs",qty:getGland(w.wp,"EX_IP_PHONE")?.verifiedActiveGlands??null,rateTHB:null,
+      status:"BUDGETARY_3_ACTIVE_JB_ENTRIES__OEM_GA_CONFLICT__SKU_OPEN",note:"First-principles provisional 3 distinct cable circuits: telephone, sounder and uplink, each assumed one JB cable entry. Selected historical PROSPER item3 lists FOUR M20 entries with FOUR stopping plugs, GA-1004 separately lists EIGHT. Do not conflate or count hole capacity as glands. MGW WAROM JB not selected."},
+     {id:"EX-PHONE-BARTEC-M20-GLAND-SIZE-QTY",item:"BARTEC Ex Telephone JB certified M20 glands, selected by actual cable OD",unit:"pcs",qty:phoneDerivation(w.wp)?.estimatedActiveGlands??null,rateTHB:null,
       source:"BARTEC GA-1004 (8×M20, 8 plugs, separate drain); Z1F MR0003; approved WIR/TER and selected cable DTS",
       owner:"EX_PHONE_JB_ASSEMBLY_OR_FIELD_BULK__VENDOR_INCLUDED_CHECK",
-      status:"CABLE_OD_SEAL_RANGE_EX_CERT_END_QTY_AND_PACKAGE_SCOPE_PENDING",
-      note:"Gland thread M20 does not establish OD/seal clamping. Check PHONE-1 WAROM inclusive package vs user-selected BARTEC JB; count only distinct Z1F cable ends and separately purchased fittings."},
-     {id:"EX-PHONE-CABLE",item:"Telephone voice/data/PoE and associated sounder wiring by selected phone DTS",unit:"route",qty:null,
+      status:"BUDGETARY_3_CANDIDATE_GLANDS__CERTIFIED_SKU_RATE_PENDING",
+      note:"3 candidate JB-end glands only if each device/uplink route enters TCAB once. Physical purchase gland qty and cost remain unknown until selected cable OD, armour, gland seal range, Ex e cert and vendor inclusion. Do not deduct MGW WAROM included gland: MGW is not selected."},
+     {id:"EX-PHONE-CABLE",item:"Telephone voice/data/PoE and associated sounder wiring by selected phone DTS",unit:"candidate circuit",qty:phoneDerivation(w.wp)?.estimatedCircuitCount??null,
       rateTHB:null,source:"Z1F MR0003 MTO, telephone DTS, BLD and LAY location/endpoint",owner:"PHONE_FIELD_BULK",
-      status:"ENDPOINT_CABLE_TYPE_NOT_EVIDENCED",note:"LSE-504-001 is EX Sounder, NOT an IP Phone; verify actual phone/JB tag and cabling first"}]},
+      status:"BUDGETARY_3_ROUTE_CANDIDATES__LENGTH_AND_CABLE_TYPE_PENDING",note:"3 conditional routes TPH→TCAB, LSE→TCAB, TCAB→E&I/PABX. No route length inferred from LAY, and no one-size-fits-all CAT6A assumption. Confirm PoE/DC and sounder triggering topology with DTS/BLD/WIR/TER. LSE is the sounder, not IP phone."}]},
    {id:"DTRS_TRUNK_RADIO",name:"DTRS / Trunk Radio",equipment:found("DTRS_TRUNK_RADIO"),route:cableRoute("DTRS_TRUNK_RADIO"),
     items:(DTRS_RFI_BULK_0553.byWP.find(x=>x.wp===w.wp)?.functions||[]).map((v,i)=>({
      id:"DTRS-"+i,item:v.fn,unit:v.unit,qty:v.qty,rateTHB:null,source:v.source,owner:v.tag,
