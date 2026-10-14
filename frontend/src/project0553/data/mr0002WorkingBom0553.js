@@ -1,38 +1,41 @@
 // MR-0002 single Working BOM derivation. Evidence is not customer release.
 // Quote-wide MGW quantities are never multiplied by guessed site quantities.
 // Site equipment is an explicit management provisional 1-per-WP distribution.
-import {MGW_P26_058_0553} from "./mgwP26058";
+import {MGW_P26_058_R2_UHF_0553} from "./mgwP26058R2Uhf0553";
 import {RFI_BDA_SELECTION_0553} from "./rfiBdaSelected0553";
 import {selectMR0002Rate0553} from "./mr0002PriceRegistry0553";
 
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {deriveDtrsRfiBudget0553} from "./dtrsRfiBudgetCalculation0553";
 const p=RFI_BDA_SELECTION_0553;
-const mgwLines=MGW_P26_058_0553.lines.filter(x=>["UHF-2","UHF-3","UHF-4"].includes(x[0]));
-// MGW UHF-2 Yagi, UHF-3 Omni and UHF-4 100m feeder/6 connectors are budget selections; UHF-1 BDA excluded.
+const mgwLines=MGW_P26_058_R2_UHF_0553.lines.filter(x=>["UHF-2","UHF-3","UHF-4"].includes(x.id));
+// R2 UHF-1 RFI BDA + WAROM enclosure is a SINGLE quoted package. UHF-2/3/4 likewise bundled.
 const budgetBulk=deriveDtrsRfiBudget0553();
 const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
  .filter(w=>w.equipment.some(x=>x.system==="DTRS_TRUNK_RADIO"))
  .map(w=>{
   const site=w.wp,siteTags=new Set(w.equipment.filter(x=>x.system==="DTRS_TRUNK_RADIO").map(x=>x.tag));
   const mappings={"UHF-2":"ANT-508-001","UHF-3":"ANT-508-002","UHF-4":"DTRS-RF-FEEDER-KIT"};
-  const equipment=mgwLines.map(([id,sku,description,quotedQty,unitPrice,,group])=>({
+  const equipment=mgwLines.map(({id,model:sku,package:description,quantity:quotedQty})=>({
    id:site+"-"+id,site,mr:"MR-0002",tag:mappings[id],quoteLine:id,sku,description,
    qty:1,unit:"set",currency:"USD",unitCost:selectMR0002Rate0553(id)?.unitRate??null,extended:selectMR0002Rate0553(id)?.unitRate??null,
-   source:"MGW-P26-058",sourceQuoteQty:quotedQty,
+   source:MGW_P26_058_R2_UHF_0553.id,sourceQuoteQty:quotedQty,
    status:["UHF-2","UHF-3","UHF-4"].includes(id)?"MANAGEMENT_SELECTED_MGW_RF_PACKAGE_PROVISIONAL_SITE_QTY":"UNSELECTED_OR_SCOPE_REVIEW",
    owner:["UHF-2","UHF-3","UHF-4"].includes(id)?"MGW_SELECTED_RF_PACKAGE":"VENDOR_EVIDENCE_ONLY",
    countedInWorkingTotal:["UHF-2","UHF-3","UHF-4"].includes(id)
   }));
-  const rfiBda={id:site+"-RFI-BDA",site,mr:"MR-0002",tag:"RFI-BDA/LOCATION_TO_VERIFY",
-   sku:RFI_BDA_SELECTION_0553.model,description:"RFI BD Series UHF Bi-Directional Amplifier 380-520 MHz; exact subband/options unresolved",
-   qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:"USD",unitCost:selectMR0002Rate0553("RFI-BDA").unitRate,extended:siteTags.has("TCAB-508-001")?selectMR0002Rate0553("RFI-BDA").unitRate:null,source:"MGW P26-058 UHF-1 DIFFERENT BRAND PROXY; "+RFI_BDA_SELECTION_0553.document,
-   status:"ACTIVE_BUDGETARY_PROXY__NOT_RFI_VENDOR_QUOTE__TECHNICAL_DEVIATION_REQUIRED",owner:"RFI_BDA_BASE_OFFER",countedInWorkingTotal:true,
-   benchmarkUSDPerSite:RFI_BDA_SELECTION_0553.pricingBenchmark.historicalMGWHyteraUSD,
-   benchmarkSource:RFI_BDA_SELECTION_0553.pricingBenchmark.basis,
-   enclosureMarketReferenceEUR:RFI_BDA_SELECTION_0553.pricingBenchmark.exDEnclosureMarketEUR,
-   referenceSiteQty:3,referenceQtyBasis:"MR0002 C1 one set each ZWP20/21/22; not a confirmed RFI purchase quantity",
-   note:"RFI BD Series is Base Offer. BD3840-0000-24 is conditional ordering candidate, not fixed SKU. Ex d IP66 full assembly and RF/thermal certification mandatory. MGW HYTERA USD13674 is OTHER-BRAND benchmark, not RFI quote. RX3852 LNA is non-additive superseded reference."};
+  const r2Bda=selectMR0002Rate0553("UHF-1");
+  const rfiBda={id:site+"-RFI-BDA",site,mr:"MR-0002",tag:"TCAB-508-001",
+   sku:r2Bda.model,description:r2Bda.description,
+   qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:"USD",
+   unitCost:r2Bda.unitRate,extended:siteTags.has("TCAB-508-001")?r2Bda.unitRate:null,
+   source:MGW_P26_058_R2_UHF_0553.id,sourceQuoteQty:r2Bda.quoteQty,
+   status:"MGW_R2_QUOTED_RFI_BDA_AND_WAROM_EXD_BUNDLE__FINAL_TECHNICAL_REVIEW_REQUIRED",
+   owner:"MGW_UHF1_RFI_WAROM_BUNDLED_PACKAGE",countedInWorkingTotal:true,
+   includedComponents:r2Bda.componentInclusions,
+   referenceSiteQty:3,referenceQtyBasis:"Three quote sets allocated provisionally one each to ZWP20, ZWP21, ZWP22; check MTO before bid release",
+   note:"RFI BD4345-00N0-AC and WAROM HRMD95-VIIIB Ex d enclosure are BOTH included in USD31474/set; never add BARTEC enclosure as another equipment cost. Confirm Ex d assembly certification, RF penetrations, thermal clearance, electrical interface and approved frequency."
+  };
   const enclosure={id:site+"-RFI-BDA-EXD-ENCLOSURE",site,mr:"MR-0002",tag:"TCAB-508-001",sku:null,
    description:"BARTEC EJB-6 Ex d IP66 minimum-fit assembly budget reference (RF feedthroughs not costed)",qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:"THB",unitCost:null,extended:null,
    source:"DTS-0002 C1 sheets 4/6; SPE-0001 C2; BDA size 620x450x270 mm",
@@ -71,19 +74,23 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
     costGap:!duplicate&&!priceKnown?"ACCESSORY_ALLOWANCE_REQUIRES_BASIS":null};
   });
   return {site,source:Z1F_TEL_LAYOUT_INDEX_0553.source,siteTags:[...siteTags],
-   items:[rfiBda,enclosure,gland,rfFeedthrough,...fieldBulk.filter(x=>x.owner!=="HISTORICAL_LNA_BULK_NOT_ADDITIVE"),...equipment],quoteAllocation:"RFI_BDA_BASE_OFFER_WITH_EXD_ENCLOSURE_MGW_YAGI_OMNI_FEEDER_SELECTED_LNA_EVIDENCE_ONLY",
+   items:[rfiBda,enclosure,gland,rfFeedthrough,...fieldBulk.filter(x=>x.owner!=="HISTORICAL_LNA_BULK_NOT_ADDITIVE"),...equipment],quoteAllocation:"MGW_R2_RFI_BDA_WAROM_EXD_YAGI_OMNI_FEEDER_FOUR_QUOTED_BUNDLES",
    controlledTotalUSD:[rfiBda,...equipment].filter(x=>x.countedInWorkingTotal&&Number.isFinite(x.extended)).reduce((sum,x)=>sum+x.extended,0),
    controlledTotalTHB:[enclosure,...fieldBulk].filter(x=>x.countedInWorkingTotal&&Number.isFinite(x.extended)).reduce((sum,x)=>sum+x.extended,0),
-   scopeWarnings:["RFI BD Series newly selected BDA product family replaces MGW UHF-1 HYTERA TS-9200; exact SKU, vendor quote, quantity and LNA coexistence not approved for cost posting","MGW UHF-2 Yagi and UHF-3 Omni selected; provisional 1 per ZWP20/ZWP21/ZWP22, reconcile site MTO","MGW UHF-3 HYTERA Omni antenna remains selected separately from excluded UHF-1 BDA; UHF-4 includes 100m feeder + six connectors",
-    "RFI RX3852 LNA removed from ACTIVE BOM; its historical data is retained separately in price registry, subject to approved BDA technical deviation",
-    "Prior DTRS bulk reused; RF-FEEDER / RF-CONNECTOR excluded to prevent overlap with MGW UHF-4",
-    "Legacy RX3852 SMA/LNA-specific DC and alarm allowances must not be automatically applied to N-type BDA; verify RF feeder kit against BDA interfaces",
-    "DTS requires 4 M20 entries; budget assumes 2 active certified glands and 2 spare stopping plugs per WP. Hawke historical THB1020 per set is rate evidence, not an OEM-approved Ex d SKU",
-    "Two RF paths require separate certified assembly treatment and no duplication with original RF surge enclosure"]};
+   scopeWarnings:[
+    "MGW P26-058_R2 UHF-1 is RFI BD4345-00N0-AC plus WAROM HRMD95-VIIIB as ONE USD31474/set package; historical HYTERA proxy and BARTEC candidate cannot be added",
+    "R2 UHF-2 Yagi includes clamp and PolyPhaser; R2 UHF-4 includes 100m feeder and six connectors per set: do not double-count accessories",
+    "Three quotation sets allocated provisionally one each to ZWP20/ZWP21/ZWP22; verify MTO and interfaces",
+    "Technical release requires confirmation of approved BDA frequency, Ex d enclosure assembly certification, glands, RF feedthroughs and safety assessment",
+    "Legacy LNA parts and references remain non-additive; separate field bulk only where demonstrably excluded from quoted kits"
+   ]
+};
  });
 export const MR0002_WORKING_BOM_0553=Object.freeze({
  id:"P553-MR0002-WORKING-BOM",mr:"MR-0002",sites:bySite,
- workingRateSource:p,quotation:MGW_P26_058_0553.id,
- quoteTotalUSD:MGW_P26_058_0553.quotedTotal,
+ workingRateSource:p,quotation:MGW_P26_058_R2_UHF_0553.id,
+ quoteTotalUSD:MGW_P26_058_R2_UHF_0553.overallTotalUSD,
+ quoteEquipmentTotalUSD:MGW_P26_058_R2_UHF_0553.equipmentTotalUSD,
+ quoteServicesTotalUSD:MGW_P26_058_R2_UHF_0553.servicesTotalUSD,
  selectedManufacturer:"RFI",selectedBda:RFI_BDA_SELECTION_0553,status:"RFI_BDA_BASE_OFFER__LNA_SUPERSEDED_NON_ADDITIVE__EXD_ENCLOSURE_AND_DEVIATION_GATED"
 });
