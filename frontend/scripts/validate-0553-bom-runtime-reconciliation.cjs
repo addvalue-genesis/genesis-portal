@@ -24,6 +24,12 @@ for(const site of target){
  assert.ok(canonical,"Missing canonical "+site);
  assert.equal(canonical.controlledTotalUSD,32568,"R2 equipment allocation "+site);
  const rows=projectRows({mr:"MR-0002",site});
+ assert.deepEqual(rows.invalidPosting,[],"Invalid posting rows for "+site);
+ const ids=rows.lines.map(x=>[x.site,x.mr,x.id].join("|"));
+ assert.equal(new Set(ids).size,ids.length,"Duplicate source cost item IDs for "+site);
+ const included=rows.lines.filter(x=>Boolean(x.item.priceInclusion));
+ assert.ok(included.length>=2,"Missing included Enclosure/Surge evidence for "+site);
+ assert.ok(included.every(x=>!x.counted),"Included child price added again "+site);
  const postedUSD=rows.lines.filter(x=>x.counted&&x.currency==="USD").reduce((s,x)=>s+x.extended,0);
  const postedTHB=rows.lines.filter(x=>x.counted&&x.currency==="THB").reduce((s,x)=>s+x.extended,0);
  assert.equal(Math.round(postedUSD*100),Math.round(canonical.controlledTotalUSD*100),"Cross-view USD "+site);
