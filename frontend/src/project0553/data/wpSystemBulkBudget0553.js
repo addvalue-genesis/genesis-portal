@@ -17,6 +17,7 @@ export function deriveWpSystemBulkBudget0553(){
  const raconBudget=deriveRaconTerminationBudget0553();
  const glandBudget=deriveBartecGlandBulkSchedule0553();
  const getGland=(wp,system)=>glandBudget.allEnclosures.find(x=>x.site===wp&&x.system===system);
+ const phoneDerivation=wp=>deriveMR0003PhoneBulk0553(wp);
  const newSites=Z1F_TEL_LAYOUT_INDEX_0553.byWP.map(w=>{
   const found=(sys)=>w.equipment.filter(e=>e.system===sys);
   const cableRoute=(sys)=>routeModel.rows.find(r=>r.wp===w.wp&&r.system===sys);
