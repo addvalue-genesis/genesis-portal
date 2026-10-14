@@ -35,10 +35,20 @@ function run(revision){
  catch(e){return {ok:false,revision,error:"Worker JSON parse failed: "+e.message};}
 }
 const rev01Result=run("REV01"),currentResult=run("CURRENT");
+const zwp8Dependency=fs.readFileSync(path.join(src,"project0553/data/zwp8Row43CostTrace.js"),"utf8");
+const legacyAntRateAbsent=/antennaUnitUSD/.test(zwp8Dependency)===false;
+const dependencyCompatibility={
+ revision:"CURRENT_DEPENDENCY_NOT_HISTORICAL",
+ rev01LedgerNeeds:["scenario.radioAssemblyUnitUSD","scenario.antennaUnitUSD","scenario.partialEquipmentUSD"],
+ currentDependencyFeatures:["preferredOwnerCodes","preferredOwnerCostsUSD","partialEquipmentUSD"],
+ historicAntennaRateProvided:!legacyAntRateAbsent,
+ sameDependencySourceForBothWorkers:true,
+ assessment:"Rev01 runtime cannot be considered reproduced until its original compatible dependency revision is recovered and independently hashed"
+};
 if(!rev01Result.ok||!currentResult.ok){
  const report={project:"PJ2608-0553",baselineApproval:"UNCHANGED",
   sourceHash:{rev01:approved,current:currentHash},
-  dependencyBasis:"same checkout, but historical dependency compatibility NOT established",
+  dependencyBasis:"same checkout, but historical dependency compatibility NOT established",dependencyCompatibility,
   gate:"BLOCKED_REPRODUCIBILITY__REV02_NOT_APPROVED",
   runtimeStatuses:{REV01:rev01Result.ok?"PASS":"FAILED",CURRENT:currentResult.ok?"PASS":"FAILED"},
   errors:[rev01Result,currentResult].filter(x=>!x.ok).map(x=>({revision:x.revision,details:x.error})),
@@ -68,7 +78,7 @@ const totals=old.rows.map(prev=>{
   rowCountRev01:prev.total,rowCountCurrent:curr.total};
 });
 const report={project:"PJ2608-0553",baselineApproval:"UNCHANGED",sourceHash:{rev01:approved,current:currentHash},
- dependencyBasis:"same checkout / isolated module evaluation",totals,changed,gate:"DRAFT_REV02_NOT_APPROVED"};
+ dependencyBasis:"same checkout / isolated module evaluation",dependencyCompatibility,totals,changed,gate:"DRAFT_REV02_NOT_APPROVED"};
 const destination=path.join(root,"build-audit","mr0001-rev01-current-reconciliation.json");
 fs.mkdirSync(path.dirname(destination),{recursive:true});
 fs.writeFileSync(destination,JSON.stringify(report,null,2)+"\n");
