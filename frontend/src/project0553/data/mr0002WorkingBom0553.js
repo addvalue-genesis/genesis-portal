@@ -36,12 +36,15 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    referenceSiteQty:3,referenceQtyBasis:"Three quote sets allocated provisionally one each to ZWP20, ZWP21, ZWP22; check MTO before bid release",
    note:"RFI BD4345-00N0-AC and WAROM HRMD95-VIIIB Ex d enclosure are BOTH included in USD31474/set; never add BARTEC enclosure as another equipment cost. Confirm Ex d assembly certification, RF penetrations, thermal clearance, electrical interface and approved frequency."
   };
-  const enclosure={id:site+"-RFI-BDA-EXD-ENCLOSURE",site,mr:"MR-0002",tag:"TCAB-508-001",sku:null,
-   description:"BARTEC EJB-6 Ex d IP66 minimum-fit assembly budget reference (RF feedthroughs not costed)",qty:siteTags.has("TCAB-508-001")?1:null,unit:"set",currency:"THB",unitCost:null,extended:null,
-   source:"DTS-0002 C1 sheets 4/6; SPE-0001 C2; BDA size 620x450x270 mm",
-   status:"SELECTED_EJB6_DIMENSIONAL_CANDIDATE__PRICE_UNVERIFIED__HISTORICAL_PANEL_THB436100_NOT_COMPARABLE",owner:"BARTEC_BDA_ENCLOSURE_BUDGET_OWNER",countedInWorkingTotal:false,
-   referenceMarketEUR:RFI_BDA_SELECTION_0553.pricingBenchmark.exDEnclosureMarketEUR,historicalProsperAssembledPanelTHB:436100,
-   note:"Do not use historical THB436100 TETRA assembled panel as EJB6 empty enclosure cost. BARTEC EJB6 internal envelope 540x760x353mm leaves 90x140x83mm gross clearance around 450x620x270mm BDA and needs a separately scoped engineered assembly quote; exact price not verified. Confirm internal clearances, 24V load, thermal rating, certified penetrations, glands, IP66 and assembly certificate."};
+  const enclosure={id:site+"-RFI-BDA-EXD-ENCLOSURE",site,mr:"MR-0002",tag:"TCAB-508-001",sku:"HRMD95-VIIIB",
+   description:"WAROM HRMD95-VIIIB Ex d enclosure, included with RFI BD4345-00N0-AC in MGW R2 UHF-1 package",
+   qty:siteTags.has("TCAB-508-001")?1:null,unit:"included set",currency:"USD",unitCost:null,extended:null,
+   source:MGW_P26_058_R2_UHF_0553.id+" / UHF-1",quoteLine:"UHF-1",
+   priceInclusion:"INCLUDED_IN_MGW_R2_UHF1",parentPackage:site+"-RFI-BDA",
+   status:"PRICE_INCLUDED_IN_UHF1__EXD_ASSEMBLY_COMPLIANCE_VERIFY",
+   owner:"MGW_UHF1_WAROM_ENCLOSURE_INCLUDED_NON_ADDITIVE",countedInWorkingTotal:false,
+   evidenceState:"INCLUDED_IN_QUOTED_PACKAGE",displayPrice:"INCLUDED IN UHF-1 (USD 31,474 / SET)",
+   note:"WAROM enclosure is vendor-quoted inside UHF-1, not a BARTEC EJB-6 procurement item. No separate enclosure price is published. Ex d assembly certification, installed glands, RF feedthroughs, internal clearance and heat dissipation still require technical verification."};
   const glandBasis=RFI_BDA_SELECTION_0553.glandBudgetDesign;
   const gland={id:site+"-BDA-M20-GLANDS",site,mr:"MR-0002",tag:"TCAB-508-001-M20",sku:glandBasis.model,
    description:"M20 Ex-rated Hawke armoured-cable gland, including locknut earth tag washer",
@@ -62,16 +65,18 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
   const obsoleteLnaBulk=new Set(["RF-SMA","LNA-POWER","LNA-ALARM"]);
   const fieldBulk=(priorBulk?.rows||[]).filter(b=>!overlapping.has(b.id)).map(b=>{
    const duplicate=overlapping.has(b.id);
-   const allowance=selectMR0002Rate0553(b.id);
+   const includedSurge=b.id==="EX-SURGE";
+   const allowance=includedSurge?null:selectMR0002Rate0553(b.id);
    const priceKnown=Number.isFinite(b.amount)||Boolean(allowance);
    return {id:site+"-BULK-"+b.id,site,mr:"MR-0002",tag:"BULK-"+b.id,
     description:b.item,qty:allowance?.qty??b.qty,unit:allowance?.unit??b.unit,currency:"THB",unitCost:allowance?.unitRate??b.rate,
     extended:allowance?Math.round(allowance.qty*allowance.unitRate*100)/100:b.amount??null,source:allowance?.source??b.source,
     priceBasis:allowance?.priceType??"EXISTING_PRIOR_BULK_CALCULATION",
-    status:obsoleteLnaBulk.has(b.id)?"SUPERSEDED_LNA_INTERFACE__BDA_REDESIGN_REQUIRED":duplicate?"INCLUDED_IN_MGW_UHF4__NOT_ADDITIVE":allowance?"BUDGETARY_ALLOWANCE_SUBJECT_TO_INTERFACE_CONFIRMATION":b.state,
-    owner:obsoleteLnaBulk.has(b.id)?"HISTORICAL_LNA_BULK_NOT_ADDITIVE":duplicate?"MGW_UHF4_INCLUDED":"FIELD_BULK_PREVIOUS_BUDGET",
-    countedInWorkingTotal:!duplicate&&!obsoleteLnaBulk.has(b.id)&&priceKnown,
-    costGap:!duplicate&&!priceKnown?"ACCESSORY_ALLOWANCE_REQUIRES_BASIS":null};
+    status:includedSurge?"PRICE_INCLUDED_IN_UHF2_POLYPHASER__EX_SURGE_COMPLIANCE_VERIFY":obsoleteLnaBulk.has(b.id)?"SUPERSEDED_LNA_INTERFACE__BDA_REDESIGN_REQUIRED":duplicate?"INCLUDED_IN_MGW_UHF4__NOT_ADDITIVE":allowance?"BUDGETARY_ALLOWANCE_SUBJECT_TO_INTERFACE_CONFIRMATION":b.state,
+    owner:includedSurge?"MGW_UHF2_POLYPHASER_INCLUDED_NON_ADDITIVE":obsoleteLnaBulk.has(b.id)?"HISTORICAL_LNA_BULK_NOT_ADDITIVE":duplicate?"MGW_UHF4_INCLUDED":"FIELD_BULK_PREVIOUS_BUDGET",
+    countedInWorkingTotal:!includedSurge&&!duplicate&&!obsoleteLnaBulk.has(b.id)&&priceKnown,
+    ...(includedSurge?{source:MGW_P26_058_R2_UHF_0553.id+" / UHF-2; TEL-LAY TCAB-508-002",quoteLine:"UHF-2",sku:"PolyPhaser IS-B50LN-C2",description:"PolyPhaser IS-B50LN-C2 surge protector included in MGW R2 UHF-2 Yagi antenna set; Ex-certified assembly for TCAB-508-002 not established",currency:"USD",unitCost:null,extended:null,priceInclusion:"INCLUDED_IN_MGW_R2_UHF2",parentPackage:site+"-UHF-2",evidenceState:"QUOTE_INCLUDED_TECHNICAL_EQUIVALENCE_UNVERIFIED",displayPrice:"INCLUDED IN UHF-2 (USD 227 / SET)",note:"PolyPhaser surge protector is included in the quoted Yagi set, without a standalone price. Do not add the former THB 25,000 EX-SURGE management allowance. Separate hazardous-area surge assembly requirements remain to be checked against MR, layout and certification; no claim of complete Ex compliance."}:{}),
+    costGap:!includedSurge&&!duplicate&&!priceKnown?"ACCESSORY_ALLOWANCE_REQUIRES_BASIS":null};
   });
   return {site,source:Z1F_TEL_LAYOUT_INDEX_0553.source,siteTags:[...siteTags],
    items:[rfiBda,enclosure,gland,rfFeedthrough,...fieldBulk.filter(x=>x.owner!=="HISTORICAL_LNA_BULK_NOT_ADDITIVE"),...equipment],quoteAllocation:"MGW_R2_RFI_BDA_WAROM_EXD_YAGI_OMNI_FEEDER_FOUR_QUOTED_BUNDLES",
