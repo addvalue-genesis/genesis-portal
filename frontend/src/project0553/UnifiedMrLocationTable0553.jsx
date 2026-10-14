@@ -1,5 +1,5 @@
 import React,{useState} from "react";
-import {BOM_READ_MODEL_0553} from "./data/bomReadModel0553";
+import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 
 // Read projection only. MR0002/MR0004 use canonical working items;
@@ -21,13 +21,10 @@ const budgetRateOwner=(mr,x)=>mr==="MR-0002"?(String(x.id).includes("RFI-LNA")?"
 export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
  const [expanded,setExpanded]=useState({});
  const [expandedItems,setExpandedItems]=useState({});
- const selected=BOM_READ_MODEL_0553.rows.filter(r=>r.mr===mr&&(site==="ALL"||r.site===site));
- const rows=selected.map(r=>({...r,items:r.detailRows?.length?r.detailRows.map(canonicalRow):(r.evidence||[]).map(evidenceToRow)}));
+ const projection=selectWorkingBomProjection0553({mr,site});
+ const rows=projection.rows;
  const withRows=rows.filter(r=>r.items.length);
- const totals=withRows.reduce((acc,r)=>{
-  for(const x of r.items)if(isCounted(x))acc[x.currency]=(acc[x.currency]||0)+x.extended;
-  return acc;
- },{});
+ const totals=projection.currencies;
  const workingUsd=totals.USD||0,workingThb=totals.THB||0;
  const hasUsd=Object.prototype.hasOwnProperty.call(totals,"USD");
  const hasThb=Object.prototype.hasOwnProperty.call(totals,"THB");
