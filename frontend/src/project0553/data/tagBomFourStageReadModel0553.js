@@ -52,16 +52,25 @@ export function getTagBomFourStage0553(site,tagRow){
   const c=byFunction.get(functionRow.functionId);
   const budget=budgetBridge?.entries.find(x=>x.functionId===functionRow.functionId);
   const aggregate=functionRow.functionId==="MOUNT_FEEDER"&&budgetBridge;
+  // Quote-backed existing TAG cost is evidence, NOT a second cost posting.
+  // The THB presentation adapter converts only after a dated FX is supplied.
+  const originalRate=Number.isFinite(c?.budgetaryUnitPrice)?c.budgetaryUnitPrice:
+   Number.isFinite(c?.unitPrice)?c.unitPrice:Number.isFinite(c?.rateTHB)?c.rateTHB:null;
+  const originalAmount=Number.isFinite(c?.budgetaryExtended)?c.budgetaryExtended:
+   Number.isFinite(c?.extended)?c.extended:null;
+  const originalCurrency=c?.currency||tagRow.currency||null;
   return {id:functionRow.id,functionId:functionRow.functionId,
    requirementState:functionRow.technicalState,quantityDriver:functionRow.quantityDriver,
    approvedSkuQty:functionRow.requiredQty, // remains null until approved by Engineering
    derivedWorkingQty:budget?.qty??(aggregate?1:Number.isFinite(c?.requiredQty)?c.requiredQty:Number.isFinite(c?.qty)?c.qty:null),
    budgetRateTHB:budget?.unitRateTHB??(aggregate?budgetBridge.scenarioTHB:null),
+   rateEvidenceOriginal:originalRate,amountEvidenceOriginal:originalAmount,currencyEvidenceOriginal:originalCurrency,
+   quoteEvidenceLine:c?.budgetaryQuoteLine||c?.functionId||null,
    budgetAmountTHB:budget?.extendedTHB??(aggregate?budgetBridge.scenarioTHB:null),
    budgetUnit:budget?.unit??(aggregate?"lot":null),
    budgetBasis:budget?.quantityBasis??(aggregate?"ONE source MTO Bulk lot, aggregate scenario total; DO NOT add to individual child amounts":null),
    budgetSource:budget?.source??(aggregate?budgetBridge.source:null),
-   budgetPosting:aggregate?"ROLLUP_TOTAL_ONLY_NOT_ADDITIVE":budget?"SOURCE_RATE_BUDGET_ESTIMATE_NOT_ADDITIVE":"NO_SOURCE_RATE_YET",
+   budgetPosting:aggregate?"ROLLUP_TOTAL_ONLY_NOT_ADDITIVE":budget?"SOURCE_RATE_BUDGET_ESTIMATE_NOT_ADDITIVE":Number.isFinite(originalRate)?"EXISTING_TAG_LEDGER_EVIDENCE_NON_ADDITIVE":"NO_SOURCE_RATE_YET",
    qtyState:budget?"WORKING_BUDGET_QUANTITY_WITH_OPEN_TECHNICAL_PROOF":aggregate?"WORKING_BUDGET_LOT_ROLLUP":c?.quantityState||"ENGINEERING_PHYSICAL_QTY_NOT_VERIFIED",
    qtyProof:c?.quantityProof||functionRow.proofRequired?.join("; ")||"REVIEW",
    costOwner:c?.allocationOwner||null,selectionStatus:c?.budgetarySelectionState||"NOT_SELECTED",
