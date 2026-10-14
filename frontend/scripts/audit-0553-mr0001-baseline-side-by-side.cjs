@@ -75,4 +75,5 @@ fs.writeFileSync(destination,JSON.stringify(report,null,2)+"\n");
 console.log("SIDE BY SIDE MR0001 — report: "+destination);
 for(const t of totals)console.log(t.site,"USD delta",t.deltaUSD,"THB delta",t.deltaTHB,"row counts",t.rowCountRev01,t.rowCountCurrent);
 console.log("changed rows:",changed.length,"Rev02 remains UNAPPROVED");
-\n}\n
+
+}
