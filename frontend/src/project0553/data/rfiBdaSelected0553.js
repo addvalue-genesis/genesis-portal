@@ -30,6 +30,19 @@ export const RFI_BDA_SELECTION_0553=Object.freeze({
  },
  glandBudgetDesign:{source:"INNOVA QA24-0604 dated 2024-07-15",model:"Hawke 501/453/UNIV/A/M20",currency:"THB",ratePerSet:1020,estimatedActivePerSite:2,dtsNominalM20EntryCapacity:4,estimatedSparePlugsPerSite:2,drainEntryCount:null,sites:3,indicativeRatePerSiteTHB:2040,indicativeAllSitesTHB:6120,includes:["locknut","earth tag","nylon washer"],status:"HISTORICAL_CANDIDATE__EX_DB_ASSEMBLY_AND_CABLE_OD_MATCH_NOT_APPROVED",pricingOwner:"STANDALONE_BULK_NOT_INCLUDED_IN_BARTEC_ASSEMBLY_UNLESS_OEM_CONFIRMATION",sourceUrl:"https://drive.google.com/file/d/1I4LhJY-heANsoV21uWMO6kUVioeokMUS/view",constraints:["DTS-0002 C1 M20 bottom entries and spare plugs","verify cable OD, braid/armour, clamping and Ex d compatibility","RF coax passes via certified RF bulkhead fittings not assumed to use M20 power glands","do not count included locknuts and washers twice"]},
  enclosureBudgetDesign:{family:"BARTEC EJB",candidate:"EJB-6 Ex d IIB+H2 IP66 copper-free aluminium coated — minimum dimensional fit candidate",manufacturerReference:"BARTEC EJB selection chart / BARTEC EJB Ex d IIB+H2",outerDimensionsMm:[650,870,480],innerDimensionsMm:[540,760,353],equipmentDimensionsMm:[450,620,270],grossClearanceMm:[90,140,83],grossEnvelopeFits:true,usableClearanceApproved:false,dimensionSource:"BARTEC legacy EJB selection chart; verify current certificate and exact ordered enclosure revision",connectorClearanceConcern:"Only 83mm total depth allowance before mounting plate and RF connectors; supplier fit/thermal drawing mandatory",wallMountWithLugs:true,entriesRequired:"DTS-0002 C1 nominal 4 x M20 bottom with spare plugs; OEM-certified RF bulkhead feedthrough and actual cable OD may require separate approved entry design",rfPorts:"two N female BDA RF ports: entry/exit certification, surge protection and bonding design to OEM",thermalApproval:false,assemblyCertification:false,siteQuantity:3,siteTag:"TCAB-508-001",alternativeNotSelected:"Historical BARTEC EJB91 660x960x462 old Ex d radio panel cannot be reused without verified internal fitting and certification"},
+ pricingModel:{
+  formula:"C_EXD_BUDGET = C_BARE_EXD + C_MACHINING_CERTIFIED_ENTRIES + C_RF_PENETRATIONS + C_MOUNTING + C_DC_TERMINALS + C_INTERNAL_WIRING + C_THERMAL_AND_ASSEMBLY_TEST + C_DOCUMENTATION - PROVEN_VENDOR_INCLUDED",
+  referenceBartecShop:{
+   ejb51UlUSD:4896.01,ejb61UlUSD:12231.52,ejb63UlUSD:8602.81,
+   url:"https://bartecshop.com/shop-all/control-and-connection-equipment/ejb-ul-certified-encloures/",
+   scope:"UL-certified empty enclosures, NOT the selected EJB-6 ATEX assembly; no automatic cost posting"
+  },
+  historicalProsper:{rateTHB:436100,source:"Q-PROSRY-24051 Rev0 Item 5 historical Ex d TETRA panel, 660x960x462mm",applicability:"PRICE CROSSCHECK ONLY: old cabinet fitted terminals/wiring; not EJB-6 bare box"},
+  constraint:"Minimum box cavity is not sufficient to approve BDA mounting. Verify OEM plate usable area, N-type port bending, RF Ex d feedthrough, maintenance, temperature T3, power load and certificate",
+  evidenceTier:"SOURCED_USD_UL_RETAIL_VS_HISTORICAL_THB_PACKAGE",
+  selectedEjb6UnitCostTHB:null,selectedEjb6UnitCostUSD:null,
+  activeEnclosureCostPostingAllowed:false
+ },
  pricingBenchmark:{
   historicalMGWHyteraUSD:13674,
   basis:"MGW P26-058 UHF-1 HYTERA per-set price: DIFFERENT BRAND alternative, not RFI quotation",
