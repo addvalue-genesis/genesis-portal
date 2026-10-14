@@ -8,6 +8,16 @@ export const MR0003_PHONE_BULK_BASIS_0553=Object.freeze({
  selectedJb:"PROSPER BARTEC 07-56D2-0411 Zone 1/2 Terminal Box historical item4, 200x200x120 SS316L incl relay and internal terminals",
  historicalQuotedJbM20Entries:3,historicalQuotedJbStoppingPlugs:3,
  gaAlternativeM20Entries:8,gaAlternativeStoppingPlugs:8,
+ sparePolicy:{minimumEntries:2,percentOfCapacity:20,ga1004SpareAtThreeActive:5},
+ accessories:[
+  {id:"M20-ACTIVE-GLAND",qty:3,unit:"candidate pcs",costOwner:"FIELD_BULK",note:"OD, armour, Ex eb certificate and sealing range must match; no SKU selected"},
+  {id:"M20-STOPPING-PLUG",qty:5,unit:"remaining fitted pcs",costOwner:"JB_PACKAGE",note:"GA-1004 includes 8 factory plugs; replace three positions only if three glands verified; no additive purchase"},
+  {id:"M20-LOCKNUT",qty:8,unit:"GA factory pcs",costOwner:"JB_PACKAGE",note:"GA-1004 BOM includes eight locknuts; verify needed fitting with gland manufacturer"},
+  {id:"DRAIN-VALVE",qty:1,unit:"assembly",costOwner:"JB_PACKAGE",note:"Separate dedicated bottom drain entry"},
+  {id:"TERMINALS-MARKERS-EARTH",qty:null,unit:"assembly inclusions",costOwner:"JB_PACKAGE",note:"GA-1004 terminals, mounting, nameplate and earth studs; no duplicate standalone cost"},
+  {id:"CABLE-END-KITS",qty:null,unit:"per verified cable end",costOwner:"FIELD_BULK",note:"Ferrules/lugs/glands/seals, continuity accessories from approved cable specs"},
+  {id:"EXTERNAL-BONDING-SUPPORT",qty:null,unit:"from site routes",costOwner:"FIELD_BULK",note:"External SS316 fixings, support ties and earthing need separate takeoff"}
+ ],
  separateDrainHole:true,
  enclosureConflict:"Historical PROSPER item4 3 field M20 bottom entries plus separate drain vs GA-1004 8 M20 top entries: DO NOT silently treat as same configured enclosure",
  routeCandidates:[
