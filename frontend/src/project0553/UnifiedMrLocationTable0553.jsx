@@ -14,6 +14,7 @@ const evidenceToRow=(x,i)=>({
 });
 const canonicalRow=(x)=>({...x,scenarioEvidence:false});
 const isCounted=x=>x.countedInWorkingTotal===true&&Number.isFinite(x.extended);
+const phoneEvidenceState=x=>({ "EX-PHONE-JB-ENTRIES":"COUNTED: 8 physical M20 entries / 3 budget-active / 5 factory plugs; included in JB assembly", "EX-PHONE-BARTEC-M20-GLAND-SIZE-QTY":"COUNTED: 3 budgetary glands × THB 1,020 = THB 3,060 indicative; not A5 booked without certified SKU", "EX-PHONE-CABLE":"COUNTED: 3 physical circuit functions; length-based cost not established from WIR/TER" })[String(x.id).toUpperCase()]||null;
 const moduleBase=(mr,site)=>"bid.budget.bom."+mr.toLowerCase().replace("-","")+(site?"."+site.toLowerCase():"");
 const moduleItem=(mr,site,item)=>moduleBase(mr,site)+"."+String(item.id).toLowerCase();
 const budgetRateOwner=(mr,x)=>mr==="MR-0002"?(String(x.id).includes("RFI-LNA")?"RFI · LNA":String(x.quoteLine||"").match(/^UHF-[234]$/)?"MGW · Antenna / Feeder":String(x.quoteLine||"")==="UHF-1"?"HYTERA BDA · excluded":x.owner||"Field bulk"):x.owner||"Evidence candidate";
@@ -61,7 +62,7 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
      {open&&<tr><td colSpan={7}><div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Tag / line</th><th>SKU / Description</th><th>Qty</th><th>Unit rate</th><th>Extension</th><th>Ownership / Evidence</th><th>Status / Copy ID</th></tr></thead><tbody>
       {r.items.map((x,i)=><tr key={x.id+"-"+i}><td><button type="button" className="p55-row-toggle" aria-expanded={!!expandedItems[moduleItem(mr,r.site,x)]} onClick={()=>setExpandedItems(o=>({...o,[moduleItem(mr,r.site,x)]:!o[moduleItem(mr,r.site,x)]}))}>{expandedItems[moduleItem(mr,r.site,x)]?"−":"+"}</button> {x.tag||x.id}</td><td>{x.sku||"—"}<small>{x.description}</small>{expandedItems[moduleItem(mr,r.site,x)]&&<div className="p55-note"><strong>Requirement → Location → Function → Quantity → Vendor → Cost:</strong> {mr} → {r.site} → {x.tag||x.id} → {x.qty??"NOT VERIFIED"} {x.unit||""} → {budgetRateOwner(mr,x)} → {isCounted(x)?money(x.extended,x.currency||""):"UNPRICED / EXCLUDED"}.<p>Source: {x.source||r.rfqSource||"RFQ cross-reference pending"} · Price basis: {x.priceBasis||r.projectionSource||"Evidence only"} · Cost owner: {x.owner||"Unassigned"} · {x.note||x.costGap||"Engineering verification required before release"}</p><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleItem(mr,r.site,x)+".evidence"} componentName={(x.tag||x.id)+" / Engineering & Cost Evidence"}/></div>}</td>
        <td>{x.qty??"PENDING"} {x.unit||""}</td><td>{money(x.unitCost,x.currency||"")}</td>
-       <td>{isCounted(x)?money(x.extended,x.currency||""):"NOT COUNTED / PENDING"}</td>
+       <td>{isCounted(x)?money(x.extended,x.currency||""):mr==="MR-0003"&&phoneEvidenceState(x)?phoneEvidenceState(x):"NOT COUNTED / PENDING"}</td>
        <td>{budgetRateOwner(mr,x)}<small>{x.source||"Source trace pending"}</small></td>
        <td>{x.status||"—"}<small><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleItem(mr,r.site,x)}/></small></td></tr>)}
      </tbody></table></div><p className="p55-note">Open constraints: {(r.gaps||[]).join(" · ")||"See RFQ / engineering evidence trace"}</p></td></tr>}
