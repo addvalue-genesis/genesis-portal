@@ -30,10 +30,29 @@ assert.equal(hash(fs.readFileSync(fixture,"utf8")),approved,"Rev01 fixture hash 
 const currentHash=hash(fs.readFileSync(ledger,"utf8"));
 function run(revision){
  const p=cp.spawnSync(process.execPath,[__filename,"--worker",revision],{cwd:root,encoding:"utf8",maxBuffer:20*1024*1024});
- if(p.status!==0)throw Error("Worker "+revision+" failed: "+p.stderr);
- return JSON.parse(p.stdout.trim().split("\n").at(-1));
+ if(p.status!==0)return {ok:false,revision,exitCode:p.status,error:(p.stderr||p.stdout||"Worker failed").slice(0,12000)};
+ try{return {ok:true,data:JSON.parse(p.stdout.trim().split("\\n").at(-1))};}
+ catch(e){return {ok:false,revision,error:"Worker JSON parse failed: "+e.message};}
 }
-const old=run("REV01"),now=run("CURRENT");
+const rev01Result=run("REV01"),currentResult=run("CURRENT");
+if(!rev01Result.ok||!currentResult.ok){
+ const report={project:"PJ2608-0553",baselineApproval:"UNCHANGED",
+  sourceHash:{rev01:approved,current:currentHash},
+  dependencyBasis:"same checkout, but historical dependency compatibility NOT established",
+  gate:"BLOCKED_REPRODUCIBILITY__REV02_NOT_APPROVED",
+  runtimeStatuses:{REV01:rev01Result.ok?"PASS":"FAILED",CURRENT:currentResult.ok?"PASS":"FAILED"},
+  errors:[rev01Result,currentResult].filter(x=>!x.ok).map(x=>({revision:x.revision,details:x.error})),
+  currentSiteTotals:currentResult.ok?currentResult.data.rows.map(x=>({site:x.site,subtotal:x.subtotal,rowCount:x.total})):[],
+  totals:[],changed:[],
+  action:"Recover Rev01-era zwp8Row43CostTrace dependency at its original approved revision before asserting any numerical delta. Do not alter legacy assertion or silently adjust scenario."
+ };
+ const destination=path.join(root,"build-audit","mr0001-rev01-current-reconciliation.json");
+ fs.mkdirSync(path.dirname(destination),{recursive:true});
+ fs.writeFileSync(destination,JSON.stringify(report,null,2)+"\\n");
+ console.error("AUDIT BLOCKED: Rev01 and current cannot be compared reproducibly with shared checkout; see "+destination);
+ process.exitCode=2;
+} else {
+const old=rev01Result.data,now=currentResult.data;
 const map=x=>new Map(x.rows.flatMap(r=>r.items.map(item=>[item.key,item])));
 const a=map(old),b=map(now);
 const changed=[...new Set([...a.keys(),...b.keys()])].flatMap(key=>{
@@ -56,3 +75,4 @@ fs.writeFileSync(destination,JSON.stringify(report,null,2)+"\n");
 console.log("SIDE BY SIDE MR0001 — report: "+destination);
 for(const t of totals)console.log(t.site,"USD delta",t.deltaUSD,"THB delta",t.deltaTHB,"row counts",t.rowCountRev01,t.rowCountCurrent);
 console.log("changed rows:",changed.length,"Rev02 remains UNAPPROVED");
+\n}\n
