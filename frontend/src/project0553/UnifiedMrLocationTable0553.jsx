@@ -1,4 +1,6 @@
 import React,{useState} from "react";
+import {bomModuleId0553,bomPriceTHB0553,bomEvidenceDisplay0553} from "./bomPresentationContract0553";
+import {MGW_P26_058_R2_UHF_0553} from "./data/mgwP26058R2Uhf0553";
 import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 
@@ -16,7 +18,7 @@ const canonicalRow=(x)=>({...x,scenarioEvidence:false});
 const isCounted=x=>x.countedInWorkingTotal===true&&Number.isFinite(x.extended);
 const phoneEvidenceState=x=>({ "EX-PHONE-JB-ENTRIES":"COUNTED: 8 physical M20 entries / 3 budget-active / 5 factory plugs; included in JB assembly", "EX-PHONE-BARTEC-M20-GLAND-SIZE-QTY":"COUNTED: 3 budgetary glands × THB 1,020 = THB 3,060 indicative; not A5 booked without certified SKU", "EX-PHONE-CABLE":"COUNTED: 3 physical circuit functions; length-based cost not established from WIR/TER" })[String(x.id).toUpperCase()]||null;
 const moduleBase=(mr,site)=>"bid.budget.bom."+mr.toLowerCase().replace("-","")+(site?"."+site.toLowerCase():"");
-const moduleItem=(mr,site,item)=>moduleBase(mr,site)+"."+String(item.id).toLowerCase();
+const moduleItem=(mr,site,item)=>bomModuleId0553({mr,site,itemId:item.id});
 const budgetRateOwner=(mr,x)=>mr==="MR-0002"?(String(x.id).includes("RFI-LNA")?"RFI · LNA":String(x.quoteLine||"").match(/^UHF-[234]$/)?"MGW · Antenna / Feeder":String(x.quoteLine||"")==="UHF-1"?"MGW R2 · RFI/WAROM bundle":x.owner||"Field bulk"):x.owner||"Evidence candidate";
 export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
  const [expanded,setExpanded]=useState({});
@@ -31,9 +33,9 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
  const convertible=!hasUsd||(Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0);
  const thbTotal=convertible?workingThb+workingUsd*(fx?.thbPerUsd||0):null;
  const candidate=mr==="MR-0003";
- const asThb=(n,c)=>!Number.isFinite(n)?"PENDING (not zero)":c==="THB"?money(n,"THB"):c==="USD"&&Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0?money(n*fx.thbPerUsd,"THB"):"FX REQUIRED";
+ const asThb=(n,c)=>bomPriceTHB0553(n,c,fx).label;
  const fmtLine=x=>Number.isFinite(x)?money(x,"THB"): "USD FX not established";
- const includedThb=x=>x.priceInclusion&&x.parentPackage?("INCLUDED IN "+(x.quoteLine||"VENDOR PACKAGE")+" · "+(Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0?"Package "+money((x.quoteLine==="UHF-1"?31474:227)*fx.thbPerUsd,"THB"):"FX REQUIRED")+" · Non-additive"):x.displayPrice;
+ const includedThb=x=>bomEvidenceDisplay0553(x,fx,MGW_P26_058_R2_UHF_0553.lines);
  return <section className="p55-panel" data-component-key={"bid.budget.bom.system-location-mto."+mr.toLowerCase().replace("-","")}>
   <h4>{mr} · System × Location × MTO / Working BOM <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.system-location-mto."+mr.toLowerCase().replace("-","")}/></h4>
   <p className="p55-note">{candidate?"MR0003: priced vendor/reference evidence and field-bulk candidates only, NOT approved or posted working cost.":"Canonical equipment working lines; INCLUDED and unpriced rows never added again."} Source currencies preserved. Missing prices/quantities are pending, never zero. No released A+B+C total is asserted.</p>
