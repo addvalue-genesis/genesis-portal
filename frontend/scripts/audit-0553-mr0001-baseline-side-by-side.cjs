@@ -31,7 +31,7 @@ const currentHash=hash(fs.readFileSync(ledger,"utf8"));
 function run(revision){
  const p=cp.spawnSync(process.execPath,[__filename,"--worker",revision],{cwd:root,encoding:"utf8",maxBuffer:20*1024*1024});
  if(p.status!==0)return {ok:false,revision,exitCode:p.status,error:(p.stderr||p.stdout||"Worker failed").slice(0,12000)};
- try{return {ok:true,data:JSON.parse(p.stdout.trim().split("\\n").at(-1))};}
+ try{return {ok:true,data:JSON.parse(p.stdout.trim().split("\n").at(-1))};}
  catch(e){return {ok:false,revision,error:"Worker JSON parse failed: "+e.message};}
 }
 const rev01Result=run("REV01"),currentResult=run("CURRENT");
@@ -48,7 +48,7 @@ if(!rev01Result.ok||!currentResult.ok){
  };
  const destination=path.join(root,"build-audit","mr0001-rev01-current-reconciliation.json");
  fs.mkdirSync(path.dirname(destination),{recursive:true});
- fs.writeFileSync(destination,JSON.stringify(report,null,2)+"\\n");
+ fs.writeFileSync(destination,JSON.stringify(report,null,2)+"\n");
  console.error("AUDIT BLOCKED: Rev01 and current cannot be compared reproducibly with shared checkout; see "+destination);
  process.exitCode=2;
 } else {
