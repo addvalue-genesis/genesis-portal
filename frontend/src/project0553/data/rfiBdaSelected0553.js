@@ -28,12 +28,20 @@ export const RFI_BDA_SELECTION_0553=Object.freeze({
   enclosure:"Certified Ex d IIA or superior IP66 enclosure for complete RFI BDA assembly, require internal clearance, thermal and RF feedthrough approval",
   caution:"RFI BDA datasheet does not establish 2dB noise figure, 24V current, or completed hazardous area assembly compliance"
  },
+ enclosureBudgetDesign:{family:"BARTEC EJB",candidate:"EJB-7 Ex d IIB+H2 IP66 copper-free aluminium coated",manufacturerReference:"BARTEC EJB selection chart / BARTEC EJB Ex d IIB+H2",outerDimensionsMm:[700,1000,500],innerDimensionsMm:[590,890,340],equipmentDimensionsMm:[450,620,270],grossClearanceMm:[140,270,70],grossEnvelopeFits:true,usableClearanceApproved:false,wallMountWithLugs:true,entriesRequired:"DTS-0002 C1 nominal 4 x M20 bottom with spare plugs; OEM-certified RF bulkhead feedthrough and actual cable OD may require separate approved entry design",rfPorts:"two N female BDA RF ports: entry/exit certification, surge protection and bonding design to OEM",thermalApproval:false,assemblyCertification:false,siteQuantity:3,siteTag:"TCAB-508-001",alternativeNotSelected:"Historical BARTEC EJB91 660x960x462 old Ex d radio panel cannot be reused without verified internal fitting and certification"},
  pricingBenchmark:{
   historicalMGWHyteraUSD:13674,
   basis:"MGW P26-058 UHF-1 HYTERA per-set price: DIFFERENT BRAND alternative, not RFI quotation",
   exDEnclosureMarketEUR:3622.50,
   enclosureSource:"ATEXShop EEx d IIC/IIB SS316 TNCD public list price, size not verified",
   doubleCountGate:"Do not sum standalone enclosure onto a package quote without scope reconciliation",
+  historicalProsperExdPanelTHB:436100,
+  historicalProsperSource:"Q-PROSRY-24051 Rev0 Item5 660x960x462 old TETRA Exd enclosure assembly; not EJB-7 purchase price",
+  referenceEnclosureAllowanceTHB:436100,
+  referenceEnclosureAllowanceClass:"HISTORICAL_COMPARABLE_NOT_BARTEC_EJB7_QUOTATION",
+  benchmarkBdaThreeSitesUSD:41022,
+  benchmarkEnclosureThreeSitesTHB:1308300,
+  scenarioExcluded:["RF penetrations","BDA mounting","internal harness and DC wiring","thermal study and certification","field bulk","freight VAT and contingency"],
   chosenRfiEquipmentQuote:null,chosenEnclosureQuote:null
  },
  deviationPlan:{required:true,authority:"PTTEP / project engineering approval",items:["BDA replaces DTS LNA architecture","NF 4dB module maximum versus DTS ≤2dB; verify full-assembly result and coverage","Standard output +21dBm versus DTS 22dBm","OIP3 >45dBm unverified for assembly","N female versus SMA female interconnect","Ex d IP66 complete certified enclosure and heat/penetration qualification","Confirm duplex plan, passband, donor/service antenna isolation and 24V load"]},
