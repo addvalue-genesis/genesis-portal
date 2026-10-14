@@ -1,6 +1,7 @@
 // PJ2608-0553: read-only composition of EXISTING authoritative sources.
 // This is a presentation adapter, not a new BOM, cost calculation engine, or
 // accepted OEM configuration. MR Set/Lot never becomes a purchased SKU count.
+import {bridgeCiscoLan0553} from "./ciscoLanFunctionBridge0553";
 import {MR0001_PACKAGE_COMPOSITION} from "./mr0001PackageComposition";
 import {MR0001_ENGINEERING_REQUIRED_BOM} from "./mr0001RequiredBomDerivation";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
@@ -41,8 +42,9 @@ export function getTagBomFourStage0553(site,tagRow){
  const pkg=MR0001_PACKAGE_COMPOSITION.packages.find(p=>p.platform===site&&p.sourceRowIndex===tagRow.row);
  const matchingTag=Boolean(source?.sourceCodes?.includes(tagRow.tag)||
    (source?.sourcePartText||"").includes(tagRow.tag)||String(tagRow.tag).toLowerCase().includes("bulk"));
- const detail=tagRow.detail?.length?tagRow.detail:tagRow.components?.length?tagRow.components:
-  auditedOwnerDetail(site,tagRow,owner);
+ const ciscoBridge=bridgeCiscoLan0553(site,tagRow,(pkg?.components||[]).map(c=>c.functionId));
+ const detail=ciscoBridge?.functions||(tagRow.detail?.length?tagRow.detail:tagRow.components?.length?tagRow.components:
+  auditedOwnerDetail(site,tagRow,owner));
  const byFunction=new Map(detail.map(c=>[c.functionId,c]));
  // Bridge the previously isolated BARTEC manufacturer geometry + source MTO
  // into THIS TAG's Stage 01 Required view. No read-model cost mutation.
@@ -56,12 +58,12 @@ export function getTagBomFourStage0553(site,tagRow){
    requirementState:functionRow.technicalState,quantityDriver:functionRow.quantityDriver,
    approvedSkuQty:functionRow.requiredQty, // remains null until approved by Engineering
    derivedWorkingQty:budget?.qty??(aggregate?1:Number.isFinite(c?.requiredQty)?c.requiredQty:Number.isFinite(c?.qty)?c.qty:null),
-   budgetRateTHB:budget?.unitRateTHB??(aggregate?budgetBridge.scenarioTHB:null),
-   budgetAmountTHB:budget?.extendedTHB??(aggregate?budgetBridge.scenarioTHB:null),
+   budgetRateTHB:budget?.unitRateTHB??(aggregate?budgetBridge.scenarioTHB:ciscoBridge?.functions.find(x=>x.functionId===functionRow.functionId)?.budgetaryUnitPrice??null),
+   budgetAmountTHB:budget?.extendedTHB??(aggregate?budgetBridge.scenarioTHB:ciscoBridge?.functions.find(x=>x.functionId===functionRow.functionId)?.budgetaryExtended??null),
    budgetUnit:budget?.unit??(aggregate?"lot":null),
    budgetBasis:budget?.quantityBasis??(aggregate?"ONE source MTO Bulk lot, aggregate scenario total; DO NOT add to individual child amounts":null),
-   budgetSource:budget?.source??(aggregate?budgetBridge.source:null),
-   budgetPosting:aggregate?"ROLLUP_TOTAL_ONLY_NOT_ADDITIVE":budget?"SOURCE_RATE_BUDGET_ESTIMATE_NOT_ADDITIVE":"NO_SOURCE_RATE_YET",
+   budgetSource:budget?.source??(aggregate?budgetBridge.source:ciscoBridge?.source??null),
+   budgetPosting:aggregate?"ROLLUP_TOTAL_ONLY_NOT_ADDITIVE":budget?"SOURCE_RATE_BUDGET_ESTIMATE_NOT_ADDITIVE":ciscoBridge?"READ_ONLY_VENDOR_FUNCTION_MAPPING_NOT_ADDITIVE":"NO_SOURCE_RATE_YET",
    qtyState:budget?"WORKING_BUDGET_QUANTITY_WITH_OPEN_TECHNICAL_PROOF":aggregate?"WORKING_BUDGET_LOT_ROLLUP":c?.quantityState||"ENGINEERING_PHYSICAL_QTY_NOT_VERIFIED",
    qtyProof:c?.quantityProof||functionRow.proofRequired?.join("; ")||"REVIEW",
    costOwner:c?.allocationOwner||null,selectionStatus:c?.budgetarySelectionState||"NOT_SELECTED",
@@ -102,7 +104,7 @@ export function getTagBomFourStage0553(site,tagRow){
  const delta=numericallyComplete&&Number.isFinite(ledgerTotal)?rounded(workingTotal-ledgerTotal):null;
  // Vendor proof belongs in the vendor registry. Show the exact quoted source rows
  // relevant to THIS physical owner, never the other owners or all 53 quote rows.
- const offered=pricedFunctions.filter(c=>/^([ABC]-\d+)$/.test(String(c.quoteCode||""))).map(c=>{
+ const offered=ciscoBridge?ciscoBridge.functions.flatMap(fn=>fn.quoteLines.map(line=>({functionId:fn.functionId,code:line.code,quoteId:ciscoBridge.quoteId,quotation:ciscoBridge.quotation,vendor:"VST ECS / Cisco",currency:"THB",sku:line.sku,description:line.description,offeredQty:line.offeredQty,quotedUnit:line.unit,quotedTotal:rounded(line.unit*line.offeredQty),workingQty:ciscoBridge.sourceQty,workingExtended:line.extended,sourceRateNull:false,sourceStatus:"WORKING_RATE_QUOTE_EXPIRED__TECHNICAL_PROOF_OPEN",costOwner:owner}))) :pricedFunctions.filter(c=>/^([ABC]-\d+)$/.test(String(c.quoteCode||""))).map(c=>{
   const q=candidateLookup.get("NG-260916");
   const found=q?.lines?.find(line=>line[0]===c.quoteCode);
   return {functionId:c.functionId,code:c.quoteCode,quoteId:q?.id||null,
@@ -120,7 +122,7 @@ export function getTagBomFourStage0553(site,tagRow){
   sourceId:source?.id||null,sourceMatched:matchingTag,sourceQuantityText:source?.sourceQuantityText||null,
   scopeQty:tagRow.sourceQty??null,scopeUnit:tagRow.sourceUnit||null,
   packageFamily:pkg?.equipmentFamily||"SOURCE_MAPPING_REVIEW",
-  required,bartecBulkRequired,budgetBridge,physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
+  required,bartecBulkRequired,budgetBridge,ciscoBridge,physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
   working:{status:tagRow.status||"REVIEW",currency:tagRow.currency||null,extended:ledgerTotal,
    selectedVendor:tagRow.vendor||null,selectedSku:tagRow.sku||null,
    source:tagRow.source||null,functions:pricedFunctions,
