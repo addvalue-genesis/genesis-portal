@@ -2,14 +2,14 @@ import React,{useState} from "react";
 import {RfFeederEvidence0553} from "./RfFeederEvidence0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {MR0002_WORKING_BOM_0553 as model} from "./data/mr0002WorkingBom0553";
-const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"0.00";
+const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 export function MR0002WorkingBom0553(){
  const [open,setOpen]=useState({});
  const [selectedSite,setSelectedSite]=useState("ALL");
  const visibleSites=model.sites.filter(g=>selectedSite==="ALL"||g.site===selectedSite);
  return <section className="p55-panel" data-component-key="bid.budget.bom.mr0002">
   <h3>MR-0002 · DMR Trunk Radio Working BOM <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.mr0002"/></h3>
-  <p className="p55-note">Selected MR0002 manufacturer: RFI. RFI LNA is a separate source-priced budget line, not a HYTERA product. MGW-P26-058 is the selected budgetary source for Yagi antenna (UHF-2), Omni antenna (UHF-3) and RF feeder kit (UHF-4), while RFI is the selected trunk-radio/LNA equipment manufacturer. MGW UHF-1 HYTERA TS-9200 BDA is removed from the active BOM at all sites; its original supplier quote remains in the source register. MGW UHF-3 is a separately selected HYTERA omni antenna, not BDA equipment. Antenna quantities and RF interface compatibility remain subject to MTO and engineering verification. One RFI LNA per tagged site remains a provisional MR C1 budget allowance, not procurement approval; check current RFI model/datasheet, RF interfaces, vendor supply boundary and cable bulk. No customer release.</p>
+  <p className="p55-note">Latest source-priced UHF package: MGW P26-058_R2. RFI BD4345-00N0-AC with WAROM HRMD95-VIIIB enclosure is included in UHF-1; PolyPhaser IS-B50LN-C2 is included in UHF-2 Yagi antenna set. Enclosure and PolyPhaser are displayed for traceability but their prices MUST NOT be added twice. Ex d assembly, RF surge compliance and field interfaces require separate engineering validation. Earlier HYTERA/BARTEC/LNA scenarios remain historical and non-additive. Internal preview, not customer release.</p>
   <div className="p55-filterbar" style={{display:"flex",gap:12,alignItems:"center",flexWrap:"wrap"}}>
    <label>Location <select aria-label="MR-0002 Location" value={selectedSite} onChange={e=>setSelectedSite(e.target.value)}>
     <option value="ALL">All locations ({model.sites.length})</option>
@@ -27,7 +27,7 @@ export function MR0002WorkingBom0553(){
     <thead><tr><th>Tag / Item</th><th>SKU / Description</th><th>Qty</th><th>Original Currency</th><th>Unit Rate</th><th>Extended</th><th>Owner / Evidence</th><th>Status</th><th>Copy ID</th></tr></thead>
     <tbody>{group.items.map(item=><tr key={item.id}><td>{item.tag}</td><td>{item.sku||"—"}<small>{item.description}</small></td>
      <td>{item.qty??"PENDING"} {item.unit}</td><td>{item.currency||"TBC"}</td><td>{money(item.unitCost)}</td>
-     <td>{item.countedInWorkingTotal?money(item.extended):"EXCLUDED / PENDING"}</td><td>{item.owner}<small>{item.source}</small></td><td>{item.status}</td>
+     <td>{item.countedInWorkingTotal?money(item.extended):(item.displayPrice||"NOT ADDITIVE / TECHNICAL REVIEW")}</td><td>{item.owner}<small>{item.source}</small></td><td>{item.status}{item.note&&<small>{item.note}</small>}</td>
      <td><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.mr0002."+group.site.toLowerCase()+"."+item.id.toLowerCase()}/></td></tr>)}</tbody></table></div>}
    <RfFeederEvidence0553 group={group}/>
    <p className="p55-note">{group.scopeWarnings.join(" · ")}</p>
