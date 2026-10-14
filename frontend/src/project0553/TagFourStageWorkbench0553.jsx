@@ -1,13 +1,19 @@
 import React,{useMemo} from "react";
+import {bomPriceTHB0553} from "./bomPresentationContract0553";
 import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {getTagBomFourStage0553} from "./data/tagBomFourStageReadModel0553";
 
 const fmt=x=>Number.isFinite(x)?x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT VERIFIED";
 const sourcePrice=(currency,amount)=>Number.isFinite(amount)?(currency||"UNVERIFIED")+" "+fmt(amount):"NOT QUOTED";
-export function TagFourStageWorkbench0553({site,tagRow,moduleKey,children}){
+export function TagFourStageWorkbench0553({site,tagRow,moduleKey,fx=null,children}){
  const m=useMemo(()=>getTagBomFourStage0553(site,tagRow),[site,tagRow]);
  const id=moduleKey;
+ const evidenceTHB=(r,kind)=>{
+  const existing=kind==="rate"?r.rateEvidenceOriginal:r.amountEvidenceOriginal;
+  const originalCurrency=r.currencyEvidenceOriginal;
+  return Number.isFinite(existing)?bomPriceTHB0553(existing,originalCurrency,fx).label:null;
+ };
  return <div className="p553-four-stage-workbench" data-component-key={id+".four-stage"}>
   <p className="p55-note"><strong>วิธีอ่าน:</strong> 1 Required = เราต้องใช้อะไร / 2 Working = เราคิดต้นทุนอะไร / 3 Vendor = ผู้ขายเสนออะไร / 4 Verify = พิสูจน์ว่าสอดคล้องข้อกำหนดหรือไม่. ทุกขั้นตอนอ่านจาก Data/Cost Ledger เดิม และไม่มีการอนุมัติสินค้าอัตโนมัติ</p>
   <ControlledModuleSection0553 moduleKey={id+".required-bom"} title="01 · Required Engineering BOM — สิ่งที่ Engineering ต้องการ" defaultOpen>
@@ -26,8 +32,8 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,children}){
      <td>{r.quantityDriver}<small>{r.qtyProof}</small>{r.quantityEvidence&&<small>Evidence: {r.quantityEvidence}</small>}</td>
      <td>{r.documentedQty??"—"} {r.documentedQty!==null&&r.documentedQty!==undefined?r.documentedUnit||"":""}<small>{r.qtyClass==="GA_FACTORY_INCLUDED_ACCESSORY"?"FACTORY INCLUDED — BARTEC TCAB PACKAGE":r.qtyClass==="GA_CONFIRMED_ASSEMBLY_CAPACITY"?"ENCLOSURE CAPACITY — NOT EXTRA PURCHASE":r.qtyClass||"NOT YET DERIVED FROM SOURCE"}</small></td>
      <td>{r.derivedWorkingQty??"SOURCE QTY TO ASSESS"} {r.budgetUnit||""}<small>{r.qtyState}</small></td>
-     <td>{r.qtyClass==="GA_FACTORY_INCLUDED_ACCESSORY"?"INCLUDED IN TCAB PACKAGE":r.qtyClass==="GA_CONFIRMED_ASSEMBLY_CAPACITY"?"N/A — PHYSICAL ENTRY":Number.isFinite(r.budgetRateTHB)?fmt(r.budgetRateTHB):"PRICE EVIDENCE REQUIRED"}<small>{r.budgetSource||r.quantityEvidence||"Engineering source review"}</small></td>
-     <td>{r.qtyClass==="GA_FACTORY_INCLUDED_ACCESSORY"?"INCLUDED — NO EXTRA COST":r.qtyClass==="GA_CONFIRMED_ASSEMBLY_CAPACITY"?"INCLUDED IN ENCLOSURE":Number.isFinite(r.budgetAmountTHB)?fmt(r.budgetAmountTHB):"UNPRICED BULK EXPOSURE"}<small>{r.qtyClass==="GA_FACTORY_INCLUDED_ACCESSORY"?"Cost Owner: SCADA TCAB assembly; do not post again":r.budgetPosting||"Source not costed"} {r.budgetBasis||""}</small></td>
+     <td>{r.qtyClass==="GA_FACTORY_INCLUDED_ACCESSORY"?"INCLUDED IN TCAB PACKAGE":r.qtyClass==="GA_CONFIRMED_ASSEMBLY_CAPACITY"?"N/A — PHYSICAL ENTRY":Number.isFinite(r.budgetRateTHB)?"THB "+fmt(r.budgetRateTHB):evidenceTHB(r,"rate")||"PRICE EVIDENCE REQUIRED"}<small>{r.budgetSource||r.quoteEvidenceLine||r.quantityEvidence||"Engineering source review"}{Number.isFinite(r.rateEvidenceOriginal)&&<small>Original {r.currencyEvidenceOriginal||"UNKNOWN"} {fmt(r.rateEvidenceOriginal)} · Existing Ledger evidence only</small>}</small></td>
+     <td>{r.qtyClass==="GA_FACTORY_INCLUDED_ACCESSORY"?"INCLUDED — NO EXTRA COST":r.qtyClass==="GA_CONFIRMED_ASSEMBLY_CAPACITY"?"INCLUDED IN ENCLOSURE":Number.isFinite(r.budgetAmountTHB)?"THB "+fmt(r.budgetAmountTHB):evidenceTHB(r,"amount")||"UNPRICED BULK EXPOSURE"}<small>{r.qtyClass==="GA_FACTORY_INCLUDED_ACCESSORY"?"Cost Owner: SCADA TCAB assembly; do not post again":r.budgetPosting||"Source not costed"} {r.budgetBasis||""}</small></td>
      <td>{r.approvedSkuQty??"OEM approval pending"}</td><td>{r.requirementState}<small>{r.selectionStatus}</small>{r.costOwner&&<small>Working owner: {r.costOwner}</small>}</td>
     </tr>)}
     {m.required.length===0&&<tr><td colSpan={8}>Functional decomposition has not been mapped to this MTO TAG. Preserve source scope and request engineering proof; do not infer a physical SKU BOM.</td></tr>}
