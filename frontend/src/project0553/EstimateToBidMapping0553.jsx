@@ -3,31 +3,9 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {ESTIMATE_TO_BID_0553,validateEstimateToBid0553} from "./estimateToBidMapping";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {derivePartBcWorkingWbs0553} from "./data/partBCWorkingWbs0553";
-import {workingBomByCustomerA0553,compareAEquipmentToLocation0553} from "./data/workingBomAggregation0553";
-import {deriveA5BulkAttribution0553} from "./data/a5BulkAttribution0553";
-import {MR0002_WORKING_BOM_0553} from "./data/mr0002WorkingBom0553";
-import {MR0004_WORKING_BOM_0553} from "./data/mr0004WorkingBom0553";
-import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./data/siteSystemCostReconciliation";
+import {compareAEquipmentToLocation0553} from "./data/workingBomAggregation0553";
+import {selectCustomerEquipmentDisplay0553} from "./data/customerEquipmentDisplay0553";
 
-const round=n=>Math.round(n*100)/100;
-// Projection of upstream evidence only. Currency is never converted using an assumed FX.
-function projectEquipmentWorkingCost0553(){
- const mrTotals=workingBomByCustomerA0553();
- const equipment=Object.fromEntries(Object.entries(mrTotals).map(([code,projection])=>[code,{
-  thb:projection.currencies.THB??null,
-  usd:projection.currencies.USD??null,
-  status:(projection.scenario?"Scenario evidence / NOT BOOKED; ":"Working source; ")+
-   projection.priced+" counted, "+projection.unresolved+" unresolved; NOT RELEASED",
-  source:projection.basis,
-  detail:projection
- }]));
- // A5 attribution is a separate customer category, not an extra additive cost.
- // Do not subtract global A5 from A1 unless the ledger has explicit line ownership.
- const attribution=deriveA5BulkAttribution0553();
- const a5=Number.isFinite(attribution.a5PriceTHB)?attribution.a5PriceTHB:null;
- equipment.A5={thb:a5,usd:null,status:"Attribution reference only; may overlap equipment ledger, NOT ADDITIVE until row-level ownership reconciles",source:"A5 source-MTO bulk attribution"};
- return equipment;
-}
 export function EstimateToBidMapping0553(){
  const [open,setOpen]=useState(null);
  const [partFilter,setPartFilter]=useState("ALL");
@@ -35,7 +13,7 @@ export function EstimateToBidMapping0553(){
  const result=validateEstimateToBid0553();
  const historical=new Map(REV08_BASELINE.summary.map(([code,,value])=>[code,value]));
  const working=new Map(derivePartBcWorkingWbs0553().rows.map(row=>[row.code,row]));
- const equipment=projectEquipmentWorkingCost0553();
+ const equipment=selectCustomerEquipmentDisplay0553();
  const reconciliation=compareAEquipmentToLocation0553();
  const checks=new Map(result.checks.map(x=>[x.customerLine,x]));
  const shown=ESTIMATE_TO_BID_0553.records.filter(x=>(partFilter==="ALL"||x.customerLine.startsWith(partFilter))&&(!query||[x.customerLine,x.description,x.engineeringSource,x.customerSheet].some(v=>String(v||"").toLowerCase().includes(query.trim().toLowerCase()))));
