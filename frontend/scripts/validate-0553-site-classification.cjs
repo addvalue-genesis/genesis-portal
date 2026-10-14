@@ -5,5 +5,8 @@ const view=fs.readFileSync(path.join(root,"src/project0553/SimpleBom0553.jsx"),"
 const mapping=fs.readFileSync(path.join(root,"src/project0553/data/workingBomByLocation.js"),"utf8");
 for(const k of ["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11","GREENFIELD","BROWNFIELD","ownershipRule"])assert(data.includes(k),k);
 assert(mapping.includes("siteClass:MR0001_SITE_CLASSIFICATION.sites[site]"));
-assert(view.includes("g.siteClass?.type")&&view.includes("Equipment ownership:"));
+assert(view.includes("g.siteClass?.type"),"Site type must remain visible");
+assert(view.includes("g.siteClass?.note"),"Site classification notes must remain visible");
+assert(view.includes("Equipment ownership NEW / REUSE / BY OTHERS"),"Equipment supply ownership warning must remain visible");
+assert(data.includes("NEW_SUPPLY")&&data.includes("REUSE")&&data.includes("BY_OTHERS"),"Independent item ownership policy must remain defined");
 console.log("PASS 0553 greenfield/brownfield site labels; SKU new/reuse ownership remains separate");
