@@ -32,7 +32,7 @@ export function Mr0003Mr0004LocationReview0553(){
     ];
    })}
   </tbody></table></div>
-  <p className="p55-note"><strong>Derivation control 01–08:</strong> source → requirements → location/tag → interfaces → physical takeoff → technical constraints → cost-owner/rate → A+B+C reconciliation. This is an evidence/coverage audit, not a completion claim for B1–B14/C1–C2. Missing source ≠ zero; MR0003 EXION quoted four phones and four sounders; PROSPER historical four JBs. Do NOT apply MGW PHONE-1 selected prices. MR0004 phase kit is one set/phase, not one set per WP.</p>
-  <p className="p55-note">Sources: AFC MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 sheets 3–13; EXION QT_1260576; PROSPER Q-PROSRY-24051 item 3 historical; MGW P26-058 (alternative only MR0003/MR0004); selected MDS/ORGA QTORG2609244 and existing shared bulk derivations. Customer release remains gated.</p>
+  <p className="p55-note"><strong>Derivation control 01–08:</strong> source → requirements → location/tag → interfaces → physical takeoff → technical constraints → cost-owner/rate → A+B+C reconciliation. This is an evidence/coverage audit, not a completion claim for B1–B14/C1–C2. Missing source ≠ zero; MR0003 EXION quoted four phones and four sounders; PROSPER Item 3 historical quote contains four JBs, but only four-hole assemblies; GA-1004 8-hole working configuration requires price confirmation. Do NOT apply MGW PHONE-1 selected prices. MR0004 phase kit is one set/phase, not one set per WP.</p>
+  <p className="p55-note">Sources: AFC MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 sheets 3–13; EXION QT_1260576; PROSPER Q-PROSRY-24051 item 3 historical / GA-1004 eight-hole working design; MGW P26-058 (alternative only MR0003/MR0004); selected MDS/ORGA QTORG2609244 and existing shared bulk derivations. Customer release remains gated.</p>
  </section>;
 }
