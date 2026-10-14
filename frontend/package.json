@@ -74,7 +74,8 @@
     "validate:0553-row11-working-budget-projection": "node scripts/validate-0553-row11-working-budget-projection.cjs",
     "validate:0553-scada-web-bulk-rates": "node scripts/validate-0553-scada-web-bulk-rates.cjs",
     "validate:0553-bom-architecture": "node scripts/validate-0553-bom-architecture.cjs",
-    "validate:0553-bom-runtime-reconciliation": "node scripts/validate-0553-bom-runtime-reconciliation.cjs"
+    "validate:0553-bom-runtime-reconciliation": "node scripts/validate-0553-bom-runtime-reconciliation.cjs",
+    "audit:0553-mr0001-baseline": "node scripts/audit-0553-mr0001-baseline-side-by-side.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
