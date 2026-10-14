@@ -1,15 +1,15 @@
 // PJ2608-0553 MR0002 — new user-supplied product-family selection (14-Oct-2026).
 // User source: RFI UHF Bi-Directional Amplifier 380-520MHz BD Series P-43899-10, pp1-2.
 // Replaces old MGW UHF-1 HYTERA TS-9200 BDA as the selected product family;
-// it does NOT automatically replace the separate RFI RX3852-2002-11 LNA.
+// RFI BD Series is the approved management Base Offer; the LNA is historical/non-additive.
 export const RFI_BDA_SELECTION_0553=Object.freeze({
  mr:"MR0002",system:"DTRS_TRUNK_RADIO",function:"UHF_BI_DIRECTIONAL_AMPLIFIER",
  manufacturer:"RFI",family:"BD Series",model:"BDxxxx-yyyy-zz",
  document:"RFI UHF Bi-Directional Amplifier.pdf, P-43899-10",sourceDate:"2026-10-14",
- selectedFamily:true,exactOrderingCode:null,unitRate:null,currency:null,
- projectedUnitCount:null,siteAllocation:null,extendedCost:null,
+ selectedFamily:true,offerRole:"BASE_OFFER_MANAGEMENT_SELECTED",exactOrderingCode:null,unitRate:null,currency:null,
+ projectedUnitCount:3,siteAllocation:["ZWP20","ZWP21","ZWP22"],extendedCost:null,
  replacesHistorical:"MGW P26-058 UHF-1 HYTERA TS-9200 BDA, unselected historical alternative",
- lnaPolicy:"RFI RX3852-2002-11 LNA remains separately evidenced; do not automatically delete or price it twice until approved RF topology confirms BDA and LNA functions",
+ lnaPolicy:"RFI RX3852-2002-11 LNA retains evidence as superseded non-additive option. Not in active BDA Base Offer. If future architecture needs both, require design revision and cost reconciliation",
  frequencySubbandsMHz:[[380,400],[400,430],[430,450],[450,470],[470,500],[500,520]],
  externalFilterVariant:"BDUEXT requires external duplexing/filtering; frequency supported 380-520MHz is filter-dependent",
  passbandMHz:[1.5,5],minimumTxRxSeparationMHz:4,
@@ -36,8 +36,9 @@ export const RFI_BDA_SELECTION_0553=Object.freeze({
   doubleCountGate:"Do not sum standalone enclosure onto a package quote without scope reconciliation",
   chosenRfiEquipmentQuote:null,chosenEnclosureQuote:null
  },
+ deviationPlan:{required:true,authority:"PTTEP / project engineering approval",items:["BDA replaces DTS LNA architecture","NF 4dB module maximum versus DTS ≤2dB; verify full-assembly result and coverage","Standard output +21dBm versus DTS 22dBm","OIP3 >45dBm unverified for assembly","N female versus SMA female interconnect","Ex d IP66 complete certified enclosure and heat/penetration qualification","Confirm duplex plan, passband, donor/service antenna isolation and 24V load"]},
  requiredDecisions:["operating frequencies UL/DL and duplex separation","off-air versus RF over Fibre / donor-service antenna topology","BD subband and full ordering code","required standard/high power gain, isolation and donor/service antenna design","DC/AC site supply, current draw and hazardous-area suitability","vendor package rate and field bulk inclusions","RFI LNA coexistence / replacement topology approval"],
- status:"SELECTED_RFI_BD_FAMILY__EXACT_MODEL_COMPLIANCE_AND_PRICE_PENDING",
+ status:"BASE_OFFER_RFI_BD_BDA__TECHNICAL_DEVIATION_REQUIRED__CONFIGURATION_AND_OEM_PRICE_PENDING",
  pricingPolicy:"Missing model/quote is unknown, never zero; no automatic transfer of excluded HYTERA BDA price.",
  releaseAllowed:false
 });
