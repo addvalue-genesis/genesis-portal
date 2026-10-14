@@ -1,5 +1,6 @@
 import {UnifiedMrLocationTable0553} from "./UnifiedMrLocationTable0553";
 import {LocationReplicationAudit0553} from "./LocationReplicationAudit0553";
+import {Mr0003Mr0004LocationReview0553} from "./Mr0003Mr0004LocationReview0553";
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
 import {MR0002WorkingBom0553} from "./MR0002WorkingBom0553";
 import {LocationBomDetail0553} from "./LocationBomDetail0553";
@@ -119,6 +120,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <h3>Engineering Working Preview — Requirement → Calculation → BOM → Cost</h3>
   <MR0001CostCloseout0553/>
   <LocationReplicationAudit0553/>
+  <Mr0003Mr0004LocationReview0553/>
   <nav className="p55-panel" aria-label="Working Preview module navigator" style={{padding:14,marginBottom:16}}>
    <SmartFilterBar moduleKey="bid.budget.bom.module-search" title="Find Working Preview Module"
     total={moduleIndex.length} shown={matches.length} onReset={()=>setModuleSearch("")}
