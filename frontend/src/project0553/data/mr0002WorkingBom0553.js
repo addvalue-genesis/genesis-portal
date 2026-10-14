@@ -93,6 +93,18 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
    ]
 };
  });
+// Regression gate: every site BDA must inherit the current vendor R2 package,
+// never the historical HYTERA cross-brand benchmark.
+for(const location of bySite){
+ const bda=location.items.find(x=>x.id===location.site+"-RFI-BDA");
+ const quoted=MGW_P26_058_R2_UHF_0553.lines.find(x=>x.id==="UHF-1");
+ if(!bda||!quoted||bda.unitCost!==quoted.unitPriceUSD||
+    bda.extended!==quoted.unitPriceUSD||bda.sku!==quoted.model||
+    bda.source!==MGW_P26_058_R2_UHF_0553.id||
+    bda.quoteLine!=="UHF-1"||quoted.unitPriceUSD===RFI_BDA_SELECTION_0553.pricingBenchmark.historicalMGWHyteraUSD){
+  throw Error("MR0002 "+location.site+" RFI BDA price/version mismatch: expected current MGW R2 UHF-1");
+ }
+}
 export const MR0002_WORKING_BOM_0553=Object.freeze({
  id:"P553-MR0002-WORKING-BOM",mr:"MR-0002",sites:bySite,
  workingRateSource:p,quotation:MGW_P26_058_R2_UHF_0553.id,
