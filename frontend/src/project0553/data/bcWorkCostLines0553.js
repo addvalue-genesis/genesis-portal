@@ -199,7 +199,7 @@ export function selectBcWorkCostLines0553(){
    costLineId:clause?.id||null,code:item.code,
    type:"REQUIREMENT_EVIDENCE_LINK_NOT_INDEPENDENT_ADDITIVE_COST",
    source:item.source,section:item.section,owner:item.owner,requirement:item.title,
-   quantityStatus:specificity?.requiredQuantityStatus||"NOT_ESTABLISHED",
+   quantityStatus:clause?.requiredQuantityStatus||"NOT_ESTABLISHED",
    costStatus:"NOT_ESTABLISHED",directCostTHB:null
   });
  });
