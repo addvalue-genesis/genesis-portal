@@ -23,7 +23,13 @@ export const ZWP20_WEB_BULK_RATES_0553=Object.freeze({
    decision:"SS316_TIE__FIELD_SUPPORT_SPACING_INSTALLATION_PROOF_REQUIRED"},
   {id:"RJ45",sku:"WEIDMULLER-1963600000",rateTHB:1176.68,unit:"ea",
    url:"https://th.rs-online.com/web/p/ethernet-couplers/7417317",source:"RS Thailand 741-7317",
-   decision:"ALREADY_COST_OWNED_DATO_ROW8__DO_NOT_POST_AGAIN"}
+   sourcePriceType:"RETAIL_BUDGETARY_REFERENCE_EX_VAT_NOT_FIRM_OEM_QUOTE",
+   approvalStatus:"MANAGEMENT_APPROVED_INTERNAL_BUDGETARY_PRODUCT_AND_RATE",
+   approvalAuthority:"PROJECT_MANAGEMENT_USER",
+   approvalConfirmation:"USER_CONFIRMED_2026-10-15__EXISTING_DECISION_REAFFIRMED",
+   approvalScope:"INTERNAL_BUDGET_PRICE_ONLY__NO_AUTOMATIC_EX_TECHNICAL_APPROVAL",
+   costOwner:"bid.budget.bom.zwp20.dato-507-001.8",
+   decision:"MANAGEMENT_APPROVED_THB_1176_68__ALREADY_COST_OWNED_DATO_ROW8__DO_NOT_POST_AGAIN"}
  ]),
  rule:"Internet retail indicative prices, ex VAT; vendor included items must not be priced twice. Gland sealing range + selected cable OD/armor and Ex approvals are mandatory before exact purchase. Cable material 100m reel procurement economics differ from fractional budget takeoff."
 });
