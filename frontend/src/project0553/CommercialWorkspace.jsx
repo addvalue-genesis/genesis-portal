@@ -105,12 +105,6 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <details className="p553-budget-phase"><summary><strong>Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
    <EstimateToBidMapping0553/>
   </details>
-  {/* Downstream Scope summary: after engineering BOM and estimate-to-bid mapping; read-only. */}
-   {(mode==="working"||mode==="budgetary")&&<details className="p553-budget-phase" open data-component-key="bid.budget.scope">
-   <summary><strong>Scope of Supply — Customer Workbook Sub-modules</strong><small>bid.budget.scope · B10 / B11 / B13 / C1 / C2 · A/B/C</small></summary>
-   <p className="p55-note"><strong>Internal engineering reference only:</strong> linked working costs are not an approved customer quotation. Original workbook codes and internal cost categories remain distinct; missing vendor prices are not zero.</p>
-   <ScopeSheetsDetail0553 fx={fx}/>
-  </details>}
   <details className="p553-budget-phase"><summary><strong>Cost & Commercial Pricing</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
    <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
   <section className="p55-panel">
@@ -155,7 +149,14 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <p><strong>Workbook source:</strong> {template.sourceName} · {template.revision} · 6 sheets. <strong>Export status:</strong> HOLD — original template fidelity and cross-sheet reconciliation not yet validated.</p>
   </details>
  </>}
- {mode==="budgetary"&&<><BudgetaryWorkbookPreview0553/><section className="p55-panel">
+ {/* Downstream Scope summary: after engineering BOM and estimate-to-bid mapping; read-only. */}
+   {(mode==="working"||mode==="budgetary")&&<details className="p553-budget-phase" open data-component-key="bid.budget.scope">
+   <summary><strong>Scope of Supply — Customer Workbook Sub-modules</strong><small>bid.budget.scope · B10 / B11 / B13 / C1 / C2 · A/B/C</small></summary>
+   <p className="p55-note"><strong>Internal engineering reference only:</strong> linked working costs are not an approved customer quotation. Original workbook codes and internal cost categories remain distinct; missing vendor prices are not zero.</p>
+   <ScopeSheetsDetail0553 fx={fx}/>
+  </details>}
+  
+  {mode==="budgetary"&&<><BudgetaryWorkbookPreview0553/><section className="p55-panel">
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · SNAPSHOT REGISTRY</div>
    <h3>Frozen Budgetary Issue — Verification Required</h3>
    <p className="p55-note"><strong>NO VERIFIED ISSUED SNAPSHOT REGISTERED.</strong> A historical Rev08 workbook is available but its exact SAMTEL-issued revision and recipients are still unverified. It is not promoted to Budgetary Submission.</p>
