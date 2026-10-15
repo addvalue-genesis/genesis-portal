@@ -91,7 +91,7 @@ for(const snippet of ['selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd})',
  'SCOPE_BC_DETAIL_CODES_0553','<ScopeBcAnnexDetail0553 code={category[1]} fx={fx}/>',
  'Historical Rev08 Reference THB','data-component-key="bid.budget.scope"','setSheet(found[0])'])
  assert(ui.includes(snippet),"10.5 Scope display missing source-backed prices or navigation: "+snippet);
-for(const snippet of ['data-component-key={p.moduleId}','p.historicalDetailLines.map(',
+for(const snippet of ['data-component-key={moduleId}','p.historicalDetailLines.map(',
  'p.currentDerivationLines.map(','p.currentRequirementRows.map(','p.currentVerificationSteps.map(',
  'p.historicalReferenceTHB','p.historicalDisplayedVsSummaryDeltaTHB','x.historicalUnitTHB','x.historicalExtendedTHB','NO ITEMIZED REV08 ANNEX',
  'NOT VERIFIED / NOT POSTED'])
