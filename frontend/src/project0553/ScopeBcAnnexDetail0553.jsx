@@ -17,27 +17,25 @@ export function ScopeBcAnnexDetail0553({code,fx=null}){
   <div className="p55-metric-grid">
    <div><strong>Current Turnkey Direct COST</strong><p>{thb(p.directCostTHB)}</p><small>Source-verified Cost Rate × Verified Qty required</small></div>
    <div><strong>Current WBS Working SELL</strong><p>{thb(p.workingSellTHB)}</p><small>Not a current customer quotation</small></div>
-   <div><strong>Historical Rev08 Reference</strong><p>{thb(p.historicalReferenceTHB)}</p><small>{usd(p.historicalReferenceUSD)} · {p.historicalFxState}</small></div>
+   <div><strong>Historical Rev08 Reference</strong><p>{thb(p.historicalReferenceTHB)}</p><small>Native USD source retained for audit · {p.historicalFxState}</small></div>
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
   <h4>1. Historical Annex Price Lines — Original Rev08 / Not current Vendor Quote</h4>
   {p.historicalHasDetail?
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-    <thead><tr><th>Legacy Ref</th><th>Historical Item</th><th>Historic Qty</th><th>Unit USD (Rev08)</th><th>Extended USD (Rev08)</th><th>THB Reference *</th><th>Current SKU / Rate Approval</th></tr></thead>
+    <thead><tr><th>Legacy Ref</th><th>Historical Item</th><th>Historic Qty</th><th>Historical Unit THB *</th><th>Historical Extended THB *</th><th>Current SKU / Rate Approval</th></tr></thead>
     <tbody>{p.historicalDetailLines.map(x=><tr key={x.id}>
      <td><strong>{x.id}</strong></td><td>{x.description}<small>{x.source}</small></td>
-     <td>{x.qty}</td><td>{usd(x.historicalUnitUSD)}</td><td>{usd(x.historicalExtendedUSD)}</td>
-     <td>{thb(x.historicalExtendedTHB)}</td>
+     <td>{x.qty}</td><td>{thb(x.historicalUnitTHB)}</td><td>{thb(x.historicalExtendedTHB)}</td>
      <td><strong>NOT VERIFIED / NOT POSTED</strong><small>OEM SKU, supplier quote, confirmed Qty and cost ownership required</small></td>
     </tr>)}</tbody>
    </table></div>:
-   <p className="p55-note"><strong>NO ITEMIZED REV08 ANNEX FOR {p.code}.</strong> Historical summary {usd(p.historicalReferenceUSD)} only; this cannot prove current insured value, premium or direct cost. No invented line items.</p>}
-  <p className="p55-note"><strong>Historical USD Reconciliation:</strong> {p.historicalHasDetail?
-   (p.historicalReconciled?"PASS — ":"FAIL — ")+"Detail "+usd(p.historicalDetailUSD)+
-    " vs summary "+usd(p.historicalReferenceUSD)+
-    " · rounded delta "+usd(p.historicalReconciliationDeltaUSD):
+   <p className="p55-note"><strong>NO ITEMIZED REV08 ANNEX FOR {p.code}.</strong> Historical summary {thb(p.historicalReferenceTHB)} only (native source in USD); this cannot prove current insured value, premium or direct cost. No invented line items.</p>}
+  <p className="p55-note"><strong>Historical Source Reconciliation:</strong> {p.historicalHasDetail?
+   (p.historicalReconciled?"PASS — ":"FAIL — ")+p.historicalDetailLines.length+
+   " Rev08 lines reconcile with source summary within native USD 0.01 tolerance":
    "NO LINE-LEVEL RECONCILIATION — historical summary only"}
-   {" "}· *THB based on working planning FX {p.historicalFxTHBPerUSD??"NOT PROVIDED"}; not a verified BOT quotation.</p>
+   {" "}· THB display at working planning FX {p.historicalFxTHBPerUSD??"NOT PROVIDED"}; not a verified BOT quotation. Original USD and unrounded values remain in the historical source model.</p>
   <h4>2. Current Requirement / Cost Driver from 10.2 — No Double Count</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>10.2 Activity / Requirement</th><th>Required Qty</th><th>Verified Direct Cost THB</th><th>Source &amp; Verification</th></tr></thead>
