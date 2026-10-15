@@ -9,6 +9,8 @@ import { ScopeSheetsDetail0553 } from "./ScopeSheetsDetail0553";
 import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 import { CostIntegrityReview0553 } from "./CostIntegrityReview0553";
 import {BcCostEvidenceDetail0553} from "./BcCostEvidenceDetail0553";
+import {ScopeCategoryTabs0553} from "./ScopeCategoryTabs0553";
+import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { SimpleBom0553 } from "./SimpleBom0553";
 import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
@@ -27,10 +29,12 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const [recipient,setRecipient]=useState("INTERNAL");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
  const [bcDetailCode,setBcDetailCode]=useState(null);
+ const [bcTab,setBcTab]=useState("ALL");
  const toggle=k=>setExpanded(a=>{const n=new Set(a);n.has(k)?n.delete(k):n.add(k);return n;});
  const rows=template.sheets;
  const baseline=getBaselineReview();
  const bcWorking=selectBcTurnkeyWorkingCost0553();
+
  const bcGroupIdByWorkflow=new Map(BUDGET_BC_WORKFLOW_0553
   .filter(x=>x.parent==="10.2").map(x=>[x.workflowNumber,x.moduleId]));
  // The Project Module Navigator opens the EXISTING 10.2 disclosure
@@ -38,7 +42,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  React.useEffect(()=>{
   if(!navigationTarget?.startsWith("bid.budget.working.bc"))return;
   const detailCode=navigationTarget.slice("bid.budget.working.bc.".length).toUpperCase();
-  if(bcWorking.byCode[detailCode])setBcDetailCode(detailCode);
+  if(bcWorking.byCode[detailCode]){setBcDetailCode(detailCode);setBcTab("ALL");}
   if(mode!=="working"){setMode("working");return;}
   const parent=document.querySelector('[data-component-key="bid.budget.working.bc"]');
   if(!parent)return;
@@ -74,6 +78,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const updateFx=(key,value)=>persistSettings({...fxSettings,[key]:value});
  const resetFx=()=>persistSettings({...DEFAULT_FX});
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
+ const bcPriceAudit=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  return <div className="p55-stack" data-component-key="bid.budget">
  <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget"/><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
  <details className="p55-panel" data-component-key="bid.budget.particular-source-gates">
@@ -130,10 +135,17 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   </details>
   <details className="p553-budget-phase" data-component-key="bid.budget.working.bc">
    <summary><strong>10.2 — Part B/C Working Cost &amp; Spare Requirements</strong><small>bid.budget.working.bc · WBS / Services / Spares</small></summary>
+   <section className="p55-panel" style={{padding:"12px 14px"}}>
+    <div className="p55-eyebrow">PART B/C WORKING SHEETS / ENGINEERING COST CONTROL <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.working.bc"/></div>
+    <h3>Part B/C — Linked Internal Working Detail</h3>
+    <p className="p55-note">หน้าตาและการเลือกหมวดเหมือน 10.5 แต่ที่นี่เป็นเจ้าของ Working Source / Direct Cost Evidence; 10.5 เป็น Read-only Customer Scope. ชื่อและ Module ID ของแต่ละรายการใช้ Canonical 10.2 เท่านั้น</p>
+    <ScopeCategoryTabs0553 value={bcTab} onChange={code=>{setBcTab(code);setBcDetailCode(code==="ALL"?null:code);}}/>
+    <p className="p55-note">Selected module: <strong>{bcTab==="ALL"?"All Part B/C — B1–B14 and C1–C2":bcTab+" — "+bcWorking.byCode[bcTab]?.requirement}</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey={bcTab==="ALL"?"bid.budget.working.bc":"bid.budget.working.bc."+bcTab.toLowerCase()}/></p>
+    </section>
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
     <p className="p55-note"><strong>MANAGEMENT FAT STRATEGY (15-Oct-2026):</strong> One integrated FAT at SAMTEL Bangkok, Thailand after supplier/OEM pretests; MGW provides China logistics advice only, not the FAT crew. Equipment from all four MRs is routed to Thailand for controlled FAT, then to JUTAL Nantong. China-origin MR0002 entails China → Thailand → China cross-border freight and customs exposure. The selected execution location is APPROVED; incremental B6 logistics/FAT direct COST remains NOT ESTABLISHED.</p>
-   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Customer Code / Workflow</th><th>Turnkey Direct Cost THB</th><th>WBS Working Sell Reference THB</th><th>Source / Execution / Gap</th></tr></thead><tbody>
-    {bcWorking.rows.map(item=><tr key={item.code} data-component-key={item.moduleId} className={navigationTarget===item.moduleId?"p553-module-nav-target":undefined}><td><button type="button" className="p55-row-toggle" aria-expanded={bcDetailCode===item.code} onClick={()=>setBcDetailCode(old=>old===item.code?null:item.code)}>{bcDetailCode===item.code?"−":"＋"} {item.code} — Detail</button><small>{item.workflowNumber} · {item.moduleId}</small></td><td>{Number.isFinite(item.directCostTHB)?"THB "+item.directCostTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"NOT ESTABLISHED"}<small>{item.workingSellBasis||"No current sell evidence"}</small></td><td>{item.costState}<small>{item.requirement} · {item.sourceRevision}</small><small>Contract: {item.contractOwner} · Turnkey: {item.turnkeyEstimator} · Execution: {item.executionOwner}</small><small>Lifecycle activity source rows: {item.requirementCount}; unverified quantities/rates are not treated as zero</small>{item.executionDecision&&<small><strong>Approved FAT / Delivery Strategy:</strong> {item.executionDecision.summary} · {item.executionDecision.decisionId} · {item.executionDecision.costState}</small>}</td></tr>)}
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>REF. / MODULE ID</th><th>DESCRIPTION</th><th>QTY / BASIS</th><th>DIRECT COST THB</th><th>WORKING SELL THB</th><th>HISTORICAL REV08 — NOT COST</th><th>SOURCE / ENGINEERING STATUS</th></tr></thead><tbody>
+    {bcWorking.rows.filter(item=>bcTab==="ALL"||item.code===bcTab).map(item=><tr key={item.code} data-component-key={item.moduleId} className={navigationTarget===item.moduleId?"p553-module-nav-target":undefined}><td><button type="button" className="p55-row-toggle" aria-expanded={bcDetailCode===item.code} onClick={()=>setBcDetailCode(old=>old===item.code?null:item.code)}>{bcDetailCode===item.code?"−":"＋"} {item.code} — Detail</button><small>{item.workflowNumber} · {item.moduleId}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={item.moduleId}/></td><td><strong>{item.requirement}</strong><small>{item.executionOwner}</small></td><td>{Number.isFinite(item.qtyDriver)?item.qtyDriver+" "+item.unit:item.unit||"1 LS (scope)"}</td><td>{Number.isFinite(item.directCostTHB)?"THB "+item.directCostTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"NOT ESTABLISHED"}<small>{item.workingSellBasis||"No current sell evidence"}</small></td><td>{Number.isFinite(bcPriceAudit.byCode[item.code]?.historicalReferenceTHB)?"THB "+bcPriceAudit.byCode[item.code].historicalReferenceTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"—"}<small>{bcPriceAudit.byCode[item.code]?"Historical Rev08 only":"No annex benchmark"}</small></td><td>{item.costState}<small>{item.requirement} · {item.sourceRevision}</small><small>Contract: {item.contractOwner} · Turnkey: {item.turnkeyEstimator} · Execution: {item.executionOwner}</small><small>Lifecycle activity source rows: {item.requirementCount}; unverified quantities/rates are not treated as zero</small>{item.executionDecision&&<small><strong>Approved FAT / Delivery Strategy:</strong> {item.executionDecision.summary} · {item.executionDecision.decisionId} · {item.executionDecision.costState}</small>}</td></tr>)}
    </tbody></table></div>
    {bcDetailCode&&<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcDetailCode]}/>}
    <p className="p55-note"><strong>10.2 Source Routing:</strong> {validateBcRoutes0553()?"16/16 customer B/C categories assigned uniquely":"MAPPING ERROR"}. Cost evidence and technical approval remain separate.</p>
