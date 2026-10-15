@@ -75,8 +75,10 @@ export function PJ26080553() {
  // Derive B/C search results from the SAME controlled 10.2 source and module IDs
  // rendered in Budgetary; avoid isolated manually-maintained search aliases.
  const navigableModules=[...mainModuleIndex,...buildBcModuleNavigator0553()];
- const searchMatches=moduleQuery.trim()?
-  navigableModules.filter(m=>(m.id+" "+m.name+" "+m.keywords).toLowerCase().includes(moduleQuery.trim().toLowerCase())):
+ // Accept either a bare Module ID or the project-qualified Copy ID text.
+ const searchableQuery=moduleQuery.trim().replace(/^PJ2608-0553\s*\/\s*/i,"").trim().toLowerCase();
+ const searchMatches=searchableQuery?
+  navigableModules.filter(m=>(m.id+" "+m.name+" "+m.keywords).toLowerCase().includes(searchableQuery)):
   navigableModules;
  const jumpModule=m=>{setLifecycleStage("L3");setL3Area("B");setWorkspaceTab(m.tab);setModuleQuery(m.id);setNavTarget(m.id);setNavigationSequence(n=>n+1);};
  const [navTarget,setNavTarget]=useState(null);
@@ -121,12 +123,12 @@ export function PJ26080553() {
  {l3Area==="B"&&<section className="p55-panel" style={{padding:14,marginBottom:16}}>
   <h3>ค้นหา Module ทั้งโครงการ / Project Module Navigator</h3>
   <p className="p55-note">ค้นหาจาก Module ID, System, MR หรือชื่อหน้าจอ แล้วคลิกเพื่อเปิดแท็บหลักที่เกี่ยวข้อง ไม่จำกัดเฉพาะ Trunk Radio</p>
-  <div className="p55-filterbar"><label>Search Module <input value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} placeholder="เช่น bid.budget.bom.mr0002, Vendor, MR-0001, Summary Workbook" aria-label="ค้นหา Module ทั้งโครงการ"/></label>
+  <div className="p55-filterbar"><label>Search Module <input value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} placeholder="เช่น bid.budget.working.bc, bid.budget.working.bc.b6, Vendor, MR-0001" aria-label="ค้นหา Module ทั้งโครงการ"/></label>
    <button type="button" onClick={()=>setModuleQuery("")}>Clear</button>
   </div>
   <div style={{maxHeight:moduleQuery.trim()?320:150,overflowY:"auto",display:"flex",flexWrap:"wrap",gap:8}}>
    {searchMatches.map(m=><button key={m.id} type="button" className="p553-detail-button" onClick={()=>jumpModule(m)}>
-    <strong>{m.name}</strong><small style={{display:"block"}}>{m.id} · Open {m.tab}</small>
+    <strong>{m.name}</strong><small style={{display:"block"}}>{m.id} · {m.workflowNumber?m.workflowNumber+" · ":""}Open Module ({m.tab})</small>
    </button>)}
    {!searchMatches.length&&<span role="status">ไม่พบ Module ที่ตรงกับคำค้น</span>}
   </div>
