@@ -110,11 +110,11 @@ export function selectBcTurnkeyWorkingCost0553(){
    })),
    requirementCount:requirementRows.length,
    workingSellTHB:Number.isFinite(spareSellTHB)?spareSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
-   workingSellBasis:Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":"MANAGEMENT_ACCEPTED_B10_REV08_BUDGETARY_WORKING_SELL_FX_31_5_NOT_VERIFIED_OEM_COST":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
+   workingSellBasis:Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
    directCostTHB:null, // No controlled source-rate x quantity internal ledger yet.
    riskCostTHB:null,
    commercialSellTHB:null, // A customer price is not the existing WBS sell reference.
-   priceStatus:Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":"MANAGEMENT_ACCEPTED_B10_WORKING_SELL_ESTIMATE":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
+   priceStatus:Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
    unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08",fxTHBPerUSD:31.5,pricingClass:"BUDGETARY_WORKING_SELL",verifiedDirectCost:false,sourceLines:spareBudget.byCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
