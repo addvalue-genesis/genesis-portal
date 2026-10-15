@@ -182,6 +182,8 @@ export function selectBcWorkCostLines0553(){
   owner:"OEM included Part A OR separately documented B5 incremental physical packing",
   equation:"GEQ-001/004/005/012/018: unique package Qty × verified type/labor rate net confirmed OEM included credits",
   scopeGate:x.qtyStatus,
+  includedInExistingCostOwner:["B5-EXPORT-MARKING","B5-PROTECT-ELECTRONICS","B5-ISPM15-WOOD","B5-SPARES-SEPARATE"].includes(x.sourceId)?
+   "B5-BKK-REPACK / B5-OEM-ORIGIN (physical pack components; add incremental charges only with net exclusion proof)":null,
   reconciliationTag:"B5-PHYSICAL_PACK_QTY_RATE_NOT_ESTABLISHED"
  }));
  // Audit clause lines are trace/quantity obligations, NOT another charge for
