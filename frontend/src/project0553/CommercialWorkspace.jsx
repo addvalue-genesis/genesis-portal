@@ -153,6 +153,12 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     <ScopeCategoryTabs0553 value={bcTab} onChange={code=>{setBcTab(code);setBcDetailCode(code==="ALL"?null:code);}}/>
     <p className="p55-note">Selected module: <strong>{bcTab==="ALL"?"All Part B/C — B1–B14 and C1–C2":bcTab+" — "+bcWorking.byCode[bcTab]?.requirement}</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey={bcTab==="ALL"?"bid.budget.working.bc":"bid.budget.working.bc."+bcTab.toLowerCase()}/></p>
     </section>
+   {bcTab==="B5"&&bcWorking.b5EquationProof?.historicalPriceBridge&&<p className="p55-note" data-component-key="bid.budget.working.bc.b5.historical-price-reference">
+    <strong>B5 historical price FOUND (Rev09): THB {bcWorking.b5EquationProof.historicalPriceBridge.originalB5HistoricalSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</strong>.
+    Packing-only historical portion after removing B7 storage: THB {bcWorking.b5EquationProof.historicalPriceBridge.originalB5PackingOnlySellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}.
+    Embedded historical B7 Storage: THB {bcWorking.b5EquationProof.historicalPriceBridge.originalB5EmbeddedStorageSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}.
+    <strong> Current B5 Direct Cost / Working SELL remains NOT ESTABLISHED</strong>. Historical quotation/estimator inputs are not posted as approved cost.
+   </p>}
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>}
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<p className="p55-note"><strong>Selected {bcTab}:</strong> รายละเอียดแสดงโดยตรงด้านล่างตารางจาก Component เดียวกับ 10.5 โดยไม่ต้องกด ＋ Detail อีกครั้ง</p>}
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
