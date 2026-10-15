@@ -33,7 +33,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null}){
    <p className="p55-note"><strong>NO ITEMIZED REV08 ANNEX FOR {p.code}.</strong> Historical summary {thb(p.historicalReferenceTHB)} only (native source in USD); this cannot prove current insured value, premium or direct cost. No invented line items.</p>}
   <p className="p55-note"><strong>Historical Source Reconciliation:</strong> {p.historicalHasDetail?
    (p.historicalReconciled?"PASS — ":"FAIL — ")+p.historicalDetailLines.length+
-   " Rev08 lines reconcile with source summary within native USD 0.01 tolerance":
+   " Rev08 lines reconcile with source summary within native USD 0.01 tolerance. Rounded-display lines "+thb(p.historicalDisplayedLineTHBSum)+" vs summary "+thb(p.historicalReferenceTHB)+"; display difference "+thb(p.historicalDisplayedVsSummaryDeltaTHB)+" (historical source precision, no balancing row added)":
    "NO LINE-LEVEL RECONCILIATION — historical summary only"}
    {" "}· THB display at working planning FX {p.historicalFxTHBPerUSD??"NOT PROVIDED"}; not a verified BOT quotation. Original USD and unrounded values remain in the historical source model.</p>
   <h4>2. Current Requirement / Cost Driver from 10.2 — No Double Count</h4>
