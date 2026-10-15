@@ -30,15 +30,25 @@ assert.equal(BUDGET_BC_WORKFLOW_0553.filter(r=>r.parent==="10.2").length,4,"10.2
 assert.equal(m.rows.length,16);
 assert.equal(new Set(m.rows.map(r=>r.code)).size,16);
 assert.deepEqual(m.rows.map(r=>r.code),BC_CUSTOMER_CODES_0553);
-assert.equal(m.knownWorkingSellTHB,3804160);
-assert.equal(scope.knownAddvalueWorkingSellTHB,3804160);
+const wbsBase=derivePartBcWorkingWbs0553().subtotalTHB;
+assert.equal(wbsBase,3804160,"Legacy ADDVALUE WBS subtotal must remain unchanged");
+const baseBudgetCodes=["B5","B6","B10","B13"];
+const expectedBase=Math.round((wbsBase+baseBudgetCodes.reduce((total,code)=>total+m.byCode[code].workingSellTHB,0))*100)/100;
+assert.equal(m.knownWorkingSellTHB,expectedBase,"Active base working SELL must reconcile to legacy WBS plus source-backed budget additions");
+assert.equal(m.knownWorkingSellTHB,4568436.58,"Controlled current pre-award base working SELL");
+assert.equal(scope.knownAddvalueWorkingSellTHB,m.knownWorkingSellTHB);
 assert.equal(m.knownDirectCostTHB,null);
 assert.equal(m.baseTurnkeyCostTHB,null);
 assert.equal(m.optionalCostTHB,null);
 assert.equal(m.releaseAllowed,false);
 assert.equal(m.costComplete,false);
 assert.equal(m.noCrossBasisSummation,true);
-assert.equal(m.rows.filter(r=>Number.isFinite(r.workingSellTHB)).length,5);
+assert.equal(m.rows.filter(r=>Number.isFinite(r.workingSellTHB)).length,9);
+assert.equal(m.byCode.B10.workingSellTHB,123024.37);
+assert.equal(m.byCode.B13.workingSellTHB,22484.21);
+assert.equal(m.byCode.C1.workingSellTHB,4049349.36);
+assert.equal(m.byCode.C2.workingSellTHB,721806.68);
+assert.equal(m.knownWorkingSellTHB,m.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((n,r)=>Math.round((n+r.workingSellTHB)*100)/100,0),"Options must not enter Base Working SELL");
 for(const r of m.rows){
  assert.equal(r.directCostTHB,null,r.code+" has unsupported internal cost");
  assert.equal(r.commercialSellTHB,null,r.code+" has unsupported customer sell");
