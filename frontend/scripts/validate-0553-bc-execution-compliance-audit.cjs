@@ -32,6 +32,14 @@ for(const item of a.requirements){
  assert(docIds.has(item.source),"Missing human-traceable source "+item.id);
  assert(!Object.hasOwn(item,"directCostTHB"),"Evidence must not invent direct cost");
 }
+const canonical=selectBcTurnkeyWorkingCost0553();
+for(const code of customerCodes){
+ const current=canonical.byCode[code];
+ assert.equal(current.executionAuditModuleId,a.moduleId);
+ assert.equal(current.executionAuditCount,a.byCode[code].length);
+ assert.deepEqual(current.executionAuditIds,a.byCode[code].map(x=>x.id));
+ assert.equal(current.directCostTHB,null,"Trace cannot promote WBS SELL to Direct Cost");
+}
 assert.equal(a.offshore.tripCount,5);
 assert.deepEqual(a.offshore.trips.map(t=>t.teamDays),[7,7,7,5,13]);
 assert.equal(a.offshore.teamDays,39);
