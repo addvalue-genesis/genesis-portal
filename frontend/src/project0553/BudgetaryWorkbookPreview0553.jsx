@@ -3,7 +3,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
-import {PartAWorkingBomReadOnly0553} from "./PartAWorkingBomReadOnly0553";
+import {ScopeSheetsDetail0553} from "./ScopeSheetsDetail0553";
 import {deriveWorkingCostReview0553} from "./data/workingCostReview0553";
 
 // Workbook-driven navigation, not an editable BOM and not a released quote.
@@ -20,7 +20,7 @@ export function BudgetaryWorkbookPreview0553(){
  const sectionForRow=(n)=>sheet==="Scope of supply"?(n>=7&&n<=22?"PART_A":n>=24&&n<=37?"PART_B":n>=41&&n<=42?"PART_C":null):(layout.sections.items.start<=n&&n<=layout.sections.items.end?"ITEMS":null);
  const labels=sheet==="Scope of supply"?{PART_A:"Part A — Basic Equipment",PART_B:"Part B — Services / Spares",PART_C:"Part C — Options"}:{ITEMS:"Detailed item schedule / รายการย่อย"};
  const toggleSection=(key)=>setCollapsed(v=>({...v,[sheet+":"+key]:!v[sheet+":"+key]}));
- const [currency,setCurrency]=useState("USD");
+ const [currency,setCurrency]=useState("THB");
  const [fx,setFx]=useState({THB:"31.5",CNY:""});
  const [fxDate,setFxDate]=useState("2026-10-12");
  const [fxSource,setFxSource]=useState("MANAGEMENT WORKING BUDGET FX — NOT BOT VERIFIED");
@@ -32,8 +32,7 @@ export function BudgetaryWorkbookPreview0553(){
  const currentFx={thbPerUsd:fx.THB&&Number(fx.THB)>0?Number(fx.THB):null,cnyPerUsd:fx.CNY&&Number(fx.CNY)>0?Number(fx.CNY):null};
  const a1Review=deriveWorkingCostReview0553(currency,currentFx);
  const a1Coverage={...a1Review.partA,siteCount:a1Review.bySite.filter(s=>s.site!=="UNALLOCATED").length,pricedCount:a1Review.partA.known,unpricedCount:a1Review.partA.pending,knownCost:a1Review.partA.original};
- const lines=active?.kind==="SUMMARY"?REV08_BASELINE.summary:
-  REV08_BASELINE.detail[active?.code]||[];
+
  return <section className="p55-panel" data-component-key="bid.budget.summary.workbook">
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · NATIVE SOURCE WORKBOOK STRUCTURE <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.summary.workbook"/></div>
    <h3>4-Scope of Supply.xlsx · 6 Worksheet Review</h3>
@@ -58,7 +57,7 @@ export function BudgetaryWorkbookPreview0553(){
    <p className="p55-note"><strong>Original worksheet cell layout:</strong> {layout.columns} columns × {layout.maxRow} rows. Blank cells are preserved; historically labelled cells are reference only. Current BOM-derived customer selling prices are not approved and remain blank.</p>
    <div className="p55-panel">
     <strong>{sheet}</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)}/>
-    <p className="p55-note">Price cells marked REV08 are historical comparison values only, displayed in the official-style grid for review. They are NOT approved customer selling prices and will NOT be exported as the current bid.</p>
+    <p className="p55-note">The official grid remains the historical original template; the linked Scope table above is authoritative for the working preview. Price cells marked REV08 are historical comparison values only. They are NOT approved customer selling prices and will NOT be exported as the current bid.</p>
    </div>
    <div className="p55-filterbar">
     <button type="button" className="p553-detail-button" onClick={()=>setCollapsed(old=>({...old,...Object.fromEntries((sheet==="Scope of supply"?["PART_A","PART_B","PART_C"]:["ITEMS"]).map(key=>[sheet+":"+key,false]))}))}>− Expand all details</button>
@@ -66,6 +65,7 @@ export function BudgetaryWorkbookPreview0553(){
     <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)}/>
    </div>
    <p className="p55-note">กด + / − เพื่อยุบเฉพาะรายการย่อย (แถว 6–18) โดยหัวเอกสาร หัวตาราง Total และ Remark จะแสดงเสมอ; Excel ต้นฉบับไม่ถูกแก้ไข</p>
+   {sheet==="Scope of supply"&&<ScopeSheetsDetail0553 fx={{thbPerUsd:currentFx.thbPerUsd}} view="summary"/>}
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
     <thead><tr><th style={{width:45}}>Row</th>{Array.from({length:layout.columns},(_,i)=><th key={i}>{String.fromCharCode(65+i)}</th>)}<th style={{width:85}}>Copy ID</th></tr></thead>
     <tbody>{Array.from({length:layout.maxRow},(_,i)=>i+1).map(rowNum=>{
@@ -111,7 +111,7 @@ export function BudgetaryWorkbookPreview0553(){
        </td>;
       })}
       <td>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/>}</td>
-     </tr>{sheet==="Scope of supply"&&rowNum===7&&<tr key="part-a-bom"><td colSpan={layout.columns+2}><PartAWorkingBomReadOnly0553 displayCurrency={currency} fx={currentFx}/></td></tr>}</React.Fragment>;
+     </tr>{sheet==="Scope of supply"&&rowNum===7&&<tr key="part-a-bom"><td colSpan={layout.columns+2}><ScopeSheetsDetail0553 fx={{thbPerUsd:currentFx.thbPerUsd}} view="part-a"/></td></tr>}</React.Fragment>;
     })}</tbody>
    </table></div>
    <p className="p55-note">Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
