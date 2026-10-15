@@ -119,9 +119,6 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    </tbody></table></div>
    <p className="p55-note">Lifecycle spare requirement register: {LIFECYCLE_SPARES_0553.rows.length} source rows. Historical B/C category codes require customer classification remapping before posting.</p>
   </details>
-  <details className="p553-budget-phase"><summary><strong>10.4 — Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
-   <EstimateToBidMapping0553/>
-  </details>
   <details className="p553-budget-phase"><summary><strong>10.3 — Cost & Commercial Pricing Reference</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
    <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
   <section className="p55-panel">
@@ -164,7 +161,10 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     </td></tr>}</React.Fragment>)}</tbody>
   </table></div>
   <p><strong>Workbook source:</strong> {template.sourceName} · {template.revision} · 6 sheets. <strong>Export status:</strong> HOLD — original template fidelity and cross-sheet reconciliation not yet validated.</p>
+  </details>  <details className="p553-budget-phase"><summary><strong>10.4 — Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
+   <EstimateToBidMapping0553/>
   </details>
+
  </>}
  {/* Downstream Scope summary: after engineering BOM and estimate-to-bid mapping; read-only. */}
    {(mode==="working"||mode==="budgetary")&&<details className="p553-budget-phase" open data-component-key="bid.budget.scope">
