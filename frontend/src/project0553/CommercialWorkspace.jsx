@@ -13,6 +13,8 @@ import { SimpleBom0553 } from "./SimpleBom0553";
 import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
+import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
+import {LIFECYCLE_SPARES_0553} from "./data/lifecycleSpareScope0553";
 import React,{useState} from "react";
 import {assessVendorEvidenceForBudget0553} from "./data/vendorExternalEvidence0553";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
@@ -24,6 +26,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const toggle=k=>setExpanded(a=>{const n=new Set(a);n.has(k)?n.delete(k):n.add(k);return n;});
  const rows=template.sheets;
  const baseline=getBaselineReview();
+ const bcWorking=selectScopePartBcWorking0553();
  
  // Working display defaults only. Never represent the 31.5 planning rate as a BOT quote.
  const DEFAULT_FX={displayCurrency:"THB",fxRate:"31.5",fxDate:"2026-10-10",fxSource:"INTERNAL PLANNING ASSUMPTION — UNVERIFIED"};
@@ -102,6 +105,14 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <details className="p553-budget-phase" open><summary><strong>10.1 — Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
    <CostIntegrityReview0553/>
    <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency}/>
+  </details>
+  <details className="p553-budget-phase" data-component-key="bid.budget.working.bc">
+   <summary><strong>10.2 — Part B/C Working Cost &amp; Spare Requirements</strong><small>bid.budget.working.bc · WBS / Services / Spares</small></summary>
+   <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Customer Code</th><th>Working Reference THB</th><th>Cost Evidence Status</th></tr></thead><tbody>
+    {Object.values(bcWorking.lines).map(item=><tr key={item.code}><td>{item.code}</td><td>{Number.isFinite(item.amountTHB)?"THB "+item.amountTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{item.priceType} · {item.priceStatus}<small>{item.source} · Execution owner: {item.owner}</small></td></tr>)}
+   </tbody></table></div>
+   <p className="p55-note">Lifecycle spare requirement register: {LIFECYCLE_SPARES_0553.rows.length} source rows. Historical B/C category codes require customer classification remapping before posting.</p>
   </details>
   <details className="p553-budget-phase"><summary><strong>10.4 — Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
    <EstimateToBidMapping0553/>
