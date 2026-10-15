@@ -11,6 +11,19 @@ require.extensions[".js"]=(mod,file)=>{
  }else old(mod,file);
 };
 const {deriveBartecGlandBulkSchedule0553:derive,reconcileBartecVerifiedCableEnds0553:reconcile}=require(path.join(root,"project0553/data/bartecGlandBulkSchedule0553.js"));
+const {MR0003_PHONE_BULK_BASIS_0553:phoneSource}=require(path.join(root,"project0553/data/mr0003PhoneBulkDerivation0553.js"));
+const selectedPhoneBasis=source=>typeof source==="string"&&
+ source.includes("EXION phone/sounder separate")&&
+ source.includes("PROSPER historical item3")&&
+ source.includes("MGW excluded")&&
+ !source.includes("WAROM");
+assert.deepEqual(phoneSource.scopeSites,["ZWP20","ZWP21","ZWP22","ZWP23"],
+ "MR0003 scope must remain four Greenfield telephone systems");
+assert(phoneSource.conflictWithPrevious.includes("MGW PHONE-1/WAROM JB not selected"),
+ "Selected phone/JB supplier basis must explicitly exclude MGW/WAROM");
+assert.equal(selectedPhoneBasis("MGW PHONE-1 includes WAROM telephone JB"),false,
+ "Negative supplier-selection fixture must reject superseded MGW/WAROM bundle");
+
 const r=derive();
 assert.equal(r.sites.length,7);
 assert.equal(r.allEnclosures.length,11);
@@ -45,7 +58,16 @@ for(const w of r.sites){
   assert(phone);assert.equal(phone.holeCapacity,8);assert(phone.interfaceRows.some(x=>x.id==="PHONE-DEVICE"));
   assert(phone.interfaceRows.some(x=>x.id==="PHONE-SOUNDER"));
   assert(phone.interfaceRows.some(x=>x.id==="PHONE-UPLINK"));
-  assert(phone.includedPackageSource.includes("WAROM")===["ZWP20","ZWP21","ZWP22"].includes(w.site));
+  // Selected source is EXION phone/sounder and BARTEC GA-1004 / PROSPER
+  // historical JB rate at all four sites. MGW PHONE-1/WAROM is an excluded
+  // alternative, not evidence that a selected WAROM gland is included.
+  assert(phoneSource.scopeSites.includes(w.site),"Phone JB location outside MR0003 source scope");
+  assert.equal(phone.holeCapacity,phoneSource.gaSelectedM20Entries,
+   "Selected BARTEC GA-1004 must retain 8 top M20 entries");
+  assert(selectedPhoneBasis(phone.includedPackageSource),
+   "MR0003 selected EXION/BARTEC/PROSPER source missing or superseded MGW/WAROM revived: "+w.site);
+  assert(phone.status.includes("GLAND_SKU_PENDING"),
+   "No inferred selected or purchased active gland may be posted at "+w.site);
  }else assert(!w.enclosures.some(x=>x.system==="EX_IP_PHONE"),"Do not invent MR0003 scope on brownfield "+w.site);
 }
 assert.equal(reconcile({site:"ZWP20",enclosureId:"ZWP20-PHONE-JB"}).purchase,null);
@@ -72,4 +94,4 @@ const wp=fs.readFileSync(path.join(root,"project0553/data/wpSystemBulkBudget0553
 assert(wp.includes('id:"EX-PHONE-BARTEC-M20-GLAND-SIZE-QTY"'));
 assert(wp.includes('id:"SCADA-BARTEC-M20-GLAND-SIZE-QTY"'));
 assert(r.policy.freeze.includes("69m"));
-console.log("PASS BARTEC M20 gland bulk: 7 SCADA/4 Ex telephone site records, 144 hole capacity NOT 144 active glands; cable OD/SKU/count remain unknown; vendor WAROM vs BARTEC conflict, no ledger postings; synthetic end/size proof works.");
+console.log("PASS BARTEC M20 gland bulk: 7 SCADA/4 EXION phone + BARTEC/PROSPER JB site records, 144 hole capacity NOT 144 active glands; superseded MGW/WAROM not selected; cable OD/SKU/count unknown; no ledger posting; synthetic end/size proof works.");
