@@ -8,9 +8,10 @@ import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkin
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
 import {selectBcB3EquationExecution0553} from "./bcB3EquationExecution0553";
+import {selectBcB5EquationExecution0553} from "./bcB5EquationExecution0553";
 
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
-const primaryCodes=Object.freeze(["B1","B2","B3","B6","B9","B10","B11"]);
+const primaryCodes=Object.freeze(["B1","B2","B3","B5","B6","B9","B10","B11"]);
 const ownerCodes=Object.freeze(["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"]);
 const sourceUrl=PART_BC_WBS_SOURCE_0553.url;
 // 08_B1_ENGINEERING: [Scope, task, role MH: Lead/Senior/Engineer/Drafter/DC,
@@ -115,7 +116,8 @@ const otherRows=(audit)=>{
   scopeGate:"IMPORTER_OF_RECORD_BROKER_TAX_AND_NAMED_YARD_UNCONFIRMED"}));
  out.push(line("B6","B6-REPACK","Repacking/reinspection after SAMTEL Integrated FAT",null,"packages",{
   owner:"SAMTEL / nominated packing vendor",sourceRef:"ANNEX4 Part I; ANNEX4-2 Master/Single Packing List",
-  scopeGate:"COUNT_PACKAGES_IPPC_AND_INCLUDED_IN_B5_PENDING"}));
+  includedInExistingCostOwner:"B5-BKK-REPACK (physical packing only; B6 freight/customs separate)",
+  scopeGate:"B5_PHYSICAL_REPACK_COST_OWNER__B6_FREIGHT_HANDLING_SEPARATE"}));
  for(const mr of FAT_EXECUTION_BASIS_0553.mrPaths)out.push(line("B6","B6-"+mr.mr,
   mr.mr+" — "+mr.routing,null,"transport legs",{
    owner:"Contractually approved Freight/Importer of Record",
@@ -174,6 +176,14 @@ export function selectBcWorkCostLines0553(){
   scopeGate:"SHIPMENT_COUNT_DOC_HOURS_AND_B5_OWNER_PENDING"}));
  const equationProof=selectBcB1B2EquationExecution0553(b1);
  const b3EquationProof=selectBcB3EquationExecution0553();
+ const b5EquationProof=selectBcB5EquationExecution0553();
+ const b5=b5EquationProof.physicalPackingDrivers.map(x=>line("B5",x.sourceId,x.name,null,"unique physical package",{
+  sourceRef:"ANNEX4 Part I / PTTEP STD006 / Annex4-2 / 4 MR Source; "+x.sourceId,
+  owner:"OEM included Part A OR separately documented B5 incremental physical packing",
+  equation:"GEQ-001/004/005/012/018: unique package Qty × verified type/labor rate net confirmed OEM included credits",
+  scopeGate:x.qtyStatus,
+  reconciliationTag:"B5-PHYSICAL_PACK_QTY_RATE_NOT_ESTABLISHED"
+ }));
  // Audit clause lines are trace/quantity obligations, NOT another charge for
  // B1 role MH, B3 site days, B6 shipment or B10 spare purchased objects.
  const auditedClauses=audit.requirements.map(r=>line(r.code,"COST-"+r.id,
@@ -186,7 +196,7 @@ export function selectBcWorkCostLines0553(){
    equation:r.costDriver,
    reconciliationTag:"AUDIT-TRACE-"+r.code
   }));
- const all=[...b1,...b2,...otherRows(audit),...auditedClauses];
+ const all=[...b1,...b2,...b5,...otherRows(audit),...auditedClauses];
  const ids=new Set(all.map(x=>x.id));
  if(ids.size!==all.length)throw Error("Duplicate 10.2 cost-line owner IDs");
  if(b1.reduce((sum,r)=>sum+r.quantity,0)!==964)throw Error("B1 detailed MH sum !=964");
@@ -234,6 +244,7 @@ export function selectBcWorkCostLines0553(){
   requiredAuditCount:mappedClauses.length,
   equationProofModuleId:equationProof.moduleId,equationProof,
   b3EquationProofModuleId:b3EquationProof.moduleId,b3EquationProof,
+  b5EquationProofModuleId:b5EquationProof.moduleId,b5EquationProof,
   workingSellByCode,
   totalCostTHB:null,totalSellingPriceTHB:null,
   currentDirectCostComplete:false,releaseAllowed:false,
