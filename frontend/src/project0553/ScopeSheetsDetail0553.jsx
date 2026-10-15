@@ -143,7 +143,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
      const audit=scopePriceAudit.byCode[id]||null;
      const amount=working?working.amount:control?.workingSellTHB; // Current scope view never substitutes Rev08 price
      const mr={A1:"MR-0001",A2:"MR-0002",A3:"MR-0003",A4:"MR-0004",A5:"MR-0001–0004 / Bulk"}[id]||"";
-     const qty=id==="A5"?"1 LS ("+a5.rowCount+" MTO lots)":child?.quantity?"1 LS ("+child.quantity+" detail lines)":control?.qty!=null&&Number.isFinite(control.qty)?control.qty+" "+control.unit:"1 LS";
+     const qty=id==="A5"?"1 LS ("+a5.rowCount+" MTO lots)":child?.quantity?"1 LS (Rev08: "+child.quantity+" historical item rows)":control?.qty!=null&&Number.isFinite(control.qty)?control.qty+" "+control.unit:"1 LS";
      return <tr key={id}><td><strong>{id}</strong>{mr&&<small>{mr}</small>}</td><td>{desc}</td><td>{qty}</td>
       <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(amount)?cash(amount):"Cost source pending"}</td>
       <td className="is-number">{id==="A5"?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(amount)?cash(amount):"Not established"}</td>
@@ -165,7 +165,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
   <p className="p55-note"><strong>Selected sheet:</strong> {sheet} · <ComponentCopyId projectId="PJ2608-0553" componentKey={sheet==="Scope of supply"?"bid.budget.scope":"bid.budget.scope."+category[1].toLowerCase()}/> · Rev08 historical detail is reference only, not current vendor cost or an authorized sell price.</p>
   <p className="p55-note">{category[2]}</p>
   <p className="p55-note"><strong>Price basis:</strong> 10.2 B/C working SELL and validated COST (where present) shown separately from original Rev08 historical USD→THB references. Not additive and not a released quote.</p>
-  {sheet==="Scope of supply"?<div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Working Unit Cost THB / LS</th><th>Working Budgetary Cost THB</th><th>Historical Rev08 Reference THB — NOT Cost</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
+  {sheet==="Scope of supply"?<div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Current Working Unit THB (A COST / B SELL)</th><th>Current Working Amount THB (A COST / B SELL)</th><th>Historical Rev08 Reference THB — NOT Cost</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
   <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
    const control=scopeBC.lines[id]||null;
    const item=workingSummary[id]||(control?{amount:control.amountTHB,
@@ -177,7 +177,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
    const audited=scopePriceAudit.byCode[id]||null;
    const shownAmount=amount;
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
-    hasChild?"1 LS ("+childSource.quantity+" detail rows)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
+    hasChild?"1 LS (Rev08: "+childSource.quantity+" unverified historical item rows)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
    return <tr key={id}><td>{audited?<button type="button" className="p553-detail-button" onClick={()=>setSheet(SHEETS.find(row=>row[1]===id)[0])}>{id} — View Details</button>:id}</td><td>{desc}</td><td>{qtyDisplay}</td>
     <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
     <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
