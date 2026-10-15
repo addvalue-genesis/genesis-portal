@@ -64,6 +64,7 @@ export function PJ26080553() {
   {id:"bid.vendor.products.supplier.quote-lines",name:"Vendor Products / Supplier Quote Lines",tab:"documents",keywords:"supplier mgw rfi cost"},
   {id:"bid.budget",name:"Budget Workspace",tab:"budget",keywords:"working costing"},
   {id:"bid.budget.bom",name:"Engineering BOM Working Preview",tab:"budget",keywords:"working preview equipment"},
+  {id:"bid.budget.working.bc.execution-audit",name:"10.2 B/C — Execution, Permits, MOB/DEMOB & Tools Audit",tab:"budget",keywords:"annex 4 annex 6 pack shipment special tools logistics license transport 01 08 10.2"},
   {id:"bid.budget.bom.mr0002",name:"MR-0002 Trunk Radio Working BOM",tab:"budget",keywords:"rfi dmr antenna feeder"},
   {id:"bid.budget.bom.source-coverage",name:"BOM Source Coverage",tab:"budget",keywords:"source evidence"},
   {id:"bid.budget.bom.reconciliation",name:"BOM Cost Reconciliation",tab:"budget",keywords:"site cost"},
