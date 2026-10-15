@@ -69,6 +69,10 @@ function rowCost(item){
     sku:"IE-PS-RJ45-FH-BK",orderNo:"1963600000",qty:plugQty,currency:"THB",
     quotedUnitPrice:plugQuotedRate,unitPrice:plugBudgetRate,extended:money(plugQty,plugBudgetRate),
     priceBasis:plugQuotedRate===null?"RS_ONLINE_RETAIL_INDICATIVE_EX_VAT_NOT_VENDOR_RFQ":"INNOVA_QUOTED_PRICE_EX_VAT",
+    budgetApproval:plugRsEvidence?.approvalStatus||"BUDGET_APPROVAL_NOT_RECORDED",
+    budgetApprovedBy:plugRsEvidence?.approvalAuthority||null,
+    budgetApprovalSource:plugRsEvidence?.approvalConfirmation||null,
+    budgetApprovalScope:plugRsEvidence?.approvalScope||null,
     quote:"QA24-0604 (N/A)",quoteItem:2,source:plugQuotedRate===null?plugRsEvidence?.url??null:innova?.url||null,
     exStatus:"IP20_DATASHEET__EX_COMPLIANCE_NOT_ESTABLISHED"};
   const panelAmount=money(q,rate);
@@ -84,8 +88,10 @@ function rowCost(item){
    source:"SONIC CCY24-PXC-633 (panel) + "+(plugQuotedRate===null?"RS Thailand 741-7317 (plug retail budget reference)":"INNOVA QA24-0604 (plug quote)"),
    priceRevision:"2026-10-12_RS_RETAIL_BUDGET_RATE_SUPERSEDES_TEMP_ZERO",
    quantityBasis:"MTO Rev04 DATO-507-001 1 Set; assumed one RJ45 patch panel as provisional budgetary interface equivalent; actual Ex-rated disconnect composition must be checked",
-   status:"BUDGETARY_SELECTED_PRODUCTS_WITH_RS_RETAIL_RATE__EX_REVIEW",
-   decision:"Selected ZWP20 DATO budget components are Phoenix Contact FL-PP-RJ45-SC (Sonic source THB 1,900) and Weidmüller IE-PS-RJ45-FH-BK (RS Thailand retail reference THB 1,176.68). The 2026-10-11 temporary THB 0 plug allowance was superseded by the 2026-10-12 working budget update. INNOVA QA24-0604 Item 2 remains N/A; RS rate is NOT an INNOVA/OEM quote or technical Ex approval. DATO Row 8 alone owns these costs; SCADA bulk mirrors but never adds the plug.",
+   status:"MANAGEMENT_APPROVED_BUDGETARY_SELECTION_AND_RATE__EX_REVIEW",
+   selectedComponentBudgetApproval:weidmuellerPlug.budgetApproval,
+   managementBudgetApprovalRecorded:weidmuellerPlug.budgetApproval==="MANAGEMENT_APPROVED_INTERNAL_BUDGETARY_PRODUCT_AND_RATE",
+   decision:"Selected ZWP20 DATO budget components are Phoenix Contact FL-PP-RJ45-SC (Sonic source THB 1,900) and Weidmüller IE-PS-RJ45-FH-BK (RS Thailand retail reference THB 1,176.68). The 2026-10-11 temporary THB 0 plug allowance was superseded by the 2026-10-12 working budget update. The project manager has approved the selected Weidmüller product and THB 1,176.68 rate for internal budget use (approval reconfirmed 2026-10-15); DO NOT re-open product/price selection without source revision or an explicit change request. INNOVA QA24-0604 Item 2 remains N/A; RS rate is NOT an INNOVA/OEM firm quote, and technical Ex compliance is independently gated. DATO Row 8 alone owns these costs; SCADA bulk mirrors but never adds the plug.",
    assumptions:["Historical Sonic CCY24-PXC-633 11-Jul-2024 THB 1,900 / EA ex VAT; quotation validity expired",
     "Weidmüller IE-PS-RJ45-FH-BK (Order No. 1963600000), 1 provisional plug × RS Thailand THB 1,176.68 retail ex VAT working reference; INNOVA QA24-0604 item 2 stays N/A. The prior THB 0 temporary allowance is historical only, not the active cost. IP20 datasheet is NOT Ex certification",
     "Phoenix FL-PP-RJ45-SC has quoted price but is NOT established as full DATO Ex-rated socket and plug. Keep technical gap, hazardous-area certification and accessory assembly as separate unresolved scope",
