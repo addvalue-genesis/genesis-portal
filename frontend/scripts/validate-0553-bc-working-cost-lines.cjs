@@ -27,6 +27,7 @@ assert.equal(m.rows.length,105);
 assert.equal(m.requiredAuditCount,40);
 assert.equal(new Set(m.rows.map(x=>x.id)).size,105);
 assert.equal(m.rows.filter(x=>x.id.startsWith("COST-AUD-")).length,40);
+assert(m.rows.filter(x=>x.id.startsWith("COST-AUD-")).every(x=>x.workingSellTHB===null&&x.directCostTHB===null&&x.includedInExistingCostOwner),"Audit records must never multiply or post existing priced cost owners");
 assert.equal(m.rows.filter(x=>!x.id.startsWith("COST-AUD-")).length,65);
 assert(m.requirementLinks.every(x=>x.costLineId==="COST-"+x.auditId));
 assert.deepEqual(m.requirementLinks.map(x=>x.auditId),audit.requirements.map(x=>x.id));
@@ -97,6 +98,7 @@ const main=read("project0553/CommercialWorkspace.jsx"),render=read("project0553/
 assert(main.includes("<BcWorkCostLines0553 selectedCode={bcTab===\"ALL\"&&bcDetailCode?bcDetailCode:bcTab}/>"));
 assert(render.includes("m.rows.filter")&&render.includes("m.workingSellByCode"));
 assert(render.includes("showAuditClauses")&&render.includes("Cost Owner: 10.2 only"));
+assert(render.includes("Object.entries(x.roleMH)")&&render.includes("knownSellCount"),"B1 labor skills and known-only incomplete Sell coverage must be visible");
 assert(render.includes("data-component-key={x.moduleId}")&&render.includes("componentKey={x.moduleId}"));
 for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcWorkCostLines0553.jsx"]){
  assert(babel.transformSync(read(f),{babelrc:false,configFile:false,
