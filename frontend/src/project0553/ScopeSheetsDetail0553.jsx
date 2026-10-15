@@ -6,6 +6,7 @@ import {selectScopeSheet0553} from "./data/scopeSheetProjection0553";
 import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {selectScopeBcPriceAudit0553,SCOPE_BC_DETAIL_CODES_0553} from "./data/scopeBcPriceAudit0553";
 import {ScopeBcAnnexDetail0553} from "./ScopeBcAnnexDetail0553";
+import {ScopeCategoryTabs0553} from "./ScopeCategoryTabs0553";
 import {BULK_TAKEOFF_0553} from "./data/bulkTakeoff0553";
 import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
 import {deriveScadaBudgetEnvelope0553} from "./data/scadaBudgetEnvelope0553";
@@ -159,9 +160,8 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
   <div className="p55-eyebrow">SCOPE SHEETS / REFERENCED DETAIL <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
   <h3>Scope of Supply — Linked Internal Detail</h3>
   <p className="p55-note">Original uploaded workbook has 6 tabs, including unpriced template cells. Historical Rev08 amounts below are kept separate from original cells, current vendor cost and new bid selling price.</p>
-  <div className="p55-filterbar" role="group" aria-label="Customer Workbook Sub-modules">
-   {SHEETS.map(([name,code,description])=><button key={name} type="button" className={sheet===name?"is-active":""} onClick={()=>setSheet(name)} title={description} aria-pressed={sheet===name}>{name}</button>)}
-  </div>
+  <ScopeCategoryTabs0553 value={category[1]==="A/B/C"?"ALL":category[1]}
+   onChange={code=>setSheet(code==="ALL"?"Scope of supply":SHEETS.find(row=>row[1]===code)?.[0]||"Scope of supply")}/>
   <p className="p55-note"><strong>Selected sheet:</strong> {sheet} · <ComponentCopyId projectId="PJ2608-0553" componentKey={sheet==="Scope of supply"?"bid.budget.scope":"bid.budget.scope."+category[1].toLowerCase()}/> · Rev08 historical detail is reference only, not current vendor cost or an authorized sell price.</p>
   <p className="p55-note">{category[2]}</p>
   <p className="p55-note"><strong>Price basis:</strong> 10.2 B/C working SELL and validated COST (where present) shown separately from original Rev08 historical USD→THB references. Not additive and not a released quote.</p>
