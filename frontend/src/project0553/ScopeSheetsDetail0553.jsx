@@ -19,7 +19,9 @@ const SHEETS=[
  ["Scope of supply","A/B/C","A1–A5 equipment+bulk, B1–B14 services, C1/C2 options"],
  ["B10 CommSpares","B10","Erection, pre-commissioning, commissioning and start-up spare parts"],
  ["B11 SpecialTool","B11","Special tools"],
+ ["B12 FirstFilling","B12","First filling — itemized worksheet not available"],
  ["B13 Consumerables","B13","Consumables"],
+ ["B14 BondsInsurance","B14","Bonds and insurance — itemized worksheet not available"],
  ["C1 CapitalSpares","C1","Capital spares option"],
  ["C2 2Y-Spares","C2","Two-year operation spares option"]
 ];
@@ -35,7 +37,8 @@ export function ScopeSheetsDetail0553({fx=null}){
  const category=SHEETS.find(x=>x[0]===sheet);
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
  const details=selectScopeSheet0553(category[1],{thbPerUsd:fx?.thbPerUsd}).rows;
- const b10Source=selectScopeSheet0553("B10",{thbPerUsd:fx?.thbPerUsd});
+ const linkedScopeCodes=new Set(["B10","B11","B13","C1","C2"]);
+ const scopeSheetSources=Object.fromEntries([...linkedScopeCodes].map(code=>[code,selectScopeSheet0553(code,{thbPerUsd:fx?.thbPerUsd})]));
  const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
  // A2 is sourced from the SAME MR0002 per-site Working BOM, including the RFI-LNA.
  // Management excluded MGW rates: omit MGW vendor rows, never erase independently
@@ -114,7 +117,7 @@ export function ScopeSheetsDetail0553({fx=null}){
  }
 
  return <section className="p55-panel">
-  <div className="p55-eyebrow">6 ORIGINAL SHEETS <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
+  <div className="p55-eyebrow">SCOPE SHEETS / REFERENCED DETAIL <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
   <h3>Scope of Supply — Linked Internal Detail</h3>
   <p className="p55-note">Original uploaded workbook has 6 tabs, including unpriced template cells. Historical Rev08 amounts below are kept separate from original cells, current vendor cost and new bid selling price.</p>
   <div className="p55-filterbar" role="group" aria-label="Customer Workbook Sub-modules">
@@ -129,14 +132,18 @@ export function ScopeSheetsDetail0553({fx=null}){
     status:control.priceType+" · "+control.priceStatus+" · "+control.requirement,
     source:control.basis+" · OWNER: "+control.owner+" · "+control.source+" · EQUATIONS: "+(control.equations.join(", ")||"source schedule required")}:null),amount=item?.amount;
    const unavailable=id==="A5"?"A5 source/ledger reconciliation required":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
-   const b10Amount=id==="B10"?b10Source.totalTHB:null;
-   const shownAmount=id==="B10"?b10Amount:amount;
+   const childSource=scopeSheetSources[id]||null;
+   const childAmount=childSource?.totalTHB??null;
+   const hasChild=Boolean(childSource&&childSource.quantity>0);
+   const shownAmount=hasChild?childAmount:amount;
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
-    id==="B10"?"1 LS ("+b10Source.quantity+" spares)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
+    hasChild?"1 LS ("+childSource.quantity+" detail rows)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>{qtyDisplay}</td>
-    <td className="is-number">{id==="B10"?(Number.isFinite(b10Amount)?cash(b10Amount):"Awaiting FX"):id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
-    <td className="is-number">{id==="B10"?(Number.isFinite(b10Amount)?cash(b10Amount):"Awaiting FX"):id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(amount):cash(amount)):control?"Current owner / OEM price not established":unavailable}</td>
-    <td>{id==="B10"?<><strong>LINKED B10 CHILD SUBTOTAL · HISTORICAL REV08 (not verified OEM cost)</strong><small>{b10Source.source} · {b10Source.quantity} rows · OEM verification: {control?.priceStatus}</small></>:item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
+    <td className="is-number">{hasChild?(Number.isFinite(childAmount)?cash(childAmount):"Awaiting FX"):id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
+    <td className="is-number">{hasChild?(Number.isFinite(childAmount)?cash(childAmount):"Awaiting FX"):id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
+    <td>{hasChild?<><strong>LINKED {id} CHILD SUBTOTAL · HISTORICAL REV08 (not verified OEM cost)</strong><small>{childSource.source} · {childSource.quantity} detail rows · OEM verification: {control?.priceStatus} · {id.startsWith("C")?"OPTION — NOT INCLUDED IN BASE": "REFERENCE — NOT ADDED TO CURRENT WORKING SELL"}</small></>:
+     (id==="B12"||id==="B14")?<><strong>NO ITEMIZED CHILD-SHEET PRICE</strong><small>{id==="B12"?"First-filling applicability and supplier scope must be verified; historical summary zero is not accepted as a verified cost.":"Insurance/bond premium and insured-value evidence required; historical Rev08 summary is not an itemized vendor quotation."} {control?.priceStatus}</small></>:
+     item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(row=><tr key={row.id}><td>{row.id}</td><td>{row.description}</td><td>{row.qty}</td>
     <td className="is-number">{Number.isFinite(row.unitTHB)?cash(row.unitTHB):"Awaiting FX"}</td>
     <td className="is-number">{Number.isFinite(row.totalTHB)?cash(row.totalTHB):"Awaiting FX"}</td>
