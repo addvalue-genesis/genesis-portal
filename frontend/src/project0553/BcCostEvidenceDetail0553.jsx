@@ -24,7 +24,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
    <div><strong>WBS Working SELL (THB)</strong><p>{thb(e.workingSellTHB)}</p><small>อ้างอิง Rev05 เท่านั้น</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
-  {e.code==="B6"&&e.reconciliation?.historicalRev08TransportSellUSD!==undefined&&<p className="p55-note"><strong>Previously supplied transport price evidence:</strong> USD {e.reconciliation.historicalRev08TransportSellUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4})} · 4-Scope of Supply.xlsx Rev08, B6 Transportation (historical customer SELL). This is not a current freight/broker quotation, is not THB Direct Cost, and must not be added to the current B/C cost subtotal. Reconcile four MR shipment legs and the Bangkok FAT routing before pricing.</p>}
+  {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Confirm the four MR legs through Bangkok FAT and JUTAL Nantong.</p>}
   <p className="p55-note">SOURCE: <a href={e.sourceUrl} target="_blank" rel="noreferrer">{e.sourceSheet} · {e.sourceRevision}</a>. ต้องใช้ Internal Rate Card / Vendor Rate ที่ควบคุมได้ก่อนคำนวณ Direct Cost</p>
   <h4>1. Working Drivers &amp; Calculation Evidence — ต้นทางปริมาณและสมการ</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
@@ -37,7 +37,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
     <td><strong>{readableKind[line.valueClass]||line.valueClass}</strong><small>{line.status}</small><small>{line.evidence}</small></td>
    </tr>)}</tbody>
   </table></div>
-  {e.reconciliation&&<p className="p55-note"><strong>Source Reconciliation:</strong> {Object.entries(e.reconciliation).map(([k,v])=>k+": "+(typeof v==="number"?v.toLocaleString("en-US"):Array.isArray(v)?v.join(" – "):v)).join(" · ")}</p>}
+  {e.reconciliation&&<p className="p55-note"><strong>Source Reconciliation:</strong> {Object.entries(e.reconciliation).filter(([k])=>k!=="historicalRev08TransportSellTHB"&&k!=="planningFxTHBPerUSD"&&k!=="displayCurrency").map(([k,v])=>k+": "+(typeof v==="number"?v.toLocaleString("en-US"):Array.isArray(v)?v.join(" – "):v)).join(" · ")}</p>}
   <h4>2. Input / Cost Gaps — ข้อมูลที่ต้องยืนยันก่อนคิดต้นทุน</h4>
   <ul>{e.requiredInputs.map((g,i)=><li key={i}>{g}</li>)}</ul>
   <details className="p55-panel" style={{padding:12,marginTop:10}}>
