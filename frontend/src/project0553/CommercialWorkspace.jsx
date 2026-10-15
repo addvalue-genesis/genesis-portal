@@ -194,7 +194,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    {(mode==="working"||mode==="budgetary")&&<details className="p553-budget-phase" open data-component-key="bid.budget.scope">
    <summary><strong>10.5 — Scope of Supply / A+B+C</strong><small>bid.budget.scope · B10 / B11 / B13 / C1 / C2 · A/B/C</small></summary>
    <p className="p55-note"><strong>Internal engineering reference only:</strong> linked working costs are not an approved customer quotation. Original workbook codes and internal cost categories remain distinct; missing vendor prices are not zero.</p>
-   <ScopeSheetsDetail0553 fx={fx}/>
+   <ScopeSheetsDetail0553 fx={fx} navigationTarget={navigationTarget} navigationSequence={navigationSequence}/>
   </details>}
   
   {mode==="budgetary"&&<><BudgetaryWorkbookPreview0553/><section className="p55-panel">
