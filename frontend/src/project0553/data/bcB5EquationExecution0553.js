@@ -6,6 +6,7 @@ import {B5_PACKING_CLAUSES_0553,B5_PACKING_SOURCE_POLICY_0553,B5_SOURCE_URLS_055
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
 import {derivePartBcWorkingWbs0553} from "./partBCWorkingWbs0553";
 import {deriveManHours,deriveLaborCost} from "../../common/cost/derivationKernel";
+import {selectBcB5HistoricalPriceBridge0553} from "./bcB5HistoricalPriceBridge0553";
 
 const freeze=x=>Object.freeze(x),finite=x=>typeof x==="number"&&Number.isFinite(x)&&x>=0;
 const ALLOWED_STAGES=freeze(["OEM_ORIGIN_PRE_BKK","BKK_POST_FAT_REPACK","YARD_POST_RECEIPT_CONDITION"]);
@@ -68,6 +69,7 @@ const formula=freeze({
 export function selectBcB5EquationExecution0553(){
  const wbs=derivePartBcWorkingWbs0553().rows.find(x=>x.code==="B5");
  if(!wbs||wbs.sellTHB!==null||wbs.qty!==null)throw Error("B5 baseline unexpectedly priced or assumed quantity");
+ const historicalPrice=selectBcB5HistoricalPriceBridge0553();
  const perLine=freeze(lineDrivers.map(x=>{
   const actual=deriveManHours({applicable:1,quantity:x.physicalPackQuantity,
    unitHours:null,factor:null,evidence:"ANNEX4/STD006; "+x.id+"; physical pack list required"});
@@ -86,6 +88,7 @@ export function selectBcB5EquationExecution0553(){
   kernelPath:"frontend/src/common/cost/derivationKernel.js",GEQ,
   MR:SOURCE_MRS,sourceUrls:B5_SOURCE_URLS_0553,
   sourceClauses:reqRows,sourceClauseCount:reqRows.length,packingStreams:streams,
+  historicalPriceBridge:historicalPrice,historicalPriceModuleId:historicalPrice.moduleId,
   combinedBangkokPacking:combined,physicalPackingDrivers:perLine,
   stages:ALLOWED_STAGES,formula,validation:checks,
   approvedPhysicalPackageCount:null,requiredNewCrateCount:null,
