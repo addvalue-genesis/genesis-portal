@@ -13,7 +13,9 @@ const applicableFamily=description=>{
  return null; // Broad words such as gland/fuse are cross-system, not a verified SKU match.
 };
 const tagRows=MR0001_WORKING_PRICED_BOM.items.filter(x=>typeof x.sourceTag==="string"&&x.sourceTag.trim());
-const installedByTag=new Map(tagRows.map(x=>[x.site+"|"+x.sourceTag,x]));
+const round=n=>Math.round((n+Number.EPSILON)*100)/100;
+const fxTHBPerUSD=31.5; // Project Rev08 working budget conversion, NOT a current BOT rate.
+const sourceTags=[...new Set(tagRows.map(x=>x.sourceTag))];
 export function selectUnifiedSpareConsumables0553(){
  const rows=codes.flatMap(code=>(REV08_BASELINE.detail[code]||[]).map(([description,quantity,unitPriceUSD],i)=>{
   const family=applicableFamily(description);
@@ -32,23 +34,30 @@ export function selectUnifiedSpareConsumables0553(){
    mrFamilyCandidate:family,relatedInstalledTags:connectedTags,
    relatedLocations:[...new Set(installed.map(x=>x.site))],
    tagMappingState:connectedTags.length?"MTO_TAG_CANDIDATES_NOT_SPARE_COMPATIBILITY_VERIFIED":"REQUIRES_TAG_SKU_COMPATIBILITY_LINK",
-   customerTagNo:null, // Never misrepresent candidate MTO TAG as OEM-approved spare fit.
+   customerTagNo:connectedTags.length?connectedTags.join(", "):"COMMON / MULTI-SYSTEM", // budgetary linked equipment family; NOT spare SKU approval.
    vendorPartNumber:null,detailSpecification:null,material:null,leadTimeARO:null,
-   approvedRequiredQty:null,approvedUnitTHB:null,workingSellTHB:null,
+   approvedRequiredQty:null,approvedUnitTHB:null, // Retain technical approval gate separately.
+   budgetQty:quantity,budgetUnitTHB:round(unitPriceUSD*fxTHBPerUSD),
+   budgetTotalTHB:round(quantity*unitPriceUSD*fxTHBPerUSD),
+   budgetBasis:"REV08_ITEM_QTY_AND_SELL_RATE_AT_PLANNING_FX_31_5",
+   budgetStatus:"PRE_AWARD_BUDGETARY__OEM_FINAL_CONFIGURATION_OPEN",
+   workingSellTHB:round(quantity*unitPriceUSD*fxTHBPerUSD),
    validDirectCost:false,customerReleaseAllowed:false,
    physicalCostOwner:code,option:code.startsWith("C"),requiredMinimumSpareValidation:"EXA_A8_AND_OEM_SPIR_PENDING"
   });
  }));
  const byCode=Object.fromEntries(codes.map(c=>[c,rows.filter(x=>x.code===c)]));
- if(rows.some(x=>!installedByTag||x.legacyQty<0))throw Error("Invalid spare source");
+ if(rows.some(x=>x.legacyQty<0))throw Error("Invalid spare source");
  for(const code of codes){
   const source=REV08_BASELINE.summary.find(x=>x[0]===code)?.[2];
   const sum=byCode[code].reduce((n,x)=>n+x.legacyTotalUSD,0);
   if(!Number.isFinite(source)||Math.abs(sum-source)>0.01)throw Error("Spare master Rev08 reconciliation "+code);
  }
- return Object.freeze({moduleId:"bid.budget.working.bc.spares-master",codes,descriptions,rows,byCode,
+ const budgetTotalsTHB=Object.fromEntries(codes.map(code=>[code,round((REV08_BASELINE.summary.find(x=>x[0]===code)?.[2]||0)*fxTHBPerUSD)]));
+ return Object.freeze({moduleId:"bid.budget.working.bc.spares-master",codes,descriptions,rows,byCode,budgetTotalsTHB,fxTHBPerUSD,
   sourceTagRegister:"MR0001 MTO Rev04 through existing Working Priced BOM",
   sourceHistorical:"4-Scope of Supply.xlsx Rev08",
   verification:"MR0001-0004 + SPE C2 + EXA-A8 + OEM SPIR + DTS/LIS compatibility remain to validate",
-  historicalNotAdditionalCost:true,complete:false,releaseAllowed:false});
+  historicalNotAdditionalCost:true,complete:false,releaseAllowed:false,
+  scopeWarning:"This is source-reconciled Rev08 budget coverage, not an EXA-A8 complete engineering takeoff. Unmapped family tags are COMMON, never fabricated."});
 }
