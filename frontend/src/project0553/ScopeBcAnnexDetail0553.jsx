@@ -26,7 +26,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
   {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
-   <h4>Customer Schedule — ${shared.descriptions[code]} (Engineering Working Preview)</h4>
+   <h4>Customer Schedule — {shared.descriptions[code]} (Engineering Working Preview)</h4>
    <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> ${shared.sourceTagRegister} · Genuine installed MTO tags appear in each row as candidate links, not as a fabricated approved spare Tag. OEM SKU, exact spare compatibility and minimum EXA-A8 scope are pending. No unverified unit rates are released.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Item</th><th>Tag No. / Linked MTO Tags</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
