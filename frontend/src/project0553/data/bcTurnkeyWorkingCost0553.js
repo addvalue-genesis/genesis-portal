@@ -75,6 +75,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    LIFECYCLE_SPARES_0553.rows.filter(x=>activities.includes(x.activity)):[];
   const costEvidence=evidence.byCode[code];
   const b6BudgetarySellTHB=code==="B6"?costEvidence?.reconciliation?.historicalRev08TransportSellTHB:null;
+  const b5ApprovedSellTHB=code==="B5"?b5PriceReference.amountTHB:null;
   const sellKnown=Number.isFinite(w.sellTHB);
   if(!costEvidence||costEvidence.workingSellTHB!==(code==="B6"?costEvidence.reconciliation?.historicalRev08TransportSellTHB:w.sellTHB)||costEvidence.directCostTHB!==null)
    throw Error("B/C cost evidence diverged from source WBS or invented a direct cost at "+code);
@@ -98,15 +99,16 @@ export function selectBcTurnkeyWorkingCost0553(){
     sourceStatus:r.priceStatus
    })),
    requirementCount:requirementRows.length,
-   workingSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
-   workingSellBasis:Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
+   workingSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
+   workingSellBasis:Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
    directCostTHB:null, // No controlled source-rate x quantity internal ledger yet.
    riskCostTHB:null,
    commercialSellTHB:null, // A customer price is not the existing WBS sell reference.
-   priceStatus:Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
+   priceStatus:Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
    b5PriceReference:code==="B5"?b5PriceReference:null,
+   b5WorkingSellDecision:code==="B5"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b5ApprovedSellTHB,source:b5PriceReference.sourceRevision,costOwner:"B5",excludedB7StorageTHB:b5PriceReference.nonAdditiveStorageTHB,verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b6UpdatedReview:code==="B6"?Object.freeze({status:"MANAGEMENT_APPROVED_WORKING_SELL_2026_10_15",reviewedOn:"2026-10-15",displayCurrency:"THB",historicalPriceReferenceTHB:costEvidence.reconciliation.historicalRev08TransportSellTHB,priceBasis:"REV08_HISTORICAL_SELL_CONVERTED_AT_PLANNING_FX_31_5",costVerified:false,shipmentScopeVerified:false,pricePostingAllowed:true,postingClass:"WORKING_SELL_ONLY",releaseAllowed:false}):null,
    costEvidence, // Read-only 01–08 requirements, WBS / route equations and explicit missing direct-cost input ledger.
    executionAuditModuleId:executionAudit.moduleId,
@@ -134,7 +136,7 @@ export function selectBcTurnkeyWorkingCost0553(){
  const byCodeOutput=Object.fromEntries(rows.map(r=>[r.code,r]));
  const knownWorkingSellTHB=round(rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
   .reduce((sum,r)=>sum+r.workingSellTHB,0));
- if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB+rows.find(r=>r.code==="B6").workingSellTHB))>0.01)
+ if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB+rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB))>0.01)
   throw Error("B WBS working sell reference reconciliation failed");
  // Source-price coverage is not cost completeness.
  return Object.freeze({
@@ -143,6 +145,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   rows,byCode:byCodeOutput,
   knownWorkingSellTHB,
   workingSellB6BudgetaryTHB:rows.find(r=>r.code==="B6").workingSellTHB,
+  workingSellB5ApprovedTHB:rows.find(r=>r.code==="B5").workingSellTHB,
   knownDirectCostTHB:null,completeDirectCostTHB:null,
   baseTurnkeyCostTHB:null,optionalCostTHB:null,
   costComplete:false,releaseAllowed:false,
