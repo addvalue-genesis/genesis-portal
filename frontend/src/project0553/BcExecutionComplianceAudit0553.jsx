@@ -1,6 +1,7 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcExecutionComplianceAudit0553} from "./data/bcExecutionComplianceAudit0553";
+import {evaluateOffshoreMobDemobEconomics0553} from "./data/bcMobDemobEconomics0553";
 
 const asSell=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 
@@ -8,6 +9,7 @@ const asSell=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFract
 // drivers, never new approved cost postings or regulatory fee quotations.
 export function BcExecutionComplianceAudit0553({selectedCode="ALL"}){
  const m=selectBcExecutionComplianceAudit0553();
+ const mobilizationEconomics=evaluateOffshoreMobDemobEconomics0553();
  const visible=m.requirements.filter(r=>selectedCode==="ALL"||r.code===selectedCode);
  return <details className="p55-panel" data-component-key={m.moduleId} style={{marginTop:12,padding:"12px 14px"}}>
   <summary><strong>{m.name}</strong> · <span>{visible.length} obligation / cost driver records</span></summary>
@@ -26,6 +28,11 @@ export function BcExecutionComplianceAudit0553({selectedCode="ALL"}){
    <tfoot><tr><td><strong>Working total (not travel approval)</strong></td><td>{m.offshore.teamDays}</td><td>{m.offshore.personDays}</td><td>Cost NOT ESTABLISHED</td></tr></tfoot>
   </table></div>
   <p className="p55-note"><strong>Optimization:</strong> Minimize total MOB/DEMOB + crew days + access/standby + change exposure subject to actual HUC/POB and FAT-before-shipment constraints. No speculative trip merging or additional days posted.</p>
+  <div className="p55-panel" data-component-key={mobilizationEconomics.moduleId} style={{padding:"10px 12px",marginTop:8}}>
+   <strong>Parametric MOB/DEMOB Economics · Working 5 trips versus alternative grouped campaigns</strong>
+   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={mobilizationEconomics.moduleId}/> · {mobilizationEconomics.state}</p>
+   <p className="p55-note">C_scenario = 78 MD × verified staff DIRECT cost rate + rotation_count × 2 staff × verified round-trip travel rate + incremental MOB/DEMOB (only if NOT in 39 team-days) + approved transfer/standby costs. Alternative trip count can be ranked only when HUC/POB/SIMOPS/marine transfers, seven-site coverage and all source rates are confirmed. No automatic quote or ledger posting.</p>
+  </div>
   <h4>Source → Cost Owner → Evidence Gate (Workflow 01–08)</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Module / Steps</th><th>Obligation &amp; Project Scope</th><th>Cost Driver &amp; Ownership</th><th>Original Document / Note</th><th>Verification State</th></tr></thead>
