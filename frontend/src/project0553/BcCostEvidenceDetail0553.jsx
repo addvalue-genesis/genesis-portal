@@ -24,6 +24,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
    <div><strong>WBS Working SELL (THB)</strong><p>{thb(e.workingSellTHB)}</p><small>อ้างอิง Rev05 เท่านั้น</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
+  {e.code==="B6"&&e.reconciliation?.historicalRev08TransportSellUSD!==undefined&&<p className="p55-note"><strong>Previously supplied transport price evidence:</strong> USD {e.reconciliation.historicalRev08TransportSellUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4})} · 4-Scope of Supply.xlsx Rev08, B6 Transportation (historical customer SELL). This is not a current freight/broker quotation, is not THB Direct Cost, and must not be added to the current B/C cost subtotal. Reconcile four MR shipment legs and the Bangkok FAT routing before pricing.</p>}
   <p className="p55-note">SOURCE: <a href={e.sourceUrl} target="_blank" rel="noreferrer">{e.sourceSheet} · {e.sourceRevision}</a>. ต้องใช้ Internal Rate Card / Vendor Rate ที่ควบคุมได้ก่อนคำนวณ Direct Cost</p>
   <h4>1. Working Drivers &amp; Calculation Evidence — ต้นทางปริมาณและสมการ</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
