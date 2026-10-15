@@ -131,11 +131,12 @@ export function BudgetaryWorkbookPreview0553(){
      </td></tr>:null;
      const hidden=section&&collapsed[sheet+":"+section];
      if(hidden||(!showEmptyRows&&!visibleContent&&!(sheet==="Scope of supply"&&rowNum>=8&&rowNum<=12)))return header;
+     const partAItem=sheet==="Scope of supply"&&rowNum>=8&&rowNum<=12?partADisplay[rowNum-8]:null;
      return <React.Fragment key={rowNum}>{header}<tr style={overlay?{background:"rgba(36,111,184,0.07)"}:{}}>
       <td><strong>{rowNum}</strong></td>
       {Array.from({length:layout.columns},(_,col)=>{
-       const partAIndex=sheet==="Scope of supply"&&rowNum>=8&&rowNum<=12?rowNum-8:-1;
-       const partAItem=partAIndex>=0?partADisplay[partAIndex]:null;
+
+
        // The original Row 5 gives the customer's A–H schema; Row 7 is a group,
        // not a cost row. Row 8 onward is a working MR package schedule.
        const partACells=partAItem?[
