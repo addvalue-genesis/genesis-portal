@@ -27,7 +27,21 @@ assert(nextG?.commercialTerms?.supplier?.name,"Next G has expanded header shape"
 assert(mgw?.commercialTerms&&!mgw.commercialTerms.supplier,"MGW commercial terms do not contain Next G supplier header");
 const nextHtml=renderQuote(nextG);
 const mgwHtml=renderQuote(mgw);
-assert(nextHtml.includes("Next G Solution Co.,Ltd")&&nextHtml.includes("100% cash in advance"),"Next G source header/clauses lost");
+// Preserve the supplier's EXACT recorded payment clause: original PDF wording is
+// "100% Cash in Advance", not a lower-case normalized commercial summary.
+const paymentClause=nextG.commercialTerms.sourceTermRecords.find(x=>x.id==="NG-TERM-03");
+assert.equal(paymentClause?.originalText,"100% Cash in Advance",
+ "Next G supplier PDF payment wording/source ID was changed");
+assert(nextHtml.includes(nextG.commercialTerms.supplier.name),
+ "Next G original supplier header lost");
+assert(nextHtml.includes(paymentClause.originalText),
+ "Next G original 100% Cash in Advance clause not rendered");
+// Negative fixture: the renderer must not invent payment text if the recorded
+// source clause is missing. Other quote fields are preserved, never repriced.
+const withoutPaymentClause={...nextG,commercialTerms:{...nextG.commercialTerms,
+ sourceTermRecords:nextG.commercialTerms.sourceTermRecords.filter(x=>x.id!=="NG-TERM-03")}};
+assert(!renderQuote(withoutPaymentClause).includes(paymentClause.originalText),
+ "Next G payment condition was invented without a source clause");
 assert(nextHtml.includes("Not expressly committed")&&nextHtml.includes("NMS licence"),"NG sourceNotStated clarification matrix lost");
 for(const term of ["Nantong","12–16 weeks","20% documents","warrantyBond","90 days"])
  assert(mgwHtml.includes(term),"MGW terms missing: "+term);
