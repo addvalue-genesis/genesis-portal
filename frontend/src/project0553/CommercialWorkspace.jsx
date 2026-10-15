@@ -8,6 +8,7 @@ import { InternalBudgetShortcut0553 } from "./InternalBudgetShortcut0553";
 import { ScopeSheetsDetail0553 } from "./ScopeSheetsDetail0553";
 import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 import { CostIntegrityReview0553 } from "./CostIntegrityReview0553";
+import {BcCostEvidenceDetail0553} from "./BcCostEvidenceDetail0553";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { SimpleBom0553 } from "./SimpleBom0553";
 import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
@@ -25,6 +26,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const [mode,setMode]=useState(initialMode);
  const [recipient,setRecipient]=useState("INTERNAL");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
+ const [bcDetailCode,setBcDetailCode]=useState(null);
  const toggle=k=>setExpanded(a=>{const n=new Set(a);n.has(k)?n.delete(k):n.add(k);return n;});
  const rows=template.sheets;
  const baseline=getBaselineReview();
@@ -35,6 +37,8 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  // and scrolls to the canonical B/C row/group; it never creates a second workbench.
  React.useEffect(()=>{
   if(!navigationTarget?.startsWith("bid.budget.working.bc"))return;
+  const detailCode=navigationTarget.slice("bid.budget.working.bc.".length).toUpperCase();
+  if(bcWorking.byCode[detailCode])setBcDetailCode(detailCode);
   if(mode!=="working"){setMode("working");return;}
   const parent=document.querySelector('[data-component-key="bid.budget.working.bc"]');
   if(!parent)return;
@@ -129,8 +133,9 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
     <p className="p55-note"><strong>MANAGEMENT FAT STRATEGY (15-Oct-2026):</strong> One integrated FAT at SAMTEL Bangkok, Thailand after supplier/OEM pretests; MGW provides China logistics advice only, not the FAT crew. Equipment from all four MRs is routed to Thailand for controlled FAT, then to JUTAL Nantong. China-origin MR0002 entails China → Thailand → China cross-border freight and customs exposure. The selected execution location is APPROVED; incremental B6 logistics/FAT direct COST remains NOT ESTABLISHED.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Customer Code / Workflow</th><th>Turnkey Direct Cost THB</th><th>WBS Working Sell Reference THB</th><th>Source / Execution / Gap</th></tr></thead><tbody>
-    {bcWorking.rows.map(item=><tr key={item.code} data-component-key={item.moduleId} className={navigationTarget===item.moduleId?"p553-module-nav-target":undefined}><td><strong>{item.code}</strong><small>{item.workflowNumber} · {item.moduleId}</small></td><td>{Number.isFinite(item.directCostTHB)?"THB "+item.directCostTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"NOT ESTABLISHED"}<small>{item.workingSellBasis||"No current sell evidence"}</small></td><td>{item.costState}<small>{item.requirement} · {item.sourceRevision}</small><small>Contract: {item.contractOwner} · Turnkey: {item.turnkeyEstimator} · Execution: {item.executionOwner}</small><small>Lifecycle activity source rows: {item.requirementCount}; unverified quantities/rates are not treated as zero</small>{item.executionDecision&&<small><strong>Approved FAT / Delivery Strategy:</strong> {item.executionDecision.summary} · {item.executionDecision.decisionId} · {item.executionDecision.costState}</small>}</td></tr>)}
+    {bcWorking.rows.map(item=><tr key={item.code} data-component-key={item.moduleId} className={navigationTarget===item.moduleId?"p553-module-nav-target":undefined}><td><button type="button" className="p55-row-toggle" aria-expanded={bcDetailCode===item.code} onClick={()=>setBcDetailCode(old=>old===item.code?null:item.code)}>{bcDetailCode===item.code?"−":"＋"} {item.code} — Detail</button><small>{item.workflowNumber} · {item.moduleId}</small></td><td>{Number.isFinite(item.directCostTHB)?"THB "+item.directCostTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"NOT ESTABLISHED"}<small>{item.workingSellBasis||"No current sell evidence"}</small></td><td>{item.costState}<small>{item.requirement} · {item.sourceRevision}</small><small>Contract: {item.contractOwner} · Turnkey: {item.turnkeyEstimator} · Execution: {item.executionOwner}</small><small>Lifecycle activity source rows: {item.requirementCount}; unverified quantities/rates are not treated as zero</small>{item.executionDecision&&<small><strong>Approved FAT / Delivery Strategy:</strong> {item.executionDecision.summary} · {item.executionDecision.decisionId} · {item.executionDecision.costState}</small>}</td></tr>)}
    </tbody></table></div>
+   {bcDetailCode&&<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcDetailCode]}/>}
    <p className="p55-note"><strong>10.2 Source Routing:</strong> {validateBcRoutes0553()?"16/16 customer B/C categories assigned uniquely":"MAPPING ERROR"}. Cost evidence and technical approval remain separate.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Workflow</th><th>Customer Categories</th><th>Working Owner / Source / Next Step</th></tr></thead><tbody>
     {BC_WORKING_ROUTES_0553.map(r=><tr key={r.workflow} data-component-key={bcGroupIdByWorkflow.get(r.workflow)} className={navigationTarget===bcGroupIdByWorkflow.get(r.workflow)?"p553-module-nav-target":undefined}><td>{r.workflow}</td><td>{r.codes.join(", ")}<small>{r.name}</small></td><td>{r.owner}<small>{r.source.join(" + ")} · {r.basis} · {r.next}</small></td></tr>)}
