@@ -7,6 +7,7 @@ import {selectBcExecutionComplianceAudit0553} from "./bcExecutionComplianceAudit
 import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
+import {selectBcB3EquationExecution0553} from "./bcB3EquationExecution0553";
 
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 const primaryCodes=Object.freeze(["B1","B2","B3","B6","B9","B10","B11"]);
@@ -172,6 +173,7 @@ export function selectBcWorkCostLines0553(){
   sourceRef:"ANNEX4-2 MASTER/SINGLE PACKING LIST; ANNEX4 Part II",
   scopeGate:"SHIPMENT_COUNT_DOC_HOURS_AND_B5_OWNER_PENDING"}));
  const equationProof=selectBcB1B2EquationExecution0553(b1);
+ const b3EquationProof=selectBcB3EquationExecution0553();
  // Audit clause lines are trace/quantity obligations, NOT another charge for
  // B1 role MH, B3 site days, B6 shipment or B10 spare purchased objects.
  const auditedClauses=audit.requirements.map(r=>line(r.code,"COST-"+r.id,
@@ -231,6 +233,7 @@ export function selectBcWorkCostLines0553(){
   activeCodes:ownerCodes,primaryDetailedCodes:primaryCodes,rows:all,byCode,requirementLinks:mappedClauses,
   requiredAuditCount:mappedClauses.length,
   equationProofModuleId:equationProof.moduleId,equationProof,
+  b3EquationProofModuleId:b3EquationProof.moduleId,b3EquationProof,
   workingSellByCode,
   totalCostTHB:null,totalSellingPriceTHB:null,
   currentDirectCostComplete:false,releaseAllowed:false,
