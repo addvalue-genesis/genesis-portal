@@ -26,7 +26,7 @@ const SHEETS=[
  ["C2 2Y-Spares","C2","Two-year operation spares option"]
 ];
 const usd=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"";
-export function ScopeSheetsDetail0553({fx=null}){
+export function ScopeSheetsDetail0553({fx=null,view="full"}){
  const [sheet,setSheet]=useState("Scope of supply");
  const [showBulk,setShowBulk]=useState(true);
  const [scadaSite,setScadaSite]=useState("ALL");
@@ -116,6 +116,31 @@ export function ScopeSheetsDetail0553({fx=null}){
    status:"RECONCILIATION ERROR — A5 exceeds MR0001 source allocated ledger"};
  }
 
+ // The workbook consumes this exact Scope projection; there is no second A/B/C ledger.
+ if(view==="part-a"||view==="summary"){
+  const codes=view==="part-a"?["A1","A2","A3","A4","A5"]:REV08_BASELINE.summary.map(row=>row[0]);
+  const linkedCodes=new Set(["B10","B11","B13","C1","C2"]);
+  return <section className="p55-panel" data-component-key={"bid.budget.summary.workbook.scope-of-supply"+(view==="part-a"?".part_a":"")}>
+   <h4>{view==="part-a"?"Part A — MR-based Scope of Supply (same canonical Scope view)":"Scope of Supply — Linked A/B/C Working View"}</h4>
+   <p className="p55-note">SOURCE: PJ2608-0553 / bid.budget.scope · Equipment values from canonical MR/location BOM; B/C from controlled WBS and child sheets. THB only. Reference prices and unverified amounts are not approved customer sell.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Ref / MR</th><th>Description</th><th>Qty / Basis</th><th>Working Unit THB / LS</th><th>Working Budgetary THB</th><th>Source / Engineering & Cost Status</th></tr></thead><tbody>
+    {REV08_BASELINE.summary.filter(([id])=>codes.includes(id)).map(([id,desc])=>{
+     const control=scopeBC.lines[id]||null;
+     const working=workingSummary[id]||null;
+     const child=linkedCodes.has(id)?scopeSheetSources[id]:null;
+     const amount=child?.quantity?child.totalTHB:working?working.amount:control?.amountTHB;
+     const mr={A1:"MR-0001",A2:"MR-0002",A3:"MR-0003",A4:"MR-0004",A5:"MR-0001–0004 / Bulk"}[id]||"";
+     const qty=id==="A5"?"1 LS ("+a5.rowCount+" MTO lots)":child?.quantity?"1 LS ("+child.quantity+" detail lines)":control?.qty!=null&&Number.isFinite(control.qty)?control.qty+" "+control.unit:"1 LS";
+     return <tr key={id}><td><strong>{id}</strong>{mr&&<small>{mr}</small>}</td><td>{desc}</td><td>{qty}</td>
+      <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(amount)?cash(amount):"Cost source pending"}</td>
+      <td className="is-number">{id==="A5"?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(amount)?cash(amount):"Not established"}</td>
+      <td>{child?.quantity?"LINKED CHILD DETAIL · REV08 HISTORICAL (not current OEM)":working?working.status:control?.priceStatus||"No current verified cost"}
+       <small>{child?.source||working?.source||control?.source||"No current source"}{mr?" · "+mr:""}</small></td>
+     </tr>;
+    })}
+   </tbody></table></div>
+  </section>;
+ }
  return <section className="p55-panel">
   <div className="p55-eyebrow">SCOPE SHEETS / REFERENCED DETAIL <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.scope"/></div>
   <h3>Scope of Supply — Linked Internal Detail</h3>
