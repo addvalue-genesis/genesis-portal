@@ -96,16 +96,17 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   </section>
   <section className="p55-panel">
    <div className="p55-eyebrow">GOVERNING METHOD · WORKING PREVIEW IS THE ENGINEERING WORKBENCH</div>
+    <p className="p55-note"><strong>WORKFLOW:</strong> 10.1 Engineering BOM → 10.2 B/C working WBS &amp; spare derivation (upstream data, not a verified complete cost) → 10.3 Pricing reference → 10.4 Estimate-to-Bid Mapping → 10.5 Scope → 10.6 Customer Workbook. Prerequisites: 04 MR, 05.3 Drawings, 06 Execution, 07 Vendor, 08 Risk, 09 Traceability. Workflow numbers indicate order, not approval.</p>
    <p className="p55-note"><strong>INPUT:</strong> RFQ/MR/MTO/BLD/DTS/RPT/Standards · <strong>DERIVE:</strong> Link/Capacity/Interface Constraints → Physical BOM and quantity → Vendor technical evaluation → WBS Services → Equipment/Service Cost and risk · <strong>OUTPUT:</strong> reviewed engineering working cost. Current MTO sets and quoted vendor quantities are input evidence, NOT verified physical SKU quantities.</p>
   </section>
-  <details className="p553-budget-phase" open><summary><strong>Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
+  <details className="p553-budget-phase" open><summary><strong>10.1 — Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
    <CostIntegrityReview0553/>
    <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency}/>
   </details>
-  <details className="p553-budget-phase"><summary><strong>Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
+  <details className="p553-budget-phase"><summary><strong>10.4 — Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
    <EstimateToBidMapping0553/>
   </details>
-  <details className="p553-budget-phase"><summary><strong>Cost & Commercial Pricing</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
+  <details className="p553-budget-phase"><summary><strong>10.3 — Cost & Commercial Pricing Reference</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
    <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
   <section className="p55-panel">
    <div className="p55-eyebrow">REV08 EXISTING COMMERCIAL BASELINE · PRICES FROM CUSTOMER WORKBOOK</div>
@@ -151,7 +152,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  </>}
  {/* Downstream Scope summary: after engineering BOM and estimate-to-bid mapping; read-only. */}
    {(mode==="working"||mode==="budgetary")&&<details className="p553-budget-phase" open data-component-key="bid.budget.scope">
-   <summary><strong>Scope of Supply — Customer Workbook Sub-modules</strong><small>bid.budget.scope · B10 / B11 / B13 / C1 / C2 · A/B/C</small></summary>
+   <summary><strong>10.5 — Scope of Supply / A+B+C</strong><small>bid.budget.scope · B10 / B11 / B13 / C1 / C2 · A/B/C</small></summary>
    <p className="p55-note"><strong>Internal engineering reference only:</strong> linked working costs are not an approved customer quotation. Original workbook codes and internal cost categories remain distinct; missing vendor prices are not zero.</p>
    <ScopeSheetsDetail0553 fx={fx}/>
   </details>}
@@ -180,10 +181,10 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  <p className="p55-note">0550 source code remains untouched. State control is based on the reused three-state doctrine, not an independent 0553 pricing policy.</p>
  </section>
  </section>
- <details className="p553-budget-phase" open><summary><strong>Customer Proposal Preview · Scope of Supply</strong><small>bid.budget.summary · Customer review layout · no release</small></summary>
+ <details className="p553-budget-phase" open><summary><strong>10.6 — Customer Proposal Preview · Scope of Supply</strong><small>bid.budget.summary · Customer review layout · no release</small></summary>
   <CustomerProposalPreview0553/>
  </details>
- <details className="p553-budget-phase"><summary><strong>Internal Budget Summary & Review</strong><small>bid.budget.internal · 4 MR systems · historical separation</small></summary>
+ <details className="p553-budget-phase"><summary><strong>10.7 — Internal Budget Summary & Review</strong><small>bid.budget.internal · 4 MR systems · historical separation</small></summary>
   <InternalBudgetShortcut0553/>
  </details>
  </div>;
