@@ -11,6 +11,7 @@ import {selectBcExecutionComplianceAudit0553} from "./bcExecutionComplianceAudit
 import {selectBcWorkCostLines0553} from "./bcWorkCostLines0553";
 import {selectBcB5HistoricalPriceBridge0553} from "./bcB5HistoricalPriceBridge0553";
 import {REV08_BASELINE} from "./rev08CommercialBaseline";
+import {selectUnifiedSpareConsumables0553} from "./unifiedSpareConsumables0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553,validateBcRoutes0553} from "./bcWorkingModuleRoutes0553";
 
 const activitiesForCustomerCode=Object.freeze({
@@ -68,6 +69,8 @@ export function selectBcTurnkeyWorkingCost0553(){
  const b10DetailUSD=(REV08_BASELINE.detail.B10||[]).reduce((sum,[,qty,unitUSD])=>sum+qty*unitUSD,0);
  if(!Number.isFinite(b10HistoricalUSD)||Math.abs(b10HistoricalUSD-b10DetailUSD)>0.01)throw Error("B10 Rev08 source reconciliation failed");
  const b10WorkingSellTHB=round(b10HistoricalUSD*31.5);
+ const spareBudget=selectUnifiedSpareConsumables0553();
+ const spareBudgetCodes=new Set(["B10","B13","C1","C2"]);
  const byCode=new Map(wbs.rows.map(row=>[row.code,row]));
  const rows=BC_CUSTOMER_CODES_0553.map(code=>{
   const w=byCode.get(code);
@@ -82,6 +85,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   const b6BudgetarySellTHB=code==="B6"?costEvidence?.reconciliation?.historicalRev08TransportSellTHB:null;
   const b5ApprovedSellTHB=code==="B5"?b5PriceReference.amountTHB:null;
   const b10ApprovedSellTHB=code==="B10"?b10WorkingSellTHB:null;
+  const spareSellTHB=spareBudgetCodes.has(code)?spareBudget.budgetTotalsTHB[code]:null;
   const sellKnown=Number.isFinite(w.sellTHB);
   if(!costEvidence||costEvidence.workingSellTHB!==(code==="B6"?costEvidence.reconciliation?.historicalRev08TransportSellTHB:w.sellTHB)||costEvidence.directCostTHB!==null)
    throw Error("B/C cost evidence diverged from source WBS or invented a direct cost at "+code);
@@ -105,14 +109,15 @@ export function selectBcTurnkeyWorkingCost0553(){
     sourceStatus:r.priceStatus
    })),
    requirementCount:requirementRows.length,
-   workingSellTHB:Number.isFinite(b10ApprovedSellTHB)?b10ApprovedSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
-   workingSellBasis:Number.isFinite(b10ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B10_REV08_BUDGETARY_WORKING_SELL_FX_31_5_NOT_VERIFIED_OEM_COST":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
+   workingSellTHB:Number.isFinite(spareSellTHB)?spareSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
+   workingSellBasis:Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":"MANAGEMENT_ACCEPTED_B10_REV08_BUDGETARY_WORKING_SELL_FX_31_5_NOT_VERIFIED_OEM_COST":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
    directCostTHB:null, // No controlled source-rate x quantity internal ledger yet.
    riskCostTHB:null,
    commercialSellTHB:null, // A customer price is not the existing WBS sell reference.
-   priceStatus:Number.isFinite(b10ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B10_WORKING_SELL_ESTIMATE":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
+   priceStatus:Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":"MANAGEMENT_ACCEPTED_B10_WORKING_SELL_ESTIMATE":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
+   unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08",fxTHBPerUSD:31.5,pricingClass:"BUDGETARY_WORKING_SELL",verifiedDirectCost:false,sourceLines:spareBudget.byCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
    b10WorkingSellDecision:code==="B10"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b10WorkingSellTHB,source:"4-Scope of Supply.xlsx · Rev08 · B10",historicalUSD:b10HistoricalUSD,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"WORKING_SELL_ONLY"}):null,
    b5PriceReference:code==="B5"?b5PriceReference:null,
    b5WorkingSellDecision:code==="B5"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b5ApprovedSellTHB,source:b5PriceReference.sourceRevision,costOwner:"B5",excludedB7StorageTHB:b5PriceReference.nonAdditiveStorageTHB,verifiedDirectCost:false,customerReleaseAllowed:false}):null,
@@ -143,7 +148,7 @@ export function selectBcTurnkeyWorkingCost0553(){
  const byCodeOutput=Object.fromEntries(rows.map(r=>[r.code,r]));
  const knownWorkingSellTHB=round(rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
   .reduce((sum,r)=>sum+r.workingSellTHB,0));
- if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB+rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB+rows.find(r=>r.code==="B10").workingSellTHB))>0.01)
+ if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB+rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB+rows.find(r=>r.code==="B10").workingSellTHB+rows.find(r=>r.code==="B13").workingSellTHB))>0.01)
   throw Error("B WBS working sell reference reconciliation failed");
  // Source-price coverage is not cost completeness.
  return Object.freeze({
@@ -154,6 +159,9 @@ export function selectBcTurnkeyWorkingCost0553(){
   workingSellB6BudgetaryTHB:rows.find(r=>r.code==="B6").workingSellTHB,
   workingSellB5ApprovedTHB:rows.find(r=>r.code==="B5").workingSellTHB,
   workingSellB10ApprovedTHB:rows.find(r=>r.code==="B10").workingSellTHB,
+  workingSellB13BudgetaryTHB:rows.find(r=>r.code==="B13").workingSellTHB,
+  workingSellC1OptionalTHB:rows.find(r=>r.code==="C1").workingSellTHB,
+  workingSellC2OptionalTHB:rows.find(r=>r.code==="C2").workingSellTHB,
   knownDirectCostTHB:null,completeDirectCostTHB:null,
   baseTurnkeyCostTHB:null,optionalCostTHB:null,
   costComplete:false,releaseAllowed:false,
