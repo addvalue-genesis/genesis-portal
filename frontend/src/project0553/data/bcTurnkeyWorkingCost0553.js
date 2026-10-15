@@ -8,6 +8,7 @@ import {LIFECYCLE_SPARES_0553} from "./lifecycleSpareScope0553";
 import {selectBcCostEvidenceDerivation0553} from "./bcCostEvidenceDerivation0553";
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
 import {selectBcExecutionComplianceAudit0553} from "./bcExecutionComplianceAudit0553";
+import {selectBcWorkCostLines0553} from "./bcWorkCostLines0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553,validateBcRoutes0553} from "./bcWorkingModuleRoutes0553";
 
 const activitiesForCustomerCode=Object.freeze({
@@ -21,7 +22,7 @@ const customerRequirements=Object.freeze({
  B3:"Inspection, testing, FAT, SAT and ITP-based certification scope",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
- B6:"DDP transportation, delivery, freight and customs contract boundary",
+ B6:"Delivery logistics — CIF China port vs DDP JUTAL yard scope/Incoterm conflict; four-MR route through SAMTEL Bangkok FAT",
  B7:"Three-month vendor workshop storage / included-in-package check",
  B8:"Training for purchaser/end-user personnel",
  B9:"Specialist assistance and mobilization as specified",
@@ -45,6 +46,8 @@ export function selectBcTurnkeyWorkingCost0553(){
  if(!validateBcRoutes0553())throw Error("Customer B/C routing is incomplete or duplicated");
  const wbs=derivePartBcWorkingWbs0553();
  const executionAudit=selectBcExecutionComplianceAudit0553();
+ const workCostLines=selectBcWorkCostLines0553();
+ if(workCostLines.sourceModuleId!==executionAudit.moduleId)throw Error("10.2 working line audit divergence");
  const evidence=selectBcCostEvidenceDerivation0553();
  const byCode=new Map(wbs.rows.map(row=>[row.code,row]));
  const rows=BC_CUSTOMER_CODES_0553.map(code=>{
@@ -92,6 +95,9 @@ export function selectBcTurnkeyWorkingCost0553(){
    executionAuditModuleId:executionAudit.moduleId,
    executionAuditIds:(executionAudit.byCode[code]||[]).map(x=>x.id),
    executionAuditCount:(executionAudit.byCode[code]||[]).length,
+   workCostLineModuleId:workCostLines.moduleId,
+   workCostLines:workCostLines.byCode[code]||[],
+   workCostLineCount:(workCostLines.byCode[code]||[]).length,
    optional,baseScope:!optional,
    sourceOwnership:"CUSTOMER_REQUIREMENT_TO_WORKING_SOURCE",
    noDoubleCountRule:"One cost owner per requirement; no posting of historical Rev08 or OEM-included component without explicit exclusion proof",
@@ -121,6 +127,9 @@ export function selectBcTurnkeyWorkingCost0553(){
   costComplete:false,releaseAllowed:false,
   noCrossBasisSummation:true,
   evidenceSourceModule:"data/bcCostEvidenceDerivation0553.js",
+  workCostLineModuleId:workCostLines.moduleId,
+  workCostLineCount:workCostLines.rows.length,
+  workCostLineAuditCount:workCostLines.requiredAuditCount,
   source:"Part B Rev05 WBS + legacy lifecycle activity requirements + customer code routing"
  });
 }
