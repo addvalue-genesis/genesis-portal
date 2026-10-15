@@ -36,7 +36,16 @@ for(const key of ["source-layout","parametric-bulk-routes","mr0002.rf-dc-alarm-b
  assert(working.includes('moduleKey="bid.budget.bom.'+key+'"'),"Working Preview module missing Copy ID: "+key);
 }
 assert(working.includes('moduleKey="bid.budget.bom.system-location-mto"'),"Master location/MTO table must have one collapsible Copy ID");
-assert(working.includes('title={"BOM Working Table — "+system+'),"Table title should expose the system/location context");
+// The Master BOM title is governed by Workflow 10.1.1.3, not the retired
+// display name "BOM Working Table". Keep System + Location dynamic context.
+const masterTitle='title={"10.1.1.3 — System × Location × MTO — "+system+';
+const masterIdentity='<ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" '+masterTitle;
+assert(working.includes(masterIdentity),
+ "Master table must retain Workflow 10.1.1.3, Module ID and dynamic System context");
+assert(working.includes('(site==="ALL"?"All Locations":site)'),
+ "Master table title must expose the selected Location context");
+assert(working.includes('description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification.'),
+ "Master table must retain the verified engineering stage description");
 assert(!working.includes('.engineering-detail"}'),"Do not add the master table identity to a child ZWP detail");
 
 for(const key of [".cost-allocation",".vendor-rate-evidence",".unallocated-scenarios",".rpt-link-budget"]){
