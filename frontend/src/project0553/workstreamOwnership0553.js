@@ -13,6 +13,11 @@ export const WORKSTREAM_OWNERSHIP_0553=Object.freeze([
  {step:"09",route:"registry",title:"Data / Code Traceability",requires:["01","04"],source:["moduleRegistry.js","workflowRegistry0553.js","DataCodeRegistry0553.jsx"],output:"source lineage / revision control"},
  {step:"10",route:"budget",title:"Working Cost to Customer Submission",requires:["04","05.3","06","07","08","09"],source:["SimpleBom0553.jsx","EstimateToBidMapping0553.jsx","ScopeSheetsDetail0553.jsx","BudgetaryWorkbookPreview0553.jsx"],output:"working cost → scope → customer workbook"}
 ]);
+export const BUDGET_BOM_WORKFLOW_0553=Object.freeze([
+ {workflowNumber:"10.1.1",moduleId:"bid.budget.bom",name:"BOM Working Table / Filter Context",parent:"10.1",requires:["04","05.3","07"],owner:"Engineering BOM Working Preview"},
+ {workflowNumber:"10.1.2",moduleId:"bid.budget.bom.filters",name:"Engineering BOM Filters",parent:"10.1",requires:["10.1.1"],owner:"View filtering only"},
+ {workflowNumber:"10.1.3",moduleId:"bid.budget.bom.system-location-mto",name:"System x Location x MTO Working Table",parent:"10.1",requires:["10.1.1","10.1.2"],owner:"Working BOM read-only cost projection"}
+]);
 export const CUSTOMER_COST_OWNERSHIP_0553=Object.freeze({
  A1:"mr0001TagCostLedger0553.js → workingBomAggregation0553.js",
  A2:"mr0002WorkingBom0553.js → workingBomAggregation0553.js",
