@@ -117,13 +117,16 @@ export function LocationBomDetail0553({site,fx}){
   <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact"><thead><tr><th>Bulk / Function</th><th>Qty</th><th>Rate (THB)</th><th>Extended (THB)</th><th>Owner / Status</th></tr></thead><tbody>
    {bulkRows.map(v=><tr key={v.id}><td>{v.item}</td><td>{v.qty??"DERIVE"} {v.unit}</td><td>{fmt(v.rateTHB)}</td><td>{fmt(v.extendedTHB)}</td><td>{v.owner}<small>{v.status}</small><small>{v.source}</small></td></tr>)}
   </tbody></table></div>
-  {site==="ZWP20"&&<details className="p55-panel" open data-component-key={keyPrefix+".scada-bulk.web-rate-evidence"}>
-   <summary style={{cursor:"pointer",fontWeight:700}}>＋ / − Internet Budgetary Rates — SCADA Bulk PENDING items</summary>
+  {site==="ZWP20"&&<ControlledModuleSection0553
+   moduleKey={keyPrefix+".scada-bulk.web-rate-evidence"}
+   title="Internet Budgetary Rates — SCADA Bulk PENDING items"
+   description="Source-backed retail price evidence; not an additional booked cost"
+   defaultOpen>
    <p className="p55-note">Source-backed THB ex-VAT retail rates; quantity/Ex suitability and supplier inclusion require Engineering confirmation. Price candidate is not a booked additional cost. Hawke gland range must match physical cable outer diameter.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Item / SKU</th><th>Retail Unit Price (THB)</th><th>OD Range</th><th>Source</th><th>Owner / Condition</th></tr></thead><tbody>
     {ZWP20_WEB_BULK_RATES_0553.lines.map(r=><tr key={r.id}><td><strong>{r.id}</strong><small>{r.sku}</small></td><td>{fmt(r.rateTHB)} / {r.unit}</td><td>{Number.isFinite(r.outerDiameterMinMm)?r.outerDiameterMinMm+"–"+r.outerDiameterMaxMm+" mm":"Cable datasheet required"}</td><td><a href={r.url} target="_blank" rel="noopener noreferrer">{r.source}</a></td><td>{r.decision}</td></tr>)}
    </tbody></table></div>
-  </details>}
+  </ControlledModuleSection0553>}
   <p className="p55-note">Bulk shown separately, not automatically additive to equipment subtotal. New/Reuse and source quantity are assessed per site. Missing pricing stays PENDING. Customer A+B+C release not approved.</p>
   </ControlledModuleSection0553>
  </section>;
