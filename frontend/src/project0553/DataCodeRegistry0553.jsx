@@ -3,9 +3,11 @@ import {getProject0553Dataset,getProject0553DataLayerStatus} from "./data/reposi
 import {WORKING_BOM_BY_LOCATION_0553} from "./data/workingBomByLocation";
 import {BID_COST_SPINE_0553} from "./data/bidCostSpine";
 import {MODULE_REGISTRY_0553} from "./moduleRegistry";
+import FILE_INVENTORY_0553 from "./data/moduleFileInventory0553.json";
+import {WORKSTREAM_OWNERSHIP_0553,validateWorkstreamOrder0553} from "./workstreamOwnership0553";
 import {MR0001_PRELIMINARY_LINK_BUDGET} from "./data/mr0001PreliminaryLinkBudget";
 import {MR0001_SITE_CLASSIFICATION} from "./data/mr0001SiteClassification";
-const ROOT="https://github.com/addvalue-genesis/genesis-portal/blob/feat/pj2608-0553-tpp-bid-handoff/";
+const ROOT="https://github.com/addvalue-genesis/genesis-portal/blob/fix/pj2608-0553-scope-mgw-r2-integrated-20261015/";
 const codeFiles=[
  "frontend/src/pages/PJ26080553.jsx",
  "frontend/src/project0553/CommercialWorkspace.jsx",
@@ -35,7 +37,7 @@ const exportObject=(type)=>{
  case "bom":return {...headers,source:WORKING_BOM_BY_LOCATION_0553.source,locations:WORKING_BOM_BY_LOCATION_0553.locations};
  case "cost":return {...headers,model:BID_COST_SPINE_0553};
  case "rf":return {...headers,model:MR0001_PRELIMINARY_LINK_BUDGET,siteClassification:MR0001_SITE_CLASSIFICATION};
- default:return {...headers,layer,modules:MODULE_REGISTRY_0553,paths:codeFiles,notice:"The manifest is an index; actual .jsx/.js source must be retrieved from versioned GitHub, not reconstructed from this export"};
+ default:return {...headers,layer,modules:MODULE_REGISTRY_0553,workflow:WORKSTREAM_OWNERSHIP_0553,fileInventory:FILE_INVENTORY_0553,paths:codeFiles,notice:"The manifest is an index; actual .jsx/.js source must be retrieved from versioned GitHub, not reconstructed from this export"};
  }
 };
 function downloadJson(key){
@@ -63,6 +65,15 @@ export function DataCodeRegistry0553(){
   {[["working","Controlled Dataset JSON"],["bom","Location BOM JSON"],["rf","RF & Site Model JSON"],["cost","Cost State JSON"],["code","Code / Handoff Manifest JSON"]].map(([key,label])=><button key={key} type="button" className="p553-detail-button" onClick={()=>downloadJson(key)}>↓ {label}</button>)}
  </div>
  <p className="p55-note">Exports are internal working snapshots. Source files are version-controlled in GitHub; .jsx source code is linked below rather than copied into JSON. Missing/OPEN quantity, price or compliance must remain unapproved.</p>
+ <h3>Workflow Ownership / Dependency Register</h3>
+ <p className="p55-note">01–10 workflow registry validation: {validateWorkstreamOrder0553()?"ORDER PASS":"ORDER REVIEW"}. File inventory contains {FILE_INVENTORY_0553.files.length} JS/JSX/JSON entries. Suggested groups are provisional; runtime usage is NOT certified and no file is authorised for deletion.</p>
+ <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Workflow</th><th>Work / Prerequisites</th><th>Source modules</th><th>Downstream output</th></tr></thead><tbody>
+ {WORKSTREAM_OWNERSHIP_0553.map(w=><tr key={w.step}><td><strong>{w.step}</strong></td><td>{w.title}<small>After: {w.requires.join(", ")||"Start"}</small></td><td>{w.source.map(src=><small key={src}>{src}</small>)}</td><td>{w.output}</td></tr>)}
+ </tbody></table></div>
+ <details><summary>Complete Project 0553 File Inventory ({FILE_INVENTORY_0553.files.length}) — usage not verified</summary>
+ <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Workflow candidate</th><th>Source file</th><th>Runtime status</th></tr></thead><tbody>
+ {FILE_INVENTORY_0553.files.map(row=><tr key={row.path}><td>{row.suggestedGroup}</td><td style={{overflowWrap:"anywhere"}}><a href={ROOT+row.path} target="_blank" rel="noreferrer">{row.path}</a></td><td>REVIEW / {row.usage}</td></tr>)}
+ </tbody></table></div></details>
  <h3>Source Code & Handoff Index</h3>
  <label>Filter source path <input value={filter} onChange={e=>setFilter(e.target.value)} placeholder="e.g. BOM, RF, .jsx, handoff" style={{marginLeft:12,padding:8,width:"min(470px,90%)"}}/></label>
  <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Source path / role</th><th>Type</th><th>GitHub</th></tr></thead><tbody>
