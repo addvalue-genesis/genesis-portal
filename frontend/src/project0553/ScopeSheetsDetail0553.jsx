@@ -1,6 +1,7 @@
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
+import {selectScopeSheet0553} from "./data/scopeSheetProjection0553";
 import {derivePartBcWorkingWbs0553} from "./data/partBCWorkingWbs0553";
 import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {BULK_TAKEOFF_0553} from "./data/bulkTakeoff0553";
@@ -33,7 +34,8 @@ export function ScopeSheetsDetail0553({fx=null}){
  const cash=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
  const category=SHEETS.find(x=>x[0]===sheet);
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
- const details=REV08_BASELINE.detail[category[1]]||[];
+ const details=selectScopeSheet0553(category[1],{thbPerUsd:fx?.thbPerUsd}).rows;
+ const b10Source=selectScopeSheet0553("B10",{thbPerUsd:fx?.thbPerUsd});
  const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
  // A2 is sourced from the SAME MR0002 per-site Working BOM, including the RFI-LNA.
  // Management excluded MGW rates: omit MGW vendor rows, never erase independently
@@ -127,20 +129,18 @@ export function ScopeSheetsDetail0553({fx=null}){
     status:control.priceType+" · "+control.priceStatus+" · "+control.requirement,
     source:control.basis+" · OWNER: "+control.owner+" · "+control.source+" · EQUATIONS: "+(control.equations.join(", ")||"source schedule required")}:null),amount=item?.amount;
    const unavailable=id==="A5"?"A5 source/ledger reconciliation required":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
+   const b10Amount=id==="B10"?b10Source.totalTHB:null;
+   const shownAmount=id==="B10"?b10Amount:amount;
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
-    control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
+    id==="B10"?"1 LS ("+b10Source.quantity+" spares)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>{qtyDisplay}</td>
-    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
-    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(amount)?(control?"WORKING SELL "+cash(amount):cash(amount)):control?"Current owner / OEM price not established":unavailable}</td>
-    <td>{item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
-  }):details.map(([desc,qty,price],i)=>{
-   // Historical template numbers are customer-facing Rev08 prices, not present-day supplier cost.
-   const rate=fxValid?round(price*fx.thbPerUsd):null;
-   return <tr key={i}><td>{category[1]}-{i+1}</td><td>{desc}</td><td>{qty}</td>
-    <td className="is-number">{Number.isFinite(rate)?cash(rate):"Awaiting FX"}</td>
-    <td className="is-number">{Number.isFinite(rate)?cash(round(qty*rate)):"Awaiting FX"}</td>
-    <td>HISTORICAL Rev08 customer-price equivalent only; current B/C supplier price and SKU/quantity reconciliation NOT ESTABLISHED</td></tr>;
-  })}</tbody></table></div>
+    <td className="is-number">{id==="B10"?(Number.isFinite(b10Amount)?cash(b10Amount):"Awaiting FX"):id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
+    <td className="is-number">{id==="B10"?(Number.isFinite(b10Amount)?cash(b10Amount):"Awaiting FX"):id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(amount):cash(amount)):control?"Current owner / OEM price not established":unavailable}</td>
+    <td>{id==="B10"?<><strong>LINKED B10 CHILD SUBTOTAL · HISTORICAL REV08 (not verified OEM cost)</strong><small>{b10Source.source} · {b10Source.quantity} rows · OEM verification: {control?.priceStatus}</small></>:item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
+  }):details.map(row=><tr key={row.id}><td>{row.id}</td><td>{row.description}</td><td>{row.qty}</td>
+    <td className="is-number">{Number.isFinite(row.unitTHB)?cash(row.unitTHB):"Awaiting FX"}</td>
+    <td className="is-number">{Number.isFinite(row.totalTHB)?cash(row.totalTHB):"Awaiting FX"}</td>
+    <td>Rev08 historical worksheet reference · OEM verification separate</td></tr>)}</tbody></table></div>
   {sheet==="Scope of supply"&&<details className="p55-panel" data-component-key="bid.budget.scope.a5" open={false}>
    <summary style={{cursor:"pointer",fontWeight:700}}>A5 Bulk Materials — Source-MTO Price Attribution / Drill-down ({a5.rowCount} lots)</summary>
    <p className="p55-note">A5 Working Priced Floor: <strong>{cash(a5.a5PriceTHB)}</strong>.
