@@ -26,7 +26,18 @@ assert(overview.includes("financial.costed")&&overview.includes("financial.total
 assert(!overview.includes("itemAllocations?.map")&&!overview.includes("extraScenarios.map")&&!overview.includes("getMR0001LocationCost0553(g.site).itemAllocations?.map"),"Long source/cost narratives leak into compact WP row");
 const detail=src.slice(end,src.indexOf("</React.Fragment>",end));
 assert(src.includes('moduleKey="bid.budget.bom.system-location-mto"'),"Master System-Location MTO table must have its own module ID");
-assert(src.includes('title={"BOM Working Table — "+system+'),"Master table needs its own visible descriptive title");
+// The master table title was deliberately renumbered under 10.1.1.3.
+// Keep the real Workflow Number + descriptive function + dynamic System/Location,
+// instead of requiring the retired "BOM Working Table" display wording.
+const masterId='moduleKey="bid.budget.bom.system-location-mto"';
+const masterTitle='title={"10.1.1.3 — System × Location × MTO — "+system+';
+const masterTag='<ControlledModuleSection0553 '+masterId+' '+masterTitle;
+assert(src.includes(masterTag),
+ "Master table must present Workflow 10.1.1.3 with its own Module ID and descriptive title");
+assert(src.includes('(site==="ALL"?"All Locations":site)'),
+ "Master table heading must reflect the selected Location");
+assert(src.includes('description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification.'),
+ "Engineering gate description must remain attached to the master table");
 assert(src.indexOf('moduleKey="bid.budget.bom.system-location-mto"')<src.indexOf('p553-location-overview" style='),"Master module must wrap, not merely precede, the overview table");
 assert(src.includes("</ControlledModuleSection0553>\n </section>;"),"Master BOM module should contain the full system-dependent table");
 assert(!src.includes('.engineering-detail"}'),"Do not misattribute the master module ID to a ZWP child detail");
