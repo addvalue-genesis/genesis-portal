@@ -76,7 +76,7 @@ assert.equal(derivePartBcWorkingWbs0553().subtotalTHB,3804160);
 assert.equal(w.rows.length,105);
 assert.equal(w.requiredAuditCount,40);
 const ui=fs.readFileSync(path.join(root,"project0553/B3EquationAudit0553.jsx"),"utf8");
-assert(ui.includes("proof.irtSourceRows.map")&&ui.includes("proof.offshore.workingTrips.map")&&ui.includes("proof.validation.map"));
+assert(ui.includes("proof.irtSourceRows.map")&&ui.includes("proof.offshore.workingTrips.map")&&ui.includes("proof.validation.map")&&ui.includes("proof.testDocumentRows.map"));
 const page=fs.readFileSync(path.join(root,"pages/PJ26080553.jsx"),"utf8");
 const budget=fs.readFileSync(path.join(root,"project0553/BcWorkCostLines0553.jsx"),"utf8");
 assert(page.includes("<B3EquationAudit0553/>"));
