@@ -1,0 +1,115 @@
+// PJ2608-0553 / 10.2 — Particular-project-first execution, logistics,
+// regulatory, mobilization and special-tools COST DRIVER AUDIT (2026-10-15).
+// Source PDFs were reviewed including the front-page reviewer comments and
+// end notes. This is NOT a price quotation, legal authorization, an approved
+// offshore schedule, or an additional cost/currency owner.
+// Source evidence retains document rev/section/page for human review.
+import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
+import {derivePartBcWorkingWbs0553} from "./partBCWorkingWbs0553";
+
+export const BC_EXECUTION_AUDIT_SOURCES_0553=Object.freeze([
+ {id:"BOD-C2",name:"MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2.pdf",revision:"C2",date:"2026-08-24",scope:"Reviewer Comments pp2-3; §3/§6/§7/§8/§10/§11, notes and references"},
+ {id:"SPE-C2",name:"MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2.pdf",revision:"C2",date:"2026-08-24",scope:"Reviewer Comment p2; §6.1.1, §7.3, §7.4, §8, notes"},
+ {id:"DTS-0001-C1",name:"MM-ZTK-1F-GEN-TEL-DTS-0001 Rev.C1.pdf",revision:"C1",date:"2026-08-24",scope:"First-page VTA review and final SCADA Radio NOTES"},
+ {id:"DTS-0003-C1",name:"MM-ZTK-1F-GEN-TEL-DTS-0003 Rev.C1.pdf",revision:"C1",date:"2026-08-24",scope:"Telephone/Sounder notes, DCDB-440 relay, Ex cabling notes"},
+ {id:"DTS-0004-C1",name:"MM-ZTK-1F-GEN-TEL-DTS-0004 Rev.C1.pdf",revision:"C1",date:"2026-08-24",scope:"Marine RACON front-page review and final NOTES"},
+ {id:"ANNEX4",name:"ANNEX 4-Transportation (incl. Packing, Marking, Shipping Instructions).pdf",revision:"0",scope:"Part I–V, page 3–19; generic template placeholders must be contract-populated"},
+ {id:"ANNEX4-1",name:"ANNEX4-1 10015-WIS-LOG-MM0001-R03 Myanmar Logistics Instruction to Contractors.pdf",revision:"R03",date:"2025-04-01",scope:"§6.1/§6.3/§6.7/§6.8, Appendices 1–7; procedure is uncontrolled if printed"},
+ {id:"ANNEX4-2",name:"ANNEX4-2：PACKING LIST.pdf",revision:"template",scope:"Master Packing List and Single Packing List, pages 1–2"},
+ {id:"ANNEX6",name:"ANNEX 6-Change Order Form.pdf",revision:"0",scope:"pp2–4, price/deadline/other-impact and signatures"},
+ {id:"EXA-A8-TOOL",name:"MMC25-5001 EXA-A8 Att-2 Operation-Special Tools.pdf",revision:"Attachment-2",scope:"§5 Telecommunication p1, Note-1 minimum requirements"},
+ {id:"WBS-REV05",name:"PJ2608-0553_PART_B_DETAILED_QUOTATION_WBS_Rev05-OFFSHORE-EVIDENCE-AUDIT-FIXED_20260903.xlsx",revision:"Rev05",scope:"00_EXEC_QUOTE, 10_B3_CAMPAIGN_PRICE, 18_TH_FAT_WBS, 19_CN_YARD_WBS, 20_CUSTOMS_PERMIT, 23_SAT_TRIP_VALIDATION; 44-day sheet superseded"}
+]);
+
+// Distinguish contractual obligations from their *current* technical and
+// commercial cost treatment. No fixed percent fee, customs charge or rate
+// is inferred from permit lead-time and packing instructions.
+export const BC_EXECUTION_AUDIT_ITEMS_0553=Object.freeze([
+ {id:"AUD-001",code:"B1",steps:"01/03/04/05.3",source:"BOD-C2",section:"Front Review Comments pp2–3 and §7.1–7.4",title:"Post-site-survey scope baseline",finding:"DMR+LNA/Yagi/Omni replaces DTRS; VHF Marine Radio removed; additional ZPQ–ZWP8 SCADA link; Brownfield modification updated. Comment CLOSED does not prove field implementation.",costDriver:"Engineering change delta by MR, RF function and drawing revision",owner:"ADDVALUE engineering",state:"MR_DWG_BOM_RECONCILIATION_REQUIRED"},
+ {id:"AUD-002",code:"B1",steps:"02/04/05.3",source:"DTS-0001-C1",section:"Final NOTES",title:"SCADA safety and installation engineering",finding:"Radio/Enclosure Ex assembly certification, Ethernet/RF surge, grounding, rain guard, conformal coating and RF path study are explicit DTS notes.",costDriver:"Per verified TAG/interface/technical document, not unverified spare count",owner:"ADDVALUE/OEM technical",state:"MATCH_TO_10_1_A_COST_NO_DUPLICATE"},
+ {id:"AUD-003",code:"B1",steps:"04/05.3",source:"DTS-0003-C1",section:"Telephone/Sounder NOTES",title:"Ex telephone sounder relay and cabling",finding:"Interposing relay is installed at DCDB-440, driven by telephone dry contact; phone from telecom enclosure; cable test note IEC-61892-4 750°C/90min.",costDriver:"Engineering/termination verification, no duplicate purchase of 10.1 relay",owner:"ADDVALUE/OEM/JUTAL responsibility matrix",state:"DRAWING_AND_OWNER_CHECK_REQUIRED"},
+ {id:"AUD-004",code:"B2",steps:"04/06",source:"ANNEX4-2",section:"Master/Single Packing List pp1–2",title:"Project packing and shipment dossier",finding:"Project/contract, TAG or MR, material code, Qty, net/gross weight, dimensions and volume must reconcile by package.",costDriver:"Distinct approved shipment/package count × document-control effort",owner:"SELLER documentation",state:"PACKAGE_DATA_SOURCE_PENDING"},
+ {id:"AUD-005",code:"B2",steps:"04/08",source:"ANNEX6",section:"pp2–4",title:"Change Order document control",finding:"Request is not approved change; price/deadline impact and signatures required before treating a variation as contractual.",costDriver:"Actual change records and review cycles; never count expected variation income",owner:"SAMTEL/ADDVALUE contract administration",state:"NO_CHANGE_ORDER_APPROVAL_ASSUMED"},
+ {id:"AUD-006",code:"B3",steps:"01/04/06/08",source:"BOD-C2",section:"§10.1–10.3 pp23–24",title:"Manufacturer FAT versus SAMTEL integrated FAT",finding:"Manufacturer-facility testing with manufacturer's calibrated tools and 30-calendar-day witness notice; BKK integrated FAT is a separate management-selected test stage after OEM tests.",costDriver:"Factory OEM included test + 8 Thai FAT team-days working sell, witness, punch, calibrated tool and facilities",owner:"OEM factory / ADDVALUE SAMTEL Bangkok integrated",state:"DUAL_FAT_STAGE_ACCEPTANCE_AND_NOTICE_30D_GATED"},
+ {id:"AUD-007",code:"B3",steps:"04/06/08",source:"SPE-C2",section:"§7.3 pp25–27",title:"Conflicting FAT witness notice",finding:"SPE states 14 days witness notice and contractor-yard physical/functional test for telephones, while BOD requires 30 days for factory tests; plan conservative 30 days pending client disposition.",costDriver:"Witness/test sequence, rescheduling if insufficient notice",owner:"ADDVALUE/SAMTEL/OEM",state:"NOTICE_14_VS_30_CONFLICT__PLAN_30"},
+ {id:"AUD-008",code:"B3",steps:"02/06/08",source:"BOD-C2",section:"§10.4–10.5 pp24–25",title:"SAT and offshore commissioning",finding:"Vendor must sign SAT and offshore commissioning test results, carry special test/analyzers and demonstrate final site performance after installation.",costDriver:"SAT/COM physical test points, access days, radio test tools, technical crew and signed records",owner:"Vendor/ADDVALUE/SAMTEL",state:"APPROVED_HUC_SAT_COM_SEQUENCE_PENDING"},
+ {id:"AUD-009",code:"B3",steps:"06/08",source:"WBS-REV05",section:"23_SAT_TRIP_VALIDATION",title:"Five offshore working rotations",finding:"ZWP20=7, ZWP21=7, ZWP22=7, ZWP23=5, ZPQ→ZWP8→ZWP11=13 team-days; 39 team-days × 2 = 78 MD; working base, not approved campaign itinerary.",costDriver:"5 trip-level access/return cycles + working team-days; separate actual physical airfare/crewboat if not COMPANY provided",owner:"ADDVALUE / offshore logistics by agreement",state:"FIVE_TRIP_WORKING_NOT_APPROVED"},
+ {id:"AUD-010",code:"B3",steps:"06/08",source:"WBS-REV05",section:"22_44DAY_EXPLAINER / 23_SAT_TRIP_VALIDATION",title:"Superseded 44-team-day model",finding:"44 team-days / 88 MD and 18 shared days belong to superseded estimating explanation; do not add the old 2-day MOB + 1-day DEMOB (or other reserves) on top of active 39 days.",costDriver:"Incremental confirmed access/mob/demob only; no superseded WBS cost posting",owner:"B3 cost control",state:"SUPERSEDED_44_DAY_POSTING_PROHIBITED"},
+ {id:"AUD-011",code:"B4",steps:"04/07",source:"DTS-0001-C1",section:"SCADA NOTES",title:"Painting, coatings, sun/rain guards",finding:"Marine coating and corrosion protection are specified; verify OEM quoted enclosure and ODU accessories before separate B4 rate.",costDriver:"Only excluded/extra coating and support per approved package",owner:"OEM/SAMTEL",state:"PACKAGE_INCLUSION_RECONCILE"},
+ {id:"AUD-012",code:"B5",steps:"04/06/07",source:"ANNEX4",section:"Part I pp4–10",title:"Mandatory packing and marking",finding:"English/bilingual packing data; proper project/package/TAG identity; weatherproof electronic sealing/desiccants; IPPC-labelled wood where applicable; 2-year preservation/marking for spares.",costDriver:"Distinct cargo package Qty × compliant packing quote net OEM included; not simply 0",owner:"Vendor packer / ADDVALUE shipment coordination",state:"PACKING_RATES_AND_INCLUDED_SCOPE_REQUIRED"},
+ {id:"AUD-013",code:"B5",steps:"04/06",source:"ANNEX4",section:"Part II p11",title:"No split shipments without advance approval",finding:"Partial shipments disallowed unless purchaser authorizes; no additional packing/shipping/handling charge without contract basis.",costDriver:"Consolidation handling, approved split shipments and storage risk",owner:"SELLER/SAMTEL/JUTAL",state:"SHIPMENT_COUNT_APPROVAL_GATED"},
+ {id:"AUD-014",code:"B6",steps:"04/06/07",source:"ANNEX4",section:"Part II pp11–12",title:"Shipping release and 14-day pre-alert",finding:"Purchaser acceptance required for shipment release, advance notice >=14 days with inspection certificate, packing list, ETA, transport/handling requirements.",costDriver:"Freight documentation, inspection/release lead-time and expediting effort",owner:"Vendor/Expediting",state:"RELEASE_NOTICE_14D_REQUIRED"},
+ {id:"AUD-015",code:"B6",steps:"04/06",source:"ANNEX4",section:"Part V p19; Cover pp1–3",title:"Actual China delivery address and contract identity",finding:"Generic template shows placeholder SELLER/Job and location details; destination must be confirmed with project Expeditor, not inferred from Shanghai/Zhuhai text.",costDriver:"Actual named port/yard, local trucking and cargo receiving charges",owner:"SAMTEL/JUTAL Logistics",state:"NAMED_NANTONG_YARD_ADDRESS_AND_INCOTERM_PENDING"},
+ {id:"AUD-016",code:"B6",steps:"06/07/08",source:"ANNEX4-1",section:"R03 §6.1.5, §6.3, Appendix 7",title:"Myanmar telecom import and frequency license",finding:"Telecommunication import license 4–5 months in R03 table; PTD/MOTC radio/frequency approvals and no hand-carry for communications equipment. Verify current authority workflow.",costDriver:"Permit-file preparation, technical brochures, government/broker fees by confirmed actual, multi-month schedule exposure",owner:"Authorized importer/licensee with ADDVALUE technical support",state:"LICENSE_AUTHORIZATION_FEES_AND_SCHEDULE_OPEN"},
+ {id:"AUD-017",code:"B6",steps:"04/06/07/08",source:"SPE-C2",section:"§6.1.1 pp14–15",title:"Vendor permit application on behalf of COMPANY",finding:"VENDOR accountable for approval/type/operating/import licensing and frequency allocation before yard sail-out; COMPANY supports mandatory documents; appointment/representation not automatically delegated.",costDriver:"Role-specific authorized filing, dossier hours and agency charges; reconcile vendor vs SAMTEL before cost owner sign-off",owner:"VENDOR with COMPANY/SAMTEL authorization",state:"SPE_PTTEPI_AGENT_AUTHORIZATION_GATED"},
+ {id:"AUD-018",code:"B6",steps:"06/07",source:"ANNEX4-1",section:"Thailand Shipping Work Instruction §6.5",title:"Thailand telecom export approval",finding:"Shipping instruction states exporter/manufacturer—not customs agent—applies for Thailand telecom export permit; confirm applicability with current competent authority.",costDriver:"Exporter application/admin time and authority fee if confirmed",owner:"Authorized Thai exporter/manufacturer",state:"EXPORTER_ID_AND_PERMIT_APPLICABILITY_REQUIRED"},
+ {id:"AUD-019",code:"B6",steps:"06/07",source:"ANNEX4-1",section:"R03 §6.1, §6.3",title:"Separate Myanmar permit classes / shipping documents",finding:"Investment, Drawback and Temporary Admission are different regimes; approved cargo class and separate invoice sets are required; PTTEPI Yangon green-light before Myanmar shipment.",costDriver:"Each required clearance/HS line, broker service, taxes only when attributable",owner:"PTTEPI Logistics / supplier / broker per matrix",state:"MYANMAR_FINAL_DESTINATION_IMPORT_REGIME_UNCONFIRMED"},
+ {id:"AUD-020",code:"B6",steps:"06/07/08",source:"ANNEX4-1",section:"R03 §6.8",title:"PTTEP/contractor passenger MOB cost",finding:"Passenger booking/visa/heli costs may be conditional and back charged; helicopter seats normally not special charters; HUET for >3 offshore flights/year or >2 nights/trip per R03.",costDriver:"Qualified personnel × trips, business visa, HUET/training, transport, POB, actual backcharges",owner:"ADDVALUE or COMPANY as contractually allocated",state:"CREW_AND_POB_MATRIX_OPEN"},
+ {id:"AUD-021",code:"B6",steps:"06/07/08",source:"ANNEX4",section:"Part III p12–16",title:"Oversized shipment applicability",finding:"Threshold length >12m, width >2.5m, height >2.5m, weight >20t triggers abnormal-load controls; no automatic oversized charge for normal telecom crates.",costDriver:"Only measured oversize dimensions, lifting/support drawings and road permits where triggered",owner:"Nominated Freight Forwarder",state:"GROSS_WEIGHT_DIMENSION_EVIDENCE_REQUIRED"},
+ {id:"AUD-022",code:"B7",steps:"06/07",source:"ANNEX4",section:"Part I / Part II",title:"Preservation and storage",finding:"Weatherproof multi-handling packing and 2-year indoor spare preservation required; 3-month customer storage line is distinct from packaging cost.",costDriver:"Storage duration beyond vendor included allowance × vendor warehouse rate",owner:"Vendor / SAMTEL",state:"STORAGE_ALLOWANCE_AND_RATE_PENDING"},
+ {id:"AUD-023",code:"B8",steps:"04/06",source:"BOD-C2",section:"§10.1 p23",title:"Operator training before FAT",finding:"Tier1/Tier2 training covering radio troubleshooting/SCADA integration before FAT.",costDriver:"Training MH, qualified trainer, equipment and trainee sessions net OEM included course",owner:"ADDVALUE / OEM",state:"TRAINING_SCHEDULE_AND_CONTENT_SCOPE_PENDING"},
+ {id:"AUD-024",code:"B9",steps:"06/08",source:"WBS-REV05",section:"19_CN_YARD_WBS; 00_EXEC_QUOTE",title:"China Yard 2-person supervision",finding:"12 team-days × 2 = 24 MD at JUTAL Yard Nantong, site erection performed by JUTAL; airfare/hotel/local transport excluded from B9 Rev05 working sell unless provided/charged separately.",costDriver:"Two staff × verified team-days × actual cost and/or role SELL rates, plus reimbursables",owner:"ADDVALUE/SAMTEL/JUTAL RACI",state:"YARD_CALENDAR_AND_REIMBURSABLES_OPEN"},
+ {id:"AUD-025",code:"B10",steps:"04/07",source:"BOD-C2",section:"§11.1 p24",title:"Startup spare schedule",finding:"OEM spare part numbers, unit weights, shipping weights, quantities and price/lead times required; keep startup inventory distinct from Part A equipment.",costDriver:"Verified OEM startup spare Qty × source supplier rate net supplied-with-package",owner:"OEM / SAMTEL purchase",state:"OEM_PART_NUMBERS_RATE_QTY_REQUIRED"},
+ {id:"AUD-026",code:"B11",steps:"04/07",source:"EXA-A8-TOOL",section:"§5 Telecommunication p1; Note-1",title:"Operational configuration and charging tools",finding:"Minimum SCADA Radio Configuration SW/License (1 lot), SCADA Network Monitoring (1 lot), TETRA Voice Gateway SW/License (1 lot), RACON Configuration SW/License (if applicable, 1 lot), RACON Charging Kit (if applicable, 1 set). TETRA applicability conflicts with current DMR design and must not be bought blindly.",costDriver:"Applicable unique tool/license SKU × OEM qty/rate net included accessories and existing NMS entitlement",owner:"OEM/SAMTEL operations",state:"TETRA_VS_DMR_AND_OEM_INCLUSION_GATED"},
+ {id:"AUD-027",code:"B11",steps:"04/07",source:"BOD-C2",section:"§6.6 and §11.2 pp16,24",title:"Evergreen configuration tools and licenses",finding:"Software/configuration/monitoring and necessary special tooling required; check OEM included programming cable, license rights and standalone delivered-tool ownership.",costDriver:"Distinct applicable new tooling and software licenses only (not duplicate equipment licenses in Part A)",owner:"OEM/ADDVALUE engineering",state:"LICENSE_SCOPE_NMS_CAPACITY_AND_DELIVERABLES_OPEN"},
+ {id:"AUD-028",code:"B13",steps:"04/06/07",source:"ANNEX4",section:"Part I pp8–10",title:"Preservation consumables",finding:"Desiccants/barrier bags/anti-corrosion protection for electrical and electronic goods; cases for spares preserved min 2 years.",costDriver:"Actual replenishment consumable Qty not already in B5 package protection or B10 spare lot",owner:"Supplier packing/maintenance",state:"B5_B13_INCLUSION_AND_REPLENISHMENT_SPLIT_REQUIRED"},
+ {id:"AUD-029",code:"B14",steps:"04/06/07",source:"ANNEX4",section:"Introduction p3, Part II p11",title:"Shipping damage and penalties exposure",finding:"Seller can be liable for defective packing, dimensions, fines/demurrage and related loss; cargo insurance and bonds need actual premium/insured value and contract evidence.",costDriver:"Quoted coverage/premium, performance bond only if applicable; distinguish B6 cargo from B14 contractual risk",owner:"SAMTEL commercial / insurer",state:"ACTUAL_INSURANCE_BANK_RATE_REQUIRED"},
+ {id:"AUD-030",code:"C1",steps:"04/07",source:"BOD-C2",section:"§11.1 p24",title:"Capital spare inventory",finding:"OEM must price capital spare part numbers, weights and lead times. Part C option not counted in mandatory A+B base.",costDriver:"Approved separate capital spares × supplier quote",owner:"OEM / SAMTEL",state:"OPTION_OEM_SPARES_PRICE_PENDING"},
+ {id:"AUD-031",code:"C2",steps:"04/07",source:"BOD-C2",section:"§11.1 p24",title:"Two-year operation spare inventory",finding:"OEM to quote 2-year normal operating spares separately; no automatic duplication with capital spares or commissioning spares.",costDriver:"Approved separate two-year spare SKU Qty × supplier quote",owner:"OEM / SAMTEL",state:"OPTION_OEM_SPARES_PRICE_PENDING"}
+]);
+
+const locations=Object.freeze([
+ {id:"TRIP-01",location:"ZWP20",teamDays:7},
+ {id:"TRIP-02",location:"ZWP21",teamDays:7},
+ {id:"TRIP-03",location:"ZWP22",teamDays:7},
+ {id:"TRIP-04",location:"ZWP23",teamDays:5},
+ {id:"TRIP-05",location:"ZPQ → ZWP8 → ZWP11",teamDays:13}
+]);
+const specialToolRequirements=Object.freeze([
+ {id:"B11-SCADA-CONFIG",description:"SCADA radio configuration software & license",quantity:1,unit:"lot",state:"OEM_INCLUSION_AND_RIGHTS_CHECK"},
+ {id:"B11-SCADA-NMS",description:"SCADA network monitoring software & license",quantity:1,unit:"lot",state:"EXISTING_NMS_CAPACITY_AND_RIGHTS_CHECK"},
+ {id:"B11-TETRA-GW",description:"TETRA voice gateway software & license",quantity:1,unit:"lot",state:"APPLICABILITY_GATED_BOD_CURRENT_DMR"},
+ {id:"B11-RACON-CONFIG",description:"RACON configuration software & license",quantity:1,unit:"lot",state:"IF_APPLICABLE_OEM_INCLUSION_CHECK"},
+ {id:"B11-RACON-CHARGER",description:"RACON charging kit",quantity:1,unit:"set",state:"IF_APPLICABLE_OEM_INCLUSION_CHECK"}
+]);
+
+export function selectBcExecutionComplianceAudit0553(){
+ if(FAT_EXECUTION_BASIS_0553.integratedFat.location!=="SAMTEL Bangkok, Thailand")
+  throw Error("Audit must follow management-approved integrated FAT location");
+ const trips=locations.map(t=>Object.freeze({...t,crew:2,workingPersonDays:t.teamDays*2,
+  state:"SOURCE_WBS_REV05_WORKING_NOT_APPROVED_TRAVEL"}));
+ const teamDays=trips.reduce((v,t)=>v+t.teamDays,0);
+ const md=trips.reduce((v,t)=>v+t.workingPersonDays,0);
+ const wbs=derivePartBcWorkingWbs0553();
+ if(teamDays!==39||md!==78||wbs.rows.find(x=>x.code==="B3")?.sellTHB!==2109600)
+  throw Error("Offshore working budget deviated from 5-trip/39-day/78-MD Rev05");
+ const codes=new Set(["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"]);
+ for(const r of BC_EXECUTION_AUDIT_ITEMS_0553)if(!codes.has(r.code))
+  throw Error("Unknown Customer B/C owner "+r.code);
+ if(new Set(BC_EXECUTION_AUDIT_ITEMS_0553.map(r=>r.id)).size!==BC_EXECUTION_AUDIT_ITEMS_0553.length)
+  throw Error("Duplicate B/C execution audit IDs");
+ return Object.freeze({
+  moduleId:"bid.budget.working.bc.execution-audit",
+  name:"10.2 — Source 01–08 / Logistics / Permits / MOB–DEMOB / Special Tools Audit",
+  sourceCount:BC_EXECUTION_AUDIT_SOURCES_0553.length,
+  sources:BC_EXECUTION_AUDIT_SOURCES_0553,
+  requirements:BC_EXECUTION_AUDIT_ITEMS_0553,
+  byCode:Object.fromEntries([...codes].map(k=>[k,BC_EXECUTION_AUDIT_ITEMS_0553.filter(x=>x.code===k)])),
+  specialTools:specialToolRequirements,
+  offshore:Object.freeze({state:"WORKING_5_TRIP_CAMPAIGN_NOT_APPROVED",
+   trips,tripCount:5,teamDays,crew:2,personDays:md,
+   workingSellRateUSDPerMD:800,
+   activeB3WorkingSellTHB:wbs.rows.find(x=>x.code==="B3").sellTHB,
+   supersededTeamDays:44,supersededPersonDays:88,
+   supersededMobDays:2,supersededDemobDays:1,
+   supersededMustNotPost:true,
+   mobilizationsPerTrip:null,actualCrewMovementAndPOB:null,
+   scheduleCostState:"TRIP_ROUTING_POB_AND_MOB_DEMOB_NOT_APPROVED",
+   rule:"Compare 5-trip WBS base with approved HUC/SIMOPS/access batches; 44-day shared MOB/DEMOB allowances were superseded and must not be posted alongside 39-day working scenario."}),
+  laborPricePolicy:"MH/MD work rates in WBS Rev05 are SELL REFERENCE; actual internal payroll, subcontract cost, per diem and travel require separate cost evidence. Never relabel USD800/MD as payroll.",
+  regulatoryPolicy:"Project-authorized filing representative / importer / exporter must be evidenced; government fees and agency quotations unknown, never auto-zero or guessed.",
+  b6RoutingState:"FOUR_MR_TO_SAMTEL_BKK_FAT_THEN_JUTAL_NANTONG; check separate Myanmar sailout duties",
+  workingCostTHB:null,permitFeesTHB:null,freightTHB:null,mobDemobActualCostTHB:null,
+  estimateCostComplete:false,customerReleaseAllowed:false
+ });
+}
