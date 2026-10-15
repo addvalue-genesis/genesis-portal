@@ -66,8 +66,9 @@ export function BudgetaryWorkbookPreview0553(){
  const partAComplete=partAKnown.length===mrPartA.length;
  const partAKnownTotal=partAKnown.reduce((sum,r)=>sum+r.amount,0);
  const partBKnownTotal=scopePartB.knownAddvalueWorkingSellTHB;
- const scopeKnownTotal=Math.round((partAKnownTotal+partBKnownTotal)*100)/100;
- const scopeTotalLabel="THB "+money(scopeKnownTotal);
+ // Part A is working COST; Part B current WBS amounts are WORKING SELL.
+ // No permitted full turnkey base total exists until a common commercial basis is available.
+ const scopeTotalLabel="NOT ESTABLISHED";
  const partADisplay=[...mrPartA,{code:"A5",mr:"MR-0001–0004",description:"Bulk materials and accessories",amount:a5Memo.a5PriceTHB,
   status:"Included in A1, non-additive; "+a5Memo.rowCount+" traced MTO lots"}];
 
@@ -159,7 +160,7 @@ export function BudgetaryWorkbookPreview0553(){
        const bcCell=bcCode?(col===5?(Number.isFinite(bcWorking)?"THB "+money(bcWorking):Number.isFinite(bcHistorical)?"REFERENCE THB "+money(bcHistorical):"COST PENDING"):
         col===6?(Number.isFinite(bcWorking)?"THB "+money(bcWorking):Number.isFinite(bcHistorical)?"REFERENCE THB "+money(bcHistorical):"NOT ESTABLISHED"):
         col===7?(Number.isFinite(bcWorking)?"Scope WBS · working sell (not cost) · Turnkey rate review":Number.isFinite(bcHistorical)?"Scope child Annex · historical Rev08 only · OEM rate required":"Turnkey scope · source quantity / supplier or service cost required"):null):null;
-       const value=bcCode&&col>=5&&col<=7?bcCell:partACells?partACells[col]:sheet==="Scope of supply"&&rowNum===38?(col===6?scopeTotalLabel:col===7?"WORKING PRICED SUBTOTAL ONLY · Part A "+money(partAKnownTotal)+" + Part B ADDVALUE "+money(partBKnownTotal)+" · "+(partAComplete?"":"INCOMPLETE PART A · ")+"B/C OWNER RATES PENDING · C OPTIONS EXCLUDED · A5 INCLUDED IN A1 · NOT CUSTOMER SELL":row[col+1]??""):rowNum===7&&col>=4&&col<=7?"":row[col+1]??"";
+       const value=bcCode&&col>=5&&col<=7?bcCell:partACells?partACells[col]:sheet==="Scope of supply"&&rowNum===38?(col===6?scopeTotalLabel:col===7?"COST/SELL BASIS MIX: Part A cost THB "+money(partAKnownTotal)+"; Part B working SELL THB "+money(partBKnownTotal)+" — NOT ADDITIVE · "+(partAComplete?"":"PART A INCOMPLETE · ")+"B/C TURNKEY COST PENDING · C OPTIONS EXCLUDED · A5 INCLUDED IN A1":row[col+1]??""):rowNum===7&&col>=4&&col<=7?"":row[col+1]??"";
        const isPrice=overlay&&(active?.kind==="SUMMARY"?col===6:(col===7||col===8));
        return <td key={col} style={{whiteSpace:"pre-wrap",minWidth:col===0?65:95}}>
         {value}{isPrice&&<small style={{display:"block"}}>REV08 · historical {fxReady?currency:"FX MISSING"} · {refCode}</small>}
@@ -181,7 +182,7 @@ export function BudgetaryWorkbookPreview0553(){
     })}</tbody>
    </table></div>
    <p className="p55-note"><strong>Part B/C price cells:</strong> source-linked to bid.budget.scope WBS and child Annex projections. Historical Annex values are labelled REFERENCE only, never posted to current turnkey total. Pending costs stay pending, including SAMTEL/OEM execution scopes.</p>
-   <p className="p55-note"><strong>Row 38 Total:</strong> {scopeTotalLabel} is the priced working subtotal from Scope Part A (excluding the non-additive A5 memo) plus known ADDVALUE Part B working sell. It is NOT the complete A+B customer quotation; unresolved lines remain pending and C options are excluded.</p>
+   <p className="p55-note"><strong>Row 38 Total:</strong> NOT ESTABLISHED. Part A currently has cost-only evidence; Part B contains working sell references. They are deliberately NOT summed. Turnkey owner/OEM B costs are incomplete, and C options remain excluded from the base.</p>
    <p className="p55-note">Part A defaults to MR equipment group summary with on-demand TAG drill-down. Detail rows show source TAG and location, with MR as grouping only. Missing specification, quantity and rates are flagged. Quantity 1 package is a display grouping, not an engineering unit count. A5 is included in A1. Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
    <p className="p55-note">The native XLSX retains all rows and columns. The JSX keeps worksheet header, totals and remarks visible while item rows can collapse. It hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
