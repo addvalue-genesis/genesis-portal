@@ -116,7 +116,10 @@ for(const name of ["project0553/BcExecutionComplianceAudit0553.jsx","project0553
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code,
   "JSX Syntax check "+name);
 assert(workspace.includes('<BcExecutionComplianceAudit0553 selectedCode={bcTab}/>'));
-assert(workspace.includes('exact?.tagName==="DETAILS"'));
+assert(workspace.includes('audit?.tagName==="DETAILS"'));
+assert(workspace.includes('bid.budget.working.bc.b3.mob-demob-economics'));
+assert(navigator.includes('id:"bid.budget.working.bc.b3.mob-demob-economics"'));
+
 assert(navigator.includes('id:"bid.budget.working.bc.execution-audit"'));
 assert(ui.includes('data-component-key={m.moduleId}'));
 assert(ui.includes('componentKey={m.moduleId}'));
