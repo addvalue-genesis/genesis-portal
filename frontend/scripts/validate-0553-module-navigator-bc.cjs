@@ -51,6 +51,8 @@ assert(compile(workspace).length>0,"Budget Working module JSX Babel transpilatio
 assert(page.includes('buildBcModuleNavigator0553()')&&page.includes('...buildBcModuleNavigator0553()'),
  "Project search must include canonical B/C module index");
 assert(page.includes('navigableModules.filter('),"Navigator Search must filter complete modules");
+assert(page.includes("replace(/^PJ2608-0553\\s*\\/\\s*/i"),
+ "Navigator must accept copied project-qualified Module ID text");
 assert(page.includes('setWorkspaceTab(m.tab)')&&page.includes('setNavTarget(m.id)'),
  "Click must navigate to Budget and carry exact selected Module ID");
 assert(page.includes('navigationTarget={navTarget}')&&page.includes('navigationSequence={navigationSequence}'),
