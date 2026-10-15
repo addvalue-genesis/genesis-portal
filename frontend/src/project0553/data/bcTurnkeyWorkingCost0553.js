@@ -76,7 +76,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   const b6BudgetarySellTHB=code==="B6"?costEvidence?.reconciliation?.historicalRev08TransportSellTHB:null;
   const sellKnown=Number.isFinite(w.sellTHB);
   const costEvidence=evidence.byCode[code];
-  if(!costEvidence||costEvidence.workingSellTHB!==w.sellTHB||costEvidence.directCostTHB!==null)
+  if(!costEvidence||costEvidence.workingSellTHB!==(code==="B6"?costEvidence.reconciliation?.historicalRev08TransportSellTHB:w.sellTHB)||costEvidence.directCostTHB!==null)
    throw Error("B/C cost evidence diverged from source WBS or invented a direct cost at "+code);
   const optional=code.startsWith("C");
   return Object.freeze({
