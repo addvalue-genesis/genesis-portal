@@ -6,6 +6,7 @@ import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate05
 import {ScopeSheetsDetail0553} from "./ScopeSheetsDetail0553";
 import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
 import {deriveA5BulkAttribution0553} from "./data/a5BulkAttribution0553";
+import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 
 // Workbook-driven navigation, not an editable BOM and not a released quote.
 // The historical Rev08 amounts are source evidence ONLY; never promote them
@@ -43,6 +44,13 @@ export function BudgetaryWorkbookPreview0553(){
    status:projection.priced+" priced; "+projection.unresolved+" unresolved · Working Scope reference, not released sell"};
  });
  const a5Memo=deriveA5BulkAttribution0553();
+ const scopePartB=selectScopePartBcWorking0553();
+ const partAKnown=mrPartA.filter(r=>Number.isFinite(r.amount));
+ const partAComplete=partAKnown.length===mrPartA.length;
+ const partAKnownTotal=partAKnown.reduce((sum,r)=>sum+r.amount,0);
+ const partBKnownTotal=scopePartB.knownAddvalueWorkingSellTHB;
+ const scopeKnownTotal=Math.round((partAKnownTotal+partBKnownTotal)*100)/100;
+ const scopeTotalLabel="THB "+money(scopeKnownTotal);
  const partADisplay=[...mrPartA,{code:"A5",mr:"MR-0001–0004",description:"Bulk materials and accessories",amount:a5Memo.a5PriceTHB,
   status:"Included in A1, non-additive; "+a5Memo.rowCount+" traced MTO lots"}];
 
@@ -125,7 +133,7 @@ export function BudgetaryWorkbookPreview0553(){
         partAItem.code==="A5"?"NON-ADDITIVE":Number.isFinite(partAItem.amount)?money(partAItem.amount):"UNPRICED",
         partAItem.status
        ]:null;
-       const value=partACells?partACells[col]:rowNum===7&&col>=4&&col<=7?"":row[col+1]??"";
+       const value=partACells?partACells[col]:sheet==="Scope of supply"&&rowNum===38?(col===6?scopeTotalLabel:col===7?"WORKING PRICED SUBTOTAL ONLY · Part A "+money(partAKnownTotal)+" + Part B ADDVALUE "+money(partBKnownTotal)+" · "+(partAComplete?"":"INCOMPLETE PART A · ")+"B/C OWNER RATES PENDING · C OPTIONS EXCLUDED · A5 INCLUDED IN A1 · NOT CUSTOMER SELL":row[col+1]??""):rowNum===7&&col>=4&&col<=7?"":row[col+1]??"";
        const isPrice=overlay&&(active?.kind==="SUMMARY"?col===6:(col===7||col===8));
        return <td key={col} style={{whiteSpace:"pre-wrap",minWidth:col===0?65:95}}>
         {value}{isPrice&&<small style={{display:"block"}}>REV08 · historical {fxReady?currency:"FX MISSING"} · {refCode}</small>}
@@ -135,6 +143,7 @@ export function BudgetaryWorkbookPreview0553(){
      </tr></React.Fragment>;
     })}</tbody>
    </table></div>
+   <p className="p55-note"><strong>Row 38 Total:</strong> {scopeTotalLabel} is the priced working subtotal from Scope Part A (excluding the non-additive A5 memo) plus known ADDVALUE Part B working sell. It is NOT the complete A+B customer quotation; unresolved lines remain pending and C options are excluded.</p>
    <p className="p55-note">Part A working rows 8–12 use the customer column layout, grouped by MR. TAG ANNEX is a reference, not an invented equipment tag. Quantity 1 package is a display grouping, not an engineering unit count. A5 is included in A1. Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
    <p className="p55-note">The native XLSX retains all rows and columns. The JSX keeps worksheet header, totals and remarks visible while item rows can collapse. It hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
