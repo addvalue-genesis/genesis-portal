@@ -9,6 +9,7 @@ import { ScopeSheetsDetail0553 } from "./ScopeSheetsDetail0553";
 import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 import { CostIntegrityReview0553 } from "./CostIntegrityReview0553";
 import {BcCostEvidenceDetail0553} from "./BcCostEvidenceDetail0553";
+import {BcExecutionComplianceAudit0553} from "./BcExecutionComplianceAudit0553";
 import {ScopeBcAnnexDetail0553} from "./ScopeBcAnnexDetail0553";
 import {ScopeCategoryTabs0553} from "./ScopeCategoryTabs0553";
 import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
@@ -156,6 +157,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Workflow</th><th>Customer Categories</th><th>Working Owner / Source / Next Step</th></tr></thead><tbody>
     {BC_WORKING_ROUTES_0553.map(r=><tr key={r.workflow} data-component-key={bcGroupIdByWorkflow.get(r.workflow)} className={navigationTarget===bcGroupIdByWorkflow.get(r.workflow)?"p553-module-nav-target":undefined}><td>{r.workflow}</td><td>{r.codes.join(", ")}<small>{r.name}</small></td><td>{r.owner}<small>{r.source.join(" + ")} · {r.basis} · {r.next}</small></td></tr>)}
    </tbody></table></div>
+   <BcExecutionComplianceAudit0553 selectedCode={bcTab}/>
    <p className="p55-note">Legacy lifecycle input contains {LIFECYCLE_SPARES_0553.rows.length} activity requirements. Customer B/C remapping is by activity (not legacy category label); current OEM spare rates and full turnkey costs are still missing.</p>
   </details>
   <details className="p553-budget-phase"><summary><strong>10.3 — Cost & Commercial Pricing Reference</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
