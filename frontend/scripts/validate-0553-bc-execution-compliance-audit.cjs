@@ -19,7 +19,7 @@ const {FAT_EXECUTION_BASIS_0553}=from("data/fatExecutionBasis0553.js");
 const oldWbs=JSON.stringify(derivePartBcWorkingWbs0553()),oldLedger=JSON.stringify(selectBcTurnkeyWorkingCost0553());
 const a=selectBcExecutionComplianceAudit0553();
 assert.equal(a.moduleId,"bid.budget.working.bc.execution-audit");
-assert(a.sourceCount>=10&&a.requirements.length>=32);
+assert(a.sourceCount>=15&&a.requirements.length>=38,"All reviewed MR/SPE/DTS/BOD/ANNEX sources required");
 assert.equal(new Set(a.requirements.map(x=>x.id)).size,a.requirements.length);
 const customerCodes=["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"];
 for(const code of customerCodes){
@@ -58,6 +58,12 @@ assert(a.byCode.B6.some(x=>x.state==="EXPORTER_ID_AND_PERMIT_APPLICABILITY_REQUI
 assert(a.byCode.B6.some(x=>x.state==="NAMED_NANTONG_YARD_ADDRESS_AND_INCOTERM_PENDING"));
 assert(a.byCode.B11.some(x=>x.state==="TETRA_VS_DMR_AND_OEM_INCLUSION_GATED"));
 assert(a.byCode.B10.some(x=>x.state==="OEM_PART_NUMBERS_RATE_QTY_REQUIRED"));
+for(const mr of ["MR0001-C1","MR0002-C1","MR0003-C1","MR0004-C1"]){
+ assert(a.sources.some(x=>x.id===mr));
+ assert(a.byCode.B10.some(x=>x.source===mr&&x.finding.includes("not")),
+  "Original MR reviewer says physically SUPPLY spares, not only a list: "+mr);
+}
+assert(a.byCode.B3.some(x=>x.source==="MR0004-C1"&&x.state==="RACON_OFFSHORE_SAT_COMMISSIONING_MANDATORY"));
 assert(a.byCode.C1.length&&a.byCode.C2.length);
 assert.deepEqual(a.specialTools.map(x=>x.quantity),[1,1,1,1,1]);
 assert(a.specialTools.some(x=>x.state==="APPLICABILITY_GATED_BOD_CURRENT_DMR"));
