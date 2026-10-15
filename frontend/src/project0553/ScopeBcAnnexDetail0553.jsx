@@ -4,14 +4,16 @@ import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
-export function ScopeBcAnnexDetail0553({code,fx=null}){
+export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
  const m=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const p=m.byCode[code];
+ const inWorking=mode==="working";
+ const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
  if(!p)return <p role="alert">Unsupported customer scope code: {code}</p>;
- return <section className="p55-panel" data-component-key={p.moduleId} style={{padding:14}}>
-  <div className="p55-eyebrow">10.5 CUSTOMER SCOPE DETAIL · PRICE SOURCE AUDIT (THB display)</div>
+ return <section className="p55-panel" data-component-key={moduleId} style={{padding:14}}>
+  <div className="p55-eyebrow">{inWorking?"10.2 WORKING COST DETAIL":"10.5 CUSTOMER SCOPE DETAIL"} · PRICE SOURCE AUDIT (THB display)</div>
   <h3>{p.code} — {p.description}</h3>
-  <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={p.moduleId}/>
+  <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/>
    {" "}· Current cost owner: <code>{p.ownerModuleId}</code>
    {" "}· <strong>{p.optional?"PART C OPTION — NOT IN BASE":"PART B — BASE SCOPE REQUIREMENT"}</strong></p>
   <div className="p55-metric-grid">
