@@ -22,5 +22,14 @@ assert(work.includes('item.workingSellTHB'));
 assert(work.includes('item.directCostTHB'));
 assert(work.includes('bcPriceAudit.byCode[item.code]?.historicalReferenceTHB'));
 assert(work.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcDetailCode]}/>'));
+assert(work.includes('<ScopeBcAnnexDetail0553 code={bcDetailCode} fx={fx} mode="working"/>'),
+ "10.2 must show same B10/B11/B13/B14/C1/C2 full price details as 10.5");
+const annex=read("project0553/ScopeBcAnnexDetail0553.jsx");
+assert(annex.includes('const inWorking=mode==="working"') &&
+ annex.includes('inWorking?"bid.budget.working.bc."') &&
+ annex.includes('data-component-key={moduleId}'),
+ "Shared annex must preserve separate working and customer module identities");
+assert(scope.includes('<ScopeBcAnnexDetail0553 code={category[1]} fx={fx}/>'),
+ "10.5 must preserve existing child data and scope view");
 assert(!tabs.includes('directCostTHB')&&!tabs.includes('workingSellTHB'),"Shared UX must not own pricing");
 console.log("PASS 0553 10.2/10.5 shared category-tabs UX, distinct canonical IDs/Copy ID, 16-row B/C presentation and no duplicate cost engine.");
