@@ -52,6 +52,10 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   parent.open=true;
   const exact=[...document.querySelectorAll("[data-component-key]")]
    .find(node=>node.getAttribute("data-component-key")===navigationTarget);
+  if(navigationTarget==="bid.budget.working.bc.cost-lines"){
+   const lines=document.querySelector('[data-component-key="bid.budget.working.bc.cost-lines"]');
+   if(lines?.tagName==="DETAILS")lines.open=true;
+  }
   if((navigationTarget==="bid.budget.working.bc.execution-audit"||navigationTarget==="bid.budget.working.bc.b3.mob-demob-economics")){
    const audit=document.querySelector('[data-component-key="bid.budget.working.bc.execution-audit"]');
    if(audit?.tagName==="DETAILS")audit.open=true;
