@@ -60,6 +60,14 @@ for(const code of codes){
   assert.equal(a.historicalDetailUSD,null);
  }
 }
+// Preserve residual rounding from Rev08, do not invent a balancing vendor cost.
+assert.equal(p.byCode.B10.historicalDisplayedVsSummaryDeltaTHB,-0.02);
+assert.equal(p.byCode.B11.historicalDisplayedVsSummaryDeltaTHB,0);
+assert.equal(p.byCode.B13.historicalDisplayedVsSummaryDeltaTHB,-0.04);
+assert.equal(p.byCode.B14.historicalDisplayedVsSummaryDeltaTHB,null);
+assert.equal(p.byCode.C1.historicalDisplayedVsSummaryDeltaTHB,0);
+assert.equal(p.byCode.C2.historicalDisplayedVsSummaryDeltaTHB,-0.08);
+assert.equal(p.byCode.C2.historicalReconciliationDeltaUSD,-0.0025);
 assert.equal(p.byCode.B10.currentRequirementCount,bc.byCode.B10.requirementCount);
 assert.equal(p.byCode.C1.currentRequirementCount,bc.byCode.C1.requirementCount);
 assert.equal(p.byCode.C2.currentRequirementCount,0,"Do not map old capital-spares C2 as 2-year options");
@@ -85,7 +93,7 @@ for(const snippet of ['selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd})',
  assert(ui.includes(snippet),"10.5 Scope display missing source-backed prices or navigation: "+snippet);
 for(const snippet of ['data-component-key={p.moduleId}','p.historicalDetailLines.map(',
  'p.currentDerivationLines.map(','p.currentRequirementRows.map(','p.currentVerificationSteps.map(',
- 'p.historicalReferenceTHB','x.historicalUnitTHB','x.historicalExtendedTHB','NO ITEMIZED REV08 ANNEX',
+ 'p.historicalReferenceTHB','p.historicalDisplayedVsSummaryDeltaTHB','x.historicalUnitTHB','x.historicalExtendedTHB','NO ITEMIZED REV08 ANNEX',
  'NOT VERIFIED / NOT POSTED'])
  assert(detail.includes(snippet),"10.5 child price audit missing: "+snippet);
 assert(!detail.includes("<td>{usd(x.historicalUnitUSD)}</td>"),"Current 10.5 screen must show THB not raw USD price columns");
