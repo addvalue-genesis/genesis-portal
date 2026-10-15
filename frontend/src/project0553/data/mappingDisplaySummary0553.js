@@ -18,7 +18,7 @@ export function mappingDisplaySummary0553(records,equipment,working,{part="ALL",
  });
  const sell=moneySummary0553(shown,row=>{
   const x=working.get(row.customerLine);
-  return x?{THB:x.sellTHB,USD:null}:null;
+  return x?{THB:Number.isFinite(x.workingSellTHB)?x.workingSellTHB:x.sellTHB,USD:null}:null;
  });
  return {shown,cost,sell};
 }
