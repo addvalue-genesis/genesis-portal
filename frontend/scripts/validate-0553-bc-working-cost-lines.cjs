@@ -20,15 +20,15 @@ const snapshot=JSON.stringify(derivePartBcWorkingWbs0553());
 const m=selectBcWorkCostLines0553(),b=selectBcTurnkeyWorkingCost0553(),audit=selectBcExecutionComplianceAudit0553();
 const codes=["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"];
 assert.deepEqual(m.activeCodes,codes);
-assert.deepEqual(m.primaryDetailedCodes,["B1","B2","B3","B6","B9","B10","B11"]);
+assert.deepEqual(m.primaryDetailedCodes,["B1","B2","B3","B5","B6","B9","B10","B11"]);
 assert.equal(m.moduleId,"bid.budget.working.bc.cost-lines");
 assert.equal(m.sourceModuleId,"bid.budget.working.bc.execution-audit");
-assert.equal(m.rows.length,105);
+assert.equal(m.rows.length,111);
 assert.equal(m.requiredAuditCount,40);
-assert.equal(new Set(m.rows.map(x=>x.id)).size,105);
+assert.equal(new Set(m.rows.map(x=>x.id)).size,111);
 assert.equal(m.rows.filter(x=>x.id.startsWith("COST-AUD-")).length,40);
 assert(m.rows.filter(x=>x.id.startsWith("COST-AUD-")).every(x=>x.workingSellTHB===null&&x.directCostTHB===null&&x.includedInExistingCostOwner),"Audit records must never multiply or post existing priced cost owners");
-assert.equal(m.rows.filter(x=>!x.id.startsWith("COST-AUD-")).length,65);
+assert.equal(m.rows.filter(x=>!x.id.startsWith("COST-AUD-")).length,71);
 assert(m.requirementLinks.every(x=>x.costLineId==="COST-"+x.auditId));
 assert.deepEqual(m.requirementLinks.map(x=>x.auditId),audit.requirements.map(x=>x.id));
 assert.equal(m.totalCostTHB,null);
@@ -50,7 +50,7 @@ for(const code of codes){
  assert.equal(b.byCode[code].workCostLineModuleId,m.moduleId);
  assert.equal(b.byCode[code].workingSellTHB,m.workingSellByCode[code]);
 }
-assert.equal(b.workCostLineCount,105);
+assert.equal(b.workCostLineCount,111);
 assert.equal(b.workCostLineAuditCount,40);
 assert.equal(b.knownWorkingSellTHB,3804160);
 assert.equal(b.knownDirectCostTHB,null);
@@ -104,4 +104,4 @@ for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcWorkCostLin
  assert(babel.transformSync(read(f),{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
 }
-console.log("PASS 0553 10.2 traceable cost-line ledger: 105 rows (65 work objects + 40 non-additive source clauses), B1 964 MH/27 activities, B2 143/38, B3 5 trips/78 MD & THB2,109,600 sell, B6 four cargo routes, B9 THB47,880/team-day sell and B10/B11 supplier gates; no invented Direct Cost.");
+console.log("PASS 0553 10.2 traceable cost-line ledger: 111 rows (71 work objects + 40 non-additive source clauses), B1 964 MH/27 activities, B2 143/38, B3 5 trips/78 MD & THB2,109,600 sell, B6 four cargo routes, B9 THB47,880/team-day sell and B10/B11 supplier gates; no invented Direct Cost.");
