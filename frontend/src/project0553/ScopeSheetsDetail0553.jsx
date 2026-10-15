@@ -33,6 +33,11 @@ export function ScopeSheetsDetail0553({fx=null}){
  const category=SHEETS.find(x=>x[0]===sheet);
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
  const details=REV08_BASELINE.detail[category[1]]||[];
+ // Historical workbook sheet totals come from the same line-item array as the child sheet.
+ // They are reference prices, never a substitute for a current verified OEM rate.
+ const b10HistoricalUSD=(REV08_BASELINE.detail.B10||[]).reduce(
+  (total,[,qty,unitUSD])=>total+qty*unitUSD,0
+ );
  const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
  // A2 is sourced from the SAME MR0002 per-site Working BOM, including the RFI-LNA.
  // Management excluded MGW rates: omit MGW vendor rows, never erase independently
@@ -126,8 +131,9 @@ export function ScopeSheetsDetail0553({fx=null}){
     control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (working basis)";
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>{qtyDisplay}</td>
     <td className="is-number">{Number.isFinite(control?.unitPriceTHB)?cash(control.unitPriceTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
-    <td className="is-number">{Number.isFinite(amount)?cash(amount):control?"Owner / OEM quotation required":unavailable}</td>
-    <td>{item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
+    <td className="is-number">{Number.isFinite(amount)?cash(amount):control?"Owner / OEM quotation required":unavailable}
+     {id==="B10"&&<small><strong>Linked B10 sheet subtotal — Rev08 historical only:</strong> {fxValid?cash(round(b10HistoricalUSD*fx.thbPerUsd)):"Awaiting FX"} (not current OEM cost)</small>}</td>
+    <td>{item?<>{item.status}<small>{item.source}</small>{id==="B10"&&<small>Historical subtotal is calculated from REV08_BASELINE.detail.B10 (same 9 source lines rendered in bid.budget.scope.b10); vendor verification remains separate.</small>}</>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(([desc,qty,price],i)=>{
    // Historical template numbers are customer-facing Rev08 prices, not present-day supplier cost.
    const rate=fxValid?round(price*fx.thbPerUsd):null;
