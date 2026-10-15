@@ -1,0 +1,60 @@
+import React,{useState} from "react";
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {selectBcB5EquationExecution0553} from "./data/bcB5EquationExecution0553";
+const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
+export function B5EquationAudit0553({selectedCode="ALL"}){
+ const [showSource,setShowSource]=useState(false);
+ const [showRoutes,setShowRoutes]=useState(false);
+ const p=selectBcB5EquationExecution0553();
+ if(selectedCode!=="ALL"&&selectedCode!=="B5")return null;
+ return <details className="p55-panel" data-component-key={p.moduleId} open={selectedCode==="B5"}
+  style={{marginTop:12,padding:"12px 14px"}}>
+  <summary><strong>02 → 10.2 B5 | Packing &amp; Marking — GEQ / ANNEX4 / STD006</strong>
+   <small> {p.sourceClauseCount} source rules · 4 MR streams · 6 cost drivers · price OPEN_INPUT</small></summary>
+  <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={p.moduleId}/>
+   {" "}Source: <a href={p.sourceUrls.annex4} target="_blank" rel="noreferrer">ANNEX4 Packing &amp; Marking</a>,
+   {" "}<a href={p.sourceUrls.annex42} target="_blank" rel="noreferrer">ANNEX4-2 Master / Single Packing List</a>,
+   {" "}<a href={p.sourceUrls.std006} target="_blank" rel="noreferrer">PTTEP STD-6-GEN-006-R00</a> and MR0001–4 Rev.C1.
+   จำนวนกล่อง/ลังจริงและค่า OEM Packing ยังไม่ยืนยัน จึงไม่สร้าง Quantity, Direct Cost หรือ Working SELL โดยเดา.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>10.2 B5 Cost Driver</th><th>Physical Qty</th><th>GEQ-005 Packing MH</th><th>Current Direct COST</th><th>Price Boundary / Missing Evidence</th></tr></thead>
+   <tbody>{p.physicalPackingDrivers.map(x=><tr key={x.id}>
+    <td><strong>{x.id}</strong><small>{x.name}</small></td>
+    <td><strong>TO VERIFY</strong><small>{x.scope}</small></td>
+    <td>{x.workloadStatus}<small>{x.missingWorkload.join(", ")}</small></td>
+    <td>{money(x.totalDirectCostTHB)}</td>
+    <td>{x.qtyStatus}<small>OEM/Part A included-credit and distinct physical package keys required</small></td>
+   </tr>)}</tbody></table></div>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>Validation</th><th>Status</th><th>Finding</th></tr></thead>
+   <tbody>{p.validation.map(x=><tr key={x.id}>
+    <td>{x.id}</td><td><strong>{x.state}</strong></td><td>{x.detail}</td>
+   </tr>)}</tbody></table></div>
+  <button type="button" className="p55-row-toggle" onClick={()=>setShowRoutes(v=>!v)}>
+   {showRoutes?"−":"＋"} Four MR Packaging / Cargo Handovers (no assumed crate quantities)
+  </button>
+  {showRoutes&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>MR / Supplier</th><th>OEM Origin → FAT → Yard</th><th>Packing Cost Gate</th></tr></thead>
+   <tbody>{p.packingStreams.map(x=><tr key={x.mr}>
+    <td>{x.mr}<small>{x.vendor}</small></td><td>{x.routing}</td>
+    <td>{x.status}<small>{x.existingCostOwner}</small></td></tr>)}</tbody>
+  </table></div>}
+  <button type="button" className="p55-row-toggle" onClick={()=>setShowSource(v=>!v)}>
+   {showSource?"−":"＋"} Source Requirements ({p.sourceClauseCount}; NOT additional priced items)
+  </button>
+  {showSource&&<div className="p55-table-wrap" style={{maxHeight:470,overflowY:"auto"}}><table className="p55-table p55-table--compact">
+   <thead><tr><th>Clause / Exact Source</th><th>Requirement</th><th>Counting / Ownership</th></tr></thead>
+   <tbody>{p.sourceClauses.map(x=><tr key={x.id}>
+    <td><strong>{x.id}</strong><small>{x.section}</small>
+     <small><a href={x.sourceUrl} target="_blank" rel="noreferrer">{x.sourceId}</a></small></td>
+    <td>{x.title}<small>{x.requirement}</small></td>
+    <td>{x.unitDriver}<small>{x.costBoundary}</small></td></tr>)}</tbody>
+  </table></div>}
+  <p className="p55-note"><strong>Known only:</strong> Section02 packing compliance and source route structure.
+   Actual count of distinct cartons/crates = NOT ESTABLISHED, B5 Working SELL = NOT ESTABLISHED,
+   current Direct COST = NOT ESTABLISHED. 4 MR ≠ 4 boxes, 16 clauses ≠ 16 charges.
+   OEM Part A original export packing, B5 incremental physical crate/repacking, B2 packing-list documentation,
+   B6 freight/customs and B13 physical consumables must not be billed twice.
+   ANNEX4 sample Shanghai/PO references are not accepted contract receiving details.</p>
+ </details>;
+}
