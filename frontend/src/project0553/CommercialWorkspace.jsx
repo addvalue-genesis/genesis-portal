@@ -16,11 +16,12 @@ import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaselin
 import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {LIFECYCLE_SPARES_0553} from "./data/lifecycleSpareScope0553";
 import {BC_WORKING_ROUTES_0553,validateBcRoutes0553} from "./data/bcWorkingModuleRoutes0553";
+import {BUDGET_BC_WORKFLOW_0553} from "./workstreamOwnership0553";
 import React,{useState} from "react";
 import {assessVendorEvidenceForBudget0553} from "./data/vendorExternalEvidence0553";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
 import { BID_0553_GATES, BID_0553_SOURCES } from "./bidReview";
-export function CommercialWorkspace0553({focusedLocation=null,initialMode="working"}){
+export function CommercialWorkspace0553({focusedLocation=null,initialMode="working",navigationTarget=null,navigationSequence=0}){
  const [mode,setMode]=useState(initialMode);
  const [recipient,setRecipient]=useState("INTERNAL");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
@@ -28,6 +29,22 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const rows=template.sheets;
  const baseline=getBaselineReview();
  const bcWorking=selectBcTurnkeyWorkingCost0553();
+ const bcGroupIdByWorkflow=new Map(BUDGET_BC_WORKFLOW_0553
+  .filter(x=>x.parent==="10.2").map(x=>[x.workflowNumber,x.moduleId]));
+ // The Project Module Navigator opens the EXISTING 10.2 disclosure
+ // and scrolls to the canonical B/C row/group; it never creates a second workbench.
+ React.useEffect(()=>{
+  if(!navigationTarget?.startsWith("bid.budget.working.bc"))return;
+  if(mode!=="working"){setMode("working");return;}
+  const parent=document.querySelector('[data-component-key="bid.budget.working.bc"]');
+  if(!parent)return;
+  parent.open=true;
+  const exact=[...document.querySelectorAll("[data-component-key]")]
+   .find(node=>node.getAttribute("data-component-key")===navigationTarget);
+  const target=exact||parent;
+  if(typeof target.scrollIntoView==="function")
+   target.scrollIntoView({block:"center",behavior:"smooth"});
+ },[navigationTarget,navigationSequence,mode]);
  
  // Working display defaults only. Never represent the 31.5 planning rate as a BOT quote.
  const DEFAULT_FX={displayCurrency:"THB",fxRate:"31.5",fxDate:"2026-10-10",fxSource:"INTERNAL PLANNING ASSUMPTION — UNVERIFIED"};
@@ -111,11 +128,11 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <summary><strong>10.2 — Part B/C Working Cost &amp; Spare Requirements</strong><small>bid.budget.working.bc · WBS / Services / Spares</small></summary>
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Customer Code / Workflow</th><th>Turnkey Direct Cost THB</th><th>WBS Working Sell Reference THB</th><th>Source / Execution / Gap</th></tr></thead><tbody>
-    {bcWorking.rows.map(item=><tr key={item.code}><td><strong>{item.code}</strong><small>{item.workflowNumber} · {item.moduleId}</small></td><td>{Number.isFinite(item.directCostTHB)?"THB "+item.directCostTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"NOT ESTABLISHED"}<small>{item.workingSellBasis||"No current sell evidence"}</small></td><td>{item.costState}<small>{item.requirement} · {item.sourceRevision}</small><small>Contract: {item.contractOwner} · Turnkey: {item.turnkeyEstimator} · Execution: {item.executionOwner}</small><small>Lifecycle activity source rows: {item.requirementCount}; unverified quantities/rates are not treated as zero</small></td></tr>)}
+    {bcWorking.rows.map(item=><tr key={item.code} data-component-key={item.moduleId}><td><strong>{item.code}</strong><small>{item.workflowNumber} · {item.moduleId}</small></td><td>{Number.isFinite(item.directCostTHB)?"THB "+item.directCostTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"NOT ESTABLISHED"}<small>{item.workingSellBasis||"No current sell evidence"}</small></td><td>{item.costState}<small>{item.requirement} · {item.sourceRevision}</small><small>Contract: {item.contractOwner} · Turnkey: {item.turnkeyEstimator} · Execution: {item.executionOwner}</small><small>Lifecycle activity source rows: {item.requirementCount}; unverified quantities/rates are not treated as zero</small></td></tr>)}
    </tbody></table></div>
    <p className="p55-note"><strong>10.2 Source Routing:</strong> {validateBcRoutes0553()?"16/16 customer B/C categories assigned uniquely":"MAPPING ERROR"}. Cost evidence and technical approval remain separate.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Workflow</th><th>Customer Categories</th><th>Working Owner / Source / Next Step</th></tr></thead><tbody>
-    {BC_WORKING_ROUTES_0553.map(r=><tr key={r.workflow}><td>{r.workflow}</td><td>{r.codes.join(", ")}<small>{r.name}</small></td><td>{r.owner}<small>{r.source.join(" + ")} · {r.basis} · {r.next}</small></td></tr>)}
+    {BC_WORKING_ROUTES_0553.map(r=><tr key={r.workflow} data-component-key={bcGroupIdByWorkflow.get(r.workflow)}><td>{r.workflow}</td><td>{r.codes.join(", ")}<small>{r.name}</small></td><td>{r.owner}<small>{r.source.join(" + ")} · {r.basis} · {r.next}</small></td></tr>)}
    </tbody></table></div>
    <p className="p55-note">Legacy lifecycle input contains {LIFECYCLE_SPARES_0553.rows.length} activity requirements. Customer B/C remapping is by activity (not legacy category label); current OEM spare rates and full turnkey costs are still missing.</p>
   </details>
