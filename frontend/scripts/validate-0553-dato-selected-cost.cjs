@@ -53,7 +53,9 @@ assert.equal(plug.quotedUnitPrice,null,"RS reference must not overwrite INNOVA N
 assert.equal(dato.extended,3076.68);
 assert.equal(dato.unitCost,3076.68,"MTO one Set unit cost must be entire selected two-component Set");
 assert.equal(dato.extended,dato.sourceQty*dato.unitCost,"No misleading unit-rate versus extended mismatch");
-assert.equal(dato.components.reduce((sum,x)=>sum+x.extended,0),dato.extended);
+// Financial amounts are asserted in integer satang: IEEE-754 may yield 3076.6800000000003.
+assert.equal(dato.components.reduce((sum,x)=>sum+Math.round(x.extended*100),0),
+ Math.round(dato.extended*100),"Selected component costs must equal DATO one-Set cost to the satang");
 assert(dato.decision.includes("superseded")&&dato.decision.includes("THB 1,176.68"),"Current decision must supersede temporary zero");
 assert(!dato.assumptions.some(x=>x.includes("1 provisional plug × THB 0")));
 const ledger=selectMR0001TagCostRows0553("ZWP20").find(x=>x.row===8);
