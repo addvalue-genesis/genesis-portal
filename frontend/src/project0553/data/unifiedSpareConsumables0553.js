@@ -7,7 +7,7 @@ const codes=Object.freeze(["B10","B13","C1","C2"]);
 const descriptions=Object.freeze({B10:"Erection, Precommissioning, Commissioning, Start-up Spare Parts",B13:"Supplier Recommendation for Consumables",C1:"Supplier Recommendation for Capital Spare Parts",C2:"Supplier Recommendation for 2 Years Operation Spare Parts"});
 const applicableFamily=description=>{
  const d=description.toLowerCase();
- if(/scada|poe|cisco|ethernet|rf |n-male|surge|radio/.test(d))return "MR0001";
+ if(/scada|poe|cisco|ethernet/.test(d))return "MR0001"; // Generic RF/connector/surge may be shared across MRs.
  if(/racon/.test(d))return "MR0004";
  if(/telephone|sounder|ex phone/.test(d))return "MR0003";
  return null; // Broad words such as gland/fuse are cross-system, not a verified SKU match.
