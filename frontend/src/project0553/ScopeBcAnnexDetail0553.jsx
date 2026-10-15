@@ -1,12 +1,15 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
+import {selectUnifiedSpareConsumables0553} from "./data/unifiedSpareConsumables0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
 export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
  const m=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const p=m.byCode[code];
+ const shared=selectUnifiedSpareConsumables0553();
+ const spareLines=shared.byCode[code]||[];
  const inWorking=mode==="working";
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
  if(!p)return <p role="alert">Unsupported customer scope code: {code}</p>;
@@ -22,6 +25,23 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
    <div><strong>Historical Rev08 Reference</strong><p>{thb(p.historicalReferenceTHB)}</p><small>Native USD source retained for audit · {p.historicalFxState}</small></div>
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
+  {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
+   <h4>Customer Schedule — ${shared.descriptions[code]} (Engineering Working Preview)</h4>
+   <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> ${shared.sourceTagRegister} · Genuine installed MTO tags appear in each row as candidate links, not as a fabricated approved spare Tag. OEM SKU, exact spare compatibility and minimum EXA-A8 scope are pending. No unverified unit rates are released.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Item</th><th>Tag No. / Linked MTO Tags</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
+    <tbody>{spareLines.map(x=><tr key={x.id}>
+     <td>{x.item}</td><td>{x.customerTagNo||"TO VERIFY"}<small>{x.relatedInstalledTags.length?"MTO candidate tags: "+x.relatedInstalledTags.join(", "):"No verified cross-reference yet"}</small><small>{x.relatedLocations.join(", ")}</small></td>
+     <td>{x.description}<small>{x.id}</small></td>
+     <td>{x.detailSpecification||"OEM model/part and rating required"}<small>{x.tagMappingState}</small></td>
+     <td>{x.material||"OEM confirmation required"}</td>
+     <td>{Number.isFinite(x.approvedRequiredQty)?x.approvedRequiredQty:"VERIFY"}<small>Rev08 benchmark quantity: {x.legacyQty} (non-posting)</small></td>
+     <td>{thb(x.approvedUnitTHB)}</td><td>{thb(x.workingSellTHB)}</td>
+     {(code==="C1"||code==="C2")&&<td>{x.leadTimeARO||"OEM confirmation required"}</td>}
+    </tr>)}</tbody>
+   </table></div>
+   <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
+  </div>}
   <h4>1. Historical Annex Price Lines — Original Rev08 / Not current Vendor Quote</h4>
   {p.historicalHasDetail?
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
