@@ -6,6 +6,7 @@ const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFraction
 export function B3EquationAudit0553({selectedCode="ALL"}){
  const proof=selectBcB3EquationExecution0553();
  const [showIrt,setShowIrt]=useState(false);
+ const [showVdrl,setShowVdrl]=useState(false);
  const [showEvents,setShowEvents]=useState(false);
  const isB3=selectedCode==="B3";
  if(selectedCode!=="ALL"&&!isB3)return null;
@@ -61,6 +62,17 @@ export function B3EquationAudit0553({selectedCode="ALL"}){
    <tbody>{proof.stageRequirementKeys.map(x=><tr key={x.id}>
     <td>{x.id}<small>{x.sourceRevision} / {x.section}</small></td>
     <td>{x.location}<small>{x.costOwner}</small></td><td>OPEN — actual event quantity and accepted test sheets not confirmed</td>
+   </tr>)}</tbody>
+  </table></div>}
+  <button className="p55-row-toggle" type="button" onClick={()=>setShowVdrl(v=>!v)}>
+   {showVdrl?"−":"＋"} Test Documents → B2/B3 VDRL Trace ({proof.testDocumentRows.length}; NON-ADDITIVE)
+  </button>
+  {showVdrl&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>VDRL MR / Document Number</th><th>Document Title / Status</th><th>Cost Ownership Boundary</th></tr></thead>
+   <tbody>{proof.testDocumentRows.map(x=><tr key={x.id}>
+    <td>{x.id} · {x.mr}<small>{x.projectDocumentNo}</small></td>
+    <td>{x.title}<small>{x.approvalClass||"SOURCE BLANK"} · {x.submissionTrigger}</small></td>
+    <td>Original test operation &amp; technical results: B3/OEM; VDRL transmittal, numbering, revision control: B2. Do not count a second test event.</td>
    </tr>)}</tbody>
   </table></div>}
   <button className="p55-row-toggle" type="button" onClick={()=>setShowIrt(v=>!v)}>
