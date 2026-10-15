@@ -70,11 +70,12 @@ assert.equal(candidate.sourceLines.length,2);
 assert.equal(Math.round(candidate.sourceLines.reduce((sum,x)=>sum+x.historicalSellTHB,0)*100)/100,candidate.amountTHB);
 assert.equal(Math.round((candidate.amountTHB+candidate.nonAdditiveStorageTHB)*100)/100,candidate.historicalGrossB5THB);
 assert.equal(candidate.validCurrentDirectCost,false);
-assert.equal(candidate.approvedWorkingSell,false);
+assert.equal(candidate.approvedWorkingSell,false); // Source reference itself remains historical; approved 10.2 decision is distinct.
+assert.equal(b.byCode.B5.b5WorkingSellDecision.amountTHB,311184);
 assert.equal(candidate.postToPricing,false);
 assert.equal(b.byCode.B5.directCostTHB,null);
 assert.equal(b.byCode.B5.commercialSellTHB,null);
-assert.equal(b.byCode.B5.workingSellTHB,null);
+assert.equal(b.byCode.B5.workingSellTHB,311184);
 for(const [code,sell] of Object.entries({B1:510000,B2:580000,B3:2109600,B8:30000,B9:574560}))assert.equal(b.byCode[code].workingSellTHB,sell);
 const primary=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(primary.includes('bcTab==="B5"&&bcWorking.byCode.B5.b5PriceReference'));
@@ -86,7 +87,7 @@ assert(primary.includes("CURRENT DIRECT COST NOT ESTABLISHED")&&primary.includes
 assert(!primary.includes("workingSellTHB:p.amountTHB"));
 assert.equal(b.byCode.B5.workingSellTHB,null);
 assert.equal(b.byCode.B3.workingSellTHB,2109600);
-assert.equal(b.knownWorkingSellTHB,3804160);
+assert.equal(b.knownWorkingSellTHB,4422928);
 assert.equal(derivePartBcWorkingWbs0553().subtotalTHB,3804160);
 assert.equal(b.knownDirectCostTHB,null);
 assert.equal(b.releaseAllowed,false);
