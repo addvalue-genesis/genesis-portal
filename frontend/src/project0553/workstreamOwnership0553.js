@@ -14,19 +14,26 @@ export const WORKSTREAM_OWNERSHIP_0553=Object.freeze([
  {step:"10",route:"budget",title:"Working Cost to Customer Submission",requires:["04","05.3","06","07","08","09"],source:["SimpleBom0553.jsx","EstimateToBidMapping0553.jsx","ScopeSheetsDetail0553.jsx","BudgetaryWorkbookPreview0553.jsx"],output:"working cost → scope → customer workbook"}
 ]);
 // Workflow numbers describe engineering steps. Context and filters are support controls, not gates.
+// Numeric navigation hierarchy is distinct from engineering prerequisite sequence.
 export const BUDGET_BOM_WORKFLOW_0553=Object.freeze([
- {workflowNumber:"10.1",moduleId:"bid.budget.bom.system-location-mto",name:"Engineering BOM Working Hub",role:"WORKING_HUB",requires:["04","05.3","07"]},
- {workflowNumber:"10.1.S1",moduleId:"bid.budget.bom",name:"BOM Selection Context",role:"SUPPORT_CONTROL",requires:[]},
- {workflowNumber:"10.1.S2",moduleId:"bid.budget.bom.filters",name:"MR / Site / Vendor Filter",role:"SUPPORT_CONTROL",requires:[]}
+ {workflowNumber:"10.1",moduleId:"bid.budget.bom",name:"Engineering BOM Working Preview",role:"PARENT",parent:"10"},
+ {workflowNumber:"10.1.1",moduleId:"bid.budget.bom.working-hub",name:"Engineering BOM Working Hub",role:"GROUP",parent:"10.1"},
+ {workflowNumber:"10.1.1.1",moduleId:"bid.budget.bom.context",name:"BOM Selection Context",role:"SUPPORT_CONTROL",parent:"10.1.1"},
+ {workflowNumber:"10.1.1.2",moduleId:"bid.budget.bom.filters",name:"MR / Site / Vendor Filter",role:"SUPPORT_CONTROL",parent:"10.1.1"},
+ {workflowNumber:"10.1.1.3",moduleId:"bid.budget.bom.system-location-mto",name:"System x Location x MTO",role:"PRIMARY_WORKBENCH",parent:"10.1.1",requires:["04","05.3","07"]}
 ]);
 export const BOM_ENGINEERING_SEQUENCE_0553=Object.freeze([
- {number:"10.1.1",name:"Requirement / MR source check",requires:["04"]},
- {number:"10.1.2",name:"Physical function / interface verification",requires:["10.1.1","05.3"]},
- {number:"10.1.3",name:"MTO and engineering quantity verification",requires:["10.1.2"]},
- {number:"10.1.4",name:"OEM SKU / vendor evidence matching",requires:["10.1.3","07"]},
- {number:"10.1.5",name:"Single-owner cost allocation",requires:["10.1.4"]},
- {number:"10.1.6",name:"Cost and engineering reconciliation",requires:["10.1.5","08","09"]}
+ {number:"10.1.2.1",name:"Requirement / MR source check",requires:["04"]},
+ {number:"10.1.2.2",name:"Physical function / interface verification",requires:["10.1.2.1","05.3"]},
+ {number:"10.1.2.3",name:"MTO and engineering quantity verification",requires:["10.1.2.2"]},
+ {number:"10.1.2.4",name:"OEM SKU / vendor evidence matching",requires:["10.1.2.3","07"]},
+ {number:"10.1.2.5",name:"Single-owner cost allocation",requires:["10.1.2.4"]},
+ {number:"10.1.2.6",name:"Cost and engineering reconciliation",requires:["10.1.2.5","08","09"]}
 ]);
+export function validateBomNumbering0553(){
+ const all=BUDGET_BOM_WORKFLOW_0553.map(x=>x.workflowNumber).concat(BOM_ENGINEERING_SEQUENCE_0553.map(x=>x.number));
+ return new Set(all).size===all.length&&BUDGET_BOM_WORKFLOW_0553.every(x=>!x.parent||x.parent==="10"||all.includes(x.parent));
+}
 export const CUSTOMER_COST_OWNERSHIP_0553=Object.freeze({
  A1:"mr0001TagCostLedger0553.js → workingBomAggregation0553.js",
  A2:"mr0002WorkingBom0553.js → workingBomAggregation0553.js",
