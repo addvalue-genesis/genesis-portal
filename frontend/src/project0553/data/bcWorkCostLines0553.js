@@ -8,7 +8,8 @@ import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkin
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
 
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
-const ownerCodes=Object.freeze(["B1","B2","B3","B6","B9","B10","B11"]);
+const primaryCodes=Object.freeze(["B1","B2","B3","B6","B9","B10","B11"]);
+const ownerCodes=Object.freeze(["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"]);
 const sourceUrl=PART_BC_WBS_SOURCE_0553.url;
 // 08_B1_ENGINEERING: [Scope, task, role MH: Lead/Senior/Engineer/Drafter/DC,
 // historical rate-card proxy]. Source controls 964 MH and THB180,892.75;
@@ -225,7 +226,7 @@ export function selectBcWorkCostLines0553(){
   name:"10.2 — B/C Traceable Cost Lines / First Principles / WBS / Rates",
   sourceModuleId:"bid.budget.working.bc.execution-audit",
   sourceUrl,sourceRevision:PART_BC_WBS_SOURCE_0553.revision,
-  activeCodes:ownerCodes,rows:all,byCode,requirementLinks:mappedClauses,
+  activeCodes:ownerCodes,primaryDetailedCodes:primaryCodes,rows:all,byCode,requirementLinks:mappedClauses,
   requiredAuditCount:mappedClauses.length,
   workingSellByCode,
   totalCostTHB:null,totalSellingPriceTHB:null,
