@@ -51,6 +51,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   parent.open=true;
   const exact=[...document.querySelectorAll("[data-component-key]")]
    .find(node=>node.getAttribute("data-component-key")===navigationTarget);
+  if(navigationTarget==="bid.budget.working.bc.execution-audit"&&exact?.tagName==="DETAILS")exact.open=true;
   const target=exact||parent;
   if(typeof target.scrollIntoView==="function")
    target.scrollIntoView({block:"center",behavior:"smooth"});
