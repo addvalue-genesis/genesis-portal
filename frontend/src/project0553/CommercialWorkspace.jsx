@@ -83,11 +83,6 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
   </div>
   <p className="p55-note"><strong>Current display:</strong> {mode.toUpperCase()} · {recipient}. {mode==="working"?"Editable commercial derivation is pending source reconciliation.":mode==="budgetary"?"Frozen snapshot required; do not overwrite prior submissions.":"Customer release remains HOLD until written authorization and all gates pass."}</p>
-  {(mode==="working"||mode==="budgetary")&&<details className="p553-budget-phase" open data-component-key="bid.budget.scope">
-   <summary><strong>Scope of Supply — Customer Workbook Sub-modules</strong><small>bid.budget.scope · B10 / B11 / B13 / C1 / C2 · A/B/C</small></summary>
-   <p className="p55-note"><strong>Internal engineering reference only:</strong> linked working costs are not an approved customer quotation. Original workbook codes and internal cost categories remain distinct; missing vendor prices are not zero.</p>
-   <ScopeSheetsDetail0553 fx={fx}/>
-  </details>}
   {mode==="working"&&<>
   <section className="p55-panel">
    <div className="p55-eyebrow">CURRENCY VIEW / ORIGINAL CURRENCY RETAINED</div>
@@ -110,6 +105,12 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <details className="p553-budget-phase"><summary><strong>Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
    <EstimateToBidMapping0553/>
   </details>
+  {/* Downstream Scope summary: after engineering BOM and estimate-to-bid mapping; read-only. */}
+   {(mode==="working"||mode==="budgetary")&&<details className="p553-budget-phase" open data-component-key="bid.budget.scope">
+   <summary><strong>Scope of Supply — Customer Workbook Sub-modules</strong><small>bid.budget.scope · B10 / B11 / B13 / C1 / C2 · A/B/C</small></summary>
+   <p className="p55-note"><strong>Internal engineering reference only:</strong> linked working costs are not an approved customer quotation. Original workbook codes and internal cost categories remain distinct; missing vendor prices are not zero.</p>
+   <ScopeSheetsDetail0553 fx={fx}/>
+  </details>}
   <details className="p553-budget-phase"><summary><strong>Cost & Commercial Pricing</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
    <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
   <section className="p55-panel">
