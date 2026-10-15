@@ -80,7 +80,8 @@
     "validate:0553-required-bom-price-bridge": "node scripts/validate-0553-required-bom-price-bridge.cjs",
     "validate:0553-bc-turnkey-contract": "node scripts/validate-0553-bc-turnkey-contract.cjs",
     "validate:0553-dato-selected-cost": "node scripts/validate-0553-dato-selected-cost.cjs",
-    "validate:0553-rev02-cost-reconciliation": "node scripts/validate-0553-rev02-cost-reconciliation.cjs"
+    "validate:0553-rev02-cost-reconciliation": "node scripts/validate-0553-rev02-cost-reconciliation.cjs",
+    "preflight:0553-build": "node scripts/preflight-0553-build.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
