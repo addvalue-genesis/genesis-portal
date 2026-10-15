@@ -68,7 +68,8 @@ export function ScopeSheetsDetail0553({fx=null,view="full"}){
  const a5Unpriced=a5.unresolved.length+a5.unknownScadaAccessories.length;
  const a5LedgerReconciled=Number.isFinite(scadaLedgerCostTHB)&&
   Number.isFinite(workingScadaEquipment)&&Number.isFinite(a5.a5PriceTHB)&&
-  Math.abs(round(workingScadaEquipment-scadaLedgerCostTHB))<=0.01 && a5.a5PriceTHB<=scadaLedgerCostTHB;
+  Math.abs(round(workingScadaEquipment+a5.a5PriceTHB-scadaLedgerCostTHB))<=0.01 &&
+  Math.abs(round(a5.a1CostToReclassifyTHB-a5.a5PriceTHB))<=0.01 && a5.a5PriceTHB<=scadaLedgerCostTHB;
  const phoneRows=SITE_SYSTEM_COST_RECONCILIATION_0553.rows.filter(r=>r.mr==="MR-0003"&&["ZWP20","ZWP21","ZWP22"].includes(r.site));
  const phoneRateLines=phoneRows.flatMap(r=>r.evidence||[]).filter(x=>["PHONE-1","SOUNDER-1","JB-1"].includes(x.line)&&x.currency==="THB"&&Number.isFinite(x.extended));
  const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
@@ -189,7 +190,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full"}){
     </tr>)}
     </tbody></table></div>
    <p className="p55-note"><strong>Source Ledger reconciliation:</strong>
-    {a5LedgerReconciled?" PASS — A1 displayed equals original MR0001 working ledger THB equivalent; A5 is INCLUDED (no additional booking)":
+    {a5LedgerReconciled?" PASS — A1 displayed is gross (A5 included); A1 net of attributed bulk + A5 memo equals original MR0001 ledger. A5 is NON-ADDITIVE":
       !fxValid?" FX required to verify displayed A1+A5 in THB":
       " NOT RECONCILED — do not release A5 or Grand Total"}
     . Missing physical functions/rates: {a5Unpriced} observations; standalone SCADA CAT6A mirrors and DATO already-owned price are not added.
