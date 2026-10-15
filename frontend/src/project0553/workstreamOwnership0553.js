@@ -34,16 +34,25 @@ export function validateBomNumbering0553(){
  const all=BUDGET_BOM_WORKFLOW_0553.map(x=>x.workflowNumber).concat(BOM_ENGINEERING_SEQUENCE_0553.map(x=>x.number));
  return new Set(all).size===all.length&&BUDGET_BOM_WORKFLOW_0553.every(x=>!x.parent||x.parent==="10"||all.includes(x.parent));
 }
+// 10.2 is the single customer-coded B/C working requirement and cost-contract owner.
+// Routes describe prerequisite evidence; they are NOT independent cost-ledger writers.
+export const BUDGET_BC_WORKFLOW_0553=Object.freeze([
+ {workflowNumber:"10.2",moduleId:"bid.budget.working.bc",role:"WORKING_COST_CONTRACT",parent:"10",implementation:"data/bcTurnkeyWorkingCost0553.js",requires:["04","05.3","06","07","08"]},
+ {workflowNumber:"10.2.1",moduleId:"bid.budget.working.bc.services",role:"WORKING_SOURCE_GROUP",parent:"10.2",customerCodes:["B1","B2","B3","B8","B9"],requires:["06","07"]},
+ {workflowNumber:"10.2.2",moduleId:"bid.budget.working.bc.execution",role:"WORKING_SOURCE_GROUP",parent:"10.2",customerCodes:["B4","B5","B6","B7","B14"],requires:["04","06","07"]},
+ {workflowNumber:"10.2.3",moduleId:"bid.budget.working.bc.startup",role:"WORKING_SOURCE_GROUP",parent:"10.2",customerCodes:["B10","B11","B12","B13"],requires:["05.3","07"]},
+ {workflowNumber:"10.2.4",moduleId:"bid.budget.working.bc.options",role:"WORKING_SOURCE_GROUP",parent:"10.2",customerCodes:["C1","C2"],requires:["05.3","07"]}
+]);
 export const CUSTOMER_COST_OWNERSHIP_0553=Object.freeze({
  A1:"mr0001TagCostLedger0553.js → workingBomAggregation0553.js",
  A2:"mr0002WorkingBom0553.js → workingBomAggregation0553.js",
  A3:"bomReadModel0553.js → workingBomAggregation0553.js",
  A4:"mr0004WorkingBom0553.js → workingBomAggregation0553.js",
  A5:"a5BulkAttribution0553.js (memo included in A1; other MR bulk incomplete)",
- B1_B3_B8_B9:"partBCWorkingWbs0553.js (WORKING SELL only; actual turnkey COST model pending)",
- B4_B7_B12_B14:"Customer scope + execution WBS / vendor-contract-logistics evidence (full cost pending)",
- B10_B11_B13:"lifecycleSpareScope0553.js + installed BOM + OEM schedule (rates pending; Rev08 not current)",
- C1_C2:"lifecycleSpareScope0553.js + installed BOM + OEM 2-year/capital spare schedule (rates pending)"
+ B1_B3_B8_B9:"bcTurnkeyWorkingCost0553.js ← partBCWorkingWbs0553.js (Working SELL only; turnkey COST still pending)",
+ B4_B7_B12_B14:"bcTurnkeyWorkingCost0553.js ← customer scope + execution WBS / logistics / insurance evidence (cost pending)",
+ B10_B11_B13:"bcTurnkeyWorkingCost0553.js ← lifecycleSpareScope0553.js activity mapping + verified equipment BOM / OEM schedule (rates pending)",
+ C1_C2:"bcTurnkeyWorkingCost0553.js ← activity-mapped capital spares + separate C2 two-year OEM schedule (rates pending)"
 });
 export function validateWorkstreamOrder0553(){
  const seen=new Set();
