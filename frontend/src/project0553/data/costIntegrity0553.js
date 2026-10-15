@@ -2,6 +2,9 @@
 import { SUPPLIER_QUOTE_LINES_0553 } from "./supplierQuoteLines";
 import { BID_COST_SPINE_0553 } from "./bidCostSpine";
 import { MR0001_ENGINEERING_REQUIRED_BOM } from "./mr0001RequiredBomDerivation";
+import { WORKING_BOM_BY_LOCATION_0553 } from "./workingBomByLocation";
+import { summarizeMR0001TagCost0553 } from "./mr0001TagCostLedger0553";
+import { WORKSTREAM_OWNERSHIP_0553 } from "../workstreamOwnership0553";
 
 export const COST_PIPELINE_STEPS_0553 = Object.freeze([
  {step:1,name:"Executive / RFQ ownership",evidence:"Current RFQ, bidder responsibility, scope A/B/C",state:"REVIEW",reason:"Full signed scope responsibility not proved by the cost model"},
@@ -13,6 +16,18 @@ export const COST_PIPELINE_STEPS_0553 = Object.freeze([
  {step:7,name:"Vendor technical & cost reconciliation",evidence:"All quotes classified by overlap, alternative, current validity and commercial terms",state:"INCOMPLETE",reason:"Source quotes registered but not allocated/approved across MRs"},
  {step:8,name:"Risk, uncertainty & change",evidence:"Assumptions, parametric ranges, risk allowance and source/revision impacts",state:"INCOMPLETE",reason:"No complete evidence-backed risk-adjusted project estimate"}
 ]);
+// Map the established 01–08 source/method gates to their existing code owners.
+const STAGE_TO_WORKSTREAM_0553=Object.freeze({"1":"01","2":"02","3":"03","4":"04","5":"05.3","6":"06","7":"07","8":"08"});
+const currentMr0001Sites=WORKING_BOM_BY_LOCATION_0553.locations.map(x=>summarizeMR0001TagCost0553(x.site));
+const currentWorkingEvidence=Object.freeze({
+ basis:"CURRENT_MR0001_TAG_LEDGER__BUDGETARY_NOT_RELEASED",
+ siteCount:currentMr0001Sites.length,
+ sourceRows:currentMr0001Sites.reduce((n,x)=>n+x.totalRows,0),
+ allocatedWorkingRows:currentMr0001Sites.reduce((n,x)=>n+x.costedRows,0),
+ originalUSD:Math.round(currentMr0001Sites.reduce((n,x)=>n+x.subtotals.USD,0)*100)/100,
+ originalTHB:Math.round(currentMr0001Sites.reduce((n,x)=>n+x.subtotals.THB,0)*100)/100,
+ physicalSkuApproved:false,completeProjectCost:false
+});
 const classification = {
  "VST-0048-RE1":{type:"WORKING_SCENARIO",note:"Cisco LAN only; carried in cost spine; expired quotation"},
  "NG-260916":{type:"UNALLOCATED_VENDOR_QUOTE",note:"SCADA radio proposal; do not add before MTO alignment, options and OEM review"},
@@ -38,7 +53,7 @@ export const COST_INTEGRITY_0553 = Object.freeze((()=>{
  const reconciliationPassed=ciscoVarianceTHB===0;
  const integrityIssues=[...quoteDataIssues.map(id=>"Missing quote amount/currency: "+id),...missingCostSourceIds.map(id=>"Missing cost source: "+id),...(!reconciliationPassed?["Cisco source subtotal differs from working BOM cost; investigate quote-line allocation and scope before use"]:[])];
  return {
-  steps:COST_PIPELINE_STEPS_0553,quotes:rows,sourceQuoteCount:rows.length,
+  steps:COST_PIPELINE_STEPS_0553.map(s=>{const workstream=WORKSTREAM_OWNERSHIP_0553.find(w=>w.step===STAGE_TO_WORKSTREAM_0553[s.step]);return {...s,workflow:workstream?.step||null,sourceModules:workstream?.source||[]};}),currentWorkingEvidence,quotes:rows,sourceQuoteCount:rows.length,
   reconciliationPassed,ciscoQuoteAmount,ciscoVarianceTHB,integrityIssues,
   includedQuoteIds:[...covered],unallocatedQuoteCount:rows.length-covered.size,
   knownCiscoSubtotalTHB:reported,knownSubtotalScope:"MR0001 / Cisco five LAN Set working scenario ONLY",
