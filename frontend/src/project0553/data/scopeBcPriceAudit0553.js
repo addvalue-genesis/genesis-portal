@@ -35,7 +35,10 @@ export function selectScopeBcPriceAudit0553({thbPerUsd=null}={}){
   const summaryUSD=historic[2];
   const detailUSD=historicalLines.length?
    historicalLines.reduce((sum,x)=>sum+x.historicalExtendedUSD,0):null;
-  const varianceUSD=detailUSD===null?null:round(detailUSD-summaryUSD);
+  const varianceUSD=detailUSD===null?null:Math.round((detailUSD-summaryUSD)*10000)/10000;
+  const displayedLineTHBSum=fx===null||!historicalLines.length?null:
+   round(historicalLines.reduce((sum,x)=>sum+x.historicalExtendedTHB,0));
+  const displayedVsSummaryDeltaTHB=displayedLineTHBSum===null?null:round(displayedLineTHBSum-money(summaryUSD,fx));
   const reconciled=varianceUSD===null?false:Math.abs(detailUSD-summaryUSD)<=0.01;
   if(varianceUSD!==null&&!reconciled)
    throw Error("Historical Rev08 worksheet line reconciliation failed at "+code);
@@ -49,6 +52,8 @@ export function selectScopeBcPriceAudit0553({thbPerUsd=null}={}){
    priceStatus:current.priceStatus,optional:isOptional,baseScope:!isOptional,
    historicalReferenceUSD:summaryUSD,historicalReferenceTHB:money(summaryUSD,fx),
    historicalDetailLines:historicalLines,historicalDetailUSD:detailUSD,
+   historicalDisplayedLineTHBSum:displayedLineTHBSum,
+   historicalDisplayedVsSummaryDeltaTHB:displayedVsSummaryDeltaTHB,
    historicalReconciliationDeltaUSD:varianceUSD,
    historicalReconciled:reconciled,historicalHasDetail:historicalLines.length>0,
    historicalSource:"4-Scope of Supply.xlsx · Rev08 · USD",
