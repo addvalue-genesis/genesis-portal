@@ -18,12 +18,15 @@ const {selectScopePartBcWorking0553}=from("data/scopePartBcReadModel0553.js");
 const {derivePartBcWorkingWbs0553}=from("data/partBCWorkingWbs0553.js");
 const {BC_CUSTOMER_CODES_0553,validateBcRoutes0553}=from("data/bcWorkingModuleRoutes0553.js");
 const {LIFECYCLE_SPARES_0553}=from("data/lifecycleSpareScope0553.js");
+const {BUDGET_BC_WORKFLOW_0553}=from("workstreamOwnership0553.js");
 
 const originalWbs=JSON.stringify(derivePartBcWorkingWbs0553());
 const originalLifecycle=JSON.stringify(LIFECYCLE_SPARES_0553.rows);
 assert(validateBcRoutes0553(),"Customer B/C mapping must not duplicate or omit codes");
 const m=selectBcTurnkeyWorkingCost0553(),scope=selectScopePartBcWorking0553();
 assert.equal(m.workflowNumber,"10.2");
+assert.equal(new Set(BUDGET_BC_WORKFLOW_0553.map(r=>r.workflowNumber)).size,BUDGET_BC_WORKFLOW_0553.length,"10.2 workflow numbers must be unique");
+assert.equal(BUDGET_BC_WORKFLOW_0553.filter(r=>r.parent==="10.2").length,4,"10.2 must own four source workstreams");
 assert.equal(m.rows.length,16);
 assert.equal(new Set(m.rows.map(r=>r.code)).size,16);
 assert.deepEqual(m.rows.map(r=>r.code),BC_CUSTOMER_CODES_0553);
@@ -59,6 +62,9 @@ assert(m.byCode.B6.executionOwner==="SAMTEL","Preserve original execution owner"
 assert.equal(m.byCode.B6.directCostTHB,null,"SAMTEL execution cost belongs in turnkey estimate but is not verified");
 assert.equal(JSON.stringify(derivePartBcWorkingWbs0553()),originalWbs,"WBS immutable");
 assert.equal(JSON.stringify(LIFECYCLE_SPARES_0553.rows),originalLifecycle,"Lifecycle evidence immutable");
+const scopeView=fs.readFileSync(path.join(root,"project0553/ScopeSheetsDetail0553.jsx"),"utf8");
+assert(!scopeView.includes("const shownAmount=hasChild?childAmount:amount"),"Scope must not use Rev08 as current B/C cost");
+assert(scopeView.includes("CURRENT TURNKEY COST NOT ESTABLISHED"),"Scope must distinguish active cost from historical reference");
 const workbook=fs.readFileSync(path.join(root,"project0553/BudgetaryWorkbookPreview0553.jsx"),"utf8");
 assert(workbook.includes("const bcHistorical=showHistorical&&"),"Historical B/C cannot fill main price by default");
 assert(!workbook.includes("partAKnownTotal+partBKnownTotal"),"Cost and sell must not be added in customer Row 38");
