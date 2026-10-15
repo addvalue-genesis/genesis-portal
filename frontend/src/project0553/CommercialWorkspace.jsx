@@ -13,7 +13,7 @@ import { SimpleBom0553 } from "./SimpleBom0553";
 import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
-import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
+import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {LIFECYCLE_SPARES_0553} from "./data/lifecycleSpareScope0553";
 import {BC_WORKING_ROUTES_0553,validateBcRoutes0553} from "./data/bcWorkingModuleRoutes0553";
 import React,{useState} from "react";
@@ -27,7 +27,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const toggle=k=>setExpanded(a=>{const n=new Set(a);n.has(k)?n.delete(k):n.add(k);return n;});
  const rows=template.sheets;
  const baseline=getBaselineReview();
- const bcWorking=selectScopePartBcWorking0553();
+ const bcWorking=selectBcTurnkeyWorkingCost0553();
  
  // Working display defaults only. Never represent the 31.5 planning rate as a BOT quote.
  const DEFAULT_FX={displayCurrency:"THB",fxRate:"31.5",fxDate:"2026-10-10",fxSource:"INTERNAL PLANNING ASSUMPTION — UNVERIFIED"};
@@ -110,14 +110,14 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <details className="p553-budget-phase" data-component-key="bid.budget.working.bc">
    <summary><strong>10.2 — Part B/C Working Cost &amp; Spare Requirements</strong><small>bid.budget.working.bc · WBS / Services / Spares</small></summary>
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
-   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Customer Code</th><th>Working Reference THB</th><th>Cost Evidence Status</th></tr></thead><tbody>
-    {Object.values(bcWorking.lines).map(item=><tr key={item.code}><td>{item.code}</td><td>{Number.isFinite(item.amountTHB)?"THB "+item.amountTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{item.priceType} · {item.priceStatus}<small>{item.source} · Execution owner: {item.owner}</small></td></tr>)}
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Customer Code / Workflow</th><th>Turnkey Direct Cost THB</th><th>WBS Working Sell Reference THB</th><th>Source / Execution / Gap</th></tr></thead><tbody>
+    {bcWorking.rows.map(item=><tr key={item.code}><td><strong>{item.code}</strong><small>{item.workflowNumber} · {item.moduleId}</small></td><td>{Number.isFinite(item.directCostTHB)?"THB "+item.directCostTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"NOT ESTABLISHED"}<small>{item.workingSellBasis||"No current sell evidence"}</small></td><td>{item.costState}<small>{item.requirement} · {item.sourceRevision}</small><small>Contract: {item.contractOwner} · Turnkey: {item.turnkeyEstimator} · Execution: {item.executionOwner}</small><small>Lifecycle activity source rows: {item.requirementCount}; unverified quantities/rates are not treated as zero</small></td></tr>)}
    </tbody></table></div>
    <p className="p55-note"><strong>10.2 Source Routing:</strong> {validateBcRoutes0553()?"16/16 customer B/C categories assigned uniquely":"MAPPING ERROR"}. Cost evidence and technical approval remain separate.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Workflow</th><th>Customer Categories</th><th>Working Owner / Source / Next Step</th></tr></thead><tbody>
     {BC_WORKING_ROUTES_0553.map(r=><tr key={r.workflow}><td>{r.workflow}</td><td>{r.codes.join(", ")}<small>{r.name}</small></td><td>{r.owner}<small>{r.source.join(" + ")} · {r.basis} · {r.next}</small></td></tr>)}
    </tbody></table></div>
-   <p className="p55-note">Lifecycle spare requirement register: {LIFECYCLE_SPARES_0553.rows.length} source rows. Historical B/C category codes require customer classification remapping before posting.</p>
+   <p className="p55-note">Legacy lifecycle input contains {LIFECYCLE_SPARES_0553.rows.length} activity requirements. Customer B/C remapping is by activity (not legacy category label); current OEM spare rates and full turnkey costs are still missing.</p>
   </details>
   <details className="p553-budget-phase"><summary><strong>10.3 — Cost & Commercial Pricing Reference</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
    <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
