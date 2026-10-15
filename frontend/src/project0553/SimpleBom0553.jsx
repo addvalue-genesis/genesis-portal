@@ -200,14 +200,14 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
   <ScadaPhysicalCompleteness0553 site={site} fx={fx}/>
   <div className="p55-panel" style={{padding:12,margin:"10px 0",border:"1px solid #b8ccd9"}}>
-   <strong>10.1 · Context (support control)</strong>
+   <strong>10.1.1.1 — Context (support control)</strong>
    <div style={{display:"flex",flexWrap:"wrap",gap:14,alignItems:"center",marginTop:8}}>
     <span>System <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")}/></span>
     <span>Location <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+(site==="ALL"?"all-locations":site.toLowerCase())}/></span>
    </div>
    <p className="p55-note" style={{marginTop:7}}>System / Location context above; the whole table below carries its own collapsible Module ID and Copy control.</p>
   </div>
-  <SmartFilterBar moduleKey="bid.budget.bom.filters" title="10.1 · Filters (support control) — System / Site / Vendor"
+  <SmartFilterBar moduleKey="bid.budget.bom.filters" title="10.1.1.2 — Filters (support control) — System / Site / Vendor"
    total={system==="MR-0001"?sourceCount:BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system).reduce((n,r)=>n+(r.detailRows?.length||r.evidence?.length||0),0)} shown={system==="MR-0001"?displayedCount:BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system&&(site==="ALL"||r.site===site)).reduce((n,r)=>n+(r.detailRows?.length||r.evidence?.length||0),0)} onReset={()=>{setSystem("MR-0001");changeSite("ALL");setVendor("ALL");}}
    controls={[
     {key:"system",label:"System",type:"select",value:system,onChange:setSystem,options:[
@@ -220,7 +220,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     ...(system==="MR-0001"?[{key:"vendor",label:"Vendor / Company",type:"select",value:vendor,onChange:setVendor,
      options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}]:[])
    ]}/>
-  <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"10.1 — Engineering BOM Working Hub — "+system+" / "+(site==="ALL"?"All Locations":site)} description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification. Context and Filters support this work; they are not approval gates." defaultOpen>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"10.1.1.3 — System × Location × MTO — "+system+" / "+(site==="ALL"?"All Locations":site)} description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification. Context and Filters support this work; they are not approval gates." defaultOpen>
   {["MR-0002","MR-0003","MR-0004"].includes(system)?<UnifiedMrLocationTable0553 mr={system} site={site} fx={fx}/>:<>
   <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
   {system==="MR-0001"&&<>
