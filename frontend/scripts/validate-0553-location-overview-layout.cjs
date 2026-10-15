@@ -39,7 +39,16 @@ assert(src.includes('(site==="ALL"?"All Locations":site)'),
 assert(src.includes('description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification.'),
  "Engineering gate description must remain attached to the master table");
 assert(src.indexOf('moduleKey="bid.budget.bom.system-location-mto"')<src.indexOf('p553-location-overview" style='),"Master module must wrap, not merely precede, the overview table");
-assert(src.includes("</ControlledModuleSection0553>\n </section>;"),"Master BOM module should contain the full system-dependent table");
+// The independent 10.1.2 Engineering Verification process follows the closed
+// 10.1.1.3 master module; the source-level closing tag is no longer immediately
+// adjacent to </section>. Assert the real boundaries and their UI ownership.
+const masterStart=src.indexOf(masterTag);
+const tableStart=src.indexOf('p553-location-overview" style=',masterStart);
+const masterEnd=src.indexOf('  </ControlledModuleSection0553>\n  <div className="p55-panel" data-component-key="bid.budget.bom.engineering-verification">',tableStart);
+assert(masterStart>=0&&tableStart>masterStart&&masterEnd>tableStart,
+ "Master 10.1.1.3 must wrap the complete table, then close before the separate 10.1.2 process");
+assert(src.includes('<strong>10.1.2 — Engineering Verification Process</strong>'),
+ "10.1.2 verification process must remain independently visible");
 assert(!src.includes('.engineering-detail"}'),"Do not misattribute the master module ID to a ZWP child detail");
 assert(detail.includes("<LocationBomDetail0553 site={g.site} fx={fx}/>"),"Canonical per-TAG cost/engineering drill-down missing from Cost Allocation");
 assert(!detail.includes("Engineering MTO / Function / Price Drill-down"),"Duplicate hidden TAG drill-down should not be reintroduced");
