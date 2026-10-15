@@ -27,19 +27,20 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
   {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
    <h4>Customer Schedule — {shared.descriptions[code]} (Engineering Working Preview)</h4>
-   <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> ${shared.sourceTagRegister} · Genuine installed MTO tags appear in each row as candidate links, not as a fabricated approved spare Tag. OEM SKU, exact spare compatibility and minimum EXA-A8 scope are pending. No unverified unit rates are released.</p>
+   <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> ${shared.sourceTagRegister} · Existing MTO tags are used where matched to an equipment family; shared spares are grouped COMMON. Budget quantity and THB sell rates come from Rev08 at FX 31.5. OEM compatibility and minimum EXA-A8 coverage remain open.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Item</th><th>Tag No. / Linked MTO Tags</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
     <tbody>{spareLines.map(x=><tr key={x.id}>
-     <td>{x.item}</td><td>{x.customerTagNo||"TO VERIFY"}<small>{x.relatedInstalledTags.length?"MTO candidate tags: "+x.relatedInstalledTags.join(", "):"No verified cross-reference yet"}</small><small>{x.relatedLocations.join(", ")}</small></td>
+     <td>{x.item}</td><td>{x.customerTagNo}<small>{x.relatedInstalledTags.length?"MTO candidate tags: "+x.relatedInstalledTags.join(", "):"No verified cross-reference yet"}</small><small>{x.relatedLocations.join(", ")}</small></td>
      <td>{x.description}<small>{x.id}</small></td>
-     <td>{x.detailSpecification||"OEM model/part and rating required"}<small>{x.tagMappingState}</small></td>
-     <td>{x.material||"OEM confirmation required"}</td>
-     <td>{Number.isFinite(x.approvedRequiredQty)?x.approvedRequiredQty:"VERIFY"}<small>Rev08 benchmark quantity: {x.legacyQty} (non-posting)</small></td>
-     <td>{thb(x.approvedUnitTHB)}</td><td>{thb(x.workingSellTHB)}</td>
+     <td>{x.detailSpecification||"Budgetary equivalent to installed equipment; final model/rating per selected OEM"}<small>{x.tagMappingState}</small></td>
+     <td>{x.material||"Compatible OEM component / as specified"}</td>
+     <td>{x.budgetQty}<small>Budgetary Qty · Rev08 source, not final OEM SPIR</small></td>
+     <td>{thb(x.budgetUnitTHB)}</td><td>{thb(x.budgetTotalTHB)}</td>
      {(code==="C1"||code==="C2")&&<td>{x.leadTimeARO||"OEM confirmation required"}</td>}
     </tr>)}</tbody>
    </table></div>
+   <p className="p55-note"><strong>PRE-AWARD CATEGORY BUDGET:</strong> {thb(shared.budgetTotalsTHB[code])} · Source: Rev08 historic priced lines × planning FX 31.5 THB/USD · budgetary sell estimate only, no new direct-cost posting. Rounding per line can differ from category source total.</p>
    <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
   </div>}
   <h4>1. Historical Annex Price Lines — Original Rev08 / Not current Vendor Quote</h4>
