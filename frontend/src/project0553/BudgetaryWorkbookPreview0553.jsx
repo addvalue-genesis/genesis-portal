@@ -156,10 +156,10 @@ export function BudgetaryWorkbookPreview0553(){
        const bcLine=bcCode?scopePartB.lines[bcCode]:null;
        const bcAnnex=bcCode?bcLinked[bcCode]:null;
        const bcWorking=bcLine&&Number.isFinite(bcLine.amountTHB)?bcLine.amountTHB:null;
-       const bcHistorical=bcAnnex?.quantity>0&&Number.isFinite(bcAnnex.totalTHB)?bcAnnex.totalTHB:null;
-       const bcCell=bcCode?(col===5?(Number.isFinite(bcWorking)?"THB "+money(bcWorking):Number.isFinite(bcHistorical)?"REFERENCE THB "+money(bcHistorical):"COST PENDING"):
-        col===6?(Number.isFinite(bcWorking)?"THB "+money(bcWorking):Number.isFinite(bcHistorical)?"REFERENCE THB "+money(bcHistorical):"NOT ESTABLISHED"):
-        col===7?(Number.isFinite(bcWorking)?"Scope WBS · working sell (not cost) · Turnkey rate review":Number.isFinite(bcHistorical)?"Scope child Annex · historical Rev08 only · OEM rate required":"Turnkey scope · source quantity / supplier or service cost required"):null):null;
+       const bcHistorical=showHistorical&&bcAnnex?.quantity>0&&Number.isFinite(bcAnnex.totalTHB)?bcAnnex.totalTHB:null;
+       const bcCell=bcCode?(col===5?(Number.isFinite(bcWorking)?"WBS SELL REF THB "+money(bcWorking):Number.isFinite(bcHistorical)?"REFERENCE THB "+money(bcHistorical):"COST PENDING"):
+        col===6?(Number.isFinite(bcWorking)?"WBS SELL REF THB "+money(bcWorking):Number.isFinite(bcHistorical)?"REFERENCE THB "+money(bcHistorical):"NOT ESTABLISHED"):
+        col===7?(Number.isFinite(bcWorking)?"10.2 Working WBS SELL reference ONLY — not internal cost or customer quotation":Number.isFinite(bcHistorical)?"Scope child Annex · historical Rev08 only · OEM rate required":"Turnkey scope · source quantity / supplier or service cost required"):null):null;
        const value=bcCode&&col>=5&&col<=7?bcCell:partACells?partACells[col]:sheet==="Scope of supply"&&rowNum===38?(col===6?scopeTotalLabel:col===7?"COST/SELL BASIS MIX: Part A cost THB "+money(partAKnownTotal)+"; Part B working SELL THB "+money(partBKnownTotal)+" — NOT ADDITIVE · "+(partAComplete?"":"PART A INCOMPLETE · ")+"B/C TURNKEY COST PENDING · C OPTIONS EXCLUDED · A5 INCLUDED IN A1":row[col+1]??""):rowNum===7&&col>=4&&col<=7?"":row[col+1]??"";
        const isPrice=overlay&&(active?.kind==="SUMMARY"?col===6:(col===7||col===8));
        return <td key={col} style={{whiteSpace:"pre-wrap",minWidth:col===0?65:95}}>
