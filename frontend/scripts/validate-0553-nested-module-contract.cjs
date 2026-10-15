@@ -63,6 +63,23 @@ assert(!auditUI.includes('<details className="p55-panel"'),
  "Audit nested modules should not bypass Module ID contract");
 assert(!ui.includes('<details className="p55-panel"'),
  "TAG nested modules should not bypass Module ID contract");
+// The SCADA price evidence was previously a raw <details> with data-component-key
+// but no visible Copy ID. Keep its exact ID and require reusable disclosure.
+const webRatesId='moduleKey={keyPrefix+".scada-bulk.web-rate-evidence"}';
+const scadaParent='moduleKey={keyPrefix+".scada-bulk"}';
+const webBlockStart=ui.indexOf(webRatesId);
+const webBlockEnd=ui.indexOf("</ControlledModuleSection0553>}",webBlockStart);
+assert(ui.includes(scadaParent)&&webBlockStart>ui.indexOf(scadaParent),
+ "SCADA web retail rates must remain nested under the original per-WP bulk module");
+assert(webBlockStart>0&&webBlockEnd>webBlockStart,
+ "SCADA retail evidence must be a controlled module with stable Copy ID");
+const webBlock=ui.slice(webBlockStart,webBlockEnd);
+assert(webBlock.includes("ZWP20_WEB_BULK_RATES_0553.lines.map"),
+ "All original web retail evidence must render within the controlled module");
+assert(webBlock.includes("defaultOpen")&&webBlock.includes("PENDING items"),
+ "Do not change original visible expanded source-evidence UX");
+assert(!ui.includes('data-component-key={keyPrefix+".scada-bulk.web-rate-evidence"}'),
+ "Do not reintroduce unmanaged raw-details identity");
 
 // Runtime markup smoke test of actual reusable component, not just source matching.
 const oldJS=require.extensions[".js"],oldJSX=require.extensions[".jsx"];
