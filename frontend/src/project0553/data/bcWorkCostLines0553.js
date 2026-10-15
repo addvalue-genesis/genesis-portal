@@ -120,7 +120,7 @@ const otherRows=(audit)=>{
    scopeGate:mr.mr==="MR-0002"?"CHINA_TO_TH_BKK_TO_CHINA_REIMPORT_DOUBLE_LEG_RATE_REQUIRED":"INCOTERM_ALL_LEGS_BROKER_RATE_REQUIRED"}));
  out.push(line("B9","B9-CHINA-SUPERVISION","ADDVALUE 2-person China JUTAL yard supervision",24,"MD",{
   sourceRef:"Rev05 19_CN_YARD_WBS / 11_B8_B9; "+FAT_EXECUTION_BASIS_0553.id,
-  sellTHB:574560,equation:"12 Team-days × 2 ADDVALUE staff; source WBS base sell THB574,560",
+  sellRateTHB:47880,sellTHB:574560,equation:"12 Team-days × THB47,880/team-day (2 staff inclusive working per diem); source WBS base sell THB574,560",
   owner:"ADDVALUE supervision only; JUTAL installation labor excluded",
   scopeGate:"YARD_SCHEDULE_ROLE_RATE_PER_DIEM_INCLUDED_TRAVEL_NOT_INCLUDED",reconciliationTag:"B9-SELL"}));
  out.push(line("B9","B9-CHINA-TRAVEL","China yard team airfare/hotel/local transport",null,"trip/person",{
