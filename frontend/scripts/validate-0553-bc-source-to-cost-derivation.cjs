@@ -36,7 +36,7 @@ for(const item of e.rows){
  assert.deepEqual(item.stages.map(x=>x.id),["01","02","03","04","05.3","06","07","08"]);
  assert(item.stages.some(x=>x.id==="07"&&x.state==="CONTROLLED_DIRECT_COST_INPUT_MISSING"));
  assert(item.stages.some(x=>x.id==="08"&&x.state==="QUALIFICATIONS_OPEN"));
- assert.equal(bc.byCode[item.code].costEvidence,item);
+ assert.deepEqual(bc.byCode[item.code].costEvidence,item);
  assert.equal(bc.byCode[item.code].directCostTHB,null);
  assert.equal(item.workingSellTHB,bc.byCode[item.code].workingSellTHB);
  for(const line of item.lines){
