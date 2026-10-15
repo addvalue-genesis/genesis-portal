@@ -54,7 +54,7 @@ assert(p.records.filter(x=>x.title==="VENDOR Document Register List").every(x=>x
 assert(p.records.filter(x=>x.title==="FAT Report"||x.title==="SAT Report").every(x=>x.technicalWorkOwner==="B3_OR_OEM_FOR_TEST_CONTENT"));
 assert.equal(m.equationProofModuleId,p.moduleId);
 assert.equal(b.b1b2EquationProofModuleId,p.moduleId);
-assert.equal(b.b1b2EquationProof,p);
+assert.deepEqual(b.b1b2EquationProof,p); // selectors produce equivalent independent snapshots, not referential identity
 assert.equal(b.byCode.B1.b1b2EquationProofModuleId,p.moduleId);
 assert.equal(b.byCode.B2.b1b2EquationProofModuleId,p.moduleId);
 assert.equal(b.byCode.B3.b1b2EquationProofModuleId,null);
