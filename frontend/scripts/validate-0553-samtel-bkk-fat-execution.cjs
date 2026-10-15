@@ -45,8 +45,9 @@ for(const c of ["B3","B6","B9"]){
 }
 assert.equal(working.byCode.B3.workingSellTHB,2109600);
 assert.equal(working.byCode.B9.workingSellTHB,574560);
-assert.equal(working.byCode.B6.workingSellTHB,null);
-assert.equal(working.knownWorkingSellTHB,3804160);
+assert.equal(working.byCode.B6.workingSellTHB,307584,"B6 approved pre-award logistics working sell; direct cost stays null");
+assert.equal(working.knownWorkingSellTHB,4568436.58,"Base Working Sell after B5/B6/B10/B13 budget additions");
+assert.equal(working.knownWorkingSellTHB,Math.round(working.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((sum,r)=>sum+r.workingSellTHB,0)*100)/100,"Options excluded from Base");
 assert.equal(working.costComplete,false);
 assert.equal(working.releaseAllowed,false);
 assert.equal(d.existingSellUnchanged,true);
