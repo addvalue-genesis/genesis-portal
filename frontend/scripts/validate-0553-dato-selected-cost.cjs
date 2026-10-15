@@ -44,6 +44,7 @@ assert.equal(panel.unitPrice,sonic[4]);
 assert.equal(panel.extended,1900);
 assert.equal(plug.qty,1);
 assert.equal(plug.unitPrice,ref.rateTHB);
+assert.equal(plug.priceBasis,"MANAGEMENT_APPROVED_RS_RETAIL_BUDGET_REFERENCE_EX_VAT");
 assert.equal(plug.extended,1176.68);
 assert.equal(plug.budgetApproval,ref.approvalStatus,"Ledger must reflect recorded approval");
 assert.equal(plug.budgetApprovedBy,ref.approvalAuthority);
@@ -57,6 +58,19 @@ assert(dato.decision.includes("superseded")&&dato.decision.includes("THB 1,176.6
 assert(!dato.assumptions.some(x=>x.includes("1 provisional plug × THB 0")));
 const ledger=selectMR0001TagCostRows0553("ZWP20").find(x=>x.row===8);
 assert.equal(ledger.extended,dato.extended,"Single ZWP20 TAG cost source");
+// A new price candidate without an approved revision must not replace the
+// existing manager-approved working budget rate or alter the original quote.
+const originalQuoteAmount=original.unitPriceExVat;
+try{
+ original.unitPriceExVat=5000;
+ const postQuoteCandidate=deriveZWP20SiteCost0553().rows.find(x=>x.row===8);
+ assert.equal(postQuoteCandidate.extended,3076.68,
+  "A newer unapproved vendor quote cannot silently override management approval");
+}finally{
+ original.unitPriceExVat=originalQuoteAmount;
+}
+assert.equal(original.unitPriceExVat,null,"Source quotation N/A must be restored");
+
 const scada=deriveWpSystemBulkBudget0553().find(w=>w.wp==="ZWP20").systems.find(s=>s.id==="SCADA_RADIO");
 const mirrored=scada.items.find(x=>x.id==="SCADA-RJ45-WEIDMULLER");
 assert.equal(mirrored.rateTHB,ref.rateTHB,"Bulk mirrors selected central retail reference");
