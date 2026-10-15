@@ -5,6 +5,7 @@
 // Source-line quantities are retained as requirements, not approved spare quantities.
 import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
 import {LIFECYCLE_SPARES_0553} from "./lifecycleSpareScope0553";
+import {selectBcCostEvidenceDerivation0553} from "./bcCostEvidenceDerivation0553";
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553,validateBcRoutes0553} from "./bcWorkingModuleRoutes0553";
 
@@ -42,6 +43,7 @@ const executionDecisionByCode=Object.freeze({
 export function selectBcTurnkeyWorkingCost0553(){
  if(!validateBcRoutes0553())throw Error("Customer B/C routing is incomplete or duplicated");
  const wbs=derivePartBcWorkingWbs0553();
+ const evidence=selectBcCostEvidenceDerivation0553();
  const byCode=new Map(wbs.rows.map(row=>[row.code,row]));
  const rows=BC_CUSTOMER_CODES_0553.map(code=>{
   const w=byCode.get(code);
@@ -53,6 +55,9 @@ export function selectBcTurnkeyWorkingCost0553(){
   const requirementRows=activities.length?
    LIFECYCLE_SPARES_0553.rows.filter(x=>activities.includes(x.activity)):[];
   const sellKnown=Number.isFinite(w.sellTHB);
+  const costEvidence=evidence.byCode[code];
+  if(!costEvidence||costEvidence.workingSellTHB!==w.sellTHB||costEvidence.directCostTHB!==null)
+   throw Error("B/C cost evidence diverged from source WBS or invented a direct cost at "+code);
   const optional=code.startsWith("C");
   return Object.freeze({
    code,workflowNumber:route.workflow,
@@ -81,6 +86,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    priceStatus:sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
+   costEvidence, // Read-only 01–08 requirements, WBS / route equations and explicit missing direct-cost input ledger.
    optional,baseScope:!optional,
    sourceOwnership:"CUSTOMER_REQUIREMENT_TO_WORKING_SOURCE",
    noDoubleCountRule:"One cost owner per requirement; no posting of historical Rev08 or OEM-included component without explicit exclusion proof",
@@ -109,6 +115,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   baseTurnkeyCostTHB:null,optionalCostTHB:null,
   costComplete:false,releaseAllowed:false,
   noCrossBasisSummation:true,
+  evidenceSourceModule:"data/bcCostEvidenceDerivation0553.js",
   source:"Part B Rev05 WBS + legacy lifecycle activity requirements + customer code routing"
  });
 }
