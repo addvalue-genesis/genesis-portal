@@ -48,11 +48,12 @@ for(const code of codes){
  assert.deepEqual(b.byCode[code].workCostLines,m.byCode[code]);
  assert.equal(b.byCode[code].workCostLineCount,m.byCode[code].length);
  assert.equal(b.byCode[code].workCostLineModuleId,m.moduleId);
- assert.equal(b.byCode[code].workingSellTHB,code==="B5"?311184:code==="B6"?307584:m.workingSellByCode[code]);
+ assert.equal(b.byCode[code].workingSellTHB,["B5","B6","B10","B13","C1","C2"].includes(code)?({B5:311184,B6:307584,B10:123024.37,B13:22484.21,C1:4049349.36,C2:721806.68})[code]:m.workingSellByCode[code]);
 }
 assert.equal(b.workCostLineCount,111);
 assert.equal(b.workCostLineAuditCount,40);
-assert.equal(b.knownWorkingSellTHB,4422928);
+assert.equal(b.knownWorkingSellTHB,4568436.58);
+assert.equal(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((sum,x)=>Math.round((sum+x.workingSellTHB)*100)/100,0),b.knownWorkingSellTHB,"Base-only budget sum; optional C1/C2 excluded");
 assert.equal(b.knownDirectCostTHB,null);
 const b1=m.byCode.B1.filter(x=>x.id.startsWith("B1-WBS-"));
 assert.equal(b1.length,27);
