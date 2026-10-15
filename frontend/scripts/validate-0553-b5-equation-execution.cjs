@@ -1,0 +1,84 @@
+// B5 acceptance: GEQ/PEQ packing source + strict no-duplicate Part A/B5/B6 boundaries.
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const babel=require("@babel/core"),root=path.resolve(__dirname,"../src");
+const orig=require.extensions[".js"];
+require.extensions[".js"]=(mod,file)=>{
+ if(file.startsWith(root+path.sep)){
+  const code=babel.transformFileSync(file,{babelrc:false,configFile:false,
+   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}]]}).code;
+  mod._compile(code,file);
+ }else orig(mod,file);
+};
+const from=p=>require(path.join(root,"project0553",p));
+const {selectBcB5EquationExecution0553,evaluateBcB5PhysicalPackCost0553}=from("data/bcB5EquationExecution0553.js");
+const {B5_PACKING_CLAUSES_0553,B5_PACKING_SOURCE_POLICY_0553}=from("data/bcB5PackingEvidence0553.js");
+const {selectBcWorkCostLines0553}=from("data/bcWorkCostLines0553.js");
+const {selectBcTurnkeyWorkingCost0553}=from("data/bcTurnkeyWorkingCost0553.js");
+const {derivePartBcWorkingWbs0553}=from("data/partBCWorkingWbs0553.js");
+const p=selectBcB5EquationExecution0553(),m=selectBcWorkCostLines0553(),b=selectBcTurnkeyWorkingCost0553();
+assert.equal(p.moduleId,"bid.engineering.equations.b5");
+assert.equal(p.workflowNumber,"02");
+assert.equal(p.sourceModuleId,B5_PACKING_SOURCE_POLICY_0553.moduleId);
+assert.equal(p.sourceClauseCount,16);
+assert.equal(B5_PACKING_CLAUSES_0553.length,16);
+assert.equal(new Set(B5_PACKING_CLAUSES_0553.map(x=>x.id)).size,16);
+assert(p.sourceClauses.every(x=>x.pricingStatus==="REQUIREMENT_ONLY_NOT_AN_ADDITIVE_PRICE"&&x.noIndependentAdditiveCost));
+assert.deepEqual(p.MR,["MR-0001","MR-0002","MR-0003","MR-0004"]);
+assert.equal(p.packingStreams.length,4);
+assert(p.packingStreams.every(x=>x.physicalPackageQuantity===null&&x.approvedPackingQuoteTHB===null));
+assert.equal(p.combinedBangkokPacking.location,"SAMTEL Bangkok, Thailand");
+assert.equal(p.combinedBangkokPacking.actualPhysicalPackQty,null);
+assert.equal(p.physicalPackingDrivers.length,6);
+assert.equal(p.validation.length,9);
+assert.equal(p.GEQ.includes("GEQ-005"),true);
+assert.equal(p.GEQ.includes("GEQ-012"),true);
+assert.equal(p.currentDirectCostTHB,null);
+assert.equal(p.currentWorkingSellTHB,null);
+assert.equal(p.approvedPhysicalPackageCount,null);
+assert.equal(p.customerReleaseAllowed,false);
+assert.equal(p.postToCostLedger,false);
+assert(p.physicalPackingDrivers.every(x=>x.workloadStatus==="OPEN_INPUT"&&x.derivedPackingMH===null&&x.totalDirectCostTHB===null));
+assert.equal(b.b5EquationProofModuleId,p.moduleId);
+assert.equal(b.byCode.B5.b5EquationProofModuleId,p.moduleId);
+assert.deepEqual(b.b5EquationProof,p);
+assert.equal(m.b5EquationProofModuleId,p.moduleId);
+assert.deepEqual(m.b5EquationProof,p);
+assert.equal(m.byCode.B5.filter(x=>x.id.startsWith("B5-")).length,6);
+assert(m.byCode.B5.every(x=>x.directCostTHB===null&&x.workingSellTHB===null));
+assert(m.byCode.B6.find(x=>x.id==="B6-REPACK").includedInExistingCostOwner.includes("B5-BKK-REPACK"));
+assert.equal(m.primaryDetailedCodes.includes("B5"),true);
+assert.equal(m.rows.length,111);
+assert.equal(m.requiredAuditCount,40);
+assert.equal(b.byCode.B5.workingSellTHB,null);
+assert.equal(b.byCode.B3.workingSellTHB,2109600);
+assert.equal(b.knownWorkingSellTHB,3804160);
+assert.equal(derivePartBcWorkingWbs0553().subtotalTHB,3804160);
+assert.equal(b.knownDirectCostTHB,null);
+assert.equal(b.releaseAllowed,false);
+const empty=evaluateBcB5PhysicalPackCost0553();
+assert.equal(empty.totalProvisionalIncrementalCostTHB,null);
+assert.equal(empty.status,"OPEN_INPUT");
+const one={mr:"MR-0002",stage:"BKK_POST_FAT_REPACK",physicalPackageId:"REAL-CRATE-ABC",quantity:1,unitPackingCostTHB:1500,packingListRef:"EXAMPLE_PACKING_LIST_REF",vendorQuoteRef:"EXAMPLE_VENDOR_QUOTE",costOwnerApprovalRef:"EXAMPLE_AWARD_REF",oemInclusionRef:"EXAMPLE_EXCLUDED_PACKING_PROOF",alreadyIncludedInOEMPartA:false};
+const s=evaluateBcB5PhysicalPackCost0553({packages:[one]});
+assert.equal(s.totalProvisionalIncrementalCostTHB,1500);
+assert.equal(s.costPostingAllowed,false);
+const duplicate=evaluateBcB5PhysicalPackCost0553({packages:[one,one]});
+assert.equal(duplicate.totalProvisionalIncrementalCostTHB,null);
+assert(duplicate.scenarios[1].status.includes("DUPLICATE"));
+const unknown=evaluateBcB5PhysicalPackCost0553({packages:[{...one,packingListRef:null}]});
+assert.equal(unknown.totalProvisionalIncrementalCostTHB,null);
+assert.equal(unknown.status,"OPEN_INPUT");
+const included=evaluateBcB5PhysicalPackCost0553({packages:[{...one,alreadyIncludedInOEMPartA:true}]});
+assert.equal(included.totalProvisionalIncrementalCostTHB,0);
+assert.equal(included.costPostingAllowed,false);
+const view=fs.readFileSync(path.join(root,"project0553/B5EquationAudit0553.jsx"),"utf8");
+const page=fs.readFileSync(path.join(root,"pages/PJ26080553.jsx"),"utf8");
+const budget=fs.readFileSync(path.join(root,"project0553/BcWorkCostLines0553.jsx"),"utf8");
+assert(view.includes("p.physicalPackingDrivers.map")&&view.includes("p.sourceClauses.map")&&view.includes("p.validation.map"));
+assert(page.includes("<B5EquationAudit0553/>"));
+assert(budget.includes("<B5EquationAudit0553 selectedCode={selectedCode}/>"));
+for(const f of ["project0553/B5EquationAudit0553.jsx","project0553/BcWorkCostLines0553.jsx","pages/PJ26080553.jsx"]){
+ assert(babel.transformFileSync(path.join(root,f),{babelrc:false,configFile:false,
+  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
+}
+console.log("PASS B5: 16 nonadditive Annex/MR source requirements; 4 supplier packing streams; 6 physical pack drivers all OPEN_INPUT; source scenario no posting, OEM credit and duplicate keys guarded; 111 cost lines / B1-B3 prices unchanged.");
