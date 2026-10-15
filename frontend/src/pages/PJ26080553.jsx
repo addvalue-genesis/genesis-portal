@@ -65,6 +65,7 @@ export function PJ26080553() {
   {id:"bid.budget",name:"Budget Workspace",tab:"budget",keywords:"working costing"},
   {id:"bid.budget.bom",name:"Engineering BOM Working Preview",tab:"budget",keywords:"working preview equipment"},
   {id:"bid.budget.working.bc.execution-audit",name:"10.2 B/C — Execution, Permits, MOB/DEMOB & Tools Audit",tab:"budget",keywords:"annex 4 annex 6 pack shipment special tools logistics license transport 01 08 10.2"},
+  {id:"bid.budget.working.bc.b3.mob-demob-economics",name:"10.2 B3 — Offshore MOB/DEMOB Parametric Economics",tab:"budget",keywords:"b3 five trips 39 teamdays economic model mobilization demobilization HUC SIMOPS POB scenario"},
   {id:"bid.budget.bom.mr0002",name:"MR-0002 Trunk Radio Working BOM",tab:"budget",keywords:"rfi dmr antenna feeder"},
   {id:"bid.budget.bom.source-coverage",name:"BOM Source Coverage",tab:"budget",keywords:"source evidence"},
   {id:"bid.budget.bom.reconciliation",name:"BOM Cost Reconciliation",tab:"budget",keywords:"site cost"},
