@@ -96,6 +96,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    executionAuditIds:(executionAudit.byCode[code]||[]).map(x=>x.id),
    executionAuditCount:(executionAudit.byCode[code]||[]).length,
    workCostLineModuleId:workCostLines.moduleId,
+   b1b2EquationProofModuleId:(code==="B1"||code==="B2")?workCostLines.equationProofModuleId:null,
    workCostLines:workCostLines.byCode[code]||[],
    workCostLineCount:(workCostLines.byCode[code]||[]).length,
    optional,baseScope:!optional,
@@ -130,6 +131,8 @@ export function selectBcTurnkeyWorkingCost0553(){
   workCostLineModuleId:workCostLines.moduleId,
   workCostLineCount:workCostLines.rows.length,
   workCostLineAuditCount:workCostLines.requiredAuditCount,
+  b1b2EquationProofModuleId:workCostLines.equationProofModuleId,
+  b1b2EquationProof:workCostLines.equationProof,
   source:"Part B Rev05 WBS + legacy lifecycle activity requirements + customer code routing"
  });
 }
