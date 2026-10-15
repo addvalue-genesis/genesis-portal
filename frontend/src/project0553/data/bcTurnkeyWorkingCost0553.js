@@ -5,6 +5,7 @@
 // Source-line quantities are retained as requirements, not approved spare quantities.
 import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
 import {LIFECYCLE_SPARES_0553} from "./lifecycleSpareScope0553";
+import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553,validateBcRoutes0553} from "./bcWorkingModuleRoutes0553";
 
 const activitiesForCustomerCode=Object.freeze({
@@ -31,6 +32,12 @@ const customerRequirements=Object.freeze({
  C2:"Two-year normal operation spares — optional; separate supplier-priced inventory"
 });
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
+// A management-approved execution location is NOT a verified logistics rate.
+const executionDecisionByCode=Object.freeze({
+ B3:"Bangkok SAMTEL combined Integrated FAT after OEM source pretests; 8 Thailand FAT team-days are still a working estimate",
+ B6:"All four MR cargo routes pass through Bangkok FAT then JUTAL Nantong; MR0002 China-to-Thailand-to-China transport and import/re-export need separate cost",
+ B9:"ADDVALUE two-person China yard supervision is distinct from Bangkok FAT; MGW is advisory only until separately contracted"
+});
 
 export function selectBcTurnkeyWorkingCost0553(){
  if(!validateBcRoutes0553())throw Error("Customer B/C routing is incomplete or duplicated");
@@ -76,7 +83,15 @@ export function selectBcTurnkeyWorkingCost0553(){
    sourceStatus:w.state,
    optional,baseScope:!optional,
    sourceOwnership:"CUSTOMER_REQUIREMENT_TO_WORKING_SOURCE",
-   noDoubleCountRule:"One cost owner per requirement; no posting of historical Rev08 or OEM-included component without explicit exclusion proof"
+   noDoubleCountRule:"One cost owner per requirement; no posting of historical Rev08 or OEM-included component without explicit exclusion proof",
+   executionDecision:executionDecisionByCode[code]?Object.freeze({
+    decisionId:FAT_EXECUTION_BASIS_0553.id,
+    status:FAT_EXECUTION_BASIS_0553.status,
+    summary:executionDecisionByCode[code],
+    costState:FAT_EXECUTION_BASIS_0553.costState,
+    integratedFatLocation:FAT_EXECUTION_BASIS_0553.integratedFat.location,
+    finalYard:FAT_EXECUTION_BASIS_0553.yard.location
+   }):null
   });
  });
  const byCodeOutput=Object.fromEntries(rows.map(r=>[r.code,r]));
