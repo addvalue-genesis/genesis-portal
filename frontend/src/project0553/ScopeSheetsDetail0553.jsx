@@ -2,7 +2,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {selectScopeSheet0553} from "./data/scopeSheetProjection0553";
-import {derivePartBcWorkingWbs0553} from "./data/partBCWorkingWbs0553";
+
 import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {BULK_TAKEOFF_0553} from "./data/bulkTakeoff0553";
 import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
@@ -73,7 +73,6 @@ export function ScopeSheetsDetail0553({fx=null,view="full"}){
  const phoneRows=SITE_SYSTEM_COST_RECONCILIATION_0553.rows.filter(r=>r.mr==="MR-0003"&&["ZWP20","ZWP21","ZWP22"].includes(r.site));
  const phoneRateLines=phoneRows.flatMap(r=>r.evidence||[]).filter(x=>["PHONE-1","SOUNDER-1","JB-1"].includes(x.line)&&x.currency==="THB"&&Number.isFinite(x.extended));
  const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
- const partBC=derivePartBcWorkingWbs0553();
  const scopeBC=selectScopePartBcWorking0553();
  // All four Scope A lines read the very same projection used by the
  // System x Location x MTO Working BOM screen. No parallel supplier-rate path.
@@ -123,19 +122,19 @@ export function ScopeSheetsDetail0553({fx=null,view="full"}){
   const linkedCodes=new Set(["B10","B11","B13","C1","C2"]);
   return <section className="p55-panel" data-component-key={"bid.budget.summary.workbook.scope-of-supply"+(view==="part-a"?".part_a":"")}>
    <h4>{view==="part-a"?"Part A — MR-based Scope of Supply (same canonical Scope view)":"Scope of Supply — Linked A/B/C Working View"}</h4>
-   <p className="p55-note">SOURCE: PJ2608-0553 / bid.budget.scope · Equipment values from canonical MR/location BOM; B/C from controlled WBS and child sheets. THB only. Reference prices and unverified amounts are not approved customer sell.</p>
+   <p className="p55-note">SOURCE: PJ2608-0553 / bid.budget.scope · Equipment values from canonical MR/location BOM; B/C current WBS sell references or unpriced turnkey cost requirements from 10.2. Historical child schedules are audit-only. THB only. Reference prices and unverified amounts are not approved customer sell.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Ref / MR</th><th>Description</th><th>Qty / Basis</th><th>Working Unit THB / LS</th><th>Working Budgetary THB</th><th>Source / Engineering & Cost Status</th></tr></thead><tbody>
     {REV08_BASELINE.summary.filter(([id])=>codes.includes(id)).map(([id,desc])=>{
      const control=scopeBC.lines[id]||null;
      const working=workingSummary[id]||null;
      const child=linkedCodes.has(id)?scopeSheetSources[id]:null;
-     const amount=child?.quantity?child.totalTHB:working?working.amount:control?.amountTHB;
+     const amount=working?working.amount:control?.workingSellTHB; // Current scope view never substitutes Rev08 price
      const mr={A1:"MR-0001",A2:"MR-0002",A3:"MR-0003",A4:"MR-0004",A5:"MR-0001–0004 / Bulk"}[id]||"";
      const qty=id==="A5"?"1 LS ("+a5.rowCount+" MTO lots)":child?.quantity?"1 LS ("+child.quantity+" detail lines)":control?.qty!=null&&Number.isFinite(control.qty)?control.qty+" "+control.unit:"1 LS";
      return <tr key={id}><td><strong>{id}</strong>{mr&&<small>{mr}</small>}</td><td>{desc}</td><td>{qty}</td>
       <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(amount)?cash(amount):"Cost source pending"}</td>
       <td className="is-number">{id==="A5"?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(amount)?cash(amount):"Not established"}</td>
-      <td>{child?.quantity?"LINKED CHILD DETAIL · REV08 HISTORICAL (not current OEM)":working?working.status:control?.priceStatus||"No current verified cost"}
+      <td>{child?.quantity?"CURRENT TURNKEY COST NOT ESTABLISHED · historical child detail is audit-only":working?working.status:control?.priceStatus||"No current verified cost"}
        <small>{child?.source||working?.source||control?.source||"No current source"}{mr?" · "+mr:""}</small></td>
      </tr>;
     })}
@@ -159,15 +158,15 @@ export function ScopeSheetsDetail0553({fx=null,view="full"}){
     source:control.basis+" · OWNER: "+control.owner+" · "+control.source+" · EQUATIONS: "+(control.equations.join(", ")||"source schedule required")}:null),amount=item?.amount;
    const unavailable=id==="A5"?"A5 source/ledger reconciliation required":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
    const childSource=scopeSheetSources[id]||null;
-   const childAmount=childSource?.totalTHB??null;
+   const childReferenceTHB=childSource?.totalTHB??null; // Audit reference only; never a current cost
    const hasChild=Boolean(childSource&&childSource.quantity>0);
-   const shownAmount=hasChild?childAmount:amount;
+   const shownAmount=amount;
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
     hasChild?"1 LS ("+childSource.quantity+" detail rows)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>{qtyDisplay}</td>
-    <td className="is-number">{hasChild?(Number.isFinite(childAmount)?cash(childAmount):"Awaiting FX"):id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
-    <td className="is-number">{hasChild?(Number.isFinite(childAmount)?cash(childAmount):"Awaiting FX"):id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
-    <td>{hasChild?<><strong>LINKED {id} CHILD SUBTOTAL · HISTORICAL REV08 (not verified OEM cost)</strong><small>{childSource.source} · {childSource.quantity} detail rows · OEM verification: {control?.priceStatus} · {id.startsWith("C")?"OPTION — NOT INCLUDED IN BASE": "REFERENCE — NOT ADDED TO CURRENT WORKING SELL"}</small></>:
+    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
+    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
+    <td>{hasChild?<><strong>{id} · CURRENT TURNKEY COST NOT ESTABLISHED (historical detail is audit-only)</strong><small>{childSource.source} · {childSource.quantity} historical rows · Reference THB {Number.isFinite(childReferenceTHB)?cash(childReferenceTHB):"FX not provided"} · OEM verification: {control?.priceStatus} · {id.startsWith("C")?"OPTION — NOT INCLUDED IN BASE": "REFERENCE — NOT ADDED TO CURRENT WORKING SELL"}</small></>:
      (id==="B12"||id==="B14")?<><strong>NO ITEMIZED CHILD-SHEET PRICE</strong><small>{id==="B12"?"First-filling applicability and supplier scope must be verified; historical summary zero is not accepted as a verified cost.":"Insurance/bond premium and insured-value evidence required; historical Rev08 summary is not an itemized vendor quotation."} {control?.priceStatus}</small></>:
      item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(row=><tr key={row.id}><td>{row.id}</td><td>{row.description}</td><td>{row.qty}</td>
@@ -206,7 +205,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full"}){
     </tbody></table></div>
    </details>
   </details>}
-  {sheet==="Scope of supply"&&<p className="p55-note"><strong>Part B ADDVALUE Working Sell (B1/B2/B3/B8/B9 only):</strong> {cash(scopeBC.knownAddvalueWorkingSellTHB)} from source-linked Rev05 WBS, not internal direct cost or full SAMTEL client price. Unpriced B/C amounts are unknown, never zero. B4–B7, B10–B14 and C1–C2 are owner-controlled excluded/optional lines; unresolved owner quotation must NOT be interpreted as zero. <a href={partBC.sourceUrl} target="_blank" rel="noreferrer">WBS Rev05 original</a>.</p>}
+  {sheet==="Scope of supply"&&<p className="p55-note"><strong>Part B WBS Working Sell Reference (B1/B2/B3/B8/B9 only — NOT turnkey direct cost):</strong> {cash(scopeBC.knownAddvalueWorkingSellTHB)} from source-linked Rev05 WBS, not internal direct cost or full SAMTEL client price. Unpriced B/C amounts are unknown, never zero. B4–B7, B10–B14 and C1–C2 are owner-controlled excluded/optional lines; unresolved owner quotation must NOT be interpreted as zero. <a href={scopeBC.sourceUrl} target="_blank" rel="noreferrer">WBS Rev05 original</a>.</p>}
   {sheet==="Scope of supply"&&<section className="p55-panel" data-component-key="bid.budget.scope.scada-working">
    <h4>MR-0001 SCADA — Engineering BOM &amp; Bulk Budgetary Working Projection</h4>
    <p className="p55-note"><strong>Live derivation:</strong> existing MR0001 tag Cost Ledger → 16-function bulk verification → budget envelope. This is not a new cost ledger and does not modify customer Rev08. Original currencies retained; FX {fx?.thbPerUsd??"REQUIRED"} THB/USD, source {fx?.source||"not entered"}. Brownfield is budgeted as new replacement only. Accessories are segregated from Base, not silently merged or double counted.</p>
