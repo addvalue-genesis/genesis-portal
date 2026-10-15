@@ -159,6 +159,20 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     Embedded historical B7 Storage: THB {bcWorking.b5EquationProof.historicalPriceBridge.originalB5EmbeddedStorageSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}.
     <strong> Current B5 Direct Cost / Working SELL remains NOT ESTABLISHED</strong>. Historical quotation/estimator inputs are not posted as approved cost.
    </p>}
+   {bcTab==="B5"&&bcWorking.byCode.B5.b5PriceReference&&(()=>{
+    const p=bcWorking.byCode.B5.b5PriceReference;
+    const thb=n=>"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+    return <section className="p55-panel" data-component-key="bid.budget.working.bc.b5.price-candidate">
+     <h3>10.2 B5 — Budgetary / Historical Price Candidate (THB)</h3>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>PRICE CLASS / ITEM</th><th>REFERENCE PRICE THB</th><th>COST OWNER / SOURCE</th><th>STATUS</th></tr></thead><tbody>
+      <tr><td><strong>Packing-only historical candidate</strong><small>{p.priceClass}</small></td><td><strong>{thb(p.amountTHB)}</strong></td><td>{p.costOwner}<small><a href={p.sourceUrl} target="_blank" rel="noreferrer">{p.sourceRevision}</a></small></td><td><strong>CURRENT DIRECT COST NOT ESTABLISHED</strong><small>NOT APPROVED WORKING SELL · NON-POSTING</small></td></tr>
+      {p.sourceLines.map(x=><tr key={x.id}><td><strong>{x.id}</strong><small>{x.description}</small></td><td>{thb(x.historicalSellTHB)}</td><td>B5 physical packing<small>{x.count} {x.unit} · {x.sourceState}</small><small>{x.note}</small></td><td>Historical supplier reference / estimator allowance only</td></tr>)}
+      <tr><td>B7 embedded storage — EXCLUDED from B5 candidate</td><td>{thb(p.nonAdditiveStorageTHB)}</td><td>{p.excludedStorageOwner}</td><td>NON-ADDITIVE</td></tr>
+      <tr><td>Historical Rev09 gross B5 including storage</td><td>{thb(p.historicalGrossB5THB)}</td><td>Rev09 comparison only</td><td>NOT CURRENT SELL / NOT COST</td></tr>
+     </tbody></table></div>
+     <p className="p55-note">No double-counting: Part A OEM-included packing, B5 physical repacking, B6 freight/repack cross-reference, B7 storage and crate-included B13 desiccants must remain distinct. No historical price is posted to 10.3 or 10.5.</p>
+    </section>;
+   })()}
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>}
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<p className="p55-note"><strong>Selected {bcTab}:</strong> รายละเอียดแสดงโดยตรงด้านล่างตารางจาก Component เดียวกับ 10.5 โดยไม่ต้องกด ＋ Detail อีกครั้ง</p>}
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
