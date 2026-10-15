@@ -9,6 +9,7 @@ import {selectBcCostEvidenceDerivation0553} from "./bcCostEvidenceDerivation0553
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
 import {selectBcExecutionComplianceAudit0553} from "./bcExecutionComplianceAudit0553";
 import {selectBcWorkCostLines0553} from "./bcWorkCostLines0553";
+import {selectBcB5HistoricalPriceBridge0553} from "./bcB5HistoricalPriceBridge0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553,validateBcRoutes0553} from "./bcWorkingModuleRoutes0553";
 
 const activitiesForCustomerCode=Object.freeze({
@@ -49,6 +50,19 @@ export function selectBcTurnkeyWorkingCost0553(){
  const workCostLines=selectBcWorkCostLines0553();
  if(workCostLines.sourceModuleId!==executionAudit.moduleId)throw Error("10.2 working line audit divergence");
  const evidence=selectBcCostEvidenceDerivation0553();
+ const b5Historical=selectBcB5HistoricalPriceBridge0553();
+ const b5PriceReference=Object.freeze({
+  amountTHB:b5Historical.originalB5PackingOnlySellTHB,
+  currency:"THB",priceClass:"HISTORICAL_PACKING_ONLY_BUDGETARY_CANDIDATE",
+  sourceRevision:b5Historical.sourceRevision,sourceUrl:b5Historical.sourceUrl,
+  sourceLines:b5Historical.sourceLines.filter(x=>x.costBucket==="B5"),
+  costOwner:"B5 — Physical packing and marking; OEM/SAMTEL inclusion subject to verification",
+  excludedStorageOwner:"B7 — Storage; no additive B5/B7 posting",
+  nonAdditiveStorageTHB:b5Historical.originalB5EmbeddedStorageSellTHB,
+  historicalGrossB5THB:b5Historical.originalB5HistoricalSellTHB,
+  validCurrentDirectCost:false,approvedWorkingSell:false,postToPricing:false,
+  status:"HISTORICAL_REFERENCE_ONLY__CURRENT_DIRECT_COST_NOT_ESTABLISHED"
+ });
  const byCode=new Map(wbs.rows.map(row=>[row.code,row]));
  const rows=BC_CUSTOMER_CODES_0553.map(code=>{
   const w=byCode.get(code);
@@ -91,6 +105,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    priceStatus:sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
+   b5PriceReference:code==="B5"?b5PriceReference:null,
    costEvidence, // Read-only 01–08 requirements, WBS / route equations and explicit missing direct-cost input ledger.
    executionAuditModuleId:executionAudit.moduleId,
    executionAuditIds:(executionAudit.byCode[code]||[]).map(x=>x.id),
