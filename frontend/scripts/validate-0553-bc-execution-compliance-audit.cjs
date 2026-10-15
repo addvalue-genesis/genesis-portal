@@ -13,6 +13,7 @@ require.extensions[".js"]=(mod,file)=>{
 };
 const from=p=>require(path.join(root,"project0553",p));
 const {selectBcExecutionComplianceAudit0553,BC_EXECUTION_AUDIT_ITEMS_0553}=from("data/bcExecutionComplianceAudit0553.js");
+const {evaluateOffshoreMobDemobEconomics0553}=from("data/bcMobDemobEconomics0553.js");
 const {selectBcTurnkeyWorkingCost0553}=from("data/bcTurnkeyWorkingCost0553.js");
 const {derivePartBcWorkingWbs0553}=from("data/partBCWorkingWbs0553.js");
 const {FAT_EXECUTION_BASIS_0553}=from("data/fatExecutionBasis0553.js");
@@ -72,6 +73,38 @@ assert(a.laborPricePolicy.includes("payroll"));
 for(const key of ["workingCostTHB","permitFeesTHB","freightTHB","mobDemobActualCostTHB"])
  assert.equal(a[key],null,"No guessed permit/freight/staff cost: "+key);
 assert.equal(a.customerReleaseAllowed,false);
+const mobBase=evaluateOffshoreMobDemobEconomics0553();
+assert.equal(mobBase.state,"INSUFFICIENT_VERIFIED_COST_OR_ACCESS_DATA");
+assert.equal(mobBase.recommendation,null);
+assert.equal(mobBase.workingB3SellReferenceTHB,2109600);
+assert.equal(mobBase.directCostPostingAllowed,false);
+const syntheticSites=["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11"];
+const makeOption=(id,n,extra=0)=>({id,rotationCount:n,coveredSites:syntheticSites,
+ hucApproved:true,simopsApproved:true,pobApproved:true,marineTransfersApproved:true,
+ approvedScheduleRef:"SYNTHETIC_VALIDATION_ONLY",transferAndAdditionalCostTHB:extra});
+const compared=evaluateOffshoreMobDemobEconomics0553({
+ crewCostTHBPerMD:1000,travelTHBPerPersonRoundTrip:5000,
+ extraMobDemobMDPerRotation:2,mobDemobAlreadyIncludedIn39:false,
+ options:[makeOption("TEST-FIVE",5),makeOption("TEST-FOUR",4,2000)]
+});
+assert.equal(compared.state,"COMPARABLE_COST_SCENARIOS_PENDING_MANAGEMENT_RELEASE");
+assert.equal(compared.recommendation.id,"TEST-FOUR");
+assert.equal(compared.scenarios[0].scenarioTotalDirectCostTHB,138000);
+assert.equal(compared.scenarios[1].scenarioTotalDirectCostTHB,128000);
+assert(compared.scenarios.every(o=>o.includedInCurrentCostLedger===false));
+const unapproved=evaluateOffshoreMobDemobEconomics0553({
+ crewCostTHBPerMD:1000,travelTHBPerPersonRoundTrip:5000,
+ extraMobDemobMDPerRotation:2,mobDemobAlreadyIncludedIn39:false,
+ options:[makeOption("TEST-FIVE",5),{...makeOption("TEST-FOUR",4),hucApproved:false}]
+});
+assert.equal(unapproved.recommendation,null,"Unapproved HUC must block economic trip recommendation");
+assert.equal(unapproved.scenarios[1].scenarioTotalDirectCostTHB,null);
+const mobIncluded=evaluateOffshoreMobDemobEconomics0553({
+ crewCostTHBPerMD:1000,travelTHBPerPersonRoundTrip:5000,
+ extraMobDemobMDPerRotation:2,mobDemobAlreadyIncludedIn39:true,
+ options:[makeOption("TEST-FIVE",5),makeOption("TEST-FOUR",4,2000)]
+});
+assert.equal(mobIncluded.scenarios[0].extraMobCostTHB,0,"Do not duplicate MOB labor already included in working base");
 assert.equal(FAT_EXECUTION_BASIS_0553.integratedFat.location,"SAMTEL Bangkok, Thailand");
 assert.equal(JSON.stringify(derivePartBcWorkingWbs0553()),oldWbs);
 assert.equal(JSON.stringify(selectBcTurnkeyWorkingCost0553()),oldLedger);
@@ -91,4 +124,5 @@ assert(ui.includes('m.offshore.trips.map('));
 assert(ui.includes('visible.map(row=>'));
 assert(ui.includes('m.specialTools.map('));
 assert(ui.includes("m.regulatoryPolicy")&&ui.includes("m.laborPricePolicy"));
+assert(ui.includes("evaluateOffshoreMobDemobEconomics0553()")&&ui.includes("mobilizationEconomics.moduleId"));
 console.log("PASS 0553 B/C execution 01–08 compliance: 32+ source clauses, all B/C codes, FAT/notice conflict, 5-trip/39-team-day/78-MD WBS vs superseded 44/88, Myanmar/Thai permit RACI, Annex-8 tools, no invented cost or changed SELL.");
