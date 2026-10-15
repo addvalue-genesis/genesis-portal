@@ -63,17 +63,21 @@ function rowCost(item){
   const plugQuote=innova?.lines.find(v=>v.partNumber==="IE-PS-RJ45-FH-BK");
   const plugQuotedRate=Number.isFinite(plugQuote?.unitPriceExVat)?plugQuote.unitPriceExVat:null;
   const plugQty=1; // ZWP20 engineering budget assumption; never copied from vendor quote qty
-  const plugRsEvidence=findZwp20WebRate0553("RJ45"); // canonical 07 rate evidence
-  const plugBudgetRate=plugQuotedRate===null?plugRsEvidence?.rateTHB??null:plugQuotedRate;
+  const plugRsEvidence=findZwp20WebRate0553("RJ45"); // canonical 07 rate and management decision evidence
+  const approvedRsBudgetRate=plugRsEvidence?.approvalStatus==="MANAGEMENT_APPROVED_INTERNAL_BUDGETARY_PRODUCT_AND_RATE";
+  // A newer unapproved supplier price must not silently override the already approved
+  // budgetary selected source. A controlled revision/change approval is required.
+  const plugBudgetRate=approvedRsBudgetRate?plugRsEvidence.rateTHB:
+    plugQuotedRate===null?plugRsEvidence?.rateTHB??null:plugQuotedRate;
   const weidmuellerPlug={functionId:"DATO_RJ45_FIELD_PLUG",vendor:"RS Thailand / Weidmüller",
     sku:"IE-PS-RJ45-FH-BK",orderNo:"1963600000",qty:plugQty,currency:"THB",
     quotedUnitPrice:plugQuotedRate,unitPrice:plugBudgetRate,extended:money(plugQty,plugBudgetRate),
-    priceBasis:plugQuotedRate===null?"RS_ONLINE_RETAIL_INDICATIVE_EX_VAT_NOT_VENDOR_RFQ":"INNOVA_QUOTED_PRICE_EX_VAT",
+    priceBasis:approvedRsBudgetRate?"MANAGEMENT_APPROVED_RS_RETAIL_BUDGET_REFERENCE_EX_VAT":plugQuotedRate===null?"RS_ONLINE_RETAIL_INDICATIVE_EX_VAT_NOT_VENDOR_RFQ":"INNOVA_QUOTED_PRICE_EX_VAT",
     budgetApproval:plugRsEvidence?.approvalStatus||"BUDGET_APPROVAL_NOT_RECORDED",
     budgetApprovedBy:plugRsEvidence?.approvalAuthority||null,
     budgetApprovalSource:plugRsEvidence?.approvalConfirmation||null,
     budgetApprovalScope:plugRsEvidence?.approvalScope||null,
-    quote:"QA24-0604 (N/A)",quoteItem:2,source:plugQuotedRate===null?plugRsEvidence?.url??null:innova?.url||null,
+    quote:"QA24-0604 (N/A)",quoteItem:2,source:approvedRsBudgetRate||plugQuotedRate===null?plugRsEvidence?.url??null:innova?.url||null,
     exStatus:"IP20_DATASHEET__EX_COMPLIANCE_NOT_ESTABLISHED"};
   const panelAmount=money(q,rate);
   const budgetaryDATO=Number.isFinite(panelAmount)&&Number.isFinite(weidmuellerPlug.extended)?Math.round((panelAmount+weidmuellerPlug.extended)*100)/100:null;
@@ -85,7 +89,7 @@ function rowCost(item){
    // This MTO unit is one complete DATO Set; component unit rates remain in components[].
    unitCost:Number.isFinite(budgetaryDATO)&&q>0?Math.round(budgetaryDATO/q*100)/100:null,
    extended:budgetaryDATO,
-   source:"SONIC CCY24-PXC-633 (panel) + "+(plugQuotedRate===null?"RS Thailand 741-7317 (plug retail budget reference)":"INNOVA QA24-0604 (plug quote)"),
+   source:"SONIC CCY24-PXC-633 (panel) + "+(approvedRsBudgetRate||plugQuotedRate===null?"RS Thailand 741-7317 (management-approved plug retail budget reference)":"INNOVA QA24-0604 (plug quote)"),
    priceRevision:"2026-10-12_RS_RETAIL_BUDGET_RATE_SUPERSEDES_TEMP_ZERO",
    quantityBasis:"MTO Rev04 DATO-507-001 1 Set; assumed one RJ45 patch panel as provisional budgetary interface equivalent; actual Ex-rated disconnect composition must be checked",
    status:"MANAGEMENT_APPROVED_BUDGETARY_SELECTION_AND_RATE__EX_REVIEW",
