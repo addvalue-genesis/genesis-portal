@@ -200,6 +200,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <p className="p55-note">ข้อมูลที่แสดงมาจาก MTO → Required Engineering Objects → Vendor Source Registry โดยตรง ไม่กรอกซ้ำในหน้า Budget. จำนวน Set/Lot เป็น Requirement Scope; Vendor SKU Candidates ยังไม่ใช่ Selected/Approved BOM.</p>
   <ScadaPhysicalCompleteness0553 site={site} fx={fx}/>
   <div className="p55-panel" style={{padding:12,margin:"10px 0",border:"1px solid #b8ccd9"}}>
+   <strong>10.1.1 — Engineering BOM Working Hub</strong>
+   <p className="p55-note">Context, Filters and MTO Table are members of this workbench, not approval gates.</p>
    <strong>10.1.1.1 — Context (support control)</strong>
    <div style={{display:"flex",flexWrap:"wrap",gap:14,alignItems:"center",marginTop:8}}>
     <span>System <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom."+system.toLowerCase().replace("-","")}/></span>
@@ -338,5 +340,9 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <p className="p55-note">ZWP20 GREENFIELD total across all equipment, vendor packages and bulk is NOT ESTABLISHED; Cisco-only priced subtotal must never be labelled total location cost. Subtotal is for priced working items only. It excludes non-priced MR0001 equipment, bulk, spares and services. Customer A+B+C total and selling price remain separate; 4-Scope of Supply.xlsx is the controlled output template.</p>
   </>}
   </ControlledModuleSection0553>
+  <div className="p55-panel" data-component-key="bid.budget.bom.engineering-verification">
+   <strong>10.1.2 — Engineering Verification Process</strong>
+   <p className="p55-note">10.1.2.1 Requirement → 10.1.2.2 Physical Function → 10.1.2.3 Quantity → 10.1.2.4 OEM SKU → 10.1.2.5 Cost Allocation → 10.1.2.6 Reconciliation. Process mapping only; engineering approval remains evidence-gated.</p>
+  </div>
  </section>;
 }
