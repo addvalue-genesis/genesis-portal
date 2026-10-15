@@ -38,7 +38,15 @@ for(const item of e.rows){
  assert(item.stages.some(x=>x.id==="08"&&x.state==="QUALIFICATIONS_OPEN"));
  assert.deepEqual(bc.byCode[item.code].costEvidence,item);
  assert.equal(bc.byCode[item.code].directCostTHB,null);
- assert.equal(item.workingSellTHB,bc.byCode[item.code].workingSellTHB);
+ // The 01–08 evidence remains the immutable source WBS (B6 has its existing transport reference).
+ // Budgetary 10.2 SELL overlays are separately owned by the canonical selector.
+ const working=derivePartBcWorkingWbs0553().rows.find(r=>r.code===item.code);
+ if(item.code==="B6")assert.equal(item.workingSellTHB,bc.byCode.B6.workingSellTHB);
+ else assert.equal(item.workingSellTHB,working.sellTHB,item.code+" WBS evidence source");
+ if(["B5","B10","B13","C1","C2"].includes(item.code)){
+  assert(Number.isFinite(bc.byCode[item.code].workingSellTHB),item.code+" budgetary working sell");
+  assert.equal(bc.byCode[item.code].directCostTHB,null,item.code+" sell must not become direct cost");
+ }else assert.equal(item.workingSellTHB,bc.byCode[item.code].workingSellTHB,item.code+" canonical divergence");
  for(const line of item.lines){
   if(Number.isFinite(line.amountTHB))
    assert(!["APPROVED_DIRECT_COST","CUSTOMER_RELEASED_SELL"].includes(line.valueClass));
