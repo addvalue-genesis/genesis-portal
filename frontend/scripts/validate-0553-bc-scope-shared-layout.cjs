@@ -22,8 +22,11 @@ assert(work.includes('item.workingSellTHB'));
 assert(work.includes('item.directCostTHB'));
 assert(work.includes('bcPriceAudit.byCode[item.code]?.historicalReferenceTHB'));
 assert(work.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcDetailCode]}/>'));
-assert(work.includes('<ScopeBcAnnexDetail0553 code={bcDetailCode} fx={fx} mode="working"/>'),
+assert(work.includes('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>'),
  "10.2 must show same B10/B11/B13/B14/C1/C2 full price details as 10.5");
+assert(work.includes('bcTab==="ALL"&&<div className="p55-table-wrap"'),"Only summary tab should show the all-B/C summary table");
+assert(work.indexOf('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>') <
+ work.indexOf('bcWorking.rows.map(item=>item)'),"B10 detail should appear immediately below tabs, before the summary section");
 const annex=read("project0553/ScopeBcAnnexDetail0553.jsx");
 assert(annex.includes('const inWorking=mode==="working"') &&
  annex.includes('inWorking?"bid.budget.working.bc."') &&
