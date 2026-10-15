@@ -6,6 +6,7 @@ import PARTICULAR from "./documentParticularRequirements0553.json";
 import {PART_BC_WBS_SOURCE_0553,derivePartBcWorkingWbs0553} from "./partBCWorkingWbs0553";
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
 import {BC_CUSTOMER_CODES_0553} from "./bcWorkingModuleRoutes0553";
+import {REV08_BASELINE} from "./rev08CommercialBaseline";
 
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 const SOURCE_URL=PART_BC_WBS_SOURCE_0553.url;
@@ -91,10 +92,14 @@ function forCode(code,working){
    ],reconciliation:{workingSellTHB:total,fatWorkingSellTHB:fat,offshoreWorkingSellTHB:offshore,approvedLocation:FAT_EXECUTION_BASIS_0553.integratedFat.location}};
   }
   case "B6":{
+   const historical=REV08_BASELINE.summary.find(x=>x[0]==="B6");
+   if(!historical||historical[2]!==9764.5714||REV08_BASELINE.currency!=="USD")throw Error("B6 Rev08 historical freight evidence changed");
    return {sheet,lines:FAT_EXECUTION_BASIS_0553.mrPaths.map(x=>r(
     "B6-"+x.mr,x.mr+" — "+x.routing,null,"shipments / customs",
     x.source+"; "+x.logistics
-   )),reconciliation:{requiredMRs:4,coveredMRs:FAT_EXECUTION_BASIS_0553.mrPaths.length,namedFinalDestination:FAT_EXECUTION_BASIS_0553.yard.location}};
+   )),reconciliation:{requiredMRs:4,coveredMRs:FAT_EXECUTION_BASIS_0553.mrPaths.length,namedFinalDestination:FAT_EXECUTION_BASIS_0553.yard.location,
+    historicalRev08TransportSellUSD:historical[2],historicalCurrency:"USD",historicalBasis:"4-Scope of Supply.xlsx Rev08 / B6 Transportation — HISTORICAL SELL ONLY; not freight quotation or direct cost",
+    historicToCurrentAllocation:"NOT_ALLOWED_WITHOUT_FREIGHT_QUOTE_AND_SCOPE_RECONCILIATION"}};
   }
   case "B9":{
    if(working.sellTHB!==574560)throw Error("B9 WBS sell has changed");
