@@ -4,7 +4,8 @@ import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl"
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
 import {ScopeSheetsDetail0553} from "./ScopeSheetsDetail0553";
-import {deriveWorkingCostReview0553} from "./data/workingCostReview0553";
+import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
+import {deriveA5BulkAttribution0553} from "./data/a5BulkAttribution0553";
 
 // Workbook-driven navigation, not an editable BOM and not a released quote.
 // The historical Rev08 amounts are source evidence ONLY; never promote them
@@ -30,8 +31,20 @@ export function BudgetaryWorkbookPreview0553(){
  const active=template.sheets.find(s=>s.name===sheet);
  const layout=OFFICIAL_WORKBOOK_TEMPLATE_0553.sheets.find(s=>s.name===sheet);
  const currentFx={thbPerUsd:fx.THB&&Number(fx.THB)>0?Number(fx.THB):null,cnyPerUsd:fx.CNY&&Number(fx.CNY)>0?Number(fx.CNY):null};
- const a1Review=deriveWorkingCostReview0553(currency,currentFx);
- const a1Coverage={...a1Review.partA,siteCount:a1Review.bySite.filter(s=>s.site!=="UNALLOCATED").length,pricedCount:a1Review.partA.known,unpricedCount:a1Review.partA.pending,knownCost:a1Review.partA.original};
+ // Mirror the four canonical Scope A equipment projections; no second supplier ledger.
+ const mrPartA=["MR-0001","MR-0002","MR-0003","MR-0004"].map((mr,index)=>{
+  const projection=selectWorkingBomProjection0553({mr});
+  const currencies=projection.currencies||{};
+  const unsupported=Object.keys(currencies).filter(k=>k!=="THB"&&k!=="USD");
+  const amount=unsupported.length||projection.orphanCurrency||(!currentFx.thbPerUsd&&currencies.USD)?null:
+   Math.round(((currencies.THB||0)+(currencies.USD||0)*(currentFx.thbPerUsd||0))*100)/100;
+  const labels=["SCADA / AVIAT / Cisco","DMR Trunk Radio","Telephone / sounder / JB","RACON"];
+  return {code:"A"+(index+1),mr,description:labels[index],amount,
+   status:projection.priced+" priced; "+projection.unresolved+" unresolved · Working Scope reference, not released sell"};
+ });
+ const a5Memo=deriveA5BulkAttribution0553();
+ const partADisplay=[...mrPartA,{code:"A5",mr:"MR-0001–0004",description:"Bulk materials and accessories",amount:a5Memo.a5PriceTHB,
+  status:"Included in A1, non-additive; "+a5Memo.rowCount+" traced MTO lots"}];
 
  return <section className="p55-panel" data-component-key="bid.budget.summary.workbook">
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · NATIVE SOURCE WORKBOOK STRUCTURE <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.summary.workbook"/></div>
@@ -71,7 +84,7 @@ export function BudgetaryWorkbookPreview0553(){
     <tbody>{Array.from({length:layout.maxRow},(_,i)=>i+1).map(rowNum=>{
      const row=[...(layout.rows.find(r=>r[0]===rowNum)||[rowNum])];
      let overlay=false,refCode="";
-     if(showHistorical&&active?.kind==="SUMMARY"){
+     if(showHistorical&&active?.kind==="SUMMARY"&&!(rowNum>=7&&rowNum<=22)){
       const match=REV08_BASELINE.summary.find(([code])=>summaryCellRow[code]===rowNum);
       if(match){
        const [code,desc,amount]=match;refCode=code;overlay=true;
@@ -97,24 +110,32 @@ export function BudgetaryWorkbookPreview0553(){
       <span style={{marginLeft:12}}><ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+"."+section.toLowerCase()}/></span>
      </td></tr>:null;
      const hidden=section&&collapsed[sheet+":"+section];
-     if(hidden||(!showEmptyRows&&!visibleContent))return header;
+     if(hidden||(!showEmptyRows&&!visibleContent&&!(sheet==="Scope of supply"&&rowNum>=8&&rowNum<=12)))return header;
      return <React.Fragment key={rowNum}>{header}<tr style={overlay?{background:"rgba(36,111,184,0.07)"}:{}}>
       <td><strong>{rowNum}</strong></td>
       {Array.from({length:layout.columns},(_,col)=>{
-       const a1Cell=sheet==="Scope of supply"&&rowNum===7;
-       const value=a1Cell&&col===6
-         ?(a1Coverage.knownCost.length?a1Coverage.knownCost.map(x=>"WORKING COST "+x.currency+" "+money(x.amount)).join(" / "):"NO WORKING COST")
-         :row[col+1]??"";
+       const partAIndex=sheet==="Scope of supply"&&rowNum>=8&&rowNum<=12?rowNum-8:-1;
+       const partAItem=partAIndex>=0?partADisplay[partAIndex]:null;
+       // The original Row 5 gives the customer's A–H schema; Row 7 is a group,
+       // not a cost row. Row 8 onward is a working MR package schedule.
+       const partACells=partAItem?[
+        partAItem.code,partAItem.mr+" · TAG ANNEX",partAItem.description,
+        "Equipment package / refer to MR and TAG schedule",
+        "1 package",partAItem.code==="A5"?"INCLUDED IN A1":Number.isFinite(partAItem.amount)?money(partAItem.amount):"UNPRICED",
+        partAItem.code==="A5"?"NON-ADDITIVE":Number.isFinite(partAItem.amount)?money(partAItem.amount):"UNPRICED",
+        partAItem.status
+       ]:null;
+       const value=partACells?partACells[col]:rowNum===7&&col>=4&&col<=7?"":row[col+1]??"";
        const isPrice=overlay&&(active?.kind==="SUMMARY"?col===6:(col===7||col===8));
        return <td key={col} style={{whiteSpace:"pre-wrap",minWidth:col===0?65:95}}>
-        {value}{a1Cell&&col===6&&<small style={{display:"block"}}>COST ONLY · NOT CUSTOMER SELL · A1: {a1Coverage.pricedCount} costed / {a1Coverage.unpricedCount} unpriced · {a1Coverage.siteCount} locations · NOT APPROVED</small>}{a1Cell&&col===7&&<small style={{display:"block"}}>SOURCE: bid.budget.bom · PRELIMINARY · SELL PRICE NOT APPROVED · Converted {currency}: {money(a1Review.partA.converted)} · {a1Review.partA.pending} PENDING · B/C/PROJECT INCOMPLETE</small>}{isPrice&&<small style={{display:"block"}}>REV08 · historical {fxReady?currency:"FX MISSING"} · {refCode}</small>}
+        {value}{isPrice&&<small style={{display:"block"}}>REV08 · historical {fxReady?currency:"FX MISSING"} · {refCode}</small>}
        </td>;
       })}
       <td>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/>}</td>
-     </tr>{sheet==="Scope of supply"&&rowNum===7&&<tr key="part-a-bom"><td colSpan={layout.columns+2}><ScopeSheetsDetail0553 fx={{thbPerUsd:currentFx.thbPerUsd}} view="part-a"/></td></tr>}</React.Fragment>;
+     </tr></React.Fragment>;
     })}</tbody>
    </table></div>
-   <p className="p55-note">Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
+   <p className="p55-note">Part A working rows 8–12 use the customer column layout, grouped by MR. TAG ANNEX is a reference, not an invented equipment tag. Quantity 1 package is a display grouping, not an engineering unit count. A5 is included in A1. Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
    <p className="p55-note">The native XLSX retains all rows and columns. The JSX keeps worksheet header, totals and remarks visible while item rows can collapse. It hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
  </section>;
