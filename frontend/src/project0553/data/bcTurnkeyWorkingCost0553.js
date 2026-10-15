@@ -7,6 +7,7 @@ import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkin
 import {LIFECYCLE_SPARES_0553} from "./lifecycleSpareScope0553";
 import {selectBcCostEvidenceDerivation0553} from "./bcCostEvidenceDerivation0553";
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
+import {selectBcExecutionComplianceAudit0553} from "./bcExecutionComplianceAudit0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553,validateBcRoutes0553} from "./bcWorkingModuleRoutes0553";
 
 const activitiesForCustomerCode=Object.freeze({
@@ -43,6 +44,7 @@ const executionDecisionByCode=Object.freeze({
 export function selectBcTurnkeyWorkingCost0553(){
  if(!validateBcRoutes0553())throw Error("Customer B/C routing is incomplete or duplicated");
  const wbs=derivePartBcWorkingWbs0553();
+ const executionAudit=selectBcExecutionComplianceAudit0553();
  const evidence=selectBcCostEvidenceDerivation0553();
  const byCode=new Map(wbs.rows.map(row=>[row.code,row]));
  const rows=BC_CUSTOMER_CODES_0553.map(code=>{
@@ -87,6 +89,9 @@ export function selectBcTurnkeyWorkingCost0553(){
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
    costEvidence, // Read-only 01–08 requirements, WBS / route equations and explicit missing direct-cost input ledger.
+   executionAuditModuleId:executionAudit.moduleId,
+   executionAuditIds:(executionAudit.byCode[code]||[]).map(x=>x.id),
+   executionAuditCount:(executionAudit.byCode[code]||[]).length,
    optional,baseScope:!optional,
    sourceOwnership:"CUSTOMER_REQUIREMENT_TO_WORKING_SOURCE",
    noDoubleCountRule:"One cost owner per requirement; no posting of historical Rev08 or OEM-included component without explicit exclusion proof",
