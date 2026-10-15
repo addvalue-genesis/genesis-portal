@@ -334,3 +334,13 @@
   overflow-wrap:anywhere;
   white-space:normal;
 }
+
+/* Exact Module Navigator deep-link target in 10.2; not an approval indicator. */
+.p553-dashboard .p553-budget-phase tr.p553-module-nav-target td {
+  background:#e5f2f9;
+  border-top:2px solid #18789d;
+  border-bottom:2px solid #18789d;
+}
+.p553-dashboard .p553-budget-phase tr.p553-module-nav-target td:first-child {
+  border-left:3px solid #18789d;
+}
