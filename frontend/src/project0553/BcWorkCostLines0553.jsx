@@ -3,6 +3,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcWorkCostLines0553} from "./data/bcWorkCostLines0553";
 import {B1B2EquationAudit0553} from "./B1B2EquationAudit0553";
 import {B3EquationAudit0553} from "./B3EquationAudit0553";
+import {B5EquationAudit0553} from "./B5EquationAudit0553";
 
 const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US"):"TO VERIFY";
@@ -21,13 +22,14 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  return <details className="p55-panel" data-component-key={m.moduleId} open={selectedCode!=="ALL"} style={{marginTop:12,padding:"12px 14px"}}>
   <summary><strong>10.2 — First Principles / Resource &amp; Cost-Line Ledger</strong> · {physical.length} work objects · {clauses.length} audited clauses</summary>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={m.moduleId}/> · Cost Owner: 10.2 only · Source: <a href={m.sourceUrl} target="_blank" rel="noreferrer">{m.sourceRevision}</a></p>
-  <p className="p55-note"><strong>Selected:</strong> {selectedCode==="ALL"?"B1/B2/B3/B6/B9/B10/B11 (current derivation priority)":selectedCode}
+  <p className="p55-note"><strong>Selected:</strong> {selectedCode==="ALL"?"B1/B2/B3/B5/B6/B9/B10/B11 (current derivation priority)":selectedCode}
    {" "}· Known WBS Working SELL subtotal: {knownSellCount>0?money(displayedWbsSell):"NOT ESTABLISHED"} ({knownSellCount}/{showGroup.length} priced; {completeSell?"covered":"NOT complete price"})
    {" "}· Actual Direct COST: <strong>NOT ESTABLISHED</strong>
    {" "}· Historical B1 proxy (not approved cost): {historicalProxy?money(historicalProxy):"n/a"}</p>
   <p className="p55-note">แต่ละบรรทัดมี ID, Quantity, Formula, SELL RATE/SELL AMOUNT (เฉพาะที่มีหลักฐาน), Cost Owner และ Source. ค่า Historical Cost Proxy ห้ามนับเป็น Current Direct Cost. รายการที่ระบุ Included เป็นตัวขับทางวิศวกรรม ไม่ใช่ต้นทุนใหม่.</p>
   {(selectedCode==="ALL"||selectedCode==="B1"||selectedCode==="B2")&&<B1B2EquationAudit0553 selectedCode={selectedCode}/>}
   {(selectedCode==="ALL"||selectedCode==="B3")&&<B3EquationAudit0553 selectedCode={selectedCode}/>}
+  {(selectedCode==="ALL"||selectedCode==="B5")&&<B5EquationAudit0553 selectedCode={selectedCode}/>}
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Module ID / CBS</th><th>Work Object / Resource</th><th>Qty / Unit</th><th>Working SELL Rate THB</th><th>Working SELL Total THB</th><th>Current Direct COST THB</th><th>Equation / Owner / Source / Gate</th></tr></thead>
    <tbody>{physical.map(x=><tr key={x.id} data-component-key={x.moduleId}>
