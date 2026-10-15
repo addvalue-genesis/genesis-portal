@@ -128,12 +128,14 @@ export function ScopeSheetsDetail0553({fx=null}){
    const item=workingSummary[id]||(control?{amount:control.sellTHB,status:control.state,source:control.driver+" · "+control.owner+" · "+control.source}:null),amount=item?.amount;
    const unavailable=id==="A5"?"A5 source/ledger reconciliation required":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
-    control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (working basis)";
+    id==="B10"?"1 LS (9 spare lines)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (working basis)";
+   // B10 summary is a projection of the B10 detail sheet, never a second price source.
+   const b10SheetTHB=id==="B10"&&fxValid?round(b10HistoricalUSD*fx.thbPerUsd):null;
+   const displayedAmount=id==="B10"?b10SheetTHB:amount;
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>{qtyDisplay}</td>
-    <td className="is-number">{Number.isFinite(control?.unitPriceTHB)?cash(control.unitPriceTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
-    <td className="is-number">{Number.isFinite(amount)?cash(amount):control?"Owner / OEM quotation required":unavailable}
-     {id==="B10"&&<small><strong>Linked B10 sheet subtotal — Rev08 historical only:</strong> {fxValid?cash(round(b10HistoricalUSD*fx.thbPerUsd)):"Awaiting FX"} (not current OEM cost)</small>}</td>
-    <td>{item?<>{item.status}<small>{item.source}</small>{id==="B10"&&<small>Historical subtotal is calculated from REV08_BASELINE.detail.B10 (same 9 source lines rendered in bid.budget.scope.b10); vendor verification remains separate.</small>}</>:"Non-A scope: separate cost derivation required"}</td></tr>;
+    <td className="is-number">{id==="B10"?(Number.isFinite(b10SheetTHB)?cash(b10SheetTHB):"Awaiting FX"):Number.isFinite(control?.unitPriceTHB)?cash(control.unitPriceTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
+    <td className="is-number">{Number.isFinite(displayedAmount)?cash(displayedAmount):id==="B10"?"Awaiting FX":control?"Owner / OEM quotation required":unavailable}</td>
+    <td>{id==="B10"?<><strong>REV08 HISTORICAL — NOT CURRENT OEM COST</strong><small>Direct subtotal of the same 9 line items in bid.budget.scope.b10 · source REV08_BASELINE.detail.B10 · original USD converted with active THB/USD FX. Current OEM verification remains pending; do not book twice.</small></>:item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(([desc,qty,price],i)=>{
    // Historical template numbers are customer-facing Rev08 prices, not present-day supplier cost.
    const rate=fxValid?round(price*fx.thbPerUsd):null;
