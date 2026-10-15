@@ -94,11 +94,13 @@ function forCode(code,working){
   case "B6":{
    const historical=REV08_BASELINE.summary.find(x=>x[0]==="B6");
    if(!historical||historical[2]!==9764.5714||REV08_BASELINE.currency!=="USD")throw Error("B6 Rev08 historical freight evidence changed");
+   const planningFxTHBPerUSD=31.5; // Rev05 WBS working planning FX; NOT verified BOT FX.
+   const historicalDisplayTHB=round(historical[2]*planningFxTHBPerUSD);
    return {sheet,lines:FAT_EXECUTION_BASIS_0553.mrPaths.map(x=>r(
     "B6-"+x.mr,x.mr+" — "+x.routing,null,"shipments / customs",
     x.source+"; "+x.logistics
    )),reconciliation:{requiredMRs:4,coveredMRs:FAT_EXECUTION_BASIS_0553.mrPaths.length,namedFinalDestination:FAT_EXECUTION_BASIS_0553.yard.location,
-    historicalRev08TransportSellUSD:historical[2],historicalCurrency:"USD",historicalBasis:"4-Scope of Supply.xlsx Rev08 / B6 Transportation — HISTORICAL SELL ONLY; not freight quotation or direct cost",
+    historicalRev08TransportSellTHB:historicalDisplayTHB,displayCurrency:"THB",planningFxTHBPerUSD,fxBasis:"REV05_WORKING_PLANNING_FX_NOT_BOT_VERIFIED",historicalBasis:"4-Scope of Supply.xlsx Rev08 / B6 Transportation — HISTORICAL SELL ONLY; not freight quotation or direct cost",
     historicToCurrentAllocation:"NOT_ALLOWED_WITHOUT_FREIGHT_QUOTE_AND_SCOPE_RECONCILIATION"}};
   }
   case "B9":{
