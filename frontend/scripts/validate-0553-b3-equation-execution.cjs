@@ -73,7 +73,7 @@ assert.equal(b.knownWorkingSellTHB,3804160);
 assert.equal(b.knownDirectCostTHB,null);
 assert.equal(b.releaseAllowed,false);
 assert.equal(derivePartBcWorkingWbs0553().subtotalTHB,3804160);
-assert.equal(w.rows.length,105);
+assert.equal(w.rows.length,111);
 assert.equal(w.requiredAuditCount,40);
 const ui=fs.readFileSync(path.join(root,"project0553/B3EquationAudit0553.jsx"),"utf8");
 assert(ui.includes("proof.irtSourceRows.map")&&ui.includes("proof.offshore.workingTrips.map")&&ui.includes("proof.validation.map")&&ui.includes("proof.testDocumentRows.map"));
