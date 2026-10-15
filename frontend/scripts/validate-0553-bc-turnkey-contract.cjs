@@ -43,7 +43,7 @@ assert.equal(m.optionalCostTHB,null);
 assert.equal(m.releaseAllowed,false);
 assert.equal(m.costComplete,false);
 assert.equal(m.noCrossBasisSummation,true);
-assert.equal(m.rows.filter(r=>Number.isFinite(r.workingSellTHB)).length,9);
+assert.equal(m.rows.filter(r=>Number.isFinite(r.workingSellTHB)).length,11);
 assert.equal(m.byCode.B10.workingSellTHB,123024.37);
 assert.equal(m.byCode.B13.workingSellTHB,22484.21);
 assert.equal(m.byCode.C1.workingSellTHB,4049349.36);
