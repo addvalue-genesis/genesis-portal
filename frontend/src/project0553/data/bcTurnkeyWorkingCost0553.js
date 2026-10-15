@@ -106,6 +106,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
    b5PriceReference:code==="B5"?b5PriceReference:null,
+   b6UpdatedReview:code==="B6"?Object.freeze({status:"UPDATED_WORKING_REVIEW_2026_10_15",reviewedOn:"2026-10-15",displayCurrency:"THB",historicalPriceReferenceTHB:costEvidence.reconciliation.historicalRev08TransportSellTHB,priceBasis:"REV08_HISTORICAL_SELL_CONVERTED_AT_PLANNING_FX_31_5",costVerified:false,shipmentScopeVerified:false,pricePostingAllowed:false,releaseAllowed:false}):null,
    costEvidence, // Read-only 01–08 requirements, WBS / route equations and explicit missing direct-cost input ledger.
    executionAuditModuleId:executionAudit.moduleId,
    executionAuditIds:(executionAudit.byCode[code]||[]).map(x=>x.id),
