@@ -19,6 +19,7 @@ export function BudgetaryWorkbookPreview0553(){
  const [showHistorical,setShowHistorical]=useState(false);
  const [showEmptyRows,setShowEmptyRows]=useState(false);
  const [collapsed,setCollapsed]=useState({});
+ const [expandedMr,setExpandedMr]=useState({});
  const sectionForRow=(n)=>sheet==="Scope of supply"?(n>=7&&n<=22?"PART_A":n>=24&&n<=37?"PART_B":n>=41&&n<=42?"PART_C":null):(layout.sections.items.start<=n&&n<=layout.sections.items.end?"ITEMS":null);
  const labels=sheet==="Scope of supply"?{PART_A:"Part A — Basic Equipment",PART_B:"Part B — Services / Spares",PART_C:"Part C — Options"}:{ITEMS:"Detailed item schedule / รายการย่อย"};
  const toggleSection=(key)=>setCollapsed(v=>({...v,[sheet+":"+key]:!v[sheet+":"+key]}));
@@ -140,7 +141,7 @@ export function BudgetaryWorkbookPreview0553(){
        // The original Row 5 gives the customer's A–H schema; Row 7 is a group,
        // not a cost row. Row 8 onward is a working MR package schedule.
        const partACells=partAItem?[
-        partAItem.code+" / "+partAItem.mr,partAItem.code==="A5"?"—":"— (MR group)",partAItem.description,
+        partAItem.code+" / "+partAItem.mr,partAItem.code==="A5"?"Included bulk":"MR equipment group",partAItem.description,
         partAItem.major||"Cross-system bulk — see MTO",
         "1 package",partAItem.code==="A5"?"INCLUDED IN A1":Number.isFinite(partAItem.amount)?money(partAItem.amount):"UNPRICED",
         partAItem.code==="A5"?"NON-ADDITIVE":Number.isFinite(partAItem.amount)?money(partAItem.amount):"UNPRICED",
@@ -153,7 +154,7 @@ export function BudgetaryWorkbookPreview0553(){
        </td>;
       })}
       <td>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/>}</td>
-     </tr>{sheet==="Scope of supply"&&rowNum>=8&&rowNum<=11&&partAItem?.tags?.map((tag,i)=><tr key={partAItem.code+"-tag-"+i}>
+     </tr>{sheet==="Scope of supply"&&rowNum>=8&&rowNum<=11&&partAItem?.tags?.length>0&&<tr><td colSpan={layout.columns+2}><button type="button" className="p553-detail-button" onClick={()=>setExpandedMr(prev=>({...prev,[partAItem.mr]:!prev[partAItem.mr]}))}>{expandedMr[partAItem.mr]?"− Hide":"＋ View"} {partAItem.mr} TAG details ({partAItem.tags.length})</button></td></tr>}{sheet==="Scope of supply"&&rowNum>=8&&rowNum<=11&&expandedMr[partAItem?.mr]&&partAItem?.tags?.map((tag,i)=><tr key={partAItem.code+"-tag-"+i}>
       <td><small>{rowNum}.{i+1}</small></td>
       <td>{partAItem.code+"."+(i+1)}</td>
       <td><strong>{tag.tag}</strong><small style={{display:"block"}}>{tag.site}</small></td>
@@ -168,7 +169,7 @@ export function BudgetaryWorkbookPreview0553(){
     })}</tbody>
    </table></div>
    <p className="p55-note"><strong>Row 38 Total:</strong> {scopeTotalLabel} is the priced working subtotal from Scope Part A (excluding the non-additive A5 memo) plus known ADDVALUE Part B working sell. It is NOT the complete A+B customer quotation; unresolved lines remain pending and C options are excluded.</p>
-   <p className="p55-note">Part A working rows 8–12 use the customer column layout, grouped by MR. Detail rows show source TAG and location, with MR as grouping only. Missing specification, quantity and rates are flagged. Quantity 1 package is a display grouping, not an engineering unit count. A5 is included in A1. Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
+   <p className="p55-note">Part A defaults to MR equipment group summary with on-demand TAG drill-down. Detail rows show source TAG and location, with MR as grouping only. Missing specification, quantity and rates are flagged. Quantity 1 package is a display grouping, not an engineering unit count. A5 is included in A1. Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
    <p className="p55-note">The native XLSX retains all rows and columns. The JSX keeps worksheet header, totals and remarks visible while item rows can collapse. It hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
  </section>;
