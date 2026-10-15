@@ -21,6 +21,7 @@ import { MR0002LNACalculation } from "../project0553/MR0002LNACalculation";
 import { MR0002PhysicalBom } from "../project0553/MR0002PhysicalBom";
 import { EngineeringView as SharedEngineeringView } from "../common/ui/EngineeringView";
 import { ENGINEERING_VIEW_MODEL_0553 } from "../project0553/engineeringViewModel";
+import {B1B2EquationAudit0553} from "../project0553/B1B2EquationAudit0553";
 import { EXECUTIVE_0553 } from "../project0553/executiveViewModel";
 import { SystemsView as SharedSystemsView } from "../common/ui/SystemsView";
 import { SYSTEMS_0553, SYSTEM_GROUPS_0553 } from "../project0553/systemsBinding";
@@ -56,6 +57,7 @@ export function PJ26080553() {
   {id:"bid.architecture",name:"Architecture / Module Registry",tab:"architecture",keywords:"structure architecture"},
   {id:"bid.systems",name:"All MR Systems",tab:"systems",keywords:"mr0001 mr0002 mr0003 mr0004 system"},
   {id:"bid.engineering",name:"Engineering / First Principles",tab:"engineering",keywords:"calculation mr engineering"},
+  {id:"bid.engineering.equations.b1-b2",name:"02 — GEQ/PEQ B1/B2 VDRL Equation Execution",tab:"engineering",keywords:"143 VDRL source 964 MH GEQ PEQ documentation revision validation"},
   {id:"bid.engineering.mr0001",name:"MR-0001 SCADA / RF Engineering",tab:"engineering",keywords:"radio link calculation"},
   {id:"bid.engineering.mr0002",name:"MR-0002 RFI LNA / Physical BOM",tab:"engineering",keywords:"rfi trunk radio"},
   {id:"bid.systems.mr0003",name:"MR-0003 IP Phone",tab:"systems",keywords:"phone telephony"},
@@ -146,7 +148,7 @@ export function PJ26080553() {
    {tab==="overview"&&<ExecutiveView model={EXECUTIVE_0553}/>}
    {tab==="architecture"&&<SharedArchitectureView manifest={ARCHITECTURE_MANIFEST_0553} modules={MODULE_REGISTRY_0553}/>}
    {tab==="systems"&&<><SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Four 0553 MR systems; project-specific engineering and cost evidence."/><DocumentReferenceControl0553/></>}
-   {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/><MR0002LNACalculation/><MR0002PhysicalBom/></SharedEngineeringView>}
+   {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/><MR0002LNACalculation/><MR0002PhysicalBom/><B1B2EquationAudit0553/></SharedEngineeringView>}
    {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
    {tab==="budget"&&<CommercialWorkspace0553 key={navTarget||"budget"} focusedLocation={focusedBomLocation} navigationTarget={navTarget} navigationSequence={navigationSequence} initialMode={navTarget?.startsWith("bid.budget.summary.workbook")?"budgetary":"working"}/>}
    {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
