@@ -1,5 +1,5 @@
 // PJ2608-0553 10.2 -> 10.5 price display and detailed B/C audit.
-// Past Rev08 USD figures stay historical; no unsourced direct cost or sell price.
+// Historical Rev08 records remain audit-only; approved budgetary Working SELL is owned by 10.2. No direct COST or customer-released price is inferred.
 const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
 const babel=require("@babel/core"),root=path.resolve(__dirname,"../src");
 const original=require.extensions[".js"];
@@ -31,7 +31,15 @@ for(const code of codes){
  assert.equal(a.workingSellTHB,b.workingSellTHB);
  assert.equal(a.commercialSellTHB,b.commercialSellTHB);
  assert.equal(a.directCostTHB,null,"No Rev08 amount may be posted as current cost "+code);
- assert.equal(a.workingSellTHB,null,"No Rev08 amount may be posted as current sell "+code);
+ // Working SELL budget approvals in 10.2 are distinct from historical source
+ // and do not constitute direct COST or customer-released quotation.
+ const budgetSell={B10:123024.37,B13:22484.21,C1:4049349.36,C2:721806.68};
+ if(Object.hasOwn(budgetSell,code)){
+  assert.equal(a.workingSellTHB,budgetSell[code],code+" approved pre-award budgetary working sell");
+  assert.equal(b.unifiedSpareBudget?.pricingClass,"BUDGETARY_WORKING_SELL");
+  assert.equal(b.unifiedSpareBudget?.verifiedDirectCost,false);
+  assert.equal(b.unifiedSpareBudget?.releaseAllowed,false);
+ }else assert.equal(a.workingSellTHB,null,"Unapproved Working Sell must remain null "+code);
  assert.equal(a.historicalReferenceUSD,s[2]);
  assert.equal(a.historicalReferenceUSD,expectedUSD[code]);
  assert.equal(a.historicalReferenceTHB,Math.round((expectedUSD[code]*31.5+Number.EPSILON)*100)/100);
