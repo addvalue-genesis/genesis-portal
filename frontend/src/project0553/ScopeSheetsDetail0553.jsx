@@ -1,6 +1,7 @@
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
+import {selectScopeSheet0553} from "./data/scopeSheetProjection0553";
 import {derivePartBcWorkingWbs0553} from "./data/partBCWorkingWbs0553";
 import {BULK_TAKEOFF_0553} from "./data/bulkTakeoff0553";
 import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
@@ -33,11 +34,7 @@ export function ScopeSheetsDetail0553({fx=null}){
  const category=SHEETS.find(x=>x[0]===sheet);
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
  const details=REV08_BASELINE.detail[category[1]]||[];
- // Historical workbook sheet totals come from the same line-item array as the child sheet.
- // They are reference prices, never a substitute for a current verified OEM rate.
- const b10HistoricalUSD=(REV08_BASELINE.detail.B10||[]).reduce(
-  (total,[,qty,unitUSD])=>total+qty*unitUSD,0
- );
+ const b10Sheet=selectScopeSheet0553("B10",{thbPerUsd:fx?.thbPerUsd});
  const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
  // A2 is sourced from the SAME MR0002 per-site Working BOM, including the RFI-LNA.
  // Management excluded MGW rates: omit MGW vendor rows, never erase independently
@@ -128,22 +125,20 @@ export function ScopeSheetsDetail0553({fx=null}){
    const item=workingSummary[id]||(control?{amount:control.sellTHB,status:control.state,source:control.driver+" · "+control.owner+" · "+control.source}:null),amount=item?.amount;
    const unavailable=id==="A5"?"A5 source/ledger reconciliation required":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
-    id==="B10"?"1 LS (9 spare lines)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (working basis)";
+    id==="B10"?"1 LS ("+b10Sheet.qty+" spare lines)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:"1 LS (working basis)";
    // B10 summary is a projection of the B10 detail sheet, never a second price source.
-   const b10SheetTHB=id==="B10"&&fxValid?round(b10HistoricalUSD*fx.thbPerUsd):null;
+   const b10SheetTHB=id==="B10"?b10Sheet.totalTHB:null;
    const displayedAmount=id==="B10"?b10SheetTHB:amount;
    return <tr key={id}><td>{id}</td><td>{desc}</td><td>{qtyDisplay}</td>
     <td className="is-number">{id==="B10"?(Number.isFinite(b10SheetTHB)?cash(b10SheetTHB):"Awaiting FX"):Number.isFinite(control?.unitPriceTHB)?cash(control.unitPriceTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
     <td className="is-number">{Number.isFinite(displayedAmount)?cash(displayedAmount):id==="B10"?"Awaiting FX":control?"Owner / OEM quotation required":unavailable}</td>
-    <td>{id==="B10"?<><strong>REV08 HISTORICAL — NOT CURRENT OEM COST</strong><small>Direct subtotal of the same 9 line items in bid.budget.scope.b10 · source REV08_BASELINE.detail.B10 · original USD converted with active THB/USD FX. Current OEM verification remains pending; do not book twice.</small></>:item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
-  }):details.map(([desc,qty,price],i)=>{
-   // Historical template numbers are customer-facing Rev08 prices, not present-day supplier cost.
-   const rate=fxValid?round(price*fx.thbPerUsd):null;
-   return <tr key={i}><td>{category[1]}-{i+1}</td><td>{desc}</td><td>{qty}</td>
-    <td className="is-number">{Number.isFinite(rate)?cash(rate):"Awaiting FX"}</td>
-    <td className="is-number">{Number.isFinite(rate)?cash(round(qty*rate)):"Awaiting FX"}</td>
-    <td>Rev08 customer-price equivalent converted to THB — historical comparison ONLY, not working supplier cost</td></tr>;
-  })}</tbody></table></div>
+    <td>{id==="B10"?<><strong>REV08 HISTORICAL — NOT CURRENT OEM COST</strong><small>Shared subtotal from selectScopeSheet0553("B10"), also used to render bid.budget.scope.b10 · original USD converted with active THB/USD FX. Current OEM verification remains pending; do not book twice.</small></>:item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
+  }):selectScopeSheet0553(category[1],{thbPerUsd:fx?.thbPerUsd}).rows.map(row=><tr key={row.id}>
+   <td>{row.id}</td><td>{row.description}</td><td>{row.qty}</td>
+   <td className="is-number">{Number.isFinite(row.unitTHB)?cash(row.unitTHB):"Awaiting FX"}</td>
+   <td className="is-number">{Number.isFinite(row.totalTHB)?cash(row.totalTHB):"Awaiting FX"}</td>
+   <td>Rev08 historical reference · not current OEM verified price · {category[1]}</td>
+  </tr>)}</tbody></table></div>
   {sheet==="Scope of supply"&&<details className="p55-panel" data-component-key="bid.budget.scope.a5" open={false}>
    <summary style={{cursor:"pointer",fontWeight:700}}>A5 Bulk Materials — Source-MTO Price Attribution / Drill-down ({a5.rowCount} lots)</summary>
    <p className="p55-note">A5 Working Priced Floor: <strong>{cash(a5.a5PriceTHB)}</strong>.
