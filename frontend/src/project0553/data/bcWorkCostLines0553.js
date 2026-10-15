@@ -164,7 +164,19 @@ export function selectBcWorkCostLines0553(){
  b2.push(line("B2","B2-PACKING-DOSSIER","ANNEX4-2 packing documentation and release records",null,"delivery dossiers",{
   sourceRef:"ANNEX4-2 MASTER/SINGLE PACKING LIST; ANNEX4 Part II",
   scopeGate:"SHIPMENT_COUNT_DOC_HOURS_AND_B5_OWNER_PENDING"}));
- const all=[...b1,...b2,...otherRows(audit)];
+ // Audit clause lines are trace/quantity obligations, NOT another charge for
+ // B1 role MH, B3 site days, B6 shipment or B10 spare purchased objects.
+ const auditedClauses=audit.requirements.map(r=>line(r.code,"COST-"+r.id,
+  r.title,null,"audit requirement",{
+   sourceRef:r.source+" §"+r.section+" / "+r.id,
+   quantityStatus:"DERIVE_FROM_UNIQUE_PHYSICAL_OR_SERVICE_WORK_OBJECT",
+   owner:r.owner,
+   scopeGate:r.state,
+   includedInExistingCostOwner:"COST_REQUIREMENT_TRACE_NOT_ADDITIVE_TO_PRICED_WORK",
+   equation:r.costDriver,
+   reconciliationTag:"AUDIT-TRACE-"+r.code
+  }));
+ const all=[...b1,...b2,...otherRows(audit),...auditedClauses];
  const ids=new Set(all.map(x=>x.id));
  if(ids.size!==all.length)throw Error("Duplicate 10.2 cost-line owner IDs");
  if(b1.reduce((sum,r)=>sum+r.quantity,0)!==964)throw Error("B1 detailed MH sum !=964");
@@ -181,11 +193,10 @@ export function selectBcWorkCostLines0553(){
   throw Error("Missing B6 four-MR cargo route");
  const namedOwners=new Map(all.map(x=>[x.id,x]));
  const mappedClauses=audit.requirements.map(item=>{
-  const costs=all.filter(line=>line.code===item.code);
-  const specificity=costs.find(x=>x.id.includes(item.source.replace(/[^A-Z0-9]/g,"")))||costs[0];
+  const clause=all.find(x=>x.id==="COST-"+item.id);
   return Object.freeze({
    auditId:item.id,moduleId:"bid.budget.working.bc."+item.code.toLowerCase(),
-   costLineId:specificity?.id||null,code:item.code,
+   costLineId:clause?.id||null,code:item.code,
    type:"REQUIREMENT_EVIDENCE_LINK_NOT_INDEPENDENT_ADDITIVE_COST",
    source:item.source,section:item.section,owner:item.owner,requirement:item.title,
    quantityStatus:specificity?.requiredQuantityStatus||"NOT_ESTABLISHED",
