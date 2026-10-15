@@ -23,6 +23,7 @@ assert.equal(new Set(irt.records.map(r=>r.id)).size,109);
 assert.deepEqual(irt.sourceDocuments.map(x=>x.count),[28,27,27,27]);
 assert.deepEqual(Object.values(p.mrIrtCounts),[28,27,27,27]);
 assert(p.irtSourceRows.every(x=>x.sourceStatus==="SOURCE_IRT_RFQ_NOT_APPROVED_ITP"));
+assert(p.irtSourceRows.every(x=>x.itemDescription&&!/MATERIAL REQUISITION FOR|INSPECTION REQUIREMENT TABLE/.test(x.itemDescription)),"IRT source item leaked repeated PDF page headers");
 assert(p.irtSourceRows.every(x=>x.eventOccurrence===null&&x.addvalueIncrementalMH===null&&!x.pricePostingAllowed));
 assert.equal(p.stageRequirementCount,16);
 assert.deepEqual(Object.values(p.stageRequirementGroups).map(x=>x.length),[4,4,4,4]);
