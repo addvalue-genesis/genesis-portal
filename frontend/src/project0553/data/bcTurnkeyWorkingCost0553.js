@@ -73,9 +73,9 @@ export function selectBcTurnkeyWorkingCost0553(){
   const activities=activitiesForCustomerCode[code]||[];
   const requirementRows=activities.length?
    LIFECYCLE_SPARES_0553.rows.filter(x=>activities.includes(x.activity)):[];
+  const costEvidence=evidence.byCode[code];
   const b6BudgetarySellTHB=code==="B6"?costEvidence?.reconciliation?.historicalRev08TransportSellTHB:null;
   const sellKnown=Number.isFinite(w.sellTHB);
-  const costEvidence=evidence.byCode[code];
   if(!costEvidence||costEvidence.workingSellTHB!==(code==="B6"?costEvidence.reconciliation?.historicalRev08TransportSellTHB:w.sellTHB)||costEvidence.directCostTHB!==null)
    throw Error("B/C cost evidence diverged from source WBS or invented a direct cost at "+code);
   const optional=code.startsWith("C");
