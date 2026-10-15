@@ -40,7 +40,19 @@ export function BudgetaryWorkbookPreview0553(){
   const amount=unsupported.length||projection.orphanCurrency||(!currentFx.thbPerUsd&&currencies.USD)?null:
    Math.round(((currencies.THB||0)+(currencies.USD||0)*(currentFx.thbPerUsd||0))*100)/100;
   const labels=["SCADA / AVIAT / Cisco","DMR Trunk Radio","Telephone / sounder / JB","RACON"];
-  return {code:"A"+(index+1),mr,description:labels[index],amount,
+  const tags=projection.lines.filter(x=>x.tag&&x.tag!==x.mr).map(x=>{
+   const item=x.item||{};
+   const qty=Number.isFinite(item.sourceQty)?item.sourceQty:Number.isFinite(item.qty)?item.qty:Number.isFinite(item.sourceScopeQty)?item.sourceScopeQty:null;
+   const unitCost=Number.isFinite(item.unitCost)?item.unitCost:null;
+   const toTHB=v=>!Number.isFinite(v)?null:x.currency==="THB"?v:x.currency==="USD"&&currentFx.thbPerUsd?v*currentFx.thbPerUsd:null;
+   return {tag:x.tag,site:x.site,description:item.description||item.role||"Equipment / interface",
+    specification:[item.vendor,item.sku].filter(Boolean).join(" · ")||item.note||"Equipment specification pending verification",
+    qty,unit:item.sourceUnit||item.sourceScopeUnit||"",
+    unitTHB:toTHB(unitCost),subtotalTHB:x.counted?toTHB(x.extended):null,
+    status:item.status||"TECHNICAL VERIFICATION REQUIRED",source:x.source||""};
+  });
+  const major=[...new Set(tags.map(x=>x.description).filter(Boolean))].slice(0,3).join("; ");
+  return {code:"A"+(index+1),mr,description:labels[index],amount,tags,major,
    status:projection.priced+" priced; "+projection.unresolved+" unresolved · Working Scope reference, not released sell"};
  });
  const a5Memo=deriveA5BulkAttribution0553();
@@ -127,8 +139,8 @@ export function BudgetaryWorkbookPreview0553(){
        // The original Row 5 gives the customer's A–H schema; Row 7 is a group,
        // not a cost row. Row 8 onward is a working MR package schedule.
        const partACells=partAItem?[
-        partAItem.code,partAItem.mr+" · TAG ANNEX",partAItem.description,
-        "Equipment package / refer to MR and TAG schedule",
+        partAItem.code+" / "+partAItem.mr,partAItem.code==="A5"?"—":"— (MR group)",partAItem.description,
+        partAItem.major||"Cross-system bulk — see MTO",
         "1 package",partAItem.code==="A5"?"INCLUDED IN A1":Number.isFinite(partAItem.amount)?money(partAItem.amount):"UNPRICED",
         partAItem.code==="A5"?"NON-ADDITIVE":Number.isFinite(partAItem.amount)?money(partAItem.amount):"UNPRICED",
         partAItem.status
@@ -140,11 +152,22 @@ export function BudgetaryWorkbookPreview0553(){
        </td>;
       })}
       <td>{(overlay||row.slice(1).some(v=>typeof v==="string"&&v.trim()))&&<ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)+".row-"+rowNum}/>}</td>
-     </tr></React.Fragment>;
+     </tr>{sheet==="Scope of supply"&&rowNum>=8&&rowNum<=11&&partAItem?.tags?.map((tag,i)=><tr key={partAItem.code+"-tag-"+i}>
+      <td><small>{rowNum}.{i+1}</small></td>
+      <td>{partAItem.code+"."+(i+1)}</td>
+      <td><strong>{tag.tag}</strong><small style={{display:"block"}}>{tag.site}</small></td>
+      <td>{tag.description}</td>
+      <td>{tag.specification}<small style={{display:"block"}}>Source: {partAItem.mr}</small></td>
+      <td>{tag.qty===null?"NOT VERIFIED":tag.qty+" "+tag.unit}</td>
+      <td className="is-number">{Number.isFinite(tag.unitTHB)?money(tag.unitTHB):"RATE NOT VERIFIED"}</td>
+      <td className="is-number">{Number.isFinite(tag.subtotalTHB)?money(tag.subtotalTHB):"NOT COUNTED"}</td>
+      <td><small>{tag.status} · {tag.source} · Included in MR group total; not additive</small></td>
+      <td/>
+     </tr>)}</React.Fragment>;
     })}</tbody>
    </table></div>
    <p className="p55-note"><strong>Row 38 Total:</strong> {scopeTotalLabel} is the priced working subtotal from Scope Part A (excluding the non-additive A5 memo) plus known ADDVALUE Part B working sell. It is NOT the complete A+B customer quotation; unresolved lines remain pending and C options are excluded.</p>
-   <p className="p55-note">Part A working rows 8–12 use the customer column layout, grouped by MR. TAG ANNEX is a reference, not an invented equipment tag. Quantity 1 package is a display grouping, not an engineering unit count. A5 is included in A1. Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
+   <p className="p55-note">Part A working rows 8–12 use the customer column layout, grouped by MR. Detail rows show source TAG and location, with MR as grouping only. Missing specification, quantity and rates are flagged. Quantity 1 package is a display grouping, not an engineering unit count. A5 is included in A1. Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
    <p className="p55-note">The native XLSX retains all rows and columns. The JSX keeps worksheet header, totals and remarks visible while item rows can collapse. It hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
  </section>;
