@@ -75,6 +75,28 @@ export function selectSpareEngineeringReconciliation0553(){
   selectedCapitalSpareQty:null,pricePostingAllowed:false,
   note:"Both amounts refer to different budget/quotation bases. The Part A installed kit may include different components; neither proves a supplier-quoted independent complete RACON spare."
  });
+ const vendorScopeConflicts=Object.freeze([
+  Object.freeze({id:"MR0004-ORGA-TOOLS",mr:"MR-0004",code:"B11",tag:"MAR-514-001",
+   source:"MDS/ORGA QTORG2609244 §1 and §3.6 vs MR0004 §5 and EXA-A8 Att-2 §5",
+   includedClaim:"USB-to-Flying-Lead communication cable and purge kit INCLUDED; quote states no special tools required",
+   conflict:"MR requires special tools 1 set/phase; EXA-A8 includes radar-beacon software and charging-kit when applicable",
+   priceDeltaTHB:null,scopeState:"OEM_INCLUDED_TOOLS_VS_REQUIRED_SET_CLARIFICATION"}),
+  Object.freeze({id:"MR0004-ORGA-GLANDS",mr:"MR-0004",code:"B13",tag:"MAR-514-001",
+   source:"MDS/ORGA QTORG2609244 §1 items 30/50/60 vs §4 Notes/Deviations",
+   includedClaim:"BFOU cables and six CMP cable glands included in §1",
+   conflict:"§4 states cables and glands are excluded and recommends local procurement",
+   priceDeltaTHB:null,scopeState:"QUOTE_INCLUSION_CONFLICT__NO_DOUBLE_COUNT"}),
+  Object.freeze({id:"MR0004-ORGA-FAT",mr:"MR-0004",code:"B10",tag:"MAR-514-001",
+   source:"MDS/ORGA QTORG2609244 §1 BB vs §3.2",
+   includedClaim:"FAT day rate included in commercial line BB",
+   conflict:"§3.2 indicates FAT/R-FAT cost not included; services B3 ownership clarification required",
+   priceDeltaTHB:null,scopeState:"B3_SERVICES_QUOTE_CONFLICT__NOT_A_SPARE"}),
+  Object.freeze({id:"MR0004-ORGA-COMPLETE-CAPITAL",mr:"MR-0004",code:"C1",tag:"MAR-514-001",
+   source:"MDS/ORGA QTORG2609244 §1 FCA USD75,000 versus Rev08 C1 Spare RACON complete",
+   includedClaim:"FCA factory installed SeaBeacon-2 package; not an independent OEM quoted spare",
+   conflict:"Complete RACON spare USD121,470 Rev08 is historical and cannot be mandated from MR 1 Set/Platform",
+   priceDeltaTHB:null,scopeState:"CAPITAL_SPARING_OPTION_NOT_PROVEN"})
+ ]);
  const systemSummary=demand.rows.map(m=>{
   const candidates=customer.rows.filter(x=>x.linkedMR.includes(m.mr));
   const historicalPricedSourceIds=candidates.map(x=>x.sourceId);
@@ -106,7 +128,7 @@ export function selectSpareEngineeringReconciliation0553(){
   moduleId:"bid.budget.working.bc.spare-reconciliation",
   methodModuleId:demand.moduleId,priceReadModelId:customer.moduleId,
   section:"10.2",equationIds:["MAP-02","MAP-06","MAP-07","MAP-08","MAP-09"],
-  kitLines,toolRequirements,capitalHistory,raconComparison,systemSummary,
+  kitLines,toolRequirements,capitalHistory,raconComparison,systemSummary,vendorScopeConflicts,
   sourceSpecificationChecklist:REQUIRED_FIELDS,byCode,
   historicalSourcePriceRows:customer.rows,
   missingOemSpares:"OEM itemized SPIR not yet reconciled in current working BOM",
