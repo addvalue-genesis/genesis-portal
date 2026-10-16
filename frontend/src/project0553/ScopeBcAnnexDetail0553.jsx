@@ -4,6 +4,7 @@ import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
 import {selectUnifiedSpareConsumables0553} from "./data/unifiedSpareConsumables0553";
 import {selectSpareCoverageEngineering0553} from "./data/spareCoverageEngineering0553";
 import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
+import {selectDocumentSpareObligations0553} from "./data/documentSpareObligations0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
@@ -12,6 +13,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
  const p=m.byCode[code];
  const shared=selectUnifiedSpareConsumables0553();
  const customerSchedule=selectSpareCustomerSchedule0553();
+ const documentObligations=selectDocumentSpareObligations0553();
  const spareLines=customerSchedule.byCode[code]||[];
  const coverage=["B10","B11","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
  const inWorking=mode==="working";
@@ -29,6 +31,23 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
    <div><strong>Historical Rev08 Reference</strong><p>{thb(p.historicalReferenceTHB)}</p><small>Native USD source retained for audit · {p.historicalFxState}</small></div>
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
+  {["B10","B11","B13","C1","C2"].includes(code)&&<details className="p55-panel" open={code==="C1"||code==="B10"} style={{padding:12}}>
+   <summary><strong>02 Document-Driven Quantity Basis → 10.2 {code}</strong> · MR0001–0004 (not an additional price)</summary>
+   <p className="p55-note">First Principles + Telecom Constraints + Parametric Cost are applied to Customer/MR obligations; they do not create extra quantities on their own. Commissioning kit contents remain a separate OEM/SPIR derivation. Risk-based SPQ-001 is a non-posting gap assessment.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>MR / Scope</th><th>Locations</th><th>B10 commissioning kits</th><th>B11 tools</th><th>C1 mandatory complete unit</th><th>C2 supply basis</th><th>Document proof</th></tr></thead>
+    <tbody>{documentObligations.rows.map(x=><tr key={x.mr}>
+     <td><strong>{x.mr}</strong><small>{x.label}</small></td>
+     <td>{x.sites.join(", ")}</td>
+     <td>{x.commissioningKitQuantity} sets<small>1 kit/platform · component list is NOT complete</small></td>
+     <td>{x.specialToolPhaseSets} set/phase<small>Supplier/tool sharing assessment needed</small></td>
+     <td>NOT mandated by 1 Set/Platform<small>Capital spares are optional engineering/quotation scope</small></td>
+     <td>Quotation only<small>Not additive physical supply in Base</small></td>
+     <td>{x.source}<small>{x.minimumProof}</small></td>
+    </tr>)}</tbody>
+   </table></div>
+   <p className="p55-note"><strong>Document-verified scope basis:</strong> {documentObligations.totals.commissioningKitSets} commissioning KIT sets across four MRs; {documentObligations.totals.specialToolMrPhaseRequirements} per-MR phase-tool requirements before proven tool sharing. A kit is not a complete main-equipment spare. Physical items, unit rates and combined prices must follow separate OEM/EXA-A8 mappings.</p>
+  </details>}
   {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
    <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (Pre-Award Budgetary Working Preview)</h4>
    <p className="p55-note"><strong>Coverage readiness:</strong> {customerSchedule.engineeringReadiness.installedTagInstances} source site-TAG instances / {customerSchedule.engineeringReadiness.criticalTagFunctionGroups} critical TAG families. Confirmed replacement SKU mappings in this model: {customerSchedule.engineeringReadiness.confirmedReplacementSkuGroups}. Verdict: <strong>{customerSchedule.engineeringReadiness.verdict}</strong> — budget price rows exist, but complete Commissioning Spare coverage and major-equipment provision have not yet been demonstrated.</p>
