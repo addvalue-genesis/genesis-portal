@@ -73,6 +73,19 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
    </p>)}
    <p className="p55-note"><strong>Coverage gate:</strong> Contract minimum EXA-A8 and OEM SPIR composition remain unresolved; major equipment and compatibility gaps stay visible. Part A and B10/B13/C1/C2 must reconcile unique physical delivered quantities before customer release. Working Sell budgets are unchanged.</p>
   </details>}
+  {code==="B11"&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
+   <summary><strong>B11 Minimum Operational Special Tools — EXA-A8 Phase 1F</strong> (five customer requirements)</summary>
+   <p className="p55-note">These are contractual minimum tool/authorization drivers, not five independent price postings. The four original Rev08 B11 tool/kit budget lines remain the only historic price basis. TETRA gateway applicability must be assessed against the selected DMR system.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>QTY</th><th>Unit Price THB</th><th>Price / Inclusion Basis</th></tr></thead>
+    <tbody>{customerSchedule.b11Requirements.rows.map(x=><tr key={x.id}>
+     <td>{x.id}</td><td><strong>{x.tag}</strong><small>{x.mr}</small></td>
+     <td>{x.description}<small>{x.compatibilityGate}</small></td><td>{x.qty} {x.unit}</td>
+     <td>Covered by shared B11 reference — not separately allocated</td>
+     <td>{x.sourceQuoteCandidate}<small>{x.budgetPriceState}</small></td>
+    </tr>)}</tbody></table></div>
+   <p className="p55-note">Source: {customerSchedule.b11Requirements.source}. No independent rate or final supplier compatibility has been invented; B11 shared-tool OEM credits remain open.</p>
+  </details>}
   {(code==="B10"||code==="C1")&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
    <summary><strong>Critical Replacement Risk Scenario — MR0002 / ZWP20 / RFI-BDA</strong> (NON-ADDITIVE budget sensitivity)</summary>
    <p className="p55-note">This is derived from the selected MR0002 Working BOM, not from a fabricated spare quote. The integrated BDA+WAROM assembly is already supplied in Part A. The comparison is for one replacement package only; choose physical ownership B10 OR C1 when justified, never both for the same stock unit.</p>
