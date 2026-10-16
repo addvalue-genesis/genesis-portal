@@ -16,6 +16,10 @@ assert.equal(d.section,"02");
 assert.equal(d.rows.length,4);
 assert.deepEqual(d.rows.map(x=>x.commissioningKitQuantity),[4,3,4,3]);
 assert.equal(d.totals.commissioningKitSets,14);
+assert.equal(d.brownfieldRows.length,4);
+assert.equal(d.totals.brownfieldAsRequiredInterfaces,4);
+assert(d.brownfieldRows.every(x=>x.commissioningKitQuantity===null&&x.commercialPriceTHB===null));
+
 assert.equal(d.totals.specialToolMrPhaseRequirements,4);
 assert(d.rows.every(x=>x.commissioningKitContents===null&&!x.c1Mandatory&&x.c1CompleteEquipmentRequiredQuantity===null));
 assert(d.rows.every(x=>x.c2QuotationRequired&&!x.c2MandatoryEquipmentDelivery&&x.specialToolPhaseSets===1));
