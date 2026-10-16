@@ -5,6 +5,7 @@ import {selectUnifiedSpareConsumables0553} from "./data/unifiedSpareConsumables0
 import {selectSpareCoverageEngineering0553} from "./data/spareCoverageEngineering0553";
 import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
 import {selectDocumentSpareObligations0553} from "./data/documentSpareObligations0553";
+import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringReconciliation0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
@@ -14,6 +15,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
  const shared=selectUnifiedSpareConsumables0553();
  const customerSchedule=selectSpareCustomerSchedule0553();
  const documentObligations=selectDocumentSpareObligations0553();
+ const spareReconciliation=selectSpareEngineeringReconciliation0553();
  const spareLines=customerSchedule.byCode[code]||[];
  const coverage=["B10","B11","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
  const inWorking=mode==="working";
@@ -47,6 +49,59 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
     </tr>)}</tbody>
    </table></div>
    <p className="p55-note"><strong>Document-verified scope basis:</strong> {documentObligations.totals.commissioningKitSets} commissioning KIT sets across four MRs; {documentObligations.totals.specialToolMrPhaseRequirements} per-MR phase-tool requirements before proven tool sharing. A kit is not a complete main-equipment spare. Physical items, unit rates and combined prices must follow separate OEM/EXA-A8 mappings.</p>
+  </details>}
+  {code==="B10"&&<div className="p55-panel" style={{padding:12}}>
+   <h4>MR Attachment-5: 14 Contractual Commissioning/Start-up Spare Kits (Physical BOM &amp; Cost Audit)</h4>
+   <p className="p55-note">Required 1 set per MR/platform is a spare KIT delivery obligation, not an automatic full spare radio/RACON or a verified bill of parts. The historical nine priced B10 source lines are NOT a 14-kit OEM SPIR cost breakdown. Missing rate is shown as unpriced, never zero.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Item</th><th>Tag No. / System</th><th>Location / MR</th><th>Description / Source</th><th>QTY</th><th>Unit Price THB</th><th>Total Price THB</th><th>Engineering Gate</th></tr></thead>
+    <tbody>{spareReconciliation.kitLines.map((x,i)=><tr key={x.id}>
+     <td>{i+1}</td><td>{x.tagNo}<small>No fabricated installed equipment TAG</small></td>
+     <td>{x.site} / {x.mr}</td>
+     <td>{x.description}<small>{x.source}</small></td>
+     <td>{x.requirementQty} {x.unit}<small>{x.equationId}</small></td>
+     <td>OEM itemized rate required</td><td>NOT ESTABLISHED</td>
+     <td>{x.contentStatus}<small>{x.priceBasis}</small></td>
+    </tr>)}</tbody></table></div>
+   <p className="p55-note"><strong>Quantity derived:</strong> {spareReconciliation.kitLines.length} contractual KITs (4/3/4/3). <strong>New verified kit price:</strong> NOT ESTABLISHED until OEM Attachment-5 itemized BOM/quantity/rate; existing B10 THB reference is kept separate below.</p>
+  </div>}
+  {code==="B11"&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
+   <summary><strong>MR0001–MR0004 Special Tools — 1 Set per Phase Requirement Audit</strong></summary>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>MR</th><th>Tag No.</th><th>Description</th><th>QTY</th><th>Unit Price THB</th><th>Total Price THB</th><th>Source / Cost Gate</th></tr></thead>
+    <tbody>{spareReconciliation.toolRequirements.map(x=><tr key={x.id}>
+     <td>{x.mr}</td><td>{x.tagNo}</td><td>{x.description}</td><td>{x.requirementQty} {x.unit}</td>
+     <td>Not separately allocated</td><td>NOT ESTABLISHED</td><td>{x.source}<small>{x.priceBasis}</small></td>
+    </tr>)}</tbody></table></div>
+   <p className="p55-note">Four requirement sets are NOT four additional prices on top of the four Rev08 B11 tool rows; verify OEM included tools, license compatibility and pooled common sets.</p>
+  </details>}
+  {code==="C1"&&<details className="p55-panel" open style={{padding:12}}>
+   <summary><strong>Capital Spare Optional Selection — MR0001–0004 Source Review</strong></summary>
+   <p className="p55-note">MR §5 does not mandate an extra complete major unit from the wording 1 Set/Platform. Rev08 C1 complete RACON and SCADA radio remain historical option candidates, not Document-Required OEM spare quantities.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Tag No.</th><th>Capital Spare Candidate</th><th>Rev08 Qty</th><th>Historical Unit THB</th><th>Current Validated Replacement Qty</th><th>OEM Spare Price THB</th><th>Evidence Gate</th></tr></thead>
+    <tbody>{spareReconciliation.capitalHistory.map(x=><tr key={x.id}>
+     <td>{x.tagNo}</td><td>{x.description}</td><td>{x.qty}</td><td>{thb(x.unitPriceTHB)}</td>
+     <td>NOT DERIVED</td><td>NOT ESTABLISHED</td><td>{x.documentMandateStatus}<small>{x.verificationStatus}</small></td>
+    </tr>)}</tbody></table></div>
+   <p className="p55-note"><strong>RACON compare:</strong> historical full-spare unit {thb(spareReconciliation.raconComparison.historicalUnitPriceTHB)} versus selected ORGA installed full-package FCA reference {thb(spareReconciliation.raconComparison.vendorPackageRateReferenceTHB)} (USD {spareReconciliation.raconComparison.vendorUnitPriceUSD}). Difference {thb(spareReconciliation.raconComparison.historicalVsPackageUnitDeltaTHB)} is a pricing-basis variance, NOT a saving or spare approval. Independent OEM spare price remains unquoted.</p>
+  </details>}
+  {["B10","B11","B13","C1","C2"].includes(code)&&<details className="p55-panel" style={{padding:12}}>
+   <summary><strong>MR Attachment-5 Vendor Spare List — Documentary Completion Gate</strong> ({spareReconciliation.sourceSpecificationChecklist.length} evidence checks)</summary>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>No.</th><th>Required Detail in OEM Spare Parts List</th><th>Current Check</th></tr></thead>
+    <tbody>{spareReconciliation.sourceSpecificationChecklist.map((x,i)=><tr key={x}>
+     <td>{i+1}</td><td>{x}</td><td>Item-level confirmation pending</td>
+    </tr>)}</tbody></table></div>
+   <p className="p55-note">Document source: MR0001–MR0004 Rev.C1 Attachment 5, cross-reference to project EXA-A8 minimum and Vendor IOM/Spare Part Interchangeability Record.</p>
+  </details>}
+  {spareReconciliation.vendorScopeConflicts.some(x=>x.code===code)&&<details className="p55-panel" open={code==="C1"} style={{padding:12}}>
+   <summary><strong>MR0004 / ORGA Vendor Package Conflict Gate</strong></summary>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>TAG</th><th>Quoted Inclusion</th><th>Contradiction / Required Resolution</th></tr></thead>
+    <tbody>{spareReconciliation.vendorScopeConflicts.filter(x=>x.code===code).map(x=><tr key={x.id}>
+     <td>{x.tag}<small>{x.source}</small></td><td>{x.includedClaim}</td><td>{x.conflict}<small>{x.scopeState}</small></td>
+    </tr>)}</tbody></table></div>
   </details>}
   {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
    <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (Pre-Award Budgetary Working Preview)</h4>
