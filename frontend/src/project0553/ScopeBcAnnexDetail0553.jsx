@@ -2,6 +2,7 @@ import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
 import {selectUnifiedSpareConsumables0553} from "./data/unifiedSpareConsumables0553";
+import {selectSpareCoverageEngineering0553} from "./data/spareCoverageEngineering0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
@@ -10,6 +11,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
  const p=m.byCode[code];
  const shared=selectUnifiedSpareConsumables0553();
  const spareLines=shared.byCode[code]||[];
+ const coverage=["B10","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
  const inWorking=mode==="working";
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
  if(!p)return <p role="alert">Unsupported customer scope code: {code}</p>;
@@ -27,7 +29,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
   {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
    <h4>Customer Schedule — {shared.descriptions[code]} (Engineering Working Preview)</h4>
-   <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> ${shared.sourceTagRegister} · Existing MTO tags are used where matched to an equipment family; shared spares are grouped COMMON. Budget quantity and THB sell rates come from Rev08 at FX 31.5. OEM compatibility and minimum EXA-A8 coverage remain open.</p>
+   <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {shared.sourceTagRegister} · Existing MTO tags are used where matched to an equipment family; shared spares are grouped COMMON. Budget quantity and THB sell rates come from Rev08 at FX 31.5. OEM compatibility and minimum EXA-A8 coverage remain open.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Item</th><th>Tag No. / Linked MTO Tags</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
     <tbody>{spareLines.map(x=><tr key={x.id}>
@@ -43,6 +45,28 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
    <p className="p55-note"><strong>PRE-AWARD CATEGORY BUDGET:</strong> {thb(shared.budgetTotalsTHB[code])} · Source: Rev08 historic priced lines × planning FX 31.5 THB/USD · budgetary sell estimate only, no new direct-cost posting. Rounding per line can differ from category source total.</p>
    <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
   </div>}
+  {coverage&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
+   <summary><strong>Top-down Engineering Spare Coverage — MR0001–MR0004</strong> (SPQ-001 + existing MAP equations; pre-award scenario only)</summary>
+   <p className="p55-note"><strong>Basis:</strong> MR0001 MTO Rev04 / MR0002 AFC TEL-LAY / MR0003–0004 MR Rev.C1 scope. Existing MAP-01/02/05/06/07/08/10 reused; SPQ-001 adds critical-family spare scenario sizing only. A scenario Qty is not an OEM-approved spare quantity or contractual minimum. No prices are newly posted by this assessment.</p>
+   {["MR-0001","MR-0002","MR-0003","MR-0004"].map(mr=>{
+    const summary=coverage.totals[mr];
+    return <details key={mr} className="p55-panel" style={{padding:10}}>
+     <summary><strong>{mr}</strong> — {summary.installedTagInstances} site-tag instances / {summary.uniqueTagTypes} equipment tag types / {summary.criticalTagTypes} critical-family candidates</summary>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Installed Tag</th><th>Location / Source</th><th>Replaceable Family</th><th>{code} Scope Assessment</th><th>B10 Budget Risk Qty (scenario)</th><th>Existing Price Reference / Gate</th></tr></thead>
+      <tbody>{coverage.groups.filter(x=>x.mr===mr).map(x=><tr key={x.id}>
+       <td><strong>{x.tag}</strong><small>{x.criticality}</small></td>
+       <td>{x.installedSites.join(", ")}<small>{x.sourceEvidence.join("; ")}</small></td>
+       <td>{x.family}<small>{x.interchangeabilityState}</small></td>
+       <td>{x.categoryApplicability[code]?"ENGINEERING ASSESSMENT APPLICABLE":"NOT PRIMARY SPARE CLASS"}<small>{x.contractKitMinimumState}</small></td>
+       <td>{x.categoryApplicability.B10?x.b10BudgetScenarioQty:"—"}<small>{x.estimatedPartQtyState} · {x.b10QtyEquationId}</small></td>
+       <td>{x.budgetaryExistingSourceIds[code]?.length?x.budgetaryExistingSourceIds[code].join(", "):"NO MATCHED REV08 CATEGORY REFERENCE"}<small>Cost evidence is a candidate, not proven interchangeable SKU</small></td>
+      </tr>)}</tbody>
+     </table></div>
+    </details>;
+   })}
+   <p className="p55-note"><strong>Coverage gate:</strong> Contract minimum EXA-A8 and OEM SPIR composition remain unresolved; major equipment and compatibility gaps stay visible. Part A and B10/B13/C1/C2 must reconcile unique physical delivered quantities before customer release. Working Sell budgets are unchanged.</p>
+  </details>}
   <h4>1. Historical Annex Price Lines — Original Rev08 / Not current Vendor Quote</h4>
   {p.historicalHasDetail?
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
