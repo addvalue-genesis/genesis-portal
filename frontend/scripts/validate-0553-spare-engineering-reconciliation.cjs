@@ -54,6 +54,9 @@ assert.equal(w.knownWorkingSellTHB,4568436.58);
 assert.equal(w.byCode.C1.workingSellTHB,c.byCode.C1.historicalBudgetReferenceTHB);
 assert(c.updatedPricePosted===false&&c.complete===false&&c.customerReleaseAllowed===false);
 const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
+assert(jsx.includes('spareLines.length>0&&code!=="C1"'),"Historical Rev08 C1 lines must not masquerade as current selected customer price schedule");
+assert(jsx.includes("NO CAPITAL SPARE ITEM HAS BEEN ENGINEERING-SELECTED FOR CUSTOMER ISSUE."),"C1 qualification gate must be shown before historical candidate prices");
+assert(jsx.includes("C1 current engineering-selected priced total: NOT ESTABLISHED."),"Do not convert historical 1 RACON into approved capital-spare price");
 for(const phrase of ["selectSpareEngineeringReconciliation0553","spareReconciliation.kitLines.map","spareReconciliation.raconComparison","customerSchedule.crossCategoryDuplicates","spareReconciliation.vendorScopeConflicts"])
  assert(jsx.includes(phrase),phrase+" must be shown in 10.2");
 assert(babel.transformSync(jsx,{babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
