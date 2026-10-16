@@ -6,7 +6,7 @@
 import {selectUnifiedSpareConsumables0553} from "./unifiedSpareConsumables0553";
 import {selectSpareCoverageEngineering0553} from "./spareCoverageEngineering0553";
 import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
-import {deriveSpareRiskQuantity0553} from "./spareRiskQuantity0553";
+import {deriveSpareRiskQuantity0553,deriveConsumableBudgetQuantity0553} from "./spareRiskQuantity0553";
 const CODES=Object.freeze(["B10","B11","B13","C1","C2"]);
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const unique=items=>[...new Set(items)];
@@ -47,6 +47,17 @@ const hint=(description)=>{
  return "Confirm actual OEM SKU, rating and delivery quantity against MR/DTS/SPIR";
 };
 const rowStatus=(code)=>code==="B11"?"BUDGETARY_REFERENCE_NOT_POSTED":"EXISTING_REV08_WORKING_SELL_BUDGET";
+const physicalFamily=d=>{
+ const v=d.toLowerCase();
+ if(/poe/.test(v))return "SCADA_POE";
+ if(/cisco power/.test(v))return "CISCO_POWER";
+ if(/rf surge/.test(v))return "RF_SURGE";
+ if(/ethernet surge/.test(v))return "ETHERNET_SURGE";
+ if(/m20/.test(v))return "M20_GLAND";
+ if(/fuse/.test(v))return "FUSE";
+ if(/n-male/.test(v))return "RF_N_CONNECTOR";
+ return null;
+};
 export function selectSpareCustomerSchedule0553(){
  const master=selectUnifiedSpareConsumables0553(),cover=selectSpareCoverageEngineering0553();
  const rows=CODES.flatMap(code=>(master.byCode[code]||[]).map(x=>{
@@ -65,6 +76,8 @@ export function selectSpareCustomerSchedule0553(){
    unit:"EA / set (per original Rev08 item)",unitPriceTHB:x.budgetUnitTHB,extendedTHB:x.budgetTotalTHB,
    sourcePriceUSD:x.legacyUnitUSD,sourceId:x.id,sourceRevision:"4-Scope of Supply.xlsx Rev08",workingFxTHBPerUSD:master.fxTHBPerUSD,
    workingStatus:rowStatus(code),costOwner:code,customerReleaseAllowed:false,
+   activityBasedQuantityEquation:code==="B13"?deriveConsumableBudgetQuantity0553({}).equationId:null,
+   activityBasedQuantityState:code==="B13"?deriveConsumableBudgetQuantity0553({}).status:null,
    possibleOverlap:code==="B13"? "B5 packing material vs separate B13 handover stock must be net reconciled":
     code==="B11"?"OEM Part A included tools/software or previously supplied RACON kit must be credited":
     "Check OEM Part A / separate category delivered-quantity register",
@@ -117,6 +130,14 @@ export function selectSpareCustomerSchedule0553(){
    "Never charge WAROM Ex d enclosure twice; full unit is priced in Part A.",
    "MR0002 Rev.C1 LNA RAD-508-001 versus selected TCAB-508-001 RFI-BDA remains a technical substitution crosswalk."]
  })]);
+ const crossCategoryDuplicates=unique(rows.map(x=>physicalFamily(x.description)).filter(Boolean)).flatMap(family=>{
+  const related=rows.filter(x=>physicalFamily(x.description)===family);
+  return unique(related.map(x=>x.code)).length>1?[Object.freeze({
+   family,sourceIds:related.map(x=>x.id),categories:unique(related.map(x=>x.code)),
+   status:"POTENTIALLY_COMMON_FUNCTION_NOT_PROVEN_SAME_SKU",
+   decision:"Different lifecycle stocks may be intentional, but require independent deliverable quantity and cost ownership; no automatic credit or additive adjustment."
+  })]:[];
+ });
  const pricedCategorySummary=Object.fromEntries(CODES.map(code=>[code,Object.freeze({
   workingReferenceTHB:master.budgetTotalsTHB[code],
   priceStatus:code==="B11"?"BUDGETARY_CANDIDATE_NOT_IN_WORKING_SELL":"EXISTING_WORKING_BUDGET",
@@ -125,13 +146,14 @@ export function selectSpareCustomerSchedule0553(){
  })]));
  return Object.freeze({
   moduleId:"bid.budget.working.bc.customer-spare-schedule",
-  codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,
+  codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,crossCategoryDuplicates,
   installedSourceCount:cover.installed.length,
   sourceOwnership:"Working BOM/Tag + Rev08 price reference + 10.2 commercial owner",
   riskQuestionAnswered:false,
   missingEngineeringProofs:["EXA-A8 applicable minimum lines by equipment","OEM spare/installed SKU replacement compatibility",
    "B10 kit-per-platform composition","B13 preservation quantity/activity consumption derivation",
    "B11 shared tools OEM-included credit","C1/C2 stock ownership and 2-year repair logistics",
+   "B13 activity drivers not yet established; SPQ-003 returns OPEN_INPUT while Rev08 quantity stays a controlled interim budget",
    "Repricing risk additions after management choice"],
   noAutomaticPricePosting:true,releaseAllowed:false
  });
