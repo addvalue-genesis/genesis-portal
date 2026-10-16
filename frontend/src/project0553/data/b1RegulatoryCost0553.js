@@ -15,6 +15,25 @@ const S=frozen([
  frozen({id:"B1-REG-07",description:"Licensed local technical/regulatory filing consultant",driver:"written scope of services × verified contracted legal fee",owner:"B1",category:"THIRD_PARTY_SERVICE",source:"Signed engagement, deliverables, beneficial-owner due diligence and invoice required",role:"Approved third party",quantity:null,rateTHB:null,unit:"service"}),
  frozen({id:"B1-REG-08",description:"Official authority application/license fee borne by ADDVALUE",driver:"official schedule × legally payable license/application",owner:"B1",category:"PERMIT",source:"Authority fee schedule and contractual liability allocation; avoid duplicate OEM/SAMTEL fee",role:"Licensed applicant / ADDVALUE if contract owner",quantity:null,rateTHB:null,unit:"application"})
 ]);
+// Extracted from the already controlled Rev05 WBS / Milestone and Sheet
+// 20_CUSTOMS_PERMIT. These are existing campaign activities, NOT regulatory trips.
+// No ERP task counts or guessed accommodation are used.
+export const B1_REGULATORY_WBS_MILESTONE_AUDIT_0553=frozen({
+ source:"PJ2608-0553_PART_B_DETAILED_QUOTATION_WBS_Rev05-OFFSHORE-EVIDENCE-AUDIT-FIXED_20260903.xlsx",
+ sourceSheets:["00_EXEC_QUOTE","18_TH_FAT_WBS","19_CN_YARD_WBS","20_CUSTOMS_PERMIT","23_SAT_TRIP_VALIDATION"],
+ knownCampaigns:frozen([
+  frozen({id:"B3-BKK-FAT",owner:"B3",teamDays:8,crew:2,personDays:16,tripCount:null,mayBookAsB1PermitTrip:false}),
+  frozen({id:"B3-OFFSHORE",owner:"B3",teamDays:39,crew:2,personDays:78,tripCount:5,mayBookAsB1PermitTrip:false}),
+  frozen({id:"B9-CN-YARD",owner:"B9",teamDays:12,crew:2,personDays:24,tripCount:null,mayBookAsB1PermitTrip:false})
+ ]),
+ regulatoryMilestone:frozen({
+  id:"WBS-20_CUSTOMS_PERMIT",owner:"B1_TECHNICAL_COORDINATION_WITH_B6_FORMAL_APPLICANT_REVIEW",
+  workStatus:"REGULATORY_ROUTE_AND_APPLICATION_CLASSES_DOCUMENTED",
+  authorizedPermitApplications:null,approvedDedicatedTrips:null,approvedDedicatedTravelers:null,
+  nights:null,officialFeeTHB:null,localAgentFeeTHB:null,
+  gate:"No separate trip count, approved travel days or person-nights in existing Rev05 WBS; do not copy B3/B9 quantities."
+ })
+});
 export function selectB1RegulatoryCost0553(){
  const b1=derivePartBcWorkingWbs0553().rows.find(x=>x.code==="B1");
  if(!b1||b1.sellTHB!==510000||b1.qty!==964)throw Error("B1 baseline/GEQ linkage changed");
@@ -32,6 +51,7 @@ export function selectB1RegulatoryCost0553(){
   category:"B1",group:"Regulatory, Import & Operating Licence Coordination",
   equationIds:["GEQ-005","GEQ-013","GEQ-016","GEQ-018","MAP-07","MAP-08"],
   protectedWorkingSellTHB:b1.sellTHB,originalEngineeringMH:b1.qty,
+  wbsMilestoneAudit:B1_REGULATORY_WBS_MILESTONE_AUDIT_0553,
   rows,computedRegulatoryDirectCostTHB:null,incrementalWorkingSellTHB:null,
   currentBudgetTotalTHB:null,approvedTripCount:null,approvedPersonNights:null,
   sourcePolicy:"MR0001–0004 §5 + existing B1 WBS Rev05; actual trip and source rates needed",
