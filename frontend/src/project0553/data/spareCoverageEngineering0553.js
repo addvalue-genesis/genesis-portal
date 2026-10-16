@@ -111,6 +111,17 @@ export function selectSpareCoverageEngineering0553(){
    sourceModel:"MAP-01/MAP-02/MAP-05/MAP-06/MAP-07/MAP-08/MAP-10 + SPQ-001"
   });
  });
+ // MR0002 Rev.C1 lists RAD-508-001 LNA; current selected RFI BDA is
+ // represented at TCAB-508-001 in working/layout evidence. Keep the MR
+ // requirement as an unresolved crosswalk; never silently deem it replaced.
+ const unresolvedRequirementTags=Object.freeze([
+  Object.freeze({mr:"MR-0002",tag:"RAD-508-001",
+   source:"MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5",
+   candidateCurrentInstalledTag:"TCAB-508-001",
+   reason:"MR LNA tag versus selected RFI BDA/Ex d package; technical substitution and spare compatibility crosswalk outstanding",
+   status:"REQUIREMENT_TO_SELECTED_PACKAGE_CROSSWALK_OPEN",
+   quantity:null,additionalCostTHB:null})
+ ]);
  const totals=Object.fromEntries(MR_CODES.map(mr=>[mr,Object.freeze({
   installedTagInstances:byMr[mr].length,uniqueTagTypes:groups.filter(x=>x.mr===mr).length,
   criticalTagTypes:groups.filter(x=>x.mr===mr&&x.criticality==="COMMISSIONING_CRITICAL_CANDIDATE").length,
@@ -124,7 +135,7 @@ export function selectSpareCoverageEngineering0553(){
   moduleId:"bid.budget.working.bc.spares-coverage",status:"PRE_AWARD_ENGINEERING_COVERAGE_REVIEW",
   sourceModuleIds:["MR0001_WORKING_PRICED_BOM","Z1F_TEL_LAYOUT_INDEX_0553","MR0003_MR0004_SCOPE_C1"],
   reusedEquationIds:requiredEquations,newEquationIds:[SPQ_001_0553.id,SPQ_002_0553.id],
-  installed,groups,byMr,totals,categoryBudgetsTHB:master.budgetTotalsTHB,
+  installed,groups,byMr,totals,unresolvedRequirementTags,categoryBudgetsTHB:master.budgetTotalsTHB,
   categoryCodes:CAT,customerReleaseAllowed:false,allSpareSkuVerified:false,minimumContractSatisfied:false,
   note:"Candidate category matches are NOT stock, SKU, minimum-spares, OEM, Ex certification or company compliance proof. Current Rev08 Working SELL is unchanged. No new price posting."
  });
