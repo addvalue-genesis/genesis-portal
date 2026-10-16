@@ -80,6 +80,27 @@ export function selectSpareEngineeringReconciliation0553(){
   selectedCapitalSpareQty:null,pricePostingAllowed:false,
   note:"Both amounts refer to different budget/quotation bases. The Part A installed kit may include different components; neither proves a supplier-quoted independent complete RACON spare."
  });
+ // Management-selected C1 OPTION: one independent spare stock item, not the Part A
+ // installed three-site supply. USD75,000 is the original ORGA full equipment
+ // FCA unit reference, NOT an OEM-issued spare quote or DDP landed sell price.
+ const selectedC1Option=Object.freeze({
+  id:"C1-MR0004-ORGA-COMPLETE-SPARE-BUDGET",
+  code:"C1",mr:"MR-0004",tagNo:"MAR-514-001",
+  description:"SeaBeacon-2 System 6 Ex — complete RACON capital spare (budgetary equivalent)",
+  detailSpecification:"X&S Band / Zone 1; configuration, accessories and spare interchangeability to match installed OEM unit",
+  materials:"OEM full package reference / independently deliverable spare set",
+  qty:1,unit:"set",unitPriceUSD:quoteRateUSD,currencySource:"USD",
+  planningFxTHBPerUSD:customer.rows[0].workingFxTHBPerUSD,
+  budgetUnitPriceTHB:round(quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
+  budgetTotalTHB:round(quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
+  source:"MDS/ORGA "+raconVendor.quoteNumber+" — installed complete package benchmark; management C1 spare option",
+  sourceIncoterm:"FCA_FACTORY_EX_VAT",
+  customerRequiredIncoterm:"DDP_PURCHASERS_YARD",
+  ddpIncrementTHB:null,ddpSellPriceTHB:null,leadTimeARO:"8 weeks indicative for equipment; OEM spare lead time subject to confirmation",
+  selectionState:"MANAGEMENT_SELECTED_BUDGETARY_C1_OPTION__NOT_OEM_SPARE_QUOTE",
+  scopeOwner:"C1_DISTINCT_PHYSICAL_SPARE_STOCK_NOT_PART_A",
+  costPosted:false,workingSellPosted:false,customerReleaseAllowed:false
+ });
  const vendorScopeConflicts=Object.freeze([
   Object.freeze({id:"MR0004-ORGA-TOOLS",mr:"MR-0004",code:"B11",tag:"MAR-514-001",
    source:"MDS/ORGA QTORG2609244 §1 and §3.6 vs MR0004 §5 and EXA-A8 Att-2 §5",
@@ -133,7 +154,7 @@ export function selectSpareEngineeringReconciliation0553(){
   moduleId:"bid.budget.working.bc.spare-reconciliation",
   methodModuleId:demand.moduleId,priceReadModelId:customer.moduleId,
   section:"10.2",equationIds:["MAP-02","MAP-06","MAP-07","MAP-08","MAP-09"],
-  kitLines,brownfieldDemand,toolRequirements,capitalHistory,raconComparison,systemSummary,vendorScopeConflicts,
+  kitLines,brownfieldDemand,toolRequirements,capitalHistory,raconComparison,selectedC1Option,systemSummary,vendorScopeConflicts,
   sourceSpecificationChecklist:REQUIRED_FIELDS,byCode,
   historicalSourcePriceRows:customer.rows,
   missingOemSpares:"OEM itemized SPIR not yet reconciled in current working BOM",
