@@ -75,6 +75,22 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
     </tr>)}</tbody></table></div>
    <p className="p55-note">Four requirement sets are NOT four additional prices on top of the four Rev08 B11 tool rows; verify OEM included tools, license compatibility and pooled common sets.</p>
   </details>}
+  {code==="C2"&&<div className="p55-panel" style={{padding:12}}>
+   <h4>2-Year Operating Spares — MR0001–0004 Attachment 7 Exclusion Audit</h4>
+   <p className="p55-note"><strong>Mandatory instruction 6:</strong> Exclude all items in the Pre-Commissioning / Start-up Spare Parts List. C2 remains Quotation Only until ordered. Historical Rev08 B10/C2 candidate overlap is not an approved duplicate supply; verify OEM SKU and remove overlapping items from revised C2 once proven.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Candidate Part Family</th><th>B10/C2 Historic Source References</th><th>Status / Calculation Action</th></tr></thead>
+    <tbody>{customerSchedule.crossCategoryDuplicates.filter(x=>x.categories.includes("B10")&&x.categories.includes("C2")).map(x=><tr key={x.family}>
+     <td>{x.family}</td><td>{x.sourceIds.join(", ")}</td><td>{x.status}<small>{x.decision}</small></td>
+    </tr>)}</tbody>
+   </table></div>
+   <p className="p55-note">Attachment 7 also requires part number, lead time, unit and breakdown price; do not assume the historical C2 quantity is an independently verified two-year OEM stock level.</p>
+  </div>}
+  {code==="B13"&&<div className="p55-panel" style={{padding:12}}>
+   <h4>Consumables Quantity Driver — MR Attachment 9 / SPQ-003</h4>
+   <p className="p55-note">Shipping and Long-Term Storage recommendations require preservation agents, quantities, reapplication interval and environmental storage conditions. Only separately delivered B13 consumables are additive; B5 shipment packaging and installed consumables are not counted again.</p>
+   <p className="p55-note"><strong>Derived required B13 quantity:</strong> NOT ESTABLISHED (activity count, usage per event and preservation program source missing). Current priced four Rev08 rows are displayed below as a historical working budget—not as demonstrated minimum consumption.</p>
+  </div>}
   {code==="C1"&&<details className="p55-panel" open style={{padding:12}}>
    <summary><strong>Capital Spare Optional Selection — MR0001–0004 Source Review</strong></summary>
    <p className="p55-note">MR §5 does not mandate an extra complete major unit from the wording 1 Set/Platform. Rev08 C1 complete RACON and SCADA radio remain historical option candidates, not Document-Required OEM spare quantities.</p>
@@ -200,7 +216,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td>{x.decision}<small>{x.status}</small></td>
     </tr>)}</tbody>
    </table></div>
-   <p className="p55-note">This is a functional overlap alert, NOT proof of identical OEM SKU or double billing. B10 and C2 may legitimately require independent delivery quantities. B13 packaging must be net of B5.</p>
+   <p className="p55-note">This is a functional overlap alert, NOT proof of identical OEM SKU or double billing. MR0001–0004 Attachment 7 requires excluding items listed in the Pre-Commissioning/Start-up spares list from C2. Confirm actual OEM part numbers before removing or retaining a historical C2 candidate. B13 preservation stock must be net of B5 shipping packing.</p>
   </details>}
   <h4>1. Historical Annex Price Lines — Original Rev08 / Not current Vendor Quote</h4>
   {p.historicalHasDetail?
