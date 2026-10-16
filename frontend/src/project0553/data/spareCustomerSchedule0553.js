@@ -149,8 +149,8 @@ export function selectSpareCustomerSchedule0553(){
   const related=rows.filter(x=>physicalFamily(x.description)===family);
   return unique(related.map(x=>x.code)).length>1?[Object.freeze({
    family,sourceIds:related.map(x=>x.id),categories:unique(related.map(x=>x.code)),
-   status:"POTENTIALLY_COMMON_FUNCTION_NOT_PROVEN_SAME_SKU",
-   decision:"Different lifecycle stocks may be intentional, but require independent deliverable quantity and cost ownership; no automatic credit or additive adjustment."
+   status:related.some(x=>x.code==="B10")&&related.some(x=>x.code==="C2")?"MR_ATTACHMENT7_EXCLUDES_PRECOM_STARTUP_SPARE_LIST_ITEMS__SKU_CROSSWALK_OPEN":"POTENTIALLY_COMMON_FUNCTION_NOT_PROVEN_SAME_SKU",
+   decision:related.some(x=>x.code==="B10")&&related.some(x=>x.code==="C2")?"MR0001–0004 Attachment 7 instruction 6: exclude items listed in pre-commissioning/start-up spares; confirm same OEM part before retaining any C2 item. No automatic silent removal of existing Rev08 candidate.":"Compare separately delivered stock, OEM included parts and category owner; no automatic adjustment."
   })]:[];
  });
  const critical=cover.groups.filter(x=>x.criticality==="COMMISSIONING_CRITICAL_CANDIDATE");
@@ -182,6 +182,7 @@ export function selectSpareCustomerSchedule0553(){
    "B11 shared tools OEM-included credit and five EXA-A8 minimum requirements","C1/C2 stock ownership and 2-year repair logistics",
    "B13 activity drivers not yet established; SPQ-003 returns OPEN_INPUT while Rev08 quantity stays a controlled interim budget",
    "Repricing risk additions after management choice"],
+  attachment7Control:"MR0001–0004 Rev.C1 Attachment 7 instruction 6 excludes all Pre-Commissioning / Start-up Spare Parts List items from the 2-year Operating Spare Parts List.",
   noAutomaticPricePosting:true,releaseAllowed:false
  });
 }
