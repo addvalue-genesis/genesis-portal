@@ -30,6 +30,16 @@ export const SPARE_DOCUMENT_METHOD_0553=Object.freeze({
  },
  control:"SPQ-001 risk scenario may flag a gap; it must never create mandatory spare BOM quantity."
 });
+// Brownfield source clauses must be captured independently from the new ZWP
+// 1 kit/platform mandate. Existing network tie-ins may require spare parts and
+// special tools "as required"; there is no document-based 1-kit-per-brownfield
+// rule. Do not erase this demand because it is not quantified in section §5.
+const BROWNFIELD_SCOPES=Object.freeze([
+ {mr:"MR-0001",site:"ZPQ",source:"MR0001 Rev.C1 §5 BROWNFIELD FOR ZPQ / as required spare parts and special tools",requirement:"SCADA tie-in/ODU/IDU/RF spare and OEM compatibility screening"},
+ {mr:"MR-0001",site:"ZWP08",source:"MR0001 Rev.C1 §5 BROWNFIELD FOR ZWP08 / as required spare parts and special tools",requirement:"SCADA dual-radio/antenna/switch interfaces and spare coverage screening"},
+ {mr:"MR-0001",site:"ZWP11",source:"MR0001 Rev.C1 §5 BROWNFIELD FOR ZWP11 / as required spare parts and special tools",requirement:"SCADA existing-site interface and spare coverage screening"},
+ {mr:"MR-0002",site:"ZPQ",source:"MR0002 Rev.C1 §5 Existing DMR/ZPQ integration / spare parts and tools as required",requirement:"RFI LNA/BDA tie-in to operating ZPQ DMR and compatible spare screening"}
+]);
 export function selectDocumentSpareObligations0553(){
  const actualMr1=new Set(MR0001_WORKING_PRICED_BOM.items.map(x=>x.site));
  const actualMr2=new Set(Z1F_TEL_LAYOUT_INDEX_0553.byWP.filter(w=>w.equipment.some(x=>x.system==="DTRS_TRUNK_RADIO")).map(x=>x.wp));
@@ -49,14 +59,15 @@ export function selectDocumentSpareObligations0553(){
   minimumProof:"MR Rev.C1 §5 + SPE §8.1 + EXA-A8 applicability; no inferred spare SKU",
   customerReleaseAllowed:false
  }));
+ const brownfieldRows=BROWNFIELD_SCOPES.map(x=>Object.freeze({...x,commissioningKitQuantity:null,sparePartItemQuantity:null,commercialPriceTHB:null,driver:"AS_REQUIRED__FUNCTIONAL_INTERFACE_AND_OEM_ASSESSMENT",costPostingAllowed:false}));
  const totals={commissioningKitSets:rows.reduce((sum,x)=>sum+x.commissioningKitQuantity,0),
-  specialToolMrPhaseRequirements:rows.length,physicalSparePartItemsVerified:0,
+  specialToolMrPhaseRequirements:rows.length,brownfieldAsRequiredInterfaces:brownfieldRows.length,physicalSparePartItemsVerified:0,
   capitalCompleteUnitsMandatedFromOneSetRule:0};
  if(totals.commissioningKitSets!==14||totals.specialToolMrPhaseRequirements!==4)
   throw Error("Four MR documented spare demand has diverged");
  return Object.freeze({moduleId:"bid.methodology.spare-obligation-derivation",
   section:"02",consumers:["10.2/B10","10.2/B11","10.2/B13","10.2/C1","10.2/C2"],
-  method:SPARE_DOCUMENT_METHOD_0553,rows,totals,
+  method:SPARE_DOCUMENT_METHOD_0553,rows,brownfieldRows,totals,
   pricePostingAllowed:false,contractSpareContentComplete:false,
   customerReleaseAllowed:false});
 }
