@@ -46,6 +46,17 @@ const hint=(description)=>{
  return "Confirm actual OEM SKU, rating and delivery quantity against MR/DTS/SPIR";
 };
 const rowStatus=(code)=>code==="B11"?"BUDGETARY_REFERENCE_NOT_POSTED":"EXISTING_REV08_WORKING_SELL_BUDGET";
+const budgetUnitFromDescription=d=>{
+ const s=d.toLowerCase();
+ if(/cable.*\(m\)|cable.*\(meter\)/.test(s))return "m";
+ if(/desiccant pack/.test(s))return "pack";
+ if(/barrier bag/.test(s))return "bag";
+ if(/kit/.test(s))return "kit";
+ if(/set|tools and maintenance access|programming and adapter/.test(s))return "set";
+ if(/gland.*set|relay.*socket/.test(s))return "set";
+ return "ea";
+};
+
 const physicalFamily=d=>{
  const v=d.toLowerCase();
  if(/poe/.test(v))return "SCADA_POE";
@@ -75,7 +86,7 @@ export function selectSpareCustomerSchedule0553(){
    mappingStatus:tags.length?"INSTALLED_TAG_FUNCTIONAL_ASSOCIATION__SPARE_SKU_COMPATIBILITY_OPEN":common?"COMMON_NON_EQUIPMENT_STOCK":"UNMAPPED_LEGACY_PRICE_SCOPE",
    description:x.description,detailSpecification:hint(x.description),
    materials:"As specified for the selected OEM item",qty:x.budgetQty,
-   unit:"EA / set (per original Rev08 item)",unitPriceTHB:x.budgetUnitTHB,extendedTHB:x.budgetTotalTHB,
+   unit:budgetUnitFromDescription(x.description),unitPriceTHB:x.budgetUnitTHB,extendedTHB:x.budgetTotalTHB,
    sourcePriceUSD:x.legacyUnitUSD,sourceId:x.id,sourceRevision:"4-Scope of Supply.xlsx Rev08",workingFxTHBPerUSD:master.fxTHBPerUSD,
    workingStatus:rowStatus(code),costOwner:code,customerReleaseAllowed:false,
    activityBasedQuantityEquation:code==="B13"?deriveConsumableBudgetQuantity0553({}).equationId:null,
