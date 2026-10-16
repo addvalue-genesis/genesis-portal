@@ -1,0 +1,124 @@
+// PJ2608-0553 — customer-style 5-category pre-award read model.
+// Source of listed quantities/prices is existing Rev08; actual installed TAG identities
+// are from MR/ MTO / AFC scoped tag model, never guessed. Candidate tag links are
+// engineering associations, not verified OEM interchangeable spare part numbers.
+// SPQ spare cost scenarios are NON-POSTING and separate from price-controlled base.
+import {selectUnifiedSpareConsumables0553} from "./unifiedSpareConsumables0553";
+import {selectSpareCoverageEngineering0553} from "./spareCoverageEngineering0553";
+import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
+import {deriveSpareRiskQuantity0553} from "./spareRiskQuantity0553";
+const CODES=Object.freeze(["B10","B11","B13","C1","C2"]);
+const round=n=>Math.round((n+Number.EPSILON)*100)/100;
+const unique=items=>[...new Set(items)];
+const fullMR=mr=>"MR-"+mr;
+function fits(category,description,x){
+ const d=description.toLowerCase(),m=x.mr,t=x.tag.toUpperCase();
+ if(category==="B11"){
+  if(/racon/.test(d))return m==="MR-0004"&&t.startsWith("MAR-");
+  if(/rf connector/.test(d))return (m==="MR-0001"||m==="MR-0002")&&t.startsWith("ANT-");
+  if(/cable termination/.test(d))return t.startsWith("TCAB-");
+  return false; // Configuration software is project COMMON and cannot be assigned a single TAG.
+ }
+ if(category==="B13")return false; // Common preservation consumables, NOT installed SKUs.
+ if(/racon/.test(d))return m==="MR-0004"&&(/racon complete/.test(d)?t.startsWith("MAR-"):t.startsWith("TCAB-"));
+ if(/scada remote radio/.test(d))return m==="MR-0001"&&t.startsWith("MR-")&&!t.endsWith("A");
+ if(/scada|poe/.test(d))return m==="MR-0001"&&t.startsWith("MR-");
+ if(/cisco/.test(d))return m==="MR-0001"&&t.startsWith("LAN-");
+ if(/ethernet/.test(d))return m==="MR-0001"&&(/^(LAN|SA)-/.test(t));
+ if(/telephone|phone/.test(d))return m==="MR-0003"&&t.startsWith("TPH-");
+ if(/sounder/.test(d))return m==="MR-0003"&&t.startsWith("LSE-");
+ if(/rf surge/.test(d))return m==="MR-0001"&&t.startsWith("SA-")||m==="MR-0002"&&t==="TCAB-508-002";
+ if(/rf |n-male|7\/8-inch/.test(d))return (m==="MR-0001"||m==="MR-0002")&&t.startsWith("ANT-");
+ if(/gland|fuse|relay/.test(d))return t.startsWith("TCAB-")||/fuse/.test(d)&&m==="MR-0001"&&t.startsWith("LAN-");
+ if(/cat6a/.test(d))return m==="MR-0001"&&t.startsWith("LAN-");
+ return false;
+}
+const hint=(description)=>{
+ const d=description.toLowerCase();
+ if(/gland/.test(d))return "Ex certification, thread and installed cable OD must match";
+ if(/surge/.test(d))return "Surge rating, RF frequency/impedance or Ethernet PoE ratings must match";
+ if(/power|poe/.test(d))return "Match OEM part number, rated input/output voltage and power";
+ if(/radio|bda/.test(d))return "Match frequency band, radio configuration, interface and Ex assembly";
+ if(/racon/.test(d))return "Match selected RACON manufacturer system configuration";
+ if(/software|configuration/.test(d))return "Confirm license/access rights and OEM package inclusions";
+ if(/connector|feeder/.test(d))return "Match cable type, impedance and termination series";
+ if(/telephone|sounder/.test(d))return "Match Ex certification, voltage, interface and approved model";
+ if(/preservation|desiccant|moisture|cleaning|labels/.test(d))return "Preservation/maintenance consumption and handover stock, not installed equipment";
+ return "Confirm actual OEM SKU, rating and delivery quantity against MR/DTS/SPIR";
+};
+const rowStatus=(code)=>code==="B11"?"BUDGETARY_REFERENCE_NOT_POSTED":"EXISTING_REV08_WORKING_SELL_BUDGET";
+export function selectSpareCustomerSchedule0553(){
+ const master=selectUnifiedSpareConsumables0553(),cover=selectSpareCoverageEngineering0553();
+ const rows=CODES.flatMap(code=>(master.byCode[code]||[]).map(x=>{
+  const installed=cover.installed.filter(a=>fits(code,x.description,a));
+  const tags=unique(installed.map(i=>i.tag)),sites=unique(installed.map(i=>i.site));
+  const common=code==="B13"||/configuration tools and maintenance access/i.test(x.description);
+  // A shared common tool/consumable is not a claim of a physical OEM TAG number.
+  return Object.freeze({
+   id:x.id,code,item:x.item,
+   tagNo:tags.length?tags.join(", "):"COMMON",
+   linkedMR:unique(installed.map(i=>i.mr)),
+   linkedLocations:sites,installedTagKeys:unique(installed.map(i=>i.key)),
+   mappingStatus:tags.length?"INSTALLED_TAG_FUNCTIONAL_ASSOCIATION__SPARE_SKU_COMPATIBILITY_OPEN":common?"COMMON_NON_EQUIPMENT_STOCK":"UNMAPPED_LEGACY_PRICE_SCOPE",
+   description:x.description,detailSpecification:hint(x.description),
+   materials:"As specified for the selected OEM item",qty:x.budgetQty,
+   unit:"EA / set (per original Rev08 item)",unitPriceTHB:x.budgetUnitTHB,extendedTHB:x.budgetTotalTHB,
+   sourcePriceUSD:x.legacyUnitUSD,sourceId:x.id,sourceRevision:"4-Scope of Supply.xlsx Rev08",workingFxTHBPerUSD:master.fxTHBPerUSD,
+   workingStatus:rowStatus(code),costOwner:code,customerReleaseAllowed:false,
+   possibleOverlap:code==="B13"? "B5 packing material vs separate B13 handover stock must be net reconciled":
+    code==="B11"?"OEM Part A included tools/software or previously supplied RACON kit must be credited":
+    "Check OEM Part A / separate category delivered-quantity register",
+   leadTimeARO:null,option:code.startsWith("C")
+  });
+ }));
+ const byCode=Object.fromEntries(CODES.map(code=>[code,rows.filter(x=>x.code===code)]));
+ // Do not silently distribute the grand total across tags or add a balancing price line.
+ for(const code of CODES){
+  const subtotal=round(byCode[code].reduce((n,x)=>n+x.extendedTHB,0));
+  const expected=master.budgetTotalsTHB[code];
+  if(Math.abs(subtotal-expected)>0.12)throw Error("Rev08 line rounding/source mismatch "+code);
+ }
+ const site=MR0002_WORKING_BOM_0553.sites.find(s=>s.site==="ZWP20");
+ const kit=site?.items.find(x=>x.id==="ZWP20-RFI-BDA"&&x.tag==="TCAB-508-001"&&x.quoteLine==="UHF-1");
+ if(!kit||kit.qty!==1||kit.currency!=="USD"||!Number.isFinite(kit.unitCost)||
+    kit.unitCost!==31474||!site.siteTags.includes(kit.tag))
+  throw Error("MR0002/ZWP20 RFI BDA vendor rate/tag must come from source Working BOM");
+ const equipmentInstances=MR0002_WORKING_BOM_0553.sites.filter(s=>s.siteTags.includes(kit.tag)).length;
+ const scenario=deriveSpareRiskQuantity0553({installedCount:equipmentInstances,critical:true,
+  contractualPartMinimum:null,compatibilityProven:false});
+ const riskCandidates=Object.freeze([Object.freeze({
+  id:"MR0002-RFI-BDA-REPLACEMENT-RISK",mr:"MR-0002",site:"ZWP20",tagNo:kit.tag,
+  moduleId:"bid.budget.bom.mr0002.zwp20.zwp20-rfi-bda.evidence",
+  description:"Complete RFI BDA + WAROM Ex d assembly — replacement risk scenario",
+  sku:kit.sku,partAEquipmentOwner:"MGW_UHF1_RFI_WAROM_BUNDLED_PACKAGE",
+  qty:scenario.budgetQty,unit:"complete set",sourceUnitUSD:kit.unitCost,planningFxTHBPerUSD:master.fxTHBPerUSD,
+  comparativeUnitTHB:round(kit.unitCost*master.fxTHBPerUSD),
+  comparativeAmountTHB:round((scenario.budgetQty||0)*kit.unitCost*master.fxTHBPerUSD),
+  source:kit.source,sourceQuoteLine:kit.quoteLine,
+  categoryDecision:"B10_VS_C1_PHYSICAL_STOCK_OWNER_MUST_BE_SELECTED_ONCE",
+  priceClass:"PART_A_VENDOR_FULL_PACKAGE_COMPARABLE__NOT_SPARE_SELL_PRICE",
+  includedInWorkingSell:false,additionalCostPostedTHB:null,notionalRiskScenarioOnly:true,
+  finalSpareSkuVerified:false,contractualMinimumConfirmed:false,
+  warnings:["A replacement spare may be only an OEM internal BDA module rather than complete WAROM assembly; rate is an upper-package comparator, NOT vendor-approved spare price.",
+   "Never charge WAROM Ex d enclosure twice; full unit is priced in Part A.",
+   "MR0002 Rev.C1 LNA RAD-508-001 versus selected TCAB-508-001 RFI-BDA remains a technical substitution crosswalk."]
+ })]);
+ const pricedCategorySummary=Object.fromEntries(CODES.map(code=>[code,Object.freeze({
+  workingReferenceTHB:master.budgetTotalsTHB[code],
+  priceStatus:code==="B11"?"BUDGETARY_CANDIDATE_NOT_IN_WORKING_SELL":"EXISTING_WORKING_BUDGET",
+  lineCount:byCode[code].length,options:code.startsWith("C"),
+  deltaFromDisplayedRoundedLinesTHB:round(master.budgetTotalsTHB[code]-byCode[code].reduce((n,x)=>n+x.extendedTHB,0))
+ })]));
+ return Object.freeze({
+  moduleId:"bid.budget.working.bc.customer-spare-schedule",
+  codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,
+  installedSourceCount:cover.installed.length,
+  sourceOwnership:"Working BOM/Tag + Rev08 price reference + 10.2 commercial owner",
+  riskQuestionAnswered:false,
+  missingEngineeringProofs:["EXA-A8 applicable minimum lines by equipment","OEM spare/installed SKU replacement compatibility",
+   "B10 kit-per-platform composition","B13 preservation quantity/activity consumption derivation",
+   "B11 shared tools OEM-included credit","C1/C2 stock ownership and 2-year repair logistics",
+   "Repricing risk additions after management choice"],
+  noAutomaticPricePosting:true,releaseAllowed:false
+ });
+}
