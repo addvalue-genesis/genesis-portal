@@ -18,6 +18,10 @@ const {MR0004_WORKING_BOM_0553}=from("data/mr0004WorkingBom0553.js");
 const c=selectSpareEngineeringReconciliation0553(),s=selectSpareCustomerSchedule0553(),w=selectBcTurnkeyWorkingCost0553();
 assert.deepEqual(Object.keys(c.byCode),["B10","B11","B13","C1","C2"]);
 assert.equal(c.kitLines.length,14);
+assert.equal(c.brownfieldDemand.length,4);
+assert.deepEqual(c.brownfieldDemand.map(x=>[x.mr,x.site]),[["MR-0001","ZPQ"],["MR-0001","ZWP08"],["MR-0001","ZWP11"],["MR-0002","ZPQ"]]);
+assert(c.brownfieldDemand.every(x=>x.commissioningKitQuantity===null&&x.commercialPriceTHB===null&&!x.costPostingAllowed));
+
 assert.equal(new Set(c.kitLines.map(x=>x.id)).size,14);
 assert.deepEqual(["MR-0001","MR-0002","MR-0003","MR-0004"].map(mr=>c.kitLines.filter(x=>x.mr===mr).length),[4,3,4,3]);
 assert(c.kitLines.every(x=>x.requirementQty===1&&x.detailedBomSku===null&&x.unitPriceTHB===null&&x.totalPriceTHB===null&&!x.postingAllowed));
