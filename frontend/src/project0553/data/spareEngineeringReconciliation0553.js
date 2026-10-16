@@ -41,6 +41,11 @@ export function selectSpareEngineeringReconciliation0553(){
   projectFormatFields:REQUIRED_FIELDS,postingAllowed:false,
   customerReleaseAllowed:false
  })));
+ const brownfieldDemand=demand.brownfieldRows.map(x=>Object.freeze({
+  ...x,code:"B10",verificationGate:"SOURCE_AS_REQUIRED_OEM_SPARE_INTERFACE_NOT_PRICED",
+  separateFromNewPlatformKits:true,verifiedOemStockQuantity:null,
+  note:"Not an additional automatic kit/platform; source-backed functional constraint check."
+ }));
  const toolRequirements=demand.rows.map(m=>Object.freeze({
   id:"B11-TOOLS-"+m.mr,code:"B11",mr:m.mr,
   description:"Special tools for "+m.label,
@@ -128,7 +133,7 @@ export function selectSpareEngineeringReconciliation0553(){
   moduleId:"bid.budget.working.bc.spare-reconciliation",
   methodModuleId:demand.moduleId,priceReadModelId:customer.moduleId,
   section:"10.2",equationIds:["MAP-02","MAP-06","MAP-07","MAP-08","MAP-09"],
-  kitLines,toolRequirements,capitalHistory,raconComparison,systemSummary,vendorScopeConflicts,
+  kitLines,brownfieldDemand,toolRequirements,capitalHistory,raconComparison,systemSummary,vendorScopeConflicts,
   sourceSpecificationChecklist:REQUIRED_FIELDS,byCode,
   historicalSourcePriceRows:customer.rows,
   missingOemSpares:"OEM itemized SPIR not yet reconciled in current working BOM",
