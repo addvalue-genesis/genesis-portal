@@ -63,6 +63,13 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td>OEM itemized rate required</td><td>NOT ESTABLISHED</td>
      <td>{x.contentStatus}<small>{x.priceBasis}</small></td>
     </tr>)}</tbody></table></div>
+   <h4>Brownfield — Spare Parts and Tools AS REQUIRED (not part of 14 new-ZWP KIT count)</h4>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>MR</th><th>Site</th><th>Required Assessment</th><th>Kit Quantity</th><th>Price THB</th><th>Source</th></tr></thead>
+    <tbody>{spareReconciliation.brownfieldDemand.map(x=><tr key={x.mr+"-"+x.site}>
+     <td>{x.mr}</td><td>{x.site}</td><td>{x.requirement}<small>{x.verificationGate}</small></td>
+     <td>As required — no fixed per-site KIT</td><td>NOT ESTABLISHED</td><td>{x.source}</td>
+    </tr>)}</tbody></table></div>
    <p className="p55-note"><strong>Quantity derived:</strong> {spareReconciliation.kitLines.length} contractual KITs (4/3/4/3). <strong>New verified kit price:</strong> NOT ESTABLISHED until OEM Attachment-5 itemized BOM/quantity/rate; existing B10 THB reference is kept separate below.</p>
   </div>}
   {code==="B11"&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
