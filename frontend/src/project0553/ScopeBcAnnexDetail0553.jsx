@@ -128,7 +128,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
   </details>}
   {code==="C1"&&<div className="p55-panel" style={{padding:12}}>
    <h4>SUPPLIER RECOMMENDATION FOR CAPITAL SPARE PARTS — CURRENT SELECTION REVIEW</h4>
-   <p className="p55-note"><strong>NO CAPITAL SPARE ITEM HAS BEEN ENGINEERING-SELECTED FOR CUSTOMER ISSUE.</strong> Rev08 Complete RACON (1 unit) and SCADA Radio (1 unit) are unapproved historical budget candidates. The MR 1 Set/Platform requirement applies to installed equipment/commissioning kits, not an additional complete capital spare.</p>
+   <p className="p55-note"><strong>MANAGEMENT C1 BUDGETARY SELECTION:</strong> One complete RACON spare set is selected as an OPTION using the ORGA installed equipment FCA quote benchmark, not a confirmed OEM spare quote or DDP delivered price. Rev08 RACON/SCADA historical entries remain only comparison references.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>MR / Installed Equipment</th><th>Document / OEM Scope</th><th>Capital Spare Assessment</th><th>Selected QTY</th><th>Unit Price THB</th><th>Total Price THB</th><th>Evidence / Decision</th></tr></thead>
     <tbody>{spareReconciliation.systemSummary.map(x=><tr key={x.mr}>
@@ -138,7 +138,20 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td>NOT DERIVED</td><td>OEM SPIR RATE REQUIRED</td><td>NOT ESTABLISHED</td>
      <td>{x.auditVerdict}<small>C1 quotation is optional, not an approved working-selection BOM</small></td>
     </tr>)}</tbody></table></div>
-   <p className="p55-note"><strong>C1 current engineering-selected priced total: NOT ESTABLISHED.</strong> Historical Rev08 option remains preserved in the Capital Spare Optional Selection audit and Historical Annex below; THB {customerSchedule.summary.C1.workingReferenceTHB.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} is NOT a validated proposed complete spare price. Part A, B10 and C2 owners are kept separate.</p>
+   <h4>Selected C1 Budgetary Option — Customer Format</h4>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>QTY</th><th>Unit Price THB</th><th>Total Price THB</th><th>Lead Time ARO</th></tr></thead>
+    <tbody><tr>
+     <td>1</td><td>{spareReconciliation.selectedC1Option.tagNo}</td>
+     <td>{spareReconciliation.selectedC1Option.description}<small>{spareReconciliation.selectedC1Option.id}</small></td>
+     <td>{spareReconciliation.selectedC1Option.detailSpecification}<small>{spareReconciliation.selectedC1Option.selectionState}</small></td>
+     <td>{spareReconciliation.selectedC1Option.materials}</td><td>{spareReconciliation.selectedC1Option.qty} set</td>
+     <td>{thb(spareReconciliation.selectedC1Option.budgetUnitPriceTHB)}</td>
+     <td>{thb(spareReconciliation.selectedC1Option.budgetTotalTHB)}</td>
+     <td>{spareReconciliation.selectedC1Option.leadTimeARO}</td>
+    </tr></tbody></table></div>
+   <p className="p55-note"><strong>C1 selected equipment-reference budget:</strong> {thb(spareReconciliation.selectedC1Option.budgetTotalTHB)} · {spareReconciliation.selectedC1Option.source}. FCA factory reference, not DDP Purchaser's Yard; DDP uplift and final sell are not established. This is a separate option stock unit, not a duplicate charge for the installed Part A systems.</p>
+   <p className="p55-note"><strong>Historical Rev08:</strong> {thb(customerSchedule.summary.C1.workingReferenceTHB)} preserved for audit only; no automatic addition to selected C1 option or A+B base.</p>
   </div>}
   {spareLines.length>0&&code!=="C1"&&<div className="p55-panel" style={{padding:12}}>
    <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (Pre-Award Budgetary Working Preview)</h4>
