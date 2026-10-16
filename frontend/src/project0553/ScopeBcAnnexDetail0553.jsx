@@ -3,6 +3,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
 import {selectUnifiedSpareConsumables0553} from "./data/unifiedSpareConsumables0553";
 import {selectSpareCoverageEngineering0553} from "./data/spareCoverageEngineering0553";
+import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
@@ -10,8 +11,9 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
  const m=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const p=m.byCode[code];
  const shared=selectUnifiedSpareConsumables0553();
- const spareLines=shared.byCode[code]||[];
- const coverage=["B10","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
+ const customerSchedule=selectSpareCustomerSchedule0553();
+ const spareLines=customerSchedule.byCode[code]||[];
+ const coverage=["B10","B11","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
  const inWorking=mode==="working";
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
  if(!p)return <p role="alert">Unsupported customer scope code: {code}</p>;
@@ -28,21 +30,21 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
   {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
-   <h4>Customer Schedule — {shared.descriptions[code]} (Engineering Working Preview)</h4>
-   <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {shared.sourceTagRegister} · Existing MTO tags are used where matched to an equipment family; shared spares are grouped COMMON. Budget quantity and THB sell rates come from Rev08 at FX 31.5. OEM compatibility and minimum EXA-A8 coverage remain open.</p>
+   <h4>Customer Schedule — {shared.descriptions[code]} (PRE-AWARD BUDGETARY WORKING PREVIEW)</h4>
+   <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {customerSchedule.sourceOwnership} · Existing MR/MTO/AFC installed TAGs are joined to the five-category Rev08 budget lines by equipment function. COMMON means a shared stock/tool item, not an invented installed TAG. Quantities and THB unit rates retain the original pre-award Rev08 basis at FX 31.5. The TAG association is not OEM interchangeable SKU approval.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Item</th><th>Tag No. / Linked MTO Tags</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
     <tbody>{spareLines.map(x=><tr key={x.id}>
-     <td>{x.item}</td><td>{x.customerTagNo}<small>{x.relatedInstalledTags.length?"MTO candidate tags: "+x.relatedInstalledTags.join(", "):"No verified cross-reference yet"}</small><small>{x.relatedLocations.join(", ")}</small></td>
+     <td>{x.item}</td><td>{x.tagNo}<small>{x.installedTagKeys.length?"Installed TAG/Location links: "+x.installedTagKeys.join("; "):"Shared/unspecified equipment stock — crosswalk open"}</small><small>{x.linkedLocations.join(", ")}</small></td>
      <td>{x.description}<small>{x.id}</small></td>
-     <td>{x.detailSpecification||"Budgetary equivalent to installed equipment; final model/rating per selected OEM"}<small>{x.tagMappingState}</small></td>
-     <td>{x.material||"Compatible OEM component / as specified"}</td>
-     <td>{x.budgetQty}<small>Budgetary Qty · Rev08 source, not final OEM SPIR</small></td>
-     <td>{thb(x.budgetUnitTHB)}</td><td>{thb(x.budgetTotalTHB)}</td>
+     <td>{x.detailSpecification}<small>{x.mappingStatus}</small></td>
+     <td>{x.materials}</td>
+     <td>{x.qty} {x.unit}<small>Budgetary Qty · source {x.sourceId} · excludes additional major-spare risk stock</small></td>
+     <td>{thb(x.unitPriceTHB)}</td><td>{thb(x.extendedTHB)}</td>
      {(code==="C1"||code==="C2")&&<td>{x.leadTimeARO||"OEM confirmation required"}</td>}
     </tr>)}</tbody>
    </table></div>
-   <p className="p55-note"><strong>PRE-AWARD CATEGORY BUDGET:</strong> {thb(shared.budgetTotalsTHB[code])} · Source: Rev08 historic priced lines × planning FX 31.5 THB/USD · budgetary sell estimate only, no new direct-cost posting. Rounding per line can differ from category source total.</p>
+   <p className="p55-note"><strong>PRE-AWARD CATEGORY BUDGET:</strong> {thb(customerSchedule.summary[code].workingReferenceTHB)} · Source: Rev08 historic priced lines × planning FX 31.5 THB/USD · {customerSchedule.summary[code].priceStatus} · B11 reference remains non-posting, other approved categories preserve existing budgetary Working Sell. No new Direct Cost posting. Rounding per line can differ from category source total.</p>
    <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
   </div>}
   {coverage&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
@@ -69,6 +71,22 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
     <strong>Open MR-to-Selected Tag Crosswalk:</strong> {x.mr} / {x.tag} → {x.candidateCurrentInstalledTag} · {x.reason} · {x.status} · {x.source}. No quantity or price counted as resolved.
    </p>)}
    <p className="p55-note"><strong>Coverage gate:</strong> Contract minimum EXA-A8 and OEM SPIR composition remain unresolved; major equipment and compatibility gaps stay visible. Part A and B10/B13/C1/C2 must reconcile unique physical delivered quantities before customer release. Working Sell budgets are unchanged.</p>
+  </details>}
+  {(code==="B10"||code==="C1")&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
+   <summary><strong>Critical Replacement Risk Scenario — MR0002 / ZWP20 / RFI-BDA</strong> (NON-ADDITIVE budget sensitivity)</summary>
+   <p className="p55-note">This is derived from the selected MR0002 Working BOM, not from a fabricated spare quote. The integrated BDA+WAROM assembly is already supplied in Part A. The comparison is for one replacement package only; choose physical ownership B10 OR C1 when justified, never both for the same stock unit.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Installed TAG / Evidence</th><th>BOM / Spare Scenario</th><th>Scenario Qty</th><th>Vendor package rate THB (comparable)</th><th>Extended risk reference THB</th><th>Commercial treatment</th></tr></thead>
+    <tbody>{customerSchedule.riskCandidates.map(x=><tr key={x.id}>
+     <td><strong>{x.tagNo}</strong><small>{x.moduleId}</small><small>{x.site} · {x.mr}</small></td>
+     <td>{x.description}<small>Selected OEM SKU: {x.sku} · {x.source} / {x.sourceQuoteLine}</small></td>
+     <td>{x.qty} {x.unit}<small>SPQ-001 critical-family budget scenario, not required SPIR quantity</small></td>
+     <td>{thb(x.comparativeUnitTHB)}<small>USD {x.sourceUnitUSD} × {x.planningFxTHBPerUSD} THB/USD</small></td>
+     <td><strong>{thb(x.comparativeAmountTHB)}</strong></td>
+     <td><strong>NOT INCLUDED IN WORKING SELL</strong><small>{x.categoryDecision}</small><small>{x.priceClass}</small></td>
+    </tr>)}</tbody>
+   </table></div>
+   <p className="p55-note"><strong>Open decision:</strong> Include standalone BDA module vs complete assembly replacement? Check OEM spare compatibility, EX certification and MR0002 RAD-508-001 LNA to RFI BDA crosswalk. This priced full-package reference must not be treated as a final spare quotation or counted in both B10 and C1.</p>
   </details>}
   <h4>1. Historical Annex Price Lines — Original Rev08 / Not current Vendor Quote</h4>
   {p.historicalHasDetail?
