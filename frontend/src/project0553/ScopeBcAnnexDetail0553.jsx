@@ -126,7 +126,21 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td>{x.tag}<small>{x.source}</small></td><td>{x.includedClaim}</td><td>{x.conflict}<small>{x.scopeState}</small></td>
     </tr>)}</tbody></table></div>
   </details>}
-  {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
+  {code==="C1"&&<div className="p55-panel" style={{padding:12}}>
+   <h4>SUPPLIER RECOMMENDATION FOR CAPITAL SPARE PARTS — CURRENT SELECTION REVIEW</h4>
+   <p className="p55-note"><strong>NO CAPITAL SPARE ITEM HAS BEEN ENGINEERING-SELECTED FOR CUSTOMER ISSUE.</strong> Rev08 Complete RACON (1 unit) and SCADA Radio (1 unit) are unapproved historical budget candidates. The MR 1 Set/Platform requirement applies to installed equipment/commissioning kits, not an additional complete capital spare.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>MR / Installed Equipment</th><th>Document / OEM Scope</th><th>Capital Spare Assessment</th><th>Selected QTY</th><th>Unit Price THB</th><th>Total Price THB</th><th>Evidence / Decision</th></tr></thead>
+    <tbody>{spareReconciliation.systemSummary.map(x=><tr key={x.mr}>
+     <td><strong>{x.mr}</strong><small>{x.label} · {x.sites.join(", ")}</small></td>
+     <td>{x.source}<small>MR one installed equipment SET / commissioning spare KIT is not a C1 requirement</small></td>
+     <td>OEM approved replaceable spare parts / repair-exchange arrangement to verify<small>Complete equipment only if source requirement, repair restriction or owner-approved insurance strategy justifies it</small></td>
+     <td>NOT DERIVED</td><td>OEM SPIR RATE REQUIRED</td><td>NOT ESTABLISHED</td>
+     <td>{x.auditVerdict}<small>C1 quotation is optional, not an approved working-selection BOM</small></td>
+    </tr>)}</tbody></table></div>
+   <p className="p55-note"><strong>C1 current engineering-selected priced total: NOT ESTABLISHED.</strong> Historical Rev08 option remains preserved in the Capital Spare Optional Selection audit and Historical Annex below; THB {customerSchedule.summary.C1.workingReferenceTHB.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})} is NOT a validated proposed complete spare price. Part A, B10 and C2 owners are kept separate.</p>
+  </div>}
+  {spareLines.length>0&&code!=="C1"&&<div className="p55-panel" style={{padding:12}}>
    <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (Pre-Award Budgetary Working Preview)</h4>
    <p className="p55-note"><strong>Coverage readiness:</strong> {customerSchedule.engineeringReadiness.installedTagInstances} source site-TAG instances / {customerSchedule.engineeringReadiness.criticalTagFunctionGroups} critical TAG families. Confirmed replacement SKU mappings in this model: {customerSchedule.engineeringReadiness.confirmedReplacementSkuGroups}. Verdict: <strong>{customerSchedule.engineeringReadiness.verdict}</strong> — budget price rows exist, but complete Commissioning Spare coverage and major-equipment provision have not yet been demonstrated.</p>
    <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {customerSchedule.sourceOwnership} · Existing MR/MTO/AFC installed TAGs are joined to the five-category Rev08 budget lines by equipment function. COMMON means a shared stock/tool item, not an invented installed TAG. Quantities and THB unit rates retain the original pre-award Rev08 basis at FX 31.5. The TAG association is not OEM interchangeable SKU approval.</p>
