@@ -25,7 +25,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
    {" "}· <strong>{p.optional?"PART C OPTION — NOT IN BASE":"PART B — BASE SCOPE REQUIREMENT"}</strong></p>
   <div className="p55-metric-grid">
    <div><strong>Current Turnkey Direct COST</strong><p>{thb(p.directCostTHB)}</p><small>Source-verified Cost Rate × Verified Qty required</small></div>
-   <div><strong>Current WBS Working SELL</strong><p>{thb(p.workingSellTHB)}</p><small>Not a current customer quotation</small></div>
+   <div><strong>{code==="B11"?"Pre-Award B11 Tool Budget (non-posting)":"Current WBS Working SELL"}</strong><p>{thb(code==="B11"?customerSchedule.summary.B11.workingReferenceTHB:p.workingSellTHB)}</p><small>{code==="B11"?"Rev08 tool-kit budget candidate only; OEM inclusion pending, not added to current Working SELL":"Not a current customer quotation"}</small></div>
    <div><strong>Historical Rev08 Reference</strong><p>{thb(p.historicalReferenceTHB)}</p><small>Native USD source retained for audit · {p.historicalFxState}</small></div>
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
