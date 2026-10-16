@@ -33,7 +33,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
    <h4>Customer Schedule — {shared.descriptions[code]} (PRE-AWARD BUDGETARY WORKING PREVIEW)</h4>
    <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {customerSchedule.sourceOwnership} · Existing MR/MTO/AFC installed TAGs are joined to the five-category Rev08 budget lines by equipment function. COMMON means a shared stock/tool item, not an invented installed TAG. Quantities and THB unit rates retain the original pre-award Rev08 basis at FX 31.5. The TAG association is not OEM interchangeable SKU approval.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-    <thead><tr><th>Item</th><th>Tag No. / Linked MTO Tags</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
+    <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
     <tbody>{spareLines.map(x=><tr key={x.id}>
      <td>{x.item}</td><td>{x.tagNo}<small>{x.installedTagKeys.length?"Installed TAG/Location links: "+x.installedTagKeys.join("; "):"Shared/unspecified equipment stock — crosswalk open"}</small><small>{x.linkedLocations.join(", ")}</small></td>
      <td>{x.description}<small>{x.id}</small></td>
@@ -86,7 +86,31 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td><strong>NOT INCLUDED IN WORKING SELL</strong><small>{x.categoryDecision}</small><small>{x.priceClass}</small></td>
     </tr>)}</tbody>
    </table></div>
+   <h4>Original MR0002 / ZWP20 Selected RFI-BDA BOM / Cost Ownership</h4>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>TAG / BOM ID</th><th>Equipment / Vendor SKU</th><th>QTY</th><th>Unit Price THB / Evidence</th><th>Total Reference THB</th><th>Cost / Inclusion Status</th></tr></thead>
+    <tbody>{customerSchedule.riskCandidates.flatMap(x=>x.originalBOM).map(x=><tr key={x.id}>
+     <td>{x.tag}<small>{x.id}</small></td>
+     <td>{x.description}<small>{x.sku||"SKU not separately specified"}</small></td>
+     <td>{Number.isFinite(x.qty)?x.qty:"Input unresolved"} {x.unit}</td>
+     <td>{Number.isFinite(x.referenceUnitTHB)?thb(x.referenceUnitTHB):x.priceInclusion?"Included with parent package":"No unit rate established"}</td>
+     <td>{Number.isFinite(x.referenceExtendedTHB)?thb(x.referenceExtendedTHB):x.priceInclusion?"Included (not additive)":"Not priced"}</td>
+     <td>{x.priceInclusion||x.status}<small>{x.countedInPartA?"Part A selected package source — not extra B10 / C1 charge":"Non-additive interface/inclusion/provisional line"}</small></td>
+    </tr>)}</tbody>
+   </table></div>
    <p className="p55-note"><strong>Open decision:</strong> Include standalone BDA module vs complete assembly replacement? Check OEM spare compatibility, EX certification and MR0002 RAD-508-001 LNA to RFI BDA crosswalk. This priced full-package reference must not be treated as a final spare quotation or counted in both B10 and C1.</p>
+  </details>}
+  {customerSchedule.crossCategoryDuplicates.length>0&&<details className="p55-panel" style={{padding:12}}>
+   <summary><strong>Cross-category Stock / Double-count Review</strong> ({customerSchedule.crossCategoryDuplicates.length} functional overlaps)</summary>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Replaceable Function</th><th>Source Rows / Categories</th><th>Quantity &amp; Cost Ownership Decision</th></tr></thead>
+    <tbody>{customerSchedule.crossCategoryDuplicates.map(x=><tr key={x.family}>
+     <td><strong>{x.family}</strong></td>
+     <td>{x.categories.join(" / ")}<small>{x.sourceIds.join(", ")}</small></td>
+     <td>{x.decision}<small>{x.status}</small></td>
+    </tr>)}</tbody>
+   </table></div>
+   <p className="p55-note">This is a functional overlap alert, NOT proof of identical OEM SKU or double billing. B10 and C2 may legitimately require independent delivery quantities. B13 packaging must be net of B5.</p>
   </details>}
   <h4>1. Historical Annex Price Lines — Original Rev08 / Not current Vendor Quote</h4>
   {p.historicalHasDetail?
