@@ -50,6 +50,14 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td>{x.owner} · {x.sourceRateStatus}<small>{x.source}</small><small>{x.riskClass}</small></td>
     </tr>)}</tbody>
    </table></div>
+   <h4>Existing Rev05 WBS / Milestone Evidence — No ERP</h4>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>WBS Activity</th><th>Original Owner</th><th>Team-Days</th><th>Personnel-Days</th><th>Trips</th><th>May Assign to B1 Permit Travel?</th></tr></thead>
+    <tbody>{b1Regulatory.wbsMilestoneAudit.knownCampaigns.map(x=><tr key={x.id}>
+     <td>{x.id}</td><td>{x.owner}</td><td>{x.teamDays}</td><td>{x.personDays}</td><td>{x.tripCount??"Not established"}</td>
+     <td>NO — existing {x.owner} cost ownership</td>
+    </tr>)}</tbody></table></div>
+   <p className="p55-note"><strong>WBS Sheet 20_CUSTOMS_PERMIT:</strong> permit and customs requirements are documented, but dedicated ADDVALUE regulatory travel trips, travelers and accommodation nights are not scheduled. Quantity remains <strong>TO DERIVE</strong>. {b1Regulatory.wbsMilestoneAudit.regulatoryMilestone.gate}</p>
    <p className="p55-note"><strong>Incremental Direct Cost:</strong> NOT ESTABLISHED · <strong>Incremental Working Sell:</strong> NOT POSTED. Regulatory Travel/MOB/DEMOB is only under B1 when its separate Trip ID is linked to permit coordination; exclude SAT B3, goods logistics B6, China Yard Specialist B9 and insurance B14.</p>
    <p className="p55-note"><strong>Compliance:</strong> Only lawful, evidenced authority fees and actual third-party services; unofficial facilitation or influence payments are excluded.</p>
   </div>}
