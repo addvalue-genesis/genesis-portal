@@ -7,6 +7,7 @@ import {selectUnifiedSpareConsumables0553} from "./unifiedSpareConsumables0553";
 import {selectSpareCoverageEngineering0553} from "./spareCoverageEngineering0553";
 import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
 import {deriveSpareRiskQuantity0553,deriveConsumableBudgetQuantity0553} from "./spareRiskQuantity0553";
+import {selectB11MinimumTools0553} from "./b11MinimumTools0553";
 const CODES=Object.freeze(["B10","B11","B13","C1","C2"]);
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const unique=items=>[...new Set(items)];
@@ -70,6 +71,7 @@ const physicalFamily=d=>{
 };
 export function selectSpareCustomerSchedule0553(){
  const master=selectUnifiedSpareConsumables0553(),cover=selectSpareCoverageEngineering0553();
+ const b11Requirements=selectB11MinimumTools0553();
  const rows=CODES.flatMap(code=>(master.byCode[code]||[]).map(x=>{
   const installed=cover.installed.filter(a=>fits(code,x.description,a));
   const tags=unique(installed.map(i=>i.tag)),sites=unique(installed.map(i=>i.site));
@@ -171,13 +173,13 @@ export function selectSpareCustomerSchedule0553(){
  })]));
  return Object.freeze({
   moduleId:"bid.budget.working.bc.customer-spare-schedule",
-  codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,crossCategoryDuplicates,
+  codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,crossCategoryDuplicates,b11Requirements,
   installedSourceCount:cover.installed.length,engineeringReadiness,
   sourceOwnership:"Working BOM/Tag + Rev08 price reference + 10.2 commercial owner",
   riskQuestionAnswered:false,
   missingEngineeringProofs:["EXA-A8 applicable minimum lines by equipment","OEM spare/installed SKU replacement compatibility",
    "B10 kit-per-platform composition","B13 preservation quantity/activity consumption derivation",
-   "B11 shared tools OEM-included credit","C1/C2 stock ownership and 2-year repair logistics",
+   "B11 shared tools OEM-included credit and five EXA-A8 minimum requirements","C1/C2 stock ownership and 2-year repair logistics",
    "B13 activity drivers not yet established; SPQ-003 returns OPEN_INPUT while Rev08 quantity stays a controlled interim budget",
    "Repricing risk additions after management choice"],
   noAutomaticPricePosting:true,releaseAllowed:false
