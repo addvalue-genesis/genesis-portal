@@ -3,8 +3,8 @@
 // Genuine OEM spare-to-installed-tag mapping requires model/part compatibility evidence.
 import {REV08_BASELINE} from "./rev08CommercialBaseline";
 import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
-const codes=Object.freeze(["B10","B13","C1","C2"]);
-const descriptions=Object.freeze({B10:"Erection, Precommissioning, Commissioning, Start-up Spare Parts",B13:"Supplier Recommendation for Consumables",C1:"Supplier Recommendation for Capital Spare Parts",C2:"Supplier Recommendation for 2 Years Operation Spare Parts"});
+const codes=Object.freeze(["B10","B11","B13","C1","C2"]);
+const descriptions=Object.freeze({B10:"Erection, Precommissioning, Commissioning, Start-up Spare Parts",B11:"Special Tools for Operation & Maintenance",B13:"Supplier Recommendation for Consumables",C1:"Supplier Recommendation for Capital Spare Parts",C2:"Supplier Recommendation for 2 Years Operation Spare Parts"});
 const applicableFamily=description=>{
  const d=description.toLowerCase();
  if(/scada|poe|cisco|ethernet/.test(d))return "MR0001"; // Generic RF/connector/surge may be shared across MRs.
@@ -43,7 +43,7 @@ export function selectUnifiedSpareConsumables0553(){
    budgetStatus:"PRE_AWARD_BUDGETARY__OEM_FINAL_CONFIGURATION_OPEN",
    workingSellTHB:round(quantity*unitPriceUSD*fxTHBPerUSD),
    validDirectCost:false,customerReleaseAllowed:false,
-   physicalCostOwner:code,option:code.startsWith("C"),requiredMinimumSpareValidation:"EXA_A8_AND_OEM_SPIR_PENDING"
+   physicalCostOwner:code,option:code.startsWith("C"),requiredMinimumSpareValidation:code==="B11"?"EXA_A8_SPECIAL_TOOLS_AND_OEM_PACKAGE_INCLUSION_PENDING":"EXA_A8_AND_OEM_SPIR_PENDING"
   });
  }));
  const byCode=Object.fromEntries(codes.map(c=>[c,rows.filter(x=>x.code===c)]));
@@ -57,6 +57,7 @@ export function selectUnifiedSpareConsumables0553(){
  return Object.freeze({moduleId:"bid.budget.working.bc.spares-master",codes,descriptions,rows,byCode,budgetTotalsTHB,fxTHBPerUSD,
   sourceTagRegister:"MR0001 MTO Rev04 through existing Working Priced BOM",
   sourceHistorical:"4-Scope of Supply.xlsx Rev08",
+  b11PriceClass:"HISTORICAL_TOOLS_BUDGET_REFERENCE_NONPOSTING",
   verification:"MR0001-0004 + SPE C2 + EXA-A8 + OEM SPIR + DTS/LIS compatibility remain to validate",
   historicalNotAdditionalCost:true,complete:false,releaseAllowed:false,
   scopeWarning:"This is source-reconciled Rev08 budget coverage, not an EXA-A8 complete engineering takeoff. Unmapped family tags are COMMON, never fabricated."});
