@@ -30,7 +30,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
   {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
-   <h4>Customer Schedule — {shared.descriptions[code]} (PRE-AWARD BUDGETARY WORKING PREVIEW)</h4>
+   <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (Pre-Award Budgetary Working Preview)</h4>
    <p className="p55-note"><strong>Coverage readiness:</strong> {customerSchedule.engineeringReadiness.installedTagInstances} source site-TAG instances / {customerSchedule.engineeringReadiness.criticalTagFunctionGroups} critical TAG families. Confirmed replacement SKU mappings in this model: {customerSchedule.engineeringReadiness.confirmedReplacementSkuGroups}. Verdict: <strong>{customerSchedule.engineeringReadiness.verdict}</strong> — budget price rows exist, but complete Commissioning Spare coverage and major-equipment provision have not yet been demonstrated.</p>
    <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {customerSchedule.sourceOwnership} · Existing MR/MTO/AFC installed TAGs are joined to the five-category Rev08 budget lines by equipment function. COMMON means a shared stock/tool item, not an invented installed TAG. Quantities and THB unit rates retain the original pre-award Rev08 basis at FX 31.5. The TAG association is not OEM interchangeable SKU approval.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
@@ -44,8 +44,10 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td>{thb(x.unitPriceTHB)}</td><td>{thb(x.extendedTHB)}</td>
      {(code==="C1"||code==="C2")&&<td>{x.leadTimeARO||"OEM confirmation required"}</td>}
     </tr>)}</tbody>
+    {code==="B11"&&<tfoot><tr><th colSpan={7} style={{textAlign:"right"}}>Total Price — Supplier Recommendation for Special Tools (THB)</th><th>{thb(customerSchedule.summary.B11.workingReferenceTHB)}</th></tr></tfoot>}
    </table></div>
    <p className="p55-note"><strong>PRE-AWARD CATEGORY BUDGET:</strong> {thb(customerSchedule.summary[code].workingReferenceTHB)} · Source: Rev08 historic priced lines × planning FX 31.5 THB/USD · {customerSchedule.summary[code].priceStatus} · B11 reference remains non-posting, other approved categories preserve existing budgetary Working Sell. No new Direct Cost posting. Rounding per line can differ from category source total.</p>
+   {code==="B11"&&<p className="p55-note"><strong>Customer template delivery basis:</strong> DDP Purchaser’s Yard shown in RFQ; current THB prices are internal budget references only, not a verified DDP delivered quotation. Installation, commissioning and special tools must reconcile with B3/B9 and Part A before customer release. Four Rev08 priced tools and five EXA-A8 minimum requirements are separate cross-references, not nine additive priced lines.</p>}
    <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
   </div>}
   {coverage&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
