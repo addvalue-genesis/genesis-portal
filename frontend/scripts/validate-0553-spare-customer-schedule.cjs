@@ -22,6 +22,9 @@ const codes=["B10","B11","B13","C1","C2"];
 assert.deepEqual(x.codes,codes);
 assert.deepEqual(cov.categoryCodes,codes);
 assert.equal(x.rows.length,31);
+assert.equal(x.b11Requirements.rows.length,5,"EXA-A8 minimum Phase 1F telecom tools missing");
+assert(x.b11Requirements.rows.some(r=>r.description.includes("TETRA voice gateway")&&r.compatibilityGate.includes("TETRA_GATEWAY_SCOPE_VS_SELECTED_DMR")),"Never silently equate TETRA gateway with selected DMR");
+assert(x.b11Requirements.rows.every(r=>r.qty===1&&r.budgetAllocationTHB===null&&!r.pricePostingAllowed));
 assert.equal(new Set(x.rows.map(r=>r.id)).size,x.rows.length);
 const counts={B10:9,B11:4,B13:4,C1:2,C2:12};
 for(const code of codes){
