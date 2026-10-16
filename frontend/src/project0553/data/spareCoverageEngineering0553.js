@@ -5,7 +5,7 @@ import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {MR0003_MR0004_SCOPE_C1} from "./mr0003Mr0004ScopeC1";
 import {selectUnifiedSpareConsumables0553} from "./unifiedSpareConsumables0553";
-import {deriveSpareRiskQuantity0553,SPQ_001_0553} from "./spareRiskQuantity0553";
+import {deriveSpareRiskQuantity0553,deriveSpareReliabilityDemand0553,SPQ_001_0553,SPQ_002_0553} from "./spareRiskQuantity0553";
 import TAG_EQUATIONS from "./controlledTagMappingEquations0553.json";
 
 const MR_CODES=Object.freeze(["MR-0001","MR-0002","MR-0003","MR-0004"]);
@@ -91,6 +91,7 @@ export function selectSpareCoverageEngineering0553(){
   const sites=distinct(x.instances.map(y=>y.site));
   const scenario=deriveSpareRiskQuantity0553({installedCount:x.instances.length,critical:x.critical,
     contractualPartMinimum:null,compatibilityProven:false});
+  const reliability=deriveSpareReliabilityDemand0553({installedCount:x.instances.length}); // Missing OEM reliability evidence -> OPEN_INPUT, not fabricated failure rate.
   const categoryCandidates=Object.fromEntries(CAT.map(cat=>[cat,(master.byCode[cat]||[]).filter(row=>relatedCategory(x.family,cat,row.description)).map(row=>row.id)]));
   // A textual/reference family match is never a proven spare SKU or actual stock coverage.
   return Object.freeze({
@@ -100,6 +101,7 @@ export function selectSpareCoverageEngineering0553(){
    categoryApplicability:{B10:x.b10,B13:x.b13,C1:x.c1,C2:x.c2},
    b10BudgetScenarioQty:x.b10?scenario.budgetQty:null,
    b10QtyEquationId:SPQ_001_0553.id,contractualPartMinimum:scenario.contractualPartMinimum,
+   reliabilityEquationId:SPQ_002_0553.id,reliabilityQty:reliability.quantity,reliabilityState:reliability.status,
    contractKitMinimumState:"MR_C1_AND_EXA_A8_SPIR_KIT_COMPOSITION_NOT_YET_RESOLVED",
    interchangeabilityState:"REQUIRES_OEM_SKU_AND_RATING_PROOF",
    estimatedPartQtyState:scenario.status,
@@ -121,7 +123,7 @@ export function selectSpareCoverageEngineering0553(){
  return Object.freeze({
   moduleId:"bid.budget.working.bc.spares-coverage",status:"PRE_AWARD_ENGINEERING_COVERAGE_REVIEW",
   sourceModuleIds:["MR0001_WORKING_PRICED_BOM","Z1F_TEL_LAYOUT_INDEX_0553","MR0003_MR0004_SCOPE_C1"],
-  reusedEquationIds:requiredEquations,newEquationIds:[SPQ_001_0553.id],
+  reusedEquationIds:requiredEquations,newEquationIds:[SPQ_001_0553.id,SPQ_002_0553.id],
   installed,groups,byMr,totals,categoryBudgetsTHB:master.budgetTotalsTHB,
   categoryCodes:CAT,customerReleaseAllowed:false,allSpareSkuVerified:false,minimumContractSatisfied:false,
   note:"Candidate category matches are NOT stock, SKU, minimum-spares, OEM, Ex certification or company compliance proof. Current Rev08 Working SELL is unchanged. No new price posting."
