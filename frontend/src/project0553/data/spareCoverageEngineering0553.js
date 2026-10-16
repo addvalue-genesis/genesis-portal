@@ -9,7 +9,7 @@ import {deriveSpareRiskQuantity0553,deriveSpareReliabilityDemand0553,SPQ_001_055
 import TAG_EQUATIONS from "./controlledTagMappingEquations0553.json";
 
 const MR_CODES=Object.freeze(["MR-0001","MR-0002","MR-0003","MR-0004"]);
-const CAT=Object.freeze(["B10","B13","C1","C2"]);
+const CAT=Object.freeze(["B10","B11","B13","C1","C2"]);
 const actualTag=tag=>/^[A-Z]{2,6}-\d{3}-\d{3}[A-Z]?$/.test(String(tag||"").trim());
 const distinct=arr=>[...new Set(arr)];
 // Functional classification only; it NEVER asserts approved spare SKU equivalence.
@@ -63,6 +63,7 @@ function sourceInstalledTags(){
 }
 const relatedCategory=(family,cat,description)=>{
  const d=description.toLowerCase();
+ if(cat==="B11")return /racon/.test(d)?family.startsWith("MARINE_RACON"):/rf connector/.test(d)?/ANTENNA|RADIO|BDA/.test(family):/cable termination/.test(d)?/JB|CONTROL|NETWORK|RADIO/.test(family):/configuration/.test(d)?true:false;
  if(family.startsWith("SCADA_")||family==="ODU_OR_RADIO"||family==="IDU"){
   if(family==="SCADA_NETWORK_SWITCH")return /cisco|ethernet/.test(d);
   if(family==="SCADA_SURGE")return /surge/.test(d);
@@ -98,7 +99,7 @@ export function selectSpareCoverageEngineering0553(){
    id:x.mr+"-"+x.tag,mr:x.mr,tag:x.tag,family:x.family,
    installedSites:sites,installedCount:x.instances.length,sourceEvidence:distinct(x.instances.map(y=>y.source)),
    sourceQtyState:distinct(x.instances.map(y=>y.authority)),criticality:x.critical?"COMMISSIONING_CRITICAL_CANDIDATE":"STANDARD_REVIEW",
-   categoryApplicability:{B10:x.b10,B13:x.b13,C1:x.c1,C2:x.c2},
+   categoryApplicability:{B10:x.b10,B11:!x.family.includes("SURGE")&&!x.family.includes("SOUNDER"),B13:x.b13,C1:x.c1,C2:x.c2},
    b10BudgetScenarioQty:x.b10?scenario.budgetQty:null,
    b10QtyEquationId:SPQ_001_0553.id,contractualPartMinimum:scenario.contractualPartMinimum,
    reliabilityEquationId:SPQ_002_0553.id,reliabilityQty:reliability.quantity,reliabilityState:reliability.status,
