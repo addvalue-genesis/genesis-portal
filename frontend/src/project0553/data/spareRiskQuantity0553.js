@@ -53,3 +53,25 @@ export function deriveSpareReliabilityDemand0553({
   quantity:q>=1000?null:q,meanFailures:mean,confidence:targetConfidence,evidence,
   sourceAssumptions:SPQ_002_0553.scope,customerReleaseAllowed:false});
 }
+
+// SPQ-003 fills the B13 lifecycle gap; never re-label an historical item quantity
+// as independently verified field consumption. B5 shipment packing remains separate.
+export const SPQ_003_0553=Object.freeze({
+ id:"SPQ-003",name:"Preservation and maintenance consumables demand",
+ formula:"Q = ceil(Q_activity × units_per_activity × (1 + loss_fraction)) + independent required handover reserve",
+ priorEquations:["MAP-02","MAP-06","MAP-07","MAP-08","GEQ-001","GEQ-004"],
+ applicability:"Only for materials delivered as separate B13 handover stock; exclude B5 shipment packing/used-up installation materials."
+});
+export function deriveConsumableBudgetQuantity0553({
+ activityCount,unitsPerActivity,lossFraction=0,requiredHandoverReserve=0,evidence
+}={}){
+ const inputs={activityCount,unitsPerActivity,lossFraction,requiredHandoverReserve};
+ const missing=Object.entries(inputs).filter(([key,v])=>!Number.isFinite(v)||v<0||
+   (["activityCount","requiredHandoverReserve"].includes(key)&&!Number.isInteger(v))).map(([key])=>key);
+ if(!evidence)missing.push("sourceEvidence");
+ if(missing.length)return Object.freeze({equationId:SPQ_003_0553.id,
+  status:"OPEN_INPUT",quantity:null,missing});
+ return Object.freeze({equationId:SPQ_003_0553.id,status:"BUDGETARY_DERIVATION_REVIEW",
+  quantity:Math.ceil(activityCount*unitsPerActivity*(1+lossFraction))+requiredHandoverReserve,
+  source:evidence,verifiedConsumption:false,postToCostLedger:false});
+}
