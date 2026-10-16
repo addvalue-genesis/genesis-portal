@@ -18,7 +18,7 @@ This is an engineering methodology, not an independent customer price or bid ame
 | MR0003 | Ex Telephone | ZWP20–23 | 4 kit sets, 1/platform | 1 set/phase | quotation only | none inferred |
 | MR0004 | Marine RACON | ZWP20–22 | 3 kit sets, 1/platform | 1 set/phase | quotation only | none inferred |
 
-**Total contractual B10 kit obligation = 14 KIT sets**, not 14 complete replacement radios/RACONs. **B11 = four per-MR, per-phase tool requirement records**, not automatically four disjoint physical packages; consolidation requires proof of common tooling/licensing. MR0004 repeats offshore commissioning/start-up one-set/platform language; verify whether redundant or independent before adding any quantity.
+**Separate Brownfield obligation:** MR0001 §5 also covers ZPQ, ZWP08 and ZWP11 spare parts/special tools **as required**; MR0002 covers ZPQ DMR integration as required. None of these four reviewed interfaces automatically receives an extra 1 kit/platform mandate; contents and quantity remain to be proven from interface and OEM documents.\n\n**Total contractual B10 kit obligation = 14 KIT sets**, not 14 complete replacement radios/RACONs. **B11 = four per-MR, per-phase tool requirement records**, not automatically four disjoint physical packages; consolidation requires proof of common tooling/licensing. MR0004 repeats offshore commissioning/start-up one-set/platform language; verify whether redundant or independent before adding any quantity.
 
 ## Price and requirement classification
 - **DOCUMENT_REQUIRED**: source clause expressly obliges the deliverable.
