@@ -51,6 +51,8 @@ for(const code of ["B10","B13","C1","C2"])
  assert.equal(bc.byCode[code].workingSellTHB,x.summary[code].workingReferenceTHB);
 assert.equal(bc.knownWorkingSellTHB,4568436.58,"Legacy base sell must remain unchanged");
 assert.equal(x.riskCandidates.length,1);
+assert(x.crossCategoryDuplicates.some(z=>z.family==="SCADA_POE"&&z.categories.includes("B10")&&z.categories.includes("C2")),"B10-C2 PoE overlap must be flagged for stock-quantity reconciliation");
+assert(x.byCode.B13.every(r=>r.activityBasedQuantityEquation==="SPQ-003"&&r.activityBasedQuantityState==="OPEN_INPUT"),"B13 must not claim evidence-based activity consumption from old spreadsheet");
 const risk=x.riskCandidates[0],src=MR0002_WORKING_BOM_0553.sites.find(s=>s.site==="ZWP20").items.find(r=>r.id==="ZWP20-RFI-BDA");
 assert.equal(risk.tagNo,"TCAB-508-001");
 assert.equal(risk.moduleId,"bid.budget.bom.mr0002.zwp20.zwp20-rfi-bda.evidence");
@@ -59,13 +61,16 @@ assert.equal(risk.sourceQuoteLine,src.quoteLine);
 assert.equal(risk.qty,1,"One risk replacement pool scenario, not 3 distributed vendor shipments");
 assert.equal(risk.comparativeAmountTHB,991431);
 assert.equal(risk.notionalRiskScenarioOnly,true);
+assert(risk.originalBOM.some(r=>r.id==="ZWP20-RFI-BDA"&&r.referenceExtendedTHB===991431));
+assert(risk.originalBOM.some(r=>r.id==="ZWP20-RFI-BDA-EXD-ENCLOSURE"&&r.nonAdditive&&r.priceInclusion==="INCLUDED_IN_MGW_R2_UHF1"));
+assert(risk.originalBOM.some(r=>r.id==="ZWP20-BDA-RF-FEEDTHROUGHS"&&r.referenceUnitTHB===null),"Unknown Ex RF penetration costs must remain unresolved");
 assert.equal(risk.includedInWorkingSell,false);
 assert.equal(risk.additionalCostPostedTHB,null);
 assert.equal(x.riskQuestionAnswered,false,"Risk question cannot be declared solved before spare SKU/quantity validation");
 assert.equal(x.releaseAllowed,false);
 const view=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(view.includes("selectSpareCustomerSchedule0553")&&view.includes("customerSchedule.riskCandidates.map"));
-for(const phrase of ["TAG / Linked MTO Tags","Unit Price THB","Total Price THB","Lead Time ARO"]){
+for(const phrase of ["Tag No.","Unit Price THB","Total Price THB","Lead Time ARO"]){
  assert(view.includes(phrase),"Missing customer table column: "+phrase);
 }
 assert(babel.transformSync(view,{babelrc:false,configFile:false,
