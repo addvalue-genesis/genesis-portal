@@ -5,6 +5,7 @@ import {selectUnifiedSpareConsumables0553} from "./data/unifiedSpareConsumables0
 import {selectSpareCoverageEngineering0553} from "./data/spareCoverageEngineering0553";
 import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
 import {selectDocumentSpareObligations0553} from "./data/documentSpareObligations0553";
+import {selectAddvalueB14Insurance0553} from "./data/addvalueB14Insurance0553";
 import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringReconciliation0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
@@ -15,6 +16,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
  const shared=selectUnifiedSpareConsumables0553();
  const customerSchedule=selectSpareCustomerSchedule0553();
  const documentObligations=selectDocumentSpareObligations0553();
+ const addvalueInsurance=code==="B14"?selectAddvalueB14Insurance0553():null;
  const spareReconciliation=selectSpareEngineeringReconciliation0553();
  const spareLines=customerSchedule.byCode[code]||[];
  const coverage=["B10","B11","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
@@ -33,6 +35,22 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
    <div><strong>Historical Rev08 Reference</strong><p>{thb(p.historicalReferenceTHB)}</p><small>Native USD source retained for audit · {p.historicalFxState}</small></div>
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
+  {code==="B14"&&<div className="p55-panel" style={{padding:12}}>
+   <h4>ADDVALUE — Personnel &amp; Work-Related Insurance Budget (B14)</h4>
+   <p className="p55-note"><strong>ADDVALUE only:</strong> no SAMTEL bond, bank guarantee or EPC master insurance is added. Four personnel roles are registered; only Senior Telecom Technician and Chief Telecom Technician are assigned to SAT/offshore for this budget.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Item</th><th>Insurance / Work Scope</th><th>Persons</th><th>Days / Period</th><th>Qty</th><th>Budget Rate THB</th><th>Amount THB</th><th>Evidence / Qualification</th></tr></thead>
+    <tbody>{addvalueInsurance.entries.map(x=><tr key={x.id}>
+     <td>{x.id}</td><td>{x.description}<small>{x.unit}</small></td>
+     <td>{x.persons}</td><td>{x.days}</td><td>{x.qty}</td><td>{thb(x.rateTHB)}</td><td>{thb(x.estimatedTHB)}</td>
+     <td>{x.rateClass}<small>{x.basis}</small></td>
+    </tr>)}</tbody>
+    <tfoot><tr><th colSpan={6} style={{textAlign:"right"}}>ADDVALUE Personnel Insurance Budget — Management Allowance (THB)</th><th>{thb(addvalueInsurance.totalBudgetTHB)}</th><th>NOT INSURER-QUOTED / NOT YET POSTED TO WORKING SELL</th></tr></tfoot>
+   </table></div>
+   <p className="p55-note"><strong>Four ADDVALUE positions:</strong> {addvalueInsurance.roles.map(x=>x.role).join("; ")}. <strong>SAT offshore team:</strong> {addvalueInsurance.offshoreSATCrew.join(" + ")}. Offshore {addvalueInsurance.b3OffshoreWorkingPersonDays} person-days; provisional China Yard {addvalueInsurance.b9ChinaProvisionalPersonDays} person-days (actual travelers pending).</p>
+   <p className="p55-note"><strong>Safety/coverage gate:</strong> General PA and travel insurance can EXCLUDE offshore oil/gas work. The offshore rate is a management allowance only, NOT evidence that the worker is insured. Obtain a policy explicitly covering offshore telecom work, medical treatment and evacuation before mobilization. Existing company policies and any EPC coverage must be deducted to avoid duplication.</p>
+   <p className="p55-note">Original Rev08 B14 {thb(p.historicalReferenceTHB)} remains a separate summary-only SAMTEL bond/insurance reference. It is NOT added to the ADDVALUE-only allowance.</p>
+  </div>}
   {["B10","B11","B13","C1","C2"].includes(code)&&<details className="p55-panel" open={code==="C1"||code==="B10"} style={{padding:12}}>
    <summary><strong>02 Document-Driven Quantity Basis → 10.2 {code}</strong> · MR0001–0004 (not an additional price)</summary>
    <p className="p55-note">First Principles + Telecom Constraints + Parametric Cost are applied to Customer/MR obligations; they do not create extra quantities on their own. Commissioning kit contents remain a separate OEM/SPIR derivation. Risk-based SPQ-001 is a non-posting gap assessment.</p>
