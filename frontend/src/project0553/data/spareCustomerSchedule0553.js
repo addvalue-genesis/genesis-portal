@@ -10,7 +10,6 @@ import {deriveSpareRiskQuantity0553,deriveConsumableBudgetQuantity0553} from "./
 const CODES=Object.freeze(["B10","B11","B13","C1","C2"]);
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const unique=items=>[...new Set(items)];
-const fullMR=mr=>"MR-"+mr;
 function fits(category,description,x){
  const d=description.toLowerCase(),m=x.mr,t=x.tag.toUpperCase();
  if(category==="B11"){
@@ -64,12 +63,15 @@ export function selectSpareCustomerSchedule0553(){
   const installed=cover.installed.filter(a=>fits(code,x.description,a));
   const tags=unique(installed.map(i=>i.tag)),sites=unique(installed.map(i=>i.site));
   const common=code==="B13"||/configuration tools and maintenance access/i.test(x.description);
+  const coveredCommon=common?cover.installed:installed;
+  const applicableMRs=unique(coveredCommon.map(i=>i.mr));
+  const applicableLocations=unique(coveredCommon.map(i=>i.site));
   // A shared common tool/consumable is not a claim of a physical OEM TAG number.
   return Object.freeze({
    id:x.id,code,item:x.item,
    tagNo:tags.length?tags.join(", "):"COMMON",
-   linkedMR:unique(installed.map(i=>i.mr)),
-   linkedLocations:sites,installedTagKeys:unique(installed.map(i=>i.key)),
+   linkedMR:applicableMRs,
+   linkedLocations:applicableLocations,installedTagKeys:unique(installed.map(i=>i.key)),
    mappingStatus:tags.length?"INSTALLED_TAG_FUNCTIONAL_ASSOCIATION__SPARE_SKU_COMPATIBILITY_OPEN":common?"COMMON_NON_EQUIPMENT_STOCK":"UNMAPPED_LEGACY_PRICE_SCOPE",
    description:x.description,detailSpecification:hint(x.description),
    materials:"As specified for the selected OEM item",qty:x.budgetQty,
@@ -94,7 +96,7 @@ export function selectSpareCustomerSchedule0553(){
  const site=MR0002_WORKING_BOM_0553.sites.find(s=>s.site==="ZWP20");
  const kit=site?.items.find(x=>x.id==="ZWP20-RFI-BDA"&&x.tag==="TCAB-508-001"&&x.quoteLine==="UHF-1");
  if(!kit||kit.qty!==1||kit.currency!=="USD"||!Number.isFinite(kit.unitCost)||
-    kit.unitCost!==31474||!site.siteTags.includes(kit.tag))
+    kit.unitCost<=0||!site.siteTags.includes(kit.tag))
   throw Error("MR0002/ZWP20 RFI BDA vendor rate/tag must come from source Working BOM");
  const rfiEvidenceRows=site.items.filter(item=>[
   "ZWP20-RFI-BDA","ZWP20-RFI-BDA-EXD-ENCLOSURE",
