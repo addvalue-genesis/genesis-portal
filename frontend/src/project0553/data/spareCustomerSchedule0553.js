@@ -151,6 +151,18 @@ export function selectSpareCustomerSchedule0553(){
    decision:"Different lifecycle stocks may be intentional, but require independent deliverable quantity and cost ownership; no automatic credit or additive adjustment."
   })]:[];
  });
+ const critical=cover.groups.filter(x=>x.criticality==="COMMISSIONING_CRITICAL_CANDIDATE");
+ const engineeringReadiness=Object.freeze({
+  installedTagInstances:cover.installed.length,uniqueTagFunctionGroups:cover.groups.length,
+  criticalTagFunctionGroups:critical.length,confirmedReplacementSkuGroups:0,
+  minimumSpareKitsContractValidated:false,priceEvidenceReconciledToSource:true,
+  finalSparePricingCalculated:false,
+  b13ActivityQuantityDerived:false,majorSpareProcurementBudgetReconciled:false,
+  verdict:"NOT_YET_DEMONSTRATED_FOR_ALL_FOUR_MRS",
+  // Zero confirmed here means none is evidenced as confirmed in this model,
+  // not that a physical vendor kit is necessarily absent in reality.
+  explanation:"Rev08 reference rows priced; delivered physical spare compatibility, contractual minimum and new major-risk allowances are not yet closed."
+ });
  const pricedCategorySummary=Object.fromEntries(CODES.map(code=>[code,Object.freeze({
   workingReferenceTHB:master.budgetTotalsTHB[code],
   priceStatus:code==="B11"?"BUDGETARY_CANDIDATE_NOT_IN_WORKING_SELL":"EXISTING_WORKING_BUDGET",
@@ -160,7 +172,7 @@ export function selectSpareCustomerSchedule0553(){
  return Object.freeze({
   moduleId:"bid.budget.working.bc.customer-spare-schedule",
   codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,crossCategoryDuplicates,
-  installedSourceCount:cover.installed.length,
+  installedSourceCount:cover.installed.length,engineeringReadiness,
   sourceOwnership:"Working BOM/Tag + Rev08 price reference + 10.2 commercial owner",
   riskQuestionAnswered:false,
   missingEngineeringProofs:["EXA-A8 applicable minimum lines by equipment","OEM spare/installed SKU replacement compatibility",
