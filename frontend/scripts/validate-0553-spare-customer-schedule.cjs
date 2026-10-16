@@ -73,6 +73,8 @@ assert.equal(x.riskQuestionAnswered,false,"Risk question cannot be declared solv
 assert.equal(x.releaseAllowed,false);
 const view=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(view.includes("selectSpareCustomerSchedule0553")&&view.includes("customerSchedule.riskCandidates.map"));
+assert(view.includes("SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS")&&view.includes("customerSchedule.summary.B11.workingReferenceTHB"),"B11 customer format must show four priced tool lines and THB total");
+assert(view.includes('colSpan={7}')&&view.includes('code==="B11"&&<tfoot>'),"B11 price footer must use original customer schedule columns");
 for(const phrase of ["Tag No.","Unit Price THB","Total Price THB","Lead Time ARO"]){
  assert(view.includes(phrase),"Missing customer table column: "+phrase);
 }
