@@ -36,7 +36,7 @@ Reuse **MAP-01/02/03/05/06/07/08/09/10**, and GENERIC GEQ as applicable. `docume
 - **B11** one phase-tool-set requirement per MR and minimum EXA-A8 instruments/licenses, net of Part A package included licences and tools.
 - **B13** distinct preservation/maintenance *handover stock*, not B5 consumed export packing or unknown field loss reserve.
 - **C1** optional capital spare recommendation with source justification and replacement strategy; a Main Equipment Set/Platform **does not create** one Capital Spare Unit.
-- **C2** two-year O&M *priced recommendation* unless ordered; not booked in Base. Same part number can be priced in B10/C2 only with independently specified delivery quantities.
+- **C2** two-year O&M *priced recommendation* unless ordered; not booked in Base. MR0001–0004 Rev.C1 Attachment 7 instruction 6 excludes items already listed in Pre-Commissioning / Start-up Spare Parts List from C2. Candidate duplicate SKUs must be reconciled and excluded from revised C2, not repriced as separate C2 physical stock.
 
 ## Price ownership / gate
 Existing Rev08 B10/B11/B13/C1/C2 budget references remain immutable. Direct Cost stays unknown until rate × derived quantity is supportable, commercial treatment remains separate. New risk-only complete RFI-BDA+WAROM comparison is **not** a priced spare quote or approved stock Qty. Keep one physical stock owner per item and prevent Part A, B10, B11, B13, C1, C2 double posting. Current B10 kit count is a document requirement only, not proof that itemized historical budget covers it.
