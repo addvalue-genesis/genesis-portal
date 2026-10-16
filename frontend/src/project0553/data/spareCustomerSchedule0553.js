@@ -83,6 +83,19 @@ export function selectSpareCustomerSchedule0553(){
  if(!kit||kit.qty!==1||kit.currency!=="USD"||!Number.isFinite(kit.unitCost)||
     kit.unitCost!==31474||!site.siteTags.includes(kit.tag))
   throw Error("MR0002/ZWP20 RFI BDA vendor rate/tag must come from source Working BOM");
+ const rfiEvidenceRows=site.items.filter(item=>[
+  "ZWP20-RFI-BDA","ZWP20-RFI-BDA-EXD-ENCLOSURE",
+  "ZWP20-BDA-M20-GLANDS","ZWP20-BDA-RF-FEEDTHROUGHS",
+  "ZWP20-BULK-EX-SURGE"
+ ].includes(item.id)).map(item=>Object.freeze({
+  id:item.id,tag:item.tag,sku:item.sku||null,description:item.description,
+  qty:item.qty,unit:item.unit,source:item.source,
+  referenceUnitTHB:Number.isFinite(item.unitCost)?round(item.unitCost*(item.currency==="USD"?master.fxTHBPerUSD:1)):null,
+  referenceExtendedTHB:Number.isFinite(item.extended)?round(item.extended*(item.currency==="USD"?master.fxTHBPerUSD:1)):null,
+  currency:item.currency||null,priceInclusion:item.priceInclusion||null,
+  countedInPartA:item.countedInWorkingTotal===true,nonAdditive:item.countedInWorkingTotal!==true,
+  status:item.status
+ }));
  const equipmentInstances=MR0002_WORKING_BOM_0553.sites.filter(s=>s.siteTags.includes(kit.tag)).length;
  const scenario=deriveSpareRiskQuantity0553({installedCount:equipmentInstances,critical:true,
   contractualPartMinimum:null,compatibilityProven:false});
@@ -99,6 +112,7 @@ export function selectSpareCustomerSchedule0553(){
   priceClass:"PART_A_VENDOR_FULL_PACKAGE_COMPARABLE__NOT_SPARE_SELL_PRICE",
   includedInWorkingSell:false,additionalCostPostedTHB:null,notionalRiskScenarioOnly:true,
   finalSpareSkuVerified:false,contractualMinimumConfirmed:false,
+  originalBOM:rfiEvidenceRows,
   warnings:["A replacement spare may be only an OEM internal BDA module rather than complete WAROM assembly; rate is an upper-package comparator, NOT vendor-approved spare price.",
    "Never charge WAROM Ex d enclosure twice; full unit is priced in Part A.",
    "MR0002 Rev.C1 LNA RAD-508-001 versus selected TCAB-508-001 RFI-BDA remains a technical substitution crosswalk."]
