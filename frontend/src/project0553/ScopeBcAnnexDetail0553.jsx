@@ -59,7 +59,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
        <td>{x.installedSites.join(", ")}<small>{x.sourceEvidence.join("; ")}</small></td>
        <td>{x.family}<small>{x.interchangeabilityState}</small></td>
        <td>{x.categoryApplicability[code]?"ENGINEERING ASSESSMENT APPLICABLE":"NOT PRIMARY SPARE CLASS"}<small>{x.contractKitMinimumState}</small></td>
-       <td>{x.categoryApplicability.B10?x.b10BudgetScenarioQty:"—"}<small>{x.estimatedPartQtyState} · {x.b10QtyEquationId}</small></td>
+       <td>{x.categoryApplicability.B10?x.b10BudgetScenarioQty:"—"}<small>{x.estimatedPartQtyState} · {x.b10QtyEquationId}</small><small>{x.reliabilityEquationId}: {x.reliabilityState} (OEM failure rate unavailable; no inferred reliability quantity)</small></td>
        <td>{x.budgetaryExistingSourceIds[code]?.length?x.budgetaryExistingSourceIds[code].join(", "):"NO MATCHED REV08 CATEGORY REFERENCE"}<small>Cost evidence is a candidate, not proven interchangeable SKU</small></td>
       </tr>)}</tbody>
      </table></div>
