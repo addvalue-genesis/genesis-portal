@@ -65,6 +65,9 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      </table></div>
     </details>;
    })}
+   {coverage.unresolvedRequirementTags.map(x=><p className="p55-note" key={x.mr+"-"+x.tag}>
+    <strong>Open MR-to-Selected Tag Crosswalk:</strong> {x.mr} / {x.tag} → {x.candidateCurrentInstalledTag} · {x.reason} · {x.status} · {x.source}. No quantity or price counted as resolved.
+   </p>)}
    <p className="p55-note"><strong>Coverage gate:</strong> Contract minimum EXA-A8 and OEM SPIR composition remain unresolved; major equipment and compatibility gaps stay visible. Part A and B10/B13/C1/C2 must reconcile unique physical delivered quantities before customer release. Working Sell budgets are unchanged.</p>
   </details>}
   <h4>1. Historical Annex Price Lines — Original Rev08 / Not current Vendor Quote</h4>
