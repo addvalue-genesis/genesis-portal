@@ -23,3 +23,33 @@ export function deriveSpareRiskQuantity0553({installedCount,critical=false,
   mayPoolAcrossSites:compatibilityProven,missingContractMinimum:contractualPartMinimum===null,
   budgetIsContractCompliant:false,pricePostingAllowed:false});
 }
+
+// SPQ-002 is supplemental when evidenced failure data exist; do not invent
+// MTBF, annual failure rate or service confidence just to obtain an answer.
+export const SPQ_002_0553=Object.freeze({
+ id:"SPQ-002",name:"Evidence-based Poisson spare demand sizing",
+ formula:"mu = N × failureRatePerYear × horizonYears; smallest q with P(Poisson(mu) <= q) >= targetConfidence",
+ scope:"Independent failures, constant hazard, no repaired-stock replenishment or correlated common-cause events",
+ priorEquations:["SPQ-001","MAP-06","MAP-08"],
+ unverifiedDefault:"OPEN_INPUT"
+});
+export function deriveSpareReliabilityDemand0553({
+ installedCount,failureRatePerYear,horizonYears,targetConfidence,evidence
+}={}){
+ const missing=[];
+ if(!valid(installedCount))missing.push("installedCount");
+ if(!Number.isFinite(failureRatePerYear)||failureRatePerYear<0)missing.push("failureRatePerYear");
+ if(!Number.isFinite(horizonYears)||horizonYears<=0)missing.push("horizonYears");
+ if(!Number.isFinite(targetConfidence)||targetConfidence<=0||targetConfidence>=1)missing.push("targetConfidence");
+ if(!evidence)missing.push("sourceEvidence");
+ if(missing.length)return Object.freeze({equationId:"SPQ-002",status:"OPEN_INPUT",quantity:null,missing});
+ const mean=installedCount*failureRatePerYear*horizonYears;
+ if(mean>200)return Object.freeze({equationId:"SPQ-002",status:"OUTSIDE_NUMERIC_BOUND",quantity:null,missing:["specialist reliability simulation needed"]});
+ let probability=Math.exp(-mean),cdf=probability,q=0;
+ while(cdf<targetConfidence&&q<1000){
+  q+=1;probability*=mean/q;cdf+=probability;
+ }
+ return Object.freeze({equationId:"SPQ-002",status:q>=1000?"OUTSIDE_NUMERIC_BOUND":"DERIVED_REVIEW",
+  quantity:q>=1000?null:q,meanFailures:mean,confidence:targetConfidence,evidence,
+  sourceAssumptions:SPQ_002_0553.scope,customerReleaseAllowed:false});
+}
