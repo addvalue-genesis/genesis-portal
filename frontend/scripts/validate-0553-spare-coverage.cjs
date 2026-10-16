@@ -38,6 +38,7 @@ assert.equal(scope.totals["MR-0003"].installedTagInstances,12,"MR0003 C1 4 platf
 assert.equal(scope.totals["MR-0004"].installedTagInstances,9,"MR0004 C1 3 platform x 3 installed functional tags");
 assert(scope.byMr["MR-0003"].some(x=>x.site==="ZWP23"&&x.tag==="TPH-504-001"),"MR scope must override missing layout phone symbol");
 assert(!scope.byMr["MR-0004"].some(x=>x.site==="ZWP23"),"Do not invent RACON on ZWP23");
+assert(scope.unresolvedRequirementTags.some(x=>x.mr==="MR-0002"&&x.tag==="RAD-508-001"&&x.candidateCurrentInstalledTag==="TCAB-508-001"&&x.quantity===null),"Preserve MR DMR LNA versus RFI BDA crosswalk gap");
 assert.equal(new Set(scope.installed.map(x=>x.key)).size,scope.installed.length);
 assert.equal(new Set(scope.groups.map(x=>x.id)).size,scope.groups.length);
 assert(scope.groups.some(x=>x.family==="MARINE_RACON_MAIN"&&x.criticality==="COMMISSIONING_CRITICAL_CANDIDATE"));
