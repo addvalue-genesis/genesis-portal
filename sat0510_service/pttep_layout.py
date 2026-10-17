@@ -45,7 +45,7 @@ def configure_page(doc,data):
     sec=doc.sections[0]
     sec.page_width=Cm(21);sec.page_height=Cm(29.7)
     sec.left_margin=Cm(2);sec.right_margin=Cm(2)
-    sec.top_margin=Cm(3.25);sec.bottom_margin=Cm(1.8)
+    sec.top_margin=Cm(4.25);sec.bottom_margin=Cm(1.8)
     sec.header_distance=Cm(0.8);sec.footer_distance=Cm(1.0)
     sec.different_first_page_header_footer=True
     header=sec.header
