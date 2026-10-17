@@ -9,6 +9,7 @@ from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT,WD_CELL_VERTICAL_ALIGNMENT
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from .pttep_layout import configure_page, add_cover
 
 ROOT=Path(__file__).resolve().parent
 OUT=ROOT/"output"
@@ -60,28 +61,13 @@ def add_block(doc,block):
     elif kind=="image":add_image(doc,block)
     elif kind=="pageBreak":doc.add_page_break()
 def create_document(data):
-    doc=Document(); sec=doc.sections[0]
-    sec.page_height=Cm(29.7);sec.page_width=Cm(21)
-    sec.left_margin=Cm(2.0);sec.right_margin=Cm(2.0)
-    sec.top_margin=Cm(2.2);sec.bottom_margin=Cm(2.0)
+    doc=Document()
     styles=doc.styles
     styles["Normal"].font.name="Arial";styles["Normal"].font.size=Pt(10)
     for name in ["Heading 1","Heading 2","Heading 3"]:
         styles[name].font.name="Arial";styles[name].font.color.rgb=BLUE
-    header=sec.header.paragraphs[0]
-    header.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    header.add_run("PTT EXPLORATION AND PRODUCTION  |  SITE ACCEPTANCE TEST").bold=True
-    foot=sec.footer.paragraphs[0];foot.alignment=WD_ALIGN_PARAGRAPH.CENTER
-    foot.add_run(str(data.get("document_no","MM-ZTK-1A-ONEP-SAT-001"))+"  |  "+str(data.get("revision","INTERNAL"))+"  |  Page ")
-    field=OxmlElement("w:fldSimple");field.set(qn("w:instr"),"PAGE");foot._p.append(field)
-    doc.add_heading("SITE ACCEPTANCE TEST (SAT)",0)
-    doc.add_paragraph(str(data["project_title"])).alignment=WD_ALIGN_PARAGRAPH.CENTER
-    write_table(doc,["CONTROL","DETAIL"],[
-      ["Project","PJ2601-0510"],["Service Order No.",data["po_number"]],
-      ["Document No.",data.get("document_no","Pending document control")],
-      ["Revision",data.get("revision","INTERNAL WORKING")],
-      ["Status","INTERNAL WORKING — NOT ISSUED FOR APPROVAL"]])
-    doc.add_page_break()
+    configure_page(doc,data)
+    add_cover(doc,data)
     for section in data.get("sections",[]):
         if section.get("enabled",True) is False:continue
         ensure_heading(doc,str(section.get("title","Untitled Section")),level=1)
