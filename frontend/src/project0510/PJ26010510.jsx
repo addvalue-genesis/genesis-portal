@@ -53,13 +53,13 @@ export function PJ26010510(){
   </section>}
   {tab==="SAT Tests"&&<section style={card}><h2>SAT Test Register</h2><table style={{borderCollapse:"collapse",width:"100%"}}><thead><tr>{["Test ID","Description","Result"].map(t=><th key={t} style={th}>{t}</th>)}</tr></thead><tbody>{data.tests.map((t,i)=><tr key={t.id}><td style={td}>{t.id}</td><td style={td}>{t.name}</td><td style={td}><select style={field} value={t.status} onChange={e=>updateTest(i,"status",e.target.value)}>{["NOT TESTED","PASS","FAIL","N/A"].map(s=><option key={s}>{s}</option>)}</select></td></tr>)}</tbody></table><p style={{color:"#a16207"}}>All results are initially NOT TESTED; only enter actual test evidence.</p></section>}
   {tab==="PTTEP Preview"&&<section style={card}>
-   <h2>PTTEP Draft — Generated Page Preview</h2>
-   <p style={{color:"#475569"}}>The original PTTEP DOCX is a style reference. Preview is rendered from the newly generated editable DOCX; page layout still requires QA approval.</p>
+   <h2>PTTEP Original SAT — Revision Preview</h2>
+   <p style={{color:"#475569"}}>The original 15-10-26 SAT DOCX is preserved, including existing tables and evidence. Export updates project references and replaces the baseline network diagram; other editor blocks are not yet applied.</p>
    <div style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap",marginBottom:14}}>
     <button onClick={renderDoc} style={{padding:"10px 15px",background:"#1d4ed8",color:"white",border:0,borderRadius:5,cursor:"pointer"}} disabled={service==="rendering"}>{service==="rendering"?"Rendering...":"Generate PTTEP DOCX + PDF"}</button>
     {service==="ready"&&<><a href={api+"/api/download/docx"} target="_blank" rel="noreferrer">Download DOCX</a><a href={api+"/api/download/pdf"} target="_blank" rel="noreferrer">Download PDF</a></>}
    </div>
-   {service!=="idle"&&<p role="status" style={{color:service==="ready"?"#166534":"#a16207"}}>{service==="ready"?"Draft generated from JSON. Verify layout, completeness of images and evidence before issue.":service}</p>}
+   {service!=="idle"&&<p role="status" style={{color:service==="ready"?"#166534":"#a16207"}}>{service==="ready"?"Original SAT preserved. Verify cover, header/footer, table pagination and the diagram before issue.":service}</p>}
    {service==="ready"?<iframe key={previewKey} title="PTTEP SAT PDF paginated preview" src={api+"/api/preview/pdf?v="+previewKey} style={{width:"100%",height:"75vh",border:"1px solid #94a3b8",background:"#fff"}}/>:<div style={{background:"#f8fafc",border:"1px dashed #94a3b8",padding:"45px 12px",textAlign:"center"}}>Page-by-page preview will appear after generating the DOCX via the local SAT document service (port 8051).</div>}
    <div style={{marginTop:18,padding:12,background:"#eff6ff",borderRadius:6}}>
     <b>Selected diagram</b> — ZMS–MS network diagram is loaded from backend asset; other legacy SAT evidence images have not yet been migrated.
@@ -67,7 +67,7 @@ export function PJ26010510(){
     <label>Optional temporary comparison image: <input type="file" accept="image/png,image/jpeg" onChange={e=>{const f=e.target.files&&e.target.files[0];if(f){const reader=new FileReader();reader.onload=()=>setDiagram(reader.result);reader.readAsDataURL(f)}}}/></label>
     {diagram&&<img src={diagram} alt="Uploaded reference diagram" style={{display:"block",width:"100%",maxWidth:1000,marginTop:12}}/>}
    </div>
-   <p style={{color:"#a16207"}}>DOCX uses JSON authoring; the existing PTTEP template serves as a visual reference. Existing source evidence images need separate migration; no document should be issued before QA.</p>
+   <p style={{color:"#a16207"}}>CURRENT EXPORT: original SAT DOCX + limited project substitutions + selected diagram. The Document Editor is not yet connected for arbitrary layout changes. Requires per-page QA before customer release.</p>
   </section>}
  </div>
 }
