@@ -3,14 +3,14 @@ from fastapi import FastAPI,HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from .generate import ROOT,render
+from .authoring import ROOT,render
 import json
 app=FastAPI(title="PJ2601-0510 SAT service")
 app.add_middleware(CORSMiddleware,allow_origins=["http://localhost:3002","http://127.0.0.1:3002"],allow_methods=["GET","POST","PUT"],allow_headers=["*"])
 datafile=ROOT/"config"/"project.json"
 @app.put("/api/project")
 def save(body:dict):
-    if not all(x in body for x in ["project_title","po_number","display_title","sites","network","tests","sections"]):raise HTTPException(400,"Missing required fields")
+    if not all(x in body for x in ["project_title","po_number","sites","network","tests","sections"]):raise HTTPException(400,"Missing required fields")
     if len(body["sites"])!=2 or any(not x.get("radio_ip") for x in body["sites"]):raise HTTPException(400,"Expected ZMS and MS radio addresses")
     datafile.parent.mkdir(exist_ok=True)
     datafile.write_text(json.dumps(body,ensure_ascii=False,indent=2),encoding="utf-8")
