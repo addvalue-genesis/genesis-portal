@@ -26,24 +26,34 @@ def write_table(doc,heads,rows):
         cells=table.add_row().cells
         for i,v in enumerate(row):cells[i].text=str(v if v is not None else "")
     for row in table.rows:
+        props=row._tr.get_or_add_trPr()
+        cant=OxmlElement("w:cantSplit");props.append(cant)
         for cell in row.cells:
             cell.vertical_alignment=WD_CELL_VERTICAL_ALIGNMENT.CENTER
             for paragraph in cell.paragraphs:
                 paragraph.paragraph_format.space_after=Pt(2)
                 for run in paragraph.runs:run.font.size=Pt(9)
     return table
+def keep_with_next(p):
+    p.paragraph_format.keep_with_next=True
+    p.paragraph_format.keep_together=True
+def ensure_heading(doc, title, level):
+    p=doc.add_heading(title,level=level)
+    keep_with_next(p)
+    return p
 def add_image(doc,block):
-    source=ROOT/"assets"/"network_zms_ms.png"
-    if block.get("asset")=="network_zms_ms.png" and source.is_file():
+    asset=block.get("asset","")
+    source=ROOT/"assets"/asset
+    if asset=="network_zms_ms.png" and source.is_file():
         doc.add_picture(str(source),width=Cm(min(float(block.get("widthCm",16)),17)))
         doc.paragraphs[-1].alignment=WD_ALIGN_PARAGRAPH.CENTER
     else:
-        doc.add_paragraph("[IMAGE NOT AVAILABLE — evidence required: "+str(block.get("asset",""))+"]")
+        raise FileNotFoundError("Referenced image has not been migrated or cannot be found: "+str(asset))
     if block.get("caption"):doc.add_paragraph(str(block["caption"]),style="Caption")
 def add_block(doc,block):
     kind=block.get("type")
     if kind=="paragraph":doc.add_paragraph(str(block.get("text","")))
-    elif kind=="heading":doc.add_heading(str(block.get("text","")),level=min(3,max(1,int(block.get("level",2)))))
+    elif kind=="heading":ensure_heading(doc,str(block.get("text","")),min(3,max(1,int(block.get("level",2)))))
     elif kind=="table":
         heads=block.get("columns",[])
         if heads:write_table(doc,heads,[[(row[i] if i<len(row) else "") for i in range(len(heads))] for row in block.get("rows",[])])
@@ -74,12 +84,12 @@ def create_document(data):
     doc.add_page_break()
     for section in data.get("sections",[]):
         if section.get("enabled",True) is False:continue
-        doc.add_heading(str(section.get("title","Untitled Section")),level=1)
+        ensure_heading(doc,str(section.get("title","Untitled Section")),level=1)
         for block in section.get("blocks",[]):add_block(doc,block)
-    doc.add_heading("SAT Test Register",level=1)
+    ensure_heading(doc,"SAT Test Register",level=1)
     write_table(doc,["Test ID","Description","Actual result","Status"],[
       [x.get("id",""),x.get("name",""),x.get("actual",""),x.get("status","NOT TESTED")] for x in data.get("tests",[])])
-    doc.add_heading("Acceptance & Sign-off",level=1)
+    ensure_heading(doc,"Acceptance & Sign-off",level=1)
     write_table(doc,["PTTEP","ADD VALUE SYSTEM"],[["Name: __________________","Name: __________________"],["Signature: ______________","Signature: ______________"],["Date: ___________________","Date: ___________________"]])
     OUT.mkdir(exist_ok=True)
     target=OUT/"PJ2601-0510_SAT_WORKING.docx";doc.save(target)
