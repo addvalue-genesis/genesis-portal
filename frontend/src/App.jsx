@@ -5,6 +5,7 @@ import { Employees } from "./pages/Employees";
 import { PJ26080550 } from "./pages/PJ26080550";
 import { PJ26080553 } from "./pages/PJ26080553";
 import { PJ26010510 } from "./project0510/PJ26010510";
+import { DocumentEngineering } from "./pages/DocumentEngineering";
 
 const STRINGS = {
   th: {
@@ -14,6 +15,7 @@ const STRINGS = {
     project0550: "PJ2608-0550 TPP",
     project0553: "PJ2608-0553 Bid",
     project0510: "PJ2601-0510 SAT",
+    documents: "Document Engineering",
     employees: "พนักงาน",
   },
   en: {
@@ -23,6 +25,7 @@ const STRINGS = {
     project0550: "PJ2608-0550 TPP",
     project0553: "PJ2608-0553 Bid",
     project0510: "PJ2601-0510 SAT",
+    documents: "Document Engineering",
     employees: "Employees",
   },
 };
@@ -52,6 +55,7 @@ export function App() {
             <NavLink to="/projects/pj2608-0550" className={navClass}>{t.project0550}</NavLink>
             <NavLink to="/projects/pj2608-0553" className={navClass}>{t.project0553}</NavLink>
             <NavLink to="/projects/pj2601-0510/sat" className={navClass}>{t.project0510}</NavLink>
+            <NavLink to="/documents" className={navClass}>{t.documents}</NavLink>
             <NavLink to="/employees" className={navClass}>{t.employees}</NavLink>
           </nav>
 
@@ -74,6 +78,7 @@ export function App() {
             <Route path="/projects/pj2608-0550" element={<PJ26080550 lang={lang} />} />
             <Route path="/projects/pj2608-0553" element={<PJ26080553 lang={lang} />} />
             <Route path="/projects/pj2601-0510/sat" element={<PJ26010510 />} />
+            <Route path="/documents" element={<DocumentEngineering />} />
             <Route path="/employees" element={<div className="genesis-main--padded"><Employees lang={lang} /></div>} />
           </Routes>
         </main>
