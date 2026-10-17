@@ -59,7 +59,16 @@ def render(data):
         for name,raw in files.items():z.writestr(name,raw)
     pdf=target.with_suffix(".pdf")
     exe=shutil.which("soffice") or shutil.which("libreoffice")
+    if not exe:
+        for candidate in [
+            Path(os.environ.get("PROGRAMFILES", r"C:\\Program Files")) / "LibreOffice" / "program" / "soffice.exe",
+            Path(os.environ.get("PROGRAMFILES(X86)", r"C:\\Program Files (x86)")) / "LibreOffice" / "program" / "soffice.exe"
+        ]:
+            if candidate.is_file():
+                exe=str(candidate)
+                break
     if not exe:raise RuntimeError("DOCX generated but LibreOffice (soffice) is not available for page preview")
-    r=subprocess.run([exe,"-env:UserInstallation=file:///tmp/sat0510_"+str(os.getpid()),"--headless","--convert-to","pdf","--outdir",str(out),str(target)],capture_output=True,text=True,timeout=120)
+    profile=(ROOT/"output"/"lo_profile").resolve().as_uri()
+    r=subprocess.run([exe,"-env:UserInstallation="+profile,"--headless","--convert-to","pdf","--outdir",str(out),str(target)],capture_output=True,text=True,timeout=120)
     if r.returncode or not pdf.is_file():raise RuntimeError("DOCX generated; PDF conversion failed: "+r.stderr[-300:])
     return {"pages":"inspect PDF for actual count","docx":str(target),"pdf":str(pdf)}
