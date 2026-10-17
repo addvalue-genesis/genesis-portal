@@ -45,11 +45,6 @@ def render(data):
         for p in root.xpath("//w:p",namespaces=NS):
             for old,new in swap.items():
                 if paragraph_replace(p,old,new):dirty=True
-            nodes=p.xpath(".//w:t",namespaces=NS)
-            if nodes and "".join(n.text or "" for n in nodes).strip().lower()=="pass":
-                nodes[0].text="NOT TESTED"
-                for n in nodes[1:]:n.text=""
-                dirty=True
         if dirty:files[name]=etree.tostring(root,xml_declaration=True,encoding="UTF-8",standalone=True)
     # The selected figure replaces the source embedded diagram without changing its
     # OOXML extent or the existing table geometry.
