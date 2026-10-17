@@ -26,3 +26,9 @@ def download(ext:str):
     path=ROOT/"output"/("PJ2601-0510_SAT_WORKING."+ext)
     if not path.is_file():raise HTTPException(404,"Generate first")
     return FileResponse(path,media_type="application/pdf" if ext=="pdf" else "application/vnd.openxmlformats-officedocument.wordprocessingml.document",filename=path.name)
+
+@app.get("/api/preview/pdf")
+def preview():
+    path=ROOT/"output"/"PJ2601-0510_SAT_WORKING.pdf"
+    if not path.is_file():raise HTTPException(404,"Generate first")
+    return FileResponse(path,media_type="application/pdf",headers={"Content-Disposition":"inline"})
