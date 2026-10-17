@@ -3,7 +3,7 @@ from fastapi import FastAPI,HTTPException
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
-from .authoring import ROOT,render
+from .generate import ROOT,render
 import json
 app=FastAPI(title="PJ2601-0510 SAT service")
 app.add_middleware(CORSMiddleware,allow_origins=["http://localhost:3002","http://127.0.0.1:3002"],allow_methods=["GET","POST","PUT"],allow_headers=["*"])
