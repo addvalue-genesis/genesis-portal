@@ -38,7 +38,7 @@ export function PJ26010510(){
     {service==="ready"&&<><a href={api+"/api/download/docx"} target="_blank" rel="noreferrer">Download DOCX</a><a href={api+"/api/download/pdf"} target="_blank" rel="noreferrer">Download PDF</a></>}
    </div>
    {service!=="idle"&&<p role="status" style={{color:service==="ready"?"#166534":"#a16207"}}>{service==="ready"?"Rendered from PTTEP Word template; inspect each page before issue.":service}</p>}
-   {service==="ready"?<iframe key={previewKey} title="PTTEP SAT PDF paginated preview" src={api+"/api/download/pdf?v="+previewKey} style={{width:"100%",height:"75vh",border:"1px solid #94a3b8",background:"#fff"}}/>:<div style={{background:"#f8fafc",border:"1px dashed #94a3b8",padding:"45px 12px",textAlign:"center"}}>Page-by-page preview will appear after generating the DOCX via the local SAT document service (port 8051).</div>}
+   {service==="ready"?<iframe key={previewKey} title="PTTEP SAT PDF paginated preview" src={api+"/api/preview/pdf?v="+previewKey} style={{width:"100%",height:"75vh",border:"1px solid #94a3b8",background:"#fff"}}/>:<div style={{background:"#f8fafc",border:"1px dashed #94a3b8",padding:"45px 12px",textAlign:"center"}}>Page-by-page preview will appear after generating the DOCX via the local SAT document service (port 8051).</div>}
    <div style={{marginTop:18,padding:12,background:"#eff6ff",borderRadius:6}}>
     <b>Selected diagram</b> — exact supplied ZMS–MS network diagram retained as source image in the template service.
     <p style={{margin:"8px 0"}}>Diagram is not automatically rewritten when IP addresses are edited. Review and replace the image before issuing changed configuration.</p>
