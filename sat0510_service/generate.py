@@ -5,6 +5,7 @@ from pathlib import Path
 from zipfile import ZipFile,ZIP_DEFLATED
 from lxml import etree
 import json,subprocess,shutil,os
+from .layout_repair import repair
 ROOT=Path(__file__).resolve().parent
 NS={"w":"http://schemas.openxmlformats.org/wordprocessingml/2006/main"}
 def paragraph_replace(p,old,new):
@@ -52,7 +53,7 @@ def render(data):
     files["word/media/image7.png"]=pic.read_bytes()
     with ZipFile(target,"w",ZIP_DEFLATED) as z:
         for name,raw in files.items():z.writestr(name,raw)
-    pdf=target.with_suffix(".pdf")
+    # Apply conservative pagination fixes after preserving all existing OOXML parts.\n    intermediate=out/"PJ2601-0510_SAT_BEFORE_LAYOUT_REPAIR.docx"\n    target.replace(intermediate)\n    repair(intermediate,target)\n    pdf=target.with_suffix(".pdf")
     exe=shutil.which("soffice") or shutil.which("libreoffice")
     if not exe:
         for candidate in [
