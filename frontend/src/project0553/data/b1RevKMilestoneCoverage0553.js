@@ -1,3 +1,4 @@
+import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
 // PJ2608-0553: Rev.K K00–K18 milestone coverage for residual B1 PROJECT MANAGEMENT only.
 // THIS IS A CHILD ALLOCATION of PM-MILESTONE, not 19 extra expense postings.
 // Each stage's physical labour/tools/travel stays with the listed A/B2–B14/C or JUTAL owner.
@@ -499,14 +500,18 @@ export const B1_REVK_MILESTONE_COVERAGE_0553=Object.freeze(B1_REVK_SOURCE_COVERA
   chargeableHere:r.stage===event.ownerStage,
   planningPmHours:r.stage===event.ownerStage?event.mh:null,
   budgetHoursBasis:event.reason,effortType:"CFO_PROVISIONAL_GATE_TOUCHPOINT_HOURS_NOT_REV_K_VERIFIED",
-  costOwner:"B1",workingCostTHB:null,workingSellTHB:null});
+  costOwner:"B1",workingCostTHB:null,workingSellTHB:null,
+  rateSource:ONSHORE_WORKING_SELL_RATE_0553.source,
+  rateApprovalState:ONSHORE_WORKING_SELL_RATE_0553.rateClass});
 }));
 export const B1_PM_BUDGET_ESTIMATED_HOURS_0553=B1_CFO_PM_EVENT_ESTIMATES_0553.reduce((n,x)=>n+x.mh,0);
 export const B1_ONSHORE_PM_SCENARIO_0553=Object.freeze({
-  usdPerPersonDay:600,fxTHBPerUSD:31.5,thbPerPersonDay:18900,
-  source:"USER_CANDIDATE_USD600_NOT_VERIFIED_AS_APPROVED_RATE__FX_REV05_31_5",
-  state:"NON_POSTING_SCENARIO_ONLY",costOrSell:"WORKING_SELL_SCENARIO_RATE_NOT_VERIFIED_DIRECT_COST",
-  previousB9ChinaTeamUSDPerDay:1250,previousB9ChinaTeamPerDiemUSD:270,
+  ...ONSHORE_WORKING_SELL_RATE_0553,
+  fxTHBPerUSD:ONSHORE_WORKING_SELL_RATE_0553.thbPerUsd,
+  state:"USER_APPROVED_RATE__NON_POSTING_PM_QUANTITY_SCENARIO",
+  costOrSell:"APPROVED_ONSHORE_WORKING_SELL_RATE_NOT_VERIFIED_DIRECT_COST",
+  previousB9ChinaTeamUSDPerDay:1250,
+  previousB9ChinaTeamPerDiemUSD:270,
   previousB9ChinaTeamTotalTHBPerDay:47880,
   offshoreSellUSDPerPersonDay:800,
   crossChargeBlocked:true
