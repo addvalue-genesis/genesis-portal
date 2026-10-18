@@ -11,6 +11,7 @@ import { CostIntegrityReview0553 } from "./CostIntegrityReview0553";
 import {BcCostEvidenceDetail0553} from "./BcCostEvidenceDetail0553";
 import {BcExecutionComplianceAudit0553} from "./BcExecutionComplianceAudit0553";
 import {BcWorkCostLines0553} from "./BcWorkCostLines0553";
+import {RevKAbcOwnershipControl0553} from "./RevKAbcOwnershipControl0553";
 import {ScopeBcAnnexDetail0553} from "./ScopeBcAnnexDetail0553";
 import {ScopeCategoryTabs0553} from "./ScopeCategoryTabs0553";
 import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
@@ -178,6 +179,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
      </tbody></table></div>
      <p className="p55-note">Live source: selectBcTurnkeyWorkingCost0553() · 10.2 Working SELL only. Missing lines are not zero; C1/C2 are kept separate. Historical non-posting references and direct costs are not added.</p>
     </section>
+    <RevKAbcOwnershipControl0553 working={bcWorking}/>
     <ScopeCategoryTabs0553 value={bcTab} onChange={code=>{setBcTab(code);setBcDetailCode(code==="ALL"?null:code);}}/>
     <p className="p55-note">Selected module: <strong>{bcTab==="ALL"?"All Part B/C — B1–B14 and C1–C2":bcTab+" — "+bcWorking.byCode[bcTab]?.requirement}</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey={bcTab==="ALL"?"bid.budget.working.bc":"bid.budget.working.bc."+bcTab.toLowerCase()}/></p>
     </section>
