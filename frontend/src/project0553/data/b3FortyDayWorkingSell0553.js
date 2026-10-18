@@ -4,7 +4,7 @@
 // Rev.K K15-18 and earlier Rev.J/Rev.H are distribution guides, not measured work days.
 // Includes 30-day VeEX MX100+ provisional rental THB1,000/day ex VAT as bare
 // pass-through SELL estimate (zero markup assumption; verify contract/rental terms).
-const r2=n=>Math.round((n+Number.EPSILON)*100)/100;
+const roundB3FortyDay0553=n=>Math.round((n+Number.EPSILON)*100)/100;
 export const B3_40DAY_ACTIVITY_SCENARIO_0553=Object.freeze([
  {id:"BF-ZPQ",site:"ZPQ",mr:"MR0001/2/3/4 host",wbs:"K15",days:3,reason:"Central NMS/PLC/PABX and host interface validation"},
  {id:"BF-ZWP8",site:"ZWP8",mr:"MR0001 BF",wbs:"K15",days:2,reason:"Existing host network, RF path and site interface"},
@@ -21,17 +21,17 @@ export function selectB3FortyDayWorkingSell0553(){
   ...x,costOwner:"B3",crew:2,plannedPersonDays:x.days*2,
   priceClass:"CURRENT_OFFSHORE_SAT_SELL_ALLOWANCE",directCostTHB:null,
   postingType:"INCLUDED_IN_CURRENT_B3_WORKING_SELL",
-  workingSellTHB:r2(x.days*2*800*31.5)
+  workingSellTHB:roundB3FortyDay0553(x.days*2*800*31.5)
  }));
  const workdays=rows.reduce((v,x)=>v+x.days,0);
  if(workdays!==40||rows.filter(x=>x.site.startsWith("ZWP")||x.site==="ZPQ").length!==7)
   throw Error("B3 seven-site + SIT/Punch 40-day workload mismatch");
- const laborWorkingSellTHB=r2(rows.reduce((v,x)=>v+x.workingSellTHB,0));
+ const laborWorkingSellTHB=roundB3FortyDay0553(rows.reduce((v,x)=>v+x.workingSellTHB,0));
  const veex=Object.freeze({id:"B3-VEEX-MX100",quantity:30,unit:"rental-day",rateTHB:1000,
   workingSellTHB:30000,verifiedDirectCostTHB:null,costOwner:"B3",
   rateSource:"User-confirmed VeEX VePAL MX100+ THB1,000/rental-day ex VAT; 30-day Rev.P rental scenario",
   pricing:"PRE_AWARD_BUDGETARY_PASS_THROUGH_NO_MARKUP__EX_VAT",nonAdditiveToB11:true});
- const workingSellTHB=r2(laborWorkingSellTHB+veex.workingSellTHB);
+ const workingSellTHB=roundB3FortyDay0553(laborWorkingSellTHB+veex.workingSellTHB);
  if(laborWorkingSellTHB!==2016000||workingSellTHB!==2046000)
   throw Error("B3 40-day working sell calculation changed");
  return Object.freeze({
