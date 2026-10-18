@@ -20,7 +20,7 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  // Original B9 mixed labor/per-diem line is replaced by itemized Rev.K B9 ledger.
  const physical=[
   ...available.filter(x=>!x.id.startsWith("COST-AUD-")&&x.id!=="B3-FAT-BKK"&&x.code!=="B9"),
-  ...(showGroup.includes("B9")?china.rows.map(x=>({
+  ...(showGroup.includes("B9")?china.rows.filter(x=>!x.optional).map(x=>({
    code:"B9",id:x.id,moduleId:x.moduleId,name:x.description,quantity:x.qty,unit:x.unit,
    workingSellRateTHB:x.unitRateTHB,workingSellTHB:x.workingSellTHB,historicalCostProxyTHB:null,
    owner:"B9",sourceRef:x.evidence,scopeGate:x.status,
@@ -44,7 +44,7 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
    {" "}· Current Working SELL subtotal (legacy Rev05 superseded for China FAT): {knownSellCount>0?money(displayedWbsSell):"NOT ESTABLISHED"} ({knownSellCount}/{showGroup.length} priced; {completeSell?"covered":"NOT complete price"})
    {" "}· Actual Direct COST: <strong>NOT ESTABLISHED</strong>
    {" "}· Historical B1 proxy (not approved cost): {historicalProxy?money(historicalProxy):"n/a"}</p>
-  <p className="p55-note">Rev.K current pricing: Bangkok FAT THB 144,000 in prior B3 is excluded; MGW China FAT is B9. Old B9 THB 574,560 mixed labor/per-diem source is replaced with B9 Rev.K itemized lines (no separate Per Diem). Source WBS history is preserved but not added. No Direct Cost approval implied.</p>
+  <p className="p55-note">Rev.K current B9 Base covers China MGW FAT witnesses and one BKK–China–BKK trip. Yard ADDVALUE 10 working/standby team-days plus extra hotel/transfer are CONDITIONAL call-out only under SPE §7.3.4 and are EXCLUDED from this base ledger. Rev05 B9 12 team-days included 2 shared travel days; travel charged once. Historical Bangkok FAT THB 144,000 removed from B3. No Direct Cost approval implied.</p>
   {(selectedCode==="ALL"||selectedCode==="B1"||selectedCode==="B2")&&<B1B2EquationAudit0553 selectedCode={selectedCode}/>}
   {(selectedCode==="ALL"||selectedCode==="B3")&&<B3EquationAudit0553 selectedCode={selectedCode}/>}
   {(selectedCode==="ALL"||selectedCode==="B5")&&<B5EquationAudit0553 selectedCode={selectedCode}/>}
