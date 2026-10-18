@@ -53,7 +53,7 @@ for(const code of ["B10","B13","C1","C2"]){
  assert.equal(current.byCode[code].workingSellTHB,baseline.budgetTotalsTHB[code],"Never re-price Rev08 silently");
  assert.equal(current.byCode[code].directCostTHB,null,"Working SELL is not approved direct cost");
 }
-assert.equal(current.knownWorkingSellTHB,4568436.58,"Protect previous B/C base working sell");
+assert.equal(current.knownWorkingSellTHB,4600020.95,"Protect current Rev.K Part B Base working sell; Rev05 preserved in source ledger");
 const view=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(view.includes("selectSpareCoverageEngineering0553")&&view.includes("coverage.groups.filter("));
 assert(babel.transformSync(view,{babelrc:false,configFile:false,
