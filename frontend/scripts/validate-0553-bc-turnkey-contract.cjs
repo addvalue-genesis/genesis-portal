@@ -93,5 +93,18 @@ assert(!workbook.includes("partAKnownTotal+partBKnownTotal"),"Cost and sell must
 const mapping=fs.readFileSync(path.join(root,"project0553/EstimateToBidMapping0553.jsx"),"utf8");
 assert(mapping.includes('selectBcTurnkeyWorkingCost0553()'),"Mapping must consume canonical 10.2 source");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
-assert(workspace.includes("bcWorking.rows.map("),"10.2 must render the canonical rows");
+// 10.2 now groups canonical rows into Part B Base and Part C Options before rendering.
+assert(workspace.includes("const bcWorking=selectBcTurnkeyWorkingCost0553();"),
+ "10.2 must select its canonical B/C working source");
+assert(workspace.includes("const partBRows=bcWorking.rows.filter(r=>!r.optional);")&&
+       workspace.includes("const partCRows=bcWorking.rows.filter(r=>r.optional);"),
+ "10.2 must separate canonical Part B Base and Part C optional rows");
+assert(workspace.includes("rows:partBRows,total:partBWorkingSell")&&
+       workspace.includes("rows:partCRows,total:partCWorkingSell")&&
+       workspace.includes("group.rows.map(item=>")&&
+       workspace.includes("data-component-key={item.moduleId}")&&
+       workspace.includes("item.workingSellTHB"),
+ "10.2 must render each canonical item in its Part B/C group with Working Sell and module ID");
+assert(workspace.includes('if(Math.abs(partBWorkingSell-bcWorking.knownWorkingSellTHB)>0.01)throw Error("10.2 Part B summary mismatch")'),
+ "10.2 Part B subtotal must reconcile to canonical Working Sell");
 console.log("PASS 0553 B/C 16/16 customer mapping, turnkey scope, working sell/cost separation, lifecycle remap, no historical default and no duplicated posting");
