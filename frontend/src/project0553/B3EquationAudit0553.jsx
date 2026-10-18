@@ -1,20 +1,23 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcB3EquationExecution0553} from "./data/bcB3EquationExecution0553";
+import {selectB3FortyDayWorkingSell0553} from "./data/b3FortyDayWorkingSell0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 export function B3EquationAudit0553({selectedCode="ALL"}){
  const proof=selectBcB3EquationExecution0553();
+ const current=selectB3FortyDayWorkingSell0553();
  const [showIrt,setShowIrt]=useState(false);
  const [showVdrl,setShowVdrl]=useState(false);
  const [showEvents,setShowEvents]=useState(false);
  const isB3=selectedCode==="B3";
  if(selectedCode!=="ALL"&&!isB3)return null;
  const c=proof.offshore.tripComposition;
- return <details className="p55-panel" data-component-key={proof.moduleId} open={isB3}
+ return <details className="p55-panel" data-component-key={proof.moduleId} open={false}
   style={{marginTop:12,padding:"12px 14px"}}>
-  <summary><strong>02 → 10.2 B3 | GEQ/PEQ IRT → FAT / SAT / Offshore Proof</strong>
+  <summary><strong>HISTORICAL Rev05 audit only — 02 → 10.2 B3 | GEQ/PEQ IRT / Bangkok FAT / 39 Days</strong>
    <small> {proof.irtSourceCount} RFQ IRT source points · {proof.offshore.workingTripCount} WORKING trips · no cost posting</small></summary>
+  <p className="p55-note"><strong>CURRENT B3 Working SELL is {thb(current.workingSellTHB)}:</strong> 40 productive SAT/SIT days × two specialists = {thb(current.laborWorkingSellTHB)} plus one 30-day VeEX rental {thb(current.toolRentalWorkingSellTHB)}. The Rev05 Bangkok FAT and 39-day/5-trip numbers below are superseded AUDIT EVIDENCE ONLY and must not enter current Working Sell.</p>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={proof.moduleId}/>
    {" "}Sources: MR0001–MR0004 Rev.C1 §7/§9, PTTEP ITP, WBS Rev05 (<a href={proof.sourceWbsUrl} target="_blank" rel="noreferrer">WBS source</a>).
    IRT points are inspection requirements, NOT individually priced test events or approved inspection dates.</p>
@@ -86,7 +89,7 @@ export function B3EquationAudit0553({selectedCode="ALL"}){
    </tr>)}</tbody></table>
   </div>}
   <p className="p55-note"><strong>Boundary:</strong> B1 engineering content, B2 transmittal/final dossier,
-   B3 actual physical testing and original signed test sheets, B9 Nantong yard supervision.
+   B3 actual physical testing and original signed test sheets, B9 MGW China FAT witnesses / conditional Zhuhai Yard support (historical Nantong references below are superseded).
    If a vendor's OEM test is included in Part A, avoid charging it again under B3.
    No default payroll, extra travel, offshore standby or additional test-event price has been created.</p>
  </details>;
