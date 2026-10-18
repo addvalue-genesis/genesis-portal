@@ -483,9 +483,9 @@ export const B3_REQUIREMENT_WBS_TRACE_0553=Object.freeze(B3_REQUIREMENT_WBS_SOUR
  ...r,
  contractualRequirementState:r.requirementClass==="MUST"?"DELIVERABLE_MANDATORY_BY_CONTRACT":"WHEN_REQUESTED",
  addvalueAttendanceState:r.costOwner!=="B9"?"CHECK_EXECUTION_RACI":
-  (r.id==="RQM-01"?"REVK_2_FAT_WITNESSES_PLANNED":"NO_UNCONDITIONAL_YARD_ATTENDANCE__CALL_OUT_OR_SIGNED_RACI_ONLY"),
+  (r.id==="RQM-01"?"REVK_2_FAT_WITNESSES_PLANNED":r.id==="RQM-02"?"FAT_NOTICE_INCLUDED_NO_EXTRA_CHARGE":"NO_UNCONDITIONAL_YARD_ATTENDANCE__CALL_OUT_OR_SIGNED_RACI_ONLY"),
  b9CommercialTreatment:r.costOwner!=="B9"?null:
-  (r.id==="RQM-01"?"FAT_BASE__WITNESS":"YARD_SUPPORT_CONDITIONAL__NO_BASE_CHARGE"),
+  (r.id==="RQM-01"?"FAT_BASE__WITNESS":r.id==="RQM-02"?"FAT_BASE__NOTICE_INCLUDED_NO_EXTRA":"YARD_SUPPORT_CONDITIONAL__NO_BASE_CHARGE"),
  costPostingAuthority:"NO_CHARGE_WITHOUT_UNIQUE_EXPENSE_ID_AND_APPROVED_SCOPE"
 }))));
 export function selectB3RequirementWbsTrace0553(){
@@ -499,7 +499,7 @@ export function selectB3RequirementWbsTrace0553(){
  }
  if(!rows.some(r=>r.id==="RQM-03"&&r.costOwner==="B9")||!rows.some(r=>r.id==="RQM-15"&&r.costOwner==="B3"))
   throw Error("Fabrication Yard SAT and Offshore SIT must be separate WBS/Cost Owners");
- if(rows.some(x=>x.costOwner==="B9"&&x.id!=="RQM-01"&&x.b9CommercialTreatment!=="YARD_SUPPORT_CONDITIONAL__NO_BASE_CHARGE"))throw Error("B9 yard assistance incorrectly made mandatory price");
+ if(rows.some(x=>x.costOwner==="B9"&&!["RQM-01","RQM-02"].includes(x.id)&&x.b9CommercialTreatment!=="YARD_SUPPORT_CONDITIONAL__NO_BASE_CHARGE"))throw Error("B9 yard assistance incorrectly made mandatory price");
  return Object.freeze({moduleId:"bid.budget.working.bc.b3.requirement-trace",rows,
   B3:rows.filter(x=>x.costOwner==="B3"),B9:rows.filter(x=>x.costOwner==="B9"),
   external:rows.filter(x=>x.costOwner!=="B3"&&x.costOwner!=="B9"),
