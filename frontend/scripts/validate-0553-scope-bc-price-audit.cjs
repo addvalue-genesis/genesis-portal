@@ -33,13 +33,21 @@ for(const code of codes){
  assert.equal(a.directCostTHB,null,"No Rev08 amount may be posted as current cost "+code);
  // Working SELL budget approvals in 10.2 are distinct from historical source
  // and do not constitute direct COST or customer-released quotation.
- const budgetSell={B10:123024.37,B13:22484.21,C1:4049349.36,C2:721806.68};
+ const budgetSell={B10:123024.37,B11:128314.11,B13:22484.21,C1:4049349.36,C2:721806.68};
  if(Object.hasOwn(budgetSell,code)){
   assert.equal(a.workingSellTHB,budgetSell[code],code+" approved pre-award budgetary working sell");
   assert.equal(b.unifiedSpareBudget?.pricingClass,"BUDGETARY_WORKING_SELL");
   assert.equal(b.unifiedSpareBudget?.verifiedDirectCost,false);
   assert.equal(b.unifiedSpareBudget?.releaseAllowed,false);
- }else assert.equal(a.workingSellTHB,null,"Unapproved Working Sell must remain null "+code);
+  if(code==="B11"){
+   assert.equal(b.b11VendorFollowup?.status,"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING");
+   assert.equal(b.b11VendorFollowup?.amountTHB,128314.11);
+   assert.equal(b.b11VendorFollowup?.verifiedDirectCost,false);
+   assert.equal(b.b11VendorFollowup?.releaseAllowed,false);
+   assert.equal(a.directCostTHB,null,"B11 OEM tool quotation/inclusion not yet verified");
+   assert.equal(a.commercialSellTHB,null,"B11 budget approval does not release customer price");
+  }
+ }else assert.equal(a.workingSellTHB,null,"No selected current Working Sell "+code);
  assert.equal(a.historicalReferenceUSD,s[2]);
  assert.equal(a.historicalReferenceUSD,expectedUSD[code]);
  assert.equal(a.historicalReferenceTHB,Math.round((expectedUSD[code]*31.5+Number.EPSILON)*100)/100);
@@ -115,4 +123,4 @@ for(const file of ["project0553/ScopeSheetsDetail0553.jsx","project0553/ScopeBcA
  }).code;
  assert(compiled?.length>0,"JSX compile failed "+file);
 }
-console.log("PASS 0553 10.2->10.5 Scope B10/B11/B13/B14/C1/C2: 6 historical USD+THB prices, 31 child rows, B14 summary-only, 01-08/current-owner trace, direct cost/sell remain unposted, exact Module ID deep-links.");
+console.log("PASS 0553 10.2->10.5 Scope B10/B11/B13/B14/C1/C2: B11 THB128314.11 selected budgetary WORKING SELL (not verified Direct Cost, not released quote); 6 Rev08 historical references, 31 child rows, B14 unpriced, current-owner trace and Module ID links.");
