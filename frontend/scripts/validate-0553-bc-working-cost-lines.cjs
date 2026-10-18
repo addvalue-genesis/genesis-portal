@@ -96,7 +96,22 @@ assert.equal(FAT_EXECUTION_BASIS_0553.integratedFat.location,"SAMTEL Bangkok, Th
 assert.equal(JSON.stringify(derivePartBcWorkingWbs0553()),snapshot);
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 const main=read("project0553/CommercialWorkspace.jsx"),render=read("project0553/BcWorkCostLines0553.jsx");
-assert(main.includes("<BcWorkCostLines0553 selectedCode={bcTab===\"ALL\"&&bcDetailCode?bcDetailCode:bcTab}/>"));
+// Current 10.2 renders detail in two supported paths: selected B/C tab and
+// expanded canonical row in ALL view. The previous conditional expression was
+// removed during UX refactor; verify both real paths and their canonical data.
+assert(main.includes('const bcWorking=selectBcTurnkeyWorkingCost0553();'),
+ "10.2 must consume the canonical Part B/C selector");
+assert(main.includes('<BcWorkCostLines0553 selectedCode={bcTab}/>'),
+ "10.2 selected B/C tab must render its Cost-Line ledger");
+assert(main.includes('<BcWorkCostLines0553 selectedCode={item.code}/>'),
+ "10.2 ALL view expanded canonical item must render Cost-Line ledger");
+assert(main.includes('bcWorking.byCode[bcTab]')&&
+ main.includes('group.rows.map(item=>')&&
+ main.includes('bcDetailCode===item.code'),
+ "10.2 current tab/expanded list must select canonical B/C rows, not a historical second source");
+assert(main.includes('<BcCostEvidenceDetail0553 workingRow={item}/>')&&
+ main.includes('data-component-key={item.moduleId}'),
+ "10.2 expanded row must carry canonical Cost Evidence and Module ID");
 assert(render.includes("m.rows.filter")&&render.includes("m.workingSellByCode"));
 assert(render.includes("showAuditClauses")&&render.includes("Cost Owner: 10.2 only"));
 assert(render.includes("Object.entries(x.roleMH)")&&render.includes("knownSellCount"),"B1 labor skills and known-only incomplete Sell coverage must be visible");
@@ -105,4 +120,4 @@ for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcWorkCostLin
  assert(babel.transformSync(read(f),{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
 }
-console.log("PASS 0553 10.2 traceable cost-line ledger: 111 rows (71 work objects + 40 non-additive source clauses), B1 964 MH/27 activities, B2 143/38, B3 5 trips/78 MD & THB2,109,600 sell, B6 four cargo routes, B9 THB47,880/team-day sell and B10/B11 supplier gates; no invented Direct Cost.");
+console.log("PASS 0553 canonical 10.2 UI: 111 historical source/audit rows retained, B1 27/964 MH historical, current B3 2,443,400 including FAT, B9 Base 0 with Yard optional 233,600; both tab and expanded detail paths render source-led cost lines. No verified Direct Cost posted.");
