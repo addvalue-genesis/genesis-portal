@@ -6,6 +6,7 @@ import {selectB1ProjectExpenseLedger0553} from "./data/b1IndirectCostLedger0553"
 import {B1RevKMilestoneBudget0553} from "./B1RevKMilestoneBudget0553";
 import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
+import {B3SiteMrSatCoverage0553} from "./B3SiteMrSatCoverage0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
 // imply that historical payroll cost or the WBS SELL is verified direct COST.
@@ -121,6 +122,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
    <p className="p55-note">MGW China FAT and JUTAL Yard belong exclusively to B9 once per person/trip. USD 600/person-day replaces the old mixed labor/per-diem pricing. No additional per diem; new airfare, hotel, visa, transfers, travel and occupational insurance are separately included in B9 as provisional Working Sell allowances. No booking in B1 or B3.</p>
   </section>}
   {(e.code==="B3"||e.code==="B9")&&<B3RequirementWbsTrace0553 selectedOwner={e.code}/>}
+  {e.code==="B3"&&<B3SiteMrSatCoverage0553/>}
   {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget}/>}
   {e.code==="B3"&&workingRow.b3FatOwnerTransfer&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b3.fat-owner-transfer" style={{padding:12,marginTop:12}}><h4>B3 — Rev.K FAT Cost Owner Reconciliation</h4><p className="p55-note">Rev05 Bangkok FAT allocation <strong>THB {workingRow.b3FatOwnerTransfer.amountTHB.toLocaleString("en-US")}</strong> is removed from B3. MGW China FAT labor/travel is now in B9 once. B3 Working Sell remains for Offshore SAT/SIT only: <strong>{thb(workingRow.workingSellTHB)}</strong>. FAT source references in the old WBS remain evidence only, not additive current Working Sell.</p></section>}
   <p className="p55-note">SOURCE: <a href={e.sourceUrl} target="_blank" rel="noreferrer">{e.sourceSheet} · {e.sourceRevision}</a>. ต้องใช้ Internal Rate Card / Vendor Rate ที่ควบคุมได้ก่อนคำนวณ Direct Cost</p>
