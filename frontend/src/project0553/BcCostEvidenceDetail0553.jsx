@@ -82,6 +82,7 @@ function B1IndirectExpenseRegister0553(){
   </tr>)}</tbody></table></div>;
  return <section className="p55-panel" data-component-key="bid.budget.working.bc.b1.indirect-ledger" style={{padding:14,marginTop:12}}>
   <h3>B1 — Project Expense Ledger (WBS-Driven / Single Cost Owner)</h3>
+  <p className="p55-note" data-component-key={ledger.pendingAllocationPolicy.moduleId}><strong>B1 PENDING COST OWNER (Suspense):</strong> รายการจาก BOD/DTS/SPE/WBS ที่ยังไม่พบหมวด A/B2–B14/C ให้พักตรวจใน B1 ก่อนโดยไม่บวก Working Cost/Working Sell อัตโนมัติ เมื่อยืนยันว่าเป็นค่า FAT/Yard ให้ออกไป B9; Offshore SAT ไป B3; ส่วนที่เหลือ B1 เฉพาะ PM/Indirect ที่มีหลักฐานและไม่ซ้ำหมวดอื่น</p>
   <p className="p55-note"><strong>CFO REVIEW VIEW — Who / What / Where / How / Cost Owner / Payer / Quantity / Rate / Evidence.</strong> Rev.K K00–K18 and Rev.L Yard roles, Rev.J Gantt and Rev.I risk review, MR0001–0004 / BOD / DTS / SPE / TAG MTO. Role/location assumptions and MGW FAT venue conflicts are flagged, not treated as approvals. No booking, no new sell and no replacement of the THB 510,000 B1 baseline.</p>
   <div className="p55-metric-grid">
    <div><strong>Existing B1 Working Sell</strong><p>{cash(ledger.baseline.b1WorkingSellTHB)}</p><small>Legacy 964-MH engineering baseline; unchanged</small></div>
@@ -106,7 +107,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
    <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
-   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Legacy engineering baseline ONLY; not approved indirect PM ledger total":e.code==="B3"||e.code==="B9"?"Rev.K current, Rev05 old evidence is audit only":"Working source estimate"}</small></div>
+   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Legacy engineering baseline ONLY; not approved indirect PM ledger total":e.code==="B3"||e.code==="B9"?"Rev.K current; B9 base excludes conditional Yard call-out. Rev05 is audit only":"Working source estimate"}</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Confirm the four MR legs through Bangkok FAT and JUTAL Nantong.</p>}
@@ -115,7 +116,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
    <div className="p55-metric-grid">
     <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
     <div><strong>2-Person Team Labor Only</strong><p>THB {workingRow.b9OnshoreRateReview.laborOnlyTeamTHBPerDay.toLocaleString("en-US")}</p><small>Excludes per diem, flights, hotels, visa and local travel</small></div>
-    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>Rev.K working budget incl. labor/travel/insurance; vendor quotes pending</small></div>
+    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>Rev.K FAT witness/travel only in Base. Yard Call-out conditional, not included. Vendor quotes pending</small></div>
    </div>
    <p className="p55-note">MGW China FAT and JUTAL Yard belong exclusively to B9 once per person/trip. USD 600/person-day replaces the old mixed labor/per-diem pricing. No additional per diem; new airfare, hotel, visa, transfers, travel and occupational insurance are separately included in B9 as provisional Working Sell allowances. No booking in B1 or B3.</p>
   </section>}
