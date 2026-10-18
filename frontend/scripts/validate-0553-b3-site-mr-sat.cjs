@@ -1,0 +1,21 @@
+/* Source-led offshore SAT/SIT matrix: 7 sites, MR1-4, 40-day Work SELL only. */
+const fs=require("node:fs"),path=require("node:path"),vm=require("node:vm"),assert=require("node:assert/strict");
+const dir=path.join(__dirname,"../src/project0553/data");
+const file=n=>fs.readFileSync(path.join(dir,n),"utf8").replace(/^import .*$/gm,"").replace(/^export /gm,"");
+const src=file("b3FortyDayWorkingSell0553.js")+"\n"+file("b3SiteMrSatCoverage0553.js");
+const v=vm.runInNewContext(src+"\nselectB3SiteMrSatCoverage0553();",{},{timeout:2000});
+assert.equal(v.sevenSiteCount,7);
+assert.equal(v.siteMRTestCount,19);
+assert.equal(v.otherTestCount,2);
+assert.equal(v.rows.length,21);
+assert.equal(v.plannedWorkingDays,40);
+assert.equal(v.paidCrew,2);
+assert.equal(v.coveredB3SellTHB,2046000);
+assert.equal(v.rows.filter(x=>x.site==="ZWP23").length,2);
+assert.ok(!v.rows.some(x=>x.site==="ZWP23"&&(x.mr==="MR0002"||x.mr==="MR0004")));
+assert.ok(["ZWP20","ZWP21","ZWP22"].every(site=>v.rows.filter(x=>x.site===site).length===4));
+assert.equal(v.budgetarySiteTimeboxes.reduce((n,r)=>n+r.days,0),40);
+assert.ok(v.rows.every(x=>x.postingAllowed!==true&&x.workingSellTHB===null&&x.directCostTHB===null));
+assert.equal(new Set(v.rows.map(x=>x.id)).size,v.rows.length);
+assert.equal(v.methodApproved,false);assert.equal(v.postingAllowed,false);
+console.log("PASS B3 Site/MR SAT: 19 requirement groups, 2 integrated/punch, 7 sites, 40 team workdays, 2 staff, B3 THB2,046,000; zero duplicate Test-ID sell.");
