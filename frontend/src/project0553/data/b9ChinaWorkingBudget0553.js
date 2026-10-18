@@ -1,6 +1,6 @@
 // PJ2608-0553 / B9 — China FAT + JUTAL Zhuhai Yard, WBS Rev.K K01–K12.
 // Management selected: USD600 PERSON/day Onshore labour; NO separate per diem line.
-// 2 MGW-FAT days = estimating assumption; Rev.K does not establish FAT duration.
+// Six MGW-FAT witness days derived from four-MR 48h agenda, not mandated by source docs.
 // 12 Yard team-days = SUPERSEDED Rev05 comparison, NOT selected for new call-out.
 // Management proposal: 1 Senior Telecom Systems Integration Engineer, 7 Yard workdays,
 // one separate BKK-China-BKK trip (2 travel days), 1 optional Lump Sum. Rev.K does not stipulate 7 days.
@@ -9,16 +9,17 @@
 // All travel/insurance figures are PRE-AWARD SELL ALLOWANCES, NOT insurer/vendor quotes.
 // No VAT/duties, payroll Direct Cost or ADDVALUE margin invented.
 import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
+import {selectFourMrFatWbs0553} from "./fatWbsFourMr0553";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const r=ONSHORE_WORKING_SELL_RATE_0553;
 const assumptionRows=[
- ["FAT-STAFF","K01","China MGW OEM FAT — 2 ADDVALUE paid witnesses","person-day",4,r.thbPerPersonDay,"USER_APPROVED_RATE__2_FAT_DAYS_PROVISIONAL","Rev.K K01 (2 paid attendees; 1 unbilled standby). FAT duration 2 days ASSUMED; actual MGW schedule pending"],
+ ["FAT-STAFF","K01","China MGW OEM FAT — PM/Chief Engineer + Senior Telecom Engineer (2 paid witnesses)","person-day",12,r.thbPerPersonDay,"USER_APPROVED_RATE__2_FAT_DAYS_PROVISIONAL","4-MR detailed FAT WBS: 6 days × 2 paid witnesses, with one standby Field Telecom Specialist unbilled. MGW execution & signed ITP pending"],
  ["YARD-STAFF","K08-K12","Senior Telecom Systems Integration Engineer — on-call Yard configuration/integration support","person-day",7,r.thbPerPersonDay,"CONDITIONAL_SR_TELECOM_ENGINEER__7_WORKDAYS_LS","SPE §7.3.2 / §7.3.4: vendor site support at onshore rate when requested. One Sr Telecom Engineer for maximum seven working days; verify post-FAT approved config before changing anything."],
  ["YARD-TRAVEL-DAYS","K08-K12","Senior Telecom Engineer separate Yard trip — mobilization and demobilization labor","person-day",2,r.thbPerPersonDay,"YARD_CALL_OUT_CONDITIONAL","One Sr Telecom Engineer × 2 travel days; separate from FAT witness travel and counted once."],
  ["YARD-AIRFARE","K08-K12","BKK–China–BKK return airfare, separate Yard call-out","return ticket",1,15000,"YARD_CALL_OUT_CONDITIONAL","One Senior Engineer. Budget only, not a booked flight."],
  ["TRAVEL-DAYS","K01","BKK-China-BKK mobilization/demobilization labour counted ONCE","person-day",4,r.thbPerPersonDay,"REV05_CN01_CN11_TRAVEL_DAYS_TRANSFERRED_TO_FAT_VISIT","Rev05 12 Yard team-days included 2 travel team-days; base visitor travel counted once"],
  ["AIRFARE","K01","BKK–China–BKK round trip economy airfare, both staff","return ticket",2,15000,"MARKET_COMPARABLE_PLUS_BOOKING_ALLOWANCE","BKK–Guangzhou airline round-trip indicative fares ~THB8–20k; actual itinerary/FAT location not confirmed"],
- ["HOTEL","K01","China business hotel for FAT visit (3 nights per staff)","room-night",6,2500,"BUSINESS_HOTEL_BUDGETARY_ALLOWANCE","3 nights × 2 people = 6 room-nights; planning allowance only; exact cities/stay unknown"],
+ ["HOTEL","K01","China business hotel for six-day FAT visit (7 nights per staff)","room-night",14,2500,"BUSINESS_HOTEL_BUDGETARY_ALLOWANCE","7 nights × 2 people = 14 room-nights; six FAT witness days + travel, venue and check-in schedule provisional"],
  ["HOTEL-YARD","K08-K12","Senior Telecom Engineer hotel for separate 7-day Yard assignment","room-night",9,2500,"YARD_CALL_OUT_CONDITIONAL","9 hotel nights × one senior; separate from MGW FAT trip; vendor price unverified"],
  ["YARD-VISA","K08-K12","Additional visa/work permit reserve for separate Yard assignment","person",1,4000,"YARD_CALL_OUT_CONDITIONAL","Only if a second authorization/fee is legally required; conditional compliance allowance"],
  ["VISA","K01","Visa/work authorisation application reserve — applicability conditional","person",2,4000,"CONDITIONAL_COMPLIANCE_ALLOWANCE","Thai ordinary passports short visits may be visa-exempt; technical on-site work may require prior authorisation. Check actual activity/status before processing"],
@@ -31,7 +32,7 @@ const assumptionRows=[
 ];
 export const B9_CHINA_BUDGET_SOURCE_0553=Object.freeze({
  id:"B9-CHINA-REV-K-WORKING-SELL",sourceWbs:"Rev.K K01-K12 / Rev.L / Rev05 B9",
- crew:2,fatDaysEstimate:2,yardTeamDaysWorking:12,hotelNightsPerPerson:3,travelEvents:1,scenarioTravelEventsWithOptionalYard:2,legacyYardTeamDaysOnlyNotSelected:true,
+ crew:2,fatDaysEstimate:6,yardTeamDaysWorking:12,hotelNightsPerPerson:7,travelEvents:1,scenarioTravelEventsWithOptionalYard:2,legacyYardTeamDaysOnlyNotSelected:true,
  yardCallOutOnly:true,fatTravelTeamDays:2,yardActualOrStandbyTeamDays:10,
  selectedYardRole:"Senior Telecom Systems Integration Engineer",yardCallOutCrew:1,
  selectedYardWorkingDays:7,selectedYardTravelDays:2,selectedYardRoomNights:9,
@@ -42,6 +43,10 @@ export const B9_CHINA_BUDGET_SOURCE_0553=Object.freeze({
  fxSource:ONSHORE_WORKING_SELL_RATE_0553.source,
  rateUSDPerPersonDay:r.usdPerPersonDay,rateTHBPerPersonDay:r.thbPerPersonDay,
  perDiemSeparate:false,oneUnbilledStandbyExcluded:true,
+ fatWitnessRoles:["Project Manager / Chief Telecom Engineer","Senior Telecom Systems Integration Engineer"],
+ fatStandbyRole:"Field Telecom Specialist (unbilled standby)",
+ yardStandbyRole:"Field Telecom Specialist (unbilled standby if needed; travel expense must be tracked if deployed)",
+ commercialNoticePlanningDays:14,contractualBodNoticeDays:30,noticePrecedenceHold:true,
  priceClass:"FAT_BASE_PLUS_CONDITIONAL_YARD_SUPPORT_SEPARATE",
  directCostVerified:false,insuranceCoverVerified:false,visaRequirementVerified:false,
  releaseAllowed:false,expenseOwner:"B9",legacyWbsB9SellTHB:574560,
@@ -67,6 +72,8 @@ export const B9_CHINA_WORKING_ROWS_0553=Object.freeze(assumptionRows.map(([id,wb
 export function selectB9ChinaWorkingBudget0553(){
  const rows=B9_CHINA_WORKING_ROWS_0553;
  const source=B9_CHINA_BUDGET_SOURCE_0553;
+ const fatWbs=selectFourMrFatWbs0553();
+ if(fatWbs.estimatedFatWitnessDays!==source.fatDaysEstimate||fatWbs.estimatedRoomNightsPerWitness!==source.hotelNightsPerPerson)throw Error("B9 FAT duration/rooms not linked to four-MR WBS");
  if(new Set(rows.map(x=>x.expenseKey)).size!==rows.length)throw Error("Duplicate B9 expense item");
  if(rows.some(x=>x.costOwner!=="B9"||!Number.isFinite(x.workingSellTHB)||x.workingCostTHB!==null))
   throw Error("B9 missing price evidence or mixed cost/sell owner");
@@ -75,10 +82,10 @@ export function selectB9ChinaWorkingBudget0553(){
  const total=round(labor+travel);
  const base=round(rows.filter(x=>!x.optional).reduce((n,x)=>n+x.workingSellTHB,0));
  const conditional=round(rows.filter(x=>x.optional).reduce((n,x)=>n+x.workingSellTHB,0));
- if(base!==226200||conditional!==233600||total!==459800||rows.length!==16||source.perDiemSeparate)
+ if(base!==397400||conditional!==233600||total!==631000||rows.length!==16||source.perDiemSeparate)
   throw Error("B9 Rev.K budget/Per Diem/equipment duplicate error");
- return Object.freeze({...source,rows,workingSellTHB:base,conditionalYardSellTHB:conditional,
-  fullCombinedVisitScenarioTHB:total,laborWorkingSellTHB:151200,
-  travelAndInsuranceWorkingSellTHB:75000,qtyDerivedManDays:8,
+ return Object.freeze({...source,fatWbs,rows,workingSellTHB:base,conditionalYardSellTHB:conditional,
+  fullCombinedVisitScenarioTHB:total,laborWorkingSellTHB:302400,
+  travelAndInsuranceWorkingSellTHB:95000,qtyDerivedManDays:16,
   conditionalNotInBase:true,deltaVsLegacyTHB:round(base-source.legacyWbsB9SellTHB)});
 }
