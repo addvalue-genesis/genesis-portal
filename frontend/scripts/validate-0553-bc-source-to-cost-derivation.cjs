@@ -1,5 +1,5 @@
 // Source-bound B1–B14/C1–C2 engineering evidence; NO invented cost posting.
-// Protect project management's SAMTEL Bangkok FAT and all existing WBS sell amounts.
+// Historical Rev05 evidence is immutable audit source; active Rev.K B1/B3/B9 Working SELL is a separate projection.
 const assert=require("node:assert/strict"),path=require("node:path"),fs=require("node:fs");
 const babel=require("@babel/core");
 const root=path.resolve(__dirname,"../src");
@@ -19,6 +19,16 @@ const {FAT_EXECUTION_BASIS_0553}=from("data/fatExecutionBasis0553.js");
 const {BC_CUSTOMER_CODES_0553}=from("data/bcWorkingModuleRoutes0553.js");
 const original=JSON.stringify(derivePartBcWorkingWbs0553());
 const e=selectBcCostEvidenceDerivation0553(),bc=selectBcTurnkeyWorkingCost0553();
+const CURRENT_REV_K_WORKING_SELL_0553=Object.freeze({
+ B1:624030.26,B2:580000,B3:2443400,B4:null,
+ B5:311184,B6:307584,B7:30000,B8:30000,
+ B9:0,B10:123024.37,B11:128314.11,B12:null,
+ B13:22484.21,B14:null,C1:4049349.36,C2:721806.68
+});
+assert.equal(bc.knownWorkingSellTHB,4600020.95,"Current Rev.K Part B Base Working SELL");
+assert.equal(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB,397400,"FAT witness belongs only to B3");
+assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600,"B9 only optional Yard Specialist");
+assert.equal(bc.byCode.B9.workingSellTHB,0,"No B9 Base specialist attendance");
 assert.equal(e.moduleId,"bid.budget.working.bc");
 assert.equal(e.rows.length,16);
 assert.deepEqual(e.rows.map(x=>x.code),BC_CUSTOMER_CODES_0553);
@@ -43,10 +53,17 @@ for(const item of e.rows){
  const working=derivePartBcWorkingWbs0553().rows.find(r=>r.code===item.code);
  if(item.code==="B6")assert.equal(item.workingSellTHB,bc.byCode.B6.workingSellTHB);
  else assert.equal(item.workingSellTHB,working.sellTHB,item.code+" WBS evidence source");
- if(["B5","B10","B13","C1","C2"].includes(item.code)){
-  assert(Number.isFinite(bc.byCode[item.code].workingSellTHB),item.code+" budgetary working sell");
-  assert.equal(bc.byCode[item.code].directCostTHB,null,item.code+" sell must not become direct cost");
- }else assert.equal(item.workingSellTHB,bc.byCode[item.code].workingSellTHB,item.code+" canonical divergence");
+ // Do not equate historical source ledger SELL with current, management-selected SELL.
+ // The historical evidence row is a provenance record, NOT a price posting.
+ assert.equal(bc.byCode[item.code].workingSellTHB,CURRENT_REV_K_WORKING_SELL_0553[item.code],
+  item.code+" Rev.K current Working SELL divergence");
+ assert.equal(bc.byCode[item.code].directCostTHB,null,item.code+" current Working SELL must not become verified Direct Cost");
+ if(["B1","B3","B5","B6","B7","B9","B10","B11","B13","C1","C2"].includes(item.code))
+  assert.notEqual(bc.byCode[item.code].workingSellBasis,null,
+   item.code+" management budgetary working SELL requires an explicit source basis");
+ if(["B2","B8"].includes(item.code))
+  assert.equal(item.workingSellTHB,bc.byCode[item.code].workingSellTHB,
+   item.code+" source and current Working SELL should still reconcile");
  for(const line of item.lines){
   if(Number.isFinite(line.amountTHB))
    assert(!["APPROVED_DIRECT_COST","CUSTOMER_RELEASED_SELL"].includes(line.valueClass));
@@ -78,7 +95,10 @@ assert.equal(FAT_EXECUTION_BASIS_0553.yard.addvalueBaseCrew,2);
 assert.equal(JSON.stringify(derivePartBcWorkingWbs0553()),original);
 const ui=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 const detail=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-for(const snippet of ['setBcDetailCode','<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcDetailCode]}/>','data-component-key={item.moduleId}'])
+for(const snippet of ['setBcDetailCode',
+ '<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}/>',
+ '<BcCostEvidenceDetail0553 workingRow={item}/>',
+ 'data-component-key={item.moduleId}','group.rows.map(item=>'])
  assert(ui.includes(snippet),"Missing B/C 10.2 clickable working trace: "+snippet);
 for(const snippet of ['e.lines.map(', 'e.stages.map(', 'e.requirementRecords.map(', 'HISTORICAL_COST_PROXY_ONLY','NOT ESTABLISHED','e.requiredInputs.map('])
  assert(detail.includes(snippet),"Missing B/C drilldown or cost verification gate: "+snippet);
@@ -86,4 +106,4 @@ for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcCostEvidenc
  assert(babel.transformSync(fs.readFileSync(path.join(root,f),"utf8"),{
   babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0,
   "Babel JSX syntax invalid: "+f);
-console.log("PASS 0553 10.2 B1–B14/C1-C2: 16 cost-owner rows, 01–08 trace, B1 964 MH/historical proxy, B2 143/38 documents, B3 THB144,000 + THB1,965,600 WBS SELL, B6 4 MR FAT routes, B9 2-person supervision; no unsupported direct cost posting.");
+console.log("PASS 0553 10.2 16/16 Rev05 source proof separated from Rev.K CURRENT SELL: B1 THB624030.26 B3 THB2443400 incl MGW FAT THB397400, B9 Base THB0 (Yard LS THB233600 optional), Part B THB4600020.95; historical Bangkok FAT / Rev05 WBS audit only; verified direct cost remains null.");
