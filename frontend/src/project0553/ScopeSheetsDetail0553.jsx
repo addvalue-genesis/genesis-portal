@@ -4,6 +4,7 @@ import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {selectScopeSheet0553} from "./data/scopeSheetProjection0553";
 
 import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
+import {selectB9ChinaWorkingBudget0553} from "./data/b9ChinaWorkingBudget0553";
 import {selectScopeBcPriceAudit0553,SCOPE_BC_DETAIL_CODES_0553} from "./data/scopeBcPriceAudit0553";
 import {ScopeBcAnnexDetail0553} from "./ScopeBcAnnexDetail0553";
 import {ScopeCategoryTabs0553} from "./ScopeCategoryTabs0553";
@@ -165,6 +166,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
   <p className="p55-note"><strong>Selected sheet:</strong> {sheet} · <ComponentCopyId projectId="PJ2608-0553" componentKey={sheet==="Scope of supply"?"bid.budget.scope":"bid.budget.scope."+category[1].toLowerCase()}/> · Rev08 historical detail is reference only, not current vendor cost or an authorized sell price.</p>
   <p className="p55-note">{category[2]}</p>
   <p className="p55-note"><strong>Price basis:</strong> 10.2 B/C working SELL and validated COST (where present) shown separately from original Rev08 historical USD→THB references. Not additive and not a released quote.</p>
+  <p className="p55-note" data-component-key="bid.budget.scope.b9.optional-yard-ls"><strong>B9 OPTIONAL CUSTOMER OFFER — NOT INCLUDED IN BASE:</strong> 1 LS · Senior Telecom Systems Integration Engineer on-call Zhuhai Yard Configuration / Interface Integration / Troubleshooting / Yard SAT Technical Assistance; 7 working days + 2 travel days, inclusive of mobilisation, return journey, accommodation and technical-work cover. <strong>{cash(selectB9ChinaWorkingBudget0553().conditionalYardSellTHB)}</strong>. Trigger: written JUTAL/SAMTEL call-out / signed RACI. One Field Telecom Specialist standby unbilled (not automatically travelling). This is customer-line pricing authorized for proposal, not a signed/released quotation.</p>
   {sheet==="Scope of supply"?<div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Current Working Unit THB (A COST / B SELL)</th><th>Current Working Amount THB (A COST / B SELL)</th><th>Historical Rev08 Reference THB — NOT Cost</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
   <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
    const control=scopeBC.lines[id]||null;
