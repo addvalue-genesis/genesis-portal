@@ -28,7 +28,7 @@ const customerRequirements=Object.freeze({
  B3:"Inspection, testing, FAT, SAT and ITP-based certification scope",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
- B6:"Delivery logistics — CIF China port vs DDP JUTAL yard scope/Incoterm conflict; four-MR route through SAMTEL Bangkok FAT",
+ B6:"Delivery logistics — MGW DDP Zhuhai Yard via China OEM FAT; shipment/importer Incoterm responsibility to verify",
  B7:"Three-month vendor workshop storage / included-in-package check",
  B8:"Training for purchaser/end-user personnel",
  B9:"Specialist assistance and mobilization as specified",
@@ -43,9 +43,9 @@ const customerRequirements=Object.freeze({
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
 const executionDecisionByCode=Object.freeze({
- B3:"Bangkok SAMTEL combined Integrated FAT after OEM source pretests; 8 Thailand FAT team-days are still a working estimate",
- B6:"All four MR cargo routes pass through Bangkok FAT then JUTAL Nantong; MR0002 China-to-Thailand-to-China transport and import/re-export need separate cost",
- B9:"ADDVALUE two-person China yard supervision is distinct from Bangkok FAT; MGW is advisory only until separately contracted"
+ B3:"Rev.K MGW China OEM FAT belongs to B9; B3 working sell covers offshore SAT/SIT only (old Bangkok FAT THB144,000 removed)",
+ B6:"Rev.K MGW China OEM FAT followed by DDP Zhuhai Yard delivery; B6 owns cargo freight/customs only (not B9 staff travel)",
+ B9:"Rev.K ADDVALUE 2 China MGW FAT attendees and 2-person Zhuhai Yard supervision; THB budget includes travel, hotel, visa reserve and work/travel insurance once, no separate per diem"
 });
 
 export function selectBcTurnkeyWorkingCost0553(){
@@ -173,11 +173,11 @@ export function selectBcTurnkeyWorkingCost0553(){
    noDoubleCountRule:"One cost owner per requirement; no posting of historical Rev08 or OEM-included component without explicit exclusion proof",
    executionDecision:executionDecisionByCode[code]?Object.freeze({
     decisionId:FAT_EXECUTION_BASIS_0553.id,
-    status:FAT_EXECUTION_BASIS_0553.status,
+    status:(code==="B3"||code==="B6"||code==="B9")?"REV_K_CHINA_FAT_ZHUHAI_YARD_CURRENT__DAYS_VENUE_APPROVAL_OPEN":FAT_EXECUTION_BASIS_0553.status,
     summary:executionDecisionByCode[code],
     costState:FAT_EXECUTION_BASIS_0553.costState,
-    integratedFatLocation:FAT_EXECUTION_BASIS_0553.integratedFat.location,
-    finalYard:FAT_EXECUTION_BASIS_0553.yard.location
+    integratedFatLocation:(code==="B3"||code==="B6"||code==="B9")?"MGW Office, China (Rev.K; venue/city TBC)":FAT_EXECUTION_BASIS_0553.integratedFat.location,
+    finalYard:(code==="B3"||code==="B6"||code==="B9")?"JUTAL Zhuhai Yard, China":FAT_EXECUTION_BASIS_0553.yard.location
    }):null
   });
  });
