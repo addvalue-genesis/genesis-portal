@@ -14,7 +14,7 @@ assert.ok(model.rows.some(r=>r.id==="RQM-03"&&r.costOwner==="B9"&&/Yard SAT/i.te
 assert.ok(model.rows.some(r=>r.id==="RQM-15"&&r.costOwner==="B3"&&/SIT/i.test(r.activity)));
 assert.ok(model.rows.some(r=>r.id==="RQM-02"&&/30 vs 14/.test(r.gate)));
 assert.ok(model.rows.some(r=>r.id==="RQM-05"&&/TETRA/.test(r.gate)));
-assert.ok(model.rows.some(r=>r.id==="RQM-14"&&/IALA/.test(r.requiredResult)));
+assert.ok(model.rows.some(r=>r.id==="RQM-14"&&/IALA/.test(r.requirementRef)));
 for(const row of model.rows){
  assert.ok(row.wbs&&row.system&&row.requiredResult&&row.responsibility&&row.location&&row.deliverable&&row.requirementRef);
  assert.ok(row.sourceKeys.every(k=>Object.prototype.hasOwnProperty.call(model.sourceURLs,k)));
