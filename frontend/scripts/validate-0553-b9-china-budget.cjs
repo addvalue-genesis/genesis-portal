@@ -9,19 +9,24 @@ assert.equal(ctx.rate.thbPerPersonDay,18900);
 assert.equal(ctx.b9.workingSellTHB,226200); // Base FAT only
 assert.equal(ctx.b9.laborWorkingSellTHB,151200); // FAT 2 + shared travel 2 team-days
 assert.equal(ctx.b9.travelAndInsuranceWorkingSellTHB,75000);
-assert.equal(ctx.b9.rows.length,11);
-assert.equal(ctx.b9.conditionalYardSellTHB,445000);
-assert.equal(ctx.b9.fullCombinedVisitScenarioTHB,671200);
-assert.equal(ctx.b9.rows.filter(x=>x.optional).length,3);
+assert.equal(ctx.b9.rows.length,16);
+assert.equal(ctx.b9.conditionalYardSellTHB,233600);
+assert.equal(ctx.b9.fullCombinedVisitScenarioTHB,459800);
+assert.equal(ctx.b9.rows.filter(x=>x.optional).length,8);
 assert.equal(ctx.b9.rows.filter(x=>!x.optional).reduce((n,x)=>n+x.workingSellTHB,0),226200);
-assert.equal(ctx.b9.rows.filter(x=>x.optional).reduce((n,x)=>n+x.workingSellTHB,0),445000);
+assert.equal(ctx.b9.rows.filter(x=>x.optional).reduce((n,x)=>n+x.workingSellTHB,0),233600);
+assert.equal(ctx.b9.selectedYardRole,"Senior Telecom Systems Integration Engineer");
+assert.equal(ctx.b9.selectedYardWorkingDays,7);
+assert.equal(ctx.b9.yardCallOutCrew,1);
+assert.equal(ctx.b9.selectedYardTravelDays,2);
+assert.equal(ctx.b9.yardConditionalQuoteFormat,"ONE_LUMP_SUM_PACKAGE_ON_WRITTEN_CALL_OUT");
 assert.ok(!ctx.b9.rows.some(x=>/per.?diem/i.test(x.id+" "+x.description)),"Per Diem must not be a separate posted row");
 assert.ok(ctx.b9.rows.every(x=>x.costOwner==="B9"&&x.workingCostTHB===null),"Cross posting to B1/B3");
 assert.equal(ctx.b9.crew,2);
 assert.equal(ctx.b9.fatDaysEstimate,2);
 assert.equal(ctx.b9.yardTeamDaysWorking,12);
 assert.equal(ctx.b9.travelEvents,1);
-assert.equal(ctx.b9.yardActualOrStandbyTeamDays,10);
+assert.equal(ctx.b9.yardActualOrStandbyTeamDays,10); // Rev05 historical, NOT selected call-out
 assert.equal(ctx.b9.fatTravelTeamDays,2);
 assert.equal(ctx.b9.conditionalNotInBase,true);
 assert.equal(ctx.b3,1965600);
@@ -35,4 +40,4 @@ assert.equal(repricedB,4234390.69);
 const b3b9=ctx.b3+ctx.b9.workingSellTHB;
 assert.equal(b3b9,2191800);
 assert.equal(ctx.rate.B9ExistingWorkingSellOverrideAllowed,false,"Rate approval alone must not overwrite old WBS without separate Rev.K scope selection");
-process.stdout.write("PASS: B9 FAT Base THB226,200 + conditional Yard THB445,000; offshore B3 THB1,965,600; Part B Base THB4,234,390.69.\n");
+process.stdout.write("PASS: B9 FAT Base THB226,200 plus optional one Senior Telecom Engineer 7-day LS THB233,600 (separate trip); B3 unaffected, Part B Base THB4,234,390.69.\n");
