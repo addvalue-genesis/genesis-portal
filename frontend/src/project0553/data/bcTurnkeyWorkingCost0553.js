@@ -69,8 +69,8 @@ export function selectBcTurnkeyWorkingCost0553(){
  // stored inside the old B5 packing total. B5 uses packing-only THB 311,184.
  const b7StorageMonths=1;
  const b7LegacyStorageMonths=3;
- const b7WorkingSellTHB=round(b5PriceReference.nonAdditiveStorageTHB/b7LegacyStorageMonths*b7StorageMonths);
- if(b7WorkingSellTHB!==12631.58||b5PriceReference.amountTHB!==311184)
+ const b7WorkingSellTHB=30000; // Management-selected budgetary Working SELL for ONE month; vendor quote pending.
+ if(b7WorkingSellTHB!==30000||b5PriceReference.amountTHB!==311184)
   throw Error("B7 one-month reserve / B5 non-duplication reconciliation failed");
  const b10HistoricalUSD=REV08_BASELINE.summary.find(x=>x[0]==="B10")?.[2];
  const b10DetailUSD=(REV08_BASELINE.detail.B10||[]).reduce((sum,[,qty,unitUSD])=>sum+qty*unitUSD,0);
@@ -129,7 +129,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    sourceStatus:w.state,
    b11VendorFollowup:code==="B11"?Object.freeze({status:"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING",amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08 B11 itemized tools",verifiedDirectCost:false,releaseAllowed:false,verification:"Requote tools with MGW/OEM; deduct included Part A tooling before bid release"}):null,
    unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08",fxTHBPerUSD:31.5,pricingClass:"BUDGETARY_WORKING_SELL",verifiedDirectCost:false,sourceLines:spareBudget.byCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
-   b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:b5PriceReference.sourceRevision,originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
+   b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b10WorkingSellDecision:code==="B10"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b10WorkingSellTHB,source:"4-Scope of Supply.xlsx · Rev08 · B10",historicalUSD:b10HistoricalUSD,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"WORKING_SELL_ONLY"}):null,
    b5PriceReference:code==="B5"?b5PriceReference:null,
    b5WorkingSellDecision:code==="B5"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b5ApprovedSellTHB,source:b5PriceReference.sourceRevision,costOwner:"B5",excludedB7StorageTHB:b5PriceReference.nonAdditiveStorageTHB,verifiedDirectCost:false,customerReleaseAllowed:false}):null,
