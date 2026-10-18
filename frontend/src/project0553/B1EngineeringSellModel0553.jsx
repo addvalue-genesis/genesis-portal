@@ -27,12 +27,12 @@ export function B1EngineeringSellModel0553({workingRow}){
   <p className="p55-note">Method: 02 First Principles / GEQ-005; 04 MR requirement mapping; 05 engineering drawings and interfaces; 06 role-hours from Rev05 08_B1_ENGINEERING; 10.2 pricing scenario. 27 source WBS activities are the present workload baseline, NOT independently verified productivity quantities from the upstream modules. Validate those dependencies before customer release.</p>
   <div className="p55-metric-grid">
    <div><strong>Source WBS workload</strong><p>{mh} MH / {lines.length} activities</p><small>{sourceOk?"PASS source integrity":"ERROR — source mismatch"}</small></div>
-   <div><strong>Canonical B1 Working SELL</strong><p>{cash(workingRow.workingSellTHB)}</p><small>Rev05 baseline; unchanged</small></div>
+   <div><strong>Canonical B1 Working SELL</strong><p>{cash(workingRow.workingSellTHB)}</p><small>New B1 = repriced source Engineering + distinct Rev.K Office PM; historical rates in this panel for audit</small></div>
    <div><strong>Role-rate derived scenario</strong><p>{cash(scenario)}</p><small>{ready?"Calculated using historical role cost × office calibration; non-posting":"Rate incomplete"}</small></div>
-   <div><strong>Scenario − Baseline</strong><p>{ready?cash(round(scenario-workingRow.workingSellTHB)):"PENDING"}</p><small>Compare, do not auto-post</small></div>
+   <div><strong>Engineering-only scenario vs full current B1</strong><p>{ready?cash(round(scenario-workingRow.workingSellTHB)):"PENDING"}</p><small>Compare, do not auto-post</small></div>
   </div>
   <h4>1 — Source-backed role COST reference (THB/MH) × Office Commercial Factor</h4>
-  <p className="p55-note">Rates are prefilled from Rev05 01_COMMERCIAL_BASIS (historical direct-cost role seeds), multiplied by the source office commercial calibration factor 2.8228342959766093. They are NOT current verified payroll or approved rate cards. Editing a rate is an unsaved what-if scenario; canonical B1 THB 510,000 stays unchanged.</p>
+  <p className="p55-note">Rates are prefilled from Rev05 01_COMMERCIAL_BASIS (historical direct-cost role seeds), multiplied by the source office commercial calibration factor 2.8228342959766093. They are NOT current verified payroll or approved rate cards. Editing a rate is an unsaved what-if scenario; current canonical B1 Working Sell is controlled separately and not modified by this on-screen what-if editor.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
    <thead><tr><th>Role</th><th>Workload (MH)</th><th>Historical COST seed (THB/MH)</th><th>Calibrated SELL by role THB</th></tr></thead>
    <tbody>{ROLES.map(role=><tr key={role}><td><strong>{role}</strong></td><td>{mhByRole[role]}</td><td><input type="number" min="0" step="0.01" aria-label={role+" sell rate THB per MH"} style={{width:"100%",maxWidth:180}} placeholder="Source role cost seed" value={rates[role]} onChange={e=>setRates(v=>({...v,[role]:e.target.value}))}/></td><td>{ready?cash(round(mhByRole[role]*Number(rates[role]||0)*SOURCE_OFFICE_FACTOR)):"RATE PENDING"}</td></tr>)}
@@ -48,6 +48,6 @@ export function B1EngineeringSellModel0553({workingRow}){
     <tbody>{subset.map(x=><tr key={x.id}><td><strong>{x.name}</strong><small>{x.id}</small></td>{ROLES.map(role=><td key={role}>{x.roleMH?.[role]||"—"}</td>)}<td>{x.quantity}</td><td>{cash(x.scenarioSell)}</td><td><small>{x.sourceRef}</small><small>Rev05 role MH, engineering validation pending</small></td></tr>)}</tbody></table></div></td></tr>}</React.Fragment>})}
    <tr><td><strong>TOTAL B1 — ROLE RATE MODEL</strong></td><td>{lines.length}</td><td>{mh}</td><td><strong>{cash(scenario)}</strong></td><td>{sourceOk?"SOURCE PASS":"CHECK"}</td></tr>
    </tbody></table></div>
-  <p className="p55-note">Commercial control: a new rate scenario must be reviewed and explicitly promoted through a separate approved rate/version workflow before replacing the THB 510,000 canonical Working SELL. No automatic posting to Part B subtotal, Direct Cost or customer quotation; B2 document control and B3 FAT/SAT activities must not be counted twice.</p>
+  <p className="p55-note">Commercial control: a new rate scenario must be reviewed and explicitly promoted through a separate approved rate/version workflow before modifying the current canonical B1 Working SELL; THB 510,000 is Rev05 historical audit only. No automatic posting to Part B subtotal, Direct Cost or customer quotation; B2 document control and B3 FAT/SAT activities must not be counted twice.</p>
  </section>;
 }
