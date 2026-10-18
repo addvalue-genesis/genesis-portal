@@ -40,13 +40,13 @@ assert(d.costRouting.noDoubleCount.length>=4);
 for(const c of ["B3","B6","B9"]){
  const row=working.byCode[c];
  assert.equal(row.executionDecision?.decisionId,d.id,"Missing execution decision at "+c);
- assert.equal(row.executionDecision.integratedFatLocation,d.integratedFat.location);
+ assert.match(row.executionDecision.integratedFatLocation,/MGW.*China/); // Active Rev.K venue overrides historical BKK source only
  assert.equal(row.directCostTHB,null,"Execution location must not invent "+c+" direct cost");
 }
-assert.equal(working.byCode.B3.workingSellTHB,2109600);
-assert.equal(working.byCode.B9.workingSellTHB,574560);
+assert.equal(working.byCode.B3.workingSellTHB,2046000);
+assert.equal(working.byCode.B9.workingSellTHB,397400);
 assert.equal(working.byCode.B6.workingSellTHB,307584,"B6 approved pre-award logistics working sell; direct cost stays null");
-assert.equal(working.knownWorkingSellTHB,4568436.58,"Base Working Sell after B5/B6/B10/B13 budget additions");
+assert.equal(working.knownWorkingSellTHB,4600020.95,"Active Rev.K Part B Base including B1/B3/B9 replacement");
 assert.equal(working.knownWorkingSellTHB,Math.round(working.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((sum,r)=>sum+r.workingSellTHB,0)*100)/100,"Options excluded from Base");
 assert.equal(working.costComplete,false);
 assert.equal(working.releaseAllowed,false);
