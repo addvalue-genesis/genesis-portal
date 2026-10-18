@@ -14,7 +14,7 @@ export const B3_REQ_TRACE_SOURCES_0553=Object.freeze({
   "DTS3": "https://drive.google.com/file/d/1vHFKKvDtkNyXSzGOvKnVAr4azDjnl3WP/view",
   "DTS4": "https://drive.google.com/file/d/1NhRRBC5iaYsAblJdcaZgzw5P1u63f5V8/view"
 });
-export const B3_REQUIREMENT_WBS_TRACE_0553=Object.freeze([
+const B3_REQUIREMENT_WBS_SOURCE_0553=Object.freeze([
   {
     "id": "RQM-01",
     "moduleId": "bid.budget.working.bc.b3.requirement-trace.rqm-01",
@@ -477,6 +477,17 @@ export const B3_REQUIREMENT_WBS_TRACE_0553=Object.freeze([
     "postingAllowed": false
   }
 ]);
+// Contract must-have ≠ automatic ADDVALUE staffing. B9 onshore help is call-out only
+// except management-selected China FAT witness, subject to signed subcontract RACI.
+export const B3_REQUIREMENT_WBS_TRACE_0553=Object.freeze(B3_REQUIREMENT_WBS_SOURCE_0553.map(r=>Object.freeze({
+ ...r,
+ contractualRequirementState:r.requirementClass==="MUST"?"DELIVERABLE_MANDATORY_BY_CONTRACT":"WHEN_REQUESTED",
+ addvalueAttendanceState:r.costOwner!=="B9"?"CHECK_EXECUTION_RACI":
+  (r.id==="RQM-01"?"REVK_2_FAT_WITNESSES_PLANNED":"NO_UNCONDITIONAL_YARD_ATTENDANCE__CALL_OUT_OR_SIGNED_RACI_ONLY"),
+ b9CommercialTreatment:r.costOwner!=="B9"?null:
+  (r.id==="RQM-01"?"FAT_BASE__WITNESS":"YARD_SUPPORT_CONDITIONAL__NO_BASE_CHARGE"),
+ costPostingAuthority:"NO_CHARGE_WITHOUT_UNIQUE_EXPENSE_ID_AND_APPROVED_SCOPE"
+}))));
 export function selectB3RequirementWbsTrace0553(){
  const rows=B3_REQUIREMENT_WBS_TRACE_0553;
  if(rows.length!==19||new Set(rows.map(r=>r.id)).size!==rows.length)throw Error("B3 requirement trace identity/coverage gap");
@@ -488,6 +499,7 @@ export function selectB3RequirementWbsTrace0553(){
  }
  if(!rows.some(r=>r.id==="RQM-03"&&r.costOwner==="B9")||!rows.some(r=>r.id==="RQM-15"&&r.costOwner==="B3"))
   throw Error("Fabrication Yard SAT and Offshore SIT must be separate WBS/Cost Owners");
+ if(rows.some(x=>x.costOwner==="B9"&&x.id!=="RQM-01"&&x.b9CommercialTreatment!=="YARD_SUPPORT_CONDITIONAL__NO_BASE_CHARGE"))throw Error("B9 yard assistance incorrectly made mandatory price");
  return Object.freeze({moduleId:"bid.budget.working.bc.b3.requirement-trace",rows,
   B3:rows.filter(x=>x.costOwner==="B3"),B9:rows.filter(x=>x.costOwner==="B9"),
   external:rows.filter(x=>x.costOwner!=="B3"&&x.costOwner!=="B9"),
