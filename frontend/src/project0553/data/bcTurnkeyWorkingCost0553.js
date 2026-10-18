@@ -5,6 +5,8 @@
 // Source-line quantities are retained as requirements, not approved spare quantities.
 import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
 import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
+import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
+import {selectB3WorkingSellAfterChinaFat0553,B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553} from "./b3ChinaFatOwnership0553";
 import {LIFECYCLE_SPARES_0553} from "./lifecycleSpareScope0553";
 import {selectBcCostEvidenceDerivation0553} from "./bcCostEvidenceDerivation0553";
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
@@ -78,6 +80,7 @@ export function selectBcTurnkeyWorkingCost0553(){
  if(!Number.isFinite(b10HistoricalUSD)||Math.abs(b10HistoricalUSD-b10DetailUSD)>0.01)throw Error("B10 Rev08 source reconciliation failed");
  const b10WorkingSellTHB=round(b10HistoricalUSD*31.5);
  const spareBudget=selectUnifiedSpareConsumables0553();
+ const chinaB9=selectB9ChinaWorkingBudget0553();
  const spareBudgetCodes=new Set(["B10","B11","B13","C1","C2"]);
  const byCode=new Map(wbs.rows.map(row=>[row.code,row]));
  const rows=BC_CUSTOMER_CODES_0553.map(code=>{
@@ -91,6 +94,8 @@ export function selectBcTurnkeyWorkingCost0553(){
    LIFECYCLE_SPARES_0553.rows.filter(x=>activities.includes(x.activity)):[];
   const costEvidence=evidence.byCode[code];
   const b6BudgetarySellTHB=code==="B6"?costEvidence?.reconciliation?.historicalRev08TransportSellTHB:null;
+  const b9ChinaSellTHB=code==="B9"?chinaB9.workingSellTHB:null;
+  const b3CurrentSellTHB=code==="B3"?selectB3WorkingSellAfterChinaFat0553(w.sellTHB):null;
   const b5ApprovedSellTHB=code==="B5"?b5PriceReference.amountTHB:null;
   const b7ReserveSellTHB=code==="B7"?b7WorkingSellTHB:null;
   const b10ApprovedSellTHB=code==="B10"?b10WorkingSellTHB:null;
@@ -111,8 +116,8 @@ export function selectBcTurnkeyWorkingCost0553(){
    contractOwner:"SAMTEL",
    turnkeyEstimator:"ADDVALUE_FOR_SAMTEL",
    executionOwner:w.owner, // Execution responsibility never excludes turnkey scope.
-   qtyDriver:code==="B7"?b7StorageMonths:w.qty,unit:w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":w.driver,
-   sourceRevision:PART_BC_WBS_SOURCE_0553.revision,
+   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"?chinaB9.fatDaysEstimate+chinaB9.yardTeamDaysWorking:w.qty,unit:code==="B9"?"team-days (2 persons)":code==="B3"?"LS (offshore SAT/SIT; old BKK FAT excluded)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"MGW China FAT + JUTAL Yard labor and BKK-China-BKK travel/insurance; no separate per diem":code==="B3"?"Offshore SAT/SIT only; Rev05 Bangkok FAT THB 144,000 transferred out to B9 China FAT":w.driver,
+   sourceRevision:(code==="B3"||code==="B9")?"Rev.K 2026-10-18 current FAT ownership + Rev05 source bridge":PART_BC_WBS_SOURCE_0553.revision,
    sourceUrl:PART_BC_WBS_SOURCE_0553.url,
    requirementRows:requirementRows.map(r=>({
     sourceId:r.id,site:r.wp,system:r.system,activity:r.activity,
@@ -120,19 +125,21 @@ export function selectBcTurnkeyWorkingCost0553(){
     sourceStatus:r.priceStatus
    })),
    requirementCount:requirementRows.length,
-   workingSellTHB:Number.isFinite(spareSellTHB)?spareSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b7ReserveSellTHB)?b7ReserveSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
-   workingSellBasis:Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b7ReserveSellTHB)?"ONE_MONTH_CONDITIONAL_STORAGE_RESERVE_FROM_SEPARATED_REV09_B7_NON_ADDITIVE":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
+   workingSellTHB:Number.isFinite(b9ChinaSellTHB)?b9ChinaSellTHB:Number.isFinite(b3CurrentSellTHB)?b3CurrentSellTHB:Number.isFinite(spareSellTHB)?spareSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b7ReserveSellTHB)?b7ReserveSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
+   workingSellBasis:Number.isFinite(b9ChinaSellTHB)?"REV_K_CHINA_FAT_YARD_TRAVEL_INSURANCE_LABOR_USD600_NO_PER_DIEM_ESTIMATE":Number.isFinite(b3CurrentSellTHB)?"REV_K_OFFSHORE_ONLY_BKK_FAT_144000_REMOVED_TO_B9":Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b7ReserveSellTHB)?"ONE_MONTH_CONDITIONAL_STORAGE_RESERVE_FROM_SEPARATED_REV09_B7_NON_ADDITIVE":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
    directCostTHB:null, // No controlled source-rate x quantity internal ledger yet.
    riskCostTHB:null,
    commercialSellTHB:null, // A customer price is not the existing WBS sell reference.
-   priceStatus:Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b7ReserveSellTHB)?"BUDGETARY_ONE_MONTH_STORAGE_RESERVE_CONDITIONAL_VENDOR_RECONFIRM":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
+   priceStatus:Number.isFinite(b9ChinaSellTHB)?"PRE_AWARD_B9_BUDGETARY_WORKING_SELL_FAT_DURATION_TRAVEL_INSURANCE_QUOTES_OPEN":Number.isFinite(b3CurrentSellTHB)?"WORKING_SELL_B3_OFFSHORE_ONLY_FAT_SCOPE_DEDUCTED":Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b7ReserveSellTHB)?"BUDGETARY_ONE_MONTH_STORAGE_RESERVE_CONDITIONAL_VENDOR_RECONFIRM":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
    b11VendorFollowup:code==="B11"?Object.freeze({status:"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING",amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08 B11 itemized tools",verifiedDirectCost:false,releaseAllowed:false,verification:"Requote tools with MGW/OEM; deduct included Part A tooling before bid release"}):null,
    unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08",fxTHBPerUSD:31.5,pricingClass:"BUDGETARY_WORKING_SELL",verifiedDirectCost:false,sourceLines:spareBudget.byCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
+   b3FatOwnerTransfer:code==="B3"?Object.freeze({...B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553,baseSourceSellTHB:w.sellTHB,currentWorkingSellTHB:b3CurrentSellTHB}):null,
+   b9ChinaBudget:code==="B9"?chinaB9:null,
    b9OnshoreRateReview:code==="B9"?Object.freeze({
     source:ONSHORE_WORKING_SELL_RATE_0553.source,
-    status:"MANAGEMENT_APPROVED_ONSHORE_PERSON_DAY_RATE__REPRICE_NOT_POSTED",
+    status:"MANAGEMENT_APPROVED_ONSHORE_PERSON_DAY_RATE__B9_BUDGET_REPRICED_REV_K",
     perPersonUSDPerDay:ONSHORE_WORKING_SELL_RATE_0553.usdPerPersonDay,
     workingFX:ONSHORE_WORKING_SELL_RATE_0553.thbPerUsd,
     perPersonTHBPerDay:ONSHORE_WORKING_SELL_RATE_0553.thbPerPersonDay,
@@ -140,9 +147,11 @@ export function selectBcTurnkeyWorkingCost0553(){
     laborOnlyTeamTHBPerDay:ONSHORE_WORKING_SELL_RATE_0553.thbPerPersonDay*2,
     previousChinaTeamDaySellTHB:47880,
     originalB9WorkingSellTHB:w.sellTHB,
+    repricedWorkingSellTHB:chinaB9.workingSellTHB,
+    chinaFATandYardDays:chinaB9.fatDaysEstimate+chinaB9.yardTeamDaysWorking,
     perDiemIncluded:false,travelIncluded:false,accommodationIncluded:false,visaIncluded:false,
     costOwner:"B9",releaseAllowed:false,
-    pricingGate:"Confirm China FAT and yard team-day allocation; separate per diem/travel and shared trip before replacing B9 sell"
+    pricingGate:"B9 repriced as provisional Working SELL; confirm MGW FAT 2 days, 12 yard days, one combined trip and insured onshore work before customer release"
    }):null,
    b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b10WorkingSellDecision:code==="B10"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b10WorkingSellTHB,source:"4-Scope of Supply.xlsx · Rev08 · B10",historicalUSD:b10HistoricalUSD,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"WORKING_SELL_ONLY"}):null,
@@ -175,7 +184,7 @@ export function selectBcTurnkeyWorkingCost0553(){
  const byCodeOutput=Object.fromEntries(rows.map(r=>[r.code,r]));
  const knownWorkingSellTHB=round(rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
   .reduce((sum,r)=>sum+r.workingSellTHB,0));
- if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB+rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB+rows.find(r=>r.code==="B10").workingSellTHB+rows.find(r=>r.code==="B11").workingSellTHB+rows.find(r=>r.code==="B13").workingSellTHB+rows.find(r=>r.code==="B7").workingSellTHB))>0.01)
+ if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB + (chinaB9.workingSellTHB - wbs.rows.find(r=>r.code==="B9").sellTHB) - B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553.amountTHB +rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB+rows.find(r=>r.code==="B10").workingSellTHB+rows.find(r=>r.code==="B11").workingSellTHB+rows.find(r=>r.code==="B13").workingSellTHB+rows.find(r=>r.code==="B7").workingSellTHB))>0.01)
   throw Error("B WBS working sell reference reconciliation failed");
  // Source-price coverage is not cost completeness.
  return Object.freeze({
@@ -184,6 +193,8 @@ export function selectBcTurnkeyWorkingCost0553(){
   rows,byCode:byCodeOutput,
   knownWorkingSellTHB,
   workingSellB6BudgetaryTHB:rows.find(r=>r.code==="B6").workingSellTHB,
+  workingSellB9ChinaBudgetTHB:chinaB9.workingSellTHB,
+  workingSellB3OffshoreOnlyTHB:rows.find(r=>r.code==="B3").workingSellTHB,
   workingSellB5ApprovedTHB:rows.find(r=>r.code==="B5").workingSellTHB,
   workingSellB10ApprovedTHB:rows.find(r=>r.code==="B10").workingSellTHB,
   workingSellB11BudgetaryTHB:rows.find(r=>r.code==="B11").workingSellTHB,
