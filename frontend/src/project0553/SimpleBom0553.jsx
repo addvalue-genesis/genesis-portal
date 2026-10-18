@@ -1,4 +1,5 @@
 import {UnifiedMrLocationTable0553} from "./UnifiedMrLocationTable0553";
+import {compareAEquipmentToLocation0553} from "./data/workingBomAggregation0553";
 import {LocationReplicationAudit0553} from "./LocationReplicationAudit0553";
 import {Mr0003Mr0004LocationReview0553} from "./Mr0003Mr0004LocationReview0553";
 import {deriveZWP20SiteCost0553} from "./data/zwp20SiteCost0553";
@@ -34,6 +35,20 @@ import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom"
 export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB"}){
  const zwp20Cost=deriveZWP20SiteCost0553();
  const wpSystemBulk=deriveWpSystemBulkBudget0553();
+ // Read-only ALL-MR subtotal from the exact System x Location x MTO projection.
+ // A5 is already attributed inside MR0001; never add it twice.
+ const allMrWorking=compareAEquipmentToLocation0553();
+ const allMrFx=Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0?fx.thbPerUsd:null;
+ const allMrRows=allMrWorking.map(r=>{
+  const other=Object.keys(r.currencies).filter(c=>c!=="THB"&&c!=="USD");
+  const amount=other.length||r.orphanCurrency||((r.currencies.USD||0)&&!allMrFx)?null:
+   Math.round(((r.currencies.THB||0)+(r.currencies.USD||0)*(allMrFx||0))*100)/100;
+  return {...r,amount};
+ });
+ const allMrTotal=allMrRows.every(r=>Number.isFinite(r.amount))?
+  Math.round(allMrRows.reduce((n,r)=>n+r.amount,0)*100)/100:null;
+ const allMrUnresolved=allMrRows.reduce((n,r)=>n+r.unresolved,0);
+
  const dtrsRfiSites=deriveDtrsRfiBudget0553();
  const raconBudgetSites=deriveRaconTerminationBudget0553();
  const lifecycleLedger=deriveSevenLocationCostLedger0553();
@@ -222,6 +237,16 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     ...(system==="MR-0001"?[{key:"vendor",label:"Vendor / Company",type:"select",value:vendor,onChange:setVendor,
      options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}]:[])
    ]}/>
+  <section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.all-mr-summary">
+   <h4>All Locations — MR0001–MR0004 Working BOM Summary (THB)</h4>
+   <p className="p55-note">Same canonical counted MTO line projection as individual MR views. Equipment/Bulk working cost evidence only; not customer Working Sell. MR0003 includes preliminary scenario evidence. A5 is included in MR0001 and is NOT added again. Unresolved lines are not zero.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
+    <thead><tr><th>Part A</th><th>MR</th><th>Counted lines</th><th>Unresolved lines</th><th>Allocated Working THB</th><th>Evidence</th></tr></thead>
+    <tbody>{allMrRows.map(r=><tr key={r.mr}><td>{r.customerLine}</td><td>{r.mr}</td><td>{r.priced}</td><td>{r.unresolved}</td><td className="is-number">{Number.isFinite(r.amount)?thbMoney(r.amount,"THB"):"FX / currency reconciliation required"}</td><td>{r.scenario?"Scenario/reference — NOT APPROVED":"Working ledger — NOT RELEASED"}</td></tr>)}
+     <tr><td colSpan={4}><strong>TOTAL A1–A4 (known allocated working cost only)</strong></td><td className="is-number"><strong>{Number.isFinite(allMrTotal)?thbMoney(allMrTotal,"THB"):"NOT ESTABLISHED"}</strong></td><td>{allMrUnresolved} unresolved lines · A5 NON-ADDITIVE</td></tr>
+    </tbody></table></div>
+   <p className="p55-note">FX: {allMrFx??"required"} THB/USD · Source: compareAEquipmentToLocation0553 → selectWorkingBomProjection0553. This partial subtotal is not a complete bid value, and no margin has been applied.</p>
+  </section>
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"10.1.1.3 — System × Location × MTO — "+system+" / "+(site==="ALL"?"All Locations":site)} description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification. Context and Filters support this work; they are not approval gates." defaultOpen>
   {["MR-0002","MR-0003","MR-0004"].includes(system)?<UnifiedMrLocationTable0553 mr={system} site={site} fx={fx}/>:<>
   <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
