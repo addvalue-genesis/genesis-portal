@@ -110,12 +110,12 @@ export function BcCostEvidenceDetail0553({workingRow}){
    <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Legacy engineering baseline ONLY; not approved indirect PM ledger total":e.code==="B3"||e.code==="B9"?"Rev.K current; B9 base excludes conditional Yard call-out. Rev05 is audit only":"Working source estimate"}</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
-  {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Confirm the four MR legs through Bangkok FAT and JUTAL Nantong.</p>}
+  {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Reconcile all four MR cargo legs against current MGW China FAT and DDP JUTAL Zhuhai Yard; Bangkok/Nantong are historical Rev05 routes only.</p>}
   {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
    <h4>B9 — Onshore Labor Working SELL Rate (Management Decision)</h4>
    <div className="p55-metric-grid">
     <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
-    <div><strong>2-Person Team Labor Only</strong><p>THB {workingRow.b9OnshoreRateReview.laborOnlyTeamTHBPerDay.toLocaleString("en-US")}</p><small>Excludes per diem, flights, hotels, visa and local travel</small></div>
+    <div><strong>FAT Witness Team Rate (2 persons)</strong><p>THB {workingRow.b9OnshoreRateReview.laborOnlyTeamTHBPerDay.toLocaleString("en-US")}</p><small>Rate excludes flights, hotels, visa and local travel; no separately priced per diem</small></div>
     <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>Rev.K FAT witness/travel only in Base. Yard Call-out conditional, not included. Vendor quotes pending</small></div>
    </div>
    <p className="p55-note">MGW China FAT and JUTAL Yard belong exclusively to B9 once per person/trip. USD 600/person-day replaces the old mixed labor/per-diem pricing. No additional per diem; new airfare, hotel, visa, transfers, travel and occupational insurance are separately included in B9 as provisional Working Sell allowances. No booking in B1 or B3.</p>
@@ -142,7 +142,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
    </table></div>
    <details style={{marginTop:12}}><summary>รายละเอียดขอบเขตและการป้องกันคิดราคาซ้ำ</summary>
     <p className="p55-note">B1 เป็นเจ้าของงานตรวจเนื้อหาทางเทคนิคและการประสานงานโครงการ รวมถึง Regulatory/Permit support เมื่อมีหลักฐานค่าใช้จ่าย ส่วน B2 จัดการเอกสาร VDRL, transmittal, revision tracking และ final dossier ไม่คิดค่าจัดทำเนื้อหาทางเทคนิคซ้ำ</p>
-    <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; FAT/SAT execution อยู่ B3; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่า licence/visa/official fees ที่ยังไม่มีราคาไม่ถือว่ารวมอยู่ใน B1 THB 510,000 แล้ว</p>
+    <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; Offshore SAT/SIT execution อยู่ B3; MGW China FAT witness/conditional Yard Senior Engineer อยู่ B9; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่า licence/visa/official fees ที่ยังไม่มีราคาไม่ถือว่ารวมอยู่ใน B1 THB 510,000 แล้ว</p>
    </details>
   </section>}
   {e.code==="B1"&&<B1RevKMilestoneBudget0553/>}
