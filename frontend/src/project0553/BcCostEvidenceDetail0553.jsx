@@ -4,6 +4,7 @@ import {selectBcWorkCostLines0553} from "./data/bcWorkCostLines0553";
 import {B1EngineeringSellModel0553} from "./B1EngineeringSellModel0553";
 import {selectB1ProjectExpenseLedger0553} from "./data/b1IndirectCostLedger0553";
 import {B1RevKMilestoneBudget0553} from "./B1RevKMilestoneBudget0553";
+import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
 // imply that historical payroll cost or the WBS SELL is verified direct COST.
@@ -104,7 +105,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
    <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
-   <div><strong>WBS Working SELL (THB)</strong><p>{thb(e.workingSellTHB)}</p><small>{e.code==="B1"?"Legacy engineering baseline ONLY; not approved indirect PM ledger total":"อ้างอิง Rev05 เท่านั้น"}</small></div>
+   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Legacy engineering baseline ONLY; not approved indirect PM ledger total":e.code==="B3"||e.code==="B9"?"Rev.K current, Rev05 old evidence is audit only":"Working source estimate"}</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Confirm the four MR legs through Bangkok FAT and JUTAL Nantong.</p>}
@@ -113,10 +114,12 @@ export function BcCostEvidenceDetail0553({workingRow}){
    <div className="p55-metric-grid">
     <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
     <div><strong>2-Person Team Labor Only</strong><p>THB {workingRow.b9OnshoreRateReview.laborOnlyTeamTHBPerDay.toLocaleString("en-US")}</p><small>Excludes per diem, flights, hotels, visa and local travel</small></div>
-    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>Unchanged Rev05 source until FAT/Yard days and allowances reconciled</small></div>
+    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>Rev.K working budget incl. labor/travel/insurance; vendor quotes pending</small></div>
    </div>
-   <p className="p55-note">MGW China FAT staff and JUTAL Yard onshore specialists belong to B9 once per person/trip. New USD 600 per person-day labor rate is management-selected; the previous B9 quote used a different team labor/per-diem structure. Do not overwrite the B9 subtotal, duplicate shared travel or charge these onshore services again to B1.</p>
+   <p className="p55-note">MGW China FAT and JUTAL Yard belong exclusively to B9 once per person/trip. USD 600/person-day replaces the old mixed labor/per-diem pricing. No additional per diem; new airfare, hotel, visa, transfers, travel and occupational insurance are separately included in B9 as provisional Working Sell allowances. No booking in B1 or B3.</p>
   </section>}
+  {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget}/>}
+  {e.code==="B3"&&workingRow.b3FatOwnerTransfer&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b3.fat-owner-transfer" style={{padding:12,marginTop:12}}><h4>B3 — Rev.K FAT Cost Owner Reconciliation</h4><p className="p55-note">Rev05 Bangkok FAT allocation <strong>THB {workingRow.b3FatOwnerTransfer.amountTHB.toLocaleString("en-US")}</strong> is removed from B3. MGW China FAT labor/travel is now in B9 once. B3 Working Sell remains for Offshore SAT/SIT only: <strong>{thb(workingRow.workingSellTHB)}</strong>. FAT source references in the old WBS remain evidence only, not additive current Working Sell.</p></section>}
   <p className="p55-note">SOURCE: <a href={e.sourceUrl} target="_blank" rel="noreferrer">{e.sourceSheet} · {e.sourceRevision}</a>. ต้องใช้ Internal Rate Card / Vendor Rate ที่ควบคุมได้ก่อนคำนวณ Direct Cost</p>
   {(e.code==="B1"||e.code==="B2")&&<section className="p55-panel" data-component-key={"bid.budget.working.bc."+e.code.toLowerCase()+".ownership-boundary"} style={{padding:16,marginTop:12}}>
    <h4>ขอบเขต B1 และ B2 ที่ควรแยก</h4>
