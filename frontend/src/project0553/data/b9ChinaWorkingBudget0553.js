@@ -44,7 +44,7 @@ export const B9_CHINA_WORKING_ROWS_0553=Object.freeze(assumptionRows.map(([id,wb
  workingSellTHB:round(qty*rateTHB),workingCostTHB:null,
  costOwner:"B9",expenseKey:"B9-REV-K-"+id,
  rateAuthority:["FAT-STAFF","YARD-STAFF"].includes(id)?r.source:"CFO_PRE_AWARD_ESTIMATOR_ALLOWANCE__2026_10_18",
- status,evidence,optional:true===false
+ status,evidence,optional:false
 })));
 export function selectB9ChinaWorkingBudget0553(){
  const rows=B9_CHINA_WORKING_ROWS_0553;
