@@ -30,7 +30,7 @@ const customerRequirements=Object.freeze({
  B3:"Offshore SAT/SIT 40 working days × 2 specialists + temporary VeEX rental; MGW FAT in B9",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
- B6:"Delivery logistics — MGW DDP Zhuhai Yard via China OEM FAT; shipment/importer Incoterm responsibility to verify",
+ B6:"Delivery logistics — MGW to JUTAL Zhuhai Yard; JUTAL coordinates customs/import/export, legal importer and Incoterm payer to confirm",
  B7:"Three-month vendor workshop storage / included-in-package check",
  B8:"Training for purchaser/end-user personnel",
  B9:"Specialist assistance and mobilization as specified",
@@ -46,7 +46,7 @@ const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
 const executionDecisionByCode=Object.freeze({
  B3:"Rev.K offshore 40 working days × 2 specialists at USD800/person-day; VeEX 30-day rental in B3; MGW FAT belongs exclusively to B9",
- B6:"Rev.K MGW China OEM FAT followed by DDP Zhuhai Yard delivery; B6 owns cargo freight/customs only (not B9 staff travel)",
+ B6:"Rev.K MGW China FAT followed by delivery through JUTAL Zhuhai; JUTAL coordinates import/export customs, actual importer of record and DDP cost bearer to verify; B6 cargo only",
  B9:"Rev.K Base: two ADDVALUE MGW China FAT witnesses and one FAT trip. Optional: one Senior Telecom Systems Integration Engineer, seven Zhuhai Yard working days, separate trip and 1 LS upon written call-out. Yard LS excluded from Base; no separate per diem"
 });
 
@@ -181,11 +181,11 @@ export function selectBcTurnkeyWorkingCost0553(){
    sourceOwnership:"CUSTOMER_REQUIREMENT_TO_WORKING_SOURCE",
    noDoubleCountRule:"One cost owner per requirement; no posting of historical Rev08 or OEM-included component without explicit exclusion proof",
    executionDecision:executionDecisionByCode[code]?Object.freeze({
-    decisionId:FAT_EXECUTION_BASIS_0553.id,
+    decisionId:"REV_K_MGW_FOUR_MR_FAT_JUTAL_ZHUHAI_20261018",legacyDecisionId:FAT_EXECUTION_BASIS_0553.id,
     status:(code==="B3"||code==="B6"||code==="B9")?"REV_K_CHINA_FAT_ZHUHAI_YARD_CURRENT__DAYS_VENUE_APPROVAL_OPEN":FAT_EXECUTION_BASIS_0553.status,
     summary:executionDecisionByCode[code],
     costState:FAT_EXECUTION_BASIS_0553.costState,
-    integratedFatLocation:(code==="B3"||code==="B6"||code==="B9")?"MGW Office, China (Rev.K; venue/city TBC)":FAT_EXECUTION_BASIS_0553.integratedFat.location,
+    integratedFatLocation:(code==="B3"||code==="B6"||code==="B9")?"MGW nominated FAT facility, China (city TBC; 6 witness-day planning)":FAT_EXECUTION_BASIS_0553.integratedFat.location,
     finalYard:(code==="B3"||code==="B6"||code==="B9")?"JUTAL Zhuhai Yard, China":FAT_EXECUTION_BASIS_0553.yard.location
    }):null
   });
