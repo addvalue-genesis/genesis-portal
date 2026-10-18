@@ -1,76 +1,112 @@
-// PJ2608-0553 / Rev.K B1-B3-B9 Activity-Based Commercial Cost Control.
-// READ ONLY: this is a reconciliation/crosswalk, not a new cost or SELL posting.
-// Source hierarchy: BOD-C2 + DTS-C1 + SPE-C2 + MR-C1 -> Rev.K -> Activity/Owner -> Ledger.
-import {selectB1RevKMilestoneCoverage0553} from "./b1RevKMilestoneCoverage0553";
+// PJ2608-0553 / READ-ONLY CFO bridge from current 10.2 B1/B3/B9 to source WBS.
+// A current budget component is shown once. This overlay NEVER posts extra sell.
+// Evidence: BOD-C2 + SPE-C2 + DTS-C1 + MR1..4 -> Rev.K -> role/owner/qty -> SELL.
+// True internal Direct Cost remains absent until verified payroll/third party rates.
+import {selectB1ActivityWorkingSell0553} from "./b1ActivityWorkingSell0553";
+import {selectB3FortyDayWorkingSell0553} from "./b3FortyDayWorkingSell0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
-
+import {selectFourMrFatWbs0553} from "./fatWbsFourMr0553";
 const roundRevKAbc0553=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function selectRevKAbcOwnershipControl0553(working){
- if(!working?.byCode)throw Error("Rev.K ABC requires canonical 10.2 Working Sell projection");
- const b1=selectB1RevKMilestoneCoverage0553();
+ if(!working?.byCode)throw Error("Rev.K ABC needs current canonical 10.2 Working Sell");
+ const b1=selectB1ActivityWorkingSell0553();
+ const b3=selectB3FortyDayWorkingSell0553();
  const trace=selectB3RequirementWbsTrace0553();
  const b9=selectB9ChinaWorkingBudget0553();
+ const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
- if(current.B1!==510000||current.B3!==1965600||current.B9!==226200||working.knownWorkingSellTHB!==4234390.69)
-  throw Error("Rev.K ABC canonical B1/B3/B9/Part B Working Sell diverged");
+ if(current.B1!==b1.workingSellTHB||current.B3!==b3.workingSellTHB||current.B9!==b9.workingSellTHB||
+    working.knownWorkingSellTHB!==4600020.95)
+  throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))
-  throw Error("Rev.K B9 customer Working Sell must display one FAT Base LS; Yard LS separate");
- const pmRateTHBPerHour=b1.rate.thbPerPersonDay/8;
- const pmEvents=b1.rows.filter(x=>x.chargeableHere).map(x=>Object.freeze({
-  id:"ABC-"+x.chargeEventKey,wbs:x.stage,owner:"B1",costObject:"OFFICE_PM_EVENT",
-  activity:x.what,site:"Office / management",source:x.deliverable,
-  quantity:x.planningPmHours,unit:"MH",workingSellRateTHB:pmRateTHBPerHour,
-  modeledSellTHB:roundRevKAbc0553(x.planningPmHours*pmRateTHBPerHour),directCostTHB:null,
-  posting:"NON_POSTING_PROXY__INSIDE_UNCHANGED_B1_BASELINE",chargeKey:x.chargeEventKey
+  throw Error("B9 current Base and optional Yard must be separate 1 LS");
+ const b1Engineering=b1.engineeringRows.map(x=>Object.freeze({
+  id:"ABC-"+x.id,wbs:"K00 engineering / "+x.group,owner:"B1",costObject:"ENGINEERING_ROLE_MH",
+  activity:x.activity,site:"Office engineering",source:"Rev05 08_B1_ENGINEERING; MR/DTS/BOD",
+  quantity:x.quantityMH,unit:"MH",workingSellRateTHB:null,
+  modeledSellTHB:x.workingSellTHB,directCostTHB:null,
+  posting:"INCLUDED_IN_CANONICAL_B1_SELL__NOT_ADDITIVE",chargeKey:x.id
  }));
+ const pmEvents=b1.pmRows.map(x=>Object.freeze({
+  id:"ABC-"+x.id,wbs:x.wbs,owner:"B1",costObject:"OFFICE_PM_EVENT",
+  activity:x.activity,site:"Office / remote management",source:x.requirement,
+  quantity:x.quantityMH,unit:"MH",workingSellRateTHB:x.workingSellRateTHB,
+  modeledSellTHB:x.workingSellTHB,directCostTHB:null,
+  posting:x.quantityMH===0?"EXCLUDED_K00_TECHNICAL_KICKOFF_OVERLAP":"INCLUDED_IN_CANONICAL_B1_SELL__NOT_ADDITIVE",
+  chargeKey:x.id
+ }));
+ const satSiteLines=b3.rows.map(x=>Object.freeze({
+  id:"ABC-"+x.id,wbs:x.wbs,owner:"B3",costObject:"OFFSHORE_SITE_TEAM_DAY",
+  activity:x.reason,site:x.site,source:x.mr,
+  quantity:x.days,unit:"two-person team workday",workingSellRateTHB:2*800*31.5,
+  modeledSellTHB:x.workingSellTHB,directCostTHB:null,
+  posting:"INCLUDED_IN_B3_40DAY_WORKING_SELL__NOT_ADDITIVE",chargeKey:x.id
+ }));
+ const satTool=Object.freeze({
+  id:"ABC-B3-VEEX",wbs:"K16",owner:"B3",costObject:"TEMPORARY_TEST_TOOL_RENTAL",
+  activity:"VeEX VePAL MX100+ test instrument 30-day rental",site:"Offshore test campaign",
+  source:b3.veex.rateSource,quantity:30,unit:"rental-day",workingSellRateTHB:1000,
+  modeledSellTHB:30000,directCostTHB:null,
+  posting:"INCLUDED_IN_B3_SELL__NOT_B11_SPECIAL_TOOL",chargeKey:"B3-VEEX-MX100"
+ });
  const satObligations=trace.B3.map(x=>Object.freeze({
-  id:"ABC-"+x.id,wbs:x.wbs,owner:"B3",costObject:"TEST_REQUIREMENT_NOT_EXPENSE",
+  id:"ABC-"+x.id,wbs:x.wbs,owner:"B3",costObject:"TECHNICAL_REQUIREMENT_ONLY",
   activity:x.activity,site:x.location,source:x.requirementRef,
-  quantity:null,unit:"TEST_ID_SITE_TAG_PENDING",workingSellRateTHB:null,modeledSellTHB:null,directCostTHB:null,
-  posting:"NON_POSTING_REQUIREMENT__B3_SELL_IS_AGGREGATE",chargeKey:null
+  quantity:null,unit:"TAG/Test-ID pending",workingSellRateTHB:null,modeledSellTHB:null,directCostTHB:null,
+  posting:"NO_SECOND_SELL__COVERED_BY_B3_SITE_TIMEBOXES",chargeKey:null
+ }));
+ const fatTasks=fat.rows.map(x=>Object.freeze({
+  id:"ABC-"+x.id,wbs:"K01/"+x.day,owner:"A",costObject:"OEM_FAT_TECHNICAL_TEST",
+  activity:x.activity,site:"MGW facility China",source:x.requirement,
+  quantity:x.hours,unit:"agenda hour",workingSellRateTHB:null,modeledSellTHB:null,directCostTHB:null,
+  posting:"OEM_EXECUTION_IN_A__B9_WITNESS_ONLY",chargeKey:null
  }));
  const chinaExpenses=b9.rows.map(x=>Object.freeze({
   id:"ABC-"+x.id,wbs:x.wbs,owner:"B9",costObject:"CHINA_EXPENSE_EVENT",
-  activity:x.description,site:x.optional?"JUTAL Zhuhai Yard; separate conditional trip":"MGW China FAT; base trip",
+  activity:x.description,site:x.optional?"JUTAL Zhuhai Yard optional trip":"MGW China FAT base trip",
   source:x.evidence,quantity:x.qty,unit:x.unit,workingSellRateTHB:x.unitRateTHB,
   modeledSellTHB:x.workingSellTHB,directCostTHB:null,
-  posting:x.optional?"CONDITIONAL_1LS__NOT_IN_BASE":"LINKED_TO_CANONICAL_B9_BASE__NOT_ADDITIVE",
+  posting:x.optional?"CONDITIONAL_1LS__EXCLUDED_FROM_BASE":"INCLUDED_IN_CANONICAL_B9_BASE__NOT_ADDITIVE",
   chargeKey:x.expenseKey
  }));
- const rows=Object.freeze([...pmEvents,...satObligations,...chinaExpenses]);
- const keys=[...pmEvents,...chinaExpenses].map(x=>x.chargeKey);
- if(keys.length!==new Set(keys).size||rows.length!==new Set(rows.map(x=>x.id)).size)
-  throw Error("Rev.K ABC duplicate unique expense-event or obligation identity");
- const pmProxyTHB=roundRevKAbc0553(pmEvents.reduce((v,x)=>v+x.modeledSellTHB,0));
- const fatTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.posting.startsWith("LINKED")).reduce((v,x)=>v+x.modeledSellTHB,0));
+ const rows=Object.freeze([...b1Engineering,...pmEvents,...satSiteLines,satTool,...satObligations,...fatTasks,...chinaExpenses]);
+ const chargeRows=[...b1Engineering,...pmEvents.filter(x=>x.quantity>0),...satSiteLines,satTool,...chinaExpenses];
+ const keys=chargeRows.map(x=>x.chargeKey);
+ if(keys.length!==new Set(keys).size||rows.length!==new Set(rows.map(x=>x.id)).size||
+   rows.some(x=>x.directCostTHB!==null))throw Error("Rev.K ABC duplicate Cost Object or unverified Direct Cost");
+ const pmWorkingSellTHB=roundRevKAbc0553(pmEvents.reduce((v,x)=>v+x.modeledSellTHB,0));
+ const fatTHB=roundRevKAbc0553(chinaExpenses.filter(x=>!x.posting.startsWith("CONDITIONAL")).reduce((v,x)=>v+x.modeledSellTHB,0));
  const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.posting.startsWith("CONDITIONAL")).reduce((v,x)=>v+x.modeledSellTHB,0));
- if(pmEvents.length!==12||b1.rows.length!==19||trace.rows.length!==19||pmProxyTHB!==132300||
-    fatTHB!==current.B9||yardTHB!==233600||b9.selectedYardWorkingDays!==7||b9.yardCallOutCrew!==1)
-  throw Error("Rev.K ABC unique PM / FAT / conditional Yard reconciliation failed");
- if(rows.some(x=>x.directCostTHB!==null))throw Error("Unverified Direct Cost must not be posted");
+ if(b1Engineering.length!==27||pmEvents.length!==12||b1.uniquePmHours!==48||trace.rows.length!==19||
+   fatTasks.length!==12||fat.estimatedFatWitnessDays!==6||satSiteLines.length!==9||
+   b3.workdays!==40||pmWorkingSellTHB!==113400||fatTHB!==397400||yardTHB!==233600)
+  throw Error("Rev.K activity reconciliation mismatch");
  return Object.freeze({
   moduleId:"bid.budget.working.bc.revk-abc-control",
-  rows,pmEvents,satObligations,chinaExpenses,
+  rows,pmEvents,b1Engineering,satSiteLines,satTool,satObligations,fatTasks,chinaExpenses,
   currentWorkingSellTHB:Object.freeze({...current}),
   currentB1B3B9BaseTHB:roundRevKAbc0553(current.B1+current.B3+current.B9),
-  partBBaseTHB:working.knownWorkingSellTHB,
-  b1PmProxyTHB:pmProxyTHB,
-  b9FatBaseTHB:fatTHB,b9YardConditionalLumpSumTHB:yardTHB,
+  partBBaseTHB:working.knownWorkingSellTHB,b1PmProxyTHB:pmWorkingSellTHB,
+  b1EngineeringSellTHB:b1.engineeringSellTHB,b1OfficePmIncludedTHB:pmWorkingSellTHB,
+  b3LaborSellTHB:b3.laborWorkingSellTHB,b3ToolSellTHB:b3.toolRentalWorkingSellTHB,
+  b9FatBaseTHB:fatTHB,b9FatWitnessDays:fat.estimatedFatWitnessDays,
+  b9YardConditionalLumpSumTHB:yardTHB,
   b9YardRole:b9.selectedYardRole,b9YardWorkdays:b9.selectedYardWorkingDays,
   b9YardTravelDays:b9.selectedYardTravelDays,b9YardCrew:b9.yardCallOutCrew,
   tracedObligations:trace.rows.length,
-  verifiedDirectCostTHB:null,
-  costState:"NOT_ESTABLISHED__SOURCE_QUANTITY_RATE_COST_OWNER_RACI_PENDING",
-  postedWorkingSellDeltaTHB:0,
-  postingAllowed:false,customerReleaseAllowed:false,
+  verifiedDirectCostTHB:null,costState:"SOURCE_RATE_BUDGETARY_SELL__PAYROLL_VENDOR_COST_OPEN",
+  postedWorkingSellDeltaTHB:0,postingAllowed:false,customerReleaseAllowed:false,
   sourceTrace:"BOD-C2/DTS-C1/SPE-C2/MR-C1 -> Rev.K K00-K18 -> 10.2 B1/B3/B9",
   gates:Object.freeze([
-   "SPE §7.3.2 Yard SAT is mandatory, ADDVALUE attendance is conditional upon signed RACI or written call-out",
-   "Offshore B3 execution requires site/TAG/Test-ID acceptance and approved manpower/crew trip calendar",
-   "B1 56 MH proxy is within existing 510,000 THB and must not be added again",
-   "B9 7-day 1-person Senior Engineer Yard LS is separate trip, excluded from base",
-   "Direct Cost requires unique ExpenseID/TripID/PersonID, verified hours/quantity/rates and real supplier evidence"
+   "SPE §7.3.2 Yard SAT mandatory under CONTRACTOR/VENDOR RACI; ADDVALUE one Sr Engineer 7d LS call-out only, optional standby free",
+   "FAT MGW six witness days derived from four-MR agenda; signed MGW agenda/test-ITP/TAG repetition pending",
+   "Use 14d for management planning per SPE; BOD 30d notice conflict remains unresolved contract precedence HOLD",
+   "Post Yard SAT loose-equipment transfer to ZPQ under SPE §7.3.2 conflicts with as-installed WH assumption; seek written TQ",
+   "B1 new price 27 technical WBS + 11 PM gates; K00 kickoff duplicate excluded, no B2/B3/B9 overtime",
+   "B3 40 workdays x two specialists; 30d VeEX rent included once, permanent O&M tools in B11 only",
+   "No fee for standby Field Specialist; if actually deployed, separately track internal travel/policy expenditure",
+   "Verified Direct Cost needs actual salary, supplier receipts, Trip/Person keys; no automatic historical posting"
   ])
  });
 }
