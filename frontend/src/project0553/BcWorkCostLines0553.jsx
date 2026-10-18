@@ -4,6 +4,8 @@ import {selectBcWorkCostLines0553} from "./data/bcWorkCostLines0553";
 import {B1B2EquationAudit0553} from "./B1B2EquationAudit0553";
 import {B3EquationAudit0553} from "./B3EquationAudit0553";
 import {B5EquationAudit0553} from "./B5EquationAudit0553";
+import {selectB9ChinaWorkingBudget0553} from "./data/b9ChinaWorkingBudget0553";
+import {selectB3WorkingSellAfterChinaFat0553} from "./data/b3ChinaFatOwnership0553";
 
 const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US"):"TO VERIFY";
@@ -13,20 +15,36 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  const [showAuditClauses,setShowAuditClauses]=useState(false);
  const showGroup=selectedCode==="ALL"?m.activeCodes:[selectedCode];
  const available=m.rows.filter(x=>showGroup.includes(x.code));
- const physical=available.filter(x=>!x.id.startsWith("COST-AUD-"));
+ const china=selectB9ChinaWorkingBudget0553();
+ // Rev05 B3 Bangkok FAT is superseded by Rev.K MGW China FAT (B9).
+ // Original B9 mixed labor/per-diem line is replaced by itemized Rev.K B9 ledger.
+ const physical=[
+  ...available.filter(x=>!x.id.startsWith("COST-AUD-")&&x.id!=="B3-FAT-BKK"&&x.id!=="B9-CHINA-SUPERVISION"),
+  ...(showGroup.includes("B9")?china.rows.map(x=>({
+   code:"B9",id:x.id,moduleId:x.moduleId,name:x.description,quantity:x.qty,unit:x.unit,
+   workingSellRateTHB:x.unitRateTHB,workingSellTHB:x.workingSellTHB,historicalCostProxyTHB:null,
+   owner:"B9",sourceRef:x.evidence,scopeGate:x.status,
+   equation:x.qty+" "+x.unit+" × THB "+x.unitRateTHB.toLocaleString("en-US")+" / "+x.unit,
+   requiredQuantityStatus:"REV_K_BUDGET_ASSUMPTION",reconciliationTag:"REV_K_B9_OWNER_SINGLE_POSTING",
+   includedInExistingCostOwner:null
+  })):[])
+ ];
  const clauses=available.filter(x=>x.id.startsWith("COST-AUD-"));
  const historicalProxy=physical.reduce((sum,x)=>sum+(x.historicalCostProxyTHB??0),0);
- const displayedWbsSell=showGroup.reduce((sum,code)=>sum+(m.workingSellByCode[code]??0),0);
- const completeSell=showGroup.every(code=>Number.isFinite(m.workingSellByCode[code]));
- const knownSellCount=showGroup.filter(code=>Number.isFinite(m.workingSellByCode[code])).length;
+ const currentSourceSell={...m.workingSellByCode,
+  B3:selectB3WorkingSellAfterChinaFat0553(m.workingSellByCode.B3),
+  B9:china.workingSellTHB};
+ const displayedWbsSell=showGroup.reduce((sum,code)=>sum+(currentSourceSell[code]??0),0);
+ const completeSell=showGroup.every(code=>Number.isFinite(currentSourceSell[code]));
+ const knownSellCount=showGroup.filter(code=>Number.isFinite(currentSourceSell[code])).length;
  return <details className="p55-panel" data-component-key={m.moduleId} open={selectedCode!=="ALL"} style={{marginTop:12,padding:"12px 14px"}}>
   <summary><strong>10.2 — First Principles / Resource &amp; Cost-Line Ledger</strong> · {physical.length} work objects · {clauses.length} audited clauses</summary>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={m.moduleId}/> · Cost Owner: 10.2 only · Source: <a href={m.sourceUrl} target="_blank" rel="noreferrer">{m.sourceRevision}</a></p>
   <p className="p55-note"><strong>Selected:</strong> {selectedCode==="ALL"?"B1/B2/B3/B5/B6/B9/B10/B11 (current derivation priority)":selectedCode}
-   {" "}· Known WBS Working SELL subtotal: {knownSellCount>0?money(displayedWbsSell):"NOT ESTABLISHED"} ({knownSellCount}/{showGroup.length} priced; {completeSell?"covered":"NOT complete price"})
+   {" "}· Current Working SELL subtotal (legacy Rev05 superseded for China FAT): {knownSellCount>0?money(displayedWbsSell):"NOT ESTABLISHED"} ({knownSellCount}/{showGroup.length} priced; {completeSell?"covered":"NOT complete price"})
    {" "}· Actual Direct COST: <strong>NOT ESTABLISHED</strong>
    {" "}· Historical B1 proxy (not approved cost): {historicalProxy?money(historicalProxy):"n/a"}</p>
-  <p className="p55-note">แต่ละบรรทัดมี ID, Quantity, Formula, SELL RATE/SELL AMOUNT (เฉพาะที่มีหลักฐาน), Cost Owner และ Source. ค่า Historical Cost Proxy ห้ามนับเป็น Current Direct Cost. รายการที่ระบุ Included เป็นตัวขับทางวิศวกรรม ไม่ใช่ต้นทุนใหม่.</p>
+  <p className="p55-note">Rev.K current pricing: Bangkok FAT THB 144,000 in prior B3 is excluded; MGW China FAT is B9. Old B9 THB 574,560 mixed labor/per-diem source is replaced with B9 Rev.K itemized lines (no separate Per Diem). Source WBS history is preserved but not added. No Direct Cost approval implied.</p>
   {(selectedCode==="ALL"||selectedCode==="B1"||selectedCode==="B2")&&<B1B2EquationAudit0553 selectedCode={selectedCode}/>}
   {(selectedCode==="ALL"||selectedCode==="B3")&&<B3EquationAudit0553 selectedCode={selectedCode}/>}
   {(selectedCode==="ALL"||selectedCode==="B5")&&<B5EquationAudit0553 selectedCode={selectedCode}/>}
