@@ -49,7 +49,13 @@ assert.equal(m.optionalCostTHB,null);
 assert.equal(m.releaseAllowed,false);
 assert.equal(m.costComplete,false);
 assert.equal(m.noCrossBasisSummation,true);
-assert.equal(m.rows.filter(r=>Number.isFinite(r.workingSellTHB)).length,11);
+const pricedCodes=m.rows.filter(r=>Number.isFinite(r.workingSellTHB)).map(r=>r.code);
+assert.deepEqual(pricedCodes,["B1","B2","B3","B5","B6","B7","B8","B9","B10","B11","B13","C1","C2"],
+ "Rev.K current: 11 Part B priced/explicit-zero codes + 2 optional Part C; B4/B12/B14 remain unpriced");
+assert.equal(pricedCodes.length,13,"Current price coverage counts B7, B11 and optional C1/C2; historical Rev05 11-code assertion superseded");
+assert.equal(m.byCode.B9.workingSellTHB,0,"B9 Base intentionally zero: conditional 1 LS is NOT in Base");
+assert.equal(m.byCode.B7.workingSellTHB,30000,"B7 user-approved budgetary 1-month reserve");
+assert.equal(m.byCode.B11.workingSellTHB,128314.11,"B11 current budgetary SELL; OEM direct cost remains unverified");
 assert.equal(m.byCode.B10.workingSellTHB,123024.37);
 assert.equal(m.byCode.B13.workingSellTHB,22484.21);
 assert.equal(m.byCode.C1.workingSellTHB,4049349.36);
