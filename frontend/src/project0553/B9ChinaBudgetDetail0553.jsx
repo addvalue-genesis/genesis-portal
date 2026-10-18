@@ -1,30 +1,43 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
-export function B9ChinaBudgetDetail0553({budget}){
+// Historic filename retained for routing compatibility; view ALWAYS filters by contractual cost owner.
+export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9"}){
  if(!budget)return null;
- return <section className="p55-panel" data-component-key="bid.budget.working.bc.b9.revk-china-budget" style={{padding:14,marginTop:12}}>
-  <h4>B9 — FAT Witness Base / Senior Telecom Engineer Yard Support (Optional LS)</h4>
+ const isFat=selectedOwner==="B3", owner=isFat?"B3":"B9";
+ const rows=budget.rows.filter(x=>x.costOwner===owner);
+ const total=isFat?budget.fatWorkingSellTHB:budget.conditionalYardSellTHB;
+ if(!rows.length||Math.abs(rows.reduce((sum,x)=>sum+x.workingSellTHB,0)-total)>0.01)
+  throw Error("Contract B3 FAT vs B9 Yard detail ownership/pricing mismatch");
+ return <section className="p55-panel" data-component-key={"bid.budget.working.bc."+owner.toLowerCase()+".revk-china-budget"} style={{padding:14,marginTop:12}}>
+  <h4>{isFat?"B3 — MGW China FAT Witness · Inspection, Testing and Certification as per ITP":"B9 — Specialist Field Assistance · JUTAL Yard Conditional 1 LS"}</h4>
   <div className="p55-metric-grid">
-   <div><strong>Base FAT Working SELL — B9</strong><p>{thb(budget.workingSellTHB)}</p><small>PM/Chief Engineer + Senior Telecom Engineer · 6 FAT witness days from four-MR agenda; one round-trip China.</small></div>
-   <div><strong>Conditional Yard Call-out</strong><p>{thb(budget.conditionalYardSellTHB)}</p><small>One billed Senior Telecom Engineer, accompanied by unbilled Field Telecom Specialist; 7 Yard days · 1 LS · separate trip. NOT in Base.</small></div>
-   <div><strong>Base + Optional LS scenario</strong><p>{thb(budget.fullCombinedVisitScenarioTHB)}</p><small>Two independent China trips in this scenario; consolidate and reconcile if same itinerary</small></div>
+   <div><strong>{isFat?"B3 FAT Witness Base Working SELL":"B9 Yard Optional 1 LS Working SELL"}</strong><p>{thb(total)}</p>
+    <small>{isFat?"Two ADDVALUE paid witnesses, six budgetary FAT days, one return China trip; OEM executes FAT in Part A":"One paid Senior Telecom Engineer · 7 working days + 2 travel days · one unbilled accompanying Field Telecom Specialist"}</small></div>
+   <div><strong>{isFat?"B3 Offshore + FAT Combined Working SELL":"Current B9 Base"}</strong><p>{isFat?thb(2046000+total):thb(budget.b9BaseWorkingSellTHB)}</p>
+    <small>{isFat?"Offshore 40-day SAT/SIT + 30-day VeEX rental + MGW FAT witness (all B3)":"No mandatory specialist call-out in B9 Base; optional THB233,600 excluded"}</small></div>
   </div>
-  {budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}><summary><strong>Four-MR MGW FAT Test Agenda — 6 witness days (provisional)</strong></summary><p className="p55-note">Paid: {budget.fatWitnessRoles.join(" + ")}; standby: {budget.fatStandbyRole}. MGW conducts OEM tests. 48-hour combined agenda, 7 hotel nights per witness; actual TAG count, signed ITP and OEM time require confirmation.</p><div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Day / Test ID</th><th>MR</th><th>FAT Activity</th><th>Hours</th><th>Evidence</th></tr></thead><tbody>{budget.fatWbs.rows.map(x=><tr key={x.id}><td>{x.day} · {x.id}</td><td>{x.mr}</td><td>{x.activity}</td><td>{x.hours}</td><td>{x.evidence}</td></tr>)}</tbody></table></div><p className="p55-note"><strong>Notification HOLD:</strong> Management selected 14 days per SPE; BOD still says minimum 30 days. Obtain formal precedence/waiver before promising a 14-day FAT notice.</p></details>}
-  <p className="p55-note"><strong>Senior Engineer task:</strong> approved configuration baseline verification, IP/VLAN/NMS/PLC/PABX interfaces, on-site troubleshooting, RFI/RACON OEM coordination and Yard SAT technical support when JUTAL specifically calls out. No routine installation or automatic full-system reconfiguration after accepted FAT; any changes require approval and as-left evidence. Customer quotation format: <strong>1 LS</strong> with 7 working days included; internal USD 600/person-day rate and travel components remain in the estimating detail.</p>
-  <p className="p55-note"><strong>SPE §7.3.2:</strong> Yard SAT is a required contractual test, but it does not by itself prove ADDVALUE must be on-site. <strong>SPE §7.3.4:</strong> supplier provides support Man-day rates; site attendance depends on specific request and signed responsibility. Physical installation is excluded from VENDOR scope.</p>
+  {isFat&&budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}>
+   <summary><strong>MGW FAT / MR0001–MR0004 — 6-Day Estimating Agenda</strong></summary>
+   <p className="p55-note">Witness team: {budget.fatWitnessRoles.join(" + ")}. Field Specialist standby unbilled. MGW/OEM provides factory test execution and its calibrated tools. Source: BOD §10.2–10.3 / SPE §7.3.1 / MR/DTS1–4. Six days are internal estimates pending signed OEM ITP and equipment TAG repetition.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Day / Test ID</th><th>MR</th><th>Test Requirement</th><th>Hours</th><th>Evidence</th></tr></thead>
+    <tbody>{budget.fatWbs.rows.map(x=><tr key={x.id}><td>{x.day} · {x.id}</td><td>{x.mr}</td><td>{x.activity}</td><td>{x.hours}</td><td>{x.evidence}</td></tr>)}</tbody>
+   </table></div>
+   <p className="p55-note">FAT notice: management target 14 days per SPE; BOD has 30-day requirement. Contract precedence/waiver remains unresolved.</p>
+  </details>}
+  {!isFat&&<p className="p55-note"><strong>Yard scope:</strong> configuration verification, IP/VLAN/NMS/PLC/PABX integration, troubleshooting and OEM coordination if called out by JUTAL. Base Yard SAT outcome remains mandatory for CONTRACTOR/VENDOR, but ADDVALUE Specialist attendance is conditional on signed RACI or written request. The second Field Telecom Specialist is unbilled but actual travel/payroll must be tracked; internal risk cash allowance {thb(budget.unbilledBackupCashAllowanceTHB)} is NOT another customer charge.</p>}
   <div className="p55-table-wrap"><table className="p55-table p55-table--budget" style={{width:"100%",minWidth:1050,tableLayout:"fixed"}}>
-   <colgroup><col style={{width:"13%"}}/><col style={{width:"29%"}}/><col style={{width:"12%"}}/><col style={{width:"13%"}}/><col style={{width:"13%"}}/><col style={{width:"20%"}}/></colgroup>
-   <thead><tr><th>Module ID / WBS</th><th>Expense (Cost Owner B9 only)</th><th>Qty / Unit</th><th>Unit Working SELL</th><th>Total THB</th><th>Basis / Conditions / Posting</th></tr></thead>
-   <tbody>{budget.rows.map(x=><tr key={x.id} data-component-key={x.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere"}}>
-     <td><strong>{x.id}</strong><small>{x.moduleId}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={x.moduleId}/></td>
-     <td><strong>{x.description}</strong><small>{x.status}</small><small>{x.optional?"CONDITIONAL — EXCLUDED FROM B9 BASE":"FAT BASE"}</small></td>
-     <td>{x.qty} {x.unit}</td><td>{thb(x.unitRateTHB)}</td><td><strong>{thb(x.workingSellTHB)}</strong><small>{x.optional?"Not included in Base Total":"Included in Base"}</small></td>
-     <td>{x.evidence}<small>{x.rateAuthority}</small></td>
-    </tr>)}
-    <tr><td colSpan={4}><strong>B9 Base FAT — Working SELL</strong></td><td><strong>{thb(budget.workingSellTHB)}</strong></td><td>Only base rows count; conditional Yard rows excluded</td></tr><tr><td colSpan={4}><strong>B9 Conditional Yard Senior Telecom Engineer — 1 LS, separate trip, non-additive</strong></td><td><strong>{thb(budget.conditionalYardSellTHB)}</strong></td><td>Client request / signed RACI required, not in current B9 Base</td></tr>
-   </tbody></table></div>
-  <p className="p55-note"><strong>CFO CASH RISK — SECOND YARD SPECIALIST TRAVELS UNBILLED:</strong> Additional planning cash exposure {thb(budget.unbilledBackupCashAllowanceTHB)} for separate airfare, 9 hotel nights, conditional visa and 2 insurance covers. This is NOT an extra Working SELL or posted Direct Cost; the accepted customer 1 LS remains {thb(budget.conditionalYardSellTHB)}. Actual payroll and work cover for the unbilled specialist remain to be verified and reduce commercial margin.</p>
-  <p className="p55-note"><strong>Estimating control:</strong> Rev.K establishes 2 ADDVALUE FAT attendees and MGW as OEM FAT executor, but not FAT duration. Six FAT workdays plus two travel team-days are planning assumptions. Rev05 Yard 12 team-days (2-person scenario) is superseded for the optional call-out, not a mandatory duration. Selected optional scenario is 1 Senior Engineer, 7 Yard working days, 2 paid travel days, 9 hotel nights and a separate trip. This is CONDITIONAL only. Reconfirm MGW FAT venue/date, Zhuhai availability, hotel route, visa/work authorisation, occupational accident cover and insurer endorsements. Travel insurance alone may not cover onsite technical work; both insurance allowances are included but are not proof of coverage. No Direct Cost is asserted.</p>
+   <thead><tr><th>Expense ID / Module</th><th>Activity</th><th>Qty / Unit</th><th>Budgetary SELL Unit Rate</th><th>Working SELL THB</th><th>Evidence / Treatment</th></tr></thead>
+   <tbody>{rows.map(x=><tr key={x.id} data-component-key={x.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere"}}>
+    <td><strong>{x.id}</strong><small>{x.moduleId}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={x.moduleId}/></td>
+    <td><strong>{x.description}</strong><small>{x.status}</small></td>
+    <td>{x.qty} {x.unit}</td><td>{thb(x.unitRateTHB)}</td><td><strong>{thb(x.workingSellTHB)}</strong></td>
+    <td>{x.evidence}<small>{x.optional?"B9 CONDITIONAL — NOT IN BASE":"B3 INSPECTION/TESTING BASE"}</small></td>
+   </tr>)}
+   <tr><td colSpan={4}><strong>{isFat?"B3 MGW FAT Witness + travel":"B9 Yard Specialist Optional 1 LS"}</strong></td>
+     <td><strong>{thb(total)}</strong></td><td>Direct Cost is NOT VERIFIED; Working Sell only. Cost Owner {owner}</td></tr></tbody>
+  </table></div>
+  <p className="p55-note"><strong>Cost rule:</strong> 4-Scope of Supply.xlsx B3 = Inspection, Testing and Certification as per ITP; B9 = Specialist Field Assistance. No FAT personnel/travel may be posted to B9. OEM FAT execution/tools remain Part A; no duplicate B3 OEM labour. Direct Cost must be derived from real payroll, fare, room, insurance and paid supplier evidence, not from the Working Sell daily rate.</p>
  </section>;
 }
