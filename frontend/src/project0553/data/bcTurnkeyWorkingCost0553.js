@@ -45,7 +45,7 @@ const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 const executionDecisionByCode=Object.freeze({
  B3:"Rev.K MGW China OEM FAT belongs to B9; B3 working sell covers offshore SAT/SIT only (old Bangkok FAT THB144,000 removed)",
  B6:"Rev.K MGW China OEM FAT followed by DDP Zhuhai Yard delivery; B6 owns cargo freight/customs only (not B9 staff travel)",
- B9:"Rev.K ADDVALUE 2 China MGW FAT attendees and 2-person Zhuhai Yard supervision; THB budget includes travel, hotel, visa reserve and work/travel insurance once, no separate per diem"
+ B9:"Rev.K Base: two ADDVALUE MGW China FAT witnesses and one FAT trip. Optional: one Senior Telecom Systems Integration Engineer, seven Zhuhai Yard working days, separate trip and 1 LS upon written call-out. Yard LS excluded from Base; no separate per diem"
 });
 
 export function selectBcTurnkeyWorkingCost0553(){
@@ -116,7 +116,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    contractOwner:"SAMTEL",
    turnkeyEstimator:"ADDVALUE_FOR_SAMTEL",
    executionOwner:w.owner, // Execution responsibility never excludes turnkey scope.
-   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"?chinaB9.fatDaysEstimate+chinaB9.fatTravelTeamDays:w.qty,unit:code==="B9"?"team-days (2 persons)":code==="B3"?"LS (offshore SAT/SIT; old BKK FAT excluded)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"MGW China FAT witness and BKK-China-BKK travel/insurance in BASE; Yard support CONDITIONAL, NOT included in Base":code==="B3"?"Offshore SAT/SIT only; Rev05 Bangkok FAT THB 144,000 transferred out to B9 China FAT":w.driver,
+   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"?1:w.qty,unit:code==="B9"?"LS (FAT Base; Yard LS conditional)":code==="B3"?"LS (offshore SAT/SIT; old BKK FAT excluded)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"MGW China FAT witness and BKK-China-BKK travel/insurance in BASE; Yard support CONDITIONAL, NOT included in Base":code==="B3"?"Offshore SAT/SIT only; Rev05 Bangkok FAT THB 144,000 transferred out to B9 China FAT":w.driver,
    sourceRevision:(code==="B3"||code==="B9")?"Rev.K 2026-10-18 current FAT ownership + Rev05 source bridge":PART_BC_WBS_SOURCE_0553.revision,
    sourceUrl:PART_BC_WBS_SOURCE_0553.url,
    requirementRows:requirementRows.map(r=>({
@@ -143,17 +143,17 @@ export function selectBcTurnkeyWorkingCost0553(){
     perPersonUSDPerDay:ONSHORE_WORKING_SELL_RATE_0553.usdPerPersonDay,
     workingFX:ONSHORE_WORKING_SELL_RATE_0553.thbPerUsd,
     perPersonTHBPerDay:ONSHORE_WORKING_SELL_RATE_0553.thbPerPersonDay,
-    crewSizeWorkingReference:2,
+    fatWitnessCrewSize:2,conditionalYardCrewSize:chinaB9.yardCallOutCrew,
     laborOnlyTeamTHBPerDay:ONSHORE_WORKING_SELL_RATE_0553.thbPerPersonDay*2,
     previousChinaTeamDaySellTHB:47880,
     originalB9WorkingSellTHB:w.sellTHB,
     repricedWorkingSellTHB:chinaB9.workingSellTHB,
     chinaFATandTravelDaysInBase:chinaB9.fatDaysEstimate+chinaB9.fatTravelTeamDays,
-    conditionalYardTeamDays:chinaB9.yardActualOrStandbyTeamDays,
+    conditionalYardWorkingDays:chinaB9.selectedYardWorkingDays,conditionalYardTravelDays:chinaB9.selectedYardTravelDays,conditionalYardQuoteUnit:"LS",conditionalYardPostingAllowed:false,
     conditionalYardWorkingSellTHB:chinaB9.conditionalYardSellTHB,
     perDiemIncluded:false,travelIncluded:false,accommodationIncluded:false,visaIncluded:false,
     costOwner:"B9",releaseAllowed:false,
-    pricingGate:"Only MGW FAT witness + one trip in Base. Rev05 Yard 12 team-days include 2 travel days and are conditional. Confirm RACI/Company site-support call-out under SPE §7.3.4; reprice if 2 separate trips. No unconditional Yard supervision posting."
+    pricingGate:"Only MGW FAT witness + one trip in Base. Conditional Yard support is one Sr Telecom Engineer, 7 working days + 2 travel days on a separate trip, quoted 1 LS; NOT included until written call-out/signed RACI. Rev05 12 team-days are historical only; reconcile if trips are combined. No unconditional Yard posting."
    }):null,
    b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b10WorkingSellDecision:code==="B10"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b10WorkingSellTHB,source:"4-Scope of Supply.xlsx · Rev08 · B10",historicalUSD:b10HistoricalUSD,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"WORKING_SELL_ONLY"}):null,
