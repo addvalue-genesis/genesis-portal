@@ -487,7 +487,7 @@ export const B3_REQUIREMENT_WBS_TRACE_0553=Object.freeze(B3_REQUIREMENT_WBS_SOUR
  b9CommercialTreatment:r.costOwner!=="B9"?null:
   (r.id==="RQM-01"?"FAT_BASE__WITNESS":r.id==="RQM-02"?"FAT_BASE__NOTICE_INCLUDED_NO_EXTRA":"YARD_SUPPORT_CONDITIONAL__NO_BASE_CHARGE"),
  costPostingAuthority:"NO_CHARGE_WITHOUT_UNIQUE_EXPENSE_ID_AND_APPROVED_SCOPE"
-}))));
+})));
 export function selectB3RequirementWbsTrace0553(){
  const rows=B3_REQUIREMENT_WBS_TRACE_0553;
  if(rows.length!==19||new Set(rows.map(r=>r.id)).size!==rows.length)throw Error("B3 requirement trace identity/coverage gap");
