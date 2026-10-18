@@ -16,7 +16,7 @@ export function selectRevKAbcOwnershipControl0553(working){
  const b9=selectB9ChinaWorkingBudget0553();
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
- if(current.B1!==b1.workingSellTHB||current.B3!==b3.workingSellTHB||current.B9!==b9.workingSellTHB||
+ if(current.B1!==b1.workingSellTHB||current.B3!==roundRevKAbc0553(b3.workingSellTHB+b9.fatWorkingSellTHB)||current.B9!==0||
     working.knownWorkingSellTHB!==4600020.95)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))
@@ -60,14 +60,14 @@ export function selectRevKAbcOwnershipControl0553(working){
   id:"ABC-"+x.id,wbs:"K01/"+x.day,owner:"A",costObject:"OEM_FAT_TECHNICAL_TEST",
   activity:x.activity,site:"MGW facility China",source:x.requirement,
   quantity:x.hours,unit:"agenda hour",workingSellRateTHB:null,modeledSellTHB:null,directCostTHB:null,
-  posting:"OEM_EXECUTION_IN_A__B9_WITNESS_ONLY",chargeKey:null
+  posting:"OEM_EXECUTION_IN_A__B3_WITNESS_ONLY",chargeKey:null
  }));
  const chinaExpenses=b9.rows.map(x=>Object.freeze({
-  id:"ABC-"+x.id,wbs:x.wbs,owner:"B9",costObject:"CHINA_EXPENSE_EVENT",
+  id:"ABC-"+x.id,wbs:x.wbs,owner:x.costOwner,costObject:x.optional?"YARD_SPECIALIST_OPTION":"FAT_WITNESS_DIRECT_COST_ACTIVITY",
   activity:x.description,site:x.optional?"JUTAL Zhuhai Yard optional trip":"MGW China FAT base trip",
   source:x.evidence,quantity:x.qty,unit:x.unit,workingSellRateTHB:x.unitRateTHB,
   modeledSellTHB:x.workingSellTHB,directCostTHB:null,
-  posting:x.optional?"CONDITIONAL_1LS__EXCLUDED_FROM_BASE":"INCLUDED_IN_CANONICAL_B9_BASE__NOT_ADDITIVE",
+  posting:x.optional?"CONDITIONAL_B9_1LS__EXCLUDED_FROM_BASE":"INCLUDED_IN_CANONICAL_B3_FAT__NOT_ADDITIVE",
   chargeKey:x.expenseKey
  }));
  const rows=Object.freeze([...b1Engineering,...pmEvents,...satSiteLines,satTool,...satObligations,...fatTasks,...chinaExpenses]);
@@ -76,8 +76,8 @@ export function selectRevKAbcOwnershipControl0553(working){
  if(keys.length!==new Set(keys).size||rows.length!==new Set(rows.map(x=>x.id)).size||
    rows.some(x=>x.directCostTHB!==null))throw Error("Rev.K ABC duplicate Cost Object or unverified Direct Cost");
  const pmWorkingSellTHB=roundRevKAbc0553(pmEvents.reduce((v,x)=>v+x.modeledSellTHB,0));
- const fatTHB=roundRevKAbc0553(chinaExpenses.filter(x=>!x.posting.startsWith("CONDITIONAL")).reduce((v,x)=>v+x.modeledSellTHB,0));
- const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.posting.startsWith("CONDITIONAL")).reduce((v,x)=>v+x.modeledSellTHB,0));
+ const fatTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B3").reduce((v,x)=>v+x.modeledSellTHB,0));
+ const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B9").reduce((v,x)=>v+x.modeledSellTHB,0));
  if(b1Engineering.length!==27||pmEvents.length!==12||b1.uniquePmHours!==48||trace.rows.length!==19||
    fatTasks.length!==12||fat.estimatedFatWitnessDays!==6||satSiteLines.length!==9||
    b3.workdays!==40||pmWorkingSellTHB!==113400||fatTHB!==397400||yardTHB!==233600)
@@ -90,7 +90,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   partBBaseTHB:working.knownWorkingSellTHB,b1PmProxyTHB:pmWorkingSellTHB,
   b1EngineeringSellTHB:b1.engineeringSellTHB,b1OfficePmIncludedTHB:pmWorkingSellTHB,
   b3LaborSellTHB:b3.laborWorkingSellTHB,b3ToolSellTHB:b3.toolRentalWorkingSellTHB,
-  b9FatBaseTHB:fatTHB,b9FatWitnessDays:fat.estimatedFatWitnessDays,
+  b9FatBaseTHB:0,b3FatWitnessSellTHB:fatTHB,b3FatWitnessDays:fat.estimatedFatWitnessDays,b9FatWitnessDays:fat.estimatedFatWitnessDays,
   b9YardConditionalLumpSumTHB:yardTHB,
   b9YardRole:b9.selectedYardRole,b9YardWorkdays:b9.selectedYardWorkingDays,
   b9YardTravelDays:b9.selectedYardTravelDays,b9YardCrew:b9.yardCallOutCrew,
@@ -100,11 +100,11 @@ export function selectRevKAbcOwnershipControl0553(working){
   sourceTrace:"BOD-C2/DTS-C1/SPE-C2/MR-C1 -> Rev.K K00-K18 -> 10.2 B1/B3/B9",
   gates:Object.freeze([
    "SPE §7.3.2 Yard SAT mandatory under CONTRACTOR/VENDOR RACI; ADDVALUE one Sr Engineer 7d LS call-out only, optional standby free",
-   "FAT MGW six witness days derived from four-MR agenda; signed MGW agenda/test-ITP/TAG repetition pending",
+   "B3 owns MGW FAT 6-day / 2-witness travel and engineering-cost events; manufacturer execution remains A. Signed ITP/TAG repetition pending",
    "Use 14d for management planning per SPE; BOD 30d notice conflict remains unresolved contract precedence HOLD",
    "Post Yard SAT loose-equipment transfer to ZPQ under SPE §7.3.2 conflicts with as-installed WH assumption; seek written TQ",
-   "B1 new price 27 technical WBS + 11 PM gates; K00 kickoff duplicate excluded, no B2/B3/B9 overtime",
-   "B3 40 workdays x two specialists; 30d VeEX rent included once, permanent O&M tools in B11 only",
+   "B1 Engineering/PM only; B3 owns all FAT Witness, no double posting in B9 specialist assistance",
+   "B3 40 workdays x two specialists, MGW FAT Witness plus travel, VeEX 30d rental all counted once; permanent O&M tools B11 only",
    "Yard Field Telecom Specialist travels as an unbilled companion; THB48,500 minimum cash risk allowance remains nonposting until cost/margin evidence",
    "Verified Direct Cost needs actual salary, supplier receipts, Trip/Person keys; no automatic historical posting"
   ])
