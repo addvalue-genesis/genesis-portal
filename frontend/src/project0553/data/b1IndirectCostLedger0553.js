@@ -1,7 +1,7 @@
 // PJ2608-0553 WBS-driven single-owner expense register. NON-POSTING engineering draft.
 // Source hierarchy: MR0001–0004/DTS/SPE + BOM/TAG/LIS + Rev.K/Rev.L/Rev.J/Rev.I.
 // One row = one physical expense object; multiple milestone references do not multiply its price.
-export const B1_PROJECT_EXPENSE_LEDGER_0553=Object.freeze([
+const SOURCE_EXPENSE_ROWS_0553=Object.freeze([
   {
     "id": "PM-MILESTONE",
     "owner": "B1",
@@ -581,6 +581,423 @@ export const B1_PROJECT_EXPENSE_LEDGER_0553=Object.freeze([
     "pricingBasis": null
   }
 ]);
+// CFO execution / responsibility metadata: who / where / how / payer / source gate.
+// Proposed roles stay explicitly proposed; location and schedule conflicts remain OPEN.
+const CFO_EXECUTION_CONTEXT_0553=Object.freeze({
+  "PM-MILESTONE": {
+    "executor": "ADDVALUE PM / Project Director (role proposed)",
+    "location": "OFFICE / PROJECT-WIDE",
+    "method": "Review K00–K18 milestones, risks, actions, owner changes; hold progress meetings and maintain change/risk register",
+    "deliverable": "Milestone tracker + MOM + change log",
+    "quantityBasis": "PM hours/meetings not estimated",
+    "payer": "ADDVALUE internal management; ultimate contract payer unconfirmed",
+    "executionStatus": "ROLE_PROPOSED",
+    "expenseObjectKey": "MGMT-PROJECT",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "PM-MEET": {
+    "executor": "ADDVALUE Executive / PM with SAMTEL, MGW, JUTAL (attendees TBC)",
+    "location": "Office / customer or vendor meeting venue TBC",
+    "method": "Contract and management meeting unrelated to hands-on FAT/Yard work",
+    "deliverable": "Meeting invitation, agenda, signed MOM",
+    "quantityBasis": "Number/duration/attendees unknown",
+    "payer": "ADDVALUE management provisional",
+    "executionStatus": "ROLE_PROPOSED",
+    "expenseObjectKey": "MGMT-MEETING",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "PM-TRAVEL": {
+    "executor": "ADDVALUE executive on dedicated management trip (person TBC)",
+    "location": "Business meeting destination TBC; not FAT/Yard/SAT crew travel",
+    "method": "Travel only for independent management purpose; require trip ID and passenger",
+    "deliverable": "Itinerary, receipts, travel approval",
+    "quantityBasis": "Trips/person/nights/fare unknown",
+    "payer": "ADDVALUE business travel provisional",
+    "executionStatus": "EVENT_NOT_CONFIRMED",
+    "expenseObjectKey": "MGMT-TRAVEL",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "PM-ADMIN": {
+    "executor": "ADDVALUE project administrator / PM office (person TBC)",
+    "location": "ADDVALUE office (location TBC)",
+    "method": "Track procurement/project correspondence, contracts, internal milestones, project calls; exclude B2 transmittals",
+    "deliverable": "Admin timesheet and project allocation basis",
+    "quantityBasis": "Office MH and allocation method unknown",
+    "payer": "ADDVALUE project office",
+    "executionStatus": "ROLE_PROPOSED",
+    "expenseObjectKey": "PM-ADMIN",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "PM-REP": {
+    "executor": "ADDVALUE authorized executive / PM (role TBC)",
+    "location": "Documented customer/vendor business meeting site TBC",
+    "method": "Lawful and approved meeting hospitality, receipts and business purpose; no unofficial payments",
+    "deliverable": "Approved entertainment claim and receipt",
+    "quantityBasis": "Events/attendees/limits unknown",
+    "payer": "ADDVALUE subject to compliance approval",
+    "executionStatus": "EVENT_NOT_CONFIRMED",
+    "expenseObjectKey": "MGMT-REP",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "PM-REG": {
+    "executor": "Authorized ADDVALUE regulatory coordinator + applicant authority (TBC)",
+    "location": "Thailand / China / Myanmar relevant regulator; jurisdiction and filing venue TBC",
+    "method": "Application coordination for telecom operating/frequency/import authorisations; EXCLUDES B6 customs execution",
+    "deliverable": "Licence matrix, applications, authority correspondence",
+    "quantityBasis": "Applications, dates, regulatory rate unknown",
+    "payer": "Contract permit applicant/payer TBC",
+    "executionStatus": "RESPONSIBILITY_OPEN",
+    "expenseObjectKey": "LICENCE-COORD",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "PM-LEGAL": {
+    "executor": "Licensed consultant/legal adviser (firm not selected); ADDVALUE coordinating",
+    "location": "Local jurisdiction relevant to licences; TBC",
+    "method": "Written retained scope for legitimate permit/legal consultation, check fee and approval",
+    "deliverable": "Engagement/quotation, invoice, legal deliverable",
+    "quantityBasis": "Number of engagement days and quoted fee unknown",
+    "payer": "Legal retainer cost bearer TBC",
+    "executionStatus": "THIRD_PARTY_UNQUOTED",
+    "expenseObjectKey": "LEGAL-CONSULT",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "PM-FEE": {
+    "executor": "Government authority or authorized official fee collector (not agent commission)",
+    "location": "Jurisdiction stated in official permit schedule; TBC",
+    "method": "Pay only published/receipted statutory licence charges outside B6 customs duties",
+    "deliverable": "Official fee notice/receipt/permit number",
+    "quantityBasis": "Permit count and statutory fee not verified",
+    "payer": "Contractual applicant and payer TBC",
+    "executionStatus": "OFFICIAL_FEES_UNVERIFIED",
+    "expenseObjectKey": "STATUTORY-LICENCE",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "PM-SOFT": {
+    "executor": "ADDVALUE engineering specialist; software licensor/vendor TBD",
+    "location": "ADDVALUE engineering office / licensed user seat TBC",
+    "method": "Use Pathloss 6 for MR0001 radio link calculations only if no project/organization licence available",
+    "deliverable": "Licence entitlement, RF profile and software quotation",
+    "quantityBasis": "Seats/licence period/rate unknown",
+    "payer": "ADDVALUE or OEM included TBC",
+    "executionStatus": "PROCUREMENT_PENDING",
+    "expenseObjectKey": "PATHLOSS",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "DOC-CTRL": {
+    "executor": "ADDVALUE Document Controller / vendor document coordinator (person TBC)",
+    "location": "Office / VDRL electronic transmittal system",
+    "method": "Manage VDRL/VDRS register, comments, revision, transmittal and final dossier; exclude technical design authorship",
+    "deliverable": "VDRL register, transmittals, dossier",
+    "quantityBasis": "143 MR rows, 38 types are source obligations NOT billable instances",
+    "payer": "B2 canonical only",
+    "executionStatus": "ACTIVITY_SUPPORTED_RATE_OPEN",
+    "expenseObjectKey": "DOC-LIFECYCLE",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "BF-SURVEY": {
+    "executor": "ADDVALUE 2 telecom specialists (planning), PTTEPI ICT/Ops/Instrument escorts",
+    "location": "ZPQ, ZWP8, ZWP11 + office reconciliation",
+    "method": "Physical/config survey, photo, port/NMS/radio/power/routing checks and signed findings before host change",
+    "deliverable": "Survey RPT, existing-state inventory, AFC/MTO delta",
+    "quantityBasis": "3 site workdays/site + 1 office day scenario; access/trips not approved",
+    "payer": "B3 subject to scope acceptance; site support by PTTEPI",
+    "executionStatus": "PLANNING_SCENARIO_ONLY",
+    "expenseObjectKey": "BF-SURVEY",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "FAT-CREW": {
+    "executor": "MGW executes OEM FAT; ADDVALUE 2 paid attendees, 1 unbilled standby",
+    "location": "MGW Office China per Rev.K; Rev.J says Zhuhai Yard (CONFLICT)",
+    "method": "Witness MGW FAT for MR0001–0004, check tests and punch/as-left records; no duplicate OEM labour",
+    "deliverable": "FAT witness attendance and FAT certificate",
+    "quantityBasis": "2 paid attendees confirmed; duration and payroll unverified",
+    "payer": "B9 ADDVALUE attendance; MGW executes OEM test",
+    "executionStatus": "VENUE_CONFLICT_DURATION_OPEN",
+    "expenseObjectKey": "CHINA-FAT-LABOR",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "FAT-TRAVEL": {
+    "executor": "ADDVALUE 2 China FAT attendees (names/booking TBC)",
+    "location": "Origin TBC → MGW China FAT venue (CONFLICT)",
+    "method": "Flights, visa, accommodation, local transport, per diem for FAT attendance",
+    "deliverable": "Trip manifest, approvals, tickets, hotels, visa receipts",
+    "quantityBasis": "Flights/nights/trips not known; 1 unbilled standby not charged",
+    "payer": "B9 once; same booking K02 Yard must be consolidated",
+    "executionStatus": "VENUE_CONFLICT_TRIP_OPEN",
+    "expenseObjectKey": "CHINA-FAT-TRAVEL",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "FAT-OEM": {
+    "executor": "MGW/OEM test personnel",
+    "location": "MGW Office vs Zhuhai Yard disputed",
+    "method": "Factory test equipment and internal OEM execution per accepted quotation",
+    "deliverable": "MGW FAT procedure, certified tool list, OEM report",
+    "quantityBasis": "Quoted inclusions pending MGW updated revision",
+    "payer": "Part A/OEM if actually included; never B9 again",
+    "executionStatus": "QUOTE_INCLUSION_PENDING",
+    "expenseObjectKey": "OEM-FAT-PACKAGE",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "YARD-CREW": {
+    "executor": "ADDVALUE telecom specialists/supervisor; JUTAL installer and MGW support roles separate",
+    "location": "JUTAL Zhuhai Yard, China",
+    "method": "Supervise telecom installation, inspect ITR, perform initial configs and precommissioning K02–K12",
+    "deliverable": "ITR, configs, punch, inspection sheets",
+    "quantityBasis": "12 team-days existing B9 working basis; allocation by K-stage not verified",
+    "payer": "B9 for ADDVALUE specialist service only",
+    "executionStatus": "ROLE_PROPOSED_DAYS_UNRECONCILED",
+    "expenseObjectKey": "CHINA-YARD-LABOR",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "YARD-TRAVEL": {
+    "executor": "ADDVALUE Yard specialist team (can overlap FAT attendees)",
+    "location": "Zhuhai Yard, China",
+    "method": "Mobilisation, meals, local transport and hotel needed for yard work; shared FAT trip billed once",
+    "deliverable": "Same Person ID/Trip ID manifest, receipts",
+    "quantityBasis": "Travel duration/cost and shared-trip evidence pending",
+    "payer": "B9 one consolidated travel event, not B1",
+    "executionStatus": "TRAVEL_DUPLICATION_GATE",
+    "expenseObjectKey": "CHINA-YARD-TRAVEL",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "YARD-EI": {
+    "executor": "JUTAL Structural/E&I installers proposed; signed RACI not available",
+    "location": "JUTAL Zhuhai Yard K03–K07",
+    "method": "Manufacture supports, mount hardware, pull and terminate cabling; ADDVALUE inspect/witness only",
+    "deliverable": "Signed construction ITR, termination and test records",
+    "quantityBasis": "Measured MTO Qty × approved unit MH open per Rev.L",
+    "payer": "JUTAL installation provisionally; do not book ADDVALUE labour",
+    "executionStatus": "RACI_NOT_SIGNED",
+    "expenseObjectKey": "YARD-INSTALL-EI",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "BULK": {
+    "executor": "MGW/OEM, ADDVALUE or JUTAL supplier owner unresolved",
+    "location": "Zhuhai Yard receipt / 7 location TAG/MTO",
+    "method": "Supply RF feeders, glands, JB, grounding, supports net of OEM included SKU and measured MTO",
+    "deliverable": "Tagged MTO, receipts, material trace",
+    "quantityBasis": "TAG quantities, interfaces and supply owner open",
+    "payer": "A or included vendor package; no B1 indirect",
+    "executionStatus": "SUPPLY_OWNER_OPEN",
+    "expenseObjectKey": "EQUIPMENT-BULK",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "PACK": {
+    "executor": "MGW supplier / JUTAL warehouse / packaging vendor as contracted",
+    "location": "OEM origin + Zhuhai Yard packing/repack",
+    "method": "Packing/preservation and mark crates for cargo movements, net manufacturer-included packing",
+    "deliverable": "Packing list, crate count, marks, receipt",
+    "quantityBasis": "Physical crates and incremental packing rate open",
+    "payer": "B5 packing-only, exclude storage B7",
+    "executionStatus": "PACKAGE_QTY_OPEN",
+    "expenseObjectKey": "PACKING",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "FREIGHT": {
+    "executor": "Freight forwarder / customs broker; MGW DDP boundary",
+    "location": "China / Thailand / Zhuhai / Myanmar cargo legs according to selected route",
+    "method": "Freight/clearance/broker logistics; clarify MGW DDP and cross-border FAT route",
+    "deliverable": "Incoterm agreement, customs entry, waybill",
+    "quantityBasis": "Shipments/duties/fees not verified",
+    "payer": "B6 cargo only, excluding B1 regulatory coordination",
+    "executionStatus": "INCOTERM_ROUTE_OPEN",
+    "expenseObjectKey": "CARGO-FREIGHT",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "STORAGE": {
+    "executor": "Warehouse / commercial owner; supplier inclusion uncertain",
+    "location": "OEM/Yard/third-party warehouse TBC",
+    "method": "Conditional one-month storage only when not free/included; track storage receipt and period",
+    "deliverable": "Storage invoice and warehouse evidence",
+    "quantityBasis": "One-month management reserve in B7; actual warehouse/rate pending",
+    "payer": "B7 only (current Working Sell 30,000 THB)",
+    "executionStatus": "CONDITIONAL_BUDGETARY",
+    "expenseObjectKey": "STORAGE-1M",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "TRAIN": {
+    "executor": "ADDVALUE trainer / OEM trainer TBD",
+    "location": "Training venue/end user location not established",
+    "method": "Develop/provide approved training sessions and attendance; OEM included instruction checked",
+    "deliverable": "Training agenda, attendance, course report",
+    "quantityBasis": "Rev05 44 MH source; session count and vendor split TBC",
+    "payer": "B8 only",
+    "executionStatus": "ACTIVITY_SUPPORTED_RATE_OPEN",
+    "expenseObjectKey": "TRAINING",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "SAT-CREW": {
+    "executor": "ADDVALUE 2 offshore telecom personnel, PTTEPI ICT/Ops/Instrument partners",
+    "location": "ZPQ/ZWP8/ZWP11 and ZWP20–23 / SIT ZPQ",
+    "method": "Execute approved SAT/SIT, configure, measure, witness signoff after RFSAT and safe access",
+    "deliverable": "SAT site RPTs, SIT signoff and as-left configs",
+    "quantityBasis": "Rev.J 36 calendar conditional vs Rev.I 40-day risk; productive MD pending",
+    "payer": "B3 dedicated SAT labour/travel; no B1 recharge",
+    "executionStatus": "CALENDAR_MD_RECONCILIATION_OPEN",
+    "expenseObjectKey": "OFFSHORE-SAT",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "SAT-TOOL": {
+    "executor": "ADDVALUE testers + approved calibrated instrument rental vendors",
+    "location": "Yard and offshore SAT sites as authorised",
+    "method": "Rent calibrated spectrum/gen/VSWR/DTF/SPL/marine specialty instruments as required by ITP",
+    "deliverable": "Cal certificates and ITP test records",
+    "quantityBasis": "Tool inventory and rental days pending",
+    "payer": "B3 temporary hire; not B11 customer handover",
+    "executionStatus": "RENTAL_QTY_OPEN",
+    "expenseObjectKey": "SAT-TOOLS",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "VEEX-RENT": {
+    "executor": "ADDVALUE tester; VeEX MX100+ rental supplier",
+    "location": "At SAT test location (7 sites as needed), logistics TBC",
+    "method": "Ethernet throughput certification using rented MX100+ if approved by test method",
+    "deliverable": "Test report / rental receipt",
+    "quantityBasis": "THB 1,000/day ex VAT source; quantity days unknown",
+    "payer": "B3 rental, never B11 permanent tools",
+    "executionStatus": "RATE_KNOWN_DAYS_OPEN",
+    "expenseObjectKey": "VEEX-MX100",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "RACON-VESSEL": {
+    "executor": "Marine vessel/operator/witness supplier not contracted; ADDVALUE test interface",
+    "location": "Offshore ZWP20/21/22 marine range test",
+    "method": "Approved X/S-band radar/vessel witness test per IALA R.101 and manufacturer procedure",
+    "deliverable": "Vessel log, radar plots, signed witness report",
+    "quantityBasis": "Vessel owner, duration, method and price unknown",
+    "payer": "B3 only if ADDVALUE contracts it; else Client provided nonadditive",
+    "executionStatus": "MARINE_METHOD_AND_PAYER_OPEN",
+    "expenseObjectKey": "RACON-MARINE",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "STANDBY": {
+    "executor": "ADDVALUE SAT personnel under signed standby/variation clause",
+    "location": "Offshore access / vessel / PTW delay",
+    "method": "Record actual cause, weather and standby and claim only approved non-embedded window",
+    "deliverable": "Daily report, site gate, client approval",
+    "quantityBasis": "Do NOT add Rev.I 7-day historical contingency to 40-day window",
+    "payer": "B3 conditional nonposting; never B1",
+    "executionStatus": "NO_DOUBLE_CONTINGENCY",
+    "expenseObjectKey": "SAT-STANDBY",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "SPARES-START": {
+    "executor": "MGW/OEM/SAMTEL spares supplier",
+    "location": "Zhuhai receipt + offshore startup",
+    "method": "Supply itemized start-up spares net of A included and C options",
+    "deliverable": "OEM SPIR, tagged box and receiving records",
+    "quantityBasis": "SKU/qty and current vendor unit rate required",
+    "payer": "B10 only",
+    "executionStatus": "SPIR_PENDING",
+    "expenseObjectKey": "STARTUP-SPARES",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "TOOLS-HANDOVER": {
+    "executor": "MGW/OEM/SAMTEL permanent tool supplier",
+    "location": "Zhuhai equipment handover / end user",
+    "method": "Deliver programming/purge/maintenance tool kits and certificates for O&M handover",
+    "deliverable": "Permanent tool list, receipt, cert",
+    "quantityBasis": "Check tools included in MGW R2 and quoted B11 candidates",
+    "payer": "B11 goods only, B3 rentals excluded",
+    "executionStatus": "OEM_INCLUSION_PENDING",
+    "expenseObjectKey": "OANDM-TOOLS",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "FIRSTFILL": {
+    "executor": "OEM / JUTAL as applicable",
+    "location": "Zhuhai prep / offshore installation",
+    "method": "Supply initial filling materials only when MR/SPE requires; no telecom blanket fee",
+    "deliverable": "OEM applicability and approved item list",
+    "quantityBasis": "OEM N/A confirmation or qty/price required",
+    "payer": "B12 conditional",
+    "executionStatus": "APPLICABILITY_NOT_VERIFIED",
+    "expenseObjectKey": "FIRSTFILL",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "CONSUM": {
+    "executor": "OEM/JUTAL/ADDVALUE supply owner per SKU",
+    "location": "Yard preservation and offshore test location",
+    "method": "Consume rated test/preservation items excluded from A, B5/B10 kits",
+    "deliverable": "Consumable register, requisitions and receipts",
+    "quantityBasis": "Material SKU/qty/price not verified",
+    "payer": "B13 unique supply owner; no B5/B10 duplicate",
+    "executionStatus": "COST_GAP",
+    "expenseObjectKey": "CONSUMABLES",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "BOND": {
+    "executor": "SAMTEL commercial/finance and insurer/bank",
+    "location": "Contract office / issuing bank",
+    "method": "Issue required bond/insurance, premiums and guarantee; contract party to confirm",
+    "deliverable": "Bank/insurance quote, policy and PO",
+    "quantityBasis": "Insured value, premium and contract payer unresolved",
+    "payer": "B14 commercial owner",
+    "executionStatus": "CONTRACT_OWNER_OPEN",
+    "expenseObjectKey": "BOND-INSURANCE",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "CAPITAL-SP": {
+    "executor": "MGW/OEM capital spares supplier",
+    "location": "Factory/yard delivery as opted",
+    "method": "Quote optional capital spare SKUs separate from installed supply",
+    "deliverable": "OEM SPIR, quote and receiving list",
+    "quantityBasis": "Optional qty/price validation pending",
+    "payer": "C1 option only",
+    "executionStatus": "OPTION_ONLY",
+    "expenseObjectKey": "CAPITAL-SPARES",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  },
+  "TWO-YR-SP": {
+    "executor": "MGW/OEM operating spares supplier",
+    "location": "Factory/yard delivery as opted",
+    "method": "Quote optional two-year operating spares and replacements",
+    "deliverable": "OEM SPIR, qty rationale, quote",
+    "quantityBasis": "2-year life/MTBF basis, qty and price pending",
+    "payer": "C2 option only",
+    "executionStatus": "OPTION_ONLY",
+    "expenseObjectKey": "TWO-YEAR-SPARES",
+    "invoiceStatus": "NOT_VERIFIED",
+    "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
+  }
+});
+export const B1_PROJECT_EXPENSE_LEDGER_0553=Object.freeze(SOURCE_EXPENSE_ROWS_0553.map(row=>{
+ const context=CFO_EXECUTION_CONTEXT_0553[row.id];
+ if(!context)throw Error("Unmapped CFO execution owner: "+row.id);
+ return Object.freeze({...row,...context});
+}));
 export const B1_LEDGER_BASELINE_0553=Object.freeze({b1WorkingSellTHB:510000,source:"Rev05 08_B1_ENGINEERING 964 MH, 27 activities",state:"BASELINE_UNCHANGED_NOT_INDIRECT_COST_VALIDATED"});
 export function selectB1ProjectExpenseLedger0553(){
  const rows=B1_PROJECT_EXPENSE_LEDGER_0553;
@@ -588,11 +1005,15 @@ export function selectB1ProjectExpenseLedger0553(){
  if(new Set(ids).size!==ids.length)throw Error("Duplicate expense object in B1 project ledger");
  if(rows.some(r=>r.owner==="B1"&&!r.account?.startsWith("B1.")))throw Error("B1 account missing");
  if(rows.some(r=>r.owner!=="B1"&&r.account?.startsWith("B1.")))throw Error("Cross-owner cost posting");
+ if(rows.some(r=>!r.executor||!r.location||!r.method||!r.deliverable||!r.payer||!r.executionStatus||!r.expenseObjectKey))throw Error("CFO who/where/how/owner coverage missing");
+ const keys=rows.map(r=>r.expenseObjectKey);
+ if(new Set(keys).size!==keys.length)throw Error("Duplicate cost expense event across WBS owners");
  const b1=rows.filter(r=>r.owner==="B1");
  const outside=rows.filter(r=>r.owner!=="B1");
  const knownCost=b1.filter(r=>Number.isFinite(r.workingCostTHB));
  return Object.freeze({rows,b1,outside,pricedB1:knownCost.length,unpricedB1:b1.length-knownCost.length,
   b1NewWorkingCostTHB:b1.every(r=>Number.isFinite(r.workingCostTHB))?b1.reduce((s,r)=>s+r.workingCostTHB,0):null,
-  baseline:B1_LEDGER_BASELINE_0553,postingAllowed:false,
+  baseline:B1_LEDGER_BASELINE_0553,postingAllowed:false,financialReleaseState:"BLOCKED_UNTIL_RACI_AND_RATE_EVIDENCE",
+  roleMappedCount:rows.filter(r=>Boolean(r.executor&&r.location&&r.method)).length,approvalRequiredCount:rows.filter(r=>r.executionStatus!=="CONFIRMED").length,
   source:"Rev.K/Rev.L/Rev.J/Rev.I; MR0001–0004/BOD/DTS/SPE; 10.2 canonical ledgers"});
 }
