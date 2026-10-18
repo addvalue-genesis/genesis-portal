@@ -65,7 +65,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
   </div>}
   {code==="B3"&&satToolReadiness&&<div className="p55-panel" data-component-key="bid.budget.working.bc.b3.sat-tools" style={{padding:12}}>
    <h4>B3 — SAT Test Equipment Compliance (non-posting engineering evidence)</h4>
-   <p className="p55-note">MR0001 SCADA · MR0002 RFI BDA/DAS · MR0003 Ex Phone/Sounder · MR0004 ORGA RACON. Tool readiness is NOT a SAT pass, supplier quotation, working direct cost or automatic Working Sell update. Known VeEX MX100+ rental rate: <strong>THB 1,000 per day</strong>; rental days remain unconfirmed.</p>
+   <p className="p55-note">MR0001 SCADA · MR0002 RFI BDA/DAS · MR0003 Ex Phone/Sounder · MR0004 ORGA RACON. Tool readiness is NOT a SAT pass, supplier quotation, working direct cost or automatic Working Sell update. VeEX MX100+ budget: <strong>30 days × THB 1,000/day = THB 30,000 (ex VAT)</strong>, included ONCE in current B3 Working Sell with no markup planning assumption. Rental receipt/campaign dates and verified Direct Cost remain open; other calibrated RF/audio/marine equipment costs are unpriced.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>MR / Test IDs</th><th>Tool / Instrument</th><th>Acquisition</th><th>Rate</th><th>Extended Cost</th><th>Source Status / Gate</th></tr></thead>
     <tbody>{satToolReadiness.rows.map(x=><tr key={x.id}>
