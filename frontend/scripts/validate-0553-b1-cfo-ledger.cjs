@@ -17,7 +17,8 @@ for(const row of rows){
  assert.equal(row.postingState,"SOURCE_ACTIVITY_ONLY","Missing nonposting gate "+row.id);
  assert.ok(row.owner!=="B1"||row.account?.startsWith("B1."),"B1 account missing "+row.id);
 }
-for(const id of ["FAT-CREW","FAT-TRAVEL","YARD-CREW","YARD-TRAVEL"]) assert.equal(byId.get(id).owner,"B9","China costs must post B9 only: "+id);
+for(const id of ["FAT-CREW","FAT-TRAVEL"])assert.equal(byId.get(id).owner,"B3","MGW FAT costs must belong B3: "+id);
+for(const id of ["YARD-CREW","YARD-TRAVEL"])assert.equal(byId.get(id).owner,"B9","Optional Yard Specialist belongs B9: "+id);
 for(const id of ["SAT-CREW","SAT-TOOL","RACON-VESSEL","BF-SURVEY"]) assert.equal(byId.get(id).owner,"B3","Field costs must post B3 only: "+id);
 assert.equal(byId.get("DOC-CTRL").owner,"B2");
 assert.equal(byId.get("FREIGHT").owner,"B6");
