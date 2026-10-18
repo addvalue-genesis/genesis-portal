@@ -17,16 +17,45 @@ assert(work.includes('componentKey="bid.budget.working.bc"'));
 assert(work.includes('componentKey={item.moduleId}'));
 assert(scope.includes('componentKey="bid.budget.scope"'));
 assert(work.includes('componentKey={bcTab==="ALL"?"bid.budget.working.bc":"bid.budget.working.bc."+bcTab.toLowerCase()}'));
-assert(work.includes('bcWorking.rows.map('));
-assert(work.includes('item.workingSellTHB'));
-assert(work.includes('item.directCostTHB'));
-assert(work.includes('bcPriceAudit.byCode[item.code]?.historicalReferenceTHB'));
-assert(work.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcDetailCode]}/>'));
+// 10.2 uses one canonical model, grouped into Part B Base and Part C Options.
+// The previous inline bcWorking.rows.map(...) contract was removed by the
+// grouped 10.2 UX; validate the actual routed data and both detail modes.
+assert(work.includes('const bcWorking=selectBcTurnkeyWorkingCost0553();'),
+ "10.2 must use its canonical Working Cost selector");
+assert(work.includes('const partBRows=bcWorking.rows.filter(r=>!r.optional);') &&
+ work.includes('const partCRows=bcWorking.rows.filter(r=>r.optional);'),
+ "10.2 must partition the canonical B/C rows by base versus optional");
+assert(work.includes('rows:partBRows,total:partBWorkingSell') &&
+ work.includes('rows:partCRows,total:partCWorkingSell') &&
+ work.includes('group.rows.map(item=>'),
+ "10.2 ALL view must render both current working groups from canonical rows");
+assert(work.includes('item.workingSellTHB') &&
+ work.includes('item.directCostTHB') &&
+ work.includes('data-component-key={item.moduleId}'),
+ "Canonical per-category Working Sell, Direct Cost and IDs must remain visible");
+assert(work.includes('if(Math.abs(partBWorkingSell-bcWorking.knownWorkingSellTHB)>0.01)throw Error("10.2 Part B summary mismatch")'),
+ "Current Part B Base summary must reconcile to canonical source without optional C");
+assert(work.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}/>') &&
+ work.includes('<BcWorkCostLines0553 selectedCode={bcTab}/>'),
+ "Selected B/C category must display canonical cost evidence and line ledger");
+assert(work.includes('bcDetailCode===item.code') &&
+ work.includes('<BcCostEvidenceDetail0553 workingRow={item}/>') &&
+ work.includes('<BcWorkCostLines0553 selectedCode={item.code}/>'),
+ "ALL view expanded category must display that canonical row's evidence and cost lines");
 assert(work.includes('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>'),
- "10.2 must show same B10/B11/B13/B14/C1/C2 full price details as 10.5");
-assert(work.includes('bcTab==="ALL"&&<div className="p55-table-wrap"'),"Only summary tab should show the all-B/C summary table");
-assert(work.indexOf('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>') <
- work.indexOf('bcWorking.rows.map(item=>item)'),"B10 detail should appear immediately below tabs, before the summary section");
+ "10.2 must show the same full B10/B11/B13/B14/C1/C2 price annex as 10.5");
+assert(work.includes('bcTab==="ALL"&&<section className="p55-panel" data-component-key="bid.budget.working.bc.inline-list"'),
+ "Only ALL tab must render the complete grouped Part B/C listing");
+const tabPosition=work.indexOf('<ScopeCategoryTabs0553 value={bcTab}');
+const detailPosition=work.indexOf('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}/>');
+const annexPosition=work.indexOf('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>');
+const allListingPosition=work.indexOf('data-component-key="bid.budget.working.bc.inline-list"');
+assert(tabPosition>=0 && tabPosition<detailPosition &&
+ detailPosition<annexPosition && annexPosition<allListingPosition,
+ "Shared 10.2 layout must render tabs then selected detail/annex before ALL grouped listing");
+assert(scope.includes('<ScopeCategoryTabs0553 value={category[1]==="A/B/C"?"ALL":category[1]}'),
+ "10.5 must reuse shared category tabs, independent of 10.2 cost owner");
+
 const annex=read("project0553/ScopeBcAnnexDetail0553.jsx");
 assert(annex.includes('const inWorking=mode==="working"') &&
  annex.includes('inWorking?"bid.budget.working.bc."') &&
