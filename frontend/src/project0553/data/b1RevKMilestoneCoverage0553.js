@@ -1,7 +1,7 @@
 // PJ2608-0553: Rev.K K00–K18 milestone coverage for residual B1 PROJECT MANAGEMENT only.
 // THIS IS A CHILD ALLOCATION of PM-MILESTONE, not 19 extra expense postings.
 // Each stage's physical labour/tools/travel stays with the listed A/B2–B14/C or JUTAL owner.
-export const B1_REVK_MILESTONE_COVERAGE_0553=Object.freeze([
+const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
   {
     "id": "PM-K00",
     "stage": "K00",
@@ -364,6 +364,144 @@ export const B1_REVK_MILESTONE_COVERAGE_0553=Object.freeze([
     "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
   }
 ]);
+// CFO planning effort: estimated office PM touchpoint hours per UNIQUE management event.
+// These are explicit management assumptions prompted by Rev.K gates, NOT verified Rev.K activity durations.
+// Shared events K03–K07 and K08–K11 charge once only.
+const B1_CFO_PM_EVENT_ESTIMATES_0553=Object.freeze([
+  {
+    "key": "PM-GATE-K00",
+    "ownerStage": "K00",
+    "stages": [
+      "K00"
+    ],
+    "mh": 8,
+    "reason": "Kickoff, scope/owner baseline and management gate: CFO 8h provisional allowance"
+  },
+  {
+    "key": "PM-GATE-K01",
+    "ownerStage": "K01",
+    "stages": [
+      "K01"
+    ],
+    "mh": 4,
+    "reason": "Single MGW FAT notice/punch decision: office PM only, 4h estimated"
+  },
+  {
+    "key": "PM-GATE-K02",
+    "ownerStage": "K02",
+    "stages": [
+      "K02"
+    ],
+    "mh": 4,
+    "reason": "DDP receiving/exception approval event: office PM 4h allowance"
+  },
+  {
+    "key": "PM-GATE-K03-K07",
+    "ownerStage": "K03",
+    "stages": [
+      "K03",
+      "K04",
+      "K05",
+      "K06",
+      "K07"
+    ],
+    "mh": 4,
+    "reason": "One shared Yard construction/installation readiness review covers K03–K07, not five charges"
+  },
+  {
+    "key": "PM-GATE-K08-K11",
+    "ownerStage": "K08",
+    "stages": [
+      "K08",
+      "K09",
+      "K10",
+      "K11"
+    ],
+    "mh": 4,
+    "reason": "One shared cross-MR Yard integration/testing coordination review covers K08–K11"
+  },
+  {
+    "key": "PM-GATE-K12",
+    "ownerStage": "K12",
+    "stages": [
+      "K12"
+    ],
+    "mh": 4,
+    "reason": "Pre-loadout/MC gate and action closeout, 4h estimated"
+  },
+  {
+    "key": "PM-GATE-K13",
+    "ownerStage": "K13",
+    "stages": [
+      "K13"
+    ],
+    "mh": 2,
+    "reason": "Marine milestone monitoring from office, NOT offshore attendance, 2h estimated"
+  },
+  {
+    "key": "PM-GATE-K14",
+    "ownerStage": "K14",
+    "stages": [
+      "K14"
+    ],
+    "mh": 4,
+    "reason": "HUC RFSAT go/no-go approval and access coordination, 4h estimated"
+  },
+  {
+    "key": "PM-GATE-K15",
+    "ownerStage": "K15",
+    "stages": [
+      "K15"
+    ],
+    "mh": 4,
+    "reason": "Brownfield host-access/project interfaces, exclude survey labour, 4h estimated"
+  },
+  {
+    "key": "PM-GATE-K16",
+    "ownerStage": "K16",
+    "stages": [
+      "K16"
+    ],
+    "mh": 6,
+    "reason": "Multi-location SAT progress/risk and client escalation, NOT technician days, 6h estimated"
+  },
+  {
+    "key": "PM-GATE-K17",
+    "ownerStage": "K17",
+    "stages": [
+      "K17"
+    ],
+    "mh": 4,
+    "reason": "SIT 72h readiness/signatory coordination; exclude test team, 4h estimated"
+  },
+  {
+    "key": "PM-GATE-K18",
+    "ownerStage": "K18",
+    "stages": [
+      "K18"
+    ],
+    "mh": 8,
+    "reason": "Final milestone claim/closeout management; B2 dossier and B3 test report excluded, 8h estimated"
+  }
+]);
+const eventByStage=new Map();
+for(const event of B1_CFO_PM_EVENT_ESTIMATES_0553){
+ for(const stage of event.stages){
+  if(eventByStage.has(stage))throw Error("Duplicate PM event stage "+stage);
+  eventByStage.set(stage,event);
+ }
+}
+export const B1_REVK_MILESTONE_COVERAGE_0553=Object.freeze(B1_REVK_SOURCE_COVERAGE_0553.map(r=>{
+ const event=eventByStage.get(r.stage);
+ if(!event)throw Error("Unmapped Rev.K PM cost event "+r.stage);
+ return Object.freeze({...r,moduleId:"bid.budget.working.bc.b1.revk."+r.stage.toLowerCase(),
+  chargeEventKey:event.key,chargeOwnerStage:event.ownerStage,
+  chargeableHere:r.stage===event.ownerStage,
+  planningPmHours:r.stage===event.ownerStage?event.mh:null,
+  budgetHoursBasis:event.reason,effortType:"CFO_PROVISIONAL_GATE_TOUCHPOINT_HOURS_NOT_REV_K_VERIFIED",
+  costOwner:"B1",workingCostTHB:null,workingSellTHB:null});
+}));
+export const B1_PM_BUDGET_ESTIMATED_HOURS_0553=B1_CFO_PM_EVENT_ESTIMATES_0553.reduce((n,x)=>n+x.mh,0);
 export const B1_ONSHORE_PM_SCENARIO_0553=Object.freeze({
   usdPerPersonDay:600,fxTHBPerUSD:31.5,thbPerPersonDay:18900,
   source:"USER_CANDIDATE_USD600_NOT_VERIFIED_AS_APPROVED_RATE__FX_REV05_31_5",
@@ -377,11 +515,28 @@ export function selectB1RevKMilestoneCoverage0553(){
  const rows=B1_REVK_MILESTONE_COVERAGE_0553;
  if(rows.length!==19||rows.some((row,i)=>row.stage!=="K"+String(i).padStart(2,"0")))
   throw Error("Missing/out-of-order Rev.K milestone in B1 PM coverage");
+ if(new Set(rows.map(r=>r.moduleId)).size!==rows.length)
+  throw Error("Duplicate B1 PM Module ID");
  if(new Set(rows.map(r=>r.expenseEventKey)).size!==rows.length)
-  throw Error("Duplicate B1 PM milestone event");
+  throw Error("Duplicate source milestone event");
+ const billed=rows.filter(x=>x.chargeableHere);
+ if(billed.length!==B1_CFO_PM_EVENT_ESTIMATES_0553.length||B1_PM_BUDGET_ESTIMATED_HOURS_0553!==56)
+  throw Error("Unexpected CFO PM management effort allowance");
+ if(new Set(billed.map(x=>x.chargeEventKey)).size!==billed.length)
+  throw Error("Duplicate PM charge event");
+ for(const r of rows){
+  const owner=rows.find(x=>x.stage===r.chargeOwnerStage);
+  if(!owner||!owner.chargeableHere||owner.chargeEventKey!==r.chargeEventKey)
+   throw Error("B1 charge owner mismatch "+r.stage);
+  if(!r.chargeableHere&&r.planningPmHours!==null)
+   throw Error("Indirect shared-stage duplicate PM hours "+r.stage);
+ }
  if(rows.some(r=>r.parentExpenseId!=="PM-MILESTONE"||r.costOwner!=="B1"||!r.directOwner))
   throw Error("B1 milestone cost ownership not segregated");
  return Object.freeze({rows,rate:B1_ONSHORE_PM_SCENARIO_0553,
   basePostingAllowed:false,scenarioDefaultDays:null,sourceRevision:"Rev.K 2026-10-18",
-  coverageTotal:rows.length,projectExpenseOwner:"PM-MILESTONE"});
+  coverageTotal:rows.length,uniquePmBudgetEvents:billed.length,
+  initialEstimatedPmHours:B1_PM_BUDGET_ESTIMATED_HOURS_0553,
+  effortEvidenceState:"CFO_PROVISIONAL_GATE_TOUCHPOINT_ASSUMPTION__NOT_REV_K_QUANTIFIED",
+  projectExpenseOwner:"PM-MILESTONE"});
 }
