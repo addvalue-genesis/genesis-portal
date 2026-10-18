@@ -38,9 +38,10 @@ const expectedBase=Math.round((wbsBase+baseDelta+baseBudgetCodes.reduce((v,c)=>v
 assert.equal(m.knownWorkingSellTHB,expectedBase,"Current B1/B3/B9 replaced rather than added to Rev05 WBS");
 assert.equal(m.knownWorkingSellTHB,4600020.95,"Controlled revised pre-award Part B Base Working SELL");
 assert.equal(m.byCode.B1.workingSellTHB,624030.26);
-assert.equal(m.byCode.B3.workingSellTHB,2046000);
-assert.equal(m.byCode.B9.workingSellTHB,397400);
+assert.equal(m.byCode.B3.workingSellTHB,2443400);
+assert.equal(m.byCode.B9.workingSellTHB,0);
 assert.equal(m.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600);
+assert.equal(m.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB,397400);
 assert.equal(scope.knownAddvalueWorkingSellTHB,m.knownWorkingSellTHB);
 assert.equal(m.knownDirectCostTHB,null);
 assert.equal(m.baseTurnkeyCostTHB,null);
