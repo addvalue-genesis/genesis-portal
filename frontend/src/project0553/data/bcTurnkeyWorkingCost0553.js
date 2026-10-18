@@ -4,6 +4,7 @@
 // WBS sell figures and historical references NEVER become a cost posting.
 // Source-line quantities are retained as requirements, not approved spare quantities.
 import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
+import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
 import {LIFECYCLE_SPARES_0553} from "./lifecycleSpareScope0553";
 import {selectBcCostEvidenceDerivation0553} from "./bcCostEvidenceDerivation0553";
 import {FAT_EXECUTION_BASIS_0553} from "./fatExecutionBasis0553";
@@ -129,6 +130,20 @@ export function selectBcTurnkeyWorkingCost0553(){
    sourceStatus:w.state,
    b11VendorFollowup:code==="B11"?Object.freeze({status:"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING",amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08 B11 itemized tools",verifiedDirectCost:false,releaseAllowed:false,verification:"Requote tools with MGW/OEM; deduct included Part A tooling before bid release"}):null,
    unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08",fxTHBPerUSD:31.5,pricingClass:"BUDGETARY_WORKING_SELL",verifiedDirectCost:false,sourceLines:spareBudget.byCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
+   b9OnshoreRateReview:code==="B9"?Object.freeze({
+    source:ONSHORE_WORKING_SELL_RATE_0553.source,
+    status:"MANAGEMENT_APPROVED_ONSHORE_PERSON_DAY_RATE__REPRICE_NOT_POSTED",
+    perPersonUSDPerDay:ONSHORE_WORKING_SELL_RATE_0553.usdPerPersonDay,
+    workingFX:ONSHORE_WORKING_SELL_RATE_0553.thbPerUsd,
+    perPersonTHBPerDay:ONSHORE_WORKING_SELL_RATE_0553.thbPerPersonDay,
+    crewSizeWorkingReference:2,
+    laborOnlyTeamTHBPerDay:ONSHORE_WORKING_SELL_RATE_0553.thbPerPersonDay*2,
+    previousChinaTeamDaySellTHB:47880,
+    originalB9WorkingSellTHB:w.sellTHB,
+    perDiemIncluded:false,travelIncluded:false,accommodationIncluded:false,visaIncluded:false,
+    costOwner:"B9",releaseAllowed:false,
+    pricingGate:"Confirm China FAT and yard team-day allocation; separate per diem/travel and shared trip before replacing B9 sell"
+   }):null,
    b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b10WorkingSellDecision:code==="B10"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b10WorkingSellTHB,source:"4-Scope of Supply.xlsx · Rev08 · B10",historicalUSD:b10HistoricalUSD,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"WORKING_SELL_ONLY"}):null,
    b5PriceReference:code==="B5"?b5PriceReference:null,
