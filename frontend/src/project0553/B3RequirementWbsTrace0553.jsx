@@ -13,7 +13,7 @@ export function B3RequirementWbsTrace0553({selectedOwner="B3"}){
   <thead><tr><th>Module ID / Requirements</th><th>WBS / MR / Owner</th><th>BOD / SPE / DTS: Required result</th><th>Rev.K: Work to execute</th><th>Who / Where</th><th>Evidence / Acceptance</th><th>Source / Gate</th></tr></thead>
   <tbody>{rows.map(r=><tr key={r.id} data-component-key={r.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere",whiteSpace:"normal"}}>
    <td><strong>{r.id}</strong><small>{r.moduleId}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={r.moduleId}/></td>
-   <td><strong>{r.wbs} · {r.system}</strong><small>Owner: {r.costOwner} ONLY</small><small>{r.requirementClass} · {r.status}</small></td>
+   <td><strong>{r.wbs} · {r.system}</strong><small>Candidate Cost Owner: {r.costOwner}</small><small>{r.contractualRequirementState}</small><small>{r.addvalueAttendanceState}</small><small>{r.b9CommercialTreatment||r.status}</small></td>
    <td><strong>{r.requiredResult}</strong></td>
    <td>{r.activity}<small>Cost boundary: {r.costRule}</small></td>
    <td>{r.responsibility}<small>{r.location}</small></td>
@@ -31,6 +31,7 @@ export function B3RequirementWbsTrace0553({selectedOwner="B3"}){
   {render(primary)}
   <button type="button" className="p553-detail-button" aria-expanded={showOthers} onClick={()=>setShowOthers(v=>!v)}>{showOthers?"− Hide":"+ Review"} Cross-owner obligations (read-only; non-additive, {others.length})</button>
   {showOthers&&render(others)}
+  <p className="p55-note"><strong>Mandatory deliverable is not mandatory ADDVALUE attendance:</strong> Yard SAT under SPE §7.3.2 remains required, but JUTAL/MGW/ADDVALUE execution and witness assignment must follow contractual RACI. SPE §7.3.4 requests onshore/offshore site-support man-day rates; it does not establish unconditional 12 ADDVALUE Yard team-days. B9 cost posting for Yard support is CONDITIONAL on call-out or signed scope.</p>
   <p className="p55-note"><strong>Contract gates:</strong> SPE §7.3.2 explicitly requires Fabrication Yard SAT; SPE §7.3.3 requires offshore commissioning/final performance; SPE §7.3.4 requests onshore/offshore support man-day rates. BOD §10.2 requests 30-day FAT notice versus SPE §7.3 14-day; resolve controlling requirement before scheduling. The SPE's post-Yard SAT transfer of some devices to ZPQ and old TETRA gateway wording must be clarified against current DMR/RFI Rev.K before budgeting or execution.</p>
  </section>;
 }
