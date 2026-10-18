@@ -10,7 +10,7 @@ export function B1RevKMilestoneBudget0553(){
  const model=selectB1RevKMilestoneCoverage0553();
  const owners=model.rows.filter(r=>r.chargeableHere);
  const [rate,setRate]=useState(String(model.rate.usdPerPersonDay));
- const [hours,setHours]=useState(()=>Object.fromEntries(owners.map(r=>[r.stage,String(r.planningPmHours)])));
+ const [hours,setHours]=useState(()=>Object.fromEntries(owners.map(r=>[r.stage,String(r.stage==="K00"?0:r.planningPmHours)])));
  const [showExclusions,setShowExclusions]=useState(false);
  const validRate=checkNonnegative(rate);
  const fx=model.rate.fxTHBPerUSD;
@@ -24,7 +24,7 @@ export function B1RevKMilestoneBudget0553(){
   const r=planned.find(x=>x.stage===stage);
   return r&&r.enteredHours!==null&&pmHourRate!==null?round(r.enteredHours*pmHourRate):null;
  };
- const reset=()=>setHours(Object.fromEntries(owners.map(r=>[r.stage,String(r.planningPmHours)])));
+ const reset=()=>setHours(Object.fromEntries(owners.map(r=>[r.stage,String(r.stage==="K00"?0:r.planningPmHours)])));
  return <section className="p55-panel" data-component-key="bid.budget.working.bc.b1.revk-pm-milestones" style={{padding:14,marginTop:12}}>
   <div className="p55-eyebrow">B1 ONLY / REV.K / CFO ACTIVITY-BASED BUDGET <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.working.bc.b1.revk-pm-milestones"/></div>
   <h3>B1 — Project Management by Rev.K Milestone (K00–K18)</h3>
@@ -35,11 +35,11 @@ export function B1RevKMilestoneBudget0553(){
    <div><strong>CFO planned Office PM effort</strong><p>{sumHours===null?"INCOMPLETE":sumHours+" MH"}</p><small>Proxy estimate {model.initialEstimatedPmHours} MH / 8 MH ต่อคน-วัน</small></div>
    <div><strong>B1 Budgetary PM SELL (partial B1 only)</strong><p>{money(totalBudgetarySell)}</p><small>Management-approved Onshore labour rate; PM hours are provisional · NON-POSTING</small></div>
   </div>
-  <p className="p55-note"><strong>หลักฐานและสมมติฐาน:</strong> Rev.K ระบุ 19 ขั้นและ Acceptance Gates แต่ไม่ได้ระบุ PM-hours ของผู้บริหาร จึงตั้ง <strong>CFO planning proxy 56 MH / 12 การประสานงานที่ไม่ซ้ำ</strong> (2–8 MH ต่อเหตุการณ์) และเปิดให้ปรับได้ อัตราค่าแรง Onshore USD 600/คน/วันได้รับการเลือกใช้โดย Management แล้ว (18-Oct-2026) แต่ยังไม่ใช่ Actual Direct Cost; ชั่วโมง PM เป็นเพียง Budgetary Planning Proxy ผลรวมนี้เป็น Budgetary SELL บางส่วนของ B1 เท่านั้น และ <strong>ไม่เพิ่มเข้ากับ B1 THB 510,000 เดิม</strong></p>
+  <p className="p55-note"><strong>หลักฐานและสมมติฐาน:</strong> Rev.K ระบุ 19 ขั้นและ Acceptance Gates แต่ไม่ได้ระบุ PM-hours ของผู้บริหาร จึงตั้ง <strong>CFO source proxy 56 MH / 12 gates; ปัจจุบัน 48 MH / 11 chargeable gates เพราะ K00 kickoff 8 MH อยู่ใน Engineering WBS แล้ว</strong> (2–8 MH ต่อเหตุการณ์) และเปิดให้ปรับได้ อัตราค่าแรง Onshore USD 600/คน/วันได้รับการเลือกใช้โดย Management แล้ว (18-Oct-2026) แต่ยังไม่ใช่ Actual Direct Cost; ชั่วโมง PM เป็นเพียง Budgetary Planning Proxy ผลรวมนี้เป็น Budgetary SELL บางส่วนของ B1 เท่านั้น และ <strong>รวมอยู่ใน B1 Working Sell ใหม่ (Engineering + 48 MH PM) โดยไม่บวกซ้ำ</strong></p>
   <div className="p55-filterbar" style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap",marginBottom:12}}>
    <label>Onshore Office PM — budgetary SELL (USD/person-day) <input type="number" min="0" step="1" value={rate} onChange={e=>setRate(e.target.value)} style={{marginLeft:8,maxWidth:130}}/></label>
    <strong>{money(moneyPerDay)} / day</strong>
-   <button type="button" className="p553-detail-button" onClick={reset}>Restore CFO 56-MH scenario</button>
+   <button type="button" className="p553-detail-button" onClick={reset}>Restore 48-MH no-double-post scenario</button>
    <button type="button" className="p553-detail-button" onClick={()=>setHours({})}>Clear PM assumptions</button>
   </div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{width:"100%",minWidth:1490,tableLayout:"fixed",fontSize:12}}>
@@ -48,7 +48,7 @@ export function B1RevKMilestoneBudget0553(){
     <th>MODULE ID / REV.K</th><th>MILESTONE</th><th>WHO</th><th>WHERE</th><th>B1 ONLY — WHAT / HOW</th><th>PM HOURS</th><th>B1 PM SELL (THB)</th><th>STATUS</th>
    </tr></thead>
    <tbody>{model.rows.map(row=>{
-    const leader=row.chargeableHere;
+    const leader=row.chargeableHere&&row.stage!=="K00";
     const h=leader?checkNonnegative(hours[row.stage]):null;
     const value=leader?amountFor(row.stage):null;
     return <tr key={row.moduleId} data-component-key={row.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere",whiteSpace:"normal"}}>
@@ -56,15 +56,15 @@ export function B1RevKMilestoneBudget0553(){
      <td><strong>{row.phase}</strong><small>{row.source}</small></td>
      <td>{row.who}</td>
      <td>{row.where}</td>
-     <td><strong>{row.how}</strong><small>Evidence / Deliverable: {row.deliverable}</small><small>{leader?row.budgetHoursBasis:"Already included in "+row.chargeOwnerStage+" shared PM management event"}</small></td>
-     <td>{leader?<input type="number" min="0" step="0.5" aria-label={row.stage+" B1 PM hours"} value={hours[row.stage]??""} onChange={e=>setHours(old=>({...old,[row.stage]:e.target.value}))} placeholder="TBC" style={{maxWidth:90,width:"100%"}}/>:<strong>Included in {row.chargeOwnerStage}</strong>}<small>{leader?(h!==null?round(h/8)+" MD (estimate)":"MH input required"):"No additional MH"}</small></td>
+     <td><strong>{row.how}</strong><small>Evidence / Deliverable: {row.deliverable}</small><small>{leader?row.budgetHoursBasis:row.stage==="K00"?"Already included in engineering WBS technical kickoff":"Already included in "+row.chargeOwnerStage+" shared PM management event"}</small></td>
+     <td>{leader?<input type="number" min="0" step="0.5" aria-label={row.stage+" B1 PM hours"} value={hours[row.stage]??""} onChange={e=>setHours(old=>({...old,[row.stage]:e.target.value}))} placeholder="TBC" style={{maxWidth:90,width:"100%"}}/>:<strong>{row.stage==="K00"?"Included in Engineering WBS":"Included in "+row.chargeOwnerStage}</strong>}<small>{leader?(h!==null?round(h/8)+" MD (estimate)":"MH input required"):"No additional MH"}</small></td>
      <td><strong>{leader?money(value):"Included — Not additive"}</strong><small>{leader?"B1 budgetary PM ONLY":"B1 event "+row.chargeEventKey+" already counted"}</small></td>
      <td><strong>{leader?"PROXY":"SHARED"}</strong><small>NOT POSTED</small></td>
     </tr>;
    })}</tbody>
   </table></div>
   <p className="p55-note"><strong>Rate policy:</strong> USD 600 เป็นค่าแรง Onshore ต่อคน/วัน ไม่รวมค่าเดินทาง โรงแรม Visa และ Per Diem หากมีการคิดรายการเหล่านี้ต้องอยู่ใน Cost Owner ของกิจกรรมจริง (China FAT/Yard = B9) ไม่ใช่เพิ่มไว้ที่ B1 อีกครั้ง</p>
-  <p className="p55-note"><strong>Cash-control check:</strong> {model.uniquePmBudgetEvents} unique B1 management events, {model.coverageTotal} Rev.K references; no physical execution or other B-item value is added to the B1 PM subtotal. Estimated B1 Office PM SELL {money(totalBudgetarySell)} is <strong>not complete B1 Working Cost</strong> and has no authorization to replace the current Canonical B1 Working Sell.</p>
+  <p className="p55-note"><strong>Cash-control check:</strong> {model.uniquePmBudgetEvents} unique B1 management events, {model.coverageTotal} Rev.K references; no physical execution or other B-item value is added to the B1 PM subtotal. Estimated B1 Office PM SELL {money(totalBudgetarySell)} is <strong>not complete B1 Working Cost</strong> and is already a component of updated B1 Working Sell; any edits in this what-if table require explicit canonical budget review.</p>
   <button type="button" className="p553-detail-button" aria-expanded={showExclusions} onClick={()=>setShowExclusions(v=>!v)}>{showExclusions?"− Hide":"+ Review"} Other Cost Owners (reference only — NO AMOUNT)</button>
   {showExclusions&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Rev.K reference</th><th>Separate Cost Owner — not posted in B1</th><th>Single-owner key</th></tr></thead><tbody>
    {model.rows.map(row=><tr key={row.stage}><td>{row.stage}</td><td>{row.directOwner}</td><td>{row.chargeEventKey}</td></tr>)}
