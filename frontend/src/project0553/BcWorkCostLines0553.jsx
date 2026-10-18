@@ -5,6 +5,8 @@ import {B1B2EquationAudit0553} from "./B1B2EquationAudit0553";
 import {B3EquationAudit0553} from "./B3EquationAudit0553";
 import {B5EquationAudit0553} from "./B5EquationAudit0553";
 import {selectB9ChinaWorkingBudget0553} from "./data/b9ChinaWorkingBudget0553";
+import {selectB1ActivityWorkingSell0553} from "./data/b1ActivityWorkingSell0553";
+import {selectB3FortyDayWorkingSell0553} from "./data/b3FortyDayWorkingSell0553";
 import {selectB3WorkingSellAfterChinaFat0553} from "./data/b3ChinaFatOwnership0553";
 
 const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
@@ -16,10 +18,25 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  const showGroup=selectedCode==="ALL"?m.activeCodes:[selectedCode];
  const available=m.rows.filter(x=>showGroup.includes(x.code));
  const china=selectB9ChinaWorkingBudget0553();
+ const b1Current=selectB1ActivityWorkingSell0553();
+ const b3Current=selectB3FortyDayWorkingSell0553();
  // Rev05 B3 Bangkok FAT is superseded by Rev.K MGW China FAT (B9).
  // Original B9 mixed labor/per-diem line is replaced by itemized Rev.K B9 ledger.
  const physical=[
-  ...available.filter(x=>!x.id.startsWith("COST-AUD-")&&x.id!=="B3-FAT-BKK"&&x.code!=="B9"),
+  ...available.filter(x=>!x.id.startsWith("COST-AUD-")&&x.code!=="B3"&&x.code!=="B9"),
+  ...(showGroup.includes("B3")?[...b3Current.rows.map(x=>({
+   code:"B3",id:"B3-"+x.id,moduleId:"bid.budget.working.bc.b3.current-"+x.id.toLowerCase(),name:x.site+" — "+x.reason,
+   quantity:x.days,unit:"2-person team workdays",workingSellRateTHB:50400,workingSellTHB:x.workingSellTHB,
+   historicalCostProxyTHB:null,owner:"B3",sourceRef:"Rev.K "+x.wbs+" "+x.mr+"; management 40-day choice",
+   scopeGate:"WORKING_SELL_40_DAY_2_CREW__SCHEDULE_PENDING",equation:x.days+" team days × 2 × USD800 × 31.5",
+   requiredQuantityStatus:"MANAGEMENT_SELECTED_40_DAY_WORK_WINDOW",reconciliationTag:"B3-REV_K-40DAY",includedInExistingCostOwner:null
+  })),{
+   code:"B3",id:"B3-VEEX-MX100",moduleId:"bid.budget.working.bc.b3.veex-mx100",name:"VeEX MX100+ temporary SAT instrument rental",
+   quantity:30,unit:"rental-day",workingSellRateTHB:1000,workingSellTHB:30000,historicalCostProxyTHB:null,
+   owner:"B3",sourceRef:b3Current.veex.rateSource,scopeGate:"30_DAYS_EX_VAT_PASS_THROUGH__OTHER_RF_INSTRUMENTS_PENDING",
+   equation:"30 rental-days × THB1000 (no markup planning basis)",requiredQuantityStatus:"CURRENT_RENTAL_SCENARIO",
+   reconciliationTag:"B3-REV_K-TOOLS",includedInExistingCostOwner:null
+  }]:[]),
   ...(showGroup.includes("B9")?china.rows.filter(x=>!x.optional).map(x=>({
    code:"B9",id:x.id,moduleId:x.moduleId,name:x.description,quantity:x.qty,unit:x.unit,
    workingSellRateTHB:x.unitRateTHB,workingSellTHB:x.workingSellTHB,historicalCostProxyTHB:null,
@@ -32,7 +49,8 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  const clauses=available.filter(x=>x.id.startsWith("COST-AUD-"));
  const historicalProxy=physical.reduce((sum,x)=>sum+(x.historicalCostProxyTHB??0),0);
  const currentSourceSell={...m.workingSellByCode,
-  B3:selectB3WorkingSellAfterChinaFat0553(m.workingSellByCode.B3),
+  B1:b1Current.workingSellTHB,
+  B3:b3Current.workingSellTHB,
   B9:china.workingSellTHB};
  const displayedWbsSell=showGroup.reduce((sum,code)=>sum+(currentSourceSell[code]??0),0);
  const completeSell=showGroup.every(code=>Number.isFinite(currentSourceSell[code]));
