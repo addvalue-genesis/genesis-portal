@@ -10,7 +10,7 @@ const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const r=ONSHORE_WORKING_SELL_RATE_0553;
 const assumptionRows=[
  ["FAT-STAFF","K01","China MGW OEM FAT — 2 ADDVALUE paid witnesses","person-day",4,r.thbPerPersonDay,"USER_APPROVED_RATE__2_FAT_DAYS_PROVISIONAL","Rev.K K01 (2 paid attendees; 1 unbilled standby). FAT duration 2 days ASSUMED; actual MGW schedule pending"],
- ["YARD-STAFF","K02-K12","JUTAL Zhuhai Yard ADDVALUE call-out ONLY on specific instruction","person-day",20,r.thbPerPersonDay,"USER_APPROVED_RATE__REV05_12_TEAM_DAYS_PROVISIONAL","Rev.K K02–K12 / Rev.L; Rev05 B9 12 2-person team-days; field scope and signed RACI pending"],
+ ["YARD-STAFF","K02-K12","JUTAL Zhuhai Yard ADDVALUE call-out ONLY on specific instruction","person-day",20,r.thbPerPersonDay,"CONDITIONAL_ONLY__SPE_7_3_4_RATE_WITHOUT_MANDATORY_DAYS","Rev.K K02–K12 / Rev.L; Rev05 12 team-days included two travel team-days (already charged once). Yard 10 team-days payable only with instruction or signed RACI."],
  ["TRAVEL-DAYS","K01","BKK-China-BKK mobilization/demobilization labour counted ONCE","person-day",4,r.thbPerPersonDay,"REV05_CN01_CN11_TRAVEL_DAYS_TRANSFERRED_TO_FAT_VISIT","Rev05 12 Yard team-days included 2 travel team-days; base visitor travel counted once"],
  ["AIRFARE","K01","BKK–China–BKK round trip economy airfare, both staff","return ticket",2,15000,"MARKET_COMPARABLE_PLUS_BOOKING_ALLOWANCE","BKK–Guangzhou airline round-trip indicative fares ~THB8–20k; actual itinerary/FAT location not confirmed"],
  ["HOTEL","K01","China business hotel for FAT visit (3 nights per staff)","room-night",6,2500,"BUSINESS_HOTEL_BUDGETARY_ALLOWANCE","15 nights × 2 rooms; supported as prudent planning allowance only; exact cities/stay unknown"],
@@ -25,8 +25,8 @@ export const B9_CHINA_BUDGET_SOURCE_0553=Object.freeze({
  id:"B9-CHINA-REV-K-WORKING-SELL",sourceWbs:"Rev.K K01-K12 / Rev.L / Rev05 B9",
  crew:2,fatDaysEstimate:2,yardTeamDaysWorking:12,hotelNightsPerPerson:15,travelEvents:1,
  yardCallOutOnly:true,fatTravelTeamDays:2,yardActualOrStandbyTeamDays:10,
- travelRoute:"BKK → China MGW FAT (venue TBC) → Zhuhai Yard → BKK",
- travelBookingState:"ONE_CONTINUOUS_TRIP_ASSUMED__SEPARATE_FAT_YARD_TRIPS_REQUIRE_REPRICING",
+ travelRoute:"Base: BKK → MGW FAT China → BKK; if Yard support called: China MGW → Zhuhai Yard or separate BKK-China trip",
+ travelBookingState:"FAT_BASE_SINGLE_VISIT__YARD_CALL_OUT_SCENARIO_ASSUMES_COMBINED_TRIP__REPRICE_IF_SEPARATE",
  fxSource:ONSHORE_WORKING_SELL_RATE_0553.source,
  rateUSDPerPersonDay:r.usdPerPersonDay,rateTHBPerPersonDay:r.thbPerPersonDay,
  perDiemSeparate:false,oneUnbilledStandbyExcluded:true,
