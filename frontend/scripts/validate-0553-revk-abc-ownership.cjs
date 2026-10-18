@@ -17,8 +17,8 @@ const source=[
 const working={
  byCode:{
   B1:{workingSellTHB:624030.26},
-  B3:{workingSellTHB:2046000},
-  B9:{workingSellTHB:397400,qtyDriver:1,unit:"LS (MGW four-MR FAT; Yard LS conditional)"}
+  B3:{workingSellTHB:2443400},
+  B9:{workingSellTHB:0,qtyDriver:1,unit:"LS (Yard Specialist optional only; Base zero)"}
  },knownWorkingSellTHB:4600020.95
 };
 const m=vm.runInNewContext(source+"\nselectRevKAbcOwnershipControl0553(working);",{working},{timeout:3000});
@@ -34,7 +34,10 @@ assert.equal(m.tracedObligations,19);
 assert.equal(m.b3LaborSellTHB,2016000);
 assert.equal(m.b3ToolSellTHB,30000);
 assert.equal(m.satSiteLines.reduce((v,x)=>v+x.quantity,0),40);
-assert.equal(m.b9FatBaseTHB,397400);
+assert.equal(m.b9FatBaseTHB,0);
+assert.equal(m.b3FatWitnessSellTHB,397400);
+assert.equal(m.chinaExpenses.filter(x=>x.owner==="B3").length,8);
+assert.equal(m.chinaExpenses.filter(x=>x.owner==="B9").length,8);
 assert.equal(m.b9FatWitnessDays,6);
 assert.equal(m.fatTasks.length,12);
 assert.equal(m.b9YardConditionalLumpSumTHB,233600);
@@ -49,4 +52,4 @@ assert.equal(m.postingAllowed,false);
 assert.equal(m.customerReleaseAllowed,false);
 assert.equal(new Set(m.rows.map(x=>x.id)).size,m.rows.length);
 assert.equal(new Set(m.rows.filter(x=>x.chargeKey!==null).map(x=>x.chargeKey)).size,m.rows.filter(x=>x.chargeKey!==null).length);
-console.log("PASS Rev.K ABC: B1 THB624030.26; B3 THB2046000; B9 FAT6d THB397400; Yard 7d optional THB233600; B BASE THB4600020.95, zero duplicate posting.");
+console.log("PASS Rev.K ABC: B1 THB624030.26; B3 THB2443400 including FAT6d THB397400; B9 Base THB0; Yard 7d optional THB233600; B BASE THB4600020.95, zero duplicate posting.");
