@@ -39,7 +39,8 @@ assert(d.mrPaths[3].source.includes("FAT included")&&d.mrPaths[3].source.include
 assert(d.costRouting.noDoubleCount.length>=4);
 for(const c of ["B3","B6","B9"]){
  const row=working.byCode[c];
- assert.equal(row.executionDecision?.decisionId,d.id,"Missing execution decision at "+c);
+ assert.equal(row.executionDecision?.legacyDecisionId,d.id,"Legacy Bangkok routing must stay as audit provenance at "+c);
+ assert.equal(row.executionDecision?.decisionId,"REV_K_MGW_FOUR_MR_FAT_JUTAL_ZHUHAI_20261018","Active decision must be MGW China rather than legacy BKK");
  assert.match(row.executionDecision.integratedFatLocation,/MGW.*China/); // Active Rev.K venue overrides historical BKK source only
  assert.equal(row.directCostTHB,null,"Execution location must not invent "+c+" direct cost");
 }
