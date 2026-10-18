@@ -2,6 +2,7 @@ import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcWorkCostLines0553} from "./data/bcWorkCostLines0553";
 import {B1EngineeringSellModel0553} from "./B1EngineeringSellModel0553";
+import {selectB1ProjectExpenseLedger0553} from "./data/b1IndirectCostLedger0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
 // imply that historical payroll cost or the WBS SELL is verified direct COST.
@@ -57,6 +58,32 @@ function B1WorkingSellBreakdown0553({workingRow}){
  </section>;
 }
 
+function B1IndirectExpenseRegister0553(){
+ const ledger=selectB1ProjectExpenseLedger0553();
+ const [showCross,setShowCross]=React.useState(false);
+ const [expanded,setExpanded]=React.useState({});
+ const groups=[["B1.1","Project Management"],["B1.2","Meetings & Representation"],["B1.3","Management Travel"],["B1.4","Office/Admin"],["B1.5","Regulatory Coordination"],["B1.6","Legal/Local Consultant"],["B1.7","Official Fees"],["B1.8","Other Project Expenses"]];
+ const cash=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
+ const renderRows=rows=><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{width:"100%",minWidth:1000}}>
+  <thead><tr><th>Expense ID / WBS</th><th>Expense / Activity</th><th>Cost Owner</th><th>Driver / Qty</th><th>Working Cost THB</th><th>Working Sell THB</th><th>Evidence / Missing Basis</th></tr></thead>
+  <tbody>{rows.map(r=><tr key={r.id}><td><strong>{r.id}</strong><small>{r.wbs}</small></td><td>{r.activity}<small>{r.classification}</small></td><td><strong>{r.owner}</strong><small>{r.account||"Other owner"}</small></td><td>{r.unit}<small>{r.quantity??"Quantity not established"}</small></td><td>{cash(r.workingCostTHB)}</td><td>{cash(r.workingSellTHB)}</td><td>{r.source}<small>{r.gate}</small>{r.pricingBasis&&<small>{r.pricingBasis}</small>}</td></tr>)}</tbody>
+ </table></div>;
+ return <section className="p55-panel" data-component-key="bid.budget.working.bc.b1.indirect-ledger" style={{padding:14,marginTop:12}}>
+  <h3>B1 — Project Expense Ledger (WBS-Driven / Single Cost Owner)</h3>
+  <p className="p55-note">Primary WBS: Rev.K K00–K18; Rev.L Yard MTO; Rev.J Gantt; Rev.I SAT Review; MR0001–0004, BOD/DTS/SPE, BOM and 10.2 expense ownership. The register is NON-POSTING: activities without quantity or rate stay unpriced, not zero. This does not reclassify the old engineering B1 baseline or overwrite any A/B/C Working Sell.</p>
+  <div className="p55-metric-grid">
+   <div><strong>Existing B1 Working Sell</strong><p>{cash(ledger.baseline.b1WorkingSellTHB)}</p><small>Legacy 964-MH engineering baseline; unchanged</small></div>
+   <div><strong>New B1 Indirect Working Cost</strong><p>{cash(ledger.b1NewWorkingCostTHB)}</p><small>Requires expense quantity and supported rate</small></div>
+   <div><strong>B1 source expense objects</strong><p>{ledger.b1.length}</p><small>{ledger.unpricedB1} awaiting cost evidence</small></div>
+   <div><strong>Other-owner expense objects</strong><p>{ledger.outside.length}</p><small>Reference only; cannot post into B1</small></div>
+  </div>
+  {groups.map(([account,title])=>{const rows=ledger.b1.filter(r=>r.account===account);return <section key={account} style={{marginBottom:10}}><button type="button" className="p553-detail-button" aria-expanded={!!expanded[account]} onClick={()=>setExpanded(x=>({...x,[account]:!x[account]}))}>{expanded[account]?"−":"+"} {account} — {title} ({rows.length})</button>{expanded[account]&&renderRows(rows)}</section>;})}
+  <button type="button" className="p553-detail-button" aria-expanded={showCross} onClick={()=>setShowCross(x=>!x)}>{showCross?"−":"+"} Cross-owner WBS Expenses (B2–B14, A, C, third parties) — non-additive</button>
+  {showCross&&renderRows(ledger.outside)}
+  <p className="p55-note"><strong>Double-post rule:</strong> China FAT staff, flights, hotels and visa → B9 once; offshore SAT/SIT → B3; VDRL/document control → B2; freight/customs broker → B6; OEM included equipment/tools → Part A; B1 only project management, lawful permit/regulatory, office and separately evidenced executive costs. No amount can enter B1 without a unique Expense ID, quantity, rate source and ownership check.</p>
+ </section>;
+}
+
 export function BcCostEvidenceDetail0553({workingRow}){
  if(!workingRow?.costEvidence)return null;
  const e=workingRow.costEvidence;
@@ -92,6 +119,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
     <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; FAT/SAT execution อยู่ B3; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่า licence/visa/official fees ที่ยังไม่มีราคาไม่ถือว่ารวมอยู่ใน B1 THB 510,000 แล้ว</p>
    </details>
   </section>}
+  {e.code==="B1"&&<B1IndirectExpenseRegister0553/>}
   {e.code==="B1"&&<B1EngineeringSellModel0553 workingRow={workingRow}/>}
   <h4>1. Working Drivers &amp; Calculation Evidence — ต้นทางปริมาณและสมการ</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
