@@ -20,7 +20,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K01",
@@ -39,7 +39,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K02",
@@ -58,7 +58,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K03",
@@ -77,7 +77,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K04",
@@ -96,7 +96,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K05",
@@ -115,7 +115,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K06",
@@ -134,7 +134,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K07",
@@ -153,7 +153,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K08",
@@ -172,7 +172,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K09",
@@ -191,7 +191,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K10",
@@ -210,7 +210,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K11",
@@ -229,7 +229,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K12",
@@ -248,7 +248,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K13",
@@ -267,7 +267,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K14",
@@ -286,7 +286,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K15",
@@ -305,7 +305,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K16",
@@ -324,7 +324,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K17",
@@ -343,7 +343,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   },
   {
     "id": "PM-K18",
@@ -362,7 +362,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "payer": "ADDVALUE project management; confirm contractual payer",
     "executionState": "PROPOSED_OFFICE_PM_OVERLAY_NOT_EXECUTION",
     "workingPmDays": null,
-    "rateSource": "USD 600/person-day is management candidate, NOT Rev05 approved onshore rate"
+    "rateSource": "Management approved Onshore labor USD 600/person-day (2026-10-18); milestone PM hours remain provisional"
   }
 ]);
 // CFO planning effort: estimated office PM touchpoint hours per UNIQUE management event.
