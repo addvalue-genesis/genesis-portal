@@ -21,7 +21,7 @@ const tasks=[
  ["FAT-ALL2","D6","ALL","K01","Signed FAT, as-left configuration backup, punch disposition and handover list",4,"BOD §10.3 / SPE §7.3.1 / MR FAT/SAT VDRL","MGW","Signed reports, printouts, licence register, ship list"]
 ];
 export const FAT_FOUR_MR_TASKS_0553=Object.freeze(tasks.map(([id,day,mr,wbs,activity,hours,requirement,executor,evidence])=>
- Object.freeze({id,day,mr,wbs,activity,hours,requirement,executor,evidence,costOwner:"A/OEM_FOR_EXECUTION",witnessCostOwner:"B9",testTagCountVerified:false,postingAllowed:false})));
+ Object.freeze({id,day,mr,wbs,activity,hours,requirement,executor,evidence,costOwner:"A/OEM_FOR_EXECUTION",witnessCostOwner:"B3",testTagCountVerified:false,postingAllowed:false})));
 export function selectFourMrFatWbs0553(){
  const rows=FAT_FOUR_MR_TASKS_0553;
  const days=[...new Set(rows.map(x=>x.day))];
@@ -40,7 +40,7 @@ export function selectFourMrFatWbs0553(){
   expectedFatTravelDays:2,estimatedRoomNightsPerWitness:7,
   notificationPlanningDays:14,notificationBodMinimumDays:30,notificationConflictUnresolved:true,
   scheduleApprovalState:"BUDGETARY_6_WITNESS_DAYS_SUBJECT_TO_MGW_AGENDA_TEST_COUNTS_ITP",
-  noDoubleCountRule:"MGW OEM execution/Factory tools in Part A; B9 paid witnesses only; Yard/SAT separate",
+  noDoubleCountRule:"MGW OEM execution/factory tools in Part A; B3 paid FAT witnesses only; Yard specialist B9 separately optional",
   postDirectCost:false,customerReleaseAllowed:false
  });
 }
