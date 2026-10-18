@@ -19,7 +19,7 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  // Rev05 B3 Bangkok FAT is superseded by Rev.K MGW China FAT (B9).
  // Original B9 mixed labor/per-diem line is replaced by itemized Rev.K B9 ledger.
  const physical=[
-  ...available.filter(x=>!x.id.startsWith("COST-AUD-")&&x.id!=="B3-FAT-BKK"&&x.id!=="B9-CHINA-SUPERVISION"),
+  ...available.filter(x=>!x.id.startsWith("COST-AUD-")&&x.id!=="B3-FAT-BKK"&&x.code!=="B9"),
   ...(showGroup.includes("B9")?china.rows.map(x=>({
    code:"B9",id:x.id,moduleId:x.moduleId,name:x.description,quantity:x.qty,unit:x.unit,
    workingSellRateTHB:x.unitRateTHB,workingSellTHB:x.workingSellTHB,historicalCostProxyTHB:null,
