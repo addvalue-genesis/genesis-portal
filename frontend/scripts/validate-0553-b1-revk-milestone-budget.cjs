@@ -16,6 +16,19 @@ assert.equal(data.rate.previousB9ChinaTeamUSDPerDay,1250);
 assert.equal(data.rate.previousB9ChinaTeamTotalTHBPerDay,47880);
 assert.equal(data.rate.offshoreSellUSDPerPersonDay,800);
 assert.equal(data.basePostingAllowed,false);
+assert.equal(data.uniquePmBudgetEvents,12,"Shared K03–K07 / K08–K11 PM events must post once");
+assert.equal(data.initialEstimatedPmHours,56,"CFO PM activity planning hours changed");
+assert.equal(data.rate.thbPerPersonDay*data.initialEstimatedPmHours/8,132300,"Planning SELL proxy math");
+const billed=data.rows.filter(x=>x.chargeableHere);
+assert.equal(billed.length,12);
+assert.equal(new Set(billed.map(x=>x.chargeEventKey)).size,billed.length);
+assert.equal(new Set(data.rows.map(x=>x.moduleId)).size,19,"Missing/duplicate nested Module ID");
+assert.ok(data.rows.every(r=>r.moduleId==="bid.budget.working.bc.b1.revk."+r.stage.toLowerCase()));
+assert.equal(data.rows.find(r=>r.stage==="K04").planningPmHours,null);
+assert.equal(data.rows.find(r=>r.stage==="K07").chargeOwnerStage,"K03");
+assert.equal(data.rows.find(r=>r.stage==="K09").chargeOwnerStage,"K08");
+for(const r of data.rows.filter(r=>!r.chargeableHere))
+ assert.equal(r.planningPmHours,null,"Shared management stage cannot receive duplicate PM hours "+r.stage);
 for(const x of data.rows){
  assert.equal(x.costOwner,"B1");
  assert.equal(x.parentExpenseId,"PM-MILESTONE");
@@ -26,4 +39,4 @@ for(const x of data.rows){
 const china=data.rows.find(x=>x.stage==="K01"); assert.match(china.directOwner,/B9/);
 const offshore=data.rows.find(x=>x.stage==="K16"); assert.match(offshore.directOwner,/B3/);
 const close=data.rows.find(x=>x.stage==="K18"); assert.match(close.directOwner,/B2/);
-process.stdout.write("PASS Rev.K K00-K18 CFO B1 coverage; USD600 nonposting; B9/B3/B2 segregation; no invented PM days.\n");
+process.stdout.write("PASS Rev.K 19 Module IDs, 12 unique PM events, 56h / THB132,300 CFO proxy, zero duplicate B2–B14 postings; no verified PM days asserted.\n");
