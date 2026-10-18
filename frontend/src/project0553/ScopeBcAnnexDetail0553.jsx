@@ -7,6 +7,7 @@ import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553"
 import {selectDocumentSpareObligations0553} from "./data/documentSpareObligations0553";
 import {selectAddvalueB14Insurance0553} from "./data/addvalueB14Insurance0553";
 import {selectB1RegulatoryCost0553} from "./data/b1RegulatoryCost0553";
+import {selectSatToolReadiness0553} from "./data/satToolReadiness0553";
 import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringReconciliation0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
@@ -19,6 +20,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
  const documentObligations=selectDocumentSpareObligations0553();
  const addvalueInsurance=code==="B14"?selectAddvalueB14Insurance0553():null;
  const b1Regulatory=code==="B1"?selectB1RegulatoryCost0553():null;
+ const satToolReadiness=code==="B3"?selectSatToolReadiness0553():null;
  const spareReconciliation=selectSpareEngineeringReconciliation0553();
  const spareLines=customerSchedule.byCode[code]||[];
  const coverage=["B10","B11","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
@@ -60,6 +62,23 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
    <p className="p55-note"><strong>WBS Sheet 20_CUSTOMS_PERMIT:</strong> permit and customs requirements are documented, but dedicated ADDVALUE regulatory travel trips, travelers and accommodation nights are not scheduled. Quantity remains <strong>TO DERIVE</strong>. {b1Regulatory.wbsMilestoneAudit.regulatoryMilestone.gate}</p>
    <p className="p55-note"><strong>Incremental Direct Cost:</strong> NOT ESTABLISHED · <strong>Incremental Working Sell:</strong> NOT POSTED. Regulatory Travel/MOB/DEMOB is only under B1 when its separate Trip ID is linked to permit coordination; exclude SAT B3, goods logistics B6, China Yard Specialist B9 and insurance B14.</p>
    <p className="p55-note"><strong>Compliance:</strong> Only lawful, evidenced authority fees and actual third-party services; unofficial facilitation or influence payments are excluded.</p>
+  </div>}
+  {code==="B3"&&satToolReadiness&&<div className="p55-panel" data-component-key="bid.budget.working.bc.b3.sat-tools" style={{padding:12}}>
+   <h4>B3 — SAT Test Equipment Compliance (non-posting engineering evidence)</h4>
+   <p className="p55-note">MR0001 SCADA · MR0002 RFI BDA/DAS · MR0003 Ex Phone/Sounder · MR0004 ORGA RACON. Tool readiness is NOT a SAT pass, supplier quotation, working direct cost or automatic Working Sell update. Known VeEX MX100+ rental rate: <strong>THB 1,000 per day</strong>; rental days remain unconfirmed.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>MR / Test IDs</th><th>Tool / Instrument</th><th>Acquisition</th><th>Rate</th><th>Extended Cost</th><th>Source Status / Gate</th></tr></thead>
+    <tbody>{satToolReadiness.rows.map(x=><tr key={x.id}>
+     <td><strong>{x.mr}</strong><small>{x.system}</small><small>{x.tests}</small></td>
+     <td>{x.item}<small>{x.id}</small></td>
+     <td>{x.method}<small>Owner: {x.owner}</small></td>
+     <td>{Number.isFinite(x.unitRateTHB)?thb(x.unitRateTHB)+" / "+x.rateUnit:"NOT ESTABLISHED"}</td>
+     <td>{Number.isFinite(x.extendedCostTHB)?thb(x.extendedCostTHB):"NOT ESTABLISHED"}</td>
+     <td>{x.status}<small>{x.gate}</small></td>
+    </tr>)}</tbody>
+   </table></div>
+   <p className="p55-note"><strong>RACON approval holds:</strong> {satToolReadiness.holds.map(x=>x.id+" — "+x.detail).join(" | ")}</p>
+   <p className="p55-note"><strong>Ledger policy:</strong> No automatic posting. Existing RF Explorer PO is not a new purchase cost; OEM-included ORGA purge/programming kits require confirmation in the current MGW offer. Rental, calibration, marine vessel and travel costs require evidence and explicit owner allocation.</p>
   </div>}
   {code==="B14"&&<div className="p55-panel" style={{padding:12}}>
    <h4>ADDVALUE — Personnel &amp; Work-Related Insurance Budget (B14)</h4>
