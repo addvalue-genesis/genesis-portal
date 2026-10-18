@@ -69,7 +69,8 @@ export const B9_CHINA_WORKING_ROWS_0553=Object.freeze(assumptionRows.map(([id,wb
  return Object.freeze({
  id:owner+"-"+id,moduleId:"bid.budget.working.bc."+owner.toLowerCase()+"."+id.toLowerCase(),
  wbs,description,unit,qty,unitRateTHB:rateTHB,
- workingSellTHB:round(qty*rateTHB),workingCostTHB:null,
+ workingSellTHB:round(qty*rateTHB),workingCostTHB:null,directCostTHB:null,
+ costAccountingClass:owner==="B3"?"B3_DIRECT_FAT_WITNESS_EXPENSE_UNVERIFIED":"B9_DIRECT_SPECIALIST_EXPENSE_IF_CALLED_UNVERIFIED",
  costOwner:owner,expenseKey:owner+"-REV-K-"+id,
  rateAuthority:["FAT-STAFF","YARD-STAFF"].includes(id)?r.source:"CFO_PRE_AWARD_ESTIMATOR_ALLOWANCE__2026_10_18",
  status,evidence,
@@ -96,6 +97,6 @@ export function selectB9ChinaWorkingBudget0553(){
   fullCombinedVisitScenarioTHB:total,laborWorkingSellTHB:302400,
   travelAndInsuranceWorkingSellTHB:95000,qtyDerivedManDays:16,
   conditionalNotInBase:true,deltaVsLegacyTHB:round(0-source.legacyWbsB9SellTHB),
-  contractCostOwnerProof:"4-Scope of Supply.xlsx B3 Inspection Testing and Certification as per ITP; B9 Specialist Field Assistance",
+  contractCostOwnerProof:"Original 4-Scope of Supply.xlsx row 24 B3 Inspection, Testing and Certification as per ITP; row 30 B9 Specialist field assistance as per specification",
   workingDirectCostTHB:null,verifiedDirectCostTHB:null,customerReleaseAllowed:false});
 }
