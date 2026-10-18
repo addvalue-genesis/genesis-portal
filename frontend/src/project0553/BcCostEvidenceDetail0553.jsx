@@ -3,6 +3,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcWorkCostLines0553} from "./data/bcWorkCostLines0553";
 import {B1EngineeringSellModel0553} from "./B1EngineeringSellModel0553";
 import {selectB1ProjectExpenseLedger0553} from "./data/b1IndirectCostLedger0553";
+import {B1RevKMilestoneBudget0553} from "./B1RevKMilestoneBudget0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
 // imply that historical payroll cost or the WBS SELL is verified direct COST.
@@ -129,6 +130,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
     <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; FAT/SAT execution อยู่ B3; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่า licence/visa/official fees ที่ยังไม่มีราคาไม่ถือว่ารวมอยู่ใน B1 THB 510,000 แล้ว</p>
    </details>
   </section>}
+  {e.code==="B1"&&<B1RevKMilestoneBudget0553/>}
   {e.code==="B1"&&<B1IndirectExpenseRegister0553/>}
   {e.code==="B1"&&<details className="p55-panel" style={{padding:12,marginTop:12}}><summary><strong>Rev05 Legacy B1 Engineering 964-MH / THB 510,000 Calculation Audit</strong> — previous method; not the new Project Management &amp; Indirect Expense budget</summary><B1EngineeringSellModel0553 workingRow={workingRow}/></details>}
   <h4>1. Working Drivers &amp; Calculation Evidence — ต้นทางปริมาณและสมการ</h4>
