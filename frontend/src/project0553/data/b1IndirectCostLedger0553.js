@@ -718,31 +718,31 @@ const CFO_EXECUTION_CONTEXT_0553=Object.freeze({
   },
   "FAT-CREW": {
     "executor": "MGW executes OEM FAT; ADDVALUE 2 paid attendees, 1 unbilled standby",
-    "location": "MGW Office China per Rev.K; Rev.J says Zhuhai Yard (CONFLICT)",
+    "location": "MGW nominated FAT facility, China per management; exact address and OEM FAT agenda OPEN",
     "method": "Witness MGW FAT for MR0001–0004, check tests and punch/as-left records; no duplicate OEM labour",
     "deliverable": "FAT witness attendance and FAT certificate",
     "quantityBasis": "2 paid attendees confirmed; duration and payroll unverified",
     "payer": "B9 ADDVALUE attendance; MGW executes OEM test",
-    "executionStatus": "VENUE_CONFLICT_DURATION_OPEN",
+    "executionStatus": "MGW_FAT_FACILITY_SELECTED_6DAY_BUDGET__ITP_PENDING",
     "expenseObjectKey": "CHINA-FAT-LABOR",
     "invoiceStatus": "NOT_VERIFIED",
     "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
   },
   "FAT-TRAVEL": {
     "executor": "ADDVALUE 2 China FAT attendees (names/booking TBC)",
-    "location": "Origin TBC → MGW China FAT venue (CONFLICT)",
-    "method": "Flights, visa, accommodation, local transport, per diem for FAT attendance",
+    "location": "BKK → MGW FAT Facility China → BKK (one return trip; exact city TBD)",
+    "method": "Flights, visa/work permit if applicable, accommodation, local transport and technical-work insurance for FAT attendance; no separately priced per diem",
     "deliverable": "Trip manifest, approvals, tickets, hotels, visa receipts",
-    "quantityBasis": "Flights/nights/trips not known; 1 unbilled standby not charged",
+    "quantityBasis": "Two paid witnesses, 6 workdays + 2 travel days, 14 room-nights budgetary; third Field Telecom Specialist standby unbilled",
     "payer": "B9 once; same booking K02 Yard must be consolidated",
-    "executionStatus": "VENUE_CONFLICT_TRIP_OPEN",
+    "executionStatus": "MANAGEMENT_SIX_FAT_DAYS__TRIP_RATES_BUDGETARY",
     "expenseObjectKey": "CHINA-FAT-TRAVEL",
     "invoiceStatus": "NOT_VERIFIED",
     "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
   },
   "FAT-OEM": {
     "executor": "MGW/OEM test personnel",
-    "location": "MGW Office vs Zhuhai Yard disputed",
+    "location": "MGW nominated FAT facility China; JUTAL Zhuhai only subsequent Yard SAT",
     "method": "Factory test equipment and internal OEM execution per accepted quotation",
     "deliverable": "MGW FAT procedure, certified tool list, OEM report",
     "quantityBasis": "Quoted inclusions pending MGW updated revision",
@@ -753,24 +753,24 @@ const CFO_EXECUTION_CONTEXT_0553=Object.freeze({
     "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
   },
   "YARD-CREW": {
-    "executor": "ADDVALUE telecom specialists/supervisor; JUTAL installer and MGW support roles separate",
+    "executor": "ADDVALUE Senior Telecom Engineer if requested, Field Telecom Specialist standby unbilled; JUTAL Yard SAT executor proposed per contract RACI",
     "location": "JUTAL Zhuhai Yard, China",
     "method": "Supervise telecom installation, inspect ITR, perform initial configs and precommissioning K02–K12",
     "deliverable": "ITR, configs, punch, inspection sheets",
-    "quantityBasis": "12 team-days existing B9 working basis; allocation by K-stage not verified",
+    "quantityBasis": "Conditional one Senior Telecom Engineer × 7 Yard working days; standby Field Telecom Specialist no labour sell; Rev05 12 team-days superseded",
     "payer": "B9 for ADDVALUE specialist service only",
-    "executionStatus": "ROLE_PROPOSED_DAYS_UNRECONCILED",
+    "executionStatus": "YARD_7_WORKDAYS_1_LS_CONDITIONAL_RACI_PENDING",
     "expenseObjectKey": "CHINA-YARD-LABOR",
     "invoiceStatus": "NOT_VERIFIED",
     "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
   },
   "YARD-TRAVEL": {
-    "executor": "ADDVALUE Yard specialist team (can overlap FAT attendees)",
+    "executor": "One Senior Telecom Engineer optional separate Zhuhai Yard call-out trip",
     "location": "Zhuhai Yard, China",
-    "method": "Mobilisation, meals, local transport and hotel needed for yard work; shared FAT trip billed once",
-    "deliverable": "Same Person ID/Trip ID manifest, receipts",
+    "method": "Mobilisation/demobilisation, transport and hotel for separate Yard call-out; reconsolidate if merged with FAT; no separate per diem",
+    "deliverable": "Separate Yard Trip ID and Senior Engineer Person ID, receipts; backup Specialist expense only if actually deployed",
     "quantityBasis": "Travel duration/cost and shared-trip evidence pending",
-    "payer": "B9 one consolidated travel event, not B1",
+    "payer": "B9 separate conditional Yard trip, 1 LS; no B1/B3 recharge",
     "executionStatus": "TRAVEL_DUPLICATION_GATE",
     "expenseObjectKey": "CHINA-YARD-TRAVEL",
     "invoiceStatus": "NOT_VERIFIED",
@@ -853,9 +853,9 @@ const CFO_EXECUTION_CONTEXT_0553=Object.freeze({
     "location": "ZPQ/ZWP8/ZWP11 and ZWP20–23 / SIT ZPQ",
     "method": "Execute approved SAT/SIT, configure, measure, witness signoff after RFSAT and safe access",
     "deliverable": "SAT site RPTs, SIT signoff and as-left configs",
-    "quantityBasis": "Rev.J 36 calendar conditional vs Rev.I 40-day risk; productive MD pending",
+    "quantityBasis": "Management selected 40 productive SAT/SIT workdays × 2 personnel, 80 person-days; site allocation provisional",
     "payer": "B3 dedicated SAT labour/travel; no B1 recharge",
-    "executionStatus": "CALENDAR_MD_RECONCILIATION_OPEN",
+    "executionStatus": "MANAGEMENT_40DAY_2PERSON_SAT__SITE_ALLOCATION_SCENARIO",
     "expenseObjectKey": "OFFSHORE-SAT",
     "invoiceStatus": "NOT_VERIFIED",
     "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
@@ -877,9 +877,9 @@ const CFO_EXECUTION_CONTEXT_0553=Object.freeze({
     "location": "At SAT test location (7 sites as needed), logistics TBC",
     "method": "Ethernet throughput certification using rented MX100+ if approved by test method",
     "deliverable": "Test report / rental receipt",
-    "quantityBasis": "THB 1,000/day ex VAT source; quantity days unknown",
+    "quantityBasis": "30 rental days × THB1,000/day ex VAT = THB30,000 working-sell pass-through, supplier dates/policy pending",
     "payer": "B3 rental, never B11 permanent tools",
-    "executionStatus": "RATE_KNOWN_DAYS_OPEN",
+    "executionStatus": "30_DAY_RENTAL_WORKING_SELL__SUPPLIER_TERMS_OPEN",
     "expenseObjectKey": "VEEX-MX100",
     "invoiceStatus": "NOT_VERIFIED",
     "bookingControl": "SINGLE_COST_OWNER_NON_POSTING"
@@ -1010,7 +1010,7 @@ export const B1_PENDING_COST_OWNER_POLICY_0553=Object.freeze({
  defaultNewExpenseAmountTHB:null,
  noAutomaticPricing:true
 });
-export const B1_LEDGER_BASELINE_0553=Object.freeze({b1WorkingSellTHB:510000,source:"Rev05 08_B1_ENGINEERING 964 MH, 27 activities",state:"BASELINE_UNCHANGED_NOT_INDIRECT_COST_VALIDATED"});
+export const B1_LEDGER_BASELINE_0553=Object.freeze({b1WorkingSellTHB:510000,source:"Rev05 08_B1_ENGINEERING 964 MH, 27 activities",state:"HISTORICAL_REV05_REPLACED_BY_NEW_ACTIVITY_WORKING_SELL__AUDIT_ONLY"});
 export function selectB1ProjectExpenseLedger0553(){
  const rows=B1_PROJECT_EXPENSE_LEDGER_0553;
  const ids=rows.map(r=>r.id);
