@@ -22,7 +22,7 @@ for(const id of ["SAT-CREW","SAT-TOOL","RACON-VESSEL","BF-SURVEY"]) assert.equal
 assert.equal(byId.get("DOC-CTRL").owner,"B2");
 assert.equal(byId.get("FREIGHT").owner,"B6");
 assert.equal(byId.get("VEEX-RENT").pricingBasis,"THB 1,000 per rental day ex VAT (days pending)");
-assert.match(byId.get("FAT-CREW").location,/CONFLICT/);
+assert.match(byId.get("FAT-CREW").location,/MGW.*China/);
 assert.equal(baseline.b1WorkingSellTHB,510000);
 assert.equal(postingAllowed,false);
 assert.equal(financialReleaseState,"BLOCKED_UNTIL_RACI_AND_RATE_EVIDENCE");
