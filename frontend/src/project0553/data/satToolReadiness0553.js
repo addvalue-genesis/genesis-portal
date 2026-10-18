@@ -1,14 +1,15 @@
 // SAT equipment readiness for PJ2608-0553; NON-POSTING evidence overlay.
 // This file NEVER edits Part B direct cost, working sell, or A/B/C ledger values.
-// "Budgetary" means quotation/rental period remains to be verified.
+// "Budgetary" means 30 rental days were user-confirmed; pickup/return dates, options and rental terms remain open.
 export const SAT_TOOL_REGISTER_0553 = Object.freeze({
  revision:"Rev.P / 2026-10-18", owner:"ADDVALUE", ledgerPolicy:"NON_POSTING",
  assumptions:["ADDVALUE executes SAT; MGW/OEM provides proprietary interfaces when contracted.",
  "Offshore: 2 Senior Specialists; rate USD 800 per PERSON-day is a selling scenario, not tool cost.",
  "RACON code D vs historical ORGA quote code Q is not closed; no acceptance auto-pass.",
- "Calibration certificates, approved ITP/OEM test method and site permissions required."],
+ "Calibration certificates, approved ITP/OEM test method and site permissions required.",
+ "VeEX: 30 days × THB 1,000/day = THB 30,000 excluding VAT; no automatic Working Sell/Direct Cost posting."],
  rows:[
-  {id:"TOOL-SCADA-01",mr:"MR0001",system:"SCADA WiMAX",tests:"WMX-12/13, SIT-04A",item:"VeEX MX100+ Ethernet test set",method:"RENT",unitRateTHB:1000,rateUnit:"day",quantity:null,extendedCostTHB:null,status:"RATE EVIDENCED / RENTAL DAYS OPEN",owner:"ADDVALUE",gate:"Confirm RFC2544/Y.1564 enabled and far-end compatible test partner; 1000 THB/day not all campaign days"},
+  {id:"TOOL-SCADA-01",mr:"MR0001",system:"SCADA WiMAX",tests:"WMX-12/13, SIT-04A",item:"VeEX MX100+ Ethernet test set",method:"RENT",unitRateTHB:1000,rateUnit:"day",quantity:30,extendedCostTHB:30000,status:"BUDGETARY / 30 RENTAL DAYS USER-CONFIRMED / NON-POSTING",owner:"ADDVALUE",gate:"Confirm RFC2544/Y.1564 enabled and far-end compatible test partner; 1000 THB/day not all campaign days"},
   {id:"TOOL-SCADA-02",mr:"MR0001",system:"SCADA WiMAX",tests:"WMX-12/13",item:"Far-end peer / Ethernet loopback",method:"RENT_OR_CLIENT",unitRateTHB:null,rateUnit:"period",quantity:null,extendedCostTHB:null,status:"NOT ESTABLISHED",owner:"ADDVALUE/ICT",gate:"Verify test-port compatibility and PTTEPI controlled load window"},
   {id:"TOOL-SCADA-03",mr:"MR0001",system:"SCADA WiMAX",tests:"WMX-05",item:"Calibrated RF Cable & Antenna Analyzer 5.5-5.8 GHz (VSWR/DTF)",method:"RENT",unitRateTHB:null,rateUnit:"period",quantity:null,extendedCostTHB:null,status:"QUOTATION PENDING",owner:"ADDVALUE",gate:"Measurement method and adapters; RF Explorer does not replace DTF"},
   {id:"TOOL-SCADA-04",mr:"MR0001",system:"SCADA WiMAX",tests:"WMX-04/08/11/15/16",item:"Aviat OEM diagnostics / NMS",method:"OEM_PROVIDED",unitRateTHB:null,rateUnit:"included-or-quote",quantity:null,extendedCostTHB:null,status:"INCLUSION OPEN",owner:"MGW/ADDVALUE",gate:"Firmware access, credentials, monitoring and log export"},
@@ -36,7 +37,8 @@ export function selectSatToolReadiness0553(){
  const rows=SAT_TOOL_REGISTER_0553.rows;
  return {revision:SAT_TOOL_REGISTER_0553.revision,rows,
   knownRentalRateTHBPerDay:1000,
-  knownExtendedToolCostTHB:null,
+  knownRentalDays:30,
+  knownExtendedToolCostTHB:30000,
   openRows:rows.filter(r=>!Number.isFinite(r.extendedCostTHB)),
   holds:SAT_TOOL_REGISTER_0553.holds,
   state:"ENGINEERING_TOOL_PLANNING_ONLY_NOT_SAT_APPROVAL",
