@@ -998,6 +998,18 @@ export const B1_PROJECT_EXPENSE_LEDGER_0553=Object.freeze(SOURCE_EXPENSE_ROWS_05
  if(!context)throw Error("Unmapped CFO execution owner: "+row.id);
  return Object.freeze({...row,...context});
 }));
+// CFO holding account: B1 is the review queue for unclassified project expenses,
+// never a default additional Working SELL posting. Resolve Cost Owner once then book once.
+export const B1_PENDING_COST_OWNER_POLICY_0553=Object.freeze({
+ moduleId:"bid.budget.working.bc.b1.pending-cost-owner",
+ account:"B1-PENDING-ALLOCATION",
+ purpose:"Temporary classification of project activity costs with no existing A/B2–B14/C owner",
+ allowedToRecordUnpriced:true,bookedToWorkingSell:false,bookedToDirectCost:false,
+ approvalGate:"Requirement+WBS activity+unique expense ID+person/trip/tool/site and nonduplication proof",
+ transferRule:"If technical/execution work belongs B2–B14, transfer without adding to B1; only genuine residual PM/indirect remains in B1",
+ defaultNewExpenseAmountTHB:null,
+ noAutomaticPricing:true
+});
 export const B1_LEDGER_BASELINE_0553=Object.freeze({b1WorkingSellTHB:510000,source:"Rev05 08_B1_ENGINEERING 964 MH, 27 activities",state:"BASELINE_UNCHANGED_NOT_INDIRECT_COST_VALIDATED"});
 export function selectB1ProjectExpenseLedger0553(){
  const rows=B1_PROJECT_EXPENSE_LEDGER_0553;
@@ -1013,7 +1025,7 @@ export function selectB1ProjectExpenseLedger0553(){
  const knownCost=b1.filter(r=>Number.isFinite(r.workingCostTHB));
  return Object.freeze({rows,b1,outside,pricedB1:knownCost.length,unpricedB1:b1.length-knownCost.length,
   b1NewWorkingCostTHB:b1.every(r=>Number.isFinite(r.workingCostTHB))?b1.reduce((s,r)=>s+r.workingCostTHB,0):null,
-  baseline:B1_LEDGER_BASELINE_0553,postingAllowed:false,financialReleaseState:"BLOCKED_UNTIL_RACI_AND_RATE_EVIDENCE",
+  baseline:B1_LEDGER_BASELINE_0553,pendingAllocationPolicy:B1_PENDING_COST_OWNER_POLICY_0553,postingAllowed:false,financialReleaseState:"BLOCKED_UNTIL_RACI_AND_RATE_EVIDENCE",
   roleMappedCount:rows.filter(r=>Boolean(r.executor&&r.location&&r.method)).length,approvalRequiredCount:rows.filter(r=>r.executionStatus!=="CONFIRMED").length,
   source:"Rev.K/Rev.L/Rev.J/Rev.I; MR0001–0004/BOD/DTS/SPE; 10.2 canonical ledgers"});
 }
