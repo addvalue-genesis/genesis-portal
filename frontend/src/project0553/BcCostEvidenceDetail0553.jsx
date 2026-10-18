@@ -71,6 +71,19 @@ export function BcCostEvidenceDetail0553({workingRow}){
   </div>
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Confirm the four MR legs through Bangkok FAT and JUTAL Nantong.</p>}
   <p className="p55-note">SOURCE: <a href={e.sourceUrl} target="_blank" rel="noreferrer">{e.sourceSheet} · {e.sourceRevision}</a>. ต้องใช้ Internal Rate Card / Vendor Rate ที่ควบคุมได้ก่อนคำนวณ Direct Cost</p>
+  {(e.code==="B1"||e.code==="B2")&&<section className="p55-panel" data-component-key={"bid.budget.working.bc."+e.code.toLowerCase()+".ownership-boundary"} style={{padding:14,marginTop:12}}>
+   <h4>{e.code} — Cost Ownership &amp; No-Double-Count Boundary</h4>
+   <p className="p55-note"><strong>B1</strong> owns technical review, OEM interfaces, project/admin and regulatory coordination when separately supported. <strong>B2</strong> owns document-register, transmittal, revision tracking and final dossier assembly. The same technical document may have both a B1 review task and a B2 control task, but not the same labour hours charged twice.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Work object</th><th>B1 treatment</th><th>B2 treatment</th><th>Other owner / gate</th></tr></thead><tbody>
+    <tr><td>MR/BOD/DTS, technical calculations &amp; design interfaces</td><td>Technical review / clarification only</td><td>Register, route &amp; track documents only</td><td>OEM authors detailed equipment design; verify included scope</td></tr>
+    <tr><td>OEM GA / schematic / wiring documents</td><td>Engineering check and comments; NOT full OEM design duplication</td><td>Revision register / transmittal / dossier</td><td>Vendor original authoring remains OEM/Part A</td></tr>
+    <tr><td>VDRL / VDRS / document submissions</td><td>Not charged as document-control MH</td><td>Primary owner: submission, expediting, revision control</td><td>143 source rows / 38 distinct title types are not automatically 143 billable documents</td></tr>
+    <tr><td>Final dossier / as-built package</td><td>Review changed technical interfaces only</td><td>Compile, index and transmit final package</td><td>OEM provides own approved as-built technical content</td></tr>
+    <tr><td>Admin office / regulatory / licences</td><td>Separate B1 scope candidate; quantify coordination labour and lawful permit fees</td><td>Submission document tracking only, if required</td><td>B6 owns customs brokerage/freight; official fees need evidence and no duplicate posting</td></tr>
+    <tr><td>FAT / SAT evidence</td><td>Technical procedure review only when separately required</td><td>Record transmission / filing</td><td>B3 owns physical test execution and signed original test evidence</td></tr>
+   </tbody></table></div>
+   <p className="p55-note">Current WBS reference is B1 THB 510,000 (964 role-MH / 27 engineering tasks), B2 THB 580,000 (document lifecycle). These are two separate quoted working values—not proof that additional admin, licences or permit fees are already funded. Any scope reallocation requires a work-object/role-MH reconciliation and explicit revised Working SELL approval.</p>
+  </section>}
   {e.code==="B1"&&<B1EngineeringSellModel0553 workingRow={workingRow}/>}
   <h4>1. Working Drivers &amp; Calculation Evidence — ต้นทางปริมาณและสมการ</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
