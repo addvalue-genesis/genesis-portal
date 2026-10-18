@@ -22,13 +22,13 @@ const readableKind=Object.freeze({
 function B1WorkingSellBreakdown0553({workingRow}){
  const lines=selectBcWorkCostLines0553().rows.filter(x=>x.code==="B1"&&x.id.startsWith("B1-WBS-"));
  const totalMH=lines.reduce((n,x)=>n+x.quantity,0);
- const totalSell=workingRow.workingSellTHB;
+ const totalSell=workingRow.b1ActivityBudget?.engineeringSellTHB;
  if(totalMH!==964||!Number.isFinite(totalSell))return <p className="p55-note">B1 reconciliation unavailable: confirm 964 MH and current Working Sell.</p>;
  const round=n=>Math.round(n*100)/100;
  // Proportional presentation-only allocation; no new role rates, vendor costs or sales posting.
  let running=0;
  const allocated=lines.map((x,i)=>{
-  const amount=i===lines.length-1?round(totalSell-running):round(totalSell*x.quantity/totalMH);
+  const amount=i===lines.length-1?round(totalSell-running):workingRow.b1ActivityBudget.engineeringRows[i].workingSellTHB;
   running=round(running+amount);
   return {...x,allocatedSellTHB:amount};
  });
@@ -38,11 +38,11 @@ function B1WorkingSellBreakdown0553({workingRow}){
  return <section className="p55-panel" data-component-key="bid.budget.working.bc.b1.sell-breakdown" style={{padding:14,marginTop:12}}>
   <h4>B1 — Working SELL Breakdown / แจกแจงราคางานวิศวกรรม</h4>
   <div className="p55-metric-grid">
-   <div><strong>Working SELL รวม B1</strong><p>{cash(totalSell)}</p></div>
+   <div><strong>B1 Engineering SELL (excludes PM)</strong><p>{cash(totalSell)}</p></div>
    <div><strong>Engineering Workload</strong><p>{totalMH.toLocaleString("en-US")} MH</p></div>
    <div><strong>Average allocated SELL / MH</strong><p>{cash(totalSell/totalMH)}</p></div>
   </div>
-  <p className="p55-note"><strong>วิธีอ่าน:</strong> THB {totalSell.toLocaleString("en-US")} เป็นยอด WBS Working Sell ที่มีอยู่แล้ว นำมาแจกแจงตามสัดส่วน Man-hours ของ 27 กิจกรรม (สัดส่วน MH / 964 × 510,000) เพื่อให้เห็นองค์ประกอบเท่านั้น อัตราเฉลี่ยไม่ใช่ Role Day Rate, Vendor Quote หรือ Direct Cost ที่อนุมัติ</p>
+  <p className="p55-note"><strong>วิธีอ่าน:</strong> ราคา Engineering {cash(totalSell)} มาจาก 27 WBS / 964 MH โดยคูณ Role Hours กับ Rev05 rate seeds และ office commercial factor; อีก {cash(workingRow.b1ActivityBudget?.officePmWorkingSellTHB)} มาจาก 48 ชั่วโมง PM ใน 11 Rev.K gate ที่ไม่ซ้ำ (K00 kickoff ถูกตัดออก) รวม B1 ใหม่ {cash(workingRow.workingSellTHB)}. เป็น Working SELL budgetary ไม่ใช่ Payroll Direct Cost ที่ยืนยันแล้ว</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--budget" style={{width:"100%",minWidth:740,tableLayout:"fixed"}}>
    <colgroup><col style={{width:"43%"}}/><col style={{width:"12%"}}/><col style={{width:"15%"}}/><col style={{width:"20%"}}/><col style={{width:"10%"}}/></colgroup>
    <thead><tr><th>กลุ่มงาน / System</th><th>Activities</th><th>MH</th><th>Allocated Working SELL THB</th><th>รายละเอียด</th></tr></thead>
@@ -57,11 +57,11 @@ function B1WorkingSellBreakdown0553({workingRow}){
      </table></div></td></tr>}</React.Fragment>;
    })}<tr><td><strong>TOTAL B1 — Reconciled to Working SELL</strong></td><td>{lines.length}</td><td><strong>{totalMH}</strong></td><td className="is-number"><strong>{cash(running)}</strong></td><td>{Math.abs(running-totalSell)<0.01?"PASS":"CHECK"}</td></tr></tbody>
   </table></div>
-  <p className="p55-note">Price allocation is NON-POSTING and will update when the canonical B1 Working Sell changes. Historical cost proxies are not included. Actual role-based selling rates and direct costs remain to be verified.</p>
+  <p className="p55-note">B1 engineering activity SELL is linked to the current 27-line role-hour scenario. This is a read-only distribution of canonical Working SELL, not a second budget posting. Actual role-based selling rates and direct costs remain to be verified.</p>
  </section>;
 }
 
-function B1IndirectExpenseRegister0553(){
+function B1IndirectExpenseRegister0553({workingRow}){
  const ledger=selectB1ProjectExpenseLedger0553();
  const [showCross,setShowCross]=React.useState(false);
  const [expanded,setExpanded]=React.useState({"B1.1":true,"B1.2":true,"B1.3":true,"B1.4":true,"B1.5":true,"B1.6":true,"B1.7":true,"B1.8":true});
@@ -83,9 +83,9 @@ function B1IndirectExpenseRegister0553(){
  return <section className="p55-panel" data-component-key="bid.budget.working.bc.b1.indirect-ledger" style={{padding:14,marginTop:12}}>
   <h3>B1 — Project Expense Ledger (WBS-Driven / Single Cost Owner)</h3>
   <p className="p55-note" data-component-key={ledger.pendingAllocationPolicy.moduleId}><strong>B1 PENDING COST OWNER (Suspense):</strong> รายการจาก BOD/DTS/SPE/WBS ที่ยังไม่พบหมวด A/B2–B14/C ให้พักตรวจใน B1 ก่อนโดยไม่บวก Working Cost/Working Sell อัตโนมัติ เมื่อยืนยันว่าเป็นค่า FAT/Yard ให้ออกไป B9; Offshore SAT ไป B3; ส่วนที่เหลือ B1 เฉพาะ PM/Indirect ที่มีหลักฐานและไม่ซ้ำหมวดอื่น</p>
-  <p className="p55-note"><strong>CFO REVIEW VIEW — Who / What / Where / How / Cost Owner / Payer / Quantity / Rate / Evidence.</strong> Rev.K K00–K18 and Rev.L Yard roles, Rev.J Gantt and Rev.I risk review, MR0001–0004 / BOD / DTS / SPE / TAG MTO. Role/location assumptions and MGW FAT venue conflicts are flagged, not treated as approvals. No booking, no new sell and no replacement of the THB 510,000 B1 baseline.</p>
+  <p className="p55-note"><strong>CFO REVIEW VIEW — Who / What / Where / How / Cost Owner / Payer / Quantity / Rate / Evidence.</strong> Rev.K K00–K18 and Rev.L Yard roles, Rev.J Gantt and Rev.I risk review, MR0001–0004 / BOD / DTS / SPE / TAG MTO. Role/location assumptions and MGW FAT venue conflicts are flagged, not treated as approvals. No new Direct Cost posting. Previous THB 510,000 B1 is superseded by user-authorized role-WBS + unique PM Working Sell; unowned suspense stays NON-POSTING.</p>
   <div className="p55-metric-grid">
-   <div><strong>Existing B1 Working Sell</strong><p>{cash(ledger.baseline.b1WorkingSellTHB)}</p><small>Legacy 964-MH engineering baseline; unchanged</small></div>
+   <div><strong>Current B1 Working Sell</strong><p>{cash(workingRow.b1ActivityBudget?.workingSellTHB)}</p><small>Repriced 27 engineering WBS + 11 distinct PM gates; old 510,000 replaced, not added</small></div>
    <div><strong>New B1 Indirect Working Cost</strong><p>{cash(ledger.b1NewWorkingCostTHB)}</p><small>Requires expense quantity and supported rate</small></div>
    <div><strong>B1 source expense objects</strong><p>{ledger.b1.length}</p><small>{ledger.unpricedB1} awaiting cost evidence</small></div>
    <div><strong>Other-owner expense objects</strong><p>{ledger.outside.length}</p><small>Reference only; cannot post into B1</small></div>
@@ -107,7 +107,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
    <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
-   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Legacy engineering baseline ONLY; not approved indirect PM ledger total":e.code==="B3"||e.code==="B9"?"Rev.K current; B9 base excludes conditional Yard call-out. Rev05 is audit only":"Working source estimate"}</small></div>
+   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Current engineering + 11 nonduplicated PM gates; internal payroll Direct Cost OPEN":e.code==="B3"||e.code==="B9"?"Rev.K current; B9 base excludes conditional Yard call-out. Rev05 is audit only":"Working source estimate"}</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Reconcile all four MR cargo legs against current MGW China FAT and DDP JUTAL Zhuhai Yard; Bangkok/Nantong are historical Rev05 routes only.</p>}
@@ -146,7 +146,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
    </details>
   </section>}
   {e.code==="B1"&&<B1RevKMilestoneBudget0553/>}
-  {e.code==="B1"&&<B1IndirectExpenseRegister0553/>}
+  {e.code==="B1"&&<B1IndirectExpenseRegister0553 workingRow={workingRow}/>}
   {e.code==="B1"&&<details className="p55-panel" style={{padding:12,marginTop:12}}><summary><strong>Rev05 Legacy B1 Engineering 964-MH / THB 510,000 Calculation Audit</strong> — previous method; not the new Project Management &amp; Indirect Expense budget</summary><B1EngineeringSellModel0553 workingRow={workingRow}/></details>}
   <h4>{e.code==="B3"||e.code==="B9"?"Rev05 Original WBS Calculation Audit — ไม่ใช่ราคาปัจจุบัน":"1. Working Drivers & Calculation Evidence — ต้นทางปริมาณและสมการ"}</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
