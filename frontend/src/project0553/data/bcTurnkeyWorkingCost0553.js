@@ -116,7 +116,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    contractOwner:"SAMTEL",
    turnkeyEstimator:"ADDVALUE_FOR_SAMTEL",
    executionOwner:w.owner, // Execution responsibility never excludes turnkey scope.
-   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"?chinaB9.fatDaysEstimate+chinaB9.yardTeamDaysWorking:w.qty,unit:code==="B9"?"team-days (2 persons)":code==="B3"?"LS (offshore SAT/SIT; old BKK FAT excluded)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"MGW China FAT + JUTAL Yard labor and BKK-China-BKK travel/insurance; no separate per diem":code==="B3"?"Offshore SAT/SIT only; Rev05 Bangkok FAT THB 144,000 transferred out to B9 China FAT":w.driver,
+   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"?chinaB9.fatDaysEstimate+chinaB9.fatTravelTeamDays:w.qty,unit:code==="B9"?"team-days (2 persons)":code==="B3"?"LS (offshore SAT/SIT; old BKK FAT excluded)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"MGW China FAT witness and BKK-China-BKK travel/insurance in BASE; Yard support CONDITIONAL, NOT included in Base":code==="B3"?"Offshore SAT/SIT only; Rev05 Bangkok FAT THB 144,000 transferred out to B9 China FAT":w.driver,
    sourceRevision:(code==="B3"||code==="B9")?"Rev.K 2026-10-18 current FAT ownership + Rev05 source bridge":PART_BC_WBS_SOURCE_0553.revision,
    sourceUrl:PART_BC_WBS_SOURCE_0553.url,
    requirementRows:requirementRows.map(r=>({
@@ -126,11 +126,11 @@ export function selectBcTurnkeyWorkingCost0553(){
    })),
    requirementCount:requirementRows.length,
    workingSellTHB:Number.isFinite(b9ChinaSellTHB)?b9ChinaSellTHB:Number.isFinite(b3CurrentSellTHB)?b3CurrentSellTHB:Number.isFinite(spareSellTHB)?spareSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b7ReserveSellTHB)?b7ReserveSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
-   workingSellBasis:Number.isFinite(b9ChinaSellTHB)?"REV_K_CHINA_FAT_YARD_TRAVEL_INSURANCE_LABOR_USD600_NO_PER_DIEM_ESTIMATE":Number.isFinite(b3CurrentSellTHB)?"REV_K_OFFSHORE_ONLY_BKK_FAT_144000_REMOVED_TO_B9":Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b7ReserveSellTHB)?"ONE_MONTH_CONDITIONAL_STORAGE_RESERVE_FROM_SEPARATED_REV09_B7_NON_ADDITIVE":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
+   workingSellBasis:Number.isFinite(b9ChinaSellTHB)?"REV_K_B9_FAT_BASE_WITH_SEPARATE_CONDITIONAL_YARD_SPE_7_3_4":Number.isFinite(b3CurrentSellTHB)?"REV_K_OFFSHORE_ONLY_BKK_FAT_144000_REMOVED_TO_B9":Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b7ReserveSellTHB)?"ONE_MONTH_CONDITIONAL_STORAGE_RESERVE_FROM_SEPARATED_REV09_B7_NON_ADDITIVE":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
    directCostTHB:null, // No controlled source-rate x quantity internal ledger yet.
    riskCostTHB:null,
    commercialSellTHB:null, // A customer price is not the existing WBS sell reference.
-   priceStatus:Number.isFinite(b9ChinaSellTHB)?"PRE_AWARD_B9_BUDGETARY_WORKING_SELL_FAT_DURATION_TRAVEL_INSURANCE_QUOTES_OPEN":Number.isFinite(b3CurrentSellTHB)?"WORKING_SELL_B3_OFFSHORE_ONLY_FAT_SCOPE_DEDUCTED":Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b7ReserveSellTHB)?"BUDGETARY_ONE_MONTH_STORAGE_RESERVE_CONDITIONAL_VENDOR_RECONFIRM":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
+   priceStatus:Number.isFinite(b9ChinaSellTHB)?"PRE_AWARD_B9_FAT_BASE_YARD_CALL_OUT_CONDITIONAL_OPEN":Number.isFinite(b3CurrentSellTHB)?"WORKING_SELL_B3_OFFSHORE_ONLY_FAT_SCOPE_DEDUCTED":Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b7ReserveSellTHB)?"BUDGETARY_ONE_MONTH_STORAGE_RESERVE_CONDITIONAL_VENDOR_RECONFIRM":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
    b11VendorFollowup:code==="B11"?Object.freeze({status:"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING",amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08 B11 itemized tools",verifiedDirectCost:false,releaseAllowed:false,verification:"Requote tools with MGW/OEM; deduct included Part A tooling before bid release"}):null,
@@ -148,10 +148,12 @@ export function selectBcTurnkeyWorkingCost0553(){
     previousChinaTeamDaySellTHB:47880,
     originalB9WorkingSellTHB:w.sellTHB,
     repricedWorkingSellTHB:chinaB9.workingSellTHB,
-    chinaFATandYardDays:chinaB9.fatDaysEstimate+chinaB9.yardTeamDaysWorking,
+    chinaFATandTravelDaysInBase:chinaB9.fatDaysEstimate+chinaB9.fatTravelTeamDays,
+    conditionalYardTeamDays:chinaB9.yardActualOrStandbyTeamDays,
+    conditionalYardWorkingSellTHB:chinaB9.conditionalYardSellTHB,
     perDiemIncluded:false,travelIncluded:false,accommodationIncluded:false,visaIncluded:false,
     costOwner:"B9",releaseAllowed:false,
-    pricingGate:"B9 repriced as provisional Working SELL; confirm MGW FAT 2 days, 12 yard days, one combined trip and insured onshore work before customer release"
+    pricingGate:"Only MGW FAT witness + one trip in Base. Rev05 Yard 12 team-days include 2 travel days and are conditional. Confirm RACI/Company site-support call-out under SPE §7.3.4; reprice if 2 separate trips. No unconditional Yard supervision posting."
    }):null,
    b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b10WorkingSellDecision:code==="B10"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b10WorkingSellTHB,source:"4-Scope of Supply.xlsx · Rev08 · B10",historicalUSD:b10HistoricalUSD,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"WORKING_SELL_ONLY"}):null,
