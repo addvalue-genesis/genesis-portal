@@ -145,7 +145,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
   {e.code==="B1"&&<B1RevKMilestoneBudget0553/>}
   {e.code==="B1"&&<B1IndirectExpenseRegister0553/>}
   {e.code==="B1"&&<details className="p55-panel" style={{padding:12,marginTop:12}}><summary><strong>Rev05 Legacy B1 Engineering 964-MH / THB 510,000 Calculation Audit</strong> — previous method; not the new Project Management &amp; Indirect Expense budget</summary><B1EngineeringSellModel0553 workingRow={workingRow}/></details>}
-  <h4>1. Working Drivers &amp; Calculation Evidence — ต้นทางปริมาณและสมการ</h4>
+  <h4>{e.code==="B3"||e.code==="B9"?"Rev05 Original WBS Calculation Audit — ไม่ใช่ราคาปัจจุบัน":"1. Working Drivers & Calculation Evidence — ต้นทางปริมาณและสมการ"}</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Activity / Physical Work</th><th>Quantity</th><th>Rate THB</th><th>Evidence Amount THB</th><th>ประเภท / แหล่งข้อมูล</th></tr></thead>
    <tbody>{e.lines.map(line=><tr key={line.id}>
@@ -156,7 +156,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
     <td><strong>{readableKind[line.valueClass]||line.valueClass}</strong><small>{line.status}</small><small>{line.evidence}</small></td>
    </tr>)}</tbody>
   </table></div>
-  {e.reconciliation&&<p className="p55-note"><strong>Source Reconciliation:</strong> {Object.entries(e.reconciliation).filter(([k])=>k!=="historicalRev08TransportSellTHB"&&k!=="planningFxTHBPerUSD"&&k!=="displayCurrency").map(([k,v])=>k+": "+(typeof v==="number"?v.toLocaleString("en-US"):Array.isArray(v)?v.join(" – "):v)).join(" · ")}</p>}
+  {e.reconciliation&&<p className="p55-note"><strong>{e.code==="B3"||e.code==="B9"?"Rev05 source reconciliation (superseded for current FAT/B9 sell):":"Source Reconciliation:"}</strong> {Object.entries(e.reconciliation).filter(([k])=>k!=="historicalRev08TransportSellTHB"&&k!=="planningFxTHBPerUSD"&&k!=="displayCurrency").map(([k,v])=>k+": "+(typeof v==="number"?v.toLocaleString("en-US"):Array.isArray(v)?v.join(" – "):v)).join(" · ")}</p>}
   <h4>2. Input / Cost Gaps — ข้อมูลที่ต้องยืนยันก่อนคิดต้นทุน</h4>
   <ul>{e.requiredInputs.map((g,i)=><li key={i}>{g}</li>)}</ul>
   <details className="p55-panel" style={{padding:12,marginTop:10}}>
