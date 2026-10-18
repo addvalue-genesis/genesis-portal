@@ -105,7 +105,7 @@ export function selectRevKAbcOwnershipControl0553(working){
    "Post Yard SAT loose-equipment transfer to ZPQ under SPE §7.3.2 conflicts with as-installed WH assumption; seek written TQ",
    "B1 new price 27 technical WBS + 11 PM gates; K00 kickoff duplicate excluded, no B2/B3/B9 overtime",
    "B3 40 workdays x two specialists; 30d VeEX rent included once, permanent O&M tools in B11 only",
-   "No fee for standby Field Specialist; if actually deployed, separately track internal travel/policy expenditure",
+   "Yard Field Telecom Specialist travels as an unbilled companion; THB48,500 minimum cash risk allowance remains nonposting until cost/margin evidence",
    "Verified Direct Cost needs actual salary, supplier receipts, Trip/Person keys; no automatic historical posting"
   ])
  });
