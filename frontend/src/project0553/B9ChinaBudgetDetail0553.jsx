@@ -9,7 +9,6 @@ export function B9ChinaBudgetDetail0553({budget}){
    <div><strong>Working SELL — B9</strong><p>{thb(budget.workingSellTHB)}</p><small>PRE-AWARD budget; not a vendor quotation</small></div>
    <div><strong>China Onshore labor</strong><p>{thb(budget.laborWorkingSellTHB)}</p><small>{budget.qtyDerivedManDays} person-days: {budget.fatDaysEstimate} FAT + {budget.yardTeamDaysWorking} Yard team-days</small></div>
    <div><strong>Travel, Visa &amp; Insurance</strong><p>{thb(budget.travelAndInsuranceWorkingSellTHB)}</p><small>One BKK–China–BKK combined crew trip assumed</small></div>
-   <div><strong>Per Diem</strong><p>Not separately charged</p><small>No legacy USD 270/day team allowance added</small></div>
   </div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--budget" style={{width:"100%",minWidth:1050,tableLayout:"fixed"}}>
    <colgroup><col style={{width:"13%"}}/><col style={{width:"29%"}}/><col style={{width:"12%"}}/><col style={{width:"13%"}}/><col style={{width:"13%"}}/><col style={{width:"20%"}}/></colgroup>
@@ -20,7 +19,7 @@ export function B9ChinaBudgetDetail0553({budget}){
      <td>{x.qty} {x.unit}</td><td>{thb(x.unitRateTHB)}</td><td><strong>{thb(x.workingSellTHB)}</strong></td>
      <td>{x.evidence}<small>{x.rateAuthority}</small></td>
     </tr>)}
-    <tr><td colSpan={4}><strong>TOTAL B9 — Revised Working Sell (no separate Per Diem)</strong></td><td><strong>{thb(budget.workingSellTHB)}</strong></td><td>Cost owner B9 only; not added to B1 or B3</td></tr>
+    <tr><td colSpan={4}><strong>TOTAL B9 — Revised Working Sell</strong></td><td><strong>{thb(budget.workingSellTHB)}</strong></td><td>Cost owner B9 only; not added to B1 or B3</td></tr>
    </tbody></table></div>
   <p className="p55-note"><strong>Estimating control:</strong> Rev.K establishes 2 ADDVALUE FAT attendees and MGW as OEM FAT executor, but not FAT duration. Two FAT days, 12 Yard days, 15 nights/employee and one continuous China trip are working assumptions. Reconfirm MGW FAT venue/date, Zhuhai availability, hotel route, visa/work authorisation, occupational accident cover and insurer endorsements. Travel insurance alone may not cover onsite technical work; both insurance allowances are included but are not proof of coverage. No Direct Cost is asserted.</p>
  </section>;
