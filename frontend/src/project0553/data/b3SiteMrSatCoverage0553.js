@@ -50,7 +50,7 @@ export function selectB3SiteMrSatCoverage0553(){
  const b3=selectB3FortyDayWorkingSell0553();
  const all=B3_SITE_MR_SAT_COVERAGE_0553;
  if(new Set(all.map(x=>x.id)).size!==all.length)throw Error("Duplicate site/MR SAT Test ID");
- if(rows.length!==17||all.length!==19)throw Error("Site SAT scope mismatch");
+ if(rows.length!==19||all.length!==21)throw Error("Site SAT scope mismatch");
  for(const [site,mrs] of siteRows){
   const matched=rows.filter(x=>x.site===site);
   if(matched.length!==mrs.length||mrs.some(m=>!matched.some(x=>x.mr===m)))
