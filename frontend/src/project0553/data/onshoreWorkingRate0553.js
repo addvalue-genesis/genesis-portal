@@ -8,7 +8,7 @@ export const ONSHORE_WORKING_SELL_RATE_0553=Object.freeze({
   thbPerPersonDay:18900,
   rateClass:"USER_SELECTED_ONSHORE_WORKING_SELL_RATE",
   source:"USER_MANAGEMENT_DECISION_2026_10_18",
-  applicability:"ADDVALUE Onshore labour (office PM B1, China MGW FAT / JUTAL Yard staffing B9) where explicitly scoped",
+  applicability:"ADDVALUE Onshore labour (office PM B1, MGW China FAT Witness B3, JUTAL optional Yard staffing B9) where explicitly scoped",
   workingSellRateApproved:true,
   internalDirectCostVerified:false,
   staffDaysApproved:false,
@@ -19,7 +19,7 @@ export const ONSHORE_WORKING_SELL_RATE_0553=Object.freeze({
   ratePerPersonNotTeam:true,
   B1PostingAuthorized:false,
   B9ExistingWorkingSellOverrideAllowed:false,
-  note:"One expense ID, one cost owner; do not re-charge China work in B1; no cumulative B1/B9 sell change until WBS scope and quantities reconciled"
+  note:"One expense ID, one cost owner; do not cross-charge MGW FAT B3 and Yard B9 into B1; no cumulative B1/B9 sell change until WBS scope and quantities reconciled"
 });
 export function selectOnshoreWorkingRate0553(){ 
  const r=ONSHORE_WORKING_SELL_RATE_0553;
