@@ -211,7 +211,7 @@ const SOURCE_EXPENSE_ROWS_0553=Object.freeze([
     "owner": "B9",
     "account": null,
     "wbs": "K01",
-    "activity": "China FAT personnel flights, hotel, visa, per diem and ground transport",
+    "activity": "China FAT personnel flights, hotel, visa, ground transport and work/travel cover; no separate per diem",
     "unit": "TRIP",
     "classification": "DIRECT",
     "source": "Rev.K K01; user single B9 ownership decision",
