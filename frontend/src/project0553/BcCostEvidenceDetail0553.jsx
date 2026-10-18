@@ -61,7 +61,7 @@ function B1WorkingSellBreakdown0553({workingRow}){
 function B1IndirectExpenseRegister0553(){
  const ledger=selectB1ProjectExpenseLedger0553();
  const [showCross,setShowCross]=React.useState(false);
- const [expanded,setExpanded]=React.useState({});
+ const [expanded,setExpanded]=React.useState({"B1.1":true,"B1.2":true,"B1.3":true,"B1.4":true,"B1.5":true,"B1.6":true,"B1.7":true,"B1.8":true});
  const groups=[["B1.1","Project Management"],["B1.2","Meetings & Representation"],["B1.3","Management Travel"],["B1.4","Office/Admin"],["B1.5","Regulatory Coordination"],["B1.6","Legal/Local Consultant"],["B1.7","Official Fees"],["B1.8","Other Project Expenses"]];
  const cash=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
  const renderRows=rows=><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1560,width:"100%",tableLayout:"fixed",fontSize:12}}>
@@ -103,7 +103,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
    <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
-   <div><strong>WBS Working SELL (THB)</strong><p>{thb(e.workingSellTHB)}</p><small>อ้างอิง Rev05 เท่านั้น</small></div>
+   <div><strong>WBS Working SELL (THB)</strong><p>{thb(e.workingSellTHB)}</p><small>{e.code==="B1"?"Legacy engineering baseline ONLY; not approved indirect PM ledger total":"อ้างอิง Rev05 เท่านั้น"}</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Confirm the four MR legs through Bangkok FAT and JUTAL Nantong.</p>}
@@ -130,7 +130,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
    </details>
   </section>}
   {e.code==="B1"&&<B1IndirectExpenseRegister0553/>}
-  {e.code==="B1"&&<B1EngineeringSellModel0553 workingRow={workingRow}/>}
+  {e.code==="B1"&&<details className="p55-panel" style={{padding:12,marginTop:12}}><summary><strong>Rev05 Legacy B1 Engineering 964-MH / THB 510,000 Calculation Audit</strong> — previous method; not the new Project Management &amp; Indirect Expense budget</summary><B1EngineeringSellModel0553 workingRow={workingRow}/></details>}
   <h4>1. Working Drivers &amp; Calculation Evidence — ต้นทางปริมาณและสมการ</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Activity / Physical Work</th><th>Quantity</th><th>Rate THB</th><th>Evidence Amount THB</th><th>ประเภท / แหล่งข้อมูล</th></tr></thead>
