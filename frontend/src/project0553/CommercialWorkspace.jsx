@@ -38,6 +38,19 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const rows=template.sheets;
  const baseline=getBaselineReview();
  const bcWorking=selectBcTurnkeyWorkingCost0553();
+ // 10.2 canonical sell totals only: C options never enter base Part B.
+ const bcSellSum=(rows)=>Math.round(rows.reduce((n,r)=>n+r.workingSellTHB,0)*100)/100;
+ const partBRows=bcWorking.rows.filter(r=>!r.optional);
+ const partCRows=bcWorking.rows.filter(r=>r.optional);
+ const pricedB=partBRows.filter(r=>Number.isFinite(r.workingSellTHB));
+ const pricedC=partCRows.filter(r=>Number.isFinite(r.workingSellTHB));
+ const partBWorkingSell=bcSellSum(pricedB);
+ const partCWorkingSell=bcSellSum(pricedC);
+ const combinedBCWorkingSell=Math.round((partBWorkingSell+partCWorkingSell)*100)/100;
+ const missingB=partBRows.filter(r=>!Number.isFinite(r.workingSellTHB)).map(r=>r.code);
+ const missingC=partCRows.filter(r=>!Number.isFinite(r.workingSellTHB)).map(r=>r.code);
+ if(Math.abs(partBWorkingSell-bcWorking.knownWorkingSellTHB)>0.01)throw Error("10.2 Part B summary mismatch");
+
 
  const bcGroupIdByWorkflow=new Map(BUDGET_BC_WORKFLOW_0553
   .filter(x=>x.parent==="10.2").map(x=>[x.workflowNumber,x.moduleId]));
@@ -152,6 +165,15 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     <div className="p55-eyebrow">PART B/C WORKING SHEETS / ENGINEERING COST CONTROL <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.working.bc"/></div>
     <h3>Part B/C — Linked Internal Working Detail</h3>
     <p className="p55-note">หน้าตาและการเลือกหมวดเหมือน 10.5 แต่ที่นี่เป็นเจ้าของ Working Source / Direct Cost Evidence; 10.5 เป็น Read-only Customer Scope. ชื่อและ Module ID ของแต่ละรายการใช้ Canonical 10.2 เท่านั้น</p>
+    <section className="p55-panel" data-component-key="bid.budget.working.bc.totals" style={{marginBottom:12}}>
+     <h4>10.2 — Part B / Part C Working Sell Summary (THB)</h4>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Price scope</th><th>Working Sell THB</th><th>Priced coverage</th><th>Commercial treatment</th></tr></thead><tbody>
+      <tr><td><strong>Part B — Base services / spares</strong></td><td className="is-number"><strong>THB {partBWorkingSell.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></td><td>{pricedB.length}/{partBRows.length} codes; pending: {missingB.join(", ")||"none"}</td><td>Partial base working sell; not direct cost or customer released price</td></tr>
+      <tr><td><strong>Part C — Optional spares</strong></td><td className="is-number"><strong>THB {partCWorkingSell.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></td><td>{pricedC.length}/{partCRows.length} codes; pending: {missingC.join(", ")||"none"}</td><td>OPTIONAL — not included in Part B base</td></tr>
+      <tr><td><strong>B + C — Reference including options</strong></td><td className="is-number"><strong>THB {combinedBCWorkingSell.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></td><td>Sum of priced lines only</td><td>Reference only; not a customer-released quotation</td></tr>
+     </tbody></table></div>
+     <p className="p55-note">Live source: selectBcTurnkeyWorkingCost0553() · 10.2 Working SELL only. Missing lines are not zero; C1/C2 are kept separate. Historical non-posting references and direct costs are not added.</p>
+    </section>
     <ScopeCategoryTabs0553 value={bcTab} onChange={code=>{setBcTab(code);setBcDetailCode(code==="ALL"?null:code);}}/>
     <p className="p55-note">Selected module: <strong>{bcTab==="ALL"?"All Part B/C — B1–B14 and C1–C2":bcTab+" — "+bcWorking.byCode[bcTab]?.requirement}</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey={bcTab==="ALL"?"bid.budget.working.bc":"bid.budget.working.bc."+bcTab.toLowerCase()}/></p>
     </section>
