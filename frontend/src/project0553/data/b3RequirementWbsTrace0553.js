@@ -19,7 +19,7 @@ const B3_REQUIREMENT_WBS_SOURCE_0553=Object.freeze([
     "id": "RQM-01",
     "moduleId": "bid.budget.working.bc.b3.requirement-trace.rqm-01",
     "system": "ALL",
-    "costOwner": "B9",
+    "costOwner": "B3",
     "wbs": "K01",
     "activity": "MGW OEM FAT China",
     "requirementRef": "BOD §10.2–10.3; SPE §7.3.1",
@@ -27,7 +27,7 @@ const B3_REQUIREMENT_WBS_SOURCE_0553=Object.freeze([
     "responsibility": "MGW executes; ADDVALUE 2 witness personnel per Rev.K; one unbilled standby",
     "location": "MGW factory China, actual address OPEN",
     "deliverable": "FAT signed procedure + hardware/software printouts + as-left configurations",
-    "costRule": "Factory tools from OEM/Part A; ADDVALUE attendance and travel only B9",
+    "costRule": "MGW OEM factory execution/tools Part A; ADDVALUE FAT witness labour/travel in B3 Inspection Testing per Scope of Supply",
     "gate": "MGW procedure/ITP, actual witness days and owner confirmation",
     "requirementClass": "MUST",
     "status": "FAT_VENDOR_OWNED",
@@ -43,7 +43,7 @@ const B3_REQUIREMENT_WBS_SOURCE_0553=Object.freeze([
     "id": "RQM-02",
     "moduleId": "bid.budget.working.bc.b3.requirement-trace.rqm-02",
     "system": "ALL",
-    "costOwner": "B9",
+    "costOwner": "B3",
     "wbs": "K01",
     "activity": "FAT advance notice",
     "requirementRef": "BOD §10.2; SPE §7.3",
@@ -51,7 +51,7 @@ const B3_REQUIREMENT_WBS_SOURCE_0553=Object.freeze([
     "responsibility": "MGW submits notice; CONTRACTOR/COMPANY confirms governing lead time",
     "location": "MGW vendor shop China",
     "deliverable": "Dated notice + witness confirmation",
-    "costRule": "No separate charge apart from unique B9 coordination event",
+    "costRule": "FAT notice/witness planning included in B3 FAT expense event; no separate B9 charge",
     "gate": "Contract precedence/notice resolution (30 vs 14 days)",
     "requirementClass": "MUST",
     "status": "NOTICE_CONFLICT_OPEN",
@@ -482,7 +482,7 @@ const B3_REQUIREMENT_WBS_SOURCE_0553=Object.freeze([
 export const B3_REQUIREMENT_WBS_TRACE_0553=Object.freeze(B3_REQUIREMENT_WBS_SOURCE_0553.map(r=>Object.freeze({
  ...r,
  contractualRequirementState:r.requirementClass==="MUST"?"DELIVERABLE_MANDATORY_BY_CONTRACT":"WHEN_REQUESTED",
- addvalueAttendanceState:r.costOwner!=="B9"?"CHECK_EXECUTION_RACI":
+ addvalueAttendanceState:["RQM-01","RQM-02"].includes(r.id)?"B3_MGW_FAT_WITNESS_AND_NOTICE":r.costOwner!=="B9"?"CHECK_EXECUTION_RACI":
   (r.id==="RQM-01"?"REVK_2_FAT_WITNESSES_PLANNED":r.id==="RQM-02"?"FAT_NOTICE_INCLUDED_NO_EXTRA_CHARGE":"NO_UNCONDITIONAL_YARD_ATTENDANCE__CALL_OUT_OR_SIGNED_RACI_ONLY"),
  b9CommercialTreatment:r.costOwner!=="B9"?null:
   (r.id==="RQM-01"?"FAT_BASE__WITNESS":r.id==="RQM-02"?"FAT_BASE__NOTICE_INCLUDED_NO_EXTRA":"YARD_SUPPORT_CONDITIONAL__NO_BASE_CHARGE"),
