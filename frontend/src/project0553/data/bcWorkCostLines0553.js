@@ -17,7 +17,7 @@ const sourceUrl=PART_BC_WBS_SOURCE_0553.url;
 // 08_B1_ENGINEERING: [Scope, task, role MH: Lead/Senior/Engineer/Drafter/DC,
 // historical rate-card proxy]. Source controls 964 MH and THB180,892.75;
 // the historical proxy MUST NOT become today's staff cost or quote.
-const B1_WBS_ACTIVITIES=Object.freeze([
+export const B1_WBS_ACTIVITIES=Object.freeze([
  ["COMMON","Project kickoff / design-basis review",8,16,16,0,0,8933],
  ["COMMON","Cross-system interface register / BLD review",8,24,24,8,0,12966],
  ["COMMON","Vendor technical coordination / TBE support",4,16,24,0,0,8666.5],
