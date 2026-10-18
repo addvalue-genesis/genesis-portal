@@ -44,7 +44,7 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
    {" "}· Current Working SELL subtotal (legacy Rev05 superseded for China FAT): {knownSellCount>0?money(displayedWbsSell):"NOT ESTABLISHED"} ({knownSellCount}/{showGroup.length} priced; {completeSell?"covered":"NOT complete price"})
    {" "}· Actual Direct COST: <strong>NOT ESTABLISHED</strong>
    {" "}· Historical B1 proxy (not approved cost): {historicalProxy?money(historicalProxy):"n/a"}</p>
-  <p className="p55-note">Rev.K current B9 Base covers China MGW FAT witnesses and one BKK–China–BKK trip. Yard ADDVALUE 10 working/standby team-days plus extra hotel/transfer are CONDITIONAL call-out only under SPE §7.3.4 and are EXCLUDED from this base ledger. Rev05 B9 12 team-days included 2 shared travel days; travel charged once. Historical Bangkok FAT THB 144,000 removed from B3. No Direct Cost approval implied.</p>
+  <p className="p55-note">Rev.K B9 Base covers two ADDVALUE China MGW FAT witnesses and one BKK–China–BKK trip. Optional Yard call-out is ONE Senior Telecom Systems Integration Engineer for 7 working days plus 2 paid travel days, hotel and cover on a SEPARATE trip, offered as 1 LS and EXCLUDED from Base. Rev05 two-person 12 Yard team-days are historical only; each actual trip must be recorded once. Historical Bangkok FAT THB 144,000 removed from B3. No Direct Cost approval implied.</p>
   {(selectedCode==="ALL"||selectedCode==="B1"||selectedCode==="B2")&&<B1B2EquationAudit0553 selectedCode={selectedCode}/>}
   {(selectedCode==="ALL"||selectedCode==="B3")&&<B3EquationAudit0553 selectedCode={selectedCode}/>}
   {(selectedCode==="ALL"||selectedCode==="B5")&&<B5EquationAudit0553 selectedCode={selectedCode}/>}
