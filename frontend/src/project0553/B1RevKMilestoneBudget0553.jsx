@@ -33,9 +33,9 @@ export function B1RevKMilestoneBudget0553(){
    <div><strong>Rev.K coverage + Module IDs</strong><p>{model.coverageTotal}/19</p><small>ทุก K มี ID เปิดอ้างอิงได้</small></div>
    <div><strong>Unique B1 PM Expense Events</strong><p>{model.uniquePmBudgetEvents}</p><small>K03–K07 และ K08–K11 รวมการประสานงาน ไม่ตั้งค่า PM ซ้ำ</small></div>
    <div><strong>CFO planned Office PM effort</strong><p>{sumHours===null?"INCOMPLETE":sumHours+" MH"}</p><small>Proxy estimate {model.initialEstimatedPmHours} MH / 8 MH ต่อคน-วัน</small></div>
-   <div><strong>B1 Budgetary PM SELL (partial B1 only)</strong><p>{money(totalBudgetarySell)}</p><small>USD {rate||"pending"} per person-day × FX {fx}; NON-POSTING</small></div>
+   <div><strong>B1 Budgetary PM SELL (partial B1 only)</strong><p>{money(totalBudgetarySell)}</p><small>Management-approved Onshore labour rate; PM hours are provisional · NON-POSTING</small></div>
   </div>
-  <p className="p55-note"><strong>หลักฐานและสมมติฐาน:</strong> Rev.K ระบุ 19 ขั้นและ Acceptance Gates แต่ไม่ได้ระบุ PM-hours ของผู้บริหาร จึงตั้ง <strong>CFO planning proxy 56 MH / 12 การประสานงานที่ไม่ซ้ำ</strong> (2–8 MH ต่อเหตุการณ์) และเปิดให้ปรับได้ ค่า USD 600/คน/วันเป็นอัตราสมมติฐานจากการหารือ ไม่ใช่ Actual Direct Cost หรือ Rate ที่ลงนามแล้ว ผลรวมนี้เป็น Budgetary SELL บางส่วนของ B1 เท่านั้น และ <strong>ไม่เพิ่มเข้ากับ B1 THB 510,000 เดิม</strong></p>
+  <p className="p55-note"><strong>หลักฐานและสมมติฐาน:</strong> Rev.K ระบุ 19 ขั้นและ Acceptance Gates แต่ไม่ได้ระบุ PM-hours ของผู้บริหาร จึงตั้ง <strong>CFO planning proxy 56 MH / 12 การประสานงานที่ไม่ซ้ำ</strong> (2–8 MH ต่อเหตุการณ์) และเปิดให้ปรับได้ อัตราค่าแรง Onshore USD 600/คน/วันได้รับการเลือกใช้โดย Management แล้ว (18-Oct-2026) แต่ยังไม่ใช่ Actual Direct Cost; ชั่วโมง PM เป็นเพียง Budgetary Planning Proxy ผลรวมนี้เป็น Budgetary SELL บางส่วนของ B1 เท่านั้น และ <strong>ไม่เพิ่มเข้ากับ B1 THB 510,000 เดิม</strong></p>
   <div className="p55-filterbar" style={{display:"flex",gap:10,alignItems:"center",flexWrap:"wrap",marginBottom:12}}>
    <label>Onshore Office PM — budgetary SELL (USD/person-day) <input type="number" min="0" step="1" value={rate} onChange={e=>setRate(e.target.value)} style={{marginLeft:8,maxWidth:130}}/></label>
    <strong>{money(moneyPerDay)} / day</strong>
@@ -63,6 +63,7 @@ export function B1RevKMilestoneBudget0553(){
     </tr>;
    })}</tbody>
   </table></div>
+  <p className="p55-note"><strong>Rate policy:</strong> USD 600 เป็นค่าแรง Onshore ต่อคน/วัน ไม่รวมค่าเดินทาง โรงแรม Visa และ Per Diem หากมีการคิดรายการเหล่านี้ต้องอยู่ใน Cost Owner ของกิจกรรมจริง (China FAT/Yard = B9) ไม่ใช่เพิ่มไว้ที่ B1 อีกครั้ง</p>
   <p className="p55-note"><strong>Cash-control check:</strong> {model.uniquePmBudgetEvents} unique B1 management events, {model.coverageTotal} Rev.K references; no physical execution or other B-item value is added to the B1 PM subtotal. Estimated B1 Office PM SELL {money(totalBudgetarySell)} is <strong>not complete B1 Working Cost</strong> and has no authorization to replace the current Canonical B1 Working Sell.</p>
   <button type="button" className="p553-detail-button" aria-expanded={showExclusions} onClick={()=>setShowExclusions(v=>!v)}>{showExclusions?"− Hide":"+ Review"} Other Cost Owners (reference only — NO AMOUNT)</button>
   {showExclusions&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Rev.K reference</th><th>Separate Cost Owner — not posted in B1</th><th>Single-owner key</th></tr></thead><tbody>
