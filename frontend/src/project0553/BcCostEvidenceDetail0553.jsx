@@ -64,18 +64,28 @@ function B1IndirectExpenseRegister0553(){
  const [expanded,setExpanded]=React.useState({});
  const groups=[["B1.1","Project Management"],["B1.2","Meetings & Representation"],["B1.3","Management Travel"],["B1.4","Office/Admin"],["B1.5","Regulatory Coordination"],["B1.6","Legal/Local Consultant"],["B1.7","Official Fees"],["B1.8","Other Project Expenses"]];
  const cash=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
- const renderRows=rows=><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{width:"100%",minWidth:1000}}>
-  <thead><tr><th>Expense ID / WBS</th><th>Expense / Activity</th><th>Cost Owner</th><th>Driver / Qty</th><th>Working Cost THB</th><th>Working Sell THB</th><th>Evidence / Missing Basis</th></tr></thead>
-  <tbody>{rows.map(r=><tr key={r.id}><td><strong>{r.id}</strong><small>{r.wbs}</small></td><td>{r.activity}<small>{r.classification}</small></td><td><strong>{r.owner}</strong><small>{r.account||"Other owner"}</small></td><td>{r.unit}<small>{r.quantity??"Quantity not established"}</small></td><td>{cash(r.workingCostTHB)}</td><td>{cash(r.workingSellTHB)}</td><td>{r.source}<small>{r.gate}</small>{r.pricingBasis&&<small>{r.pricingBasis}</small>}</td></tr>)}</tbody>
- </table></div>;
+ const renderRows=rows=><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1560,width:"100%",tableLayout:"fixed",fontSize:12}}>
+  <colgroup><col style={{width:"10%"}}/><col style={{width:"13%"}}/><col style={{width:"11%"}}/><col style={{width:"17%"}}/><col style={{width:"13%"}}/><col style={{width:"11%"}}/><col style={{width:"12%"}}/><col style={{width:"13%"}}/></colgroup>
+  <thead><tr><th>WBS / Expense ID</th><th>WHO — ผู้ปฏิบัติ</th><th>WHERE — สถานที่</th><th>WHAT &amp; HOW — วิธีทำ/ผลส่งมอบ</th><th>COST OWNER / PAYER</th><th>QTY / RATE</th><th>WORKING COST / SELL</th><th>SOURCE / CFO GATE</th></tr></thead>
+  <tbody>{rows.map(r=><tr key={r.id} style={{verticalAlign:"top",overflowWrap:"anywhere",whiteSpace:"normal"}}>
+   <td><strong>{r.id}</strong><small>{r.wbs}</small><small>{r.account||r.owner}</small></td>
+   <td><strong>{r.executor}</strong><small>{r.executionStatus}</small></td>
+   <td>{r.location}</td>
+   <td><strong>{r.activity}</strong><small>Method: {r.method}</small><small>Deliverable: {r.deliverable}</small></td>
+   <td><strong>{r.owner}</strong><small>Payer: {r.payer}</small><small>{r.classification}</small></td>
+   <td><strong>{r.unit}</strong><small>Qty: {r.quantity??"NOT VERIFIED"}</small><small>Unit rate: {cash(r.unitCostTHB)}</small><small>{r.quantityBasis}</small></td>
+   <td><strong>Cost: {cash(r.workingCostTHB)}</strong><small>Sell: {cash(r.workingSellTHB)}</small><small>{r.postingState}</small></td>
+   <td>{r.source}<small>{r.gate}</small><small>Event key: {r.expenseObjectKey}</small><small>{r.invoiceStatus}</small></td>
+  </tr>)}</tbody></table></div>;
  return <section className="p55-panel" data-component-key="bid.budget.working.bc.b1.indirect-ledger" style={{padding:14,marginTop:12}}>
   <h3>B1 — Project Expense Ledger (WBS-Driven / Single Cost Owner)</h3>
-  <p className="p55-note">Primary WBS: Rev.K K00–K18; Rev.L Yard MTO; Rev.J Gantt; Rev.I SAT Review; MR0001–0004, BOD/DTS/SPE, BOM and 10.2 expense ownership. The register is NON-POSTING: activities without quantity or rate stay unpriced, not zero. This does not reclassify the old engineering B1 baseline or overwrite any A/B/C Working Sell.</p>
+  <p className="p55-note"><strong>CFO REVIEW VIEW — Who / What / Where / How / Cost Owner / Payer / Quantity / Rate / Evidence.</strong> Rev.K K00–K18 and Rev.L Yard roles, Rev.J Gantt and Rev.I risk review, MR0001–0004 / BOD / DTS / SPE / TAG MTO. Role/location assumptions and MGW FAT venue conflicts are flagged, not treated as approvals. No booking, no new sell and no replacement of the THB 510,000 B1 baseline.</p>
   <div className="p55-metric-grid">
    <div><strong>Existing B1 Working Sell</strong><p>{cash(ledger.baseline.b1WorkingSellTHB)}</p><small>Legacy 964-MH engineering baseline; unchanged</small></div>
    <div><strong>New B1 Indirect Working Cost</strong><p>{cash(ledger.b1NewWorkingCostTHB)}</p><small>Requires expense quantity and supported rate</small></div>
    <div><strong>B1 source expense objects</strong><p>{ledger.b1.length}</p><small>{ledger.unpricedB1} awaiting cost evidence</small></div>
    <div><strong>Other-owner expense objects</strong><p>{ledger.outside.length}</p><small>Reference only; cannot post into B1</small></div>
+   <div><strong>Who/Where/How mapped</strong><p>{ledger.roleMappedCount}/{ledger.rows.length}</p><small>Mapped is not an approved RACI or priced budget</small></div>
   </div>
   {groups.map(([account,title])=>{const rows=ledger.b1.filter(r=>r.account===account);return <section key={account} style={{marginBottom:10}}><button type="button" className="p553-detail-button" aria-expanded={!!expanded[account]} onClick={()=>setExpanded(x=>({...x,[account]:!x[account]}))}>{expanded[account]?"−":"+"} {account} — {title} ({rows.length})</button>{expanded[account]&&renderRows(rows)}</section>;})}
   <button type="button" className="p553-detail-button" aria-expanded={showCross} onClick={()=>setShowCross(x=>!x)}>{showCross?"−":"+"} Cross-owner WBS Expenses (B2–B14, A, C, third parties) — non-additive</button>
