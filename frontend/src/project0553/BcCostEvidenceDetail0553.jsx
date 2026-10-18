@@ -108,6 +108,15 @@ export function BcCostEvidenceDetail0553({workingRow}){
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Confirm the four MR legs through Bangkok FAT and JUTAL Nantong.</p>}
+  {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
+   <h4>B9 — Onshore Labor Working SELL Rate (Management Decision)</h4>
+   <div className="p55-metric-grid">
+    <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
+    <div><strong>2-Person Team Labor Only</strong><p>THB {workingRow.b9OnshoreRateReview.laborOnlyTeamTHBPerDay.toLocaleString("en-US")}</p><small>Excludes per diem, flights, hotels, visa and local travel</small></div>
+    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>Unchanged Rev05 source until FAT/Yard days and allowances reconciled</small></div>
+   </div>
+   <p className="p55-note">MGW China FAT staff and JUTAL Yard onshore specialists belong to B9 once per person/trip. New USD 600 per person-day labor rate is management-selected; the previous B9 quote used a different team labor/per-diem structure. Do not overwrite the B9 subtotal, duplicate shared travel or charge these onshore services again to B1.</p>
+  </section>}
   <p className="p55-note">SOURCE: <a href={e.sourceUrl} target="_blank" rel="noreferrer">{e.sourceSheet} · {e.sourceRevision}</a>. ต้องใช้ Internal Rate Card / Vendor Rate ที่ควบคุมได้ก่อนคำนวณ Direct Cost</p>
   {(e.code==="B1"||e.code==="B2")&&<section className="p55-panel" data-component-key={"bid.budget.working.bc."+e.code.toLowerCase()+".ownership-boundary"} style={{padding:16,marginTop:12}}>
    <h4>ขอบเขต B1 และ B2 ที่ควรแยก</h4>
