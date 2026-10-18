@@ -62,7 +62,7 @@ assert.equal(b.knownWorkingSellTHB,4600020.95,"Current base B1/B3/B9 replaced by
 assert.equal(b.knownWorkingSellTHB,Math.round(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((sum,x)=>sum+x.workingSellTHB,0)*100)/100,"C1/C2 options excluded from base");
 assert.equal(b.byCode.B1.workingSellTHB,624030.26);
 assert.equal(b.byCode.B2.workingSellTHB,580000);
-assert.equal(b.byCode.B3.workingSellTHB,2046000);
+assert.equal(b.byCode.B3.workingSellTHB,2443400);
 assert.equal(derivePartBcWorkingWbs0553().subtotalTHB,3804160);
 assert.equal(b.knownDirectCostTHB,null);
 assert.equal(b.releaseAllowed,false);
