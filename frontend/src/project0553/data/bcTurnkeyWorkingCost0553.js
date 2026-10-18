@@ -110,7 +110,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    contractOwner:"SAMTEL",
    turnkeyEstimator:"ADDVALUE_FOR_SAMTEL",
    executionOwner:w.owner, // Execution responsibility never excludes turnkey scope.
-   qtyDriver:w.qty,unit:w.unit,equations:w.equations||[],basis:w.driver,
+   qtyDriver:code==="B7"?b7StorageMonths:w.qty,unit:w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":w.driver,
    sourceRevision:PART_BC_WBS_SOURCE_0553.revision,
    sourceUrl:PART_BC_WBS_SOURCE_0553.url,
    requirementRows:requirementRows.map(r=>({
