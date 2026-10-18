@@ -27,7 +27,7 @@ const activitiesForCustomerCode=Object.freeze({
 const customerRequirements=Object.freeze({
  B1:"Engineering design review / technical content and distinct Rev.K office PM (B2 VDRL excluded)",
  B2:"VDRL, documentation and final as-built delivery per MR",
- B3:"Offshore SAT/SIT 40 working days × 2 specialists + temporary VeEX rental; MGW FAT in B9",
+ B3:"Inspection, Testing and Certification per ITP: MGW FAT Witness plus Offshore SAT/SIT and VeEX rental",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
  B6:"Delivery logistics — MGW to JUTAL Zhuhai Yard; JUTAL coordinates customs/import/export, legal importer and Incoterm payer to confirm",
@@ -45,9 +45,9 @@ const customerRequirements=Object.freeze({
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
 const executionDecisionByCode=Object.freeze({
- B3:"Rev.K offshore 40 working days × 2 specialists at USD800/person-day; VeEX 30-day rental in B3; MGW FAT belongs exclusively to B9",
+ B3:"B3 owns MGW FAT Witness/travel plus Offshore SAT/SIT and temporary tools; MGW OEM FAT execution belongs A",
  B6:"Rev.K MGW China FAT followed by delivery through JUTAL Zhuhai; JUTAL coordinates import/export customs, actual importer of record and DDP cost bearer to verify; B6 cargo only",
- B9:"Rev.K Base: two ADDVALUE MGW China FAT witnesses and one FAT trip. Optional: one Senior Telecom Systems Integration Engineer, seven Zhuhai Yard working days, separate trip and 1 LS upon written call-out. Yard LS excluded from Base; no separate per diem"
+ B9:"Specialist field assistance only: no B9 Base; conditional Yard Sr Telecom Engineer 7-day 1 LS. MGW FAT Witness belongs B3."
 });
 
 export function selectBcTurnkeyWorkingCost0553(){
@@ -98,9 +98,9 @@ export function selectBcTurnkeyWorkingCost0553(){
    LIFECYCLE_SPARES_0553.rows.filter(x=>activities.includes(x.activity)):[];
   const costEvidence=evidence.byCode[code];
   const b6BudgetarySellTHB=code==="B6"?costEvidence?.reconciliation?.historicalRev08TransportSellTHB:null;
-  const b9ChinaSellTHB=code==="B9"?chinaB9.workingSellTHB:null;
+  const b9ChinaSellTHB=code==="B9"?chinaB9.b9BaseWorkingSellTHB:null;
   const b1CurrentSellTHB=code==="B1"?b1Current.workingSellTHB:null;
-  const b3CurrentSellTHB=code==="B3"?b3Current.workingSellTHB:null;
+  const b3CurrentSellTHB=code==="B3"?round(b3Current.workingSellTHB+chinaB9.fatWorkingSellTHB):null;
   const b5ApprovedSellTHB=code==="B5"?b5PriceReference.amountTHB:null;
   const b7ReserveSellTHB=code==="B7"?b7WorkingSellTHB:null;
   const b10ApprovedSellTHB=code==="B10"?b10WorkingSellTHB:null;
@@ -121,7 +121,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    contractOwner:"SAMTEL",
    turnkeyEstimator:"ADDVALUE_FOR_SAMTEL",
    executionOwner:w.owner, // Execution responsibility never excludes turnkey scope.
-   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"?1:code==="B3"?1:w.qty,unit:code==="B9"?"LS (MGW four-MR FAT; Yard LS conditional)":code==="B3"?"LS (40 workdays × 2 persons + VeEX 30d rental)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"MGW six-day four-MR FAT witness and BKK-China-BKK travel/insurance in BASE; Yard support CONDITIONAL, NOT included in Base":code==="B3"?"Forty productive SAT/SIT days × two specialists plus 30-day VeEX rental; travel/other tools outside allowance":code==="B1"?"27 legacy source engineering work activities plus 11 distinct Rev.K PM gate events; old B1 THB 510,000 superseded":w.driver,
+   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"?1:code==="B3"?1:w.qty,unit:code==="B9"?"LS (Yard Specialist optional only; Base zero)":code==="B3"?"LS (MGW FAT Witness + 40d SAT/SIT + VeEX 30d)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"No B9 Base; Yard Specialist optional 1 LS only, FAT Witness and travel are B3":code==="B3"?"B3: 6-day MGW FAT Witness × 2 plus travel + 40 offshore SAT/SIT team-days and VeEX rental":code==="B1"?"27 legacy source engineering work activities plus 11 distinct Rev.K PM gate events; old B1 THB 510,000 superseded":w.driver,
    sourceRevision:(code==="B1"||code==="B3"||code==="B9")?"Rev.K 2026-10-18 current FAT ownership + Rev05 source bridge":PART_BC_WBS_SOURCE_0553.revision,
    sourceUrl:PART_BC_WBS_SOURCE_0553.url,
    requirementRows:requirementRows.map(r=>({
@@ -131,11 +131,11 @@ export function selectBcTurnkeyWorkingCost0553(){
    })),
    requirementCount:requirementRows.length,
    workingSellTHB:Number.isFinite(b1CurrentSellTHB)?b1CurrentSellTHB:Number.isFinite(b9ChinaSellTHB)?b9ChinaSellTHB:Number.isFinite(b3CurrentSellTHB)?b3CurrentSellTHB:Number.isFinite(spareSellTHB)?spareSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b7ReserveSellTHB)?b7ReserveSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
-   workingSellBasis:Number.isFinite(b1CurrentSellTHB)?"REV_K_B1_27_ENG_WBS_964MH_PLUS_11_DISTINCT_PM_48MH":Number.isFinite(b9ChinaSellTHB)?"REV_K_B9_FAT_BASE_WITH_SEPARATE_CONDITIONAL_YARD_SPE_7_3_4":Number.isFinite(b3CurrentSellTHB)?"REV_K_OFFSHORE_40_DAYS_2_SPECIALISTS_PLUS_30_DAY_VEEX_WORKING_SELL":Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b7ReserveSellTHB)?"ONE_MONTH_CONDITIONAL_STORAGE_RESERVE_FROM_SEPARATED_REV09_B7_NON_ADDITIVE":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
+   workingSellBasis:Number.isFinite(b1CurrentSellTHB)?"REV_K_B1_27_ENG_WBS_964MH_PLUS_11_DISTINCT_PM_48MH":Number.isFinite(b9ChinaSellTHB)?"REV_K_B9_YARD_SPECIALIST_CONDITIONAL_ONLY_NO_BASE":Number.isFinite(b3CurrentSellTHB)?"REV_K_B3_FAT_WITNESS_PLUS_OFFSHORE_40D_VEEX":Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b7ReserveSellTHB)?"ONE_MONTH_CONDITIONAL_STORAGE_RESERVE_FROM_SEPARATED_REV09_B7_NON_ADDITIVE":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
    directCostTHB:null, // No controlled source-rate x quantity internal ledger yet.
    riskCostTHB:null,
    commercialSellTHB:null, // A customer price is not the existing WBS sell reference.
-   priceStatus:Number.isFinite(b1CurrentSellTHB)?"PRE_AWARD_B1_REPRICED_ACTIVITY_WORKING_SELL_COST_UNVERIFIED":Number.isFinite(b9ChinaSellTHB)?"PRE_AWARD_B9_FAT_BASE_YARD_CALL_OUT_CONDITIONAL_OPEN":Number.isFinite(b3CurrentSellTHB)?"PRE_AWARD_B3_40DAY_TWO_SPECIALISTS_AND_30DAY_VEEX_RENTAL":Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b7ReserveSellTHB)?"BUDGETARY_ONE_MONTH_STORAGE_RESERVE_CONDITIONAL_VENDOR_RECONFIRM":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
+   priceStatus:Number.isFinite(b1CurrentSellTHB)?"PRE_AWARD_B1_REPRICED_ACTIVITY_WORKING_SELL_COST_UNVERIFIED":Number.isFinite(b9ChinaSellTHB)?"B9_NO_BASE_YARD_OPTIONAL_LS":Number.isFinite(b3CurrentSellTHB)?"B3_FAT_WITNESS_AND_40_DAY_OFFSHORE_VEEX":Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b7ReserveSellTHB)?"BUDGETARY_ONE_MONTH_STORAGE_RESERVE_CONDITIONAL_VENDOR_RECONFIRM":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
    b11VendorFollowup:code==="B11"?Object.freeze({status:"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING",amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08 B11 itemized tools",verifiedDirectCost:false,releaseAllowed:false,verification:"Requote tools with MGW/OEM; deduct included Part A tooling before bid release"}):null,
@@ -143,6 +143,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    b1ActivityBudget:code==="B1"?b1Current:null,
    b3FortyDayBudget:code==="B3"?b3Current:null,
    b3FatOwnerTransfer:code==="B3"?Object.freeze({...B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553,baseSourceSellTHB:w.sellTHB,currentWorkingSellTHB:b3CurrentSellTHB}):null,
+   b3ChinaFatBudget:code==="B3"?chinaB9:null,
    b9ChinaBudget:code==="B9"?chinaB9:null,
    b9OnshoreRateReview:code==="B9"?Object.freeze({
     source:ONSHORE_WORKING_SELL_RATE_0553.source,
@@ -160,7 +161,7 @@ export function selectBcTurnkeyWorkingCost0553(){
     conditionalYardWorkingSellTHB:chinaB9.conditionalYardSellTHB,
     perDiemIncluded:false,travelIncluded:false,accommodationIncluded:false,visaIncluded:false,
     costOwner:"B9",releaseAllowed:false,
-    pricingGate:"Only MGW FAT witness + one trip in Base. Conditional Yard support is one Sr Telecom Engineer, 7 working days + 2 travel days on a separate trip, quoted 1 LS; NOT included until written call-out/signed RACI. Rev05 12 team-days are historical only; reconcile if trips are combined. No unconditional Yard posting."
+    pricingGate:"No B9 Base. MGW FAT Witness belongs B3 as Inspection/Testing; B9 conditional Yard 7 working days + 2 travel days 1 LS on written call-out."
    }):null,
    b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b10WorkingSellDecision:code==="B10"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b10WorkingSellTHB,source:"4-Scope of Supply.xlsx · Rev08 · B10",historicalUSD:b10HistoricalUSD,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"WORKING_SELL_ONLY"}):null,
@@ -193,7 +194,7 @@ export function selectBcTurnkeyWorkingCost0553(){
  const byCodeOutput=Object.fromEntries(rows.map(r=>[r.code,r]));
  const knownWorkingSellTHB=round(rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
   .reduce((sum,r)=>sum+r.workingSellTHB,0));
- if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB +(b1Current.workingSellTHB-wbs.rows.find(r=>r.code==="B1").sellTHB)+(b3Current.workingSellTHB-wbs.rows.find(r=>r.code==="B3").sellTHB)+(chinaB9.workingSellTHB-wbs.rows.find(r=>r.code==="B9").sellTHB) +rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB+rows.find(r=>r.code==="B10").workingSellTHB+rows.find(r=>r.code==="B11").workingSellTHB+rows.find(r=>r.code==="B13").workingSellTHB+rows.find(r=>r.code==="B7").workingSellTHB))>0.01)
+ if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB +(b1Current.workingSellTHB-wbs.rows.find(r=>r.code==="B1").sellTHB)+(b3Current.workingSellTHB+chinaB9.fatWorkingSellTHB-wbs.rows.find(r=>r.code==="B3").sellTHB)+(chinaB9.b9BaseWorkingSellTHB-wbs.rows.find(r=>r.code==="B9").sellTHB) +rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB+rows.find(r=>r.code==="B10").workingSellTHB+rows.find(r=>r.code==="B11").workingSellTHB+rows.find(r=>r.code==="B13").workingSellTHB+rows.find(r=>r.code==="B7").workingSellTHB))>0.01)
   throw Error("B WBS working sell reference reconciliation failed");
  // Source-price coverage is not cost completeness.
  return Object.freeze({
@@ -202,7 +203,8 @@ export function selectBcTurnkeyWorkingCost0553(){
   rows,byCode:byCodeOutput,
   knownWorkingSellTHB,
   workingSellB6BudgetaryTHB:rows.find(r=>r.code==="B6").workingSellTHB,
-  workingSellB9ChinaBudgetTHB:chinaB9.workingSellTHB,
+  workingSellB9ChinaBudgetTHB:chinaB9.b9BaseWorkingSellTHB,
+  workingSellB3ChinaFatWitnessTHB:chinaB9.fatWorkingSellTHB,
   workingSellB1RepricedTHB:b1Current.workingSellTHB,
   workingSellB3FortyDayTHB:b3Current.workingSellTHB,
   workingSellB9YardConditionalTHB:chinaB9.conditionalYardSellTHB,
