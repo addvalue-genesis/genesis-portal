@@ -6,7 +6,7 @@ const body=file("onshoreWorkingRate0553.js")+"\n"+file("fatWbsFourMr0553.js")+"\
 const ctx=vm.runInNewContext(body+"\n({rate:selectOnshoreWorkingRate0553(),b9:selectB9ChinaWorkingBudget0553(),b3:selectB3WorkingSellAfterChinaFat0553(2109600),transfer:B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553});",{}, {timeout:2000});
 assert.equal(ctx.rate.usdPerPersonDay,600);
 assert.equal(ctx.rate.thbPerPersonDay,18900);
-assert.equal(ctx.b9.workingSellTHB,397400); // 6-day four-MR Base FAT only
+assert.equal(ctx.b9.workingSellTHB,0); // No B9 Base: FAT Witness is contractual B3
 assert.equal(ctx.b9.laborWorkingSellTHB,302400); // FAT 6 + two travel days x 2 witnesses
 assert.equal(ctx.b9.travelAndInsuranceWorkingSellTHB,95000);
 assert.equal(ctx.b9.rows.length,16);
@@ -21,7 +21,8 @@ assert.equal(ctx.b9.yardCallOutCrew,1);
 assert.equal(ctx.b9.selectedYardTravelDays,2);
 assert.equal(ctx.b9.yardConditionalQuoteFormat,"ONE_LUMP_SUM_PACKAGE_ON_WRITTEN_CALL_OUT");
 assert.ok(!ctx.b9.rows.some(x=>/per.?diem/i.test(x.id+" "+x.description)),"Per Diem must not be a separate posted row");
-assert.ok(ctx.b9.rows.every(x=>x.costOwner==="B9"&&x.workingCostTHB===null),"Cross posting to B1/B3");
+assert.ok(ctx.b9.rows.every(x=>x.costOwner===(x.optional?"B9":"B3")&&x.workingCostTHB===null),"FAT B3 / Yard B9 owner violation");
+assert.equal(ctx.b9.fatWorkingSellTHB,397400);
 assert.equal(ctx.b9.crew,2);
 assert.equal(ctx.b9.fatDaysEstimate,6);
 assert.equal(ctx.b9.fatWbs.rows.length,12);
@@ -37,13 +38,13 @@ assert.equal(ctx.b9.fatTravelTeamDays,2);
 assert.equal(ctx.b9.conditionalNotInBase,true);
 assert.equal(ctx.b3,1965600);
 assert.equal(ctx.transfer.amountTHB,144000);
-assert.equal(ctx.transfer.newOwner,"B9");
+assert.equal(ctx.transfer.newOwner,"B3");
 // Finance guard: previous B THB4,726,750.69 contained B3 2,109,600 & B9 574,560.
 // Current B = previous B - old B3/B9 + new B3/B9; C remains separate.
 const previousPartB=4726750.69;
-const legacyBridge=Math.round((previousPartB-2109600-574560+ctx.b3+ctx.b9.workingSellTHB)*100)/100;
+const legacyBridge=Math.round((previousPartB-2109600-574560+ctx.b3+ctx.b9.fatWorkingSellTHB)*100)/100;
 assert.equal(legacyBridge,4405590.69); // Old B1 and 39-day B3 retained only in source bridge; new ABC test owns repricing.
-const b3b9=ctx.b3+ctx.b9.workingSellTHB;
+const b3b9=ctx.b3+ctx.b9.fatWorkingSellTHB;
 assert.equal(b3b9,2363000);
 assert.equal(ctx.rate.B9ExistingWorkingSellOverrideAllowed,false,"Rate approval alone must not overwrite old WBS without separate Rev.K scope selection");
-process.stdout.write("PASS: B9 4-MR FAT 6-day Base THB397,400 plus optional 7-day Yard LS THB233,600; legacy B3 bridge untouched, ABC repricing tested separately.\n");
+process.stdout.write("PASS: contract B3 owns 4-MR FAT witness THB397,400; B9 Base zero, optional Yard 7-day LS THB233,600; legacy B3 bridge untouched, ABC repricing tested separately.\n");
