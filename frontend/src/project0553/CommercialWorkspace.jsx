@@ -58,8 +58,12 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  // and scrolls to the canonical B/C row/group; it never creates a second workbench.
  React.useEffect(()=>{
   if(!navigationTarget?.startsWith("bid.budget.working.bc"))return;
-  const detailCode=navigationTarget.slice("bid.budget.working.bc.".length).toUpperCase();
-  if(bcWorking.byCode[detailCode]){setBcDetailCode(detailCode);setBcTab("ALL");}
+  // Route nested B1 Rev.K cost objects (and other B/C child IDs) through the same parent workbench.
+  const nestedCode=navigationTarget.match(/^bid\.budget\.working\.bc\.(b(?:[1-9]|1[0-4])|c[12])(?:\.|$)/i)?.[1]?.toUpperCase();
+  if(nestedCode&&bcWorking.byCode[nestedCode]){
+   setBcDetailCode(old=>old===nestedCode?old:nestedCode);
+   setBcTab(old=>old==="ALL"?old:"ALL");
+  }
   if(mode!=="working"){setMode("working");return;}
   const parent=document.querySelector('[data-component-key="bid.budget.working.bc"]');
   if(!parent)return;
@@ -77,7 +81,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   const target=exact||parent;
   if(typeof target.scrollIntoView==="function")
    target.scrollIntoView({block:"center",behavior:"smooth"});
- },[navigationTarget,navigationSequence,mode]);
+ },[navigationTarget,navigationSequence,mode,bcDetailCode]);
  
  // Working display defaults only. Never represent the 31.5 planning rate as a BOT quote.
  const DEFAULT_FX={displayCurrency:"THB",fxRate:"31.5",fxDate:"2026-10-10",fxSource:"INTERNAL PLANNING ASSUMPTION — UNVERIFIED"};
