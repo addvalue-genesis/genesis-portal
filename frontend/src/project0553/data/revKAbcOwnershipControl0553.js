@@ -5,7 +5,7 @@ import {selectB1RevKMilestoneCoverage0553} from "./b1RevKMilestoneCoverage0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
 
-const round=n=>Math.round((n+Number.EPSILON)*100)/100;
+const roundRevKAbc0553=n=>Math.roundRevKAbc0553((n+Number.EPSILON)*100)/100;
 export function selectRevKAbcOwnershipControl0553(working){
  if(!working?.byCode)throw Error("Rev.K ABC requires canonical 10.2 Working Sell projection");
  const b1=selectB1RevKMilestoneCoverage0553();
@@ -21,7 +21,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   id:"ABC-"+x.chargeEventKey,wbs:x.stage,owner:"B1",costObject:"OFFICE_PM_EVENT",
   activity:x.what,site:"Office / management",source:x.deliverable,
   quantity:x.planningPmHours,unit:"MH",workingSellRateTHB:pmRateTHBPerHour,
-  modeledSellTHB:round(x.planningPmHours*pmRateTHBPerHour),directCostTHB:null,
+  modeledSellTHB:roundRevKAbc0553(x.planningPmHours*pmRateTHBPerHour),directCostTHB:null,
   posting:"NON_POSTING_PROXY__INSIDE_UNCHANGED_B1_BASELINE",chargeKey:x.chargeEventKey
  }));
  const satObligations=trace.B3.map(x=>Object.freeze({
@@ -42,9 +42,9 @@ export function selectRevKAbcOwnershipControl0553(working){
  const keys=[...pmEvents,...chinaExpenses].map(x=>x.chargeKey);
  if(keys.length!==new Set(keys).size||rows.length!==new Set(rows.map(x=>x.id)).size)
   throw Error("Rev.K ABC duplicate unique expense-event or obligation identity");
- const pmProxyTHB=round(pmEvents.reduce((v,x)=>v+x.modeledSellTHB,0));
- const fatTHB=round(chinaExpenses.filter(x=>x.posting.startsWith("LINKED")).reduce((v,x)=>v+x.modeledSellTHB,0));
- const yardTHB=round(chinaExpenses.filter(x=>x.posting.startsWith("CONDITIONAL")).reduce((v,x)=>v+x.modeledSellTHB,0));
+ const pmProxyTHB=roundRevKAbc0553(pmEvents.reduce((v,x)=>v+x.modeledSellTHB,0));
+ const fatTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.posting.startsWith("LINKED")).reduce((v,x)=>v+x.modeledSellTHB,0));
+ const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.posting.startsWith("CONDITIONAL")).reduce((v,x)=>v+x.modeledSellTHB,0));
  if(pmEvents.length!==12||b1.rows.length!==19||trace.rows.length!==19||pmProxyTHB!==132300||
     fatTHB!==current.B9||yardTHB!==233600||b9.selectedYardWorkingDays!==7||b9.yardCallOutCrew!==1)
   throw Error("Rev.K ABC unique PM / FAT / conditional Yard reconciliation failed");
@@ -53,7 +53,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   moduleId:"bid.budget.working.bc.revk-abc-control",
   rows,pmEvents,satObligations,chinaExpenses,
   currentWorkingSellTHB:Object.freeze({...current}),
-  currentB1B3B9BaseTHB:round(current.B1+current.B3+current.B9),
+  currentB1B3B9BaseTHB:roundRevKAbc0553(current.B1+current.B3+current.B9),
   partBBaseTHB:working.knownWorkingSellTHB,
   b1PmProxyTHB:pmProxyTHB,
   b9FatBaseTHB:fatTHB,b9YardConditionalLumpSumTHB:yardTHB,
