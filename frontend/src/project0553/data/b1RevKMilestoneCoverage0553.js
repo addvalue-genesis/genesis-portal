@@ -1,5 +1,5 @@
 import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
-// PJ2608-0553: Rev.K K00–K18 milestone coverage for residual B1 PROJECT MANAGEMENT only.
+// PJ2608-0553: Rev.K K00–K18 source coverage for B1 residual support. Legacy USD600 PM proxy stays audit-only; live multi-role THB planning lives in b1ProjectSupportBudget0553.js.
 // THIS IS A CHILD ALLOCATION of PM-MILESTONE, not 19 extra expense postings.
 // Each stage's physical labour/tools/travel stays with the listed A/B2–B14/C or JUTAL owner.
 const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
@@ -32,7 +32,7 @@ const B1_REVK_SOURCE_COVERAGE_0553=Object.freeze([
     "where": "ADDVALUE office; MGW Office China",
     "what": "Project Management / Milestone coordination",
     "how": "Confirm witness plan, FAT notice and closure; exclude paid FAT attendees/flights/hotel",
-    "directOwner": "B9 China FAT; A OEM factory execution",
+    "directOwner": "B3 MGW China FAT witness/travel; A OEM factory execution",
     "deliverable": "Witness invitation and FAT action register",
     "source": "Rev.K K01 / linked MR0001–0004/BOD/DTS/SPE as applicable",
     "costOwner": "B1",
