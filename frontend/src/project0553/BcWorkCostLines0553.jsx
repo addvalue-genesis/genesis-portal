@@ -5,7 +5,7 @@ import {B1B2EquationAudit0553} from "./B1B2EquationAudit0553";
 import {B3EquationAudit0553} from "./B3EquationAudit0553";
 import {B5EquationAudit0553} from "./B5EquationAudit0553";
 import {selectB9ChinaWorkingBudget0553} from "./data/b9ChinaWorkingBudget0553";
-import {selectB1ActivityWorkingSell0553} from "./data/b1ActivityWorkingSell0553";
+import {selectB1ProjectSupportBudget0553} from "./data/b1ProjectSupportBudget0553";
 import {selectB3FortyDayWorkingSell0553} from "./data/b3FortyDayWorkingSell0553";
 import {selectB3WorkingSellAfterChinaFat0553} from "./data/b3ChinaFatOwnership0553";
 
@@ -18,7 +18,7 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  const showGroup=selectedCode==="ALL"?m.activeCodes:[selectedCode];
  const available=m.rows.filter(x=>showGroup.includes(x.code));
  const china=selectB9ChinaWorkingBudget0553();
- const b1Current=selectB1ActivityWorkingSell0553();
+ const b1Current=selectB1ProjectSupportBudget0553();
  const b3Current=selectB3FortyDayWorkingSell0553();
  // Rev05 Bangkok FAT is superseded by MGW FAT, but witness/travel ALWAYS cost owner B3 per contract. B9 is only optional Yard specialist.
  const physical=[
@@ -56,7 +56,7 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  const clauses=available.filter(x=>x.id.startsWith("COST-AUD-"));
  const historicalProxy=physical.reduce((sum,x)=>sum+(x.historicalCostProxyTHB??0),0);
  const currentSourceSell={...m.workingSellByCode,
-  B1:b1Current.workingSellTHB,
+  B1:b1Current.baseWorkingSellTHB,
   B3:b3Current.workingSellTHB+china.fatWorkingSellTHB,
   B9:china.b9BaseWorkingSellTHB};
  const displayedWbsSell=showGroup.reduce((sum,code)=>sum+(currentSourceSell[code]??0),0);
