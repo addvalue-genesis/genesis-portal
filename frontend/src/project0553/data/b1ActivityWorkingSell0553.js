@@ -52,7 +52,7 @@ export function selectB1ActivityWorkingSell0553(){
   engineeringRows:eng,pmRows:pmEvents,uniquePostedEvents:eng.length+pmEvents.filter(x=>x.quantityMH>0).length,
   rateBasis:"Rev05 27 engineering activity / 964 MH role seeds × Rev05 office factor; 11 nonduplicate Rev.K PM gates × USD600 onshore SELL × 31.5/8",
   duplicatedK00PmExcluded:true,
-  noDoubleCount:"B1 excludes K01 witness travel (B9), Yard specialist (B9), offshore SAT (B3), document-control (B2) and OEM engineering (Part A)",
+  noDoubleCount:"B1 excludes K01 MGW FAT witness/travel (B3), Yard specialist (B9), offshore SAT (B3), document-control (B2) and OEM engineering (Part A); 11-gate USD600 allowance is historic canonical until CFO support reprice",
   costState:"WORKING_SELL_BUDGETARY__INTERNAL_PAYROLL_RATE_NOT_VERIFIED",
   directCostTHB:null,releaseAllowed:false,customerReleaseAllowed:false
  });
