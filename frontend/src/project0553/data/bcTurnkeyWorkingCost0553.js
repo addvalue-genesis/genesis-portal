@@ -7,6 +7,7 @@ import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkin
 import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
 import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
 import {selectB1ActivityWorkingSell0553} from "./b1ActivityWorkingSell0553";
+import {selectB1ProjectSupportBudget0553} from "./b1ProjectSupportBudget0553";
 import {selectB3FortyDayWorkingSell0553} from "./b3FortyDayWorkingSell0553";
 import {selectB3WorkingSellAfterChinaFat0553,B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553} from "./b3ChinaFatOwnership0553";
 import {LIFECYCLE_SPARES_0553} from "./lifecycleSpareScope0553";
@@ -25,7 +26,7 @@ const activitiesForCustomerCode=Object.freeze({
  C1:["CAPITAL_SPARES"]
 });
 const customerRequirements=Object.freeze({
- B1:"Engineering design review / technical content and distinct Rev.K office PM (B2 VDRL excluded)",
+ B1:"Engineering and Design — 1 Lot (customer B1); internal ADDVALUE project support B1.1–B1.8 separately planned",
  B2:"VDRL, documentation and final as-built delivery per MR",
  B3:"Inspection, Testing and Certification per ITP: MGW FAT Witness plus Offshore SAT/SIT and VeEX rental",
  B4:"Painting and protective coating according to MR, when applicable",
@@ -84,6 +85,7 @@ export function selectBcTurnkeyWorkingCost0553(){
  const spareBudget=selectUnifiedSpareConsumables0553();
  const chinaB9=selectB9ChinaWorkingBudget0553();
  const b1Current=selectB1ActivityWorkingSell0553();
+ const b1SupportPlanning=selectB1ProjectSupportBudget0553();
  const b3Current=selectB3FortyDayWorkingSell0553();
  const spareBudgetCodes=new Set(["B10","B11","B13","C1","C2"]);
  const byCode=new Map(wbs.rows.map(row=>[row.code,row]));
@@ -121,7 +123,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    contractOwner:"SAMTEL",
    turnkeyEstimator:"ADDVALUE_FOR_SAMTEL",
    executionOwner:w.owner, // Execution responsibility never excludes turnkey scope.
-   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"?1:code==="B3"?1:w.qty,unit:code==="B9"?"LS (Yard Specialist optional only; Base zero)":code==="B3"?"LS (MGW FAT Witness + 40d SAT/SIT + VeEX 30d)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"No B9 Base; Yard Specialist optional 1 LS only, FAT Witness and travel are B3":code==="B3"?"B3: 6-day MGW FAT Witness × 2 plus travel + 40 offshore SAT/SIT team-days and VeEX rental":code==="B1"?"27 legacy source engineering work activities plus 11 distinct Rev.K PM gate events; old B1 THB 510,000 superseded":w.driver,
+   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"?1:code==="B3"?1:w.qty,unit:code==="B9"?"LS (Yard Specialist optional only; Base zero)":code==="B3"?"LS (MGW FAT Witness + 40d SAT/SIT + VeEX 30d)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"No B9 Base; Yard Specialist optional 1 LS only, FAT Witness and travel are B3":code==="B3"?"B3: 6-day MGW FAT Witness × 2 plus travel + 40 offshore SAT/SIT team-days and VeEX rental":code==="B1"?"Customer B1 Engineering & Design 1 Lot; current 27 source engineering WBS + legacy office PM base, separate role-based B1.1–B1.8 candidate budget not yet canonical-posted":w.driver,
    sourceRevision:(code==="B1"||code==="B3"||code==="B9")?"Rev.K 2026-10-18 current FAT ownership + Rev05 source bridge":PART_BC_WBS_SOURCE_0553.revision,
    sourceUrl:PART_BC_WBS_SOURCE_0553.url,
    requirementRows:requirementRows.map(r=>({
@@ -141,6 +143,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    b11VendorFollowup:code==="B11"?Object.freeze({status:"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING",amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08 B11 itemized tools",verifiedDirectCost:false,releaseAllowed:false,verification:"Requote tools with MGW/OEM; deduct included Part A tooling before bid release"}):null,
    unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08",fxTHBPerUSD:31.5,pricingClass:"BUDGETARY_WORKING_SELL",verifiedDirectCost:false,sourceLines:spareBudget.byCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
    b1ActivityBudget:code==="B1"?b1Current:null,
+   b1SupportPlanningBudget:code==="B1"?b1SupportPlanning:null,
    b3FortyDayBudget:code==="B3"?b3Current:null,
    b3FatOwnerTransfer:code==="B3"?Object.freeze({...B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553,baseSourceSellTHB:w.sellTHB,currentWorkingSellTHB:b3CurrentSellTHB}):null,
    b3ChinaFatBudget:code==="B3"?chinaB9:null,
