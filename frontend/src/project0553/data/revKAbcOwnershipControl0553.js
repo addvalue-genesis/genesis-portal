@@ -2,7 +2,7 @@
 // A current budget component is shown once. This overlay NEVER posts extra sell.
 // Evidence: BOD-C2 + SPE-C2 + DTS-C1 + MR1..4 -> Rev.K -> role/owner/qty -> SELL.
 // True internal Direct Cost remains absent until verified payroll/third party rates.
-import {selectB1ActivityWorkingSell0553} from "./b1ActivityWorkingSell0553";
+import {selectB1ProjectSupportBudget0553} from "./b1ProjectSupportBudget0553";
 import {selectB3FortyDayWorkingSell0553} from "./b3FortyDayWorkingSell0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
@@ -10,30 +10,39 @@ import {selectFourMrFatWbs0553} from "./fatWbsFourMr0553";
 const roundRevKAbc0553=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function selectRevKAbcOwnershipControl0553(working){
  if(!working?.byCode)throw Error("Rev.K ABC needs current canonical 10.2 Working Sell");
- const b1=selectB1ActivityWorkingSell0553();
+ const b1=selectB1ProjectSupportBudget0553();
  const b3=selectB3FortyDayWorkingSell0553();
  const trace=selectB3RequirementWbsTrace0553();
  const b9=selectB9ChinaWorkingBudget0553();
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
- if(current.B1!==b1.workingSellTHB||current.B3!==roundRevKAbc0553(b3.workingSellTHB+b9.fatWorkingSellTHB)||current.B9!==0||
-    working.knownWorkingSellTHB!==4600020.95)
+ if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.workingSellTHB+b9.fatWorkingSellTHB)||current.B9!==0||
+    working.knownWorkingSellTHB!==4187590.69)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))
   throw Error("B9 current Base and optional Yard must be separate 1 LS");
- const b1Engineering=b1.engineeringRows.map(x=>Object.freeze({
-  id:"ABC-"+x.id,wbs:"K00 engineering / "+x.group,owner:"B1",costObject:"ENGINEERING_ROLE_MH",
-  activity:x.activity,site:"Office engineering",source:"Rev05 08_B1_ENGINEERING; MR/DTS/BOD",
-  quantity:x.quantityMH,unit:"MH",workingSellRateTHB:null,
-  modeledSellTHB:x.workingSellTHB,directCostTHB:null,
-  posting:"INCLUDED_IN_CANONICAL_B1_SELL__NOT_ADDITIVE",chargeKey:x.id
+ // Rev05 Engineering price/hours are not a present B1 price; retain names only
+ // for technical ownership checks against B2 VDRL, B3 ITP and OEM Part A.
+ const b1Engineering=b1.engineeringScopeReview.map(x=>Object.freeze({
+  id:"ABC-"+x.id,wbs:x.group,owner:"B1_REVIEW",costObject:"ENGINEERING_SCOPE_OWNER_REVIEW",
+  activity:x.activity,site:"Engineering responsibility TBC",source:x.source,
+  quantity:null,unit:"TBC only if independently assigned",workingSellRateTHB:null,
+  modeledSellTHB:null,directCostTHB:null,
+  posting:"NON_POSTING_SCOPE_REVIEW__B2_B3_OEM_OVERLAP_UNRESOLVED",chargeKey:null
  }));
- const pmEvents=b1.pmRows.map(x=>Object.freeze({
-  id:"ABC-"+x.id,wbs:x.wbs,owner:"B1",costObject:"OFFICE_PM_EVENT",
-  activity:x.activity,site:"Office / remote management",source:x.requirement,
-  quantity:x.quantityMH,unit:"MH",workingSellRateTHB:x.workingSellRateTHB,
+ const pmEvents=b1.roleLines.map(x=>Object.freeze({
+  id:"ABC-"+x.id,wbs:x.wbs,owner:"B1",costObject:"ROLE_BASED_PM_ADMIN_ACCOUNTING_PROCUREMENT",
+  activity:x.activity,site:"ADDVALUE project office",source:x.verification,
+  quantity:x.qty,unit:"MH",workingSellRateTHB:roundRevKAbc0553(x.workingSellTHB/x.qty),
   modeledSellTHB:x.workingSellTHB,directCostTHB:null,
-  posting:x.quantityMH===0?"EXCLUDED_K00_TECHNICAL_KICKOFF_OVERLAP":"INCLUDED_IN_CANONICAL_B1_SELL__NOT_ADDITIVE",
+  posting:"INCLUDED_IN_NEW_CANONICAL_B1_SUPPORT_SELL__NOT_ADDITIVE",chargeKey:x.id
+ }));
+ const supportExpenses=b1.expenseLines.map(x=>Object.freeze({
+  id:"ABC-"+x.id,wbs:x.wbs,owner:"B1",costObject:"PROJECT_SUPPORT_NONLABOR_EXPENSE",
+  activity:x.activity,site:"Project management / office",source:x.verification,
+  quantity:x.qty,unit:x.unit,workingSellRateTHB:roundRevKAbc0553(x.workingSellTHB/x.qty),
+  modeledSellTHB:x.workingSellTHB,directCostTHB:null,
+  posting:x.conditional?"CONDITIONAL_B1__EXCLUDED_FROM_BASE":"INCLUDED_IN_NEW_CANONICAL_B1_SUPPORT_SELL__NOT_ADDITIVE",
   chargeKey:x.id
  }));
  const satSiteLines=b3.rows.map(x=>Object.freeze({
@@ -70,25 +79,27 @@ export function selectRevKAbcOwnershipControl0553(working){
   posting:x.optional?"CONDITIONAL_B9_1LS__EXCLUDED_FROM_BASE":"INCLUDED_IN_CANONICAL_B3_FAT__NOT_ADDITIVE",
   chargeKey:x.expenseKey
  }));
- const rows=Object.freeze([...b1Engineering,...pmEvents,...satSiteLines,satTool,...satObligations,...fatTasks,...chinaExpenses]);
- const chargeRows=[...b1Engineering,...pmEvents.filter(x=>x.quantity>0),...satSiteLines,satTool,...chinaExpenses];
+ const rows=Object.freeze([...b1Engineering,...pmEvents,...supportExpenses,...satSiteLines,satTool,...satObligations,...fatTasks,...chinaExpenses]);
+ const chargeRows=[...pmEvents,...supportExpenses,...satSiteLines,satTool,...chinaExpenses];
  const keys=chargeRows.map(x=>x.chargeKey);
  if(keys.length!==new Set(keys).size||rows.length!==new Set(rows.map(x=>x.id)).size||
    rows.some(x=>x.directCostTHB!==null))throw Error("Rev.K ABC duplicate Cost Object or unverified Direct Cost");
- const pmWorkingSellTHB=roundRevKAbc0553(pmEvents.reduce((v,x)=>v+x.modeledSellTHB,0));
+ const pmWorkingSellTHB=b1.labourWorkingSellTHB;
  const fatTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B3").reduce((v,x)=>v+x.modeledSellTHB,0));
  const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B9").reduce((v,x)=>v+x.modeledSellTHB,0));
- if(b1Engineering.length!==27||pmEvents.length!==12||b1.uniquePmHours!==48||trace.rows.length!==19||
+ if(b1Engineering.length!==27||pmEvents.length!==41||supportExpenses.length!==9||b1.labourHours!==242||trace.rows.length!==19||
    fatTasks.length!==12||fat.estimatedFatWitnessDays!==6||satSiteLines.length!==9||
-   b3.workdays!==40||pmWorkingSellTHB!==113400||fatTHB!==397400||yardTHB!==233600)
+   b3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==397400||yardTHB!==233600)
   throw Error("Rev.K activity reconciliation mismatch");
  return Object.freeze({
   moduleId:"bid.budget.working.bc.revk-abc-control",
-  rows,pmEvents,b1Engineering,satSiteLines,satTool,satObligations,fatTasks,chinaExpenses,
+  rows,pmEvents,b1Engineering,supportExpenses,satSiteLines,satTool,satObligations,fatTasks,chinaExpenses,
   currentWorkingSellTHB:Object.freeze({...current}),
   currentB1B3B9BaseTHB:roundRevKAbc0553(current.B1+current.B3+current.B9),
-  partBBaseTHB:working.knownWorkingSellTHB,b1PmProxyTHB:pmWorkingSellTHB,
-  b1EngineeringSellTHB:b1.engineeringSellTHB,b1OfficePmIncludedTHB:pmWorkingSellTHB,
+  partBBaseTHB:working.knownWorkingSellTHB,b1PmProxyTHB:0,
+  b1EngineeringSellTHB:0,b1OfficePmIncludedTHB:pmWorkingSellTHB,
+  b1SupportSellTHB:b1.baseWorkingSellTHB,b1SupportCostTHB:b1.baseWorkingCostTHB,
+  b1ConditionalSellTHB:b1.conditionalWorkingSellTHB,b1LegacyEngineeringCarriedTHB:0,
   b3LaborSellTHB:b3.laborWorkingSellTHB,b3ToolSellTHB:b3.toolRentalWorkingSellTHB,
   b9FatBaseTHB:0,b3FatWitnessSellTHB:fatTHB,b3FatWitnessDays:fat.estimatedFatWitnessDays,b9FatWitnessDays:fat.estimatedFatWitnessDays,
   b9YardConditionalLumpSumTHB:yardTHB,
@@ -103,7 +114,7 @@ export function selectRevKAbcOwnershipControl0553(working){
    "B3 owns MGW FAT 6-day / 2-witness travel and engineering-cost events; manufacturer execution remains A. Signed ITP/TAG repetition pending",
    "Use 14d for management planning per SPE; BOD 30d notice conflict remains unresolved contract precedence HOLD",
    "Post Yard SAT loose-equipment transfer to ZPQ under SPE §7.3.2 conflicts with as-installed WH assumption; seek written TQ",
-   "B1 Engineering/PM only; B3 owns all FAT Witness, no double posting in B9 specialist assistance",
+   "B1 contains fresh role-based management/admin/accounting/procurement expenses ONLY; legacy B1 engineering price excluded, technical engineering ownership review nonposting; B3 owns FAT Witness",
    "B3 40 workdays x two specialists, MGW FAT Witness plus travel, VeEX 30d rental all counted once; permanent O&M tools B11 only",
    "Yard Field Telecom Specialist travels as an unbilled companion; THB48,500 minimum cash risk allowance remains nonposting until cost/margin evidence",
    "Verified Direct Cost needs actual salary, supplier receipts, Trip/Person keys; no automatic historical posting"
