@@ -9,7 +9,7 @@
 // K groups are unique events (K03-07 and K08-11 shared); physical B2/B3/B5/B6/B9 excluded.
 import {selectB1RevKMilestoneCoverage0553} from "./b1RevKMilestoneCoverage0553";
 import {B1_WBS_ACTIVITIES} from "./bcWorkCostLines0553";
-const roundB1Support0553=n=>Math.roundB1Support0553((n+Number.EPSILON)*100)/100;
+const roundB1Support0553=n=>Math.round((n+Number.EPSILON)*100)/100;
 const load=1.20,workingHoursPerMonth=176,laborSellDivider=0.80,expenseSellFactor=1.10;
 export const B1_SUPPORT_ROLE_RATES_0553=Object.freeze({
  PM:{name:"Project Manager",monthlyTHB:90000,account:"B1.1"},
