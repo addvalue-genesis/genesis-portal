@@ -13,6 +13,7 @@ function compile(mod,file){
 require.extensions[".js"]=(mod,file)=>file.startsWith(root+path.sep)?compile(mod,file):oldJS(mod,file);
 require.extensions[".jsx"]=(mod,file)=>file.startsWith(root+path.sep)?compile(mod,file):(oldJSX||oldJS)(mod,file);
 const {auditZWP8CostOwnership0553}=require(path.join(root,"project0553/data/zwp8CostOwnershipAudit0553.js"));
+const {MR0001_WORKING_PRICED_BOM}=require(path.join(root,"project0553/data/mr0001WorkingPricedBom.js"));
 const {summarizeMR0001TagCost0553}=require(path.join(root,"project0553/data/mr0001TagCostLedger0553.js"));
 const {ZWP8_ROW43_COST_TRACE}=require(path.join(root,"project0553/data/zwp8Row43CostTrace.js"));
 const {SCADA_LINKS_0553}=require(path.join(root,"project0553/data/scadaLinkEvidence.js"));
@@ -26,17 +27,26 @@ assert(zwp11Enclosure.status.includes("MODIFICATION_NOT_ESTABLISHED"),"Do not ma
 const original=JSON.stringify(summarizeMR0001TagCost0553("ZWP8").rows);
 const audit=auditZWP8CostOwnership0553({thbPerUsd:31.5});
 assert.deepEqual(audit.physicalGroup,{radioODU:2,radioIDU:2,antenna:2,surge:2});
-assert.deepEqual(audit.currencyTotals,{USD:28174.05,THB:499906});
+// Original ZWP8 before TC-0001: USD 28,174.05 + THB 499,906.
+ // Now only the Cisco expansion module and module SmartNet are removed (THB 51,950).
+const cisco=MR0001_WORKING_PRICED_BOM.cisco;
+assert.equal(cisco.removedUnitTHB,51950,"TC-0001 excludes exactly one module and its SmartNet per site");
+assert.equal(cisco.unitPackageQuotedSumTHB,371580);
+assert.deepEqual(audit.currencyTotals,{USD:28174.05,THB:447956});
+assert.equal(audit.currencyTotals.THB+cisco.removedUnitTHB,499906,
+ "ZWP8 THB ledger must preserve original currency source bridge");
 assert.equal(audit.sourceUnitUSD.oduOnly,7288.65);
 assert.equal(audit.sourceUnitUSD.poe,671.27);
 assert.equal(audit.sourceUnitUSD.surge,614.2);
 assert.equal(audit.sourceUnitUSD.oduScenarioWithAccessories,13002);
 assert(ZWP8_ROW43_COST_TRACE.referenceScenarios.find(x=>x.id===ZWP8_ROW43_COST_TRACE.preferredScenarioId).radioCodes.includes("B-8"));
-assert.equal(audit.currentWorkingTHB,1387388.58);
+assert.equal(audit.currentWorkingTHB,1335438.58);
+assert.equal(Math.round((audit.currentWorkingTHB+cisco.removedUnitTHB)*100)/100,1387388.58,
+ "ZWP8 pre-TC baseline must reconcile exactly to removed Cisco expansion costs");
 assert.equal(audit.duplicatedSurgeUSD,0);
 assert.equal(audit.misplacedPOEUSD,0);
 assert.equal(audit.adjustedOwnerTotalUSD,28174.05);
-assert.equal(audit.adjustedOwnerTotalTHB,1387388.58);
+assert.equal(audit.adjustedOwnerTotalTHB,1335438.58);
 assert.equal(audit.currentWorkingTHB,audit.adjustedOwnerTotalTHB,"Owner totals reconciled");
 assert.equal(audit.flags.verifiedArithmetic,false,"No duplicate surge event should be active");
 assert.equal(audit.flags.uniqueCostOwnerPassed,true,"Each physical owner receives its own source quote function");
@@ -72,4 +82,4 @@ assert(!view.includes("setCost")&&!view.includes("updateLedger"));
 const compiled=babel.transformSync(view,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
 assert(compiled.code.length>0);
-console.log("PASS ZWP8 AFC owner reconciliation: USD 28,174.05 + THB 499,906 = THB 1,387,388.58 at working FX; 11/11 TAG allocated, surge and IDU cost owners separated; OEM/NMS gating remains open.");
+console.log("PASS ZWP8 AFC owner reconciliation: USD 28,174.05 + THB 447,956 = THB 1,335,438.58 at working FX; legacy THB 1,387,388.58 reconciles via THB 51,950 TC-0001 Cisco exclusion; 11/11 TAG allocated; OEM/NMS gates open.");
