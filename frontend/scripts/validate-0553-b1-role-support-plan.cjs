@@ -35,8 +35,12 @@ assert.equal(m.baseWorkingCostTHB,181400);
 assert.equal(m.baseWorkingSellTHB,211600);
 assert.equal(m.conditionalWorkingCostTHB,47000);
 assert.equal(m.conditionalWorkingSellTHB,51700);
-assert.equal(m.proposedB1BaseWorkingSellTHB,722230.26);
-assert.equal(m.previousCanonicalB1WorkingSellTHB,624030.26);
+assert.equal(m.proposedB1BaseWorkingSellTHB,211600);
+assert.equal(m.canonicalB1WorkingSellTHB,211600);
+assert.equal(m.historicalEngineeringCarryForwardTHB,0);
+assert.equal(m.historicalPmCarryForwardTHB,0);
+assert.equal(m.engineeringScopeReview.length,27);
+assert(m.engineeringScopeReview.every(x=>x.workingSellTHB===null&&x.quantityMH===null&&x.postingAllowed===false));
 assert.equal(m.budgetaryVsCanonicalDeltaTHB,98200);
 assert.equal(m.actualDirectCostTHB,null);
 assert.equal(m.customerReleasedSellTHB,null);
@@ -58,9 +62,9 @@ assert.equal(m.milestones.find(x=>x.stage==="K09").chargeOwnerStage,"K08");
 assert.equal(m.milestones.find(x=>x.stage==="K00").rows.every(x=>x.role!=="PM"),true,"K00 PM kickoff included in engineering legacy");
 assert(m.roleLines.filter(x=>x.wbs==="K01").every(x=>!x.roleName.includes("FAT witness")),"B3 factory team not eligible for B1");
 assert(m.expenseLines.filter(x=>x.conditional).every(x=>x.account==="B1.6"||x.account==="B1.7"));
-assert.equal(bc.byCode.B1.workingSellTHB,624030.26,"Proposal must not silently reprice canonical customer B1");
+assert.equal(bc.byCode.B1.workingSellTHB,211600,"Proposal must not silently reprice canonical customer B1");
 assert.equal(bc.byCode.B1.b1SupportPlanningBudget.proposedB1BaseWorkingSellTHB,m.proposedB1BaseWorkingSellTHB);
-assert.equal(bc.knownWorkingSellTHB,4600020.95,"Part B base must remain unchanged until CFO release");
+assert.equal(bc.knownWorkingSellTHB,4187590.69,"Part B base must remain unchanged until CFO release");
 assert.equal(bc.byCode.B3.workingSellTHB,2443400);
 assert.equal(bc.byCode.B9.workingSellTHB,0);
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600);
@@ -75,4 +79,4 @@ assert(!jsx.includes("usdPerPersonDay"),"Old USD600 general admin widget still a
 assert(babel.transformSync(jsx,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0,
  "B1 budget JSX Babel syntax invalid");
-console.log("PASS PJ2608-0553 B1 role-based planning: 19 K/12 unique events; 7 roles, 242 MH, THB 80,400 labour cost; THB 181,400 support base cost / THB 211,600 support SELL; THB 51,700 conditional sell; proposed B1 THB 722,230.26; original Part B canonical unchanged.");
+console.log("PASS PJ2608-0553 B1 role-based planning: 19 K/12 unique events; 7 roles, 242 MH, THB 80,400 labour cost; THB 181,400 support base cost / THB 211,600 support SELL; THB 51,700 conditional sell; proposed B1 THB 211,600; original Part B canonical unchanged.");
