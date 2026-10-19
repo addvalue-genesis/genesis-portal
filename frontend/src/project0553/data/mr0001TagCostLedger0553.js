@@ -271,10 +271,10 @@ export function selectMR0001TagCostRows0553(site){
    description:item.description,sourceQty:item.sourceScopeQty,sourceUnit:item.sourceScopeUnit,
    currency:priced?"THB":null,unitCost:priced&&item.sourceScopeQty>0?round(item.indicativePackageCostTHB/item.sourceScopeQty):null,
    extended:priced?round(item.indicativePackageCostTHB):null,
-   status:priced?"CISCO_PRELIMINARY_WORKING_BUNDLE":"ENGINEERING_SELECTION_OR_PRICE_MAPPING_REQUIRED",
+   status:priced?"TC0001_8PORT_ENGINEERING_REVIEW_PENDING":"ENGINEERING_SELECTION_OR_PRICE_MAPPING_REQUIRED",
    source:priced?"VST-0048-RE1 / MTO Rev04":"MTO Rev04 / vendor candidates only",
    candidates:item.vendorCandidates||[],countedInWorkingTotal:priced,
-   note:priced?"Cisco source quote is not OEM-accepted system BOM":"Selection must follow site-specific BLD/RPT/topology, not nearest vendor rate"};
+   note:priced?"TC-0001 Item 13: 8 RJ45 + 2 SFP, no expansion module; confirm per-site port mapping, PoE load, 65W PSU adequacy and Layer 3 licence. Quote is expired; working cost only, not customer sell.":"Selection must follow site-specific BLD/RPT/topology, not nearest vendor rate"};
  });
 }
 export function summarizeMR0001TagCost0553(site){
