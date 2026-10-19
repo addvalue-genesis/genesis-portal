@@ -6,7 +6,6 @@
 import {derivePartBcWorkingWbs0553,PART_BC_WBS_SOURCE_0553} from "./partBCWorkingWbs0553";
 import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
 import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
-import {selectB1ActivityWorkingSell0553} from "./b1ActivityWorkingSell0553";
 import {selectB1ProjectSupportBudget0553} from "./b1ProjectSupportBudget0553";
 import {selectB3FortyDayWorkingSell0553} from "./b3FortyDayWorkingSell0553";
 import {selectB3WorkingSellAfterChinaFat0553,B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553} from "./b3ChinaFatOwnership0553";
@@ -84,7 +83,6 @@ export function selectBcTurnkeyWorkingCost0553(){
  const b10WorkingSellTHB=round(b10HistoricalUSD*31.5);
  const spareBudget=selectUnifiedSpareConsumables0553();
  const chinaB9=selectB9ChinaWorkingBudget0553();
- const b1LegacyAudit=selectB1ActivityWorkingSell0553(); // historical only, never used in new B1 Working SELL
  const b1Current=selectB1ProjectSupportBudget0553();
  const b3Current=selectB3FortyDayWorkingSell0553();
  const spareBudgetCodes=new Set(["B10","B11","B13","C1","C2"]);
@@ -142,7 +140,6 @@ export function selectBcTurnkeyWorkingCost0553(){
    sourceStatus:w.state,
    b11VendorFollowup:code==="B11"?Object.freeze({status:"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING",amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08 B11 itemized tools",verifiedDirectCost:false,releaseAllowed:false,verification:"Requote tools with MGW/OEM; deduct included Part A tooling before bid release"}):null,
    unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08",fxTHBPerUSD:31.5,pricingClass:"BUDGETARY_WORKING_SELL",verifiedDirectCost:false,sourceLines:spareBudget.byCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
-   b1ActivityBudget:code==="B1"?b1LegacyAudit:null, // audit only; NEVER pricing authority
    b1SupportPlanningBudget:code==="B1"?b1Current:null,
    b3FortyDayBudget:code==="B3"?b3Current:null,
    b3FatOwnerTransfer:code==="B3"?Object.freeze({...B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553,baseSourceSellTHB:w.sellTHB,currentWorkingSellTHB:b3CurrentSellTHB}):null,
