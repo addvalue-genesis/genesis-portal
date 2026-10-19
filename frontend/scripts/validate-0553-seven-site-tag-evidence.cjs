@@ -16,7 +16,7 @@ const {selectWorkingBomProjection0553:projection}=source("data/workingBomAggrega
 const {SUPPLIER_QUOTE_LINES_0553:quotes}=source("data/supplierQuoteLines.js");
 const sites=["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11"];
 const family=t=>String(t).toUpperCase().replace(/\s+/g,"");
-let inspected=0;const familyCounts={DATO:0,SURGE:0,ENCLOSURE:0,BULK:0};
+let inspected=0,allTagRows=0;const familyCounts={DATO:0,SURGE:0,ENCLOSURE:0,BULK:0};
 const sourceBefore=JSON.stringify(Object.fromEntries(sites.map(site=>[site,tagRows(site)])));
 const originalQuotes=JSON.stringify(quotes);
 for(const site of sites){
@@ -28,10 +28,20 @@ for(const site of sites){
   const key=item.row+"|"+item.tag;
   assert(!ownerKeys.has(key),"Duplicate MTO owner at "+site+"/"+key);ownerKeys.add(key);
   const t=family(item.tag);
+  // Structural parity: all 55 MR0001 TAGs, including ODU/IDU/antennas/LAN,
+  // must remain readable through the SAME four-stage workbench.
+  const m=fourStage(site,item);
+  assert.equal(m.site,site);
+  assert.equal(m.row,item.row);
+  assert.equal(m.owner,item.tag+"."+item.row);
+  assert.equal(m.sourceMatched,true,site+"/"+key+" not matched to site MTO Rev04");
+  assert(m.required.length>=1,site+"/"+key+" has no engineering function");
+  assert.equal(m.releaseAllowed,false);
+  assert.equal(m.physicalSkuApproved,false,"No source TAG may be auto-approved");
+  allTagRows++;
   const expected=t.startsWith("DATO-")?"DATO":t.startsWith("SA-")?"SURGE":
    t.startsWith("TCAB-")?"ENCLOSURE":t==="BULKMATERIAL"?"BULK":null;
   if(!expected)continue;
-  const m=fourStage(site,item);
   assert(m.ownerEvidence,site+"/"+key+" has no owner-aware evidence in shared workbench");
   assert.equal(m.ownerEvidence.category,expected);
   assert.equal(m.ownerEvidence.siteRole,["ZPQ","ZWP8","ZWP11"].includes(site)?
@@ -88,6 +98,7 @@ assert.equal(familyCounts.ENCLOSURE,6);
 assert.equal(familyCounts.SURGE,8);
 assert.equal(familyCounts.BULK,7);
 assert.equal(inspected,25);
+assert.equal(allTagRows,55,"Seven-location structural parity must cover all 55 MR0001 source TAGs");
 assert.equal(JSON.stringify(Object.fromEntries(sites.map(site=>[site,tagRows(site)]))),sourceBefore,
  "Read-only seven-site projection must never mutate TAG ledgers");
 assert.equal(JSON.stringify(quotes),originalQuotes,"Vendor source quote must remain immutable");
@@ -101,4 +112,4 @@ assert(model.includes("projectMR0001TagEvidence0553"));
 const compiled=babel.transformSync(view,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
 assert(compiled.code.length>0);
-console.log("PASS 0553 seven-site MR0001: 25 DATO/SA/TCAB/Bulk TAGs in 7 locations, 4-stage owner-scoped evidence; original quotes/Rev03 costs unchanged, no OEM or sell release");
+console.log("PASS 0553 seven-site MR0001: 55/55 TAGs share 4 stages; 25 DATO/SA/TCAB/Bulk TAGs in 7 locations, 4-stage owner-scoped evidence; original quotes/Rev03 costs unchanged, no OEM or sell release");
