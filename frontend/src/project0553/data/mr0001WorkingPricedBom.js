@@ -13,7 +13,14 @@ const pricedSource=(id,code)=>{
 };
 const switchTags=new Set(["LAN-502-001","LAN-502-002"]);
 const switchCodes=["1.0","1.0.1","1.1","1.2","1.3","1.4","1.5","1.6","1.6.1","2.0","2.0.1"];
-const switchOffers=switchCodes.map(code=>pricedSource("VST-0048-RE1",code));
+const originalSwitchOffers=switchCodes.map(code=>pricedSource("VST-0048-RE1",code));
+const removedCodes=new Set(["2.0","2.0.1"]);
+const switchOffers=originalSwitchOffers.filter(x=>x&&!removedCodes.has(x.quoteLine));
+const removedSwitchOffers=originalSwitchOffers.filter(x=>x&&removedCodes.has(x.quoteLine));
+const unitOriginal=originalSwitchOffers.reduce((n,x)=>n+(x?.unitPrice||0),0);
+const unitReduction=removedSwitchOffers.reduce((n,x)=>n+(x?.unitPrice||0),0);
+const tc0001Ref="MM-ZTK-1F-GEN-TEL-TC-0001 / Item 13";
+const tc0001Gate="ENGINEERING_REVIEW_PENDING_SITE_PORT_MAPPING_POE_POWER_AND_L3_LICENCE";
 const lineQtyText=r=>r.sourceQuantityText.split(/\n/).map(s=>s.trim()).filter(Boolean);
 const rows=MTO.itemRows.flatMap(r=>{
  const tags=r.sourceItemCodes.length?r.sourceItemCodes:[r.sourcePartText];
@@ -34,7 +41,10 @@ const rows=MTO.itemRows.flatMap(r=>{
    engineeringRequiredSkuQty:null,acceptedPrice:null,
    indicativePackageCostTHB:switchRow&&quantity!==null&&related.every(x=>Number.isFinite(x.unitPrice))?
     related.reduce((sum,x)=>sum+x.unitPrice,0)*quantity:null,
-   costStatus:switchRow?"PROVISIONAL_PRICE_SOURCE_PACKAGE_NOT_OEM_APPROVED":"AWAITING_PHYSICAL_OEM_TAKEOFF",
+   costStatus:switchRow?"TC0001_8PORT_BUDGETARY_PENDING_ENGINEERING_VERIFICATION":"AWAITING_PHYSICAL_OEM_TAKEOFF",
+   tcReference:switchRow?tc0001Ref:null,
+   portConfiguration:switchRow?{poeRj45:8,sfpUplink:2,expansionRj45:0}:null,
+   engineeringGate:switchRow?tc0001Gate:null,
    releaseAllowed:false};
  });
 });
@@ -45,13 +55,20 @@ export const MR0001_WORKING_PRICED_BOM=Object.freeze({
  items:rows,sourceRowCount:MTO.itemRows.length,sourceItemCount:rows.length,
  cisco:{siteCount:scoped.length,sourceScopeSets:scoped.reduce((n,r)=>n+(r.sourceScopeQty||0),0),
   sourceQuote:"A-0048/2026_Re1",quoteQty:5,currency:"THB",
-  items:switchOffers,unitPackageQuotedSumTHB:perSwitch,
+  items:switchOffers,originalQuoteItems:originalSwitchOffers,removedItems:removedSwitchOffers,
+  unitPackageQuotedSumTHB:perSwitch,originalUnitQuotedTHB:unitOriginal,
+  removedUnitTHB:unitReduction,removedTotalTHB:unitReduction*scoped.reduce((n,r)=>n+(r.sourceScopeQty||0),0),
+  tcReference:tc0001Ref,engineeringGate:tc0001Gate,
+  specification:"IE-3400-8P2S-E / 8 RJ45 PoE+ + 2 SFP / expansion module excluded",
+  technicalApproval:false,workingSellChanged:false,
   indicativeExtendedTHB:scoped.reduce((n,r)=>n+(r.indicativePackageCostTHB||0),0),
   sourceTotalTHB:quotes.get("VST-0048-RE1").quotedTotal,
-  status:"MTO_SET_QTY_AND_QUOTE_TOTAL_MATCH__CONFIGURATION_REVIEW"},
+  status:"TC0001_8PORT_REVISED_WORKING_COST_FROM_ORIGINAL_QUOTE__ENGINEERING_NOT_RELEASED"},
  assumptions:["Cisco 11 quote codes represent one potential switch procurement bundle, including subscriptions and source zero-price codes",
   "One quoted group per MTO LAN Set is a working package scenario, not an approved OEM design",
-  "5 existing Cisco quote quantities reconcile with four new ZWP20-23 plus one ZWP8 LAN source Set",
+  "5 original Cisco quote quantities reconcile with four new ZWP20-23 plus one ZWP8 LAN source Set",
+  "TC-0001 item 13 requests 8 copper ports; revised candidate removes IEM-3300-8T= and CON-SNT-IEM3308T from five working packages; original 11 quotation lines remain audit evidence",
+  "Port assignment per site, PoE loads/65W PSU headroom and Layer 3 Network Essentials entitlement are not verified; no technical/customer price release",
   "No multiplication of radio or accessories by unverified OEM SKU quantities",
   "Grouped source tag splits require checking native Excel cells",
   "Historical/customer sell prices not used as equipment cost"],
