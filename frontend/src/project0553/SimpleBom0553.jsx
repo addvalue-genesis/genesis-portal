@@ -250,6 +250,11 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"10.1.1.3 — System × Location × MTO — "+system+" / "+(site==="ALL"?"All Locations":site)} description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification. Context and Filters support this work; they are not approval gates." defaultOpen>
   {["MR-0002","MR-0003","MR-0004"].includes(system)?<UnifiedMrLocationTable0553 mr={system} site={site} fx={fx}/>:<>
   <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
+  {system==="MR-0001"&&<p className="p55-note" data-component-key="bid.budget.bom.system-location-mto.tc0001-8port">
+   <strong>TC-0001 Item 13 — Cisco 8-Port Working Revision:</strong> 5 LAN sets (ZWP20/21/22/23 and ZWP8); IE-3400-8P2S-E with 8 RJ45 PoE + 2 SFP, without IEM-3300-8T= or its SmartNet.
+   Revised Cisco working cost <strong>{thbMoney(bom.cisco.indicativeExtendedTHB,"THB")}</strong> against original VST source <strong>{thbMoney(bom.cisco.sourceTotalTHB,"THB")}</strong>; reduction <strong>{thbMoney(bom.cisco.removedTotalTHB,"THB")}</strong> ex VAT, not an additional discount line.
+   <small>{bom.cisco.engineeringGate} · Confirm each site's port assignment, PoE and 65W PSU budget, required L3 licence and updated vendor quotation. No change to customer Working Sell.</small>
+  </p>}
   {system==="MR-0001"&&<>
   <p className="p55-note"><strong>Source row completeness:</strong> {displayedCount} displayed / {sourceCount} registered MTO item tags. {vendor!=="ALL"?"Vendor filter hides some source rows; select All vendors for the full BOM.":"All source rows remain visible, including items lacking price."} Source item coverage does not mean a complete physical SKU take-off.</p>
   <div className="p55-source-facts">
