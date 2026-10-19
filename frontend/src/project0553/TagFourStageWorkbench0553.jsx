@@ -25,6 +25,12 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,fx=null,childre
     <small>{m.ciscoTc0001.engineeringGate} · Port assignment, PoE load/PSU rating and Layer 3 licence still require Engineering verification. No approved SKU quantity or customer sell release.</small>
    </p>}
    <p className="p55-note"><strong>Source identity:</strong> {m.sourceId||"MTO TAG not uniquely mapped"} · {m.sourceMatched?"Source TAG cross-reference found":"Source TAG identity needs review"}. <strong>Accepted Physical SKU BOM:</strong> {m.physicalSkuApproved?"PARTIAL / VERIFY PER FUNCTION":"NOT YET ENGINEERING APPROVED"}.</p>
+   {m.tcabRequired&&<div className="p55-panel" data-component-key={id+".required-bom.tcab-assembly"}>
+    <p className="p55-note"><strong>TCAB-500-001 Row 9 — Required SCADA Ex e Assembly:</strong> MTO 1 Set, BARTEC working model <strong>{m.tcabRequired.selectedModel}</strong>, SS316L, {m.tcabRequired.sizeMm.join(" × ")} mm. Working TAG cost <strong>{sourcePrice("THB",m.working.extended)}</strong> from a historical Prosper budget reference, NOT a current confirmed supplier quotation or approved Ex design.</p>
+    <p className="p55-note"><strong>GA capacity:</strong> {m.tcabRequired.entries.top} top + {m.tcabRequired.entries.left} left + {m.tcabRequired.entries.right} right = <strong>{m.tcabRequired.entryCount} M20 cable-entry holes</strong>; {m.tcabRequired.factoryStoppingPlugs} factory plugs, {m.tcabRequired.factoryLocknuts} locknuts and {m.tcabRequired.drainValveCount} drain valve in a separate hole. These are historical GA assembly counts, not separate material purchase quantities.</p>
+    <p className="p55-note"><strong>Open engineering deviation:</strong> DTS requires at least {m.tcabRequired.requiredEntriesByDts} entries; selected GA basis has {m.tcabRequired.entryCount}. Client disposition, Ex/thermal arrangement and final cable-end/OD allocation remain open. Active field glands and final purchase quantity belong to Bulk Row 11, not another TCAB Row 9 charge.</p>
+    <p className="p55-note"><strong>Source:</strong> {m.tcabRequired.source}. <strong>Cost ownership:</strong> {m.tcabRequired.includedCostOwner}; {m.tcabRequired.fieldBulkCostOwner}. No change to Working Sell.</p>
+   </div>}
    {m.bartecBulkRequired&&<div className="p55-panel" data-component-key={id+".required-bom.bartec-quantity"}>
     <p className="p55-note"><strong>BARTEC SCADA Enclosure — verified manufacturer GA quantities for this working design:</strong> 12 M20 top holes + 2 left + 2 right = <strong>{m.bartecBulkRequired.holeCount} M20 cable-entry holes</strong>. Initially supplied: <strong>{m.bartecBulkRequired.initialFactoryPlugs} M20 stopping plugs</strong> and 16 locknuts; one drain valve uses a separate hole. These components are within the BARTEC TCAB factory assembly, NOT 16 separately required cable glands.</p>
     <p className="p55-note"><strong>Actual active cable glands by OD / certified SKU:</strong> {m.bartecBulkRequired.installedGlandRequired??"CABLE-END TAKEOFF REQUIRED"} · <strong>Additional gland purchase:</strong> {m.bartecBulkRequired.netAdditionalGlandPurchase??"VENDOR INCLUSION / OD REQUIRED"} · <strong>Current separately booked working allowance:</strong> {m.bartecBulkRequired.recordedActiveGlandAllowance} M20 gland (provisional) + CAT6A 69m (budgetary route). Factory Included, Required, and Purchase quantities are different.</p>
@@ -61,6 +67,7 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,fx=null,childre
 
   <ControlledModuleSection0553 moduleKey={id+".vendor-comparison"} title="03 · Vendor Offer Comparison — หลักฐานที่ผู้ขายเสนอ">
    <p className="p55-note"><strong>07 Vendor is the original quotation source.</strong> This read-only owner-scoped comparison is not a supplier-driven Required BOM. Vendor offered quantity is quote-wide; TAG working quantity is separately allocated. <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.supplier" componentName="Vendor source and supplier quotation registry"/></p>
+   {m.tcabRequired&&<p className="p55-note"><strong>BARTEC / Prosper historical quotation Q-PROSRY-24051:</strong> line 1 is the internal budgetary comparable for TCAB Row 9; line 2 is an unselected alternative. The original 2024 quoted quantities are not Z1F purchase quantities. Requotation and certificate/layout review remain required.</p>}
    {m.ciscoTc0001&&<p className="p55-note"><strong>Cisco VST A-0048/2026 Rev.1:</strong> original 11 quoted lines remain visible. The 9 retained quote codes feed the revised 8-port working TAG; expansion module and module SmartNet are audit-only (not charged). Quotation remains expired; engineering release is pending.</p>}
    <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
     <thead><tr><th>Supplier Quote Line</th><th>Original Supplier SKU</th><th>Vendor Quoted Qty</th><th>Original Unit / Extended</th><th>TAG Working Qty / Amount</th><th>Difference / Technical Gate</th></tr></thead><tbody>
@@ -68,7 +75,7 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,fx=null,childre
       <ComponentCopyId projectId="PJ2608-0553" componentKey={id+".vendor-comparison."+r.code.toLowerCase()} componentName={r.code+" supplier comparison"}/></td>
      <td>{r.sku||"NOT FOUND"}<small>{r.description}</small></td><td>{r.offeredQty??"NOT QUOTED"}</td>
      <td>{sourcePrice(r.currency,r.quotedUnit)}<small>Original quote extension: {sourcePrice(r.currency,r.quotedTotal)}</small></td>
-     <td>{r.sourceStatus?.startsWith("TC0001_EXCLUDED")?"EXCLUDED":r.workingQty??"NOT DERIVED"}<small>{r.sourceStatus?.startsWith("TC0001_EXCLUDED")?"NOT INCLUDED IN WORKING COST":sourcePrice(r.currency,r.workingExtended)}</small></td>
+     <td>{r.sourceStatus?.startsWith("TC0001_EXCLUDED")||r.sourceStatus?.startsWith("HISTORICAL_ALTERNATIVE")?"EXCLUDED":r.workingQty??"NOT DERIVED"}<small>{r.sourceStatus?.startsWith("TC0001_EXCLUDED")||r.sourceStatus?.startsWith("HISTORICAL_ALTERNATIVE")?"NOT INCLUDED IN WORKING COST":sourcePrice(r.currency,r.workingExtended)}</small></td>
      <td>{r.sourceRateNull?"Vendor rate NULL; management zero incremental assumption is NOT a sourced vendor price":r.sourceStatus}<small>{r.costOwner}</small></td>
     </tr>)}
     {m.offered.length===0&&<tr><td colSpan={6}>{m.otherSupplierEvidence?"Current TAG has supplier/candidate evidence, but no uniquely matching Next G source row. Inspect the source reference below; do not equate the TAG total to a full supplier quotation.":"No uniquely mapped quoted vendor line for this TAG."}</td></tr>}
@@ -76,6 +83,8 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,fx=null,childre
    {m.otherSupplierEvidence&&<p className="p55-note">Existing ledger reference (not a second quotation): {m.working.selectedVendor||"Vendor pending"} · {m.working.selectedSku||"SKU pending"} · {m.working.source||"Source not indexed"}.</p>}
    <p className="p55-note">{m.ciscoTc0001
     ?"Original VST quote is evidence only. Cisco TAG working amount comes from the shared 8-port MTO ledger; the excluded expansion codes are non-additive and no quoted quantity is multiplied into each site twice."
+    :m.tcabRequired
+    ?"Historical Prosper rates provide a Row9 budget reference only. BARTEC factory-installed parts and entry holes are non-additive; CAT6A, active field glands and other Bulk Row11 functions retain their own cost owners."
     :"Full Next G quotation may contain other lines owned by IDU, surge, antenna, spares, or another site. Those must stay under their own Cost Owner or the 07 Vendor master. No quotation-wide amounts are added to this TAG."}</p>
   </ControlledModuleSection0553>
 
