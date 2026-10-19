@@ -6,7 +6,7 @@ import {MR0001_ENGINEERING_REQUIRED_BOM} from "./mr0001RequiredBomDerivation";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {auditZWP20RadioVendorMapping0553} from "./controlledTagMappingPilot0553";
-import {deriveBartecTagRequiredBulkProjection0553} from "./bartecTagRequiredBulkProjection0553";
+import {deriveBartecTagRequiredBulkProjection0553,deriveBartecTcabRequiredBom0553} from "./bartecTagRequiredBulkProjection0553";
 import {deriveZwp20BulkPricingBridge0553} from "./zwp20BulkPricingBridge0553";
 
 const rounded=n=>Math.round(n*100)/100;
@@ -93,6 +93,50 @@ const ciscoTc0001ForTag=(site,tagRow,owner)=>{
   engineeringGate:offer.engineeringGate};
 };
 
+// The TCAB package is one separately allocated factory assembly, not 16
+// extra M20 glands or a repetition of the SCADA Bulk Row11 cost owner.
+const tcabWorkingQuoteForTag=(site,tagRow,owner,tcab)=>{
+ if(!tcab)return null;
+ const quoted=candidateLookup.get("PROSPER-24051");
+ const originalLines=(quoted?.lines||[]).filter(x=>["1","2"].includes(x[0]));
+ const selectedCode=tagRow.budgetarySelectedQuoteLine||"1";
+ const selected=originalLines.find(x=>x[0]===selectedCode);
+ const count=tagRow.sourceQty;
+ const amount=tagRow.countedInWorkingTotal===true?tagRow.extended:null;
+ const rate=tagRow.unitCost;
+ const priced=Number.isFinite(count)&&Number.isFinite(rate)&&Number.isFinite(amount)&&
+  Math.abs(rounded(count*rate)-amount)<0.01;
+ const detail=priced?[{
+  id:"TCAB-FACTORY-EXE-PANEL",functionId:"BARTEC_EXE_PANEL_ASSEMBLY",
+  allocationOwner:owner,quoteId:"PROSPER-24051",
+  budgetaryQuoteLine:selectedCode,budgetarySelectedSKU:tagRow.sku||selected?.[1]||null,
+  requiredQty:count,qty:count,currency:"THB",
+  budgetaryUnitPrice:rate,budgetaryExtended:amount,
+  priceEvidenceType:"HISTORICAL_ZAWTIKA_1E_COMPARABLE_WORKING_ONLY",
+  budgetaryDecision:tcab.approvalState,
+  technicalState:"EX_E_LAYOUT_CERTIFICATION_AND_16_VS_18_DTS_REVIEW",
+  sourceStatus:"VENDOR_REQUOTE_REQUIRED_NOT_CURRENT_PHASE_1F"
+ }]:[];
+ const offered=originalLines.map(line=>{
+  const used=line[0]===selectedCode&&priced;
+  return {
+   functionId:"BARTEC_EXE_PANEL_ASSEMBLY",code:line[0],
+   quoteId:quoted.id,vendor:quoted.vendor,quotation:quoted.quotation,
+   sku:line[1],description:line[2],currency:"THB",
+   offeredQty:line[3],quotedUnit:line[4],
+   quotedTotal:Number.isFinite(line[3])&&Number.isFinite(line[4])?
+    rounded(line[3]*line[4]):null,
+   workingQty:used?count:0,workingExtended:used?amount:null,
+   sourceRateNull:!Number.isFinite(line[4]),workingAssumedZero:false,
+   sourceStatus:used?"HISTORICAL_LINE_1_BUDGETARY_COMPARABLE__REQUOTE_REQUIRED":
+    "HISTORICAL_ALTERNATIVE__NOT_ADDITIVE",
+   costOwner:owner
+  };
+ });
+ return {detail,offered,matchedQuote:quoted?.quotation||null,
+  budgetarySourcePriceTHB:amount,originalSourceStatus:quoted?.status||null};
+};
+
 export function getTagBomFourStage0553(site,tagRow){
  const owner=String(tagRow.tag||"")+"."+String(tagRow.row??"");
  const source=MR0001_ENGINEERING_REQUIRED_BOM.rows.find(r=>r.platform===site&&r.sourceRowIndex===tagRow.row);
@@ -101,8 +145,10 @@ export function getTagBomFourStage0553(site,tagRow){
  const matchingTag=Boolean(source?.sourceCodes?.includes(tagRow.tag)||
    (source?.sourcePartText||"").includes(tagRow.tag)||String(tagRow.tag).toLowerCase().includes("bulk"));
  const ciscoTc=ciscoTc0001ForTag(site,tagRow,owner);
+ const tcab=deriveBartecTcabRequiredBom0553(site,tagRow.tag,source);
+ const tcabQuote=tcabWorkingQuoteForTag(site,tagRow,owner,tcab);
  const detail=tagRow.detail?.length?tagRow.detail:tagRow.components?.length?tagRow.components:
-  ciscoTc?.detail||auditedOwnerDetail(site,tagRow,owner);
+  ciscoTc?.detail||tcabQuote?.detail||auditedOwnerDetail(site,tagRow,owner);
  const byFunction=new Map(detail.map(c=>[c.functionId,c]));
  // Bridge the previously isolated BARTEC manufacturer geometry + source MTO
  // into THIS TAG's Stage 01 Required view. No read-model cost mutation.
@@ -140,6 +186,18 @@ export function getTagBomFourStage0553(site,tagRow){
  // distinct GA documented capacity/accessories and the separately priced 1-gland
  // allowance without replacing the original MTO-required functional composition.
  if(bartecBulkRequired)required.push(...bartecBulkRequired.requirements);
+ if(tcab){
+  // The one MTO source assembly has a working historical comparable in Row9.
+  // Show it beside the required functions as NON-ADDITIVE existing TAG evidence.
+  required.push(...tcab.requirements.map(r=>r.functionId==="SCADA_EX_E_PANEL_ASSEMBLY"?
+   {...r,derivedWorkingQty:tagRow.sourceQty,
+    budgetUnit:tagRow.sourceUnit||"Set",
+    budgetRateTHB:Number.isFinite(tagRow.unitCost)?tagRow.unitCost:null,
+    budgetAmountTHB:tagRow.countedInWorkingTotal?tagRow.extended:null,
+    budgetSource:tcab.priceBasis,
+    budgetPosting:"EXISTING_TCAB_ROW9_TAG_LEDGER_ONLY__NOT_ADDITIVE",
+    selectionStatus:tcab.approvalState}:r));
+ }
  // Working functions and pricing originate exclusively from the existing TAG cost ledger.
  // For ODU row4 B-6/B-7 are required functions but belong to IDU row5; do NOT sum them.
  const ownerDetail=detail.filter(c=>ownedBy(c,owner));
@@ -183,14 +241,14 @@ export function getTagBomFourStage0553(site,tagRow){
    sourceStatus:q?.status||null,
    costOwner:owner};
  });
- const offered=ciscoTc?.offered||offeredNextG;
+ const offered=ciscoTc?.offered||tcabQuote?.offered||offeredNextG;
  const otherSupplierEvidence=offered.length===0&&Boolean(tagRow.vendor||tagRow.sku||tagRow.source);
  return Object.freeze({
   site,tag:tagRow.tag,row:tagRow.row,owner,
   sourceId:source?.id||null,sourceMatched:matchingTag,sourceQuantityText:source?.sourceQuantityText||null,
   scopeQty:tagRow.sourceQty??null,scopeUnit:tagRow.sourceUnit||null,
   packageFamily:pkg?.equipmentFamily||"SOURCE_MAPPING_REVIEW",
-  required,bartecBulkRequired,budgetBridge,physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
+  required,bartecBulkRequired,tcabRequired:tcab,budgetBridge,physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
   working:{status:tagRow.status||"REVIEW",currency:tagRow.currency||null,extended:ledgerTotal,
    selectedVendor:tagRow.vendor||null,selectedSku:tagRow.sku||null,
    source:tagRow.source||null,functions:pricedFunctions,
@@ -200,6 +258,6 @@ export function getTagBomFourStage0553(site,tagRow){
     !currencyValid?"MIXED_OR_UNVERIFIED_FUNCTION_CURRENCIES":
     !numericallyComplete?"FUNCTION_PRICES_PARTIAL":delta===null?"LEDGER_OR_RATE_REVIEW":
     Math.abs(delta)<=0.01?"WORKING_FUNCTIONS_RECONCILED":"COST_OWNER_MISMATCH"},
-  offered,otherSupplierEvidence,ciscoTc0001:ciscoTc?{unitWorkingTHB:ciscoTc.unitWorkingTHB,originalTotalTHB:ciscoTc.originalTotalTHB,removedTHB:ciscoTc.removedTHB,engineeringGate:ciscoTc.engineeringGate}:null,releaseAllowed:false
+  offered,otherSupplierEvidence,tcabQuoteStatus:tcabQuote?.originalSourceStatus||null,ciscoTc0001:ciscoTc?{unitWorkingTHB:ciscoTc.unitWorkingTHB,originalTotalTHB:ciscoTc.originalTotalTHB,removedTHB:ciscoTc.removedTHB,engineeringGate:ciscoTc.engineeringGate}:null,releaseAllowed:false
  });
 }
