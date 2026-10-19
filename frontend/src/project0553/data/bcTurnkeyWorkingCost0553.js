@@ -197,8 +197,21 @@ export function selectBcTurnkeyWorkingCost0553(){
  const byCodeOutput=Object.fromEntries(rows.map(r=>[r.code,r]));
  const knownWorkingSellTHB=round(rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
   .reduce((sum,r)=>sum+r.workingSellTHB,0));
- if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB +(b1Current.baseWorkingSellTHB-wbs.rows.find(r=>r.code==="B1").sellTHB)+(b3Current.workingSellTHB+chinaB9.fatWorkingSellTHB-wbs.rows.find(r=>r.code==="B3").sellTHB)+(chinaB9.b9BaseWorkingSellTHB-wbs.rows.find(r=>r.code==="B9").sellTHB) +rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB+rows.find(r=>r.code==="B10").workingSellTHB+rows.find(r=>r.code==="B11").workingSellTHB+rows.find(r=>r.code==="B13").workingSellTHB+rows.find(r=>r.code==="B7").workingSellTHB))>0.01)
-  throw Error("B WBS working sell reference reconciliation failed");
+ // Current Base sell must come only from CURRENT selected B1-B14 owner rows.
+// Never reconstruct current B1 from the historical Engineering 964MH/Rev05 price.
+ const baseOwnerCodes=["B1","B2","B3","B5","B6","B7","B8","B9","B10","B11","B13"];
+ const expectedCurrentBaseTHB=round(baseOwnerCodes.reduce((sum,code)=>{
+  const item=rows.find(x=>x.code===code);
+  if(!item||!item.baseScope||!Number.isFinite(item.workingSellTHB))
+   throw Error("Current B working sell owner price missing "+code);
+  return sum+item.workingSellTHB;
+ },0));
+ if(Math.abs(knownWorkingSellTHB-expectedCurrentBaseTHB)>0.01 ||
+    knownWorkingSellTHB!==4187590.69 ||
+    b1Current.baseWorkingSellTHB!==211600 ||
+    b1Current.historicalEngineeringCarryForwardTHB!==0 ||
+    b1Current.historicalPmCarryForwardTHB!==0)
+  throw Error("Current base owner-only SELL reconciliation failed: B1 must exclude legacy Engineering and USD600 PM");
  // Source-price coverage is not cost completeness.
  return Object.freeze({
   moduleId:"bid.budget.working.bc",workflowNumber:"10.2",
