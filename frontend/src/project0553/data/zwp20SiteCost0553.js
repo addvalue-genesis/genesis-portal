@@ -12,7 +12,6 @@ import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 import {INNOVA_0553_PROVISIONAL_PRICES} from "./innovaHistoricalBudgetPrices";
 import {findZwp20WebRate0553} from "./zwp20WebBulkRates0553";
 const lineByCode=new Map(NEXTG.lines.map(q=>[q.code,q]));
-const cisco=SUPPLIER_QUOTE_LINES_0553.find(q=>q.id==="VST-0048-RE1");
 const money=(q,p)=>Number.isFinite(q)&&Number.isFinite(p)?Math.round(q*p*100)/100:null;
 const SOURCE="MTO Rev04 ZWP20 rows 4–11";
 function rowCost(item){
