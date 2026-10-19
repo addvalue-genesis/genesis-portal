@@ -14,6 +14,7 @@ require.extensions[".js"]=(mod,file)=>{
 };
 const from=name=>require(path.join(root,"project0553/data",name));
 const {deriveZWP20SiteCost0553}=from("zwp20SiteCost0553.js");
+const {MR0001_WORKING_PRICED_BOM}=from("mr0001WorkingPricedBom.js");
 const {selectMR0001TagCostRows0553}=from("mr0001TagCostLedger0553.js");
 const {deriveWpSystemBulkBudget0553}=from("wpSystemBulkBudget0553.js");
 const {findZwp20WebRate0553}=from("zwp20WebBulkRates0553.js");
@@ -78,10 +79,22 @@ const mirrored=scada.items.find(x=>x.id==="SCADA-RJ45-WEIDMULLER");
 assert.equal(mirrored.rateTHB,ref.rateTHB,"Bulk mirrors selected central retail reference");
 assert.equal(mirrored.extendedTHB,null,"DATO already owns RJ45; NEVER book again as bulk");
 assert.equal(mirrored.owner,"DATO_ROW8_INCLUDED_IN_BUDGET__NOT_ADDITIVE");
+// The original DATO price and its owner are frozen, but TC-0001 Item 13
+// intentionally removed one Cisco expansion module and its SmartNet at ZWP20.
+// Reconcile the new site total against the pre-TC baseline instead of
+// silently restoring an obsolete 16-port switch package.
 const gross=Math.round((site.subtotals.THB+site.subtotals.USD*31.5)*100)/100;
-assert.equal(gross,921425.22,"ZWP20 total must remain unchanged after source alignment");
+const cisco8=MR0001_WORKING_PRICED_BOM.cisco;
+const removedPerSite=cisco8.removedUnitTHB;
+const switchRow=site.rows.find(x=>x.row===7&&x.tag==="LAN-502-001");
+assert(switchRow,"ZWP20 Cisco switch MTO row7 must remain present");
+assert.equal(removedPerSite,51950,"TC-0001 removes only module and expansion SmartNet");
+assert.equal(switchRow.extended,371580,"Cisco 8-port package must use selected working estimate");
+assert.equal(gross,869475.22,"Current ZWP20 cost must reflect TC-0001 8-port reduction");
+assert.equal(Math.round((gross+removedPerSite)*100)/100,921425.22,
+ "ZWP20 prior total must reconcile to TC-0001 source-only reduction; DATO unchanged");
 const bulkSource=fs.readFileSync(path.join(root,"project0553/data/wpSystemBulkBudget0553.js"),"utf8");
 const datoSource=fs.readFileSync(path.join(root,"project0553/data/zwp20SiteCost0553.js"),"utf8");
 assert(!bulkSource.includes("rateTHB:1176.68"),"Do not duplicate retail rate in bulk read model");
 assert(!datoSource.includes("const plugRsRetailRate=1176.68"),"DATO must read canonical vendor evidence, not hardcode another rate");
-console.log("PASS 0553 DATO selected Phoenix + Weidmuller: THB 1900 + 1176.68 = 3076.68; RS source not INNOVA; no SCADA Bulk duplicate; ZWP20 THB 921425.22 unchanged");
+console.log("PASS 0553 DATO selected Phoenix + Weidmuller: THB 1900 + 1176.68 = 3076.68; RS source not INNOVA; no SCADA Bulk duplicate; ZWP20 THB 869475.22 after TC-0001 Cisco reduction THB 51950; original THB 921425.22 reconciled");
