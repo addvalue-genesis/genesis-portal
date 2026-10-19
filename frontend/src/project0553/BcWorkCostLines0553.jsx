@@ -22,7 +22,21 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  const b3Current=selectB3FortyDayWorkingSell0553();
  // Rev05 Bangkok FAT is superseded by MGW FAT, but witness/travel ALWAYS cost owner B3 per contract. B9 is only optional Yard specialist.
  const physical=[
-  ...available.filter(x=>!x.id.startsWith("COST-AUD-")&&x.code!=="B3"&&x.code!=="B9"),
+  ...available.filter(x=>!x.id.startsWith("COST-AUD-")&&x.code!=="B1"&&x.code!=="B3"&&x.code!=="B9"),
+  ...(showGroup.includes("B1")?b1Current.lines.map(x=>({
+   code:"B1",id:x.id,moduleId:"bid.budget.working.bc.b1.current-"+x.id.toLowerCase(),
+   name:x.activity,quantity:x.qty,unit:x.unit,
+   workingSellRateTHB:Math.round(x.workingSellTHB/x.qty*100)/100,
+   workingSellTHB:x.workingSellTHB,historicalCostProxyTHB:null,
+   owner:"B1",sourceRef:x.verification,
+   scopeGate:x.conditional?"CONDITIONAL_B1_LAWFUL_SCOPE_ONLY_EXCLUDED_FROM_BASE":"NEW_B1_RESOURCE_BASE_UNVERIFIED_PAYROLL",
+   equation:x.role==="EXTERNAL_OR_ALLOWANCE"?
+    x.qty+" × THB "+x.unitCostTHB.toFixed(2)+" cost × 1.10 sell handling":
+    x.qty+" MH × loaded role cost THB "+x.unitCostTHB.toFixed(2)+" (planning) / 0.80 sell factor",
+   requiredQuantityStatus:x.conditional?"OPTIONAL_NOT_IN_CANONICAL_B1_BASE":"ROLE/EXPENSE_PLANNING_QTY",
+   reconciliationTag:x.conditional?"B1_CONDITIONAL_NO_POST":"B1_1_TO_B1_8_CURRENT_RESOURCE",
+   includedInExistingCostOwner:x.conditional?"EXCLUDED_FROM_BASE_THB51700":null
+  })):[]),
   ...(showGroup.includes("B3")?[...b3Current.rows.map(x=>({
    code:"B3",id:"B3-"+x.id,moduleId:"bid.budget.working.bc.b3.current-"+x.id.toLowerCase(),name:x.site+" — "+x.reason,
    quantity:x.days,unit:"2-person team workdays",workingSellRateTHB:50400,workingSellTHB:x.workingSellTHB,
@@ -68,9 +82,9 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
   <p className="p55-note"><strong>Selected:</strong> {selectedCode==="ALL"?"B1/B2/B3/B5/B6/B9/B10/B11 (current derivation priority)":selectedCode}
    {" "}· Current Working SELL subtotal (legacy Rev05 superseded for China FAT): {knownSellCount>0?money(displayedWbsSell):"NOT ESTABLISHED"} ({knownSellCount}/{showGroup.length} priced; {completeSell?"covered":"NOT complete price"})
    {" "}· Actual Direct COST: <strong>NOT ESTABLISHED</strong>
-   {" "}· Historical B1 proxy (not approved cost): {historicalProxy?money(historicalProxy):"n/a"}</p>
+   {" "}· Legacy Engineering pricing excluded from current B1</p>
   <p className="p55-note">Contract B3 Inspection/Testing includes MGW FAT Witness & associated travel under B3, plus offshore SAT/SIT and VeEX hire. B9 holds only optional Yard specialist support, not MGW FAT. Legacy Bangkok FAT THB144,000 replaced in B3, not additive. Direct COST is unverified.</p>
-  {(selectedCode==="ALL"||selectedCode==="B1"||selectedCode==="B2")&&<B1B2EquationAudit0553 selectedCode={selectedCode}/>}
+  {selectedCode==="B2"&&<B1B2EquationAudit0553 selectedCode={selectedCode}/>}
   {(selectedCode==="ALL"||selectedCode==="B3")&&<B3EquationAudit0553 selectedCode={selectedCode}/>}
   {(selectedCode==="ALL"||selectedCode==="B5")&&<B5EquationAudit0553 selectedCode={selectedCode}/>}
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
