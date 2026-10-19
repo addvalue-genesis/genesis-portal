@@ -5,13 +5,13 @@ import {ZWP20_BARTEC_NEXTG_REFERENCE_MAP} from "./zwp20BartecNextgMap";
 // ZWP20 SCADA MR0001 single allocation ledger: never add vendor alternatives or quote-wide quantities.
 // Each MTO source row owns its cost once. A/B/C classifications and missing sources stay explicit.
 import {WORKING_BOM_BY_LOCATION_0553} from "./workingBomByLocation";
-import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {deriveEngineeringOwnedCost0553} from "./engineeringOwnedCost0553";
 import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 import {INNOVA_0553_PROVISIONAL_PRICES} from "./innovaHistoricalBudgetPrices";
 import {findZwp20WebRate0553} from "./zwp20WebBulkRates0553";
 const lineByCode=new Map(NEXTG.lines.map(q=>[q.code,q]));
+const cisco=SUPPLIER_QUOTE_LINES_0553.find(q=>q.id==="VST-0048-RE1");
 const money=(q,p)=>Number.isFinite(q)&&Number.isFinite(p)?Math.round(q*p*100)/100:null;
 const SOURCE="MTO Rev04 ZWP20 rows 4–11";
 function rowCost(item){
@@ -46,12 +46,12 @@ function rowCost(item){
    status:"BUDGETARY_CALCULATED",assumptions:["4ft B-12 preliminary per management downsize; final RPT/OEM gain/availability confirmation required","Do not sum 6ft alternative"]};
  }
  if(item.sourceRow===7){
-  const relevant=MR0001_WORKING_PRICED_BOM.cisco.items.map(v=>[v.quoteLine,v.sku,v.description,v.quoteQty,v.unitPrice]);
+  const relevant=(cisco?.lines||[]).filter(v=>["1.0","1.0.1","1.1","1.6.1","2.0","2.0.1"].includes(v[0]));
   const unit=relevant.reduce((n,v)=>n+(Number.isFinite(v[4])?v[4]:0),0);
-  return {...base,vendor:"VST ECS / Cisco",sku:"IE-3400-8P2S-E with 8 PoE RJ45 and 2 SFP; no expansion module",currency:"THB",
-   unitCost:unit,extended:money(q,unit),status:"TC0001_8PORT_ENGINEERING_REVIEW_PENDING",
+  return {...base,vendor:"VST ECS / Cisco",sku:"IE-3400 + IE-3300 + priced modules/licences",currency:"THB",
+   unitCost:unit,extended:money(q,unit),status:"BUDGETARY_CALCULATED",
    quantityBasis:"1 LAN Set in ZWP20 MTO, reconciled with 5-switch vendor quote across five locations",
-   assumptions:["TC-0001 Item 13: expansion IEM-3300-8T= and its SmartNet excluded from working bundle","Port mapping, PoE load/65W PSU capacity, and Layer 3 licence require engineering review","Current quote expired; included SmartNet/subscription terms per retained package","Zero-priced source software lines are included, not separately charged"]};
+   assumptions:["Current quote expired; included SmartNet/subscription terms per offered package","Zero-priced source software lines are included, not separately charged"]};
  }
  if(item.sourceRow===8){
   const quote=SUPPLIER_QUOTE_LINES_0553.find(v=>v.id==="SONIC-CCY24-PXC-633");
