@@ -86,9 +86,9 @@ function B1IndirectExpenseRegister0553({workingRow}){
   <p className="p55-note" data-component-key={ledger.pendingAllocationPolicy.moduleId}><strong>B1 PENDING COST OWNER (Suspense):</strong> รายการจาก BOD/DTS/SPE/WBS ที่ยังไม่พบหมวด A/B2–B14/C ให้พักตรวจใน B1 ก่อนโดยไม่บวก Working Cost/Working Sell อัตโนมัติ เมื่อยืนยันว่าเป็นค่า FAT/SAT/Witness ให้ออกไป B3; เฉพาะ Yard Specialist Call-out จึงอยู่ B9; ส่วนที่เหลือ B1 เฉพาะ PM/Indirect ที่มีหลักฐานและไม่ซ้ำหมวดอื่น</p>
   <p className="p55-note"><strong>CFO REVIEW VIEW — Who / What / Where / How / Cost Owner / Payer / Quantity / Rate / Evidence.</strong> Rev.K K00–K18 and Rev.L Yard roles, Rev.J Gantt and Rev.I risk review, MR0001–0004 / BOD / DTS / SPE / TAG MTO. Role/location assumptions and MGW FAT venue conflicts are flagged, not treated as approvals. No new Direct Cost posting. Legacy THB 510,000 B1 is audit only; the source-register rows below stay nonposting. The new B1.1–B1.8 THB multi-role and expense estimate is itemized in the Rev.K budget immediately above, while actual payroll/invoices and contractual payers remain to verify.</p>
   <div className="p55-metric-grid">
-   <div><strong>Existing Canonical B1 Working Sell</strong><p>{cash(workingRow.b1ActivityBudget?.workingSellTHB)}</p><small>Older 11-gate USD600 PM allowance; new role-based proposal separate</small></div>
+   <div><strong>NEW Canonical B1 Working Sell</strong><p>{cash(workingRow.workingSellTHB)}</p><small>New B1.1–B1.8 role-based THB estimate only; old Engineering/PM prices excluded</small></div>
    <div><strong>New B1 Support Working Cost (planning)</strong><p>{cash(workingRow.b1SupportPlanningBudget?.baseWorkingCostTHB)}</p><small>Seven roles + B1.2–B1.8 expenses; NOT verified Direct Cost</small></div>
-   <div><strong>Proposed Revised B1 Working Sell</strong><p>{cash(workingRow.b1SupportPlanningBudget?.proposedB1BaseWorkingSellTHB)}</p><small>Replaces old PM sell allowance on CFO review; not added to current customer quote</small></div>
+   <div><strong>Engineering Ownership Review (UNPRICED)</strong><p>{workingRow.b1SupportPlanningBudget?.engineeringScopeReview.length||0} items</p><small>Only distinct ADDVALUE technical engineering may later enter B1 after checking B2/OEM</small></div>
    <div><strong>Conditional B1 Allowances (SELL)</strong><p>{cash(workingRow.b1SupportPlanningBudget?.conditionalWorkingSellTHB)}</p><small>Legal consultant / statutory permits excluded from Base</small></div>
    <div><strong>B1 source expense objects</strong><p>{ledger.b1.length}</p><small>{ledger.unpricedB1} awaiting cost evidence</small></div>
    <div><strong>Other-owner expense objects</strong><p>{ledger.outside.length}</p><small>Reference only; cannot post into B1</small></div>
@@ -110,7 +110,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
    <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
-   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Existing canonical Engineering and 11 legacy PM gates; new B1.1–B1.8 THB support plan is NON-POSTING; actual Direct Cost OPEN":e.code==="B3"?"Current MGW FAT Witness + Offshore SAT/SIT + VeEX rental, all Inspection/Testing under B3":e.code==="B9"?"No B9 Base; only conditional Yard Specialist 1 LS":"Working source estimate"}</small></div>
+   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Current B1 SELL from fresh B1.1–B1.8 support-only THB resource budget; actual Direct Cost OPEN, old engineering/PM quotes excluded":e.code==="B3"?"Current MGW FAT Witness + Offshore SAT/SIT + VeEX rental, all Inspection/Testing under B3":e.code==="B9"?"No B9 Base; only conditional Yard Specialist 1 LS":"Working source estimate"}</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Reconcile all four MR cargo legs against current MGW China FAT and DDP JUTAL Zhuhai Yard; Bangkok/Nantong are historical Rev05 routes only.</p>}
@@ -152,7 +152,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
   </section>}
   {e.code==="B1"&&<B1RevKMilestoneBudget0553/>}
   {e.code==="B1"&&<B1IndirectExpenseRegister0553 workingRow={workingRow}/>}
-  {e.code==="B1"&&<details className="p55-panel" style={{padding:12,marginTop:12}}><summary><strong>Rev05 Legacy B1 Engineering 964-MH / THB 510,000 Calculation Audit</strong> — previous method; not the new Project Management &amp; Indirect Expense budget</summary><B1EngineeringSellModel0553 workingRow={workingRow}/></details>}
+   {/* No former 964-MH Engineering pricing audit rendered in current B1 */}
   <h4>{e.code==="B3"||e.code==="B9"?"Rev05 Original WBS Calculation Audit — ไม่ใช่ราคาปัจจุบัน":"1. Working Drivers & Calculation Evidence — ต้นทางปริมาณและสมการ"}</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Activity / Physical Work</th><th>Quantity</th><th>Rate THB</th><th>Evidence Amount THB</th><th>ประเภท / แหล่งข้อมูล</th></tr></thead>
