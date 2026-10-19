@@ -8,6 +8,7 @@ import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {auditZWP20RadioVendorMapping0553} from "./controlledTagMappingPilot0553";
 import {deriveBartecTagRequiredBulkProjection0553,deriveBartecTcabRequiredBom0553} from "./bartecTagRequiredBulkProjection0553";
 import {deriveZwp20BulkPricingBridge0553} from "./zwp20BulkPricingBridge0553";
+import {projectMR0001TagEvidence0553} from "./mr0001TagEvidenceProjection0553";
 
 const rounded=n=>Math.round(n*100)/100;
 const ownedBy=(c,owner)=>!c.allocationOwner||c.allocationOwner===owner;
@@ -145,10 +146,26 @@ export function getTagBomFourStage0553(site,tagRow){
  const matchingTag=Boolean(source?.sourceCodes?.includes(tagRow.tag)||
    (source?.sourcePartText||"").includes(tagRow.tag)||String(tagRow.tag).toLowerCase().includes("bulk"));
  const ciscoTc=ciscoTc0001ForTag(site,tagRow,owner);
+ const ownerEvidence=projectMR0001TagEvidence0553(site,tagRow,source);
  const tcab=deriveBartecTcabRequiredBom0553(site,tagRow.tag,source);
  const tcabQuote=tcabWorkingQuoteForTag(site,tagRow,owner,tcab);
+ // For historical enclosure references with one site-owned TAG cost, expose
+ // a single owner-scoped working function without inventing factory fitting rates.
+ // Brownfield existing/reuse alternatives never become new approved purchases.
+ const enclosureWorking=ownerEvidence?.category==="ENCLOSURE"&&!tcab&&
+   tagRow.countedInWorkingTotal===true&&Number.isFinite(tagRow.extended)&&
+   tagRow.sourceQty===1&&tagRow.procurementQty!==0&&
+   Number.isFinite(tagRow.unitCost)?[{
+    id:"SOURCE-TCAB-"+site+"-"+tagRow.row,
+    functionId:"SCADA_EXE_ENCLOSURE_ASSEMBLY",allocationOwner:owner,
+    requiredQty:tagRow.sourceQty,qty:tagRow.sourceQty,currency:tagRow.currency,
+    budgetaryQuoteLine:"PROSPER-24051-1-HISTORICAL-COMPARABLE",
+    budgetarySelectedSKU:tagRow.sku||null,
+    budgetaryUnitPrice:tagRow.unitCost,budgetaryExtended:tagRow.extended,
+    priceEvidenceType:"HISTORICAL_COMPARABLE_TAG_COST_NOT_1F_QUOTE",
+    budgetaryDecision:"EX_AND_SCOPE_OWNER_REVIEW_PENDING"}]:[];
  const detail=tagRow.detail?.length?tagRow.detail:tagRow.components?.length?tagRow.components:
-  ciscoTc?.detail||tcabQuote?.detail||auditedOwnerDetail(site,tagRow,owner);
+  (ciscoTc?.detail||tcabQuote?.detail|| (enclosureWorking.length?enclosureWorking:auditedOwnerDetail(site,tagRow,owner)));
  const byFunction=new Map(detail.map(c=>[c.functionId,c]));
  // Bridge the previously isolated BARTEC manufacturer geometry + source MTO
  // into THIS TAG's Stage 01 Required view. No read-model cost mutation.
@@ -186,6 +203,10 @@ export function getTagBomFourStage0553(site,tagRow){
  // distinct GA documented capacity/accessories and the separately priced 1-gland
  // allowance without replacing the original MTO-required functional composition.
  if(bartecBulkRequired)required.push(...bartecBulkRequired.requirements);
+ // All source-backed functional evidence is NON-ADDITIVE to the existing TAG
+ // ledger. It improves Stage 01 visibility, not TAG prices or procurement qty.
+ if(ownerEvidence&&!(tcab&&ownerEvidence.category==="ENCLOSURE"))
+  required.push(...ownerEvidence.required);
  if(tcab){
   // The one MTO source assembly has a working historical comparable in Row9.
   // Show it beside the required functions as NON-ADDITIVE existing TAG evidence.
@@ -241,14 +262,16 @@ export function getTagBomFourStage0553(site,tagRow){
    sourceStatus:q?.status||null,
    costOwner:owner};
  });
- const offered=ciscoTc?.offered||tcabQuote?.offered||offeredNextG;
+ const offered=ciscoTc?.offered||tcabQuote?.offered||
+  (offeredNextG.length?offeredNextG:ownerEvidence?.offered||[]);
  const otherSupplierEvidence=offered.length===0&&Boolean(tagRow.vendor||tagRow.sku||tagRow.source);
  return Object.freeze({
   site,tag:tagRow.tag,row:tagRow.row,owner,
   sourceId:source?.id||null,sourceMatched:matchingTag,sourceQuantityText:source?.sourceQuantityText||null,
   scopeQty:tagRow.sourceQty??null,scopeUnit:tagRow.sourceUnit||null,
   packageFamily:pkg?.equipmentFamily||"SOURCE_MAPPING_REVIEW",
-  required,bartecBulkRequired,tcabRequired:tcab,budgetBridge,physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
+  required,bartecBulkRequired,tcabRequired:tcab,ownerEvidence,budgetBridge,
+  physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
   working:{status:tagRow.status||"REVIEW",currency:tagRow.currency||null,extended:ledgerTotal,
    selectedVendor:tagRow.vendor||null,selectedSku:tagRow.sku||null,
    source:tagRow.source||null,functions:pricedFunctions,
