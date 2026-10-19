@@ -13,7 +13,7 @@ require.extensions[".js"]=(mod,file)=>{
 };
 const from=file=>require(path.join(root,"project0553/data",file));
 const {WORKING_BOM_BY_LOCATION_0553}=from("workingBomByLocation.js");
-const {summarizeMR0001Rev03TagCost0553 as summarizeMR0001TagCost0553}=from("mr0001Rev03CostOverlay0553.js");
+const {summarizeMR0001Rev03TagCost0553: summarizeMR0001TagCost0553}=from("mr0001Rev03CostOverlay0553.js");
 const {MR0001_WORKING_PRICED_BOM}=from("mr0001WorkingPricedBom.js");
 const {selectWorkingBomProjection0553}=from("workingBomAggregation0553.js");
 const {deriveA5BulkAttribution0553}=from("a5BulkAttribution0553.js");
