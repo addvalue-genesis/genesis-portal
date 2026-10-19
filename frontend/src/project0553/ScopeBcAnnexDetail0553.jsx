@@ -41,7 +41,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
   {code==="B1"&&<div className="p55-panel" style={{padding:12}}>
    <h4>B1 — Regulatory, Import &amp; Operating Licence Coordination (ADDVALUE)</h4>
-   <p className="p55-note"><strong>Cost owner:</strong> ADDVALUE · First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model. B1 Rev05 working SELL {thb(b1Regulatory.protectedWorkingSellTHB)} (original {b1Regulatory.originalEngineeringMH} engineering MH) is frozen. The permit coordination entries below do not automatically increase it.</p>
+   <p className="p55-note"><strong>Cost owner:</strong> ADDVALUE · First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model. Historical Rev05 engineering evidence is retained for audit only and NOT carried into current B1 Working SELL. New B1.1–B1.8 role-based project support is the current pricing basis; statutory/consultant conditional costs remain separate.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Internal Ref</th><th>Description</th><th>Role</th><th>Quantity Driver</th><th>Qty</th><th>Unit Rate THB</th><th>Amount THB</th><th>Owner / Source Gate</th></tr></thead>
     <tbody>{b1Regulatory.rows.map(x=><tr key={x.id}>
