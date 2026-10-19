@@ -4,6 +4,7 @@
 import {MR0001_PACKAGE_COMPOSITION} from "./mr0001PackageComposition";
 import {MR0001_ENGINEERING_REQUIRED_BOM} from "./mr0001RequiredBomDerivation";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
+import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {auditZWP20RadioVendorMapping0553} from "./controlledTagMappingPilot0553";
 import {deriveBartecTagRequiredBulkProjection0553} from "./bartecTagRequiredBulkProjection0553";
 import {deriveZwp20BulkPricingBridge0553} from "./zwp20BulkPricingBridge0553";
@@ -34,6 +35,64 @@ const auditedOwnerDetail=(site,tagRow,owner)=>{
  }));
 };
 
+// TC-0001 Item 13: present the same selected 8-port Cisco working source
+// under the MTO TAG's Required/Working/Vendor stages, without creating a new
+// ledger or treating quote-wide 5 units as 5 units at each site.
+const ciscoTc0001ForTag=(site,tagRow,owner)=>{
+ if(!/^LAN-502-00[12]$/.test(String(tagRow.tag||"")))return null;
+ const tag=MR0001_WORKING_PRICED_BOM.items.find(r=>
+  r.site===site&&r.sourceRow===tagRow.row&&r.sourceTag===tagRow.tag&&
+  r.bomType==="L3_SWITCH_CISCO_BUNDLE_CANDIDATE");
+ if(!tag||tag.sourceScopeQty!==1)return null;
+ const offer=MR0001_WORKING_PRICED_BOM.cisco;
+ const lookup=new Map(tag.configuration.map(q=>[q.quoteLine,q]));
+ const groups=[
+  {id:"NETWORK_SWITCH",codes:["1.0"],description:"IE-3400-8P2S-E, 8 integrated PoE RJ45 and 2 SFP slots"},
+  {id:"NETWORK_LICENCE",codes:["1.6","1.6.1"],description:"IE3400 DNA Essentials subscription, 3 years; routing entitlement review"},
+  {id:"DC_POWER",codes:["1.1"],description:"PWR-IE65W-PC-DC, PoE/DC supply, power headroom pending"},
+  {id:"SFP_INTERFACE",codes:[],description:"Two built-in SFP interfaces only; separate optical transceivers not priced",included:true,qty:2},
+  {id:"CONFIGURATION",codes:["1.2","1.3","1.4","1.5"],description:"Quote's included software/tracking parent lines",included:true},
+  {id:"NETWORK_SUPPORT",codes:["1.0.1"],description:"Main-switch SmartNet; removed module SmartNet excluded"}
+ ];
+ const detail=groups.map(g=>{
+  const sourceLines=g.codes.map(code=>lookup.get(code)).filter(Boolean);
+  const quoteCodes=sourceLines.map(q=>q.quoteLine);
+  const price=sourceLines.length?rounded(sourceLines.reduce((sum,q)=>sum+q.unitPrice,0)):null;
+  const qty=g.qty||tag.sourceScopeQty;
+  return {
+   id:"TC0001-"+g.id,functionId:g.id,allocationOwner:owner,quoteId:"VST-0048-RE1",
+   sourceQuoteCodes:quoteCodes,budgetaryQuoteLine:quoteCodes.join(", ")||"INTEGRATED_BASE_PORTS",
+   budgetarySelectedSKU:sourceLines.map(x=>x.sku).join(" + ")||"IE-3400-8P2S-E (embedded SFP slots)",
+   description:g.description,requiredQty:qty,qty,quantityState:"TC0001_INTERNAL_WORKING_QTY_NOT_OEM_APPROVED",
+   currency:"THB",budgetaryUnitPrice:price,
+   budgetaryExtended:g.included?null:price===null?null:rounded(price*tag.sourceScopeQty),
+   nonCostedIncluded:Boolean(g.included),
+   priceEvidenceType:"VST_0048_RE1_ORIGINAL_QUOTE__TC0001_REVISED_WORKING_SUBSET",
+   budgetaryDecision:offer.engineeringGate,
+   technicalState:"PORT_POE_L3_AND_OEM_APPROVAL_PENDING",
+   sourceStatus:"QUOTE_EXPIRED_REQUOTE_REQUIRED"
+  };
+ });
+ const quoted=offer.originalQuoteItems.map(q=>{
+  const selected=lookup.has(q.quoteLine);
+  return {
+   functionId:groups.find(g=>g.codes.includes(q.quoteLine))?.id||"EXCLUDED_EXPANSION_MODULE",
+   code:q.quoteLine,quoteId:"VST-0048-RE1",vendor:"VST ECS (Thailand) / Cisco",
+   quotation:offer.sourceQuote,sku:q.sku,description:q.description,currency:q.currency,
+   offeredQty:q.quoteQty,quotedUnit:q.unitPrice,
+   quotedTotal:rounded(q.unitPrice*q.quoteQty),
+   workingQty:selected?tag.sourceScopeQty:0,
+   workingExtended:selected?rounded(q.unitPrice*tag.sourceScopeQty):null,
+   sourceStatus:selected?"TC0001_RETAINED_8PORT_WORKING_QUOTE_LINE":
+     "TC0001_EXCLUDED_EXPANSION_OR_MODULE_SMARTNET__AUDIT_ONLY",
+   sourceRateNull:false,workingAssumedZero:false,costOwner:owner
+  };
+ });
+ return {detail,offered:quoted,sourceTag:tag,originalTotalTHB:offer.sourceTotalTHB,
+  unitWorkingTHB:offer.unitPackageQuotedSumTHB,removedTHB:offer.removedTotalTHB,
+  engineeringGate:offer.engineeringGate};
+};
+
 export function getTagBomFourStage0553(site,tagRow){
  const owner=String(tagRow.tag||"")+"."+String(tagRow.row??"");
  const source=MR0001_ENGINEERING_REQUIRED_BOM.rows.find(r=>r.platform===site&&r.sourceRowIndex===tagRow.row);
@@ -41,8 +100,9 @@ export function getTagBomFourStage0553(site,tagRow){
  const pkg=MR0001_PACKAGE_COMPOSITION.packages.find(p=>p.platform===site&&p.sourceRowIndex===tagRow.row);
  const matchingTag=Boolean(source?.sourceCodes?.includes(tagRow.tag)||
    (source?.sourcePartText||"").includes(tagRow.tag)||String(tagRow.tag).toLowerCase().includes("bulk"));
+ const ciscoTc=ciscoTc0001ForTag(site,tagRow,owner);
  const detail=tagRow.detail?.length?tagRow.detail:tagRow.components?.length?tagRow.components:
-  auditedOwnerDetail(site,tagRow,owner);
+  ciscoTc?.detail||auditedOwnerDetail(site,tagRow,owner);
  const byFunction=new Map(detail.map(c=>[c.functionId,c]));
  // Bridge the previously isolated BARTEC manufacturer geometry + source MTO
  // into THIS TAG's Stage 01 Required view. No read-model cost mutation.
@@ -111,7 +171,7 @@ export function getTagBomFourStage0553(site,tagRow){
  const delta=numericallyComplete&&Number.isFinite(ledgerTotal)?rounded(workingTotal-ledgerTotal):null;
  // Vendor proof belongs in the vendor registry. Show the exact quoted source rows
  // relevant to THIS physical owner, never the other owners or all 53 quote rows.
- const offered=pricedFunctions.filter(c=>/^([ABC]-\d+)$/.test(String(c.quoteCode||""))).map(c=>{
+ const offeredNextG=pricedFunctions.filter(c=>/^([ABC]-\d+)$/.test(String(c.quoteCode||""))).map(c=>{
   const q=candidateLookup.get("NG-260916");
   const found=q?.lines?.find(line=>line[0]===c.quoteCode);
   return {functionId:c.functionId,code:c.quoteCode,quoteId:q?.id||null,
@@ -123,6 +183,7 @@ export function getTagBomFourStage0553(site,tagRow){
    sourceStatus:q?.status||null,
    costOwner:owner};
  });
+ const offered=ciscoTc?.offered||offeredNextG;
  const otherSupplierEvidence=offered.length===0&&Boolean(tagRow.vendor||tagRow.sku||tagRow.source);
  return Object.freeze({
   site,tag:tagRow.tag,row:tagRow.row,owner,
@@ -139,6 +200,6 @@ export function getTagBomFourStage0553(site,tagRow){
     !currencyValid?"MIXED_OR_UNVERIFIED_FUNCTION_CURRENCIES":
     !numericallyComplete?"FUNCTION_PRICES_PARTIAL":delta===null?"LEDGER_OR_RATE_REVIEW":
     Math.abs(delta)<=0.01?"WORKING_FUNCTIONS_RECONCILED":"COST_OWNER_MISMATCH"},
-  offered,otherSupplierEvidence,releaseAllowed:false
+  offered,otherSupplierEvidence,ciscoTc0001:ciscoTc?{unitWorkingTHB:ciscoTc.unitWorkingTHB,originalTotalTHB:ciscoTc.originalTotalTHB,removedTHB:ciscoTc.removedTHB,engineeringGate:ciscoTc.engineeringGate}:null,releaseAllowed:false
  });
 }
