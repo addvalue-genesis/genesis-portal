@@ -103,7 +103,7 @@ export function selectB1ProjectSupportBudget0553(){
  const baseWorkingSellTHB=round(labourWorkingSellTHB+baseExpenseWorkingSellTHB);
  const byAccount=Object.freeze(ACCOUNTS.map(([account,label])=>{
   const rows=lines.filter(x=>x.account===account);
-  const rawWorkingCost=x=>x.role==="EXTERNAL_OR_ALLOWANCE"?x.workingCostTHB:x.monthlySalaryTHB*load/workHoursPerMonth*x.qty;
+  const rawWorkingCost=x=>x.role==="EXTERNAL_OR_ALLOWANCE"?x.workingCostTHB:x.monthlySalaryTHB*load/workingHoursPerMonth*x.qty;
   return Object.freeze({account,label,rows,qtyRows:rows.length,
    baseWorkingCostTHB:round(rows.filter(x=>!x.conditional).reduce((n,x)=>n+rawWorkingCost(x),0)),
    baseWorkingSellTHB:round(rows.filter(x=>!x.conditional).reduce((n,x)=>n+x.workingSellTHB,0)),
