@@ -24,9 +24,9 @@ export function B1RevKMilestoneBudget0553(){
    <div><strong>Support Base Working Cost</strong><p>{money(model.baseWorkingCostTHB)}</p><small>Indicative allocated cost, NOT actual Direct Cost</small></div>
    <div><strong>Support Base Working SELL</strong><p>{money(model.baseWorkingSellTHB)}</p><small>20% labour gross margin + 10% non-labour handling, provisional</small></div>
    <div><strong>B1 Conditional Expenses</strong><p>{money(model.conditionalWorkingSellTHB)}</p><small>Legal consultant and official permit fee, NOT in base</small></div>
-   <div><strong>Proposed Revised B1 Working SELL</strong><p>{money(model.proposedB1BaseWorkingSellTHB)}</p><small>Engineering {money(model.engineeringBaselineWorkingSellTHB)} + Support {money(model.baseWorkingSellTHB)}</small></div>
+   <div><strong>NEW Canonical B1 Working SELL</strong><p>{money(model.baseWorkingSellTHB)}</p><small>Only new B1.1–B1.8 role/activity budget; NO old Engineering/PM price carried forward</small></div>
   </div>
-  <p className="p55-note"><strong>Budget reconciliation:</strong> Existing canonical 10.2 B1 Working SELL <strong>{money(model.previousCanonicalB1WorkingSellTHB)}</strong> remains unchanged pending CFO rate/overhead ownership review. The new proposal is <strong>{money(model.proposedB1BaseWorkingSellTHB)}</strong>, an increase of <strong>{money(model.budgetaryVsCanonicalDeltaTHB)}</strong> after replacing, NOT adding again, the former USD600/day 48-MH PM allowance. This page does not automatically update the customer quote, change the 10.2 base total, or post provisional Working Cost as verified Direct Cost.</p>
+  <p className="p55-note"><strong>NEW B1 COST OWNER:</strong> B1 Working SELL is <strong>{money(model.baseWorkingSellTHB)}</strong> from current THB role-based labor + explicit project expense allowances only. Historical 27 Engineering WBS prices and the previous USD600 PM proxy are <strong>EXCLUDED, not added or used for calibration</strong>. Actual Payroll/Invoices still unverified, customer bid release blocked. Technical engineering tasks requiring separate ADDVALUE design rather than B2 VDRL or OEM included work are held in the Engineering Scope Review below, with zero legacy price carryforward.</p>
   <p className="p55-note"><strong>Rate assumptions:</strong> Thai office-role salary scenarios: 22 days × 8 hours/month; employer burden 20%, no additional general overhead in this loaded rate; labour Working SELL = labour planning cost / 0.80 (20% target gross margin). Non-labour Working SELL = documented planning expense × 1.10. All salary, trip, regulatory and spending quantities are PRE-AWARD estimates requiring ADDVALUE internal verification.</p>
   <button type="button" className="p553-detail-button" onClick={()=>setShowRates(v=>!v)}>{showRates?"− Hide":"＋ Show"} Seven Role Cost Rates — THB, not USD600</button>
   {showRates&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Role / Resource</th><th>Allocated B1 Account</th><th>Monthly Salary Assumption</th><th>Loaded Working Cost / MH</th><th>Basis / Status</th></tr></thead>
@@ -57,6 +57,12 @@ export function B1RevKMilestoneBudget0553(){
     <td>{k.rows.length?money(k.workingSellTHB):"Not additive"}</td><td>{k.executionCostOwner}</td>
    </tr>)}</tbody>
   </table></div>}
+  <h4>B1 Technical Engineering Ownership Review — 27 old activity TITLES, no legacy price</h4>
+  <p className="p55-note">Technical engineering must remain priced in B1 only when ADDVALUE has a distinct requirement/deliverable that is not included in MGW OEM Part A, B2 VDRL or B3 test execution. Activities below are source titles used for screening, with historic quantities, rates and sell removed. No automatic amount is carried to B1.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>Ref / MR</th><th>Engineering Activity</th><th>Provisional Owner / Decision</th><th>Working Sell</th></tr></thead>
+   <tbody>{model.engineeringScopeReview.map(x=><tr key={x.id}><td>{x.id}<small>{x.group}</small></td><td>{x.activity}</td><td>{x.proposedOwner}<small>{x.status} · RACI / MGW included / B2 documentation verification required</small></td><td>NOT PRICED — no old WBS price</td></tr>)}</tbody>
+  </table></div>
   <p className="p55-note"><strong>Risk gates:</strong> B1.2 expenses require lawful hospitality evidence; B1.3 uses management-only Trip IDs; B1.6 consultant requires written lawful scope and due diligence; B1.7 official fees require published authority rates/receipts and confirmed ADDVALUE liability. Conditional THB {model.conditionalWorkingCostTHB.toLocaleString("en-US")} Working Cost and {money(model.conditionalWorkingSellTHB)} Working Sell remain separate from Base. No facilitation payments, unofficial commissions or unsupported expense reimbursements.</p>
  </section>;
 }
