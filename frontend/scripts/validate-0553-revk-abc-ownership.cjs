@@ -12,24 +12,30 @@ const source=[
  b1Activities,
  ...["onshoreWorkingRate0553.js","b1RevKMilestoneCoverage0553.js","b3RequirementWbsTrace0553.js",
  "fatWbsFourMr0553.js","b1ActivityWorkingSell0553.js","b3FortyDayWorkingSell0553.js",
- "b9ChinaWorkingBudget0553.js","revKAbcOwnershipControl0553.js"].map(file)
+ "b9ChinaWorkingBudget0553.js","b1ProjectSupportBudget0553.js","revKAbcOwnershipControl0553.js"].map(file)
 ].join("\n");
 const working={
  byCode:{
-  B1:{workingSellTHB:624030.26},
+  B1:{workingSellTHB:211600},
   B3:{workingSellTHB:2443400},
   B9:{workingSellTHB:0,qtyDriver:1,unit:"LS (Yard Specialist optional only; Base zero)"}
- },knownWorkingSellTHB:4600020.95
+ },knownWorkingSellTHB:4187590.69
 };
 const m=vm.runInNewContext(source+"\nselectRevKAbcOwnershipControl0553(working);",{working},{timeout:3000});
-assert.equal(m.partBBaseTHB,4600020.95);
-assert.equal(m.currentB1B3B9BaseTHB,3067430.26);
-assert.equal(m.b1EngineeringSellTHB,510630.26);
-assert.equal(m.b1OfficePmIncludedTHB,113400);
-assert.equal(m.b1PmProxyTHB,113400);
+assert.equal(m.partBBaseTHB,4187590.69);
+assert.equal(m.currentB1B3B9BaseTHB,2655000);
+assert.equal(m.b1EngineeringSellTHB,0);
+assert.equal(m.b1OfficePmIncludedTHB,100500);
+assert.equal(m.b1PmProxyTHB,0);
 assert.equal(m.b1Engineering.length,27);
-assert.equal(m.pmEvents.length,12);
-assert.equal(m.pmEvents.filter(x=>x.quantity>0).length,11);
+assert.equal(m.pmEvents.length,41);
+assert.equal(m.pmEvents.filter(x=>x.quantity>0).length,41);
+assert.equal(m.supportExpenses.length,9);
+assert.equal(m.b1SupportSellTHB,211600);
+assert.equal(m.b1SupportCostTHB,181400);
+assert.equal(m.b1ConditionalSellTHB,51700);
+assert.equal(m.b1LegacyEngineeringCarriedTHB,0);
+assert(m.b1Engineering.every(x=>x.modeledSellTHB===null&&x.posting.startsWith("NON_POSTING")));
 assert.equal(m.tracedObligations,19);
 assert.equal(m.b3LaborSellTHB,2016000);
 assert.equal(m.b3ToolSellTHB,30000);
@@ -52,4 +58,4 @@ assert.equal(m.postingAllowed,false);
 assert.equal(m.customerReleaseAllowed,false);
 assert.equal(new Set(m.rows.map(x=>x.id)).size,m.rows.length);
 assert.equal(new Set(m.rows.filter(x=>x.chargeKey!==null).map(x=>x.chargeKey)).size,m.rows.filter(x=>x.chargeKey!==null).length);
-console.log("PASS Rev.K ABC: B1 THB624030.26; B3 THB2443400 including FAT6d THB397400; B9 Base THB0; Yard 7d optional THB233600; B BASE THB4600020.95, zero duplicate posting.");
+console.log("PASS Rev.K ABC: new B1 role-based THB211600, old engineering carryforward 0; B3 THB2443400 FAT6d THB397400; B9 Base 0 Yard optional 233600; Part B Base 4187590.69; single cost owner.");
