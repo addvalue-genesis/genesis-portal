@@ -5,7 +5,7 @@ import {selectB1ProjectSupportBudget0553} from "./data/b1ProjectSupportBudget055
 const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT VERIFIED";
 const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US"):"TBC";
 
-// B1 Rev.K is an INTERNAL role-based planning estimate, not a renaming of the
+// B1 Rev.K is the current INTERNAL role-based B1 pricing basis; never rename the
 // customer's Engineering and Design B1 1-Lot item and not a second sell posting.
 export function B1RevKMilestoneBudget0553(){
  const model=selectB1ProjectSupportBudget0553();
@@ -44,7 +44,7 @@ export function B1RevKMilestoneBudget0553(){
      <tbody>{group.rows.map(x=><tr key={x.id}><td><strong>{x.id}</strong><small>{x.wbs}</small></td><td>{x.activity}<small>{x.conditional?"CONDITIONAL — EXCLUDED FROM BASE":"BASE PLANNING"}</small></td><td>{qty(x.qty)} {x.unit}</td><td>{money(x.unitCostTHB)}</td><td>{money(x.workingCostTHB)}</td><td>{money(x.workingSellTHB)}</td><td>{x.verification}<small>Actual Direct Cost: NOT VERIFIED</small></td></tr>)}</tbody>
     </table></div></td></tr>}
    </React.Fragment>)}
-   <tr><td colSpan={2}><strong>B1 INTERNAL BASE SUPPORT ESTIMATE</strong></td><td className="is-number"><strong>{money(totalBase)}</strong></td><td className="is-number"><strong>{money(model.baseWorkingSellTHB)}</strong></td><td className="is-number"><strong>{money(model.conditionalWorkingSellTHB)}</strong></td><td>Not posted to 10.2 canonical yet</td></tr>
+   <tr><td colSpan={2}><strong>B1 INTERNAL BASE SUPPORT ESTIMATE</strong></td><td className="is-number"><strong>{money(totalBase)}</strong></td><td className="is-number"><strong>{money(model.baseWorkingSellTHB)}</strong></td><td className="is-number"><strong>{money(model.conditionalWorkingSellTHB)}</strong></td><td>Current 10.2 canonical B1 only; no additional posting</td></tr>
   </tbody></table></div>
   <button type="button" className="p553-detail-button" onClick={()=>setShowMilestones(v=>!v)}>{showMilestones?"− Hide":"＋ Show"} Rev.K K00–K18 Role-Based Milestone Allocation</button>
   {showMilestones&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1100,width:"100%"}}>
