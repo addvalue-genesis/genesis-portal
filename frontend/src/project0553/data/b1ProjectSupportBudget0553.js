@@ -1,12 +1,14 @@
 // PJ2608-0553 / B1.1–B1.8: internal project support, management and residual expense PLANNING ledger.
 // Customer's original B1 label remains "Engineering and design" (1 Lot).
-// This is a separately reviewable B1 Working Cost / Working Sell SCENARIO,
-// not verified direct cost or an additional post to the canonical 10.2 total.
+// Current B1 is derived only from NEW multi-role project-support activities.
+// Legacy engineering 964 MH and all legacy historical prices are EXCLUDED from B1 price.
+// Independent technical engineering remains scope review only until ADDVALUE vs OEM/B2 verified.
 // Role/month rates are THB 2026 Thailand indicative salary assumptions,
 // not ADDVALUE payroll. 22 workdays x 8h, 20% employer-cost loading;
 // 20% target gross margin on labor; 10% handling uplift on non-labor.
 // K groups are unique events (K03-07 and K08-11 shared); physical B2/B3/B5/B6/B9 excluded.
 import {selectB1RevKMilestoneCoverage0553} from "./b1RevKMilestoneCoverage0553";
+import {B1_WBS_ACTIVITIES} from "./bcWorkCostLines0553";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const load=1.20,workingHoursPerMonth=176,laborSellDivider=0.80,expenseSellFactor=1.10;
 export const B1_SUPPORT_ROLE_RATES_0553=Object.freeze({
@@ -89,6 +91,21 @@ export function selectB1ProjectSupportBudget0553(){
   workingSellTHB:round(x.qty*x.unitCostTHB*expenseSellFactor),
   directCostTHB:null,workingCostClass:"PLANNING_PROJECT_EXPENSE_NOT_VERIFIED",
   verification:x.gate}));
+ const engineeringScopeReview=Object.freeze(B1_WBS_ACTIVITIES.map(([group,activity],i)=>{
+  const id="B1-ENG-REVIEW-"+String(i+1).padStart(2,"0");
+  // No historical engineering MH, proxy costs or sell values are ever used here.
+  const lower=activity.toLowerCase();
+  const isTest=lower.includes("test technical content");
+  const isVdrl=lower.includes("ga /")||lower.includes("ifc /")||lower.includes("internal check / revision");
+  const status=isTest?"B3_ITP_TEST_PREPARATION_NOT_B1":
+   isVdrl?"B2_VDRL_OR_OEM_DRAWING_HOLD":
+   "B1_TECHNICAL_ENGINEERING_SCOPE_REVIEW_PENDING_ADDVALUE_RACI";
+  return Object.freeze({id,group,activity,source:"Rev05 engineering activity TITLE only / MR/BOD/DTS review",
+   proposedOwner:isTest?"B3":isVdrl?"B2_OR_A_OEM":"B1_CANDIDATE",
+   status,ownerVerified:false,nonDuplicateApproval:false,
+   quantityMH:null,workingCostTHB:null,workingSellTHB:null,directCostTHB:null,
+   postingAllowed:false,gate:"Compare deliverable, TAG, MGW Part A inclusion and B2 VDRL + B3 test ownership before fresh B1 rate/MH pricing"});
+ }));
  const lines=Object.freeze([...roleLines,...expenseLines]);
  const labourHours=roleLines.reduce((n,x)=>n+x.qty,0);
  const labourWorkingCostTHB=round(roleLines.reduce((n,x)=>n+x.monthlySalaryTHB*load/workingHoursPerMonth*x.qty,0));
@@ -121,7 +138,7 @@ export function selectB1ProjectSupportBudget0553(){
   moduleId:"bid.budget.working.bc.b1.revk-pm-milestones",
   costOwner:"B1",category:"INTERNAL_RESIDUAL_PROJECT_SUPPORT_NOT_CUSTOMER_SCOPE_RENAME",
   customerB1Description:"Engineering and design / 1 Lot — ORIGINAL CUSTOMER SCOPE UNCHANGED",
-  pricingStatus:"MANAGEMENT_REQUESTED_INITIAL_ESTIMATE__CFO_REVIEW_BEFORE_CANONICAL_B1_REPLACEMENT",
+  pricingStatus:"MANAGEMENT_REQUESTED_ROLE_BASED_WORKING_BUDGET__CANONICAL_B1_NO_LEGACY_PRICE",
   accounts:byAccount,milestones,lines,roleLines,expenseLines,roleRates:B1_SUPPORT_ROLE_RATES_0553,
   uniqueKChargeEvents:12,coveredMilestones:19,labourHours,
   employerLoadFactor:load,workHoursPerMonth:workingHoursPerMonth,
@@ -129,10 +146,12 @@ export function selectB1ProjectSupportBudget0553(){
   labourWorkingCostTHB,labourWorkingSellTHB,baseExpenseWorkingCostTHB,
   baseExpenseWorkingSellTHB,baseWorkingCostTHB,baseWorkingSellTHB,
   conditionalWorkingCostTHB,conditionalWorkingSellTHB,
-  engineeringBaselineWorkingSellTHB:510630.26,
-  proposedB1BaseWorkingSellTHB:round(510630.26+baseWorkingSellTHB),
-  previousCanonicalB1WorkingSellTHB:624030.26,
-  budgetaryVsCanonicalDeltaTHB:round(510630.26+baseWorkingSellTHB-624030.26),
+  engineeringScopeReview,retainedEngineeringPriceTHB:null,
+  proposedB1BaseWorkingSellTHB:baseWorkingSellTHB,
+  canonicalB1WorkingSellTHB:baseWorkingSellTHB,
+  canonicalPriceSource:"NEW_2026_ROLE_ACTIVITY_RESOURCE_COST_ONLY",
+  historicalEngineeringCarryForwardTHB:0,
+  historicalPmCarryForwardTHB:0,
   actualDirectCostTHB:null,customerReleasedSellTHB:null,postingAllowed:false,
   policy:"No USD600 office-admin rate; support is role-based THB; no double posting with existing A/B2–B14; conditional legal/permit fees excluded from base; no unverified cost becomes Actual Direct Cost",
   evidence:"Rev.K K00–K18; MGW/JUTAL/ZPQ/ZWP SAT coordination; Thailand 2026 salary benchmarks; management provisional trip/transaction allowances"
