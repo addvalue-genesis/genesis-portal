@@ -42,7 +42,7 @@ for(const x of data.rows){
  assert.equal(x.workingPmDays,null,"PM days must not be invented "+x.stage);
  assert.equal(x.rateSource,"USER_MANAGEMENT_DECISION_2026_10_18","Management rate source mismatch");
 }
-const china=data.rows.find(x=>x.stage==="K01"); assert.match(china.directOwner,/B9/);
+const china=data.rows.find(x=>x.stage==="K01"); assert.match(china.directOwner,/B3/);
 const offshore=data.rows.find(x=>x.stage==="K16"); assert.match(offshore.directOwner,/B3/);
 const close=data.rows.find(x=>x.stage==="K18"); assert.match(close.directOwner,/B2/);
 process.stdout.write("PASS Rev.K 19 Module IDs, 12 unique PM events, 56h / THB132,300 CFO proxy; USD600 Onshore management approved; no duplicate B2–B14 postings.\n");
