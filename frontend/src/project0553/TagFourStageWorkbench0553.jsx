@@ -18,6 +18,12 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,fx=null,childre
   <p className="p55-note"><strong>วิธีอ่าน:</strong> 1 Required = เราต้องใช้อะไร / 2 Working = เราคิดต้นทุนอะไร / 3 Vendor = ผู้ขายเสนออะไร / 4 Verify = พิสูจน์ว่าสอดคล้องข้อกำหนดหรือไม่. ทุกขั้นตอนอ่านจาก Data/Cost Ledger เดิม และไม่มีการอนุมัติสินค้าอัตโนมัติ</p>
   <ControlledModuleSection0553 moduleKey={id+".required-bom"} title="01 · Required Engineering BOM — สิ่งที่ Engineering ต้องการ" defaultOpen>
    <p className="p55-note"><strong>Requirement source:</strong> MR0001 MTO Rev04 → MR0001 Engineering Required BOM → Functional Package Composition. {m.site} / {m.tag} / source row {m.row} = {m.scopeQty??"REVIEW"} {m.scopeUnit||"Set/Lot"} · {m.packageFamily}. Physical SKU Qty is NOT equal to 1 MTO Set automatically.</p>
+   {m.ciscoTc0001&&<p className="p55-note" data-component-key={id+".required-bom.tc0001"}>
+    <strong>TC-0001 Item 13 — Revised 8-Port Required BOM:</strong> IE-3400-8P2S-E (8 RJ45 PoE + 2 built-in SFP slots), PWR-IE65W-PC-DC, main-switch SmartNet and DNA Essentials licence.
+    IEM-3300-8T= and CON-SNT-IEM3308T are excluded from the working package.
+    <strong> Site working unit reference: {sourcePrice("THB",m.ciscoTc0001.unitWorkingTHB)}.</strong>
+    <small>{m.ciscoTc0001.engineeringGate} · Port assignment, PoE load/PSU rating and Layer 3 licence still require Engineering verification. No approved SKU quantity or customer sell release.</small>
+   </p>}
    <p className="p55-note"><strong>Source identity:</strong> {m.sourceId||"MTO TAG not uniquely mapped"} · {m.sourceMatched?"Source TAG cross-reference found":"Source TAG identity needs review"}. <strong>Accepted Physical SKU BOM:</strong> {m.physicalSkuApproved?"PARTIAL / VERIFY PER FUNCTION":"NOT YET ENGINEERING APPROVED"}.</p>
    {m.bartecBulkRequired&&<div className="p55-panel" data-component-key={id+".required-bom.bartec-quantity"}>
     <p className="p55-note"><strong>BARTEC SCADA Enclosure — verified manufacturer GA quantities for this working design:</strong> 12 M20 top holes + 2 left + 2 right = <strong>{m.bartecBulkRequired.holeCount} M20 cable-entry holes</strong>. Initially supplied: <strong>{m.bartecBulkRequired.initialFactoryPlugs} M20 stopping plugs</strong> and 16 locknuts; one drain valve uses a separate hole. These components are within the BARTEC TCAB factory assembly, NOT 16 separately required cable glands.</p>
@@ -54,20 +60,23 @@ export function TagFourStageWorkbench0553({site,tagRow,moduleKey,fx=null,childre
   </ControlledModuleSection0553>
 
   <ControlledModuleSection0553 moduleKey={id+".vendor-comparison"} title="03 · Vendor Offer Comparison — หลักฐานที่ผู้ขายเสนอ">
-   <p className="p55-note"><strong>07 Vendor is the original quotation source.</strong> This is a read-only owner-scoped comparison, NOT a supplier-driven Required BOM. Supplier offered quantity is quote-wide, not purchased ZWP20 quantity. <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.supplier" componentName="Vendor source and supplier quotation registry"/></p>
+   <p className="p55-note"><strong>07 Vendor is the original quotation source.</strong> This read-only owner-scoped comparison is not a supplier-driven Required BOM. Vendor offered quantity is quote-wide; TAG working quantity is separately allocated. <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.vendor.products.supplier" componentName="Vendor source and supplier quotation registry"/></p>
+   {m.ciscoTc0001&&<p className="p55-note"><strong>Cisco VST A-0048/2026 Rev.1:</strong> original 11 quoted lines remain visible. The 9 retained quote codes feed the revised 8-port working TAG; expansion module and module SmartNet are audit-only (not charged). Quotation remains expired; engineering release is pending.</p>}
    <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
     <thead><tr><th>Supplier Quote Line</th><th>Original Supplier SKU</th><th>Vendor Quoted Qty</th><th>Original Unit / Extended</th><th>TAG Working Qty / Amount</th><th>Difference / Technical Gate</th></tr></thead><tbody>
     {m.offered.map(r=><tr key={r.code}><td><strong>{r.code}</strong><small>{r.quotation||r.quoteId}</small>
       <ComponentCopyId projectId="PJ2608-0553" componentKey={id+".vendor-comparison."+r.code.toLowerCase()} componentName={r.code+" supplier comparison"}/></td>
      <td>{r.sku||"NOT FOUND"}<small>{r.description}</small></td><td>{r.offeredQty??"NOT QUOTED"}</td>
      <td>{sourcePrice(r.currency,r.quotedUnit)}<small>Original quote extension: {sourcePrice(r.currency,r.quotedTotal)}</small></td>
-     <td>{r.workingQty??"NOT DERIVED"}<small>{sourcePrice(r.currency,r.workingExtended)}</small></td>
+     <td>{r.sourceStatus?.startsWith("TC0001_EXCLUDED")?"EXCLUDED":r.workingQty??"NOT DERIVED"}<small>{r.sourceStatus?.startsWith("TC0001_EXCLUDED")?"NOT INCLUDED IN WORKING COST":sourcePrice(r.currency,r.workingExtended)}</small></td>
      <td>{r.sourceRateNull?"Vendor rate NULL; management zero incremental assumption is NOT a sourced vendor price":r.sourceStatus}<small>{r.costOwner}</small></td>
     </tr>)}
     {m.offered.length===0&&<tr><td colSpan={6}>{m.otherSupplierEvidence?"Current TAG has supplier/candidate evidence, but no uniquely matching Next G source row. Inspect the source reference below; do not equate the TAG total to a full supplier quotation.":"No uniquely mapped quoted vendor line for this TAG."}</td></tr>}
     </tbody></table></div>
    {m.otherSupplierEvidence&&<p className="p55-note">Existing ledger reference (not a second quotation): {m.working.selectedVendor||"Vendor pending"} · {m.working.selectedSku||"SKU pending"} · {m.working.source||"Source not indexed"}.</p>}
-   <p className="p55-note">Full Next G quotation may contain other lines owned by IDU, surge, antenna, spares, or another site. Those must stay under their own Cost Owner or the 07 Vendor master. No quotation-wide amounts are added to this TAG.</p>
+   <p className="p55-note">{m.ciscoTc0001
+    ?"Original VST quote is evidence only. Cisco TAG working amount comes from the shared 8-port MTO ledger; the excluded expansion codes are non-additive and no quoted quantity is multiplied into each site twice."
+    :"Full Next G quotation may contain other lines owned by IDU, surge, antenna, spares, or another site. Those must stay under their own Cost Owner or the 07 Vendor master. No quotation-wide amounts are added to this TAG."}</p>
   </ControlledModuleSection0553>
 
   <ControlledModuleSection0553 moduleKey={id+".engineering-verification"} title="04 · Engineering Verification — RFQ / CAL-RPT / Scope / Audit">
