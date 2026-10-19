@@ -1,0 +1,168 @@
+{
+  "projectId": "PJ2608-0553",
+  "baselineId": "0553-INTERNAL-BUDGETARY-COST-BASELINE-R03",
+  "baselineRevision": "Rev03",
+  "baselineDate": "2026-10-19",
+  "baselineStatus": "MANAGEMENT_AUTHORIZED_INTERNAL_WORKING_REVISION__TECHNICAL_RELEASE_PENDING",
+  "approvalAuthority": "PROJECT_MANAGEMENT_USER",
+  "approvalEvidence": "2026-10-19 project chat: approved opening PJ2608-0553 Cost Baseline Rev03 for TC-0001 Item 13",
+  "approvalScope": "FIVE_SITE_CISCO_EIGHT_PORT_INTERNAL_WORKING_COST_DELTA_ONLY",
+  "changeId": "REV03-TC0001-ITEM13",
+  "changeRegister": "docs/handoff/pj2608-0553/40_COST_BASELINE_REV03_TC0001_CHANGE_REGISTER_20261019.md",
+  "immutableManifestReferences": {
+    "Rev01": {
+      "path": "docs/handoff/pj2608-0553/20_APPROVED_ARCHITECTURE_BASELINE_MANIFEST_REV01.json",
+      "gitBlobSha": "7b7516b446c4a4b9545e406b63177145eb664247"
+    },
+    "Rev02": {
+      "path": "docs/handoff/pj2608-0553/32_APPROVED_COST_BASELINE_MANIFEST_REV02.json",
+      "gitBlobSha": "3d3606f47948c938c28af94d9219b7c3b24fd678"
+    }
+  },
+  "immutableRev02ProtectedFiles": [
+    {
+      "path": "frontend/src/project0553/data/mr0001TagCostLedger0553.js",
+      "gitBlobSha": "65e3a690e8bc04a4cf6b812f0fe07703972ff483"
+    },
+    {
+      "path": "frontend/src/project0553/data/engineeringOwnedCost0553.js",
+      "gitBlobSha": "f29b8d3705fd8bee0d72ddeb1349b80d9b28d760"
+    },
+    {
+      "path": "frontend/src/project0553/data/zwp20SiteCost0553.js",
+      "gitBlobSha": "75efeff5b5b85665be5aab6088b7cf806fa8085a"
+    }
+  ],
+  "newControlledCostFiles": [
+    {
+      "path": "frontend/src/project0553/data/mr0001Rev03CostOverlay0553.js",
+      "gitBlobSha": "bbb382451f24b28f0eb5e55db2ddef02d0876c2f",
+      "type": "READ_ONLY_COST_OVERLAY"
+    },
+    {
+      "path": "frontend/src/project0553/data/mr0001WorkingPricedBom.js",
+      "gitBlobSha": "83aace6f7d7de98d29ac63d510978ffb729303be",
+      "type": "PROVISIONAL_VENDOR_QUOTE_COMPOSITION"
+    }
+  ],
+  "consumerBindEvidence": [
+    {
+      "path": "frontend/src/project0553/data/workingBomAggregation0553.js",
+      "gitBlobSha": "d17843189269f364a0420f857789d28bd1357e3b"
+    },
+    {
+      "path": "frontend/src/project0553/data/mr0001LocationCostSummary0553.js",
+      "gitBlobSha": "345e2c9356a18c1bbab02bac3c42ba7a73ae1877"
+    },
+    {
+      "path": "frontend/src/project0553/LocationBomDetail0553.jsx",
+      "gitBlobSha": "0f2d0a90af21fcde00898f71bd081eaade0c3589"
+    },
+    {
+      "path": "frontend/src/project0553/data/zwp8CostOwnershipAudit0553.js",
+      "gitBlobSha": "9125f1f68d36c0f8b0d492d07bc78ce7790c3595"
+    }
+  ],
+  "authorizedSource": {
+    "tc": "MM-ZTK-1F-GEN-TEL-TC-0001_SAMTEL_20261014.xlsx",
+    "item": "13",
+    "description": "Layer 3 switch revised to eight ports as Trunk Radio design changes",
+    "vendorQuote": "VST A-0048/2026_Re1",
+    "supplierQuoteStatus": "EXPIRED_REFERENCE_ONLY",
+    "retainedBase": "IE-3400-8P2S-E",
+    "retainedInterfaces": {
+      "poeRJ45": 8,
+      "sfp": 2
+    },
+    "excluded": [
+      {
+        "code": "2.0",
+        "sku": "IEM-3300-8T=",
+        "unitTHB": 45630
+      },
+      {
+        "code": "2.0.1",
+        "sku": "CON-SNT-IEM3308T",
+        "unitTHB": 6320
+      }
+    ]
+  },
+  "controlledLocations": [
+    {
+      "site": "ZWP20",
+      "tag": "LAN-502-001",
+      "sourceRow": 7,
+      "sourceQty": 1
+    },
+    {
+      "site": "ZWP21",
+      "tag": "LAN-502-001",
+      "sourceRow": 16,
+      "sourceQty": 1
+    },
+    {
+      "site": "ZWP22",
+      "tag": "LAN-502-001",
+      "sourceRow": 25,
+      "sourceQty": 1
+    },
+    {
+      "site": "ZWP23",
+      "tag": "LAN-502-001",
+      "sourceRow": 32,
+      "sourceQty": 1
+    },
+    {
+      "site": "ZWP8",
+      "tag": "LAN-502-002",
+      "sourceRow": 44,
+      "sourceQty": 1
+    }
+  ],
+  "controlledWorkingReference": {
+    "currency": "THB",
+    "planningFxTHBPerUSD": 31.5,
+    "fxType": "INTERNAL_PLANNING_NOT_BOT",
+    "rev02SevenLocationsTHB": 6100453.15,
+    "rev03SevenLocationsTHB": 5840703.15,
+    "rev02ZWP20THB": 921425.22,
+    "rev03ZWP20THB": 869475.22,
+    "rev02ZWP8THB": 1387388.58,
+    "rev03ZWP8THB": 1335438.58,
+    "originalVstCiscoFiveSiteTHB": 2117650,
+    "rev03CiscoFiveSiteTHB": 1857900,
+    "priceReductionPerSiteTHB": 51950,
+    "totalExcludedTHB": 259750,
+    "a5AlreadyIncludedBulkMemoTHB": 260232,
+    "a5NonAdditive": true
+  },
+  "requiredRegressionScripts": [
+    "validate:0553-approved-baseline",
+    "validate:0553-rev03-approved-baseline",
+    "validate:0553-rev03-cost-reconciliation",
+    "validate:0553-tc0001-8port",
+    "validate:0553-dato-selected-cost",
+    "validate:0553-zwp8-cost-ownership",
+    "validate:0553-a5-bulk-attribution"
+  ],
+  "pendingEngineeringProof": [
+    "site_specific_RJ45_and_SFP_Port_Allocation",
+    "PoE_load_and_65W_PSU_headroom",
+    "Layer3_Cisco_license_entitlement",
+    "current_vendor_MGW_supplier_quotation",
+    "Ex_and_hazardous_area_installation"
+  ],
+  "changeApprovalRules": {
+    "noAutomaticManifestRegeneration": true,
+    "rev02MustRemainImmutable": true,
+    "rev03SourceFilesPinned": true,
+    "noChangeToCustomerWorkingSell": true,
+    "noEngineeringAcceptanceWithoutEvidence": true,
+    "noQuoteRelease": true,
+    "noActualDirectCostVerification": true
+  },
+  "technicalApproval": false,
+  "actualDirectCostVerified": false,
+  "customerPriceApproved": false,
+  "releaseAllowed": false
+}
