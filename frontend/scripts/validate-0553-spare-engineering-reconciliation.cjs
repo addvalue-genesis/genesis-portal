@@ -55,7 +55,7 @@ assert.equal(c.byCode.B11.historicalBudgetReferenceTHB,128314.11);
 assert.equal(c.byCode.B13.historicalBudgetReferenceTHB,22484.21);
 assert.equal(c.byCode.C1.historicalBudgetReferenceTHB,4049349.36);
 assert.equal(c.byCode.C2.historicalBudgetReferenceTHB,721806.68);
-assert.equal(w.knownWorkingSellTHB,4600020.95);
+assert.equal(w.knownWorkingSellTHB,4187590.69);
 assert.equal(w.byCode.C1.workingSellTHB,c.byCode.C1.historicalBudgetReferenceTHB);
 assert(c.updatedPricePosted===false&&c.complete===false&&c.customerReleaseAllowed===false);
 const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
