@@ -74,10 +74,26 @@ for(const site of sites){
    assert(m.ownerEvidence.notes.every(s=>!s.includes("TECHNICAL_APPROVED")));
   }
   if(expected==="BULK"){
-   for(const fn of ["SCADA_CAT6A_WORKING_ALLOWANCE","SCADA_M20_GLAND_WORKING_ALLOWANCE"])
-    assert(m.required.some(r=>r.functionId===fn),site+"/"+key+" "+fn);
-   assert(m.ownerEvidence.notes.some(s=>s.includes("not as-built")||s.includes("not dimensioned")||s.includes("not as-built"))||
-    m.ownerEvidence.notes.some(s=>s.includes("not measured")),site+"/"+key+" bulk scope must be qualified");
+   // Quantity limitations belong to the functional Qty Driver / Proof, not
+   // necessarily to the supplemental summary notes. Verify the actual
+   // engineering evidence contract rather than fragile English note wording.
+   const cable=m.required.find(r=>r.functionId==="SCADA_CAT6A_WORKING_ALLOWANCE");
+   const gland=m.required.find(r=>r.functionId==="SCADA_M20_GLAND_WORKING_ALLOWANCE");
+   assert(cable&&gland,site+"/"+key+" CAT6A and M20 functions both required");
+   assert(/not as-built|not measured|not dimensioned/i.test(
+    [cable.quantityDriver,cable.qtyProof,cable.quantityEvidence,...m.ownerEvidence.notes].filter(Boolean).join(" ")),
+    site+"/"+key+" CAT6A physical route must remain an unmeasured engineering allowance");
+   assert(/not as-built|OD|Ex|pending|certif/i.test(
+    [gland.quantityDriver,gland.qtyProof,gland.requirementState,...m.ownerEvidence.notes].filter(Boolean).join(" ")),
+    site+"/"+key+" actual gland count/cable OD and Ex suitability must remain open");
+   for(const r of [cable,gland]){
+    assert.equal(r.approvedSkuQty,null,site+"/"+key+" unapproved bulk physical SKU quantity");
+    assert.equal(r.budgetPosting,"EXISTING_BULK_TAG_ROW_ONLY__NOT_ADDITIVE",
+     site+"/"+key+" budget function must not post a second cost");
+    assert.equal(r.costOwner,m.owner,site+"/"+key+" bulk component has wrong TAG cost owner");
+   }
+   assert(m.ownerEvidence.notes.some(x=>/pending takeoff|component breakdown partial|not measured/i.test(x)),
+    site+"/"+key+" missing explicit unresolved bulk quantity/coverage qualification");
   }
   if(expected==="ENCLOSURE"){
    assert(m.required.some(r=>r.functionId==="SCADA_EXE_ENCLOSURE_ASSEMBLY"||
