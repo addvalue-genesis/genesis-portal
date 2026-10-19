@@ -3,7 +3,7 @@
 // A visible child never implies a separately purchasable SKU or an approved OEM quantity.
 import React,{useState} from "react";
 import {WORKING_BOM_BY_LOCATION_0553} from "./data/workingBomByLocation";
-import {selectMR0001TagCostRows0553} from "./data/mr0001TagCostLedger0553";
+import {selectMR0001Rev03TagCostRows0553 as selectMR0001TagCostRows0553} from "./data/mr0001Rev03CostOverlay0553";
 import {ZWP20_BULK_SCOPE_AUDIT_0553} from "./data/zwp20BulkScopeAudit0553";
 import {MR0001_FUNCTIONS_0553} from "./data/mr0001EightFunctionCoverage0553";
 import {deriveScadaBulkVerification0553} from "./data/scadaBulkQuantityVerification0553";
