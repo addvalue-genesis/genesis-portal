@@ -10,7 +10,7 @@ require.extensions[".js"]=(mod,file)=>{
 };
 const project=p=>require(path.join(root,"project0553",p));
 const {getTagBomFourStage0553:getView}=project("data/tagBomFourStageReadModel0553.js");
-const {selectMR0001TagCostRows0553:getRows}=project("data/mr0001TagCostLedger0553.js");
+const {selectMR0001Rev03TagCostRows0553:getRows}=project("data/mr0001Rev03CostOverlay0553.js");
 const {MR0001_WORKING_PRICED_BOM:source}=project("data/mr0001WorkingPricedBom.js");
 const {selectWorkingBomProjection0553:projectCost}=project("data/workingBomAggregation0553.js");
 const req=["NETWORK_SWITCH","NETWORK_LICENCE","DC_POWER","SFP_INTERFACE","CONFIGURATION","NETWORK_SUPPORT"];
