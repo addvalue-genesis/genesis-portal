@@ -1,7 +1,7 @@
 // PJ2608-0553 — ZWP8 source-backed, read-only O&G cost-ownership audit.
 // NEVER mutates the frozen MR0001 ledger, vendor quotation, management scenario,
 // Brownfield NEW/REUSE selection, or approval/release flags.
-import {summarizeMR0001TagCost0553} from "./mr0001TagCostLedger0553";
+import {summarizeMR0001Rev03TagCost0553 as summarizeMR0001TagCost0553} from "./mr0001Rev03CostOverlay0553";
 import {ZWP8_ROW43_COST_TRACE} from "./zwp8Row43CostTrace";
 import {SCADA_LINKS_0553} from "./scadaLinkEvidence";
 import {MR0001_SITE_CLASSIFICATION} from "./mr0001SiteClassification";
