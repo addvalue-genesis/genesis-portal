@@ -101,7 +101,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   const costEvidence=evidence.byCode[code];
   const b6BudgetarySellTHB=code==="B6"?costEvidence?.reconciliation?.historicalRev08TransportSellTHB:null;
   const b9ChinaSellTHB=code==="B9"?chinaB9.b9BaseWorkingSellTHB:null;
-  const b1CurrentSellTHB=code==="B1"?b1Current.workingSellTHB:null;
+  const b1CurrentSellTHB=code==="B1"?b1Current.baseWorkingSellTHB:null;
   const b3CurrentSellTHB=code==="B3"?round(b3Current.workingSellTHB+chinaB9.fatWorkingSellTHB):null;
   const b5ApprovedSellTHB=code==="B5"?b5PriceReference.amountTHB:null;
   const b7ReserveSellTHB=code==="B7"?b7WorkingSellTHB:null;
@@ -197,7 +197,7 @@ export function selectBcTurnkeyWorkingCost0553(){
  const byCodeOutput=Object.fromEntries(rows.map(r=>[r.code,r]));
  const knownWorkingSellTHB=round(rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
   .reduce((sum,r)=>sum+r.workingSellTHB,0));
- if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB +(b1Current.workingSellTHB-wbs.rows.find(r=>r.code==="B1").sellTHB)+(b3Current.workingSellTHB+chinaB9.fatWorkingSellTHB-wbs.rows.find(r=>r.code==="B3").sellTHB)+(chinaB9.b9BaseWorkingSellTHB-wbs.rows.find(r=>r.code==="B9").sellTHB) +rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB+rows.find(r=>r.code==="B10").workingSellTHB+rows.find(r=>r.code==="B11").workingSellTHB+rows.find(r=>r.code==="B13").workingSellTHB+rows.find(r=>r.code==="B7").workingSellTHB))>0.01)
+ if(Math.abs(knownWorkingSellTHB-(wbs.subtotalTHB +(b1Current.baseWorkingSellTHB-wbs.rows.find(r=>r.code==="B1").sellTHB)+(b3Current.workingSellTHB+chinaB9.fatWorkingSellTHB-wbs.rows.find(r=>r.code==="B3").sellTHB)+(chinaB9.b9BaseWorkingSellTHB-wbs.rows.find(r=>r.code==="B9").sellTHB) +rows.find(r=>r.code==="B6").workingSellTHB+rows.find(r=>r.code==="B5").workingSellTHB+rows.find(r=>r.code==="B10").workingSellTHB+rows.find(r=>r.code==="B11").workingSellTHB+rows.find(r=>r.code==="B13").workingSellTHB+rows.find(r=>r.code==="B7").workingSellTHB))>0.01)
   throw Error("B WBS working sell reference reconciliation failed");
  // Source-price coverage is not cost completeness.
  return Object.freeze({
@@ -208,7 +208,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   workingSellB6BudgetaryTHB:rows.find(r=>r.code==="B6").workingSellTHB,
   workingSellB9ChinaBudgetTHB:chinaB9.b9BaseWorkingSellTHB,
   workingSellB3ChinaFatWitnessTHB:chinaB9.fatWorkingSellTHB,
-  workingSellB1RepricedTHB:b1Current.workingSellTHB,
+  workingSellB1RepricedTHB:b1Current.baseWorkingSellTHB,
   workingSellB3FortyDayTHB:b3Current.workingSellTHB,
   workingSellB9YardConditionalTHB:chinaB9.conditionalYardSellTHB,
   workingSellB3OffshoreOnlyTHB:rows.find(r=>r.code==="B3").workingSellTHB,
