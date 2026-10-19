@@ -9,7 +9,7 @@
 // K groups are unique events (K03-07 and K08-11 shared); physical B2/B3/B5/B6/B9 excluded.
 import {selectB1RevKMilestoneCoverage0553} from "./b1RevKMilestoneCoverage0553";
 import {B1_WBS_ACTIVITIES} from "./bcWorkCostLines0553";
-const round=n=>Math.round((n+Number.EPSILON)*100)/100;
+const roundB1Support0553=n=>Math.roundB1Support0553((n+Number.EPSILON)*100)/100;
 const load=1.20,workingHoursPerMonth=176,laborSellDivider=0.80,expenseSellFactor=1.10;
 export const B1_SUPPORT_ROLE_RATES_0553=Object.freeze({
  PM:{name:"Project Manager",monthlyTHB:90000,account:"B1.1"},
@@ -65,14 +65,14 @@ export function selectB1ProjectSupportBudget0553(){
   const assigned=Object.entries(ROLE_BY_K[row.stage]||{}).map(([role,mh])=>{
    const info=B1_SUPPORT_ROLE_RATES_0553[role];
    if(!info||!Number.isInteger(mh)||mh<=0)throw Error("B1 unsupported role/hours "+row.stage+"/"+role);
-   const loadedRateTHB=round(info.monthlyTHB*load/workingHoursPerMonth);
+   const loadedRateTHB=roundB1Support0553(info.monthlyTHB*load/workingHoursPerMonth);
    const exactWorkingCostTHB=info.monthlyTHB*load/workingHoursPerMonth*mh;
    return Object.freeze({
     id:"B1-ROLE-"+row.stage+"-"+role,wbs:row.stage,chargeEventKey:row.chargeEventKey,
     account:info.account,activity:row.phase+" — "+info.name+" support",
     role,roleName:info.name,monthlySalaryTHB:info.monthlyTHB,qty:mh,unit:"MH",
-    unitCostTHB:loadedRateTHB,workingCostTHB:round(exactWorkingCostTHB),
-    workingSellTHB:round(exactWorkingCostTHB/laborSellDivider),conditional:false,
+    unitCostTHB:loadedRateTHB,workingCostTHB:roundB1Support0553(exactWorkingCostTHB),
+    workingSellTHB:roundB1Support0553(exactWorkingCostTHB/laborSellDivider),conditional:false,
     costOwner:"B1",workingCostClass:"PLANNING_EMPLOYER_LOADED_COST_NOT_VERIFIED_PAYROLL",
     directCostTHB:null,verification:"Distinct office support only; "+row.directOwner+" remains separate"
    });
@@ -81,14 +81,14 @@ export function selectB1ProjectSupportBudget0553(){
    chargeOwnerStage:row.chargeOwnerStage,chargeableHere:row.chargeableHere,
    sharedStages:coverage.rows.filter(x=>x.chargeOwnerStage===row.stage).map(x=>x.stage),
    rows:assigned,estimatedMH:assigned.reduce((n,x)=>n+x.qty,0),
-   budgetaryCostTHB:round(assigned.reduce((n,x)=>n+x.workingCostTHB,0)),
-   workingSellTHB:round(assigned.reduce((n,x)=>n+x.workingSellTHB,0)),
+   budgetaryCostTHB:roundB1Support0553(assigned.reduce((n,x)=>n+x.workingCostTHB,0)),
+   workingSellTHB:roundB1Support0553(assigned.reduce((n,x)=>n+x.workingSellTHB,0)),
    executionCostOwner:row.directOwner,deliverable:row.deliverable});
  });
  const roleLines=milestones.flatMap(x=>x.rows);
  const expenseLines=NON_LABOR.map(x=>Object.freeze({...x,costOwner:"B1",role:"EXTERNAL_OR_ALLOWANCE",
-  workingCostTHB:round(x.qty*x.unitCostTHB),
-  workingSellTHB:round(x.qty*x.unitCostTHB*expenseSellFactor),
+  workingCostTHB:roundB1Support0553(x.qty*x.unitCostTHB),
+  workingSellTHB:roundB1Support0553(x.qty*x.unitCostTHB*expenseSellFactor),
   directCostTHB:null,workingCostClass:"PLANNING_PROJECT_EXPENSE_NOT_VERIFIED",
   verification:x.gate}));
  const engineeringScopeReview=Object.freeze(B1_WBS_ACTIVITIES.map(([group,activity],i)=>{
@@ -108,24 +108,24 @@ export function selectB1ProjectSupportBudget0553(){
  }));
  const lines=Object.freeze([...roleLines,...expenseLines]);
  const labourHours=roleLines.reduce((n,x)=>n+x.qty,0);
- const labourWorkingCostTHB=round(roleLines.reduce((n,x)=>n+x.monthlySalaryTHB*load/workingHoursPerMonth*x.qty,0));
- const labourWorkingSellTHB=round(labourWorkingCostTHB/laborSellDivider);
+ const labourWorkingCostTHB=roundB1Support0553(roleLines.reduce((n,x)=>n+x.monthlySalaryTHB*load/workingHoursPerMonth*x.qty,0));
+ const labourWorkingSellTHB=roundB1Support0553(labourWorkingCostTHB/laborSellDivider);
  const baseExpenses=expenseLines.filter(x=>!x.conditional);
  const optionExpenses=expenseLines.filter(x=>x.conditional);
- const baseExpenseWorkingCostTHB=round(baseExpenses.reduce((n,x)=>n+x.workingCostTHB,0));
- const baseExpenseWorkingSellTHB=round(baseExpenses.reduce((n,x)=>n+x.workingSellTHB,0));
- const conditionalWorkingCostTHB=round(optionExpenses.reduce((n,x)=>n+x.workingCostTHB,0));
- const conditionalWorkingSellTHB=round(optionExpenses.reduce((n,x)=>n+x.workingSellTHB,0));
- const baseWorkingCostTHB=round(labourWorkingCostTHB+baseExpenseWorkingCostTHB);
- const baseWorkingSellTHB=round(labourWorkingSellTHB+baseExpenseWorkingSellTHB);
+ const baseExpenseWorkingCostTHB=roundB1Support0553(baseExpenses.reduce((n,x)=>n+x.workingCostTHB,0));
+ const baseExpenseWorkingSellTHB=roundB1Support0553(baseExpenses.reduce((n,x)=>n+x.workingSellTHB,0));
+ const conditionalWorkingCostTHB=roundB1Support0553(optionExpenses.reduce((n,x)=>n+x.workingCostTHB,0));
+ const conditionalWorkingSellTHB=roundB1Support0553(optionExpenses.reduce((n,x)=>n+x.workingSellTHB,0));
+ const baseWorkingCostTHB=roundB1Support0553(labourWorkingCostTHB+baseExpenseWorkingCostTHB);
+ const baseWorkingSellTHB=roundB1Support0553(labourWorkingSellTHB+baseExpenseWorkingSellTHB);
  const byAccount=Object.freeze(ACCOUNTS.map(([account,label])=>{
   const rows=lines.filter(x=>x.account===account);
   const rawWorkingCost=x=>x.role==="EXTERNAL_OR_ALLOWANCE"?x.workingCostTHB:x.monthlySalaryTHB*load/workingHoursPerMonth*x.qty;
   return Object.freeze({account,label,rows,qtyRows:rows.length,
-   baseWorkingCostTHB:round(rows.filter(x=>!x.conditional).reduce((n,x)=>n+rawWorkingCost(x),0)),
-   baseWorkingSellTHB:round(rows.filter(x=>!x.conditional).reduce((n,x)=>n+x.workingSellTHB,0)),
-   conditionalWorkingCostTHB:round(rows.filter(x=>x.conditional).reduce((n,x)=>n+x.workingCostTHB,0)),
-   conditionalWorkingSellTHB:round(rows.filter(x=>x.conditional).reduce((n,x)=>n+x.workingSellTHB,0))});
+   baseWorkingCostTHB:roundB1Support0553(rows.filter(x=>!x.conditional).reduce((n,x)=>n+rawWorkingCost(x),0)),
+   baseWorkingSellTHB:roundB1Support0553(rows.filter(x=>!x.conditional).reduce((n,x)=>n+x.workingSellTHB,0)),
+   conditionalWorkingCostTHB:roundB1Support0553(rows.filter(x=>x.conditional).reduce((n,x)=>n+x.workingCostTHB,0)),
+   conditionalWorkingSellTHB:roundB1Support0553(rows.filter(x=>x.conditional).reduce((n,x)=>n+x.workingSellTHB,0))});
  }));
  const unique=new Set(lines.map(x=>x.id));
  if(unique.size!==lines.length||milestones.length!==19||labourHours!==242 ||
