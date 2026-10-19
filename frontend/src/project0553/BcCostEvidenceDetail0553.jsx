@@ -147,12 +147,14 @@ export function BcCostEvidenceDetail0553({workingRow}){
    </table></div>
    <details style={{marginTop:12}}><summary>รายละเอียดขอบเขตและการป้องกันคิดราคาซ้ำ</summary>
     <p className="p55-note">B1 เป็นเจ้าของงานตรวจเนื้อหาทางเทคนิคและการประสานงานโครงการ รวมถึง Regulatory/Permit support เมื่อมีหลักฐานค่าใช้จ่าย ส่วน B2 จัดการเอกสาร VDRL, transmittal, revision tracking และ final dossier ไม่คิดค่าจัดทำเนื้อหาทางเทคนิคซ้ำ</p>
-    <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; Offshore SAT/SIT execution อยู่ B3; MGW China FAT Witness อยู่ B3 และเฉพาะ Conditional Yard Senior Engineer อยู่ B9; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่า licence/visa/official fees ที่ยังไม่มีราคาไม่ถือว่ารวมอยู่ใน B1 THB 510,000 แล้ว</p>
+    <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; Offshore SAT/SIT execution อยู่ B3; MGW China FAT Witness อยู่ B3 และเฉพาะ Conditional Yard Senior Engineer อยู่ B9; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่าใช้จ่ายที่ปรึกษาและค่าธรรมเนียมราชการที่มีเงื่อนไขยังไม่รวมใน B1 Base และราคา Engineering WBS เก่าถูกตัดจาก B1</p>
    </details>
   </section>}
   {e.code==="B1"&&<B1RevKMilestoneBudget0553/>}
   {e.code==="B1"&&<B1IndirectExpenseRegister0553 workingRow={workingRow}/>}
    {/* No former 964-MH Engineering pricing audit rendered in current B1 */}
+  {e.code==="B1"&&<p className="p55-note"><strong>B1 current basis:</strong> New B1.1–B1.8 roles and expenses only. Old Engineering 964-MH price excluded. Engineering activity titles appear solely in unpriced scope-owner review above.</p>}
+  {e.code!=="B1"&&<>
   <h4>{e.code==="B3"||e.code==="B9"?"Rev05 Original WBS Calculation Audit — ไม่ใช่ราคาปัจจุบัน":"1. Working Drivers & Calculation Evidence — ต้นทางปริมาณและสมการ"}</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Activity / Physical Work</th><th>Quantity</th><th>Rate THB</th><th>Evidence Amount THB</th><th>ประเภท / แหล่งข้อมูล</th></tr></thead>
@@ -165,6 +167,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
    </tr>)}</tbody>
   </table></div>
   {e.reconciliation&&<p className="p55-note"><strong>{e.code==="B3"||e.code==="B9"?"Rev05 source reconciliation (superseded for current FAT/B9 sell):":"Source Reconciliation:"}</strong> {Object.entries(e.reconciliation).filter(([k])=>k!=="historicalRev08TransportSellTHB"&&k!=="planningFxTHBPerUSD"&&k!=="displayCurrency").map(([k,v])=>k+": "+(typeof v==="number"?v.toLocaleString("en-US"):Array.isArray(v)?v.join(" – "):v)).join(" · ")}</p>}
+  </>}
   <h4>2. Input / Cost Gaps — ข้อมูลที่ต้องยืนยันก่อนคิดต้นทุน</h4>
   <ul>{e.requiredInputs.map((g,i)=><li key={i}>{g}</li>)}</ul>
   <details className="p55-panel" style={{padding:12,marginTop:10}}>
