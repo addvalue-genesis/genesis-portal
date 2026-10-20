@@ -77,6 +77,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
    <B3Item0553 number="B3.1.1" title="MGW Rev.2 Supplier iFAT / Facility Evidence"
     moduleId={ROOT+".mgw-r2-cover-20261020"} defaultOpen>
     <MgwR2CommercialCover0553 code="B3"/>
+    <p className="p55-note">MGW SERV-2 USD 5,000 (internal iFAT 2 days) and SERV-4 USD 2,500 (end-user FAT facility minimum 5 days) are already within its quoted USD 368,841 supplier total; these are NOT ADDVALUE B3 Working SELL. ADDVALUE B3.1 THB 397,400 covers its 2 paid FAT witnesses and travel/insurance. Confirm whether supplier sessions overlap with 6 witness days before approving cost owner or revising an estimate. No second vendor service cost is posted here.</p>
     <p className="p55-note">Supplier iFAT/facility USD amounts are supplier quote evidence, NOT another B3 Working SELL line.
      Compare the 2-day iFAT + minimum 5-day FAT facility with ADDVALUE's 6 FAT witness workdays before approval.</p>
    </B3Item0553>
