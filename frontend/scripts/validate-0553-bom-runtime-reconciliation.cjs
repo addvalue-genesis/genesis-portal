@@ -12,12 +12,17 @@ require.extensions[".jsx"]=(mod,file)=>file.startsWith(root+path.sep)?compile(mo
 const project=p=>require(path.join(root,"project0553",p));
 const {MGW_P26_058_R2_SELECTED_0553:q}=project("data/mgwP26058R2Selected0553.js");
 const {MR0002_WORKING_BOM_0553:bom}=project("data/mr0002WorkingBom0553.js");
+const {MGW_R2_COVER_20261020_0553:cover}=project("data/mgwP26058R2Cover20261020.js");
 const {selectWorkingBomProjection0553:projectRows}=project("data/workingBomAggregation0553.js");
 const {validateBomPresentationContract0553:validateUi}=project("bomPresentationContract0553.test.js");
 assert.equal(validateUi(),true,"Presentation invariants");
 assert.equal(q.lines.filter(x=>x.mr==="MR-0002").reduce((sum,r)=>sum+r.quantity*r.unitPriceUSD,0),99564);
 assert.equal(q.services.reduce((sum,r)=>sum+r.amountUSD,0),14500);
 assert.equal(bom.quoteEquipmentTotalUSD,99564);
+assert.equal(bom.quoteTotalUSD,cover.overallTotalUSD);
+assert.equal(bom.quoteServicesTotalUSD,cover.serviceTotalUSD);
+assert.equal(bom.priorDetailedQuoteTotalUSD,q.overallTotalUSD);
+assert.equal(bom.priorDetailedServicesUSD,q.serviceTotalUSD);
 const target=["ZWP20","ZWP21","ZWP22"];
 for(const site of target){
  const canonical=bom.sites.find(s=>s.site===site);
