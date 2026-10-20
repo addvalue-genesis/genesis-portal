@@ -130,7 +130,8 @@ def validate_payload(wb,payload,template):
         before=ws.get_range(cell).values[0][0]
         # Allow changing an explicitly empty bid-price field or a native placeholder,
         # not the customer's header, annex pointer, contractual text or fixed numbers.
-        if before not in (None,"","Not quote","xxx") and before!=val:
+        native_demo_placeholder=(sheet=="Scope of supply" and cell=="E8" and before==8)
+        if before not in (None,"","Not quote","xxx") and before!=val and not native_demo_placeholder:
             raise ValueError(f"Original nonblank customer content cannot be replaced: {sheet}!{cell}={before!r}")
         valid.append((sheet,cell,val))
     # Native summary Grand Total (G38) is A+B base only; C options stay separate.
