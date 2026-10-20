@@ -65,16 +65,23 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
   <h4>4. Required SAT Test IDs — Refer to the shared Site budget above</h4>
   <p className="p55-note"><strong>21 Test Groups below are Engineering Coverage, not 21 additional priced visits.</strong> Their individual duration and SELL are deliberately NOT allocated until a validated ITP and tagged test execution plan exists. The booked price belongs to the shared Site timebox above.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1140,width:"100%",tableLayout:"fixed"}}>
-   <thead><tr><th>Site / MR / Test ID</th><th>Shared timebox / People-days</th><th>Measurement / Technical Work</th><th>Needed instruments</th><th>Output evidence</th><th>Price / Gate / Owner</th></tr></thead>
+   <thead><tr><th>Site / MR / Test ID / Module ID</th><th>Shared timebox / People-days</th><th>Measurement / Technical Work</th><th>Needed instruments</th><th>Output evidence</th><th>Shared Site Working SELL (THB) / Approval Gate</th></tr></thead>
    <tbody>{model.rows.map(r=>{
     const t=byTimebox.get(r.budgetTimeboxId);
     return <tr key={r.id} data-component-key={r.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere"}}>
-     <td><strong>{r.site}</strong><small>{r.mr} · {r.id}</small><small>{r.wbs} · {r.system}</small></td>
-     <td><strong>{t?.site}</strong><small>{t?.days} shared team-days × {price.persons} people = {t?.personDays} MD</small>
-      <small>Site labour budget {fmt(t?.includedLaborSellTHB)} — shared with {t?.testIds.length} Test IDs; NOT per MR</small></td>
+     <td><strong>{r.site}</strong><small>{r.mr} · {r.id}</small><small>{r.wbs} · {r.system}</small>
+      <small><strong>Module ID:</strong></small>
+      <ComponentCopyId projectId="PJ2608-0553" componentKey={r.moduleId}/></td>
+     <td><strong>{t?.site}</strong><small>{t?.id} · {t?.days} shared team-days × {price.persons} people = {t?.personDays} MD</small>
+      <small>{t?.testIds.length} Test IDs use the same Site allocation; no additional MR working days</small></td>
      <td>{r.requiredFunction}</td><td>{r.testInstruments}</td><td>{r.signoffEvidence}</td>
-     <td><strong>INCLUDED IN SHARED SITE PRICE</strong><small>Incremental Test-ID SELL: NONE — nonposting</small>
-      <small>{r.gate} · {r.costOwner}</small></td>
+     <td>
+      <strong>{fmt(t?.includedLaborSellTHB)}</strong>
+      <small><strong>SHARED SITE WORKING SELL — NON-ADDITIVE</strong></small>
+      <small>This amount is the TOTAL for {t?.site}, repeated as a reference for its {t?.testIds.length} Test IDs. Count only ONCE in Site Timebox table 2.</small>
+      <small>Individual Test-ID SELL: NOT SEPARATELY PRICED · Direct Cost: NOT ESTABLISHED</small>
+      <small>{r.gate} · Cost Owner: {r.costOwner}</small>
+     </td>
     </tr>;
    })}</tbody>
   </table></div>
