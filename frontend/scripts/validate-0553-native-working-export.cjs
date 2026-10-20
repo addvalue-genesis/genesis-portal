@@ -59,6 +59,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
 (async()=>{
  const output=await api.buildNativeWorkingDraft0553(testFile,model);
  assert.match(output.filename,/NATIVE_WORKING_DRAFT_NOT_RELEASED/);
+ assert.match(output.filename,/^4-Scope of Supply_PJ2608-0553_NATIVE_WORKING_DRAFT_NOT_RELEASED_/);
  assert.equal(output.warnings.some(x=>x.includes("NOT RELEASED")),true);
  const encoded=new Uint8Array(await output.blob.arrayBuffer()),parts=api.entriesFromZip(encoded);
  assert.equal(parts.length,9);
