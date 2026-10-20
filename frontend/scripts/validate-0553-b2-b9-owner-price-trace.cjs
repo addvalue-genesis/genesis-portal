@@ -67,6 +67,8 @@ for(const x of ["580,000.00","143","38","Document Controller MH",
  assert(b2html.toLowerCase().includes(x.toLowerCase()),"B2 current proof missing "+x);
 }
 assert(!b2html.includes("Rate THB/MH: THB "),"No invented Document Controller pay rate");
+assert(b2html.includes("104.125")&&b2html.includes("341.625"),"Rev05 historical role-rate reference missing");
+assert(b2html.includes("HISTORICAL"),"Old role cost seeds must never masquerade as current rate");
 const b9html=renderToStaticMarkup(React.createElement(PriceTrace,{workingRow:bc.byCode.B9}));
 assert(b9html.includes("233,600.00")&&b9html.includes("THB 0.00"));
 assert(b9html.includes("Optional call-out only"));
