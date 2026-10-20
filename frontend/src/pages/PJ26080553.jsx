@@ -90,8 +90,9 @@ export function PJ26080553() {
  const searchMatches=searchableQuery?
   navigableModules.filter(m=>(m.id+" "+m.name+" "+m.keywords).toLowerCase().includes(searchableQuery)):
   navigableModules;
- const jumpModule=m=>{setLifecycleStage("L3");setL3Area("B");setWorkspaceTab(m.tab);setModuleQuery(m.id);setNavTarget(m.id);setNavigationSequence(n=>n+1);};
+ const jumpModule=m=>{setLifecycleStage("L3");setL3Area("B");setWorkspaceTab(m.tab);setModuleQuery(m.id);setNavTarget(m.anchorModuleId||m.id);setNavOwner(m.parentOwner||null);setNavigationSequence(n=>n+1);};
  const [navTarget,setNavTarget]=useState(null);
+ const [navOwner,setNavOwner]=useState(null);
  const [navigationSequence,setNavigationSequence]=useState(0);
  const [opened,setOpened]=useState(null);
  const [workspaceTab,setWorkspaceTab]=useState("overview");
@@ -132,15 +133,15 @@ export function PJ26080553() {
  {l3Area==="C"&&<div className="p55-stack"><section className="p55-panel"><ComponentCopyId projectId="PJ2608-0553" componentKey="l3.submissions"/></section><Section title="L3.C — Communications & Submissions"><p>ทะเบียนเอกสารสื่อสารกับ SAMTEL / JUTAL และเอกสารเสนอราคา ไม่ถือว่ารายการที่ INDEXED หรือ PREPARED ได้ส่งแล้ว</p><Table headers={["ID","Document / location","Revision","Control state","Meaning"]} rows={sourceRows(communications)}/></Section><Section title="Submission Control"><p>TC/TQ, technical bid, commercial priced/unpriced, transmittals, comments และ responses ต้องตรวจหลักฐานผู้ส่ง ผู้รับ วันที่ และ Revision ก่อนเปลี่ยนสถานะเป็น SUBMITTED. TBE ภายในไม่ใช่ Submission อัตโนมัติ</p></Section></div>}
  {l3Area==="B"&&<section className="p55-panel" style={{padding:14,marginBottom:16}}>
   <h3>ค้นหา Module ทั้งโครงการ / Project Module Navigator</h3>
-  <p className="p55-note">ค้นหาจาก Module ID, System, MR หรือชื่อหน้าจอ แล้วคลิกเพื่อเปิดแท็บหลักที่เกี่ยวข้อง ไม่จำกัดเฉพาะ Trunk Radio</p>
-  <div className="p55-filterbar"><label>Search Module <input value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} placeholder="เช่น bid.budget.working.bc, bid.budget.working.bc.b6, Vendor, MR-0001" aria-label="ค้นหา Module ทั้งโครงการ"/></label>
+  <p className="p55-note">ค้นหา Module ID (รวม Module ย่อย) แล้วกด Enter เพื่อเปิดผลลัพธ์แรกทันที หรือคลิกผลลัพธ์ที่ต้องการ ระบบจะเปิด Parent และเลื่อนไปยัง Module นั้น</p>
+  <div className="p55-filterbar"><label>Search Module <input value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&searchMatches.length){e.preventDefault();jumpModule(searchMatches.find(m=>m.id.toLowerCase()===searchableQuery)||searchMatches[0]);}}} placeholder="เช่น bid.budget.working.bc.b3.site-mr-sat-matrix" aria-label="ค้นหา Module ทั้งโครงการ"/></label>
    <button type="button" onClick={()=>setModuleQuery("")}>Clear</button>
   </div>
   <div style={{maxHeight:moduleQuery.trim()?320:150,overflowY:"auto",display:"flex",flexWrap:"wrap",gap:8}}>
    {searchMatches.map(m=><button key={m.id} type="button" className="p553-detail-button" onClick={()=>jumpModule(m)}>
     <strong>{m.name}</strong><small style={{display:"block"}}>{m.id} · {m.workflowNumber?m.workflowNumber+" · ":""}Open Module ({m.tab})</small>
    </button>)}
-   {!searchMatches.length&&<span role="status">ไม่พบ Module ที่ตรงกับคำค้น</span>}
+   {!searchMatches.length&&<span role="status">ไม่พบ Module ID ในทะเบียนค้นหา ลองพิมพ์ชื่อหรือ Parent ID</span>}
   </div>
  </section>}
  {l3Area==="B"&&<>
@@ -154,7 +155,7 @@ export function PJ26080553() {
    {tab==="systems"&&<><SharedSystemsView systems={SYSTEMS_0553} systemGroups={SYSTEM_GROUPS_0553} title="System group view" description="Four 0553 MR systems; project-specific engineering and cost evidence."/><DocumentReferenceControl0553/></>}
    {tab==="engineering"&&<SharedEngineeringView model={ENGINEERING_VIEW_MODEL_0553}><MR0001RFProofPilot/><MR0002LNACalculation/><MR0002PhysicalBom/><B1B2EquationAudit0553/><B3EquationAudit0553/><B5EquationAudit0553/></SharedEngineeringView>}
    {tab==="execution"&&<div className="p55-stack"><Section title="Execution and Delivery Basis"><Table headers={["Activity","Status / Required action"]} rows={[["Engineering & VDRL","Check MR-specific documents and review cycles"],["FAT / Inspection","Confirm approved test matrix, vendor factory and witnessed scope"],["Logistics / Import / Licences","Reconcile DAP Nonthaburi with CIF Zhuhai proposal and authority-processing exclusions"],["SAT / Commissioning","Verify responsibilities, test sites, crew, POB and rates"],["Spares / Special tools","Match inventory, quotation and validity"]].map(x=>x)}/></Section></div>}
-   {tab==="budget"&&<CommercialWorkspace0553 key={navTarget||"budget"} focusedLocation={focusedBomLocation} navigationTarget={navTarget} navigationSequence={navigationSequence} initialMode={navTarget?.startsWith("bid.budget.summary.workbook")?"budgetary":"working"}/>}
+   {tab==="budget"&&<CommercialWorkspace0553 key={navTarget||"budget"} focusedLocation={focusedBomLocation} navigationTarget={navTarget} navigationOwner={navOwner} navigationSequence={navigationSequence} initialMode={navTarget?.startsWith("bid.budget.summary.workbook")?"budgetary":"working"}/>}
    {tab==="risk"&&<div className="p55-stack"><Section title="Bid Readiness — source-linked audit"><div className="p553-filters"><label>System / MR <select value={selectedMr} onChange={e=>setSelectedMr(e.target.value)}><option value="ALL">ALL</option>{p.systems.map(s=><option key={s.id} value={s.mr}>{s.mr}</option>)}</select></label><Badge>{visibleGates.length} relevant gates</Badge></div><Table headers={["ID","Priority","Scope","Action / control","State","Source"]} rows={visibleGates.map(g=>[g.id,g.priority,g.system,<div key={g.id}><strong>{g.title}</strong><small>{g.detail}</small></div>,<Badge key={g.id}>{g.status}</Badge>,sourceLinks(g.sources)])}/><p className="p55-note">Release allowed: {validateBidReview().releaseAllowed?"YES":"NO — outstanding evidence and approvals"}.</p></Section></div>}
    {tab==="documents"&&<div className="p55-stack">
     <VendorProductCatalog0553/>

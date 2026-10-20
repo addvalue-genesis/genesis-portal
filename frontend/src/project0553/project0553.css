@@ -344,3 +344,13 @@
 .p553-dashboard .p553-budget-phase tr.p553-module-nav-target td:first-child {
   border-left:3px solid #18789d;
 }
+
+/* Project Module Navigator: emphasize the exact target, including nested B3 SAT rows. */
+.p553-dashboard [data-component-key].p553-module-nav-focus {
+  outline:2px solid #18789d;
+  outline-offset:2px;
+  scroll-margin-top:90px;
+}
+.p553-dashboard tr[data-component-key].p553-module-nav-focus > td {
+  background:#e5f2f9;
+}

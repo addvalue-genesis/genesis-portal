@@ -102,7 +102,7 @@ function B1IndirectExpenseRegister0553({workingRow}){
  </section>;
 }
 
-export function BcCostEvidenceDetail0553({workingRow}){
+export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
  if(!workingRow?.costEvidence)return null;
  const e=workingRow.costEvidence;
  return <section className="p55-panel p553-bc-evidence" data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
@@ -125,7 +125,7 @@ export function BcCostEvidenceDetail0553({workingRow}){
    <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD600/day is a selling-rate input, not internal payroll Direct Cost.</p>
   </section>}
   {e.code==="B3"&&<B3WorkingSellBreakdown0553 workingRow={workingRow}/>}
-  {(e.code==="B3"||e.code==="B9")&&<B3RequirementWbsTrace0553 selectedOwner={e.code}/>}
+  {(e.code==="B3"||e.code==="B9")&&<B3RequirementWbsTrace0553 selectedOwner={e.code} navigationTarget={navigationTarget}/>}
   {e.code==="B3"&&<B3SiteMrSatCoverage0553/>}
   {e.code==="B3"&&<B9ChinaBudgetDetail0553 budget={workingRow.b3ChinaFatBudget} selectedOwner="B3"/>}
   {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
