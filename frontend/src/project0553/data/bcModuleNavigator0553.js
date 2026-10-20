@@ -7,6 +7,9 @@ import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553} from "./bcWorkingModuleRo
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
+import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
+import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553,
+ B1_AUDIT_KINDS_0553,b1AuditModuleId0553} from "./b1AccordionModuleIds0553";
 
 export function buildBcModuleNavigator0553(){
  const bc=selectBcTurnkeyWorkingCost0553();
@@ -36,6 +39,57 @@ export function buildBcModuleNavigator0553(){
    anchorModuleId:row.moduleId
   }))
  ];
+ // Nested B1 work-type modules come directly from the canonical B1 support plan.
+ // UI numbering B1.1–B1.8 is not a new cost posting; B1.A is an audit namespace.
+ const b1=bc.byCode.B1.b1SupportPlanningBudget;
+ const b1Root=B1_ACCORDION_ROOT_0553;
+ if(!b1||b1.accounts.length!==8||b1.canonicalB1WorkingSellTHB!==bc.byCode.B1.workingSellTHB)
+  throw Error("B1 accordion Navigator cannot diverge from canonical Working SELL");
+ const b1Nested=(id,name,keywords)=>({
+  id,name,tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:id,keywords:"B1 internal engineering management support "+keywords
+ });
+ const b1Entries=[
+  b1Nested(b1Root+".revk-pm-milestones","B1 — Rev.K / B1.1–B1.8 Support Planning","source management accounts"),
+  b1Nested(b1Root+".worktype-accordion","B1 — Color-coded Nested Accordion","expand collapse eight categories"),
+  ...b1.accounts.flatMap(g=>{
+   const id=b1AccountModuleId0553(g.account);
+   return [
+    b1Nested(id,g.account+" — "+g.label,g.label+" working sell budget"),
+    b1Nested(id+".budget",g.account+".1 — Working Cost & SELL",g.label+" quantity rates"),
+    b1Nested(id+".verification",g.account+".2 — Cost Owner & Verification",g.label+" approval gaps"),
+    ...g.rows.map((line,index)=>b1Nested(
+     b1AccountLineModuleId0553(g.account,line.id),
+     g.account+".1."+(index+1)+" — "+line.activity,
+     line.id+" "+line.wbs+" "+line.verification))
+   ];
+  }),
+  b1Nested(b1Root+".audit","B1.A — Non-posting Audit & Traceability","role rates K milestones owner crosswalk"),
+  ...B1_AUDIT_KINDS_0553.map((kind,index)=>b1Nested(
+   b1AuditModuleId0553(kind),"B1.A."+(index+1)+" — "+kind,
+   kind+" audit evidence review")),
+  ...b1.milestones.map(k=>b1Nested(k.moduleId,k.stage+" — "+k.phase,
+   k.executionCostOwner+" "+k.chargeOwnerStage+" RevK")),
+  ...b1.engineeringScopeReview.map(x=>b1Nested(
+   b1AuditModuleId0553("engineering-review")+"."+x.id.toLowerCase(),
+   x.id+" — "+x.activity,x.proposedOwner+" no historical sell")),
+  b1Nested(b1Root+".indirect-ledger","B1.A.4 — CFO Cost Owner Ledger","indirect working planning historical nonposting"),
+  b1Nested(b1Root+".ownership-boundary","B1.A.5 — B1/B2 Scope Ownership","VDRL Engineering and Design")
+ ];
+ entries.push(...b1Entries);
+ // B1.A.4 ledger records remain read-only with their own actual DOM anchors.
+ const b1Ledger=selectB1ProjectExpenseLedger0553();
+ const indirectBase=b1Root+".indirect-ledger";
+ const indirectAccounts=["B1.1","B1.2","B1.3","B1.4","B1.5","B1.6","B1.7","B1.8"];
+ entries.push(...indirectAccounts.map((account,index)=>b1Nested(
+  indirectBase+".account."+account.toLowerCase().replace(".","-"),
+  "B1.A.4."+(index+1)+" — "+account+" CFO evidence","WBS owner account audit")));
+ entries.push(b1Nested(indirectBase+".cross-owner","B1.A.4.9 — Other owners non-additive",
+  "cross owner third party nonposting"));
+ entries.push(...b1Ledger.rows.map(x=>b1Nested(
+  indirectBase+".expense."+x.id.toLowerCase(),
+  "B1 CFO Evidence — "+x.id+" · "+x.activity,
+  x.owner+" "+(x.account||"") + " "+x.wbs+" audit nonposting")));
  // Nested B3 IDs are derived from the SAME read-only source models that render
  // the B3 panel. A source ID may resolve to a distinct (unique) UI anchor.
  const req=selectB3RequirementWbsTrace0553();
