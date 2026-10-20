@@ -25,7 +25,7 @@ export function B2WorkingPriceOverview0553({workingRow}){
  if(workingRow.moduleId!==ROOT||quote.quote.currentWorkingSellTHB!==580000||
   source.b2WorkingSellTHB!==quote.quote.currentWorkingSellTHB||
   source.totals.sourceRows!==143||source.totals.uniqueTitleTypes!==38||
-  workingRow.qtyDriver!==143||workingRow.directCostTHB!==null||
+  workingRow.qtyDriver!==1||workingRow.directCostTHB!==null||
   source.b2CalculatedMH!==null||source.b2VerifiedCostTHB!==null)
   throw Error("B2 historical Rev05 comparison must retain 143 source requirements and 580000 old quoted LS");
  const rows=MR_LIST.map((mr,i)=>{
@@ -208,7 +208,7 @@ export function B2WorkingPriceOverview0553({workingRow}){
    </tfoot>
   </table></div>
   <section className="p553-b2-commercial-proof" data-component-key={ROOT+".price-overview.lump-sum-proof"}>
-   <h4>Price Formula / Authority — what can actually be reconciled?</h4>
+   <h4>Rev05 Historical Source Formula / Authority — SUPERSEDED</h4>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Commercial Quantity</th><th>Working SELL / LS</th>
      <th>Current Working SELL THB</th><th>Derivation Status</th></tr></thead>
