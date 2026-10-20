@@ -14,28 +14,23 @@
 .p553-cfo-subtotal th,.p553-cfo-subtotal td{font-weight:700;background:#f1f4f6}
 .p553-cfo-detail{margin-top:12px}
 .p553-cfo-detail summary{font-size:12px;cursor:pointer;font-weight:600}
-/* Part A: 10.1 MR -> TAG-family drilldown, all items; original native grid unchanged. */
-.p553-a-group-breakdown{border:1px solid #c9d7e0;background:#fff;padding:12px;margin:14px 0;border-radius:4px}
-.p553-a-group-breakdown h4{font-size:14px;margin:2px 0 8px}
-.p553-tag-breakdown-table{width:100%;min-width:1020px;table-layout:fixed;border-collapse:collapse;font-size:12px}
-.p553-tag-breakdown-table th,.p553-tag-breakdown-table td{border:1px solid #cbd5df;padding:7px 9px;vertical-align:middle}
-.p553-tag-breakdown-table thead th{background:#e5edf3;font-weight:700}
-.p553-tag-breakdown-table th:first-child{width:17%;text-align:left}
-.p553-tag-breakdown-table th:nth-child(2){width:31%}
-.p553-tag-breakdown-table th:nth-child(3){width:7%}
-.p553-tag-breakdown-table th:nth-child(4){width:12%}
-.p553-tag-breakdown-table th:nth-child(5){width:14%}
-.p553-tag-breakdown-table th:nth-child(6){width:19%}
-.p553-tag-breakdown-table .p553-price-cell{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.p553-tag-breakdown-table small{display:block;color:#637589;font-size:10px;white-space:normal;margin-top:3px}
-.p553-tag-mr-total th,.p553-tag-mr-total td{background:#f3f7fa;font-weight:600}
-.p553-tag-family td{background:#fff}
-.p553-tag-detail td{background:#fbfcfe}
-.p553-tag-detail td:nth-child(2){padding-left:20px}
-.p553-tag-rounding td{font-size:11px;background:#fffaf0}
-.p553-tag-grand-total th,.p553-tag-grand-total td{background:#e8f0f4;font-weight:700;border-top:2px solid #385973}
-.p553-tag-expander{background:none;color:#1d5d7a;cursor:pointer;border:0;padding:3px;text-align:left;font:inherit;font-weight:600}
-.p553-tag-expander:hover{text-decoration:underline}
+/* One native-like sheet per tab; MR price rows + UI-only TAG drilldown. */
+.p553-preview-totals{display:flex;flex-wrap:wrap;gap:12px;border:1px solid #d0dce5;background:#f4f7f9;padding:9px 11px;margin:6px 0 12px;font-size:12px}
+.p553-preview-totals span{padding-right:12px;border-right:1px solid #d2dce4}
+.p553-preview-totals span:last-child{border-right:0}
+.p553-mr-preview-row td{background:#f6f9fc;font-weight:600}
+.p553-mr-preview-row td small{font-size:10px;color:#627b89;font-weight:400}
+.p553-mr-expand{border:1px solid #aabfcc;background:#f2f7fa;color:#145873;font-size:10px;padding:4px;cursor:pointer;border-radius:3px;white-space:nowrap}
+.p553-mr-expand:hover{background:#e1f1f7}
+.p553-drilldown-only td{background:#f8fbfd!important;padding:12px!important}
+.p553-drilldown-table-wrap{overflow-x:auto;max-width:100%;margin:7px 0}
+.p553-drilldown-table{min-width:950px;border-collapse:collapse;width:100%;table-layout:fixed;font-size:11px}
+.p553-drilldown-table th,.p553-drilldown-table td{border:1px solid #c9d9e5;padding:6px 8px;text-align:left;background:white;font-weight:400}
+.p553-drilldown-table thead th,.p553-drilldown-table tfoot th,.p553-drilldown-table tfoot td{background:#eaf1f5;font-weight:600}
+.p553-drilldown-table .p553-price-cell{text-align:right;white-space:nowrap}
+.p553-native-warning{border:1px solid #e0bb7e;background:#fff9eb;padding:8px 10px;font-size:11px;margin:10px 0;line-height:1.6}
+.p553-release-checks{margin:10px 0}
+.p553-release-checks table td{font-size:11px}
 .p553-release-controls{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:10px 0}
 .p553-release-controls label{font-size:12px;display:flex;flex-direction:column;gap:4px}
 .p553-release-controls select{padding:8px 12px;border:1px solid #bfd0dc;border-radius:5px;background:white}
