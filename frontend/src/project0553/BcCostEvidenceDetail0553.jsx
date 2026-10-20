@@ -9,6 +9,8 @@ import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {B3WorkTypeAccordion0553} from "./B3WorkTypeAccordion0553";
+import {B3B8IntegratedFatTraining0553} from "./B3B8IntegratedFatTraining0553";
+import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
 // imply that historical payroll cost or the WBS SELL is verified direct COST.
@@ -201,6 +203,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
   </section>}
   {e.code==="B3"&&<B3WorkTypeAccordion0553 workingRow={workingRow}
    navigationTarget={navigationTarget} auditContent={sharedEvidence}/>}
+  {e.code==="B8"&&<B3B8IntegratedFatTraining0553 b3={selectBcTurnkeyWorkingCost0553().byCode.B3} b8={workingRow} owner="B8"/>}
   {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
   {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
   {e.code!=="B3"&&sharedEvidence}
