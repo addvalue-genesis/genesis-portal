@@ -65,16 +65,21 @@ const ui=file("ReleaseCustomerWorkbook0553.jsx");
 for(const sheet of ["Scope of supply","B10 CommSpares","B11 SpecialTool","B13 Consumerables","C1 CapitalSpares","C2 2Y-Spares"])
  assert.ok(ui.includes(sheet),"Missing original sheet "+sheet);
 assert.match(ui,/const canQuote=false/);
-assert.match(ui,/approved:false,releaseAllowed:false/);
-assert.match(ui,/sourceModuleId/);
+assert.match(ui,/customer Excel Preview|Customer Excel Preview/);
 assert.match(ui,/recipient==="INTERNAL"&&viewer==="INTERNAL"/);
-assert.match(ui,/OVERFLOW/);
 assert.match(ui,/buildPartATagGroupBreakdown0553\(model\)/);
-assert.match(ui,/bid.budget.pricing.release.part-a-tag-groups/);
-assert.match(ui,/Part A — TAG Group Price Breakdown/);
-assert.match(ui,/partATagBreakdown.pricedFloorTHB/);
-assert.match(ui,/expandedTagGroups\[key\]/);
-assert.match(ui,/aTags.slice\(15\)/); // Original template 15-row cap still audited.
-
+assert.match(ui,/partA\.groups\.map/);
+assert.match(ui,/part\.previewSellTHB/);
+assert.match(ui,/const provisionalBase=addKnown/);
+assert.match(ui,/10\.1.*10\.3|10\.1 \/ 10\.3/);
+assert.match(ui,/10\.2 B1–B14 Working Sell/);
+assert.match(ui,/15 item rows|15 slots|15 item/);
+assert.match(ui,/buyer must accept group-level TAG mapping/);
+assert.match(ui,/const \[viewer,setViewer\]=useState\("CUSTOMER"\)/);
+assert.match(ui,/Native Original XLSX — HOLD/);
+assert.ok(!/p553-a-group-breakdown|Part A — TAG Group Price Breakdown|aTags\.slice\(15\)|p553-tag-breakdown-table|expandedTagGroups/.test(ui),
+ "Duplicate TAG summary and first-15 TAG copy must be removed");
+assert.ok(!/Export source mapping JSON|saveDraft=|approved:false,releaseAllowed:false/.test(ui),
+ "Obsolete staging JSON export must not clutter the customer release UX");
 assert.ok(!/sourceFile\.write|updateWorkingSellTHB/.test(ui));
 console.log("PASS PJ2608-0553 release pricing 100 => A/C 130, B client 100 / SAMTEL 5 / ADDVALUE 95; source and HOLD checks");
