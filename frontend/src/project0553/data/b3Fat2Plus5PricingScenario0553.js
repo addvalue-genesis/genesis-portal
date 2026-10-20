@@ -84,5 +84,5 @@ export function selectB3Fat2Plus5PricingScenario0553(workingRow){
    "Hotel assumes eight nights per person; one BKK-China-BKK return trip; confirm actual FAT dates and itinerary",
    "MGW SERV-2 USD5000 and SERV-4 USD2500 are separate supplier scopes already inside USD368841 vendor quote, not additive to ADDVALUE Working SELL",
    "Proposed THB440200 FAT and THB2486200 whole B3 are approval scenarios only, not a changed canonical B3 Working SELL or Customer Release"
-  ]))
-});
+  ])
+ });
