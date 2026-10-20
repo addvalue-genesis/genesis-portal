@@ -110,8 +110,11 @@ export function buildBcModuleNavigator0553(){
  const roadEntries=Object.entries(MGW_ROAD_FREIGHT_PACKING_EVIDENCE_0553.moduleIds)
   .map(([owner,id])=>child(id,owner+" — MGW road freight including packing / potential USD500 overlap",
    id,"Nantong JUTAL Zhuhai MGW WhatsApp packing road freight supplier COST HOLD"));
+ // RACON-KIT / RACON-BD are 10.1 BOM evidence sharing one MR0004 anchor;
+ // only index real 10.2 B/C IDs rendered by its Cost Evidence panel.
  const emailRows=[...MGW_PAUL_EMAIL_CLARIFICATIONS_0553.rows,
-  ...MGW_PAUL_EMAIL_CLARIFICATIONS_0553.additionalSpareOwners];
+  ...MGW_PAUL_EMAIL_CLARIFICATIONS_0553.additionalSpareOwners]
+  .filter(r=>Boolean(workingOwnerFromModuleId0553(r.moduleId)));
  const emailOwners=[...new Set(emailRows.map(r=>r.owner))];
  const emailEntries=[
   ...emailOwners.map(owner=>{
