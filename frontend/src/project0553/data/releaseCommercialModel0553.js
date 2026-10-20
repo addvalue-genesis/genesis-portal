@@ -101,6 +101,60 @@ const resultMoneyTHB=(line,rate)=>{
  return line.currency==="THB"?round(line.extended):
   line.currency==="USD"&&positive(rate)?round(line.extended*rate):null;
 };
+// 10.2 -> 10.3 Annex price projection: one source, no second cost posting.
+// B10/B11/B13: currently selected pre-award Working SELL; not verified Direct COST.
+// C1/C2: current historical-based OPTION budget reference, NOT verified OEM cost,
+// thus NOT the A/C cost-plus-30% customer price. Show reference only for internal audit.
+export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}={}){
+ const amount=x=>typeof x==="number"&&Number.isFinite(x)?x:null;
+ const isBase=["B10","B11","B13"].includes(code);
+ const isOption=["C1","C2"].includes(code);
+ if(!isBase&&!isOption)throw Error("Unsupported 10.3 annex code "+code);
+ const selected=amount(isBase?owner?.workingSellTHB:owner?.workingReferenceTHB);
+ const rows=sourceRows.map((x,i)=>{
+  const qty=amount(x.qty),priceUSD=amount(x.sourcePriceUSD),fx=amount(x.workingFxTHBPerUSD);
+  const unitReference=amount(x.unitPriceTHB);
+  const extReference=amount(x.extendedTHB);
+  const selectedLine=qty!==null&&qty>0&&extReference!==null;
+  const unitPrecision4=qty!==null&&qty>0&&priceUSD!==null&&fx!==null?
+   Math.round((priceUSD*fx+Number.EPSILON)*10000)/10000:
+   selectedLine?Math.round((extReference/qty+Number.EPSILON)*10000)/10000:null;
+  return Object.freeze({
+   id:x.id||code+"-ROW-"+(i+1),code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
+   sourceScheduleModuleId:"bid.budget.working.bc.customer-spare-schedule",
+   sourceId:x.sourceId||x.id,sourceRevision:x.sourceRevision,sourcePriceUSD:priceUSD,
+   tagNo:x.tagNo,description:x.description,specification:x.detailSpecification,
+   materials:x.materials,qty:x.qty,unit:x.unit,leadTimeARO:x.leadTimeARO,
+   mr:x.linkedMR,sites:x.linkedLocations,
+   referenceUnitTHB:unitReference,referenceTotalTHB:extReference,
+   workingUnitTHB:unitPrecision4,workingTotalTHB:extReference,
+   customerUnitTHB:isBase?unitPrecision4:null,
+   customerTotalTHB:isBase?extReference:null,
+   priceClass:isBase?"BUDGETARY_WORKING_SELL_OEM_COST_NOT_VERIFIED":
+    "OPTION_BUDGET_REFERENCE_ONLY_NO_VERIFIED_COST",
+   mappingStatus:x.mappingStatus,workingStatus:x.workingStatus,
+   priceSource:"10.2 / "+code+" · "+(x.sourceRevision||"unconfirmed"),
+   priceSourceStatus:x.workingStatus,customerReleaseAllowed:false,
+   selectedLine,possibleOverlap:x.possibleOverlap||null
+  });
+ });
+ const complete=rows.length>0&&rows.every(x=>x.selectedLine&&Number.isFinite(x.workingUnitTHB));
+ const subtotal=rows.length?round(rows.reduce((a,r)=>a+(amount(r.workingTotalTHB)||0),0)):null;
+ const variance=selected!==null&&subtotal!==null?round(selected-subtotal):null;
+ return Object.freeze({
+  code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
+  rows,selectedWorkingTHB:selected,annexLineTotalTHB:subtotal,varianceTHB:variance,
+  isOption,pricedRows:rows.filter(x=>x.selectedLine).length,totalRows:rows.length,
+  sourceLineCoverageComplete:complete,
+  priceStatus:!complete||selected===null?"MISSING_SOURCE_LINE_PRICES":
+    Math.abs(variance)>0.01?"SOURCE_TO_ANNEX_VARIANCE_HOLD":
+    isOption?"OPTION_BUDGET_REFERENCE_NOT_CUSTOMER_SELL":"WORKING_SELL_PROVISIONAL_NOT_RELEASED",
+  reconciled:complete&&selected!==null&&Math.abs(variance)<=0.01,
+  priceLabel:isOption?"REFERENCE ONLY / NOT QUOTED":"WORKING SELL / NOT RELEASED",
+  customerReleaseAllowed:false
+ });
+}
+
 export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  const rate=positive(thbPerUsd)?thbPerUsd:null;
  const bc=selectBcTurnkeyWorkingCost0553();
@@ -168,15 +222,11 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    state:basis?"WORKING_COST_NOT_APPROVED":"DIRECT_COST_NOT_ESTABLISHED__NO_30_PERCENT_ON_WORKING_SELL"};
  });
  const annexCodes=["B10","B11","B13","C1","C2"];
- const annex=Object.fromEntries(annexCodes.map(code=>[code,(spare.byCode[code]||[]).map(x=>({
-  id:x.id,code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
-  tagNo:x.tagNo,description:x.description,
-  specification:x.detailSpecification,materials:x.materials,qty:x.qty,unit:x.unit,
-  leadTimeARO:x.leadTimeARO,referenceUnitTHB:x.unitPriceTHB,referenceTotalTHB:x.extendedTHB,
-  customerUnitTHB:null,customerTotalTHB:null,
-  status:x.mappingStatus,sourceId:x.sourceId,customerReleaseAllowed:false,
-  note:"Rev08 budgetary reference; OEM SKU/quantity/cost not approved"
- }))]));
+ const annexModels=Object.fromEntries(annexCodes.map(code=>[code,buildAnnexWorkingPriceBridge0553({
+  code,sourceRows:spare.byCode[code]||[],
+  owner:code.startsWith("B")?b.find(x=>x.code===code):c.find(x=>x.code===code)
+ })]));
+ const annex=Object.fromEntries(annexCodes.map(code=>[code,annexModels[code].rows]));
  const aKnown=a.filter(x=>n(x.previewSellTHB));
  const bKnown=b.filter(x=>n(x.customerSellTHB));
  const cKnown=c.filter(x=>n(x.customerSellTHB));
@@ -200,7 +250,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  ];
  return Object.freeze({
   moduleId:"bid.budget.pricing.release",policy:RELEASE_POLICY_0553,
-  a,b,c,annex,summary:{
+  a,b,c,annex,annexModels,summary:{
    aProvisionalCostTHB:aKnown.length?aCost:null,
    aProvisionalCustomerSellTHB:aKnown.length?aPrice:null,
    aProvisionalSamTelShareTHB:aKnown.length?round(aCost*.20):null,
