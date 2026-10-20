@@ -44,6 +44,8 @@ for(const r of trace().rows){
  const item=lookup(r.moduleId);
  assert(item&&item.parentOwner===(r.costOwner==="B9"?"B9":"B3"),"Route owner of "+r.id);
 }
+assert(lookup("bid.budget.working.bc.b11.test-equipment-ownership")?.anchorModuleId===
+ "bid.budget.working.bc.b11.test-equipment-ownership");
 assert.equal(owner(satId),"B3");
 assert.equal(owner(rootId+".sat-matrix.sat-zwp20-mr0001"),"B3");
 assert.equal(owner("bid.budget.working.bc.b9.revk-china-budget"),"B9");
@@ -64,6 +66,9 @@ const html=renderToStaticMarkup(React.createElement(BcDetail,{workingRow:b,navig
 assert(html.includes('data-component-key="'+satId+'"'));
 assert(html.includes('data-component-key="'+site().rows[0].moduleId+'"'));
 assert(html.includes("2,443,400.00"));
+const b11=renderToStaticMarkup(React.createElement(BcDetail,{workingRow:current().byCode.B11}));
+assert(b11.includes('data-component-key="bid.budget.working.bc.b11.test-equipment-ownership"'));
+assert(b11.includes("VeEX MX100+ 30 rental-days"));
 const foreign=trace().rows.find(x=>x.costOwner!=="B3"&&x.costOwner!=="B9");
 assert(foreign);
 const cross=renderToStaticMarkup(React.createElement(Crosswalk,{selectedOwner:"B3",navigationTarget:foreign.moduleId}));
