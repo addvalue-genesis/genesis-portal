@@ -11,7 +11,7 @@ export function B3WorkingSellBreakdown0553({workingRow}){
   <p className="p55-note"><strong>ราคาใน B3 นี้เป็น Working SELL ไม่ใช่ Direct Cost.</strong> B3 ต้องครอบคลุม MGW China FAT witnesses, Offshore SAT/SIT 40 workdays และ VeEX rental. ตาราง Contract Requirement กับ Site-MR SAT เป็นเอกสาร Coverage/Verification แยกต่างหาก ไม่คิดราคาบวกเพิ่ม.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Current B3 Cost Owner / Copy ID</th><th>Price driver / Quantity</th><th>Working SELL (THB)</th><th>Pricing / Source status</th></tr></thead>
-   <tbody>{m.summary.map(x=><tr key={x.id} data-component-key={x.moduleId}>
+   <tbody>{m.summary.map(x=><tr key={x.id} data-component-key={m.moduleId+".component-preview."+x.id.toLowerCase()}>
     <td><strong>{x.activity}</strong><ComponentCopyId projectId="PJ2608-0553" componentKey={x.moduleId}/></td>
     <td>{x.driver}</td><td><strong>{cash(x.workingSellTHB)}</strong></td><td>ALREADY INCLUDED IN B3 — DO NOT ADD AGAIN</td>
    </tr>)}
@@ -21,7 +21,7 @@ export function B3WorkingSellBreakdown0553({workingRow}){
    <summary><strong>MGW China FAT Witness — Eight source-priced expense lines ({cash(m.fat.workingSellTHB)})</strong></summary>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Expense / Module ID</th><th>Qty / Unit</th><th>Working SELL Unit THB</th><th>Working SELL THB</th><th>Source/Status</th></tr></thead>
-    <tbody>{m.fat.rows.map(x=><tr key={x.id} data-component-key={x.moduleId}>
+    <tbody>{m.fat.rows.map(x=><tr key={x.id} data-component-key={m.moduleId+".fat-expense-preview."+x.id.toLowerCase()}>
      <td><strong>{x.description}</strong><ComponentCopyId projectId="PJ2608-0553" componentKey={x.moduleId}/></td>
      <td>{x.qty} {x.unit}</td><td>{cash(x.unitRateTHB)}</td><td>{cash(x.workingSellTHB)}</td><td>{x.status}<small>{x.evidence}</small></td>
     </tr>)}
