@@ -110,10 +110,21 @@ assert.equal(pricingViews.map(v=>v.moduleId).join(","),
 assert.equal(new Set(pricingViews.map(v=>v.moduleId)).size,3);
 assert.equal(pricingViewsBox.byKey("released").fullLabel,"Released Customer Output");
 
+// Source-tone UX is provenance-only: Equipment A from 10.1, B/C from 10.2.
+const guide=file("PricingSourceGuide0553.jsx");
+assert.match(guide,/code:"A",number:"10.1"/);
+assert.match(guide,/code:"B\/C",number:"10.2"/);
+assert.match(guide,/source="equipment" onClick=\{\(\)=>onOpenSource\(\{code:"A1"\}\)\}/);
+assert.match(guide,/source="bc" onClick=\{\(\)=>onOpenSource\(\{code:"B1"\}\)\}/);
+assert.match(guide,/not approved status|never commercial approval|never.*approval/i);
 const workspace=file("CommercialWorkspace.jsx");
 assert.match(workspace,/PricingCfoDashboard0553 model=\{releaseModel\}/);
 assert.match(workspace,/ReleaseCustomerWorkbook0553 model=\{releaseModel\} recipient=\{recipient\}/);
 assert.match(workspace,/onOpenSource=\{openReleaseSource\}/);
+assert.match(workspace,/recipient==="INTERNAL"&&<PricingSourceGuide0553 onOpenSource=\{openReleaseSource\}/);
+assert.match(workspace,/p553-source-frame--equipment/);
+assert.match(workspace,/p553-source-frame--services/);
+
 assert.match(workspace,/PRICING_VIEWS_0553\.map\(view=>/);
 assert.match(workspace,/\{view.number\} · \{view.shortLabel\}/);
 assert.match(workspace,/activePricingView\.moduleId/);
@@ -128,6 +139,8 @@ assert.match(cfo,/กำไรเป้าหมาย/);
 assert.match(cfo,/const preliminaryBase=plus/);
 assert.match(cfo,/ช่อง “ADDVALUE ได้รับ” ยังไม่ใช่กำไร/);
 assert.ok(!/<Stat\b|<ul>|p553-cfo-grid/.test(cfo),"CFO must be table-only");
+assert.match(cfo,/tone="equipment"/);
+assert.match(cfo,/tone="services"/);
 const cfoStyles=file("releaseWorkbook0553.css");
 assert.ok(!cfoStyles.includes(".p553-cfo-grid{")&&!cfoStyles.includes(".p553-cfo-stat{"),"Retired KPI-card styles must be absent");
 const ui=file("ReleaseCustomerWorkbook0553.jsx");
@@ -137,6 +150,14 @@ assert.match(ui,/const canQuote=false/);
 assert.match(ui,/customer Excel Preview|Customer Excel Preview/);
 assert.match(ui,/recipient==="INTERNAL"&&viewer==="INTERNAL"/);
 assert.match(ui,/buildPartATagGroupBreakdown0553\(model\)/);
+assert.match(ui,/internal&&<div className="p553-source-preview-legend"/);
+assert.match(ui,/p553-origin-link--/);
+assert.match(ui,/p553-source-cell--equipment/);
+assert.match(ui,/p553-source-cell--services/);
+assert.match(ui,/read.*source|source evidence|source evidence/i);
+assert.ok(ui.includes('className={internal?"p553-source-cell--services":undefined}'),
+ "Customer Preview must not show internal source tones");
+
 assert.match(ui,/partA\.groups\.map/);
 assert.match(ui,/part\.previewSellTHB/);
 assert.match(ui,/const provisionalBase=addKnown/);
