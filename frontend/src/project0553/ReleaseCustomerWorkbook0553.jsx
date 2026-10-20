@@ -1,15 +1,18 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
-import {RELEASE_POLICY_0553,RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
+import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import "./releaseWorkbook0553.css";
 
+// Single customer-format sheet preview. Internal TAG/source drilldowns are UI-only
+// and MUST NOT be included in the unchanged six-sheet native XLSX export.
 const WORKSHEETS=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
  ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"]
 ]);
 const B_ROWS=Array.from({length:14},(_,i)=>"B"+(i+1));
-const format=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const cash=n=>Number.isFinite(n)?"THB "+money(n):"PENDING";
 const formatUnit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"—";
 const parseName=code=>REV08_BASELINE.summary.find(r=>r[0]===code)?.[1]||code;
 const ANNEX_TITLE={
@@ -19,189 +22,177 @@ const ANNEX_TITLE={
  C1:["SUPPLIER RECOMMENDATION FOR CAPITAL SPARE PARTS","供货商推荐的主要备品备件"],
  C2:["SUPPLIER RECOMMENDATION FOR 2 YEARS OPERATION SPARE PARTS","供货商推荐的两年运行备品备件"]
 };
-const UNIT_NOTE="Original 4-Scope of Supply.xlsx price fields use (CURRENCY); THB staging only. Verified final currency/FX must be approved before native export.";
+const addKnown=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?Math.round((a+b)*100)/100:null;
 export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSource=()=>{},title="10.3 — Customer Release"}){
  const [sheet,setSheet]=useState("Scope of supply");
- const [viewer,setViewer]=useState("INTERNAL");
+ const [viewer,setViewer]=useState("CUSTOMER");
  const [source,setSource]=useState(null);
- const [showOverflow,setShowOverflow]=useState(false);
- const [expandedTagGroups,setExpandedTagGroups]=useState({});
- const toggleTagGroup=key=>setExpandedTagGroups(prev=>({...prev,[key]:!prev[key]}));
- const internal=recipient==="INTERNAL"&&viewer==="INTERNAL",code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
- const partATagBreakdown=buildPartATagGroupBreakdown0553(model);
- const aTags=model.a.flatMap(x=>x.sourceRows.map(line=>({...line,mrCode:x.code})));
- const overflow=aTags.slice(15),rows=aTags.slice(0,15);
+ const [expandedMr,setExpandedMr]=useState({});
+ const [showChecks,setShowChecks]=useState(false);
+ const internal=recipient==="INTERNAL"&&viewer==="INTERNAL";
+ const code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
+ const partA=buildPartATagGroupBreakdown0553(model);
  const annexLines=model.annex[code]||[];
  const annexOverflow=annexLines.slice(13);
- const record=(item)=>{
-  if(!internal)return;
-  setSource(item);
- };
- const viewSource=(item)=><button type="button" className="p553-origin-link"
-   onClick={()=>record(item)} aria-label={"ดูต้นทาง "+(item.code||item.mrCode||"")}>↗ Source</button>;
- const canQuote=false; // Pending written approval and price/fidelity gates.
- const saveDraft=()=>{
-  const payload={project:"PJ2608-0553",schema:"0553-RELEASE-PROVENANCE-DRAFT-01",
-   approved:false,releaseAllowed:false,currency:"THB",revision:"UNAPPROVED_WORKING",
-   pricingPolicy:RELEASE_POLICY_0553,sourceCoverage:model.sourceCoverage,
-   staged:{a:model.a.map(x=>({code:x.code,mr:x.mr,costTHB:x.previewCostTHB,
-    provisionalSellTHB:x.previewSellTHB,sourceModuleId:x.sourceModuleId,
-    lines:x.sourceRows.map(r=>({tag:r.tag,site:r.site,qty:r.qty,costTHB:r.costTHB,
-     provisionalSellTHB:r.customerSellTHB,sourceRef:r.sourceRef}))})),
-   b:model.b.map(x=>({code:x.code,customerSellTHB:x.customerSellTHB,
-    samTelDeductionTHB:x.samTelDeductionTHB,sourceModuleId:x.sourceModuleId})),
-   c:model.c.map(x=>({code:x.code,verifiedDirectCostTHB:x.verifiedDirectCostTHB,
-    customerSellTHB:x.customerSellTHB,sourceModuleId:x.sourceModuleId}))},
-   note:"INTERNAL STAGING ONLY. Not an approved XLSX cell mapping. Native XLSX export is gated."};
-  const blob=new Blob([JSON.stringify(payload,null,2)],{type:"application/json"});
-  const url=URL.createObjectURL(blob),link=document.createElement("a");
-  link.href=url;link.download="PJ2608-0553_10.3_RELEASE_STAGING_NOT_APPROVED.json";
-  document.body.appendChild(link);link.click();link.remove();URL.revokeObjectURL(url);
- };
- return <section className="p55-panel p553-release-workbook"
-  data-component-key="bid.budget.pricing.release.preview">
-  <div className="p55-eyebrow">{title} · XLSX-SHAPED JSX, NOT EXCEL <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing.release.preview"/></div>
-  <h3>4-Scope of Supply.xlsx · Customer Presentation (6 sheets)</h3>
-  <p className="p55-note"><strong>Internal Preview — NOT RELEASED.</strong> รูปแบบหัวตาราง รายการ B1–B14 และ Annex จำลองตามต้นฉบับโดยไม่เปลี่ยน Working Cost ต้นทาง. Part A แสดง TAG ที่เชื่อมโยงจาก 10.1 และ B แสดงราคา Working Sell ของ 10.2 โดยตรง; C ยังไม่คิด 30% จาก Working Sell ซึ่งไม่ใช่ Direct Cost.</p>
-  <div className="p553-release-controls">
-   <label>View <select value={viewer} onChange={e=>{setViewer(e.target.value);setSource(null);}}>
-     <option value="INTERNAL">Internal + source trace</option><option value="CUSTOMER">Customer clean preview</option>
-   </select></label>
-   {internal&&<button type="button" onClick={saveDraft} className="p553-detail-button">Export source mapping JSON (internal draft)</button>}
-   <button type="button" disabled={!canQuote} title="Customer export requires signed release and validated native template mapping" className="p553-detail-button">Export Native Original XLSX — HOLD</button>
-  </div>
-  <div className="p553-release-tabs" role="tablist" aria-label="Original customer worksheets">
-   {WORKSHEETS.map(([name])=><button type="button" role="tab" aria-selected={sheet===name}
-     className={sheet===name?"is-active":""} key={name} onClick={()=>{setSheet(name);setSource(null);}}>
-     {name}</button>)}
-  </div>
-  {code==="SUMMARY"&&<section className="p553-a-group-breakdown"
-     data-component-key="bid.budget.pricing.release.part-a-tag-groups">
-    <h4>Part A — TAG Group Price Breakdown / แจกแจงราคาตามกลุ่ม TAG</h4>
-    <p className="p55-note">10.1 → 10.3 · สรุปทุก Site / TAG ที่มีราคา ไม่ใช่เพียง 15 แถวแรกของ Excel ต้นฉบับ · ราคาขาย A = Working Cost × 1.30 · A5 Bulk ที่รวมใน A1 ห้ามบวกซ้ำ</p>
-    <div className="p553-sheet-scroll">
-     <table className="p55-table p55-table--compact p553-tag-breakdown-table">
-      <thead><tr><th>MR / กลุ่มงาน</th><th>TAG Family / Equipment</th><th>Sites</th><th>Priced TAG Lines</th><th>Working Sell THB</th><th>Source / Status</th></tr></thead>
-      <tbody>
-       {partATagBreakdown.groups.map(part=><React.Fragment key={part.code}>
-        <tr className="p553-tag-mr-total">
-         <th scope="row"><strong>{part.code} · {part.mr}</strong></th>
-         <td><strong>{part.description}</strong></td>
-         <td>{new Set(part.sourceRows.map(x=>x.site)).size}</td>
-         <td>{part.pricedCount}{part.unresolvedCount>0?" · +"+part.unresolvedCount+" pending":""}</td>
-         <td className="p553-price-cell"><strong>{format(part.previewSellTHB)}</strong></td>
-         <td>{internal&&viewSource(part)}<small>{part.costComplete?"Working cost mapped":"WORKING ONLY · Unpriced/verification pending"}</small></td>
-        </tr>
-        {part.tagGroups.map(group=>{
-         const key=part.code+":"+group.family;
-         return <React.Fragment key={key}>
-          <tr className="p553-tag-family">
-           <td>{part.code}</td>
-           <td><button className="p553-tag-expander" type="button" aria-expanded={!!expandedTagGroups[key]}
-             onClick={()=>toggleTagGroup(key)}>{expandedTagGroups[key]?"−":"＋"} {group.family} · {group.tags.length} TAG(s)</button></td>
-           <td>{group.sites.length}</td><td>{group.pricedRows}{group.missingRows?" · "+group.missingRows+" pending":""}</td>
-           <td className="p553-price-cell">{format(group.customerSellTHB)}</td>
-           <td><small>{group.tags.slice(0,3).join(", ")}{group.tags.length>3?" …":""}</small></td>
-          </tr>
-          {expandedTagGroups[key]&&group.rows.map((tag,i)=><tr className="p553-tag-detail" key={key+":"+tag.site+":"+tag.id+":"+i}>
-           <td>{tag.site||"—"}</td><td><strong>{tag.tag}</strong><small>{tag.description}</small></td>
-           <td>{tag.mr}</td><td>{tag.qty??"TBC"} {tag.unit||""}</td>
-           <td className="p553-price-cell">{format(tag.customerSellTHB)}<small>Unit {formatUnit(tag.customerUnitTHB)}</small></td>
-           <td>{internal&&viewSource(tag)}<small>{tag.sourceRef||tag.status}</small></td>
-          </tr>)}
-         </React.Fragment>;
-        })}
-        {Number.isFinite(part.roundingVarianceTHB)&&Math.abs(part.roundingVarianceTHB)>0&&<tr className="p553-tag-rounding">
-         <td>{part.code}</td><td colSpan={3}>Price rounding reconciliation — group totals vs. MR Working Sell</td>
-         <td className="p553-price-cell">{format(part.roundingVarianceTHB)}</td>
-         <td><small>{part.reconciliationState}</small></td>
-        </tr>}
-       </React.Fragment>)}
-       <tr className="p553-tag-grand-total"><th scope="row" colSpan={4}>Part A — Working Selling Price (priced lines only)</th>
-        <td className="p553-price-cell"><strong>THB {format(partATagBreakdown.pricedFloorTHB)}</strong></td>
-        <td><strong>{partATagBreakdown.reconciliationPassed?"MATCH 10.3 CFO":"RECONCILIATION HOLD"}</strong>
-         <small>{partATagBreakdown.incomplete?"NOT FINAL · Outstanding engineering cost/TAG evidence": "Working estimate · customer release approval pending"}</small></td>
-       </tr>
-      </tbody>
-     </table>
-    </div>
-   </section>}
-  <div className="p553-native-sheet">
-   {code==="SUMMARY"?<>
-    <div className="p553-native-title">Scope of supply<br/>供货范围</div>
-    <div className="p553-sheet-meta"><strong>Project</strong><span>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</span>
+ const bLines=model.b;
+ const aWorkingTotal=partA.pricedFloorTHB;
+ const bWorkingTotal=model.summary.bProvisionalCustomerSellTHB;
+ const provisionalBase=addKnown(model.summary.aProvisionalCustomerSellTHB,bWorkingTotal);
+ const tagCount=model.a.reduce((n,p)=>n+p.sourceRows.length,0);
+ const isOverOriginalCapacity=tagCount>15;
+ const activeChecks=[
+  {id:"A-SUM",label:"10.1 → 10.3 Part A vs CFO",state:partA.reconciliationPassed?"PASS":"HOLD",detail:"Working price "+cash(aWorkingTotal)+" · CFO "+cash(partA.expectedPreviewTHB)},
+  {id:"A-TAGS",label:"Original Part A layout / Buyer TAG grouping approval",state:isOverOriginalCapacity?"HOLD":"REVIEW",detail:tagCount+" source TAG lines → 4 MR summary rows; buyer must accept group-level TAG mapping for original 15 slots"},
+  {id:"B-SCOPE",label:"10.2 B1–B14 Working Sell",state:model.sourceCoverage.bSellReady?"PREVIEW":"HOLD",detail:"Working Sell displayed unchanged; conditional B7/B9 must be reviewed"},
+  {id:"B-COST",label:"10.2 B1–B14 verified Direct Cost",state:model.sourceCoverage.bCostReady?"PASS":"HOLD",detail:"Required for actual ADDVALUE profit, not for displaying provisional Working Sell"},
+  {id:"C-COST",label:"10.2 C1/C2 optional supplier cost",state:model.sourceCoverage.cCostReady?"PASS":"HOLD",detail:"No 30% markup of C Working Sell; verified direct cost required"},
+  {id:"ANNEX",label:"Original Annex B10/B11/B13/C1/C2 capacities",state:model.sourceCoverage.annexOverflow.length?"HOLD":"REVIEW",detail:model.sourceCoverage.annexOverflow.length?"Exceeds 13 rows: "+model.sourceCoverage.annexOverflow.join(", "):"Annex price and OEM TAG/SKU still to validate"},
+  {id:"EXPORT",label:"Signed snapshot / native XLSX geometry and currency",state:"HOLD",detail:"No approved release and source-cell mapping; original workbook unchanged"}
+ ];
+ const canQuote=false;
+ const openSource=item=>{if(internal)setSource(item);};
+ const sourceButton=item=>internal?<button type="button" className="p553-origin-link"
+   aria-label={"เปิดต้นทาง "+(item.code||item.mr||item.tag||"")} onClick={()=>openSource(item)}>↗ Source</button>:null;
+ const toggleMr=key=>setExpandedMr(old=>({...old,[key]:!old[key]}));
+ return <section className="p55-panel p553-release-workbook" data-component-key="bid.budget.pricing.release.preview">
+   <div className="p55-eyebrow">{title} · 10.3 / bid.budget.pricing.release.preview <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing.release.preview"/></div>
+   <h3>Customer Excel Format Preview — 4-Scope of Supply.xlsx</h3>
+   <p className="p55-note"><strong>PRE-EXPORT PREVIEW / NOT ISSUED.</strong> ตารางนี้เป็น JSX จำลองแบบฟอร์มลูกค้า ไม่ใช่ไฟล์ Excel ที่ Export แล้ว ข้อมูล A1–A4 สรุปทั้ง MR จาก 10.1, B1–B14 จาก Working Sell ของ 10.2, C1/C2 รอ Verified Direct Cost และแยกจาก Base</p>
+   <div className="p553-release-controls">
+    <label>Preview mode
+     <select value={recipient==="INTERNAL"?viewer:"CUSTOMER"} onChange={e=>{setViewer(e.target.value);setSource(null);}} disabled={recipient!=="INTERNAL"}>
+      <option value="CUSTOMER">Customer Excel Preview</option>
+      <option value="INTERNAL">Internal · Expand TAG / Source</option>
+     </select>
+    </label>
+    {recipient==="INTERNAL"&&<button type="button" className="p553-detail-button"
+      onClick={()=>setShowChecks(x=>!x)} aria-expanded={showChecks}>{showChecks?"− Hide":"＋ Review"} Export checks ({activeChecks.filter(x=>x.state==="HOLD").length} HOLD)</button>}
+    <button type="button" disabled={!canQuote} className="p553-detail-button"
+      title="Original customer XLSX only after approved release, full TAG/Annex mapping and snapshot verification">Export Native Original XLSX — HOLD</button>
+   </div>
+   {showChecks&&recipient==="INTERNAL"&&<div className="p55-table-wrap p553-release-checks">
+    <table className="p55-table p55-table--compact"><thead><tr><th>Check</th><th>Module / Requirement</th><th>Status</th><th>Detail</th></tr></thead>
+     <tbody>{activeChecks.map(x=><tr key={x.id}><td>{x.id}</td><td>{x.label}</td><td><strong>{x.state}</strong></td><td>{x.detail}</td></tr>)}</tbody>
+    </table>
+   </div>}
+   <div className="p553-release-tabs" role="tablist" aria-label="Original customer workbook sheets">
+    {WORKSHEETS.map(([name])=><button type="button" key={name} role="tab" aria-selected={sheet===name}
+     className={sheet===name?"is-active":""} onClick={()=>{setSheet(name);setSource(null);}}>{name}</button>)}
+   </div>
+   <div className="p553-native-sheet">
+    {code==="SUMMARY"?<>
+     <div className="p553-native-title">Scope of supply<br/>供货范围</div>
+     <div className="p553-sheet-meta"><strong>Project</strong><span>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</span>
       <strong>RFQ No.</strong><span> </span><strong>Package Name</strong><span> </span></div>
-    <div className="p553-sheet-scroll"><table className="p553-customer-table">
+     <div className="p553-preview-totals">
+      <span>Part A / 10.1 · <strong>{cash(aWorkingTotal)}</strong></span>
+      <span>Part B / 10.2 · <strong>{cash(bWorkingTotal)}</strong></span>
+      <span>Base A+B (working only) · <strong>{cash(provisionalBase)}</strong></span>
+     </div>
+     <div className="p553-sheet-scroll"><table className="p553-customer-table">
       <thead><tr>{RELEASE_CUSTOMER_COLUMNS_0553.scope.map(h=><th key={h}>{h.split(" / ").map((t,i)=><React.Fragment key={i}>{i>0&&<br/>}{t}</React.Fragment>)}</th>)}</tr></thead>
       <tbody>
        <tr className="p553-sheet-section"><td colSpan={8}>Part A: BASIC<br/>A部分：基本</td></tr>
-       <tr className="p553-sheet-subheading"><td colSpan={8}>A1. Main Equipment · TAG-based Working Mapping</td></tr>
-       {rows.map((r,i)=><tr key={r.mrCode+":"+r.site+":"+r.id+":"+i}>
-        <td>{i+1}</td><td><strong>{r.tag}</strong>{internal&&<><small>{r.site} · {r.mr}</small>{viewSource(r)}</>}</td>
-        <td>{r.description}</td><td>{r.specification}</td><td>{r.qty??"TBC"}</td>
-        <td className="p553-price-cell">{formatUnit(r.customerUnitTHB)}</td>
-        <td className="p553-price-cell">{format(r.customerSellTHB)}</td>
-        <td>{internal?"PROVISIONAL · "+r.mrCode+" · "+r.status:""}</td></tr>)}
-       {Array.from({length:Math.max(0,15-rows.length)},(_,i)=><tr key={"blank-a-"+i} className="p553-empty-row">{Array.from({length:8},(_,j)=><td key={j}>&nbsp;</td>)}</tr>)}
+       <tr className="p553-sheet-subheading"><td colSpan={8}>A1. Main Equipment · Source MR-0001–MR-0004 / Customer Grouping Preview</td></tr>
+       {partA.groups.map((part,i)=><React.Fragment key={part.code}>
+        <tr className="p553-mr-preview-row">
+         <td><strong>{part.code}</strong></td>
+         <td><strong>{part.mr}</strong><small>MULTI-TAG / customer grouping subject to approval</small></td>
+         <td>{part.description}</td>
+         <td>{part.sourceRows.length} TAG lines across {new Set(part.sourceRows.map(x=>x.site)).size} sites
+           {internal&&<small>{part.unresolvedCount} unpriced / pending</small>}</td>
+         <td>1 lot</td>
+         <td className="p553-price-cell">{money(part.previewSellTHB)}</td>
+         <td className="p553-price-cell"><strong>{money(part.previewSellTHB)}</strong></td>
+         <td>{internal&&<>
+          <button className="p553-mr-expand" type="button" aria-expanded={!!expandedMr[part.code]}
+           onClick={()=>toggleMr(part.code)}>{expandedMr[part.code]?"− Hide":"＋ TAG / Site"}</button>
+          {sourceButton(part)}
+         </>}</td>
+        </tr>
+        {internal&&expandedMr[part.code]&&<tr className="p553-drilldown-only"><td colSpan={8}>
+         <strong>{part.code} / {part.mr} — Source TAG detail (Internal UI only, not additional XLSX rows)</strong>
+         <div className="p553-drilldown-table-wrap"><table className="p553-drilldown-table">
+          <thead><tr><th>Site</th><th>TAG No.</th><th>Description</th><th>Qty</th><th>Unit Sell THB</th><th>Sell THB</th><th>Module</th></tr></thead>
+          <tbody>{part.sourceRows.map((tag,ix)=><tr key={tag.id+":"+tag.site+":"+ix}>
+           <td>{tag.site||"—"}</td><td>{tag.tag}</td><td>{tag.description}</td>
+           <td>{tag.qty??"TBC"}</td><td className="p553-price-cell">{formatUnit(tag.customerUnitTHB)}</td>
+           <td className="p553-price-cell">{money(tag.customerSellTHB)}</td>
+           <td>10.1 {sourceButton(tag)}</td>
+          </tr>)}</tbody>
+          <tfoot><tr><th colSpan={5}>Total {part.code} (same as parent row)</th>
+           <th className="p553-price-cell">{money(part.previewSellTHB)}</th><th>Working · NOT RELEASED</th></tr></tfoot>
+         </table></div>
+        </td></tr>}
+       </React.Fragment>)}
+       {Array.from({length:11},(_,i)=><tr key={"empty-part-a-"+i} className="p553-empty-row">
+        {Array.from({length:8},(_,j)=><td key={j}>&nbsp;</td>)}</tr>)}
        <tr className="p553-sheet-section"><td colSpan={8}>Part B: OTHERS<br/>B部分：其它</td></tr>
        {B_ROWS.map(id=>{
-        const r=model.b.find(x=>x.code===id);
+        const line=bLines.find(r=>r.code===id);
         return <tr key={id}><td><strong>{id}</strong></td>
-         <td colSpan={3}>{parseName(id)} {internal&&r&&viewSource(r)}</td>
-         <td>1 lot</td><td className="p553-price-cell">{format(r?.customerSellTHB)}</td>
-         <td className="p553-price-cell">{format(r?.customerSellTHB)}</td>
-         <td>{["B10","B11","B13"].includes(id)?"Refer to Annex "+id:id==="B12"?"Refer to Annex B12 (not in original six sheets)":id==="B7"||id==="B9"?"Conditional scope — confirm before release":""}</td>
+         <td colSpan={3}>{parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}</td>
+         <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
+         <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
+         <td>{["B10","B11","B13"].includes(id)?"refer to Annex "+id:
+          id==="B12"?"refer to Annex B12":
+          line?.conditional&&internal?"Conditional — verify before release":""}</td>
         </tr>;
        })}
-       <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 — Base A+B</td><td>{format(model.summary.baseCustomerSellTHB)}</td><td>{internal?"HOLD · missing cost/approved snapshot":""}</td></tr>
+       <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 / Base A+B (WORKING PREVIEW)</td>
+        <td className="p553-price-cell">{money(provisionalBase)}</td>
+        <td>{internal?"Pending verification · not approved bid":""}</td></tr>
        <tr className="p553-sheet-highlight"><td colSpan={8}>Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
-       {model.c.map(r=><tr key={r.code}><td><strong>{r.code}</strong></td><td colSpan={3}>{parseName(r.code)} {internal&&viewSource(r)}</td><td>1 lot</td>
-        <td className="p553-price-cell">{format(r.customerSellTHB)}</td><td className="p553-price-cell">{format(r.customerSellTHB)}</td>
-        <td>Refer to Annex {r.code} · OPTION (excluded from base)</td></tr>)}
+       {model.c.map(r=><tr key={r.code}><td><strong>{r.code}</strong></td>
+        <td colSpan={3}>{parseName(r.code)} {sourceButton(r)}</td>
+        <td>1 lot</td><td className="p553-price-cell">{money(r.customerSellTHB)}</td>
+        <td className="p553-price-cell">{money(r.customerSellTHB)}</td>
+        <td>refer to Annex {r.code} · OPTION</td></tr>)}
        <tr className="p553-sheet-highlight"><td colSpan={8}>Remark: Delivery term shall follow program logistic proposal and fixed by each cluster per equipment cargo size.</td></tr>
-      </tbody></table></div>
-    {overflow.length>0&&<div className="p553-release-overflow">
-      <strong>OVERFLOW — {overflow.length} Part A TAG rows exceed the 15 physical template rows.</strong> Native XLSX export is blocked; do not drop TAGs or resize template.
-      <button className="p553-detail-button" type="button" onClick={()=>setShowOverflow(x=>!x)}>{showOverflow?"Hide":"View"} overflow TAGs</button>
-      {showOverflow&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Site</th><th>TAG</th><th>Description</th><th>Source</th></tr></thead><tbody>{overflow.map((r,i)=><tr key={i}><td>{r.site}</td><td>{r.tag}</td><td>{r.description}</td><td>{r.mr} <span>{internal&&viewSource(r)}</span></td></tr>)}</tbody></table></div>}
-     </div>}
-   </>:<>
-    <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
-    <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table">
-     <thead><tr><th rowSpan={2}>Item<br/>序号</th><th rowSpan={2}>Tag No<br/>位号</th><th rowSpan={2}>Description<br/>描述</th><th rowSpan={2}>Detail Specification<br/>详细规格</th><th rowSpan={2}>Materials<br/>材质</th><th rowSpan={2}>QTY<br/>数量</th><th colSpan={code.startsWith("C")?3:2}>DDP site （DDP现场交货）</th></tr>
+      </tbody>
+     </table></div>
+     {isOverOriginalCapacity&&<p className="p553-native-warning">
+      <strong>Native Excel constraint:</strong> 10.1 has {tagCount} priced TAG rows but the original Part A provides 15 item rows.
+      This JSX groups all source data into four MR package rows, with no priced TAG silently discarded.
+      Grouped Tag No. format must be accepted by purchaser before native export; no original cell size/layout changes are allowed.
+     </p>}
+    </>:<>
+     <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
+     <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table">
+      <thead><tr><th rowSpan={2}>Item<br/>序号</th><th rowSpan={2}>Tag No<br/>位号</th><th rowSpan={2}>Description<br/>描述</th><th rowSpan={2}>Detail Specification<br/>详细规格</th><th rowSpan={2}>Materials<br/>材质</th><th rowSpan={2}>QTY<br/>数量</th><th colSpan={code.startsWith("C")?3:2}>DDP site （DDP现场交货）</th></tr>
        <tr><th>UNIT PRICE (CURRENCY)<br/>单价</th><th>TOTAL PRICE (CURRENCY)<br/>总价</th>
         {code.startsWith("C")&&<th>Lead time (ARO)<br/>交货期 (周)</th>}</tr></thead>
-     <tbody>{Array.from({length:13},(_,i)=>{
-      const r=annexLines[i];return <tr key={r?.id||"blank:"+i}>
-       <td>{r?i+1:""}</td><td>{r?.tagNo||""}{internal&&r&&viewSource(r)}</td>
-       <td>{r?.description||""}</td><td>{r?.specification||""}</td>
-       <td>{r?.materials||""}</td><td>{r?.qty??""}</td>
-       <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):Number.isFinite(r.customerUnitTHB)?format(r.customerUnitTHB):code==="C2"?"Not quote":""}</td>
-       <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):Number.isFinite(r.customerTotalTHB)?format(r.customerTotalTHB):code==="C2"?"Not quote":""}</td>
-       {code.startsWith("C")&&<td>{r?.leadTimeARO??""}</td>}
-      </tr>;
-     })}
-      <tr className="p553-sheet-total"><td colSpan={7}>Total Price DDP PURCHASER'S YARD:<br/>DDP采购商场地的总费用：</td>
-       <td>Not quote</td>{code.startsWith("C")&&<td/>}</tr>
-     </tbody></table></div>
-    {annexOverflow.length>0&&<div className="p553-release-overflow">OVERFLOW: {annexOverflow.length} rows beyond original 13 item slots. Native export blocked. {internal&&annexOverflow.map(x=><div key={x.id}>{x.id} · {x.description}</div>)}</div>}
-    <div className="p553-annex-remark">Remark 注释: {code.startsWith("C")?
-      "Above Price of spare parts is valid up to Two years after Delivery date of purchase order":
-      "Please include the costs for installation, commissioning, spare parts and special tools in the total price, and provide a detailed breakdown"}</div>
-    <p className="p55-note">{UNIT_NOTE} Annex detail prices are blank until OEM TAG/SKU and cost allocation are verified. Historical working reference is internal only.</p>
-   </>}
-  </div>
-  {internal&&source&&<div className="p553-source-drawer" role="region" aria-label="Source trace">
-    <div className="p553-source-head"><strong>Source Trace · {source.code||source.mrCode}</strong>
-      <button type="button" onClick={()=>setSource(null)}>× Close</button></div>
+      <tbody>{Array.from({length:13},(_,i)=>{
+       const r=annexLines[i];return <tr key={r?.id||"empty:"+i}>
+        <td>{r?i+1:""}</td><td>{r?.tagNo||""}{sourceButton(r||{code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase()})&&internal&&r?sourceButton(r):null}</td>
+        <td>{r?.description||""}</td><td>{r?.specification||""}</td><td>{r?.materials||""}</td>
+        <td>{r?.qty??""}</td>
+        <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):Number.isFinite(r.customerUnitTHB)?money(r.customerUnitTHB):code==="C2"?"Not quote":""}</td>
+        <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):Number.isFinite(r.customerTotalTHB)?money(r.customerTotalTHB):code==="C2"?"Not quote":""}</td>
+        {code.startsWith("C")&&<td>{r?.leadTimeARO??""}</td>}
+       </tr>;
+      })}
+       <tr className="p553-sheet-total"><td colSpan={7}>Total Price DDP PURCHASER'S YARD:<br/>DDP采购商场地的总费用：</td>
+        <td>Not quote</td>{code.startsWith("C")&&<td/>}</tr>
+      </tbody></table></div>
+      {annexOverflow.length>0&&<p className="p553-native-warning">HOLD — {code}: {annexOverflow.length} source lines exceed the original 13 annex slots. No rows are discarded from the source; native export requires reconciliation.</p>}
+      <div className="p553-annex-remark">Remark 注释: {code.startsWith("C")?
+       "Above Price of spare parts is valid up to Two years after Delivery date of purchase order":
+       "Please include the costs for installation, commissioning, spare parts and special tools in the total price, and provide a detailed breakdown"}</div>
+      <p className="p55-note">10.2 {code}: TAG/SKU budget references shown for mapping. Customer Annex prices remain blank until verified OEM/technical price. No Rev08 historical amount is silently treated as direct cost.</p>
+    </>}
+   </div>
+   {internal&&source&&<div className="p553-source-drawer" role="region" aria-label="Source trace">
+    <div className="p553-source-head"><strong>Source Trace · {source.code||source.mr||""}</strong>
+     <button type="button" onClick={()=>setSource(null)}>× Close</button></div>
     <p><strong>Module:</strong> <code>{source.sourceModuleId}</code></p>
     <p><strong>Trace:</strong> {source.mr||source.code||""} · {source.site||""} · {source.tag||source.tagNo||""} · {source.sourceRef||source.sourceId||source.workingSellBasis||""}</p>
-    <p><strong>Release Status:</strong> HOLD · {source.state||source.status||source.sourceStatus||"Pre-award budget source; verify OEM cost and TAG"}</p>
+    <p><strong>Release status:</strong> HOLD · {source.state||source.status||source.sourceStatus||"Supplier pricing / TAG mapping not verified"}</p>
     <button type="button" className="p553-detail-button" onClick={()=>onOpenSource(source)}>
      Go to {source.sourceModuleId?.startsWith("bid.budget.bom")?"10.1 Engineering BOM":"10.2 Working BC"} ↗
     </button>
    </div>}
-  <p className="p55-note">Native XLSX preservation: original 6-sheet template remains untouched. Export disabled pending signed revision, source-cell mapping, capacity check and verified currency. Internal Source controls and CFO data must NEVER be written into customer file.</p>
+   <p className="p55-note">Original customer workbook: 6 Sheets, unchanged. Pre-export preview is a read-only JSX layout; it does not prove pixel-perfect native XLSX fidelity. Final native export requires signed line/cell mapping, full cost + TAG reconciliation, verified FX and buyer approval of any grouping.</p>
  </section>;
 }
