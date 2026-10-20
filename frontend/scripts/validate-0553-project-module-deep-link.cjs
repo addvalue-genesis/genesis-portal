@@ -13,7 +13,7 @@ require.extensions[".js"]=(m,f)=>f.startsWith(root+path.sep)?transpile(m,f):oldJ
 require.extensions[".jsx"]=(m,f)=>f.startsWith(root+path.sep)?transpile(m,f):(oldJsx||oldJs)(m,f);
 require.extensions[".css"]=()=>{};
 const from=p=>require(path.join(root,"project0553",p));
-const {buildBcModuleNavigator0553:entries}=from("data/bcModuleNavigator0553.js");
+const {buildBcModuleNavigator0553:entries,searchBcModuleNavigator0553:search}=from("data/bcModuleNavigator0553.js");
 const {selectB3SiteMrSatCoverage0553:site}=from("data/b3SiteMrSatCoverage0553.js");
 const {selectB3RequirementWbsTrace0553:trace}=from("data/b3RequirementWbsTrace0553.js");
 const {selectBcTurnkeyWorkingCost0553:current}=from("data/bcTurnkeyWorkingCost0553.js");
@@ -28,6 +28,8 @@ const satId=rootId+".site-mr-sat-matrix";
 const offId=rootId+".40-day-abc";
 const parent=lookup(satId);
 assert(parent&&parent.tab==="budget"&&parent.anchorModuleId===satId);
+assert.equal(search(rootId+".site",all).length,1,"User partial b3.site must find SAT matrix");
+assert.equal(search(satId.toUpperCase(),all)[0]?.id,satId,"Case-insensitive exact Module ID search");
 assert.equal(all.filter(m=>m.id===satId).length,1); // B3.site search must find the matrix parent
 assert.equal(all.filter(m=>m.id.startsWith(rootId+".sat-matrix.")).length,site().rows.length);
 assert(lookup(offId)?.anchorModuleId===rootId+".working-sell-breakdown.component-preview.offshore");
@@ -74,6 +76,9 @@ assert(page.includes('m.anchorModuleId||m.id')&&page.includes('e.key==="Enter"')
 assert(page.includes('setNavOwner(m.parentOwner||null)'));
 assert(ws.includes("findModuleElement0553(document,navigationTarget)"));
 assert(ws.includes("openModuleAncestors0553(exact)"));
+assert(ws.includes('exact.classList?.add("p553-module-nav-focus")'));
+const css=fs.readFileSync(path.join(root,"project0553/project0553.css"),"utf8");
+assert(css.includes("[data-component-key].p553-module-nav-focus"));
 assert(!ws.includes("const target=exact||parent"),"Do not silently scroll to parent for failed leaf navigation");
 assert(ws.includes("ยังเปิด Module ปลายทางไม่ได้"));
 console.log("PASS PJ2608-0553 Project Module Navigator: nested B3.site + 21 SAT IDs, 19 RQM IDs, Enter/click route, exact DOM target, open all disclosure ancestors, RQM cross-owner reveal, current THB 2,443,400 unchanged.");
