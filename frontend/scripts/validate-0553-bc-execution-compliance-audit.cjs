@@ -116,8 +116,9 @@ for(const name of ["project0553/BcExecutionComplianceAudit0553.jsx","project0553
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code,
   "JSX Syntax check "+name);
 assert(workspace.includes('<BcExecutionComplianceAudit0553 selectedCode={bcTab}/>'));
-assert(workspace.includes('audit?.tagName==="DETAILS"'));
-assert(workspace.includes('bid.budget.working.bc.b3.mob-demob-economics'));
+assert(workspace.includes('findModuleElement0553(document,navigationTarget)')&&
+ workspace.includes('openModuleAncestors0553(exact)'),"10.2 exact audit Module deep link must open all disclosure ancestors");
+assert(navigator.includes('id:"bid.budget.working.bc.b3.mob-demob-economics"'),"Mob-demob Module ID belongs in the Project Module Navigator");
 assert(navigator.includes('id:"bid.budget.working.bc.b3.mob-demob-economics"'));
 
 assert(navigator.includes('id:"bid.budget.working.bc.execution-audit"'));
