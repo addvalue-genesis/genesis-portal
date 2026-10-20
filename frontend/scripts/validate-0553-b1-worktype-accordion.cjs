@@ -72,6 +72,20 @@ for(const kind of auditKinds){
  assert(byId.has(id)&&output.includes('data-component-key="'+id+'"'),"B1 audit leaf missing "+id);
  assert(output.includes("Copy component ID "+id));
 }
+const {selectB1ProjectExpenseLedger0553:expenseSource}=get("data/b1IndirectCostLedger0553.js");
+const ledger=expenseSource(),ledgerRoot=ROOT+".indirect-ledger";
+assert.equal(ledger.rows.length,34);
+for(const [index,account] of model.accounts.entries()){
+ const id=ledgerRoot+".account."+account.account.toLowerCase().replace(".","-");
+ assert(byId.has(id)&&output.includes('data-component-key="'+id+'"'));
+ assert(output.includes("Copy component ID "+id));
+}
+assert(byId.has(ledgerRoot+".cross-owner"));
+for(const expense of ledger.rows){
+ const id=ledgerRoot+".expense."+expense.id.toLowerCase();
+ assert(byId.has(id)&&output.includes('data-component-key="'+id+'"'),"Missing CFO expense anchor "+id);
+ assert(output.includes("Copy component ID "+id),"Missing CFO expense Copy ID "+id);
+}
 for(const stage of model.milestones){
  assert(byId.has(stage.moduleId));
  assert(output.includes('data-component-key="'+stage.moduleId+'"'));
