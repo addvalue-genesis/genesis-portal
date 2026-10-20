@@ -66,15 +66,19 @@ function B1WorkingSellBreakdown0553({workingRow}){
 
 function B1IndirectExpenseRegister0553({workingRow}){
  const ledger=selectB1ProjectExpenseLedger0553();
- const [showCross,setShowCross]=React.useState(false);
- const [expanded,setExpanded]=React.useState({});
  const groups=[["B1.1","Project Management"],["B1.2","Meetings & Representation"],["B1.3","Management Travel"],["B1.4","Office/Admin"],["B1.5","Regulatory Coordination"],["B1.6","Legal/Local Consultant"],["B1.7","Official Fees"],["B1.8","Other Project Expenses"]];
+ const sourceId="bid.budget.working.bc.b1.indirect-ledger";
+ const groupId=account=>sourceId+".account."+account.toLowerCase().replace(".","-");
+ const rowId=id=>sourceId+".expense."+String(id).toLowerCase();
+ const auditCopy=id=><span className="p553-b1-copy"
+  onClick={e=>{e.preventDefault();e.stopPropagation();}} onKeyDown={e=>e.stopPropagation()}>
+  <ComponentCopyId projectId="PJ2608-0553" componentKey={id}/></span>;
  const cash=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
  const renderRows=rows=><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1560,width:"100%",tableLayout:"fixed",fontSize:12}}>
   <colgroup><col style={{width:"10%"}}/><col style={{width:"13%"}}/><col style={{width:"11%"}}/><col style={{width:"17%"}}/><col style={{width:"13%"}}/><col style={{width:"11%"}}/><col style={{width:"12%"}}/><col style={{width:"13%"}}/></colgroup>
   <thead><tr><th>WBS / Expense ID</th><th>WHO — ผู้ปฏิบัติ</th><th>WHERE — สถานที่</th><th>WHAT &amp; HOW — วิธีทำ/ผลส่งมอบ</th><th>COST OWNER / PAYER</th><th>QTY / RATE</th><th>WORKING COST / SELL</th><th>SOURCE / CFO GATE</th></tr></thead>
-  <tbody>{rows.map(r=><tr key={r.id} style={{verticalAlign:"top",overflowWrap:"anywhere",whiteSpace:"normal"}}>
-   <td><strong>{r.id}</strong><small>{r.wbs}</small><small>{r.account||r.owner}</small></td>
+  <tbody>{rows.map(r=><tr key={r.id} data-component-key={rowId(r.id)} style={{verticalAlign:"top",overflowWrap:"anywhere",whiteSpace:"normal"}}>
+   <td><strong>{r.id}</strong><small>{r.wbs}</small><small>{r.account||r.owner}</small>{auditCopy(rowId(r.id))}</td>
    <td><strong>{r.executor}</strong><small>{r.executionStatus}</small></td>
    <td>{r.location}</td>
    <td><strong>{r.activity}</strong><small>Method: {r.method}</small><small>Deliverable: {r.deliverable}</small></td>
@@ -85,6 +89,7 @@ function B1IndirectExpenseRegister0553({workingRow}){
   </tr>)}</tbody></table></div>;
  return <section className="p55-panel" data-component-key="bid.budget.working.bc.b1.indirect-ledger" style={{padding:14,marginTop:12}}>
   <h3>B1 — Project Expense Ledger (WBS-Driven / Single Cost Owner)</h3>
+  <p className="p55-note">Module ID: {auditCopy(sourceId)}</p>
   <p className="p55-note" data-component-key={ledger.pendingAllocationPolicy.moduleId}><strong>B1 PENDING COST OWNER (Suspense):</strong> รายการจาก BOD/DTS/SPE/WBS ที่ยังไม่พบหมวด A/B2–B14/C ให้พักตรวจใน B1 ก่อนโดยไม่บวก Working Cost/Working Sell อัตโนมัติ เมื่อยืนยันว่าเป็นค่า FAT/SAT/Witness ให้ออกไป B3; เฉพาะ Yard Specialist Call-out จึงอยู่ B9; ส่วนที่เหลือ B1 เฉพาะ PM/Indirect ที่มีหลักฐานและไม่ซ้ำหมวดอื่น</p>
   <p className="p55-note"><strong>CFO REVIEW VIEW — Who / What / Where / How / Cost Owner / Payer / Quantity / Rate / Evidence.</strong> Rev.K K00–K18 and Rev.L Yard roles, Rev.J Gantt and Rev.I risk review, MR0001–0004 / BOD / DTS / SPE / TAG MTO. Role/location assumptions and MGW FAT venue conflicts are flagged, not treated as approvals. No new Direct Cost posting. Earlier Engineering WBS pricing has been excluded from active B1; the source-register rows below stay nonposting. The new B1.1–B1.8 THB multi-role and expense estimate is itemized in the Rev.K budget immediately above, while actual payroll/invoices and contractual payers remain to verify.</p>
   <div className="p55-metric-grid">
@@ -96,9 +101,25 @@ function B1IndirectExpenseRegister0553({workingRow}){
    <div><strong>Other-owner expense objects</strong><p>{ledger.outside.length}</p><small>Reference only; cannot post into B1</small></div>
    <div><strong>Who/Where/How mapped</strong><p>{ledger.roleMappedCount}/{ledger.rows.length}</p><small>Mapped is not an approved RACI or priced budget</small></div>
   </div>
-  {groups.map(([account,title])=>{const rows=ledger.b1.filter(r=>r.account===account);return <section key={account} style={{marginBottom:10}}><button type="button" className="p553-detail-button" aria-expanded={!!expanded[account]} onClick={()=>setExpanded(x=>({...x,[account]:!x[account]}))}>{expanded[account]?"−":"+"} {account} — {title} ({rows.length})</button>{expanded[account]&&renderRows(rows)}</section>;})}
-  <button type="button" className="p553-detail-button" aria-expanded={showCross} onClick={()=>setShowCross(x=>!x)}>{showCross?"−":"+"} Cross-owner WBS Expenses (B2–B14, A, C, third parties) — non-additive</button>
-  {showCross&&renderRows(ledger.outside)}
+  {groups.map(([account,title],index)=>{
+   const rows=ledger.b1.filter(r=>r.account===account),id=groupId(account);
+   return <details key={account} className="p553-b1-item" data-component-key={id}>
+    <summary className="p553-b1-item-summary">
+     <span className="p553-b1-numeral">B1.A.4.{index+1}</span>
+     <span className="p553-b1-summary-label"><strong>{account} — {title} ({rows.length})</strong>
+      <small>Read-only owner evidence / not priced again</small><code>{id}</code></span>
+     {auditCopy(id)}
+    </summary><div className="p553-b1-item-body">{renderRows(rows)}</div>
+   </details>;
+  })}
+  <details className="p553-b1-item" data-component-key={sourceId+".cross-owner"}>
+   <summary className="p553-b1-item-summary">
+    <span className="p553-b1-numeral">B1.A.4.9</span>
+    <span className="p553-b1-summary-label"><strong>Cross-owner WBS Expenses (B2–B14 / A / C)</strong>
+     <small>NON-ADDITIVE — cannot post inside B1</small><code>{sourceId+".cross-owner"}</code></span>
+    {auditCopy(sourceId+".cross-owner")}
+   </summary><div className="p553-b1-item-body">{renderRows(ledger.outside)}</div>
+  </details>
   <p className="p55-note"><strong>Double-post rule:</strong> MGW FAT witness staff/travel/insurance → B3 once; offshore SAT/SIT → B3; optional Yard Specialist → B9; VDRL/document control → B2; freight/customs broker → B6; OEM included equipment/tools → Part A; B1 only project management, lawful permit/regulatory, office and separately evidenced executive costs. No amount can enter B1 without a unique Expense ID, quantity, rate source and ownership check.</p>
  </section>;
 }
