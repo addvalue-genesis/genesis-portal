@@ -114,8 +114,8 @@ function Pricing({row}){
     <small>Working SELL is not a supplier invoice or verified payroll cost</small></div>
   </div>
   {code==="B2"&&<section className="p55-panel" style={{padding:12}}>
-   <h4>B2 — THB 580,000 Source Quotation / Reconciliation</h4>
-   <p className="p55-note"><strong>THB 580,000 is the controlled WBS Working SELL lump sum.</strong>
+   <h4>B2 — Historical Rev05 THB 580,000 Quotation / Reconciliation (non-current)</h4>
+   <p className="p55-note"><strong>THB 580,000 is the SUPERSEDED Rev05 historical WBS lump sum, not current 10.2 B2 Working SELL.</strong>
     The 143 source rows are not separately priced document instances. There is no validated
     allocation of Qty × document hours × staff role rate or independent direct cost that
     reconciles to this SELL figure. <strong>Do not divide THB580,000 by 143 or 38</strong>
@@ -283,8 +283,10 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
   .forEach(x=>{x.open=open;});
  if(!workingRow.costEvidence||workingRow.directCostTHB!==null)
   throw Error("B/C price trace must not imply a verified Direct Cost");
- if(code==="B2"&&workingRow.workingSellTHB!==580000)
-  throw Error("B2 Working SELL authority changed from WBS source");
+ if(code==="B2"&&(!workingRow.b2WorkingSellDecision||
+  workingRow.workingSellTHB!==workingRow.b2WorkingSellDecision.selectedWorkingSellTHB||
+  workingRow.workingSellTHB!==237121.13||workingRow.b2PriorWorkingSellReferenceTHB!==580000))
+  throw Error("B2 owner trace must display independent 131-WO Working SELL; Rev05 is historical only");
  return <section ref={root} className={"p55-panel p553-bc-price-trace p553-bc-price-trace--"+tone}
   data-component-key={id}>
   <div className="p553-bc-price-head">
@@ -298,11 +300,11 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
     <button type="button" className="p553-detail-button" onClick={()=>setAll(false)}>− Collapse All</button>
    </div>
   </div>
-  {code==="B2"&&<B2IndependentVdrlRecalculation0553/>}
+  {code==="B2"&&<B2IndependentVdrlRecalculation0553 workingRow={workingRow}/>}
   {code==="B2"&&<details className="p55-panel p553-b2-legacy-price-reference"
    data-component-key="bid.budget.working.bc.b2.quote-comparison"
    style={{padding:12,marginTop:12}}>
-   <summary><strong>B2 Historical / Existing Working SELL Reference — NOT used to recalculate</strong>
+   <summary><strong>B2 Rev05 Historical SELL THB 580,000 — REPLACED / NOT USED IN CURRENT WORKING</strong>
     {" "}<small>Open only to compare the previous source WBS and original revisions;
     the independent VDRL estimate above uses no old selling-price target</small></summary>
    <B2WorkingPriceOverview0553 workingRow={workingRow}/>
