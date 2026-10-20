@@ -50,7 +50,7 @@ assert.equal(audit.incomplete,true);
 // 10.2 source schedules drive ALL five Annex tabs. B Working Sell is unchanged,
 // C remains a reference only; any source-to-detail variance blocks release.
 const revBox={};
-vm.runInNewContext(file("data/rev08CommercialBaseline.js").replace(/\\bexport /g,"")+";this.rev=REV08_BASELINE;",revBox);
+vm.runInNewContext(file("data/rev08CommercialBaseline.js").replace(/\bexport /g,"")+";this.rev=REV08_BASELINE;",revBox);
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 for(const code of ["B10","B11","B13","C1","C2"]){
  const detail=revBox.rev.detail[code];
