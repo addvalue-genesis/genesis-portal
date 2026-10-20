@@ -76,7 +76,7 @@ export function selectB3SiteMrSatCoverage0553(){
   personDayRateTHB:dailyRateTHBPerPerson,
   includedLaborSellTHB:t.workingSellTHB,
   testIds:all.filter(r=>timeboxOf(r)===t.id).map(r=>r.id),
-  additionalTestSellTHB:0, // PRESENTATION ONLY; test rows retain null
+  additionalTestSellTHB:null, // NO incremental price posting; unverified costs remain UNKNOWN
   postingAllowed:false
  }));
  if(pricedTimeboxes.some(t=>!t.testIds.length||
