@@ -72,7 +72,7 @@ const modelSrc=fs.readFileSync(path.join(root,"project0553/data/b2IndependentVdr
 assert(!modelSrc.includes("580000")&&!modelSrc.includes("580,000"),
  "Recalculation may not backsolve from the old B2 quote");
 const priceSrc=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
-assert(priceSrc.indexOf("<B2IndependentVdrlRecalculation0553/>")<
+assert(priceSrc.indexOf('<B2IndependentVdrlRecalculation0553 workingRow={workingRow}/>')<
  priceSrc.indexOf('<B2WorkingPriceOverview0553 workingRow={workingRow}/>'));
 assert.equal(JSON.stringify(working()),original,"Recalc altered B2 canonical Working SELL");
 assert.equal(working().byCode.B2.workingSellTHB,237121.13);
