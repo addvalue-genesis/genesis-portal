@@ -10,6 +10,10 @@ import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553
 // Presentation-only B3 grouping. No new source prices, Cost Owner or cost posting.
 // Use native <details> so Project Module Navigator can open ALL ancestors of a leaf.
 const ROOT="bid.budget.working.bc.b3";
+const copyInSummary=id=><span className="p553-b3-copy"
+ onClick={e=>{e.preventDefault();e.stopPropagation();}} onKeyDown={e=>e.stopPropagation()}>
+ <ComponentCopyId projectId="PJ2608-0553" componentKey={id}/>
+ </span>;
 const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 
 function B3Group0553({number,kind,title,description,defaultOpen=false,children}){
@@ -19,7 +23,7 @@ function B3Group0553({number,kind,title,description,defaultOpen=false,children})
   <summary className="p553-b3-summary">
    <span className="p553-b3-sequence">{number}</span>
    <span className="p553-b3-summary-label"><strong>{title}</strong>
-    <small>{description}</small><code>{moduleId}</code></span>
+    <small>{description}</small><code>{moduleId}</code></span>{copyInSummary(moduleId)}
   </summary>
   <div className="p553-b3-group-body">
    <p className="p55-note">Group Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/></p>
@@ -32,7 +36,7 @@ function B3Item0553({number,title,moduleId,children,defaultOpen=false}){
  return <details className="p553-b3-accordion-item" defaultOpen={defaultOpen}>
   <summary className="p553-b3-item-summary">
    <span className="p553-b3-sequence">{number}</span>
-   <span className="p553-b3-summary-label"><strong>{title}</strong><code>{moduleId}</code></span>
+   <span className="p553-b3-summary-label"><strong>{title}</strong><code>{moduleId}</code></span>{copyInSummary(moduleId)}
   </summary>
   <div className="p553-b3-item-body">
    <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/></p>
@@ -61,6 +65,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
   data-component-key={ROOT+".worktype-accordion"}>
   <div className="p553-b3-worktype-header">
    <div><h4>B3 — Inspection, Testing &amp; Certification / จัดกลุ่มตามประเภทงาน</h4>
+    <p className="p55-note">Module ID: {copyInSummary(ROOT+".worktype-accordion")}</p>
     <p className="p55-note">Working SELL <strong>{money(workingRow.workingSellTHB)}</strong> · Direct Cost NOT ESTABLISHED · RELEASE HOLD.
      All categories are views of ONE canonical B3 owner; grouped totals are not new postings.</p></div>
    <div className="p553-b3-actions">
