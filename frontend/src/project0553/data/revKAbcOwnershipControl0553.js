@@ -17,7 +17,8 @@ export function selectRevKAbcOwnershipControl0553(working){
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
  if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.workingSellTHB+b9.fatWorkingSellTHB)||current.B9!==0||
-    working.knownWorkingSellTHB!==4187590.69)
+    working.knownWorkingSellTHB!==3844711.82 ||
+    working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))
   throw Error("B9 current Base and optional Yard must be separate 1 LS");
