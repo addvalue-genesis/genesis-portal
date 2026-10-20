@@ -6,6 +6,7 @@ import {B1EngineeringSellModel0553} from "./B1EngineeringSellModel0553";
 import {selectB1ProjectExpenseLedger0553} from "./data/b1IndirectCostLedger0553";
 import {B1RevKMilestoneBudget0553} from "./B1RevKMilestoneBudget0553";
 import {B1WorkingPriceOverview0553} from "./B1WorkingPriceOverview0553";
+import {B2WorkingPriceOverview0553} from "./B2WorkingPriceOverview0553";
 import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
@@ -196,6 +197,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
   <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
   <h3>{e.code} — {workingRow.requirement}</h3>
   {e.code==="B1"&&<B1WorkingPriceOverview0553 workingRow={workingRow}/> }
+  {e.code==="B2"&&<B2WorkingPriceOverview0553 workingRow={workingRow}/> }
   {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&<MgwR2CommercialCover0553 code={e.code}/>}
   {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&<MgwPaulVendorClarifications0553 code={e.code}/>}
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
