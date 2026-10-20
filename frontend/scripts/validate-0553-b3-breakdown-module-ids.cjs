@@ -61,7 +61,7 @@ const x=render(Crosswalk,{selectedOwner:"B3"});
 assert(x.includes("bid.budget.working.bc.b3.requirement-crosswalk"));
 assert(x.includes("bid.budget.working.bc.b3.requirement-trace"));
 assert(x.includes("Copy component ID bid.budget.working.bc.b3.requirement-crosswalk"));
-assert(x.includes("RQM-01")&&x.includes("RQM-19"));
+assert(x.includes("RQM-01")&&x.includes("RQM-16")); // RQM-19 belongs B1 and stays in collapsed Cross-owner list
 const m=render(SiteMatrix,{});
 assert(m.includes("bid.budget.working.bc.b3.site-mr-sat-matrix"));
 assert(m.includes("Copy component ID bid.budget.working.bc.b3.site-mr-sat-matrix"));
