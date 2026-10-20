@@ -46,7 +46,7 @@ for(const s of [
  "required-bom.ga-revision-comparison",
  "required-bom.z1f-ga-complete-factory-bom",
  "07-56D1-5831","07-56D1-9811","39,200.00",
- "GA_CUSTOMER_FREE_ISSUE_SEPARATE_TAG",
+ "CUSTOMER SUPPLIED — SEPARATE OWNER, NOT PANEL PRICE",
  "SCADA_TCAB_ACTIVE_M20_GLANDS_BY_VERIFIED_CABLE_ENDS",
  "NOT ESTABLISHED"
 ])must(tcabHtml,s,"ZWP20 TCAB");
@@ -120,7 +120,7 @@ must(cfoHtml,"INTERNAL CFO PRICING TABLE","CFO");
 must(cfoHtml,"WORKING","CFO");
 const workbookHtml=render(Workbook,{model:release,recipient:"INTERNAL"});
 for(const s of [
- 'data-component-key="bid.budget.pricing.release"',
+ 'data-component-key="bid.budget.pricing.release.preview"',
  "Internal Preview","NOT RELEASED","Part A",
  "Export Native Original XLSX","HOLD","Source"
 ])must(workbookHtml,s,"Release workbook");
