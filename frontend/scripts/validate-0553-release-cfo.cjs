@@ -25,7 +25,7 @@ assert.match(source,/aOverflow=.*>15/);
 assert.match(source,/annexOverflow=.*>13/);
 const workspace=file("CommercialWorkspace.jsx");
 assert.match(workspace,/PricingCfoDashboard0553 model=\{releaseModel\}/);
-assert.match(workspace,/ReleaseCustomerWorkbook0553 model=\{releaseModel\}/);
+assert.match(workspace,/ReleaseCustomerWorkbook0553 model=\{releaseModel\} recipient=\{recipient\}/);
 assert.match(workspace,/onOpenSource=\{openReleaseSource\}/);
 const ui=file("ReleaseCustomerWorkbook0553.jsx");
 for(const sheet of ["Scope of supply","B10 CommSpares","B11 SpecialTool","B13 Consumerables","C1 CapitalSpares","C2 2Y-Spares"])
@@ -33,6 +33,7 @@ for(const sheet of ["Scope of supply","B10 CommSpares","B11 SpecialTool","B13 Co
 assert.match(ui,/const canQuote=false/);
 assert.match(ui,/approved:false,releaseAllowed:false/);
 assert.match(ui,/sourceModuleId/);
+assert.match(ui,/recipient==="INTERNAL"&&viewer==="INTERNAL"/);
 assert.match(ui,/OVERFLOW/);
 assert.ok(!/sourceFile\.write|updateWorkingSellTHB/.test(ui));
 console.log("PASS PJ2608-0553 release pricing 100 => A/C 130, B client 100 / SAMTEL 5 / ADDVALUE 95; source and HOLD checks");
