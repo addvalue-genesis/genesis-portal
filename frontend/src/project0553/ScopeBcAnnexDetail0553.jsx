@@ -190,8 +190,8 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
     </tr>)}</tbody></table></div>
   </details>}
   {code==="C1"&&<div className="p55-panel" style={{padding:12}}>
-   <h4>SUPPLIER RECOMMENDATION FOR CAPITAL SPARE PARTS — CURRENT SELECTION REVIEW</h4>
-   <p className="p55-note"><strong>MANAGEMENT C1 BUDGETARY SELECTION:</strong> One complete RACON spare set is selected as an OPTION using the ORGA installed equipment FCA quote benchmark, not a confirmed OEM spare quote or DDP delivered price. Rev08 RACON/SCADA historical entries remain only comparison references.</p>
+   <h4>C1 CAPITAL SPARES — HISTORICAL COMPARISON / CURRENT MGW SPIR REQUIRED</h4>
+   <p className="p55-note"><strong>C1 HISTORICAL SCENARIO — NON-SELECTED SOURCE:</strong> The prior one-complete-RACON-spare option uses an ORGA installed equipment FCA quote benchmark, NOT MGW selected Working Cost, a current OEM capital-spare quote, or a DDP sell price. MGW selected installed RACON is USD {spareReconciliation.raconComparison.vendorUnitPriceUSD.toLocaleString("en-US")} per set; ORGA old comparator USD {spareReconciliation.raconComparison.historicalAlternativeUnitUSD.toLocaleString("en-US")}. Await MGW itemized OEM SPIR and Engineering/Commercial approval; do not carry the historical option into release.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>MR / Installed Equipment</th><th>Document / OEM Scope</th><th>Capital Spare Assessment</th><th>Selected QTY</th><th>Unit Price THB</th><th>Total Price THB</th><th>Evidence / Decision</th></tr></thead>
     <tbody>{spareReconciliation.systemSummary.map(x=><tr key={x.mr}>
@@ -201,7 +201,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td>NOT DERIVED</td><td>OEM SPIR RATE REQUIRED</td><td>NOT ESTABLISHED</td>
      <td>{x.auditVerdict}<small>C1 quotation is optional, not an approved working-selection BOM</small></td>
     </tr>)}</tbody></table></div>
-   <h4>Selected C1 Budgetary Option — Customer Format</h4>
+   <h4>Historical C1 Capital-Spare Scenario — Internal Reference Only</h4>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>QTY</th><th>Unit Price THB</th><th>Total Price THB</th><th>Lead Time ARO</th></tr></thead>
     <tbody><tr>
