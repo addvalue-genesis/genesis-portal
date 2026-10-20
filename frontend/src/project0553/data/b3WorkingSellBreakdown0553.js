@@ -1,0 +1,54 @@
+// 10.2 / B3 price reconciliation for human-readable working SELL display.
+// Single read-only bridge of bcTurnkeyWorkingCost0553 B3 source components.
+// Does NOT post working costs, infer direct payroll, or change 10.3 release.
+const round=n=>Math.round((n+Number.EPSILON)*100)/100;
+const isMoney=n=>Number.isFinite(n)&&n>=0;
+export function selectB3WorkingSellBreakdown0553(workingRow){
+ if(!workingRow||workingRow.code!=="B3")return null;
+ const sat=workingRow.b3FortyDayBudget,china=workingRow.b3ChinaFatBudget;
+ if(!sat||!china)throw Error("Missing B3 current 40-day SAT or MGW China FAT source");
+ const fatRows=china.rows.filter(x=>x.costOwner==="B3"&&!x.optional);
+ if(fatRows.length!==8||!fatRows.every(x=>isMoney(x.workingSellTHB)&&x.moduleId))
+  throw Error("MGW FAT source row ownership or working sell missing");
+ const fatSell=round(fatRows.reduce((n,x)=>n+x.workingSellTHB,0));
+ const offshoreLabor=round(sat.rows.reduce((n,x)=>n+x.workingSellTHB,0));
+ const veex=sat.veex;
+ const rent=veex?.workingSellTHB;
+ const satSell=round(offshoreLabor+rent);
+ const total=round(satSell+fatSell);
+ if(sat.workdays!==40||sat.persons!==2||sat.personDays!==80||
+  offshoreLabor!==sat.laborWorkingSellTHB||satSell!==sat.workingSellTHB||
+  fatSell!==china.fatWorkingSellTHB||total!==workingRow.workingSellTHB)
+  throw Error("B3 Working SELL source reconciliation failed; no price override allowed");
+ return Object.freeze({
+  moduleId:"bid.budget.working.bc.b3.working-sell-breakdown",
+  ownerModuleId:workingRow.moduleId,
+  currency:"THB",
+  summary:[
+   {id:"OFFSHORE",moduleId:"bid.budget.working.bc.b3.40-day-abc",
+    activity:"Offshore SAT/SIT — seven sites plus integrated SIT and punch closeout",
+    driver:"40 working team-days × 2 paid specialists × USD800/person-day × THB31.5/USD",
+    workingSellTHB:offshoreLabor,postedWithinB3:true},
+   {id:"VEEX",moduleId:"bid.budget.working.bc.b3.veex-mx100",
+    activity:"Temporary VeEX MX100+ SAT instrument rental",
+    driver:veex.quantity+" rental-days × THB"+veex.rateTHB+" /day; ex VAT; no extra B11 tool purchase",
+    workingSellTHB:rent,postedWithinB3:true},
+   {id:"MGW-FAT",moduleId:"bid.budget.working.bc.b3.revk-china-budget",
+    activity:"MGW China FAT — 2 paid witnesses, travel, accommodation and insurance",
+    driver:"6 FAT witness workdays × 2 persons + 2 travel days × 2 persons + eight separately owned B3 estimate lines",
+    workingSellTHB:fatSell,postedWithinB3:true}
+  ],
+  offshore:{workdays:sat.workdays,people:sat.persons,personDays:sat.personDays,rateUSD:sat.rateUSDPerPersonDay,workingFx:sat.fxTHBPerUSD,
+   laborWorkingSellTHB:offshoreLabor,rentalWorkingSellTHB:rent,
+   includedSatSellTHB:satSell,siteTimeboxes:sat.rows},
+  fat:{rows:fatRows,workingSellTHB:fatSell,conditionalYardExcludedTHB:china.conditionalYardSellTHB},
+  totalWorkingSellTHB:total,verifiedDirectCostTHB:null,
+  excluded:["B9 conditional Yard specialist allowance is NOT B3",
+   "MGW OEM factory test execution and instruments belong to Part A",
+   "Rev05 Bangkok FAT THB144,000 is superseded, NOT additive",
+   "19 contract trace rows and 21 SAT Test IDs are NON-POSTING engineering evidence",
+   "No site-MR SAT Test ID has a separate working day or sell posting"],
+  status:"CURRENT_PRE_AWARD_BUDGETARY_WORKING_SELL__DIRECT_COST_NOT_ESTABLISHED__RELEASE_HOLD",
+  releaseAllowed:false
+ });
+}
