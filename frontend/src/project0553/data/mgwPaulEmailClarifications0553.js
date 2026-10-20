@@ -54,7 +54,7 @@ export const MGW_PAUL_EMAIL_CLARIFICATIONS_0553=Object.freeze({
   origin:"MGW Nantong",destination:"JUTAL site — exact address unspecified",
   sourceCostOwner:"B6",moduleId:"bid.budget.working.bc.b6.mgw-road-freight",
   freightScopeVerified:false,incotermVerified:false,exwQuoteUSD:quoted.overallTotalUSD,
-  chinaTransportToMyanmarrOnwardIncluded:null,customsDutyUSD:null,
+  onwardTransportToMyanmarIncluded:null,customsDutyUSD:null,
   currentWorkingSellOverrideAllowed:false,
   directCostPostingAllowed:false,
   status:"SOURCE_RATE_AVAILABLE__LOGISTICS_SCOPE_AWAITING_CONFIRMATION"
