@@ -81,8 +81,8 @@ export function evaluateB2VdrlIndependentScenario0553({
    directCostProxyTHB:directCostProxy,
    employerLoadedPlanningCostTHB:loadedPlanningCost,
    indicativeSellTHB:grossMarginPrice.value,
-   ownerDisposition:isExplicitB1?"B1_TECH_AUTHOR_EXCLUDED__B2_DC_ONLY":
-    ownerPolicy==="DC_ADMIN_ONLY_BOUNDARY_CASE"?"ALL_TECH_REVIEW_PENDING__DC_ONLY":
+   ownerDisposition:ownerPolicy==="DC_ADMIN_ONLY_BOUNDARY_CASE"?"ALL_TECH_REVIEW_PENDING__DC_ONLY":
+    isExplicitB1&&ownerPolicy==="EXCLUDE_EXPLICIT_B1_TECHNICAL_AUTHOR_HOURS"?"B1_TECH_AUTHOR_EXCLUDED__B2_DC_ONLY":
     "B2_DOC_AND_REVIEW_CANDIDATE__RACI_NOT_APPROVED",
    priceStatus:"SCENARIO_ONLY_NOT_VERIFIED_NOT_POSTED"
   });
