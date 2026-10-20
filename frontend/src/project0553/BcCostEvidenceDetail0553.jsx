@@ -67,7 +67,7 @@ function B1WorkingSellBreakdown0553({workingRow}){
 function B1IndirectExpenseRegister0553({workingRow}){
  const ledger=selectB1ProjectExpenseLedger0553();
  const [showCross,setShowCross]=React.useState(false);
- const [expanded,setExpanded]=React.useState({"B1.1":true,"B1.2":true,"B1.3":true,"B1.4":true,"B1.5":true,"B1.6":true,"B1.7":true,"B1.8":true});
+ const [expanded,setExpanded]=React.useState({});
  const groups=[["B1.1","Project Management"],["B1.2","Meetings & Representation"],["B1.3","Management Travel"],["B1.4","Office/Admin"],["B1.5","Regulatory Coordination"],["B1.6","Legal/Local Consultant"],["B1.7","Official Fees"],["B1.8","Other Project Expenses"]];
  const cash=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
  const renderRows=rows=><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1560,width:"100%",tableLayout:"fixed",fontSize:12}}>
@@ -129,10 +129,14 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; Offshore SAT/SIT execution อยู่ B3; MGW China FAT Witness อยู่ B3 และเฉพาะ Conditional Yard Senior Engineer อยู่ B9; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่าใช้จ่ายที่ปรึกษาและค่าธรรมเนียมราชการที่มีเงื่อนไขยังไม่รวมใน B1 Base และราคา Engineering WBS เก่าถูกตัดจาก B1</p>
    </details>
   </section>}
-  {e.code==="B1"&&<B1RevKMilestoneBudget0553/>}
-  {e.code==="B1"&&<B1IndirectExpenseRegister0553 workingRow={workingRow}/>}
-   {/* No former 964-MH Engineering pricing audit rendered in current B1 */}
-  {e.code==="B1"&&<p className="p55-note"><strong>B1 current basis:</strong> New B1.1–B1.8 roles and expenses only. Old Engineering 964-MH price excluded. Engineering activity titles appear solely in unpriced scope-owner review above.</p>}
+  {e.code==="B1"&&<B1RevKMilestoneBudget0553
+   sourceLedger={<B1IndirectExpenseRegister0553 workingRow={workingRow}/>}
+   sourceEvidence={<React.Fragment>
+    <MgwR2CommercialCover0553 code="B1"/>
+    <MgwPaulVendorClarifications0553 code="B1"/>
+    {sharedEvidence}
+   </React.Fragment>}/>}
+   {/* 27 historical engineering titles remain unpriced inside B1.A.3; no legacy posting. */}
   {e.code!=="B1"&&<>
   <h4>{e.code==="B3"||e.code==="B9"?"Rev05 Original WBS Calculation Audit — ไม่ใช่ราคาปัจจุบัน":"1. Working Drivers & Calculation Evidence — ต้นทางปริมาณและสมการ"}</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
@@ -166,8 +170,8 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
  return <section className="p55-panel p553-bc-evidence" data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
   <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
   <h3>{e.code} — {workingRow.requirement}</h3>
-  {e.code!=="B3"&&<MgwR2CommercialCover0553 code={e.code}/>}
-  {e.code!=="B3"&&<MgwPaulVendorClarifications0553 code={e.code}/>}
+  {e.code!=="B3"&&e.code!=="B1"&&<MgwR2CommercialCover0553 code={e.code}/>}
+  {e.code!=="B3"&&e.code!=="B1"&&<MgwPaulVendorClarifications0553 code={e.code}/>}
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
    <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
@@ -203,6 +207,6 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
    navigationTarget={navigationTarget} auditContent={sharedEvidence}/>}
   {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
   {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
-  {e.code!=="B3"&&sharedEvidence}
+  {e.code!=="B3"&&e.code!=="B1"&&sharedEvidence}
  </section>;
 }
