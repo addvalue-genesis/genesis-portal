@@ -75,6 +75,15 @@ assert.equal(v.deliveryTerms.previousDetail,"EX WORKS Nantong China");
 assert.equal(v.FAT.internalFatDays,2);
 assert.equal(v.FAT.facilityEndUserDaysMinimum,5);
 assert.equal(v.FAT.addvalueExistingWitnessDaysBudgeted,6);
+assert.equal(v.FAT.managementDistinctFATStagesConfirmed,true);
+assert.equal(v.FAT.customerFATIsSeparateFromInternalIFAT,true);
+assert.equal(v.FAT.quotedServiceOverlap,false);
+assert.equal(v.FAT.supplierServicesIncludedOnceInCoverUSD,7500);
+assert.equal(v.FAT.supplierFATPriceCreditUSD,null);
+assert.equal(v.FAT.freightAfterCustomerFATPlanned,true);
+assert.deepEqual(v.FAT.executionOrder,["SERV-2_INTERNAL_IFAT","SERV-4_CUSTOMER_FAT_RESERVE","SERV-5_JUTAL_YARD_DELIVERY"]);
+assert.equal(v.FAT.signedFATAgendaAndDatesConfirmed,false);
+assert.equal(v.FAT.actualAddvalueAttendanceDaysConfirmed,false);
 assert.equal(v.FAT.attendanceVsVenueReconciled,false);
 assert.equal(email.pricedVendorFreight.usd,2500);
 assert.equal(delivery.coverFreightUSD,2500);
@@ -128,6 +137,8 @@ for(const code of ["B5","B6"]){
 }
 const b3=renderToStaticMarkup(React.createElement(CoverUI,{code:"B3"}));
 assert(b3.includes("minimum")&&b3.includes("6 FAT witness days"));
+assert(b3.includes("two DISTINCT sequential scopes")&&b3.includes("delivery to JUTAL Zhuhai Yard"));
+assert(b3.includes("Supplier SERV-2 and SERV-4 are not duplicates"));
 const b6=renderToStaticMarkup(React.createElement(CoverUI,{code:"B6"}));
 assert(b6.includes("ALREADY INCLUDED")&&b6.includes("NOT another USD2,500"));
 assert.equal(b.byCode.B3.workingSellTHB,2443400);
