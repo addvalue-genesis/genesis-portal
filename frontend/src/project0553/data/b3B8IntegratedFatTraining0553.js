@@ -15,7 +15,7 @@ export function selectB3B8IntegratedFatTraining0553(b3,b8){
  const gross=selectB3Fat2Plus5PricingScenario0553(b3);
  const requirement=selectB3RequirementWbsTrace0553().rows.find(r=>r.id==="RQM-18");
  const audit=selectBcExecutionComplianceAudit0553();
- const beforeFat=audit.rows.find(r=>r.id==="AUD-023");
+ const beforeFat=audit.requirements.find(r=>r.id==="AUD-023");
  if(!requirement||requirement.costOwner!=="B8"||!requirement.requiredResult.includes("2 batches")||
   !requirement.requiredResult.includes("Yangon")||
   !beforeFat||beforeFat.code!=="B8"||!beforeFat.finding.includes("before FAT"))
