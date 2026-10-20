@@ -10,8 +10,8 @@ export const B2_ORIGINAL_PRICE_EVIDENCE_0553=Object.freeze({
  quote:{
   source:"Rev05 / 00_EXEC_QUOTE + 09_B2_DOCUMENTATION",
   url:"https://docs.google.com/spreadsheets/d/1vXwV3py-FwdyvZaNq-OvsDyefZEJKPqz/edit",
-  currentWorkingSellTHB:580000,
-  quoteClass:"CURRENT_WBS_WORKING_SELL_PROJECT_WIDE_LUMP_SUM_NOT_VERIFIED_DIRECT_COST",
+  currentWorkingSellTHB:580000, // This is the ORIGINAL Rev05 file field only; no longer the selected 10.2 Working SELL.
+  quoteClass:"HISTORICAL_REV05_WBS_SELL_SUPERSEDED_BY_131WO_REPRICE_NOT_VERIFIED_DIRECT_COST",
   quantity:1,unit:"LS"
  },
  sources:Object.freeze({
@@ -88,7 +88,7 @@ export const B2_ORIGINAL_PRICE_EVIDENCE_0553=Object.freeze({
   state:"HISTORICAL_BOUNDED_COST_PROXY_NOT_CURRENT_DIRECT_COST"
  }),
  openIssues:Object.freeze([
-  "Rev00d B2 revised THB560,000 does NOT independently reconcile to Rev05 current THB580,000; THB20,000 source difference has no identified activity or quote bridge.",
+  "Rev00d B2 revised THB560,000 does NOT independently reconcile to the SUPERSEDED Rev05 THB580,000; THB20,000 source difference has no identified activity or quote bridge.",
   "Rev00d TEMP cost estimate and Rev02 bounded cost proxy are alternative source revisions; do NOT add them together.",
   "143 VDRL rows/38 title types are contractual requirements, NOT priced document quantities.",
   "Provisional 964.28 MH, salary rates, commercial factors, VDRS cycles and Final/As-Built assumptions are NOT approved current paid MH or verified direct costs.",
