@@ -1,6 +1,7 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
+import {PricingSourceChip0553} from "./PricingSourceGuide0553";
 import {buildNewNativeWorkingWorkbook0553} from "./newNativeWorkbook0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import "./releaseWorkbook0553.css";
@@ -73,13 +74,27 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   }finally{setNativeBusy(false);}
  };
  const openSource=item=>{if(internal)setSource(item);};
- const sourceButton=item=>internal?<button type="button" className="p553-origin-link"
-   aria-label={"เปิดต้นทาง "+(item.code||item.mr||item.tag||"")} onClick={()=>openSource(item)}>↗ Source</button>:null;
+ const sourceButton=item=>{
+  if(!internal||!item)return null;
+  const isEquipment=String(item.sourceModuleId||"").startsWith("bid.budget.bom")||
+   /^A[1-5]$/.test(String(item.code||item.mrCode||""));
+  const number=isEquipment?"10.1":"10.2";
+  return <button type="button"
+   className={"p553-origin-link p553-origin-link--"+(isEquipment?"equipment":"services")}
+   title={number+" · "+item.sourceModuleId+" — Working evidence, not approval"}
+   aria-label={"View "+number+" source for "+(item.code||item.mr||item.tag||"")}
+   onClick={()=>openSource(item)}>↗ {number}</button>;
+ };
  const toggleMr=key=>setExpandedMr(old=>({...old,[key]:!old[key]}));
  return <section className="p55-panel p553-release-workbook" data-component-key="bid.budget.pricing.release.preview">
    <div className="p55-eyebrow">{title} · 10.3 / bid.budget.pricing.release.preview <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing.release.preview"/></div>
    <h3>Customer Excel Format Preview — 4-Scope of Supply.xlsx</h3>
    <p className="p55-note"><strong>PRE-EXPORT PREVIEW / NOT ISSUED.</strong> ตารางนี้เป็น JSX จำลองแบบฟอร์มลูกค้า ไม่ใช่ไฟล์ Excel ที่ Export แล้ว ข้อมูล A1–A4 สรุปทั้ง MR จาก 10.1, B1–B14 จาก Working Sell ของ 10.2, C1/C2 รอ Verified Direct Cost และแยกจาก Base</p>
+   {internal&&<div className="p553-source-preview-legend">
+    <PricingSourceChip0553 source="equipment" role="reads" onClick={()=>onOpenSource({code:"A1"})}/>
+    <PricingSourceChip0553 source="bc" role="reads" onClick={()=>onOpenSource({code:code==="SUMMARY"?"B1":code})}/>
+    <small>สีเดียวกัน = Source Module เดียวกัน · ไม่ได้หมายถึง Save/Sync หรืออนุมัติแล้ว</small>
+   </div>}
    <div className="p553-release-controls">
     <label>Preview mode
      <select value={recipient==="INTERNAL"?viewer:"CUSTOMER"} onChange={e=>{setViewer(e.target.value);setSource(null);}} disabled={recipient!=="INTERNAL"}>
@@ -119,7 +134,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      <div className="p553-native-title">Scope of supply<br/>供货范围</div>
      <div className="p553-sheet-meta"><strong>Project</strong><span>ZAWTIKA DEVELOPMENT PROJECT PHASE 1F</span>
       <strong>RFQ No.</strong><span> </span><strong>Package Name</strong><span> </span></div>
-     <div className="p553-preview-totals">
+     <div className={"p553-preview-totals"+(internal?" p553-preview-totals--internal":"")}>
       <span>Part A / 10.1 · <strong>{cash(aWorkingTotal)}</strong></span>
       <span>Part B / 10.2 · <strong>{cash(bWorkingTotal)}</strong></span>
       <span>Base A+B (working only) · <strong>{cash(provisionalBase)}</strong></span>
@@ -130,7 +145,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-section"><td colSpan={8}>Part A: BASIC<br/>A部分：基本</td></tr>
        <tr className="p553-sheet-subheading"><td colSpan={8}>A1. Main Equipment · Source MR-0001–MR-0004 / Customer Grouping Preview</td></tr>
        {partA.groups.map((part,i)=><React.Fragment key={part.code}>
-        <tr className="p553-mr-preview-row">
+        <tr className={"p553-mr-preview-row"+(internal?" p553-source-cell--equipment":"")}>
          <td><strong>{part.code}</strong></td>
          <td><strong>{part.mr}</strong><small>MULTI-TAG / customer grouping subject to approval</small></td>
          <td>{part.description}</td>
@@ -165,7 +180,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-section"><td colSpan={8}>Part B: OTHERS<br/>B部分：其它</td></tr>
        {B_ROWS.map(id=>{
         const line=bLines.find(r=>r.code===id);
-        return <tr key={id}><td><strong>{id}</strong></td>
+        return <tr key={id} className={internal?"p553-source-cell--services":undefined}><td><strong>{id}</strong></td>
          <td colSpan={3}>{parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}</td>
          <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
@@ -179,7 +194,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         <td>{internal?"Pending verification · not approved bid":""}</td></tr>
        <tr className="p553-sheet-highlight"><td colSpan={8}>Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
-       {model.c.map(r=><tr key={r.code}><td><strong>{r.code}</strong></td>
+       {model.c.map(r=><tr key={r.code} className={internal?"p553-source-cell--services":undefined}><td><strong>{r.code}</strong></td>
         <td colSpan={3}>{parseName(r.code)} {sourceButton(r)}</td>
         <td>1 lot</td><td className="p553-price-cell">{money(r.customerSellTHB)}</td>
         <td className="p553-price-cell">{money(r.customerSellTHB)}</td>
