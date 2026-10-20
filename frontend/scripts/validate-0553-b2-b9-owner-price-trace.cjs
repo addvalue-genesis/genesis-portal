@@ -20,7 +20,8 @@ const bc=current(),snap=JSON.stringify(bc),idx=navigator(),byId=new Map(idx.map(
 const codes=["B2","B4","B5","B6","B7","B8","B9"];
 const mod=code=>"bid.budget.working.bc."+code.toLowerCase()+".price-trace";
 assert.equal(new Set(idx.map(x=>x.id)).size,idx.length,"Global module IDs collision");
-assert.equal(bc.byCode.B2.workingSellTHB,580000);
+assert.equal(bc.byCode.B2.workingSellTHB,237121.13);
+assert.equal(bc.byCode.B2.b2PriorWorkingSellReferenceTHB,580000);
 assert.equal(vdrl().records.length,143);
 assert.equal(vdrl().totals.uniqueTitleTypes,38);
 assert.equal(vdrl().b2CalculatedMH,null);
@@ -83,4 +84,4 @@ assert(host.includes('{e.code==="B2"&&ownerPriceTrace}'),
  "B2 price detail must appear before generic evidence summary");
 const canonical=JSON.stringify(current());
 assert.equal(canonical,snap,"Presentation mutated canonical B1–B14/C1/C2 cost/SELL");
-console.log("PASS B2-B9 cost owner trace: B2 143 VDRL + 580,000 LS with MH/rate OPEN; B9 conditional 233,600 not Base; no fabricated price, no duplicate Module ID or price posting.");
+console.log("PASS B2-B9 cost owner trace: B2 143 VDRL source plus recalculated 237,121.13 Working SELL with MH/rate OPEN; B9 conditional 233,600 not Base; no fabricated price, no duplicate Module ID or price posting.");
