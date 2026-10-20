@@ -96,8 +96,8 @@ assert.equal(JSON.stringify(derivePartBcWorkingWbs0553()),original);
 const ui=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 const detail=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
 for(const snippet of ['setBcDetailCode',
- '<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}/>',
- '<BcCostEvidenceDetail0553 workingRow={item}/>',
+ '<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/>',
+ '<BcCostEvidenceDetail0553 workingRow={item} navigationTarget={navigationTarget}/>',
  'data-component-key={item.moduleId}','group.rows.map(item=>'])
  assert(ui.includes(snippet),"Missing B/C 10.2 clickable working trace: "+snippet);
 for(const snippet of ['e.lines.map(', 'e.stages.map(', 'e.requirementRecords.map(', 'HISTORICAL_COST_PROXY_ONLY','NOT ESTABLISHED','e.requiredInputs.map('])
