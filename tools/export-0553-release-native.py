@@ -107,6 +107,8 @@ def validate_payload(wb,payload,template):
         raise ValueError("TAG, stock owner and no-double-count sign-off missing")
     if payload.get("sourceCostVerified") is not True or payload.get("sheetCapacityVerified") is not True:
         raise ValueError("10.1 / 10.2 source cost or 15/13 row-capacity check not signed off")
+    if payload.get("originalPartATagCount",0)>15 and payload.get("buyerGroupedTagFormatAccepted") is not True:
+        raise ValueError("Native Part A only has 15 lines; written buyer acceptance for grouped MR/TAG is required")
     if not isinstance(payload.get("cells"),list) or not payload["cells"]:
         raise ValueError("No source-linked approved cell entries")
     seen=set()
@@ -120,10 +122,14 @@ def validate_payload(wb,payload,template):
         val=item.get("value")
         if not value_allowed(val):raise ValueError(f"Non-finite, blank, invalid value: {sheet}!{cell}")
         src=item.get("sourceModuleId")
-        if not isinstance(src,str) or not src.startswith(
-            "bid.budget.bom" if sheet=="Scope of supply" and int(CELL_RE.fullmatch(cell)[2])<=22
-            else "bid.budget.working.bc" ):
-            raise ValueError(f"Unrelated or missing source module: {sheet}!{cell}")
+        if sheet=="Scope of supply" and cell=="G38":
+            expected_source="bid.budget.pricing"
+        elif sheet=="Scope of supply" and int(CELL_RE.fullmatch(cell)[2])<=22:
+            expected_source="bid.budget.bom"
+        else:
+            expected_source="bid.budget.working.bc"
+        if not isinstance(src,str) or not src.startswith(expected_source):
+            raise ValueError(f"Unrelated or missing source module: {sheet}!{cell} (expected {expected_source})")
         if not item.get("sourceLineId"):
             raise ValueError(f"Source Line ID required: {sheet}!{cell}")
         ws=wb.worksheets.get_item(sheet)
