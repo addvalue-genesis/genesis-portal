@@ -23,6 +23,7 @@ import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
+import {PRICING_VIEWS_0553,pricingViewByKey0553} from "./pricingViewRegistry0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {LIFECYCLE_SPARES_0553} from "./data/lifecycleSpareScope0553";
@@ -113,6 +114,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  const bcPriceAudit=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const releaseModel=buildReleaseCommercialModel0553({thbPerUsd:fx?.thbPerUsd});
+ const activePricingView=pricingViewByKey0553(mode);
  const openReleaseSource=(item)=>{
   const key=String(item?.code||item?.mrCode||"").toUpperCase();
   setMode("working");
@@ -153,11 +155,18 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <p className="p55-note">This is a controlled WORKSPACE, not a price release. The previously issued SAMTEL file is historical evidence; its exact issued revision must be verified before snapshot registration. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
     <div className="p55-segmented p55-segmented--commercial">
-    {[[ "working","Working Preview" ],["budgetary","Budgetary Submission"],["released","Released Customer Output"]].map(([k,label])=><button key={k} type="button" className={mode===k?"is-active":""} onClick={()=>setMode(k)}>{label}</button>)}
+    {PRICING_VIEWS_0553.map(view=><button key={view.key} type="button"
+     data-component-key={view.moduleId} title={view.number+" — "+view.fullLabel+" · "+view.moduleId}
+     aria-pressed={mode===view.key} className={mode===view.key?"is-active":""}
+     onClick={()=>setMode(view.key)}>{view.number} · {view.shortLabel}</button>)}
     </div>
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
   </div>
-  <p className="p55-note"><strong>Current display:</strong> {mode.toUpperCase()} · {recipient}. {mode==="working"?"Editable commercial derivation is pending source reconciliation.":mode==="budgetary"?"Frozen snapshot required; do not overwrite prior submissions.":"Customer release remains HOLD until written authorization and all gates pass."}</p>
+  <p className="p55-note" data-component-key="bid.budget.pricing.view-reference">
+   <strong>Current module:</strong> {activePricingView.number} · {activePricingView.fullLabel} ·
+   <ComponentCopyId projectId="PJ2608-0553" componentKey={activePricingView.moduleId}/>
+   {" "}· {recipient} · {mode==="working"?"LIVE Working Read Model — Save/Sync is not complete.":mode==="budgetary"?"BUDGET PREVIEW — no authenticated frozen snapshot.":"RELEASE PREVIEW — approval HOLD; selecting this tab does not issue a quotation."}
+  </p>
   {recipient==="INTERNAL"&&<PricingCfoDashboard0553 model={releaseModel}/>}
   {mode==="working"&&<>
   <section className="p55-panel">
