@@ -9,6 +9,8 @@ import {auditZWP20RadioVendorMapping0553} from "./controlledTagMappingPilot0553"
 import {deriveBartecTagRequiredBulkProjection0553,deriveBartecTcabRequiredBom0553} from "./bartecTagRequiredBulkProjection0553";
 import {deriveZwp20BulkPricingBridge0553} from "./zwp20BulkPricingBridge0553";
 import {projectMR0001TagEvidence0553} from "./mr0001TagEvidenceProjection0553";
+import {getMR0001EnclosureGaEvidence0553,ZWP20_SCADA_BULK_PHYSICAL_GAPS_0553} from "./mr0001GaEnclosureEvidence0553";
+import {getZWP8RadioOwnerEvidence0553} from "./mr0001Zwp8RadioOwnerEvidence0553";
 
 const rounded=n=>Math.round(n*100)/100;
 const ownedBy=(c,owner)=>!c.allocationOwner||c.allocationOwner===owner;
@@ -148,6 +150,8 @@ export function getTagBomFourStage0553(site,tagRow){
  const ciscoTc=ciscoTc0001ForTag(site,tagRow,owner);
  const ownerEvidence=projectMR0001TagEvidence0553(site,tagRow,source);
  const tcab=deriveBartecTcabRequiredBom0553(site,tagRow.tag,source);
+ const gaEvidence=getMR0001EnclosureGaEvidence0553(site,tagRow.tag,tagRow.row);
+ const zwp8RadioEvidence=getZWP8RadioOwnerEvidence0553(site,tagRow);
  const tcabQuote=tcabWorkingQuoteForTag(site,tagRow,owner,tcab);
  // For historical enclosure references with one site-owned TAG cost, expose
  // a single owner-scoped working function without inventing factory fitting rates.
@@ -207,6 +211,35 @@ export function getTagBomFourStage0553(site,tagRow){
  // ledger. It improves Stage 01 visibility, not TAG prices or procurement qty.
  if(ownerEvidence&&!(tcab&&ownerEvidence.category==="ENCLOSURE"))
   required.push(...ownerEvidence.required);
+ // New GA-0001 sheet13 components are source-document quantities, NOT
+ // a second selected or priced enclosure. The current 2022 16-M20 GA remains
+ // an explicit historic baseline and is no longer hidden as a Z1F certainty.
+ if(gaEvidence?.factoryBom?.length){
+  required.push(...gaEvidence.factoryBom.map(x=>({
+   id:"Z1F-GA-"+x.id,functionId:"Z1F_GA_"+x.id,
+   documentedQty:x.documentedQty,documentedUnit:x.unit,
+   qtyClass:x.classification,approvedSkuQty:null,derivedWorkingQty:null,
+   budgetRateTHB:null,budgetAmountTHB:null,rateEvidenceOriginal:null,amountEvidenceOriginal:null,
+   currencyEvidenceOriginal:null,quantityDriver:x.description,qtyProof:x.description+" / "+(x.partNumber||"factory assembly item"),
+   quantityEvidence:x.source,budgetSource:x.source,
+   budgetPosting:"SOURCE_GA_EVIDENCE_ONLY__EXISTING_OWNER_"+x.costOwner,
+   selectionStatus:"GA_REVISION_CONFLICT__OEM_SCOPE_AND_PRICE_PENDING",
+   requirementState:"FACTORY_SOURCE_GA_NOT_ACCEPTED_AS_REVISED_TCAB_SKU",
+   costOwner:x.costOwner,documentedSku:x.partNumber||null
+  })));
+ }
+ if(site==="ZWP20"&&tagRow.row===11&&String(tagRow.tag).toLowerCase()==="bulk material"){
+  required.push(...ZWP20_SCADA_BULK_PHYSICAL_GAPS_0553.map(x=>({
+   id:"PHYSICAL-GAP-"+x.id,functionId:"UNPRICED_BULK_"+x.id,
+   documentedQty:null,documentedUnit:null,qtyClass:"ENGINEERING_CABLE_END_OR_ACCESSORY_GAP",
+   approvedSkuQty:null,derivedWorkingQty:null,budgetRateTHB:null,budgetAmountTHB:null,
+   currencyEvidenceOriginal:null,quantityDriver:x.proof,qtyProof:x.description,
+   quantityEvidence:"MR0001 C1 / Z1F GA-0001 sheets5–13 / SPE C2 6.6",
+   budgetPosting:"PENDING_PHYSICAL_TAKEOFF__NO_ADDITIONAL_POSTING",
+   requirementState:"CABLE_ROUTE_OEM_INCLUSION_AND_EX_CERT_OPEN",
+   selectionStatus:"UNPRICED_HOLD",costOwner:x.owner
+  })));
+ }
  if(tcab){
   // The one MTO source assembly has a working historical comparable in Row9.
   // Show it beside the required functions as NON-ADDITIVE existing TAG evidence.
@@ -270,7 +303,7 @@ export function getTagBomFourStage0553(site,tagRow){
   sourceId:source?.id||null,sourceMatched:matchingTag,sourceQuantityText:source?.sourceQuantityText||null,
   scopeQty:tagRow.sourceQty??null,scopeUnit:tagRow.sourceUnit||null,
   packageFamily:pkg?.equipmentFamily||"SOURCE_MAPPING_REVIEW",
-  required,bartecBulkRequired,tcabRequired:tcab,ownerEvidence,budgetBridge,
+  required,bartecBulkRequired,tcabRequired:tcab,ownerEvidence,budgetBridge,gaEvidence,zwp8RadioEvidence,
   physicalSkuApproved:required.some(x=>Number.isFinite(x.approvedSkuQty)),
   working:{status:tagRow.status||"REVIEW",currency:tagRow.currency||null,extended:ledgerTotal,
    selectedVendor:tagRow.vendor||null,selectedSku:tagRow.sku||null,
