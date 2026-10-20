@@ -131,7 +131,7 @@ export function BcWorkingHierarchy0553({partBRows,partCRows,partBWorkingSell,par
        style={{padding:12,marginTop:10}}>
        <h4>{item.code} — Detailed Work / Cost Evidence</h4>
        <BcCostEvidenceDetail0553 workingRow={item} navigationTarget={navigationTarget}/>
-       <BcWorkCostLines0553 selectedCode={item.code} presentationNamespace={item.moduleId}/>
+       {!["B1","B2","B3","B4","B5","B6","B7","B8","B9"].includes(item.code)&&<BcWorkCostLines0553 selectedCode={item.code} presentationNamespace={item.moduleId}/>}
       </section>
      </div>}
     </details>;
