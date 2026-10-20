@@ -1,6 +1,7 @@
-import React,{useState} from "react";
+import React,{useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
+import {buildNativeWorkingDraft0553} from "./nativeWorkingDraft0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import "./releaseWorkbook0553.css";
 
@@ -29,6 +30,9 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const [source,setSource]=useState(null);
  const [expandedMr,setExpandedMr]=useState({});
  const [showChecks,setShowChecks]=useState(false);
+ const sourceFileRef=useRef(null);
+ const [nativeBusy,setNativeBusy]=useState(false);
+ const [nativeReport,setNativeReport]=useState(null);
  const internal=recipient==="INTERNAL"&&viewer==="INTERNAL";
  const code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
  const partA=buildPartATagGroupBreakdown0553(model);
@@ -52,7 +56,25 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
    detail:Object.entries(model.annexModels||{}).map(([id,x])=>id+": "+money(x.selectedWorkingTHB)+" source − "+money(x.annexLineTotalTHB)+" lines = "+money(x.varianceTHB)+" difference").join(" · ")},
   {id:"EXPORT",label:"Signed snapshot / native XLSX geometry and currency",state:"HOLD",detail:"No approved release and source-cell mapping; original workbook unchanged"}
  ];
- const canQuote=false;
+ const canQuote=false; // Final customer-issued XLSX still requires approval.
+ const chooseNativeDraft=()=>sourceFileRef.current?.click();
+ const exportNativeDraft=async event=>{
+  const file=event.target.files?.[0];
+  event.target.value="";
+  if(!file)return;
+  setNativeBusy(true);setNativeReport(null);
+  try{
+   const result=await buildNativeWorkingDraft0553(file,model);
+   const url=URL.createObjectURL(result.blob),link=document.createElement("a");
+   link.href=url;link.download=result.filename;document.body.appendChild(link);
+   link.click();link.remove();
+   window.setTimeout(()=>URL.revokeObjectURL(url),15000);
+   setNativeReport({success:true,text:"Exported: "+result.filename,
+    mappedCells:result.mappedCells,warnings:result.warnings});
+  }catch(error){
+   setNativeReport({success:false,text:"Native export failed: "+(error?.message||String(error)),warnings:[]});
+  }finally{setNativeBusy(false);}
+ };
  const openSource=item=>{if(internal)setSource(item);};
  const sourceButton=item=>internal?<button type="button" className="p553-origin-link"
    aria-label={"เปิดต้นทาง "+(item.code||item.mr||item.tag||"")} onClick={()=>openSource(item)}>↗ Source</button>:null;
@@ -70,9 +92,25 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     </label>
     {recipient==="INTERNAL"&&<button type="button" className="p553-detail-button"
       onClick={()=>setShowChecks(x=>!x)} aria-expanded={showChecks}>{showChecks?"− Hide":"＋ Review"} Export checks ({activeChecks.filter(x=>x.state==="HOLD").length} HOLD)</button>}
+    {recipient==="INTERNAL"&&<>
+      <input ref={sourceFileRef} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+       onChange={exportNativeDraft} style={{display:"none"}} aria-label="Select original 4-Scope of Supply.xlsx"/>
+      <button type="button" className="p553-detail-button" onClick={chooseNativeDraft} disabled={nativeBusy}
+       title="Choose original 4-Scope of Supply.xlsx from your computer. File processed only in your browser; outputs a new native-format working draft.">
+       {nativeBusy?"Preparing Native XLSX…":"Export Native XLSX — WORKING DRAFT"}
+      </button>
+     </>}
     <button type="button" disabled={!canQuote} className="p553-detail-button"
-      title="Original customer XLSX only after approved release, full TAG/Annex mapping and snapshot verification">Export Native Original XLSX — HOLD</button>
+      title="Approved customer XLSX requires signed release and completed checks">Final Customer Release — HOLD</button>
    </div>
+   {nativeReport&&recipient==="INTERNAL"&&<section className="p553-native-warning" role="status">
+    <strong>{nativeReport.success?"WORKING DRAFT XLSX READY":"EXPORT ERROR"}</strong> · {nativeReport.text}
+    {nativeReport.success&&<div>{nativeReport.mappedCells} native cells mapped; original file not modified; NOT approved for customer submission.</div>}
+    {nativeReport.warnings.length>0&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+     <thead><tr><th>No.</th><th>Working Draft Checks / Warnings</th></tr></thead>
+     <tbody>{nativeReport.warnings.map((w,i)=><tr key={i}><td>{i+1}</td><td>{w}</td></tr>)}</tbody>
+    </table></div>}
+   </section>}
    {showChecks&&recipient==="INTERNAL"&&<div className="p55-table-wrap p553-release-checks">
     <table className="p55-table p55-table--compact"><thead><tr><th>Check</th><th>Module / Requirement</th><th>Status</th><th>Detail</th></tr></thead>
      <tbody>{activeChecks.map(x=><tr key={x.id}><td>{x.id}</td><td>{x.label}</td><td><strong>{x.state}</strong></td><td>{x.detail}</td></tr>)}</tbody>
