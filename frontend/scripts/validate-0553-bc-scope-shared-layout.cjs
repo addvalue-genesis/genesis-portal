@@ -45,6 +45,10 @@ for(const p of ["data-component-key={item.moduleId}","item.workingSellTHB",
  assert(hierarchy.includes(p),"Missing canonical source projection "+p);
 assert(hierarchy.includes('new Set(["B1"])'),"B1 must be expanded initially in 10.2 ALL");
 assert(hierarchy.includes("Expand All")&&hierarchy.includes("Collapse All"));
+assert(hierarchy.includes('!["B1","B2","B3","B4","B5","B6","B7","B8","B9"].includes(item.code)'),
+ "Owner-local B1–B9 audit should replace old standalone cost-lines");
+assert(work.includes('!["B1","B2","B3","B4","B5","B6","B7","B8","B9"].includes(bcTab)'),
+ "Selected cost owner B1–B9 should not duplicate standalone audit ledger");
 assert(hierarchy.includes("setExpanded(new Set(isOpen?allRows.map(x=>x.code):[]))"));
 assert(lines.includes('presentationNamespace?presentationNamespace+".cost-lines-view":m.moduleId'),
  "Repeated cost-line read models must have unique view-only anchors");
