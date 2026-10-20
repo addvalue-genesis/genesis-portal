@@ -173,6 +173,12 @@ export function buildBcModuleNavigator0553(){
    anchorModuleId:id,keywords:code+" "+label+" "+keywords
   });
   if(code==="B2"){
+   for(const [suffix,name] of [
+    ["original-source","Source-quoted 580k vs prior 440k+120k price bridge"],
+    ["role-cost-build","Rev00a actual workbook provisional 964.28 MH by 5 positions × historical rates"],
+    ["new-doc-build","Rev00d N01–N04 VDRS / As-built / DDP extra document work"]
+   ])entries.push(nested("bid.budget.working.bc.b2.price-overview."+suffix,
+    "B2 — "+name,"B2 documentary rate price qty cost history variance"));
    const visibleId="bid.budget.working.bc.b2.price-overview";
    entries.push(nested(visibleId,"B2 — Visible VDRL Qty / Role-MH / 580,000 LS Price Overview",
     "B2 143 document requirements source price 580000 quantity four MR visible"));
