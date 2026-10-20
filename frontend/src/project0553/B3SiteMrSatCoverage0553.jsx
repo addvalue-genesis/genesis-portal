@@ -3,6 +3,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
 import {selectB3SiteMrSatCoverage0553} from "./data/b3SiteMrSatCoverage0553";
 import {B3SatMrWorkBreakdown0553} from "./B3SatMrWorkBreakdown0553";
+import {findModuleElement0553,openModuleAncestors0553} from "./data/moduleDeepLink0553";
 
 const fmt=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:2}):"TBC";
@@ -16,6 +17,15 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
   !Number.isFinite(b3Total)||Math.abs(expectedB3-b3Total)>0.01))
   throw Error("B3 SAT timebox + VeEX + MGW FAT must reconcile to canonical B3 Working SELL");
  const byTimebox=new Map(model.budgetarySiteTimeboxes.map(t=>[t.id,t]));
+ const openMrDetails=row=>{
+  const id=row.moduleId+".work-breakdown";
+  const node=typeof document!=="undefined"?findModuleElement0553(document,id):null;
+  if(node){openModuleAncestors0553(node);
+   node.classList?.add("p553-module-nav-focus");
+   if(typeof node.scrollIntoView==="function")
+    node.scrollIntoView({block:"center",behavior:"smooth"});
+  }
+ };
  return <ControlledModuleSection0553
   moduleKey={model.moduleId}
   title="B3 — Seven-Site / Four-MR SAT Test Coverage"
@@ -72,7 +82,8 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
     return <tr key={r.id} data-component-key={r.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere"}}>
      <td><strong>{r.site}</strong><small>{r.mr} · {r.id}</small><small>{r.wbs} · {r.system}</small>
       <small><strong>Module ID:</strong></small>
-      <ComponentCopyId projectId="PJ2608-0553" componentKey={r.moduleId}/></td>
+      <ComponentCopyId projectId="PJ2608-0553" componentKey={r.moduleId}/>
+      <button type="button" className="p553-detail-button" onClick={()=>openMrDetails(r)}>ดูรายละเอียดงานและที่มาของราคา / View MR Breakdown</button></td>
      <td><strong>{t?.site}</strong><small>{t?.id} · {t?.days} shared team-days × {price.persons} people = {t?.personDays} MD</small>
       <small>{t?.testIds.length} Test IDs use the same Site allocation; no additional MR working days</small></td>
      <td>{r.requiredFunction}</td><td>{r.testInstruments}</td><td>{r.signoffEvidence}</td>
