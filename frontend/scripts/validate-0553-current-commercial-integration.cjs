@@ -43,6 +43,7 @@ assert.equal(budget.costComplete,false);
 assert.equal(abc.customerReleaseAllowed,false);
 const jsx=[
  "project0553/B3SiteMrSatCoverage0553.jsx",
+ "project0553/B3WorkTypeAccordion0553.jsx",
  "project0553/B9ChinaBudgetDetail0553.jsx",
  "project0553/BcCostEvidenceDetail0553.jsx",
  "project0553/RevKAbcOwnershipControl0553.jsx",
@@ -55,7 +56,10 @@ for(const f of jsx){
  assert(x.code.length>0,"Cannot parse "+f);
 }
 const view=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(view.includes("<B3SiteMrSatCoverage0553 workingRow={workingRow}/>"),"B3 SAT matrix not mounted with its canonical B3 Working SELL owner");
+const workType=fs.readFileSync(path.join(root,"project0553/B3WorkTypeAccordion0553.jsx"),"utf8");
+assert(view.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"),"B3 work-type accordion not mounted");
+assert(workType.includes("<B3SiteMrSatCoverage0553 workingRow={workingRow}/>"),"B3 SAT matrix not mounted in SAT group");
+assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3"/>'),"China FAT witness not mounted in FAT group");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(workspace.includes("<RevKAbcOwnershipControl0553 working={bcWorking}/>"),"CFO current ABC not mounted");
-console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,443,400 (FAT 397,400 included) B9 Base 0; Yard optional 233,600, Part B 4,187,590.69; seven-site 21 test groups, six-day FAT; 6 JSX parse valid.");
+console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,443,400 (FAT 397,400 included) B9 Base 0; Yard optional 233,600, Part B 4,187,590.69; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
