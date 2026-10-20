@@ -78,7 +78,9 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   const parent=findModuleElement0553(document,"bid.budget.working.bc");
   if(!parent)return;
   parent.open=true;
-  const exact=findModuleElement0553(document,navigationTarget);
+  const exact=findModuleElement0553(document,navigationTarget)||
+   (owner&&navigationTarget==="bid.budget.working.bc."+owner.toLowerCase()?
+    findModuleElement0553(document,navigationTarget+".details"):null);
   if(exact){
    openModuleAncestors0553(exact);
    if(typeof exact.scrollIntoView==="function")
