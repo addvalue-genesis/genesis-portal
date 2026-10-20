@@ -35,7 +35,13 @@ assert.equal(gp.supplierFat.quoteOverallUSD,368841);
 assert.deepEqual(gp.supplierFat.serviceRows.map(x=>[x.id,x.supplierCostUSD]),[["SERV-2",5000],["SERV-4",2500]]);
 assert(gp.supplierFat.serviceRows.every(x=>!x.directCostPostingAllowed&&!x.workingSellPostingAllowed));
 assert.equal(gp.supplierFat.addvalueWitnessBudgetDays,6);
-assert.equal(gp.supplierFat.sequenceAndOverlapVerified,false);
+assert.equal(gp.supplierFat.managementSeparateSequentialFATStagesConfirmed,true);
+assert.deepEqual(gp.supplierFat.plannedExecutionOrder,["SERV-2_INTERNAL_IFAT","SERV-4_CUSTOMER_FAT_RESERVE","SERV-5_JUTAL_YARD_DELIVERY"]);
+assert.equal(gp.supplierFat.internalAndCustomerFATScopeDuplicate,false);
+assert.equal(gp.supplierFat.supplierFATServiceCreditUSD,null);
+assert.equal(gp.supplierFat.supplierFATServicesAlreadyQuotedOnce,true);
+assert.equal(gp.supplierFat.actualFATAgendaAndDatesConfirmed,false);
+assert.equal(gp.supplierFat.freightAfterCustomerFATPlanned,true);
 assert.equal(gp.supplierFat.b3ActualDirectCostTHB,null);
 
 assert.equal(b.moduleId,"bid.budget.working.bc.b3");
