@@ -6,7 +6,7 @@ export function B3Fat2Plus5Pricing0553({workingRow}){
  const s=selectB3Fat2Plus5PricingScenario0553(workingRow);
  if(!s)return null;
  return <section className="p55-panel" data-component-key={s.moduleId} style={{padding:12,marginTop:10}}>
-  <h4>B3.1 — Gross 7-Day On-site Crew Estimate, BEFORE B3/B8 Training Allocation · Onshore USD 600</h4>
+  <h4>B3.1 — Gross 2-day iFAT + 5-day Customer FAT On-site Crew Estimate, BEFORE B3/B8 Training Allocation · Onshore USD 600</h4>
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={s.moduleId}/> ·
    Source: <ComponentCopyId projectId="PJ2608-0553" componentKey={s.sourceModuleId}/></p>
   <p className="p55-note"><strong>Pricing basis:</strong> 2 MGW/ADDVALUE iFAT days + 5 Customer FAT days =
