@@ -146,25 +146,18 @@ assert.match(ui,/15 item rows|15 slots|15 item/);
 assert.match(ui,/buyer must accept group-level TAG mapping/);
 assert.match(ui,/const \[viewer,setViewer\]=useState\("CUSTOMER"\)/);
 assert.match(ui,/Download 4-Scope of Supply — WORKING DRAFT/);
-assert.match(ui,/loadNativeTemplate0553\(\)/);
-assert.match(ui,/saveNativeTemplate0553\(file\)/);
-assert.match(ui,/templateReady/);
-assert.match(ui,/sourceFileRef\.current\?\.click\(\)/);
-const cacheSource=file("nativeTemplateCache0553.js");
-assert.match(cacheSource,/indexedDB\.open\(DATABASE,1\)/);
-assert.match(cacheSource,/NATIVE_TEMPLATE_NAME_0553=KEY/);
-assert.match(cacheSource,/Original workbook|originalBytes/);
-assert.ok(!/fetch\(|https?:\/\//.test(cacheSource),"Original workbook must never leave browser");
+assert.match(ui,/buildNewNativeWorkingWorkbook0553\(model\)/);
 assert.match(ui,/Final Customer Release — HOLD/);
-assert.match(ui,/buildNativeWorkingDraft0553\(file,model\)/);
-assert.match(ui,/sourceFileRef\.current\?\.click\(\)/);
-const nativeHelper=file("nativeWorkingDraft0553.js");
-assert.match(nativeHelper,/entriesFromZip/);
-assert.match(nativeHelper,/rebuildZip/);
-assert.match(nativeHelper,/Uploaded workbook sheet names/); // source validity gate
-assert.match(nativeHelper,/NOT_RELEASED/);
-assert.match(nativeHelper,/buyer acceptance/);
-assert.ok(!nativeHelper.includes("fetch("),"Native template must stay on the local computer");
+assert.ok(!/type="file"|sourceFileRef|loadNativeTemplate0553|saveNativeTemplate0553|indexedDB/.test(ui),
+ "10.3.3 must create new XLSX with no source file picker, upload or cache");
+const templateGenerator=file("newNativeWorkbook0553.js");
+assert.match(templateGenerator,/OFFICIAL_WORKBOOK_TEMPLATE_0553/);
+assert.match(templateGenerator,/buildNewNativeWorkingWorkbook0553/);
+assert.match(templateGenerator,/INTERNAL_WORKING_NOT_RELEASED/);
+assert.match(templateGenerator,/SHEETS.length!==6/);
+assert.match(templateGenerator,/const cells=baseCells\(sheet\)/);
+assert.ok(!/fetch\(|https:\/\/|indexedDB|type="file"/.test(templateGenerator),
+ "New customer-structured XLSX must generate locally with no confidential binary fetch");
 assert.match(ui,/model.annexModels\?\.\[code\]/);
 assert.match(ui,/r.customerUnitTHB/);
 assert.match(ui,/r.customerTotalTHB/);
