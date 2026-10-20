@@ -98,10 +98,27 @@ const unbalanced=sandbox.calc.buildAnnexWorkingPriceBridge0553({
 assert.equal(unbalanced.varianceTHB,5);
 assert.equal(unbalanced.reconciled,false);
 
+// 10.3.1/10.3.2/10.3.3 refer to view identifiers, not frozen versions.
+const pricingViewsBox={};
+vm.runInNewContext(file("pricingViewRegistry0553.js").replace(/\bexport /g,"")+
+ ";this.pricingViews=PRICING_VIEWS_0553;this.byKey=pricingViewByKey0553;",pricingViewsBox);
+const pricingViews=pricingViewsBox.pricingViews;
+assert.equal(pricingViews.length,3);
+assert.equal(pricingViews.map(v=>v.number).join(","),"10.3.1,10.3.2,10.3.3");
+assert.equal(pricingViews.map(v=>v.moduleId).join(","),
+ "bid.budget.pricing.working,bid.budget.pricing.budgetary,bid.budget.pricing.release");
+assert.equal(new Set(pricingViews.map(v=>v.moduleId)).size,3);
+assert.equal(pricingViewsBox.byKey("released").fullLabel,"Released Customer Output");
+
 const workspace=file("CommercialWorkspace.jsx");
 assert.match(workspace,/PricingCfoDashboard0553 model=\{releaseModel\}/);
 assert.match(workspace,/ReleaseCustomerWorkbook0553 model=\{releaseModel\} recipient=\{recipient\}/);
 assert.match(workspace,/onOpenSource=\{openReleaseSource\}/);
+assert.match(workspace,/PRICING_VIEWS_0553\.map\(view=>/);
+assert.match(workspace,/\{view.number\} · \{view.shortLabel\}/);
+assert.match(workspace,/activePricingView\.moduleId/);
+assert.match(workspace,/data-component-key=\{view.moduleId\}/);
+
 assert.match(workspace,/mode==="working"&&<details className="p553-budget-phase" open><summary><strong>10\.6/);
 // CFO UX contract: a single financial summary table, never KPI cards/bullet lists.
 const cfo=file("PricingCfoDashboard0553.jsx");
