@@ -1,27 +1,18 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectB1ProjectSupportBudget0553} from "./data/b1ProjectSupportBudget0553";
+import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553} from "./data/b1AccordionModuleIds0553";
 
 // 10.2 / B1. Presentation ONLY: canonical B1.1–B1.8 source accounts, no repricing.
 // B1.A is AUDIT (never an additional contractual or financial cost account).
 // Native <details> preserves nested Project Module Navigator deep-link behavior.
-const ROOT="bid.budget.working.bc.b1";
+const ROOT=B1_ACCORDION_ROOT_0553;
 const amount=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT VERIFIED";
 const quantity=n=>Number.isFinite(n)?n.toLocaleString("en-US"):"TBC";
-const slug=account=>account.toLowerCase().replace(".","-");
-export const b1AccountModuleId0553=account=>ROOT+".account."+slug(account);
-export const b1AccountLineModuleId0553=(account,lineId)=>b1AccountModuleId0553(account)+".line."+String(lineId).toLowerCase();
 const accountTone=Object.freeze({
  "B1.1":"management","B1.2":"meetings","B1.3":"travel","B1.4":"administration",
  "B1.5":"regulatory","B1.6":"legal","B1.7":"permits","B1.8":"misc"
 });
-const auditItems=Object.freeze([
- ["B1.A.1","role-rates","Support Role Rates"],
- ["B1.A.2","revk-events","Rev.K Milestones"],
- ["B1.A.3","engineering-review","Unpriced Engineering Review"],
- ["B1.A.4","indirect-ledger","Cost Owner / Indirect Evidence"],
- ["B1.A.5","source-audit","Historical Source & Cost Verification"]
-]);
 const copy=id=><span className="p553-b1-copy" onClick={e=>{e.preventDefault();e.stopPropagation();}}
  onKeyDown={e=>e.stopPropagation()}>
  <ComponentCopyId projectId="PJ2608-0553" componentKey={id}/>
