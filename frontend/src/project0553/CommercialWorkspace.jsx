@@ -83,6 +83,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     findModuleElement0553(document,navigationTarget+".details"):null);
   if(exact){
    openModuleAncestors0553(exact);
+   exact.classList?.add("p553-module-nav-focus");
    if(typeof exact.scrollIntoView==="function")
     exact.scrollIntoView({block:"center",behavior:"smooth"});
    setNavigationFeedback(null);
