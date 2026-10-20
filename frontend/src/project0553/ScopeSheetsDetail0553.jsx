@@ -53,14 +53,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
  const details=selectScopeSheet0553(category[1],{thbPerUsd:fx?.thbPerUsd}).rows;
  const linkedScopeCodes=new Set(SCOPE_BC_DETAIL_CODES_0553);
  const scopeSheetSources=Object.fromEntries([...linkedScopeCodes].map(code=>[code,selectScopeSheet0553(code,{thbPerUsd:fx?.thbPerUsd})]));
- const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
- // A2 is sourced from the SAME MR0002 per-site Working BOM, including the RFI-LNA.
- // Historical exclusion rule below is for old A2 legacy scratch data only; ACTIVE
- // Working A2 must read the selected MGW P26-058_R2 quotation through sourceMrProjection.A2.
- const a2Eligible=MR0002_WORKING_BOM_0553.sites.flatMap(s=>s.items)
-  .filter(x=>x.countedInWorkingTotal&&Number.isFinite(x.extended)&&x.source!=="MGW-P26-058"&&!String(x.owner||"").startsWith("MGW_"));
- const a2THB=a2Eligible.filter(x=>x.currency==="THB").reduce((n,x)=>n+x.extended,0);
- const a2USD=a2Eligible.filter(x=>x.currency==="USD").reduce((n,x)=>n+x.extended,0);
+ // Current A2/A3/A4 use ONLY sourceMrProjection from the selected 10.1 BOM.
  // Working figures are live provisional cost evidence, not customer sell / released A1-A5.
  // A1 currently has SCADA field bulk embedded in tag ledger; it cannot be split blindly into A5.
  const round=n=>Math.round(n*100)/100;
@@ -84,9 +77,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
   Number.isFinite(workingScadaEquipment)&&Number.isFinite(a5.a5PriceTHB)&&
   Math.abs(round(workingScadaEquipment+a5.a5PriceTHB-scadaLedgerCostTHB))<=0.01 &&
   Math.abs(round(a5.a1CostToReclassifyTHB-a5.a5PriceTHB))<=0.01 && a5.a5PriceTHB<=scadaLedgerCostTHB;
- const phoneRows=SITE_SYSTEM_COST_RECONCILIATION_0553.rows.filter(r=>r.mr==="MR-0003"&&["ZWP20","ZWP21","ZWP22"].includes(r.site));
- const phoneRateLines=phoneRows.flatMap(r=>r.evidence||[]).filter(x=>["PHONE-1","SOUNDER-1","JB-1"].includes(x.line)&&x.currency==="THB"&&Number.isFinite(x.extended));
- const a3PricedFloor=phoneRateLines.length===9?round(phoneRateLines.reduce((n,x)=>n+x.extended,0)):null;
+ // Former EXION/PROSPER three-site phone-price proxy is historical, not posted.
  const scopeBC=selectScopePartBcWorking0553();
  // All four Scope A lines read the very same projection used by the
  // System x Location x MTO Working BOM screen. No parallel supplier-rate path.
