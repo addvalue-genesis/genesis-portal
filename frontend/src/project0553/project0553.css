@@ -459,3 +459,32 @@
 .p553-dashboard .p553-bc-row-summary:focus-visible{outline:2px solid #18789d;outline-offset:-2px}
 .p553-dashboard .p553-bc-row.p553-module-nav-target{outline:2px solid #18789d;outline-offset:2px}
 @media(max-width:750px){.p553-dashboard .p553-bc-row-summary{gap:8px;padding:9px}.p553-dashboard .p553-bc-row-label{flex-basis:100%}.p553-dashboard .p553-bc-row-sell{margin-left:0;min-width:0;text-align:left}.p553-dashboard .p553-bc-copy{flex-basis:100%}}
+
+
+/* B2 / B4–B9: owner-local cost proof + VDRL documents. Colors mean work type only. */
+.p553-dashboard .p553-bc-price-trace{--price-accent:#516b85;--price-tint:#f2f6f9;margin:12px 0;min-width:0}
+.p553-dashboard .p553-bc-price-trace--engineering{--price-accent:#245e9b;--price-tint:#eef5ff}
+.p553-dashboard .p553-bc-price-trace--fabrication{--price-accent:#586d79;--price-tint:#f1f5f8}
+.p553-dashboard .p553-bc-price-trace--logistics{--price-accent:#a46b13;--price-tint:#fff7e9}
+.p553-dashboard .p553-bc-price-trace--services{--price-accent:#355da2;--price-tint:#eef3fc}
+.p553-dashboard .p553-bc-price-head{display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;margin:0 0 12px}
+.p553-dashboard .p553-bc-price-head h4{margin:0 0 7px}
+.p553-dashboard .p553-bc-price-head .p55-note{margin:4px 0}
+.p553-dashboard .p553-bc-price-leaf,.p553-dashboard .p553-bc-price-doc-group{border:1px solid #d5dfe8;border-left:4px solid var(--price-accent);border-radius:8px;overflow:hidden;margin:9px 0;background:#fff}
+.p553-dashboard .p553-bc-price-doc-group{margin:7px 0;--price-accent:#426d9a}
+.p553-dashboard .p553-bc-price-leaf-head{list-style:none;cursor:pointer;display:flex;align-items:flex-start;gap:9px;padding:11px 12px;background:var(--price-tint);overflow-wrap:anywhere}
+.p553-dashboard .p553-bc-price-doc-group>.p553-bc-price-leaf-head{background:#f1f6fa}
+.p553-dashboard .p553-bc-price-leaf-head::-webkit-details-marker{display:none}
+.p553-dashboard .p553-bc-price-leaf-head::before{content:"+";display:grid;place-items:center;min-width:25px;height:25px;border:1px solid currentColor;color:var(--price-accent);border-radius:5px;font-weight:800;font-size:19px;flex-shrink:0}
+.p553-dashboard details[open]>.p553-bc-price-leaf-head::before{content:"−"}
+.p553-dashboard .p553-bc-price-num{min-width:46px;margin-top:3px;font-weight:800;font-size:13px;color:var(--price-accent);white-space:nowrap}
+.p553-dashboard .p553-bc-price-leaf-label{display:grid;gap:3px;flex:1;min-width:0}
+.p553-dashboard .p553-bc-price-leaf-label strong{color:var(--ink);font-size:14px}
+.p553-dashboard .p553-bc-price-leaf-label small{font-size:12px;color:#53667b}
+.p553-dashboard .p553-bc-price-leaf-label code{font-size:11px;color:#466177;overflow-wrap:anywhere;white-space:normal}
+.p553-dashboard .p553-bc-price-leaf-body{padding:11px 13px;min-width:0}
+.p553-dashboard .p553-bc-price-leaf-body .p55-table-wrap{max-width:100%}
+.p553-dashboard .p553-price-trace-copy{display:inline-flex;max-width:100%}
+.p553-dashboard .p553-bc-price-leaf-head:focus-visible{outline:2px solid #18789d;outline-offset:-2px}
+.p553-dashboard .p553-bc-price-doc-group .p55-table td{overflow-wrap:anywhere;white-space:normal}
+@media(max-width:720px){.p553-dashboard .p553-bc-price-leaf-head{padding:9px 7px;gap:6px}.p553-dashboard .p553-bc-price-num{min-width:39px}.p553-dashboard .p553-price-trace-copy{flex-basis:100%}}

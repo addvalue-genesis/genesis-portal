@@ -46,8 +46,8 @@ assert(html.includes('data-component-key="bid.budget.working.bc.b1.account.b1-1"
  "B1 nested source group must be mounted in initial ALL mode");
 assert(html.includes("THB 211,600.00"));
 assert(html.includes("THB 2,443,400.00"));
-assert(html.includes('data-component-key="bid.budget.working.bc.b1.cost-lines-view"'),
- "B1 shared work cost lines must be rendered as a scoped read-only view");
+assert(html.includes('data-component-key="bid.budget.working.bc.b1.audit.cost-lines-view"'),
+ "B1 shared work cost lines must be nested in the owner audit with unique presentation ID");
 assert(!html.includes('data-component-key="bid.budget.working.bc.b3.site-mr-sat-matrix"'),
  "Collapsed B3 must not unnecessarily mount large SAT matrix");
 const moduleIds=[...html.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);

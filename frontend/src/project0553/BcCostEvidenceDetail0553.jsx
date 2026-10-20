@@ -1,6 +1,7 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcWorkCostLines0553} from "./data/bcWorkCostLines0553";
+import {BcWorkCostLines0553} from "./BcWorkCostLines0553";
 import {B1EngineeringSellModel0553} from "./B1EngineeringSellModel0553";
 import {selectB1ProjectExpenseLedger0553} from "./data/b1IndirectCostLedger0553";
 import {B1RevKMilestoneBudget0553} from "./B1RevKMilestoneBudget0553";
@@ -9,6 +10,7 @@ import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {B3WorkTypeAccordion0553} from "./B3WorkTypeAccordion0553";
+import {BcOwnerPriceTrace0553} from "./BcOwnerPriceTrace0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
 // imply that historical payroll cost or the WBS SELL is verified direct COST.
@@ -156,6 +158,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     <MgwR2CommercialCover0553 code="B1"/>
     <MgwPaulVendorClarifications0553 code="B1"/>
     {sharedEvidence}
+    <BcWorkCostLines0553 selectedCode="B1" presentationNamespace="bid.budget.working.bc.b1.audit"/>
    </React.Fragment>}/>}
    {/* 27 historical engineering titles remain unpriced inside B1.A.3; no legacy posting. */}
   {e.code!=="B1"&&<>
@@ -191,8 +194,8 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
  return <section className="p55-panel p553-bc-evidence" data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
   <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
   <h3>{e.code} — {workingRow.requirement}</h3>
-  {e.code!=="B3"&&e.code!=="B1"&&<MgwR2CommercialCover0553 code={e.code}/>}
-  {e.code!=="B3"&&e.code!=="B1"&&<MgwPaulVendorClarifications0553 code={e.code}/>}
+  {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&<MgwR2CommercialCover0553 code={e.code}/>}
+  {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&<MgwPaulVendorClarifications0553 code={e.code}/>}
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
    <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
@@ -215,7 +218,17 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     ข้อมูลนี้เป็น read-only cost-ownership rule ไม่เปลี่ยน B11 Working SELL.</p>
   </section>}
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Reconcile all four MR cargo legs against current MGW China FAT and DDP JUTAL Zhuhai Yard; Bangkok/Nantong are historical Rev05 routes only.</p>}
-  {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
+  {e.code==="B3"&&<B3WorkTypeAccordion0553 workingRow={workingRow}
+   navigationTarget={navigationTarget} auditContent={<React.Fragment>
+    {sharedEvidence}
+    <BcWorkCostLines0553 selectedCode="B3" presentationNamespace="bid.budget.working.bc.b3.audit"/>
+   </React.Fragment>}/> }
+  {["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&<BcOwnerPriceTrace0553
+   workingRow={workingRow}
+   sourceContent={<React.Fragment>
+    <MgwR2CommercialCover0553 code={e.code}/>
+    <MgwPaulVendorClarifications0553 code={e.code}/>
+    {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
    <h4>B9 — Conditional Yard Specialist Onshore SELL Rate (FAT Witness = B3)</h4>
    <div className="p55-metric-grid">
     <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
@@ -224,10 +237,13 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
    </div>
    <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD600/day is a selling-rate input, not internal payroll Direct Cost.</p>
   </section>}
-  {e.code==="B3"&&<B3WorkTypeAccordion0553 workingRow={workingRow}
-   navigationTarget={navigationTarget} auditContent={sharedEvidence}/>}
-  {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
+    {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
   {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
-  {e.code!=="B3"&&e.code!=="B1"&&sharedEvidence}
+   </React.Fragment>}
+   auditContent={<React.Fragment>
+    {sharedEvidence}
+    <BcWorkCostLines0553 selectedCode={e.code} presentationNamespace={"bid.budget.working.bc."+e.code.toLowerCase()+".audit"}/>
+   </React.Fragment>}/>}
+  {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&sharedEvidence}
  </section>;
 }
