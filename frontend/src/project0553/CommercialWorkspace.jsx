@@ -20,6 +20,9 @@ import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { SimpleBom0553 } from "./SimpleBom0553";
 import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
+import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
+import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
+import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {LIFECYCLE_SPARES_0553} from "./data/lifecycleSpareScope0553";
@@ -109,6 +112,17 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const resetFx=()=>persistSettings({...DEFAULT_FX});
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  const bcPriceAudit=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
+ const releaseModel=buildReleaseCommercialModel0553({thbPerUsd:fx?.thbPerUsd});
+ const openReleaseSource=(item)=>{
+  const key=String(item?.code||item?.mrCode||"").toUpperCase();
+  setMode("working");
+  if(/^B(?:[1-9]|1[0-4])$|^C[12]$/.test(key)){setBcTab(key);setBcDetailCode(key);}
+  window.setTimeout(()=>{
+   const sourceDetails=document.querySelector(key.startsWith("A")?
+    '[data-component-key="bid.budget.bom"]':'[data-component-key="bid.budget.working.bc"]');
+   if(sourceDetails){sourceDetails.open=true;sourceDetails.scrollIntoView({behavior:"smooth",block:"start"});}
+  },30);
+ };
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  return <div className="p55-stack" data-component-key="bid.budget">
  <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget"/><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
@@ -144,6 +158,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
   </div>
   <p className="p55-note"><strong>Current display:</strong> {mode.toUpperCase()} · {recipient}. {mode==="working"?"Editable commercial derivation is pending source reconciliation.":mode==="budgetary"?"Frozen snapshot required; do not overwrite prior submissions.":"Customer release remains HOLD until written authorization and all gates pass."}</p>
+  {recipient==="INTERNAL"&&<PricingCfoDashboard0553 model={releaseModel}/>}
   {mode==="working"&&<>
   <section className="p55-panel">
    <div className="p55-eyebrow">CURRENCY VIEW / ORIGINAL CURRENCY RETAINED</div>
@@ -160,7 +175,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     <p className="p55-note"><strong>WORKFLOW:</strong> 10.1 Engineering BOM → 10.2 B/C working WBS &amp; spare derivation (upstream data, not a verified complete cost) → 10.3 Pricing reference → 10.4 Estimate-to-Bid Mapping → 10.5 Scope → 10.6 Customer Workbook. Prerequisites: 04 MR, 05.3 Drawings, 06 Execution, 07 Vendor, 08 Risk, 09 Traceability. Workflow numbers indicate order, not approval.</p>
    <p className="p55-note"><strong>INPUT:</strong> RFQ/MR/MTO/BLD/DTS/RPT/Standards · <strong>DERIVE:</strong> Link/Capacity/Interface Constraints → Physical BOM and quantity → Vendor technical evaluation → WBS Services → Equipment/Service Cost and risk · <strong>OUTPUT:</strong> reviewed engineering working cost. Current MTO sets and quoted vendor quantities are input evidence, NOT verified physical SKU quantities.</p>
   </section>
-  <details className="p553-budget-phase" open><summary><strong>10.1 — Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
+  <details className="p553-budget-phase" open data-component-key="bid.budget.bom"><summary><strong>10.1 — Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
    <CostIntegrityReview0553/>
    <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency}/>
   </details>
@@ -271,6 +286,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  {mode==="released"&&<section className="p55-panel">
    <div className="p55-eyebrow">RELEASED CUSTOMER OUTPUT · APPROVAL GATE</div>
    <h3>Customer Release — HOLD</h3>
+   <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} title="10.3 — Released Customer Output (Read-only staging)"/>
    <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Gate</th><th>Required check</th><th>Current status</th></tr></thead>
    <tbody>{BID_0553_GATES.map(g=><tr key={g.id}><td><strong>{g.id}</strong></td><td>{g.title}<small>{g.detail}</small></td><td><span className="p55-badge">{g.status}</span></td></tr>)}</tbody></table></div>
