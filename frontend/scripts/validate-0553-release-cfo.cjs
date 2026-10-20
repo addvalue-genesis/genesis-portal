@@ -1,0 +1,38 @@
+// PJ2608-0553 · executable pricing arithmetic + JSX/source-route contract checks.
+const assert=require("node:assert/strict");
+const fs=require("node:fs"),path=require("node:path"),vm=require("node:vm");
+const base=path.resolve(__dirname,"../src/project0553");
+const file=(rel)=>fs.readFileSync(path.join(base,rel),"utf8");
+const source=file("data/releaseCommercialModel0553.js");
+const isolated=source.replace(/^import .*?;\\s*$/gm,"").replace(/\\bexport /g,"");
+const sandbox={};vm.runInNewContext(isolated+";this.calc={priceAorCFromCost0553,priceBWorkingSell0553};",sandbox);
+const ac=sandbox.calc.priceAorCFromCost0553(100);
+assert.equal(ac.customerSellTHB,130);
+assert.equal(ac.samTelShareTHB,20);
+assert.equal(ac.addvalueTargetProfitTHB,5);
+assert.equal(ac.omissionReserveTHB,5);
+assert.equal(sandbox.calc.priceAorCFromCost0553(null),null);
+const b=sandbox.calc.priceBWorkingSell0553(100);
+assert.equal(b.customerSellTHB,100);
+assert.equal(b.samTelDeductionTHB,5);
+assert.equal(b.addvalueReceivableTHB,95);
+assert.equal(b.addvalueProfitTHB,null);
+assert.equal(sandbox.calc.priceBWorkingSell0553(100,70).addvalueProfitTHB,25);
+assert.equal(sandbox.calc.priceBWorkingSell0553(null),null);
+assert.match(source,/workingSellTHB.*not.*supplier direct cost|workingSellTHB.*not.*a supplier direct cost/i);
+assert.match(source,/DIRECT_COST_NOT_ESTABLISHED__NO_30_PERCENT_ON_WORKING_SELL/);
+assert.match(source,/aOverflow=.*>15/);
+assert.match(source,/annexOverflow=.*>13/);
+const workspace=file("CommercialWorkspace.jsx");
+assert.match(workspace,/PricingCfoDashboard0553 model=\{releaseModel\}/);
+assert.match(workspace,/ReleaseCustomerWorkbook0553 model=\{releaseModel\}/);
+assert.match(workspace,/onOpenSource=\{openReleaseSource\}/);
+const ui=file("ReleaseCustomerWorkbook0553.jsx");
+for(const sheet of ["Scope of supply","B10 CommSpares","B11 SpecialTool","B13 Consumerables","C1 CapitalSpares","C2 2Y-Spares"])
+ assert.ok(ui.includes(sheet),"Missing original sheet "+sheet);
+assert.match(ui,/const canQuote=false/);
+assert.match(ui,/approved:false,releaseAllowed:false/);
+assert.match(ui,/sourceModuleId/);
+assert.match(ui,/OVERFLOW/);
+assert.ok(!/sourceFile\.write|updateWorkingSellTHB/.test(ui));
+console.log("PASS PJ2608-0553 release pricing 100 => A/C 130, B client 100 / SAMTEL 5 / ADDVALUE 95; source and HOLD checks");
