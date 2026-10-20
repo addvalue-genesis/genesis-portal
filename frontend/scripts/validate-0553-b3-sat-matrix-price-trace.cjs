@@ -56,7 +56,7 @@ for(let i=0;i<wanted.length;i++){
  assert.equal(t.crew,2);assert.equal(t.teamDayRateTHB,50400);
  assert.equal(t.sourceModuleId,p.sourceModuleId);
  assert.equal(t.postingAllowed,false);
- assert.equal(t.additionalTestSellTHB,0);
+ assert.equal(t.additionalTestSellTHB,null); // nonposting is NOT verified zero cost
  assert.equal(t.includedLaborSellTHB,t.personDays*25200);
  assert.equal(m.rows.filter(x=>x.budgetTimeboxId===t.id).length,t.testIds.length);
 }
