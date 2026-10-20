@@ -77,9 +77,9 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
       <small>{t?.testIds.length} Test IDs use the same Site allocation; no additional MR working days</small></td>
      <td>{r.requiredFunction}</td><td>{r.testInstruments}</td><td>{r.signoffEvidence}</td>
      <td>
-      <strong>MR-SPECIFIC WORKING SELL: NOT ESTABLISHED</strong>
+      <strong>MR-SPECIFIC WORKING SELL: NOT ESTABLISHED — NOT SEPARATELY PRICED</strong>
       <small>Site allowance: <strong>{fmt(t?.includedLaborSellTHB)}</strong> for ALL {t?.testIds.length} Test IDs at {t?.site}</small>
-      <small><strong>SHARED SITE PRICE ONLY — NON-ADDITIVE</strong></small>
+      <small><strong>SHARED SITE WORKING SELL — NON-ADDITIVE</strong></small>
       <small>See the individual MR work breakdown in Section 5; no per-MR hours or independent SELL are established.</small>
       <small>{r.gate} · Cost Owner: {r.costOwner}</small>
      </td>
