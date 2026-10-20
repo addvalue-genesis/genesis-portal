@@ -48,7 +48,8 @@ for(const [i,a] of m.accounts.entries()){
   "The clickable account must have a matching target with actual detailed source lines: "+a.account);
  assert(Number.isFinite(a.baseWorkingCostTHB)&&Number.isFinite(a.baseWorkingSellTHB));
 }
-assert(!html.includes("964 MH"),"Legacy Engineering MH must not be presented as current B1 hours");
+assert(html.includes("964 MH is excluded from current B1 pricing"),
+ "Historical Engineering 964 MH must be labeled as EXCLUDED, not presented as current priced activity");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
 const first=host.indexOf('{e.code==="B1"&&<B1WorkingPriceOverview0553 workingRow={workingRow}/>');
 const generic=host.indexOf('<div className="p55-metric-grid">',host.indexOf('export function BcCostEvidenceDetail0553'));
