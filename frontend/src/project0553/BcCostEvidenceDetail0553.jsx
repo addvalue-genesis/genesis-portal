@@ -174,6 +174,21 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
    <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Current B1 SELL from fresh B1.1–B1.8 support-only THB resource budget; actual Direct Cost OPEN, old engineering/PM quotes excluded":e.code==="B3"?"Current MGW FAT Witness + Offshore SAT/SIT + VeEX rental, all Inspection/Testing under B3":e.code==="B9"?"No B9 Base; only conditional Yard Specialist 1 LS":"Working source estimate"}</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
+  {e.code==="B11"&&<section className="p55-panel"
+   data-component-key="bid.budget.working.bc.b11.test-equipment-ownership"
+   style={{padding:12,marginTop:12}}>
+   <h4>B11 — Special Tools for Operation &amp; Maintenance / ขอบเขตเครื่องมือ</h4>
+   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553"
+    componentKey="bid.budget.working.bc.b11.test-equipment-ownership"/></p>
+   <p className="p55-note"><strong>B11:</strong> เครื่องมือพิเศษที่ส่งมอบให้ผู้ซื้อเพื่อใช้งาน,
+    ตรวจซ่อมบำรุงหรือโปรแกรมอุปกรณ์หลังส่งมอบ (Permanent O&amp;M Special Tools)
+    ต้องมี OEM SKU / Qty / TAG / Included-or-Extra evidence ก่อนคิดราคาจริง.</p>
+   <p className="p55-note"><strong>B3:</strong> เครื่องมือทดสอบเช่าชั่วคราวเพื่อทำ FAT/SAT
+    เช่น VeEX MX100+ 30 rental-days = THB 30,000 อยู่ใน B3 เพียงครั้งเดียว;
+    อ้างอิง <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.working.bc.b3.veex-mx100"/>.
+    RACON programming kit ที่ MGW แจ้งว่ารวมแล้วต้องตรวจ SKU/Qty ไม่คิดซ้ำใน B11.
+    ข้อมูลนี้เป็น read-only cost-ownership rule ไม่เปลี่ยน B11 Working SELL.</p>
+  </section>}
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Reconcile all four MR cargo legs against current MGW China FAT and DDP JUTAL Zhuhai Yard; Bangkok/Nantong are historical Rev05 routes only.</p>}
   {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
    <h4>B9 — Conditional Yard Specialist Onshore SELL Rate (FAT Witness = B3)</h4>
