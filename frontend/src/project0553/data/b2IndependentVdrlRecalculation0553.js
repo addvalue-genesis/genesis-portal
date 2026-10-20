@@ -59,10 +59,10 @@ export function evaluateB2VdrlIndependentScenario0553({
   const grossSourceMH=x.roleMH.reduce((a,b)=>a+b,0);
   const b2MH=selectedMH.reduce((a,b)=>a+b,0);
   const roleCostProxies=selectedMH.map((mh,i)=>{
-   const x=deriveLaborCost({hours:mh,loadedRate:DOC_SOURCE_RATES[i],
+   const proof=deriveLaborCost({hours:mh,loadedRate:DOC_SOURCE_RATES[i],
     evidence:SOURCE_URL+"#05_WORK_OBJECTS / "+x.id});
-   if(x.status!=="DERIVED_REVIEW")throw Error("VDRL role source/rate incomplete");
-   return x.value;
+   if(proof.status!=="DERIVED_REVIEW")throw Error("VDRL role source/rate incomplete");
+   return proof.value;
   });
   const directCostProxy=roleCostProxies.reduce((a,b)=>a+b,0);
   const loadedPlanningCost=directCostProxy*employerLoadFactor;
