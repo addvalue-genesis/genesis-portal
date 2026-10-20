@@ -68,6 +68,17 @@ assert(m.includes("Copy component ID bid.budget.working.bc.b3.site-mr-sat-matrix
 assert(m.includes("SAT-ZWP20-MR0001")&&m.includes("SAT-SIT-CROSS-MR"));
 const d=render(Evidence,{workingRow:b});
 assert(d.includes("bid.budget.working.bc.b3.working-sell-breakdown"));
+assert(d.includes("bid.budget.working.bc.b3.working-sell-breakdown.component-preview.offshore"));
+assert(d.includes("bid.budget.working.bc.b3.working-sell-breakdown.fat-expense-preview.b3-fat-staff"));
+// Source expense ID remains canonical; read-only preview gets a DISTINCT UI anchor.
+const renderedKeys=[...d.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
+assert.equal(new Set(renderedKeys).size,renderedKeys.length,"Visible B3 UI must not duplicate module DOM anchors");
+assert.equal(renderedKeys.filter(x=>x==="bid.budget.working.bc.b3.fat-staff").length,1,
+ "Only the original MGW China FAT expense table may own the canonical FAT-STAFF DOM anchor");
+const historicalAudit=fs.readFileSync(path.join(dir,"B3EquationAudit0553.jsx"),"utf8");
+assert(historicalAudit.includes("B3 owns MGW China FAT witness personnel/travel"));
+assert(!historicalAudit.includes("B9 MGW China FAT witnesses"));
+
 assert(d.indexOf("B3 — Current Working SELL Breakdown")<d.indexOf("B3 — Contract Requirements × Rev.K Work Breakdown"));
 assert(d.indexOf("B3 — Contract Requirements × Rev.K Work Breakdown")<d.indexOf("B3 — Seven-Site / Four-MR SAT Test Coverage"));
 assert.equal(JSON.stringify({b3:bc().byCode.B3,overall:bc().knownWorkingSellTHB}),sourceSnapshot,"Rendering must never mutate current B3 pricing");
