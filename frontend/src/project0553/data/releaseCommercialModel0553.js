@@ -64,6 +64,8 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    const rawQty=n(item.sourceQty)?item.sourceQty:n(item.qty)?item.qty:null;
    const cost=resultMoneyTHB(line,rate);
    const unit=n(cost)&&positive(rawQty)?round(cost/rawQty):null;
+   const extendedSell=n(cost)?priceAorCFromCost0553(cost).customerSellTHB:null;
+   const customerUnitSell=extendedSell!==null&&positive(rawQty)?Math.round(extendedSell/rawQty*10000)/10000:null;
    return {
     id:String(line.id||index),code,sourceModuleId:"bid.budget.bom.system-location-mto",
     mr,site:line.site,tag:String(line.tag||"NOT VERIFIED"),
@@ -71,8 +73,8 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
     specification:[item.vendor,item.sku].filter(Boolean).join(" / ")||item.note||"OEM specification pending",
     qty:rawQty,unit:item.sourceUnit||item.unit||null,
     costTHB:cost,unitCostTHB:unit,
-    customerUnitTHB:unit===null?null:priceAorCFromCost0553(unit).customerSellTHB,
-    customerSellTHB:cost===null?null:priceAorCFromCost0553(cost).customerSellTHB,
+    customerUnitTHB:customerUnitSell, // 4-decimal rate reconciles against extended sell to 0.01 THB
+    customerSellTHB:extendedSell,
     sourcePriceCurrency:line.currency,sourceRef:line.source,
     status:item.status||"WORKING_EVIDENCE_NOT_APPROVED",verified:false
    };
