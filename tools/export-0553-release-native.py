@@ -74,6 +74,7 @@ def allowed(sheet,cell):
     col,row=m.group(1),int(m.group(2))
     if sheet=="Scope of supply":
         if 8<=row<=22:return col in "ABCDEFG"
+        if row==38:return col=="G"  # native Base A+B total, not the optional Part C
         if row in (24,25,26,27,28,29,30,31,32,37):return col in "FG"
         if row in (33,34,35,36,41,42):return col=="G"  # F keeps "refer to Annex"
         return False
@@ -132,6 +133,20 @@ def validate_payload(wb,payload,template):
         if before not in (None,"","Not quote","xxx") and before!=val:
             raise ValueError(f"Original nonblank customer content cannot be replaced: {sheet}!{cell}={before!r}")
         valid.append((sheet,cell,val))
+    # Native summary Grand Total (G38) is A+B base only; C options stay separate.
+    sumcell=next((i["value"] for i in payload["cells"]
+                  if i["sheet"]=="Scope of supply" and i["cell"]=="G38"),None)
+    if not isinstance(sumcell,(int,float)):
+        raise ValueError("Original Scope of supply!G38 Base A+B total required")
+    scope_entries={i["cell"]:i["value"] for i in payload["cells"] if i["sheet"]=="Scope of supply"}
+    for row in range(24,38):
+        if "G"+str(row) not in scope_entries:
+            raise ValueError("Missing customer B1-B14 native total cell G"+str(row))
+    calculated=sum(float(i["value"]) for i in payload["cells"]
+                   if i["sheet"]=="Scope of supply" and
+                   i["cell"] in {("G"+str(r)) for r in list(range(8,23))+list(range(24,38))})
+    if abs(calculated-float(sumcell))>0.01:
+        raise ValueError("Native Scope G38 must equal Part A TAG + Part B (no optional C)")
     # Price totals and detail sheets must reconcile before native output.
     for code,summaryrow in SCOPE_ANNEX.items():
         sheet=SHEET_BY_CODE[code]
