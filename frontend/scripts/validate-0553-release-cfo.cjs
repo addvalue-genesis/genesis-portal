@@ -4,7 +4,7 @@ const fs=require("node:fs"),path=require("node:path"),vm=require("node:vm");
 const base=path.resolve(__dirname,"../src/project0553");
 const file=(rel)=>fs.readFileSync(path.join(base,rel),"utf8");
 const source=file("data/releaseCommercialModel0553.js");
-const isolated=source.replace(/^import .*?;\\s*$/gm,"").replace(/\\bexport /g,"");
+const isolated=source.replace(/^import .*?;\s*$/gm,"").replace(/\bexport /g,"");
 const sandbox={};vm.runInNewContext(isolated+";this.calc={priceAorCFromCost0553,priceBWorkingSell0553};",sandbox);
 const ac=sandbox.calc.priceAorCFromCost0553(100);
 assert.equal(ac.customerSellTHB,130);
