@@ -8,6 +8,7 @@ import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
+import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
 import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553,
  B1_AUDIT_KINDS_0553,b1AuditModuleId0553} from "./b1AccordionModuleIds0553";
 
@@ -157,6 +158,38 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId:"bid.budget.working.bc.b11.test-equipment-ownership",
   keywords:"B11 special tools operation maintenance OEM RACON programming kit B3 VeEX rental"
  });
+ // Owner-local price/source evidence is searchable, never a new cost owner.
+ // B2 VDRL rows are real requirement IDs with unknown document instances/MH/rates.
+ const vdrl=selectBcB1B2EquationExecution0553();
+ if(vdrl.records.length!==143||vdrl.totals.uniqueTitleTypes!==38)
+  throw Error("B2 143 / 38 source register changed");
+ const priceCodes=["B2","B4","B5","B6","B7","B8","B9"];
+ for(const code of priceCodes){
+  const rootId="bid.budget.working.bc."+code.toLowerCase()+".price-trace";
+  const label=bc.byCode[code].requirement;
+  const nested=(id,name,keywords="source scope cost price qty rate manhours")=>({
+   id,name,tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+   anchorModuleId:id,keywords:code+" "+label+" "+keywords
+  });
+  entries.push(nested(rootId,code+" — Source-backed Working SELL / Quantity / Rate audit"));
+  for(const [suffix,name] of [
+   ["work-scope","Scope and source work drivers"],
+   ["price-reconciliation","Working SELL and quantity/rate proof"],
+   ["resource-man-hours","Positions / Man-hours / Rate and cost gaps"],
+   ["source-audit","Vendor quote / historical evidence and owner audit"]
+  ])entries.push(nested(rootId+"."+suffix,code+" — "+name));
+  if(code==="B2"){
+   for(const mr of ["MR-0001","MR-0002","MR-0003","MR-0004"]){
+    entries.push(nested(rootId+".vdrl."+mr.toLowerCase(),
+     "B2 — "+mr+" VDRL required documents","VDRL contract dossiers records"));
+   }
+   for(const doc of vdrl.records){
+    entries.push(nested(rootId+".vdrl."+doc.id.toLowerCase(),
+     "B2 "+doc.id+" — "+doc.title+" ("+doc.projectDocumentNo+")",
+     doc.mr+" "+doc.dossier+" "+doc.submissionTrigger+" "+doc.workKind));
+   }
+  }
+ }
  const ids=entries.map(x=>x.id),all=new Set(ids);
  if(all.size!==entries.length)throw Error("Duplicate B/C Navigator Module ID");
  const leaves=entries.filter(x=>x.kind==="CUSTOMER_BC_WORKING_ROW");
