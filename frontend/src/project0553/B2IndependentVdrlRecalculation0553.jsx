@@ -106,7 +106,12 @@ export function B2IndependentVdrlRecalculation0553(){
     <td>{num(x.selectedMH)}</td><td>{money(x.historicalRateTHBPerMH)}</td>
     <td>{money(x.costProxyTHB)}</td><td>{money(x.loadedPlanningCostTHB)}</td>
     <td>{money(x.indicativeSellTHB)}</td></tr>)}</tbody>
-   <tfoot><tr><th>Independent scenario TOTAL</th><th>{num(r.sourceRoleMH)}</th>
+   <tfoot>
+    {model.roleLineCostRoundingBridgeTHB!==0&&<tr><th colSpan={4}>
+     Source role-line rounding reconciliation (5 displayed rows × 2 decimals)</th>
+     <th>{money(model.roleLineCostRoundingBridgeTHB)}</th>
+     <th>Included in aggregate</th><th>Not a separate Cost Owner or price item</th></tr>}
+    <tr><th>Independent scenario TOTAL</th><th>{num(r.sourceRoleMH)}</th>
     <th>{num(r.selectedB2MH)}</th><th>Mixed role rates</th>
     <th>{money(r.selectedHistoricalCostProxyTHB)}</th>
     <th>{money(r.employerLoadedPlanningCostTHB)}</th>
