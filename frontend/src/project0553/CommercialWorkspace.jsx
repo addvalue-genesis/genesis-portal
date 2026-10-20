@@ -22,6 +22,7 @@ import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
+import {PricingSourceGuide0553,PricingSourceChip0553} from "./PricingSourceGuide0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
 import {PRICING_VIEWS_0553,pricingViewByKey0553} from "./pricingViewRegistry0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
@@ -167,6 +168,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <ComponentCopyId projectId="PJ2608-0553" componentKey={activePricingView.moduleId}/>
    {" "}· {recipient} · {mode==="working"?"LIVE Working Read Model — Save/Sync is not complete.":mode==="budgetary"?"BUDGET PREVIEW — no authenticated frozen snapshot.":"RELEASE PREVIEW — approval HOLD; selecting this tab does not issue a quotation."}
   </p>
+  {recipient==="INTERNAL"&&<PricingSourceGuide0553 onOpenSource={openReleaseSource}/>}
   {recipient==="INTERNAL"&&<PricingCfoDashboard0553 model={releaseModel}/>}
   {mode==="working"&&<>
   <section className="p55-panel">
@@ -184,12 +186,12 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     <p className="p55-note"><strong>WORKFLOW:</strong> 10.1 Engineering BOM → 10.2 B/C working WBS &amp; spare derivation (upstream data, not a verified complete cost) → 10.3 Pricing reference → 10.4 Estimate-to-Bid Mapping → 10.5 Scope → 10.6 Customer Workbook. Prerequisites: 04 MR, 05.3 Drawings, 06 Execution, 07 Vendor, 08 Risk, 09 Traceability. Workflow numbers indicate order, not approval.</p>
    <p className="p55-note"><strong>INPUT:</strong> RFQ/MR/MTO/BLD/DTS/RPT/Standards · <strong>DERIVE:</strong> Link/Capacity/Interface Constraints → Physical BOM and quantity → Vendor technical evaluation → WBS Services → Equipment/Service Cost and risk · <strong>OUTPUT:</strong> reviewed engineering working cost. Current MTO sets and quoted vendor quantities are input evidence, NOT verified physical SKU quantities.</p>
   </section>
-  <details className="p553-budget-phase" open data-component-key="bid.budget.bom"><summary><strong>10.1 — Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
+  <details className="p553-budget-phase p553-source-frame p553-source-frame--equipment" open data-component-key="bid.budget.bom"><summary><strong>10.1 — Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small><PricingSourceChip0553 source="equipment" role="owner"/></summary>
    <CostIntegrityReview0553/>
    <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency}/>
   </details>
-  <details className="p553-budget-phase" data-component-key="bid.budget.working.bc">
-   <summary><strong>10.2 — Part B/C Working Cost &amp; Spare Requirements</strong><small>bid.budget.working.bc · WBS / Services / Spares</small></summary>
+  <details className="p553-budget-phase p553-source-frame p553-source-frame--services" data-component-key="bid.budget.working.bc">
+   <summary><strong>10.2 — Part B/C Working Cost &amp; Spare Requirements</strong><small>bid.budget.working.bc · WBS / Services / Spares</small><PricingSourceChip0553 source="bc" role="owner"/></summary>
    <section className="p55-panel" style={{padding:"12px 14px"}}>
     <div className="p55-eyebrow">PART B/C WORKING SHEETS / ENGINEERING COST CONTROL <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.working.bc"/></div>
     <h3>Part B/C — Linked Internal Working Detail</h3>
