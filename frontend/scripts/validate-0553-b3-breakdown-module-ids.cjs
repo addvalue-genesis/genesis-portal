@@ -89,6 +89,9 @@ for(const name of ["fat","sat","tools","audit"]){
 }
 assert(d.includes('data-component-key="bid.budget.working.bc.b3.veex-mx100"'));
 assert(d.includes("B11 = Special Tools for Operation"),"Permanent special tools remain B11; VeEX rental is B3");
+const b11html=render(Evidence,{workingRow:r.byCode.B11});
+assert(b11html.includes('data-component-key="bid.budget.working.bc.b11.test-equipment-ownership"'));
+assert.equal(r.byCode.B11.directCostTHB,null,"B11 tool ownership note must not become a cost posting");
 assert.equal(JSON.stringify({b3:bc().byCode.B3,overall:bc().knownWorkingSellTHB}),sourceSnapshot,"Rendering must never mutate current B3 pricing");
 const host=fs.readFileSync(path.join(dir,"BcCostEvidenceDetail0553.jsx"),"utf8");
 assert(host.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"));
