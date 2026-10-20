@@ -126,7 +126,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
   </section>}
   {e.code==="B3"&&<B3WorkingSellBreakdown0553 workingRow={workingRow}/>}
   {(e.code==="B3"||e.code==="B9")&&<B3RequirementWbsTrace0553 selectedOwner={e.code} navigationTarget={navigationTarget}/>}
-  {e.code==="B3"&&<B3SiteMrSatCoverage0553/>}
+  {e.code==="B3"&&<B3SiteMrSatCoverage0553 workingRow={workingRow}/>}
   {e.code==="B3"&&<B9ChinaBudgetDetail0553 budget={workingRow.b3ChinaFatBudget} selectedOwner="B3"/>}
   {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
   {e.code==="B3"&&workingRow.b3FatOwnerTransfer&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b3.fat-owner-transfer" style={{padding:12,marginTop:12}}><h4>B3 — Rev.K FAT Cost Owner Reconciliation</h4><p className="p55-note">Rev05 Bangkok FAT allocation <strong>THB {workingRow.b3FatOwnerTransfer.amountTHB.toLocaleString("en-US")}</strong> is removed from B3. MGW China FAT witness labor/travel stays in contractual B3 (new THB 397,400); old Bangkok FAT THB144,000 is superseded once. B3 includes 40 Offshore SAT/SIT workdays, 30-day VeEX rental and MGW FAT Witness: <strong>{thb(workingRow.workingSellTHB)}</strong>. Historical FAT source evidence is not additive.</p></section>}
