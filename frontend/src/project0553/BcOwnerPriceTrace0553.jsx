@@ -122,6 +122,30 @@ function Pricing({row}){
     <strong> NOT</strong> current direct cost. Any change to B2 Working SELL requires
     a separate controlled document WBS, effort/rate evidence and approval.</p>
   </section>}
+  {code==="B2"&&<section className="p55-panel" style={{padding:12}}>
+   <h4>B2 — Historical Role Rate Seeds / Cross-check ONLY</h4>
+   <p className="p55-note">Rev05 Workbook 01_COMMERCIAL_BASIS records the following
+    historical THB/MH input cost seeds. They are NOT current ADDVALUE payroll,
+    NOT assigned B2 staff, and do not allocate the THB580,000 lump sum.
+    No role hours, revision cycles or hours per document have been approved.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Historical Role / Position</th><th>Historical Input Cost THB / MH</th>
+     <th>Current B2 Allocated MH</th><th>Current B2 Direct Cost</th></tr></thead>
+    <tbody>{[
+     ["Lead / PM / QA Checker",341.625],
+     ["Senior Telecom Engineer",250],
+     ["Telecom Engineer",137.5],
+     ["CAD / Telecom Drafter",116.625],
+     ["Document Controller",104.125]
+    ].map(([role,rate])=><tr key={role}><td>{role}</td><td>{fmt(rate)}</td>
+     <td>NOT ESTABLISHED</td><td>NOT ESTABLISHED</td></tr>)}</tbody>
+   </table></div>
+   <p className="p55-note">Rev04 bounded cost proxy THB202,717.25–208,217.25
+    and project office calibration 2.8228342959766093× are HISTORICAL
+    price sanity checks only. They do not establish current cost, unit rate,
+    or the number of man-hours needed for B2. Source: Rev05
+    01_COMMERCIAL_BASIS / 09_B2_DOCUMENTATION.</p>
+  </section>}
   {code==="B5"&&<section className="p55-panel" style={{padding:12}}>
    <h4>B5 — Working SELL vs Historic Packing Source</h4>
    <p className="p55-note">Current selected B5 Working SELL: <strong>{fmt(total)}</strong>.
