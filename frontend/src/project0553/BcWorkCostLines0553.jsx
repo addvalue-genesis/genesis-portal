@@ -12,7 +12,7 @@ import {selectB3WorkingSellAfterChinaFat0553} from "./data/b3ChinaFatOwnership05
 const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US"):"TO VERIFY";
 
-export function BcWorkCostLines0553({selectedCode="ALL"}){
+export function BcWorkCostLines0553({selectedCode="ALL",presentationNamespace=null}){
  const m=selectBcWorkCostLines0553();
  const [showAuditClauses,setShowAuditClauses]=useState(false);
  const showGroup=selectedCode==="ALL"?m.activeCodes:[selectedCode];
@@ -76,7 +76,7 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
  const displayedWbsSell=showGroup.reduce((sum,code)=>sum+(currentSourceSell[code]??0),0);
  const completeSell=showGroup.every(code=>Number.isFinite(currentSourceSell[code]));
  const knownSellCount=showGroup.filter(code=>Number.isFinite(currentSourceSell[code])).length;
- return <details className="p55-panel" data-component-key={m.moduleId} open={selectedCode!=="ALL"} style={{marginTop:12,padding:"12px 14px"}}>
+ return <details className="p55-panel" data-component-key={presentationNamespace?presentationNamespace+".cost-lines-view":m.moduleId} open={selectedCode!=="ALL"} style={{marginTop:12,padding:"12px 14px"}}>
   <summary><strong>10.2 — First Principles / Resource &amp; Cost-Line Ledger</strong> · {physical.length} work objects · {clauses.length} audited clauses</summary>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={m.moduleId}/> · Cost Owner: 10.2 only · Source: <a href={m.sourceUrl} target="_blank" rel="noreferrer">{m.sourceRevision}</a></p>
   <p className="p55-note"><strong>Selected:</strong> {selectedCode==="ALL"?"B1/B2/B3/B5/B6/B9/B10/B11 (current derivation priority)":selectedCode}
@@ -89,7 +89,7 @@ export function BcWorkCostLines0553({selectedCode="ALL"}){
   {(selectedCode==="ALL"||selectedCode==="B5")&&<B5EquationAudit0553 selectedCode={selectedCode}/>}
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Module ID / CBS</th><th>Work Object / Resource</th><th>Qty / Unit</th><th>Working SELL Rate THB</th><th>Working SELL Total THB</th><th>Current Direct COST THB</th><th>Equation / Owner / Source / Gate</th></tr></thead>
-   <tbody>{physical.map(x=><tr key={x.id} data-component-key={x.moduleId}>
+   <tbody>{physical.map(x=><tr key={x.id} data-component-key={presentationNamespace?presentationNamespace+".cost-line-preview."+x.id.toLowerCase():x.moduleId}>
     <td><strong>{x.code} · {x.id}</strong><small>{x.moduleId}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={x.moduleId}/></td>
     <td><strong>{x.name}</strong><small>{x.reconciliationTag}</small>{x.roleMH&&<small>Role MH: {Object.entries(x.roleMH).map(([role,hours])=>role+" "+hours).join(" · ")}</small>}</td>
     <td>{qty(x.quantity)} {x.unit}<small>{x.requiredQuantityStatus}</small></td>
