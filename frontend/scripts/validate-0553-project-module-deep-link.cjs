@@ -31,7 +31,8 @@ assert(parent&&parent.tab==="budget"&&parent.anchorModuleId===satId);
 assert.equal(search(rootId+".site",all).length,1,"User partial b3.site must find SAT matrix");
 assert.equal(search(satId.toUpperCase(),all)[0]?.id,satId,"Case-insensitive exact Module ID search");
 assert.equal(all.filter(m=>m.id===satId).length,1); // B3.site search must find the matrix parent
-assert.equal(all.filter(m=>m.id.startsWith(rootId+".sat-matrix.")).length,site().rows.length);
+assert.equal(site().rows.filter(r=>lookup(r.moduleId)?.anchorModuleId===r.moduleId).length,site().rows.length);
+assert(site().rows.every(r=>lookup(r.moduleId+".work-breakdown")?.anchorModuleId===r.moduleId+".work-breakdown"),"All 21 SAT Modules have searchable detail work breakdowns");
 assert(lookup(offId)?.anchorModuleId===rootId+".working-sell-breakdown.component-preview.offshore");
 assert(lookup(rootId+".requirement-trace")?.anchorModuleId===rootId+".requirement-crosswalk");
 for(const r of site().rows)assert(lookup(r.moduleId)?.anchorModuleId===r.moduleId,r.id);

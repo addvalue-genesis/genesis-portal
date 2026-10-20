@@ -6,6 +6,7 @@ import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553} from "./bcWorkingModuleRoutes0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
+import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 
 export function buildBcModuleNavigator0553(){
  const bc=selectBcTurnkeyWorkingCost0553();
@@ -62,6 +63,16 @@ export function buildBcModuleNavigator0553(){
    "requirement "+r.system+" "+r.wbs+" "+r.requirementRef+" "+r.location)),
   ...sat.rows.map(r=>child(r.moduleId,r.id+" — "+r.site+" "+r.mr,
    r.moduleId,"SAT test "+r.site+" "+r.mr+" "+r.system)),
+  ...sat.rows.flatMap(r=>{
+   const timebox=sat.budgetarySiteTimeboxes.find(t=>t.id===r.budgetTimeboxId);
+   const work=selectB3SatMrWorkBreakdown0553(r,timebox,sat.priceProof);
+   return [
+    child(work.moduleId,r.id+" — "+r.mr+" detailed SAT activities / working-basis",
+     work.moduleId,"MR task function engineering work breakdown "+r.site),
+    ...work.taskRows.map(task=>child(task.moduleId,r.id+" — "+task.activity,
+     task.moduleId,"SAT individual subtask "+r.site+" "+r.mr))
+   ];
+  }),
   ...b3.b3ChinaFatBudget.rows.map(r=>child(r.moduleId,r.description,
    r.moduleId,(r.costOwner==="B9"?"B9 optional Yard":"B3 China MGW FAT")+" "+r.id))
  ];
