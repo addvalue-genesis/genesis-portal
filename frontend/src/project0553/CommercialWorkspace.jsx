@@ -286,7 +286,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  {mode==="released"&&<section className="p55-panel">
    <div className="p55-eyebrow">RELEASED CUSTOMER OUTPUT · APPROVAL GATE</div>
    <h3>Customer Release — HOLD</h3>
-   <ReleaseCustomerWorkbook0553 model={releaseModel} onOpenSource={openReleaseSource} title="10.3 — Released Customer Output (Read-only staging)"/>
+   <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} title="10.3 — Released Customer Output (Read-only staging)"/>
    <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Gate</th><th>Required check</th><th>Current status</th></tr></thead>
    <tbody>{BID_0553_GATES.map(g=><tr key={g.id}><td><strong>{g.id}</strong></td><td>{g.title}<small>{g.detail}</small></td><td><span className="p55-badge">{g.status}</span></td></tr>)}</tbody></table></div>
