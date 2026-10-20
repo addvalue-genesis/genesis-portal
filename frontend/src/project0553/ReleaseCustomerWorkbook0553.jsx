@@ -1,7 +1,8 @@
-import React,{useRef,useState} from "react";
+import React,{useEffect,useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {buildNativeWorkingDraft0553} from "./nativeWorkingDraft0553";
+import {loadNativeTemplate0553,saveNativeTemplate0553,NATIVE_TEMPLATE_NAME_0553} from "./nativeTemplateCache0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import "./releaseWorkbook0553.css";
 
@@ -33,6 +34,18 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const sourceFileRef=useRef(null);
  const [nativeBusy,setNativeBusy]=useState(false);
  const [nativeReport,setNativeReport]=useState(null);
+ const [templateReady,setTemplateReady]=useState(false);
+ const [templateChecking,setTemplateChecking]=useState(true);
+ // 10.3.3 Native source: cached on THIS browser/localhost only, not on GitHub or server.
+ useEffect(()=>{
+  let mounted=true;
+  loadNativeTemplate0553().then(data=>{
+   if(mounted){setTemplateReady(Boolean(data));setTemplateChecking(false);}
+  }).catch(()=>{
+   if(mounted){setTemplateReady(false);setTemplateChecking(false);}
+  });
+  return ()=>{mounted=false;};
+ },[]);
  const internal=recipient==="INTERNAL"&&viewer==="INTERNAL";
  const code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
  const partA=buildPartATagGroupBreakdown0553(model);
@@ -57,24 +70,51 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   {id:"EXPORT",label:"Signed snapshot / native XLSX geometry and currency",state:"HOLD",detail:"No approved release and source-cell mapping; original workbook unchanged"}
  ];
  const canQuote=false; // Final customer-issued XLSX still requires approval.
- const chooseNativeDraft=()=>sourceFileRef.current?.click();
+ const downloadBlob=result=>{
+  // Only this explicit user-requested Working Draft download uses the browser filename.
+  const url=URL.createObjectURL(result.blob),link=document.createElement("a");
+  link.href=url;link.download=result.filename;document.body.appendChild(link);
+  link.click();link.remove();
+  window.setTimeout(()=>URL.revokeObjectURL(url),15000);
+  setNativeReport({success:true,text:"Downloaded: "+result.filename,
+   mappedCells:result.mappedCells,warnings:result.warnings});
+ };
+ const generateFromOriginal=async file=>{
+  const result=await buildNativeWorkingDraft0553(file,model);
+  downloadBlob(result);
+ };
+ const handleNativeError=error=>setNativeReport({
+  success:false,text:"Native XLSX export: "+(error?.message||String(error)),warnings:[]
+ });
  const exportNativeDraft=async event=>{
+  // The first use requires a local consent gesture to open Windows File Picker.
   const file=event.target.files?.[0];
   event.target.value="";
   if(!file)return;
   setNativeBusy(true);setNativeReport(null);
   try{
+   // Validate original and generate before caching it, so a bad workbook is never saved.
    const result=await buildNativeWorkingDraft0553(file,model);
-   const url=URL.createObjectURL(result.blob),link=document.createElement("a");
-   link.href=url;link.download=result.filename;document.body.appendChild(link);
-   link.click();link.remove();
-   window.setTimeout(()=>URL.revokeObjectURL(url),15000);
-   setNativeReport({success:true,text:"Exported: "+result.filename,
-    mappedCells:result.mappedCells,warnings:result.warnings});
-  }catch(error){
-   setNativeReport({success:false,text:"Native export failed: "+(error?.message||String(error)),warnings:[]});
-  }finally{setNativeBusy(false);}
+   await saveNativeTemplate0553(file);
+   setTemplateReady(true);
+   downloadBlob(result);
+  }catch(error){handleNativeError(error);}
+  finally{setNativeBusy(false);}
  };
+ const chooseNativeDraft=()=>{
+  if(nativeBusy||templateChecking)return;
+  if(!templateReady){
+   // No same-origin template exists; browser permission is required ONCE.
+   sourceFileRef.current?.click();
+   return;
+  }
+  setNativeBusy(true);setNativeReport(null);
+  loadNativeTemplate0553().then(cached=>{
+   if(!cached){setTemplateReady(false);throw Error("Original template cache is empty. Select 4-Scope of Supply.xlsx again.");}
+   return generateFromOriginal(cached);
+  }).catch(handleNativeError).finally(()=>setNativeBusy(false));
+ };
+ const replaceOriginalTemplate=()=>{if(!nativeBusy)sourceFileRef.current?.click();};
  const openSource=item=>{if(internal)setSource(item);};
  const sourceButton=item=>internal?<button type="button" className="p553-origin-link"
    aria-label={"เปิดต้นทาง "+(item.code||item.mr||item.tag||"")} onClick={()=>openSource(item)}>↗ Source</button>:null;
@@ -95,11 +135,16 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     {recipient==="INTERNAL"&&<>
       <input ref={sourceFileRef} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
        onChange={exportNativeDraft} style={{display:"none"}} aria-label="Select original 4-Scope of Supply.xlsx"/>
-      <button type="button" className="p553-detail-button" onClick={chooseNativeDraft} disabled={nativeBusy}
-       title="Select source file: 4-Scope of Supply.xlsx. Windows Open dialog requires manual file selection; export name keeps the original prefix and adds WORKING_DRAFT.">
-       {nativeBusy?"Preparing Native XLSX…":"Export Native XLSX — WORKING DRAFT"}
+      <button type="button" className="p553-detail-button" onClick={chooseNativeDraft}
+       disabled={nativeBusy||templateChecking}
+       title={templateReady?"One-click download with filename 4-Scope of Supply_PJ2608-0553_NATIVE_WORKING_DRAFT_NOT_RELEASED_YYYYMMDD.xlsx":"First time only: choose the original 4-Scope of Supply.xlsx and it will be cached locally for next downloads."}>
+       {nativeBusy?"Preparing Native XLSX…":templateChecking?"Checking original template…":"Download 4-Scope of Supply — WORKING DRAFT"}
       </button>
-      <small className="p55-note">Source file: <strong>4-Scope of Supply.xlsx</strong> (choose it in the Open dialog)</small>
+      {templateReady&&<button type="button" className="p553-detail-button"
+       onClick={replaceOriginalTemplate} disabled={nativeBusy}>Change original template</button>}
+      <small className="p55-note">{templateReady?
+       "Original template ready in this browser — click Download directly.":
+       "First download only: select 4-Scope of Supply.xlsx once; later downloads are one-click."}</small>
      </>}
     <button type="button" disabled={!canQuote} className="p553-detail-button"
       title="Approved customer XLSX requires signed release and completed checks">Final Customer Release — HOLD</button>
