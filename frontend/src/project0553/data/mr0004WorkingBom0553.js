@@ -5,6 +5,7 @@
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {MGW_P26_058_R2_SELECTED_0553 as quote,selectMGWR2Selected0553} from "./mgwP26058R2Selected0553";
 import {RACON_TERMINATION_POLICY_0553} from "./raconTerminationBudget0553";
+import {MGW_PAUL_EMAIL_CLARIFICATIONS_0553 as paul} from "./mgwPaulEmailClarifications0553";
 const offered=selectMGWR2Selected0553("RACON-1");
 if(!offered||offered.quantity!==3||offered.unitPriceUSD!==75059||
  offered.extendedUSD!==225177)throw Error("MGW P26-058_R2 RACON quote mismatch");
@@ -30,6 +31,16 @@ const sites=locations.map(w=>{
   source:quote.id,owner:"MGW_RACON1_INCLUDED_DB5P_NON_ADDITIVE",
   status:"QUOTED_INCLUDED__EX_CERTIFICATE_AND_INTERFACE_VERIFY",
   countedInWorkingTotal:false};
+ const programmingKit={
+  id:site+"-MGW-RACON-PROGRAMMING-KIT",site,mr:"MR-0004",tag:null,
+  sku:null,description:"RACON programming kit — included per MGW Paul Lee email 20-Oct-2026; exact OEM SKU/set count to verify",
+  qty:null,unit:"included in RACON-1",currency:"USD",unitCost:null,extended:null,
+  parentPackage:mainId,priceInclusion:"MGW_EMAIL_INCLUDED_20261020",
+  quoteLine:"RACON-1",source:paul.sourceId,
+  owner:"MGW_RACON1_PROGRAMMING_KIT_INCLUDED_NON_ADDITIVE",
+  status:"MGW_EMAIL_INCLUDED__OEM_PART_SKU_QTY_DELIVERY_LIST_OPEN",
+  countedInWorkingTotal:false
+ };
  const uncertain=[{
   id:"CONTROL-JB",tag:"TCAB-514-002",sku:null,
   description:"Separate RACON Ex e control/junction box: not separately identified in MGW R2; request explicit inclusion or separate priced offer",
@@ -44,7 +55,7 @@ const sites=locations.map(w=>{
   scope:"EX_BULK_ENTRY_QTY_AND_INCLUDED_DELIVERY_OPEN"
  },{
   id:"TOOLS-TEST",tag:null,sku:null,
-  description:"Purge/charging adapter if protection method needs it, programming cable, vessel/marine radar/operator acceptance arrangements",
+  description:"Purge/charging adapter if protection method needs it, vessel/marine radar/operator acceptance arrangements; programming kit included separately per supplier email",
   scope:"RACON_SPECIAL_TOOL_SAT_SUPPORT_VENDOR_INCLUSION_OPEN"
  }].map(x=>({
   ...x,id:site+"-MR0004-"+x.id,site,mr:"MR-0004",qty:null,unit:null,
@@ -53,9 +64,9 @@ const sites=locations.map(w=>{
   countedInWorkingTotal:false,owner:"MR0004_FIELD_BULK_OR_CONTROL_PENDING",
   status:"COST_NOT_ESTABLISHED__BULK_CONTROL_TOOL_SCOPE_VERIFY",
   priceInclusion:null,priceBasis:x.scope}));
- return Object.freeze({site,mr:"MR-0004",items:[packageRow,included,...uncertain],
+ return Object.freeze({site,mr:"MR-0004",items:[packageRow,included,programmingKit,...uncertain],
   controlledTotalUSD:75059,
-  gaps:["MGW R2 names Tideland SeaBeacon 2 and DB-5P only; confirm separate control box TCAB-514-002, internal control/purge and programming kit",
+  gaps:["MGW 20-Oct email confirms RACON programming kit included; confirm exact kit SKU/quantity and separate control box TCAB-514-002, control/purge requirements",
    "No ORGA QTORG2609244 cable/gland/FAT/packing scope inclusion may be copied into MGW quote",
    "Check actual field routing, BFOU/24VDC cable, glands, Ex d assembly, X/S response and Morse code D-vs-Q deviation",
    "No confirmed EXW freight/DDP JUTAL Yard landed cost or FAT/site technical compliance"]});
