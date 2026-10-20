@@ -2,6 +2,7 @@ import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
 import {selectB3SiteMrSatCoverage0553} from "./data/b3SiteMrSatCoverage0553";
+import {B3SatMrWorkBreakdown0553} from "./B3SatMrWorkBreakdown0553";
 
 const fmt=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:2}):"TBC";
@@ -65,7 +66,7 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
   <h4>4. Required SAT Test IDs — Refer to the shared Site budget above</h4>
   <p className="p55-note"><strong>21 Test Groups below are Engineering Coverage, not 21 additional priced visits.</strong> Their individual duration and SELL are deliberately NOT allocated until a validated ITP and tagged test execution plan exists. The booked price belongs to the shared Site timebox above.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1140,width:"100%",tableLayout:"fixed"}}>
-   <thead><tr><th>Site / MR / Test ID / Module ID</th><th>Shared timebox / People-days</th><th>Measurement / Technical Work</th><th>Needed instruments</th><th>Output evidence</th><th>Shared Site Working SELL (THB) / Approval Gate</th></tr></thead>
+   <thead><tr><th>Site / MR / Test ID / Module ID</th><th>Shared timebox / People-days</th><th>Measurement / Technical Work</th><th>Needed instruments</th><th>Output evidence</th><th>MR-Specific Price / Shared Site Budget / Gate</th></tr></thead>
    <tbody>{model.rows.map(r=>{
     const t=byTimebox.get(r.budgetTimeboxId);
     return <tr key={r.id} data-component-key={r.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere"}}>
@@ -76,15 +77,23 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
       <small>{t?.testIds.length} Test IDs use the same Site allocation; no additional MR working days</small></td>
      <td>{r.requiredFunction}</td><td>{r.testInstruments}</td><td>{r.signoffEvidence}</td>
      <td>
-      <strong>{fmt(t?.includedLaborSellTHB)}</strong>
-      <small><strong>SHARED SITE WORKING SELL — NON-ADDITIVE</strong></small>
-      <small>This amount is the TOTAL for {t?.site}, repeated as a reference for its {t?.testIds.length} Test IDs. Count only ONCE in Site Timebox table 2.</small>
-      <small>Individual Test-ID SELL: NOT SEPARATELY PRICED · Direct Cost: NOT ESTABLISHED</small>
+      <strong>MR-SPECIFIC WORKING SELL: NOT ESTABLISHED</strong>
+      <small>Site allowance: <strong>{fmt(t?.includedLaborSellTHB)}</strong> for ALL {t?.testIds.length} Test IDs at {t?.site}</small>
+      <small><strong>SHARED SITE PRICE ONLY — NON-ADDITIVE</strong></small>
+      <small>See the individual MR work breakdown in Section 5; no per-MR hours or independent SELL are established.</small>
       <small>{r.gate} · Cost Owner: {r.costOwner}</small>
      </td>
     </tr>;
    })}</tbody>
   </table></div>
+  <h4>5. Individual SAT Module Work Breakdown — ZPQ MR0001 / MR0002 / MR0003 and other test IDs</h4>
+  <p className="p55-note"><strong>How to read:</strong> Each Module below lists its own verification activities and planned deliverables.
+   The Site budget remains shared. Individual MR team-hours, days, direct cost and Working SELL are NOT ESTABLISHED until an approved tagged ITP and task-duration estimate allocate the Site effort.
+   ZPQ 3 team-days = THB 151,200 shared across its three Test IDs, not three separately priced amounts.
+  </p>
+  {model.rows.map(r=><B3SatMrWorkBreakdown0553
+   key={r.id} testRow={r} timebox={byTimebox.get(r.budgetTimeboxId)} priceProof={price}
+   defaultOpen={r.site==="ZPQ"}/>)}
   <p className="p55-note"><strong>Budget exceptions not silently costed:</strong> {model.technicalHolds.join(" · ")}.
    Airfare/offshore MOB-DEMOB, access/visa/insurance, additional calibrated instruments and RACON vessel/operator may require separately sourced scope allowances. No automatic Working SELL change is made by this SAT coverage table.</p>
  </ControlledModuleSection0553>;
