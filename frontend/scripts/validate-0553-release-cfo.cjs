@@ -145,7 +145,17 @@ assert.match(ui,/10\.2 B1–B14 Working Sell/);
 assert.match(ui,/15 item rows|15 slots|15 item/);
 assert.match(ui,/buyer must accept group-level TAG mapping/);
 assert.match(ui,/const \[viewer,setViewer\]=useState\("CUSTOMER"\)/);
-assert.match(ui,/Native Original XLSX — HOLD/);
+assert.match(ui,/Export Native XLSX — WORKING DRAFT/);
+assert.match(ui,/Final Customer Release — HOLD/);
+assert.match(ui,/buildNativeWorkingDraft0553\(file,model\)/);
+assert.match(ui,/sourceFileRef\.current\?\.click\(\)/);
+const nativeHelper=file("nativeWorkingDraft0553.js");
+assert.match(nativeHelper,/entriesFromZip/);
+assert.match(nativeHelper,/rebuildZip/);
+assert.match(nativeHelper,/Uploaded workbook sheet names/); // source validity gate
+assert.match(nativeHelper,/NOT_RELEASED/);
+assert.match(nativeHelper,/buyer acceptance/);
+assert.ok(!nativeHelper.includes("fetch("),"Native template must stay on the local computer");
 assert.match(ui,/model.annexModels\?\.\[code\]/);
 assert.match(ui,/r.customerUnitTHB/);
 assert.match(ui,/r.customerTotalTHB/);
