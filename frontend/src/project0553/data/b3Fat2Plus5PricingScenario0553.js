@@ -86,3 +86,4 @@ export function selectB3Fat2Plus5PricingScenario0553(workingRow){
    "Proposed THB440200 FAT and THB2486200 whole B3 are approval scenarios only, not a changed canonical B3 Working SELL or Customer Release"
   ])
  });
+}
