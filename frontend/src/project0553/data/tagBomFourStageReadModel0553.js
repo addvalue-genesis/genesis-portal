@@ -218,7 +218,11 @@ export function getTagBomFourStage0553(site,tagRow){
   required.push(...gaEvidence.factoryBom.map(x=>({
    id:"Z1F-GA-"+x.id,functionId:"Z1F_GA_"+x.id,
    documentedQty:x.documentedQty,documentedUnit:x.unit,
-   qtyClass:x.classification,approvedSkuQty:null,derivedWorkingQty:null,
+   qtyClass:x.classification.startsWith("CUSTOMER_SUPPLIED")?
+    "GA_CUSTOMER_FREE_ISSUE_SEPARATE_TAG":
+    x.classification==="ENCLOSURE_CAPACITY_NOT_PURCHASED_GLAND"||x.classification==="SEPARATE_DRAIN_ENTRY_NOT_CABLE_GLAND"?
+    "GA_CONFIRMED_ASSEMBLY_CAPACITY":"GA_FACTORY_INCLUDED_ACCESSORY",
+   approvedSkuQty:null,derivedWorkingQty:null,
    budgetRateTHB:null,budgetAmountTHB:null,rateEvidenceOriginal:null,amountEvidenceOriginal:null,
    currencyEvidenceOriginal:null,quantityDriver:x.description,qtyProof:x.description+" / "+(x.partNumber||"factory assembly item"),
    quantityEvidence:x.source,budgetSource:x.source,
