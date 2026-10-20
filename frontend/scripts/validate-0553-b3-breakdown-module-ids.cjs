@@ -79,9 +79,17 @@ const historicalAudit=fs.readFileSync(path.join(dir,"B3EquationAudit0553.jsx"),"
 assert(historicalAudit.includes("B3 owns MGW China FAT witness personnel/travel"));
 assert(!historicalAudit.includes("B9 MGW China FAT witnesses"));
 
-assert(d.indexOf("B3 — Current Working SELL Breakdown")<d.indexOf("B3 — Contract Requirements × Rev.K Work Breakdown"));
-assert(d.indexOf("B3 — Contract Requirements × Rev.K Work Breakdown")<d.indexOf("B3 — Seven-Site / Four-MR SAT Test Coverage"));
+// Work type owns presentation order: FAT -> SAT -> temporary tools -> cost audit.
+assert(d.indexOf("B3.1")<d.indexOf("B3.2"));
+assert(d.indexOf("B3.2")<d.indexOf("B3.3"));
+assert(d.indexOf("B3.3")<d.indexOf("B3.4"));
+assert(d.indexOf("B3 — Seven-Site / Four-MR SAT Test Coverage")<d.indexOf("B3 — Current Working SELL Breakdown"));
+for(const name of ["fat","sat","tools","audit"]){
+ assert(d.includes('data-component-key="bid.budget.working.bc.b3.'+name+'"'));
+}
+assert(d.includes('data-component-key="bid.budget.working.bc.b3.veex-mx100"'));
+assert(d.includes("B11 = Special Tools for Operation"),"Permanent special tools remain B11; VeEX rental is B3");
 assert.equal(JSON.stringify({b3:bc().byCode.B3,overall:bc().knownWorkingSellTHB}),sourceSnapshot,"Rendering must never mutate current B3 pricing");
 const host=fs.readFileSync(path.join(dir,"BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(host.includes("<B3WorkingSellBreakdown0553 workingRow={workingRow}/>"));
-console.log("PASS B3 10.2 source/SSR: THB 2,443,400 = offshore 2,016,000 + VeEX 30,000 + China FAT 397,400; 19 requirements, 21 SAT Test IDs non-additive; parent Module IDs visible and copyable, B9 excluded.");
+assert(host.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"));
+console.log("PASS B3 10.2 FAT/SAT/Tools/Audit accordion + source/SSR: THB 2,443,400 = offshore 2,016,000 + VeEX 30,000 + China FAT 397,400; 19 requirements, 21 SAT Test IDs non-additive; parent Module IDs visible and copyable, B9 excluded.");
