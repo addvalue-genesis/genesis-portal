@@ -10,6 +10,7 @@ const WORKSHEETS=Object.freeze([
 ]);
 const B_ROWS=Array.from({length:14},(_,i)=>"B"+(i+1));
 const format=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
+const formatUnit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"—";
 const parseName=code=>REV08_BASELINE.summary.find(r=>r[0]===code)?.[1]||code;
 const ANNEX_TITLE={
  B10:["ERECTION, PRECOMMISSIONING, COMMISSIONING, START UP SPARE PARTS LISTS","安装，预试车，试车和开车的备件清单"],
@@ -84,7 +85,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        {rows.map((r,i)=><tr key={r.mrCode+":"+r.site+":"+r.id+":"+i}>
         <td>{i+1}</td><td><strong>{r.tag}</strong>{internal&&<><small>{r.site} · {r.mr}</small>{viewSource(r)}</>}</td>
         <td>{r.description}</td><td>{r.specification}</td><td>{r.qty??"TBC"}</td>
-        <td className="p553-price-cell">{format(r.customerUnitTHB)}</td>
+        <td className="p553-price-cell">{formatUnit(r.customerUnitTHB)}</td>
         <td className="p553-price-cell">{format(r.customerSellTHB)}</td>
         <td>{internal?"PROVISIONAL · "+r.mrCode+" · "+r.status:""}</td></tr>)}
        {Array.from({length:Math.max(0,15-rows.length)},(_,i)=><tr key={"blank-a-"+i} className="p553-empty-row">{Array.from({length:8},(_,j)=><td key={j}>&nbsp;</td>)}</tr>)}
