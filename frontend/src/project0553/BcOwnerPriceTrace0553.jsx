@@ -2,6 +2,7 @@ import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcB1B2EquationExecution0553} from "./data/bcB1B2EquationExecution0553";
 import {B2WorkingPriceOverview0553} from "./B2WorkingPriceOverview0553";
+import {B2IndependentVdrlRecalculation0553} from "./B2IndependentVdrlRecalculation0553";
 import {selectBcB5HistoricalPriceBridge0553} from "./data/bcB5HistoricalPriceBridge0553";
 
 // 10.2 owner-local READ ONLY price evidence for B2/B4–B9.
@@ -297,6 +298,7 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
     <button type="button" className="p553-detail-button" onClick={()=>setAll(false)}>− Collapse All</button>
    </div>
   </div>
+  {code==="B2"&&<B2IndependentVdrlRecalculation0553/>}
   {code==="B2"&&<B2WorkingPriceOverview0553 workingRow={workingRow}/>}
   <Section code={code} num={code+".1"} suffix="work-scope"
    title={code==="B2"?"VDRL / Document Register by MR":"Work Type / Physical Deliverables"}
