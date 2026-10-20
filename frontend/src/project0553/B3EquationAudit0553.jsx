@@ -89,7 +89,7 @@ export function B3EquationAudit0553({selectedCode="ALL"}){
    </tr>)}</tbody></table>
   </div>}
   <p className="p55-note"><strong>Boundary:</strong> B1 engineering content, B2 transmittal/final dossier,
-   B3 actual physical testing and original signed test sheets, B9 MGW China FAT witnesses / conditional Zhuhai Yard support (historical Nantong references below are superseded).
+   B3 owns MGW China FAT witness personnel/travel and Offshore SAT/SIT, plus original signed test sheets; B9 owns only optional Zhuhai Yard specialist call-out (Rev05 Bangkok FAT / Nantong references above are historical audit evidence, never the current price).
    If a vendor's OEM test is included in Part A, avoid charging it again under B3.
    No default payroll, extra travel, offshore standby or additional test-event price has been created.</p>
  </details>;
