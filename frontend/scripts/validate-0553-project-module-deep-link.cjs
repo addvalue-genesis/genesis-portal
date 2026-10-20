@@ -33,7 +33,11 @@ assert.equal(search(satId.toUpperCase(),all)[0]?.id,satId,"Case-insensitive exac
 assert.equal(all.filter(m=>m.id===satId).length,1); // B3.site search must find the matrix parent
 assert.equal(site().rows.filter(r=>lookup(r.moduleId)?.anchorModuleId===r.moduleId).length,site().rows.length);
 assert(site().rows.every(r=>lookup(r.moduleId+".work-breakdown")?.anchorModuleId===r.moduleId+".work-breakdown"),"All 21 SAT Modules have searchable detail work breakdowns");
-assert(lookup(offId)?.anchorModuleId===rootId+".working-sell-breakdown.component-preview.offshore");
+assert(lookup(offId)?.anchorModuleId===offId);
+assert(lookup(rootId+".veex-mx100")?.anchorModuleId===rootId+".veex-mx100");
+for(const part of ["fat","sat","tools","audit","test-tools-ownership","source-cost-audit"]){
+ assert(lookup(rootId+"."+part)?.anchorModuleId===rootId+"."+part);
+}
 assert(lookup(rootId+".requirement-trace")?.anchorModuleId===rootId+".requirement-crosswalk");
 for(const r of site().rows)assert(lookup(r.moduleId)?.anchorModuleId===r.moduleId,r.id);
 for(const r of trace().rows){
