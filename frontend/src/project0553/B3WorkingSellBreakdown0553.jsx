@@ -8,6 +8,7 @@ export function B3WorkingSellBreakdown0553({workingRow}){
  return <section className="p55-panel" data-component-key={m.moduleId} style={{padding:12,marginTop:12}}>
   <h4>B3 — Current Working SELL Breakdown · {cash(m.totalWorkingSellTHB)}</h4>
   <p className="p55-note"><strong>Module ID:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={m.moduleId}/> · <strong>Parent Cost Owner:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={m.ownerModuleId}/></p>
+  <p className="p55-note"><strong>กำลังคน Offshore SAT/SIT:</strong> {m.offshore.people} คนทำงานเป็นทีมเดียวกัน × {m.offshore.workdays} วันทำงาน = <strong>{m.offshore.personDays} Man-days</strong> (ไม่ใช่ 40 วันต่อระบบ MR). อัตรา USD {m.offshore.rateUSD}/คน/วัน × FX {m.offshore.workingFx} = {cash(m.offshore.laborWorkingSellTHB)} ค่าแรง. แจกแจงวันและราคาต่อ Site อยู่ที่ <code>bid.budget.working.bc.b3.site-mr-sat-matrix</code>.</p>
   <p className="p55-note"><strong>ราคาใน B3 นี้เป็น Working SELL ไม่ใช่ Direct Cost.</strong> B3 ต้องครอบคลุม MGW China FAT witnesses, Offshore SAT/SIT 40 workdays และ VeEX rental. ตาราง Contract Requirement กับ Site-MR SAT เป็นเอกสาร Coverage/Verification แยกต่างหาก ไม่คิดราคาบวกเพิ่ม.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Current B3 Cost Owner / Copy ID</th><th>Price driver / Quantity</th><th>Working SELL (THB)</th><th>Pricing / Source status</th></tr></thead>
