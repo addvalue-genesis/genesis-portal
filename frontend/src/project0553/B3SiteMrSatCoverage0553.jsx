@@ -1,11 +1,11 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
 import {selectB3SiteMrSatCoverage0553} from "./data/b3SiteMrSatCoverage0553";
 const fmt=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 export function B3SiteMrSatCoverage0553(){
  const model=selectB3SiteMrSatCoverage0553();
- return <details className="p55-panel" data-component-key={model.moduleId} style={{padding:12,marginTop:12}}>
-  <summary><strong>B3 — Seven-Site / Four-MR SAT Test Coverage</strong> <small>19 site-MR functions + 2 integrated/closeout objects; included in 40 working days</small><small><code>{model.moduleId}</code></small></summary>
+ return <ControlledModuleSection0553 moduleKey={model.moduleId} title="B3 — Seven-Site / Four-MR SAT Test Coverage" description="19 site-MR functions + 2 integrated/closeout objects; included in 40 working days">
   <p className="p55-note"><strong>Module ID:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={model.moduleId}/> <strong>40-Day B3 working scope:</strong> Two ADDVALUE offshore specialists × 40 workdays, with {model.rows.length} traceable Test-ID groups; {fmt(model.coveredB3SellTHB)} current B3 Working Sell INCLUDING 30-day VeEX hire. No line below posts a second price. These are test-scope groups, NOT verified counts of installed TAGs or approval of numeric acceptance thresholds.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1100,width:"100%",tableLayout:"fixed"}}>
    <thead><tr><th>Site / MR / Test ID</th><th>WBS / Function</th><th>Measurement / Technical Work</th><th>Needed instruments</th><th>Output evidence</th><th>Gate / Owner</th></tr></thead>
@@ -21,5 +21,5 @@ export function B3SiteMrSatCoverage0553(){
    <tfoot><tr><th>TOTAL</th><th>40-day scenario</th><th>{model.plannedWorkingDays}</th><th>Labour included in B3</th><th>Test groups shown above are not individually billable days</th></tr></tfoot>
   </table></div>
   <p className="p55-note"><strong>Hold points:</strong> {model.technicalHolds.join(" · ")}.</p>
- </details>;
+ </ControlledModuleSection0553>;
 }
