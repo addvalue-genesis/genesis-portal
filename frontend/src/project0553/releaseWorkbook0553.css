@@ -1,11 +1,19 @@
 /* PJ2608-0553: 10.3 pricing CFO and native-like RELEASE preview.
    Isolated stylesheet; no changes to actual customer Excel template. */
 .p553-release-dash,.p553-release-workbook{min-width:0}
-.p553-cfo-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:12px 0}
-.p553-cfo-stat{border:1px solid #ced9e2;border-radius:7px;padding:12px;display:flex;flex-direction:column;min-height:103px;gap:7px;min-width:0;background:#fff}
-.p553-cfo-stat small{font-size:11px;font-weight:700;color:#516272}
-.p553-cfo-stat strong{font-size:20px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere;color:#173d54}
-.p553-cfo-stat span{color:#64748b;font-size:11px;line-height:1.35}
+/* 10.3 CFO: compact Excel-style summary, no separate KPI cards. */
+.p553-cfo-table-wrap{width:100%;overflow-x:auto;margin:12px 0}
+.p553-cfo-table{width:100%;min-width:1060px;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.p553-cfo-table th,.p553-cfo-table td{padding:9px 10px;vertical-align:middle;line-height:1.45;border:1px solid #cfdae2}
+.p553-cfo-table thead th{font-size:12px;line-height:1.45;background:#e8eff5;text-align:center;color:#18364a}
+.p553-cfo-table tbody th{text-align:left;font-weight:600;width:19%}
+.p553-cfo-table tbody th small{display:block;color:#697c8c;font-weight:400;font-size:10px;margin-top:4px;overflow-wrap:anywhere}
+.p553-cfo-table tbody td:not(:last-child){text-align:right}
+.p553-cfo-number{white-space:nowrap;font-size:12px;font-variant-numeric:tabular-nums}
+.p553-cfo-table tbody td.p553-cfo-state{font-size:11px;text-align:left;white-space:normal;min-width:175px}
+.p553-cfo-subtotal th,.p553-cfo-subtotal td{font-weight:700;background:#f1f4f6}
+.p553-cfo-detail{margin-top:12px}
+.p553-cfo-detail summary{font-size:12px;cursor:pointer;font-weight:600}
 .p553-release-controls{display:flex;flex-wrap:wrap;align-items:end;gap:8px;margin:10px 0}
 .p553-release-controls label{font-size:12px;display:flex;flex-direction:column;gap:4px}
 .p553-release-controls select{padding:8px 12px;border:1px solid #bfd0dc;border-radius:5px;background:white}
@@ -56,5 +64,4 @@
 .p553-source-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .p553-source-head button{border:0;background:transparent;color:#246386;cursor:pointer}
 .p553-source-drawer p{margin:7px 0;font-size:12px;overflow-wrap:anywhere}
-@media(max-width:1080px){.p553-cfo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:620px){.p553-cfo-grid{grid-template-columns:1fr}.p553-native-sheet{padding:6px}}
+@media(max-width:620px){.p553-native-sheet{padding:6px}.p553-cfo-table{min-width:1020px}}
