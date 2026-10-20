@@ -65,39 +65,48 @@ export function selectSpareEngineeringReconciliation0553(){
  const raconHistory=capitalHistory.find(x=>/racon complete/i.test(x.description));
  const raconVendor=MR0004_WORKING_BOM_0553;
  const quoteRateUSD=raconVendor.quotePackageUSD;
+ // Old MDS/ORGA FCA USD75,000 is a comparison ONLY, not current selected
+ // MGW installed price or verified independent C1 spare. Preserve the legacy
+ // C1 reference without re-basing it automatically to MGW USD75,059.
+ const historicalOrgaRateUSD=raconVendor.historicalAlternative.packageUSD;
+ if(raconVendor.historicalAlternative.selected!==false)throw Error("Historical RACON selection flag invalid");
  if(!raconHistory||!Number.isFinite(quoteRateUSD)||quoteRateUSD<=0)
   throw Error("Cannot reconcile optional C1 RACON historical and current quoted package");
  const raconComparison=Object.freeze({
   code:"C1",mr:"MR-0004",tagNo:"MAR-514-001",
   historicalDescription:raconHistory.description,
   historicalQty:raconHistory.qty,historicalUnitPriceTHB:raconHistory.unitPriceTHB,
-  vendorDescription:"ORGA/MDS selected installed Marine RACON full package (Part A quote)",
+  vendorDescription:"MGW / Tideland SeaBeacon 2 selected installed Marine RACON package (Part A quote; NOT independent C1 spare)",
   vendorQuote:MR0004_WORKING_BOM_0553.quoteNumber,
   vendorUnitPriceUSD:quoteRateUSD,
   vendorPackageRateReferenceTHB:round(quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
   historicalVsPackageUnitDeltaTHB:round(raconHistory.unitPriceTHB-quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
+  selectedSupplier:"MGW",historicalAlternativeSupplier:"MDS / ORGA",
+  historicalAlternativeUnitUSD:historicalOrgaRateUSD,
   independentSparePriceTHB:null,
   selectedCapitalSpareQty:null,pricePostingAllowed:false,
   note:"Both amounts refer to different budget/quotation bases. The Part A installed kit may include different components; neither proves a supplier-quoted independent complete RACON spare."
  });
- // Management-selected C1 OPTION: one independent spare stock item, not the Part A
- // installed three-site supply. USD75,000 is the original ORGA full equipment
- // FCA unit reference, NOT an OEM-issued spare quote or DDP landed sell price.
+ // C1 historical comparison ONLY: previously budgeted one independent spare.
+ // USD75,000 is the old ORGA installed complete-kit FCA analogue, NOT an MGW
+ // selected Working Cost, approved independent C1 spare or customer release.
  const selectedC1Option=Object.freeze({
   id:"C1-MR0004-ORGA-COMPLETE-SPARE-BUDGET",
   code:"C1",mr:"MR-0004",tagNo:"MAR-514-001",
   description:"SeaBeacon-2 System 6 Ex — complete RACON capital spare (budgetary equivalent)",
   detailSpecification:"X&S Band / Zone 1; configuration, accessories and spare interchangeability to match installed OEM unit",
   materials:"OEM full package reference / independently deliverable spare set",
-  qty:1,unit:"set",unitPriceUSD:quoteRateUSD,currencySource:"USD",
+  qty:1,unit:"set",unitPriceUSD:historicalOrgaRateUSD,currencySource:"USD",
   planningFxTHBPerUSD:customer.rows[0].workingFxTHBPerUSD,
-  budgetUnitPriceTHB:round(quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
-  budgetTotalTHB:round(quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
-  source:"MDS/ORGA "+raconVendor.quoteNumber+" — installed complete package benchmark; management C1 spare option",
+  budgetUnitPriceTHB:round(historicalOrgaRateUSD*customer.rows[0].workingFxTHBPerUSD),
+  budgetTotalTHB:round(historicalOrgaRateUSD*customer.rows[0].workingFxTHBPerUSD),
+  source:"MDS/ORGA "+raconVendor.historicalAlternative.quote+" — HISTORICAL installed-kit reference, non-selected current working cost",
   sourceIncoterm:"FCA_FACTORY_EX_VAT",
   customerRequiredIncoterm:"DDP_PURCHASERS_YARD",
   ddpIncrementTHB:null,ddpSellPriceTHB:null,leadTimeARO:"8 weeks indicative for equipment; OEM spare lead time subject to confirmation",
-  selectionState:"MANAGEMENT_SELECTED_BUDGETARY_C1_OPTION__NOT_OEM_SPARE_QUOTE",
+  selectionState:"HISTORICAL_ORGA_C1_REFERENCE__NOT_SELECTED_MGW_WORKING_COST__NOT_OEM_SPARE_QUOTE",
+  currentSelectedInstalledEquipmentSupplier:"MGW",currentInstalledEquipmentQuoteUnitUSD:quoteRateUSD,
+  historicalComparisonOnly:true,activeWorkingCostSelection:false,
   scopeOwner:"C1_DISTINCT_PHYSICAL_SPARE_STOCK_NOT_PART_A",
   costPosted:false,workingSellPosted:false,customerReleaseAllowed:false
  });
