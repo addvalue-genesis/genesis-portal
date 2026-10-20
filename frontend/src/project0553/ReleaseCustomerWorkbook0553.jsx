@@ -33,6 +33,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
  const partA=buildPartATagGroupBreakdown0553(model);
  const annexLines=model.annex[code]||[];
+ const annexModel=model.annexModels?.[code]||null;
  const annexOverflow=annexLines.slice(13);
  const bLines=model.b;
  const aWorkingTotal=partA.pricedFloorTHB;
@@ -46,7 +47,9 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   {id:"B-SCOPE",label:"10.2 B1–B14 Working Sell",state:model.sourceCoverage.bSellReady?"PREVIEW":"HOLD",detail:"Working Sell displayed unchanged; conditional B7/B9 must be reviewed"},
   {id:"B-COST",label:"10.2 B1–B14 verified Direct Cost",state:model.sourceCoverage.bCostReady?"PASS":"HOLD",detail:"Required for actual ADDVALUE profit, not for displaying provisional Working Sell"},
   {id:"C-COST",label:"10.2 C1/C2 optional supplier cost",state:model.sourceCoverage.cCostReady?"PASS":"HOLD",detail:"No 30% markup of C Working Sell; verified direct cost required"},
-  {id:"ANNEX",label:"Original Annex B10/B11/B13/C1/C2 capacities",state:model.sourceCoverage.annexOverflow.length?"HOLD":"REVIEW",detail:model.sourceCoverage.annexOverflow.length?"Exceeds 13 rows: "+model.sourceCoverage.annexOverflow.join(", "):"Annex price and OEM TAG/SKU still to validate"},
+  {id:"ANNEX",label:"Original Annex B10/B11/B13/C1/C2 capacities",state:model.sourceCoverage.annexOverflow.length?"HOLD":"REVIEW",detail:model.sourceCoverage.annexOverflow.length?"Exceeds 13 rows: "+model.sourceCoverage.annexOverflow.join(", "):"13 original slots per Annex / OEM price proof pending"},
+  {id:"ANNEX-PRICE",label:"10.2 → 10.3 Annex totals",state:Object.values(model.annexModels||{}).every(x=>x.reconciled)?"REVIEW":"HOLD",
+   detail:Object.entries(model.annexModels||{}).map(([id,x])=>id+": "+money(x.selectedWorkingTHB)+" source − "+money(x.annexLineTotalTHB)+" lines = "+money(x.varianceTHB)+" difference").join(" · ")},
   {id:"EXPORT",label:"Signed snapshot / native XLSX geometry and currency",state:"HOLD",detail:"No approved release and source-cell mapping; original workbook unchanged"}
  ];
  const canQuote=false;
@@ -159,6 +162,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      </p>}
     </>:<>
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
+     <p className="p553-native-warning"><strong>{code} — {annexModel?.priceLabel||"WORKING REFERENCE"}</strong>
+      {" "}· รายการจาก 10.2 — <code>bid.budget.working.bc.{code.toLowerCase()}</code>
+      {code.startsWith("C")?" · Optional Spare: มีเพียง Budgetary Reference ยังไม่มี Verified Direct Cost สำหรับราคาขาย ×1.30":
+      " · THB Working Sell, อ้างอิงราคา Budgetary Rev08; OEM Part No./SKU/การไม่ซ้ำซ้อนยังต้องตรวจ"}</p>
      <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table">
       <thead><tr><th rowSpan={2}>Item<br/>序号</th><th rowSpan={2}>Tag No<br/>位号</th><th rowSpan={2}>Description<br/>描述</th><th rowSpan={2}>Detail Specification<br/>详细规格</th><th rowSpan={2}>Materials<br/>材质</th><th rowSpan={2}>QTY<br/>数量</th><th colSpan={code.startsWith("C")?3:2}>DDP site （DDP现场交货）</th></tr>
        <tr><th>UNIT PRICE (CURRENCY)<br/>单价</th><th>TOTAL PRICE (CURRENCY)<br/>总价</th>
@@ -167,20 +174,40 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        const r=annexLines[i];return <tr key={r?.id||"empty:"+i}>
         <td>{r?i+1:""}</td><td>{r?.tagNo||""}{r&&sourceButton(r)}</td>
         <td>{r?.description||""}</td><td>{r?.specification||""}</td><td>{r?.materials||""}</td>
-        <td>{r?.qty??""}</td>
-        <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):Number.isFinite(r.customerUnitTHB)?money(r.customerUnitTHB):code==="C2"?"Not quote":""}</td>
-        <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):Number.isFinite(r.customerTotalTHB)?money(r.customerTotalTHB):code==="C2"?"Not quote":""}</td>
+        <td>{r?.qty??""}{internal&&r?.unit&&<small>{r.unit}</small>}</td>
+        <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):
+          code.startsWith("B")?formatUnit(r.customerUnitTHB):
+          internal?formatUnit(r.workingUnitTHB):"Not quote"}
+          {internal&&r&&<small>{r.priceClass.startsWith("OPTION")?"Reference only":"Working Sell / pre-award"}</small>}
+        </td>
+        <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):
+          code.startsWith("B")?money(r.customerTotalTHB):
+          internal?money(r.workingTotalTHB):"Not quote"}
+          {internal&&r?.sourceId&&<small>{r.sourceId}</small>}
+        </td>
         {code.startsWith("C")&&<td>{r?.leadTimeARO??""}</td>}
        </tr>;
       })}
        <tr className="p553-sheet-total"><td colSpan={7}>Total Price DDP PURCHASER'S YARD:<br/>DDP采购商场地的总费用：</td>
-        <td>Not quote</td>{code.startsWith("C")&&<td/>}</tr>
+        <td>{code.startsWith("B")?money(annexModel?.selectedWorkingTHB):"Not quote"}</td>
+        {code.startsWith("C")&&<td/>}</tr>
       </tbody></table></div>
+      {annexModel&&<div className="p553-annex-reconciliation" role="region" aria-label={code+" source reconciliation"}>
+       <table className="p55-table p55-table--compact"><thead>
+        <tr><th>Source / Pricing</th><th>10.2 Selected Working/Reference THB</th><th>Σ Qty × Unit (Annex lines) THB</th><th>Difference THB</th><th>Gate</th></tr>
+       </thead><tbody><tr><td><strong>{code}</strong><small>10.2 → 10.3 · {annexModel.totalRows} lines</small></td>
+        <td className="p553-price-cell">{money(annexModel.selectedWorkingTHB)}</td>
+        <td className="p553-price-cell">{money(annexModel.annexLineTotalTHB)}</td>
+        <td className="p553-price-cell">{money(annexModel.varianceTHB)}</td>
+        <td>{annexModel.reconciled?"Source sums within 0.01 THB · NOT RELEASED":"HOLD — source summary differs from detailed lines"}</td>
+       </tr></tbody></table>
+       <p className="p55-note">{code.startsWith("C")?"OPTIONAL · Reference value for working review only; customer sell remains Not quote pending OEM verified cost.":"Budgetary Working Sell from 10.2; unresolved variance is not silently added to any spare item."} TAGs shown are functional associations, not verified OEM spare-part equivalence.</p>
+      </div>}
       {annexOverflow.length>0&&<p className="p553-native-warning">HOLD — {code}: {annexOverflow.length} source lines exceed the original 13 annex slots. No rows are discarded from the source; native export requires reconciliation.</p>}
       <div className="p553-annex-remark">Remark 注释: {code.startsWith("C")?
        "Above Price of spare parts is valid up to Two years after Delivery date of purchase order":
        "Please include the costs for installation, commissioning, spare parts and special tools in the total price, and provide a detailed breakdown"}</div>
-      <p className="p55-note">10.2 {code}: TAG/SKU budget references shown for mapping. Customer Annex prices remain blank until verified OEM/technical price. No Rev08 historical amount is silently treated as direct cost.</p>
+      <p className="p55-note">10.2 {code}: B Annex shows source-backed Working Sell (NOT direct cost or Released Offer). C Annex shows working reference only in Internal view; customer price remains Not quote until verified OEM cost. Do not double count equipment included in A, startup spares B10, consumables B13 or two-year spares C2.</p>
     </>}
    </div>
    {internal&&source&&<div className="p553-source-drawer" role="region" aria-label="Source trace">
