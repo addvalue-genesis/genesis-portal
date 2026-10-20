@@ -1,6 +1,7 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcWorkCostLines0553} from "./data/bcWorkCostLines0553";
+import {BcWorkCostLines0553} from "./BcWorkCostLines0553";
 import {B1EngineeringSellModel0553} from "./B1EngineeringSellModel0553";
 import {selectB1ProjectExpenseLedger0553} from "./data/b1IndirectCostLedger0553";
 import {B1RevKMilestoneBudget0553} from "./B1RevKMilestoneBudget0553";
@@ -157,6 +158,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     <MgwR2CommercialCover0553 code="B1"/>
     <MgwPaulVendorClarifications0553 code="B1"/>
     {sharedEvidence}
+    <BcWorkCostLines0553 selectedCode="B1" presentationNamespace="bid.budget.working.bc.b1.audit"/>
    </React.Fragment>}/>}
    {/* 27 historical engineering titles remain unpriced inside B1.A.3; no legacy posting. */}
   {e.code!=="B1"&&<>
@@ -217,7 +219,10 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
   </section>}
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Reconcile all four MR cargo legs against current MGW China FAT and DDP JUTAL Zhuhai Yard; Bangkok/Nantong are historical Rev05 routes only.</p>}
   {e.code==="B3"&&<B3WorkTypeAccordion0553 workingRow={workingRow}
-   navigationTarget={navigationTarget} auditContent={sharedEvidence}/>}
+   navigationTarget={navigationTarget} auditContent={<React.Fragment>
+    {sharedEvidence}
+    <BcWorkCostLines0553 selectedCode="B3" presentationNamespace="bid.budget.working.bc.b3.audit"/>
+   </React.Fragment>}/> }
   {["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&<BcOwnerPriceTrace0553
    workingRow={workingRow}
    sourceContent={<React.Fragment>
@@ -235,7 +240,10 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
   {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
    </React.Fragment>}
-   auditContent={sharedEvidence}/>}
+   auditContent={<React.Fragment>
+    {sharedEvidence}
+    <BcWorkCostLines0553 selectedCode={e.code} presentationNamespace={"bid.budget.working.bc."+e.code.toLowerCase()+".audit"}/>
+   </React.Fragment>}/>}
   {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&sharedEvidence}
  </section>;
 }
