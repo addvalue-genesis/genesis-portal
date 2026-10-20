@@ -43,7 +43,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor authored; ADDVALUE review/DC"
+   "ownerCaveat": "Vendor authored; ADDVALUE review/DC",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-002",
@@ -69,7 +72,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor authored; ADDVALUE review/DC"
+   "ownerCaveat": "Vendor authored; ADDVALUE review/DC",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-003",
@@ -95,7 +101,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor authored; ADDVALUE review/DC"
+   "ownerCaveat": "Vendor authored; ADDVALUE review/DC",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-004",
@@ -121,7 +130,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor authored; ADDVALUE review/DC"
+   "ownerCaveat": "Vendor authored; ADDVALUE review/DC",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-005",
@@ -147,7 +159,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED/CROSS-MR_SHARED_CANDIDATE",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Project-shared recurring report"
+   "ownerCaveat": "Project-shared recurring report",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-006",
@@ -173,7 +188,10 @@
    "sourceStatus": "TEMP_ESTIMATING + UNDERCOUNT_RISK_VDRS_UPDATE_CADENCE_OPEN",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "STD003 §4.5 UNDERCOUNT_RISK — VDRS requires regular updating until Approved; cadence not yet bound"
+   "ownerCaveat": "STD003 §4.5 UNDERCOUNT_RISK — VDRS requires regular updating until Approved; cadence not yet bound",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-007",
@@ -199,7 +217,10 @@
    "sourceStatus": "TEMP_ESTIMATING + UNDERCOUNT_RISK_VDRS_UPDATE_CADENCE_OPEN",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "STD003 §4.5 UNDERCOUNT_RISK — VDRS requires regular updating until Approved; cadence not yet bound"
+   "ownerCaveat": "STD003 §4.5 UNDERCOUNT_RISK — VDRS requires regular updating until Approved; cadence not yet bound",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-008",
@@ -225,7 +246,10 @@
    "sourceStatus": "TEMP_ESTIMATING + UNDERCOUNT_RISK_VDRS_UPDATE_CADENCE_OPEN",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "STD003 §4.5 UNDERCOUNT_RISK — VDRS requires regular updating until Approved; cadence not yet bound"
+   "ownerCaveat": "STD003 §4.5 UNDERCOUNT_RISK — VDRS requires regular updating until Approved; cadence not yet bound",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-009",
@@ -251,7 +275,10 @@
    "sourceStatus": "TEMP_ESTIMATING + UNDERCOUNT_RISK_VDRS_UPDATE_CADENCE_OPEN",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "STD003 §4.5 UNDERCOUNT_RISK — VDRS requires regular updating until Approved; cadence not yet bound"
+   "ownerCaveat": "STD003 §4.5 UNDERCOUNT_RISK — VDRS requires regular updating until Approved; cadence not yet bound",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-010",
@@ -277,7 +304,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list review"
+   "ownerCaveat": "Vendor list review",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-011",
@@ -303,7 +333,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list review"
+   "ownerCaveat": "Vendor list review",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-012",
@@ -329,7 +362,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list review"
+   "ownerCaveat": "Vendor list review",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-013",
@@ -355,7 +391,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list review"
+   "ownerCaveat": "Vendor list review",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-014",
@@ -381,7 +420,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Compilation only"
+   "ownerCaveat": "Compilation only",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-015",
@@ -407,7 +449,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Compilation only"
+   "ownerCaveat": "Compilation only",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-016",
@@ -433,7 +478,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Compilation only"
+   "ownerCaveat": "Compilation only",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-017",
@@ -459,7 +507,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Compilation only"
+   "ownerCaveat": "Compilation only",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-018",
@@ -485,7 +536,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED/CROSS-MR_SHARED_CANDIDATE",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Project-shared candidate"
+   "ownerCaveat": "Project-shared candidate",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-019",
@@ -511,7 +565,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: Shipping/packing procedure — human tick only; do not dedup yet"
+   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: Shipping/packing procedure — human tick only; do not dedup yet",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-020",
@@ -537,7 +594,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: Shipping/packing procedure — human tick only; do not dedup yet"
+   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: Shipping/packing procedure — human tick only; do not dedup yet",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-021",
@@ -563,7 +623,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: Shipping/packing procedure — human tick only; do not dedup yet"
+   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: Shipping/packing procedure — human tick only; do not dedup yet",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-022",
@@ -589,7 +652,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: Shipping/packing procedure — human tick only; do not dedup yet"
+   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: Shipping/packing procedure — human tick only; do not dedup yet",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-023",
@@ -615,7 +681,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED/CROSS-MR_SHARED_CANDIDATE",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Project shared; attendance/record only here"
+   "ownerCaveat": "Project shared; attendance/record only here",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-024",
@@ -641,7 +710,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED/CROSS-MR_SHARED_CANDIDATE",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Project-shared recurring record"
+   "ownerCaveat": "Project-shared recurring record",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-025",
@@ -667,7 +739,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor/joint GA; facility content delta"
+   "ownerCaveat": "Vendor/joint GA; facility content delta",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-026",
@@ -693,7 +768,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor/joint GA; facility content delta"
+   "ownerCaveat": "Vendor/joint GA; facility content delta",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-027",
@@ -719,7 +797,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor/joint GA; facility content delta"
+   "ownerCaveat": "Vendor/joint GA; facility content delta",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-028",
@@ -745,7 +826,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor/joint GA; facility content delta"
+   "ownerCaveat": "Vendor/joint GA; facility content delta",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-029",
@@ -771,7 +855,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — schematic class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — schematic class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-030",
@@ -797,7 +884,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — schematic class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — schematic class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-031",
@@ -823,7 +913,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — schematic class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — schematic class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-032",
@@ -849,7 +942,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — schematic class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — schematic class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-033",
@@ -875,7 +971,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor data"
+   "ownerCaveat": "Vendor data",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-034",
@@ -901,7 +1000,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor data"
+   "ownerCaveat": "Vendor data",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-035",
@@ -927,7 +1029,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor data"
+   "ownerCaveat": "Vendor data",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-036",
@@ -953,7 +1058,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor data"
+   "ownerCaveat": "Vendor data",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-037",
@@ -979,7 +1087,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Content quantity = equipment document family count"
+   "ownerCaveat": "Content quantity = equipment document family count",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-038",
@@ -1005,7 +1116,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Content quantity = equipment document family count"
+   "ownerCaveat": "Content quantity = equipment document family count",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-039",
@@ -1031,7 +1145,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Content quantity = equipment document family count"
+   "ownerCaveat": "Content quantity = equipment document family count",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-040",
@@ -1057,7 +1174,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Content quantity = equipment document family count"
+   "ownerCaveat": "Content quantity = equipment document family count",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-041",
@@ -1083,7 +1203,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor catalogue review by equipment family"
+   "ownerCaveat": "Vendor catalogue review by equipment family",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-042",
@@ -1109,7 +1232,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor catalogue review by equipment family"
+   "ownerCaveat": "Vendor catalogue review by equipment family",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-043",
@@ -1135,7 +1261,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor catalogue review by equipment family"
+   "ownerCaveat": "Vendor catalogue review by equipment family",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-044",
@@ -1161,7 +1290,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor catalogue review by equipment family"
+   "ownerCaveat": "Vendor catalogue review by equipment family",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-045",
@@ -1187,7 +1319,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — installation detail class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — installation detail class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-046",
@@ -1213,7 +1348,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — installation detail class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — installation detail class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-047",
@@ -1239,7 +1377,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — installation detail class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — installation detail class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-048",
@@ -1265,7 +1406,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — installation detail class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — installation detail class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-049",
@@ -1291,7 +1435,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Simple technical format review"
+   "ownerCaveat": "Simple technical format review",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-050",
@@ -1317,7 +1464,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Simple technical format review"
+   "ownerCaveat": "Simple technical format review",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-051",
@@ -1343,7 +1493,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Simple technical format review"
+   "ownerCaveat": "Simple technical format review",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-052",
@@ -1369,7 +1522,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Simple technical format review"
+   "ownerCaveat": "Simple technical format review",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-053",
@@ -1395,7 +1551,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — wiring/termination class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — wiring/termination class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-054",
@@ -1421,7 +1580,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — wiring/termination class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — wiring/termination class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-055",
@@ -1447,7 +1609,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — wiring/termination class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — wiring/termination class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-056",
@@ -1473,7 +1638,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — wiring/termination class/workmode/complexity review"
+   "ownerCaveat": "H-02 RECLASSIFY_WORK_OBJECT candidate — wiring/termination class/workmode/complexity review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-057",
@@ -1499,7 +1667,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: QMS certificate — human tick only; do not dedup yet"
+   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: QMS certificate — human tick only; do not dedup yet",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-058",
@@ -1525,7 +1696,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: QMS certificate — human tick only; do not dedup yet"
+   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: QMS certificate — human tick only; do not dedup yet",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-059",
@@ -1551,7 +1725,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: QMS certificate — human tick only; do not dedup yet"
+   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: QMS certificate — human tick only; do not dedup yet",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-060",
@@ -1577,7 +1754,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: QMS certificate — human tick only; do not dedup yet"
+   "ownerCaveat": "H-01 CANDIDATE_PROJECT_SHARED: QMS certificate — human tick only; do not dedup yet",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-061",
@@ -1603,7 +1783,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor/joint ITP; technical review"
+   "ownerCaveat": "Vendor/joint ITP; technical review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-062",
@@ -1629,7 +1812,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor/joint ITP; technical review"
+   "ownerCaveat": "Vendor/joint ITP; technical review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-063",
@@ -1655,7 +1841,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor/joint ITP; technical review"
+   "ownerCaveat": "Vendor/joint ITP; technical review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-064",
@@ -1681,7 +1870,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor/joint ITP; technical review"
+   "ownerCaveat": "Vendor/joint ITP; technical review",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-065",
@@ -1707,7 +1899,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Shared system FAT procedure"
+   "ownerCaveat": "Shared system FAT procedure",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-066",
@@ -1733,7 +1928,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Shared system FAT procedure"
+   "ownerCaveat": "Shared system FAT procedure",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-067",
@@ -1759,7 +1957,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Shared system FAT procedure"
+   "ownerCaveat": "Shared system FAT procedure",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-068",
@@ -1785,7 +1986,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Shared system FAT procedure"
+   "ownerCaveat": "Shared system FAT procedure",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-069",
@@ -1811,7 +2015,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02/H-03 SAT Procedure — review facility-delta binding; one primary driver only"
+   "ownerCaveat": "H-02/H-03 SAT Procedure — review facility-delta binding; one primary driver only",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-070",
@@ -1837,7 +2044,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02/H-03 SAT Procedure — review facility-delta binding; one primary driver only"
+   "ownerCaveat": "H-02/H-03 SAT Procedure — review facility-delta binding; one primary driver only",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-071",
@@ -1863,7 +2073,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02/H-03 SAT Procedure — review facility-delta binding; one primary driver only"
+   "ownerCaveat": "H-02/H-03 SAT Procedure — review facility-delta binding; one primary driver only",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-072",
@@ -1889,7 +2102,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-02/H-03 SAT Procedure — review facility-delta binding; one primary driver only"
+   "ownerCaveat": "H-02/H-03 SAT Procedure — review facility-delta binding; one primary driver only",
+   "approvalClass": "A",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-073",
@@ -1915,7 +2131,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor procedure; applicability remains project check"
+   "ownerCaveat": "Vendor procedure; applicability remains project check",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-074",
@@ -1941,7 +2160,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor procedure; applicability remains project check"
+   "ownerCaveat": "Vendor procedure; applicability remains project check",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-075",
@@ -1967,7 +2189,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor procedure; applicability remains project check"
+   "ownerCaveat": "Vendor procedure; applicability remains project check",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-076",
@@ -1993,7 +2218,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor procedure; applicability remains project check"
+   "ownerCaveat": "Vendor procedure; applicability remains project check",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-077",
@@ -2019,7 +2247,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Result evidence per FAT event"
+   "ownerCaveat": "Result evidence per FAT event",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-078",
@@ -2045,7 +2276,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Result evidence per FAT event"
+   "ownerCaveat": "Result evidence per FAT event",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-079",
@@ -2071,7 +2305,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Result evidence per FAT event"
+   "ownerCaveat": "Result evidence per FAT event",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-080",
@@ -2097,7 +2334,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Result evidence per FAT event"
+   "ownerCaveat": "Result evidence per FAT event",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-081",
@@ -2123,7 +2363,10 @@
    "sourceStatus": "SOURCE_BLANK_HOLD + TEMP_ESTIMATING + STRUCTURAL_FIX_REV00a",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "STRUCTURAL_FIX: SAT Report uses SAT_EVENT only; A/I source blank preserved; review delta = 0"
+   "ownerCaveat": "STRUCTURAL_FIX: SAT Report uses SAT_EVENT only; A/I source blank preserved; review delta = 0",
+   "approvalClass": "SOURCE_BLANK",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-082",
@@ -2149,7 +2392,10 @@
    "sourceStatus": "SOURCE_BLANK_HOLD + TEMP_ESTIMATING + STRUCTURAL_FIX_REV00a",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "STRUCTURAL_FIX: SAT Report uses SAT_EVENT only; A/I source blank preserved; review delta = 0"
+   "ownerCaveat": "STRUCTURAL_FIX: SAT Report uses SAT_EVENT only; A/I source blank preserved; review delta = 0",
+   "approvalClass": "SOURCE_BLANK",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-083",
@@ -2175,7 +2421,10 @@
    "sourceStatus": "SOURCE_BLANK_HOLD + TEMP_ESTIMATING + STRUCTURAL_FIX_REV00a",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "STRUCTURAL_FIX: SAT Report uses SAT_EVENT only; A/I source blank preserved; review delta = 0"
+   "ownerCaveat": "STRUCTURAL_FIX: SAT Report uses SAT_EVENT only; A/I source blank preserved; review delta = 0",
+   "approvalClass": "SOURCE_BLANK",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-084",
@@ -2201,7 +2450,10 @@
    "sourceStatus": "SOURCE_BLANK_HOLD + TEMP_ESTIMATING + STRUCTURAL_FIX_REV00a",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "STRUCTURAL_FIX: SAT Report uses SAT_EVENT only; A/I source blank preserved; review delta = 0"
+   "ownerCaveat": "STRUCTURAL_FIX: SAT Report uses SAT_EVENT only; A/I source blank preserved; review delta = 0",
+   "approvalClass": "SOURCE_BLANK",
+   "complexity": "COMPLEX",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-085",
@@ -2227,7 +2479,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor certificate"
+   "ownerCaveat": "Vendor certificate",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-086",
@@ -2253,7 +2508,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor certificate"
+   "ownerCaveat": "Vendor certificate",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-087",
@@ -2279,7 +2537,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor certificate"
+   "ownerCaveat": "Vendor certificate",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-088",
@@ -2305,7 +2566,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor certificate"
+   "ownerCaveat": "Vendor certificate",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-089",
@@ -2331,7 +2595,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Certificate-family count is not yet vendor-confirmed"
+   "ownerCaveat": "Certificate-family count is not yet vendor-confirmed",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-090",
@@ -2357,7 +2624,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Certificate-family count is not yet vendor-confirmed"
+   "ownerCaveat": "Certificate-family count is not yet vendor-confirmed",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-091",
@@ -2383,7 +2653,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Certificate-family count is not yet vendor-confirmed"
+   "ownerCaveat": "Certificate-family count is not yet vendor-confirmed",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-092",
@@ -2409,7 +2682,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Certificate-family count is not yet vendor-confirmed"
+   "ownerCaveat": "Certificate-family count is not yet vendor-confirmed",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-093",
@@ -2435,7 +2711,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Report occurrence only"
+   "ownerCaveat": "Report occurrence only",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-094",
@@ -2461,7 +2740,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Report occurrence only"
+   "ownerCaveat": "Report occurrence only",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-095",
@@ -2487,7 +2769,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Report occurrence only"
+   "ownerCaveat": "Report occurrence only",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-096",
@@ -2513,7 +2798,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Report occurrence only"
+   "ownerCaveat": "Report occurrence only",
+   "approvalClass": "A",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-097",
@@ -2539,7 +2827,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Per shipment/document set"
+   "ownerCaveat": "Per shipment/document set",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-098",
@@ -2565,7 +2856,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Per shipment/document set"
+   "ownerCaveat": "Per shipment/document set",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-099",
@@ -2591,7 +2885,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Per shipment/document set"
+   "ownerCaveat": "Per shipment/document set",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-100",
@@ -2617,7 +2914,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Per shipment/document set"
+   "ownerCaveat": "Per shipment/document set",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-101",
@@ -2643,7 +2943,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Administrative shipping document set"
+   "ownerCaveat": "Administrative shipping document set",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-102",
@@ -2669,7 +2972,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Administrative shipping document set"
+   "ownerCaveat": "Administrative shipping document set",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-103",
@@ -2695,7 +3001,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Administrative shipping document set"
+   "ownerCaveat": "Administrative shipping document set",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-104",
@@ -2721,7 +3030,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Administrative shipping document set"
+   "ownerCaveat": "Administrative shipping document set",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-105",
@@ -2747,7 +3059,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent compile/control; child authoring not repeated"
+   "ownerCaveat": "Parent compile/control; child authoring not repeated",
+   "approvalClass": "I",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-106",
@@ -2773,7 +3088,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent compile/control; child authoring not repeated"
+   "ownerCaveat": "Parent compile/control; child authoring not repeated",
+   "approvalClass": "I",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-107",
@@ -2799,7 +3117,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent compile/control; child authoring not repeated"
+   "ownerCaveat": "Parent compile/control; child authoring not repeated",
+   "approvalClass": "I",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-108",
@@ -2825,7 +3146,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent compile/control; child authoring not repeated"
+   "ownerCaveat": "Parent compile/control; child authoring not repeated",
+   "approvalClass": "I",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-109",
@@ -2851,7 +3175,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "System installation procedure"
+   "ownerCaveat": "System installation procedure",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-110",
@@ -2877,7 +3204,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "System installation procedure"
+   "ownerCaveat": "System installation procedure",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-111",
@@ -2903,7 +3233,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "System installation procedure"
+   "ownerCaveat": "System installation procedure",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-112",
@@ -2929,7 +3262,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "System installation procedure"
+   "ownerCaveat": "System installation procedure",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-113",
@@ -2955,7 +3291,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list; technical screen"
+   "ownerCaveat": "Vendor list; technical screen",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-114",
@@ -2981,7 +3320,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list; technical screen"
+   "ownerCaveat": "Vendor list; technical screen",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-115",
@@ -3007,7 +3349,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list; technical screen"
+   "ownerCaveat": "Vendor list; technical screen",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-116",
@@ -3033,7 +3378,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list; technical screen"
+   "ownerCaveat": "Vendor list; technical screen",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-117",
@@ -3059,7 +3407,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list; technical screen"
+   "ownerCaveat": "Vendor list; technical screen",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-118",
@@ -3085,7 +3436,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list; technical screen"
+   "ownerCaveat": "Vendor list; technical screen",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-119",
@@ -3111,7 +3465,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list; technical screen"
+   "ownerCaveat": "Vendor list; technical screen",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-120",
@@ -3137,7 +3494,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Vendor list; technical screen"
+   "ownerCaveat": "Vendor list; technical screen",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-121",
@@ -3163,7 +3523,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent dossier compilation"
+   "ownerCaveat": "Parent dossier compilation",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-122",
@@ -3189,7 +3552,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent dossier compilation"
+   "ownerCaveat": "Parent dossier compilation",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-123",
@@ -3215,7 +3581,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent dossier compilation"
+   "ownerCaveat": "Parent dossier compilation",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-124",
@@ -3241,7 +3610,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent dossier compilation"
+   "ownerCaveat": "Parent dossier compilation",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-125",
@@ -3267,7 +3639,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent dossier compilation"
+   "ownerCaveat": "Parent dossier compilation",
+   "approvalClass": "I",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-126",
@@ -3293,7 +3668,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent dossier compilation"
+   "ownerCaveat": "Parent dossier compilation",
+   "approvalClass": "I",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-127",
@@ -3319,7 +3697,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent dossier compilation"
+   "ownerCaveat": "Parent dossier compilation",
+   "approvalClass": "I",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-128",
@@ -3345,7 +3726,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Parent dossier compilation"
+   "ownerCaveat": "Parent dossier compilation",
+   "approvalClass": "I",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-129",
@@ -3371,7 +3755,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-10 B1 technical authoring only; B2 retains workflow/DC only — check B1 overlap"
+   "ownerCaveat": "H-10 B1 technical authoring only; B2 retains workflow/DC only — check B1 overlap",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-130",
@@ -3397,7 +3784,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "H-10 B1 technical authoring only; B2 retains workflow/DC only — check B1 overlap"
+   "ownerCaveat": "H-10 B1 technical authoring only; B2 retains workflow/DC only — check B1 overlap",
+   "approvalClass": "A",
+   "complexity": "STANDARD",
+   "documentOwnerStatus": "PENDING"
   },
   {
    "id": "WO-131",
@@ -3423,7 +3813,10 @@
    "sourceStatus": "TEMP_ESTIMATING",
    "evidenceStatus": "PROJECT_CONFIRMED",
    "bindingDecision": "PENDING",
-   "ownerCaveat": "Administrative loose-item/shipping list; occurrence tied to shipment"
+   "ownerCaveat": "Administrative loose-item/shipping list; occurrence tied to shipment",
+   "approvalClass": "I",
+   "complexity": "ROUTINE",
+   "documentOwnerStatus": "PENDING"
   }
  ]
 }
