@@ -44,16 +44,24 @@ export function selectB3WorkTypeReconciliation0553(workingRow){
   internalIFATDays:cover.FAT.internalFatDays,
   endUserFacilityDaysMinimum:cover.FAT.facilityEndUserDaysMinimum,
   addvalueWitnessBudgetDays:cover.FAT.addvalueExistingWitnessDaysBudgeted,
-  sequenceAndOverlapVerified:false,
+  managementSeparateSequentialFATStagesConfirmed:cover.FAT.managementDistinctFATStagesConfirmed,
+  plannedExecutionOrder:cover.FAT.executionOrder,
+  internalAndCustomerFATScopeDuplicate:cover.FAT.quotedServiceOverlap,
+  supplierFATServicesAlreadyQuotedOnce:true,
+  customerFATReserveDaysMinimum:cover.FAT.facilityEndUserDaysMinimum,
+  freightAfterCustomerFATPlanned:cover.FAT.freightAfterCustomerFATPlanned,
+  supplierFATServiceCreditUSD:cover.FAT.supplierFATPriceCreditUSD,
+  actualFATAgendaAndDatesConfirmed:false,
+  actualADDVALUEWitnessAttendanceDaysConfirmed:false,
   addvalueWitnessLaborIncludedInSupplierUSD:null,
   supplierVendorServiceCostOwnerApproved:false,
   alreadyIncludedInMGWCommercialCover:true,
   b3WorkingSellComponentTHB:fat.workingSellTHB,
   b3ActualDirectCostTHB:null,
   approvedAdditionalWorkingSellTHB:null,
-  potentialActivityOverlapNotProvenPriceDuplication:true,
+  plannedDistinctSupplierActivitiesNoPriceDuplication:true,
   noVendorCostPostingFromThisReadModel:true,
-  governance:"MGW OEM iFAT, integration and end-user premises are vendor-side services; ADDVALUE B3 Working SELL has eight separate employee/travel/insurance estimates. Need written OEM FAT agenda and cost-owner allocation before supplier services are booked once to direct COST. Do not assume 2+5 is 7 additional witness days, or deduct/add B3 SELL."
+  governance:"User-directed plan: Stage 1 MGW/ADDVALUE internal iFAT (2 days), Stage 2 separate customer FAT premises reserve (minimum 5 days), Stage 3 ship equipment to JUTAL Zhuhai Yard after FAT. SERV-2 USD5000 and SERV-4 USD2500 are distinct, not duplicates; both are included once in MGW supplier total. ADDVALUE B3 Working SELL remains 6 witness-day budget, not an automatic seven-day personnel commitment. Actual attendance, agreed FAT agenda, supplier cost allocation and Incoterm are still unapproved. No Working SELL/cost ledger automatic posting."
  });
  return Object.freeze({
   moduleId:"bid.budget.working.bc.b3.worktype-accordion",
