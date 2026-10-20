@@ -19,12 +19,12 @@ const ANNEX_TITLE={
  C2:["SUPPLIER RECOMMENDATION FOR 2 YEARS OPERATION SPARE PARTS","供货商推荐的两年运行备品备件"]
 };
 const UNIT_NOTE="Original 4-Scope of Supply.xlsx price fields use (CURRENCY); THB staging only. Verified final currency/FX must be approved before native export.";
-export function ReleaseCustomerWorkbook0553({model,onOpenSource=()=>{},title="10.3 — Customer Release"}){
+export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSource=()=>{},title="10.3 — Customer Release"}){
  const [sheet,setSheet]=useState("Scope of supply");
  const [viewer,setViewer]=useState("INTERNAL");
  const [source,setSource]=useState(null);
  const [showOverflow,setShowOverflow]=useState(false);
- const internal=viewer==="INTERNAL",code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
+ const internal=recipient==="INTERNAL"&&viewer==="INTERNAL",code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
  const aTags=model.a.flatMap(x=>x.sourceRows.map(line=>({...line,mrCode:x.code})));
  const overflow=aTags.slice(15),rows=aTags.slice(0,15);
  const annexLines=model.annex[code]||[];
@@ -63,7 +63,7 @@ export function ReleaseCustomerWorkbook0553({model,onOpenSource=()=>{},title="10
    <label>View <select value={viewer} onChange={e=>{setViewer(e.target.value);setSource(null);}}>
      <option value="INTERNAL">Internal + source trace</option><option value="CUSTOMER">Customer clean preview</option>
    </select></label>
-   <button type="button" onClick={saveDraft} className="p553-detail-button">Export source mapping JSON (internal draft)</button>
+   {internal&&<button type="button" onClick={saveDraft} className="p553-detail-button">Export source mapping JSON (internal draft)</button>}
    <button type="button" disabled={!canQuote} title="Customer export requires signed release and validated native template mapping" className="p553-detail-button">Export Native Original XLSX — HOLD</button>
   </div>
   <div className="p553-release-tabs" role="tablist" aria-label="Original customer worksheets">
