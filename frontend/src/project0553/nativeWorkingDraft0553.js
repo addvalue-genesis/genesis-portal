@@ -75,7 +75,7 @@ function replaceCell(xml,address,value){
  const cellPattern=new RegExp('(<c\\b[^>]*\\br="'+address+'"[^>]*)(?:\\s*/>|>([\\s\\S]*?)</c>)');
  const match=xml.match(cellPattern);
  if(!match)throw Error("Customer source does not have expected styled cell "+address);
- const nameAndStyle=match[1].replace(/\s+t="[^"]*"/g,"");
+ const nameAndStyle=match[1].replace(/\s+t="[^"]*"/g,"").replace(/\/\s*$/,"");
  if(/<f(?:\s|>)/.test(match[2]||""))throw Error("Refusing to overwrite formula "+address);
  const isText=typeof value==="string",start=nameAndStyle+(isText?' t="inlineStr"':'')+">";
  const contents=isText?'<is><t xml:space="preserve">'+encodeExcelText(value)+'</t></is>':
