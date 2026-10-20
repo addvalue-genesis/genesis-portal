@@ -51,6 +51,7 @@ const workspace=file("CommercialWorkspace.jsx");
 assert.match(workspace,/PricingCfoDashboard0553 model=\{releaseModel\}/);
 assert.match(workspace,/ReleaseCustomerWorkbook0553 model=\{releaseModel\} recipient=\{recipient\}/);
 assert.match(workspace,/onOpenSource=\{openReleaseSource\}/);
+assert.match(workspace,/mode==="working"&&<details className="p553-budget-phase" open><summary><strong>10\.6/);
 // CFO UX contract: a single financial summary table, never KPI cards/bullet lists.
 const cfo=file("PricingCfoDashboard0553.jsx");
 assert.match(cfo,/p553-cfo-table/);
