@@ -95,9 +95,19 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   try{
    // Validate original and generate before caching it, so a bad workbook is never saved.
    const result=await buildNativeWorkingDraft0553(file,model);
-   await saveNativeTemplate0553(file);
-   setTemplateReady(true);
+   let cacheIssue=null;
+   try{
+    await saveNativeTemplate0553(file);
+    setTemplateReady(true);
+   }catch(error){
+    cacheIssue=error?.message||"Browser cannot remember the source workbook";
+    setTemplateReady(false);
+   }
    downloadBlob(result);
+   if(cacheIssue)setNativeReport(prev=>({...prev,warnings:[
+    ...(prev?.warnings||[]),
+    "Browser could not cache original template: "+cacheIssue+". Future downloads need the original file again."
+   ]}));
   }catch(error){handleNativeError(error);}
   finally{setNativeBusy(false);}
  };
