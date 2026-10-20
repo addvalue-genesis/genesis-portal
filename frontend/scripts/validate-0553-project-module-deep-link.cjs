@@ -28,7 +28,8 @@ const satId=rootId+".site-mr-sat-matrix";
 const offId=rootId+".40-day-abc";
 const parent=lookup(satId);
 assert(parent&&parent.tab==="budget"&&parent.anchorModuleId===satId);
-assert.equal(all.filter(m=>m.id.includes(rootId+".site")).length,site().rows.length+1);
+assert.equal(all.filter(m=>m.id===satId).length,1); // B3.site search must find the matrix parent
+assert.equal(all.filter(m=>m.id.startsWith(rootId+".sat-matrix.")).length,site().rows.length);
 assert(lookup(offId)?.anchorModuleId===rootId+".working-sell-breakdown.component-preview.offshore");
 assert(lookup(rootId+".requirement-trace")?.anchorModuleId===rootId+".requirement-crosswalk");
 for(const r of site().rows)assert(lookup(r.moduleId)?.anchorModuleId===r.moduleId,r.id);
