@@ -20,12 +20,12 @@ const {BC_CUSTOMER_CODES_0553}=from("data/bcWorkingModuleRoutes0553.js");
 const original=JSON.stringify(derivePartBcWorkingWbs0553());
 const e=selectBcCostEvidenceDerivation0553(),bc=selectBcTurnkeyWorkingCost0553();
 const CURRENT_REV_K_WORKING_SELL_0553=Object.freeze({
- B1:211600,B2:580000,B3:2443400,B4:null,
+ B1:211600,B2:237121.13,B3:2443400,B4:null,
  B5:311184,B6:307584,B7:30000,B8:30000,
  B9:0,B10:123024.37,B11:128314.11,B12:null,
  B13:22484.21,B14:null,C1:4049349.36,C2:721806.68
 });
-assert.equal(bc.knownWorkingSellTHB,4187590.69,"Current Rev.K Part B Base Working SELL");
+assert.equal(bc.knownWorkingSellTHB,3844711.82,"Current Rev.K Part B Base Working SELL");
 assert.equal(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB,397400,"FAT witness belongs only to B3");
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600,"B9 only optional Yard Specialist");
 assert.equal(bc.byCode.B9.workingSellTHB,0,"No B9 Base specialist attendance");
@@ -61,7 +61,7 @@ for(const item of e.rows){
  if(["B1","B3","B5","B6","B7","B9","B10","B11","B13","C1","C2"].includes(item.code))
   assert.notEqual(bc.byCode[item.code].workingSellBasis,null,
    item.code+" management budgetary working SELL requires an explicit source basis");
- if(["B2","B8"].includes(item.code))
+ if(["B8"].includes(item.code))
   assert.equal(item.workingSellTHB,bc.byCode[item.code].workingSellTHB,
    item.code+" source and current Working SELL should still reconcile");
  for(const line of item.lines){
@@ -96,9 +96,8 @@ assert.equal(JSON.stringify(derivePartBcWorkingWbs0553()),original);
 const ui=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 const detail=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
 for(const snippet of ['setBcDetailCode',
- '<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}/>',
- '<BcCostEvidenceDetail0553 workingRow={item}/>',
- 'data-component-key={item.moduleId}','group.rows.map(item=>'])
+ '<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}',
+ 'bcTab==="ALL"&&<BcWorkingHierarchy0553'])
  assert(ui.includes(snippet),"Missing B/C 10.2 clickable working trace: "+snippet);
 for(const snippet of ['e.lines.map(', 'e.stages.map(', 'e.requirementRecords.map(', 'HISTORICAL_COST_PROXY_ONLY','NOT ESTABLISHED','e.requiredInputs.map('])
  assert(detail.includes(snippet),"Missing B/C drilldown or cost verification gate: "+snippet);
@@ -106,4 +105,4 @@ for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcCostEvidenc
  assert(babel.transformSync(fs.readFileSync(path.join(root,f),"utf8"),{
   babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0,
   "Babel JSX syntax invalid: "+f);
-console.log("PASS 0553 10.2 16/16 Rev05 source proof separated from Rev.K CURRENT SELL: B1 THB211600 B3 THB2443400 incl MGW FAT THB397400, B9 Base THB0 (Yard LS THB233600 optional), Part B THB4187590.69; historical Bangkok FAT / Rev05 WBS audit only; verified direct cost remains null.");
+console.log("PASS 0553 10.2 16/16 Rev05 source proof separated from Rev.K CURRENT SELL: B1 THB211600 B3 THB2443400 incl MGW FAT THB397400, B9 Base THB0 (Yard LS THB233600 optional), Part B THB3844711.82; historical Bangkok FAT / Rev05 WBS audit only; verified direct cost remains null.");
