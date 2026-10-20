@@ -33,13 +33,19 @@ assert.equal(search(satId.toUpperCase(),all)[0]?.id,satId,"Case-insensitive exac
 assert.equal(all.filter(m=>m.id===satId).length,1); // B3.site search must find the matrix parent
 assert.equal(site().rows.filter(r=>lookup(r.moduleId)?.anchorModuleId===r.moduleId).length,site().rows.length);
 assert(site().rows.every(r=>lookup(r.moduleId+".work-breakdown")?.anchorModuleId===r.moduleId+".work-breakdown"),"All 21 SAT Modules have searchable detail work breakdowns");
-assert(lookup(offId)?.anchorModuleId===rootId+".working-sell-breakdown.component-preview.offshore");
+assert(lookup(offId)?.anchorModuleId===offId);
+assert(lookup(rootId+".veex-mx100")?.anchorModuleId===rootId+".veex-mx100");
+for(const part of ["fat","sat","tools","audit","test-tools-ownership","source-cost-audit"]){
+ assert(lookup(rootId+"."+part)?.anchorModuleId===rootId+"."+part);
+}
 assert(lookup(rootId+".requirement-trace")?.anchorModuleId===rootId+".requirement-crosswalk");
 for(const r of site().rows)assert(lookup(r.moduleId)?.anchorModuleId===r.moduleId,r.id);
 for(const r of trace().rows){
  const item=lookup(r.moduleId);
  assert(item&&item.parentOwner===(r.costOwner==="B9"?"B9":"B3"),"Route owner of "+r.id);
 }
+assert(lookup("bid.budget.working.bc.b11.test-equipment-ownership")?.anchorModuleId===
+ "bid.budget.working.bc.b11.test-equipment-ownership");
 assert.equal(owner(satId),"B3");
 assert.equal(owner(rootId+".sat-matrix.sat-zwp20-mr0001"),"B3");
 assert.equal(owner("bid.budget.working.bc.b9.revk-china-budget"),"B9");
@@ -60,6 +66,9 @@ const html=renderToStaticMarkup(React.createElement(BcDetail,{workingRow:b,navig
 assert(html.includes('data-component-key="'+satId+'"'));
 assert(html.includes('data-component-key="'+site().rows[0].moduleId+'"'));
 assert(html.includes("2,443,400.00"));
+const b11=renderToStaticMarkup(React.createElement(BcDetail,{workingRow:current().byCode.B11}));
+assert(b11.includes('data-component-key="bid.budget.working.bc.b11.test-equipment-ownership"'));
+assert(b11.includes("VeEX MX100+ 30 rental-days"));
 const foreign=trace().rows.find(x=>x.costOwner!=="B3"&&x.costOwner!=="B9");
 assert(foreign);
 const cross=renderToStaticMarkup(React.createElement(Crosswalk,{selectedOwner:"B3",navigationTarget:foreign.moduleId}));

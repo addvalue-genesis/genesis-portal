@@ -47,11 +47,21 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId,keywords
  });
  const b3Entries=[
+  child(b3Id+".worktype-accordion","B3 — Expandable FAT / SAT / Test Equipment / Audit groups"),
+  child(b3Id+".fat","B3.1 — FAT Factory Acceptance Test",b3Id+".fat","FAT witness OEM iFAT China"),
+  child(b3Id+".sat","B3.2 — Offshore SAT/SIT Tests",b3Id+".sat","SAT 7 sites 40 days"),
+  child(b3Id+".tools","B3.3 — Temporary Test Equipment (B3) vs B11 O&M Special Tools",
+   b3Id+".tools","VeEX rental B11 tool boundary"),
+  child(b3Id+".audit","B3.4 — Working Sell and Contract Cost Audit",b3Id+".audit","19 requirements price trace"),
+  child(b3Id+".mgw-r2-cover-20261020","B3.1.1 — MGW FAT iFAT / Facility Vendor Evidence"),
+  child(b3Id+".fat-owner-transfer","B3.1.3 — FAT Historic Owner Reconciliation"),
+  child(b3Id+".test-tools-ownership","B3.3.2 — Test Tools / B11 Cost Ownership"),
+  child(b3Id+".source-cost-audit","B3.4.3 — Historical Source and Cost Evidence"),
   child(b3Id+".working-sell-breakdown","B3 — Working SELL THB 2,443,400 Breakdown"),
   child(b3Id+".40-day-abc","B3 — Offshore SAT/SIT 40-Day Working Basis",
-   b3Id+".working-sell-breakdown.component-preview.offshore","offshore 40 days two specialists site SAT"),
+   b3Id+".40-day-abc","offshore 40 days two specialists site SAT"),
   child(b3Id+".veex-mx100","B3 — VeEX MX100+ Temporary Test Rental",
-   b3Id+".working-sell-breakdown.component-preview.veex","30 rental days tools SAT"),
+   b3Id+".veex-mx100","30 rental days tools SAT"),
   child(b3Id+".revk-china-budget","B3 — MGW China FAT Witness Expense Breakdown"),
   child(b3Id+".requirement-crosswalk","B3 — Contract Requirements × Rev.K / BOD SPE DTS MR"),
   child(req.moduleId,"B3 — Requirement Source Register (19)",
@@ -86,6 +96,13 @@ export function buildBcModuleNavigator0553(){
   }
  }
  entries.push(...b3Entries);
+ entries.push({
+  id:"bid.budget.working.bc.b11.test-equipment-ownership",
+  name:"B11 — Permanent O&M Special Tools vs B3 Temporary FAT/SAT Rental",
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:"bid.budget.working.bc.b11.test-equipment-ownership",
+  keywords:"B11 special tools operation maintenance OEM RACON programming kit B3 VeEX rental"
+ });
  const ids=entries.map(x=>x.id),all=new Set(ids);
  if(all.size!==entries.length)throw Error("Duplicate B/C Navigator Module ID");
  const leaves=entries.filter(x=>x.kind==="CUSTOMER_BC_WORKING_ROW");
