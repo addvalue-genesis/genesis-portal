@@ -159,7 +159,7 @@ export function B2IndependentVdrlRecalculation0553(){
          <td>{money(x.directCostProxyTHB)}</td>
          <td>{money(x.employerLoadedPlanningCostTHB)}</td>
          <td>{money(x.indicativeSellTHB)}</td>
-         <td>{x.ownerDisposition}<small>{x.sourceStatus}</small></td>
+         <td>{x.ownerDisposition}<small>{x.evidenceStatus}</small><small>{x.bindingDecision}</small></td>
         </tr>;
        })}</tbody>
       </table></div>
