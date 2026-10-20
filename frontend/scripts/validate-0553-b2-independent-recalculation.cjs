@@ -72,8 +72,9 @@ const modelSrc=fs.readFileSync(path.join(root,"project0553/data/b2IndependentVdr
 assert(!modelSrc.includes("580000")&&!modelSrc.includes("580,000"),
  "Recalculation may not backsolve from the old B2 quote");
 const priceSrc=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
-assert(priceSrc.indexOf("<B2IndependentVdrlRecalculation0553/>")<
+assert(priceSrc.indexOf('<B2IndependentVdrlRecalculation0553 workingRow={workingRow}/>')<
  priceSrc.indexOf('<B2WorkingPriceOverview0553 workingRow={workingRow}/>'));
 assert.equal(JSON.stringify(working()),original,"Recalc altered B2 canonical Working SELL");
-assert.equal(working().byCode.B2.workingSellTHB,580000);
+assert.equal(working().byCode.B2.workingSellTHB,237121.13);
+assert.equal(working().byCode.B2.b2PriorWorkingSellReferenceTHB,580000);
 console.log("PASS B2 131 WOs: default 963.76 MH, historical-cost proxy THB158,080.75, loaded cost THB189,696.90, indicative SELL THB237,121.13; source 964.28 MH, document only alternatives, no 580k price target or posting.");

@@ -39,7 +39,7 @@ function WorkGroup({title,description,id,numCode,children,tone="project",default
   <div className="p553-b2-recalc-body">{children}</div>
  </details>;
 }
-export function B2IndependentVdrlRecalculation0553(){
+export function B2IndependentVdrlRecalculation0553({workingRow=null}){
  const [ownerPolicy,setOwnerPolicy]=React.useState("EXCLUDE_EXPLICIT_B1_TECHNICAL_AUTHOR_HOURS");
  const [employerLoad,setEmployerLoad]=React.useState(1.2);
  const [margin,setMargin]=React.useState(.2);
@@ -61,6 +61,24 @@ export function B2IndependentVdrlRecalculation0553(){
    Original source: {model.sourceTitle}</a>. Source effort, occurrence factors, and
    historical THB/MH are provisional inputs; only scenario formula is newly calculated.
    No historical SELL price and no 580,000 THB price anchor enter the formulas.</p>
+  {workingRow?.code==="B2"&&<section className="p55-panel"
+   data-component-key={ROOT+".selected-working-sell"}
+   style={{padding:12,marginTop:10,background:"#edf7ff",borderLeft:"4px solid #2563a6"}}>
+   <h4>B2 — Current Working SELL / ราคาที่ใช้จริงใน 10.2</h4>
+   <div className="p55-metric-grid">
+    <div><strong>Selected B2 Working SELL</strong>
+     <p>{money(workingRow.workingSellTHB)}</p>
+     <small>131 Work Objects · 963.76 MH · source role rates / planning load and margin</small></div>
+    <div><strong>Prior Rev05 Reference — Replaced</strong>
+     <p>SUPERSEDED</p><small>THB 580,000 is non-current history in the collapsed audit only</small></div>
+    <div><strong>Verified Direct Cost</strong><p>NOT ESTABLISHED</p>
+     <small>RACI, resource rates and revision assumptions remain open</small></div>
+   </div>
+   <p className="p55-note">The selected default scenario equals the canonical B2 Working SELL
+    in 10.2, 10.3 and 10.5. Changing the inputs below is a LOCAL WHAT-IF VIEW ONLY;
+    the active selected Working SELL remains unchanged until an explicitly controlled reprice.
+    No Customer Release is permitted.</p>
+  </section>}
   <div className="p553-b2-recalc-controls">
    <label>Cost Owner Boundary
     <select value={ownerPolicy} onChange={e=>setOwnerPolicy(e.target.value)}>
@@ -88,7 +106,7 @@ export function B2IndependentVdrlRecalculation0553(){
     <small>Old historical THB/MH rate seed; NOT verified Direct Cost</small></div>
    <div><strong>Scenario employer-loaded Working Cost</strong><p>{money(r.employerLoadedPlanningCostTHB)}</p>
     <small>Source Cost × {employerLoad.toFixed(2)} planning only</small></div>
-   <div><strong>Independent indicative SELL scenario</strong><p>{money(r.indicativeGrossMarginSellTHB)}</p>
+   <div><strong>Independent indicative SELL scenario (interactive what-if)</strong><p>{money(r.indicativeGrossMarginSellTHB)}</p>
     <small>Loaded cost ÷ (1 − {(margin*100).toFixed(0)}% margin) — NOT current SELL</small></div>
   </div>
   <p className="p55-note"><strong>Independent GEQ-005 workload derivation:</strong>

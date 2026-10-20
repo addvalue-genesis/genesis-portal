@@ -52,7 +52,7 @@ for(const code of codes){
 }
 assert.equal(b.workCostLineCount,111);
 assert.equal(b.workCostLineAuditCount,40);
-assert.equal(b.knownWorkingSellTHB,4187590.69);
+assert.equal(b.knownWorkingSellTHB,3844711.82);
 assert.equal(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((sum,x)=>Math.round((sum+x.workingSellTHB)*100)/100,0),b.knownWorkingSellTHB,"Base-only budget sum; optional C1/C2 excluded");
 assert.equal(b.knownDirectCostTHB,null);
 const b1=m.byCode.B1.filter(x=>x.id.startsWith("B1-WBS-"));

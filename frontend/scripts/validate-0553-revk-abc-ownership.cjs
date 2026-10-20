@@ -19,10 +19,10 @@ const working={
   B1:{workingSellTHB:211600},
   B3:{workingSellTHB:2443400},
   B9:{workingSellTHB:0,qtyDriver:1,unit:"LS (Yard Specialist optional only; Base zero)"}
- },knownWorkingSellTHB:4187590.69
+ },knownWorkingSellTHB:3844711.82
 };
 const m=vm.runInNewContext(source+"\nselectRevKAbcOwnershipControl0553(working);",{working},{timeout:3000});
-assert.equal(m.partBBaseTHB,4187590.69);
+assert.equal(m.partBBaseTHB,3844711.82);
 assert.equal(m.currentB1B3B9BaseTHB,2655000);
 assert.equal(m.b1EngineeringSellTHB,0);
 assert.equal(m.b1OfficePmIncludedTHB,100500);
@@ -58,4 +58,4 @@ assert.equal(m.postingAllowed,false);
 assert.equal(m.customerReleaseAllowed,false);
 assert.equal(new Set(m.rows.map(x=>x.id)).size,m.rows.length);
 assert.equal(new Set(m.rows.filter(x=>x.chargeKey!==null).map(x=>x.chargeKey)).size,m.rows.filter(x=>x.chargeKey!==null).length);
-console.log("PASS Rev.K ABC: new B1 role-based THB211600, old engineering carryforward 0; B3 THB2443400 FAT6d THB397400; B9 Base 0 Yard optional 233600; Part B Base 4187590.69; single cost owner.");
+console.log("PASS Rev.K ABC: new B1 role-based THB211600, old engineering carryforward 0; B3 THB2443400 FAT6d THB397400; B9 Base 0 Yard optional 233600; Part B Base 3844711.82; single cost owner.");

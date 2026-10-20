@@ -22,12 +22,12 @@ export function B2WorkingPriceOverview0553({workingRow}){
  const source=selectBcB1B2EquationExecution0553();
  const quote=selectB2OriginalWorkbookPriceEvidence0553();
  const by=source.byMr;
- if(workingRow.moduleId!==ROOT||workingRow.workingSellTHB!==580000||
-  source.b2WorkingSellTHB!==workingRow.workingSellTHB||
+ if(workingRow.moduleId!==ROOT||quote.quote.currentWorkingSellTHB!==580000||
+  source.b2WorkingSellTHB!==quote.quote.currentWorkingSellTHB||
   source.totals.sourceRows!==143||source.totals.uniqueTitleTypes!==38||
-  workingRow.qtyDriver!==143||workingRow.directCostTHB!==null||
+  workingRow.qtyDriver!==1||workingRow.directCostTHB!==null||
   source.b2CalculatedMH!==null||source.b2VerifiedCostTHB!==null)
-  throw Error("B2 visible detail must retain 143 requirements, 580000 LS and unknown actual MH/cost");
+  throw Error("B2 historical Rev05 comparison must retain 143 source requirements and 580000 old quoted LS");
  const rows=MR_LIST.map((mr,i)=>{
   const group=by[mr];
   if(!group||group.sourceRows!==MR_COUNTS[i])throw Error("B2 VDRL MR source discrepancy: "+mr);
@@ -46,14 +46,14 @@ export function B2WorkingPriceOverview0553({workingRow}){
  };
  return <section className="p55-panel p553-b2-price-overview"
   data-component-key={ROOT+".price-overview"} style={{padding:12,marginTop:12}}>
-  <div className="p55-eyebrow">10.2 / B2 — DOCUMENTATION QUANTITY &amp; PRICE AUTHORITY (READ ONLY)</div>
+  <div className="p55-eyebrow">10.2 / B2 — SUPERSEDED REV05 QUOTATION EVIDENCE ONLY (READ ONLY)</div>
   <h3>B2 — Document Requirements × Resource Hours × Price Trace</h3>
   <p className="p55-note"><strong>Module ID:</strong>
    {" "}<ComponentCopyId projectId="PJ2608-0553" componentKey={ROOT+".price-overview"}/>
    {" "}· Source Cost Owner <ComponentCopyId projectId="PJ2608-0553" componentKey={ROOT}/></p>
   <div className="p55-metric-grid">
-   <div><strong>Current B2 Working SELL</strong><p>{showAmount(workingRow.workingSellTHB)}</p>
-    <small>Project-wide 1 LS · WBS source quotation</small></div>
+   <div><strong>Rev05 Original B2 Quoted SELL — SUPERSEDED</strong><p>{showAmount(quote.quote.currentWorkingSellTHB)}</p>
+    <small>Not current 10.2 B2 selected Working SELL. For historical comparison only.</small></div>
    <div><strong>Source Requirement Rows</strong><p>{source.totals.sourceRows}</p>
     <small>MR0001–0004 Table 11 obligations</small></div>
    <div><strong>Unique Document Title Types</strong><p>{source.totals.uniqueTitleTypes}</p>
@@ -95,10 +95,10 @@ export function B2WorkingPriceOverview0553({workingRow}){
       <td><strong>{showAmount(quote.unreconciledWorkingSellDifferenceTHB)}</strong></td>
       <td><strong>SOURCE GAP — no itemized additional work identified</strong></td></tr>
      <tr><td><a href={quote.quote.url} target="_blank" rel="noreferrer">
-      <strong>Rev05 CURRENT B2</strong></a></td>
+      <strong>Rev05 Historical B2 — SUPERSEDED</strong></a></td>
       <td>1 project-wide B2 LS</td>
       <td><strong>{showAmount(quote.quote.currentWorkingSellTHB)}</strong></td>
-      <td>Current Working SELL / verified Direct Cost NOT ESTABLISHED</td></tr>
+      <td>Historical SELL only / verified Direct Cost NOT ESTABLISHED</td></tr>
     </tbody>
    </table></div>
 
@@ -208,20 +208,20 @@ export function B2WorkingPriceOverview0553({workingRow}){
    </tfoot>
   </table></div>
   <section className="p553-b2-commercial-proof" data-component-key={ROOT+".price-overview.lump-sum-proof"}>
-   <h4>Price Formula / Authority — what can actually be reconciled?</h4>
+   <h4>Rev05 Historical Source Formula / Authority — SUPERSEDED</h4>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Commercial Quantity</th><th>Working SELL / LS</th>
      <th>Current Working SELL THB</th><th>Derivation Status</th></tr></thead>
     <tbody><tr><td><strong>1 project-wide B2 package (LS)</strong>
       <small>Includes applicable VDRL/VDRS, transmittals, reviews and final dossier</small></td>
-     <td>{showAmount(workingRow.workingSellTHB)} / LS</td>
-     <td><strong>{showAmount(workingRow.workingSellTHB)}</strong></td>
+     <td>{showAmount(quote.quote.currentWorkingSellTHB)} / LS (Rev05 historical)</td>
+     <td><strong>{showAmount(quote.quote.currentWorkingSellTHB)}</strong></td>
      <td>Quoted lump sum only — NOT a derived document-rate calculation</td>
     </tr></tbody>
    </table></div>
    <p className="p55-note"><strong>Pricing reconciliation:</strong> 1 LS ×
-    {" "}{showAmount(workingRow.workingSellTHB)} / LS =
-    {" "}<strong>{showAmount(workingRow.workingSellTHB)}</strong>.
+    {" "}{showAmount(quote.quote.currentWorkingSellTHB)} / LS =
+    {" "}<strong>{showAmount(quote.quote.currentWorkingSellTHB)}</strong> (Rev05 reference only).
     This restates the selected source quotation; it does NOT establish paid cost,
     document-level SELL, number of hours, document instances or review cycles.
     Never divide THB 580,000 by 143 requirements or 38 title types and present it
