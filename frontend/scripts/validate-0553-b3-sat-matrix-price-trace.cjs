@@ -75,7 +75,7 @@ for(const x of [
  "2 persons","40 days","80 MD","USD 800","50,400.00",
  "Site × Team Workdays × Working SELL","ZWP20","403,200.00",
  "2,016,000.00","30,000.00","397,400.00","2,443,400.00",
- "Shared across MR Test IDs","NOT per MR","INCLUDED IN SHARED SITE PRICE"
+ "Shared across MR Test IDs","NOT per MR","SHARED SITE WORKING SELL"
 ])assert(html.includes(x),"Rendered SAT matrix missing "+x);
 for(const r of m.rows){
  const start=html.indexOf('data-component-key="'+r.moduleId+'"');
