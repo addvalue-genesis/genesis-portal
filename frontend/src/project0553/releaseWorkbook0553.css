@@ -89,3 +89,44 @@
 .p553-source-head button{border:0;background:transparent;color:#246386;cursor:pointer}
 .p553-source-drawer p{margin:7px 0;font-size:12px;overflow-wrap:anywhere}
 @media(max-width:620px){.p553-native-sheet{padding:6px}.p553-cfo-table{min-width:1020px}}
+
+
+/* 0553 Provenance colors: ownership ONLY; never approved/synced status.
+   A 10.1 = blue/teal; B/C 10.2 = violet/slate. Customer preview unchanged. */
+.p553-source-guide,.p553-source-preview-legend{
+ --p553-source-equipment:#226879;--p553-source-services:#71538e;
+ display:flex;align-items:center;flex-wrap:wrap;gap:7px;
+ padding:7px 9px;border:1px solid #dae3ea;border-radius:5px;background:#f9fbfc;
+ margin:9px 0;font-size:12px;line-height:1.4
+}
+.p553-source-guide-caption{margin-right:6px;font-size:11px;color:#435b6b}
+.p553-source-guide-disclaimer,.p553-source-preview-legend>small{
+ font-size:10px;color:#586c7b;flex-basis:100%;line-height:1.35
+}
+.p553-source-chip{
+ display:inline-flex;align-items:center;gap:5px;padding:4px 8px;border-radius:4px;
+ border:1px solid currentColor;font:inherit;font-size:11px;line-height:1.25;
+ white-space:normal;max-width:100%;background:#fff;cursor:default
+}
+button.p553-source-chip{cursor:pointer}
+button.p553-source-chip:hover{text-decoration:underline}
+button.p553-source-chip:focus-visible,.p553-origin-link:focus-visible{outline:2px solid #173e5e;outline-offset:2px}
+.p553-source-chip--equipment{color:#226879;background:#eaf4f6}
+.p553-source-chip--services{color:#71538e;background:#f2eef6}
+.p553-source-chip-meta{font-size:9px;letter-spacing:.02em;font-weight:700}
+.p553-source-dot{width:7px;height:7px;flex:0 0 7px;background:currentColor;border-radius:50%}
+.p553-source-frame--equipment{border-left:3px solid #226879!important}
+.p553-source-frame--services{border-left:3px solid #71538e!important}
+.p553-source-frame>summary .p553-source-chip{margin:3px 8px;vertical-align:middle}
+.p553-origin-link.p553-origin-link--equipment{
+ color:#205c6c;background:#eaf4f6;border-color:#8cc3cf;font-weight:700
+}
+.p553-origin-link.p553-origin-link--services{
+ color:#644781;background:#f2eef6;border-color:#baa3d0;font-weight:700
+}
+.p553-preview-totals--internal span:first-child{border-left:3px solid #226879;padding-left:7px}
+.p553-preview-totals--internal span:nth-child(2){border-left:3px solid #71538e;padding-left:7px}
+.p553-customer-table .p553-source-cell--equipment>td:first-child{box-shadow:inset 3px 0 #226879}
+.p553-customer-table .p553-source-cell--services>td:first-child{box-shadow:inset 3px 0 #71538e}
+.p553-cfo-table .p553-cfo-source--equipment>th:first-child{box-shadow:inset 3px 0 #226879}
+.p553-cfo-table .p553-cfo-source--services>th:first-child{box-shadow:inset 3px 0 #71538e}
