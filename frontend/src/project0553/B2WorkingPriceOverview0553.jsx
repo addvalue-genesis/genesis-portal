@@ -1,6 +1,7 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcB1B2EquationExecution0553} from "./data/bcB1B2EquationExecution0553";
+import {selectB2OriginalWorkbookPriceEvidence0553} from "./data/b2OriginalWorkbookPriceEvidence0553";
 import {findModuleElement0553,openModuleAncestors0553} from "./data/moduleDeepLink0553";
 
 // Read-only B2 first-visible summary, same presentation pattern as B1.
@@ -14,6 +15,7 @@ const MR_COUNTS=Object.freeze([37,36,35,35]);
 export function B2WorkingPriceOverview0553({workingRow}){
  if(!workingRow||workingRow.code!=="B2")return null;
  const source=selectBcB1B2EquationExecution0553();
+ const quote=selectB2OriginalWorkbookPriceEvidence0553();
  const by=source.byMr;
  if(workingRow.moduleId!==ROOT||workingRow.workingSellTHB!==580000||
   source.b2WorkingSellTHB!==workingRow.workingSellTHB||
@@ -54,6 +56,124 @@ export function B2WorkingPriceOverview0553({workingRow}){
    <div><strong>Verified Document MH / Direct Cost</strong><p>NOT ESTABLISHED</p>
     <small>Review cycles, allocated roles and current rates are open</small></div>
   </div>
+  <section className="p553-b2-original-price-build" data-component-key={ROOT+".price-overview.original-source"}>
+   <h4>B2 — Original Source Price Breakdown / รายละเอียดจาก Workbook จริง</h4>
+   <p className="p55-note"><strong>Source hierarchy:</strong> Rev05 quoted B2
+    <strong> {showAmount(quote.quote.currentWorkingSellTHB)}</strong>;
+    the earlier Rev00a / Rev00d provisional estimation comprises
+    {showAmount(quote.temporaryRev00a.roundedWorkingSellTHB)} + 
+    {showAmount(quote.rev00d.roundedAdditionTHB)} =
+    <strong> {showAmount(quote.rev00d.revisedTemporarySellTHB)}</strong>;
+    unexplained gap to current quote
+    <strong> {showAmount(quote.unreconciledWorkingSellDifferenceTHB)}</strong>.
+    This gap is NOT a priced activity, provision, or approved cost.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Source / Revision</th><th>Quantity / Basis</th>
+     <th>Working SELL THB</th><th>Authority / Price Status</th></tr></thead>
+    <tbody>
+     <tr><td><a href={quote.sources.rolePrice.url} target="_blank" rel="noreferrer">
+      Rev00a / Rev00b · Core MR VDRL</a></td>
+      <td>{quote.workingMH.toFixed(2)} provisional MH / {quote.documentScope.provisionalUniqueWorkObjects} provisional WOs</td>
+      <td>{showAmount(quote.temporaryRev00a.roundedWorkingSellTHB)}</td>
+      <td>TEMP_ESTIMATING; 2.744× proxy; excludes later document-cycle tasks</td></tr>
+     <tr><td><a href={quote.sources.extraPrice.url} target="_blank" rel="noreferrer">
+      Rev00d · N-01…N-04 New B2 document work</a></td>
+      <td>4 source-priced additional work types; see nested itemization below</td>
+      <td>{showAmount(quote.rev00d.roundedAdditionTHB)}</td>
+      <td>TEMP_PRUDENT rounded from calculated {showAmount(quote.rev00d.additionalDocumentCalculatedSellTHB)}</td></tr>
+     <tr><td><strong>Rev00d provisional combined</strong></td>
+      <td>Rev00a core + Rev00d new B2-only lines</td>
+      <td><strong>{showAmount(quote.rev00d.revisedTemporarySellTHB)}</strong></td>
+      <td>Prior revision; not controlling customer quote</td></tr>
+     <tr><td><strong>Unreconciled price change</strong></td>
+      <td>Current Rev05 minus Rev00d provisional combined</td>
+      <td><strong>{showAmount(quote.unreconciledWorkingSellDifferenceTHB)}</strong></td>
+      <td><strong>SOURCE GAP — no itemized additional work identified</strong></td></tr>
+     <tr><td><a href={quote.quote.url} target="_blank" rel="noreferrer">
+      <strong>Rev05 CURRENT B2</strong></a></td>
+      <td>1 project-wide B2 LS</td>
+      <td><strong>{showAmount(quote.quote.currentWorkingSellTHB)}</strong></td>
+      <td>Current Working SELL / verified Direct Cost NOT ESTABLISHED</td></tr>
+    </tbody>
+   </table></div>
+
+   <details className="p553-bc-price-doc-group"
+    data-component-key={ROOT+".price-overview.role-cost-build"} defaultOpen>
+    <summary className="p553-bc-price-leaf-head">
+     <span className="p553-bc-price-num">B2.P1</span>
+     <span className="p553-bc-price-leaf-label"><strong>Rev00a — 5 Roles × Provisional MH × Historical THB/MH</strong>
+      <small>964.28 MH / {showAmount(quote.roleCostProxyTotalTHB)} historical input cost proxy; NOT current Direct Cost</small>
+      <code>{ROOT+".price-overview.role-cost-build"}</code></span>
+     <ComponentCopyId projectId="PJ2608-0553" componentKey={ROOT+".price-overview.role-cost-build"}/>
+    </summary>
+    <div className="p553-bc-price-leaf-body">
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Role / Description</th><th>MH (provisional)</th><th>Historic Unit Rate THB/MH</th>
+       <th>Historical Cost Proxy THB</th><th>Evidence / Status</th></tr></thead>
+      <tbody>{quote.roleWorkload.map(x=><tr key={x.id}>
+       <td><strong>{x.role}</strong><small>{x.id}</small></td>
+       <td>{x.mh.toFixed(3)} MH</td>
+       <td>{showAmount(x.historicalInputRateTHBPerMH)}</td>
+       <td>{showAmount(x.historicalCostTHB)}</td>
+       <td>Rev00a role MH × historical AWP45 seed · HUMAN REVIEW REQUIRED</td>
+      </tr>)}</tbody>
+      <tfoot><tr><th>Core historical role cost</th><th>{quote.workingMH.toFixed(3)} MH</th>
+       <th>Mixed role rates</th><th>{showAmount(quote.roleCostProxyTotalTHB)}</th>
+       <th>Rev00a temporary SELL {showAmount(quote.temporaryRev00a.roundedWorkingSellTHB)}</th>
+      </tr></tfoot>
+     </table></div>
+     <p className="p55-note">Rev00a temporary pricing:
+      historical cost {showAmount(quote.temporaryRev00a.coreHistoricalDirectCostProxyTHB)}
+      {" "}× 2.744 = {showAmount(quote.temporaryRev00a.unroundedWorkingSellTHB)}
+      {" "}→ rounded to {showAmount(quote.temporaryRev00a.roundedWorkingSellTHB)}.
+      These are real entries in the older model, NOT validated current payroll or a required margin.</p>
+    </div>
+   </details>
+
+   <details className="p553-bc-price-doc-group"
+    data-component-key={ROOT+".price-overview.new-doc-build"} defaultOpen>
+    <summary className="p553-bc-price-leaf-head">
+     <span className="p553-bc-price-num">B2.P2</span>
+     <span className="p553-bc-price-leaf-label"><strong>Rev00d — N-01…N-04 VDRS / Final / DDP New Document Cost</strong>
+      <small>{showAmount(quote.extraCostProxyTotalTHB)} direct cost proxy; calculated SELL
+       {" "}{showAmount(quote.extraCalculatedSellTotalTHB)} → rounded 120,000 Working SELL</small>
+      <code>{ROOT+".price-overview.new-doc-build"}</code></span>
+     <ComponentCopyId projectId="PJ2608-0553" componentKey={ROOT+".price-overview.new-doc-build"}/>
+    </summary>
+    <div className="p553-bc-price-leaf-body">
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1120}}>
+      <thead><tr><th>WBS / Work Type</th><th>Basis / Qty Driver</th><th>DC MH</th>
+       <th>Engineer MH</th><th>Senior MH</th><th>Draft MH</th>
+       <th>External Cost THB</th><th>Source Cost Proxy THB</th><th>Calculated SELL THB</th></tr></thead>
+      <tbody>{quote.additionalDocumentScope.map(x=><tr key={x.id}>
+       <td><strong>{x.id} — {x.scope}</strong></td><td>{x.driver}</td>
+       <td>{x.dcMH}</td><td>{x.engineerMH}</td><td>{x.seniorMH}</td><td>{x.drafterMH}</td>
+       <td>{showAmount(x.externalDirectTHB)}</td>
+       <td>{showAmount(x.directCostProxyTHB)}</td>
+       <td>{showAmount(x.sellCalculatedTHB)}</td>
+      </tr>)}</tbody>
+      <tfoot><tr><th colSpan={7}>Rev00d B2 additional-only subtotal</th>
+       <th>{showAmount(quote.extraCostProxyTotalTHB)}</th>
+       <th>{showAmount(quote.extraCalculatedSellTotalTHB)}</th>
+      </tr></tfoot>
+     </table></div>
+     <p className="p55-note">Commercial rounding in Rev00d: 119,500.84 → 120,000.
+      N-05…N-10 admin/regulatory 140,000, N-11…N-14 B3/B9 test-support 80,000
+      and optional N-15 10,000 are <strong>OTHER COST OWNERS / NOT INCLUDED</strong>
+      in B2 additional pricing.</p>
+    </div>
+   </details>
+   <p className="p55-note">
+    <a href={quote.sources.boundedCost.url} target="_blank" rel="noreferrer">Independent Rev02 bounded B2 historical cost proxy</a>:
+    {" "}{showAmount(quote.rev02CostProxy.lowTHB)}–{showAmount(quote.rev02CostProxy.highTHB)}.
+    This is a separate sensitivity/source revision, NOT an additional line on top of
+    Rev00d and NOT independently verified current Direct Cost.</p>
+   <p className="p55-note"><strong>Unresolved pricing authority:</strong>
+    The Rev05 THB 580,000 quote remains unchanged, but the specific
+    THB 20,000 bridge versus Rev00d THB 560,000 is not itemized in the inspected
+    source. It must stay a reconciliation gap until a later controlled WBS/quotation
+    proves the difference. No proportional allocation to MR0001–MR0004 or VDRL IDs.</p>
+  </section>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact p553-b2-price-overview-table"
    style={{width:"100%",minWidth:1080}}>
    <thead><tr><th>MR / Document Module ID</th><th>System / VDRL Work</th>
