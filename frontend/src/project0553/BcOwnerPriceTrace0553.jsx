@@ -299,7 +299,14 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
    </div>
   </div>
   {code==="B2"&&<B2IndependentVdrlRecalculation0553/>}
-  {code==="B2"&&<B2WorkingPriceOverview0553 workingRow={workingRow}/>}
+  {code==="B2"&&<details className="p55-panel p553-b2-legacy-price-reference"
+   data-component-key="bid.budget.working.bc.b2.quote-comparison"
+   style={{padding:12,marginTop:12}}>
+   <summary><strong>B2 Historical / Existing Working SELL Reference — NOT used to recalculate</strong>
+    {" "}<small>Open only to compare the previous source WBS and original revisions;
+    the independent VDRL estimate above uses no old selling-price target</small></summary>
+   <B2WorkingPriceOverview0553 workingRow={workingRow}/>
+  </details>}
   <Section code={code} num={code+".1"} suffix="work-scope"
    title={code==="B2"?"VDRL / Document Register by MR":"Work Type / Physical Deliverables"}
    summary={code==="B2"?"MR0001–0004 · 143 requirement rows / 38 unique title types":
