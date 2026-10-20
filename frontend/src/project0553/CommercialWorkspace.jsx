@@ -23,6 +23,7 @@ import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
+import {findModuleElement0553,openModuleAncestors0553,workingOwnerFromModuleId0553} from "./data/moduleDeepLink0553";
 import {PRICING_VIEWS_0553,pricingViewByKey0553} from "./pricingViewRegistry0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
@@ -33,7 +34,7 @@ import React,{useState} from "react";
 import {assessVendorEvidenceForBudget0553} from "./data/vendorExternalEvidence0553";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
 import { BID_0553_GATES, BID_0553_SOURCES } from "./bidReview";
-export function CommercialWorkspace0553({focusedLocation=null,initialMode="working",navigationTarget=null,navigationSequence=0}){
+export function CommercialWorkspace0553({focusedLocation=null,initialMode="working",navigationTarget=null,navigationOwner=null,navigationSequence=0}){
  const [mode,setMode]=useState(initialMode);
  const [recipient,setRecipient]=useState("INTERNAL");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
@@ -59,36 +60,39 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
 
  const bcGroupIdByWorkflow=new Map(BUDGET_BC_WORKFLOW_0553
   .filter(x=>x.parent==="10.2").map(x=>[x.workflowNumber,x.moduleId]));
- // The Project Module Navigator opens the EXISTING 10.2 disclosure
- // and scrolls to the canonical B/C row/group; it never creates a second workbench.
+ // Navigate to the EXACT module anchor after its React row is mounted,
+ // opening ALL containing <details> from the nested leaf to the 10.2 parent.
+ // Previously navigation stopped at the 10.2 heading and left SAT hidden.
+ const handledNavigation=React.useRef(null);
+ const [navigationFeedback,setNavigationFeedback]=useState(null);
  React.useEffect(()=>{
   if(!navigationTarget?.startsWith("bid.budget.working.bc"))return;
-  // Route nested B1 Rev.K cost objects (and other B/C child IDs) through the same parent workbench.
-  const nestedCode=navigationTarget.match(/^bid\.budget\.working\.bc\.(b(?:[1-9]|1[0-4])|c[12])(?:\.|$)/i)?.[1]?.toUpperCase();
-  if(nestedCode&&bcWorking.byCode[nestedCode]){
-   setBcDetailCode(old=>old===nestedCode?old:nestedCode);
-   setBcTab(old=>old==="ALL"?old:"ALL");
-  }
+  const requestKey=navigationSequence+":"+navigationTarget+":"+(navigationOwner||"");
+  if(handledNavigation.current===requestKey)return;
+  const owner=navigationOwner||workingOwnerFromModuleId0553(navigationTarget);
   if(mode!=="working"){setMode("working");return;}
-  const parent=document.querySelector('[data-component-key="bid.budget.working.bc"]');
+  if(owner&&bcWorking.byCode[owner]){
+   if(bcTab!=="ALL"&&bcTab!==owner){setBcTab(owner);return;}
+   if(bcTab==="ALL"&&bcDetailCode!==owner){setBcDetailCode(owner);return;}
+  }
+  const parent=findModuleElement0553(document,"bid.budget.working.bc");
   if(!parent)return;
   parent.open=true;
-  const exact=[...document.querySelectorAll("[data-component-key]")]
-   .find(node=>node.getAttribute("data-component-key")===navigationTarget);
-  if(navigationTarget==="bid.budget.working.bc.cost-lines"){
-   const lines=document.querySelector('[data-component-key="bid.budget.working.bc.cost-lines"]');
-   if(lines?.tagName==="DETAILS")lines.open=true;
+  const exact=findModuleElement0553(document,navigationTarget);
+  if(exact){
+   openModuleAncestors0553(exact);
+   if(typeof exact.scrollIntoView==="function")
+    exact.scrollIntoView({block:"center",behavior:"smooth"});
+   setNavigationFeedback(null);
+   handledNavigation.current=requestKey;
+  }else{
+   // DO NOT report success or silently jump only to 10.2 for a missing leaf.
+   setNavigationFeedback("ยังเปิด Module ปลายทางไม่ได้: "+navigationTarget);
+   handledNavigation.current=requestKey;
   }
-  if((navigationTarget==="bid.budget.working.bc.execution-audit"||navigationTarget==="bid.budget.working.bc.b3.mob-demob-economics")){
-   const audit=document.querySelector('[data-component-key="bid.budget.working.bc.execution-audit"]');
-   if(audit?.tagName==="DETAILS")audit.open=true;
-  }
-  const target=exact||parent;
-  if(typeof target.scrollIntoView==="function")
-   target.scrollIntoView({block:"center",behavior:"smooth"});
- },[navigationTarget,navigationSequence,mode,bcDetailCode]);
- 
- // Working display defaults only. Never represent the 31.5 planning rate as a BOT quote.
+ },[navigationTarget,navigationOwner,navigationSequence,mode,bcTab,bcDetailCode]);
+
+  // Working display defaults only. Never represent the 31.5 planning rate as a BOT quote.
  const DEFAULT_FX={displayCurrency:"THB",fxRate:"31.5",fxDate:"2026-10-10",fxSource:"INTERNAL PLANNING ASSUMPTION — UNVERIFIED"};
  const STORAGE_KEY="pj2608-0553-working-fx-v1";
  const readSettings=()=>{
@@ -192,6 +196,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <summary><strong>10.2 — Part B/C Working Cost &amp; Spare Requirements</strong><small>bid.budget.working.bc · WBS / Services / Spares</small></summary>
    <section className="p55-panel" style={{padding:"12px 14px"}}>
     <div className="p55-eyebrow">PART B/C WORKING SHEETS / ENGINEERING COST CONTROL <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.working.bc"/></div>
+     {navigationFeedback&&<p className="p55-note" role="status">{navigationFeedback}</p>}
     <h3>Part B/C — Linked Internal Working Detail</h3>
     <p className="p55-note">หน้าตาและการเลือกหมวดเหมือน 10.5 แต่ที่นี่เป็นเจ้าของ Working Source / Direct Cost Evidence; 10.5 เป็น Read-only Customer Scope. ชื่อและ Module ID ของแต่ละรายการใช้ Canonical 10.2 เท่านั้น</p>
     <section className="p55-panel" data-component-key="bid.budget.working.bc.totals" style={{marginBottom:12}}>
@@ -207,14 +212,14 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     <ScopeCategoryTabs0553 value={bcTab} onChange={code=>{setBcTab(code);setBcDetailCode(code==="ALL"?null:code);}}/>
     <p className="p55-note">Selected module: <strong>{bcTab==="ALL"?"All Part B/C — B1–B14 and C1–C2":bcTab+" — "+bcWorking.byCode[bcTab]?.requirement}</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey={bcTab==="ALL"?"bid.budget.working.bc":"bid.budget.working.bc."+bcTab.toLowerCase()}/></p>
     </section>
-   {bcTab!=="ALL"&&bcWorking.byCode[bcTab]&&<section className="p55-panel" data-component-key={"bid.budget.working.bc."+bcTab.toLowerCase()+".details"}><h4>{bcTab} — Engineering & Cost Detail</h4><BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}/><BcWorkCostLines0553 selectedCode={bcTab}/></section>}
+   {bcTab!=="ALL"&&bcWorking.byCode[bcTab]&&<section className="p55-panel" data-component-key={"bid.budget.working.bc."+bcTab.toLowerCase()+".details"}><h4>{bcTab} — Engineering & Cost Detail</h4><BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/><BcWorkCostLines0553 selectedCode={bcTab}/></section>}
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>}
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<p className="p55-note"><strong>Selected {bcTab}:</strong> รายละเอียดแสดงโดยตรงด้านล่างตารางจาก Component เดียวกับ 10.5 โดยไม่ต้องกด ＋ Detail อีกครั้ง</p>}
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
     <p className="p55-note"><strong>CURRENT REV.K FAT / YARD BASIS (18-Oct-2026):</strong> MGW executes MR0001–MR0004 OEM IFAT/FAT at MGW Office in China; ADDVALUE sends 2 paid attendees (plus 1 unbilled standby). MGW DDP delivery is at JUTAL Zhuhai Yard, China. FAT venue/city, approved attendance days, one-trip routing, visa/work permissions, lodging and insured activities remain to confirm. ADDVALUE MGW FAT Witness staff/travel/insurance AND offshore SAT/SIT are B3 Inspection/Testing. B9 is only optional Yard Specialist assistance; direct personnel COST is not established. The former Bangkok integrated FAT and JUTAL Nantong routing in Rev05 are superseded for current 10.2 budget, preserved as audit source only.</p>
    {bcTab==="ALL"&&<section className="p55-panel" data-component-key="bid.budget.working.bc.inline-list"><h4>Working WBS — Separate Part B Base and Part C Options</h4>
     {([{part:"B",title:"Part B — Services / Spares · Base Scope",rows:partBRows,total:partBWorkingSell,missing:missingB},{part:"C",title:"Part C — Optional Spare Parts",rows:partCRows,total:partCWorkingSell,missing:missingC}]).map(group=><section className="p55-panel" key={group.part} data-component-key={"bid.budget.working.bc.part-"+group.part.toLowerCase()} style={{marginBottom:16,padding:12,minWidth:0}}><h4>{group.title}</h4><p className="p55-note">Current Working SELL only. Unpriced codes remain NOT ESTABLISHED; budgetary candidates and earlier revision references are available in source evidence, not added to this table or subtotal without controlled working-sell selection.</p><p className="p55-note"><strong>Working Sell subtotal: THB {group.total.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</strong> · Priced {group.rows.length-group.missing.length}/{group.rows.length} · Pending: {group.missing.join(", ")||"none"} · {group.part==="C"?"OPTIONAL — excluded from Part B base":"BASE — known priced lines only"}; unresolved values are not zero.</p>
-    {group.rows.map(item=><div key={item.code} style={{marginBottom:12,minWidth:0}}><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{width:"100%",minWidth:1120,tableLayout:"fixed",fontSize:"12px"}}><colgroup><col style={{width:"16%"}}/><col style={{width:"23%"}}/><col style={{width:"10%"}}/><col style={{width:"12%"}}/><col style={{width:"15%"}}/><col style={{width:"24%"}}/></colgroup><thead><tr><th style={{overflowWrap:"anywhere"}}>REF. / MODULE ID</th><th>DESCRIPTION</th><th>QTY / BASIS</th><th>DIRECT COST THB</th><th style={{whiteSpace:"normal",overflowWrap:"anywhere",lineHeight:1.4}}>WORKING SELL THB</th><th style={{whiteSpace:"normal",overflowWrap:"anywhere",wordBreak:"normal",lineHeight:1.4,verticalAlign:"top"}}>SOURCE / ENGINEERING STATUS</th></tr></thead><tbody><tr style={{verticalAlign:"top",overflowWrap:"anywhere",wordBreak:"break-word",whiteSpace:"normal"}} data-component-key={item.moduleId} className={navigationTarget===item.moduleId?"p553-module-nav-target":undefined}><td style={{whiteSpace:"normal",overflowWrap:"anywhere",wordBreak:"break-word"}}><button type="button" className="p553-detail-button" style={{display:"inline-flex",alignItems:"center",gap:6,width:"auto",maxWidth:"100%",whiteSpace:"nowrap",wordBreak:"normal",overflowWrap:"normal",padding:"5px 8px"}} aria-expanded={bcDetailCode===item.code} onClick={()=>setBcDetailCode(old=>old===item.code?null:item.code)}><span aria-hidden="true">{bcDetailCode===item.code?"−":"＋"}</span><span>{item.code} — Detail</span></button><small style={{display:"block",overflowWrap:"anywhere",whiteSpace:"normal"}}>{item.workflowNumber} · {item.moduleId}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={item.moduleId}/></td><td><strong>{item.requirement}</strong><small>{item.executionOwner}</small></td><td>{Number.isFinite(item.qtyDriver)?item.qtyDriver+" "+item.unit:item.unit||"1 LS (scope)"}</td><td>{Number.isFinite(item.directCostTHB)?"THB "+item.directCostTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"NOT ESTABLISHED"}<small>{item.code==="B6"?"MANAGEMENT APPROVED · PRE-AWARD BUDGETARY WORKING SELL · THB · actual logistics quotation after award":item.workingSellBasis||"No current sell evidence"}</small></td><td>{item.b6UpdatedReview?<><strong>UPDATED WORKING REVIEW · {item.b6UpdatedReview.reviewedOn}</strong><small>Approved Working SELL: {Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"PENDING DATA RECONCILIATION"} · sourced from Rev08 · FX 31.5 planning only</small><small>Pre-award budget approval only · Direct Cost NOT VERIFIED · Four-MR freight and Incoterm reconciliation OPEN</small></>:item.costState}<small>{item.requirement} · {item.sourceRevision}</small><small>Contract: {item.contractOwner} · Turnkey: {item.turnkeyEstimator} · Execution: {item.executionOwner}</small><small>Lifecycle activity source rows: {item.requirementCount}; unverified quantities/rates are not treated as zero</small>{item.executionDecision&&<small><strong>Approved FAT / Delivery Strategy:</strong> {item.executionDecision.summary} · {item.executionDecision.decisionId} · {item.executionDecision.costState}</small>}</td></tr></tbody></table></div>{bcDetailCode===item.code&&<section className="p55-panel" data-component-key={item.moduleId+".details"} style={{width:"100%",minWidth:0,overflowX:"auto",marginTop:8,padding:12}}><h4>{item.code} — Engineering &amp; Cost Detail</h4><BcCostEvidenceDetail0553 workingRow={item}/><BcWorkCostLines0553 selectedCode={item.code}/></section>}</div>)}</section>)}
+    {group.rows.map(item=><div key={item.code} style={{marginBottom:12,minWidth:0}}><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{width:"100%",minWidth:1120,tableLayout:"fixed",fontSize:"12px"}}><colgroup><col style={{width:"16%"}}/><col style={{width:"23%"}}/><col style={{width:"10%"}}/><col style={{width:"12%"}}/><col style={{width:"15%"}}/><col style={{width:"24%"}}/></colgroup><thead><tr><th style={{overflowWrap:"anywhere"}}>REF. / MODULE ID</th><th>DESCRIPTION</th><th>QTY / BASIS</th><th>DIRECT COST THB</th><th style={{whiteSpace:"normal",overflowWrap:"anywhere",lineHeight:1.4}}>WORKING SELL THB</th><th style={{whiteSpace:"normal",overflowWrap:"anywhere",wordBreak:"normal",lineHeight:1.4,verticalAlign:"top"}}>SOURCE / ENGINEERING STATUS</th></tr></thead><tbody><tr style={{verticalAlign:"top",overflowWrap:"anywhere",wordBreak:"break-word",whiteSpace:"normal"}} data-component-key={item.moduleId} className={navigationTarget===item.moduleId?"p553-module-nav-target":undefined}><td style={{whiteSpace:"normal",overflowWrap:"anywhere",wordBreak:"break-word"}}><button type="button" className="p553-detail-button" style={{display:"inline-flex",alignItems:"center",gap:6,width:"auto",maxWidth:"100%",whiteSpace:"nowrap",wordBreak:"normal",overflowWrap:"normal",padding:"5px 8px"}} aria-expanded={bcDetailCode===item.code} onClick={()=>setBcDetailCode(old=>old===item.code?null:item.code)}><span aria-hidden="true">{bcDetailCode===item.code?"−":"＋"}</span><span>{item.code} — Detail</span></button><small style={{display:"block",overflowWrap:"anywhere",whiteSpace:"normal"}}>{item.workflowNumber} · {item.moduleId}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={item.moduleId}/></td><td><strong>{item.requirement}</strong><small>{item.executionOwner}</small></td><td>{Number.isFinite(item.qtyDriver)?item.qtyDriver+" "+item.unit:item.unit||"1 LS (scope)"}</td><td>{Number.isFinite(item.directCostTHB)?"THB "+item.directCostTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"COST NOT ESTABLISHED"}</td><td>{Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"NOT ESTABLISHED"}<small>{item.code==="B6"?"MANAGEMENT APPROVED · PRE-AWARD BUDGETARY WORKING SELL · THB · actual logistics quotation after award":item.workingSellBasis||"No current sell evidence"}</small></td><td>{item.b6UpdatedReview?<><strong>UPDATED WORKING REVIEW · {item.b6UpdatedReview.reviewedOn}</strong><small>Approved Working SELL: {Number.isFinite(item.workingSellTHB)?"THB "+item.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2}):"PENDING DATA RECONCILIATION"} · sourced from Rev08 · FX 31.5 planning only</small><small>Pre-award budget approval only · Direct Cost NOT VERIFIED · Four-MR freight and Incoterm reconciliation OPEN</small></>:item.costState}<small>{item.requirement} · {item.sourceRevision}</small><small>Contract: {item.contractOwner} · Turnkey: {item.turnkeyEstimator} · Execution: {item.executionOwner}</small><small>Lifecycle activity source rows: {item.requirementCount}; unverified quantities/rates are not treated as zero</small>{item.executionDecision&&<small><strong>Approved FAT / Delivery Strategy:</strong> {item.executionDecision.summary} · {item.executionDecision.decisionId} · {item.executionDecision.costState}</small>}</td></tr></tbody></table></div>{bcDetailCode===item.code&&<section className="p55-panel" data-component-key={item.moduleId+".details"} style={{width:"100%",minWidth:0,overflowX:"auto",marginTop:8,padding:12}}><h4>{item.code} — Engineering &amp; Cost Detail</h4><BcCostEvidenceDetail0553 workingRow={item} navigationTarget={navigationTarget}/><BcWorkCostLines0553 selectedCode={item.code}/></section>}</div>)}</section>)}
    </section>}
    
    
