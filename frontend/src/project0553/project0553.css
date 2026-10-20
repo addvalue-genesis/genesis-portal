@@ -500,3 +500,18 @@
 .p553-dashboard .p553-b1-price-overview-table tfoot th{background:#dcebf8}
 .p553-dashboard .p553-b1-price-overview-table td{vertical-align:top}
 .p553-dashboard .p553-b1-price-overview-table .p553-detail-button{white-space:normal;text-align:left}
+
+
+/* B2: immediate source document quantities and one verified lump-sum SELL authority.
+   NOT a per-document price model, nor verified Direct Cost. */
+.p553-dashboard .p553-b2-price-overview{border-left:5px solid #245e9b;background:#fcfdff;min-width:0}
+.p553-dashboard .p553-b2-price-overview h3{margin:6px 0 9px}
+.p553-dashboard .p553-b2-price-overview .p55-metric-grid{margin:10px 0}
+.p553-dashboard .p553-b2-price-overview-table{font-size:12px;font-variant-numeric:tabular-nums}
+.p553-dashboard .p553-b2-price-overview-table thead th{background:#e9f2fc}
+.p553-dashboard .p553-b2-price-overview-table tbody tr:hover{background:#f0f7ff}
+.p553-dashboard .p553-b2-price-overview-table tfoot th{background:#dcebf8}
+.p553-dashboard .p553-b2-price-overview-table td{vertical-align:top}
+.p553-dashboard .p553-b2-price-overview-table .p553-detail-button{white-space:normal;text-align:left}
+.p553-dashboard .p553-b2-commercial-proof{margin:12px 0 3px;padding:12px;border:1px solid #c4d8e8;border-radius:8px;background:#f9fbff}
+.p553-dashboard .p553-b2-commercial-proof h4{margin:0 0 8px}

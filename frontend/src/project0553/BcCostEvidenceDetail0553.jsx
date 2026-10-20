@@ -192,10 +192,34 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
   </details>}
   <p className="p55-note"><strong>NO DOUBLE COUNT:</strong> {e.noDoubleCountRule} · Direct Cost / Risk / Customer Sell จะยังไม่ถูก Post จนกว่า Cost Evidence จะครบและผ่านการอนุมัติ</p>
  </React.Fragment>;
+ const ownerPriceTrace=["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)?(
+ <BcOwnerPriceTrace0553
+   workingRow={workingRow}
+   sourceContent={<React.Fragment>
+    <MgwR2CommercialCover0553 code={e.code}/>
+    <MgwPaulVendorClarifications0553 code={e.code}/>
+    {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
+   <h4>B9 — Conditional Yard Specialist Onshore SELL Rate (FAT Witness = B3)</h4>
+   <div className="p55-metric-grid">
+    <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
+    <div><strong>Yard Senior Engineer Onshore SELL Rate</strong><p>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")}</p><small>One paid engineer only · no separately priced per diem · FAT crew billed B3</small></div>
+    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>B9 has zero Base activity; Yard Call-out 1 LS THB 233,600 remains Conditional, excluded from Part B Base</small></div>
+   </div>
+   <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD600/day is a selling-rate input, not internal payroll Direct Cost.</p>
+  </section>}
+    {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
+  {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
+   </React.Fragment>}
+   auditContent={<React.Fragment>
+    {sharedEvidence}
+    <BcWorkCostLines0553 selectedCode={e.code} presentationNamespace={"bid.budget.working.bc."+e.code.toLowerCase()+".audit"}/>
+   </React.Fragment>}/>
+ ):null;
  return <section className="p55-panel p553-bc-evidence" data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
   <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
   <h3>{e.code} — {workingRow.requirement}</h3>
   {e.code==="B1"&&<B1WorkingPriceOverview0553 workingRow={workingRow}/> }
+  {e.code==="B2"&&ownerPriceTrace}
   {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&<MgwR2CommercialCover0553 code={e.code}/>}
   {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&<MgwPaulVendorClarifications0553 code={e.code}/>}
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
@@ -225,27 +249,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     {sharedEvidence}
     <BcWorkCostLines0553 selectedCode="B3" presentationNamespace="bid.budget.working.bc.b3.audit"/>
    </React.Fragment>}/> }
-  {["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&<BcOwnerPriceTrace0553
-   workingRow={workingRow}
-   sourceContent={<React.Fragment>
-    <MgwR2CommercialCover0553 code={e.code}/>
-    <MgwPaulVendorClarifications0553 code={e.code}/>
-    {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
-   <h4>B9 — Conditional Yard Specialist Onshore SELL Rate (FAT Witness = B3)</h4>
-   <div className="p55-metric-grid">
-    <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
-    <div><strong>Yard Senior Engineer Onshore SELL Rate</strong><p>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")}</p><small>One paid engineer only · no separately priced per diem · FAT crew billed B3</small></div>
-    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>B9 has zero Base activity; Yard Call-out 1 LS THB 233,600 remains Conditional, excluded from Part B Base</small></div>
-   </div>
-   <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD600/day is a selling-rate input, not internal payroll Direct Cost.</p>
-  </section>}
-    {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
-  {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
-   </React.Fragment>}
-   auditContent={<React.Fragment>
-    {sharedEvidence}
-    <BcWorkCostLines0553 selectedCode={e.code} presentationNamespace={"bid.budget.working.bc."+e.code.toLowerCase()+".audit"}/>
-   </React.Fragment>}/>}
+  {e.code!=="B2"&&ownerPriceTrace}
   {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&sharedEvidence}
  </section>;
 }

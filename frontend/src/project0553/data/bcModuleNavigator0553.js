@@ -172,6 +172,17 @@ export function buildBcModuleNavigator0553(){
    id,name,tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
    anchorModuleId:id,keywords:code+" "+label+" "+keywords
   });
+  if(code==="B2"){
+   for(const [suffix,name] of [
+    ["original-source","Source-quoted 580k vs prior 440k+120k price bridge"],
+    ["role-cost-build","Rev00a actual workbook provisional 964.28 MH by 5 positions × historical rates"],
+    ["new-doc-build","Rev00d N01–N04 VDRS / As-built / DDP extra document work"]
+   ])entries.push(nested("bid.budget.working.bc.b2.price-overview."+suffix,
+    "B2 — "+name,"B2 documentary rate price qty cost history variance"));
+   const visibleId="bid.budget.working.bc.b2.price-overview";
+   entries.push(nested(visibleId,"B2 — Visible VDRL Qty / Role-MH / 580,000 LS Price Overview",
+    "B2 143 document requirements source price 580000 quantity four MR visible"));
+  }
   entries.push(nested(rootId,code+" — Source-backed Working SELL / Quantity / Rate audit"));
   for(const [suffix,name] of [
    ["work-scope","Scope and source work drivers"],
@@ -191,6 +202,13 @@ export function buildBcModuleNavigator0553(){
    }
   }
  }
+ entries.push({
+  id:"bid.budget.working.bc.b2.price-overview.lump-sum-proof",
+  name:"B2 — 1 LS × THB580,000 = THB580,000 Source Quotation",
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:"bid.budget.working.bc.b2.price-overview.lump-sum-proof",
+  keywords:"B2 lump sum quantity rate working sell invoice not verified"
+ });
  const ids=entries.map(x=>x.id),all=new Set(ids);
  if(all.size!==entries.length)throw Error("Duplicate B/C Navigator Module ID");
  const leaves=entries.filter(x=>x.kind==="CUSTOMER_BC_WORKING_ROW");

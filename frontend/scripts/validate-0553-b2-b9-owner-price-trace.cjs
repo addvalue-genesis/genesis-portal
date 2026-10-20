@@ -77,7 +77,10 @@ const source=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.j
 assert(source.includes("Do not divide THB580,000 by 143 or 38"));
 assert(source.includes("row.calculatedB2MH"));
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(host.includes("<BcOwnerPriceTrace0553")&&host.includes("auditContent={sharedEvidence}"));
+assert(host.includes("<BcOwnerPriceTrace0553")&&host.includes("auditContent={<React.Fragment>"),
+ "All owner-local B2-B9 audit proof must be nested without duplicate standalone cost-lines");
+assert(host.includes('{e.code==="B2"&&ownerPriceTrace}'),
+ "B2 price detail must appear before generic evidence summary");
 const canonical=JSON.stringify(current());
 assert.equal(canonical,snap,"Presentation mutated canonical B1–B14/C1/C2 cost/SELL");
 console.log("PASS B2-B9 cost owner trace: B2 143 VDRL + 580,000 LS with MH/rate OPEN; B9 conditional 233,600 not Base; no fabricated price, no duplicate Module ID or price posting.");
