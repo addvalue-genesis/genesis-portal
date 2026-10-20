@@ -9,6 +9,11 @@ import {findModuleElement0553,openModuleAncestors0553} from "./data/moduleDeepLi
 // 580,000 THB is a source quotation for ONE project-wide B2 package.
 const ROOT="bid.budget.working.bc.b2";
 const showAmount=x=>Number.isFinite(x)?"THB "+x.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
+const copyHeader=id=><span className="p553-price-trace-copy"
+ onClick={e=>{e.preventDefault();e.stopPropagation();}}
+ onKeyDown={e=>e.stopPropagation()}>
+ <ComponentCopyId projectId="PJ2608-0553" componentKey={id}/>
+ </span>;
 const MR_LIST=Object.freeze(["MR-0001","MR-0002","MR-0003","MR-0004"]);
 const MR_COUNTS=Object.freeze([37,36,35,35]);
 
@@ -104,7 +109,7 @@ export function B2WorkingPriceOverview0553({workingRow}){
      <span className="p553-bc-price-leaf-label"><strong>Rev00a — 5 Roles × Provisional MH × Historical THB/MH</strong>
       <small>964.28 MH / {showAmount(quote.roleCostProxyTotalTHB)} historical input cost proxy; NOT current Direct Cost</small>
       <code>{ROOT+".price-overview.role-cost-build"}</code></span>
-     <ComponentCopyId projectId="PJ2608-0553" componentKey={ROOT+".price-overview.role-cost-build"}/>
+     {copyHeader(ROOT+".price-overview.role-cost-build")}
     </summary>
     <div className="p553-bc-price-leaf-body">
      <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
@@ -138,7 +143,7 @@ export function B2WorkingPriceOverview0553({workingRow}){
       <small>{showAmount(quote.extraCostProxyTotalTHB)} direct cost proxy; calculated SELL
        {" "}{showAmount(quote.extraCalculatedSellTotalTHB)} → rounded 120,000 Working SELL</small>
       <code>{ROOT+".price-overview.new-doc-build"}</code></span>
-     <ComponentCopyId projectId="PJ2608-0553" componentKey={ROOT+".price-overview.new-doc-build"}/>
+     {copyHeader(ROOT+".price-overview.new-doc-build")}
     </summary>
     <div className="p553-bc-price-leaf-body">
      <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1120}}>
