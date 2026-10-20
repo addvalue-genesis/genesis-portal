@@ -99,7 +99,9 @@ assert(parentHtml.includes("2. Site × Team Workdays × Working SELL"));
 const head=renderToStaticMarkup(React.createElement(Breakdown,{workingRow:b3}));
 assert(head.includes("80 Man-days")&&head.includes("40")&&head.includes("site-mr-sat-matrix"));
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(host.includes('<B3SiteMrSatCoverage0553 workingRow={workingRow}/>'));
+const nested=fs.readFileSync(path.join(root,"project0553/B3WorkTypeAccordion0553.jsx"),"utf8");
+assert(host.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"),"10.2 must mount B3 work-type sections");
+assert(nested.includes('<B3SiteMrSatCoverage0553 workingRow={workingRow}/>'),"SAT group must mount B3 SAT matrix with its canonical owner");
 assert.equal(JSON.stringify({workingSell:canonical().byCode.B3.workingSellTHB,
  directCost:canonical().byCode.B3.directCostTHB,source:days().rows,veex:days().veex}),frozenSnapshot,
  "UI/matrix may not mutate the 10.2 B3 canonical Working Sell or source days");
