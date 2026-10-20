@@ -2,10 +2,13 @@ import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectB3RequirementWbsTrace0553} from "./data/b3RequirementWbsTrace0553";
 
-export function B3RequirementWbsTrace0553({selectedOwner="B3"}){
+export function B3RequirementWbsTrace0553({selectedOwner="B3",navigationTarget=null}){
  const model=selectB3RequirementWbsTrace0553();
- const [showOthers,setShowOthers]=useState(false);
  const owner=selectedOwner==="B9"?"B9":"B3";
+ const selectedRow=model.rows.find(r=>r.moduleId===navigationTarget);
+ const needsOtherOwner=Boolean(selectedRow&&selectedRow.costOwner!==owner);
+ const [showOthers,setShowOthers]=useState(needsOtherOwner);
+ React.useEffect(()=>{if(needsOtherOwner)setShowOthers(true);},[needsOtherOwner,navigationTarget]);
  const primary=owner==="B9"?model.B9:model.B3;
  const others=model.rows.filter(r=>r.costOwner!==owner);
  const render=(rows)=><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1440,width:"100%",tableLayout:"fixed",fontSize:12}}>
