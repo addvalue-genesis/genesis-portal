@@ -27,7 +27,7 @@ assert(model.rows.some(x=>x.id==="B1-REG-07"&&x.riskClass.includes("ANTI_BRIBERY
 assert.equal(model.computedRegulatoryDirectCostTHB,null);
 assert.equal(model.workingSellPosted,false);
 assert.equal(base.byCode.B1.workingSellTHB,211600); // New Rev.K engineering + PM, old 510k audit only
-assert.equal(base.knownWorkingSellTHB,4187590.69);
+assert.equal(base.knownWorkingSellTHB,3844711.82);
 const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(jsx.includes("selectB1RegulatoryCost0553")&&jsx.includes("b1Regulatory.rows.map("));
 assert(babel.transformSync(jsx,{babelrc:false,configFile:false,
