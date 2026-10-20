@@ -6,10 +6,9 @@ import {selectB1ProjectExpenseLedger0553} from "./data/b1IndirectCostLedger0553"
 import {B1RevKMilestoneBudget0553} from "./B1RevKMilestoneBudget0553";
 import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
-import {B3SiteMrSatCoverage0553} from "./B3SiteMrSatCoverage0553";
-import {B3WorkingSellBreakdown0553} from "./B3WorkingSellBreakdown0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
+import {B3WorkTypeAccordion0553} from "./B3WorkTypeAccordion0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
 // imply that historical payroll cost or the WBS SELL is verified direct COST.
@@ -107,33 +106,7 @@ function B1IndirectExpenseRegister0553({workingRow}){
 export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
  if(!workingRow?.costEvidence)return null;
  const e=workingRow.costEvidence;
- return <section className="p55-panel p553-bc-evidence" data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
-  <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
-  <h3>{e.code} — {workingRow.requirement}</h3>
-  <MgwR2CommercialCover0553 code={e.code}/>
-  <MgwPaulVendorClarifications0553 code={e.code}/>
-  <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
-  <div className="p55-metric-grid">
-   <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
-   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Current B1 SELL from fresh B1.1–B1.8 support-only THB resource budget; actual Direct Cost OPEN, old engineering/PM quotes excluded":e.code==="B3"?"Current MGW FAT Witness + Offshore SAT/SIT + VeEX rental, all Inspection/Testing under B3":e.code==="B9"?"No B9 Base; only conditional Yard Specialist 1 LS":"Working source estimate"}</small></div>
-   <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
-  </div>
-  {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Reconcile all four MR cargo legs against current MGW China FAT and DDP JUTAL Zhuhai Yard; Bangkok/Nantong are historical Rev05 routes only.</p>}
-  {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
-   <h4>B9 — Conditional Yard Specialist Onshore SELL Rate (FAT Witness = B3)</h4>
-   <div className="p55-metric-grid">
-    <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
-    <div><strong>Yard Senior Engineer Onshore SELL Rate</strong><p>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")}</p><small>One paid engineer only · no separately priced per diem · FAT crew billed B3</small></div>
-    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>B9 has zero Base activity; Yard Call-out 1 LS THB 233,600 remains Conditional, excluded from Part B Base</small></div>
-   </div>
-   <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD600/day is a selling-rate input, not internal payroll Direct Cost.</p>
-  </section>}
-  {e.code==="B3"&&<B3WorkingSellBreakdown0553 workingRow={workingRow}/>}
-  {(e.code==="B3"||e.code==="B9")&&<B3RequirementWbsTrace0553 selectedOwner={e.code} navigationTarget={navigationTarget}/>}
-  {e.code==="B3"&&<B3SiteMrSatCoverage0553 workingRow={workingRow}/>}
-  {e.code==="B3"&&<B9ChinaBudgetDetail0553 budget={workingRow.b3ChinaFatBudget} selectedOwner="B3"/>}
-  {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
-  {e.code==="B3"&&workingRow.b3FatOwnerTransfer&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b3.fat-owner-transfer" style={{padding:12,marginTop:12}}><h4>B3 — Rev.K FAT Cost Owner Reconciliation</h4><p className="p55-note">Rev05 Bangkok FAT allocation <strong>THB {workingRow.b3FatOwnerTransfer.amountTHB.toLocaleString("en-US")}</strong> is removed from B3. MGW China FAT witness labor/travel stays in contractual B3 (new THB 397,400); old Bangkok FAT THB144,000 is superseded once. B3 includes 40 Offshore SAT/SIT workdays, 30-day VeEX rental and MGW FAT Witness: <strong>{thb(workingRow.workingSellTHB)}</strong>. Historical FAT source evidence is not additive.</p></section>}
+ const sharedEvidence=<React.Fragment>
   <p className="p55-note">SOURCE: <a href={e.sourceUrl} target="_blank" rel="noreferrer">{e.sourceSheet} · {e.sourceRevision}</a>. ต้องใช้ Internal Rate Card / Vendor Rate ที่ควบคุมได้ก่อนคำนวณ Direct Cost</p>
   {(e.code==="B1"||e.code==="B2")&&<section className="p55-panel" data-component-key={"bid.budget.working.bc."+e.code.toLowerCase()+".ownership-boundary"} style={{padding:16,marginTop:12}}>
    <h4>ขอบเขต B1 และ B2 ที่ควรแยก</h4>
@@ -189,5 +162,47 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
    </tbody></table></div>
   </details>}
   <p className="p55-note"><strong>NO DOUBLE COUNT:</strong> {e.noDoubleCountRule} · Direct Cost / Risk / Customer Sell จะยังไม่ถูก Post จนกว่า Cost Evidence จะครบและผ่านการอนุมัติ</p>
+ </React.Fragment>;
+ return <section className="p55-panel p553-bc-evidence" data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
+  <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
+  <h3>{e.code} — {workingRow.requirement}</h3>
+  {e.code!=="B3"&&<MgwR2CommercialCover0553 code={e.code}/>}
+  {e.code!=="B3"&&<MgwPaulVendorClarifications0553 code={e.code}/>}
+  <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
+  <div className="p55-metric-grid">
+   <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
+   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Current B1 SELL from fresh B1.1–B1.8 support-only THB resource budget; actual Direct Cost OPEN, old engineering/PM quotes excluded":e.code==="B3"?"Current MGW FAT Witness + Offshore SAT/SIT + VeEX rental, all Inspection/Testing under B3":e.code==="B9"?"No B9 Base; only conditional Yard Specialist 1 LS":"Working source estimate"}</small></div>
+   <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
+  </div>
+  {e.code==="B11"&&<section className="p55-panel"
+   data-component-key="bid.budget.working.bc.b11.test-equipment-ownership"
+   style={{padding:12,marginTop:12}}>
+   <h4>B11 — Special Tools for Operation &amp; Maintenance / ขอบเขตเครื่องมือ</h4>
+   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553"
+    componentKey="bid.budget.working.bc.b11.test-equipment-ownership"/></p>
+   <p className="p55-note"><strong>B11:</strong> เครื่องมือพิเศษที่ส่งมอบให้ผู้ซื้อเพื่อใช้งาน,
+    ตรวจซ่อมบำรุงหรือโปรแกรมอุปกรณ์หลังส่งมอบ (Permanent O&amp;M Special Tools)
+    ต้องมี OEM SKU / Qty / TAG / Included-or-Extra evidence ก่อนคิดราคาจริง.</p>
+   <p className="p55-note"><strong>B3:</strong> เครื่องมือทดสอบเช่าชั่วคราวเพื่อทำ FAT/SAT
+    เช่น VeEX MX100+ 30 rental-days = THB 30,000 อยู่ใน B3 เพียงครั้งเดียว;
+    อ้างอิง <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.working.bc.b3.veex-mx100"/>.
+    RACON programming kit ที่ MGW แจ้งว่ารวมแล้วต้องตรวจ SKU/Qty ไม่คิดซ้ำใน B11.
+    ข้อมูลนี้เป็น read-only cost-ownership rule ไม่เปลี่ยน B11 Working SELL.</p>
+  </section>}
+  {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Reconcile all four MR cargo legs against current MGW China FAT and DDP JUTAL Zhuhai Yard; Bangkok/Nantong are historical Rev05 routes only.</p>}
+  {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
+   <h4>B9 — Conditional Yard Specialist Onshore SELL Rate (FAT Witness = B3)</h4>
+   <div className="p55-metric-grid">
+    <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
+    <div><strong>Yard Senior Engineer Onshore SELL Rate</strong><p>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")}</p><small>One paid engineer only · no separately priced per diem · FAT crew billed B3</small></div>
+    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>B9 has zero Base activity; Yard Call-out 1 LS THB 233,600 remains Conditional, excluded from Part B Base</small></div>
+   </div>
+   <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD600/day is a selling-rate input, not internal payroll Direct Cost.</p>
+  </section>}
+  {e.code==="B3"&&<B3WorkTypeAccordion0553 workingRow={workingRow}
+   navigationTarget={navigationTarget} auditContent={sharedEvidence}/>}
+  {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
+  {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
+  {e.code!=="B3"&&sharedEvidence}
  </section>;
 }
