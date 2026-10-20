@@ -165,7 +165,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         {code.startsWith("C")&&<th>Lead time (ARO)<br/>交货期 (周)</th>}</tr></thead>
       <tbody>{Array.from({length:13},(_,i)=>{
        const r=annexLines[i];return <tr key={r?.id||"empty:"+i}>
-        <td>{r?i+1:""}</td><td>{r?.tagNo||""}{sourceButton(r||{code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase()})&&internal&&r?sourceButton(r):null}</td>
+        <td>{r?i+1:""}</td><td>{r?.tagNo||""}{r&&sourceButton(r)}</td>
         <td>{r?.description||""}</td><td>{r?.specification||""}</td><td>{r?.materials||""}</td>
         <td>{r?.qty??""}</td>
         <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):Number.isFinite(r.customerUnitTHB)?money(r.customerUnitTHB):code==="C2"?"Not quote":""}</td>
