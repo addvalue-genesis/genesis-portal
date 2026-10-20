@@ -22,6 +22,7 @@ export function B3RequirementWbsTrace0553({selectedOwner="B3"}){
   </tr>)}</tbody></table></div>;
  return <section className="p55-panel" data-component-key={"bid.budget.working.bc."+owner.toLowerCase()+".requirement-crosswalk"} style={{padding:12,marginTop:12}}>
   <h4>{owner} — Contract Requirements × Rev.K Work Breakdown (BOD + SPE + DTS + MR)</h4>
+  <p className="p55-note"><strong>Module ID:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.working.bc."+owner.toLowerCase()+".requirement-crosswalk"}/> · <strong>Trace source:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={model.moduleId}/> · 19 obligations are non-priced and must not be summed into Working Sell.</p>
   <p className="p55-note"><strong>Reading rule:</strong> BOD states system/function/acceptance basis; DTS gives equipment parameters; SPE and MR prescribe tests, certificates, approval and support; Rev.K gives actionable activities/locations. A valid budget line is then one unique Activity + Resource + Cost Owner. This crosswalk is contractual technical coverage, NOT a price ledger and will not add to any Working Sell.</p>
   <div className="p55-metric-grid">
    <div><strong>{owner} source-linked activities</strong><p>{primary.length}</p><small>Contractual activities and owner gates shown</small></div>
