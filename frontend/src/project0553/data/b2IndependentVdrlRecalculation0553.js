@@ -131,7 +131,12 @@ export function evaluateB2VdrlIndependentScenario0553({
    indicativeSellTHB:round(selectedMH*DOC_SOURCE_RATES[i]*employerLoadFactor/(1-laborGrossMarginTarget))
   });
  }));
+ const roundingBridgeTHB=round(raw.selectedHistoricalCostProxyTHB-
+  round(roleSummary.reduce((n,x)=>n+x.costProxyTHB,0)));
+ if(Math.abs(roundingBridgeTHB)>0.02)
+  throw Error("B2 line display vs aggregate rounding bridge exceeds 2 satang");
  return freeze({
+  roleLineCostRoundingBridgeTHB:roundingBridgeTHB,
   moduleId:"bid.budget.working.bc.b2.independent-recalculation",
   scenarioId:"B2-VDRL-FIRST-PRINCIPLES-131WO-20261021",
   costOwner:"B2",
