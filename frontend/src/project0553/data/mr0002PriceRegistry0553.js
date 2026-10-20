@@ -1,6 +1,6 @@
 // Controlled MR0002 commercial price evidence. Not a new BOM or supplier quotation.
 import {MGW_P26_058_0553} from "./mgwP26058";
-import {MGW_P26_058_R2_UHF_0553} from "./mgwP26058R2Uhf0553";
+import {MGW_P26_058_R2_SELECTED_0553} from "./mgwP26058R2Selected0553";
 import {RFI_LNA_PRICE_DECISION_0553} from "./rfiLnaPriceDecision0553";
 import {RFI_BDA_SELECTION_0553} from "./rfiBdaSelected0553";
 import {RF_AND_PATCH_REFERENCE_0553} from "./rfAndPatchReference0553";
@@ -17,14 +17,14 @@ const mgw=MGW_P26_058_0553.lines.filter(x=>["UHF-1","UHF-2","UHF-3","UHF-4"].inc
  source:MGW_P26_058_0553.id,priceType:"SUPPLIER_QUOTE",
  selected:x[0]!=="UHF-1",selectionStatus:x[0]==="UHF-1"?"UNSELECTED_BDA":"BUDGETARY_SELECTED"
 }));
-const latestUhf=MGW_P26_058_R2_UHF_0553.lines.map(line=>({
- id:line.id,supplier:MGW_P26_058_R2_UHF_0553.supplier,
+const latestUhf=MGW_P26_058_R2_SELECTED_0553.lines.filter(line=>line.mr==="MR-0002").map(line=>({
+ id:line.id,supplier:MGW_P26_058_R2_SELECTED_0553.supplier,
  manufacturer:line.manufacturer,model:line.model,description:line.package,
  currency:"USD",unitRate:line.unitPriceUSD,quoteQty:line.quantity,
- source:MGW_P26_058_R2_UHF_0553.id,priceType:"SUPPLIER_QUOTE_R2_BUNDLED_PACKAGE",
+ source:MGW_P26_058_R2_SELECTED_0553.id,priceType:"SUPPLIER_QUOTE_R2_BUNDLED_PACKAGE",
  selected:true,selectionStatus:"R2_VENDOR_QUOTED__TECHNICAL_ASSEMBLY_REVIEW",
  componentInclusions:line.componentInclusions,datasheets:line.datasheets,
- quoteRevision:MGW_P26_058_R2_UHF_0553.quotation
+ quoteRevision:MGW_P26_058_R2_SELECTED_0553.quoteNumber
 }));
 const lna=RFI_LNA_PRICE_DECISION_0553;
 export const MR0002_PRICE_REGISTRY_0553=Object.freeze([

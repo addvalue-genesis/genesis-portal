@@ -1,11 +1,11 @@
 // PJ2608-0553 MR0003 product-side first-principles working derivation.
 // Contractual authority: MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 sec.5, four systems.
-// Selected sources: EXION QT_1260576; PROSPER Q-PROSRY-24051 Rev0 item3 (historical Z1E).
+// Selected MGW P26-058_R2 Gai-Tronics/EATON/WAROM; EXION/PROSPER remain historical alternatives.
 // A route is a physical circuit candidate, not a measured cable length or verified termination.
 export const MR0003_PHONE_BULK_BASIS_0553=Object.freeze({
- mr:"MR0003",state:"ENGINEERING_BUDGETARY_CANDIDATE__NOT_PROCUREMENT_APPROVED",
+ mr:"MR0003",state:"MGW_R2_SELECTED__FIELD_BULK_AND_CABLE_END_CERTIFICATION_OPEN",
  scopeSites:["ZWP20","ZWP21","ZWP22","ZWP23"],
- selectedJb:"BARTEC GA-1004 300x300x160 SS316L eight M20 working configuration / PROSPER item3 historical four-M20 price reference",
+ selectedJb:"MGW P26-058_R2 WAROM BXJ-S Ex e SS316L (included in PHONE-1 with quoted Ex-P gland); BARTEC GA-1004/PROSPER historical comparison only",
  historicalQuotedJbM20Entries:4,historicalQuotedJbStoppingPlugs:4,
  gaSelectedM20Entries:8,gaSelectedStoppingPlugs:8,
  sparePolicy:{minimumEntries:2,percentOfCapacity:20,ga1004SpareAtThreeActive:5},
@@ -40,9 +40,11 @@ export const MR0003_PHONE_BULK_BASIS_0553=Object.freeze({
  verifiedGlandCableOdMm:null,
  verifiedCableMetres:null,
  pricedMaterialTHB:null,
- vendorIncludedActiveGlands:null,
+ vendorIncludedActiveGlands:null,quotedVendorGlandPerSet:1,selectedEnclosureActiveEntryCapacity:null,
+ selectionSource:"MGW P26-058_R2 PHONE-1",selectedEnclosure:"WAROM BXJ-S",
+ bartecGa1004OnlyHistorical:true,
  rule:"Count distinct cable ends physically entering JB; choose certified Ex gland by actual cable OD/armouring/Ex e assembly and supplier-provided gland list; do not price stopping plugs or drilled capacity as active glands",
- conflictWithPrevious:"MGW PHONE-1/WAROM JB not selected. No deduction of MGW included gland for PROSPER-selected BARTEC JB. PROSPER Item3 historical includes two UT2.5 terminal blocks, PE terminal, four fitted plugs and drain valve; GA-1004 has eight factory plugs, locknuts and terminals. Do not double-count those inclusions, and do not treat 4-entry quote rate as confirmed 8-entry configuration pricing."
+ conflictWithPrevious:"MGW P26-058_R2 PHONE-1/WAROM BXJ-S is NOW SELECTED and includes quoted Ex-P SS316L gland. No deduction of MGW included gland for PROSPER-selected BARTEC JB. PROSPER Item3 historical includes two UT2.5 terminal blocks, PE terminal, four fitted plugs and drain valve; GA-1004 has eight factory plugs, locknuts and terminals. Do not double-count those inclusions, and do not treat 4-entry quote rate as confirmed 8-entry configuration pricing."
 });
 export function deriveMR0003PhoneBulk0553(site){
  if(!MR0003_PHONE_BULK_BASIS_0553.scopeSites.includes(site))return null;

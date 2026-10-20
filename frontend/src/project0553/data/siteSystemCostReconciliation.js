@@ -6,6 +6,10 @@ import {deriveZWP20SiteCost0553} from "./zwp20SiteCost0553";
 import {ZWP8_ROW43_COST_TRACE} from "./zwp8Row43CostTrace";
 import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {MGW_P26_058_0553} from "./mgwP26058";
+import {MGW_P26_058_R2_SELECTED_0553} from "./mgwP26058R2Selected0553";
+import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
+import {MR0003_MGW_WORKING_BOM_0553} from "./mr0003MgwWorkingBom0553";
+import {MR0004_WORKING_BOM_0553} from "./mr0004WorkingBom0553";
 import {SUPPLIER_QUOTE_LINES_0553} from "./supplierQuoteLines";
 import {MR0001_RADIO_ROLE_MATRIX} from "./mr0001RadioRoleMatrix";
 import {deriveWpSystemBulkBudget0553} from "./wpSystemBulkBudget0553";
@@ -21,7 +25,21 @@ const sites=[...new Set([
 const sourcePrice=(id)=>SUPPLIER_QUOTE_LINES_0553.find(q=>q.id===id);
 const mgwBySystem={"MR-0002":["UHF-1","UHF-2","UHF-3","UHF-4"]};
 // EXION THAI QT 1260576 (4 quoted each); PROSPER JB is 2024 historical Zawtika 1E comparator, not a current 1F firm quote.
-export const MR0003_SELECTED_RATE_EVIDENCE_0553=Object.freeze({phone:{sku:"212-02-6008-510",rateTHB:145000,quotedQty:4},sounder:{sku:"DB3BDG048N2BNR",rateTHB:62000,quotedQty:4},jb:{sku:"BARTEC-EX-E-TELEPHONE-JB",rateTHB:24500,quotedQty:4,referenceOnly:true},siteBudgetQty:1,assignedSites:["ZWP20","ZWP21","ZWP22"],unallocatedExionQty:1,exionQuote:"1260576",prosperQuote:"Q-PROSRY-24051"});
+export const MR0003_LEGACY_EXION_RATE_EVIDENCE_0553=Object.freeze({phone:{sku:"212-02-6008-510",rateTHB:145000,quotedQty:4},sounder:{sku:"DB3BDG048N2BNR",rateTHB:62000,quotedQty:4},jb:{sku:"BARTEC-EX-E-TELEPHONE-JB",rateTHB:24500,quotedQty:4,referenceOnly:true},siteBudgetQty:1,assignedSites:["ZWP20","ZWP21","ZWP22"],unallocatedExionQty:1,exionQuote:"1260576",prosperQuote:"Q-PROSRY-24051"});
+// Selected current MR0003 quote: single MGW PHONE-1 package across four
+// sites; EXION 2026 and PROSPER 2024 preserved as historic comparison only.
+export const MR0003_SELECTED_RATE_EVIDENCE_0553=Object.freeze({
+ quoteId:MGW_P26_058_R2_SELECTED_0553.id,
+ quoteNumber:MGW_P26_058_R2_SELECTED_0553.quoteNumber,
+ supplier:"MGW Technologies Pte Ltd",
+ currency:"USD",sites:["ZWP20","ZWP21","ZWP22","ZWP23"],
+ phone:{sku:"212-02-6008-410",quotedQty:4,packageUnitUSD:6400},
+ sounder:{sku:"DB3B",quotedQty:4,priceInclusion:"MGW_PHONE1"},
+ jb:{sku:"BXJ-S",quotedQty:4,priceInclusion:"MGW_PHONE1"},
+ legacyEXION:"1260576",legacyPROSPER:"Q-PROSRY-24051",
+ canonicalBOM:"MR0003_MGW_WORKING_BOM_0553",
+ selectedWorkingSupplier:true,releaseAllowed:false
+});
 const normalizedMGW=MGW_P26_058_0553.lines.map(([id,sku,description,qty,unit,extended,group])=>({id,sku,description,qty,unit,extended,group}));
 const sharedMGW=normalizedMGW.filter(x=>x.id.startsWith("SERV-"));
 const checkedAmount=(row)=>row.qty*row.unit;
@@ -47,8 +65,8 @@ const legacyRows=sites.flatMap(site=>systems.map(mr=>{
     currency:"USD",unit:v.unit,extended:v.unit,kind:"PROVISIONAL_EQUAL_SPLIT_3_SITES"});
   }
  }
- if(mr.id==="MR-0003"&&MR0003_SELECTED_RATE_EVIDENCE_0553.assignedSites.includes(site)){
-  const e=MR0003_SELECTED_RATE_EVIDENCE_0553;
+ if(mr.id==="MR-0003"&&MR0003_LEGACY_EXION_RATE_EVIDENCE_0553.assignedSites.includes(site)){
+  const e=MR0003_LEGACY_EXION_RATE_EVIDENCE_0553;
   for(const x of [
    {line:"PHONE-1",description:"GAI-TRONICS Auteldac 6 Ex VoIP Phone / "+e.phone.sku,rate:e.phone.rateTHB,source:"EXION THAI QT "+e.exionQuote,kind:"2026_QUOTED_RATE__ONE_PER_SITE_PROVISIONAL"},
    {line:"SOUNDER-1",description:"Ex sounder / "+e.sounder.sku,rate:e.sounder.rateTHB,source:"EXION THAI QT "+e.exionQuote,kind:"2026_QUOTED_RATE__ONE_PER_SITE_PROVISIONAL"},
@@ -99,7 +117,28 @@ const canonicalZwp20Mr1={
  sourceNote:"Same row objects and subtotals as PJ2608-0553 / bid.budget.bom.zwp20; presentation grouped under MR-0001."
 };
 
-const rows=legacyRows.map(r=>r.site==="ZWP20"&&r.mr==="MR-0001"?canonicalZwp20Mr1:r);
+// A single active selected BOM is reused in reconciliation views. Historical
+// EXION / PROSPER and original MGW P26-058 remain source comparisons only.
+const selectedSystemRows=[
+ ...MR0002_WORKING_BOM_0553.sites.map(s=>({site:s.site,mr:"MR-0002",
+  name:"DMR/RFI BDA — MGW P26-058_R2",evidence:[],
+  detailRows:s.items,subtotals:[{currency:"USD",amount:s.controlledTotalUSD}],
+  gaps:s.scopeWarnings,projectionSource:"MGW_R2_SELECTED_MR0002",completeness:"WORKING_TECH_HOLD"})),
+ ...MR0003_MGW_WORKING_BOM_0553.sites.map(s=>({site:s.site,mr:"MR-0003",
+  name:"Ex Phone / Gai-Tronics EATON WAROM — MGW P26-058_R2",evidence:[],
+  detailRows:s.items,subtotals:[{currency:"USD",amount:s.controlledTotalUSD}],
+  gaps:s.gaps,projectionSource:"MGW_R2_SELECTED_MR0003",completeness:"WORKING_TECH_HOLD"})),
+ ...MR0004_WORKING_BOM_0553.sites.map(s=>({site:s.site,mr:"MR-0004",
+  name:"Marine RACON — MGW Tideland SeaBeacon 2",evidence:[],
+  detailRows:s.items,subtotals:[{currency:"USD",amount:s.controlledTotalUSD}],
+  gaps:s.gaps,projectionSource:"MGW_R2_SELECTED_MR0004",completeness:"WORKING_TECH_HOLD"}))
+];
+const rows=legacyRows.map(r=>r.site==="ZWP20"&&r.mr==="MR-0001"?
+ canonicalZwp20Mr1:
+ selectedSystemRows.find(v=>v.site===r.site&&v.mr===r.mr)||r);
+for(const selected of selectedSystemRows){
+ if(!rows.some(r=>r.site===selected.site&&r.mr===selected.mr))rows.push(selected);
+}
 const byMr=systems.map(mr=>({
  ...mr,
  rows:rows.filter(r=>r.mr===mr.id),
@@ -113,6 +152,10 @@ export const SITE_SYSTEM_COST_RECONCILIATION_0553=Object.freeze({
  id:"P553-MR-BOM-RECON",basis:"SINGLE_LEDGER_MULTI_PROJECTION",
  sites,systems,rows,byMr,
  canonicalBindings:[{view:"bid.budget.bom.zwp20",mr:"MR-0001",site:"ZWP20",source:"deriveZWP20SiteCost0553"}],
+ mgwSelectedQuote:MGW_P26_058_R2_SELECTED_0553.id,
+ mgwSelectedEquipmentUSD:MGW_P26_058_R2_SELECTED_0553.equipmentTotalUSD,
+ mgwSelectedOverallUSD:MGW_P26_058_R2_SELECTED_0553.overallTotalUSD,
+ mgwOriginalQuoteClass:"HISTORICAL_COMPARATOR_NOT_SELECTED",
  mgwSharedUSD:mgwSharedAmount,mgwProductQuotedUSD:mgwProductQuotedAmount,
  mgwQuoteUSD:MGW_P26_058_0553.quotedTotal,
  nextGQuoteUSD:sourcePrice("NG-260916")?.quotedTotal??null,

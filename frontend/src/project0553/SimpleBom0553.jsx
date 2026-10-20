@@ -13,7 +13,7 @@ import {BOM_READ_MODEL_0553} from "./data/bomReadModel0553";
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./data/z1fTelLayoutIndex0553";
 import {deriveZ1FTelBulkRoutes0553} from "./data/z1fParametricBulkRoutes0553";
 import {DTRS_RFI_BULK_0553} from "./data/dtrsRfiBulk0553";
-import {deriveWpSystemBulkBudget0553} from "./data/wpSystemBulkBudget0553";
+import {deriveMGWSelectedWpSystemBulk0553} from "./data/mgwR2SelectedFieldBulk0553";
 import {deriveDtrsRfiBudget0553} from "./data/dtrsRfiBudgetCalculation0553";
 import {deriveRaconTerminationBudget0553} from "./data/raconTerminationBudget0553";
 import {deriveSevenLocationCostLedger0553} from "./data/sevenLocationCostCalculations0553";
@@ -34,7 +34,7 @@ import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom"
 // One operational BOM surface. All Source/Engineering/Vendor links derive from existing registries.
 export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB"}){
  const zwp20Cost=deriveZWP20SiteCost0553();
- const wpSystemBulk=deriveWpSystemBulkBudget0553();
+ const wpSystemBulk=deriveMGWSelectedWpSystemBulk0553();
  // Read-only ALL-MR subtotal from the exact System x Location x MTO projection.
  // A5 is already attributed inside MR0001; never add it twice.
  const allMrWorking=compareAEquipmentToLocation0553();
@@ -180,8 +180,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Site</th><th>System</th><th>Bulk material / interface</th><th>Quantity</th><th>Rate THB</th><th>Budget THB</th><th>Evidence / state</th></tr></thead><tbody>
   {wpSystemBulk.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.systems.flatMap(sys=>sys.items.map((item,i)=><tr key={w.wp+sys.id+item.id+i}><td>{w.wp}</td><td>{w.siteClass}</td><td>{sys.name}</td><td>{item.item}</td><td>{item.qty===null?"DERIVE":item.qty+" "+item.unit}</td><td>{money(item.rateTHB,"THB")}</td><td>{money(item.extendedTHB,"THB")}</td><td>{item.status}<small>{item.source}</small></td></tr>)))}
   </tbody></table></div></ControlledModuleSection0553>
-  <ControlledModuleSection0553 moduleKey="bid.budget.bom.mr0004.racon-termination-bulk" title="RACON · SEABEACON-2 Termination-Based Bulk · ZWP20/21/22">
-   <p className="p55-note">Source: Tideland 070.1016-DWG Rev.C, application diagram p3. ORGA QTORG2609244 p4 includes BFOU 12C × 1.5mm² runs (5m + 5m + 10m) and 6 CMP T3CDS glands. Its p8 general exclusion contradicts this and must be clarified. RACON, Control Box, DB-5P are package owned and never added as extra enclosures. Cable sizes in drawing are for reference. Budgetary quantities only and working zero is NOT zero cost.</p>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.mr0004.racon-termination-bulk" title="RACON · HISTORICAL MDS/ORGA Termination Scenario (not selected MGW R2)">
+   <p className="p55-note"><strong>HISTORICAL MDS/ORGA COMPARATOR ONLY — NOT SELECTED MGW R2, no ORGA cable or gland credit applies to MGW.</strong> Current selected source: MGW P26-058_R2 Tideland SeaBeacon 2 System 6 plus DB-5P; see WP System Bulk above for unpriced current cable/gland/control scope. Source: Tideland 070.1016-DWG Rev.C, application diagram p3. ORGA QTORG2609244 p4 includes BFOU 12C × 1.5mm² runs (5m + 5m + 10m) and 6 CMP T3CDS glands. Its p8 general exclusion contradicts this and must be clarified. RACON, Control Box, DB-5P are package owned and never added as extra enclosures. Cable sizes in drawing are for reference. Budgetary quantities only and working zero is NOT zero cost.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Location</th><th>Circuits / Routes</th><th>Gross / ORGA supplied / Full-run replacement case</th><th>Price state</th><th>Derivation</th></tr></thead><tbody>
    {raconBudgetSites.filter(w=>site==="ALL"||site===w.wp).map(w=><React.Fragment key={w.wp}><tr><td><button type="button" className="p55-row-toggle" aria-expanded={Boolean(expanded["raconbulk:"+w.wp])} onClick={()=>open("raconbulk:"+w.wp)}>{expanded["raconbulk:"+w.wp]?"−":"+"}</button> {w.wp}</td><td>{w.routedRunCount} distinct circuit rows</td><td>{w.procurementTotalM} m / {w.vendorIncludedCableM} m / <strong>{w.additionalCablePurchaseM} m</strong><small>Cut lengths cannot automatically be spliced; replacement is a conservative purchase scenario. Group by cable type</small></td><td>{Number.isFinite(w.pricedSubtotalTHB)?money(w.pricedSubtotalTHB,"THB"):"NOT COSTED"}<small>{w.pricedCoverageCount} priced / {w.unpricedCoverageCount} unpriced cable lines · incomplete, not site total</small></td><td>{w.completionState}</td></tr>
    {expanded["raconbulk:"+w.wp]&&<tr><td colSpan={5}><div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Circuit / From → To</th><th>Cable Type</th><th>Budget Route (m)</th><th>Gross incl. 15%</th><th>Vendor included</th><th>Shortfall only</th><th>Replacement purchase</th><th>Rate THB/m</th><th>Extended / Cost Owner / Evidence</th></tr></thead><tbody>
