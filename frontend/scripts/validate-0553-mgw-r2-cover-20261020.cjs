@@ -17,6 +17,7 @@ const get=p=>require(path.join(root,"project0553",p));
 const {MGW_R2_COVER_20261020_0553:v}=get("data/mgwP26058R2Cover20261020.js");
 const {MGW_P26_058_R2_SELECTED_0553:detail}=get("data/mgwP26058R2Selected0553.js");
 const {MGW_PAUL_EMAIL_CLARIFICATIONS_0553:email}=get("data/mgwPaulEmailClarifications0553.js");
+const {MGW_ROAD_FREIGHT_PACKING_EVIDENCE_0553:delivery}=get("data/mgwRoadFreightPackingEvidence0553.js");
 const {SUPPLIER_QUOTE_LINES_0553:registry}=get("data/supplierQuoteLines.js");
 const {selectBcTurnkeyWorkingCost0553:working}=get("data/bcTurnkeyWorkingCost0553.js");
 const {MgwR2CommercialCover0553:CoverUI}=get("MgwR2CommercialCover0553.jsx");
@@ -50,6 +51,20 @@ assert.equal(v.FAT.facilityEndUserDaysMinimum,5);
 assert.equal(v.FAT.addvalueExistingWitnessDaysBudgeted,6);
 assert.equal(v.FAT.attendanceVsVenueReconciled,false);
 assert.equal(email.pricedVendorFreight.usd,2500);
+assert.equal(delivery.coverFreightUSD,2500);
+assert.equal(delivery.coverPackingUSD,500);
+assert.equal(delivery.supplierMessageRoadFreightUSD,2500);
+assert.equal(delivery.supplierConfirmsRoadFreightIncludesPacking,true);
+assert.equal(delivery.possibleOverlapUSD,500);
+assert.equal(delivery.confirmedCreditUSD,null,"No confirmed packing credit until a supplier amendment");
+assert.equal(delivery.vendorQuoteTotalUSD,368841,"Latest vendor offer unchanged by WhatsApp");
+assert.equal(delivery.adjustedSupplierTotalUSD,null);
+assert.equal(delivery.directCostPostingAllowed,false);
+assert.equal(delivery.b5WorkingSellOverrideAllowed,false);
+assert.equal(delivery.b6WorkingSellOverrideAllowed,false);
+assert.equal(delivery.navigationMap.routeDistanceKmIndicative,1639);
+assert.equal(delivery.navigationMap.transitTimeForCargoVerified,null);
+
 assert.equal(detail.equipmentTotalUSD,350341);
 assert.equal(detail.overallTotalUSD,364841);
 assert.equal(detail.services.reduce((sum,x)=>sum+x.amountUSD,0),14500);
@@ -78,10 +93,17 @@ for(const [code,serviceIds] of [
  assert(joined.includes('data-component-key="bid.budget.working.bc.'+code.toLowerCase()+'.mgw-r2-cover-20261020"'),
  "10.2 owner should surface updated MGW cover evidence "+code);
 }
+for(const code of ["B5","B6"]){
+ const html=renderToStaticMarkup(React.createElement(CoverUI,{code}));
+ assert(html.includes('data-component-key="'+delivery.moduleIds[code]+'"'),code+" new supplier chat module missing");
+ assert(html.includes("2,500.00")&&html.includes("500.00"),code+" freight/packing source values missing");
+ assert(html.includes("Confirmed deduction: NOT ESTABLISHED"),code+" no unauthorized USD500 credit");
+ assert(html.includes("Zhuhai Jutal")&&html.includes("DAP Nantong"),code+" destination and Incoterm conflict hidden");
+}
 const b3=renderToStaticMarkup(React.createElement(CoverUI,{code:"B3"}));
 assert(b3.includes("minimum")&&b3.includes("6 FAT witness days"));
 const b6=renderToStaticMarkup(React.createElement(CoverUI,{code:"B6"}));
 assert(b6.includes("ALREADY INCLUDED")&&b6.includes("NOT another USD2,500"));
 assert.equal(b.byCode.B3.workingSellTHB,2443400);
 assert.equal(JSON.stringify(owners.map(x=>[x,working().byCode[x].workingSellTHB,working().byCode[x].directCostTHB])),before);
-console.log("PASS MGW R2 20-Oct COVER: USD350341 equipment unchanged, services 14500->18500, total 364841->368841 (+4000), iFAT 5000, FAT facility 2500, road freight 2500 counted once, 10.2 B/C sell and customer release unchanged.");
+console.log("PASS MGW R2 20-Oct COVER + chat packing overlap: USD350341 equipment unchanged, services 14500->18500, total 364841->368841 (+4000), iFAT 5000, FAT facility 2500, road freight 2500 counted once, 10.2 B/C sell and customer release unchanged.");
