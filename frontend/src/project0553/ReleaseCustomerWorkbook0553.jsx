@@ -96,9 +96,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       <input ref={sourceFileRef} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
        onChange={exportNativeDraft} style={{display:"none"}} aria-label="Select original 4-Scope of Supply.xlsx"/>
       <button type="button" className="p553-detail-button" onClick={chooseNativeDraft} disabled={nativeBusy}
-       title="Choose original 4-Scope of Supply.xlsx from your computer. File processed only in your browser; outputs a new native-format working draft.">
+       title="Select source file: 4-Scope of Supply.xlsx. Windows Open dialog requires manual file selection; export name keeps the original prefix and adds WORKING_DRAFT.">
        {nativeBusy?"Preparing Native XLSX…":"Export Native XLSX — WORKING DRAFT"}
       </button>
+      <small className="p55-note">Source file: <strong>4-Scope of Supply.xlsx</strong> (choose it in the Open dialog)</small>
      </>}
     <button type="button" disabled={!canQuote} className="p553-detail-button"
       title="Approved customer XLSX requires signed release and completed checks">Final Customer Release — HOLD</button>
