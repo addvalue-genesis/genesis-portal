@@ -90,6 +90,18 @@ export const MGW_R2_COVER_20261020_0553=Object.freeze({
  facilityEndUserDaysMinimum:5,
  facilityEndUserUSD:2500,
  addvalueExistingWitnessDaysBudgeted:6,
+ // Management instruction: distinct sequential FAT stages, then JUTAL road delivery.
+ managementDistinctFATStagesConfirmed:true,
+ executionOrder:Object.freeze(["SERV-2_INTERNAL_IFAT","SERV-4_CUSTOMER_FAT_RESERVE","SERV-5_JUTAL_YARD_DELIVERY"]),
+ internalIFATPurpose:"MGW+ADDVALUE integration and readiness before Customer FAT",
+ customerFATPurpose:"Separate end-user/customer FAT premises reserved for at least five days",
+ customerFATIsSeparateFromInternalIFAT:true,
+ quotedServiceOverlap:false,
+ supplierFATPriceCreditUSD:null,
+ supplierServicesIncludedOnceInCoverUSD:7500,
+ freightAfterCustomerFATPlanned:true,
+ signedFATAgendaAndDatesConfirmed:false,
+ actualAddvalueAttendanceDaysConfirmed:false,
  attendanceVsVenueReconciled:false,
  sourceOwnerDifference:"MGW iFAT and facility are vendor service prices; ADDVALUE FAT witness personnel/travel are separately budgeted in B3; no automatic duplicate labour or facility posting"
  }),
