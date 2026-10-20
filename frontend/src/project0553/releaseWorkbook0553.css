@@ -72,6 +72,13 @@
 .p553-annex-table th:nth-child(8){width:12%}
 .p553-annex-table th:nth-child(9){width:10%}
 .p553-annex-table td{min-height:25px}
+/* 10.3 Annex B10/B11/B13/C1/C2: native-like detail cells plus source-to-total audit. */
+.p553-annex-reconciliation{margin:12px 0;overflow-x:auto}
+.p553-annex-reconciliation .p55-table{min-width:800px}
+.p553-annex-reconciliation .p55-table th,.p553-annex-reconciliation .p55-table td{padding:7px 9px;font-size:11px}
+.p553-annex-reconciliation .p553-price-cell{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.p553-annex-reconciliation small{display:block;color:#5d7180;font-size:10px;margin-top:3px}
+.p553-annex-table .p553-price-cell small{font-weight:400;line-height:1.35;white-space:normal}
 .p553-annex-remark{color:#e11d29;padding:10px 6px;line-height:1.4}
 .p553-origin-link{display:inline-flex;margin:2px 2px 2px 4px;color:#09668e;background:#eef8fc;border:1px solid #add5e3;border-radius:3px;font-size:10px;padding:2px 5px;cursor:pointer}
 .p553-origin-link:hover{background:#d9effb}
