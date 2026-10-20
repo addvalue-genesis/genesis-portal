@@ -93,6 +93,9 @@ function baseCells(sheet){
 }
 function summary(sheet,model,warnings){
  const cells=baseCells(sheet);
+ // Original customer worksheet has "xxx" / sample Qty 8; remove samples
+ // BEFORE writing current A1 TAG-group data, never erase actual Working values.
+ cells.delete("3:8");cells.delete("4:8");cells.delete("5:8");cells.delete("5:7");
  for(const p of model.a){
   const index=Number(String(p.code).slice(1))-1;
   if(index<0||index>3)throw Error("Unexpected Part A customer group "+p.code);
@@ -104,8 +107,7 @@ function summary(sheet,model,warnings){
   if(n!==null){set(cells,"F",row,r2(n));set(cells,"G",row,r2(n));}
   else warnings.push(p.code+" price pending");
  }
- // Remove dummy original examples, not actual supplier data.
- cells.delete("3:8");cells.delete("4:8");cells.delete("5:8");
+
  for(let i=1;i<=14;i++){
   const code="B"+i,row=i+23,owner=model.b.find(x=>x.code===code),price=num(owner?.customerSellTHB);
   if(price===null){warnings.push(code+" sell pending");continue;}
@@ -164,7 +166,7 @@ function worksheet(sheet,index,cells){
  '</cols><sheetData>'+rows.join("")+'</sheetData><mergeCells count="'+merges.length+'">'+
  merges.map(x=>'<mergeCell ref="'+x+'"/>').join("")+'</mergeCells>'+
  '<pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/>'+
- '<pageSetup orientation="landscape" fitToWidth="1" fitToHeight="0"/></worksheet>';
+ '<pageSetup orientation="landscape"/></worksheet>';
 }
 function excelParts(model,warnings){
  const wb='<?xml version="1.0" encoding="UTF-8"?>'+
