@@ -49,7 +49,7 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
    </tr></tbody>
   </table></div>
   <h4>2. Site × Team Workdays × Working SELL — Shared across MR Test IDs</h4>
-  <p className="p55-note">The same 2 persons work as one team at each Site. ZWP20, for example, has 8 workdays (16 MD) to cover MR0001–0004 in that one timebox; it is NOT 8 days per MR. K17 SIT and K18 Punch are reserved once across all applicable sites.</p>
+  <p className="p55-note">The same 2 persons work as one team at each Site. The shared Site Working SELL is NOT per MR: ZWP20 has 8 workdays (16 MD) to cover MR0001–0004 in that one timebox; it is NOT 8 days per MR. K17 SIT and K18 Punch are reserved once across all applicable sites.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1000,width:"100%",tableLayout:"fixed"}}>
    <thead><tr><th>Site / Work Package</th><th>Rev.K / Linked MR Test Groups</th><th>People</th><th>Team days</th><th>Man-days</th><th>Team SELL / day</th><th>Included Labour SELL THB</th><th>Work scope / Quantity basis</th></tr></thead>
    <tbody>{model.budgetarySiteTimeboxes.map(t=><tr key={t.id} data-component-key={model.moduleId+".timebox."+t.id.toLowerCase()}>
