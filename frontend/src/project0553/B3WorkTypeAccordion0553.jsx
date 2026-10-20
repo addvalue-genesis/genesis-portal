@@ -6,13 +6,14 @@ import {B3SiteMrSatCoverage0553} from "./B3SiteMrSatCoverage0553";
 import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
+import {selectB3WorkTypeReconciliation0553} from "./data/b3WorkTypeReconciliation0553";
 
 // Presentation-only B3 grouping. No new source prices, Cost Owner or cost posting.
 // Use native <details> so Project Module Navigator can open ALL ancestors of a leaf.
 const ROOT="bid.budget.working.bc.b3";
 const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 
-function B3Group0553({number,kind,title,description,defaultOpen=false,children}){
+function B3Group0553({number,kind,title,description,sellTHB=null,sourceId=null,auditOnly=false,defaultOpen=false,children}){
  const moduleId=ROOT+"."+kind;
  return <details className={"p553-b3-group p553-b3-group--"+kind}
   data-component-key={moduleId} defaultOpen={defaultOpen}>
@@ -20,6 +21,7 @@ function B3Group0553({number,kind,title,description,defaultOpen=false,children})
    <span className="p553-b3-sequence">{number}</span>
    <span className="p553-b3-summary-label"><strong>{title}</strong>
     <small>{description}</small><code>{moduleId}</code></span>
+   <span className="p553-b3-group-total"><strong>{auditOnly?"AUDIT ONLY":money(sellTHB)}</strong><small>{auditOnly?"NON-ADDITIVE":"CURRENT WORKING SELL"}</small></span>
   </summary>
   <div className="p553-b3-group-body">
    <p className="p55-note">Group Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/></p>
@@ -57,6 +59,8 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
    .forEach(node=>{node.open=open;});
  };
  const veex=sat.veex;
+ const price=selectB3WorkTypeReconciliation0553(workingRow);
+ const priceBy=id=>price.categories.find(x=>x.id===id);
  return <section className="p553-b3-worktype" ref={rootRef}
   data-component-key={ROOT+".worktype-accordion"}>
   <div className="p553-b3-worktype-header">
@@ -69,7 +73,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
    </div>
   </div>
   <B3Group0553 number="B3.1" kind="fat" title="FAT — Factory Acceptance Test"
-   description="MGW China · OEM FAT evidence / ADDVALUE witness and travel" defaultOpen>
+   description="MGW China · OEM FAT evidence / ADDVALUE witness and travel" sellTHB={priceBy("B3.1").workingSellTHB} defaultOpen>
    <B3Item0553 number="B3.1.1" title="MGW Rev.2 Supplier iFAT / Facility Evidence"
     moduleId={ROOT+".mgw-r2-cover-20261020"} defaultOpen>
     <MgwR2CommercialCover0553 code="B3"/>
@@ -94,7 +98,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
   </B3Group0553>
 
   <B3Group0553 number="B3.2" kind="sat" title="SAT / SIT — Offshore Site & Integration Tests"
-   description="Seven locations · 40 team-days · 19 Site/MR tests + SIT/Punch" defaultOpen>
+   description="Seven locations · 40 team-days · 19 Site/MR tests + SIT/Punch" sellTHB={priceBy("B3.2").workingSellTHB} defaultOpen>
    <B3Item0553 number="B3.2.1" title="40-Day SAT/SIT Execution Budget"
     moduleId={ROOT+".40-day-abc"} defaultOpen>
     <section className="p55-panel" data-component-key={ROOT+".40-day-abc"} style={{padding:12}}>
@@ -112,7 +116,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
   </B3Group0553>
 
   <B3Group0553 number="B3.3" kind="tools" title="Test Equipment — Temporary FAT/SAT Tools"
-   description="Temporary test rental B3; permanent O&amp;M special tools B11">
+   description="Temporary test rental B3; permanent O&amp;M special tools B11" sellTHB={priceBy("B3.3").workingSellTHB}>
    <B3Item0553 number="B3.3.1" title="VeEX MX100+ — Temporary SAT Rental"
     moduleId={ROOT+".veex-mx100"}>
     <section className="p55-panel" data-component-key={ROOT+".veex-mx100"} style={{padding:12}}>
@@ -138,7 +142,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
   </B3Group0553>
 
   <B3Group0553 number="B3.4" kind="audit" title="Price Reconciliation / Requirement & Cost Audit"
-   description="Canonical THB 2,443,400 · 19 obligations · historical audit is non-posting">
+   description="Canonical THB 2,443,400 · 19 obligations · historical audit is non-posting" auditOnly>
    <B3Item0553 number="B3.4.1" title="Working SELL Breakdown — Single Source"
     moduleId={ROOT+".working-sell-breakdown"}>
     <B3WorkingSellBreakdown0553 workingRow={workingRow}/>
