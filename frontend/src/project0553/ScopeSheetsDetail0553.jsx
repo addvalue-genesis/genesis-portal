@@ -55,8 +55,8 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
  const scopeSheetSources=Object.fromEntries([...linkedScopeCodes].map(code=>[code,selectScopeSheet0553(code,{thbPerUsd:fx?.thbPerUsd})]));
  const workingMR4USD=MR0004_WORKING_BOM_0553.sites.reduce((sum,s)=>sum+s.controlledTotalUSD,0);
  // A2 is sourced from the SAME MR0002 per-site Working BOM, including the RFI-LNA.
- // Management excluded MGW rates: omit MGW vendor rows, never erase independently
- // evidenced RFI-LNA and THB field allowance entries.
+ // Historical exclusion rule below is for old A2 legacy scratch data only; ACTIVE
+ // Working A2 must read the selected MGW P26-058_R2 quotation through sourceMrProjection.A2.
  const a2Eligible=MR0002_WORKING_BOM_0553.sites.flatMap(s=>s.items)
   .filter(x=>x.countedInWorkingTotal&&Number.isFinite(x.extended)&&x.source!=="MGW-P26-058"&&!String(x.owner||"").startsWith("MGW_"));
  const a2THB=a2Eligible.filter(x=>x.currency==="THB").reduce((n,x)=>n+x.extended,0);
@@ -119,8 +119,8 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
    source:"MR0001 TAG Cost Ledger → system-location-mto; A1 is the full allocated amount including bulk. A5 is a non-additive disclosure only",
    status:"WORKING ALLOCATED EQUIPMENT/BULK — INCLUDES A5; same MR0001 BOM total; NOT full A+B+C"},
   A2:sourceLine("A2","MR0002 vendor working lines; engineering/source gates retained"),
-  A3:sourceLine("A3","MR0003 preliminary phone/sounder/JB scenario",true),
-  A4:sourceLine("A4","MR0004 ORGA provisional three-location equipment scenario"),
+  A3:sourceLine("A3","Selected MGW R2 Gai-Tronics 212-02-6008-410, EATON DB3B and WAROM BXJ-S; 4 sites, external field bulk unpriced"),
+  A4:sourceLine("A4","Selected MGW R2 Tideland SeaBeacon 2 System 6; 3 sites, DB-5P included, control/bulk pending"),
   A5:{amount:a5.a5PriceTHB,source:a5.source+"; exact "+a5.rowCount+" source MTO Bulk cost-owner rows; A1→A5 display reclassification only",
    status:"INCLUDED IN A1 — NON-ADDITIVE MEMO ONLY; "+a5.state+"; "+a5Unpriced+" remaining field-bulk/accessory evidence gaps"}
  };
