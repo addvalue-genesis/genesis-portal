@@ -122,8 +122,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <td>{r?i+1:""}</td><td>{r?.tagNo||""}{internal&&r&&viewSource(r)}</td>
        <td>{r?.description||""}</td><td>{r?.specification||""}</td>
        <td>{r?.materials||""}</td><td>{r?.qty??""}</td>
-       <td className="p553-price-cell">{format(r?.customerUnitTHB)}</td>
-       <td className="p553-price-cell">{format(r?.customerTotalTHB)}</td>
+       <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):Number.isFinite(r.customerUnitTHB)?format(r.customerUnitTHB):code==="C2"?"Not quote":""}</td>
+       <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):Number.isFinite(r.customerTotalTHB)?format(r.customerTotalTHB):code==="C2"?"Not quote":""}</td>
        {code.startsWith("C")&&<td>{r?.leadTimeARO??""}</td>}
       </tr>;
      })}
