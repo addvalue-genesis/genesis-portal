@@ -53,6 +53,7 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
      B1.1–B1.8 below are INTERNAL project support cost accounts. B1.A is read-only Audit.
      No historical 964-MH engineering or old PM rate is reposted.</p>
     <p className="p55-note"><strong>Module ID:</strong> {copy(ROOT+".revk-pm-milestones")}</p>
+    <p className="p55-note"><strong>Accordion UI Module:</strong> {copy(ROOT+".worktype-accordion")}</p>
    </div>
    <div className="p553-b1-actions">
     <button type="button" className="p553-detail-button" onClick={()=>expandAll(true)}>＋ Expand All</button>

@@ -45,11 +45,13 @@ assert.equal(JSON.stringify(selectBcTurnkeyWorkingCost0553()),original,
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");
 const page=read("pages/PJ26080553.jsx");
 const workspace=read("project0553/CommercialWorkspace.jsx");
+const hierarchy=read("project0553/BcWorkingHierarchy0553.jsx");
 const css=read("project0553/project0553.css");
 const compile=p=>babel.transformSync(p,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code;
 assert(compile(page).length>0,"Project Navigator JSX Babel transpilation");
 assert(compile(workspace).length>0,"Budget Working module JSX Babel transpilation");
+assert(compile(hierarchy).length>0,"B/C color-coded hierarchy JSX Babel transpilation");
 assert(page.includes('buildBcModuleNavigator0553()')&&page.includes('...buildBcModuleNavigator0553()'),
  "Project search must include canonical B/C module index");
 assert(page.includes('navigableModules.filter('),"Navigator Search must filter complete modules");
@@ -61,13 +63,17 @@ assert(page.includes('navigationTarget={navTarget}')&&page.includes('navigationS
  "Clicked target must reach Budget workspace even on repeated selection");
 assert(workspace.includes('data-component-key="bid.budget.working.bc"'),
  "Canonical 10.2 disclosure must be present");
-assert(workspace.includes('data-component-key={item.moduleId}'),
- "Each B/C source row must render exact canonical ID");
+assert(hierarchy.includes('data-component-key={item.moduleId}'),
+ "Each B/C source row must render exact canonical ID in work-type accordion");
 assert(workspace.includes('data-component-key={bcGroupIdByWorkflow.get(r.workflow)}'),
  "Each of four workflow groups must expose real target ID");
 assert(workspace.includes('parent.open=true')&&workspace.includes('exact.scrollIntoView(')&&workspace.includes("openModuleAncestors0553(exact)"),
  "Module navigator must open all nested disclosures and scroll to exact selected anchor");
-assert(workspace.includes("navigationTarget===item.moduleId")&&css.includes("p553-module-nav-target"),
+assert(hierarchy.includes("navigationTarget===item.moduleId")&&css.includes("p553-module-nav-target"),
  "Selected B/C row must be identifiable visually");
 assert(!workspace.includes("directCostTHB:0"),"No empty cost invented for search");
+assert(workspace.includes('if(bcTab==="ALL"){setBcTab(owner);setBcDetailCode(owner);return;}'),
+ "Deep links must select the owner tab before resolving nested module IDs");
+assert(hierarchy.includes('new Set(["B1"])'),"B1 rows should be visible by default");
+assert(hierarchy.includes("Expand All")&&hierarchy.includes("Collapse All"));
 console.log("PASS PJ2608-0553 Project Module Navigator 10.2: 21 base IDs retained, B3 SAT/Requirement nested IDs added, deep exact Module anchors and cost source preserved.");
