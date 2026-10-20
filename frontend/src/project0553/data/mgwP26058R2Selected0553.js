@@ -24,7 +24,7 @@ export const MGW_P26_058_R2_SELECTED_0553=Object.freeze({
   "MR-0004":["ZWP20","ZWP21","ZWP22"]
  }),
  lines:Object.freeze([
-  row("UHF-1","MR-0002",["ZWP20","ZWP21","ZWP22"],"RFI / WAROM","BD4345-00N0-AC + HRMD95-VIIIB",3,31474,
+  row("UHF-1","MR-0002",["ZWP20","ZWP21","ZWP22"],"RFI / WAROM","BD4345-00N0-AC",3,31474,
    ["RFI BD4345-00N0-AC UHF BDA 430–450 MHz","WAROM HRMD95-VIIIB Ex d protective enclosure 800×540×270 internal","wall-mounted components"]),
   row("UHF-2","MR-0002",["ZWP20","ZWP21","ZWP22"],"RFI / PolyPhaser / Solexy","YBSS6-99 + UNV2 + IS-B50LN-C2 + RXNMS0200JX0",3,847,
    ["RFI YBSS6-99 6-element Yagi antenna","UNV2 stainless steel universal angle clamp",
