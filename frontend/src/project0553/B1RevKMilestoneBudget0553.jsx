@@ -1,68 +1,216 @@
-import React,{useState} from "react";
+import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectB1ProjectSupportBudget0553} from "./data/b1ProjectSupportBudget0553";
 
-const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT VERIFIED";
-const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US"):"TBC";
+// 10.2 / B1. Presentation ONLY: canonical B1.1–B1.8 source accounts, no repricing.
+// B1.A is AUDIT (never an additional contractual or financial cost account).
+// Native <details> preserves nested Project Module Navigator deep-link behavior.
+const ROOT="bid.budget.working.bc.b1";
+const amount=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT VERIFIED";
+const quantity=n=>Number.isFinite(n)?n.toLocaleString("en-US"):"TBC";
+const slug=account=>account.toLowerCase().replace(".","-");
+export const b1AccountModuleId0553=account=>ROOT+".account."+slug(account);
+export const b1AccountLineModuleId0553=(account,lineId)=>b1AccountModuleId0553(account)+".line."+String(lineId).toLowerCase();
+const accountTone=Object.freeze({
+ "B1.1":"management","B1.2":"meetings","B1.3":"travel","B1.4":"administration",
+ "B1.5":"regulatory","B1.6":"legal","B1.7":"permits","B1.8":"misc"
+});
+const auditItems=Object.freeze([
+ ["B1.A.1","role-rates","Support Role Rates"],
+ ["B1.A.2","revk-events","Rev.K Milestones"],
+ ["B1.A.3","engineering-review","Unpriced Engineering Review"],
+ ["B1.A.4","indirect-ledger","Cost Owner / Indirect Evidence"],
+ ["B1.A.5","source-audit","Historical Source & Cost Verification"]
+]);
+const copy=id=><span className="p553-b1-copy" onClick={e=>{e.preventDefault();e.stopPropagation();}}
+ onKeyDown={e=>e.stopPropagation()}>
+ <ComponentCopyId projectId="PJ2608-0553" componentKey={id}/>
+ </span>;
 
-// B1 Rev.K is the current INTERNAL role-based B1 pricing basis; never rename the
-// customer's Engineering and Design B1 1-Lot item and not a second sell posting.
-export function B1RevKMilestoneBudget0553(){
+function B1AuditLeaf0553({number,kind,title,children}){
+ const id=ROOT+".audit."+kind;
+ return <details className="p553-b1-item" data-component-key={id}>
+  <summary className="p553-b1-item-summary"><span className="p553-b1-numeral">{number}</span>
+   <span className="p553-b1-summary-label"><strong>{title}</strong><code>{id}</code></span>{copy(id)}
+  </summary>
+  <div className="p553-b1-item-body">{children}</div>
+ </details>;
+}
+
+export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null}){
  const model=selectB1ProjectSupportBudget0553();
- const [openAccounts,setOpenAccounts]=useState(["B1.1","B1.2","B1.3","B1.4","B1.5","B1.6","B1.7","B1.8"]);
- const [showMilestones,setShowMilestones]=useState(true);
- const [showRates,setShowRates]=useState(true);
- const toggleAccount=account=>setOpenAccounts(v=>v.includes(account)?v.filter(x=>x!==account):[...v,account]);
+ const rootRef=React.useRef(null);
  const totalBase=model.accounts.reduce((n,x)=>n+x.baseWorkingCostTHB,0);
- return <section className="p55-panel" data-component-key="bid.budget.working.bc.b1.revk-pm-milestones" style={{padding:14,marginTop:12}}>
-  <div className="p55-eyebrow">PJ2608-0553 / B1 INTERNAL CFO PLAN / K00–K18 <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.working.bc.b1.revk-pm-milestones"/></div>
-  <h3>B1.1–B1.8 — Project Management, Administration & General Project Expenses</h3>
-  <p className="p55-note"><strong>Scope boundary:</strong> Original customer B1 stays <strong>Engineering and Design / 1 Lot</strong>. This is the ADDVALUE internal residual project-cost plan, including Administration, Accountant, Procurement, Coordinator and PM effort across unique Rev.K milestones. B2 VDRL; B3 MGW FAT witness, offshore SAT/SIT and hired test equipment; B5 packing; B6 DDP freight/customs broker; B7 vendor storage; and B9 optional seven-day Yard Specialist remain separate. No activity is billed twice.</p>
-  <div className="p55-metric-grid">
-   <div><strong>Support Labour (7 roles / {model.labourHours} MH)</strong><p>Cost {money(model.labourWorkingCostTHB)}</p><small>Planning loaded salary, not verified payroll</small></div>
-   <div><strong>B1 Base Project Expenses</strong><p>Cost {money(model.baseExpenseWorkingCostTHB)}</p><small>Meetings, management travel, project office, filing, misc</small></div>
-   <div><strong>Support Base Working Cost</strong><p>{money(model.baseWorkingCostTHB)}</p><small>Indicative allocated cost, NOT actual Direct Cost</small></div>
-   <div><strong>Support Base Working SELL</strong><p>{money(model.baseWorkingSellTHB)}</p><small>20% labour gross margin + 10% non-labour handling, provisional</small></div>
-   <div><strong>B1 Conditional Expenses</strong><p>{money(model.conditionalWorkingSellTHB)}</p><small>Legal consultant and official permit fee, NOT in base</small></div>
-   <div><strong>NEW Canonical B1 Working SELL</strong><p>{money(model.canonicalB1WorkingSellTHB)}</p><small>Only new B1.1–B1.8 role/activity budget; NO old Engineering/PM price carried forward</small></div>
+ if(model.accounts.length!==8||model.canonicalB1WorkingSellTHB!==211600||
+  model.baseWorkingSellTHB!==211600||model.conditionalWorkingSellTHB!==51700||
+  model.actualDirectCostTHB!==null||model.historicalEngineeringCarryForwardTHB!==0)
+  throw Error("B1 accordion source/owner reconciliation failed");
+ const expandAll=isOpen=>{
+  rootRef.current?.querySelectorAll("details.p553-b1-group, details.p553-b1-item")
+   .forEach(node=>{node.open=isOpen;});
+ };
+ return <section className="p55-panel p553-b1-worktype" ref={rootRef}
+  data-component-key={ROOT+".revk-pm-milestones"} style={{padding:14,marginTop:12}}>
+  <div className="p55-eyebrow">10.2 / B1 — INTERNAL PROJECT SUPPORT · Rev.K K00–K18</div>
+  <div className="p553-b1-header" data-component-key={ROOT+".worktype-accordion"}>
+   <div><h3>B1 — Engineering &amp; Design / Internal Project Cost Groups</h3>
+    <p className="p55-note"><strong>Canonical B1 Working SELL: {amount(model.canonicalB1WorkingSellTHB)}</strong>
+     {" "}· Planning Working Cost {amount(model.baseWorkingCostTHB)}
+     {" "}· Conditional SELL {amount(model.conditionalWorkingSellTHB)} (EXCLUDED FROM BASE).
+     Direct Cost NOT ESTABLISHED · Customer RELEASE HOLD.</p>
+    <p className="p55-note">Customer B1 = Engineering and Design / 1 Lot (unchanged).
+     B1.1–B1.8 below are INTERNAL project support cost accounts. B1.A is read-only Audit.
+     No historical 964-MH engineering or old PM rate is reposted.</p>
+    <p className="p55-note"><strong>Module ID:</strong> {copy(ROOT+".revk-pm-milestones")}</p>
+   </div>
+   <div className="p553-b1-actions">
+    <button type="button" className="p553-detail-button" onClick={()=>expandAll(true)}>＋ Expand All</button>
+    <button type="button" className="p553-detail-button" onClick={()=>expandAll(false)}>− Collapse All</button>
+   </div>
   </div>
-  <p className="p55-note"><strong>NEW B1 COST OWNER:</strong> B1 Working SELL is <strong>{money(model.canonicalB1WorkingSellTHB)}</strong> from current THB role-based labor + explicit project expense allowances only. Historical 27 Engineering WBS prices and the previous USD600 PM proxy are <strong>EXCLUDED, not added or used for calibration</strong>. Actual Payroll/Invoices still unverified, customer bid release blocked. Technical engineering tasks requiring separate ADDVALUE design rather than B2 VDRL or OEM included work are held in the Engineering Scope Review below, with zero legacy price carryforward.</p>
-  <p className="p55-note"><strong>Rate assumptions:</strong> Thai office-role salary scenarios: 22 days × 8 hours/month; employer burden 20%, no additional general overhead in this loaded rate; labour Working SELL = labour planning cost / 0.80 (20% target gross margin). Non-labour Working SELL = documented planning expense × 1.10. All salary, trip, regulatory and spending quantities are PRE-AWARD estimates requiring ADDVALUE internal verification.</p>
-  <button type="button" className="p553-detail-button" onClick={()=>setShowRates(v=>!v)}>{showRates?"− Hide":"＋ Show"} Seven Role Cost Rates — THB, not USD600</button>
-  {showRates&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Role / Resource</th><th>Allocated B1 Account</th><th>Monthly Salary Assumption</th><th>Loaded Working Cost / MH</th><th>Basis / Status</th></tr></thead>
-  <tbody>{Object.entries(model.roleRates).map(([key,r])=><tr key={key}><td><strong>{r.name}</strong></td><td>{r.account}</td><td className="is-number">{money(r.monthlyTHB)}</td><td className="is-number">{money(r.monthlyTHB*model.employerLoadFactor/model.workHoursPerMonth)}</td><td>THAILAND 2026 INDICATIVE / payroll unverified</td></tr>)}</tbody></table></div>}
-  <h4>B1.1–B1.8 — Quantity, Unit Cost, Working Cost &amp; Sell</h4>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Cost Account</th><th>Indirect / Project-specific Expense</th><th>Base Working Cost THB</th><th>Base Working Sell THB</th><th>Conditional Working Sell THB</th><th>Details</th></tr></thead>
-   <tbody>{model.accounts.map(group=><React.Fragment key={group.account}>
-    <tr><td><strong>{group.account}</strong></td><td><strong>{group.label}</strong><small>{group.qtyRows} source-bound resource/expense lines</small></td>
-     <td className="is-number">{money(group.baseWorkingCostTHB)}</td>
-     <td className="is-number">{money(group.baseWorkingSellTHB)}</td>
-     <td className="is-number">{money(group.conditionalWorkingSellTHB)}</td>
-     <td><button type="button" className="p553-detail-button" aria-expanded={openAccounts.includes(group.account)} onClick={()=>toggleAccount(group.account)}>{openAccounts.includes(group.account)?"− Hide":"＋ View"}</button></td></tr>
-    {openAccounts.includes(group.account)&&<tr><td colSpan={6}><div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1200,width:"100%"}}>
-     <thead><tr><th>Expense ID / K WBS</th><th>Activity / Staff Role</th><th>Qty</th><th>Unit Cost THB</th><th>Working Cost THB</th><th>Working Sell THB</th><th>Evidence / Booking Condition</th></tr></thead>
-     <tbody>{group.rows.map(x=><tr key={x.id}><td><strong>{x.id}</strong><small>{x.wbs}</small></td><td>{x.activity}<small>{x.conditional?"CONDITIONAL — EXCLUDED FROM BASE":"BASE PLANNING"}</small></td><td>{qty(x.qty)} {x.unit}</td><td>{money(x.unitCostTHB)}</td><td>{money(x.workingCostTHB)}</td><td>{money(x.workingSellTHB)}</td><td>{x.verification}<small>Actual Direct Cost: NOT VERIFIED</small></td></tr>)}</tbody>
-    </table></div></td></tr>}
-   </React.Fragment>)}
-   <tr><td colSpan={2}><strong>B1 INTERNAL BASE SUPPORT ESTIMATE</strong></td><td className="is-number"><strong>{money(totalBase)}</strong></td><td className="is-number"><strong>{money(model.baseWorkingSellTHB)}</strong></td><td className="is-number"><strong>{money(model.conditionalWorkingSellTHB)}</strong></td><td>Current 10.2 canonical B1 only; no additional posting</td></tr>
-  </tbody></table></div>
-  <button type="button" className="p553-detail-button" onClick={()=>setShowMilestones(v=>!v)}>{showMilestones?"− Hide":"＋ Show"} Rev.K K00–K18 Role-Based Milestone Allocation</button>
-  {showMilestones&&<div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1100,width:"100%"}}>
-   <thead><tr><th>K / Module ID</th><th>Milestone</th><th>Resource Roles</th><th>Support MH</th><th>Working Cost THB</th><th>Working SELL THB</th><th>Separate Execution Owner</th></tr></thead>
-   <tbody>{model.milestones.map(k=><tr key={k.stage} data-component-key={k.moduleId}>
-    <td><strong>{k.stage}</strong><small>{k.moduleId}</small><ComponentCopyId projectId="PJ2608-0553" componentKey={k.moduleId}/></td>
-    <td>{k.phase}<small>Unique charge: {k.chargeOwnerStage}</small></td>
-    <td>{k.rows.length?k.rows.map(r=>r.roleName+" "+r.qty+"MH").join(" · "):"Shared event — charged in "+k.chargeOwnerStage}</td>
-    <td>{k.estimatedMH||"—"}</td><td>{k.rows.length?money(k.budgetaryCostTHB):"Included"}</td>
-    <td>{k.rows.length?money(k.workingSellTHB):"Not additive"}</td><td>{k.executionCostOwner}</td>
-   </tr>)}</tbody>
-  </table></div>}
-  <h4>B1 Technical Engineering Ownership Review — 27 old activity TITLES, no legacy price</h4>
-  <p className="p55-note">Technical engineering must remain priced in B1 only when ADDVALUE has a distinct requirement/deliverable that is not included in MGW OEM Part A, B2 VDRL or B3 test execution. Activities below are source titles used for screening, with historic quantities, rates and sell removed. No automatic amount is carried to B1.</p>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-   <thead><tr><th>Ref / MR</th><th>Engineering Activity</th><th>Provisional Owner / Decision</th><th>Working Sell</th></tr></thead>
-   <tbody>{model.engineeringScopeReview.map(x=><tr key={x.id}><td>{x.id}<small>{x.group}</small></td><td>{x.activity}</td><td>{x.proposedOwner}<small>{x.status} · RACI / MGW included / B2 documentation verification required</small></td><td>NOT PRICED — no old WBS price</td></tr>)}</tbody>
-  </table></div>
-  <p className="p55-note"><strong>Risk gates:</strong> B1.2 expenses require lawful hospitality evidence; B1.3 uses management-only Trip IDs; B1.6 consultant requires written lawful scope and due diligence; B1.7 official fees require published authority rates/receipts and confirmed ADDVALUE liability. Conditional THB {model.conditionalWorkingCostTHB.toLocaleString("en-US")} Working Cost and {money(model.conditionalWorkingSellTHB)} Working Sell remain separate from Base. No facilitation payments, unofficial commissions or unsupported expense reimbursements.</p>
+  <div className="p55-metric-grid">
+   <div><strong>Support Labour ({Object.keys(model.roleRates).length} roles / {model.labourHours} MH)</strong>
+    <p>{amount(model.labourWorkingCostTHB)}</p><small>Planning loaded salary, not payroll</small></div>
+   <div><strong>Base Project Expenses</strong><p>{amount(model.baseExpenseWorkingCostTHB)}</p><small>Non-labour base only</small></div>
+   <div><strong>Support Base Working Cost</strong><p>{amount(model.baseWorkingCostTHB)}</p><small>NOT verified Direct Cost</small></div>
+   <div><strong>Base Working SELL</strong><p>{amount(model.baseWorkingSellTHB)}</p><small>Same single owner B1</small></div>
+   <div><strong>Conditional Expenses / SELL</strong><p>{amount(model.conditionalWorkingSellTHB)}</p>
+    <small>Lawful legal / government fees; NOT in Base</small></div>
+   <div><strong>Historical Carry-forward</strong><p>THB 0.00</p><small>Old engineering / PM excluded</small></div>
+  </div>
+  <p className="p55-note">Rate assumptions: 22 workdays × 8 h/month, 20% employer load;
+   provisional 20% labour gross-margin target / 10% non-labour handling.
+   All commercial cost and rate inputs require evidence before customer release.</p>
+
+  {model.accounts.map((group,index)=>{
+   const id=b1AccountModuleId0553(group.account),tone=accountTone[group.account];
+   const budgetId=id+".budget",gateId=id+".verification";
+   return <details key={group.account} className={"p553-b1-group p553-b1-group--"+tone}
+    data-component-key={id} defaultOpen={index===0}>
+    <summary className="p553-b1-summary">
+     <span className="p553-b1-numeral">{group.account}</span>
+     <span className="p553-b1-summary-label"><strong>{group.label}</strong>
+      <small>{group.qtyRows} source line(s) · Base SELL {amount(group.baseWorkingSellTHB)}
+       {" "}· Conditional {amount(group.conditionalWorkingSellTHB)}</small>
+      <code>{id}</code></span>{copy(id)}
+    </summary>
+    <div className="p553-b1-group-body">
+     <B1AccountBudget0553 account={group} number={group.account+".1"} moduleId={budgetId}/>
+     <details className="p553-b1-item" data-component-key={gateId}>
+      <summary className="p553-b1-item-summary">
+       <span className="p553-b1-numeral">{group.account}.2</span>
+       <span className="p553-b1-summary-label"><strong>Cost Owner, Verification &amp; Conditions</strong>
+        <code>{gateId}</code></span>{copy(gateId)}
+      </summary>
+      <div className="p553-b1-item-body">
+       <p className="p55-note"><strong>Owner B1 only.</strong> Quantities and THB Working Cost / SELL
+        are planning assumptions. Verified Direct Cost remains NULL.</p>
+       <p className="p55-note">Base Working Cost: {amount(group.baseWorkingCostTHB)} |
+        Base Working SELL: {amount(group.baseWorkingSellTHB)} |
+        Conditional SELL (excluded): {amount(group.conditionalWorkingSellTHB)}</p>
+       {group.rows.map(x=><p key={x.id} className="p55-note"><strong>{x.id}:</strong> {x.verification}
+        {" "}· {x.conditional?"Conditional / not Base":"Included once in Base"}.</p>)}
+      </div>
+     </details>
+    </div>
+   </details>;
+  })}
+
+  <details className="p553-b1-group p553-b1-group--audit" data-component-key={ROOT+".audit"}>
+   <summary className="p553-b1-summary">
+    <span className="p553-b1-numeral">B1.A</span>
+    <span className="p553-b1-summary-label"><strong>Audit / Traceability — Non-posting Evidence</strong>
+     <small>Role rates, 19 Rev.K milestones, 27 engineering titles, cost-owner ledger, sources</small>
+     <code>{ROOT+".audit"}</code></span>{copy(ROOT+".audit")}
+   </summary>
+   <div className="p553-b1-group-body">
+    <B1AuditLeaf0553 number="B1.A.1" kind="role-rates" title="Seven Role Rates — Internal THB Basis">
+     <p className="p55-note">No USD600 specialist rate may be used for office administration.
+      Loaded rates are estimates, not actual payroll direct cost.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Role</th><th>Cost Account</th><th>Monthly Salary Assumption</th><th>Loaded Working Cost / MH</th><th>Status</th></tr></thead>
+      <tbody>{Object.entries(model.roleRates).map(([key,r])=><tr key={key}>
+       <td><strong>{r.name}</strong></td><td>{r.account}</td><td>{amount(r.monthlyTHB)}</td>
+       <td>{amount(r.monthlyTHB*model.employerLoadFactor/model.workHoursPerMonth)}</td>
+       <td>THAILAND 2026 INDICATIVE · Payroll unverified</td></tr>)}</tbody>
+     </table></div>
+    </B1AuditLeaf0553>
+    <B1AuditLeaf0553 number="B1.A.2" kind="revk-events" title="K00–K18 Unique Role / Milestone Allocation">
+     <p className="p55-note">12 unique project-support charging events across 19 Rev.K stages.
+      Shared K03–07 and K08–11 are charged only once.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1090}}>
+      <thead><tr><th>Rev.K / Module ID</th><th>Milestone</th><th>Role / Hours</th><th>Support MH</th>
+       <th>Planning Cost THB</th><th>Working SELL THB</th><th>Execution Owner</th></tr></thead>
+      <tbody>{model.milestones.map(k=><tr key={k.stage} data-component-key={k.moduleId}>
+       <td><strong>{k.stage}</strong><small>{k.moduleId}</small>{copy(k.moduleId)}</td>
+       <td>{k.phase}<small>Charge owner {k.chargeOwnerStage}</small></td>
+       <td>{k.rows.length?k.rows.map(r=>r.roleName+" "+r.qty+"MH").join(" · "):"Shared event — "+k.chargeOwnerStage}</td>
+       <td>{k.estimatedMH||"—"}</td>
+       <td>{k.rows.length?amount(k.budgetaryCostTHB):"Included"}</td>
+       <td>{k.rows.length?amount(k.workingSellTHB):"Not additive"}</td>
+       <td>{k.executionCostOwner}</td>
+      </tr>)}</tbody></table></div>
+    </B1AuditLeaf0553>
+    <B1AuditLeaf0553 number="B1.A.3" kind="engineering-review" title="27 Engineering Scope Titles — Ownership Review Only">
+     <p className="p55-note">Legacy technical engineering WBS activities are unpriced review items.
+      Distinct ADDVALUE engineering must be checked against OEM Part A, B2 VDRL and B3 testing.
+      No 964-MH historical Engineering price or quantity is carried into current B1.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Engineering ID / Module ID</th><th>Activity</th><th>Provisional Owner</th><th>Working SELL</th></tr></thead>
+      <tbody>{model.engineeringScopeReview.map(x=>{
+       const id=ROOT+".audit.engineering-review."+x.id.toLowerCase();
+       return <tr key={x.id} data-component-key={id}>
+        <td><strong>{x.id}</strong><small>{x.group}</small>{copy(id)}</td>
+        <td>{x.activity}</td><td>{x.proposedOwner}<small>{x.status}</small></td>
+        <td>NOT PRICED — No legacy WBS carry-forward</td>
+       </tr>;
+      })}</tbody></table></div>
+    </B1AuditLeaf0553>
+    <B1AuditLeaf0553 number="B1.A.4" kind="indirect-ledger" title="CFO Expense Ledger / Cost Owner Evidence">
+     {sourceLedger||<p className="p55-note">Available in 10.2 B1 working cost evidence panel.</p>}
+    </B1AuditLeaf0553>
+    <B1AuditLeaf0553 number="B1.A.5" kind="source-audit" title="Historical Source, Evidence & Direct Cost Gaps">
+     {sourceEvidence||<p className="p55-note">Read-only source audit in 10.2 B1 working cost detail.</p>}
+    </B1AuditLeaf0553>
+    <p className="p55-note"><strong>Reconciliation:</strong> 8 account Base Working Costs total
+     {" "}{amount(totalBase)} and Base SELL totals {amount(model.canonicalB1WorkingSellTHB)};
+     Conditional SELL {amount(model.conditionalWorkingSellTHB)} is separate, not additive.</p>
+   </div>
+  </details>
+  <p className="p55-note"><strong>No double posting:</strong> B1 is project-support planning.
+   B2 documentation, B3 FAT/SAT and temporary test tools, B5 packing, B6 freight/customs,
+   B9 conditional specialist assistance, and OEM Part A technical scope remain with their owners.
+   No source or SELL values have been changed by this presentation.</p>
  </section>;
+}
+
+function B1AccountBudget0553({account,number,moduleId}){
+ return <details className="p553-b1-item" data-component-key={moduleId} defaultOpen>
+  <summary className="p553-b1-item-summary">
+   <span className="p553-b1-numeral">{number}</span>
+   <span className="p553-b1-summary-label"><strong>Quantity / Working Cost / Working SELL</strong>
+    <small>{account.qtyRows} lines · Base {amount(account.baseWorkingSellTHB)}
+     {" "}· Conditional {amount(account.conditionalWorkingSellTHB)}</small>
+    <code>{moduleId}</code></span>{copy(moduleId)}
+  </summary>
+  <div className="p553-b1-item-body">
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1060}}>
+    <thead><tr><th>No. / Source ID / Copy Module ID</th><th>Activity / Role</th><th>Qty</th>
+     <th>Unit Cost THB</th><th>Working Cost THB</th><th>Working SELL THB</th>
+     <th>Evidence / Booking Condition</th></tr></thead>
+    <tbody>{account.rows.map((x,i)=>{
+     const id=b1AccountLineModuleId0553(account.account,x.id);
+     return <tr key={x.id} data-component-key={id}>
+      <td><strong>{number+"."+(i+1)} · {x.id}</strong><small>{x.wbs}</small>{copy(id)}</td>
+      <td>{x.activity}<small>{x.conditional?"CONDITIONAL — EXCLUDED FROM BASE":"BASE PLANNING"}</small></td>
+      <td>{quantity(x.qty)} {x.unit}</td><td>{amount(x.unitCostTHB)}</td>
+      <td>{amount(x.workingCostTHB)}</td><td>{amount(x.workingSellTHB)}</td>
+      <td>{x.verification}<small>Actual Direct Cost: NOT VERIFIED</small></td>
+     </tr>;
+    })}</tbody>
+   </table></div>
+   <p className="p55-note"><strong>One B1 cost owner:</strong> the row prices above are already
+    included in the canonical B1 account subtotal. Never add their displayed values to B1 a second time.</p>
+  </div>
+ </details>;
 }
