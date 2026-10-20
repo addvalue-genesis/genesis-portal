@@ -2,6 +2,7 @@
 // Values are selected INTERNAL Next G USD function rates already posted by the
 // immutable Rev02/Rev03 ledger. Do not multiply vendor quotation-wide quantities.
 import {ZWP8_ROW43_COST_TRACE} from "./zwp8Row43CostTrace";
+import {ZWP8_BOD_NEW_LINK_AUTHORITY_0553} from "./zwp8BodNewLinkAuthority0553";
 import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
 const tags=["MR-502-003","MR-502-004"];
 const get=code=>NEXTG.lines.find(x=>x.code===code);
@@ -24,10 +25,11 @@ export function getZWP8RadioOwnerEvidence0553(site,tagRow){
  return {site,tag:tagRow.tag,row:tagRow.row,unit:"Set",scopeQty:1,
   quote:NEXTG.quoteNumber,fromGroup:"MR0001 C1 ZWP8 MTO Row43 (six source TAGs)",
   role:tagRow.tag==="MR-502-003"?"PTMP base serving ZWP20 and ZWP22":
-   "PTP additional-link radio candidate: EXISTING ZPQ–ZWP8 PTP remains in use",
+   "BOD C2 §7.2 REQUIRED NEW PTP radio endpoint at ZWP8; existing ZPQ–ZWP8 PTP retained",
   originalOwnerRateUSD:ownerUSD,alreadyBookedSiteUSD:ownerUSD,functions,
   pairedIdU:tagRow.tag==="MR-502-003"?"MR-502-003A":"MR-502-004A",
   associatedAntenna:tagRow.tag==="MR-502-003"?"ANT-502-002":"ANT-502-003",
+  bodNewLinkAuthority:ZWP8_BOD_NEW_LINK_AUTHORITY_0553,
   exclusions:["Related IDU PoE A-6/A-7 or B-6/B-7 has a separately counted TAG owner",
    "Ethernet surge A-8/B-8 belongs to SA-502-002 and SA-502-003, not ODU again",
    "Licence A-3/B-4 and OEM complete IDU are not proved by this selected partial cost",
@@ -56,5 +58,5 @@ export function getZWP8RadioOwnershipComparison0553(rows){
   countOfRadioODUs:2,countOfRadioIDUs:2,countOfAntennas:2,countOfSurges:2,
   countOfEnclosureTags:1,radioOverlapFound:false,
   decision:"One enclosure 1 Set; 2022 BARTEC dual-interface Type2 reference only. Check actual space/thermal/Ex and current supplier quotation.",
-  status:"USD_OWNER_PRICES_FOUND__TWO_RADIOS_PRESERVED__OEM_NEW_REUSE_OPEN"};
+  status:"USD_OWNER_PRICES_FOUND__BOD_TWO_NEW_BRANCHES_CONFIRMED__OEM_MODEL_AND_PRICE_OPEN"};
 }
