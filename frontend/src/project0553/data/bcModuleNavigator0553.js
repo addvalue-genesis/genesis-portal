@@ -7,6 +7,7 @@ import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553} from "./bcWorkingModuleRo
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
+import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
 import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553,
  B1_AUDIT_KINDS_0553,b1AuditModuleId0553} from "./b1AccordionModuleIds0553";
 
@@ -76,6 +77,19 @@ export function buildBcModuleNavigator0553(){
   b1Nested(b1Root+".ownership-boundary","B1.A.5 — B1/B2 Scope Ownership","VDRL Engineering and Design")
  ];
  entries.push(...b1Entries);
+ // B1.A.4 ledger records remain read-only with their own actual DOM anchors.
+ const b1Ledger=selectB1ProjectExpenseLedger0553();
+ const indirectBase=b1Root+".indirect-ledger";
+ const indirectAccounts=["B1.1","B1.2","B1.3","B1.4","B1.5","B1.6","B1.7","B1.8"];
+ entries.push(...indirectAccounts.map((account,index)=>b1Nested(
+  indirectBase+".account."+account.toLowerCase().replace(".","-"),
+  "B1.A.4."+(index+1)+" — "+account+" CFO evidence","WBS owner account audit")));
+ entries.push(b1Nested(indirectBase+".cross-owner","B1.A.4.9 — Other owners non-additive",
+  "cross owner third party nonposting"));
+ entries.push(...b1Ledger.rows.map(x=>b1Nested(
+  indirectBase+".expense."+x.id.toLowerCase(),
+  "B1 CFO Evidence — "+x.id+" · "+x.activity,
+  x.owner+" "+(x.account||"") + " "+x.wbs+" audit nonposting")));
  // Nested B3 IDs are derived from the SAME read-only source models that render
  // the B3 panel. A source ID may resolve to a distinct (unique) UI anchor.
  const req=selectB3RequirementWbsTrace0553();
