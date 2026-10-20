@@ -35,6 +35,8 @@ for(const id of ["FAT-CREW","FAT-TRAVEL"]){
  assert.match(head.slice(rowStart,rowStart+85),/"owner": "B3"/);
 }
 const ui=fs.readFileSync(path.join(__dirname,"../src/project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(ui.includes('selectedOwner="B3"'));
-assert(ui.includes('selectedOwner="B9"'));
+const group=fs.readFileSync(path.join(__dirname,"../src/project0553/B3WorkTypeAccordion0553.jsx"),"utf8");
+assert(ui.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"),"B3 must mount current grouped trace");
+assert(group.includes('selectedOwner="B3"'),"B3 FAT witnesses must remain inside B3.1");
+assert(ui.includes('selectedOwner="B9"'),"B9 Yard conditional must remain separate");
 console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB397400), B9 Yard conditional THB233600; no B9 Base; Actual Direct COST unverified and non-posting.");

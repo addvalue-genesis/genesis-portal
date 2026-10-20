@@ -61,7 +61,10 @@ export function MgwR2CommercialCover0553({code}){
   {code==="B3"&&<p className="p55-note"><strong>FAT distinction:</strong> Vendor iFAT {cover.FAT.internalFatDays} days /
    {f(cover.FAT.internalFatUSD)} is separate from the end-user FAT premises minimum
    {cover.FAT.facilityEndUserDaysMinimum} days / {f(cover.FAT.facilityEndUserUSD)}.
-   ADDVALUE currently budgets 6 FAT witness days × 2 staff in B3; the venue and attendance durations are not yet reconciled.
+   These are two DISTINCT sequential scopes: Stage 1 internal iFAT (2 days) to prepare the equipment; Stage 2 Customer/End-user FAT facility reserved for at least 5 days.
+   After FAT, Stage 3 is delivery to JUTAL Zhuhai Yard (SERV-5, already in the supplier cover).
+   Supplier SERV-2 and SERV-4 are not duplicates.
+   ADDVALUE B3 currently budgets 6 FAT witness days × 2 staff; its actual attendance days and travel must be reconciled with the FAT agenda.
    Do not add the vendor FAT charges a second time to the B3 Working SELL.</p>}
   {code==="B6"&&<p className="p55-note"><strong>Freight is ALREADY INCLUDED in new vendor overall quote:</strong>
    {f(cover.freight.quotedUSD)} for Nantong → JUTAL site, recorded in SERV-5.

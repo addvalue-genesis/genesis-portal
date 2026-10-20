@@ -16,6 +16,7 @@ const dir=path.join(root,"project0553");
 const get=f=>require(path.join(dir,f));
 const {selectBcTurnkeyWorkingCost0553:bc}=get("data/bcTurnkeyWorkingCost0553.js");
 const {selectB3WorkingSellBreakdown0553:detail}=get("data/b3WorkingSellBreakdown0553.js");
+const {selectB3WorkTypeReconciliation0553:groupPrice}=get("data/b3WorkTypeReconciliation0553.js");
 const {selectB3RequirementWbsTrace0553:trace}=get("data/b3RequirementWbsTrace0553.js");
 const {selectB3SiteMrSatCoverage0553:matrix}=get("data/b3SiteMrSatCoverage0553.js");
 const {B3WorkingSellBreakdown0553:Breakdown}=get("B3WorkingSellBreakdown0553.jsx");
@@ -24,6 +25,25 @@ const {B3SiteMrSatCoverage0553:SiteMatrix}=get("B3SiteMrSatCoverage0553.jsx");
 const {BcCostEvidenceDetail0553:Evidence}=get("BcCostEvidenceDetail0553.jsx");
 const r=bc(),b=r.byCode.B3;
 const sourceSnapshot=JSON.stringify({b3:b,overall:r.knownWorkingSellTHB});
+const gp=groupPrice(b);
+assert.deepEqual(gp.categories.map(x=>x.workingSellTHB),[397400,2016000,30000,null]);
+assert.deepEqual(gp.categories.map(x=>x.id),["B3.1","B3.2","B3.3","B3.4"]);
+assert.equal(gp.totalWorkingSellTHB,2443400);
+assert.equal(gp.directCostTHB,null);
+assert.equal(gp.supplierFat.serviceSubtotalUSD,7500);
+assert.equal(gp.supplierFat.quoteOverallUSD,368841);
+assert.deepEqual(gp.supplierFat.serviceRows.map(x=>[x.id,x.supplierCostUSD]),[["SERV-2",5000],["SERV-4",2500]]);
+assert(gp.supplierFat.serviceRows.every(x=>!x.directCostPostingAllowed&&!x.workingSellPostingAllowed));
+assert.equal(gp.supplierFat.addvalueWitnessBudgetDays,6);
+assert.equal(gp.supplierFat.managementSeparateSequentialFATStagesConfirmed,true);
+assert.deepEqual(gp.supplierFat.plannedExecutionOrder,["SERV-2_INTERNAL_IFAT","SERV-4_CUSTOMER_FAT_RESERVE","SERV-5_JUTAL_YARD_DELIVERY"]);
+assert.equal(gp.supplierFat.internalAndCustomerFATScopeDuplicate,false);
+assert.equal(gp.supplierFat.supplierFATServiceCreditUSD,null);
+assert.equal(gp.supplierFat.supplierFATServicesAlreadyQuotedOnce,true);
+assert.equal(gp.supplierFat.actualFATAgendaAndDatesConfirmed,false);
+assert.equal(gp.supplierFat.freightAfterCustomerFATPlanned,true);
+assert.equal(gp.supplierFat.b3ActualDirectCostTHB,null);
+
 assert.equal(b.moduleId,"bid.budget.working.bc.b3");
 assert.equal(b.workingSellTHB,2443400);
 assert.equal(b.directCostTHB,null);
@@ -67,6 +87,12 @@ assert(m.includes("bid.budget.working.bc.b3.site-mr-sat-matrix"));
 assert(m.includes("Copy component ID bid.budget.working.bc.b3.site-mr-sat-matrix"));
 assert(m.includes("SAT-ZWP20-MR0001")&&m.includes("SAT-SIT-CROSS-MR"));
 const d=render(Evidence,{workingRow:b});
+for(const amount of ["397,400.00","2,016,000.00","30,000.00"] )assert(render(Evidence,{workingRow:b}).includes(amount));
+assert(render(Evidence,{workingRow:b}).includes("AUDIT ONLY"));
+assert(render(Evidence,{workingRow:b}).includes("SERV-2 USD 5,000"));
+assert(render(Evidence,{workingRow:b}).includes("SERV-4 USD 2,500"));
+assert(render(Evidence,{workingRow:b}).includes("No second vendor service cost is posted"));
+
 assert(d.includes("bid.budget.working.bc.b3.working-sell-breakdown"));
 assert(d.includes("bid.budget.working.bc.b3.working-sell-breakdown.component-preview.offshore"));
 assert(d.includes("bid.budget.working.bc.b3.working-sell-breakdown.fat-expense-preview.b3-fat-staff"));
@@ -79,9 +105,20 @@ const historicalAudit=fs.readFileSync(path.join(dir,"B3EquationAudit0553.jsx"),"
 assert(historicalAudit.includes("B3 owns MGW China FAT witness personnel/travel"));
 assert(!historicalAudit.includes("B9 MGW China FAT witnesses"));
 
-assert(d.indexOf("B3 — Current Working SELL Breakdown")<d.indexOf("B3 — Contract Requirements × Rev.K Work Breakdown"));
-assert(d.indexOf("B3 — Contract Requirements × Rev.K Work Breakdown")<d.indexOf("B3 — Seven-Site / Four-MR SAT Test Coverage"));
+// Work type owns presentation order: FAT -> SAT -> temporary tools -> cost audit.
+assert(d.indexOf("B3.1")<d.indexOf("B3.2"));
+assert(d.indexOf("B3.2")<d.indexOf("B3.3"));
+assert(d.indexOf("B3.3")<d.indexOf("B3.4"));
+assert(d.indexOf("B3 — Seven-Site / Four-MR SAT Test Coverage")<d.indexOf("B3 — Current Working SELL Breakdown"));
+for(const name of ["fat","sat","tools","audit"]){
+ assert(d.includes('data-component-key="bid.budget.working.bc.b3.'+name+'"'));
+}
+assert(d.includes('data-component-key="bid.budget.working.bc.b3.veex-mx100"'));
+assert(d.includes("B11 = Special Tools for Operation"),"Permanent special tools remain B11; VeEX rental is B3");
+const b11html=render(Evidence,{workingRow:r.byCode.B11});
+assert(b11html.includes('data-component-key="bid.budget.working.bc.b11.test-equipment-ownership"'));
+assert.equal(r.byCode.B11.directCostTHB,null,"B11 tool ownership note must not become a cost posting");
 assert.equal(JSON.stringify({b3:bc().byCode.B3,overall:bc().knownWorkingSellTHB}),sourceSnapshot,"Rendering must never mutate current B3 pricing");
 const host=fs.readFileSync(path.join(dir,"BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(host.includes("<B3WorkingSellBreakdown0553 workingRow={workingRow}/>"));
-console.log("PASS B3 10.2 source/SSR: THB 2,443,400 = offshore 2,016,000 + VeEX 30,000 + China FAT 397,400; 19 requirements, 21 SAT Test IDs non-additive; parent Module IDs visible and copyable, B9 excluded.");
+assert(host.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"));
+console.log("PASS B3 10.2 FAT/SAT/Tools/Audit accordion + source/SSR: THB 2,443,400 = offshore 2,016,000 + VeEX 30,000 + China FAT 397,400; 19 requirements, 21 SAT Test IDs non-additive; parent Module IDs visible and copyable, B9 excluded.");

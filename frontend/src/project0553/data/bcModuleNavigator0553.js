@@ -51,11 +51,20 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId,keywords
  });
  const b3Entries=[
+  child(b3Id+".worktype-accordion","B3 — FAT SAT Tools Audit with Working SELL totals"),
+  child(b3Id+".fat","B3.1 — FAT · THB 397,400","bid.budget.working.bc.b3.fat","factory witness"),
+  child(b3Id+".sat","B3.2 — SAT/SIT · THB 2,016,000","bid.budget.working.bc.b3.sat","offshore"),
+  child(b3Id+".tools","B3.3 — Test rental · THB 30,000","bid.budget.working.bc.b3.tools","VeEX B11 boundary"),
+  child(b3Id+".audit","B3.4 — Non-additive audit","bid.budget.working.bc.b3.audit","reconcile"),
+  child(b3Id+".test-tools-ownership","B3.3.2 — B11 tool boundary"),
+  child(b3Id+".source-cost-audit","B3.4.3 — Cost audit"),
+  child(b3Id+".fat-owner-transfer","B3.1.3 — FAT historical"),
+  child(b3Id+".mgw-fat-owner-reconciliation","B3.1.1 — MGW FAT service cost comparison"),
   child(b3Id+".working-sell-breakdown","B3 — Working SELL THB 2,443,400 Breakdown"),
   child(b3Id+".40-day-abc","B3 — Offshore SAT/SIT 40-Day Working Basis",
-   b3Id+".working-sell-breakdown.component-preview.offshore","offshore 40 days two specialists site SAT"),
+   b3Id+".40-day-abc","offshore 40 days two specialists site SAT"),
   child(b3Id+".veex-mx100","B3 — VeEX MX100+ Temporary Test Rental",
-   b3Id+".working-sell-breakdown.component-preview.veex","30 rental days tools SAT"),
+   b3Id+".veex-mx100","30 rental days tools SAT"),
   child(b3Id+".revk-china-budget","B3 — MGW China FAT Witness Expense Breakdown"),
   child(b3Id+".requirement-crosswalk","B3 — Contract Requirements × Rev.K / BOD SPE DTS MR"),
   child(req.moduleId,"B3 — Requirement Source Register (19)",

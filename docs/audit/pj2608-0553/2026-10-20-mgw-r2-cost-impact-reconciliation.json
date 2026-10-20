@@ -207,7 +207,16 @@
       "addvalueB3WitnessDaysBudgeted": 6,
       "addvalueWitnessStaffBudgeted": 2,
       "scheduleReconciled": false,
-      "facilitySupplierCostIsNotAdditionalB3WorkingSell": true
+      "facilitySupplierCostIsNotAdditionalB3WorkingSell": true,
+      "managementTwoStageStrategy": "STAGE_1_INTERNAL_IFAT_2_DAYS__STAGE_2_CUSTOMER_FAT_MINIMUM_5_DAY_RESERVE__STAGE_3_JUTAL_ZHUHAI_DELIVERY",
+      "separateVendorScopesConfirmedByManagement": true,
+      "supplierFATStagesDoubleCount": false,
+      "supplierFatServicePricesIncludedInLatestCoverUSD": 7500,
+      "supplierFatServiceCreditUSD": null,
+      "customerFATStageReserved": true,
+      "jutalDeliveryAfterFATPlanned": true,
+      "actualADDVALUEWitnessAttendanceReconciled": false,
+      "signedFATAgendaCalendarConfirmed": false
     }
   },
   "workingCost": {
@@ -242,7 +251,7 @@
     "open": [
       "MGW USD500 packing-vs-freight scope confirmation",
       "Incoterm DAP Nantong vs JUTAL Zhuhai and trucking insurance/loading",
-      "Supplier 2-day iFAT and minimum 5-day venue vs 6 ADDVALUE B3 paid witness days",
+      "Distinct MGW iFAT 2-day / Customer FAT minimum 5-day stage strategy CONFIRMED; only exact calendar, ADDVALUE 6-day witness allocation, tools/facility responsibility and extra-day terms remain OPEN",
       "MR0002 Ex d assembly and RF/glands/frequency verification",
       "MR0003 EATON 24VDC variant and field Ex cables",
       "MR0004 TCAB-514-002/control/gland/purge/packing/programming kit SKU",
