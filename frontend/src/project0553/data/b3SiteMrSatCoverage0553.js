@@ -62,9 +62,54 @@ export function selectB3SiteMrSatCoverage0553(){
   throw Error("SAT test reference cannot post duplicate current price");
  if(b3.workdays!==40||b3.rows.length!==9||b3.workingSellTHB!==2046000)
   throw Error("SAT Test matrix must follow canonical 40-day B3 source");
+ // One two-person team is timeboxed by SITE / SIT / PUNCH, not 19 separately
+ // priced MR tests. Site working SELL is copied from the canonical 40-day source.
+ const dailyRateTHBPerPerson=b3.rateUSDPerPersonDay*b3.fxTHBPerUSD;
+ const dailyRateTHBForTeam=dailyRateTHBPerPerson*b3.persons;
+ const timeboxOf=r=>r.id==="SAT-SIT-CROSS-MR"?"SIT":
+  r.id==="SAT-PUNCH-RETEST"?"PUNCH":
+  b3.rows.find(t=>t.site===r.site)?.id;
+ const pricedTimeboxes=b3.rows.map(t=>Object.freeze({
+  ...t,sourceModuleId:b3.moduleId,siteTimeboxId:t.id,
+  personDays:t.days*b3.persons,
+  teamDayRateTHB:dailyRateTHBForTeam,
+  personDayRateTHB:dailyRateTHBPerPerson,
+  includedLaborSellTHB:t.workingSellTHB,
+  testIds:all.filter(r=>timeboxOf(r)===t.id).map(r=>r.id),
+  additionalTestSellTHB:null, // NO incremental price posting; unverified costs remain UNKNOWN
+  postingAllowed:false
+ }));
+ if(pricedTimeboxes.some(t=>!t.testIds.length||
+  Math.abs(t.personDays*dailyRateTHBPerPerson-t.includedLaborSellTHB)>0.01))
+  throw Error("Site timebox to MR/SAT labour allocation is incomplete");
+ const priceProof=Object.freeze({
+  sourceModuleId:b3.moduleId,persons:b3.persons,workdays:b3.workdays,
+  personDays:b3.personDays,rateUSDPerPersonDay:b3.rateUSDPerPersonDay,
+  fxTHBPerUSD:b3.fxTHBPerUSD,rateTHBPerPersonDay:dailyRateTHBPerPerson,
+  rateTHBPerTeamDay:dailyRateTHBForTeam,
+  laborWorkingSellTHB:b3.laborWorkingSellTHB,
+  veexRentalDays:b3.veex.quantity,veexRentalRateTHB:b3.veex.rateTHB,
+  veexWorkingSellTHB:b3.toolRentalWorkingSellTHB,
+  offshoreWorkingSellTHB:b3.workingSellTHB,
+  workingDirectCostTHB:null
+ });
+ if(pricedTimeboxes.reduce((n,t)=>n+t.days,0)!==40||
+  pricedTimeboxes.reduce((n,t)=>n+t.personDays,0)!==80||
+  pricedTimeboxes.reduce((n,t)=>n+t.includedLaborSellTHB,0)!==2016000||
+  priceProof.offshoreWorkingSellTHB!==2046000)
+  throw Error("40-day two-person resource and Working SELL rollup diverges");
+ const tracedRows=all.map(r=>Object.freeze({...r,
+  budgetTimeboxId:timeboxOf(r),
+  budgetBasisModuleId:b3.moduleId,
+  // Each SAT Test-ID belongs to one timebox; the test itself is NOT billable.
+  pricePostingState:"INCLUDED_IN_SHARED_SITE_TIMEBOX__NO_EXTRA_MR_TEST_CHARGE"
+ }));
+ if(tracedRows.some(r=>!pricedTimeboxes.some(t=>t.id===r.budgetTimeboxId)))
+  throw Error("SAT test ID has no shared timebox owner");
  return Object.freeze({moduleId:"bid.budget.working.bc.b3.site-mr-sat-matrix",
-  rows:all,siteMRTestCount:rows.length,otherTestCount:integrationRows.length,
-  sevenSiteCount:siteRows.length,budgetarySiteTimeboxes:b3.rows,
+  rows:tracedRows,siteMRTestCount:rows.length,otherTestCount:integrationRows.length,
+  sevenSiteCount:siteRows.length,budgetarySiteTimeboxes:pricedTimeboxes,
+  priceProof,priceBasisModuleId:b3.moduleId,
   paidCrew:2,plannedWorkingDays:40,coveredB3SellTHB:b3.workingSellTHB,
   postingAllowed:false,methodApproved:false,tagCountVerified:false,rateReleaseAllowed:false,
   technicalHolds:[
