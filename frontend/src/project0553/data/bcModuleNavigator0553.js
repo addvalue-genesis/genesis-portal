@@ -52,6 +52,7 @@ export function buildBcModuleNavigator0553(){
  });
  const b3Entries=[
   child(b3Id+".worktype-accordion","B3 — FAT SAT Tools Audit with Working SELL totals"),
+  child(b3Id+".fat-training-7d-allocation","B3 — 7-day FAT / two-day Training price ownership split",b3Id+".fat-training-7d-allocation","B8 training 2 MD B3 12 MD no duplicate"),
   child(b3Id+".fat-2plus5-pricing-scenario","B3.1 — 2-day iFAT + 5-day Customer FAT / USD600 onshore / travel separate",
    b3Id+".fat-2plus5-pricing-scenario","7 on-site days two staff proposed THB 440200 total B3 2486200 nonposted"),
   child(b3Id+".fat","B3.1 — FAT · THB 397,400","bid.budget.working.bc.b3.fat","factory witness"),
@@ -140,6 +141,7 @@ export function buildBcModuleNavigator0553(){
   ...entry,parentOwner:workingOwnerFromModuleId0553(entry.id)
  }));
  entries.push(...b3Entries,...vendorEntries);
+ entries.push({id:"bid.budget.working.bc.b8.integrated-fat-training-7d",name:"B8 — integrated FAT 7-day package / two training batches",tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",anchorModuleId:"bid.budget.working.bc.b8.integrated-fat-training-7d",parentOwner:"B8",keywords:"B8 training two batches Yangon China USD600 2 trainer days 37800 pending customer approval"});
  const ids=entries.map(x=>x.id),all=new Set(ids);
  if(all.size!==entries.length)throw Error("Duplicate B/C Navigator Module ID");
  const leaves=entries.filter(x=>x.kind==="CUSTOMER_BC_WORKING_ROW");
