@@ -7,6 +7,9 @@ const row=(id,mr,sites,manufacturer,model,qty,unitUSD,components)=>Object.freeze
  id,mr,sites,manufacturer,model,quantity:qty,unit:"set",currency:"USD",
  unitPriceUSD:unitUSD,extendedUSD:qty*unitUSD,
  includedComponents:Object.freeze(components.slice()),
+ componentInclusions:Object.freeze(components.slice()),
+ package:components.join("; "),
+ datasheets:Object.freeze([]),
  quotedPriceOwner:id,source,postAdditionalIncludedComponents:false,
  vendorQuoteStatus:"MGW_P26_058_R2_COMBINED__SELECTED_WORKING_OEM_QUOTE"
 });
