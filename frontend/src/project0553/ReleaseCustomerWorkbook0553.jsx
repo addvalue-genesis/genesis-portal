@@ -1,7 +1,7 @@
 import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
-import {RELEASE_POLICY_0553,RELEASE_CUSTOMER_COLUMNS_0553} from "./data/releaseCommercialModel0553";
+import {RELEASE_POLICY_0553,RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import "./releaseWorkbook0553.css";
 
 const WORKSHEETS=Object.freeze([
@@ -25,7 +25,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const [viewer,setViewer]=useState("INTERNAL");
  const [source,setSource]=useState(null);
  const [showOverflow,setShowOverflow]=useState(false);
+ const [expandedTagGroups,setExpandedTagGroups]=useState({});
+ const toggleTagGroup=key=>setExpandedTagGroups(prev=>({...prev,[key]:!prev[key]}));
  const internal=recipient==="INTERNAL"&&viewer==="INTERNAL",code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
+ const partATagBreakdown=buildPartATagGroupBreakdown0553(model);
  const aTags=model.a.flatMap(x=>x.sourceRows.map(line=>({...line,mrCode:x.code})));
  const overflow=aTags.slice(15),rows=aTags.slice(0,15);
  const annexLines=model.annex[code]||[];
@@ -72,6 +75,57 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      className={sheet===name?"is-active":""} key={name} onClick={()=>{setSheet(name);setSource(null);}}>
      {name}</button>)}
   </div>
+  {code==="SUMMARY"&&<section className="p553-a-group-breakdown"
+     data-component-key="bid.budget.pricing.release.part-a-tag-groups">
+    <h4>Part A — TAG Group Price Breakdown / แจกแจงราคาตามกลุ่ม TAG</h4>
+    <p className="p55-note">10.1 → 10.3 · สรุปทุก Site / TAG ที่มีราคา ไม่ใช่เพียง 15 แถวแรกของ Excel ต้นฉบับ · ราคาขาย A = Working Cost × 1.30 · A5 Bulk ที่รวมใน A1 ห้ามบวกซ้ำ</p>
+    <div className="p553-sheet-scroll">
+     <table className="p55-table p55-table--compact p553-tag-breakdown-table">
+      <thead><tr><th>MR / กลุ่มงาน</th><th>TAG Family / Equipment</th><th>Sites</th><th>Priced TAG Lines</th><th>Working Sell THB</th><th>Source / Status</th></tr></thead>
+      <tbody>
+       {partATagBreakdown.groups.map(part=><React.Fragment key={part.code}>
+        <tr className="p553-tag-mr-total">
+         <th scope="row"><strong>{part.code} · {part.mr}</strong></th>
+         <td><strong>{part.description}</strong></td>
+         <td>{new Set(part.sourceRows.map(x=>x.site)).size}</td>
+         <td>{part.pricedCount}{part.unresolvedCount>0?" · +"+part.unresolvedCount+" pending":""}</td>
+         <td className="p553-price-cell"><strong>{format(part.previewSellTHB)}</strong></td>
+         <td>{internal&&viewSource(part)}<small>{part.costComplete?"Working cost mapped":"WORKING ONLY · Unpriced/verification pending"}</small></td>
+        </tr>
+        {part.tagGroups.map(group=>{
+         const key=part.code+":"+group.family;
+         return <React.Fragment key={key}>
+          <tr className="p553-tag-family">
+           <td>{part.code}</td>
+           <td><button className="p553-tag-expander" type="button" aria-expanded={!!expandedTagGroups[key]}
+             onClick={()=>toggleTagGroup(key)}>{expandedTagGroups[key]?"−":"＋"} {group.family} · {group.tags.length} TAG(s)</button></td>
+           <td>{group.sites.length}</td><td>{group.pricedRows}{group.missingRows?" · "+group.missingRows+" pending":""}</td>
+           <td className="p553-price-cell">{format(group.customerSellTHB)}</td>
+           <td><small>{group.tags.slice(0,3).join(", ")}{group.tags.length>3?" …":""}</small></td>
+          </tr>
+          {expandedTagGroups[key]&&group.rows.map((tag,i)=><tr className="p553-tag-detail" key={key+":"+tag.site+":"+tag.id+":"+i}>
+           <td>{tag.site||"—"}</td><td><strong>{tag.tag}</strong><small>{tag.description}</small></td>
+           <td>{tag.mr}</td><td>{tag.qty??"TBC"} {tag.unit||""}</td>
+           <td className="p553-price-cell">{format(tag.customerSellTHB)}<small>Unit {formatUnit(tag.customerUnitTHB)}</small></td>
+           <td>{internal&&viewSource(tag)}<small>{tag.sourceRef||tag.status}</small></td>
+          </tr>)}
+         </React.Fragment>;
+        })}
+        {Number.isFinite(part.roundingVarianceTHB)&&Math.abs(part.roundingVarianceTHB)>0&&<tr className="p553-tag-rounding">
+         <td>{part.code}</td><td colSpan={3}>Price rounding reconciliation — group totals vs. MR Working Sell</td>
+         <td className="p553-price-cell">{format(part.roundingVarianceTHB)}</td>
+         <td><small>{part.reconciliationState}</small></td>
+        </tr>}
+       </React.Fragment>)}
+       <tr className="p553-tag-grand-total"><th scope="row" colSpan={4}>Part A — Working Selling Price (priced lines only)</th>
+        <td className="p553-price-cell"><strong>THB {format(partATagBreakdown.pricedFloorTHB)}</strong></td>
+        <td><strong>{partATagBreakdown.reconciliationPassed?"MATCH 10.3 CFO":"RECONCILIATION HOLD"}</strong>
+         <small>{partATagBreakdown.incomplete?"NOT FINAL · Outstanding engineering cost/TAG evidence": "Working estimate · customer release approval pending"}</small></td>
+       </tr>
+      </tbody>
+     </table>
+    </div>
+   </section>}
   <div className="p553-native-sheet">
    {code==="SUMMARY"?<>
     <div className="p553-native-title">Scope of supply<br/>供货范围</div>
