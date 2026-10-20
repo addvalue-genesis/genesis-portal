@@ -1,0 +1,293 @@
+{
+  "projectId": "PJ2608-0553",
+  "status": "PRE_AWARD_READ_ONLY_RECONCILIATION__CUSTOMER_RELEASE_HOLD",
+  "asOfDate": "2026-10-20",
+  "quote": {
+    "supplier": "MGW",
+    "number": "P26-058_R2",
+    "currency": "USD",
+    "detailedEquipmentAuthority": {
+      "date": "2026-09-21",
+      "sourceUrl": "https://drive.google.com/file/d/1DLaku-mj2uYI-7A_E3z5QFZQgbz6OozA/view"
+    },
+    "latestCommercialCoverAuthority": {
+      "date": "2026-10-20",
+      "sourceUrl": "https://drive.google.com/file/d/1qOswXUq_gogU272zWDaLilRGdjhtLK7n/view"
+    }
+  },
+  "supplierCost": {
+    "priorDetail": {
+      "equipmentUSD": 350341,
+      "servicesUSD": 14500,
+      "totalUSD": 364841
+    },
+    "latestCover": {
+      "equipmentUSD": 350341,
+      "servicesUSD": 18500,
+      "totalUSD": 368841
+    },
+    "priceDeltaUSD": {
+      "equipment": 0,
+      "services": 4000,
+      "total": 4000
+    },
+    "equipmentLines": [
+      {
+        "id": "UHF-1",
+        "mr": "MR-0002",
+        "sites": [
+          "ZWP20",
+          "ZWP21",
+          "ZWP22"
+        ],
+        "qty": 3,
+        "unitUSD": 31474,
+        "extendedUSD": 94422,
+        "nonAdditiveIncluded": [
+          "RFI BD4345-00N0-AC",
+          "WAROM HRMD95-VIIIB"
+        ]
+      },
+      {
+        "id": "UHF-2",
+        "mr": "MR-0002",
+        "sites": [
+          "ZWP20",
+          "ZWP21",
+          "ZWP22"
+        ],
+        "qty": 3,
+        "unitUSD": 847,
+        "extendedUSD": 2541,
+        "nonAdditiveIncluded": [
+          "YBSS6-99",
+          "UNV2",
+          "PolyPhaser IS-B50LN-C2",
+          "Solexy RXNMS0200JX0"
+        ]
+      },
+      {
+        "id": "UHF-3",
+        "mr": "MR-0002",
+        "sites": [
+          "ZWP20",
+          "ZWP21",
+          "ZWP22"
+        ],
+        "qty": 3,
+        "unitUSD": 21,
+        "extendedUSD": 63,
+        "nonAdditiveIncluded": [
+          "KBT TQJ-400AD5"
+        ]
+      },
+      {
+        "id": "UHF-4",
+        "mr": "MR-0002",
+        "sites": [
+          "ZWP20",
+          "ZWP21",
+          "ZWP22"
+        ],
+        "qty": 3,
+        "unitUSD": 846,
+        "extendedUSD": 2538,
+        "nonAdditiveIncluded": [
+          "FORLLER RF LLF 1/2-inch 50ohm 100m/set",
+          "6 feeder connectors/set"
+        ]
+      },
+      {
+        "id": "PHONE-1",
+        "mr": "MR-0003",
+        "sites": [
+          "ZWP20",
+          "ZWP21",
+          "ZWP22",
+          "ZWP23"
+        ],
+        "qty": 4,
+        "unitUSD": 6400,
+        "extendedUSD": 25600,
+        "nonAdditiveIncluded": [
+          "Gai-Tronics 212-02-6008-410",
+          "EATON DB3B",
+          "WAROM BXJ-S with quoted gland"
+        ]
+      },
+      {
+        "id": "RACON-1",
+        "mr": "MR-0004",
+        "sites": [
+          "ZWP20",
+          "ZWP21",
+          "ZWP22"
+        ],
+        "qty": 3,
+        "unitUSD": 75059,
+        "extendedUSD": 225177,
+        "nonAdditiveIncluded": [
+          "Tideland SeaBeacon 2 System 6",
+          "DB-5P",
+          "Programming kit confirmed by Paul email; SKU/qty pending"
+        ]
+      }
+    ],
+    "latestServices": [
+      {
+        "id": "SERV-1",
+        "ownerReview": [
+          "B1",
+          "B2"
+        ],
+        "scope": "MGW engineering/PM/VDRL",
+        "currentUSD": 8000,
+        "priorUSD": 8000
+      },
+      {
+        "id": "SERV-2",
+        "ownerReview": [
+          "B3"
+        ],
+        "scope": "MGW 2-day internal iFAT",
+        "currentUSD": 5000,
+        "priorUSD": 6000
+      },
+      {
+        "id": "SERV-4",
+        "ownerReview": [
+          "B3"
+        ],
+        "scope": "MGW end-user FAT premises minimum 5 days",
+        "currentUSD": 2500,
+        "priorUSD": null
+      },
+      {
+        "id": "SERV-3",
+        "ownerReview": [
+          "B5"
+        ],
+        "scope": "Packing marking and preparation; possible overlap",
+        "currentUSD": 500,
+        "priorUSD": 500
+      },
+      {
+        "id": "SERV-5",
+        "ownerReview": [
+          "B6"
+        ],
+        "scope": "Nantong to JUTAL Zhuhai road freight includes packing",
+        "currentUSD": 2500,
+        "priorUSD": null
+      }
+    ],
+    "packingFreightReconciliation": {
+      "coverPackingUSD": 500,
+      "coverFreightUSD": 2500,
+      "whatsAppFreightUSD": 2500,
+      "whatsAppSaysIncludesPacking": true,
+      "possibleOverlapUSD": 500,
+      "confirmedCreditUSD": null,
+      "amendedSupplierTotalUSD": null,
+      "addEmailFreightAgain": false,
+      "supplierRevisedCoverReceived": false,
+      "decision": "NO_VENDOR_CREDIT_OR_COST_CHANGE_WITHOUT_SIGNED_SCOPE_CONFIRMATION"
+    },
+    "logistics": {
+      "coverIncoterm": "DAP Nantong China",
+      "previousDetailedIncoterm": "EX WORKS Nantong China",
+      "statedDestination": "JUTAL Zhuhai",
+      "deliveryIncotermReconciled": false,
+      "ChinaMyanmarOnwardFreightIncluded": null,
+      "dutyExemptionOfficiallyVerified": false
+    },
+    "fat": {
+      "supplierIFATDays": 2,
+      "endUserFacilityDaysMinimum": 5,
+      "addvalueB3WitnessDaysBudgeted": 6,
+      "addvalueWitnessStaffBudgeted": 2,
+      "scheduleReconciled": false,
+      "facilitySupplierCostIsNotAdditionalB3WorkingSell": true
+    }
+  },
+  "workingCost": {
+    "basis": "Selected supplier quote source evidence only; controlled ADDVALUE direct cost requires ledger, FX and owner approval",
+    "quoteEquipmentCostUSD": 350341,
+    "quoteServiceCostUSD": 18500,
+    "quoteTotalUSD": 368841,
+    "additiveToApprovedWorkingLedger": false,
+    "approvedDirectCostTHB": null,
+    "approvedLandedCostTHB": null,
+    "approvedVendorIncludedCreditTHB": null,
+    "unpricedFieldBulkAndLandedFreightStatus": "NOT_ESTABLISHED"
+  },
+  "workingSell": {
+    "sourceModule": "10.2 / bid.budget.working.bc",
+    "b3WorkingSellTHB": 2443400,
+    "b3ChangeTHB": 0,
+    "allB1ToB14C1C2ExistingValuesUnchanged": true,
+    "automaticB5B6AdjustmentAllowed": false,
+    "note": "Existing B5/B6 SELL is not the supplier USD quote. Read the unchanged 10.2 canonical owner values; this JSON does not restate them."
+  },
+  "customerRelease": {
+    "sourceModule": "10.3 / bid.budget.pricing.release",
+    "status": "HOLD",
+    "releasedToCustomer": false,
+    "approvedSellingPriceTHB": null,
+    "commercialApprovalReceived": false,
+    "engineeringApprovalReceived": false,
+    "automaticCustomerPriceCalculationAllowed": false
+  },
+  "gates": {
+    "open": [
+      "MGW USD500 packing-vs-freight scope confirmation",
+      "Incoterm DAP Nantong vs JUTAL Zhuhai and trucking insurance/loading",
+      "Supplier 2-day iFAT and minimum 5-day venue vs 6 ADDVALUE B3 paid witness days",
+      "MR0002 Ex d assembly and RF/glands/frequency verification",
+      "MR0003 EATON 24VDC variant and field Ex cables",
+      "MR0004 TCAB-514-002/control/gland/purge/packing/programming kit SKU",
+      "B10 B11 C2 itemized SPIR/commissioning/2-year spares/tools",
+      "RADWIN free issue Thailand-Nantong customs/return/export ownership"
+    ],
+    "noHistoricalSelectedWorkingCost": [
+      "ORGA",
+      "EXION",
+      "PROSPER"
+    ],
+    "protectedBaselineRevision": [
+      "Rev02",
+      "Rev03"
+    ],
+    "baselineChanged": false
+  },
+  "sourceToConsumers": {
+    "supplierSource": [
+      "10.1 / bid.budget.bom.mr0002",
+      "10.1 / bid.budget.bom.mr0003",
+      "10.1 / bid.budget.bom.mr0004"
+    ],
+    "functions": [
+      "mgwP26058R2Selected0553.js",
+      "mgwP26058R2Cover20261020.js",
+      "siteSystemCostReconciliation.js",
+      "bomReadModel0553.js",
+      "selectWorkingBomProjection0553",
+      "selectBcTurnkeyWorkingCost0553",
+      "buildReleaseCommercialModel0553"
+    ],
+    "downstream": [
+      "10.1 / bid.budget.bom",
+      "10.2 / bid.budget.working.bc",
+      "10.5 / bid.budget.scope",
+      "10.3 / bid.budget.pricing.release"
+    ],
+    "nonAdditiveQuoteWideServices": true,
+    "moduleIds": [
+      "bid.budget.working.bc.b5.mgw-road-freight-packing-inclusion",
+      "bid.budget.working.bc.b6.mgw-road-freight-packing-inclusion",
+      "bid.budget.working.bc.b10.mgw-commissioning-spares",
+      "bid.budget.working.bc.b11.mgw-special-tools",
+      "bid.budget.working.bc.c2.mgw-two-year-operation-spares"
+    ]
+  }
+}
