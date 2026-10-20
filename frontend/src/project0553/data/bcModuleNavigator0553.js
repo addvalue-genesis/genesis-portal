@@ -96,6 +96,13 @@ export function buildBcModuleNavigator0553(){
   }
  }
  entries.push(...b3Entries);
+ entries.push({
+  id:"bid.budget.working.bc.b11.test-equipment-ownership",
+  name:"B11 — Permanent O&M Special Tools vs B3 Temporary FAT/SAT Rental",
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:"bid.budget.working.bc.b11.test-equipment-ownership",
+  keywords:"B11 special tools operation maintenance OEM RACON programming kit B3 VeEX rental"
+ });
  const ids=entries.map(x=>x.id),all=new Set(ids);
  if(all.size!==entries.length)throw Error("Duplicate B/C Navigator Module ID");
  const leaves=entries.filter(x=>x.kind==="CUSTOMER_BC_WORKING_ROW");
