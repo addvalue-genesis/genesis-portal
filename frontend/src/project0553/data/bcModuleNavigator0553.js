@@ -218,6 +218,7 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId:id,keywords:"B2 "+keywords
  });
  entries.push(b2Entry(calcRoot,"B2 — Independent First Principles Recalculation (VDRL Only)"));
+ entries.push(b2Entry("bid.budget.working.bc.b2.quote-comparison","B2 — Prior 580k Working SELL audit, excluded from new calculation"));
  entries.push(b2Entry(calcRoot+".audit","B2.RA — Recalc Input and Cost Owner Audit"));
  const dossierSlug=d=>d.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
  for(const dossier of b2Recalc.dossierGroups){
