@@ -42,6 +42,56 @@ export function priceBWorkingSell0553(workingSellTHB,actualCostTHB=null){
   addvalueProfitTHB:n(actualCostTHB)?round(workingSellTHB-deduction-actualCostTHB):null
  });
 }
+// 10.3 customer-price drilldown: site + TAG family within each governed MR.
+// All prices originate from the same 10.1 sourceRows / parent 10.3 Working Sell.
+// This is a UI audit grouping, NOT a new cost posting or native XLSX worksheet.
+export function buildPartATagGroupBreakdown0553(model){
+ const amount=rows=>round(rows.reduce((s,x)=>s+(n(x)?x:0),0));
+ const tagFamily=tag=>{
+  const value=String(tag||"").trim().toUpperCase();
+  if(!value||value==="NOT VERIFIED")return "UNMAPPED TAG";
+  if(value==="BULK MATERIAL")return "BULK MATERIAL";
+  return value.includes("-")?value.split("-")[0]:value;
+ };
+ const groups=model.a.map(part=>{
+  const families=new Map();
+  for(const row of part.sourceRows){
+   const family=tagFamily(row.tag);
+   if(!families.has(family))families.set(family,[]);
+   families.get(family).push(row);
+  }
+  const tagGroups=[...families.entries()].map(([family,rows])=>{
+   const priced=rows.filter(r=>n(r.costTHB));
+   const cost=priced.length?amount(priced.map(r=>r.costTHB)):null;
+   return Object.freeze({
+    family,rows,sourceModuleId:part.sourceModuleId,
+    sites:[...new Set(rows.map(x=>x.site).filter(Boolean))],
+    tags:[...new Set(rows.map(x=>x.tag).filter(Boolean))],
+    pricedRows:priced.length,missingRows:rows.length-priced.length,
+    costTHB:cost,customerSellTHB:cost===null?null:priceAorCFromCost0553(cost).customerSellTHB
+   });
+  });
+  const tagGroupSell=amount(tagGroups.filter(g=>n(g.customerSellTHB)).map(g=>g.customerSellTHB));
+  const variance=n(part.previewSellTHB)?round(part.previewSellTHB-tagGroupSell):null;
+  return Object.freeze({
+   ...part,tagGroups,tagGroupSellTHB:tagGroupSell,roundingVarianceTHB:variance,
+   reconciliationState:!n(variance)?"NO_PRICED_TOTAL":Math.abs(variance)<=0.01?
+    "MATCH_WITHIN_0_01_THB":"ROUNDING_VARIANCE_REQUIRES_REVIEW"
+  });
+ });
+ const sumGroups=amount(groups.filter(g=>n(g.previewSellTHB)).map(g=>g.previewSellTHB));
+ const expected=model.summary.aProvisionalCustomerSellTHB;
+ const variance=n(expected)?round(sumGroups-expected):null;
+ return Object.freeze({
+  moduleId:"bid.budget.pricing.release.part-a-tag-groups",
+  sourceModuleId:"bid.budget.bom.system-location-mto",
+  groups,pricedFloorTHB:sumGroups,expectedPreviewTHB:expected,varianceTHB:variance,
+  reconciliationPassed:n(variance)&&Math.abs(variance)<=0.01,
+  incomplete:groups.some(g=>!g.costComplete),
+  releaseAllowed:false
+ });
+}
+
 const LINE_DESCRIPTION_0553=Object.freeze({
  A1:"MR-0001 SCADA / AVIAT / Cisco",A2:"MR-0002 Trunk Radio",
  A3:"MR-0003 Ex Telephone / Sounder",A4:"MR-0004 RACON"
