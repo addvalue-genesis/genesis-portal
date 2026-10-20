@@ -13,6 +13,13 @@ const {selectBcTurnkeyWorkingCost0553:working}=get("data/bcTurnkeyWorkingCost055
 const {buildBcModuleNavigator0553:navigator}=get("data/bcModuleNavigator0553.js");
 const {B2IndependentVdrlRecalculation0553:View}=get("B2IndependentVdrlRecalculation0553.jsx");
 const {BcCostEvidenceDetail0553:Host}=get("BcCostEvidenceDetail0553.jsx");
+const factors=get("data/b2VdrlSourceEquationFactors0553.json");
+const input=get("data/b2VdrlRecalcSourceWorkObjects0553.json");
+assert.equal(Object.keys(factors.classBaseMH).length,11);
+assert.equal(Object.keys(factors.complexityFactors).length,4);
+assert.equal(Object.keys(factors.workModeFactors).length,6);
+assert.equal(factors.approvalAProvisionalReviewCycles,2);
+assert.equal(input.records.length,131);
 const original=JSON.stringify(working());
 const base=estimate(),all=estimate({ownerPolicy:"SOURCE_ALL_ROLE_HOURS"}),dc=estimate({ownerPolicy:"DC_ADMIN_ONLY_BOUNDARY_CASE"});
 const r=base.result;
@@ -33,7 +40,12 @@ assert.equal(base.verifiedDirectCostTHB,null);
 assert.equal(base.approvedWorkingSellTHB,null);
 assert.equal(base.postingAllowed,false);
 assert.equal(base.customerReleaseAllowed,false);
+assert(base.derivationEquation.startsWith("GEQ-005"));
 for(const x of base.objectRows){
+ assert.equal(x.calculatedRoleMH.length,5);
+ assert(x.calculatedRoleMH.every((v,i)=>Math.abs(v-x.roleMH[i])<.000001),
+  "D0-D10 class/complexity/mode/review calculation does not reconcile with original "+x.id);
+
  assert(Math.abs(x.countedMH-x.selectedRoleMH.reduce((n,a)=>n+a,0))<.000001);
  assert(Math.abs(x.employerLoadedPlanningCostTHB-x.directCostProxyTHB*1.2)<.000001);
  assert(Math.abs(x.indicativeSellTHB-x.employerLoadedPlanningCostTHB/.8)<.000001);
