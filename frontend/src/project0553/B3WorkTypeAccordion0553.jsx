@@ -7,6 +7,7 @@ import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
 import {selectB3WorkTypeReconciliation0553} from "./data/b3WorkTypeReconciliation0553";
+import {B3Fat2Plus5Pricing0553} from "./B3Fat2Plus5Pricing0553";
 
 // Presentation-only B3 grouping. No new source prices, Cost Owner or cost posting.
 // Use native <details> so Project Module Navigator can open ALL ancestors of a leaf.
@@ -84,6 +85,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
    <B3Item0553 number="B3.1.2" title="MGW China FAT Witness · Labour / Travel / Insurance"
     moduleId={ROOT+".revk-china-budget"}>
     <B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3"/>
+    <B3Fat2Plus5Pricing0553 workingRow={workingRow}/>
    </B3Item0553>
    <B3Item0553 number="B3.1.3" title="FAT Ownership, Supplier Clarifications & Historical Transfer"
     moduleId={ROOT+".fat-owner-transfer"}>

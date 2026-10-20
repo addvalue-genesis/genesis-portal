@@ -52,6 +52,8 @@ export function buildBcModuleNavigator0553(){
  });
  const b3Entries=[
   child(b3Id+".worktype-accordion","B3 — FAT SAT Tools Audit with Working SELL totals"),
+  child(b3Id+".fat-2plus5-pricing-scenario","B3.1 — 2-day iFAT + 5-day Customer FAT / USD600 onshore / travel separate",
+   b3Id+".fat-2plus5-pricing-scenario","7 on-site days two staff proposed THB 440200 total B3 2486200 nonposted"),
   child(b3Id+".fat","B3.1 — FAT · THB 397,400","bid.budget.working.bc.b3.fat","factory witness"),
   child(b3Id+".sat","B3.2 — SAT/SIT · THB 2,016,000","bid.budget.working.bc.b3.sat","offshore"),
   child(b3Id+".tools","B3.3 — Test rental · THB 30,000","bid.budget.working.bc.b3.tools","VeEX B11 boundary"),
