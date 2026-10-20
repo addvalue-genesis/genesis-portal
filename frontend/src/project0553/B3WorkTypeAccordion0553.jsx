@@ -3,6 +3,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {B3WorkingSellBreakdown0553} from "./B3WorkingSellBreakdown0553";
 import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
 import {B3SiteMrSatCoverage0553} from "./B3SiteMrSatCoverage0553";
+import {B3LeanSatScenario0553} from "./B3LeanSatScenario0553";
 import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
@@ -118,6 +119,10 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
    <B3Item0553 number="B3.2.2" title="Seven-Site / Four-MR SAT Matrix & Individual Tests"
     moduleId={ROOT+".site-mr-sat-matrix"}>
     <B3SiteMrSatCoverage0553 workingRow={workingRow}/>
+   </B3Item0553>
+   <B3Item0553 number="B3.2.3" title="Lean SAT/SIT 28+2 — Proposed Internal WBS (NONPOSTING)"
+    moduleId={ROOT+".lean-sat-28plus2"}>
+    <B3LeanSatScenario0553 workingRow={workingRow}/>
    </B3Item0553>
   </B3Group0553>
 
