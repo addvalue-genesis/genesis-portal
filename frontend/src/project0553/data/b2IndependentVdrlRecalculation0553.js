@@ -5,7 +5,8 @@
 // 2026 employer load (20%) and 20% cost-based gross margin are EXPLICITLY
 // selectable WHAT-IF policy assumptions, never approved B2 selling policy.
 import SOURCE from "./b2VdrlRecalcSourceWorkObjects0553.json";
-import {deriveLaborCost,deriveSellByMargin} from "../../common/cost/derivationKernel";
+import FACTORS from "./b2VdrlSourceEquationFactors0553.json";
+import {deriveManHours,deriveLaborCost,deriveSellByMargin} from "../../common/cost/derivationKernel";
 
 const freeze=Object.freeze;
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
@@ -48,15 +49,35 @@ export function evaluateB2VdrlIndependentScenario0553({
    x.bindingDecision!=="PENDING"))
   throw Error("B2 131 original VDRL source-work-objects / decisions invalid");
  const objectRows=SOURCE.records.map(x=>{
-  const [lead,senior,engineer,drafter,dc]=x.roleMH;
-  const selectedMH=[...x.roleMH];
+  const base=FACTORS.classBaseMH[x.documentClass];
+  const complexity=FACTORS.complexityFactors[x.complexity];
+  const mode=FACTORS.workModeFactors[x.workMode];
+  const reviewCycles=x.approvalClass==="A"?FACTORS.approvalAProvisionalReviewCycles:
+   FACTORS.nonApprovalDocumentReviewCycles;
+  if(!base||!complexity||!mode||!Number.isFinite(x.effectiveUnits)||x.effectiveUnits<0)
+   throw Error("B2 First Principles missing class/complexity/mode/quantity source at "+x.id);
+  // GEQ-005: MH = I × Qeffective × BaseUMH[class,role] ×
+  // ComplexityFactor × WorkModeFactor × (1 + Nreview × ReviewDeltaFactor).
+  const calculatedRoleMH=FACTORS.roleOrder.map((role,i)=>{
+   const hoursPerUnit=base[i]*complexity[i]*mode[i];
+   const totalFactor=1+reviewCycles*FACTORS.reviewPerCycleFactors[i];
+   const proof=deriveManHours({applicable:1,quantity:x.effectiveUnits,
+    unitHours:hoursPerUnit,factor:totalFactor,evidence:SOURCE_URL+
+    "#03_DOC_CLASSES/04_ROLE_FACTORS/05_WORK_OBJECTS / "+x.id+" / "+role});
+   if(proof.status!=="DERIVED_REVIEW")throw Error("B2 MH proof incomplete "+x.id+" "+role);
+   return proof.value;
+  });
+  if(calculatedRoleMH.some((v,i)=>Math.abs(v-x.roleMH[i])>0.000001)||
+   Math.abs(calculatedRoleMH.reduce((a,b)=>a+b,0)-x.sourceTotalMH)>0.000001)
+   throw Error("B2 D0-D10 first-principles recomputed MH differs from original source at "+x.id);
+  const selectedMH=[...calculatedRoleMH];
   const isExplicitB1=x.workMode==="TECHNICAL_B1_DOC_ONLY";
   if(ownerPolicy==="EXCLUDE_EXPLICIT_B1_TECHNICAL_AUTHOR_HOURS"&&isExplicitB1){
    selectedMH[0]=0;selectedMH[1]=0;selectedMH[2]=0;selectedMH[3]=0;
   }
   if(ownerPolicy==="DC_ADMIN_ONLY_BOUNDARY_CASE")
    selectedMH.splice(0,4,0,0,0,0);
-  const grossSourceMH=x.roleMH.reduce((a,b)=>a+b,0);
+  const grossSourceMH=calculatedRoleMH.reduce((a,b)=>a+b,0);
   const b2MH=selectedMH.reduce((a,b)=>a+b,0);
   const roleCostProxies=selectedMH.map((mh,i)=>{
    const proof=deriveLaborCost({hours:mh,loadedRate:DOC_SOURCE_RATES[i],
@@ -71,9 +92,12 @@ export function evaluateB2VdrlIndependentScenario0553({
    evidence:"B2 provisional 2026 planning WHAT-IF; pending actual role rates/owner RACI"});
   if(grossMarginPrice.status!=="DERIVED_REVIEW")
    throw Error("B2 formula kernel refused owner price");
-  const sourceCostProxy=x.roleMH.reduce((n,m,i)=>n+m*DOC_SOURCE_RATES[i],0);
+  const sourceCostProxy=calculatedRoleMH.reduce((n,m,i)=>n+m*DOC_SOURCE_RATES[i],0);
   return freeze({
    ...x,sourceMH:grossSourceMH,
+   calculatedRoleMH:freeze(calculatedRoleMH),
+   firstPrinciplesReviewCycles:reviewCycles,
+   sourceUMHClass:x.documentClass,
    countedMH:b2MH,
    excludedMH:grossSourceMH-b2MH,
    selectedRoleMH:freeze(selectedMH),
@@ -142,11 +166,16 @@ export function evaluateB2VdrlIndependentScenario0553({
   costOwner:"B2",
   sourceUrl:SOURCE.sourceUrl,
   sourceTitle:SOURCE.sourceTitle,
+  equationFactorSourceUrl:FACTORS.sourceUrl,
+  formulaSourceModuleId:FACTORS.moduleId,
+  derivationEquation:"GEQ-005: MH = I×Qeffective×BaseUMH[class,role]×Complexity×WorkMode×(1+Ncycle×ReviewDelta)",
   evidenceAuthority:SOURCE.sourceAuthority,
   status:"INDEPENDENT_PROVISIONAL_VDRL_ONLY_NOT_APPROVED",
   hasQuotedWorkingSellReference:false,
   assumptions:freeze({employerLoadFactor,laborGrossMarginTarget,ownerPolicy,
    rateSource:"2025 original AWP45 historical role rate seeds (Rev00a) / NOT 2026 internal payroll",
+   workloadFactorStatus:FACTORS.status,
+   approvalAProvisionalReviewCycles:FACTORS.approvalAProvisionalReviewCycles,
    loadSource:"2026 B1 support planning employer-load convention (20%), proposal ONLY for B2",
    marginSource:"2026 B1 20% gross-margin planning convention, proposal ONLY for B2",
    physicalDocumentsIncluded:false,additionalRev00dScopeIncluded:false,
