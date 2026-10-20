@@ -77,8 +77,22 @@ for(const x of [
  "2,016,000.00","30,000.00","397,400.00","2,443,400.00",
  "Shared across MR Test IDs","NOT per MR","INCLUDED IN SHARED SITE PRICE"
 ])assert(html.includes(x),"Rendered SAT matrix missing "+x);
-for(const r of m.rows)
- assert(html.includes('data-component-key="'+r.moduleId+'"'),"Missing Test-ID module "+r.id);
+for(const r of m.rows){
+ const start=html.indexOf('data-component-key="'+r.moduleId+'"');
+ assert(start>=0,"Missing Test-ID module "+r.id);
+ const end=html.indexOf("</tr>",start);
+ assert(end>start,"Missing SAT Test-ID HTML row end "+r.id);
+ const rowHtml=html.slice(start,end);
+ const siteBudget=m.budgetarySiteTimeboxes.find(t=>t.id===r.budgetTimeboxId);
+ assert(siteBudget,"SAT Test row missing price owner "+r.id);
+ const sharedPrice="THB "+siteBudget.includedLaborSellTHB.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
+ assert(rowHtml.includes("Module ID:")&&rowHtml.includes("Copy component ID "+r.moduleId),
+  "SAT Test-ID must display its exact copyable Module ID: "+r.id);
+ assert(rowHtml.includes(sharedPrice)&&rowHtml.includes("SHARED SITE WORKING SELL"),
+  "SAT Test-ID must show source Site Working SELL visibly: "+r.id);
+ assert(rowHtml.includes("NON-ADDITIVE")&&rowHtml.includes("NOT SEPARATELY PRICED"),
+  "Shared Site value may not be mistaken for a second per-MR price: "+r.id);
+}
 const parentHtml=renderToStaticMarkup(React.createElement(Parent,{workingRow:b3}));
 assert(parentHtml.includes("2,443,400.00")&&parentHtml.includes("80 MD"));
 assert(parentHtml.includes("2. Site × Team Workdays × Working SELL"));
