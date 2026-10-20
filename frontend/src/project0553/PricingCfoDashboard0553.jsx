@@ -23,8 +23,8 @@ const riskModule=reason=>{
 };
 
 function Currency({value}){return <span className="p553-cfo-number">{money(value)}</span>;}
-function CfoRow({label,source,cost,customer,samtel,receivable,profit,reserve,state,subtotal=false}){
- return <tr className={subtotal?"p553-cfo-subtotal":""}>
+function CfoRow({label,source,cost,customer,samtel,receivable,profit,reserve,state,tone=null,subtotal=false}){
+ return <tr className={[subtotal?"p553-cfo-subtotal":"",tone?"p553-cfo-source--"+tone:""].filter(Boolean).join(" ")}>
   <th scope="row"><strong>{label}</strong><small>{source}</small></th>
   <td><Currency value={cost}/></td>
   <td><Currency value={customer}/></td>
@@ -67,12 +67,12 @@ export function PricingCfoDashboard0553({model=null,thbPerUsd=null}){
      <th scope="col">ความครบถ้วน</th>
     </tr></thead>
     <tbody>
-     <CfoRow label="A — Equipment" source="10.1 · bid.budget.bom.system-location-mto"
+     <CfoRow label="A — Equipment" tone="equipment" source="10.1 · bid.budget.bom.system-location-mto"
       cost={s.aProvisionalCostTHB} customer={s.aProvisionalCustomerSellTHB}
       samtel={s.aProvisionalSamTelShareTHB} receivable={aAfterSamTel}
       profit={s.aProvisionalAddvalueTargetProfitTHB} reserve={s.aProvisionalReserveTHB}
       state={data.sourceCoverage.aReady?"ต้นทุน Working ครบ · รออนุมัติ":"เฉพาะรายการที่มีราคา · TAG/FX ยังไม่ครบ"}/>
-     <CfoRow label="B — Services" source="10.2 · bid.budget.working.bc.b1–b14"
+     <CfoRow label="B — Services" tone="services" source="10.2 · bid.budget.working.bc.b1–b14"
       cost={s.bVerifiedCostTHB} customer={s.bProvisionalCustomerSellTHB}
       samtel={s.bProvisionalSamTelDeductionTHB} receivable={s.bProvisionalNetReceivableTHB}
       profit={s.bProfitTHB} reserve={null}
@@ -81,7 +81,7 @@ export function PricingCfoDashboard0553({model=null,thbPerUsd=null}){
       cost={null} customer={preliminaryBase} samtel={preliminarySamTel}
       receivable={preliminaryReceivable} profit={null} reserve={null}
       state="HOLD · ต้นทุนรวมและกำไรจริงยังไม่ครบ" subtotal/>
-     <CfoRow label="C — Optional Spares" source="10.2 · bid.budget.working.bc.c1 / c2 · ไม่รวมใน A+B"
+     <CfoRow label="C — Optional Spares" tone="services" source="10.2 · bid.budget.working.bc.c1 / c2 · ไม่รวมใน A+B"
       cost={cCost} customer={cPrice} samtel={cSamTel} receivable={cAfterSamTel}
       profit={cProfit} reserve={cReserve}
       state={data.sourceCoverage.cCostReady?"รออนุมัติราคา Option":"ยังไม่มี Verified Direct Cost · ห้ามนำ Working Sell ไปบวก 30%"}/>
