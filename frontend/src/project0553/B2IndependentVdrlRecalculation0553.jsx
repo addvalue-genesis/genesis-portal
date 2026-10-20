@@ -91,6 +91,16 @@ export function B2IndependentVdrlRecalculation0553(){
    <div><strong>Independent indicative SELL scenario</strong><p>{money(r.indicativeGrossMarginSellTHB)}</p>
     <small>Loaded cost ÷ (1 − {(margin*100).toFixed(0)}% margin) — NOT current SELL</small></div>
   </div>
+  <p className="p55-note"><strong>Independent GEQ-005 workload derivation:</strong>
+   {" "}<a href={model.equationFactorSourceUrl} target="_blank" rel="noreferrer">
+    D0–D10 source class UMH / role factors</a>
+   {" "}→ Qeffective × Base MH × Complexity × Work Mode ×
+    (1 + Nreview × per-cycle Review Delta).
+    The original source temporarily assumes {model.assumptions.approvalAProvisionalReviewCycles}
+    review cycles for Approval A; other approvals use zero additional cycles.
+    Each of 131 recomputed 5-role MH vectors independently matches the source calculation,
+    but the original quantities, factor calibration and review-cycle choices remain
+    TEMP_ESTIMATING pending Human/Contract approval.</p>
   <p className="p55-note"><strong>Cost formula:</strong>
    {" "}Σ [I × Q × UMH by position × historical cost rate] × Employer Load
    {" "}÷ (1 − planning margin). No original B2 SELL price is referenced.
@@ -117,6 +127,12 @@ export function B2IndependentVdrlRecalculation0553(){
     <th>{money(r.employerLoadedPlanningCostTHB)}</th>
     <th>{money(r.indicativeGrossMarginSellTHB)}</th></tr></tfoot>
   </table></div>
+  <p className="p55-note"><strong>Included source boundary:</strong> this scenario includes
+   only MR0001–MR0004 VDRL work-object rows; it does not quietly add Rev00d N-01…N-04
+   extra documentation, regulatory applications or additional FAT/SAT field execution.
+   A work object identified as B1 technical authoring retains only its DC activity
+   under the default B2 scenario; all other technical reviewer/author roles still
+   require an approved RACI.</p>
   <div className="p553-b2-recalc-topbar">
    <h4>Work Type → MR → Work Object / Source Qty, MH, Cost &amp; SELL</h4>
    <div className="p553-b2-recalc-buttons">
