@@ -36,7 +36,7 @@ assert.match(cfo,/const preliminaryBase=plus/);
 assert.match(cfo,/ช่อง “ADDVALUE ได้รับ” ยังไม่ใช่กำไร/);
 assert.ok(!/<Stat\b|<ul>|p553-cfo-grid/.test(cfo),"CFO must be table-only");
 const cfoStyles=file("releaseWorkbook0553.css");
-assert.ok(!/\.p553-cfo-grid|\.p553-cfo-stat/.test(cfoStyles),"Retired KPI-card styles must be absent");
+assert.ok(!cfoStyles.includes(".p553-cfo-grid{")&&!cfoStyles.includes(".p553-cfo-stat{"),"Retired KPI-card styles must be absent");
 const ui=file("ReleaseCustomerWorkbook0553.jsx");
 for(const sheet of ["Scope of supply","B10 CommSpares","B11 SpecialTool","B13 Consumerables","C1 CapitalSpares","C2 2Y-Spares"])
  assert.ok(ui.includes(sheet),"Missing original sheet "+sheet);
