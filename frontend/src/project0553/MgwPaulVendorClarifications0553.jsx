@@ -29,7 +29,7 @@ export function MgwPaulVendorClarifications0553({code}){
     <td>John/MGW itemized OEM SKU, TAG, quantity and supplied-vs-extra price. No automatic deduction or zero-cost assumption.</td>
    </tr>)}</tbody>
   </table></div>
-  {code==="B6"&&<p className="p55-note"><strong>Freight / duty hold:</strong> MGW email indicates USD 2,500 road transport only. JUTAL receiving site, final transport legs to Myanmar, export/customs, VAT, insurance and DDP responsibility are unverified. Seller's Myanmar offshore zero-rated duty assertion is NOT an official customs ruling.</p>}
+  {code==="B6"&&<p className="p55-note"><strong>Freight / duty hold:</strong> MGW email USD 2,500 road transport is also listed ONCE as SERV-5 in the 20-Oct-2026 P26-058_R2 Cover USD 368,841; do not add it again. JUTAL receiving site, final transport legs to Myanmar, export/customs, VAT, insurance and DDP responsibility are unverified. Seller's Myanmar offshore zero-rated duty assertion is NOT an official customs ruling.</p>}
   {["B10","B11","C2"].includes(code)&&<p className="p55-note"><strong>Spares/Tools gate:</strong> MGW says items will be included; the OEM two-year spare list, commissioning spares and special tools remain unitemized. Do NOT double-book the vendor-inclusive scope or erase existing budget before receiving detailed SPIR/quote revision.</p>}
  </section>;
 }

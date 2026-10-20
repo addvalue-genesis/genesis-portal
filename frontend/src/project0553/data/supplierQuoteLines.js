@@ -2,6 +2,7 @@ import NEXT_G_FULL_BOQ from "./quotes/NG-260916-ADV-DAP1.full.json";
 import {NEXT_G_260916_TERMS_0553} from "./quotes/NG-260916-commercial-terms";
 import {MGW_P26_058_0553} from "./mgwP26058";
 import {MGW_P26_058_R2_SELECTED_0553} from "./mgwP26058R2Selected0553";
+import {MGW_R2_COVER_20261020_0553} from "./mgwP26058R2Cover20261020";
 import { INNOVA_0553_PROVISIONAL_PRICES } from "./innovaHistoricalBudgetPrices";
 // 0553 supplier quotation evidence from user-provided PDF sources.
 // The 2024 quotations are REFERENCE_ONLY from Zawtika 1E; they are NOT adopted 0553 project prices.
@@ -15,20 +16,22 @@ export const SUPPLIER_QUOTE_LINES_0553=[
  {id:MGW_P26_058_R2_SELECTED_0553.id,
   vendor:MGW_P26_058_R2_SELECTED_0553.supplier,
   quotation:MGW_P26_058_R2_SELECTED_0553.quoteNumber,
-  date:MGW_P26_058_R2_SELECTED_0553.quoteDate,
+  date:MGW_R2_COVER_20261020_0553.quoteDate,
   currency:"USD",mr:"MR-0002/MR-0003/MR-0004",
-  status:"MGW_R2_MANAGEMENT_SELECTED_WORKING__TECH_AND_COMMERCIAL_RELEASE_HOLD",
-  source:MGW_P26_058_R2_SELECTED_0553.source,
+  status:"MGW_R2_SELECTED_EQUIPMENT__LATEST_COMMERCIAL_COVER_20261020__COST_RELEASE_HOLD",
+  source:MGW_R2_COVER_20261020_0553.sourceUrl,detailSource:MGW_P26_058_R2_SELECTED_0553.source,
   scope:"ZWP20/21/22 RFI BDA + Tideland RACON; ZWP20/21/22/23 Gai-Tronics Ex Phone",
-  quotedTotal:MGW_P26_058_R2_SELECTED_0553.overallTotalUSD,
-  terms:MGW_P26_058_R2_SELECTED_0553.commercialTerms.delivery+
+  quotedTotal:MGW_R2_COVER_20261020_0553.overallTotalUSD,
+  previousCoverTotalUSD:MGW_R2_COVER_20261020_0553.priorOverallTotalUSD,
+  equipmentQuotedTotalUSD:MGW_R2_COVER_20261020_0553.equipmentTotalUSD,
+  terms:MGW_R2_COVER_20261020_0553.deliveryTerms.cover+
    "; "+MGW_P26_058_R2_SELECTED_0553.commercialTerms.payment+
    "; customer JUTAL Zhuhai DDP / supplier inclusions NOT confirmed",
   lines:[
    ...MGW_P26_058_R2_SELECTED_0553.lines.map(x=>[x.id,x.model,
     x.includedComponents.join("; "),x.quantity,x.unitPriceUSD,x.extendedUSD,x.mr]),
-   ...MGW_P26_058_R2_SELECTED_0553.services.map(x=>[
-    x.id,x.id,x.description,1,x.amountUSD,x.amountUSD,"VENDOR_SERVICES_SHARED"])
+   ...MGW_R2_COVER_20261020_0553.services.map(x=>[
+    x.id,x.id,x.description,1,x.usd,x.usd,"VENDOR_SERVICES_SHARED__LATEST_COVER_20261020"])
   ]},
  {id:"NG-260916",vendor:"Next G Solution",quotation:"NG/260916-ADV-DAP1",date:"2026-09-16",validUntil:"2026-10-01",currency:"USD",terms:"100% Cash in Advance; DAP Ranong; 22–24 Weeks; Thai inland delivery VAT note; quotation valid until 01-Oct-26",commercialTerms:NEXT_G_260916_TERMS_0553,sourceUrl:NEXT_G_260916_TERMS_0553.sourceUrl,mr:"MR-0001",status:"2026_QUOTE_EXPIRED_RECONFIRM",source:"NG Price Proposal - ADV Z1F as of 16Sep26.pdf",scope:"Zawtika Phase 1F",quotedTotal:191610.15,lines:NEXT_G_FULL_BOQ.lines.map(x=>[x.code,x.partNumber,x.description,x.qty,x.unitPrice,x.quotedTotal,x.group,x.sourcePage,x.pricingState])},
  {id:"VST-0048-RE1",vendor:"VST ECS (Thailand) / Cisco",quotation:"A-0048/2026_Re1",date:"2026-09-09",validUntil:"2026-09-30",currency:"THB",terms:"Delivery 60–75 days; quote validity end of issue month; VAT 7% separately",mr:"MR-0001",status:"2026_QUOTE_EXPIRED_RECONFIRM",source:"A-0048_Add Value System_PTTEP_Re1.pdf",scope:"PTTEP / verify Z1F MTO",quotedTotal:2117650,lines:[

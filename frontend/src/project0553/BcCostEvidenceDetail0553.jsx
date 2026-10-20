@@ -9,6 +9,7 @@ import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
 import {B3SiteMrSatCoverage0553} from "./B3SiteMrSatCoverage0553";
 import {B3WorkingSellBreakdown0553} from "./B3WorkingSellBreakdown0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
+import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
 // imply that historical payroll cost or the WBS SELL is verified direct COST.
@@ -109,6 +110,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
  return <section className="p55-panel p553-bc-evidence" data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
   <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
   <h3>{e.code} — {workingRow.requirement}</h3>
+  <MgwR2CommercialCover0553 code={e.code}/>
   <MgwPaulVendorClarifications0553 code={e.code}/>
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
