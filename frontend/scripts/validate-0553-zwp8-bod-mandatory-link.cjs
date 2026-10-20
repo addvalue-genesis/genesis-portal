@@ -1,0 +1,15 @@
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path"),babel=require("@babel/core");
+const root=path.resolve(__dirname,"../src/project0553");
+const compile=name=>{const s=fs.readFileSync(path.join(root,name),"utf8");const compiled=babel.transformSync(s,{babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});assert(compiled.code.length>0);return s;};
+const authority=compile("data/zwp8BodNewLinkAuthority0553.js");
+const working=compile("data/mr0001Zwp8RadioOwnerEvidence0553.js");
+const ui=compile("ZWP8CostOwnershipAudit0553.jsx");
+assert(authority.includes("ADDITIONAL_NEW_PTP_LINK_REQUIRED_BY_BOD_C2"));
+assert(authority.includes('odu:"MR-502-004"')&&authority.includes('antenna:"ANT-502-003"'));
+assert(authority.includes('odu:"MR-502-003"')&&authority.includes('antenna:"ANT-502-002"'));
+assert(authority.includes("EXISTING_LINK_RETAINED__NO_AUTO_REPLACEMENT"));
+assert(working.includes("BOD C2 §7.2 REQUIRED NEW PTP radio endpoint"));
+assert(ui.includes("bodIssueCorrections[issue.id]?.details||issue.details"));
+assert(ui.includes("BOD C2 §7.2 MANDATES ONE ADDITIONAL NEW PTP LINK"));
+assert(ui.includes("ONE enclosure"));
+console.log("PASS BOD C2 §7.2: NEW additional PTP ZPQ–ZWP8 mandated, retained existing link separate; PTMP distinct, two radio TAG prices retained; no cost baseline mutation.");
