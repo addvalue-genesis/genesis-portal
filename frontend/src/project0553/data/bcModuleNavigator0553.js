@@ -9,6 +9,7 @@ import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
+import {evaluateB2VdrlIndependentScenario0553} from "./b2IndependentVdrlRecalculation0553";
 import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553,
  B1_AUDIT_KINDS_0553,b1AuditModuleId0553} from "./b1AccordionModuleIds0553";
 
@@ -209,6 +210,30 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId:"bid.budget.working.bc.b2.price-overview.lump-sum-proof",
   keywords:"B2 lump sum quantity rate working sell invoice not verified"
  });
+ // New B2 independent scenario has unique source Work Objects, NOT new cost postings.
+ const b2Recalc=evaluateB2VdrlIndependentScenario0553();
+ const calcRoot=b2Recalc.moduleId;
+ const b2Entry=(id,name,keywords="recalculate VDRL work object MH rate direct cost price")=>({
+  id,name,tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:id,keywords:"B2 "+keywords
+ });
+ entries.push(b2Entry(calcRoot,"B2 — Independent First Principles Recalculation (VDRL Only)"));
+ entries.push(b2Entry("bid.budget.working.bc.b2.quote-comparison","B2 — Prior 580k Working SELL audit, excluded from new calculation"));
+ entries.push(b2Entry(calcRoot+".audit","B2.RA — Recalc Input and Cost Owner Audit"));
+ const dossierSlug=d=>d.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
+ for(const dossier of b2Recalc.dossierGroups){
+  const id=calcRoot+".dossier."+dossierSlug(dossier.dossier);
+  entries.push(b2Entry(id,"B2 — "+dossier.dossier+" / independent MH cost price"));
+  for(const mr of dossier.byMr){
+   const mrId=id+".mr."+dossierSlug(mr.mr);
+   entries.push(b2Entry(mrId,"B2 — "+dossier.dossier+" / "+mr.mr+" source document work objects"));
+  }
+ }
+ entries.push(...b2Recalc.objectRows.map(x=>b2Entry(
+  calcRoot+".wo."+x.id.toLowerCase(),
+  "B2 "+x.id+" — "+x.title+" ("+x.mr+")",
+  "VDRL WO source "+x.sourceItem+" "+x.documentClass+" "+x.mr+" "+x.workMode
+ )));
  const ids=entries.map(x=>x.id),all=new Set(ids);
  if(all.size!==entries.length)throw Error("Duplicate B/C Navigator Module ID");
  const leaves=entries.filter(x=>x.kind==="CUSTOMER_BC_WORKING_ROW");
