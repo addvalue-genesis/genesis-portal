@@ -35,11 +35,11 @@ assert(work.includes('item.workingSellTHB') &&
  "Canonical per-category Working Sell, Direct Cost and IDs must remain visible");
 assert(work.includes('if(Math.abs(partBWorkingSell-bcWorking.knownWorkingSellTHB)>0.01)throw Error("10.2 Part B summary mismatch")'),
  "Current Part B Base summary must reconcile to canonical source without optional C");
-assert(work.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}/>') &&
+assert(work.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/>') &&
  work.includes('<BcWorkCostLines0553 selectedCode={bcTab}/>'),
  "Selected B/C category must display canonical cost evidence and line ledger");
 assert(work.includes('bcDetailCode===item.code') &&
- work.includes('<BcCostEvidenceDetail0553 workingRow={item}/>') &&
+ work.includes('<BcCostEvidenceDetail0553 workingRow={item} navigationTarget={navigationTarget}/>') &&
  work.includes('<BcWorkCostLines0553 selectedCode={item.code}/>'),
  "ALL view expanded category must display that canonical row's evidence and cost lines");
 assert(work.includes('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>'),
@@ -47,7 +47,7 @@ assert(work.includes('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working
 assert(work.includes('bcTab==="ALL"&&<section className="p55-panel" data-component-key="bid.budget.working.bc.inline-list"'),
  "Only ALL tab must render the complete grouped Part B/C listing");
 const tabPosition=work.indexOf('<ScopeCategoryTabs0553 value={bcTab}');
-const detailPosition=work.indexOf('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}/>');
+const detailPosition=work.indexOf('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/>');
 const annexPosition=work.indexOf('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>');
 const allListingPosition=work.indexOf('data-component-key="bid.budget.working.bc.inline-list"');
 assert(tabPosition>=0 && tabPosition<detailPosition &&

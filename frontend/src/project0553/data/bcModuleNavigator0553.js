@@ -7,6 +7,10 @@ import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553} from "./bcWorkingModuleRo
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
+import {MGW_R2_COVER_20261020_0553} from "./mgwP26058R2Cover20261020";
+import {MGW_ROAD_FREIGHT_PACKING_EVIDENCE_0553} from "./mgwRoadFreightPackingEvidence0553";
+import {MGW_PAUL_EMAIL_CLARIFICATIONS_0553} from "./mgwPaulEmailClarifications0553";
+import {workingOwnerFromModuleId0553} from "./moduleDeepLink0553";
 
 export function buildBcModuleNavigator0553(){
  const bc=selectBcTurnkeyWorkingCost0553();
@@ -85,7 +89,46 @@ export function buildBcModuleNavigator0553(){
    entry.parentOwner=match.costOwner==="B9"?"B9":"B3";
   }
  }
- entries.push(...b3Entries);
+ // MGW nested 10.2 evidence IDs MUST be searchable at their exact rendered anchors.
+ // Only UI navigation metadata is produced here; supplier amounts and approved costs
+ // remain owned by the quote/working-cost modules, never this registry.
+ const coverOwners={B1:["SERV-1"],B2:["SERV-1"],B3:["SERV-2","SERV-4"],
+  B5:["SERV-3"],B6:["SERV-5"]};
+ const coverEntries=Object.entries(coverOwners).flatMap(([owner,ids])=>{
+  const base="bid.budget.working.bc."+owner.toLowerCase()+".mgw-r2-cover-20261020";
+  return [
+   child(base,owner+" — MGW 20-Oct-2026 Commercial Cover",base,
+    "MGW R2 "+owner+" vendor supplier cost cover 368841 no working sell posting"),
+   ...ids.map(id=>{
+    const line=MGW_R2_COVER_20261020_0553.services.find(x=>x.id===id);
+    if(!line)throw Error("Navigator missing MGW Cover "+id);
+    return child(base+"."+id.toLowerCase(),owner+" — "+id+" "+line.description,
+     base+"."+id.toLowerCase(),"MGW "+owner+" "+id+" supplier service evidence");
+   })
+  ];
+ });
+ const roadEntries=Object.entries(MGW_ROAD_FREIGHT_PACKING_EVIDENCE_0553.moduleIds)
+  .map(([owner,id])=>child(id,owner+" — MGW road freight including packing / potential USD500 overlap",
+   id,"Nantong JUTAL Zhuhai MGW WhatsApp packing road freight supplier COST HOLD"));
+ // RACON-KIT / RACON-BD are 10.1 BOM evidence sharing one MR0004 anchor;
+ // only index real 10.2 B/C IDs rendered by its Cost Evidence panel.
+ const emailRows=[...MGW_PAUL_EMAIL_CLARIFICATIONS_0553.rows,
+  ...MGW_PAUL_EMAIL_CLARIFICATIONS_0553.additionalSpareOwners]
+  .filter(r=>Boolean(workingOwnerFromModuleId0553(r.moduleId)));
+ const emailOwners=[...new Set(emailRows.map(r=>r.owner))];
+ const emailEntries=[
+  ...emailOwners.map(owner=>{
+   const id="bid.budget.working.bc."+owner.toLowerCase()+".mgw-email-clarifications";
+   return child(id,owner+" — MGW Paul 20-Oct Vendor Clarifications",id,
+    "MGW RACON freight RADWIN FAT SPIR spares special tools");
+  }),
+  ...emailRows.map(r=>child(r.moduleId,r.owner+" — "+(r.statement||r.expected||r.id),
+   r.moduleId,"MGW "+r.owner+" "+r.id+" SPIR freight RACON tools commissioning spares"))
+ ];
+ const vendorEntries=[...coverEntries,...roadEntries,...emailEntries].map(entry=>({
+  ...entry,parentOwner:workingOwnerFromModuleId0553(entry.id)
+ }));
+ entries.push(...b3Entries,...vendorEntries);
  const ids=entries.map(x=>x.id),all=new Set(ids);
  if(all.size!==entries.length)throw Error("Duplicate B/C Navigator Module ID");
  const leaves=entries.filter(x=>x.kind==="CUSTOMER_BC_WORKING_ROW");

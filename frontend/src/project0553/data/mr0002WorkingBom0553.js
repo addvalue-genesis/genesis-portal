@@ -2,6 +2,7 @@
 // Quote-wide MGW quantities are never multiplied by guessed site quantities.
 // Site equipment is an explicit management provisional 1-per-WP distribution.
 import {MGW_P26_058_R2_SELECTED_0553} from "./mgwP26058R2Selected0553";
+import {MGW_R2_COVER_20261020_0553} from "./mgwP26058R2Cover20261020";
 import {RFI_BDA_SELECTION_0553} from "./rfiBdaSelected0553";
 import {selectMR0002Rate0553} from "./mr0002PriceRegistry0553";
 
@@ -108,8 +109,13 @@ for(const location of bySite){
 export const MR0002_WORKING_BOM_0553=Object.freeze({
  id:"P553-MR0002-WORKING-BOM",mr:"MR-0002",sites:bySite,
  workingRateSource:p,quotation:MGW_P26_058_R2_SELECTED_0553.id,
- quoteTotalUSD:MGW_P26_058_R2_SELECTED_0553.overallTotalUSD,quoteTotalClass:"COMBINED_THREE_SYSTEM_VENDOR_OFFER_NOT_MR0002_ALONE",
+ // Quote-wide reference is the LATEST commercial cover; not an MR0002 cost line.
+ quoteTotalUSD:MGW_R2_COVER_20261020_0553.overallTotalUSD,quoteTotalClass:"LATEST_OCT20_COMBINED_THREE_SYSTEM_VENDOR_OFFER_NON_ADDITIVE",
+ priorDetailedQuoteTotalUSD:MGW_P26_058_R2_SELECTED_0553.overallTotalUSD,
+ quoteCoverSource:MGW_R2_COVER_20261020_0553.sourceUrl,
  quoteEquipmentTotalUSD:MGW_P26_058_R2_SELECTED_0553.lines.filter(x=>x.mr==="MR-0002").reduce((n,x)=>n+x.extendedUSD,0),
- quoteServicesTotalUSD:MGW_P26_058_R2_SELECTED_0553.serviceTotalUSD,quoteServicesScope:"SHARED_ACROSS_MR0002_MR0003_MR0004__NOT_ADDITIVE_A2",
+ quoteServicesTotalUSD:MGW_R2_COVER_20261020_0553.serviceTotalUSD,
+ priorDetailedServicesUSD:MGW_P26_058_R2_SELECTED_0553.serviceTotalUSD,
+ quoteServicesScope:"SHARED_ACROSS_MR0002_MR0003_MR0004__NON_ADDITIVE_A2__NOT_BOOKED_WORKING_COST",
  selectedManufacturer:"RFI",selectedBda:RFI_BDA_SELECTION_0553,status:"RFI_BDA_BASE_OFFER__LNA_SUPERSEDED_NON_ADDITIVE__EXD_ENCLOSURE_AND_DEVIATION_GATED"
 });

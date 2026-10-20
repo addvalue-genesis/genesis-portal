@@ -109,7 +109,7 @@ assert(main.includes('bcWorking.byCode[bcTab]')&&
  main.includes('group.rows.map(item=>')&&
  main.includes('bcDetailCode===item.code'),
  "10.2 current tab/expanded list must select canonical B/C rows, not a historical second source");
-assert(main.includes('<BcCostEvidenceDetail0553 workingRow={item}/>')&&
+assert(main.includes('<BcCostEvidenceDetail0553 workingRow={item} navigationTarget={navigationTarget}/>')&&
  main.includes('data-component-key={item.moduleId}'),
  "10.2 expanded row must carry canonical Cost Evidence and Module ID");
 assert(render.includes("m.rows.filter")&&render.includes("m.workingSellByCode"));

@@ -88,11 +88,14 @@ for(const s of wpBulk.filter(x=>["ZWP20","ZWP21","ZWP22"].includes(x.wp))){
 }
 assert.equal(bc().byCode.B3.workingSellTHB,2443400,"MGW OEM work may not alter ADDVALUE B3 Working SELL");
 assert.equal(bc().byCode.B3.directCostTHB,null);
-assert.equal(recon.mgwSelectedOverallUSD,364841);
+assert.equal(recon.mgwSelectedOverallUSD,368841);
+assert.equal(recon.mgwSelectedServiceUSD,18500);
+assert.equal(recon.mgwSelectedPriorDetailOverallUSD,364841);
+assert.equal(recon.mgwSelectedVendorServicesPostingAllowed,false);
 assert.equal(recon.mgwSelectedEquipmentUSD,350341);
 const otherAssets=fs.readFileSync(path.join(root,"project0553/data/mr0002WorkingBom0553.js"),"utf8");
 assert(otherAssets.includes("MGW_P26_058_R2_SELECTED_0553"));
 const scope=fs.readFileSync(path.join(root,"project0553/ScopeSheetsDetail0553.jsx"),"utf8");
 assert(scope.includes("Selected MGW R2 Tideland"));
 assert(scope.includes("Selected MGW R2 Gai-Tronics"));
-console.log("PASS MGW P26-058_R2 selected: MR2 USD99564 / 3 WPs; MR3 USD25600 / 4 WPs; MR4 Tideland USD225177 / 3 WPs; shared services USD14500; quote USD364841. No duplicate accessory, no rev03 cost or B3 SELL change.");
+console.log("PASS MGW P26-058_R2 selected: MR2 USD99564 / 3 WPs; MR3 USD25600 / 4 WPs; MR4 Tideland USD225177 / 3 WPs; Sep21 detail shared services USD14500 / overall USD364841 retained as prior, latest Oct20 cover USD368841. No duplicate accessory, no rev03 cost or B3 SELL change.");

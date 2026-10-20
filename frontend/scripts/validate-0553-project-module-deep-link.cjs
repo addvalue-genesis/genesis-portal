@@ -60,6 +60,29 @@ const html=renderToStaticMarkup(React.createElement(BcDetail,{workingRow:b,navig
 assert(html.includes('data-component-key="'+satId+'"'));
 assert(html.includes('data-component-key="'+site().rows[0].moduleId+'"'));
 assert(html.includes("2,443,400.00"));
+for(const code of ["B5","B6","B10","B11","C2"]){
+ const panel=renderToStaticMarkup(React.createElement(BcDetail,{
+  workingRow:current().byCode[code],navigationTarget:null
+ }));
+ const markers={
+  B5:["bid.budget.working.bc.b5.mgw-road-freight-packing-inclusion"],
+  B6:["bid.budget.working.bc.b6.mgw-road-freight-packing-inclusion",
+      "bid.budget.working.bc.b6.mgw-road-freight"],
+  B10:["bid.budget.working.bc.b10.mgw-commissioning-spares"],
+  B11:["bid.budget.working.bc.b11.mgw-special-tools"],
+  C2:["bid.budget.working.bc.c2.mgw-two-year-operation-spares"]
+ };
+ for(const id of markers[code]){
+  const entry=lookup(id);
+  assert(entry&&entry.anchorModuleId===id&&entry.parentOwner===code,
+   "Navigator exact leaf and owner missing: "+id);
+  assert(panel.includes('data-component-key="'+id+'"'),
+   "10.2 owner panel does not render registered leaf: "+id);
+  assert.equal(search(id.toUpperCase(),all).filter(x=>x.id===id).length,1,
+   "Exact MGW leaf search must resolve uniquely: "+id);
+ }
+}
+
 const foreign=trace().rows.find(x=>x.costOwner!=="B3"&&x.costOwner!=="B9");
 assert(foreign);
 const cross=renderToStaticMarkup(React.createElement(Crosswalk,{selectedOwner:"B3",navigationTarget:foreign.moduleId}));

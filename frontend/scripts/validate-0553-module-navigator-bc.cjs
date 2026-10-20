@@ -35,7 +35,12 @@ assert(index.every(x=>x.tab==="budget"&&x.anchorModuleId),
  "Navigator must route each source Module ID to a real Budget DOM anchor");
 const same=searchBcModuleNavigator0553("BID.BUDGET.WORKING.BC",index);
 assert.equal(same.length,index.length,"Parent prefix must find all nested Budget modules");
-assert.equal(searchBcModuleNavigator0553("bid.budget.working.bc.b6",index).length,1);
+assert(searchBcModuleNavigator0553("bid.budget.working.bc.b6",index).some(x=>x.id==="bid.budget.working.bc.b6"),"B6 owner must be indexed");
+assert.equal(index.filter(x=>x.id==="bid.budget.working.bc.b6").length,1,"B6 owner has one canonical ID");
+for(const id of ["bid.budget.working.bc.b5.mgw-road-freight-packing-inclusion","bid.budget.working.bc.b6.mgw-road-freight-packing-inclusion","bid.budget.working.bc.b10.mgw-commissioning-spares","bid.budget.working.bc.b11.mgw-special-tools","bid.budget.working.bc.c2.mgw-two-year-operation-spares"]){
+ const found=index.find(x=>x.id===id);
+ assert(found&&found.anchorModuleId===id&&found.parentOwner,"MGW evidence ID not indexed: "+id);
+}
 assert.equal(searchBcModuleNavigator0553("10.2.3",index).length,5,
  "Third source group plus B10–B13 must be indexed");
 assert.equal(searchBcModuleNavigator0553("never-created-fake-module",index).length,0);

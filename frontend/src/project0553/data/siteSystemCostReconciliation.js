@@ -7,6 +7,7 @@ import {ZWP8_ROW43_COST_TRACE} from "./zwp8Row43CostTrace";
 import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {MGW_P26_058_0553} from "./mgwP26058";
 import {MGW_P26_058_R2_SELECTED_0553} from "./mgwP26058R2Selected0553";
+import {MGW_R2_COVER_20261020_0553} from "./mgwP26058R2Cover20261020";
 import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
 import {MR0003_MGW_WORKING_BOM_0553} from "./mr0003MgwWorkingBom0553";
 import {MR0004_WORKING_BOM_0553} from "./mr0004WorkingBom0553";
@@ -154,8 +155,15 @@ export const SITE_SYSTEM_COST_RECONCILIATION_0553=Object.freeze({
  canonicalBindings:[{view:"bid.budget.bom.zwp20",mr:"MR-0001",site:"ZWP20",source:"deriveZWP20SiteCost0553"}],
  mgwSelectedQuote:MGW_P26_058_R2_SELECTED_0553.id,
  mgwSelectedEquipmentUSD:MGW_P26_058_R2_SELECTED_0553.equipmentTotalUSD,
- mgwSelectedOverallUSD:MGW_P26_058_R2_SELECTED_0553.overallTotalUSD,
+ // Latest quote-wide commercial authority is the 20-Oct cover; six equipment packages
+ // still come from the 21-Sep detailed offer. Never add vendor services to A2–A4.
+ mgwSelectedOverallUSD:MGW_R2_COVER_20261020_0553.overallTotalUSD,
+ mgwSelectedServiceUSD:MGW_R2_COVER_20261020_0553.serviceTotalUSD,
+ mgwSelectedPriorDetailOverallUSD:MGW_P26_058_R2_SELECTED_0553.overallTotalUSD,
+ mgwSelectedCoverSource:MGW_R2_COVER_20261020_0553.sourceUrl,
+ mgwSelectedVendorServicesPostingAllowed:false,
  mgwOriginalQuoteClass:"HISTORICAL_COMPARATOR_NOT_SELECTED",
+ // Values below are an ORIGINAL MGW P26-058 (superseded) comparison, not current R2.
  mgwSharedUSD:mgwSharedAmount,mgwProductQuotedUSD:mgwProductQuotedAmount,
  mgwQuoteUSD:MGW_P26_058_0553.quotedTotal,
  nextGQuoteUSD:sourcePrice("NG-260916")?.quotedTotal??null,

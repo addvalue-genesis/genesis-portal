@@ -11,7 +11,7 @@ const EVIDENCE=Object.freeze({
  phoneMR:"MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 / MTO Rev04",
  bartec:"21G1048t-BA-GA-100X_Z0.pdf (GA-1001/1002/1003 and GA-1004, 2022 as-built)",
  cable:"MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §6.6.2/6.6.3/6.6.4/6.6.5",
- supplier:"Selected EXION QT_1260576 + PROSPER Q-PROSRY-24051 item3 historical; MGW PHONE-1 excluded"
+ supplier:"Selected MGW P26-058_R2 PHONE-1/WAROM BXJ-S Ex e; EXION/PROSPER/BARTEC GA-1004 are historical comparator only"
 });
 const cableCandidate=(id,description,from,to,cableType,designSource,ownership)=>Object.freeze({
  id,description,from,to,cableType,designSource,ownership,
@@ -83,9 +83,14 @@ export function deriveBartecGlandBulkSchedule0553(){
    interfaceRows:PHONE_CABLES,
    verifiedUsedEntries:null,verifiedActiveGlands:null,verifiedSparePlugs:null,
    requiredGlandsBySize:null,purchaseGlandsBySize:null,
-   includedPackageSource:"Selected working GA-1004 has 8 M20 top entries with 8 factory plugs plus a separate drain. PROSPER historical item3 price covers 4 M20 top entries, not a confirmed 8-entry GA-1004 price. Certified active glands not included by evidence. EXION phone/sounder separate; MGW excluded.",
+   includedPackageSource:"Selected MGW PHONE-1 includes WAROM BXJ-S Ex e SS316L with one quoted Ex-P gland. WAROM actual field entry capacity/plugs NOT ESTABLISHED. The displayed BARTEC GA-1004 8×M20 entry scenario and PROSPER historical item3 4×M20 are non-selected reference only; do not price, deduct, or claim fitment by using the historical GA capacity.",
+   scenarioBasis:"BARTEC_GA1004_HISTORICAL_COMPARATOR__NOT_SELECTED_PHYSICAL_PACKAGE",
+   currentSelectedSupplier:"MGW",currentSelectedEnclosure:"WAROM BXJ-S",
+   currentSelectedEntryCapacity:null,currentSelectedFactoryPlugs:null,
+   mgwQuotedIncludedExPGlandPerSet:1,verifiedInstalledExGlandQty:null,
+   selectedWorkingCostPostingAllowed:false,
    source:EVIDENCE.phoneMR+" + "+EVIDENCE.bartec+" + "+EVIDENCE.supplier,
-   status:"BUDGETARY_3_ENDS__GA1004_8_TOP_M20__PROSPER_ITEM3_4_HOLE_PRICE_GAP__GLAND_SKU_PENDING"
+   status:"HISTORICAL_BARTEC_GA1004_COMPARATOR__MGW_WAROM_CAPACITY_UNKNOWN__GLAND_SKU_PENDING"
   });
   return {site,enclosures:rows};
  });
@@ -100,7 +105,8 @@ export function deriveBartecGlandBulkSchedule0553(){
    plannedReservedEntryCapacity:all.reduce((n,x)=>n+x.spareEntryPlanningQty,0),
    verifiedActiveGlandQty:null,verifiedPurchaseGlandQty:null,
    actualGlandSizeBreakdown:null,
-   note:"Hole and plug capacity assume one selected physical SCADA enclosure per MR0001 site and one Ex telephone JB per MR0003 site; these are NOT final gland procurement totals."
+   phoneJbHoleScenarioOnly:true,currentSelectedPhoneJbHoleCapacityVerified:false,
+   note:"The 7 SCADA BARTEC plus 4 telephone GA-1004 counts are comparative as-built entry-capacity scenario values ONLY. MGW current selected WAROM phone JB hole/plug capacities are NOT ESTABLISHED; 144 must NOT be treated as current selected fitted capacity or gland procurement."
   },
   policy:BARTEC_GLAND_BULK_POLICY_0553,pricePosted:false,customerApproved:false
  };
