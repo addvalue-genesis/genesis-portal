@@ -10,19 +10,19 @@ function compile(mod,file){
 require.extensions[".js"]=(mod,file)=>file.startsWith(root+path.sep)?compile(mod,file):oldJs(mod,file);
 require.extensions[".jsx"]=(mod,file)=>file.startsWith(root+path.sep)?compile(mod,file):(oldJsx||oldJs)(mod,file);
 const project=p=>require(path.join(root,"project0553",p));
-const {MGW_P26_058_R2_UHF_0553:q}=project("data/mgwP26058R2Uhf0553.js");
+const {MGW_P26_058_R2_SELECTED_0553:q}=project("data/mgwP26058R2Selected0553.js");
 const {MR0002_WORKING_BOM_0553:bom}=project("data/mr0002WorkingBom0553.js");
 const {selectWorkingBomProjection0553:projectRows}=project("data/workingBomAggregation0553.js");
 const {validateBomPresentationContract0553:validateUi}=project("bomPresentationContract0553.test.js");
 assert.equal(validateUi(),true,"Presentation invariants");
-assert.equal(q.lines.reduce((sum,r)=>sum+r.quantity*r.unitPriceUSD,0),97704);
-assert.equal(q.services.reduce((sum,r)=>sum+r.price,0),6000);
-assert.equal(bom.quoteEquipmentTotalUSD,97704);
+assert.equal(q.lines.filter(x=>x.mr==="MR-0002").reduce((sum,r)=>sum+r.quantity*r.unitPriceUSD,0),99564);
+assert.equal(q.services.reduce((sum,r)=>sum+r.amountUSD,0),14500);
+assert.equal(bom.quoteEquipmentTotalUSD,99564);
 const target=["ZWP20","ZWP21","ZWP22"];
 for(const site of target){
  const canonical=bom.sites.find(s=>s.site===site);
  assert.ok(canonical,"Missing canonical "+site);
- assert.equal(canonical.controlledTotalUSD,32568,"R2 equipment allocation "+site);
+ assert.equal(canonical.controlledTotalUSD,33188,"R2 equipment allocation "+site);
  const rows=projectRows({mr:"MR-0002",site});
  assert.deepEqual(rows.invalidPosting,[],"Invalid posting rows for "+site);
  const ids=rows.lines.map(x=>[x.site,x.mr,x.id].join("|"));
@@ -41,5 +41,5 @@ for(const site of target){
   assert.equal(item.countedInWorkingTotal,false,id+" double posted");
  }
 }
-assert.equal(target.reduce((sum,s)=>sum+bom.sites.find(x=>x.site===s).controlledTotalUSD,0),97704,"Three-location equipment quote reconciles");
+assert.equal(target.reduce((sum,s)=>sum+bom.sites.find(x=>x.site===s).controlledTotalUSD,0),99564,"Three-location equipment quote reconciles");
 console.log("PASS PJ2608-0553 runtime MR0002 quote, 3-WP source ledger, presentation and inclusion checks");
