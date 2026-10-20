@@ -488,3 +488,15 @@
 .p553-dashboard .p553-bc-price-leaf-head:focus-visible{outline:2px solid #18789d;outline-offset:-2px}
 .p553-dashboard .p553-bc-price-doc-group .p55-table td{overflow-wrap:anywhere;white-space:normal}
 @media(max-width:720px){.p553-dashboard .p553-bc-price-leaf-head{padding:9px 7px;gap:6px}.p553-dashboard .p553-bc-price-num{min-width:39px}.p553-dashboard .p553-price-trace-copy{flex-basis:100%}}
+
+
+/* B1 first-visible commercial trace: all eight account amounts above the nested audit. */
+.p553-dashboard .p553-b1-price-overview{border-left:5px solid #265a9b;background:#fcfdff}
+.p553-dashboard .p553-b1-price-overview h3{margin:6px 0 10px}
+.p553-dashboard .p553-b1-price-overview .p55-metric-grid{margin:10px 0}
+.p553-dashboard .p553-b1-price-overview-table{font-size:12px;font-variant-numeric:tabular-nums}
+.p553-dashboard .p553-b1-price-overview-table thead th{background:#e9f2fc}
+.p553-dashboard .p553-b1-price-overview-table tbody tr:hover{background:#f0f7ff}
+.p553-dashboard .p553-b1-price-overview-table tfoot th{background:#dcebf8}
+.p553-dashboard .p553-b1-price-overview-table td{vertical-align:top}
+.p553-dashboard .p553-b1-price-overview-table .p553-detail-button{white-space:normal;text-align:left}

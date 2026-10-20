@@ -51,6 +51,7 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId:id,keywords:"B1 internal engineering management support "+keywords
  });
  const b1Entries=[
+  b1Nested(b1Root+".price-overview","B1 — Visible Qty / MH / Working Cost / SELL for B1.1–B1.8","B1 financial line details summary view amounts"),
   b1Nested(b1Root+".revk-pm-milestones","B1 — Rev.K / B1.1–B1.8 Support Planning","source management accounts"),
   b1Nested(b1Root+".worktype-accordion","B1 — Color-coded Nested Accordion","expand collapse eight categories"),
   ...b1.accounts.flatMap(g=>{
