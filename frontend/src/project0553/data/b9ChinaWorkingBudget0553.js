@@ -1,4 +1,4 @@
-// PJ2608-0553 / B3 China FAT Witness + B9 conditional JUTAL Yard Assistance. Contract Scope-of-Supply controls cost owner.
+// PJ2608-0553 / B3 China FAT Witness + B9 priced JUTAL Yard Assistance. The B9 1 LS is in customer Base pricing; physical execution remains written-call-out conditional.
 // Management selected: USD600 PERSON/day Onshore labour; NO separate per diem line.
 // Six MGW-FAT witness days derived from four-MR 48h agenda, not mandated by source docs.
 // 12 Yard team-days = SUPERSEDED Rev05 comparison, NOT selected for new call-out.
@@ -52,10 +52,10 @@ export const B9_CHINA_BUDGET_SOURCE_0553=Object.freeze({
  unbilledBackupCashAllowanceBasis:"INTERNAL CASH RISK ONLY, NOT EXTRA SELL: airfare 15000 + 9 hotel-nights 22500 + conditional visa 4000 + travel insurance 2000 + technical-work cover 5000; local transport incremental TBC; field labour payroll not estimated",
  unbilledBackupCashAllowancePosting:"NON_POSTING_RISK_WITHIN_ACCEPTED_233600_LS__MARGIN_REVIEW",
  commercialNoticePlanningDays:14,contractualBodNoticeDays:30,noticePrecedenceHold:true,
- priceClass:"B3_MGW_FAT_BASE_PLUS_B9_CONDITIONAL_YARD_SUPPORT_SEPARATE",
+ priceClass:"B3_MGW_FAT_BASE_PLUS_B9_QUOTED_BASE_YARD_CALL_OUT_SEPARATE",
  directCostVerified:false,insuranceCoverVerified:false,visaRequirementVerified:false,
  releaseAllowed:false,expenseOwner:"B3_FAT_B9_YARD_BY_ACTIVITY",legacyWbsB9SellTHB:574560,
- laborOwner:"B3_FOR_FAT_B9_FOR_YARD",clientBasePricePosting:"FAT_WORKING_SELL_B3_ONLY",
+ laborOwner:"B3_FOR_FAT_B9_FOR_YARD",clientBasePricePosting:"FAT_WORKING_SELL_B3_AND_YARD_SPECIALIST_B9_ONCE",
  marketEvidence:[
   "https://www.thaiairways.com/flights/en/flights-from-bangkok-to-guangzhou",
   "https://flights.cathaypacific.com/destinations/en_TH/flights-from-bangkok-to-guangzhou",
@@ -103,10 +103,12 @@ export function selectB9ChinaWorkingBudget0553(){
  const conditional=round(rows.filter(x=>x.optional).reduce((n,x)=>n+x.workingSellTHB,0));
  if(base!==397400||conditional!==233600||total!==631000||rows.length!==16||source.perDiemSeparate||rows.filter(x=>x.costOwner==="B3").length!==8)
   throw Error("B9 Rev.K budget/Per Diem/equipment duplicate error");
- return Object.freeze({...source,fatWbs,rows,workingSellTHB:0,fatWorkingSellTHB:base,b3FatWorkingSellTHB:base,b9BaseWorkingSellTHB:0,conditionalYardSellTHB:conditional,
+ // One quoted contract line (B9) with conditional execution. conditionalYardSellTHB
+ // remains source evidence, NOT a second additional option/price posting.
+ return Object.freeze({...source,fatWbs,rows,workingSellTHB:conditional,fatWorkingSellTHB:base,b3FatWorkingSellTHB:base,b9BaseWorkingSellTHB:conditional,conditionalYardSellTHB:conditional,
   fullCombinedVisitScenarioTHB:total,laborWorkingSellTHB:302400,
   travelAndInsuranceWorkingSellTHB:95000,qtyDerivedManDays:16,
-  conditionalNotInBase:true,deltaVsLegacyTHB:round(0-source.legacyWbsB9SellTHB),
+  conditionalNotInBase:false,quotedBaseWorkingSell:true,conditionalExecutionOnWrittenCallout:true,priceAlreadyIncludedInB9Base:true,deltaVsLegacyTHB:round(conditional-source.legacyWbsB9SellTHB),
   contractCostOwnerProof:"Original 4-Scope of Supply.xlsx row 24 B3 Inspection, Testing and Certification as per ITP; row 30 B9 Specialist field assistance as per specification",
   workingDirectCostTHB:null,verifiedDirectCostTHB:null,customerReleaseAllowed:false});
 }
