@@ -240,7 +240,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
      options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}]:[]),
      {key:"bulk-status",label:"BULK Status",type:"select",value:bulkState,onChange:setBulkState,options:[
       {value:"ALL",label:"All BULK statuses"},{value:"NEEDS_QUANTITY",label:"Qty / Route required"},
-      {value:"NEEDS_RATE",label:"Price required"},{value:"VENDOR_INCLUDED",label:"Vendor included"},
+      {value:"NEEDS_RATE",label:"Price required"},{value:"ADDVALUE_PROPOSED",label:"ADDVALUE proposed BULK"},
+      {value:"VENDOR_INCLUDED",label:"Vendor included"},
       {value:"SCOPE_REVIEW",label:"Owner / Scope review"},{value:"BOOKED_PARTIAL",label:"A5 booked partial"}]}
    ]}/>
   <section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.all-mr-summary">
