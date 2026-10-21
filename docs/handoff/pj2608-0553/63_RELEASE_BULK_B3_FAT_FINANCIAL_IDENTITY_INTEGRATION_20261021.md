@@ -102,3 +102,31 @@ Confirm 10.2 / B3.1 price/source, B3.2 SAT and B3.3 VeEX, 16 owner
 financial identity matrices, 10.3 release source navigator, 10.5 Scope,
 Navigator Jump, What's New R02, and Release HOLD on real browser.
 Do not merge before CI/local build and management review.
+
+
+## 2026-10-21 Local build blocker / targeted non-pricing fixes
+- User local Node v24.21.0 `npm run build` failed at
+  `frontend/scripts/validate-0553-b9-china-budget.cjs` with
+  `ReferenceError: makeInternalCostLineId0553 is not defined`
+  in `evalmachine.<anonymous>`. Cause: this validator strips `import`
+  before `vm.runInNewContext`; the existing
+  `b9ChinaWorkingBudget0553.js` now depends on
+  `makeInternalCostLineId0553` from `workingCostCommercialIdentity0553.js`.
+- Corrected **both** VM-based validation scripts:
+  `validate-0553-b9-china-budget.cjs` and
+  `validate-0553-fat-cost-owner-contract.cjs`, by including
+  `workingCostCommercialIdentity0553.js` BEFORE
+  `b9ChinaWorkingBudget0553.js` in concatenated VM sources.
+  Added assertions `IC-FAT-STAFF-001` and `IC-YARD-STAFF-001`.
+  No source financial amount, B3/B9 model, scope ID or customer price changed.
+- Local `npm start` failed `EADDRINUSE :::3000`: an unrelated already-listening
+  process owns port 3000. This is not a pricing/build defect. Check the PID
+  with `Get-NetTCPConnection -LocalPort 3000 -State Listen`, inspect
+  `Get-CimInstance Win32_Process -Filter "ProcessId = <PID>"`, reuse
+  the current instance or run `npm start -- --port 3001`.
+  Do not kill all `node.exe` processes or claim that the original server
+  is running current branch.
+- Remote code read-back confirms imports and source order; user must still
+  execute `npm run validate:0553-b9-china-budget`,
+  `npm run validate:0553-fat-cost-owner-contract` and `npm run build`
+  on a clean, updated worktree. No unobserved PASS claims.
