@@ -149,9 +149,12 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   const isBc=/^(?:B(?:[1-9]|1[0-4])|C[12])$/.test(code);
   if(isBc&&bcTab!==code)return; // wait for selected owner to mount
   const found=findModuleElement0553(document,id);
-  const fallback=isBc?"bid.budget.working.bc."+code.toLowerCase():
+  // When the owner filter is selected, its canonical 10.2 details element is
+  // mounted as [sourceId].details instead of the unfiltered accordion root.
+  const detail=isBc?findModuleElement0553(document,id+".details"):null;
+  const fallback=isBc?"bid.budget.working.bc":
    id.startsWith("bid.budget.pricing")?"bid.budget.pricing.release.preview":"bid.budget.bom";
-  const target=found||findModuleElement0553(document,fallback);
+  const target=found||detail||findModuleElement0553(document,fallback);
   if(!target){setNavigationFeedback("Module not found: "+id);return;}
   openModuleAncestors0553(target);
   if(target.tagName==="DETAILS")target.open=true;
