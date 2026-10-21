@@ -22,19 +22,22 @@ const audit=from("estimateToBidMapping.js")
  .auditCurrentCustomerProjection0553({canonical,release,scope});
 const current=canonical.byCode;
 const scenarios=canonical.scenarioAudits;
-assert.equal(canonical.knownWorkingSellTHB,4151836.82);
+assert.equal(canonical.knownWorkingSellTHB,4385436.82);
 assert.equal(current.B3.workingSellTHB,2750525);
 assert.equal(current.B8.workingSellTHB,30000);
-assert.equal(current.B9.workingSellTHB,0);
+assert.equal(current.B9.workingSellTHB,233600);
 assert.equal(current.B9.b9ChinaBudget.conditionalYardSellTHB,233600);
 assert.equal(release.b.find(x=>x.code==="B9").conditionalOptionWorkingSellTHB,233600);
-assert.equal(release.b.find(x=>x.code==="B9").customerSellTHB,0);
+assert.equal(release.b.find(x=>x.code==="B9").customerSellTHB,233600);
+assert.equal(release.b.find(x=>x.code==="B9").conditionalOptionIncludedInBase,true);
+assert.equal(release.b.find(x=>x.code==="B9").samTelDeductionTHB,11680);
+assert.equal(release.b.find(x=>x.code==="B9").addvalueReceivableTHB,221920);
 assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2750525);
 assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,169420);
 assert.equal(release.b.find(x=>x.code==="B3").addvalueReceivableTHB,2581105);
 assert.equal(scope.lines.B3.workingSellTHB,2750525);
 assert.equal(scope.lines.B8.workingSellTHB,30000);
-assert.equal(scope.lines.B9.workingSellTHB,0);
+assert.equal(scope.lines.B9.workingSellTHB,233600);
 const lean=scenarios.b3LeanSat28plus2;
 assert.equal(lean.baseTeamDays,28);
 assert.equal(lean.workingTeamDaysWithRisk,30);
@@ -95,4 +98,4 @@ const names=from("data/officialWorkbookTemplate0553.js").OFFICIAL_WORKBOOK_TEMPL
 for(const [code,row] of [["B3",26],["B8",31],["B9",32]])
  assert(names.some(x=>x[0]===row&&x[1]===code&&x[2]),"Native description missing "+code);
 assert.equal(release.approval.releaseAllowed,false);
-console.log("PASS 0553 5-day nonposting source allocation / 28+2 SAT 21 Test IDs / B9 option / 21 A+B+C native parity. Customer RELEASE HOLD.");
+console.log("PASS 0553 5-day nonposting source allocation / 28+2 SAT 21 Test IDs / B9 Base 1 LS (on-call execution) / 21 A+B+C native parity. Customer RELEASE HOLD.");
