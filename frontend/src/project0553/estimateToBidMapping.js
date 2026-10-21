@@ -71,9 +71,16 @@ export function auditCurrentCustomerProjection0553({canonical,release,scope}={})
   }else if(part==="B"){
    const owner=canonical.byCode[code],priced=release.b.find(x=>x.code===code);
    const scoped=scope?.lines?.[code];
-   parity=Boolean(owner&&priced&&eq(owner.workingSellTHB,priced.customerSellTHB)&&
-    priced.sourceModuleId===owner.moduleId&&
-    (!scope||scoped&&eq(scoped.workingSellTHB,owner.workingSellTHB)));
+   // Null must remain null where the contractual owner has no selected price
+   // (for example B4/B12/B14). Zero is a real selected state, notably B9.
+   const sameSelected=Boolean(owner&&priced&&(
+    eq(owner.workingSellTHB,priced.customerSellTHB)||
+    (owner.workingSellTHB===null&&priced.customerSellTHB===null)));
+   const sameScope=!scope||Boolean(scoped&&(
+    eq(scoped.workingSellTHB,owner?.workingSellTHB)||
+    (scoped.workingSellTHB===null&&owner?.workingSellTHB===null)));
+   parity=Boolean(owner&&priced&&sameSelected&&sameScope&&
+    priced.sourceModuleId===owner.moduleId);
    amount=owner?.workingSellTHB??null;
    if(code==="B9"){
     parity=parity&&owner?.b9ChinaBudget?.conditionalYardSellTHB===233600&&
