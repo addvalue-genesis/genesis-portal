@@ -1,4 +1,4 @@
-// 10.2 B6 / MR0001 — ONE 4-set assembly intake from Thailand to MGW Nantong.
+// 10.2 B6 / MR0001 — earlier four-cabinet all-Thailand inbound COMPARISON (nonposting).
 // Nonposting feasibility and 2026 market-envelope reference, NOT a freight offer.
 // Quoted MGW SERV-5 USD2500 is Nantong -> JUTAL, NOT Thailand -> Nantong.
 // Quote P26-058_R2 dated 20 Oct covers OEM iFAT/facility & outgoing road leg;
@@ -27,7 +27,7 @@ export function selectB6Mr0001ChinaInboundScenario0553(){
   sourceId:"B6-MR0001-CHINA-INBOUND-4-SETS-SC-20261021",
   system:"MR0001 SCADA",receivedAt:"MGW Nantong, China",
   bundleCount:4,bundleDescription:"Enclosure + IDU + Cisco integration/assembly set",
-  newRoute:"Thailand assembly components → Shanghai port → MGW Nantong → MGW integration/FAT → JUTAL site",
+  newRoute:"ALL-THAILAND COMPARISON ONLY: Thai assembly components → Shanghai → MGW Nantong → integration/FAT → JUTAL",
   obsoleteRouteReference:"MR0001 supplier → SAMTEL Bangkok FAT → JUTAL (historical; check before removing existing source costs)",
   supplierOutgoingFreightUSD:freight.usd,supplierOutgoingFreightTHB:round(freight.usd*fx),
   supplierOutgoingFreightAlreadyInCover:true,
@@ -42,7 +42,7 @@ export function selectB6Mr0001ChinaInboundScenario0553(){
   alreadyCoveredInHistoricalB6SelectedTHB:null,
   comparableNetChangeVsOldRouteTHB:null, // old route components have not been allocated
   incrementToCurrentB6WorkingSellTHB:null,
-  ownerOfRecord:"B6",pricingClass:"SCENARIO_ONLY__MARKET_AND_PARAMETRIC_ALLOWANCES",
+  ownerOfRecord:"B6",routingSelected:false,routingScenarioStatus:"ALL_THAILAND_COMPARISON_NOT_PREFERRED",pricingClass:"SCENARIO_ONLY__MARKET_AND_PARAMETRIC_ALLOWANCES",
   signedImporterOfRecord:false,motherboardCiscoLicensingAndCountryOfOriginChecked:false,
   gates:Object.freeze([
    "Confirm supplier/origin of all 4 enclosures, Cisco switches, IDUs, serial numbers and Incoterm ownership",
