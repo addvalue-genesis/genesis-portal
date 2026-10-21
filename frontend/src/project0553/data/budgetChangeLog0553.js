@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-21-R11";
+export const CHANGE_LOG_VERSION_0553="2026-10-21-R12";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261021-15",date:"2026-10-21",kind:"DATA_FLOW",tone:"pricing",
+  title:"B6 MR0001 NextG Direct-MGW Hybrid + MR0002–0004 Consolidated China FAT Route",
+  detail:"ADDVALUE B6 historical Working SELL THB307584 remains selected, no source-level freight-by-MR price available. NG/260916 DAP Ranong (NOT DDP) quote USD191610.15 expired; NextG IDU/ODU direct China scenario, 4 Thailand-built Enclosure+Cisco cabinets to MGW, Greenfield RFQ 5 antennas may bypass MGW only with approved FAT ITP. MR0002–0004 MGW/OEM goods remain China-side, no Thai round trip. MGW SERV-5 USD2500 already quoted, SERV-3 USD500 packing could overlap, no invented credit. Earlier Thailand all-4-cabinet THB42797–72372 is narrow comparison only. 10.2/10.3/10.5 price unaffected; release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b6","bid.budget.working.bc","bid.budget.pricing.release.preview","bid.budget.scope"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"ADR-67 / NextG NG-260916-ADV-DAP1 / RQ2609-1182 / MGW P26-058_R2 SERV-5 / existing MGW freight packing evidence"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261021-14",date:"2026-10-21",kind:"DATA_FLOW",tone:"pricing",
   title:"B3 Site Survey / B6 MR0001 China Assembly Inbound / B7 3-month Free Storage Audit",
