@@ -1,4 +1,5 @@
 import {UnifiedMrLocationTable0553} from "./UnifiedMrLocationTable0553";
+import {BulkMrLocationCoverage0553} from "./BulkMrLocationCoverage0553";
 import {compareAEquipmentToLocation0553} from "./data/workingBomAggregation0553";
 import {LocationReplicationAudit0553} from "./LocationReplicationAudit0553";
 import {Mr0003Mr0004LocationReview0553} from "./Mr0003Mr0004LocationReview0553";
@@ -32,7 +33,7 @@ import { WORKING_BOM_BY_LOCATION_0553 as model } from "./data/workingBomByLocati
 import { MR0001_WORKING_PRICED_BOM as bom } from "./data/mr0001WorkingPricedBom";
 
 // One operational BOM surface. All Source/Engineering/Vendor links derive from existing registries.
-export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB"}){
+export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB",navigationTarget=null,navigationSequence=0}){
  const zwp20Cost=deriveZWP20SiteCost0553();
  const wpSystemBulk=deriveMGWSelectedWpSystemBulk0553();
  // Read-only ALL-MR subtotal from the exact System x Location x MTO projection.
@@ -77,6 +78,19 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  const activeCurrency=currencyOverride||displayCurrency;
  const [vendor,setVendor]=useState("ALL");
  const [system,setSystem]=useState("MR-0001");
+ const [bulkState,setBulkState]=useState("ALL");
+ // Match the exact Module Navigator target to System/Location before the UI renders.
+ // Data models remain read-only; this effect only changes local filter controls.
+ React.useEffect(()=>{
+  if(!navigationTarget?.startsWith("bid.budget.bom."))return;
+  const match=navigationTarget.match(/^bid\\.budget\\.bom\\.(zwp20|zwp21|zwp22|zwp23|zpq|zwp8|zwp11)\\.(mr000[1-4])\\./i);
+  if(match){
+   setSystem(match[2].toUpperCase().replace("MR000","MR-000"));
+   setManualSite(match[1].toUpperCase());
+   setFocusSeen(focusedLocation);
+  }
+  setBulkState("ALL");
+ },[navigationTarget,navigationSequence]);
  const [expanded,setExpanded]=useState({});
  const [allSitesExpanded,setAllSitesExpanded]=useState(false);
  const siteExpanded=siteId=>expanded["site:"+siteId]??allSitesExpanded;
@@ -225,7 +239,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <p className="p55-note" style={{marginTop:7}}>System / Location context above; the whole table below carries its own collapsible Module ID and Copy control.</p>
   </div>
   <SmartFilterBar moduleKey="bid.budget.bom.filters" title="10.1.1.2 — Filters (support control) — System / Site / Vendor"
-   total={system==="MR-0001"?sourceCount:BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system).reduce((n,r)=>n+(r.detailRows?.length||r.evidence?.length||0),0)} shown={system==="MR-0001"?displayedCount:BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system&&(site==="ALL"||r.site===site)).reduce((n,r)=>n+(r.detailRows?.length||r.evidence?.length||0),0)} onReset={()=>{setSystem("MR-0001");changeSite("ALL");setVendor("ALL");}}
+   total={system==="MR-0001"?sourceCount:BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system).reduce((n,r)=>n+(r.detailRows?.length||r.evidence?.length||0),0)} shown={system==="MR-0001"?displayedCount:BOM_READ_MODEL_0553.rows.filter(r=>r.mr===system&&(site==="ALL"||r.site===site)).reduce((n,r)=>n+(r.detailRows?.length||r.evidence?.length||0),0)} onReset={()=>{setSystem("MR-0001");changeSite("ALL");setVendor("ALL");setBulkState("ALL");}}
    controls={[
     {key:"system",label:"System",type:"select",value:system,onChange:setSystem,options:[
       {value:"MR-0001",label:"MR0001 · SCADA Radio"},
@@ -235,7 +249,12 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     {key:"location",label:"Location",type:"select",value:site,onChange:changeSite,
      options:[{value:"ALL",label:"All locations"},...model.locations.map(x=>({value:x.site,label:x.site}))]},
     ...(system==="MR-0001"?[{key:"vendor",label:"Vendor / Company",type:"select",value:vendor,onChange:setVendor,
-     options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}]:[])
+     options:[{value:"ALL",label:"All vendors"},...model.vendors.map(v=>({value:v,label:v}))]}]:[]),
+    {key:"bulk-status",label:"BULK Status / Optional Spare",type:"select",value:bulkState,onChange:setBulkState,
+     options:[{value:"ALL",label:"All BULK evidence"},{value:"BOOKED_PARTIAL",label:"A5 original booked"},
+      {value:"VENDOR_INCLUDED",label:"Vendor included"},{value:"BULK_RESERVE_CANDIDATE",label:"ADDVALUE optional spare reserve"},
+      {value:"NEEDS_QUANTITY",label:"BULK quantity required"},{value:"NEEDS_RATE",label:"Rate required"},
+      {value:"SCOPE_REVIEW",label:"Owner / scope review"},{value:"OTHER_WBS",label:"Separate spares or services"}]}
    ]}/>
   <section className="p55-panel" data-component-key="bid.budget.bom.system-location-mto.all-mr-summary">
    <h4>All Locations — MR0001–MR0004 Working BOM Summary (THB)</h4>
@@ -248,6 +267,8 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <p className="p55-note">FX: {allMrFx??"required"} THB/USD · Source: compareAEquipmentToLocation0553 → selectWorkingBomProjection0553. This partial subtotal is not a complete bid value, and no margin has been applied.</p>
   </section>
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"10.1.1.3 — System × Location × MTO — "+system+" / "+(site==="ALL"?"All Locations":site)} description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification. Context and Filters support this work; they are not approval gates." defaultOpen>
+  <p className="p55-note"><strong>BULK ownership supplement (read-only):</strong> this separate location-level evidence table does NOT replace the canonical priced Equipment/MTO rows below, the Bulk Master, the A5 source or any B/C cost ledger. MGW complete MR0002 RF installation remains Vendor Scope; ADDVALUE NEK is only an optional reserve candidate.</p>
+  <BulkMrLocationCoverage0553 mr={system} site={site} state={bulkState} focusModuleId={navigationTarget}/>
   {["MR-0002","MR-0003","MR-0004"].includes(system)?<UnifiedMrLocationTable0553 mr={system} site={site} fx={fx}/>:<>
   <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
   {system==="MR-0001"&&<p className="p55-note" data-component-key="bid.budget.bom.system-location-mto.tc0001-8port">
