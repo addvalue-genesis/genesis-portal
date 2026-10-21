@@ -1,8 +1,11 @@
-import React,{useRef,useState} from "react";
+import React,{useMemo,useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
 import {buildNativeWorkingDraft0553} from "./nativeWorkingDraft0553";
+import {auditCurrentCustomerProjection0553} from "./estimateToBidMapping";
+import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
+import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import "./releaseWorkbook0553.css";
 
@@ -49,7 +52,18 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const provisionalBase=addKnown(model.summary.aProvisionalCustomerSellTHB,bWorkingTotal);
  const tagCount=model.a.reduce((n,p)=>n+p.sourceRows.length,0);
  const isOverOriginalCapacity=tagCount>15;
+ // Existing 10.4 registry supplements—not replaces—the active 10.3 adapter.
+ // This is a read-only parity check; the 21 estimate-line allocations remain HOLD.
+ const mappingAudit=useMemo(()=>auditCurrentCustomerProjection0553({
+  canonical:selectBcTurnkeyWorkingCost0553(),release:model,
+  scope:selectScopePartBcWorking0553()
+ }),[model]);
  const activeChecks=[
+  {id:"MAP",label:"10.4 A/B/C → 10.3/10.5 → Native customer row parity",
+   state:mappingAudit.selectedValueParity?"REVIEW":"HOLD",
+   detail:mappingAudit.declaredMappingCount+" contract lines; "+
+    mappingAudit.unresolvedEstimateLines+" estimate allocations still need evidence; "+
+    (mappingAudit.selectedValueParity?"current value projection matches":"SOURCE MISMATCH")},
   {id:"A-SUM",label:"10.1 → 10.3 Part A vs CFO",state:partA.reconciliationPassed?"PASS":"HOLD",detail:"Working price "+cash(aWorkingTotal)+" · CFO "+cash(partA.expectedPreviewTHB)},
   {id:"A-TAGS",label:"Original Part A layout / Buyer TAG grouping approval",state:isOverOriginalCapacity?"HOLD":"REVIEW",detail:tagCount+" source TAG lines → 4 MR summary rows; buyer must accept group-level TAG mapping for original 15 slots"},
   {id:"B-SCOPE",label:"10.2 B1–B14 Working Sell",state:model.sourceCoverage.bSellReady?"PREVIEW":"HOLD",detail:"Working Sell displayed unchanged; conditional B7/B9 must be reviewed"},
