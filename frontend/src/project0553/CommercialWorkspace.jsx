@@ -24,6 +24,7 @@ import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
 import {ReleaseSourceNavigator0553} from "./ReleaseSourceNavigator0553";
+import {BudgetChangeSummary0553} from "./BudgetChangeSummary0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
 import {findModuleElement0553,openModuleAncestors0553,workingOwnerFromModuleId0553} from "./data/moduleDeepLink0553";
 import {PRICING_VIEWS_0553} from "./pricingViewRegistry0553";
@@ -177,6 +178,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  return <div className="p55-stack" data-component-key="bid.budget">
  <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget"/><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
+ <BudgetChangeSummary0553 onOpenModule={openReleaseSource}/>
  <details className="p55-panel" data-component-key="bid.budget.particular-source-gates">
   <summary><strong>Budgetary 10 — RFQ Particular Scope &amp; Conflict Gates</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.particular-source-gates"/></summary>
   <p className="p55-note">The 04 Documents particular matrix holds {PARTICULAR.records.length} source-linked engineering requirements and {PARTICULAR_CONFLICTS.records.length} cross-document review issues. This budget view references that same source, not a copied rate table or new costing model.</p>
