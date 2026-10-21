@@ -1,6 +1,6 @@
 # PJ2608-0553 | Architecture & Decision Index (10.1–10.5)
 
-**Updated:** 2026-10-21 ICT · **Repository:** `addvalue-genesis/genesis-portal`  
+**Updated:** 2026-10-21 ICT · **Latest B9 decision: ADR-65** · **Repository:** `addvalue-genesis/genesis-portal`  
 **Integration branch:** `integrate/pj2608-0553-mgw-fat-financial-identity-20261021`  
 **Draft PR:** #30 · **Customer Release:** HOLD / NOT ISSUED.
 
@@ -13,7 +13,7 @@
 | 10.2 B/C | `bid.budget.working.bc` / `data/bcTurnkeyWorkingCost0553.js::selectBcTurnkeyWorkingCost0553` | selected `rows[].workingSellTHB`; OEM quote/source WBS | 10.3 B/C, 10.5, native Excel | **SINGLE SELECTED WS SOURCE** |
 | 10.2 MGW FAT | `data/mgwP26058R2Cover20261020.js` → `data/b3MgwPurchasedFatWorkingSell0553.js` | VQ-MGW SERV-2/4 (USD7500) | B3 purchased WS THB307125 once | VQ quoted cost ≠ actual paid |
 | 10.2 ADDVALUE FAT | `data/b9ChinaWorkingBudget0553.js` | eight original B3 expense source IDs, six-day witness | B3 current THB397400 | WS only, direct cost NULL |
-| 10.2 B9 Yard | same China budget owner-separated B9 IDs | 7 Yard days + 2 travel days, separate call-out | B9 CONDITIONAL THB233600 | NONPOSTING; Base B9 = 0 |
+| 10.2 B9 Yard | same China budget owner-separated B9 IDs | 7 Yard days + 2 travel days, separate call-out | B9 quoted Base THB233600 | Conditional EXECUTION; no separate option or actual cost |
 | 10.2 B3 SAT | `data/b3FortyDayWorkingSell0553.js`; `data/b3SiteMrSatCoverage0553.js` | selected 40 team-day / 21 Test IDs | B3 selected offshore THB2016000 + VeEX THB30000 | Site MR Test IDs NONPOSTING |
 | 10.2 scenarios | `data/b3LeanSatScenario0553.js`, `data/b3B8FiveDaySourceAllocation0553.js` | prior SAT lean branch + 5-day proposed activities | `canonical.scenarioAudits` | SC / audit ONLY |
 | 10.4 | `estimateToBidMapping.js` and `commercialWorkbookControl.js` | Original customer workbook destination registry | `auditCurrentCustomerProjection0553` read parity | **Mapping validation, NOT pricing transformation** |
@@ -32,7 +32,7 @@
 ## Module contracts / invariant checks
 
 1. `SOW` customer code, `VQ` original quotation, `IC` activity/expense with actual Direct Cost **NULL**, `WS` selected internal Working SELL, `CP` not issued, `SC` scenario nonposting, `AU` audit nonposting.
-2. `selectBcTurnkeyWorkingCost0553()` owns current B3=THB2750525, B8=THB30000, B9=THB0, Part B Base=THB4151836.82. No automatic scenario promotion, no ERP posting.
+2. `selectBcTurnkeyWorkingCost0553()` owns current B3=THB2750525, B8=THB30000, B9=THB233600, Part B Base=THB4385436.82. No automatic scenario promotion, no ERP posting.
 3. MGW Purchased quote SERV-2 USD5000 + SERV-4 USD2500 quoted THB236250; WS THB307125 using 20+5+5 **once**. No separate customer iFAT line; internal iFAT remains traceable as vendor identity under customer B3 FAT.
 4. `priceBWorkingSell0553` deducts SAMTEL 5% on ordinary B3 only, preserves vendor purchased SAMTEL 20% on quoted cost and excludes purchased portion from second 5% deduction. Receivable is not profit.
 5. Scenario selector(s) are accessible under `canonical.scenarioAudits`; they are not included in `knownWorkingSellTHB`, C options, Release or native XLSX.
@@ -41,11 +41,12 @@
 
 ## Decisions, gates, test ownership
 
-- **ADR:** [64_B3_B8_B9_SAT_CUSTOMER_PARITY_ADR_20261021.md](64_B3_B8_B9_SAT_CUSTOMER_PARITY_ADR_20261021.md)
+- **Latest B9 decision:** [65_B9_RELEASE_QUOTED_BASE_ADR_20261021.md](65_B9_RELEASE_QUOTED_BASE_ADR_20261021.md) (supersedes ADR-64 D-64.1 only)
+- **Earlier ADR:** [64_B3_B8_B9_SAT_CUSTOMER_PARITY_ADR_20261021.md](64_B3_B8_B9_SAT_CUSTOMER_PARITY_ADR_20261021.md)
 - PR#30 earlier integrated evidence: [63_RELEASE_BULK_B3_FAT_FINANCIAL_IDENTITY_INTEGRATION_20261021.md](63_RELEASE_BULK_B3_FAT_FINANCIAL_IDENTITY_INTEGRATION_20261021.md)
 - Prior lean basis (not a canonical price): `60_B3_Z1D_BENCHMARK_LEAN_28PLUS2_OFFSHORE_SAT_WBS_20261020.md` on separate origin branch.
 - New contract regression: `frontend/scripts/validate-0553-b3-b8-five-day-lean-parity.cjs` via `npm run validate:0553-b3-b8-five-day-lean-parity`; included in `npm run build`.
 - **Build proof:** Full webpack + regression build **NOT VERIFIED IN CONNECTED GITHUB SESSION**. No local repository checkout/build runner is exposed to the connector; CI for prior SHA not found. A real `npm run build` on Windows worktree remains required before acceptance.
-- **Decision owners:** Project Owner controls B9 Base promotion, five-day personnel and trip split, MGW facility/customer FAT acceptance and SAT 28+2 posting. Implementation must never infer that approval from an illustrative model.
+- **Decision owners:** Project Owner selected the B9 1 LS Base Working SELL price under ADR-65. Project Owner still controls five-day personnel/trip split, MGW facility/customer FAT acceptance, SAT 28+2 posting and final issue. Implementation must never infer that approval from an illustrative model.
 
 Do not merge PR#30 or issue the customer native workbook until cost evidence, client approval, source-to-worksheet validation and regression/build gates are actually met.
