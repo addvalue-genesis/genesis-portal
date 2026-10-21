@@ -100,7 +100,7 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
    </>;
   }
   case "revk-china-budget":
-   return <B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3"/>;
+   return <B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell}/>;
   case "fat-owner-transfer":
    return <>
     <MgwPaulVendorClarifications0553 code="B3"/>
