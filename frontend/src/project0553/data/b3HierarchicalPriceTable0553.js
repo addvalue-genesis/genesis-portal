@@ -30,6 +30,7 @@ const group=(number,kind,title,driver,items)=>Object.freeze({
  referenceTHB:kind==="audit"?round(items.reduce((n,x)=>n+(x.referenceTHB||0),0)):null,
  qty:kind==="fat"?1:kind==="sat"?80:kind==="tools"?30:null,
  unit:kind==="fat"?"FAT trip LS":kind==="sat"?"person-days":kind==="tools"?"rental-days":null,
+ unitRateTHB:kind==="sat"?25200:kind==="tools"?1000:null,
  owner:"B3"
 });
 
