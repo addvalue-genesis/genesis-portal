@@ -109,6 +109,6 @@ export function selectB9ChinaWorkingBudget0553(){
   fullCombinedVisitScenarioTHB:total,laborWorkingSellTHB:302400,
   travelAndInsuranceWorkingSellTHB:95000,qtyDerivedManDays:16,
   conditionalNotInBase:false,quotedBaseWorkingSell:true,conditionalExecutionOnWrittenCallout:true,priceAlreadyIncludedInB9Base:true,deltaVsLegacyTHB:round(conditional-source.legacyWbsB9SellTHB),
-  contractCostOwnerProof:"Original 4-Scope of Supply.xlsx row 24 B3 Inspection, Testing and Certification as per ITP; row 30 B9 Specialist field assistance as per specification",
+  contractCostOwnerProof:"Original 4-Scope of Supply.xlsx row 26 B3 Inspection, Testing and Certification as per ITP; row 32 B9 Specialist field assistance as per specification",
   workingDirectCostTHB:null,verifiedDirectCostTHB:null,customerReleaseAllowed:false});
 }
