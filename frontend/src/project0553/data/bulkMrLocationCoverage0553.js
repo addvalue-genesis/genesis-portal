@@ -84,7 +84,7 @@ function dmrItems(site){
     'NEK RF LLF 1/2" 50Ω SHF1 — SM000111.pdf Rev6 / HISTORICAL TECHNICAL EVIDENCE',
     "RF_CABLE_REVISION_CONFLICT__TECHNICAL_HOLD",
     "SM000111.pdf (user-uploaded NEK datasheet, pages 1–3)",
-    "Source Rev6 dated 11-Jan-2022: 450MHz attenuation 4.93dB/100m nominal (max 105% per PDF); OD 16.40 ±0.40mm, flexible bend 135mm, 50±2Ω, DNV-GL listed; male/female connectors 65402/65464. Rev9 comparison recorded at 6.00dB/100m, DIFFERENCE 1.07dB/100m. Maintain REVISION HOLD. This NEK source is not the actual MGW quoted FORLLER cable. Also source anomaly: 300MHz attenuation 4.31 > 400MHz 4.10; do not interpolate without manufacturer proof.",
+    "Source Rev6 dated 11-Jan-2022: 450MHz attenuation 4.93dB/100m nominal (max 105% per PDF); OD 16.40 ±0.40mm, flexible bend 135mm, 50±2Ω, DNV-GL listed; male/female connectors 65402/65464. Rev9 comparison recorded at 6.00dB/100m, DIFFERENCE 1.07dB/100m. Maintain REVISION HOLD. This NEK source is not the actual MGW quoted FORLLER cable. Also source anomaly: 300MHz attenuation 4.31 > 400MHz 4.10; do not interpolate without manufacturer proof."),
     evidenceFile:"SM000111.pdf",evidencePage:2,evidenceRevision:"6",
     comparisonRevision:"9",evidenceLoss450DbPer100M:rf?.rev6Evidence?.attenuation450DbPer100M??null,
     comparisonLoss450DbPer100M:rf?.candidate?.attenuation450DbPer100M??null,
