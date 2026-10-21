@@ -177,18 +177,18 @@ function Pricing({row}){
     ONCE in the 20-Oct MGW cover; it must be reconciled with the B6 cost owner,
     supplier packing USD500, delivery terms, and original equipment A inclusion.
     There is no approved allocation of the B6 Working SELL to four MR cargo legs.</p>
-   <p className="p55-note"><strong>Routing recommendation:</strong> NextG quotation
-    <strong> NG/260916-ADV-DAP1 / DAP Ranong</strong> (expired; not DDP Thailand).
-    Preferred B6 nonposting plan: NextG IDU/ODU directly to MGW Nantong for factory
-    assembly/FAT; Enclosure+Cisco 4 sets pre-mounted in Thailand and shipped protected
-    to MGW; antennas direct to JUTAL only if OEM/client approves FAT without physical
-    antenna onsite. MGW MR0002/0003/0004 should be received for FAT in China,
-    without a needless Thailand loop. MR0001 quote was requested with 4 greenfield
-    IDUs, 4 ODUs but 5 antennas; re-quote SKU/dimensions and carrier handover.
-    <strong> B6 THB307,584 is a legacy budgetary SELL, NOT calculated from these
-    MR shipments</strong>; gross saving or incremental charge remains NOT ESTABLISHED.
-    MGW can receive/assemble operationally per Project Owner; quoted China importer,
-    clearance and handling charges still need allocation.</p>
+   <p className="p55-note"><strong>OWNER-APPROVED B6 Physical Routing (ADR-68 · 22-Oct-2026):</strong>
+    NextG <strong>IDU 4 + ODU 4 + ALL 5 Greenfield Antennas</strong> to MGW Nantong
+    directly; Thailand receives <strong>Enclosure + Cisco 4 sets</strong>, performs
+    approved bench preassembly/wiring and preliminary electrical QA, then exports
+    these four protected sets to MGW for final integration/FAT. No antenna diversion
+    direct to JUTAL. MGW MR0002/0003/0004 OEM items remain China-bound for combined FAT,
+    without an artificial Thailand transit. The original NextG
+    <strong> NG/260916-ADV-DAP1 / DAP Ranong</strong> delivery quotation has expired
+    and has NOT been amended to MGW Nantong; destination/Incoterm, freight credit
+    and supplier dispatch still require confirmation.
+    <strong> Selected B6 Working SELL {fmt(total)} remains unchanged.</strong>
+    No verified saving, increment, tariff or actual logistics COST has been posted.</p>
    <p className="p55-note"><strong>Earlier all-Thailand scenario (comparison only):</strong>
     four preassembled cabinets (not ODU/antenna freight) to MGW Nantong; planning-only
     inbound allowance <strong>{fmt(row.b6Mr0001ChinaInboundEvidence?.preliminaryInboundLowTHB)}
