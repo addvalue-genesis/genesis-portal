@@ -9,6 +9,8 @@ import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
 import {selectB1ProjectSupportBudget0553} from "./b1ProjectSupportBudget0553";
 import {evaluateB2VdrlIndependentScenario0553} from "./b2IndependentVdrlRecalculation0553";
 import {selectB3FortyDayWorkingSell0553} from "./b3FortyDayWorkingSell0553";
+import {selectB3LeanSatScenario0553} from "./b3LeanSatScenario0553";
+import {selectB3B8FiveDaySourceAllocation0553} from "./b3B8FiveDaySourceAllocation0553";
 import {selectB3MgwPurchasedFatWorkingSell0553} from "./b3MgwPurchasedFatWorkingSell0553";
 import {selectB3WorkingSellAfterChinaFat0553,B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553} from "./b3ChinaFatOwnership0553";
 import {LIFECYCLE_SPARES_0553} from "./lifecycleSpareScope0553";
@@ -221,6 +223,25 @@ export function selectBcTurnkeyWorkingCost0553(){
   });
  });
  const byCodeOutput=Object.fromEntries(rows.map(r=>[r.code,r]));
+ // READ-ONLY engineering/commercial scenarios, deliberately below selected rows.
+ // Dependency: original B3/B8 source + existing 21 SAT Test IDs → SC audit.
+ // 10.3, 10.5 and native workbook continue to consume rows[].workingSellTHB ONLY.
+ // Never add scenario references into knownWorkingSellTHB or financial postings.
+ const scenarioAudits=Object.freeze({
+  b3LeanSat28plus2:selectB3LeanSatScenario0553(byCodeOutput.B3),
+  b3B8FiveDayOneTrainer:selectB3B8FiveDaySourceAllocation0553({
+   b3:byCodeOutput.B3,b8:byCodeOutput.B8,trainingCrew:1
+  }),
+  b3B8FiveDayTwoTrainers:selectB3B8FiveDaySourceAllocation0553({
+   b3:byCodeOutput.B3,b8:byCodeOutput.B8,trainingCrew:2
+  })
+ });
+ if(scenarioAudits.b3LeanSat28plus2.postingAllowed||
+  scenarioAudits.b3B8FiveDayOneTrainer.postingAllowed||
+  scenarioAudits.b3B8FiveDayTwoTrainers.postingAllowed||
+  scenarioAudits.b3LeanSat28plus2.currentWorkingSellTHB!==byCodeOutput.B3.workingSellTHB||
+  scenarioAudits.b3LeanSat28plus2.illustrativeWholeB3THB!==2246525)
+  throw Error("Nonposting B3 scenario contaminated 10.2 canonical selected Working SELL");
  const knownWorkingSellTHB=round(rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
   .reduce((sum,r)=>sum+r.workingSellTHB,0));
  // Current Base sell must come only from CURRENT selected B1-B14 owner rows.
@@ -243,7 +264,7 @@ export function selectBcTurnkeyWorkingCost0553(){
  return Object.freeze({
   moduleId:"bid.budget.working.bc",workflowNumber:"10.2",
   status:"WORKING_COST_GAPS__NOT_RELEASED",
-  rows,byCode:byCodeOutput,
+  rows,byCode:byCodeOutput,scenarioAudits,
   knownWorkingSellTHB,
   workingSellB6BudgetaryTHB:rows.find(r=>r.code==="B6").workingSellTHB,
   workingSellB9ChinaBudgetTHB:chinaB9.b9BaseWorkingSellTHB,
