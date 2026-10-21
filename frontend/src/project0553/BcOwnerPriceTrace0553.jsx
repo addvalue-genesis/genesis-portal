@@ -177,13 +177,29 @@ function Pricing({row}){
     ONCE in the 20-Oct MGW cover; it must be reconciled with the B6 cost owner,
     supplier packing USD500, delivery terms, and original equipment A inclusion.
     There is no approved allocation of the B6 Working SELL to four MR cargo legs.</p>
-   <p className="p55-note"><strong>MR0001 SCADA / China Assembly Inbound:</strong>
-    4 Enclosure + IDU + Cisco integration sets to MGW Nantong; source-based indicative
+   <p className="p55-note"><strong>Routing recommendation:</strong> NextG quotation
+    <strong> NG/260916-ADV-DAP1 / DAP Ranong</strong> (expired; not DDP Thailand).
+    Preferred B6 nonposting plan: NextG IDU/ODU directly to MGW Nantong for factory
+    assembly/FAT; Enclosure+Cisco 4 sets pre-mounted in Thailand and shipped protected
+    to MGW; antennas direct to JUTAL only if OEM/client approves FAT without physical
+    antenna onsite. MGW MR0002/0003/0004 should be received for FAT in China,
+    without a needless Thailand loop. MR0001 quote was requested with 4 greenfield
+    IDUs, 4 ODUs but 5 antennas; re-quote SKU/dimensions and carrier handover.
+    <strong> B6 THB307,584 is a legacy budgetary SELL, NOT calculated from these
+    MR shipments</strong>; gross saving or incremental charge remains NOT ESTABLISHED.
+    MGW can receive/assemble operationally per Project Owner; quoted China importer,
+    clearance and handling charges still need allocation.</p>
+   <p className="p55-note"><strong>Earlier all-Thailand scenario (comparison only):</strong>
+    four preassembled cabinets (not ODU/antenna freight) to MGW Nantong; planning-only
     inbound allowance <strong>{fmt(row.b6Mr0001ChinaInboundEvidence?.preliminaryInboundLowTHB)}
     – {fmt(row.b6Mr0001ChinaInboundEvidence?.preliminaryInboundHighTHB)}</strong> (scenario,
     NOT additional selected SELL). MGW SERV-5 USD2,500 is Nantong→JUTAL quoted once;
     the Thailand→Nantong inbound leg, customs, taxes, cargo value and four-set dimensions
-    are not covered by proof. Compare against current B6 owner before selecting any delta.</p>
+    are not covered by proof. The compared scenario does NOT price the complete
+    NextG radio/antenna shipment. MGW SERV-5 outbound USD2500 includes packing
+    per supplier message; separately quoted SERV-3 USD500 creates an overlap check,
+    not an automatic credit. Compare all four MR legs against B6 owner before
+    selecting an actual delta.</p>
   </section>}
   {code==="B7"&&<section className="p55-panel" style={{padding:12}}>
    <h4>B7 — Storage Reserve</h4>
