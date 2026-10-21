@@ -33,6 +33,14 @@ export function MgwR2CommercialCover0553({code,purchasedWorkingSell=null}){
    {f(cover.serviceTotalUSD)} = <strong>{f(cover.overallTotalUSD)}</strong>.
    The previous cover was {f(cover.priorOverallTotalUSD)}; vendor total change = <strong>{f(cover.changes.overallDeltaUSD)}</strong>.
    These are vendor USD figures, not ADDVALUE's B/C Working SELL.</p>
+  {code==="B3"&&purchasedWorkingSell&&<div className="p55-metric-grid">
+   <div><strong>MGW iFAT + FAT Facility Purchased Quote</strong>
+    <p>USD {purchasedWorkingSell.vendorPurchasedQuoteUSD.toLocaleString("en-US")}</p>
+    <small>MGW Item 3 + Item 4; quote not a paid invoice</small></div>
+   <div><strong>Selected WS-B3 Purchased Service SELL</strong>
+    <p>THB {purchasedWorkingSell.selectedIncrementalWorkingSellTHB.toLocaleString("en-US")}</p>
+    <small>Supplier quote cost ×1.30 (SAMTEL20 + ADDVALUE5 + Omission5)</small></div>
+  </div>}
   {["B5","B6"].includes(code)&&<section className="p55-panel"
    data-component-key={deliveryEvidence.moduleIds[code]} style={{marginTop:10,padding:10}}>
    <h4>MGW WhatsApp — Nantong → Zhuhai JUTAL / USD 2,500 INCLUDING PACKING</h4>
