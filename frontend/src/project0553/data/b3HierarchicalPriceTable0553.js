@@ -6,16 +6,11 @@ import {MGW_R2_COVER_20261020_0553 as cover} from "./mgwP26058R2Cover20261020";
 import {selectB3WorkingSellBreakdown0553} from "./b3WorkingSellBreakdown0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
+import {WORKING_PRICE_ROW_CLASSES_0553 as C,validateWorkingHierarchyPriceTable0553} from "./workingModulePriceTableContract0553";
 
 const ROOT="bid.budget.working.bc.b3";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
-export const B3_PRICE_ROW_CLASSES_0553=Object.freeze({
- INCLUDED_WORKING_SELL:"INCLUDED_WORKING_SELL",
- SUPPLIER_QUOTE_REFERENCE:"SUPPLIER_QUOTE_REFERENCE",
- HISTORICAL_REFERENCE:"HISTORICAL_REFERENCE",
- NON_POSTING_AUDIT:"NON_POSTING_AUDIT"
-});
-const C=B3_PRICE_ROW_CLASSES_0553;
+export const B3_PRICE_ROW_CLASSES_0553=C;
 const sourcePrice=(x)=>Number.isFinite(x)?round(x):null;
 const item=(number,suffix,title,driver,priceClass,{workingSellTHB=null,vendorQuoteUSD=null,historicalTHB=null,
  referenceTHB=null,qty=null,unit=null,unitRateTHB=null,owner="B3",status="PENDING_VERIFICATION",supplierRows=[]}={})=>
@@ -109,6 +104,10 @@ export function selectB3HierarchicalPriceTable0553(workingRow){
     C.NON_POSTING_AUDIT,{status:"NO VERIFIED DIRECT COST — RELEASE HOLD"})
   ])
  ]);
+ const contract=validateWorkingHierarchyPriceTable0553({
+  ownerModuleId:ROOT,groups,expectedSellTHB:workingRow.workingSellTHB,
+  knownSupplierReferenceUSD:7500
+ });
  const totalSell=round(groups.reduce((n,g)=>n+g.workingSellTHB,0));
  const vendorUSD=round(groups.reduce((n,g)=>n+g.vendorQuoteUSD,0));
  const groupsAsExpected={fat:397400,sat:2016000,tools:30000,audit:0};
@@ -122,7 +121,7 @@ export function selectB3HierarchicalPriceTable0553(workingRow){
  return Object.freeze({
   moduleId:ROOT+".worktype-accordion",
   parentModuleId:ROOT,
-  groups,totalWorkingSellTHB:totalSell,
+  groups,contract,totalWorkingSellTHB:totalSell,
   supplierFatReferenceUSD:vendorUSD,
   supplierFatReferenceTHB:round(vendorUSD*31.5),
   supplierFxTHBPerUSD:31.5,
