@@ -36,7 +36,7 @@ const copy=id=><span className="p553-price-trace-copy"
  </span>;
 function Section({code,num,suffix,title,summary,children,defaultOpen=false}){
  const id=idFor(code,suffix);
- return <details className="p553-bc-price-leaf" data-component-key={id} defaultOpen={defaultOpen}>
+ return <details className="p553-bc-price-leaf" data-component-key={id} open={defaultOpen}>
   <summary className="p553-bc-price-leaf-head">
    <span className="p553-bc-price-num">{num}</span>
    <span className="p553-bc-price-leaf-label"><strong>{title}</strong>
