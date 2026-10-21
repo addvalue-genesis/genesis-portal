@@ -32,6 +32,8 @@ assert.equal(m.verifiedDirectCostTHB,null);
 assert.equal(m.customerReleaseAllowed,false);
 const rows=m.groups.flatMap(x=>x.items);
 assert.equal(rows.length,11);
+assert.deepEqual(m.groups.map(x=>x.items.length),[2,2,2,5],
+ "B3.1 must have ONLY supplier evidence + current WS; historical & scenario belong to B3.4 audit");
 assert.equal(new Set(rows.map(x=>x.moduleId)).size,11);
 assert.equal(rows.filter(x=>x.priceClass===CLASS.INCLUDED_WORKING_SELL).length,3);
 assert.equal(round(rows.filter(x=>x.priceClass===CLASS.INCLUDED_WORKING_SELL)
@@ -51,10 +53,14 @@ assert(integrated,"Missing seven-day FAT/Training review-only submodule");
 assert.equal(integrated.priceClass,CLASS.NON_POSTING_AUDIT);
 assert.equal(integrated.workingSellTHB,null);
 assert(integrated.status.includes("NOT ISSUED"));
+assert(m.groups[3].items.includes(integrated),"Seven-day training proposal belongs in B3.4 Audit/Scenario");
+assert(!m.groups[0].items.includes(integrated),"Scenario not a current B3.1 FAT quote item");
 const witness=rows.find(x=>x.moduleId.endsWith(".revk-china-budget"));
 assert.equal(witness.workingSellTHB,397400);
 const historical=rows.find(x=>x.moduleId.endsWith(".fat-owner-transfer"));
 assert.equal(historical.historicalTHB,144000);
+assert(m.groups[3].items.includes(historical),"Historical FAT must be grouped under B3.4 audit");
+assert(!m.groups[0].items.includes(historical),"Historical FAT no longer belongs in priced B3.1 FAT");
 assert.equal(historical.workingSellTHB,null);
 const audit=rows.find(x=>x.moduleId.endsWith(".working-sell-breakdown"));
 assert.equal(audit.referenceTHB,2443400);
@@ -68,10 +74,10 @@ assert.equal(veex.unitRateTHB,1000);
 const content=renderToStaticMarkup(React.createElement(Host,{workingRow:b3}));
 assert(content.includes("<table")&&content.includes("p553-b3-hierarchical-table"),
  "Price hierarchy must be a table, not a list of source cards");
-for(const tag of ["MGW Quote USD","MGW Source THB","Historical / Audit THB",
+for(const tag of ["MGW Quote USD","MGW Source THB","Historical / Scenario / Audit THB",
  "B3 Working SELL THB","Treatment / Owner","Expand All","Collapse All",
  "397,400.00","2,016,000.00","30,000.00","2,443,400.00","236,250.00",
- "7,500.00","144,000.00","5,000.00","2,500.00","NON-POSTING"]){
+ "7,500.00","144,000.00","5,000.00","2,500.00","NON-POSTING","IC-FAT-STAFF-001"]){
  assert(content.includes(tag),"Price table missing "+tag);
 }
 for(const r of m.groups){
@@ -97,4 +103,4 @@ for(const row of m.groups){
   "Navigator missing child "+child.moduleId);
 }
 assert.equal(JSON.stringify(working()),snapshot,"B3 price summary UI changed 10.2 sources");
-console.log("PASS 0553 B3 priced HIERARCHY TABLE: FAT 397400 + SAT 2016000 + tools 30000 + audit NONPOST = 2443400; quoted MGW USD7500/THB236250, historical Bangkok THB144000, audit mirror THB2443400 all NONADDITIVE. 4 parent + 10 child IDs; same table columns; no cost mutation.");
+console.log("PASS 0553 B3 priced HIERARCHY TABLE / historical + scenario in B3.4 Audit only: FAT 397400 + SAT 2016000 + tools 30000 + audit NONPOST = 2443400; quoted MGW USD7500/THB236250, historical Bangkok THB144000, audit mirror THB2443400 all NONADDITIVE. 4 parent + 10 child IDs; same table columns; no cost mutation.");
