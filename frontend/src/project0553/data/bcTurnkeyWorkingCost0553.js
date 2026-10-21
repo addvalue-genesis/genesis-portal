@@ -38,7 +38,7 @@ const customerRequirements=Object.freeze({
  B3:"Inspection / Site Survey / FAT / SAT — pre-SAT field survey across 7 locations is in B3 contract scope but remains unpriced pending separate crew/days/travel WBS; MGW purchased iFAT/FAT Facility and ADDVALUE FAT witness, offshore SAT/SIT and VeEX remain selected Working SELL",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
- B6:"Transportation — MR0001 NextG radios/IDU/ODU direct-to-MGW Nantong option; Thai Enclosure+Cisco 4 preassemblies to MGW; antennas direct JUTAL only subject to ITP; MR0002–0004 OEM-to-MGW; MGW single SERV-5 outbound road quote. No automatic extra freight posting.",
+ B6:"Transportation — APPROVED MR0001 route: NextG IDU/ODU plus 5 greenfield antennas directly to MGW Nantong; Thai Enclosure+Cisco 4 preassembled sets to MGW; MR0002–0004 OEM into MGW China FAT; MGW SERV-5 single outbound freight to JUTAL. Commercial freight credit not yet verified.",
  B7:"Three-month FREE storage at vendor workshop per customer; MGW P26-058_R2 does not separately quote or confirm 3-month free storage. 1-month THB30000 Working SELL reserve remains selected pending inclusion proof",
  B8:"Training for purchaser/end-user personnel",
  B9:"Specialist assistance and mobilization as specified",
@@ -54,7 +54,7 @@ const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
 const executionDecisionByCode=Object.freeze({
  B3:"B3 owns purchased MGW iFAT/facility SERV-2/4 WS at 20+5+5, ADDVALUE FAT Witness/travel plus Offshore SAT/SIT and temporary tools; do not duplicate vendor service in Part A",
- B6:"China FAT at MGW Nantong; NextG expired NG/260916-ADV-DAP1 is DAP Ranong (NOT DDP Thailand). Direct-to-China radio route and consolidated MGW outbound freight need source quote/credit; B6 handles freight only, not A equipment or B3 FAT.",
+ B6:"Project Owner approved NextG IDU/ODU/all 5 antenna direct MGW and Thai-built Enclosure+Cisco 4 sets to MGW; NextG expired DAP Ranong quotation needs destination amendment and price/credit. B6 historical SELL unchanged, B5 packing/B3 FAT ownership separated.",
  B9:"Specialist field assistance 7-day Sr Telecom Engineer 1 LS quoted in B9 Base; on-call execution conditional on written Yard request. MGW FAT Witness remains B3."
 });
 
@@ -102,7 +102,11 @@ export function selectBcTurnkeyWorkingCost0553(){
  // Supplier quote SERV-5 is VQ COST BASIS, not additive to selected WS-B6.
  if(b6RouteDecision.selectedB6WorkingSellTHB!==307584||
     b6RouteDecision.netSavingOrIncreaseTHB!==null||
-    b6RouteDecision.postingAllowed||!b6RouteDecision.siteAssembly.inboundToMgwAcceptedOperationallyByOwner)
+    b6RouteDecision.postingAllowed||!b6RouteDecision.siteAssembly.inboundToMgwAcceptedOperationallyByOwner||
+    b6RouteDecision.selectedPhysicalRouteId!=="SC-B6-B-HYBRID-MGW"||
+    b6RouteDecision.physicalRoutingStatus!=="OWNER_APPROVED__NOT_VENDOR_RECONFIRMED"||
+    b6RouteDecision.ownerApprovedAntennaCount!==5||
+    b6RouteDecision.selectedAntennaBypassToJutal!==false)
   throw Error("B6 routing proposal cannot silently reprice pre-award B6");
  const b7StorageEvidence=selectB7ThreeMonthStorageEvidence0553();
  if(!b3SiteSurvey.scopeIncluded||b3SiteSurvey.alreadyPricedInCurrentSelectedB3||
