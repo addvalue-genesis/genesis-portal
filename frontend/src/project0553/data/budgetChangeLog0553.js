@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-21-R05";
+export const CHANGE_LOG_VERSION_0553="2026-10-21-R06";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261021-09",date:"2026-10-21",kind:"UI",tone:"navigation",
+  title:"แก้ Warning details.defaultOpen และ Regression ลำดับ B3.1–B3.4",
+  detail:"B3 hierarchical table ใช้ native <details open> ที่ React รองรับแทน defaultOpen; Regression ตรวจลำดับ FAT→SAT→Tools→Audit จาก data-component-key ของ Module จริง ไม่ใช้ indexOf ข้อความเกริ่น B3.1–B3.4 ที่ปรากฏก่อนแถวราคา การจัดสรร SAT, MGW Supplier Quote, Working SELL และ Historical Audit คงเดิม.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.worktype-accordion","bid.budget.working.bc.b3.fat","bid.budget.working.bc.b3.sat","bid.budget.working.bc.b3.tools","bid.budget.working.bc.b3.audit"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"B3WorkTypeAccordion0553.jsx / validate-0553-b3-breakdown-module-ids.cjs"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261021-08",date:"2026-10-21",kind:"UI",tone:"navigation",
   title:"SAT Matrix Regression: ข้อความ NOT 8 days per MR และ Caller B3.2",
