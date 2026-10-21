@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-21-R09";
+export const CHANGE_LOG_VERSION_0553="2026-10-21-R10";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261021-13",date:"2026-10-21",kind:"PRICE",tone:"pricing",
+  title:"B9 Specialist Assistance — Quoted Base 1 LS THB233600 ใน 10.3 Release Preview",
+  detail:"ตามนโยบาย Project Owner ให้ B9 Specialist Assistance 1 Lot มีราคาใน Release; 10.2 เลือก Working SELL 233600 จาก source Yard package เดิม 7+2 วันและรายจ่ายร่วมเพียงครั้งเดียว. 10.3 และ 10.5/Native G32 รับยอดเดียวกัน Part B Base 4385436.82 (+233600), SAMTEL B9 5% =11680, ADDVALUE receivable 221920 ก่อนต้นทุนจริง. การเข้าทำงานที่ Yard ยังขึ้นกับ written call-out/RACI; ไม่สร้าง conditional line ซ้ำ ไม่บวก markup ของ ADDVALUE ซ้ำ Actual Direct Cost NULL และ Customer Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b9","bid.budget.working.bc","bid.budget.pricing.release.preview","bid.budget.scope","bid.budget.mapping"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"ADR-65 / Original 4-Scope of Supply.xlsx B9 1 Lot / Rev.K B9 Yard estimate"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261021-12",date:"2026-10-21",kind:"DATA_FLOW",tone:"pricing",
   title:"B3/B8 ห้าวัน + SAT Lean 28+2 + B9 Conditional + Customer Mapping Audit",
