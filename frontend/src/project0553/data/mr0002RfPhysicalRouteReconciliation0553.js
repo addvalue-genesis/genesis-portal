@@ -75,6 +75,11 @@ export function calculateMR0002RFNetMaterial0553({verifiedPhysicalRunLengthsM=nu
 export function deriveMR0002RfPhysicalRouteReconciliation0553(){
  const policy=MR0002_RF_ROUTE_SCENARIO_POLICY_0553,src=MR0002_RF_ROUTE_SOURCE_0553;
  const selectedSites=MGW.sitesByMR["MR-0002"];
+ const kit=MGW.lines.find(x=>x.id==="UHF-4");
+ if(!kit||kit.quantity!==selectedSites.length||
+   NEK_QA.selectedQtyPerSiteM!==src.mgw.includedFeederMPerSite||
+   NEK_QA.selectedConnectorQtyPerSite!==src.mgw.includedConnectorPcPerSite)
+   throw Error("MR0002 RF feeder route reconciliation requires exact selected MGW Rev2 UHF-4 included supply");
  const sites=selectedSites.map(site=>{
   const found=Z1F_TEL_LAYOUT_INDEX_0553.byWP.find(w=>w.wp===site);
   const eq=(tag)=>found?.equipment.find(x=>x.system==="DTRS_TRUNK_RADIO"&&x.tag===tag);
