@@ -76,6 +76,49 @@ assert.equal(rfLossAt450Db0553(100,4.93),4.93);
 assert.equal(rfLossAt450Db0553(100,4.93*1.05),5.177);
 assert.equal(rfSite("ZWP20").uploadedRev6Loss450DbAtIncludedQty,4.93);
 assert.equal(rfSite("ZWP20").uploadedRev6MaxLoss450DbAtIncludedQty,5.177);
+const {deriveMR0002RfPhysicalRouteReconciliation0553:rfRoutes,
+ calculateMR0002RFNetMaterial0553:rfNet,
+ mr0002RfPurchaseM0553:rfBuy}=require(path.join(root,"project0553/data/mr0002RfPhysicalRouteReconciliation0553.js"));
+const routeAudit=rfRoutes();
+assert.equal(routeAudit.sites.length,3);
+assert.deepEqual(routeAudit.sites.map(x=>x.site),["ZWP20","ZWP21","ZWP22"]);
+assert.equal(routeAudit.totalIllustrativeReferencePurchaseM,84);
+assert.equal(routeAudit.totalActualAddvalueNetM,null);
+assert.equal(routeAudit.postedAdditionalTHB,0);
+assert.equal(routeAudit.costLedgerChanged,false);
+assert.equal(routeAudit.allSitesTakeoffApproved,false);
+assert.equal(rfBuy(12.144),14);
+const unknownRfNet=rfNet();
+assert.equal(unknownRfNet.netAdditionalM,null);
+assert.equal(unknownRfNet.additionalConnectors,null);
+assert.equal(unknownRfNet.state,"ROUTE_OR_ACCEPTED_VENDOR_CREDIT_NOT_VERIFIED");
+assert.deepEqual(rfNet({verifiedPhysicalRunLengthsM:[10,20],acceptedMGWAvailableM:10,
+ connectorsRequired:7,acceptedMGWConnectorQty:6}).netAdditionalM,25);
+assert.deepEqual(rfNet({verifiedPhysicalRunLengthsM:[10,20],acceptedMGWAvailableM:10,
+ connectorsRequired:7,acceptedMGWConnectorQty:6}).additionalConnectors,1);
+for(const siteRf of routeAudit.sites){
+ assert.equal(siteRf.circuitCount,2);
+ assert.deepEqual(siteRf.missingTags,[]);
+ assert.deepEqual(siteRf.circuits.map(x=>x.id),["RF-DONOR","RF-SERVICE"]);
+ assert(siteRf.circuits.every(x=>x.verifiedInstalledM===null));
+ assert(siteRf.circuits.every(x=>x.engineeringBudgetReferencePurchaseM===14));
+ assert.equal(siteRf.scenario.referenceTotalPurchaseM,28);
+ assert.equal(siteRf.scenario.mgwPotentialBalanceIfEquivalentM,72);
+ assert.equal(siteRf.scenario.netAdditionalIfMGWAcceptedAndPooledM,0);
+ assert.equal(siteRf.actual.netNEKPurchaseM,null);
+ assert.equal(siteRf.addvalue.procurementQtyM,null);
+ assert.equal(siteRf.addvalue.workingTHB,null);
+ assert.equal(siteRf.mgw.providedFeederM,100);
+ assert.equal(siteRf.mgw.providedConnectors,6);
+ assert.equal(siteRf.mgw.technicallyAccepted,false);
+ assert.equal(siteRf.compliance.mrRequiresFireResistant,true);
+ assert.equal(siteRf.compliance.nekIEC60331Proof,false);
+ assert.equal(siteRf.compliance.forllerIEC60331Proof,false);
+ assert.equal(siteRf.changedExistingWorkingTHB,0);
+}
+const rfRouteUI=fs.readFileSync(path.join(root,"project0553/MR0002RfRouteReconciliation0553.jsx"),"utf8");
+babel.transformSync(rfRouteUI,{babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
+
 
 assert.equal(rf.candidate.nominalOdMm,16);
 assert.equal(rf.candidateStatus,"ADDVALUE_NEK_FIELD_BULK_PROPOSED__NET_QTY_AND_PRICE_PENDING");
@@ -102,6 +145,9 @@ for(const site of ["ZWP20","ZWP21","ZWP22"]){
  assert.equal(addvalue.rateTHB,null);
  assert.equal(addvalue.bookedIncrementalTHB,0);
  assert.equal(addvalue.vendorPackageIncludedM,100);
+ assert.equal(addvalue.physicalCircuitCount,2);
+ assert.equal(addvalue.unverifiedScenarioPurchaseM,28);
+ assert.equal(addvalue.physicalQuantityState,"ROUTE_OR_ACCEPTED_VENDOR_CREDIT_NOT_VERIFIED");
  assert.equal(addvalue.supplierIncludedDeductionRequired,true);
  assert.equal(addvalue.replacementApproved,false);
  const o=g.items.find(x=>x.id==="FEEDER-NEK-TECHNICAL-COMPARABLE");
@@ -142,5 +188,6 @@ assert(simple.includes('moduleKey="bid.budget.bom.system-location-mto"'));
 assert(simple.includes('key:"bulk-status"'));
 assert(simple.includes('value:"ADDVALUE_PROPOSED"'));
 assert(ui.includes('ADDVALUE NEK FIELD BULK — PROPOSED / NOT BOOKED'));
+assert(ui.includes('<MR0002RfRouteReconciliation0553 site={g.site}/>'));
 assert(location.includes('<BulkMrLocationCoverage0553 mr="MR-0001" site={site} detail/>'));
 console.log("PASS 0553 BULK MR / Location: 7×4 groups, 17 active, 7 original A5 floor rows THB260232 non-additive, MGW Rev2, source-linked table/filter/Row11, no changed cost");
