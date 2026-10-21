@@ -1,7 +1,8 @@
 // 10.2 / B3: ONE source-backed, read-only normalized table schema for every Module.
 // Future B3 entries must declare ONE classification: INCLUDED_WORKING_SELL,
 // SUPPLIER_QUOTE_REFERENCE, HISTORICAL_REFERENCE, or NON_POSTING_AUDIT.
-// Never sum supplier, historical or audit previews into canonical B3 Working SELL.
+// Purchased MGW iFAT/Facility supplier price is NOW selected at 20+5+5 in WS-B3 once.
+// Never add the original quote AGAIN; historical or audit references do not post.
 import {MGW_R2_COVER_20261020_0553 as cover} from "./mgwP26058R2Cover20261020";
 import {selectB3WorkingSellBreakdown0553} from "./b3WorkingSellBreakdown0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
@@ -108,8 +109,8 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
     C.HISTORICAL_REFERENCE,{historicalTHB:workingRow.b3FatOwnerTransfer.amountTHB,
      qty:8,unit:"historical team-days",unitRateTHB:18000,
      owner:"B3 historical only",status:"SUPERSEDED — NON ADDITIVE"}),
-   item("B3.4.5","fat-training-7d-allocation","7-Day Integrated FAT + Training — INTERNAL SCENARIO",
-    "B3/B8 shared 7 onsite team-days: 12 B3 FAT MD + 2 B8 training MD; 4 travel MD stay in B3 once",
+   item("B3.4.5","fat-training-7d-allocation","ADDVALUE-only 7-Day Integrated FAT + Training — INTERNAL SCENARIO",
+    "ADDVALUE staff-only 7-day shared proposal; MGW purchased FAT THB307125 remains IN B3.1.1 unchanged and is not re-added",
     C.NON_POSTING_AUDIT,{referenceTHB:integratedScenario?.proposedB3FatWorkingSellTHB??null,
      qty:integratedScenario?.onSiteDays??null,unit:"shared on-site days",
      owner:"IC-FAT-001 / IC-TRN-001 · B3/B8 cross-owner",
