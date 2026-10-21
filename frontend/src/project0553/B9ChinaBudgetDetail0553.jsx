@@ -2,7 +2,7 @@ import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 // Historic filename retained for routing compatibility; view ALWAYS filters by contractual cost owner.
-export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9"}){
+export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServices=null}){
  if(!budget)return null;
  const isFat=selectedOwner==="B3", owner=isFat?"B3":"B9";
  const rows=budget.rows.filter(x=>x.costOwner===owner);
@@ -16,7 +16,7 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9"}){
    <div><strong>{isFat?"WS-B3 — Current Internal FAT Working SELL":"WS-B9 — Optional Internal Yard Working SELL"}</strong><p>{thb(total)}</p>
     <small>{isFat?"Two ADDVALUE paid witnesses, six budgetary FAT days, one return China trip; OEM executes FAT in Part A":"One paid Senior Telecom Engineer · 7 working days + 2 travel days · one unbilled accompanying Field Telecom Specialist"}</small></div>
    <div><strong>{isFat?"WS-B3 — Offshore + FAT Internal Working SELL":"Current B9 Base"}</strong><p>{isFat?thb(2046000+total):thb(budget.b9BaseWorkingSellTHB)}</p>
-    <small>{isFat?"Offshore 40-day SAT/SIT + 30-day VeEX rental + MGW FAT witness (all B3)":"No mandatory specialist call-out in B9 Base; optional THB233,600 excluded"}</small></div>
+    <small>{isFat?"Offshore 40-day SAT/SIT + VeEX + ADDVALUE FAT witness + MGW purchased FAT service (Part A owner check OPEN)":"No mandatory specialist call-out in B9 Base; optional THB233,600 excluded"}</small></div>
   </div>
   {isFat&&budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}>
    <summary><strong>MGW FAT / MR0001–MR0004 — 6-Day Estimating Agenda</strong></summary>
