@@ -68,6 +68,8 @@ assert.equal(rf.uploadedSm000111.nominalOdMm,16.4);
 assert.equal(rf.uploadedSm000111.odToleranceMm,0.4);
 assert.equal(rf.uploadedSm000111.minimumFlexibleBendRadiusMm,135);
 assert.equal(rf.uploadedSm000111.selectedByMGW,false);
+assert.equal(rf.uploadedSm000111.flameResistance,null);
+assert.equal(rf.uploadedSm000111.fireResistanceIEC60331Proof,false);
 assert.equal(rf.uploadedSm000111.attenuation300DbPer100M>rf.uploadedSm000111.attenuation400DbPer100M,true);
 assert.equal(rf.revisionConflict.state,"NEK_REV6_VS_REV9_450MHZ_DATA_CONFLICT__HOLD");
 assert.equal(rf.revisionConflict.differenceDbPer100M,1.07);
@@ -102,6 +104,8 @@ assert.equal(rfNet({verifiedPhysicalRunLengthsM:[10,20],acceptedMGWAvailableM:10
  connectorsRequired:7,acceptedMGWConnectorQty:6}).addvalueAutomaticProcurementM,null);
 for(const siteRf of routeAudit.sites){
  assert.equal(siteRf.circuitCount,2);
+ assert(siteRf.circuits.every(x=>x.fromDeck==="MEZZANINE_EI_ROOFTOP"));
+ assert(siteRf.circuits.every(x=>x.toDeck==="MEZZANINE_EI_ROOFTOP"));
  assert.deepEqual(siteRf.missingTags,[]);
  assert.deepEqual(siteRf.circuits.map(x=>x.id),["RF-DONOR","RF-SERVICE"]);
  assert(siteRf.circuits.every(x=>x.verifiedInstalledM===null));
