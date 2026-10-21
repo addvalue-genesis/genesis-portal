@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-21-R07";
+export const CHANGE_LOG_VERSION_0553="2026-10-21-R08";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261021-11",date:"2026-10-21",kind:"DATA_FLOW",tone:"pricing",
+  title:"B1 Role Support Regression: ตรวจยอด Part B หลัง B2 Reprice และ MGW FAT",
+  detail:"แก้ validate-0553-b1-role-support-plan.cjs ที่ยังคาด 4,187,590.69 ก่อนเลือก B2 131-WO และ MGW Purchased FAT ให้ตรวจ Canonical B1 211600, B2 237121.13, B3 2750525, Part B 4151836.82 พร้อม Bridge จาก Historical (B2 580000→237121.13 และ B3 +307125). ทดสอบ B1 legacy Engineering carryforward 0 และห้ามเก็บ Rev05 เป็นราคา Working SELL ปัจจุบัน.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1.revk-pm-milestones","bid.budget.working.bc.b2","bid.budget.working.bc.b3.mgw-r2-cover-20261020","bid.budget.working.bc"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"B1 role-plan regression / canonical B2/B3 price migration and owner-only roll-up"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261021-10",date:"2026-10-21",kind:"UI",tone:"navigation",
   title:"แก้ B3/B8 Seven-day SSR ราคาเก่าและ Warning ที่ B/C Owner Price Trace",
