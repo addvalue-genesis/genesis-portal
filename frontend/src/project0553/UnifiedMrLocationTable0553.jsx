@@ -1,6 +1,6 @@
 import React,{useState} from "react";
 import {bomModuleId0553,bomPriceTHB0553,bomEvidenceDisplay0553} from "./bomPresentationContract0553";
-import {MGW_P26_058_R2_UHF_0553} from "./data/mgwP26058R2Uhf0553";
+import {MGW_P26_058_R2_SELECTED_0553} from "./data/mgwP26058R2Selected0553";
 import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 
@@ -34,12 +34,12 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
  const thbTotal=convertible?workingThb+workingUsd*(fx?.thbPerUsd||0):null;
  const candidate=mr==="MR-0003";
  const asThb=(n,c)=>bomPriceTHB0553(n,c,fx).label;
- const checkedRate=(x)=>{if(mr==="MR-0002"&&String(x.id).endsWith("-RFI-BDA")){const line=MGW_P26_058_R2_UHF_0553.lines.find(q=>q.id==="UHF-1");if(!line||x.unitCost!==line.unitPriceUSD||x.extended!==line.unitPriceUSD||x.source!==MGW_P26_058_R2_UHF_0553.id)return "SOURCE RATE MISMATCH — CHECK MGW R2";}return asThb(x.unitCost,x.currency);};
+ const checkedRate=(x)=>{if(mr==="MR-0002"&&String(x.id).endsWith("-RFI-BDA")){const line=MGW_P26_058_R2_SELECTED_0553.lines.find(q=>q.id==="UHF-1");if(!line||x.unitCost!==line.unitPriceUSD||x.extended!==line.unitPriceUSD||x.source!==MGW_P26_058_R2_SELECTED_0553.id)return "SOURCE RATE MISMATCH — CHECK MGW R2";}return asThb(x.unitCost,x.currency);};
  const fmtLine=x=>Number.isFinite(x)?money(x,"THB"): "FX REQUIRED";
- const includedThb=x=>bomEvidenceDisplay0553(x,fx,MGW_P26_058_R2_UHF_0553.lines);
+ const includedThb=x=>bomEvidenceDisplay0553(x,fx,MGW_P26_058_R2_SELECTED_0553.lines);
  return <section className="p55-panel" data-component-key={"bid.budget.bom.system-location-mto."+mr.toLowerCase().replace("-","")}>
   <h4>{mr} · System × Location × MTO / Working BOM <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.bom.system-location-mto."+mr.toLowerCase().replace("-","")}/></h4>
-  {mr==="MR-0002"&&<p className="p55-note" data-testid="mr0002-r2-quote-authority"><strong>Active vendor price authority: MGW P26-058_R2 / UHF-1 · RFI BD4345-00N0-AC + WAROM HRMD95-VIIIB · source package THB conversion from USD 31,474 per site (original USD is stored in vendor registry).</strong> {rows.some(r=>r.items.some(i=>i.id===r.site+"-RFI-BDA"&&i.unitCost!==MGW_P26_058_R2_UHF_0553.lines.find(q=>q.id==="UHF-1")?.unitPriceUSD))?"RATE SOURCE MISMATCH — STOP RELEASE":"R2 quote linked to working BOM."}</p>}
+  {mr==="MR-0002"&&<p className="p55-note" data-testid="mr0002-r2-quote-authority"><strong>Active vendor price authority: MGW P26-058_R2 / UHF-1 · RFI BD4345-00N0-AC + WAROM HRMD95-VIIIB · source package THB conversion from USD 31,474 per site (original USD is stored in vendor registry).</strong> {rows.some(r=>r.items.some(i=>i.id===r.site+"-RFI-BDA"&&i.unitCost!==MGW_P26_058_R2_SELECTED_0553.lines.find(q=>q.id==="UHF-1")?.unitPriceUSD))?"RATE SOURCE MISMATCH — STOP RELEASE":"R2 quote linked to working BOM."}</p>}
   <p className="p55-note"><strong>Display currency: THB only.</strong> {Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0?`Working FX ${fx.thbPerUsd} THB/USD · ${fx.date||"date not verified"} · ${fx.source||"source not verified"}`:"USD→THB FX rate required; values will not be mislabeled as THB."}</p>
   <p className="p55-note">{candidate?"MR0003: priced vendor/reference evidence and field-bulk candidates only, NOT approved or posted working cost.":"Canonical equipment working lines; INCLUDED and unpriced rows never added again."} Source quote currencies remain preserved in the underlying registry, not shown in this THB working view. Missing prices/quantities are pending, never zero. No released A+B+C total is asserted.</p>
   <div className="p55-source-facts">
