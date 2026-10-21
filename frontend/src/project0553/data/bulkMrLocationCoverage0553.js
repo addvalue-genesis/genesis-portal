@@ -5,6 +5,7 @@ import {deriveScadaBulkVerification0553} from "./scadaBulkQuantityVerification05
 import {deriveA5BulkAttribution0553} from "./a5BulkAttribution0553";
 import {deriveRaconTerminationBudget0553} from "./raconTerminationBudget0553";
 import {MGW_P26_058_R2_SELECTED_0553 as MGW} from "./mgwP26058R2Selected0553";
+import {deriveMR0002RfFeederQualification0553} from "./mr0002RfFeederQualification0553";
 
 export const BULK_MR_SITE_ORDER_0553=Object.freeze(["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11"]);
 export const BULK_MR_LIST_0553=Object.freeze(["MR-0001","MR-0002","MR-0003","MR-0004"]);
@@ -63,12 +64,22 @@ const mgwIncluded=(id,description,lineId,detail,qty=null,unit="included")=>{
   ". Existing USD "+(quote?.unitPriceUSD??"NOT QUOTED")+" per package is NOT an additional accessory rate.",
   qty,unit);
 };
-function dmrItems(){
+function dmrItems(site){
+ const rf=deriveMR0002RfFeederQualification0553(site);
  return [
   mgwIncluded("BDA-WAROM","RFI BD4345-00N0-AC BDA / WAROM HRMD95-VIIIB Ex d housing","UHF-1","Assembly Ex certification, RF penetrations, thermal and AC/DC compatibility pending",1,"set"),
   mgwIncluded("YAGI-EX-RF","RFI Yagi / UNV2 clamp / PolyPhaser IS-B50LN-C2 / Solexy RXNMS0200JX0","UHF-2","Full combined Rev2 selected, not older UHF-only Rev2; PolyPhaser and Solexy bundled",1,"set"),
   mgwIncluded("OMNI","KBT TQJ-400AD5 omni antenna","UHF-3","N-female mating connection to be confirmed",1,"set"),
-  mgwIncluded("FEEDER-KIT","FORLLER 1/2-inch RF low loss feeder 100 m per quoted site kit","UHF-4","Cable included, actual installation route and suitable cable type/length require proof",100,"m"),
+  mgwIncluded("FEEDER-KIT","FORLLER 1/2-inch RF low loss feeder 100 m per quoted site kit","UHF-4","Cable included, actual installation route and suitable cable type/length require proof. Quote lacks FORLLER traceable SKU/manufacturer datasheet. NEK Rev9 is comparison ONLY; at 450 MHz NEK 6.00 dB/100m versus obsolete LDF4RK proxy 4.749 dB/100m. Recalculate RF budget at exact frequency/route; vendor quote remains FORLLER.",100,"m"),
+  {...review("FEEDER-NEK-TECHNICAL-COMPARABLE",
+    'NEK RF LLF 1/2" SHF1, 50Ω / DNV — datasheet Rev9 TECHNICAL COMPARISON ONLY',
+    "RF_CABLE_TECHNICAL_QA__NOT_SELECTED_PROCUREMENT",
+    rf?.candidate?.page||"NEK datasheet qualification required",
+    "NEK Kabel AS black 1028850 / grey 1028857, SHF1 UV, nominal OD 16 ±0.5mm, 50 ±2Ω; 450MHz attenuation 6.00 dB/100m; connector references N-male 65402, N-female 65464. WARNING: MGW quotes FORLLER (not NEK); obtain FORLLER datasheet, cable marking and DNV CoC before technical approval. For the quoted 100m, NEK nominal ~"+(rf?.candidateLoss450DbAtIncludedQty??"N/A")+"dB vs legacy LDF4RK proxy "+(rf?.oldProxyLoss450DbAtIncludedQty??"N/A")+"dB. NEK is NOT an adopted alternative."),
+    technicalPdfUrl:rf?.candidate?.datasheet||null,
+    technicalSourcePage:rf?.candidate?.page||null,
+    qualificationState:rf?.qualificationState||"NOT_QUALIFIED",
+    quotedManufacturer:"FORLLER",quotedCableSku:null,selectedSupplierChanged:false},
   mgwIncluded("FEEDER-CONNECTORS","Six 1/2-inch 50-ohm male RF feeder connectors per site kit","UHF-4","Do not reprice the six included fittings",6,"ea"),
   review("BDA-RF-PORTS","Certified Ex d RF bulkheads / feedthrough / 2-port donor and service paths","MGW_UHF1_OEM_ASSEMBLY_FIRST",sources.mgw,"Ex d assembly approval and antenna-side interface cannot be assumed included from plain BDA line"),
   field("BDA-POWER-CABLE","Field DC power feeder, protective device and terminals","FIELD_POWER_OR_ELECTRICAL","MR0002 DTS / MGW R2","Redesign for selected BDA; do not reuse superseded MOT LNA 11–28V assumption"),
@@ -133,7 +144,7 @@ export function deriveBulkMrLocationCoverage0553(){
    const isActive=mr==="MR-0001"||MGW.sitesByMR[mr]?.includes(site)===true;
    let result={items:[],sourceMtoRow:null,bookedA5THB:null};
    if(mr==="MR-0001") result=scadaItems(site,scada.find(x=>x.site===site),a5.rows.find(x=>x.site===site));
-   else if(isActive&&mr==="MR-0002") result={...result,items:dmrItems()};
+   else if(isActive&&mr==="MR-0002") result={...result,items:dmrItems(site)};
    else if(isActive&&mr==="MR-0003") result={...result,items:phoneItems()};
    else if(isActive&&mr==="MR-0004") result={...result,items:raconItems(site,racon)};
    const sourceSystem=existing.find(x=>x.wp===site)?.systems.find(x=>({
