@@ -118,6 +118,35 @@ assert.match(workspace,/onOpenSource=\{openReleaseSource\}/);
 assert.match(workspace,/activePricingView\.moduleId/);
 assert.match(workspace,/PRICING_VIEWS_0553\.find\(view=>view\.key==="released"\)/);
 assert.match(workspace,/data-component-key="bid\.budget\.pricing\.single-release"/);
+for(const stage of ["working","budgetary","released"])
+ assert.ok(workspace.includes('openPricingStage("'+stage+'")'),
+  "Original pricing workflow shortcut missing: "+stage);
+assert.match(workspace,/10\.3\.1 · Working \/ Edit/);
+assert.match(workspace,/10\.3\.2 · Budgetary/);
+assert.match(workspace,/10\.3\.3 · Release/);
+assert.match(workspace,/openModuleAncestors0553\(target\)/);
+assert.match(workspace,/findModuleElement0553\(document,id\+"\.details"\)/);
+assert.match(workspace,/<ReleaseSourceNavigator0553 model=\{releaseModel\} onOpenSource=\{openReleaseSource\}/);
+const navFile=file("ReleaseSourceNavigator0553.jsx");
+assert.match(navFile,/p553-rsn-group--/);
+assert.match(navFile,/CATEGORY_COLOR_0553/);
+assert.match(navFile,/＋ Expand All/);
+assert.match(navFile,/− Collapse All/);
+assert.match(navFile,/onOpenSource\(\{\.\.\.row,sourceModuleId:id\}\)/);
+assert.match(navFile,/ComponentCopyId/);
+assert.match(navFile,/data-component-key="bid\.budget\.pricing\.release\.source-navigator"/);
+assert.ok(!/setWorkingSell|postingAllowed:true|releaseAllowed:true/.test(navFile),
+ "Source navigator must be read-only and nonposting");
+const uiSourceLink=file("ReleaseCustomerWorkbook0553.jsx");
+assert.match(uiSourceLink,/onClick=\{\(\)=>onOpenSource\(item\)\}/);
+assert.match(uiSourceLink,/p553-origin-link--a/);
+assert.match(uiSourceLink,/p553-origin-link--c/);
+const navStyles=file("project0553.css");
+for(const key of ["p553-pricing-stage--working","p553-pricing-stage--budgetary",
+ "p553-pricing-stage--released","p553-rsn-row--testing","p553-rsn-row--logistics",
+ "p553-rsn-row--spares","p553-rsn-row--options"])
+ assert.ok(navStyles.includes(key),"Missing color-coded pricing/navigation group "+key);
+
 assert.match(workspace,/data-component-key="bid\.budget\.pricing\.release"/);
 assert.match(workspace,/data-component-key="bid\.budget\.pricing\.release\.source-trace"/);
 assert.match(workspace,/data-component-key="bid\.budget\.pricing\.temp"/);
