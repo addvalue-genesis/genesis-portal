@@ -5,6 +5,7 @@
 // Do not convert unknown price/actual cost NULL to THB0.
 const C=Object.freeze({
  INCLUDED_WORKING_SELL:"INCLUDED_WORKING_SELL",
+ PURCHASED_SERVICE_WORKING_SELL:"PURCHASED_SERVICE_WORKING_SELL",
  SUPPLIER_QUOTE_REFERENCE:"SUPPLIER_QUOTE_REFERENCE",
  HISTORICAL_REFERENCE:"HISTORICAL_REFERENCE",
  NON_POSTING_AUDIT:"NON_POSTING_AUDIT"
@@ -33,20 +34,24 @@ export function validateWorkingHierarchyPriceTable0553({ownerModuleId,groups,exp
     throw Error("Hierarchical Working Cost child missing source, status, owner, or unique Module ID");
    modules.add(child.moduleId);
    rows.push(child);
-   if(child.priceClass===C.INCLUDED_WORKING_SELL){
+   if([C.INCLUDED_WORKING_SELL,C.PURCHASED_SERVICE_WORKING_SELL].includes(child.priceClass)){
     if(!n(child.workingSellTHB))throw Error("Included Working SELL requires source-derived THB amount");
     ownSell+=child.workingSellTHB;
    }else if(child.workingSellTHB!==null)
     throw Error("Supplier, historical or audit line cannot post current Working SELL: "+child.moduleId);
-   if(child.priceClass===C.SUPPLIER_QUOTE_REFERENCE&&child.vendorQuoteUSD===null)
-    throw Error("Supplier-source reference must present actual quoted currency amount");
+   if([C.SUPPLIER_QUOTE_REFERENCE,C.PURCHASED_SERVICE_WORKING_SELL].includes(child.priceClass)&&
+    child.vendorQuoteUSD===null)
+    throw Error("Supplier source purchased/ref rows must show original USD quote");
+   if(child.priceClass===C.PURCHASED_SERVICE_WORKING_SELL&&
+     child.workingSellTHB<=0)
+    throw Error("Purchased service selected Working SELL must have positive cost markup source");
   }
   if(round(ownSell)!==group.workingSellTHB)
    throw Error("Cost Owner group subtotal does not equal its unique included children: "+group.moduleId);
   owners.add(group.kind);
  }
  const selected=round(groups.reduce((sum,g)=>sum+g.workingSellTHB,0));
- const supplier=round(rows.filter(x=>x.priceClass===C.SUPPLIER_QUOTE_REFERENCE)
+ const supplier=round(rows.filter(x=>Number.isFinite(x.vendorQuoteUSD))
   .reduce((sum,x)=>sum+x.vendorQuoteUSD,0));
  if(selected!==round(expectedSellTHB)||
   knownSupplierReferenceUSD!==null&&supplier!==round(knownSupplierReferenceUSD))
@@ -56,6 +61,7 @@ export function validateWorkingHierarchyPriceTable0553({ownerModuleId,groups,exp
   supplierReferenceUSD:supplier,groupCount:groups.length,childModuleCount:rows.length,
   moduleIds:Object.freeze([...modules]),
   noDuplicateModuleIds:modules.size===groups.length+rows.length,
-  noVendorCostOrAuditAddedToSell:true,customerReleaseAllowed:false
+  noSupplierReferenceOrHistoricalAuditDoublePosting:true,
+  purchasedSupplierSellClassesValidated:true,customerReleaseAllowed:false
  });
 }
