@@ -13,9 +13,9 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9"}){
   <h4>{isFat?"IC-FAT — ADDVALUE China FAT Witness · Internal Working SELL Detail":"IC-YARD — Specialist Field Assistance · Internal Conditional Working SELL"}</h4>
   <p className="p55-note"><strong>Internal record:</strong> {isFat?"IC-FAT / WS-B3":"IC-YARD / WS-B9"} · <strong>Customer contractual Scope:</strong> {isFat?"SOW-B3":"SOW-B9"} · <strong>Commercial Proposal:</strong> {isFat?"CP-B3":"CP-B9"} NOT ISSUED. These rows are internal estimating activities, not customer B3/B9 quotation line numbers.</p>
   <div className="p55-metric-grid">
-   <div><strong>{isFat?"B3 FAT Witness Base Working SELL":"B9 Yard Optional 1 LS Working SELL"}</strong><p>{thb(total)}</p>
+   <div><strong>{isFat?"WS-B3 — Current Internal FAT Working SELL":"WS-B9 — Optional Internal Yard Working SELL"}</strong><p>{thb(total)}</p>
     <small>{isFat?"Two ADDVALUE paid witnesses, six budgetary FAT days, one return China trip; OEM executes FAT in Part A":"One paid Senior Telecom Engineer · 7 working days + 2 travel days · one unbilled accompanying Field Telecom Specialist"}</small></div>
-   <div><strong>{isFat?"B3 Offshore + FAT Combined Working SELL":"Current B9 Base"}</strong><p>{isFat?thb(2046000+total):thb(budget.b9BaseWorkingSellTHB)}</p>
+   <div><strong>{isFat?"WS-B3 — Offshore + FAT Internal Working SELL":"Current B9 Base"}</strong><p>{isFat?thb(2046000+total):thb(budget.b9BaseWorkingSellTHB)}</p>
     <small>{isFat?"Offshore 40-day SAT/SIT + 30-day VeEX rental + MGW FAT witness (all B3)":"No mandatory specialist call-out in B9 Base; optional THB233,600 excluded"}</small></div>
   </div>
   {isFat&&budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}>
