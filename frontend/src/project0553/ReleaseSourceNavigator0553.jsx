@@ -65,6 +65,16 @@ export function ReleaseSourceNavigator0553({model,onOpenSource}){
           <summary><strong>{row.code}</strong> {row.mr||row.description||""}</summary>
           <div className="p553-rsn-detail">
            <div>Source: <code>{id}</code></div>
+           {group.part!=="a"&&<div><strong>Financial Identity:</strong>
+            <code>{" SOW-"+row.code}</code> Scope ·
+            <code>{" WS-"+row.code}</code> Internal Working SELL ·
+            <code>{" CP-"+row.code}</code> Customer Proposal NOT ISSUED
+           </div>}
+           {row.code==="B3"&&Number.isFinite(row.mgwPurchasedServicesSellIncludedTHB)&&
+            <div>VQ-MGW-SERV-2 / VQ-MGW-SERV-4 → IC-FAT-MGW-SERV-2-4 quoted-cost
+             → WS-B3 purchased services {currency(row.mgwPurchasedServicesSellIncludedTHB)};
+             SAMTEL purchased cost share {currency(row.samTelPurchased20PctCostShareTHB)}
+             counted ONCE · CP-B3 HOLD</div>}
            <div>Commercial owner: {group.part==="a"?"10.1 Equipment":row.code+" selected Working Owner"}</div>
            <div>Preview: {currency(itemPrice(group.part,row))} · {group.part==="c"?"OPTIONAL / not included in Base":group.part==="a"?"Provisional Equipment":"B Working SELL passed unchanged"}</div>
           </div>
