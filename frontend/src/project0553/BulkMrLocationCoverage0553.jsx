@@ -1,4 +1,4 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 import {selectBulkMrLocationCoverage0553} from "./data/bulkMrLocationCoverage0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {MR0002RfRouteReconciliation0553} from "./MR0002RfRouteReconciliation0553";
@@ -17,10 +17,32 @@ const stateText={
  OTHER_WBS:"SEPARATE SERVICE / SPARES"
 };
 const countFmt=(n)=>Number.isFinite(n)?n:"—";
-export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",detail=false}){
+export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",detail=false,focusModuleId=null}){
  const [opened,setOpened]=useState({});
  const view=selectBulkMrLocationCoverage0553({mr,site,state});
  const groups=view.groups.filter(g=>state==="ALL"||g.visibleItems.length);
+ // Open the exact MR/site group when the project-level Module Navigator targets a
+ // nested BULK item or RF circuit. Do not mutate canonical BOM or cost sources.
+ useEffect(()=>{
+  if(!focusModuleId)return;
+  const g=view.groups.find(group=>group.active&&(
+    focusModuleId===group.moduleId||
+    group.items.some(item=>item.moduleId===focusModuleId)||
+    focusModuleId.startsWith("bid.budget.bom."+group.site.toLowerCase()+"."+
+      group.mr.toLowerCase().replace("-","")+".rf-")
+  ));
+  if(g)setOpened(prev=>prev[g.site+"-"+g.mr]?prev:{...prev,[g.site+"-"+g.mr]:true});
+ },[focusModuleId,mr,site,state]);
+ useEffect(()=>{
+  if(!focusModuleId||typeof document==="undefined")return;
+  const el=[...document.querySelectorAll("[data-component-key]")].
+    find(node=>node.getAttribute("data-component-key")===focusModuleId);
+  if(!el)return;
+  let cursor=el.parentElement;
+  while(cursor){if(cursor.tagName==="DETAILS")cursor.open=true;cursor=cursor.parentElement;}
+  el.classList?.add("p553-module-nav-focus");
+  el.scrollIntoView?.({block:"center",behavior:"smooth"});
+ },[focusModuleId,opened,mr,site,state]);
  const toggle=(key)=>setOpened(prev=>({...prev,[key]:!prev[key]}));
  const title=detail?"Source MTO BULK — engineering material / owner reconciliation":
   "BULK / Installation Materials — "+mr+" / "+(site==="ALL"?"All Locations":site);
@@ -45,8 +67,8 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
         <td><ComponentCopyId projectId="PJ2608-0553" componentKey={g.moduleId} componentName={g.site+" "+g.mr+" BULK Material"}/>
           <small>{g.sourceMtoRow!==null?"Original MR0001 MTO Bulk Row "+g.sourceMtoRow:"Per-system field interface register (no fabricated MTO source row)"}</small></td>
         <td className="is-number">{shown.length} / {g.items.length}<small>{g.scopeReview} owner/inclusion reviews</small></td>
-        <td className="is-number">{shown.filter(i=>i.state==="NEEDS_QUANTITY"||(i.state==="ADDVALUE_PROPOSED"&&i.qty===null)).length}</td>
-        <td className="is-number">{shown.filter(i=>i.state==="NEEDS_RATE"||(i.state==="ADDVALUE_PROPOSED"&&!Number.isFinite(i.rateTHB))).length}</td>
+        <td className="is-number">{shown.filter(i=>i.state==="NEEDS_QUANTITY"||(i.state==="BULK_RESERVE_CANDIDATE"&&i.qty===null)).length}</td>
+        <td className="is-number">{shown.filter(i=>i.state==="NEEDS_RATE"||(i.state==="BULK_RESERVE_CANDIDATE"&&!Number.isFinite(i.rateTHB))).length}</td>
         <td className="is-number">{shown.filter(i=>i.state==="VENDOR_INCLUDED").length}</td>
         <td className="is-number">{Number.isFinite(g.bookedA5THB)?fmt(g.bookedA5THB):"N/A"}<small>{g.mr==="MR-0001"?"Reclassified once / NOT additive":"No source A5 posting"}</small></td>
        </tr>
