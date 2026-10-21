@@ -29,7 +29,7 @@ const activitiesForCustomerCode=Object.freeze({
 const customerRequirements=Object.freeze({
  B1:"Engineering and Design — 1 Lot (customer B1); internal ADDVALUE project support B1.1–B1.8 separately planned",
  B2:"VDRL, documentation and final as-built delivery per MR",
- B3:"Inspection, Testing and Certification per ITP: MGW FAT Witness plus Offshore SAT/SIT and VeEX rental",
+ B3:"Inspection, Testing and Certification per ITP: MGW purchased iFAT and FAT Facility plus ADDVALUE FAT Witness, Offshore SAT/SIT and VeEX rental",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
  B6:"Delivery logistics — MGW to JUTAL Zhuhai Yard; JUTAL coordinates customs/import/export, legal importer and Incoterm payer to confirm",
@@ -47,7 +47,7 @@ const customerRequirements=Object.freeze({
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
 const executionDecisionByCode=Object.freeze({
- B3:"B3 owns MGW FAT Witness/travel plus Offshore SAT/SIT and temporary tools; MGW OEM FAT execution belongs A",
+ B3:"B3 owns purchased MGW iFAT/facility SERV-2/4 WS at 20+5+5, ADDVALUE FAT Witness/travel plus Offshore SAT/SIT and temporary tools; do not duplicate vendor service in Part A",
  B6:"Rev.K MGW China FAT followed by delivery through JUTAL Zhuhai; JUTAL coordinates import/export customs, actual importer of record and DDP cost bearer to verify; B6 cargo only",
  B9:"Specialist field assistance only: no B9 Base; conditional Yard Sr Telecom Engineer 7-day 1 LS. MGW FAT Witness belongs B3."
 });
@@ -133,7 +133,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    contractOwner:"SAMTEL",
    turnkeyEstimator:"ADDVALUE_FOR_SAMTEL",
    executionOwner:w.owner, // Execution responsibility never excludes turnkey scope.
-   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"||code==="B3"||code==="B1"||code==="B2"?1:w.qty,unit:code==="B1"?"LS (internal B1.1–B1.8 resource-cost estimate; customer Engineering & Design 1 Lot)":code==="B2"?"LS (131 VDRL work objects from 143 MR Table 11 obligations; provisional role MH/rate)":code==="B9"?"LS (Yard Specialist optional only; Base zero)":code==="B3"?"LS (MGW FAT Witness + 40d SAT/SIT + VeEX 30d)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"No B9 Base; Yard Specialist optional 1 LS only, FAT Witness and travel are B3":code==="B3"?"B3: MGW purchased iFAT+facility USD7500 × FX31.5 × (1+SAMTEL20%+ADDVALUE5%+reserve5%) + original FAT witnesses/travel + offshore 40 days + VeEX; no Part B 5% charge twice":code==="B1"?"Current B1 equals NEW B1.1–B1.8 team resource cost + management/project expense allowances only; legacy 27 WBS engineering/964MH prices NOT carried; engineering technical owner review nonposting":code==="B2"?"B2 First Principles: 131 unique VDRL work objects / selected 963.76 MH / historical rate cost proxy × planning load 1.20 ÷ (1-0.20 GM); conditional review and missing inputs OPEN":w.driver,
+   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"||code==="B3"||code==="B1"||code==="B2"?1:w.qty,unit:code==="B1"?"LS (internal B1.1–B1.8 resource-cost estimate; customer Engineering & Design 1 Lot)":code==="B2"?"LS (131 VDRL work objects from 143 MR Table 11 obligations; provisional role MH/rate)":code==="B9"?"LS (Yard Specialist optional only; Base zero)":code==="B3"?"LS (MGW Purchased iFAT/Facility + FAT Witness + 40d SAT/SIT + VeEX 30d)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B9"?"No B9 Base; Yard Specialist optional 1 LS only, FAT Witness and travel are B3":code==="B3"?"B3: MGW purchased iFAT+facility USD7500 × FX31.5 × (1+SAMTEL20%+ADDVALUE5%+reserve5%) + original FAT witnesses/travel + offshore 40 days + VeEX; no Part B 5% charge twice":code==="B1"?"Current B1 equals NEW B1.1–B1.8 team resource cost + management/project expense allowances only; legacy 27 WBS engineering/964MH prices NOT carried; engineering technical owner review nonposting":code==="B2"?"B2 First Principles: 131 unique VDRL work objects / selected 963.76 MH / historical rate cost proxy × planning load 1.20 ÷ (1-0.20 GM); conditional review and missing inputs OPEN":w.driver,
    sourceRevision:code==="B2"?"B2 FIRST PRINCIPLES REPRICE 2026-10-21 (provisional); VDRL Rev00a source quantities and 2026 planning load/margin":(code==="B1"||code==="B3"||code==="B9")?"Rev.K 2026-10-18 current FAT ownership + Rev05 source bridge":PART_BC_WBS_SOURCE_0553.revision,
    sourceUrl:code==="B2"?b2Recalculated.sourceUrl:PART_BC_WBS_SOURCE_0553.url,
    requirementRows:requirementRows.map(r=>({
