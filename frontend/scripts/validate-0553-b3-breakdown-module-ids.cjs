@@ -95,4 +95,4 @@ assert.equal(r.byCode.B11.directCostTHB,null,"B11 tool ownership note must not b
 assert.equal(JSON.stringify({b3:bc().byCode.B3,overall:bc().knownWorkingSellTHB}),sourceSnapshot,"Rendering must never mutate current B3 pricing");
 const host=fs.readFileSync(path.join(dir,"BcCostEvidenceDetail0553.jsx"),"utf8");
 assert(host.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"));
-console.log("PASS B3 10.2 FAT/SAT/Tools/Audit accordion + source/SSR: THB 2,443,400 = offshore 2,016,000 + VeEX 30,000 + China FAT 397,400; 19 requirements, 21 SAT Test IDs non-additive; parent Module IDs visible and copyable, B9 excluded.");
+console.log("PASS B3 10.2 FAT/SAT/Tools/Audit accordion + source/SSR: THB 2,750,525 = MGW purchased 307,125 + offshore 2,016,000 + VeEX 30,000 + ADDVALUE China FAT 397,400; 19 requirements, 21 SAT Test IDs non-additive; parent Module IDs visible and copyable, B9 excluded.");
