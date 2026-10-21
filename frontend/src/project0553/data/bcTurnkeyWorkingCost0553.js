@@ -10,6 +10,9 @@ import {selectB1ProjectSupportBudget0553} from "./b1ProjectSupportBudget0553";
 import {evaluateB2VdrlIndependentScenario0553} from "./b2IndependentVdrlRecalculation0553";
 import {selectB3FortyDayWorkingSell0553} from "./b3FortyDayWorkingSell0553";
 import {selectB3LeanSatScenario0553} from "./b3LeanSatScenario0553";
+import {selectB3SiteSurveyScope0553} from "./b3SiteSurveyScope0553";
+import {selectB6Mr0001ChinaInboundScenario0553} from "./b6Mr0001ChinaInboundScenario0553";
+import {selectB7ThreeMonthStorageEvidence0553} from "./b7ThreeMonthStorageEvidence0553";
 import {selectB3B8FiveDaySourceAllocation0553} from "./b3B8FiveDaySourceAllocation0553";
 import {selectB3MgwPurchasedFatWorkingSell0553} from "./b3MgwPurchasedFatWorkingSell0553";
 import {selectB3WorkingSellAfterChinaFat0553,B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553} from "./b3ChinaFatOwnership0553";
@@ -31,11 +34,11 @@ const activitiesForCustomerCode=Object.freeze({
 const customerRequirements=Object.freeze({
  B1:"Engineering and Design — 1 Lot (customer B1); internal ADDVALUE project support B1.1–B1.8 separately planned",
  B2:"VDRL, documentation and final as-built delivery per MR",
- B3:"Inspection, Testing and Certification per ITP: MGW purchased iFAT and FAT Facility plus ADDVALUE FAT Witness, Offshore SAT/SIT and VeEX rental",
+ B3:"Inspection / Site Survey / FAT / SAT — pre-SAT field survey across 7 locations is in B3 contract scope but remains unpriced pending separate crew/days/travel WBS; MGW purchased iFAT/FAT Facility and ADDVALUE FAT witness, offshore SAT/SIT and VeEX remain selected Working SELL",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
- B6:"Delivery logistics — MGW to JUTAL Zhuhai Yard; JUTAL coordinates customs/import/export, legal importer and Incoterm payer to confirm",
- B7:"Three-month vendor workshop storage / included-in-package check",
+ B6:"Transportation — MR0001 4 Enclosure + IDU + Cisco sets inbound for assembly at MGW Nantong PLUS MGW quoted Nantong→JUTAL road freight; China importer/broker/Incoterm payer and same-price inclusion to reconcile",
+ B7:"Three-month FREE storage at vendor workshop per customer; MGW P26-058_R2 does not separately quote or confirm 3-month free storage. 1-month THB30000 Working SELL reserve remains selected pending inclusion proof",
  B8:"Training for purchaser/end-user personnel",
  B9:"Specialist assistance and mobilization as specified",
  B10:"Erection, pre-commissioning, commissioning and start-up spares",
@@ -87,6 +90,13 @@ export function selectBcTurnkeyWorkingCost0553(){
  const b10WorkingSellTHB=round(b10HistoricalUSD*31.5);
  const spareBudget=selectUnifiedSpareConsumables0553();
  const chinaB9=selectB9ChinaWorkingBudget0553();
+ const b3SiteSurvey=selectB3SiteSurveyScope0553();
+ const b6ChinaInbound=selectB6Mr0001ChinaInboundScenario0553();
+ const b7StorageEvidence=selectB7ThreeMonthStorageEvidence0553();
+ if(!b3SiteSurvey.scopeIncluded||b3SiteSurvey.alreadyPricedInCurrentSelectedB3||
+  b6ChinaInbound.postingAllowed||b7StorageEvidence.postingAllowed||
+  b7StorageEvidence.currentSelectedOneMonthWorkingSellTHB!==b7WorkingSellTHB)
+  throw Error("B3 survey/B6 inbound/B7 3-month scenario must stay nonposting until cost-owner selection");
  const b1Current=selectB1ProjectSupportBudget0553();
  const b2Recalculated=evaluateB2VdrlIndependentScenario0553();
  const b2CurrentSellTHB=b2Recalculated.result.indicativeGrossMarginSellTHB;
@@ -171,6 +181,9 @@ export function selectBcTurnkeyWorkingCost0553(){
     note:"Working SELL replaced per user request; role MH / historical proxy rates remain provisional and cannot be treated as Actual Direct Cost"
    }):null,
    b3FortyDayBudget:code==="B3"?b3Current:null,
+   b3SiteSurveyScope:code==="B3"?b3SiteSurvey:null,
+   b6Mr0001ChinaInboundEvidence:code==="B6"?b6ChinaInbound:null,
+   b7ThreeMonthStorageEvidence:code==="B7"?b7StorageEvidence:null,
    b3MgwPurchasedFatWorkingSell:code==="B3"?b3MgwPurchased:null,
    b3OriginalWithoutMgwPurchasedTHB:code==="B3"?round(b3Current.workingSellTHB+chinaB9.fatWorkingSellTHB):null,
    b3FatOwnerTransfer:code==="B3"?Object.freeze({...B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553,baseSourceSellTHB:w.sellTHB,currentWorkingSellTHB:b3CurrentSellTHB}):null,
@@ -277,6 +290,11 @@ export function selectBcTurnkeyWorkingCost0553(){
   workingSellB3FortyDayTHB:b3Current.workingSellTHB,
   workingSellB9YardConditionalTHB:chinaB9.conditionalYardSellTHB,
   workingSellB9QuotedInBase:true, // same B9 owner amount, NEVER add this conditional-source mirror again
+  unpostedScopeRiskAudits:Object.freeze({
+   B3SiteSurvey:b3SiteSurvey,
+   B6Mr0001Inbound4Sets:b6ChinaInbound,
+   B7ThreeMonthStorage:b7StorageEvidence
+  }),
   workingSellB3OffshoreOnlyTHB:rows.find(r=>r.code==="B3").workingSellTHB,
   workingSellB5ApprovedTHB:rows.find(r=>r.code==="B5").workingSellTHB,
   workingSellB10ApprovedTHB:rows.find(r=>r.code==="B10").workingSellTHB,
