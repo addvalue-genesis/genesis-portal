@@ -12,6 +12,7 @@ import { ArchitectureView as SharedArchitectureView } from "../common/ui/Archite
 import { ARCHITECTURE_MANIFEST_0553 } from "../project0553/architectureManifest";
 import { MODULE_REGISTRY_0553 } from "../project0553/moduleRegistry";
 import {buildBcModuleNavigator0553} from "../project0553/data/bcModuleNavigator0553";
+import {buildBulkModuleNavigator0553} from "../project0553/data/bulkModuleNavigator0553";
 import {buildScopeBcModuleNavigator0553} from "../project0553/data/scopeBcPriceAudit0553";
 import { ExecutiveView } from "../common/ui/ExecutiveView";
 import { MR0001RFProofPilot } from "../project0553/MR0001RFProofPilot";
@@ -84,7 +85,7 @@ export function PJ26080553() {
  ];
  // Derive B/C search results from the SAME controlled 10.2 source and module IDs
  // rendered in Budgetary; avoid isolated manually-maintained search aliases.
- const navigableModules=[...mainModuleIndex,...buildBcModuleNavigator0553(),...buildScopeBcModuleNavigator0553()];
+ const navigableModules=[...mainModuleIndex,...buildBcModuleNavigator0553(),...buildScopeBcModuleNavigator0553(),...buildBulkModuleNavigator0553()];
  // Accept either a bare Module ID or the project-qualified Copy ID text.
  const searchableQuery=moduleQuery.trim().replace(/^PJ2608-0553\s*\/\s*/i,"").trim().toLowerCase();
  const searchMatches=searchableQuery?
