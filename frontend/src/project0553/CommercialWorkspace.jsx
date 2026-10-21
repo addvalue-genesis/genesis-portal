@@ -333,7 +333,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <p><strong>Customer export:</strong> DISABLED — no authenticated frozen budgetary snapshot.</p>
  </section></details>
 
- <details className="p553-budget-phase" data-component-key="bid.budget.summary"><summary><strong>Previous Customer Proposal Preview</strong><small>TEMP · 10.6 · No release</small></summary>
+ <details className="p553-budget-phase" data-component-key="bid.budget.pricing.temp.customer-proposal"><summary><strong>Previous Customer Proposal Preview</strong><small>TEMP · 10.6 · No release</small></summary>
   <CustomerProposalPreview0553/>
  </details>
 
