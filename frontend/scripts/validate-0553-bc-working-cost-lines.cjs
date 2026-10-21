@@ -48,11 +48,11 @@ for(const code of codes){
  assert.deepEqual(b.byCode[code].workCostLines,m.byCode[code]);
  assert.equal(b.byCode[code].workCostLineCount,m.byCode[code].length);
  assert.equal(b.byCode[code].workCostLineModuleId,m.moduleId);
- assert.equal(b.byCode[code].workingSellTHB,({B1:211600,B3:2443400,B9:0,B5:311184,B6:307584,B7:30000,B10:123024.37,B13:22484.21,C1:4049349.36,C2:721806.68,B11:b.byCode.B11.workingSellTHB})[code]??m.workingSellByCode[code]);
+ assert.equal(b.byCode[code].workingSellTHB,({B1:211600,B3:2750525,B9:0,B5:311184,B6:307584,B7:30000,B10:123024.37,B13:22484.21,C1:4049349.36,C2:721806.68,B11:b.byCode.B11.workingSellTHB})[code]??m.workingSellByCode[code]);
 }
 assert.equal(b.workCostLineCount,111);
 assert.equal(b.workCostLineAuditCount,40);
-assert.equal(b.knownWorkingSellTHB,3844711.82);
+assert.equal(b.knownWorkingSellTHB,4151836.82);
 assert.equal(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((sum,x)=>Math.round((sum+x.workingSellTHB)*100)/100,0),b.knownWorkingSellTHB,"Base-only budget sum; optional C1/C2 excluded");
 assert.equal(b.knownDirectCostTHB,null);
 const b1=m.byCode.B1.filter(x=>x.id.startsWith("B1-WBS-"));
@@ -120,4 +120,4 @@ for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcWorkCostLin
  assert(babel.transformSync(read(f),{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
 }
-console.log("PASS 0553 canonical 10.2 UI: 111 historical source/audit rows retained, B1 27/964 MH historical, current B3 2,443,400 including FAT, B9 Base 0 with Yard optional 233,600; both tab and expanded detail paths render source-led cost lines. No verified Direct Cost posted.");
+console.log("PASS 0553 canonical 10.2 UI: 111 historical source/audit rows retained, B1 27/964 MH historical, current B3 2,750,525 including FAT, B9 Base 0 with Yard optional 233,600; both tab and expanded detail paths render source-led cost lines. No verified Direct Cost posted.");
