@@ -12,18 +12,19 @@ const source=[
  b1Activities,
  ...["onshoreWorkingRate0553.js","b1RevKMilestoneCoverage0553.js","b3RequirementWbsTrace0553.js",
  "fatWbsFourMr0553.js","b1ActivityWorkingSell0553.js","b3FortyDayWorkingSell0553.js",
- "b9ChinaWorkingBudget0553.js","b1ProjectSupportBudget0553.js","revKAbcOwnershipControl0553.js"].map(file)
+ "workingCostCommercialIdentity0553.js","b9ChinaWorkingBudget0553.js","b1ProjectSupportBudget0553.js","revKAbcOwnershipControl0553.js"].map(file)
 ].join("\n");
 const working={
  byCode:{
   B1:{workingSellTHB:211600},
+  B2:{workingSellTHB:237121.13},
   B3:{workingSellTHB:2750525},
   B9:{workingSellTHB:0,qtyDriver:1,unit:"LS (Yard Specialist optional only; Base zero)"}
  },knownWorkingSellTHB:4151836.82
 };
 const m=vm.runInNewContext(source+"\nselectRevKAbcOwnershipControl0553(working);",{working},{timeout:3000});
 assert.equal(m.partBBaseTHB,4151836.82);
-assert.equal(m.currentB1B3B9BaseTHB,2655000);
+assert.equal(m.currentB1B3B9BaseTHB,2962125);
 assert.equal(m.b1EngineeringSellTHB,0);
 assert.equal(m.b1OfficePmIncludedTHB,100500);
 assert.equal(m.b1PmProxyTHB,0);
