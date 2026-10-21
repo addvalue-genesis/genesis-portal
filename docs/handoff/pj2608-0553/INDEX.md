@@ -46,12 +46,13 @@
 - B7 `data/b7ThreeMonthStorageEvidence0553.js`: customer requires **3 months FREE**, MGW quote does NOT explicitly price or confirm the three-month term. Public 2026 rate scenario four pallets × 90d ≈ THB4527–8148.60 bare space; user prior THB30000/month ×3 = THB90000 sensitivity, extra THB60000 scenario-only; selected B7 THB30000 for 1-month management allowance unchanged.
 - New automated contract `npm run validate:0553-b3-survey-b6-inbound-b7-storage` is in the frontend build chain; full Node/Webpack run **not confirmed**. No new UI module, price ledger, or customer-native cell overwrite.
 
-## Current 4-MR shipment strategy (ADR-67, supersedes ADR-66 B6 routing assumption)
+## Prior 4-MR shipment recommendation (ADR-67; antenna bypass superseded by ADR-68)
 
 - **Owner-approved** `SC-B6-B-HYBRID-MGW` (ADR-68) under existing `byCode.B6.b6FourMrRoutingEvidence`: **NextG IDU 4 + ODU 4 + ALL 5 Greenfield Antennas directly → MGW Nantong**; **Thai-built Enclosure+Cisco 4 protected sets → MGW Nantong**; MR0002/3/4 OEM → MGW; **NO owner-selected antenna JUTAL bypass**. New NextG delivery quotation/credit and customs costs remain unconfirmed.
 - NextG 2026 `NG/260916-ADV-DAP1` quote USD191610.15 is **DAP Ranong, NOT DDP Thailand**, expired 2026-10-01; source `data/quotes/NG-260916-ADV-DAP1.full.json`. Direct-China rerouting, freight cost/credit and actual cabinet freight quantities remain UNKNOWN.
 - MGW commercial `SERV-5` USD2500 outbound Nantong→JUTAL is already in vendor quote and supplier states packing included. Cover `SERV-3` USD500 packing could overlap, **no signed USD500 credit**. One shared outbound cost event; no separate per-MR charge.
 - B6 selected WS **THB307584 historical Rev08 based** unchanged, `netSavingOrIncreaseTHB:null`, no invented savings/posting. Validation: `npm run validate:0553-b6-four-mr-routing` included in build.
+- **ADR-68 prevails**: all 5 antennas are MGW-bound; no separate direct-JUTAL Antenna branch is selected.
 - `docs/handoff/pj2608-0553/67_B6_NEXTG_DIRECT_MGW_FOUR_MR_ROUTE_COST_IDENTITY_20261021.md` is authoritative for the new route; earlier all-Thailand cost range is NOT all-inclusive radio/antenna freight.
 
 ## ADR-68 supersession (22-Oct-2026)
