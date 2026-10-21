@@ -55,4 +55,10 @@ assert(ui.includes('<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} s
 assert(ownerDetail.includes('owner=isFat?"B3":"B9"')&&
  ownerDetail.includes('rows=budget.rows.filter(x=>x.costOwner===owner)'),
  "Shared FAT/Yard expense detail must filter source records by the selected owner");
+assert(ownerDetail.includes("2046000+total+purchasedFatSell")&&
+ ownerDetail.includes("selectedIncrementalWorkingSellTHB"),
+ "FAT detail must include the already-purchased MGW service ONLY in its full B3 rollup");
+assert(ownerDetail.includes("purchasedServices?")&&
+ ownerDetail.includes("vendorPurchasedQuoteUSD!==7500"),
+ "FAT detail must distinguish MGW quoted supplier cost from the ADDVALUE witness amount");
 console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB397400), B9 Yard conditional THB233600; no B9 Base; Actual Direct COST unverified and non-posting.");
