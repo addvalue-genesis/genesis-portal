@@ -54,7 +54,7 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
    purchasedServices:purchased,conditionalYardExcludedTHB:china.conditionalYardSellTHB},
   totalWorkingSellTHB:total,verifiedDirectCostTHB:null,
   excluded:["B9 conditional Yard specialist allowance is NOT B3",
-   "MGW OEM factory test execution and instruments belong to Part A",
+   "MGW purchased iFAT and Facility SERV-2/4 quoted USD7500 are now in SOW-B3 Working SELL ONCE; Part A equipment quote must not include the same USD7500",
    "Rev05 Bangkok FAT THB144,000 is superseded, NOT additive",
    "19 contract trace rows and 21 SAT Test IDs are NON-POSTING engineering evidence",
    "No site-MR SAT Test ID has a separate working day or sell posting"],
