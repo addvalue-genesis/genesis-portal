@@ -20,7 +20,7 @@ assert.ok(yard.every(x=>x.costOwner==="B9"&&x.directCostTHB===null));
 assert.equal(fat.reduce((sum,x)=>sum+x.workingSellTHB,0),397400);
 assert.equal(yard.reduce((sum,x)=>sum+x.workingSellTHB,0),233600);
 assert.equal(data.budget.fatWorkingSellTHB,397400);
-assert.equal(data.budget.b9BaseWorkingSellTHB,0);
+assert.equal(data.budget.b9BaseWorkingSellTHB,233600);
 assert.equal(data.budget.workingSellTHB,0);
 assert.equal(data.budget.conditionalYardSellTHB,233600);
 assert.equal(data.trace.rows.find(x=>x.id==="RQM-01").costOwner,"B3");
@@ -61,4 +61,4 @@ assert(ownerDetail.includes("2046000+total+purchasedFatSell")&&
 assert(ownerDetail.includes("purchasedServices?")&&
  ownerDetail.includes("vendorPurchasedQuoteUSD!==7500"),
  "FAT detail must distinguish MGW quoted supplier cost from the ADDVALUE witness amount");
-console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB397400), B9 Yard conditional THB233600; no B9 Base; Actual Direct COST unverified and non-posting.");
+console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB397400), B9 Yard conditional THB233600; B9 1 LS in Base; Actual Direct COST unverified and non-posting.");
