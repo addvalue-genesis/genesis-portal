@@ -48,6 +48,8 @@ export function B3B8SevenDayAllocation0553({b3,b8,owner="B3"}){
    → {money(m.proposedB3FatWorkingSellTHB)}:
    additional {m.additionalHotelNights} hotel room-nights = {money(m.additionalHotelSellTHB)};
    B8 2 on-site training person-days = {money(m.proposedB8TrainingWorkingSellTHB)}.
+   MGW Purchased Service THB307,125 is already INCLUDED in both current and scenario B3 prices;
+   the B3 FAT travel subtotal here is ADDVALUE-only and must not be added to MGW twice.
    Travel labour of {m.travelPersonDays} MD = {money(m.travelLabourExistingIncludedB3THB)}
    is already in B3 once, NOT another B8 charge.</p>
   <details className="p55-panel" style={{padding:10,marginTop:12}}>
