@@ -114,12 +114,23 @@ const workspace=file("CommercialWorkspace.jsx");
 assert.match(workspace,/PricingCfoDashboard0553 model=\{releaseModel\}/);
 assert.match(workspace,/ReleaseCustomerWorkbook0553 model=\{releaseModel\} recipient=\{recipient\}/);
 assert.match(workspace,/onOpenSource=\{openReleaseSource\}/);
-assert.match(workspace,/PRICING_VIEWS_0553\.map\(view=>/);
-assert.match(workspace,/\{view.number\} · \{view.shortLabel\}/);
+// One LIVE 10.3 Release Preview; three legacy identifiers remain a compatibility registry.
 assert.match(workspace,/activePricingView\.moduleId/);
-assert.match(workspace,/data-component-key=\{view.moduleId\}/);
-
-assert.match(workspace,/mode==="working"&&<details className="p553-budget-phase" open><summary><strong>10\.6/);
+assert.match(workspace,/PRICING_VIEWS_0553\.find\(view=>view\.key==="released"\)/);
+assert.match(workspace,/data-component-key="bid\.budget\.pricing\.single-release"/);
+assert.match(workspace,/data-component-key="bid\.budget\.pricing\.release"/);
+assert.match(workspace,/data-component-key="bid\.budget\.pricing\.release\.source-trace"/);
+assert.match(workspace,/data-component-key="bid\.budget\.pricing\.temp"/);
+assert.match(workspace,/data-component-key="bid\.budget\.pricing\.working"/);
+assert.match(workspace,/data-component-key="bid\.budget\.pricing\.budgetary"/);
+assert.match(workspace,/data-component-key="bid\.budget\.summary"/);
+assert.match(workspace,/data-component-key="bid\.budget\.working\.bc"/);
+assert.match(workspace,/data-component-key="bid\.budget\.scope"/);
+assert.match(workspace,/10\.2 B3 selected Working SELL does not match 10\.3 Release Preview/);
+assert.ok(!workspace.includes('PRICING_VIEWS_0553.map(view=>'),
+ "Do not show three competing Pricing buttons");
+assert.ok(!workspace.includes('mode==="budgetary"')&&!workspace.includes('mode==="released"'),
+ "TEMP views must not be alternate active price modes");
 // CFO UX contract: a single financial summary table, never KPI cards/bullet lists.
 const cfo=file("PricingCfoDashboard0553.jsx");
 assert.match(cfo,/p553-cfo-table/);
