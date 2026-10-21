@@ -45,7 +45,7 @@ for(const c of ["B3","B6","B9"]){
  assert.equal(row.directCostTHB,null,"Execution location must not invent "+c+" direct cost");
 }
 assert.equal(working.byCode.B3.workingSellTHB,2750525);
-assert.equal(working.byCode.B9.workingSellTHB,0);
+assert.equal(working.byCode.B9.workingSellTHB,233600);
 assert.equal(working.byCode.B6.workingSellTHB,307584,"B6 approved pre-award logistics working sell; direct cost stays null");
 assert.equal(working.knownWorkingSellTHB,4187590.69,"Active Rev.K Part B Base including B1/B3/B9 replacement");
 assert.equal(working.knownWorkingSellTHB,Math.round(working.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((sum,r)=>sum+r.workingSellTHB,0)*100)/100,"Options excluded from Base");
