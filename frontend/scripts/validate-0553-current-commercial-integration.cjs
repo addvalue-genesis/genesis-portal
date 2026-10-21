@@ -26,19 +26,25 @@ for(const line of release.b){
  assert.equal(line.workingSellTHB,owner.workingSellTHB,"Release must read selected 10.2 "+line.code);
  assert.equal(line.customerSellTHB,owner.workingSellTHB,"Release B must not reprice selected "+line.code);
 }
-assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2443400,
+assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2750525,
  "Unapproved B3 28+2 scenario must not replace the canonical 40-day selected sell");
-for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2443400,B9:0})){
+for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2750525,B9:0})){
  assert.equal(by[code].workingSellTHB,amount,"Canonical current "+code+" sell mismatch");
  assert.equal(scope.lines[code].workingSellTHB,amount,"Customer Scope/10.2 "+code+" divergence");
  assert.equal(by[code].directCostTHB,null,"Unverified direct cost posted to "+code);
 }
-assert.equal(budget.knownWorkingSellTHB,3844711.82);
+assert.equal(budget.knownWorkingSellTHB,4151836.82);
 assert.equal(abc.partBBaseTHB,budget.knownWorkingSellTHB);
-assert.equal(abc.currentB1B3B9BaseTHB,2655000);
+assert.equal(abc.currentB1B3B9BaseTHB,2962125);
 assert.equal(abc.postedWorkingSellDeltaTHB,0);
 assert.equal(abc.b9YardConditionalLumpSumTHB,233600);
 assert.equal(abc.b3FatWitnessSellTHB,397400);
+assert.equal(by.B3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,7500);
+assert.equal(by.B3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB,236250);
+assert.equal(by.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
+assert.equal(release.b.find(x=>x.code==="B3").samTelPurchased20PctCostShareTHB,47250);
+assert.equal(release.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,122170);
+assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,169420);
 assert.equal(abc.b9FatBaseTHB,0);
 assert.ok(by.B3.b3ChinaFatBudget.rows.filter(x=>!x.optional).every(x=>x.costOwner==="B3"));
 assert.ok(by.B9.b9ChinaBudget.rows.filter(x=>x.optional).every(x=>x.costOwner==="B9"));
@@ -71,7 +77,7 @@ const view=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.
 const workType=fs.readFileSync(path.join(root,"project0553/B3WorkTypeAccordion0553.jsx"),"utf8");
 assert(view.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"),"B3 work-type accordion not mounted");
 assert(workType.includes("<B3SiteMrSatCoverage0553 workingRow={workingRow}/>"),"B3 SAT matrix not mounted in SAT group");
-assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3"/>'),"China FAT witness not mounted in FAT group");
+assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell}/>'),"China FAT witness not mounted in FAT group");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(workspace.includes("<RevKAbcOwnershipControl0553 working={bcWorking}/>"),"CFO current ABC not mounted");
-console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,443,400 (FAT 397,400 included) B9 Base 0; Yard optional 233,600, Part B 3,844,711.82; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
+console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,750,525 (FAT 397,400 included) B9 Base 0; Yard optional 233,600, Part B 4,151,836.82; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
