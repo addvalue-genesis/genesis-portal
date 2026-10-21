@@ -15,7 +15,8 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
  const src=id=>{const v=rows.find(r=>r.id==="B3-"+id);
   if(!v)throw Error("Missing current B3 source expense "+id);return v;};
  const staff=src("FAT-STAFF"),travel=src("TRAVEL-DAYS"),hotel=src("HOTEL");
- if(b3.workingSellTHB!==2443400||b8.workingSellTHB!==30000||
+ if(b3.workingSellTHB!==2750525||b8.workingSellTHB!==30000||
+  b3.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB!==307125||
   fat.fatWorkingSellTHB!==397400||rows.length!==8||
   rate.usdPerPersonDay!==600||rate.thbPerUsd!==31.5||
   staff.qty!==12||staff.unitRateTHB!==18900||
@@ -56,8 +57,8 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   travelPersonDays!==4||hotelExtraNights!==2||hotelExtraSellTHB!==5000||
   trainingAssignedSellTHB!==37800||newB3FatSellTHB!==402400||
   newGrossFatTrainingTripSellTHB!==440200||
-  newB3OverallSellTHB!==2448400||newB8OverallSellTHB!==37800||
-  oldCombined!==2473400||newCombined!==2486200||
+  newB3OverallSellTHB!==2755525||newB8OverallSellTHB!==37800||
+  oldCombined!==2780525||newCombined!==2793325||
   round(newCombined-oldCombined)!==12800||
   b3.directCostTHB!==null||b8.directCostTHB!==null)
   throw Error("B3/B8 7-day allocation math / no-extra-travel / no-double-count failed");
@@ -78,6 +79,8 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   additionalHotelSellTHB:hotelExtraSellTHB,
   b3FatWorkingSellCurrentTHB:fat.fatWorkingSellTHB,
   proposedB3FatWorkingSellTHB:newB3FatSellTHB,
+  b3CurrentFatIncludingMgwPurchasedTHB:round(fat.fatWorkingSellTHB+307125),
+  b3ProposedFatIncludingMgwPurchasedTHB:round(newB3FatSellTHB+307125),
   proposedB8TrainingWorkingSellTHB:newB8OverallSellTHB,
   b3CurrentWorkingSellTHB:b3.workingSellTHB,
   b8CurrentWorkingSellTHB:b8.workingSellTHB,
@@ -93,6 +96,8 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   mgwQuotedIFATUSD:cover.FAT.internalFatUSD,
   mgwQuotedFatFacilityUSD:cover.FAT.facilityEndUserUSD,
   vendorQuoteAlreadyInMGWCover:true,
+  vendorMgwPurchasedSellAlreadyInCanonicalB3THB:307125,
+  noDuplicateVendorPurchasedOnScenario:true,
   customerTrainingLocationAndTwoBatchAcceptanceConfirmed:false,
   threeDayWitnessITPAccepted:false,
   preFATSequenceAndNoticeConfirmed:false,
