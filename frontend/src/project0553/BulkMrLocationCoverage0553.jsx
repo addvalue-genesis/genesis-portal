@@ -61,7 +61,7 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
       const key=g.site+"-"+g.mr,open=detail||!!opened[key];
       const shown=g.visibleItems;
       return <React.Fragment key={key}>
-       <tr data-component-key={g.moduleId}>
+       <tr data-component-key={detail?g.moduleId+".source-row-detail-mirror":g.moduleId}>
         <td data-component-key={g.moduleId+".bulk-summary"}><button type="button" className="p55-row-toggle" aria-expanded={open} onClick={()=>toggle(key)} disabled={detail}>{open?"−":"+"}</button></td>
         <td><strong>{g.site} / {g.mr}</strong><small>{g.active?"APPLICABLE MR/SITE":"NOT IN MGW SELECTED MR/SITE SCOPE"}</small></td>
         <td><ComponentCopyId projectId="PJ2608-0553" componentKey={g.moduleId} componentName={g.site+" "+g.mr+" BULK Material"}/>
