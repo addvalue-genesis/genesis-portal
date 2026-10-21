@@ -23,7 +23,7 @@ for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2750525,B9:
 }
 assert.equal(budget.knownWorkingSellTHB,4151836.82);
 assert.equal(abc.partBBaseTHB,budget.knownWorkingSellTHB);
-assert.equal(abc.currentB1B3B9BaseTHB,2655000);
+assert.equal(abc.currentB1B3B9BaseTHB,2962125);
 assert.equal(abc.postedWorkingSellDeltaTHB,0);
 assert.equal(abc.b9YardConditionalLumpSumTHB,233600);
 assert.equal(abc.b3FatWitnessSellTHB,397400);
@@ -62,4 +62,4 @@ assert(workType.includes("<B3SiteMrSatCoverage0553 workingRow={workingRow}/>"),"
 assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3"/>'),"China FAT witness not mounted in FAT group");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(workspace.includes("<RevKAbcOwnershipControl0553 working={bcWorking}/>"),"CFO current ABC not mounted");
-console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,750,525 (FAT 397,400 included) B9 Base 0; Yard optional 233,600, Part B 4,151,836.82; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
+console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,750,525 (MGW purchased 307,125 + FAT witnesses 397,400 included) B9 Base 0; Yard optional 233,600, Part B 4,151,836.82; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
