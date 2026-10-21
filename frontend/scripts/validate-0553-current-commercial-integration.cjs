@@ -16,6 +16,18 @@ const fat=from("data/fatWbsFourMr0553.js").selectFourMrFatWbs0553();
 const sites=from("data/b3SiteMrSatCoverage0553.js").selectB3SiteMrSatCoverage0553();
 const scope=from("data/scopePartBcReadModel0553.js").selectScopePartBcWorking0553();
 const by=budget.byCode;
+const release=from("data/releaseCommercialModel0553.js").buildReleaseCommercialModel0553({thbPerUsd:31.5});
+assert.equal(release.moduleId,"bid.budget.pricing.release");
+assert.equal(release.approval.releaseAllowed,false,"One live preview must not authorize customer issue");
+assert.equal(release.b.length,14,"All B1–B14 need a release projection");
+for(const line of release.b){
+ const owner=by[line.code];
+ assert(owner,"Release B category lacks selected 10.2 owner: "+line.code);
+ assert.equal(line.workingSellTHB,owner.workingSellTHB,"Release must read selected 10.2 "+line.code);
+ assert.equal(line.customerSellTHB,owner.workingSellTHB,"Release B must not reprice selected "+line.code);
+}
+assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2443400,
+ "Unapproved B3 28+2 scenario must not replace the canonical 40-day selected sell");
 for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2443400,B9:0})){
  assert.equal(by[code].workingSellTHB,amount,"Canonical current "+code+" sell mismatch");
  assert.equal(scope.lines[code].workingSellTHB,amount,"Customer Scope/10.2 "+code+" divergence");
