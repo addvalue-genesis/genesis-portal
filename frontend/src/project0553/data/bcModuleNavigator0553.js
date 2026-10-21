@@ -112,6 +112,7 @@ export function buildBcModuleNavigator0553(){
   child(b3Id+".audit","B3.4 — Working Sell and Contract Cost Audit",b3Id+".audit","19 requirements price trace"),
   child(b3Id+".mgw-r2-cover-20261020","B3.1.1 — MGW FAT iFAT / Facility Vendor Evidence"),
   child(b3Id+".fat-owner-transfer","B3.1.3 — FAT Historic Owner Reconciliation"),
+  child(b3Id+".fat-training-7d-allocation","B3.1.4 — Integrated FAT + Training 7 Days / IC-FAT-001 / WS-B3 / CP-B3 NOT ISSUED"),
   child(b3Id+".test-tools-ownership","B3.3.2 — Test Tools / B11 Cost Ownership"),
   child(b3Id+".source-cost-audit","B3.4.3 — Historical Source and Cost Evidence"),
   child(b3Id+".working-sell-breakdown","B3 — Working SELL THB 2,443,400 Breakdown"),
@@ -153,6 +154,13 @@ export function buildBcModuleNavigator0553(){
   }
  }
  entries.push(...b3Entries);
+ entries.push({
+  id:"bid.budget.working.bc.b8.integrated-fat-training-7d",
+  name:"B8 — Shared seven-day FAT + Training / SOW-B8 / IC-TRN-001 / WS-B8 / CP-B8 reserved",
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:"bid.budget.working.bc.b8.integrated-fat-training-7d",
+  keywords:"B8 FAT customer training China 7 onsite days 2 training person-days B3 shared 4 travel man-days Yangon approval"
+ });
  entries.push({
   id:"bid.budget.working.bc.b11.test-equipment-ownership",
   name:"B11 — Permanent O&M Special Tools vs B3 Temporary FAT/SAT Rental",
