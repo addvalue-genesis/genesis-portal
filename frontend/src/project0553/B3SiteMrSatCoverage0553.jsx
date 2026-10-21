@@ -10,12 +10,24 @@ const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:
 
 export function B3SiteMrSatCoverage0553({workingRow=null}){
  const model=selectB3SiteMrSatCoverage0553(),price=model.priceProof;
+ // This SAT selector owns only the offshore 40-day labour and VeEX rental.
+ // Full B3 additionally includes the already-selected ADDVALUE China FAT witness
+ // AND the separately purchased MGW iFAT/FAT Facility quoted services.
+ // Read the purchased amount from canonical 10.2, never reprice/add to SAT lines.
  const fat=workingRow?.b3ChinaFatBudget?.fatWorkingSellTHB??null;
+ const purchased=workingRow?.b3MgwPurchasedFatWorkingSell??null;
+ const mgwPurchasedSell=purchased?.selectedIncrementalWorkingSellTHB??null;
  const b3Total=workingRow?.workingSellTHB??null;
- const expectedB3=price.offshoreWorkingSellTHB+(Number.isFinite(fat)?fat:0);
- if(workingRow&&(workingRow.code!=="B3"||!Number.isFinite(fat)||
-  !Number.isFinite(b3Total)||Math.abs(expectedB3-b3Total)>0.01))
-  throw Error("B3 SAT timebox + VeEX + MGW FAT must reconcile to canonical B3 Working SELL");
+ const expectedB3=Number.isFinite(fat)&&Number.isFinite(mgwPurchasedSell)?
+  price.offshoreWorkingSellTHB+fat+mgwPurchasedSell:null;
+ if(workingRow&&(workingRow.code!=="B3"||
+  !Number.isFinite(fat)||!Number.isFinite(mgwPurchasedSell)||
+  !Number.isFinite(b3Total)||!Number.isFinite(expectedB3)||
+  purchased.vendorPurchasedQuoteUSD!==7500||
+  purchased.vendorPurchasedQuoteTHB!==236250||
+  purchased.includedInB3WorkingSell!==true||
+  Math.abs(expectedB3-b3Total)>0.01))
+  throw Error("B3 SAT/VeEX + ADDVALUE FAT + MGW Purchased FAT must reconcile once to canonical B3 Working SELL");
  const byTimebox=new Map(model.budgetarySiteTimeboxes.map(t=>[t.id,t]));
  const openMrDetails=row=>{
   const id=row.moduleId+".work-breakdown";
@@ -70,7 +82,12 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
    <tbody>
     <tr><td><strong>Offshore SAT/SIT labour</strong><small>{price.sourceModuleId}</small></td><td>2 people × 40 days = 80 MD × USD 800 × FX 31.5</td><td><strong>{fmt(price.laborWorkingSellTHB)}</strong></td><td>Included once in B3</td></tr>
     <tr><td><strong>VeEX MX100+ rental</strong><small>bid.budget.working.bc.b3.veex-mx100</small></td><td>{price.veexRentalDays} rental days × {fmt(price.veexRentalRateTHB)}/day</td><td><strong>{fmt(price.veexWorkingSellTHB)}</strong></td><td>One equipment rental allowance, not per MR or per Site</td></tr>
-    <tr><td><strong>MGW China FAT witness + travel</strong><small>bid.budget.working.bc.b3.revk-china-budget</small></td><td>Separate factory witness expense; not 40 offshore days</td><td><strong>{fmt(fat)}</strong></td><td>B3 source; NOT B9 conditional Yard</td></tr>
+    <tr><td><strong>ADDVALUE China FAT witness + travel · WS-B3</strong><small>bid.budget.working.bc.b3.revk-china-budget</small></td><td>Separate ADDVALUE factory witness expense; not 40 offshore days</td><td><strong>{fmt(fat)}</strong></td><td>B3 source; NOT B9 conditional Yard</td></tr>
+    <tr><td><strong>MGW Purchased iFAT + FAT Facility · VQ-MGW-SERV-2/4 → WS-B3</strong>
+     <small>bid.budget.working.bc.b3.mgw-r2-cover-20261020</small></td>
+     <td>MGW P26-058_R2 USD 7,500 × THB 31.50 × 1.30 (SAMTEL 20%, ADDVALUE 5%, Reserve 5%)</td>
+     <td><strong>{fmt(mgwPurchasedSell)}</strong></td>
+     <td>PURCHASED SERVICE WS ONCE — quoted supplier cost is not verified paid Direct Cost; CP-B3 HOLD</td></tr>
     <tr><th colSpan={2}>TOTAL B3 — Inspection, Testing &amp; Certification</th><th><strong>{fmt(b3Total)}</strong></th><th>Working SELL / Direct COST pending / Release HOLD</th></tr>
    </tbody></table></div>
   <h4>4. Required SAT Test IDs — Refer to the shared Site budget above</h4>
