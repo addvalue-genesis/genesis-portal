@@ -58,7 +58,7 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
             {Number.isFinite(item.existingBookedTHB)&&<small>A5 source THB {fmt(item.existingBookedTHB)} — NOT extra</small>}</td>
            <td>{item.owner}<small>{item.state==="VENDOR_INCLUDED"?"Selected MGW package or original factory owner":"Confirm physical owner before working-cost revision"}</small></td>
            <td><strong>{stateText[item.state]||item.state}</strong><small>{item.approvedProcurement?"Procurement selected":"NOT PROCUREMENT-APPROVED"}</small></td>
-           <td>{item.detail}<small>Evidence: {/^https:/.test(item.source)?<a href={item.source} target="_blank" rel="noopener noreferrer">Open source quotation / manufacturer page</a>:item.source}</small>{item.technicalPdfUrl&&<small><a href={item.technicalPdfUrl} target="_blank" rel="noopener noreferrer">NEK manufacturer RF LLF 1/2\" SHF1 Rev9 PDF — candidate only, not FORLLER certification</a></small>}</td>
+           <td>{item.detail}<small>Evidence: {/^https:/.test(item.source)?<a href={item.source} target="_blank" rel="noopener noreferrer">Open source quotation / manufacturer page</a>:item.source}</small>{item.technicalPdfUrl&&<small><a href={item.technicalPdfUrl} target="_blank" rel="noopener noreferrer">NEK manufacturer RF LLF half-inch SHF1 Rev9 PDF — candidate only, not FORLLER certification</a></small>}</td>
           </tr>)}
           {shown.length===0&&<tr><td colSpan={6}>No applicable physical BULK row under this MR / Location / status filter. This is not a confirmed zero-cost allocation; check MR scope.</td></tr>}
          </tbody>
