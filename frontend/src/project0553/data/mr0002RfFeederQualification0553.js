@@ -1,6 +1,6 @@
 // PJ2608-0553 / MR0002 RF feeder: seller quote authority versus independent
-// MGW quotes FORLLER; ADDVALUE independently PROPOSES NEK for field BULK.
-// Separate proposal from vendor-included kit and never double-book either.
+// MGW's complete system supply owns functional installed RF feeder and connectors.
+// ADDVALUE NEK is a conditional BULK reserve/spare candidate only; no duplicate base purchase.
 import {MGW_P26_058_R2_SELECTED_0553 as mgw} from "./mgwP26058R2Selected0553";
 
 export const MR0002_RF_FEEDER_QUALIFICATION_0553=Object.freeze({
@@ -14,19 +14,25 @@ export const MR0002_RF_FEEDER_QUALIFICATION_0553=Object.freeze({
  selectedLocations:Object.freeze(mgw.sitesByMR["MR-0002"].slice()),
  quoteUrl:mgw.source,
  quoteStatus:"MGW_INCLUDED__MANUFACTURER_PRODUCT_IDENTITY_UNVERIFIED",
- candidateStatus:"ADDVALUE_NEK_FIELD_BULK_PROPOSED__NET_QTY_AND_PRICE_PENDING",
+ candidateStatus:"ADDVALUE_NEK_BULK_RESERVE_CANDIDATE__SPARE_QTY_AND_PRICE_PENDING",
  addvalueFieldBulkProposal:Object.freeze({
   proposer:"ADDVALUE",manufacturer:"NEK Kabel AS",
   product:'RF LLF 1/2" 50Ω SHF1',
-  origin:"INDEPENDENT_ADDVALUE_ENGINEERING_PROPOSAL__NOT_MGW_SUPPLY",
-  proposedFor:"ADDITIONAL_VERIFIED_FIELD_RF_CIRCUIT_OR_CONDITIONALLY_APPROVED_REPLACEMENT",
-  scopeOwner:"ADDVALUE_FIELD_BULK",selectedForBudgetaryEngineering:true,
+  origin:"ADDVALUE_INTERNAL_CONDITIONAL_BULK_RESERVE__NOT_BASE_SYSTEM_SUPPLY",
+  proposedFor:"SPARE_FOR_SITE_INSTALLATION_DAMAGE_OR_CERTIFIED_CONTINGENT_REPLACEMENT_ONLY",
+  scopeOwner:"ADDVALUE_BULK_RESERVE",selectedForBudgetaryEngineering:true,
+  baselineSupplyResponsibility:"MGW_COMPLETE_SYSTEM__INSTALLATION_RF_CABLE_AND_CONNECTORS",
+  reserveClassification:"CONDITIONAL_BULK_SPARE_NOT_BASE_PROCUREMENT",
+  reserveOptions:["installation handling/cutting spare","certified contingency/replacement reserve"],
+  separateSpareLedgers:["B10 Commissioning Spares (only if separately required)","C2 Capital/long-term Spares (only if separately required)"],
+  automaticReservePercentage:null,proposedReserveQuantityM:null,
+  countedInEquipmentCost:false,additionalAmountBookedTHB:0,
   procurementApproved:false,approvedSku:null,verifiedRouteM:null,
   netAdditionalPurchaseM:null,unitRateTHB:null,costTHB:null,
   includedMgWFeederMPerSite:100,includedMgWConnectorsPerSite:6,
-  overlapRule:"No ADDVALUE NEK booking for a circuit already satisfied by MGW FORLLER UHF-4; first map independent RF cable runs or controlled replacement/credit.",
+  overlapRule:"MGW owns complete installed RF cable scope. An MGW system shortage or non-compliant cable is a vendor clarification/corrective scope, NOT an ADDVALUE BULK quantity. NEK reserve only on separately approved spare/contingency basis.",
   documentRevisionGate:"SM000111 NEK Rev6 vs prior NEK Rev9 conflict at 450MHz: 4.93 vs 6.00dB/100m; verify manufacturer-approved revision",
-  procurementRule:"Engineering proposal is not an approved vendor replacement; require selected NEK datasheet, takeoff, budget rate, Ex/marine compliance and price owner."
+  procurementRule:"Reserve candidate only. Obtain separately approved reserve/spare quantity and price with valid fire-resistance/Ex evidence; do not infer NEK purchase from installation cable takeoff or vendor shortfall."
  }),
  candidate:Object.freeze({
   manufacturer:"NEK Kabel AS",
@@ -80,8 +86,9 @@ export const MR0002_RF_FEEDER_QUALIFICATION_0553=Object.freeze({
   source:"dtrsRfiBudgetCalculation0553.js"
  }),
  proofGates:Object.freeze([
-  "Identify independent ADDVALUE field-BULK RF runs and derive additional NEK procurement quantity net of MGW UHF-4 100m and six connectors per site; no parallel purchase for same installed function",
-  "Obtain unit price and approved NEK cable/connector SKU, MR0002/DTS/SPE technical compliance, and confirm revision used for ADDVALUE proposal",
+  "MGW as complete-system supplier remains accountable for installed RF feeder/functions and their compliance; any shortage/nonconformance requires MGW corrective proposal rather than automatic ADDVALUE purchase",
+  "Review whether ADDVALUE needs a separately authorized BULK installation spare/contingency reserve; do not equate spare reserve with B10 commissioning or C2 long-term spares",
+  "If NEK is approved for a BULK spare reserve, obtain spare quantity policy, current NEK quote, cable/connector SKU, DMR fire-resistance compliance and correct datasheet revision before pricing",
   "Obtain MGW/FORLLER actual manufacturer datasheet, exact product SKU, jacket marking and DNV Type Approval/CoC; do not present NEK documentation as FORLLER proof",
   "SM000111.pdf (NEK Rev6) and prior NEK Rev9 comparable disagree at 450MHz (4.93 vs 6.00 dB/100m); maintain revision evidence and HOLD attenuation selection until manufacturer confirms",
   "SM000111.pdf page2 anomalous 300MHz 4.31 > 400MHz 4.10 dB/100m; do not interpolate or claim an approved frequency curve without manufacturer confirmation",
@@ -89,7 +96,7 @@ export const MR0002_RF_FEEDER_QUALIFICATION_0553=Object.freeze({
   "Confirm which antenna paths consume the vendor-included 100 m/site feeder and six connectors; a 100 m kit is not necessarily 100 m per RF circuit",
   "Check 1/2-inch connector cable family, inner/outer conductor, N-male/female port mating, weatherproofing and certified RF enclosure penetrations; no SKU substitution",
   "Verify IEC/DNV/marine fire/halogen/UV requirements against MR0002/DTS/SPE and manufacturer traceable certificates",
-  "Derive net additional cable/connector purchases only from verified field route and vendor inclusion; no double counting of UHF-4"
+  "Keep any MGW route shortfall in vendor corrective scope. ADDVALUE NEK BULK reserve has independent controlled approval, quantity and cost ownership; never automatically post A/B/C or Working Sell"
  ]),
  pricePostingAllowed:false,selectedManufacturerChanged:false,customerReleased:false
 });
