@@ -37,11 +37,12 @@ const html=renderToStaticMarkup(React.createElement(Panel,{onOpenModule:()=>{}})
 assert(html.includes('data-component-key="bid.budget.changes"'));
 assert(html.includes('data-component-key="bid.budget.changes.ui"'));
 assert(html.includes('data-component-key="bid.budget.changes.data"'));
-assert(html.includes("What&#x27;s New")||html.includes("What's New"));
+const readableHtml=html.replace(/&#x27;|&#39;|&apos;/g,"'");
+assert(readableHtml.includes("What's New"));
 assert(html.includes("Expand All")&&html.includes("Collapse All"));
 assert(html.includes("Mark Reviewed"),"Unseen version must be visible to users");
 for(const note of notes){
- assert(html.includes(note.title),"Latest change not rendered: "+note.id);
+ assert(readableHtml.includes(note.title),"Latest change not rendered: "+note.id);
  for(const id of note.moduleIds)assert(html.includes(id),"No visible linked Module ID: "+id);
 }
 const anchors=[...html.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
