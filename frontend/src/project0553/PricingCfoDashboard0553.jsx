@@ -88,7 +88,7 @@ export function PricingCfoDashboard0553({model=null,thbPerUsd=null}){
     </tbody>
    </table>
   </div>
-  <p className="p55-note"><strong>การอ่านตาราง:</strong> A/C = ต้นทุน × 1.30 (SAMTEL 20% + กำไรเป้าหมาย ADDVALUE 5% + เงินสำรอง 5% ของต้นทุน); B = ราคาขาย Working Sell เดิม โดย SAMTEL หัก 5% จากราคาขาย. <strong>ช่อง “ADDVALUE ได้รับ” ยังไม่ใช่กำไร</strong> เพราะรวมเงินต้นทุนที่จะต้องจ่ายด้วย. เครื่องหมาย — คือข้อมูลยังไม่ครบ ไม่ใช่ 0 บาท</p>
+  <p className="p55-note"><strong>การอ่านตาราง:</strong> A/C = ต้นทุน × 1.30 (SAMTEL 20% + กำไรเป้าหมาย ADDVALUE 5% + เงินสำรอง 5% ของต้นทุน); B = ราคาขาย Internal Working SELL ปัจจุบัน; SAMTEL หัก 5% เฉพาะ B Services ปกติ. ข้อยกเว้น B3: MGW Purchased iFAT/Facility มูลค่า Cost Quote THB236,250 ได้บวก SAMTEL 20% (THB47,250), ADDVALUE 5% และ Omission 5% ลงใน WS-B3 THB307,125 แล้ว จึงไม่หัก SAMTEL 5% ซ้ำบนส่วน Purchased นี้. <strong>ช่อง “ADDVALUE ได้รับ” ยังไม่ใช่กำไร</strong> เพราะรวมเงินต้นทุนที่จะต้องจ่ายด้วย. เครื่องหมาย — คือข้อมูลยังไม่ครบ ไม่ใช่ 0 บาท</p>
   <details className="p553-cfo-detail">
    <summary>ตรวจสอบ Source / รายการที่ยังไม่ครบ ({data.sourceCoverage.gaps.length})</summary>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
