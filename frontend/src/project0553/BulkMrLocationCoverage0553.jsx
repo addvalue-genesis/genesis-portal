@@ -1,6 +1,7 @@
 import React,{useState} from "react";
 import {selectBulkMrLocationCoverage0553} from "./data/bulkMrLocationCoverage0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {MR0002RfRouteReconciliation0553} from "./MR0002RfRouteReconciliation0553";
 
 // Shared 10.1.1.3 and MR0001 MTO Row11 viewer. Price figures are
 // evidence only: never participate in the A1-A5 or B/C counted ledger.
@@ -64,6 +65,7 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
           {shown.length===0&&<tr><td colSpan={6}>No applicable physical BULK row under this MR / Location / status filter. This is not a confirmed zero-cost allocation; check MR scope.</td></tr>}
          </tbody>
         </table></div>
+        {g.mr==="MR-0002"&&g.active&&<MR0002RfRouteReconciliation0553 site={g.site}/>}
         <p className="p55-note">Unresolved amount remains NULL. The displayed Qty/Price is separate engineering evidence. No original TAG cost, MGW included component, A5, B/C or customer price changes here.</p>
        </td></tr>}
       </React.Fragment>;
