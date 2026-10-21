@@ -72,7 +72,7 @@ export function auditCurrentCustomerProjection0553({canonical,release,scope}={})
    const owner=canonical.byCode[code],priced=release.b.find(x=>x.code===code);
    const scoped=scope?.lines?.[code];
    // Null must remain null where the contractual owner has no selected price
-   // (for example B4/B12/B14). Zero is a real selected state, notably B9.
+   // (for example B4/B12/B14). B9 is a selected nonzero 1 LS, while field execution needs call-out.
    const sameSelected=Boolean(owner&&priced&&(
     eq(owner.workingSellTHB,priced.customerSellTHB)||
     (owner.workingSellTHB===null&&priced.customerSellTHB===null)));
@@ -84,8 +84,9 @@ export function auditCurrentCustomerProjection0553({canonical,release,scope}={})
    amount=owner?.workingSellTHB??null;
    if(code==="B9"){
     parity=parity&&owner?.b9ChinaBudget?.conditionalYardSellTHB===233600&&
-     priced?.conditionalOptionWorkingSellTHB===233600&&amount===0;
-    status="B9_BASE_ZERO__CONDITIONAL_233600_NOT_IN_NATIVE_G32";
+     priced?.conditionalOptionWorkingSellTHB===233600&&
+     priced?.conditionalOptionIncludedInBase===true&&amount===233600;
+    status="B9_QUOTED_BASE_233600__NATIVE_G32__ON_CALL_EXECUTION_NONADDITIVE";
    }
   }else if(part==="C"){
    const owner=canonical.byCode[code],priced=release.c.find(x=>x.code===code);
