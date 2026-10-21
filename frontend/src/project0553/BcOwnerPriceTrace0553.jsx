@@ -1,5 +1,7 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {B3B8SevenDayAllocation0553} from "./B3B8SevenDayAllocation0553";
+import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {selectBcB1B2EquationExecution0553} from "./data/bcB1B2EquationExecution0553";
 import {B2WorkingPriceOverview0553} from "./B2WorkingPriceOverview0553";
 import {B2IndependentVdrlRecalculation0553} from "./B2IndependentVdrlRecalculation0553";
@@ -300,6 +302,8 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
     <button type="button" className="p553-detail-button" onClick={()=>setAll(false)}>− Collapse All</button>
    </div>
   </div>
+  {code==="B8"&&<B3B8SevenDayAllocation0553
+   b3={selectBcTurnkeyWorkingCost0553().byCode.B3} b8={workingRow} owner="B8"/>}
   {code==="B2"&&<B2IndependentVdrlRecalculation0553 workingRow={workingRow}/>}
   {code==="B2"&&<details className="p55-panel p553-b2-legacy-price-reference"
    data-component-key="bid.budget.working.bc.b2.quote-comparison"
