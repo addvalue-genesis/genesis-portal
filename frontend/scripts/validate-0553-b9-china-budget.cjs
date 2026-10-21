@@ -2,7 +2,7 @@
 const fs=require("node:fs"),path=require("node:path"),vm=require("node:vm"),assert=require("node:assert/strict");
 const dir=path.join(__dirname,"../src/project0553/data");
 const file=n=>fs.readFileSync(path.join(dir,n),"utf8").replace(/^import .*$/gm,"").replace(/^export /gm,"");
-const body=file("onshoreWorkingRate0553.js")+"\n"+file("fatWbsFourMr0553.js")+"\n"+file("b9ChinaWorkingBudget0553.js")+"\n"+file("b3ChinaFatOwnership0553.js");
+const body=file("onshoreWorkingRate0553.js")+"\n"+file("fatWbsFourMr0553.js")+"\n"+file("workingCostCommercialIdentity0553.js")+"\n"+file("b9ChinaWorkingBudget0553.js")+"\n"+file("b3ChinaFatOwnership0553.js");
 const ctx=vm.runInNewContext(body+"\n({rate:selectOnshoreWorkingRate0553(),b9:selectB9ChinaWorkingBudget0553(),b3:selectB3WorkingSellAfterChinaFat0553(2109600),transfer:B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553});",{}, {timeout:2000});
 assert.equal(ctx.rate.usdPerPersonDay,600);
 assert.equal(ctx.rate.thbPerPersonDay,18900);
@@ -10,6 +10,9 @@ assert.equal(ctx.b9.workingSellTHB,0); // No B9 Base: FAT Witness is contractual
 assert.equal(ctx.b9.laborWorkingSellTHB,302400); // FAT 6 + two travel days x 2 witnesses
 assert.equal(ctx.b9.travelAndInsuranceWorkingSellTHB,95000);
 assert.equal(ctx.b9.rows.length,16);
+assert.equal(ctx.b9.rows.find(x=>x.id==="B3-FAT-STAFF").internalCostLineId,"IC-FAT-STAFF-001");
+assert.equal(ctx.b9.rows.find(x=>x.id==="B9-YARD-STAFF").internalCostLineId,"IC-YARD-STAFF-001");
+assert.ok(ctx.b9.rows.every(x=>x.directCostTHB===null&&x.proposalIssued===false));
 assert.equal(ctx.b9.conditionalYardSellTHB,233600);
 assert.equal(ctx.b9.fullCombinedVisitScenarioTHB,631000);
 assert.equal(ctx.b9.rows.filter(x=>x.optional).length,8);
