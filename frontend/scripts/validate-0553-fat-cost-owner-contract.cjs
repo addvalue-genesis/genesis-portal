@@ -7,10 +7,12 @@
 const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path"),vm=require("node:vm");
 const dir=path.join(__dirname,"../src/project0553/data");
 const get=n=>fs.readFileSync(path.join(dir,n),"utf8").replace(/^import .*$/gm,"").replace(/^export /gm,"");
-const src=["onshoreWorkingRate0553.js","fatWbsFourMr0553.js","b9ChinaWorkingBudget0553.js","b3RequirementWbsTrace0553.js"].map(get).join("\n");
+const src=["onshoreWorkingRate0553.js","fatWbsFourMr0553.js","workingCostCommercialIdentity0553.js","b9ChinaWorkingBudget0553.js","b3RequirementWbsTrace0553.js"].map(get).join("\n");
 const data=vm.runInNewContext(src+"\n({budget:selectB9ChinaWorkingBudget0553(),trace:selectB3RequirementWbsTrace0553()});",{},{timeout:3000});
 const fat=data.budget.rows.filter(x=>!x.optional),yard=data.budget.rows.filter(x=>x.optional);
 assert.equal(fat.length,8);
+assert.equal(fat.find(x=>x.id==="B3-FAT-STAFF").internalCostLineId,"IC-FAT-STAFF-001");
+assert.equal(yard.find(x=>x.id==="B9-YARD-STAFF").internalCostLineId,"IC-YARD-STAFF-001");
 assert.equal(yard.length,8);
 assert.ok(fat.every(x=>x.costOwner==="B3"&&x.directCostTHB===null&&x.workingCostTHB===null));
 assert.ok(fat.every(x=>x.costAccountingClass==="B3_DIRECT_FAT_WITNESS_EXPENSE_UNVERIFIED"));
