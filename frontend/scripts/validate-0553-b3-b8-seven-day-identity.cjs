@@ -86,6 +86,12 @@ assert.equal(m.noDuplicateVendorPurchasedOnScenario,true,
  "Seven-day nonposting option must not repost MGW SERV-2/4");
 assert(ownerB3.includes('data-component-key="bid.budget.working.bc.b3.fat-training-7d-allocation"'));
 assert(ownerB8.includes('data-component-key="bid.budget.working.bc.b8.integrated-fat-training-7d"'));
+// B8 owner trace hosts this scenario inside native <details> sections. Their
+// initial-expanded state must use React-supported DOM open, not defaultOpen.
+const ownerTrace=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
+assert(ownerTrace.includes('data-component-key={id} open={defaultOpen}')&&
+ !ownerTrace.includes('data-component-key={id} defaultOpen={defaultOpen}'),
+ "B/C owner native details must not leak unsupported defaultOpen DOM property");
 const ids=new Set(nav().map(x=>x.id));
 assert(ids.has("bid.budget.working.bc.b3.fat-training-7d-allocation"));
 assert(ids.has("bid.budget.working.bc.b8.integrated-fat-training-7d"));
