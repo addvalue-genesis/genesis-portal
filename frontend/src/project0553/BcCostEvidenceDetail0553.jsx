@@ -11,6 +11,7 @@ import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {B3WorkTypeAccordion0553} from "./B3WorkTypeAccordion0553";
+import {BcFinancialIdentityMatrix0553} from "./BcFinancialIdentityMatrix0553";
 import {BcOwnerPriceTrace0553} from "./BcOwnerPriceTrace0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
@@ -218,6 +219,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
  return <section className="p55-panel p553-bc-evidence" data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
   <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
   <h3>{e.code} — {workingRow.requirement}</h3>
+  <BcFinancialIdentityMatrix0553 workingRow={workingRow}/>
   {e.code==="B1"&&<B1WorkingPriceOverview0553 workingRow={workingRow}/> }
   {e.code==="B2"&&ownerPriceTrace}
   {!["B2","B4","B5","B6","B7","B8","B9"].includes(e.code)&&e.code!=="B3"&&e.code!=="B1"&&<MgwR2CommercialCover0553 code={e.code}/>}
@@ -225,7 +227,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
    <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
-   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Current B1 SELL from fresh B1.1–B1.8 support-only THB resource budget; actual Direct Cost OPEN, old engineering/PM quotes excluded":e.code==="B3"?"Current MGW FAT Witness + Offshore SAT/SIT + VeEX rental, all Inspection/Testing under B3":e.code==="B9"?"No B9 Base; only conditional Yard Specialist 1 LS":"Working source estimate"}</small></div>
+   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Current B1 SELL from fresh B1.1–B1.8 support-only THB resource budget; actual Direct Cost OPEN, old engineering/PM quotes excluded":e.code==="B3"?"Current MGW Purchased iFAT/Facility + ADDVALUE FAT Witness + Offshore SAT/SIT + VeEX rental; supplier quotation source is not paid Direct Cost":e.code==="B9"?"No B9 Base; only conditional Yard Specialist 1 LS":"Working source estimate"}</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
   {e.code==="B11"&&<section className="p55-panel"
