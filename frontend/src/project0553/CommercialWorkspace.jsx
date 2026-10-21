@@ -40,6 +40,9 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  // Retain initialMode compatibility; views are not separate price authorities.
  void initialMode;
  const [recipient,setRecipient]=useState("INTERNAL");
+ // These are three workflow navigation shortcuts, NOT three independent price models.
+ const [pricingStage,setPricingStage]=useState(()=>
+  ["working","budgetary","released"].includes(initialMode)?initialMode:"released");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
  const [bcDetailCode,setBcDetailCode]=useState(null);
  const [bcTab,setBcTab]=useState("ALL");
@@ -157,6 +160,17 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   target.scrollIntoView?.({behavior:"smooth",block:"center"});
   setNavigationFeedback(found?null:"Module "+id+" ยังไม่แสดงใน Filter นี้; เปิด "+fallback+" ให้ตรวจสอบ");
  },[releaseJump,bcTab]);
+ const openPricingStage=stage=>{
+  setPricingStage(stage);
+  const id=stage==="working"?"bid.budget.working.bc":
+   stage==="budgetary"?"bid.budget.pricing.budgetary":"bid.budget.pricing.release.preview";
+  const target=findModuleElement0553(document,id);
+  if(!target){setNavigationFeedback("Pricing view unavailable: "+id);return;}
+  openModuleAncestors0553(target);
+  if(target.tagName==="DETAILS")target.open=true;
+  target.scrollIntoView?.({behavior:"smooth",block:"start"});
+  setNavigationFeedback(null);
+ };
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  return <div className="p55-stack" data-component-key="bid.budget">
  <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget"/><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
@@ -186,15 +200,30 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <p className="p55-note"><strong>MR0001 Cisco-only preliminary subtotal (NOT total project cost):</strong> THB {BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US")} · {BID_COST_SPINE_0553.pricedRows} provisionally priced source items / {BID_COST_SPINE_0553.unpricedRows} unpriced · Next G / MGW / other vendors / bulk / A+B+C / customer sell NOT included. Source: {BID_COST_SPINE_0553.source}</p>
   <p className="p55-note">This is a controlled WORKSPACE, not a price release. The previously issued SAMTEL file is historical evidence; its exact issued revision must be verified before snapshot registration. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
-    <div className="p55-segmented p55-segmented--commercial" data-component-key="bid.budget.pricing.single-release">
-     <strong>10.3 — Single Customer Release Preview</strong>
-    </div>
+    <nav className="p553-pricing-stage-nav" aria-label="Pricing workflow stages"
+     data-component-key="bid.budget.pricing.single-release">
+     <button type="button" className={"p553-pricing-stage p553-pricing-stage--working"+(pricingStage==="working"?" is-active":"")}
+      aria-pressed={pricingStage==="working"} onClick={()=>openPricingStage("working")}>
+      <strong>10.3.1 · Working / Edit</strong>
+      <small>↗ 10.2 · Source details</small>
+     </button>
+     <button type="button" className={"p553-pricing-stage p553-pricing-stage--budgetary"+(pricingStage==="budgetary"?" is-active":"")}
+      aria-pressed={pricingStage==="budgetary"} onClick={()=>openPricingStage("budgetary")}>
+      <strong>10.3.2 · Budgetary</strong>
+      <small>↗ TEMP · Historical / audit</small>
+     </button>
+     <button type="button" className={"p553-pricing-stage p553-pricing-stage--released"+(pricingStage==="released"?" is-active":"")}
+      aria-pressed={pricingStage==="released"} onClick={()=>openPricingStage("released")}>
+      <strong>10.3.3 · Release</strong>
+      <small>↗ Live Customer Preview · HOLD</small>
+     </button>
+    </nav>
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
   </div>
   <p className="p55-note" data-component-key="bid.budget.pricing.view-reference">
    <strong>Current module:</strong> {activePricingView.number} · {activePricingView.fullLabel} ·
    <ComponentCopyId projectId="PJ2608-0553" componentKey={activePricingView.moduleId}/>
-   {" "}· {recipient} · LIVE projection from 10.1 + 10.2 selected source · Approval HOLD; not issued.
+   {" "}· {recipient} · LIVE projection from 10.1 + 10.2 selected source · Approval HOLD; not issued. The three shortcuts change navigation only, not prices.
   </p>
   {recipient==="INTERNAL"&&<PricingCfoDashboard0553 model={releaseModel}/>}
   <>
