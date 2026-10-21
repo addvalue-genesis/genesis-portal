@@ -42,7 +42,9 @@ export function selectB6Mr0001ChinaInboundScenario0553(){
   alreadyCoveredInHistoricalB6SelectedTHB:null,
   comparableNetChangeVsOldRouteTHB:null, // old route components have not been allocated
   incrementToCurrentB6WorkingSellTHB:null,
-  ownerOfRecord:"B6",routingSelected:false,routingScenarioStatus:"ALL_THAILAND_COMPARISON_NOT_PREFERRED",pricingClass:"SCENARIO_ONLY__MARKET_AND_PARAMETRIC_ALLOWANCES",
+  ownerOfRecord:"B6",routingSelected:false,routingScenarioStatus:"SUPERSEDED_ALL_THAILAND_REFERENCE_BY_ADR68",
+  supersededAsPhysicalRouteBy:"ADR-68-B6-MR0001-DIRECT-MGW-20261022",
+  pricingClass:"SCENARIO_ONLY__MARKET_AND_PARAMETRIC_ALLOWANCES",
   signedImporterOfRecord:false,motherboardCiscoLicensingAndCountryOfOriginChecked:false,
   gates:Object.freeze([
    "Confirm supplier/origin of all 4 enclosures, Cisco switches, IDUs, serial numbers and Incoterm ownership",
