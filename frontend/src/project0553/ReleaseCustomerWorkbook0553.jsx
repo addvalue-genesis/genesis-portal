@@ -1,6 +1,7 @@
 import React,{useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
+import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
 import {buildNativeWorkingDraft0553} from "./nativeWorkingDraft0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import "./releaseWorkbook0553.css";
@@ -15,7 +16,10 @@ const B_ROWS=Array.from({length:14},(_,i)=>"B"+(i+1));
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 const cash=n=>Number.isFinite(n)?"THB "+money(n):"PENDING";
 const formatUnit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"—";
-const parseName=code=>REV08_BASELINE.summary.find(r=>r[0]===code)?.[1]||code;
+// Customer descriptions must follow the native source workbook, not Rev08 history.
+const sourceScopeRows=OFFICIAL_WORKBOOK_TEMPLATE_0553.sheets.find(s=>s.name==="Scope of supply")?.rows||[];
+const parseName=code=>sourceScopeRows.find(row=>row[1]===code)?.[2]||
+ REV08_BASELINE.summary.find(r=>r[0]===code)?.[1]||code;
 const ANNEX_TITLE={
  B10:["ERECTION, PRECOMMISSIONING, COMMISSIONING, START UP SPARE PARTS LISTS","安装，预试车，试车和开车的备件清单"],
  B11:["SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS","供货商推荐的特殊工具"],
