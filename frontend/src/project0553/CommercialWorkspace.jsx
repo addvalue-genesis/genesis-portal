@@ -249,7 +249,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   </section>
   <details className="p553-budget-phase" open data-component-key="bid.budget.bom"><summary><strong>10.1 — Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
    <CostIntegrityReview0553/>
-   <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency}/>
+   <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency} navigationTarget={navigationTarget} navigationSequence={navigationSequence}/>
   </details>
   <details className="p553-budget-phase" data-component-key="bid.budget.working.bc" defaultOpen>
    <summary><strong>10.2 — Part B/C Working Cost &amp; Spare Requirements</strong><small>bid.budget.working.bc · WBS / Services / Spares</small></summary>
