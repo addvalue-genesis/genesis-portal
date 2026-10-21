@@ -80,9 +80,20 @@ assert(historicalAudit.includes("B3 owns MGW China FAT witness personnel/travel"
 assert(!historicalAudit.includes("B9 MGW China FAT witnesses"));
 
 // Work type owns presentation order: FAT -> SAT -> temporary tools -> cost audit.
-assert(d.indexOf("B3.1")<d.indexOf("B3.2"));
-assert(d.indexOf("B3.2")<d.indexOf("B3.3"));
-assert(d.indexOf("B3.3")<d.indexOf("B3.4"));
+// Test actual unique DOM group anchors, not free text: the intro already mentions
+// "B3.1–B3.4" before any of the four price table groups.
+const groupIds=["fat","sat","tools","audit"].map(kind=>
+ "bid.budget.working.bc.b3."+kind);
+const groupPositions=groupIds.map(id=>renderedKeys.indexOf(id));
+assert(groupPositions.every(n=>n>=0),"B3.1–B3.4 must all render exact Module ID group anchors");
+assert(groupPositions.every((n,i)=>i===0||groupPositions[i-1]<n),
+ "B3 FAT -> SAT -> Tools -> Audit exact DOM group order changed");
+// React DOM supports details.open, not details.defaultOpen. Do not pass an
+// unknown prop down to native DOM just to set the initial disclosure state.
+const workTypeCode=fs.readFileSync(path.join(dir,"B3WorkTypeAccordion0553.jsx"),"utf8");
+assert(!workTypeCode.includes("defaultOpen="),"B3 native details may not use invalid React defaultOpen prop");
+assert(workTypeCode.includes('open={group.kind==="fat"||group.kind==="sat"}'),
+ "B3.1 and B3.2 must remain initially expanded using native details.open");
 assert(d.indexOf("B3 — Seven-Site / Four-MR SAT Test Coverage")<d.indexOf("B3 — Current Working SELL Breakdown"));
 for(const name of ["fat","sat","tools","audit"]){
  assert(d.includes('data-component-key="bid.budget.working.bc.b3.'+name+'"'));
