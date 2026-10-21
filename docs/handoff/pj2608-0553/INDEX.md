@@ -1,6 +1,6 @@
 # PJ2608-0553 | Architecture & Decision Index (10.1–10.5)
 
-**Updated:** 2026-10-21 ICT · **Latest B9 decision: ADR-65** · **Repository:** `addvalue-genesis/genesis-portal`  
+**Updated:** 2026-10-21 ICT · **Latest B6 route decision: ADR-67; B9 remains ADR-65** · **Repository:** `addvalue-genesis/genesis-portal`  
 **Integration branch:** `integrate/pj2608-0553-mgw-fat-financial-identity-20261021`  
 **Draft PR:** #30 · **Customer Release:** HOLD / NOT ISSUED.
 
@@ -42,13 +42,22 @@
 ## Additional B3/B6/B7 scope and market audit (ADR-66)
 
 - B3 working display **Inspection / Site Survey / FAT / SAT**: `data/b3SiteSurveyScope0553.js`, 7 unique locations, survey effort/cost NULL. B3 selected THB2750525 unchanged; native customer B3 wording original.
-- B6 MR0001 four Enclosure+IDU+Cisco sets inbound Thailand→MGW Nantong: `data/b6Mr0001ChinaInboundScenario0553.js`, pre-award THB42797–72372 **NONPOSTING**. Outbound MGW SERV-5 USD2500 = THB78750 quoted in original MGW cover, no duplicate posting. B6 selected THB307584 unchanged; actual net route difference and customs costs NULL.
+- B6 earlier all-Thailand **four-cabinet comparison only**: `data/b6Mr0001ChinaInboundScenario0553.js`, narrow pre-award THB42797–72372 **NONPOSTING**. Outbound MGW SERV-5 USD2500 = THB78750 quoted in original MGW cover, no duplicate posting. B6 selected THB307584 unchanged; actual net route difference and customs costs NULL.
 - B7 `data/b7ThreeMonthStorageEvidence0553.js`: customer requires **3 months FREE**, MGW quote does NOT explicitly price or confirm the three-month term. Public 2026 rate scenario four pallets × 90d ≈ THB4527–8148.60 bare space; user prior THB30000/month ×3 = THB90000 sensitivity, extra THB60000 scenario-only; selected B7 THB30000 for 1-month management allowance unchanged.
 - New automated contract `npm run validate:0553-b3-survey-b6-inbound-b7-storage` is in the frontend build chain; full Node/Webpack run **not confirmed**. No new UI module, price ledger, or customer-native cell overwrite.
 
+## Current 4-MR shipment strategy (ADR-67, supersedes ADR-66 B6 routing assumption)
+
+- Preferred `SC-B6-B-HYBRID-MGW` under existing `byCode.B6.b6FourMrRoutingEvidence`: **NextG IDU/ODU direct to MGW Nantong**, **Thai-built Enclosure+Cisco 4 protected sets → MGW**, **5 greenfield antennas to JUTAL direct only if ITP/FAT bypass accepted**, MR0002/3/4 OEM → MGW (no forced China→Thailand→China loop).
+- NextG 2026 `NG/260916-ADV-DAP1` quote USD191610.15 is **DAP Ranong, NOT DDP Thailand**, expired 2026-10-01; source `data/quotes/NG-260916-ADV-DAP1.full.json`. Direct-China rerouting, freight cost/credit and actual cabinet freight quantities remain UNKNOWN.
+- MGW commercial `SERV-5` USD2500 outbound Nantong→JUTAL is already in vendor quote and supplier states packing included. Cover `SERV-3` USD500 packing could overlap, **no signed USD500 credit**. One shared outbound cost event; no separate per-MR charge.
+- B6 selected WS **THB307584 historical Rev08 based** unchanged, `netSavingOrIncreaseTHB:null`, no invented savings/posting. Validation: `npm run validate:0553-b6-four-mr-routing` included in build.
+- `docs/handoff/pj2608-0553/67_B6_NEXTG_DIRECT_MGW_FOUR_MR_ROUTE_COST_IDENTITY_20261021.md` is authoritative for the new route; earlier all-Thailand cost range is NOT all-inclusive radio/antenna freight.
+
 ## Decisions, gates, test ownership
 
-- **B3/B6/B7 decision:** [66_B3_SURVEY_B6_MR1_CHINA_INBOUND_B7_STORAGE_ADR_20261021.md](66_B3_SURVEY_B6_MR1_CHINA_INBOUND_B7_STORAGE_ADR_20261021.md)
+- **Latest B6 route ADR:** [67_B6_NEXTG_DIRECT_MGW_FOUR_MR_ROUTE_COST_IDENTITY_20261021.md](67_B6_NEXTG_DIRECT_MGW_FOUR_MR_ROUTE_COST_IDENTITY_20261021.md) (supersedes ADR-66 MR0001 all-Thailand routing assumption only)
+- **Earlier B3/B6/B7 evidence ADR:** [66_B3_SURVEY_B6_MR1_CHINA_INBOUND_B7_STORAGE_ADR_20261021.md](66_B3_SURVEY_B6_MR1_CHINA_INBOUND_B7_STORAGE_ADR_20261021.md)
 - **Latest B9 decision:** [65_B9_RELEASE_QUOTED_BASE_ADR_20261021.md](65_B9_RELEASE_QUOTED_BASE_ADR_20261021.md) (supersedes ADR-64 D-64.1 only)
 - **Earlier ADR:** [64_B3_B8_B9_SAT_CUSTOMER_PARITY_ADR_20261021.md](64_B3_B8_B9_SAT_CUSTOMER_PARITY_ADR_20261021.md)
 - PR#30 earlier integrated evidence: [63_RELEASE_BULK_B3_FAT_FINANCIAL_IDENTITY_INTEGRATION_20261021.md](63_RELEASE_BULK_B3_FAT_FINANCIAL_IDENTITY_INTEGRATION_20261021.md)
