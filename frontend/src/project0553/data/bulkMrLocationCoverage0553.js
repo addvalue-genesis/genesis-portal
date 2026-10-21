@@ -6,6 +6,7 @@ import {deriveA5BulkAttribution0553} from "./a5BulkAttribution0553";
 import {deriveRaconTerminationBudget0553} from "./raconTerminationBudget0553";
 import {MGW_P26_058_R2_SELECTED_0553 as MGW} from "./mgwP26058R2Selected0553";
 import {deriveMR0002RfFeederQualification0553} from "./mr0002RfFeederQualification0553";
+import {deriveMR0002RfPhysicalRouteReconciliation0553} from "./mr0002RfPhysicalRouteReconciliation0553";
 
 export const BULK_MR_SITE_ORDER_0553=Object.freeze(["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11"]);
 export const BULK_MR_LIST_0553=Object.freeze(["MR-0001","MR-0002","MR-0003","MR-0004"]);
@@ -66,6 +67,7 @@ const mgwIncluded=(id,description,lineId,detail,qty=null,unit="included")=>{
 };
 function dmrItems(site){
  const rf=deriveMR0002RfFeederQualification0553(site);
+ const physical=deriveMR0002RfPhysicalRouteReconciliation0553().sites.find(x=>x.site===site);
  return [
   mgwIncluded("BDA-WAROM","RFI BD4345-00N0-AC BDA / WAROM HRMD95-VIIIB Ex d housing","UHF-1","Assembly Ex certification, RF penetrations, thermal and AC/DC compatibility pending",1,"set"),
   mgwIncluded("YAGI-EX-RF","RFI Yagi / UNV2 clamp / PolyPhaser IS-B50LN-C2 / Solexy RXNMS0200JX0","UHF-2","Full combined Rev2 selected, not older UHF-only Rev2; PolyPhaser and Solexy bundled",1,"set"),
@@ -81,6 +83,11 @@ function dmrItems(site){
     requestedProcurementQty:null,requiredInstallationQty:null,rateStatus:"NEK_UNIT_COST_REQUIRED",
     supplierIncludedDeductionRequired:true,
     quoteManufacturer:"FORLLER",vendorPackageIncludedM:rf?.quoteIncludedM??100,
+    physicalRouteModuleId:physical?.moduleId??null,
+    physicalCircuitCount:physical?.circuitCount??null,
+    unverifiedScenarioPurchaseM:physical?.scenario?.referenceTotalPurchaseM??null,
+    physicalQuantityState:physical?.actual?.calculationStatus??"PENDING",
+    fireResistanceProofState:physical?.compliance?.scope??"PENDING",
     replacementApproved:false,packageCreditTHB:null,
     revisionConflictState:rf?.revisionConflict?.state||"REVISION_HOLD"},
   {...review("FEEDER-NEK-TECHNICAL-COMPARABLE",
