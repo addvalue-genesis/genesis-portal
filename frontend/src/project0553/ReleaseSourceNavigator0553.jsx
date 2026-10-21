@@ -44,7 +44,7 @@ export function ReleaseSourceNavigator0553({model,onOpenSource}){
   </div>
   {groups.map(group=><details key={group.part} className={"p553-rsn-group p553-rsn-group--"+group.part}
    data-component-key={"bid.budget.pricing.release.source-navigator."+group.part}
-   open={group.defaultOpen} onToggle={e=>{ /* native details control; no financial mutation */ void e; }}>
+   defaultOpen={group.defaultOpen}>
    <summary>
     <strong>{group.title}</strong>
     <span>{group.rows.length} price groups</span>
