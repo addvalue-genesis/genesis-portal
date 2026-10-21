@@ -228,14 +228,16 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    addvalueReceivableTHB:price?.addvalueReceivableTHB??null,
    actualCostTHB:price?.directCostTHB??null,
    profitTHB:price?.addvalueProfitTHB??null,
-   conditional:r.code==="B7"||r.code==="B9",
-   // B9 optional package exists in 10.2 but is excluded from Base and the
-   // customer native G32 Working Preview unless Project Owner activates it.
-   // This evidence is internal ONLY; never a second customer price row.
+   conditional:r.code==="B7",
+   executionConditional:r.code==="B9",
+   // B9 quoted 1 LS comes from canonical 10.2 Base; original Yard package is
+   // source evidence of the SAME quoted amount and must not be added again.
+   // Conditional EXECUTION means written call-out, not a zero-price quotation.
    conditionalOptionWorkingSellTHB:r.code==="B9"?
     (r.b9ChinaBudget?.conditionalYardSellTHB??null):null,
    conditionalOptionStatus:r.code==="B9"?
-    "ONE_LS_WRITTEN_CALL_OUT_NOT_IN_BASE":null,
+    "ONE_LS_QUOTED_IN_BASE__EXECUTION_ON_WRITTEN_CALL_OUT__NONADDITIVE":null,
+   conditionalOptionIncludedInBase:r.code==="B9"?true:null,
    costComplete:n(r.directCostTHB),releaseAllowed:false,
    sourceStatus:r.priceStatus,workingSellBasis:r.workingSellBasis};
  });
