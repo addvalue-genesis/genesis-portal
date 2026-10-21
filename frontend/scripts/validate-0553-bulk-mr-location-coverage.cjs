@@ -208,6 +208,14 @@ assert(simple.includes('moduleKey="bid.budget.bom.system-location-mto"'));
 assert(simple.includes('key:"bulk-status"'));
 assert(simple.includes('value:"BULK_RESERVE_CANDIDATE"'));
 assert(simple.includes('navigationTarget={navigationTarget}'));
+const routeFilterLine=simple.split(/\\r?\\n/).find(x=>x.includes("navigationTarget.match("));
+assert(routeFilterLine,"10.1.1.3 must interpret Site + MR from the exact navigator Module ID");
+const matchSource=routeFilterLine.match(/navigationTarget\\.match\\((\\/.*\\/[imgsy]*)\\)/)?.[1];
+assert(matchSource,"Navigational filter regex is parseable");
+const matchNav=new Function("navigationTarget","return navigationTarget.match("+matchSource+");");
+assert.deepEqual(matchNav("bid.budget.bom.zwp20.mr0002.bulk.feeder-kit")?.slice(1),["zwp20","mr0002"]);
+assert.deepEqual(matchNav("bid.budget.bom.zwp21.mr0002.rf-route.rf-donor")?.slice(1),["zwp21","mr0002"]);
+
 assert(ui.includes('ADDVALUE NEK — CONDITIONAL BULK SPARE / NOT BOOKED'));
 assert(ui.includes('<MR0002RfRouteReconciliation0553 site={g.site}/>'));
 assert(location.includes('<BulkMrLocationCoverage0553 mr="MR-0001" site={site} detail/>'));
@@ -228,6 +236,11 @@ assert(proj.includes("...buildBulkModuleNavigator0553()"));
 assert(workspace.includes("navigationTarget={navigationTarget} navigationSequence={navigationSequence}"));
 assert(unified.includes("MGW_P26_058_R2_SELECTED_0553"));
 assert(!unified.includes("MGW_P26_058_R2_UHF_0553"));
+const {MGW_P26_058_R2_SELECTED_0553:fullMGW}=require(path.join(root,"project0553/data/mgwP26058R2Selected0553.js"));
+assert.equal(fullMGW.lines.find(x=>x.id==="UHF-2").unitPriceUSD,847);
+assert.equal(fullMGW.lines.find(x=>x.id==="UHF-4").unitPriceUSD,846);
+assert(unified.includes('bomEvidenceDisplay0553(x,fx,MGW_P26_058_R2_SELECTED_0553.lines)'));
+
 assert(ui.includes("focusModuleId=null"));
 
 console.log("PASS 0553 BULK MR / Location: 7×4 groups, 17 active, 7 original A5 floor rows THB260232 non-additive, MGW Rev2, source-linked table/filter/Row11, no changed cost");
