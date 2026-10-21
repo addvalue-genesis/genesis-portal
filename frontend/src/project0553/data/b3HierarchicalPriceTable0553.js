@@ -25,13 +25,15 @@ const item=(number,suffix,title,driver,priceClass,{workingSellTHB=null,vendorQuo
   qty,unit,unitRateTHB:sourcePrice(unitRateTHB),owner,status,supplierRows:Object.freeze(supplierRows)});
 const group=(number,kind,title,driver,items)=>Object.freeze({
  number,moduleId:ROOT+"."+kind,kind,title,driver,items:Object.freeze(items),
- priceClass:C.INCLUDED_WORKING_SELL,
+ priceClass:kind==="audit"?C.NON_POSTING_AUDIT:C.INCLUDED_WORKING_SELL,
  workingSellTHB:round(items.filter(x=>x.priceClass===C.INCLUDED_WORKING_SELL)
   .reduce((n,x)=>n+x.workingSellTHB,0)),
  vendorQuoteUSD:round(items.filter(x=>x.priceClass===C.SUPPLIER_QUOTE_REFERENCE)
   .reduce((n,x)=>n+(x.vendorQuoteUSD||0),0)),
  vendorQuoteTHB:null,
- qty:null,unit:null,owner:"B3"
+ qty:kind==="fat"?1:kind==="sat"?80:kind==="tools"?30:null,
+ unit:kind==="fat"?"FAT trip LS":kind==="sat"?"person-days":kind==="tools"?"rental-days":null,
+ owner:"B3"
 });
 
 export function selectB3HierarchicalPriceTable0553(workingRow){
