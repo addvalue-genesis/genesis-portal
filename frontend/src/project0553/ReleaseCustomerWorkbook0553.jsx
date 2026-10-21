@@ -76,8 +76,12 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   }finally{setNativeBusy(false);}
  };
  const openSource=item=>{if(internal)setSource(item);};
- const sourceButton=item=>internal?<button type="button" className="p553-origin-link"
-   aria-label={"เปิดต้นทาง "+(item.code||item.mr||item.tag||"")} onClick={()=>openSource(item)}>↗ Source</button>:null;
+ const sourceButton=item=>internal?<span className="p553-origin-actions">
+  <button type="button" className={"p553-origin-link "+(item.sourceModuleId?.startsWith("bid.budget.bom")?"p553-origin-link--a":item.code?.startsWith("C")?"p553-origin-link--c":"p553-origin-link--b")}
+   aria-label={"Open Module ID "+(item.sourceModuleId||item.code||"")} title={item.sourceModuleId}
+   onClick={()=>onOpenSource(item)}>↗ {item.sourceModuleId||item.code||"Source"}</button>
+  <button type="button" className="p553-origin-trace" onClick={()=>openSource(item)}>Trace</button>
+ </span>:null;
  const toggleMr=key=>setExpandedMr(old=>({...old,[key]:!old[key]}));
  return <section className="p55-panel p553-release-workbook" data-component-key="bid.budget.pricing.release.preview">
    <div className="p55-eyebrow">{title} · 10.3 / bid.budget.pricing.release.preview <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing.release.preview"/></div>
