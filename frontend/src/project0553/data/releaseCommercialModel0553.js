@@ -229,6 +229,13 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    actualCostTHB:price?.directCostTHB??null,
    profitTHB:price?.addvalueProfitTHB??null,
    conditional:r.code==="B7"||r.code==="B9",
+   // B9 optional package exists in 10.2 but is excluded from Base and the
+   // customer native G32 Working Preview unless Project Owner activates it.
+   // This evidence is internal ONLY; never a second customer price row.
+   conditionalOptionWorkingSellTHB:r.code==="B9"?
+    (r.b9ChinaBudget?.conditionalYardSellTHB??null):null,
+   conditionalOptionStatus:r.code==="B9"?
+    "ONE_LS_WRITTEN_CALL_OUT_NOT_IN_BASE":null,
    costComplete:n(r.directCostTHB),releaseAllowed:false,
    sourceStatus:r.priceStatus,workingSellBasis:r.workingSellBasis};
  });
