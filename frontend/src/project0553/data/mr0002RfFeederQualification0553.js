@@ -1,5 +1,6 @@
 // PJ2608-0553 / MR0002 RF feeder: seller quote authority versus independent
-// NEK marine cable technical comparable. Read-only; no vendor substitution.
+// MGW quotes FORLLER; ADDVALUE independently PROPOSES NEK for field BULK.
+// Separate proposal from vendor-included kit and never double-book either.
 import {MGW_P26_058_R2_SELECTED_0553 as mgw} from "./mgwP26058R2Selected0553";
 
 export const MR0002_RF_FEEDER_QUALIFICATION_0553=Object.freeze({
@@ -13,7 +14,20 @@ export const MR0002_RF_FEEDER_QUALIFICATION_0553=Object.freeze({
  selectedLocations:Object.freeze(mgw.sitesByMR["MR-0002"].slice()),
  quoteUrl:mgw.source,
  quoteStatus:"MGW_INCLUDED__MANUFACTURER_PRODUCT_IDENTITY_UNVERIFIED",
- candidateStatus:"NEK_TECHNICAL_COMPARABLE_ONLY__NOT_SELECTED_SUBSTITUTION",
+ candidateStatus:"ADDVALUE_NEK_FIELD_BULK_PROPOSED__NET_QTY_AND_PRICE_PENDING",
+ addvalueFieldBulkProposal:Object.freeze({
+  proposer:"ADDVALUE",manufacturer:"NEK Kabel AS",
+  product:'RF LLF 1/2" 50Ω SHF1',
+  origin:"INDEPENDENT_ADDVALUE_ENGINEERING_PROPOSAL__NOT_MGW_SUPPLY",
+  proposedFor:"ADDITIONAL_VERIFIED_FIELD_RF_CIRCUIT_OR_CONDITIONALLY_APPROVED_REPLACEMENT",
+  scopeOwner:"ADDVALUE_FIELD_BULK",selectedForBudgetaryEngineering:true,
+  procurementApproved:false,approvedSku:null,verifiedRouteM:null,
+  netAdditionalPurchaseM:null,unitRateTHB:null,costTHB:null,
+  includedMgWFeederMPerSite:100,includedMgWConnectorsPerSite:6,
+  overlapRule:"No ADDVALUE NEK booking for a circuit already satisfied by MGW FORLLER UHF-4; first map independent RF cable runs or controlled replacement/credit.",
+  documentRevisionGate:"SM000111 NEK Rev6 vs prior NEK Rev9 conflict at 450MHz: 4.93 vs 6.00dB/100m; verify manufacturer-approved revision",
+  procurementRule:"Engineering proposal is not an approved vendor replacement; require selected NEK datasheet, takeoff, budget rate, Ex/marine compliance and price owner."
+ }),
  candidate:Object.freeze({
   manufacturer:"NEK Kabel AS",
   name:'RF LLF 1/2" SHF1',
@@ -66,6 +80,8 @@ export const MR0002_RF_FEEDER_QUALIFICATION_0553=Object.freeze({
   source:"dtrsRfiBudgetCalculation0553.js"
  }),
  proofGates:Object.freeze([
+  "Identify independent ADDVALUE field-BULK RF runs and derive additional NEK procurement quantity net of MGW UHF-4 100m and six connectors per site; no parallel purchase for same installed function",
+  "Obtain unit price and approved NEK cable/connector SKU, MR0002/DTS/SPE technical compliance, and confirm revision used for ADDVALUE proposal",
   "Obtain MGW/FORLLER actual manufacturer datasheet, exact product SKU, jacket marking and DNV Type Approval/CoC; do not present NEK documentation as FORLLER proof",
   "SM000111.pdf (NEK Rev6) and prior NEK Rev9 comparable disagree at 450MHz (4.93 vs 6.00 dB/100m); maintain revision evidence and HOLD attenuation selection until manufacturer confirms",
   "SM000111.pdf page2 anomalous 300MHz 4.31 > 400MHz 4.10 dB/100m; do not interpolate or claim an approved frequency curve without manufacturer confirmation",
@@ -94,7 +110,8 @@ export function deriveMR0002RfFeederQualification0553(site){
   rev6Evidence:q.uploadedSm000111,revisionConflict:q.revisionConflict,
   candidateLoss450DbAtIncludedQty:rfLossAt450Db0553(length,q.candidate.attenuation450DbPer100M),
   oldProxyLoss450DbAtIncludedQty:rfLossAt450Db0553(length,q.oldParametricComparable.attenuation450DbPer100M),
-  candidate:q.candidate,quoteUrl:q.quoteUrl,qualificationState:q.quoteStatus,
+  candidate:q.candidate,addvalueFieldBulkProposal:q.addvalueFieldBulkProposal,
+  quoteUrl:q.quoteUrl,qualificationState:q.quoteStatus,
   candidateStatus:q.candidateStatus,pricePostingAllowed:false,
   proofGates:q.proofGates};
 }
