@@ -202,7 +202,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
     <tbody>{model.groups.map(group=><tr key={group.moduleId} className={"p553-b3-master-row p553-b3-master-row--"+group.kind}>
      <td colSpan={gridColumns.length} className="p553-b3-flat-cell">
       <details className={"p553-b3-table-group p553-b3-table-group--"+group.kind}
-       data-component-key={group.moduleId} defaultOpen={group.kind==="fat"||group.kind==="sat"}>
+       data-component-key={group.moduleId} open={group.kind==="fat"||group.kind==="sat"}>
        <summary className="p553-b3-table-summary">
         <span className="p553-b3-table-plus">+</span>
         <TablePriceCells0553 number={group.number} title={group.title} row={group}
