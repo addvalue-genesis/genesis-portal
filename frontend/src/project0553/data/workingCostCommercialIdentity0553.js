@@ -44,3 +44,18 @@ export function validateCostVsCommercialIdentity0553(identities){
  return Object.freeze({valid:true,contractLines:new Set(identities.map(x=>x.contractLineId)).size,
   protectsLegalBCode:true,customerReleased:false});
 }
+
+/**
+ * Stable activity IDs for internal FAT/YARD resource line items.
+ * Legacy source IDs (B3-FAT-STAFF, B9-YARD-STAFF) are NOT renamed:
+ * the underlying module IDs and cost-owner source mapping remain stable.
+ * A financial activity ID never establishes actual paid COST by itself.
+ */
+export function makeInternalCostLineId0553(contractCode,sourceSuffix){
+ if(!["B3","B9"].includes(contractCode)||typeof sourceSuffix!=="string"||
+  !/^[A-Z][A-Z0-9-]*$/.test(sourceSuffix))
+  throw Error("Invalid unique internal FAT/YARD source activity");
+ const prefix=contractCode==="B3"?"FAT":"YARD";
+ const normalized=sourceSuffix.startsWith("YARD-")?sourceSuffix.slice(5):sourceSuffix;
+ return "IC-"+prefix+"-"+normalized+"-001";
+}
