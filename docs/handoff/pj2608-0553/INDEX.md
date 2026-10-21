@@ -39,8 +39,16 @@
 6. `auditCurrentCustomerProjection0553` checks 21 A/B/C targets for current value parity. Existing `validateEstimateToBid0553` remains an estimate-line allocation **HOLD**; passing projection parity is not source-cost or release certification.
 7. No new Dashboard/Module, no change to B1–B14/C1–C2 IDs; exceptions can be exposed through **existing** Release Export Checks.
 
+## Additional B3/B6/B7 scope and market audit (ADR-66)
+
+- B3 working display **Inspection / Site Survey / FAT / SAT**: `data/b3SiteSurveyScope0553.js`, 7 unique locations, survey effort/cost NULL. B3 selected THB2750525 unchanged; native customer B3 wording original.
+- B6 MR0001 four Enclosure+IDU+Cisco sets inbound Thailand→MGW Nantong: `data/b6Mr0001ChinaInboundScenario0553.js`, pre-award THB42797–72372 **NONPOSTING**. Outbound MGW SERV-5 USD2500 = THB78750 quoted in original MGW cover, no duplicate posting. B6 selected THB307584 unchanged; actual net route difference and customs costs NULL.
+- B7 `data/b7ThreeMonthStorageEvidence0553.js`: customer requires **3 months FREE**, MGW quote does NOT explicitly price or confirm the three-month term. Public 2026 rate scenario four pallets × 90d ≈ THB4527–8148.60 bare space; user prior THB30000/month ×3 = THB90000 sensitivity, extra THB60000 scenario-only; selected B7 THB30000 for 1-month management allowance unchanged.
+- New automated contract `npm run validate:0553-b3-survey-b6-inbound-b7-storage` is in the frontend build chain; full Node/Webpack run **not confirmed**. No new UI module, price ledger, or customer-native cell overwrite.
+
 ## Decisions, gates, test ownership
 
+- **B3/B6/B7 decision:** [66_B3_SURVEY_B6_MR1_CHINA_INBOUND_B7_STORAGE_ADR_20261021.md](66_B3_SURVEY_B6_MR1_CHINA_INBOUND_B7_STORAGE_ADR_20261021.md)
 - **Latest B9 decision:** [65_B9_RELEASE_QUOTED_BASE_ADR_20261021.md](65_B9_RELEASE_QUOTED_BASE_ADR_20261021.md) (supersedes ADR-64 D-64.1 only)
 - **Earlier ADR:** [64_B3_B8_B9_SAT_CUSTOMER_PARITY_ADR_20261021.md](64_B3_B8_B9_SAT_CUSTOMER_PARITY_ADR_20261021.md)
 - PR#30 earlier integrated evidence: [63_RELEASE_BULK_B3_FAT_FINANCIAL_IDENTITY_INTEGRATION_20261021.md](63_RELEASE_BULK_B3_FAT_FINANCIAL_IDENTITY_INTEGRATION_20261021.md)
