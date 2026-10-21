@@ -66,7 +66,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     (mappingAudit.selectedValueParity?"current value projection matches":"SOURCE MISMATCH")},
   {id:"A-SUM",label:"10.1 → 10.3 Part A vs CFO",state:partA.reconciliationPassed?"PASS":"HOLD",detail:"Working price "+cash(aWorkingTotal)+" · CFO "+cash(partA.expectedPreviewTHB)},
   {id:"A-TAGS",label:"Original Part A layout / Buyer TAG grouping approval",state:isOverOriginalCapacity?"HOLD":"REVIEW",detail:tagCount+" source TAG lines → 4 MR summary rows; buyer must accept group-level TAG mapping for original 15 slots"},
-  {id:"B-SCOPE",label:"10.2 B1–B14 Working Sell",state:model.sourceCoverage.bSellReady?"PREVIEW":"HOLD",detail:"Working Sell displayed unchanged; conditional B7/B9 must be reviewed"},
+  {id:"B-SCOPE",label:"10.2 B1–B14 Working Sell",state:model.sourceCoverage.bSellReady?"PREVIEW":"HOLD",detail:"B9 quoted 1 LS included once in Base; Yard execution conditional, B7 reserve still under review"},
   {id:"B-COST",label:"10.2 B1–B14 verified Direct Cost",state:model.sourceCoverage.bCostReady?"PASS":"HOLD",detail:"Required for actual ADDVALUE profit, not for displaying provisional Working Sell"},
   {id:"C-COST",label:"10.2 C1/C2 optional supplier cost",state:model.sourceCoverage.cCostReady?"PASS":"HOLD",detail:"No 30% markup of C Working Sell; verified direct cost required"},
   {id:"ANNEX",label:"Original Annex B10/B11/B13/C1/C2 capacities",state:model.sourceCoverage.annexOverflow.length?"HOLD":"REVIEW",detail:model.sourceCoverage.annexOverflow.length?"Exceeds 13 rows: "+model.sourceCoverage.annexOverflow.join(", "):"13 original slots per Annex / OEM price proof pending"},
@@ -199,7 +199,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td>{["B10","B11","B13"].includes(id)?"refer to Annex "+id:
           id==="B12"?"refer to Annex B12":
-          line?.conditional&&internal?"Conditional — verify before release":""}</td>
+          line?.executionConditional&&internal?"Quoted in Base · attendance on written call-out":line?.conditional&&internal?"Conditional — verify before release":""}</td>
         </tr>;
        })}
        <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 / Base A+B (WORKING PREVIEW)</td>
