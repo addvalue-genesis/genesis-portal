@@ -43,6 +43,10 @@ assert.equal(p.veexWorkingSellTHB,30000);
 assert.equal(p.offshoreWorkingSellTHB,2046000);
 assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,397400);
 assert.equal(p.offshoreWorkingSellTHB+b3.b3ChinaFatBudget.fatWorkingSellTHB+b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,b3.workingSellTHB);
+assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,7500);
+assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB,236250);
+assert.equal(b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
+assert.equal(p.offshoreWorkingSellTHB,2016000+30000);
 const wanted=[
  ["ZPQ",3,6,151200,3],["ZWP8",2,4,100800,1],["ZWP11",2,4,100800,1],
  ["ZWP20",8,16,403200,4],["ZWP21",7,14,352800,4],
@@ -70,11 +74,18 @@ const testIDs=new Set(m.budgetarySiteTimeboxes.flatMap(x=>x.testIds));
 assert.equal(testIDs.size,21,"Every SAT Test ID belongs to one and only one priced Site timebox");
 for(const x of m.rows)assert(testIDs.has(x.id));
 const html=renderToStaticMarkup(React.createElement(MatrixUI,{workingRow:b3}));
+assert.throws(()=>renderToStaticMarkup(React.createElement(MatrixUI,{
+ workingRow:{...b3,workingSellTHB:b3.workingSellTHB+307125}
+})),/reconcile once/,"Guard must detect double-posted purchased MGW services");
+assert.throws(()=>renderToStaticMarkup(React.createElement(MatrixUI,{
+ workingRow:{...b3,b3MgwPurchasedFatWorkingSell:null}
+})),/reconcile once/,"Guard must detect missing purchased MGW service source");
 for(const x of [
  'data-component-key="bid.budget.working.bc.b3.site-mr-sat-matrix"',
  "2 persons","40 days","80 MD","USD 800","50,400.00",
  "Site × Team Workdays × Working SELL","ZWP20","403,200.00",
- "2,016,000.00","30,000.00","397,400.00","2,750,525.00",
+ "2,016,000.00","30,000.00","397,400.00","307,125.00","2,750,525.00",
+ "MGW Purchased iFAT","VQ-MGW-SERV-2/4","P26-058_R2","CP-B3 HOLD",
  "Shared across MR Test IDs","NOT per MR","SHARED SITE WORKING SELL"
 ])assert(html.includes(x),"Rendered SAT matrix missing "+x);
 for(const r of m.rows){
@@ -103,4 +114,4 @@ assert(host.includes('<B3SiteMrSatCoverage0553 workingRow={workingRow}/>'));
 assert.equal(JSON.stringify({workingSell:canonical().byCode.B3.workingSellTHB,
  directCost:canonical().byCode.B3.directCostTHB,source:days().rows,veex:days().veex}),frozenSnapshot,
  "UI/matrix may not mutate the 10.2 B3 canonical Working Sell or source days");
-console.log("PASS B3 SAT Matrix cost trace: 2 persons ×40 team-days =80 MD × THB25,200 = THB2,016,000; 9 shared site/SIT/Punch allocations, 21 nonposting Test IDs, +VeEX30,000 +MGW FAT397,400 = THB2,750,525 incl MGW purchased 307,125. No new price posting.");
+console.log("PASS B3 SAT Matrix cost trace: 2 persons ×40 team-days =80 MD × THB25,200 = THB2,016,000; 9 shared site/SIT/Punch allocations, 21 nonposting Test IDs, +VeEX30,000 +ADDVALUE Witness397,400 +MGW Purchased307,125 = THB2,750,525. No new price posting.");
