@@ -28,14 +28,14 @@ for(const line of release.b){
 }
 assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2750525,
  "Unapproved B3 28+2 scenario must not replace the canonical 40-day selected sell");
-for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2750525,B9:0})){
+for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2750525,B9:233600})){
  assert.equal(by[code].workingSellTHB,amount,"Canonical current "+code+" sell mismatch");
  assert.equal(scope.lines[code].workingSellTHB,amount,"Customer Scope/10.2 "+code+" divergence");
  assert.equal(by[code].directCostTHB,null,"Unverified direct cost posted to "+code);
 }
-assert.equal(budget.knownWorkingSellTHB,4151836.82);
+assert.equal(budget.knownWorkingSellTHB,4385436.82);
 assert.equal(abc.partBBaseTHB,budget.knownWorkingSellTHB);
-assert.equal(abc.currentB1B3B9BaseTHB,2962125);
+assert.equal(abc.currentB1B3B9BaseTHB,3195725);
 assert.equal(abc.postedWorkingSellDeltaTHB,0);
 assert.equal(abc.b9YardConditionalLumpSumTHB,233600);
 assert.equal(abc.b3FatWitnessSellTHB,397400);
@@ -80,4 +80,4 @@ assert(workType.includes("<B3SiteMrSatCoverage0553 workingRow={workingRow}/>"),"
 assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell}/>'),"China FAT witness not mounted in FAT group");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(workspace.includes("<RevKAbcOwnershipControl0553 working={bcWorking}/>"),"CFO current ABC not mounted");
-console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,750,525 (FAT 397,400 included) B9 Base 0; Yard optional 233,600, Part B 4,151,836.82; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
+console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,750,525 (FAT 397,400 included) B9 Base 233,600, execution on written call-out, Part B 4,385,436.82; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
