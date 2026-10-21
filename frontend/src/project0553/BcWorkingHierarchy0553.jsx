@@ -69,6 +69,10 @@ export function BcWorkingHierarchy0553({partBRows,partCRows,partBWorkingSell,par
     <h4>10.2 — B1–B14 / C1–C2 · Hierarchical Work Type Accordion</h4>
     <p className="p55-note">Click ＋ / − to view individual modules. B1 is expanded initially so
      B1.1–B1.8 are immediately available. Colors identify WORK TYPE, not approval status.</p>
+    <p className="p55-note"><strong>Naming rule:</strong>
+     SOW-B3 = customer contract line; IC-FAT-001 = distinct internal cost activity;
+     WS-B3 = internal Working SELL; CP-B3 = official proposal line reserved, NOT ISSUED.
+     Contract B1–B14/C1–C2 codes and technical Module IDs remain unchanged.</p>
     <p className="p55-note">Each Working SELL amount is shown once from the canonical 10.2
      cost-owner row. Details below are read-only; actual Direct Cost is NOT ESTABLISHED.</p>
    </div>
@@ -109,11 +113,14 @@ export function BcWorkingHierarchy0553({partBRows,partCRows,partBWorkingSell,par
       <span className="p553-bc-row-label">
        <strong>{item.requirement}</strong>
        <small>{type} · {item.workflowNumber} · {item.optional?"OPTIONAL":"BASE"}</small>
+       <small><strong>{"SOW-"+item.code}</strong> Contract Scope ·
+        <strong>{" WS-"+item.code}</strong> Internal Working SELL ·
+        <strong>{" CP-"+item.code}</strong> Proposal NOT ISSUED</small>
        <code>{item.moduleId}</code>
       </span>
       <span className="p553-bc-row-sell">
        <strong>{money(item.workingSellTHB)}</strong>
-       <small>Working SELL · {Number.isFinite(item.directCostTHB)?
+       <small>INTERNAL WS · NOT CUSTOMER PROPOSAL · {Number.isFinite(item.directCostTHB)?
         "Direct cost verified separately":"Direct Cost NOT ESTABLISHED"}</small>
       </span>
       {copy(item.moduleId)}
