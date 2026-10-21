@@ -1,0 +1,68 @@
+// PJ2608-0553 — What's New is visible, source-linked, read-only and release-safe.
+const assert=require("node:assert/strict");
+const fs=require("node:fs"),path=require("node:path");
+const babel=require("@babel/core"),React=require("react");
+const {renderToStaticMarkup}=require("react-dom/server");
+const root=path.resolve(__dirname,"../src");
+const read=name=>fs.readFileSync(path.join(root,"project0553",name),"utf8");
+
+const data=read("data/budgetChangeLog0553.js");
+const box={};
+const model=babel.transformSync(data,{babelrc:false,configFile:false,
+ presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}]]}).code;
+const m={exports:{}};
+require("node:vm").runInNewContext(model,{module:m,exports:m.exports});
+const {CHANGE_LOG_VERSION_0553,RELEASE_NOTES_0553:notes}=m.exports;
+assert.match(CHANGE_LOG_VERSION_0553,/^20\d{2}-\d{2}-\d{2}-R\d+$/);
+assert(notes.length>=4,"List recent meaningful changes");
+assert.equal(new Set(notes.map(x=>x.id)).size,notes.length,"No duplicate change entries");
+assert(notes.every(x=>x.moduleIds.length>0&&x.moduleIds.every(id=>id.startsWith("bid."))),
+ "Every change requires traceable Module IDs");
+assert(notes.every(x=>x.priceImpact==="NO_PRICE_CHANGE"||
+ ["WORKING_SOURCE_CHANGED","PRICE_REVIEW_REQUIRED"].includes(x.priceImpact)),
+ "Never invent commercial price impact");
+assert(notes.every(x=>x.date&&x.title&&x.detail&&x.source));
+
+const priorJs=require.extensions[".js"],priorJsx=require.extensions[".jsx"];
+const compile=(mod,file)=>{
+ const transformed=babel.transformFileSync(file,{babelrc:false,configFile:false,
+  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
+ mod._compile(transformed.code,file);
+};
+require.extensions[".js"]=(mod,file)=>file.startsWith(root+path.sep)?compile(mod,file):priorJs(mod,file);
+require.extensions[".jsx"]=(mod,file)=>file.startsWith(root+path.sep)?compile(mod,file):(priorJsx||priorJs)(mod,file);
+require.extensions[".css"]=()=>{};
+const {BudgetChangeSummary0553:Panel}=require(path.join(root,"project0553/BudgetChangeSummary0553.jsx"));
+const html=renderToStaticMarkup(React.createElement(Panel,{onOpenModule:()=>{}}));
+assert(html.includes('data-component-key="bid.budget.changes"'));
+assert(html.includes('data-component-key="bid.budget.changes.ui"'));
+assert(html.includes('data-component-key="bid.budget.changes.data"'));
+assert(html.includes("What&#x27;s New")||html.includes("What's New"));
+assert(html.includes("Expand All")&&html.includes("Collapse All"));
+assert(html.includes("Mark Reviewed"),"Unseen version must be visible to users");
+for(const note of notes){
+ assert(html.includes(note.title),"Latest change not rendered: "+note.id);
+ for(const id of note.moduleIds)assert(html.includes(id),"No visible linked Module ID: "+id);
+}
+const anchors=[...html.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
+assert.equal(new Set(anchors).size,anchors.length,"Change module DOM anchors must be unique");
+const workspace=read("CommercialWorkspace.jsx");
+assert(workspace.includes('<BudgetChangeSummary0553 onOpenModule={openReleaseSource}/>'));
+assert(workspace.indexOf("<BudgetChangeSummary0553 ")<workspace.indexOf("bid.budget.particular-source-gates"),
+ "What's New should appear immediately after Budget Workspace heading");
+assert(workspace.includes("buildReleaseCommercialModel0553"),"One live release model preserved");
+const view=read("BudgetChangeSummary0553.jsx");
+assert(view.includes("onClick={()=>onOpenModule({sourceModuleId:id})}"));
+assert(view.includes("ComponentCopyId"));
+assert(view.includes("window.localStorage.setItem(SEEN_KEY_0553,stamp)"));
+assert(view.includes("BUILD_REVISION_0553"));
+const webpack=fs.readFileSync(path.resolve(root,"../webpack.config.js"),"utf8");
+assert(webpack.includes("currentGitRevision()")&&webpack.includes("__PJ0553_BUILD_REVISION__"),
+ "Pull revision must be injected by Webpack on restart");
+const css=read("project0553.css");
+for(const cls of ["p553-changes-group--ui","p553-changes-group--data","p553-changes-module-open",
+ "p553-changes-new","p553-changes-impact--none"])
+ assert(css.includes(cls),"Missing color-coded What's New style: "+cls);
+assert(!/setWorkingSell|customerSellTHB\s*=|releaseAllowed\s*:\s*true/.test(view),
+ "What's New must never change Working SELL or release approval");
+console.log("PASS PJ2608-0553 What's New: visible change registry, Git build revision, local reviewed marker, nested colored groups, Expand/Collapse, unique clickable/copyable IDs, price-safe.");
