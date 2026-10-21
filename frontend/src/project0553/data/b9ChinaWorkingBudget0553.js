@@ -10,6 +10,7 @@
 // No VAT/duties, payroll Direct Cost or ADDVALUE margin invented.
 import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
 import {selectFourMrFatWbs0553} from "./fatWbsFourMr0553";
+import {makeInternalCostLineId0553} from "./workingCostCommercialIdentity0553";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const r=ONSHORE_WORKING_SELL_RATE_0553;
 const assumptionRows=[
@@ -68,6 +69,11 @@ export const B9_CHINA_WORKING_ROWS_0553=Object.freeze(assumptionRows.map(([id,wb
  const owner=isYard?"B9":"B3";
  return Object.freeze({
  id:owner+"-"+id,moduleId:"bid.budget.working.bc."+owner.toLowerCase()+"."+id.toLowerCase(),
+ legacySourceExpenseId:owner+"-"+id,
+ internalCostLineId:makeInternalCostLineId0553(owner,id),
+ financialNamespace:"IC_INTERNAL_RESOURCE_ACTIVITY_NOT_VERIFIED_COST",
+ workingSellIdentity:"WS-"+owner,contractLineIdentity:"SOW-"+owner,
+ proposalLineIdentity:"CP-"+owner,proposalIssued:false,
  wbs,description,unit,qty,unitRateTHB:rateTHB,
  workingSellTHB:round(qty*rateTHB),workingCostTHB:null,directCostTHB:null,
  costAccountingClass:owner==="B3"?"B3_DIRECT_FAT_WITNESS_EXPENSE_UNVERIFIED":"B9_DIRECT_SPECIALIST_EXPENSE_IF_CALLED_UNVERIFIED",
@@ -84,6 +90,10 @@ export function selectB9ChinaWorkingBudget0553(){
  const fatWbs=selectFourMrFatWbs0553();
  if(fatWbs.estimatedFatWitnessDays!==source.fatDaysEstimate||fatWbs.estimatedRoomNightsPerWitness!==source.hotelNightsPerPerson)throw Error("B3 FAT duration/rooms not linked to four-MR WBS");
  if(new Set(rows.map(x=>x.expenseKey)).size!==rows.length)throw Error("Duplicate B9 expense item");
+ if(new Set(rows.map(x=>x.internalCostLineId)).size!==rows.length||
+  rows.some(x=>!x.internalCostLineId.startsWith(x.costOwner==="B3"?"IC-FAT-":"IC-YARD-")||
+   x.proposalIssued||x.workingSellIdentity!=="WS-"+x.costOwner))
+  throw Error("B3/B9 internal cost activity IDs conflict with customer contract line or Working SELL");
  if(rows.some(x=>x.costOwner!==(x.optional?"B9":"B3")||!Number.isFinite(x.workingSellTHB)||x.workingCostTHB!==null))
   throw Error("B9 missing price evidence or mixed cost/sell owner");
  const labor=round(rows.filter(x=>/^(B3-FAT|B9-YARD)-STAFF$/.test(x.id)).reduce((n,x)=>n+x.workingSellTHB,0));

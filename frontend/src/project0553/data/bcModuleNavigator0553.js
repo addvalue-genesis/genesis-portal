@@ -111,8 +111,8 @@ export function buildBcModuleNavigator0553(){
    b3Id+".tools","VeEX rental B11 tool boundary"),
   child(b3Id+".audit","B3.4 — Working Sell and Contract Cost Audit",b3Id+".audit","19 requirements price trace"),
   child(b3Id+".mgw-r2-cover-20261020","B3.1.1 — MGW FAT iFAT / Facility Vendor Evidence"),
-  child(b3Id+".fat-owner-transfer","B3.1.3 — FAT Historic Owner Reconciliation"),
-  child(b3Id+".fat-training-7d-allocation","B3.1.4 — Integrated FAT + Training 7 Days / IC-FAT-001 / WS-B3 / CP-B3 NOT ISSUED"),
+  child(b3Id+".fat-owner-transfer","B3.4.4 — Rev05 Historic FAT Owner Reference (Audit Only)"),
+  child(b3Id+".fat-training-7d-allocation","B3.4.5 — Seven-day FAT + Training Unapproved Scenario / IC-FAT-001 / CP-B3 NOT ISSUED"),
   child(b3Id+".test-tools-ownership","B3.3.2 — Test Tools / B11 Cost Ownership"),
   child(b3Id+".source-cost-audit","B3.4.3 — Historical Source and Cost Evidence"),
   child(b3Id+".working-sell-breakdown","B3 — Working SELL THB 2,443,400 Breakdown"),
@@ -120,7 +120,7 @@ export function buildBcModuleNavigator0553(){
    b3Id+".40-day-abc","offshore 40 days two specialists site SAT"),
   child(b3Id+".veex-mx100","B3 — VeEX MX100+ Temporary Test Rental",
    b3Id+".veex-mx100","30 rental days tools SAT"),
-  child(b3Id+".revk-china-budget","B3 — MGW China FAT Witness Expense Breakdown"),
+  child(b3Id+".revk-china-budget","IC-FAT — ADDVALUE China FAT Internal Resource Activities / WS-B3 (not CP-B3)"),
   child(b3Id+".requirement-crosswalk","B3 — Contract Requirements × Rev.K / BOD SPE DTS MR"),
   child(req.moduleId,"B3 — Requirement Source Register (19)",
    b3Id+".requirement-crosswalk","RQM-01 RQM-19 contract trace"),
@@ -141,7 +141,7 @@ export function buildBcModuleNavigator0553(){
      task.moduleId,"SAT individual subtask "+r.site+" "+r.mr))
    ];
   }),
-  ...b3.b3ChinaFatBudget.rows.map(r=>child(r.moduleId,r.description,
+  ...b3.b3ChinaFatBudget.rows.map(r=>child(r.moduleId,r.internalCostLineId+" — "+r.description,
    r.moduleId,(r.costOwner==="B9"?"B9 optional Yard":"B3 China MGW FAT")+" "+r.id))
  ];
  // Child-level RQM rows need their own exact anchor, not just the visible
