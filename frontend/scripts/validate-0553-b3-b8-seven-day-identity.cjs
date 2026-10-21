@@ -66,12 +66,24 @@ const htmlB3=renderToStaticMarkup(React.createElement(View,{b3,b8,owner:"B3"}));
 const htmlB8=renderToStaticMarkup(React.createElement(View,{b3,b8,owner:"B8"}));
 const ownerB3=renderToStaticMarkup(React.createElement(OwnerDetail,{workingRow:b3}));
 const ownerB8=renderToStaticMarkup(React.createElement(OwnerDetail,{workingRow:b8}));
+// Rendered prices come from the SAME nonposting scenario selector. Do not
+// require former 2,448,400/2,486,200 prices from before MGW Purchased FAT
+// was selected inside B3 Working SELL. The old hard-coded UI assertion lagged
+// behind its own up-to-date 2,755,525/2,793,325 data-model assertions.
+const readable=n=>n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 for(const x of [htmlB3,htmlB8]){
  for(const text of ["SOW-B3","SOW-B8","IC-FAT-001","IC-TRN-001",
   "WS-B3","WS-B8","CP-B3","CP-B8","NOT ISSUED",
-  "2,448,400.00","37,800.00","2,486,200.00","75,600.00"])
-  assert(x.includes(text),"financial identity or scenario price not visible: "+text);
+  readable(m.b3CurrentWorkingSellTHB),readable(m.b3ProposedWorkingSellTHB),
+  readable(m.b8ProposedWorkingSellTHB),
+  readable(m.currentCombinedWorkingSellTHB),readable(m.proposedCombinedWorkingSellTHB),
+  readable(m.travelLabourExistingIncludedB3THB)])
+  assert(x.includes(text),"financial identity or selected/nonposting scenario price not visible: "+text);
 }
+assert.equal(m.vendorMgwPurchasedSellAlreadyInCanonicalB3THB,307125,
+ "Purchased OEM FAT must remain in canonical B3, not added by seven-day scenario");
+assert.equal(m.noDuplicateVendorPurchasedOnScenario,true,
+ "Seven-day nonposting option must not repost MGW SERV-2/4");
 assert(ownerB3.includes('data-component-key="bid.budget.working.bc.b3.fat-training-7d-allocation"'));
 assert(ownerB8.includes('data-component-key="bid.budget.working.bc.b8.integrated-fat-training-7d"'));
 const ids=new Set(nav().map(x=>x.id));
