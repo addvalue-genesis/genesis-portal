@@ -175,7 +175,13 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
     <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
     <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
     <td className="is-number">{audited?cash(audited.historicalReferenceTHB):"—"}<small>{audited?"Rev08 HISTORICAL ONLY — not additive":""}</small></td>
-    <td>{hasChild?<><strong>{id} · CURRENT TURNKEY COST NOT ESTABLISHED (historical detail is audit-only)</strong><small>{childSource.source} · {childSource.quantity} historical rows · Rev08 rates available in original audit detail, never posted to current turnkey cost · OEM verification: {control?.priceStatus} · {id.startsWith("C")?"OPTION — NOT INCLUDED IN BASE": "REFERENCE — NOT ADDED TO CURRENT WORKING SELL"}</small></>:
+    <td>{control&&<small><strong>{control.financialIdentity.scopeId}</strong> Scope ·
+     <strong> {control.financialIdentity.workingSellId}</strong> Working SELL ·
+     <strong> {control.financialIdentity.customerProposalId}</strong> NOT ISSUED
+     {Number.isFinite(control.financialIdentity.mgwPurchasedWorkingSellTHB)&&
+      " · VQ-MGW-SERV-2 / SERV-4 supplier quotation → WS-B3 MGW Purchased THB "+
+       control.financialIdentity.mgwPurchasedWorkingSellTHB.toLocaleString("en-US")}</small>}
+     {hasChild?<><strong>{id} · CURRENT TURNKEY COST NOT ESTABLISHED (historical detail is audit-only)</strong><small>{childSource.source} · {childSource.quantity} historical rows · Rev08 rates available in original audit detail, never posted to current turnkey cost · OEM verification: {control?.priceStatus} · {id.startsWith("C")?"OPTION — NOT INCLUDED IN BASE": "REFERENCE — NOT ADDED TO CURRENT WORKING SELL"}</small></>:
      (id==="B12"||id==="B14")?<><strong>NO ITEMIZED CHILD-SHEET PRICE</strong><small>{id==="B12"?"First-filling applicability and supplier scope must be verified; historical summary zero is not accepted as a verified cost.":"Insurance/bond premium and insured-value evidence required; historical Rev08 summary is not an itemized vendor quotation."} {control?.priceStatus}</small></>:
      item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(row=><tr key={row.id}><td>{row.id}</td><td>{row.description}</td><td>{row.qty}</td>
