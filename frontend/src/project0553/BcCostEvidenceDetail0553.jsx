@@ -200,11 +200,11 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     <MgwR2CommercialCover0553 code={e.code}/>
     <MgwPaulVendorClarifications0553 code={e.code}/>
     {e.code==="B9"&&workingRow.b9OnshoreRateReview&&<section className="p55-panel" data-component-key="bid.budget.working.bc.b9.onshore-rate-policy" style={{padding:12,marginTop:12}}>
-   <h4>B9 — Conditional Yard Specialist Onshore SELL Rate (FAT Witness = B3)</h4>
+   <h4>B9 — Quoted Base Yard Specialist Onshore SELL Rate (Execution On Call-out; FAT Witness = B3)</h4>
    <div className="p55-metric-grid">
     <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
     <div><strong>Yard Senior Engineer Onshore SELL Rate</strong><p>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")}</p><small>One paid engineer only · no separately priced per diem · FAT crew billed B3</small></div>
-    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>B9 has zero Base activity; Yard Call-out 1 LS THB 233,600 remains Conditional, excluded from Part B Base</small></div>
+    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>B9 1 LS THB233,600 included in Base price; Engineer attends only on written Yard call-out; not an extra option</small></div>
    </div>
    <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD600/day is a selling-rate input, not internal payroll Direct Cost.</p>
   </section>}
