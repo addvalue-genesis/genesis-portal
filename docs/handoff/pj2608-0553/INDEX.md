@@ -1,6 +1,6 @@
 # PJ2608-0553 | Architecture & Decision Index (10.1–10.5)
 
-**Updated:** 2026-10-21 ICT · **Latest B6 route decision: ADR-67; B9 remains ADR-65** · **Repository:** `addvalue-genesis/genesis-portal`  
+**Updated:** 2026-10-22 ICT · **Latest B6 owner-approved routing: ADR-68; B9 Base approval remains ADR-65** · **Repository:** `addvalue-genesis/genesis-portal`  
 **Integration branch:** `integrate/pj2608-0553-mgw-fat-financial-identity-20261021`  
 **Draft PR:** #30 · **Customer Release:** HOLD / NOT ISSUED.
 
@@ -48,11 +48,18 @@
 
 ## Current 4-MR shipment strategy (ADR-67, supersedes ADR-66 B6 routing assumption)
 
-- Preferred `SC-B6-B-HYBRID-MGW` under existing `byCode.B6.b6FourMrRoutingEvidence`: **NextG IDU/ODU direct to MGW Nantong**, **Thai-built Enclosure+Cisco 4 protected sets → MGW**, **5 greenfield antennas to JUTAL direct only if ITP/FAT bypass accepted**, MR0002/3/4 OEM → MGW (no forced China→Thailand→China loop).
+- **Owner-approved** `SC-B6-B-HYBRID-MGW` (ADR-68) under existing `byCode.B6.b6FourMrRoutingEvidence`: **NextG IDU 4 + ODU 4 + ALL 5 Greenfield Antennas directly → MGW Nantong**; **Thai-built Enclosure+Cisco 4 protected sets → MGW Nantong**; MR0002/3/4 OEM → MGW; **NO owner-selected antenna JUTAL bypass**. New NextG delivery quotation/credit and customs costs remain unconfirmed.
 - NextG 2026 `NG/260916-ADV-DAP1` quote USD191610.15 is **DAP Ranong, NOT DDP Thailand**, expired 2026-10-01; source `data/quotes/NG-260916-ADV-DAP1.full.json`. Direct-China rerouting, freight cost/credit and actual cabinet freight quantities remain UNKNOWN.
 - MGW commercial `SERV-5` USD2500 outbound Nantong→JUTAL is already in vendor quote and supplier states packing included. Cover `SERV-3` USD500 packing could overlap, **no signed USD500 credit**. One shared outbound cost event; no separate per-MR charge.
 - B6 selected WS **THB307584 historical Rev08 based** unchanged, `netSavingOrIncreaseTHB:null`, no invented savings/posting. Validation: `npm run validate:0553-b6-four-mr-routing` included in build.
 - `docs/handoff/pj2608-0553/67_B6_NEXTG_DIRECT_MGW_FOUR_MR_ROUTE_COST_IDENTITY_20261021.md` is authoritative for the new route; earlier all-Thailand cost range is NOT all-inclusive radio/antenna freight.
+
+## ADR-68 supersession (22-Oct-2026)
+
+- **Latest decision**: [68_B6_MR0001_MGW_DIRECT_SHIPPING_OWNER_APPROVAL_20261022.md](68_B6_MR0001_MGW_DIRECT_SHIPPING_OWNER_APPROVAL_20261022.md) — supersedes ADR-67's conditional antenna direct-JUTAL recommendation ONLY.
+- The selected physical route now has `physicalRoutingStatus: OWNER_APPROVED__NOT_VENDOR_RECONFIRMED`, `ownerApprovedAntennaCount:5`, and four unique inbound MR0001 cargo IDs; NextG source quotation still expired DAP Ranong and physical dispatch **not booked**.
+- B6 selected Working SELL **THB307584** and Part B Base **THB4385436.82** unchanged. No assumed freight credit, Direct Cost, second MGW SERV-5 or release.
+- Existing B6 10.2 UI and build-chain regression now assert ALL 5 antennas MGW-bound. The branch is source committed; local workstation pull and full webpack build require separate execution.
 
 ## Decisions, gates, test ownership
 
