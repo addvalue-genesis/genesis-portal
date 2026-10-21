@@ -108,7 +108,7 @@ function Pricing({row}){
  return <div className="p553-bc-price-recon">
   <div className="p55-metric-grid">
    <div><strong>Current Working SELL (one owner)</strong><p>{fmt(total)}</p>
-    <small>{code==="B9"?"Base is ZERO; optional call-out excluded":"Only canonical 10.2 owner amount"}</small></div>
+    <small>{code==="B9"?"Quoted Base 1 LS; execution requires written call-out":"Only canonical 10.2 owner amount"}</small></div>
    <div><strong>Current Verified Direct Cost</strong><p>{fmt(row.directCostTHB)}</p>
     <small>Missing cost evidence is not zero</small></div>
    <div><strong>Qty / Commercial basis</strong><p>{qty(row.qtyDriver)}</p><small>{row.unit}</small></div>
@@ -195,23 +195,23 @@ function Pricing({row}){
     an approved hourly-rate calculation. Do not treat THB30,000/44 as an agreed rate.</p>
   </section>}
   {code==="B9"&&<section className="p55-panel" style={{padding:12}}>
-   <h4>B9 — Conditional Senior Telecom Engineer Package (one Lump Sum)</h4>
-   <p className="p55-note"><strong>Current B9 Base {fmt(total)}.</strong> Separate optional Yard call-out
-    Working SELL <strong>{fmt(b9.conditionalYardSellTHB)}</strong>, consisting of one
+   <h4>B9 — Quoted Senior Telecom Engineer Package (one Lump Sum)</h4>
+   <p className="p55-note"><strong>Current B9 quoted Base {fmt(total)}.</strong> The same on-call Yard package has
+    source Working SELL <strong>{fmt(b9.conditionalYardSellTHB)}</strong>, consisting of one
     Senior Telecom Systems Integration Engineer, seven Yard working days plus travel,
-    lodging, insurance and related allowance rows. Conditional amount is NOT included in
-    B1–B14 Base. The legacy 12 team-day/THB574,560 WBS is superseded and non-posting.
+    lodging, insurance and related allowance rows. This amount is included ONCE in
+    B1–B14 Base; execution requires written request. The legacy 12 team-day/THB574,560 WBS is superseded and non-posting.
     FAT witnesses belong only in B3.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Call-out Item / Module ID</th><th>Role / Activity</th><th>Qty × Unit</th>
-     <th>Working SELL rate THB</th><th>Conditional Working SELL THB</th><th>Cost authority</th></tr></thead>
+     <th>Working SELL rate THB</th><th>Included B9 Working SELL THB</th><th>Cost authority</th></tr></thead>
     <tbody>{b9.rows.filter(x=>x.costOwner==="B9").map(x=><tr key={x.id}>
      <td><strong>{x.id}</strong><small>{x.moduleId}</small>{copy(x.moduleId)}</td>
      <td>{x.description}</td><td>{qty(x.qty)} {x.unit}</td>
      <td>{fmt(x.unitRateTHB)}</td><td>{fmt(x.workingSellTHB)}</td>
      <td>{x.status}<small>Verified Direct Cost: NOT ESTABLISHED</small></td>
     </tr>)}</tbody>
-    <tfoot><tr><th colSpan={4}>Optional call-out only — not Base</th>
+    <tfoot><tr><th colSpan={4}>Quoted B9 Base once — execution upon written call-out</th>
      <th>{fmt(b9.conditionalYardSellTHB)}</th><th>Written RACI / call-out required</th></tr></tfoot>
    </table></div>
   </section>}
@@ -264,7 +264,7 @@ function Resource({row}){
   {code==="B8"&&<p className="p55-note">Trainer discipline and sessions by MR0001–0004,
    number of trainees, training days/total 44 source MH allocation and
    OEM-provided materials remain to validate.</p>}
-  {code==="B9"&&<p className="p55-note">Optional Sr Telecom Systems Integration Engineer:
+  {code==="B9"&&<p className="p55-note">Quoted Sr Telecom Systems Integration Engineer:
    7 Yard working days and 2 travel days, 1 person selected.
    The second standby specialist is UNBILLED labour in the offer but could still
    incur internal cash cost. Actual payroll Direct Cost stays open.</p>}
