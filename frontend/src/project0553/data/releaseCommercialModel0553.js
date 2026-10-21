@@ -1,7 +1,9 @@
 // PJ2608-0553 · 10.3 Customer Release staging model.
 // NEVER mutate 10.1 / 10.2. Never equate Working SELL with direct COST.
 // A/C: cost × (1 + 20% SAMTEL + 5% ADDVALUE + 5% ADDVALUE omission reserve).
-// B: show canonical 10.2 Working SELL unchanged; SAMTEL deducts 5% internally.
+// B: canonical 10.2 Working SELL; 5% SAMTEL deduction on ordinary service portion ONLY.
+// Exception MGW purchased FAT service: 20% SAMTEL on QUOTED COST already inside B3 WS;
+// no second standard B 5% deduction against the purchased-service increment.
 import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
 import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
@@ -32,14 +34,32 @@ export function priceAorCFromCost0553(costTHB){
   customerSellTHB:round(costTHB*p.priceFactor)
  });
 }
-export function priceBWorkingSell0553(workingSellTHB,actualCostTHB=null){
+export function priceBWorkingSell0553(workingSellTHB,actualCostTHB=null,purchasedException=null){
  if(!n(workingSellTHB)||workingSellTHB<0)return null;
- const deduction=round(workingSellTHB*RELEASE_POLICY_0553.b.samtelDeductionOfCustomerSellPct/100);
+ const purchased=purchasedException?.selectedIncrementalWorkingSellTHB??0;
+ const purchasedSamtel=purchasedException?.samTelMarkupTHB??0;
+ if(purchasedException&&(
+  purchasedException.policy?.samTelCostMarkupPct!==RELEASE_POLICY_0553.aAndC.samtelCostPct||
+  purchasedException.policy?.addvalueCostMarkupPct!==RELEASE_POLICY_0553.aAndC.addvalueCostPct||
+  purchasedException.policy?.omissionReserveCostMarkupPct!==RELEASE_POLICY_0553.aAndC.omissionReserveCostPct||
+  purchasedException.policy?.bStandardFivePctDeductionOnPurchasedComponentAllowed!==false||
+  !n(purchased)||purchased<0||!n(purchasedSamtel)||purchasedSamtel<0||
+  purchased>workingSellTHB||
+  round(purchasedException.vendorPurchasedQuoteTHB*1.30)!==purchased))
+  throw Error("B3 purchased service cannot be subjected to A/C 20/5/5 and B 5% twice");
+ const ordinaryBWorkingSell=round(workingSellTHB-purchased);
+ const ordinarySamtelDeduction=round(ordinaryBWorkingSell*
+  RELEASE_POLICY_0553.b.samtelDeductionOfCustomerSellPct/100);
+ const combinedSamtel=round(ordinarySamtelDeduction+purchasedSamtel);
  return Object.freeze({
-  customerSellTHB:round(workingSellTHB),samTelDeductionTHB:deduction,
-  addvalueReceivableTHB:round(workingSellTHB-deduction),
+  customerSellTHB:round(workingSellTHB),
+  samTelDeductionTHB:combinedSamtel,
+  samTelOrdinaryB5PctDeductionTHB:ordinarySamtelDeduction,
+  samTelPurchased20PctCostShareTHB:round(purchasedSamtel),
+  mgwPurchasedServicesSellIncludedTHB:round(purchased),
+  addvalueReceivableTHB:round(workingSellTHB-combinedSamtel),
   directCostTHB:n(actualCostTHB)?round(actualCostTHB):null,
-  addvalueProfitTHB:n(actualCostTHB)?round(workingSellTHB-deduction-actualCostTHB):null
+  addvalueProfitTHB:n(actualCostTHB)?round(workingSellTHB-combinedSamtel-actualCostTHB):null
  });
 }
 // 10.3 customer-price drilldown: site + TAG family within each governed MR.
@@ -196,11 +216,15 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    costComplete,releaseAllowed:false};
  });
  const b=bc.rows.filter(r=>r.code.startsWith("B")).map(r=>{
-  const price=priceBWorkingSell0553(r.workingSellTHB,r.directCostTHB);
+  const price=priceBWorkingSell0553(r.workingSellTHB,r.directCostTHB,
+   r.code==="B3"?r.b3MgwPurchasedFatWorkingSell:null);
   return {code:r.code,description:r.requirement,sourceModuleId:r.moduleId,
    qty:1,unit:"lot",workingSellTHB:r.workingSellTHB,
    customerSellTHB:price?.customerSellTHB??null,
    samTelDeductionTHB:price?.samTelDeductionTHB??null,
+   samTelOrdinaryB5PctDeductionTHB:price?.samTelOrdinaryB5PctDeductionTHB??null,
+   samTelPurchased20PctCostShareTHB:price?.samTelPurchased20PctCostShareTHB??null,
+   mgwPurchasedServicesSellIncludedTHB:price?.mgwPurchasedServicesSellIncludedTHB??null,
    addvalueReceivableTHB:price?.addvalueReceivableTHB??null,
    actualCostTHB:price?.directCostTHB??null,
    profitTHB:price?.addvalueProfitTHB??null,
