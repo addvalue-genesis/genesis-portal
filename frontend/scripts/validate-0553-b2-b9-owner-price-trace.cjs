@@ -28,7 +28,7 @@ assert.equal(vdrl().b2CalculatedMH,null);
 assert.equal(vdrl().b2VerifiedCostTHB,null);
 assert.deepEqual(["MR-0001","MR-0002","MR-0003","MR-0004"].map(x=>vdrl().byMr[x].sourceRows),
  [37,36,35,35]);
-assert.equal(bc.byCode.B9.workingSellTHB,0);
+assert.equal(bc.byCode.B9.workingSellTHB,233600);
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600);
 assert.equal(bc.byCode.B8.workingSellTHB,30000);
 assert.equal(bc.byCode.B8.qtyDriver,44);
@@ -71,8 +71,8 @@ assert(!b2html.includes("Rate THB/MH: THB "),"No invented Document Controller pa
 assert(b2html.includes("104.125")&&b2html.includes("341.625"),"Rev05 historical role-rate reference missing");
 assert(b2html.includes("HISTORICAL"),"Old role cost seeds must never masquerade as current rate");
 const b9html=renderToStaticMarkup(React.createElement(PriceTrace,{workingRow:bc.byCode.B9}));
-assert(b9html.includes("233,600.00")&&b9html.includes("THB 0.00"));
-assert(b9html.includes("Optional call-out only"));
+assert(b9html.includes("233,600.00")&&b9html.includes("THB 233,600.00"));
+assert(b9html.includes("Quoted B9 Base once"));
 assert(b9html.includes("seven Yard working days"));
 const source=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 assert(source.includes("Do not divide THB580,000 by 143 or 38"));
@@ -84,4 +84,4 @@ assert(host.includes('{e.code==="B2"&&ownerPriceTrace}'),
  "B2 price detail must appear before generic evidence summary");
 const canonical=JSON.stringify(current());
 assert.equal(canonical,snap,"Presentation mutated canonical B1–B14/C1/C2 cost/SELL");
-console.log("PASS B2-B9 cost owner trace: B2 143 VDRL source plus recalculated 237,121.13 Working SELL with MH/rate OPEN; B9 conditional 233,600 not Base; no fabricated price, no duplicate Module ID or price posting.");
+console.log("PASS B2-B9 cost owner trace: B2 143 VDRL source plus recalculated 237,121.13 Working SELL with MH/rate OPEN; B9 quoted 233,600 Base, execution on written call-out; no fabricated price, no duplicate Module ID or price posting.");
