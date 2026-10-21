@@ -43,7 +43,7 @@ function TablePriceCells0553({row,number,title,isGroup=false,fx}){
   <span className="p553-b3-table-cell p553-b3-table-amount">{fmtPrice(sourceThb)}</span>
   <span className="p553-b3-table-cell p553-b3-table-amount">{fmtPrice(reference)}</span>
   <span className="p553-b3-table-cell p553-b3-table-amount">
-   <strong>{fmtPrice(isGroup?row.workingSellTHB:row.priceClass===PRICE_CLASS.INCLUDED_WORKING_SELL?
+   <strong>{fmtPrice((isGroup&&row.kind!=="audit")?row.workingSellTHB:row.priceClass===PRICE_CLASS.INCLUDED_WORKING_SELL?
     row.workingSellTHB:null)}</strong>
   </span>
   <span className="p553-b3-table-cell p553-b3-table-treatment">
@@ -207,7 +207,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
          </tr>)}</tbody>
          <tfoot><tr><th colSpan={6}>{group.number} — Included Working SELL subtotal
           (supplier/historical/audit excluded)</th><th className="p553-b3-money">
-          {money(group.workingSellTHB)}</th><th>ONE B3 owner</th></tr></tfoot>
+          {group.kind==="audit"?"— (NON-POSTING)":money(group.workingSellTHB)}</th><th>ONE B3 owner</th></tr></tfoot>
         </table>
        </div>
       </details>
