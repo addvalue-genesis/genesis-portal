@@ -13,7 +13,7 @@ export const ESTIMATE_TO_BID_0553=Object.freeze({
  customerTemplate:COMMERCIAL_TEMPLATE_0553.id,
  records:REV08_BASELINE.summary.map(([code,description])=>Object.freeze({
   ...(() => {const m=COMMERCIAL_TEMPLATE_0553.mappings.find(x=>x.code===code);return m||{code,source:"Customer scope / WBS evidence not yet mapped",driver:"required WBS or OEM evidence",sheet:"Scope of supply"};})(),
-  description,
+  description:code==="B3"?"Inspection / Site Survey / FAT / SAT":description, // working display alias only; Rev08 numeric evidence and native B3 source text unchanged.
   id:"PJ2608-0553:MAP:"+code,customerLine:code,customerSheet:(COMMERCIAL_TEMPLATE_0553.mappings.find(x=>x.code===code)?.sheet||"Scope of supply"),
   engineeringSource:(COMMERCIAL_TEMPLATE_0553.mappings.find(x=>x.code===code)?.source||"Source allocation required"),quantityDriver:(COMMERCIAL_TEMPLATE_0553.mappings.find(x=>x.code===code)?.driver||"WBS / vendor schedule"),
   estimateLineIds:Object.freeze([]),allocationRule:null,
