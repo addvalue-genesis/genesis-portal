@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-21-R03";
+export const CHANGE_LOG_VERSION_0553="2026-10-21-R04";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261021-07",date:"2026-10-21",kind:"UI",tone:"navigation",
+  title:"แก้ Validation ให้ตรวจ Cost Owner B3/B9 ตาม Caller จริง",
+  detail:"ปรับ validate-0553-fat-cost-owner-contract ให้ตรวจ B3.1 FAT ผ่าน B3WorkTypeAccordion ที่รับผิดชอบ Witness/Travel และ B9 conditional Yard ผ่าน BcCostEvidenceDetail. ยังคงตรวจ 8 FAT + 8 Yard rows, IC-FAT/IC-YARD, ไม่รวม B9 Base และไม่มี Actual Cost ที่พิสูจน์แล้ว; ปรับหน้าสรุป B3 FAT ให้รวม MGW Purchased THB307125 ครั้งเดียว.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.revk-china-budget","bid.budget.working.bc.b3.mgw-r2-cover-20261020","bid.budget.working.bc.b9.revk-china-budget"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"node:vm FAT Cost Owner regression / B3WorkTypeAccordion → B9ChinaBudgetDetail"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261021-06",date:"2026-10-21",kind:"DATA_FLOW",tone:"pricing",
   title:"แก้ SAT Matrix Runtime Reconciliation หลังเพิ่ม MGW Purchased FAT",
