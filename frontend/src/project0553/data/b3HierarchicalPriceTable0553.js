@@ -26,8 +26,8 @@ const group=(number,kind,title,driver,items)=>Object.freeze({
  vendorQuoteUSD:round(items.filter(x=>x.priceClass===C.SUPPLIER_QUOTE_REFERENCE)
   .reduce((n,x)=>n+(x.vendorQuoteUSD||0),0)),
  vendorQuoteTHB:null,
- historicalTHB:kind==="fat"?round(items.reduce((n,x)=>n+(x.historicalTHB||0),0)):null,
- referenceTHB:kind==="audit"?round(items.reduce((n,x)=>n+(x.referenceTHB||0),0)):null,
+ historicalTHB:null, // FAT historical THB144000 moved to B3.4 source audit only
+ referenceTHB:null, // Audit contains incompatible THB references; NEVER sum mirror, historic and scenario
  qty:kind==="fat"?1:kind==="sat"?80:kind==="tools"?30:null,
  unit:kind==="fat"?"FAT trip LS":kind==="sat"?"person-days":kind==="tools"?"rental-days":null,
  unitRateTHB:kind==="sat"?25200:kind==="tools"?1000:null,
@@ -56,21 +56,11 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
     C.SUPPLIER_QUOTE_REFERENCE,{vendorQuoteUSD:quotedUSD,qty:2,unit:"supplier service lines",
      owner:"MGW / Part A scope check",status:"SUPPLIER QUOTE ONLY — Part A vs B3 payer pending",
      supplierRows:quoted.map(x=>Object.freeze({id:x.id,usd:x.usd,description:x.description}))}),
-   item("B3.1.2","revk-china-budget","ADDVALUE China FAT Witness / Travel / Insurance",
+   item("B3.1.2","revk-china-budget","WS-B3 / IC-FAT — ADDVALUE China FAT Witness / Travel / Insurance",
     "2 witnesses × 6 FAT days + 2 travel days; 8 unique B3 priced expense lines",
     C.INCLUDED_WORKING_SELL,{workingSellTHB:fat.workingSellTHB,qty:1,unit:"FAT trip LS",
-     owner:"B3",status:"CURRENT WORKING SELL · direct cost unknown"}),
-   item("B3.1.3","fat-owner-transfer","Rev05 Bangkok FAT — Superseded Reference",
-    "8 old team-days × THB18,000; replaced by China FAT; do not carry forward",
-    C.HISTORICAL_REFERENCE,{historicalTHB:workingRow.b3FatOwnerTransfer.amountTHB,
-     qty:8,unit:"historical team-days",unitRateTHB:18000,
-     owner:"B3 historical only",status:"SUPERSEDED — NON ADDITIVE"}),
-   item("B3.1.4","fat-training-7d-allocation","7-Day Integrated FAT + Training — INTERNAL SCENARIO",
-    "B3/B8 shared 7 onsite team-days: 12 B3 FAT MD + 2 B8 training MD; 4 travel MD stay in B3 once",
-    C.NON_POSTING_AUDIT,{referenceTHB:integratedScenario?.proposedB3FatWorkingSellTHB??null,
-     qty:integratedScenario?.onSiteDays??null,unit:"shared on-site days",
-     owner:"IC-FAT-001 / IC-TRN-001 · B3/B8 cross-owner",
-     status:"SC-B3-FAT WHAT-IF; CP-B3/CP-B8 NOT ISSUED; no Working SELL posting"})
+     owner:"IC-FAT-001 / WS-B3 (SOW-B3); CP-B3 NOT ISSUED",status:"CURRENT INTERNAL WORKING SELL · DIRECT COST NOT VERIFIED"}),
+
   ]),
   group("B3.2","sat","SAT / SIT — Offshore Site & Integration Tests",
    "7 locations + cross-site SIT / punch, 40 team-days shared across MR",[
@@ -97,7 +87,7 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
      status:"PRICE NOT ESTABLISHED — do not invent a zero-priced item"})
   ]),
   group("B3.4","audit","Price Reconciliation / Requirement & Cost Audit",
-   "Read-only mirror, contract coverage, historical cost source; never additive",[
+   "Read-only current-price mirror, legacy FAT owner and seven-day what-if scenario; never additive",[
    item("B3.4.1","working-sell-breakdown","Canonical Working SELL Bridge",
     "FAT + Offshore + VeEX is a mirror of the B3 total, NOT a fourth priced work item",
     C.NON_POSTING_AUDIT,{referenceTHB:b.totalWorkingSellTHB,qty:3,unit:"priced B3 source buckets",
@@ -108,7 +98,18 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
      status:"NON-POSTING CONTRACT COVERAGE"}),
    item("B3.4.3","source-cost-audit","Historical WBS / Source Cost Audit",
     "Original working evidence / missing direct cost; reference only",
-    C.NON_POSTING_AUDIT,{status:"NO VERIFIED DIRECT COST — RELEASE HOLD"})
+    C.NON_POSTING_AUDIT,{status:"NO VERIFIED DIRECT COST — RELEASE HOLD"}),
+   item("B3.4.4","fat-owner-transfer","Rev05 Bangkok FAT — Superseded Reference",
+    "8 old team-days × THB18,000; replaced by China FAT; do not carry forward",
+    C.HISTORICAL_REFERENCE,{historicalTHB:workingRow.b3FatOwnerTransfer.amountTHB,
+     qty:8,unit:"historical team-days",unitRateTHB:18000,
+     owner:"B3 historical only",status:"SUPERSEDED — NON ADDITIVE"}),
+   item("B3.4.5","fat-training-7d-allocation","7-Day Integrated FAT + Training — INTERNAL SCENARIO",
+    "B3/B8 shared 7 onsite team-days: 12 B3 FAT MD + 2 B8 training MD; 4 travel MD stay in B3 once",
+    C.NON_POSTING_AUDIT,{referenceTHB:integratedScenario?.proposedB3FatWorkingSellTHB??null,
+     qty:integratedScenario?.onSiteDays??null,unit:"shared on-site days",
+     owner:"IC-FAT-001 / IC-TRN-001 · B3/B8 cross-owner",
+     status:"SC-B3-FAT WHAT-IF; CP-B3/CP-B8 NOT ISSUED; no Working SELL posting"})
   ])
  ]);
  const contract=validateWorkingHierarchyPriceTable0553({
