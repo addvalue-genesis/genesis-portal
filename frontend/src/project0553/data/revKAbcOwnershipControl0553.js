@@ -16,7 +16,7 @@ export function selectRevKAbcOwnershipControl0553(working){
  const b9=selectB9ChinaWorkingBudget0553();
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
- if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.workingSellTHB+b9.fatWorkingSellTHB)||current.B9!==0||
+ if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.workingSellTHB+b9.fatWorkingSellTHB+307125)||current.B9!==0||
     working.knownWorkingSellTHB!==4151836.82 ||
     working.byCode.B3?.workingSellTHB!==2750525 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
@@ -71,7 +71,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   id:"ABC-"+x.id,wbs:"K01/"+x.day,owner:"A",costObject:"OEM_FAT_TECHNICAL_TEST",
   activity:x.activity,site:"MGW facility China",source:x.requirement,
   quantity:x.hours,unit:"agenda hour",workingSellRateTHB:null,modeledSellTHB:null,directCostTHB:null,
-  posting:"OEM_EXECUTION_IN_A__B3_WITNESS_ONLY",chargeKey:null
+  posting:"MGW_VENDOR_TEST_PURCHASED_ONCE_AS_B3_SERV_2_4__NOT_A_COST_POST",chargeKey:null
  }));
  const chinaExpenses=b9.rows.map(x=>Object.freeze({
   id:"ABC-"+x.id,wbs:x.wbs,owner:x.costOwner,costObject:x.optional?"YARD_SPECIALIST_OPTION":"FAT_WITNESS_DIRECT_COST_ACTIVITY",
@@ -103,6 +103,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   b1SupportSellTHB:b1.baseWorkingSellTHB,b1SupportCostTHB:b1.baseWorkingCostTHB,
   b1ConditionalSellTHB:b1.conditionalWorkingSellTHB,b1LegacyEngineeringCarriedTHB:0,
   b3LaborSellTHB:b3.laborWorkingSellTHB,b3ToolSellTHB:b3.toolRentalWorkingSellTHB,
+  b3MgwPurchasedFatWorkingSellTHB:307125,
   b9FatBaseTHB:0,b3FatWitnessSellTHB:fatTHB,b3FatWitnessDays:fat.estimatedFatWitnessDays,b9FatWitnessDays:fat.estimatedFatWitnessDays,
   b9YardConditionalLumpSumTHB:yardTHB,
   b9YardRole:b9.selectedYardRole,b9YardWorkdays:b9.selectedYardWorkingDays,
