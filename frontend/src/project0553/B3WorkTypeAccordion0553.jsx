@@ -190,6 +190,11 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
      {money(model.supplierFatReferenceTHB)} at FX {model.supplierFxTHBPerUSD}
      (PURCHASED COST BASIS; cost ×1.30 is already included ONCE in the B3 Working SELL);
      old Bangkok FAT is HISTORICAL. Direct Cost NOT ESTABLISHED · RELEASE HOLD.</p>
+    <p className="p55-note"><strong>Inspection / Site Survey / FAT / SAT:</strong> pre-SAT Site Survey
+     covers {workingRow.b3SiteSurveyScope?.locations??0} project locations as B3 scope,
+     but physical survey crew, journey and separate Working SELL are NOT ESTABLISHED.
+     The selected offshore 40-day SAT timeboxes cannot be reused as extra survey days;
+     B1 design review and B2 report control are not duplicate B3 survey charges.</p>
    </div>
    <div className="p553-b3-actions">
     <button type="button" className="p553-detail-button" onClick={()=>expandAll(true)}>＋ Expand All</button>
