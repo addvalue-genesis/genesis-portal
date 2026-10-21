@@ -12,6 +12,7 @@ import {selectB3FortyDayWorkingSell0553} from "./b3FortyDayWorkingSell0553";
 import {selectB3LeanSatScenario0553} from "./b3LeanSatScenario0553";
 import {selectB3SiteSurveyScope0553} from "./b3SiteSurveyScope0553";
 import {selectB6Mr0001ChinaInboundScenario0553} from "./b6Mr0001ChinaInboundScenario0553";
+import {selectB6FourMrRoutingDecision0553} from "./b6FourMrRoutingDecision0553";
 import {selectB7ThreeMonthStorageEvidence0553} from "./b7ThreeMonthStorageEvidence0553";
 import {selectB3B8FiveDaySourceAllocation0553} from "./b3B8FiveDaySourceAllocation0553";
 import {selectB3MgwPurchasedFatWorkingSell0553} from "./b3MgwPurchasedFatWorkingSell0553";
@@ -37,7 +38,7 @@ const customerRequirements=Object.freeze({
  B3:"Inspection / Site Survey / FAT / SAT — pre-SAT field survey across 7 locations is in B3 contract scope but remains unpriced pending separate crew/days/travel WBS; MGW purchased iFAT/FAT Facility and ADDVALUE FAT witness, offshore SAT/SIT and VeEX remain selected Working SELL",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
- B6:"Transportation — MR0001 4 Enclosure + IDU + Cisco sets inbound for assembly at MGW Nantong PLUS MGW quoted Nantong→JUTAL road freight; China importer/broker/Incoterm payer and same-price inclusion to reconcile",
+ B6:"Transportation — MR0001 NextG radios/IDU/ODU direct-to-MGW Nantong option; Thai Enclosure+Cisco 4 preassemblies to MGW; antennas direct JUTAL only subject to ITP; MR0002–0004 OEM-to-MGW; MGW single SERV-5 outbound road quote. No automatic extra freight posting.",
  B7:"Three-month FREE storage at vendor workshop per customer; MGW P26-058_R2 does not separately quote or confirm 3-month free storage. 1-month THB30000 Working SELL reserve remains selected pending inclusion proof",
  B8:"Training for purchaser/end-user personnel",
  B9:"Specialist assistance and mobilization as specified",
@@ -53,7 +54,7 @@ const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
 const executionDecisionByCode=Object.freeze({
  B3:"B3 owns purchased MGW iFAT/facility SERV-2/4 WS at 20+5+5, ADDVALUE FAT Witness/travel plus Offshore SAT/SIT and temporary tools; do not duplicate vendor service in Part A",
- B6:"Rev.K MGW China FAT followed by delivery through JUTAL Zhuhai; JUTAL coordinates import/export customs, actual importer of record and DDP cost bearer to verify; B6 cargo only",
+ B6:"China FAT at MGW Nantong; NextG expired NG/260916-ADV-DAP1 is DAP Ranong (NOT DDP Thailand). Direct-to-China radio route and consolidated MGW outbound freight need source quote/credit; B6 handles freight only, not A equipment or B3 FAT.",
  B9:"Specialist field assistance 7-day Sr Telecom Engineer 1 LS quoted in B9 Base; on-call execution conditional on written Yard request. MGW FAT Witness remains B3."
 });
 
@@ -92,6 +93,17 @@ export function selectBcTurnkeyWorkingCost0553(){
  const chinaB9=selectB9ChinaWorkingBudget0553();
  const b3SiteSurvey=selectB3SiteSurveyScope0553();
  const b6ChinaInbound=selectB6Mr0001ChinaInboundScenario0553();
+ const b6RouteDecision=selectB6FourMrRoutingDecision0553({
+  selectedB6WorkingSellTHB:evidence.byCode.B6?.reconciliation?.historicalRev08TransportSellTHB,
+  earlierFourCabinetReference:b6ChinaInbound
+ });
+ // MGW receiving capability was orally accepted by Project Owner; price, import
+ // duty, freight credit and the actual cargo manifest are separate evidence.
+ // Supplier quote SERV-5 is VQ COST BASIS, not additive to selected WS-B6.
+ if(b6RouteDecision.selectedB6WorkingSellTHB!==307584||
+    b6RouteDecision.netSavingOrIncreaseTHB!==null||
+    b6RouteDecision.postingAllowed||!b6RouteDecision.siteAssembly.inboundToMgwAcceptedOperationallyByOwner)
+  throw Error("B6 routing proposal cannot silently reprice pre-award B6");
  const b7StorageEvidence=selectB7ThreeMonthStorageEvidence0553();
  if(!b3SiteSurvey.scopeIncluded||b3SiteSurvey.alreadyPricedInCurrentSelectedB3||
   b6ChinaInbound.postingAllowed||b7StorageEvidence.postingAllowed||
@@ -183,6 +195,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    b3FortyDayBudget:code==="B3"?b3Current:null,
    b3SiteSurveyScope:code==="B3"?b3SiteSurvey:null,
    b6Mr0001ChinaInboundEvidence:code==="B6"?b6ChinaInbound:null,
+   b6FourMrRoutingEvidence:code==="B6"?b6RouteDecision:null,
    b7ThreeMonthStorageEvidence:code==="B7"?b7StorageEvidence:null,
    b3MgwPurchasedFatWorkingSell:code==="B3"?b3MgwPurchased:null,
    b3OriginalWithoutMgwPurchasedTHB:code==="B3"?round(b3Current.workingSellTHB+chinaB9.fatWorkingSellTHB):null,
@@ -293,6 +306,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   unpostedScopeRiskAudits:Object.freeze({
    B3SiteSurvey:b3SiteSurvey,
    B6Mr0001Inbound4Sets:b6ChinaInbound,
+   B6FourMrHybridRoute:b6RouteDecision,
    B7ThreeMonthStorage:b7StorageEvidence
   }),
   workingSellB3OffshoreOnlyTHB:rows.find(r=>r.code==="B3").workingSellTHB,
