@@ -86,7 +86,7 @@ for(const x of [
  "Site × Team Workdays × Working SELL","ZWP20","403,200.00",
  "2,016,000.00","30,000.00","397,400.00","307,125.00","2,750,525.00",
  "MGW Purchased iFAT","VQ-MGW-SERV-2/4","P26-058_R2","CP-B3 HOLD",
- "Shared across MR Test IDs","NOT per MR","SHARED SITE WORKING SELL"
+ "Shared across MR Test IDs","NOT 8 days per MR","SHARED SITE WORKING SELL"
 ])assert(html.includes(x),"Rendered SAT matrix missing "+x);
 for(const r of m.rows){
  const start=html.indexOf('data-component-key="'+r.moduleId+'"');
@@ -110,7 +110,13 @@ assert(parentHtml.includes("2. Site × Team Workdays × Working SELL"));
 const head=renderToStaticMarkup(React.createElement(Breakdown,{workingRow:b3}));
 assert(head.includes("80 Man-days")&&head.includes("40")&&head.includes("site-mr-sat-matrix"));
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(host.includes('<B3SiteMrSatCoverage0553 workingRow={workingRow}/>'));
+// B3 SAT moved under the source-backed B3.2 hierarchical accordion.
+// Verify BOTH the mounted parent route and the exact SAT child renderer.
+assert(host.includes('<B3WorkTypeAccordion0553 workingRow={workingRow}'),
+ "10.2 B3 owner must mount its B3 work-type accordion");
+const workType=fs.readFileSync(path.join(root,"project0553/B3WorkTypeAccordion0553.jsx"),"utf8");
+assert(workType.includes('<B3SiteMrSatCoverage0553 workingRow={workingRow}/>'),
+ "B3.2 SAT group must mount the source-backed shared Site/MR coverage table");
 assert.equal(JSON.stringify({workingSell:canonical().byCode.B3.workingSellTHB,
  directCost:canonical().byCode.B3.directCostTHB,source:days().rows,veex:days().veex}),frozenSnapshot,
  "UI/matrix may not mutate the 10.2 B3 canonical Working Sell or source days");
