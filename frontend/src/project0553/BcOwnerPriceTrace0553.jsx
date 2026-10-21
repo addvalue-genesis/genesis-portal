@@ -177,6 +177,13 @@ function Pricing({row}){
     ONCE in the 20-Oct MGW cover; it must be reconciled with the B6 cost owner,
     supplier packing USD500, delivery terms, and original equipment A inclusion.
     There is no approved allocation of the B6 Working SELL to four MR cargo legs.</p>
+   <p className="p55-note"><strong>MR0001 SCADA / China Assembly Inbound:</strong>
+    4 Enclosure + IDU + Cisco integration sets to MGW Nantong; source-based indicative
+    inbound allowance <strong>{fmt(row.b6Mr0001ChinaInboundEvidence?.preliminaryInboundLowTHB)}
+    – {fmt(row.b6Mr0001ChinaInboundEvidence?.preliminaryInboundHighTHB)}</strong> (scenario,
+    NOT additional selected SELL). MGW SERV-5 USD2,500 is Nantong→JUTAL quoted once;
+    the Thailand→Nantong inbound leg, customs, taxes, cargo value and four-set dimensions
+    are not covered by proof. Compare against current B6 owner before selecting any delta.</p>
   </section>}
   {code==="B7"&&<section className="p55-panel" style={{padding:12}}>
    <h4>B7 — Storage Reserve</h4>
@@ -185,6 +192,15 @@ function Pricing({row}){
     This is a planned lump sum for one month, NOT a vendor quotation or a verified monthly rate.
     Charge only where the OEM/SAMTEL storage period is insufficient.
     Legacy three-month storage allocation in older B5 must not be booked twice.</p>
+   <p className="p55-note"><strong>Customer requires 3 months FREE at Vendor Workshop.</strong>
+    MGW P26-058_R2 contains no storage charge or written inclusion commitment.
+    Public 2026 China pallet-price reference for 4 assumed pallets / 90 days:
+    <strong>{fmt(row.b7ThreeMonthStorageEvidence?.marketThreeMonthBarePalletTHBLow)}
+    – {fmt(row.b7ThreeMonthStorageEvidence?.marketThreeMonthBarePalletTHBHigh)}</strong>
+    (bare space only; not MGW workshop quote). Full three-month reserve at historical
+    internal THB30,000/month would be THB90,000, with THB60,000 additional
+    NONPOSTING sensitivity. Confirm actual pallet/CBM, vendor free period and
+    handling/protection fees before revising B7 Selected Working SELL.</p>
   </section>}
   {code==="B8"&&<section className="p55-panel" style={{padding:12}}>
    <h4>B8 — Training WBS Source</h4>
