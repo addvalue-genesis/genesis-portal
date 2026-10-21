@@ -35,7 +35,7 @@ assert.equal(rows.length,11);
 assert.deepEqual(m.groups.map(x=>x.items.length),[2,2,2,5],
  "B3.1 must have ONLY supplier evidence + current WS; historical & scenario belong to B3.4 audit");
 assert.equal(new Set(rows.map(x=>x.moduleId)).size,11);
-assert.equal(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length,3);
+assert.equal(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length,4);
 assert.equal(round(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass))
  .reduce((n,x)=>n+x.workingSellTHB,0)),2750525);
 for(const r of rows){
@@ -91,7 +91,7 @@ assert.equal(new Set(ids).size,ids.length,"Must preserve unique B3 DOM deep-link
 assert.equal(m.groups[3].items.every(x=>x.workingSellTHB===null),true);
 const moduleSource=fs.readFileSync(path.join(root,"project0553/data/b3HierarchicalPriceTable0553.js"),"utf8");
 assert(moduleSource.includes("selectB3WorkingSellBreakdown0553"));
-assert(moduleSource.includes("C.SUPPLIER_QUOTE_REFERENCE"));
+assert(moduleSource.includes("C.PURCHASED_SERVICE_WORKING_SELL"));
 assert(moduleSource.includes("C.HISTORICAL_REFERENCE"));
 assert(moduleSource.includes("C.NON_POSTING_AUDIT"));
 assert(moduleSource.includes("new Set(groups.flatMap"));
@@ -103,4 +103,4 @@ for(const row of m.groups){
   "Navigator missing child "+child.moduleId);
 }
 assert.equal(JSON.stringify(working()),snapshot,"B3 price summary UI changed 10.2 sources");
-console.log("PASS 0553 B3 priced HIERARCHY TABLE / historical + scenario in B3.4 Audit only: FAT 397400 + SAT 2016000 + tools 30000 + audit NONPOST = 2750525; quoted MGW USD7500/THB236250, historical Bangkok THB144000, audit mirror THB2750525 all NONADDITIVE. 4 parent + 10 child IDs; same table columns; no cost mutation.");
+console.log("PASS 0553 B3 priced HIERARCHY TABLE / historical + scenario in B3.4 Audit only: FAT 704525 (= MGW 307125 + Witness 397400) + SAT 2016000 + tools 30000 + audit NONPOST = 2750525; purchased MGW USD7500/THB236250 at 20+5+5 into selected THB307125; historical Bangkok THB144000, audit mirror THB2750525 all NONADDITIVE. 4 parent + 10 child IDs; same table columns; no cost mutation.");
