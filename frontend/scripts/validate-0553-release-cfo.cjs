@@ -123,7 +123,7 @@ assert.match(workspace,/data-component-key="bid\.budget\.pricing\.release\.sourc
 assert.match(workspace,/data-component-key="bid\.budget\.pricing\.temp"/);
 assert.match(workspace,/data-component-key="bid\.budget\.pricing\.working"/);
 assert.match(workspace,/data-component-key="bid\.budget\.pricing\.budgetary"/);
-assert.match(workspace,/data-component-key="bid\.budget\.summary"/);
+assert.match(workspace,/data-component-key="bid\.budget\.pricing\.temp\.customer-proposal"/);
 assert.match(workspace,/data-component-key="bid\.budget\.working\.bc"/);
 assert.match(workspace,/data-component-key="bid\.budget\.scope"/);
 assert.match(workspace,/10\.2 B3 selected Working SELL does not match 10\.3 Release Preview/);
