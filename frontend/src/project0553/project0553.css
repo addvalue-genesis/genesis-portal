@@ -548,3 +548,51 @@
 .p553-dashboard .p553-b2-recalc .p55-table-wrap{max-width:100%}
 .p553-dashboard .p553-b2-recalc .p55-table tfoot th{background:#eaf3fa}
 @media(max-width:750px){.p553-dashboard .p553-b2-recalc-summary{gap:6px;padding:9px 7px}.p553-dashboard .p553-b2-recalc-num{min-width:38px}.p553-dashboard .p553-b2-recalc-copy{flex-basis:100%}}
+
+
+/* B3 10.2: actual hierarchical PRICE TABLE, not standalone accordion cards.
+   Header, parent and child modules use identical column widths/price classes. */
+.p553-dashboard .p553-b3-price-table-section{--b3-table-cols:32px 58px minmax(310px,2.4fr) 140px 132px 140px 154px 176px minmax(195px,1.2fr) 100px}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-worktype-header{margin-bottom:12px}
+.p553-dashboard .p553-b3-table-scroll{overflow-x:auto;max-width:100%;border:1px solid #c7d5e3;border-radius:8px}
+.p553-dashboard .p553-b3-hierarchical-table{min-width:1540px;width:100%;border-collapse:collapse;table-layout:fixed;background:#fff;font-variant-numeric:tabular-nums}
+.p553-dashboard .p553-b3-hierarchical-table>thead th{font-size:11px;text-transform:none;background:#e9f1f8;border:1px solid #cfdce6;vertical-align:middle;padding:11px 7px;white-space:normal}
+.p553-dashboard .p553-b3-hierarchical-table>thead th:first-child{width:88px}
+.p553-dashboard .p553-b3-hierarchical-table>thead th:nth-child(2){width:27%}
+.p553-dashboard .p553-b3-hierarchical-table>thead th:nth-child(3){width:14%}
+.p553-dashboard .p553-b3-hierarchical-table>thead th:nth-child(4){width:10%}
+.p553-dashboard .p553-b3-hierarchical-table>thead th:nth-child(5){width:10%}
+.p553-dashboard .p553-b3-hierarchical-table>thead th:nth-child(6){width:10%}
+.p553-dashboard .p553-b3-hierarchical-table>thead th:nth-child(7){width:12%}
+.p553-dashboard .p553-b3-hierarchical-table>thead th:nth-child(8){width:15%}
+.p553-dashboard .p553-b3-hierarchical-table td.p553-b3-flat-cell{padding:0!important;border-bottom:1px solid #cddae4;vertical-align:top;background:#fff}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-group{--b3-tone:#245f9e;--b3-wash:#edf4fc;display:block;border:0;margin:0;border-left:5px solid var(--b3-tone);background:var(--b3-wash)}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-group--fat{--b3-tone:#2563a6;--b3-wash:#edf4fd}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-group--sat{--b3-tone:#168042;--b3-wash:#ecf8f1}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-group--tools{--b3-tone:#a06a14;--b3-wash:#fff7e9}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-group--audit{--b3-tone:#7350a1;--b3-wash:#f4effb}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-summary{display:grid;grid-template-columns:var(--b3-table-cols);gap:0;list-style:none;align-items:stretch;min-width:1540px;cursor:pointer;background:var(--b3-wash);border-bottom:1px solid #cedbe5;overflow-wrap:anywhere}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-summary::-webkit-details-marker{display:none}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-plus{display:grid;place-items:center;color:var(--b3-tone);font-weight:900;font-size:19px;padding:8px 3px}
+.p553-dashboard .p553-b3-price-table-section details[open]>.p553-b3-table-summary>.p553-b3-table-plus{font-size:0}
+.p553-dashboard .p553-b3-price-table-section details[open]>.p553-b3-table-summary>.p553-b3-table-plus::before{content:"−";font-size:19px}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-cell{padding:10px 7px;font-size:12px;border-left:1px solid #d2dee7;min-width:0;overflow-wrap:anywhere}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-cell small{display:block;color:#536779;font-size:10px;font-weight:500;line-height:1.4;margin-top:3px}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-cell code{display:block;max-width:100%;font-size:9px;color:#465c73;white-space:normal;overflow-wrap:anywhere;margin-top:4px}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-num{color:var(--b3-tone);font-weight:900;white-space:nowrap}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-name strong{font-size:12px}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-amount{text-align:right;white-space:normal;overflow-wrap:normal}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-amount strong{font-weight:850;white-space:nowrap}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-treatment{font-size:10px;font-weight:600}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-copy{display:grid;place-items:start center;padding:8px 3px}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-children{padding:0 0 5px 10px;background:#fff;overflow-x:auto}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-subtable{min-width:1540px;border:0}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-subtable>thead th{background:#f2f6fa;font-size:10px;padding:6px 7px}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-item{--b3-wash:#fafcff;--b3-tone:#536779;background:#fff}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-summary--child{background:#fafcff}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-summary--child:hover{background:#eef6fc}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-expanded{padding:12px 15px;background:#fff;max-width:100%;border-top:1px dashed #ced8e4;overflow-x:auto}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-expanded .p55-panel{max-width:100%}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-hierarchical-table>tfoot th{background:#e6f0fa;padding:12px 8px}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-money{text-align:right;font-weight:900;white-space:nowrap}
+.p553-dashboard .p553-b3-price-table-section .p553-b3-table-summary:focus-visible{outline:2px solid #1680af;outline-offset:-2px}
