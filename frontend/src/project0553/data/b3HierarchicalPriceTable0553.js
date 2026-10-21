@@ -31,6 +31,8 @@ const group=(number,kind,title,driver,items)=>Object.freeze({
  vendorQuoteUSD:round(items.filter(x=>x.priceClass===C.SUPPLIER_QUOTE_REFERENCE)
   .reduce((n,x)=>n+(x.vendorQuoteUSD||0),0)),
  vendorQuoteTHB:null,
+ historicalTHB:kind==="fat"?round(items.reduce((n,x)=>n+(x.historicalTHB||0),0)):null,
+ referenceTHB:kind==="audit"?round(items.reduce((n,x)=>n+(x.referenceTHB||0),0)):null,
  qty:kind==="fat"?1:kind==="sat"?80:kind==="tools"?30:null,
  unit:kind==="fat"?"FAT trip LS":kind==="sat"?"person-days":kind==="tools"?"rental-days":null,
  owner:"B3"
