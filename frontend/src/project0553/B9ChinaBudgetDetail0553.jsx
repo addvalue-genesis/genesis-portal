@@ -7,6 +7,16 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
  const isFat=selectedOwner==="B3", owner=isFat?"B3":"B9";
  const rows=budget.rows.filter(x=>x.costOwner===owner);
  const total=isFat?budget.fatWorkingSellTHB:budget.conditionalYardSellTHB;
+ // This component's eight B3 source lines are ADDVALUE witnesses only.
+ // The purchased MGW factory-service WS is already selected in the parent B3.
+ // Include that source in the FULL-B3 preview only when supplied by its caller;
+ // never modify rows, POST an extra line, or claim quoted cost is paid cost.
+ const purchasedFatSell=isFat&&Number.isFinite(purchasedServices?.selectedIncrementalWorkingSellTHB)?
+  purchasedServices.selectedIncrementalWorkingSellTHB:0;
+ if(isFat&&purchasedServices&&
+   (purchasedFatSell!==307125||purchasedServices.vendorPurchasedQuoteUSD!==7500))
+  throw Error("B3 purchased MGW FAT quotation and Working SELL source mismatch");
+ const ownerPreviewB3THB=isFat?2046000+total+purchasedFatSell:null;
  if(!rows.length||Math.abs(rows.reduce((sum,x)=>sum+x.workingSellTHB,0)-total)>0.01)
   throw Error("Contract B3 FAT vs B9 Yard detail ownership/pricing mismatch");
  return <section className="p55-panel" data-component-key={"bid.budget.working.bc."+owner.toLowerCase()+".revk-china-budget"} style={{padding:14,marginTop:12}}>
@@ -15,8 +25,12 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
   <div className="p55-metric-grid">
    <div><strong>{isFat?"WS-B3 — Current Internal FAT Working SELL":"WS-B9 — Optional Internal Yard Working SELL"}</strong><p>{thb(total)}</p>
     <small>{isFat?"Two ADDVALUE paid witnesses, six budgetary FAT days, one return China trip; OEM executes FAT in Part A":"One paid Senior Telecom Engineer · 7 working days + 2 travel days · one unbilled accompanying Field Telecom Specialist"}</small></div>
-   <div><strong>{isFat?"WS-B3 — Offshore + FAT Internal Working SELL":"Current B9 Base"}</strong><p>{isFat?thb(2046000+total):thb(budget.b9BaseWorkingSellTHB)}</p>
-    <small>{isFat?"Offshore 40-day SAT/SIT + VeEX + ADDVALUE FAT witness + MGW purchased FAT service (Part A owner check OPEN)":"No mandatory specialist call-out in B9 Base; optional THB233,600 excluded"}</small></div>
+   <div><strong>{isFat?
+    (purchasedServices?"WS-B3 — FULL B3 incl. MGW Purchased FAT Working SELL":"WS-B3 — Offshore + ADDVALUE FAT only (MGW purchased cost not provided)"):
+    "Current B9 Base"}</strong><p>{isFat?thb(ownerPreviewB3THB):thb(budget.b9BaseWorkingSellTHB)}</p>
+    <small>{isFat?
+     (purchasedServices?"Offshore SAT/SIT + VeEX + ADDVALUE FAT witness + MGW purchased iFAT/Facility included ONCE; vendor quote not paid cost":"ADDVALUE and offshore sources only; not a full B3 rollup"):
+     "No mandatory specialist call-out in B9 Base; optional THB233,600 excluded"}</small></div>
   </div>
   {isFat&&budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}>
    <summary><strong>MGW FAT / MR0001–MR0004 — 6-Day Estimating Agenda</strong></summary>
