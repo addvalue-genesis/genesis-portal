@@ -60,3 +60,25 @@ Manual acceptance:
 5. Explicitly changing the **selected** upstream price in a controlled development branch changes the preview via same `buildReleaseCommercialModel0553`, without editing the preview's prices directly. Revert after verification.
 
 Do not describe all tests as passing until user local execution output is verified.
+
+
+## 2026-10-21 UI follow-up — restore three original navigation groups
+User requested that the three original visible groups must NOT disappear. Preserve three
+**color-coded navigation shortcuts**, while retaining **one canonical commercial source**:
+1. `10.3.1 · Working / Edit` (blue): navigate straight to live `10.2 bid.budget.working.bc` for review / approved source work.
+2. `10.3.2 · Budgetary` (amber): expand `bid.budget.pricing.temp` then the **historical** budgetary/audit view. Still NO verified frozen budgetary snapshot.
+3. `10.3.3 · Release` (green): navigate to the ONE live `bid.budget.pricing.release.preview`, still HOLD.
+These are navigator buttons, **not** three independent price/cost models.
+
+Added `ReleaseSourceNavigator0553.jsx` in 10.3 Internal view: table-first
+Part A, Part B, Part C native nested accordion; category color distinguishes
+Engineering (blue), Testing B3 (green), Logistics (orange), Spares/Options (purple),
+Tools (teal), etc. Expand All / Collapse All, full Module ID and Copy ID are
+available. Clicking a colored source Module ID opens exact 10.1/10.2 module
+when mounted, otherwise opens and flags its parent; reverse 10.2 → 10.3
+jump is also visible. In Internal Customer Excel, Module IDs now link in
+one click; Trace detail is still available as an alternative.
+
+NO sell/cost/markup change, NO B3 28+2 promotion, NO release approval.
+New static regression assertions are in `validate-0553-release-cfo.cjs`.
+Remote commit verified, but local Node validators/Webpack/visual QA must still run.
