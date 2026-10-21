@@ -23,6 +23,7 @@ import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
+import {ReleaseSourceNavigator0553} from "./ReleaseSourceNavigator0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
 import {findModuleElement0553,openModuleAncestors0553,workingOwnerFromModuleId0553} from "./data/moduleDeepLink0553";
 import {PRICING_VIEWS_0553} from "./pricingViewRegistry0553";
@@ -128,15 +129,34 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  if(!sourceB3||!previewB3||previewB3.workingSellTHB!==sourceB3.workingSellTHB||
     previewB3.customerSellTHB!==sourceB3.workingSellTHB)
   throw Error("10.2 B3 selected Working SELL does not match 10.3 Release Preview");
- const openReleaseSource=(item)=>{
-  const key=String(item?.code||item?.mrCode||"").toUpperCase();
-  if(/^B(?:[1-9]|1[0-4])$|^C[12]$/.test(key)){setBcTab(key);setBcDetailCode(key);}
-  window.setTimeout(()=>{
-   const sourceDetails=document.querySelector(key.startsWith("A")?
-    '[data-component-key="bid.budget.bom"]':'[data-component-key="bid.budget.working.bc"]');
-   if(sourceDetails){sourceDetails.open=true;sourceDetails.scrollIntoView({behavior:"smooth",block:"start"});}
-  },30);
+ // Navigate directly to the selected canonical 10.1/10.2 Module ID.
+ // Link navigation is read-only: never modify Working SELL or release status.
+ const [releaseJump,setReleaseJump]=useState(null);
+ const openReleaseSource=item=>{
+  const code=String(item?.code||"").toUpperCase();
+  const isBc=/^(?:B(?:[1-9]|1[0-4])|C[12])$/.test(code);
+  const id=String(item?.sourceModuleId||
+   (isBc?"bid.budget.working.bc."+code.toLowerCase():"bid.budget.bom.system-location-mto"));
+  if(isBc){setBcTab(code);setBcDetailCode(code);}
+  setReleaseJump(previous=>({id,code,seq:(previous?.seq||0)+1}));
  };
+ React.useEffect(()=>{
+  if(!releaseJump)return;
+  const {id,code}=releaseJump;
+  const isBc=/^(?:B(?:[1-9]|1[0-4])|C[12])$/.test(code);
+  if(isBc&&bcTab!==code)return; // wait for selected owner to mount
+  const found=findModuleElement0553(document,id);
+  const fallback=isBc?"bid.budget.working.bc."+code.toLowerCase():
+   id.startsWith("bid.budget.pricing")?"bid.budget.pricing.release.preview":"bid.budget.bom";
+  const target=found||findModuleElement0553(document,fallback);
+  if(!target){setNavigationFeedback("Module not found: "+id);return;}
+  openModuleAncestors0553(target);
+  if(target.tagName==="DETAILS")target.open=true;
+  document.querySelectorAll(".p553-module-nav-focus").forEach(x=>x.classList.remove("p553-module-nav-focus"));
+  target.classList.add("p553-module-nav-focus");
+  target.scrollIntoView?.({behavior:"smooth",block:"center"});
+  setNavigationFeedback(found?null:"Module "+id+" ยังไม่แสดงใน Filter นี้; เปิด "+fallback+" ให้ตรวจสอบ");
+ },[releaseJump,bcTab]);
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  return <div className="p55-stack" data-component-key="bid.budget">
  <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget"/><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
@@ -212,6 +232,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
       <tr><td><strong>B + C — Reference including options</strong></td><td className="is-number"><strong>THB {combinedBCWorkingSell.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})}</strong></td><td>Sum of priced lines only</td><td>Reference only; not a customer-released quotation</td></tr>
      </tbody></table></div>
      <p className="p55-note">Live source: selectBcTurnkeyWorkingCost0553() · 10.2 Working SELL only. Missing lines are not zero; C1/C2 are kept separate. Historical non-posting references and direct costs are not added.</p>
+     <button type="button" className="p553-rsn-return" onClick={()=>openReleaseSource({sourceModuleId:"bid.budget.pricing.release.preview"})}>↗ 10.3 · Go to Release Preview</button>
     </section>
     <RevKAbcOwnershipControl0553 working={bcWorking}/>
     <ScopeCategoryTabs0553 value={bcTab} onChange={code=>{setBcTab(code);setBcDetailCode(code==="ALL"?null:code);}}/>
@@ -250,6 +271,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     Historical Working/Budgetary previews and unapproved SAT scenarios are NONPOSTING.
     Updated selected source values flow here on the next render; issuing a customer quote still needs approval.
    </p>
+   {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
    <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} title="10.3 — Released Customer Output (Read-only staging)"/>
    <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Gate</th><th>Required check</th><th>Current status</th></tr></thead>
