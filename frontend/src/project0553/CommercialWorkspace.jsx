@@ -25,7 +25,7 @@ import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
 import {findModuleElement0553,openModuleAncestors0553,workingOwnerFromModuleId0553} from "./data/moduleDeepLink0553";
-import {PRICING_VIEWS_0553,pricingViewByKey0553} from "./pricingViewRegistry0553";
+import {PRICING_VIEWS_0553} from "./pricingViewRegistry0553";
 import { REV08_BASELINE, getBaselineReview } from "./data/rev08CommercialBaseline";
 import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {LIFECYCLE_SPARES_0553} from "./data/lifecycleSpareScope0553";
@@ -36,7 +36,8 @@ import {assessVendorEvidenceForBudget0553} from "./data/vendorExternalEvidence05
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
 import { BID_0553_GATES, BID_0553_SOURCES } from "./bidReview";
 export function CommercialWorkspace0553({focusedLocation=null,initialMode="working",navigationTarget=null,navigationOwner=null,navigationSequence=0}){
- const [mode,setMode]=useState(initialMode);
+ // Retain initialMode compatibility; views are not separate price authorities.
+ void initialMode;
  const [recipient,setRecipient]=useState("INTERNAL");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
  const [bcDetailCode,setBcDetailCode]=useState(null);
@@ -71,7 +72,6 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   const requestKey=navigationSequence+":"+navigationTarget+":"+(navigationOwner||"");
   if(handledNavigation.current===requestKey)return;
   const owner=navigationOwner||workingOwnerFromModuleId0553(navigationTarget);
-  if(mode!=="working"){setMode("working");return;}
   if(owner&&bcWorking.byCode[owner]){
    if(bcTab!=="ALL"&&bcTab!==owner){setBcTab(owner);return;}
    if(bcTab==="ALL"){setBcTab(owner);setBcDetailCode(owner);return;}
@@ -94,7 +94,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    setNavigationFeedback("ยังเปิด Module ปลายทางไม่ได้: "+navigationTarget);
    handledNavigation.current=requestKey;
   }
- },[navigationTarget,navigationOwner,navigationSequence,mode,bcTab,bcDetailCode]);
+ },[navigationTarget,navigationOwner,navigationSequence,bcTab,bcDetailCode]);
 
   // Working display defaults only. Never represent the 31.5 planning rate as a BOT quote.
  const DEFAULT_FX={displayCurrency:"THB",fxRate:"31.5",fxDate:"2026-10-10",fxSource:"INTERNAL PLANNING ASSUMPTION — UNVERIFIED"};
@@ -122,10 +122,14 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  const bcPriceAudit=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const releaseModel=buildReleaseCommercialModel0553({thbPerUsd:fx?.thbPerUsd});
- const activePricingView=pricingViewByKey0553(mode);
+ const activePricingView=PRICING_VIEWS_0553.find(view=>view.key==="released");
+ const sourceB3=bcWorking.byCode.B3;
+ const previewB3=releaseModel.b.find(x=>x.code==="B3");
+ if(!sourceB3||!previewB3||previewB3.workingSellTHB!==sourceB3.workingSellTHB||
+    previewB3.customerSellTHB!==sourceB3.workingSellTHB)
+  throw Error("10.2 B3 selected Working SELL does not match 10.3 Release Preview");
  const openReleaseSource=(item)=>{
   const key=String(item?.code||item?.mrCode||"").toUpperCase();
-  setMode("working");
   if(/^B(?:[1-9]|1[0-4])$|^C[12]$/.test(key)){setBcTab(key);setBcDetailCode(key);}
   window.setTimeout(()=>{
    const sourceDetails=document.querySelector(key.startsWith("A")?
@@ -162,21 +166,18 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <p className="p55-note"><strong>MR0001 Cisco-only preliminary subtotal (NOT total project cost):</strong> THB {BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US")} · {BID_COST_SPINE_0553.pricedRows} provisionally priced source items / {BID_COST_SPINE_0553.unpricedRows} unpriced · Next G / MGW / other vendors / bulk / A+B+C / customer sell NOT included. Source: {BID_COST_SPINE_0553.source}</p>
   <p className="p55-note">This is a controlled WORKSPACE, not a price release. The previously issued SAMTEL file is historical evidence; its exact issued revision must be verified before snapshot registration. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
-    <div className="p55-segmented p55-segmented--commercial">
-    {PRICING_VIEWS_0553.map(view=><button key={view.key} type="button"
-     data-component-key={view.moduleId} title={view.number+" — "+view.fullLabel+" · "+view.moduleId}
-     aria-pressed={mode===view.key} className={mode===view.key?"is-active":""}
-     onClick={()=>setMode(view.key)}>{view.number} · {view.shortLabel}</button>)}
+    <div className="p55-segmented p55-segmented--commercial" data-component-key="bid.budget.pricing.single-release">
+     <strong>10.3 — Single Customer Release Preview</strong>
     </div>
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
   </div>
   <p className="p55-note" data-component-key="bid.budget.pricing.view-reference">
    <strong>Current module:</strong> {activePricingView.number} · {activePricingView.fullLabel} ·
    <ComponentCopyId projectId="PJ2608-0553" componentKey={activePricingView.moduleId}/>
-   {" "}· {recipient} · {mode==="working"?"LIVE Working Read Model — Save/Sync is not complete.":mode==="budgetary"?"BUDGET PREVIEW — no authenticated frozen snapshot.":"RELEASE PREVIEW — approval HOLD; selecting this tab does not issue a quotation."}
+   {" "}· {recipient} · LIVE projection from 10.1 + 10.2 selected source · Approval HOLD; not issued.
   </p>
   {recipient==="INTERNAL"&&<PricingCfoDashboard0553 model={releaseModel}/>}
-  {mode==="working"&&<>
+  <>
   <section className="p55-panel">
    <div className="p55-eyebrow">CURRENCY VIEW / ORIGINAL CURRENCY RETAINED</div>
    <div className="p55-filterbar p55-filterbar--simple">
@@ -236,7 +237,47 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <BcExecutionComplianceAudit0553 selectedCode={bcTab}/>
    <p className="p55-note">Legacy lifecycle input contains {LIFECYCLE_SPARES_0553.rows.length} activity requirements. Customer B/C remapping is by activity (not legacy category label); current OEM spare rates and full turnkey costs are still missing.</p>
   </details>
-  <details className="p553-budget-phase"><summary><strong>10.3 — Cost & Commercial Pricing Reference</strong><small>bid.budget.pricing · Rev08 historical reference</small></summary>
+ <section className="p55-panel" data-component-key="bid.budget.pricing.release">
+   <div className="p55-eyebrow">RELEASED CUSTOMER OUTPUT · APPROVAL GATE</div>
+   <h3>Customer Release — HOLD</h3>
+   <p className="p55-note" data-component-key="bid.budget.pricing.release.source-trace">
+    <strong>LIVE SOURCE TRACE:</strong> Part A comes from 10.1 Equipment BOM;
+    B/C from 10.2 selected canonical owners. B3 source
+    <strong> THB {sourceB3.workingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</strong>
+    {" → "} Release Preview
+    <strong> THB {previewB3.customerSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}</strong>
+    {" · "} PASS selected-source reconciliation.
+    Historical Working/Budgetary previews and unapproved SAT scenarios are NONPOSTING.
+    Updated selected source values flow here on the next render; issuing a customer quote still needs approval.
+   </p>
+   <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} title="10.3 — Released Customer Output (Read-only staging)"/>
+   <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Gate</th><th>Required check</th><th>Current status</th></tr></thead>
+   <tbody>{BID_0553_GATES.map(g=><tr key={g.id}><td><strong>{g.id}</strong></td><td>{g.title}<small>{g.detail}</small></td><td><span className="p55-badge">{g.status}</span></td></tr>)}</tbody></table></div>
+   <p><strong>Price / Approved XLSX / Submission:</strong> HOLD — final technical, commercial, six-sheet reconciliation, authenticated ITB amendment and written approval required.</p>
+ </section>
+  <details className="p553-budget-phase"><summary><strong>10.4 — Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
+   <EstimateToBidMapping0553/>
+  </details>
+
+ </>
+ {/* Downstream Scope summary: after engineering BOM and estimate-to-bid mapping; read-only. */}
+   <details className="p553-budget-phase" open data-component-key="bid.budget.scope">
+   <summary><strong>10.5 — Scope of Supply / A+B+C</strong><small>bid.budget.scope · B10 / B11 / B13 / C1 / C2 · A/B/C</small></summary>
+   <p className="p55-note"><strong>Internal engineering reference only:</strong> linked working costs are not an approved customer quotation. Original workbook codes and internal cost categories remain distinct; missing vendor prices are not zero.</p>
+   <ScopeSheetsDetail0553 fx={fx} navigationTarget={navigationTarget} navigationSequence={navigationSequence}/>
+  </details>
+
+ <section className="p55-panel"><h3>Release & integrity checklist</h3>
+ <p>1. Source MR/MTO/TC/vendor revision → 2. Engineering quantity → 3. Vendor cost & service MH → 4. Summary A/B/C ↔ detail sheets → 5. Freeze per recipient → 6. Approved XLSX export.</p>
+ <p className="p55-note">0550 source code remains untouched. One live 10.3 release model is shown; prior Working/Budgetary views are TEMP and not independent pricing sources.</p>
+ </section>
+ </section>
+ <details className="p553-budget-phase" data-component-key="bid.budget.pricing.temp">
+  <summary><strong>TEMP — Previous Working / Budgetary / Customer Previews</strong>
+   <small>Historical/audit views only · Excluded from selected 10.3 Release data path</small></summary>
+  <p className="p55-note">Not used to calculate the current customer price. Do not manually copy TEMP values to Release Preview. Existing source references and module IDs are retained for audit.</p>
+  <details className="p553-budget-phase" data-component-key="bid.budget.pricing.working"><summary><strong>Previous Working / Rev08 Price Reference</strong><small>TEMP · 10.3.1 · Audit only, not release source</small></summary>
    <p className="p55-note"><strong>10.3 Current Working Basis:</strong> B/C turnkey direct cost: {Number.isFinite(bcWorking.knownDirectCostTHB)?"THB "+bcWorking.knownDirectCostTHB.toLocaleString("en-US"):"NOT ESTABLISHED"} · B WBS working SELL reference: THB {bcWorking.knownWorkingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})}. Part A equipment COST and Part B working SELL cannot be summed into a project cost or released customer quotation. C1/C2 are optional. Historical Rev08 below is AUDIT ONLY.</p>
    <CommercialSystemBreakdown0553 displayCurrency={displayCurrency} fx={fx}/>
   <section className="p55-panel">
@@ -279,19 +320,8 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     </td></tr>}</React.Fragment>)}</tbody>
   </table></div>
   <p><strong>Workbook source:</strong> {template.sourceName} · {template.revision} · 6 sheets. <strong>Export status:</strong> HOLD — original template fidelity and cross-sheet reconciliation not yet validated.</p>
-  </details>  <details className="p553-budget-phase"><summary><strong>10.4 — Estimate → Customer Bid Mapping</strong><small>bid.budget.mapping · allocation review</small></summary>
-   <EstimateToBidMapping0553/>
   </details>
-
- </>}
- {/* Downstream Scope summary: after engineering BOM and estimate-to-bid mapping; read-only. */}
-   {(mode==="working"||mode==="budgetary")&&<details className="p553-budget-phase" open data-component-key="bid.budget.scope">
-   <summary><strong>10.5 — Scope of Supply / A+B+C</strong><small>bid.budget.scope · B10 / B11 / B13 / C1 / C2 · A/B/C</small></summary>
-   <p className="p55-note"><strong>Internal engineering reference only:</strong> linked working costs are not an approved customer quotation. Original workbook codes and internal cost categories remain distinct; missing vendor prices are not zero.</p>
-   <ScopeSheetsDetail0553 fx={fx} navigationTarget={navigationTarget} navigationSequence={navigationSequence}/>
-  </details>}
-  
-  {mode==="budgetary"&&<><BudgetaryWorkbookPreview0553/><section className="p55-panel">
+  <details className="p553-budget-phase" data-component-key="bid.budget.pricing.budgetary"><summary><strong>Previous Budgetary Workbook</strong><small>TEMP · 10.3.2 · Not approved/snapshotted</small></summary><BudgetaryWorkbookPreview0553/><section className="p55-panel">
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · SNAPSHOT REGISTRY</div>
    <h3>Frozen Budgetary Issue — Verification Required</h3>
    <p className="p55-note"><strong>NO VERIFIED ISSUED SNAPSHOT REGISTERED.</strong> A historical Rev08 workbook is available but its exact SAMTEL-issued revision and recipients are still unverified. It is not promoted to Budgetary Submission.</p>
@@ -301,24 +331,13 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    </tbody></table></div>
    <p className="p55-note"><strong>Required before freeze:</strong> confirmed issued document, recipient, revision, approved commercial amount, source hash, issue timestamp, and management authorization. Working price changes must not rewrite an issued snapshot.</p>
    <p><strong>Customer export:</strong> DISABLED — no authenticated frozen budgetary snapshot.</p>
- </section></>}
- {mode==="released"&&<section className="p55-panel">
-   <div className="p55-eyebrow">RELEASED CUSTOMER OUTPUT · APPROVAL GATE</div>
-   <h3>Customer Release — HOLD</h3>
-   <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} title="10.3 — Released Customer Output (Read-only staging)"/>
-   <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
-   <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Gate</th><th>Required check</th><th>Current status</th></tr></thead>
-   <tbody>{BID_0553_GATES.map(g=><tr key={g.id}><td><strong>{g.id}</strong></td><td>{g.title}<small>{g.detail}</small></td><td><span className="p55-badge">{g.status}</span></td></tr>)}</tbody></table></div>
-   <p><strong>Price / Approved XLSX / Submission:</strong> HOLD — final technical, commercial, six-sheet reconciliation, authenticated ITB amendment and written approval required.</p>
- </section>}
- <section className="p55-panel"><h3>Release & integrity checklist</h3>
- <p>1. Source MR/MTO/TC/vendor revision → 2. Engineering quantity → 3. Vendor cost & service MH → 4. Summary A/B/C ↔ detail sheets → 5. Freeze per recipient → 6. Approved XLSX export.</p>
- <p className="p55-note">0550 source code remains untouched. State control is based on the reused three-state doctrine, not an independent 0553 pricing policy.</p>
- </section>
- </section>
- {mode==="working"&&<details className="p553-budget-phase" open><summary><strong>10.6 — Customer Proposal Preview · Scope of Supply</strong><small>bid.budget.summary · Customer review layout · no release</small></summary>
+ </section></details>
+
+ <details className="p553-budget-phase" data-component-key="bid.budget.summary"><summary><strong>Previous Customer Proposal Preview</strong><small>TEMP · 10.6 · No release</small></summary>
   <CustomerProposalPreview0553/>
- </details>}
+ </details>
+
+ </details>
  <details className="p553-budget-phase"><summary><strong>10.7 — Internal Budget Summary & Review</strong><small>bid.budget.internal · 4 MR systems · historical separation</small></summary>
   <InternalBudgetShortcut0553/>
  </details>
