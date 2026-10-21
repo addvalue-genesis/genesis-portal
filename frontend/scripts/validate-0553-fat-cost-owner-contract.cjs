@@ -36,7 +36,23 @@ for(const id of ["FAT-CREW","FAT-TRAVEL"]){
  assert(rowStart>=0);
  assert.match(head.slice(rowStart,rowStart+85),/"owner": "B3"/);
 }
-const ui=fs.readFileSync(path.join(__dirname,"../src/project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(ui.includes('selectedOwner="B3"'));
-assert(ui.includes('selectedOwner="B9"'));
+// The B3.1 FAT detail moved into the nested B3 accordion. Check the REAL
+// caller chain, not the obsolete expectation that both owners appear in
+// BcCostEvidenceDetail0553.jsx itself.
+const jsx=name=>fs.readFileSync(path.join(__dirname,"../src/project0553",name),"utf8");
+const ui=jsx("BcCostEvidenceDetail0553.jsx");
+const accordion=jsx("B3WorkTypeAccordion0553.jsx");
+const ownerDetail=jsx("B9ChinaBudgetDetail0553.jsx");
+assert(ui.includes('e.code==="B3"&&<B3WorkTypeAccordion0553 workingRow={workingRow}'),
+ "B3 canonical owner must mount the nested FAT/SAT accordion");
+assert(accordion.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell}/>'),
+ "B3.1 China FAT witness must filter B3-owned expense rows via the nested accordion");
+assert(accordion.includes('<B3RequirementWbsTrace0553 selectedOwner="B3"'),
+ "B3 contract requirements must retain B3 ownership in the crosswalk");
+assert(ui.includes('<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>')&&
+ ui.includes('e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9"'),
+ "B9 conditional Yard source and obligations must use B9 explicitly");
+assert(ownerDetail.includes('owner=isFat?"B3":"B9"')&&
+ ownerDetail.includes('rows=budget.rows.filter(x=>x.costOwner===owner)'),
+ "Shared FAT/Yard expense detail must filter source records by the selected owner");
 console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB397400), B9 Yard conditional THB233600; no B9 Base; Actual Direct COST unverified and non-posting.");
