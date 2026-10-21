@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-21-R12";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R13";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-01",date:"2026-10-22",kind:"DATA_FLOW",tone:"pricing",
+  title:"B6 Approved MR0001 Shipping: NextG IDU/ODU + Antenna 5 Sets → MGW; Thai Enclosure+Cisco 4 Sets → MGW",
+  detail:"Project Owner อนุมัติ Physical Route โดย NextG IDU4 / ODU4 / Greenfield Antenna5 ส่ง MGW Nantong ตรงทั้งหมด ไม่มีการแยก Antenna ไป JUTAL; ไทยประกอบ Enclosure+Cisco 4 Sets และตรวจ Wiring/Power ก่อนส่ง MGW. MR0002–0004 OEM เข้าจีน FAT ตามเดิม. Selected B6 Working SELL THB307584 และ Part B THB4385436.82 ไม่เปลี่ยน; NextG Quote DAP Ranong หมดอายุ ยังต้อง Requote ปลายทาง MGW, Freight Credit, Customs/Importer, Actual Direct Cost และ shipment booking. MGW SERV-5 USD2500 / SERV-3 USD500 ไม่คิดซ้ำ; Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b6","bid.budget.working.bc","bid.budget.pricing.release.preview","bid.budget.scope"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"ADR-68 / Owner approval 22-Oct-2026 / NextG NG-260916-ADV-DAP1 / RQ2609-1182 / MGW P26-058_R2"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261021-15",date:"2026-10-21",kind:"DATA_FLOW",tone:"pricing",
   title:"B6 MR0001 NextG Direct-MGW Hybrid + MR0002–0004 Consolidated China FAT Route",
