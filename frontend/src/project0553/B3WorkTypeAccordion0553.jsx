@@ -91,7 +91,7 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
        <td><strong>{money(m.selectedIncrementalWorkingSellTHB)}</strong></td>
        <td>CP-B3 NOT ISSUED / release HOLD</td></tr>
      </tbody></table></div>
-    <MgwR2CommercialCover0553 code="B3"/>
+    <MgwR2CommercialCover0553 code="B3" purchasedWorkingSell={m}/>
     <p className="p55-note"><strong>Commercial rule:</strong> MGW Item 3/4 purchased-service quotation
      is included ONCE in WS-B3 under the 20% SAMTEL + 5% ADDVALUE + 5% Omission
      cost markup. **DO NOT** apply the standard Part B 5% SAMTEL deduction again
