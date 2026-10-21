@@ -6,7 +6,7 @@ const body=file("onshoreWorkingRate0553.js")+"\n"+file("fatWbsFourMr0553.js")+"\
 const ctx=vm.runInNewContext(body+"\n({rate:selectOnshoreWorkingRate0553(),b9:selectB9ChinaWorkingBudget0553(),b3:selectB3WorkingSellAfterChinaFat0553(2109600),transfer:B3_LEGACY_BKK_FAT_OWNER_TRANSFER_0553});",{}, {timeout:2000});
 assert.equal(ctx.rate.usdPerPersonDay,600);
 assert.equal(ctx.rate.thbPerPersonDay,18900);
-assert.equal(ctx.b9.workingSellTHB,0); // No B9 Base: FAT Witness is contractual B3
+assert.equal(ctx.b9.workingSellTHB,233600); // SOW-B9 quoted 1 LS; Yard execution remains on written call-out
 assert.equal(ctx.b9.laborWorkingSellTHB,302400); // FAT 6 + two travel days x 2 witnesses
 assert.equal(ctx.b9.travelAndInsuranceWorkingSellTHB,95000);
 assert.equal(ctx.b9.rows.length,16);
@@ -38,7 +38,9 @@ assert.equal(ctx.b9.yardTeamDaysWorking,12);
 assert.equal(ctx.b9.travelEvents,1);
 assert.equal(ctx.b9.yardActualOrStandbyTeamDays,10); // Rev05 historical, NOT selected call-out
 assert.equal(ctx.b9.fatTravelTeamDays,2);
-assert.equal(ctx.b9.conditionalNotInBase,true);
+assert.equal(ctx.b9.conditionalNotInBase,false);
+assert.equal(ctx.b9.b9BaseWorkingSellTHB,233600);
+assert.equal(ctx.b9.priceAlreadyIncludedInB9Base,true);
 assert.equal(ctx.b3,1965600);
 assert.equal(ctx.transfer.amountTHB,144000);
 assert.equal(ctx.transfer.newOwner,"B3");
@@ -50,4 +52,4 @@ assert.equal(legacyBridge,4405590.69); // Old B1 and 39-day B3 retained only in 
 const b3b9=ctx.b3+ctx.b9.fatWorkingSellTHB;
 assert.equal(b3b9,2363000);
 assert.equal(ctx.rate.B9ExistingWorkingSellOverrideAllowed,false,"Rate approval alone must not overwrite old WBS without separate Rev.K scope selection");
-process.stdout.write("PASS: contract B3 owns 4-MR FAT witness THB397,400; B9 Base zero, optional Yard 7-day LS THB233,600; legacy B3 bridge untouched, ABC repricing tested separately.\n");
+process.stdout.write("PASS: contract B3 owns 4-MR FAT witness THB397,400; B9 quoted 1 LS THB233,600 included once in Base (execution conditional); legacy B3 bridge untouched, ABC repricing tested separately.\n");
