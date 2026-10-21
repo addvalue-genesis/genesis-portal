@@ -96,6 +96,10 @@ assert.deepEqual(rfNet({verifiedPhysicalRunLengthsM:[10,20],acceptedMGWAvailable
  connectorsRequired:7,acceptedMGWConnectorQty:6}).netAdditionalM,25);
 assert.deepEqual(rfNet({verifiedPhysicalRunLengthsM:[10,20],acceptedMGWAvailableM:10,
  connectorsRequired:7,acceptedMGWConnectorQty:6}).additionalConnectors,1);
+assert.equal(rfNet({verifiedPhysicalRunLengthsM:[10,20],acceptedMGWAvailableM:10,
+ connectorsRequired:7,acceptedMGWConnectorQty:6}).shortfallOwner,"MGW_COMPLETE_SYSTEM__SUPPLIER_CORRECTIVE_SCOPE");
+assert.equal(rfNet({verifiedPhysicalRunLengthsM:[10,20],acceptedMGWAvailableM:10,
+ connectorsRequired:7,acceptedMGWConnectorQty:6}).addvalueAutomaticProcurementM,null);
 for(const siteRf of routeAudit.sites){
  assert.equal(siteRf.circuitCount,2);
  assert.deepEqual(siteRf.missingTags,[]);
@@ -106,6 +110,14 @@ for(const siteRf of routeAudit.sites){
  assert.equal(siteRf.scenario.mgwPotentialBalanceIfEquivalentM,72);
  assert.equal(siteRf.scenario.netAdditionalIfMGWAcceptedAndPooledM,0);
  assert.equal(siteRf.actual.netNEKPurchaseM,null);
+ assert.equal(siteRf.actual.mgwSystemShortfallM,null);
+ assert.equal(siteRf.addvalue.installationScopeOwner,"MGW");
+ assert.equal(siteRf.addvalue.reserveType,"CONDITIONAL_INSTALLATION_BULK_SPARE");
+ assert.equal(siteRf.addvalue.approvedReserveM,null);
+ assert.equal(siteRf.scenario.replacementNEKIfMGWRejectedM,null);
+ assert.equal(siteRf.scenario.independentADDVALUENEKSpareM,null);
+ assert.equal(siteRf.mgw.functionalInstalledSupplyOwner,true);
+ assert.equal(siteRf.mgw.shortfallCorrectiveOwner,"MGW");
  assert.equal(siteRf.addvalue.procurementQtyM,null);
  assert.equal(siteRf.addvalue.workingTHB,null);
  assert.equal(siteRf.mgw.providedFeederM,100);
@@ -121,7 +133,7 @@ babel.transformSync(rfRouteUI,{babelrc:false,configFile:false,presets:[["@babel/
 
 
 assert.equal(rf.candidate.nominalOdMm,16);
-assert.equal(rf.candidateStatus,"ADDVALUE_NEK_FIELD_BULK_PROPOSED__NET_QTY_AND_PRICE_PENDING");
+assert.equal(rf.candidateStatus,"ADDVALUE_NEK_BULK_RESERVE_CANDIDATE__SPARE_QTY_AND_PRICE_PENDING");
 assert.equal(rf.addvalueFieldBulkProposal.proposer,"ADDVALUE");
 assert.equal(rf.addvalueFieldBulkProposal.manufacturer,"NEK Kabel AS");
 assert.equal(rf.addvalueFieldBulkProposal.selectedForBudgetaryEngineering,true);
@@ -129,6 +141,10 @@ assert.equal(rf.addvalueFieldBulkProposal.procurementApproved,false);
 assert.equal(rf.addvalueFieldBulkProposal.netAdditionalPurchaseM,null);
 assert.equal(rf.addvalueFieldBulkProposal.costTHB,null);
 assert.equal(rf.addvalueFieldBulkProposal.includedMgWFeederMPerSite,100);
+assert.equal(rf.addvalueFieldBulkProposal.baselineSupplyResponsibility,"MGW_COMPLETE_SYSTEM__INSTALLATION_RF_CABLE_AND_CONNECTORS");
+assert.equal(rf.addvalueFieldBulkProposal.reserveClassification,"CONDITIONAL_BULK_SPARE_NOT_BASE_PROCUREMENT");
+assert.equal(rf.addvalueFieldBulkProposal.proposedReserveQuantityM,null);
+assert.equal(rf.addvalueFieldBulkProposal.additionalAmountBookedTHB,0);
 assert.equal(rf.addvalueFieldBulkProposal.includedMgWConnectorsPerSite,6);
 assert.equal(rf.pricePostingAllowed,false);
 assert.equal(rfLossAt450Db0553(100,6),6);
@@ -138,7 +154,7 @@ assert.equal(rfSite("ZWP23"),null);
 for(const site of ["ZWP20","ZWP21","ZWP22"]){
  const g=model.groups.find(g=>g.mr==="MR-0002"&&g.site===site);
  const addvalue=g.items.find(x=>x.id==="ADDVALUE-NEK-FIELD-FEEDER");
- assert(addvalue&&addvalue.state==="ADDVALUE_PROPOSED");
+ assert(addvalue&&addvalue.state==="BULK_RESERVE_CANDIDATE");
  assert.equal(addvalue.proposalOwner,"ADDVALUE");
  assert.equal(addvalue.proposedManufacturer,"NEK Kabel AS");
  assert.equal(addvalue.qty,null);
@@ -148,7 +164,11 @@ for(const site of ["ZWP20","ZWP21","ZWP22"]){
  assert.equal(addvalue.physicalCircuitCount,2);
  assert.equal(addvalue.unverifiedScenarioPurchaseM,28);
  assert.equal(addvalue.physicalQuantityState,"ROUTE_OR_ACCEPTED_VENDOR_CREDIT_NOT_VERIFIED");
- assert.equal(addvalue.supplierIncludedDeductionRequired,true);
+ assert.equal(addvalue.supplierIncludedDeductionRequired,false);
+ assert.equal(addvalue.vendorInstallationScopeOwner,"MGW");
+ assert.equal(addvalue.reserveClass,"INSTALLATION_BULK_SPARE_NOT_BASE_COST");
+ assert.equal(addvalue.approvedReserveQty,null);
+ assert.equal(addvalue.autoWorkingCostPostAllowed,false);
  assert.equal(addvalue.replacementApproved,false);
  const o=g.items.find(x=>x.id==="FEEDER-NEK-TECHNICAL-COMPARABLE");
  assert(o&&o.state==="SCOPE_REVIEW");
@@ -186,8 +206,8 @@ const location=fs.readFileSync(path.join(root,"project0553/LocationBomDetail0553
 assert(simple.includes('<BulkMrLocationCoverage0553 mr={system} site={site} state={bulkState}/>'));
 assert(simple.includes('moduleKey="bid.budget.bom.system-location-mto"'));
 assert(simple.includes('key:"bulk-status"'));
-assert(simple.includes('value:"ADDVALUE_PROPOSED"'));
-assert(ui.includes('ADDVALUE NEK FIELD BULK — PROPOSED / NOT BOOKED'));
+assert(simple.includes('value:"BULK_RESERVE_CANDIDATE"'));
+assert(ui.includes('ADDVALUE NEK — CONDITIONAL BULK SPARE / NOT BOOKED'));
 assert(ui.includes('<MR0002RfRouteReconciliation0553 site={g.site}/>'));
 assert(location.includes('<BulkMrLocationCoverage0553 mr="MR-0001" site={site} detail/>'));
 console.log("PASS 0553 BULK MR / Location: 7×4 groups, 17 active, 7 original A5 floor rows THB260232 non-additive, MGW Rev2, source-linked table/filter/Row11, no changed cost");
