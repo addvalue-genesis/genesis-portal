@@ -9,7 +9,8 @@ const fmt=x=>Number.isFinite(x)?x.toLocaleString("en-US",{minimumFractionDigits:
 const stateText={
  BOOKED_PARTIAL:"A5 ORIGINAL / PARTIAL",
  VENDOR_INCLUDED:"VENDOR INCLUDED — NON-ADDITIVE",
- ADDVALUE_PROPOSED:"ADDVALUE NEK FIELD BULK — PROPOSED / NOT BOOKED",
+ ADDVALUE_PROPOSED:"ADDVALUE NEK FIELD BULK — LEGACY PROPOSAL",
+ BULK_RESERVE_CANDIDATE:"ADDVALUE NEK — CONDITIONAL BULK SPARE / NOT BOOKED",
  NEEDS_QUANTITY:"QTY / ROUTE REQUIRED",
  NEEDS_RATE:"PRICE EVIDENCE REQUIRED",
  SCOPE_REVIEW:"VERIFY OWNER / INCLUSION",
@@ -28,7 +29,7 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
   <p className="p55-note"><strong>One MR × Location view:</strong> physical field BULK and supplier-included assemblies are separate from priced equipment.
    Only MR0001 has seven booked source A5 partial floors (THB {fmt(view.originalA5BookedTHB)} total — already inside A1/A5 presentation).
    <strong> This page posts THB 0 additional</strong>. A quantity or quote in this table is evidence, not a released purchase or customer sell price.
-   Non-applicable MR/Location pairs are not automatically purchased. Selected MGW supply for MR0002–MR0004 remains MGW P26-058_R2 combined. ADDVALUE NEK is a separate proposed Field BULK selection, not a replacement for the MGW FORLLER package unless credit/substitution is approved.</p>
+   Non-applicable MR/Location pairs are not automatically purchased. Selected MGW supply for MR0002–MR0004 remains MGW P26-058_R2 combined. MGW is responsible for functional installed RF cabling as complete-system scope; ADDVALUE NEK is a separate optional installation BULK spare reserve. No automatic replacement, no installation shortfall transfer and no B10/C2 double count.</p>
   <div className="p55-table-wrap p553-module-scroll">
    <table className="p55-table p55-table--compact p55-table--budget">
     <thead><tr><th>+/−</th><th>Location / MR</th><th>Source / Module ID</th><th>BULK functions</th>
@@ -59,7 +60,7 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
            <td className="is-number">{Number.isFinite(item.rateTHB)?"THB "+fmt(item.rateTHB):item.state==="VENDOR_INCLUDED"?"INCLUDED / NO EXTRA RATE":"NOT ESTABLISHED"}
             {Number.isFinite(item.existingBookedTHB)&&<small>A5 source THB {fmt(item.existingBookedTHB)} — NOT extra</small>}</td>
            <td>{item.owner}<small>{item.state==="VENDOR_INCLUDED"?"Selected MGW package or original factory owner":"Confirm physical owner before working-cost revision"}</small></td>
-           <td><strong>{stateText[item.state]||item.state}</strong><small>{item.approvedProcurement?"Procurement selected":"NOT PROCUREMENT-APPROVED"}</small>{item.revisionConflictState&&<small><strong>RF DATASHEET REVISION HOLD — SM000111 Rev6 vs NEK Rev9 (not FORLLER)</strong></small>}</td>
+           <td><strong>{stateText[item.state]||item.state}</strong><small>{item.approvedProcurement?"Procurement selected":item.state==="BULK_RESERVE_CANDIDATE"?"SPARE RESERVE — PENDING APPROVAL":"NOT PROCUREMENT-APPROVED"}</small>{item.revisionConflictState&&<small><strong>RF DATASHEET REVISION HOLD — SM000111 Rev6 vs NEK Rev9 (not FORLLER)</strong></small>}</td>
            <td>{item.detail}<small>Evidence: {/^https:/.test(item.source)?<a href={item.source} target="_blank" rel="noopener noreferrer">Open source quotation / manufacturer page</a>:item.source}</small>{item.evidenceFile&&<small><strong>Attached engineering evidence: {item.evidenceFile} / page {item.evidencePage??"?"} / Rev {item.evidenceRevision||"not stated"}</strong></small>}{item.technicalPdfUrl&&<small><a href={item.technicalPdfUrl} target="_blank" rel="noopener noreferrer">NEK manufacturer RF LLF half-inch SHF1 Rev9 PDF — candidate only, not FORLLER certification</a></small>}</td>
           </tr>)}
           {shown.length===0&&<tr><td colSpan={6}>No applicable physical BULK row under this MR / Location / status filter. This is not a confirmed zero-cost allocation; check MR scope.</td></tr>}
