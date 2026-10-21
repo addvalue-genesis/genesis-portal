@@ -8,6 +8,7 @@ const fmt=x=>Number.isFinite(x)?x.toLocaleString("en-US",{minimumFractionDigits:
 const stateText={
  BOOKED_PARTIAL:"A5 ORIGINAL / PARTIAL",
  VENDOR_INCLUDED:"VENDOR INCLUDED — NON-ADDITIVE",
+ ADDVALUE_PROPOSED:"ADDVALUE NEK FIELD BULK — PROPOSED / NOT BOOKED",
  NEEDS_QUANTITY:"QTY / ROUTE REQUIRED",
  NEEDS_RATE:"PRICE EVIDENCE REQUIRED",
  SCOPE_REVIEW:"VERIFY OWNER / INCLUSION",
@@ -26,7 +27,7 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
   <p className="p55-note"><strong>One MR × Location view:</strong> physical field BULK and supplier-included assemblies are separate from priced equipment.
    Only MR0001 has seven booked source A5 partial floors (THB {fmt(view.originalA5BookedTHB)} total — already inside A1/A5 presentation).
    <strong> This page posts THB 0 additional</strong>. A quantity or quote in this table is evidence, not a released purchase or customer sell price.
-   Non-applicable MR/Location pairs are not automatically purchased. Selected MR0002–MR0004 source: MGW P26-058_R2 combined.</p>
+   Non-applicable MR/Location pairs are not automatically purchased. Selected MGW supply for MR0002–MR0004 remains MGW P26-058_R2 combined. ADDVALUE NEK is a separate proposed Field BULK selection, not a replacement for the MGW FORLLER package unless credit/substitution is approved.</p>
   <div className="p55-table-wrap p553-module-scroll">
    <table className="p55-table p55-table--compact p55-table--budget">
     <thead><tr><th>+/−</th><th>Location / MR</th><th>Source / Module ID</th><th>BULK functions</th>
@@ -42,8 +43,8 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
         <td><ComponentCopyId projectId="PJ2608-0553" componentKey={g.moduleId} componentName={g.site+" "+g.mr+" BULK Material"}/>
           <small>{g.sourceMtoRow!==null?"Original MR0001 MTO Bulk Row "+g.sourceMtoRow:"Per-system field interface register (no fabricated MTO source row)"}</small></td>
         <td className="is-number">{shown.length} / {g.items.length}<small>{g.scopeReview} owner/inclusion reviews</small></td>
-        <td className="is-number">{shown.filter(i=>i.state==="NEEDS_QUANTITY").length}</td>
-        <td className="is-number">{shown.filter(i=>i.state==="NEEDS_RATE").length}</td>
+        <td className="is-number">{shown.filter(i=>i.state==="NEEDS_QUANTITY"||(i.state==="ADDVALUE_PROPOSED"&&i.qty===null)).length}</td>
+        <td className="is-number">{shown.filter(i=>i.state==="NEEDS_RATE"||(i.state==="ADDVALUE_PROPOSED"&&!Number.isFinite(i.rateTHB))).length}</td>
         <td className="is-number">{shown.filter(i=>i.state==="VENDOR_INCLUDED").length}</td>
         <td className="is-number">{Number.isFinite(g.bookedA5THB)?fmt(g.bookedA5THB):"N/A"}<small>{g.mr==="MR-0001"?"Reclassified once / NOT additive":"No source A5 posting"}</small></td>
        </tr>
