@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-21-R06";
+export const CHANGE_LOG_VERSION_0553="2026-10-21-R07";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261021-10",date:"2026-10-21",kind:"UI",tone:"navigation",
+  title:"แก้ B3/B8 Seven-day SSR ราคาเก่าและ Warning ที่ B/C Owner Price Trace",
+  detail:"ปรับ Regression Seven-day Scenario ให้เทียบราคาจาก Current Data Model หลัง MGW Purchased FAT: B3 proposed THB2755525, B8 THB37800, Combined THB2793325; เก็บ Non-posting และ Customer Release HOLD. แก้ Native details ใน BcOwnerPriceTrace ให้ใช้ open แทน defaultOpen โดยไม่เปลี่ยน Canonical Working SELL หรือค่า SAT.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.fat-training-7d-allocation","bid.budget.working.bc.b8.integrated-fat-training-7d","bid.budget.working.bc.b8.price-trace"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"validate-0553-b3-b8-seven-day-identity.cjs / BcOwnerPriceTrace0553.jsx"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261021-09",date:"2026-10-21",kind:"UI",tone:"navigation",
   title:"แก้ Warning details.defaultOpen และ Regression ลำดับ B3.1–B3.4",
