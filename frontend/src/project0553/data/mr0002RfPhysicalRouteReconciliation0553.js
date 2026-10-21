@@ -88,10 +88,11 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
   const eq=(tag)=>found?.equipment.find(x=>x.system==="DTRS_TRUNK_RADIO"&&x.tag===tag);
   const expected=["ANT-508-001","ANT-508-002","TCAB-508-001","TCAB-508-002"];
   const missingTags=expected.filter(t=>!eq(t));
+  const routeTag=x=>String(x).split(" / ")[0];
   const circuits=paths.map(p=>({
    ...p,site,moduleId:"bid.budget.bom."+site.toLowerCase()+".mr0002.rf-route."+p.id.toLowerCase(),
-   fromDeck:eq(p.from)?.deck||eq("TCAB-508-001")?.deck||"NOT LOCATED",
-   toDeck:eq(p.to)?.deck||eq("ANT-508-002")?.deck||"NOT LOCATED",
+   fromDeck:eq(routeTag(p.from))?.deck||"NOT LOCATED",
+   toDeck:eq(routeTag(p.to))?.deck||"NOT LOCATED",
    sourceSheet:siteLayoutSheets[site],routeSegmentsM:null,verifiedInstalledM:null,
    verifiedTerminationEnds:null,verifiedConnectors:null,
    cableSku:null,cableOemAccepted:false,
