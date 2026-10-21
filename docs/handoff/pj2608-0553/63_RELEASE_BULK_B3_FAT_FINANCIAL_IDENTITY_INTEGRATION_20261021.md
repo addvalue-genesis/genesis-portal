@@ -130,3 +130,42 @@ Do not merge before CI/local build and management review.
   execute `npm run validate:0553-b9-china-budget`,
   `npm run validate:0553-fat-cost-owner-contract` and `npm run build`
   on a clean, updated worktree. No unobserved PASS claims.
+
+
+## 2026-10-21 B3 SAT UI runtime crash after purchased FAT addition
+User screenshot at http://localhost:3000/projects/pj2608-0553 showed
+`B3 SAT timebox + VeEX + MGW FAT must reconcile to canonical B3 Working SELL`
+from `B3SiteMrSatCoverage0553.jsx` line 38.
+
+**Root cause**: a stale **React view-only reconciliation guard** summed only
+`selectB3SiteMrSatCoverage0553().priceProof.offshoreWorkingSellTHB` THB2,046,000
+(including SAT labour THB2,016,000 + VeEX THB30,000) and
+`workingRow.b3ChinaFatBudget.fatWorkingSellTHB` THB397,400, yielding prior
+B3 THB2,443,400. The canonical selected B3 increased by **already-posted**
+MGW iFAT/FAT Facility purchased service Working SELL THB307,125; expected
+selected B3 is THB2,750,525. The source SAT matrix itself was still correct.
+
+**Targeted fix** (no price modification): read
+`workingRow.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB`
+directly from canonical 10.2, require MGW quote USD7500/THB236250 and
+`includedInB3WorkingSell===true`, and reconcile
+`2046000+397400+307125=2750525`. Add separate VQ-MGW iFAT/Facility
+source-to-WS row in the visible SAT matrix reconciliation table.
+Keep all 40 SAT days, 80 MD, 21 nonposting test IDs unchanged. Reject both
+double-posted and missing MGW purchased source.
+Regression additions in `frontend/scripts/validate-0553-b3-sat-matrix-price-trace.cjs`
+SSR render, price row evidence, missing source and double-post rejection.
+
+**Local validation required**:
+```powershell
+git fetch origin
+git status -sb
+# Use clean worktree and origin/integrate/pj2608-0553-mgw-fat-financial-identity-20261021
+cd frontend
+npm run validate:0553-b3-sat-matrix-price-trace
+npm run validate:0553-current-commercial-integration
+npm run build
+```
+Browser localhost:3000 may be served by the previously started webpack process.
+Check listener PID before deciding to restart it; do not kill unrelated Node processes.
+No local Node/Webpack/browser run has been observed by the assistant; do not claim PASS.
