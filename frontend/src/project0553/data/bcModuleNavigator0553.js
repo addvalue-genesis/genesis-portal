@@ -41,6 +41,14 @@ export function buildBcModuleNavigator0553(){
    anchorModuleId:row.moduleId
   }))
  ];
+ // The same read-only financial identity matrix is available under all 16 B/C owner IDs.
+ entries.push(...bc.rows.map(r=>({
+  id:r.moduleId+".financial-identity",
+  name:r.code+" — SOW / VQ / IC / WS / CP Financial Identity (working, not released)",
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:r.moduleId+".financial-identity",
+  keywords:r.code+" SOW VQ IC WS CP vendor quote internal cost working sell customer proposal release hold"
+ })));
  // Nested B1 work-type modules come directly from the canonical B1 support plan.
  // UI numbering B1.1–B1.8 is not a new cost posting; B1.A is an audit namespace.
  const b1=bc.byCode.B1.b1SupportPlanningBudget;
@@ -110,12 +118,12 @@ export function buildBcModuleNavigator0553(){
   child(b3Id+".tools","B3.3 — Temporary Test Equipment (B3) vs B11 O&M Special Tools",
    b3Id+".tools","VeEX rental B11 tool boundary"),
   child(b3Id+".audit","B3.4 — Working Sell and Contract Cost Audit",b3Id+".audit","19 requirements price trace"),
-  child(b3Id+".mgw-r2-cover-20261020","B3.1.1 — MGW FAT iFAT / Facility Vendor Evidence"),
+  child(b3Id+".mgw-r2-cover-20261020","B3.1.1 — MGW SERV-2/4 Purchased FAT · VQ-MGW source and WS-B3 THB307125"),
   child(b3Id+".fat-owner-transfer","B3.4.4 — Rev05 Historic FAT Owner Reference (Audit Only)"),
   child(b3Id+".fat-training-7d-allocation","B3.4.5 — Seven-day FAT + Training Unapproved Scenario / IC-FAT-001 / CP-B3 NOT ISSUED"),
   child(b3Id+".test-tools-ownership","B3.3.2 — Test Tools / B11 Cost Ownership"),
   child(b3Id+".source-cost-audit","B3.4.3 — Historical Source and Cost Evidence"),
-  child(b3Id+".working-sell-breakdown","B3 — Working SELL THB 2,443,400 Breakdown"),
+  child(b3Id+".working-sell-breakdown","B3 — Working SELL THB 2,750,525 Breakdown"),
   child(b3Id+".40-day-abc","B3 — Offshore SAT/SIT 40-Day Working Basis",
    b3Id+".40-day-abc","offshore 40 days two specialists site SAT"),
   child(b3Id+".veex-mx100","B3 — VeEX MX100+ Temporary Test Rental",
