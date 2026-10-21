@@ -8,7 +8,12 @@ export function selectScopePartBcWorking0553(){
  const lines=Object.fromEntries(canonical.rows.map(r=>{
   const workingSellKnown=Number.isFinite(r.workingSellTHB);
   return [r.code,{
-   code:r.code,amountTHB:r.workingSellTHB, // Legacy name; this is WORKING SELL only, NEVER cost.
+   code:r.code,financialIdentity:Object.freeze({
+    scopeId:"SOW-"+r.code,workingSellId:"WS-"+r.code,customerProposalId:"CP-"+r.code,
+    customerProposalState:"NOT_ISSUED_RELEASE_HOLD",
+    mgwPurchasedVendorQuoteIds:r.code==="B3"?(r.b3MgwPurchasedFatWorkingSell?.quoteLines.map(q=>q.vendorQuoteId)||[]):[],
+    mgwPurchasedWorkingSellTHB:r.code==="B3"?(r.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB??null):null
+   }),amountTHB:r.workingSellTHB, // Legacy name; this is WORKING SELL only, NEVER cost.
    directCostTHB:r.directCostTHB,
    workingSellTHB:r.workingSellTHB,
    commercialSellTHB:r.commercialSellTHB,
