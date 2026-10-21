@@ -671,3 +671,56 @@
 .p553-dashboard .p553-pricing-stage:hover,.p553-dashboard .p553-pricing-stage:focus-visible{outline:2px solid var(--stage-accent);outline-offset:2px}
 .p553-dashboard .p553-pricing-stage.is-active{box-shadow:0 0 0 2px var(--stage-accent) inset}
 @media(max-width:700px){.p553-dashboard .p553-pricing-stage-nav{min-width:100%}}
+
+
+/* PJ2608-0553 / Budget What's New: read-only color-coded hierarchical change audit.
+   Colors represent CHANGE TYPE; never use them as approval / price-release signals. */
+.p553-dashboard .p553-changes{border:1px solid #cedce8;border-left:5px solid #24648e;background:#fff}
+.p553-dashboard .p553-changes-top{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.p553-dashboard .p553-changes-title{display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.p553-dashboard .p553-changes-title h3{margin:0;color:#183b59;font-size:17px}
+.p553-dashboard .p553-changes-title .p553-changes-new{display:inline-block;border-radius:6px;
+ background:#fdf3df;border:1px solid #e9c58c;color:#885514;font-weight:800;font-size:10px;padding:5px 8px}
+.p553-dashboard .p553-changes-top .p55-note{margin:6px 0;color:#52697e}
+.p553-dashboard .p553-changes-actions{display:flex;flex-wrap:wrap;gap:7px}
+.p553-dashboard .p553-changes-actions button{padding:7px 9px;border:1px solid #abc5d6;border-radius:6px;
+ background:#eef6fb;color:#225574;font-size:12px;font-weight:750;cursor:pointer}
+.p553-dashboard .p553-changes-actions button[disabled]{cursor:default;opacity:.6}
+.p553-dashboard .p553-changes-groups{margin-top:12px;display:grid;gap:9px}
+.p553-dashboard .p553-changes-group{--change-accent:#205f9b;--change-tint:#eaf3fe;border:1px solid #d2e0eb;
+ border-left:5px solid var(--change-accent);border-radius:8px;overflow:hidden;background:#fff}
+.p553-dashboard .p553-changes-group--ui{--change-accent:#205f9b;--change-tint:#edf4fc}
+.p553-dashboard .p553-changes-group--data{--change-accent:#ac6a14;--change-tint:#fff7ec}
+.p553-dashboard .p553-changes-group>summary{display:flex;align-items:center;flex-wrap:wrap;gap:12px;
+ background:var(--change-tint);padding:12px 13px;cursor:pointer;list-style:none}
+.p553-dashboard .p553-changes-group>summary::-webkit-details-marker{display:none}
+.p553-dashboard .p553-changes-group>summary::before{content:"＋";color:var(--change-accent);border:1px solid var(--change-accent);
+ border-radius:4px;min-width:22px;text-align:center;font-size:15px}
+.p553-dashboard .p553-changes-group[open]>summary::before{content:"−"}
+.p553-dashboard .p553-changes-group>summary strong{color:#243b50;font-size:13px}
+.p553-dashboard .p553-changes-group>summary small{font-size:11px;color:#526c80}
+.p553-dashboard .p553-changes-group>summary code{font-size:10px;color:#597185;overflow-wrap:anywhere}
+.p553-dashboard .p553-changes-table{min-width:920px;table-layout:fixed}
+.p553-dashboard .p553-changes-table th:nth-child(1){width:16%}
+.p553-dashboard .p553-changes-table th:nth-child(2){width:34%}
+.p553-dashboard .p553-changes-table th:nth-child(3){width:34%}
+.p553-dashboard .p553-changes-table th:nth-child(4){width:16%}
+.p553-dashboard .p553-changes-item{--change-row-accent:#2870aa}
+.p553-dashboard .p553-changes-item--pricing{--change-row-accent:#a96b20}
+.p553-dashboard .p553-changes-item td:first-child{border-left:4px solid var(--change-row-accent)}
+.p553-dashboard .p553-changes-item td{font-size:11px;vertical-align:top;overflow-wrap:anywhere}
+.p553-dashboard .p553-changes-item td small{display:block;margin-top:4px;font-size:10px}
+.p553-dashboard .p553-changes-row>summary{cursor:pointer;color:var(--change-row-accent);font-weight:750;font-size:12px}
+.p553-dashboard .p553-changes-row p{padding:8px;margin:6px 0;background:#f5f9fc;border-radius:5px;line-height:1.5}
+.p553-dashboard .p553-changes-module{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin:0 0 6px}
+.p553-dashboard .p553-changes-module-open{display:inline-flex;align-items:center;gap:6px;max-width:100%;
+ font-size:11px;line-height:1.35;border:1px solid #a7c5da;border-radius:5px;color:#1e547b;background:#eef6fc;
+ padding:6px;cursor:pointer;text-align:left}
+.p553-dashboard .p553-changes-module-open code{font-family:ui-monospace,Consolas,monospace;
+ white-space:normal;overflow-wrap:anywhere;color:inherit;font-size:10px}
+.p553-dashboard .p553-changes-module-open:hover,.p553-dashboard .p553-changes-module-open:focus-visible{
+ outline:2px solid #2a779f;outline-offset:1px}
+.p553-dashboard .p553-changes-module .gns-copy-id{display:inline-flex;flex-wrap:wrap;gap:4px}
+.p553-dashboard .p553-changes-impact--none{color:#516c7b}
+.p553-dashboard .p553-changes-impact--changed{color:#905719}
+@media(max-width:720px){.p553-dashboard .p553-changes-actions{width:100%}.p553-dashboard .p553-changes-title h3{font-size:15px}}
