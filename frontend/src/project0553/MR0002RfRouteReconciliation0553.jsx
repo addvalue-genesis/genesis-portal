@@ -31,12 +31,12 @@ export function MR0002RfRouteReconciliation0553({site}){
     <thead><tr><th>RF Material Owner</th><th>Feeder m/site</th><th>Connector pcs/site</th><th>Interpretation</th><th>Cost status</th></tr></thead>
     <tbody>
      <tr><td><strong>MGW / FORLLER — UHF-4</strong></td><td>100 m quoted included</td><td>6 included</td>
-      <td>One site package pool; usable reel/cut allocation, IEC60331 and RF interface compatibility still unverified</td><td>VENDOR INCLUDED · no second cost</td></tr>
-     <tr><td><strong>ADDVALUE / NEK — Proposed Field BULK</strong></td><td><strong>NOT VERIFIED</strong><small>Net of MGW accepted package</small></td><td>NOT VERIFIED</td>
-      <td>Proposed by ADDVALUE, NOT MGW. A separate installed run OR documented replacement/credit must be established before purchase</td><td>NO RATE / NO WORKING POST</td></tr>
+      <td>MGW complete system includes functional installed RF feeder; verify reel/cut allocation, IEC60331 and RF interfaces. Any cable shortage is MGW corrective scope.</td><td>VENDOR INCLUDED · complete-system owner</td></tr>
+     <tr><td><strong>ADDVALUE / NEK — Conditional BULK Spare Reserve</strong></td><td><strong>NOT APPROVED</strong><small>Independent spare/installation contingency quantity; NOT net installation length</small></td><td>NOT APPROVED</td>
+      <td>Internal spare for cutting/handling damage or contingency only if management approves; does not replace MGW installation obligation and is distinct from B10/C2 spares</td><td>NO APPROVED QTY / RATE / WORKING POST</td></tr>
      <tr><td><strong>Scenario: 2 provisional RF paths</strong></td>
       <td>{data.scenario.referenceTotalPurchaseM} m total illustrative</td><td>At least 4 main terminal ends (not a final connector count)</td>
-      <td>~{fmt(data.scenario.referenceTotalInstalledM)} m physically assumed; 2 × {data.scenario.referenceMPerCircuit} m and 15% purchasing allowance. If MGW 100m is fully compatible and pooled, theoretical additional feeder is 0m; NOT engineering proof</td>
+      <td>~{fmt(data.scenario.referenceTotalInstalledM)} m illustrative installed MGW functional scope, 2 × {data.scenario.referenceMPerCircuit}m +15%. Not a request for ADDVALUE to buy NEK; reserve sizing is an INDEPENDENT decision.</td>
       <td>ILLUSTRATIVE ONLY · no booking</td></tr>
     </tbody>
    </table>
@@ -44,9 +44,9 @@ export function MR0002RfRouteReconciliation0553({site}){
   <p className="p55-note"><strong>Compliance HOLD:</strong> {data.compliance.scope}. SPE Rev.C2 §6.3 requires FIRE RESISTANT DMR RF coaxial cable.
    NEK SM000111 Rev6 lists IEC60332 flame retardancy, not IEC60331 fire resistance; MGW/FORLLER does not yet have verified fire-resistance certificate either.
    The 7/8-inch cable rule for remote ODU-to-antenna greater than 5m is a separate applicability check, not an automatic BDA requirement.</p>
-  <p className="p55-note"><strong>Actual ADDVALUE NEK purchase: NOT DETERMINED</strong> — cannot call it 0m or 28m for procurement until measured paths,
-   approved Ex/FIRE cable, compatible usable MGW supply and commercial owner/credit are resolved.
-   Quote cost and A5/B/C/customer price remain unchanged.</p>
+  <p className="p55-note"><strong>MGW vendor corrective responsibility:</strong> an actual installed-route shortfall or nonconformance belongs to MGW's complete-system scope; supplier must remedy/clarify.
+   <strong> ADDVALUE NEK BULK Spare Reserve: NOT DETERMINED</strong> — determine only from a separately approved spare/handling contingency policy, compliant cable and independent price evidence.
+   Do not derive NEK reserve from the two functional RF route lengths. B10 commissioning and C2 long-term spares are separate ledgers. MGW/A5/B/C/customer price unchanged.</p>
   <small>Documents:
    {" "}<a href={data.mgw.source} target="_blank" rel="noopener noreferrer">MGW UHF-4 Quote</a>
    {" · "}<a href={deriveMR0002RfPhysicalRouteReconciliation0553().source.customerMR.url} target="_blank" rel="noopener noreferrer">MR0002 C1</a>
