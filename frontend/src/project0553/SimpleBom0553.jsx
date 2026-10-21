@@ -83,7 +83,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
  // Data models remain read-only; this effect only changes local filter controls.
  React.useEffect(()=>{
   if(!navigationTarget?.startsWith("bid.budget.bom."))return;
-  const match=navigationTarget.match(/^bid\\.budget\\.bom\\.(zwp20|zwp21|zwp22|zwp23|zpq|zwp8|zwp11)\\.(mr000[1-4])\\./i);
+  const match=navigationTarget.match(/^bid\.budget\.bom\.(zwp20|zwp21|zwp22|zwp23|zpq|zwp8|zwp11)\.(mr000[1-4])\./i);
   if(match){
    setSystem(match[2].toUpperCase().replace("MR000","MR-000"));
    setManualSite(match[1].toUpperCase());
