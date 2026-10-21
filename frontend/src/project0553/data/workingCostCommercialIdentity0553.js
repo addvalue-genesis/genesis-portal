@@ -56,6 +56,6 @@ export function makeInternalCostLineId0553(contractCode,sourceSuffix){
   !/^[A-Z][A-Z0-9-]*$/.test(sourceSuffix))
   throw Error("Invalid unique internal FAT/YARD source activity");
  const prefix=contractCode==="B3"?"FAT":"YARD";
- const normalized=sourceSuffix.startsWith("YARD-")?sourceSuffix.slice(5):sourceSuffix;
+ const normalized=sourceSuffix.replace(/^(?:FAT|YARD)-/,"");
  return "IC-"+prefix+"-"+normalized+"-001";
 }
