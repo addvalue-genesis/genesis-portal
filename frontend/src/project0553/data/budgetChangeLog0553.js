@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-21-R08";
+export const CHANGE_LOG_VERSION_0553="2026-10-21-R09";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261021-12",date:"2026-10-21",kind:"DATA_FLOW",tone:"pricing",
+  title:"B3/B8 ห้าวัน + SAT Lean 28+2 + B9 Conditional + Customer Mapping Audit",
+  detail:"เพิ่ม Nonposting Five-day China FAT/Training Allocation จาก 8 Expense IDs (1/2 trainer); SAT Lean 28+2 ผูก 21 Test IDs และรวม MGW Purchased FAT THB307125 ครั้งเดียว. 10.4 ตรวจ A/B/C Current Projection ไปยัง 10.3/10.5/Native; Preview ใช้ชื่อรายการจาก Original Workbook และ B9 THB233600 ยังเป็น Conditional, Base Zero. B3 2750525, B8 30000, B9 0 และ Part B 4151836.82 ไม่เปลี่ยน. Full npm build ยังไม่ยืนยัน; Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3","bid.budget.working.bc.b8","bid.budget.working.bc.b9","bid.budget.mapping","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"ADR-64 / MGW P26-058_R2 / original 4-Scope of Supply.xlsx / existing 10.2 price authority"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261021-11",date:"2026-10-21",kind:"DATA_FLOW",tone:"pricing",
   title:"B1 Role Support Regression: ตรวจยอด Part B หลัง B2 Reprice และ MGW FAT",
