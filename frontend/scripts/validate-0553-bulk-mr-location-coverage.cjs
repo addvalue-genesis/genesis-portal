@@ -53,6 +53,30 @@ const zwp20=model.groups.find(g=>g.mr==="MR-0002"&&g.site==="ZWP20");
 assert(zwp20.items.find(x=>x.id==="YAGI-EX-RF")?.detail.includes("Full combined Rev2"));
 assert(zwp20.items.find(x=>x.id==="FEEDER-KIT")?.qty===100);
 assert(zwp20.items.find(x=>x.id==="FEEDER-CONNECTORS")?.qty===6);
+const {MR0002_RF_FEEDER_QUALIFICATION_0553:rf,deriveMR0002RfFeederQualification0553:rfSite,rfLossAt450Db0553}=require(path.join(root,"project0553/data/mr0002RfFeederQualification0553.js"));
+assert.equal(rf.selectedQuotedManufacturer,"FORLLER");
+assert.equal(rf.selectedQtyPerSiteM,100);
+assert.equal(rf.selectedConnectorQtyPerSite,6);
+assert.equal(rf.candidate.manufacturer,"NEK Kabel AS");
+assert.equal(rf.candidate.revision,9);
+assert.equal(rf.candidate.attenuation450DbPer100M,6);
+assert.equal(rf.candidate.nominalOdMm,16);
+assert.equal(rf.candidateStatus,"NEK_TECHNICAL_COMPARABLE_ONLY__NOT_SELECTED_SUBSTITUTION");
+assert.equal(rf.pricePostingAllowed,false);
+assert.equal(rfLossAt450Db0553(100,6),6);
+assert.equal(rfLossAt450Db0553(100,4.749),4.749);
+assert.equal(rfSite("ZWP20").candidateLoss450DbAtIncludedQty,6);
+assert.equal(rfSite("ZWP23"),null);
+for(const site of ["ZWP20","ZWP21","ZWP22"]){
+ const g=model.groups.find(g=>g.mr==="MR-0002"&&g.site===site);
+ const o=g.items.find(x=>x.id==="FEEDER-NEK-TECHNICAL-COMPARABLE");
+ assert(o&&o.state==="SCOPE_REVIEW");
+ assert(o.technicalPdfUrl===rf.candidate.datasheet);
+ assert(o.quotedManufacturer==="FORLLER"&&o.selectedSupplierChanged===false);
+ assert(g.items.find(x=>x.id==="FEEDER-KIT")?.state==="VENDOR_INCLUDED");
+ assert(g.items.find(x=>x.id==="FEEDER-KIT")?.qty===100);
+}
+
 assert(zwp20.items.some(x=>x.id==="BDA-RF-PORTS"&&x.state==="SCOPE_REVIEW"));
 assert(!zwp20.items.some(x=>/LNA-RX3852|MOT_SELECTED/i.test(x.id)));
 const phone=model.groups.find(g=>g.mr==="MR-0003"&&g.site==="ZWP23");
