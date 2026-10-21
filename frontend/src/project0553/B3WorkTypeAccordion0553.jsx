@@ -7,6 +7,9 @@ import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
 import {selectB3HierarchicalPriceTable0553,B3_PRICE_ROW_CLASSES_0553 as PRICE_CLASS} from "./data/b3HierarchicalPriceTable0553";
+import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
+import {selectB3B8SevenDayCommercialAllocation0553} from "./data/b3B8SevenDayCommercialAllocation0553";
+import {B3B8SevenDayAllocation0553} from "./B3B8SevenDayAllocation0553";
 
 // 10.2 B3 — real TABLE for groups and nested MODULES, one read-only source model.
 // Table shows all prices even when details are collapsed. Native details preserves
@@ -23,7 +26,7 @@ const copyInSummary=id=><span className="p553-b3-table-copy"
 const qtyUnit=row=>row.qty===null?"—":row.qty.toLocaleString("en-US")+" "+(row.unit||"");
 const rateSource=row=>row.unitRateTHB===null?"":money(row.unitRateTHB)+" / "+(row.unit||"unit");
 const gridColumns=Object.freeze(["No.","Work Type / Module ID","Qty / Rate","MGW Quote USD",
- "MGW Source THB","Historical / Audit THB","B3 Working SELL THB","Treatment / Owner"]);
+ "MGW Source THB","Historical / Scenario / Audit THB","B3 Working SELL THB","Treatment / Owner"]);
 function TablePriceCells0553({row,number,title,isGroup=false,fx}){
  const quote=Number.isFinite(row.vendorQuoteUSD)?row.vendorQuoteUSD:null;
  const sourceThb=quote===null?null:Math.round((quote*fx+Number.EPSILON)*100)/100;
@@ -49,11 +52,14 @@ function TablePriceCells0553({row,number,title,isGroup=false,fx}){
   <span className="p553-b3-table-cell p553-b3-table-treatment">
    <small>{isGroup?"GROUP ROLL-UP · B3 ONLY":row.status}</small>
    <small>{row.owner||"B3"}</small>
+   <small>{row.priceClass===PRICE_CLASS.SUPPLIER_QUOTE_REFERENCE?
+    "VQ-MGW / SOURCE ONLY":row.priceClass===PRICE_CLASS.INCLUDED_WORKING_SELL?
+    "SOW-B3 | WS-B3 | CP-B3 NOT ISSUED":"IC / AU / SC — NON-POSTING"}</small>
   </span>
  </>;
 }
 
-function B3DetailContents0553({item,workingRow,navigationTarget,auditContent}){
+function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditContent}){
  const suffix=item.moduleId.slice(ROOT.length+1);
  const sat=workingRow.b3FortyDayBudget,fat=workingRow.b3ChinaFatBudget,veex=sat.veex;
  switch(suffix){
@@ -120,6 +126,8 @@ function B3DetailContents0553({item,workingRow,navigationTarget,auditContent}){
      componentKey="bid.budget.working.bc.b11"/>; tools included by MGW/OEM Part A
      cannot be billed a second time. Confirm SKU / TAG / SPIR / supplier inclusion.</p>
    </section>;
+  case "fat-training-7d-allocation":
+   return <B3B8SevenDayAllocation0553 b3={workingRow} b8={b8Row} owner="B3"/>;
   case "working-sell-breakdown":
    return <B3WorkingSellBreakdown0553 workingRow={workingRow}/>;
   case "requirement-crosswalk":
@@ -136,7 +144,9 @@ function B3DetailContents0553({item,workingRow,navigationTarget,auditContent}){
 export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditContent=null}){
  const rootRef=React.useRef(null);
  if(!workingRow||workingRow.code!=="B3")return null;
- const model=selectB3HierarchicalPriceTable0553(workingRow);
+ const b8Row=selectBcTurnkeyWorkingCost0553().byCode.B8;
+ const integratedScenario=selectB3B8SevenDayCommercialAllocation0553({b3:workingRow,b8:b8Row});
+ const model=selectB3HierarchicalPriceTable0553(workingRow,integratedScenario);
  const expandAll=open=>rootRef.current?.querySelectorAll(
   "details.p553-b3-table-group, details.p553-b3-table-item").forEach(node=>{node.open=open;});
  return <section className="p553-b3-worktype p553-b3-price-table-section"
@@ -199,7 +209,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
                </tr>)}</tbody>
               </table>
              </div>}
-             <B3DetailContents0553 item={item} workingRow={workingRow}
+             <B3DetailContents0553 item={item} workingRow={workingRow} b8Row={b8Row}
               navigationTarget={navigationTarget} auditContent={auditContent}/>
             </div>
            </details>
