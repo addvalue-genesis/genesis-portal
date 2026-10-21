@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-21-R10";
+export const CHANGE_LOG_VERSION_0553="2026-10-21-R11";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261021-14",date:"2026-10-21",kind:"DATA_FLOW",tone:"pricing",
+  title:"B3 Site Survey / B6 MR0001 China Assembly Inbound / B7 3-month Free Storage Audit",
+  detail:"B3 internal mapping shows Inspection / Site Survey / FAT / SAT; 7-site pre-SAT survey included in scope but survey cost/MD must be separately evidenced (no price posting). B6 SCADA 4 sets Enclosure + IDU + Cisco inbound to MGW Nantong scenario THB42797–72372, MGW SERV-5 USD2500 outbound already vendor quoted separately, no extra B6 price selected. B7 3 months FREE client requirement; MGW no dedicated storage charge/3-month guarantee, external pallet market reference and existing THB30000 one-month allowance kept; THB90000 full 3-month sensitivity nonposting. Current Part B THB4385436.82 unchanged; Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3","bid.budget.working.bc.b6","bid.budget.working.bc.b7","bid.budget.mapping","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"ADR-66 / MGW P26-058_R2 20-Oct-2026 / Original 4-Scope of Supply.xlsx / Flexport / China 3PL"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261021-13",date:"2026-10-21",kind:"PRICE",tone:"pricing",
   title:"B9 Specialist Assistance — Quoted Base 1 LS THB233600 ใน 10.3 Release Preview",
