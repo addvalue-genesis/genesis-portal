@@ -16,13 +16,13 @@ export function selectRevKAbcOwnershipControl0553(working){
  const b9=selectB9ChinaWorkingBudget0553();
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
- if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.workingSellTHB+b9.fatWorkingSellTHB+307125)||current.B9!==0||
-    working.knownWorkingSellTHB!==4151836.82 ||
+ if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.workingSellTHB+b9.fatWorkingSellTHB+307125)||current.B9!==b9.b9BaseWorkingSellTHB||
+    working.knownWorkingSellTHB!==4385436.82 ||
     working.byCode.B3?.workingSellTHB!==2750525 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))
-  throw Error("B9 current Base and optional Yard must be separate 1 LS");
+  throw Error("B9 quoted Base must be one LS with on-call execution; no second optional posting");
  // Rev05 Engineering price/hours are not a present B1 price; retain names only
  // for technical ownership checks against B2 VDRL, B3 ITP and OEM Part A.
  const b1Engineering=b1.engineeringScopeReview.map(x=>Object.freeze({
@@ -75,10 +75,10 @@ export function selectRevKAbcOwnershipControl0553(working){
  }));
  const chinaExpenses=b9.rows.map(x=>Object.freeze({
   id:"ABC-"+x.id,wbs:x.wbs,owner:x.costOwner,costObject:x.optional?"YARD_SPECIALIST_OPTION":"FAT_WITNESS_DIRECT_COST_ACTIVITY",
-  activity:x.description,site:x.optional?"JUTAL Zhuhai Yard optional trip":"MGW China FAT base trip",
+  activity:x.description,site:x.optional?"JUTAL Zhuhai Yard (quoted Base, on-call trip)":"MGW China FAT base trip",
   source:x.evidence,quantity:x.qty,unit:x.unit,workingSellRateTHB:x.unitRateTHB,
   modeledSellTHB:x.workingSellTHB,directCostTHB:null,
-  posting:x.optional?"CONDITIONAL_B9_1LS__EXCLUDED_FROM_BASE":"INCLUDED_IN_CANONICAL_B3_FAT__NOT_ADDITIVE",
+  posting:x.optional?"INCLUDED_IN_CANONICAL_B9_1LS__ON_CALL_EXECUTION_NONADDITIVE":"INCLUDED_IN_CANONICAL_B3_FAT__NOT_ADDITIVE",
   chargeKey:x.expenseKey
  }));
  const rows=Object.freeze([...b1Engineering,...pmEvents,...supportExpenses,...satSiteLines,satTool,...satObligations,...fatTasks,...chinaExpenses]);
@@ -105,7 +105,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   b3LaborSellTHB:b3.laborWorkingSellTHB,b3ToolSellTHB:b3.toolRentalWorkingSellTHB,
   b3MgwPurchasedFatWorkingSellTHB:307125,
   b9FatBaseTHB:0,b3FatWitnessSellTHB:fatTHB,b3FatWitnessDays:fat.estimatedFatWitnessDays,b9FatWitnessDays:fat.estimatedFatWitnessDays,
-  b9YardConditionalLumpSumTHB:yardTHB,
+  b9YardConditionalLumpSumTHB:yardTHB,b9YardQuotedInBaseTHB:current.B9,
   b9YardRole:b9.selectedYardRole,b9YardWorkdays:b9.selectedYardWorkingDays,
   b9YardTravelDays:b9.selectedYardTravelDays,b9YardCrew:b9.yardCallOutCrew,
   tracedObligations:trace.rows.length,
@@ -113,7 +113,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   postedWorkingSellDeltaTHB:0,postingAllowed:false,customerReleaseAllowed:false,
   sourceTrace:"BOD-C2/DTS-C1/SPE-C2/MR-C1 -> Rev.K K00-K18 -> 10.2 B1/B3/B9",
   gates:Object.freeze([
-   "SPE §7.3.2 Yard SAT mandatory under CONTRACTOR/VENDOR RACI; ADDVALUE one Sr Engineer 7d LS call-out only, optional standby free",
+   "SPE §7.3.2 Yard SAT mandatory under CONTRACTOR/VENDOR RACI; ADDVALUE one Sr Engineer 7d LS included in B9 customer Base, field attendance on signed call-out only, standby labour not charged",
    "B3 owns MGW FAT 6-day / 2-witness travel and engineering-cost events; manufacturer execution remains A. Signed ITP/TAG repetition pending",
    "Use 14d for management planning per SPE; BOD 30d notice conflict remains unresolved contract precedence HOLD",
    "Post Yard SAT loose-equipment transfer to ZPQ under SPE §7.3.2 conflicts with as-installed WH assumption; seek written TQ",
