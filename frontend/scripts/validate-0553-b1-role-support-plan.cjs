@@ -82,8 +82,9 @@ const roundTHB=v=>Math.round((v+Number.EPSILON)*100)/100;
 const historicalB1OnlyBaseTHB=4187590.69; // B1-current, B2 historical Rev05, B3 before MGW purchase.
 const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
  -(bc.previousB2Rev05ReferenceTHB-bc.byCode.B2.workingSellTHB)
- +bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB);
-assert.equal(historicalToCurrent,4151836.82,
+ +bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB
+ +bc.byCode.B9.workingSellTHB);
+assert.equal(historicalToCurrent,4385436.82,
  "Historical B1-only baseline to current B2/B3 price selection bridge failed");
 const sumBaseOwners=roundTHB(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
  .reduce((sum,r)=>sum+r.workingSellTHB,0));
@@ -91,7 +92,7 @@ assert.equal(bc.knownWorkingSellTHB,sumBaseOwners,
  "Canonical Part B Base must be the sum of unique selected base-scope B owners");
 assert.equal(bc.knownWorkingSellTHB,historicalToCurrent,
  "Part B Base must reconcile after B1 legacy exclusion, B2 131-WO reprice and MGW purchased FAT");
-assert.equal(bc.byCode.B9.workingSellTHB,0);
+assert.equal(bc.byCode.B9.workingSellTHB,233600);
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600);
 const jsx=fs.readFileSync(path.join(root,"project0553/B1RevKMilestoneBudget0553.jsx"),"utf8");
 for(const token of ["selectB1ProjectSupportBudget0553","model.accounts.map(","model.milestones.map(",
