@@ -34,7 +34,7 @@ const group=(number,kind,title,driver,items)=>Object.freeze({
  owner:"B3"
 });
 
-export function selectB3HierarchicalPriceTable0553(workingRow){
+export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario=null){
  if(!workingRow||workingRow.code!=="B3")return null;
  const b=selectB3WorkingSellBreakdown0553(workingRow);
  const fat=b.fat,offshore=b.offshore,veex=workingRow.b3FortyDayBudget.veex;
@@ -64,7 +64,13 @@ export function selectB3HierarchicalPriceTable0553(workingRow){
     "8 old team-days × THB18,000; replaced by China FAT; do not carry forward",
     C.HISTORICAL_REFERENCE,{historicalTHB:workingRow.b3FatOwnerTransfer.amountTHB,
      qty:8,unit:"historical team-days",unitRateTHB:18000,
-     owner:"B3 historical only",status:"SUPERSEDED — NON ADDITIVE"})
+     owner:"B3 historical only",status:"SUPERSEDED — NON ADDITIVE"}),
+   item("B3.1.4","fat-training-7d-allocation","7-Day Integrated FAT + Training — INTERNAL SCENARIO",
+    "B3/B8 shared 7 onsite team-days: 12 B3 FAT MD + 2 B8 training MD; 4 travel MD stay in B3 once",
+    C.NON_POSTING_AUDIT,{referenceTHB:integratedScenario?.proposedB3FatWorkingSellTHB??null,
+     qty:integratedScenario?.onSiteDays??null,unit:"shared on-site days",
+     owner:"IC-FAT-001 / IC-TRN-001 · B3/B8 cross-owner",
+     status:"SC-B3-FAT WHAT-IF; CP-B3/CP-B8 NOT ISSUED; no Working SELL posting"})
   ]),
   group("B3.2","sat","SAT / SIT — Offshore Site & Integration Tests",
    "7 locations + cross-site SIT / punch, 40 team-days shared across MR",[
