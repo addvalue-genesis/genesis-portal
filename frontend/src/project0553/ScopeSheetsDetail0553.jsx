@@ -52,6 +52,8 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
  const details=selectScopeSheet0553(category[1],{thbPerUsd:fx?.thbPerUsd}).rows;
  const linkedScopeCodes=new Set(SCOPE_BC_DETAIL_CODES_0553);
+  const pttepRepriceCodes=new Set(["B10","B11","B13","C1","C2"]);
+  // The five active lifecycle owners shall not display Rev08 prices on current Scope.
  const scopeSheetSources=Object.fromEntries([...linkedScopeCodes].map(code=>[code,selectScopeSheet0553(code,{thbPerUsd:fx?.thbPerUsd})]));
  // Current A2/A3/A4 use ONLY sourceMrProjection from the selected 10.1 BOM.
  // Working figures are live provisional cost evidence, not customer sell / released A1-A5.
@@ -136,11 +138,11 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
      const audit=scopePriceAudit.byCode[id]||null;
      const amount=working?working.amount:control?.workingSellTHB; // Current scope view never substitutes Rev08 price
      const mr={A1:"MR-0001",A2:"MR-0002",A3:"MR-0003",A4:"MR-0004",A5:"MR-0001–0004 / Bulk"}[id]||"";
-     const qty=id==="A5"?"1 LS ("+a5.rowCount+" MTO lots)":child?.quantity?"1 LS (Rev08: "+child.quantity+" historical item rows)":control?.qty!=null&&Number.isFinite(control.qty)?control.qty+" "+control.unit:"1 LS";
+     const qty=id==="A5"?"1 LS ("+a5.rowCount+" MTO lots)":child?.quantity?(pttepRepriceCodes.has(id)?"OEM SPIR quantity to derive":"1 LS (Rev08: "+child.quantity+" historical item rows)"):control?.qty!=null&&Number.isFinite(control.qty)?control.qty+" "+control.unit:"1 LS";
      return <tr key={id}><td><strong>{id}</strong>{mr&&<small>{mr}</small>}</td><td>{desc}</td><td>{qty}</td>
       <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(amount)?cash(amount):"Cost source pending"}</td>
       <td className="is-number">{id==="A5"?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(amount)?cash(amount):"Not established"}</td>
-      <td className="is-number">{audit?cash(audit.historicalReferenceTHB):"—"}<small>{audit?"HISTORICAL REV08 ONLY":"—"}</small></td>
+      <td className="is-number">{pttepRepriceCodes.has(id)?"NOT USED — new OEM re-estimate":audit?cash(audit.historicalReferenceTHB):"—"}<small>{pttepRepriceCodes.has(id)?"PTTEP current OEM price NOT ESTABLISHED":audit?"HISTORICAL REV08 ONLY":"—"}</small></td>
       <td>{child?.quantity?"CURRENT TURNKEY COST NOT ESTABLISHED · historical child detail is audit-only":working?working.status:control?.priceStatus||"No current verified cost"}
        <small>{child?.source||working?.source||control?.source||"No current source"}{mr?" · "+mr:""}</small></td>
      </tr>;
@@ -190,11 +192,11 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
    const audited=scopePriceAudit.byCode[id]||null;
    const shownAmount=amount;
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
-    hasChild?"1 LS (Rev08: "+childSource.quantity+" unverified historical item rows)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
+    hasChild?(pttepRepriceCodes.has(id)?"OEM SPIR quantity to derive":"1 LS (Rev08: "+childSource.quantity+" unverified historical item rows)"):control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
    return <tr key={id}><td>{audited?<button type="button" className="p553-detail-button" onClick={()=>setSheet(SHEETS.find(row=>row[1]===id)[0])}>{id} — View Details</button>:id}</td><td>{desc}</td><td>{qtyDisplay}</td>
     <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
     <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
-    <td className="is-number">{audited?cash(audited.historicalReferenceTHB):"—"}<small>{audited?"Rev08 HISTORICAL ONLY — not additive":""}</small></td>
+    <td className="is-number">{pttepRepriceCodes.has(id)?"NOT USED — new OEM re-estimate":audited?cash(audited.historicalReferenceTHB):"—"}<small>{pttepRepriceCodes.has(id)?"PTTEP current OEM price NOT ESTABLISHED":audited?"Rev08 HISTORICAL ONLY — not additive":""}</small></td>
     <td>{control&&<small><strong>{control.financialIdentity.scopeId}</strong> Scope ·
      <strong> {control.financialIdentity.workingSellId}</strong> Working SELL ·
      <strong> {control.financialIdentity.customerProposalId}</strong> NOT ISSUED
