@@ -151,7 +151,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
    </table></div>
    <details style={{marginTop:12}}><summary>รายละเอียดขอบเขตและการป้องกันคิดราคาซ้ำ</summary>
     <p className="p55-note">B1 เป็นเจ้าของงานตรวจเนื้อหาทางเทคนิคและการประสานงานโครงการ รวมถึง Regulatory/Permit support เมื่อมีหลักฐานค่าใช้จ่าย ส่วน B2 จัดการเอกสาร VDRL, transmittal, revision tracking และ final dossier ไม่คิดค่าจัดทำเนื้อหาทางเทคนิคซ้ำ</p>
-    <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; Offshore SAT/SIT execution อยู่ B3; MGW China FAT Witness อยู่ B3 และเฉพาะ Conditional Yard Senior Engineer อยู่ B9; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่าใช้จ่ายที่ปรึกษาและค่าธรรมเนียมราชการที่มีเงื่อนไขยังไม่รวมใน B1 Base และราคา Engineering WBS เก่าถูกตัดจาก B1</p>
+    <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; Offshore SAT/SIT execution อยู่ B3; MGW China FAT Witness อยู่ B3 และเฉพาะ Conditional Yard Senior Engineer + Field Technician อยู่ B9; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่าใช้จ่ายที่ปรึกษาและค่าธรรมเนียมราชการที่มีเงื่อนไขยังไม่รวมใน B1 Base และราคา Engineering WBS เก่าถูกตัดจาก B1</p>
    </details>
   </section>}
   {e.code!=="B1"&&<>
@@ -197,7 +197,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     <div><strong>Yard Senior Engineer Onshore SELL Rate</strong><p>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")}</p><small>One paid engineer only · no separately priced per diem · FAT crew billed B3</small></div>
     <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>B9 1 LS {thb(workingRow.workingSellTHB)} included in Base price; Engineer attends only on written Yard call-out; not an extra option</small></div>
    </div>
-   <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}/day is the Senior Engineer onshore Working SELL rate; Field/standard USD600/day is not an extra B9 paid crew posting. Neither rate is verified payroll Direct Cost.</p>
+   <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}/day is the Senior Engineer onshore Working SELL rate; Field Technician USD600/day is the second PAID B9 Yard crew member for the same 7 workdays + 2 travel days. CCL Item31 18 Yard / 45 Offshore days remains unmodified and subject to RACI reconciliation. Neither rate is verified payroll Direct Cost.</p>
   </section>}
     {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
   {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
@@ -229,7 +229,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
   <p className="p55-note">Module ID: <ComponentCopyId projectId="PJ2608-0553" componentKey={e.moduleId}/></p>
   <div className="p55-metric-grid">
    <div><strong>Turnkey Direct Cost</strong><p>NOT ESTABLISHED</p><small>อัตราต้นทุนจริงยังไม่ได้อนุมัติ ห้ามนำ Working SELL มาแทน</small></div>
-   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Current B1 SELL from fresh B1.1–B1.8 support-only THB resource budget; actual Direct Cost OPEN, old engineering/PM quotes excluded":e.code==="B3"?"Current MGW Purchased iFAT/Facility + ADDVALUE FAT Witness + Offshore SAT/SIT + VeEX rental; supplier quotation source is not paid Direct Cost":e.code==="B9"?"B9 1 LS THB233,600 quoted in Base; Yard execution on written call-out":"Working source estimate"}</small></div>
+   <div><strong>Current Working SELL (THB)</strong><p>{thb(workingRow.workingSellTHB)}</p><small>{e.code==="B1"?"Current B1 SELL from fresh B1.1–B1.8 support-only THB resource budget; actual Direct Cost OPEN, old engineering/PM quotes excluded":e.code==="B3"?"Current MGW Purchased iFAT/Facility + ADDVALUE FAT Witness + Offshore SAT/SIT + VeEX rental; supplier quotation source is not paid Direct Cost":e.code==="B9"?"B9 Senior + Field Technician 2-person 1 LS Working SELL, 7 Yard days + 2 travel days each; execution on written call-out":"Working source estimate"}</small></div>
    <div><strong>MR / RFQ Evidence Links</strong><p>{e.requirementRecords.length}</p><small>Source requirement ≠ technical approval</small></div>
   </div>
   {e.code==="B11"&&<section className="p55-panel"
