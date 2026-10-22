@@ -52,4 +52,4 @@ assert.equal(legacyBridge,4430790.69); // Old B1 and 39-day B3 retained only in 
 const b3b9=ctx.b3+ctx.b9.fatWorkingSellTHB;
 assert.equal(b3b9,2388200);
 assert.equal(ctx.rate.B9ExistingWorkingSellOverrideAllowed,false,"Rate approval alone must not overwrite old WBS without separate Rev.K scope selection");
-process.stdout.write("PASS: contract B3 owns 4-MR FAT witness THB397,400; B9 quoted 1 LS THB233,600 included once in Base (execution conditional); legacy B3 bridge untouched, ABC repricing tested separately.\n");
+process.stdout.write("PASS: contract B3 owns 4-MR China FAT paid-witness SELL THB422,600; B9 Yard Specialist 1 LS THB261,950 included once in Base (written call-out execution); onshore Senior USD700 and provisional PM/standard USD600, no duplicate posting.\n");
