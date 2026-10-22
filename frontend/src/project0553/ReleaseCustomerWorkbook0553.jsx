@@ -198,14 +198,33 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-section"><td colSpan={8}>Part B: OTHERS<br/>B部分：其它</td></tr>
        {B_ROWS.map(id=>{
         const line=bLines.find(r=>r.code===id);
-        return <tr key={id}><td><strong>{id}</strong></td>
+        return <React.Fragment key={id}><tr><td><strong>{id}</strong></td>
          <td colSpan={3}>{parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}</td>
          <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td>{["B10","B11","B13"].includes(id)?"refer to Annex "+id:
           id==="B12"?"refer to Annex B12":
           line?.executionConditional&&internal?"Quoted in Base · attendance on written call-out":line?.conditional&&internal?"Conditional — verify before release":""}</td>
-        </tr>;
+        </tr>
+        {internal&&id==="B3"&&line?.b3GroupTrace&&<tr className="p553-drilldown-only"
+         data-component-key="bid.budget.pricing.release.b3.group-trace"><td colSpan={8}>
+         <strong>10.3 B3 — Work Type Source-to-Release attribution (internal only, NOT 4 quotation lines)</strong>
+         <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+          <thead><tr><th>10.2 Group Source</th><th>Working SELL THB</th><th>10.3 Customer Preview Attribution THB</th>
+           <th>Status</th><th>Go to 10.2 Source</th></tr></thead>
+          <tbody>{line.b3GroupTrace.map(g=><tr key={g.id}>
+           <td>{g.name}<small>{g.id}</small></td>
+           <td>{money(g.workingSellTHB)}</td><td>{money(g.customerPreviewAttributionTHB)}</td>
+           <td>{g.status}<small>{g.approvalGate}</small></td>
+           <td><button type="button" className="p553-detail-button"
+             onClick={()=>onOpenSource({code:"B3",sourceModuleId:g.sourceModuleId})}>↗ 10.2 B3 Group</button></td>
+          </tr>)}</tbody>
+          <tfoot><tr><th>B3 Working Budget Preview — ONE customer LS</th>
+           <th>{money(line.workingSellTHB)}</th><th>{money(line.customerSellTHB)}</th>
+           <th>CP-B3 NOT ISSUED · No additional posting</th><th>Release HOLD</th></tr></tfoot>
+         </table></div>
+        </td></tr>}
+        </React.Fragment>;
        })}
        <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 / Base A+B (WORKING PREVIEW)</td>
         <td className="p553-price-cell">{money(provisionalBase)}</td>
