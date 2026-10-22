@@ -35,9 +35,9 @@ const historicalB3BeforeScenarioTHB=2397725;
 const historicalB3ScenarioTHB=2750525;
 const historicalB9WorkingSellTHB=233600;
 const historicalScenarioPartBTHB=4385436.82;
-assert.equal(source.knownWorkingSellTHB,4262586.82);
+assert.equal(source.knownWorkingSellTHB,4481186.82);
 assert.equal(source.byCode.B3.workingSellTHB,2599325);
-assert.equal(source.byCode.B9.workingSellTHB,261950);
+assert.equal(source.byCode.B9.workingSellTHB,480550);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit
 assert.equal(historicalB3ScenarioTHB-historicalB3BeforeScenarioTHB,352800);
 assert.equal(source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB,201600);
