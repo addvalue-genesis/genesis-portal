@@ -250,14 +250,26 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       {" "}· รายการจาก 10.2 — <code>bid.budget.working.bc.{code.toLowerCase()}</code>
       {code.startsWith("C")?" · Optional Spare: มีเพียง Budgetary Reference ยังไม่มี Verified Direct Cost สำหรับราคาขาย ×1.30":
       " · THB Working Sell, อ้างอิงราคา Budgetary Rev08; OEM Part No./SKU/การไม่ซ้ำซ้อนยังต้องตรวจ"}</p>
+     <p className="p55-note p553-annex-reading-guide"><strong>วิธีอ่านตารางนี้ / How to read:</strong>
+      Description = ซื้ออะไหล่อะไรและใช้ทำอะไร · Detail Specification = คุณสมบัติที่ต้องตรงกับของเดิม ·
+      Materials = วัสดุหรือส่วนประกอบ (ถ้าไม่ทราบระบุ TBC) · Related TAGs = อุปกรณ์ที่อาจใช้อะไหล่นี้ร่วมกัน ไม่ใช่จำนวนที่จะซื้อ ·
+      <strong> QTY = จำนวนอะไหล่สำรองที่จะซื้อ</strong>. ความเข้ากันได้ของ OEM ยังรอการยืนยัน</p>
      <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table">
       <thead><tr><th rowSpan={2}>Item<br/>序号</th><th rowSpan={2}>Tag No<br/>位号</th><th rowSpan={2}>Description<br/>描述</th><th rowSpan={2}>Detail Specification<br/>详细规格</th><th rowSpan={2}>Materials<br/>材质</th><th rowSpan={2}>QTY<br/>数量</th><th colSpan={code.startsWith("C")?3:2}>DDP site （DDP现场交货）</th></tr>
        <tr><th>UNIT PRICE (CURRENCY)<br/>单价</th><th>TOTAL PRICE (CURRENCY)<br/>总价</th>
         {code.startsWith("C")&&<th>Lead time (ARO)<br/>交货期 (周)</th>}</tr></thead>
       <tbody>{Array.from({length:13},(_,i)=>{
        const r=annexLines[i];return <tr key={r?.id||"empty:"+i}>
-        <td>{r?i+1:""}</td><td>{r?.tagNo||""}{r&&sourceButton(r)}</td>
-        <td>{r?.description||""}</td><td>{r?.specification||""}</td><td>{r?.materials||""}</td>
+        <td>{r?i+1:""}</td>
+        <td>{r&&<><strong>{r.tagSummary||r.tagNo||"COMMON"}</strong>
+         {r.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list">
+          <summary>View {r.relatedEquipmentTagCount} TAGs / ดู TAG</summary>
+          <div>{(r.relatedTagList||[]).join(" · ")}</div>
+          <small>Functional TAG references only — OEM spare compatibility NOT verified</small>
+         </details>}{sourceButton(r)}</>}</td>
+        <td>{r?.description||""}{r?.purpose&&<small>{r.purpose}</small>}{internal&&r?.explanationTH&&<small>{r.explanationTH}</small>}</td>
+        <td>{r?.specification||""}{r&&<small>Confirm against installed OEM part number before release</small>}</td>
+        <td>{r?.materials||""}{r?.materialVerified===false&&<small>Material / OEM confirmation pending</small>}</td>
         <td>{r?.qty??""}{internal&&r?.unit&&<small>{r.unit}</small>}</td>
         <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):
           code.startsWith("B")?formatUnit(r.customerUnitTHB):
@@ -285,7 +297,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         <td className="p553-price-cell">{money(annexModel.varianceTHB)}</td>
         <td>{annexModel.reconciled?"Source sums within 0.01 THB · NOT RELEASED":"HOLD — source summary differs from detailed lines"}</td>
        </tr></tbody></table>
-       <p className="p55-note">{code.startsWith("C")?"OPTIONAL · Reference value for working review only; customer sell remains Not quote pending OEM verified cost.":"Budgetary Working Sell from 10.2; unresolved variance is not silently added to any spare item."} TAGs shown are functional associations, not verified OEM spare-part equivalence.</p>
+       <p className="p55-note">{code.startsWith("C")?"OPTIONAL · Reference value for working review only; customer sell remains Not quote pending OEM verified cost.":"Budgetary Working Sell from 10.2; unresolved variance is not silently added to any spare item."} One priced row = one type of proposed spare stock; many related TAGs do NOT multiply spare Qty. TAGs shown are equipment-function candidates, NOT proof of interchangeable OEM part numbers.</p>
       </div>}
       {annexOverflow.length>0&&<p className="p553-native-warning">HOLD — {code}: {annexOverflow.length} source lines exceed the original 13 annex slots. No rows are discarded from the source; native export requires reconciliation.</p>}
       <div className="p553-annex-remark">Remark 注释: {code.startsWith("C")?
