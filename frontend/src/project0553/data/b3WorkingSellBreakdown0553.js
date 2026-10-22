@@ -24,7 +24,7 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
  const satSell=round(offshoreLabor+surveyLabour+rent);
  const total=round(satSell+fatWithPurchased);
  if(sat.satTeamDays!==28||sat.satPersonDays!==56||sat.siteSurveyTeamDays!==5||
-  offshoreLabor!==1411200||surveyLabour!==252000||satSell!==sat.includedB3SatSurveyToolsWorkingSellTHB||
+  offshoreLabor!==1587600||surveyLabour!==252000||satSell!==sat.includedB3SatSurveyToolsWorkingSellTHB||
   fatSell!==china.fatWorkingSellTHB||total!==workingRow.workingSellTHB)
   throw Error("B3 Working SELL source reconciliation failed; no price override allowed");
  return Object.freeze({
@@ -34,7 +34,7 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
   summary:[
    {id:"OFFSHORE",moduleId:"bid.budget.working.bc.b3.40-day-abc",
     activity:"Selected 28-day SAT/SIT labour Working SELL basis — stage RACI/ITP still open",
-    driver:"28 selected productive team-days × 2 specialists × USD800/person-day × FX31.5; pooled +2 SAT risk team-days nonposted",
+    driver:"28 productive team-days × (Senior Telecom Systems Integration Engineer USD1000/MD + Senior RF/Telecom Field Specialist USD800/MD) × FX31.5; +2 SAT risk team-days NONPOSTING",
     workingSellTHB:offshoreLabor,postedWithinB3:true},
    {id:"BF-SURVEY",moduleId:"bid.budget.working.bc.b3.site-survey-price",
     activity:"Selected 3-BF-site Survey plus two trip-team-days — work order conditional",
@@ -53,7 +53,7 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
     driver:"6 FAT witness workdays × 2 persons + 2 travel days × 2 persons + eight separately owned B3 estimate lines",
     workingSellTHB:fatSell,postedWithinB3:true}
   ],
-  offshore:{workdays:sat.satTeamDays,people:2,personDays:sat.satPersonDays,rateUSD:sat.sourceRateUSDPerPersonDay,workingFx:sat.fxTHBPerUSD,
+  offshore:{workdays:sat.satTeamDays,people:2,personDays:sat.satPersonDays,rateUSD:sat.sourceRateUSDPerPersonDay,roleRates:sat.satRoleRates,workingFx:sat.fxTHBPerUSD,
    laborWorkingSellTHB:offshoreLabor,surveyLabourWorkingSellTHB:surveyLabour,rentalWorkingSellTHB:rent,
    includedSatSellTHB:satSell,siteTimeboxes:sat.satRows},
   survey:{siteTeamDays:sat.siteSurveyTeamDays,personDays:sat.siteSurveyPersonDays,
