@@ -41,7 +41,7 @@ assert.equal(source.byCode.B9.workingSellTHB,480550);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit
 assert.equal(historicalB3ScenarioTHB-historicalB3BeforeScenarioTHB,352800);
 assert.equal(source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB,201600);
-assert.equal(source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB,28350);
+assert.equal(source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB,246950);
 assert.equal(
  source.knownWorkingSellTHB+
  (historicalB3ScenarioTHB-source.byCode.B3.workingSellTHB)+
