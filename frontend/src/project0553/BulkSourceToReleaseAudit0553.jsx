@@ -1,5 +1,6 @@
 import React,{useState,useEffect} from "react";
 import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrace0553";
+import {PhysicalCableEndRegister0553} from "./PhysicalCableEndRegister0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 
 // Read-only source → engineering BULK → working ledger → customer Release gate.
@@ -87,6 +88,7 @@ export function BulkSourceToReleaseAudit0553({releaseModel=null,placement="BOM",
    × THB1020 per MR0001 location are *historical source working-cost components*; they are NOT verified installed material quantities.
    FORLLER is MGW MR0002 complete-system supply; NEK spare is conditional/not booked.
    MR0004 phase kit is exactly one requirement across all three WPs; check MGW quotation/B11 before pricing.</p>
+  {placement==="BOM"&&<PhysicalCableEndRegister0553 mr={mr} site={site} focusModuleId={focusModuleId}/>}
   {placement==="RELEASE"&&<p className="p55-note"><strong>Customer release remains HOLD:</strong> this coverage matrix exposes
    incomplete BULK engineering. Any numeric A/B/C shown in Release Preview comes from the existing
    Working source, not from this audit; no validated complete supply cost is asserted.</p>}

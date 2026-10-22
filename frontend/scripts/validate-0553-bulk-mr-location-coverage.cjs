@@ -146,6 +146,18 @@ for(const siteRf of routeAudit.sites){
  assert.equal(siteRf.compliance.mrRequiresFireResistant,true);
  assert.equal(siteRf.compliance.nekIEC60331Proof,false);
  assert.equal(siteRf.compliance.forllerIEC60331Proof,false);
+ assert.equal(siteRf.deviationId,"MR0002-DEVIATION-1.1");
+ assert.equal(siteRf.deviationStatus,"Open");
+ assert.equal(siteRf.proposedDonorAntenna.model,"YBSS6");
+ assert.equal(siteRf.proposedDonorAntenna.elements,6);
+ assert.equal(siteRf.proposedDonorAntenna.gainDbi,11);
+ assert.equal(siteRf.proposedDonorAntenna.elevationM,21.1);
+ assert.equal(siteRf.proposedServiceAntenna.location,"BENEATH_LOWER_DECK");
+ assert.equal(siteRf.proposedServiceAntenna.elevationM,18.3);
+ assert.equal(siteRf.proposedServiceAntenna.positionApproval,false);
+ assert.equal(siteRf.approvedDeviationCableLengthM,null);
+ assert.equal(siteRf.scenario.usableForOpenBdaRelocation,false);
+ assert.equal(siteRf.scenario.proposedBdaRelocationRequiredCableM,null);
  assert.equal(siteRf.changedExistingWorkingTHB,0);
 }
 const rfRouteUI=fs.readFileSync(path.join(root,"project0553/MR0002RfRouteReconciliation0553.jsx"),"utf8");
