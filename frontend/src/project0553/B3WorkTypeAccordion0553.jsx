@@ -197,12 +197,15 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
      {money(model.supplierFatReferenceTHB)} at FX {model.supplierFxTHBPerUSD}
      (PURCHASED COST BASIS; cost ×1.30 is already included ONCE in the B3 Working SELL);
      old Bangkok FAT is HISTORICAL. Direct Cost NOT ESTABLISHED · RELEASE HOLD.</p>
-    <p className="p55-note"><strong>Inspection / Site Survey / FAT / SAT:</strong> pre-SAT Site Survey
-     covers {workingRow.b3SiteSurveyScope?.locations??0} project locations as B3 scope,
-     with 7 site field-days + 2 travel days for 2 people as a new nonposting planning assumption.
-     Survey labour reference {money(fieldPlan.survey.planningLabourSellReferenceTHB)} is NOT verified COST or accepted Working SELL;
-     the latest SAT field plan is 28 productive + 2 risk Team-days / 60 MD, while the old 40-day price basis is retained;
-     B1 design review and B2 report control are not duplicate B3 survey charges.</p>
+    <p className="p55-note"><strong>Source-verified split:</strong>
+     BOD Rev.C2 §8 already records prior surveys of ZPQ/ZWP8/ZWP11;
+     any new ADDVALUE BF visit is conditional, not a scheduled 7-site Survey.
+     SPE Rev.C2 §7.3.2 places SAT at JUTAL Zhuhai Fabrication Yard,
+     §7.3.3 requires distinct Offshore Commissioning after installation.
+     BF conditional revisit labour scenario {money(fieldPlan.survey.conditionalLabourSellReferenceTHB)}
+     is NONPOSTING; new Yard / Offshore ADDVALUE crew/days/Direct COST remain NOT ESTABLISHED.
+     The previous 28+2 lean allocation remains a nonposting comparison, and
+     the 40-day SELL basis is not a confirmed execution duration.</p>
    </div>
    <div className="p553-b3-actions">
     <button type="button" className="p553-detail-button" onClick={()=>expandAll(true)}>＋ Expand All</button>
@@ -224,11 +227,13 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
        </summary>
        <div className="p553-b3-table-children">
         {group.kind==="sat"&&<p className="p55-note">
-         <strong>Latest Plan: Site Survey 2 people × {fieldPlan.survey.totalTeamDays} team-days
-          (7 field + 2 travel) + SAT 2 people × {fieldPlan.sat.executionTeamDays} team-days
-          (28 productive + 2 risk) = {fieldPlan.sat.executionPersonDays} SAT MD.</strong>
-         {" "}Old 40-day / 80-MD Working SELL is a retained price source, not the field execution duration.
-         Survey labour budget {money(fieldPlan.survey.planningLabourSellReferenceTHB)} is PROPOSED ONLY — NOT POSTED.
+         <strong>Contractual work-front split: BF 3 sites conditional verification;
+          GF 4 sites Fabrication Yard SAT at Zhuhai; then GF Offshore Commissioning after installation.</strong>
+         {" "}New ADDVALUE persons × days for GF Yard and Offshore are NOT ESTABLISHED.
+         Previous 28+2 team-days (60 MD) are OLD COMBINED LEAN COMPARATOR ONLY;
+         40 team-days (80 MD) are RETAINED Working SELL PRICE BASIS only.
+         Conditional BF revisit labour {money(fieldPlan.survey.conditionalLabourSellReferenceTHB)}
+         is a nonposting scenario, not a vendor cost or customer price.
         </p>}
         <table className="p55-table p553-b3-hierarchical-table p553-b3-subtable">
          <thead><tr>{gridColumns.map(name=><th key={name}>{name}</th>)}</tr></thead>
