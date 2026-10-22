@@ -112,7 +112,8 @@ for(const siteRf of routeAudit.sites){
  assert.equal(siteRf.afcLnaEnclosureTag,afc.lna,"AFC original LNA location shall match per-site LAY");
  assert.equal(siteRf.afcSurgeEnclosureTag,afc.surge,"AFC RF Surge TAG shall match per-site LAY");
  assert.equal(siteRf.afcTagRoleVerified,true);
- assert.equal(siteRf.selectedMgWBdaFunctionMapsToOriginalAfcLna,true);
+ assert.equal(siteRf.selectedMgWBdaFunctionMapsToOriginalAfcLna,false); // formal AFC mapping still not approved
+ assert.equal(siteRf.selectedWorkingBdaMapsToOriginalLnaSitePosition,true);
  assert.equal(siteRf.selectedDesignRfiBdaAtOriginalLnaPosition,true);
  assert.equal(siteRf.donorAntennaPositionChanged,false);
  assert.equal(siteRf.serviceAntennaPositionChanged,false);
