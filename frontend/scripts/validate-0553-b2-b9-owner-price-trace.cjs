@@ -28,8 +28,8 @@ assert.equal(vdrl().b2CalculatedMH,null);
 assert.equal(vdrl().b2VerifiedCostTHB,null);
 assert.deepEqual(["MR-0001","MR-0002","MR-0003","MR-0004"].map(x=>vdrl().byMr[x].sourceRows),
  [37,36,35,35]);
-assert.equal(bc.byCode.B9.workingSellTHB,261950);
-assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,261950);
+assert.equal(bc.byCode.B9.workingSellTHB,480550);
+assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,480550);
 assert.equal(bc.byCode.B8.workingSellTHB,30000);
 assert.equal(bc.byCode.B8.qtyDriver,44);
 assert.equal(bc.byCode.B5.workingSellTHB,311184);
@@ -79,39 +79,44 @@ const {buildReleaseCommercialModel0553:releaseModel}=get("data/releaseCommercial
 const {selectScopePartBcWorking0553:scopeModel}=get("data/scopePartBcReadModel0553.js");
 const b9Scope=b9ScopeSource(bc.byCode.B9);
 assert.equal(b9Scope.moduleId,mod("B9")+".work-scope");
-assert.equal(b9Scope.selectedWorkingSellTHB,261950);
-assert.equal(b9Scope.sourceRowCount,8);
-assert.deepEqual(b9Scope.groups.map(g=>g.selectedWorkingSellTHB),[198450,52500,11000]);
-assert.deepEqual(b9Scope.groups.map(g=>g.rows.length),[2,3,3]);
+assert.equal(b9Scope.selectedWorkingSellTHB,480550);
+assert.equal(b9Scope.sourceRowCount,10);
+assert.deepEqual(b9Scope.groups.map(g=>g.selectedWorkingSellTHB),[368550,90000,22000]);
+assert.deepEqual(b9Scope.groups.map(g=>g.rows.length),[4,3,3]);
 assert.equal(b9Scope.groups[0].rows[0].people,1);
 assert.equal(b9Scope.groups[0].rows[0].days,7);
 assert.equal(b9Scope.groups[0].rows[0].unitRateTHB,22050);
 assert.equal(b9Scope.groups[0].rows[0].rateUSDPerMD,700);
 assert.equal(b9Scope.groups[0].rows[0].fxTHBPerUSD,31.5);
 assert.equal(b9Scope.groups[0].rows[1].days,2);
-assert.equal(b9Scope.groups[0].rows.reduce((sum,x)=>sum+x.workingSellTHB,0),198450);
+assert.equal(b9Scope.groups[0].rows.reduce((sum,x)=>sum+x.workingSellTHB,0),368550);
 assert(b9Scope.groups.every(g=>!g.independentPostingAllowed&&!g.releaseAllowed));
 assert(b9Scope.groups.flatMap(g=>g.rows).every(r=>
  r.costOwner==="B9"&&r.workingCostTHB===null&&r.directCostTHB===null&&
  r.verifiedDirectCostTHB===null&&!r.postingAllowed&&
  r.workingSellTHB===r.qty*r.unitRateTHB));
-assert.equal(new Set(b9Scope.groups.flatMap(g=>g.rows.map(r=>r.sourceExpenseId))).size,8);
+assert.equal(new Set(b9Scope.groups.flatMap(g=>g.rows.map(r=>r.sourceExpenseId))).size,10);
 assert.equal(b9Scope.b3RequirementModuleId,"bid.budget.working.bc.b3.resource-price-dossier.group.06");
-assert.equal(b9Scope.unbilledFieldBackupCashRiskTHB,48500);
+assert.equal(b9Scope.unbilledFieldBackupCashRiskTHB,0);
+assert.equal(b9Scope.fieldTechnicianIncludedExpenseAllowanceTHB,48500);
+assert.equal(b9Scope.cclItem31OriginalScope.yardWorkingDays,18);
+assert.equal(b9Scope.cclItem31OriginalScope.offshoreWorkingDays,45);
+assert.equal(b9Scope.cclItem31OriginalScope.trainingDays,2);
+assert.equal(b9Scope.cclItem31OriginalScope.surveyDays,5);
 assert(!b9Scope.unbilledFieldBackupPostingAllowed&&b9Scope.b3Group06SeparateUnpricedTestScope);
 const b3Yard=b3Dossier(bc.byCode.B3).groups[5];
 assert.equal(b3Yard.selectedWorkingSellTHB,0,"Unpriced B3 Yard SAT must not inherit B9 1 LS");
 assert(b3Yard.rows.every(r=>r.workingSellTHB===null&&r.people===null&&r.teamDays===null));
-assert.equal(releaseModel().b.find(r=>r.code==="B9").customerSellTHB,261950);
-assert.equal(scopeModel().lines.B9.workingSellTHB,261950);
+assert.equal(releaseModel().b.find(r=>r.code==="B9").customerSellTHB,480550);
+assert.equal(scopeModel().lines.B9.workingSellTHB,480550);
 assert.equal(scopeModel().lines.B9.directCostTHB,null);
 assert(!releaseModel().approval.releaseAllowed);
 const b9html=renderToStaticMarkup(React.createElement(PriceTrace,{workingRow:bc.byCode.B9}));
-assert(b9html.includes("261,950.00")&&b9html.includes("THB 261,950.00"));
+assert(b9html.includes("480,550.00")&&b9html.includes("THB 480,550.00"));
 assert(b9html.includes("Quoted B9 Base once"));
 assert(b9html.includes("seven Yard working days"));
-for(const amount of ["198,450.00","52,500.00","11,000.00","154,350.00",
- "44,100.00","15,000.00","22,500.00","4,000.00","2,000.00","5,000.00"]){
+for(const amount of ["368,550.00","90,000.00","22,000.00","154,350.00","132,300.00",
+ "44,100.00","37,800.00","30,000.00","45,000.00","8,000.00","4,000.00","10,000.00"]){
  assert(b9html.includes(amount),"B9 detailed Work Scope missing selected working SELL "+amount);
 }
 assert(b9html.includes("B3 GF Yard SAT")&&b9html.includes("not four separately priced"));
@@ -153,4 +158,4 @@ assert(host.includes('{e.code==="B2"&&ownerPriceTrace}'),
  "B2 price detail must appear before generic evidence summary");
 const canonical=JSON.stringify(current());
 assert.equal(canonical,snap,"Presentation mutated canonical B1–B14/C1/C2 cost/SELL");
-console.log("PASS B2-B9 cost owner trace: B2 143 VDRL source plus recalculated 237,121.13 Working SELL with MH/rate OPEN; B9 quoted 261,950 Base with Senior onshore USD700/MD, execution on written call-out; no fabricated price, no duplicate Module ID or price posting.");
+console.log("PASS B2-B9 cost owner trace: B2 143 VDRL source plus recalculated 237,121.13 Working SELL with MH/rate OPEN; B9 quoted 480,550 Base with Senior onshore USD700/MD, execution on written call-out; no fabricated price, no duplicate Module ID or price posting.");
