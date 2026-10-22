@@ -94,9 +94,10 @@ export function selectSpareEngineeringReconciliation0553(){
  const selectedC1Option=Object.freeze({
   id:"C1-MR0004-ORGA-COMPLETE-SPARE-BUDGET",
   code:"C1",mr:"MR-0004",tagNo:"MAR-514-001",
-  description:"SeaBeacon-2 System 6 Ex — complete RACON capital spare (budgetary equivalent)",
-  detailSpecification:"X&S Band / Zone 1; configuration, accessories and spare interchangeability to match installed OEM unit",
-  materials:"Historical ORGA full package budget benchmark; MGW Tideland spare interchangeability NOT verified",
+  description:"RACON complete system — one optional replacement spare",
+  detailSpecification:"Match installed RACON model, X/S band, hazardous-area rating, control box and all required accessories; OEM interchangeability pending",
+  materials:"OEM RACON electrical/mechanical assembly — enclosure material and components TBC",
+  simpleExplanationTH:"RACON สำรองทั้งชุด 1 ชุด (ราคาเทียบเคียงเท่านั้น ยังไม่ยืนยันว่าใช้แทน MGW ได้)",
   qty:1,unit:"set",unitPriceUSD:historicalC1ReferenceUSD,currencySource:"USD",
   planningFxTHBPerUSD:customer.rows[0].workingFxTHBPerUSD,
   budgetUnitPriceTHB:round(historicalC1ReferenceUSD*customer.rows[0].workingFxTHBPerUSD),
