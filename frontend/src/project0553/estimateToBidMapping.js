@@ -83,10 +83,13 @@ export function auditCurrentCustomerProjection0553({canonical,release,scope}={})
     priced.sourceModuleId===owner.moduleId);
    amount=owner?.workingSellTHB??null;
    if(code==="B9"){
-    parity=parity&&owner?.b9ChinaBudget?.conditionalYardSellTHB===233600&&
-     priced?.conditionalOptionWorkingSellTHB===233600&&
-     priced?.conditionalOptionIncludedInBase===true&&amount===233600;
-    status="B9_QUOTED_BASE_233600__NATIVE_G32__ON_CALL_EXECUTION_NONADDITIVE";
+    const sourceYardSell=owner?.b9ChinaBudget?.b9BaseWorkingSellTHB;
+    parity=parity&&Number.isFinite(sourceYardSell)&&
+     eq(owner?.b9ChinaBudget?.conditionalYardSellTHB,sourceYardSell)&&
+     eq(priced?.conditionalOptionWorkingSellTHB,sourceYardSell)&&
+     priced?.conditionalOptionIncludedInBase===true&&
+     eq(amount,sourceYardSell);
+    status="B9_QUOTED_BASE_ONE_LS__NATIVE_G32__ON_CALL_EXECUTION_NONADDITIVE";
    }
   }else if(part==="C"){
    const owner=canonical.byCode[code],priced=release.c.find(x=>x.code===code);
