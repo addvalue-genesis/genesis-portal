@@ -201,6 +201,44 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    workingSellTHB:null,directCostTHB:null,illustrativeOnlyTHB:round(4*rateTHB),
    status:"NONPOSTING_MANAGEMENT_RESERVE__SEPARATE_APPROVAL"})
  ]);
+ // Presentation hierarchy is a controlled, non-additive bridge over the same
+ // eight original dossier stages. These rollups are NEVER independent WBS sales.
+ const rollupDefinitions=freeze([
+  freeze({key:"fat",name:"FAT — Factory Acceptance Test",tone:"fat",
+   sourceStageIndices:freeze([0,1]),state:"INCLUDED",approval:"PURCHASED_FAT_QUOTE__ADDVALUE_WITNESS_COST_NOT_VERIFIED"}),
+  freeze({key:"site-survey",name:"SITE SURVEY — BF Verification",tone:"survey",
+   sourceStageIndices:freeze([4]),state:"INCLUDED_CONDITIONAL",
+   approval:"IN_WORKING_BUDGET__PHYSICAL_REVISIT_ON_WRITTEN_CALLOUT_ONLY"}),
+  freeze({key:"sat-commissioning",name:"SAT / COMMISSIONING — BF, GF Yard & Offshore",tone:"sat",
+   sourceStageIndices:freeze([2,5,6,7]),state:"INCLUDED_PLUS_UNPRICED",
+   approval:"SAT28_PRICE_SELECTED__GF_YARD_OFFSHORE_RACI_NOT_APPROVED"}),
+  freeze({key:"tools-reserve",name:"TOOLS / RESERVE — Temporary Equipment",tone:"tools",
+   sourceStageIndices:freeze([3]),state:"INCLUDED_PLUS_NONPOSTING_RESERVES",
+   approval:"TEMPORARY_VEEX_SELECTED__SAT_RISK_AND_MANAGEMENT_RESERVE_EXCLUDED"})
+ ]);
+ const groupRollups=freeze(rollupDefinitions.map(g=>{
+  const stages=g.sourceStageIndices.map(i=>stageGroups[i]);
+  return freeze({...g,id:root+".rollup."+g.key,
+   sourceModuleId:root,workingSellId:"WS-B3",customerProposalId:"CP-B3",
+   scopeId:"SOW-B3",qty:1,unit:"B3 group attribution only (not customer LS row)",
+   selectedWorkingSellTHB:round(stages.reduce((n,stage)=>n+stage.selectedWorkingSellTHB,0)),
+   sourceRowCount:stages.reduce((n,stage)=>n+stage.rowCount,0),
+   verifiedDirectCostTHB:null,independentPostingAllowed:false,
+   releaseAllowed:false,customerProposalIssued:false,
+   receiver10_3:"bid.budget.pricing.release / B3",
+   receiver10_5:"bid.budget.scope.b3 / SOW-B3",
+   priceIdentity:"SAME_CANONICAL_B3_WORKING_SELL__READ_ONLY_ATTRIBUTION"
+  });
+ }));
+ const sourceIndexList=groupRollups.flatMap(g=>g.sourceStageIndices);
+ if(sourceIndexList.length!==stageGroups.length||
+    new Set(sourceIndexList).size!==stageGroups.length||
+    sourceIndexList.some(i=>i<0||i>=stageGroups.length))
+  throw Error("B3 group hierarchy cannot omit or duplicate any source stage");
+ const rollupTotalTHB=round(groupRollups.reduce((n,g)=>n+g.selectedWorkingSellTHB,0));
+ if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="704525|252000|1411200|30000"||
+    rollupTotalTHB!==workingRow.workingSellTHB)
+  throw Error("B3 group hierarchy must reconcile once to canonical WS-B3");
  const priced=stageGroups.slice(0,5);
  const budgetSelected=total(priced.map(g=>({workingSellTHB:g.selectedWorkingSellTHB})));
  const picked=freeze(priced.map(g=>g.selectedWorkingSellTHB));
@@ -230,7 +268,9 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   moduleId:root,ownerModuleId:workingRow.moduleId,
   groupNames:freeze(["MGW Purchased FAT","ADDVALUE FAT witness","Selected SAT 28d priced resource roles",
    "VeEX Rental","Selected BF survey working budget","GF Yard SAT","GF Offshore commissioning","SIT/Punch Gate"]),
-  groups:stageGroups,pricedGroupCount:priced.length,
+  groups:stageGroups,groupRollups,rollupTotalTHB,
+  groupAttributionOnly:true,groupIndependentCostPostingAllowed:false,
+  pricedGroupCount:priced.length,
   priceRowCount:mgwLines.length+fatLines.length+satLines.length+rental.length+bfLines.length+bfTripLines.length,
   pricedWorkingSellTHB:budgetSelected,selectedCanonicalWorkingSellTHB:workingRow.workingSellTHB,
   vendorQuoteCostTHB,actualPaidDirectCostTHB:null,
