@@ -134,4 +134,4 @@ for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcWorkCostLin
  assert(babel.transformSync(read(f),{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
 }
-console.log("PASS 0553 canonical 10.2 UI: 111 historical source/audit rows retained, B1 27/964 MH historical, current B3 2,750,525 including FAT, B9 Base 233,600 with conditional field execution; both tab and expanded detail paths render source-led cost lines. No verified Direct Cost posted.");
+console.log("PASS 0553 canonical 10.2 UI: 111 historical source/audit rows retained, B1 27/964 MH historical, historical B3 2,750,525 NONPOSTING, current B3 2,599,325 including FAT, B9 Base 261,950 with conditional field execution; both tab and expanded detail paths render source-led cost lines. No verified Direct Cost posted.");
