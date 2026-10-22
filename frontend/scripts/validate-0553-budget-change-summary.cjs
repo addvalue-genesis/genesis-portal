@@ -42,9 +42,16 @@ assert(readableHtml.includes("What's New"));
 assert(html.includes("Expand All")&&html.includes("Collapse All"));
 assert(html.includes("Mark Reviewed"),"Unseen version must be visible to users");
 for(const note of notes){
- assert(readableHtml.includes(note.title),"Latest change not rendered: "+note.id);
+ // React SSR correctly escapes user-visible title text, e.g. '&' -> '&amp;'.
+ // Validate the actual rendered <strong> title rather than comparing
+ // unescaped JS source to serialized HTML and raising a false release blocker.
+ const encodedTitle=renderToStaticMarkup(React.createElement("strong",null,note.title));
+ assert(html.includes(encodedTitle),
+  "Latest change not rendered or HTML-escaped incorrectly: "+note.id);
  for(const id of note.moduleIds)assert(html.includes(id),"No visible linked Module ID: "+id);
 }
+assert(notes.some(x=>x.id==="P553-CHANGE-20261022-15"&&x.title.includes(" & ")),
+ "R27 linked-logistics release note with ampersand must stay covered by SSR validation");
 const anchors=[...html.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(new Set(anchors).size,anchors.length,"Change module DOM anchors must be unique");
 const workspace=read("CommercialWorkspace.jsx");
