@@ -9,10 +9,15 @@ import {selectAddvalueB14Insurance0553} from "./data/addvalueB14Insurance0553";
 import {selectB1RegulatoryCost0553} from "./data/b1RegulatoryCost0553";
 import {selectSatToolReadiness0553} from "./data/satToolReadiness0553";
 import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringReconciliation0553";
+import {SpareLifecycleRepriceDetail0553} from "./SpareLifecycleRepriceDetail0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
 export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
+ // Five lifecycle owners use PTTEP-first current scope. Historical Rev08 tables
+ // remain archived in source modules but MUST NOT be the active pricing screen.
+ if(["B10","B11","B13","C1","C2"].includes(code))
+  return <SpareLifecycleRepriceDetail0553 code={code} mode={mode}/>;
  const m=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const p=m.byCode[code];
  const shared=selectUnifiedSpareConsumables0553();
