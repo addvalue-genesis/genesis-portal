@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R26";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R27";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-15",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"B5–B6–B7 Linked Logistics Actual Route & Price Trace",
+  detail:"Owner raised B5 physical packing and B6 freight / B7 storage sources mismatch. New nonposting 10.2 B5/B6/B7 linked ADR-68 breakdown documents Thai Enclosure+Cisco four preassembled sets, NextG 4 IDU/4 ODU/all 5 antennas direct MGW, MR0002–4 OEM to MGW Nantong, MGW FAT and onward JUTAL. Seven B5 packing, six B6 transport and three B7 storage lines show individual Cargo IDs, source equipment Qty vs UNKNOWN physical package Qty, quote/rate evidence and gates. MGW SERV-3 USD500 is THB15750 planning reference and SERV-5 USD2500 is THB78750 planning reference, with possible packing overlap and NO unverified USD500 vendor credit. Earlier Thai packing scenario THB6000–12000 is NONPOSTING once, not verified. Customer requires 3mo free MGW storage still unconfirmed, selected B7 1mo THB30000 remains conditional. JUTAL Nantong claim versus owner-approved Zhuhai named-yard conflict flagged; no silent route change. Rev09 historic B5 THB311184 is still selected 10.2/10.3 but NOT derived route cost. B6 THB307584 and B7 THB30000 selected unchanged; 3-owner THB648768 is selected SELL, not actual Cost. Historical B5 Bangkok FAT equation marked LEGACY; new 16-line Navigator/SSR regression included in build. No code-generated customer release approval or price mutation; PR remains draft and release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b5.price-trace.work-scope","bid.budget.working.bc.b6.price-trace.work-scope","bid.budget.working.bc.b7.price-trace.work-scope"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner current MR0001 Thai Enclosure/Cisco and NextG direct China, MR0002–4 MGW FAT, ADR68, MGW 20-Oct P26-058_R2 SERV-3/5 and original B5 Rev09 historical source"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-14",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"10.2 Cost-Line Module IDs: Canonical vs Preview Namespace Regression",
