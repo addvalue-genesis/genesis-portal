@@ -39,7 +39,12 @@ assert.equal(dev.proposed.yagiElements,6);
 assert.equal(dev.proposed.yagiGainDbi,11);
 assert.equal(dev.proposed.yagiElevationM,21.1);
 assert.equal(dev.proposed.omniRelocation,"BENEATH_LOWER_DECK");
-assert.equal(dev.proposed.omniElevationM,18.3);
+assert.equal(dev.proposed.omniElevationM,18.3); // historical unadopted Rev00 proposal
+assert.equal(dev.workingDesign.equipmentSubstitution,"LNA_TO_RFI_BDA_ONLY");
+assert.equal(dev.workingDesign.preservePhysicalPositions,true);
+assert.equal(dev.workingDesign.adoptDeviationOmniRelocation,false);
+assert.equal(dev.workingDesign.adoptDeviationAntennaEquipmentChanges,false);
+assert.equal(dev.workingDesign.purchaserDeviationApproved,false);
 assert.equal(cableRegister.applicableGroups,17);
 assert.equal(cableRegister.registeredFunctionalCandidates,61);
 assert.deepEqual(cableRegister.byMR,{"MR-0001":28,"MR-0002":12,"MR-0003":12,"MR-0004":9});
@@ -54,7 +59,10 @@ for(const wp of ["ZWP20","ZWP21","ZWP22"]){
  const service=cableRegister.lines.find(x=>x.site===wp&&x.id==="DMR-SERVICE-RF");
  assert(service);
  assert.equal(service.afcToDeck,"MEZZANINE_EI_ROOFTOP");
- assert.equal(service.proposedToDeck,"BENEATH_LOWER_DECK");
+ assert.equal(service.proposedToDeck,"MEZZANINE_EI_ROOFTOP");
+ assert.equal(service.selectedWorkingToDeck,service.afcToDeck);
+ assert.equal(service.historicalDeviationProposedToDeck,"BENEATH_LOWER_DECK");
+ assert.equal(service.historicalDeviationNotSelected,true);
  assert.equal(service.deviationStatus,"Open");
  assert.equal(service.verifiedInstalledLengthM,null);
  assert.equal(service.incrementalWorkingTHB,0);
@@ -98,7 +106,14 @@ for(const [site,roles] of Object.entries({
  assert.equal(mr2.mr0002OriginalAfcLnaTag,roles[0]);
  assert.equal(mr2.mr0002OriginalAfcSurgeTag,roles[1]);
  assert.equal(mr2.mr0002SelectedBdaAfcApproved,false);
- assert(mr2.openEvidenceGates.includes("MGW_BDA_REPLACES_AFC_LNA__UPDATED_GA_BLD_EX_DEVIATION_HOLD"));
+ assert.equal(mr2.mr0002WorkingBdaSelected,true);
+ assert.equal(mr2.mr0002WorkingDesignChange,"LNA_TO_RFI_BDA_ONLY");
+ assert.equal(mr2.mr0002AntennaPositionsUnchanged,true);
+ assert.equal(mr2.mr0002HistoricalOmniRelocationSelected,false);
+ assert.equal(mr2.proposedServiceAntennaElevationM,null);
+ assert.equal(mr2.historicalUnadoptedRev00OmniElevationM,18.3);
+ assert(mr2.openEvidenceGates.includes("CURRENT_BUDGETARY_DESIGN_LNA_TO_RFI_BDA_SAME_POSITION_SELECTED"));
+ assert(mr2.openEvidenceGates.includes("REV00_OMNI_RELOCATION_AND_YBSS6_CHANGES_NOT_ADOPTED"));
  assert.equal(mr2.internalSchematic.pricingAuthority,false);
 }
 for(const mr of ["MR-0002","MR-0003","MR-0004"]){
@@ -151,7 +166,7 @@ const physicalUI=fs.readFileSync(path.join(root,"project0553/PhysicalCableEndReg
 babel.transformSync(physicalUI,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
 assert(jsx.includes('<PhysicalCableEndRegister0553 mr={mr} site={site} focusModuleId={focusModuleId}/>'));
-assert(physicalUI.includes('Deviation 1.1 Rev00: OPEN.'));
+assert(physicalUI.includes('Historical Deviation 1.1 Rev00 remains OPEN'));
 assert(navigator.includes('derivePhysicalCableEndRegister0553'));
 
 console.log("PASS 0553 BULK source→release: exact MR0001 MTO rows 11/20/29/36/41/47/52, 7+3+4+3 scope, MR0004 1 shared phase kit, MGW owner/NEK spare HOLD, A5 260232 source-only, Release prices unchanged");

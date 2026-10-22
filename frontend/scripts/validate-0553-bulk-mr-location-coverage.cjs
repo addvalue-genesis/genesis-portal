@@ -112,12 +112,17 @@ for(const siteRf of routeAudit.sites){
  assert.equal(siteRf.afcLnaEnclosureTag,afc.lna,"AFC original LNA location shall match per-site LAY");
  assert.equal(siteRf.afcSurgeEnclosureTag,afc.surge,"AFC RF Surge TAG shall match per-site LAY");
  assert.equal(siteRf.afcTagRoleVerified,true);
- assert.equal(siteRf.selectedMgWBdaFunctionMapsToOriginalAfcLna,false);
- assert(siteRf.engineeringChange.includes("DEVIATION_HOLD"));
+ assert.equal(siteRf.selectedMgWBdaFunctionMapsToOriginalAfcLna,false); // formal AFC mapping still not approved
+ assert.equal(siteRf.selectedWorkingBdaMapsToOriginalLnaSitePosition,true);
+ assert.equal(siteRf.selectedDesignRfiBdaAtOriginalLnaPosition,true);
+ assert.equal(siteRf.donorAntennaPositionChanged,false);
+ assert.equal(siteRf.serviceAntennaPositionChanged,false);
+ assert.equal(siteRf.physicalRelocationSelected,false);
+ assert(siteRf.engineeringChange.includes("CUSTOMER_CHANGE_CLOSURE_PENDING"));
  assert.equal(siteRf.circuits[0].to.split(" / ")[0],afc.lna);
  assert.equal(siteRf.circuits[1].from.split(" / ")[0],afc.lna);
  assert(siteRf.circuits.every(c=>c.originalAfcSurgeTag===afc.surge&&
-  c.sourceStatus==="AFC_LNA_VS_MGW_BDA_CHANGE_AND_RF_ROUTE_HOLD"));
+  c.sourceStatus==="SELECTED_INTERNAL_BDA_SAME_LOCATION__WIR_TER_PHYSICAL_ROUTE_OPEN"));
 
  assert.equal(siteRf.circuitCount,2);
  assert(siteRf.circuits.every(x=>x.fromDeck==="MEZZANINE_EI_ROOFTOP"));
@@ -148,16 +153,20 @@ for(const siteRf of routeAudit.sites){
  assert.equal(siteRf.compliance.forllerIEC60331Proof,false);
  assert.equal(siteRf.deviationId,"MR0002-DEVIATION-1.1");
  assert.equal(siteRf.deviationStatus,"Open");
- assert.equal(siteRf.proposedDonorAntenna.model,"YBSS6");
- assert.equal(siteRf.proposedDonorAntenna.elements,6);
- assert.equal(siteRf.proposedDonorAntenna.gainDbi,11);
- assert.equal(siteRf.proposedDonorAntenna.elevationM,21.1);
- assert.equal(siteRf.proposedServiceAntenna.location,"BENEATH_LOWER_DECK");
- assert.equal(siteRf.proposedServiceAntenna.elevationM,18.3);
- assert.equal(siteRf.proposedServiceAntenna.positionApproval,false);
+ assert.equal(siteRf.historicalDeviationDonorAntenna.model,"YBSS6");
+ assert.equal(siteRf.historicalDeviationDonorAntenna.elements,6);
+ assert.equal(siteRf.historicalDeviationDonorAntenna.gainDbi,11);
+ assert.equal(siteRf.historicalDeviationDonorAntenna.elevationM,21.1);
+ assert.equal(siteRf.selectedWorkingServiceAntenna.location,"ORIGINAL_REFERENCE_MEZZANINE_EI_ROOFTOP");
+ assert.equal(siteRf.historicalDeviationServiceAntenna.location,"BENEATH_LOWER_DECK");
+ assert.equal(siteRf.historicalDeviationServiceAntenna.adopted,false);
+ assert.equal(siteRf.historicalDeviationServiceAntenna.elevationM,18.3);
+ assert.equal(siteRf.selectedWorkingServiceAntenna.positionRelocated,false);
  assert.equal(siteRf.approvedDeviationCableLengthM,null);
- assert.equal(siteRf.scenario.usableForOpenBdaRelocation,false);
- assert.equal(siteRf.scenario.proposedBdaRelocationRequiredCableM,null);
+ assert.equal(siteRf.scenario.usableForCurrentSamePositionDesignAsSensitivity,true);
+ assert.equal(siteRf.scenario.usableAsApprovedInstalledCableLength,false);
+ assert.equal(siteRf.scenario.historicalCrossDeckRelocationNotSelected,true);
+ assert.equal(siteRf.scenario.selectedDesignActualRequiredCableM,null);
  assert.equal(siteRf.changedExistingWorkingTHB,0);
 }
 const rfRouteUI=fs.readFileSync(path.join(root,"project0553/MR0002RfRouteReconciliation0553.jsx"),"utf8");

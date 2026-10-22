@@ -32,6 +32,37 @@ export const MR0002_BDA_DEVIATION_REV00_0553=Object.freeze({
   omniElevationM:18.300,omniAfcDeck:"MEZZANINE_EI_ROOM_ROOFTOP",
   includesAlternateConfiguration:true
  }),
+ // Preserve the literal historical bidder Deviation Rev00 above, including the
+ // lower-deck proposal; it is NOT the CURRENT user-selected working design.
+ workingDesign:Object.freeze({
+   id:"MR0002_WORKING_DESIGN_20261022_LNA_TO_BDA_ONLY",
+   basis:"USER_DIRECTED_CURRENT_BUDGETARY_DESIGN",
+   baselineDrawing:"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 (existing reference positions)",
+   equipmentSubstitution:"LNA_TO_RFI_BDA_ONLY",
+   substitutionManufacturer:"RFI",
+   substitutionVendor:"MGW",
+   preservePhysicalPositions:true,
+   preserveOriginalEnclosureTagAndSite:true,
+   preserveYagiAntennaLocation:true,
+   preserveOmniAntennaLocation:true,
+   adoptDeviationYagiRelocation:false,
+   adoptDeviationOmniRelocation:false,
+   adoptDeviationAntennaEquipmentChanges:false,
+   fromOriginalLnaPosition:"SAME_SITE_EXD_ENCLOSURE_POSITION__GA_AND_EX_ASSEMBLY_CHECK",
+   selectedYagiPosition:"ORIGINAL_REFERENCE_LAYOUT_LOCATION",
+   selectedOmniPosition:"ORIGINAL_REFERENCE_LAYOUT_LOCATION",
+   engineeringDesignSelected:true,
+   purchaserDeviationApproved:false,
+   currentDesignNotEquivalentToAllRev00DeviationTerms:true,
+   designBasisApproval:"INTERNAL_BUDGETARY_DESIGN_SELECTED__CUSTOMER_FORMAL_ACCEPTANCE_PENDING",
+   routeQuantityBasis:"ORIGINAL_POSITIONS__ACTUAL_CABLE_TRAY_PATH_AND_TERMINATIONS_TBD",
+   physicalCableLengthM:null,
+   requirements:["RFI BDA mechanical/Ex/electrical fit at original LNA location",
+      "Donor/service port and isolation at original antenna positions",
+      "Compare vendor Yagi specification against customer reference and resolve separately",
+      "MGW complete-system cable scope, RF loss and fire/Ex compliance",
+      "Confirm revised technical clarification with SAMTEL/JUTAL; do not claim Rev00 relocation was approved"]
+ }),
  rationale:"Bi-directional DMR coverage, controlled gain, selectivity, donor/service isolation; separate decks intended to reduce oscillation.",
  verificationRequired:["RF link budget","Donor/service isolation margin","Licensed channel assignments",
   "Hazardous-area/Ex assembly certification","Approved MGW GA and updated schematic/WIR/TER",
@@ -39,5 +70,5 @@ export const MR0002_BDA_DEVIATION_REV00_0553=Object.freeze({
  statusOwner:"CUSTOMER_DEVIATION_REPLY_PENDING",
  noCanonicalCostPosting:true,noCustomerRelease:true,
  // No approval means no automatic moving physical TAGs in the AFC layout index.
- rule:"Use new BDA and proposed lower-deck Omni ONLY as OPEN deviation scenario. AFC original TAG/elevation/deck and MGW quotation remain separately traceable."
+ rule:"Preserve Rev00 proposal verbatim as historical/open source. CURRENT working bid design changes LNA to RFI BDA only at original equipment location; donor and service antennas remain at original reference positions. No lower-deck move or revised cable geometry is adopted."
 });

@@ -24,11 +24,10 @@ export function PhysicalCableEndRegister0553({mr="ALL",site="ALL",focusModuleId=
   <p className="p55-note"><strong>61 FUNCTION CANDIDATES / 17 MR×Location groups</strong> — source-backed prompts for
    WIR/TER takeoff only. <strong>NOT 61 verified installed cable runs</strong>.
    Cable lengths, terminated ends, selected cable SKUs, spare quantities and purchase costs remain TBD.
-   The customer AFC drawings outrank the internal bidding schematic.</p>
-  <p className="p55-note"><strong>MR0002 — Deviation 1.1 Rev00: OPEN.</strong> RFI Offshore BDA (+33–36 dBm output,
-   60–80 dB gain); proposed RFI YBSS6 Yagi ANT-508-001 +21.100 m; proposed Omni ANT-508-002 beneath
-   Lower Deck +18.300 m. Original AFC uses LNA and Mezzanine Omni. Open Deviation does not approve
-   the relocated antenna, BDA/Ex mapping or measured cable lengths.</p>
+   The customer reference LAY/BLD equipment locations and internal selected BDA-only design are separate from signed cable-end WIR/TER.</p>
+  <p className="p55-note"><strong>Selected Working Design:</strong> replace LNA with RFI BDA at the SAME equipment position.
+   Keep Yagi ANT-508-001 and Omni ANT-508-002 at their original reference positions. No relocation is selected.
+   <strong> Historical Deviation 1.1 Rev00 remains OPEN</strong> and previously proposed YBSS6 +21.100m / Omni beneath Lower Deck +18.300m; these additional antenna changes are NOT adopted. Final RF/Ex and customer acceptance remain outstanding.</p>
   <div className="p55-source-facts">
    <div><span>MR1 / MR2 / MR3 / MR4 functional candidates</span><strong>{model.byMR["MR-0001"]} / {model.byMR["MR-0002"]} / {model.byMR["MR-0003"]} / {model.byMR["MR-0004"]}</strong></div>
    <div><span>MR0004 Adapter + Charging Kit</span><strong>1 SET / PHASE · shared</strong></div>
@@ -42,7 +41,7 @@ export function PhysicalCableEndRegister0553({mr="ALL",site="ALL",focusModuleId=
   <div className="p55-table-wrap p553-module-scroll">
    <table className="p55-table p55-table--compact">
     <thead><tr><th>MR / Location / ID</th><th>Physical function</th><th>From → To</th>
-     <th>AFC Deck → Proposed BDA Deck</th><th>Cable / Connector & Gland</th>
+     <th>Reference Deck → Selected Working Deck</th><th>Cable / Connector & Gland</th>
      <th>MGW/OEM vs ADDVALUE Owner</th><th>Qty, Cost and Approval</th></tr></thead>
     <tbody>{rows.map(e=><tr key={e.moduleId} data-component-key={placement==="RELEASE"?id+"."+e.site.toLowerCase()+"."+e.id.toLowerCase():e.moduleId}>
      <td><strong>{e.site} / {e.mr}</strong><small>{e.id}</small>
@@ -51,8 +50,9 @@ export function PhysicalCableEndRegister0553({mr="ALL",site="ALL",focusModuleId=
      <td><strong>{e.fromTag}</strong> → <strong>{e.toTag}</strong>
       <small>Final cable end count and termination pinout: TBD</small></td>
      <td>{fmt(e.afcFromDeck)} → {fmt(e.afcToDeck)}
-      {e.proposedToDeck&&<small><strong>OPEN Deviation:</strong> Proposed destination {e.proposedToDeck}</small>}
-      <small>{e.deviationStatus&&"Deviation 1.1: "+e.deviationStatus}</small></td>
+      {e.selectedWorkingToDeck&&<small><strong>Selected Working Deck:</strong> {e.selectedWorkingToDeck}</small>}
+      {e.historicalDeviationNotSelected&&<small>Historical Rev00 Lower Deck relocation: NOT ADOPTED</small>}
+      <small>{e.deviationStatus&&"Original Rev00 status: "+e.deviationStatus}</small></td>
      <td>{e.cableFamily}<small>{e.connectorGlandEvidence}</small></td>
      <td>{e.owner}<small>{e.vendorIncluded===true?"Vendor quoted package reference":"Interface / inclusion needs verification"} · {fmt(e.vendorPackageLine)}</small></td>
      <td><strong>HOLD</strong><small>Installed length {fmt(e.verifiedInstalledLengthM)} m; Purchase {fmt(e.procurementQtyM)}; Unit Rate {fmt(e.unitRateTHB)}</small>
@@ -60,9 +60,9 @@ export function PhysicalCableEndRegister0553({mr="ALL",site="ALL",focusModuleId=
     </tr>)}</tbody>
    </table>
   </div>
-  <p className="p55-note"><strong>Release gate:</strong> AFC 508 TAG exceptions preserved: ZWP20 (001 Surge / 002 LNA),
-   ZWP21/22 (001 LNA / 002 Surge). The proposed RFI BDA and below-Lower-Deck Omni require approved
-   technical deviation, RF isolation/link calculation, equipment GA, Ex/fire compliance, WIR/TER,
+  <p className="p55-note"><strong>Release evidence gate:</strong> Original reference 508 TAG exceptions preserved: ZWP20 (001 Surge / 002 LNA),
+   ZWP21/22 (001 LNA / 002 Surge). RFI BDA is selected for budgetary design in original LNA position; no antenna relocation selected.
+   Complete vendor RF isolation/link calculation, equipment GA, Ex/fire compliance, WIR/TER and formal clarification,
    OEM inclusion review and authorized pricing before adoption. FORLLER MGW complete system remains
    the installed cable cost owner; NEK is optional ADDVALUE spare only, not duplicate installed cable.</p>
  </section>;

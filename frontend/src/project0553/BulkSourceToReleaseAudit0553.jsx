@@ -68,7 +68,7 @@ export function BulkSourceToReleaseAudit0553({releaseModel=null,placement="BOM",
        {r.sourceMtoDescription&&<p><strong>Original MTO description:</strong> {r.sourceMtoDescription}</p>}
        {r.mr==="MR-0002"&&<p><strong>AFC original LNA/RF surge TAG evidence:</strong>
         {" "}{r.mr0002OriginalAfcLnaTag} = LNA; {r.mr0002OriginalAfcSurgeTag} = RF Surge Ex d.
-        <strong> MGW RFI BDA is a proposed change to the original AFC LNA, NOT an already-approved replacement.</strong></p>}
+        <strong> Selected Working Design: RFI BDA at original LNA position, with antenna positions UNCHANGED.</strong> Historical Rev00 proposed relocation is not adopted; formal customer clarification remains open.</p>}
        <p><strong>Drawing authority:</strong> {r.afcLayoutDrawing||"LAY does not cover this brownfield site"}
         {" · "}{r.afcBlockDrawing||"separate drawing required"}.
         <strong> Internal schematic {r.internalSchematic.document} is engineering crosscheck only</strong>

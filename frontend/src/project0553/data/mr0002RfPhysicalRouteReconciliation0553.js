@@ -1,5 +1,5 @@
 // PJ2608-0553 MR0002 DMR/BDA physically distinct RF feeder circuits.
-// Evidence-led route takeoff; LAY positions ≠ WIR/TER routes ≠ AFC measured metres.
+// Budgetary design: replace original LNA with MGW RFI BDA at SAME original site location; antennas remain at original positions. LAY ≠ measured WIR/TER.
 // MGW complete-system supply is responsible for installed RF cables and accessories.
 // ADDVALUE NEK is a discretionary BULK installation spare/contingency reserve only.
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
@@ -17,7 +17,7 @@ export const MR0002_RF_ROUTE_SOURCE_0553=Object.freeze({
  layout:{document:"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 AFC",url:"https://drive.google.com/file/d/1PStua_5EmygpXpT2wMB3Jlj-Sq7syETA/view",
   limitation:"AFC positions/decks only; no cable-by-cable routing metres or service loops"},
  block:{document:"MM-ZTK-1F-ZWPX-TEL-BLD-0001 Rev.C1",url:"https://drive.google.com/file/d/1ilsnWSfMlFZh8nD29rra4YRWizadovl-/view",
-  limitation:"AFC functional schematic (not WIR/TER) still shows original LNA at new WPs and BDA in brownfield system; no unapproved BDA substitution."},
+  limitation:"Customer reference diagram still depicts original LNA. Current internal selected design replaces only LNA with RFI BDA at same location, no relocation; manufacturer GA/Ex/WIR still required."},
  internalSchematic:{document:"MM-ZTK-1F-GEN-SCADA-TEL-DWG-0001 Rev00",
   class:"INTERNAL_SAMART_ADDVALUE_ENGINEERING_CHECK_ONLY",status:"ISSUED_FOR_BIDDING",
   pages:"3–4 of 4",caveat:"BOM cable detail entries use 1 LOT not measured runs; old LNA and 16-port L3 must not override AFC or current MGW RF quote."},
@@ -28,7 +28,7 @@ export const MR0002_RF_ROUTE_SOURCE_0553=Object.freeze({
   scope:"ADDVALUE-proposed RF BULK technical source; only IEC 60332 Flame Retardant listed, no IEC 60331 Fire Resistant proof in supplied PDF",
   attenuation450DbPer100m:4.93},
  requirements:["Verify ZWP20 AFC TCAB-508-001 surge / 002 LNA; ZWP21/ZWP22 001 LNA / 002 surge",
- "Approve engineering change from AFC original LNA to MGW RFI BDA with GA/BLD/Ex evidence before mapping selected BDA ports",
+ "Use internal selected BDA in original LNA position for the budgetary takeoff; verify fit, Ex, power/alarm and vendor GA; customer formal deviation closure remains open",
  "Confirm selected donor/service BDA port and certified Ex feedthrough diagram; no old LNA assumptions",
  "Obtain AFC TEL cable routing or WIR/TER actual start/end, bends, tray segments and termination tails for EACH distinct RF run",
  "Confirm MGW UHF-4 feeder supplied form (reel/cut assemblies), usable balance, connectors and installation ownership",
@@ -48,11 +48,11 @@ export const MR0002_RF_ROUTE_SCENARIO_POLICY_0553=Object.freeze({
 });
 const siteLayoutSheets=Object.freeze({ZWP20:4,ZWP21:7,ZWP22:10});
 const paths=Object.freeze([
- {id:"RF-DONOR",name:"DONOR YAGI → BDA",from:"ANT-508-001",to:"TCAB-508-001 / donor RF IN",
+ {id:"RF-DONOR",name:"DONOR YAGI → RFI BDA (same LNA location)",
   topology:"ANT-508-001 Yagi → Ex/cable coupling + PolyPhaser / TCAB-508-002 where selected → TCAB-508-001 BDA donor input",
   intermediate:["Yagi","Solexy RXNMS0200JX0","PolyPhaser IS-B50LN-C2","Ex feedthrough / surge enclosure (verify final order)"],
   owner:"MGW_COMPLETE_SYSTEM__DONOR_INSTALLED_RF_CABLE"},
- {id:"RF-SERVICE",name:"BDA → SERVICE OMNI",from:"TCAB-508-001 / service RF OUT",to:"ANT-508-002",
+ {id:"RF-SERVICE",name:"RFI BDA → SERVICE OMNI (original site location)",
   topology:"TCAB-508-001 BDA service output → surge / certified RF interface (as selected) → ANT-508-002 Omni",
   intermediate:["BDA service port","SA-508-001/002 as applicable","TCAB-508-002 as applicable","KBT antenna"],
   owner:"MGW_COMPLETE_SYSTEM__SERVICE_INSTALLED_RF_CABLE"}
@@ -102,22 +102,22 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
   const lnaTag=lnaCandidates[0].tag,surgeTag=surgeCandidates[0].tag;
   const circuits=paths.map(p=>{
    const donor=p.id==="RF-DONOR";
-   const from=donor?"ANT-508-001":lnaTag+" / ORIGINAL AFC LNA — BDA CHANGE HOLD";
-   const to=donor?lnaTag+" / ORIGINAL AFC LNA — BDA CHANGE HOLD":"ANT-508-002";
+   const from=donor?"ANT-508-001":lnaTag+" / SELECTED RFI BDA — SAME POSITION";
+   const to=donor?lnaTag+" / SELECTED RFI BDA — SAME POSITION":"ANT-508-002";
    return {
    ...p,from,to,site,moduleId:"bid.budget.bom."+site.toLowerCase()+".mr0002.rf-route."+p.id.toLowerCase(),
    originalAfcLnaTag:lnaTag,originalAfcSurgeTag:surgeTag,
    topology:donor?
-    "Yagi ANT-508-001 → "+surgeTag+" AFC surge (order pending WIR) → "+lnaTag+" AFC original LNA / proposed MGW BDA HOLD":
-    lnaTag+" AFC original LNA / proposed BDA service interface HOLD → "+surgeTag+" AFC surge (order pending WIR) → ANT-508-002 Omni",
-   intermediate:donor?["Yagi","Solexy and PolyPhaser supplier accessories",surgeTag+" AFC surge",lnaTag+" AFC LNA/proposed BDA"]:
-    [lnaTag+" AFC LNA/proposed BDA",surgeTag+" AFC surge","Omni"],
+    "Yagi ANT-508-001 (original location) → "+surgeTag+" original RF surge (order pending WIR) → "+lnaTag+" selected RFI BDA at former LNA location":
+    lnaTag+" selected RFI BDA at former LNA location → "+surgeTag+" RF surge (order pending WIR) → ANT-508-002 Omni at original location",
+   intermediate:donor?["Yagi","Solexy and PolyPhaser supplier accessories",surgeTag+" RF surge",lnaTag+" selected RFI BDA"]:
+    [lnaTag+" selected RFI BDA",surgeTag+" RF surge","Omni original position"],
    fromDeck:eq(routeTag(from))?.deck||"NOT LOCATED",
    toDeck:eq(routeTag(to))?.deck||"NOT LOCATED",
    sourceSheet:siteLayoutSheets[site],routeSegmentsM:null,verifiedInstalledM:null,
    verifiedTerminationEnds:null,verifiedConnectors:null,
    cableSku:null,cableOemAccepted:false,
-   sourceStatus:"AFC_LNA_VS_MGW_BDA_CHANGE_AND_RF_ROUTE_HOLD",
+   sourceStatus:"SELECTED_INTERNAL_BDA_SAME_LOCATION__WIR_TER_PHYSICAL_ROUTE_OPEN",
    engineeringBudgetReferenceInstalledM:policy.perRouteInstalledReferenceM,
    engineeringBudgetReferencePurchaseM:mr0002RfPurchaseM0553(policy.perRouteInstalledReferenceM,policy.purchasingAllowancePct)
   };});
@@ -131,15 +131,23 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
    layoutDocument:src.layout.document,layoutSheet:siteLayoutSheets[site],
    afcLnaEnclosureTag:lnaTag,afcSurgeEnclosureTag:surgeTag,
    afcTagRoleVerified:true,selectedMgWBdaFunctionMapsToOriginalAfcLna:false,
-   engineeringChange:"SELECTED_MGW_BDA_VS_CUSTOMER_AFC_LNA__GA_BLD_EX_CERT_DEVIATION_HOLD",
+   selectedWorkingBdaMapsToOriginalLnaSitePosition:true,
+   selectedDesignRfiBdaAtOriginalLnaPosition:true,
+   donorAntennaPositionChanged:false,serviceAntennaPositionChanged:false,
+   physicalRelocationSelected:false,
+   engineeringChange:"INTERNAL_BUDGETARY_LNA_TO_RFI_BDA_ONLY_SAME_POSITION__CUSTOMER_CHANGE_CLOSURE_PENDING",
    deviationId:DEV.id,deviationStatus:DEV.status,
+   designStatus:DEV.workingDesign.designBasisApproval,
+   historicalLowerDeckRelocationNotAdopted:true,
    proposedRfiBda:{outputDbm:DEV.proposed.outputCompositeDbm,gainDb:DEV.proposed.gainAdjustableDb,
      agc:true,oscillationMute:true},
-   proposedDonorAntenna:{tag:"ANT-508-001",model:DEV.proposed.yagiModel,
+   historicalDeviationDonorAntenna:{tag:"ANT-508-001",model:DEV.proposed.yagiModel,
      elements:DEV.proposed.yagiElements,gainDbi:DEV.proposed.yagiGainDbi,
      elevationM:DEV.proposed.yagiElevationM,positionApproval:false},
-   proposedServiceAntenna:{tag:"ANT-508-002",location:DEV.proposed.omniRelocation,
-     elevationM:DEV.proposed.omniElevationM,positionApproval:false},
+   selectedWorkingServiceAntenna:{tag:"ANT-508-002",location:"ORIGINAL_REFERENCE_MEZZANINE_EI_ROOFTOP",
+     deck:eq("ANT-508-002")?.deck||null,positionRelocated:false},
+   historicalDeviationServiceAntenna:{tag:"ANT-508-002",location:DEV.proposed.omniRelocation,
+     elevationM:DEV.proposed.omniElevationM,adopted:false},
    approvedDeviationCableLengthM:null,
    circuitCount:circuits.length,circuits,
    mgw:{vendor:"MGW",materialBrand:"FORLLER",offerLine:"UHF-4",
@@ -168,8 +176,11 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
     replacementNEKIfMGWRejectedM:null,
     mgwSystemIllustrativeShortfallM:Math.max(0,illustrativePurchaseM-100),
     independentADDVALUENEKSpareM:null,
-    geometryOnlyFor:"AFC_BASE_LEGACY_SAME_DECK_REFERENCE",
-    usableForOpenBdaRelocation:false,proposedBdaRelocationRequiredCableM:null,
+    geometryOnlyFor:"BUDGETARY_REFERENCE_SAME_POSITION_ROUTE_ONLY",
+    usableForCurrentSamePositionDesignAsSensitivity:true,
+    usableAsApprovedInstalledCableLength:false,
+    historicalCrossDeckRelocationNotSelected:true,
+    selectedDesignActualRequiredCableM:null,
     conditionalOnly:true,financialPostingAllowed:false},
    compliance:{mrRequiresFireResistant:true,nekSm000111OnlyDocumentsFlameRetardant:true,
     nekIEC60331Proof:false,forllerIEC60331Proof:false,
@@ -181,7 +192,7 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
     "FORLLER datasheet/IEC60331 and delivered 100m physical form",
     "NEK IEC60331 and confirmed Rev6/Rev9, current budget unit cost",
     "Certified connector, 2x surge assembly, Ex bulkhead and cable OD/gland matching"],
-   ownerStatus:"MGW_COMPLETE_SYSTEM_OWNER__ADDVALUE_NEK_SPARE_RESERVE_UNPRICED",
+   ownerStatus:"MGW_COMPLETE_SYSTEM_SELECTED_RFI_BDA_SAME_POSITION__ADDVALUE_NEK_SPARE_UNPRICED",
    changedExistingWorkingTHB:0,customerReleased:false};
  });
  return {id:"PJ2608-0553",moduleId:"bid.budget.bom.mr0002.rf-physical-routes",
