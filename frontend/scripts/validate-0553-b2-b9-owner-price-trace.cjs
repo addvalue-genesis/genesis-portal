@@ -104,4 +104,4 @@ assert(host.includes('{e.code==="B2"&&ownerPriceTrace}'),
  "B2 price detail must appear before generic evidence summary");
 const canonical=JSON.stringify(current());
 assert.equal(canonical,snap,"Presentation mutated canonical B1–B14/C1/C2 cost/SELL");
-console.log("PASS B2-B9 cost owner trace: B2 143 VDRL source plus recalculated 237,121.13 Working SELL with MH/rate OPEN; B9 quoted 233,600 Base, execution on written call-out; no fabricated price, no duplicate Module ID or price posting.");
+console.log("PASS B2-B9 cost owner trace: B2 143 VDRL source plus recalculated 237,121.13 Working SELL with MH/rate OPEN; B9 quoted 261,950 Base with Senior onshore USD700/MD, execution on written call-out; no fabricated price, no duplicate Module ID or price posting.");
