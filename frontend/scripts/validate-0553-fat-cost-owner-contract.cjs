@@ -21,7 +21,16 @@ assert.equal(fat.reduce((sum,x)=>sum+x.workingSellTHB,0),397400);
 assert.equal(yard.reduce((sum,x)=>sum+x.workingSellTHB,0),233600);
 assert.equal(data.budget.fatWorkingSellTHB,397400);
 assert.equal(data.budget.b9BaseWorkingSellTHB,233600);
-assert.equal(data.budget.workingSellTHB,0);
+// B9 was promoted from an optional quote to ONE priced Base contract line by
+// ADR-65. The separate call-out is an execution condition, not a price exclusion.
+assert.equal(data.budget.workingSellTHB,233600);
+assert.equal(data.budget.workingSellTHB,data.budget.b9BaseWorkingSellTHB);
+assert.equal(data.budget.conditionalYardSellTHB,data.budget.b9BaseWorkingSellTHB,
+ "Source package is already included in B9 Base: do not post twice");
+assert.equal(data.budget.priceAlreadyIncludedInB9Base,true);
+assert.equal(data.budget.conditionalNotInBase,false);
+assert.equal(data.budget.conditionalExecutionOnWrittenCallout,true);
+assert.equal(data.budget.customerReleaseAllowed,false);
 assert.equal(data.budget.conditionalYardSellTHB,233600);
 assert.equal(data.trace.rows.find(x=>x.id==="RQM-01").costOwner,"B3");
 assert.equal(data.trace.rows.find(x=>x.id==="RQM-02").costOwner,"B3");
