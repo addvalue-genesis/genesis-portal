@@ -12,14 +12,14 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
  const source=china?.rows.filter(r=>r.costOwner==="B3"&&!r.optional)||[];
  const ids=new Set(source.map(r=>r.id));
  const purchased=b3.b3MgwPurchasedFatWorkingSell;
- if(source.length!==8||ids.size!==8||china.fatWorkingSellTHB!==397400||
-  b3.workingSellTHB!==2574125||b8.workingSellTHB!==30000||b8.qtyDriver!==44||
+ if(source.length!==8||ids.size!==8||china.fatWorkingSellTHB!==422600||
+  b3.workingSellTHB!==2599325||b8.workingSellTHB!==30000||b8.qtyDriver!==44||
   purchased?.selectedIncrementalWorkingSellTHB!==307125||
   purchased?.vendorPurchasedQuoteTHB!==236250)
   throw Error("Source has changed: review six-day B3/B8 and SERV-2/4 before reallocation");
  const staffing=source.find(r=>r.id==="B3-FAT-STAFF");
- if(staffing?.qty!==12||staffing?.unitRateTHB!==18900||
-  staffing?.workingSellTHB!==226800)
+ if(staffing?.qty!==12||staffing?.unitRateTHB!==20475||
+  staffing?.workingSellTHB!==245700)
   throw Error("Existing 12-MD witness labor source not established");
  const programme=Object.freeze([
   {day:1,activity:"Formal customer FAT / ITP day 1",b3MD:2,b8MD:0},
@@ -57,8 +57,8 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
  const scenarioSell=total(rows.map(r=>r.scenarioWorkingSellTHB));
  const b3Alloc=total(rows.map(r=>r.proposedB3AllocationTHB));
  const b8Alloc=total(rows.map(r=>r.proposedB8AllocationTHB));
- if(sourceSell!==397400||scenarioSell!==359600||
-  round(b3Alloc+b8Alloc)!==scenarioSell||sourceSell-scenarioSell!==37800||
+ if(sourceSell!==422600||scenarioSell!==381650||
+  round(b3Alloc+b8Alloc)!==scenarioSell||sourceSell-scenarioSell!==40950||
   new Set(rows.map(r=>r.sourceExpenseId)).size!==8)
   throw Error("B3/B8 five-day scenario is not financially conserved");
  return Object.freeze({
