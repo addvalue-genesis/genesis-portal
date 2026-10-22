@@ -31,8 +31,8 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
   currency:"THB",
   summary:[
    {id:"OFFSHORE",moduleId:"bid.budget.working.bc.b3.40-day-abc",
-    activity:"Offshore SAT/SIT — seven sites plus integrated SIT and punch closeout",
-    driver:"40 working team-days × 2 paid specialists × USD800/person-day × THB31.5/USD",
+    activity:"Retained 40-day SAT/SIT labour SELL basis — phase/day split NOT yet established",
+    driver:"40 historical-priced team-days × 2 paid specialist SELL rate × USD800/person-day × THB31.5/USD (not new approved BF/Yard/Offshore schedule)",
     workingSellTHB:offshoreLabor,postedWithinB3:true},
    {id:"VEEX",moduleId:"bid.budget.working.bc.b3.veex-mx100",
     activity:"Temporary VeEX MX100+ SAT instrument rental",
