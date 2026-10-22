@@ -103,6 +103,19 @@ assert(jsx.includes("querySelectorAll(\"details.p553-b1-group, details.p553-b1-i
 assert(css.includes(".p553-b1-group--management")&&css.includes(".p553-b1-group--audit"));
 assert(host.includes("sourceLedger={<B1IndirectExpenseRegister0553 workingRow={workingRow}/>}")&&
  host.includes("sourceEvidence={<React.Fragment>"));
+// Regression: React evaluates JSX eagerly. No sharedEvidence reference is allowed
+// inside its OWN initializer, even when the B1 budget prop is conditionally rendered.
+const initAt=host.indexOf("const sharedEvidence=<React.Fragment>");
+const ownerAt=host.indexOf("const ownerPriceTrace=",initAt);
+const returnAt=host.indexOf("return <section",ownerAt);
+const b1At=host.indexOf('e.code==="B1"&&<B1RevKMilestoneBudget0553',returnAt);
+assert(initAt>=0&&ownerAt>initAt&&returnAt>ownerAt&&b1At>returnAt,
+ "B1 Rev.K budget must render after sharedEvidence was initialized");
+assert(!host.slice(initAt,ownerAt).includes("{sharedEvidence}"),
+ "React SSR TDZ regression: sharedEvidence cannot refer to itself in its initializer");
+assert(host.slice(b1At).includes("{sharedEvidence}"),
+ "B1 audit source evidence should still be passed into the original B1 accordion");
+// The renderToStaticMarkup(Host) above is the runtime regression for B1.
 assert.equal(JSON.stringify({b1:current().byCode.B1,b3:current().byCode.B3,
  partB:current().knownWorkingSellTHB}),snapshot,
  "Read-only B1 accordion mutated canonical B/C values");
