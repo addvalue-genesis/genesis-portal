@@ -35,7 +35,7 @@ const historicalB3BeforeScenarioTHB=2397725;
 const historicalB3ScenarioTHB=2750525;
 const historicalB9WorkingSellTHB=233600;
 const historicalScenarioPartBTHB=4385436.82;
-assert.equal(source.knownWorkingSellTHB,4481186.82);
+assert.equal(source.knownWorkingSellTHB,4667836.82);
 assert.equal(source.byCode.B3.workingSellTHB,2599325);
 assert.equal(source.byCode.B9.workingSellTHB,480550);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit
@@ -45,7 +45,8 @@ assert.equal(source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB,246950);
 assert.equal(
  source.knownWorkingSellTHB+
  (historicalB3ScenarioTHB-source.byCode.B3.workingSellTHB)+
- (historicalB9WorkingSellTHB-source.byCode.B9.workingSellTHB),
+ (historicalB9WorkingSellTHB-source.byCode.B9.workingSellTHB)-
+ (source.byCode.B8.workingSellTHB-30000), // B8 current Hybrid increase excluded from historical B6 bridge
  historicalScenarioPartBTHB
 );
 // Compare integer satang to avoid IEEE-754 drift (e.g. 4032636.8200000003).
@@ -53,7 +54,8 @@ assert.equal(
  Math.round(100*(
   source.knownWorkingSellTHB-
   (source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB)-
-  (source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB)
+  (source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB)-
+  (source.byCode.B8.workingSellTHB-30000)
  )),
  403263682
 );
