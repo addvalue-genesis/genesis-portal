@@ -103,7 +103,7 @@ export function B2WorkingPriceOverview0553({workingRow}){
    </table></div>
 
    <details className="p553-bc-price-doc-group"
-    data-component-key={ROOT+".price-overview.role-cost-build"} defaultOpen>
+    data-component-key={ROOT+".price-overview.role-cost-build"} open>
     <summary className="p553-bc-price-leaf-head">
      <span className="p553-bc-price-num">B2.P1</span>
      <span className="p553-bc-price-leaf-label"><strong>Rev00a — 5 Roles × Provisional MH × Historical THB/MH</strong>
@@ -136,7 +136,7 @@ export function B2WorkingPriceOverview0553({workingRow}){
    </details>
 
    <details className="p553-bc-price-doc-group"
-    data-component-key={ROOT+".price-overview.new-doc-build"} defaultOpen>
+    data-component-key={ROOT+".price-overview.new-doc-build"} open>
     <summary className="p553-bc-price-leaf-head">
      <span className="p553-bc-price-num">B2.P2</span>
      <span className="p553-bc-price-leaf-label"><strong>Rev00d — N-01…N-04 VDRS / Final / DDP New Document Cost</strong>
