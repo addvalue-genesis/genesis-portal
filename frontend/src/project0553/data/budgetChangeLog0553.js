@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R16";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R17";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-05",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"B2 Working Price Overview React SSR defaultOpen Warning Fix",
+  detail:"Windows Node v24.21.0 reports B1 SSR PASS and B2/B9 owner-price-trace PASS, but React development warns B2WorkingPriceOverview0553.jsx native details.defaultOpen unsupported. Replace BOTH role-cost-build and new-doc-build details with React-supported open, keep initial expansion unchanged, and add SSR/source guard in validate-0553-b2-b9-owner-price-trace.cjs. Historical Rev05 rates, selected B2/B9 Working SELL, release finance, native source and direct costs unchanged; Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b2","bid.budget.working.bc.b2.price-overview","bid.budget.working.bc.b2.price-trace"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"2026-10-22 user Node B2 SSR warning, B2WorkingPriceOverview0553.jsx line 35"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-04",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"B2 Rev05 THB/MH precision and React details defaultOpen warnings resolved",
