@@ -77,7 +77,24 @@ assert.equal(docIds.length,new Set(docIds).size,
  "B2 should show source detail exactly ONCE with unique Module IDs");
 const original=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(original.includes('{code==="B2"&&<B2WorkingPriceOverview0553 workingRow={workingRow}/>}'));
+// The historical B2 price view now sits inside a collapsed, explicitly
+// labeled Rev05 comparison <details> under the ONE B2 owner-price-trace.
+// React SSR still renders its children and all source module anchors once.
+const legacyWrapper='{code==="B2"&&<details className="p55-panel p553-b2-legacy-price-reference"';
+const child='<B2WorkingPriceOverview0553 workingRow={workingRow}/>';
+assert(original.includes(legacyWrapper),
+ "B2 original historical price comparison must stay in the owner-local panel");
+assert(original.includes('data-component-key="bid.budget.working.bc.b2.quote-comparison"'),
+ "B2 legacy comparison must keep the original Module ID");
+assert(original.includes(child)&&original.indexOf(child)>original.indexOf(legacyWrapper),
+ "B2 original price breakdown must remain nested inside the legacy comparison");
+assert(original.split(child).length===2,
+ "B2 historical price overview must be mounted exactly ONCE in the owner trace");
+const overviewId='data-component-key="bid.budget.working.bc.b2.price-overview"';
+assert(html.includes(overviewId)&&html.split(overviewId).length===2,
+ "B2 original price overview must render exactly ONCE without duplicate posting");
+assert(html.includes('data-component-key="bid.budget.working.bc.b2.quote-comparison"'),
+ "B2 original source overview must remain reachable under the legacy audit wrapper");
 assert(host.includes('{e.code==="B2"&&ownerPriceTrace}'));
 assert(!host.includes('<B2WorkingPriceOverview0553 workingRow={workingRow}/>'),
  "Do not duplicate B2 overview outside owner price-trace");
