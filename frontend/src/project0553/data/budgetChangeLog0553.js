@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R24";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R25";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-13",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"Unified 101-Validator Repair: Source Authority, Rev03 Lock and Current 10.2 UI",
+  detail:"User sequential diagnostic found 91 PASS and 10 FAIL in spare-onward build. Reconcile outdated B2/B3/B9 B5 test prices and legacy 10.2 inline cost/navigation assertions to current canonical hierarchy; keep B3 historical 39-team-day audit separate from selected 40-day plan. Restore LocationBomDetail0553.jsx exactly to locked Rev03 gitBlobSha 0f2d0a90af21fcde00898f71bd081eaade0c3589; keep independent BULK via SimpleBom, never regenerate manifest. MR0003 selected MGW PHONE-1/WAROM, BARTEC GA-1004 8-hole comparison is historical only with MGW actual entry count OPEN; no gland or extra equipment posting. Show VALIDATION change notes in What's New. Improve diagnostic to show failing stack/script line, not generic AssertionError only. Current Working SELL unchanged; full Node 101-test rerun and webpack verification still REQUIRED, Customer Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc","bid.budget.working.bc.b1","bid.budget.working.bc.b2","bid.budget.working.bc.b3","bid.budget.bulk.bartec-gland-size-quantity","bid.budget.bom.system-location-mto"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"2026-10-22 Windows Node 101-test diagnostic (91 PASS, 10 FAIL) / approved Rev03 manifest and selected MGW R2"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-12",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"RACON quotation cost identity and 132-stage build validation diagnostic",
