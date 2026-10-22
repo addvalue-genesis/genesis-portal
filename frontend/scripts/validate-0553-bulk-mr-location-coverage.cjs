@@ -211,7 +211,8 @@ assert(simple.includes('<BulkMrLocationCoverage0553 mr={system} site={site} stat
 assert(simple.includes('moduleKey="bid.budget.bom.system-location-mto"'));
 assert(simple.includes('key:"bulk-status"'));
 assert(simple.includes('value:"BULK_RESERVE_CANDIDATE"'));
-assert(simple.includes('navigationTarget={navigationTarget}'));
+assert(simple.includes('focusModuleId={navigationTarget}'),
+ "10.1 BULK filters must pass exact Project Navigator target to BulkMrLocationCoverage0553");
 const routeFilterLine=simple.split(/\r?\n/).find(x=>x.includes("navigationTarget.match("));
 assert(routeFilterLine,"10.1.1.3 must interpret Site + MR from the exact navigator Module ID");
 const matchSource=routeFilterLine.match(/navigationTarget\.match\((\/.*\/[imgsy]*)\)/)?.[1];
