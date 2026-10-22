@@ -30,7 +30,7 @@ const copy=id=><span className="p553-b2-recalc-copy"
  </span>;
 function WorkGroup({title,description,id,numCode,children,tone="project",defaultOpen=false}){
  return <details className={"p553-b2-recalc-group p553-b2-recalc-group--"+tone}
-  data-component-key={id} defaultOpen={defaultOpen}>
+  data-component-key={id} open={defaultOpen}>
   <summary className="p553-b2-recalc-summary">
    <span className="p553-b2-recalc-num">{numCode}</span>
    <span className="p553-b2-recalc-label"><strong>{title}</strong>

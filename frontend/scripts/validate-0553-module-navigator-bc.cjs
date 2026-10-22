@@ -35,7 +35,12 @@ assert(index.every(x=>x.tab==="budget"&&x.anchorModuleId),
  "Navigator must route each source Module ID to a real Budget DOM anchor");
 const same=searchBcModuleNavigator0553("BID.BUDGET.WORKING.BC",index);
 assert.equal(same.length,index.length,"Parent prefix must find all nested Budget modules");
-assert.equal(searchBcModuleNavigator0553("bid.budget.working.bc.b6",index).length,1);
+const b6Matches=searchBcModuleNavigator0553("bid.budget.working.bc.b6",index);
+assert(b6Matches.some(x=>x.id==="bid.budget.working.bc.b6"&&x.kind==="CUSTOMER_BC_WORKING_ROW"),
+ "B6 search must retain its EXACT canonical owner even with nested price/evidence modules");
+assert(b6Matches.every(x=>x.id.startsWith("bid.budget.working.bc.b6")||
+ x.keywords.toLowerCase().includes("bid.budget.working.bc.b6")),
+ "B6 search must not return an unrelated owner module");
 assert.equal(searchBcModuleNavigator0553("10.2.3",index).length,5,
  "Third source group plus B10–B13 must be indexed");
 assert.equal(searchBcModuleNavigator0553("never-created-fake-module",index).length,0);

@@ -48,11 +48,11 @@ for(const code of codes){
  assert.deepEqual(b.byCode[code].workCostLines,m.byCode[code]);
  assert.equal(b.byCode[code].workCostLineCount,m.byCode[code].length);
  assert.equal(b.byCode[code].workCostLineModuleId,m.moduleId);
- assert.equal(b.byCode[code].workingSellTHB,({B1:211600,B3:2443400,B9:0,B5:311184,B6:307584,B7:30000,B10:123024.37,B13:22484.21,C1:4049349.36,C2:721806.68,B11:b.byCode.B11.workingSellTHB})[code]??m.workingSellByCode[code]);
+ assert.equal(b.byCode[code].workingSellTHB,({B1:211600,B2:237121.13,B3:2750525,B9:233600,B5:311184,B6:307584,B7:30000,B10:123024.37,B13:22484.21,C1:4049349.36,C2:721806.68,B11:b.byCode.B11.workingSellTHB})[code]??m.workingSellByCode[code]);
 }
 assert.equal(b.workCostLineCount,111);
 assert.equal(b.workCostLineAuditCount,40);
-assert.equal(b.knownWorkingSellTHB,3844711.82);
+assert.equal(b.knownWorkingSellTHB,4385436.82);
 assert.equal(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((sum,x)=>Math.round((sum+x.workingSellTHB)*100)/100,0),b.knownWorkingSellTHB,"Base-only budget sum; optional C1/C2 excluded");
 assert.equal(b.knownDirectCostTHB,null);
 const b1=m.byCode.B1.filter(x=>x.id.startsWith("B1-WBS-"));
@@ -103,21 +103,35 @@ assert(main.includes('const bcWorking=selectBcTurnkeyWorkingCost0553();'),
  "10.2 must consume the canonical Part B/C selector");
 assert(main.includes('<BcWorkCostLines0553 selectedCode={bcTab}/>'),
  "10.2 selected B/C tab must render its Cost-Line ledger");
-assert(main.includes('<BcWorkCostLines0553 selectedCode={item.code}/>'),
- "10.2 ALL view expanded canonical item must render Cost-Line ledger");
-assert(main.includes('bcWorking.byCode[bcTab]')&&
- main.includes('group.rows.map(item=>')&&
- main.includes('bcDetailCode===item.code'),
- "10.2 current tab/expanded list must select canonical B/C rows, not a historical second source");
-assert(main.includes('<BcCostEvidenceDetail0553 workingRow={item}/>')&&
- main.includes('data-component-key={item.moduleId}'),
- "10.2 expanded row must carry canonical Cost Evidence and Module ID");
+// ALL view is now BcWorkingHierarchy0553; CommercialWorkspace mounts the
+// hierarchy once and passes canonical Part B/C rows. Check its actual JSX.
+const hierarchy=read("project0553/BcWorkingHierarchy0553.jsx");
+assert(main.includes('<BcWorkingHierarchy0553')&&
+ main.includes('partBRows={partBRows} partCRows={partCRows}')&&
+ main.includes('bcWorking.byCode[bcTab]'),
+ "10.2 must mount hierarchy and per-owner tab from canonical B/C rows");
+assert(hierarchy.includes('group.rows.map(item=>')&&
+ hierarchy.includes('data-component-key={item.moduleId}')&&
+ hierarchy.includes('<BcCostEvidenceDetail0553 workingRow={item} navigationTarget={navigationTarget}/>'),
+ "ALL work-type rows must carry the canonical source/Module ID");
+assert(hierarchy.includes('<BcWorkCostLines0553 selectedCode={item.code} presentationNamespace={item.moduleId}/>')&&
+ main.includes('<BcWorkCostLines0553 selectedCode={bcTab}/>'),
+ "Historical nonposting cost audit must remain accessible in both supported paths");
 assert(render.includes("m.rows.filter")&&render.includes("m.workingSellByCode"));
 assert(render.includes("showAuditClauses")&&render.includes("Cost Owner: 10.2 only"));
 assert(render.includes("Object.entries(x.roleMH)")&&render.includes("knownSellCount"),"B1 labor skills and known-only incomplete Sell coverage must be visible");
-assert(render.includes("data-component-key={x.moduleId}")&&render.includes("componentKey={x.moduleId}"));
+// Cost-line rows use their canonical moduleId when viewed directly, but use a
+// namespaced preview anchor when embedded in another owner's audit accordion
+// to prevent duplicate DOM IDs. The visible Copy action must always preserve
+// the original canonical Module ID, regardless of the preview namespace.
+assert(render.includes('data-component-key={presentationNamespace?presentationNamespace+".cost-line-preview."+x.id.toLowerCase():x.moduleId}'),
+ "Each cost-line DOM anchor must use canonical ID or distinct preview namespace");
+assert(render.includes('componentKey={x.moduleId}'),
+ "Each cost-line must still expose its canonical Module ID for Copy/navigation");
+assert(render.includes('data-component-key={presentationNamespace?presentationNamespace+".cost-lines-view":m.moduleId}'),
+ "Cost-line panel itself must keep the canonical anchor for un-namespaced views");
 for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcWorkCostLines0553.jsx"]){
  assert(babel.transformSync(read(f),{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
 }
-console.log("PASS 0553 canonical 10.2 UI: 111 historical source/audit rows retained, B1 27/964 MH historical, current B3 2,443,400 including FAT, B9 Base 0 with Yard optional 233,600; both tab and expanded detail paths render source-led cost lines. No verified Direct Cost posted.");
+console.log("PASS 0553 canonical 10.2 UI: 111 historical source/audit rows retained, B1 27/964 MH historical, current B3 2,750,525 including FAT, B9 Base 233,600 with conditional field execution; both tab and expanded detail paths render source-led cost lines. No verified Direct Cost posted.");

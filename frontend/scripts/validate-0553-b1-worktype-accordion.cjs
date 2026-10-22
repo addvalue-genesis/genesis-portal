@@ -27,8 +27,8 @@ assert.equal(model.baseWorkingCostTHB,181400);
 assert.equal(model.conditionalWorkingSellTHB,51700);
 assert.equal(b1.workingSellTHB,211600);
 assert.equal(b1.directCostTHB,null);
-assert.equal(bc.knownWorkingSellTHB,3844711.82);
-assert.equal(bc.byCode.B3.workingSellTHB,2443400);
+assert.equal(bc.knownWorkingSellTHB,4385436.82);
+assert.equal(bc.byCode.B3.workingSellTHB,2750525);
 assert.equal(model.accounts.length,8);
 assert.equal(model.roleLines.length,41);
 assert.equal(model.milestones.length,19);
@@ -100,9 +100,28 @@ const jsx=fs.readFileSync(path.join(root,"project0553/B1RevKMilestoneBudget0553.
 const css=fs.readFileSync(path.join(root,"project0553/project0553.css"),"utf8");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
 assert(jsx.includes("querySelectorAll(\"details.p553-b1-group, details.p553-b1-item\")"));
+assert(!jsx.includes("data-component-key={id} defaultOpen={index===0}")&&
+ !jsx.includes("data-component-key={moduleId} defaultOpen>"),
+ "React <details> must use supported open attr without defaultOpen warnings");
+assert(jsx.includes("data-component-key={id} open={index===0}")&&
+ jsx.includes("data-component-key={moduleId} open>"),
+ "Initial B1 details-open states must be maintained");
 assert(css.includes(".p553-b1-group--management")&&css.includes(".p553-b1-group--audit"));
 assert(host.includes("sourceLedger={<B1IndirectExpenseRegister0553 workingRow={workingRow}/>}")&&
  host.includes("sourceEvidence={<React.Fragment>"));
+// Regression: React evaluates JSX eagerly. No sharedEvidence reference is allowed
+// inside its OWN initializer, even when the B1 budget prop is conditionally rendered.
+const initAt=host.indexOf("const sharedEvidence=<React.Fragment>");
+const ownerAt=host.indexOf("const ownerPriceTrace=",initAt);
+const returnAt=host.indexOf("return <section",ownerAt);
+const b1At=host.indexOf('e.code==="B1"&&<B1RevKMilestoneBudget0553',returnAt);
+assert(initAt>=0&&ownerAt>initAt&&returnAt>ownerAt&&b1At>returnAt,
+ "B1 Rev.K budget must render after sharedEvidence was initialized");
+assert(!host.slice(initAt,ownerAt).includes("{sharedEvidence}"),
+ "React SSR TDZ regression: sharedEvidence cannot refer to itself in its initializer");
+assert(host.slice(b1At).includes("{sharedEvidence}"),
+ "B1 audit source evidence should still be passed into the original B1 accordion");
+// The renderToStaticMarkup(Host) above is the runtime regression for B1.
 assert.equal(JSON.stringify({b1:current().byCode.B1,b3:current().byCode.B3,
  partB:current().knownWorkingSellTHB}),snapshot,
  "Read-only B1 accordion mutated canonical B/C values");

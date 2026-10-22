@@ -86,7 +86,8 @@ for(const s of wpBulk.filter(x=>["ZWP20","ZWP21","ZWP22"].includes(x.wp))){
  assert(racon.items.some(x=>/MGW-R2-CONTROL/.test(x.id)&&x.extendedTHB===null));
  assert(racon.items.every(x=>x.rateTHB===null&&x.extendedTHB===null));
 }
-assert.equal(bc().byCode.B3.workingSellTHB,2443400,"MGW OEM work may not alter ADDVALUE B3 Working SELL");
+assert.equal(bc().byCode.B3.workingSellTHB,2750525,"MGW purchased iFAT and Facility SERV-2/4 are added to B3 once, while MGW A equipment remains unchanged");
+assert.equal(bc().byCode.B3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,7500);
 assert.equal(bc().byCode.B3.directCostTHB,null);
 assert.equal(recon.mgwSelectedOverallUSD,364841);
 assert.equal(recon.mgwSelectedEquipmentUSD,350341);

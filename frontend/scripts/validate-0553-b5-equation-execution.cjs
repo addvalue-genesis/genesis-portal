@@ -76,11 +76,11 @@ assert.equal(candidate.postToPricing,false);
 assert.equal(b.byCode.B5.directCostTHB,null);
 assert.equal(b.byCode.B5.commercialSellTHB,null);
 assert.equal(b.byCode.B5.workingSellTHB,311184);
-for(const [code,sell] of Object.entries({B1:211600,B2:580000,B3:2443400,B8:30000,B9:0}))assert.equal(b.byCode[code].workingSellTHB,sell);
+for(const [code,sell] of Object.entries({B1:211600,B2:237121.13,B3:2750525,B8:30000,B9:233600}))assert.equal(b.byCode[code].workingSellTHB,sell,"Current selected Working SELL must not be replaced by Rev05 "+code);
 const primary=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert.equal(b.byCode.B5.workingSellTHB,311184,"B5 approved budgetary Working SELL; physical packing direct cost remains unverified");
-assert.equal(b.byCode.B3.workingSellTHB,2443400);
-assert.equal(b.knownWorkingSellTHB,4187590.69,"Current Rev.K Base includes repriced B1/B3/B9 and excludes C1/C2 options");
+assert.equal(b.byCode.B3.workingSellTHB,2750525,"MGW purchased FAT + B3 current selected owner amount");
+assert.equal(b.knownWorkingSellTHB,4385436.82,"Current Part B Base includes latest B2/B3 FAT and B9 quoted Base, excludes C1/C2 options");
 assert.equal(b.knownWorkingSellTHB,Math.round(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((n,x)=>n+x.workingSellTHB,0)*100)/100);
 assert.equal(derivePartBcWorkingWbs0553().subtotalTHB,3804160);
 assert.equal(b.knownDirectCostTHB,null);
@@ -112,4 +112,4 @@ for(const f of ["project0553/B5EquationAudit0553.jsx","project0553/BcWorkCostLin
  assert(babel.transformFileSync(path.join(root,f),{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
 }
-console.log("PASS B5: 16 nonadditive Annex/MR source requirements; 4 supplier packing streams; 6 physical pack drivers all OPEN_INPUT; source scenario no posting, OEM credit and duplicate keys guarded; 111 cost lines / B1-B3 prices unchanged.");
+console.log("PASS B5: 16 nonadditive Annex/MR source requirements; 4 supplier packing streams; 6 physical pack drivers all OPEN_INPUT; source scenario no posting, OEM credit and duplicate keys guarded; 111 cost lines / current B1-B3 prices unchanged.");

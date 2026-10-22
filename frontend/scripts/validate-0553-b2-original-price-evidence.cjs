@@ -31,6 +31,9 @@ assert.equal(m.rev00d.roundedAdditionTHB,120000);
 assert.equal(m.rev00d.revisedTemporarySellTHB,560000);
 assert.equal(m.unreconciledWorkingSellDifferenceTHB,20000);
 assert.equal(m.roleWorkload.length,5);
+// The source records 964.2785625 MH; B2 UI uses toFixed(3) = 964.279,
+// not the stale literal 964.278. Never change source MH to satisfy a text test.
+assert(Math.abs(m.workingMH-964.2785625)<1e-8,"Rev00a source MH precision drift");
 assert.equal(round(m.workingMH),964.28);
 assert.equal(round(m.roleCostProxyTotalTHB),158166.88);
 assert.equal(round(m.temporaryRev00a.unroundedWorkingSellTHB),434009.91);
@@ -50,8 +53,14 @@ assert.equal(m.canPostCost,false);
 assert.equal(m.canChangeWorkingSell,false);
 const html=renderToStaticMarkup(React.createElement(Host,{workingRow:b2}));
 const standalone=renderToStaticMarkup(React.createElement(View,{workingRow:b2}));
+// Contract check: verify source MH and its actual 3-decimal presentation,
+// including the standalone owner screen. Do not back-solve the 580k quote.
+const expectedHistoricalMH=m.workingMH.toFixed(3)+" MH";
+assert.equal(expectedHistoricalMH,"964.279 MH");
+assert(standalone.includes(expectedHistoricalMH),
+ "B2 standalone original source must show the rounded Rev00a MH");
 for(const k of ["440,000.00","120,000.00","560,000.00","20,000.00","580,000.00",
- "964.278","158,166.88","43,549.87","119,500.84","B2.P1","B2.P2",
+ m.workingMH.toFixed(3),"158,166.88","43,549.87","119,500.84","B2.P1","B2.P2",
  "Unreconciled price change","source cost proxy","Source / Revision",
  "Document Controller / Project Admin","N-01","N-02","N-03","N-04"]){
  assert(html.toLowerCase().includes(k.toLowerCase()),"Missing original B2 source evidence in owner: "+k);
@@ -68,7 +77,24 @@ assert.equal(docIds.length,new Set(docIds).size,
  "B2 should show source detail exactly ONCE with unique Module IDs");
 const original=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(original.includes('{code==="B2"&&<B2WorkingPriceOverview0553 workingRow={workingRow}/>}'));
+// The historical B2 price view now sits inside a collapsed, explicitly
+// labeled Rev05 comparison <details> under the ONE B2 owner-price-trace.
+// React SSR still renders its children and all source module anchors once.
+const legacyWrapper='{code==="B2"&&<details className="p55-panel p553-b2-legacy-price-reference"';
+const child='<B2WorkingPriceOverview0553 workingRow={workingRow}/>';
+assert(original.includes(legacyWrapper),
+ "B2 original historical price comparison must stay in the owner-local panel");
+assert(original.includes('data-component-key="bid.budget.working.bc.b2.quote-comparison"'),
+ "B2 legacy comparison must keep the original Module ID");
+assert(original.includes(child)&&original.indexOf(child)>original.indexOf(legacyWrapper),
+ "B2 original price breakdown must remain nested inside the legacy comparison");
+assert(original.split(child).length===2,
+ "B2 historical price overview must be mounted exactly ONCE in the owner trace");
+const overviewId='data-component-key="bid.budget.working.bc.b2.price-overview"';
+assert(html.includes(overviewId)&&html.split(overviewId).length===2,
+ "B2 original price overview must render exactly ONCE without duplicate posting");
+assert(html.includes('data-component-key="bid.budget.working.bc.b2.quote-comparison"'),
+ "B2 original source overview must remain reachable under the legacy audit wrapper");
 assert(host.includes('{e.code==="B2"&&ownerPriceTrace}'));
 assert(!host.includes('<B2WorkingPriceOverview0553 workingRow={workingRow}/>'),
  "Do not duplicate B2 overview outside owner price-trace");

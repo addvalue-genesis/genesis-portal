@@ -64,9 +64,35 @@ assert(m.roleLines.filter(x=>x.wbs==="K01").every(x=>!x.roleName.includes("FAT w
 assert(m.expenseLines.filter(x=>x.conditional).every(x=>x.account==="B1.6"||x.account==="B1.7"));
 assert.equal(bc.byCode.B1.workingSellTHB,211600,"B1 must use new role/activity costs only");
 assert.equal(bc.byCode.B1.b1SupportPlanningBudget.proposedB1BaseWorkingSellTHB,m.proposedB1BaseWorkingSellTHB);
-assert.equal(bc.knownWorkingSellTHB,4187590.69,"Part B Base must reconcile after B1 legacy exclusion");
-assert.equal(bc.byCode.B3.workingSellTHB,2443400);
-assert.equal(bc.byCode.B9.workingSellTHB,0);
+// Part B selected pricing has changed since the original B1-only test was
+// authored: B2 Rev05 THB580,000 was replaced with a first-principles
+// THB237,121.13 selected Working SELL, and MGW purchased iFAT/Facility added
+// THB307,125 to B3. Do not regress either price owner to satisfy a B1 test.
+assert.equal(bc.byCode.B2.workingSellTHB,237121.13,
+ "B2 current independent 131-WO VDRL Working SELL must be selected, not Rev05");
+assert.equal(bc.previousB2Rev05ReferenceTHB,580000,
+ "Old B2 quoted SELL must remain historical, nonposting evidence");
+assert.equal(bc.byCode.B3.workingSellTHB,2750525,
+ "B3 must include sourced MGW purchased FAT in addition to witnesses/SAT");
+assert.equal(bc.byCode.B3.b3OriginalWithoutMgwPurchasedTHB,2443400,
+ "B3 previous 40-day SAT / FAT witness remains a reference basis, not double posted");
+assert.equal(bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125,
+ "MGW purchased FAT Working SELL must be included once in canonical B3");
+const roundTHB=v=>Math.round((v+Number.EPSILON)*100)/100;
+const historicalB1OnlyBaseTHB=4187590.69; // B1-current, B2 historical Rev05, B3 before MGW purchase.
+const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
+ -(bc.previousB2Rev05ReferenceTHB-bc.byCode.B2.workingSellTHB)
+ +bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB
+ +bc.byCode.B9.workingSellTHB);
+assert.equal(historicalToCurrent,4385436.82,
+ "Historical B1-only baseline to current B2/B3 price selection bridge failed");
+const sumBaseOwners=roundTHB(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
+ .reduce((sum,r)=>sum+r.workingSellTHB,0));
+assert.equal(bc.knownWorkingSellTHB,sumBaseOwners,
+ "Canonical Part B Base must be the sum of unique selected base-scope B owners");
+assert.equal(bc.knownWorkingSellTHB,historicalToCurrent,
+ "Part B Base must reconcile after B1 legacy exclusion, B2 131-WO reprice and MGW purchased FAT");
+assert.equal(bc.byCode.B9.workingSellTHB,233600);
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600);
 const jsx=fs.readFileSync(path.join(root,"project0553/B1RevKMilestoneBudget0553.jsx"),"utf8");
 for(const token of ["selectB1ProjectSupportBudget0553","model.accounts.map(","model.milestones.map(",

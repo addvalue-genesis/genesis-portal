@@ -137,7 +137,11 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  // Link navigation is read-only: never modify Working SELL or release status.
  const [releaseJump,setReleaseJump]=useState(null);
  const openReleaseSource=item=>{
-  const code=String(item?.code||"").toUpperCase();
+  const incomingId=String(item?.sourceModuleId||"");
+  // What's New and nested financial IDs carry a Module ID but no B/C code field.
+  // Resolve the owner from the existing contract Module ID; do not infer from prices.
+  const ownerFromId=incomingId.match(/^bid\.budget\.working\.bc\.(b(?:[1-9]|1[0-4])|c[12])(?:\.|$)/i)?.[1]||"";
+  const code=String(item?.code||ownerFromId).toUpperCase();
   const isBc=/^(?:B(?:[1-9]|1[0-4])|C[12])$/.test(code);
   const id=String(item?.sourceModuleId||
    (isBc?"bid.budget.working.bc."+code.toLowerCase():"bid.budget.bom.system-location-mto"));

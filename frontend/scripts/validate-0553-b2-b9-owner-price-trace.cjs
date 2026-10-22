@@ -28,7 +28,7 @@ assert.equal(vdrl().b2CalculatedMH,null);
 assert.equal(vdrl().b2VerifiedCostTHB,null);
 assert.deepEqual(["MR-0001","MR-0002","MR-0003","MR-0004"].map(x=>vdrl().byMr[x].sourceRows),
  [37,36,35,35]);
-assert.equal(bc.byCode.B9.workingSellTHB,0);
+assert.equal(bc.byCode.B9.workingSellTHB,233600);
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600);
 assert.equal(bc.byCode.B8.workingSellTHB,30000);
 assert.equal(bc.byCode.B8.qtyDriver,44);
@@ -68,15 +68,35 @@ for(const x of ["580,000.00","143","38","Document Controller MH",
  assert(b2html.toLowerCase().includes(x.toLowerCase()),"B2 current proof missing "+x);
 }
 assert(!b2html.includes("Rate THB/MH: THB "),"No invented Document Controller pay rate");
-assert(b2html.includes("104.125")&&b2html.includes("341.625"),"Rev05 historical role-rate reference missing");
+// Rev05 source rates are THB/MH with 3 decimal precision (NOT new payroll).
+// Guard the rendered values, not a two-decimal commercial formatting artefact.
+assert(b2html.includes("THB 104.125")&&b2html.includes("THB 341.625"),
+ "Rev05 historical THB/MH exact source seeds must be visible at 3 decimals");
 assert(b2html.includes("HISTORICAL"),"Old role cost seeds must never masquerade as current rate");
 const b9html=renderToStaticMarkup(React.createElement(PriceTrace,{workingRow:bc.byCode.B9}));
-assert(b9html.includes("233,600.00")&&b9html.includes("THB 0.00"));
-assert(b9html.includes("Optional call-out only"));
+assert(b9html.includes("233,600.00")&&b9html.includes("THB 233,600.00"));
+assert(b9html.includes("Quoted B9 Base once"));
 assert(b9html.includes("seven Yard working days"));
 const source=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 assert(source.includes("Do not divide THB580,000 by 143 or 38"));
 assert(source.includes("row.calculatedB2MH"));
+assert(source.includes("fmtHistoricalRate(rate)"),
+ "Historical input THB/MH must use a 3-decimal reference-only formatter");
+const vdrlUi=fs.readFileSync(path.join(root,"project0553/B2IndependentVdrlRecalculation0553.jsx"),"utf8");
+assert(!vdrlUi.includes("data-component-key={id} defaultOpen={defaultOpen}"),
+ "React <details> must use supported open, not defaultOpen, for dossier groups");
+assert(vdrlUi.includes("data-component-key={id} open={defaultOpen}"),
+ "Original B2 expand/default-open behavior must be preserved");
+const priceOverviewJsx=fs.readFileSync(path.join(root,"project0553/B2WorkingPriceOverview0553.jsx"),"utf8");
+assert(!priceOverviewJsx.includes("defaultOpen"),
+ "React <details> inside B2 historical overview must never use unsupported defaultOpen");
+for(const key of ["role-cost-build","new-doc-build"]){
+ assert(priceOverviewJsx.includes('data-component-key={ROOT+".price-overview.'+key+'"} open>'),
+  "B2 historical accordion "+key+" must start expanded using valid native open");
+}
+assert(b2html.includes('data-component-key="bid.budget.working.bc.b2.price-overview.role-cost-build"')&&
+ b2html.includes('data-component-key="bid.budget.working.bc.b2.price-overview.new-doc-build"'),
+ "Both B2 historical price details must remain present in actual server rendering");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
 assert(host.includes("<BcOwnerPriceTrace0553")&&host.includes("auditContent={<React.Fragment>"),
  "All owner-local B2-B9 audit proof must be nested without duplicate standalone cost-lines");
@@ -84,4 +104,4 @@ assert(host.includes('{e.code==="B2"&&ownerPriceTrace}'),
  "B2 price detail must appear before generic evidence summary");
 const canonical=JSON.stringify(current());
 assert.equal(canonical,snap,"Presentation mutated canonical B1–B14/C1/C2 cost/SELL");
-console.log("PASS B2-B9 cost owner trace: B2 143 VDRL source plus recalculated 237,121.13 Working SELL with MH/rate OPEN; B9 conditional 233,600 not Base; no fabricated price, no duplicate Module ID or price posting.");
+console.log("PASS B2-B9 cost owner trace: B2 143 VDRL source plus recalculated 237,121.13 Working SELL with MH/rate OPEN; B9 quoted 233,600 Base, execution on written call-out; no fabricated price, no duplicate Module ID or price posting.");

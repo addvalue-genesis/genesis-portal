@@ -44,10 +44,10 @@ for(const c of ["B3","B6","B9"]){
  assert.match(row.executionDecision.integratedFatLocation,/MGW.*China/); // Active Rev.K venue overrides historical BKK source only
  assert.equal(row.directCostTHB,null,"Execution location must not invent "+c+" direct cost");
 }
-assert.equal(working.byCode.B3.workingSellTHB,2443400);
-assert.equal(working.byCode.B9.workingSellTHB,0);
+assert.equal(working.byCode.B3.workingSellTHB,2750525);
+assert.equal(working.byCode.B9.workingSellTHB,233600);
 assert.equal(working.byCode.B6.workingSellTHB,307584,"B6 approved pre-award logistics working sell; direct cost stays null");
-assert.equal(working.knownWorkingSellTHB,4187590.69,"Active Rev.K Part B Base including B1/B3/B9 replacement");
+assert.equal(working.knownWorkingSellTHB,4385436.82,"Current selected Part B Base: B1/B2 reprice, MGW purchased B3 FAT and B9 1 LS Base included once");
 assert.equal(working.knownWorkingSellTHB,Math.round(working.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((sum,r)=>sum+r.workingSellTHB,0)*100)/100,"Options excluded from Base");
 assert.equal(working.costComplete,false);
 assert.equal(working.releaseAllowed,false);
@@ -56,6 +56,11 @@ assert.equal(d.existingDirectCostUnchanged,true);
 assert.equal(d.releaseAllowed,false);
 const ui=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(ui.includes("MGW executes MR0001–MR0004 OEM IFAT/FAT"));
-assert(ui.includes("item.executionDecision"));
+// The old inline item.executionDecision panel moved into canonical 10.2
+// BcCostEvidenceDetail. Ensure active MGW FAT is visible while Bangkok stays
+// isolated as historical FAT_EXECUTION_BASIS provenance.
+assert(ui.includes("MGW executes MR0001–MR0004 OEM IFAT/FAT")&&
+ ui.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/>'),
+ "10.2 active MGW basis must be visible through the selected owner detail");
 assert(ui.includes("JUTAL Zhuhai Yard, China"));
 console.log("PASS 0553 Rev05 Bangkok FAT audit preserved, active Rev.K MGW FAT and JUTAL Yard strategy reconciled, B1/B3/B9 current working sell changed with budget authority; no direct-cost posting.");

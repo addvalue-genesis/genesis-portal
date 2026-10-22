@@ -6,12 +6,16 @@ import {selectBcB1B2EquationExecution0553} from "./data/bcB1B2EquationExecution0
 import {B2WorkingPriceOverview0553} from "./B2WorkingPriceOverview0553";
 import {B2IndependentVdrlRecalculation0553} from "./B2IndependentVdrlRecalculation0553";
 import {selectBcB5HistoricalPriceBridge0553} from "./data/bcB5HistoricalPriceBridge0553";
+import {B5B6B7LinkedLogistics0553} from "./B5B6B7LinkedLogistics0553";
 
 // 10.2 owner-local READ ONLY price evidence for B2/B4–B9.
 // Never infer document man-hours, unit SELL or payroll from a lump-sum quote.
 // Source authority remains bcTurnkeyWorkingCost0553, VDRL register and vendor evidence.
 const ROOT="bid.budget.working.bc.";
 const fmt=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
+// Historical Rev05 THB/MH inputs have 3 decimal places; preserve their exact
+// stated rate in the AUDIT view. Do not use this to calculate current B2 cost.
+const fmtHistoricalRate=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:3}):"NOT ESTABLISHED";
 const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:2}):"NOT ESTABLISHED";
 const categories=Object.freeze({
  B2:["engineering","Documentation / VDRL"],
@@ -36,7 +40,7 @@ const copy=id=><span className="p553-price-trace-copy"
  </span>;
 function Section({code,num,suffix,title,summary,children,defaultOpen=false}){
  const id=idFor(code,suffix);
- return <details className="p553-bc-price-leaf" data-component-key={id} defaultOpen={defaultOpen}>
+ return <details className="p553-bc-price-leaf" data-component-key={id} open={defaultOpen}>
   <summary className="p553-bc-price-leaf-head">
    <span className="p553-bc-price-num">{num}</span>
    <span className="p553-bc-price-leaf-label"><strong>{title}</strong>
@@ -108,7 +112,7 @@ function Pricing({row}){
  return <div className="p553-bc-price-recon">
   <div className="p55-metric-grid">
    <div><strong>Current Working SELL (one owner)</strong><p>{fmt(total)}</p>
-    <small>{code==="B9"?"Base is ZERO; optional call-out excluded":"Only canonical 10.2 owner amount"}</small></div>
+    <small>{code==="B9"?"Quoted Base 1 LS; execution requires written call-out":"Only canonical 10.2 owner amount"}</small></div>
    <div><strong>Current Verified Direct Cost</strong><p>{fmt(row.directCostTHB)}</p>
     <small>Missing cost evidence is not zero</small></div>
    <div><strong>Qty / Commercial basis</strong><p>{qty(row.qtyDriver)}</p><small>{row.unit}</small></div>
@@ -141,7 +145,7 @@ function Pricing({row}){
      ["Telecom Engineer",137.5],
      ["CAD / Telecom Drafter",116.625],
      ["Document Controller",104.125]
-    ].map(([role,rate])=><tr key={role}><td>{role}</td><td>{fmt(rate)}</td>
+    ].map(([role,rate])=><tr key={role}><td>{role}</td><td>{fmtHistoricalRate(rate)}</td>
      <td>NOT ESTABLISHED</td><td>NOT ESTABLISHED</td></tr>)}</tbody>
    </table></div>
    <p className="p55-note">Rev04 bounded cost proxy THB202,717.25–208,217.25
@@ -177,6 +181,29 @@ function Pricing({row}){
     ONCE in the 20-Oct MGW cover; it must be reconciled with the B6 cost owner,
     supplier packing USD500, delivery terms, and original equipment A inclusion.
     There is no approved allocation of the B6 Working SELL to four MR cargo legs.</p>
+   <p className="p55-note"><strong>OWNER-APPROVED B6 Physical Routing (ADR-68 · 22-Oct-2026):</strong>
+    NextG <strong>IDU 4 + ODU 4 + ALL 5 Greenfield Antennas</strong> to MGW Nantong
+    directly; Thailand receives <strong>Enclosure + Cisco 4 sets</strong>, performs
+    approved bench preassembly/wiring and preliminary electrical QA, then exports
+    these four protected sets to MGW for final integration/FAT. No antenna diversion
+    direct to JUTAL. MGW MR0002/0003/0004 OEM items remain China-bound for combined FAT,
+    without an artificial Thailand transit. The original NextG
+    <strong> NG/260916-ADV-DAP1 / DAP Ranong</strong> delivery quotation has expired
+    and has NOT been amended to MGW Nantong; destination/Incoterm, freight credit
+    and supplier dispatch still require confirmation.
+    <strong> Selected B6 Working SELL {fmt(total)} remains unchanged.</strong>
+    No verified saving, increment, tariff or actual logistics COST has been posted.</p>
+   <p className="p55-note"><strong>Earlier all-Thailand scenario (comparison only):</strong>
+    four preassembled cabinets (not ODU/antenna freight) to MGW Nantong; planning-only
+    inbound allowance <strong>{fmt(row.b6Mr0001ChinaInboundEvidence?.preliminaryInboundLowTHB)}
+    – {fmt(row.b6Mr0001ChinaInboundEvidence?.preliminaryInboundHighTHB)}</strong> (scenario,
+    NOT additional selected SELL). MGW SERV-5 USD2,500 is Nantong→JUTAL quoted once;
+    the Thailand→Nantong inbound leg, customs, taxes, cargo value and four-set dimensions
+    are not covered by proof. The compared scenario does NOT price the complete
+    NextG radio/antenna shipment. MGW SERV-5 outbound USD2500 includes packing
+    per supplier message; separately quoted SERV-3 USD500 creates an overlap check,
+    not an automatic credit. Compare all four MR legs against B6 owner before
+    selecting an actual delta.</p>
   </section>}
   {code==="B7"&&<section className="p55-panel" style={{padding:12}}>
    <h4>B7 — Storage Reserve</h4>
@@ -185,6 +212,15 @@ function Pricing({row}){
     This is a planned lump sum for one month, NOT a vendor quotation or a verified monthly rate.
     Charge only where the OEM/SAMTEL storage period is insufficient.
     Legacy three-month storage allocation in older B5 must not be booked twice.</p>
+   <p className="p55-note"><strong>Customer requires 3 months FREE at Vendor Workshop.</strong>
+    MGW P26-058_R2 contains no storage charge or written inclusion commitment.
+    Public 2026 China pallet-price reference for 4 assumed pallets / 90 days:
+    <strong>{fmt(row.b7ThreeMonthStorageEvidence?.marketThreeMonthBarePalletTHBLow)}
+    – {fmt(row.b7ThreeMonthStorageEvidence?.marketThreeMonthBarePalletTHBHigh)}</strong>
+    (bare space only; not MGW workshop quote). Full three-month reserve at historical
+    internal THB30,000/month would be THB90,000, with THB60,000 additional
+    NONPOSTING sensitivity. Confirm actual pallet/CBM, vendor free period and
+    handling/protection fees before revising B7 Selected Working SELL.</p>
   </section>}
   {code==="B8"&&<section className="p55-panel" style={{padding:12}}>
    <h4>B8 — Training WBS Source</h4>
@@ -195,23 +231,32 @@ function Pricing({row}){
     an approved hourly-rate calculation. Do not treat THB30,000/44 as an agreed rate.</p>
   </section>}
   {code==="B9"&&<section className="p55-panel" style={{padding:12}}>
-   <h4>B9 — Conditional Senior Telecom Engineer Package (one Lump Sum)</h4>
-   <p className="p55-note"><strong>Current B9 Base {fmt(total)}.</strong> Separate optional Yard call-out
-    Working SELL <strong>{fmt(b9.conditionalYardSellTHB)}</strong>, consisting of one
+   <h4>B9 — Quoted Senior Telecom Engineer Package (one Lump Sum)</h4>
+   <p className="p55-note"><strong>Current B9 quoted Base {fmt(total)}.</strong> The same on-call Yard package has
+    source Working SELL <strong>{fmt(b9.conditionalYardSellTHB)}</strong>, consisting of one
     Senior Telecom Systems Integration Engineer, seven Yard working days plus travel,
-    lodging, insurance and related allowance rows. Conditional amount is NOT included in
-    B1–B14 Base. The legacy 12 team-day/THB574,560 WBS is superseded and non-posting.
+    lodging, insurance and related allowance rows. This amount is included ONCE in
+    B1–B14 Base; execution requires written request. The legacy 12 team-day/THB574,560 WBS is superseded and non-posting.
     FAT witnesses belong only in B3.</p>
+   <p className="p55-note"><strong>B1 → B2 → B3 → B9/B11 scope trace:</strong>
+    B1 engineering/configuration defines technical functions; B2 VDRL transmits OEM/ITP/configuration and as-built documents;
+    B3 performs physical FAT/SAT using ADDVALUE temporary instruments.
+    <strong> B9 is Specialist Field Assistance, NOT permanent equipment procurement</strong>:
+    one Senior Telecom Engineer supports JUTAL Zhuhai Yard on written call-out.
+    Customer-retained configuration software, OEM programming/charging kits and O&amp;M Special Tools belong to
+    <strong> B11</strong> — see <ComponentCopyId projectId="PJ2608-0553"
+    componentKey="bid.budget.working.bc.b11.operational-tools-trace"/>.
+    Tool SKU/Qty, Part A OEM inclusions and B11 selling allocation remain unverified; never charge them again as B9.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Call-out Item / Module ID</th><th>Role / Activity</th><th>Qty × Unit</th>
-     <th>Working SELL rate THB</th><th>Conditional Working SELL THB</th><th>Cost authority</th></tr></thead>
+     <th>Working SELL rate THB</th><th>Included B9 Working SELL THB</th><th>Cost authority</th></tr></thead>
     <tbody>{b9.rows.filter(x=>x.costOwner==="B9").map(x=><tr key={x.id}>
      <td><strong>{x.id}</strong><small>{x.moduleId}</small>{copy(x.moduleId)}</td>
      <td>{x.description}</td><td>{qty(x.qty)} {x.unit}</td>
      <td>{fmt(x.unitRateTHB)}</td><td>{fmt(x.workingSellTHB)}</td>
      <td>{x.status}<small>Verified Direct Cost: NOT ESTABLISHED</small></td>
     </tr>)}</tbody>
-    <tfoot><tr><th colSpan={4}>Optional call-out only — not Base</th>
+    <tfoot><tr><th colSpan={4}>Quoted B9 Base once — execution upon written call-out</th>
      <th>{fmt(b9.conditionalYardSellTHB)}</th><th>Written RACI / call-out required</th></tr></tfoot>
    </table></div>
   </section>}
@@ -264,7 +309,7 @@ function Resource({row}){
   {code==="B8"&&<p className="p55-note">Trainer discipline and sessions by MR0001–0004,
    number of trainees, training days/total 44 source MH allocation and
    OEM-provided materials remain to validate.</p>}
-  {code==="B9"&&<p className="p55-note">Optional Sr Telecom Systems Integration Engineer:
+  {code==="B9"&&<p className="p55-note">Quoted Sr Telecom Systems Integration Engineer:
    7 Yard working days and 2 travel days, 1 person selected.
    The second standby specialist is UNBILLED labour in the offer but could still
    incur internal cash cost. Actual payroll Direct Cost stays open.</p>}
@@ -317,7 +362,13 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
    title={code==="B2"?"VDRL / Document Register by MR":"Work Type / Physical Deliverables"}
    summary={code==="B2"?"MR0001–0004 · 143 requirement rows / 38 unique title types":
     "Scope and source work drivers; no invented quantities"} defaultOpen>
-   {code==="B2"?<B2Vdrl code={code}/>:<PhysicalDrivers row={workingRow}/>}
+   {code==="B2"?<B2Vdrl code={code}/>:["B5","B6","B7"].includes(code)?
+    <React.Fragment><B5B6B7LinkedLogistics0553 workingRow={workingRow}/>
+     <details className="p55-panel" style={{padding:8,marginTop:10}}>
+      <summary>Historical source cost drivers — audit only, not additional packing/freight/storage price</summary>
+      <PhysicalDrivers row={workingRow}/>
+     </details></React.Fragment>:
+    <PhysicalDrivers row={workingRow}/> }
   </Section>
   <Section code={code} num={code+".2"} suffix="price-reconciliation"
    title="Qty × Rate × Working SELL / Cost Reconciliation"

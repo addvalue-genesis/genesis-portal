@@ -43,12 +43,12 @@ assert.equal(m.b3FatWorkingSellCurrentTHB,397400);
 assert.equal(m.proposedB3FatWorkingSellTHB,402400);
 assert.equal(m.proposedB8TrainingWorkingSellTHB,37800);
 assert.equal(m.grossTripProposedWorkingSellTHB,440200);
-assert.equal(m.b3CurrentWorkingSellTHB,2443400);
+assert.equal(m.b3CurrentWorkingSellTHB,2750525);
 assert.equal(m.b8CurrentWorkingSellTHB,30000);
-assert.equal(m.b3ProposedWorkingSellTHB,2448400);
+assert.equal(m.b3ProposedWorkingSellTHB,2755525);
 assert.equal(m.b8ProposedWorkingSellTHB,37800);
-assert.equal(m.currentCombinedWorkingSellTHB,2473400);
-assert.equal(m.proposedCombinedWorkingSellTHB,2486200);
+assert.equal(m.currentCombinedWorkingSellTHB,2780525);
+assert.equal(m.proposedCombinedWorkingSellTHB,2793325);
 assert.equal(m.currentToProposedDeltaTHB,12800);
 assert.equal(m.b8SourceOriginalTrainingMH,44);
 assert.equal(m.b8TrainingContactHours,16);
@@ -61,26 +61,44 @@ const table=priceTable(b3,m);
 const p=table.groups.find(x=>x.kind==="audit").items.find(x=>x.moduleId.endsWith(".fat-training-7d-allocation"));
 assert(p&&p.workingSellTHB===null&&p.referenceTHB===402400);
 assert(!table.groups.find(x=>x.kind==="fat").items.some(x=>x.moduleId.endsWith(".fat-training-7d-allocation")));
-assert.equal(table.totalWorkingSellTHB,2443400);
+assert.equal(table.totalWorkingSellTHB,2750525);
 const htmlB3=renderToStaticMarkup(React.createElement(View,{b3,b8,owner:"B3"}));
 const htmlB8=renderToStaticMarkup(React.createElement(View,{b3,b8,owner:"B8"}));
 const ownerB3=renderToStaticMarkup(React.createElement(OwnerDetail,{workingRow:b3}));
 const ownerB8=renderToStaticMarkup(React.createElement(OwnerDetail,{workingRow:b8}));
+// Rendered prices come from the SAME nonposting scenario selector. Do not
+// require former 2,448,400/2,486,200 prices from before MGW Purchased FAT
+// was selected inside B3 Working SELL. The old hard-coded UI assertion lagged
+// behind its own up-to-date 2,755,525/2,793,325 data-model assertions.
+const readable=n=>n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});
 for(const x of [htmlB3,htmlB8]){
  for(const text of ["SOW-B3","SOW-B8","IC-FAT-001","IC-TRN-001",
   "WS-B3","WS-B8","CP-B3","CP-B8","NOT ISSUED",
-  "2,448,400.00","37,800.00","2,486,200.00","75,600.00"])
-  assert(x.includes(text),"financial identity or scenario price not visible: "+text);
+  readable(m.b3CurrentWorkingSellTHB),readable(m.b3ProposedWorkingSellTHB),
+  readable(m.b8ProposedWorkingSellTHB),
+  readable(m.currentCombinedWorkingSellTHB),readable(m.proposedCombinedWorkingSellTHB),
+  readable(m.travelLabourExistingIncludedB3THB)])
+  assert(x.includes(text),"financial identity or selected/nonposting scenario price not visible: "+text);
 }
+assert.equal(m.vendorMgwPurchasedSellAlreadyInCanonicalB3THB,307125,
+ "Purchased OEM FAT must remain in canonical B3, not added by seven-day scenario");
+assert.equal(m.noDuplicateVendorPurchasedOnScenario,true,
+ "Seven-day nonposting option must not repost MGW SERV-2/4");
 assert(ownerB3.includes('data-component-key="bid.budget.working.bc.b3.fat-training-7d-allocation"'));
 assert(ownerB8.includes('data-component-key="bid.budget.working.bc.b8.integrated-fat-training-7d"'));
+// B8 owner trace hosts this scenario inside native <details> sections. Their
+// initial-expanded state must use React-supported DOM open, not defaultOpen.
+const ownerTrace=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
+assert(ownerTrace.includes('data-component-key={id} open={defaultOpen}')&&
+ !ownerTrace.includes('data-component-key={id} defaultOpen={defaultOpen}'),
+ "B/C owner native details must not leak unsupported defaultOpen DOM property");
 const ids=new Set(nav().map(x=>x.id));
 assert(ids.has("bid.budget.working.bc.b3.fat-training-7d-allocation"));
 assert(ids.has("bid.budget.working.bc.b8.integrated-fat-training-7d"));
 const quoted=fs.readFileSync(path.join(root,"project0553/BcWorkingHierarchy0553.jsx"),"utf8");
 assert(quoted.includes('"SOW-"+item.code')&&quoted.includes('" WS-"+item.code')&&
  quoted.includes('" CP-"+item.code'));
-assert.equal(current().byCode.B3.workingSellTHB,2443400);
+assert.equal(current().byCode.B3.workingSellTHB,2750525);
 assert.equal(current().byCode.B8.workingSellTHB,30000);
 assert.equal(JSON.stringify(current()),snapshot);
-console.log("PASS 0553 7-day B3/B8: 14 onsite MD (12 FAT/2 Training) + 4 travel MD B3 once; new B3 2448400 / B8 37800 scenario-only; original B3 2443400 / B8 30000 intact; SOW IC WS CP VQ IDs segregated and no release.");
+console.log("PASS 0553 7-day B3/B8: 14 onsite MD (12 FAT/2 Training) + 4 travel MD B3 once; new B3 2755525 / B8 37800 scenario-only; original B3 2750525 / B8 30000 intact; SOW IC WS CP VQ IDs segregated and no release.");

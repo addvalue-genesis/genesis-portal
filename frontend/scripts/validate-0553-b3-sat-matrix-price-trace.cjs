@@ -24,7 +24,7 @@ const current=canonical(),b3=current.byCode.B3,original=days(),m=matrix();
 const frozenSnapshot=JSON.stringify({workingSell:b3.workingSellTHB,
  directCost:b3.directCostTHB,source:original.rows,veex:original.veex});
 assert.equal(b3.moduleId,"bid.budget.working.bc.b3");
-assert.equal(b3.workingSellTHB,2443400);
+assert.equal(b3.workingSellTHB,2750525);
 assert.equal(b3.directCostTHB,null);
 assert.equal(m.moduleId,"bid.budget.working.bc.b3.site-mr-sat-matrix");
 assert.equal(m.priceBasisModuleId,"bid.budget.working.bc.b3.40-day-abc");
@@ -42,7 +42,11 @@ assert.equal(p.veexRentalRateTHB,1000);
 assert.equal(p.veexWorkingSellTHB,30000);
 assert.equal(p.offshoreWorkingSellTHB,2046000);
 assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,397400);
-assert.equal(p.offshoreWorkingSellTHB+b3.b3ChinaFatBudget.fatWorkingSellTHB,b3.workingSellTHB);
+assert.equal(p.offshoreWorkingSellTHB+b3.b3ChinaFatBudget.fatWorkingSellTHB+b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,b3.workingSellTHB);
+assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,7500);
+assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB,236250);
+assert.equal(b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
+assert.equal(p.offshoreWorkingSellTHB,2016000+30000);
 const wanted=[
  ["ZPQ",3,6,151200,3],["ZWP8",2,4,100800,1],["ZWP11",2,4,100800,1],
  ["ZWP20",8,16,403200,4],["ZWP21",7,14,352800,4],
@@ -70,12 +74,19 @@ const testIDs=new Set(m.budgetarySiteTimeboxes.flatMap(x=>x.testIds));
 assert.equal(testIDs.size,21,"Every SAT Test ID belongs to one and only one priced Site timebox");
 for(const x of m.rows)assert(testIDs.has(x.id));
 const html=renderToStaticMarkup(React.createElement(MatrixUI,{workingRow:b3}));
+assert.throws(()=>renderToStaticMarkup(React.createElement(MatrixUI,{
+ workingRow:{...b3,workingSellTHB:b3.workingSellTHB+307125}
+})),/reconcile once/,"Guard must detect double-posted purchased MGW services");
+assert.throws(()=>renderToStaticMarkup(React.createElement(MatrixUI,{
+ workingRow:{...b3,b3MgwPurchasedFatWorkingSell:null}
+})),/reconcile once/,"Guard must detect missing purchased MGW service source");
 for(const x of [
  'data-component-key="bid.budget.working.bc.b3.site-mr-sat-matrix"',
  "2 persons","40 days","80 MD","USD 800","50,400.00",
  "Site × Team Workdays × Working SELL","ZWP20","403,200.00",
- "2,016,000.00","30,000.00","397,400.00","2,443,400.00",
- "Shared across MR Test IDs","NOT per MR","SHARED SITE WORKING SELL"
+ "2,016,000.00","30,000.00","397,400.00","307,125.00","2,750,525.00",
+ "MGW Purchased iFAT","VQ-MGW-SERV-2/4","P26-058_R2","CP-B3 HOLD",
+ "Shared across MR Test IDs","NOT 8 days per MR","SHARED SITE WORKING SELL"
 ])assert(html.includes(x),"Rendered SAT matrix missing "+x);
 for(const r of m.rows){
  const start=html.indexOf('data-component-key="'+r.moduleId+'"');
@@ -94,13 +105,19 @@ for(const r of m.rows){
   "Shared Site value may not be mistaken for a second per-MR price: "+r.id);
 }
 const parentHtml=renderToStaticMarkup(React.createElement(Parent,{workingRow:b3}));
-assert(parentHtml.includes("2,443,400.00")&&parentHtml.includes("80 MD"));
+assert(parentHtml.includes("2,750,525.00")&&parentHtml.includes("80 MD"));
 assert(parentHtml.includes("2. Site × Team Workdays × Working SELL"));
 const head=renderToStaticMarkup(React.createElement(Breakdown,{workingRow:b3}));
 assert(head.includes("80 Man-days")&&head.includes("40")&&head.includes("site-mr-sat-matrix"));
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(host.includes('<B3SiteMrSatCoverage0553 workingRow={workingRow}/>'));
+// B3 SAT moved under the source-backed B3.2 hierarchical accordion.
+// Verify BOTH the mounted parent route and the exact SAT child renderer.
+assert(host.includes('<B3WorkTypeAccordion0553 workingRow={workingRow}'),
+ "10.2 B3 owner must mount its B3 work-type accordion");
+const workType=fs.readFileSync(path.join(root,"project0553/B3WorkTypeAccordion0553.jsx"),"utf8");
+assert(workType.includes('<B3SiteMrSatCoverage0553 workingRow={workingRow}/>'),
+ "B3.2 SAT group must mount the source-backed shared Site/MR coverage table");
 assert.equal(JSON.stringify({workingSell:canonical().byCode.B3.workingSellTHB,
  directCost:canonical().byCode.B3.directCostTHB,source:days().rows,veex:days().veex}),frozenSnapshot,
  "UI/matrix may not mutate the 10.2 B3 canonical Working Sell or source days");
-console.log("PASS B3 SAT Matrix cost trace: 2 persons ×40 team-days =80 MD × THB25,200 = THB2,016,000; 9 shared site/SIT/Punch allocations, 21 nonposting Test IDs, +VeEX30,000 +MGW FAT397,400 = THB2,443,400. No new price posting.");
+console.log("PASS B3 SAT Matrix cost trace: 2 persons ×40 team-days =80 MD × THB25,200 = THB2,016,000; 9 shared site/SIT/Punch allocations, 21 nonposting Test IDs, +VeEX30,000 +ADDVALUE Witness397,400 +MGW Purchased307,125 = THB2,750,525. No new price posting.");

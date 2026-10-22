@@ -78,7 +78,7 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
    const id=b1AccountModuleId0553(group.account),tone=accountTone[group.account];
    const budgetId=id+".budget",gateId=id+".verification";
    return <details key={group.account} className={"p553-b1-group p553-b1-group--"+tone}
-    data-component-key={id} defaultOpen={index===0}>
+    data-component-key={id} open={index===0}>
     <summary className="p553-b1-summary">
      <span className="p553-b1-numeral">{group.account}</span>
      <span className="p553-b1-summary-label"><strong>{group.label}</strong>
@@ -177,7 +177,7 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
 }
 
 function B1AccountBudget0553({account,number,moduleId}){
- return <details className="p553-b1-item" data-component-key={moduleId} defaultOpen>
+ return <details className="p553-b1-item" data-component-key={moduleId} open>
   <summary className="p553-b1-item-summary">
    <span className="p553-b1-numeral">{number}</span>
    <span className="p553-b1-summary-label"><strong>Quantity / Working Cost / Working SELL</strong>

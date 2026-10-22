@@ -42,7 +42,12 @@ assert(ids.includes("bid.budget.working.bc.b1.price-overview"));
 for(const [i,a] of m.accounts.entries()){
  const id="bid.budget.working.bc.b1.account."+a.account.toLowerCase().replace(".","-");
  assert(html.includes("Copy component ID "+id),"Missing copyable B1 account ID "+id);
- assert(html.includes(a.label),"Missing category "+a.account);
+ // React SSR HTML-escapes text node content: "A & B" becomes "A &amp; B".
+ // Validate the real source-backed account label as escaped HTML, rather than
+ // failing on a present B1.1/B1.2/B1.3/B1.4/B1.6 row. No pricing source change.
+ const escapedLabel=a.label.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+ assert(html.includes("<strong>"+escapedLabel+"</strong>"),
+  "Missing rendered category "+a.account+" / "+a.label);
  assert(html.includes("View Qty × Rate × Amount"),"Drilldown action missing");
  assert(full.includes('data-component-key="'+id+'"'),
   "The clickable account must have a matching target with actual detailed source lines: "+a.account);
@@ -51,11 +56,24 @@ for(const [i,a] of m.accounts.entries()){
 assert(html.includes("964 MH is excluded from current B1 pricing"),
  "Historical Engineering 964 MH must be labeled as EXCLUDED, not presented as current priced activity");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-const first=host.indexOf('{e.code==="B1"&&<B1WorkingPriceOverview0553 workingRow={workingRow}/>');
-const generic=host.indexOf('<div className="p55-metric-grid">',host.indexOf('export function BcCostEvidenceDetail0553'));
-const detail=host.indexOf('{e.code==="B1"&&<B1RevKMilestoneBudget0553');
-assert(first>=0&&first<generic&&detail>generic,
- "B1 price table must show BEFORE generic evidence/audit modules");
+// Scope positional checks to the component's RETURNED JSX. The function
+// initializes ownerPriceTrace earlier (containing a B9 metric grid); scanning
+// from the function declaration incorrectly captures that non-B1 JSX fragment.
+const entry=host.indexOf('export function BcCostEvidenceDetail0553');
+const renderStart=host.indexOf('return <section className="p55-panel p553-bc-evidence"',entry);
+assert(entry>=0&&renderStart>entry,"Missing B/C returned view for price-order contract");
+const first=host.indexOf('{e.code==="B1"&&<B1WorkingPriceOverview0553 workingRow={workingRow}/>',renderStart);
+const detail=host.indexOf('{e.code==="B1"&&<B1RevKMilestoneBudget0553',renderStart);
+const generic=host.indexOf('<div className="p55-metric-grid">',renderStart);
+// After the B1 sharedEvidence TDZ fix, its Rev.K accordion is rendered
+// directly after the quick-price table, BEFORE the generic metric grid.
+// Check actual source order and independently assert the SSR DOM anchor order.
+assert(first>=0&&detail>first&&generic>detail,
+ "B1 Quick Price must precede nested Rev.K evidence AND generic metrics");
+const quickInSSR=full.indexOf('data-component-key="bid.budget.working.bc.b1.price-overview"');
+const revkInSSR=full.indexOf('data-component-key="bid.budget.working.bc.b1.revk-pm-milestones"');
+assert(quickInSSR>=0&&revkInSSR>quickInSSR,
+ "Rendered B1 price-overview must appear before Rev.K detailed account audit");
 const partB=source.rows.filter(x=>!x.optional),partC=source.rows.filter(x=>x.optional);
 const sum=x=>Math.round(x.filter(r=>Number.isFinite(r.workingSellTHB)).reduce((n,r)=>n+r.workingSellTHB,0)*100)/100;
 const all=renderToStaticMarkup(React.createElement(All,{

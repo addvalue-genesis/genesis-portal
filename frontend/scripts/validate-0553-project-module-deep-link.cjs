@@ -23,6 +23,11 @@ const {BcCostEvidenceDetail0553:BcDetail}=from("BcCostEvidenceDetail0553.jsx");
 const {B3RequirementWbsTrace0553:Crosswalk}=from("B3RequirementWbsTrace0553.jsx");
 const all=entries(),lookup=id=>all.find(x=>x.id===id);
 assert.equal(new Set(all.map(x=>x.id)).size,all.length,"Navigator IDs must be unique");
+for(const code of ["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"]){
+ const id="bid.budget.working.bc."+code.toLowerCase()+".financial-identity";
+ assert.equal(lookup(id)?.anchorModuleId,id,"Missing "+code+" Financial Identity deep link");
+}
+
 const rootId="bid.budget.working.bc.b3";
 const satId=rootId+".site-mr-sat-matrix";
 const offId=rootId+".40-day-abc";
@@ -65,7 +70,8 @@ const snap=JSON.stringify({sell:b.workingSellTHB,cost:b.directCostTHB});
 const html=renderToStaticMarkup(React.createElement(BcDetail,{workingRow:b,navigationTarget:satId}));
 assert(html.includes('data-component-key="'+satId+'"'));
 assert(html.includes('data-component-key="'+site().rows[0].moduleId+'"'));
-assert(html.includes("2,443,400.00"));
+assert(html.includes("2,750,525.00"));
+assert(html.includes("SOW-B3")&&html.includes("WS-B3")&&html.includes("CP-B3")&&html.includes("VQ-MGW-SERV-2"),"B3 financial identity table missing from detail view");
 const b11=renderToStaticMarkup(React.createElement(BcDetail,{workingRow:current().byCode.B11}));
 assert(b11.includes('data-component-key="bid.budget.working.bc.b11.test-equipment-ownership"'));
 assert(b11.includes("VeEX MX100+ 30 rental-days"));
@@ -91,4 +97,4 @@ const css=fs.readFileSync(path.join(root,"project0553/project0553.css"),"utf8");
 assert(css.includes("[data-component-key].p553-module-nav-focus"));
 assert(!ws.includes("const target=exact||parent"),"Do not silently scroll to parent for failed leaf navigation");
 assert(ws.includes("ยังเปิด Module ปลายทางไม่ได้"));
-console.log("PASS PJ2608-0553 Project Module Navigator: nested B3.site + 21 SAT IDs, 19 RQM IDs, Enter/click route, exact DOM target, open all disclosure ancestors, RQM cross-owner reveal, current THB 2,443,400 unchanged.");
+console.log("PASS PJ2608-0553 Project Module Navigator: nested B3.site + 21 SAT IDs, 19 RQM IDs, Enter/click route, exact DOM target, open all disclosure ancestors, RQM cross-owner reveal, current THB 2,750,525 selected MGW purchased FAT WS.");

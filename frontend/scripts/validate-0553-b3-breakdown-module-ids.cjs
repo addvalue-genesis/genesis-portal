@@ -25,13 +25,13 @@ const {BcCostEvidenceDetail0553:Evidence}=get("BcCostEvidenceDetail0553.jsx");
 const r=bc(),b=r.byCode.B3;
 const sourceSnapshot=JSON.stringify({b3:b,overall:r.knownWorkingSellTHB});
 assert.equal(b.moduleId,"bid.budget.working.bc.b3");
-assert.equal(b.workingSellTHB,2443400);
+assert.equal(b.workingSellTHB,2750525);
 assert.equal(b.directCostTHB,null);
 const p=detail(b);
 assert.equal(p.moduleId,"bid.budget.working.bc.b3.working-sell-breakdown");
 assert.equal(p.ownerModuleId,b.moduleId);
-assert.equal(p.totalWorkingSellTHB,2443400);
-assert.deepEqual(p.summary.map(x=>x.workingSellTHB),[2016000,30000,397400]);
+assert.equal(p.totalWorkingSellTHB,2750525);
+assert.deepEqual(p.summary.map(x=>x.workingSellTHB),[2016000,30000,307125,397400]);
 assert.equal(p.offshore.workdays,40);
 assert.equal(p.offshore.people,2);
 assert.equal(p.offshore.personDays,80);
@@ -53,7 +53,7 @@ assert.equal(s.plannedWorkingDays,40);assert.equal(s.coveredB3SellTHB,2046000);
 assert(s.rows.every(x=>x.workingSellTHB===null&&x.directCostTHB===null));
 const render=(Comp,props)=>renderToStaticMarkup(React.createElement(Comp,props));
 const h=render(Breakdown,{workingRow:b});
-assert(h.includes("2,443,400.00")&&h.includes("2,016,000.00")&&h.includes("30,000.00")&&h.includes("397,400.00"));
+assert(h.includes("2,750,525.00")&&h.includes("2,016,000.00")&&h.includes("30,000.00")&&h.includes("397,400.00"));
 assert(h.includes("bid.budget.working.bc.b3.working-sell-breakdown"));
 assert(h.includes("bid.budget.working.bc.b3.fat-staff"));
 assert(h.includes("DIRECT COST NOT ESTABLISHED"));
@@ -80,9 +80,20 @@ assert(historicalAudit.includes("B3 owns MGW China FAT witness personnel/travel"
 assert(!historicalAudit.includes("B9 MGW China FAT witnesses"));
 
 // Work type owns presentation order: FAT -> SAT -> temporary tools -> cost audit.
-assert(d.indexOf("B3.1")<d.indexOf("B3.2"));
-assert(d.indexOf("B3.2")<d.indexOf("B3.3"));
-assert(d.indexOf("B3.3")<d.indexOf("B3.4"));
+// Test actual unique DOM group anchors, not free text: the intro already mentions
+// "B3.1–B3.4" before any of the four price table groups.
+const groupIds=["fat","sat","tools","audit"].map(kind=>
+ "bid.budget.working.bc.b3."+kind);
+const groupPositions=groupIds.map(id=>renderedKeys.indexOf(id));
+assert(groupPositions.every(n=>n>=0),"B3.1–B3.4 must all render exact Module ID group anchors");
+assert(groupPositions.every((n,i)=>i===0||groupPositions[i-1]<n),
+ "B3 FAT -> SAT -> Tools -> Audit exact DOM group order changed");
+// React DOM supports details.open, not details.defaultOpen. Do not pass an
+// unknown prop down to native DOM just to set the initial disclosure state.
+const workTypeCode=fs.readFileSync(path.join(dir,"B3WorkTypeAccordion0553.jsx"),"utf8");
+assert(!workTypeCode.includes("defaultOpen="),"B3 native details may not use invalid React defaultOpen prop");
+assert(workTypeCode.includes('open={group.kind==="fat"||group.kind==="sat"}'),
+ "B3.1 and B3.2 must remain initially expanded using native details.open");
 assert(d.indexOf("B3 — Seven-Site / Four-MR SAT Test Coverage")<d.indexOf("B3 — Current Working SELL Breakdown"));
 for(const name of ["fat","sat","tools","audit"]){
  assert(d.includes('data-component-key="bid.budget.working.bc.b3.'+name+'"'));
@@ -95,4 +106,4 @@ assert.equal(r.byCode.B11.directCostTHB,null,"B11 tool ownership note must not b
 assert.equal(JSON.stringify({b3:bc().byCode.B3,overall:bc().knownWorkingSellTHB}),sourceSnapshot,"Rendering must never mutate current B3 pricing");
 const host=fs.readFileSync(path.join(dir,"BcCostEvidenceDetail0553.jsx"),"utf8");
 assert(host.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"));
-console.log("PASS B3 10.2 FAT/SAT/Tools/Audit accordion + source/SSR: THB 2,443,400 = offshore 2,016,000 + VeEX 30,000 + China FAT 397,400; 19 requirements, 21 SAT Test IDs non-additive; parent Module IDs visible and copyable, B9 excluded.");
+console.log("PASS B3 10.2 FAT/SAT/Tools/Audit accordion + source/SSR: THB 2,750,525 = MGW purchased 307,125 + offshore 2,016,000 + VeEX 30,000 + ADDVALUE China FAT 397,400; 19 requirements, 21 SAT Test IDs non-additive; parent Module IDs visible and copyable, B9 excluded.");

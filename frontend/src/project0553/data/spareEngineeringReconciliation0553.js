@@ -64,40 +64,52 @@ export function selectSpareEngineeringReconciliation0553(){
  }));
  const raconHistory=capitalHistory.find(x=>/racon complete/i.test(x.description));
  const raconVendor=MR0004_WORKING_BOM_0553;
- const quoteRateUSD=raconVendor.quotePackageUSD;
- if(!raconHistory||!Number.isFinite(quoteRateUSD)||quoteRateUSD<=0)
-  throw Error("Cannot reconcile optional C1 RACON historical and current quoted package");
+ const quoteRateUSD=raconVendor.quotePackageUSD; // MGW R2 INSTALLED equipment
+ const legacyAlternative=raconVendor.historicalAlternative; // MDS/ORGA FCA
+ const historicalC1ReferenceUSD=legacyAlternative?.packageUSD;
+ if(!raconHistory||quoteRateUSD!==75059||raconVendor.quoteNumber!=="P26-058_R2"||
+    historicalC1ReferenceUSD!==75000||legacyAlternative?.quote!=="QTORG2609244"||
+    legacyAlternative.selected!==false||legacyAlternative.additive!==false)
+  throw Error("C1 RACON price identity: selected MGW USD75059 must stay separate from historical ORGA USD75000");
  const raconComparison=Object.freeze({
   code:"C1",mr:"MR-0004",tagNo:"MAR-514-001",
   historicalDescription:raconHistory.description,
   historicalQty:raconHistory.qty,historicalUnitPriceTHB:raconHistory.unitPriceTHB,
-  vendorDescription:"ORGA/MDS selected installed Marine RACON full package (Part A quote)",
+  vendorDescription:"MGW R2 selected installed Tideland SeaBeacon 2 RACON package (Part A only)",
   vendorQuote:MR0004_WORKING_BOM_0553.quoteNumber,
   vendorUnitPriceUSD:quoteRateUSD,
+  vendorSelectedSource:"MGW P26-058_R2 RACON-1 / installed quote only",
+  historicalAlternativeUnitUSD:historicalC1ReferenceUSD,
+  historicalAlternativeSource:"MDS / ORGA QTORG2609244 FCA / comparison only",
   vendorPackageRateReferenceTHB:round(quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
   historicalVsPackageUnitDeltaTHB:round(raconHistory.unitPriceTHB-quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
   independentSparePriceTHB:null,
   selectedCapitalSpareQty:null,pricePostingAllowed:false,
   note:"Both amounts refer to different budget/quotation bases. The Part A installed kit may include different components; neither proves a supplier-quoted independent complete RACON spare."
  });
- // Management-selected C1 OPTION: one independent spare stock item, not the Part A
- // installed three-site supply. USD75,000 is the original ORGA full equipment
- // FCA unit reference, NOT an OEM-issued spare quote or DDP landed sell price.
+ // Management-selected C1 OPTION: one distinct spare stock item, NOT the Part A
+ // installed three-site supply. The ORIGINAL ORGA FCA USD75,000 is ONLY the
+ // management budgetary option benchmark. Selected installed MGW R2 USD75,059
+ // is NOT an OEM-issued independent spare quote and must not silently reprice C1.
  const selectedC1Option=Object.freeze({
   id:"C1-MR0004-ORGA-COMPLETE-SPARE-BUDGET",
   code:"C1",mr:"MR-0004",tagNo:"MAR-514-001",
   description:"SeaBeacon-2 System 6 Ex — complete RACON capital spare (budgetary equivalent)",
   detailSpecification:"X&S Band / Zone 1; configuration, accessories and spare interchangeability to match installed OEM unit",
-  materials:"OEM full package reference / independently deliverable spare set",
-  qty:1,unit:"set",unitPriceUSD:quoteRateUSD,currencySource:"USD",
+  materials:"Historical ORGA full package budget benchmark; MGW Tideland spare interchangeability NOT verified",
+  qty:1,unit:"set",unitPriceUSD:historicalC1ReferenceUSD,currencySource:"USD",
   planningFxTHBPerUSD:customer.rows[0].workingFxTHBPerUSD,
-  budgetUnitPriceTHB:round(quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
-  budgetTotalTHB:round(quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
-  source:"MDS/ORGA "+raconVendor.quoteNumber+" — installed complete package benchmark; management C1 spare option",
+  budgetUnitPriceTHB:round(historicalC1ReferenceUSD*customer.rows[0].workingFxTHBPerUSD),
+  budgetTotalTHB:round(historicalC1ReferenceUSD*customer.rows[0].workingFxTHBPerUSD),
+  source:"MDS/ORGA "+legacyAlternative.quote+" — historical installed complete-package FCA benchmark; management C1 spare option",
+  installedMGWComparisonUnitUSD:quoteRateUSD,
+  installedMGWComparisonSource:raconVendor.quoteNumber,
+  oemQuotedIndependentSpareUSD:null,
+  interchangeableWithSelectedMGWVerified:false,
   sourceIncoterm:"FCA_FACTORY_EX_VAT",
   customerRequiredIncoterm:"DDP_PURCHASERS_YARD",
   ddpIncrementTHB:null,ddpSellPriceTHB:null,leadTimeARO:"8 weeks indicative for equipment; OEM spare lead time subject to confirmation",
-  selectionState:"MANAGEMENT_SELECTED_BUDGETARY_C1_OPTION__NOT_OEM_SPARE_QUOTE",
+  selectionState:"MANAGEMENT_SELECTED_BUDGETARY_C1_OPTION__HISTORICAL_ORGA_ONLY__MGW_SPARE_EQUIVALENCE_PENDING",
   scopeOwner:"C1_DISTINCT_PHYSICAL_SPARE_STOCK_NOT_PART_A",
   costPosted:false,workingSellPosted:false,customerReleaseAllowed:false
  });

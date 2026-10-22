@@ -6,10 +6,13 @@ import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553} from "./bcWorkingModuleRoutes0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
+import {selectB3LeanSatScenario0553} from "./b3LeanSatScenario0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
 import {evaluateB2VdrlIndependentScenario0553} from "./b2IndependentVdrlRecalculation0553";
+import {selectB11MinimumTools0553} from "./b11MinimumTools0553";
+import {selectB5B6B7LinkedLogistics0553} from "./b5B6B7LinkedLogistics0553";
 import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553,
  B1_AUDIT_KINDS_0553,b1AuditModuleId0553} from "./b1AccordionModuleIds0553";
 
@@ -41,6 +44,14 @@ export function buildBcModuleNavigator0553(){
    anchorModuleId:row.moduleId
   }))
  ];
+ // The same read-only financial identity matrix is available under all 16 B/C owner IDs.
+ entries.push(...bc.rows.map(r=>({
+  id:r.moduleId+".financial-identity",
+  name:r.code+" — SOW / VQ / IC / WS / CP Financial Identity (working, not released)",
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:r.moduleId+".financial-identity",
+  keywords:r.code+" SOW VQ IC WS CP vendor quote internal cost working sell customer proposal release hold"
+ })));
  // Nested B1 work-type modules come directly from the canonical B1 support plan.
  // UI numbering B1.1–B1.8 is not a new cost posting; B1.A is an audit namespace.
  const b1=bc.byCode.B1.b1SupportPlanningBudget;
@@ -97,6 +108,7 @@ export function buildBcModuleNavigator0553(){
  // the B3 panel. A source ID may resolve to a distinct (unique) UI anchor.
  const req=selectB3RequirementWbsTrace0553();
  const sat=selectB3SiteMrSatCoverage0553();
+ const leanSat=selectB3LeanSatScenario0553(bc.byCode.B3);
  const b3=bc.byCode.B3;
  const b3Id=b3.moduleId;
  const child=(id,name,anchorModuleId=id,keywords="B3 SAT FAT ITP")=>({
@@ -106,16 +118,16 @@ export function buildBcModuleNavigator0553(){
  const b3Entries=[
   child(b3Id+".worktype-accordion","B3 — Expandable FAT / SAT / Test Equipment / Audit groups"),
   child(b3Id+".fat","B3.1 — FAT Factory Acceptance Test",b3Id+".fat","FAT witness OEM iFAT China"),
-  child(b3Id+".sat","B3.2 — Offshore SAT/SIT Tests",b3Id+".sat","SAT 7 sites 40 days"),
+  child(b3Id+".sat","B3.2 — SAT lean 28+2 execution, 2 reserve; 40-day unchanged Working SELL baseline",b3Id+".sat","SAT 7 sites 28 2 risk 2 reserve 40 priced days"),
   child(b3Id+".tools","B3.3 — Temporary Test Equipment (B3) vs B11 O&M Special Tools",
    b3Id+".tools","VeEX rental B11 tool boundary"),
   child(b3Id+".audit","B3.4 — Working Sell and Contract Cost Audit",b3Id+".audit","19 requirements price trace"),
-  child(b3Id+".mgw-r2-cover-20261020","B3.1.1 — MGW FAT iFAT / Facility Vendor Evidence"),
+  child(b3Id+".mgw-r2-cover-20261020","B3.1.1 — MGW SERV-2/4 Purchased FAT · VQ-MGW source and WS-B3 THB307125"),
   child(b3Id+".fat-owner-transfer","B3.4.4 — Rev05 Historic FAT Owner Reference (Audit Only)"),
   child(b3Id+".fat-training-7d-allocation","B3.4.5 — Seven-day FAT + Training Unapproved Scenario / IC-FAT-001 / CP-B3 NOT ISSUED"),
   child(b3Id+".test-tools-ownership","B3.3.2 — Test Tools / B11 Cost Ownership"),
   child(b3Id+".source-cost-audit","B3.4.3 — Historical Source and Cost Evidence"),
-  child(b3Id+".working-sell-breakdown","B3 — Working SELL THB 2,443,400 Breakdown"),
+  child(b3Id+".working-sell-breakdown","B3 — Working SELL THB 2,750,525 Breakdown"),
   child(b3Id+".40-day-abc","B3 — Offshore SAT/SIT 40-Day Working Basis",
    b3Id+".40-day-abc","offshore 40 days two specialists site SAT"),
   child(b3Id+".veex-mx100","B3 — VeEX MX100+ Temporary Test Rental",
@@ -124,8 +136,14 @@ export function buildBcModuleNavigator0553(){
   child(b3Id+".requirement-crosswalk","B3 — Contract Requirements × Rev.K / BOD SPE DTS MR"),
   child(req.moduleId,"B3 — Requirement Source Register (19)",
    b3Id+".requirement-crosswalk","RQM-01 RQM-19 contract trace"),
-  child(sat.moduleId,"B3 — Seven-Site / Four-MR SAT Test Coverage (40 days)",
+  child(sat.moduleId,"B3 — Latest Lean SAT 28+2 execution versus 40-day Working SELL price evidence",
    sat.moduleId,"ZPQ ZWP8 ZWP11 ZWP20 ZWP21 ZWP22 ZWP23 matrix"),
+  child(b3Id+".sat.latest-execution-days","B3 — Latest Lean SAT: 28 productive +2 risk; +2 management reserve",
+   b3Id+".sat.latest-execution-days","28 2 risk reserve 40 price timeboxes"),
+  ...leanSat.rows.map(r=>child(b3Id+".sat.latest-execution-days."+r.id.toLowerCase(),
+   r.site+" — latest lean "+r.days+" productive team-days vs priced "+r.originalDays,
+   b3Id+".sat.latest-execution-days."+r.id.toLowerCase(),
+   "B3 SAT lean "+r.wbs+" "+r.site+" "+r.id)),
   ...req.rows.map(r=>child(r.moduleId,r.id+" — "+r.activity,
    (r.costOwner==="B9"?"bid.budget.working.bc.b9":"bid.budget.working.bc.b3")+".requirement-crosswalk",
    "requirement "+r.system+" "+r.wbs+" "+r.requirementRef+" "+r.location)),
@@ -161,6 +179,21 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId:"bid.budget.working.bc.b8.integrated-fat-training-7d",
   keywords:"B8 FAT customer training China 7 onsite days 2 training person-days B3 shared 4 travel man-days Yangon approval"
  });
+ const b11ToolTraceId="bid.budget.working.bc.b11.operational-tools-trace";
+ entries.push({
+  id:b11ToolTraceId,
+  name:"B11 — Customer-retained Special Tools from EXA-A8 / B1 Design → B2 VDRL → B3 SAT / B9 Assistance boundary",
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:b11ToolTraceId,
+  keywords:"B11 5 EXA-A8 software licenses configuration SCADA network TETRA RACON charging kit special tools purchaser handover B3 B9"
+ });
+ entries.push(...selectB11MinimumTools0553().rows.map(r=>({
+  id:b11ToolTraceId+"."+r.id.toLowerCase(),
+  name:r.id+" — "+r.description+" / "+r.mr+" / "+r.tag,
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:b11ToolTraceId+"."+r.id.toLowerCase(),
+  keywords:"B11 O&M Special Tools purchaser "+r.mr+" "+r.tag+" "+r.compatibilityGate
+ })));
  entries.push({
   id:"bid.budget.working.bc.b11.test-equipment-ownership",
   name:"B11 — Permanent O&M Special Tools vs B3 Temporary FAT/SAT Rental",
@@ -174,6 +207,7 @@ export function buildBcModuleNavigator0553(){
  if(vdrl.records.length!==143||vdrl.totals.uniqueTitleTypes!==38)
   throw Error("B2 143 / 38 source register changed");
  const priceCodes=["B2","B4","B5","B6","B7","B8","B9"];
+ const logistics=selectB5B6B7LinkedLogistics0553();
  for(const code of priceCodes){
   const rootId="bid.budget.working.bc."+code.toLowerCase()+".price-trace";
   const label=bc.byCode[code].requirement;
@@ -199,6 +233,13 @@ export function buildBcModuleNavigator0553(){
    ["resource-man-hours","Positions / Man-hours / Rate and cost gaps"],
    ["source-audit","Vendor quote / historical evidence and owner audit"]
   ])entries.push(nested(rootId+"."+suffix,code+" — "+name));
+  if(logistics.rowsByCode[code]){
+   for(const work of logistics.rowsByCode[code]){
+    entries.push(nested(work.moduleId,code+" — "+work.activity,
+     "B5 B6 B7 logistics MGW Nantong JUTAL ADR-68 "+work.mr+" "+work.cargoId+
+     " source vendor quoted cost quantity rate packing freight storage no double count"));
+   }
+  }
   if(code==="B2"){
    for(const mr of ["MR-0001","MR-0002","MR-0003","MR-0004"]){
     entries.push(nested(rootId+".vdrl."+mr.toLowerCase(),

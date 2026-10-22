@@ -1,7 +1,11 @@
-import React,{useRef,useState} from "react";
+import React,{useMemo,useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
+import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
 import {buildNativeWorkingDraft0553} from "./nativeWorkingDraft0553";
+import {auditCurrentCustomerProjection0553} from "./estimateToBidMapping";
+import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
+import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import "./releaseWorkbook0553.css";
 
@@ -15,7 +19,10 @@ const B_ROWS=Array.from({length:14},(_,i)=>"B"+(i+1));
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 const cash=n=>Number.isFinite(n)?"THB "+money(n):"PENDING";
 const formatUnit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"—";
-const parseName=code=>REV08_BASELINE.summary.find(r=>r[0]===code)?.[1]||code;
+// Customer descriptions must follow the native source workbook, not Rev08 history.
+const sourceScopeRows=OFFICIAL_WORKBOOK_TEMPLATE_0553.sheets.find(s=>s.name==="Scope of supply")?.rows||[];
+const parseName=code=>sourceScopeRows.find(row=>row[1]===code)?.[2]||
+ REV08_BASELINE.summary.find(r=>r[0]===code)?.[1]||code;
 const ANNEX_TITLE={
  B10:["ERECTION, PRECOMMISSIONING, COMMISSIONING, START UP SPARE PARTS LISTS","安装，预试车，试车和开车的备件清单"],
  B11:["SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS","供货商推荐的特殊工具"],
@@ -45,10 +52,21 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const provisionalBase=addKnown(model.summary.aProvisionalCustomerSellTHB,bWorkingTotal);
  const tagCount=model.a.reduce((n,p)=>n+p.sourceRows.length,0);
  const isOverOriginalCapacity=tagCount>15;
+ // Existing 10.4 registry supplements—not replaces—the active 10.3 adapter.
+ // This is a read-only parity check; the 21 estimate-line allocations remain HOLD.
+ const mappingAudit=useMemo(()=>auditCurrentCustomerProjection0553({
+  canonical:selectBcTurnkeyWorkingCost0553(),release:model,
+  scope:selectScopePartBcWorking0553()
+ }),[model]);
  const activeChecks=[
+  {id:"MAP",label:"10.4 A/B/C → 10.3/10.5 → Native customer row parity",
+   state:mappingAudit.selectedValueParity?"REVIEW":"HOLD",
+   detail:mappingAudit.declaredMappingCount+" contract lines; "+
+    mappingAudit.unresolvedEstimateLines+" estimate allocations still need evidence; "+
+    (mappingAudit.selectedValueParity?"current value projection matches":"SOURCE MISMATCH")},
   {id:"A-SUM",label:"10.1 → 10.3 Part A vs CFO",state:partA.reconciliationPassed?"PASS":"HOLD",detail:"Working price "+cash(aWorkingTotal)+" · CFO "+cash(partA.expectedPreviewTHB)},
   {id:"A-TAGS",label:"Original Part A layout / Buyer TAG grouping approval",state:isOverOriginalCapacity?"HOLD":"REVIEW",detail:tagCount+" source TAG lines → 4 MR summary rows; buyer must accept group-level TAG mapping for original 15 slots"},
-  {id:"B-SCOPE",label:"10.2 B1–B14 Working Sell",state:model.sourceCoverage.bSellReady?"PREVIEW":"HOLD",detail:"Working Sell displayed unchanged; conditional B7/B9 must be reviewed"},
+  {id:"B-SCOPE",label:"10.2 B1–B14 Working Sell",state:model.sourceCoverage.bSellReady?"PREVIEW":"HOLD",detail:"B9 quoted 1 LS included once in Base; Yard execution conditional, B7 reserve still under review"},
   {id:"B-COST",label:"10.2 B1–B14 verified Direct Cost",state:model.sourceCoverage.bCostReady?"PASS":"HOLD",detail:"Required for actual ADDVALUE profit, not for displaying provisional Working Sell"},
   {id:"C-COST",label:"10.2 C1/C2 optional supplier cost",state:model.sourceCoverage.cCostReady?"PASS":"HOLD",detail:"No 30% markup of C Working Sell; verified direct cost required"},
   {id:"ANNEX",label:"Original Annex B10/B11/B13/C1/C2 capacities",state:model.sourceCoverage.annexOverflow.length?"HOLD":"REVIEW",detail:model.sourceCoverage.annexOverflow.length?"Exceeds 13 rows: "+model.sourceCoverage.annexOverflow.join(", "):"13 original slots per Annex / OEM price proof pending"},
@@ -181,7 +199,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td>{["B10","B11","B13"].includes(id)?"refer to Annex "+id:
           id==="B12"?"refer to Annex B12":
-          line?.conditional&&internal?"Conditional — verify before release":""}</td>
+          line?.executionConditional&&internal?"Quoted in Base · attendance on written call-out":line?.conditional&&internal?"Conditional — verify before release":""}</td>
         </tr>;
        })}
        <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 / Base A+B (WORKING PREVIEW)</td>
