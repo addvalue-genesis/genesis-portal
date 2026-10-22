@@ -15,14 +15,14 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
  const src=id=>{const v=rows.find(r=>r.id==="B3-"+id);
   if(!v)throw Error("Missing current B3 source expense "+id);return v;};
  const staff=src("FAT-STAFF"),travel=src("TRAVEL-DAYS"),hotel=src("HOTEL");
- if(b3.workingSellTHB!==2599325||b8.workingSellTHB!==30000||
+ if(b3.workingSellTHB!==2599325||b8.workingSellTHB!==216650||
   b3.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB!==307125||
   fat.fatWorkingSellTHB!==422600||rows.length!==8||
   rate.usdPerPersonDay!==600||rate.thbPerUsd!==31.5||
   staff.qty!==12||staff.unitRateTHB!==20475||
   travel.qty!==4||travel.unitRateTHB!==20475||
   hotel.qty!==14||hotel.unitRateTHB!==2500||
-  b8.qtyDriver!==44||cover.FAT.internalFatDays!==2||
+  b8.qtyDriver!==1||cover.FAT.internalFatDays!==2||
   cover.FAT.facilityEndUserDaysMinimum!==5)
   throw Error("B3/B8 7-day scenario diverged from prior canonical input; do not quietly update price");
  const program=Object.freeze([
@@ -58,8 +58,8 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   trainingAssignedSellTHB!==37800||newB3FatSellTHB!==427600||
   newGrossFatTrainingTripSellTHB!==465400||
   newB3OverallSellTHB!==2604325||newB8OverallSellTHB!==37800||
-  oldCombined!==2629325||newCombined!==2642125||
-  round(newCombined-oldCombined)!==12800||
+  oldCombined!==2815975||newCombined!==2642125||
+  round(newCombined-oldCombined)!==-173850||
   b3.directCostTHB!==null||b8.directCostTHB!==null)
   throw Error("B3/B8 7-day allocation math / no-extra-travel / no-double-count failed");
  return Object.freeze({
@@ -69,7 +69,7 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   }),
   identities,program,
   sourceEventId:"MGW_FAT_TRAINING_ONE_CHINA_VISIT_7_WORKDAYS",
-  sourceAuthority:"MANAGEMENT_7_DAY_INTERNAL_PROPOSAL__NOT_CUSTOMER_ACCEPTED",
+  sourceAuthority:"SUPERSEDED_FAT_TRAINING_7_DAY_COMPARISON__NOT_SELECTED_B8_HYBRID",
   onSiteDays:7,crew:2,onsitePersonDays:14,
   b3OnsitePersonDays,b8OnsitePersonDays,
   travelDaysPerPerson:2,travelPersonDays,
