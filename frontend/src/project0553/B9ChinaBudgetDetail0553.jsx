@@ -2,7 +2,7 @@ import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 // Historic filename retained for routing compatibility; view ALWAYS filters by contractual cost owner.
-export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServices=null}){
+export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServices=null,workingRow=null}){
  if(!budget)return null;
  const isFat=selectedOwner==="B3", owner=isFat?"B3":"B9";
  const rows=budget.rows.filter(x=>x.costOwner===owner);
@@ -16,7 +16,14 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
  if(isFat&&purchasedServices&&
    (purchasedFatSell!==307125||purchasedServices.vendorPurchasedQuoteUSD!==7500))
   throw Error("B3 purchased MGW FAT quotation and Working SELL source mismatch");
- const ownerPreviewB3THB=isFat?2046000+total+purchasedFatSell:null;
+ // FULL B3 must originate from canonical 10.2 owner, not historical 40d
+ // SAT THB2,046,000. Missing canonical input means NO full-total claim.
+ const ownerPreviewB3THB=isFat&&workingRow?.code==="B3"?
+  workingRow.workingSellTHB:null;
+ if(isFat&&Number.isFinite(ownerPreviewB3THB)&&
+  Math.round((workingRow.b3SelectedSatSurveyBudget.includedB3SatSurveyToolsWorkingSellTHB+
+   total+purchasedFatSell)*100)!==Math.round(ownerPreviewB3THB*100))
+  throw Error("B3 FAT detail FULL preview must reconcile to canonical WS-B3");
  if(!rows.length||Math.abs(rows.reduce((sum,x)=>sum+x.workingSellTHB,0)-total)>0.01)
   throw Error("Contract B3 FAT vs B9 Yard detail ownership/pricing mismatch");
  return <section className="p55-panel" data-component-key={"bid.budget.working.bc."+owner.toLowerCase()+".revk-china-budget"} style={{padding:14,marginTop:12}}>
@@ -26,10 +33,10 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
    <div><strong>{isFat?"WS-B3 — Current Internal FAT Working SELL":"WS-B9 — Included in Base Once · On-call Yard Working SELL"}</strong><p>{thb(total)}</p>
     <small>{isFat?"Two ADDVALUE paid witnesses, six budgetary FAT days, one return China trip; OEM executes FAT in Part A":"One paid Senior Telecom Engineer · 7 working days + 2 travel days · one unbilled accompanying Field Telecom Specialist"}</small></div>
    <div><strong>{isFat?
-    (purchasedServices?"WS-B3 — FULL B3 incl. MGW Purchased FAT Working SELL":"WS-B3 — Offshore + ADDVALUE FAT only (MGW purchased cost not provided)"):
+    (Number.isFinite(ownerPreviewB3THB)?"WS-B3 — FULL B3 canonical Working SELL (MGW Purchased FAT included once)":"WS-B3 — Full total requires canonical 10.2 owner"):
     "Current B9 Base"}</strong><p>{isFat?thb(ownerPreviewB3THB):thb(budget.b9BaseWorkingSellTHB)}</p>
     <small>{isFat?
-     (purchasedServices?"Offshore SAT/SIT + VeEX + ADDVALUE FAT witness + MGW purchased iFAT/Facility included ONCE; vendor quote not paid cost":"ADDVALUE and offshore sources only; not a full B3 rollup"):
+     (Number.isFinite(ownerPreviewB3THB)?"SAT28 + BF conditional Survey + VeEX + ADDVALUE FAT witness + MGW purchased iFAT/Facility included ONCE; vendor quote is not paid cost":"Standalone FAT source detail only; total WS-B3 cannot be inferred from this budget object"):
      "B9 1 LS included in quoted Base; actual deployment requires written Yard call-out"}</small></div>
   </div>
   {isFat&&budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}>
