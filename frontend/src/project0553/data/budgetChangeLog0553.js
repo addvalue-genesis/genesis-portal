@@ -2,8 +2,16 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R30";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R31";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-19",date:"2026-10-22",kind:"PRICE",tone:"neutral",
+  title:"B3 Working Budget Selected SAT 28 Days + BF Site Survey 3+2, Not Historical 40 Days",
+  detail:"Project Owner directs B3 current Working SELL to use SAT/SIT 28 productive two-person team-days (56 MD) at existing pre-award USD800/person-day and THB31.50/USD = THB1411200; plus separate BF Site Survey ZPQ/ZWP8/ZWP11 one team-day each (6 MD), and survey MOB/DEMOB two team-days (4 MD), total BF 5 team-days /10 MD / THB252000. SAT extra 2 risk team-days and additional 2 management-reserve team-days are NOT added to selected Working SELL. MGW purchased iFAT+facility THB307125, ADDVALUE FAT witness/travel THB397400, and VeEX rental THB30000 remain unchanged. Canonical WS-B3 changes from old THB2750525 to NEW THB2397725; Part B Base from THB4385436.82 to THB4032636.82. 10.3 Budget/Release Preview and 10.5 Scope read that selected B3 amount only once; Customer Release remains HOLD and Actual Direct Cost null. Previous 40 team-days /80 MD remain source-priced historical audit ONLY. B3 Resource Price Dossier now expands SAT28, BF Survey5, FAT and Vendor Quote source into individual role x people x days x rate rows. Visible MGW source quotation sum THB236250 is NOT extra SELL and purchase is not yet paid Actual Cost. BF revisit price is selected budget allowance only; physical revisit requires JUTAL written instruction and review of previous BOD section 8 survey evidence. GF Yard SAT / offshore commissioning still have unverified ADDVALUE RACI/person-days; no double posting into B9 or Part A.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier","bid.budget.working.bc.b3.40-day-abc","bid.budget.working.bc.b3.site-survey-price","bid.budget.pricing.release"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",
+  source:"Owner decision 2026-10-22 SAT28 and BF3+travel2; BOD C2 section 8; SPE C2 sections 7.3.2/7.3.3; selected 10.2 b3SelectedSatSurveyPrice0553 and MGW P26-058_R2"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-18",date:"2026-10-22",kind:"UI",tone:"neutral",
   title:"B3 B2-style Detailed Resource Price Dossier: People × Days × Rate × Cost/SELL",
