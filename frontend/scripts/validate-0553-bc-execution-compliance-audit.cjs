@@ -116,8 +116,14 @@ for(const name of ["project0553/BcExecutionComplianceAudit0553.jsx","project0553
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code,
   "JSX Syntax check "+name);
 assert(workspace.includes('<BcExecutionComplianceAudit0553 selectedCode={bcTab}/>'));
-assert(workspace.includes('audit?.tagName==="DETAILS"'));
-assert(workspace.includes('bid.budget.working.bc.b3.mob-demob-economics'));
+// Current 10.2 deep link opens the canonical <details> parent by exact ID
+// and mounts the B/C audit in its own component. Old audit?.tagName check
+// belonged to the removed navigation implementation.
+assert(workspace.includes('const parent=findModuleElement0553(document,"bid.budget.working.bc")')&&
+ workspace.includes("parent.open=true")&&workspace.includes("openModuleAncestors0553(exact)"),
+ "10.2 deep-link must open actual B/C disclosure and nested cost evidence");
+assert(navigator.includes('id:"bid.budget.working.bc.b3.mob-demob-economics"'),
+ "Offshore MOB/DEMOB module must remain navigable without posting extra cost");
 assert(navigator.includes('id:"bid.budget.working.bc.b3.mob-demob-economics"'));
 
 assert(navigator.includes('id:"bid.budget.working.bc.execution-audit"'));
