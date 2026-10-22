@@ -49,7 +49,7 @@ assert.equal(quote.policy.samTelCostMarkupPct,policy.aAndC.samtelCostPct);
 assert.equal(quote.policy.addvalueCostMarkupPct,policy.aAndC.addvalueCostPct);
 assert.equal(quote.policy.omissionReserveCostMarkupPct,policy.aAndC.omissionReserveCostPct);
 assert.equal(b3.workingSellTHB,2599325);
-assert.equal(b3.b3OriginalWithoutMgwPurchasedTHB,2090600);
+assert.equal(b3.b3OriginalWithoutMgwPurchasedTHB,2292200); // current B3 minus purchased OEM FAT, SAT/Survey/China rate revisions included
 assert.equal(b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
 assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,422600);
 assert.equal(b3.b3FortyDayBudget.workingSellTHB,2046000);
@@ -81,10 +81,10 @@ const commercial=release();
 const b3Release=commercial.b.find(x=>x.code==="B3");
 assert.equal(b3Release.customerSellTHB,2599325);
 assert.equal(b3Release.mgwPurchasedServicesSellIncludedTHB,307125);
-assert.equal(b3Release.samTelOrdinaryB5PctDeductionTHB,104530);
+assert.equal(b3Release.samTelOrdinaryB5PctDeductionTHB,114610); // 5% × current THB2,292,200 ordinary B3 only
 assert.equal(b3Release.samTelPurchased20PctCostShareTHB,47250);
-assert.equal(b3Release.samTelDeductionTHB,151780);
-assert.equal(b3Release.addvalueReceivableTHB,2245945);
+assert.equal(b3Release.samTelDeductionTHB,161860); // THB114,610 ordinary + THB47,250 purchased share
+assert.equal(b3Release.addvalueReceivableTHB,2437465); // B3 current THB2,599,325 less THB161,860
 assert.equal(b3Release.actualCostTHB,null);
 assert.equal(b3Release.releaseAllowed,false);
 assert.equal(commercial.approval.releaseAllowed,false);
@@ -94,7 +94,7 @@ assert.equal(ordinary.customerSellTHB,100);
 assert.equal(ordinary.samTelDeductionTHB,5);
 assert.equal(ordinary.addvalueReceivableTHB,95);
 const protectedC=priceB(2599325,null,quote);
-assert.equal(protectedC.samTelDeductionTHB,151780);
+assert.equal(protectedC.samTelDeductionTHB,161860);
 assert.throws(()=>priceB(2599325,null,{...quote,
  policy:{...quote.policy,bStandardFivePctDeductionOnPurchasedComponentAllowed:true}
 }),/cannot be subjected/);
