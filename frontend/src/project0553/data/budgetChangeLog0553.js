@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R18";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R19";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-07",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"B1 Visible Price SSR order aligned with post-TDZ accordion layout",
+  detail:"Windows npm build validate-0553-b1-visible-price-overview failed outdated expectation detail>generic at line62. After the sharedEvidence TDZ repair, actual B1 JSX order is Quick B1WorkingPriceOverview → detailed B1RevKMilestoneBudget → generic evidence metric grid. Update regression to verify exactly that source order and actual SSR data-component-key placement, while retaining B1.1–B1.8 source/category checks, navigation anchors and B1 Working SELL THB211600, planning THB181400 and conditional THB51700. No UI or price mutation; Customer Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1.price-overview","bid.budget.working.bc.b1.revk-pm-milestones","bid.budget.working.bc.b1"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"2026-10-22 user Windows Node assert line62 / prior BcCostEvidenceDetail0553.jsx TDZ structural repair"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-06",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"B1 Visible Price Overview SSR Test: HTML-escaped Account Labels",
