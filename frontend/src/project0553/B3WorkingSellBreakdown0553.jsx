@@ -8,14 +8,14 @@ export function B3WorkingSellBreakdown0553({workingRow}){
  return <section className="p55-panel" data-component-key={m.moduleId} style={{padding:12,marginTop:12}}>
   <h4>B3 — Current Working SELL Breakdown · {cash(m.totalWorkingSellTHB)}</h4>
   <p className="p55-note"><strong>Module ID:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={m.moduleId}/> · <strong>Parent Cost Owner:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={m.ownerModuleId}/></p>
-  <p className="p55-note"><strong>กำลังคน 40 วันในฐานราคาขาย SAT/SIT เดิม (ไม่ใช่กำหนดการไปทำงานจริง):</strong> {m.offshore.people} คนทำงานเป็นทีมเดียวกัน × {m.offshore.workdays} วันทำงาน = <strong>{m.offshore.personDays} Man-days</strong> (ไม่ใช่ 40 วันต่อระบบ MR). อัตรา USD {m.offshore.rateUSD}/คน/วัน × FX {m.offshore.workingFx} = {cash(m.offshore.laborWorkingSellTHB)} ค่าแรง. แจกแจงวันและราคาต่อ Site อยู่ที่ <code>bid.budget.working.bc.b3.site-mr-sat-matrix</code>.</p>
+  <p className="p55-note"><strong>กำลังคน SAT 28 วันทำงาน (56 MD) — Current Working SELL:</strong> {m.offshore.people} คนทำงานเป็นทีมเดียวกัน × {m.offshore.workdays} วันทำงาน = <strong>{m.offshore.personDays} Man-days</strong> (ไม่ใช่ 40 วันต่อระบบ MR). อัตรา USD {m.offshore.rateUSD}/คน/วัน × FX {m.offshore.workingFx} = {cash(m.offshore.laborWorkingSellTHB)} ค่าแรง. แจกแจงวันและราคาต่อ Site อยู่ที่ <code>bid.budget.working.bc.b3.site-mr-sat-matrix</code>.</p>
   <p className="p55-note"><strong>ตรวจตาม BOD/SPE:</strong>
    BOD Rev.C2 §8 มีผล BF survey ที่ ZPQ, ZWP8 และ ZWP11 อยู่แล้ว;
    SPE Rev.C2 §7.3.2 แยก GF SAT ที่ JUTAL Zhuhai Fabrication Yard,
    และ §7.3.3 แยก GF Offshore Commissioning หลังติดตั้ง.
-   <strong>40 team-days / 80 MD เป็นฐาน Working SELL เดิม ไม่ใช่จำนวนวันเดินทางที่อนุมัติ.</strong>
+   <strong>SAT 28 Team-days / 56 MD + BF Site Survey 3 field +2 travel Team-days / 10 MD เป็น Working Budget ปัจจุบัน; 40d อยู่ใน Historical Audit เท่านั้น.</strong>
    GF Yard/Offshore ADDVALUE people/days และ BF revisit ยังไม่มีอนุมัติหรือ Verified Direct Cost.</p>
-  <p className="p55-note"><strong>ราคาใน B3 นี้เป็น Working SELL ไม่ใช่ Direct Cost.</strong> B3 ครอบคลุม MGW Purchased iFAT/Facility (ต้นทุนซื้อ × 20% SAMTEL + 5% ADDVALUE + 5% Reserve), ADDVALUE China FAT witnesses, Offshore SAT/SIT 40 workdays และ VeEX rental. ตาราง Contract Requirement กับ Site-MR SAT เป็นเอกสาร Coverage/Verification แยกต่างหาก ไม่คิดราคาบวกเพิ่ม.</p>
+  <p className="p55-note"><strong>ราคาใน B3 นี้เป็น Working SELL ไม่ใช่ Direct Cost.</strong> B3 ครอบคลุม MGW Purchased iFAT/Facility (ต้นทุนซื้อ × 20% SAMTEL + 5% ADDVALUE + 5% Reserve), ADDVALUE China FAT witnesses, SAT 28 productive Team-days และ BF Survey 5 Team-days รวมทั้ง VeEX rental. ตาราง Contract Requirement กับ Site-MR SAT เป็นเอกสาร Coverage/Verification แยกต่างหาก ไม่คิดราคาบวกเพิ่ม.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Current B3 Cost Owner / Copy ID</th><th>Price driver / Quantity</th><th>Working SELL (THB)</th><th>Pricing / Source status</th></tr></thead>
    <tbody>{m.summary.map(x=><tr key={x.id} data-component-key={m.moduleId+".component-preview."+x.id.toLowerCase()}>
@@ -35,6 +35,6 @@ export function B3WorkingSellBreakdown0553({workingRow}){
     <tr><td colSpan={3}><strong>FAT China base · B3 only</strong></td><td><strong>{cash(m.fat.workingSellTHB)}</strong></td><td>MGW purchased services selected separately in B3.1.1; no B9 FAT duplication</td></tr>
     </tbody></table></div>
   </details>
-  <p className="p55-note"><strong>Scope / Commercial exclusions:</strong> {m.excluded.join(" · ")}. Retained site/SIT PRICE-ONLY allocation appears separately under <code>bid.budget.working.bc.b3.site-mr-sat-matrix</code>. Source values are read-only mirrors of the CURRENT selected B3 Working SELL. Purchased quote is priced once in B3.1; Direct Cost paid invoice and Customer Release remain unverified.</p>
+  <p className="p55-note"><strong>Scope / Commercial exclusions:</strong> {m.excluded.join(" · ")}. Selected SAT28 / BF Survey5 resource-price breakdown appears separately under <code>bid.budget.working.bc.b3.site-mr-sat-matrix</code>. Source values are read-only mirrors of the CURRENT selected B3 Working SELL. Purchased quote is priced once in B3.1; Direct Cost paid invoice and Customer Release remain unverified.</p>
  </section>;
 }
