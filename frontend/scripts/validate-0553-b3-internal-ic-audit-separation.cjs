@@ -25,8 +25,8 @@ assert.equal(internalId("B3","FAT-STAFF"),"IC-FAT-STAFF-001");
 assert.equal(internalId("B3","TRAVEL-DAYS"),"IC-FAT-TRAVEL-DAYS-001");
 assert.equal(internalId("B9","YARD-STAFF"),"IC-YARD-STAFF-001");
 const all=b3.b3ChinaFatBudget.rows;
-assert.equal(all.length,16);
-assert.equal(new Set(all.map(x=>x.internalCostLineId)).size,16);
+assert.equal(all.length,18);
+assert.equal(new Set(all.map(x=>x.internalCostLineId)).size,18);
 for(const x of all){
  assert.match(x.internalCostLineId,/^IC-(?:FAT|YARD)-[A-Z0-9-]+-001$/);
  assert.equal(x.legacySourceExpenseId,x.id);
