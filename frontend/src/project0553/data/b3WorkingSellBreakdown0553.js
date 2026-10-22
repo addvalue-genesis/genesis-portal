@@ -5,8 +5,9 @@ const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const isMoney=n=>Number.isFinite(n)&&n>=0;
 export function selectB3WorkingSellBreakdown0553(workingRow){
  if(!workingRow||workingRow.code!=="B3")return null;
- const sat=workingRow.b3FortyDayBudget,china=workingRow.b3ChinaFatBudget;
- if(!sat||!china)throw Error("Missing B3 current 40-day SAT or MGW China FAT source");
+ const sat=workingRow.b3SelectedSatSurveyBudget,china=workingRow.b3ChinaFatBudget;
+ const legacy=workingRow.b3FortyDayBudget;
+ if(!sat||!china||!legacy)throw Error("Missing B3 current SAT28+Survey5 or MGW China FAT source");
  const fatRows=china.rows.filter(x=>x.costOwner==="B3"&&!x.optional);
  if(fatRows.length!==8||!fatRows.every(x=>isMoney(x.workingSellTHB)&&x.moduleId))
   throw Error("MGW FAT source row ownership or working sell missing");
@@ -16,13 +17,14 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
   purchased.vendorPurchasedQuoteTHB!==236250||purchased.customerReleaseAllowed)
   throw Error("Missing separately priced MGW purchased 20/5/5 services in B3");
  const fatWithPurchased=round(fatSell+purchased.selectedIncrementalWorkingSellTHB);
- const offshoreLabor=round(sat.rows.reduce((n,x)=>n+x.workingSellTHB,0));
+ const offshoreLabor=sat.satWorkingSellTHB;
+ const surveyLabour=sat.siteSurveyWorkingSellTHB;
  const veex=sat.veex;
  const rent=veex?.workingSellTHB;
- const satSell=round(offshoreLabor+rent);
+ const satSell=round(offshoreLabor+surveyLabour+rent);
  const total=round(satSell+fatWithPurchased);
- if(sat.workdays!==40||sat.persons!==2||sat.personDays!==80||
-  offshoreLabor!==sat.laborWorkingSellTHB||satSell!==sat.workingSellTHB||
+ if(sat.satTeamDays!==28||sat.satPersonDays!==56||sat.siteSurveyTeamDays!==5||
+  offshoreLabor!==1411200||surveyLabour!==252000||satSell!==sat.includedB3SatSurveyToolsWorkingSellTHB||
   fatSell!==china.fatWorkingSellTHB||total!==workingRow.workingSellTHB)
   throw Error("B3 Working SELL source reconciliation failed; no price override allowed");
  return Object.freeze({
@@ -31,9 +33,13 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
   currency:"THB",
   summary:[
    {id:"OFFSHORE",moduleId:"bid.budget.working.bc.b3.40-day-abc",
-    activity:"Retained 40-day SAT/SIT labour SELL basis — phase/day split NOT yet established",
-    driver:"40 historical-priced team-days × 2 paid specialist SELL rate × USD800/person-day × THB31.5/USD (not new approved BF/Yard/Offshore schedule)",
+    activity:"Selected 28-day SAT/SIT labour Working SELL basis — stage RACI/ITP still open",
+    driver:"28 selected productive team-days × 2 specialists × USD800/person-day × FX31.5; pooled +2 SAT risk team-days nonposted",
     workingSellTHB:offshoreLabor,postedWithinB3:true},
+   {id:"BF-SURVEY",moduleId:"bid.budget.working.bc.b3.site-survey-price",
+    activity:"Selected 3-BF-site Survey plus two trip-team-days — work order conditional",
+    driver:"(ZPQ 1d + ZWP8 1d + ZWP11 1d + MOB/DEMOB 2d) × 2 paid specialists × THB25,200/MD",
+    workingSellTHB:surveyLabour,postedWithinB3:true},
    {id:"VEEX",moduleId:"bid.budget.working.bc.b3.veex-mx100",
     activity:"Temporary VeEX MX100+ SAT instrument rental",
     driver:veex.quantity+" rental-days × THB"+veex.rateTHB+" /day; ex VAT; no extra B11 tool purchase",
@@ -47,9 +53,12 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
     driver:"6 FAT witness workdays × 2 persons + 2 travel days × 2 persons + eight separately owned B3 estimate lines",
     workingSellTHB:fatSell,postedWithinB3:true}
   ],
-  offshore:{workdays:sat.workdays,people:sat.persons,personDays:sat.personDays,rateUSD:sat.rateUSDPerPersonDay,workingFx:sat.fxTHBPerUSD,
-   laborWorkingSellTHB:offshoreLabor,rentalWorkingSellTHB:rent,
-   includedSatSellTHB:satSell,siteTimeboxes:sat.rows},
+  offshore:{workdays:sat.satTeamDays,people:2,personDays:sat.satPersonDays,rateUSD:sat.sourceRateUSDPerPersonDay,workingFx:sat.fxTHBPerUSD,
+   laborWorkingSellTHB:offshoreLabor,surveyLabourWorkingSellTHB:surveyLabour,rentalWorkingSellTHB:rent,
+   includedSatSellTHB:satSell,siteTimeboxes:sat.satRows},
+  survey:{siteTeamDays:sat.siteSurveyTeamDays,personDays:sat.siteSurveyPersonDays,
+   workingSellTHB:surveyLabour,rows:sat.siteSurveyRows,physicalVisitApproved:false},
+  old40PriceAudit:{workdays:legacy.workdays,personDays:legacy.personDays,workingSellTHB:legacy.workingSellTHB},
   fat:{rows:fatRows,workingSellTHB:fatSell,groupFatWorkingSellTHB:fatWithPurchased,
    purchasedServices:purchased,conditionalYardExcludedTHB:china.conditionalYardSellTHB},
   totalWorkingSellTHB:total,verifiedDirectCostTHB:null,
