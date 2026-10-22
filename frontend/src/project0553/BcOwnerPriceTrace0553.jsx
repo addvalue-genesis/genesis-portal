@@ -1,6 +1,7 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {B3B8SevenDayAllocation0553} from "./B3B8SevenDayAllocation0553";
+import {B8FourSystemHybridTraining0553} from "./B8FourSystemHybridTraining0553";
 import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {selectBcB1B2EquationExecution0553} from "./data/bcB1B2EquationExecution0553";
 import {B2WorkingPriceOverview0553} from "./B2WorkingPriceOverview0553";
@@ -224,12 +225,13 @@ function Pricing({row}){
     handling/protection fees before revising B7 Selected Working SELL.</p>
   </section>}
   {code==="B8"&&<section className="p55-panel" style={{padding:12}}>
-   <h4>B8 — Training WBS Source</h4>
-   <p className="p55-note">Current <strong>{fmt(total)}</strong> is a Working SELL WBS allowance;
-    Rev05 identifies <strong>44 MH</strong> of training scope, but the allocated positions,
-    trainer hours per session, number of trainee groups, rate per role, sessions, materials
-    and OEM-included courses are not independently verified. THB 30,000 is not
-    an approved hourly-rate calculation. Do not treat THB30,000/44 as an agreed rate.</p>
+   <h4>B8 — Current Hybrid Two-day Training Price / Historical Source</h4>
+   <p className="p55-note">Selected WS-B8 <strong>{fmt(total)}</strong> covers four systems,
+    eight attendees, two practical onsite days and four provisional OEM online instructors.
+    The Hybrid Training Dossier contains detailed Qty × Rate. Rev05 44 MH / THB30,000 is
+    <strong> SUPERSEDED historical source</strong>, not an incremental current charge.
+    Venue, OEM quotations, B3/B9 trip-sharing and final customer syllabus need approval.
+    Working COST / Direct COST NOT ESTABLISHED.</p>
   </section>}
   {code==="B9"&&<section className="p55-panel" style={{padding:12}}>
    <h4>B9 — Senior Telecom Engineer + Field Technician Package (one Lump Sum)</h4>
@@ -390,9 +392,7 @@ function Resource({row}){
    OEM/B3 author for FAT/SAT test reports. These are
    <strong> cost-ownership candidates, not approved assigned positions or MH</strong>.
    Engineering design content must not be charged again through B2.</p>}
-  {code==="B8"&&<p className="p55-note">Trainer discipline and sessions by MR0001–0004,
-   number of trainees, training days/total 44 source MH allocation and
-   OEM-provided materials remain to validate.</p>}
+  {code==="B8"&&<p className="p55-note">Eight customer attendees and four OEM remote half-day lessons for MR0001–0004 over two onsite days. ADDVALUE Senior onsite at USD700/MD leads demonstrations; remote OEM fees USD400/session are PARAMETRIC only. Venue and itinerary unapproved. Rev05 44 MH historical only.</p>}
   {code==="B9"&&<p className="p55-note">B9 2-person selected planning crew:
    Senior Telecom Systems Integration Engineer (USD700/MD) + Field Telecom Technician (USD600/MD),
    each for 7 Yard working days and 2 travel days. CCL Item31 original 18 Yard / 45 Offshore
@@ -432,6 +432,7 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
     <button type="button" className="p553-detail-button" onClick={()=>setAll(false)}>− Collapse All</button>
    </div>
   </div>
+  {code==="B8"&&<B8FourSystemHybridTraining0553 workingRow={workingRow}/>}
   {code==="B8"&&<B3B8SevenDayAllocation0553
    b3={selectBcTurnkeyWorkingCost0553().byCode.B3} b8={workingRow} owner="B8"/>}
   {code==="B2"&&<B2IndependentVdrlRecalculation0553 workingRow={workingRow}/>}
@@ -446,6 +447,7 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
   <Section code={code} num={code+".1"} suffix="work-scope"
    title={code==="B2"?"VDRL / Document Register by MR":"Work Type / Physical Deliverables"}
    summary={code==="B2"?"MR0001–0004 · 143 requirement rows / 38 unique title types":
+    code==="B8"?"4 systems / 8 trainees / 2 onsite days / remote OEM lecturers · "+fmt(workingRow.workingSellTHB):
     code==="B9"?"10 priced source rows · Senior + Field Tech · 7 Yard workdays + 2 travel days each · 1 LS "+fmt(workingRow.workingSellTHB):
     "Scope and source work drivers; no invented quantities"} defaultOpen>
    {code==="B2"?<B2Vdrl code={code}/>:["B5","B6","B7"].includes(code)?
