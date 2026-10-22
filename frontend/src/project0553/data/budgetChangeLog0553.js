@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R20";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R21";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-09",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"B2 Original Price Evidence SSR — Rev00a 964.279 MH Rendering vs Full Source MH",
+  detail:"User Windows Node.js 24.21 build failed validate-0553-b2-original-price-evidence.cjs on stale literal 964.278. Rev00a source five roles sum 964.2785625 MH (JS floating-point result may be 964.2785624999999), while B2WorkingPriceOverview0553.jsx renders total.toFixed(3) = 964.279 MH and separately two-decimal 964.28 MH. Fix test to assert source with tolerance, derive rendered expected MH from exact source and verify both Host and Standalone. B2 selected THB237121.13, Rev05 historical 580000, 20k historical gap and Direct Cost null unchanged. No reprice; Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b2.price-overview","bid.budget.working.bc.b2.price-trace","bid.budget.working.bc.b2"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Windows npm build error validate-0553-b2-original-price-evidence.cjs:57 / Rev00a actual source 5-role MH"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-08",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"B1 SSR order test scoped to actual returned JSX, not B9 ownerPriceTrace pre-render",
