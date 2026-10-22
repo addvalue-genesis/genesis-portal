@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R28";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R29";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-17",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"B9 eight-line Specialist Assistance Sell vs Actual Cost Completeness HOLD",
+  detail:"B9 is contracted Specialist Field Assistance at JUTAL Zhuhai on written call-out, NOT B11 customer special tool supply. Eight source budget SELL rows total THB233600, 7 productive plus 2 travel days for one paid Senior Telecom Engineer and fare/hotel/local/insurance/visa allowances. Unbilled accompanying Field Specialist has nonposting THB48500 preliminary cash travel/cover exposure with payroll/rate still unresolved, so B9 Direct Cost and profit cannot be verified. B9 owner trace now shows explicit B1 technical design, B2 document control, B3 FAT/SAT temporary tools vs B11 purchaser-retained software/O&M Special Tools and remaining payroll, vendor, access and compliance gates. No current Working SELL or customer proposal release changes. B3 SAT 28+2 execution and 40-day rate baseline continue separately in R28.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b9.revk-china-budget","bid.budget.working.bc.b9.price-trace.work-scope","bid.budget.working.bc.b11.operational-tools-trace","bid.budget.working.bc.b3.sat"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"2026-10-22 owner cost completeness review / 4-Scope of Supply B9 and B11 / b9ChinaWorkingBudget0553 K08-K12 eight priced rows"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-16",date:"2026-10-22",kind:"UI",tone:"neutral",
   title:"B3 SAT latest 28+2 execution days and B11 tools vs B9 field specialist",
