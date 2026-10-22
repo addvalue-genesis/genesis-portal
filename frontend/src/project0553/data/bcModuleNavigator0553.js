@@ -7,6 +7,7 @@ import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553} from "./bcWorkingModuleRo
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3SurveySatExecutionPlan0553} from "./b3SurveySatExecutionPlan0553";
+import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
@@ -108,6 +109,7 @@ export function buildBcModuleNavigator0553(){
  const req=selectB3RequirementWbsTrace0553();
  const sat=selectB3SiteMrSatCoverage0553();
  const fieldPlan=selectB3SurveySatExecutionPlan0553(bc.byCode.B3);
+ const resourceDossier=selectB3ResourcePriceDossier0553(bc.byCode.B3);
  const b3=bc.byCode.B3;
  const b3Id=b3.moduleId;
  const child=(id,name,anchorModuleId=id,keywords="B3 SAT FAT ITP")=>({
@@ -151,6 +153,26 @@ export function buildBcModuleNavigator0553(){
   ...fieldPlan.sat.rows.map(r=>child(fieldPlan.moduleId+".sat."+r.id.toLowerCase(),
    "B3 OLD Lean comparator only "+r.site+" — "+r.oldLeanTeamDays+" prior team-days not stage allocated",
    fieldPlan.moduleId+".sat."+r.id.toLowerCase(),"old 28 plus 2 lean unallocated price audit "+r.wbs+" "+r.site)),
+  child(resourceDossier.moduleId,"B3 — Resource Price Dossier | Qty × People × Days × Rate × Cost / SELL | B2-style",
+   resourceDossier.moduleId,"cost resource breakdown B3 actual vs quotation vs selected sell labour crew manpower survey yard commissioning"),
+  ...resourceDossier.groups.flatMap((g,i)=>{
+   const gid=resourceDossier.moduleId+".group."+String(i+1).padStart(2,"0");
+   const places=[...new Set(g.rows.map(x=>x.site||"Shared"))];
+   return [
+    child(gid,"B3.R"+(i+1)+" — "+g.name+" / Selected "+g.selectedWorkingSellTHB+" THB",
+     gid,"B3 resource cost dossier "+g.name),
+    ...places.flatMap((site,j)=>{
+     const sid=gid+".site."+String(j+1).padStart(2,"0");
+     return [
+      child(sid,"B3.R"+(i+1)+"."+(j+1)+" — "+site+" detailed man-days / price",
+       sid,"site role days rate breakdown "+site),
+      ...g.rows.filter(x=>(x.site||"Shared")===site).map(r=>child(
+       r.id,(r.role||"")+" · "+(r.site||"Shared")+" · "+r.work,
+       r.id,"B3 dossier "+(r.unit||"")+" qty rate direct cost working sell "+(r.site||"")))
+     ];
+    })
+   ];
+  }),
   ...req.rows.map(r=>child(r.moduleId,r.id+" — "+r.activity,
    (r.costOwner==="B9"?"bid.budget.working.bc.b9":"bid.budget.working.bc.b3")+".requirement-crosswalk",
    "requirement "+r.system+" "+r.wbs+" "+r.requirementRef+" "+r.location)),
