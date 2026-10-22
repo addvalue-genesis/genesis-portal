@@ -52,7 +52,8 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
     costOwner:"WS-B8",postingClass:"ATTRIBUTION_TO_SINGLE_SELECTED_B8_1LS",
     verifiedSourceRate:item.oemFeeNotQuoted?"PARAMETRIC_OEM_REMOTE_SESSION_ALLOWANCE_NOT_VENDOR_QUOTE":
      "PRE_AWARD_RESOURCE_WORKING_SELL_OR_EXPENSE_ALLOWANCE",
-    customerLineAllowed:false}));
+    customerLineAllowed:false});
+  }));
   const subtotal=round(lines.reduce((sum,x)=>sum+x.workingSellTHB,0));
   return f({key:group.key,name:group.name,id:ROOT+".group."+String(i+1).padStart(2,"0"),
    rows:lines,workingSellTHB:subtotal,independentPostingAllowed:false});
