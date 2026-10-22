@@ -79,7 +79,8 @@ export function B3ResourcePriceDossier0553({workingRow}){
          <tbody>{rows.map(x=><tr key={x.id} data-component-key={x.id}>
           <td><strong>{x.id.split(".").slice(-2).join(" / ")}</strong>
            <small>{x.sourceModuleId}</small>{c(x.id)}</td>
-          <td>{x.work}<small>{x.wbs||""}</small><small>{x.calculation}</small></td>
+          <td><strong>{x.mr||""}</strong> {x.work}<small>{x.wbs||""}</small><small>{x.calculation}</small>
+           {x.linkedTestIds?.length>0&&<small>Test ID: {x.linkedTestIds.join(", ")}</small>}</td>
           <td>{x.role}</td><td>{num(x.people)}</td><td>{num(x.teamDays)}</td>
           <td>{num(x.qty)} {x.unit||""}</td>
           <td>{Number.isFinite(x.rateUSDPerUnit)?"USD "+num(x.rateUSDPerUnit):"—"}</td>
@@ -91,7 +92,9 @@ export function B3ResourcePriceDossier0553({workingRow}){
           <td>NOT ESTABLISHED</td>
           <td>{x.verifiedRateType||x.sourceType}
            <small>{x.sourceEvidence||x.sourceType||"No approved source rate"}</small>
-           <small>{x.postingClass}</small></td>
+           <small>{x.postingClass}</small>
+           {x.testInstruments&&<small>Instruments: {x.testInstruments}</small>}
+           {x.signoffEvidence&&<small>Output: {x.signoffEvidence}</small>}</td>
          </tr>)}</tbody>
          <tfoot><tr>
           <th colSpan={10}>{site} — subtotal · {active?"selected price ONCE":"not priced"}</th>
