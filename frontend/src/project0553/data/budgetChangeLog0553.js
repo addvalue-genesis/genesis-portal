@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R27";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R28";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-16",date:"2026-10-22",kind:"UI",tone:"neutral",
+  title:"B3 SAT latest 28+2 execution days and B11 tools vs B9 field specialist",
+  detail:"Owner confirmed JUTAL receiving Yard is ZHUHAI, not Nantong (MGW Office/FAT is Nantong), so remove false named-city discrepancy while retaining exact gate/Incoterm approval. Source decisions: latest lean offshore SAT plan 28 productive TWO-PERSON team-days (56 MD), 2 pooled risk team-days (4 MD), plus 2 additional management-reserve team-days NONPOSTING; selected B3 40-team-day / 80-MD Working SELL basis remains unchanged until explicitly repriced. Show 28+2 execution rows above distinct priced 40-day reference in B3.sat and B3 site/MR SAT matrix; retain 21 Test IDs and seven sites/SIT/punch. Scope correction: original 4-Scope of Supply B9 is Specialist Field Assistance (one Sr Telecom Engineer 7 Yard days plus 2 travel, WS THB233600 in Base, written call-out), NOT customer special-tool procurement. B11 is Permanent O&M Special Tools for PURCHASER: five EXA-A8 requirements and B1 design/B2 VDRL/B3 SAT Test ID crosswalk with OEM inclusion gates; category WS THB128314.11 remains only historical-derived allowance without individual verified cost. B3 temporary VeEX 30 rental-days belongs solely B3, not B11. No commercial repricing, no direct cost posted and PR draft Customer Release HOLD; new SSR regression added to full build.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.sat","bid.budget.working.bc.b3.sat.latest-execution-days","bid.budget.working.bc.b11.operational-tools-trace","bid.budget.working.bc.b9.price-trace.work-scope"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner 2026-10-22 JUTAL Zhuhai correction, prior accepted B3 Lean 28+2 (+2 management reserve) scenario, 4-Scope of Supply B9 Specialist Assistance/B11 Special Tools, EXA-A8 Section 5"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-15",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"B5–B6–B7 Linked Logistics Actual Route & Price Trace",
