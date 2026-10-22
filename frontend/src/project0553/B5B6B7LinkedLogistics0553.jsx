@@ -85,9 +85,10 @@ export function B5B6B7LinkedLogistics0553({workingRow}){
    customer requires 3 months FREE at vendor workshop, but MGW written confirmation is pending.
    Selected {fmt(selected)} = 1-month conditional contingency SELL, not MGW rent quote or
    additional charge on top of B5/B6; physical pallet-days/CBM and duration are OPEN.</p>}
-  <p className="p55-note"><strong>Destination gate:</strong> {m.destinationConflict}.
-   The routing owner approved MGW Nantong → JUTAL Zhuhai; user has called it JUTAL Nantong.
-   Do not switch destination or add a logistics leg without written named-place confirmation.</p>
+  <p className="p55-note"><strong>Confirmed logistics cities:</strong>
+   MGW Office Nantong is the receiving/FAT/dispatch origin; <strong>JUTAL Zhuhai Yard</strong> is the receiving destination (owner correction).
+   Exact delivery gate and Incoterm named place remain to confirm against the supplier quote.
+   {m.destinationConflict}</p>
   <details className="p55-panel" style={{padding:10,marginTop:10}}>
    <summary><strong>Open cross-owner B5 / B6 / B7 requirements and missing quote gates ({m.gates.length})</strong></summary>
    {m.gates.map((g,i)=><p className="p55-note" key={i}><strong>{i+1}.</strong> {g}</p>)}
