@@ -50,8 +50,14 @@ try{
    const lines=output.split(/\r?\n/);
    const first=lines.find(x=>/^(?:AssertionError|Error:|SyntaxError|ReferenceError|TypeError|FAIL\b)/.test(x.trim()))||
     lines.find(x=>/assertion|failed|ERR_|Error:/i.test(x))||String(run.error||"Nonzero exit");
-   failed.push({name,exit:run.status,error:String(first).trim()});
-   console.error("FAIL "+name+" — "+String(first).trim().slice(0,230));
+   const frame=lines.find(x=>/\bscripts[\\/]+validate[^)]*:\d+:\d+\)/i.test(x))||
+    lines.find(x=>/^\s*at Object\.<anonymous>/.test(x))||"";
+   const statement=lines.find(x=>/^\s*assert(?:\.|\()/.test(x))||"";
+   const detail=lines.find(x=>/^\s*(?:actual|expected):/.test(x))||"";
+   const error=[String(first).trim(),String(frame).trim(),String(statement).trim(),String(detail).trim()]
+    .filter(Boolean).join(" | ");
+   failed.push({name,exit:run.status,error});
+   console.error("FAIL "+name+" — "+error.slice(0,440));
   }
  }
 }finally{fs.closeSync(log)}
