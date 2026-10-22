@@ -30,17 +30,18 @@ const stage=(name,rows,reference)=>{
 };
 export function selectB3ResourcePriceDossier0553(workingRow){
  if(!workingRow||workingRow.code!=="B3")throw Error("B3 dossier requires selected 10.2 owner row");
- const sat=workingRow.b3FortyDayBudget;
+ const sat=workingRow.b3FortyDayBudget; // historical
+ const satSelected=workingRow.b3SelectedSatSurveyBudget;
  const fat=workingRow.b3ChinaFatBudget;
  const mgw=workingRow.b3MgwPurchasedFatWorkingSell;
  const plan=selectB3SurveySatExecutionPlan0553(workingRow);
  const matrix=selectB3SiteMrSatCoverage0553();
  const rateUSD=sat.rateUSDPerPersonDay,fx=sat.fxTHBPerUSD;
  const rateTHB=round(rateUSD*fx);
- const satLines=sat.rows.flatMap(box=>{
+ const satLines=satSelected.satRows.flatMap(box=>{
   const mrTests=matrix.budgetarySiteTimeboxes.find(x=>x.id===box.id)?.testIds||[];
   return resourceRoles.map((role,i)=>make("sat-baseline",box.id.toLowerCase()+".person-"+(i+1),{
-   group:"SAT_BASELINE",site:box.site,wbs:box.wbs,work:box.reason,
+   group:"SAT_SELECTED_28D",site:box.site,wbs:box.wbs,work:box.work,
    role,people:1,teamDays:box.days,qty:box.days,unit:"person-day",unitRateTHB:rateTHB,
    rateUSDPerUnit:rateUSD,fxTHBPerUSD:fx,
    calculation:"1 person × "+box.days+" days × USD "+rateUSD+" × FX "+fx,
@@ -100,29 +101,27 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   verifiedRateType:"PROVISIONAL_RENTAL_SELL_ALLOWANCE",
   stageAllocationConfirmed:false
  })];
- const bfLines=plan.survey.rows.flatMap((r)=>{
+ const bfLines=satSelected.siteSurveyRows.filter(x=>x.id!=="SUR-TRAVEL").flatMap((r)=>{
   return resourceRoles.map((role,i)=>make("bf-conditional",r.site.toLowerCase()+".person-"+(i+1),{
-   group:"BF_REVISIT_OPTION",site:r.site,wbs:"BOD Rev.C2 §8",
-   work:r.recommendedWork,role,people:1,teamDays:r.provisionalTeamDaysIfCalled,
-   qty:r.provisionalTeamDaysIfCalled,unit:"person-day",unitRateTHB:rateTHB,
-   calculation:"1 person × "+r.provisionalTeamDaysIfCalled+" conditional site-day × THB "+rateTHB,
-   illustrativeOnlyTHB:round(r.provisionalTeamDaysIfCalled*rateTHB),
-   workingSellTHB:null,sourceModuleId:plan.moduleId,
-   sourceType:"OPTIONAL_BF_REVISIT_ONLY_IF_WRITTEN_GAP_AND_CALL_OUT",
-   postingClass:"UNPRICED_CONDITIONAL_NONPOSTING",
+   group:"BF_SELECTED_SURVEY_ALLOWANCE",site:r.site,wbs:"BOD Rev.C2 §8",
+   work:r.work,role,people:1,teamDays:r.days,
+   qty:r.days,unit:"person-day",unitRateTHB:rateTHB,
+   calculation:"1 person × "+r.days+" selected-budget BF Survey site-day × THB "+rateTHB,
+   workingSellTHB:round(r.days*rateTHB),sourceModuleId:satSelected.moduleId,
+   sourceType:"SELECTED_WORKING_SELL_SURVEY_ALLOWANCE__BF_PHYSICAL_CALL_OUT_PENDING",
+   postingClass:"INCLUDED_SELECTED_B3_WORKING_SELL",
    stageAllocationConfirmed:false
   }));
  });
  const bfTripLines=resourceRoles.map((role,i)=>make("bf-conditional","trip.person-"+(i+1),{
-  group:"BF_REVISIT_OPTION",site:"BF joint roundtrip",wbs:"BOD Rev.C2 §8",
+  group:"BF_SELECTED_SURVEY_ALLOWANCE",site:"BF joint roundtrip",wbs:"BOD Rev.C2 §8",
   work:"Only if separate ADDVALUE physical BF revisit/boat logistics required",
-  role,people:1,teamDays:plan.survey.provisionalTravelTeamDaysIfCalled,
-  qty:plan.survey.provisionalTravelTeamDaysIfCalled,unit:"person-day",unitRateTHB:rateTHB,
+  role,people:1,teamDays:2,
+  qty:2,unit:"person-day",unitRateTHB:rateTHB,
   calculation:"1 person × "+plan.survey.provisionalTravelTeamDaysIfCalled+" conditional travel-day × THB "+rateTHB,
-  illustrativeOnlyTHB:round(plan.survey.provisionalTravelTeamDaysIfCalled*rateTHB),
-  workingSellTHB:null,sourceModuleId:plan.moduleId,
-  sourceType:"OPTIONAL_BF_TRIP_NOT_BOOKED_OR_PRICED",
-  postingClass:"UNPRICED_CONDITIONAL_NONPOSTING",
+  workingSellTHB:round(2*rateTHB),sourceModuleId:satSelected.moduleId,
+  sourceType:"SELECTED_WORKING_SELL_SURVEY_TRAVEL_ALLOWANCE__TRIP_NOT_BOOKED",
+  postingClass:"INCLUDED_SELECTED_B3_WORKING_SELL",
   stageAllocationConfirmed:false
  }));
  // Yard/Offshore are distinct CONTRACT PHASES. Crosswalk each phase to
@@ -158,40 +157,42 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  const stageGroups=freeze([
   stage("MGW Purchased Factory FAT — Quotation Cost → WS-B3 SELL",mgwLines,"B3.1.1"),
   stage("ADDVALUE China FAT — Witness / Travel / Hotel / Insurance",fatLines,"B3.1.2"),
-  stage("Retained 40-Team-Day SAT/SIT labour PRICE BASELINE",satLines,"B3.2.1"),
+  stage("Selected SAT/SIT 28 Team-days / 56 MD",satLines,"B3.2.1"),
   stage("Temporary VeEX MX100+ rental",rental,"B3.3.1"),
-  stage("Brownfield conditional site re-verification — not current price",freeze([...bfLines,...bfTripLines]),"BOD §8"),
+  stage("Selected BF Survey 3 site +2 travel Team-days / 10 MD (physical call-out conditional)",freeze([...bfLines,...bfTripLines]),"B3.2.3"),
   stage("JUTAL Zhuhai Fabrication Yard SAT — actual resource inputs OPEN",yardLines,"SPE §7.3.2"),
   stage("Offshore Vendor Commissioning after installation — actual resources OPEN",offshoreLines,"SPE §7.3.3"),
   stage("Integrated SIT and Punch — phase/RACI undecided",sharedLines,"K17–K18")
  ]);
- const priced=stageGroups.slice(0,4);
+ const priced=stageGroups.slice(0,5);
  const budgetSelected=total(priced.map(g=>({workingSellTHB:g.selectedWorkingSellTHB})));
  const picked=freeze(priced.map(g=>g.selectedWorkingSellTHB));
  const singleIds=stageGroups.flatMap(g=>g.rows.map(r=>r.id));
  if(new Set(singleIds).size!==singleIds.length||
     mgwLines.length!==2||fatLines.length!==8||satLines.length!==18||
     bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
-    total(mgwLines)!==307125||total(fatLines)!==397400||total(satLines)!==2016000||
-    total(rental)!==30000||budgetSelected!==2750525||
+    total(mgwLines)!==307125||total(fatLines)!==397400||total(satLines)!==1411200||total(bfLines)+total(bfTripLines)!==252000||
+    total(rental)!==30000||budgetSelected!==2397725||
     workingRow.workingSellTHB!==budgetSelected||
-    picked.join("|")!=="307125|397400|2016000|30000"||
+    picked.join("|")!=="307125|397400|1411200|30000|252000"||
     plan.survey.conditionalLabourSellReferenceTHB!==252000||
     mgwLines.reduce((n,r)=>n+r.quotedVendorCostTHB,0)!==236250||
-    stageGroups.slice(4).some(g=>g.selectedWorkingSellTHB!==0||
+    stageGroups.slice(5).some(g=>g.selectedWorkingSellTHB!==0||
       g.rows.some(r=>r.workingSellTHB!==null||r.actualDirectCostTHB!==null)))
   throw Error("B3 detailed dossier does not reconcile to 10.2 canonical Working SELL");
  return freeze({
   moduleId:root,ownerModuleId:workingRow.moduleId,
-  groupNames:freeze(["MGW Purchased FAT","ADDVALUE FAT witness","Retained SAT 40d priced resource roles",
-   "VeEX Rental","BF conditional review","GF Yard SAT","GF Offshore commissioning","SIT/Punch Gate"]),
+  groupNames:freeze(["MGW Purchased FAT","ADDVALUE FAT witness","Selected SAT 28d priced resource roles",
+   "VeEX Rental","Selected BF survey working budget","GF Yard SAT","GF Offshore commissioning","SIT/Punch Gate"]),
   groups:stageGroups,pricedGroupCount:priced.length,
-  priceRowCount:mgwLines.length+fatLines.length+satLines.length+rental.length,
+  priceRowCount:mgwLines.length+fatLines.length+satLines.length+rental.length+bfLines.length+bfTripLines.length,
   pricedWorkingSellTHB:budgetSelected,selectedCanonicalWorkingSellTHB:workingRow.workingSellTHB,
   vendorQuoteCostTHB:236250,actualPaidDirectCostTHB:null,
   noApprovedStagePersonDays:true,
   oldLeanScenarioReferenceTeamDays:plan.sat.oldLeanWithRiskTeamDays,
   oldPriceReferenceTeamDays:sat.workdays,
+  currentSATTeamDays:satSelected.satTeamDays,currentBFSurveyTeamDays:satSelected.siteSurveyTeamDays,
+  bfSelectedSurveyWorkingSellTHB:satSelected.siteSurveyWorkingSellTHB,
   bfOptionalIllustrativeSellTHB:plan.survey.conditionalLabourSellReferenceTHB,
   currentBFRevisitRequired:null,
   customerReleaseAllowed:false,postingAllowed:false,
