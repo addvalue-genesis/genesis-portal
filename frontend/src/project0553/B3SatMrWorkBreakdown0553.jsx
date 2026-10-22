@@ -5,7 +5,7 @@ import {selectB3SatMrWorkBreakdown0553} from "./data/b3SatMrWorkBreakdown0553";
 
 const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 
-export function B3SatMrWorkBreakdown0553({testRow,timebox,priceProof,defaultOpen=false}){
+export function B3SatMrWorkBreakdown0553({testRow,timebox,priceProof,leanTimebox=null,defaultOpen=false}){
  const m=selectB3SatMrWorkBreakdown0553(testRow,timebox,priceProof);
  return <ControlledModuleSection0553 moduleKey={m.moduleId}
   title={m.site+" / "+m.mr+" — "+m.testId+" · Engineering Work Breakdown"}
@@ -18,7 +18,11 @@ export function B3SatMrWorkBreakdown0553({testRow,timebox,priceProof,defaultOpen
   <p className="p55-note"><strong>Source basis:</strong> {m.activitySource}.
    The items below describe proposed technical verification work, not an approved per-MR ITP, exact installed TAG takeoff, or sourced per-activity man-hours.
   </p>
-  <h4>1. Shared Site Budget — ไม่ใช่ราคาของ MR นี้โดยเฉพาะ</h4>
+  {leanTimebox&&<p className="p55-note"><strong>Latest Lean execution: {leanTimebox.days} productive two-person TEAM-days at {leanTimebox.site}</strong>
+   {" "}({leanTimebox.plannedPersonDays} productive MD); <strong>retained 40-day pricing source for this shared timebox = {m.siteTeamDays} team-days</strong>.
+   The 2 risk team-days are pooled across the project and 2 further management-reserve team-days are nonposting;
+   neither is allocated to this MR/Test ID. Do not infer per-MR Test Duration or reprice B3 from this activity view.</p>}
+  <h4>1. Retained Shared Site SELL Baseline — ไม่ใช่ราคาหรือจำนวนวันของ MR นี้โดยเฉพาะ</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Cost / Evidence Owner</th><th>Team</th><th>Site team-days</th><th>Site person-days</th><th>Planning SELL rate</th><th>Site Working SELL THB</th><th>MR allocation status</th></tr></thead>
    <tbody><tr><td><strong>{m.siteTimeboxId}</strong><small>{m.priceSourceModuleId}</small></td>
