@@ -75,7 +75,7 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
      qty:offshore.personDays,unit:"paid person-days",unitRateTHB:25200,
      status:"RETAINED WORKING SELL PRICE ONLY; Yard/Offshore manpower days not established"}),
    item("B3.2.2","site-mr-sat-matrix","Seven-Site / Four-MR SAT Coverage Matrix",
-    "19 Site/MR Test IDs plus SIT/Punch =21 source coverage; original 40d is price-only, not stage-assigned"
+    "19 Site/MR Test IDs plus SIT/Punch =21 source coverage; original 40d is price-only, not stage-assigned",
     C.NON_POSTING_AUDIT,{qty:satMatrix.rows.length,unit:"test IDs",
      status:"COVERAGE ONLY — NOT 21 separate costs"})
   ]),
