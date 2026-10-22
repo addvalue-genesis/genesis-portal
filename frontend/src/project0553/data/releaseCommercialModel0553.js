@@ -144,8 +144,16 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    id:x.id||code+"-ROW-"+(i+1),code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
    sourceScheduleModuleId:"bid.budget.working.bc.customer-spare-schedule",
    sourceId:x.sourceId||x.id,sourceRevision:x.sourceRevision,sourcePriceUSD:priceUSD,
-   tagNo:x.tagNo,description:x.description,specification:x.detailSpecification,
-   materials:x.materials,qty:x.qty,unit:x.unit,leadTimeARO:x.leadTimeARO,
+   // Native source TAG list remains available for export and technical trace.
+   // Display fields are deliberately short; no installed spare interchangeability is asserted.
+   tagNo:x.tagNo,tagSummary:x.tagSummary,
+   relatedTagList:x.relatedTagList,relatedEquipmentTagCount:x.relatedEquipmentTagCount,
+   relatedSiteTagCount:x.relatedSiteTagCount,commonSpareInterchangeabilityVerified:false,
+   originalDescription:x.description,description:x.displayDescription||x.description,
+   purpose:x.displayPurpose||null,specification:x.displaySpecification||x.detailSpecification,
+   materials:x.displayMaterials||x.materials,explanationTH:x.explanationTH||null,
+   materialVerified:false,oemSpareSkuVerified:false,
+   qty:x.qty,unit:x.unit,leadTimeARO:x.leadTimeARO,
    mr:x.linkedMR,sites:x.linkedLocations,
    referenceUnitTHB:unitReference,referenceTotalTHB:extReference,
    workingUnitTHB:unitPrecision4,workingTotalTHB:extReference,
