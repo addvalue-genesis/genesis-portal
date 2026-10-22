@@ -59,8 +59,15 @@ const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.
 const first=host.indexOf('{e.code==="B1"&&<B1WorkingPriceOverview0553 workingRow={workingRow}/>');
 const generic=host.indexOf('<div className="p55-metric-grid">',host.indexOf('export function BcCostEvidenceDetail0553'));
 const detail=host.indexOf('{e.code==="B1"&&<B1RevKMilestoneBudget0553');
-assert(first>=0&&first<generic&&detail>generic,
- "B1 price table must show BEFORE generic evidence/audit modules");
+// After the B1 sharedEvidence TDZ fix, its Rev.K accordion is rendered
+// directly after the quick-price table, BEFORE the generic metric grid.
+// Check actual source order and independently assert the SSR DOM anchor order.
+assert(first>=0&&detail>first&&generic>detail,
+ "B1 Quick Price must precede nested Rev.K evidence AND generic metrics");
+const quickInSSR=full.indexOf('data-component-key="bid.budget.working.bc.b1.price-overview"');
+const revkInSSR=full.indexOf('data-component-key="bid.budget.working.bc.b1.revk-pm-milestones"');
+assert(quickInSSR>=0&&revkInSSR>quickInSSR,
+ "Rendered B1 price-overview must appear before Rev.K detailed account audit");
 const partB=source.rows.filter(x=>!x.optional),partC=source.rows.filter(x=>x.optional);
 const sum=x=>Math.round(x.filter(r=>Number.isFinite(r.workingSellTHB)).reduce((n,r)=>n+r.workingSellTHB,0)*100)/100;
 const all=renderToStaticMarkup(React.createElement(All,{
