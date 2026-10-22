@@ -18,6 +18,7 @@ const {deriveBulkSourceToReleaseTrace0553:trace}=from("data/bulkSourceToReleaseT
 const {buildReleaseCommercialModel0553:release}=from("data/releaseCommercialModel0553.js");
 const {MGW_P26_058_R2_SELECTED_0553:mgw}=from("data/mgwP26058R2Selected0553.js");
 const {MR0002_WORKING_BOM_0553:currentMR2}=from("data/mr0002WorkingBom0553.js");
+const {selectSpareCustomerSchedule0553:spareSchedule}=from("data/spareCustomerSchedule0553.js");
 const {Z1F_TEL_LAYOUT_INDEX_0553:layout}=from("data/z1fTelLayoutIndex0553.js");
 const selectedOwnerTags={
  ZWP20:{bda:"TCAB-508-002",surge:"TCAB-508-001"},
@@ -57,6 +58,17 @@ for(const site of currentMR2.sites){
  }
 }
 assert.equal(mgw.lines.filter(x=>x.mr==="MR-0002").reduce((a,x)=>a+x.extendedUSD,0),99564);
+const spares=spareSchedule(),risk=spares.riskCandidates.find(x=>x.id==="MR0002-RFI-BDA-REPLACEMENT-RISK");
+const zwp20Bda=currentMR2.sites.find(x=>x.site==="ZWP20").items.find(x=>x.id==="ZWP20-RFI-BDA");
+assert(risk&&risk.tagNo==="TCAB-508-002"&&risk.tagNo===zwp20Bda.tag,
+ "10.1 MR0002 selected ZWP20 BDA AFC role must feed 10.3 risk TAG instead of -001 RF surge");
+assert.equal(risk.sourceQuoteLine,"UHF-1");
+assert.equal(risk.sourceUnitUSD,31474);
+assert.equal(risk.comparativeAmountTHB,991431);
+assert.equal(risk.qty,1);
+assert.equal(risk.includedInWorkingSell,false);
+assert.equal(risk.additionalCostPostedTHB,null);
+assert.equal(spares.releaseAllowed,false);
 
 const mto=from("data/snapshots/mr0001.mto.rev04.sourceRows.json");
 const before=release({thbPerUsd:31.5});
