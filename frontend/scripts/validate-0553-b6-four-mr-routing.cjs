@@ -48,11 +48,14 @@ assert.equal(
  (historicalB9WorkingSellTHB-source.byCode.B9.workingSellTHB),
  historicalScenarioPartBTHB
 );
+// Compare integer satang to avoid IEEE-754 drift (e.g. 4032636.8200000003).
 assert.equal(
- source.knownWorkingSellTHB-
- (source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB)-
- (source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB),
- 4032636.82
+ Math.round(100*(
+  source.knownWorkingSellTHB-
+  (source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB)-
+  (source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB)
+ )),
+ 403263682
 );
 assert.equal(source.byCode.B6.workingSellTHB,307584);
 assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,307584);
