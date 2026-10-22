@@ -58,7 +58,7 @@ assert.deepEqual(b.b1b2EquationProof,p); // selectors produce equivalent indepen
 assert.equal(b.byCode.B1.b1b2EquationProofModuleId,p.moduleId);
 assert.equal(b.byCode.B2.b1b2EquationProofModuleId,p.moduleId);
 assert.equal(b.byCode.B3.b1b2EquationProofModuleId,null);
-assert.equal(b.knownWorkingSellTHB,4582736.82,"Current base B1/B3/B9 replaced by Rev.K WBS costed budget");
+assert.equal(b.knownWorkingSellTHB,4308914.13,"Current base B1/B3/B9 replaced by Rev.K WBS costed budget");
 assert.equal(b.knownWorkingSellTHB,Math.round(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((sum,x)=>sum+x.workingSellTHB,0)*100)/100,"C1/C2 options excluded from base");
 assert.equal(b.byCode.B1.workingSellTHB,211600);
 assert.equal(b.byCode.B2.workingSellTHB,237121.13);
