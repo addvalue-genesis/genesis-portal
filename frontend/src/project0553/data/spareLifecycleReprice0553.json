@@ -1,0 +1,1723 @@
+{
+  "schema": "PJ2608-0553-LIFECYCLE-SPARE-REPRICE-V1",
+  "moduleId": "bid.budget.working.bc.spare-lifecycle-reprice",
+  "purpose": "One technical register, unique cost owners B10/B11/B13/C1/C2. No historical price seeds.",
+  "classification": "PRE_AWARD_SCOPE_EVIDENCE_NOT_VENDOR_PRICED",
+  "commercialOwners": [
+    {
+      "code": "B10",
+      "commercialClass": "BASE",
+      "name": "Erection, Pre-commissioning, Commissioning and Start-up Spares",
+      "customerReleaseAllowed": false
+    },
+    {
+      "code": "B11",
+      "commercialClass": "BASE",
+      "name": "Special Tools for Operation and Maintenance",
+      "customerReleaseAllowed": false
+    },
+    {
+      "code": "B13",
+      "commercialClass": "BASE",
+      "name": "Consumables for Preservation and Maintenance",
+      "customerReleaseAllowed": false
+    },
+    {
+      "code": "C1",
+      "commercialClass": "OPTION",
+      "name": "Capital Spares (OEM replacement strategy)",
+      "customerReleaseAllowed": false
+    },
+    {
+      "code": "C2",
+      "commercialClass": "OPTION",
+      "name": "Two-Year Operating Spares (quotation only)",
+      "customerReleaseAllowed": false
+    }
+  ],
+  "documentControl": {
+    "bindingBaseline": "MR0001–0004 Rev.C1 + BOD/SPE C2 + DTS0001–0004 C1 + AFC LAY + approved GA/MTO + PTTEP STD",
+    "specificConflict": "SPE §8.1 references Phase-1E MMC23-5025 while user-supplied Phase-1F is MMC25-5001 EXA-A8; unresolved contract precedence. Do not transplant PLC chassis spare rules into SCADA telecom.",
+    "contractSpareKitsByMR": {
+      "MR-0001": 4,
+      "MR-0002": 3,
+      "MR-0003": 4,
+      "MR-0004": 3
+    },
+    "totalContractKits": 14,
+    "brownfieldAsRequired": [
+      "MR-0001/ZPQ",
+      "MR-0001/ZWP08",
+      "MR-0001/ZWP11",
+      "MR-0002/ZPQ"
+    ],
+    "cableCapacityNotStock": "PTTEP TEL-012 30% cable-run free space and TEL-016 spare capacity are design capacity rules; not 30% purchased B10 spare cable.",
+    "phaseToolPooling": "One compatible special-tool SET per phase per MR unless signed compatibility/common-share proof.",
+    "c2Exclusion": "MR0001–0004 Attachment 7 instruction 6: no identical B10 precommission/start-up spare physical SKUs in C2.",
+    "oemFormFields": [
+      "MR/Site/Installed TAG",
+      "OEM selected manufacturer/model",
+      "Spare Part Number",
+      "Supplied installed quantity",
+      "Minimum requirement clause and unit",
+      "Required spare quantity per type/rating",
+      "Commissioning consumable demand",
+      "Independent OEM spare quote/unit rate",
+      "Lead time",
+      "Interchangeability & Ex service certificate",
+      "Part A/A5 included credit",
+      "Physical stock cost owner",
+      "Delivery package/kit allocation"
+    ]
+  },
+  "groups": [
+    {
+      "code": "B10",
+      "key": "scada",
+      "title": "SCADA Radio + Cisco L3 Switch",
+      "mr": "MR-0001",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "source": "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5"
+      ],
+      "candidateCount": 7
+    },
+    {
+      "code": "B10",
+      "key": "bda",
+      "title": "RFI BDA and DMR RF Protection",
+      "mr": "MR-0002",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "source": "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5"
+      ],
+      "candidateCount": 6
+    },
+    {
+      "code": "B10",
+      "key": "phone",
+      "title": "Ex IP Telephone + Ex Sounder",
+      "mr": "MR-0003",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "source": "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5"
+      ],
+      "candidateCount": 6
+    },
+    {
+      "code": "B10",
+      "key": "racon",
+      "title": "Tideland SeaBeacon 2 Marine RACON",
+      "mr": "MR-0004",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "source": "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5"
+      ],
+      "candidateCount": 6
+    },
+    {
+      "code": "B10",
+      "key": "bulk",
+      "title": "Shared Commissioning Repair Bulk (not installed bulk)",
+      "mr": "MULTI",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "source": "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3",
+      "sourceReferences": [
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3"
+      ],
+      "candidateCount": 5
+    },
+    {
+      "code": "B11",
+      "key": "shared-tools",
+      "title": "OEM Special Tools / Software / Test Adaptors",
+      "mr": "MULTI",
+      "sites": [
+        "PHASE"
+      ],
+      "source": "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1"
+      ],
+      "candidateCount": 7
+    },
+    {
+      "code": "B13",
+      "key": "preservation",
+      "title": "Consumables / Preservation / Handover Material",
+      "mr": "MULTI",
+      "sites": [
+        "SCOPE"
+      ],
+      "source": "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1"
+      ],
+      "candidateCount": 5
+    },
+    {
+      "code": "C1",
+      "key": "capital",
+      "title": "Optional Capital Spares – equipment replacement strategy",
+      "mr": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "source": "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 §11.1",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 §11.1"
+      ],
+      "candidateCount": 4
+    },
+    {
+      "code": "C2",
+      "key": "operation",
+      "title": "Optional Two-Year Operating Spares – OEM SPIR quotation",
+      "mr": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "source": "MR0001–0004 Rev.C1 Attachment 7, Instruction 6",
+      "sourceReferences": [
+        "MR0001–0004 Rev.C1 Attachment 7, Instruction 6"
+      ],
+      "candidateCount": 4
+    }
+  ],
+  "items": [
+    {
+      "id": "B10-SCADA-L3-SW",
+      "owner": "B10",
+      "group": "scada",
+      "description": "Compatible industrial L3 switch replacement",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "Cisco exact SKU, L3 license and Ex use compatibility; no PLC ControlLogix assumption",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-SCADA-TEL-GA-0001 supplier GA (approval check)",
+        "MMC25-5001 EXA-A8 Attachment-1 Phase 1F"
+      ],
+      "relatedMR": "MR-0001",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-SCADA-L3-PSU",
+      "owner": "B10",
+      "group": "scada",
+      "description": "Field replaceable Cisco PSU / power module",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "Confirm approved replaceable power unit, if applicable",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-SCADA-TEL-GA-0001 supplier GA (approval check)",
+        "MM-ZTK-1F-GEN-TEL-DTS-0001 Rev.C1"
+      ],
+      "relatedMR": "MR-0001",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-SCADA-POE",
+      "owner": "B10",
+      "group": "scada",
+      "description": "DC Power over Ethernet injector spare",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "REDLINE RPM-POE-INJ-DC shown on supplier GA; confirm as-built installed OEM",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-SCADA-TEL-GA-0001 supplier GA (approval check)",
+        "MM-ZTK-1F-GEN-TEL-DTS-0001 Rev.C1"
+      ],
+      "relatedMR": "MR-0001",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-SCADA-ETH-SPD",
+      "owner": "B10",
+      "group": "scada",
+      "description": "Ethernet surge arrestor spare",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "EATON/MTL variant, Ex certification, PoE/data ratings",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0001 Rev.C1",
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1"
+      ],
+      "relatedMR": "MR-0001",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-SCADA-RF-SPD",
+      "owner": "B10",
+      "group": "scada",
+      "description": "RF surge / grounding service spare",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "Only replaceable assembly by RF rating, without counted Part A accessories",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0001 Rev.C1"
+      ],
+      "relatedMR": "MR-0001",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-SCADA-FUSE-2A",
+      "owner": "B10",
+      "group": "scada",
+      "description": "Sand-filled 2A fuse rated spare",
+      "requirementClass": "EXA_APPLICABILITY",
+      "qualification": "GA 2A fuse rating, EXA-A8 numerical minimum only if equipment class applicable",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-SCADA-TEL-GA-0001 supplier GA (approval check)",
+        "MMC25-5001 EXA-A8 Attachment-1 Phase 1F"
+      ],
+      "relatedMR": "MR-0001",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-SCADA-FUSE-4A",
+      "owner": "B10",
+      "group": "scada",
+      "description": "Sand-filled 4A fuse rated spare",
+      "requirementClass": "EXA_APPLICABILITY",
+      "qualification": "GA 4A fuse rating must be separate from 2A, not eight generic fuses",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-SCADA-TEL-GA-0001 supplier GA (approval check)",
+        "MMC25-5001 EXA-A8 Attachment-1 Phase 1F"
+      ],
+      "relatedMR": "MR-0001",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BDA-BDA-MOD",
+      "owner": "B10",
+      "group": "bda",
+      "description": "OEM-approved RFI BDA service module OR Ex d complete replacement",
+      "requirementClass": "OEM_CHOICE",
+      "qualification": "MGW BD4345-00N0-AC with WAROM HRMD95-VIIIB; do not use installed USD31474 as spare price",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1",
+        "MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 AFC"
+      ],
+      "relatedMR": "MR-0002",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BDA-BDA-POWER",
+      "owner": "B10",
+      "group": "bda",
+      "description": "BDA power/protective service item",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "Must be field serviceable under Ex certificate",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1"
+      ],
+      "relatedMR": "MR-0002",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BDA-BDA-SPD",
+      "owner": "B10",
+      "group": "bda",
+      "description": "PolyPhaser RF surge + Solexy coupler replacement",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "MGW UHF-2 includes installed components, spare requires independent quote",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1"
+      ],
+      "relatedMR": "MR-0002",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BDA-BDA-PORT",
+      "owner": "B10",
+      "group": "bda",
+      "description": "Ex d certified RF feedthrough service spare",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "Qualified SKU only; interface count is not mandatory spare quantity",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1"
+      ],
+      "relatedMR": "MR-0002",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BDA-BDA-SEAL",
+      "owner": "B10",
+      "group": "bda",
+      "description": "M20 service gasket / gland / certified plug",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Approved sealed enclosure rework kit after installed and MGW included stock credits",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1"
+      ],
+      "relatedMR": "MR-0002",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BDA-BDA-N",
+      "owner": "B10",
+      "group": "bda",
+      "description": "N-type RF replacement connector/jumper",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Net of MGW UHF-4 feeder kit 100m + six connectors per set",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1",
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3"
+      ],
+      "relatedMR": "MR-0002",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-PHONE-PHONE",
+      "owner": "B10",
+      "group": "phone",
+      "description": "Auteldac 6 approved service item OR whole Ex telephone",
+      "requirementClass": "OEM_CHOICE",
+      "qualification": "No unauthorized Ex field repair; request OEM repair strategy",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0003 Rev.C1"
+      ],
+      "relatedMR": "MR-0003",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-PHONE-HANDSET",
+      "owner": "B10",
+      "group": "phone",
+      "description": "Auteldac handset/cord service part if approved",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "Ex certificate and OEM part compatibility",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0003 Rev.C1"
+      ],
+      "relatedMR": "MR-0003",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-PHONE-SOUNDER",
+      "owner": "B10",
+      "group": "phone",
+      "description": "EATON DB3B driver service module OR complete sounder",
+      "requirementClass": "OEM_CHOICE",
+      "qualification": "Exact Ex/duty rating and 24V variant required",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0003 Rev.C1"
+      ],
+      "relatedMR": "MR-0003",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-PHONE-PHONE-REL",
+      "owner": "B10",
+      "group": "phone",
+      "description": "Approved sounder-interface relay / protective fuse",
+      "requirementClass": "APPLICABILITY",
+      "qualification": "Only if actually installed per wiring/GA",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0003 Rev.C1",
+        "MM-ZTK-1F-GEN-SCADA-TEL-GA-0001 supplier GA (approval check)"
+      ],
+      "relatedMR": "MR-0003",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-PHONE-PHONE-JB",
+      "owner": "B10",
+      "group": "phone",
+      "description": "WAROM BXJ-S Ex e gasket / entry service item",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "Confirm certified item and enclosure configuration",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0003 Rev.C1"
+      ],
+      "relatedMR": "MR-0003",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-PHONE-PHONE-TERM",
+      "owner": "B10",
+      "group": "phone",
+      "description": "CAT6A/RJ45/M20 termination spare kit",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Repair activity and current A5 inventory net of installed vendor kit",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0003 Rev.C1",
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3"
+      ],
+      "relatedMR": "MR-0003",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-RACON-RACON-PSU",
+      "owner": "B10",
+      "group": "racon",
+      "description": "OEM-approved RACON power converter / DC-DC service component",
+      "requirementClass": "APPLICABILITY",
+      "qualification": "Only if fitted per IT earthing/power design, confirm MGW SeaBeacon 2 OEM",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 §11.1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0004 Rev.C1"
+      ],
+      "relatedMR": "MR-0004",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-RACON-RACON-CTRL",
+      "owner": "B10",
+      "group": "racon",
+      "description": "OEM-approved RACON control/interface service part",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "No assumption of field serviceable Ex module",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0004 Rev.C1"
+      ],
+      "relatedMR": "MR-0004",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-RACON-RACON-FUSE",
+      "owner": "B10",
+      "group": "racon",
+      "description": "RACON control/distribution fuse by rating",
+      "requirementClass": "APPLICABILITY",
+      "qualification": "Read approved electrical termination and OEM parts list",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0004 Rev.C1"
+      ],
+      "relatedMR": "MR-0004",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-RACON-RACON-SEAL",
+      "owner": "B10",
+      "group": "racon",
+      "description": "DB-5P or Ex control JB gasket and certified entry service parts",
+      "requirementClass": "OEM_SPIR",
+      "qualification": "Part A MGW DB-5P included; separate TCAB-514-002 still open",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0004 Rev.C1"
+      ],
+      "relatedMR": "MR-0004",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-RACON-RACON-M25",
+      "owner": "B10",
+      "group": "racon",
+      "description": "M25 Ex gland and stopping plug rework stock",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Check DTS0004 and actual installed M25 entry",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-DTS-0004 Rev.C1"
+      ],
+      "relatedMR": "MR-0004",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-RACON-RACON-CABLE",
+      "owner": "B10",
+      "group": "racon",
+      "description": "BFOU / power/control short cable rework kit",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Confirm cable routing and OEM included scope before commissioning stock",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 §11.1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0004 Rev.C1"
+      ],
+      "relatedMR": "MR-0004",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BULK-REPAIR-CAT6A",
+      "owner": "B10",
+      "group": "bulk",
+      "description": "Short CAT6A approved repair cable / shielded patch ends",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Derive from separate witnessed retermination plan, not tray 30% spare capacity",
+      "sourceReferences": [
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3",
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3",
+        "MM-ZTK-1F-GEN-TEL-DTS-0001 Rev.C1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BULK-REPAIR-RF",
+      "owner": "B10",
+      "group": "bulk",
+      "description": "RF 1/2-inch / 7/8-inch repair jumper stock",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Only approved band/impedance/type; no 60m baseline or blanket 15% inventory",
+      "sourceReferences": [
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3",
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BULK-REPAIR-CON",
+      "owner": "B10",
+      "group": "bulk",
+      "description": "N/SMA/RJ45 replacement connector pairs",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Per unique cable end and approved rework contingency; credit UHF-4 6 connectors",
+      "sourceReferences": [
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3",
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BULK-REPAIR-EX",
+      "owner": "B10",
+      "group": "bulk",
+      "description": "Certified M20/M25 gland / plug / seal / locknut",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Per distinct Ex enclosure and cable OD, not all installed bulk",
+      "sourceReferences": [
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0003 Rev.C1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0004 Rev.C1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B10-BULK-REPAIR-LUG",
+      "owner": "B10",
+      "group": "bulk",
+      "description": "Grounding lug / ferrule / earth tag repair set",
+      "requirementClass": "REWORK_ONLY",
+      "qualification": "Only for approved commissioning repairs, not installed GA kit",
+      "sourceReferences": [
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3",
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "ZWP20",
+        "ZWP21",
+        "ZWP22",
+        "ZWP23"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B11-SHARED-TOOLS-RACON-PROG",
+      "owner": "B11",
+      "group": "shared-tools",
+      "description": "SeaBeacon 2 programming/adaptor kit",
+      "requirementClass": "OEM_INCLUDED_RECONCILE",
+      "qualification": "MGW email 20-Oct says included; do not post second tool price until delivery and SKU confirmation",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PHASE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B11-SHARED-TOOLS-RACON-PURGE",
+      "owner": "B11",
+      "group": "shared-tools",
+      "description": "RACON charging/purge adapter if required by OEM",
+      "requirementClass": "APPLICABILITY",
+      "qualification": "Only if selected Ex assembly requires charging/purge, confirm MGW supply",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0004 Rev.C1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PHASE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B11-SHARED-TOOLS-RF-TORQUE",
+      "owner": "B11",
+      "group": "shared-tools",
+      "description": "Calibrated RF connector torque / termination tooling",
+      "requirementClass": "OEM_TOOL",
+      "qualification": "Count shared by phase once, compare existing tools and OEM kits",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1",
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PHASE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B11-SHARED-TOOLS-ETH-TERM",
+      "owner": "B11",
+      "group": "shared-tools",
+      "description": "CAT6A shielded RJ45 certified termination/test tooling",
+      "requirementClass": "OEM_TOOL",
+      "qualification": "Confirm equipment compatibility, Phase tool pooling",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "10008-STD-6-TEL-012-R00 §7.1.4 / 10008-STD-6-TEL-016-R00 §7.3"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PHASE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B11-SHARED-TOOLS-SW-CONFIG",
+      "owner": "B11",
+      "group": "shared-tools",
+      "description": "Cisco L3 configuration access/licenses and OEM adapters",
+      "requirementClass": "OEM_TOOL",
+      "qualification": "Existing engineering software entitlement and licenses credit",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0001 Rev.C1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PHASE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B11-SHARED-TOOLS-BDA-TOOL",
+      "owner": "B11",
+      "group": "shared-tools",
+      "description": "RFI BDA programming/configuration service interface",
+      "requirementClass": "OEM_TOOL",
+      "qualification": "OEM restriction / service tool model and license pending",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0002 Rev.C1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PHASE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B11-SHARED-TOOLS-PHONE-TOOL",
+      "owner": "B11",
+      "group": "shared-tools",
+      "description": "Ex telephone/sounder safe service tool if any",
+      "requirementClass": "APPLICABILITY",
+      "qualification": "Only certified OEM-authorized maintenance procedures",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-DTS-0003 Rev.C1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PHASE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B13-PRESERVATION-DESICCANT",
+      "owner": "B13",
+      "group": "preservation",
+      "description": "Replacement preservation desiccant",
+      "requirementClass": "ACTIVITY_DRIVER",
+      "qualification": "Calculate from protected packages, storage duration, replacement interval, not legacy pack quantities",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "SCOPE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B13-PRESERVATION-BARRIER",
+      "owner": "B13",
+      "group": "preservation",
+      "description": "Replacement moisture-barrier material",
+      "requirementClass": "ACTIVITY_DRIVER",
+      "qualification": "Exclude B5 shipment packaging materials already included",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "SCOPE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B13-PRESERVATION-CLEAN",
+      "owner": "B13",
+      "group": "preservation",
+      "description": "Electrical/RF approved cleaning consumables",
+      "requirementClass": "ACTIVITY_DRIVER",
+      "qualification": "Based on commissioning and handover cleaning actions; no technical-tool duplication",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "SCOPE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B13-PRESERVATION-LABEL",
+      "owner": "B13",
+      "group": "preservation",
+      "description": "Preservation/reinspection labels & seals",
+      "requirementClass": "ACTIVITY_DRIVER",
+      "qualification": "Physical preservation inspection events and PTTEP marked spare requirements",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 §11.1"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "SCOPE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "B13-PRESERVATION-GASKET-CONSUME",
+      "owner": "B13",
+      "group": "preservation",
+      "description": "OEM-approved single-use reassembly gaskets/cleaning consumables",
+      "requirementClass": "ACTIVITY_DRIVER",
+      "qualification": "Only when consumed per approved commissioning procedure; not B10 spare kit duplicated",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 §8.1",
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5",
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "SCOPE"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "C1-CAPITAL-SCADA-ODU",
+      "owner": "C1",
+      "group": "capital",
+      "description": "SCADA radio complete replacement candidate",
+      "requirementClass": "OEM_OPTION",
+      "qualification": "Only owner-selected optional stock after interchangeability and independent spare quote",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 §11.1",
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "C1-CAPITAL-BDA",
+      "owner": "C1",
+      "group": "capital",
+      "description": "RFI BDA complete Ex assembly replacement candidate",
+      "requirementClass": "OEM_OPTION",
+      "qualification": "No installed MGW UHF-1 package quotation treated as spare quote",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 §11.1",
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "C1-CAPITAL-PHONE",
+      "owner": "C1",
+      "group": "capital",
+      "description": "Complete Ex telephone/sounder replacement candidate",
+      "requirementClass": "OEM_OPTION",
+      "qualification": "Separate from B10 repair stock, OEM/owner must choose replacement strategy",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 §11.1",
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "C1-CAPITAL-RACON",
+      "owner": "C1",
+      "group": "capital",
+      "description": "Complete Tideland SeaBeacon 2 Ex RACON replacement candidate",
+      "requirementClass": "OEM_OPTION",
+      "qualification": "Do not use MDS/ORGA historical unit or MGW installed RACON-1 price as spare quote",
+      "sourceReferences": [
+        "MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 §11.1",
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "C2-OPERATION-SCADA",
+      "owner": "C2",
+      "group": "operation",
+      "description": "SCADA / Cisco / PoE two-year replaceables",
+      "requirementClass": "OEM_2YR",
+      "qualification": "Part numbers, replacement demand and lead time; exclude identical approved B10 stock SKUs",
+      "sourceReferences": [
+        "MR0001–0004 Rev.C1 Attachment 7, Instruction 6",
+        "MM-ZTK-1F-GEN-TEL-MR-0001 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "C2-OPERATION-BDA",
+      "owner": "C2",
+      "group": "operation",
+      "description": "RFI BDA RF/electrical two-year replaceables",
+      "requirementClass": "OEM_2YR",
+      "qualification": "OEM failure/maintenance plan, stock ownership distinct from B10/C1",
+      "sourceReferences": [
+        "MR0001–0004 Rev.C1 Attachment 7, Instruction 6",
+        "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "C2-OPERATION-PHONE",
+      "owner": "C2",
+      "group": "operation",
+      "description": "Ex IP Phone/Sounder two-year replaceables",
+      "requirementClass": "OEM_2YR",
+      "qualification": "OEM service policy, use separate SKU and signed kit exclusion against B10",
+      "sourceReferences": [
+        "MR0001–0004 Rev.C1 Attachment 7, Instruction 6",
+        "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    },
+    {
+      "id": "C2-OPERATION-RACON",
+      "owner": "C2",
+      "group": "operation",
+      "description": "SeaBeacon 2 RACON two-year replaceables",
+      "requirementClass": "OEM_2YR",
+      "qualification": "OEM-certified service parts and delivery time; no full capital spare duplicate",
+      "sourceReferences": [
+        "MR0001–0004 Rev.C1 Attachment 7, Instruction 6",
+        "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1 §5 / Attachment 5"
+      ],
+      "relatedMR": "MULTI",
+      "sites": [
+        "PROJECT_POOL"
+      ],
+      "installedEquipmentTag": null,
+      "sparePartNumber": null,
+      "unit": "ea",
+      "documentMinimumQuantity": null,
+      "derivedRequiredQuantity": null,
+      "independentSupplierUnitCostTHB": null,
+      "selectedWorkingSellTHB": null,
+      "evidenceStatus": "REQUIREMENT_IDENTIFIED__OEM_SPIR_AND_QTY_OPEN",
+      "supplierQuoteId": null,
+      "leadTimeARO": null,
+      "countedInPartA": false,
+      "commercialPostingApproved": false
+    }
+  ],
+  "approval": {
+    "technical": false,
+    "oemSpirComplete": false,
+    "costComplete": false,
+    "customerReleaseAllowed": false,
+    "customerAnnexUnpriced": true
+  },
+  "historicalCommercialInputsPermitted": false
+}
