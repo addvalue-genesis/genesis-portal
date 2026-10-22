@@ -13,7 +13,7 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
  const ids=new Set(source.map(r=>r.id));
  const purchased=b3.b3MgwPurchasedFatWorkingSell;
  if(source.length!==8||ids.size!==8||china.fatWorkingSellTHB!==422600||
-  b3.workingSellTHB!==2599325||b8.workingSellTHB!==30000||b8.qtyDriver!==44||
+  b3.workingSellTHB!==2599325||b8.workingSellTHB!==216650||b8.qtyDriver!==1||
   purchased?.selectedIncrementalWorkingSellTHB!==307125||
   purchased?.vendorPurchasedQuoteTHB!==236250)
   throw Error("Source has changed: review six-day B3/B8 and SERV-2/4 before reallocation");
@@ -72,8 +72,8 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
   originalExpenseRows:8,allocations:rows,
   originalChinaTripSellTHB:sourceSell,fiveDayTripReferenceTHB:scenarioSell,
   b3TripAllocatedReferenceTHB:b3Alloc,b8TripAllocatedReferenceTHB:b8Alloc,
-  originalB8WorkingSellTHB:b8.workingSellTHB,
-  originalB8Hours:44,trainingPreparationOverlapReconciled:false,
+  originalB8WorkingSellTHB:30000, // historical Rev05-only source reference, not current WS-B8
+  originalB8Hours:44,currentSelectedB8HybridTrainingWorkingSellTHB:b8.workingSellTHB,trainingPreparationOverlapReconciled:false,
   mgwSupplierQuotedUSD:7500,mgwSupplierQuotedTHB:purchased.vendorPurchasedQuoteTHB,
   mgwPurchasedInB3WorkingSellTHB:purchased.selectedIncrementalWorkingSellTHB,
   supplierSERV2SERV4Unchanged:true,customerIFATLineAllowed:false,
