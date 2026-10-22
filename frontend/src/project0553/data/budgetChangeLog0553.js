@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R25";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R26";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-14",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"10.2 Cost-Line Module IDs: Canonical vs Preview Namespace Regression",
+  detail:"Windows 101-test diagnostic reached 100 PASS / 1 FAIL, with bc-working-cost-lines assertion expecting obsolete static data-component-key={x.moduleId}. Actual BcWorkCostLines0553.jsx intentionally uses presentationNamespace cost-line-preview per row to avoid duplicate DOM IDs when embedded in owner audits; direct canonical render uses x.moduleId and Copy always retains componentKey=x.moduleId. Updated strict JSX source assertion to verify both anchor paths and Copy identity. No working cost/sell, source WBS, Scope, MGW routing or Customer Release mutation; final Node validation and webpack build must still pass.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.cost-lines","bid.budget.working.bc","bid.budget.working.bc.b2"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"User 2026-10-22 100 PASS / 1 FAIL Node.js v24.21.0 B/C cost-line anchor regression"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-13",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"Unified 101-Validator Repair: Source Authority, Rev03 Lock and Current 10.2 UI",
