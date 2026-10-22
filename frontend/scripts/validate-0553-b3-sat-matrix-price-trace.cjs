@@ -24,8 +24,8 @@ const current=canonical(),b3=current.byCode.B3,original=days(),m=matrix();
 const frozenSnapshot=JSON.stringify({workingSell:b3.workingSellTHB,
  directCost:b3.directCostTHB,source:original.rows,veex:original.veex});
 assert.equal(b3.moduleId,"bid.budget.working.bc.b3");
-assert.equal(b3.workingSellTHB,2397725);
-assert.equal(b3.b3SelectedSatSurveyBudget.satWorkingSellTHB,1411200);
+assert.equal(b3.workingSellTHB,2599325);
+assert.equal(b3.b3SelectedSatSurveyBudget.satWorkingSellTHB,1587600);
 assert.equal(b3.b3SelectedSatSurveyBudget.siteSurveyWorkingSellTHB,252000);
 assert.equal(b3.directCostTHB,null);
 assert.equal(m.moduleId,"bid.budget.working.bc.b3.site-mr-sat-matrix");
@@ -43,7 +43,7 @@ assert.equal(p.veexRentalDays,30);
 assert.equal(p.veexRentalRateTHB,1000);
 assert.equal(p.veexWorkingSellTHB,30000);
 assert.equal(p.offshoreWorkingSellTHB,2046000);
-assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,397400);
+assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,422600);
 assert.equal(b3.b3SelectedSatSurveyBudget.includedB3SatSurveyToolsWorkingSellTHB+b3.b3ChinaFatBudget.fatWorkingSellTHB+b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,b3.workingSellTHB);
 assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,7500);
 assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB,236250);
@@ -86,7 +86,7 @@ for(const x of [
  'data-component-key="bid.budget.working.bc.b3.site-mr-sat-matrix"',
  "2 persons","40 days","80 MD","USD 800","50,400.00",
  "Site × Team Workdays × Working SELL","ZWP20","403,200.00",
- "2,016,000.00","1,411,200.00","252,000.00","30,000.00","397,400.00","307,125.00","2,397,725.00",
+ "2,016,000.00","1,587,600.00","252,000.00","30,000.00","422,600.00","307,125.00","2,599,325.00",
  "MGW Purchased iFAT","VQ-MGW-SERV-2/4","P26-058_R2","CP-B3 HOLD",
  "Shared across MR Test IDs","NOT 8 days per MR","SHARED SITE WORKING SELL"
 ])assert(html.includes(x),"Rendered SAT matrix missing "+x);
@@ -107,7 +107,7 @@ for(const r of m.rows){
   "Shared Site value may not be mistaken for a second per-MR price: "+r.id);
 }
 const parentHtml=renderToStaticMarkup(React.createElement(Parent,{workingRow:b3}));
-assert(parentHtml.includes("2,397,725.00")&&parentHtml.includes("80 MD"));
+assert(parentHtml.includes("2,599,325.00")&&parentHtml.includes("80 MD"));
 assert(parentHtml.includes("2. Site × Team Workdays × Working SELL"));
 const head=renderToStaticMarkup(React.createElement(Breakdown,{workingRow:b3}));
 assert(head.includes("56 Man-days")&&head.includes("28")&&head.includes("site-mr-sat-matrix"));
