@@ -157,6 +157,9 @@ export function buildBcModuleNavigator0553(){
    fieldPlan.moduleId+".sat."+r.id.toLowerCase(),"old 28 plus 2 lean unallocated price audit "+r.wbs+" "+r.site)),
   child(resourceDossier.moduleId,"B3 — Resource Price Dossier | Qty × People × Days × Rate × Cost / SELL | B2-style",
    resourceDossier.moduleId,"cost resource breakdown B3 actual vs quotation vs selected sell labour crew manpower survey yard commissioning"),
+  ...resourceDossier.groupRollups.map((g,i)=>child(g.id,
+   "B3.G"+(i+1)+" — "+g.name+" / Working SELL THB "+g.selectedWorkingSellTHB,
+   g.id,"B3 group Source-to-Release 10.2 10.3 10.5 "+g.state)),
   ...resourceDossier.groups.flatMap((g,i)=>{
    const gid=resourceDossier.moduleId+".group."+String(i+1).padStart(2,"0");
    const places=[...new Set(g.rows.map(x=>x.site||"Shared"))];
