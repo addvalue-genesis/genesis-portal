@@ -725,3 +725,10 @@
 .p556-dashboard .p556-changes-impact--none{color:#516c7b}
 .p556-dashboard .p556-changes-impact--changed{color:#905719}
 @media(max-width:720px){.p556-dashboard .p556-changes-actions{width:100%}.p556-dashboard .p556-changes-title h3{font-size:15px}}
+
+/* PJ2610-0556 isolated interaction polish (no shared CSS edits). */
+.p556-dashboard .p556-detail-button[aria-pressed="true"],.p556-dashboard .p556-detail-button.is-active{background:#1d5d86;color:#fff;border-color:#1d5d86}
+.p556-dashboard .p556-link-diagram{display:flex;align-items:center;justify-content:space-around;flex-wrap:wrap;gap:15px;margin:16px 0;padding:22px 15px;border:1px solid #cbdde9;border-radius:9px;background:#f6f9fb;text-align:center;font-weight:750;color:#193a54}
+.p556-dashboard .p556-link-diagram>div{flex:1;min-width:145px}
+.p556-dashboard .p556-link-diagram small{display:block;font-size:12px;font-weight:400;color:#506d81;margin-top:7px}
+.p556-dashboard .p55-panel :is(select,input){max-width:100%}

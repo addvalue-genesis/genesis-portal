@@ -21,6 +21,8 @@ const STRINGS = {
     subtitle: "ADDVALUE Digital Backbone",
     home: "Home",
     project0550: "PJ2608-0550 TPP",
+    project0553: "PJ2608-0553 Bid",
+    project0556: "PJ2610-0556 PTP",
     employees: "Employees",
   },
 };
