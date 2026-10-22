@@ -7,6 +7,7 @@ import {B2WorkingPriceOverview0553} from "./B2WorkingPriceOverview0553";
 import {B2IndependentVdrlRecalculation0553} from "./B2IndependentVdrlRecalculation0553";
 import {selectBcB5HistoricalPriceBridge0553} from "./data/bcB5HistoricalPriceBridge0553";
 import {B5B6B7LinkedLogistics0553} from "./B5B6B7LinkedLogistics0553";
+import {selectB9YardWorkScopeDossier0553} from "./data/b9YardWorkScopeDossier0553";
 
 // 10.2 owner-local READ ONLY price evidence for B2/B4–B9.
 // Never infer document man-hours, unit SELL or payroll from a lump-sum quote.
@@ -258,6 +259,96 @@ function Pricing({row}){
    {" "}Original source {e.sourceSheet} — {e.sourceRevision}. No independent cost posting from this view.</p>
  </div>;
 }
+// B9.1: price-bearing site/activity drilldown uses the same eight B9 rows as
+// B9.2 Pricing. All child groups are attribution ONLY, not fresh ledger entries.
+function B9YardWorkScopeDossier0553({workingRow}){
+ const model=selectB9YardWorkScopeDossier0553(workingRow);
+ return <div className="p553-b9-work-scope-dossier">
+  <div className="p55-metric-grid">
+   <div><strong>Selected B9 Working SELL · 1 LS</strong>
+    <p>{fmt(model.selectedWorkingSellTHB)}</p>
+    <small>Same canonical WS-B9 in 10.2 → 10.3 → 10.5; no extra quotation lines</small></div>
+   <div><strong>Paid Yard Resource</strong><p>1 Senior Engineer</p>
+    <small>7 workdays + 2 travel days · USD 700/MD · FX 31.50</small></div>
+   <div><strong>Verified Direct COST</strong><p>NOT ESTABLISHED</p>
+    <small>Working SELL rates/allowances are not internal payroll or actual expenses</small></div>
+   <div><strong>Physical Execution / Customer Release</strong><p>HOLD</p>
+    <small>Written JUTAL call-out required; CP-B9 not issued</small></div>
+  </div>
+  <p className="p55-note"><strong>Cost-owner cross-reference:</strong>
+   {" "}B3 GF Yard SAT <code>{model.b3RequirementModuleId}</code> is an
+   unpriced CONTRACTUAL testing / acceptance requirement; it does not
+   transfer the entire SAT obligation into B9. B9 here owns only the priced
+   on-call Senior Telecom Systems Integration Engineer package, once.
+   {" "}Site ZWP20/21/22/23 and MR0001–0004 are technical coverage,
+   <strong> not four separately priced field visits or eight new customer rows</strong>.
+   {" "}GF Yard SAT crew, ITP and RACI remain to be approved.</p>
+  {model.groups.map((g,i)=><details key={g.id}
+   className={"p553-bc-price-doc-group p553-b9-dossier-group p553-b9-dossier-group--"+g.key}
+   data-component-key={g.id} open={i===0}>
+   <summary className="p553-bc-price-leaf-head">
+    <span className="p553-bc-price-num">B9.G{i+1}</span>
+    <span className="p553-bc-price-leaf-label"><strong>{g.name}</strong>
+     <small>{g.rows.length} B9-owned internal activities · INCLUDED ONCE · {fmt(g.selectedWorkingSellTHB)}</small>
+     <code>{g.id}</code></span>{copy(g.id)}
+   </summary>
+   <div className="p553-bc-price-leaf-body">
+    <details className="p553-bc-price-doc-group p553-b9-dossier-site"
+     data-component-key={g.siteId} open={i===0}>
+     <summary className="p553-bc-price-leaf-head">
+      <span className="p553-bc-price-num">B9.G{i+1}.1</span>
+      <span className="p553-bc-price-leaf-label"><strong>{g.site}</strong>
+       <small>Site / activity subtotal: {fmt(g.selectedWorkingSellTHB)} · pooled 1 LS, not per-WP</small>
+       <code>{g.siteId}</code></span>{copy(g.siteId)}
+     </summary>
+     <div className="p553-bc-price-leaf-body">
+      <div className="p55-table-wrap"><table className="p55-table p55-table--compact"
+       style={{minWidth:1600}}>
+       <thead><tr>
+        <th>Expense ID / Source Module</th><th>Yard Scope / WBS</th><th>Owner / Workfront</th>
+        <th>Role / Resource</th><th>People</th><th>Days</th><th>Qty × Unit</th>
+        <th>Rate USD / MD</th><th>FX</th><th>Working SELL Unit THB</th>
+        <th>Working COST THB</th><th>Included Working SELL THB</th>
+        <th>Verified Direct COST THB</th><th>Evidence / Approval</th>
+       </tr></thead>
+       <tbody>{g.rows.map(r=><tr key={r.id} data-component-key={r.id}>
+        <td><strong>{r.internalCostLineId}</strong>
+         <small>{r.sourceExpenseId}</small><small>{r.sourceModuleId}</small>{copy(r.id)}</td>
+        <td>{r.description}<small>{r.wbs}</small></td>
+        <td>B9 / WS-B9<small>JUTAL Zhuhai Yard, pooled 4 GF sites</small></td>
+        <td>{r.role}</td><td>{qty(r.people)}</td><td>{qty(r.days)}</td>
+        <td>{qty(r.qty)} {r.unit}</td>
+        <td>{Number.isFinite(r.rateUSDPerMD)?"USD "+qty(r.rateUSDPerMD):"—"}</td>
+        <td>{Number.isFinite(r.fxTHBPerUSD)?qty(r.fxTHBPerUSD):"—"}</td>
+        <td>{fmt(r.unitRateTHB)}</td>
+        <td>NOT ESTABLISHED</td>
+        <td><strong>{fmt(r.workingSellTHB)}</strong><small>Included in B9 1 LS</small></td>
+        <td>NOT ESTABLISHED</td>
+        <td>{r.status}<small>{r.evidence}</small>
+         <small>Physical execution requires written call-out · CP-B9 HOLD</small></td>
+       </tr>)}</tbody>
+       <tfoot><tr><th colSpan={11}>B9.G{i+1}.1 — selected Work Type / Yard subtotal</th>
+        <th>{fmt(g.selectedWorkingSellTHB)}</th>
+        <th>NOT ESTABLISHED</th><th>Read-only attribution · no duplicate posting</th></tr></tfoot>
+      </table></div>
+     </div>
+    </details>
+   </div>
+  </details>)}
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>Source-to-Release Financial Identity</th><th>Working SELL THB</th><th>Status</th></tr></thead>
+   <tbody><tr><th>{model.workingSellId} · Canonical 10.2 B9 1 LS</th>
+    <th>{fmt(model.selectedWorkingSellTHB)}</th><td>INCLUDED ONCE</td></tr>
+    <tr><td>10.3 CP-B9 Preview → 10.5 SOW-B9</td><td>{fmt(model.selectedWorkingSellTHB)}</td>
+     <td>Same amount · attribution only · Customer Release HOLD</td></tr></tbody>
+  </table></div>
+  <p className="p55-note"><strong>Nonposting staffing risk:</strong>
+   an unbilled Field Specialist backup may incur internal travel/cash costs
+   ({fmt(model.unbilledFieldBackupCashRiskTHB)} planning risk reference only).
+   It is <strong>not</strong> added to WS-B9. No additional JUTAL Yard SAT test labour,
+   site-level MR price or B3 group.06 cost is posted by this view.</p>
+ </div>;
+}
 function PhysicalDrivers({row}){
  const code=row.code;
  const drivers=(row.costEvidence?.lines||[]);
@@ -352,6 +443,7 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
   <Section code={code} num={code+".1"} suffix="work-scope"
    title={code==="B2"?"VDRL / Document Register by MR":"Work Type / Physical Deliverables"}
    summary={code==="B2"?"MR0001–0004 · 143 requirement rows / 38 unique title types":
+    code==="B9"?"8 priced source rows · 7 Yard workdays + 2 travel days · 1 LS "+fmt(workingRow.workingSellTHB):
     "Scope and source work drivers; no invented quantities"} defaultOpen>
    {code==="B2"?<B2Vdrl code={code}/>:["B5","B6","B7"].includes(code)?
     <React.Fragment><B5B6B7LinkedLogistics0553 workingRow={workingRow}/>
@@ -359,6 +451,7 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
       <summary>Historical source cost drivers — audit only, not additional packing/freight/storage price</summary>
       <PhysicalDrivers row={workingRow}/>
      </details></React.Fragment>:
+    code==="B9"?<B9YardWorkScopeDossier0553 workingRow={workingRow}/>:
     <PhysicalDrivers row={workingRow}/> }
   </Section>
   <Section code={code} num={code+".2"} suffix="price-reconciliation"
