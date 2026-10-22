@@ -3,8 +3,9 @@
 // demonstration; four OEM discipline instructors may teach remotely (each 0.5 day).
 // PRE-AWARD WORKING SELL allowance; not a supplier quotation or verified direct cost.
 // Venue/dates (China vs BOD Yangon), remote OEM teaching price and ITP sequence OPEN.
-// Separate-trip costs included conservatively ONCE; possible shared B3/B9 trip
-// credits stay NONPOSTING until calendar/expense owner and travel are confirmed.
+// Selected B8 shares the existing B3 MGW China FAT trip: no second B8 airfare,
+// hotel, mobilisation/travel labour or trip insurance. Retain historical
+// separate-trip source inputs as NONPOSTING comparisons with unique IDs.
 import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
 const ROOT="bid.budget.working.bc.b8.hybrid-training";
 const f=Object.freeze;
@@ -19,7 +20,7 @@ const systems=f([
  f({mr:"MR0004",name:"RACON",day:2,slot:"Afternoon",hours:4})
 ]);
 const def=f([
- f({key:"onsite",name:"Onsite Facilitation / Preparation / Travel-day Labour",items:f([
+ f({key:"onsite",name:"Onsite Facilitation / Preparation · Shared B3 FAT Travel",items:f([
   f({id:"SR-ONSITE",activity:"Senior Telecom Systems Integration Engineer — onsite practical facilitator",qty:2,unit:"person-day",usdUnit:700}),
   f({id:"SR-PREP",activity:"Four-system OEM coordination, material/configuration checks and video rehearsal",qty:1,unit:"person-day",usdUnit:700}),
   f({id:"SR-MOB",activity:"Senior Telecom Engineer mobilisation/demobilisation labour — separate-trip reserve",qty:2,unit:"person-day",usdUnit:700,sharedTripReconciliation:true})
@@ -31,7 +32,7 @@ const def=f([
   f({id:"TRAINING-PACK",activity:"Four discipline training packs, handouts, exercise checklist, attendee register and assessment for eight people",qty:4,unit:"system training pack",thbUnit:2500}),
   f({id:"VIDEO-CONNECT",activity:"Onsite audio/video, conferencing, connection test and support allowance",qty:1,unit:"two-day session allowance",thbUnit:5000})
  ])}),
- f({key:"travel",name:"Separate Onsite Trip — Cash Expense Allowance",items:f([
+ f({key:"travel",name:"Shared B3 FAT Trip — EXCLUDED Duplicate B8 Travel (Audit)",items:f([
   f({id:"AIRFARE",activity:"Return airfare for one onsite facilitator, budgetary",qty:1,unit:"ticket",thbUnit:15000,sharedTripReconciliation:true}),
   f({id:"HOTEL",activity:"Hotel for two-day class and travel, four nights",qty:4,unit:"room-night",thbUnit:2500,sharedTripReconciliation:true}),
   f({id:"LOCAL",activity:"Local transport / airport transfer for one facilitator",qty:1,unit:"trip",thbUnit:5000,sharedTripReconciliation:true}),
@@ -48,20 +49,29 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
    return f({...item,id:ROOT+".line."+item.id.toLowerCase(),sourceId:item.id,
     sourceModuleId:ROOT,rateUSDPerUnit:Number.isFinite(item.usdUnit)?item.usdUnit:null,
     fxTHBPerUSD:Number.isFinite(item.usdUnit)?fx:null,unitRateTHB,
-    workingSellTHB:round(item.qty*unitRateTHB),workingCostTHB:null,actualDirectCostTHB:null,
-    costOwner:"WS-B8",postingClass:"ATTRIBUTION_TO_SINGLE_SELECTED_B8_1LS",
+    workingSellTHB:item.sharedTripReconciliation?null:round(item.qty*unitRateTHB),
+    separateTripHistoricalReferenceTHB:item.sharedTripReconciliation?round(item.qty*unitRateTHB):null,
+    workingCostTHB:null,actualDirectCostTHB:null,
+    costOwner:item.sharedTripReconciliation?"WS-B3_SHARES_FAT_TRAVEL":"WS-B8",
+    postingClass:item.sharedTripReconciliation?
+     "EXCLUDED_DUPLICATE_B8_TRIP__EXISTING_B3_FAT_OWNER_ONLY":
+     "ATTRIBUTION_TO_SINGLE_SELECTED_B8_1LS",
     verifiedSourceRate:item.oemFeeNotQuoted?"PARAMETRIC_OEM_REMOTE_SESSION_ALLOWANCE_NOT_VENDOR_QUOTE":
      "PRE_AWARD_RESOURCE_WORKING_SELL_OR_EXPENSE_ALLOWANCE",
     customerLineAllowed:false});
   }));
-  const subtotal=round(lines.reduce((sum,x)=>sum+x.workingSellTHB,0));
+  const subtotal=round(lines.reduce((sum,x)=>sum+(x.workingSellTHB??0),0));
   return f({key:group.key,name:group.name,id:ROOT+".group."+String(i+1).padStart(2,"0"),
    rows:lines,workingSellTHB:subtotal,independentPostingAllowed:false});
  }));
  const total=round(groups.reduce((sum,g)=>sum+g.workingSellTHB,0));
- const counted=groups.flatMap(g=>g.rows), sharedTripPotential=round(counted.filter(x=>x.sharedTripReconciliation).reduce((s,x)=>s+x.workingSellTHB,0));
- if(total!==216650||groups.map(g=>g.workingSellTHB).join("|")!=="110250|50400|15000|41000"||
-  sharedTripPotential!==85100||counted.length!==14||
+ const counted=groups.flatMap(g=>g.rows);
+ const sharedTripDeduplication=round(counted.reduce((s,x)=>s+(x.separateTripHistoricalReferenceTHB??0),0));
+ const priced=counted.filter(x=>Number.isFinite(x.workingSellTHB));
+ const standaloneReferenceTHB=round(total+sharedTripDeduplication);
+ if(total!==131550||groups.map(g=>g.workingSellTHB).join("|")!=="66150|50400|15000|0"||
+  sharedTripDeduplication!==85100||standaloneReferenceTHB!==216650||
+  counted.length!==14||priced.length!==9||
   fx!==31.5||seniorUSD!==700||
   new Set(counted.map(x=>x.id)).size!==counted.length||
   (workingRow!==null&&(workingRow.workingSellTHB!==total||workingRow.directCostTHB!==null)))
@@ -71,13 +81,16 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
   code:"B8",systems,trainees:8,systemsCount:4,onsiteTrainingDays:2,
   onsiteContactHours:16,onsitePaidSeniorCount:1,onsiteFieldCount:0,
   trainingMode:"ON_SITE_HANDS_ON_WITH_REMOTE_OEM_DISCIPLINE_INSTRUCTORS",
-  assumedBudgetaryVenue:"JUTAL Zhuhai Yard, China — subject to JUTAL written acceptance; BOD Yangon location remains OPEN",
+  assumedBudgetaryVenue:"MGW Nantong, China — co-scheduled with MGW FAT, venue/attendance approval OPEN; BOD Yangon training location remains contractual deviation",
   alternateMode:"FULL_OEM_ONSITE_INSTRUCTOR__UNQUOTED_NONPOSTING",
   originalRev05WorkingSellReferenceTHB:30000,originalRev05TrainingMH:44,
-  groups,pricedRows:counted.length,selectedWorkingSellTHB:total,
-  selectedTripExpenseBasis:"ONE_INDEPENDENT_ONSITE_CHINA_TRIP_PLANNING_RESERVE__NOT_VERIFIED",
-  possibleSharedB3B9TripCreditTHB:sharedTripPotential,
-  sharedTripCreditAllowed:false,unverifiedTripCashIncludedOnce:true,
+  groups,pricedRows:priced.length,sourceAuditRows:counted.length,selectedWorkingSellTHB:total,
+  selectedTripExpenseBasis:"SHARED_MGW_CHINA_FAT_TRIP__WS_B3_ONCE__NO_SEPARATE_B8_TRAVEL",
+  standaloneTripPreviousWorkingSellTHB:standaloneReferenceTHB,
+  excludedDuplicateTripWorkingSellTHB:sharedTripDeduplication,
+  possibleSharedB3B9TripCreditTHB:0, // no SECOND credit; all travel excluded already
+  sharedTripDeduplicationApplied:true,unverifiedTripCashIncludedOnce:false,
+  onsiteSeniorDayOverlapWithB3Pending:true,
   oemRemoteSessionsVendorConfirmed:false,onsiteVenueApproved:false,
   trainingBeforeFATApproved:false,trainingDeliveryReportApproved:false,
   instructorCashExpenseVerified:false,actualDirectCostTHB:null,verifiedWorkingCostTHB:null,
@@ -87,7 +100,9 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
    "Confirm purchaser-approved venue and OEM-led remote instruction; historic BOD training venue Yangon and pre-FAT timing must not be silently overridden",
    "Four manufacturer disciplines × four-hour remote fee USD400 each is a PARAMETRIC allowance, NOT a vendor quotation",
    "One onsite Senior runs demonstration, Q&A, records attendance of eight people, four system training packs and assessment",
-   "Confirm whether the actual two-day onsite session overlaps existing B3 China FAT or B9 Yard deployment; only then remove distinct travel/insurance cash and labour without double posting",
+   "Same MGW FAT trip selected: B8 separate airfare, hotel, visa/insurance and travel-day labour EXCLUDED THB85100, already reserved under B3 FAT; no second travel credit",
+   "Confirm whether the SAME B3 FAT Senior performs the two-day B8 onsite facilitation: either document non-overlapping FAT and training work hours or remove duplicated 2 Senior MD THB44100 before customer release",
+   "Confirm purchaser responsibility for eight attendees travel/accommodation to MGW China; attendee transport not budgeted in B8",
    "Source Rev05 THB30000 / 44 MH is superseded as Working SELL but remains historical audit; no payroll or OEM paid direct cost has been established",
    "Training must be onsite for end users even where OEM instructor appears online; fully remote delivery alone is not selected"
   ])
