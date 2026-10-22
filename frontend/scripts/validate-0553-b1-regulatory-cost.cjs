@@ -29,8 +29,14 @@ assert.equal(model.workingSellPosted,false);
 assert.equal(base.byCode.B1.workingSellTHB,211600); // New Rev.K engineering + PM, old 510k audit only
 assert.equal(base.knownWorkingSellTHB,4262586.82);
 assert.equal(base.byCode.B3.workingSellTHB,2599325);
-assert.equal(base.knownWorkingSellTHB+(2750525-base.byCode.B3.workingSellTHB),4385436.82,
- "Older Part B total differs ONLY because selected B3 SAT40->SAT28/BF5 was repriced");
+// 21-Oct audit bridge is NONPOSTING. The 22-Oct revision changed BOTH B3
+// FAT/SAT role rates and B9 onshore Senior; remove both current deltas.
+assert.equal(Math.round(100*(
+ base.knownWorkingSellTHB+
+ (2750525-base.byCode.B3.workingSellTHB)+
+ (233600-base.byCode.B9.workingSellTHB)
+)),438543682,
+ "Historical Part B audit must back out BOTH B3 and B9 current role-rate revisions");
 const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(jsx.includes("selectB1RegulatoryCost0553")&&jsx.includes("b1Regulatory.rows.map("));
 assert(babel.transformSync(jsx,{babelrc:false,configFile:false,
