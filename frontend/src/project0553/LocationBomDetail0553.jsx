@@ -1,5 +1,4 @@
 import React,{useState} from "react";
-import {BulkMrLocationCoverage0553} from "./BulkMrLocationCoverage0553";
 import {bomPriceTHB0553} from "./bomPresentationContract0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
@@ -114,7 +113,6 @@ export function LocationBomDetail0553({site,fx}){
      </ControlledModuleSection0553>})()}
      {(v.quotedRateCandidates||[]).length>0&&<ControlledModuleSection0553 moduleKey={tagKey(v)+".vendor-alternatives"} title="Vendor alternative quotation evidence (not additive)"><div className="p55-table-wrap p553-module-scroll"><table className="p55-table"><thead><tr><th>Quote line</th><th>SKU</th><th>Original Unit Rate</th><th>Selected</th></tr></thead><tbody>{v.quotedRateCandidates.map((c,i)=><tr key={i}><td>{c.quoteLine}</td><td>{c.sku}</td><td>{fmt(c.unitPriceTHB??c.sourceUnitTHB)}</td><td>{c.selected?"WORKING COMPARABLE":"ALTERNATIVE"}</td></tr>)}</tbody></table></div></ControlledModuleSection0553>}
      {(v.candidates||[]).map((c,i)=><p key={i} className="p55-note">{c.vendor||"Supplier"} · {c.sku} · {c.originalCurrency} {fmt(c.originalUnitPrice)} · candidate only, NOT additional booked cost</p>)}
-     {/bulk[ -]*material/i.test(String(v.tag))&&<BulkMrLocationCoverage0553 mr="MR-0001" site={site} detail/>}
      </TagFourStageWorkbench0553>
     </ControlledModuleSection0553></td></tr>}
    </React.Fragment>)}
