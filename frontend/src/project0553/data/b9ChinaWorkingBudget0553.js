@@ -90,7 +90,7 @@ export const B9_CHINA_WORKING_ROWS_0553=Object.freeze(assumptionRows.map(([id,wb
  workingSellTHB:round(qty*rateTHB),workingCostTHB:null,directCostTHB:null,
  costAccountingClass:owner==="B3"?"B3_DIRECT_FAT_WITNESS_EXPENSE_UNVERIFIED":"B9_DIRECT_SPECIALIST_EXPENSE_IF_CALLED_UNVERIFIED",
  costOwner:owner,expenseKey:owner+"-REV-K-"+id,
- rateAuthority:["FAT-STAFF","YARD-STAFF"].includes(id)?r.source:"CFO_PRE_AWARD_ESTIMATOR_ALLOWANCE__2026_10_18",
+ rateAuthority:["FAT-STAFF","YARD-STAFF","YARD-TRAVEL-DAYS","YARD-FIELD-STAFF","YARD-FIELD-TRAVEL-DAYS"].includes(id)?r.source:"CFO_PRE_AWARD_ESTIMATOR_ALLOWANCE__2026_10_18",
  status,evidence,
  postingClass:isYard?"B9_YARD_CALL_OUT_CONDITIONAL":"B3_MGW_FAT_WITNESS_BASE",
  optional:isYard
