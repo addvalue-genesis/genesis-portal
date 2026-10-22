@@ -80,7 +80,7 @@ for(const [code,sell] of Object.entries({B1:211600,B2:237121.13,B3:2599325,B8:13
 const primary=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert.equal(b.byCode.B5.workingSellTHB,311184,"B5 approved budgetary Working SELL; physical packing direct cost remains unverified");
 assert.equal(b.byCode.B3.workingSellTHB,2599325,"MGW purchased FAT plus selected SAT28 and BF Survey5 current owner budget");
-assert.equal(b.knownWorkingSellTHB,4582736.82,"Current Part B Base includes latest B2/B3 FAT and B9 quoted Base, excludes C1/C2 options");
+assert.equal(b.knownWorkingSellTHB,4308914.13,"Current Part B Base includes latest B2/B3 FAT and B9 quoted Base, excludes C1/C2 options");
 assert.equal(b.knownWorkingSellTHB,Math.round(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((n,x)=>n+x.workingSellTHB,0)*100)/100);
 assert.equal(derivePartBcWorkingWbs0553().subtotalTHB,3804160);
 assert.equal(b.knownDirectCostTHB,null);
