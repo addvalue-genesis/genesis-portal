@@ -17,6 +17,47 @@ const {deriveBulkMrLocationCoverage0553:bulkSource}=from("data/bulkMrLocationCov
 const {deriveBulkSourceToReleaseTrace0553:trace}=from("data/bulkSourceToReleaseTrace0553.js");
 const {buildReleaseCommercialModel0553:release}=from("data/releaseCommercialModel0553.js");
 const {MGW_P26_058_R2_SELECTED_0553:mgw}=from("data/mgwP26058R2Selected0553.js");
+const {MR0002_WORKING_BOM_0553:currentMR2}=from("data/mr0002WorkingBom0553.js");
+const {Z1F_TEL_LAYOUT_INDEX_0553:layout}=from("data/z1fTelLayoutIndex0553.js");
+const selectedOwnerTags={
+ ZWP20:{bda:"TCAB-508-002",surge:"TCAB-508-001"},
+ ZWP21:{bda:"TCAB-508-001",surge:"TCAB-508-002"},
+ ZWP22:{bda:"TCAB-508-001",surge:"TCAB-508-002"}
+};
+assert.equal(currentMR2.sites.length,3);
+for(const site of currentMR2.sites){
+ const expected=selectedOwnerTags[site.site];
+ assert(expected,"Unknown selected RFI BDA site "+site.site);
+ assert.equal(site.selectedBdaTag,expected.bda);
+ assert.equal(site.referenceSurgeTag,expected.surge);
+ const radio=layout.byWP.find(x=>x.wp===site.site).equipment;
+ assert.equal(radio.find(x=>x.functionRole==="LEGACY_LNA_ENCLOSURE")?.tag,expected.bda);
+ assert.equal(radio.find(x=>x.functionRole==="RF_SURGE_EXD")?.tag,expected.surge);
+ const byId=id=>site.items.find(x=>x.id===site.site+"-"+id);
+ const amp=byId("RFI-BDA"),warom=byId("RFI-BDA-EXD-ENCLOSURE");
+ const gland=byId("BDA-M20-GLANDS"),rf=byId("BDA-RF-FEEDTHROUGHS");
+ assert(amp&&warom&&gland&&rf);
+ assert.equal(amp.tag,expected.bda);
+ assert.equal(warom.tag,expected.bda);
+ assert.equal(gland.tag,expected.bda+"-M20");
+ assert.equal(rf.tag,expected.bda+"-RF");
+ assert.equal(amp.unitCost,31474);
+ assert.equal(amp.extended,31474);
+ assert.equal(amp.qty,1);
+ assert.equal(warom.extended,null);
+ assert.equal(warom.countedInWorkingTotal,false);
+ assert.equal(gland.countedInWorkingTotal,false);
+ assert.equal(rf.countedInWorkingTotal,false);
+ assert.equal(amp.antennaPositionsChanged,false);
+ assert.equal(site.controlledTotalUSD,33188);
+ const surge=site.items.find(x=>x.id===site.site+"-BULK-EX-SURGE");
+ if(surge){
+  assert.equal(surge.countedInWorkingTotal,false);
+  assert(surge.source.includes("TEL-LAY "+expected.surge));
+ }
+}
+assert.equal(mgw.lines.filter(x=>x.mr==="MR-0002").reduce((a,x)=>a+x.extendedUSD,0),99564);
+
 const mto=from("data/snapshots/mr0001.mto.rev04.sourceRows.json");
 const before=release({thbPerUsd:31.5});
 const snap=JSON.stringify({a:before.a,b:before.b,c:before.c,summary:before.summary});
