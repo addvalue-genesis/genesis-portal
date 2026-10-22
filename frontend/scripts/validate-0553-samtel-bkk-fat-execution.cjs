@@ -47,8 +47,14 @@ for(const c of ["B3","B6","B9"]){
 assert.equal(working.byCode.B3.workingSellTHB,2599325);
 assert.equal(working.byCode.B3.b3FortyDayBudget.workdays,40,
  "Legacy Bangkok/40-day pricing basis remains audit-only");
-assert.equal(working.byCode.B3.workingSellTHB+352800,2750525,
- "SAT28+BF5 new working SELL supersedes old 40-day baseline without re-posting");
+// Current B3 includes two independent 22-Oct rate deltas (+SAT Senior 176400,
+// +FAT China paid witnesses 25200). Remove these before the 21-Oct audit bridge.
+const satSeniorRateDeltaTHB=28*(1000-800)*31.5;
+const fatWitnessRateDeltaTHB=working.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB-397400;
+assert.equal(satSeniorRateDeltaTHB+fatWitnessRateDeltaTHB,201600);
+assert.equal(working.byCode.B3.workingSellTHB-
+ (satSeniorRateDeltaTHB+fatWitnessRateDeltaTHB)+352800,2750525,
+ "Historical B3 scenario must NOT blend 21-Oct SAT change with 22-Oct role revisions");
 assert.equal(working.byCode.B9.workingSellTHB,261950);
 assert.equal(working.byCode.B6.workingSellTHB,307584,"B6 approved pre-award logistics working sell; direct cost stays null");
 assert.equal(working.knownWorkingSellTHB,4262586.82,"Current selected Part B Base: includes SAT28+BF5 in B3; B9 1 LS once");
@@ -67,4 +73,4 @@ assert(ui.includes("MGW executes MR0001–MR0004 OEM IFAT/FAT")&&
  ui.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/>'),
  "10.2 active MGW basis must be visible through the selected owner detail");
 assert(ui.includes("JUTAL Zhuhai Yard, China"));
-console.log("PASS 0553 Rev05 Bangkok FAT audit preserved, active Rev.K MGW FAT and JUTAL Yard strategy reconciled, B1/B3/B9 current working sell changed with budget authority; no direct-cost posting.");
+console.log("PASS 0553 Rev05 Bangkok FAT audit preserved, active Rev.K MGW FAT and JUTAL Yard strategy reconciled, B1 current SELL protected and B3/B9 current SELL repriced with separate management authority; no direct-cost posting.");
