@@ -7,6 +7,7 @@ import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
 import {selectB3HierarchicalPriceTable0553,B3_PRICE_ROW_CLASSES_0553 as PRICE_CLASS} from "./data/b3HierarchicalPriceTable0553";
+import {selectB3LeanSatScenario0553} from "./data/b3LeanSatScenario0553";
 import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {selectB3B8SevenDayCommercialAllocation0553} from "./data/b3B8SevenDayCommercialAllocation0553";
 import {B3B8SevenDayAllocation0553} from "./B3B8SevenDayAllocation0553";
@@ -176,6 +177,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
  const b8Row=selectBcTurnkeyWorkingCost0553().byCode.B8;
  const integratedScenario=selectB3B8SevenDayCommercialAllocation0553({b3:workingRow,b8:b8Row});
  const model=selectB3HierarchicalPriceTable0553(workingRow,integratedScenario);
+ const lean=selectB3LeanSatScenario0553(workingRow);
  const expandAll=open=>rootRef.current?.querySelectorAll(
   "details.p553-b3-table-group, details.p553-b3-table-item").forEach(node=>{node.open=open;});
  return <section className="p553-b3-worktype p553-b3-price-table-section"
@@ -193,7 +195,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
     <p className="p55-note"><strong>Inspection / Site Survey / FAT / SAT:</strong> pre-SAT Site Survey
      covers {workingRow.b3SiteSurveyScope?.locations??0} project locations as B3 scope,
      but physical survey crew, journey and separate Working SELL are NOT ESTABLISHED.
-     The selected offshore 40-day SAT timeboxes cannot be reused as extra survey days;
+     Latest lean SAT execution is 28 productive + 2 pooled risk team-days (+ 2 management reserve days NONPOSTING); the 40-day Working SELL baseline cannot be reused as extra survey days;
      B1 design review and B2 report control are not duplicate B3 survey charges.</p>
    </div>
    <div className="p553-b3-actions">
@@ -215,6 +217,12 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
         {copyInSummary(group.moduleId)}
        </summary>
        <div className="p553-b3-table-children">
+        {group.kind==="sat"&&<p className="p55-note">
+         <strong>Latest SAT execution: {lean.baseTeamDays} productive + {lean.internalRiskTeamDays} risk = {lean.workingTeamDaysWithRisk} two-person team-days</strong>.
+         {" "}{lean.managementReserveTeamDays} further management-reserve team-days are NOT priced or scheduled automatically.
+         <strong> The {lean.oldTeamDays}-day / {lean.oldPersonDays}-MD price basis remains in B3 Working SELL and must not be confused with the updated execution plan.</strong>
+         Open B3.2.2 for the nine work packages and the 28-day site allocation.
+        </p>}
         <table className="p55-table p553-b3-hierarchical-table p553-b3-subtable">
          <thead><tr>{gridColumns.map(name=><th key={name}>{name}</th>)}</tr></thead>
          <tbody>{group.items.map(item=><tr key={item.moduleId}
