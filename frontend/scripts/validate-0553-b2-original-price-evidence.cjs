@@ -31,6 +31,9 @@ assert.equal(m.rev00d.roundedAdditionTHB,120000);
 assert.equal(m.rev00d.revisedTemporarySellTHB,560000);
 assert.equal(m.unreconciledWorkingSellDifferenceTHB,20000);
 assert.equal(m.roleWorkload.length,5);
+// The source records 964.2785625 MH; B2 UI uses toFixed(3) = 964.279,
+// not the stale literal 964.278. Never change source MH to satisfy a text test.
+assert.equal(m.workingMH,964.2785625);
 assert.equal(round(m.workingMH),964.28);
 assert.equal(round(m.roleCostProxyTotalTHB),158166.88);
 assert.equal(round(m.temporaryRev00a.unroundedWorkingSellTHB),434009.91);
@@ -50,8 +53,14 @@ assert.equal(m.canPostCost,false);
 assert.equal(m.canChangeWorkingSell,false);
 const html=renderToStaticMarkup(React.createElement(Host,{workingRow:b2}));
 const standalone=renderToStaticMarkup(React.createElement(View,{workingRow:b2}));
+// Contract check: verify source MH and its actual 3-decimal presentation,
+// including the standalone owner screen. Do not back-solve the 580k quote.
+const expectedHistoricalMH=m.workingMH.toFixed(3)+" MH";
+assert.equal(expectedHistoricalMH,"964.279 MH");
+assert(standalone.includes(expectedHistoricalMH),
+ "B2 standalone original source must show the rounded Rev00a MH");
 for(const k of ["440,000.00","120,000.00","560,000.00","20,000.00","580,000.00",
- "964.278","158,166.88","43,549.87","119,500.84","B2.P1","B2.P2",
+ m.workingMH.toFixed(3),"158,166.88","43,549.87","119,500.84","B2.P1","B2.P2",
  "Unreconciled price change","source cost proxy","Source / Revision",
  "Document Controller / Project Admin","N-01","N-02","N-03","N-04"]){
  assert(html.toLowerCase().includes(k.toLowerCase()),"Missing original B2 source evidence in owner: "+k);
