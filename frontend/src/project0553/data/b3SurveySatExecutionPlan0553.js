@@ -35,7 +35,7 @@ const detail=(site,matrix,kind,number,activity)=>freeze({
  status:kind==="YARD"?"FABRICATION_YARD_SAT_VENDOR_CONTRACTOR_RACI_DAYS_OPEN":"OFFSHORE_VENDOR_COMMISSIONING_AFTER_INSTALL__ADDVALUE_SCOPE_DAYS_OPEN"
 });
 export function selectB3SurveySatExecutionPlan0553(workingRow=null){
- const lean=selectB3LeanSatScenario0553(workingRow);
+ const lean=selectB3LeanSatScenario0553(); // 28-day selected work quantity; prior 40d only historic audit
  const priorSurvey=selectB3SiteSurveyScope0553();
  const matrix=selectB3SiteMrSatCoverage0553();
  const retained=selectB3FortyDayWorkingSell0553();
@@ -112,7 +112,7 @@ export function selectB3SurveySatExecutionPlan0553(workingRow=null){
     yardRows.length!==4||offshoreRows.length!==4||
     shared.length!==2||lean.workingTeamDaysWithRisk!==30||
     proposedSATWithRiskSellTHB!==1512000||
-    (workingRow&&currentB3!==2750525))
+    (workingRow&&currentB3!==2397725))
    throw Error("BF-only optional survey and stage-separated SAT cost/readiness boundary divergence");
  return freeze({
   moduleId:"bid.budget.working.bc.b3.field-execution-plan",
@@ -124,7 +124,7 @@ export function selectB3SurveySatExecutionPlan0553(workingRow=null){
   bfSites:BF,gfSites:GF,
   survey:freeze({
    rows,excludedGFRows:gfExcluded,crew,
-   physicalRevisitApproved:false,selectedPhysicalSurveyTeamDays:null,
+   physicalRevisitApproved:false,selectedPhysicalSurveyTeamDays:3, // selected budget allowance, NOT physical work order
    provisionalPhysicalSiteDaysIfCalled:surveyProductiveDays,
    provisionalTravelTeamDaysIfCalled:tripTeamDays,
    totalTeamDaysIfCalled:surveyProductiveDays+tripTeamDays,
@@ -135,7 +135,7 @@ export function selectB3SurveySatExecutionPlan0553(workingRow=null){
    conditionalLabourSellReferenceTHB:totalSurveySellReferenceTHB,
    priorSevenSiteIllustrationTHB:453600,
    priorSevenSiteIllustrationWithdrawn:true,
-   selectedWorkingSellTHB:null,verifiedDirectCostTHB:null,
+   selectedWorkingSellTHB:workingRow?252000:null,verifiedDirectCostTHB:null,
    actualTravelCashCostTHB:null,releaseAllowed:false,postingAllowed:false
   }),
   yardSat:freeze({location:"JUTAL Zhuhai Fabrication Yard, China",
@@ -159,6 +159,7 @@ export function selectB3SurveySatExecutionPlan0553(workingRow=null){
    scenarioLabourWithRiskReferenceTHB:proposedSATWithRiskSellTHB,
    proposedBFPlusLegacySATLabourSellReferenceTHB:bfPlusOldLeanReference,
    selectedBaselineTeamDays:40,selectedBaselinePersonDays:80,
+   currentSelectedSATTeamDays:28,currentSelectedSATPersonDays:56,
    selectedBaselineLaborSellTHB:retained.laborWorkingSellTHB,
    sourceTestCount:matrix.rows.length,verifiedDirectCostTHB:null,
    postedWorkingSellTHB:null,postingAllowed:false}),
@@ -166,7 +167,10 @@ export function selectB3SurveySatExecutionPlan0553(workingRow=null){
    physicalNewSurveyRequired:null,
    confirmedNewManDays:null,
    allThreeStagesDaysEstablished:false,
-   prior28Plus2IsOldPlanningComparison:true,
+   prior28Plus2IsOldPlanningComparison:false,
+   sat28ProductiveSelectedWorkingBudget:true,
+   includedBFSurveyBudgetAllowanceTHB:workingRow?252000:null,
+   riskTwoTeamDaysNotPriced:true,
    selectedB3WorkingSellTHB:currentB3,
    BFConditionalFieldLabourReferenceTHB:totalSurveySellReferenceTHB,
    removedSevenSiteSurveyScenarioTHB:453600,
