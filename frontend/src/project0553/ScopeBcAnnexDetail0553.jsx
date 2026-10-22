@@ -219,14 +219,29 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
   {spareLines.length>0&&code!=="C1"&&<div className="p55-panel" style={{padding:12}}>
    <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (Pre-Award Budgetary Working Preview)</h4>
    <p className="p55-note"><strong>Coverage readiness:</strong> {customerSchedule.engineeringReadiness.installedTagInstances} source site-TAG instances / {customerSchedule.engineeringReadiness.criticalTagFunctionGroups} critical TAG families. Confirmed replacement SKU mappings in this model: {customerSchedule.engineeringReadiness.confirmedReplacementSkuGroups}. Verdict: <strong>{customerSchedule.engineeringReadiness.verdict}</strong> — budget price rows exist, but complete Commissioning Spare coverage and major-equipment provision have not yet been demonstrated.</p>
+   <p className="p55-note"><strong>วิธีอ่านราคาอะไหล่:</strong> Description = รายการที่จะซื้อและหน้าที่ใช้งาน ·
+    Detail Specification = คุณสมบัติที่ต้องตรงกับของเดิม · Materials = วัสดุ/ส่วนประกอบจริง (TBC หากยังไม่ยืนยัน) ·
+    TAG No. = จุดติดตั้งที่เกี่ยวข้อง ไม่ใช่จำนวนอะไหล่ · <strong>Qty = จำนวนอะไหล่ที่จะจัดหาจริงตามงบประมาณ</strong>.
+    รายการที่มีหลาย TAG ยังไม่ถือว่าใช้แทนกันได้จนกว่าจะยืนยัน OEM SKU</p>
    <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {customerSchedule.sourceOwnership} · Existing MR/MTO/AFC installed TAGs are joined to the five-category Rev08 budget lines by equipment function. COMMON means a shared stock/tool item, not an invented installed TAG. Quantities and THB unit rates retain the original pre-award Rev08 basis at FX 31.5. The TAG association is not OEM interchangeable SKU approval.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
     <tbody>{spareLines.map(x=><tr key={x.id}>
-     <td>{x.item}</td><td>{x.tagNo}<small>{x.installedTagKeys.length?"Installed TAG/Location links: "+x.installedTagKeys.join("; "):"Shared/unspecified equipment stock — crosswalk open"}</small><small>{x.linkedLocations.join(", ")}</small></td>
-     <td>{x.description}<small>{x.id}</small></td>
-     <td>{x.detailSpecification}<small>{x.mappingStatus}</small></td>
-     <td>{x.materials}</td>
+     <td>{x.item}</td>
+     <td><strong>{x.tagSummary||x.tagNo}</strong>
+      {x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list">
+       <summary>ดู TAG ทั้งหมด ({x.relatedEquipmentTagCount})</summary>
+       <div>{x.relatedTagList.join(" · ")}</div>
+       <small>ยังไม่รับรองว่าใช้ Spare Part รุ่นเดียวกันได้</small>
+      </details>}
+      <small>{x.linkedLocations.join(", ")||"Location pending"}</small></td>
+     <td><strong>{x.displayDescription||x.description}</strong>
+      <small>{x.displayPurpose}</small><small>{x.explanationTH}</small>
+      <small>Original source: {x.description} · {x.id}</small></td>
+     <td>{x.displaySpecification||x.detailSpecification}
+      <small>ต้องตรวจ OEM Part No. และ Rating จริงก่อนอนุมัติ</small></td>
+     <td>{x.displayMaterials||x.materials}
+      <small>รอยืนยันวัสดุ/รุ่นจาก OEM</small></td>
      <td>{x.qty} {x.unit}<small>Budgetary Qty · source {x.sourceId} · excludes additional major-spare risk stock</small></td>
      <td>{thb(x.unitPriceTHB)}</td><td>{thb(x.extendedTHB)}</td>
      {(code==="C1"||code==="C2")&&<td>{x.leadTimeARO||"OEM confirmation required"}</td>}
