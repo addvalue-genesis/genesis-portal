@@ -77,11 +77,11 @@ assert(html.indexOf("B3.4.3")<html.indexOf("B3.4.4"));
 assert(html.indexOf("B3.4.4")<html.indexOf("B3.4.5"));
 assert(html.includes("IC-FAT-STAFF-001"));
 assert(html.includes("144,000.00"));
-assert(html.includes("402,400.00"));
+assert(html.includes(b3.b3ChinaFatBudget.fatWorkingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2})),"Selected B3 China FAT witness Working SELL not rendered in canonical host");
 const keys=[...html.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(new Set(keys).size,keys.length,"Must preserve unique DOM anchors");
 const ids=new Set(nav().map(x=>x.id));
 for(const name of ["fat-owner-transfer","fat-training-7d-allocation","revk-china-budget"])
  assert(ids.has("bid.budget.working.bc.b3."+name),"legacy deep-link missing "+name);
 assert.equal(JSON.stringify(working()),snapshot,"Identity/audit relocation must not mutate source WBS");
-console.log("PASS B3 IC-FAT internal activity names, B3.1 priced rows only, B3.4 historical/scenario nonposting, old 422600, original 2599325; WS/CP/SOW namespaces and all original Module IDs preserved");
+console.log("PASS B3 IC-FAT internal activity names, B3.1 priced rows only, B3.4 historical/scenario nonposting, current FAT 422600, current B3 2599325; WS/CP/SOW namespaces and all original Module IDs preserved");
