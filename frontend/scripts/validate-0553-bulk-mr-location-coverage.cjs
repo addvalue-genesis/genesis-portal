@@ -102,7 +102,23 @@ assert.equal(rfNet({verifiedPhysicalRunLengthsM:[10,20],acceptedMGWAvailableM:10
  connectorsRequired:7,acceptedMGWConnectorQty:6}).shortfallOwner,"MGW_COMPLETE_SYSTEM__SUPPLIER_CORRECTIVE_SCOPE");
 assert.equal(rfNet({verifiedPhysicalRunLengthsM:[10,20],acceptedMGWAvailableM:10,
  connectorsRequired:7,acceptedMGWConnectorQty:6}).addvalueAutomaticProcurementM,null);
+const afcDmrTags={
+ ZWP20:{lna:"TCAB-508-002",surge:"TCAB-508-001"},
+ ZWP21:{lna:"TCAB-508-001",surge:"TCAB-508-002"},
+ ZWP22:{lna:"TCAB-508-001",surge:"TCAB-508-002"}
+};
 for(const siteRf of routeAudit.sites){
+ const afc=afcDmrTags[siteRf.site];
+ assert.equal(siteRf.afcLnaEnclosureTag,afc.lna,"AFC original LNA location shall match per-site LAY");
+ assert.equal(siteRf.afcSurgeEnclosureTag,afc.surge,"AFC RF Surge TAG shall match per-site LAY");
+ assert.equal(siteRf.afcTagRoleVerified,true);
+ assert.equal(siteRf.selectedMgWBdaFunctionMapsToOriginalAfcLna,false);
+ assert(siteRf.engineeringChange.includes("DEVIATION_HOLD"));
+ assert.equal(siteRf.circuits[0].to.split(" / ")[0],afc.lna);
+ assert.equal(siteRf.circuits[1].from.split(" / ")[0],afc.lna);
+ assert(siteRf.circuits.every(c=>c.originalAfcSurgeTag===afc.surge&&
+  c.sourceStatus==="AFC_LNA_VS_MGW_BDA_CHANGE_AND_RF_ROUTE_HOLD"));
+
  assert.equal(siteRf.circuitCount,2);
  assert(siteRf.circuits.every(x=>x.fromDeck==="MEZZANINE_EI_ROOFTOP"));
  assert(siteRf.circuits.every(x=>x.toDeck==="MEZZANINE_EI_ROOFTOP"));

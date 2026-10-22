@@ -16,14 +16,19 @@ export const MR0002_RF_ROUTE_SOURCE_0553=Object.freeze({
  layout:{document:"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 AFC",url:"https://drive.google.com/file/d/1PStua_5EmygpXpT2wMB3Jlj-Sq7syETA/view",
   limitation:"AFC positions/decks only; no cable-by-cable routing metres or service loops"},
  block:{document:"MM-ZTK-1F-ZWPX-TEL-BLD-0001 Rev.C1",url:"https://drive.google.com/file/d/1ilsnWSfMlFZh8nD29rra4YRWizadovl-/view",
-  limitation:"Functional connection concept Yagi/BDA/Omni with surge; not a cable termination schedule"},
+  limitation:"AFC functional schematic (not WIR/TER) still shows original LNA at new WPs and BDA in brownfield system; no unapproved BDA substitution."},
+ internalSchematic:{document:"MM-ZTK-1F-GEN-SCADA-TEL-DWG-0001 Rev00",
+  class:"INTERNAL_SAMART_ADDVALUE_ENGINEERING_CHECK_ONLY",status:"ISSUED_FOR_BIDDING",
+  pages:"3–4 of 4",caveat:"BOM cable detail entries use 1 LOT not measured runs; old LNA and 16-port L3 must not override AFC or current MGW RF quote."},
  mgw:{document:MGW.document,quoteLine:"UHF-4",url:MGW.source,
   includedFeederMPerSite:100,includedConnectorPcPerSite:6,
   scope:"FORLLER 1/2 inch low-loss 50-ohm coax and six 1/2-inch male RF connectors, per quoted site package"},
  nek:{document:"SM000111.pdf NEK Rev6",sourceKind:"USER_DOCUMENT",
   scope:"ADDVALUE-proposed RF BULK technical source; only IEC 60332 Flame Retardant listed, no IEC 60331 Fire Resistant proof in supplied PDF",
   attenuation450DbPer100m:4.93},
- requirements:["Confirm selected donor/service BDA port and certified Ex feedthrough diagram; no old LNA assumptions",
+ requirements:["Verify ZWP20 AFC TCAB-508-001 surge / 002 LNA; ZWP21/ZWP22 001 LNA / 002 surge",
+ "Approve engineering change from AFC original LNA to MGW RFI BDA with GA/BLD/Ex evidence before mapping selected BDA ports",
+ "Confirm selected donor/service BDA port and certified Ex feedthrough diagram; no old LNA assumptions",
  "Obtain AFC TEL cable routing or WIR/TER actual start/end, bends, tray segments and termination tails for EACH distinct RF run",
  "Confirm MGW UHF-4 feeder supplied form (reel/cut assemblies), usable balance, connectors and installation ownership",
  "Resolve 1/2 inch vs 7/8 inch conditional clause for ODU-antenna runs with project authority; do not automatically apply that clause to BDA",
@@ -89,17 +94,32 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
   const expected=["ANT-508-001","ANT-508-002","TCAB-508-001","TCAB-508-002"];
   const missingTags=expected.filter(t=>!eq(t));
   const routeTag=x=>String(x).split(" / ")[0];
-  const circuits=paths.map(p=>({
-   ...p,site,moduleId:"bid.budget.bom."+site.toLowerCase()+".mr0002.rf-route."+p.id.toLowerCase(),
-   fromDeck:eq(routeTag(p.from))?.deck||"NOT LOCATED",
-   toDeck:eq(routeTag(p.to))?.deck||"NOT LOCATED",
+   const lnaCandidates=found?.equipment.filter(x=>x.system==="DTRS_TRUNK_RADIO"&&x.functionRole==="LEGACY_LNA_ENCLOSURE")||[];
+  const surgeCandidates=found?.equipment.filter(x=>x.system==="DTRS_TRUNK_RADIO"&&x.functionRole==="RF_SURGE_EXD")||[];
+  if(lnaCandidates.length!==1||surgeCandidates.length!==1||lnaCandidates[0].tag===surgeCandidates[0].tag)
+   throw Error("AFC LNA / RF surge role mismatch: "+site);
+  const lnaTag=lnaCandidates[0].tag,surgeTag=surgeCandidates[0].tag;
+  const circuits=paths.map(p=>{
+   const donor=p.id==="RF-DONOR";
+   const from=donor?"ANT-508-001":lnaTag+" / ORIGINAL AFC LNA — BDA CHANGE HOLD";
+   const to=donor?lnaTag+" / ORIGINAL AFC LNA — BDA CHANGE HOLD":"ANT-508-002";
+   return {
+   ...p,from,to,site,moduleId:"bid.budget.bom."+site.toLowerCase()+".mr0002.rf-route."+p.id.toLowerCase(),
+   originalAfcLnaTag:lnaTag,originalAfcSurgeTag:surgeTag,
+   topology:donor?
+    "Yagi ANT-508-001 → "+surgeTag+" AFC surge (order pending WIR) → "+lnaTag+" AFC original LNA / proposed MGW BDA HOLD":
+    lnaTag+" AFC original LNA / proposed BDA service interface HOLD → "+surgeTag+" AFC surge (order pending WIR) → ANT-508-002 Omni",
+   intermediate:donor?["Yagi","Solexy and PolyPhaser supplier accessories",surgeTag+" AFC surge",lnaTag+" AFC LNA/proposed BDA"]:
+    [lnaTag+" AFC LNA/proposed BDA",surgeTag+" AFC surge","Omni"],
+   fromDeck:eq(routeTag(from))?.deck||"NOT LOCATED",
+   toDeck:eq(routeTag(to))?.deck||"NOT LOCATED",
    sourceSheet:siteLayoutSheets[site],routeSegmentsM:null,verifiedInstalledM:null,
    verifiedTerminationEnds:null,verifiedConnectors:null,
    cableSku:null,cableOemAccepted:false,
-   sourceStatus:"LAY_TAGS_CONFIRMED_BUT_TERMINATION_AND_TRAY_ROUTE_UNPROVEN",
+   sourceStatus:"AFC_LNA_VS_MGW_BDA_CHANGE_AND_RF_ROUTE_HOLD",
    engineeringBudgetReferenceInstalledM:policy.perRouteInstalledReferenceM,
    engineeringBudgetReferencePurchaseM:mr0002RfPurchaseM0553(policy.perRouteInstalledReferenceM,policy.purchasingAllowancePct)
-  }));
+  };});
   // This intentionally uses an unverified *illustration* separately from the actual quantity answer.
   const illustrativeInstalledM=circuits.reduce((s,c)=>s+c.engineeringBudgetReferenceInstalledM,0);
   const illustrativePurchaseM=circuits.reduce((s,c)=>s+c.engineeringBudgetReferencePurchaseM,0);
@@ -108,6 +128,9 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
   return {site,scope:"MR-0002",moduleId:"bid.budget.bom."+site.toLowerCase()+".mr0002.rf-physical-routes",
    sourceBulk:"MR0002 Bulk 1 Lot per MR C1",expectedTags:expected,missingTags,
    layoutDocument:src.layout.document,layoutSheet:siteLayoutSheets[site],
+   afcLnaEnclosureTag:lnaTag,afcSurgeEnclosureTag:surgeTag,
+   afcTagRoleVerified:true,selectedMgWBdaFunctionMapsToOriginalAfcLna:false,
+   engineeringChange:"SELECTED_MGW_BDA_VS_CUSTOMER_AFC_LNA__GA_BLD_EX_CERT_DEVIATION_HOLD",
    circuitCount:circuits.length,circuits,
    mgw:{vendor:"MGW",materialBrand:"FORLLER",offerLine:"UHF-4",
     providedFeederM:100,providedConnectors:6,source:src.mgw.url,

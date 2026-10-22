@@ -5,6 +5,7 @@ import ORIGINAL_MTO from "./snapshots/mr0001.mto.rev04.sourceRows.json";
 import {deriveBulkMrLocationCoverage0553} from "./bulkMrLocationCoverage0553";
 import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
 import {MGW_P26_058_R2_SELECTED_0553 as MGW} from "./mgwP26058R2Selected0553";
+import {deriveMR0002RfPhysicalRouteReconciliation0553} from "./mr0002RfPhysicalRouteReconciliation0553";
 
 const MR_TO_CUSTOMER=Object.freeze({"MR-0001":"A1","MR-0002":"A2","MR-0003":"A3","MR-0004":"A4"});
 const SOURCE_REFS=Object.freeze({
@@ -37,6 +38,7 @@ const normativeId=(group)=>"bid.budget.bom."+group.site.toLowerCase()+"."+
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
  const coverage=deriveBulkMrLocationCoverage0553();
+ const rfRoutesBySite=Object.fromEntries(deriveMR0002RfPhysicalRouteReconciliation0553().sites.map(x=>[x.site,x]));
  const working=Object.fromEntries(Object.keys(MR_TO_CUSTOMER).map(mr=>
   [mr,selectWorkingBomProjection0553({mr})]));
  const source=ORIGIN_BULK;
@@ -64,7 +66,7 @@ export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
   const expectedPriceRow=releaseModel?.a?.find(x=>x.mr===g.mr);
   const sourceComplianceGates={
    "MR-0001":["TC0001_7_8_FIRE_RATING_CLIENT_REPLY_UNVERIFIED","AFC_CABLE_END_ROUTES_AND_GLAND_OD_OPEN","SUPPLIER_INSTALLED_BULK_INCLUSION_OPEN"],
-   "MR-0002":["MGW_FORLLER_IEC60331_AND_EX_CERT_OPEN","RF_RUNS_AND_CONNECTORS_UNMEASURED","NEK_INSTALLATION_SPARE_SEPARATE_NOT_APPROVED"],
+   "MR-0002":["AFC_LAY_TCAB508_ROLE_SITE_SPECIFIC_VERIFIED","MGW_BDA_REPLACES_AFC_LNA__UPDATED_GA_BLD_EX_DEVIATION_HOLD","MGW_FORLLER_IEC60331_AND_EX_CERT_OPEN","RF_RUNS_AND_CONNECTORS_UNMEASURED","NEK_INSTALLATION_SPARE_SEPARATE_NOT_APPROVED"],
    "MR-0003":["PHONE_SOUND_DC_POE_TERMINATION_UNVERIFIED","EX_WAROM_GLAND_INCLUDED_CREDIT_AND_OD_UNVERIFIED","SPECIAL_CABLE_IF_REQUIRED_NOT_DERIVED"],
    "MR-0004":["ADAPTER_CHARGING_KIT_ONE_PER_PHASE_VENDOR_PRICE_OPEN","RACON_CONTROL_BOX_AND_PROGRAMMING_INCLUSION_OPEN","RACON_POWER_ALARM_CABLE_END_AND_EX_GLAND_UNVERIFIED"]
   }[g.mr];
@@ -81,6 +83,13 @@ export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
    mr0003SystemQty:g.mr==="MR-0003"?1:null,
    mr0004PhaseSharedQty:g.mr==="MR-0004"?1:null,
    mr0004SiteAllocatedPhaseKitQty:null,
+   afcLayoutDrawing:g.site.startsWith("ZWP2")?"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1":null,
+   afcBlockDrawing:g.site.startsWith("ZWP2")||g.site==="ZWP8"?"MM-ZTK-1F-ZWPX-TEL-BLD-0001 Rev.C1":null,
+   internalSchematic:{document:"MM-ZTK-1F-GEN-SCADA-TEL-DWG-0001 Rev00",
+    role:"INTERNAL_ENGINEERING_CROSSCHECK_ONLY",pricingAuthority:false,measuredCableLengthAuthority:false},
+   mr0002OriginalAfcLnaTag:g.mr==="MR-0002"?rfRoutesBySite[g.site]?.afcLnaEnclosureTag:null,
+   mr0002OriginalAfcSurgeTag:g.mr==="MR-0002"?rfRoutesBySite[g.site]?.afcSurgeEnclosureTag:null,
+   mr0002SelectedBdaAfcApproved:g.mr==="MR-0002"?false:null,
    itemCount:g.items.length,requiredFunctionCount:REQUIRED_ITEMS[g.mr].length,
    missingRequiredFunctionIds:missingRequired,
    knownSourceFloorTHB:pricedSourceCost,
