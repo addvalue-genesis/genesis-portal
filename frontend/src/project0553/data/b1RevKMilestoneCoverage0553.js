@@ -1,4 +1,8 @@
 import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
+// B1 PM USD600/day remains the 18-Oct NONPOSTING milestone audit proxy.
+// The 22-Oct onshore Senior700/Field600 role revision is B3/B9-scoped;
+// it must not silently rewrite B1 historical cost-source provenance.
+const B1_PM_LEGACY_PROXY_RATE_SOURCE_0553="USER_MANAGEMENT_DECISION_2026_10_18";
 // PJ2608-0553: Rev.K K00–K18 source coverage for B1 residual support. Legacy USD600 PM proxy stays audit-only; live multi-role THB planning lives in b1ProjectSupportBudget0553.js.
 // THIS IS A CHILD ALLOCATION of PM-MILESTONE, not 19 extra expense postings.
 // Each stage's physical labour/tools/travel stays with the listed A/B2–B14/C or JUTAL owner.
@@ -501,12 +505,14 @@ export const B1_REVK_MILESTONE_COVERAGE_0553=Object.freeze(B1_REVK_SOURCE_COVERA
   planningPmHours:r.stage===event.ownerStage?event.mh:null,
   budgetHoursBasis:event.reason,effortType:"CFO_PROVISIONAL_GATE_TOUCHPOINT_HOURS_NOT_REV_K_VERIFIED",
   costOwner:"B1",workingCostTHB:null,workingSellTHB:null,
-  rateSource:ONSHORE_WORKING_SELL_RATE_0553.source,
+  rateSource:B1_PM_LEGACY_PROXY_RATE_SOURCE_0553,
   rateApprovalState:ONSHORE_WORKING_SELL_RATE_0553.rateClass});
 }));
 export const B1_PM_BUDGET_ESTIMATED_HOURS_0553=B1_CFO_PM_EVENT_ESTIMATES_0553.reduce((n,x)=>n+x.mh,0);
 export const B1_ONSHORE_PM_SCENARIO_0553=Object.freeze({
   ...ONSHORE_WORKING_SELL_RATE_0553,
+  source:B1_PM_LEGACY_PROXY_RATE_SOURCE_0553,
+  applicability:"B1 PM planning/audit proxy ONLY; NOT B3 FAT or B9 Yard rate posting",
   fxTHBPerUSD:ONSHORE_WORKING_SELL_RATE_0553.thbPerUsd,
   state:"USER_APPROVED_RATE__NON_POSTING_PM_QUANTITY_SCENARIO",
   costOrSell:"APPROVED_ONSHORE_WORKING_SELL_RATE_NOT_VERIFIED_DIRECT_COST",
