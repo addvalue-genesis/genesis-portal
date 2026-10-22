@@ -13,6 +13,10 @@ export function MR0002RfRouteReconciliation0553({site}){
   <p className="p55-note"><strong>Engineering source:</strong> {data.layoutDocument}, Sheet {data.layoutSheet} locates the four TAGs, but does NOT give routed cable metres.
    BLD C1 is a functional system diagram, NOT accepted WIR/TER.
    MR0002 C1 requires a 1 Lot BULK scope per site including fire-resistant coaxial cable and grounding.</p>
+  <p className="p55-note"><strong>AFC LAY role-identity review (DO NOT SWAP TAGs):</strong>
+   {site}: <strong>{data.afcSurgeEnclosureTag}</strong> = Ex d RF SURGE; <strong>{data.afcLnaEnclosureTag}</strong> = original AFC LNA.
+   MGW Rev2 proposes RFI BDA; the AFC still depicts LNA and does not certify BDA substitution.
+   <strong> {data.engineeringChange}</strong>. Approved vendor GA, updated schematic, Ex certificate and technical deviation are pending.</p>
   <div className="p55-table-wrap p553-module-scroll">
    <table className="p55-table p55-table--compact">
     <thead><tr><th>Physical RF function / ID</th><th>From → To</th><th>AFC installed length</th><th>Budget reference installed</th><th>Budget reference buy (+15%)</th><th>Evidence / Cost Owner</th></tr></thead>
