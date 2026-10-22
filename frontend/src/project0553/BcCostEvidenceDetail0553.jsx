@@ -195,9 +195,9 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
    <div className="p55-metric-grid">
     <div><strong>Rate / Person / Day</strong><p>USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}</p><small>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")} / person-day</small></div>
     <div><strong>Yard Senior Engineer Onshore SELL Rate</strong><p>THB {workingRow.b9OnshoreRateReview.perPersonTHBPerDay.toLocaleString("en-US")}</p><small>One paid engineer only · no separately priced per diem · FAT crew billed B3</small></div>
-    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>B9 1 LS THB233,600 included in Base price; Engineer attends only on written Yard call-out; not an extra option</small></div>
+    <div><strong>Current B9 Working SELL</strong><p>{thb(workingRow.workingSellTHB)}</p><small>B9 1 LS {thb(workingRow.workingSellTHB)} included in Base price; Engineer attends only on written Yard call-out; not an extra option</small></div>
    </div>
-   <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD600/day is a selling-rate input, not internal payroll Direct Cost.</p>
+   <p className="p55-note">MGW China FAT Witness travel/personnel/insurance belong to B3 Inspection, Testing and Certification. B9 holds ONLY requested Yard specialist assistance; no B3 FAT cost may appear in B9. USD {workingRow.b9OnshoreRateReview.perPersonUSDPerDay}/day is the Senior Engineer onshore Working SELL rate; Field/standard USD600/day is not an extra B9 paid crew posting. Neither rate is verified payroll Direct Cost.</p>
   </section>}
     {e.code==="B9"&&<B3RequirementWbsTrace0553 selectedOwner="B9" navigationTarget={navigationTarget}/>}
   {e.code==="B9"&&<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} selectedOwner="B9"/>}
