@@ -65,6 +65,13 @@ export function BulkSourceToReleaseAudit0553({releaseModel=null,placement="BOM",
       {open&&<tr data-component-key={placement==="RELEASE"?id+"."+r.site.toLowerCase()+"."+r.mr.toLowerCase().replace("-","")+".requirements":r.moduleId+".requirements"}><td colSpan={7}>
        <p><strong>Requirement:</strong> {r.sourceRequirement}</p>
        {r.sourceMtoDescription&&<p><strong>Original MTO description:</strong> {r.sourceMtoDescription}</p>}
+       {r.mr==="MR-0002"&&<p><strong>AFC original LNA/RF surge TAG evidence:</strong>
+        {" "}{r.mr0002OriginalAfcLnaTag} = LNA; {r.mr0002OriginalAfcSurgeTag} = RF Surge Ex d.
+        <strong> MGW RFI BDA is a proposed change to the original AFC LNA, NOT an already-approved replacement.</strong></p>}
+       <p><strong>Drawing authority:</strong> {r.afcLayoutDrawing||"LAY does not cover this brownfield site"}
+        {" · "}{r.afcBlockDrawing||"separate drawing required"}.
+        <strong> Internal schematic {r.internalSchematic.document} is engineering crosscheck only</strong>
+        (no AFC, measured cable length, current price or vendor-acceptance authority).</p>
        <p><strong>Engineering and technical HOLD:</strong> {r.openEvidenceGates.join(" · ")}</p>
        <p><strong>Source:</strong> {r.sourceUrl?<a href={r.sourceUrl} target="_blank" rel="noopener noreferrer">{r.sourceDocument}</a>:r.sourceDocument} |
         {" "}BOM <ComponentCopyId projectId="PJ2608-0553" componentKey={r.sourceModuleId}/></p>
