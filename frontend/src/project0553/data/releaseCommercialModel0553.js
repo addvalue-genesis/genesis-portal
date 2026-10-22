@@ -8,6 +8,7 @@ import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
 import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
+import {selectSpareLifecycleReprice0553} from "./spareLifecycleReprice0553";
 
 export const RELEASE_POLICY_0553=Object.freeze({
  id:"P553-RELEASE-PRICING-R01",
@@ -127,6 +128,20 @@ const resultMoneyTHB=(line,rate)=>{
 // C1/C2: current historical-based OPTION budget reference, NOT verified OEM cost,
 // thus NOT the A/C cost-plus-30% customer price. Show reference only for internal audit.
 export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}={}){
+ // PTTEP-first repricing: no historical price lines may populate customer annex.
+ // Requirements are retained in a separate trace, not misrepresented as priced.
+ if(["B10","B11","B13","C1","C2"].includes(code)){
+  const model=selectSpareLifecycleReprice0553(),entry=model.byCode[code];
+  return Object.freeze({
+   code,sourceModuleId:entry.moduleId,rows:Object.freeze([]),
+   requirementRows:entry.rows,requirementCount:entry.rows.length,
+   selectedWorkingTHB:null,annexLineTotalTHB:null,varianceTHB:null,
+   isOption:code.startsWith("C"),pricedRows:0,totalRows:0,
+   sourceLineCoverageComplete:false,priceStatus:"PTTEP_STD_NEW_OEM_SPIR_REESTIMATE_HOLD",
+   reconciled:false,priceLabel:"NOT ESTABLISHED / NOT RELEASED",
+   customerReleaseAllowed:false,historicalPriceSeedUsed:false
+  });
+ }
  const amount=x=>typeof x==="number"&&Number.isFinite(x)?x:null;
  const isBase=["B10","B11","B13"].includes(code);
  const isOption=["C1","C2"].includes(code);
@@ -276,6 +291,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
   owner:code.startsWith("B")?b.find(x=>x.code===code):c.find(x=>x.code===code)
  })]));
  const annex=Object.fromEntries(annexCodes.map(code=>[code,annexModels[code].rows]));
+ const spareLifecycle=selectSpareLifecycleReprice0553();
  const aKnown=a.filter(x=>n(x.previewSellTHB));
  const bKnown=b.filter(x=>n(x.customerSellTHB));
  const cKnown=c.filter(x=>n(x.customerSellTHB));
@@ -299,7 +315,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  ];
  return Object.freeze({
   moduleId:"bid.budget.pricing.release",policy:RELEASE_POLICY_0553,
-  a,b,c,annex,annexModels,summary:{
+  a,b,c,annex,annexModels,spareLifecycleReprice:spareLifecycle,summary:{
    aProvisionalCostTHB:aKnown.length?aCost:null,
    aProvisionalCustomerSellTHB:aKnown.length?aPrice:null,
    aProvisionalSamTelShareTHB:aKnown.length?round(aCost*.20):null,
