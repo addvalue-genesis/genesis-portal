@@ -19,9 +19,16 @@ for(const [token,src] of [
  ["selectMR0001TagCostRows0553",aggregation],["BOM_READ_MODEL_0553",aggregation],
  ["MR0002_WORKING_BOM_0553",model],["sourceScopeQty",sourceLedger]
 ])assert(src.includes(token),"Missing active BOM data/view contract: "+token);
-const bomMount=parent.indexOf("<SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency}/>");
-assert(bomMount>=0&&bomMount<parent.indexOf("<CommercialSystemBreakdown0553"),
- "Working BOM must precede legacy breakdown and receive shared location/FX");
+// Current 10.1 passes navigator selection to the same shared Working BOM.
+// Do not use an obsolete exact-match string that omits navigation props.
+const bomMount=parent.indexOf("<SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency}");
+const legacyMount=parent.indexOf("<CommercialSystemBreakdown0553");
+assert(bomMount>=0&&legacyMount>bomMount,
+ "Working BOM must precede legacy breakdown in active 10.1");
+const selectedBom=parent.slice(bomMount,parent.indexOf("/>",bomMount)+2);
+assert(selectedBom.includes("navigationTarget={navigationTarget}")&&
+ selectedBom.includes("navigationSequence={navigationSequence}"),
+ "Working BOM must receive shared location/FX AND nested Module Navigator target");
 assert(!legacy.includes("<SimpleBom0553/>"),"No nested duplicate working BOM");
 assert(projection.includes("MR0001_WORKING_PRICED_BOM")&&projection.includes("MR0001_ENGINEERING_REQUIRED_BOM")&&projection.includes("SUPPLIER_QUOTE_LINES_0553"),
  "Working projection retains original engineering, MTO and vendor evidence");
