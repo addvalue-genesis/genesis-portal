@@ -118,7 +118,7 @@ for(const siteRf of routeAudit.sites){
  assert.equal(siteRf.donorAntennaPositionChanged,false);
  assert.equal(siteRf.serviceAntennaPositionChanged,false);
  assert.equal(siteRf.physicalRelocationSelected,false);
- assert(siteRf.engineeringChange.includes("DEVIATION_HOLD"));
+ assert(siteRf.engineeringChange.includes("CUSTOMER_CHANGE_CLOSURE_PENDING"));
  assert.equal(siteRf.circuits[0].to.split(" / ")[0],afc.lna);
  assert.equal(siteRf.circuits[1].from.split(" / ")[0],afc.lna);
  assert(siteRf.circuits.every(c=>c.originalAfcSurgeTag===afc.surge&&
