@@ -10,6 +10,7 @@ import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
 import {evaluateB2VdrlIndependentScenario0553} from "./b2IndependentVdrlRecalculation0553";
+import {selectB5B6B7LinkedLogistics0553} from "./b5B6B7LinkedLogistics0553";
 import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553,
  B1_AUDIT_KINDS_0553,b1AuditModuleId0553} from "./b1AccordionModuleIds0553";
 
@@ -182,6 +183,7 @@ export function buildBcModuleNavigator0553(){
  if(vdrl.records.length!==143||vdrl.totals.uniqueTitleTypes!==38)
   throw Error("B2 143 / 38 source register changed");
  const priceCodes=["B2","B4","B5","B6","B7","B8","B9"];
+ const logistics=selectB5B6B7LinkedLogistics0553();
  for(const code of priceCodes){
   const rootId="bid.budget.working.bc."+code.toLowerCase()+".price-trace";
   const label=bc.byCode[code].requirement;
@@ -207,6 +209,13 @@ export function buildBcModuleNavigator0553(){
    ["resource-man-hours","Positions / Man-hours / Rate and cost gaps"],
    ["source-audit","Vendor quote / historical evidence and owner audit"]
   ])entries.push(nested(rootId+"."+suffix,code+" — "+name));
+  if(logistics.rowsByCode[code]){
+   for(const work of logistics.rowsByCode[code]){
+    entries.push(nested(work.moduleId,code+" — "+work.activity,
+     "B5 B6 B7 logistics MGW Nantong JUTAL ADR-68 "+work.mr+" "+work.cargoId+
+     " source vendor quoted cost quantity rate packing freight storage no double count"));
+   }
+  }
   if(code==="B2"){
    for(const mr of ["MR-0001","MR-0002","MR-0003","MR-0004"]){
     entries.push(nested(rootId+".vdrl."+mr.toLowerCase(),
