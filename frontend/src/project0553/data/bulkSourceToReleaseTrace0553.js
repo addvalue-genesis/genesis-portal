@@ -6,6 +6,7 @@ import {deriveBulkMrLocationCoverage0553} from "./bulkMrLocationCoverage0553";
 import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
 import {MGW_P26_058_R2_SELECTED_0553 as MGW} from "./mgwP26058R2Selected0553";
 import {deriveMR0002RfPhysicalRouteReconciliation0553} from "./mr0002RfPhysicalRouteReconciliation0553";
+import {derivePhysicalCableEndRegister0553} from "./physicalCableEndRegister0553";
 
 const MR_TO_CUSTOMER=Object.freeze({"MR-0001":"A1","MR-0002":"A2","MR-0003":"A3","MR-0004":"A4"});
 const SOURCE_REFS=Object.freeze({
@@ -38,6 +39,7 @@ const normativeId=(group)=>"bid.budget.bom."+group.site.toLowerCase()+"."+
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
  const coverage=deriveBulkMrLocationCoverage0553();
+ const cableEnds=derivePhysicalCableEndRegister0553();
  const rfRoutesBySite=Object.fromEntries(deriveMR0002RfPhysicalRouteReconciliation0553().sites.map(x=>[x.site,x]));
  const working=Object.fromEntries(Object.keys(MR_TO_CUSTOMER).map(mr=>
   [mr,selectWorkingBomProjection0553({mr})]));
@@ -90,6 +92,11 @@ export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
    mr0002OriginalAfcLnaTag:g.mr==="MR-0002"?rfRoutesBySite[g.site]?.afcLnaEnclosureTag:null,
    mr0002OriginalAfcSurgeTag:g.mr==="MR-0002"?rfRoutesBySite[g.site]?.afcSurgeEnclosureTag:null,
    mr0002SelectedBdaAfcApproved:g.mr==="MR-0002"?false:null,
+   physicalCableEndModuleId:"bid.budget.bom.physical-cable-end-register",
+   functionalCableEndCandidates:cableEnds.lines.filter(x=>x.site===g.site&&x.mr===g.mr).length,
+   bdaDeviationSource:g.mr==="MR-0002"?"5-Deviation List Rev00.xlsx / row 13":null,
+   bdaDeviationOpen:g.mr==="MR-0002"?true:null,
+   proposedServiceAntennaElevationM:g.mr==="MR-0002"?18.3:null,
    itemCount:g.items.length,requiredFunctionCount:REQUIRED_ITEMS[g.mr].length,
    missingRequiredFunctionIds:missingRequired,
    knownSourceFloorTHB:pricedSourceCost,
@@ -134,6 +141,8 @@ export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
    site:x.platform,row:x.sourceRowIndex,qty:x.sourceQty,unit:x.sourceUnit
   })),
   groups,sourceMR0004PhaseKitQty:1,sourceMR0004PhaseKitSitePurchaseQty:null,
+  physicalCableEndModuleId:cableEnds.modelId,
+  totalFunctionalCandidates:cableEnds.registeredFunctionalCandidates,
   originalA5PartialTHB:coverage.originalA5BookedTHB,
   additionalPostingTHB:0,workingSellChanged:false,releasePriceChanged:false,
   fullMaterialQuantityPriceReady:false,sourceToReleaseReady:false,releaseAllowed:false,
