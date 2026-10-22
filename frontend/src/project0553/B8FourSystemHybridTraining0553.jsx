@@ -11,9 +11,9 @@ export function B8FourSystemHybridTraining0553({workingRow}){
  return <section ref={holder} className="p55-panel p553-bc-price-trace p553-bc-price-trace--services p553-b8-hybrid"
   data-component-key={m.moduleId} style={{padding:12,marginTop:10}}>
   <div className="p553-bc-price-head">
-   <div><h4>B8 — Onsite Practical Training + Remote Manufacturer Instructor</h4>
+   <div><h4>B8 — ADDVALUE Onsite Training + Provisional OEM Remote Support</h4>
     <p className="p55-note">{copy(m.moduleId)} · 4 systems / 8 customer trainees / 2 training days.
-     Selected HYBRID working estimate; no direct payroll cost or signed OEM quote.</p></div>
+     ADDVALUE-led HYBRID Budgetary Working SELL · Manufacturer online specialist time and RFI/RACON demo setups are UNQUOTED allowances, not verified Direct COST.</p></div>
    <div className="p553-bc-main-actions">
     <button type="button" className="p553-detail-button" onClick={()=>toggleAll(true)}>＋ Expand All</button>
     <button type="button" className="p553-detail-button" onClick={()=>toggleAll(false)}>− Collapse All</button></div>
@@ -25,12 +25,20 @@ export function B8FourSystemHybridTraining0553({workingRow}){
     <small>Four disciplines · four half-day live sessions (16 contact hours)</small></div>
    <div><strong>Onsite ADDVALUE Resource</strong><p>1 Senior Telecom Engineer</p>
     <small>2 training days + 1 preparation day at USD700/MD; NO separate travel-day labour</small></div>
-   <div><strong>OEM Teaching</strong><p>Online · Pending Confirmation</p>
-    <small>Four remote instructors/sessions · USD400/session parametric allowance, NOT vendor quote</small></div>
+   <div><strong>OEM Technical Support</strong><p>Online · Budgetary Only</p>
+    <small>Four manufacturer discipline support sessions · USD400/session estimated; ADDVALUE owns onsite instruction</small></div>
   </div>
   <p className="p55-note"><strong>Working venue:</strong> {m.assumedBudgetaryVenue}.
    Physical classroom, live equipment demonstrations, test access and an ADDVALUE engineer MUST be onsite.
-   OEM lecturer may deliver theoretical content and Q&amp;A remotely. B8 shares the MGW FAT trip booked to B3; no additional B8 flight, lodging, visa, insurance or travel-day labour. Physical onsite Senior training 2 person-days remain selected provisionally until non-overlapping B3 FAT hours/role owner are confirmed; B9 Yard attendance is separate.</p>
+   OEM expert may support theory / configuration Q&amp;A remotely, subject to availability and quote. B8 shares the MGW FAT trip booked to B3; no additional B8 flight, lodging, visa, insurance or travel-day labour. Physical onsite Senior training 2 person-days remain selected provisionally until non-overlapping B3 FAT hours/role owner are confirmed; B9 Yard attendance is separate.</p>
+  <p className="p55-note"><strong>Budgetary instructor and practical test assumptions:</strong>
+   ADDVALUE is responsible for customer-facing onsite delivery. MR0002/RFI BDA
+   RF demonstration reserve {money(15000)} and MR0004/RACON programming/interface
+   reserve {money(5000)} are additional <strong>temporary training setups</strong>,
+   not purchases or customer-delivered special tools. The MDS QTORG2609244
+   ORGA quote is an alternate; its included programming cable / no-special-tools
+   statement does not establish MGW Tideland inclusions. Both allowances
+   and all OEM remote support fees remain unquoted.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Day / Timebox</th><th>MR / System</th><th>Audience</th><th>Onsite Delivery</th><th>OEM Instructor</th></tr></thead>
    <tbody>{m.systems.map(x=><tr key={x.mr}>
@@ -38,7 +46,7 @@ export function B8FourSystemHybridTraining0553({workingRow}){
     <td><strong>{x.mr}</strong> · {x.name}</td>
     <td>8 purchaser/end-user attendees (same cohort)</td>
     <td>ADDVALUE Sr Engineer — demonstration, hands-on, attendance and assessment</td>
-    <td>Manufacturer online · awaiting quotation and availability</td>
+    <td>ADDVALUE-led practical / OEM online specialist assistance allowance, awaiting vendor confirmation</td>
    </tr>)}</tbody>
    <tfoot><tr><th colSpan={4}>Four systems / total classroom training 2 days × 8 attendees</th>
     <th>16 contact hours · no fourfold multiplication of days</th></tr></tfoot>
@@ -74,7 +82,7 @@ export function B8FourSystemHybridTraining0553({workingRow}){
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Source-to-Release & Reconciliation</th><th>THB</th><th>Status</th></tr></thead>
    <tbody><tr><th>B8 source → WS-B8 · ONE LS</th><th>{money(m.selectedWorkingSellTHB)}</th>
-    <td>Selected Working SELL, quoted OEM & Direct COST not verified</td></tr>
+    <td>Selected Budgetary Working SELL · OEM support and actual Direct COST unverified</td></tr>
     <tr><td>10.3 CP-B8 / 10.5 SOW-B8 preview</td><td>{money(m.selectedWorkingSellTHB)}</td>
      <td>Same canonical source; Customer Release HOLD</td></tr>
     <tr><td>Old Rev05 B8 training WBS / 44 MH</td><td>{money(m.originalRev05WorkingSellReferenceTHB)}</td>
