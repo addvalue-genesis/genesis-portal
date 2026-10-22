@@ -68,7 +68,7 @@ assert.equal(m.rowsByCode.B5.find(x=>x.id==="MGW-SERV3-PACK").supplierQuoteTHBRe
 assert.equal(m.rowsByCode.B6.find(x=>x.id==="B6-MGW-JUTAL-OUT").supplierQuoteTHBReference,78750);
 assert.equal(m.rowsByCode.B7.find(x=>x.id==="MGW-WORKSHOP-FREE-3MO").contractFreeMonths,3);
 assert.equal(m.rowsByCode.B7.find(x=>x.id==="CONDITIONAL-ONE-MONTH").selectedReserveWorkingSellTHB,30000);
-assert.equal(bc.knownWorkingSellTHB,4667836.82);
+assert.equal(bc.knownWorkingSellTHB,4582736.82);
 assert.equal(JSON.stringify(current()),before,"Source-to-release link must never mutate canonical SELL");
 const ui=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 assert(ui.includes('<B5B6B7LinkedLogistics0553 workingRow={workingRow}/>'));

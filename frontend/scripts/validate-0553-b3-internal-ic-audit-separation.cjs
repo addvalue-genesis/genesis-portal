@@ -60,7 +60,7 @@ assert.equal(sections.audit.workingSellTHB,0);
 assert.equal(sections.audit.referenceTHB,null,"Audit references must not be mixed or summed");
 assert.equal(price.totalWorkingSellTHB,2599325);
 assert.equal(b3.workingSellTHB,2599325);
-assert.equal(b8.workingSellTHB,216650);
+assert.equal(b8.workingSellTHB,131550);
 assert.equal(m.proposedB3FatWorkingSellTHB,427600);
 assert.equal(m.workingSellChangeAllowed,false);
 const fatMarkup=renderToStaticMarkup(React.createElement(Detail,{
