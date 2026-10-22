@@ -724,3 +724,31 @@
 .p553-dashboard .p553-changes-impact--none{color:#516c7b}
 .p553-dashboard .p553-changes-impact--changed{color:#905719}
 @media(max-width:720px){.p553-dashboard .p553-changes-actions{width:100%}.p553-dashboard .p553-changes-title h3{font-size:15px}}
+
+/* PJ2608-0553 — B3 work-type grouped Source→Release accordion.
+   Colours signify FUNCTION, not commercial approval. Subgroups retain all old Module IDs. */
+.p553-b3-resource-dossier .p553-b3-dossier-rollup{--b3-accent:#2666a1;--b3-tint:#edf5fe;
+ margin:10px 0;border:1px solid #c9dae8;border-left:5px solid var(--b3-accent);
+ border-radius:9px;background:#fff;overflow:hidden}
+.p553-b3-resource-dossier .p553-b3-dossier-rollup--fat{--b3-accent:#2666a1;--b3-tint:#edf5fe}
+.p553-b3-resource-dossier .p553-b3-dossier-rollup--survey{--b3-accent:#178179;--b3-tint:#eaf8f3}
+.p553-b3-resource-dossier .p553-b3-dossier-rollup--sat{--b3-accent:#aa641a;--b3-tint:#fff6e9}
+.p553-b3-resource-dossier .p553-b3-dossier-rollup--tools{--b3-accent:#6651a5;--b3-tint:#f4f1fc}
+.p553-b3-resource-dossier .p553-b3-rollup-summary{display:flex;align-items:center;flex-wrap:wrap;
+ gap:10px;padding:12px;background:var(--b3-tint);cursor:pointer;list-style:none}
+.p553-b3-resource-dossier .p553-b3-rollup-summary::-webkit-details-marker{display:none}
+.p553-b3-resource-dossier .p553-b3-rollup-summary::before{content:"＋";min-width:24px;
+ border:1px solid var(--b3-accent);border-radius:5px;text-align:center;color:var(--b3-accent);font-weight:800}
+.p553-b3-resource-dossier .p553-b3-dossier-rollup[open]>.p553-b3-rollup-summary::before{content:"−"}
+.p553-b3-resource-dossier .p553-b3-rollup-code{font-weight:800;color:var(--b3-accent);font-size:12px}
+.p553-b3-resource-dossier .p553-b3-rollup-heading{display:flex;flex:1 1 270px;flex-direction:column;gap:3px;min-width:160px}
+.p553-b3-resource-dossier .p553-b3-rollup-heading strong{font-size:14px;color:#283b50}
+.p553-b3-resource-dossier .p553-b3-rollup-heading small{font-size:11px;color:#4f6575}
+.p553-b3-resource-dossier .p553-b3-rollup-heading code{font-size:10px;overflow-wrap:anywhere;color:#526c81}
+.p553-b3-resource-dossier .p553-b3-rollup-price{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.p553-b3-resource-dossier .p553-b3-rollup-price strong{font-size:16px;color:var(--b3-accent);white-space:nowrap}
+.p553-b3-resource-dossier .p553-b3-rollup-price small{font-size:10px;color:#4c6573}
+.p553-b3-resource-dossier .p553-b3-rollup-body{padding:10px;display:grid;gap:8px}
+.p553-b3-resource-dossier .p553-b3-dossier-group{margin:3px 0;border-left:3px solid var(--b3-accent)}
+.p553-b3-resource-dossier .p553-b3-group-trace-table{min-width:800px}
+@media(max-width:700px){.p553-b3-resource-dossier .p553-b3-rollup-price{align-items:flex-start;width:100%}}
