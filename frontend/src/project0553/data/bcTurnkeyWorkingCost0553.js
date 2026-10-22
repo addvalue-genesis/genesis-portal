@@ -225,7 +225,7 @@ export function selectBcTurnkeyWorkingCost0553(){
     conditionalYardWorkingSellTHB:chinaB9.conditionalYardSellTHB,
     perDiemIncluded:false,travelIncluded:false,accommodationIncluded:false,visaIncluded:false,
     costOwner:"B9",releaseAllowed:false,
-    pricingGate:"B9 1 LS THB233600 included in customer Base Working SELL, but deployment remains conditional on written call-out. MGW FAT Witness remains B3."
+    pricingGate:"B9 1 LS THB261950 included in customer Base Working SELL, but deployment remains conditional on written call-out. MGW FAT Witness remains B3."
    }):null,
    b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b10WorkingSellDecision:code==="B10"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b10WorkingSellTHB,source:"4-Scope of Supply.xlsx · Rev08 · B10",historicalUSD:b10HistoricalUSD,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"WORKING_SELL_ONLY"}):null,
@@ -287,7 +287,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   return sum+item.workingSellTHB;
  },0));
  if(Math.abs(knownWorkingSellTHB-expectedCurrentBaseTHB)>0.01 ||
-    knownWorkingSellTHB!==4209036.82 ||
+    knownWorkingSellTHB!==4262586.82 ||
     rows.find(x=>x.code==="B2")?.workingSellTHB!==b2CurrentSellTHB ||
     b1Current.baseWorkingSellTHB!==211600 ||
     b1Current.historicalEngineeringCarryForwardTHB!==0 ||
