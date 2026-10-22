@@ -45,7 +45,9 @@ assert(html.includes("B1.1")&&html.includes("B1.8"),
 assert(html.includes('data-component-key="bid.budget.working.bc.b1.account.b1-1"'),
  "B1 nested source group must be mounted in initial ALL mode");
 assert(html.includes("THB 211,600.00"));
-assert(html.includes("THB 2,750,525.00"));
+assert(html.includes("THB 2,397,725.00"));
+assert.equal(canonical.byCode.B3.b3FortyDayBudget.workdays,40,
+ "Old 40-day/80MD pricing source must remain available for audit only");
 assert(html.includes('data-component-key="bid.budget.working.bc.b1.audit.cost-lines-view"'),
  "B1 shared work cost lines must be nested in the owner audit with unique presentation ID");
 assert(!html.includes('data-component-key="bid.budget.working.bc.b3.site-mr-sat-matrix"'),
@@ -67,4 +69,4 @@ assert(ws.includes('if(bcTab==="ALL"){setBcTab(owner);setBcDetailCode(owner);ret
  "Navigator must select owner before resolving collapsed nested Module IDs");
 assert.equal(JSON.stringify(cost()),snapshot,
  "16 B/C work-type accordion changed canonical cost/Working SELL/ownership");
-console.log("PASS 10.2 B/C 16-owner color-coded hierarchical accordion: B1.1–B1.8 visible by default, 16 copyable IDs, unique shared cost-line view, B1 211,600, B3 2,750,525 and Part B 4,385,436.82 preserved.");
+console.log("PASS 10.2 B/C 16-owner color-coded hierarchical accordion: B1.1–B1.8 visible by default, 16 copyable IDs, unique shared cost-line view, B1 211,600, B3 2,397,725 selected SAT28/BF5 and Part B 4,032,636.82; legacy 40d audit preserved.");
