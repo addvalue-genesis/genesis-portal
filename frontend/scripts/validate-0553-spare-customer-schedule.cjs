@@ -21,7 +21,12 @@ const x=selectSpareCustomerSchedule0553(),cov=selectSpareCoverageEngineering0553
 const codes=["B10","B11","B13","C1","C2"];
 assert.deepEqual(x.codes,codes);
 assert.deepEqual(cov.categoryCodes,codes);
-assert.equal(x.rows.length,31);
+assert.equal(x.rows.length,31); // immutable historical audit count, NOT current price rows
+assert.equal(x.currentCandidateRows.length,50);
+assert.equal(new Set(x.currentCandidateRows.map(r=>r.id)).size,50);
+assert.deepEqual(["B10","B11","B13","C1","C2"].map(code=>x.currentByCode[code].length),[30,7,5,4,4]);
+assert(x.currentCandidateRows.every(r=>r.currentWorkingSellTHB===null&&r.currentRequiredQty===null&&r.oemSparePartNumber===null));
+assert.equal(x.currentDocumentControl.totalContractKits,14);
 assert.equal(x.b11Requirements.rows.length,5,"EXA-A8 minimum Phase 1F telecom tools missing");
 assert(x.b11Requirements.rows.some(r=>r.description.includes("TETRA voice gateway")&&r.compatibilityGate.includes("TETRA_GATEWAY_SCOPE_VS_SELECTED_DMR")),"Never silently equate TETRA gateway with selected DMR");
 assert(x.b11Requirements.rows.every(r=>r.qty===1&&r.budgetAllocationTHB===null&&!r.pricePostingAllowed));
@@ -49,9 +54,9 @@ assert.equal(x.summary.B11.workingReferenceTHB,128314.11);
 assert.equal(x.summary.B13.workingReferenceTHB,22484.21);
 assert.equal(x.summary.C1.workingReferenceTHB,4049349.36);
 assert.equal(x.summary.C2.workingReferenceTHB,721806.68);
-assert.equal(bc.byCode.B11.workingSellTHB,128314.11,"Current B11 management budgetary working sell; OEM direct cost and inclusion remain unverified");
+assert.equal(bc.byCode.B11.workingSellTHB,null,"Current B11 OEM price not yet independently established");
 for(const code of ["B10","B13","C1","C2"])
- assert.equal(bc.byCode[code].workingSellTHB,x.summary[code].workingReferenceTHB);
+ assert.equal(bc.byCode[code].workingSellTHB,null);
 assert.equal(bc.knownWorkingSellTHB,4602736.82,"Current Part B Base includes B2 131-WO, MGW Purchased FAT and B9 quoted Base once; Rev08 spare lines remain audit");
 assert.equal(x.riskCandidates.length,1);
 assert(x.crossCategoryDuplicates.some(z=>z.family==="SCADA_POE"&&z.categories.includes("B10")&&z.categories.includes("C2")),"B10-C2 PoE overlap must be flagged for stock-quantity reconciliation");
