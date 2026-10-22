@@ -9,7 +9,7 @@ const c=id=><ComponentCopyId projectId="PJ2608-0553" componentKey={id}/>;
 export function B3ResourcePriceDossier0553({workingRow}){
  const model=selectB3ResourcePriceDossier0553(workingRow);
  const holder=React.useRef(null);
- const expandAll=open=>holder.current?.querySelectorAll("details.p553-b3-dossier-group,details.p553-b3-dossier-site")
+ const expandAll=open=>holder.current?.querySelectorAll("details.p553-b3-dossier-rollup,details.p553-b3-dossier-group,details.p553-b3-dossier-site")
   .forEach(x=>{x.open=open;});
  return <section ref={holder} className="p55-panel p553-b2-recalc p553-b3-resource-dossier"
   data-component-key={root} style={{padding:12,marginTop:12}}>
@@ -63,7 +63,37 @@ export function B3ResourcePriceDossier0553({workingRow}){
    Supplier Quotation แสดงราคาซื้อก่อนบวก 20%+5%+5% (เฉพาะ MGW);
    Actual Direct Cost ที่ยังไม่มีใบจ่าย/Payroll ให้แสดง NOT ESTABLISHED ไม่ตีว่าเป็นศูนย์.
    Site/MR Test IDs ไม่ใช่รายการราคาซ้ำ.</p>
-  {model.groups.map((g,i)=>{
+  <h4>B3 — Grouped Work Type / Source-to-Release (10.2 → 10.3 → 10.5)</h4>
+  <p className="p55-note">Select a colour-coded Work Type to drill down into Site → MR/Activity → Role × Days × Rate.
+   Prices in these four headers are an attribution of the SAME WS-B3 1 LS amount, NOT four new customer quotation lines.
+   Conditional BF execution and all additional unpriced GF Yard/Offshore work remain under HOLD.</p>
+  {model.groupRollups.map((rollup,k)=><details key={rollup.id}
+   className={"p553-b3-dossier-rollup p553-b3-dossier-rollup--"+rollup.tone}
+   data-component-key={rollup.id}>
+   <summary className="p553-b3-rollup-summary">
+    <span className="p553-b3-rollup-code">B3.G{k+1}</span>
+    <span className="p553-b3-rollup-heading"><strong>{rollup.name}</strong>
+     <small>{rollup.sourceRowCount} source detail rows · {rollup.state}</small>
+     <code>{rollup.id}</code></span>
+    <span className="p553-b3-rollup-price"><strong>{cash(rollup.selectedWorkingSellTHB)}</strong>
+     <small>INCLUDED ONCE · Working SELL</small></span>
+    {c(rollup.id)}
+   </summary>
+   <div className="p553-b3-rollup-body">
+    <div className="p55-table-wrap"><table className="p55-table p55-table--compact p553-b3-group-trace-table">
+     <thead><tr><th>10.2 · Source → WS-B3</th><th>10.3 · Budget / Release Preview</th>
+      <th>10.5 · Scope of Supply</th><th>Direct Cost / Approval</th></tr></thead>
+     <tbody><tr>
+      <td><strong>{cash(rollup.selectedWorkingSellTHB)}</strong><small>{rollup.workingSellId} · Qty 1 group attribution ONLY</small></td>
+      <td><strong>{cash(rollup.selectedWorkingSellTHB)}</strong>
+       <small>{rollup.receiver10_3} · CP-B3 HOLD · not additive</small></td>
+      <td><strong>{cash(rollup.selectedWorkingSellTHB)}</strong>
+       <small>{rollup.receiver10_5} · SOW-B3 1 LS · not a new line</small></td>
+      <td>NOT ESTABLISHED<small>{rollup.approval}</small><small>Customer Release NOT ISSUED</small></td>
+     </tr></tbody>
+    </table></div>
+   {rollup.sourceStageIndices.map(i=>{
+   const g=model.groups[i];
    const gid=root+".group."+String(i+1).padStart(2,"0");
    const active=i<5;
    const surveyConditional=i===4;
@@ -166,7 +196,12 @@ export function B3ResourcePriceDossier0553({workingRow}){
       ADDVALUE crew, mobilization, vessel/POB and RF/RACON support require separate priced evidence and signed RACI.</p>}
     </div>
    </details>;
-  })}
+  })}</div>
+  </details>)}
+  <p className="p55-note"><strong>Group Source-to-Release parity:</strong>
+    FAT + SITE SURVEY + SAT / COMMISSIONING + TOOLS = {cash(model.rollupTotalTHB)} =
+    WS-B3 selected source. 10.3 Customer Preview and 10.5 SOW-B3 derive from that same owner.
+    10.3/10.5 do not count the four groups as independent customer rows.</p>
   <h4>SAT Risk / Management Reserve — separate NONPOSTING references</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Reserve class</th><th>Team-days</th><th>Crew</th><th>Person-days</th><th>Illustrative SELL-only reference THB</th><th>Selected / cost status</th></tr></thead>
