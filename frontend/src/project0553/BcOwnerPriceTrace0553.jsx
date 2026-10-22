@@ -433,8 +433,12 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
    </div>
   </div>
   {code==="B8"&&<B8FourSystemHybridTraining0553 workingRow={workingRow}/>}
-  {code==="B8"&&<B3B8SevenDayAllocation0553
-   b3={selectBcTurnkeyWorkingCost0553().byCode.B3} b8={workingRow} owner="B8"/>}
+  {code==="B8"&&<details className="p55-panel p553-b8-superseded-fat-audit" style={{padding:10,marginTop:12}}>
+   <summary><strong>SUPERSEDED B3/B8 Seven-day FAT + Training Scenario — Audit Only</strong>
+    <small>Earlier two training MD allocation is not the selected four-system, eight-trainee hybrid B8 price</small></summary>
+   <B3B8SevenDayAllocation0553
+    b3={selectBcTurnkeyWorkingCost0553().byCode.B3} b8={workingRow} owner="B8"/>
+  </details>}
   {code==="B2"&&<B2IndependentVdrlRecalculation0553 workingRow={workingRow}/>}
   {code==="B2"&&<details className="p55-panel p553-b2-legacy-price-reference"
    data-component-key="bid.budget.working.bc.b2.quote-comparison"
