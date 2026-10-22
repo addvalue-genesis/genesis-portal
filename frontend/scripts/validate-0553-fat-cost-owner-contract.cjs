@@ -54,7 +54,7 @@ const accordion=jsx("B3WorkTypeAccordion0553.jsx");
 const ownerDetail=jsx("B9ChinaBudgetDetail0553.jsx");
 assert(ui.includes('e.code==="B3"&&<B3WorkTypeAccordion0553 workingRow={workingRow}'),
  "B3 canonical owner must mount the nested FAT/SAT accordion");
-assert(accordion.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell}/>'),
+assert(accordion.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell} workingRow={workingRow}/>'),
  "B3.1 China FAT witness must filter B3-owned expense rows via the nested accordion");
 assert(accordion.includes('<B3RequirementWbsTrace0553 selectedOwner="B3"'),
  "B3 contract requirements must retain B3 ownership in the crosswalk");
@@ -64,10 +64,12 @@ assert(ui.includes('<B9ChinaBudgetDetail0553 budget={workingRow.b9ChinaBudget} s
 assert(ownerDetail.includes('owner=isFat?"B3":"B9"')&&
  ownerDetail.includes('rows=budget.rows.filter(x=>x.costOwner===owner)'),
  "Shared FAT/Yard expense detail must filter source records by the selected owner");
-assert(ownerDetail.includes("2046000+total+purchasedFatSell")&&
- ownerDetail.includes("selectedIncrementalWorkingSellTHB"),
- "FAT detail must include the already-purchased MGW service ONLY in its full B3 rollup");
-assert(ownerDetail.includes("purchasedServices?")&&
+assert(ownerDetail.includes('workingRow?.code==="B3"')&&
+ ownerDetail.includes("workingRow.workingSellTHB")&&
+ ownerDetail.includes("selectedIncrementalWorkingSellTHB")&&
+ !ownerDetail.includes("2046000+total+purchasedFatSell"),
+ "FAT detail FULL B3 must read canonical WS-B3 and never use historical 40-day base");
+assert(ownerDetail.includes("purchasedServices?.selectedIncrementalWorkingSellTHB")&&
  ownerDetail.includes("vendorPurchasedQuoteUSD!==7500"),
  "FAT detail must distinguish MGW quoted supplier cost from the ADDVALUE witness amount");
 console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB422600), B9 Yard conditional THB261950; B9 1 LS in Base; Actual Direct COST unverified and non-posting.");
