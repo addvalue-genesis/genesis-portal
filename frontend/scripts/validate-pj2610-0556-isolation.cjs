@@ -1,0 +1,35 @@
+const fs=require("node:fs"),path=require("node:path"),assert=require("node:assert/strict");
+const root=path.resolve(__dirname,"../src"),read=p=>fs.readFileSync(path.join(root,p),"utf8");
+const d=JSON.parse(read("project0556/data/project0556.json"));
+assert.equal(d.projectId,"PJ2610-0556");
+assert.equal(d.project.durationMonths,60);
+assert.equal(d.sites.length,2);
+assert.equal(d.releaseAllowed,false);
+assert.equal(d.issuePermission,false);
+assert.equal(d.costs.lines.length,0);
+for(const k of ["capexTotal","opex60Months","workingSell","budgetarySell","releaseSell"])assert.equal(d.costs[k],null);
+const app=read("App.jsx");
+assert.match(app,/path="\/projects\/pj2610-0556"/);
+assert.match(app,/path="\/projects\/pj2608-0553"/);
+assert.match(app,/path="\/projects\/pj2608-0550"/);
+const page=read("pages/PJ26080556.jsx");
+assert.match(page,/ProjectWorkspaceShell/);
+assert.match(page,/CommercialWorkspace0556/);
+const dir=path.join(root,"project0556"),files=[];
+const walk=p=>{for(const x of fs.readdirSync(p,{withFileTypes:true})){const f=path.join(p,x.name);if(x.isDirectory()){if(x.name==="_ui_master_reference")continue;walk(f);}else if(/\.(js|jsx)$/.test(f))files.push(f);}};
+walk(dir);
+for(const f of files){
+ const s=fs.readFileSync(f,"utf8");
+ assert.doesNotMatch(s,/from\s*["'][^"']*(project0550|project0553)[\/\\]/,"Old project data import: "+f);
+ assert.doesNotMatch(s,/\b(getProject0553Dataset|PROJECT_0553_FACTS|selectBcTurnkeyWorkingCost0553)\b/,"Old project cost import: "+f);
+}
+const nav=read("project0556/lifecycleNavigation.js"),budget=read("project0556/moduleRegistry.js");
+for(const code of ["BID-GOV","BID-FPR","BID-ARC","BID-REQ","BID-ENG-SCH","BID-EXE","BID-VEN","BID-RSK","BID-DAT","BID-BUD"])assert.ok(nav.includes(code),"missing tab "+code);
+for(const i of ["10.1","10.2","10.3","10.4","10.5","10.6","10.7"])assert.ok(budget.includes('"'+i+'"'),"missing budget section "+i);
+const budgetUi=read("project0556/CommercialWorkspace0556.jsx");
+assert.match(budgetUi,/NOT ESTABLISHED/);
+assert.match(budgetUi,/disabled type="button"/);
+const styles=read("project0556/project0556.css");
+assert.match(styles,/p556-dashboard/);
+assert.doesNotMatch(styles,/\.p553-dashboard/);
+console.log("PASS PJ2610-0556 — TOR-only data, route, 10-tab UI, 10.1-10.7, project cost isolation, release gate");
