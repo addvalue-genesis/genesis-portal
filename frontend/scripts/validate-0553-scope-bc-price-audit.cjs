@@ -33,15 +33,15 @@ for(const code of codes){
  assert.equal(a.directCostTHB,null,"No Rev08 amount may be posted as current cost "+code);
  // Working SELL budget approvals in 10.2 are distinct from historical source
  // and do not constitute direct COST or customer-released quotation.
- const budgetSell={B10:123024.37,B11:128314.11,B13:22484.21,C1:4049349.36,C2:721806.68};
+ const budgetSell={B10:null,B11:null,B13:null,C1:null,C2:null};
  if(Object.hasOwn(budgetSell,code)){
   assert.equal(a.workingSellTHB,budgetSell[code],code+" approved pre-award budgetary working sell");
-  assert.equal(b.unifiedSpareBudget?.pricingClass,"BUDGETARY_WORKING_SELL");
+  assert.equal(b.unifiedSpareBudget?.pricingClass,"PTTEP_OEM_NEW_PRICE_REQUIRED");
   assert.equal(b.unifiedSpareBudget?.verifiedDirectCost,false);
   assert.equal(b.unifiedSpareBudget?.releaseAllowed,false);
   if(code==="B11"){
-   assert.equal(b.b11VendorFollowup?.status,"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING");
-   assert.equal(b.b11VendorFollowup?.amountTHB,128314.11);
+   assert.equal(b.b11VendorFollowup?.status,"NEW_OEM_TOOL_SPIR_PRICE_REQUIRED");
+   assert.equal(b.b11VendorFollowup?.amountTHB,null);
    assert.equal(b.b11VendorFollowup?.verifiedDirectCost,false);
    assert.equal(b.b11VendorFollowup?.releaseAllowed,false);
    assert.equal(a.directCostTHB,null,"B11 OEM tool quotation/inclusion not yet verified");
@@ -123,4 +123,4 @@ for(const file of ["project0553/ScopeSheetsDetail0553.jsx","project0553/ScopeBcA
  }).code;
  assert(compiled?.length>0,"JSX compile failed "+file);
 }
-console.log("PASS 0553 10.2->10.5 Scope B10/B11/B13/B14/C1/C2: B11 THB128314.11 selected budgetary WORKING SELL (not verified Direct Cost, not released quote); 6 Rev08 historical references, 31 child rows, B14 unpriced, current-owner trace and Module ID links.");
+console.log("PASS 0553 10.2->10.5 Scope B10/B11/B13/C1/C2 new PTTEP OEM prices NULL, historical references isolated from active current scope, B14 unpriced.");
