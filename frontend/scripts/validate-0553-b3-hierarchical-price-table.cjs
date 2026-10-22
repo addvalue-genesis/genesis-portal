@@ -1,5 +1,5 @@
 // B3 10.2 / hierarchical TABLE; MGW supplier quote, old FAT, and audit are
-// nonposting REFERENCES. Only FAT witness, offshore SAT labour and VeEX are SELL.
+// nonposting REFERENCES. FAT witness, SAT28, selected BF Survey5 and VeEX are SELL.
 const assert=require("node:assert/strict"),path=require("node:path"),fs=require("node:fs");
 const babel=require("@babel/core"),React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
 const root=path.resolve(__dirname,"../src"),oldJS=require.extensions[".js"],oldJSX=require.extensions[".jsx"];
@@ -31,11 +31,11 @@ assert.equal(m.supplierFatReferenceTHB,236250);
 assert.equal(m.verifiedDirectCostTHB,null);
 assert.equal(m.customerReleaseAllowed,false);
 const rows=m.groups.flatMap(x=>x.items);
-assert.equal(rows.length,11);
-assert.deepEqual(m.groups.map(x=>x.items.length),[2,2,2,5],
+assert.equal(rows.length,12);
+assert.deepEqual(m.groups.map(x=>x.items.length),[2,3,2,5],
  "B3.1 must have ONLY supplier evidence + current WS; historical & scenario belong to B3.4 audit");
-assert.equal(new Set(rows.map(x=>x.moduleId)).size,11);
-assert.equal(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length,4);
+assert.equal(new Set(rows.map(x=>x.moduleId)).size,12);
+assert.equal(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length,5);
 assert.equal(round(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass))
  .reduce((n,x)=>n+x.workingSellTHB,0)),2397725);
 for(const r of rows){
@@ -106,4 +106,4 @@ for(const row of m.groups){
   "Navigator missing child "+child.moduleId);
 }
 assert.equal(JSON.stringify(working()),snapshot,"B3 price summary UI changed 10.2 sources");
-console.log("PASS 0553 B3 priced HIERARCHY TABLE / historical + scenario in B3.4 Audit only: FAT 704525 (= MGW 307125 + Witness 397400) + SAT 1411200 + Survey 252000 + tools 30000 + audit NONPOST = 2397725; purchased MGW USD7500/THB236250 at 20+5+5 into selected THB307125; historical Bangkok THB144000, audit mirror THB2750525 all NONADDITIVE. 4 parent + 10 child IDs; same table columns; no cost mutation.");
+console.log("PASS 0553 B3 priced HIERARCHY TABLE / historical + scenario in B3.4 Audit only: FAT 704525 (= MGW 307125 + Witness 397400) + SAT 1411200 + Survey 252000 + tools 30000 + audit NONPOST = 2397725; purchased MGW USD7500/THB236250 at 20+5+5 into selected THB307125; historical Bangkok THB144000, audit mirror THB2750525 all NONADDITIVE. 4 parent + 12 child IDs; same table columns; no cost mutation.");
