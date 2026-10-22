@@ -123,7 +123,7 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
     <B3SurveySatExecutionPlan0553 workingRow={workingRow} compact/>
      <h4>Selected SAT/SIT 28 productive two-person Team-days = 56 MD</h4>
      <p className="p55-note"><strong>Current Working SELL SAT Labour: {money(selected.satWorkingSellTHB)}</strong>
-      {" "}56 MD × USD {selected.sourceRateUSDPerPersonDay} × FX {selected.fxTHBPerUSD}.
+      {" "}28 Senior Engineer MD × USD {selected.satRoleRates[0].usdPerPersonDay} + 28 RF Specialist MD × USD {selected.satRoleRates[1].usdPerPersonDay}, × FX {selected.fxTHBPerUSD}.
       +2 Risk and +2 management reserve days are NOT priced. Historical 40-day estimate remains audit only.</p>
      <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
       <thead><tr><th>Site / WBS</th><th>Function</th><th>People</th><th>Team-days</th><th>Man-days</th><th>Working SELL</th></tr></thead>
