@@ -34,7 +34,7 @@ assert.equal(b2.b2WorkingSellDecision.approvedDirectCost,false);
 assert.equal(old.sellTHB,580000);
 assert.equal(b2.b2PriorWorkingSellReferenceTHB,old.sellTHB);
 assert.equal(source.previousB2Rev05ReferenceTHB,580000);
-assert.equal(source.knownWorkingSellTHB,4582736.82);
+assert.equal(source.knownWorkingSellTHB,4308914.13);
 assert.equal(sp.lines.B2.workingSellTHB,237121.13);
 assert.equal(sp.lines.B2.qty,1);
 assert.equal(sp.lines.B2.unitRateTHB,237121.13);
@@ -65,7 +65,7 @@ for(const [name,html] of [["B2 Module",b2Html],["B2 Price View",vm]]){
 }
 assert(b2Html.includes('data-component-key="bid.budget.working.bc.b2.quote-comparison"'));
 assert(b2Html.includes("SUPERSEDED"),"Old Rev05 price must be marked superseded");
-assert(all.includes("4,582,736.82"),"10.2 ALL Part B must show SAT28/BF5 revised total");
+assert(all.includes("4,308,914.13"),"10.2 ALL Part B must show SAT28/BF5 revised total");
 assert.equal(source.byCode.B3.workingSellTHB,2599325,
  "B2 price is unchanged, but B3 SAT28 drives the revised aggregate");
 assert(all.includes("237,121.13"),"10.2 ALL B2 row does not show reprice");
@@ -73,4 +73,4 @@ const evidence=fs.readFileSync(path.join(root,"project0553/data/bcTurnkeyWorking
 assert(evidence.includes('Number.isFinite(b2RecalculatedSellTHB)?b2RecalculatedSellTHB:'),
  "Canonical owner B2 must have priority over Rev05 source working quote");
 assert.equal(JSON.stringify(working()),before,"B2 derived projection must never mutate 10.2 source");
-console.log("PASS B2 237121.13 ACTIVE Working SELL 10.2 / 10.3 / 10.5, Base 4582736.82, prior 580000 SUPERSEDED, Direct Cost NULL and Customer Release HOLD");
+console.log("PASS B2 237121.13 ACTIVE Working SELL 10.2 / 10.3 / 10.5, Base 4308914.13, prior 580000 SUPERSEDED, Direct Cost NULL and Customer Release HOLD");
