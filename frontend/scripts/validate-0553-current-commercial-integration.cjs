@@ -80,7 +80,7 @@ const view=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.
 const workType=fs.readFileSync(path.join(root,"project0553/B3WorkTypeAccordion0553.jsx"),"utf8");
 assert(view.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"),"B3 work-type accordion not mounted");
 assert(workType.includes("<B3SiteMrSatCoverage0553 workingRow={workingRow}/>"),"B3 SAT matrix not mounted in SAT group");
-assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell}/>'),"China FAT witness not mounted in FAT group");
+assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell} workingRow={workingRow}/>'),"China FAT witness must receive canonical WS-B3 owner for full total");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(workspace.includes("<RevKAbcOwnershipControl0553 working={bcWorking}/>"),"CFO current ABC not mounted");
 console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,599,325 (MGW purchased 307,125 + China witness 422,600 included) B9 Base 261,950, execution on written call-out, Part B 4,262,586.82; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
