@@ -19,8 +19,9 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
  const purchased=workingRow?.b3MgwPurchasedFatWorkingSell??null;
  const mgwPurchasedSell=purchased?.selectedIncrementalWorkingSellTHB??null;
  const b3Total=workingRow?.workingSellTHB??null;
+ const current=workingRow?.b3SelectedSatSurveyBudget??null;
  const expectedB3=Number.isFinite(fat)&&Number.isFinite(mgwPurchasedSell)?
-  price.offshoreWorkingSellTHB+fat+mgwPurchasedSell:null;
+  current?.includedB3SatSurveyToolsWorkingSellTHB+fat+mgwPurchasedSell:null;
  if(workingRow&&(workingRow.code!=="B3"||
   !Number.isFinite(fat)||!Number.isFinite(mgwPurchasedSell)||
   !Number.isFinite(b3Total)||!Number.isFinite(expectedB3)||
@@ -86,11 +87,12 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
     <th><strong>{fmt(price.laborWorkingSellTHB)}</strong></th><th>Sum of nine timeboxes, not sum of Test-ID prices</th></tr></tfoot>
   </table></div>
   </details>
-  <h4>3. Retained B3 Working SELL Price Bridge (not confirmed on-site resource days)</h4>
+  <h4>3. Selected B3 Working SELL — 28 SAT +5 BF Survey team-days</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:750,width:"100%",tableLayout:"fixed"}}>
    <thead><tr><th>Cost Owner / Source Module</th><th>Basis</th><th>Working SELL THB</th><th>Price Treatment</th></tr></thead>
    <tbody>
-    <tr><td><strong>Offshore SAT/SIT labour</strong><small>{price.sourceModuleId}</small></td><td>2 people × 40 days = 80 MD × USD 800 × FX 31.5</td><td><strong>{fmt(price.laborWorkingSellTHB)}</strong></td><td>Included once in B3</td></tr>
+    <tr><td><strong>Selected SAT/SIT Labour 28 Team-days</strong><small>{current?.moduleId}</small></td><td>2 ×28 =56 MD × USD800 × FX31.5</td><td><strong>{fmt(current?.satWorkingSellTHB)}</strong></td><td>Selected Working SELL once</td></tr>
+    <tr><td><strong>Selected BF Survey 3 on-site +2 travel Team-days</strong><small>bid.budget.working.bc.b3.site-survey-price</small></td><td>2 ×5 =10 MD × USD800 × FX31.5; physical call-out conditional</td><td><strong>{fmt(current?.siteSurveyWorkingSellTHB)}</strong></td><td>Selected Working SELL allowance; verified direct cost open</td></tr>
     <tr><td><strong>VeEX MX100+ rental</strong><small>bid.budget.working.bc.b3.veex-mx100</small></td><td>{price.veexRentalDays} rental days × {fmt(price.veexRentalRateTHB)}/day</td><td><strong>{fmt(price.veexWorkingSellTHB)}</strong></td><td>One equipment rental allowance, not per MR or per Site</td></tr>
     <tr><td><strong>ADDVALUE China FAT witness + travel · WS-B3</strong><small>bid.budget.working.bc.b3.revk-china-budget</small></td><td>Separate ADDVALUE factory witness expense; not 40 offshore days</td><td><strong>{fmt(fat)}</strong></td><td>B3 source; NOT B9 conditional Yard</td></tr>
     <tr><td><strong>MGW Purchased iFAT + FAT Facility · VQ-MGW-SERV-2/4 → WS-B3</strong>
