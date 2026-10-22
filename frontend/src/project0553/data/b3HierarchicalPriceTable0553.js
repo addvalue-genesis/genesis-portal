@@ -43,7 +43,7 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
  const quotedUSD=round(quoted.reduce((n,x)=>n+x.usd,0));
  const satMatrix=selectB3SiteMrSatCoverage0553();
  const crosswalk=selectB3RequirementWbsTrace0553();
- if(quoted.length!==2||quotedUSD!==7500||offshore.laborWorkingSellTHB!==1411200||offshore.surveyLabourWorkingSellTHB!==252000||
+ if(quoted.length!==2||quotedUSD!==7500||offshore.laborWorkingSellTHB!==1587600||offshore.surveyLabourWorkingSellTHB!==252000||
   fat.workingSellTHB!==397400||
   fat.groupFatWorkingSellTHB!==704525||veex.workingSellTHB!==30000||
   satMatrix.rows.length!==21||crosswalk.rows.length!==19||
@@ -70,9 +70,9 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
   group("B3.2","sat","SAT 28 Team-days + BF Survey 3 Site+2 Travel Days — Selected Working SELL",
    "Selected SAT28 (56 MD) plus BF Survey 3+2 team-days (10 MD); old 40-day history NONPOSTING",[
    item("B3.2.1","40-day-abc","Selected SAT/SIT 28 productive team-days / 56 MD (2 roles)",
-    "Selected SAT labour: 2 specialists × 28 team-days × USD800/MD × FX31.50; historic 40-day audit below",
+    "Selected SAT: 28 Senior Engineer MD × USD1000 + 28 RF Specialist MD × USD800, all × FX31.50; 40-day audit below",
     C.INCLUDED_WORKING_SELL,{workingSellTHB:offshore.laborWorkingSellTHB,
-     qty:offshore.personDays,unit:"paid person-days",unitRateTHB:25200,
+     qty:offshore.personDays,unit:"mixed-rate person-days",unitRateTHB:null,
      status:"SELECTED SAT 28-DAY SELL; actual GF Yard/Offshore RACI/ITP OPEN"}),
    item("B3.2.2","site-mr-sat-matrix","Seven-Site / Four-MR SAT Coverage Matrix",
     "19 Site/MR Test IDs plus SIT/Punch =21 source coverage; original 40d is price-only, not stage-assigned",
@@ -128,8 +128,8 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
  });
  const totalSell=round(groups.reduce((n,g)=>n+g.workingSellTHB,0));
  const vendorUSD=round(groups.reduce((n,g)=>n+g.vendorQuoteUSD,0));
- const groupsAsExpected={fat:704525,sat:1663200,tools:30000,audit:0};
- if(totalSell!==2397725||totalSell!==b.totalWorkingSellTHB||
+ const groupsAsExpected={fat:704525,sat:1839600,tools:30000,audit:0};
+ if(totalSell!==2574125||totalSell!==b.totalWorkingSellTHB||
   vendorUSD!==7500||
   groups.some(g=>g.workingSellTHB!==groupsAsExpected[g.kind])||
   groups.flatMap(g=>g.items).filter(x=>[C.INCLUDED_WORKING_SELL,C.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length!==5||
