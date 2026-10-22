@@ -158,6 +158,26 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
   <p className="p55-note">{category[2]}</p>
   <p className="p55-note"><strong>Price basis:</strong> 10.2 B/C working SELL and validated COST (where present) shown separately from original Rev08 historical USD→THB references. Not additive and not a released quote.</p>
   <p className="p55-note" data-component-key="bid.budget.scope.b9.optional-yard-ls"><strong>B9 CUSTOMER BASE 1 LS — EXECUTION ON WRITTEN CALL-OUT:</strong> 1 LS · Senior Telecom Systems Integration Engineer on-call Zhuhai Yard Configuration / Interface Integration / Troubleshooting / Yard SAT Technical Assistance; 7 working days + 2 travel days, inclusive of mobilisation, return journey, accommodation and technical-work cover. <strong>{cash(selectB9ChinaWorkingBudget0553().conditionalYardSellTHB)}</strong>. Trigger: written JUTAL/SAMTEL call-out / signed RACI. One additional Field Telecom Specialist accompanies the Senior Engineer but carries no separately charged labour; ADDVALUE absorbs actual backup travel cost within the fixed LS. This same B9 source Working SELL is included ONCE in Part B Base, not added as a second option; this is not a signed/released quotation.</p>
+  {sheet==="Scope of supply"&&scopeBC.lines.B3?.b3GroupTrace&&
+   <details className="p55-panel p553-b3-scope-trace" style={{padding:12,margin:"10px 0"}}
+    data-component-key="bid.budget.scope.b3.group-trace">
+    <summary style={{cursor:"pointer",fontWeight:750}}>B3 — FAT / SITE SURVEY / SAT / TOOLS · Source-to-Scope (Working SELL {cash(scopeBC.lines.B3.workingSellTHB)})</summary>
+    <p className="p55-note">10.5 SOW-B3 1 LS is derived from canonical 10.2 WS-B3.
+     These four group subtotals are audit attribution ONLY — not four additional customer rows.
+     CP-B3 Customer Release remains NOT ISSUED; BF physical survey conditional, RACI/Direct Cost open.</p>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+     <thead><tr><th>10.2 Work Type Source</th><th>Working SELL THB</th><th>10.5 Scope Attribution THB</th>
+      <th>Execution & Approval / Cost State</th></tr></thead>
+     <tbody>{scopeBC.lines.B3.b3GroupTrace.map(g=><tr key={g.id}>
+      <td><strong>{g.name}</strong><small>{g.sourceModuleId}</small></td>
+      <td>{cash(g.workingSellTHB)}</td><td>{cash(g.scopeWorkingSellAttributionTHB)}</td>
+      <td>{g.status}<small>{g.approvalGate}</small><small>Direct Cost NOT ESTABLISHED · no independent customer line</small></td>
+     </tr>)}</tbody>
+     <tfoot><tr><th>SOW-B3 · 1 LS · Release HOLD</th>
+      <th>{cash(scopeBC.lines.B3.workingSellTHB)}</th><th>{cash(scopeBC.lines.B3.amountTHB)}</th>
+      <th>WS-B3 = CP-B3 Preview = SOW-B3 · NO DOUBLE POST</th></tr></tfoot>
+    </table></div>
+   </details>}
   {sheet==="Scope of supply"?<div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Ref.</th><th>Description</th><th>Qty</th><th>Current Working Unit THB (A COST / B SELL)</th><th>Current Working Amount THB (A COST / B SELL)</th><th>Historical Rev08 Reference THB — NOT Cost</th><th>Source / Engineering &amp; Cost Status</th></tr></thead>
   <tbody>{sheet==="Scope of supply"?summary.map(([id,desc])=>{
    const control=scopeBC.lines[id]||null;
