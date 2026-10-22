@@ -31,7 +31,7 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
   <p className="p55-note"><strong>Internal record:</strong> {isFat?"IC-FAT / WS-B3":"IC-YARD / WS-B9"} · <strong>Customer contractual Scope:</strong> {isFat?"SOW-B3":"SOW-B9"} · <strong>Commercial Proposal:</strong> {isFat?"CP-B3":"CP-B9"} NOT ISSUED. These rows are internal estimating activities, not customer B3/B9 quotation line numbers.</p>
   <div className="p55-metric-grid">
    <div><strong>{isFat?"WS-B3 — Current Internal FAT Working SELL":"WS-B9 — Included in Base Once · On-call Yard Working SELL"}</strong><p>{thb(total)}</p>
-    <small>{isFat?"Two ADDVALUE paid witnesses, six budgetary FAT days, one return China trip; OEM executes FAT in Part A":"One paid Senior Telecom Engineer · 7 working days + 2 travel days · one unbilled accompanying Field Telecom Specialist"}</small></div>
+    <small>{isFat?"Two ADDVALUE paid witnesses, six budgetary FAT days, one return China trip; OEM executes FAT in Part A":"Two paid staff: Senior USD700/MD + Field Technician USD600/MD · 7 Yard days + 2 travel days EACH"}</small></div>
    <div><strong>{isFat?
     (Number.isFinite(ownerPreviewB3THB)?"WS-B3 — FULL B3 canonical Working SELL (MGW Purchased FAT included once)":"WS-B3 — Full total requires canonical 10.2 owner"):
     "Current B9 Base"}</strong><p>{isFat?thb(ownerPreviewB3THB):thb(budget.b9BaseWorkingSellTHB)}</p>
@@ -48,7 +48,7 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
    </table></div>
    <p className="p55-note">FAT notice: management target 14 days per SPE; BOD has 30-day requirement. Contract precedence/waiver remains unresolved.</p>
   </details>}
-  {!isFat&&<p className="p55-note"><strong>Yard scope:</strong> configuration verification, IP/VLAN/NMS/PLC/PABX integration, troubleshooting and OEM coordination if called out by JUTAL. Base Yard SAT outcome remains mandatory for CONTRACTOR/VENDOR, but ADDVALUE Specialist attendance is conditional on signed RACI or written request. The second Field Telecom Specialist is unbilled but actual travel/payroll must be tracked; internal risk cash allowance {thb(budget.unbilledBackupCashAllowanceTHB)} is NOT another customer charge.</p>}
+  {!isFat&&<p className="p55-note"><strong>Yard scope:</strong> configuration verification, IP/VLAN/NMS/PLC/PABX integration, troubleshooting and OEM coordination if called out by JUTAL. Base Yard SAT outcome remains mandatory for CONTRACTOR/VENDOR, but ADDVALUE Specialist attendance is conditional on signed RACI or written request. The second Field Telecom Technician is a paid B9 resource (USD600/MD, 7+2 days); associated two-person travel/insurance allowances are INCLUDED ONCE in WS-B9. Actual internal payroll/expenses remain unverified. CCL Item31 18 Yard / 45 Offshore days remains unchanged and needs separate scope/RACI reconciliation.</p>}
   <div className="p55-table-wrap"><table className="p55-table p55-table--budget" style={{width:"100%",minWidth:1050,tableLayout:"fixed"}}>
    <thead><tr><th>Internal Cost Activity ID / Technical Module</th><th>Activity</th><th>Qty / Unit</th><th>Internal Working SELL Unit Rate</th><th>Internal Working SELL THB</th><th>Evidence / Treatment</th></tr></thead>
    <tbody>{rows.map(x=><tr key={x.id} data-component-key={x.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere"}}>
