@@ -26,7 +26,7 @@ assert(x.survey.rows.every(r=>r.previousSiteSurveyReported&&r.physicalRevisitReq
   r.approvedCrew===null&&r.approvedDays===null&&r.postingAllowed===false));
 assert(x.survey.excludedGFRows.every(r=>!r.separatePhysicalSurveyBudgeted));
 assert.equal(x.survey.physicalRevisitApproved,false);
-assert.equal(x.survey.selectedPhysicalSurveyTeamDays,null);
+assert.equal(x.survey.selectedPhysicalSurveyTeamDays,3);
 assert.equal(x.survey.provisionalPhysicalSiteDaysIfCalled,3);
 assert.equal(x.survey.provisionalTravelTeamDaysIfCalled,2);
 assert.equal(x.survey.totalTeamDaysIfCalled,5);
@@ -36,7 +36,7 @@ assert.equal(x.survey.travelLabourSellReferenceTHB,100800);
 assert.equal(x.survey.conditionalLabourSellReferenceTHB,252000);
 assert.equal(x.survey.priorSevenSiteIllustrationTHB,453600);
 assert.equal(x.survey.priorSevenSiteIllustrationWithdrawn,true);
-assert.equal(x.survey.selectedWorkingSellTHB,null);
+assert.equal(x.survey.selectedWorkingSellTHB,252000);
 assert.equal(x.survey.verifiedDirectCostTHB,null);
 assert.equal(x.survey.postingAllowed,false);
 assert.equal(x.yardSat.location,"JUTAL Zhuhai Fabrication Yard, China");
@@ -56,11 +56,12 @@ assert.equal(x.sat.noAuthoritativeNewStageTotals,true);
 assert.equal(x.sat.actualNewDeploymentTeamDays,null);
 assert.equal(x.sat.actualNewDeploymentPersonDays,null);
 assert.equal(x.sat.selectedBaselineTeamDays,40);
+assert.equal(x.sat.currentSelectedSATTeamDays,28);
 assert.equal(x.sat.selectedBaselinePersonDays,80);
 assert.equal(x.sat.selectedBaselineLaborSellTHB,2016000);
 assert.equal(x.sat.scenarioLabourWithRiskReferenceTHB,1512000);
 assert.equal(x.phaseSummary.allThreeStagesDaysEstablished,false);
-assert.equal(x.phaseSummary.selectedB3WorkingSellTHB,2750525);
+assert.equal(x.phaseSummary.selectedB3WorkingSellTHB,2397725);
 assert.equal(x.phaseSummary.noNewReleasePrice,true);
 assert.equal(x.postingAllowed,false);assert.equal(x.customerReleaseAllowed,false);
 const html=renderToStaticMarkup(React.createElement(Panel,{workingRow:b3}));
@@ -70,14 +71,14 @@ assert(!compact.includes('data-component-key="bid.budget.working.bc.b3.field-exe
 for(const phrase of ["ZPQ","ZWP8","ZWP11","ZWP20","ZWP21","ZWP22","ZWP23",
  "JUTAL Zhuhai","Fabrication Yard SAT","Offshore Commissioning",
  "28","60","80","252,000.00","151,200.00","100,800.00",
- "2,750,525.00","NOT ESTABLISHED","NOT POSTED","RACI","BOD"]){
+ "2,397,725.00","NOT ESTABLISHED","NOT POSTED","RACI","BOD"]){
  assert(html.includes(phrase),"B3 contract phase WBS missing "+phrase);
 }
 const matrix=renderToStaticMarkup(React.createElement(Matrix,{workingRow:b3}));
 assert(matrix.includes("Zhuhai")&&matrix.includes("40 วัน / 80 MD"));
 const host=renderToStaticMarkup(React.createElement(Host,{workingRow:b3}));
 assert(host.includes("BF Verification / GF Yard SAT / Offshore Commissioning"));
-assert(host.includes("2,750,525.00"));
+assert(host.includes("2,397,725.00"));
 const navIds=new Set(nav().map(r=>r.id));
 const ids=[x.moduleId,
  ...x.survey.rows.map(r=>x.moduleId+".survey."+r.site.toLowerCase()),
@@ -93,5 +94,5 @@ const anchors=[...host.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(anchors.length,new Set(anchors).size,"B3 phase workfront duplicated DOM Module ID");
 assert.equal(JSON.stringify(working()),before,"Stage reassignment may not reprice original B3");
 assert.equal(bc.byCode.B3.directCostTHB,null);
-assert.equal(bc.knownWorkingSellTHB,4385436.82);
-console.log("PASS B3 phase split: BF 3 historical survey sites (conditional 3+2 team-days 10MD THB252000 nonposting), GF 4 Zhuhai Yard SAT and 4 Offshore Commissioning stages RACI/day/cost unknown, legacy 28+2 comparator isolated, selected 40day/80MD B3 SELL THB2750525 unchanged / Release HOLD.");
+assert.equal(bc.knownWorkingSellTHB,4032636.82);
+console.log("PASS B3 phase split: BF 3 historical survey sites (conditional 3+2 team-days 10MD THB252000 nonposting), GF 4 Zhuhai Yard SAT and 4 Offshore Commissioning stages RACI/day/cost unknown, legacy 28+2 comparator isolated, selected SAT28 +BF Survey5 B3 SELL THB2397725 and 40day/80MD historical audit only / Release HOLD.");
