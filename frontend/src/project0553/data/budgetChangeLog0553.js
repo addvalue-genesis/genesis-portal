@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R15";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R16";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-04",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"B2 Rev05 THB/MH precision and React details defaultOpen warnings resolved",
+  detail:"Node SSR 10.2 B1 worktype PASS but React DOM warned about unsupported details.defaultOpen; B2 owner-price-trace failed historical rate 104.125 and 341.625 test since 2-decimal commercial THB formatter displayed 104.13/341.63. B2 Rev05 historical THB/MH rows now render actual source precision up to 3 decimals (NOT a rate reprice); native B1 and B2 details use supported open attribute with original initial expanded states preserved. B1/B2 SSR tests guard this behavior. B1/B2 current selected Working SELL and Part B unchanged; customer release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1","bid.budget.working.bc.b2","bid.budget.working.bc.b2.price-trace"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"User Windows Node.js v24.21.0 SSR logs / Rev05 01_COMMERCIAL_BASIS historical role-rate seeds"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-03",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"Fix React SSR sharedEvidence initialization crash in 10.2 B/C Cost Evidence",
