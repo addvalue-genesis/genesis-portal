@@ -2,6 +2,7 @@ import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {ControlledModuleSection0553} from "./ControlledModuleSection0553";
 import {selectB3SiteMrSatCoverage0553} from "./data/b3SiteMrSatCoverage0553";
+import {B3SurveySatExecutionPlan0553} from "./B3SurveySatExecutionPlan0553";
 import {B3SatMrWorkBreakdown0553} from "./B3SatMrWorkBreakdown0553";
 import {findModuleElement0553,openModuleAncestors0553} from "./data/moduleDeepLink0553";
 
@@ -40,13 +41,17 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
  };
  return <ControlledModuleSection0553
   moduleKey={model.moduleId}
-  title="B3 — Seven-Site / Four-MR SAT Test Coverage"
-  description="2 persons × 40 team workdays = 80 man-days; 21 test groups share nine priced timeboxes">
+  title="B3 — แผน Site Survey + SAT/SIT: 2 คน × (Survey 9 + SAT 30) team-days"
+  description="แผนล่าสุด SAT 28 วันงาน + 2 Risk = 30 team-days / 60 MD · Survey 7 Site + 2 Travel เป็น Scenario แยก · 40 วันเดิมเป็นฐานราคาเท่านั้น"
+  defaultOpen={true}>
+  <B3SurveySatExecutionPlan0553 workingRow={workingRow}/>
   <p className="p55-note"><strong>Module ID:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={model.moduleId}/>
    <strong> Price source:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={model.priceBasisModuleId}/>
    These are pre-award Working SELL allowances, NOT verified Direct Cost or approved SAT working duration.
    <strong> Each Site timebox covers all its MR Test IDs together; do not multiply the price by 19 Site/MR tests.</strong>
   </p>
+  <details className="p55-panel" style={{padding:10,marginTop:12}}>
+   <summary><strong>แสดงฐานราคาเดิม 40 วัน / 80 MD (Audit/Comparison ONLY — ไม่ใช่แผนการทำงานล่าสุด)</strong></summary>
   <h4>1. Resource and Rate Basis — How many people × how many days?</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:920,width:"100%",tableLayout:"fixed"}}>
    <thead><tr><th>Labour / Crew</th><th>People working together</th><th>Team working days</th><th>Person-days / MD</th><th>SELL Rate per person-day</th><th>FX planning</th><th>SELL / 2-person team-day</th><th>Included Offshore Labour SELL</th></tr></thead>
@@ -76,6 +81,7 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
     <th>{price.workdays}</th><th>{price.personDays}</th><th>{fmt(price.rateTHBPerTeamDay)}</th>
     <th><strong>{fmt(price.laborWorkingSellTHB)}</strong></th><th>Sum of nine timeboxes, not sum of Test-ID prices</th></tr></tfoot>
   </table></div>
+  </details>
   <h4>3. B3 Price Reconciliation — Where does {fmt(b3Total)} come from?</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:750,width:"100%",tableLayout:"fixed"}}>
    <thead><tr><th>Cost Owner / Source Module</th><th>Basis</th><th>Working SELL THB</th><th>Price Treatment</th></tr></thead>
@@ -90,6 +96,8 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
      <td>PURCHASED SERVICE WS ONCE — quoted supplier cost is not verified paid Direct Cost; CP-B3 HOLD</td></tr>
     <tr><th colSpan={2}>TOTAL B3 — Inspection, Testing &amp; Certification</th><th><strong>{fmt(b3Total)}</strong></th><th>Working SELL / Direct COST pending / Release HOLD</th></tr>
    </tbody></table></div>
+  <details className="p55-panel" style={{padding:10,marginTop:12}}>
+   <summary><strong>เปิดดู Technical SAT Test IDs ทั้ง 21 รายการ (ข้อมูลวิศวกรรมละเอียด / ไม่บวกวันซ้ำ)</strong></summary>
   <h4>4. Required SAT Test IDs — Refer to the shared Site budget above</h4>
   <p className="p55-note"><strong>21 Test Groups below are Engineering Coverage, not 21 additional priced visits.</strong> Their individual duration and SELL are deliberately NOT allocated until a validated ITP and tagged test execution plan exists. The booked price belongs to the shared Site timebox above.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1140,width:"100%",tableLayout:"fixed"}}>
@@ -122,6 +130,7 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
   {model.rows.map(r=><B3SatMrWorkBreakdown0553
    key={r.id} testRow={r} timebox={byTimebox.get(r.budgetTimeboxId)} priceProof={price}
    defaultOpen={r.site==="ZPQ"}/>)}
+  </details>
   <p className="p55-note"><strong>Budget exceptions not silently costed:</strong> {model.technicalHolds.join(" · ")}.
    Airfare/offshore MOB-DEMOB, access/visa/insurance, additional calibrated instruments and RACON vessel/operator may require separately sourced scope allowances. No automatic Working SELL change is made by this SAT coverage table.</p>
  </ControlledModuleSection0553>;
