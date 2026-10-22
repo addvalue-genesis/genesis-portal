@@ -42,7 +42,12 @@ assert(ids.includes("bid.budget.working.bc.b1.price-overview"));
 for(const [i,a] of m.accounts.entries()){
  const id="bid.budget.working.bc.b1.account."+a.account.toLowerCase().replace(".","-");
  assert(html.includes("Copy component ID "+id),"Missing copyable B1 account ID "+id);
- assert(html.includes(a.label),"Missing category "+a.account);
+ // React SSR HTML-escapes text node content: "A & B" becomes "A &amp; B".
+ // Validate the real source-backed account label as escaped HTML, rather than
+ // failing on a present B1.1/B1.2/B1.3/B1.4/B1.6 row. No pricing source change.
+ const escapedLabel=a.label.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+ assert(html.includes("<strong>"+escapedLabel+"</strong>"),
+  "Missing rendered category "+a.account+" / "+a.label);
  assert(html.includes("View Qty × Rate × Amount"),"Drilldown action missing");
  assert(full.includes('data-component-key="'+id+'"'),
   "The clickable account must have a matching target with actual detailed source lines: "+a.account);
