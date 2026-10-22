@@ -763,3 +763,13 @@
 .p553-dashboard .p553-b9-dossier-site{border-left-width:3px;margin-top:8px}
 .p553-dashboard .p553-b9-work-scope-dossier .p55-table{min-width:1500px}
 .p553-dashboard .p553-b9-work-scope-dossier td small{display:block;margin-top:3px;font-size:11px;overflow-wrap:anywhere}
+
+/* B8 hybrid training — color-coded source-attribution groups; no extra posting. */
+.p553-dashboard .p553-b8-hybrid-group--onsite{--price-accent:#315b9b;--price-tint:#edf3fe}
+.p553-dashboard .p553-b8-hybrid-group--oem{--price-accent:#168276;--price-tint:#e8f8f4}
+.p553-dashboard .p553-b8-hybrid-group--materials{--price-accent:#915e1a;--price-tint:#fff5e8}
+.p553-dashboard .p553-b8-hybrid-group--travel{--price-accent:#8050a2;--price-tint:#f5effb}
+.p553-dashboard .p553-b8-hybrid-group>.p553-bc-price-leaf-head{background:var(--price-tint)}
+.p553-dashboard .p553-b8-hybrid-group>.p553-bc-price-leaf-head small{font-weight:700;color:var(--price-accent)}
+.p553-dashboard .p553-b8-hybrid .p55-table{min-width:1000px}
+.p553-dashboard .p553-b8-hybrid td small{display:block;margin-top:3px;font-size:11px;overflow-wrap:anywhere}
