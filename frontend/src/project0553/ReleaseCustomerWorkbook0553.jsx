@@ -248,8 +248,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
      <p className="p553-native-warning"><strong>{code} — {annexModel?.priceLabel||"WORKING REFERENCE"}</strong>
       {" "}· รายการจาก 10.2 — <code>bid.budget.working.bc.{code.toLowerCase()}</code>
-      {code.startsWith("C")?" · Optional Spare: มีเพียง Budgetary Reference ยังไม่มี Verified Direct Cost สำหรับราคาขาย ×1.30":
-      " · THB Working Sell, อ้างอิงราคา Budgetary Rev08; OEM Part No./SKU/การไม่ซ้ำซ้อนยังต้องตรวจ"}</p>
+      {code.startsWith("C")?" · Optional OEM spare quotation NOT ESTABLISHED; never use Rev08 as a new cost":
+      " · Current PTTEP/OEM Working SELL NOT ESTABLISHED; Rev08 is only historical audit"}</p>
      <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table">
       <thead><tr><th rowSpan={2}>Item<br/>序号</th><th rowSpan={2}>Tag No<br/>位号</th><th rowSpan={2}>Description<br/>描述</th><th rowSpan={2}>Detail Specification<br/>详细规格</th><th rowSpan={2}>Materials<br/>材质</th><th rowSpan={2}>QTY<br/>数量</th><th colSpan={code.startsWith("C")?3:2}>DDP site （DDP现场交货）</th></tr>
        <tr><th>UNIT PRICE (CURRENCY)<br/>单价</th><th>TOTAL PRICE (CURRENCY)<br/>总价</th>
@@ -287,6 +287,22 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        </tr></tbody></table>
        <p className="p55-note">{code.startsWith("C")?"OPTIONAL · Reference value for working review only; customer sell remains Not quote pending OEM verified cost.":"Budgetary Working Sell from 10.2; unresolved variance is not silently added to any spare item."} TAGs shown are functional associations, not verified OEM spare-part equivalence.</p>
       </div>}
+      {internal&&annexModel?.requirementRows?.length>0&&<details className="p55-panel" open>
+       <summary><strong>{code} — Source → Current OEM/SPIR → Release Price Gap</strong> ({annexModel.requirementRows.length} candidate lines, NOT priced Annex rows)</summary>
+       <p className="p55-note">Existing Module ID: bid.budget.working.bc.{code.toLowerCase()}. No new commercial module. Proposed physical spare/tool candidates require PTTEP applicability, OEM approved SKU, confirmed stock owner/quantity and independent supplier rate before customer Annex pricing.</p>
+       <div className="p553-sheet-scroll"><table className="p55-table p55-table--compact">
+        <thead><tr><th>Owner / ID</th><th>Requirement / Scope</th><th>Site/Installed TAG</th><th>OEM Part No.</th><th>Required Qty</th><th>Direct Cost THB</th><th>Working SELL THB</th></tr></thead>
+        <tbody>{annexModel.requirementRows.map(r=><tr key={r.id}>
+         <td>{r.code}<small>{r.id}</small></td>
+         <td>{r.description}<small>{r.qualification}</small></td>
+         <td>{r.linkedMR?.join(", ")}<small>{r.installedTagsBySite?.join(" | ")||"OEM SPIR link required"}</small></td>
+         <td>{r.oemSparePartNumber||"NOT ESTABLISHED"}</td>
+         <td>{r.currentRequiredQty??"NOT ESTABLISHED"}</td>
+         <td>{r.verifiedSupplierUnitCostTHB??"NOT ESTABLISHED"}</td>
+         <td>{r.currentWorkingSellTHB??"NOT ESTABLISHED"}</td>
+        </tr>)}</tbody>
+       </table></div>
+      </details>}
       {annexOverflow.length>0&&<p className="p553-native-warning">HOLD — {code}: {annexOverflow.length} source lines exceed the original 13 annex slots. No rows are discarded from the source; native export requires reconciliation.</p>}
       <div className="p553-annex-remark">Remark 注释: {code.startsWith("C")?
        "Above Price of spare parts is valid up to Two years after Delivery date of purchase order":
