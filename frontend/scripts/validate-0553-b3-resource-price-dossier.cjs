@@ -1,6 +1,7 @@
 // B3 dossier mirrors the B2 Work Type -> Site -> detailed role/expense model;
 // reads selected 10.2 B3 source, traces 10.3 Release/10.5 Scope once, never
-// manufactures actual Cost or sells conditional GF Yard/Offshore/BF work.
+// manufactures actual Cost or separately sells GF Yard/Offshore work.
+ // The BF revisit is a selected conditional working-budget allowance; no travel order.
 const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
 const babel=require("@babel/core"),React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
 const root=path.resolve(__dirname,"../src");
@@ -28,6 +29,26 @@ assert.deepEqual(m.groups.map(x=>x.selectedWorkingSellTHB),
  [307125,397400,1411200,30000,252000,0,0,0]);
 assert.equal(m.pricedWorkingSellTHB,2397725);
 assert.equal(m.vendorQuoteCostTHB,236250);
+assert.deepEqual(m.vendorQuoteMarkupBridge,{
+ supplierQuoteTHB:236250,samtel20PctTHB:47250,
+ addvalue5PctTHB:11812.5,reserve5PctTHB:11812.5,
+ selectedWorkingSellTHB:307125,verifiedPaidDirectCostTHB:null
+});
+assert.equal(m.financialLayers.selectedBaseExcludingBFConditionalTHB,2145725);
+assert.equal(m.financialLayers.includedBFConditionalBudgetAllowanceTHB,252000);
+assert.equal(m.financialLayers.selectedWorkingBudgetPreviewTHB,2397725);
+assert.equal(m.financialLayers.selectedBaseExcludingBFConditionalTHB+
+ m.financialLayers.includedBFConditionalBudgetAllowanceTHB,m.pricedWorkingSellTHB);
+assert.equal(m.financialLayers.conditionalBFPhysicalExecutionApproved,false);
+assert.equal(m.financialLayers.unpricedExtraBFExpenseCostTHB,null);
+assert.equal(m.financialLayers.actualDirectCostTHB,null);
+assert.equal(m.financialLayers.commercialReleaseAllowed,false);
+assert.equal(m.bfSurveyExpenseDrivers.length,4);
+assert(m.bfSurveyExpenseDrivers.every(x=>x.postingClass==="NOT_ESTABLISHED_NONPOSTING_EXPENSE"&&
+ x.workingCostTHB===null&&x.workingSellTHB===null&&x.actualDirectCostTHB===null));
+assert.deepEqual(m.riskReserve.map(x=>[x.teamDays,x.people,x.personDays,x.illustrativeOnlyTHB,
+ x.workingSellTHB,x.directCostTHB]),[[2,2,4,100800,null,null],[2,2,4,100800,null,null]]);
+assert.equal(m.bfSurveyExpenseDrivers.reduce((n,x)=>n+(x.workingSellTHB||0),0),0);
 assert.equal(m.actualPaidDirectCostTHB,null);
 assert.equal(m.customerReleaseAllowed,false);
 const paid=m.groups.slice(0,5).flatMap(g=>g.rows);
@@ -41,6 +62,10 @@ assert.equal(new Set([...paid,...notPaid].map(x=>x.id)).size,67);
 const sat=m.groups[2].rows;
 assert.equal(new Set(sat.map(x=>x.site)).size,9);
 assert.equal(new Set(sat.map(x=>x.role)).size,2);
+assert(sat.every(x=>x.mr&&x.workfront&&x.costOwner.includes("B3 SAT28")));
+assert.equal(sat.filter(x=>x.site.startsWith("ZWP")||x.site==="ZPQ").length,14);
+assert(sat.filter(x=>x.site.startsWith("ZWP2")).every(x=>
+ x.workfront.includes("POOLED PRICE; NO PHASE DUPLICATION")));
 assert.equal(sat.reduce((n,r)=>n+r.qty,0),56);
 assert(sat.every(x=>x.people===1&&x.unit==="person-day"&&
  x.rateUSDPerUnit===800&&x.fxTHBPerUSD===31.5&&x.unitRateTHB===25200&&
@@ -59,6 +84,7 @@ assert.equal(m.currentSATTeamDays,28);
 assert.equal(m.currentBFSurveyTeamDays,5);
 assert.equal(m.currentBFRevisitRequired,null);
 assert.equal(m.groups[4].rows.reduce((n,x)=>n+x.workingSellTHB,0),252000);
+assert(m.groups[4].rows.every(x=>x.workfront&&x.costOwner));
 assert(m.groups[4].rows.every(x=>x.postingClass==="INCLUDED_SELECTED_B3_WORKING_SELL"));
 assert(m.groups[5].rows.every(x=>x.people===null&&x.teamDays===null&&x.unitRateTHB===null));
 assert(m.groups[6].rows.every(x=>x.people===null&&x.teamDays===null&&x.unitRateTHB===null));
@@ -77,6 +103,8 @@ for(const token of ["resource-price-dossier","MGW Purchased Factory FAT","ADDVAL
  "Selected SAT/SIT 28 Team-days","Fabrication Yard SAT","Offshore Vendor Commissioning",
  "1,411,200.00","307,125.00","397,400.00","30,000.00",
  "2,397,725.00","236,250.00","252,000.00","NOT ESTABLISHED",
+ "2,145,725.00","47,250.00","11,812.50","BF Survey — additional actual cash expense",
+ "Offshore POB","NOT INCLUDED in Base","GF FABRICATION YARD SAT",
  "MR0001","MR0002","MR0003","MR0004","Test ID:","Instruments:",
  "Qty × Unit","Expand All","Collapse All"]){
  assert(html.includes(token),"Dossier SSR missing "+token);
@@ -107,5 +135,7 @@ for(const id of allIds){
 const htmlIds=[...host.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(htmlIds.length,new Set(htmlIds).size,"B3 dossier must not duplicate DOM IDs");
 assert.equal(JSON.stringify(working()),before,"B3 dossier modified canonical source");
+assert(!html.includes("453,600.00"),"Superseded 7-site survey must NOT be a current price");
+assert(!html.includes("2,016,000.00"),"Old 40-day SAT SELL must NOT appear as current resource dossier price");
 assert.equal(bc.knownWorkingSellTHB,4032636.82);
 console.log("PASS 0553 B3 B2-style resource dossier: 37 priced (MGW2 + China FAT8 + SAT18 + VeEX1 + BF Survey8) detailed person-day/qty/rate lines = WS-B3 THB2397725; BF conditional/4 GF Yard/4 Offshore cost TBD nonposting; 10.3/10.5 B3 trace equal/Release HOLD; 67 unique cost-evidence rows (14 GF Yard + 14 GF Offshore Site/MR), zero new postings.");
