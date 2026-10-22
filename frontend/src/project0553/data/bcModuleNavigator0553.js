@@ -8,6 +8,7 @@ import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3SurveySatExecutionPlan0553} from "./b3SurveySatExecutionPlan0553";
 import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
+import {selectB8FourSystemHybridTraining0553} from "./b8FourSystemHybridTraining0553";
 import {selectB9YardWorkScopeDossier0553} from "./b9YardWorkScopeDossier0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
@@ -253,6 +254,21 @@ export function buildBcModuleNavigator0553(){
    ["resource-man-hours","Positions / Man-hours / Rate and cost gaps"],
    ["source-audit","Vendor quote / historical evidence and owner audit"]
   ])entries.push(nested(rootId+"."+suffix,code+" — "+name));
+  if(code==="B8"){
+   const b8Hybrid=selectB8FourSystemHybridTraining0553(bc.byCode.B8);
+   entries.push(nested(b8Hybrid.moduleId,
+    "B8 — 4 Systems × 8 Customer Trainees × 2 Onsite Days / Hybrid OEM Online · THB "+b8Hybrid.selectedWorkingSellTHB,
+    "B8 hybrid first principles onsite training remote OEM eight attendees two days"));
+   for(const g of b8Hybrid.groups){
+    entries.push(nested(g.id,
+     "B8 — "+g.name+" / selected Working SELL THB "+g.workingSellTHB,
+     "B8 training price dossier group breakdown subtotal"));
+    for(const row of g.rows){
+     entries.push(nested(row.id,"B8 — "+row.sourceId+" · "+row.activity,
+      "B8 work type "+row.qty+" "+row.unit+" onsite hybrid training Working SELL "+row.workingSellTHB));
+    }
+   }
+  }
   if(code==="B9"){
    const b9Scope=selectB9YardWorkScopeDossier0553(bc.byCode.B9);
    for(const group of b9Scope.groups){
