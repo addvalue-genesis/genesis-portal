@@ -47,11 +47,15 @@ export function selectB3SurveySatExecutionPlan0553(workingRow=null){
  const surveyTravelLabourSellReferenceTHB=round(provisionalTravelTeamDays*2*planningRateTHBPerPersonDay);
  const surveyPlanningLabourSellReferenceTHB=round(surveyOnsiteLabourSellReferenceTHB+surveyTravelLabourSellReferenceTHB);
  const satRows=freeze(lean.rows.map((x,i)=>{
+  const dayStart=1+lean.rows.slice(0,i).reduce((n,r)=>n+r.days,0);
+  const dayEnd=dayStart+x.days-1;
   const tests=matrix.budgetarySiteTimeboxes.find(t=>t.id===x.id);
   if(!tests||x.testIds.length!==tests.testIds.length)
    throw Error("SAT lean timebox cannot drop existing MR tests "+x.id);
   return freeze({
    id:x.id,site:x.site,wbs:x.wbs,sequence:i+1,
+   relativeWorkdayStart:dayStart,relativeWorkdayEnd:dayEnd,
+   relativeWorkdayLabel:"SAT D"+dayStart+(dayStart===dayEnd?"":"–D"+dayEnd),
    crew:x.crew,productiveTeamDays:x.days,productivePersonDays:x.plannedPersonDays,
    work:x.work,mrs:x.mrs,linkedTests:x.testIds,
    systemNames:freeze(x.mrs.filter(mr=>mrName[mr]).map(mr=>mrName[mr])),
