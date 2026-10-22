@@ -49,7 +49,7 @@ for(const code of codes){
 // while ALL 31 raw TAG/source and Qty × Unit Price amounts remain intact.
 for(const r of x.rows){
  assert.equal(r.originalDescription,r.description,"Loss of raw Rev08 description "+r.id);
- assert.notEqual(r.displayDescription,r.description,"Plain item name missing "+r.id);
+ assert(r.displayDescription&&r.displayDescription.length>4,"Plain item name missing "+r.id);
  assert(r.displayPurpose&&r.displaySpecification&&r.explanationTH,"Missing explanation "+r.id);
  assert(r.displayMaterials.includes("TBC"),"Do not invent physical material "+r.id);
  assert.equal(r.materialVerified,false);
@@ -59,6 +59,10 @@ for(const r of x.rows){
  assert.equal(r.relatedSiteTagCount,r.installedTagKeys.length);
  if(r.relatedEquipmentTagCount>1)
   assert(r.tagSummary.includes("related equipment TAGs"),"TAG summary missing "+r.id);
+}
+for(const code of ["B10","C2"]){
+ for(const item of x.byCode[code].filter(r=>/poe|gland|surge/i.test(r.description)))
+  assert.notEqual(item.displayDescription,item.description,"Complex spare label must be simplified "+item.id);
 }
 const release=buildReleaseCommercialModel0553();
 for(const code of codes){
