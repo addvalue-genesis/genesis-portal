@@ -56,7 +56,7 @@ export function selectB3SelectedSatSurveyPrice0553(){
   satRows,siteSurveyRows:surveyRows,rateTHBPerPersonDay:rate,
   sourceRateUSDPerPersonDay:old.rateUSDPerPersonDay,fxTHBPerUSD:old.fxTHBPerUSD,
   satTeamDays:28,satPersonDays:56,satWorkingSellTHB,
-  siteSurveyTeamDays:5,siteSurveyPersonDays:10,siteSurveyWorkingSellTHB,
+  siteSurveyTeamDays:5,siteSurveyPersonDays:10,siteSurveyWorkingSellTHB:surveyWorkingSellTHB,
   pricedLaborTeamDays:33,pricedLaborPersonDays:66,laborWorkingSellTHB,
   veex:old.veex,veexWorkingSellTHB,
   includedB3SatSurveyToolsWorkingSellTHB,
