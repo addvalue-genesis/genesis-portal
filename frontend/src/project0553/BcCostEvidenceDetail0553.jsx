@@ -13,6 +13,7 @@ import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {B3WorkTypeAccordion0553} from "./B3WorkTypeAccordion0553";
 import {BcFinancialIdentityMatrix0553} from "./BcFinancialIdentityMatrix0553";
 import {BcOwnerPriceTrace0553} from "./BcOwnerPriceTrace0553";
+import {B11OperationalToolsTrace0553} from "./B11OperationalToolsTrace0553";
 
 // Read-only drill-down inside existing 10.2. Numeric value types must never
 // imply that historical payroll cost or the WBS SELL is verified direct COST.
@@ -246,6 +247,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     อ้างอิง <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.working.bc.b3.veex-mx100"/>.
     RACON programming kit ที่ MGW แจ้งว่ารวมแล้วต้องตรวจ SKU/Qty ไม่คิดซ้ำใน B11.
     ข้อมูลนี้เป็น read-only cost-ownership rule ไม่เปลี่ยน B11 Working SELL.</p>
+   <B11OperationalToolsTrace0553 workingRow={workingRow}/>
   </section>}
   {e.code==="B6"&&Number.isFinite(e.reconciliation?.historicalRev08TransportSellTHB)&&<p className="p55-note"><strong>B6 Historical Transportation Reference (THB):</strong> {thb(e.reconciliation.historicalRev08TransportSellTHB)} · 4-Scope of Supply.xlsx Rev08 · Conversion at WBS Rev05 planning FX {e.reconciliation.planningFxTHBPerUSD} THB per USD (NOT verified BOT FX). Historical SELL reference only; NOT current freight quotation or Direct Cost. Do not post to current B/C subtotal. Reconcile all four MR cargo legs against current MGW China FAT and DDP JUTAL Zhuhai Yard; Bangkok/Nantong are historical Rev05 routes only.</p>}
   {e.code==="B3"&&<B3WorkTypeAccordion0553 workingRow={workingRow}
