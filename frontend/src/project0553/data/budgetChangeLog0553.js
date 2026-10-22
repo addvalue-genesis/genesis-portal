@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R27";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R28";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-16",date:"2026-10-22",kind:"UI",tone:"neutral",
+  title:"B3 Site Survey and Latest Offshore SAT 28+2-Day Readable Execution WBS",
+  detail:"Owner reported 10.2 b3.site-mr-sat-matrix and b3.40-day-abc still show 40 team-days/80 MD as if current operational plan; seven-site Survey has no displayed price build. New source-linked B3 field-execution-plan uses existing 28 productive two-person SAT team-days (56 MD), pooled 2 risk team-days (4 MD), and 2 management-reserve team-days separately UNPOSTED. Nine site/SIT/PUNCH schedule rows link original 21 SAT Test IDs without duplicate per-MR day/price. Seven survey site visit-days plus two separate team travel-days (2 people x 9 days =18 MD) are a NEW estimator-only 1-day/site assumption; physical visit, cruise/weather/POB, crew days and direct rates NOT VERIFIED. Using original B3 SAT Working SELL reference rate USD800/person-day x FX31.5 gives onsite THB352800 plus transit labour THB100800 = survey illustrative THB453600; it is NOT payroll Direct COST, vendor quote, selected customer price or additive posting. New 28+2 SAT labour scenario THB1512000 and illustrative complete B3 incl Survey, FAT and VeEX THB2700125 are NONPOSTING until owner approves; selected B3 THB2750525 from 40-day/80-MD pricing remains unchanged. UI leads with Thai where/who/days/work and collapses original 40-day prices and 21 individual SAT Test-IDs for audit. 10.2/10.3/10.5 current totals, Rev03 immutable, commercial release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.field-execution-plan","bid.budget.working.bc.b3.site-mr-sat-matrix","bid.budget.working.bc.b3.40-day-abc"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner B3 survey and SAT staffing-day correction; source b3LeanSatScenario0553 Rev.K K15–K18 and b3SiteSurveyScope0553 seven locations"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-15",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"B5–B6–B7 Linked Logistics Actual Route & Price Trace",
