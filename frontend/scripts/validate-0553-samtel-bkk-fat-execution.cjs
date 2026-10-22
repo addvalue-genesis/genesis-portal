@@ -56,6 +56,11 @@ assert.equal(d.existingDirectCostUnchanged,true);
 assert.equal(d.releaseAllowed,false);
 const ui=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(ui.includes("MGW executes MR0001–MR0004 OEM IFAT/FAT"));
-assert(ui.includes("item.executionDecision"));
+// The old inline item.executionDecision panel moved into canonical 10.2
+// BcCostEvidenceDetail. Ensure active MGW FAT is visible while Bangkok stays
+// isolated as historical FAT_EXECUTION_BASIS provenance.
+assert(ui.includes("MGW executes MR0001–MR0004 OEM IFAT/FAT")&&
+ ui.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/>'),
+ "10.2 active MGW basis must be visible through the selected owner detail");
 assert(ui.includes("JUTAL Zhuhai Yard, China"));
 console.log("PASS 0553 Rev05 Bangkok FAT audit preserved, active Rev.K MGW FAT and JUTAL Yard strategy reconciled, B1/B3/B9 current working sell changed with budget authority; no direct-cost posting.");
