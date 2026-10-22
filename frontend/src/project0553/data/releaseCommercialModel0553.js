@@ -127,6 +127,21 @@ const resultMoneyTHB=(line,rate)=>{
 // C1/C2: current historical-based OPTION budget reference, NOT verified OEM cost,
 // thus NOT the A/C cost-plus-30% customer price. Show reference only for internal audit.
 export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}={}){
+ // Existing B10/B11/B13/C1/C2 Annex: requirements are NOT quoteable until
+ // OEM SKU, PTTEP minimum quantity and supplier cost are verified and selected.
+ // Never publish the Rev08 priced schedule as current lines.
+ if(["B10","B11","B13","C1","C2"].includes(code)){
+  return Object.freeze({
+   code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
+   rows:Object.freeze([]),requirementRows:Object.freeze(sourceRows),
+   requirementCount:sourceRows.length,
+   selectedWorkingTHB:null,annexLineTotalTHB:null,varianceTHB:null,
+   isOption:code.startsWith("C"),pricedRows:0,totalRows:0,
+   sourceLineCoverageComplete:false,
+   priceStatus:"PTTEP_OEM_SPIR_NEW_REPRICE_HOLD",reconciled:false,
+   priceLabel:"NOT ESTABLISHED / NOT RELEASED",customerReleaseAllowed:false
+  });
+ }
  const amount=x=>typeof x==="number"&&Number.isFinite(x)?x:null;
  const isBase=["B10","B11","B13"].includes(code);
  const isOption=["C1","C2"].includes(code);
@@ -272,7 +287,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  });
  const annexCodes=["B10","B11","B13","C1","C2"];
  const annexModels=Object.fromEntries(annexCodes.map(code=>[code,buildAnnexWorkingPriceBridge0553({
-  code,sourceRows:spare.byCode[code]||[],
+  code,sourceRows:spare.currentByCode[code]||[],
   owner:code.startsWith("B")?b.find(x=>x.code===code):c.find(x=>x.code===code)
  })]));
  const annex=Object.fromEntries(annexCodes.map(code=>[code,annexModels[code].rows]));
