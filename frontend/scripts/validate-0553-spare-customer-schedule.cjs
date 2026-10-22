@@ -57,7 +57,24 @@ assert.equal(x.riskCandidates.length,1);
 assert(x.crossCategoryDuplicates.some(z=>z.family==="SCADA_POE"&&z.categories.includes("B10")&&z.categories.includes("C2")),"B10-C2 PoE overlap must be flagged for stock-quantity reconciliation");
 assert(x.byCode.B13.every(r=>r.activityBasedQuantityEquation==="SPQ-003"&&r.activityBasedQuantityState==="OPEN_INPUT"),"B13 must not claim evidence-based activity consumption from old spreadsheet");
 const risk=x.riskCandidates[0],src=MR0002_WORKING_BOM_0553.sites.find(s=>s.site==="ZWP20").items.find(r=>r.id==="ZWP20-RFI-BDA");
-assert.equal(risk.tagNo,"TCAB-508-001");
+// ZWP20 is the only site where BDA is the -002 enclosure and RF surge -001.
+assert.equal(src.tag,"TCAB-508-002");
+assert.equal(risk.tagNo,src.tag);
+assert.equal(risk.sourceUnitUSD,31474);
+for(const [wp,expectedBda,expectedSurge] of [
+ ["ZWP20","TCAB-508-002","TCAB-508-001"],
+ ["ZWP21","TCAB-508-001","TCAB-508-002"],
+ ["ZWP22","TCAB-508-001","TCAB-508-002"]
+]){
+ const selected=MR0002_WORKING_BOM_0553.sites.find(x=>x.site===wp);
+ assert(selected,"No selected MR0002 site "+wp);
+ assert.equal(selected.selectedBdaTag,expectedBda);
+ assert.equal(selected.referenceSurgeTag,expectedSurge);
+ assert.equal(selected.items.find(x=>x.id===wp+"-RFI-BDA").tag,expectedBda);
+ assert.equal(selected.items.find(x=>x.id===wp+"-RFI-BDA").unitCost,31474);
+}
+assert.equal(risk.originalBOM.find(x=>x.id==="ZWP20-RFI-BDA").tag,src.tag);
+assert(!risk.warnings.some(x=>x.includes("selected TCAB-508-001 RFI-BDA")));
 assert.equal(risk.moduleId,"bid.budget.bom.mr0002.zwp20.zwp20-rfi-bda.evidence");
 assert.equal(risk.sourceUnitUSD,src.unitCost);
 assert.equal(risk.sourceQuoteLine,src.quoteLine);
