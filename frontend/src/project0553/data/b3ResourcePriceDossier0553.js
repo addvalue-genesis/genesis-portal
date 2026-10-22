@@ -44,10 +44,12 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    group:"SAT_SELECTED_28D",site:box.site,wbs:box.wbs,work:box.work,
    mr:box.mrs?.join(" / ")||"SIT / PUNCH",workfront:box.workfront,
    costOwner:"B3 SAT28 pooled labour; BF/GF Yard/Offshore phase split not independently priced",
-   role,people:1,teamDays:box.days,qty:box.days,unit:"person-day",unitRateTHB:rateTHB,
-   rateUSDPerUnit:rateUSD,fxTHBPerUSD:fx,
-   calculation:"1 person × "+box.days+" days × USD "+rateUSD+" × FX "+fx,
-   workingSellTHB:round(box.days*rateTHB),
+   role,people:1,teamDays:box.days,qty:box.days,unit:"person-day",
+   unitRateTHB:satSelected.satRoleRates[i].thbPerPersonDay,
+   rateUSDPerUnit:satSelected.satRoleRates[i].usdPerPersonDay,fxTHBPerUSD:fx,
+   calculation:"1 "+role+" × "+box.days+" SAT days × USD "+
+    satSelected.satRoleRates[i].usdPerPersonDay+" × FX "+fx,
+   workingSellTHB:round(box.days*satSelected.satRoleRates[i].thbPerPersonDay),
    sourceModuleId:satSelected.moduleId,sourceType:"CURRENT_SELECTED_SAT_28_DAY_WORKING_BUDGET__GF_YARD_OFFSHORE_RACI_NOT_APPROVED",
    linkedTestIds:freeze(mrTests),
    postingClass:"INCLUDED_SELECTED_B3_WORKING_SELL",
@@ -195,7 +197,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  })));
  const riskReserve=freeze([
   freeze({id:"SAT-RISK-2D",name:"SAT/SIT risk allowance",teamDays:2,people:2,personDays:4,
-   workingSellTHB:null,directCostTHB:null,illustrativeOnlyTHB:round(4*rateTHB),
+   workingSellTHB:null,directCostTHB:null,illustrativeOnlyTHB:round(2*satSelected.satTeamDaySellTHB),
    status:"RISK_ALLOWANCE__NOT_INCLUDED_BASE__APPROVAL_GATE"}),
   freeze({id:"SAT-MANAGEMENT-RESERVE-2D",name:"Management reserve",teamDays:2,people:2,personDays:4,
    workingSellTHB:null,directCostTHB:null,illustrativeOnlyTHB:round(4*rateTHB),
@@ -236,7 +238,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
     sourceIndexList.some(i=>i<0||i>=stageGroups.length))
   throw Error("B3 group hierarchy cannot omit or duplicate any source stage");
  const rollupTotalTHB=round(groupRollups.reduce((n,g)=>n+g.selectedWorkingSellTHB,0));
- if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="704525|252000|1411200|30000"||
+ if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="704525|252000|1587600|30000"||
     rollupTotalTHB!==workingRow.workingSellTHB)
   throw Error("B3 group hierarchy must reconcile once to canonical WS-B3");
  const priced=stageGroups.slice(0,5);
@@ -249,14 +251,14 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  if(new Set(singleIds).size!==singleIds.length||
     mgwLines.length!==2||fatLines.length!==8||satLines.length!==18||
     bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
-    total(mgwLines)!==307125||total(fatLines)!==397400||total(satLines)!==1411200||total(bfLines)+total(bfTripLines)!==252000||
-    total(rental)!==30000||budgetSelected!==2397725||
-    selectedBaseExcludingConditionalBFTHB!==2145725||bfConditionalBudgetAllowanceTHB!==252000||
+    total(mgwLines)!==307125||total(fatLines)!==397400||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
+    total(rental)!==30000||budgetSelected!==2574125||
+    selectedBaseExcludingConditionalBFTHB!==2322125||bfConditionalBudgetAllowanceTHB!==252000||
     bfSurveyExpenseDrivers.length!==4||
     bfSurveyExpenseDrivers.some(x=>x.workingSellTHB!==null||x.actualDirectCostTHB!==null)||
     riskReserve.some(x=>x.workingSellTHB!==null||x.directCostTHB!==null)||
     workingRow.workingSellTHB!==budgetSelected||
-    picked.join("|")!=="307125|397400|1411200|30000|252000"||
+    picked.join("|")!=="307125|397400|1587600|30000|252000"||
     plan.survey.conditionalLabourSellReferenceTHB!==252000||
     vendorQuoteCostTHB!==236250||
     round(vendorQuoteCostTHB+mgw.samTelMarkupTHB+mgw.addvalueMarkupTHB+
@@ -288,13 +290,16 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    unpricedExtraBFExpenseCostTHB:null,
    GFYardAdditionalCostTHB:null,GFOffshoreAdditionalCostTHB:null,
    actualDirectCostTHB:null,commercialReleaseAllowed:false,
-   reconciliation:"2145725 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2397725 PRE-AWARD WORKING BUDGET; RELEASE HOLD"
+   reconciliation:"2322125 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2574125 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
+    satSeniorUsd1000DeltaTHB:satSelected.satSeniorRateRevisionDeltaTHB
   }),
   bfSurveyExpenseDrivers,riskReserve,
   noApprovedStagePersonDays:true,
   oldLeanScenarioReferenceTeamDays:plan.sat.oldLeanWithRiskTeamDays,
   oldPriceReferenceTeamDays:sat.workdays,
   currentSATTeamDays:satSelected.satTeamDays,currentBFSurveyTeamDays:satSelected.siteSurveyTeamDays,
+  satRoleRates:satSelected.satRoleRates,
+  satSeniorRateRevisionDeltaTHB:satSelected.satSeniorRateRevisionDeltaTHB,
   bfSelectedSurveyWorkingSellTHB:satSelected.siteSurveyWorkingSellTHB,
   bfOptionalIllustrativeSellTHB:plan.survey.conditionalLabourSellReferenceTHB,
   currentBFRevisitRequired:null,
