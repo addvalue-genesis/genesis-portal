@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R13";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R14";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-02",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"Repair B9 FAT Cost Owner regression after Selected Base THB233600",
+  detail:"Fix stale assert workingSellTHB===0 in validate-0553-fat-cost-owner-contract.cjs; approved B9 SOW/WS 1 LS THB233600 is selected Base once, conditional execution upon written call-out, direct cost remains NULL. Also correct stale Part B total 4187590.69 to 4385436.82 in SAMTEL Bangkok historical FAT evidence validation. No repricing, MGW FAT B3 remains separate and release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b9","bid.budget.working.bc.b3","bid.budget.working.bc","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"ADR-65 / B9 source owner / 2026-10-22 user Windows Node.js v24 assertion evidence"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-01",date:"2026-10-22",kind:"DATA_FLOW",tone:"pricing",
   title:"B6 Approved MR0001 Shipping: NextG IDU/ODU + Antenna 5 Sets → MGW; Thai Enclosure+Cisco 4 Sets → MGW",
