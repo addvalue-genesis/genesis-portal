@@ -27,7 +27,7 @@ function fits(category,description,x){
  if(/ethernet/.test(d))return m==="MR-0001"&&(/^(LAN|SA)-/.test(t));
  if(/telephone|phone/.test(d))return m==="MR-0003"&&t.startsWith("TPH-");
  if(/sounder/.test(d))return m==="MR-0003"&&t.startsWith("LSE-");
- if(/rf surge/.test(d))return m==="MR-0001"&&t.startsWith("SA-")||m==="MR-0002"&&t==="TCAB-508-002";
+ if(/rf surge/.test(d))return m==="MR-0001"&&t.startsWith("SA-")||m==="MR-0002"&&x.functionRole==="RF_SURGE_EXD";
  if(/rf |n-male|7\/8-inch/.test(d))return (m==="MR-0001"||m==="MR-0002")&&t.startsWith("ANT-");
  if(/gland|fuse|relay/.test(d))return t.startsWith("TCAB-")||/fuse/.test(d)&&m==="MR-0001"&&t.startsWith("LAN-");
  if(/cat6a/.test(d))return m==="MR-0001"&&t.startsWith("LAN-");
@@ -107,10 +107,18 @@ export function selectSpareCustomerSchedule0553(){
   if(Math.abs(subtotal-expected)>0.12)throw Error("Rev08 line rounding/source mismatch "+code);
  }
  const site=MR0002_WORKING_BOM_0553.sites.find(s=>s.site==="ZWP20");
- const kit=site?.items.find(x=>x.id==="ZWP20-RFI-BDA"&&x.tag==="TCAB-508-001"&&x.quoteLine==="UHF-1");
- if(!kit||kit.qty!==1||kit.currency!=="USD"||!Number.isFinite(kit.unitCost)||
-    kit.unitCost<=0||!site.siteTags.includes(kit.tag))
-  throw Error("MR0002/ZWP20 RFI BDA vendor rate/tag must come from source Working BOM");
+ // RFI BDA is installed at the ORIGINAL LNA TAG, NOT at a hardcoded TCAB
+ // suffix. ZWP20 uses -002; ZWP21/22 use -001 (reverse surge positions).
+ // This 10.3 risk comparison reads actual selected BOM identity without
+ // altering the MGW UHF-1 vendor quotation or creating a new spare price.
+ const kit=site?.items.find(x=>x.id==="ZWP20-RFI-BDA"&&
+  x.tag===site.selectedBdaTag&&x.quoteLine==="UHF-1");
+ if(!kit||site.selectedDesign!=="LNA_TO_RFI_BDA_ONLY_SAME_POSITION"||
+    site.referenceSurgeTag===site.selectedBdaTag||
+    !site.siteTags.includes(site.referenceSurgeTag)||
+    kit.qty!==1||kit.currency!=="USD"||kit.unitCost!==31474||
+    !site.siteTags.includes(kit.tag))
+  throw Error("MR0002/ZWP20 RFI BDA selected AFC LNA-position TAG and MGW UHF-1 quote must match Working BOM");
  const rfiEvidenceRows=site.items.filter(item=>[
   "ZWP20-RFI-BDA","ZWP20-RFI-BDA-EXD-ENCLOSURE",
   "ZWP20-BDA-M20-GLANDS","ZWP20-BDA-RF-FEEDTHROUGHS",
@@ -124,7 +132,15 @@ export function selectSpareCustomerSchedule0553(){
   countedInPartA:item.countedInWorkingTotal===true,nonAdditive:item.countedInWorkingTotal!==true,
   status:item.status
  }));
- const equipmentInstances=MR0002_WORKING_BOM_0553.sites.filter(s=>s.siteTags.includes(kit.tag)).length;
+ // Count selected BDA installed bundles at each site's OWN approved
+ // LNA physical position, never count a similarly named surge TAG.
+ const equipmentInstances=MR0002_WORKING_BOM_0553.sites.filter(w=>
+  w.selectedBdaTag&&w.selectedBdaTag!==w.referenceSurgeTag&&
+  w.items.some(x=>x.id===w.site+"-RFI-BDA"&&
+   x.tag===w.selectedBdaTag&&x.quoteLine==="UHF-1"&&
+   x.unitCost===kit.unitCost&&x.qty===1)).length;
+ if(equipmentInstances!==3)
+  throw Error("MR0002 spare risk installed BDA count must follow three physical BDA positions, not shared TAG suffix");
  const scenario=deriveSpareRiskQuantity0553({installedCount:equipmentInstances,critical:true,
   contractualPartMinimum:null,compatibilityProven:false});
  const riskCandidates=Object.freeze([Object.freeze({
@@ -143,7 +159,7 @@ export function selectSpareCustomerSchedule0553(){
   originalBOM:rfiEvidenceRows,
   warnings:["A replacement spare may be only an OEM internal BDA module rather than complete WAROM assembly; rate is an upper-package comparator, NOT vendor-approved spare price.",
    "Never charge WAROM Ex d enclosure twice; full unit is priced in Part A.",
-   "MR0002 Rev.C1 LNA RAD-508-001 versus selected TCAB-508-001 RFI-BDA remains a technical substitution crosswalk."]
+   "MR0002 Rev.C1 LNA RAD-508-001 versus selected "+site.site+" "+kit.tag+" RFI-BDA remains a technical substitution crosswalk (same original LNA position; other sites may use different TCAB suffix)."]
  })]);
  const crossCategoryDuplicates=unique(rows.map(x=>physicalFamily(x.description)).filter(Boolean)).flatMap(family=>{
   const related=rows.filter(x=>physicalFamily(x.description)===family);
