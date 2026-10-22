@@ -31,6 +31,7 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
   Math.abs(expectedB3-b3Total)>0.01))
   throw Error("B3 SAT/VeEX + ADDVALUE FAT + MGW Purchased FAT must reconcile once to canonical B3 Working SELL");
  const byTimebox=new Map(model.budgetarySiteTimeboxes.map(t=>[t.id,t]));
+ const leanByTimebox=new Map(lean.rows.map(r=>[r.id,r]));
  const openMrDetails=row=>{
   const id=row.moduleId+".work-breakdown";
   const node=typeof document!=="undefined"?findModuleElement0553(document,id):null;
@@ -157,7 +158,7 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
   </p>
   {model.rows.map(r=><B3SatMrWorkBreakdown0553
    key={r.id} testRow={r} timebox={byTimebox.get(r.budgetTimeboxId)} priceProof={price}
-   defaultOpen={r.site==="ZPQ"}/>)}
+   leanTimebox={leanByTimebox.get(r.budgetTimeboxId)} defaultOpen={r.site==="ZPQ"}/>)}
   <p className="p55-note"><strong>Budget exceptions not silently costed:</strong> {model.technicalHolds.join(" · ")}.
    Airfare/offshore MOB-DEMOB, access/visa/insurance, additional calibrated instruments and RACON vessel/operator may require separately sourced scope allowances. No automatic Working SELL change is made by this SAT coverage table.</p>
  </ControlledModuleSection0553>;
