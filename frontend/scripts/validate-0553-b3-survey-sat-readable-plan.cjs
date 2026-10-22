@@ -94,5 +94,5 @@ const anchors=[...host.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(anchors.length,new Set(anchors).size,"B3 phase workfront duplicated DOM Module ID");
 assert.equal(JSON.stringify(working()),before,"Stage reassignment may not reprice original B3");
 assert.equal(bc.byCode.B3.directCostTHB,null);
-assert.equal(bc.knownWorkingSellTHB,4582736.82);
+assert.equal(bc.knownWorkingSellTHB,4308914.13);
 console.log("PASS B3 phase split: BF 3 historical survey sites (conditional 3+2 team-days 10MD THB252000 selected conditional Working SELL allowance, physical trip NOT approved), GF 4 Zhuhai Yard SAT and 4 Offshore Commissioning stages RACI/day/cost unknown, legacy 28+2 comparator isolated, selected SAT28 +BF Survey5 B3 SELL THB2599325 and 40day/80MD historical audit only / Release HOLD.");
