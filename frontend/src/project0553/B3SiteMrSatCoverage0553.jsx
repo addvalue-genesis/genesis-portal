@@ -41,10 +41,14 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
  };
  return <ControlledModuleSection0553
   moduleKey={model.moduleId}
-  title="B3 — แผน Site Survey + SAT/SIT: 2 คน × (Survey 9 + SAT 30) team-days"
-  description="แผนล่าสุด SAT 28 วันงาน + 2 Risk = 30 team-days / 60 MD · Survey 7 Site + 2 Travel เป็น Scenario แยก · 40 วันเดิมเป็นฐานราคาเท่านั้น"
+  title="B3 — BF Verification / JUTAL Zhuhai Yard SAT / Offshore Commissioning"
+  description="BF 3 sites conditional visit only · GF 4 sites Yard SAT and Offshore Commissioning as separate vendor phases · old 28+2/40d are NOT approved field days"
   defaultOpen={true}>
   <B3SurveySatExecutionPlan0553 workingRow={workingRow}/>
+  <p className="p55-note"><strong>Source-phase separation:</strong> BOD Rev.C2 §8 has PRIOR BF survey findings;
+   SPE Rev.C2 §7.3.2 requires Fabrication Yard SAT and §7.3.3 offshore commissioning.
+   The 40-day priced Site tables below are retained as AUDIT ONLY — not a location/deployment instruction.
+   The earlier 28+2 lean effort cannot be double-counted as both Yard and Offshore.</p>
   <p className="p55-note"><strong>Module ID:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={model.moduleId}/>
    <strong> Price source:</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey={model.priceBasisModuleId}/>
    These are pre-award Working SELL allowances, NOT verified Direct Cost or approved SAT working duration.
@@ -82,7 +86,7 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
     <th><strong>{fmt(price.laborWorkingSellTHB)}</strong></th><th>Sum of nine timeboxes, not sum of Test-ID prices</th></tr></tfoot>
   </table></div>
   </details>
-  <h4>3. B3 Price Reconciliation — Where does {fmt(b3Total)} come from?</h4>
+  <h4>3. Retained B3 Working SELL Price Bridge (not confirmed on-site resource days)</h4>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:750,width:"100%",tableLayout:"fixed"}}>
    <thead><tr><th>Cost Owner / Source Module</th><th>Basis</th><th>Working SELL THB</th><th>Price Treatment</th></tr></thead>
    <tbody>
@@ -98,7 +102,7 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
    </tbody></table></div>
   <details className="p55-panel" style={{padding:10,marginTop:12}}>
    <summary><strong>เปิดดู Technical SAT Test IDs ทั้ง 21 รายการ (ข้อมูลวิศวกรรมละเอียด / ไม่บวกวันซ้ำ)</strong></summary>
-  <h4>4. Required SAT Test IDs — Refer to the shared Site budget above</h4>
+  <h4>4. Technical SAT Test IDs — Verify at Yard / Offshore per approved ITP, not extra paid visits</h4>
   <p className="p55-note"><strong>21 Test Groups below are Engineering Coverage, not 21 additional priced visits.</strong> Their individual duration and SELL are deliberately NOT allocated until a validated ITP and tagged test execution plan exists. The booked price belongs to the shared Site timebox above.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1140,width:"100%",tableLayout:"fixed"}}>
    <thead><tr><th>Site / MR / Test ID / Module ID</th><th>Shared timebox / People-days</th><th>Measurement / Technical Work</th><th>Needed instruments</th><th>Output evidence</th><th>MR-Specific Price / Shared Site Budget / Gate</th></tr></thead>
