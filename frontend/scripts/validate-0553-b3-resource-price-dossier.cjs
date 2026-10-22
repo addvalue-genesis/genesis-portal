@@ -23,7 +23,7 @@ const bc=working(),b3=bc.byCode.B3,before=JSON.stringify(bc),m=dossier(b3);
 assert.equal(m.moduleId,"bid.budget.working.bc.b3.resource-price-dossier");
 assert.equal(m.groups.length,8);
 assert.equal(m.priceRowCount,29);
-assert.deepEqual(m.groups.map(x=>x.rowCount),[2,8,18,1,8,4,4,2]);
+assert.deepEqual(m.groups.map(x=>x.rowCount),[2,8,18,1,8,14,14,2]);
 assert.deepEqual(m.groups.map(x=>x.selectedWorkingSellTHB),
  [307125,397400,2016000,30000,0,0,0,0]);
 assert.equal(m.pricedWorkingSellTHB,2750525);
@@ -32,12 +32,12 @@ assert.equal(m.actualPaidDirectCostTHB,null);
 assert.equal(m.customerReleaseAllowed,false);
 const paid=m.groups.slice(0,4).flatMap(g=>g.rows);
 const notPaid=m.groups.slice(4).flatMap(g=>g.rows);
-assert.equal(paid.length,29);assert.equal(notPaid.length,18);
+assert.equal(paid.length,29);assert.equal(notPaid.length,38);
 assert(paid.every(x=>Number.isFinite(x.workingSellTHB)&&x.workingSellTHB>0&&
  x.actualDirectCostTHB===null&&x.postingClass==="INCLUDED_SELECTED_B3_WORKING_SELL"));
 assert(notPaid.every(x=>x.workingSellTHB===null&&x.actualDirectCostTHB===null&&
  x.postingClass!=="INCLUDED_SELECTED_B3_WORKING_SELL"));
-assert.equal(new Set([...paid,...notPaid].map(x=>x.id)).size,47);
+assert.equal(new Set([...paid,...notPaid].map(x=>x.id)).size,67);
 const sat=m.groups[2].rows;
 assert.equal(new Set(sat.map(x=>x.site)).size,9);
 assert.equal(new Set(sat.map(x=>x.role)).size,2);
@@ -72,6 +72,7 @@ for(const token of ["resource-price-dossier","MGW Purchased Factory FAT","ADDVAL
  "Retained 40-Team-Day","Fabrication Yard SAT","Offshore Vendor Commissioning",
  "2,016,000.00","307,125.00","397,400.00","30,000.00",
  "2,750,525.00","236,250.00","252,000.00","NOT ESTABLISHED",
+ "MR0001","MR0002","MR0003","MR0004","Test ID:","Instruments:",
  "Qty × Unit","Expand All","Collapse All"]){
  assert(html.includes(token),"Dossier SSR missing "+token);
 }
@@ -88,6 +89,12 @@ const allIds=[rootId,
   })];
  })];
 assert.equal(allIds.length,new Set(allIds).size);
+assert.equal(m.groups[5].rows.filter(x=>x.site==="ZWP23").length,2);
+assert.equal(m.groups[6].rows.filter(x=>x.site==="ZWP23").length,2);
+assert(m.groups[5].rows.every(x=>x.mr.startsWith("MR000")&&x.linkedTestIds.length===1&&
+ x.testInstruments&&x.signoffEvidence&&x.sourceModuleId.includes(".sat-matrix.")));
+assert(m.groups[6].rows.every(x=>x.mr.startsWith("MR000")&&x.linkedTestIds.length===1&&
+ x.testInstruments&&x.signoffEvidence));
 for(const id of allIds){
  assert(entries.has(id),"Navigator missing detailed source work ID "+id);
  assert(html.includes('data-component-key="'+id+'"'),"Dossier missing HTML work row ID "+id);
@@ -96,4 +103,4 @@ const htmlIds=[...host.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(htmlIds.length,new Set(htmlIds).size,"B3 dossier must not duplicate DOM IDs");
 assert.equal(JSON.stringify(working()),before,"B3 dossier modified canonical source");
 assert.equal(bc.knownWorkingSellTHB,4385436.82);
-console.log("PASS 0553 B3 B2-style resource dossier: 29 priced (MGW2 + China FAT8 + SAT18 + VeEX1) detailed person-day/qty/rate lines = WS-B3 THB2750525; BF conditional/4 GF Yard/4 Offshore cost TBD nonposting; 10.3/10.5 B3 trace equal/Release HOLD; 47 unique cost-evidence rows, zero new postings.");
+console.log("PASS 0553 B3 B2-style resource dossier: 29 priced (MGW2 + China FAT8 + SAT18 + VeEX1) detailed person-day/qty/rate lines = WS-B3 THB2750525; BF conditional/4 GF Yard/4 Offshore cost TBD nonposting; 10.3/10.5 B3 trace equal/Release HOLD; 67 unique cost-evidence rows (14 GF Yard + 14 GF Offshore Site/MR), zero new postings.");
