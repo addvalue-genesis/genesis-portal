@@ -1,0 +1,170 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectId": "PJ2610-0556",
+  "projectName": "NEXTG AIS PTTEP PTP APP-AMA",
+  "phase": "L3",
+  "area": "B",
+  "state": "WORKING / RELEASE HOLD",
+  "project": {
+    "shortName": "APP–AMA Microwave Rental",
+    "customer": "PTTEP",
+    "bidContext": "NextG / AIS",
+    "durationMonths": 60,
+    "startDate": "2027-07-01",
+    "pathKmApprox": 40,
+    "topology": "PTP 2+0 XPIC + ASD"
+  },
+  "source": {
+    "id": "TOR-AMA-MW-5Y",
+    "filename": "TOR_AMA_Microwave_5Years (for Aviat).docx",
+    "url": "https://drive.google.com/drive/folders/1fRaQWO30DVeo3lD_0LOY-RJayQgLesXB",
+    "state": "DRAFT_TOR_REVIEW"
+  },
+  "sites": [
+    {
+      "id": "APP",
+      "name": "Arthit Central Processing Platform",
+      "elevationM": [
+        70
+      ],
+      "datum": "AGL_ASL_CONFLICT"
+    },
+    {
+      "id": "AMA",
+      "name": "Arthit Mobile Accommodation at AWP36",
+      "elevationM": [
+        30,
+        25
+      ],
+      "datum": "AGL_ASL_CONFLICT"
+    }
+  ],
+  "requirements": [
+    {
+      "id": "RF-01",
+      "area": "RF",
+      "description": "2+0 XPIC with Advanced Space Diversity",
+      "required": "2+0 XPIC + ASD"
+    },
+    {
+      "id": "RF-02",
+      "area": "RF",
+      "description": "Minimum committed full-duplex throughput",
+      "required": "80 Mbps"
+    },
+    {
+      "id": "RF-03",
+      "area": "RF",
+      "description": "Yearly availability target",
+      "required": "99.995%"
+    },
+    {
+      "id": "NW-01",
+      "area": "NETWORK",
+      "description": "Ethernet demarcation",
+      "required": "1 GbE minimum, 802.1Q"
+    },
+    {
+      "id": "NW-02",
+      "area": "NETWORK",
+      "description": "Latency round-trip",
+      "required": "≤20 ms"
+    },
+    {
+      "id": "NW-03",
+      "area": "NETWORK",
+      "description": "Packet loss",
+      "required": "≤0.1%"
+    },
+    {
+      "id": "OPS-01",
+      "area": "SERVICE",
+      "description": "NOC monitoring & incident support",
+      "required": "24x7"
+    },
+    {
+      "id": "OPS-02",
+      "area": "SERVICE",
+      "description": "Preventive maintenance",
+      "required": "at least annual"
+    },
+    {
+      "id": "OPS-03",
+      "area": "SERVICE",
+      "description": "Monthly SLA performance report",
+      "required": "60 monthly cycles"
+    },
+    {
+      "id": "END-01",
+      "area": "DECOM",
+      "description": "End-of-contract decommissioning",
+      "required": "within 30 days after notice"
+    }
+  ],
+  "openItems": [
+    {
+      "id": "OPEN-01",
+      "issue": "Frequency range and license",
+      "source": "XXXXX"
+    },
+    {
+      "id": "OPEN-02",
+      "issue": "Antenna elevation datum conflict AGL / ASL",
+      "source": "TOR uses both"
+    },
+    {
+      "id": "OPEN-03",
+      "issue": "Cable route and installed length",
+      "source": "XXX m"
+    },
+    {
+      "id": "OPEN-04",
+      "issue": "Burn-in duration",
+      "source": "[24/72] hours"
+    },
+    {
+      "id": "OPEN-05",
+      "issue": "Duplicate CAT2 SLA class",
+      "source": "CAT2 Significant / CAT2 Normal"
+    },
+    {
+      "id": "OPEN-06",
+      "issue": "Vendor/OEM equipment, license and quotation",
+      "source": "NO 0556 QUOTE"
+    },
+    {
+      "id": "OPEN-07",
+      "issue": "60-month rates, operating crews, contingencies",
+      "source": "NOT ESTABLISHED"
+    }
+  ],
+  "milestones": [
+    {
+      "id": "MS1",
+      "name": "Fabrication yard cable work",
+      "date": "2027-03-15"
+    },
+    {
+      "id": "MS2",
+      "name": "APP/AMA antenna installation",
+      "date": "2027-06-01"
+    },
+    {
+      "id": "MS3",
+      "name": "Service commencement",
+      "date": "2027-07-01"
+    }
+  ],
+  "costs": {
+    "currency": "THB",
+    "sourceRate": null,
+    "capexTotal": null,
+    "opex60Months": null,
+    "workingSell": null,
+    "budgetarySell": null,
+    "releaseSell": null,
+    "lines": []
+  },
+  "releaseAllowed": false,
+  "issuePermission": false
+}
