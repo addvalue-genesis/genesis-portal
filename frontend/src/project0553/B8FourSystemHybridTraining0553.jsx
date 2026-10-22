@@ -24,13 +24,13 @@ export function B8FourSystemHybridTraining0553({workingRow}){
    <div><strong>End Users / Duration</strong><p>{m.trainees} people · {m.onsiteTrainingDays} days</p>
     <small>Four disciplines · four half-day live sessions (16 contact hours)</small></div>
    <div><strong>Onsite ADDVALUE Resource</strong><p>1 Senior Telecom Engineer</p>
-    <small>2 session days + 1 preparation day + 2 reserve travel days at USD700/MD</small></div>
+    <small>2 training days + 1 preparation day at USD700/MD; NO separate travel-day labour</small></div>
    <div><strong>OEM Teaching</strong><p>Online · Pending Confirmation</p>
     <small>Four remote instructors/sessions · USD400/session parametric allowance, NOT vendor quote</small></div>
   </div>
   <p className="p55-note"><strong>Working venue:</strong> {m.assumedBudgetaryVenue}.
    Physical classroom, live equipment demonstrations, test access and an ADDVALUE engineer MUST be onsite.
-   OEM lecturer may deliver theoretical content and Q&amp;A remotely. Factory FAT activities B3 and Yard support B9 are separate cost owners.</p>
+   OEM lecturer may deliver theoretical content and Q&amp;A remotely. B8 shares the MGW FAT trip booked to B3; no additional B8 flight, lodging, visa, insurance or travel-day labour. Physical onsite Senior training 2 person-days remain selected provisionally until non-overlapping B3 FAT hours/role owner are confirmed; B9 Yard attendance is separate.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Day / Timebox</th><th>MR / System</th><th>Audience</th><th>Onsite Delivery</th><th>OEM Instructor</th></tr></thead>
    <tbody>{m.systems.map(x=><tr key={x.mr}>
@@ -48,7 +48,7 @@ export function B8FourSystemHybridTraining0553({workingRow}){
    <summary className="p553-bc-price-leaf-head">
     <span className="p553-bc-price-num">B8.G{i+1}</span>
     <span className="p553-bc-price-leaf-label"><strong>{g.name}</strong>
-     <small>{g.rows.length} source estimate activities · {money(g.workingSellTHB)} · attribution once</small>
+     <small>{g.rows.length} source activities · {g.key==="travel"?"NO B8 TRAVEL POSTING · Shared B3 FAT":money(g.workingSellTHB)+" · attribution once"}</small>
      <code>{g.id}</code></span>{copy(g.id)}
    </summary>
    <div className="p553-bc-price-leaf-body">
@@ -62,12 +62,12 @@ export function B8FourSystemHybridTraining0553({workingRow}){
       <td>{Number.isFinite(r.rateUSDPerUnit)?"USD "+qty(r.rateUSDPerUnit):"—"}</td>
       <td>{Number.isFinite(r.fxTHBPerUSD)?qty(r.fxTHBPerUSD):"—"}</td>
       <td>{money(r.unitRateTHB)}</td><td>NOT ESTABLISHED</td>
-      <td><strong>{money(r.workingSellTHB)}</strong></td>
-      <td>{r.verifiedSourceRate}<small>WS-B8 · single owner, no extra CP row</small>
-       {r.sharedTripReconciliation&&<small>Potential B3/B9 shared-trip credit — NO reduction without approved itinerary</small>}</td>
+      <td><strong>{r.sharedTripReconciliation?"EXCLUDED — B3 shared FAT trip":money(r.workingSellTHB)}</strong>{r.sharedTripReconciliation&&<small>Former separate-trip planning {money(r.separateTripHistoricalReferenceTHB)} · NONPOSTING</small>}</td>
+      <td>{r.verifiedSourceRate}<small>{r.sharedTripReconciliation?"Already allocated to B3 FAT trip / excluded from B8":"WS-B8 · one owner, no extra customer row"}</small>
+       {r.sharedTripReconciliation&&<small>Deducted ONCE from old B8 standalone estimate; no additional B8 travel charge</small>}</td>
      </tr>)}</tbody>
      <tfoot><tr><th colSpan={7}>B8.G{i+1} selected Working SELL subtotal</th>
-      <th>{money(g.workingSellTHB)}</th><th>No separate customer line</th></tr></tfoot>
+      <th>{g.key==="travel"?"EXCLUDED · SHARED B3":money(g.workingSellTHB)}</th><th>No separate customer line</th></tr></tfoot>
     </table></div>
    </div>
   </details>)}
@@ -79,9 +79,14 @@ export function B8FourSystemHybridTraining0553({workingRow}){
      <td>Same canonical source; Customer Release HOLD</td></tr>
     <tr><td>Old Rev05 B8 training WBS / 44 MH</td><td>{money(m.originalRev05WorkingSellReferenceTHB)}</td>
      <td>SUPERSEDED historical reference only; NO current posting</td></tr>
-    <tr><td>Possible same-trip credit B3/B9 (not selected)</td>
-     <td>{money(m.possibleSharedB3B9TripCreditTHB)}</td>
-     <td>NONPOSTING: only credit after proven personnel/travel event overlap</td></tr></tbody>
+    <tr><td>Old standalone B8 price before trip sharing</td><td>{money(m.standaloneTripPreviousWorkingSellTHB)}</td>
+     <td>Historical planning comparison only · not another invoice row</td></tr>
+    <tr><td>B3 FAT shared-trip duplication EXCLUDED from B8</td>
+     <td>− {money(m.excludedDuplicateTripWorkingSellTHB)}</td>
+     <td>ALREADY DEDUCTED · B3 owns common travel, no additional credit</td></tr>
+    <tr><td>B8 onsite Senior labour 2 days · overlap verification</td>
+     <td>{money(44100)}</td>
+     <td>INCLUDED pending evidence of distinct training-only time; if same B3 Senior hours, avoid second posting</td></tr></tbody>
   </table></div>
   <p className="p55-note"><strong>Approval gaps:</strong> {m.gates.join(" · ")}.</p>
   <p className="p55-note"><strong>Full OEM onsite instructor alternative:</strong>
