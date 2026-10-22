@@ -190,8 +190,13 @@ export function B3ResourcePriceDossier0553({workingRow}){
         <td>{x.costOwner}<small>{x.sourceEvidence}</small></td>
        </tr>)}</tbody>
       </table></div></>}
-     {i===5&&<p className="p55-note">SPE §7.3.2: JUTAL Zhuhai fabrication site SAT.
-      ADDVALUE Crew × Days × Rate = NOT ESTABLISHED; MGW OEM FAT in B3.R1–R2 cannot be posted again here.</p>}
+     {i===5&&<p className="p55-note"><strong>SPE §7.3.2 — B3.R6 JUTAL Zhuhai Yard SAT is a contract test/acceptance requirement.</strong>
+      ADDVALUE SAT Crew × Days × Rate = NOT ESTABLISHED (ITP/RACI pending).
+      B9 Specialist Assistance is a separately priced Senior Engineer support package on written call-out,
+      not a transfer of the entire B3 Yard SAT. B9 source price details:
+      {" "}<code>bid.budget.working.bc.b9.price-trace.work-scope</code>.
+      B9's 7+2 paid Senior days and related expenses belong to WS-B9 1 LS only,
+      never to these 14 unpriced B3 Yard Test IDs. MGW Factory FAT remains a separate B3 event.</p>}
      {i===6&&<p className="p55-note">SPE §7.3.3: GF offshore commissioning after installation.
       ADDVALUE crew, mobilization, vessel/POB and RF/RACON support require separate priced evidence and signed RACI.</p>}
     </div>
