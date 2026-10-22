@@ -238,7 +238,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
     sourceIndexList.some(i=>i<0||i>=stageGroups.length))
   throw Error("B3 group hierarchy cannot omit or duplicate any source stage");
  const rollupTotalTHB=round(groupRollups.reduce((n,g)=>n+g.selectedWorkingSellTHB,0));
- if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="704525|252000|1587600|30000"||
+ if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="729725|252000|1587600|30000"||
     rollupTotalTHB!==workingRow.workingSellTHB)
   throw Error("B3 group hierarchy must reconcile once to canonical WS-B3");
  const priced=stageGroups.slice(0,5);
@@ -251,14 +251,14 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  if(new Set(singleIds).size!==singleIds.length||
     mgwLines.length!==2||fatLines.length!==8||satLines.length!==18||
     bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
-    total(mgwLines)!==307125||total(fatLines)!==397400||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
-    total(rental)!==30000||budgetSelected!==2574125||
-    selectedBaseExcludingConditionalBFTHB!==2322125||bfConditionalBudgetAllowanceTHB!==252000||
+    total(mgwLines)!==307125||total(fatLines)!==422600||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
+    total(rental)!==30000||budgetSelected!==2599325||
+    selectedBaseExcludingConditionalBFTHB!==2347325||bfConditionalBudgetAllowanceTHB!==252000||
     bfSurveyExpenseDrivers.length!==4||
     bfSurveyExpenseDrivers.some(x=>x.workingSellTHB!==null||x.actualDirectCostTHB!==null)||
     riskReserve.some(x=>x.workingSellTHB!==null||x.directCostTHB!==null)||
     workingRow.workingSellTHB!==budgetSelected||
-    picked.join("|")!=="307125|397400|1587600|30000|252000"||
+    picked.join("|")!=="307125|422600|1587600|30000|252000"||
     plan.survey.conditionalLabourSellReferenceTHB!==252000||
     vendorQuoteCostTHB!==236250||
     round(vendorQuoteCostTHB+mgw.samTelMarkupTHB+mgw.addvalueMarkupTHB+
@@ -290,7 +290,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    unpricedExtraBFExpenseCostTHB:null,
    GFYardAdditionalCostTHB:null,GFOffshoreAdditionalCostTHB:null,
    actualDirectCostTHB:null,commercialReleaseAllowed:false,
-   reconciliation:"2322125 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2574125 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
+   reconciliation:"2347325 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2599325 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
     satSeniorUsd1000DeltaTHB:satSelected.satSeniorRateRevisionDeltaTHB
   }),
   bfSurveyExpenseDrivers,riskReserve,
