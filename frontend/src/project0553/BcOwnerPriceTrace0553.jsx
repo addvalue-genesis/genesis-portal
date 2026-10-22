@@ -238,6 +238,15 @@ function Pricing({row}){
     lodging, insurance and related allowance rows. This amount is included ONCE in
     B1–B14 Base; execution requires written request. The legacy 12 team-day/THB574,560 WBS is superseded and non-posting.
     FAT witnesses belong only in B3.</p>
+   <p className="p55-note"><strong>B1 → B2 → B3 → B9/B11 scope trace:</strong>
+    B1 engineering/configuration defines technical functions; B2 VDRL transmits OEM/ITP/configuration and as-built documents;
+    B3 performs physical FAT/SAT using ADDVALUE temporary instruments.
+    <strong> B9 is Specialist Field Assistance, NOT permanent equipment procurement</strong>:
+    one Senior Telecom Engineer supports JUTAL Zhuhai Yard on written call-out.
+    Customer-retained configuration software, OEM programming/charging kits and O&amp;M Special Tools belong to
+    <strong> B11</strong> — see <ComponentCopyId projectId="PJ2608-0553"
+    componentKey="bid.budget.working.bc.b11.operational-tools-trace"/>.
+    Tool SKU/Qty, Part A OEM inclusions and B11 selling allocation remain unverified; never charge them again as B9.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Call-out Item / Module ID</th><th>Role / Activity</th><th>Qty × Unit</th>
      <th>Working SELL rate THB</th><th>Included B9 Working SELL THB</th><th>Cost authority</th></tr></thead>
