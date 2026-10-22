@@ -25,7 +25,12 @@ const proof=from("data/mgwRoadFreightPackingEvidence0553.js").MGW_ROAD_FREIGHT_P
 const ng=from("data/quotes/NG-260916-ADV-DAP1.full.json");
 const m=source.byCode.B6.b6FourMrRoutingEvidence;
 const old=source.byCode.B6.b6Mr0001ChinaInboundEvidence;
-assert.equal(source.knownWorkingSellTHB,4385436.82);
+// B3 management-selected SAT28 and conditional BF Survey repriced the Part B
+// TOTAL by THB352800; this is NOT a B6 transportation price change.
+assert.equal(source.knownWorkingSellTHB,4032636.82);
+assert.equal(source.byCode.B3.workingSellTHB,2397725);
+assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit
+assert.equal(source.knownWorkingSellTHB+(2750525-source.byCode.B3.workingSellTHB),4385436.82);
 assert.equal(source.byCode.B6.workingSellTHB,307584);
 assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,307584);
 assert.equal(scope.lines.B6.workingSellTHB,307584);
