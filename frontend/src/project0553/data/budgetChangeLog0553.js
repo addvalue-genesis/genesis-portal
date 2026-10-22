@@ -2,8 +2,16 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R28";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R29";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-17",date:"2026-10-22",kind:"ENGINEERING",tone:"neutral",
+  title:"B3 BOD/SPE Correction: BF Conditional Visit, GF Zhuhai Yard SAT and Offshore Commissioning",
+  detail:"Source correction to previous R28 B3 site-survey scenario: original MM-ZTK-1F-GEN-TEL-BOD-0001 Rev.C2 section 8 already records site survey findings for brownfield ZPQ, ZWP8 and ZWP11. No new separate 7-site physical visit is established by BOD or SPE. Previous THB453600 survey labour illustration is withdrawn as current planning candidate. Only if additional ADDVALUE brownfield physical checks are explicitly requested, a NONPOSTING 2-person 3 onsite +2 travel team-day THB252000 labour SELL illustration is shown; verified direct cost, approved crew/duration and work order are OPEN. MM-ZTK-1F-GEN-TEL-SPE-0001 Rev.C2 section 7.3.2 specifies Fabrication Yard SAT by CONTRACTOR/VENDOR (JUTAL Zhuhai), while section 7.3.3 requires distinct VENDOR offshore commissioning after installation at new GF ZWP20/21/22/23. No written ADDVALUE RACI or staff/day quantities for Yard/Offshore, so no combined execution-day total may be asserted. Old lean 28+2 team-day/60 MD is a NONPOSTING combined effort comparison only, not apportioned between phases. Previous 40-day/80 MD THB2016000 labour selected basis and total B3 Working SELL THB2750525 remain unchanged; B3/B9 and B2/B11 no double count, Customer Release HOLD. New UI shows stage-by-stage GF/BF workfronts with unknown persons/days instead of inventing numbers; old 28/40 lines are accessible under Audit.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.field-execution-plan","bid.budget.working.bc.b3.site-mr-sat-matrix","bid.budget.working.bc.b3.40-day-abc"]),
+  priceImpact:"NO_PRICE_CHANGE",
+  source:"BOD Rev.C2 section 8 and 10.4/10.5; SPE Rev.C2 section 7.3.2/7.3.3/7.3.4; owner BF-only survey clarification 2026-10-22"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-16",date:"2026-10-22",kind:"UI",tone:"neutral",
   title:"B3 Site Survey and Latest Offshore SAT 28+2-Day Readable Execution WBS",
