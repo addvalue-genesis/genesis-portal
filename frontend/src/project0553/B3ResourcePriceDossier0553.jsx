@@ -103,7 +103,16 @@ export function B3ResourcePriceDossier0553({workingRow}){
           <th>Quoted Vendor Cost THB</th><th>Working COST THB</th><th>Working SELL THB</th>
           <th>Verified Direct COST THB</th><th>Evidence / Posting Gate</th>
          </tr></thead>
-         <tbody>{rows.map(x=><tr key={x.id} data-component-key={x.id}>
+         <tbody>{[...new Set(rows.map(x=>x.mr||x.wbs||"SHARED ACTIVITY"))].map(mrGroup=><React.Fragment key={mrGroup}>
+          <tr className="p553-b3-dossier-mr-heading"><th colSpan={15}>
+           MR / Activity Group: {mrGroup} ·
+           {active?cash(rows.filter(x=>(x.mr||x.wbs||"SHARED ACTIVITY")===mrGroup)
+            .reduce((sum,x)=>sum+(Number.isFinite(x.workingSellTHB)?x.workingSellTHB:0),0)):
+            "NOT ESTABLISHED / NONPOSTING"}
+           <small>One pooled site/activity allowance only · Test IDs are NOT independent billing lines</small>
+          </th></tr>
+          {rows.filter(x=>(x.mr||x.wbs||"SHARED ACTIVITY")===mrGroup)
+           .map(x=><tr key={x.id} data-component-key={x.id}>
           <td><strong>{x.id.split(".").slice(-2).join(" / ")}</strong>
            <small>{x.sourceModuleId}</small>{c(x.id)}</td>
           <td><strong>{x.mr||""}</strong> {x.work}<small>{x.wbs||""}</small><small>{x.calculation}</small>
@@ -124,7 +133,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
            <small>{x.postingClass}</small>
            {x.testInstruments&&<small>Instruments: {x.testInstruments}</small>}
            {x.signoffEvidence&&<small>Output: {x.signoffEvidence}</small>}</td>
-         </tr>)}</tbody>
+         </tr>)}</React.Fragment>)}</tbody>
          <tfoot><tr>
           <th colSpan={12}>{site} — subtotal · {active?"selected price ONCE":"not priced"}</th>
           <th>{active?cash(siteAmount):"NOT ESTABLISHED"}</th>
