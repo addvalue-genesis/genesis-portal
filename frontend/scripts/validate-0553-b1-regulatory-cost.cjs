@@ -34,7 +34,8 @@ assert.equal(base.byCode.B3.workingSellTHB,2599325);
 assert.equal(Math.round(100*(
  base.knownWorkingSellTHB+
  (2750525-base.byCode.B3.workingSellTHB)+
- (233600-base.byCode.B9.workingSellTHB)
+ (233600-base.byCode.B9.workingSellTHB)+
+ (30000-base.byCode.B8.workingSellTHB) // exclude current B8 hybrid delta from 21-Oct historical audit
 )),438543682,
  "Historical Part B audit must back out BOTH B3 and B9 current role-rate revisions");
 const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
