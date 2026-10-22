@@ -4,6 +4,7 @@
 // engineering associations, not verified OEM interchangeable spare part numbers.
 // SPQ spare cost scenarios are NON-POSTING and separate from price-controlled base.
 import {selectUnifiedSpareConsumables0553} from "./unifiedSpareConsumables0553";
+import {selectSparePlainLanguage0553} from "./sparePlainLanguage0553";
 import {selectSpareCoverageEngineering0553} from "./spareCoverageEngineering0553";
 import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
 import {deriveSpareRiskQuantity0553,deriveConsumableBudgetQuantity0553} from "./spareRiskQuantity0553";
@@ -75,6 +76,8 @@ export function selectSpareCustomerSchedule0553(){
  const rows=CODES.flatMap(code=>(master.byCode[code]||[]).map(x=>{
   const installed=cover.installed.filter(a=>fits(code,x.description,a));
   const tags=unique(installed.map(i=>i.tag)),sites=unique(installed.map(i=>i.site));
+  const explain=selectSparePlainLanguage0553(x.description);
+  const tagSummary=tags.length>1?tags.length+" related equipment TAGs — check OEM":tags.length===1?tags[0]:"COMMON / TAG not assigned";
   const common=code==="B13"||/configuration tools and maintenance access/i.test(x.description);
   const coveredCommon=common?cover.installed:installed;
   const applicableMRs=unique(coveredCommon.map(i=>i.mr));
@@ -83,6 +86,14 @@ export function selectSpareCustomerSchedule0553(){
   return Object.freeze({
    id:x.id,code,item:x.item,
    tagNo:tags.length?tags.join(", "):"COMMON",
+   tagSummary,relatedEquipmentTagCount:tags.length,
+   relatedTagList:tags,relatedSiteTagCount:installed.length,
+   // Candidate applicability only; cannot assert one physical spare fits these TAGs.
+   commonSpareInterchangeabilityVerified:false,
+   displayDescription:explain.name,displayPurpose:explain.purpose,
+   displaySpecification:explain.specification,displayMaterials:explain.materials,
+   explanationTH:explain.explanationTH,originalDescription:explain.originalDescription,
+   materialVerified:false,oemSpareSkuVerified:false,
    linkedMR:applicableMRs,
    linkedLocations:applicableLocations,installedTagKeys:unique(installed.map(i=>i.key)),
    mappingStatus:tags.length?"INSTALLED_TAG_FUNCTIONAL_ASSOCIATION__SPARE_SKU_COMPATIBILITY_OPEN":common?"COMMON_NON_EQUIPMENT_STOCK":"UNMAPPED_LEGACY_PRICE_SCOPE",
