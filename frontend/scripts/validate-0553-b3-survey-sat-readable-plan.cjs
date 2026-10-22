@@ -1,7 +1,8 @@
-// PJ2608-0553 B3 10.2 review: human-readable Survey and latest 28+2
-// SAT execution WBS. Survey 7 field+2 transit days is NONPOSTING new assumption.
-// Old 40 team-day/80 MD selected price stays isolated from execution plan.
-const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+// B3 latest source-grounded stage split. BOD C2 §8 documents PREVIOUS BF
+// survey; SPE C2 §7.3.2 requires JUTAL fabrication SAT, §7.3.3 Vendor
+// offshore commissioning AFTER installation. No automatic 7-site survey trip.
+// Previous 28+2 /40-day model is a NONPOSTING comparison/old SELL identity.
+const assert=require("node:assert/strict"),path=require("node:path");
 const babel=require("@babel/core"),React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
 const root=path.resolve(__dirname,"../src");
 const js=require.extensions[".js"],jsx=require.extensions[".jsx"];
@@ -18,71 +19,79 @@ const {B3SurveySatExecutionPlan0553:Panel}=from("B3SurveySatExecutionPlan0553.js
 const {B3SiteMrSatCoverage0553:Matrix}=from("B3SiteMrSatCoverage0553.jsx");
 const {BcCostEvidenceDetail0553:Host}=from("BcCostEvidenceDetail0553.jsx");
 const bc=working(),b3=bc.byCode.B3,before=JSON.stringify(bc),x=plan(b3);
-assert.equal(x.survey.rows.length,7);assert.equal(x.survey.crew,2);
-assert.equal(x.survey.productiveTeamDays,7);assert.equal(x.survey.travelTeamDays,2);
-assert.equal(x.survey.totalTeamDays,9);assert.equal(x.survey.personDays,18);
-assert.equal(x.survey.onsiteLabourSellReferenceTHB,352800);
+assert.deepEqual([...x.bfSites],["ZPQ","ZWP8","ZWP11"]);
+assert.deepEqual([...x.gfSites],["ZWP20","ZWP21","ZWP22","ZWP23"]);
+assert.equal(x.survey.rows.length,3);assert.equal(x.survey.excludedGFRows.length,4);
+assert(x.survey.rows.every(r=>r.previousSiteSurveyReported&&r.physicalRevisitRequired===null&&
+  r.approvedCrew===null&&r.approvedDays===null&&r.postingAllowed===false));
+assert(x.survey.excludedGFRows.every(r=>!r.separatePhysicalSurveyBudgeted));
+assert.equal(x.survey.physicalRevisitApproved,false);
+assert.equal(x.survey.selectedPhysicalSurveyTeamDays,null);
+assert.equal(x.survey.provisionalPhysicalSiteDaysIfCalled,3);
+assert.equal(x.survey.provisionalTravelTeamDaysIfCalled,2);
+assert.equal(x.survey.totalTeamDaysIfCalled,5);
+assert.equal(x.survey.totalPersonDaysIfCalled,10);
+assert.equal(x.survey.onsiteLabourSellReferenceTHB,151200);
 assert.equal(x.survey.travelLabourSellReferenceTHB,100800);
-assert.equal(x.survey.planningLabourSellReferenceTHB,453600);
+assert.equal(x.survey.conditionalLabourSellReferenceTHB,252000);
+assert.equal(x.survey.priorSevenSiteIllustrationTHB,453600);
+assert.equal(x.survey.priorSevenSiteIllustrationWithdrawn,true);
 assert.equal(x.survey.selectedWorkingSellTHB,null);
-assert.equal(x.survey.directCostTHB,null);assert.equal(x.survey.workingSellPostingAllowed,false);
-assert.equal(x.sat.crew,2);assert.equal(x.sat.productiveTeamDays,28);
-assert.equal(x.sat.productivePersonDays,56);assert.equal(x.sat.riskTeamDays,2);
-assert.equal(x.sat.riskPersonDays,4);assert.equal(x.sat.executionTeamDays,30);
-assert.equal(x.sat.executionPersonDays,60);
+assert.equal(x.survey.verifiedDirectCostTHB,null);
+assert.equal(x.survey.postingAllowed,false);
+assert.equal(x.yardSat.location,"JUTAL Zhuhai Fabrication Yard, China");
+assert.equal(x.yardSat.rows.length,4);
+assert.equal(x.offshore.rows.length,4);
+assert(x.yardSat.rows.every(r=>r.plannedCrew===null&&r.plannedTeamDays===null&&
+  r.directCostTHB===null&&r.postingAllowed===false&&r.location.includes("Zhuhai")));
+assert(x.offshore.rows.every(r=>r.plannedCrew===null&&r.plannedTeamDays===null&&
+  r.directCostTHB===null&&r.postingAllowed===false&&r.location.includes("after installation")));
+assert.equal(x.shared.length,2);
+assert.equal(x.sat.rows.length,9);
+assert.equal(x.sat.oldLeanProductiveTeamDays,28);
+assert.equal(x.sat.oldLeanWithRiskTeamDays,30);
+assert.equal(x.sat.oldLeanWithRiskPersonDays,60);
 assert.equal(x.sat.managementReserveTeamDays,2);
-assert.equal(x.sat.managementReservePersonDays,4);
-assert.equal(x.sat.managementReserveIncluded,false);
+assert.equal(x.sat.noAuthoritativeNewStageTotals,true);
+assert.equal(x.sat.actualNewDeploymentTeamDays,null);
+assert.equal(x.sat.actualNewDeploymentPersonDays,null);
 assert.equal(x.sat.selectedBaselineTeamDays,40);
 assert.equal(x.sat.selectedBaselinePersonDays,80);
 assert.equal(x.sat.selectedBaselineLaborSellTHB,2016000);
-assert.equal(x.sat.scenarioLabourWithRiskTHB,1512000);
-assert.equal(x.phaseSummary.surveyPlusSatPlannedTeamDays,39);
-assert.equal(x.phaseSummary.surveyPlusSatPlannedPersonDays,78);
-assert.equal(x.phaseSummary.satTravelMOBDEMOBExcluded,true);
+assert.equal(x.sat.scenarioLabourWithRiskReferenceTHB,1512000);
+assert.equal(x.phaseSummary.allThreeStagesDaysEstablished,false);
 assert.equal(x.phaseSummary.selectedB3WorkingSellTHB,2750525);
-assert.equal(x.phaseSummary.scenarioB3SATFATPlusSurveySellTHB,2700125);
-assert.equal(x.customerReleaseAllowed,false);assert.equal(x.postingAllowed,false);
-assert.deepEqual(x.sat.rows.map(r=>[r.id,r.productiveTeamDays]),[
- ["BF-ZPQ",2],["BF-ZWP8",2],["BF-ZWP11",2],
- ["GF-ZWP21",5],["GF-ZWP23",3],["GF-ZWP22",5],["GF-ZWP20",5],["SIT",3],["PUNCH",1]]);
-assert.equal(new Set(x.sat.rows.flatMap(r=>r.linkedTests)).size,21);
-assert.deepEqual(x.sat.rows.map(r=>r.relativeWorkdayLabel),[
- "SAT D1–D2","SAT D3–D4","SAT D5–D6","SAT D7–D11",
- "SAT D12–D14","SAT D15–D19","SAT D20–D24","SAT D25–D27","SAT D28"
-]);
-assert.equal(x.sat.rows[x.sat.rows.length-1].relativeWorkdayEnd,28);
-assert.deepEqual(x.survey.rows.map(r=>r.site),
- ["ZPQ","ZWP8","ZWP11","ZWP21","ZWP23","ZWP22","ZWP20"]);
+assert.equal(x.phaseSummary.noNewReleasePrice,true);
+assert.equal(x.postingAllowed,false);assert.equal(x.customerReleaseAllowed,false);
 const html=renderToStaticMarkup(React.createElement(Panel,{workingRow:b3}));
 const compact=renderToStaticMarkup(React.createElement(Panel,{workingRow:b3,compact:true}));
 assert(html.includes('data-component-key="bid.budget.working.bc.b3.field-execution-plan"'));
-assert(html.includes("SAT D1–D2")&&html.includes("SAT D20–D24")&&html.includes("SAT D29–D30"));
 assert(!compact.includes('data-component-key="bid.budget.working.bc.b3.field-execution-plan"'));
-for(const phrase of ["28", "30", "56", "60", "80", "453,600.00", "352,800.00",
- "100,800.00", "1,512,000.00", "2,700,125.00", "2,750,525.00",
- "Site Survey", "Mobilization","Survey 7 sites","NOT ESTABLISHED","NOT POSTED"]){
- assert(html.includes(phrase),"Readable Site Survey / SAT WBS missing "+phrase);
+for(const phrase of ["ZPQ","ZWP8","ZWP11","ZWP20","ZWP21","ZWP22","ZWP23",
+ "JUTAL Zhuhai","Fabrication Yard SAT","Offshore Commissioning",
+ "28","60","80","252,000.00","151,200.00","100,800.00",
+ "2,750,525.00","NOT ESTABLISHED","NOT POSTED","RACI","BOD"]){
+ assert(html.includes(phrase),"B3 contract phase WBS missing "+phrase);
 }
 const matrix=renderToStaticMarkup(React.createElement(Matrix,{workingRow:b3}));
-assert(matrix.includes("28")&&matrix.includes("60")&&matrix.includes("7 site"));
-assert(matrix.includes("แสดงฐานราคาเดิม 40 วัน / 80 MD"));
-assert(matrix.includes("Technical SAT Test IDs ทั้ง 21 รายการ"));
+assert(matrix.includes("Zhuhai")&&matrix.includes("40 วัน / 80 MD"));
 const host=renderToStaticMarkup(React.createElement(Host,{workingRow:b3}));
-assert(host.includes("Site Survey + SAT Execution Plan"));
-assert(host.includes("Survey 2 people"));
+assert(host.includes("BF Verification / GF Yard SAT / Offshore Commissioning"));
 assert(host.includes("2,750,525.00"));
 const navIds=new Set(nav().map(r=>r.id));
-const expected=[x.moduleId,
+const ids=[x.moduleId,
  ...x.survey.rows.map(r=>x.moduleId+".survey."+r.site.toLowerCase()),
+ ...x.yardSat.rows.map(r=>x.moduleId+".yard."+r.site.toLowerCase()),
+ ...x.offshore.rows.map(r=>x.moduleId+".offshore."+r.site.toLowerCase()),
  ...x.sat.rows.map(r=>x.moduleId+".sat."+r.id.toLowerCase())];
-for(const id of expected){
- assert(navIds.has(id),"Module Navigator missing "+id);
- assert(html.includes('data-component-key="'+id+'"'),"Actual planned B3 task not rendered "+id);
+assert.equal(new Set(ids).size,ids.length);
+for(const id of ids){
+ assert(navIds.has(id),"Navigator missing "+id);
+ assert(html.includes('data-component-key="'+id+'"'),"B3 contract workfront DOM ID missing "+id);
 }
-const keys=[...host.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
-assert.equal(keys.length,new Set(keys).size,"B3 Survey/SAT rendering duplicates DOM Module IDs");
-assert.equal(JSON.stringify(working()),before,"Scenario cannot reprice 10.2 canonical B3");
+const anchors=[...host.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
+assert.equal(anchors.length,new Set(anchors).size,"B3 phase workfront duplicated DOM Module ID");
+assert.equal(JSON.stringify(working()),before,"Stage reassignment may not reprice original B3");
 assert.equal(bc.byCode.B3.directCostTHB,null);
 assert.equal(bc.knownWorkingSellTHB,4385436.82);
-console.log("PASS B3 readable survey/SAT: 2 people, proposed Survey 7 onsite +2 travel=9 team-days/18MD (THB453600 unposted SELL scenario, Cost null); latest SAT 28 productive+2 risk=30 team-days/60MD, +2 mgmt unposted; 7 sites and 21 tests; old 40 days/80MD retained for price audit, B3 SELL 2750525 unchanged, Release HOLD.");
+console.log("PASS B3 phase split: BF 3 historical survey sites (conditional 3+2 team-days 10MD THB252000 nonposting), GF 4 Zhuhai Yard SAT and 4 Offshore Commissioning stages RACI/day/cost unknown, legacy 28+2 comparator isolated, selected 40day/80MD B3 SELL THB2750525 unchanged / Release HOLD.");
