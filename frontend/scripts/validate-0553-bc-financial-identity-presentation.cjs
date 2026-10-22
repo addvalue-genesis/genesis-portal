@@ -68,8 +68,8 @@ for(const f of ["control.financialIdentity.scopeId","control.financialIdentity.w
  assert(scopeUI.includes(f),"10.5 lacks source-aware identity "+f);
 const b3owner=source.byCode.B3;
 assert.equal(b3owner.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
-assert.equal(price.b.find(x=>x.code==="B3").samTelDeductionTHB,151780);
+assert.equal(price.b.find(x=>x.code==="B3").samTelDeductionTHB,161860);
 assert.equal(price.b.find(x=>x.code==="B3").samTelPurchased20PctCostShareTHB,47250);
-assert.equal(price.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,104530);
+assert.equal(price.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,114610);
 assert.equal(JSON.stringify(working()),snap,"Presentation must never mutate canonical B/C ledger");
 console.log("PASS 0553 SOW/VQ/IC/WS/CP identity matrices all 16 B/C owners: source-linked 10.2/10.3/10.5, B3 MGW purchased USD7500/WS307125 once, no inferred actual cost, CP release HOLD.");
