@@ -273,7 +273,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   scenarioAudits.b3B8FiveDayOneTrainer.postingAllowed||
   scenarioAudits.b3B8FiveDayTwoTrainers.postingAllowed||
   scenarioAudits.b3LeanSat28plus2.currentWorkingSellTHB!==null||
-  scenarioAudits.b3LeanSat28plus2.illustrativeWholeB3THB!==2246525)
+  scenarioAudits.b3LeanSat28plus2.illustrativeWholeB3THB!==null)
   throw Error("Nonposting B3 scenario contaminated 10.2 canonical selected Working SELL");
  const knownWorkingSellTHB=round(rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
   .reduce((sum,r)=>sum+r.workingSellTHB,0));
