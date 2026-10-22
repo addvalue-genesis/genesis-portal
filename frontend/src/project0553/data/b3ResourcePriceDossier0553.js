@@ -125,16 +125,26 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   postingClass:"UNPRICED_CONDITIONAL_NONPOSTING",
   stageAllocationConfirmed:false
  }));
- const pendingPhase=(rows,phase,workOwner)=>rows.map(x=>make(phase,x.site.toLowerCase(),{
-  group:workOwner,site:x.site,wbs:x.sourceClause,
-  work:x.activity,role:"ADDVALUE role / vendor RACI NOT APPROVED",
-  people:null,teamDays:null,qty:null,unit:"person-day",
-  unitRateTHB:null,rateUSDPerUnit:null,workingSellTHB:null,
-  calculation:"Crew × working days × sourced Direct Cost rate = NOT ESTABLISHED",
-  sourceModuleId:plan.moduleId,sourceType:x.status,
-  linkedTestIds:x.linkedTestIds,
-  postingClass:"UNPRICED_REQUIREMENT_NONPOSTING",stageAllocationConfirmed:false
- }));
+ // Yard/Offshore are distinct CONTRACT PHASES. Crosswalk each phase to
+ // existing Site/MR Test IDs without multiplying the same shared price/crew.
+ // Per-MR labour rate/duration MUST remain null until OEM/ITP/RACI approval.
+ const pendingPhase=(rows,phase,workOwner)=>rows.flatMap(x=>{
+  const tests=matrix.rows.filter(t=>t.site===x.site&&t.mr.startsWith("MR000"));
+  if(!tests.length||tests.length!==x.linkedTestIds.length)
+   throw Error("B3 GF phase source Test-ID coverage diverged at "+x.site);
+  return tests.map(t=>make(phase,x.site.toLowerCase()+"."+t.mr.toLowerCase(),{
+   group:workOwner,site:x.site,wbs:x.sourceClause+" / "+t.wbs,
+   work:t.system+" — "+t.requiredFunction,phaseScope:x.activity,
+   role:"ADDVALUE role / vendor RACI NOT APPROVED",
+   people:null,teamDays:null,qty:null,unit:"person-day",
+   unitRateTHB:null,rateUSDPerUnit:null,workingSellTHB:null,
+   calculation:"Qty × role × working days × verified Direct Cost rate = NOT ESTABLISHED",
+   sourceModuleId:t.moduleId,sourceType:x.status,
+   mr:t.mr,linkedTestIds:freeze([t.id]),
+   testInstruments:t.testInstruments,signoffEvidence:t.signoffEvidence,
+   postingClass:"UNPRICED_REQUIREMENT_NONPOSTING",stageAllocationConfirmed:false
+  }));
+ });
  const yardLines=pendingPhase(plan.yardSat.rows,"gf-yard","GF_FABRICATION_YARD_SAT");
  const offshoreLines=pendingPhase(plan.offshore.rows,"gf-offshore","GF_OFFSHORE_COMMISSIONING");
  const sharedLines=plan.shared.map(x=>make("shared",x.id.toLowerCase(),{
@@ -161,7 +171,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  const singleIds=stageGroups.flatMap(g=>g.rows.map(r=>r.id));
  if(new Set(singleIds).size!==singleIds.length||
     mgwLines.length!==2||fatLines.length!==8||satLines.length!==18||
-    bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==4||offshoreLines.length!==4||
+    bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
     total(mgwLines)!==307125||total(fatLines)!==397400||total(satLines)!==2016000||
     total(rental)!==30000||budgetSelected!==2750525||
     workingRow.workingSellTHB!==budgetSelected||
