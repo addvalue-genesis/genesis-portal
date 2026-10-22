@@ -36,7 +36,7 @@ const activitiesForCustomerCode=Object.freeze({
 const customerRequirements=Object.freeze({
  B1:"Engineering and Design — 1 Lot (customer B1); internal ADDVALUE project support B1.1–B1.8 separately planned",
  B2:"VDRL, documentation and final as-built delivery per MR",
- B3:"Inspection / Site Survey / FAT / SAT — pre-SAT field survey across 7 locations is in B3 contract scope but remains unpriced pending separate crew/days/travel WBS; MGW purchased iFAT/FAT Facility and ADDVALUE FAT witness, offshore SAT/SIT and VeEX remain selected Working SELL",
+ B3:"Inspection / FAT / BF Site Survey and SAT — selected SAT 28 productive team-days; BF Survey ZPQ/ZWP8/ZWP11 3 onsite +2 travel Team-days in B3 Working SELL as conditional work allowance; GF Yard and Offshore ADDVALUE RACI open",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
  B6:"Transportation — APPROVED MR0001 route: NextG IDU/ODU plus 5 greenfield antennas directly to MGW Nantong; Thai Enclosure+Cisco 4 preassembled sets to MGW; MR0002–0004 OEM into MGW China FAT; MGW SERV-5 single outbound freight to JUTAL. Commercial freight credit not yet verified.",
@@ -54,7 +54,7 @@ const customerRequirements=Object.freeze({
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
 const executionDecisionByCode=Object.freeze({
- B3:"B3 owns purchased MGW iFAT/facility SERV-2/4 WS at 20+5+5, ADDVALUE FAT Witness/travel plus Offshore SAT/SIT and temporary tools; do not duplicate vendor service in Part A",
+ B3:"B3 owns MGW iFAT SERV-2/4 20+5+5, ADDVALUE FAT Witness, SAT 28d and BF Survey 3+2d, temporary VeEX; GF Yard/Offshore RACI open; no duplicate Part A/B9",
  B6:"Project Owner approved NextG IDU/ODU/all 5 antenna direct MGW and Thai-built Enclosure+Cisco 4 sets to MGW; NextG expired DAP Ranong quotation needs destination amendment and price/credit. B6 historical SELL unchanged, B5 packing/B3 FAT ownership separated.",
  B9:"Specialist field assistance 7-day Sr Telecom Engineer 1 LS quoted in B9 Base; on-call execution conditional on written Yard request. MGW FAT Witness remains B3."
 });
