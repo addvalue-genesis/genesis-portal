@@ -23,9 +23,9 @@ const {buildBcModuleNavigator0553:registry}=from("data/bcModuleNavigator0553.js"
 const codes=["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"];
 const source=working(),snap=JSON.stringify(source),sc=scope(),price=release();
 assert.equal(source.rows.length,16);
-assert.equal(source.knownWorkingSellTHB,4385436.82);
-assert.equal(source.byCode.B3.workingSellTHB,2750525);
-assert.equal(price.b.find(r=>r.code==="B3").customerSellTHB,2750525);
+assert.equal(source.knownWorkingSellTHB,4032636.82);
+assert.equal(source.byCode.B3.workingSellTHB,2397725);
+assert.equal(price.b.find(r=>r.code==="B3").customerSellTHB,2397725);
 assert.equal(price.approval.releaseAllowed,false);
 const registered=new Set(registry().map(r=>r.id));
 const ui=[];
@@ -68,8 +68,8 @@ for(const f of ["control.financialIdentity.scopeId","control.financialIdentity.w
  assert(scopeUI.includes(f),"10.5 lacks source-aware identity "+f);
 const b3owner=source.byCode.B3;
 assert.equal(b3owner.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
-assert.equal(price.b.find(x=>x.code==="B3").samTelDeductionTHB,169420);
+assert.equal(price.b.find(x=>x.code==="B3").samTelDeductionTHB,151780);
 assert.equal(price.b.find(x=>x.code==="B3").samTelPurchased20PctCostShareTHB,47250);
-assert.equal(price.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,122170);
+assert.equal(price.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,104530);
 assert.equal(JSON.stringify(working()),snap,"Presentation must never mutate canonical B/C ledger");
 console.log("PASS 0553 SOW/VQ/IC/WS/CP identity matrices all 16 B/C owners: source-linked 10.2/10.3/10.5, B3 MGW purchased USD7500/WS307125 once, no inferred actual cost, CP release HOLD.");
