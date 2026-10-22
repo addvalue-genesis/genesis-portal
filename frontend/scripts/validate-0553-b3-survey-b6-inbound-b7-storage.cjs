@@ -19,14 +19,22 @@ const scope=from("data/scopePartBcReadModel0553.js").selectScopePartBcWorking055
 const quote=from("data/mgwP26058R2Cover20261020.js").MGW_R2_COVER_20261020_0553;
 const template=from("data/officialWorkbookTemplate0553.js").OFFICIAL_WORKBOOK_TEMPLATE_0553;
 const survey=bc.byCode.B3.b3SiteSurveyScope,
+ selectedSurvey=bc.byCode.B3.b3SelectedSatSurveyBudget,
  inbound=bc.byCode.B6.b6Mr0001ChinaInboundEvidence,
  storage=bc.byCode.B7.b7ThreeMonthStorageEvidence;
-assert.equal(bc.knownWorkingSellTHB,4385436.82,"B6/B7/SURVEY must never reprice selected Base automatically");
-assert.equal(bc.byCode.B3.workingSellTHB,2750525);
+assert.equal(bc.knownWorkingSellTHB,4032636.82,"Only owner-selected SAT28 + BF Survey5 may replace the prior B3 budget; B6/B7 cannot reprice");
+assert.equal(bc.byCode.B3.workingSellTHB,2397725);
+assert.equal(selectedSurvey.satTeamDays,28);
+assert.equal(selectedSurvey.siteSurveyTeamDays,5);
+assert.equal(selectedSurvey.satWorkingSellTHB,1411200);
+assert.equal(selectedSurvey.siteSurveyWorkingSellTHB,252000);
+assert.equal(selectedSurvey.riskTeamDaysNotIncluded,2);
+assert.equal(selectedSurvey.siteSurveyPhysicalVisitConfirmed,false);
+assert.equal(selectedSurvey.directCostTHB,null);
 assert.equal(bc.byCode.B6.workingSellTHB,307584);
 assert.equal(bc.byCode.B7.workingSellTHB,30000);
 assert.equal(bc.byCode.B9.workingSellTHB,233600);
-assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2750525);
+assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2397725);
 assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,307584);
 assert.equal(release.b.find(x=>x.code==="B7").customerSellTHB,30000);
 assert.equal(release.b.find(x=>x.code==="B9").customerSellTHB,233600);
@@ -37,7 +45,7 @@ assert.equal(new Set(survey.rows.map(x=>x.site)).size,7);
 assert.equal(survey.displayName,"Inspection / Site Survey / FAT / SAT");
 assert(survey.scopeIncluded&&survey.rows.every(x=>
  x.surveyEffortTeamDays===null&&x.workingSellTHB===null&&!x.postingAllowed));
-assert.equal(survey.alreadyPricedInCurrentSelectedB3,false);
+assert.equal(survey.alreadyPricedInCurrentSelectedB3,false); // raw seven-site source survey rows remain NONPOSTING; selected BF3+travel2 belongs to separate source owner
 assert.equal(survey.newIncrementalWorkingSellTHB,null);
 assert.equal(inbound.bundleCount,4);
 assert.equal(inbound.referenceCBM,5);
@@ -83,4 +91,4 @@ assert.equal(release.approval.releaseAllowed,false);
 assert.equal(bc.byCode.B3.directCostTHB,null);
 assert.equal(bc.byCode.B6.directCostTHB,null);
 assert.equal(bc.byCode.B7.directCostTHB,null);
-console.log("PASS 0553 B3 7-site Survey scope, B6 4-set China inlet vs MGW USD2500 outgoing, B7 3-month unquoted storage; selected prices unchanged / HOLD.");
+console.log("PASS 0553 B3 selected SAT28 (THB1411200) + conditional BF Survey3+travel2 (THB252000), raw 7-location Survey source NONPOSTING, B6 China inlet/B7 storage unchanged; B3 selected THB2397725, Release HOLD.");
