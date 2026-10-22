@@ -232,10 +232,9 @@ function Pricing({row}){
     an approved hourly-rate calculation. Do not treat THB30,000/44 as an agreed rate.</p>
   </section>}
   {code==="B9"&&<section className="p55-panel" style={{padding:12}}>
-   <h4>B9 — Quoted Senior Telecom Engineer Package (one Lump Sum)</h4>
+   <h4>B9 — Senior Telecom Engineer + Field Technician Package (one Lump Sum)</h4>
    <p className="p55-note"><strong>Current B9 quoted Base {fmt(total)}.</strong> The same on-call Yard package has
-    source Working SELL <strong>{fmt(b9.conditionalYardSellTHB)}</strong>, consisting of one
-    Senior Telecom Systems Integration Engineer, seven Yard working days plus travel,
+    source Working SELL <strong>{fmt(b9.conditionalYardSellTHB)}</strong>, consisting of two paid roles (Senior Telecom Systems Integration Engineer + Field Telecom Technician), seven Yard working days each plus two travel days each,
     lodging, insurance and related allowance rows. This amount is included ONCE in
     B1–B14 Base; execution requires written request. The legacy 12 team-day/THB574,560 WBS is superseded and non-posting.
     FAT witnesses belong only in B3.</p>
@@ -268,8 +267,8 @@ function B9YardWorkScopeDossier0553({workingRow}){
    <div><strong>Selected B9 Working SELL · 1 LS</strong>
     <p>{fmt(model.selectedWorkingSellTHB)}</p>
     <small>Same canonical WS-B9 in 10.2 → 10.3 → 10.5; no extra quotation lines</small></div>
-   <div><strong>Paid Yard Resource</strong><p>1 Senior Engineer</p>
-    <small>7 workdays + 2 travel days · USD 700/MD · FX 31.50</small></div>
+   <div><strong>Paid Yard Resource</strong><p>2 People</p>
+    <small>Senior USD700/MD + Field Tech USD600/MD · 7 workdays + 2 travel days each · FX 31.50</small></div>
    <div><strong>Verified Direct COST</strong><p>NOT ESTABLISHED</p>
     <small>Working SELL rates/allowances are not internal payroll or actual expenses</small></div>
    <div><strong>Physical Execution / Customer Release</strong><p>HOLD</p>
@@ -279,7 +278,7 @@ function B9YardWorkScopeDossier0553({workingRow}){
    {" "}B3 GF Yard SAT <code>{model.b3RequirementModuleId}</code> is an
    unpriced CONTRACTUAL testing / acceptance requirement; it does not
    transfer the entire SAT obligation into B9. B9 here owns only the priced
-   on-call Senior Telecom Systems Integration Engineer package, once.
+   on-call Senior Telecom Engineer + Field Technician support package, once.
    {" "}Site ZWP20/21/22/23 and MR0001–0004 are technical coverage,
    <strong> not four separately priced field visits or eight new customer rows</strong>.
    {" "}GF Yard SAT crew, ITP and RACI remain to be approved.</p>
@@ -343,10 +342,13 @@ function B9YardWorkScopeDossier0553({workingRow}){
      <td>Same amount · attribution only · Customer Release HOLD</td></tr></tbody>
   </table></div>
   <p className="p55-note"><strong>Nonposting staffing risk:</strong>
-   an unbilled Field Specialist backup may incur internal travel/cash costs
-   ({fmt(model.unbilledFieldBackupCashRiskTHB)} planning risk reference only).
-   It is <strong>not</strong> added to WS-B9. No additional JUTAL Yard SAT test labour,
-   site-level MR price or B3 group.06 cost is posted by this view.</p>
+   the second Field Technician is PAID in B9 using USD 600/MD for the same 7+2 days;
+   second-person cash/travel/insurance allowances ({fmt(model.fieldTechnicianIncludedExpenseAllowanceTHB)})
+   are included ONCE in WS-B9. <strong>CCL Item 31 remains 18 Yard working days,
+   45 offshore days, 2 training days and 5 survey days as previously stated.</strong>
+   The B9 7+2 Yard specialist package does not fully cover those contractual service
+   durations: CCL scope and allocation remain OPEN, with no unapproved extra posting.
+   No B3 group.06 cost is created by this view.</p>
  </div>;
 }
 function PhysicalDrivers({row}){
@@ -391,10 +393,11 @@ function Resource({row}){
   {code==="B8"&&<p className="p55-note">Trainer discipline and sessions by MR0001–0004,
    number of trainees, training days/total 44 source MH allocation and
    OEM-provided materials remain to validate.</p>}
-  {code==="B9"&&<p className="p55-note">Quoted Sr Telecom Systems Integration Engineer:
-   7 Yard working days and 2 travel days, 1 person selected.
-   The second standby specialist is UNBILLED labour in the offer but could still
-   incur internal cash cost. Actual payroll Direct Cost stays open.</p>}
+  {code==="B9"&&<p className="p55-note">B9 2-person selected planning crew:
+   Senior Telecom Systems Integration Engineer (USD700/MD) + Field Telecom Technician (USD600/MD),
+   each for 7 Yard working days and 2 travel days. CCL Item31 original 18 Yard / 45 Offshore
+   working days remains unchanged and is a separate unclosed scope-to-resource allocation gap.
+   Actual payroll Direct Cost stays NOT ESTABLISHED; customer release HOLD.</p>}
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Required cost / effort input</th><th>Current evidence status</th></tr></thead>
    <tbody>{e.requiredInputs.map((text,i)=><tr key={i}><td>{text}</td>
@@ -443,7 +446,7 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
   <Section code={code} num={code+".1"} suffix="work-scope"
    title={code==="B2"?"VDRL / Document Register by MR":"Work Type / Physical Deliverables"}
    summary={code==="B2"?"MR0001–0004 · 143 requirement rows / 38 unique title types":
-    code==="B9"?"8 priced source rows · 7 Yard workdays + 2 travel days · 1 LS "+fmt(workingRow.workingSellTHB):
+    code==="B9"?"10 priced source rows · Senior + Field Tech · 7 Yard workdays + 2 travel days each · 1 LS "+fmt(workingRow.workingSellTHB):
     "Scope and source work drivers; no invented quantities"} defaultOpen>
    {code==="B2"?<B2Vdrl code={code}/>:["B5","B6","B7"].includes(code)?
     <React.Fragment><B5B6B7LinkedLogistics0553 workingRow={workingRow}/>
