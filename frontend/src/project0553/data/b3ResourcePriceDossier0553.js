@@ -1,7 +1,7 @@
 // PJ2608-0553 — B2-style, source-linked B3 work/crew/day/rate dossier.
 // Read-only detailed decomposition of the ONE selected WS-B3 amount, not a
 // new calculator that can override 10.2/10.3/10.5 customer budgets.
-// Source values: B3 40-day priced timeboxes, B3 China FAT eight rows,
+// Source values: management-selected B3 SAT28 / BF Survey 3+2 resource days, B3 China FAT eight rows,
 // MGW P26-058_R2 SERV-2/4 and temporary VeEX rental. Actual Direct Cost null.
 // RACI-limited NEW scope: BOD C2 §8 BF revisit conditional; SPE C2
 // §7.3.2 Yard SAT; §7.3.3 Offshore Vendor commissioning — unpriced.
@@ -46,7 +46,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    rateUSDPerUnit:rateUSD,fxTHBPerUSD:fx,
    calculation:"1 person × "+box.days+" days × USD "+rateUSD+" × FX "+fx,
    workingSellTHB:round(box.days*rateTHB),
-   sourceModuleId:sat.moduleId,sourceType:"CURRENT_SELECTED_40_DAY_PRICING_BASIS__NOT_APPROVED_DEPLOYMENT",
+   sourceModuleId:satSelected.moduleId,sourceType:"CURRENT_SELECTED_SAT_28_DAY_WORKING_BUDGET__GF_YARD_OFFSHORE_RACI_NOT_APPROVED",
    linkedTestIds:freeze(mrTests),
    postingClass:"INCLUDED_SELECTED_B3_WORKING_SELL",
    verifiedRateType:"PRE_AWARD_WORKING_SELL_RATE",
