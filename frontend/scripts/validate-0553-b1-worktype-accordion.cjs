@@ -100,6 +100,12 @@ const jsx=fs.readFileSync(path.join(root,"project0553/B1RevKMilestoneBudget0553.
 const css=fs.readFileSync(path.join(root,"project0553/project0553.css"),"utf8");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
 assert(jsx.includes("querySelectorAll(\"details.p553-b1-group, details.p553-b1-item\")"));
+assert(!jsx.includes("data-component-key={id} defaultOpen={index===0}")&&
+ !jsx.includes("data-component-key={moduleId} defaultOpen>"),
+ "React <details> must use supported open attr without defaultOpen warnings");
+assert(jsx.includes("data-component-key={id} open={index===0}")&&
+ jsx.includes("data-component-key={moduleId} open>"),
+ "Initial B1 details-open states must be maintained");
 assert(css.includes(".p553-b1-group--management")&&css.includes(".p553-b1-group--audit"));
 assert(host.includes("sourceLedger={<B1IndirectExpenseRegister0553 workingRow={workingRow}/>}")&&
  host.includes("sourceEvidence={<React.Fragment>"));
