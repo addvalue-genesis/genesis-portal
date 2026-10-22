@@ -47,3 +47,17 @@ Additional two management reserve team-days = four MD, nonposting and not automa
 - Module root: `bid.budget.working.bc.b3.field-execution-plan`; children: `.survey.<site>` and `.sat.<timebox-id>`.
 - `npm run validate:0553-b3-survey-sat-readable-plan` included in `npm run build`. Local Windows Node/webpack validation pending.
 - No unapproved commercial release; **PR #35 remains DRAFT**.
+
+---
+## SUPERSEDING CONTRACT REVIEW — 22 OCT 2026 (BOD/SPE)
+Previous seven-site Survey / offshore-only 28+2 modelling is NOT current execution authority. The original section above is retained for audit only.
+
+1. BF: BOD-0001 Rev.C2 §8 already records previous ZPQ, ZWP8 and ZWP11 site-survey findings. Do NOT assume another visit. Optional ADDVALUE two-person x (3 site-days + 2 travel-days) = 5 team-days / 10 MD; THB252000 SELL labour reference, only if a written gap/call-out exists. NOT POSTED / Direct Cost OPEN.
+2. GF Fabrication Yard SAT: SPE-0001 Rev.C2 §7.3.2 specifies CONTRACTOR/VENDOR test at Fabrication Site. Four GF ZWP20/ZWP21/ZWP22/ZWP23 at JUTAL Zhuhai, distinct from MGW Nantong Factory FAT. ADDVALUE crew/day/ITP/RACI NOT ESTABLISHED.
+3. GF Offshore Commissioning: SPE-0001 Rev.C2 §7.3.3 specifies VENDOR commissioning after installation. Four GF offshore workfronts, but ADDVALUE crew/day, offshore permit, vessel/POB and RACI OPEN. Never duplicate GF Yard timeboxes.
+4. Previous lean 28 productive +2 risk days = 30 team-days / 60 MD for two-person COMBINED historical planning only; never assert allocated GF Yard or Offshore days. Two management-reserve days nonposting. Old 40 team-days/80MD remains a historical-based internal price driver.
+5. Do not use the previous 7-site THB453600 Survey price or THB2700125 B3 what-if as current. Controlled B3 Working SELL THB2750525 UNCHANGED; actual cost and release approval OPEN.
+
+BOD: https://drive.google.com/file/d/1YPVUfUIy8X5lVOHbTcQ3i6J2zc4bLTFQ/view
+SPE: https://drive.google.com/file/d/1pa5Tlqpu65Lv1HDkNSz3XvcDCkpjVGRn/view
+New source model: frontend/src/project0553/data/b3SurveySatExecutionPlan0553.js
