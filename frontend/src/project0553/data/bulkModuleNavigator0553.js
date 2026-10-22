@@ -2,17 +2,23 @@
 // Navigation is read-only; it does not post costs, approve procurement or alter source MTO.
 import {deriveBulkMrLocationCoverage0553} from "./bulkMrLocationCoverage0553";
 import {deriveMR0002RfPhysicalRouteReconciliation0553} from "./mr0002RfPhysicalRouteReconciliation0553";
+import {deriveBulkSourceToReleaseTrace0553} from "./bulkSourceToReleaseTrace0553";
+import {derivePhysicalCableEndRegister0553} from "./physicalCableEndRegister0553";
 
 export function buildBulkModuleNavigator0553(){
  const bulk=deriveBulkMrLocationCoverage0553();
  const rf=deriveMR0002RfPhysicalRouteReconciliation0553();
+ const sourceToRelease=deriveBulkSourceToReleaseTrace0553();
+ const cables=derivePhysicalCableEndRegister0553();
  const make=(id,name,keywords,site=null,mr=null)=>({
   id,anchorModuleId:id,tab:"budget",kind:"BULK_READ_ONLY",
   name,keywords,site,mr,workflowNumber:"10.1.1.3"
  });
  const result=[
   make("bid.budget.bom.system-location-mto","10.1.1.3 — System × Location × MTO","BOM source TAG working cost"),
-  make(bulk.moduleId,"10.1.1.3 — BULK / Location Reconciliation","BULK all MR site system installation spare vendor included")
+  make(bulk.moduleId,"10.1.1.3 — BULK / Location Reconciliation","BULK all MR site system installation spare vendor included"),
+  make(sourceToRelease.moduleId,"10.1.1.3 — BULK Source-to-Release Audit","source release MR0001 MR0002 MR0003 MR0004 MTO 11 20 29 36 41 47 52"),
+  make(cables.modelId,"10.1.1.3 — Physical Cable-End Register","61 source-driven functional candidates BDA deviation Open 1.1 MR0001-4")
  ];
  for(const g of bulk.groups.filter(x=>x.active)){
   const title=g.site+" / "+g.mr;
@@ -20,6 +26,14 @@ export function buildBulkModuleNavigator0553(){
    title+" conditional reserve included missing cable price scope",g.site,g.mr));
   for(const item of g.items)result.push(make(item.moduleId,title+" — "+item.item,
    item.id+" "+item.state+" "+item.owner+" "+title,g.site,g.mr));
+ }
+ for(const g of sourceToRelease.groups){
+  result.push(make(g.moduleId,g.site+" / "+g.mr+" — BULK Source-to-Release",
+   "source release trace "+g.sourceRequirement+" "+g.site+" "+g.mr,g.site,g.mr));
+ }
+ for(const e of cables.lines){
+  result.push(make(e.moduleId,e.site+" / "+e.mr+" / Cable-End "+e.id,
+   e.function+" "+e.cableFamily+" "+e.fromTag+" "+e.toTag,e.site,e.mr));
  }
  for(const loc of rf.sites){
   result.push(make(loc.moduleId,loc.site+" / MR0002 — RF Physical Route Evidence",

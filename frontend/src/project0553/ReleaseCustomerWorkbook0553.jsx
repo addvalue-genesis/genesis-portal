@@ -7,6 +7,7 @@ import {auditCurrentCustomerProjection0553} from "./estimateToBidMapping";
 import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
+import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrace0553";
 import "./releaseWorkbook0553.css";
 
 // Single customer-format sheet preview. Internal TAG/source drilldowns are UI-only
@@ -58,6 +59,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   canonical:selectBcTurnkeyWorkingCost0553(),release:model,
   scope:selectScopePartBcWorking0553()
  }),[model]);
+ const bulkGate=useMemo(()=>deriveBulkSourceToReleaseTrace0553({releaseModel:model}),[model]);
  const activeChecks=[
   {id:"MAP",label:"10.4 A/B/C → 10.3/10.5 → Native customer row parity",
    state:mappingAudit.selectedValueParity?"REVIEW":"HOLD",
@@ -66,6 +68,9 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     (mappingAudit.selectedValueParity?"current value projection matches":"SOURCE MISMATCH")},
   {id:"A-SUM",label:"10.1 → 10.3 Part A vs CFO",state:partA.reconciliationPassed?"PASS":"HOLD",detail:"Working price "+cash(aWorkingTotal)+" · CFO "+cash(partA.expectedPreviewTHB)},
   {id:"A-TAGS",label:"Original Part A layout / Buyer TAG grouping approval",state:isOverOriginalCapacity?"HOLD":"REVIEW",detail:tagCount+" source TAG lines → 4 MR summary rows; buyer must accept group-level TAG mapping for original 15 slots"},
+  {id:"A-BULK",label:"10.1 MR0001–MR0004 Physical BULK → 10.3 / 10.5",state:bulkGate.sourceToReleaseReady?"PASS":"HOLD",
+   detail:bulkGate.applicable+" applicable site/MR groups; "+bulkGate.totalFunctionalCandidates+" cable-end function candidates NOT measured runs. "+
+    "Working design LNA to RFI BDA ONLY at unchanged location, historical Rev00 relocation NOT adopted; OEM/Ex/cable-end proof open; no new A5 or MGW purchase."},
   {id:"B-SCOPE",label:"10.2 B1–B14 Working Sell",state:model.sourceCoverage.bSellReady?"PREVIEW":"HOLD",detail:"B9 quoted 1 LS included once in Base; Yard execution conditional, B7 reserve still under review"},
   {id:"B-COST",label:"10.2 B1–B14 verified Direct Cost",state:model.sourceCoverage.bCostReady?"PASS":"HOLD",detail:"Required for actual ADDVALUE profit, not for displaying provisional Working Sell"},
   {id:"C-COST",label:"10.2 C1/C2 optional supplier cost",state:model.sourceCoverage.cCostReady?"PASS":"HOLD",detail:"No 30% markup of C Working Sell; verified direct cost required"},

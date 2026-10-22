@@ -1,5 +1,6 @@
 import {UnifiedMrLocationTable0553} from "./UnifiedMrLocationTable0553";
 import {BulkMrLocationCoverage0553} from "./BulkMrLocationCoverage0553";
+import {BulkSourceToReleaseAudit0553} from "./BulkSourceToReleaseAudit0553";
 import {compareAEquipmentToLocation0553} from "./data/workingBomAggregation0553";
 import {LocationReplicationAudit0553} from "./LocationReplicationAudit0553";
 import {Mr0003Mr0004LocationReview0553} from "./Mr0003Mr0004LocationReview0553";
@@ -181,7 +182,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   {layoutRouteEstimates.rows.filter(r=>site==="ALL"||r.wp===site).map(r=><tr key={r.id}><td>{r.wp}<small>{r.system}</small></td><td>{r.from} → {r.to}</td><td>{r.sourceDeck}</td><td>{r.geometricProxyM} m (assumed)</td><td>{r.scenarios.short} / {r.scenarios.base} / {r.scenarios.long}</td><td>{money(r.materialBaseTHB,"THB")}</td><td>{r.rateState}<small>Not included in active WP total</small></td></tr>)}
   </tbody></table></div></ControlledModuleSection0553>
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.mr0002.rf-dc-alarm-bulk" title="MOT / RFI Trunk Radio — RF, DC & Alarm Bulk Functions">
-  <p className="p55-note">RFI RX3852-2002-11 LNA 380–520 MHz, 50 ohm, SMA(F). Sources: MOT Datasheet and Z1F LAY. Quantities are candidate functions, not approved cable procurement. No Motorola baseline and no CAT6A unit rates for RF/DC/Alarm.</p>
+  <p className="p55-note"><strong>HISTORICAL LNA INTERFACE CHECK ONLY — NOT SELECTED.</strong> Current MR0002 Working BOM uses MGW/RFI BDA at original LNA enclosure position for ZWP20/21/22, with Yagi/Omni positions unchanged. The legacy RFI RX3852 LNA table below is nonposting comparison, not selected equipment or RF cable procurement. No CAT6A rate for RF/DC/Alarm.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>WP</th><th>Function</th><th>Interface / Tag</th><th>Candidate Product</th><th>Qty</th><th>Cost</th></tr></thead><tbody>
   {DTRS_RFI_BULK_0553.byWP.filter(w=>site==="ALL"||w.wp===site).flatMap(w=>w.functions.map((f,i)=><tr key={w.wp+f.fn+i}><td>{w.wp}</td><td>{f.fn}</td><td>{f.tag}</td><td>{f.sku}<small>{f.source}</small></td><td>{f.qty===null?"DERIVE":f.qty+" "+f.unit}</td><td>Rate required</td></tr>))}
   </tbody></table></div></ControlledModuleSection0553>
@@ -269,6 +270,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"10.1.1.3 — System × Location × MTO — "+system+" / "+(site==="ALL"?"All Locations":site)} description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification. Context and Filters support this work; they are not approval gates." defaultOpen>
   <p className="p55-note"><strong>BULK ownership supplement (read-only):</strong> this separate location-level evidence table does NOT replace the canonical priced Equipment/MTO rows below, the Bulk Master, the A5 source or any B/C cost ledger. MGW complete MR0002 RF installation remains Vendor Scope; ADDVALUE NEK is only an optional reserve candidate.</p>
   <BulkMrLocationCoverage0553 mr={system} site={site} state={bulkState} focusModuleId={navigationTarget}/>
+  <BulkSourceToReleaseAudit0553 mr={system} site={site} focusModuleId={navigationTarget}/>
   {["MR-0002","MR-0003","MR-0004"].includes(system)?<UnifiedMrLocationTable0553 mr={system} site={site} fx={fx}/>:<>
   <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
   {system==="MR-0001"&&<p className="p55-note" data-component-key="bid.budget.bom.system-location-mto.tc0001-8port">
