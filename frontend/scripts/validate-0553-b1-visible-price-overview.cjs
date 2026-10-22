@@ -56,9 +56,15 @@ for(const [i,a] of m.accounts.entries()){
 assert(html.includes("964 MH is excluded from current B1 pricing"),
  "Historical Engineering 964 MH must be labeled as EXCLUDED, not presented as current priced activity");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-const first=host.indexOf('{e.code==="B1"&&<B1WorkingPriceOverview0553 workingRow={workingRow}/>');
-const generic=host.indexOf('<div className="p55-metric-grid">',host.indexOf('export function BcCostEvidenceDetail0553'));
-const detail=host.indexOf('{e.code==="B1"&&<B1RevKMilestoneBudget0553');
+// Scope positional checks to the component's RETURNED JSX. The function
+// initializes ownerPriceTrace earlier (containing a B9 metric grid); scanning
+// from the function declaration incorrectly captures that non-B1 JSX fragment.
+const entry=host.indexOf('export function BcCostEvidenceDetail0553');
+const renderStart=host.indexOf('return <section className="p55-panel p553-bc-evidence"',entry);
+assert(entry>=0&&renderStart>entry,"Missing B/C returned view for price-order contract");
+const first=host.indexOf('{e.code==="B1"&&<B1WorkingPriceOverview0553 workingRow={workingRow}/>',renderStart);
+const detail=host.indexOf('{e.code==="B1"&&<B1RevKMilestoneBudget0553',renderStart);
+const generic=host.indexOf('<div className="p55-metric-grid">',renderStart);
 // After the B1 sharedEvidence TDZ fix, its Rev.K accordion is rendered
 // directly after the quick-price table, BEFORE the generic metric grid.
 // Check actual source order and independently assert the SSR DOM anchor order.
