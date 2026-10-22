@@ -71,7 +71,7 @@ assert.equal(scope.minimumContractSatisfied,false);
 assert.equal(scope.customerReleaseAllowed,false);
 for(const code of ["B10","B13","C1","C2"]){
  assert.equal(scope.categoryBudgetsTHB[code],baseline.budgetTotalsTHB[code],"Risk analysis must not change budget "+code);
- assert.equal(current.byCode[code].workingSellTHB,baseline.budgetTotalsTHB[code],"Never re-price Rev08 silently");
+ assert.equal(current.byCode[code].workingSellTHB,null,"PTTEP OEM spare re-estimate must not carry Rev08 source price");
  assert.equal(current.byCode[code].directCostTHB,null,"Working SELL is not approved direct cost");
 }
 assert.equal(current.knownWorkingSellTHB,4308914.13,"Protect latest owner-only Part B Base; legacy Rev05 remains audit source");
