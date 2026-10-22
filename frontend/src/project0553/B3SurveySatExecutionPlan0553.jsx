@@ -28,7 +28,7 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
    <div><strong>GF Offshore Commissioning</strong><p>4 GF Platforms</p>
     <small>หลังติดตั้ง · ผู้รับผิดชอบและระยะเวลาของ ADDVALUE ยัง OPEN</small></div>
    <div><strong>Retained B3 Working SELL</strong><p>{thb(summary.selectedB3WorkingSellTHB)}</p>
-    <small>40 team-days / 80 MD เดิมเป็น PRICE BASIS — ไม่ใช่แผนเดินทางใหม่</small></div>
+    <small>Current Working SELL: SAT 28 team-days + BF Survey 3 onsite +2 travel; 40d is historical audit only</small></div>
   </div>
   <h4>A. BF — Brownfield Field Verification / Re-survey เฉพาะที่จำเป็น</h4>
   <p className="p55-note">ข้อมูลต้นทาง BOD §8 ได้บันทึก Survey ที่เคยทำแล้วสำหรับ 3 BF.
@@ -48,7 +48,7 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
    </tr>)}</tbody>
   </table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-   <thead><tr><th>Optional BF Revisit Budget (not selected)</th><th>ทีม × วัน</th>
+   <thead><tr><th>BF Survey Working Budget — Selected (physical revisit conditional)</th><th>ทีม × วัน</th>
     <th>Existing SELL rate reference</th><th>Illustrative SELL</th><th>Actual Cost</th></tr></thead>
    <tbody>
     <tr><td>3 BF Site verifications if explicitly requested</td>
@@ -57,13 +57,13 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
     <tr><td>Assumed separate BF trip MOB/DEMOB, only if needed</td>
      <td>2 คน × 2 team-days = 4 MD</td><td>{thb(bf.planningRateTHBPerPersonDay)} / MD</td>
      <td>{thb(bf.travelLabourSellReferenceTHB)}</td><td>NOT ESTABLISHED</td></tr>
-    <tr><th>BF CONDITIONAL scenario total, not current price</th>
+    <tr><th>BF Survey 5-team-day Working SELL allowance (selected)</th>
      <th>5 team-days / 10 MD</th><th>No verified payroll or journey rates</th>
      <th>{thb(bf.conditionalLabourSellReferenceTHB)}</th><th>NOT POSTED</th></tr>
    </tbody>
   </table></div>
   <p className="p55-note"><strong>ยกเลิกการใช้ Survey 7-Site THB453,600 เป็นราคาเสนอเพิ่มเติม</strong>.
-   กรณี BF 3-Site THB252,000 เป็นเพียงตัวอย่างค่าแรงโดยใช้อัตราขายจากฐาน SAT เดิม ไม่ใช่ต้นทุนจริงและไม่บวกเพิ่มใน B3.</p>
+   BF Survey 3 วันหน้างาน +2 วันเดินทาง THB252,000 ได้รวมอยู่ใน B3 Working SELL ใหม่แล้ว ไม่ใช่ Verified Direct Cost และยังต้องมีหนังสือสั่งงานก่อนเข้าสำรวจจริง.</p>
   <h4>B. GF — Fabrication Yard SAT ที่ JUTAL Zhuhai</h4>
   <p className="p55-note"><strong>สถานที่:</strong> JUTAL Zhuhai Fabrication Yard, China.
    งานนี้ต่างจาก MGW OEM Factory FAT ใน B3.1; ตาม SPE §7.3.2 ผู้เกี่ยวข้องต้องทำ SAT
@@ -92,14 +92,14 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
     <td>TO VERIFY</td><td>NOT ESTABLISHED</td>
     <td>{x.sourceClause}<small>Offshore access, POB, vessel, witness & OEM RACI open</small></td>
    </tr>)}</tbody></table></div>
-  <h4>D. 28+2 วันเดิม — เก็บไว้เปรียบเทียบ ไม่ใช่คำสั่งเดินทาง</h4>
+  <h4>D. SAT 28 productive team-days — CURRENT Working Budget + 2 risk days unpriced</h4>
   <p className="p55-note"><strong>ข้อมูลล่าสุดที่เคยวางแผนร่วมกัน:</strong>
    28 productive Team-days × 2 คน = 56 MD; บวก Risk 2 Team-days = 60 MD;
    Management Reserve อีก 2 Team-days ยังไม่ Post.
    <strong> ตัวเลขนี้ยังไม่ได้แยกว่าเป็น BF Verification, Zhuhai Yard SAT หรือ Offshore Commissioning กี่วัน</strong>
    จึงยังไม่ใช่ระยะเวลาปฏิบัติงานฉบับอนุมัติ.</p>
   <details className="p55-panel" style={{padding:10,marginTop:9}}>
-   <summary><strong>ดูตัวเลข Site-days จากแผน Lean เดิม 28+2 (NONPOSTING comparator)</strong></summary>
+   <summary><strong>ดู Site allocation ของ SAT 28 วันตาม Working Budget (งานแต่ละ GF ต้องยืนยัน Yard/Offshore RACI)</strong></summary>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Original Timebox</th><th>Old Team-days</th><th>2-person MD</th>
      <th>Work</th><th>Current stage allocation</th></tr></thead>
@@ -107,7 +107,7 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
       data-component-key={compact?undefined:ROOT+".sat."+x.id.toLowerCase()}>
      <td>{x.wbs} / {x.site}</td><td>{x.oldLeanTeamDays}</td><td>{x.oldLeanMD}</td>
      <td>{x.work}</td><td>YARD / OFFSHORE / BF: NOT ESTABLISHED</td></tr>)}</tbody>
-    <tfoot><tr><th>Legacy Lean</th><th>28 + 2 risk</th><th>60 MD including risk</th>
+    <tfoot><tr><th>Current SAT selected</th><th>28 +2 risk (unpriced)</th><th>56 MD selected +4 risk MD excluded</th>
      <th>2 management reserve days excluded</th><th>No new allocation</th></tr></tfoot>
    </table></div>
   </details>
@@ -115,15 +115,15 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Budget Owner / Stage</th><th>ข้อมูลจำนวนวัน</th><th>ราคา / ตัวเลขอ้างอิง</th><th>อนุมัติหรือไม่</th></tr></thead>
    <tbody>
-    <tr><td>BF-only conditional re-verification</td><td>3 field +2 transit days / 2 persons, only if called</td>
-     <td>{thb(bf.conditionalLabourSellReferenceTHB)} illustrative labour SELL</td><td>NO / Cost unknown</td></tr>
+    <tr><td>BF Survey Working Budget — physical callout conditional</td><td>3 field +2 transit days / 2 persons</td>
+     <td>{thb(bf.conditionalLabourSellReferenceTHB)} selected budgetary Working SELL</td><td>Cost unknown / work order open</td></tr>
     <tr><td>GF Zhuhai Fabrication Yard SAT</td><td>ADDVALUE days and people UNKNOWN</td><td>NOT ESTABLISHED</td><td>RACI/ITP pending</td></tr>
     <tr><td>GF Offshore Commissioning</td><td>ADDVALUE days and people UNKNOWN</td><td>NOT ESTABLISHED</td><td>RACI/ITP pending</td></tr>
-    <tr><td>Previously estimated 28+2 Lean SAT</td><td>30 team-days / 60 MD (old combined scenario)</td>
-     <td>{thb(legacy.scenarioLabourWithRiskReferenceTHB)} comparison ONLY</td>
+    <tr><td>Selected SAT 28 productive team-days</td><td>28 team-days / 56 MD (2 risk days not included)</td>
+     <td>{thb(28*2*25200)} CURRENT SAT Labour Working SELL</td>
      <td>NOT allocated to phases</td></tr>
-    <tr><th>Current B3 Working SELL / 40d price basis</th><th>Not a current site schedule</th>
-     <th>{thb(summary.selectedB3WorkingSellTHB)}</th><th>UNCHANGED / Release HOLD</th></tr>
+    <tr><th>Current B3 Working SELL / SAT 28d + BF Survey 5d</th><th>33 labour team-days / 66MD plus FAT and VeEX</th>
+     <th>{thb(summary.selectedB3WorkingSellTHB)}</th><th>Updated Working Budget / Release HOLD</th></tr>
    </tbody></table></div>
   <p className="p55-note"><strong>Cost Owner:</strong> B3 MGW Factory FAT, Yard SAT and offshore commissioning must remain separate activities.
    B9 is conditional Senior Specialist Yard assistance only when the contractual assistance scope applies;
