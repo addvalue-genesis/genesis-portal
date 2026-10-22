@@ -27,7 +27,7 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
     <small>JUTAL Zhuhai · จำนวนคน/วันของ ADDVALUE ยังไม่มีอนุมัติ</small></div>
    <div><strong>GF Offshore Commissioning</strong><p>4 GF Platforms</p>
     <small>หลังติดตั้ง · ผู้รับผิดชอบและระยะเวลาของ ADDVALUE ยัง OPEN</small></div>
-   <div><strong>Retained B3 Working SELL</strong><p>{thb(summary.selectedB3WorkingSellTHB)}</p>
+   <div><strong>Current Selected B3 Working SELL</strong><p>{thb(summary.selectedB3WorkingSellTHB)}</p>
     <small>Current Working SELL: SAT 28 team-days + BF Survey 3 onsite +2 travel; 40d is historical audit only</small></div>
   </div>
   <h4>A. BF — Brownfield Field Verification / Re-survey เฉพาะที่จำเป็น</h4>
@@ -59,7 +59,7 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
      <td>{thb(bf.travelLabourSellReferenceTHB)}</td><td>NOT ESTABLISHED</td></tr>
     <tr><th>BF Survey 5-team-day Working SELL allowance (selected)</th>
      <th>5 team-days / 10 MD</th><th>No verified payroll or journey rates</th>
-     <th>{thb(bf.conditionalLabourSellReferenceTHB)}</th><th>NOT POSTED</th></tr>
+     <th>{thb(bf.conditionalLabourSellReferenceTHB)}</th><th>INCLUDED IN WS-B3 budget allowance · physical visit not authorized</th></tr>
    </tbody>
   </table></div>
   <p className="p55-note"><strong>ยกเลิกการใช้ Survey 7-Site THB453,600 เป็นราคาเสนอเพิ่มเติม</strong>.
