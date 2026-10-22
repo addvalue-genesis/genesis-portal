@@ -13,7 +13,7 @@ const CAT=Object.freeze(["B10","B11","B13","C1","C2"]);
 const actualTag=tag=>/^[A-Z]{2,6}-\d{3}-\d{3}[A-Z]?$/.test(String(tag||"").trim());
 const distinct=arr=>[...new Set(arr)];
 // Functional classification only; it NEVER asserts approved spare SKU equivalence.
-function classify(mr,tag){
+function classify(mr,tag,functionRole=null){
  const t=tag.toUpperCase();
  if(mr==="MR-0001"){
   if(/^MR-/.test(t))return {family:/A$/.test(t)?"IDU":"ODU_OR_RADIO",critical:true,b10:true,b13:false,c1:true,c2:true};
@@ -23,8 +23,8 @@ function classify(mr,tag){
   return {family:"SCADA_OTHER",critical:false,b10:true,b13:true,c1:false,c2:true};
  }
  if(mr==="MR-0002"){
-  if(t==="TCAB-508-001")return {family:"DMR_BDA_ENCLOSURE_ASSEMBLY",critical:true,b10:true,b13:false,c1:true,c2:true};
-  if(t==="TCAB-508-002")return {family:"DMR_SURGE_ASSEMBLY",critical:false,b10:true,b13:false,c1:false,c2:true};
+  if(functionRole==="LEGACY_LNA_ENCLOSURE")return {family:"DMR_BDA_ENCLOSURE_ASSEMBLY",critical:true,b10:true,b13:false,c1:true,c2:true};
+  if(functionRole==="RF_SURGE_EXD")return {family:"DMR_SURGE_ASSEMBLY",critical:false,b10:true,b13:false,c1:false,c2:true};
   if(/^ANT-/.test(t))return {family:"DMR_ANTENNA",critical:false,b10:true,b13:false,c1:false,c2:true};
   return {family:"DMR_RADIO_INTERFACE",critical:true,b10:true,b13:false,c1:true,c2:true};
  }
@@ -45,7 +45,7 @@ function sourceInstalledTags(){
  }));
  // MR-0002: current AFC TEL-LAY source, explicitly filtered to DMR only.
  const mr2=Z1F_TEL_LAYOUT_INDEX_0553.byWP.flatMap(w=>w.equipment.filter(x=>x.system==="DTRS_TRUNK_RADIO"&&actualTag(x.tag)).map(x=>({
-  mr:"MR-0002",site:w.wp,tag:x.tag,description:x.description||"",
+  mr:"MR-0002",site:w.wp,tag:x.tag,functionRole:x.functionRole||null,description:x.description||"",
   source:Z1F_TEL_LAYOUT_INDEX_0553.source,scopeQty:1,authority:"AFC_LAYOUT_TAG__MR_MTO_QUANTITY_CROSSCHECK"
  })));
  // MR0003/4: MR Rev.C1 scope controls even when symbols omitted from layout.
@@ -84,7 +84,9 @@ export function selectSpareCoverageEngineering0553(){
  const master=selectUnifiedSpareConsumables0553();
  const byFamily=new Map();
  for(const x of installed){
-  const cls=classify(x.mr,x.tag),key=x.mr+"|"+x.tag;
+  const cls=classify(x.mr,x.tag,x.functionRole||null);
+  // Same TCAB-508 suffix can be BDA at one WP and surge at another.
+  const key=x.mr+"|"+x.tag+"|"+(x.mr==="MR-0002"?cls.family:"TAG");
   if(!byFamily.has(key))byFamily.set(key,{mr:x.mr,tag:x.tag,...cls,instances:[]});
   byFamily.get(key).instances.push(x);
  }
@@ -96,7 +98,7 @@ export function selectSpareCoverageEngineering0553(){
   const categoryCandidates=Object.fromEntries(CAT.map(cat=>[cat,(master.byCode[cat]||[]).filter(row=>relatedCategory(x.family,cat,row.description)).map(row=>row.id)]));
   // A textual/reference family match is never a proven spare SKU or actual stock coverage.
   return Object.freeze({
-   id:x.mr+"-"+x.tag,mr:x.mr,tag:x.tag,family:x.family,
+   id:x.mr+"-"+x.tag+(x.mr==="MR-0002"?"-"+x.family:""),mr:x.mr,tag:x.tag,family:x.family,
    installedSites:sites,installedCount:x.instances.length,sourceEvidence:distinct(x.instances.map(y=>y.source)),
    sourceQtyState:distinct(x.instances.map(y=>y.authority)),criticality:x.critical?"COMMISSIONING_CRITICAL_CANDIDATE":"STANDARD_REVIEW",
    categoryApplicability:{B10:x.b10,B11:!x.family.includes("SURGE")&&!x.family.includes("SOUNDER"),B13:x.b13,C1:x.c1,C2:x.c2},
@@ -112,14 +114,20 @@ export function selectSpareCoverageEngineering0553(){
    sourceModel:"MAP-01/MAP-02/MAP-05/MAP-06/MAP-07/MAP-08/MAP-10 + SPQ-001"
   });
  });
- // MR0002 Rev.C1 lists RAD-508-001 LNA; current selected RFI BDA is
- // represented at TCAB-508-001 in working/layout evidence. Keep the MR
- // requirement as an unresolved crosswalk; never silently deem it replaced.
+ // MR0002 C1 RAD-508-001 LNA is replaced at the original AFC LNA position
+ // as budgetary RFI BDA, with different actual TAG suffixes by Site.
+ const bdaSiteTags=Object.freeze(Object.fromEntries(
+  installed.filter(x=>x.mr==="MR-0002"&&
+   x.functionRole==="LEGACY_LNA_ENCLOSURE").map(x=>[x.site,x.tag])));
+ if(Object.keys(bdaSiteTags).length!==3||bdaSiteTags.ZWP20!=="TCAB-508-002"||
+   bdaSiteTags.ZWP21!=="TCAB-508-001"||bdaSiteTags.ZWP22!=="TCAB-508-001")
+  throw Error("MR0002 AFC role-specific original LNA/BDA TAG crosswalk changed");
  const unresolvedRequirementTags=Object.freeze([
   Object.freeze({mr:"MR-0002",tag:"RAD-508-001",
    source:"MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1 §5",
-   candidateCurrentInstalledTag:"TCAB-508-001",
-   reason:"MR LNA tag versus selected RFI BDA/Ex d package; technical substitution and spare compatibility crosswalk outstanding",
+   candidateCurrentInstalledTag:"ZWP20 TCAB-508-002; ZWP21/ZWP22 TCAB-508-001",
+   candidateCurrentInstalledTagsBySite:bdaSiteTags,
+   reason:"MR LNA requirement vs RFI BDA at site-specific original LNA position; deviation/Ex/RF and spare SKU compatibility pending",
    status:"REQUIREMENT_TO_SELECTED_PACKAGE_CROSSWALK_OPEN",
    quantity:null,additionalCostTHB:null})
  ]);
