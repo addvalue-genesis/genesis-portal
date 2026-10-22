@@ -72,9 +72,9 @@ const modelSrc=fs.readFileSync(path.join(root,"project0553/data/b2IndependentVdr
 // Preserve source documentation that EXPLICITLY disclaims the Rev05 quote.
 // A textual search over comments falsely flags a harmless "legacy 580,000"
 // warning as if it were an executable backsolve. Scan active JS source only.
-const executableModelSrc=modelSrc.split(/\\r?\\n/).filter(line=>
- !line.trimStart().startsWith("//")).join("\\n");
-assert(!/\\b580000\\b|\\b580,000\\b/.test(executableModelSrc),
+const executableModelSrc=modelSrc.split(/\r?\n/).filter(line=>
+ !line.trimStart().startsWith("//")).join("\n");
+assert(!/\b580000\b|\b580,000\b/.test(executableModelSrc),
  "B2 131-WO formula must not reference the historical 580k quoted SELL");
 assert.equal(base.hasQuotedWorkingSellReference,false,
  "Independent B2 cost model must not depend on any historical quote");
