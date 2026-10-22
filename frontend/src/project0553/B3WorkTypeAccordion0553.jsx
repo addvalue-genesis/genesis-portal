@@ -66,6 +66,7 @@ function TablePriceCells0553({row,number,title,isGroup=false,fx}){
 function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditContent}){
  const suffix=item.moduleId.slice(ROOT.length+1);
  const sat=workingRow.b3FortyDayBudget,fat=workingRow.b3ChinaFatBudget,veex=sat.veex;
+ const selected=workingRow.b3SelectedSatSurveyBudget;
  switch(suffix){
   case "mgw-r2-cover-20261020":{
    const m=workingRow.b3MgwPurchasedFatWorkingSell;
@@ -120,9 +121,22 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
    return <section className="p55-panel" data-component-key={ROOT+".40-day-abc"}
     style={{padding:12,marginTop:12}}>
     <B3SurveySatExecutionPlan0553 workingRow={workingRow} compact/>
+     <h4>Selected SAT/SIT 28 productive two-person Team-days = 56 MD</h4>
+     <p className="p55-note"><strong>Current Working SELL SAT Labour: {money(selected.satWorkingSellTHB)}</strong>
+      {" "}56 MD × USD {selected.sourceRateUSDPerPersonDay} × FX {selected.fxTHBPerUSD}.
+      +2 Risk and +2 management reserve days are NOT priced. Historical 40-day estimate remains audit only.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Site / WBS</th><th>Function</th><th>People</th><th>Team-days</th><th>Man-days</th><th>Working SELL</th></tr></thead>
+      <tbody>{selected.satRows.map(r=><tr key={r.id}>
+       <td>{r.site} · {r.wbs}</td><td>{r.work}</td>
+       <td>{r.crew}</td><td>{r.days}</td><td>{r.plannedPersonDays}</td>
+       <td>{money(r.workingSellTHB)}</td></tr>)}</tbody>
+      <tfoot><tr><th colSpan={3}>Selected SAT Team total</th><th>28</th><th>56</th>
+       <th>{money(selected.satWorkingSellTHB)}</th></tr></tfoot>
+     </table></div>
     <details className="p55-panel" style={{padding:10,marginTop:12}}>
      <summary><strong>ดูตารางราคา SAT เดิม 40 วัน / 80 MD (Price Baseline — ไม่ใช่แผนปฏิบัติงาน)</strong></summary>
-    <h4>B3.2.1 — 40-Day Offshore SAT/SIT Working SELL (Retained Price Basis)</h4>
+    <h4>Historical 40-day / 80MD commercial audit only — NOT added to current B3</h4>
     <p className="p55-note">{sat.persons} engineers × {sat.workdays} team-days =
      {" "}{sat.personDays} paid person-days × USD {sat.rateUSDPerPersonDay}/person-day
      × FX {sat.fxTHBPerUSD} = <strong>{money(sat.laborWorkingSellTHB)}</strong>.
@@ -138,7 +152,25 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
     </table></div>
     </details>
    </section>;
-  case "site-mr-sat-matrix":
+  case "site-survey-price":
+    return <section className="p55-panel" data-component-key={ROOT+".site-survey-price"}
+     style={{padding:12,marginTop:12}}>
+     <h4>B3.2.3 — Selected BF Site Survey 3 Site + 2 Travel Team-days / 10 MD</h4>
+     <p className="p55-note"><strong>Current budget allowance {money(selected.siteSurveyWorkingSellTHB)}</strong>;
+      physical BF revisit only on written JUTAL call-out and documented reason.
+      Rate is PRE-AWARD Working SELL, not payroll Direct Cost.</p>
+     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Site / Travel</th><th>Activity</th><th>People</th><th>Team-days</th>
+       <th>MD</th><th>SELL / person-day</th><th>Working SELL</th></tr></thead>
+      <tbody>{selected.siteSurveyRows.map(r=><tr key={r.id}>
+       <td>{r.site}</td><td>{r.work}</td><td>{r.crew}</td><td>{r.days}</td>
+       <td>{r.plannedPersonDays}</td><td>{money(selected.rateTHBPerPersonDay)}</td>
+       <td>{money(r.workingSellTHB)}</td></tr>)}</tbody>
+      <tfoot><tr><th colSpan={3}>Total BF Survey budget allowance</th><th>5</th><th>10</th><th>—</th>
+       <th>{money(selected.siteSurveyWorkingSellTHB)}</th></tr></tfoot>
+     </table></div>
+    </section>;
+   case "site-mr-sat-matrix":
    return <B3SiteMrSatCoverage0553 workingRow={workingRow}/>;
   case "veex-mx100":
    return <section className="p55-panel" data-component-key={ROOT+".veex-mx100"}
