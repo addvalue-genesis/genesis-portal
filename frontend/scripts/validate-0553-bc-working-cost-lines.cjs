@@ -120,7 +120,16 @@ assert(hierarchy.includes('<BcWorkCostLines0553 selectedCode={item.code} present
 assert(render.includes("m.rows.filter")&&render.includes("m.workingSellByCode"));
 assert(render.includes("showAuditClauses")&&render.includes("Cost Owner: 10.2 only"));
 assert(render.includes("Object.entries(x.roleMH)")&&render.includes("knownSellCount"),"B1 labor skills and known-only incomplete Sell coverage must be visible");
-assert(render.includes("data-component-key={x.moduleId}")&&render.includes("componentKey={x.moduleId}"));
+// Cost-line rows use their canonical moduleId when viewed directly, but use a
+// namespaced preview anchor when embedded in another owner's audit accordion
+// to prevent duplicate DOM IDs. The visible Copy action must always preserve
+// the original canonical Module ID, regardless of the preview namespace.
+assert(render.includes('data-component-key={presentationNamespace?presentationNamespace+".cost-line-preview."+x.id.toLowerCase():x.moduleId}'),
+ "Each cost-line DOM anchor must use canonical ID or distinct preview namespace");
+assert(render.includes('componentKey={x.moduleId}'),
+ "Each cost-line must still expose its canonical Module ID for Copy/navigation");
+assert(render.includes('data-component-key={presentationNamespace?presentationNamespace+".cost-lines-view":m.moduleId}'),
+ "Cost-line panel itself must keep the canonical anchor for un-namespaced views");
 for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcWorkCostLines0553.jsx"]){
  assert(babel.transformSync(read(f),{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
