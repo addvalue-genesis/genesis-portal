@@ -44,10 +44,14 @@ for(const c of ["B3","B6","B9"]){
  assert.match(row.executionDecision.integratedFatLocation,/MGW.*China/); // Active Rev.K venue overrides historical BKK source only
  assert.equal(row.directCostTHB,null,"Execution location must not invent "+c+" direct cost");
 }
-assert.equal(working.byCode.B3.workingSellTHB,2750525);
+assert.equal(working.byCode.B3.workingSellTHB,2397725);
+assert.equal(working.byCode.B3.b3FortyDayBudget.workdays,40,
+ "Legacy Bangkok/40-day pricing basis remains audit-only");
+assert.equal(working.byCode.B3.workingSellTHB+352800,2750525,
+ "SAT28+BF5 new working SELL supersedes old 40-day baseline without re-posting");
 assert.equal(working.byCode.B9.workingSellTHB,233600);
 assert.equal(working.byCode.B6.workingSellTHB,307584,"B6 approved pre-award logistics working sell; direct cost stays null");
-assert.equal(working.knownWorkingSellTHB,4385436.82,"Current selected Part B Base: B1/B2 reprice, MGW purchased B3 FAT and B9 1 LS Base included once");
+assert.equal(working.knownWorkingSellTHB,4032636.82,"Current selected Part B Base: includes SAT28+BF5 in B3; B9 1 LS once");
 assert.equal(working.knownWorkingSellTHB,Math.round(working.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((sum,r)=>sum+r.workingSellTHB,0)*100)/100,"Options excluded from Base");
 assert.equal(working.costComplete,false);
 assert.equal(working.releaseAllowed,false);
