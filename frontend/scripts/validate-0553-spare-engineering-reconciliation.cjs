@@ -70,7 +70,7 @@ assert.equal(c.byCode.C1.historicalBudgetReferenceTHB,4049349.36);
 assert.equal(c.byCode.C2.historicalBudgetReferenceTHB,721806.68);
 assert.equal(w.knownWorkingSellTHB,4328914.13,
  "Current 10.2 Part B after B2 131-WO, MGW FAT and approved B9 Base; do not use prior Rev.K bridge");
-assert.equal(w.byCode.C1.workingSellTHB,c.byCode.C1.historicalBudgetReferenceTHB);
+assert.equal(w.byCode.C1.workingSellTHB,null);
 assert(c.updatedPricePosted===false&&c.complete===false&&c.customerReleaseAllowed===false);
 const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(jsx.includes('spareLines.length>0&&code!=="C1"'),"Historical Rev08 C1 lines must not masquerade as current selected customer price schedule");
