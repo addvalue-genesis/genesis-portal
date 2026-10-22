@@ -10,6 +10,7 @@ import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
 import {evaluateB2VdrlIndependentScenario0553} from "./b2IndependentVdrlRecalculation0553";
+import {selectB11MinimumTools0553} from "./b11MinimumTools0553";
 import {selectB5B6B7LinkedLogistics0553} from "./b5B6B7LinkedLogistics0553";
 import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553,
  B1_AUDIT_KINDS_0553,b1AuditModuleId0553} from "./b1AccordionModuleIds0553";
@@ -170,6 +171,21 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId:"bid.budget.working.bc.b8.integrated-fat-training-7d",
   keywords:"B8 FAT customer training China 7 onsite days 2 training person-days B3 shared 4 travel man-days Yangon approval"
  });
+ const b11ToolTraceId="bid.budget.working.bc.b11.operational-tools-trace";
+ entries.push({
+  id:b11ToolTraceId,
+  name:"B11 — Customer-retained Special Tools from EXA-A8 / B1 Design → B2 VDRL → B3 SAT / B9 Assistance boundary",
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:b11ToolTraceId,
+  keywords:"B11 5 EXA-A8 software licenses configuration SCADA network TETRA RACON charging kit special tools purchaser handover B3 B9"
+ });
+ entries.push(...selectB11MinimumTools0553().rows.map(r=>({
+  id:b11ToolTraceId+"."+r.id.toLowerCase(),
+  name:r.id+" — "+r.description+" / "+r.mr+" / "+r.tag,
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:b11ToolTraceId+"."+r.id.toLowerCase(),
+  keywords:"B11 O&M Special Tools purchaser "+r.mr+" "+r.tag+" "+r.compatibilityGate
+ })));
  entries.push({
   id:"bid.budget.working.bc.b11.test-equipment-ownership",
   name:"B11 — Permanent O&M Special Tools vs B3 Temporary FAT/SAT Rental",
