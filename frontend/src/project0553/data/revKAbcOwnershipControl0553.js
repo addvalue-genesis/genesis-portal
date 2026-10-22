@@ -19,7 +19,8 @@ export function selectRevKAbcOwnershipControl0553(working){
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
  if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+307125)||current.B9!==b9.b9BaseWorkingSellTHB||
-    working.knownWorkingSellTHB!==4582736.82 ||
+    working.knownWorkingSellTHB!==Math.round(working.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((n,r)=>n+r.workingSellTHB,0)*100)/100 ||
+    ["B10","B11","B13","C1","C2"].some(code=>working.byCode[code].workingSellTHB!==null) ||
     working.byCode.B3?.workingSellTHB!==2599325 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
