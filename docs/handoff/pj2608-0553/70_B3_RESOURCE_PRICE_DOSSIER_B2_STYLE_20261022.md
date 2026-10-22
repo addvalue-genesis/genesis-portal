@@ -18,8 +18,8 @@ New module: `bid.budget.working.bc.b3.resource-price-dossier`, mounted at the to
 
 ## Unpriced stages — no invented costs
 - B3.R5 BF prior survey (BOD-C2 §8), ZPQ/ZWP8/ZWP11: conditional revisit only. Independent labour illustrative reference 2 people × (3 site days + 2 travel team-days) × THB25,200 = THB252,000. **NOT POSTED**, Direct Cost null, written work order and POB/marine travel unknown.
-- B3.R6 GF Fabrication Yard SAT (SPE-C2 §7.3.2), ZWP20/21/22/23 at JUTAL **Zhuhai**, not MGW Nantong OEM FAT; ADDVALUE crew, days, rate, ITP and RACI **NOT ESTABLISHED**.
-- B3.R7 GF Offshore Commissioning (SPE-C2 §7.3.3) after platform installation. Vendor scope; ADDVALUE share, man-days, vessel/access and cost **NOT ESTABLISHED**.
+- B3.R6 GF Fabrication Yard SAT (SPE-C2 §7.3.2), 14 per-Site/MR work items across ZWP20/21/22/23 at JUTAL **Zhuhai**, not MGW Nantong OEM FAT; ADDVALUE crew, days, rate, ITP and RACI **NOT ESTABLISHED**.
+- B3.R7 GF Offshore Commissioning (SPE-C2 §7.3.3), 14 per-Site/MR work items after platform installation. Vendor scope; ADDVALUE share, man-days, vessel/access and cost **NOT ESTABLISHED**.
 - B3.R8 Shared integrated SIT and Punch, phase allocation unresolved.
 - Earlier 28 productive +2 risk = 30 two-person team-days is a **legacy lean comparison only** not a stage-approved deployment plan; 2 more management-reserve days unposted.
 
@@ -32,7 +32,7 @@ New module: `bid.budget.working.bc.b3.resource-price-dossier`, mounted at the to
 The new `b3ResourcePriceDossier0553.js` reads the same selected owner and validates all 29 line totals without rewriting the canonical Working Sell. Other candidate phases/line items have `workingSellTHB:null`, `actualDirectCostTHB:null`, and are NONPOSTING. This is intentional: a detailed ledger must not fabricate payroll Cost or imply approval.
 
 ## Deliverables
-- `frontend/src/project0553/data/b3ResourcePriceDossier0553.js`: financial identity, row quantity/rates, 8 work groups, 47 record objects, 29 selected-priced lines.
+- `frontend/src/project0553/data/b3ResourcePriceDossier0553.js`: financial identity, row quantity/rates, 8 work groups, 67 record objects (including 14 GF Yard MR and 14 GF Offshore MR test work items), 29 selected-priced lines.
 - `frontend/src/project0553/B3ResourcePriceDossier0553.jsx`: B2-style collapsible work-type/site/price dossier with actual cost gates.
 - `frontend/src/project0553/B3WorkTypeAccordion0553.jsx`: mounts dossier above B3 selected Working SELL hierarchy.
 - `frontend/src/project0553/data/bcModuleNavigator0553.js`: root and 8 groups, site-level and row-level deep links.
