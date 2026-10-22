@@ -8,6 +8,7 @@ import {selectSpareCoverageEngineering0553} from "./spareCoverageEngineering0553
 import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
 import {deriveSpareRiskQuantity0553,deriveConsumableBudgetQuantity0553} from "./spareRiskQuantity0553";
 import {selectB11MinimumTools0553} from "./b11MinimumTools0553";
+import pttepCandidateData from "./snapshots/pttepSpareCandidateInventory0553.json";
 const CODES=Object.freeze(["B10","B11","B13","C1","C2"]);
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const unique=items=>[...new Set(items)];
@@ -100,6 +101,46 @@ export function selectSpareCustomerSchedule0553(){
   });
  }));
  const byCode=Object.fromEntries(CODES.map(code=>[code,rows.filter(x=>x.code===code)]));
+ // NEW current engineering evidence for the EXISTING five commercial modules.
+ // The old Rev08 schedule above is AUDIT ONLY and must not seed current prices.
+ const currentCandidateRows=pttepCandidateData.items.map(item=>{
+  const related=cover.installed.filter(x=>
+   (item.relatedMR==="MULTI"||x.mr===item.relatedMR)&&
+   item.sites.includes(x.site));
+  return Object.freeze({
+   ...item,
+   id:item.id,
+   code:item.owner,
+   installedTagsBySite:unique(related.map(x=>x.site+" / "+x.tag)),
+   installedTagKeys:unique(related.map(x=>x.key)),
+   tagNo:"TBC — Refer to OEM SPIR",
+   linkedMR:item.relatedMR==="MULTI"?unique(related.map(x=>x.mr)):[item.relatedMR],
+   linkedLocations:item.sites,
+   currentRequiredQty:item.derivedRequiredQuantity,
+   oemSparePartNumber:item.sparePartNumber,
+   verifiedSupplierUnitCostTHB:item.independentSupplierUnitCostTHB,
+   currentWorkingSellTHB:null,
+   releaseAllowed:false,
+   priceStatus:"NOT_ESTABLISHED__PTTEP_OEM_SPIR_REQUIRED",
+   sourceId:item.id,
+   sourceRevision:"PTTEP STD / MR Rev.C1 / BOD-SPE Rev.C2 / DTS Rev.C1 / AFC LAY / GA",
+   sourceModuleId:"bid.budget.working.bc."+item.owner.toLowerCase()
+  });
+ });
+ const currentByCode=Object.fromEntries(CODES.map(code=>[code,
+  Object.freeze(currentCandidateRows.filter(x=>x.owner===code))]));
+ const currentGroups=pttepCandidateData.groups.map(g=>Object.freeze({
+  ...g,code:g.code,
+  moduleId:"bid.budget.working.bc."+g.code.toLowerCase()+".detail",
+  rows:Object.freeze(currentByCode[g.code].filter(x=>x.group===g.key))
+ }));
+ if(currentCandidateRows.length!==50||
+  new Set(currentCandidateRows.map(x=>x.id)).size!==50||
+  currentGroups.reduce((n,g)=>n+g.rows.length,0)!==50||
+  pttepCandidateData.documentControl.totalContractKits!==14||
+  currentCandidateRows.some(x=>x.currentWorkingSellTHB!==null||x.commercialPostingApproved))
+  throw Error("PTTEP current five-owner spare register incomplete or price unexpectedly posted");
+
  // Do not silently distribute the grand total across tags or add a balancing price line.
  for(const code of CODES){
   const subtotal=round(byCode[code].reduce((n,x)=>n+x.extendedTHB,0));
@@ -190,6 +231,9 @@ export function selectSpareCustomerSchedule0553(){
  return Object.freeze({
   moduleId:"bid.budget.working.bc.customer-spare-schedule",
   codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,crossCategoryDuplicates,b11Requirements,
+  currentCandidateRows,currentByCode,currentGroups,currentDocumentControl:pttepCandidateData.documentControl,
+  currentWorkingSellByCode:Object.freeze(Object.fromEntries(CODES.map(code=>[code,null]))),
+  currentPriceStatus:"PTTEP_REQUIREMENT_FIRST__NO_HISTORICAL_PRICE_CARRY_FORWARD",
   installedSourceCount:cover.installed.length,engineeringReadiness,
   sourceOwnership:"Working BOM/Tag + Rev08 price reference + 10.2 commercial owner",
   riskQuestionAnswered:false,
