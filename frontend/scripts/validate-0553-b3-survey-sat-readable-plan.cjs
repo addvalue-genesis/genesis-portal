@@ -47,11 +47,17 @@ assert.deepEqual(x.sat.rows.map(r=>[r.id,r.productiveTeamDays]),[
  ["BF-ZPQ",2],["BF-ZWP8",2],["BF-ZWP11",2],
  ["GF-ZWP21",5],["GF-ZWP23",3],["GF-ZWP22",5],["GF-ZWP20",5],["SIT",3],["PUNCH",1]]);
 assert.equal(new Set(x.sat.rows.flatMap(r=>r.linkedTests)).size,21);
+assert.deepEqual(x.sat.rows.map(r=>r.relativeWorkdayLabel),[
+ "SAT D1–D2","SAT D3–D4","SAT D5–D6","SAT D7–D11",
+ "SAT D12–D14","SAT D15–D19","SAT D20–D24","SAT D25–D27","SAT D28"
+]);
+assert.equal(x.sat.rows[x.sat.rows.length-1].relativeWorkdayEnd,28);
 assert.deepEqual(x.survey.rows.map(r=>r.site),
  ["ZPQ","ZWP8","ZWP11","ZWP21","ZWP23","ZWP22","ZWP20"]);
 const html=renderToStaticMarkup(React.createElement(Panel,{workingRow:b3}));
 const compact=renderToStaticMarkup(React.createElement(Panel,{workingRow:b3,compact:true}));
 assert(html.includes('data-component-key="bid.budget.working.bc.b3.field-execution-plan"'));
+assert(html.includes("SAT D1–D2")&&html.includes("SAT D20–D24")&&html.includes("SAT D29–D30"));
 assert(!compact.includes('data-component-key="bid.budget.working.bc.b3.field-execution-plan"'));
 for(const phrase of ["28", "30", "56", "60", "80", "453,600.00", "352,800.00",
  "100,800.00", "1,512,000.00", "2,700,125.00", "2,750,525.00",
