@@ -12,6 +12,13 @@ export function B5EquationAudit0553({selectedCode="ALL"}){
   style={{marginTop:12,padding:"12px 14px"}}>
   <summary><strong>02 → 10.2 B5 | Packing &amp; Marking — GEQ / ANNEX4 / STD006</strong>
    <small> {p.sourceClauseCount} source rules · 4 MR streams · 6 cost drivers · price OPEN_INPUT</small></summary>
+  <p className="p55-note"><strong>Current physical logistics authority = ADR-68:</strong>
+   Thailand Enclosure+Cisco four sets to MGW Nantong; NextG IDU/ODU and five antennas direct to MGW;
+   MR0002–0004 OEM goods receive at MGW; joint FAT at MGW before JUTAL shipment.
+   The Bangkok integrated-FAT packing streams below are <strong>LEGACY METHOD AUDIT ONLY</strong>,
+   not the current dispatch route. Current B5 Working SELL remains historical-derived THB 311,184
+   selected in 10.2, but independent route-derived COST is NOT ESTABLISHED.
+   See 10.2 B5 price-trace.work-scope for the linked B5/B6/B7 current-route breakdown.</p>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={p.moduleId}/>
    {" "}Source: <a href={p.sourceUrls.annex4} target="_blank" rel="noreferrer">ANNEX4 Packing &amp; Marking</a>,
    {" "}<a href={p.sourceUrls.annex42} target="_blank" rel="noreferrer">ANNEX4-2 Master / Single Packing List</a>,
@@ -33,7 +40,7 @@ export function B5EquationAudit0553({selectedCode="ALL"}){
      <td>{x.costBucket}<small>{x.sourceState}</small><small>{x.note}</small></td>
     </tr>)}</tbody>
    </table></div>
-   <p className="p55-note">B5 ปัจจุบัน: <strong>NOT ESTABLISHED</strong>.
+   <p className="p55-note">Current B5 verified Direct COST / route-priced SELL: <strong>NOT ESTABLISHED</strong>; current management-selected legacy-based Working SELL is THB 311,184.
     ราคารวม Rev09 มี Allowance สำหรับ 4 System Lots และ Storage 3 เดือน;
     ก่อนใช้เสนอราคาจริงต้องตรวจ OEM Packing Inclusion, จำนวน Package ที่ผ่าน Bangkok FAT และการจัด Cost Owner B7.</p>
   </div>
@@ -72,7 +79,7 @@ export function B5EquationAudit0553({selectedCode="ALL"}){
     <td>{x.unitDriver}<small>{x.costBoundary}</small></td></tr>)}</tbody>
   </table></div>}
   <p className="p55-note"><strong>Known only:</strong> Section02 packing compliance and source route structure.
-   Actual count of distinct cartons/crates = NOT ESTABLISHED, B5 Working SELL = NOT ESTABLISHED,
+   Actual count of distinct cartons/crates = NOT ESTABLISHED, independently re-derived B5 price = NOT ESTABLISHED (selected legacy-based Working SELL THB311,184),
    current Direct COST = NOT ESTABLISHED. 4 MR ≠ 4 boxes, 16 clauses ≠ 16 charges.
    OEM Part A original export packing, B5 incremental physical crate/repacking, B2 packing-list documentation,
    B6 freight/customs and B13 physical consumables must not be billed twice.
