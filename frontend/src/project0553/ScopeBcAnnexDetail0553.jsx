@@ -27,6 +27,63 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
  const inWorking=mode==="working";
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
  if(!p)return <p role="alert">Unsupported customer scope code: {code}</p>;
+ // Existing B10/B11/B13/C1/C2 modules use the same Module IDs and UI function.
+ // Replace ONLY the active engineering list; Rev08 candidates remain audit-only.
+ if(["B10","B11","B13","C1","C2"].includes(code)){
+  const currentRows=customerSchedule.currentByCode[code]||[];
+  const currentGroups=customerSchedule.currentGroups.filter(g=>g.code===code);
+  const ctrl=customerSchedule.currentDocumentControl;
+  const ownerClass=code.startsWith("C")?"PART C OPTION — QUOTATION ONLY":"PART B BASE — DOCUMENT REQUIRED";
+  return <section className="p55-panel" data-component-key={moduleId} style={{padding:14}}>
+   <div className="p55-eyebrow">{inWorking?"10.2 WORKING COST DETAIL":"10.5 CUSTOMER SCOPE DETAIL"} · PTTEP REQUIREMENT-FIRST RE-ESTIMATE</div>
+   <h3>{p.code} — {p.description}</h3>
+   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/>
+    {" "}· <strong>{ownerClass}</strong> · Original Module ID retained · Source register <code>{customerSchedule.moduleId}</code></p>
+   <div className="p55-metric-grid">
+    <div><strong>Current Working SELL</strong><p>{thb(p.workingSellTHB)}</p><small>Do not use Rev08 as current rate</small></div>
+    <div><strong>Verified Direct COST</strong><p>{thb(p.directCostTHB)}</p><small>OEM part quotations pending</small></div>
+    <div><strong>PTTEP Engineering Candidates</strong><p>{currentRows.length}</p><small>Not equal to number of confirmed OEM replacement SKUs</small></div>
+    <div><strong>Release Status</strong><p>HOLD</p><small>Minimum kit, SKU, quantity, proof and stock ownership open</small></div>
+   </div>
+   {code==="B10"&&<details open className="p55-panel" style={{padding:10}}>
+    <summary><strong>MR0001–MR0004 Attachment 5: 14 contract commissioning spare kits</strong></summary>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+     <thead><tr><th>MR</th><th>Installed Platforms</th><th>Required Kits</th><th>Physical OEM SPIR Contents</th><th>Rate</th></tr></thead>
+     <tbody>{documentObligations.rows.map(x=><tr key={x.mr}>
+      <td>{x.mr}</td><td>{x.sites.join(", ")}</td><td>{x.commissioningKitQuantity}</td>
+      <td>NOT ESTABLISHED · OEM Attachment-5 SPIR required</td><td>NOT ESTABLISHED</td>
+     </tr>)}</tbody>
+    </table></div>
+    <p className="p55-note">BROWNFIELD ZPQ / ZWP08 / ZWP11: AS REQUIRED, not extra automatic kits. Installed Part A/A5 bulk must not be counted again.</p>
+   </details>}
+   {currentGroups.map(g=><details key={g.key} open className="p55-panel" style={{padding:10}}>
+    <summary><strong>{g.title}</strong> · {g.rows.length} candidates · Price NOT ESTABLISHED</summary>
+    <p className="p55-note">{g.mr} · {g.sites.join(", ")} · {g.source}</p>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+     <thead><tr><th>Reference</th><th>Part / Description</th><th>Site / Installed TAG Evidence</th><th>OEM/Ex/Minimum Requirement</th><th>Qty / Part No.</th><th>Direct Cost THB</th><th>Working SELL THB</th></tr></thead>
+     <tbody>{g.rows.map((row,i)=><tr key={row.id}>
+      <td>{i+1}<small>{row.id}</small></td>
+      <td><strong>{row.description}</strong><small>{row.requirementClass}</small></td>
+      <td>{row.relatedMR}<small>{row.installedTagsBySite.length?row.installedTagsBySite.join(" · "):"COMMON / OEM SPIR mapping required"}</small></td>
+      <td>{row.qualification}<small>{row.sourceReferences.join(" / ")}</small></td>
+      <td>{row.currentRequiredQty??"NOT ESTABLISHED"}<small>OEM SKU: {row.oemSparePartNumber||"NOT ESTABLISHED"}</small></td>
+      <td>{thb(row.verifiedSupplierUnitCostTHB)}</td><td>{thb(row.currentWorkingSellTHB)}</td>
+     </tr>)}</tbody>
+    </table></div>
+   </details>)}
+   <details className="p55-panel" style={{padding:10}}>
+    <summary><strong>PTTEP compliance, revision conflict and unique-cost-owner controls</strong></summary>
+    <p className="p55-note">{ctrl.specificConflict}</p>
+    <p className="p55-note">{ctrl.cableCapacityNotStock}</p>
+    <p className="p55-note">{ctrl.c2Exclusion}</p>
+    <p className="p55-note">B11: {ctrl.phaseToolPooling}</p>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+     <tbody>{ctrl.oemFormFields.map(x=><tr key={x}><td>{x}</td><td>OPEN — technical/OEM evidence required</td></tr>)}</tbody>
+    </table></div>
+   </details>
+   <p className="p55-note"><strong>Commercial owner:</strong> B10 Commissioning Spares · B11 Special Tools · B13 Consumables · C1 Capital Spare Option · C2 Two-Year Operation Spare Option. No physical stock double-posting or installation-bulk allowance counted as B10. Current quote/approved sell absent, not zero THB.</p>
+  </section>;
+ }
  return <section className="p55-panel" data-component-key={moduleId} style={{padding:14}}>
   <div className="p55-eyebrow">{inWorking?"10.2 WORKING COST DETAIL":"10.5 CUSTOMER SCOPE DETAIL"} · PRICE SOURCE AUDIT (THB display)</div>
   <h3>{p.code} — {p.description}</h3>
