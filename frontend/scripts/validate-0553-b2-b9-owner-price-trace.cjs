@@ -68,7 +68,10 @@ for(const x of ["580,000.00","143","38","Document Controller MH",
  assert(b2html.toLowerCase().includes(x.toLowerCase()),"B2 current proof missing "+x);
 }
 assert(!b2html.includes("Rate THB/MH: THB "),"No invented Document Controller pay rate");
-assert(b2html.includes("104.125")&&b2html.includes("341.625"),"Rev05 historical role-rate reference missing");
+// Rev05 source rates are THB/MH with 3 decimal precision (NOT new payroll).
+// Guard the rendered values, not a two-decimal commercial formatting artefact.
+assert(b2html.includes("THB 104.125")&&b2html.includes("THB 341.625"),
+ "Rev05 historical THB/MH exact source seeds must be visible at 3 decimals");
 assert(b2html.includes("HISTORICAL"),"Old role cost seeds must never masquerade as current rate");
 const b9html=renderToStaticMarkup(React.createElement(PriceTrace,{workingRow:bc.byCode.B9}));
 assert(b9html.includes("233,600.00")&&b9html.includes("THB 233,600.00"));
@@ -77,6 +80,13 @@ assert(b9html.includes("seven Yard working days"));
 const source=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 assert(source.includes("Do not divide THB580,000 by 143 or 38"));
 assert(source.includes("row.calculatedB2MH"));
+assert(source.includes("fmtHistoricalRate(rate)"),
+ "Historical input THB/MH must use a 3-decimal reference-only formatter");
+const vdrlUi=fs.readFileSync(path.join(root,"project0553/B2IndependentVdrlRecalculation0553.jsx"),"utf8");
+assert(!vdrlUi.includes("data-component-key={id} defaultOpen={defaultOpen}"),
+ "React <details> must use supported open, not defaultOpen, for dossier groups");
+assert(vdrlUi.includes("data-component-key={id} open={defaultOpen}"),
+ "Original B2 expand/default-open behavior must be preserved");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
 assert(host.includes("<BcOwnerPriceTrace0553")&&host.includes("auditContent={<React.Fragment>"),
  "All owner-local B2-B9 audit proof must be nested without duplicate standalone cost-lines");
