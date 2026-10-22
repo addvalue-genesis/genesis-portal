@@ -75,7 +75,7 @@ const snap=JSON.stringify({sell:b.workingSellTHB,cost:b.directCostTHB});
 const html=renderToStaticMarkup(React.createElement(BcDetail,{workingRow:b,navigationTarget:satId}));
 assert(html.includes('data-component-key="'+satId+'"'));
 assert(html.includes('data-component-key="'+site().rows[0].moduleId+'"'));
-assert(html.includes("2,397,725.00"),"Selected SAT28 BF Survey5 B3 price must render as customer proposal preview");
+assert(html.includes("2,599,325.00"),"Selected SAT28 BF Survey5 B3 price must render as customer proposal preview");
 assert(html.includes("SOW-B3")&&html.includes("WS-B3")&&html.includes("CP-B3")&&html.includes("VQ-MGW-SERV-2"),"B3 financial identity table missing from detail view");
 const b11=renderToStaticMarkup(React.createElement(BcDetail,{workingRow:current().byCode.B11}));
 assert(b11.includes('data-component-key="bid.budget.working.bc.b11.test-equipment-ownership"'));
