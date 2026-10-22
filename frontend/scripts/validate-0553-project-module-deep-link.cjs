@@ -102,4 +102,4 @@ const css=fs.readFileSync(path.join(root,"project0553/project0553.css"),"utf8");
 assert(css.includes("[data-component-key].p553-module-nav-focus"));
 assert(!ws.includes("const target=exact||parent"),"Do not silently scroll to parent for failed leaf navigation");
 assert(ws.includes("ยังเปิด Module ปลายทางไม่ได้"));
-console.log("PASS PJ2608-0553 Project Module Navigator: nested B3.site + 21 SAT IDs, 19 RQM IDs, Enter/click route, exact DOM target, open all disclosure ancestors, RQM cross-owner reveal, current THB 2,397,725 SAT28+BF Survey conditional WS; 40d old audit only.");
+console.log("PASS PJ2608-0553 Project Module Navigator: nested B3.site + 21 SAT IDs, 19 RQM IDs, Enter/click route, exact DOM target, open all disclosure ancestors, RQM cross-owner reveal, current THB 2,599,325 SAT28+BF Survey conditional WS; 40d old audit only.");
