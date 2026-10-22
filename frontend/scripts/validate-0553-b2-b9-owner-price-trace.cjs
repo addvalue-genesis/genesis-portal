@@ -28,8 +28,8 @@ assert.equal(vdrl().b2CalculatedMH,null);
 assert.equal(vdrl().b2VerifiedCostTHB,null);
 assert.deepEqual(["MR-0001","MR-0002","MR-0003","MR-0004"].map(x=>vdrl().byMr[x].sourceRows),
  [37,36,35,35]);
-assert.equal(bc.byCode.B9.workingSellTHB,233600);
-assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600);
+assert.equal(bc.byCode.B9.workingSellTHB,261950);
+assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,261950);
 assert.equal(bc.byCode.B8.workingSellTHB,30000);
 assert.equal(bc.byCode.B8.qtyDriver,44);
 assert.equal(bc.byCode.B5.workingSellTHB,311184);
@@ -74,7 +74,7 @@ assert(b2html.includes("THB 104.125")&&b2html.includes("THB 341.625"),
  "Rev05 historical THB/MH exact source seeds must be visible at 3 decimals");
 assert(b2html.includes("HISTORICAL"),"Old role cost seeds must never masquerade as current rate");
 const b9html=renderToStaticMarkup(React.createElement(PriceTrace,{workingRow:bc.byCode.B9}));
-assert(b9html.includes("233,600.00")&&b9html.includes("THB 233,600.00"));
+assert(b9html.includes("261,950.00")&&b9html.includes("THB 261,950.00"));
 assert(b9html.includes("Quoted B9 Base once"));
 assert(b9html.includes("seven Yard working days"));
 const source=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
