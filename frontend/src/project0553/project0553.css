@@ -752,3 +752,14 @@
 .p553-b3-resource-dossier .p553-b3-dossier-group{margin:3px 0;border-left:3px solid var(--b3-accent)}
 .p553-b3-resource-dossier .p553-b3-group-trace-table{min-width:800px}
 @media(max-width:700px){.p553-b3-resource-dossier .p553-b3-rollup-price{align-items:flex-start;width:100%}}
+
+/* PJ2608-0553 — B9 priced Yard Work Scope, a NONPOSTING drilldown of WS-B9.
+   Color denotes source expense type, not approval. Keep amounts visible collapsed. */
+.p553-dashboard .p553-b9-dossier-group--labour{--price-accent:#23649b;--price-tint:#eff5ff}
+.p553-dashboard .p553-b9-dossier-group--travel{--price-accent:#0f8071;--price-tint:#eaf8f3}
+.p553-dashboard .p553-b9-dossier-group--compliance{--price-accent:#986b20;--price-tint:#fff6e9}
+.p553-dashboard .p553-b9-dossier-group>.p553-bc-price-leaf-head{background:var(--price-tint)}
+.p553-dashboard .p553-b9-dossier-group>.p553-bc-price-leaf-head small{font-weight:700;color:var(--price-accent)}
+.p553-dashboard .p553-b9-dossier-site{border-left-width:3px;margin-top:8px}
+.p553-dashboard .p553-b9-work-scope-dossier .p55-table{min-width:1500px}
+.p553-dashboard .p553-b9-work-scope-dossier td small{display:block;margin-top:3px;font-size:11px;overflow-wrap:anywhere}
