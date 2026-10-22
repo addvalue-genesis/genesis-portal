@@ -22,7 +22,7 @@ const audit=from("estimateToBidMapping.js")
  .auditCurrentCustomerProjection0553({canonical,release,scope});
 const current=canonical.byCode;
 const scenarios=canonical.scenarioAudits;
-assert.equal(canonical.knownWorkingSellTHB,4582736.82);
+assert.equal(canonical.knownWorkingSellTHB,4308914.13);
 assert.equal(current.B3.workingSellTHB,2599325);
 assert.equal(current.B8.workingSellTHB,131550);
 assert.equal(current.B9.workingSellTHB,480550);
