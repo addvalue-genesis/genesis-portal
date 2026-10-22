@@ -35,7 +35,7 @@ for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2599325,B9:
 }
 assert.equal(budget.knownWorkingSellTHB,4262586.82);
 assert.equal(abc.partBBaseTHB,budget.knownWorkingSellTHB);
-assert.equal(abc.currentB1B3B9BaseTHB,2842925);
+assert.equal(abc.currentB1B3B9BaseTHB,3072875); // current B1 211600 + B3 2599325 + B9 261950
 assert.equal(abc.postedWorkingSellDeltaTHB,0);
 assert.equal(abc.b9YardConditionalLumpSumTHB,261950);
 assert.equal(abc.b3FatWitnessSellTHB,422600);
@@ -46,8 +46,8 @@ assert.equal(by.B3.b3SelectedSatSurveyBudget.satWorkingSellTHB,1587600);
 assert.equal(by.B3.b3SelectedSatSurveyBudget.siteSurveyWorkingSellTHB,252000);
 assert.equal(by.B3.b3SelectedSatSurveyBudget.riskTeamDaysNotIncluded,2);
 assert.equal(release.b.find(x=>x.code==="B3").samTelPurchased20PctCostShareTHB,47250);
-assert.equal(release.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,104530);
-assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,151780);
+assert.equal(release.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,114610);
+assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,161860);
 assert.equal(abc.b9FatBaseTHB,0);
 assert.ok(by.B3.b3ChinaFatBudget.rows.filter(x=>!x.optional).every(x=>x.costOwner==="B3"));
 assert.ok(by.B9.b9ChinaBudget.rows.filter(x=>x.optional).every(x=>x.costOwner==="B9"));
@@ -83,4 +83,4 @@ assert(workType.includes("<B3SiteMrSatCoverage0553 workingRow={workingRow}/>"),"
 assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell}/>'),"China FAT witness not mounted in FAT group");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(workspace.includes("<RevKAbcOwnershipControl0553 working={bcWorking}/>"),"CFO current ABC not mounted");
-console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,397,725 (FAT 397,400 included) B9 Base 233,600, execution on written call-out, Part B 4,262,586.82; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
+console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,599,325 (MGW purchased 307,125 + China witness 422,600 included) B9 Base 261,950, execution on written call-out, Part B 4,262,586.82; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
