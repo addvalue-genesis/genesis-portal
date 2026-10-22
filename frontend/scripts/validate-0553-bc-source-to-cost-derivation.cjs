@@ -22,8 +22,8 @@ const e=selectBcCostEvidenceDerivation0553(),bc=selectBcTurnkeyWorkingCost0553()
 const CURRENT_REV_K_WORKING_SELL_0553=Object.freeze({
  B1:211600,B2:237121.13,B3:2599325,B4:null,
  B5:311184,B6:307584,B7:30000,B8:151550,
- B9:480550,B10:123024.37,B11:128314.11,B12:null,
- B13:22484.21,B14:null,C1:4049349.36,C2:721806.68
+ B9:480550,B10:null,B11:null,B12:null,
+ B13:null,B14:null,C1:null,C2:null
 });
 assert.equal(bc.knownWorkingSellTHB,4602736.82,"Current Rev.K Part B Base Working SELL");
 assert.equal(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB,422600,"FAT witness belongs only to B3");
