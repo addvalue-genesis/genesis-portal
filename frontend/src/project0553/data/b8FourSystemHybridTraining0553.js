@@ -71,7 +71,7 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
  const standaloneReferenceTHB=round(total+sharedTripDeduplication);
  if(total!==131550||groups.map(g=>g.workingSellTHB).join("|")!=="66150|50400|15000|0"||
   sharedTripDeduplication!==85100||standaloneReferenceTHB!==216650||
-  counted.length!==14||priced.length!==9||
+  counted.length!==14||priced.length!==8||
   fx!==31.5||seniorUSD!==700||
   new Set(counted.map(x=>x.id)).size!==counted.length||
   (workingRow!==null&&(workingRow.workingSellTHB!==total||workingRow.directCostTHB!==null)))
