@@ -49,9 +49,9 @@ assert.equal(x.summary.B11.workingReferenceTHB,128314.11);
 assert.equal(x.summary.B13.workingReferenceTHB,22484.21);
 assert.equal(x.summary.C1.workingReferenceTHB,4049349.36);
 assert.equal(x.summary.C2.workingReferenceTHB,721806.68);
-assert.equal(bc.byCode.B11.workingSellTHB,128314.11,"Current B11 management budgetary working sell; OEM direct cost and inclusion remain unverified");
+assert.equal(bc.byCode.B11.workingSellTHB,null,"B11 new PTTEP/OEM SPIR reprice unpriced");
 for(const code of ["B10","B13","C1","C2"])
- assert.equal(bc.byCode[code].workingSellTHB,x.summary[code].workingReferenceTHB);
+ assert.equal(bc.byCode[code].workingSellTHB,null);
 assert.equal(bc.knownWorkingSellTHB,4308914.13,"Current Part B Base includes B2 131-WO, MGW Purchased FAT and B9 quoted Base once; Rev08 spare lines remain audit");
 assert.equal(x.riskCandidates.length,1);
 assert(x.crossCategoryDuplicates.some(z=>z.family==="SCADA_POE"&&z.categories.includes("B10")&&z.categories.includes("C2")),"B10-C2 PoE overlap must be flagged for stock-quantity reconciliation");
