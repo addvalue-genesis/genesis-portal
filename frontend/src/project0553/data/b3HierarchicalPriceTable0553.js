@@ -67,15 +67,15 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
      owner:"IC-FAT-001 / WS-B3 (SOW-B3); CP-B3 NOT ISSUED",status:"CURRENT INTERNAL WORKING SELL · DIRECT COST NOT VERIFIED"}),
 
   ]),
-  group("B3.2","sat","SAT / SIT — Offshore Site & Integration Tests",
-   "7 locations + cross-site SIT / punch, 40 team-days shared across MR",[
-   item("B3.2.1","40-day-abc","Offshore SAT/SIT Team",
-    "2 engineers × 40 team-days × USD800/person-day × FX31.50",
+  group("B3.2","sat","SAT / SIT — Retained 40-Day Price Basis; BF/Yard/Offshore Days Open",
+   "Historical-selected Working SELL 40 team-days/80 MD only; BF re-verification, GF Zhuhai Yard SAT and Offshore Vendor Commissioning have separate RACI/days OPEN",[
+   item("B3.2.1","40-day-abc","BF / GF Yard / Offshore Plan — Retained SAT/SIT Pricing Audit",
+    "Retained Working SELL labour price: 2 × 40 historical team-days × USD800 × FX31.50; NOT a new approved schedule",
     C.INCLUDED_WORKING_SELL,{workingSellTHB:offshore.laborWorkingSellTHB,
      qty:offshore.personDays,unit:"paid person-days",unitRateTHB:25200,
-     status:"CURRENT WORKING SELL; site timeboxes counted once"}),
+     status:"RETAINED WORKING SELL PRICE ONLY; Yard/Offshore manpower days not established"}),
    item("B3.2.2","site-mr-sat-matrix","Seven-Site / Four-MR SAT Coverage Matrix",
-    "19 Site/MR test IDs plus SIT and Punch = 21 traceable objects; shared 40 days",
+    "19 Site/MR Test IDs plus SIT/Punch =21 source coverage; original 40d is price-only, not stage-assigned"
     C.NON_POSTING_AUDIT,{qty:satMatrix.rows.length,unit:"test IDs",
      status:"COVERAGE ONLY — NOT 21 separate costs"})
   ]),
