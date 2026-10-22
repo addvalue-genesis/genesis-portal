@@ -4,6 +4,7 @@
 // True internal Direct Cost remains absent until verified payroll/third party rates.
 import {selectB1ProjectSupportBudget0553} from "./b1ProjectSupportBudget0553";
 import {selectB3FortyDayWorkingSell0553} from "./b3FortyDayWorkingSell0553";
+import {selectB3SelectedSatSurveyPrice0553} from "./b3SelectedSatSurveyPrice0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
 import {selectFourMrFatWbs0553} from "./fatWbsFourMr0553";
@@ -11,14 +12,15 @@ const roundRevKAbc0553=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function selectRevKAbcOwnershipControl0553(working){
  if(!working?.byCode)throw Error("Rev.K ABC needs current canonical 10.2 Working Sell");
  const b1=selectB1ProjectSupportBudget0553();
- const b3=selectB3FortyDayWorkingSell0553();
+ const historicalB3=selectB3FortyDayWorkingSell0553();
+ const b3=selectB3SelectedSatSurveyPrice0553();
  const trace=selectB3RequirementWbsTrace0553();
  const b9=selectB9ChinaWorkingBudget0553();
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
- if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.workingSellTHB+b9.fatWorkingSellTHB+307125)||current.B9!==b9.b9BaseWorkingSellTHB||
-    working.knownWorkingSellTHB!==4385436.82 ||
-    working.byCode.B3?.workingSellTHB!==2750525 ||
+ if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+307125)||current.B9!==b9.b9BaseWorkingSellTHB||
+    working.knownWorkingSellTHB!==4032636.82 ||
+    working.byCode.B3?.workingSellTHB!==2397725 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))
@@ -47,12 +49,20 @@ export function selectRevKAbcOwnershipControl0553(working){
   posting:x.conditional?"CONDITIONAL_B1__EXCLUDED_FROM_BASE":"INCLUDED_IN_NEW_CANONICAL_B1_SUPPORT_SELL__NOT_ADDITIVE",
   chargeKey:x.id
  }));
- const satSiteLines=b3.rows.map(x=>Object.freeze({
-  id:"ABC-"+x.id,wbs:x.wbs,owner:"B3",costObject:"OFFSHORE_SITE_TEAM_DAY",
-  activity:x.reason,site:x.site,source:x.mr,
+ const satSiteLines=b3.satRows.map(x=>Object.freeze({
+  id:"ABC-"+x.id,wbs:x.wbs,owner:"B3",costObject:"CURRENT_SELECTED_SAT28_TEAM_DAY",
+  activity:x.work,site:x.site,source:x.wbs,
   quantity:x.days,unit:"two-person team workday",workingSellRateTHB:2*800*31.5,
   modeledSellTHB:x.workingSellTHB,directCostTHB:null,
-  posting:"INCLUDED_IN_B3_40DAY_WORKING_SELL__NOT_ADDITIVE",chargeKey:x.id
+  posting:"SELECTED_28DAY_SAT_WORKING_SELL__NOT_ADDITIVE",chargeKey:x.id
+ }));
+ const surveyLines=b3.siteSurveyRows.map(x=>Object.freeze({
+  id:"ABC-B3-"+x.id,wbs:x.wbs,owner:"B3",
+  costObject:"SELECTED_BF_SURVEY_AND_TRAVEL_ALLOWANCE",activity:x.work,
+  site:x.site,source:"User 2026-10-22 BF3+Travel2",quantity:x.days,unit:"two-person team workday",
+  workingSellRateTHB:50400,modeledSellTHB:x.workingSellTHB,directCostTHB:null,
+  posting:"SELECTED_BF_SURVEY_WORKING_BUDGET__PHYSICAL_VISIT_CONDITIONAL",
+  chargeKey:x.id
  }));
  const satTool=Object.freeze({
   id:"ABC-B3-VEEX",wbs:"K16",owner:"B3",costObject:"TEMPORARY_TEST_TOOL_RENTAL",
@@ -81,8 +91,8 @@ export function selectRevKAbcOwnershipControl0553(working){
   posting:x.optional?"INCLUDED_IN_CANONICAL_B9_1LS__ON_CALL_EXECUTION_NONADDITIVE":"INCLUDED_IN_CANONICAL_B3_FAT__NOT_ADDITIVE",
   chargeKey:x.expenseKey
  }));
- const rows=Object.freeze([...b1Engineering,...pmEvents,...supportExpenses,...satSiteLines,satTool,...satObligations,...fatTasks,...chinaExpenses]);
- const chargeRows=[...pmEvents,...supportExpenses,...satSiteLines,satTool,...chinaExpenses];
+ const rows=Object.freeze([...b1Engineering,...pmEvents,...supportExpenses,...satSiteLines,...surveyLines,satTool,...satObligations,...fatTasks,...chinaExpenses]);
+ const chargeRows=[...pmEvents,...supportExpenses,...satSiteLines,...surveyLines,satTool,...chinaExpenses];
  const keys=chargeRows.map(x=>x.chargeKey);
  if(keys.length!==new Set(keys).size||rows.length!==new Set(rows.map(x=>x.id)).size||
    rows.some(x=>x.directCostTHB!==null))throw Error("Rev.K ABC duplicate Cost Object or unverified Direct Cost");
@@ -91,18 +101,19 @@ export function selectRevKAbcOwnershipControl0553(working){
  const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B9").reduce((v,x)=>v+x.modeledSellTHB,0));
  if(b1Engineering.length!==27||pmEvents.length!==41||supportExpenses.length!==9||b1.labourHours!==242||trace.rows.length!==19||
    fatTasks.length!==12||fat.estimatedFatWitnessDays!==6||satSiteLines.length!==9||
-   b3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==397400||yardTHB!==233600)
+   b3.satTeamDays!==28||b3.siteSurveyTeamDays!==5||historicalB3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==397400||yardTHB!==233600)
   throw Error("Rev.K activity reconciliation mismatch");
  return Object.freeze({
   moduleId:"bid.budget.working.bc.revk-abc-control",
-  rows,pmEvents,b1Engineering,supportExpenses,satSiteLines,satTool,satObligations,fatTasks,chinaExpenses,
+  rows,pmEvents,b1Engineering,supportExpenses,satSiteLines,surveyLines,satTool,satObligations,fatTasks,chinaExpenses,
   currentWorkingSellTHB:Object.freeze({...current}),
   currentB1B3B9BaseTHB:roundRevKAbc0553(current.B1+current.B3+current.B9),
   partBBaseTHB:working.knownWorkingSellTHB,b1PmProxyTHB:0,
   b1EngineeringSellTHB:0,b1OfficePmIncludedTHB:pmWorkingSellTHB,
   b1SupportSellTHB:b1.baseWorkingSellTHB,b1SupportCostTHB:b1.baseWorkingCostTHB,
   b1ConditionalSellTHB:b1.conditionalWorkingSellTHB,b1LegacyEngineeringCarriedTHB:0,
-  b3LaborSellTHB:b3.laborWorkingSellTHB,b3ToolSellTHB:b3.toolRentalWorkingSellTHB,
+  b3LaborSellTHB:b3.satWorkingSellTHB,b3SurveySellTHB:b3.siteSurveyWorkingSellTHB,
+   b3Historical40DayLabourTHB:historicalB3.laborWorkingSellTHB,b3ToolSellTHB:b3.veexWorkingSellTHB,
   b3MgwPurchasedFatWorkingSellTHB:307125,
   b9FatBaseTHB:0,b3FatWitnessSellTHB:fatTHB,b3FatWitnessDays:fat.estimatedFatWitnessDays,b9FatWitnessDays:fat.estimatedFatWitnessDays,
   b9YardConditionalLumpSumTHB:yardTHB,b9YardQuotedInBaseTHB:current.B9,
@@ -118,7 +129,7 @@ export function selectRevKAbcOwnershipControl0553(working){
    "Use 14d for management planning per SPE; BOD 30d notice conflict remains unresolved contract precedence HOLD",
    "Post Yard SAT loose-equipment transfer to ZPQ under SPE §7.3.2 conflicts with as-installed WH assumption; seek written TQ",
    "B1 contains fresh role-based management/admin/accounting/procurement expenses ONLY; legacy B1 engineering price excluded, technical engineering ownership review nonposting; B3 owns FAT Witness",
-   "B3 40 workdays x two specialists, MGW FAT Witness plus travel, VeEX 30d rental all counted once; permanent O&M tools B11 only",
+   "B3 selected SAT28 plus BF Survey3+2 two-person team-days, FAT Witness, VeEX30 rental counted once; old 40d historic audit only, physical BF visit conditional",
    "Yard Field Telecom Specialist travels as an unbilled companion; THB48,500 minimum cash risk allowance remains nonposting until cost/margin evidence",
    "Verified Direct Cost needs actual salary, supplier receipts, Trip/Person keys; no automatic historical posting"
   ])
