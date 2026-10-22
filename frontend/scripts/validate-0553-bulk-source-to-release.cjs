@@ -86,10 +86,14 @@ const jsx=fs.readFileSync(path.join(root,"project0553/BulkSourceToReleaseAudit05
 const bom=fs.readFileSync(path.join(root,"project0553/SimpleBom0553.jsx"),"utf8");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 const navigator=fs.readFileSync(path.join(root,"project0553/data/bulkModuleNavigator0553.js"),"utf8");
+const workbook=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
 babel.transformSync(jsx,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
 assert(bom.includes('<BulkSourceToReleaseAudit0553 mr={system} site={site} focusModuleId={navigationTarget}/>'));
 assert(workspace.includes('<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>'));
 assert(navigator.includes('deriveBulkSourceToReleaseTrace0553'));
+assert(workbook.includes('id:"A-BULK"'));
+assert(workbook.includes('deriveBulkSourceToReleaseTrace0553({releaseModel:model})'));
+assert(workbook.includes('state:bulkGate.sourceToReleaseReady?"PASS":"HOLD"'));
 assert(jsx.includes('MR0004 phase kit is exactly one requirement across all three WPs'));
 console.log("PASS 0553 BULK source→release: exact MR0001 MTO rows 11/20/29/36/41/47/52, 7+3+4+3 scope, MR0004 1 shared phase kit, MGW owner/NEK spare HOLD, A5 260232 source-only, Release prices unchanged");
