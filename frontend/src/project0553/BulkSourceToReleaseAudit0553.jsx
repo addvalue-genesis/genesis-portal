@@ -1,14 +1,31 @@
-import React,{useState} from "react";
+import React,{useState,useEffect} from "react";
 import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrace0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 
 // Read-only source → engineering BULK → working ledger → customer Release gate.
 // This view never changes Canonical BOM, quoted-cost owner or customer price.
-export function BulkSourceToReleaseAudit0553({releaseModel=null,placement="BOM",mr="ALL",site="ALL"}){
+export function BulkSourceToReleaseAudit0553({releaseModel=null,placement="BOM",mr="ALL",site="ALL",focusModuleId=null}){
  const model=deriveBulkSourceToReleaseTrace0553({releaseModel});
  const [opened,setOpened]=useState({});
  const rows=model.groups.filter(x=>(mr==="ALL"||x.mr===mr)&&(site==="ALL"||x.site===site));
  const id=placement==="RELEASE"?model.releaseModuleId:model.moduleId;
+ // Page-level module navigator selects MR+site upstream. Expand the exact source
+ // row here without altering any canonical costing or customer release.
+ useEffect(()=>{
+  if(!focusModuleId||placement!=="BOM")return;
+  const match=rows.find(x=>x.moduleId===focusModuleId||x.moduleId+".requirements"===focusModuleId);
+  if(match)setOpened(prev=>prev[match.id]?prev:{...prev,[match.id]:true});
+ },[focusModuleId,placement,mr,site]);
+ useEffect(()=>{
+  if(!focusModuleId||placement!=="BOM"||typeof document==="undefined")return;
+  const target=[...document.querySelectorAll("[data-component-key]")].find(
+   x=>x.getAttribute("data-component-key")===focusModuleId);
+  if(!target)return;
+  let p=target.parentElement;
+  while(p){if(p.tagName==="DETAILS")p.open=true;p=p.parentElement;}
+  target.classList?.add("p553-module-nav-focus");
+  target.scrollIntoView?.({behavior:"smooth",block:"center"});
+ },[focusModuleId,opened,placement,mr,site]);
  const toggle=k=>setOpened(p=>({...p,[k]:!p[k]}));
  const money=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"PENDING";
  return <section className="p55-panel" data-component-key={id}>
@@ -32,9 +49,9 @@ export function BulkSourceToReleaseAudit0553({releaseModel=null,placement="BOM",
     <tbody>{rows.map(r=>{
      const open=!!opened[r.id];
      return <React.Fragment key={r.id}>
-      <tr data-component-key={r.moduleId}>
+      <tr data-component-key={placement==="RELEASE"?id+"."+r.site.toLowerCase()+"."+r.mr.toLowerCase().replace("-",""):r.moduleId}>
        <td><button className="p55-row-toggle" type="button" aria-expanded={open} onClick={()=>toggle(r.id)}>{open?"−":"+"}</button></td>
-       <td><strong>{r.site} / {r.mr}</strong><ComponentCopyId projectId="PJ2608-0553" componentKey={r.moduleId}/></td>
+       <td><strong>{r.site} / {r.mr}</strong><ComponentCopyId projectId="PJ2608-0553" componentKey={placement==="RELEASE"?id+"."+r.site.toLowerCase()+"."+r.mr.toLowerCase().replace("-",""):r.moduleId}/></td>
        <td><strong>{r.sourceMtoRow!==null?"MTO Row "+r.sourceMtoRow:r.sourceAuthority}</strong>
         <small>{r.sourceDocument} · {r.sourceRevision}</small>
         <small>{r.sourceLotQty===1?"1 Lot / site":r.mr0003SystemQty===1?"1 System / site":r.mr0004PhaseSharedQty===1?"1 shared adapter/charging kit per PHASE (not per site)":"Review source"}</small></td>
@@ -45,7 +62,7 @@ export function BulkSourceToReleaseAudit0553({releaseModel=null,placement="BOM",
         <small>{r.mr==="MR-0001"?"A5 reclassification only; never post twice":"MGW/OEM bundle first; no extra BULK posting"}</small></td>
        <td><strong>HOLD</strong><small>{r.openMaterialEvidenceCount} unapproved material/evidence items</small></td>
       </tr>
-      {open&&<tr data-component-key={r.moduleId+".requirements"}><td colSpan={7}>
+      {open&&<tr data-component-key={placement==="RELEASE"?id+"."+r.site.toLowerCase()+"."+r.mr.toLowerCase().replace("-","")+".requirements":r.moduleId+".requirements"}><td colSpan={7}>
        <p><strong>Requirement:</strong> {r.sourceRequirement}</p>
        {r.sourceMtoDescription&&<p><strong>Original MTO description:</strong> {r.sourceMtoDescription}</p>}
        <p><strong>Engineering and technical HOLD:</strong> {r.openEvidenceGates.join(" · ")}</p>
