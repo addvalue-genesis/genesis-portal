@@ -68,7 +68,7 @@ export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
   const expectedPriceRow=releaseModel?.a?.find(x=>x.mr===g.mr);
   const sourceComplianceGates={
    "MR-0001":["TC0001_7_8_FIRE_RATING_CLIENT_REPLY_UNVERIFIED","AFC_CABLE_END_ROUTES_AND_GLAND_OD_OPEN","SUPPLIER_INSTALLED_BULK_INCLUSION_OPEN"],
-   "MR-0002":["BDA_DEVIATION_REV00_ITEM_1_1_OPEN__OMNI_MOVE_EL18300_AND_YAGI_YBSS6","AFC_LAY_TCAB508_ROLE_SITE_SPECIFIC_VERIFIED","MGW_BDA_REPLACES_AFC_LNA__UPDATED_GA_BLD_EX_DEVIATION_HOLD","MGW_FORLLER_IEC60331_AND_EX_CERT_OPEN","RF_RUNS_AND_CONNECTORS_UNMEASURED","NEK_INSTALLATION_SPARE_SEPARATE_NOT_APPROVED"],
+   "MR-0002":["CURRENT_BUDGETARY_DESIGN_LNA_TO_RFI_BDA_SAME_POSITION_SELECTED","REV00_OMNI_RELOCATION_AND_YBSS6_CHANGES_NOT_ADOPTED","CUSTOMER_BDA_FORMAL_CHANGE_CLOSURE_OPEN","AFC_LAY_TCAB508_ROLE_SITE_SPECIFIC_VERIFIED","MGW_FORLLER_IEC60331_AND_EX_CERT_OPEN","RF_RUNS_AND_CONNECTORS_UNMEASURED","NEK_INSTALLATION_SPARE_SEPARATE_NOT_APPROVED"],
    "MR-0003":["PHONE_SOUND_DC_POE_TERMINATION_UNVERIFIED","EX_WAROM_GLAND_INCLUDED_CREDIT_AND_OD_UNVERIFIED","SPECIAL_CABLE_IF_REQUIRED_NOT_DERIVED"],
    "MR-0004":["ADAPTER_CHARGING_KIT_ONE_PER_PHASE_VENDOR_PRICE_OPEN","RACON_CONTROL_BOX_AND_PROGRAMMING_INCLUSION_OPEN","RACON_POWER_ALARM_CABLE_END_AND_EX_GLAND_UNVERIFIED"]
   }[g.mr];
@@ -92,11 +92,16 @@ export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
    mr0002OriginalAfcLnaTag:g.mr==="MR-0002"?rfRoutesBySite[g.site]?.afcLnaEnclosureTag:null,
    mr0002OriginalAfcSurgeTag:g.mr==="MR-0002"?rfRoutesBySite[g.site]?.afcSurgeEnclosureTag:null,
    mr0002SelectedBdaAfcApproved:g.mr==="MR-0002"?false:null,
+   mr0002WorkingBdaSelected:g.mr==="MR-0002"?true:null,
+   mr0002WorkingDesignChange:g.mr==="MR-0002"?"LNA_TO_RFI_BDA_ONLY":null,
+   mr0002AntennaPositionsUnchanged:g.mr==="MR-0002"?true:null,
+   mr0002HistoricalOmniRelocationSelected:g.mr==="MR-0002"?false:null,
    physicalCableEndModuleId:"bid.budget.bom.physical-cable-end-register",
    functionalCableEndCandidates:cableEnds.lines.filter(x=>x.site===g.site&&x.mr===g.mr).length,
    bdaDeviationSource:g.mr==="MR-0002"?"5-Deviation List Rev00.xlsx / row 13":null,
    bdaDeviationOpen:g.mr==="MR-0002"?true:null,
-   proposedServiceAntennaElevationM:g.mr==="MR-0002"?18.3:null,
+   proposedServiceAntennaElevationM:null,
+   historicalUnadoptedRev00OmniElevationM:g.mr==="MR-0002"?18.3:null,
    itemCount:g.items.length,requiredFunctionCount:REQUIRED_ITEMS[g.mr].length,
    missingRequiredFunctionIds:missingRequired,
    knownSourceFloorTHB:pricedSourceCost,
@@ -146,7 +151,7 @@ export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
   originalA5PartialTHB:coverage.originalA5BookedTHB,
   additionalPostingTHB:0,workingSellChanged:false,releasePriceChanged:false,
   fullMaterialQuantityPriceReady:false,sourceToReleaseReady:false,releaseAllowed:false,
-  missingApprovalPolicy:"NEVER infer procured SKU, measured cable length, approved price, Ex/fire compliance or vendor kit inclusion from 1 Lot or historical quote",
+  missingApprovalPolicy:"Budgetary BDA design at unchanged location is selected internally; do not infer actual cable lengths, certified Ex/fire, vendor inclusions or formal client deviation acceptance from this design basis.",
   conditions:["MR0001 original 7 MTO BULK lot rows remain source-cost partial only",
    "MR0002 full MGW complete RF scope remains MGW; NEK is ADDVALUE optional unbooked spare",
    "MR0003 special cable is conditional within 1 system/site; no fake separate Bulk MTO lot",
