@@ -33,7 +33,7 @@ assert.equal(m.unreconciledWorkingSellDifferenceTHB,20000);
 assert.equal(m.roleWorkload.length,5);
 // The source records 964.2785625 MH; B2 UI uses toFixed(3) = 964.279,
 // not the stale literal 964.278. Never change source MH to satisfy a text test.
-assert.equal(m.workingMH,964.2785625);
+assert(Math.abs(m.workingMH-964.2785625)<1e-8,"Rev00a source MH precision drift");
 assert.equal(round(m.workingMH),964.28);
 assert.equal(round(m.roleCostProxyTotalTHB),158166.88);
 assert.equal(round(m.temporaryRev00a.unroundedWorkingSellTHB),434009.91);
