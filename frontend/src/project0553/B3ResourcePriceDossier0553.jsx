@@ -24,9 +24,9 @@ export function B3ResourcePriceDossier0553({workingRow}){
   </div>
   <div className="p55-metric-grid">
    <div><strong>Selected B3 Working SELL · 10.2 → 10.3/10.5</strong>
-    <p>{cash(model.pricedWorkingSellTHB)}</p><small>4 included cost-owner workgroups / 29 priced evidence lines</small></div>
+    <p>{cash(model.pricedWorkingSellTHB)}</p><small>5 included cost-owner groups / 37 price evidence lines (SAT 28d + BF Survey 5d)</small></div>
    <div><strong>Actual Paid Direct Cost</strong><p>NOT ESTABLISHED</p>
-    <small>Vendor Quote THB 236,250 is PURCHASE EVIDENCE, not paid cost</small></div>
+    <small>MGW Vendor Quotation total {cash(model.vendorQuoteCostTHB)} (USD 7,500) is PURCHASE EVIDENCE, not paid cost</small></div>
    <div><strong>Current physical people × days (GF Yard / Offshore)</strong><p>TO VERIFY</p>
     <small>No approved ADDVALUE RACI, deployment or cash cost</small></div>
    <div><strong>Commercial Release</strong><p>HOLD</p>
@@ -39,7 +39,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
    Site/MR Test IDs ไม่ใช่รายการราคาซ้ำ.</p>
   {model.groups.map((g,i)=>{
    const gid=root+".group."+String(i+1).padStart(2,"0");
-   const active=i<4;
+   const active=i<5;
    const sites=[...new Set(g.rows.map(x=>x.site||"Shared"))];
    return <details className="p553-b2-recalc-group p553-b3-dossier-group" key={gid}
     data-component-key={gid} open={i===0||i===1||i===2}>
@@ -48,7 +48,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
      <span className="p553-b2-recalc-label">
       <strong>{g.name}</strong>
       <small>{g.rowCount} detailed resource/expense rows ·
-       {active?" INCLUDED IN WORKING SELL":" CONDITIONAL / UNPRICED — NOT ADDITIVE"} ·
+       {active?" INCLUDED IN WORKING SELL":" UNPRICED — NOT ADDITIVE"} ·
        {active?cash(g.selectedWorkingSellTHB):"0 POSTED; amount NOT ESTABLISHED"}</small>
       <code>{gid}</code>
      </span>{c(gid)}
@@ -105,10 +105,10 @@ export function B3ResourcePriceDossier0553({workingRow}){
        </div>
       </details>;
      })}
-     {i===4&&<p className="p55-note"><strong>BF ONLY conditional working labour scenario:</strong>
+     {i===4&&<p className="p55-note"><strong>BF Survey SELECTED Working Budget — physical execution still conditional:</strong>
       {cash(model.bfOptionalIllustrativeSellTHB)} = 2 people × (3 provisional site-days + 2 provisional travel-days)
       × THB25,200/person-day. BOD §8 has previous survey findings;
-      this scenario is NOT a payable verified direct cost or selected Working SELL.</p>}
+      this labour allowance IS in the selected Working SELL (not verified Direct Cost); physical work requires written work order.</p>}
      {i===5&&<p className="p55-note">SPE §7.3.2: JUTAL Zhuhai fabrication site SAT.
       ADDVALUE Crew × Days × Rate = NOT ESTABLISHED; MGW OEM FAT in B3.R1–R2 cannot be posted again here.</p>}
      {i===6&&<p className="p55-note">SPE §7.3.3: GF offshore commissioning after installation.
@@ -118,7 +118,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
   })}
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Selected Working SELL reconciliation</th><th>Amount THB</th><th>Cost status / Receiver</th></tr></thead>
-   <tbody>{model.groups.slice(0,4).map((g,i)=><tr key={i}>
+   <tbody>{model.groups.slice(0,5).map((g,i)=><tr key={i}>
     <td>B3.R{i+1} — {g.name}</td><td>{cash(g.selectedWorkingSellTHB)}</td>
     <td>Included WS-B3 once / Actual Cost NOT ESTABLISHED</td>
    </tr>)}
