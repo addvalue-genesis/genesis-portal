@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R21";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R22";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-10",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"B2 Rev05 Original Price Evidence Nested SSR Ownership Test Repair",
+  detail:"The original B2 Rev05 price comparison is present under BcOwnerPriceTrace0553.jsx > the quote-comparison details, with B2WorkingPriceOverview0553 mounted exactly once, but validate-0553-b2-original-price-evidence.cjs line80 still asserted an obsolete direct inline code===B2 mount. Test now checks the actual nested B2 quote-comparison wrapper, unchanged module anchor, exactly one owner-local mount, one SSR B2 price-overview anchor, and no second BcCostEvidenceDetail mount. Source MH, 580000 historical SELL, 237121.13 current B2 Working SELL, Direct Cost null and release HOLD are unchanged.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b2.price-overview","bid.budget.working.bc.b2.quote-comparison","bid.budget.working.bc.b2.price-trace"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"User Windows Node.js 24.21.0 AssertionError at validate-0553-b2-original-price-evidence.cjs line80"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-09",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"B2 Original Price Evidence SSR — Rev00a 964.279 MH Rendering vs Full Source MH",
