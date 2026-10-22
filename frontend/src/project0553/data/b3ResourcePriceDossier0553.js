@@ -44,7 +44,6 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    group:"SAT_SELECTED_28D",site:box.site,wbs:box.wbs,work:box.work,
    mr:box.mrs?.join(" / ")||"SIT / PUNCH",workfront:box.workfront,
    costOwner:"B3 SAT28 pooled labour; BF/GF Yard/Offshore phase split not independently priced",
-   stageAllocationConfirmed:false,
    role,people:1,teamDays:box.days,qty:box.days,unit:"person-day",unitRateTHB:rateTHB,
    rateUSDPerUnit:rateUSD,fxTHBPerUSD:fx,
    calculation:"1 person × "+box.days+" days × USD "+rateUSD+" × FX "+fx,
