@@ -77,8 +77,9 @@ export function selectSpareCustomerSchedule0553(){
   const installed=cover.installed.filter(a=>fits(code,x.description,a));
   const tags=unique(installed.map(i=>i.tag)),sites=unique(installed.map(i=>i.site));
   const explain=selectSparePlainLanguage0553(x.description);
-  const tagSummary=tags.length>1?tags.length+" related equipment TAGs — check OEM":tags.length===1?tags[0]:"COMMON / TAG not assigned";
   const common=code==="B13"||/configuration tools and maintenance access/i.test(x.description);
+  const tagSummary=tags.length>1?tags.length+" related equipment TAGs — check OEM":
+   tags.length===1?tags[0]:common?"Common stock — no equipment TAG":"Equipment TAG mapping pending";
   const coveredCommon=common?cover.installed:installed;
   const applicableMRs=unique(coveredCommon.map(i=>i.mr));
   const applicableLocations=unique(coveredCommon.map(i=>i.site));
