@@ -27,8 +27,8 @@ const m=source.byCode.B6.b6FourMrRoutingEvidence;
 const old=source.byCode.B6.b6Mr0001ChinaInboundEvidence;
 // B3 management-selected SAT28 and conditional BF Survey repriced the Part B
 // TOTAL by THB352800; this is NOT a B6 transportation price change.
-assert.equal(source.knownWorkingSellTHB,4032636.82);
-assert.equal(source.byCode.B3.workingSellTHB,2397725);
+assert.equal(source.knownWorkingSellTHB,4262586.82);
+assert.equal(source.byCode.B3.workingSellTHB,2599325);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit
 assert.equal(source.knownWorkingSellTHB+(2750525-source.byCode.B3.workingSellTHB),4385436.82);
 assert.equal(source.byCode.B6.workingSellTHB,307584);
