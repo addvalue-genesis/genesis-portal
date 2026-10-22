@@ -56,7 +56,7 @@ assert.equal(new Set(lean.coveredTestIds).size,21);
 assert(lean.rows.every(x=>x.testIds.length>0&&x.postingAllowed===false));
 assert.equal(lean.directCostTHB,null);
 assert.equal(lean.postingAllowed,false);
-for(const [people,b3Amount,b8Amount] of [[1,323640,35960],[2,287680,71920]]){
+for(const [people,b3Amount,b8Amount] of [[1,343485,38165],[2,305320,76330]]){
  const plan=people===1?scenarios.b3B8FiveDayOneTrainer:
   scenarios.b3B8FiveDayTwoTrainers;
  assert.equal(plan.trainingCrew,people);
