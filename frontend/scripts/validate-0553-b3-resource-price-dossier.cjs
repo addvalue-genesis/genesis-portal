@@ -1,0 +1,99 @@
+// B3 dossier mirrors the B2 Work Type -> Site -> detailed role/expense model;
+// reads selected 10.2 B3 source, traces 10.3 Release/10.5 Scope once, never
+// manufactures actual Cost or sells conditional GF Yard/Offshore/BF work.
+const assert=require("node:assert/strict"),fs=require("node:fs"),path=require("node:path");
+const babel=require("@babel/core"),React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
+const root=path.resolve(__dirname,"../src");
+const originalJS=require.extensions[".js"],originalJSX=require.extensions[".jsx"];
+const compile=(m,file)=>{const x=babel.transformFileSync(file,{babelrc:false,configFile:false,
+ presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
+ m._compile(x.code,file);};
+require.extensions[".js"]=(m,file)=>file.startsWith(root+path.sep)?compile(m,file):originalJS(m,file);
+require.extensions[".jsx"]=(m,file)=>file.startsWith(root+path.sep)?compile(m,file):(originalJSX||originalJS)(m,file);
+require.extensions[".css"]=()=>{};
+const get=p=>require(path.join(root,"project0553",p));
+const working=get("data/bcTurnkeyWorkingCost0553.js").selectBcTurnkeyWorkingCost0553;
+const release=get("data/releaseCommercialModel0553.js");
+const scope=get("data/scopePartBcReadModel0553.js").selectScopePartBcWorking0553;
+const nav=get("data/bcModuleNavigator0553.js").buildBcModuleNavigator0553;
+const dossier=get("data/b3ResourcePriceDossier0553.js").selectB3ResourcePriceDossier0553;
+const DossierUI=get("B3ResourcePriceDossier0553.jsx").B3ResourcePriceDossier0553;
+const Host=get("BcCostEvidenceDetail0553.jsx").BcCostEvidenceDetail0553;
+const bc=working(),b3=bc.byCode.B3,before=JSON.stringify(bc),m=dossier(b3);
+assert.equal(m.moduleId,"bid.budget.working.bc.b3.resource-price-dossier");
+assert.equal(m.groups.length,8);
+assert.equal(m.priceRowCount,29);
+assert.deepEqual(m.groups.map(x=>x.rowCount),[2,8,18,1,8,4,4,2]);
+assert.deepEqual(m.groups.map(x=>x.selectedWorkingSellTHB),
+ [307125,397400,2016000,30000,0,0,0,0]);
+assert.equal(m.pricedWorkingSellTHB,2750525);
+assert.equal(m.vendorQuoteCostTHB,236250);
+assert.equal(m.actualPaidDirectCostTHB,null);
+assert.equal(m.customerReleaseAllowed,false);
+const paid=m.groups.slice(0,4).flatMap(g=>g.rows);
+const notPaid=m.groups.slice(4).flatMap(g=>g.rows);
+assert.equal(paid.length,29);assert.equal(notPaid.length,18);
+assert(paid.every(x=>Number.isFinite(x.workingSellTHB)&&x.workingSellTHB>0&&
+ x.actualDirectCostTHB===null&&x.postingClass==="INCLUDED_SELECTED_B3_WORKING_SELL"));
+assert(notPaid.every(x=>x.workingSellTHB===null&&x.actualDirectCostTHB===null&&
+ x.postingClass!=="INCLUDED_SELECTED_B3_WORKING_SELL"));
+assert.equal(new Set([...paid,...notPaid].map(x=>x.id)).size,47);
+const sat=m.groups[2].rows;
+assert.equal(new Set(sat.map(x=>x.site)).size,9);
+assert.equal(new Set(sat.map(x=>x.role)).size,2);
+assert.equal(sat.reduce((n,r)=>n+r.qty,0),80);
+assert(sat.every(x=>x.people===1&&x.unit==="person-day"&&
+ x.rateUSDPerUnit===800&&x.fxTHBPerUSD===31.5&&x.unitRateTHB===25200&&
+ x.workingSellTHB===x.qty*25200&&!x.stageAllocationConfirmed));
+assert.equal(sat.reduce((n,x)=>n+x.workingSellTHB,0),2016000);
+const quote=m.groups[0].rows;
+assert.deepEqual(quote.map(x=>x.rateUSDPerUnit),[5000,2500]);
+assert.deepEqual(quote.map(x=>x.quotedVendorCostTHB),[157500,78750]);
+assert.deepEqual(quote.map(x=>x.workingSellTHB),[204750,102375]);
+assert.equal(m.groups[1].rows.reduce((n,x)=>n+x.workingSellTHB,0),397400);
+assert.equal(m.groups[3].rows[0].qty,30);
+assert.equal(m.groups[3].rows[0].unitRateTHB,1000);
+assert.equal(m.bfOptionalIllustrativeSellTHB,252000);
+assert.equal(m.currentBFRevisitRequired,null);
+assert(m.groups[5].rows.every(x=>x.people===null&&x.teamDays===null&&x.unitRateTHB===null));
+assert(m.groups[6].rows.every(x=>x.people===null&&x.teamDays===null&&x.unitRateTHB===null));
+const r=release.buildReleaseCommercialModel0553();
+assert.equal(r.b.find(x=>x.code==="B3").workingSellTHB,2750525);
+assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2750525);
+assert.equal(r.b.find(x=>x.code==="B3").actualCostTHB,null);
+assert.equal(r.b.find(x=>x.code==="B3").releaseAllowed,false);
+const sc=scope();
+assert.equal(sc.lines.B3.workingSellTHB,2750525);
+assert.equal(sc.lines.B3.directCostTHB,null);
+assert.equal(sc.lines.B3.financialIdentity.customerProposalState,"NOT_ISSUED_RELEASE_HOLD");
+const html=renderToStaticMarkup(React.createElement(DossierUI,{workingRow:b3}));
+const host=renderToStaticMarkup(React.createElement(Host,{workingRow:b3}));
+for(const token of ["resource-price-dossier","MGW Purchased Factory FAT","ADDVALUE China FAT",
+ "Retained 40-Team-Day","Fabrication Yard SAT","Offshore Vendor Commissioning",
+ "2,016,000.00","307,125.00","397,400.00","30,000.00",
+ "2,750,525.00","236,250.00","252,000.00","NOT ESTABLISHED",
+ "Qty × Unit","Expand All","Collapse All"]){
+ assert(html.includes(token),"Dossier SSR missing "+token);
+}
+assert(host.includes('data-component-key="bid.budget.working.bc.b3.resource-price-dossier"'));
+const entries=new Set(nav().map(x=>x.id));
+const rootId=m.moduleId;
+const allIds=[rootId,
+ ...m.groups.flatMap((g,i)=>{
+  const gid=rootId+".group."+String(i+1).padStart(2,"0");
+  const places=[...new Set(g.rows.map(x=>x.site||"Shared"))];
+  return [gid,...places.flatMap((site,j)=>{
+   const sid=gid+".site."+String(j+1).padStart(2,"0");
+   return [sid,...g.rows.filter(x=>(x.site||"Shared")===site).map(r=>r.id)];
+  })];
+ })];
+assert.equal(allIds.length,new Set(allIds).size);
+for(const id of allIds){
+ assert(entries.has(id),"Navigator missing detailed source work ID "+id);
+ assert(html.includes('data-component-key="'+id+'"'),"Dossier missing HTML work row ID "+id);
+}
+const htmlIds=[...host.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
+assert.equal(htmlIds.length,new Set(htmlIds).size,"B3 dossier must not duplicate DOM IDs");
+assert.equal(JSON.stringify(working()),before,"B3 dossier modified canonical source");
+assert.equal(bc.knownWorkingSellTHB,4385436.82);
+console.log("PASS 0553 B3 B2-style resource dossier: 29 priced (MGW2 + China FAT8 + SAT18 + VeEX1) detailed person-day/qty/rate lines = WS-B3 THB2750525; BF conditional/4 GF Yard/4 Offshore cost TBD nonposting; 10.3/10.5 B3 trace equal/Release HOLD; 47 unique cost-evidence rows, zero new postings.");
