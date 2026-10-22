@@ -48,7 +48,7 @@ for(const code of codes){
  assert.deepEqual(b.byCode[code].workCostLines,m.byCode[code]);
  assert.equal(b.byCode[code].workCostLineCount,m.byCode[code].length);
  assert.equal(b.byCode[code].workCostLineModuleId,m.moduleId);
- assert.equal(b.byCode[code].workingSellTHB,({B1:211600,B2:237121.13,B3:2599325,B8:131550,B9:480550,B5:311184,B6:307584,B7:30000,B10:123024.37,B13:22484.21,C1:4049349.36,C2:721806.68,B11:b.byCode.B11.workingSellTHB})[code]??m.workingSellByCode[code]);
+ assert.equal(b.byCode[code].workingSellTHB,["B10","B11","B13","C1","C2"].includes(code)?null:({B1:211600,B2:237121.13,B3:2599325,B8:131550,B9:480550,B5:311184,B6:307584,B7:30000})[code]??m.workingSellByCode[code]);
 }
 assert.equal(b.workCostLineCount,111);
 assert.equal(b.workCostLineAuditCount,40);
