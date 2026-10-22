@@ -69,8 +69,19 @@ for(const g of base.dossierGroups){
  for(const m of g.byMr)assert(nav.has(id+".mr."+m.mr.toLowerCase().replace(/[^a-z0-9]+/g,"-")));
 }
 const modelSrc=fs.readFileSync(path.join(root,"project0553/data/b2IndependentVdrlRecalculation0553.js"),"utf8");
-assert(!modelSrc.includes("580000")&&!modelSrc.includes("580,000"),
- "Recalculation may not backsolve from the old B2 quote");
+// Preserve source documentation that EXPLICITLY disclaims the Rev05 quote.
+// A textual search over comments falsely flags a harmless "legacy 580,000"
+// warning as if it were an executable backsolve. Scan active JS source only.
+const executableModelSrc=modelSrc.split(/\\r?\\n/).filter(line=>
+ !line.trimStart().startsWith("//")).join("\\n");
+assert(!/\\b580000\\b|\\b580,000\\b/.test(executableModelSrc),
+ "B2 131-WO formula must not reference the historical 580k quoted SELL");
+assert.equal(base.hasQuotedWorkingSellReference,false,
+ "Independent B2 cost model must not depend on any historical quote");
+const higherLoad=estimate({employerLoadFactor:1.3});
+assert(higherLoad.result.indicativeGrossMarginSellTHB>r.indicativeGrossMarginSellTHB,
+ "B2 SELL must respond to independently estimated employer load, not a 580k backsolve");
+assert.equal(higherLoad.hasQuotedWorkingSellReference,false);
 const priceSrc=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 assert(priceSrc.indexOf('<B2IndependentVdrlRecalculation0553 workingRow={workingRow}/>')<
  priceSrc.indexOf('<B2WorkingPriceOverview0553 workingRow={workingRow}/>'));
