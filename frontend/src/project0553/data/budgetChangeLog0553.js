@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R19";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R20";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-08",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"B1 SSR order test scoped to actual returned JSX, not B9 ownerPriceTrace pre-render",
+  detail:"The first p55-metric-grid found after BcCostEvidenceDetail function declaration actually belongs to B9 ownerPriceTrace JSX initialized BEFORE the main JSX return. Thus even after updating expected B1 order, scanning from function declaration gives false ordering. Regression now starts at the exact BcCostEvidenceDetail returned section: B1 Quick Price → B1 Rev.K Accordion → generic evidence metric grid, plus SSR data-component-key order. No UI, working cost, working sell, contract label or customer release mutation. User B1 accordion has PASS; full build remains unverified.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1.price-overview","bid.budget.working.bc.b1.revk-pm-milestones"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"2026-10-22 Windows npm build B1 visible-price-overview line62 / B9 JSX-before-return guard"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-07",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"B1 Visible Price SSR order aligned with post-TDZ accordion layout",
