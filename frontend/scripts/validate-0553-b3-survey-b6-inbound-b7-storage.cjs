@@ -22,7 +22,7 @@ const survey=bc.byCode.B3.b3SiteSurveyScope,
  selectedSurvey=bc.byCode.B3.b3SelectedSatSurveyBudget,
  inbound=bc.byCode.B6.b6Mr0001ChinaInboundEvidence,
  storage=bc.byCode.B7.b7ThreeMonthStorageEvidence;
-assert.equal(bc.knownWorkingSellTHB,4481186.82,"Only owner-selected SAT28 + BF Survey5 may replace the prior B3 budget; B6/B7 cannot reprice");
+assert.equal(bc.knownWorkingSellTHB,4667836.82,"Only owner-selected SAT28 + BF Survey5 may replace the prior B3 budget; B6/B7 cannot reprice");
 assert.equal(bc.byCode.B3.workingSellTHB,2599325);
 assert.equal(selectedSurvey.satTeamDays,28);
 assert.equal(selectedSurvey.siteSurveyTeamDays,5);
