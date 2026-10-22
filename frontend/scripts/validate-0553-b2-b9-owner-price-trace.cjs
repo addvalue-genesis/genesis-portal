@@ -30,8 +30,8 @@ assert.deepEqual(["MR-0001","MR-0002","MR-0003","MR-0004"].map(x=>vdrl().byMr[x]
  [37,36,35,35]);
 assert.equal(bc.byCode.B9.workingSellTHB,480550);
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,480550);
-assert.equal(bc.byCode.B8.workingSellTHB,30000);
-assert.equal(bc.byCode.B8.qtyDriver,44);
+assert.equal(bc.byCode.B8.workingSellTHB,216650);
+assert.equal(bc.byCode.B8.qtyDriver,1);
 assert.equal(bc.byCode.B5.workingSellTHB,311184);
 assert.equal(bc.byCode.B7.workingSellTHB,30000);
 for(const code of codes){
