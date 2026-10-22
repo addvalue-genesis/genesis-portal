@@ -48,11 +48,11 @@ export const MR0002_RF_ROUTE_SCENARIO_POLICY_0553=Object.freeze({
 });
 const siteLayoutSheets=Object.freeze({ZWP20:4,ZWP21:7,ZWP22:10});
 const paths=Object.freeze([
- {id:"RF-DONOR",name:"DONOR YAGI → RFI BDA (same LNA location)",from:"ANT-508-001",to:"TCAB-508-001 / donor RF IN",
+ {id:"RF-DONOR",name:"DONOR YAGI → RFI BDA (same LNA location)",
   topology:"ANT-508-001 Yagi → Ex/cable coupling + PolyPhaser / TCAB-508-002 where selected → TCAB-508-001 BDA donor input",
   intermediate:["Yagi","Solexy RXNMS0200JX0","PolyPhaser IS-B50LN-C2","Ex feedthrough / surge enclosure (verify final order)"],
   owner:"MGW_COMPLETE_SYSTEM__DONOR_INSTALLED_RF_CABLE"},
- {id:"RF-SERVICE",name:"RFI BDA → SERVICE OMNI (original site location)",from:"TCAB-508-001 / service RF OUT",to:"ANT-508-002",
+ {id:"RF-SERVICE",name:"RFI BDA → SERVICE OMNI (original site location)",
   topology:"TCAB-508-001 BDA service output → surge / certified RF interface (as selected) → ANT-508-002 Omni",
   intermediate:["BDA service port","SA-508-001/002 as applicable","TCAB-508-002 as applicable","KBT antenna"],
   owner:"MGW_COMPLETE_SYSTEM__SERVICE_INSTALLED_RF_CABLE"}
@@ -130,7 +130,8 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
    sourceBulk:"MR0002 Bulk 1 Lot per MR C1",expectedTags:expected,missingTags,
    layoutDocument:src.layout.document,layoutSheet:siteLayoutSheets[site],
    afcLnaEnclosureTag:lnaTag,afcSurgeEnclosureTag:surgeTag,
-   afcTagRoleVerified:true,selectedMgWBdaFunctionMapsToOriginalAfcLna:true,
+   afcTagRoleVerified:true,selectedMgWBdaFunctionMapsToOriginalAfcLna:false,
+   selectedWorkingBdaMapsToOriginalLnaSitePosition:true,
    selectedDesignRfiBdaAtOriginalLnaPosition:true,
    donorAntennaPositionChanged:false,serviceAntennaPositionChanged:false,
    physicalRelocationSelected:false,
