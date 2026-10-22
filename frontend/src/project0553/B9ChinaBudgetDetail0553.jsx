@@ -42,6 +42,17 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
    <p className="p55-note">FAT notice: management target 14 days per SPE; BOD has 30-day requirement. Contract precedence/waiver remains unresolved.</p>
   </details>}
   {!isFat&&<p className="p55-note"><strong>Yard scope:</strong> configuration verification, IP/VLAN/NMS/PLC/PABX integration, troubleshooting and OEM coordination if called out by JUTAL. Base Yard SAT outcome remains mandatory for CONTRACTOR/VENDOR, but ADDVALUE Specialist attendance is conditional on signed RACI or written request. The second Field Telecom Specialist is unbilled but actual travel/payroll must be tracked; internal risk cash allowance {thb(budget.unbilledBackupCashAllowanceTHB)} is NOT another customer charge.</p>}
+  {!isFat&&<p className="p55-note"><strong>B9 Direct COST verification / handover scope gate:</strong>
+   Eight B9 quoted Working SELL lines reconcile to {thb(total)} and cover the paid Senior Telecom Engineer's
+   seven Yard days plus two travel days, airfare, hotel, local transport, conditional visa and travel/work insurance.
+   However <strong>this is a SELL estimate, NOT verified payroll/vendor Direct COST</strong>.
+   An accompanying Field Telecom Specialist is UNBILLED in the customer LS but carries a separate
+   <strong> {thb(budget.unbilledBackupCashAllowanceTHB)}</strong> internal cash-risk allowance plus unverified payroll;
+   do not treat margin as proven. Separate FAT witness activities belong B3, official VDRL documents B2,
+   technical design/configuration B1, and <strong>permanent purchaser-retained O&amp;M software/tools B11</strong>.
+   B9 engineering use of an OEM service laptop or temporary test equipment does not purchase customer B11 assets.
+   Remaining gates: signed JUTAL Zhuhai call-out/RACI, actual personnel payroll and standby arrangement,
+   vendor ticket/hotel/insurance quotes, legally required work permits and equipment handover/inclusion evidence.</p>}
   <div className="p55-table-wrap"><table className="p55-table p55-table--budget" style={{width:"100%",minWidth:1050,tableLayout:"fixed"}}>
    <thead><tr><th>Internal Cost Activity ID / Technical Module</th><th>Activity</th><th>Qty / Unit</th><th>Internal Working SELL Unit Rate</th><th>Internal Working SELL THB</th><th>Evidence / Treatment</th></tr></thead>
    <tbody>{rows.map(x=><tr key={x.id} data-component-key={x.moduleId} style={{verticalAlign:"top",overflowWrap:"anywhere"}}>
