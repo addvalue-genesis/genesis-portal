@@ -78,7 +78,7 @@ export function B8FourSystemHybridTraining0553({workingRow}){
     <tr><td>10.3 CP-B8 / 10.5 SOW-B8 preview</td><td>{money(m.selectedWorkingSellTHB)}</td>
      <td>Same canonical source; Customer Release HOLD</td></tr>
     <tr><td>Old Rev05 B8 training WBS / 44 MH</td><td>{money(m.originalRev05WorkingSellReferenceTHB)}</td>
-     <td>Historical reference only; NO current posting</td></tr>
+     <td>SUPERSEDED historical reference only; NO current posting</td></tr>
     <tr><td>Possible same-trip credit B3/B9 (not selected)</td>
      <td>{money(m.possibleSharedB3B9TripCreditTHB)}</td>
      <td>NONPOSTING: only credit after proven personnel/travel event overlap</td></tr></tbody>
