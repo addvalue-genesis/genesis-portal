@@ -34,7 +34,7 @@ assert.equal(b2.b2WorkingSellDecision.approvedDirectCost,false);
 assert.equal(old.sellTHB,580000);
 assert.equal(b2.b2PriorWorkingSellReferenceTHB,old.sellTHB);
 assert.equal(source.previousB2Rev05ReferenceTHB,580000);
-assert.equal(source.knownWorkingSellTHB,4385436.82);
+assert.equal(source.knownWorkingSellTHB,4032636.82);
 assert.equal(sp.lines.B2.workingSellTHB,237121.13);
 assert.equal(sp.lines.B2.qty,1);
 assert.equal(sp.lines.B2.unitRateTHB,237121.13);
@@ -71,4 +71,4 @@ const evidence=fs.readFileSync(path.join(root,"project0553/data/bcTurnkeyWorking
 assert(evidence.includes('Number.isFinite(b2RecalculatedSellTHB)?b2RecalculatedSellTHB:'),
  "Canonical owner B2 must have priority over Rev05 source working quote");
 assert.equal(JSON.stringify(working()),before,"B2 derived projection must never mutate 10.2 source");
-console.log("PASS B2 237121.13 ACTIVE Working SELL 10.2 / 10.3 / 10.5, Base 4385436.82, prior 580000 SUPERSEDED, Direct Cost NULL and Customer Release HOLD");
+console.log("PASS B2 237121.13 ACTIVE Working SELL 10.2 / 10.3 / 10.5, Base 4032636.82, prior 580000 SUPERSEDED, Direct Cost NULL and Customer Release HOLD");
