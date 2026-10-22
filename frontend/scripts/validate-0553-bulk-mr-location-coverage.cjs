@@ -223,7 +223,12 @@ assert.deepEqual(matchNav("bid.budget.bom.zwp21.mr0002.rf-route.rf-donor")?.slic
 
 assert(ui.includes('ADDVALUE NEK — CONDITIONAL BULK SPARE / NOT BOOKED'));
 assert(ui.includes('<MR0002RfRouteReconciliation0553 site={g.site}/>'));
-assert(location.includes('<BulkMrLocationCoverage0553 mr="MR-0001" site={site} detail/>'));
+// LocationBomDetail0553 is Rev03-locked; BULK presentation mounts through
+// unprotected SimpleBom0553 10.1.1.3, not an unauthorized pinned-file addition.
+assert(!location.includes('<BulkMrLocationCoverage0553'),
+ "Protected Rev03 LocationBomDetail must not be modified to mount new BULK");
+assert(simple.includes('<BulkMrLocationCoverage0553 mr={system} site={site} state={bulkState} focusModuleId={navigationTarget}/>'),
+ "BULK still accessible from the active 10.1.1.3 SimpleBom location/MR viewer");
 const navFile=path.join(root,"project0553/data/bulkModuleNavigator0553.js");
 const {buildBulkModuleNavigator0553}=require(navFile);
 const nav=buildBulkModuleNavigator0553();
