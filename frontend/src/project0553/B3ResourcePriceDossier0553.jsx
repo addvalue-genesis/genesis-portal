@@ -11,7 +11,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
  const holder=React.useRef(null);
  const expandAll=open=>holder.current?.querySelectorAll("details.p553-b3-dossier-group,details.p553-b3-dossier-site")
   .forEach(x=>{x.open=open;});
- return <section ref={holder} className="p55-panel p553-b3-resource-dossier"
+ return <section ref={holder} className="p55-panel p553-b2-recalc p553-b3-resource-dossier"
   data-component-key={root} style={{padding:12,marginTop:12}}>
   <div className="p553-b2-recalc-topbar">
    <div><h3>B3 — Resource / Cost &amp; Working SELL Dossier (แจกแจงคน วัน อัตรา และราคา)</h3>
