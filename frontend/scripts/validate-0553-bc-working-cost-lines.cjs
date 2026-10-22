@@ -103,15 +103,20 @@ assert(main.includes('const bcWorking=selectBcTurnkeyWorkingCost0553();'),
  "10.2 must consume the canonical Part B/C selector");
 assert(main.includes('<BcWorkCostLines0553 selectedCode={bcTab}/>'),
  "10.2 selected B/C tab must render its Cost-Line ledger");
-assert(main.includes('<BcWorkCostLines0553 selectedCode={item.code}/>'),
- "10.2 ALL view expanded canonical item must render Cost-Line ledger");
-assert(main.includes('bcWorking.byCode[bcTab]')&&
- main.includes('group.rows.map(item=>')&&
- main.includes('bcDetailCode===item.code'),
- "10.2 current tab/expanded list must select canonical B/C rows, not a historical second source");
-assert(main.includes('<BcCostEvidenceDetail0553 workingRow={item}/>')&&
- main.includes('data-component-key={item.moduleId}'),
- "10.2 expanded row must carry canonical Cost Evidence and Module ID");
+// ALL view is now BcWorkingHierarchy0553; CommercialWorkspace mounts the
+// hierarchy once and passes canonical Part B/C rows. Check its actual JSX.
+const hierarchy=read("project0553/BcWorkingHierarchy0553.jsx");
+assert(main.includes('<BcWorkingHierarchy0553')&&
+ main.includes('partBRows={partBRows} partCRows={partCRows}')&&
+ main.includes('bcWorking.byCode[bcTab]'),
+ "10.2 must mount hierarchy and per-owner tab from canonical B/C rows");
+assert(hierarchy.includes('group.rows.map(item=>')&&
+ hierarchy.includes('data-component-key={item.moduleId}')&&
+ hierarchy.includes('<BcCostEvidenceDetail0553 workingRow={item} navigationTarget={navigationTarget}/>'),
+ "ALL work-type rows must carry the canonical source/Module ID");
+assert(hierarchy.includes('<BcWorkCostLines0553 selectedCode={item.code} presentationNamespace={item.moduleId}/>')&&
+ main.includes('<BcWorkCostLines0553 selectedCode={bcTab}/>'),
+ "Historical nonposting cost audit must remain accessible in both supported paths");
 assert(render.includes("m.rows.filter")&&render.includes("m.workingSellByCode"));
 assert(render.includes("showAuditClauses")&&render.includes("Cost Owner: 10.2 only"));
 assert(render.includes("Object.entries(x.roleMH)")&&render.includes("knownSellCount"),"B1 labor skills and known-only incomplete Sell coverage must be visible");
