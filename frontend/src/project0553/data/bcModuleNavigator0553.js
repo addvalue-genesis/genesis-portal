@@ -8,6 +8,7 @@ import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3SurveySatExecutionPlan0553} from "./b3SurveySatExecutionPlan0553";
 import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
+import {selectB9YardWorkScopeDossier0553} from "./b9YardWorkScopeDossier0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
@@ -252,6 +253,22 @@ export function buildBcModuleNavigator0553(){
    ["resource-man-hours","Positions / Man-hours / Rate and cost gaps"],
    ["source-audit","Vendor quote / historical evidence and owner audit"]
   ])entries.push(nested(rootId+"."+suffix,code+" — "+name));
+  if(code==="B9"){
+   const b9Scope=selectB9YardWorkScopeDossier0553(bc.byCode.B9);
+   for(const group of b9Scope.groups){
+    entries.push(nested(group.id,
+     "B9 — "+group.name+" · Included Working SELL THB "+group.selectedWorkingSellTHB,
+     "Yard senior engineer onshore allowance cost owner source-to-release 1 LS"));
+    entries.push(nested(group.siteId,
+     "B9 — JUTAL Zhuhai Yard · "+group.name+" detailed site/activity price",
+     "B9 work scope site qty people days rate THB working sell"));
+    for(const line of group.rows){
+     entries.push(nested(line.id,
+      "B9 — "+line.internalCostLineId+" · "+line.description,
+      "B9 "+line.sourceExpenseId+" Qty "+line.qty+" "+line.unit+" Working SELL "+line.workingSellTHB));
+    }
+   }
+  }
   if(logistics.rowsByCode[code]){
    for(const work of logistics.rowsByCode[code]){
     entries.push(nested(work.moduleId,code+" — "+work.activity,
