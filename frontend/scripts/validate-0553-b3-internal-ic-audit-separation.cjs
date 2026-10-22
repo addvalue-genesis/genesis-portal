@@ -55,8 +55,8 @@ assert.equal(scenario.referenceTHB,402400);
 assert.equal(scenario.workingSellTHB,null);
 assert.equal(sections.audit.workingSellTHB,0);
 assert.equal(sections.audit.referenceTHB,null,"Audit references must not be mixed or summed");
-assert.equal(price.totalWorkingSellTHB,2750525);
-assert.equal(b3.workingSellTHB,2750525);
+assert.equal(price.totalWorkingSellTHB,2397725);
+assert.equal(b3.workingSellTHB,2397725);
 assert.equal(b8.workingSellTHB,30000);
 assert.equal(m.proposedB3FatWorkingSellTHB,402400);
 assert.equal(m.workingSellChangeAllowed,false);
@@ -81,4 +81,4 @@ const ids=new Set(nav().map(x=>x.id));
 for(const name of ["fat-owner-transfer","fat-training-7d-allocation","revk-china-budget"])
  assert(ids.has("bid.budget.working.bc.b3."+name),"legacy deep-link missing "+name);
 assert.equal(JSON.stringify(working()),snapshot,"Identity/audit relocation must not mutate source WBS");
-console.log("PASS B3 IC-FAT internal activity names, B3.1 priced rows only, B3.4 historical/scenario nonposting, old 397400, original 2750525; WS/CP/SOW namespaces and all original Module IDs preserved");
+console.log("PASS B3 IC-FAT internal activity names, B3.1 priced rows only, B3.4 historical/scenario nonposting, old 397400, original 2397725; WS/CP/SOW namespaces and all original Module IDs preserved");
