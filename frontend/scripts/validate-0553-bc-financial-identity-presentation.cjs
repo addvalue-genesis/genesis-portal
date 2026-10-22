@@ -23,9 +23,9 @@ const {buildBcModuleNavigator0553:registry}=from("data/bcModuleNavigator0553.js"
 const codes=["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"];
 const source=working(),snap=JSON.stringify(source),sc=scope(),price=release();
 assert.equal(source.rows.length,16);
-assert.equal(source.knownWorkingSellTHB,4032636.82);
-assert.equal(source.byCode.B3.workingSellTHB,2397725);
-assert.equal(price.b.find(r=>r.code==="B3").customerSellTHB,2397725);
+assert.equal(source.knownWorkingSellTHB,4262586.82);
+assert.equal(source.byCode.B3.workingSellTHB,2599325);
+assert.equal(price.b.find(r=>r.code==="B3").customerSellTHB,2599325);
 assert.equal(price.approval.releaseAllowed,false);
 const registered=new Set(registry().map(r=>r.id));
 const ui=[];
