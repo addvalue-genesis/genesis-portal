@@ -19,7 +19,7 @@ export function selectRevKAbcOwnershipControl0553(working){
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
  if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+307125)||current.B9!==b9.b9BaseWorkingSellTHB||
-    working.knownWorkingSellTHB!==4262586.82 ||
+    working.knownWorkingSellTHB!==4481186.82 ||
     working.byCode.B3?.workingSellTHB!==2599325 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
@@ -101,7 +101,7 @@ export function selectRevKAbcOwnershipControl0553(working){
  const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B9").reduce((v,x)=>v+x.modeledSellTHB,0));
  if(b1Engineering.length!==27||pmEvents.length!==41||supportExpenses.length!==9||b1.labourHours!==242||trace.rows.length!==19||
    fatTasks.length!==12||fat.estimatedFatWitnessDays!==6||satSiteLines.length!==9||
-   b3.satTeamDays!==28||b3.siteSurveyTeamDays!==5||historicalB3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==422600||yardTHB!==261950)
+   b3.satTeamDays!==28||b3.siteSurveyTeamDays!==5||historicalB3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==422600||yardTHB!==480550)
   throw Error("Rev.K activity reconciliation mismatch");
  return Object.freeze({
   moduleId:"bid.budget.working.bc.revk-abc-control",
@@ -118,7 +118,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   b9FatBaseTHB:0,b3FatWitnessSellTHB:fatTHB,b3FatWitnessDays:fat.estimatedFatWitnessDays,b9FatWitnessDays:fat.estimatedFatWitnessDays,
   b9YardConditionalLumpSumTHB:yardTHB,b9YardQuotedInBaseTHB:current.B9,
   b9YardRole:b9.selectedYardRole,b9YardWorkdays:b9.selectedYardWorkingDays,
-  b9YardTravelDays:b9.selectedYardTravelDays,b9YardCrew:b9.yardCallOutCrew,
+  b9YardTravelDays:b9.selectedYardTravelDays,b9YardCrew:b9.yardCallOutCrew, b9YardFieldRateUSDPerMD:b9.onshoreFieldUSDPerDay,
   tracedObligations:trace.rows.length,
   verifiedDirectCostTHB:null,costState:"SOURCE_RATE_BUDGETARY_SELL__PAYROLL_VENDOR_COST_OPEN",
   postedWorkingSellDeltaTHB:0,postingAllowed:false,customerReleaseAllowed:false,
