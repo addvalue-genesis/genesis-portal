@@ -61,9 +61,12 @@ for(const item of e.rows){
  if(["B1","B3","B5","B6","B7","B9","B10","B11","B13","C1","C2"].includes(item.code))
   assert.notEqual(bc.byCode[item.code].workingSellBasis,null,
    item.code+" management budgetary working SELL requires an explicit source basis");
- if(["B8"].includes(item.code))
-  assert.equal(item.workingSellTHB,bc.byCode[item.code].workingSellTHB,
-   item.code+" source and current Working SELL should still reconcile");
+ if(item.code==="B8"){
+  assert.equal(item.workingSellTHB,30000,"Original Rev05 B8 is a superseded historical SELL source");
+  assert.equal(bc.byCode.B8.workingSellTHB,216650,"New four-MR hybrid 2-day estimate posted once to WS-B8");
+  assert.equal(bc.byCode.B8.qtyDriver,1);
+  assert.equal(bc.byCode.B8.b8FourSystemHybridTraining.selectedWorkingSellTHB,216650);
+ }
  for(const line of item.lines){
   if(Number.isFinite(line.amountTHB))
    assert(!["APPROVED_DIRECT_COST","CUSTOMER_RELEASED_SELL"].includes(line.valueClass));
