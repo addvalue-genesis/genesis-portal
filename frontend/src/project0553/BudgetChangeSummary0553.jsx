@@ -14,7 +14,7 @@ const readSeen=()=>{
 };
 const groups=Object.freeze([
  {key:"ui",label:"UI / Navigation",tone:"ui",kinds:["UI"]},
- {key:"data",label:"Data Flow / Cost / Release",tone:"data",kinds:["DATA_FLOW","ENGINEERING","COST","PRICE","RELEASE"]}
+ {key:"data",label:"Data Flow / Cost / Release",tone:"data",kinds:["DATA_FLOW","ENGINEERING","COST","PRICE","RELEASE","VALIDATION"]}
 ]);
 const stamp=BUILD_REVISION_0553+"|"+CHANGE_LOG_VERSION_0553;
 const validSha=sha=>/^[a-f0-9]{7,40}$/i.test(sha||"");
