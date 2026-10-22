@@ -24,14 +24,40 @@ export function B3ResourcePriceDossier0553({workingRow}){
   </div>
   <div className="p55-metric-grid">
    <div><strong>Selected B3 Working SELL · 10.2 → 10.3/10.5</strong>
-    <p>{cash(model.pricedWorkingSellTHB)}</p><small>5 included cost-owner groups / 37 price evidence lines (SAT 28d + BF Survey 5d)</small></div>
+    <p>{cash(model.pricedWorkingSellTHB)}</p><small>37 labour/service/rental price lines. Includes Conditional BF Labour, but NO new physical travel approval.</small></div>
    <div><strong>Actual Paid Direct Cost</strong><p>NOT ESTABLISHED</p>
-    <small>MGW Vendor Quotation total {cash(model.vendorQuoteCostTHB)} (USD 7,500) is PURCHASE EVIDENCE, not paid cost</small></div>
+    <small>MGW Vendor Quotation is a PURCHASE PRICE SOURCE, not verified invoice/payment</small></div>
    <div><strong>Current physical people × days (GF Yard / Offshore)</strong><p>TO VERIFY</p>
     <small>No approved ADDVALUE RACI, deployment or cash cost</small></div>
    <div><strong>Commercial Release</strong><p>HOLD</p>
     <small>No Working SELL or customer price mutation from this dossier</small></div>
   </div>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>Financial layer / authority</th><th>Amount THB</th><th>Posting / decision</th></tr></thead>
+   <tbody>
+    <tr><td>MGW Vendor Quotation COST basis · SERV-2 + SERV-4 · USD 7,500</td>
+     <td><strong>{cash(model.vendorQuoteMarkupBridge.supplierQuoteTHB)}</strong></td>
+     <td>VQ-MGW supplier quotation; NOT actual paid direct cost</td></tr>
+    <tr><td>SAMTEL markup on MGW quote · 20%</td><td>{cash(model.vendorQuoteMarkupBridge.samtel20PctTHB)}</td>
+     <td>MGW purchased-service price bridge only</td></tr>
+    <tr><td>ADDVALUE markup on MGW quote · 5%</td><td>{cash(model.vendorQuoteMarkupBridge.addvalue5PctTHB)}</td>
+     <td>Not an incremental invoice cost</td></tr>
+    <tr><td>Omission reserve on MGW quote · 5%</td><td>{cash(model.vendorQuoteMarkupBridge.reserve5PctTHB)}</td>
+     <td>Do not apply the ordinary B 5% deduction again</td></tr>
+    <tr><th>MGW Purchased FAT Working SELL · selected once</th>
+     <th>{cash(model.vendorQuoteMarkupBridge.selectedWorkingSellTHB)}</th>
+     <th>WS-B3, CP-B3 NOT ISSUED</th></tr>
+    <tr><td>Base selected B3 Working SELL excluding conditional BF revisit labour</td>
+     <td>{cash(model.financialLayers.selectedBaseExcludingBFConditionalTHB)}</td>
+     <td>MGW FAT + ADDVALUE China FAT + SAT28 + VeEX; Actual COST NOT ESTABLISHED</td></tr>
+    <tr><td>BF Site Survey conditional labour allowance · 3 onsite + 2 travel team-days</td>
+     <td>{cash(model.financialLayers.includedBFConditionalBudgetAllowanceTHB)}</td>
+     <td>INCLUDED in pre-award working budget once; NO approved physical revisit</td></tr>
+    <tr><th>Selected B3 Working Budget Preview (10.2 = 10.3 / 10.5)</th>
+     <th>{cash(model.financialLayers.selectedWorkingBudgetPreviewTHB)}</th>
+     <th>Customer Release HOLD · verified actual Direct Cost NOT ESTABLISHED</th></tr>
+   </tbody>
+  </table></div>
   <p className="p55-note"><strong>อ่านตารางนี้อย่างไร:</strong>
    คอลัมน์ Working SELL คือยอดขายที่อยู่ในฐาน 10.2 แล้วเฉพาะรายการระบุ INCLUDED;
    Supplier Quotation แสดงราคาซื้อก่อนบวก 20%+5%+5% (เฉพาะ MGW);
@@ -40,6 +66,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
   {model.groups.map((g,i)=>{
    const gid=root+".group."+String(i+1).padStart(2,"0");
    const active=i<5;
+   const surveyConditional=i===4;
    const sites=[...new Set(g.rows.map(x=>x.site||"Shared"))];
    return <details className="p553-b2-recalc-group p553-b3-dossier-group" key={gid}
     data-component-key={gid} open={i===0||i===1||i===2}>
@@ -48,14 +75,14 @@ export function B3ResourcePriceDossier0553({workingRow}){
      <span className="p553-b2-recalc-label">
       <strong>{g.name}</strong>
       <small>{g.rowCount} detailed resource/expense rows ·
-       {active?" INCLUDED IN WORKING SELL":" UNPRICED — NOT ADDITIVE"} ·
+       {surveyConditional?" INCLUDED CONDITIONAL LABOUR ALLOWANCE; CALL-OUT HOLD":active?" INCLUDED IN WORKING SELL":" UNPRICED — NOT ADDITIVE"} ·
        {active?cash(g.selectedWorkingSellTHB):"0 POSTED; amount NOT ESTABLISHED"}</small>
       <code>{gid}</code>
      </span>{c(gid)}
     </summary>
     <div className="p553-b2-recalc-body">
      <p className="p55-note">Basis: {g.reference} ·
-      {active?" Selected source price evidence; no duplicate posting.":" Engineering SOW only; physical crew, day and Direct Cost require approval."}</p>
+      {surveyConditional?" Conditional BF labour provision is INCLUDED in pre-award WS-B3, not evidence that a vessel/site trip was ordered.":active?" Selected source price evidence; no duplicate posting.":" Engineering SOW only; physical crew, day and Direct Cost require approval."}</p>
      {sites.map((site,j)=>{
       const rows=g.rows.filter(x=>(x.site||"Shared")===site);
       const sid=gid+".site."+String(j+1).padStart(2,"0");
@@ -70,10 +97,10 @@ export function B3ResourcePriceDossier0553({workingRow}){
        <div className="p55-table-wrap">
         <table className="p55-table p55-table--compact" style={{minWidth:1650}}>
          <thead><tr>
-          <th>Expense ID / Source Module</th><th>Activity / WBS</th><th>Role / Crew</th>
+          <th>Expense ID / Source Module</th><th>MR / Activity / WBS</th><th>Workfront / Owner</th><th>Role / Crew</th>
           <th>People</th><th>Days</th><th>Qty × Unit</th>
           <th>Rate USD / unit</th><th>FX</th><th>THB / unit</th>
-          <th>Quoted Vendor Cost THB</th><th>Working SELL THB</th>
+          <th>Quoted Vendor Cost THB</th><th>Working COST THB</th><th>Working SELL THB</th>
           <th>Verified Direct COST THB</th><th>Evidence / Posting Gate</th>
          </tr></thead>
          <tbody>{rows.map(x=><tr key={x.id} data-component-key={x.id}>
@@ -81,12 +108,14 @@ export function B3ResourcePriceDossier0553({workingRow}){
            <small>{x.sourceModuleId}</small>{c(x.id)}</td>
           <td><strong>{x.mr||""}</strong> {x.work}<small>{x.wbs||""}</small><small>{x.calculation}</small>
            {x.linkedTestIds?.length>0&&<small>Test ID: {x.linkedTestIds.join(", ")}</small>}</td>
+          <td>{x.workfront||"—"}<small>Cost Owner: {x.costOwner||"B3 / WS-B3"}</small></td>
           <td>{x.role}</td><td>{num(x.people)}</td><td>{num(x.teamDays)}</td>
           <td>{num(x.qty)} {x.unit||""}</td>
           <td>{Number.isFinite(x.rateUSDPerUnit)?"USD "+num(x.rateUSDPerUnit):"—"}</td>
           <td>{Number.isFinite(x.fxTHBPerUSD)?num(x.fxTHBPerUSD):"—"}</td>
           <td>{cash(x.unitRateTHB)}</td>
           <td>{cash(x.quotedVendorCostTHB)}</td>
+          <td>{cash(x.workingCostTHB)}</td>
           <td><strong>{cash(x.workingSellTHB)}</strong>
            {Number.isFinite(x.illustrativeOnlyTHB)&&<small>Conditional estimate {cash(x.illustrativeOnlyTHB)} — not posted</small>}</td>
           <td>NOT ESTABLISHED</td>
@@ -97,7 +126,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
            {x.signoffEvidence&&<small>Output: {x.signoffEvidence}</small>}</td>
          </tr>)}</tbody>
          <tfoot><tr>
-          <th colSpan={10}>{site} — subtotal · {active?"selected price ONCE":"not priced"}</th>
+          <th colSpan={12}>{site} — subtotal · {active?"selected price ONCE":"not priced"}</th>
           <th>{active?cash(siteAmount):"NOT ESTABLISHED"}</th>
           <th>NOT ESTABLISHED</th><th>Do not add duplicate Test IDs or unapproved work</th>
          </tr></tfoot>
@@ -105,10 +134,23 @@ export function B3ResourcePriceDossier0553({workingRow}){
        </div>
       </details>;
      })}
-     {i===4&&<p className="p55-note"><strong>BF Survey SELECTED Working Budget — physical execution still conditional:</strong>
+     {i===4&&<><p className="p55-note"><strong>BF Survey SELECTED Working Budget — physical execution still conditional:</strong>
       {cash(model.bfOptionalIllustrativeSellTHB)} = 2 people × (3 provisional site-days + 2 provisional travel-days)
       × THB25,200/person-day. BOD §8 has previous survey findings;
-      this labour allowance IS in the selected Working SELL (not verified Direct Cost); physical work requires written work order.</p>}
+      this labour allowance IS in the selected Working SELL (not verified Direct Cost); physical work requires written work order.</p>
+      <h4>BF Survey — additional actual cash expense drivers (UNPRICED / NONPOSTING)</h4>
+      <p className="p55-note">The 2 survey travel team-days above are PERSONNEL LABOUR ONLY.
+       Airfare, marine transport, POB, accommodation and insurance must NOT be treated as included cash expenses or zero cost.
+       Each item needs a documented payer, vendor quotation or receipts, and separate approval before financial posting.</p>
+      <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+       <thead><tr><th>Cost driver / Activity</th><th>Qty</th><th>Rate THB</th>
+        <th>Working Cost THB</th><th>Working SELL THB</th><th>Evidence / Cost Owner</th></tr></thead>
+       <tbody>{model.bfSurveyExpenseDrivers.map(x=><tr key={x.id}>
+        <td>{x.work}</td><td>NOT ESTABLISHED</td><td>NOT ESTABLISHED</td>
+        <td>NOT ESTABLISHED</td><td>NOT ESTABLISHED</td>
+        <td>{x.costOwner}<small>{x.sourceEvidence}</small></td>
+       </tr>)}</tbody>
+      </table></div></>}
      {i===5&&<p className="p55-note">SPE §7.3.2: JUTAL Zhuhai fabrication site SAT.
       ADDVALUE Crew × Days × Rate = NOT ESTABLISHED; MGW OEM FAT in B3.R1–R2 cannot be posted again here.</p>}
      {i===6&&<p className="p55-note">SPE §7.3.3: GF offshore commissioning after installation.
@@ -116,6 +158,14 @@ export function B3ResourcePriceDossier0553({workingRow}){
     </div>
    </details>;
   })}
+  <h4>SAT Risk / Management Reserve — separate NONPOSTING references</h4>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>Reserve class</th><th>Team-days</th><th>Crew</th><th>Person-days</th><th>Illustrative SELL-only reference THB</th><th>Selected / cost status</th></tr></thead>
+   <tbody>{model.riskReserve.map(x=><tr key={x.id}>
+    <td>{x.name}</td><td>{num(x.teamDays)}</td><td>{num(x.people)}</td>
+    <td>{num(x.personDays)}</td><td>{cash(x.illustrativeOnlyTHB)}</td>
+    <td>{x.status} · NOT INCLUDED in Base · Direct Cost NOT ESTABLISHED</td></tr>)}</tbody>
+  </table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Selected Working SELL reconciliation</th><th>Amount THB</th><th>Cost status / Receiver</th></tr></thead>
    <tbody>{model.groups.slice(0,5).map((g,i)=><tr key={i}>
