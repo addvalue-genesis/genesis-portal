@@ -1,6 +1,7 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {B3WorkingSellBreakdown0553} from "./B3WorkingSellBreakdown0553";
+import {B3ResourcePriceDossier0553} from "./B3ResourcePriceDossier0553";
 import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
 import {B3SiteMrSatCoverage0553} from "./B3SiteMrSatCoverage0553";
 import {B3SurveySatExecutionPlan0553} from "./B3SurveySatExecutionPlan0553";
@@ -212,6 +213,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
     <button type="button" className="p553-detail-button" onClick={()=>expandAll(false)}>− Collapse All</button>
    </div>
   </div>
+  <B3ResourcePriceDossier0553 workingRow={workingRow}/>
   <div className="p55-table-wrap p553-b3-table-scroll">
    <table className="p55-table p553-b3-hierarchical-table">
     <thead><tr>{gridColumns.map(name=><th key={name}>{name}</th>)}</tr></thead>
