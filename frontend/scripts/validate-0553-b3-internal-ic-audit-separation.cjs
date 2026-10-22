@@ -39,7 +39,10 @@ for(const x of all){
  assert.equal(x.directCostTHB,null);
 }
 const sections=Object.fromEntries(price.groups.map(x=>[x.kind,x]));
-assert.deepEqual(price.groups.map(g=>g.items.length),[2,2,2,5]);
+// BF Site Survey is a third B3.2 child, not a second B3.1 internal FAT price.
+assert.deepEqual(price.groups.map(g=>g.items.length),[2,3,2,5]);
+assert(sections.sat.items.some(x=>x.moduleId.endsWith(".site-survey-price")&&
+ x.workingSellTHB===252000));
 assert(sections.fat.items.some(x=>x.moduleId.endsWith(".revk-china-budget")));
 assert(sections.fat.items.some(x=>x.moduleId.endsWith(".mgw-r2-cover-20261020")));
 assert(!sections.fat.items.some(x=>x.moduleId.endsWith(".fat-owner-transfer")||
