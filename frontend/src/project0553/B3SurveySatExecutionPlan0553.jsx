@@ -120,7 +120,7 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
     <tr><td>GF Zhuhai Fabrication Yard SAT</td><td>ADDVALUE days and people UNKNOWN</td><td>NOT ESTABLISHED</td><td>RACI/ITP pending</td></tr>
     <tr><td>GF Offshore Commissioning</td><td>ADDVALUE days and people UNKNOWN</td><td>NOT ESTABLISHED</td><td>RACI/ITP pending</td></tr>
     <tr><td>Selected SAT 28 productive team-days</td><td>28 team-days / 56 MD (2 risk days not included)</td>
-     <td>{thb(28*2*25200)} CURRENT SAT Labour Working SELL</td>
+     <td>{thb(workingRow.b3SelectedSatSurveyBudget.satWorkingSellTHB)} CURRENT SAT Labour Working SELL · 28 MD Senior USD1000 + 28 MD Specialist USD800 × FX31.5</td>
      <td>NOT allocated to phases</td></tr>
     <tr><th>Current B3 Working SELL / SAT 28d + BF Survey 5d</th><th>33 labour team-days / 66MD plus FAT and VeEX</th>
      <th>{thb(summary.selectedB3WorkingSellTHB)}</th><th>Updated Working Budget / Release HOLD</th></tr>
