@@ -92,4 +92,4 @@ const ui=fs.readFileSync(path.join(root,"project0553/B3SiteMrSatCoverage0553.jsx
 assert(ui.includes("openMrDetails(r)")&&ui.includes("B3SatMrWorkBreakdown0553"));
 assert.equal(JSON.stringify({currentB3:canon().byCode.B3.workingSellTHB,days:matrix().budgetarySiteTimeboxes}),original,
  "SAT subtask drilldown may not mutate any source Working SELL or Site days");
-console.log("PASS B3 SAT per-MR Work Breakdown: ZPQ 3 days ×2 people ×USD800 ×FX31.5 = THB151,200 Site only; MR0001/2/3 have distinct source-led test subtasks, no invented MR/day/rate, 21 detailed modules searchable, B3 THB2,397,725 selected while historical ZPQ 3-day matrix is price-only nonposting.");
+console.log("PASS B3 SAT per-MR Work Breakdown: ZPQ 3 days ×2 people ×USD800 ×FX31.5 = THB151,200 Site only; MR0001/2/3 have distinct source-led test subtasks, no invented MR/day/rate, 21 detailed modules searchable, B3 THB2,599,325 selected while historical ZPQ 3-day matrix is price-only nonposting.");
