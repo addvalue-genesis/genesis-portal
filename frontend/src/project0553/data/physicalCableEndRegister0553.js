@@ -1,18 +1,22 @@
 // PJ2608-0553 — 17 applicable MR/Location physical *FUNCTION REGISTER*.
 // Candidate cable-end pairs are NOT signed WIR/TER, measured lengths or POs.
-// No Cost mutation: site/system quote covers packaged items, BDA Open deviation is separate.
+// No Cost mutation. CURRENT bid design: only LNA -> BDA at SAME original position;
+// keep donor/service antenna positions. Deviation Rev00 moved Omni historically, NOT selected.
 import {Z1F_TEL_LAYOUT_INDEX_0553 as LAY} from "./z1fTelLayoutIndex0553";
 import {MR0002_BDA_DEVIATION_REV00_0553 as DEV} from "./mr0002DeviationBdaRev00_0553";
 import {deriveBulkMrLocationCoverage0553} from "./bulkMrLocationCoverage0553";
 import {MGW_P26_058_R2_SELECTED_0553 as MGW} from "./mgwP26058R2Selected0553";
 
 const POLICY=Object.freeze({
- sourcePriority:["MR/MTO/TC","PTTEP AFC LAY/BLD","Internal SAMART/ADDVALUE schematic Rev00 (check only)","Selected MGW R2 quote","Approved Deviation/GA/WIR/TER"],
+ sourcePriority:["MR/MTO/TC","Customer reference LAY/BLD positions (base design)","User-selected LNA-to-RFI-BDA-only budget design","Internal SAMART/ADDVALUE schematic Rev00 (check only)","Selected MGW R2 quote","Customer technical closure/GA/WIR/TER"],
  customerAfcLayout:"MM-ZTK-1F-ZWPX-TEL-LAY-0001 Rev.C1 (AFC 04-Sep-2026)",
  customerAfcBlock:"MM-ZTK-1F-ZWPX-TEL-BLD-0001 Rev.C1 (AFC 25-Aug-2026)",
  internalCrosscheck:"MM-ZTK-1F-GEN-SCADA-TEL-DWG-0001_All.pdf Rev00",
  customerMto:"MR0001 Rev04 source; MR0002–MR0004 MR Rev.C1",
  rfSubstitution:DEV.id,
+ currentDesign:DEV.workingDesign.id,
+ onlyDesignChange:"LNA_TO_RFI_BDA_AT_ORIGINAL_LOCATION",
+ positionRelocationApprovedInWorkingDesign:false,
  noAutomaticQtyFromOneLot:true,allowWorkingMutation:false,allowReleaseMutation:false
 });
 const SITE_SHEETS=Object.freeze({ZWP20:[4,3],ZWP21:[7,4],ZWP22:[10,5],ZWP23:[12,6],ZPQ:[null,null],ZWP8:[null,7],ZWP11:[null,null]});
@@ -24,6 +28,10 @@ function make(site,mr,id,fn,from,to,cableFamily,owner,options={}){
   fromAfcConfirmed:Boolean(options.fromAfcConfirmed),toAfcConfirmed:Boolean(options.toAfcConfirmed),
   afcFromDeck:options.fromDeck||null,afcToDeck:options.toDeck||null,
   proposedFromDeck:options.proposedFromDeck||null,proposedToDeck:options.proposedToDeck||null,
+  selectedWorkingFromDeck:options.selectedWorkingFromDeck||options.fromDeck||null,
+  selectedWorkingToDeck:options.selectedWorkingToDeck||options.toDeck||null,
+  historicalDeviationProposedToDeck:options.historicalDeviationProposedToDeck||null,
+  historicalDeviationNotSelected:Boolean(options.historicalDeviationNotSelected),
   cableFamily,cableTypeApproved:null,approvedSKU:null,
   circuitCount:null,verifiedInstalledLengthM:null,procurementQtyM:null,
   quantityBasis:options.quantityBasis||"FUNCTION_CANDIDATE__WIR_TER_ROUTE_AND_ENDS_REQUIRED",
@@ -32,7 +40,7 @@ function make(site,mr,id,fn,from,to,cableFamily,owner,options={}){
   owner,addvalueReserveQtyM:null,unitRateTHB:null,incrementalWorkingTHB:0,
   sourceDrawing:POLICY.customerAfcLayout+"; "+POLICY.customerAfcBlock,
   drawingSheet:options.drawingSheet||null,sourceClause:options.sourceClause||null,
-  scenario:options.scenario||"CUSTOMER_AFC_BASE",
+  scenario:options.scenario||"BASE_REFERENCE_DESIGN_UNCHANGED_POSITION",
   deviationId:options.deviationId||null,deviationStatus:options.deviationStatus||null,
   evidenceStatus:options.evidenceStatus||"FUNCTION_EVIDENCE_ONLY__NOT_AFC_CABLE_SCHEDULE",
   engineeringNote:options.note||"",
@@ -81,9 +89,9 @@ function dmr(site){
  const lna=rf("LEGACY_LNA_ENCLOSURE"),surge=rf("RF_SURGE_EXD");
  if(!lna||!surge)throw Error("AFC DMR LNA/surge roles unresolved: "+site);
  const yagi=getTag(site,"ANT-508-001","DTRS_TRUNK_RADIO"),omni=getTag(site,"ANT-508-002","DTRS_TRUNK_RADIO");
- const info={drawingSheet:SITE_SHEETS[site][0],sourceClause:"MR0002 C1 + Deviation 1.1 Open",
+ const info={drawingSheet:SITE_SHEETS[site][0],sourceClause:"MR0002 C1 / working design LNA→BDA only; original Rev00 Deviation still Open",
   deviationId:DEV.id,deviationStatus:DEV.status};
- const common={...info,evidenceStatus:"AFC_FUNCTION_PLUS_OPEN_BDA_DEVIATION__WIR_TER_PENDING",
+ const common={...info,evidenceStatus:"SELECTED_BUDGETARY_BDA_SAME_LOCATION__WIR_TER_PENDING",
   vendorIncluded:true,vendorPackageLine:"MGW Full Rev2 UHF-1/UHF-2/UHF-3/UHF-4",
   connectorGlandEvidence:"MGW FORLLER 100m + 6 male RF connectors/site included; site-specific RF genders, Ex surge, antenna, glands and IEC60331 still require confirmation."};
  return [
@@ -92,22 +100,24 @@ function dmr(site){
   "50Ω DMR RF coax / connector / surge","MGW_COMPLETE_SYSTEM",{
    ...common,fromAfcConfirmed:true,toAfcConfirmed:true,
    fromDeck:yagi?.deck,toDeck:lna.deck,
-   note:"AFC source LNA and surge tags preserved. Deviation selects 6-element RFI YBSS6, 11 dBi at +21.100m, but remains OPEN. Connection sequence and number of terminated segments not proven."}),
+   note:"Selected working design changes ONLY LNA→RFI BDA; donor Yagi location remains as reference layout. Rev00 YBSS6 spec/elevation is historical proposed data, NOT automatically selected. Connection sequence and real terminated segments TBD."}),
  make(site,"MR-0002","DMR-SERVICE-RF","Original LNA ↔ Omni; proposed RFI BDA service → relocated Omni",
-  lna.tag+" / original LNA (proposed BDA HOLD)",omni?.tag||"ANT-508-002",
+  lna.tag+" / selected RFI BDA at former LNA position",omni?.tag||"ANT-508-002",
   "50Ω DMR RF coax / surge / service antenna connector","MGW_COMPLETE_SYSTEM",{
    ...common,fromAfcConfirmed:true,toAfcConfirmed:true,
    fromDeck:lna.deck,toDeck:omni?.deck,
-   proposedFromDeck:lna.deck,proposedToDeck:DEV.proposed.omniRelocation,
-   scenario:"AFC_BASE_AND_OPEN_BDA_RELOCATION_SEPARATED",
-   quantityBasis:"CROSS_DECK_DEVIATION_SCENARIO__NO_MEASURED_CABLE_LENGTH",
-   note:"AFC Omni at Mezzanine E&I rooftop; OPEN Deviation 1.1 proposes beneath Lower Deck at +18.300m. DO NOT use former same-deck 12.144m routing proxy as proposed cable length."}),
+   proposedFromDeck:lna.deck,proposedToDeck:omni?.deck||null,
+   historicalDeviationProposedToDeck:DEV.proposed.omniRelocation,
+   historicalDeviationNotSelected:true,
+   scenario:"SELECTED_LNA_TO_BDA_ONLY__ORIGINAL_ANTENNA_POSITIONS",
+   quantityBasis:"SAME_POSITION_BUDGET_ROUTE__REAL_CABLE_PATH_TBD",
+   note:"Working-design Omni remains in original reference location on Mezzanine E&I rooftop, NOT beneath Lower Deck. Rev00 lower-deck proposal is historical and NOT ADOPTED. Preliminary same-position cable budget sensitivity may be used, but actual length requires WIR/TER."}),
  make(site,"MR-0002","DMR-BDA-POWER-ALARM","Original LNA / proposed BDA DC and alarm/supervision",
-  "E&I_DC_ALARM_TERMINALS_TBD",lna.tag+" / original LNA; RFI BDA proposed",
+  "E&I_DC_ALARM_TERMINALS_TBD",lna.tag+" / RFI BDA selected at original LNA position",
   "DC power + alarm/control, individually identify circuits","MGW_COMPLETE_SYSTEM__INTERFACE_REVIEW",{
    ...common,toAfcConfirmed:true,toDeck:lna.deck,
    vendorIncluded:null,vendorPackageLine:"MGW Full Rev2 UHF-1",
-   note:"BDA vendor electrical ports must be established from OEM GA/Ex docs; cannot reuse LNA DC/ALARM pinout."}),
+   note:"RFI BDA is SELECTED for internal budget design at unchanged enclosure location; verify footprint/Ex power/alarm and do not reuse original LNA pinout."}),
  make(site,"MR-0002","DMR-RF-BONDING","Surge/amp/antenna grounding and Ex glands",
   "PLATFORM_EARTH_POINT_TBD",surge.tag+" / Ex d RF Surge and "+lna.tag,
   "RF grounding / cable end glands / marine support","MGW_COMPLETE_SYSTEM__FIELD_BOUNDARY_REVIEW",{
@@ -191,7 +201,7 @@ export function derivePhysicalCableEndRegister0553(){
   byMR:Object.fromEntries(["MR-0001","MR-0002","MR-0003","MR-0004"].map(mr=>[mr,entries.filter(e=>e.mr===mr).length])),
   registeredFunctionalCandidates:entries.length,
   measuredCableRuns:0,approvedProcurementLines:0,workingCostDeltaTHB:0,releaseCostDeltaTHB:0,
-  readiness:"ENGINEERING_CANDIDATE_ONLY__AFC_BDA_DEVIATION_OPEN__WIR_TER_PENDING",
+  readiness:"BUDGETARY_LNA_TO_BDA_SAME_POSITION_SELECTED__PHYSICAL_WIR_TER_OPEN",
   releaseAllowed:false
  });
  const expected=Object.freeze({"MR-0001":28,"MR-0002":12,"MR-0003":12,"MR-0004":9});
