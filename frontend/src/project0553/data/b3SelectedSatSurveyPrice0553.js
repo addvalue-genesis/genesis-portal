@@ -16,6 +16,10 @@ export function selectB3SelectedSatSurveyPrice0553(){
  const roles=old.team,people=old.persons,rate=old.rateUSDPerPersonDay*old.fxTHBPerUSD;
  const satRows=Object.freeze(lean.rows.map(x=>Object.freeze({
   id:x.id,site:x.site,wbs:x.wbs,days:x.days,
+  mrs:x.mrs,workfront:x.id.startsWith("BF-")?"BF FIELD SAT / INTERFACE TEST":
+   x.id.startsWith("GF-")?"GF FABRICATION YARD SAT + OFFSHORE COMMISSIONING POOLED PRICE; NO PHASE DUPLICATION":
+   "CROSS-SITE SIT / PUNCH — EXACT EXECUTION PHASE PENDING RACI",
+  executionPhaseAssigned:false,
   crew:people,plannedPersonDays:x.days*people,
   workingSellTHB:round(x.days*people*rate),
   linkedTestIds:x.testIds,work:x.work,
@@ -30,7 +34,7 @@ export function selectB3SelectedSatSurveyPrice0553(){
    workingSellTHB:round(2*rate),wbs:"BOD C2 §8",
    work:"Physical verification reserve ONLY IF JUTAL requests BF revisit",
    conditionalExecution:true,directCostTHB:null,
-   priceClass:"SELECTED_BUDGETARY_ALLOWANCE_CONDITIONAL_EXECUTION"
+   priceClass:"SELECTED_WORKING_BUDGET_CONDITIONAL_BF_EXECUTION"
   })),
   Object.freeze({id:"SUR-TRAVEL",site:"BF joint survey mobilisation",days:2,crew:2,
    plannedPersonDays:4,workingSellTHB:round(4*rate),wbs:"BOD C2 §8",
@@ -66,6 +70,9 @@ export function selectB3SelectedSatSurveyPrice0553(){
   managementReserveTeamDaysNotIncluded:lean.managementReserveTeamDays,
   B3FatAndPurchasedOutsideThisModel:true,
   siteSurveyBudgetAllowanceSelected:true,siteSurveyPhysicalVisitConfirmed:false,
+  siteSurveyAllowanceExecutionConditional:true,
+  siteSurveyActualTravelPOBInsuranceCostTHB:null,
+  siteSurveyAllowanceIncludedInSelectedWorkingBudget:true,
   directCostTHB:null,customerReleaseAllowed:false,
   sourceAuthority:"USER_SELECTED_SAT28_SURVEY_BF3_PLUS_TRAVEL2_WORKING_BUDGET_20261022"
  });
