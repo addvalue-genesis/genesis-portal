@@ -17,13 +17,13 @@ assert.equal(yard.length,8);
 assert.ok(fat.every(x=>x.costOwner==="B3"&&x.directCostTHB===null&&x.workingCostTHB===null));
 assert.ok(fat.every(x=>x.costAccountingClass==="B3_DIRECT_FAT_WITNESS_EXPENSE_UNVERIFIED"));
 assert.ok(yard.every(x=>x.costOwner==="B9"&&x.directCostTHB===null));
-assert.equal(fat.reduce((sum,x)=>sum+x.workingSellTHB,0),397400);
-assert.equal(yard.reduce((sum,x)=>sum+x.workingSellTHB,0),233600);
-assert.equal(data.budget.fatWorkingSellTHB,397400);
-assert.equal(data.budget.b9BaseWorkingSellTHB,233600);
+assert.equal(fat.reduce((sum,x)=>sum+x.workingSellTHB,0),422600);
+assert.equal(yard.reduce((sum,x)=>sum+x.workingSellTHB,0),261950);
+assert.equal(data.budget.fatWorkingSellTHB,422600);
+assert.equal(data.budget.b9BaseWorkingSellTHB,261950);
 // B9 was promoted from an optional quote to ONE priced Base contract line by
 // ADR-65. The separate call-out is an execution condition, not a price exclusion.
-assert.equal(data.budget.workingSellTHB,233600);
+assert.equal(data.budget.workingSellTHB,261950);
 assert.equal(data.budget.workingSellTHB,data.budget.b9BaseWorkingSellTHB);
 assert.equal(data.budget.conditionalYardSellTHB,data.budget.b9BaseWorkingSellTHB,
  "Source package is already included in B9 Base: do not post twice");
@@ -31,7 +31,7 @@ assert.equal(data.budget.priceAlreadyIncludedInB9Base,true);
 assert.equal(data.budget.conditionalNotInBase,false);
 assert.equal(data.budget.conditionalExecutionOnWrittenCallout,true);
 assert.equal(data.budget.customerReleaseAllowed,false);
-assert.equal(data.budget.conditionalYardSellTHB,233600);
+assert.equal(data.budget.conditionalYardSellTHB,261950);
 assert.equal(data.trace.rows.find(x=>x.id==="RQM-01").costOwner,"B3");
 assert.equal(data.trace.rows.find(x=>x.id==="RQM-02").costOwner,"B3");
 assert.equal(data.trace.rows.find(x=>x.id==="RQM-03").costOwner,"B9");
@@ -70,4 +70,4 @@ assert(ownerDetail.includes("2046000+total+purchasedFatSell")&&
 assert(ownerDetail.includes("purchasedServices?")&&
  ownerDetail.includes("vendorPurchasedQuoteUSD!==7500"),
  "FAT detail must distinguish MGW quoted supplier cost from the ADDVALUE witness amount");
-console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB397400), B9 Yard conditional THB233600; B9 1 LS in Base; Actual Direct COST unverified and non-posting.");
+console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB422600), B9 Yard conditional THB261950; B9 1 LS in Base; Actual Direct COST unverified and non-posting.");
