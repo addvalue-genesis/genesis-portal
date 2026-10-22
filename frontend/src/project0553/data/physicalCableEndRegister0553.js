@@ -194,10 +194,11 @@ export function derivePhysicalCableEndRegister0553(){
   readiness:"ENGINEERING_CANDIDATE_ONLY__AFC_BDA_DEVIATION_OPEN__WIR_TER_PENDING",
   releaseAllowed:false
  });
- if(groups.length!==17||entries.length!==56||s.byMR["MR-0001"]!==28||s.byMR["MR-0002"]!==12||s.byMR["MR-0003"]!==12||s.byMR["MR-0004"]!==9) {
-   // These counts are a structural audit; valid scope is 28 + 12 + 12 + 9 = 61.
-   // Do not let the model appear complete based on an incorrect expected total.
-   if(entries.length!==61||groups.length!==17)throw Error("Cable-end register total/Scope error");
- }
+ const expected=Object.freeze({"MR-0001":28,"MR-0002":12,"MR-0003":12,"MR-0004":9});
+ if(groups.length!==17||entries.length!==61||Object.keys(expected).some(mr=>s.byMR[mr]!==expected[mr]))
+  throw Error("Cable-end candidate register scope mismatch — expected 61 lines over 17 groups");
+ if(s.phaseSharedItem.requirementQty!==1||s.phaseSharedItem.siteAllocation!==null)
+  throw Error("MR0004 phase kit must not be multiplied by three sites");
+
  return s;
 }
