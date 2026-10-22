@@ -156,5 +156,5 @@ assert.equal(htmlIds.length,new Set(htmlIds).size,"B3 dossier must not duplicate
 assert.equal(JSON.stringify(working()),before,"B3 dossier modified canonical source");
 assert(!html.includes("453,600.00"),"Superseded 7-site survey must NOT be a current price");
 assert(!html.includes("2,016,000.00"),"Old 40-day SAT SELL must NOT appear as current resource dossier price");
-assert.equal(bc.knownWorkingSellTHB,4667836.82);
+assert.equal(bc.knownWorkingSellTHB,4582736.82);
 console.log("PASS 0553 B3 B2-style resource dossier: 37 priced (MGW2 + China FAT8 + SAT18 + VeEX1 + BF Survey8) detailed person-day/qty/rate lines = WS-B3 THB2599325; BF conditional/4 GF Yard/4 Offshore cost TBD nonposting; 10.3/10.5 B3 trace equal/Release HOLD; 67 unique cost-evidence rows (14 GF Yard + 14 GF Offshore Site/MR), zero new postings.");

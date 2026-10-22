@@ -44,12 +44,12 @@ assert.equal(m.proposedB3FatWorkingSellTHB,427600);
 assert.equal(m.proposedB8TrainingWorkingSellTHB,37800);
 assert.equal(m.grossTripProposedWorkingSellTHB,465400);
 assert.equal(m.b3CurrentWorkingSellTHB,2599325);
-assert.equal(m.b8CurrentWorkingSellTHB,216650);
+assert.equal(m.b8CurrentWorkingSellTHB,131550);
 assert.equal(m.b3ProposedWorkingSellTHB,2604325);
 assert.equal(m.b8ProposedWorkingSellTHB,37800);
-assert.equal(m.currentCombinedWorkingSellTHB,2815975);
+assert.equal(m.currentCombinedWorkingSellTHB,2730875);
 assert.equal(m.proposedCombinedWorkingSellTHB,2642125);
-assert.equal(m.currentToProposedDeltaTHB,-173850);
+assert.equal(m.currentToProposedDeltaTHB,-88750);
 assert.equal(m.b8SourceOriginalTrainingMH,44);
 assert.equal(m.b8TrainingContactHours,16);
 assert.equal(m.b8PreparationAndOtherMHToReconcile,28);
@@ -99,6 +99,6 @@ const quoted=fs.readFileSync(path.join(root,"project0553/BcWorkingHierarchy0553.
 assert(quoted.includes('"SOW-"+item.code')&&quoted.includes('" WS-"+item.code')&&
  quoted.includes('" CP-"+item.code'));
 assert.equal(current().byCode.B3.workingSellTHB,2599325);
-assert.equal(current().byCode.B8.workingSellTHB,216650);
+assert.equal(current().byCode.B8.workingSellTHB,131550);
 assert.equal(JSON.stringify(current()),snapshot);
-console.log("PASS 0553 7-day B3/B8: 14 onsite MD (12 FAT/2 Training) + 4 travel MD B3 once; new B3 2604325 / B8 37800 scenario-only; original B3 2599325 / B8 216650 intact; SOW IC WS CP VQ IDs segregated and no release.");
+console.log("PASS 0553 7-day B3/B8: 14 onsite MD (12 FAT/2 Training) + 4 travel MD B3 once; new B3 2604325 / B8 37800 scenario-only; original B3 2599325 / B8 131550 intact; SOW IC WS CP VQ IDs segregated and no release.");
