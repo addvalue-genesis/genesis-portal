@@ -136,8 +136,8 @@ export function selectB5B6B7LinkedLogistics0553(){
   approvedRoutingId:route.approvedDecisionId,routeStatus:route.physicalRoutingStatus,
   MGWFatLocation:"MGW office / Nantong, China (route evidence; named FAT venue acceptance OPEN)",
   yardOwnerRoute:"JUTAL Zhuhai Yard, China per ADR-68",
-  yardUserDescription:"JUTAL Nantong Yard (stated in user review; conflict to verify)",
-  destinationConflict:"MGW Nantong dispatch vs user-named JUTAL Nantong Yard vs owner-approved JUTAL Zhuhai Yard: named receiving yard/address MUST be reconciled, do not silently change approved route",
+  yardUserDescription:"JUTAL Zhuhai Yard, China (user-corrected 2026-10-22)",
+  destinationConflict:"CONFIRMED CITY: MGW Office Nantong = FAT/dispatch; JUTAL Zhuhai Yard = receiving destination (user corrected). Exact consignee gate/address and supplier Incoterm still require written confirmation; no extra Nantong-to-Nantong JUTAL leg.",
   fxTHBPerUSD:fx,fxClass:"INTERNAL_PLANNING_FX_NOT_OFFICIAL_VENDOR_THB_INVOICE",
   selectedWorkingSellByCode,selectedThreeOwnerWorkingSellTHB:648768,
   totalCurrentVerifiedDirectCostTHB:null,
@@ -164,7 +164,7 @@ export function selectB5B6B7LinkedLogistics0553(){
    "MGW SERV-3 USD500 vs SERV-5 USD2500 packing overlap: require written distinct scope/credit, no automatic minus USD500",
    "MGW outbound SERV-5 USD2500: obtain all four MR cargo manifest, transport/delivery condition and verified insurance",
    "B7 three-month FREE vendor workshop storage: written inclusion and actual duration; THB30000 additional month is conditional Working SELL reserve, not verified Cost",
-   "Confirm JUTAL Zhuhai vs user reference Nantong, consignee address, Incoterm and delivery milestone",
+   "JUTAL receiving yard is Zhuhai; verify exact receiving gate, consignee, handover Incoterm and release milestone in supplier confirmation",
    "B2 owns packing-list document creation; B3 FAT labour; B5 physical protection/marking; B6 freight/customs; B7 physical storage; B13 preservation consumables not double billed"
   ])
  });
