@@ -6,6 +6,7 @@ import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553} from "./bcWorkingModuleRoutes0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
+import {selectB3SurveySatExecutionPlan0553} from "./b3SurveySatExecutionPlan0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
@@ -106,6 +107,7 @@ export function buildBcModuleNavigator0553(){
  // the B3 panel. A source ID may resolve to a distinct (unique) UI anchor.
  const req=selectB3RequirementWbsTrace0553();
  const sat=selectB3SiteMrSatCoverage0553();
+ const fieldPlan=selectB3SurveySatExecutionPlan0553(bc.byCode.B3);
  const b3=bc.byCode.B3;
  const b3Id=b3.moduleId;
  const child=(id,name,anchorModuleId=id,keywords="B3 SAT FAT ITP")=>({
@@ -115,7 +117,7 @@ export function buildBcModuleNavigator0553(){
  const b3Entries=[
   child(b3Id+".worktype-accordion","B3 — Expandable FAT / SAT / Test Equipment / Audit groups"),
   child(b3Id+".fat","B3.1 — FAT Factory Acceptance Test",b3Id+".fat","FAT witness OEM iFAT China"),
-  child(b3Id+".sat","B3.2 — Offshore SAT/SIT Tests",b3Id+".sat","SAT 7 sites 40 days"),
+  child(b3Id+".sat","B3.2 — Survey + Latest SAT 28+2 Days (40-day priced reference only)",b3Id+".sat","Survey 7 site 2 mobilization SAT 28+2 execution 2 people 60 MD"),
   child(b3Id+".tools","B3.3 — Temporary Test Equipment (B3) vs B11 O&M Special Tools",
    b3Id+".tools","VeEX rental B11 tool boundary"),
   child(b3Id+".audit","B3.4 — Working Sell and Contract Cost Audit",b3Id+".audit","19 requirements price trace"),
@@ -125,16 +127,24 @@ export function buildBcModuleNavigator0553(){
   child(b3Id+".test-tools-ownership","B3.3.2 — Test Tools / B11 Cost Ownership"),
   child(b3Id+".source-cost-audit","B3.4.3 — Historical Source and Cost Evidence"),
   child(b3Id+".working-sell-breakdown","B3 — Working SELL THB 2,750,525 Breakdown"),
-  child(b3Id+".40-day-abc","B3 — Offshore SAT/SIT 40-Day Working Basis",
-   b3Id+".40-day-abc","offshore 40 days two specialists site SAT"),
+  child(b3Id+".40-day-abc","B3 — Site Survey + Latest SAT 28+2; old 40-day price audit",
+   b3Id+".40-day-abc","site survey 7+2 team days sat 28+2 60MD cost planning comparison"),
   child(b3Id+".veex-mx100","B3 — VeEX MX100+ Temporary Test Rental",
    b3Id+".veex-mx100","30 rental days tools SAT"),
   child(b3Id+".revk-china-budget","IC-FAT — ADDVALUE China FAT Internal Resource Activities / WS-B3 (not CP-B3)"),
   child(b3Id+".requirement-crosswalk","B3 — Contract Requirements × Rev.K / BOD SPE DTS MR"),
   child(req.moduleId,"B3 — Requirement Source Register (19)",
    b3Id+".requirement-crosswalk","RQM-01 RQM-19 contract trace"),
-  child(sat.moduleId,"B3 — Seven-Site / Four-MR SAT Test Coverage (40 days)",
+  child(sat.moduleId,"B3 — readable two-person Site Survey + SAT 28+2 plan; 40d price audit",
    sat.moduleId,"ZPQ ZWP8 ZWP11 ZWP20 ZWP21 ZWP22 ZWP23 matrix"),
+  child(fieldPlan.moduleId,"B3 — Field Execution Plan: where, who, days, tasks, Survey rate evidence",
+   fieldPlan.moduleId,"B3 survey seven locations 9 team-days 18MD SAT 28+2 60MD THB cost source"),
+  ...fieldPlan.survey.rows.map(r=>child(fieldPlan.moduleId+".survey."+r.site.toLowerCase(),
+   "B3 Survey "+r.site+" — 2 people x 1 provisional team-day",
+   fieldPlan.moduleId+".survey."+r.site.toLowerCase(),"site survey "+r.site+" purpose packing power RF")),
+  ...fieldPlan.sat.rows.map(r=>child(fieldPlan.moduleId+".sat."+r.id.toLowerCase(),
+   "B3 latest SAT "+r.site+" — 2 people x "+r.productiveTeamDays+" productive days",
+   fieldPlan.moduleId+".sat."+r.id.toLowerCase(),"SAT "+r.site+" "+r.wbs+" "+r.id)),
   ...req.rows.map(r=>child(r.moduleId,r.id+" — "+r.activity,
    (r.costOwner==="B9"?"bid.budget.working.bc.b9":"bid.budget.working.bc.b3")+".requirement-crosswalk",
    "requirement "+r.system+" "+r.wbs+" "+r.requirementRef+" "+r.location)),
