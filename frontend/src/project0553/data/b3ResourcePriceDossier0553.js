@@ -42,6 +42,9 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   const mrTests=matrix.budgetarySiteTimeboxes.find(x=>x.id===box.id)?.testIds||[];
   return resourceRoles.map((role,i)=>make("sat-baseline",box.id.toLowerCase()+".person-"+(i+1),{
    group:"SAT_SELECTED_28D",site:box.site,wbs:box.wbs,work:box.work,
+   mr:box.mrs?.join(" / ")||"SIT / PUNCH",workfront:box.workfront,
+   costOwner:"B3 SAT28 pooled labour; BF/GF Yard/Offshore phase split not independently priced",
+   stageAllocationConfirmed:false,
    role,people:1,teamDays:box.days,qty:box.days,unit:"person-day",unitRateTHB:rateTHB,
    rateUSDPerUnit:rateUSD,fxTHBPerUSD:fx,
    calculation:"1 person × "+box.days+" days × USD "+rateUSD+" × FX "+fx,
@@ -104,6 +107,8 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  const bfLines=satSelected.siteSurveyRows.filter(x=>x.id!=="SUR-TRAVEL").flatMap((r)=>{
   return resourceRoles.map((role,i)=>make("bf-conditional",r.site.toLowerCase()+".person-"+(i+1),{
    group:"BF_SELECTED_SURVEY_ALLOWANCE",site:r.site,wbs:"BOD Rev.C2 §8",
+   mr:"BF SURVEY / BOD §8",workfront:"BF PHYSICAL REVISIT ONLY ON WRITTEN JUTAL CALL-OUT",
+   costOwner:"B3 BF conditional labour allowance; B2 controls VDRL only",
    work:r.work,role,people:1,teamDays:r.days,
    qty:r.days,unit:"person-day",unitRateTHB:rateTHB,
    calculation:"1 person × "+r.days+" selected-budget BF Survey site-day × THB "+rateTHB,
@@ -115,6 +120,8 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  });
  const bfTripLines=resourceRoles.map((role,i)=>make("bf-conditional","trip.person-"+(i+1),{
   group:"BF_SELECTED_SURVEY_ALLOWANCE",site:"BF joint roundtrip",wbs:"BOD Rev.C2 §8",
+  mr:"BF SURVEY / MOB-DEMOB",workfront:"BF SURVEY MOB/DEMOB ONLY; NOT SAT28 TRAVEL",
+  costOwner:"B3 BF conditional travel-day labour allowance; cash expenses separate",
   work:"Only if separate ADDVALUE physical BF revisit/boat logistics required",
   role,people:1,teamDays:2,
   qty:2,unit:"person-day",unitRateTHB:rateTHB,
@@ -164,19 +171,57 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   stage("Offshore Vendor Commissioning after installation — actual resources OPEN",offshoreLines,"SPE §7.3.3"),
   stage("Integrated SIT and Punch — phase/RACI undecided",sharedLines,"K17–K18")
  ]);
+ // Cash expenses are cost drivers only: no zero, assumed supplier cost, or
+ // additional selected SELL. They do not replicate the 2 paid travel-day
+ // LABOUR allowance (2 persons × 2 travel-days) in BF Survey.
+ const bfSurveyExpenseDrivers=freeze([
+  ["BF-CASH-TRAVEL","Airfare / road transport / actual tickets","B3 survey travel cash; not personnel travel-day labour"],
+  ["BF-MARINE-BOAT","Boat / marine transfer and marine operator","JUTAL / vessel provider; payer and trip evidence OPEN"],
+  ["BF-POB-ACCESS","Offshore POB, site access and accommodation","JUTAL / PTTEPI marine logistics; entitlement OPEN"],
+  ["BF-INSURANCE-PERMIT","Insurance, offshore medical, visa and work permits","B3 travel compliance vs B14 policy insurance; ownership to verify"]
+ ].map(([id,work,costOwner])=>make("bf-cash-expense",id.toLowerCase(),{
+  group:"BF_SURVEY_CASH_EXPENSES_NONPOSTING",site:"BF ZPQ / ZWP8 / ZWP11",
+  mr:"BOD Rev.C2 §8",wbs:"B3.2.3",work,role:"Expense / vendor owner NOT ESTABLISHED",
+  people:null,teamDays:null,qty:null,unit:"receipt / trip",
+  rateUSDPerUnit:null,fxTHBPerUSD:null,unitRateTHB:null,
+  quotedVendorCostTHB:null,workingSellTHB:null,workingCostTHB:null,
+  costOwner,calculation:"Qty × actual unit cost — NOT ESTABLISHED",
+  sourceModuleId:plan.moduleId,
+  sourceType:"NO_APPROVED_TRIP_OR_EXPENSE_QUOTE",
+  sourceEvidence:"BOD Rev.C2 §8 previous BF findings; new written JUTAL work order and vendor cash evidence required",
+  postingClass:"NOT_ESTABLISHED_NONPOSTING_EXPENSE",
+  stageAllocationConfirmed:false
+ })));
+ const riskReserve=freeze([
+  freeze({id:"SAT-RISK-2D",name:"SAT/SIT risk allowance",teamDays:2,people:2,personDays:4,
+   workingSellTHB:null,directCostTHB:null,illustrativeOnlyTHB:round(4*rateTHB),
+   status:"RISK_ALLOWANCE__NOT_INCLUDED_BASE__APPROVAL_GATE"}),
+  freeze({id:"SAT-MANAGEMENT-RESERVE-2D",name:"Management reserve",teamDays:2,people:2,personDays:4,
+   workingSellTHB:null,directCostTHB:null,illustrativeOnlyTHB:round(4*rateTHB),
+   status:"NONPOSTING_MANAGEMENT_RESERVE__SEPARATE_APPROVAL"})
+ ]);
  const priced=stageGroups.slice(0,5);
  const budgetSelected=total(priced.map(g=>({workingSellTHB:g.selectedWorkingSellTHB})));
  const picked=freeze(priced.map(g=>g.selectedWorkingSellTHB));
+ const bfConditionalBudgetAllowanceTHB=stageGroups[4].selectedWorkingSellTHB;
+ const selectedBaseExcludingConditionalBFTHB=round(budgetSelected-bfConditionalBudgetAllowanceTHB);
+ const vendorQuoteCostTHB=round(mgwLines.reduce((n,r)=>n+r.quotedVendorCostTHB,0));
  const singleIds=stageGroups.flatMap(g=>g.rows.map(r=>r.id));
  if(new Set(singleIds).size!==singleIds.length||
     mgwLines.length!==2||fatLines.length!==8||satLines.length!==18||
     bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
     total(mgwLines)!==307125||total(fatLines)!==397400||total(satLines)!==1411200||total(bfLines)+total(bfTripLines)!==252000||
     total(rental)!==30000||budgetSelected!==2397725||
+    selectedBaseExcludingConditionalBFTHB!==2145725||bfConditionalBudgetAllowanceTHB!==252000||
+    bfSurveyExpenseDrivers.length!==4||
+    bfSurveyExpenseDrivers.some(x=>x.workingSellTHB!==null||x.actualDirectCostTHB!==null)||
+    riskReserve.some(x=>x.workingSellTHB!==null||x.directCostTHB!==null)||
     workingRow.workingSellTHB!==budgetSelected||
     picked.join("|")!=="307125|397400|1411200|30000|252000"||
     plan.survey.conditionalLabourSellReferenceTHB!==252000||
-    mgwLines.reduce((n,r)=>n+r.quotedVendorCostTHB,0)!==236250||
+    vendorQuoteCostTHB!==236250||
+    round(vendorQuoteCostTHB+mgw.samTelMarkupTHB+mgw.addvalueMarkupTHB+
+      mgw.omissionReserveTHB)!==mgw.selectedIncrementalWorkingSellTHB||
     stageGroups.slice(5).some(g=>g.selectedWorkingSellTHB!==0||
       g.rows.some(r=>r.workingSellTHB!==null||r.actualDirectCostTHB!==null)))
   throw Error("B3 detailed dossier does not reconcile to 10.2 canonical Working SELL");
@@ -187,7 +232,24 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   groups:stageGroups,pricedGroupCount:priced.length,
   priceRowCount:mgwLines.length+fatLines.length+satLines.length+rental.length+bfLines.length+bfTripLines.length,
   pricedWorkingSellTHB:budgetSelected,selectedCanonicalWorkingSellTHB:workingRow.workingSellTHB,
-  vendorQuoteCostTHB:236250,actualPaidDirectCostTHB:null,
+  vendorQuoteCostTHB,actualPaidDirectCostTHB:null,
+  vendorQuoteMarkupBridge:freeze({
+   supplierQuoteTHB:vendorQuoteCostTHB,samtel20PctTHB:mgw.samTelMarkupTHB,
+   addvalue5PctTHB:mgw.addvalueMarkupTHB,reserve5PctTHB:mgw.omissionReserveTHB,
+   selectedWorkingSellTHB:mgw.selectedIncrementalWorkingSellTHB,
+   verifiedPaidDirectCostTHB:null
+  }),
+  financialLayers:freeze({
+   selectedBaseExcludingBFConditionalTHB:selectedBaseExcludingConditionalBFTHB,
+   includedBFConditionalBudgetAllowanceTHB:bfConditionalBudgetAllowanceTHB,
+   selectedWorkingBudgetPreviewTHB:budgetSelected,
+   conditionalBFPhysicalExecutionApproved:false,
+   unpricedExtraBFExpenseCostTHB:null,
+   GFYardAdditionalCostTHB:null,GFOffshoreAdditionalCostTHB:null,
+   actualDirectCostTHB:null,commercialReleaseAllowed:false,
+   reconciliation:"2145725 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2397725 PRE-AWARD WORKING BUDGET; RELEASE HOLD"
+  }),
+  bfSurveyExpenseDrivers,riskReserve,
   noApprovedStagePersonDays:true,
   oldLeanScenarioReferenceTeamDays:plan.sat.oldLeanWithRiskTeamDays,
   oldPriceReferenceTeamDays:sat.workdays,
