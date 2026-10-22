@@ -73,10 +73,59 @@ assert(!b2html.includes("Rate THB/MH: THB "),"No invented Document Controller pa
 assert(b2html.includes("THB 104.125")&&b2html.includes("THB 341.625"),
  "Rev05 historical THB/MH exact source seeds must be visible at 3 decimals");
 assert(b2html.includes("HISTORICAL"),"Old role cost seeds must never masquerade as current rate");
+const {selectB9YardWorkScopeDossier0553:b9ScopeSource}=get("data/b9YardWorkScopeDossier0553.js");
+const {selectB3ResourcePriceDossier0553:b3Dossier}=get("data/b3ResourcePriceDossier0553.js");
+const {buildReleaseCommercialModel0553:releaseModel}=get("data/releaseCommercialModel0553.js");
+const {selectScopePartBcWorking0553:scopeModel}=get("data/scopePartBcReadModel0553.js");
+const b9Scope=b9ScopeSource(bc.byCode.B9);
+assert.equal(b9Scope.moduleId,mod("B9")+".work-scope");
+assert.equal(b9Scope.selectedWorkingSellTHB,261950);
+assert.equal(b9Scope.sourceRowCount,8);
+assert.deepEqual(b9Scope.groups.map(g=>g.selectedWorkingSellTHB),[198450,52500,11000]);
+assert.deepEqual(b9Scope.groups.map(g=>g.rows.length),[2,3,3]);
+assert.equal(b9Scope.groups[0].rows[0].people,1);
+assert.equal(b9Scope.groups[0].rows[0].days,7);
+assert.equal(b9Scope.groups[0].rows[0].unitRateTHB,22050);
+assert.equal(b9Scope.groups[0].rows[0].rateUSDPerMD,700);
+assert.equal(b9Scope.groups[0].rows[0].fxTHBPerUSD,31.5);
+assert.equal(b9Scope.groups[0].rows[1].days,2);
+assert.equal(b9Scope.groups[0].rows.reduce((sum,x)=>sum+x.workingSellTHB,0),198450);
+assert(b9Scope.groups.every(g=>!g.independentPostingAllowed&&!g.releaseAllowed));
+assert(b9Scope.groups.flatMap(g=>g.rows).every(r=>
+ r.costOwner==="B9"&&r.workingCostTHB===null&&r.directCostTHB===null&&
+ r.verifiedDirectCostTHB===null&&!r.postingAllowed&&
+ r.workingSellTHB===r.qty*r.unitRateTHB));
+assert.equal(new Set(b9Scope.groups.flatMap(g=>g.rows.map(r=>r.sourceExpenseId))).size,8);
+assert.equal(b9Scope.b3RequirementModuleId,"bid.budget.working.bc.b3.resource-price-dossier.group.06");
+assert.equal(b9Scope.unbilledFieldBackupCashRiskTHB,48500);
+assert(!b9Scope.unbilledFieldBackupPostingAllowed&&b9Scope.b3Group06SeparateUnpricedTestScope);
+const b3Yard=b3Dossier(bc.byCode.B3).groups[5];
+assert.equal(b3Yard.selectedWorkingSellTHB,0,"Unpriced B3 Yard SAT must not inherit B9 1 LS");
+assert(b3Yard.rows.every(r=>r.workingSellTHB===null&&r.people===null&&r.teamDays===null));
+assert.equal(releaseModel().b.find(r=>r.code==="B9").customerSellTHB,261950);
+assert.equal(scopeModel().lines.B9.workingSellTHB,261950);
+assert.equal(scopeModel().lines.B9.directCostTHB,null);
+assert(!releaseModel().approval.releaseAllowed);
 const b9html=renderToStaticMarkup(React.createElement(PriceTrace,{workingRow:bc.byCode.B9}));
 assert(b9html.includes("261,950.00")&&b9html.includes("THB 261,950.00"));
 assert(b9html.includes("Quoted B9 Base once"));
 assert(b9html.includes("seven Yard working days"));
+for(const amount of ["198,450.00","52,500.00","11,000.00","154,350.00",
+ "44,100.00","15,000.00","22,500.00","4,000.00","2,000.00","5,000.00"]){
+ assert(b9html.includes(amount),"B9 detailed Work Scope missing selected working SELL "+amount);
+}
+assert(b9html.includes("B3 GF Yard SAT")&&b9html.includes("not four separately priced"));
+assert(b9html.includes("NOT ESTABLISHED")&&b9html.includes("Senior Telecom Systems Integration Engineer"));
+for(const group of b9Scope.groups){
+ for(const id of [group.id,group.siteId,...group.rows.map(r=>r.id)]){
+  assert(byId.has(id),"Missing B9 source price Navigator: "+id);
+  assert(b9html.includes('data-component-key="'+id+'"'),"B9 rendered line/module missing "+id);
+  assert(b9html.includes("Copy component ID "+id),"B9 nested Copy ID missing "+id);
+ }
+}
+const b9HtmlIds=[...b9html.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
+assert.equal(b9HtmlIds.length,new Set(b9HtmlIds).size,"B9 Work Scope must not duplicate DOM anchors");
+
 const source=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 assert(source.includes("Do not divide THB580,000 by 143 or 38"));
 assert(source.includes("row.calculatedB2MH"));
