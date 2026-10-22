@@ -22,7 +22,7 @@ const {BcOwnerPriceTrace0553:Parent}=get("BcOwnerPriceTrace0553.jsx");
 const bc=working(),before=JSON.stringify(bc),b8=bc.byCode.B8,m=hybrid(b8);
 assert.equal(b8.workingSellTHB,151550);
 assert.equal(b8.qtyDriver,1);assert.equal(b8.directCostTHB,null);
-assert.equal(bc.knownWorkingSellTHB,4602736.82);
+assert.equal(bc.knownWorkingSellTHB,4328914.13);
 assert.deepEqual(m.systems.map(x=>x.mr),["MR0001","MR0002","MR0003","MR0004"]);
 assert.deepEqual(m.systems.map(x=>x.hours),[4,4,4,4]);
 assert.deepEqual(m.systems.map(x=>x.day),[1,1,2,2]);
