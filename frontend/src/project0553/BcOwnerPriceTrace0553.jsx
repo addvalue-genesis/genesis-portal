@@ -6,6 +6,7 @@ import {selectBcB1B2EquationExecution0553} from "./data/bcB1B2EquationExecution0
 import {B2WorkingPriceOverview0553} from "./B2WorkingPriceOverview0553";
 import {B2IndependentVdrlRecalculation0553} from "./B2IndependentVdrlRecalculation0553";
 import {selectBcB5HistoricalPriceBridge0553} from "./data/bcB5HistoricalPriceBridge0553";
+import {B5B6B7LinkedLogistics0553} from "./B5B6B7LinkedLogistics0553";
 
 // 10.2 owner-local READ ONLY price evidence for B2/B4–B9.
 // Never infer document man-hours, unit SELL or payroll from a lump-sum quote.
@@ -352,7 +353,13 @@ export function BcOwnerPriceTrace0553({workingRow,auditContent=null,sourceConten
    title={code==="B2"?"VDRL / Document Register by MR":"Work Type / Physical Deliverables"}
    summary={code==="B2"?"MR0001–0004 · 143 requirement rows / 38 unique title types":
     "Scope and source work drivers; no invented quantities"} defaultOpen>
-   {code==="B2"?<B2Vdrl code={code}/>:<PhysicalDrivers row={workingRow}/>}
+   {code==="B2"?<B2Vdrl code={code}/>:["B5","B6","B7"].includes(code)?
+    <React.Fragment><B5B6B7LinkedLogistics0553 workingRow={workingRow}/>
+     <details className="p55-panel" style={{padding:8,marginTop:10}}>
+      <summary>Historical source cost drivers — audit only, not additional packing/freight/storage price</summary>
+      <PhysicalDrivers row={workingRow}/>
+     </details></React.Fragment>:
+    <PhysicalDrivers row={workingRow}/> }
   </Section>
   <Section code={code} num={code+".2"} suffix="price-reconciliation"
    title="Qty × Rate × Working SELL / Cost Reconciliation"
