@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R17";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R18";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-06",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"B1 Visible Price Overview SSR Test: HTML-escaped Account Labels",
+  detail:"Windows Node v24 Full Build halted in validate-0553-b1-visible-price-overview.cjs:45 at Missing category B1.1. Source contains all eight B1.1–B1.8 accounts, but React server HTML escapes '&' in account labels to '&amp;'. Update the regression to compare escaped <strong> label text for each actual B1 account, preserving module ID/navigation, B1 THB211600 selected Working SELL, THB181400 support planning cost and THB51700 conditional excluded. No source/account/price/UI mutation; Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1","bid.budget.working.bc.b1.price-overview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"2026-10-22 user Windows npm build B1 visible price overview AssertionError / B1 source account labels"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-05",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"B2 Working Price Overview React SSR defaultOpen Warning Fix",
