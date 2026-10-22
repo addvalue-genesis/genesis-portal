@@ -12,6 +12,9 @@ import {selectBcB5HistoricalPriceBridge0553} from "./data/bcB5HistoricalPriceBri
 // Source authority remains bcTurnkeyWorkingCost0553, VDRL register and vendor evidence.
 const ROOT="bid.budget.working.bc.";
 const fmt=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
+// Historical Rev05 THB/MH inputs have 3 decimal places; preserve their exact
+// stated rate in the AUDIT view. Do not use this to calculate current B2 cost.
+const fmtHistoricalRate=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:3,maximumFractionDigits:3}):"NOT ESTABLISHED";
 const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:2}):"NOT ESTABLISHED";
 const categories=Object.freeze({
  B2:["engineering","Documentation / VDRL"],
@@ -141,7 +144,7 @@ function Pricing({row}){
      ["Telecom Engineer",137.5],
      ["CAD / Telecom Drafter",116.625],
      ["Document Controller",104.125]
-    ].map(([role,rate])=><tr key={role}><td>{role}</td><td>{fmt(rate)}</td>
+    ].map(([role,rate])=><tr key={role}><td>{role}</td><td>{fmtHistoricalRate(rate)}</td>
      <td>NOT ESTABLISHED</td><td>NOT ESTABLISHED</td></tr>)}</tbody>
    </table></div>
    <p className="p55-note">Rev04 bounded cost proxy THB202,717.25–208,217.25
