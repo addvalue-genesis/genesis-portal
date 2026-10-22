@@ -23,8 +23,8 @@ const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 assert.equal(m.moduleId,"bid.budget.working.bc.b3.worktype-accordion");
 assert.equal(m.groups.length,4);
 assert.deepEqual(m.groups.map(x=>x.number),["B3.1","B3.2","B3.3","B3.4"]);
-assert.deepEqual(m.groups.map(x=>x.workingSellTHB),[704525,1663200,30000,0]);
-assert.equal(m.totalWorkingSellTHB,2397725);
+assert.deepEqual(m.groups.map(x=>x.workingSellTHB),[729725,1839600,30000,0]);
+assert.equal(m.totalWorkingSellTHB,2599325);
 assert.equal(m.totalWorkingSellTHB,b3.workingSellTHB);
 assert.equal(m.supplierFatReferenceUSD,7500);
 assert.equal(m.supplierFatReferenceTHB,236250);
@@ -37,7 +37,7 @@ assert.deepEqual(m.groups.map(x=>x.items.length),[2,3,2,5],
 assert.equal(new Set(rows.map(x=>x.moduleId)).size,12);
 assert.equal(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length,5);
 assert.equal(round(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass))
- .reduce((n,x)=>n+x.workingSellTHB,0)),2397725);
+ .reduce((n,x)=>n+x.workingSellTHB,0)),2599325);
 for(const r of rows){
  assert.equal(r.workingSellTHB===null,![CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(r.priceClass),
   "Non-posting module cannot carry included Working SELL "+r.moduleId);
@@ -56,14 +56,14 @@ assert(integrated.status.includes("NOT ISSUED"));
 assert(m.groups[3].items.includes(integrated),"Seven-day training proposal belongs in B3.4 Audit/Scenario");
 assert(!m.groups[0].items.includes(integrated),"Scenario not a current B3.1 FAT quote item");
 const witness=rows.find(x=>x.moduleId.endsWith(".revk-china-budget"));
-assert.equal(witness.workingSellTHB,397400);
+assert.equal(witness.workingSellTHB,422600);
 const historical=rows.find(x=>x.moduleId.endsWith(".fat-owner-transfer"));
 assert.equal(historical.historicalTHB,144000);
 assert(m.groups[3].items.includes(historical),"Historical FAT must be grouped under B3.4 audit");
 assert(!m.groups[0].items.includes(historical),"Historical FAT no longer belongs in priced B3.1 FAT");
 assert.equal(historical.workingSellTHB,null);
 const audit=rows.find(x=>x.moduleId.endsWith(".working-sell-breakdown"));
-assert.equal(audit.referenceTHB,2397725);
+assert.equal(audit.referenceTHB,2599325);
 assert.equal(audit.workingSellTHB,null);
 const sat=rows.find(x=>x.moduleId.endsWith(".40-day-abc"));
 assert.equal(sat.qty,56);
@@ -79,7 +79,7 @@ assert(content.includes("<table")&&content.includes("p553-b3-hierarchical-table"
  "Price hierarchy must be a table, not a list of source cards");
 for(const tag of ["MGW Quote USD","MGW Source THB","Historical / Scenario / Audit THB",
  "B3 Working SELL THB","Treatment / Owner","Expand All","Collapse All",
- "397,400.00","1,411,200.00","30,000.00","252,000.00","2,397,725.00","236,250.00",
+ "422,600.00","1,587,600.00","30,000.00","252,000.00","2,599,325.00","236,250.00",
  "7,500.00","144,000.00","307,125.00","5,000.00","2,500.00","NON-POSTING","IC-FAT-STAFF-001"]){
  assert(content.includes(tag),"Price table missing "+tag);
 }
@@ -106,4 +106,4 @@ for(const row of m.groups){
   "Navigator missing child "+child.moduleId);
 }
 assert.equal(JSON.stringify(working()),snapshot,"B3 price summary UI changed 10.2 sources");
-console.log("PASS 0553 B3 priced HIERARCHY TABLE / historical + scenario in B3.4 Audit only: FAT 704525 (= MGW 307125 + Witness 397400) + SAT 1411200 + Survey 252000 + tools 30000 + audit NONPOST = 2397725; purchased MGW USD7500/THB236250 at 20+5+5 into selected THB307125; historical Bangkok THB144000, audit mirror THB2750525 all NONADDITIVE. 4 parent + 12 child IDs; same table columns; no cost mutation.");
+console.log("PASS 0553 B3 priced HIERARCHY TABLE / historical + scenario in B3.4 Audit only: FAT 729725 (= MGW 307125 + Witness 422600) + SAT 1587600 + Survey 252000 + tools 30000 + audit NONPOST = 2599325; purchased MGW USD7500/THB236250 at 20+5+5 into selected THB307125; historical Bangkok THB144000, audit mirror THB2750525 all NONADDITIVE. 4 parent + 12 child IDs; same table columns; no cost mutation.");
