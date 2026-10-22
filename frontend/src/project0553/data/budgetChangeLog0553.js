@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R23";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R24";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-12",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"RACON quotation cost identity and 132-stage build validation diagnostic",
+  detail:"Current MR0004 installed Part A MGW P26-058_R2 RACON-1 USD75059/unit is separated from superseded MDS/ORGA QTORG2609244 USD75000 FCA comparator; no quote-price replacement, cross-credit or vendor scope inheritance. C1 management-selected 1 LS budgetary nonposting remains historical ORGA USD75000 x FX31.50=THB2362500 with OEM spare equivalence unverified; MGW equipment is USD75059 x FX31.50=THB2364358.50 comparison ONLY. Correct 10.2 annex vendor labels and spare engineering test. Reconcile stale Part B THB4187590.69 assertions across spare obligations, spare coverage, spare customer schedule and B5 equation tests to controlled THB4385436.82; no Working SELL changes. Add independent sequential validate:0553-build-diagnostics with --from support and full local TEMP log, so remaining validation failures can be collected in ONE pass without altering npm run build. PR Draft / Customer Release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.bom.mr0004","bid.budget.working.bc","bid.budget.working.bc.b10","bid.budget.working.bc.b11","bid.budget.working.bc.b13","bid.budget.working.bc.c1"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"User Windows 2026-10-22 spare-engineering AssertionError 75059 !== 75000 / MGW P26-058_R2 RACON-1 / MDS-ORGA QTORG2609244 / existing current canonical B/C"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-11",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"Fix B2 Independent First-Principles No-Backsolve Test Comment False Positive",
