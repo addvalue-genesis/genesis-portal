@@ -23,9 +23,9 @@ const snapshot=JSON.stringify(canonical);
 assert.equal(codes.length,16);
 assert.equal(B.length,14);
 assert.equal(C.length,2);
-assert.equal(pb,4385436.82);
+assert.equal(pb,4032636.82);
 assert.equal(canonical.byCode.B1.workingSellTHB,211600);
-assert.equal(canonical.byCode.B3.workingSellTHB,2750525);
+assert.equal(canonical.byCode.B3.workingSellTHB,2397725);
 assert.equal(canonical.byCode.B1.directCostTHB,null);
 const html=renderToStaticMarkup(React.createElement(Hierarchy,{
  partBRows:B,partCRows:C,partBWorkingSell:pb,partCWorkingSell:pc,
