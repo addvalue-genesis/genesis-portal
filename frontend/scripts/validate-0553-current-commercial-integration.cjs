@@ -34,6 +34,21 @@ for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2599325,B8:
  assert.equal(by[code].directCostTHB,null,"Unverified direct cost posted to "+code);
 }
 assert.equal(budget.knownWorkingSellTHB,4328914.13);
+ // EXISTING B10/B11/B13/C1/C2: same 10.2/10.5/10.3 owner IDs, no Rev08 price.
+ const expectedCandidates={B10:30,B11:7,B13:5,C1:4,C2:4};
+ for(const [code,required] of Object.entries(expectedCandidates)){
+  assert.equal(by[code].workingSellTHB,null,"Old Working SELL leaked into "+code);
+  assert.equal(scope.lines[code].workingSellTHB,null,"Old Scope Price leaked into "+code);
+  const annex=release.annexModels[code];
+  assert.equal(annex.requirementCount,required,"Current OEM candidate scope incomplete "+code);
+  assert.equal(annex.rows.length,0,"Unpriced technical candidates must not be customer quote rows "+code);
+  assert.equal(annex.selectedWorkingTHB,null);
+  assert.equal(annex.customerReleaseAllowed,false);
+  assert.equal(code.startsWith("B")
+   ?release.b.find(x=>x.code===code).customerSellTHB
+   :release.c.find(x=>x.code===code).customerSellTHB,null);
+ }
+
 assert.equal(abc.partBBaseTHB,budget.knownWorkingSellTHB);
 assert.equal(abc.currentB1B3B9BaseTHB,3291475); // current B1 211600 + B3 2599325 + B9 480550
 assert.equal(abc.postedWorkingSellDeltaTHB,0);
