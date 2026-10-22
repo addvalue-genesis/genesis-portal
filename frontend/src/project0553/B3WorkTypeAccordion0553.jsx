@@ -3,6 +3,8 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {B3WorkingSellBreakdown0553} from "./B3WorkingSellBreakdown0553";
 import {B3RequirementWbsTrace0553} from "./B3RequirementWbsTrace0553";
 import {B3SiteMrSatCoverage0553} from "./B3SiteMrSatCoverage0553";
+import {B3SurveySatExecutionPlan0553} from "./B3SurveySatExecutionPlan0553";
+import {selectB3SurveySatExecutionPlan0553} from "./data/b3SurveySatExecutionPlan0553";
 import {B9ChinaBudgetDetail0553} from "./B9ChinaBudgetDetail0553";
 import {MgwR2CommercialCover0553} from "./MgwR2CommercialCover0553";
 import {MgwPaulVendorClarifications0553} from "./MgwPaulVendorClarifications0553";
@@ -116,7 +118,10 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
   case "40-day-abc":
    return <section className="p55-panel" data-component-key={ROOT+".40-day-abc"}
     style={{padding:12,marginTop:12}}>
-    <h4>B3.2.1 — 40-Day Offshore SAT/SIT Working SELL</h4>
+    <B3SurveySatExecutionPlan0553 workingRow={workingRow} compact/>
+    <details className="p55-panel" style={{padding:10,marginTop:12}}>
+     <summary><strong>ดูตารางราคา SAT เดิม 40 วัน / 80 MD (Price Baseline — ไม่ใช่แผนปฏิบัติงาน)</strong></summary>
+    <h4>B3.2.1 — 40-Day Offshore SAT/SIT Working SELL (Retained Price Basis)</h4>
     <p className="p55-note">{sat.persons} engineers × {sat.workdays} team-days =
      {" "}{sat.personDays} paid person-days × USD {sat.rateUSDPerPersonDay}/person-day
      × FX {sat.fxTHBPerUSD} = <strong>{money(sat.laborWorkingSellTHB)}</strong>.
@@ -130,6 +135,7 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
       <td>{x.days}</td><td>{x.plannedPersonDays}</td>
       <td>{money(x.workingSellTHB)}</td><td>B3 once, shared MR workload</td></tr>)}</tbody>
     </table></div>
+    </details>
    </section>;
   case "site-mr-sat-matrix":
    return <B3SiteMrSatCoverage0553 workingRow={workingRow}/>;
@@ -176,6 +182,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
  const b8Row=selectBcTurnkeyWorkingCost0553().byCode.B8;
  const integratedScenario=selectB3B8SevenDayCommercialAllocation0553({b3:workingRow,b8:b8Row});
  const model=selectB3HierarchicalPriceTable0553(workingRow,integratedScenario);
+ const fieldPlan=selectB3SurveySatExecutionPlan0553(workingRow);
  const expandAll=open=>rootRef.current?.querySelectorAll(
   "details.p553-b3-table-group, details.p553-b3-table-item").forEach(node=>{node.open=open;});
  return <section className="p553-b3-worktype p553-b3-price-table-section"
@@ -192,8 +199,9 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
      old Bangkok FAT is HISTORICAL. Direct Cost NOT ESTABLISHED · RELEASE HOLD.</p>
     <p className="p55-note"><strong>Inspection / Site Survey / FAT / SAT:</strong> pre-SAT Site Survey
      covers {workingRow.b3SiteSurveyScope?.locations??0} project locations as B3 scope,
-     but physical survey crew, journey and separate Working SELL are NOT ESTABLISHED.
-     The selected offshore 40-day SAT timeboxes cannot be reused as extra survey days;
+     with 7 site field-days + 2 travel days for 2 people as a new nonposting planning assumption.
+     Survey labour reference {money(fieldPlan.survey.planningLabourSellReferenceTHB)} is NOT verified COST or accepted Working SELL;
+     the latest SAT field plan is 28 productive + 2 risk Team-days / 60 MD, while the old 40-day price basis is retained;
      B1 design review and B2 report control are not duplicate B3 survey charges.</p>
    </div>
    <div className="p553-b3-actions">
@@ -215,6 +223,13 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
         {copyInSummary(group.moduleId)}
        </summary>
        <div className="p553-b3-table-children">
+        {group.kind==="sat"&&<p className="p55-note">
+         <strong>Latest Plan: Site Survey 2 people × {fieldPlan.survey.totalTeamDays} team-days
+          (7 field + 2 travel) + SAT 2 people × {fieldPlan.sat.executionTeamDays} team-days
+          (28 productive + 2 risk) = {fieldPlan.sat.executionPersonDays} SAT MD.</strong>
+         {" "}Old 40-day / 80-MD Working SELL is a retained price source, not the field execution duration.
+         Survey labour budget {money(fieldPlan.survey.planningLabourSellReferenceTHB)} is PROPOSED ONLY — NOT POSTED.
+        </p>}
         <table className="p55-table p553-b3-hierarchical-table p553-b3-subtable">
          <thead><tr>{gridColumns.map(name=><th key={name}>{name}</th>)}</tr></thead>
          <tbody>{group.items.map(item=><tr key={item.moduleId}
