@@ -176,13 +176,24 @@ function Pricing({row}){
     no automatic reassessment of selected SELL and no duplicate OEM packing.</p>
   </section>}
   {code==="B6"&&<section className="p55-panel" style={{padding:12}}>
-   <h4>B6 — Transportation Working SELL Source</h4>
+   <h4>B6 — Transportation Working SELL / Proposed DAP JUTAL Zhuhai Yard</h4>
    <p className="p55-note">{fmt(total)} is a Rev08 transportation Working SELL reference
     converted using internal planning FX 31.5, <strong>NOT a quotation from MGW</strong>
     or a shipment-level rate. Supplier USD2500 Nantong→JUTAL road freight is contained
     ONCE in the 20-Oct MGW cover; it must be reconciled with the B6 cost owner,
     supplier packing USD500, delivery terms, and original equipment A inclusion.
     There is no approved allocation of the B6 Working SELL to four MR cargo legs.</p>
+    <p className="p55-note"><strong>Selected Pre-award DAP Planning Basis:</strong>
+    {" "}{row.b6FourMrRoutingEvidence?.dapCommercialPlanning?.proposedDeliveryTerm}.
+    The B6 budgetary Working SELL remains <strong>{fmt(total)}</strong>, with
+    MGW SERV-5 Road Freight USD2,500 only a supplier quote for the outbound
+    China leg. Contract Article 8.1 is still DDP and JUTAL CCL Item12 previously
+    accepted offshore CIF. <strong>DAP is a proposed clarification, NOT
+    JUTAL/MGW accepted commercial terms.</strong> Import duties, import VAT,
+    Chinese domestic sales VAT, bonded status and customs-broker cost are
+    unverified and no 13% VAT reduction has been assumed. MGW receiving,
+    NextG inbound Nantong reroute, four-MR cargo manifest and packing USD500
+    overlap need price reconciliation; no Direct COST or Release posting.</p>
    <p className="p55-note"><strong>OWNER-APPROVED B6 Physical Routing (ADR-68 · 22-Oct-2026):</strong>
     NextG <strong>IDU 4 + ODU 4 + ALL 5 Greenfield Antennas</strong> to MGW Nantong
     directly; Thailand receives <strong>Enclosure + Cisco 4 sets</strong>, performs
