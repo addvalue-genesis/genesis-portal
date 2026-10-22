@@ -73,7 +73,7 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
     <th>Man-days</th><th>ทำงานอะไร</th><th>Working SELL Reference</th></tr></thead>
    <tbody>{sat.rows.map(r=><tr key={r.id}
     data-component-key={compact?undefined:ROOT+".sat."+r.id.toLowerCase()}>
-    <td>{r.sequence} · {r.wbs}<small>{r.id}</small></td>
+    <td><strong>{r.relativeWorkdayLabel}</strong><small>{r.wbs} · {r.id}</small></td>
     <td><strong>{r.site}</strong><small>{r.systemNames.join(", ")||r.mrs.join(", ")}</small></td>
     <td>{r.crew}</td><td><strong>{r.productiveTeamDays}</strong></td>
     <td>{r.productivePersonDays}</td>
@@ -84,7 +84,7 @@ export function B3SurveySatExecutionPlan0553({workingRow,compact=false}){
     <tr><th colSpan={3}>SAT + SIT + Punch</th><th>{sat.productiveTeamDays}</th><th>{sat.productivePersonDays}</th>
      <th>2-person team / 21 Test IDs retained</th>
      <th>{money(sat.productiveTeamDays*sat.planningRateTHBPerTeamDay)} scenario</th></tr>
-    <tr><th colSpan={3}>Central Risk reserve (not per-site)</th><th>+ {sat.riskTeamDays}</th>
+    <tr><th colSpan={3}>Central Risk reserve (SAT D29–D30 if triggered)</th><th>+ {sat.riskTeamDays}</th>
      <th>+ {sat.riskPersonDays}</th><th>Retest/access/ITP witness only if required</th>
      <th>{money(sat.riskTeamDays*sat.planningRateTHBPerTeamDay)} scenario</th></tr>
     <tr><th colSpan={3}>SAT Planned with Risk</th><th>{sat.executionTeamDays}</th><th>{sat.executionPersonDays}</th>
