@@ -6,6 +6,7 @@
 // no second standard B 5% deduction against the purchased-service increment.
 import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
 import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
+import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
 
 export const RELEASE_POLICY_0553=Object.freeze({
@@ -218,6 +219,20 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  const b=bc.rows.filter(r=>r.code.startsWith("B")).map(r=>{
   const price=priceBWorkingSell0553(r.workingSellTHB,r.directCostTHB,
    r.code==="B3"?r.b3MgwPurchasedFatWorkingSell:null);
+  const b3Source=r.code==="B3"?selectB3ResourcePriceDossier0553(r):null;
+  if(b3Source&&(b3Source.rollupTotalTHB!==r.workingSellTHB||
+    b3Source.rollupTotalTHB!==price?.customerSellTHB))
+   throw Error("10.3 B3 GROUP Source→Release parity failed");
+  const b3GroupTrace=b3Source?Object.freeze(b3Source.groupRollups.map(g=>Object.freeze({
+   id:g.id,sourceModuleId:g.id,workingSellId:"WS-B3",
+   scopeId:"SOW-B3",customerProposalId:"CP-B3",
+   groupKey:g.key,name:g.name,workingSellTHB:g.selectedWorkingSellTHB,
+   customerPreviewAttributionTHB:g.selectedWorkingSellTHB,
+   postingAllowed:false,additionalCustomerLineAllowed:false,
+   independentCustomerReleaseApproved:false,approved:false,
+   status:g.state,approvalGate:g.approval,
+   verifiedDirectCostTHB:null
+  }))):null;
   return {code:r.code,description:r.requirement,sourceModuleId:r.moduleId,
    qty:1,unit:"lot",workingSellTHB:r.workingSellTHB,
    customerSellTHB:price?.customerSellTHB??null,
@@ -238,6 +253,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    conditionalOptionStatus:r.code==="B9"?
     "ONE_LS_QUOTED_IN_BASE__EXECUTION_ON_WRITTEN_CALL_OUT__NONADDITIVE":null,
    conditionalOptionIncludedInBase:r.code==="B9"?true:null,
+   b3GroupTrace,groupAttributionOnly:Boolean(b3Source),
    costComplete:n(r.directCostTHB),releaseAllowed:false,
    sourceStatus:r.priceStatus,workingSellBasis:r.workingSellBasis};
  });
