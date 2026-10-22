@@ -50,6 +50,17 @@ for(const [site,row] of Object.entries(rows)){
  const a=mto.itemRows.find(r=>r.sourceRowIndex===row&&r.platform===site);
  assert(a&&a.sourcePartText==="Bulk Material");
 }
+for(const [site,roles] of Object.entries({
+ ZWP20:["TCAB-508-002","TCAB-508-001"],
+ ZWP21:["TCAB-508-001","TCAB-508-002"],
+ ZWP22:["TCAB-508-001","TCAB-508-002"]})){
+ const mr2=matrix.groups.find(g=>g.site===site&&g.mr==="MR-0002");
+ assert.equal(mr2.mr0002OriginalAfcLnaTag,roles[0]);
+ assert.equal(mr2.mr0002OriginalAfcSurgeTag,roles[1]);
+ assert.equal(mr2.mr0002SelectedBdaAfcApproved,false);
+ assert(mr2.openEvidenceGates.includes("MGW_BDA_REPLACES_AFC_LNA__UPDATED_GA_BLD_EX_DEVIATION_HOLD"));
+ assert.equal(mr2.internalSchematic.pricingAuthority,false);
+}
 for(const mr of ["MR-0002","MR-0003","MR-0004"]){
  const pairs=matrix.groups.filter(x=>x.mr===mr);
  assert(pairs.every(x=>x.selectedQuoteId===mgw.id));
