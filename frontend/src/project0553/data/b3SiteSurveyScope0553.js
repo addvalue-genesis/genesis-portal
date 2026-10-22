@@ -11,7 +11,7 @@ export function selectB3SiteSurveyScope0553(){
   purpose:site==="ZPQ"||site==="ZWP8"||site==="ZWP11"?
    "Brownfield existing-asset/IDU/Cisco interface, rack/earthing/cable path verification":
    "Greenfield layout, access, network/RF interfaces, hazardous-area and cable route readiness",
-  activityOwner:"B3_TECHNICAL_SITE_REVIEW__PHYSICAL_VISIT_CONDITIONAL",reportOwner:"B2_VDRL_FINAL_DOCUMENT_CONTROL_ONLY",
+  activityOwner:"B3_FIELD_SURVEY_SOW",reportOwner:"B2_VDRL_FINAL_DOCUMENT_CONTROL_ONLY",
   siteClass:site==="ZPQ"||site==="ZWP8"||site==="ZWP11"?"BF":"GF",
   oldBodSurveyResultsExist:site==="ZPQ"||site==="ZWP8"||site==="ZWP11",
   newPhysicalVisitApproved:false,newPhysicalVisitRequired:null,
