@@ -73,7 +73,19 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   verifiedRateType:"USER_OR_ESTIMATOR_WORKING_SELL_ALLOWANCE",
   stageAllocationConfirmed:true
  }));
- const mgwLines=mgw.quoteLines.map(q=>make("mgw-vendor",q.serviceId.toLowerCase(),{
+ const onshoreFatPaidRoleTrace=freeze([
+  freeze({id:"B3-FAT-SR",role:"Senior Telecom Systems Integration Engineer",
+   onsiteMD:6,travelMD:2,usdPerMD:700,rateTHBPerMD:22050,
+   workingSellTHB:176400,directCostTHB:null}),
+  freeze({id:"B3-FAT-PM",role:"PM / Chief Engineer — provisional standard USD600 (not unbilled Field standby)",
+   onsiteMD:6,travelMD:2,usdPerMD:600,rateTHBPerMD:18900,
+   workingSellTHB:151200,directCostTHB:null})
+ ]);
+ if(round(onshoreFatPaidRoleTrace.reduce((n,x)=>n+x.workingSellTHB,0))!==327600||
+    fatRows.find(x=>x.id==="B3-FAT-STAFF")?.workingSellTHB!==245700||
+    fatRows.find(x=>x.id==="B3-TRAVEL-DAYS")?.workingSellTHB!==81900)
+  throw Error("B3 China FAT paid role rate-to-source bridge missing");
+  const mgwLines=mgw.quoteLines.map(q=>make("mgw-vendor",q.serviceId.toLowerCase(),{
   group:"MGW_PURCHASED_FAT",site:mgw.policy.executionLocation,wbs:"K01",
   work:q.description,role:"MGW service / facility",people:null,teamDays:null,
   qty:q.qty,unit:q.unit,rateUSDPerUnit:q.quotedUnitUSD,
@@ -200,7 +212,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    workingSellTHB:null,directCostTHB:null,illustrativeOnlyTHB:round(2*satSelected.satTeamDaySellTHB),
    status:"RISK_ALLOWANCE__NOT_INCLUDED_BASE__APPROVAL_GATE"}),
   freeze({id:"SAT-MANAGEMENT-RESERVE-2D",name:"Management reserve",teamDays:2,people:2,personDays:4,
-   workingSellTHB:null,directCostTHB:null,illustrativeOnlyTHB:round(4*rateTHB),
+   workingSellTHB:null,directCostTHB:null,illustrativeOnlyTHB:round(2*satSelected.satTeamDaySellTHB),
    status:"NONPOSTING_MANAGEMENT_RESERVE__SEPARATE_APPROVAL"})
  ]);
  // Presentation hierarchy is a controlled, non-additive bridge over the same
@@ -270,7 +282,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   moduleId:root,ownerModuleId:workingRow.moduleId,
   groupNames:freeze(["MGW Purchased FAT","ADDVALUE FAT witness","Selected SAT 28d priced resource roles",
    "VeEX Rental","Selected BF survey working budget","GF Yard SAT","GF Offshore commissioning","SIT/Punch Gate"]),
-  groups:stageGroups,groupRollups,rollupTotalTHB,
+  groups:stageGroups,groupRollups,rollupTotalTHB,onshoreFatPaidRoleTrace,
   groupAttributionOnly:true,groupIndependentCostPostingAllowed:false,
   pricedGroupCount:priced.length,
   priceRowCount:mgwLines.length+fatLines.length+satLines.length+rental.length+bfLines.length+bfTripLines.length,
