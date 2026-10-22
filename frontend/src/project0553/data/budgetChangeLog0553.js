@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R22";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R23";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-11",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"Fix B2 Independent First-Principles No-Backsolve Test Comment False Positive",
+  detail:"The Windows npm build B2 independent recalculation check failed because modelSrc.includes('580,000') matched ONLY the source comment stating that the legacy Rev05 THB580000 SELL is not an input. Test now excludes comment-only lines before checking quoted-price numerical literals in executable model code, asserts hasQuotedWorkingSellReference false and verifies changing employer load changes the independent scenario SELL. B2 131 WO, original 143 VDRL rows, selected B2 Working SELL THB237121.13, historical quote reference THB580000, actual Direct Cost NULL and Customer Release HOLD unchanged. No code path repriced or user-facing price changed.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b2.independent-recalculation","bid.budget.working.bc.b2.price-overview","bid.budget.working.bc.b2"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"2026-10-22 Windows Node.js 24.21.0 validate-0553-b2-independent-recalculation.cjs line72 AssertionError"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-10",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"B2 Rev05 Original Price Evidence Nested SSR Ownership Test Repair",
