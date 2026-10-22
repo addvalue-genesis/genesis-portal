@@ -13,7 +13,7 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
  const ids=new Set(source.map(r=>r.id));
  const purchased=b3.b3MgwPurchasedFatWorkingSell;
  if(source.length!==8||ids.size!==8||china.fatWorkingSellTHB!==422600||
-  b3.workingSellTHB!==2599325||b8.workingSellTHB!==216650||b8.qtyDriver!==1||
+  b3.workingSellTHB!==2599325||b8.workingSellTHB!==131550||b8.qtyDriver!==1||
   purchased?.selectedIncrementalWorkingSellTHB!==307125||
   purchased?.vendorPurchasedQuoteTHB!==236250)
   throw Error("Source has changed: review six-day B3/B8 and SERV-2/4 before reallocation");

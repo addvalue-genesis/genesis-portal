@@ -15,7 +15,7 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
  const src=id=>{const v=rows.find(r=>r.id==="B3-"+id);
   if(!v)throw Error("Missing current B3 source expense "+id);return v;};
  const staff=src("FAT-STAFF"),travel=src("TRAVEL-DAYS"),hotel=src("HOTEL");
- if(b3.workingSellTHB!==2599325||b8.workingSellTHB!==216650||
+ if(b3.workingSellTHB!==2599325||b8.workingSellTHB!==131550||
   b3.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB!==307125||
   fat.fatWorkingSellTHB!==422600||rows.length!==8||
   rate.usdPerPersonDay!==600||rate.thbPerUsd!==31.5||
@@ -58,8 +58,8 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   trainingAssignedSellTHB!==37800||newB3FatSellTHB!==427600||
   newGrossFatTrainingTripSellTHB!==465400||
   newB3OverallSellTHB!==2604325||newB8OverallSellTHB!==37800||
-  oldCombined!==2815975||newCombined!==2642125||
-  round(newCombined-oldCombined)!==-173850||
+  oldCombined!==2730875||newCombined!==2642125||
+  round(newCombined-oldCombined)!==-88750||
   b3.directCostTHB!==null||b8.directCostTHB!==null)
   throw Error("B3/B8 7-day allocation math / no-extra-travel / no-double-count failed");
  return Object.freeze({
