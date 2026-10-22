@@ -13,6 +13,14 @@ export function MR0002RfRouteReconciliation0553({site}){
   <p className="p55-note"><strong>Engineering source:</strong> {data.layoutDocument}, Sheet {data.layoutSheet} locates the four TAGs, but does NOT give routed cable metres.
    BLD C1 is a functional system diagram, NOT accepted WIR/TER.
    MR0002 C1 requires a 1 Lot BULK scope per site including fire-resistant coaxial cable and grounding.</p>
+  <p className="p55-note"><strong>AFC LAY role-identity review (DO NOT SWAP TAGs):</strong>
+   {site}: <strong>{data.afcSurgeEnclosureTag}</strong> = Ex d RF SURGE; <strong>{data.afcLnaEnclosureTag}</strong> = original AFC LNA.
+   <strong>RFI BDA is SELECTED for our budgetary design at the original LNA position.</strong>
+   Antenna locations remain unchanged; this is NOT an approved client technical deviation or measured cable schedule.
+   <strong> {data.engineeringChange}</strong>. OEM mechanical/Ex compatibility and formal customer clarification remain open.</p>
+  <p className="p55-note"><strong>Current selected Working Design:</strong> LNA → RFI BDA ONLY at unchanged location; donor Yagi and service Omni positions unchanged.
+   <strong> Historical Deviation 1.1 Rev00 remains {data.deviationStatus.toUpperCase()}:</strong> it also proposed YBSS6 at EL +21.100m and Omni beneath Lower Deck at EL +18.300m, but those antenna changes are NOT adopted in our current design.
+   Budget route proxy is indicative for original positions only; the real cable length is still pending WIR/TER.</p>
   <div className="p55-table-wrap p553-module-scroll">
    <table className="p55-table p55-table--compact">
     <thead><tr><th>Physical RF function / ID</th><th>From → To</th><th>AFC installed length</th><th>Budget reference installed</th><th>Budget reference buy (+15%)</th><th>Evidence / Cost Owner</th></tr></thead>
@@ -34,9 +42,9 @@ export function MR0002RfRouteReconciliation0553({site}){
       <td>MGW complete system includes functional installed RF feeder; verify reel/cut allocation, IEC60331 and RF interfaces. Any cable shortage is MGW corrective scope.</td><td>VENDOR INCLUDED · complete-system owner</td></tr>
      <tr><td><strong>ADDVALUE / NEK — Conditional BULK Spare Reserve</strong></td><td><strong>NOT APPROVED</strong><small>Independent spare/installation contingency quantity; NOT net installation length</small></td><td>NOT APPROVED</td>
       <td>Internal spare for cutting/handling damage or contingency only if management approves; does not replace MGW installation obligation and is distinct from B10/C2 spares</td><td>NO APPROVED QTY / RATE / WORKING POST</td></tr>
-     <tr><td><strong>Scenario: 2 provisional RF paths</strong></td>
+     <tr><td><strong>Same-location budget sensitivity — NOT measured route</strong></td>
       <td>{data.scenario.referenceTotalPurchaseM} m total illustrative</td><td>At least 4 main terminal ends (not a final connector count)</td>
-      <td>~{fmt(data.scenario.referenceTotalInstalledM)} m illustrative installed MGW functional scope, 2 × {data.scenario.referenceMPerCircuit}m +15%. Not a request for ADDVALUE to buy NEK; reserve sizing is an INDEPENDENT decision.</td>
+      <td>~{fmt(data.scenario.referenceTotalInstalledM)} m indicative route proxy with equipment/antenna positions UNCHANGED, 2 × {data.scenario.referenceMPerCircuit}m +15%. Not a measured installation route, signed cable schedule or ADDVALUE NEK purchase.</td>
       <td>ILLUSTRATIVE ONLY · no booking</td></tr>
     </tbody>
    </table>

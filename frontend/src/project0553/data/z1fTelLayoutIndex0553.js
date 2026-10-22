@@ -20,8 +20,8 @@ export const Z1F_TEL_LAYOUT_INDEX_0553=Object.freeze({
     {tag:"ANT-502-001",system:"SCADA_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"SCADA parabolic antenna"},
     {tag:"ANT-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"Outdoor Yagi antenna"},
     {tag:"ANT-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"Outdoor omni antenna"},
-    {tag:"TCAB-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"RF low noise amplifier enclosure"},
-    {tag:"TCAB-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"RF surge Ex d enclosure"},
+    {tag:"TCAB-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"RF surge Ex d enclosure",functionRole:"RF_SURGE_EXD"},
+    {tag:"TCAB-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:4,description:"RF low noise amplifier enclosure (legacy AFC)",functionRole:"LEGACY_LNA_ENCLOSURE"},
     {tag:"LSE-504-001",system:"EX_SOUNDER_NOT_IP_PHONE",deck:"LOWER",sheet:5,description:"Outdoor Ex sounder"}
    ],
    indoor:{place:"E&I Room on Lower Deck",sheet:5,reference:"MM-ZTK-1F-ZWPX-ELE-LAY-0002",roomEquipmentLocations:"REFERENCED_ELSEWHERE"},
@@ -34,8 +34,8 @@ export const Z1F_TEL_LAYOUT_INDEX_0553=Object.freeze({
     {tag:"TCAB-514-002",system:"MARINE_RACON",deck:"UPPER",sheet:6},
     {tag:"ANT-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:7},
     {tag:"ANT-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:7},
-    {tag:"TCAB-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:7},
-    {tag:"TCAB-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:7},
+    {tag:"TCAB-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:7,description:"RF low noise amplifier enclosure (legacy AFC)",functionRole:"LEGACY_LNA_ENCLOSURE"},
+    {tag:"TCAB-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:7,description:"RF surge Ex d enclosure",functionRole:"RF_SURGE_EXD"},
     {tag:"MR-502-001",system:"SCADA_RADIO",deck:"LOWER",sheet:8},
     {tag:"ANT-502-001",system:"SCADA_RADIO",deck:"LOWER",sheet:8},
     {tag:"LSE-504-001",system:"EX_SOUNDER_NOT_IP_PHONE",deck:"LOWER",sheet:8}
@@ -49,8 +49,8 @@ export const Z1F_TEL_LAYOUT_INDEX_0553=Object.freeze({
     {tag:"ANT-502-001",system:"SCADA_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:10},
     {tag:"ANT-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:10},
     {tag:"ANT-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:10},
-    {tag:"TCAB-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:10},
-    {tag:"TCAB-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:10},
+    {tag:"TCAB-508-001",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:10,description:"RF low noise amplifier enclosure (legacy AFC)",functionRole:"LEGACY_LNA_ENCLOSURE"},
+    {tag:"TCAB-508-002",system:"DTRS_TRUNK_RADIO",deck:"MEZZANINE_EI_ROOFTOP",sheet:10,description:"RF surge Ex d enclosure",functionRole:"RF_SURGE_EXD"},
     {tag:"LSE-504-001",system:"EX_SOUNDER_NOT_IP_PHONE",deck:"LOWER",sheet:11}
    ]},
   {wp:"ZWP23",sheets:{mezzanine:12,lower:13},equipment:[
@@ -59,5 +59,11 @@ export const Z1F_TEL_LAYOUT_INDEX_0553=Object.freeze({
     {tag:"ANT-502-001",system:"SCADA_RADIO",deck:"LOWER",sheet:13,note:"Duplicate tag appears on lower deck sheet; do not count second antenna without resolving GA/MTO revision"}
    ]}
  ],
+ sourceRoleExceptions:Object.freeze({
+  ZWP20:"AFC LAY Rev.C1 Drawing Sheet 4 / PDF page 6 has TCAB-508-001 RF SURGE Exd and TCAB-508-002 legacy RF LNA; this differs from W21/W22",
+  ZWP21:"AFC LAY Rev.C1 Drawing Sheet 7 / PDF page 9 has TCAB-508-001 legacy RF LNA and TCAB-508-002 RF SURGE",
+  ZWP22:"AFC LAY Rev.C1 Drawing Sheet 10 / PDF page 12 has TCAB-508-001 legacy RF LNA and TCAB-508-002 RF SURGE"
+ }),
+ technicalChangeBoundary:"The customer AFC LAY/BLD specify original LNA. Selected MGW RFI BDA is a proposed equipment change; no automatic function/Ex/physical TAG assignment until approved GA, schematic, deviation and vendor interface drawing.",
  bulkRule:"Per unique physical cable: tagFrom → tagTo → path/deck → design length → allowance → selected SKU → unit rate → cost owner. Group by WP/system; no global 50m for all systems."
 });

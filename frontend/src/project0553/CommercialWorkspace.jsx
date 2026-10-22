@@ -19,6 +19,7 @@ import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
 import {selectBcOutstandingBudgetReferences0553} from "./data/bcOutstandingBudgetReferences0553";
 import { CommercialSystemBreakdown0553 } from "./CommercialSystemBreakdown";
 import { SimpleBom0553 } from "./SimpleBom0553";
+import {BulkSourceToReleaseAudit0553} from "./BulkSourceToReleaseAudit0553";
 import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
@@ -309,6 +310,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     Historical Working/Budgetary previews and unapproved SAT scenarios are NONPOSTING.
     Updated selected source values flow here on the next render; issuing a customer quote still needs approval.
    </p>
+   {recipient==="INTERNAL"&&<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>}
    {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
    <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} title="10.3 — Released Customer Output (Read-only staging)"/>
    <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
