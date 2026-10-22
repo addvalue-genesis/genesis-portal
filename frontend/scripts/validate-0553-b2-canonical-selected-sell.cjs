@@ -65,7 +65,9 @@ for(const [name,html] of [["B2 Module",b2Html],["B2 Price View",vm]]){
 }
 assert(b2Html.includes('data-component-key="bid.budget.working.bc.b2.quote-comparison"'));
 assert(b2Html.includes("SUPERSEDED"),"Old Rev05 price must be marked superseded");
-assert(all.includes("4,385,436.82"),"10.2 ALL Part B does not show new total");
+assert(all.includes("4,032,636.82"),"10.2 ALL Part B must show SAT28/BF5 revised total");
+assert.equal(source.byCode.B3.workingSellTHB,2397725,
+ "B2 price is unchanged, but B3 SAT28 drives the revised aggregate");
 assert(all.includes("237,121.13"),"10.2 ALL B2 row does not show reprice");
 const evidence=fs.readFileSync(path.join(root,"project0553/data/bcTurnkeyWorkingCost0553.js"),"utf8");
 assert(evidence.includes('Number.isFinite(b2RecalculatedSellTHB)?b2RecalculatedSellTHB:'),
