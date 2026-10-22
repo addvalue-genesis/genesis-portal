@@ -170,7 +170,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td>{x.tagNo}</td><td>{x.description}</td><td>{x.qty}</td><td>{thb(x.unitPriceTHB)}</td>
      <td>NOT DERIVED</td><td>NOT ESTABLISHED</td><td>{x.documentMandateStatus}<small>{x.verificationStatus}</small></td>
     </tr>)}</tbody></table></div>
-   <p className="p55-note"><strong>RACON compare:</strong> historical full-spare unit {thb(spareReconciliation.raconComparison.historicalUnitPriceTHB)} versus selected ORGA installed full-package FCA reference {thb(spareReconciliation.raconComparison.vendorPackageRateReferenceTHB)} (USD {spareReconciliation.raconComparison.vendorUnitPriceUSD}). Difference {thb(spareReconciliation.raconComparison.historicalVsPackageUnitDeltaTHB)} is a pricing-basis variance, NOT a saving or spare approval. Independent OEM spare price remains unquoted.</p>
+   <p className="p55-note"><strong>RACON compare — distinct vendor sources:</strong> Rev08 historical full-spare unit {thb(spareReconciliation.raconComparison.historicalUnitPriceTHB)} versus <strong>selected installed MGW R2 RACON-1</strong> {thb(spareReconciliation.raconComparison.vendorPackageRateReferenceTHB)} (USD {spareReconciliation.raconComparison.vendorUnitPriceUSD}). MDS/ORGA QTORG2609244 FCA <strong>USD {spareReconciliation.raconComparison.historicalAlternativeUnitUSD}</strong> is a separate historical alternative, not an MGW vendor price. Difference {thb(spareReconciliation.raconComparison.historicalVsPackageUnitDeltaTHB)} compares Rev08 against the MGW installed unit only; it is NOT an independent spare quote, saving or approval.</p>
   </details>}
   {["B10","B11","B13","C1","C2"].includes(code)&&<details className="p55-panel" style={{padding:12}}>
    <summary><strong>MR Attachment-5 Vendor Spare List — Documentary Completion Gate</strong> ({spareReconciliation.sourceSpecificationChecklist.length} evidence checks)</summary>
@@ -213,7 +213,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
      <td>{thb(spareReconciliation.selectedC1Option.budgetTotalTHB)}</td>
      <td>{spareReconciliation.selectedC1Option.leadTimeARO}</td>
     </tr></tbody></table></div>
-   <p className="p55-note"><strong>C1 selected equipment-reference budget:</strong> {thb(spareReconciliation.selectedC1Option.budgetTotalTHB)} · {spareReconciliation.selectedC1Option.source}. FCA factory reference, not DDP Purchaser's Yard; DDP uplift and final sell are not established. This is a separate option stock unit, not a duplicate charge for the installed Part A systems.</p>
+   <p className="p55-note"><strong>C1 management-selected BUDGETARY spare option (NONPOSTING):</strong> {thb(spareReconciliation.selectedC1Option.budgetTotalTHB)} · {spareReconciliation.selectedC1Option.source}. Based on historical ORGA USD 75,000 FCA, NOT the installed MGW USD 75,059 equipment quotation. Separate OEM replacement-spare quotation and technical interchangeability with MGW Tideland are PENDING. Not DDP Purchaser's Yard, not a verified direct cost, not posted to Part A/Part B/C1 Customer SELL.</p>
    <p className="p55-note"><strong>Historical Rev08:</strong> {thb(customerSchedule.summary.C1.workingReferenceTHB)} preserved for audit only; no automatic addition to selected C1 option or A+B base.</p>
   </div>}
   {spareLines.length>0&&code!=="C1"&&<div className="p55-panel" style={{padding:12}}>
