@@ -1,5 +1,6 @@
 import {UnifiedMrLocationTable0553} from "./UnifiedMrLocationTable0553";
 import {BulkMrLocationCoverage0553} from "./BulkMrLocationCoverage0553";
+import {BulkSourceToReleaseAudit0553} from "./BulkSourceToReleaseAudit0553";
 import {compareAEquipmentToLocation0553} from "./data/workingBomAggregation0553";
 import {LocationReplicationAudit0553} from "./LocationReplicationAudit0553";
 import {Mr0003Mr0004LocationReview0553} from "./Mr0003Mr0004LocationReview0553";
@@ -269,6 +270,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
   <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"10.1.1.3 — System × Location × MTO — "+system+" / "+(site==="ALL"?"All Locations":site)} description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification. Context and Filters support this work; they are not approval gates." defaultOpen>
   <p className="p55-note"><strong>BULK ownership supplement (read-only):</strong> this separate location-level evidence table does NOT replace the canonical priced Equipment/MTO rows below, the Bulk Master, the A5 source or any B/C cost ledger. MGW complete MR0002 RF installation remains Vendor Scope; ADDVALUE NEK is only an optional reserve candidate.</p>
   <BulkMrLocationCoverage0553 mr={system} site={site} state={bulkState} focusModuleId={navigationTarget}/>
+  <BulkSourceToReleaseAudit0553 mr={system} site={site} focusModuleId={navigationTarget}/>
   {["MR-0002","MR-0003","MR-0004"].includes(system)?<UnifiedMrLocationTable0553 mr={system} site={site} fx={fx}/>:<>
   <p className="p55-note"><strong>Display currency: THB first (Working FX {fx?.thbPerUsd??"NOT SET"} THB/USD; {fx?.source||"source pending"}). Original currencies preserved.</strong></p>
   {system==="MR-0001"&&<p className="p55-note" data-component-key="bid.budget.bom.system-location-mto.tc0001-8port">
