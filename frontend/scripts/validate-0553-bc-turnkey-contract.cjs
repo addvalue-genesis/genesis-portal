@@ -35,17 +35,17 @@ assert.equal(wbsBase,3804160,"Legacy ADDVALUE WBS subtotal must remain unchanged
 const currentBaseCodes=["B1","B2","B3","B5","B6","B7","B8","B9","B10","B11","B13"];
 const expectedBase=Math.round(currentBaseCodes.reduce((sum,code)=>sum+m.byCode[code].workingSellTHB,0)*100)/100;
 assert.equal(m.knownWorkingSellTHB,expectedBase,"Current owner-only B1-B14 SELL: no Rev05 Engineering source price arithmetic");
-assert.equal(m.knownWorkingSellTHB,4032636.82,"Controlled revised pre-award Part B Base Working SELL");
+assert.equal(m.knownWorkingSellTHB,4262586.82,"Controlled revised pre-award Part B Base Working SELL");
 assert.equal(m.byCode.B1.workingSellTHB,211600);
 assert.equal(m.byCode.B2.workingSellTHB,237121.13);
 assert.equal(m.byCode.B2.b2PriorWorkingSellReferenceTHB,580000);
 assert.equal(m.byCode.B2.directCostTHB,null);
 assert.equal(m.byCode.B1.b1SupportPlanningBudget.historicalEngineeringCarryForwardTHB,0);
 assert.equal(m.byCode.B1.b1SupportPlanningBudget.historicalPmCarryForwardTHB,0);
-assert.equal(m.byCode.B3.workingSellTHB,2397725);
-assert.equal(m.byCode.B9.workingSellTHB,233600);
-assert.equal(m.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,233600);
-assert.equal(m.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB,397400);
+assert.equal(m.byCode.B3.workingSellTHB,2599325);
+assert.equal(m.byCode.B9.workingSellTHB,261950);
+assert.equal(m.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,261950);
+assert.equal(m.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB,422600);
 assert.equal(scope.knownAddvalueWorkingSellTHB,m.knownWorkingSellTHB);
 assert.equal(m.knownDirectCostTHB,null);
 assert.equal(m.baseTurnkeyCostTHB,null);
@@ -57,7 +57,7 @@ const pricedCodes=m.rows.filter(r=>Number.isFinite(r.workingSellTHB)).map(r=>r.c
 assert.deepEqual(pricedCodes,["B1","B2","B3","B5","B6","B7","B8","B9","B10","B11","B13","C1","C2"],
  "Rev.K current: 11 Part B priced/explicit-zero codes + 2 optional Part C; B4/B12/B14 remain unpriced");
 assert.equal(pricedCodes.length,13,"Current price coverage counts B7, B11 and optional C1/C2; historical Rev05 11-code assertion superseded");
-assert.equal(m.byCode.B9.workingSellTHB,233600,"B9 1 LS included ONCE in Base; field attendance conditional");
+assert.equal(m.byCode.B9.workingSellTHB,261950,"B9 1 LS included ONCE in Base; field attendance conditional");
 assert.equal(m.byCode.B7.workingSellTHB,30000,"B7 user-approved budgetary 1-month reserve");
 assert.equal(m.byCode.B11.workingSellTHB,128314.11,"B11 current budgetary SELL; OEM direct cost remains unverified");
 assert.equal(m.byCode.B10.workingSellTHB,123024.37);
