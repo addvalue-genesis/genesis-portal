@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R14";
+export const CHANGE_LOG_VERSION_0553="2026-10-22-R15";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261022-03",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
+  title:"Fix React SSR sharedEvidence initialization crash in 10.2 B/C Cost Evidence",
+  detail:"BcCostEvidenceDetail0553.jsx had B1RevKMilestoneBudget JSX referencing {sharedEvidence} inside the sharedEvidence initializer. React evaluates JSX props eagerly, causing ReferenceError during B1 Server-Side Render. Move original B1RevKMilestoneBudget and its sourceLedger/sourceEvidence unchanged to the return section after sharedEvidence is initialized; preserve cost ownership and selected Working SELL. Add B1 runtime SSR and source ordering guard in validate-0553-b1-worktype-accordion.cjs. Also align obsolete B9 zero Base note with selected THB233600. No price or Customer Release policy change.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1","bid.budget.working.bc.b2","bid.budget.working.bc.b9","bid.budget.working.bc"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"User Node.js v24.21.0 React SSR ReferenceError / existing 10.2 B/C owner evidence"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-02",date:"2026-10-22",kind:"VALIDATION",tone:"neutral",
   title:"Repair B9 FAT Cost Owner regression after Selected Base THB233600",
