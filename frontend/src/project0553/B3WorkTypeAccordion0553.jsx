@@ -235,10 +235,9 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
      any new ADDVALUE BF visit is conditional, not a scheduled 7-site Survey.
      SPE Rev.C2 §7.3.2 places SAT at JUTAL Zhuhai Fabrication Yard,
      §7.3.3 requires distinct Offshore Commissioning after installation.
-     BF conditional revisit labour scenario {money(fieldPlan.survey.conditionalLabourSellReferenceTHB)}
-     is NONPOSTING; new Yard / Offshore ADDVALUE crew/days/Direct COST remain NOT ESTABLISHED.
-     The previous 28+2 lean allocation remains a nonposting comparison, and
-     the 40-day SELL basis is not a confirmed execution duration.</p>
+     BF Survey 3 onsite +2 travel team-days {money(fieldPlan.survey.conditionalLabourSellReferenceTHB)}
+     are included ONCE in the selected B3 Working SELL budget; actual Direct COST remains unknown and a physical revisit needs a written JUTAL call-out.
+     Current SAT labour is 28 productive team-days (56 MD); +2 Risk days are NOT priced. Old 40 days are audit only.</p>
    </div>
    <div className="p553-b3-actions">
     <button type="button" className="p553-detail-button" onClick={()=>expandAll(true)}>＋ Expand All</button>
@@ -264,10 +263,9 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
          <strong>Contractual work-front split: BF 3 sites conditional verification;
           GF 4 sites Fabrication Yard SAT at Zhuhai; then GF Offshore Commissioning after installation.</strong>
          {" "}New ADDVALUE persons × days for GF Yard and Offshore are NOT ESTABLISHED.
-         Previous 28+2 team-days (60 MD) are OLD COMBINED LEAN COMPARATOR ONLY;
-         40 team-days (80 MD) are RETAINED Working SELL PRICE BASIS only.
-         Conditional BF revisit labour {money(fieldPlan.survey.conditionalLabourSellReferenceTHB)}
-         is a nonposting scenario, not a vendor cost or customer price.
+         Selected 28 SAT team-days (56 MD) are the CURRENT priced labour basis; +2 risk days are NONPOSTING.
+          Old 40 team-days (80 MD) are historical audit only.
+          BF Survey allowance {money(fieldPlan.survey.conditionalLabourSellReferenceTHB)} is included once in Working SELL, but execution needs a written work order.
         </p>}
         <table className="p55-table p553-b3-hierarchical-table p553-b3-subtable">
          <thead><tr>{gridColumns.map(name=><th key={name}>{name}</th>)}</tr></thead>
