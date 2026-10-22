@@ -6,6 +6,7 @@ import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553} from "./bcWorkingModuleRoutes0553";
 import {selectB3RequirementWbsTrace0553} from "./b3RequirementWbsTrace0553";
 import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
+import {selectB3LeanSatScenario0553} from "./b3LeanSatScenario0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
 import {selectBcB1B2EquationExecution0553} from "./bcB1B2EquationExecution0553";
@@ -107,6 +108,7 @@ export function buildBcModuleNavigator0553(){
  // the B3 panel. A source ID may resolve to a distinct (unique) UI anchor.
  const req=selectB3RequirementWbsTrace0553();
  const sat=selectB3SiteMrSatCoverage0553();
+ const leanSat=selectB3LeanSatScenario0553(bc.byCode.B3);
  const b3=bc.byCode.B3;
  const b3Id=b3.moduleId;
  const child=(id,name,anchorModuleId=id,keywords="B3 SAT FAT ITP")=>({
@@ -116,7 +118,7 @@ export function buildBcModuleNavigator0553(){
  const b3Entries=[
   child(b3Id+".worktype-accordion","B3 — Expandable FAT / SAT / Test Equipment / Audit groups"),
   child(b3Id+".fat","B3.1 — FAT Factory Acceptance Test",b3Id+".fat","FAT witness OEM iFAT China"),
-  child(b3Id+".sat","B3.2 — Offshore SAT/SIT Tests",b3Id+".sat","SAT 7 sites 40 days"),
+  child(b3Id+".sat","B3.2 — SAT lean 28+2 execution, 2 reserve; 40-day unchanged Working SELL baseline",b3Id+".sat","SAT 7 sites 28 2 risk 2 reserve 40 priced days"),
   child(b3Id+".tools","B3.3 — Temporary Test Equipment (B3) vs B11 O&M Special Tools",
    b3Id+".tools","VeEX rental B11 tool boundary"),
   child(b3Id+".audit","B3.4 — Working Sell and Contract Cost Audit",b3Id+".audit","19 requirements price trace"),
@@ -134,8 +136,14 @@ export function buildBcModuleNavigator0553(){
   child(b3Id+".requirement-crosswalk","B3 — Contract Requirements × Rev.K / BOD SPE DTS MR"),
   child(req.moduleId,"B3 — Requirement Source Register (19)",
    b3Id+".requirement-crosswalk","RQM-01 RQM-19 contract trace"),
-  child(sat.moduleId,"B3 — Seven-Site / Four-MR SAT Test Coverage (40 days)",
+  child(sat.moduleId,"B3 — Latest Lean SAT 28+2 execution versus 40-day Working SELL price evidence",
    sat.moduleId,"ZPQ ZWP8 ZWP11 ZWP20 ZWP21 ZWP22 ZWP23 matrix"),
+  child(b3Id+".sat.latest-execution-days","B3 — Latest Lean SAT: 28 productive +2 risk; +2 management reserve",
+   b3Id+".sat.latest-execution-days","28 2 risk reserve 40 price timeboxes"),
+  ...leanSat.rows.map(r=>child(b3Id+".sat.latest-execution-days."+r.id.toLowerCase(),
+   r.site+" — latest lean "+r.days+" productive team-days vs priced "+r.originalDays,
+   b3Id+".sat.latest-execution-days."+r.id.toLowerCase(),
+   "B3 SAT lean "+r.wbs+" "+r.site+" "+r.id)),
   ...req.rows.map(r=>child(r.moduleId,r.id+" — "+r.activity,
    (r.costOwner==="B9"?"bid.budget.working.bc.b9":"bid.budget.working.bc.b3")+".requirement-crosswalk",
    "requirement "+r.system+" "+r.wbs+" "+r.requirementRef+" "+r.location)),
