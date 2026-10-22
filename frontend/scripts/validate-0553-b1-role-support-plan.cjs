@@ -74,17 +74,19 @@ assert.equal(bc.previousB2Rev05ReferenceTHB,580000,
  "Old B2 quoted SELL must remain historical, nonposting evidence");
 assert.equal(bc.byCode.B3.workingSellTHB,2599325,
  "B3 must include sourced MGW purchased FAT in addition to witnesses/SAT");
-assert.equal(bc.byCode.B3.b3OriginalWithoutMgwPurchasedTHB,2090600,
- "B3 previous 40-day SAT / FAT witness remains a reference basis, not double posted");
+assert.equal(bc.byCode.B3.b3OriginalWithoutMgwPurchasedTHB,2292200,
+ "B3 current non-MGW component must include new SAT28, conditional BF Survey and China FAT witness rates only once");
 assert.equal(bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125,
  "MGW purchased FAT Working SELL must be included once in canonical B3");
 const roundTHB=v=>Math.round((v+Number.EPSILON)*100)/100;
-const historicalB1OnlyBaseTHB=4187590.69; // B1-current, B2 historical Rev05, B3 before MGW purchase.
+const historicalB1OnlyBaseTHB=4187590.69; // B1-current, B2 historical Rev05, B3 before MGW purchase and 22-Oct China FAT witness rate revision.
+const historicalChinaFatWitnessSellTHB=397400; // pre-22-Oct audit snapshot; NONPOSTING
 const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
  -(bc.previousB2Rev05ReferenceTHB-bc.byCode.B2.workingSellTHB)
  +bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB
  +bc.byCode.B9.workingSellTHB
- -(bc.byCode.B3.b3FortyDayBudget.laborWorkingSellTHB-bc.byCode.B3.b3SelectedSatSurveyBudget.laborWorkingSellTHB));
+ -(bc.byCode.B3.b3FortyDayBudget.laborWorkingSellTHB-bc.byCode.B3.b3SelectedSatSurveyBudget.laborWorkingSellTHB)
+ +(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB-historicalChinaFatWitnessSellTHB));
 assert.equal(historicalToCurrent,4262586.82,
  "Historical B1-only baseline to current B2/B3 price selection bridge failed");
 const sumBaseOwners=roundTHB(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
