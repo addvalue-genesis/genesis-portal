@@ -72,9 +72,9 @@ assert.equal(bc.byCode.B2.workingSellTHB,237121.13,
  "B2 current independent 131-WO VDRL Working SELL must be selected, not Rev05");
 assert.equal(bc.previousB2Rev05ReferenceTHB,580000,
  "Old B2 quoted SELL must remain historical, nonposting evidence");
-assert.equal(bc.byCode.B3.workingSellTHB,2750525,
+assert.equal(bc.byCode.B3.workingSellTHB,2397725,
  "B3 must include sourced MGW purchased FAT in addition to witnesses/SAT");
-assert.equal(bc.byCode.B3.b3OriginalWithoutMgwPurchasedTHB,2443400,
+assert.equal(bc.byCode.B3.b3OriginalWithoutMgwPurchasedTHB,2090600,
  "B3 previous 40-day SAT / FAT witness remains a reference basis, not double posted");
 assert.equal(bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125,
  "MGW purchased FAT Working SELL must be included once in canonical B3");
@@ -83,8 +83,9 @@ const historicalB1OnlyBaseTHB=4187590.69; // B1-current, B2 historical Rev05, B3
 const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
  -(bc.previousB2Rev05ReferenceTHB-bc.byCode.B2.workingSellTHB)
  +bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB
- +bc.byCode.B9.workingSellTHB);
-assert.equal(historicalToCurrent,4385436.82,
+ +bc.byCode.B9.workingSellTHB
+ -(bc.byCode.B3.b3FortyDayBudget.laborWorkingSellTHB-bc.byCode.B3.b3SelectedSatSurveyBudget.laborWorkingSellTHB));
+assert.equal(historicalToCurrent,4032636.82,
  "Historical B1-only baseline to current B2/B3 price selection bridge failed");
 const sumBaseOwners=roundTHB(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
  .reduce((sum,r)=>sum+r.workingSellTHB,0));
