@@ -1,6 +1,7 @@
 // PJ2608-0553 BULK engineering evidence register for 10.1.1.2 / 10.1.1.3.
 // Read only: never re-post A5, MGW included accessories, alternative vendors or price candidates.
 import {deriveMGWSelectedWpSystemBulk0553} from "./mgwR2SelectedFieldBulk0553";
+import MR0001_MTO_SOURCE_0553 from "./snapshots/mr0001.mto.rev04.sourceRows.json";
 import {deriveScadaBulkVerification0553} from "./scadaBulkQuantityVerification0553";
 import {deriveA5BulkAttribution0553} from "./a5BulkAttribution0553";
 import {deriveRaconTerminationBudget0553} from "./raconTerminationBudget0553";
@@ -11,6 +12,16 @@ import {deriveMR0002RfPhysicalRouteReconciliation0553} from "./mr0002RfPhysicalR
 export const BULK_MR_SITE_ORDER_0553=Object.freeze(["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11"]);
 export const BULK_MR_LIST_0553=Object.freeze(["MR-0001","MR-0002","MR-0003","MR-0004"]);
 const scadaRow=Object.freeze({ZWP20:11,ZWP21:20,ZWP22:29,ZWP23:36,ZPQ:41,ZWP8:47,ZWP11:52});
+// Exact 7 source row references are extracted from the Rev04 MTO snapshot; never
+// promote the price of one source lot to physical material completeness.
+const sourceBulkRows=MR0001_MTO_SOURCE_0553.itemRows.filter(x=>
+ String(x.sourcePartText||"").trim().toUpperCase()==="BULK MATERIAL");
+const sourceBulkBySite=Object.fromEntries(sourceBulkRows.map(x=>[x.platform,x]));
+if(sourceBulkRows.length!==7||Object.entries(scadaRow).some(([site,index])=>
+ sourceBulkBySite[site]?.sourceRowIndex!==index||
+ sourceBulkBySite[site]?.sourceQty!==1||
+ sourceBulkBySite[site]?.sourceUnit!=="Lot"))
+ throw Error("MR0001 original seven MTO Bulk Material site/row/lot identities differ from Rev04 source");
 const sources=Object.freeze({
  historical:"ATT6-Price Schedule for Equipments TEL--20260122 Rev.02 SAMART (historical comparator; not a Z1F procurement approval)",
  innova:"https://drive.google.com/file/d/1I4LhJY-heANsoV21uWMO6kUVioeokMUS/view",
@@ -39,6 +50,7 @@ const scadaAdditions=[
 ];
 function scadaItems(site,bulkAudit,a5Row){
  const row=scadaRow[site];
+ const sourceBulk=sourceBulkBySite[site];
  const rows=bulkAudit?.rows||[];
  const base=rows.map(x=>{
   const isFloor=["ODU_CAT6A","PANEL_M20"].includes(x.id);
@@ -56,7 +68,9 @@ function scadaItems(site,bulkAudit,a5Row){
  const extra=scadaAdditions.map(([id,item,owner,note])=>field(id,item,owner,
   sources.historical+"; MR0001 BLD/LAY/SPE",note));
  const total=a5Row?.workingCostTHB??null;
- return {items:[...base,...extra],bookedA5THB:total,sourceMtoRow:row};
+ return {items:[...base,...extra],bookedA5THB:total,sourceMtoRow:row,
+  sourceMtoDescription:sourceBulk.sourceDescription,sourceMtoQtyText:sourceBulk.sourceQuantityText,
+  sourceMtoRevision:MR0001_MTO_SOURCE_0553.source.revision};
 }
 const mgwIncluded=(id,description,lineId,detail,qty=null,unit="included")=>{
  const quote=MGW.lines.find(x=>x.id===lineId);
@@ -69,6 +83,10 @@ function dmrItems(site){
  const rf=deriveMR0002RfFeederQualification0553(site);
  const physical=deriveMR0002RfPhysicalRouteReconciliation0553().sites.find(x=>x.site===site);
  return [
+  review("DMR-MR-C1-BULK-LOT","MR0002 C1 — Bulk Material 1 Lot / Platform: fire-resistant coaxial, Ethernet, glands, grounding",
+   "MR0002_VENDOR_SYSTEM_SCOPE_FIRST",
+   "MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1, pages 10–11; MTO Rev04 DMR Radio",
+   "Source requirement anchor only (one lot per ZWP20/ZWP21/ZWP22), NOT another priced lot. Functional MGW complete-system RF supply and site-external installation interface ownership require traceable review."),
   mgwIncluded("BDA-WAROM","RFI BD4345-00N0-AC BDA / WAROM HRMD95-VIIIB Ex d housing","UHF-1","Assembly Ex certification, RF penetrations, thermal and AC/DC compatibility pending",1,"set"),
   mgwIncluded("YAGI-EX-RF","RFI Yagi / UNV2 clamp / PolyPhaser IS-B50LN-C2 / Solexy RXNMS0200JX0","UHF-2","Full combined Rev2 selected, not older UHF-only Rev2; PolyPhaser and Solexy bundled",1,"set"),
   mgwIncluded("OMNI","KBT TQJ-400AD5 omni antenna","UHF-3","N-female mating connection to be confirmed",1,"set"),
@@ -118,12 +136,16 @@ function dmrItems(site){
   field("BDA-EX-GLANDS","Ex-rated cable glands / adaptors / stopping plugs NET of WAROM supplied","FIELD_BULK_NET_OF_MGW_UHF1",sources.mgw,"Count distinct active cable ends by OD/armour and Ex certificate; N-type feedthroughs are separate"),
   field("BDA-GROUND","External RF earth grounding kit / bonding, lugs and clamps","FIELD_RF_EARTH",sources.historical,"Verify RF feeder grounding per route and surge earthing"),
   field("BDA-CABLE-PROTECTION","UV/SS316 cable ties, support clamps, weatherproofing / self-amalgamating tape","FIELD_INSTALLATION_BULK",sources.historical,"Confirm installed path/spacing and OEM included supports"),
-  field("BDA-RF-EXTENSION","Net additional RF feeder, jumpers or mating adapters beyond MGW UHF-4","FIELD_RF_BULK_NET_VENDOR",sources.mgw,"Do not buy 100m/6 connectors again; validate RF loss and physical interfaces"),
+  review("BDA-RF-EXTENSION","RF feeder/jumpers/adapters needed to complete MGW system beyond UHF-4 quoted kit","MGW_COMPLETE_SYSTEM_CORRECTIVE_SCOPE",sources.mgw,"Supplier obligation clarification only; NOT ADDVALUE new BULK procurement. Validate RF path, connector interfaces and installed compliance first"),
   field("BDA-TAGS","Cable labels, stainless tagplates and ferrules","FIELD_IDENTIFICATION",sources.historical,"Only field items not included by MGW / assembly")
  ];
 }
 function phoneItems(){
  return [
+  review("PHONE-SPECIAL-CABLE-C1","MR0003 C1 — Special Cable (if required) / Field cable specification",
+   "MGW_PHONE_SYSTEM_WITH_INSTALLATION_BOUNDARY_REVIEW",
+   "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1, page 10–11",
+   "Customer MR lists 1 telephone system/site and special cable if required, NOT a separately counted Bulk Material MTO lot. Count only source-driven PoE/control/sounder cables and owner-approved exclusions; do not fabricate one lot/site."),
   mgwIncluded("PHONE-SET","Gai-Tronics Auteldac 6 / EATON DB3B horn / WAROM BXJ-S JB","PHONE-1","Four complete quoted sets across ZWP20–23; do not separately buy EXION/PROSPER alternatives",1,"set"),
   mgwIncluded("PHONE-GLAND-CREDIT","WAROM BXJ-S supplied Ex-P SS316L gland","PHONE-1","Supplier says c/w gland, exact installed number/type remains to be confirmed",null,"included (qty open)"),
   field("PHONE-VOIP-CABLE","Ex VoIP SIP/PoE telephone to JB field cable and connector","MR0003_FIELD_CABLE","MR0003 DTS / BLD / WIR/TER","Check Ethernet/PoE DC topology, armour, IEC 60331 and actual physical route"),
@@ -139,6 +161,15 @@ function phoneItems(){
 function raconItems(site,routes){
  const route=routes.find(x=>x.wp===site);
  return [
+  {...review("RACON-PHASE-ADAPTER-CHARGER",
+   "MR0004 C1 — BULK Adapter and Charging Kit · 1 Set PER PHASE (shared)",
+   "MR0004_VENDOR_SCOPE_CLARIFICATION__ONE_SHARED_PHASE_POOL",
+   "MM-ZTK-1F-GEN-TEL-MR-0004 Rev.C1, page 10/30",
+   "Source row repeated under ZWP20/21/22 but quantity is ONE kit PER PHASE, not three kits. MGW RACON-1 explicit quoted contents do not establish this kit inclusion. Compare B11 special tools / OEM scope; do not post by site."),
+   phaseSharedRequirementId:"MR0004-RACON-ADAPTER-CHARGING-ONE-PHASE",
+   phaseRequiredQty:1,phaseUnit:"set",siteAllocatedQty:null,
+   purchaseQty:null,unitRateTHB:null,onePhaseForSites:["ZWP20","ZWP21","ZWP22"],
+   quotedInMGWRev2:false,bookedIncrementalTHB:0},
   mgwIncluded("RACON-SET","Tideland SeaBeacon 2 System 6 X/S marine RACON","RACON-1","Three quoted sets across ZWP20–22",1,"set"),
   mgwIncluded("RACON-DB5P","DB-5P Ex d junction/distribution box listed in MGW package","RACON-1","Not a second separately posted enclosure",1,"set"),
   review("RACON-EX-CONTROL","Separate RACON Ex control box / TCAB-514-002","RACON_VENDOR_CLARIFICATION",sources.mgw,
@@ -186,6 +217,9 @@ export function deriveBulkMrLocationCoverage0553(){
     sourceMtoRow:result.sourceMtoRow,
     moduleId:"bid.budget.bom."+site.toLowerCase()+"."+mr.toLowerCase().replace("-","")+".bulk."+x.id.toLowerCase().replace(/[^a-z0-9-]/g,"-")
    })),sourceMtoRow:result.sourceMtoRow,
+   sourceMtoDescription:result.sourceMtoDescription??null,
+   sourceMtoQtyText:result.sourceMtoQtyText??null,
+   sourceMtoRevision:result.sourceMtoRevision??null,
    moduleId:mr==="MR-0001"?"bid.budget.bom."+site.toLowerCase()+".bulk-material."+result.sourceMtoRow:
     "bid.budget.bom."+site.toLowerCase()+"."+mr.toLowerCase().replace("-","")+".bulk-material",
    bookedA5THB:result.bookedA5THB,
@@ -204,7 +238,10 @@ export function deriveBulkMrLocationCoverage0553(){
    "Legacy SAMART/ORGA/EXION evidence is comparison only; NEK is ADDVALUE optional BULK spare reserve, not MGW installed supply",
    "Never double count A5 booked source, MGW inclusions, or factory-installed components",
    "Unknown cable-end quantity/route/rate is NULL, never zero",
-   "MR0001 seven MTO Bulk rows retain independent source ID and partial cost owner"]};
+   "MR0001 seven MTO Bulk rows retain independent source ID and partial cost owner",
+   "MR0002 C1 defines one BULK lot per site; supplier-included items are not an additional A2 posting",
+   "MR0003 C1 defines one telephone system per site and special cable if required, not a fabricated Bulk MTO lot",
+   "MR0004 C1 defines ONE shared adapter/charging kit per phase, not three site-set purchases"]};
 }
 export const selectBulkMrLocationCoverage0553=({mr="ALL",site="ALL",state="ALL"}={})=>{
  const m=deriveBulkMrLocationCoverage0553();
