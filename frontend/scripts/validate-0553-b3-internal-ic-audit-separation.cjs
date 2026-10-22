@@ -71,6 +71,12 @@ for(const token of ["IC-FAT-STAFF-001","IC-FAT-TRAVEL-DAYS-001",
  "IC-FAT-WORK-INSURANCE-001","Legacy WBS source: B3-FAT-STAFF",
  "WS-B3","SOW-B3","CP-B3","NOT ISSUED","422,600.00"])
  assert(fatMarkup.includes(token),"FAT internal-price source missing "+token);
+const fullFatMarkup=renderToStaticMarkup(React.createElement(Detail,{
+ budget:b3.b3ChinaFatBudget,selectedOwner:"B3",
+ purchasedServices:b3.b3MgwPurchasedFatWorkingSell,workingRow:b3
+}));
+assert(fullFatMarkup.includes("2,599,325.00"),"FAT full-B3 card must render canonical WS-B3");
+assert(!fullFatMarkup.includes("2,775,725.00"),"Superseded 40d B3 source must not label FULL B3");
 const html=renderToStaticMarkup(React.createElement(Host,{workingRow:b3}));
 assert(html.indexOf("B3.1.1")<html.indexOf("B3.1.2"));
 assert(html.indexOf("B3.4.3")<html.indexOf("B3.4.4"));
