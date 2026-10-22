@@ -112,7 +112,8 @@ for(const [site,roles] of Object.entries({
  assert.equal(mr2.mr0002HistoricalOmniRelocationSelected,false);
  assert.equal(mr2.proposedServiceAntennaElevationM,null);
  assert.equal(mr2.historicalUnadoptedRev00OmniElevationM,18.3);
- assert(mr2.openEvidenceGates.includes("MGW_BDA_REPLACES_AFC_LNA__UPDATED_GA_BLD_EX_DEVIATION_HOLD"));
+ assert(mr2.openEvidenceGates.includes("CURRENT_BUDGETARY_DESIGN_LNA_TO_RFI_BDA_SAME_POSITION_SELECTED"));
+ assert(mr2.openEvidenceGates.includes("REV00_OMNI_RELOCATION_AND_YBSS6_CHANGES_NOT_ADOPTED"));
  assert.equal(mr2.internalSchematic.pricingAuthority,false);
 }
 for(const mr of ["MR-0002","MR-0003","MR-0004"]){
