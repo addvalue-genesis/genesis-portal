@@ -41,7 +41,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
    const gid=root+".group."+String(i+1).padStart(2,"0");
    const active=i<4;
    const sites=[...new Set(g.rows.map(x=>x.site||"Shared"))];
-   return <details className="p553-b3-dossier-group" key={gid}
+   return <details className="p553-b2-recalc-group p553-b3-dossier-group" key={gid}
     data-component-key={gid} open={i===0||i===1||i===2}>
     <summary className="p553-b2-recalc-summary">
      <span className="p553-b2-recalc-num">B3.R{i+1}</span>
@@ -60,7 +60,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
       const rows=g.rows.filter(x=>(x.site||"Shared")===site);
       const sid=gid+".site."+String(j+1).padStart(2,"0");
       const siteAmount=rows.reduce((n,x)=>n+(Number.isFinite(x.workingSellTHB)?x.workingSellTHB:0),0);
-      return <details className="p553-b3-dossier-site" key={sid} data-component-key={sid} open={i<3&&j===0}>
+      return <details className="p553-b2-recalc-group p553-b3-dossier-site" key={sid} data-component-key={sid} open={i<3&&j===0}>
        <summary className="p553-b2-recalc-summary">
         <span className="p553-b2-recalc-num">B3.R{i+1}.{j+1}</span>
         <span className="p553-b2-recalc-label"><strong>{site}</strong>
