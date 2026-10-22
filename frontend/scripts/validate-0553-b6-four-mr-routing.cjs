@@ -25,12 +25,35 @@ const proof=from("data/mgwRoadFreightPackingEvidence0553.js").MGW_ROAD_FREIGHT_P
 const ng=from("data/quotes/NG-260916-ADV-DAP1.full.json");
 const m=source.byCode.B6.b6FourMrRoutingEvidence;
 const old=source.byCode.B6.b6Mr0001ChinaInboundEvidence;
-// B3 management-selected SAT28 and conditional BF Survey repriced the Part B
-// TOTAL by THB352800; this is NOT a B6 transportation price change.
+// Historical bridge is an AUDIT COMPARISON, never a current B6 pricing owner.
+// The old B3 subtotal THB2,397,725 became THB2,750,525 under the 2026-10-21
+// SAT/survey scenario (+THB352,800). Management's 2026-10-22 rate change
+// then added THB201,600 to B3 and THB28,350 to B9, independently.
+// Reverse BOTH latest rate movements before comparing with that old snapshot;
+// otherwise an unchanged B6 is incorrectly blamed for the B9 rate revision.
+const historicalB3BeforeScenarioTHB=2397725;
+const historicalB3ScenarioTHB=2750525;
+const historicalB9WorkingSellTHB=233600;
+const historicalScenarioPartBTHB=4385436.82;
 assert.equal(source.knownWorkingSellTHB,4262586.82);
 assert.equal(source.byCode.B3.workingSellTHB,2599325);
+assert.equal(source.byCode.B9.workingSellTHB,261950);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit
-assert.equal(source.knownWorkingSellTHB+(2750525-source.byCode.B3.workingSellTHB),4385436.82);
+assert.equal(historicalB3ScenarioTHB-historicalB3BeforeScenarioTHB,352800);
+assert.equal(source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB,201600);
+assert.equal(source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB,28350);
+assert.equal(
+ source.knownWorkingSellTHB+
+ (historicalB3ScenarioTHB-source.byCode.B3.workingSellTHB)+
+ (historicalB9WorkingSellTHB-source.byCode.B9.workingSellTHB),
+ historicalScenarioPartBTHB
+);
+assert.equal(
+ source.knownWorkingSellTHB-
+ (source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB)-
+ (source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB),
+ 4032636.82
+);
 assert.equal(source.byCode.B6.workingSellTHB,307584);
 assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,307584);
 assert.equal(scope.lines.B6.workingSellTHB,307584);
