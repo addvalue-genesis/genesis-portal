@@ -48,25 +48,25 @@ assert.equal(quote.policy.bStandardFivePctDeductionOnPurchasedComponentAllowed,f
 assert.equal(quote.policy.samTelCostMarkupPct,policy.aAndC.samtelCostPct);
 assert.equal(quote.policy.addvalueCostMarkupPct,policy.aAndC.addvalueCostPct);
 assert.equal(quote.policy.omissionReserveCostMarkupPct,policy.aAndC.omissionReserveCostPct);
-assert.equal(b3.workingSellTHB,2397725);
+assert.equal(b3.workingSellTHB,2599325);
 assert.equal(b3.b3OriginalWithoutMgwPurchasedTHB,2090600);
 assert.equal(b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
-assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,397400);
+assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,422600);
 assert.equal(b3.b3FortyDayBudget.workingSellTHB,2046000);
-assert.equal(b3.b3SelectedSatSurveyBudget.satWorkingSellTHB,1411200);
+assert.equal(b3.b3SelectedSatSurveyBudget.satWorkingSellTHB,1587600);
 assert.equal(b3.b3SelectedSatSurveyBudget.siteSurveyWorkingSellTHB,252000);
 assert.equal(b3.directCostTHB,null);
 assert.equal(b3.commercialSellTHB,null);
-assert.equal(b.knownWorkingSellTHB,4032636.82);
+assert.equal(b.knownWorkingSellTHB,4262586.82);
 assert.equal(b.releaseAllowed,false);
 assert.equal(b.costComplete,false);
 const price=breakdown(b3),table=hierarchy(b3);
-assert.equal(price.totalWorkingSellTHB,2397725);
+assert.equal(price.totalWorkingSellTHB,2599325);
 assert.deepEqual(price.summary.map(x=>x.workingSellTHB),
- [1411200,252000,30000,307125,397400]);
-assert.equal(price.fat.groupFatWorkingSellTHB,704525);
-assert.equal(table.totalWorkingSellTHB,2397725);
-assert.deepEqual(table.groups.map(x=>x.workingSellTHB),[704525,1663200,30000,0]);
+ [1587600,252000,30000,307125,422600]);
+assert.equal(price.fat.groupFatWorkingSellTHB,729725);
+assert.equal(table.totalWorkingSellTHB,2599325);
+assert.deepEqual(table.groups.map(x=>x.workingSellTHB),[729725,1839600,30000,0]);
 const mgwRow=table.groups[0].items.find(x=>x.moduleId.endsWith(".mgw-r2-cover-20261020"));
 assert.equal(mgwRow.priceClass,"PURCHASED_SERVICE_WORKING_SELL");
 assert.equal(mgwRow.vendorQuoteUSD,7500);
@@ -75,11 +75,11 @@ assert.equal(mgwRow.supplierRows.length,2);
 assert(table.groups[3].items.every(x=>x.workingSellTHB===null),
  "Historically replaced FAT / seven-day what-if shall not inflate B3");
 const s=scope();
-assert.equal(s.lines.B3.workingSellTHB,2397725);
-assert.equal(s.knownAddvalueWorkingSellTHB,4032636.82);
+assert.equal(s.lines.B3.workingSellTHB,2599325);
+assert.equal(s.knownAddvalueWorkingSellTHB,4262586.82);
 const commercial=release();
 const b3Release=commercial.b.find(x=>x.code==="B3");
-assert.equal(b3Release.customerSellTHB,2397725);
+assert.equal(b3Release.customerSellTHB,2599325);
 assert.equal(b3Release.mgwPurchasedServicesSellIncludedTHB,307125);
 assert.equal(b3Release.samTelOrdinaryB5PctDeductionTHB,104530);
 assert.equal(b3Release.samTelPurchased20PctCostShareTHB,47250);
@@ -93,13 +93,13 @@ const ordinary=priceB(100);
 assert.equal(ordinary.customerSellTHB,100);
 assert.equal(ordinary.samTelDeductionTHB,5);
 assert.equal(ordinary.addvalueReceivableTHB,95);
-const protectedC=priceB(2397725,null,quote);
+const protectedC=priceB(2599325,null,quote);
 assert.equal(protectedC.samTelDeductionTHB,151780);
-assert.throws(()=>priceB(2397725,null,{...quote,
+assert.throws(()=>priceB(2599325,null,{...quote,
  policy:{...quote.policy,bStandardFivePctDeductionOnPurchasedComponentAllowed:true}
 }),/cannot be subjected/);
 const html=renderToStaticMarkup(React.createElement(Owner,{workingRow:b3}));
-for(const word of ["2,397,725.00","704,525.00","397,400.00",
+for(const word of ["2,599,325.00","729,725.00","422,600.00",
  "307,125.00","236,250.00","47,250.00","11,812.50",
  "7,500.00","5,000.00","2,500.00","IC-FAT-MGW-SERV-2-4"])
  assert(html.includes(word),"B3 FAT purchased/markup price table missing "+word);
@@ -109,4 +109,4 @@ assert.equal(JSON.stringify(working().byCode.B3),b3Snap);
 const source=fs.readFileSync(path.join(root,"project0553/data/releaseCommercialModel0553.js"),"utf8");
 assert(source.includes("samTelPurchased20PctCostShareTHB"));
 assert(source.includes("samTelOrdinaryB5PctDeductionTHB"));
-console.log("PASS MGW item3/4 cost USD7500 / THB236250 -> SAMTEL20 THB47250 + ADDVALUE5 THB11812.50 + Reserve5 THB11812.50 -> selected WS-B3 MGW THB307125; FAT subtotal THB704525 / B3 THB2397725 / PartB THB4032636.82. 10.3 SAMTEL20 on purchase, NOT another 5%. Cost unverified, customer release HOLD.");
+console.log("PASS MGW item3/4 cost USD7500 / THB236250 -> SAMTEL20 THB47250 + ADDVALUE5 THB11812.50 + Reserve5 THB11812.50 -> selected WS-B3 MGW THB307125; FAT subtotal THB729725 / B3 THB2599325 / PartB THB4262586.82. 10.3 SAMTEL20 on purchase, NOT another 5%. Cost unverified, customer release HOLD.");
