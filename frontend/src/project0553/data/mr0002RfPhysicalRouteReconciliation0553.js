@@ -5,6 +5,7 @@
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {MGW_P26_058_R2_SELECTED_0553 as MGW} from "./mgwP26058R2Selected0553";
 import {MR0002_RF_FEEDER_QUALIFICATION_0553 as NEK_QA} from "./mr0002RfFeederQualification0553";
+import {MR0002_BDA_DEVIATION_REV00_0553 as DEV} from "./mr0002DeviationBdaRev00_0553";
 
 export const MR0002_RF_ROUTE_SOURCE_0553=Object.freeze({
  customerMR:{document:"MM-ZTK-1F-GEN-TEL-MR-0002 Rev.C1",pages:"10–11 of 31",
@@ -131,6 +132,15 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
    afcLnaEnclosureTag:lnaTag,afcSurgeEnclosureTag:surgeTag,
    afcTagRoleVerified:true,selectedMgWBdaFunctionMapsToOriginalAfcLna:false,
    engineeringChange:"SELECTED_MGW_BDA_VS_CUSTOMER_AFC_LNA__GA_BLD_EX_CERT_DEVIATION_HOLD",
+   deviationId:DEV.id,deviationStatus:DEV.status,
+   proposedRfiBda:{outputDbm:DEV.proposed.outputCompositeDbm,gainDb:DEV.proposed.gainAdjustableDb,
+     agc:true,oscillationMute:true},
+   proposedDonorAntenna:{tag:"ANT-508-001",model:DEV.proposed.yagiModel,
+     elements:DEV.proposed.yagiElements,gainDbi:DEV.proposed.yagiGainDbi,
+     elevationM:DEV.proposed.yagiElevationM,positionApproval:false},
+   proposedServiceAntenna:{tag:"ANT-508-002",location:DEV.proposed.omniRelocation,
+     elevationM:DEV.proposed.omniElevationM,positionApproval:false},
+   approvedDeviationCableLengthM:null,
    circuitCount:circuits.length,circuits,
    mgw:{vendor:"MGW",materialBrand:"FORLLER",offerLine:"UHF-4",
     providedFeederM:100,providedConnectors:6,source:src.mgw.url,
@@ -158,6 +168,8 @@ export function deriveMR0002RfPhysicalRouteReconciliation0553(){
     replacementNEKIfMGWRejectedM:null,
     mgwSystemIllustrativeShortfallM:Math.max(0,illustrativePurchaseM-100),
     independentADDVALUENEKSpareM:null,
+    geometryOnlyFor:"AFC_BASE_LEGACY_SAME_DECK_REFERENCE",
+    usableForOpenBdaRelocation:false,proposedBdaRelocationRequiredCableM:null,
     conditionalOnly:true,financialPostingAllowed:false},
    compliance:{mrRequiresFireResistant:true,nekSm000111OnlyDocumentsFlameRetardant:true,
     nekIEC60331Proof:false,forllerIEC60331Proof:false,
