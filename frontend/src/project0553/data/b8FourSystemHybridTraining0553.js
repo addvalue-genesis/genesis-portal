@@ -30,7 +30,11 @@ const def=f([
  ])}),
  f({key:"materials",name:"Training Materials & AV Connectivity",items:f([
   f({id:"TRAINING-PACK",activity:"Four discipline training packs, handouts, exercise checklist, attendee register and assessment for eight people",qty:4,unit:"system training pack",thbUnit:2500}),
-  f({id:"VIDEO-CONNECT",activity:"Onsite audio/video, conferencing, connection test and support allowance",qty:1,unit:"two-day session allowance",thbUnit:5000})
+  f({id:"VIDEO-CONNECT",activity:"Onsite audio/video, conferencing, connection test and support allowance",qty:1,unit:"two-day session allowance",thbUnit:5000}),
+  f({id:"MR0002-RFI-DEMO",activity:"ADDVALUE RFI UHF BDA practical demo: RF gain/alarm/configuration; temporary spectrum/attenuator/load/interconnect test setup",mr:"MR0002",qty:1,unit:"budgetary RF training setup allowance",thbUnit:15000,allowanceOnly:true,
+    evidence:"RFI BD Series configuration and RF interface data; ADDVALUE test instrument rental/use not quoted; exclude any B3 FAT/B11 tools duplicate"}),
+  f({id:"MR0004-RACON-DEMO",activity:"ADDVALUE RACON programming/interface practical demonstration — temporary laptop interface and simulated alarm tests",mr:"MR0004",qty:1,unit:"budgetary RACON demo setup allowance",thbUnit:5000,allowanceOnly:true,
+    evidence:"MDS ORGA QTORG2609244 is an alternate with included cable/no special tools; MGW Tideland content and actual instructor/tools costs unconfirmed"})
  ])}),
  f({key:"travel",name:"Shared B3 FAT Trip — EXCLUDED Duplicate B8 Travel (Audit)",items:f([
   f({id:"AIRFARE",activity:"Return airfare for one onsite facilitator, budgetary",qty:1,unit:"ticket",thbUnit:15000,sharedTripReconciliation:true}),
@@ -69,9 +73,9 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
  const sharedTripDeduplication=round(counted.reduce((s,x)=>s+(x.separateTripHistoricalReferenceTHB??0),0));
  const priced=counted.filter(x=>Number.isFinite(x.workingSellTHB));
  const standaloneReferenceTHB=round(total+sharedTripDeduplication);
- if(total!==131550||groups.map(g=>g.workingSellTHB).join("|")!=="66150|50400|15000|0"||
-  sharedTripDeduplication!==85100||standaloneReferenceTHB!==216650||
-  counted.length!==14||priced.length!==8||
+ if(total!==151550||groups.map(g=>g.workingSellTHB).join("|")!=="66150|50400|35000|0"||
+  sharedTripDeduplication!==85100||standaloneReferenceTHB!==236650||
+  counted.length!==16||priced.length!==10||
   fx!==31.5||seniorUSD!==700||
   new Set(counted.map(x=>x.id)).size!==counted.length||
   (workingRow!==null&&(workingRow.workingSellTHB!==total||workingRow.directCostTHB!==null)))
@@ -84,6 +88,10 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
   assumedBudgetaryVenue:"MGW Nantong, China — co-scheduled with MGW FAT, venue/attendance approval OPEN; BOD Yangon training location remains contractual deviation",
   alternateMode:"FULL_OEM_ONSITE_INSTRUCTOR__UNQUOTED_NONPOSTING",
   originalRev05WorkingSellReferenceTHB:30000,originalRev05TrainingMH:44,
+  trainingEvidence:Object.freeze({
+    raconMdsAlternate:Object.freeze({quoteNo:"QTORG2609244",quoteDate:"2026-09-22",uri:"https://drive.google.com/file/d/1Wjod3tJNvte2Wrc3p0fmj8-9i664pEMW/view?usp=drivesdk",supplier:"MDS/ORGA ALTERNATE NOT SELECTED MGW/TIDELAND",cableIncludedInAlternate:true,laptopIncluded:false,specialToolsDeclaredRequired:false,oemTrainingInstructorPriceTHB:null}),
+    rfiBda:Object.freeze({reference:"RFI BD Series UHF BDA technical datasheet",uri:"https://drive.google.com/file/d/1orMpdimoB3vpjyyMDDNnZu2k9YXoGWlb/view?usp=drivesdk",configAndMonitoringInterface:true,rfTestToolsQuoted:false,manufacturerInstructorQuoted:false})
+  }),
   groups,pricedRows:priced.length,sourceAuditRows:counted.length,selectedWorkingSellTHB:total,
   selectedTripExpenseBasis:"SHARED_MGW_CHINA_FAT_TRIP__WS_B3_ONCE__NO_SEPARATE_B8_TRAVEL",
   standaloneTripPreviousWorkingSellTHB:standaloneReferenceTHB,
@@ -91,6 +99,10 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
   possibleSharedB3B9TripCreditTHB:0, // no SECOND credit; all travel excluded already
   sharedTripDeduplicationApplied:true,unverifiedTripCashIncludedOnce:false,
   onsiteSeniorDayOverlapWithB3Pending:true,
+  provisionalTrainingDeliveryOwner:"ADDVALUE",
+  rfiRaconPracticalTrainingAllowanceTHB:20000,
+  permanentRfTestEquipmentPurchased:false,instrumentsCustomerDeliverable:false,
+  mgwRfiOnlineInstructorQuotationReceived:false,mgwRaconOnlineInstructorQuotationReceived:false,
   oemRemoteSessionsVendorConfirmed:false,onsiteVenueApproved:false,
   trainingBeforeFATApproved:false,trainingDeliveryReportApproved:false,
   instructorCashExpenseVerified:false,actualDirectCostTHB:null,verifiedWorkingCostTHB:null,
@@ -98,7 +110,9 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
   workingSellId:"WS-B8",customerProposalId:"CP-B8",scopeId:"SOW-B8",
   gates:f([
    "Confirm purchaser-approved venue and OEM-led remote instruction; historic BOD training venue Yangon and pre-FAT timing must not be silently overridden",
-   "Four manufacturer disciplines × four-hour remote fee USD400 each is a PARAMETRIC allowance, NOT a vendor quotation",
+   "ADDVALUE owns onsite training delivery; four remote OEM support sessions at USD400 each are provisional parametric risk allowances, NOT supplier confirmations",
+   "RFI BDA ADDVALUE practical RF test setup THB15000 and RACON interface demo THB5000 are budgeting allowances only; not permanent tools procurement or confirmed OEM fees",
+   "RACON MDS ORGA quote QTORG2609244 is alternate evidence only and DOES NOT prove included programming cable or training on MGW selected Tideland SeaBeacon",
    "One onsite Senior runs demonstration, Q&A, records attendance of eight people, four system training packs and assessment",
    "Same MGW FAT trip selected: B8 separate airfare, hotel, visa/insurance and travel-day labour EXCLUDED THB85100, already reserved under B3 FAT; no second travel credit",
    "Confirm whether the SAME B3 FAT Senior performs the two-day B8 onsite facilitation: either document non-overlapping FAT and training work hours or remove duplicated 2 Senior MD THB44100 before customer release",
