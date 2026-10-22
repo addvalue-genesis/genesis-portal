@@ -87,6 +87,16 @@ assert(!vdrlUi.includes("data-component-key={id} defaultOpen={defaultOpen}"),
  "React <details> must use supported open, not defaultOpen, for dossier groups");
 assert(vdrlUi.includes("data-component-key={id} open={defaultOpen}"),
  "Original B2 expand/default-open behavior must be preserved");
+const priceOverviewJsx=fs.readFileSync(path.join(root,"project0553/B2WorkingPriceOverview0553.jsx"),"utf8");
+assert(!priceOverviewJsx.includes("defaultOpen"),
+ "React <details> inside B2 historical overview must never use unsupported defaultOpen");
+for(const key of ["role-cost-build","new-doc-build"]){
+ assert(priceOverviewJsx.includes('data-component-key={ROOT+".price-overview.'+key+'"} open>'),
+  "B2 historical accordion "+key+" must start expanded using valid native open");
+}
+assert(b2html.includes('data-component-key="bid.budget.working.bc.b2.price-overview.role-cost-build"')&&
+ b2html.includes('data-component-key="bid.budget.working.bc.b2.price-overview.new-doc-build"'),
+ "Both B2 historical price details must remain present in actual server rendering");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
 assert(host.includes("<BcOwnerPriceTrace0553")&&host.includes("auditContent={<React.Fragment>"),
  "All owner-local B2-B9 audit proof must be nested without duplicate standalone cost-lines");
