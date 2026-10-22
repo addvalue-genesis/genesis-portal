@@ -35,7 +35,7 @@ assert.equal(wbsBase,3804160,"Legacy ADDVALUE WBS subtotal must remain unchanged
 const currentBaseCodes=["B1","B2","B3","B5","B6","B7","B8","B9","B10","B11","B13"];
 const expectedBase=Math.round(currentBaseCodes.reduce((sum,code)=>sum+m.byCode[code].workingSellTHB,0)*100)/100;
 assert.equal(m.knownWorkingSellTHB,expectedBase,"Current owner-only B1-B14 SELL: no Rev05 Engineering source price arithmetic");
-assert.equal(m.knownWorkingSellTHB,4481186.82,"Controlled revised pre-award Part B Base Working SELL");
+assert.equal(m.knownWorkingSellTHB,4667836.82,"Controlled revised pre-award Part B Base Working SELL");
 assert.equal(m.byCode.B1.workingSellTHB,211600);
 assert.equal(m.byCode.B2.workingSellTHB,237121.13);
 assert.equal(m.byCode.B2.b2PriorWorkingSellReferenceTHB,580000);
@@ -58,6 +58,8 @@ assert.deepEqual(pricedCodes,["B1","B2","B3","B5","B6","B7","B8","B9","B10","B11
  "Rev.K current: 11 Part B priced/explicit-zero codes + 2 optional Part C; B4/B12/B14 remain unpriced");
 assert.equal(pricedCodes.length,13,"Current price coverage counts B7, B11 and optional C1/C2; historical Rev05 11-code assertion superseded");
 assert.equal(m.byCode.B9.workingSellTHB,480550,"B9 1 LS included ONCE in Base; field attendance conditional");
+assert.equal(m.byCode.B8.workingSellTHB,216650);
+assert.equal(m.byCode.B8.qtyDriver,1);
 assert.equal(m.byCode.B7.workingSellTHB,30000,"B7 user-approved budgetary 1-month reserve");
 assert.equal(m.byCode.B11.workingSellTHB,128314.11,"B11 current budgetary SELL; OEM direct cost remains unverified");
 assert.equal(m.byCode.B10.workingSellTHB,123024.37);
