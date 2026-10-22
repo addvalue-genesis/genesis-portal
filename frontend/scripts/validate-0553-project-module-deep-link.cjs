@@ -33,7 +33,12 @@ const satId=rootId+".site-mr-sat-matrix";
 const offId=rootId+".40-day-abc";
 const parent=lookup(satId);
 assert(parent&&parent.tab==="budget"&&parent.anchorModuleId===satId);
-assert.equal(search(rootId+".site",all).length,1,"User partial b3.site must find SAT matrix");
+const b3SiteHits=search(rootId+".site",all);
+assert(b3SiteHits.some(x=>x.id===satId),"Partial b3.site must find SAT matrix");
+assert(b3SiteHits.some(x=>x.id===rootId+".site-survey-price"),
+ "Partial b3.site must ALSO find BF Survey price detail");
+assert.equal(all.filter(x=>x.id===rootId+".site-survey-price").length,1,
+ "BF Survey deep-link registry must stay unique");
 assert.equal(search(satId.toUpperCase(),all)[0]?.id,satId,"Case-insensitive exact Module ID search");
 assert.equal(all.filter(m=>m.id===satId).length,1); // B3.site search must find the matrix parent
 assert.equal(site().rows.filter(r=>lookup(r.moduleId)?.anchorModuleId===r.moduleId).length,site().rows.length);
@@ -97,4 +102,4 @@ const css=fs.readFileSync(path.join(root,"project0553/project0553.css"),"utf8");
 assert(css.includes("[data-component-key].p553-module-nav-focus"));
 assert(!ws.includes("const target=exact||parent"),"Do not silently scroll to parent for failed leaf navigation");
 assert(ws.includes("ยังเปิด Module ปลายทางไม่ได้"));
-console.log("PASS PJ2608-0553 Project Module Navigator: nested B3.site + 21 SAT IDs, 19 RQM IDs, Enter/click route, exact DOM target, open all disclosure ancestors, RQM cross-owner reveal, current THB 2,750,525 selected MGW purchased FAT WS.");
+console.log("PASS PJ2608-0553 Project Module Navigator: nested B3.site + 21 SAT IDs, 19 RQM IDs, Enter/click route, exact DOM target, open all disclosure ancestors, RQM cross-owner reveal, current THB 2,397,725 SAT28+BF Survey conditional WS; 40d old audit only.");
