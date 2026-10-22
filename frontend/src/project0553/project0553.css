@@ -773,3 +773,12 @@
 .p553-dashboard .p553-b8-hybrid-group>.p553-bc-price-leaf-head small{font-weight:700;color:var(--price-accent)}
 .p553-dashboard .p553-b8-hybrid .p55-table{min-width:1000px}
 .p553-dashboard .p553-b8-hybrid td small{display:block;margin-top:3px;font-size:11px;overflow-wrap:anywhere}
+
+/* 0553 spare previews: concise TAG count, expand exact source TAGs on demand.
+   This is UI-only and does not change the native customer workbook geometry. */
+.p553-annex-tag-list{max-width:285px;margin-top:6px;font-size:11px;line-height:1.4}
+.p553-annex-tag-list>summary{cursor:pointer;color:#12617f;text-decoration:underline;text-underline-offset:2px;font-weight:600}
+.p553-annex-tag-list[open]{border:1px solid #bed3e0;background:#f7fbfd;padding:6px 8px;border-radius:4px}
+.p553-annex-tag-list>div{padding:6px 0;line-height:1.6;overflow-wrap:anywhere}
+.p553-annex-tag-list small{display:block;font-size:10px;color:#606e78}
+.p553-annex-reading-guide{margin:9px 0!important;padding:7px 9px;border-left:3px solid #879ca9;background:rgba(128,145,160,.07);line-height:1.6}
