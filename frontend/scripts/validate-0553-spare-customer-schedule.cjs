@@ -16,6 +16,7 @@ const {selectSpareCustomerSchedule0553}=from("data/spareCustomerSchedule0553.js"
 const {selectSpareCoverageEngineering0553}=from("data/spareCoverageEngineering0553.js");
 const {selectBcTurnkeyWorkingCost0553}=from("data/bcTurnkeyWorkingCost0553.js");
 const {REV08_BASELINE}=from("data/rev08CommercialBaseline.js");
+const {buildReleaseCommercialModel0553}=from("data/releaseCommercialModel0553.js");
 const {MR0002_WORKING_BOM_0553}=from("data/mr0002WorkingBom0553.js");
 const x=selectSpareCustomerSchedule0553(),cov=selectSpareCoverageEngineering0553(),bc=selectBcTurnkeyWorkingCost0553();
 const codes=["B10","B11","B13","C1","C2"];
@@ -44,6 +45,43 @@ for(const code of codes){
  }
  assert(Math.abs(x.summary[code].deltaFromDisplayedRoundedLinesTHB)<=0.12);
 }
+// Plain-English table contract: item/purpose/spec/materials must explain the scope,
+// while ALL 31 raw TAG/source and Qty × Unit Price amounts remain intact.
+for(const r of x.rows){
+ assert.equal(r.originalDescription,r.description,"Loss of raw Rev08 description "+r.id);
+ assert.notEqual(r.displayDescription,r.description,"Plain item name missing "+r.id);
+ assert(r.displayPurpose&&r.displaySpecification&&r.explanationTH,"Missing explanation "+r.id);
+ assert(r.displayMaterials.includes("TBC"),"Do not invent physical material "+r.id);
+ assert.equal(r.materialVerified,false);
+ assert.equal(r.oemSpareSkuVerified,false);
+ assert.equal(r.commonSpareInterchangeabilityVerified,false);
+ assert.equal(r.relatedTagList.length,r.relatedEquipmentTagCount);
+ assert.equal(r.relatedSiteTagCount,r.installedTagKeys.length);
+ if(r.relatedEquipmentTagCount>1)
+  assert(r.tagSummary.includes("related equipment TAGs"),"TAG summary missing "+r.id);
+}
+const release=buildReleaseCommercialModel0553();
+for(const code of codes){
+ const source=x.byCode[code],customer=release.annex[code];
+ assert.equal(customer.length,source.length);
+ for(let i=0;i<source.length;i++){
+  assert.equal(customer[i].tagNo,source[i].tagNo,"Never lose original linked TAG identity");
+  assert.equal(customer[i].tagSummary,source[i].tagSummary);
+  assert.deepEqual(customer[i].relatedTagList,source[i].relatedTagList);
+  assert.equal(customer[i].description,source[i].displayDescription);
+  assert.equal(customer[i].specification,source[i].displaySpecification);
+  assert.equal(customer[i].materials,source[i].displayMaterials);
+  assert.equal(customer[i].workingTotalTHB,source[i].extendedTHB,"No price change on reword");
+ }
+}
+const workbookUI=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
+const scopeUI=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
+for(const jsx of [workbookUI,scopeUI]){
+ assert(jsx.includes("p553-annex-tag-list"),"TAG Expand/Collapse not rendered");
+ assert(jsx.includes("tagSummary"),"Concise TAG summary not rendered");
+}
+assert(workbookUI.includes("r?.purpose")&&workbookUI.includes("materialVerified"));
+assert(scopeUI.includes("x.displayDescription")&&scopeUI.includes("x.displayMaterials"));
 assert.equal(x.summary.B10.workingReferenceTHB,123024.37);
 assert.equal(x.summary.B11.workingReferenceTHB,128314.11);
 assert.equal(x.summary.B13.workingReferenceTHB,22484.21);
