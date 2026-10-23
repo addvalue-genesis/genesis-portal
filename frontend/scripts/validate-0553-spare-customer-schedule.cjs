@@ -144,7 +144,17 @@ const eng=selectSpareEngineeringReconciliation0553();
 assert.equal(eng.verificationRows.length,31);
 assert.equal(new Set(eng.verificationRows.map(v=>v.id)).size,31);
 assert(eng.vendorClarificationReady&&!eng.physicalSpirComplete);
-assert.equal(eng.verifiedSpareRows,undefined);
+assert.equal(eng.engineeringSummary.reviewedSourceRows,31);
+assert.equal(eng.engineeringSummary.confirmedIndependentSpareSku,0);
+assert.equal(eng.engineeringSummary.verifiedOemDirectCostRows,0);
+assert.equal(eng.engineeringSummary.contractualNewPlatformCommissioningKits,14);
+assert.equal(eng.engineeringSummary.exaA8TelecomToolMinimumFunctions,5);
+assert.equal(eng.engineeringSummary.possibleB10C2DuplicateFamilies,eng.b10c2Conflicts.length);
+assert.equal(eng.engineeringSummary.possibleC2DuplicateHistoricalReferenceTHB,
+ Math.round(eng.b10c2Conflicts.reduce((t,x)=>t+x.sourceReferenceSellTHB,0)*100)/100);
+assert(eng.engineeringSummary.possibleC2DuplicateHistoricalReferenceTHB>0);
+assert.equal(eng.engineeringSummary.customerReleaseAllowed,false);
+assert.equal(eng.engineeringSummary.procurementReadiness,"NOT_READY_PENDING_OEM_ITEMIZED_SPIR");
 assert(eng.verificationRows.every(v=>v.sourceRowModuleId&&v.requiredVendorAnswer&&
  v.technicalGap&&v.verifiedSpareSku===null&&v.verifiedDirectCostTHB===null&&
  v.verifiedQuantity===null&&!v.pricePosted&&!v.customerReleaseAllowed));
