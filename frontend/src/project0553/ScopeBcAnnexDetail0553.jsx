@@ -222,11 +222,14 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
    <p className="p55-note"><strong>วิธีอ่านราคาอะไหล่:</strong> Description = รายการที่จะซื้อและหน้าที่ใช้งาน ·
     Detail Specification = คุณสมบัติที่ต้องตรงกับของเดิม · Materials = วัสดุ/ส่วนประกอบจริง (TBC หากยังไม่ยืนยัน) ·
     TAG No. = จุดติดตั้งที่เกี่ยวข้อง ไม่ใช่จำนวนอะไหล่ · <strong>Qty = จำนวนอะไหล่ที่จะจัดหาจริงตามงบประมาณ</strong>.
-    รายการที่มีหลาย TAG ยังไม่ถือว่าใช้แทนกันได้จนกว่าจะยืนยัน OEM SKU</p>
+    รายการที่มีหลาย TAG ยังไม่ถือว่าใช้แทนกันได้จนกว่าจะยืนยัน OEM SKU
+    <strong> ข้อมูลในตารางมาจาก Spare Source ของ 10.2 เดียวกับ Release 10.3</strong>;
+    การเปิดรายละเอียดไม่คำนวณราคาใหม่</p>
    <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {customerSchedule.sourceOwnership} · Existing MR/MTO/AFC installed TAGs are joined to the five-category Rev08 budget lines by equipment function. COMMON means a shared stock/tool item, not an invented installed TAG. Quantities and THB unit rates retain the original pre-award Rev08 basis at FX 31.5. The TAG association is not OEM interchangeable SKU approval.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
-    <tbody>{spareLines.map(x=><tr key={x.id}>
+    <tbody>{spareLines.map(x=><tr key={x.id}
+      data-component-key={inWorking?x.sourceRowModuleId:"bid.budget.scope."+code.toLowerCase()+".spare-line."+x.id.toLowerCase()}>
      <td>{x.item}</td>
      <td><strong>{x.tagSummary||x.tagNo}</strong>
       {x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list">
