@@ -71,7 +71,7 @@ assert.equal(scope.minimumContractSatisfied,false);
 assert.equal(scope.customerReleaseAllowed,false);
 for(const code of ["B10","B13","C1","C2"]){
  assert.equal(scope.categoryBudgetsTHB[code],baseline.budgetTotalsTHB[code],"Risk analysis must not change budget "+code);
- assert.equal(current.byCode[code].workingSellTHB,baseline.budgetTotalsTHB[code],"Never re-price Rev08 silently");
+ assert.equal(current.byCode[code].workingSellTHB,({B10:509827.5,B13:46683,C1:null,C2:null})[code],"Current 2026 engineering price never inherits Rev08");
  assert.equal(current.byCode[code].directCostTHB,null,"Working SELL is not approved direct cost");
 }
 assert.equal(current.knownWorkingSellTHB,5043082.13,"Protect latest owner-only Part B Base; legacy Rev05 remains audit source");
