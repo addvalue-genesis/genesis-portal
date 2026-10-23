@@ -189,6 +189,18 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
      <td>{x.tag}<small>{x.source}</small></td><td>{x.includedClaim}</td><td>{x.conflict}<small>{x.scopeState}</small></td>
     </tr>)}</tbody></table></div>
   </details>}
+  {code==="C1"&&spareLines.length>0&&<details className="p55-panel p553-c1-historical-source-trace" style={{padding:12}}>
+   <summary><strong>C1 Rev08 historical source rows / Release trace — NOT POSTED</strong><small>Separate from management RACON option and not a new quote</small></summary>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Source item</th><th>Related TAGs</th><th>Description / Use</th><th>Specification</th><th>Materials</th><th>Qty</th><th>Reference THB</th></tr></thead>
+    <tbody>{spareLines.map(x=><tr key={x.id} data-component-key={inWorking?x.sourceRowModuleId:"bid.budget.scope.c1.spare-line."+x.id.toLowerCase()}>
+     <td>{x.item}<small>{x.id}</small>{inWorking&&<button type="button" className="p553-detail-button" onClick={()=>onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x.sourceRowModuleId})}>↗ 10.3 Release</button>}</td>
+     <td><strong>{x.tagSummary}</strong>{x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list"><summary>ดู TAG ({x.relatedEquipmentTagCount})</summary><div>{x.relatedTagList.join(" · ")}</div></details>}</td>
+     <td>{x.displayDescription}<small>{x.displayPurpose}</small></td>
+     <td>{x.displaySpecification}</td><td>{x.displayMaterials}</td><td>{x.qty} {x.unit}</td>
+     <td>{thb(x.extendedTHB)}<small>Historical reference only / No Customer Release</small></td>
+    </tr>)}</tbody></table></div>
+  </details>}
   {code==="C1"&&<div className="p55-panel" style={{padding:12}}>
    <h4>SUPPLIER RECOMMENDATION FOR CAPITAL SPARE PARTS — CURRENT SELECTION REVIEW</h4>
    <p className="p55-note"><strong>MANAGEMENT C1 BUDGETARY SELECTION:</strong> One complete RACON spare set is selected as an OPTION using the ORGA installed equipment FCA quote benchmark, not a confirmed OEM spare quote or DDP delivered price. Rev08 RACON/SCADA historical entries remain only comparison references.</p>
