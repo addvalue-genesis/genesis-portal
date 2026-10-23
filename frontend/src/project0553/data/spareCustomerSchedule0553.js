@@ -308,7 +308,21 @@ export function selectSpareCustomerSchedule0553(){
   workingStatus:"OPTION_NOT_QUOTED__NO_APPROVED_SPIR",
   customerReleaseAllowed:false,leadTimeARO:null,option:true
  }));
- const currentRows=Object.freeze([...built,capital,...twoYear]);
+ // Read site + TAG from the ORIGINAL engineering/MTO/AFC source register.
+ // These are RELATED installed equipment references, NOT proof that one spare
+ // SKU fits every TAG. No fabricated TAG or suffix-only crosswalk is allowed.
+ const currentRows=Object.freeze([...built,capital,...twoYear].map(line=>{
+  const related=line.linkedMR.includes("MR-0001")&&line.linkedMR.length>1?[]:
+   cover.installed.filter(x=>line.linkedMR.includes(x.mr)&&line.linkedLocations.includes(x.site));
+  const keys=unique(related.map(x=>x.key)),tagRefs=unique(related.map(x=>x.site+" / "+x.tag));
+  return Object.freeze({...line,
+   installedTagKeys:keys,relatedTagList:tagRefs,
+   relatedEquipmentTagCount:tagRefs.length,
+   relatedSiteTagCount:unique(related.map(x=>x.site)).length,
+   tagSummary:tagRefs.length?line.tagSummary+" · "+tagRefs.length+" related installed Site/TAG references":line.tagSummary,
+   commonSpareInterchangeabilityVerified:false
+  });
+ }));
  const currentByCode=Object.fromEntries(CODES.map(code=>[code,
   Object.freeze(currentRows.filter(x=>x.code===code))]));
  const currentBudgetaryByCode=Object.fromEntries(CODES.map(code=>[code,
