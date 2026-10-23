@@ -46,6 +46,13 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
     <small>{spareReconciliation.verificationRows.filter(x=>x.code===code).length} Rev08 candidates ·
      {spareReconciliation.priorityRows.filter(x=>x.code===code).length} high-risk gaps ·
      No independently verified spare SKU or purchased stock</small></summary>
+   <p className="p55-note"><strong>Evidence basis:</strong>
+    <a href="https://drive.google.com/file/d/1aFGpjocp4YUlsTEewTTvw9-BDi1mz5ZL/view" target="_blank" rel="noreferrer">EXA-A8 Att-1 Minimum Spares</a>
+    {" · "}
+    <a href="https://drive.google.com/file/d/1J3jkvf9e-tbFAiGwrK0s_bVIbH6pmUZ7/view" target="_blank" rel="noreferrer">EXA-A8 Att-2 Telecom Tools</a>
+    {" · "}
+    <a href="https://drive.google.com/file/d/1LHfQU0yg2O9GwLhHnVyBPxtfPfrI1Jzo/view" target="_blank" rel="noreferrer">MGW P26-058_R2 (Installed Supply Only)</a>.
+    Engineering finding is traceable to the exact source; none is an approved OEM spare SPIR.</p>
    <p className="p55-note"><strong>Engineering assessment completed against current available evidence:</strong>
     MR Rev.C1 / EXA-A8 / MGW R2 installed quotation and seller clarification.
     Listed candidate OEM models are NOT approved replacement spare part numbers.
@@ -69,7 +76,8 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
     to the actual equipment/rating and must not be mechanically imposed on every telecom item.</p>}
    {code==="B11"&&<p className="p55-note"><strong>Vendor inclusion:</strong> MGW Paul email 20-Oct confirms RACON
     programming kit included; exact OEM kit content, quantity and handover still OPEN.
-    Do not buy/price the same kit twice. EXA-A8 Att-2 has five telecom tool/license
+    Do not buy/price the same kit twice. The historical TETRA voice gateway tool
+    does not automatically apply to the selected DMR/RFI BDA design. EXA-A8 Att-2 has five telecom tool/license
     functions, while the historical B11 contains four priced rows: reconcile by function
     and actual project-wide license/tool rights, not by row count.</p>}
    {code==="B13"&&<p className="p55-note"><strong>Preservation:</strong> the 4 historical consumable
@@ -79,6 +87,11 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
     is an alternate price basis, not a spare part interchangeable with selected
     MGW/Tideland. Independently sourced Tideland spare quote still missing;
     C1 is NOT in Base.</p>}
+   {code==="C2"&&<p className="p55-note"><strong>Overlap screening:</strong>
+    {spareReconciliation.engineeringSummary.possibleB10C2DuplicateFamilies} C2 spare families
+    have potential B10 start-up stock overlap, with
+    <strong> {thb(spareReconciliation.engineeringSummary.possibleC2DuplicateHistoricalReferenceTHB)}</strong>
+    as historical C2 reference exposed to verification, NOT confirmed savings or an approved price deduction.</p>}
    {code==="C2"&&<p className="p55-note"><strong>Attachment 7 instruction 6:</strong>
     items physically listed in start-up B10 shall be excluded from 2-year operating
     spare quotation once identical part numbers are proven. Do not automatically
