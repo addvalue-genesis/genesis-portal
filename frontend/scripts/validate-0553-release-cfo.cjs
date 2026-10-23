@@ -138,8 +138,10 @@ assert.match(navFile,/data-component-key="bid\.budget\.pricing\.release\.source-
 assert.ok(!/setWorkingSell|postingAllowed:true|releaseAllowed:true/.test(navFile),
  "Source navigator must be read-only and nonposting");
 const uiSourceLink=file("ReleaseCustomerWorkbook0553.jsx");
-assert.match(uiSourceLink,/onClick=\{\(\)=>onOpenSource\(item\)\}/);
+assert.match(uiSourceLink,/onOpenSource\(\{\.\.\.item,sourceModuleId:item\.sourceRowModuleId\|\|item\.sourceModuleId\}\)/);
 assert.match(uiSourceLink,/p553-origin-link--a/);
+assert.match(uiSourceLink,/r\.sourceId\.toLowerCase\(\)/);
+assert.match(uiSourceLink,/same source row ID/);
 assert.match(uiSourceLink,/p553-origin-link--c/);
 const navStyles=file("project0553.css");
 for(const key of ["p553-pricing-stage--working","p553-pricing-stage--budgetary",
