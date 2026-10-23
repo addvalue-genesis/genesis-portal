@@ -148,7 +148,7 @@ export async function buildNativeWorkingDraft0553(file,model){
  for(let i=1;i<=14;i++){
   const row=23+i,b=bc.find(x=>x.code==="B"+i),price=b?.customerSellTHB;
   if(!Number.isFinite(price)){warnings.push("B"+i+" price NOT ESTABLISHED");write(scope,"F"+row,"NOT ESTABLISHED");write(scope,"G"+row,"NOT ESTABLISHED");continue;}
-  if(![33,34,35,36].includes(row))write(scope,"F"+row,round(price));
+  write(scope,"F"+row,round(price)); // B10/B11/B13 current Annex working unit LS must replace original stale F value too.
   write(scope,"G"+row,round(price));
  }
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
