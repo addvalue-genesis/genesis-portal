@@ -32,10 +32,10 @@ assert.equal(new Set(m.rows.map(r=>r.code)).size,16);
 assert.deepEqual(m.rows.map(r=>r.code),BC_CUSTOMER_CODES_0553);
 const wbsBase=derivePartBcWorkingWbs0553().subtotalTHB;
 assert.equal(wbsBase,3804160,"Legacy ADDVALUE WBS subtotal must remain unchanged");
-const currentBaseCodes=["B1","B2","B3","B5","B6","B7","B8","B9","B10","B11","B13"];
+const currentBaseCodes=["B1","B2","B3","B5","B6","B7","B8","B9"];
 const expectedBase=Math.round(currentBaseCodes.reduce((sum,code)=>sum+m.byCode[code].workingSellTHB,0)*100)/100;
 assert.equal(m.knownWorkingSellTHB,expectedBase,"Current owner-only B1-B14 SELL: no Rev05 Engineering source price arithmetic");
-assert.equal(m.knownWorkingSellTHB,4602736.82,"Controlled revised pre-award Part B Base Working SELL");
+assert.equal(m.knownWorkingSellTHB,4328914.13,"Controlled revised pre-award Part B Base Working SELL");
 assert.equal(m.byCode.B1.workingSellTHB,211600);
 assert.equal(m.byCode.B2.workingSellTHB,237121.13);
 assert.equal(m.byCode.B2.b2PriorWorkingSellReferenceTHB,580000);
@@ -54,18 +54,18 @@ assert.equal(m.releaseAllowed,false);
 assert.equal(m.costComplete,false);
 assert.equal(m.noCrossBasisSummation,true);
 const pricedCodes=m.rows.filter(r=>Number.isFinite(r.workingSellTHB)).map(r=>r.code);
-assert.deepEqual(pricedCodes,["B1","B2","B3","B5","B6","B7","B8","B9","B10","B11","B13","C1","C2"],
+assert.deepEqual(pricedCodes,["B1","B2","B3","B5","B6","B7","B8","B9"],
  "Rev.K current: 11 Part B priced/explicit-zero codes + 2 optional Part C; B4/B12/B14 remain unpriced");
-assert.equal(pricedCodes.length,13,"Current price coverage counts B7, B11 and optional C1/C2; historical Rev05 11-code assertion superseded");
+assert.equal(pricedCodes.length,8,"Current price coverage counts B7, B11 and optional C1/C2; historical Rev05 11-code assertion superseded");
 assert.equal(m.byCode.B9.workingSellTHB,480550,"B9 1 LS included ONCE in Base; field attendance conditional");
 assert.equal(m.byCode.B8.workingSellTHB,151550);
 assert.equal(m.byCode.B8.qtyDriver,1);
 assert.equal(m.byCode.B7.workingSellTHB,30000,"B7 user-approved budgetary 1-month reserve");
-assert.equal(m.byCode.B11.workingSellTHB,128314.11,"B11 current budgetary SELL; OEM direct cost remains unverified");
-assert.equal(m.byCode.B10.workingSellTHB,123024.37);
-assert.equal(m.byCode.B13.workingSellTHB,22484.21);
-assert.equal(m.byCode.C1.workingSellTHB,4049349.36);
-assert.equal(m.byCode.C2.workingSellTHB,721806.68);
+assert.equal(m.byCode.B11.workingSellTHB,null,"B11 current budgetary SELL; OEM direct cost remains unverified");
+assert.equal(m.byCode.B10.workingSellTHB,null);
+assert.equal(m.byCode.B13.workingSellTHB,null);
+assert.equal(m.byCode.C1.workingSellTHB,null);
+assert.equal(m.byCode.C2.workingSellTHB,null);
 assert.equal(m.knownWorkingSellTHB,m.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((n,r)=>Math.round((n+r.workingSellTHB)*100)/100,0),"Options must not enter Base Working SELL");
 for(const r of m.rows){
  assert.equal(r.directCostTHB,null,r.code+" has unsupported internal cost");
