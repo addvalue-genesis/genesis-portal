@@ -146,6 +146,13 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    sourceId:x.sourceId||x.id,sourceRevision:x.sourceRevision,sourcePriceUSD:priceUSD,
    // Native source TAG list remains available for export and technical trace.
    // Display fields are deliberately short; no installed spare interchangeability is asserted.
+   traceId:x.traceId||code+"::"+(x.sourceId||x.id||i+1),
+   sourceRowModuleId:x.sourceRowModuleId||"bid.budget.working.bc."+code.toLowerCase()+".spare-line."+(x.sourceId||x.id||code+"-"+(i+1)).toLowerCase(),
+   sourceOwnerModuleId:x.sourceOwnerModuleId||"bid.budget.working.bc."+code.toLowerCase(),
+   nativeSheet:({B10:"B10 CommSpares",B11:"B11 SpecialTool",B13:"B13 Consumerables",C1:"C1 CapitalSpares",C2:"C2 2Y-Spares"})[code],
+   nativeRow:6+i,
+   nativeCells:Object.freeze({tagNo:"C"+(6+i),description:"D"+(6+i),specification:"E"+(6+i),
+    materials:"F"+(6+i),qty:"G"+(6+i),unitPrice:"H"+(6+i),totalPrice:"I"+(6+i)}),
    tagNo:x.tagNo,tagSummary:x.tagSummary,
    relatedTagList:x.relatedTagList,relatedEquipmentTagCount:x.relatedEquipmentTagCount,
    relatedSiteTagCount:x.relatedSiteTagCount,commonSpareInterchangeabilityVerified:false,
@@ -164,7 +171,9 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    mappingStatus:x.mappingStatus,workingStatus:x.workingStatus,
    priceSource:"10.2 / "+code+" · "+(x.sourceRevision||"unconfirmed"),
    priceSourceStatus:x.workingStatus,customerReleaseAllowed:false,
-   selectedLine,possibleOverlap:x.possibleOverlap||null
+   selectedLine,possibleOverlap:x.possibleOverlap||null,
+   releaseToSourceStatus:"SOURCE_OWNER_TRACE_PRESERVED__OEM_SKU_STILL_PENDING",
+   sourceToReleaseStatus:"SAME_ROW_ID_QTY_PRICE_DESCRIPTION_MAPPING"
   });
  });
  const complete=rows.length>0&&rows.every(x=>x.selectedLine&&Number.isFinite(x.workingUnitTHB));
@@ -182,6 +191,56 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
   priceLabel:isOption?"REFERENCE ONLY / NOT QUOTED":"WORKING SELL / NOT RELEASED",
   customerReleaseAllowed:false
  });
+}
+
+// Bidirectional pricing-line audit is part of the existing release adapter.
+// Traceable row !== vendor-approved OEM interchangeability or permission to issue.
+export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
+ const codes=["B10","B11","B13","C1","C2"];
+ const traces=[],problems=[];
+ const n=x=>typeof x==="number"&&Number.isFinite(x);
+ for(const code of codes){
+  const source=sourceByCode[code]||[],shown=annexByCode[code]||[];
+  const ids=new Set(),reversed=new Map(source.map(x=>[x.id,x]));
+  const projected=new Map(shown.map(x=>[x.sourceId,x]));
+  if(source.length!==shown.length||reversed.size!==source.length||projected.size!==shown.length)
+   problems.push(code+" line identity/count mismatch");
+  for(const row of source){
+   const x=projected.get(row.id);
+   if(!x){problems.push(code+" missing Release mapping "+row.id);continue;}
+   if(ids.has(x.nativeSheet+"!"+x.nativeRow))problems.push(code+" duplicate native row");
+   ids.add(x.nativeSheet+"!"+x.nativeRow);
+   const same=
+    x.sourceId===row.id&&x.code===row.code&&x.sourceRowModuleId===row.sourceRowModuleId&&
+    x.traceId===row.traceId&&x.tagNo===row.tagNo&&
+    JSON.stringify(x.relatedTagList||[])===JSON.stringify(row.relatedTagList||[])&&
+    x.description===row.displayDescription&&x.specification===row.displaySpecification&&
+    x.materials===row.displayMaterials&&x.originalDescription===row.description&&
+    x.qty===row.qty&&x.workingTotalTHB===row.extendedTHB&&
+    x.sourcePriceUSD===row.sourcePriceUSD&&
+    (!n(row.qty)||!n(row.unitPriceTHB)||Math.abs(row.qty*row.unitPriceTHB-row.extendedTHB)<0.12)&&
+    x.customerReleaseAllowed===false&&x.nativeRow>=6;
+   if(!same)problems.push(code+" source→release value mismatch "+row.id);
+   traces.push(Object.freeze({code,sourceId:row.id,sourceModuleId:row.sourceRowModuleId,
+    releaseModuleId:"bid.budget.pricing.release.preview",scopeModuleId:"bid.budget.scope."+code.toLowerCase(),
+    nativeSheet:x.nativeSheet,nativeRow:x.nativeRow,
+    qty:x.qty,workingTotalTHB:x.workingTotalTHB,
+    sourceToReleaseMatched:same,releaseToSourceMatched:reversed.get(x.sourceId)===row,
+    customerReleaseAllowed:false}));
+  }
+  for(const x of shown){
+   const original=reversed.get(x.sourceId);
+   if(!original||original.traceId!==x.traceId)
+    problems.push(code+" release→source orphan "+x.sourceId);
+   const canonical=source.find(y=>y.id===x.sourceId);
+   if(!canonical||canonical.sourceRowModuleId!==x.sourceRowModuleId)
+    problems.push(code+" release→source module mismatch "+x.sourceId);
+  }
+ }
+ if(problems.length)throw Error("0553 ANNEX BIDIRECTIONAL SOURCE↔RELEASE: "+problems.join(" | "));
+ return Object.freeze({moduleId:"bid.budget.pricing.release",totalRows:traces.length,
+  sourceToReleasePassed:true,releaseToSourcePassed:true,
+  rowTrace:Object.freeze(traces),releaseAllowed:false});
 }
 
 export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
@@ -284,6 +343,8 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
   owner:code.startsWith("B")?b.find(x=>x.code===code):c.find(x=>x.code===code)
  })]));
  const annex=Object.fromEntries(annexCodes.map(code=>[code,annexModels[code].rows]));
+ const annexTraceAudit=auditAnnexBidirectionalTrace0553(spare.byCode,annex);
+ if(annexTraceAudit.totalRows!==31)throw Error("0553 31-source Annex identity inventory changed");
  const aKnown=a.filter(x=>n(x.previewSellTHB));
  const bKnown=b.filter(x=>n(x.customerSellTHB));
  const cKnown=c.filter(x=>n(x.customerSellTHB));
@@ -307,7 +368,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  ];
  return Object.freeze({
   moduleId:"bid.budget.pricing.release",policy:RELEASE_POLICY_0553,
-  a,b,c,annex,annexModels,summary:{
+  a,b,c,annex,annexModels,annexTraceAudit,summary:{
    aProvisionalCostTHB:aKnown.length?aCost:null,
    aProvisionalCustomerSellTHB:aKnown.length?aPrice:null,
    aProvisionalSamTelShareTHB:aKnown.length?round(aCost*.20):null,
