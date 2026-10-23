@@ -131,12 +131,12 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
  const isBase=["B10","B11","B13"].includes(code);
  const isOption=["C1","C2"].includes(code);
  if(!isBase&&!isOption)throw Error("Unsupported 10.3 annex code "+code);
- const selected=amount(isBase?owner?.workingSellTHB:owner?.workingReferenceTHB);
+ const selected=null; // Rev08 excluded; independent OEM Qty x Rate not established.
  const rows=sourceRows.map((x,i)=>{
   const qty=amount(x.qty),priceUSD=amount(x.sourcePriceUSD),fx=amount(x.workingFxTHBPerUSD);
   const unitReference=amount(x.unitPriceTHB);
   const extReference=amount(x.extendedTHB);
-  const selectedLine=qty!==null&&qty>0&&extReference!==null;
+  const selectedLine=false; // Legacy qty/rate is audit data, not current OEM offer.
   const unitPrecision4=qty!==null&&qty>0&&priceUSD!==null&&fx!==null?
    Math.round((priceUSD*fx+Number.EPSILON)*10000)/10000:
    selectedLine?Math.round((extReference/qty+Number.EPSILON)*10000)/10000:null;
@@ -160,35 +160,32 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    purpose:x.displayPurpose||null,specification:x.displaySpecification||x.detailSpecification,
    materials:x.displayMaterials||x.materials,explanationTH:x.explanationTH||null,
    materialVerified:false,oemSpareSkuVerified:false,
-   qty:x.qty,unit:x.unit,leadTimeARO:x.leadTimeARO,
+   qty:null,historicalQty:x.qty,unit:x.unit,leadTimeARO:x.leadTimeARO,
    mr:x.linkedMR,sites:x.linkedLocations,
    referenceUnitTHB:unitReference,referenceTotalTHB:extReference,
-   workingUnitTHB:unitPrecision4,workingTotalTHB:extReference,
-   customerUnitTHB:isBase?unitPrecision4:null,
-   customerTotalTHB:isBase?extReference:null,
-   priceClass:isBase?"BUDGETARY_WORKING_SELL_OEM_COST_NOT_VERIFIED":
-    "OPTION_BUDGET_REFERENCE_ONLY_NO_VERIFIED_COST",
+   workingUnitTHB:null,workingTotalTHB:null,
+   customerUnitTHB:null,
+   customerTotalTHB:null,
+   priceClass:"NEW_PTTEP_OEM_SPIR_REPRICE_PENDING__REV08_HISTORICAL_ONLY",
    mappingStatus:x.mappingStatus,workingStatus:x.workingStatus,
-   priceSource:"10.2 / "+code+" · "+(x.sourceRevision||"unconfirmed"),
+   priceSource:"10.2 / "+code+" · PTTEP/OEM updated price required",
    priceSourceStatus:x.workingStatus,customerReleaseAllowed:false,
    selectedLine,possibleOverlap:x.possibleOverlap||null,
    releaseToSourceStatus:"SOURCE_OWNER_TRACE_PRESERVED__OEM_SKU_STILL_PENDING",
    sourceToReleaseStatus:"SAME_ROW_ID_QTY_PRICE_DESCRIPTION_MAPPING"
   });
  });
- const complete=rows.length>0&&rows.every(x=>x.selectedLine&&Number.isFinite(x.workingUnitTHB));
- const subtotal=rows.length?round(rows.reduce((a,r)=>a+(amount(r.workingTotalTHB)||0),0)):null;
- const variance=selected!==null&&subtotal!==null?round(selected-subtotal):null;
+ const complete=false; // Not a verified physical-spare list.
+ const subtotal=null;
+ const variance=null;
  return Object.freeze({
   code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
   rows,selectedWorkingTHB:selected,annexLineTotalTHB:subtotal,varianceTHB:variance,
   isOption,pricedRows:rows.filter(x=>x.selectedLine).length,totalRows:rows.length,
   sourceLineCoverageComplete:complete,
-  priceStatus:!complete||selected===null?"MISSING_SOURCE_LINE_PRICES":
-    Math.abs(variance)>0.01?"SOURCE_TO_ANNEX_VARIANCE_HOLD":
-    isOption?"OPTION_BUDGET_REFERENCE_NOT_CUSTOMER_SELL":"WORKING_SELL_PROVISIONAL_NOT_RELEASED",
+  priceStatus:"OEM_SPARE_SKU_QTY_AND_NEW_PRICE_NOT_ESTABLISHED",
   reconciled:complete&&selected!==null&&Math.abs(variance)<=0.01,
-  priceLabel:isOption?"REFERENCE ONLY / NOT QUOTED":"WORKING SELL / NOT RELEASED",
+  priceLabel:isOption?"OPTION: NOT QUOTED / OEM SPIR OPEN":"BASE: NOT ESTABLISHED / OEM SPIR OPEN",
   customerReleaseAllowed:false
  });
 }
@@ -216,7 +213,8 @@ export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
     JSON.stringify(x.relatedTagList||[])===JSON.stringify(row.relatedTagList||[])&&
     x.description===row.displayDescription&&x.specification===row.displaySpecification&&
     x.materials===row.displayMaterials&&x.originalDescription===row.description&&
-    x.qty===row.qty&&x.workingTotalTHB===row.extendedTHB&&
+    x.qty===null&&x.historicalQty===row.qty&&x.workingTotalTHB===null&&
+    x.referenceTotalTHB===row.extendedTHB&&x.customerTotalTHB===null&&
     x.sourcePriceUSD===row.sourcePriceUSD&&
     // Price audit uses original USD precision × FX before THB display rounding.
     // C2 long cable quantities would incorrectly fail if rounded 2-decimal unit THB were multiplied.
@@ -325,6 +323,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    conditionalOptionIncludedInBase:r.code==="B9"?true:null,
    b3GroupTrace,groupAttributionOnly:Boolean(b3Source),
    costComplete:n(r.directCostTHB),releaseAllowed:false,
+   spareSourceReview:r.spareSourceReview||null,
    sourceStatus:r.priceStatus,workingSellBasis:r.workingSellBasis};
  });
  const c=bc.rows.filter(r=>r.code.startsWith("C")).map(r=>{
@@ -338,6 +337,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    reserveTHB:basis?.omissionReserveTHB??null,
    addvalueTargetProfitTHB:basis?.addvalueTargetProfitTHB??null,
    costComplete:Boolean(basis),optional:true,releaseAllowed:false,
+   spareSourceReview:r.spareSourceReview||null,
    state:basis?"WORKING_COST_NOT_APPROVED":"DIRECT_COST_NOT_ESTABLISHED__NO_30_PERCENT_ON_WORKING_SELL"};
  });
  const annexCodes=["B10","B11","B13","C1","C2"];
