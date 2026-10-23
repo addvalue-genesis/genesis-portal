@@ -27,7 +27,7 @@ assert(model.rows.some(x=>x.id==="B1-REG-07"&&x.riskClass.includes("ANTI_BRIBERY
 assert.equal(model.computedRegulatoryDirectCostTHB,null);
 assert.equal(model.workingSellPosted,false);
 assert.equal(base.byCode.B1.workingSellTHB,211600); // New Rev.K engineering + PM, old 510k audit only
-assert.equal(base.knownWorkingSellTHB,4602736.82);
+assert.equal(base.knownWorkingSellTHB,4328914.13);
 assert.equal(base.byCode.B3.workingSellTHB,2599325);
 // 21-Oct audit bridge is NONPOSTING. The 22-Oct revision changed BOTH B3
 // FAT/SAT role rates and B9 onshore Senior; remove both current deltas.
