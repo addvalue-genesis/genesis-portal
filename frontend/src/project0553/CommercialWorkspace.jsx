@@ -137,6 +137,12 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  // Navigate directly to the selected canonical 10.1/10.2 Module ID.
  // Link navigation is read-only: never modify Working SELL or release status.
  const [releaseJump,setReleaseJump]=useState(null);
+ const [releaseAnnexTarget,setReleaseAnnexTarget]=useState(null);
+ const openReleaseAnnexRow=({code,sourceId})=>{
+  if(!["B10","B11","B13","C1","C2"].includes(code)||!sourceId)return;
+  setReleaseAnnexTarget(prev=>({code,sourceId,seq:(prev?.seq||0)+1}));
+  setPricingStage("released"); // navigation only, no price posting/approval
+ };
  const openReleaseSource=item=>{
   const incomingId=String(item?.sourceModuleId||"");
   // What's New and nested financial IDs carry a Module ID but no B/C code field.
@@ -278,10 +284,10 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     <p className="p55-note">Selected module: <strong>{bcTab==="ALL"?"All Part B/C — B1–B14 and C1–C2":bcTab+" — "+bcWorking.byCode[bcTab]?.requirement}</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey={bcTab==="ALL"?"bid.budget.working.bc":"bid.budget.working.bc."+bcTab.toLowerCase()}/></p>
     </section>
    {bcTab!=="ALL"&&bcWorking.byCode[bcTab]&&<section className="p55-panel" data-component-key={"bid.budget.working.bc."+bcTab.toLowerCase()+".details"}><h4>{bcTab} — Engineering & Cost Detail</h4><BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/>{!["B1","B2","B3","B4","B5","B6","B7","B8","B9"].includes(bcTab)&&<BcWorkCostLines0553 selectedCode={bcTab}/>}</section>}
-   {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>}
+   {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working" onOpenReleaseRow={openReleaseAnnexRow}/>}
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<p className="p55-note"><strong>Selected {bcTab}:</strong> รายละเอียดแสดงโดยตรงด้านล่างตารางจาก Component เดียวกับ 10.5 โดยไม่ต้องกด ＋ Detail อีกครั้ง</p>}
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
-    <p className="p55-note"><strong>CURRENT REV.K FAT / YARD BASIS (18-Oct-2026):</strong> MGW executes MR0001–MR0004 OEM IFAT/FAT at MGW Office in China; ADDVALUE sends 2 paid attendees (plus 1 unbilled standby). MGW DDP delivery is at JUTAL Zhuhai Yard, China. FAT venue/city, approved attendance days, one-trip routing, visa/work permissions, lodging and insured activities remain to confirm. ADDVALUE MGW FAT Witness staff/travel/insurance AND offshore SAT/SIT are B3 Inspection/Testing. B9 is only optional Yard Specialist assistance; direct personnel COST is not established. The former Bangkok integrated FAT and JUTAL Nantong routing in Rev05 are superseded for current 10.2 budget, preserved as audit source only.</p>
+    <p className="p55-note"><strong>CURRENT REV.K FAT / YARD BASIS (18-Oct-2026):</strong> MGW executes MR0001–MR0004 OEM IFAT/FAT at MGW Office in China; ADDVALUE sends 2 paid attendees (plus 1 unbilled standby). MGW outbound freight to JUTAL Zhuhai Yard is provisionally priced under Proposed DAP (Incoterms 2020) for B6; original DDP contractual wording is NOT amended or buyer-approved. FAT venue/city, approved attendance days, one-trip routing, visa/work permissions, lodging and insured activities remain to confirm. ADDVALUE MGW FAT Witness staff/travel/insurance AND offshore SAT/SIT are B3 Inspection/Testing. B9 is only optional Yard Specialist assistance; direct personnel COST is not established. The former Bangkok integrated FAT and JUTAL Nantong routing in Rev05 are superseded for current 10.2 budget, preserved as audit source only.</p>
    {bcTab==="ALL"&&<BcWorkingHierarchy0553
     partBRows={partBRows} partCRows={partCRows}
     partBWorkingSell={partBWorkingSell} partCWorkingSell={partCWorkingSell}
@@ -312,7 +318,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    </p>
    {recipient==="INTERNAL"&&<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>}
    {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
-   <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} title="10.3 — Released Customer Output (Read-only staging)"/>
+   <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} focusAnnexTarget={releaseAnnexTarget} title="10.3 — Released Customer Output (Read-only staging)"/>
    <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Gate</th><th>Required check</th><th>Current status</th></tr></thead>
    <tbody>{BID_0553_GATES.map(g=><tr key={g.id}><td><strong>{g.id}</strong></td><td>{g.title}<small>{g.detail}</small></td><td><span className="p55-badge">{g.status}</span></td></tr>)}</tbody></table></div>
