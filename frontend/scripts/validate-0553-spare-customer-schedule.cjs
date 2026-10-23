@@ -105,6 +105,10 @@ for(const code of codes){
   assert.equal(customer[i].tagSummary,source[i].tagSummary);
   assert.deepEqual(customer[i].relatedTagList,source[i].relatedTagList);
   assert.equal(customer[i].description,source[i].displayDescription);
+  assert.deepEqual(customer[i].engineeringVerification,source[i].engineeringVerification,
+   "Source→Release must preserve existing OEM evidence and risk on all 31 spare lines");
+  assert.equal(customer[i].actualOemSpareSku,null);
+  assert.equal(customer[i].engineeringProofComplete,false);
   assert.equal(customer[i].specification,source[i].displaySpecification);
   assert.equal(customer[i].materials,source[i].displayMaterials);
   assert.equal(customer[i].workingTotalTHB,source[i].extendedTHB,"No price change on reword");
