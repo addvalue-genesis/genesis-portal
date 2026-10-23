@@ -139,6 +139,10 @@ export function selectSpareCustomerSchedule0553(){
   // A shared common tool/consumable is not a claim of a physical OEM TAG number.
   return Object.freeze({
    id:x.id,code,item:x.item,
+   sourceRowModuleId:"bid.budget.working.bc."+code.toLowerCase()+".spare-line."+x.id.toLowerCase(),
+   sourceOwnerModuleId:"bid.budget.working.bc."+code.toLowerCase(),
+   traceId:code+"::"+x.id,
+   sourcePriceBasis:"REV08_HISTORICAL_PRICED_INPUT__PRE_AWARD_SELECTED_WORKING_REFERENCE",
    tagNo:tags.length?tags.join(", "):"COMMON",
    tagSummary,relatedEquipmentTagCount:tags.length,
    relatedTagList:tags,relatedSiteTagCount:installed.length,
