@@ -1,6 +1,7 @@
 const fs=require("node:fs"),path=require("node:path"),assert=require("node:assert/strict");
 const root=path.join(__dirname,"../src");
-const read=p=>fs.readFileSync(path.join(root,p),"utf8");
+// Windows checkouts may use CRLF; layout boundaries have the same meaning.
+const read=p=>fs.readFileSync(path.join(root,p),"utf8").replace(/\r\n/g,"\n");
 const vendor=read("project0553/VendorProductCatalog0553.jsx");
 const docs=read("project0553/VendorSourceRegister0553.jsx");
 const page=read("pages/PJ26080553.jsx");
