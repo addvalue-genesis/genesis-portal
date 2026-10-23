@@ -178,7 +178,7 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
   });
  });
  const complete=rows.length>0&&rows.every(x=>x.selectedLine&&Number.isFinite(x.workingUnitTHB));
- const subtotal=rows.length?round(rows.reduce((a,r)=>a+(amount(r.workingTotalTHB)||0),0)):null;
+ const subtotal=rows.some(x=>x.selectedLine)?round(rows.reduce((a,r)=>a+(amount(r.workingTotalTHB)||0),0)):null; // No OEM quote is NULL, never 0.
  const variance=selected!==null&&subtotal!==null?round(selected-subtotal):null;
  return Object.freeze({
   code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
