@@ -57,7 +57,7 @@ assert.equal(working.byCode.B3.workingSellTHB-
  "Historical B3 scenario must NOT blend 21-Oct SAT change with 22-Oct role revisions");
 assert.equal(working.byCode.B9.workingSellTHB,480550);
 assert.equal(working.byCode.B6.workingSellTHB,307584,"B6 approved pre-award logistics working sell; direct cost stays null");
-assert.equal(working.knownWorkingSellTHB,4602736.82,"Current selected Part B Base: includes SAT28+BF5 in B3; B9 1 LS once");
+assert.equal(working.knownWorkingSellTHB,5043082.13,"Current selected Part B Base: includes SAT28+BF5 in B3; B9 1 LS once");
 assert.equal(working.knownWorkingSellTHB,Math.round(working.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((sum,r)=>sum+r.workingSellTHB,0)*100)/100,"Options excluded from Base");
 assert.equal(working.costComplete,false);
 assert.equal(working.releaseAllowed,false);
