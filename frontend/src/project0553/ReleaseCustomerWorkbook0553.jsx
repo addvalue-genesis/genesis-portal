@@ -285,16 +285,18 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        const r=annexLines[i];return <tr key={r?.id||"empty:"+i}
         data-component-key={r?"bid.budget.pricing.release.preview.annex."+code.toLowerCase()+"."+r.sourceId.toLowerCase():undefined}>
         <td>{r?i+1:""}</td>
-        <td>{r&&<><strong>{r.tagSummary||r.tagNo||"COMMON"}</strong>
+        <td className="p553-annex-tags">{r&&<><strong>{r.tagSummary||r.tagNo||"COMMON"}</strong>
          {r.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list">
           <summary>View {r.relatedEquipmentTagCount} TAGs / ดู TAG</summary>
-          <div>{(r.relatedTagList||[]).join(" · ")}</div>
+          <div>{(r.relatedTagList||[]).map(tag=><code key={tag} className="p553-annex-tag-chip">{tag}</code>)}</div>
           <small>Functional TAG references only — OEM spare compatibility NOT verified</small>
          </details>}{sourceButton(r)}</>}</td>
-        <td>{r?.description||""}{r?.purpose&&<small>{r.purpose}</small>}{internal&&r?.explanationTH&&<small>{r.explanationTH}</small>}</td>
-        <td>{r?.specification||""}{r&&<small>Confirm against installed OEM part number before release</small>}</td>
-        <td>{r?.materials||""}{r?.materialVerified===false&&<small>Material / OEM confirmation pending</small>}</td>
-        <td>{r?.qty??""}{internal&&r?.unit&&<small>{r.unit}</small>}</td>
+        <td className="p553-annex-description">{r?.description&&<strong>{r.description}</strong>}
+         {r?.purpose&&<small>{r.purpose}</small>}
+         {internal&&r?.explanationTH&&<small>{r.explanationTH}</small>}</td>
+        <td className="p553-annex-specification">{r?.specification||""}</td>
+        <td className="p553-annex-materials">{r?.materials||""}</td>
+        <td className="p553-annex-qty">{r?.qty??""}{r?.unit&&<small>{r.unit} · spare qty</small>}</td>
         <td className="p553-price-cell">{!r?(code==="C2"?"Not quote":""):
           code.startsWith("B")?formatUnit(r.customerUnitTHB):
           internal?formatUnit(r.workingUnitTHB):"Not quote"}
