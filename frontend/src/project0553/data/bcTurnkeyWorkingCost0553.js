@@ -27,6 +27,7 @@ import {selectBcWorkCostLines0553} from "./bcWorkCostLines0553";
 import {selectBcB5HistoricalPriceBridge0553} from "./bcB5HistoricalPriceBridge0553";
 import {REV08_BASELINE} from "./rev08CommercialBaseline";
 import {selectUnifiedSpareConsumables0553} from "./unifiedSpareConsumables0553";
+import {selectSpareEngineeringReconciliation0553} from "./spareEngineeringReconciliation0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553,validateBcRoutes0553} from "./bcWorkingModuleRoutes0553";
 
 const activitiesForCustomerCode=Object.freeze({
@@ -90,8 +91,9 @@ export function selectBcTurnkeyWorkingCost0553(){
  const b10HistoricalUSD=REV08_BASELINE.summary.find(x=>x[0]==="B10")?.[2];
  const b10DetailUSD=(REV08_BASELINE.detail.B10||[]).reduce((sum,[,qty,unitUSD])=>sum+qty*unitUSD,0);
  if(!Number.isFinite(b10HistoricalUSD)||Math.abs(b10HistoricalUSD-b10DetailUSD)>0.01)throw Error("B10 Rev08 source reconciliation failed");
- const b10WorkingSellTHB=round(b10HistoricalUSD*31.5);
- const spareBudget=selectUnifiedSpareConsumables0553();
+ const b10WorkingSellTHB=null; // Current PTTEP/OEM QTY×RATE not established; Rev08 historic only.
+ const spareBudget=selectUnifiedSpareConsumables0553(); // Historical audit only.
+ const spareReview=selectSpareEngineeringReconciliation0553();
  const chinaB9=selectB9ChinaWorkingBudget0553();
  const b8Hybrid=selectB8FourSystemHybridTraining0553();
  const b3SiteSurvey=selectB3SiteSurveyScope0553();
@@ -149,9 +151,9 @@ export function selectBcTurnkeyWorkingCost0553(){
   const b5ApprovedSellTHB=code==="B5"?b5PriceReference.amountTHB:null;
   const b7ReserveSellTHB=code==="B7"?b7WorkingSellTHB:null;
   const b10ApprovedSellTHB=code==="B10"?b10WorkingSellTHB:null;
-  const spareSellTHB=spareBudgetCodes.has(code)?spareBudget.budgetTotalsTHB[code]:null;
+  const spareSellTHB=null; // Five categories require independent current OEM quotations.
   // Management-authorized pre-award B11 sell allowance; vendor quotation and Part A inclusions to reconcile.
-  if(code==="B11"&&(!Number.isFinite(spareSellTHB)||spareSellTHB<=0))throw Error("B11 budgetary sell reference missing");
+  if(code==="B11"&&spareSellTHB!==null)throw Error("Old B11 tool amount cannot be current price");
   const sellKnown=Number.isFinite(w.sellTHB);
   if(!costEvidence||costEvidence.workingSellTHB!==(code==="B6"?costEvidence.reconciliation?.historicalRev08TransportSellTHB:w.sellTHB)||costEvidence.directCostTHB!==null)
    throw Error("B/C cost evidence diverged from source WBS or invented a direct cost at "+code);
@@ -175,16 +177,17 @@ export function selectBcTurnkeyWorkingCost0553(){
     sourceStatus:r.priceStatus
    })),
    requirementCount:requirementRows.length,
-   workingSellTHB:Number.isFinite(b8HybridWorkingSellTHB)?b8HybridWorkingSellTHB:Number.isFinite(b1CurrentSellTHB)?b1CurrentSellTHB:Number.isFinite(b2RecalculatedSellTHB)?b2RecalculatedSellTHB:Number.isFinite(b9ChinaSellTHB)?b9ChinaSellTHB:Number.isFinite(b3CurrentSellTHB)?b3CurrentSellTHB:Number.isFinite(spareSellTHB)?spareSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b7ReserveSellTHB)?b7ReserveSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
-   workingSellBasis:Number.isFinite(b8HybridWorkingSellTHB)?"FOUR_SYSTEMS_EIGHT_TRAINEES_TWO_DAYS_ONSITE_OEM_REMOTE_SENIOR_PRE_AWARD_WORKING_SELL":Number.isFinite(b1CurrentSellTHB)?"2026_B1_1_TO_B1_8_NEW_ROLE_ADMIN_ACCOUNTING_PROCUREMENT_PM_COST_PLUS_ALLOWANCES_NO_LEGACY":Number.isFinite(b2RecalculatedSellTHB)?"B2_VDRL_131WO_GEQ005_COST_RATE_HISTORY_LOAD_1_2_MARGIN_20_PRE_AWARD_PROVISIONAL":Number.isFinite(b9ChinaSellTHB)?"REV_K_B9_YARD_SPECIALIST_ONE_LS_QUOTED_BASE_EXECUTION_CONDITIONAL":Number.isFinite(b3CurrentSellTHB)?"USER_20261022_B3_SAT28_SENIOR_USD1000_SPECIALIST_USD800_BF_SURVEY_USD800_FAT_MGW_VEEX":Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b7ReserveSellTHB)?"ONE_MONTH_CONDITIONAL_STORAGE_RESERVE_FROM_SEPARATED_REV09_B7_NON_ADDITIVE":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
+   workingSellTHB:spareBudgetCodes.has(code)?null:Number.isFinite(b8HybridWorkingSellTHB)?b8HybridWorkingSellTHB:Number.isFinite(b1CurrentSellTHB)?b1CurrentSellTHB:Number.isFinite(b2RecalculatedSellTHB)?b2RecalculatedSellTHB:Number.isFinite(b9ChinaSellTHB)?b9ChinaSellTHB:Number.isFinite(b3CurrentSellTHB)?b3CurrentSellTHB:Number.isFinite(spareSellTHB)?spareSellTHB:Number.isFinite(b5ApprovedSellTHB)?b5ApprovedSellTHB:Number.isFinite(b7ReserveSellTHB)?b7ReserveSellTHB:Number.isFinite(b6BudgetarySellTHB)?b6BudgetarySellTHB:sellKnown?w.sellTHB:null,
+   workingSellBasis:spareBudgetCodes.has(code)?"PTTEP_STD_BOD_SPE_DTS_MR_GA_LAY_OEM_SPIR_REPRICE_IN_PROGRESS":Number.isFinite(b8HybridWorkingSellTHB)?"FOUR_SYSTEMS_EIGHT_TRAINEES_TWO_DAYS_ONSITE_OEM_REMOTE_SENIOR_PRE_AWARD_WORKING_SELL":Number.isFinite(b1CurrentSellTHB)?"2026_B1_1_TO_B1_8_NEW_ROLE_ADMIN_ACCOUNTING_PROCUREMENT_PM_COST_PLUS_ALLOWANCES_NO_LEGACY":Number.isFinite(b2RecalculatedSellTHB)?"B2_VDRL_131WO_GEQ005_COST_RATE_HISTORY_LOAD_1_2_MARGIN_20_PRE_AWARD_PROVISIONAL":Number.isFinite(b9ChinaSellTHB)?"REV_K_B9_YARD_SPECIALIST_ONE_LS_QUOTED_BASE_EXECUTION_CONDITIONAL":Number.isFinite(b3CurrentSellTHB)?"USER_20261022_B3_SAT28_SENIOR_USD1000_SPECIALIST_USD800_BF_SURVEY_USD800_FAT_MGW_VEEX":Number.isFinite(spareSellTHB)?"REV08_SOURCE_RECONCILED_BUDGETARY_SELL_FX_31_5__OEM_SPIR_PENDING":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_B5_REV09_PACKING_ONLY_WORKING_SELL_NON_VERIFIED_DIRECT_COST":Number.isFinite(b7ReserveSellTHB)?"ONE_MONTH_CONDITIONAL_STORAGE_RESERVE_FROM_SEPARATED_REV09_B7_NON_ADDITIVE":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_BUDGETARY_SELL_FROM_REV08_FX_31_5_NOT_ACTUAL_COST":sellKnown?"WBS_REV05_WORKING_SELL_NOT_COST":null,
    directCostTHB:null, // No controlled source-rate x quantity internal ledger yet.
    riskCostTHB:null,
    commercialSellTHB:null, // A customer price is not the existing WBS sell reference.
-   priceStatus:Number.isFinite(b8HybridWorkingSellTHB)?"PRE_AWARD_HYBRID_TRAINING_SELECTED_WORKING_SELL__OEM_QUOTE_AND_VENUE_PENDING":Number.isFinite(b1CurrentSellTHB)?"PRE_AWARD_B1_REPRICED_ACTIVITY_WORKING_SELL_COST_UNVERIFIED":Number.isFinite(b2RecalculatedSellTHB)?"B2_VDRL_FIRST_PRINCIPLES_131WO_PROVISIONAL_WORKING_SELL__INPUT_AND_RACI_HOLD":Number.isFinite(b9ChinaSellTHB)?"B9_PRICED_BASE_ONE_LS_YARD_EXECUTION_CONDITIONAL":Number.isFinite(b3CurrentSellTHB)?"B3_SELECTED_SAT28_SURVEY_BF3_PLUS_TRAVEL2_FAT_WITNESS_VEEX__COST_UNVERIFIED":Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b7ReserveSellTHB)?"BUDGETARY_ONE_MONTH_STORAGE_RESERVE_CONDITIONAL_VENDOR_RECONFIRM":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
+   priceStatus:spareBudgetCodes.has(code)?spareReview.reestimateReviewByCode[code].status:Number.isFinite(b8HybridWorkingSellTHB)?"PRE_AWARD_HYBRID_TRAINING_SELECTED_WORKING_SELL__OEM_QUOTE_AND_VENUE_PENDING":Number.isFinite(b1CurrentSellTHB)?"PRE_AWARD_B1_REPRICED_ACTIVITY_WORKING_SELL_COST_UNVERIFIED":Number.isFinite(b2RecalculatedSellTHB)?"B2_VDRL_FIRST_PRINCIPLES_131WO_PROVISIONAL_WORKING_SELL__INPUT_AND_RACI_HOLD":Number.isFinite(b9ChinaSellTHB)?"B9_PRICED_BASE_ONE_LS_YARD_EXECUTION_CONDITIONAL":Number.isFinite(b3CurrentSellTHB)?"B3_SELECTED_SAT28_SURVEY_BF3_PLUS_TRAVEL2_FAT_WITNESS_VEEX__COST_UNVERIFIED":Number.isFinite(spareSellTHB)?"PRE_AWARD_WORKING_SELL_BUDGETARY__TECHNICAL_COMPLETENESS_OPEN":Number.isFinite(b5ApprovedSellTHB)?"MANAGEMENT_ACCEPTED_WORKING_SELL_REV09_PACKING_ONLY":Number.isFinite(b7ReserveSellTHB)?"BUDGETARY_ONE_MONTH_STORAGE_RESERVE_CONDITIONAL_VENDOR_RECONFIRM":Number.isFinite(b6BudgetarySellTHB)?"MANAGEMENT_APPROVED_WORKING_SELL_ESTIMATE":sellKnown?"WORKING_SELL_REFERENCE_ONLY":"TURNKEY_COST_INPUTS_REQUIRED",
    costState:"DIRECT_COST_NOT_ESTABLISHED",
    sourceStatus:w.state,
-   b11VendorFollowup:code==="B11"?Object.freeze({status:"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING",amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08 B11 itemized tools",verifiedDirectCost:false,releaseAllowed:false,verification:"Requote tools with MGW/OEM; deduct included Part A tooling before bid release"}):null,
-   unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:spareSellTHB,source:"4-Scope of Supply.xlsx Rev08",fxTHBPerUSD:31.5,pricingClass:"BUDGETARY_WORKING_SELL",verifiedDirectCost:false,sourceLines:spareBudget.byCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
+   b11VendorFollowup:code==="B11"?Object.freeze({status:"NEW_OEM_TOOLS_PRICE_REQUIRED",amountTHB:null,source:spareReview.reestimateReviewByCode.B11.source,verifiedDirectCost:false,releaseAllowed:false,verification:"Confirm EXA-A8 tool applicability, MR phase sets and MGW included kits"}):null,
+   unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:null,source:spareReview.reestimateReviewByCode[code].source,fxTHBPerUSD:null,pricingClass:"PTTEP_NEW_OEM_PRICING_REQUIRED",verifiedDirectCost:false,historicalSourceLines:spareBudget.byCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
+   spareSourceReview:spareBudgetCodes.has(code)?spareReview.reestimateReviewByCode[code]:null,
    b1SupportPlanningBudget:code==="B1"?b1Current:null,
    b2IndependentRecalculation:code==="B2"?b2Recalculated:null,
    b2PriorWorkingSellReferenceTHB:code==="B2"?w.sellTHB:null,
@@ -232,7 +235,7 @@ export function selectBcTurnkeyWorkingCost0553(){
     pricingGate:"B9 1 LS THB480550 includes paid Senior + Field Technician, each 7+2 days, and two-person cash allowances; customer Release HOLD, call-out required. CCL Item31 18 Yard / 45 Offshore days unchanged: gap pending RACI. MGW FAT Witness remains B3."
    }):null,
    b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
-   b10WorkingSellDecision:code==="B10"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b10WorkingSellTHB,source:"4-Scope of Supply.xlsx · Rev08 · B10",historicalUSD:b10HistoricalUSD,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"WORKING_SELL_ONLY"}):null,
+   b10WorkingSellDecision:code==="B10"?Object.freeze({status:"PTTEP_OEM_REESTIMATE_REQUIRED",amountTHB:null,source:spareReview.reestimateReviewByCode.B10.source,historicalUSD:null,fxTHBPerUSD:null,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"NOT_POSTED"}):null,
    b5PriceReference:code==="B5"?b5PriceReference:null,
    b5WorkingSellDecision:code==="B5"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b5ApprovedSellTHB,source:b5PriceReference.sourceRevision,costOwner:"B5",excludedB7StorageTHB:b5PriceReference.nonAdditiveStorageTHB,verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b6UpdatedReview:code==="B6"?Object.freeze({status:"MANAGEMENT_APPROVED_WORKING_SELL_2026_10_15",reviewedOn:"2026-10-15",displayCurrency:"THB",historicalPriceReferenceTHB:costEvidence.reconciliation.historicalRev08TransportSellTHB,priceBasis:"REV08_HISTORICAL_SELL_CONVERTED_AT_PLANNING_FX_31_5",costVerified:false,shipmentScopeVerified:false,pricePostingAllowed:true,postingClass:"WORKING_SELL_ONLY",releaseAllowed:false}):null,
@@ -283,7 +286,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   .reduce((sum,r)=>sum+r.workingSellTHB,0));
  // Current Base sell must come only from CURRENT selected B1-B14 owner rows.
 // Never reconstruct current B1 from the historical Engineering 964MH/Rev05 price.
- const baseOwnerCodes=["B1","B2","B3","B5","B6","B7","B8","B9","B10","B11","B13"];
+ const baseOwnerCodes=["B1","B2","B3","B5","B6","B7","B8","B9"];
  const expectedCurrentBaseTHB=round(baseOwnerCodes.reduce((sum,code)=>{
   const item=rows.find(x=>x.code===code);
   if(!item||!item.baseScope||!Number.isFinite(item.workingSellTHB))
@@ -291,7 +294,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   return sum+item.workingSellTHB;
  },0));
  if(Math.abs(knownWorkingSellTHB-expectedCurrentBaseTHB)>0.01 ||
-    knownWorkingSellTHB!==4602736.82 ||
+    knownWorkingSellTHB!==4328914.13 ||
     rows.find(x=>x.code==="B2")?.workingSellTHB!==b2CurrentSellTHB ||
     b1Current.baseWorkingSellTHB!==211600 ||
     b1Current.historicalEngineeringCarryForwardTHB!==0 ||
@@ -302,7 +305,9 @@ export function selectBcTurnkeyWorkingCost0553(){
   moduleId:"bid.budget.working.bc",workflowNumber:"10.2",
   status:"WORKING_COST_GAPS__NOT_RELEASED",
   rows,byCode:byCodeOutput,scenarioAudits,
-  knownWorkingSellTHB,
+  knownWorkingSellTHB,baseAmountComplete:false,
+   baseAmountLabel:"PRICED_ITEMS_ONLY__B10_B11_B13_PENDING",
+   unpricedBaseCodes:Object.freeze(["B4","B10","B11","B12","B13","B14"]),
   workingSellB6BudgetaryTHB:rows.find(r=>r.code==="B6").workingSellTHB,
   workingSellB9ChinaBudgetTHB:chinaB9.b9BaseWorkingSellTHB,
   workingSellB3ChinaFatWitnessTHB:chinaB9.fatWorkingSellTHB,
