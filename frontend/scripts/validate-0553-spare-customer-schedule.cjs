@@ -72,7 +72,7 @@ assert.equal(release.annexTraceAudit.rowTrace.length,16);
 assert(release.annexTraceAudit.rowTrace.every(r=>r.sourceToReleaseMatched&&r.releaseToSourceMatched&&!r.customerReleaseAllowed));
 const nativeNames={B10:"B10 CommSpares",B11:"B11 SpecialTool",B13:"B13 Consumerables",
  C1:"C1 CapitalSpares",C2:"C2 2Y-Spares"};
-const originIndex=new Map(x.rows.map(row=>[row.id,row]));
+const originIndex=new Map(x.currentRows.map(row=>[row.id,row]));
 for(const code of codes){
  for(const [i,row] of release.annex[code].entries()){
   const original=originIndex.get(row.sourceId);
@@ -97,7 +97,7 @@ assert(bcNavigatorText.includes("selectSpareCustomerSchedule0553"));
 assert(bcNavigatorText.includes("id:s.sourceRowModuleId"));
 
 for(const code of codes){
- const source=x.byCode[code],customer=release.annex[code];
+ const source=x.currentByCode[code],customer=release.annex[code];
  assert.equal(customer.length,source.length);
  for(let i=0;i<source.length;i++){
   assert.equal(customer[i].tagNo,source[i].tagNo,"Never lose original linked TAG identity");
