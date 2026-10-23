@@ -14,6 +14,7 @@ require.extensions[".js"]=(m,file)=>{
 const from=p=>require(path.join(root,"project0553",p));
 const {selectSpareCustomerSchedule0553}=from("data/spareCustomerSchedule0553.js");
 const {selectSpareCoverageEngineering0553}=from("data/spareCoverageEngineering0553.js");
+const {selectSpareEngineeringReconciliation0553}=from("data/spareEngineeringReconciliation0553.js");
 const {selectBcTurnkeyWorkingCost0553}=from("data/bcTurnkeyWorkingCost0553.js");
 const {REV08_BASELINE}=from("data/rev08CommercialBaseline.js");
 const {buildReleaseCommercialModel0553}=from("data/releaseCommercialModel0553.js");
@@ -104,6 +105,10 @@ for(const code of codes){
   assert.equal(customer[i].tagSummary,source[i].tagSummary);
   assert.deepEqual(customer[i].relatedTagList,source[i].relatedTagList);
   assert.equal(customer[i].description,source[i].displayDescription);
+  assert.deepEqual(customer[i].engineeringVerification,source[i].engineeringVerification,
+   "Source→Release must preserve current OEM evidence and risk on all 16 Annex rows");
+  assert.equal(customer[i].actualOemSpareSku,null);
+  assert.equal(customer[i].engineeringProofComplete,false);
   assert.equal(customer[i].specification,source[i].displaySpecification);
   assert.equal(customer[i].materials,source[i].displayMaterials);
   assert.equal(customer[i].workingTotalTHB,source[i].extendedTHB,"No price change on reword");
@@ -134,6 +139,49 @@ const workspaceUI=fs.readFileSync(path.join(root,"project0553/CommercialWorkspac
 assert(workspaceUI.includes('onOpenReleaseRow={openReleaseAnnexRow}'));
 assert(workspaceUI.includes('focusAnnexTarget={releaseAnnexTarget}'));
 
+// Complete 31-line PRE-AWARD engineering review (not fictitious OEM validation).
+const eng=selectSpareEngineeringReconciliation0553();
+assert.equal(eng.verificationRows.length,31);
+assert.equal(new Set(eng.verificationRows.map(v=>v.id)).size,31);
+assert(eng.vendorClarificationReady&&!eng.physicalSpirComplete);
+assert.equal(eng.engineeringSummary.reviewedSourceRows,31);
+assert.equal(eng.engineeringSummary.confirmedIndependentSpareSku,0);
+assert.equal(eng.engineeringSummary.verifiedOemDirectCostRows,0);
+assert.equal(eng.engineeringSummary.contractualNewPlatformCommissioningKits,14);
+assert.equal(eng.engineeringSummary.exaA8TelecomToolMinimumFunctions,5);
+assert.equal(eng.engineeringSummary.possibleB10C2DuplicateFamilies,eng.b10c2Conflicts.length);
+assert.equal(eng.engineeringSummary.possibleC2DuplicateHistoricalReferenceTHB,
+ Math.round(eng.b10c2Conflicts.reduce((t,x)=>t+x.sourceReferenceSellTHB,0)*100)/100);
+assert(eng.engineeringSummary.possibleC2DuplicateHistoricalReferenceTHB>0);
+assert.equal(eng.engineeringSummary.customerReleaseAllowed,false);
+assert.equal(eng.engineeringSummary.procurementReadiness,"NOT_READY_PENDING_OEM_ITEMIZED_SPIR");
+assert(eng.verificationRows.every(v=>v.sourceRowModuleId&&v.requiredVendorAnswer&&
+ v.technicalGap&&v.verifiedSpareSku===null&&v.verifiedDirectCostTHB===null&&
+ v.verifiedQuantity===null&&!v.pricePosted&&!v.customerReleaseAllowed));
+assert.equal(eng.includedVendorKits.length,2);
+assert(eng.includedVendorKits[0].included===true&&eng.includedVendorKits[0].affects==="B11-REV08-01");
+assert(eng.priorityRows.some(v=>v.id==="B11-REV08-01"));
+assert(eng.priorityRows.some(v=>v.id==="C1-REV08-02"&&v.installedCandidateSku.includes("Tideland")));
+assert(eng.priorityRows.some(v=>v.id==="C2-REV08-09"&&v.technicalGap.includes("1/2-inch")));
+assert(eng.priorityRows.some(v=>v.id==="C2-REV08-10")===false,"CAT6A row pending, not invent OEM quote");
+assert(eng.b10c2Conflicts.length>=5);
+for(const v of eng.b10c2Conflicts)assert(v.code==="C2");
+assert.equal(eng.kitLines.length,14);
+for(const r of x.rows){
+ const evidence=r.engineeringVerification;
+ assert(evidence&&evidence.action&&evidence.issue);
+ assert.equal(evidence.approvedReplacementSku,null);
+ assert.equal(evidence.verifiedSpareQty,null);
+ assert.equal(evidence.verifiedDirectCostTHB,null);
+ assert.equal(evidence.extraPostingAllowed,false);
+ assert.equal(r.verifiedSpareSku,null);
+ assert.equal(r.verifiedSpareQty,null);
+ assert.equal(r.verifiedSpareDirectCostTHB,null);
+}
+const engineeringUi=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
+assert(engineeringUi.includes("spareReconciliation.verificationRows.filter(x=>x.code===code)"));
+assert(engineeringUi.includes("MGW Paul email 20-Oct"));
+assert(engineeringUi.includes("Attachment 7 instruction 6"));
 assert.equal(x.summary.B10.workingReferenceTHB,123024.37);
 assert.equal(x.summary.B11.workingReferenceTHB,128314.11);
 assert.equal(x.summary.B13.workingReferenceTHB,22484.21);

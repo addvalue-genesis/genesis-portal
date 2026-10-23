@@ -56,6 +56,16 @@ for(const code of codes){
   assert.equal(projected[i].qty,source[i].qty);
   assert.equal(projected[i].workingTotalTHB,source[i].extendedTHB);
   assert.equal(projected[i].customerReleaseAllowed,false);
+  assert.equal(source[i].engineeringVerification.sourceId,source[i].id);
+  assert.equal(source[i].engineeringVerification.sourceRowModuleId,source[i].sourceRowModuleId);
+  assert(source[i].engineeringVerification.evidence&&source[i].engineeringVerification.action);
+  assert.equal(source[i].engineeringVerification.approvedReplacementSku,null);
+  assert.equal(source[i].engineeringVerification.verifiedSpareQty,null);
+  assert.equal(source[i].engineeringVerification.verifiedDirectCostTHB,null);
+  assert.equal(source[i].engineeringVerification.extraPostingAllowed,false);
+  assert.deepEqual(projected[i].engineeringVerification,source[i].engineeringVerification);
+  assert.equal(projected[i].actualOemSpareSku,null);
+  assert.equal(projected[i].engineeringProofComplete,false);
   assert(projected[i].nativeRow<=18);
  }
  if(code.startsWith("B")){
@@ -81,13 +91,17 @@ for(const patch of [
  {sourceId:"ORPHAN"},{sourceRowModuleId:"bid.budget.working.bc.b11"},
  {qty:99},{workingTotalTHB:0},{customerUnitTHB:0},{workingUnitTHB:0},
  {nativeRow:18},{nativeSheet:"C1 CapitalSpares"},{nativeCells:{}},
- {mr:[]},{sites:[]},{evidenceSource:"unverified replacement"},{customerReleaseAllowed:true}
+ {mr:[]},{sites:[]},{evidenceSource:"unverified replacement"},{customerReleaseAllowed:true},
+ {engineeringVerification:null},{engineeringVerification:{approvedReplacementSku:"invented"}},
+ {actualOemSpareSku:"invented"},{installedCandidateSku:"invented"},{engineeringProofComplete:true}
 ]){
  const wrong=structuredClone(rel.annex);Object.assign(wrong.B10[0],patch);
  assert.throws(()=>auditAnnexBidirectionalTrace0553(costs.currentByCode,wrong),/BIDIRECTIONAL/);
 }
 const duplicate=structuredClone(rel.annex);duplicate.C2[1]=duplicate.C2[0];
 assert.throws(()=>auditAnnexBidirectionalTrace0553(costs.currentByCode,duplicate),/BIDIRECTIONAL/);
+// Value-preserving serialization must remain valid; object identity is not evidence parity.
+assert.equal(auditAnnexBidirectionalTrace0553(costs.currentByCode,structuredClone(rel.annex)).totalRows,16);
 assert.equal(bc.knownWorkingSellTHB,5043082.13);
 const unchangedOwners={B1:211600,B2:237121.13,B3:2599325,B4:null,B5:311184,
  B6:307584,B7:30000,B8:151550,B9:480550,B12:null,B14:null};
@@ -126,6 +140,7 @@ for(const code of codes){
    assert.equal(html.split('data-component-key="'+anchor+'"').length-1,1,"Unique rendered source anchor "+anchor);
   }
   assert(html.includes("10.3 Release"));
+  assert(html.includes("Current row OEM proof — OPEN"));
   if(mode==="scope")assert(html.includes("10.2 Source"));
   if(code.startsWith("C"))assert(html.includes("NOT QUOTED"));
  }

@@ -161,6 +161,10 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    purpose:x.displayPurpose||null,specification:x.displaySpecification||x.detailSpecification,
    materials:x.displayMaterials||x.materials,explanationTH:x.explanationTH||null,
    materialVerified:false,oemSpareSkuVerified:false,
+   engineeringVerification:x.engineeringVerification||null,
+   installedCandidateSku:x.installedCandidateSku||null,
+   actualOemSpareSku:null,
+   engineeringProofComplete:false,
    qty:x.qty,unit:x.unit,leadTimeARO:x.leadTimeARO,
    mr:x.linkedMR,sites:x.linkedLocations,
    referenceUnitTHB:unitReference,referenceTotalTHB:extReference,
@@ -226,6 +230,9 @@ export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
     JSON.stringify(x.sites)===JSON.stringify(row.linkedLocations)&&
     x.evidenceSource===(row.evidenceSource||null)&&x.priceAuthority===(row.sourcePriceBasis||null)&&
     x.sourceOwnerModuleId===row.sourceOwnerModuleId&&
+    JSON.stringify(x.engineeringVerification)===JSON.stringify(row.engineeringVerification)&&
+    x.installedCandidateSku===(row.installedCandidateSku||null)&&
+    x.actualOemSpareSku===null&&x.engineeringProofComplete===false&&
     x.sourcePriceUSD===row.sourcePriceUSD&&
     // Price audit uses original USD precision × FX before THB display rounding.
     // C2 long cable quantities would incorrectly fail if rounded 2-decimal unit THB were multiplied.

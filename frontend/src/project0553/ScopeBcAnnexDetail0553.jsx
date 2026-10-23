@@ -39,6 +39,66 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    <div><strong>Historical Rev08 Reference</strong><p>{thb(p.historicalReferenceTHB)}</p><small>Native USD source retained for audit · {p.historicalFxState}</small></div>
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
+  {["B10","B11","B13","C1","C2"].includes(code)&&<details
+   className="p55-panel p553-spare-oem-verification" open={inWorking} style={{padding:12}}
+   data-component-key={"bid.budget.working.bc."+code.toLowerCase()+".spare-engineering-review"}>
+   <summary><strong>{code} — OEM Spare Verification / Purchasing Scope Review</strong>
+    <small>{spareReconciliation.verificationRows.filter(x=>x.code===code).length} Rev08 candidates ·
+     {spareReconciliation.priorityRows.filter(x=>x.code===code).length} high-risk gaps ·
+     No independently verified spare SKU or purchased stock</small></summary>
+   <p className="p55-note"><strong>Evidence basis:</strong>
+    <a href="https://drive.google.com/file/d/1aFGpjocp4YUlsTEewTTvw9-BDi1mz5ZL/view" target="_blank" rel="noreferrer">EXA-A8 Att-1 Minimum Spares</a>
+    {" · "}
+    <a href="https://drive.google.com/file/d/1J3jkvf9e-tbFAiGwrK0s_bVIbH6pmUZ7/view" target="_blank" rel="noreferrer">EXA-A8 Att-2 Telecom Tools</a>
+    {" · "}
+    <a href="https://drive.google.com/file/d/1LHfQU0yg2O9GwLhHnVyBPxtfPfrI1Jzo/view" target="_blank" rel="noreferrer">MGW P26-058_R2 (Installed Supply Only)</a>.
+    Engineering finding is traceable to the exact source; none is an approved OEM spare SPIR.</p>
+   <p className="p55-note"><strong>Engineering assessment completed against current available evidence:</strong>
+    MR Rev.C1 / EXA-A8 / MGW R2 installed quotation and seller clarification.
+    Listed candidate OEM models are NOT approved replacement spare part numbers.
+    Each row below states exactly what the selected supplier must provide to prove
+    physical interchangeability, scope and pricing. No Qty/Working SELL changes or
+    automatic credit are made by this review.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Original Item / Source</th><th>Installed Model Candidate (not spare SKU)</th>
+     <th>Finding / Risk</th><th>Remaining OEM Proof / Action</th><th>Commercial Treatment</th></tr></thead>
+    <tbody>{spareReconciliation.verificationRows.filter(x=>x.code===code).map(x=><tr key={x.id}>
+     <td><strong>{x.description}</strong><small>{x.id} · Qty {x.sourceQty} (Rev08 reference)</small></td>
+     <td>{x.installedCandidateSku||"Not established"}<small>{x.evidence}</small></td>
+     <td><strong>{x.severity==="HIGH"?"HIGH — ":""}{x.conflict}</strong>
+      <small>{x.technicalGap}</small></td>
+     <td>{x.requiredVendorAnswer}<small>Accepted replacement SKU / approved Qty / quoted Direct COST: NOT ESTABLISHED</small></td>
+     <td>REFERENCE ONLY · no additional posting<small>B10/B11/B13 Base / C1/C2 Options retain original boundaries; Release HOLD</small></td>
+    </tr>)}</tbody></table></div>
+   {code==="B10"&&<p className="p55-note"><strong>Document minimum:</strong> 14 commissioning/start-up
+    spare KITS (MR0001–0004: 4/3/4/3). The 9 historical B10 item descriptions are not
+    a substitute for 14 itemized OEM commissioning kit bills. EXA-A8 Att-1 applies
+    to the actual equipment/rating and must not be mechanically imposed on every telecom item.</p>}
+   {code==="B11"&&<p className="p55-note"><strong>Vendor inclusion:</strong> MGW Paul email 20-Oct confirms RACON
+    programming kit included; exact OEM kit content, quantity and handover still OPEN.
+    Do not buy/price the same kit twice. The historical TETRA voice gateway tool
+    does not automatically apply to the selected DMR/RFI BDA design. EXA-A8 Att-2 has five telecom tool/license
+    functions, while the historical B11 contains four priced rows: reconcile by function
+    and actual project-wide license/tool rights, not by row count.</p>}
+   {code==="B13"&&<p className="p55-note"><strong>Preservation:</strong> the 4 historical consumable
+    lines are provisional; confirm activity-driven replenishment and distinctly
+    handed-over stock versus B5 shipping packing. Unknown direct cost stays NULL.</p>}
+   {code==="C1"&&<p className="p55-note"><strong>Capital spare:</strong> historical MDS/ORGA
+    is an alternate price basis, not a spare part interchangeable with selected
+    MGW/Tideland. Independently sourced Tideland spare quote still missing;
+    C1 is NOT in Base.</p>}
+   {code==="C2"&&<p className="p55-note"><strong>Overlap screening:</strong>
+    {spareReconciliation.engineeringSummary.possibleB10C2DuplicateFamilies} C2 spare families
+    have potential B10 start-up stock overlap, with
+    <strong> {thb(spareReconciliation.engineeringSummary.possibleC2DuplicateHistoricalReferenceTHB)}</strong>
+    as historical C2 reference exposed to verification, NOT confirmed savings or an approved price deduction.</p>}
+   {code==="C2"&&<p className="p55-note"><strong>Attachment 7 instruction 6:</strong>
+    items physically listed in start-up B10 shall be excluded from 2-year operating
+    spare quotation once identical part numbers are proven. Do not automatically
+    remove historical C2 lines before SKU reconciliation.
+    Notice: MGW UHF-4 specifies 1/2-inch RF feeder; historic C2 requests 7/8-inch,
+    so cable/connector specification requires particular attention.</p>}
+  </details>}
   {code==="B1"&&<div className="p55-panel" style={{padding:12}}>
    <h4>B1 — Regulatory, Import &amp; Operating Licence Coordination (ADDVALUE)</h4>
    <p className="p55-note"><strong>Cost owner:</strong> ADDVALUE · First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model. Historical Rev05 engineering evidence is retained for audit only and NOT carried into current B1 Working SELL. New B1.1–B1.8 role-based project support is the current pricing basis; statutory/consultant conditional costs remain separate.</p>
@@ -259,6 +319,11 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
       <small>{x.displayPurpose}</small><small>{x.explanationTH}</small>
       <small>Original source: {x.description} · {x.id}</small></td>
      <td>{x.displaySpecification||x.detailSpecification}
+      {x.engineeringVerification&&<details><summary>Current row OEM proof — OPEN</summary>
+       <small>Evidence: {x.engineeringVerification.evidence}</small>
+       <small>Gap: {x.engineeringVerification.issue}</small>
+       <small>Required: {x.engineeringVerification.action}</small>
+      </details>}
       <small>ต้องตรวจ OEM Part No. และ Rating จริงก่อนอนุมัติ</small></td>
      <td>{x.displayMaterials||x.materials}
       <small>รอยืนยันวัสดุ/รุ่นจาก OEM</small></td>
