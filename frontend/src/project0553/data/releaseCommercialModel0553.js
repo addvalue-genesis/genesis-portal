@@ -218,7 +218,10 @@ export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
     x.materials===row.displayMaterials&&x.originalDescription===row.description&&
     x.qty===row.qty&&x.workingTotalTHB===row.extendedTHB&&
     x.sourcePriceUSD===row.sourcePriceUSD&&
-    (!n(row.qty)||!n(row.unitPriceTHB)||Math.abs(row.qty*row.unitPriceTHB-row.extendedTHB)<0.12)&&
+    // Price audit uses original USD precision × FX before THB display rounding.
+    // C2 long cable quantities would incorrectly fail if rounded 2-decimal unit THB were multiplied.
+    (!n(row.qty)||!n(row.sourcePriceUSD)||!n(row.workingFxTHBPerUSD)||
+     Math.abs(row.qty*row.sourcePriceUSD*row.workingFxTHBPerUSD-row.extendedTHB)<=0.011)&&
     x.customerReleaseAllowed===false&&x.nativeRow>=6;
    if(!same)problems.push(code+" source→release value mismatch "+row.id);
    traces.push(Object.freeze({code,sourceId:row.id,sourceModuleId:row.sourceRowModuleId,
