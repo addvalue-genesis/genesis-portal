@@ -353,7 +353,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
    {internal&&source&&<div className="p553-source-drawer" role="region" aria-label="Source trace">
     <div className="p553-source-head"><strong>Source Trace · {source.code||source.mr||""}</strong>
      <button type="button" onClick={()=>setSource(null)}>× Close</button></div>
-    <p><strong>Module:</strong> <code>{source.sourceModuleId}</code></p>
+    <p><strong>Module:</strong> <code>{source.sourceRowModuleId||source.sourceModuleId}</code></p>
     <p><strong>Trace:</strong> {source.mr||source.code||""} · {source.site||""} · {source.tag||source.tagNo||""} · {source.sourceRef||source.sourceId||source.workingSellBasis||""}</p>
     <p><strong>Release status:</strong> HOLD · {source.state||source.status||source.sourceStatus||"Supplier pricing / TAG mapping not verified"}</p>
     {source.engineeringVerification&&<section className="p55-panel" style={{padding:10}}>
@@ -367,7 +367,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       <strong> OEM spare SKU:</strong> NOT VERIFIED ·
       <strong> Price posting:</strong> NONE</p>
     </section>}
-    <button type="button" className="p553-detail-button" onClick={()=>onOpenSource(source)}>
+    <button type="button" className="p553-detail-button" onClick={()=>onOpenSource({...source,sourceModuleId:source.sourceRowModuleId||source.sourceModuleId})}>
      Go to {source.sourceModuleId?.startsWith("bid.budget.bom")?"10.1 Engineering BOM":"10.2 Working BC"} ↗
     </button>
    </div>}

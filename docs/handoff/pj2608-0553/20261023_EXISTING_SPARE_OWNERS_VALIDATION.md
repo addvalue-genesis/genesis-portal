@@ -92,3 +92,26 @@ Every source row below remains under `bid.budget.working.bc.<owner>.spare-line.<
 - C2: optional two-year OEM SPIR requires parts/quantities/lead times and exact SKU exclusion against B10. Unquoted values remain null, never zero.
 - DDP/inclusion/independent rate evidence and remaining Part A/B4/B12/B14 completeness gates remain OPEN.
 - Customer Release, native FINAL export approval and merge are **not granted**. User preview/approval and engineering/commercial closure are still required. No merge or customer publication was performed.
+
+## Continuation: current integration evidence and Windows validation
+
+The continuation rechecked working HEAD `052a4d09` and found that the integration base was at `4c6ef6bbc668d4e28e5dc681e98863e01951ae37`, with 11 engineering-review commits not in the working branch. PR #38 reported conflicts in the spare schedule/release adapter. The existing CI did not run for this fix branch or its integration-base PR.
+
+- Reconciled the base's existing 31-row Rev08 OEM risk review, MGW inclusion evidence and potential B10/C2 overlap screening. The 31 rows remain historical, nonposting evidence; they do not become current customer rows or prices.
+- Added explicit evidence, unresolved issue and required OEM action to each of the **16 current source rows**, inside the existing source selector. The existing release adapter preserves these fields and audits value equality, including after serialization. No historical candidate is invented as an approved current kit SKU.
+- The existing Working/Scope rows expose current OEM proof; the existing internal Release Trace shows the same evidence/action. Its return button uses the exact source row ID when available, with the existing owner fallback for non-row sources.
+- Preserved the integration base's complete engineering reconciliation source file without modification. No new business module, replacement owner, pricing ledger, dependency or module registry entry was created.
+- Extended the existing CI workflow to cover this exact working branch and integration-base PR, including a Windows Node 24 full-build job. No deployment or customer-release step was added.
+- Actual Windows CI found two LF-only source-text assertions: vendor hierarchy and location overview. Both failed under a reproduced CRLF checkout. Normalizing only CRLF in the test readers made both pass without deleting or weakening the original layout/ownership assertions; application code and prices were unaffected.
+
+### Executed cross-platform evidence
+
+- Commit `12c90dc54fc27034161456eff5abeb19b83860d2`: [GitHub Actions run 39901438051](https://github.com/addvalue-genesis/genesis-portal/actions/runs/39901438051), **Windows and Linux jobs both SUCCESS**. Full `npm run build` executes all 138 validators and webpack. Windows additionally ran the explicit existing-spare-owners validator: 139 validator command executions in that job. Windows Server 2025 / Node 24.22.1; webpack completed with three size/performance warnings.
+- First Windows attempt at `8b064e0a` failed on the CRLF assertion; it is not counted as a pass. Linux on that commit passed.
+- Browser: the integrated model's **16 unique current rows** passed Source → exact Release row → exact Source row, including exact evidence/action in the internal Trace. A long combined browser run timed out waiting for a stable C2-03 Trace button after 14 passes; a fresh C2 run passed all four rows, the five customer-summary owners, five Scope owners and native file download with zero page errors.
+- Original private native XLSX validation passed again: six sheets, 16 rows, unchanged styles/merges/geometry and unrelated ZIP parts. Browser-downloaded output matched the separately tested Node output for every ZIP part.
+- Deep comparison against the pre-integration model confirmed all Part A/B/C prices, quantities, owners and totals unchanged, and every pre-existing field on the 16 current Annex rows unchanged. Only engineering-evidence metadata was added.
+- Final local full build after the Trace return-button fix: **PASS**, all 138 validators and webpack; three bundle-size warnings, exit 0. The strengthened existing-owner validator also passed separately after that handler change.
+- Final production-bundle browser check: Trace drawer displays the exact source row ID and its Go-to-Source button returns to that row for B10 and C2. Customer/Scope summaries for all five owners and native download passed again, with zero page errors. This supplements the 16-row direct-link coverage above.
+
+The Windows result is from a real GitHub-hosted Windows runner; the user's own Windows installation, local configuration and fonts were not accessed. OEM/Commercial holds above remain OPEN. A green software build does not approve an OEM SPIR or customer issue. PR #38 remains a draft; integration-base synchronization in the working branch must not be confused with merging that PR into the integration branch.

@@ -119,6 +119,8 @@ const exportSrc=fs.readFileSync(path.join(root,"project0553/nativeWorkingDraft05
 assert(ui.includes("PTTEP FIRST-PRINCIPLES PARAMETRIC"));
 assert(ui.includes('fullBaseReady?money(provisionalBase):"NOT ESTABLISHED"'));
 assert(ui.includes("sourceRowModuleId"));
+assert(ui.includes('onOpenSource({...source,sourceModuleId:source.sourceRowModuleId||source.sourceModuleId})'),
+ "Trace drawer must return to the same source row, with owner fallback only for non-row sources");
 assert(detail.includes("customerSchedule.currentByCode"));
 assert(detail.includes("onOpenReleaseRow"));
 assert(exportSrc.includes('model.sourceCoverage?.aReady===true&&model.sourceCoverage?.bSellReady===true'));
