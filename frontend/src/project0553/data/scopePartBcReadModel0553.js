@@ -34,7 +34,7 @@ export function selectScopePartBcWorking0553(){
    qty:r.qtyDriver,unit:r.unit,owner:r.executionOwner,
    turnkeyEstimator:r.turnkeyEstimator,contractOwner:r.contractOwner,
    priceType:workingSellKnown?"WORKING_SELL_NOT_INTERNAL_COST":"NO_CURRENT_VERIFIED_PRICE",
-   priceStatus:r.sourceStatus,
+   priceStatus:r.priceStatus,sourceStatus:r.sourceStatus,
    costState:r.costState,
    source:r.sourceRevision,
    sourceUrl:r.sourceUrl,
