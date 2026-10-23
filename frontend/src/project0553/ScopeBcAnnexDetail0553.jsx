@@ -195,7 +195,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
     <thead><tr><th>Source item</th><th>Related TAGs</th><th>Description / Use</th><th>Specification</th><th>Materials</th><th>Qty</th><th>Reference THB</th></tr></thead>
     <tbody>{spareLines.map(x=><tr key={x.id} data-component-key={inWorking?x.sourceRowModuleId:"bid.budget.scope.c1.spare-line."+x.id.toLowerCase()}>
      <td>{x.item}<small>{x.id}</small>{inWorking&&<button type="button" className="p553-detail-button" onClick={()=>onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x.sourceRowModuleId})}>↗ 10.3 Release</button>}</td>
-     <td><strong>{x.tagSummary}</strong>{x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list"><summary>ดู TAG ({x.relatedEquipmentTagCount})</summary><div>{x.relatedTagList.join(" · ")}</div></details>}</td>
+     <td><strong>{x.tagSummary}</strong>{x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list"><summary>ดู TAG ({x.relatedEquipmentTagCount})</summary><div>{x.relatedTagList.map(tag=><code key={tag} className="p553-annex-tag-chip">{tag}</code>)}</div></details>}</td>
      <td>{x.displayDescription}<small>{x.displayPurpose}</small></td>
      <td>{x.displaySpecification}</td><td>{x.displayMaterials}</td><td>{x.qty} {x.unit}</td>
      <td>{thb(x.extendedTHB)}<small>Historical reference only / No Customer Release</small></td>
@@ -248,7 +248,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
      <td><strong>{x.tagSummary||x.tagNo}</strong>
       {x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list">
        <summary>ดู TAG ทั้งหมด ({x.relatedEquipmentTagCount})</summary>
-       <div>{x.relatedTagList.join(" · ")}</div>
+       <div>{x.relatedTagList.map(tag=><code key={tag} className="p553-annex-tag-chip">{tag}</code>)}</div>
        <small>ยังไม่รับรองว่าใช้ Spare Part รุ่นเดียวกันได้</small>
       </details>}
       <small>{x.linkedLocations.join(", ")||"Location pending"}</small></td>
@@ -259,7 +259,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
       <small>ต้องตรวจ OEM Part No. และ Rating จริงก่อนอนุมัติ</small></td>
      <td>{x.displayMaterials||x.materials}
       <small>รอยืนยันวัสดุ/รุ่นจาก OEM</small></td>
-     <td>{x.qty} {x.unit}<small>Budgetary Qty · source {x.sourceId} · excludes additional major-spare risk stock</small></td>
+     <td className="p553-annex-qty"><strong>{x.qty}</strong><small>{x.unit} · spare qty</small><small>Budgetary quantity · {x.sourceId}</small></td>
      <td>{thb(x.unitPriceTHB)}</td><td>{thb(x.extendedTHB)}</td>
      {(code==="C1"||code==="C2")&&<td>{x.leadTimeARO||"OEM confirmation required"}</td>}
     </tr>)}</tbody>
