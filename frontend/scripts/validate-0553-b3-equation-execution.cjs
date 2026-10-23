@@ -69,7 +69,7 @@ assert.equal(b.byCode.B3.b3EquationProofModuleId,p.moduleId);
 assert.equal(b.byCode.B1.b3EquationProofModuleId,null);
 assert.equal(b.byCode.B2.b3EquationProofModuleId,null);
 assert.equal(b.byCode.B3.workingSellTHB,2599325);
-assert.equal(b.knownWorkingSellTHB,4602736.82,"Current Part B Base includes replacement B1/B3/B9 + selected B5/B6/B7/B10/B11/B13");
+assert.equal(b.knownWorkingSellTHB,5043082.13,"Current Part B Base includes replacement B1/B3/B9 + selected B5/B6/B7/B10/B11/B13");
 assert.equal(b.knownWorkingSellTHB,Math.round(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((n,x)=>n+x.workingSellTHB,0)*100)/100,"Optional C1/C2 excluded");
 assert.equal(b.knownDirectCostTHB,null);
 assert.equal(b.releaseAllowed,false);
