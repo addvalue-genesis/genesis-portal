@@ -9,6 +9,8 @@ import {selectSpareCoverageEngineering0553} from "./spareCoverageEngineering0553
 import {MR0002_WORKING_BOM_0553} from "./mr0002WorkingBom0553";
 import {deriveSpareRiskQuantity0553,deriveConsumableBudgetQuantity0553} from "./spareRiskQuantity0553";
 import {selectB11MinimumTools0553} from "./b11MinimumTools0553";
+import {MGW_P26_058_R2_SELECTED_0553} from "./mgwP26058R2Selected0553";
+import {MGW_PAUL_EMAIL_CLARIFICATIONS_0553} from "./mgwPaulEmailClarifications0553";
 // PJ2608-0553 — customer terminology belongs to the EXISTING spare source selector.
 // Rev08 descriptions, quantities, prices and candidate installed-TAG identities
 // remain untouched. No claim that different TAGs share interchangeable OEM SKUs.
@@ -123,13 +125,96 @@ const physicalFamily=d=>{
  if(/n-male/.test(v))return "RF_N_CONNECTOR";
  return null;
 };
+// Evidence-grade analysis of EXISTING 31 Rev08 rows; no second price model.
+const assessSpareLine0553=(code,description)=>{
+ const s=description.toLowerCase(),option=code.startsWith("C");
+ const b10c2=["SCADA_POE","CISCO_POWER","RF_SURGE","ETHERNET_SURGE","M20_GLAND","FUSE","RF_N_CONNECTOR"].includes(physicalFamily(description)||"");
+ let installedCandidateSku=null,evidence="MR0001–0004 Rev.C1 / Rev08 candidate",issue="OEM spare SKU, rating, interchangeability and supplier unit price are not evidenced",
+ action="Obtain OEM SPIR part number, applicable installed TAG, unit price, lead time and per-platform quantity",
+ category="OEM_SPIR_REQUIRED",level="REVIEW";
+ if(/rf surge/.test(s)){
+  installedCandidateSku="PolyPhaser IS-B50LN-C2 quoted in MGW UHF-2 for MR0002 only";
+  evidence="MGW P26-058_R2 UHF-2 + MR0001 surge MTO";
+  issue="RF surge candidates span different systems; a quoted MR0002 protector is not interchangeable with all MR0001 surge TAGs";
+  action="Verify by installed surge SKU, RF band, impedance, Ex protection and connector; split by actual part if models differ";level="HIGH";
+ }else if(/7\/8-inch/.test(s)){
+  installedCandidateSku='MGW UHF-4 quotes FORLLER 1/2-inch cable, NOT 7/8-inch';
+  issue="Historical C2 7/8-inch cable does not match the quoted MR0002 1/2-inch feeder";
+  action="Verify 7/8-inch is actually installed elsewhere; otherwise replace the historical candidate only after approved cable BOM update";level="HIGH";category="SIZE_MISMATCH";
+ }else if(/racon.*complete/.test(s)){
+  installedCandidateSku="Tideland SeaBeacon 2 System 6; MGW RACON-1 installed quotation only";
+  issue="Historical ORGA option is NOT MGW/Tideland interchangeable spare, and MGW installed-system price is not spare price";
+  action="Obtain separately priced Tideland spare SKU, Ex certificate, accessories and delivery basis";level="HIGH";category="UNQUOTED_CAPITAL_OPTION";
+ }else if(/racon.*distribution/.test(s)){
+  installedCandidateSku="DB-5P Ex d box included with MGW RACON-1 installed set";
+  issue="No separately quoted DB-5P spare, and possible B10/C2 overlap";
+  action="Confirm DB-5P standalone spare part, Ex/terminal spec and kit inclusion";level="HIGH";
+ }else if(/racon.*programming/.test(s)){
+  installedCandidateSku="MGW Paul 20-Oct email confirms RACON programming kit included; exact SKU unlisted";
+  evidence="MGW Paul 20-Oct-2026 email RACON-KIT";
+  issue="B11 historical tool line may overlap an already included Part A MGW programming kit";
+  action="Get kit packing list, quantity, OEM software license and credit included items before independent B11 tool pricing";level="HIGH";category="VENDOR_INCLUDED_KIT_RECONCILE";
+ }else if(/telephone|ip phone/.test(s)){
+  installedCandidateSku="Gai-Tronics Auteldac 6 212-02-6008-410 — installed MGW PHONE-1";
+  issue="Installed phone model known; independently priced compliant spare not quoted";
+  action="Check identical handset model, Ex certificate, PoE/SIP settings and vendor spare rate";
+ }else if(/sounder/.test(s)){
+  installedCandidateSku="EATON DB3B — installed MGW PHONE-1, voltage variant unverified";
+  issue="MGW installed bundle includes sounder, but correct spare voltage and Ex model not quoted";
+  action="Confirm voltage, alarm output, Ex approval, independently priced spare";
+ }else if(/cisco power/.test(s)){
+  issue="Cisco equipment family known; exact PSU replacement part number not recorded";
+  action="Verify switch PID, PSU SKU, DC voltage and redundancy per installed location";
+ }else if(/poe/.test(s)){
+  issue="PoE injector vendor part and rating are not established as common for all associated TAGs";
+  action="Obtain installed injector model, input/output volts, power and PoE port specification";
+ }else if(/gland/.test(s)){
+  issue="Gland vs stopping plug are different physical items; Ex, thread and cable OD must match";
+  action="Cross-check certified installed glands and plugs with MR0002 BDA and MR0003 accessories, net Part A inclusions";level="HIGH";
+ }else if(/fuse|relay/.test(s)){
+  evidence="EXA-A8 Att-1 relevant equipment/rating minimum; MR0001–0004";
+  issue="EXA-A8 minimum depends on fuse rating/relay type; Rev08 Qty alone does not prove each type";
+  action="Count installed distinct electrical ratings and apply ONLY applicable EXA-A8 minimum; identify OEM fuse/relay+socket SKU";level="HIGH";
+ }else if(/n-male|rf type n/.test(s)){
+  installedCandidateSku='MGW UHF-4 includes 1/2-inch feeder connectors (type/model not independently specified)';
+  issue="Connector style and feeder cable size cannot be assumed interchangeable across TAGs";
+  action="Reconcile each 1/2-inch vs 7/8-inch cable and required RF connector series, net MGW included accessories";level="HIGH";
+ }else if(code==="B13"){
+  evidence="MR Attachment 9 / EXA-A8 preservation & B5 packing owner";
+  issue="Rev08 consumption has no evidenced activity count and may duplicate B5 shipment packing";
+  action="Compute handover consumables from preservation/inspection events and net actual B5 packing inclusions";level="HIGH";category="B5_B13_NETTING_REQUIRED";
+ }else if(code==="B11"){
+  evidence="EXA-A8 Att-2 Telecom / MR Attachment 8";
+  issue="Tool/license item may be included in Part A and may not serve the selected DMR/RACON";
+  action="Confirm project license rights, OEM inclusion, tool compatibility and one shared phase set";level="HIGH";
+ }
+ if(option&&code==="C2"&&b10c2){
+  category="C2_B10_ATTACHMENT7_EXCLUSION";level="HIGH";
+  issue+="; MR Attachment 7 requires exclusion of physical stock items already listed in B10";
+  action+="; compare B10 and C2 SKU/quantity and remove proven duplicate from C2 before release";
+ }
+ return Object.freeze({installedCandidateSku,quotedIndependentSpareSku:null,
+  approvedReplacementSku:null,verifiedSpareQty:null,verifiedDirectCostTHB:null,
+  evidence,issue,action,category,level,
+  proofKind:installedCandidateSku?"INSTALLED_VENDOR_MODEL_ONLY__NOT_SPARE_SKU":"DOCUMENT_OR_FUNCTION_REFERENCE_ONLY",
+  exaAtt1:"https://drive.google.com/file/d/1aFGpjocp4YUlsTEewTTvw9-BDi1mz5ZL/view",
+  exaAtt2:"https://drive.google.com/file/d/1J3jkvf9e-tbFAiGwrK0s_bVIbH6pmUZ7/view",
+  mgwSelectedQuote:"https://drive.google.com/file/d/1LHfQU0yg2O9GwLhHnVyBPxtfPfrI1Jzo/view",
+  completeness:"PRE_AWARD_FUNCTIONAL_REVIEW_COMPLETE__OEM_SPIR_OPEN",
+  stockInterchangeabilityApproved:false,extraPostingAllowed:false,releaseAllowed:false});
+};
 export function selectSpareCustomerSchedule0553(){
  const master=selectUnifiedSpareConsumables0553(),cover=selectSpareCoverageEngineering0553();
  const b11Requirements=selectB11MinimumTools0553();
+ if(!MGW_P26_058_R2_SELECTED_0553.lines.some(r=>r.id==="UHF-2"&&r.model.includes("IS-B50LN-C2"))||
+    !MGW_P26_058_R2_SELECTED_0553.lines.some(r=>r.id==="PHONE-1"&&r.model.includes("DB3B"))||
+    MGW_PAUL_EMAIL_CLARIFICATIONS_0553.raconProgrammingKit.included!==true)
+  throw Error("MGW installed component/e-mail source changed; spare compatibility must be reassessed");
  const rows=CODES.flatMap(code=>(master.byCode[code]||[]).map(x=>{
   const installed=cover.installed.filter(a=>fits(code,x.description,a));
   const tags=unique(installed.map(i=>i.tag)),sites=unique(installed.map(i=>i.site));
   const explain=selectSparePlainLanguage0553(x.description);
+  const verification=assessSpareLine0553(code,x.description);
   const common=code==="B13"||/configuration tools and maintenance access/i.test(x.description);
   const tagSummary=tags.length>1?tags.length+" related equipment TAGs — check OEM":
    tags.length===1?tags[0]:common?"Common stock — no equipment TAG":"Equipment TAG mapping pending";
@@ -143,6 +228,8 @@ export function selectSpareCustomerSchedule0553(){
    sourceOwnerModuleId:"bid.budget.working.bc."+code.toLowerCase(),
    traceId:code+"::"+x.id,
    sourcePriceBasis:"REV08_HISTORICAL_PRICED_INPUT__PRE_AWARD_SELECTED_WORKING_REFERENCE",
+   engineeringVerification:verification,installedCandidateSku:verification.installedCandidateSku,
+   verifiedSpareSku:null,verifiedSpareQty:null,verifiedSpareDirectCostTHB:null,
    tagNo:tags.length?tags.join(", "):"COMMON",
    tagSummary,relatedEquipmentTagCount:tags.length,
    relatedTagList:tags,relatedSiteTagCount:installed.length,
