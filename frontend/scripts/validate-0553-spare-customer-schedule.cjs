@@ -65,6 +65,37 @@ for(const code of ["B10","C2"]){
   assert.notEqual(item.displayDescription,item.description,"Complex spare label must be simplified "+item.id);
 }
 const release=buildReleaseCommercialModel0553();
+assert.equal(release.annexTraceAudit.totalRows,31);
+assert.equal(release.annexTraceAudit.sourceToReleasePassed,true);
+assert.equal(release.annexTraceAudit.releaseToSourcePassed,true);
+assert.equal(release.annexTraceAudit.rowTrace.length,31);
+assert(release.annexTraceAudit.rowTrace.every(r=>r.sourceToReleaseMatched&&r.releaseToSourceMatched&&!r.customerReleaseAllowed));
+const nativeNames={B10:"B10 CommSpares",B11:"B11 SpecialTool",B13:"B13 Consumerables",
+ C1:"C1 CapitalSpares",C2:"C2 2Y-Spares"};
+const originIndex=new Map(x.rows.map(row=>[row.id,row]));
+for(const code of codes){
+ for(const [i,row] of release.annex[code].entries()){
+  const original=originIndex.get(row.sourceId);
+  assert(original,"Orphan Release Annex line "+row.sourceId);
+  assert.equal(row.sourceRowModuleId,original.sourceRowModuleId);
+  assert.equal(row.nativeSheet,nativeNames[code]);
+  assert.equal(row.nativeRow,6+i);
+  assert.deepEqual(row.nativeCells,{tagNo:"C"+(6+i),description:"D"+(6+i),
+   specification:"E"+(6+i),materials:"F"+(6+i),qty:"G"+(6+i),
+   unitPrice:"H"+(6+i),totalPrice:"I"+(6+i)});
+  assert.equal(row.originalDescription,original.description);
+  assert.equal(row.tagNo,original.tagNo);
+  assert.equal(row.qty,original.qty);
+  assert.equal(row.workingTotalTHB,original.extendedTHB);
+ }
+}
+const reverseCheckText=fs.readFileSync(path.join(root,"project0553/nativeWorkingDraft0553.js"),"utf8");
+assert(reverseCheckText.includes("RELEASE→SOURCE→NATIVE mismatch"));
+assert(reverseCheckText.includes("routeTrace[j].sourceId!==r.sourceId"));
+const bcNavigatorText=fs.readFileSync(path.join(root,"project0553/data/bcModuleNavigator0553.js"),"utf8");
+assert(bcNavigatorText.includes("selectSpareCustomerSchedule0553"));
+assert(bcNavigatorText.includes("id:s.sourceRowModuleId"));
+
 for(const code of codes){
  const source=x.byCode[code],customer=release.annex[code];
  assert.equal(customer.length,source.length);
@@ -86,6 +117,9 @@ for(const jsx of [workbookUI,scopeUI]){
 }
 assert(workbookUI.includes("r?.purpose")&&workbookUI.includes("materialVerified"));
 assert(scopeUI.includes("x.displayDescription")&&scopeUI.includes("x.displayMaterials"));
+assert(scopeUI.includes("inWorking?x.sourceRowModuleId"));
+assert(workbookUI.includes("item.sourceRowModuleId||item.sourceModuleId"));
+
 assert.equal(x.summary.B10.workingReferenceTHB,123024.37);
 assert.equal(x.summary.B11.workingReferenceTHB,128314.11);
 assert.equal(x.summary.B13.workingReferenceTHB,22484.21);
