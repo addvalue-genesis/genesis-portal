@@ -125,7 +125,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   <button type="button" className={"p553-origin-link "+(item.sourceModuleId?.startsWith("bid.budget.bom")?"p553-origin-link--a":item.code?.startsWith("C")?"p553-origin-link--c":"p553-origin-link--b")}
    aria-label={"Open Module ID "+(item.sourceModuleId||item.code||"")} title={item.sourceModuleId}
    onClick={()=>onOpenSource({...item,sourceModuleId:item.sourceRowModuleId||item.sourceModuleId})}>
-   ↗ {item.sourceRowModuleId||item.sourceModuleId||item.code||"Source"}</button>
+   ↗ {item.sourceRowModuleId?"10.2 Source":item.sourceModuleId||item.code||"Source"}</button>
   <button type="button" className="p553-origin-trace" onClick={()=>openSource(item)}>Trace</button>
  </span>:null;
  const toggleMr=key=>setExpandedMr(old=>({...old,[key]:!old[key]}));
