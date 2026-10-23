@@ -73,6 +73,12 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const aWorkingTotal=partA.pricedFloorTHB;
  const bWorkingTotal=model.summary.bProvisionalCustomerSellTHB;
  const provisionalBase=addKnown(model.summary.aProvisionalCustomerSellTHB,bWorkingTotal);
+ const baseCurrentComplete=model.sourceCoverage.aReady&&model.sourceCoverage.bSellReady;
+ const baseReadyValue=baseCurrentComplete?provisionalBase:null;
+ const pendingBaseCodes=["B10","B11","B13"].filter(code=>!Number.isFinite(bLines.find(x=>x.code===code)?.customerSellTHB));
+ const spareReviewFor=code=>code.startsWith("C")?model.c.find(x=>x.code===code)?.spareSourceReview:
+   bLines.find(x=>x.code===code)?.spareSourceReview;
+
  const tagCount=model.a.reduce((n,p)=>n+p.sourceRows.length,0);
  const isOverOriginalCapacity=tagCount>15;
  // Existing 10.4 registry supplements—not replaces—the active 10.3 adapter.
@@ -177,8 +183,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       <strong>RFQ No.</strong><span> </span><strong>Package Name</strong><span> </span></div>
      <div className="p553-preview-totals">
       <span>Part A / 10.1 · <strong>{cash(aWorkingTotal)}</strong></span>
-      <span>Part B / 10.2 · <strong>{cash(bWorkingTotal)}</strong></span>
-      <span>Base A+B (working only) · <strong>{cash(provisionalBase)}</strong></span>
+      <span>Part B / 10.2 · <strong>{model.sourceCoverage.bSellReady?cash(bWorkingTotal):"INCOMPLETE — priced portion "+cash(bWorkingTotal)}</strong></span>
+      <span>Base A+B (working only) · <strong>{baseCurrentComplete?cash(baseReadyValue):"NOT ESTABLISHED — required items unpriced"}</strong></span>
      </div>
      <div className="p553-sheet-scroll"><table className="p553-customer-table">
       <thead><tr>{RELEASE_CUSTOMER_COLUMNS_0553.scope.map(h=><th key={h}>{h.split(" / ").map((t,i)=><React.Fragment key={i}>{i>0&&<br/>}{t}</React.Fragment>)}</th>)}</tr></thead>
@@ -221,13 +227,19 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-section"><td colSpan={8}>Part B: OTHERS<br/>B部分：其它</td></tr>
        {B_ROWS.map(id=>{
         const line=bLines.find(r=>r.code===id);
+        const lifecycleReview=spareReviewFor(id);
         return <React.Fragment key={id}><tr><td><strong>{id}</strong></td>
          <td colSpan={3}>{parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}</td>
          <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
-         <td>{["B10","B11","B13"].includes(id)?"refer to Annex "+id:
-          id==="B12"?"refer to Annex B12":
-          line?.executionConditional&&internal?"Quoted in Base · attendance on written call-out":line?.conditional&&internal?"Conditional — verify before release":""}</td>
+         <td>{["B10","B11","B13"].includes(id)?<>
+          <span>refer to Annex {id}</span>
+          {internal&&<><small><strong>{lifecycleReview?.status||"REESTIMATE_HOLD"}</strong></small>
+           <small>{lifecycleReview?.display||"Current OEM price NOT ESTABLISHED"}</small>
+           <button type="button" className="p553-detail-button"
+            onClick={()=>setSheet(WORKSHEETS.find(([,code])=>code===id)?.[0]||sheet)}>↗ Annex {id}</button></>}
+         </>:id==="B12"?"refer to Annex B12":
+         line?.executionConditional&&internal?"Quoted in Base · attendance on written call-out":line?.conditional&&internal?"Conditional — verify before release":""}</td>
         </tr>
         {internal&&id==="B3"&&line?.b3GroupTrace&&<tr className="p553-drilldown-only"
          data-component-key="bid.budget.pricing.release.b3.group-trace"><td colSpan={8}>
@@ -250,15 +262,18 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         </React.Fragment>;
        })}
        <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 / Base A+B (WORKING PREVIEW)</td>
-        <td className="p553-price-cell">{money(provisionalBase)}</td>
-        <td>{internal?"Pending verification · not approved bid":""}</td></tr>
+        <td className="p553-price-cell">{baseCurrentComplete?money(baseReadyValue):"NOT ESTABLISHED"}</td>
+        <td>{!baseCurrentComplete?<><strong>INCOMPLETE · NOT A FULL A+B OFFER</strong>{internal&&<small>Required unpriced: {pendingBaseCodes.join(", ")} · priced portion {cash(provisionalBase)} only</small>}</>:internal?"Pending final approval":""}</td></tr>
        <tr className="p553-sheet-highlight"><td colSpan={8}>Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
        {model.c.map(r=><tr key={r.code}><td><strong>{r.code}</strong></td>
         <td colSpan={3}>{parseName(r.code)} {sourceButton(r)}</td>
         <td>1 lot</td><td className="p553-price-cell">{money(r.customerSellTHB)}</td>
         <td className="p553-price-cell">{money(r.customerSellTHB)}</td>
-        <td>refer to Annex {r.code} · OPTION</td></tr>)}
+        <td>refer to Annex {r.code} · OPTION
+         {internal&&<><small>{r.spareSourceReview?.display||"OEM SPIR/quote pending"}</small>
+          <button type="button" className="p553-detail-button" onClick={()=>setSheet(WORKSHEETS.find(([,code])=>code===r.code)?.[0]||sheet)}>↗ Annex {r.code}</button></>}
+        </td></tr>)}
        <tr className="p553-sheet-highlight"><td colSpan={8}>Remark: Delivery term shall follow program logistic proposal and fixed by each cluster per equipment cargo size.</td></tr>
       </tbody>
      </table></div>
@@ -270,9 +285,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     </>:<>
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
      <p className="p553-native-warning"><strong>{code} — {annexModel?.priceLabel||"WORKING REFERENCE"}</strong>
+     {" "}· <strong>{spareReviewFor(code)?.display||"Current OEM price NOT ESTABLISHED"}</strong>
       {" "}· รายการจาก 10.2 — <code>bid.budget.working.bc.{code.toLowerCase()}</code>
-      {code.startsWith("C")?" · Optional Spare: มีเพียง Budgetary Reference ยังไม่มี Verified Direct Cost สำหรับราคาขาย ×1.30":
-      " · THB Working Sell, อ้างอิงราคา Budgetary Rev08; OEM Part No./SKU/การไม่ซ้ำซ้อนยังต้องตรวจ"}</p>
+      {code.startsWith("C")?" · OPTIONAL OEM spare cost and price NOT ESTABLISHED":
+      " · NEW OEM re-estimate required; historical Rev08 NOT USED in current Working SELL"}</p>
      <p className="p55-note p553-annex-reading-guide"><strong>วิธีอ่านตารางนี้ / How to read:</strong>
       Description = ซื้ออะไหล่อะไรและใช้ทำอะไร · Detail Specification = คุณสมบัติที่ต้องตรงกับของเดิม ·
       Materials = วัสดุหรือส่วนประกอบ (ถ้าไม่ทราบระบุ TBC) · Related TAGs = อุปกรณ์ที่อาจใช้อะไหล่นี้ร่วมกัน ไม่ใช่จำนวนที่จะซื้อ ·
