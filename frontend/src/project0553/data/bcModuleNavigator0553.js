@@ -9,6 +9,7 @@ import {selectB3SiteMrSatCoverage0553} from "./b3SiteMrSatCoverage0553";
 import {selectB3SurveySatExecutionPlan0553} from "./b3SurveySatExecutionPlan0553";
 import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 import {selectB8FourSystemHybridTraining0553} from "./b8FourSystemHybridTraining0553";
+import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
 import {selectB9YardWorkScopeDossier0553} from "./b9YardWorkScopeDossier0553";
 import {selectB3SatMrWorkBreakdown0553} from "./b3SatMrWorkBreakdown0553";
 import {selectB1ProjectExpenseLedger0553} from "./b1IndirectCostLedger0553";
@@ -46,6 +47,16 @@ export function buildBcModuleNavigator0553(){
    anchorModuleId:row.moduleId
   }))
  ];
+ // Existing B/C spare source rows get searchable/clickable source anchors,
+ // not new execution modules, prices or customer rows.
+ const spareSchedule=selectSpareCustomerSchedule0553();
+ entries.push(...spareSchedule.rows.map(s=>({
+  id:s.sourceRowModuleId,name:s.code+" — "+s.displayDescription+" / "+s.id,
+  tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
+  anchorModuleId:s.sourceRowModuleId,
+  keywords:s.code+" "+s.id+" "+s.description+" "+s.displayDescription+
+   " "+s.tagSummary+" "+s.relatedTagList.join(" ")+" Rev08 spare source line"
+ })));
  // The same read-only financial identity matrix is available under all 16 B/C owner IDs.
  entries.push(...bc.rows.map(r=>({
   id:r.moduleId+".financial-identity",
