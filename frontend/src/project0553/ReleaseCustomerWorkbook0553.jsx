@@ -293,6 +293,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          </details>}{sourceButton(r)}</>}</td>
         <td className="p553-annex-description">{r?.description&&<strong>{r.description}</strong>}
          {r?.purpose&&<small>{r.purpose}</small>}
+         {internal&&r?.engineeringVerification&&<small>OEM SPIR: OPEN · {r.engineeringVerification.level} risk · Trace for details</small>}
          {internal&&r?.explanationTH&&<small>{r.explanationTH}</small>}</td>
         <td className="p553-annex-specification">{r?.specification||""}</td>
         <td className="p553-annex-materials">{r?.materials||""}</td>
@@ -341,6 +342,17 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     <p><strong>Module:</strong> <code>{source.sourceModuleId}</code></p>
     <p><strong>Trace:</strong> {source.mr||source.code||""} · {source.site||""} · {source.tag||source.tagNo||""} · {source.sourceRef||source.sourceId||source.workingSellBasis||""}</p>
     <p><strong>Release status:</strong> HOLD · {source.state||source.status||source.sourceStatus||"Supplier pricing / TAG mapping not verified"}</p>
+    {source.engineeringVerification&&<section className="p55-panel" style={{padding:10}}>
+     <strong>OEM Spare Engineering Verification — {source.engineeringVerification.level}</strong>
+     <p><strong>Installed component (NOT approved spare):</strong>
+      {" "}{source.installedCandidateSku||"Model not established"}</p>
+     <p><strong>Evidence:</strong> {source.engineeringVerification.evidence}</p>
+     <p><strong>Technical gap:</strong> {source.engineeringVerification.issue}</p>
+     <p><strong>Supplier action:</strong> {source.engineeringVerification.action}</p>
+     <p><strong>Stock / Direct COST:</strong> NOT ESTABLISHED ·
+      <strong> OEM spare SKU:</strong> NOT VERIFIED ·
+      <strong> Price posting:</strong> NONE</p>
+    </section>}
     <button type="button" className="p553-detail-button" onClick={()=>onOpenSource(source)}>
      Go to {source.sourceModuleId?.startsWith("bid.budget.bom")?"10.1 Engineering BOM":"10.2 Working BC"} ↗
     </button>
