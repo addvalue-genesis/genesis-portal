@@ -172,6 +172,22 @@ export function selectSpareEngineeringReconciliation0553(){
  const priorityRows=Object.freeze(verificationRows.filter(x=>x.severity==="HIGH"));
  const quoteCandidates=Object.freeze(verificationRows.filter(x=>x.installedCandidateSku!==null));
  const b10c2Conflicts=Object.freeze(verificationRows.filter(x=>x.conflict==="C2_B10_ATTACHMENT7_EXCLUSION"));
+ const b10c2PotentialDuplicateReferenceTHB=round(b10c2Conflicts.reduce(
+  (sum,x)=>sum+x.sourceReferenceSellTHB,0));
+ const engineeringSummary=Object.freeze({
+  reviewedSourceRows:verificationRows.length,
+  installedCandidateModelReferences:quoteCandidates.length,
+  confirmedIndependentSpareSku:0,confirmedPhysicalStockQuantities:0,
+  verifiedOemDirectCostRows:0,fullyVerifiedSpares:0,
+  highRiskLineCount:priorityRows.length,
+  possibleB10C2DuplicateFamilies:b10c2Conflicts.length,
+  possibleC2DuplicateHistoricalReferenceTHB:b10c2PotentialDuplicateReferenceTHB,
+  contractualNewPlatformCommissioningKits:kitLines.length,
+  exaA8TelecomToolMinimumFunctions:5,
+  supplierEmailPromisesDoNotEstablishItemizedSPIR:true,
+  budgetaryReviewComplete:true,procurementReadiness:"NOT_READY_PENDING_OEM_ITEMIZED_SPIR",
+  customerReleaseAllowed:false
+ });
  const includedVendorKits=Object.freeze([
   Object.freeze({source:"MGW Paul Lee email 20-Oct-2026",mr:"MR-0004",
    item:"RACON programming kit",included:true,priceOwner:"Part A vendor quoted RACON package",
@@ -208,7 +224,7 @@ export function selectSpareEngineeringReconciliation0553(){
   methodModuleId:demand.moduleId,priceReadModelId:customer.moduleId,
   section:"10.2",equationIds:["MAP-02","MAP-06","MAP-07","MAP-08","MAP-09"],
   kitLines,brownfieldDemand,toolRequirements,capitalHistory,raconComparison,selectedC1Option,systemSummary,vendorScopeConflicts,
-  verificationRows,priorityRows,quoteCandidates,b10c2Conflicts,includedVendorKits,
+  verificationRows,priorityRows,quoteCandidates,b10c2Conflicts,includedVendorKits,engineeringSummary,
   vendorClarificationReady:true,physicalSpirComplete:false,
   selectedCustomerPriceUnchanged:true,
   sourceSpecificationChecklist:REQUIRED_FIELDS,byCode,
