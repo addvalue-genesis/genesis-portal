@@ -119,6 +119,13 @@ assert(workbookUI.includes("r?.purpose")&&workbookUI.includes("materialVerified"
 assert(scopeUI.includes("x.displayDescription")&&scopeUI.includes("x.displayMaterials"));
 assert(scopeUI.includes("inWorking?x.sourceRowModuleId"));
 assert(workbookUI.includes("item.sourceRowModuleId||item.sourceModuleId"));
+assert(scopeUI.includes("onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x.sourceRowModuleId})"),"Source→Release row link missing");
+assert(scopeUI.includes('p553-c1-historical-source-trace'),"C1 historical source rows must remain reverse-traceable, nonposting");
+assert(workbookUI.includes('focusAnnexTarget'),"Source→Release must select exact customer tab");
+assert(workbookUI.includes('focusAnnexTarget.sourceId.toLowerCase()'),"Source→Release must highlight exact Annex row");
+const workspaceUI=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
+assert(workspaceUI.includes('onOpenReleaseRow={openReleaseAnnexRow}'));
+assert(workspaceUI.includes('focusAnnexTarget={releaseAnnexTarget}'));
 
 assert.equal(x.summary.B10.workingReferenceTHB,123024.37);
 assert.equal(x.summary.B11.workingReferenceTHB,128314.11);
