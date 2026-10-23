@@ -150,6 +150,38 @@ export function selectSpareEngineeringReconciliation0553(){
    auditVerdict:"CANNOT_ASSERT_1_SET_PER_PLATFORM_KIT_CONTENT_COVERED"
   });
  });
+ // PTTEP document/engineering review for the EXISTING five commercial owners.
+ // This is contract coverage evidence, not an approved OEM spare SKU/price.
+ const reestimateReviewByCode=Object.freeze({
+  B10:Object.freeze({requiredKitSets:14,verifiedKitContents:0,
+   status:"DOC_SCOPE_VERIFIED__OEM_KIT_CONTENT_AND_PRICE_HOLD",
+   display:"14 MR/platform commissioning spare kits · OEM SPIR/part Qty/price pending",
+   sourceModuleId:demand.moduleId,relatedModuleId:"bid.budget.working.bc.b10",
+   source:"MR0001–0004 Rev.C1 §5 / Attachment 5 / BOD/SPE/EXA-A8",
+   workingSellTHB:null,complete:false,customerReleaseAllowed:false}),
+  B11:Object.freeze({requiredMrToolSets:toolRequirements.length,
+   minimumToolChecks:customer.b11Requirements.rows.length,
+   status:"DOC_TOOLS_IDENTIFIED__OEM_INCLUDED_TOOL_AND_PRICE_HOLD",
+   display:"4 MR phase-tool sets + 5 EXA-A8 tool checks · OEM inclusions/price pending",
+   sourceModuleId:customer.b11Requirements.moduleId,relatedModuleId:"bid.budget.working.bc.b11",
+   source:"MR0001–0004 §5 / EXA-A8 Attachment 2 / MGW inclusion check",
+   workingSellTHB:null,complete:false,customerReleaseAllowed:false}),
+  B13:Object.freeze({status:"ACTIVITY_QUANTITY_AND_RATE_HOLD",
+   display:"Preservation/maintenance consumables · activity quantity/OEM rate pending",
+   sourceModuleId:"bid.budget.working.bc.spare-reconciliation",relatedModuleId:"bid.budget.working.bc.b13",
+   source:"MR Attachment 9 / SPQ-003 / B5 packing exclusion",
+   workingSellTHB:null,complete:false,customerReleaseAllowed:false}),
+  C1:Object.freeze({status:"OPTIONAL_CAPITAL_OEM_REPLACEMENT_QUOTE_HOLD",
+   display:"Capital spare OPTION · OEM interchangeability/independent spare quote pending",
+   sourceModuleId:"bid.budget.working.bc.spare-reconciliation",relatedModuleId:"bid.budget.working.bc.c1",
+   source:"MR §5 / selected MGW installed OEM vs historical alternative",
+   workingSellTHB:null,complete:false,customerReleaseAllowed:false}),
+  C2:Object.freeze({status:"OPTIONAL_TWO_YEAR_SPIR_AND_B10_EXCLUSION_HOLD",
+   display:"Two-year operating spare OPTION · OEM SPIR/qty/B10 overlap pending",
+   sourceModuleId:"bid.budget.working.bc.spare-reconciliation",relatedModuleId:"bid.budget.working.bc.c2",
+   source:"MR0001–0004 Attachment 7 instruction 6 / OEM IOM",
+   workingSellTHB:null,complete:false,customerReleaseAllowed:false})
+ });
  const byCode=Object.fromEntries(SCOPE.map(code=>[code,Object.freeze({
   code,historicalBudgetReferenceTHB:customer.summary[code].workingReferenceTHB,
   pricedHistoricalLines:customer.byCode[code].length,
@@ -168,7 +200,7 @@ export function selectSpareEngineeringReconciliation0553(){
   methodModuleId:demand.moduleId,priceReadModelId:customer.moduleId,
   section:"10.2",equationIds:["MAP-02","MAP-06","MAP-07","MAP-08","MAP-09"],
   kitLines,brownfieldDemand,toolRequirements,capitalHistory,raconComparison,selectedC1Option,systemSummary,vendorScopeConflicts,
-  sourceSpecificationChecklist:REQUIRED_FIELDS,byCode,
+  sourceSpecificationChecklist:REQUIRED_FIELDS,byCode,reestimateReviewByCode,
   historicalSourcePriceRows:customer.rows,
   missingOemSpares:"OEM itemized SPIR not yet reconciled in current working BOM",
   revisedQuantityPricedStatus:"OPEN_ITEMIZED_BOM",complete:false,
