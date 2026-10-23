@@ -104,7 +104,7 @@ const detail=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.
 const page=fs.readFileSync(path.join(root,"pages/PJ26080553.jsx"),"utf8");
 const work=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 for(const snippet of ['selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd})',
- 'SCOPE_BC_DETAIL_CODES_0553','<ScopeBcAnnexDetail0553 code={category[1]} fx={fx}/>',
+ 'SCOPE_BC_DETAIL_CODES_0553','<ScopeBcAnnexDetail0553 code={category[1]} fx={fx} onOpenReleaseRow={onOpenReleaseRow} onOpenSource={onOpenSource}/>',
  'Historical Rev08 Reference THB','data-component-key="bid.budget.scope"','setSheet(found[0])'])
  assert(ui.includes(snippet),"10.5 Scope display missing source-backed prices or navigation: "+snippet);
 for(const snippet of ['data-component-key={moduleId}','p.historicalDetailLines.map(',

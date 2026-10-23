@@ -35,6 +35,11 @@ const historicalB3BeforeScenarioTHB=2397725;
 const historicalB3ScenarioTHB=2750525;
 const historicalB9WorkingSellTHB=233600;
 const historicalScenarioPartBTHB=4385436.82;
+// Back out the authorized 23-Oct spare revision only for this historical audit.
+const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
+const currentSpareDelta=Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
+ sum+source.byCode[code].workingSellTHB-old,0);
+assert.equal(Math.round(currentSpareDelta*100),44034531);
 assert.equal(source.knownWorkingSellTHB,5043082.13);
 assert.equal(source.byCode.B3.workingSellTHB,2599325);
 assert.equal(source.byCode.B9.workingSellTHB,480550);
@@ -46,7 +51,7 @@ assert.equal(
  source.knownWorkingSellTHB+
  (historicalB3ScenarioTHB-source.byCode.B3.workingSellTHB)+
  (historicalB9WorkingSellTHB-source.byCode.B9.workingSellTHB)-
- (source.byCode.B8.workingSellTHB-30000), // B8 current Hybrid increase excluded from historical B6 bridge
+ (source.byCode.B8.workingSellTHB-30000)-currentSpareDelta, // B8 and current spare deltas excluded from historical bridge
  historicalScenarioPartBTHB
 );
 // Compare integer satang to avoid IEEE-754 drift (e.g. 4032636.8200000003).
@@ -55,7 +60,7 @@ assert.equal(
   source.knownWorkingSellTHB-
   (source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB)-
   (source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB)-
-  (source.byCode.B8.workingSellTHB-30000)
+  (source.byCode.B8.workingSellTHB-30000)-currentSpareDelta
  )),
  403263682
 );

@@ -72,7 +72,9 @@ function replaceCell(xml,address,value){
  if(!/^[A-J][1-9][0-9]*$/.test(address))throw Error("Illegal destination "+address);
  if(typeof value!=="string"&&!(typeof value==="number"&&Number.isFinite(value)))
   throw Error("Invalid cell value "+address);
- const cellPattern=new RegExp('(<c\\b[^>]*\\br="'+address+'"[^>]*)(?:\\s*/>|>([\\s\\S]*?)</c>)');
+ // Stop before a self-closing slash. A greedy opening tag can consume the
+ // next cell through its </c>, silently deleting intervening styled cells.
+ const cellPattern=new RegExp('(<c\\b[^>]*\\br="'+address+'"[^>]*?)(?:\\s*/>|>([\\s\\S]*?)</c>)');
  const match=xml.match(cellPattern);
  if(!match)throw Error("Customer source does not have expected styled cell "+address);
  const nameAndStyle=match[1].replace(/\s+t="[^"]*"/g,"").replace(/\/\s*$/,"");
@@ -106,7 +108,8 @@ function rebuildZip(entries,changes){
  return combine([...localParts,central,end]);
 }
 function write(writes,cell,value){
- if(value===null||value===undefined||value==="")return;
+ // Empty strings are intentional clears of superseded native Annex cells.
+ if(value===null||value===undefined)return;
  if(writes.has(cell))throw Error("Duplicate native mapping "+cell);
  writes.set(cell,value);
 }
@@ -152,6 +155,10 @@ export async function buildNativeWorkingDraft0553(file,model){
   write(scope,"G"+row,round(price));
  }
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
+ for(const row of [41,42]){
+  write(scope,"F"+row,"NOT QUOTED");
+  write(scope,"G"+row,"NOT QUOTED");
+ }
  if(model.sourceCoverage?.aReady===true&&model.sourceCoverage?.bSellReady===true&&Number.isFinite(a)&&Number.isFinite(b))write(scope,"G38",round(a+b));
  else{write(scope,"G38","NOT ESTABLISHED");warnings.push("A+B NOT COMPLETE: priced subtotal only; mandatory items/confirmed supplier evidence pending");}
  if(model.sourceCoverage?.aOverflow)warnings.push("Original has 15 A TAG slots; 4 grouped MR lines require buyer acceptance before final submission");
@@ -177,6 +184,7 @@ export async function buildNativeWorkingDraft0553(file,model){
   for(let j=detail.length;j<13;j++){
    const row=j+6;
    for(const col of ["B","C","D","E","F","G","H","I"])write(rows,col+row,"");
+   if(code.startsWith("C"))write(rows,"J"+row,"");
   }
   detail.forEach((r,j)=>{
    const row=j+6;
@@ -204,7 +212,10 @@ export async function buildNativeWorkingDraft0553(file,model){
     write(rows,"H"+row,Number.isFinite(r.customerUnitTHB)?r.customerUnitTHB:"NOT ESTABLISHED");
     write(rows,"I"+row,Number.isFinite(r.customerTotalTHB)?round(r.customerTotalTHB):"NOT ESTABLISHED");
    }
-   if(code.startsWith("C")){write(rows,"H"+row,"NOT QUOTED");write(rows,"I"+row,"NOT QUOTED");}
+   if(code.startsWith("C")){
+    write(rows,"H"+row,"NOT QUOTED");write(rows,"I"+row,"NOT QUOTED");
+    write(rows,"J"+row,r.leadTimeARO??"OEM confirmation required");
+   }
    // C1/C2 require independent OEM spare cost before any commercial price.
   });
   write(rows,"I19",code.startsWith("B")?(Number.isFinite(audit?.annexLineTotalTHB)?round(audit.annexLineTotalTHB):"NOT ESTABLISHED"):"NOT QUOTED");

@@ -12,7 +12,7 @@ import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringR
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
-export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseRow=()=>{}}){
+export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseRow=null,onOpenSource=null}){
  const m=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const p=m.byCode[code];
  const shared=selectUnifiedSpareConsumables0553();
@@ -143,7 +143,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
      <td>{x.mr}</td><td>{x.tagNo}</td><td>{x.description}</td><td>{x.requirementQty} {x.unit}</td>
      <td>Not separately allocated</td><td>NOT ESTABLISHED</td><td>{x.source}<small>{x.priceBasis}</small></td>
     </tr>)}</tbody></table></div>
-   <p className="p55-note">Four requirement sets are NOT four additional prices on top of the four Rev08 B11 tool rows; verify OEM included tools, license compatibility and pooled common sets.</p>
+   <p className="p55-note">Four MR-phase requirement sets use the current B11 parametric budget once; verify OEM included tools, license compatibility and pooled common sets. Rev08 tool rows remain historical audit only.</p>
   </details>}
   {code==="C2"&&<div className="p55-panel" style={{padding:12}}>
    <h4>2-Year Operating Spares — MR0001–0004 Attachment 7 Exclusion Audit</h4>
@@ -159,7 +159,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
   {code==="B13"&&<div className="p55-panel" style={{padding:12}}>
    <h4>Consumables Quantity Driver — MR Attachment 9 / SPQ-003</h4>
    <p className="p55-note">Shipping and Long-Term Storage recommendations require preservation agents, quantities, reapplication interval and environmental storage conditions. Only separately delivered B13 consumables are additive; B5 shipment packaging and installed consumables are not counted again.</p>
-   <p className="p55-note"><strong>Derived required B13 quantity:</strong> NOT ESTABLISHED (activity count, usage per event and preservation program source missing). Current priced four Rev08 rows are displayed below as a historical working budget—not as demonstrated minimum consumption.</p>
+   <p className="p55-note"><strong>Derived required B13 quantity:</strong> NOT ESTABLISHED (activity count, usage per event and preservation program source missing). The three current parametric allowance rows remain unquoted planning assumptions, not demonstrated minimum consumption. Rev08 rows are historical audit only.</p>
   </div>}
   {code==="C1"&&<details className="p55-panel" open style={{padding:12}}>
    <summary><strong>Capital Spare Optional Selection — MR0001–0004 Source Review</strong></summary>
@@ -190,11 +190,11 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
     </tr>)}</tbody></table></div>
   </details>}
   {code==="C1"&&spareLines.length>0&&<details className="p55-panel p553-c1-historical-source-trace" style={{padding:12}}>
-   <summary><strong>C1 Rev08 historical source rows / Release trace — NOT POSTED</strong><small>Separate from management RACON option and not a new quote</small></summary>
+   <summary><strong>C1 Rev08 historical source rows — NOT POSTED</strong><small>Historical audit only; the current source-to-release row is in the Customer Schedule below</small></summary>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Source item</th><th>Related TAGs</th><th>Description / Use</th><th>Specification</th><th>Materials</th><th>Qty</th><th>Reference THB</th></tr></thead>
-    <tbody>{spareLines.map(x=><tr key={x.id} data-component-key={inWorking?x.sourceRowModuleId:"bid.budget.scope.c1.spare-line."+x.id.toLowerCase()}>
-     <td>{x.item}<small>{x.id}</small>{inWorking&&<button type="button" className="p553-detail-button" onClick={()=>onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x.sourceRowModuleId})}>↗ 10.3 Release</button>}</td>
+    <tbody>{customerSchedule.byCode.C1.map(x=><tr key={x.id}>
+     <td>{x.item}<small>{x.id}</small></td>
      <td><strong>{x.tagSummary}</strong>{x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list"><summary>ดู TAG ({x.relatedEquipmentTagCount})</summary><div>{x.relatedTagList.map(tag=><code key={tag} className="p553-annex-tag-chip">{tag}</code>)}</div></details>}</td>
      <td>{x.displayDescription}<small>{x.displayPurpose}</small></td>
      <td>{x.displaySpecification}</td><td>{x.displayMaterials}</td><td>{x.qty} {x.unit}</td>
@@ -243,9 +243,11 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
     <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
     <tbody>{spareLines.map(x=><tr key={x.id}
       data-component-key={inWorking?x.sourceRowModuleId:"bid.budget.scope."+code.toLowerCase()+".spare-line."+x.id.toLowerCase()}>
-     <td>{x.item}{inWorking&&<button className="p553-detail-button p553-source-to-release" type="button"
+     <td>{x.item}{onOpenReleaseRow&&<button className="p553-detail-button p553-source-to-release" type="button"
        onClick={()=>onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x.sourceRowModuleId})}
-       title={"Open matching 10.3 customer preview item "+x.id}>↗ 10.3 Release</button>}</td>
+       title={"Open matching 10.3 customer preview item "+x.id}>↗ 10.3 Release</button>}
+      {!inWorking&&onOpenSource&&<button type="button" className="p553-detail-button"
+       onClick={()=>onOpenSource({code,sourceModuleId:x.sourceRowModuleId})}>↗ 10.2 Source</button>}</td>
      <td><strong>{x.tagSummary||x.tagNo}</strong>
       {x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list">
        <summary>ดู TAG ทั้งหมด ({x.relatedEquipmentTagCount})</summary>
@@ -260,8 +262,8 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
       <small>ต้องตรวจ OEM Part No. และ Rating จริงก่อนอนุมัติ</small></td>
      <td>{x.displayMaterials||x.materials}
       <small>รอยืนยันวัสดุ/รุ่นจาก OEM</small></td>
-     <td className="p553-annex-qty"><strong>{x.qty}</strong><small>{x.unit} · spare qty</small><small>Engineering Qty · {x.sourceId} · {x.sourcePriceBasis}</small></td>
-     <td>{thb(x.unitPriceTHB)}</td><td>{thb(x.extendedTHB)}</td>
+     <td className="p553-annex-qty"><strong>{x.qty??"TBC — OEM SPIR"}</strong><small>{x.unit} · spare qty</small><small>Engineering Qty · {x.sourceId} · {x.sourcePriceBasis}</small></td>
+     <td>{x.option?"NOT QUOTED":thb(x.unitPriceTHB)}</td><td>{x.option?"NOT QUOTED":thb(x.extendedTHB)}</td>
      {(code==="C1"||code==="C2")&&<td>{x.leadTimeARO||"OEM confirmation required"}</td>}
     </tr>)}</tbody>
     {code==="B11"&&<tfoot><tr><th colSpan={7} style={{textAlign:"right"}}>B11 Current First-Principles Working SELL (THB) — OEM QUOTE HOLD</th><th>{thb(customerSchedule.currentBudgetaryByCode.B11)}</th></tr></tfoot>}

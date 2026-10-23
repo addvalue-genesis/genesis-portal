@@ -206,7 +206,7 @@ export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
   const projected=new Map(shown.map(x=>[x.sourceId,x]));
   if(source.length!==shown.length||reversed.size!==source.length||projected.size!==shown.length)
    problems.push(code+" line identity/count mismatch");
-  for(const row of source){
+  for(const [index,row] of source.entries()){
    const x=projected.get(row.id);
    if(!x){problems.push(code+" missing Release mapping "+row.id);continue;}
    if(ids.has(x.nativeSheet+"!"+x.nativeRow))problems.push(code+" duplicate native row");
@@ -217,13 +217,24 @@ export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
     JSON.stringify(x.relatedTagList||[])===JSON.stringify(row.relatedTagList||[])&&
     x.description===row.displayDescription&&x.specification===row.displaySpecification&&
     x.materials===row.displayMaterials&&x.originalDescription===row.description&&
-    x.qty===row.qty&&x.workingTotalTHB===row.extendedTHB&&
+    x.qty===row.qty&&x.unit===row.unit&&x.workingTotalTHB===row.extendedTHB&&
+    x.referenceUnitTHB===row.unitPriceTHB&&
+    (n(row.unitPriceTHB)?n(x.workingUnitTHB)&&Math.abs(x.workingUnitTHB-row.unitPriceTHB)<=0.005:x.workingUnitTHB===null)&&
+    (code.startsWith("B")?x.customerUnitTHB===x.workingUnitTHB&&x.customerTotalTHB===row.extendedTHB:
+     x.customerUnitTHB===null&&x.customerTotalTHB===null)&&
+    JSON.stringify(x.mr)===JSON.stringify(row.linkedMR)&&
+    JSON.stringify(x.sites)===JSON.stringify(row.linkedLocations)&&
+    x.evidenceSource===(row.evidenceSource||null)&&x.priceAuthority===(row.sourcePriceBasis||null)&&
+    x.sourceOwnerModuleId===row.sourceOwnerModuleId&&
     x.sourcePriceUSD===row.sourcePriceUSD&&
     // Price audit uses original USD precision × FX before THB display rounding.
     // C2 long cable quantities would incorrectly fail if rounded 2-decimal unit THB were multiplied.
     (!n(row.qty)||!n(row.sourcePriceUSD)||!n(row.workingFxTHBPerUSD)||
      Math.abs(row.qty*row.sourcePriceUSD*row.workingFxTHBPerUSD-row.extendedTHB)<=0.011)&&
-    x.customerReleaseAllowed===false&&x.nativeRow>=6;
+    x.customerReleaseAllowed===false&&x.nativeRow===6+index&&x.nativeRow<=18&&
+    x.nativeSheet===({B10:"B10 CommSpares",B11:"B11 SpecialTool",B13:"B13 Consumerables",C1:"C1 CapitalSpares",C2:"C2 2Y-Spares"})[code]&&
+    Object.entries({tagNo:"C",description:"D",specification:"E",materials:"F",qty:"G",unitPrice:"H",totalPrice:"I"})
+     .every(([key,col])=>x.nativeCells?.[key]===col+(6+index));
    if(!same)problems.push(code+" source→release value mismatch "+row.id);
    traces.push(Object.freeze({code,sourceId:row.id,sourceModuleId:row.sourceRowModuleId,
     releaseModuleId:"bid.budget.pricing.release.preview",scopeModuleId:"bid.budget.scope."+code.toLowerCase(),

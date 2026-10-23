@@ -63,6 +63,6 @@ const annex=read("project0553/ScopeBcAnnexDetail0553.jsx");
 assert(annex.includes('const inWorking=mode==="working"') &&
  annex.includes('inWorking?"bid.budget.working.bc."') &&
  annex.includes('data-component-key={moduleId}'));
-assert(scope.includes('<ScopeBcAnnexDetail0553 code={category[1]} fx={fx}/>'));
+assert(scope.includes('<ScopeBcAnnexDetail0553 code={category[1]} fx={fx} onOpenReleaseRow={onOpenReleaseRow} onOpenSource={onOpenSource}/>'));
 assert(!tabs.includes('directCostTHB')&&!tabs.includes('workingSellTHB'));
 console.log("PASS B/C 10.2/10.5 layout: all 16 source owner accordion headings, B1 expanded by default, colored single-owner read-only details and distinct customer scope.");

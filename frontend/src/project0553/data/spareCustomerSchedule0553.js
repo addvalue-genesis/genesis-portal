@@ -1,5 +1,6 @@
 // PJ2608-0553 — customer-style 5-category pre-award read model.
-// Source of listed quantities/prices is existing Rev08; actual installed TAG identities
+// Current rows use the locked 2026 parametric checkpoint; rows/byCode retain
+// Rev08 exclusively for historical audit. Actual installed TAG identities
 // are from MR/ MTO / AFC scoped tag model, never guessed. Candidate tag links are
 // engineering associations, not verified OEM interchangeable spare part numbers.
 // SPQ spare cost scenarios are NON-POSTING and separate from price-controlled base.
@@ -432,7 +433,7 @@ export function selectSpareCustomerSchedule0553(){
   currentWorkingFxTHBPerUSD:paramFx,currentBudgetaryPricingFactor:commercialFactor,
   currentPriceAuthority:"ENGINEERING_PARAMETRIC_SCENARIO_NOT_OEM_VENDOR_QUOTE",
   installedSourceCount:cover.installed.length,engineeringReadiness,
-  sourceOwnership:"Working BOM/Tag + Rev08 price reference + 10.2 commercial owner",
+  sourceOwnership:"MR/PTTEP requirement + Working BOM/Tag + current unquoted parametric allowance + 10.2 commercial owner; Rev08 historical audit only",
   riskQuestionAnswered:false,
   missingEngineeringProofs:["EXA-A8 applicable minimum lines by equipment","OEM spare/installed SKU replacement compatibility",
    "B10 kit-per-platform composition","B13 preservation quantity/activity consumption derivation",

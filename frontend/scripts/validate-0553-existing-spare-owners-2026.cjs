@@ -6,16 +6,19 @@ const original=require.extensions[".js"];
 require.extensions[".js"]=(mod,file)=>{
  if(file.startsWith(root+path.sep)){
   const out=babel.transformFileSync(file,{babelrc:false,configFile:false,
-   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}]]});
+   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
   mod._compile(out.code,file);
  }else original(mod,file);
 };
+require.extensions[".jsx"]=require.extensions[".js"];
+require.extensions[".css"]=()=>{};
 const from=p=>require(path.join(root,"project0553",p));
 const {selectSpareCustomerSchedule0553}=from("data/spareCustomerSchedule0553.js");
 const {selectDocumentSpareObligations0553}=from("data/documentSpareObligations0553.js");
 const {selectBcTurnkeyWorkingCost0553}=from("data/bcTurnkeyWorkingCost0553.js");
 const {selectScopePartBcWorking0553}=from("data/scopePartBcReadModel0553.js");
-const {buildReleaseCommercialModel0553}=from("data/releaseCommercialModel0553.js");
+const {buildReleaseCommercialModel0553,auditAnnexBidirectionalTrace0553}=from("data/releaseCommercialModel0553.js");
+const {auditCurrentCustomerProjection0553}=from("estimateToBidMapping.js");
 const costs=selectSpareCustomerSchedule0553(),docs=selectDocumentSpareObligations0553();
 const bc=selectBcTurnkeyWorkingCost0553(),scope=selectScopePartBcWorking0553(),rel=buildReleaseCommercialModel0553({thbPerUsd:31.5});
 const codes=["B10","B11","B13","C1","C2"];
@@ -68,7 +71,31 @@ for(const code of codes){
 assert.equal(rel.annexTraceAudit.totalRows,16);
 assert.equal(rel.annexTraceAudit.sourceToReleasePassed,true);
 assert.equal(rel.annexTraceAudit.releaseToSourcePassed,true);
+// Null option parity is valid; zero, missing values and mismatched projections are not.
+assert.equal(auditCurrentCustomerProjection0553({canonical:bc,release:rel,scope}).selectedValueParity,true);
+for(const value of [0,undefined,1]){
+ const wrong=structuredClone(rel);wrong.c[0].workingReferenceTHB=value;
+ assert.equal(auditCurrentCustomerProjection0553({canonical:bc,release:wrong,scope}).selectedValueParity,false);
+}
+for(const patch of [
+ {sourceId:"ORPHAN"},{sourceRowModuleId:"bid.budget.working.bc.b11"},
+ {qty:99},{workingTotalTHB:0},{customerUnitTHB:0},{workingUnitTHB:0},
+ {nativeRow:18},{nativeSheet:"C1 CapitalSpares"},{nativeCells:{}},
+ {mr:[]},{sites:[]},{evidenceSource:"unverified replacement"},{customerReleaseAllowed:true}
+]){
+ const wrong=structuredClone(rel.annex);Object.assign(wrong.B10[0],patch);
+ assert.throws(()=>auditAnnexBidirectionalTrace0553(costs.currentByCode,wrong),/BIDIRECTIONAL/);
+}
+const duplicate=structuredClone(rel.annex);duplicate.C2[1]=duplicate.C2[0];
+assert.throws(()=>auditAnnexBidirectionalTrace0553(costs.currentByCode,duplicate),/BIDIRECTIONAL/);
 assert.equal(bc.knownWorkingSellTHB,5043082.13);
+const unchangedOwners={B1:211600,B2:237121.13,B3:2599325,B4:null,B5:311184,
+ B6:307584,B7:30000,B8:151550,B9:480550,B12:null,B14:null};
+for(const [code,value] of Object.entries(unchangedOwners)){
+ assert.equal(bc.byCode[code].workingSellTHB,value,code+" checkpoint must not change");
+ assert.equal(scope.lines[code].workingSellTHB,value);
+ assert.equal(rel.b.find(x=>x.code===code).customerSellTHB,value);
+}
 assert.equal(rel.summary.baseCustomerSellTHB,null,"A+B complete total must not be constructed from partial costs");
 assert.equal(rel.approval.releaseAllowed,false);
 assert.equal(rel.approval.exportNativeAllowed,false);
@@ -86,4 +113,30 @@ for(const file of ["project0553/ReleaseCustomerWorkbook0553.jsx","project0553/Sc
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
  assert(result.code.length>0,"Existing UI JSX does not parse "+file);
 }
+// Render the existing components: canonical row anchors must occur exactly once,
+// including C1 whose historical audit previously reused the current row anchor.
+const React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
+const Detail=from("ScopeBcAnnexDetail0553.jsx").ScopeBcAnnexDetail0553;
+for(const code of codes){
+ for(const mode of ["working","scope"]){
+  const html=renderToStaticMarkup(React.createElement(Detail,{code,mode,
+   onOpenReleaseRow:()=>{},onOpenSource:()=>{}}));
+  for(const row of costs.currentByCode[code]){
+   const anchor=mode==="working"?row.sourceRowModuleId:"bid.budget.scope."+code.toLowerCase()+".spare-line."+row.id.toLowerCase();
+   assert.equal(html.split('data-component-key="'+anchor+'"').length-1,1,"Unique rendered source anchor "+anchor);
+  }
+  assert(html.includes("10.3 Release"));
+  if(mode==="scope")assert(html.includes("10.2 Source"));
+  if(code.startsWith("C"))assert(html.includes("NOT QUOTED"));
+ }
+}
+const Customer=from("ReleaseCustomerWorkbook0553.jsx").ReleaseCustomerWorkbook0553;
+const html=renderToStaticMarkup(React.createElement(Customer,{model:rel}));
+for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(html.includes(amount));
+assert(html.includes("NOT QUOTED")&&html.includes("NOT ESTABLISHED"));
+const Scope=from("ScopeSheetsDetail0553.jsx").ScopeSheetsDetail0553;
+const scopeHtml=renderToStaticMarkup(React.createElement(Scope,{fx:{thbPerUsd:31.5},onOpenSource:()=>{},onOpenReleaseRow:()=>{}}));
+for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(scopeHtml.includes(amount));
+assert(scopeHtml.includes("4 current Annex rows")&&scopeHtml.includes("3 current Annex rows"));
+assert(scopeHtml.includes("NOT QUOTED")&&scopeHtml.includes("10.2 Source")&&scopeHtml.includes("10.3 Annex"));
 console.log("PASS 0553 existing B10/B11/B13/C1/C2: PTTEP 14 kits, new provisional Working 509827.50/157657.50/46683.00, C option quote HOLD; 16 bidirectional row mappings, no old Rev08 rates, incomplete customer A+B total");

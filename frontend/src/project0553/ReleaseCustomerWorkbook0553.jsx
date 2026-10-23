@@ -264,8 +264,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
        {model.c.map(r=><tr key={r.code}><td><strong>{r.code}</strong></td>
         <td colSpan={3}>{parseName(r.code)} {sourceButton(r)}</td>
-        <td>1 lot</td><td className="p553-price-cell">{money(r.customerSellTHB)}</td>
-        <td className="p553-price-cell">{money(r.customerSellTHB)}</td>
+        <td>1 lot</td><td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
+        <td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
         <td>refer to Annex {r.code} · OPTION
           <small>{r.code==="C1"?"MGW installed RACON comparison only; independent spare OEM quote open":"2-year OEM SPIR/part qty/price open; excludes B10 SKU stock"}</small>
           {internal&&r.code==="C1"&&Number.isFinite(r.internalNonpostingInstalledPackageComparableTHB)&&
