@@ -79,5 +79,37 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   ...names.map((name,i)=>zippedEntry("xl/worksheets/sheet"+(i+1)+".xml",sheet(i+1))),
   zippedEntry("docProps/core.xml","<properties><creator>Original</creator></properties>")
  ],new Map()).byteLength);
- console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, annex detail, C not quoted, geometry preserved");
+ // Real 31-line Source→Release→Native XLSX→Source round-trip on the SAME
+ // original-format ZIP. No independent price/Qty data is created here.
+ const babel=require("@babel/core"),srcRoot=path.resolve(__dirname,"../src");
+ const originalLoader=require.extensions[".js"];
+ require.extensions[".js"]=(mod,file)=>{
+  if(file.startsWith(srcRoot+path.sep)){
+   const converted=babel.transformFileSync(file,{babelrc:false,configFile:false,sourceMaps:false,
+    presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});
+   mod._compile(converted.code,file);
+  }else originalLoader(mod,file);
+ };
+ const real=require(path.join(srcRoot,"project0553/data/releaseCommercialModel0553.js")).buildReleaseCommercialModel0553();
+ assert.equal(real.annexTraceAudit.totalRows,31);
+ const live=await api.buildNativeWorkingDraft0553(testFile,real);
+ const realZip=api.entriesFromZip(new Uint8Array(await live.blob.arrayBuffer()));
+ const nativeText=index=>decoder.decode(realZip.find(x=>x.name==="xl/worksheets/sheet"+index+".xml").compressed);
+ for(const [code,index] of [["B10",2],["B11",3],["B13",4],["C1",5],["C2",6]]){
+  const xml=nativeText(index);
+  for(const row of real.annex[code]){
+   assert(xml.includes('r="'+row.nativeCells.tagNo+'"'),"Native row missing TAG cell "+row.sourceId);
+   assert(xml.includes(row.tagNo),"Native lost ORIGINAL source TAG string "+row.sourceId);
+   assert(xml.includes(row.description),"Native lost approved simple description "+row.sourceId);
+   assert(xml.includes(row.specification),"Native lost selected specification "+row.sourceId);
+   assert(xml.includes(row.materials),"Native lost material/TBC disclosure "+row.sourceId);
+   assert(xml.includes('r="'+row.nativeCells.qty+'"'),"Native Qty target missing "+row.sourceId);
+   if(code.startsWith("C"))
+    assert(!new RegExp('<c r="'+row.nativeCells.totalPrice+'"[^>]*><v>').test(xml),
+     "C option cannot become a Released Price "+row.sourceId);
+  }
+ }
+ assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.sourceToReleaseMatched),Array(31).fill(true));
+ assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.releaseToSourceMatched),Array(31).fill(true));
+ console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 31 bidirectional annex item rows, C not quoted, geometry preserved");
 })().catch(e=>{console.error(e);process.exitCode=1;});
