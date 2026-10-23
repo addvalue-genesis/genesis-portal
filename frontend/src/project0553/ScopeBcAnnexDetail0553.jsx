@@ -12,7 +12,7 @@ import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringR
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
-export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
+export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseRow=()=>{}}){
  const m=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const p=m.byCode[code];
  const shared=selectUnifiedSpareConsumables0553();
@@ -230,7 +230,9 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope"}){
     <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
     <tbody>{spareLines.map(x=><tr key={x.id}
       data-component-key={inWorking?x.sourceRowModuleId:"bid.budget.scope."+code.toLowerCase()+".spare-line."+x.id.toLowerCase()}>
-     <td>{x.item}</td>
+     <td>{x.item}{inWorking&&<button className="p553-detail-button p553-source-to-release" type="button"
+       onClick={()=>onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x.sourceRowModuleId})}
+       title={"Open matching 10.3 customer preview item "+x.id}>↗ 10.3 Release</button>}</td>
      <td><strong>{x.tagSummary||x.tagNo}</strong>
       {x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list">
        <summary>ดู TAG ทั้งหมด ({x.relatedEquipmentTagCount})</summary>
