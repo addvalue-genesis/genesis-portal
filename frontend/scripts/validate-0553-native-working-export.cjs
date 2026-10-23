@@ -65,7 +65,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
  const worksheet=n=>decoder.decode(parts.find(x=>x.name==="xl/worksheets/sheet"+n+".xml").compressed);
  const main=worksheet(1),b10=worksheet(2),c1=worksheet(5);
  assert.match(main,/<c r="A8" s="12" t="inlineStr"><is>/);
- assert.match(main,/<c r="G38" s="12"><v>2791<\/v><\/c>/);
+ assert.match(main,/<c r="G38" s="12" t="inlineStr"><is><t xml:space="preserve">NOT ESTABLISHED<\/t><\/is><\/c>/);
  assert.match(main,/<c r="G33" s="12"><v>109<\/v><\/c>/); // B10 100 + 9
  assert.match(b10,/<c r="D6" s="12" t="inlineStr"><is><t xml:space="preserve">Spare B10<\/t><\/is><\/c>/);
  assert.match(b10,/<c r="I19" s="12"><v>20<\/v><\/c>/);
@@ -91,7 +91,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   }else originalLoader(mod,file);
  };
  const real=require(path.join(srcRoot,"project0553/data/releaseCommercialModel0553.js")).buildReleaseCommercialModel0553();
- assert.equal(real.annexTraceAudit.totalRows,31);
+ assert.equal(real.annexTraceAudit.totalRows,16);
  const live=await api.buildNativeWorkingDraft0553(testFile,real);
  const realZip=api.entriesFromZip(new Uint8Array(await live.blob.arrayBuffer()));
  const nativeText=index=>decoder.decode(realZip.find(x=>x.name==="xl/worksheets/sheet"+index+".xml").compressed);
@@ -109,7 +109,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      "C option cannot become a Released Price "+row.sourceId);
   }
  }
- assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.sourceToReleaseMatched),Array(31).fill(true));
- assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.releaseToSourceMatched),Array(31).fill(true));
- console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 31 bidirectional annex item rows, C not quoted, geometry preserved");
+ assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.sourceToReleaseMatched),Array(16).fill(true));
+ assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.releaseToSourceMatched),Array(16).fill(true));
+ console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 16 bidirectional PTTEP current annex source item rows, C not quoted, geometry preserved");
 })().catch(e=>{console.error(e);process.exitCode=1;});
