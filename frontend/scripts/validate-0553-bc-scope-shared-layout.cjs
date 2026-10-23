@@ -31,7 +31,7 @@ assert(work.includes('const partCRows=bcWorking.rows.filter(r=>r.optional);'));
 assert(work.includes('if(Math.abs(partBWorkingSell-bcWorking.knownWorkingSellTHB)>0.01)throw Error("10.2 Part B summary mismatch")'));
 assert(work.includes('<BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]}'));
 assert(work.includes('<BcWorkCostLines0553 selectedCode={bcTab}/>'));
-assert(work.includes('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working"/>'));
+assert(work.includes('<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working" onOpenReleaseRow={openReleaseAnnexRow}/>'));;
 assert(work.includes('bcTab==="ALL"&&<BcWorkingHierarchy0553'));
 for(const p of ["partBRows={partBRows}","partCRows={partCRows}",
  "partBWorkingSell={partBWorkingSell}","partCWorkingSell={partCWorkingSell}",
