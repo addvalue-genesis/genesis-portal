@@ -2,7 +2,8 @@
 const fs=require("node:fs"),assert=require("node:assert/strict"),path=require("node:path");
 const babel=require("@babel/core");
 const root=path.resolve(__dirname,"../src");
-const src=fs.readFileSync(path.join(root,"project0553/SimpleBom0553.jsx"),"utf8");
+// Normalize checkout line endings, retaining all layout ownership assertions.
+const src=fs.readFileSync(path.join(root,"project0553/SimpleBom0553.jsx"),"utf8").replace(/\r\n/g,"\n");
 const css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
 const compiled=babel.transformSync(src,{babelrc:false,configFile:false,
   presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]});

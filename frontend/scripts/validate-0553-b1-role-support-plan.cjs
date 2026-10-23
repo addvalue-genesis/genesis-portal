@@ -81,14 +81,18 @@ assert.equal(bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkin
 const roundTHB=v=>Math.round((v+Number.EPSILON)*100)/100;
 const historicalB1OnlyBaseTHB=4187590.69; // B1-current, B2 historical Rev05, B3 before MGW purchase and 22-Oct China FAT witness rate revision.
 const historicalChinaFatWitnessSellTHB=397400; // pre-22-Oct audit snapshot; NONPOSTING
+const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
+const currentSpareDelta=roundTHB(Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
+ sum+bc.byCode[code].workingSellTHB-old,0));
+assert.equal(currentSpareDelta,440345.31);
 const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
  -(bc.previousB2Rev05ReferenceTHB-bc.byCode.B2.workingSellTHB)
  +bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB
  +bc.byCode.B9.workingSellTHB
  -(bc.byCode.B3.b3FortyDayBudget.laborWorkingSellTHB-bc.byCode.B3.b3SelectedSatSurveyBudget.laborWorkingSellTHB)
  +(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB-historicalChinaFatWitnessSellTHB)
- +(bc.byCode.B8.workingSellTHB-30000)); // B8 Rev05 historical to 4MR Hybrid 2d
-assert.equal(historicalToCurrent,4602736.82,
+ +(bc.byCode.B8.workingSellTHB-30000)+currentSpareDelta); // B8 Hybrid and 23-Oct authorized spare revision
+assert.equal(historicalToCurrent,5043082.13,
  "Historical B1-only baseline to current B2/B3 price selection bridge failed");
 const sumBaseOwners=roundTHB(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
  .reduce((sum,r)=>sum+r.workingSellTHB,0));

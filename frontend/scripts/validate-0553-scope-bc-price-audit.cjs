@@ -33,15 +33,15 @@ for(const code of codes){
  assert.equal(a.directCostTHB,null,"No Rev08 amount may be posted as current cost "+code);
  // Working SELL budget approvals in 10.2 are distinct from historical source
  // and do not constitute direct COST or customer-released quotation.
- const budgetSell={B10:123024.37,B11:128314.11,B13:22484.21,C1:4049349.36,C2:721806.68};
+ const budgetSell={B10:509827.5,B11:157657.5,B13:46683,C1:null,C2:null};
  if(Object.hasOwn(budgetSell,code)){
   assert.equal(a.workingSellTHB,budgetSell[code],code+" approved pre-award budgetary working sell");
-  assert.equal(b.unifiedSpareBudget?.pricingClass,"BUDGETARY_WORKING_SELL");
+  assert.equal(b.unifiedSpareBudget?.pricingClass,code.startsWith("C")?"OPTIONAL_OEM_QUOTE_NOT_ESTABLISHED":"UNQUOTED_2026_PARAMETRIC_WORKING_SELL");
   assert.equal(b.unifiedSpareBudget?.verifiedDirectCost,false);
   assert.equal(b.unifiedSpareBudget?.releaseAllowed,false);
   if(code==="B11"){
-   assert.equal(b.b11VendorFollowup?.status,"BUDGETARY_WORKING_SELL_VENDOR_QUOTE_PENDING");
-   assert.equal(b.b11VendorFollowup?.amountTHB,128314.11);
+   assert.equal(b.b11VendorFollowup?.status,"UNQUOTED_PARAMETRIC_2026_TOOL_REVIEW");
+   assert.equal(b.b11VendorFollowup?.amountTHB,157657.5);
    assert.equal(b.b11VendorFollowup?.verifiedDirectCost,false);
    assert.equal(b.b11VendorFollowup?.releaseAllowed,false);
    assert.equal(a.directCostTHB,null,"B11 OEM tool quotation/inclusion not yet verified");
@@ -104,7 +104,7 @@ const detail=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.
 const page=fs.readFileSync(path.join(root,"pages/PJ26080553.jsx"),"utf8");
 const work=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 for(const snippet of ['selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd})',
- 'SCOPE_BC_DETAIL_CODES_0553','<ScopeBcAnnexDetail0553 code={category[1]} fx={fx}/>',
+ 'SCOPE_BC_DETAIL_CODES_0553','<ScopeBcAnnexDetail0553 code={category[1]} fx={fx} onOpenReleaseRow={onOpenReleaseRow} onOpenSource={onOpenSource}/>',
  'Historical Rev08 Reference THB','data-component-key="bid.budget.scope"','setSheet(found[0])'])
  assert(ui.includes(snippet),"10.5 Scope display missing source-backed prices or navigation: "+snippet);
 for(const snippet of ['data-component-key={moduleId}','p.historicalDetailLines.map(',

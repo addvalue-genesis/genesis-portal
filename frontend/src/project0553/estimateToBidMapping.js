@@ -48,6 +48,7 @@ export function auditCurrentCustomerProjection0553({canonical,release,scope}={})
  if(!canonical?.byCode||!Array.isArray(release?.a)||!Array.isArray(release?.b)||
   !Array.isArray(release?.c))throw Error("10.4 parity requires current 10.2 and 10.3 models");
  const eq=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)&&Math.abs(a-b)<=0.01;
+ const sameSelectedValue=(a,b)=>eq(a,b)||(a===null&&b===null);
  const codes=ESTIMATE_TO_BID_0553.records.map(r=>r.customerLine);
  const seen=new Set(),rows=[];
  for(const code of codes){
@@ -94,9 +95,10 @@ export function auditCurrentCustomerProjection0553({canonical,release,scope}={})
   }else if(part==="C"){
    const owner=canonical.byCode[code],priced=release.c.find(x=>x.code===code);
    const scoped=scope?.lines?.[code];
-   parity=Boolean(owner&&priced&&eq(owner.workingSellTHB,priced.workingReferenceTHB)&&
+   parity=Boolean(owner&&priced&&sameSelectedValue(owner.workingSellTHB,priced.workingReferenceTHB)&&
     priced.customerSellTHB===null&&priced.sourceModuleId===owner.moduleId&&
-    (!scope||scoped&&eq(scoped.workingSellTHB,owner.workingSellTHB)));
+    (!scope||scoped&&sameSelectedValue(scoped.workingSellTHB,owner.workingSellTHB)));
+   originalCell=code==="C1"?"G41":"G42";
    amount=null;status="C_OPTION_REFERENCE_ONLY__NO_VERIFIED_CUSTOMER_PRICE";
   }else throw Error("Unknown native customer scope "+code);
   rows.push(Object.freeze({code,sourceOwner,customerModuleId:"bid.budget.pricing.release",

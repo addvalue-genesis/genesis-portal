@@ -1,5 +1,6 @@
 // PJ2608-0553 — customer-style 5-category pre-award read model.
-// Source of listed quantities/prices is existing Rev08; actual installed TAG identities
+// Current rows use the locked 2026 parametric checkpoint; rows/byCode retain
+// Rev08 exclusively for historical audit. Actual installed TAG identities
 // are from MR/ MTO / AFC scoped tag model, never guessed. Candidate tag links are
 // engineering associations, not verified OEM interchangeable spare part numbers.
 // SPQ spare cost scenarios are NON-POSTING and separate from price-controlled base.
@@ -255,7 +256,202 @@ export function selectSpareCustomerSchedule0553(){
    leadTimeARO:null,option:code.startsWith("C")
   });
  }));
- const byCode=Object.fromEntries(CODES.map(code=>[code,rows.filter(x=>x.code===code)]));
+ const byCode=Object.fromEntries(CODES.map(code=>[code,rows.filter(x=>x.code===code)])); 
+ // CURRENT PTTEP FIRST-PRINCIPLES WORKING ESTIMATE (not the historical 31 rows).
+ // Class A: MR-confirmed contractual kit counts; Class P: explicitly assumed
+ // vendor-UNQUOTED planning rates, 31.5 FX and 1.30 SELL multiplier.
+ // Every physical SKU/Ex compatibility and independent OEM quote remains OPEN.
+ // The four B10 kit lines are envelopes, NOT 14 approved spare part SKUs.
+ const paramInputs=Object.freeze([
+  // B10: one kit per new MR/platform, 4/3/4/3; the OEM must later itemize each.
+  ["B10","MR-0001","SCADA radio / Cisco L3 / PoE commissioning spare kit",4,1400,
+   "SCADA/L3 replacement fuses by rating, power injector and approved Ethernet/RF protection; EXA-A8 PLC scope not assumed",
+   "MR0001 Rev.C1 §5 Attachment 5; GA-0001; DTS0001; PTTEP TEL-001 §7.7"],
+  ["B10","MR-0002","RFI BDA RF interface commissioning spare kit",3,700,
+   "RFI/WAROM OEM-approved RF surge/coupler, feeder termination, Ex seal parts; full BDA assembly is NOT included",
+   "MR0002 Rev.C1 §5; DTS0002; MGW R2 UHF-1/UHF-2/UHF-4 inclusion audit"],
+  ["B10","MR-0003","Ex IP telephone and sounder commissioning spare kit",4,550,
+   "OEM-approved handset/sounder service parts, certified Ex glands/seals, CAT6A re-termination only",
+   "MR0003 Rev.C1 §5; DTS0003; MGW R2 PHONE-1 inclusion audit"],
+  ["B10","MR-0004","Marine RACON commissioning spare kit",3,850,
+   "Approved fuse/control box gasket/Ex gland and OEM service materials, excluding complete SeaBeacon-2 capital spare",
+   "MR0004 Rev.C1 §5; DTS0004; MGW R2 RACON-1 inclusion audit"],
+  // B11: four MR-phase sets; PTTEP Annex Att-2 five telecom checks mapped
+  // to SCADA licenses, TETRA vs selected DMR, and RACON charging/config tools.
+  ["B11","MR-0001","SCADA configuration and network-monitoring special tools",1,2100,
+   "EXA-A8 Attachment 2 §5 SCADA configuration/NMS licences; check Cisco/AVIAT licences included in Part A",
+   "MMC25-5001 EXA-A8 Att-2 §5; MR0001 §5; SPE §8.2"],
+  ["B11","MR-0002","RFI BDA OEM service/configuration special tool set",1,650,
+   "Selected DMR/RFI BDA does NOT establish TETRA voice gateway need; seek approved OEM service method",
+   "MR0002 §5; EXA-A8 Att-2 TETRA applicability hold; MGW R2 UHF-1"],
+  ["B11","MR-0003","Ex phone/sounder approved service and verification tooling",1,350,
+   "Only special OEM tools not already ordinary SAT tester or Part A inclusions; B3 temporary VeEX excluded",
+   "MR0003 §5; DTS0003; SPE §8.2; B3 tool cost owner"],
+  ["B11","MR-0004","RACON configuration/charging tool readiness reserve",1,750,
+   "Conditional only: deduct OEM-supplied adapter/charging kit on written inclusion proof",
+   "MR0004 §5; EXA-A8 Att-2 §5 if applicable; SPE RACON adapter; MGW tool inclusion audit"],
+  // B13: preservation consumption, not supplied installation bulk or B5 packing.
+  ["B13","MULTI","Replacement desiccant/preservation activity sets",4,120,
+   "One tentative preservation/reinspection lot per new platform; frequency and actual event count open",
+   "MR Attachment 9; BOD preservation requirement; B5 packing duplicate exclusion"],
+  ["B13","MULTI","Commissioning-approved cleaning/termination consumable kits",4,95,
+   "For rework consumption only; no installed CAT6A/coax lengths or permanent cable glands",
+   "BOD/SPE/DTS; site SAT activity basis; A5 installed-bulk exclusion"],
+  ["B13","MULTI","Replacement preservation seals/inspection label project stock",1,280,
+   "Shared project stock; storage/reinspection procedure and consumed quantities need approval",
+   "MR Attachment 9 / preservation procedure; B5 overlap control"]
+ ]);
+ const paramFx=31.5,commercialFactor=1.30;
+ const mrSites=Object.freeze({
+  "MR-0001":["ZWP20","ZWP21","ZWP22","ZWP23"],
+  "MR-0002":["ZWP20","ZWP21","ZWP22"],
+  "MR-0003":["ZWP20","ZWP21","ZWP22","ZWP23"],
+  "MR-0004":["ZWP20","ZWP21","ZWP22"],
+  MULTI:["ZWP20","ZWP21","ZWP22","ZWP23"]
+ });
+ const built=paramInputs.map(([code,mr,description,qty,rate,details,source],i)=>{
+  const sameOwnerIndex=paramInputs.slice(0,i+1).filter(row=>row[0]===code).length;
+  const id=code+"-PTTEP-"+String(sameOwnerIndex).padStart(2,"0");
+  const soldUnitUsd=rate*commercialFactor,siteList=mrSites[mr];
+  return Object.freeze({
+   id,code,item:sameOwnerIndex,sourceId:id,
+   sourceRowModuleId:"bid.budget.working.bc."+code.toLowerCase()+".spare-line."+id.toLowerCase(),
+   sourceOwnerModuleId:"bid.budget.working.bc."+code.toLowerCase(),
+   traceId:code+"::"+id,tagNo:"SYSTEM SPARES / "+mr,
+   tagSummary:mr==="MULTI"?"SHARED PROJECT STOCK":mr+" kit/tool scope",
+   relatedTagList:[],relatedEquipmentTagCount:0,relatedSiteTagCount:siteList.length,
+   displayDescription:description,description,originalDescription:description,
+   displayPurpose:details,explanationTH:"Engineering parametric price allowance: OEM SKU/rating and delivered item list remain unverified",
+   displaySpecification:details,detailSpecification:details,
+   displayMaterials:"OEM certified as applicable / SPIR pending",
+   materials:"OEM certified as applicable / SPIR pending",
+   linkedMR:mr==="MULTI"?["MR-0001","MR-0002","MR-0003","MR-0004"]:[mr],
+   linkedLocations:siteList,installedTagKeys:[],
+   mappingStatus:"MR_SITE_SCOPE_VERIFIED__OEM_PART_KIT_CONTENT_PENDING",
+   qty,unit:"set",budgetQty:qty,unitPriceTHB:round(soldUnitUsd*paramFx),
+   extendedTHB:round(qty*soldUnitUsd*paramFx),
+   sourcePriceUSD:soldUnitUsd,workingFxTHBPerUSD:paramFx,
+   internalParametricUnitCostUSD:rate,internalParametricCostTHB:round(rate*qty*paramFx),
+   sourceRevision:"PTTEP_FIRST_PRINCIPLES_BUDGETARY_2026_10_23",
+   sourcePriceBasis:"UNQUOTED_PARAMETRIC_ALLOWANCE__NOT_OEM_VERIFIED",
+   evidenceSource:source,workingStatus:"PRE_AWARD_BUDGETARY_PARAMETRIC__TECHNICAL_HOLD",
+   displayPriceClass:"PLANNING_SELL_ONLY__OEM_SPIR_AND_DDP_OPEN",
+   customerReleaseAllowed:false,leadTimeARO:null,option:false,
+   possibleOverlap:"Part A/A5, B5, B3/B11, C1/C2 physical stock crosswalk mandatory"
+  });
+ });
+ // C1 installed MGW RACON-1 is a current OEM installed PACKAGE comparable, not
+ // an independent spare quotation. Keep it OPTION and do not release its price.
+ const racon=MGW_P26_058_R2_SELECTED_0553.lines.find(x=>x.id==="RACON-1");
+ if(!racon||racon.quantity!==3||racon.unitPriceUSD!==75059)
+  throw Error("Current OEM RACON source quote missing for distinct C1 comparable");
+ const capital=Object.freeze({
+  id:"C1-PTTEP-01",code:"C1",item:1,sourceId:"C1-PTTEP-01",
+  sourceRowModuleId:"bid.budget.working.bc.c1.spare-line.c1-pttep-01",
+  sourceOwnerModuleId:"bid.budget.working.bc.c1",traceId:"C1::C1-PTTEP-01",
+  tagNo:"MAR-514-001",tagSummary:"Marine RACON capital spare (project pool)",
+  relatedTagList:[],relatedEquipmentTagCount:1,relatedSiteTagCount:3,
+  description:"SeaBeacon 2 complete RACON capital spare — optional equivalent",
+  originalDescription:"SeaBeacon 2 complete RACON capital spare — optional equivalent",
+  displayDescription:"SeaBeacon 2 complete RACON capital spare — optional equivalent",
+  displayPurpose:"Owner candidate one distinct pool unit, NOT an MR-required extra system",
+  displaySpecification:"Tideland SeaBeacon 2 System 6 X/S; Ex and configuration to match installed MGW quote; OEM spare quote pending",
+  detailSpecification:"Tideland SeaBeacon 2 System 6 X/S; OEM spare approval required",
+  displayMaterials:"Complete Ex certified compatible assembly — OEM verification pending",
+  materials:"Complete Ex certified compatible assembly — OEM verification pending",
+  linkedMR:["MR-0004"],linkedLocations:mrSites["MR-0004"],installedTagKeys:[],
+  mappingStatus:"C1_OPTION__INDEPENDENT_SPARE_QUOTE_NOT_VERIFIED",
+  qty:1,unit:"set",budgetQty:1,
+  sourcePriceUSD:null,workingFxTHBPerUSD:paramFx,
+  internalInstalledComparableUnitUSD:racon.unitPriceUSD,
+  internalNonpostingCostReferenceTHB:round(racon.unitPriceUSD*paramFx),
+  internalNonpostingSellScenarioTHB:round(racon.unitPriceUSD*paramFx*commercialFactor),
+  unitPriceTHB:null,extendedTHB:null,
+  sourceRevision:"MGW_P26_058_R2_RACON_1_INSTALLED_COMPARABLE_ONLY",
+  sourcePriceBasis:"INSTALLED_PACKAGE_COMPARABLE__NOT_SPARE_VENDOR_QUOTE",
+  workingStatus:"OPTION_REQUIRES_INDEPENDENT_OEM_SPARE_QUOTE",
+  customerReleaseAllowed:false,leadTimeARO:null,option:true
+ });
+ const twoYear=["MR-0001","MR-0002","MR-0003","MR-0004"].map((mr,i)=>Object.freeze({
+  id:"C2-PTTEP-"+String(i+1).padStart(2,"0"),code:"C2",item:i+1,
+  sourceId:"C2-PTTEP-"+String(i+1).padStart(2,"0"),
+  sourceRowModuleId:"bid.budget.working.bc.c2.spare-line.c2-pttep-"+String(i+1).padStart(2,"0"),
+  sourceOwnerModuleId:"bid.budget.working.bc.c2",traceId:"C2::C2-PTTEP-"+String(i+1).padStart(2,"0"),
+  tagNo:"SYSTEM SPARES / "+mr,tagSummary:mr+" two-year OEM operating spares",
+  relatedTagList:[],relatedEquipmentTagCount:0,relatedSiteTagCount:mrSites[mr].length,
+  description:"Two-year OEM operating spare parts list — "+mr,
+  originalDescription:"Two-year OEM operating spare parts list — "+mr,
+  displayDescription:"Two-year OEM operating spare parts list — "+mr,
+  displayPurpose:"OEM SPIR separate quotation; must exclude physical B10 identical part stock",
+  displaySpecification:"OEM part numbers, MTBF/maintenance, qty, lead time, Ex and B10 exclusion required",
+  detailSpecification:"OEM recommended two-year spare part list; no duplicate B10 SKU",
+  displayMaterials:"OEM material specification pending",materials:"OEM material specification pending",
+  linkedMR:[mr],linkedLocations:mrSites[mr],installedTagKeys:[],
+  mappingStatus:"OPTIONAL_C2_PRICE_QUOTATION_AND_SKU_CROSSWALK_REQUIRED",
+  qty:null,unit:"lot",budgetQty:null,unitPriceTHB:null,extendedTHB:null,
+  sourcePriceUSD:null,workingFxTHBPerUSD:paramFx,
+  sourceRevision:"MR0001_0004_REV_C1_ATTACHMENT_7",
+  sourcePriceBasis:"OEM_TWO_YEAR_SPARE_QUOTATION_ONLY__NO_RATE_GUESS",
+  workingStatus:"OPTION_NOT_QUOTED__NO_APPROVED_SPIR",
+  customerReleaseAllowed:false,leadTimeARO:null,option:true
+ }));
+ // Read site + TAG from the ORIGINAL engineering/MTO/AFC source register.
+ // These are RELATED installed equipment references, NOT proof that one spare
+ // SKU fits every TAG. No fabricated TAG or suffix-only crosswalk is allowed.
+ const currentRows=Object.freeze([...built,capital,...twoYear].map(line=>{
+  const related=line.linkedMR.includes("MR-0001")&&line.linkedMR.length>1?[]:
+   cover.installed.filter(x=>line.linkedMR.includes(x.mr)&&line.linkedLocations.includes(x.site));
+  const keys=unique(related.map(x=>x.key)),tagRefs=unique(related.map(x=>x.site+" / "+x.tag));
+  // Current MR envelopes retain their own evidence; the 31 historical candidates
+  // are a separate risk review, never an invented SKU-to-kit allocation.
+  const controls={
+   B10:["OEM_KIT_CONTENTS_OPEN","14 contractual kits do not establish approved contents, spare SKUs or Ex compatibility",
+    "Provide itemized commissioning SPIR per MR/platform, installed TAG compatibility, Ex evidence, independent rates and DDP; assign each physical item one cost owner"],
+   B11:["OEM_TOOL_INCLUSION_OPEN","Four MR phase sets do not establish five EXA-A8 functions or net OEM-included tools",
+    "Resolve Phase 1E/1F precedence and TETRA applicability; verify five telecom functions, licenses and MGW included RACON kit; exclude B3 testers and Part A inclusions before any authorized price change"],
+   B13:["PRESERVATION_CONSUMPTION_OPEN","Preservation activity counts and consumed quantities remain unapproved",
+    "Provide preservation/reinspection events and consumption records; exclude B5 shipment packing and A5 installed bulk; no automatic quantity or price posting"],
+   C1:["OEM_REPLACEMENT_STRATEGY_OPEN","Installed RACON package is not an independently quoted capital spare",
+    "Confirm OEM replacement versus repair strategy, compatible spare SKU/Ex certificate, accessories, lead time and independent DDP quotation"],
+   C2:["C2_B10_SPIR_EXCLUSION_OPEN","Two-year spare quantities and rates are not established; B10 physical stock exclusion remains open",
+    "Provide two-year OEM SPIR by MR, maintenance basis, SKU/quantity/lead time and independent quotation; exclude identical B10 stock under Attachment 7 instruction 6"]
+  };
+  const [category,issue,action]=controls[line.code];
+  const installedCandidateSku=line.code==="C1"?"Tideland SeaBeacon 2 System 6 — MGW RACON-1 installed package only":null;
+  const engineeringVerification=Object.freeze({
+   sourceId:line.id,sourceRowModuleId:line.sourceRowModuleId,
+   installedCandidateSku,quotedIndependentSpareSku:null,approvedReplacementSku:null,
+   verifiedSpareQty:null,verifiedDirectCostTHB:null,
+   evidence:line.evidenceSource||line.sourceRevision,issue,action,category,level:"HIGH",
+   proofKind:"CURRENT_MR_ENVELOPE__OEM_SPIR_NOT_VERIFIED",
+   completeness:"CURRENT_REQUIREMENT_TRACE_PRESENT__OEM_PROOF_OPEN",
+   stockInterchangeabilityApproved:false,extraPostingAllowed:false,releaseAllowed:false
+  });
+  return Object.freeze({...line,
+   engineeringVerification,installedCandidateSku,
+   verifiedSpareSku:null,verifiedSpareQty:null,verifiedSpareDirectCostTHB:null,
+   installedTagKeys:keys,relatedTagList:tagRefs,
+   relatedEquipmentTagCount:tagRefs.length,
+   relatedSiteTagCount:unique(related.map(x=>x.site)).length,
+   tagSummary:tagRefs.length?line.tagSummary+" · "+tagRefs.length+" related installed Site/TAG references":line.tagSummary,
+   commonSpareInterchangeabilityVerified:false
+  });
+ }));
+ const currentByCode=Object.fromEntries(CODES.map(code=>[code,
+  Object.freeze(currentRows.filter(x=>x.code===code))]));
+ const currentBudgetaryByCode=Object.fromEntries(CODES.map(code=>[code,
+  currentByCode[code].length&&currentByCode[code].every(x=>Number.isFinite(x.extendedTHB))?
+   round(currentByCode[code].reduce((n,x)=>n+x.extendedTHB,0)):null]));
+ const docKits={"MR-0001":4,"MR-0002":3,"MR-0003":4,"MR-0004":3};
+ if(currentByCode.B10.reduce((n,r)=>n+r.qty,0)!==14||
+  Object.entries(docKits).some(([mr,qty])=>currentByCode.B10.find(r=>r.linkedMR[0]===mr)?.qty!==qty)||
+  currentByCode.B11.length!==4||currentByCode.B13.length!==3||
+  currentByCode.C1.length!==1||currentByCode.C2.length!==4||
+  new Set(currentRows.map(x=>x.id)).size!==currentRows.length||
+  currentBudgetaryByCode.C2!==null||
+  !currentRows.every(x=>x.customerReleaseAllowed===false))
+  throw Error("0553 PTTEP current physical-owner/kit quantity/optional gates failed");
+
  // Do not silently distribute the grand total across tags or add a balancing price line.
  for(const code of CODES){
   const subtotal=round(byCode[code].reduce((n,x)=>n+x.extendedTHB,0));
@@ -346,8 +542,11 @@ export function selectSpareCustomerSchedule0553(){
  return Object.freeze({
   moduleId:"bid.budget.working.bc.customer-spare-schedule",
   codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,crossCategoryDuplicates,b11Requirements,
+  currentRows,currentByCode,currentBudgetaryByCode,
+  currentWorkingFxTHBPerUSD:paramFx,currentBudgetaryPricingFactor:commercialFactor,
+  currentPriceAuthority:"ENGINEERING_PARAMETRIC_SCENARIO_NOT_OEM_VENDOR_QUOTE",
   installedSourceCount:cover.installed.length,engineeringReadiness,
-  sourceOwnership:"Working BOM/Tag + Rev08 price reference + 10.2 commercial owner",
+  sourceOwnership:"MR/PTTEP requirement + Working BOM/Tag + current unquoted parametric allowance + 10.2 commercial owner; Rev08 historical audit only",
   riskQuestionAnswered:false,
   missingEngineeringProofs:["EXA-A8 applicable minimum lines by equipment","OEM spare/installed SKU replacement compatibility",
    "B10 kit-per-platform composition","B13 preservation quantity/activity consumption derivation",

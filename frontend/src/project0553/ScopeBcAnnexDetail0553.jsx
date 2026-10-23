@@ -12,7 +12,7 @@ import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringR
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
-export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseRow=()=>{}}){
+export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseRow=null,onOpenSource=null}){
  const m=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const p=m.byCode[code];
  const shared=selectUnifiedSpareConsumables0553();
@@ -22,7 +22,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
  const b1Regulatory=code==="B1"?selectB1RegulatoryCost0553():null;
  const satToolReadiness=code==="B3"?selectSatToolReadiness0553():null;
  const spareReconciliation=selectSpareEngineeringReconciliation0553();
- const spareLines=customerSchedule.byCode[code]||[];
+ const spareLines=customerSchedule.currentByCode?.[code]||customerSchedule.byCode[code]||[];
  const coverage=["B10","B11","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
  const inWorking=mode==="working";
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
@@ -35,7 +35,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    {" "}· <strong>{p.optional?"PART C OPTION — NOT IN BASE":"PART B — BASE SCOPE REQUIREMENT"}</strong></p>
   <div className="p55-metric-grid">
    <div><strong>Current Turnkey Direct COST</strong><p>{thb(p.directCostTHB)}</p><small>Source-verified Cost Rate × Verified Qty required</small></div>
-   <div><strong>{code==="B11"?"Pre-Award B11 Tool Budget (non-posting)":code==="C1"?"C1 Historical Capital Spare Option — Engineering Validation Open":code==="B10"?"B10 Working Budget — Kit Content Not Verified":"Current WBS Working SELL"}</strong><p>{thb(code==="B11"?customerSchedule.summary.B11.workingReferenceTHB:p.workingSellTHB)}</p><small>{code==="B11"?"Rev08 tool-kit budget candidate only; OEM inclusion pending, not added to current Working SELL":code==="C1"?"Rev08 working option, not a source-verified full RACON spare selection or OEM quote":code==="B10"?"Rev08 nine historical source rows do not demonstrate the 14 contract commissioning spare kits are complete":"Not a current customer quotation"}</small></div>
+   <div><strong>New PTTEP First-Principles Working Estimate</strong><p>{thb(p.workingSellTHB)}</p><small>{["B10","B11","B13","C1","C2"].includes(code)?"Unquoted Engineering Parametric Allowance · 2026 planning only · OEM SPIR, SKU, DDP proof OPEN":"Current Working SELL"}</small></div>
    <div><strong>Historical Rev08 Reference</strong><p>{thb(p.historicalReferenceTHB)}</p><small>Native USD source retained for audit · {p.historicalFxState}</small></div>
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
@@ -203,7 +203,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
      <td>{x.mr}</td><td>{x.tagNo}</td><td>{x.description}</td><td>{x.requirementQty} {x.unit}</td>
      <td>Not separately allocated</td><td>NOT ESTABLISHED</td><td>{x.source}<small>{x.priceBasis}</small></td>
     </tr>)}</tbody></table></div>
-   <p className="p55-note">Four requirement sets are NOT four additional prices on top of the four Rev08 B11 tool rows; verify OEM included tools, license compatibility and pooled common sets.</p>
+   <p className="p55-note">Four MR-phase requirement sets use the current B11 parametric budget once; verify OEM included tools, license compatibility and pooled common sets. Rev08 tool rows remain historical audit only.</p>
   </details>}
   {code==="C2"&&<div className="p55-panel" style={{padding:12}}>
    <h4>2-Year Operating Spares — MR0001–0004 Attachment 7 Exclusion Audit</h4>
@@ -219,7 +219,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
   {code==="B13"&&<div className="p55-panel" style={{padding:12}}>
    <h4>Consumables Quantity Driver — MR Attachment 9 / SPQ-003</h4>
    <p className="p55-note">Shipping and Long-Term Storage recommendations require preservation agents, quantities, reapplication interval and environmental storage conditions. Only separately delivered B13 consumables are additive; B5 shipment packaging and installed consumables are not counted again.</p>
-   <p className="p55-note"><strong>Derived required B13 quantity:</strong> NOT ESTABLISHED (activity count, usage per event and preservation program source missing). Current priced four Rev08 rows are displayed below as a historical working budget—not as demonstrated minimum consumption.</p>
+   <p className="p55-note"><strong>Derived required B13 quantity:</strong> NOT ESTABLISHED (activity count, usage per event and preservation program source missing). The three current parametric allowance rows remain unquoted planning assumptions, not demonstrated minimum consumption. Rev08 rows are historical audit only.</p>
   </div>}
   {code==="C1"&&<details className="p55-panel" open style={{padding:12}}>
    <summary><strong>Capital Spare Optional Selection — MR0001–0004 Source Review</strong></summary>
@@ -250,20 +250,21 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
     </tr>)}</tbody></table></div>
   </details>}
   {code==="C1"&&spareLines.length>0&&<details className="p55-panel p553-c1-historical-source-trace" style={{padding:12}}>
-   <summary><strong>C1 Rev08 historical source rows / Release trace — NOT POSTED</strong><small>Separate from management RACON option and not a new quote</small></summary>
+   <summary><strong>C1 Rev08 historical source rows — NOT POSTED</strong><small>Historical audit only; the current source-to-release row is in the Customer Schedule below</small></summary>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Source item</th><th>Related TAGs</th><th>Description / Use</th><th>Specification</th><th>Materials</th><th>Qty</th><th>Reference THB</th></tr></thead>
-    <tbody>{spareLines.map(x=><tr key={x.id} data-component-key={inWorking?x.sourceRowModuleId:"bid.budget.scope.c1.spare-line."+x.id.toLowerCase()}>
-     <td>{x.item}<small>{x.id}</small>{inWorking&&<button type="button" className="p553-detail-button" onClick={()=>onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x.sourceRowModuleId})}>↗ 10.3 Release</button>}</td>
+    <tbody>{customerSchedule.byCode.C1.map(x=><tr key={x.id}>
+     <td>{x.item}<small>{x.id}</small></td>
      <td><strong>{x.tagSummary}</strong>{x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list"><summary>ดู TAG ({x.relatedEquipmentTagCount})</summary><div>{x.relatedTagList.map(tag=><code key={tag} className="p553-annex-tag-chip">{tag}</code>)}</div></details>}</td>
      <td>{x.displayDescription}<small>{x.displayPurpose}</small></td>
      <td>{x.displaySpecification}</td><td>{x.displayMaterials}</td><td>{x.qty} {x.unit}</td>
      <td>{thb(x.extendedTHB)}<small>Historical reference only / No Customer Release</small></td>
     </tr>)}</tbody></table></div>
   </details>}
-  {code==="C1"&&<div className="p55-panel" style={{padding:12}}>
+  {code==="C1"&&<details className="p55-panel" style={{padding:12}}>
+   <summary>Historical C1 ORGA comparison — NOT current independent OEM spare price</summary>
    <h4>SUPPLIER RECOMMENDATION FOR CAPITAL SPARE PARTS — CURRENT SELECTION REVIEW</h4>
-   <p className="p55-note"><strong>MANAGEMENT C1 BUDGETARY SELECTION:</strong> One complete RACON spare set is selected as an OPTION using the ORGA installed equipment FCA quote benchmark, not a confirmed OEM spare quote or DDP delivered price. Rev08 RACON/SCADA historical entries remain only comparison references.</p>
+   <p className="p55-note"><strong>HISTORICAL NONPOSTING C1 AUDIT:</strong> One complete RACON spare set is selected as an OPTION using the ORGA installed equipment FCA quote benchmark, not a confirmed OEM spare quote or DDP delivered price. Rev08 RACON/SCADA historical entries remain only comparison references.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>MR / Installed Equipment</th><th>Document / OEM Scope</th><th>Capital Spare Assessment</th><th>Selected QTY</th><th>Unit Price THB</th><th>Total Price THB</th><th>Evidence / Decision</th></tr></thead>
     <tbody>{spareReconciliation.systemSummary.map(x=><tr key={x.mr}>
@@ -287,24 +288,26 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
     </tr></tbody></table></div>
    <p className="p55-note"><strong>C1 management-selected BUDGETARY spare option (NONPOSTING):</strong> {thb(spareReconciliation.selectedC1Option.budgetTotalTHB)} · {spareReconciliation.selectedC1Option.source}. Based on historical ORGA USD 75,000 FCA, NOT the installed MGW USD 75,059 equipment quotation. Separate OEM replacement-spare quotation and technical interchangeability with MGW Tideland are PENDING. Not DDP Purchaser's Yard, not a verified direct cost, not posted to Part A/Part B/C1 Customer SELL.</p>
    <p className="p55-note"><strong>Historical Rev08:</strong> {thb(customerSchedule.summary.C1.workingReferenceTHB)} preserved for audit only; no automatic addition to selected C1 option or A+B base.</p>
-  </div>}
-  {spareLines.length>0&&code!=="C1"&&<div className="p55-panel" style={{padding:12}}>
-   <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (Pre-Award Budgetary Working Preview)</h4>
+  </details>}
+  {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
+   <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (PTTEP 2026 First-Principles Working Preview)</h4>
    <p className="p55-note"><strong>Coverage readiness:</strong> {customerSchedule.engineeringReadiness.installedTagInstances} source site-TAG instances / {customerSchedule.engineeringReadiness.criticalTagFunctionGroups} critical TAG families. Confirmed replacement SKU mappings in this model: {customerSchedule.engineeringReadiness.confirmedReplacementSkuGroups}. Verdict: <strong>{customerSchedule.engineeringReadiness.verdict}</strong> — budget price rows exist, but complete Commissioning Spare coverage and major-equipment provision have not yet been demonstrated.</p>
    <p className="p55-note"><strong>วิธีอ่านราคาอะไหล่:</strong> Description = รายการที่จะซื้อและหน้าที่ใช้งาน ·
     Detail Specification = คุณสมบัติที่ต้องตรงกับของเดิม · Materials = วัสดุ/ส่วนประกอบจริง (TBC หากยังไม่ยืนยัน) ·
-    TAG No. = จุดติดตั้งที่เกี่ยวข้อง ไม่ใช่จำนวนอะไหล่ · <strong>Qty = จำนวนอะไหล่ที่จะจัดหาจริงตามงบประมาณ</strong>.
+    TAG No. = จุดติดตั้งที่เกี่ยวข้อง ไม่ใช่จำนวนอะไหล่ · <strong>Qty = จำนวน Kit/Tools/Consumables สำหรับประเมินงบ ไม่ใช่ OEM Spare SKU ที่ผ่าน SPIR</strong>.
     รายการที่มีหลาย TAG ยังไม่ถือว่าใช้แทนกันได้จนกว่าจะยืนยัน OEM SKU
     <strong> ข้อมูลในตารางมาจาก Spare Source ของ 10.2 เดียวกับ Release 10.3</strong>;
     การเปิดรายละเอียดไม่คำนวณราคาใหม่</p>
-   <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {customerSchedule.sourceOwnership} · Existing MR/MTO/AFC installed TAGs are joined to the five-category Rev08 budget lines by equipment function. COMMON means a shared stock/tool item, not an invented installed TAG. Quantities and THB unit rates retain the original pre-award Rev08 basis at FX 31.5. The TAG association is not OEM interchangeable SKU approval.</p>
+   <p className="p55-note"><strong>TOP-DOWN TRACE:</strong> {customerSchedule.sourceOwnership} · Current 4/3/4/3 B10 kit quantities derive from MR0001–0004; B11 reviews EXA-A8 Phase 1F tools and applicability; B13 excludes B5/A5. Rates are UNQUOTED planning estimates at FX31.5 and factor 1.30, NOT OEM supplier prices. C1/C2 remain optional and unquoted.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification</th><th>Materials</th><th>Qty</th><th>Unit Price THB</th><th>Total Price THB</th>{(code==="C1"||code==="C2")&&<th>Lead Time ARO</th>}</tr></thead>
     <tbody>{spareLines.map(x=><tr key={x.id}
       data-component-key={inWorking?x.sourceRowModuleId:"bid.budget.scope."+code.toLowerCase()+".spare-line."+x.id.toLowerCase()}>
-     <td>{x.item}{inWorking&&<button className="p553-detail-button p553-source-to-release" type="button"
+     <td>{x.item}{onOpenReleaseRow&&<button className="p553-detail-button p553-source-to-release" type="button"
        onClick={()=>onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x.sourceRowModuleId})}
-       title={"Open matching 10.3 customer preview item "+x.id}>↗ 10.3 Release</button>}</td>
+       title={"Open matching 10.3 customer preview item "+x.id}>↗ 10.3 Release</button>}
+      {!inWorking&&onOpenSource&&<button type="button" className="p553-detail-button"
+       onClick={()=>onOpenSource({code,sourceModuleId:x.sourceRowModuleId})}>↗ 10.2 Source</button>}</td>
      <td><strong>{x.tagSummary||x.tagNo}</strong>
       {x.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list">
        <summary>ดู TAG ทั้งหมด ({x.relatedEquipmentTagCount})</summary>
@@ -316,17 +319,22 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
       <small>{x.displayPurpose}</small><small>{x.explanationTH}</small>
       <small>Original source: {x.description} · {x.id}</small></td>
      <td>{x.displaySpecification||x.detailSpecification}
+      {x.engineeringVerification&&<details><summary>Current row OEM proof — OPEN</summary>
+       <small>Evidence: {x.engineeringVerification.evidence}</small>
+       <small>Gap: {x.engineeringVerification.issue}</small>
+       <small>Required: {x.engineeringVerification.action}</small>
+      </details>}
       <small>ต้องตรวจ OEM Part No. และ Rating จริงก่อนอนุมัติ</small></td>
      <td>{x.displayMaterials||x.materials}
       <small>รอยืนยันวัสดุ/รุ่นจาก OEM</small></td>
-     <td className="p553-annex-qty"><strong>{x.qty}</strong><small>{x.unit} · spare qty</small><small>Budgetary quantity · {x.sourceId}</small></td>
-     <td>{thb(x.unitPriceTHB)}</td><td>{thb(x.extendedTHB)}</td>
+     <td className="p553-annex-qty"><strong>{x.qty??"TBC — OEM SPIR"}</strong><small>{x.unit} · spare qty</small><small>Engineering Qty · {x.sourceId} · {x.sourcePriceBasis}</small></td>
+     <td>{x.option?"NOT QUOTED":thb(x.unitPriceTHB)}</td><td>{x.option?"NOT QUOTED":thb(x.extendedTHB)}</td>
      {(code==="C1"||code==="C2")&&<td>{x.leadTimeARO||"OEM confirmation required"}</td>}
     </tr>)}</tbody>
-    {code==="B11"&&<tfoot><tr><th colSpan={7} style={{textAlign:"right"}}>Total Price — Supplier Recommendation for Special Tools (THB)</th><th>{thb(customerSchedule.summary.B11.workingReferenceTHB)}</th></tr></tfoot>}
+    {code==="B11"&&<tfoot><tr><th colSpan={7} style={{textAlign:"right"}}>B11 Current First-Principles Working SELL (THB) — OEM QUOTE HOLD</th><th>{thb(customerSchedule.currentBudgetaryByCode.B11)}</th></tr></tfoot>}
    </table></div>
-   <p className="p55-note"><strong>PRE-AWARD CATEGORY BUDGET:</strong> {thb(customerSchedule.summary[code].workingReferenceTHB)} · Source: Rev08 historic priced lines × planning FX 31.5 THB/USD · {customerSchedule.summary[code].priceStatus} · B11 reference remains non-posting, other approved categories preserve existing budgetary Working Sell. No new Direct Cost posting. Rounding per line can differ from category source total.</p>
-   {code==="B11"&&<p className="p55-note"><strong>Customer template delivery basis:</strong> DDP Purchaser’s Yard shown in RFQ; current THB prices are internal budget references only, not a verified DDP delivered quotation. Installation, commissioning and special tools must reconcile with B3/B9 and Part A before customer release. Four Rev08 priced tools and five EXA-A8 minimum requirements are separate cross-references, not nine additive priced lines.</p>}
+   <p className="p55-note"><strong>CURRENT PARAMETRIC WORKING SELL:</strong> {thb(customerSchedule.currentBudgetaryByCode?.[code])} · Unquoted cost allowance × {customerSchedule.currentBudgetaryPricingFactor} × FX {customerSchedule.currentWorkingFxTHBPerUSD}. Each estimate row exposes qty, rate basis, and requirement. <strong>OEM quote/SPIR/Ex compatibility/DDP remain open.</strong> Rev08 is archived and excluded from current cost.</p>
+   {code==="B11"&&<p className="p55-note"><strong>Customer template delivery basis:</strong> DDP Purchaser’s Yard shown in RFQ; current THB prices are internal budget references only, not a verified DDP delivered quotation. Installation, commissioning and special tools must reconcile with B3/B9 and Part A before customer release. Four MR-phase tool sets and five EXA-A8 minimum applicability checks do NOT mean nine additive tool purchase lines.</p>}
    <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
   </div>}
   {coverage&&<details className="p55-panel" open={inWorking} style={{padding:12}}>

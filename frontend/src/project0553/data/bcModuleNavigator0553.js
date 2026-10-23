@@ -50,12 +50,12 @@ export function buildBcModuleNavigator0553(){
  // Existing B/C spare source rows get searchable/clickable source anchors,
  // not new execution modules, prices or customer rows.
  const spareSchedule=selectSpareCustomerSchedule0553();
- entries.push(...spareSchedule.rows.map(s=>({
+ entries.push(...spareSchedule.currentRows.map(s=>({
   id:s.sourceRowModuleId,name:s.code+" — "+s.displayDescription+" / "+s.id,
   tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",
   anchorModuleId:s.sourceRowModuleId,
   keywords:s.code+" "+s.id+" "+s.description+" "+s.displayDescription+
-   " "+s.tagSummary+" "+s.relatedTagList.join(" ")+" Rev08 spare source line"
+   " "+s.tagSummary+" "+s.relatedTagList.join(" ")+" PTTEP 2026 current spare source line"
  })));
  // The same read-only financial identity matrix is available under all 16 B/C owner IDs.
  entries.push(...bc.rows.map(r=>({

@@ -144,6 +144,7 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    id:x.id||code+"-ROW-"+(i+1),code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
    sourceScheduleModuleId:"bid.budget.working.bc.customer-spare-schedule",
    sourceId:x.sourceId||x.id,sourceRevision:x.sourceRevision,sourcePriceUSD:priceUSD,
+   evidenceSource:x.evidenceSource||null,priceAuthority:x.sourcePriceBasis||null,
    // Native source TAG list remains available for export and technical trace.
    // Display fields are deliberately short; no installed spare interchangeability is asserted.
    traceId:x.traceId||code+"::"+(x.sourceId||x.id||i+1),
@@ -170,10 +171,10 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    workingUnitTHB:unitPrecision4,workingTotalTHB:extReference,
    customerUnitTHB:isBase?unitPrecision4:null,
    customerTotalTHB:isBase?extReference:null,
-   priceClass:isBase?"BUDGETARY_WORKING_SELL_OEM_COST_NOT_VERIFIED":
-    "OPTION_BUDGET_REFERENCE_ONLY_NO_VERIFIED_COST",
+   priceClass:x.sourcePriceBasis||"OEM_SPIR_PENDING",
    mappingStatus:x.mappingStatus,workingStatus:x.workingStatus,
-   priceSource:"10.2 / "+code+" · "+(x.sourceRevision||"unconfirmed"),
+   independentOemSkuVerified:false,independentOemUnitRateVerified:false,
+   priceSource:"10.2 / "+code+" · "+(x.sourceRevision||"unconfirmed")+(x.sourcePriceBasis?" · "+x.sourcePriceBasis:""),
    priceSourceStatus:x.workingStatus,customerReleaseAllowed:false,
    selectedLine,possibleOverlap:x.possibleOverlap||null,
    releaseToSourceStatus:"SOURCE_OWNER_TRACE_PRESERVED__OEM_SKU_STILL_PENDING",
@@ -181,7 +182,7 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
   });
  });
  const complete=rows.length>0&&rows.every(x=>x.selectedLine&&Number.isFinite(x.workingUnitTHB));
- const subtotal=rows.length?round(rows.reduce((a,r)=>a+(amount(r.workingTotalTHB)||0),0)):null;
+ const subtotal=rows.some(x=>x.selectedLine)?round(rows.reduce((a,r)=>a+(amount(r.workingTotalTHB)||0),0)):null; // No OEM quote is NULL, never 0.
  const variance=selected!==null&&subtotal!==null?round(selected-subtotal):null;
  return Object.freeze({
   code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
@@ -209,7 +210,7 @@ export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
   const projected=new Map(shown.map(x=>[x.sourceId,x]));
   if(source.length!==shown.length||reversed.size!==source.length||projected.size!==shown.length)
    problems.push(code+" line identity/count mismatch");
-  for(const row of source){
+  for(const [index,row] of source.entries()){
    const x=projected.get(row.id);
    if(!x){problems.push(code+" missing Release mapping "+row.id);continue;}
    if(ids.has(x.nativeSheet+"!"+x.nativeRow))problems.push(code+" duplicate native row");
@@ -220,15 +221,27 @@ export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
     JSON.stringify(x.relatedTagList||[])===JSON.stringify(row.relatedTagList||[])&&
     x.description===row.displayDescription&&x.specification===row.displaySpecification&&
     x.materials===row.displayMaterials&&x.originalDescription===row.description&&
-    x.engineeringVerification===row.engineeringVerification&&
+    x.qty===row.qty&&x.unit===row.unit&&x.workingTotalTHB===row.extendedTHB&&
+    x.referenceUnitTHB===row.unitPriceTHB&&
+    (n(row.unitPriceTHB)?n(x.workingUnitTHB)&&Math.abs(x.workingUnitTHB-row.unitPriceTHB)<=0.005:x.workingUnitTHB===null)&&
+    (code.startsWith("B")?x.customerUnitTHB===x.workingUnitTHB&&x.customerTotalTHB===row.extendedTHB:
+     x.customerUnitTHB===null&&x.customerTotalTHB===null)&&
+    JSON.stringify(x.mr)===JSON.stringify(row.linkedMR)&&
+    JSON.stringify(x.sites)===JSON.stringify(row.linkedLocations)&&
+    x.evidenceSource===(row.evidenceSource||null)&&x.priceAuthority===(row.sourcePriceBasis||null)&&
+    x.sourceOwnerModuleId===row.sourceOwnerModuleId&&
+    JSON.stringify(x.engineeringVerification)===JSON.stringify(row.engineeringVerification)&&
+    x.installedCandidateSku===(row.installedCandidateSku||null)&&
     x.actualOemSpareSku===null&&x.engineeringProofComplete===false&&
-    x.qty===row.qty&&x.workingTotalTHB===row.extendedTHB&&
     x.sourcePriceUSD===row.sourcePriceUSD&&
     // Price audit uses original USD precision × FX before THB display rounding.
     // C2 long cable quantities would incorrectly fail if rounded 2-decimal unit THB were multiplied.
     (!n(row.qty)||!n(row.sourcePriceUSD)||!n(row.workingFxTHBPerUSD)||
      Math.abs(row.qty*row.sourcePriceUSD*row.workingFxTHBPerUSD-row.extendedTHB)<=0.011)&&
-    x.customerReleaseAllowed===false&&x.nativeRow>=6;
+    x.customerReleaseAllowed===false&&x.nativeRow===6+index&&x.nativeRow<=18&&
+    x.nativeSheet===({B10:"B10 CommSpares",B11:"B11 SpecialTool",B13:"B13 Consumerables",C1:"C1 CapitalSpares",C2:"C2 2Y-Spares"})[code]&&
+    Object.entries({tagNo:"C",description:"D",specification:"E",materials:"F",qty:"G",unitPrice:"H",totalPrice:"I"})
+     .every(([key,col])=>x.nativeCells?.[key]===col+(6+index));
    if(!same)problems.push(code+" source→release value mismatch "+row.id);
    traces.push(Object.freeze({code,sourceId:row.id,sourceModuleId:row.sourceRowModuleId,
     releaseModuleId:"bid.budget.pricing.release.preview",scopeModuleId:"bid.budget.scope."+code.toLowerCase(),
@@ -344,16 +357,18 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    reserveTHB:basis?.omissionReserveTHB??null,
    addvalueTargetProfitTHB:basis?.addvalueTargetProfitTHB??null,
    costComplete:Boolean(basis),optional:true,releaseAllowed:false,
+   internalNonpostingInstalledPackageComparableTHB:r.code==="C1"?
+     (r.spareCurrentLines?.find(x=>x.id==="C1-PTTEP-01")?.internalNonpostingSellScenarioTHB??null):null,
    state:basis?"WORKING_COST_NOT_APPROVED":"DIRECT_COST_NOT_ESTABLISHED__NO_30_PERCENT_ON_WORKING_SELL"};
  });
  const annexCodes=["B10","B11","B13","C1","C2"];
  const annexModels=Object.fromEntries(annexCodes.map(code=>[code,buildAnnexWorkingPriceBridge0553({
-  code,sourceRows:spare.byCode[code]||[],
+  code,sourceRows:spare.currentByCode[code]||[],
   owner:code.startsWith("B")?b.find(x=>x.code===code):c.find(x=>x.code===code)
  })]));
  const annex=Object.fromEntries(annexCodes.map(code=>[code,annexModels[code].rows]));
- const annexTraceAudit=auditAnnexBidirectionalTrace0553(spare.byCode,annex);
- if(annexTraceAudit.totalRows!==31)throw Error("0553 31-source Annex identity inventory changed");
+ const annexTraceAudit=auditAnnexBidirectionalTrace0553(spare.currentByCode,annex);
+ if(annexTraceAudit.totalRows!==16)throw Error("0553 16 PTTEP current-source Annex identity inventory changed");
  const aKnown=a.filter(x=>n(x.previewSellTHB));
  const bKnown=b.filter(x=>n(x.customerSellTHB));
  const cKnown=c.filter(x=>n(x.customerSellTHB));

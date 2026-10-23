@@ -4,6 +4,7 @@ import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {selectScopeSheet0553} from "./data/scopeSheetProjection0553";
 
 import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
+import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
 import {selectB9ChinaWorkingBudget0553} from "./data/b9ChinaWorkingBudget0553";
 import {selectScopeBcPriceAudit0553,SCOPE_BC_DETAIL_CODES_0553} from "./data/scopeBcPriceAudit0553";
 import {ScopeBcAnnexDetail0553} from "./ScopeBcAnnexDetail0553";
@@ -30,7 +31,7 @@ const SHEETS=[
  ["C2 2Y-Spares","C2","Two-year operation spares option"]
 ];
 const usd=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"";
-export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null,navigationSequence=0}){
+export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null,navigationSequence=0,onOpenReleaseRow=null,onOpenSource=null}){
  const [sheet,setSheet]=useState("Scope of supply");
  React.useEffect(()=>{
   if(!navigationTarget?.startsWith("bid.budget.scope."))return;
@@ -49,6 +50,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
  const cash=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
  const category=SHEETS.find(x=>x[0]===sheet);
  const scopePriceAudit=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
+ const currentSpare=selectSpareCustomerSchedule0553();
  const summary=REV08_BASELINE.summary.filter(x=>sheet==="Scope of supply"||x[0]===category[1]);
  const details=selectScopeSheet0553(category[1],{thbPerUsd:fx?.thbPerUsd}).rows;
  const linkedScopeCodes=new Set(SCOPE_BC_DETAIL_CODES_0553);
@@ -186,14 +188,15 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
     source:control.basis+" · OWNER: "+control.owner+" · "+control.source+" · EQUATIONS: "+(control.equations.join(", ")||"source schedule required")}:null),amount=item?.amount;
    const unavailable=id==="A5"?"A5 source/ledger reconciliation required":item?.status?.includes("MGW PRICE EXCLUDED")?"Selected rate required":fxValid?"Cost source pending":"Awaiting FX";
    const childSource=scopeSheetSources[id]||null;
+   const currentRows=currentSpare.currentByCode[id]||null;
    const hasChild=Boolean(childSource&&childSource.quantity>0);
    const audited=scopePriceAudit.byCode[id]||null;
    const shownAmount=amount;
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
-    hasChild?"1 LS (Rev08: "+childSource.quantity+" unverified historical item rows)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
+    currentRows?"1 LS ("+currentRows.length+" current Annex rows)":hasChild?"1 LS (Rev08: "+childSource.quantity+" unverified historical item rows)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
    return <tr key={id}><td>{audited?<button type="button" className="p553-detail-button" onClick={()=>setSheet(SHEETS.find(row=>row[1]===id)[0])}>{id} — View Details</button>:id}</td><td>{desc}</td><td>{qtyDisplay}</td>
-    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
-    <td className="is-number">{id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
+    <td className="is-number">{currentRows&&id.startsWith("C")?"NOT QUOTED":id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
+    <td className="is-number">{currentRows&&id.startsWith("C")?"NOT QUOTED":id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
     <td className="is-number">{audited?cash(audited.historicalReferenceTHB):"—"}<small>{audited?"Rev08 HISTORICAL ONLY — not additive":""}</small></td>
     <td>{control&&<small><strong>{control.financialIdentity.scopeId}</strong> Scope ·
      <strong> {control.financialIdentity.workingSellId}</strong> Working SELL ·
@@ -201,13 +204,16 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
      {Number.isFinite(control.financialIdentity.mgwPurchasedWorkingSellTHB)&&
       " · VQ-MGW-SERV-2 / SERV-4 supplier quotation → WS-B3 MGW Purchased THB "+
        control.financialIdentity.mgwPurchasedWorkingSellTHB.toLocaleString("en-US")}</small>}
-     {hasChild?<><strong>{id} · CURRENT TURNKEY COST NOT ESTABLISHED (historical detail is audit-only)</strong><small>{childSource.source} · {childSource.quantity} historical rows · Rev08 rates available in original audit detail, never posted to current turnkey cost · OEM verification: {control?.priceStatus} · {id.startsWith("C")?"OPTION — NOT INCLUDED IN BASE": "REFERENCE — NOT ADDED TO CURRENT WORKING SELL"}</small></>:
+     {currentRows?<><strong>{id.startsWith("C")?"OPTION / NOT QUOTED":"CURRENT PARAMETRIC WORKING SELL / UNQUOTED"}</strong><small>{currentRows.length} current Annex rows · Source: {control?.sourceModuleId} · OEM SKU / SPIR / Ex / DDP OPEN · {control?.priceStatus}</small>
+      {onOpenSource&&<button type="button" className="p553-detail-button" onClick={()=>onOpenSource({code:id,sourceModuleId:control.sourceModuleId})}>↗ 10.2 Source</button>}
+      {onOpenReleaseRow&&<button type="button" className="p553-detail-button" onClick={()=>onOpenReleaseRow({code:id,sourceId:currentRows[0].id})}>↗ 10.3 Annex</button>}</>:
+     hasChild?<><strong>{id} · CURRENT TURNKEY COST NOT ESTABLISHED (historical detail is audit-only)</strong><small>{childSource.source} · {childSource.quantity} historical rows · Rev08 rates available in original audit detail, never posted to current turnkey cost · OEM verification: {control?.priceStatus} · {id.startsWith("C")?"OPTION — NOT INCLUDED IN BASE": "REFERENCE — NOT ADDED TO CURRENT WORKING SELL"}</small></>:
      (id==="B12"||id==="B14")?<><strong>NO ITEMIZED CHILD-SHEET PRICE</strong><small>{id==="B12"?"First-filling applicability and supplier scope must be verified; historical summary zero is not accepted as a verified cost.":"Insurance/bond premium and insured-value evidence required; historical Rev08 summary is not an itemized vendor quotation."} {control?.priceStatus}</small></>:
      item?<>{item.status}<small>{item.source}</small></>:"Non-A scope: separate cost derivation required"}</td></tr>;
   }):details.map(row=><tr key={row.id}><td>{row.id}</td><td>{row.description}</td><td>{row.qty}</td>
     <td className="is-number">{Number.isFinite(row.unitTHB)?cash(row.unitTHB):"Awaiting FX"}</td>
     <td className="is-number">{Number.isFinite(row.totalTHB)?cash(row.totalTHB):"Awaiting FX"}</td>
-    <td>Rev08 historical worksheet reference · OEM verification separate</td></tr>)}</tbody></table></div>:<ScopeBcAnnexDetail0553 code={category[1]} fx={fx}/>}
+    <td>Rev08 historical worksheet reference · OEM verification separate</td></tr>)}</tbody></table></div>:<ScopeBcAnnexDetail0553 code={category[1]} fx={fx} onOpenReleaseRow={onOpenReleaseRow} onOpenSource={onOpenSource}/>}
   {sheet==="Scope of supply"&&<details className="p55-panel" data-component-key="bid.budget.scope.a5" open={false}>
    <summary style={{cursor:"pointer",fontWeight:700}}>A5 Bulk Materials — Source-MTO Price Attribution / Drill-down ({a5.rowCount} lots)</summary>
    <p className="p55-note">A5 Working Priced Floor: <strong>{cash(a5.a5PriceTHB)}</strong>.
