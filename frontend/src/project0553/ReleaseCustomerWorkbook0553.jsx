@@ -268,6 +268,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         <td className="p553-price-cell">{money(r.customerSellTHB)}</td>
         <td>refer to Annex {r.code} · OPTION
           <small>{r.code==="C1"?"MGW installed RACON comparison only; independent spare OEM quote open":"2-year OEM SPIR/part qty/price open; excludes B10 SKU stock"}</small>
+          {internal&&r.code==="C1"&&Number.isFinite(r.internalNonpostingInstalledPackageComparableTHB)&&
+            <small>Separate NONPOSTING installed-package budget comparison: {cash(r.internalNonpostingInstalledPackageComparableTHB)} · not a C1 OEM spare quote / not DDP</small>}
           {internal&&<button type="button" className="p553-detail-button"
             onClick={()=>setSheet(WORKSHEETS.find(([,code])=>code===r.code)?.[0]||sheet)}>↗ Annex {r.code}</button>}
          </td></tr>)}
