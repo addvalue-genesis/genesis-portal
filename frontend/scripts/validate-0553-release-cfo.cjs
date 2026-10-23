@@ -47,8 +47,8 @@ assert.equal(audit.varianceTHB,0);
 assert.equal(audit.reconciliationPassed,true);
 assert.equal(audit.incomplete,true);
 
-// 10.2 source schedules drive ALL five Annex tabs. B Working Sell is unchanged,
-// C remains a reference only; any source-to-detail variance blocks release.
+// CURRENT PTTEP five-category Annex: preserve source-row identity, but never
+// convert historical Rev08 spare Qty or unit prices into customer current offer.
 const revBox={};
 vm.runInNewContext(file("data/rev08CommercialBaseline.js").replace(/\bexport /g,"")+";this.rev=REV08_BASELINE;",revBox);
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
@@ -57,45 +57,35 @@ for(const code of ["B10","B11","B13","C1","C2"]){
  const original=revBox.rev.summary.find(x=>x[0]===code)[2];
  const parent=round2(original*31.5);
  const rows=detail.map(([description,qty,usd],index)=>({
-  id:code+"-REV08-"+String(index+1).padStart(2,"0"),sourceId:code+"-REV08-"+String(index+1).padStart(2,"0"),
+  id:code+"-REV08-"+String(index+1).padStart(2,"0"),
+  sourceId:code+"-REV08-"+String(index+1).padStart(2,"0"),
   sourceRevision:"Rev08",sourcePriceUSD:usd,workingFxTHBPerUSD:31.5,
   qty,tagNo:"SOURCE-MTO-ASSOCIATION",description,
-  unitPriceTHB:round2(usd*31.5),extendedTHB:round2(qty*usd*31.5),
-  mappingStatus:"VERIFICATION_OPEN",workingStatus:"PRE_AWARD_BUDGETARY"
+  unitPriceTHB:round2(usd*31.5),extendedTHB:round2(qty*usd*31.5)
  }));
  const x=sandbox.calc.buildAnnexWorkingPriceBridge0553({
   code,sourceRows:rows,owner:code.startsWith("B")?{workingSellTHB:parent}:{workingReferenceTHB:parent}
  });
  assert.equal(x.totalRows,detail.length);
- assert.equal(x.selectedWorkingTHB,parent);
  assert.equal(x.rows.length,detail.length);
- assert.equal(x.rows[0].workingTotalTHB,rows[0].extendedTHB);
- assert.ok(x.rows.every(z=>Number.isFinite(z.workingUnitTHB)&&z.sourceModuleId==="bid.budget.working.bc."+code.toLowerCase()));
- if(code.startsWith("B")){
-  assert.equal(x.rows[0].customerTotalTHB,rows[0].extendedTHB);
-  assert.ok(x.rows.every(z=>Number.isFinite(z.customerUnitTHB)));
- }else{
-  assert.ok(x.rows.every(z=>z.customerTotalTHB===null&&z.customerUnitTHB===null));
-  assert.equal(x.priceLabel,"REFERENCE ONLY / NOT QUOTED");
- }
+ assert.equal(x.selectedWorkingTHB,null);
+ assert.equal(x.annexLineTotalTHB,null);
+ assert.equal(x.varianceTHB,null);
+ assert.equal(x.reconciled,false);
+ assert.equal(x.priceStatus,"OEM_SPARE_SKU_QTY_AND_NEW_PRICE_NOT_ESTABLISHED");
+ assert.ok(x.rows.every(z=>z.qty===null&&z.workingUnitTHB===null&&z.workingTotalTHB===null&&
+  z.customerUnitTHB===null&&z.customerTotalTHB===null&&z.selectedLine===false));
+ assert.ok(x.rows.every((z,i)=>z.historicalQty===rows[i].qty&&
+  z.referenceTotalTHB===rows[i].extendedTHB),"History must be audit-only, never current quote");
  assert.equal(x.customerReleaseAllowed,false);
- if(code==="B10"){
-  assert.equal(x.selectedWorkingTHB,123024.37);
-  assert.equal(x.annexLineTotalTHB,123024.35);
-  assert.equal(x.varianceTHB,0.02);
-  assert.equal(x.reconciled,false);
-  assert.equal(x.priceStatus,"SOURCE_TO_ANNEX_VARIANCE_HOLD");
- }
- if(code==="B11")assert.equal(x.varianceTHB,0);
- if(code==="B13")assert.equal(x.varianceTHB,0.04);
- if(code==="C2")assert.equal(x.varianceTHB,0.08);
 }
-// A deliberate material mismatch must remain visible and not be silently balanced.
+// Even a synthetic historical price must NOT bypass the new OEM proof gate.
 const unbalanced=sandbox.calc.buildAnnexWorkingPriceBridge0553({
  code:"B10",sourceRows:[{qty:1,sourcePriceUSD:10,workingFxTHBPerUSD:31.5,
  unitPriceTHB:315,extendedTHB:315}],owner:{workingSellTHB:320}
 });
-assert.equal(unbalanced.varianceTHB,5);
+assert.equal(unbalanced.selectedWorkingTHB,null);
+assert.equal(unbalanced.varianceTHB,null);
 assert.equal(unbalanced.reconciled,false);
 
 // 10.3.1/10.3.2/10.3.3 refer to view identifiers, not frozen versions.
