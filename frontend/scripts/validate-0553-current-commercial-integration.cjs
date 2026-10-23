@@ -34,6 +34,26 @@ for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2599325,B8:
  assert.equal(by[code].directCostTHB,null,"Unverified direct cost posted to "+code);
 }
 assert.equal(budget.knownWorkingSellTHB,4328914.13);
+ // Existing module IDs and customer rows are connected both ways, but no
+ // historical Rev08 spare price may be mistaken for an OEM-approved new rate.
+ for(const code of ["B10","B11","B13","C1","C2"]){
+  assert.equal(by[code].moduleId,"bid.budget.working.bc."+code.toLowerCase());
+  assert.equal(by[code].workingSellTHB,null);
+  assert(by[code].spareSourceReview?.status,"Missing PTTEP readiness "+code);
+  assert.equal(scope.lines[code].workingSellTHB,null);
+  const annex=release.annexModels[code];
+  assert.equal(annex.selectedWorkingTHB,null);
+  assert.equal(annex.annexLineTotalTHB,null);
+  assert.equal(annex.customerReleaseAllowed,false);
+  assert(annex.rows.every(row=>row.customerTotalTHB===null&&row.workingTotalTHB===null&&row.qty===null));
+  assert(annex.rows.every(row=>row.sourceRowModuleId.startsWith("bid.budget.working.bc."+code.toLowerCase())));
+ }
+ assert.equal(release.annexTraceAudit.totalRows,31);
+ assert.equal(release.annexTraceAudit.sourceToReleasePassed,true);
+ assert.equal(release.annexTraceAudit.releaseToSourcePassed,true);
+ assert.equal(release.sourceCoverage.bSellReady,false);
+ assert.equal(release.summary.baseCustomerSellTHB,null);
+
 assert.equal(abc.partBBaseTHB,budget.knownWorkingSellTHB);
 assert.equal(abc.currentB1B3B9BaseTHB,3291475); // current B1 211600 + B3 2599325 + B9 480550
 assert.equal(abc.postedWorkingSellDeltaTHB,0);
