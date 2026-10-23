@@ -339,6 +339,8 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    reserveTHB:basis?.omissionReserveTHB??null,
    addvalueTargetProfitTHB:basis?.addvalueTargetProfitTHB??null,
    costComplete:Boolean(basis),optional:true,releaseAllowed:false,
+   internalNonpostingInstalledPackageComparableTHB:r.code==="C1"?
+     (r.spareCurrentLines?.find(x=>x.id==="C1-PTTEP-01")?.internalNonpostingSellScenarioTHB??null):null,
    state:basis?"WORKING_COST_NOT_APPROVED":"DIRECT_COST_NOT_ESTABLISHED__NO_30_PERCENT_ON_WORKING_SELL"};
  });
  const annexCodes=["B10","B11","B13","C1","C2"];
