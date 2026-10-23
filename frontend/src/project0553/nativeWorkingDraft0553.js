@@ -147,13 +147,13 @@ export async function buildNativeWorkingDraft0553(file,model){
  const bc=model.b||[];
  for(let i=1;i<=14;i++){
   const row=23+i,b=bc.find(x=>x.code==="B"+i),price=b?.customerSellTHB;
-  if(!Number.isFinite(price)){warnings.push("B"+i+" Working Sell pending");continue;}
+  if(!Number.isFinite(price)){warnings.push("B"+i+" price NOT ESTABLISHED");write(scope,"F"+row,"NOT ESTABLISHED");write(scope,"G"+row,"NOT ESTABLISHED");continue;}
   if(![33,34,35,36].includes(row))write(scope,"F"+row,round(price));
   write(scope,"G"+row,round(price));
  }
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
- if(Number.isFinite(a)&&Number.isFinite(b))write(scope,"G38",round(a+b));
- else warnings.push("Base A+B not complete");
+ if(model.sourceCoverage?.aReady===true&&model.sourceCoverage?.bSellReady===true&&Number.isFinite(a)&&Number.isFinite(b))write(scope,"G38",round(a+b));
+ else{write(scope,"G38","NOT ESTABLISHED");warnings.push("A+B NOT COMPLETE: priced subtotal only; mandatory items/confirmed supplier evidence pending");}
  if(model.sourceCoverage?.aOverflow)warnings.push("Original has 15 A TAG slots; 4 grouped MR lines require buyer acceptance before final submission");
  if(!model.sourceCoverage?.aReady)warnings.push("Part A Working equipment cost/TAG evidence still incomplete");
  const changes=new Map();
@@ -172,6 +172,12 @@ export async function buildNativeWorkingDraft0553(file,model){
   const routeTrace=model.annexTraceAudit?.rowTrace?.filter(x=>x.code===code)||null;
   if(routeTrace&&routeTrace.length!==detail.length)
    throw Error(code+" native export diverged from bidirectional Source/Release line count");
+  // Overwrite every original customer Annex cell so a previously filled
+  // workbook cannot leak stale Rev08 Qty/prices into the working draft.
+  for(let j=detail.length;j<13;j++){
+   const row=j+6;
+   for(const col of ["B","C","D","E","F","G","H","I"])write(rows,col+row,"");
+  }
   detail.forEach((r,j)=>{
    const row=j+6;
    if(r.nativeRow!==undefined&&r.nativeRow!==row)
@@ -193,15 +199,15 @@ export async function buildNativeWorkingDraft0553(file,model){
    write(rows,"D"+row,r.description||"");
    write(rows,"E"+row,r.specification||"");
    write(rows,"F"+row,r.materials||"");
-   if(typeof r.qty==="number"&&Number.isFinite(r.qty))write(rows,"G"+row,r.qty);
+   write(rows,"G"+row,Number.isFinite(r.qty)?r.qty:"TBC — OEM SPIR");
    if(code.startsWith("B")){
-    if(Number.isFinite(r.customerUnitTHB))write(rows,"H"+row,r.customerUnitTHB);
-    if(Number.isFinite(r.customerTotalTHB))write(rows,"I"+row,round(r.customerTotalTHB));
+    write(rows,"H"+row,Number.isFinite(r.customerUnitTHB)?r.customerUnitTHB:"NOT ESTABLISHED");
+    write(rows,"I"+row,Number.isFinite(r.customerTotalTHB)?round(r.customerTotalTHB):"NOT ESTABLISHED");
    }
-   // C1/C2 retain native Not quote cells — do not falsely mark cost as approved.
+   if(code.startsWith("C")){write(rows,"H"+row,"NOT QUOTED");write(rows,"I"+row,"NOT QUOTED");}
+   // C1/C2 require independent OEM spare cost before any commercial price.
   });
-  if(code.startsWith("B")&&Number.isFinite(audit?.annexLineTotalTHB))
-   write(rows,"I19",round(audit.annexLineTotalTHB));
+  write(rows,"I19",code.startsWith("B")?(Number.isFinite(audit?.annexLineTotalTHB)?round(audit.annexLineTotalTHB):"NOT ESTABLISHED"):"NOT QUOTED");
   if(Number.isFinite(audit?.varianceTHB)&&Math.abs(audit.varianceTHB)>0.01)
    warnings.push(code+" line-to-summary variance THB "+audit.varianceTHB.toFixed(2)+" — no balancing item created");
   if(code.startsWith("C"))warnings.push(code+" optional price not quoted: verified direct cost required");
