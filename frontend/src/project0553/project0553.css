@@ -782,3 +782,12 @@
 .p553-annex-tag-list>div{padding:6px 0;line-height:1.6;overflow-wrap:anywhere}
 .p553-annex-tag-list small{display:block;font-size:10px;color:#606e78}
 .p553-annex-reading-guide{margin:9px 0!important;padding:7px 9px;border-left:3px solid #879ca9;background:rgba(128,145,160,.07);line-height:1.6}
+
+/* Reuse current 0553 Annex/Scope tables: readable grouped TAGs and spare quantity.
+   UI-only; original six-sheet XLSX structure and canonical cost data are unchanged. */
+.p553-annex-tag-chip{display:inline-block;margin:2px 4px 2px 0;padding:2px 5px;
+ border:1px solid #cad6df;border-radius:3px;background:#fff;color:#203c4d;
+ font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:11px}
+.p553-annex-qty{text-align:center;white-space:normal;font-variant-numeric:tabular-nums}
+.p553-annex-qty small{display:block;color:#697481;font-size:10px;margin-top:3px}
+.p553-annex-description strong{display:block;line-height:1.4}
