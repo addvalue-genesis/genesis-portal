@@ -89,3 +89,18 @@
 .p553-source-head button{border:0;background:transparent;color:#246386;cursor:pointer}
 .p553-source-drawer p{margin:7px 0;font-size:12px;overflow-wrap:anywhere}
 @media(max-width:620px){.p553-native-sheet{padding:6px}.p553-cfo-table{min-width:1020px}}
+
+/* 10.3 spare annex: give TAG summary, purpose, technical spec and material room.
+   Browser-only read view. Native XLSX column widths and merges are untouched. */
+.p553-customer-table.p553-annex-table{min-width:1440px}
+.p553-annex-table th:nth-child(1){width:4%}
+.p553-annex-table th:nth-child(2){width:16%}
+.p553-annex-table th:nth-child(3){width:20%}
+.p553-annex-table th:nth-child(4){width:24%}
+.p553-annex-table th:nth-child(5){width:14%}
+.p553-annex-table th:nth-child(6){width:5%}
+.p553-annex-table th:nth-child(7){width:17%}
+.p553-annex-table .p553-annex-tags{line-height:1.5;overflow-wrap:anywhere}
+.p553-annex-table .p553-annex-description small{line-height:1.45}
+.p553-annex-table .p553-annex-specification,
+.p553-annex-table .p553-annex-materials{line-height:1.45}
