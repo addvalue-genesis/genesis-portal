@@ -102,7 +102,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const sourceButton=item=>internal?<span className="p553-origin-actions">
   <button type="button" className={"p553-origin-link "+(item.sourceModuleId?.startsWith("bid.budget.bom")?"p553-origin-link--a":item.code?.startsWith("C")?"p553-origin-link--c":"p553-origin-link--b")}
    aria-label={"Open Module ID "+(item.sourceModuleId||item.code||"")} title={item.sourceModuleId}
-   onClick={()=>onOpenSource(item)}>↗ {item.sourceModuleId||item.code||"Source"}</button>
+   onClick={()=>onOpenSource({...item,sourceModuleId:item.sourceRowModuleId||item.sourceModuleId})}>
+   ↗ {item.sourceRowModuleId||item.sourceModuleId||item.code||"Source"}</button>
   <button type="button" className="p553-origin-trace" onClick={()=>openSource(item)}>Trace</button>
  </span>:null;
  const toggleMr=key=>setExpandedMr(old=>({...old,[key]:!old[key]}));
@@ -259,7 +260,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr><th>UNIT PRICE (CURRENCY)<br/>单价</th><th>TOTAL PRICE (CURRENCY)<br/>总价</th>
         {code.startsWith("C")&&<th>Lead time (ARO)<br/>交货期 (周)</th>}</tr></thead>
       <tbody>{Array.from({length:13},(_,i)=>{
-       const r=annexLines[i];return <tr key={r?.id||"empty:"+i}>
+       const r=annexLines[i];return <tr key={r?.id||"empty:"+i}
+        data-component-key={r?"bid.budget.pricing.release.preview.annex."+code.toLowerCase()+"."+r.sourceId.toLowerCase():undefined}>
         <td>{r?i+1:""}</td>
         <td>{r&&<><strong>{r.tagSummary||r.tagNo||"COMMON"}</strong>
          {r.relatedEquipmentTagCount>1&&<details className="p553-annex-tag-list">
@@ -299,6 +301,9 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        </tr></tbody></table>
        <p className="p55-note">{code.startsWith("C")?"OPTIONAL · Reference value for working review only; customer sell remains Not quote pending OEM verified cost.":"Budgetary Working Sell from 10.2; unresolved variance is not silently added to any spare item."} One priced row = one type of proposed spare stock; many related TAGs do NOT multiply spare Qty. TAGs shown are equipment-function candidates, NOT proof of interchangeable OEM part numbers.</p>
       </div>}
+      <p className="p55-note"><strong>Reverse trace:</strong> 10.3 Annex ↔ 10.2 Owner / Spare Source uses the same source row ID.
+       Expand TAG details for readability; the native XLSX draft retains the complete source TAG string inside its original fixed cell and cannot fold TAGs in Excel.
+       Both presentations carry the same description, specification, materials, Qty and Working Sell; Customer Release remains HOLD.</p>
       {annexOverflow.length>0&&<p className="p553-native-warning">HOLD — {code}: {annexOverflow.length} source lines exceed the original 13 annex slots. No rows are discarded from the source; native export requires reconciliation.</p>}
       <div className="p553-annex-remark">Remark 注释: {code.startsWith("C")?
        "Above Price of spare parts is valid up to Two years after Delivery date of purchase order":
