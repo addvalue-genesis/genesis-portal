@@ -5,6 +5,7 @@
 import {selectDocumentSpareObligations0553} from "./documentSpareObligations0553";
 import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
 import {MR0004_WORKING_BOM_0553} from "./mr0004WorkingBom0553";
+import {MGW_PAUL_EMAIL_CLARIFICATIONS_0553} from "./mgwPaulEmailClarifications0553";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const SCOPE=Object.freeze(["B10","B11","B13","C1","C2"]);
 const REQUIRED_FIELDS=Object.freeze([
@@ -150,6 +151,45 @@ export function selectSpareEngineeringReconciliation0553(){
    auditVerdict:"CANNOT_ASSERT_1_SET_PER_PLATFORM_KIT_CONTENT_COVERED"
   });
  });
+ // Bidirectional engineering evidence matrix: same 31 existing source IDs.
+ // This is the fully reviewed PRE-AWARD vendor clarification list, NOT a
+ // certified OEM SPIR, part interchangeability or a second cost ledger.
+ const verificationRows=Object.freeze(customer.rows.map(x=>Object.freeze({
+  id:x.id,sourceRowModuleId:x.sourceRowModuleId,code:x.code,
+  description:x.displayDescription,linkedTags:Object.freeze(x.relatedTagList.slice()),
+  installedCandidateSku:x.engineeringVerification.installedCandidateSku,
+  verifiedSpareSku:null,verifiedDirectCostTHB:null,verifiedQuantity:null,
+  sourceQty:x.qty,sourceReferenceSellTHB:x.extendedTHB,
+  severity:x.engineeringVerification.level,
+  evidence:x.engineeringVerification.evidence,
+  technicalGap:x.engineeringVerification.issue,
+  requiredVendorAnswer:x.engineeringVerification.action,
+  conflict:x.engineeringVerification.category,
+  state:x.engineeringVerification.completeness,
+  sourceToReleaseId:x.traceId,
+  independentlyPriceable:false,pricePosted:false,customerReleaseAllowed:false
+ })));
+ const priorityRows=Object.freeze(verificationRows.filter(x=>x.severity==="HIGH"));
+ const quoteCandidates=Object.freeze(verificationRows.filter(x=>x.installedCandidateSku!==null));
+ const b10c2Conflicts=Object.freeze(verificationRows.filter(x=>x.conflict==="C2_B10_ATTACHMENT7_EXCLUSION"));
+ const includedVendorKits=Object.freeze([
+  Object.freeze({source:"MGW Paul Lee email 20-Oct-2026",mr:"MR-0004",
+   item:"RACON programming kit",included:true,priceOwner:"Part A vendor quoted RACON package",
+   affects:"B11-REV08-01",spareSku:null,spareQty:null,
+   financialAction:"DO NOT ADD INDEPENDENT B11 ITEM UNTIL INCLUDED KIT SKUS/COUNT AND PHASE TOOLS VERIFIED",
+   status:"VENDOR_EMAIL_INCLUDED__PACKING_LIST_UNKNOWN",postingAllowed:false}),
+  Object.freeze({source:"MGW Paul Lee email 20-Oct-2026",mr:"MR0001–MR0004",
+   item:"Commissioning spares, special tools and two-year operating spares",included:null,
+   priceOwner:"OEM declaration promised, ITEMIZED SPIR NOT PROVIDED",
+   affects:"B10/B11/C2",spareSku:null,spareQty:null,
+   financialAction:"CONFIRM EACH PHYSICAL STOCK ITEM, UNIT PRICE, INCLUDED/EXCLUDED AND UNIQUE COST OWNER",
+   status:"PROMISED_ONLY__CANNOT_CREDIT_OR_MARK_COMPLETE",postingAllowed:false})
+ ]);
+ if(verificationRows.length!==31||new Set(verificationRows.map(x=>x.id)).size!==31||
+  verificationRows.some(x=>x.sourceQty<=0||x.pricePosted||x.verifiedSpareSku!==null)||
+  MGW_PAUL_EMAIL_CLARIFICATIONS_0553.approvedVendorSpareListReceived!==false||
+  MGW_PAUL_EMAIL_CLARIFICATIONS_0553.raconProgrammingKit.included!==true)
+  throw Error("Spare vendor verification matrix source IDs, email inclusions or 31-line quantities diverged");
  const byCode=Object.fromEntries(SCOPE.map(code=>[code,Object.freeze({
   code,historicalBudgetReferenceTHB:customer.summary[code].workingReferenceTHB,
   pricedHistoricalLines:customer.byCode[code].length,
@@ -168,6 +208,9 @@ export function selectSpareEngineeringReconciliation0553(){
   methodModuleId:demand.moduleId,priceReadModelId:customer.moduleId,
   section:"10.2",equationIds:["MAP-02","MAP-06","MAP-07","MAP-08","MAP-09"],
   kitLines,brownfieldDemand,toolRequirements,capitalHistory,raconComparison,selectedC1Option,systemSummary,vendorScopeConflicts,
+  verificationRows,priorityRows,quoteCandidates,b10c2Conflicts,includedVendorKits,
+  vendorClarificationReady:true,physicalSpirComplete:false,
+  selectedCustomerPriceUnchanged:true,
   sourceSpecificationChecklist:REQUIRED_FIELDS,byCode,
   historicalSourcePriceRows:customer.rows,
   missingOemSpares:"OEM itemized SPIR not yet reconciled in current working BOM",
