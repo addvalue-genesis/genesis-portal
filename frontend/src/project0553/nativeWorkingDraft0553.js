@@ -169,9 +169,26 @@ export async function buildNativeWorkingDraft0553(file,model){
   const code=annexCodes[i],detail=model.annex?.[code]||[],audit=model.annexModels?.[code];
   const rows=new Map();
   if(detail.length>13)throw Error(code+" exceeds 13 physical rows in original. Cannot export without layout changes.");
+  const routeTrace=model.annexTraceAudit?.rowTrace?.filter(x=>x.code===code)||null;
+  if(routeTrace&&routeTrace.length!==detail.length)
+   throw Error(code+" native export diverged from bidirectional Source/Release line count");
   detail.forEach((r,j)=>{
    const row=j+6;
+   if(r.nativeRow!==undefined&&r.nativeRow!==row)
+    throw Error(code+" native row changed: "+r.sourceId);
+   if(r.nativeSheet&&r.nativeSheet!==SHEETS_0553[i+1])
+    throw Error(code+" native worksheet/source row mismatch: "+r.sourceId);
+   if(r.nativeCells&&Object.entries({tagNo:"C",description:"D",specification:"E",
+    materials:"F",qty:"G",unitPrice:"H",totalPrice:"I"}).some(([key,col])=>r.nativeCells[key]!==col+row))
+    throw Error(code+" native cell mapping changed: "+r.sourceId);
+   if(routeTrace&&(!routeTrace[j]||routeTrace[j].sourceId!==r.sourceId||
+      routeTrace[j].nativeRow!==row||
+      routeTrace[j].sourceModuleId!==r.sourceRowModuleId||
+      routeTrace[j].workingTotalTHB!==r.workingTotalTHB))
+    throw Error(code+" RELEASE→SOURCE→NATIVE mismatch: "+r.sourceId);
    write(rows,"B"+row,j+1);
+   // Native customer worksheet retains ALL original candidate TAG references.
+   // Count/expand is a browser UI presentation and cannot fit the frozen template.
    write(rows,"C"+row,r.tagNo||"COMMON");
    write(rows,"D"+row,r.description||"");
    write(rows,"E"+row,r.specification||"");
