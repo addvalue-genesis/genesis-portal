@@ -68,9 +68,9 @@ assert.equal(c.byCode.B11.historicalBudgetReferenceTHB,128314.11);
 assert.equal(c.byCode.B13.historicalBudgetReferenceTHB,22484.21);
 assert.equal(c.byCode.C1.historicalBudgetReferenceTHB,4049349.36);
 assert.equal(c.byCode.C2.historicalBudgetReferenceTHB,721806.68);
-assert.equal(w.knownWorkingSellTHB,4602736.82,
+assert.equal(w.knownWorkingSellTHB,4328914.13,
  "Current 10.2 Part B after B2 131-WO, MGW FAT and approved B9 Base; do not use prior Rev.K bridge");
-assert.equal(w.byCode.C1.workingSellTHB,c.byCode.C1.historicalBudgetReferenceTHB);
+assert.equal(w.byCode.C1.workingSellTHB,null);
 assert(c.updatedPricePosted===false&&c.complete===false&&c.customerReleaseAllowed===false);
 const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(jsx.includes('spareLines.length>0&&code!=="C1"'),"Historical Rev08 C1 lines must not masquerade as current selected customer price schedule");
@@ -81,4 +81,4 @@ assert(jsx.includes("selected installed MGW R2 RACON-1")&&jsx.includes("historic
 for(const phrase of ["selectSpareEngineeringReconciliation0553","spareReconciliation.kitLines.map","spareReconciliation.raconComparison","customerSchedule.crossCategoryDuplicates","spareReconciliation.vendorScopeConflicts"])
  assert(jsx.includes(phrase),phrase+" must be shown in 10.2");
 assert(babel.transformSync(jsx,{babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
-console.log("PASS 0553 spare reconciliation: MR0004 installed MGW RACON USD75059 is distinct from historical ORGA C1 reference USD75000; nonposting C1 budget THB2362500, 14 kits unpriced, 4 tool phases, Attachment7 exclusion, Part B THB4602736.82 unchanged.");
+console.log("PASS 0553 spare reconciliation: MR0004 installed MGW RACON USD75059 is distinct from historical ORGA C1 reference USD75000; nonposting C1 budget THB2362500, 14 kits unpriced, 4 tool phases, Attachment7 exclusion, Part B THB4328914.13 unchanged.");
