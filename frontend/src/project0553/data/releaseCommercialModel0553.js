@@ -220,6 +220,8 @@ export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
     JSON.stringify(x.relatedTagList||[])===JSON.stringify(row.relatedTagList||[])&&
     x.description===row.displayDescription&&x.specification===row.displaySpecification&&
     x.materials===row.displayMaterials&&x.originalDescription===row.description&&
+    x.engineeringVerification===row.engineeringVerification&&
+    x.actualOemSpareSku===null&&x.engineeringProofComplete===false&&
     x.qty===row.qty&&x.workingTotalTHB===row.extendedTHB&&
     x.sourcePriceUSD===row.sourcePriceUSD&&
     // Price audit uses original USD precision × FX before THB display rounding.
