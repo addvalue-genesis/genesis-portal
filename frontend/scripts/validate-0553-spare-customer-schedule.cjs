@@ -115,7 +115,14 @@ for(const jsx of [workbookUI,scopeUI]){
  assert(jsx.includes("p553-annex-tag-list"),"TAG Expand/Collapse not rendered");
  assert(jsx.includes("tagSummary"),"Concise TAG summary not rendered");
 }
-assert(workbookUI.includes("r?.purpose")&&workbookUI.includes("materialVerified"));
+assert(workbookUI.includes("r?.purpose")&&workbookUI.includes("p553-annex-materials"));
+assert(workbookUI.includes("p553-annex-description")&&workbookUI.includes("p553-annex-specification"));
+assert(workbookUI.includes("p553-annex-qty")&&workbookUI.includes("r?.unit"));
+assert(workbookUI.includes("p553-annex-tag-chip")&&scopeUI.includes("p553-annex-tag-chip"));
+const releaseCss=fs.readFileSync(path.join(root,"project0553/releaseWorkbook0553.css"),"utf8");
+const projectCss=fs.readFileSync(path.join(root,"project0553/project0553.css"),"utf8");
+assert(releaseCss.includes(".p553-customer-table.p553-annex-table{min-width:1440px}"));
+assert(projectCss.includes(".p553-annex-tag-chip"));
 assert(scopeUI.includes("x.displayDescription")&&scopeUI.includes("x.displayMaterials"));
 assert(scopeUI.includes("inWorking?x.sourceRowModuleId"));
 assert(workbookUI.includes("item.sourceRowModuleId||item.sourceModuleId"));
