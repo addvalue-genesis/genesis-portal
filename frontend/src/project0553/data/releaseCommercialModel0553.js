@@ -144,6 +144,7 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    id:x.id||code+"-ROW-"+(i+1),code,sourceModuleId:"bid.budget.working.bc."+code.toLowerCase(),
    sourceScheduleModuleId:"bid.budget.working.bc.customer-spare-schedule",
    sourceId:x.sourceId||x.id,sourceRevision:x.sourceRevision,sourcePriceUSD:priceUSD,
+   evidenceSource:x.evidenceSource||null,priceAuthority:x.sourcePriceBasis||null,
    // Native source TAG list remains available for export and technical trace.
    // Display fields are deliberately short; no installed spare interchangeability is asserted.
    traceId:x.traceId||code+"::"+(x.sourceId||x.id||i+1),
@@ -166,10 +167,10 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    workingUnitTHB:unitPrecision4,workingTotalTHB:extReference,
    customerUnitTHB:isBase?unitPrecision4:null,
    customerTotalTHB:isBase?extReference:null,
-   priceClass:isBase?"BUDGETARY_WORKING_SELL_OEM_COST_NOT_VERIFIED":
-    "OPTION_BUDGET_REFERENCE_ONLY_NO_VERIFIED_COST",
+   priceClass:x.sourcePriceBasis||"OEM_SPIR_PENDING",
    mappingStatus:x.mappingStatus,workingStatus:x.workingStatus,
-   priceSource:"10.2 / "+code+" · "+(x.sourceRevision||"unconfirmed"),
+   independentOemSkuVerified:false,independentOemUnitRateVerified:false,
+   priceSource:"10.2 / "+code+" · "+(x.sourceRevision||"unconfirmed")+(x.sourcePriceBasis?" · "+x.sourcePriceBasis:""),
    priceSourceStatus:x.workingStatus,customerReleaseAllowed:false,
    selectedLine,possibleOverlap:x.possibleOverlap||null,
    releaseToSourceStatus:"SOURCE_OWNER_TRACE_PRESERVED__OEM_SKU_STILL_PENDING",
@@ -342,12 +343,12 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  });
  const annexCodes=["B10","B11","B13","C1","C2"];
  const annexModels=Object.fromEntries(annexCodes.map(code=>[code,buildAnnexWorkingPriceBridge0553({
-  code,sourceRows:spare.byCode[code]||[],
+  code,sourceRows:spare.currentByCode[code]||[],
   owner:code.startsWith("B")?b.find(x=>x.code===code):c.find(x=>x.code===code)
  })]));
  const annex=Object.fromEntries(annexCodes.map(code=>[code,annexModels[code].rows]));
- const annexTraceAudit=auditAnnexBidirectionalTrace0553(spare.byCode,annex);
- if(annexTraceAudit.totalRows!==31)throw Error("0553 31-source Annex identity inventory changed");
+ const annexTraceAudit=auditAnnexBidirectionalTrace0553(spare.currentByCode,annex);
+ if(annexTraceAudit.totalRows!==16)throw Error("0553 16 PTTEP current-source Annex identity inventory changed");
  const aKnown=a.filter(x=>n(x.previewSellTHB));
  const bKnown=b.filter(x=>n(x.customerSellTHB));
  const cKnown=c.filter(x=>n(x.customerSellTHB));
