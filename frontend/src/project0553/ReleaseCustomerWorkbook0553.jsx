@@ -1,4 +1,4 @@
-import React,{useMemo,useRef,useState} from "react";
+import React,{useEffect,useMemo,useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
@@ -32,8 +32,30 @@ const ANNEX_TITLE={
  C2:["SUPPLIER RECOMMENDATION FOR 2 YEARS OPERATION SPARE PARTS","供货商推荐的两年运行备品备件"]
 };
 const addKnown=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?Math.round((a+b)*100)/100:null;
-export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSource=()=>{},title="10.3 — Customer Release"}){
+export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSource=()=>{},focusAnnexTarget=null,title="10.3 — Customer Release"}){
  const [sheet,setSheet]=useState("Scope of supply");
+ // Source→Release: resolve one exact B/C spare row, never change a price.
+ const focusKey=focusAnnexTarget?.code+"::"+focusAnnexTarget?.sourceId+"::"+focusAnnexTarget?.seq;
+ useEffect(()=>{
+  if(!focusAnnexTarget?.code)return;
+  const matched=WORKSHEETS.find(([name,code])=>code===focusAnnexTarget.code);
+  if(matched)setSheet(matched[0]);
+ },[focusKey]);
+ useEffect(()=>{
+  if(!focusAnnexTarget?.code)return;
+  const matched=WORKSHEETS.find(([name,code])=>code===focusAnnexTarget.code);
+  if(!matched||matched[0]!==sheet)return;
+  const targetId="bid.budget.pricing.release.preview.annex."+
+   focusAnnexTarget.code.toLowerCase()+"."+focusAnnexTarget.sourceId.toLowerCase();
+  const target=[...document.querySelectorAll("[data-component-key]")]
+   .find(node=>node.getAttribute("data-component-key")===targetId);
+  if(target){
+   for(let node=target;node;node=node.parentElement){
+    if(node.tagName==="DETAILS")node.open=true;
+   }
+   target.scrollIntoView?.({behavior:"smooth",block:"center"});
+  }
+ },[focusKey,sheet]);
  const [viewer,setViewer]=useState("CUSTOMER");
  const [source,setSource]=useState(null);
  const [expandedMr,setExpandedMr]=useState({});
