@@ -234,8 +234,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td>{["B10","B11","B13"].includes(id)?<>
           <span>refer to Annex {id}</span>
+          <small>{lifecycleReview?.display||"Current OEM price NOT ESTABLISHED"}</small>
           {internal&&<><small><strong>{lifecycleReview?.status||"REESTIMATE_HOLD"}</strong></small>
-           <small>{lifecycleReview?.display||"Current OEM price NOT ESTABLISHED"}</small>
            <button type="button" className="p553-detail-button"
             onClick={()=>setSheet(WORKSHEETS.find(([,code])=>code===id)?.[0]||sheet)}>↗ Annex {id}</button></>}
          </>:id==="B12"?"refer to Annex B12":
@@ -271,7 +271,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         <td>1 lot</td><td className="p553-price-cell">{money(r.customerSellTHB)}</td>
         <td className="p553-price-cell">{money(r.customerSellTHB)}</td>
         <td>refer to Annex {r.code} · OPTION
-         {internal&&<><small>{r.spareSourceReview?.display||"OEM SPIR/quote pending"}</small>
+         <small>{r.spareSourceReview?.display||"OEM SPIR/quote pending"}</small>
+         {internal&&<>
           <button type="button" className="p553-detail-button" onClick={()=>setSheet(WORKSHEETS.find(([,code])=>code===r.code)?.[0]||sheet)}>↗ Annex {r.code}</button></>}
         </td></tr>)}
        <tr className="p553-sheet-highlight"><td colSpan={8}>Remark: Delivery term shall follow program logistic proposal and fixed by each cluster per equipment cargo size.</td></tr>
