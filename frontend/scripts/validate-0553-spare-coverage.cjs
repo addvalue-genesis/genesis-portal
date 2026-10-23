@@ -71,10 +71,10 @@ assert.equal(scope.minimumContractSatisfied,false);
 assert.equal(scope.customerReleaseAllowed,false);
 for(const code of ["B10","B13","C1","C2"]){
  assert.equal(scope.categoryBudgetsTHB[code],baseline.budgetTotalsTHB[code],"Risk analysis must not change budget "+code);
- assert.equal(current.byCode[code].workingSellTHB,baseline.budgetTotalsTHB[code],"Never re-price Rev08 silently");
+ assert.equal(current.byCode[code].workingSellTHB,null,"New PTTEP OEM cost required, never carry historic line values");
  assert.equal(current.byCode[code].directCostTHB,null,"Working SELL is not approved direct cost");
 }
-assert.equal(current.knownWorkingSellTHB,4602736.82,"Protect latest owner-only Part B Base; legacy Rev05 remains audit source");
+assert.equal(current.knownWorkingSellTHB,4328914.13,"Protect latest owner-only Part B Base; legacy Rev05 remains audit source");
 const view=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(view.includes("selectSpareCoverageEngineering0553")&&view.includes("coverage.groups.filter("));
 assert(babel.transformSync(view,{babelrc:false,configFile:false,
