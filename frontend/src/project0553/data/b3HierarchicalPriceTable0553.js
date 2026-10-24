@@ -44,8 +44,8 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
  const satMatrix=selectB3SiteMrSatCoverage0553();
  const crosswalk=selectB3RequirementWbsTrace0553();
  if(quoted.length!==2||quotedUSD!==7500||offshore.laborWorkingSellTHB!==1587600||offshore.surveyLabourWorkingSellTHB!==252000||
-  fat.workingSellTHB!==263700||
-  fat.groupFatWorkingSellTHB!==263700||veex.workingSellTHB!==30000||
+  fat.workingSellTHB!==693000||
+  fat.groupFatWorkingSellTHB!==693000||veex.workingSellTHB!==30000||
   satMatrix.rows.length!==21||crosswalk.rows.length!==19||
   workingRow.b3FatOwnerTransfer?.amountTHB!==144000||
   workingRow.directCostTHB!==null)
@@ -120,8 +120,8 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
  });
  const totalSell=round(groups.reduce((n,g)=>n+g.workingSellTHB,0));
  const vendorUSD=round(groups.reduce((n,g)=>n+g.vendorQuoteUSD,0));
- const groupsAsExpected={fat:263700,sat:1839600,tools:30000,audit:0};
- if(totalSell!==2133300||totalSell!==b.totalWorkingSellTHB||
+ const groupsAsExpected={fat:693000,sat:1839600,tools:30000,audit:0};
+ if(totalSell!==2562600||totalSell!==b.totalWorkingSellTHB||
   vendorUSD!==0||
   groups.some(g=>g.workingSellTHB!==groupsAsExpected[g.kind])||
   groups.flatMap(g=>g.items).filter(x=>[C.INCLUDED_WORKING_SELL,C.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length!==4||

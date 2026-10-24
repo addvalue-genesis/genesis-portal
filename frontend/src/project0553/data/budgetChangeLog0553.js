@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R34";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R35";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-04",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"SAMTEL lump sum: preparation, FAT, hosting, shared tools, training and CIF export allocation",
+  detail:"Current local B3 execution allowance693000: 4 prep +6 FAT +1 closeout +1 retest, shared14-day facility/transport, tools, meals and OEM remote FAT support. Total B3 2562600 (+429300). B8 142550 (-9000): demo20000 transferred to B3, catering11000 added; six products/16h, prior content-prep day and separate D5–6 training. OEM onsite alternative615350 nonposting. B5 311184/B6 307584 retain existing envelopes with internal activity allocations, including SAMTEL dispatch/export25000; freight/tax/insurance adequacy not verified. A/B9/spares unchanged. Known Part B4997357.13, net change+420300; source flows to Scope/Release/native draft, no MGW service, no second travel credit. Historical5/7-day comparisons frozen to prior baseline; not current execution plans.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.02.site.01","bid.budget.working.bc.b8.hybrid-training","bid.budget.working.bc.b6.price-trace.work-scope"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner 24-Oct full lump-sum execution scope; internal estimator assumptions explicitly unquoted"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-03",date:"2026-10-24",kind:"PRICE",tone:"neutral",
   title:"MGW supplies MR0002 equipment only — remove all B3 FAT services/reserve",

@@ -11,6 +11,12 @@ const round=v=>Math.round((v+Number.EPSILON)*100)/100;
 const ROOT="bid.budget.working.bc.";
 export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
  if(!b3||b3.code!=="B3"||!b8||b8.code!=="B8")return null;
+ // Historical comparison only: excludes the subsequent 14-day local execution plan.
+ const currentSelected={B3:b3.workingSellTHB,B8:b8.workingSellTHB};
+ const historicalIds=new Set(["FAT-STAFF","TRAVEL-DAYS","AIRFARE","HOTEL","VISA","LOCAL-TRAVEL","TRAVEL-INSURANCE","WORK-INSURANCE"].map(x=>"B3-"+x));
+ const historicalRows=b3.b3ChinaFatBudget.rows.filter(x=>historicalIds.has(x.id)).map(x=>x.id==="B3-LOCAL-TRAVEL"?{...x,qty:1,unit:"consolidated trip",unitRateTHB:8000,workingSellTHB:8000}:x);
+ b3={...b3,workingSellTHB:2133300,b3ChinaFatBudget:{...b3.b3ChinaFatBudget,rows:historicalRows,fatWorkingSellTHB:263700}};
+ b8={...b8,workingSellTHB:151550};
  const fat=b3.b3ChinaFatBudget,rows=fat?.rows.filter(x=>x.costOwner==="B3"&&!x.optional)||[];
  const src=id=>{const v=rows.find(r=>r.id==="B3-"+id);
   if(!v)throw Error("Missing current B3 source expense "+id);return v;};
@@ -63,6 +69,7 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   b3.directCostTHB!==null||b8.directCostTHB!==null)
   throw Error("B3/B8 7-day allocation math / no-extra-travel / no-double-count failed");
  return Object.freeze({
+  historicalBaselineOnly:true,baselineRevision:"1526365e before complete local-execution allowances",currentSelected,
   moduleIds:Object.freeze({
    B3:ROOT+"b3.fat-training-7d-allocation",
    B8:ROOT+"b8.integrated-fat-training-7d"

@@ -26,6 +26,47 @@ const row=(code,id,stage,mr,cargoId,activity,sourceEquipmentQty,sourceEquipmentU
  postingAllowed:false,customerReleaseAllowed:false,
  sourceUrl,status,...extra
 });
+// 24-Oct internal allocation of the EXISTING B5/B6 envelopes, not freight quotations.
+// One allowance lot per activity; no fabricated crate count, weight, duty exemption or market rate.
+export function selectSamtelLogisticsEnvelope0553(){
+ const definitions={
+  B5:[
+   ["RECEIVE-PRESERVE","Receiving/unpacking/protection of reusable OEM cases at SAMTEL",40000],
+   ["MR1-SEA-PACK","MR0001 all seven locations: cabinets/radios/Cisco/antennas export protection",64000],
+   ["MR2-SEA-PACK","MR0002 three BDA locations: reusable-case protection/repack",24000],
+   ["MR3-SEA-UPGRADE","MR0003 four phone/sounder locations: upgrade EXION inland packing",32000],
+   ["MR4-CASE-REUSE","MR0004 three RACON locations: inspect/reuse included MDS sea cases",24000],
+   ["SPARE-TOOL-CASES","Selected B10/B11/B13 spares/tools/consumables separate marked cases",28000],
+   ["MARK-PRESERVATION","Shipping marks, desiccants, wood/IPPC compliance and preservation",30000],
+   ["POST-FAT-PACK","Post-FAT dismantle/protection/seal/physical repacking labour",40000],
+   ["WEIGH-MEASURE","Physical package measurement, weighing and label data; B2 controls documents",9184],
+   ["PACK-RISK","Unallocated packing damage/upgrade contingency within existing envelope",20000]
+  ],
+  B6:[
+   ["MR1-TH-IN","NextG/VST/Thai assembly to SAMTEL incl destination-change allowance",35000],
+   ["MR2-CN-TH","MGW RF equipment China origin → Thailand; EXW/DAP discrepancy remains",60000],
+   ["MR3-TH-IN","EXION Nonthaburi → actual SAMTEL address, local delivery reserve",8000],
+   ["MR4-FCA-TH","MDS named FCA factory → Thailand; pickup place/cargo dimensions open",65000],
+   ["TH-IMPORT-BROKER","Thailand inbound broker/permit processing, excluding unknown statutory duty/VAT",12000],
+   ["SAMTEL-EXPORT","SAMTEL dispatch loading, truck to port, export broker/terminal handling",25000],
+   ["CIF-ZHUHAI-SEA","Thailand port → Zhuhai Port sea freight, all four MR consolidated",80000],
+   ["CARGO-RISK","Cargo insurance plus unallocated route-price contingency",22584]
+  ]
+ };
+ const byCode=Object.fromEntries(Object.entries(definitions).map(([code,list])=>[code,freeze(list.map(([id,activity,amount])=>freeze({
+  id:code+"-SAMTEL-"+id,code,activity,qty:1,unit:"internal allowance lot",unitRateTHB:amount,
+  workingSellTHB:amount,sourceModuleId:ROOT+"."+code.toLowerCase()+".price-trace.work-scope",
+  status:"INTERNAL_ENVELOPE_ALLOCATION_NOT_VENDOR_QUOTE_OR_VERIFIED_ADEQUACY",
+  verifiedDirectCostTHB:null,independentPostingAllowed:false
+ })))]));
+ const totals=Object.fromEntries(Object.entries(byCode).map(([code,rows])=>[code,round(rows.reduce((n,r)=>n+r.workingSellTHB,0))]));
+ if(totals.B5!==311184||totals.B6!==307584)throw Error("Existing packing/CIF envelopes allocated more than once");
+ return freeze({byCode:freeze(byCode),totals:freeze(totals),adequacyVerified:false,
+  coverage:"All MR0001/2/3/4 7+3+4+3 scope and selected spares; equipment location counts are not shipment package counts",
+  statutoryThaiDutyVATTHB:null,clientTravelHotelTHB:null,
+  unpricedExposures:freeze(["Thailand import duty/tax regime and recoverable VAT cash flow: amount/payer not established, no exemption assumed", "Actual dimensions/weights/freight surcharges and OEM included freight/packing netting", "Cargo ICC(A) insurance to Yard versus CIF Port: broker extent/premium unconfirmed", "China clearance/duty/VAT/port-to-yard Purchaser per COM-D02; any changed responsibility must be repriced"]),
+  customerReleaseAllowed:false});
+}
 export function selectB5B6B7LinkedLogistics0553(){
  const route=selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB:307584});
  const earlier=selectB6Mr0001ChinaInboundScenario0553();
@@ -62,7 +103,7 @@ export function selectB5B6B7LinkedLogistics0553(){
    "B6-MGW-MR234-INTERNAL",
    "MGW MR0002 inbound packing; EXION inland-only protection; MDS sea packing included, net new B5 work only",null,"physical packages",
    MGW.sourceUrl,"MGW_OEM_ORIGIN_PACKING_INCLUSION_PENDING"),
-  row("B5","MGW-POST-FAT-REPACK","MGW-AFTER-FAT","MR-0001..0004",
+  row("B5","MGW-POST-FAT-REPACK","SAMTEL-AFTER-FAT","MR-0001..0004",
    "B6-MGW-JUTAL-OUT",
    "Unpack, inspect, reuse/reseal or replace crates after SAMTEL FAT; charge only net new work",null,"repacked physical packages",
    documents.annex4,"FAT_OPENED_PKG_IDS_REUSE_QTY_AND_NEW_PACK_RATE_PENDING",{
@@ -133,6 +174,7 @@ export function selectB5B6B7LinkedLogistics0553(){
   throw Error("B5/B6/B7 line identity or unpriced-source nonposting reconciliation failed");
  return freeze({
   moduleId:"bid.budget.working.bc.logistics-linked-audit",
+  envelope:selectSamtelLogisticsEnvelope0553(),
   approvedRoutingId:route.approvedDecisionId,routeStatus:route.physicalRoutingStatus,
   MGWFatLocation:"SAMTEL Warehouse, Thailand — selected working venue; customer acceptance open",
   yardOwnerRoute:"CIF Zhuhai Port China, COM-D02 port→yard by Purchaser",

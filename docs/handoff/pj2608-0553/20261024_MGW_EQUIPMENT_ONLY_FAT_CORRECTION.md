@@ -1,3 +1,5 @@
+> B3/B8 amounts and the warehouse/tool gap in this historical correction are superseded by [the complete local-execution budget](20261024_SAMTEL_LUMP_SUM_EXECUTION_BUDGET.md). MGW equipment-only selection and withdrawn service decision remain unchanged.
+
 # PJ2608-0553 — MGW equipment supply only / FAT correction
 
 Owner correction on 24 October: MGW supplies MR0002 equipment only. It does not execute integration, FAT, witnessed FAT or provide the test facility. This supersedes the THB307,125 retained service reserve in the earlier urgent pricing review and commit c6699aca.

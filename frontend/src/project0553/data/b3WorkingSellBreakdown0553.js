@@ -7,10 +7,10 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
  if(!workingRow||workingRow.code!=="B3")return null;
  const sat=workingRow.b3SelectedSatSurveyBudget,china=workingRow.b3ChinaFatBudget;
  const legacy=workingRow.b3FortyDayBudget;
- if(!sat||!china||!legacy)throw Error("Missing B3 current SAT28+Survey5 or MGW China FAT source");
+ if(!sat||!china||!legacy)throw Error("Missing B3 current SAT28+Survey5 or local execution source");
  const fatRows=china.rows.filter(x=>x.costOwner==="B3"&&!x.optional);
- if(fatRows.length!==8||!fatRows.every(x=>isMoney(x.workingSellTHB)&&x.moduleId))
-  throw Error("MGW FAT source row ownership or working sell missing");
+ if(fatRows.length!==20||!fatRows.every(x=>isMoney(x.workingSellTHB)&&x.moduleId))
+  throw Error("SAMTEL execution source row ownership or working sell missing");
  const fatSell=round(fatRows.reduce((n,x)=>n+x.workingSellTHB,0));
  const purchased=workingRow.b3MgwPurchasedFatWorkingSell;
  if(!purchased||purchased.selectedIncrementalWorkingSellTHB!==0||
@@ -45,8 +45,8 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
     driver:veex.quantity+" rental-days × THB"+veex.rateTHB+" /day; ex VAT; no extra B11 tool purchase",
     workingSellTHB:rent,postedWithinB3:true},
    {id:"MGW-FAT",moduleId:"bid.budget.working.bc.b3.revk-china-budget",
-    activity:"SAMTEL Warehouse FAT — 2 paid roles, local transfers and work insurance",
-    driver:"6 FAT workdays × 2 persons; China trip quantity zero; THB8000 local + THB10000 work cover retained",
+    activity:"SAMTEL Warehouse preparation/FAT — ADDVALUE crew, shared facility/tools, hosting and closeout",
+    driver:"4 prep + 6 FAT +1 closeout +1 retest crew-days; 2 separate B8 training days; 14-day facility/transport, shared tools, meals, OEM support and work cover",
     workingSellTHB:fatSell,postedWithinB3:true}
   ],
   offshore:{workdays:sat.satTeamDays,people:2,personDays:sat.satPersonDays,rateUSD:sat.sourceRateUSDPerPersonDay,roleRates:sat.satRoleRates,workingFx:sat.fxTHBPerUSD,

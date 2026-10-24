@@ -8,6 +8,12 @@ const total=a=>round(a.reduce((sum,x)=>sum+x,0));
 export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={}){
  if(b3?.code!=="B3"||b8?.code!=="B8"||![1,2].includes(trainingCrew))
   throw Error("Require canonical B3/B8 and scenario training crew=1 or 2");
+ // Historical comparison only: excludes the subsequent 14-day local execution plan.
+ const currentSelected={B3:b3.workingSellTHB,B8:b8.workingSellTHB};
+ const historicalIds=new Set(["FAT-STAFF","TRAVEL-DAYS","AIRFARE","HOTEL","VISA","LOCAL-TRAVEL","TRAVEL-INSURANCE","WORK-INSURANCE"].map(x=>"B3-"+x));
+ const historicalRows=b3.b3ChinaFatBudget.rows.filter(x=>historicalIds.has(x.id)).map(x=>x.id==="B3-LOCAL-TRAVEL"?{...x,qty:1,unit:"consolidated trip",unitRateTHB:8000,workingSellTHB:8000}:x);
+ b3={...b3,workingSellTHB:2133300,b3ChinaFatBudget:{...b3.b3ChinaFatBudget,rows:historicalRows,fatWorkingSellTHB:263700}};
+ b8={...b8,workingSellTHB:151550};
  const china=b3.b3ChinaFatBudget;
  const source=china?.rows.filter(r=>r.costOwner==="B3"&&!r.optional)||[];
  const ids=new Set(source.map(r=>r.id));
@@ -62,6 +68,7 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
   new Set(rows.map(r=>r.sourceExpenseId)).size!==8)
   throw Error("B3/B8 five-day scenario is not financially conserved");
  return Object.freeze({
+  historicalBaselineOnly:true,baselineRevision:"1526365e before complete local-execution allowances",currentSelected,
   moduleId:"bid.budget.working.bc.b3.fat-training-5d-source-allocation",
   scenarioId:"SC-B3-B8-SAMTEL-FIVE-DAY-NONPOSTING",
   sourceModuleId:"bid.budget.working.bc.b3.revk-china-budget",
@@ -83,6 +90,7 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
   selectedWorkingSellTHB:null,customerPriceTHB:null,
   postingAllowed:false,releaseAllowed:false,
   gates:Object.freeze([
+   "HISTORICAL ONLY: excludes current preparation/facility/hosting allowances; cannot replace current complete plan",
    "Training Day 4 after FAT contradicts BOD pre-FAT training; require purchaser agreement",
    "SERV-2 two iFAT days and SERV-4 minimum five facility days are separate quote identities",
    "Training crew count 1 or 2 and actual site/facility itinerary not approved",

@@ -12,15 +12,15 @@ export function B3B8SevenDayAllocation0553({b3,b8,owner="B3"}){
  if(!moduleId)throw Error("Unknown integrated FAT/Training owner "+owner);
  return <section className="p55-panel p553-fat7-allocation"
   data-component-key={moduleId} style={{padding:12,marginTop:12}}>
-  <div className="p55-eyebrow">INTERNAL SCENARIO ONLY / NOT OFFICIAL CUSTOMER PROPOSAL</div>
+  <div className="p55-eyebrow">HISTORICAL 7-DAY COMPARISON / EXCLUDES CURRENT LOCAL EXECUTION PLAN</div>
   <h4>FAT + Training — Shared 7 On-site Days / Separate B3 and B8 Owners</h4>
   <p className="p55-note">Module ID: {copy(moduleId)}.
    One ADDVALUE 2-person team × 7 on-site days = 14 unique paid person-days.
-   Travel 4 person-days is SEPARATE and already included ONCE in B3
+   Local venue has no foreign travel labour
    ({money(m.travelLabourExistingIncludedB3THB)}).</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Contract Line / Internal WS</th><th>Internal Cost Activity</th>
-    <th>On-site MD</th><th>Current Working SELL</th><th>Scenario SELL</th>
+    <th>On-site MD</th><th>Historical baseline SELL</th><th>Scenario SELL</th>
     <th>Variance</th><th>Customer Proposal</th></tr></thead>
    <tbody>{m.identities.map((id,i)=>{
     const fat=i===0,current=fat?m.b3CurrentWorkingSellTHB:m.b8CurrentWorkingSellTHB;
@@ -48,8 +48,7 @@ export function B3B8SevenDayAllocation0553({b3,b8,owner="B3"}){
    → {money(m.proposedB3FatWorkingSellTHB)}:
    additional {m.additionalHotelNights} hotel room-nights = {money(m.additionalHotelSellTHB)};
    B8 2 on-site training person-days = {money(m.proposedB8TrainingWorkingSellTHB)}.
-   MGW Purchased Service THB307,125 is already INCLUDED in both current and scenario B3 prices;
-   the B3 FAT travel subtotal here is ADDVALUE-only and must not be added to MGW twice.
+   No MGW service is included. This old comparison omits the new preparation/facility/hosting plan and cannot replace current pricing.
    Travel labour of {m.travelPersonDays} MD = {money(m.travelLabourExistingIncludedB3THB)}
    is already in B3 once, NOT another B8 charge.</p>
   <details className="p55-panel" style={{padding:10,marginTop:12}}>

@@ -60,8 +60,8 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  const fatRows=fat.rows.filter(r=>r.costOwner==="B3"&&!r.optional);
  const fatLines=fatRows.map(r=>make("fat-witness",r.id.toLowerCase(),{
   group:"FAT_WITNESS",site:fat.executionLocation,wbs:r.wbs,
-  work:r.description,role:r.id==="B3-FAT-STAFF"?"2 FAT paid witnesses (PM/Chief Telecom Engineer + Sr Telecom Engineer)":
-   "FAT witness travel / accommodation / insurance expense",
+  work:r.description,role:r.id==="B3-FAT-STAFF"?"ADDVALUE Senior + Field Engineer execute FAT":
+   "ADDVALUE preparation / execution / local expense",
   people:r.id==="B3-FAT-STAFF"?2:null,
   teamDays:r.id==="B3-FAT-STAFF"?6:r.id==="B3-TRAVEL-DAYS"?2:null,
   qty:r.qty,unit:r.unit,unitRateTHB:r.unitRateTHB,
@@ -77,7 +77,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   freeze({id:"B3-FAT-SR",role:"Senior Telecom Systems Integration Engineer",
    onsiteMD:6,travelMD:0,usdPerMD:700,rateTHBPerMD:22050,
    workingSellTHB:132300,directCostTHB:null}),
-  freeze({id:"B3-FAT-PM",role:"PM / Chief Engineer — provisional standard USD600 (not unbilled Field standby)",
+  freeze({id:"B3-FAT-PM",role:"Field Telecom Engineer — USD600 planning rate",
    onsiteMD:6,travelMD:0,usdPerMD:600,rateTHBPerMD:18900,
    workingSellTHB:113400,directCostTHB:null})
  ]);
@@ -178,7 +178,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  }));
  const stageGroups=freeze([
   stage("External FAT service — withdrawn, not selected",mgwLines,"B3.1.1"),
-  stage("SAMTEL Warehouse FAT — Labour / Local Transfers / Work Insurance",fatLines,"B3.1.2"),
+  stage("SAMTEL Warehouse — Preparation / FAT / Shared Tools / Hosting / Closeout",fatLines,"B3.1.2"),
   stage("Selected SAT/SIT 28 Team-days / 56 MD",satLines,"B3.2.1"),
   stage("Temporary VeEX MX100+ rental",rental,"B3.3.1"),
   stage("Selected BF Survey 3 site +2 travel Team-days / 10 MD (physical call-out conditional)",freeze([...bfLines,...bfTripLines]),"B3.2.3"),
@@ -250,7 +250,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
     sourceIndexList.some(i=>i<0||i>=stageGroups.length))
   throw Error("B3 group hierarchy cannot omit or duplicate any source stage");
  const rollupTotalTHB=round(groupRollups.reduce((n,g)=>n+g.selectedWorkingSellTHB,0));
- if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="263700|252000|1587600|30000"||
+ if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="693000|252000|1587600|30000"||
     rollupTotalTHB!==workingRow.workingSellTHB)
   throw Error("B3 group hierarchy must reconcile once to canonical WS-B3");
  const priced=stageGroups.slice(0,5);
@@ -261,16 +261,16 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  const vendorQuoteCostTHB=round(mgwLines.reduce((n,r)=>n+r.quotedVendorCostTHB,0));
  const singleIds=stageGroups.flatMap(g=>g.rows.map(r=>r.id));
  if(new Set(singleIds).size!==singleIds.length||
-    mgwLines.length!==0||fatLines.length!==8||satLines.length!==18||
+    mgwLines.length!==0||fatLines.length!==20||satLines.length!==18||
     bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
-    total(mgwLines)!==0||total(fatLines)!==263700||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
-    total(rental)!==30000||budgetSelected!==2133300||
-    selectedBaseExcludingConditionalBFTHB!==1881300||bfConditionalBudgetAllowanceTHB!==252000||
+    total(mgwLines)!==0||total(fatLines)!==693000||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
+    total(rental)!==30000||budgetSelected!==2562600||
+    selectedBaseExcludingConditionalBFTHB!==2310600||bfConditionalBudgetAllowanceTHB!==252000||
     bfSurveyExpenseDrivers.length!==4||
     bfSurveyExpenseDrivers.some(x=>x.workingSellTHB!==null||x.actualDirectCostTHB!==null)||
     riskReserve.some(x=>x.workingSellTHB!==null||x.directCostTHB!==null)||
     workingRow.workingSellTHB!==budgetSelected||
-    picked.join("|")!=="0|263700|1587600|30000|252000"||
+    picked.join("|")!=="0|693000|1587600|30000|252000"||
     plan.survey.conditionalLabourSellReferenceTHB!==252000||
     vendorQuoteCostTHB!==0||
     round(vendorQuoteCostTHB+mgw.samTelMarkupTHB+mgw.addvalueMarkupTHB+
@@ -280,7 +280,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   throw Error("B3 detailed dossier does not reconcile to 10.2 canonical Working SELL");
  return freeze({
   moduleId:root,ownerModuleId:workingRow.moduleId,
-  groupNames:freeze(["SAMTEL FAT service reserve","ADDVALUE FAT witness","Selected SAT 28d priced resource roles",
+  groupNames:freeze(["External services withdrawn","ADDVALUE local execution","Selected SAT 28d priced resource roles",
    "VeEX Rental","Selected BF survey working budget","GF Yard SAT","GF Offshore commissioning","SIT/Punch Gate"]),
   groups:stageGroups,groupRollups,rollupTotalTHB,onshoreFatPaidRoleTrace,
   groupAttributionOnly:true,groupIndependentCostPostingAllowed:false,
@@ -302,7 +302,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    unpricedExtraBFExpenseCostTHB:null,
    GFYardAdditionalCostTHB:null,GFOffshoreAdditionalCostTHB:null,
    actualDirectCostTHB:null,commercialReleaseAllowed:false,
-   reconciliation:"1881300 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2133300 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
+   reconciliation:"2310600 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2562600 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
     satSeniorUsd1000DeltaTHB:satSelected.satSeniorRateRevisionDeltaTHB
   }),
   bfSurveyExpenseDrivers,riskReserve,

@@ -23,9 +23,9 @@ const snapshot=JSON.stringify(canonical);
 assert.equal(codes.length,16);
 assert.equal(B.length,14);
 assert.equal(C.length,2);
-assert.equal(pb,4577057.13);
+assert.equal(pb,4997357.13);
 assert.equal(canonical.byCode.B1.workingSellTHB,211600);
-assert.equal(canonical.byCode.B3.workingSellTHB,2133300);
+assert.equal(canonical.byCode.B3.workingSellTHB,2562600);
 assert.equal(canonical.byCode.B1.directCostTHB,null);
 const html=renderToStaticMarkup(React.createElement(Hierarchy,{
  partBRows:B,partCRows:C,partBWorkingSell:pb,partCWorkingSell:pc,
@@ -45,7 +45,7 @@ assert(html.includes("B1.1")&&html.includes("B1.8"),
 assert(html.includes('data-component-key="bid.budget.working.bc.b1.account.b1-1"'),
  "B1 nested source group must be mounted in initial ALL mode");
 assert(html.includes("THB 211,600.00"));
-assert(html.includes("THB 2,133,300.00"));
+assert(html.includes("THB 2,562,600.00"));
 assert.equal(canonical.byCode.B3.b3FortyDayBudget.workdays,40,
  "Old 40-day/80MD pricing source must remain available for audit only");
 assert(html.includes('data-component-key="bid.budget.working.bc.b1.audit.cost-lines-view"'),
@@ -69,4 +69,4 @@ assert(ws.includes('if(bcTab==="ALL"){setBcTab(owner);setBcDetailCode(owner);ret
  "Navigator must select owner before resolving collapsed nested Module IDs");
 assert.equal(JSON.stringify(cost()),snapshot,
  "16 B/C work-type accordion changed canonical cost/Working SELL/ownership");
-console.log("PASS 10.2 B/C 16-owner color-coded hierarchical accordion: B1.1–B1.8 visible by default, 16 copyable IDs, unique shared cost-line view, B1 211,600, B3 2,440,425 selected SAT28/BF5 and Part B 4,577,057.13; legacy 40d audit preserved.");
+console.log("PASS 10.2 B/C 16-owner color-coded hierarchical accordion: B1.1–B1.8 visible by default, 16 copyable IDs, unique shared cost-line view, B1 211,600, B3 2,440,425 selected SAT28/BF5 and Part B 4,997,357.13; legacy 40d audit preserved.");

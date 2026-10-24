@@ -40,14 +40,14 @@ const rows=bc.byCode.B3.b3ChinaFatBudget.rows;
 const removed=new Set(['B3-TRAVEL-DAYS','B3-AIRFARE','B3-HOTEL','B3-VISA','B3-TRAVEL-INSURANCE']);
 const removedTHB=sum(before.b3FatRows.filter(x=>removed.has(x.id)).map(x=>x.workingSellTHB));
 assert.equal(removedTHB,81900+30000+35000+8000+4000);
-assert.equal(bc.byCode.B3.workingSellTHB,before.b.B3-removedTHB-307125);
+assert.equal(bc.byCode.B3.workingSellTHB,before.b.B3-removedTHB-307125+429300);
 assert.deepEqual(rows.filter(x=>x.costOwner==='B9'),before.b9Rows,'B9 trip and paid crew must remain exactly unchanged');
 assert.equal(rows.filter(x=>removed.has(x.id)&&x.qty===0&&x.workingSellTHB===0).length,5);
 assert.equal(rows.find(x=>x.id==='B3-FAT-STAFF').workingSellTHB,6*(700+600)*31.5);
-assert.equal(rows.find(x=>x.id==='B3-LOCAL-TRAVEL').workingSellTHB,8000);
+assert.equal(rows.find(x=>x.id==='B3-LOCAL-TRAVEL').workingSellTHB,14000);
 assert.equal(rows.find(x=>x.id==='B3-WORK-INSURANCE').workingSellTHB,10000);
 for(const row of bc.rows){
- if(row.code!=='B3')assert.equal(row.workingSellTHB,before.b[row.code],row.code+' unauthorized repricing');
+ if(!['B3','B8'].includes(row.code))assert.equal(row.workingSellTHB,before.b[row.code],row.code+' unauthorized repricing');
  assert.equal(scope.lines[row.code].workingSellTHB,row.workingSellTHB);
  if(row.code.startsWith('B')){
   const out=rel.b.find(x=>x.code===row.code);
@@ -58,7 +58,7 @@ for(const row of bc.rows){
 const reserve=bc.byCode.B3.b3MgwPurchasedFatWorkingSell;
 assert.equal(reserve.selectedIncrementalWorkingSellTHB,0);assert.equal(reserve.includedInB3WorkingSell,false);assert.deepEqual(reserve.quoteLines,[]);
 assert.equal(reserve.selectedSupplierPurchase,false);assert.equal(reserve.confirmedMGWCreditTHB,null);
-assert.equal(get('b8FourSystemHybridTraining0553').selectB8FourSystemHybridTraining0553().selectedWorkingSellTHB,151550);
+assert.equal(get('b8FourSystemHybridTraining0553').selectB8FourSystemHybridTraining0553().selectedWorkingSellTHB,142550);
 assert.equal(get('b8FourSystemHybridTraining0553').selectB8FourSystemHybridTraining0553().excludedDuplicateTripWorkingSellTHB,85100);
 for(const code of ['B3','B6','B9'])assert.equal(bc.byCode[code].executionDecision.integratedFatLocation,'SAMTEL Warehouse, Thailand');
 const b3=rel.b.find(x=>x.code==='B3');
@@ -80,10 +80,10 @@ assert.equal(coverage.originalA5BookedTHB,260232);assert.equal(coverage.postAddi
 assert.equal(rel.summary.baseCustomerSellTHB,null);assert.equal(rel.approval.releaseAllowed,false);
 assert.equal(rel.summary.cOptionalCustomerSellTHB,null);
 assert.equal(round(rel.summary.aProvisionalCustomerSellTHB-before.summary.aProvisionalCustomerSellTHB),20831.85);
-assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-before.summary.bProvisionalCustomerSellTHB),-466025);
+assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-before.summary.bProvisionalCustomerSellTHB),-45725);
 console.log('PASS urgent pricing: supplier identity/currency, exact foreign FAT travel removal, B9 unchanged, B8 no second credit, 8 CIF legs, 16 bidirectional annex rows, A5 non-additive, corruption detection and FX sensitivity; draft only.');
 
 const reviewed=require('../audit-fixtures/urgent-pricing-reviewed-20261024.json');
-assert.equal(bc.byCode.B3.workingSellTHB,reviewed.b.B3-307125);
+assert.equal(bc.byCode.B3.workingSellTHB,reviewed.b.B3-307125+429300);
 for(const a of rel.a)assert.deepEqual({code:a.code,previewCostTHB:a.previewCostTHB,previewSellTHB:a.previewSellTHB},reviewed.a.find(x=>x.code===a.code),'All equipment including MGW RF stays unchanged');
-assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,reviewed.summary.bProvisionalSamTelDeductionTHB-47250);
+assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,round(reviewed.summary.bProvisionalSamTelDeductionTHB-47250+420300*.05));

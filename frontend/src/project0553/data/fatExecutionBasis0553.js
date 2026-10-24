@@ -12,13 +12,13 @@ export const FAT_EXECUTION_BASIS_0553=Object.freeze({
   country:"TH",
   strategy:"ONE_COMBINED_CROSS_SYSTEM_INTEGRATED_FAT_AFTER_OEM_PRETESTS",
   lead:"ADDVALUE_SAMTEL_IN_THAILAND",
-  reason:"ADDVALUE/SAMTEL must control integration, functional test, punch closure and witnessing in a facility with accountable personnel. China-side MGW provides advice only, not an agreed FAT execution team.",
+  reason:"ADDVALUE/SAMTEL must control integration, functional test, punch closure and witnessing in a facility with accountable personnel. MGW supplies MR0002 equipment only; ADDVALUE manages the local execution.",
   supplierPretests:"OEM factory tests and relevant certificates/release notes remain applicable per MR/ITP; never represent supplier pretests as the Bangkok integrated FAT.",
   shipmentRelease:"Do not release equipment from Thailand to Zhuhai Port (CIF; Yard handling by Purchaser) until contracted FAT/ITP sign-offs and shipping release prerequisites are satisfied."
  },
  chinaPartner:{
   partner:"MGW",
-  authority:"LOGISTICS_AND_CUSTOMS_ADVICE_ONLY__NO_CONFIRMED_EXECUTION_OR_IMPORTER_OF_RECORD",
+  authority:"MR0002_EQUIPMENT_SUPPLY_ONLY__NO_SERVICE_EXECUTION",
   notCommitted:["Operating ADDVALUE's integrated FAT in China","Providing the entire FAT test crew/equipment","China importer of record / customs declaration","Arranging shipment Thailand to China without a separate agreement"],
   rule:"Any MGW China-side logistics execution, importer, brokerage or yard service requires a separately accepted written scope and rate."
  },
@@ -33,7 +33,7 @@ export const FAT_EXECUTION_BASIS_0553=Object.freeze({
  },
  mrPaths:[
   {mr:"MR-0001",vendor:"Next G / associated OEMs",origin:"SUPPLIER_DELIVERY_PER_ISSUED_QUOTE_DAP_RANONG__RENEGOTIATE",routing:"Vendor → SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Confirm supplier release point, domestic freight, Thailand-China export and China import with nominated broker",source:"NG/260916-ADV-DAP1 DAP Ranong",quotedTransportIncludedUnknown:true},
-  {mr:"MR-0002",vendor:"MGW / China partner",origin:"EXW_NANTONG_CHINA",routing:"Nantong/China supplier → Thailand SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Cost BOTH China export → Thailand import for FAT AND Thailand re-export → China import; temporary admission/re-export only if broker confirms eligibility",source:"MGW P26-058 EXW Nantong; MGW SERV-2 Nantong FAT quote is a separate quoted service, not Bangkok integrated FAT",quotedTransportIncludedUnknown:true},
+  {mr:"MR-0002",vendor:"MGW equipment supplier",origin:"EXW_NANTONG_CHINA",routing:"Nantong/China supplier → Thailand SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Cost BOTH China export → Thailand import for FAT AND Thailand re-export → China import; temporary admission/re-export only if broker confirms eligibility",source:"MGW P26-058 EXW Nantong; MGW SERV-2 Nantong FAT quote is a separate quoted service, not Bangkok integrated FAT",quotedTransportIncludedUnknown:true},
   {mr:"MR-0003",vendor:"EXION Thailand",origin:"DDP_NONTHABURI_THAILAND",routing:"EXION Thailand → SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Confirm EXION transport handover, Bangkok FAT facility interface and subsequent Thailand export → China import",source:"EXION 1260576 Rev.0 DDP Nonthaburi (quote validity expired)",quotedTransportIncludedUnknown:true},
   {mr:"MR-0004",vendor:"MDS / ORGA",origin:"FCA_FACTORY__NAMED_PLACE_UNCONFIRMED",routing:"ORGA/MDS origin → SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Confirm origin/export, international freight to Thailand, then Thailand-China freight and China import",source:"ORGA QTORG2609244 p5 FAT included versus p7 FAT/R-FAT excluded — unresolved quotation conflict",quotedTransportIncludedUnknown:true}
  ],

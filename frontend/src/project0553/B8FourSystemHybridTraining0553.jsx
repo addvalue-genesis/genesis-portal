@@ -13,7 +13,7 @@ export function B8FourSystemHybridTraining0553({workingRow}){
   <div className="p553-bc-price-head">
    <div><h4>B8 — ADDVALUE Onsite Training + Provisional OEM Remote Support</h4>
     <p className="p55-note">{copy(m.moduleId)} · 4 systems / 8 customer trainees / 2 training days.
-     ADDVALUE-led HYBRID Budgetary Working SELL · Manufacturer online specialist time and RFI/RACON demo setups are UNQUOTED allowances, not verified Direct COST.</p></div>
+     ADDVALUE-led HYBRID Budgetary Working SELL · Manufacturer online specialist time is an UNQUOTED allowance; shared demo setups belong to B3, not verified Direct COST.</p></div>
    <div className="p553-bc-main-actions">
     <button type="button" className="p553-detail-button" onClick={()=>toggleAll(true)}>＋ Expand All</button>
     <button type="button" className="p553-detail-button" onClick={()=>toggleAll(false)}>− Collapse All</button></div>
@@ -30,15 +30,13 @@ export function B8FourSystemHybridTraining0553({workingRow}){
   </div>
   <p className="p55-note"><strong>Working venue:</strong> {m.assumedBudgetaryVenue}.
    Physical classroom, live equipment demonstrations, test access and an ADDVALUE engineer MUST be onsite.
-   OEM expert may support theory / configuration Q&amp;A remotely, subject to availability and quote. B8 shares the MGW FAT trip booked to B3; no additional B8 flight, lodging, visa, insurance or travel-day labour. Physical onsite Senior training 2 person-days remain selected provisionally until non-overlapping B3 FAT hours/role owner are confirmed; B9 Yard attendance is separate.</p>
-  <p className="p55-note"><strong>Budgetary instructor and practical test assumptions:</strong>
-   ADDVALUE is responsible for customer-facing onsite delivery. MR0002/RFI BDA
-   RF demonstration reserve {money(15000)} and MR0004/RACON programming/interface
-   reserve {money(5000)} are additional <strong>temporary training setups</strong>,
-   not purchases or customer-delivered special tools. The MDS QTORG2609244
-   ORGA quote is an alternate; its included programming cable / no-special-tools
-   statement does not establish MGW Tideland inclusions. Both allowances
-   and all OEM remote support fees remain unquoted.</p>
+   OEM expert supports remotely under provisional fees. D5–D6 training and the prior content-preparation day are distinct from B3 execution days.
+   The two legacy RFI/RACON demo rows now post zero in B8: shared temporary instruments are budgeted in B3 once.</p>
+  <p className="p55-note">Training materials cover lesson preparation, OEM manuals, exercises, configuration examples, attendee register and assessment.
+   B2 owns controlled document submission. Lunch/two breaks: 10 people × 2 days × THB550 = THB11,000.
+   Client travel/hotel responsibility remains unconfirmed; these are not assumed included or free.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Product</th><th>Hours in existing 16-hour course</th><th>Online fee allocation THB</th><th>Specialist source</th></tr></thead>
+   <tbody>{m.productCoverage.map(x=><tr key={x.product}><td>{x.mr} · {x.product}</td><td>{x.hours}</td><td>{money(x.onlineFeeTHB)}</td><td>{x.provider}</td></tr>)}</tbody></table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Day / Timebox</th><th>MR / System</th><th>Audience</th><th>Onsite Delivery</th><th>OEM Instructor</th></tr></thead>
    <tbody>{m.systems.map(x=><tr key={x.mr}>
@@ -70,7 +68,7 @@ export function B8FourSystemHybridTraining0553({workingRow}){
       <td>{Number.isFinite(r.rateUSDPerUnit)?"USD "+qty(r.rateUSDPerUnit):"—"}</td>
       <td>{Number.isFinite(r.fxTHBPerUSD)?qty(r.fxTHBPerUSD):"—"}</td>
       <td>{money(r.unitRateTHB)}</td><td>NOT ESTABLISHED</td>
-      <td><strong>{r.sharedTripReconciliation?"EXCLUDED — B3 shared FAT trip":money(r.workingSellTHB)}</strong>{r.sharedTripReconciliation&&<small>Former separate-trip planning {money(r.separateTripHistoricalReferenceTHB)} · NONPOSTING</small>}</td>
+      <td><strong>{r.transferredToB3?"MOVED TO B3 — ZERO IN B8":r.sharedTripReconciliation?"EXCLUDED — historical travel":money(r.workingSellTHB)}</strong>{r.sharedTripReconciliation&&<small>Former separate-trip planning {money(r.separateTripHistoricalReferenceTHB)} · NONPOSTING</small>}</td>
       <td>{r.verifiedSourceRate}<small>{r.sharedTripReconciliation?"Already allocated to B3 FAT trip / excluded from B8":"WS-B8 · one owner, no extra customer row"}</small>
        {r.sharedTripReconciliation&&<small>Deducted ONCE from old B8 standalone estimate; no additional B8 travel charge</small>}</td>
      </tr>)}</tbody>
@@ -94,11 +92,16 @@ export function B8FourSystemHybridTraining0553({workingRow}){
      <td>ALREADY DEDUCTED · B3 owns common travel, no additional credit</td></tr>
     <tr><td>B8 onsite Senior labour 2 days · overlap verification</td>
      <td>{money(44100)}</td>
-     <td>INCLUDED pending evidence of distinct training-only time; if same B3 Senior hours, avoid second posting</td></tr></tbody>
+     <td>INCLUDED on separate planned D5–D6; no B3 Senior labour posted on these training days</td></tr></tbody>
   </table></div>
   <p className="p55-note"><strong>Approval gaps:</strong> {m.gates.join(" · ")}.</p>
-  <p className="p55-note"><strong>Full OEM onsite instructor alternative:</strong>
-   not priced and not selected; require four discipline quotations, logistics and owner approval.
-   B3/B8 seven-day FAT+training comparisons remain historical/nonposting, not the selected B8 plan.</p>
+  <h4>Full OEM onsite alternative — NOT SELECTED / NOT ADDITIVE</h4>
+  <p className="p55-note">สมมติผู้เชี่ยวชาญ 6 product มา onsite แทน online: ค่าสอนใช้วงเงินเดิม 50,400 ครั้งเดียว;
+   เพิ่มค่าเดินทาง/วันเดินทาง/ที่พัก/รถ/ใบอนุญาต/ประกัน {money(m.onsiteAlternative.extraTHB)}.
+   B8 ทางเลือก {money(m.onsiteAlternative.wholeB8IllustrativeTHB)} ไม่รวมในยอดที่เลือก.
+   อัตราและจำนวนผู้สอนเป็นสมมติฐานประมาณการ ต้องปรับตามผู้สอนจริงและผู้ที่อยู่ไทย.</p>
+  <table className="p55-table p55-table--compact"><thead><tr><th>Expense per specialist</th><th>Qty × THB</th><th>THB/person</th></tr></thead>
+   <tbody>{m.onsiteAlternative.extraPerSpecialist.map(x=><tr key={x.activity}><td>{x.activity}</td><td>{x.qty} × {money(x.rateTHB)}</td><td>{money(x.amountTHB)}</td></tr>)}</tbody></table>
+  <p className="p55-note">{m.onsiteAlternative.gate} B3/B8 five-/seven-day comparisons are historical only and exclude the current execution allowances.</p>
  </section>;
 }

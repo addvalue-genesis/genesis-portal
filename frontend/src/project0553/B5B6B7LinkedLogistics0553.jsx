@@ -28,8 +28,8 @@ export function B5B6B7LinkedLogistics0553({workingRow}){
     <small>{quoteOnly.length?quoteOnly.map(x=>x.supplierQuoteId+" "+usd(x.supplierQuoteUSD)).join(" / ")+" · FX 31.5 reference ONLY":"ไม่มีใบเสนอราคาตรงหมวดนี้"}</small></div>
    <div><strong>Current Verified Direct Cost</strong><p>NOT ESTABLISHED</p>
     <small>ต้องมี Package ID / Rate / OEM inclusion / owner approval</small></div>
-   <div><strong>Allocated SELL by physical line</strong><p>NOT ESTABLISHED</p>
-    <small>Selected {fmt(selected)} ยังไม่มีการจัดสรรกลับแต่ละกิจกรรม</small></div>
+   <div><strong>Internal envelope allocation</strong><p>NOT ESTABLISHED</p>
+    <small>Selected {fmt(selected)} แยกวงเงินกิจกรรมด้านล่าง; ราคาจริง/จำนวนหีบห่อยังไม่ยืนยัน</small></div>
   </div>
   <p className="p55-note"><strong>Linked Cost Owners:</strong>
    {" "}{["B5","B6","B7"].map(owner=><React.Fragment key={owner}>
@@ -40,6 +40,16 @@ export function B5B6B7LinkedLogistics0553({workingRow}){
    รวมสามหมวด Selected Working SELL {fmt(m.selectedThreeOwnerWorkingSellTHB)} เพื่อ Reconciliation เท่านั้น
    <strong> ไม่ใช่ต้นทุน Logistics ที่ตรวจสอบแล้วหรือรายการเรียกเก็บเพิ่ม</strong>.
   </p>
+  {m.envelope.byCode[code]&&<>
+   <h4>วงเงินเตรียมแพ็ก/ส่งออกจาก SAMTEL — รวมในยอดเดิมแล้ว</h4>
+   <p className="p55-note">จัดสรรวงเงินภายในเพื่อเห็นผู้รับผิดชอบ ไม่ใช่ใบเสนอราคาขนส่งหรือการยืนยันว่างบเพียงพอ.
+    ครบ 7+3+4+3 locations และ selected spares; จำนวน location ไม่ใช่จำนวนลัง. ค่า dispatch/export ให้ SAMTEL/forwarder อยู่ B6-SAMTEL-EXPORT 25,000 บาท.</p>
+   <table className="p55-table p55-table--compact"><thead><tr><th>Source activity</th><th>Internal allowance THB</th><th>Basis</th></tr></thead>
+    <tbody>{m.envelope.byCode[code].map(x=><tr key={x.id}><td>{x.id}<small>{x.activity}</small></td><td>{fmt(x.workingSellTHB)}</td><td>1 allowance lot · UNQUOTED · already in WS-{code}</td></tr>)}</tbody>
+    <tfoot><tr><th>รวมจาก source → Working → Budget/Release draft</th><th>{fmt(m.envelope.totals[code])}</th><th>ไม่บวกซ้ำกับ route audit ด้านล่าง</th></tr></tfoot>
+   </table>
+   <p className="p55-note">{m.envelope.unpricedExposures.join(" · ")}</p>
+  </>}
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1350}}>
    <thead><tr>
     <th>Activity / Module ID</th><th>MR / Cargo &amp; Work Stage</th>
