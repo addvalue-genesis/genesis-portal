@@ -69,7 +69,9 @@ export function B3ResourcePriceDossier0553({workingRow}){
    ].map(([code,activity,basis])=><tr key={code}><td>{activity}</td><td>{code} {c("bid.budget.working.bc."+code.toLowerCase())}</td><td>{basis}</td></tr>)}</tbody>
   </table></div>
   <h4>B3 — Grouped Work Type / Source-to-Release (10.2 → 10.3 → 10.5)</h4>
-  <p className="p55-note">Select a colour-coded Work Type to drill down into Site → MR/Activity → Role × Days × Rate.
+  <p className="p55-note"><strong>สีเดียวกัน = กลุ่มงานเดียวกัน:</strong> ยอดรวมกลุ่ม → รายละเอียดงาน → สถานที่ → รายการค่าใช้จ่าย.
+   ยอดด้านในเป็นการแจกแจงยอดของหัวกลุ่ม ไม่ให้นำยอดหัวกลุ่มมาบวกซ้ำกับรายการด้านใน.
+   Select a colour-coded Work Type to drill down into Site → MR/Activity → Role × Days × Rate.
    Prices in these four headers are an attribution of the SAME WS-B3 1 LS amount, NOT four new customer quotation lines.
    Conditional BF execution and all additional unpriced GF Yard/Offshore work remain under HOLD.</p>
   {model.groupRollups.map((rollup,k)=><details key={rollup.id}
@@ -77,7 +79,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
    data-component-key={rollup.id}>
    <summary className="p553-b3-rollup-summary">
     <span className="p553-b3-rollup-code">B3.G{k+1}</span>
-    <span className="p553-b3-rollup-heading"><strong>{rollup.name}</strong>
+    <span className="p553-b3-rollup-heading"><span className="p553-b3-level-label">ยอดรวมกลุ่ม</span><strong>{rollup.name}</strong>
      <small>{rollup.sourceRowCount} source detail rows · {rollup.state}</small>
      <code>{rollup.id}</code></span>
     <span className="p553-b3-rollup-price"><strong>{cash(rollup.selectedWorkingSellTHB)}</strong>
@@ -112,6 +114,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
     <summary className="p553-b2-recalc-summary">
      <span className="p553-b2-recalc-num">B3.R{i+1}</span>
      <span className="p553-b2-recalc-label">
+      <span className="p553-b3-level-label">รายละเอียดงาน · ในกลุ่ม {rollup.name}</span>
       <strong>{g.name}</strong>
       <small>{g.rowCount} detailed resource/expense rows ·
        {surveyConditional?" INCLUDED CONDITIONAL LABOUR ALLOWANCE; CALL-OUT HOLD":active?" INCLUDED IN WORKING SELL":" UNPRICED — NOT ADDITIVE"} ·
@@ -129,7 +132,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
       return <details className="p553-b2-recalc-group p553-b3-dossier-site" key={sid} data-component-key={sid} open={i<3&&j===0}>
        <summary className="p553-b2-recalc-summary">
         <span className="p553-b2-recalc-num">B3.R{i+1}.{j+1}</span>
-        <span className="p553-b2-recalc-label"><strong>{site}</strong>
+        <span className="p553-b2-recalc-label"><span className="p553-b3-level-label">สถานที่ · แจกแจงจาก {g.name}</span><strong>{site}</strong>
          <small>{rows.length} lines · {active?cash(siteAmount):"NONPOSTING / Pending approved scope & rates"}</small>
          <code>{sid}</code></span>{c(sid)}
        </summary>

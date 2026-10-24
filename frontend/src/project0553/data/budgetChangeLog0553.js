@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R37";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R38";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-07",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"B3 สีเดียวกันตลอดกลุ่ม พร้อมป้ายยอดรวม / รายละเอียดงาน / สถานที่",
+  detail:"หัวข้อย่อยและสถานที่ใช้สีของกลุ่มแม่ทั้ง FAT, Survey, SAT/Commissioning และ Tools แทนสีฟ้าเริ่มต้นที่ทำให้เข้าใจว่าเป็นคนละกลุ่ม; เพิ่มป้ายระดับและชื่อกลุ่มต้นทาง พร้อมอธิบายว่ายอดด้านในแจกแจงยอดหัวกลุ่ม ไม่บวกซ้ำ. Module IDs, Source → Working → Budget/Scope → Release และราคา A/B/C คงเดิม.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier","bid.budget.working.bc.b3.resource-price-dossier.rollup.sat-commissioning"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner screenshot24-Oct: mismatched parent/child colours obscure the same work group"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-06",date:"2026-10-24",kind:"PRICE",tone:"neutral",
   title:"Owner duration: FAT2+1 / Training1+1; reserve days included once",

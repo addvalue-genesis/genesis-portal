@@ -748,10 +748,24 @@
 .p553-b3-resource-dossier .p553-b3-rollup-price{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
 .p553-b3-resource-dossier .p553-b3-rollup-price strong{font-size:16px;color:var(--b3-accent);white-space:nowrap}
 .p553-b3-resource-dossier .p553-b3-rollup-price small{font-size:10px;color:#4c6573}
-.p553-b3-resource-dossier .p553-b3-rollup-body{padding:10px;display:grid;gap:8px}
-.p553-b3-resource-dossier .p553-b3-dossier-group{margin:3px 0;border-left:3px solid var(--b3-accent)}
+.p553-b3-resource-dossier .p553-b3-rollup-body{padding:10px;display:grid;grid-template-columns:minmax(0,1fr);gap:8px;min-width:0}
+.p553-dashboard .p553-b3-resource-dossier .p553-b3-dossier-group,
+.p553-dashboard .p553-b3-resource-dossier .p553-b3-dossier-site{
+ --rec-accent:var(--b3-accent);--rec-tint:var(--b3-tint);border-left-color:var(--b3-accent)}
+.p553-dashboard .p553-b3-resource-dossier .p553-b3-dossier-group{margin:3px 0;border-left-width:3px}
+.p553-dashboard .p553-b3-resource-dossier .p553-b3-dossier-site{border-left-width:2px}
+.p553-b3-resource-dossier .p553-b3-level-label{display:block;color:var(--b3-accent);font-size:11px;font-weight:700}
+.p553-dashboard .p553-b3-resource-dossier .gns-copy-id{min-width:0;max-width:100%}
+.p553-dashboard .p553-b3-resource-dossier .gns-copy-id code{overflow-wrap:anywhere;white-space:normal}
+.p553-dashboard .p553-b3-resource-dossier .p553-b2-recalc-summary:focus-visible{outline-color:var(--b3-accent)}
+.p553-b3-resource-dossier .p553-b3-rollup-summary:focus-visible{outline:2px solid var(--b3-accent);outline-offset:-2px}
 .p553-b3-resource-dossier .p553-b3-group-trace-table{min-width:800px}
 @media(max-width:700px){.p553-b3-resource-dossier .p553-b3-rollup-price{align-items:flex-start;width:100%}}
+@media(max-width:750px){
+ .p553-dashboard .p553-b3-resource-dossier .p553-b2-recalc-summary{flex-wrap:wrap}
+ .p553-dashboard .p553-b3-resource-dossier .p553-b2-recalc-summary>.gns-copy-id{flex-basis:100%;margin-left:0}
+ .p553-dashboard .p553-b3-resource-dossier .p553-b2-recalc-label{flex-basis:160px}
+}
 
 /* PJ2608-0553 — B9 priced Yard Work Scope, a NONPOSTING drilldown of WS-B9.
    Color denotes source expense type, not approval. Keep amounts visible collapsed. */
