@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R44";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R45";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-14",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release แสดงยอด A+B เฉพาะรายการที่มีราคา",
+  detail:"แสดงยอดรวมจาก Source เดิมทั้ง Customer/Internal Preview และ Native Excel G38 พร้อมระบุรายการยังไม่มีราคา ยอดราคาไม่เปลี่ยน Final Release ยัง HOLD.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: show available quotation total"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-13",date:"2026-10-24",kind:"PRICE",tone:"pricing",
   title:"B1–B14 activities + Thailand / CIF / Myanmar operations",

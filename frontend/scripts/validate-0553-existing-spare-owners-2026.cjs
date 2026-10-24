@@ -117,7 +117,7 @@ const ui=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553
 const detail=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 const exportSrc=fs.readFileSync(path.join(root,"project0553/nativeWorkingDraft0553.js"),"utf8");
 assert(ui.includes("PTTEP FIRST-PRINCIPLES PARAMETRIC"));
-assert(ui.includes('fullBaseReady?money(provisionalBase):"NOT ESTABLISHED"'));
+assert(ui.includes('money(provisionalBase)'));
 assert(ui.includes("sourceRowModuleId"));
 assert(ui.includes('onOpenSource({...source,sourceModuleId:source.sourceRowModuleId||source.sourceModuleId})'),
  "Trace drawer must return to the same source row, with owner fallback only for non-row sources");
@@ -150,7 +150,8 @@ for(const code of codes){
 const Customer=from("ReleaseCustomerWorkbook0553.jsx").ReleaseCustomerWorkbook0553;
 const html=renderToStaticMarkup(React.createElement(Customer,{model:rel}));
 for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(html.includes(amount));
-assert(html.includes("NOT QUOTED")&&html.includes("NOT ESTABLISHED"));
+assert(html.includes("NOT QUOTED")&&html.includes("Excludes unpriced items: B4, B12, B14."));
+assert(html.includes("27,192,339.36")&&html.includes("WORKING DRAFT"));
 const Scope=from("ScopeSheetsDetail0553.jsx").ScopeSheetsDetail0553;
 const scopeHtml=renderToStaticMarkup(React.createElement(Scope,{fx:{thbPerUsd:31.5},onOpenSource:()=>{},onOpenReleaseRow:()=>{}}));
 for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(scopeHtml.includes(amount));

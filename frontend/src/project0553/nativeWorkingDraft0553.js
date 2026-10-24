@@ -127,8 +127,8 @@ function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
  const fonts=fontsSection[1].match(/<font\b[^>]*>[\s\S]*?<\/font>/g)||[];
  const styles=stylesSection[1].match(/<xf\b[^>]*?(?:\/>|>[\s\S]*?<\/xf>)/g)||[];
  const fontCache=new Map(),styleCache=new Map();
- const fittedStyle=(id,numeric,header)=>{
-  const key=id+':'+numeric+':'+header;if(styleCache.has(key))return styleCache.get(key);
+ const fittedStyle=(id,numeric,header,total=false)=>{
+  const key=id+':'+numeric+':'+header+':'+total;if(styleCache.has(key))return styleCache.get(key);
   let xf=styles[id];if(!xf)throw Error('Invalid native cell style '+id);
   const fontId=Number(attr(xf,'fontId')||0);
   if(!fontCache.has(fontId)){
@@ -138,6 +138,7 @@ function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
    let next=fonts.indexOf(font);if(next<0){next=fonts.length;fonts.push(font);}fontCache.set(fontId,next);
   }
   xf=xf.replace(/^<xf\b[^>]*>/,tag=>setAttr(setAttr(setAttr(tag,'fontId',fontCache.get(fontId)),'applyFont',1),'applyAlignment',1));
+  if(total)xf=xf.replace(/^<xf\b[^>]*>/,tag=>setAttr(setAttr(tag,'numFmtId',4),'applyNumberFormat',1));
   if(xf.endsWith('/>'))xf=xf.slice(0,-2)+'></xf>';
   xf=xf.replace(/<alignment\b[^>]*?(?:\/>|>[\s\S]*?<\/alignment>)/g,'');
   xf=xf.replace('</xf>','<alignment horizontal="'+(header?'center':numeric?'right':'left')+'" vertical="'+(header?'center':'top')+'" wrapText="'+(numeric?0:1)+'"/></xf>');
@@ -184,7 +185,7 @@ function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
     const text=type==='s'?shared[Number(v)]||'':type==='inlineStr'?textOf(cell):v||'';
     if(!text&&!/<f\b/.test(cell))return cell;
     const numeric=!['s','inlineStr','str'].includes(type)&&v!==undefined&&Number.isFinite(Number(v));
-    const id=fittedStyle(Number(attr(opening,'s')||0),numeric,header);
+    const id=fittedStyle(Number(attr(opening,'s')||0),numeric,header,main&&address==='G38'&&numeric);
     cell=cell.replace(opening,setAttr(opening,'s',id));touched=true;
     const merge=merges.get(address);
     if(!merge||merge.rowspan===1){
@@ -268,8 +269,14 @@ export async function buildNativeWorkingDraft0553(file,model){
   write(scope,"F"+row,"NOT QUOTED");
   write(scope,"G"+row,"NOT QUOTED");
  }
- if(model.sourceCoverage?.aReady===true&&model.sourceCoverage?.bSellReady===true&&Number.isFinite(a)&&Number.isFinite(b))write(scope,"G38",round(a+b));
- else{write(scope,"G38","NOT ESTABLISHED");warnings.push("A+B NOT COMPLETE: priced subtotal only; mandatory items/confirmed supplier evidence pending");}
+ const complete=model.sourceCoverage?.aReady===true&&model.sourceCoverage?.bSellReady===true;
+ const priced=[a,b].filter(Number.isFinite);
+ const unpricedB=bc.filter(r=>!Number.isFinite(r.customerSellTHB)).map(r=>r.code).join(", ");
+ write(scope,"A38","Total 合计 / A+B — priced items (THB)"+
+  (complete?"":"\nExcludes unpriced items"+(unpricedB?": "+unpricedB:"")+"."));
+ write(scope,"G38",priced.length?round(priced.reduce((sum,n)=>sum+n,0)):"NOT ESTABLISHED");
+ write(scope,"H38","WORKING DRAFT");
+ if(!complete)warnings.push("A+B NOT COMPLETE: priced subtotal only; mandatory items/confirmed supplier evidence pending");
  if(model.sourceCoverage?.aOverflow)warnings.push("Original has 15 A TAG slots; 4 grouped MR lines require buyer acceptance before final submission");
  if(!model.sourceCoverage?.aReady)warnings.push("Part A Working equipment cost/TAG evidence still incomplete");
  const changes=new Map();

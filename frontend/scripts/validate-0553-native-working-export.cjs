@@ -31,7 +31,7 @@ function sheet(index){
  const cells=[];
  for(let row=1;row<=max;row++){
   const addresses=index===1?(row>=24&&row<=37?["B"+row,"F"+row,"G"+row]:row>=8&&row<=11?"ABCDEFG".split("").map(x=>x+row):
-   row>=24&&row<=37||row===41||row===42?["F"+row,"G"+row]:row===38?["G38"]:[]):
+   row>=24&&row<=37||row===41||row===42?["F"+row,"G"+row]:row===38?["A38","G38","H38"]:[]):
    row>=6&&row<=18?(index>=5?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]).map(x=>x+row):row===19?["I19"]:[];
   // A previously priced workbook must not leak historical values in unused rows.
   const xml=addresses.map(address=>'<c r="'+address+'" s="12"><v>987654321</v></c>').join("");
@@ -71,7 +71,8 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
  const worksheet=n=>decoder.decode(parts.find(x=>x.name==="xl/worksheets/sheet"+n+".xml").compressed);
  const main=worksheet(1),b10=worksheet(2),c1=worksheet(5);
  assert.match(main,/<c r="A8" s="\d+" t="inlineStr"><is>/);
- assert.match(main,/<c r="G38" s="\d+" t="inlineStr"><is><t xml:space="preserve">NOT ESTABLISHED<\/t><\/is><\/c>/);
+ assert.match(main,/<c r="G38" s="\d+"><v>2791<\/v><\/c>/);
+ assert(main.includes("Excludes unpriced items"));
  assert.match(main,/<c r="G33" s="\d+"><v>109<\/v><\/c>/); // B10 100 + 9
  assert.match(b10,/<c r="D6" s="\d+" t="inlineStr"><is><t xml:space="preserve">Spare B10<\/t><\/is><\/c>/);
  assert.match(b10,/<c r="I19" s="\d+"><v>20<\/v><\/c>/);
@@ -115,7 +116,8 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   }
  }
  for(const address of ["F41","G41","F42","G42"])assert(cell(nativeScope,address).includes("NOT QUOTED"));
- assert(cell(nativeScope,"G38").includes("NOT ESTABLISHED"));
+ assert(cell(nativeScope,"G38").includes("<v>27192339.36</v>"));
+ assert(cell(nativeScope,"A38").includes("B4, B12, B14"));
  for(const [code,index] of [["B10",2],["B11",3],["B13",4],["C1",5],["C2",6]]){
   const xml=nativeText(index);
   assert(!xml.includes("987654321"),code+" leaked stale native values");
@@ -200,7 +202,8 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':"NOT ESTABLISHED"));
     }
     for(const address of ["F41","G41","F42","G42"])assert(cell(newXml,address).includes("NOT QUOTED"));
-    assert(cell(newXml,"G38").includes("NOT ESTABLISHED"));
+    assert(cell(newXml,"G38").includes("<v>27192339.36</v>"));
+    assert(cell(newXml,"A38").includes("B4, B12, B14"));
    }else{
     const code=annexCodes[index-2];
     for(const row of real.annex[code]){

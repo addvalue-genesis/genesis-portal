@@ -76,6 +76,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const bWorkingTotal=model.summary.bProvisionalCustomerSellTHB;
  const provisionalBase=addKnown(model.summary.aProvisionalCustomerSellTHB,bWorkingTotal);
  const fullBaseReady=model.sourceCoverage.aReady&&model.sourceCoverage.bSellReady;
+ const unpricedB=model.b.filter(r=>!Number.isFinite(r.customerSellTHB)).map(r=>r.code).join(", ");
  const workingBudgetaryOwners=new Set(["B10","B11","B13"]);
  const tagCount=model.a.reduce((n,p)=>n+p.sourceRows.length,0);
  const isOverOriginalCapacity=tagCount>15;
@@ -186,7 +187,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      <div className="p553-preview-totals">
       <span>Part A / 10.1 · <strong>{cash(aWorkingTotal)}</strong></span>
       <span>Part B / 10.2 · <strong>{cash(bWorkingTotal)} (priced working portion, not complete)</strong></span>
-      <span>Base A+B (working only) · <strong>{fullBaseReady?cash(provisionalBase):"NOT ESTABLISHED · priced portion "+cash(provisionalBase)}</strong></span>
+      <span>Base A+B (working only) · <strong>{cash(provisionalBase)}</strong></span>
      </div>
      <div className="p553-sheet-scroll"><table className="p553-customer-table">
       <thead><tr>{RELEASE_CUSTOMER_COLUMNS_0553.scope.map(h=><th key={h}>{h.split(" / ").map((t,i)=><React.Fragment key={i}>{i>0&&<br/>}{t}</React.Fragment>)}</th>)}</tr></thead>
@@ -264,11 +265,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         </td></tr>}
         </React.Fragment>;
        })}
-       <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 / Base A+B (WORKING PREVIEW)</td>
-        <td className="p553-price-cell">{fullBaseReady?money(provisionalBase):"NOT ESTABLISHED"}</td>
-        <td><strong>{fullBaseReady?"Working Preview · NOT RELEASED":"INCOMPLETE BASE · not full quotation"}</strong>
-          {internal&&!fullBaseReady&&<small>Priced portion only: {cash(provisionalBase)}; B4/B12/B14 and OEM signoffs remain open</small>}
-        </td></tr>
+       <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 / A+B — priced items (THB)
+         {!fullBaseReady&&<small>Excludes unpriced items{unpricedB?": "+unpricedB:""}.</small>}</td>
+        <td className="p553-price-cell">{money(provisionalBase)}</td>
+        <td><strong>WORKING DRAFT</strong></td></tr>
        <tr className="p553-sheet-highlight"><td colSpan={8}>Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
        {model.c.map(r=><tr key={r.code} data-cost-owner={r.code}><td><strong>{r.code}</strong></td>

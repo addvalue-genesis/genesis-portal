@@ -62,3 +62,11 @@ Targeted cost-owner test checks250,000 planning cost, official fee no uplift, fi
 
 
 Final verification: all142 build validators and production webpack passed (3 existing size warnings). After the shared Working renderer fix, current-integration, B1 accordion, B/C hierarchy and new operational-budget checks passed again; production webpack rebuilt successfully. Browser passed all14 Working activity owners, both B1 purpose groups and collapse/expand, Customer/Internal14 compact Release notes and B1/B6 values, six viewport checks1366/700/390, direct Excel download with no file chooser and zero page errors. Native test explicitly checks14 source activity notes, all16 annex rows, original structure/formulas and idempotence. Exported B1/B2 and B5–B8 cells were rendered and visually reviewed; no desktop Microsoft Excel test claimed.
+
+## Follow-up: visible priced A+B subtotal
+Owner requested the available quotation amount in the Release total row.
+Customer and Internal preview now show the source-derived priced A+B subtotal,
+and native Excel G38 carries the same numeric value. A38 identifies the priced
+items total in THB and unpriced B owners dynamically; H38 says WORKING DRAFT. Current subtotal is 27,192,339.36 THB; B4/B12/B14 stay unpriced.
+No source prices, cost assumptions, final Base readiness or Release gates change.
+The original six-sheet template and geometry remain in use.
