@@ -11,7 +11,7 @@ export function B8FourSystemHybridTraining0553({workingRow}){
  return <section ref={holder} className="p55-panel p553-bc-price-trace p553-bc-price-trace--services p553-b8-hybrid"
   data-component-key={m.moduleId} style={{padding:12,marginTop:10}}>
   <div className="p553-bc-price-head">
-   <div><h4>B8 — ADDVALUE Onsite Training + Provisional OEM Remote Support</h4>
+   <div><h4>B8 — OEM Online Base + ADDVALUE Onsite Training</h4>
     <p className="p55-note">{copy(m.moduleId)} · 4 systems / 8 customer trainees / 2 training days.
      ADDVALUE-led HYBRID Budgetary Working SELL · Manufacturer online specialist time is an UNQUOTED allowance; shared demo setups belong to B3, not verified Direct COST.</p></div>
    <div className="p553-bc-main-actions">
@@ -25,9 +25,12 @@ export function B8FourSystemHybridTraining0553({workingRow}){
     <small>Four disciplines · four half-day live sessions (16 contact hours)</small></div>
    <div><strong>Onsite ADDVALUE Resource</strong><p>1 Senior Telecom Engineer</p>
     <small>2 training days + 1 preparation day at USD700/MD; NO separate travel-day labour</small></div>
-   <div><strong>OEM Technical Support</strong><p>Online · Budgetary Only</p>
+   <div><strong>OEM Technical Support</strong><p>Online · Owner-selected Base</p>
     <small>Four manufacturer discipline support sessions · USD400/session estimated; ADDVALUE owns onsite instruction</small></div>
   </div>
+  <p className="p55-note"><strong>ฐานเสนอราคาที่เจ้าของโครงการกำหนด 24-Oct-2026:</strong> OEM สอน Online เป็นหลัก พร้อม ADDVALUE ดูแลภาคปฏิบัติ onsite ที่ SAMTEL Warehouse.
+   B8 {money(m.selectedWorkingSellTHB)} รวมใน Base; OEM onsite เป็นทางเลือกภายใน ไม่บวกเข้า Base หรือ C1/C2.</p>
+  <p className="p55-note"><strong>Proposal delivery basis:</strong> {m.bidBasisDecision.proposalWording}</p>
   <p className="p55-note"><strong>Working venue:</strong> {m.assumedBudgetaryVenue}.
    Physical classroom, live equipment demonstrations, test access and an ADDVALUE engineer MUST be onsite.
    OEM expert supports remotely under provisional fees. D5–D6 training and the prior content-preparation day are distinct from B3 execution days.

@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R35";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R36";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-05",date:"2026-10-24",kind:"UI",tone:"neutral",
+  title:"B8 Base confirmed by owner: OEM ONLINE + ADDVALUE onsite at SAMTEL",
+  detail:"Owner selects OEM online as the base proposal method. B8 remains142550; onsite OEM615350 stays internal/nonposting and is not C1/C2. Source decision and proposal wording distinguish owner selection from customer acceptance and vendor fee confirmation. No A/B/C price change; all downstream totals unchanged.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b8.hybrid-training","bid.budget.working.bc.b8"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner 24-Oct: กำหนดไปเลย ผมจะเอา OEM online เป็นหลัก"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-04",date:"2026-10-24",kind:"PRICE",tone:"neutral",
   title:"SAMTEL lump sum: preparation, FAT, hosting, shared tools, training and CIF export allocation",

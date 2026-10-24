@@ -41,6 +41,9 @@ Temporary instruments are shared across preparation/FAT/training. The former B8 
 
 ## Training: selected hybrid and separate onsite alternative
 
+**Subsequent owner decision, 24 October 2026:** Jack explicitly selects **OEM ONLINE as the BASE BID method**, with ADDVALUE onsite practical facilitation at SAMTEL Warehouse. This is a settled internal proposal decision, not a request to wait for another internal choice. State the method in the offer: “Training is based on online OEM specialist instruction with ADDVALUE onsite practical facilitation at SAMTEL Warehouse, Thailand.” B8 remains142,550. OEM onsite615,350 remains an internal, unselected alternative, never C1/C2; any later request for OEM attendance must be re-scoped/repriced under B8. Owner selection does not fabricate purchaser acceptance or confirmed supplier fees. All A/B/C monetary values below are unchanged.
+
+
 Selected B8 **142,550** = Senior onsite44,100 + separate content preparation22,050 + remote OEM50,400 + four course packs10,000 + AV5,000 + classroom meals11,000. Eight trainees plus onsite facilitator/host =10×2×550 meals. B8 old demo20,000 transfers to B3 once; old foreign travel85,100 stays excluded with no second credit.
 
 | Product family | Hours within existing 16-hour course | Online specialist fee allocation THB |

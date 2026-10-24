@@ -88,6 +88,14 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
  ]),trainees:8,systemsCount:4,onsiteTrainingDays:2,
   onsiteContactHours:16,onsitePaidSeniorCount:1,onsiteFieldCount:0,
   trainingMode:"ON_SITE_HANDS_ON_WITH_REMOTE_OEM_DISCIPLINE_INSTRUCTORS",
+  bidBasisDecision:f({
+   id:"OWNER_20261024_OEM_ONLINE_BASE",authority:"PROJECT_OWNER_JACK",date:"2026-10-24",
+   ownerApproved:true,status:"SELECTED_BASE_BID_DELIVERY_METHOD",
+   oemDelivery:"ONLINE",addvalueDelivery:"ONSITE_AT_SAMTEL_WAREHOUSE",
+   customerAcceptanceConfirmed:false,
+   proposalWording:"Training is based on online OEM specialist instruction with ADDVALUE onsite practical facilitation at SAMTEL Warehouse, Thailand.",
+   changeRule:"OEM onsite attendance is outside the selected Base; re-scope and reprice B8 if requested. Do not add it to C1/C2 or post both alternatives."
+  }),
   assumedBudgetaryVenue:"SAMTEL Warehouse, Thailand — training BEFORE FAT; BOD/SPE Yangon and manufacturer-facility requirements remain deviations to reconcile",
   alternateMode:"FULL_OEM_ONSITE_INSTRUCTOR__UNQUOTED_NONPOSTING",
   onsiteAlternative:f({
@@ -128,7 +136,7 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
   customerReleaseAllowed:false,additionalCustomerLineAllowed:false,
   workingSellId:"WS-B8",customerProposalId:"CP-B8",scopeId:"SOW-B8",
   gates:f([
-   "Confirm purchaser-approved venue and OEM-led remote instruction; historic BOD training venue Yangon and pre-FAT timing must not be silently overridden",
+   "Project Owner selects OEM ONLINE with ADDVALUE onsite at SAMTEL as the BASE BID method on 24-Oct-2026. State this delivery basis in the proposal; do not automatically substitute OEM onsite. Historic Yangon/two-batch requirements remain documented qualifications, not a pending internal method choice",
    "ADDVALUE owns onsite training delivery; four remote OEM support sessions at USD400 each are provisional parametric risk allowances, NOT supplier confirmations",
    "Former B8 RFI15000 + RACON5000 transferred to B3 shared temporary setups; B8 posts zero for those stable source IDs; no permanent B11 purchase",
    "Selected MDS/ORGA programming cable is equipment scope; no quoted instructor fee or calibrated simulator supplied for this budget",
