@@ -32,6 +32,13 @@ for(const m of [sat,yard]){
  if(m.code==='B3')assert(html.includes('125.00')&&html.includes('100.00'));
  else assert(html.includes('TBC')&&html.includes('700.00')&&html.includes('600.00'));
  assert(m.qualificationText.includes('No duplicate base-day'));
+ const compact=renderToStaticMarkup(React.createElement(UI,{basis:m,compact:true}));
+ assert(!/<(?:table|details|summary|tr)\b/.test(compact));
+ assert(compact.includes(m.code==='B3'?'Included SAT: 2 persons':'Included Yard support: 2 persons')&&compact.includes('Senior / Field'));
+ assert(compact.includes('subject to written agreement')&&compact.includes('no duplicate time charges'));
+ assert(compact.includes(m.code==='B3'?'28 working days; 12 h/day':'7 working + 2 travel days/person'));
+ assert(compact.includes(m.code==='B3'?'125.00 / 100.00':'Normal onshore hours / OT: TBC'));
+
 }
 assert.equal(release.b.find(x=>x.code==='B3').customerSellTHB,2322450);
 assert.equal(release.b.find(x=>x.code==='B9').customerSellTHB,480550);

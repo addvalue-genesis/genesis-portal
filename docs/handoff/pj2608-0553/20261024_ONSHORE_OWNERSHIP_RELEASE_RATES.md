@@ -47,3 +47,11 @@ Owner screenshots showed the entire page expanding beyond the viewport and reque
 The single-column `.p55-stack` now uses `minmax(0,1fr)`; nested grid items/panels can shrink and existing table wrappers retain internal horizontal scrolling. Long Copy IDs wrap. Rules are scoped to PJ0553. No body overflow hiding, zoom reduction or clipping workaround is used.
 
 Verification: BOM/System-location, B3 SAT, B9 and Release each fit the document viewport at 1920, 1366, 700 and 390 pixels. Wide data tables still scroll within their wrappers. Customer Release has no nested tables in either service block; rates, days, unapproved proposals and owner colours remain visible. No browser errors. Source/Working/Release snapshot is unchanged. Focused validators and production build pass (the same three bundle-size warnings).
+
+## Follow-up: short same-cell Release note
+
+The owner clarified that the reference is the compact cell layout in `Z1F-Commercial_check_list_FOR-SAMTEL_Rev04_20260923.xlsx` (Drive ID `1iS7nWeYt4tgnnu7a8cEe5PJZw5qZ55GD`), not a separate prose panel. Release Customer and Internal now append five short text lines within the existing B3/B9 description cell; no extra service row, table, accordion or coloured panel. Detailed Working/Scope audit remains available. Compact notes derive days, crew and rates from the same service basis and retain labour-only/extra-expense exclusions, proposal status, onshore OT TBC and no duplicate time charges.
+
+Reference CCL item31 still says 18 Yard /45 offshore days; those old quantities were not copied into the current budget. Native XLSX and the linked Drive workbook were not edited by this UI correction. Price model and all amounts remain unchanged.
+
+Verification for same-cell correction: service-basis and change-registry validators pass; complete Working/Release snapshot unchanged. Browser checks both Customer/Internal description cells (colSpan3), five text lines, no additional service row or nested panel/table, source rates/TBC, four viewport widths and zero page errors. Production build passes with the same three size warnings.

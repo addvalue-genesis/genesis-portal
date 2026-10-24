@@ -61,7 +61,7 @@
 .p553-dashboard .p553-service-basis>:not(summary){margin:10px}
 .p553-dashboard .p553-service-prose{line-height:1.6;overflow-wrap:anywhere}
 .p553-dashboard .p553-service-prose p{margin:0 0 10px}
-.p553-dashboard .p553-service-rate-row>td>.p553-service-basis{margin:0}
+.p553-dashboard .p553-service-cell-note{display:block;margin-top:5px;white-space:pre-line;line-height:1.35;color:inherit;font-size:inherit;overflow-wrap:anywhere}
 
 /* Constrain grid tracks before wide tables calculate their intrinsic width.
    Tables keep their columns and scroll inside their existing wrappers. */

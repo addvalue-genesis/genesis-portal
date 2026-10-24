@@ -226,7 +226,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         const line=bLines.find(r=>r.code===id);
         return <React.Fragment key={id}><tr data-cost-owner={id}><td><strong>{id}</strong></td>
          <td colSpan={3}>{id==="B6"?line?.description:parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}
-          {line?.serviceCommercialBasis&&<small>{line.serviceCommercialBasis.includedText} · Day / OT / Standby schedule below.</small>}
+          {line?.serviceCommercialBasis&&<ServiceCommercialBasis0553 basis={line.serviceCommercialBasis} compact/>}
          </td>
          <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
@@ -238,9 +238,6 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  </>:id==="B12"?"refer to Annex B12":
  line?.executionConditional&&internal?"Quoted in Base · attendance on written call-out":line?.conditional&&internal?"Conditional — verify before release":""}</td>
         </tr>
-        {line?.serviceCommercialBasis&&<tr className="p553-service-rate-row" data-cost-owner={id}><td colSpan={8}>
-         <ServiceCommercialBasis0553 basis={line.serviceCommercialBasis} customer={!internal}/>
-        </td></tr>}
         {internal&&id==="B3"&&line?.b3GroupTrace&&<tr className="p553-drilldown-only"
          data-component-key="bid.budget.pricing.release.b3.group-trace"><td colSpan={8}>
          <strong>10.3 B3 — Work Type Source-to-Release attribution (internal only, NOT 4 quotation lines)</strong>
