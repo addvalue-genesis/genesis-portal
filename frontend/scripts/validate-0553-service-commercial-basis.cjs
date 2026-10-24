@@ -26,6 +26,8 @@ for(const m of [sat,yard]){
  assert.deepEqual(release.b.find(x=>x.code===m.code).serviceCommercialBasis,m);
  assert.deepEqual(scope.lines[m.code].serviceCommercialBasis,m);
  const html=renderToStaticMarkup(React.createElement(UI,{basis:m,customer:true}));
+ assert(!html.includes('<table'), 'Service terms must be prose, not a nested rate table');
+ assert(html.includes('Additional working day:')&&html.includes('Proposed Standby:'));
  assert(html.includes('DRAFT / PROPOSED'));assert(html.includes('ยังไม่อนุมัติ'));assert(html.includes('open=""'));
  if(m.code==='B3')assert(html.includes('125.00')&&html.includes('100.00'));
  else assert(html.includes('TBC')&&html.includes('700.00')&&html.includes('600.00'));

@@ -13,16 +13,14 @@ export function ServiceCommercialBasis0553({workingRow=null,basis=null,customer=
   <p><strong>DRAFT / PROPOSED — subject to written agreement; not included as an additional lump sum.</strong></p>
   <p><strong>{m.location}</strong> · {m.includedText}</p>
   <p>Included allocation: THB {amount(m.includedWorkingSellTHB)} · อยู่ในยอด {m.code} THB {amount(m.ownerTotalWorkingSellTHB)} แล้ว ไม่บวกอีกครั้ง.</p>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-   <colgroup>{[28,20,12,20,20].map((width,i)=><col key={i} style={{width:width+"%"}}/>)}</colgroup>
-   <thead><tr><th>Role / คน</th><th>Additional working day · labour USD/คน/วัน</th><th>Normal hours/day</th><th>Proposed OT USD/คน/ชั่วโมง</th><th>Proposed Standby USD/คน/วัน</th></tr></thead>
-   <tbody>{m.roles.map(r=><tr key={r.role}><td>{r.role}</td><td>{amount(r.dayUSD)}<small>THB {amount(r.dayTHB)} · current planning rate</small></td>
-    <td>{m.normalHoursPerDay??"TBC — onshore"}</td>
-    <td>{amount(r.proposedOtUSDPerHour)}<small>{m.normalHoursPerDay?"เสนอ: day rate ÷ 12 × 1.5; ยังไม่อนุมัติ":"เสนอสูตร day rate ÷ ชั่วโมงปกติ × 1.5; รอฐานชั่วโมง"}</small></td>
-    <td>{amount(r.proposedStandbyUSDPerDay)}<small>เสนอ 100% day rate; ยังไม่อนุมัติ</small></td></tr>)}</tbody>
-   <tfoot><tr><th>ทีม {m.crew} คน · Proposed rates</th><th>USD {amount(m.teamDayUSD)}/วัน</th><th>{m.normalHoursPerDay??"TBC"}</th><th>{Number.isFinite(teamOT)?"USD "+amount(teamOT)+"/ชั่วโมง":"TBC"}</th><th>USD {amount(m.teamDayUSD)}/วัน</th></tr>
-    <tr><td colSpan={5}>Day rate THB {amount(m.teamDayTHB)} · แรงงานเท่านั้น ไม่รวมค่าเดินทาง/ที่พักเพิ่มที่ยังไม่ตกลง</td></tr></tfoot>
-  </table></div>
+  <div className="p553-service-prose">
+   <p><strong>Additional working day / OT / Standby — proposed labour rates</strong></p>
+   {m.roles.map(r=><p key={r.role}><strong>{r.role}.</strong> Additional working day: USD {amount(r.dayUSD)} per person/day (THB {amount(r.dayTHB)} at the current planning rate). {m.normalHoursPerDay
+    ?<>Normal working day: {m.normalHoursPerDay} hours. Proposed OT beyond {m.normalHoursPerDay} hours: USD {amount(r.proposedOtUSDPerHour)} per person/hour (day rate ÷ {m.normalHoursPerDay} × 1.5).</>
+    :<>Normal onshore working hours and OT rate: TBC by written agreement.</>} Proposed Standby: USD {amount(r.proposedStandbyUSDPerDay)} per person/day (100% of day rate).</p>)}
+   <p><strong>Team of {m.crew} persons.</strong> Additional working day: USD {amount(m.teamDayUSD)}/day (THB {amount(m.teamDayTHB)}). Proposed OT: {Number.isFinite(teamOT)?"USD "+amount(teamOT)+"/hour for the team":"TBC"}. Proposed Standby: USD {amount(m.teamDayUSD)}/day for the team. Labour only; additional travel and accommodation require agreement.</p>
+   <p>OT multiplier 1.5× and Standby 100% are proposals only — ยังไม่อนุมัติ.</p>
+  </div>
   <ul>{m.controls.map(s=><li key={s}>{s}</li>)}</ul>
   <p className="p55-note"><strong>Release qualification — DRAFT:</strong> {m.qualificationText}</p>
  </details>;

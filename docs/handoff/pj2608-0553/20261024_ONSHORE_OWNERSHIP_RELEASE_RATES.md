@@ -39,3 +39,11 @@ This turn implements the rate schedule in the **Release web preview**. The origi
 - Browser Customer Release verified initially visible B3/B9 Day/OT/Standby proposals and unchanged totals; Internal Release retained A/B/C owner identities. No page errors. Production webpack passed with three existing size warnings.
 
 Continue on `fix/pj2608-0553-urgent-thailand-cif-pricing-20261024`, draft PR39. MGW remains equipment supply only; no requotation. FAT2+1, Training1+1/OEM online, CIF allocation, A5 non-additive260,232 and spare rows remain unchanged. DB/global Manual Input and unrecovered requirements1–8 are still deferred.
+
+## Follow-up: viewport width and prose terms (24 October)
+
+Owner screenshots showed the entire page expanding beyond the viewport and requested text instead of the nested B3/B9 rates table. The source-derived service component now uses paragraphs by role, then team totals and the existing commercial controls. There is no nested rate table. Amounts, durations, proposal status, owner IDs and native export remain unchanged.
+
+The single-column `.p55-stack` now uses `minmax(0,1fr)`; nested grid items/panels can shrink and existing table wrappers retain internal horizontal scrolling. Long Copy IDs wrap. Rules are scoped to PJ0553. No body overflow hiding, zoom reduction or clipping workaround is used.
+
+Verification: BOM/System-location, B3 SAT, B9 and Release each fit the document viewport at 1920, 1366, 700 and 390 pixels. Wide data tables still scroll within their wrappers. Customer Release has no nested tables in either service block; rates, days, unapproved proposals and owner colours remain visible. No browser errors. Source/Working/Release snapshot is unchanged. Focused validators and production build pass (the same three bundle-size warnings).

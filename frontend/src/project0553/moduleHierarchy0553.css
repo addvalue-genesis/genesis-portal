@@ -59,9 +59,16 @@
 .p553-dashboard .p553-service-basis>summary{cursor:pointer;padding:10px;background:var(--module-tint);color:#20394b}
 .p553-dashboard .p553-service-basis>summary small{display:block;margin-top:4px}
 .p553-dashboard .p553-service-basis>:not(summary){margin:10px}
-.p553-dashboard .p553-service-basis .p55-table{min-width:800px}
-.p553-dashboard .p553-service-basis td small{display:block;margin-top:4px}
+.p553-dashboard .p553-service-prose{line-height:1.6;overflow-wrap:anywhere}
+.p553-dashboard .p553-service-prose p{margin:0 0 10px}
+.p553-dashboard .p553-service-rate-row>td>.p553-service-basis{margin:0}
 
-.p553-dashboard .p553-service-basis .p55-table{width:100%;table-layout:fixed}
-.p553-dashboard .p553-service-basis .p55-table th{width:auto}
-.p553-dashboard .p553-service-rate-row>.p553-service-basis{margin:0}
+/* Constrain grid tracks before wide tables calculate their intrinsic width.
+   Tables keep their columns and scroll inside their existing wrappers. */
+.p553-dashboard .p55-stack{grid-template-columns:minmax(0,1fr)}
+.p553-dashboard :is(.p55-main,.p55-stack,.p55-grid,.p55-panel,[data-component-key]){min-width:0}
+.p553-dashboard :is(.p55-stack,.p55-grid)>*{min-width:0}
+.p553-dashboard :is(.p55-table-wrap,.p553-sheet-scroll){max-width:100%;min-width:0}
+.p553-dashboard :is(.p55-panel,details,summary){overflow-wrap:anywhere}
+.p553-dashboard .gns-copy-id{min-width:0;max-width:100%;flex-wrap:wrap}
+.p553-dashboard .gns-copy-id code{white-space:normal;overflow-wrap:anywhere}

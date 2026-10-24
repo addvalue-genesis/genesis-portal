@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R39";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R40";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-09",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"หน้าพอดีจอ + Release Day / OT / Standby เป็นข้อความ",
+  detail:"แก้กรอบ grid ที่ขยายตามตารางด้านใน; ตาราง BOM และ workbook เลื่อนภายในกรอบ ไม่ดันทั้งหน้าเกินจอ. เปลี่ยนรายละเอียด Day / OT / Standby ใต้ B3/B9 เป็นย่อหน้าตามตำแหน่ง พร้อมฐานจำนวนวัน อัตราทีม และข้อกำหนดเดิม แทนตารางซ้อน. คงสีเจ้าของงบและป้าย DRAFT/PROPOSED; ตัวเลข ต้นทาง และ native workbook ไม่เปลี่ยน.",
+  moduleIds:Object.freeze(["bid.budget.bom.system-location-mto","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct screenshots: page wider than screen; show service terms as text like the actual document"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-08",date:"2026-10-24",kind:"UI",tone:"navigation",
   title:"สีต่อเนื่องถึงตารางชั้นใน + จัด Yard onshore group.06 ไว้กับ B9",
