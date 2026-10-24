@@ -1,7 +1,7 @@
 /**
  * PJ2608-0553 / 10.3.3 — Export WORKING DRAFT into an ORIGINAL native .xlsx
  * supplied via local browser file picker.  No template is checked into GitHub,
- * no upload or network request occurs, no worksheet/style/merge/size is created.
+ * no upload or network request occurs. Sheets/merges are retained; exported layout is fitted.
  *
  * 10.1 -> 10.3.3: four GROUPED MR lines within original Part A rows 8..11.
  * 10.2 -> 10.3.3: B1..B14 Working Sell and B10/B11/B13 Annex detail.
@@ -9,7 +9,7 @@
  * RELEASE is always HOLD; this export is INTERNAL / NOT FOR CUSTOMER SUBMISSION.
  *
  * ZIP archive parts are copied unchanged except specified worksheet XML cell
- * value elements.  No dependency/package addition, no historical 'cost' posting.
+ * values and presentation styles/sizes. No dependency addition or price change.
  */
 const SHEETS_0553=Object.freeze([
  "Scope of supply","B10 CommSpares","B11 SpecialTool",
@@ -113,6 +113,97 @@ function write(writes,cell,value){
  if(writes.has(cell))throw Error("Duplicate native mapping "+cell);
  writes.set(cell,value);
 }
+// Owner-requested Release export layout. Original values, formulas, merges,
+// borders, fills and unrelated ZIP parts are retained; body styles are cloned.
+function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
+ const attr=(tag,key)=>tag.match(new RegExp('\\b'+key+'="([^"]*)"'))?.[1];
+ const setAttr=(tag,key,value)=>{
+  const re=new RegExp('\\s'+key+'="[^"]*"');
+  return re.test(tag)?tag.replace(re,' '+key+'="'+value+'"'):tag.replace(/\s*\/?>$/,end=>' '+key+'="'+value+'"'+end);
+ };
+ const section=(xml,name)=>xml.match(new RegExp('<'+name+'\\b[^>]*>([\\s\\S]*?)</'+name+'>'));
+ const fontsSection=section(stylesXml,'fonts'),stylesSection=section(stylesXml,'cellXfs');
+ if(!fontsSection||!stylesSection)throw Error('Native workbook has no usable font/cell styles');
+ const fonts=fontsSection[1].match(/<font\b[^>]*>[\s\S]*?<\/font>/g)||[];
+ const styles=stylesSection[1].match(/<xf\b[^>]*?(?:\/>|>[\s\S]*?<\/xf>)/g)||[];
+ const fontCache=new Map(),styleCache=new Map();
+ const fittedStyle=(id,numeric,header)=>{
+  const key=id+':'+numeric+':'+header;if(styleCache.has(key))return styleCache.get(key);
+  let xf=styles[id];if(!xf)throw Error('Invalid native cell style '+id);
+  const fontId=Number(attr(xf,'fontId')||0);
+  if(!fontCache.has(fontId)){
+   let font=fonts[fontId];if(!font)throw Error('Invalid native font '+fontId);
+   font=font.replace(/<sz\b[^>]*\/>/g,'').replace(/<name\b[^>]*\/>/g,'').replace(/<scheme\b[^>]*\/>/g,'')
+    .replace('</font>','<sz val="10"/><name val="Arial"/></font>');
+   let next=fonts.indexOf(font);if(next<0){next=fonts.length;fonts.push(font);}fontCache.set(fontId,next);
+  }
+  xf=xf.replace(/^<xf\b[^>]*>/,tag=>setAttr(setAttr(setAttr(tag,'fontId',fontCache.get(fontId)),'applyFont',1),'applyAlignment',1));
+  if(xf.endsWith('/>'))xf=xf.slice(0,-2)+'></xf>';
+  xf=xf.replace(/<alignment\b[^>]*?(?:\/>|>[\s\S]*?<\/alignment>)/g,'');
+  xf=xf.replace('</xf>','<alignment horizontal="'+(header?'center':numeric?'right':'left')+'" vertical="'+(header?'center':'top')+'" wrapText="'+(numeric?0:1)+'"/></xf>');
+  let next=styles.indexOf(xf);if(next<0){next=styles.length;styles.push(xf);}styleCache.set(key,next);return next;
+ };
+ const unescape=s=>s.replace(/&#(x[0-9a-f]+|\d+);/gi,(_,n)=>String.fromCodePoint(n[0].toLowerCase()==='x'?parseInt(n.slice(1),16):Number(n)))
+  .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+ const textOf=xml=>[...xml.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map(x=>unescape(x[1])).join('');
+ const shared=[...(sharedXml||'').matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map(x=>textOf(x[1]));
+ const column=letters=>[...letters].reduce((n,c)=>n*26+c.charCodeAt(0)-64,0);
+ // Conservative Arial 10 metrics at 96dpi, including wide glyphs and long TAGs.
+ const pixels=s=>[...s].reduce((n,c)=>n+(/[^\x00-\x7f]/.test(c)?14:/[MW@%]/.test(c)?12:/[A-Z0-9]/.test(c)?8:/[il.,:;'!| ]/.test(c)?4:7),0);
+ const linesFor=(text,width)=>text.split(/\r?\n/).reduce((total,line)=>{
+  let lines=1,used=0;
+  for(const token of line.split(/(\s+)/).filter(Boolean)){
+   const w=pixels(token);if(used&&used+w>width){lines++;used=0;}
+   if(w>width){const full=Math.ceil(w/width);lines+=full-1;used=w-(full-1)*width;}else used+=w;
+  }
+  return total+lines;
+ },0);
+ const output=new Map();
+ for(const [name,input] of sheets){
+  const main=/sheet1\.xml$/.test(name),last=main?8:/sheet[56]\.xml$/.test(name)?10:9;
+  let xml=input;
+  const originalCols=xml.match(/<cols\b[^>]*>([\s\S]*?)<\/cols>/);
+  if(!originalCols)throw Error('Native worksheet has no column widths: '+name);
+  const cols=originalCols[1].match(/<col\b[^>]*\/>/g)||[];
+  const widths=Array.from({length:last},(_,i)=>{
+   const old=cols.find(c=>Number(attr(c,'min'))<=i+1&&Number(attr(c,'max'))>=i+1);
+   return Number(old&&attr(old,'width')||8.43);
+  });
+  const merges=new Map();
+  for(const m of xml.matchAll(/<mergeCell\b[^>]*ref="([A-Z]+)(\d+):([A-Z]+)(\d+)"[^>]*\/>/g))
+   merges.set(m[1]+m[2],{end:column(m[3]),rowspan:Number(m[4])-Number(m[2])+1});
+  xml=xml.replace(/<row\b[^>]*>[\s\S]*?<\/row>/g,row=>{
+   const r=Number(attr(row,'r')),header=r===4||r===5;
+   const body=main?r>=8&&r<=42&&![23,39,40].includes(r):r>=6&&r<=19;
+   if(!header&&!body)return row;
+   let height=Number(attr(row.match(/^<row\b[^>]*>/)[0],'ht')||15),touched=false;
+   row=row.replace(/<c\b[^>]*?(?:\/>|>[\s\S]*?<\/c>)/g,cell=>{
+    const opening=cell.match(/^<c\b[^>]*>/)[0],address=attr(opening,'r'),col=column(address?.match(/^[A-Z]+/)?.[0]||'A');
+    if(col>last||(!main&&col<2))return cell;
+    const type=attr(opening,'t'),v=cell.match(/<v>([\s\S]*?)<\/v>/)?.[1];
+    const text=type==='s'?shared[Number(v)]||'':type==='inlineStr'?textOf(cell):v||'';
+    if(!text&&!/<f\b/.test(cell))return cell;
+    const numeric=!['s','inlineStr','str'].includes(type)&&v!==undefined&&Number.isFinite(Number(v));
+    const id=fittedStyle(Number(attr(opening,'s')||0),numeric,header);
+    cell=cell.replace(opening,setAttr(opening,'s',id));touched=true;
+    const merge=merges.get(address);
+    if(!merge||merge.rowspan===1){
+     const width=widths.slice(col-1,merge?.end||col).reduce((n,w)=>n+w*7+5,0)-12;
+     const needed=numeric?20:linesFor(text,Math.max(width,20))*14+6;
+     if(needed>409)warnings.push(name+' '+address+': text exceeds Excel maximum row height; review this cell before issue');
+     height=Math.max(height,Math.min(409,needed));
+    }
+    return cell;
+   });
+   if(touched)row=row.replace(/^<row\b[^>]*>/,tag=>setAttr(setAttr(tag,'ht',height),'customHeight',1));
+   return row;
+  });
+  output.set(name,xml);
+ }
+ const replaceSection=(xml,name,items)=>xml.replace(new RegExp('<'+name+'\\b[^>]*>[\\s\\S]*?</'+name+'>'),'<'+name+' count="'+items.length+'">'+items.join('')+'</'+name+'>');
+ return {sheets:output,stylesXml:replaceSection(replaceSection(stylesXml,'fonts',fonts),'cellXfs',styles)};
+}
+
 /**
  * @returns {{blob:Blob,filename:string,warnings:string[],mappedCells:number}}
  */
@@ -131,6 +222,15 @@ export async function buildNativeWorkingDraft0553(file,model){
   if(!names.has(entryName))throw Error("Original worksheet missing: "+entryName);
   sourceXml.set(entryName,decode.decode(await readEntry(entries.find(e=>e.name===entryName))));
  }
+ const sharedEntry=entries.find(e=>e.name==="xl/sharedStrings.xml");
+ const sharedXml=sharedEntry?decode.decode(await readEntry(sharedEntry)):"";
+ const textRuns=xml=>[...xml.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map(x=>x[1]).join("");
+ const sharedStrings=[...sharedXml.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map(x=>textRuns(x[1]));
+ const sourceText=address=>{
+  const cell=sourceXml.get("xl/worksheets/sheet1.xml").match(new RegExp('<c\\b[^>]*r="'+address+'"[^>]*?>[\\s\\S]*?</c>'))?.[0]||"";
+  const text=/\bt="s"/.test(cell)?sharedStrings[Number(cell.match(/<v>(\d+)<\/v>/)?.[1])]||"":textRuns(cell);
+  return text.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,"&");
+ };
  const warnings=["WORKING DRAFT ONLY — NOT RELEASED / NOT FOR CUSTOMER SUBMISSION"];
  const writes=new Map();
  const scope=new Map();
@@ -142,7 +242,7 @@ export async function buildNativeWorkingDraft0553(file,model){
   write(scope,"A"+row,group.code);
   write(scope,"B"+row,group.mr);
   write(scope,"C"+row,group.description);
-  write(scope,"D"+row,"Grouped MR "+group.mr+"; "+group.sourceRows.length+" TAG working lines; verify TAGs before customer issue");
+  write(scope,"D"+row,"Locations: "+([...new Set(group.sourceRows.map(x=>x.site).filter(Boolean))].join(", ")||"TBC"));
   write(scope,"E"+row,1);
   write(scope,"F"+row,round(sum));
   write(scope,"G"+row,round(sum));
@@ -156,6 +256,10 @@ export async function buildNativeWorkingDraft0553(file,model){
  }
  // Current commercial wording comes from the same B6 source as Working/Release.
  // The original template remains unchanged; do not re-export its superseded DDP heading.
+ for(const code of ["B3","B9"]){
+  const line=bc.find(x=>x.code===code),cell="B"+(23+Number(code.slice(1)));
+  if(line?.serviceCommercialBasis?.compactText)write(scope,cell,(sourceText(cell).split(/\r?\nIncluded (?:SAT|Yard support):/)[0]||line.description)+"\n"+line.serviceCommercialBasis.compactText);
+ }
  const b6=bc.find(x=>x.code==="B6");
  if(b6?.description)write(scope,"B29",b6.description);
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
@@ -228,7 +332,15 @@ export async function buildNativeWorkingDraft0553(file,model){
   if(code.startsWith("C"))warnings.push(code+" optional price not quoted: verified direct cost required");
   replaceAll("xl/worksheets/sheet"+(i+2)+".xml",rows);
  }
- // Re-use each original binary ZIP part as-is; only native cell values in 6 sheets change.
+ // Fit the exported Release workbook, including merged description cells.
+ const styleEntry=entries.find(e=>e.name==="xl/styles.xml");
+ if(!styleEntry)throw Error("Native workbook is missing styles.xml");
+ const fitted=fitNativeReleaseLayout0553(decode.decode(await readEntry(styleEntry)),
+  sharedXml,
+  new Map([...changes].map(([name,bytes])=>[name,decode.decode(bytes)])),warnings);
+ for(const [name,xml] of fitted.sheets)changes.set(name,encode.encode(xml));
+ changes.set("xl/styles.xml",encode.encode(fitted.stylesXml));
+ // All unrelated ZIP parts are copied byte-for-byte.
  const result=rebuildZip(entries,changes);
  const date=new Date().toISOString().slice(0,10).replace(/-/g,"");
  return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),

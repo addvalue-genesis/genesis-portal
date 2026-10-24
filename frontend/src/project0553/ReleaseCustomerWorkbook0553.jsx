@@ -1,3 +1,4 @@
+import nativeReleaseTemplate0553 from "./data/nativeReleaseTemplate0553.json";
 import {ServiceCommercialBasis0553} from "./ServiceCommercialBasis0553";
 import React,{useEffect,useMemo,useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
@@ -12,7 +13,7 @@ import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrac
 import "./releaseWorkbook0553.css";
 
 // Single customer-format sheet preview. Internal TAG/source drilldowns are UI-only
-// and MUST NOT be included in the unchanged six-sheet native XLSX export.
+// and MUST NOT be included in the six-sheet native XLSX export.
 const WORKSHEETS=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
  ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"]
@@ -107,9 +108,12 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const canQuote=false; // Final customer-issued XLSX still requires approval.
  const chooseNativeDraft=()=>sourceFileRef.current?.click();
  const exportNativeDraft=async event=>{
-  const file=event.target.files?.[0];
-  event.target.value="";
-  if(!file)return;
+  let file;
+  if(event?.target?.files){file=event.target.files[0];event.target.value="";if(!file)return;}
+  else{
+   const bytes=Uint8Array.from(atob(nativeReleaseTemplate0553.base64),c=>c.charCodeAt(0));
+   file=new File([bytes],nativeReleaseTemplate0553.sourceName,{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  }
   setNativeBusy(true);setNativeReport(null);
   try{
    const result=await buildNativeWorkingDraft0553(file,model);
@@ -148,10 +152,11 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     {recipient==="INTERNAL"&&<>
       <input ref={sourceFileRef} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
        onChange={exportNativeDraft} style={{display:"none"}} aria-label="Select original 4-Scope of Supply.xlsx"/>
-      <button type="button" className="p553-detail-button" onClick={chooseNativeDraft} disabled={nativeBusy}
-       title="Choose original 4-Scope of Supply.xlsx from your computer. File processed only in your browser; outputs a new native-format working draft.">
-       {nativeBusy?"Preparing Native XLSX…":"Export Native XLSX — WORKING DRAFT"}
+      <button type="button" className="p553-detail-button" onClick={()=>exportNativeDraft()} disabled={nativeBusy}
+       title="Generate Excel from current Release data using the original template. No file selection required.">
+       {nativeBusy?"Preparing Excel…":"Export Excel — WORKING DRAFT"}
       </button>
+      <button type="button" className="p553-detail-button" onClick={chooseNativeDraft} disabled={nativeBusy}>Use another original template…</button>
      </>}
     <button type="button" disabled={!canQuote} className="p553-detail-button"
       title="Approved customer XLSX requires signed release and completed checks">Final Customer Release — HOLD</button>
@@ -282,7 +287,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      {isOverOriginalCapacity&&<p className="p553-native-warning">
       <strong>Native Excel constraint:</strong> 10.1 has {tagCount} priced TAG rows but the original Part A provides 15 item rows.
       This JSX groups all source data into four MR package rows, with no priced TAG silently discarded.
-      Grouped Tag No. format must be accepted by purchaser before native export; no original cell size/layout changes are allowed.
+      Grouped Tag No. format must be accepted by purchaser before native export; original column widths, page setup and merges are retained; exported text wraps with fitted row heights.
      </p>}
     </>:<>
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
@@ -374,6 +379,6 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      Go to {source.sourceModuleId?.startsWith("bid.budget.bom")?"10.1 Engineering BOM":"10.2 Working BC"} ↗
     </button>
    </div>}
-   <p className="p55-note">Original customer workbook: 6 Sheets, unchanged. Pre-export preview is a read-only JSX layout; it does not prove pixel-perfect native XLSX fidelity. Final native export requires signed line/cell mapping, full cost + TAG reconciliation, verified FX and buyer approval of any grouping.</p>
+   <p className="p55-note">Export retains the original 6 sheets, merged cells and formulas, column widths and page setup, with fitted text and row heights. Pre-export preview is a read-only JSX layout; it does not prove pixel-perfect native XLSX fidelity. Final native export requires signed line/cell mapping, full cost + TAG reconciliation, verified FX and buyer approval of any grouping.</p>
  </section>;
 }

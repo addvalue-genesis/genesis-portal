@@ -187,7 +187,7 @@ assert.match(ui,/10\.2 B1–B14 Working Sell/);
 assert.match(ui,/15 item rows|15 slots|15 item/);
 assert.match(ui,/buyer must accept group-level TAG mapping/);
 assert.match(ui,/const \[viewer,setViewer\]=useState\("CUSTOMER"\)/);
-assert.match(ui,/Export Native XLSX — WORKING DRAFT/);
+assert.match(ui,/Export Excel — WORKING DRAFT/);
 assert.match(ui,/Final Customer Release — HOLD/);
 assert.match(ui,/buildNativeWorkingDraft0553\(file,model\)/);
 assert.match(ui,/sourceFileRef\.current\?\.click\(\)/);
