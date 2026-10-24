@@ -55,3 +55,7 @@ The owner clarified that the reference is the compact cell layout in `Z1F-Commer
 Reference CCL item31 still says 18 Yard /45 offshore days; those old quantities were not copied into the current budget. Native XLSX and the linked Drive workbook were not edited by this UI correction. Price model and all amounts remain unchanged.
 
 Verification for same-cell correction: service-basis and change-registry validators pass; complete Working/Release snapshot unchanged. Browser checks both Customer/Internal description cells (colSpan3), five text lines, no additional service row or nested panel/table, source rates/TBC, four viewport widths and zero page errors. Production build passes with the same three size warnings.
+
+## Follow-up: Main Specification location names
+
+Release A1–A4 Main Specification now shows unique location names from each MR's existing `sourceRows`, in source order, instead of TAG/site counts. Customer and Internal use the same display. Current rows: A1 ZWP20/ZWP21/ZWP22/ZWP23/ZPQ/ZWP8/ZWP11; A2 ZWP20/ZWP21/ZWP22; A3 ZWP20/ZWP21/ZWP22/ZWP23; A4 ZWP20/ZWP21/ZWP22. These identify the current projected rows, not a claim that unresolved scope is complete. No location is inferred or copied from another MR. Source model, TAG drilldowns, prices and native export unchanged.

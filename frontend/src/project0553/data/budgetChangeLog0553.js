@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R41";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R42";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-11",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release Main Specification แสดงชื่อ Locations",
+  detail:"ช่อง Main Specification ของ A1–A4 แสดงชื่อ Location ไม่ซ้ำจาก sourceRows ของแต่ละ MR แทนจำนวน TAG/sites; ใช้ทั้ง Customer และ Internal. รายละเอียด TAG ยังเปิดดูได้ตามเดิม ตัวเลขและ source model ไม่เปลี่ยน.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: show actual locations such as ZPQ/ZWP20 in Main Specification"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-10",date:"2026-10-24",kind:"UI",tone:"navigation",
   title:"Release B3/B9: ข้อความสั้นในเซลล์คำอธิบายเดิม",

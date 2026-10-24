@@ -193,7 +193,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          <td><strong>{part.code}</strong></td>
          <td><strong>{part.mr}</strong><small>MULTI-TAG / customer grouping subject to approval</small></td>
          <td>{part.description}</td>
-         <td>{part.sourceRows.length} TAG lines across {new Set(part.sourceRows.map(x=>x.site)).size} sites
+         <td>Locations: {[...new Set(part.sourceRows.map(x=>x.site).filter(Boolean))].join(", ")||"TBC"}
            {internal&&<small>{part.unresolvedCount} unpriced / pending</small>}</td>
          <td>1 lot</td>
          <td className="p553-price-cell">{money(part.previewSellTHB)}</td>
