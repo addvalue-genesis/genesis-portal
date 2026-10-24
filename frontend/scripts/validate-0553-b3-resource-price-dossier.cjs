@@ -112,6 +112,8 @@ assert.equal(sc.lines.B3.directCostTHB,null);
 assert.equal(sc.lines.B3.financialIdentity.customerProposalState,"NOT_ISSUED_RELEASE_HOLD");
 const html=renderToStaticMarkup(React.createElement(DossierUI,{workingRow:b3}));
 const host=renderToStaticMarkup(React.createElement(Host,{workingRow:b3}));
+const yardHtml=renderToStaticMarkup(React.createElement(Host,{workingRow:bc.byCode.B9}));
+const {isOnshoreYardDossierModule0553:isYard,workingOwnerFromModuleId0553:displayOwner}=get("data/moduleDeepLink0553.js");
 for(const token of ["resource-price-dossier","บริการ FAT ภายนอก","SAMTEL Warehouse — Preparation",
  "Selected SAT/SIT 28 Team-days","Fabrication Yard SAT","Offshore Vendor Commissioning",
  "1,587,600.00","452,850.00","30,000.00",
@@ -120,7 +122,7 @@ for(const token of ["resource-price-dossier","บริการ FAT ภาย�
  "Offshore POB","NOT INCLUDED in Base","GF FABRICATION YARD SAT",
  "MR0001","MR0002","MR0003","MR0004","Test ID:","Instruments:",
  "Qty × Unit","Expand All","Collapse All"]){
- assert(html.includes(token),"Dossier SSR missing "+token);
+ assert((html+yardHtml).includes(token),"Source-linked dossier SSR missing "+token);
 }
 assert(host.includes('data-component-key="bid.budget.working.bc.b3.resource-price-dossier"'));
 for(const g of m.groupRollups){
@@ -149,10 +151,18 @@ assert(m.groups[6].rows.every(x=>x.mr.startsWith("MR000")&&x.linkedTestIds.lengt
  x.testInstruments&&x.signoffEvidence));
 for(const id of allIds){
  assert(entries.has(id),"Navigator missing detailed source work ID "+id);
- assert(html.includes('data-component-key="'+id+'"'),"Dossier missing HTML work row ID "+id);
+ const targetHtml=isYard(id)?yardHtml:html;
+ assert(targetHtml.includes('data-component-key="'+id+'"'),"Dossier missing relocated work row ID "+id);
+ if(isYard(id)){
+  assert(!html.includes('data-component-key="'+id+'"'),"Onshore row duplicated in B3: "+id);
+  assert.equal(displayOwner(id),"B9");
+  assert.equal(nav().find(x=>x.id===id)?.parentOwner,"B9");
+ }
 }
-const htmlIds=[...host.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
+const htmlIds=[...(host+yardHtml).matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(htmlIds.length,new Set(htmlIds).size,"B3 dossier must not duplicate DOM IDs");
+assert(m.groups[5].rows.every(x=>x.workingSellTHB===null&&x.postingClass==="UNPRICED_REQUIREMENT_NONPOSTING"));
+assert.equal(bc.byCode.B9.workingSellTHB,480550);
 assert.equal(JSON.stringify(working()),before,"B3 dossier modified canonical source");
 assert(!html.includes("453,600.00"),"Superseded 7-site survey must NOT be a current price");
 assert(!html.includes("2,016,000.00"),"Old 40-day SAT SELL must NOT appear as current resource dossier price");

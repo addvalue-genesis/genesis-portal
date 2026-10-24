@@ -1,6 +1,7 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectB3ResourcePriceDossier0553} from "./data/b3ResourcePriceDossier0553";
+import {selectB9ChinaWorkingBudget0553} from "./data/b9ChinaWorkingBudget0553";
 
 const root="bid.budget.working.bc.b3.resource-price-dossier";
 const cash=v=>Number.isFinite(v)?"THB "+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
@@ -79,8 +80,8 @@ export function B3ResourcePriceDossier0553({workingRow}){
    data-component-key={rollup.id}>
    <summary className="p553-b3-rollup-summary">
     <span className="p553-b3-rollup-code">B3.G{k+1}</span>
-    <span className="p553-b3-rollup-heading"><span className="p553-b3-level-label">ยอดรวมกลุ่ม</span><strong>{rollup.name}</strong>
-     <small>{rollup.sourceRowCount} source detail rows · {rollup.state}</small>
+    <span className="p553-b3-rollup-heading"><span className="p553-b3-level-label">ยอดรวมกลุ่ม</span><strong>{rollup.tone==="sat"?"SAT / COMMISSIONING — BF & Offshore · Yard ดู B9":rollup.name}</strong>
+     <small>{rollup.sourceRowCount} source detail rows{rollup.tone==="sat"?" · รวม 14 Yard reference rows ที่แสดงใน B9":""} · {rollup.state}</small>
      <code>{rollup.id}</code></span>
     <span className="p553-b3-rollup-price"><strong>{cash(rollup.selectedWorkingSellTHB)}</strong>
      <small>INCLUDED ONCE · Working SELL</small></span>
@@ -99,7 +100,50 @@ export function B3ResourcePriceDossier0553({workingRow}){
       <td>NOT ESTABLISHED<small>{rollup.approval}</small><small>Customer Release NOT ISSUED</small></td>
      </tr></tbody>
     </table></div>
-   {rollup.sourceStageIndices.map(i=>{
+   {rollup.sourceStageIndices.map(i=>i===5?
+    <aside key="yard-reference" className="p553-owner-reference" data-cost-owner="B9"
+     data-component-key={root+".yard-onshore-reference"}>
+     <strong>ONSHORE · JUTAL Zhuhai Yard — ดูรายละเอียดใน B9</strong>
+     <p>ย้าย group.06 และรายการทดสอบ 14 รายการไปแสดงร่วมกับทีม onshore ใน B9.
+      เป็นการย้ายตำแหน่งแสดงผลเท่านั้น ไม่บวกงบเพิ่ม และไม่ยืนยันว่า B9 ครอบคลุม Yard SAT ทั้งหมด.</p>
+     <button type="button" className="p553-detail-button" data-open-source-module={root+".group.06"}>↗ เปิด group.06 — Onshore Yard ใน B9</button>
+    </aside>:<B3DossierStage0553 key={i} model={model} i={i} rollup={rollup}/>)}
+   </div>
+  </details>)}
+  <p className="p55-note"><strong>Group Source-to-Release parity:</strong>
+    FAT + SITE SURVEY + SAT / COMMISSIONING + TOOLS = {cash(model.rollupTotalTHB)} =
+    WS-B3 selected source. 10.3 Customer Preview and 10.5 SOW-B3 derive from that same owner.
+    10.3/10.5 do not count the four groups as independent customer rows.</p>
+  <h4>SAT Risk / Management Reserve — separate NONPOSTING references</h4>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>Reserve class</th><th>Team-days</th><th>Crew</th><th>Person-days</th><th>Illustrative SELL-only reference THB</th><th>Selected / cost status</th></tr></thead>
+   <tbody>{model.riskReserve.map(x=><tr key={x.id}>
+    <td>{x.name}</td><td>{num(x.teamDays)}</td><td>{num(x.people)}</td>
+    <td>{num(x.personDays)}</td><td>{cash(x.illustrativeOnlyTHB)}</td>
+    <td>{x.status} · NOT INCLUDED in Base · Direct Cost NOT ESTABLISHED</td></tr>)}</tbody>
+  </table></div>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>Selected Working SELL reconciliation</th><th>Amount THB</th><th>Cost status / Receiver</th></tr></thead>
+   <tbody>{model.groups.slice(0,5).map((g,i)=>g.rows.length>0&&<tr key={i}>
+    <td>B3.R{i+1} — {g.name}</td><td>{cash(g.selectedWorkingSellTHB)}</td>
+    <td>Included WS-B3 once / Actual Cost NOT ESTABLISHED</td>
+   </tr>)}
+   <tr><th>Selected B3 / CP-B3 preview · 1 LS</th>
+    <th>{cash(model.pricedWorkingSellTHB)}</th>
+    <th>10.2 source → 10.3 releaseCommercialModel → 10.5 scope; Customer Release HOLD</th></tr>
+   </tbody></table></div>
+  <p className="p55-note"><strong>New cost ledger gate:</strong>
+   No new BF/Yard/Offshore work may enter the financial total until separately evidenced
+   Qty × role × days × verified cost rate + travel/POB/allowances, one cost owner,
+   a priced Working SELL decision, an approved ITP/RACI, and 10.3 Release reconciliation.
+   This dossier does not invent payroll or migrate old 40-day SELL to the new work phases.</p>
+ </section>;
+}
+
+// UI placement only: Yard requirements are shown under B9 onshore; source IDs and prices remain unchanged.
+export function B3DossierStage0553({model,i,rollup}){
+ const yardBudget=i===5?selectB9ChinaWorkingBudget0553():null;
+
    const g=model.groups[i];
    const gid=root+".group."+String(i+1).padStart(2,"0");
    if(i===0&&!g.rows.length)return <details key={gid} data-component-key={gid} className="p553-b3-dossier-group">
@@ -110,12 +154,13 @@ export function B3ResourcePriceDossier0553({workingRow}){
    const surveyConditional=i===4;
    const sites=[...new Set(g.rows.map(x=>x.site||"Shared"))];
    return <details className="p553-b2-recalc-group p553-b3-dossier-group" key={gid}
+    data-module-kind={i>=5?"requirement":undefined}
     data-component-key={gid} open={i===0||i===1||i===2}>
     <summary className="p553-b2-recalc-summary">
-     <span className="p553-b2-recalc-num">B3.R{i+1}</span>
+     <span className="p553-b2-recalc-num">{i===5?"B9.YARD":"B3.R"+(i+1)}</span>
      <span className="p553-b2-recalc-label">
-      <span className="p553-b3-level-label">รายละเอียดงาน · ในกลุ่ม {rollup.name}</span>
-      <strong>{g.name}</strong>
+      <span className="p553-b3-level-label">{i>=5?"ข้อกำหนดงาน · ไม่ใช่รายการงบเพิ่ม":"รายละเอียดงาน · ในกลุ่ม "+rollup.name}</span>
+      <strong>{i===5?"ONSHORE · ":""}{g.name}</strong>
       <small>{g.rowCount} detailed resource/expense rows ·
        {surveyConditional?" INCLUDED CONDITIONAL LABOUR ALLOWANCE; CALL-OUT HOLD":active?" INCLUDED IN WORKING SELL":" UNPRICED — NOT ADDITIVE"} ·
        {active?cash(g.selectedWorkingSellTHB):"0 POSTED; amount NOT ESTABLISHED"}</small>
@@ -123,6 +168,14 @@ export function B3ResourcePriceDossier0553({workingRow}){
      </span>{c(gid)}
     </summary>
     <div className="p553-b2-recalc-body">
+     {i===5&&<aside className="p553-owner-reference" data-cost-owner="B9">
+      <strong>เจ้าของงบทีมไป JUTAL: B9 · {cash(yardBudget.b9BaseWorkingSellTHB)} · รวมครั้งเดียว</strong>
+      <p>รหัสเดิม B3.R6 / group.06 เก็บไว้เพื่อ trace; แสดงที่ B9 onshore แล้ว. เก็บข้อกำหนด Yard SAT ตาม SPE §7.3.2 เพื่อทวนสอบการทดสอบ มี 14 รายการที่ยังไม่ลงราคาใน B3.
+       งบ Senior + Field 7 วันทำงาน + 2 วันเดินทางต่อคน และค่าเดินทาง/ที่พักอยู่ที่ B9 แล้ว ไม่บวกจากตารางนี้อีก.</p>
+      <p>ยังต้องเทียบงานและวันของ B3 SAT 28 วันกับ B9 ก่อนยืนยันว่าแรงงานไม่ทับกัน;
+       การมีงบ B9 ไม่ได้ยืนยันว่าครอบคลุมข้อกำหนด Yard SAT ทั้งหมด.</p>
+      <button type="button" className="p553-detail-button" data-open-source-module="bid.budget.working.bc.b9.price-trace.work-scope">↗ ไปงบ B9 — ทีม JUTAL Yard</button>
+     </aside>}
      <p className="p55-note">Basis: {g.reference} ·
       {surveyConditional?" Conditional BF labour provision is INCLUDED in pre-award WS-B3, not evidence that a vessel/site trip was ordered.":active?" Selected source price evidence; no duplicate posting.":" Engineering SOW only; physical crew, day and Direct Cost require approval."}</p>
      {sites.map((site,j)=>{
@@ -131,7 +184,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
       const siteAmount=rows.reduce((n,x)=>n+(Number.isFinite(x.workingSellTHB)?x.workingSellTHB:0),0);
       return <details className="p553-b2-recalc-group p553-b3-dossier-site" key={sid} data-component-key={sid} open={i<3&&j===0}>
        <summary className="p553-b2-recalc-summary">
-        <span className="p553-b2-recalc-num">B3.R{i+1}.{j+1}</span>
+        <span className="p553-b2-recalc-num">{i===5?"B9.YARD":"B3.R"+(i+1)}.{j+1}</span>
         <span className="p553-b2-recalc-label"><span className="p553-b3-level-label">สถานที่ · แจกแจงจาก {g.name}</span><strong>{site}</strong>
          <small>{rows.length} lines · {active?cash(siteAmount):"NONPOSTING / Pending approved scope & rates"}</small>
          <code>{sid}</code></span>{c(sid)}
@@ -159,7 +212,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
            <small>{x.sourceModuleId}</small>{c(x.id)}</td>
           <td><strong>{x.mr||""}</strong> {x.work}<small>{x.wbs||""}</small><small>{x.calculation}</small>
            {x.linkedTestIds?.length>0&&<small>Test ID: {x.linkedTestIds.join(", ")}</small>}</td>
-          <td>{x.workfront||"—"}<small>Cost Owner: {x.costOwner||"B3 / WS-B3"}</small></td>
+          <td>{x.workfront||"—"}<small>{i>=5?"ข้อกำหนด / NONPOSTING — เจ้าของแรงงานยังต้องเทียบ RACI":"Cost Owner: "+(x.costOwner||"B3 / WS-B3")}</small></td>
           <td>{x.role}</td><td>{num(x.people)}</td><td>{num(x.teamDays)}</td>
           <td>{num(x.qty)} {x.unit||""}</td>
           <td>{Number.isFinite(x.rateUSDPerUnit)?"USD "+num(x.rateUSDPerUnit):"—"}</td>
@@ -204,43 +257,14 @@ export function B3ResourcePriceDossier0553({workingRow}){
       </table></div></>}
      {i===5&&<p className="p55-note"><strong>SPE §7.3.2 — B3.R6 JUTAL Zhuhai Yard SAT is a contract test/acceptance requirement.</strong>
       ADDVALUE SAT Crew × Days × Rate = NOT ESTABLISHED (ITP/RACI pending).
-      B9 Specialist Assistance is a separately priced Senior Engineer support package on written call-out,
+      B9 Specialist Assistance is a separately priced Senior Engineer + Field Technician support package on written call-out,
       not a transfer of the entire B3 Yard SAT. B9 source price details:
       {" "}<code>bid.budget.working.bc.b9.price-trace.work-scope</code>.
-      B9's 7+2 paid Senior days and related expenses belong to WS-B9 1 LS only,
+      B9's 7+2 paid days per role and related expenses belong to WS-B9 1 LS only,
       never to these 14 unpriced B3 Yard Test IDs. SAMTEL local FAT is the selected B3 event.</p>}
      {i===6&&<p className="p55-note">SPE §7.3.3: GF offshore commissioning after installation.
       ADDVALUE crew, mobilization, vessel/POB and RF/RACON support require separate priced evidence and signed RACI.</p>}
     </div>
    </details>;
-  })}</div>
-  </details>)}
-  <p className="p55-note"><strong>Group Source-to-Release parity:</strong>
-    FAT + SITE SURVEY + SAT / COMMISSIONING + TOOLS = {cash(model.rollupTotalTHB)} =
-    WS-B3 selected source. 10.3 Customer Preview and 10.5 SOW-B3 derive from that same owner.
-    10.3/10.5 do not count the four groups as independent customer rows.</p>
-  <h4>SAT Risk / Management Reserve — separate NONPOSTING references</h4>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-   <thead><tr><th>Reserve class</th><th>Team-days</th><th>Crew</th><th>Person-days</th><th>Illustrative SELL-only reference THB</th><th>Selected / cost status</th></tr></thead>
-   <tbody>{model.riskReserve.map(x=><tr key={x.id}>
-    <td>{x.name}</td><td>{num(x.teamDays)}</td><td>{num(x.people)}</td>
-    <td>{num(x.personDays)}</td><td>{cash(x.illustrativeOnlyTHB)}</td>
-    <td>{x.status} · NOT INCLUDED in Base · Direct Cost NOT ESTABLISHED</td></tr>)}</tbody>
-  </table></div>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-   <thead><tr><th>Selected Working SELL reconciliation</th><th>Amount THB</th><th>Cost status / Receiver</th></tr></thead>
-   <tbody>{model.groups.slice(0,5).map((g,i)=>g.rows.length>0&&<tr key={i}>
-    <td>B3.R{i+1} — {g.name}</td><td>{cash(g.selectedWorkingSellTHB)}</td>
-    <td>Included WS-B3 once / Actual Cost NOT ESTABLISHED</td>
-   </tr>)}
-   <tr><th>Selected B3 / CP-B3 preview · 1 LS</th>
-    <th>{cash(model.pricedWorkingSellTHB)}</th>
-    <th>10.2 source → 10.3 releaseCommercialModel → 10.5 scope; Customer Release HOLD</th></tr>
-   </tbody></table></div>
-  <p className="p55-note"><strong>New cost ledger gate:</strong>
-   No new BF/Yard/Offshore work may enter the financial total until separately evidenced
-   Qty × role × days × verified cost rate + travel/POB/allowances, one cost owner,
-   a priced Working SELL decision, an approved ITP/RACI, and 10.3 Release reconciliation.
-   This dossier does not invent payroll or migrate old 40-day SELL to the new work phases.</p>
- </section>;
+
 }

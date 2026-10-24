@@ -1,3 +1,4 @@
+import {ServiceCommercialBasis0553} from "./ServiceCommercialBasis0553";
 import React,{useEffect,useMemo,useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
@@ -131,7 +132,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   <button type="button" className="p553-origin-trace" onClick={()=>openSource(item)}>Trace</button>
  </span>:null;
  const toggleMr=key=>setExpandedMr(old=>({...old,[key]:!old[key]}));
- return <section className="p55-panel p553-release-workbook" data-component-key="bid.budget.pricing.release.preview">
+ return <section className="p55-panel p553-release-workbook" data-owner-colours={internal?"true":"false"} data-component-key="bid.budget.pricing.release.preview">
    <div className="p55-eyebrow">{title} · 10.3 / bid.budget.pricing.release.preview <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing.release.preview"/></div>
    <h3>Customer Excel Format Preview — 4-Scope of Supply.xlsx</h3>
    <p className="p55-note"><strong>PRE-EXPORT PREVIEW / NOT ISSUED.</strong> ตารางนี้เป็น JSX จำลองแบบฟอร์มลูกค้า ไม่ใช่ไฟล์ Excel ที่ Export แล้ว ข้อมูล A1–A4 สรุปทั้ง MR จาก 10.1, B1–B14 จาก Working Sell ของ 10.2, C1/C2 รอ Verified Direct Cost และแยกจาก Base</p>
@@ -188,7 +189,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-section"><td colSpan={8}>Part A: BASIC<br/>A部分：基本</td></tr>
        <tr className="p553-sheet-subheading"><td colSpan={8}>A1. Main Equipment · Source MR-0001–MR-0004 / Customer Grouping Preview</td></tr>
        {partA.groups.map((part,i)=><React.Fragment key={part.code}>
-        <tr className="p553-mr-preview-row">
+        <tr className="p553-mr-preview-row" data-cost-owner={part.code}>
          <td><strong>{part.code}</strong></td>
          <td><strong>{part.mr}</strong><small>MULTI-TAG / customer grouping subject to approval</small></td>
          <td>{part.description}</td>
@@ -203,7 +204,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
           {sourceButton(part)}
          </>}</td>
         </tr>
-        {internal&&expandedMr[part.code]&&<tr className="p553-drilldown-only"><td colSpan={8}>
+        {internal&&expandedMr[part.code]&&<tr className="p553-drilldown-only" data-cost-owner={part.code}><td colSpan={8}>
          <strong>{part.code} / {part.mr} — Source TAG detail (Internal UI only, not additional XLSX rows)</strong>
          <div className="p553-drilldown-table-wrap"><table className="p553-drilldown-table">
           <thead><tr><th>Site</th><th>TAG No.</th><th>Description</th><th>Qty</th><th>Unit Sell THB</th><th>Sell THB</th><th>Module</th></tr></thead>
@@ -223,8 +224,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-section"><td colSpan={8}>Part B: OTHERS<br/>B部分：其它</td></tr>
        {B_ROWS.map(id=>{
         const line=bLines.find(r=>r.code===id);
-        return <React.Fragment key={id}><tr><td><strong>{id}</strong></td>
-         <td colSpan={3}>{id==="B6"?line?.description:parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}</td>
+        return <React.Fragment key={id}><tr data-cost-owner={id}><td><strong>{id}</strong></td>
+         <td colSpan={3}>{id==="B6"?line?.description:parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}
+          {line?.serviceCommercialBasis&&<small>{line.serviceCommercialBasis.includedText} · Day / OT / Standby schedule below.</small>}
+         </td>
          <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td>{workingBudgetaryOwners.has(id)?<>
@@ -235,13 +238,16 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  </>:id==="B12"?"refer to Annex B12":
  line?.executionConditional&&internal?"Quoted in Base · attendance on written call-out":line?.conditional&&internal?"Conditional — verify before release":""}</td>
         </tr>
+        {line?.serviceCommercialBasis&&<tr className="p553-service-rate-row" data-cost-owner={id}><td colSpan={8}>
+         <ServiceCommercialBasis0553 basis={line.serviceCommercialBasis} customer={!internal}/>
+        </td></tr>}
         {internal&&id==="B3"&&line?.b3GroupTrace&&<tr className="p553-drilldown-only"
          data-component-key="bid.budget.pricing.release.b3.group-trace"><td colSpan={8}>
          <strong>10.3 B3 — Work Type Source-to-Release attribution (internal only, NOT 4 quotation lines)</strong>
          <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
           <thead><tr><th>10.2 Group Source</th><th>Working SELL THB</th><th>10.3 Customer Preview Attribution THB</th>
            <th>Status</th><th>Go to 10.2 Source</th></tr></thead>
-          <tbody>{line.b3GroupTrace.map(g=><tr key={g.id}>
+          <tbody>{line.b3GroupTrace.map(g=><tr key={g.id} data-work-family={g.id.split(".").pop()}>
            <td>{g.name}<small>{g.id}</small></td>
            <td>{money(g.workingSellTHB)}</td><td>{money(g.customerPreviewAttributionTHB)}</td>
            <td>{g.status}<small>{g.approvalGate}</small></td>
@@ -262,7 +268,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         </td></tr>
        <tr className="p553-sheet-highlight"><td colSpan={8}>Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
-       {model.c.map(r=><tr key={r.code}><td><strong>{r.code}</strong></td>
+       {model.c.map(r=><tr key={r.code} data-cost-owner={r.code}><td><strong>{r.code}</strong></td>
         <td colSpan={3}>{parseName(r.code)} {sourceButton(r)}</td>
         <td>1 lot</td><td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
         <td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
@@ -291,7 +297,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       Description = ซื้ออะไหล่อะไรและใช้ทำอะไร · Detail Specification = คุณสมบัติที่ต้องตรงกับของเดิม ·
       Materials = วัสดุหรือส่วนประกอบ (ถ้าไม่ทราบระบุ TBC) · Related TAGs = อุปกรณ์ที่อาจใช้อะไหล่นี้ร่วมกัน ไม่ใช่จำนวนที่จะซื้อ ·
       <strong> QTY = จำนวนอะไหล่สำรองที่จะซื้อ</strong>. ความเข้ากันได้ของ OEM ยังรอการยืนยัน</p>
-     <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table">
+     <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table" data-cost-owner={code}>
       <thead><tr><th rowSpan={2}>Item<br/>序号</th><th rowSpan={2}>Tag No<br/>位号</th><th rowSpan={2}>Description<br/>描述</th><th rowSpan={2}>Detail Specification<br/>详细规格</th><th rowSpan={2}>Materials<br/>材质</th><th rowSpan={2}>QTY<br/>数量</th><th colSpan={code.startsWith("C")?3:2}>DDP site （DDP现场交货）</th></tr>
        <tr><th>UNIT PRICE (CURRENCY)<br/>单价</th><th>TOTAL PRICE (CURRENCY)<br/>总价</th>
         {code.startsWith("C")&&<th>Lead time (ARO)<br/>交货期 (周)</th>}</tr></thead>

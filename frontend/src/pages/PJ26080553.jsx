@@ -38,6 +38,7 @@ import { STANDARD_PROJECT_TABS, AuditBadge, AuditMetric, AuditTable, AuditSectio
 import { getProject0553Dataset } from "../project0553/data/repository";
 import "../project0550/project0550.css"; // Reuse existing 0550 presentation primitives, never project facts.
 import "../project0553/project0553.css";
+import "../project0553/moduleHierarchy0553.css";
 
 // IDs are stable application route keys. Display order follows the project
 // engineering workflow; Budget is the final workbench after all upstream views.

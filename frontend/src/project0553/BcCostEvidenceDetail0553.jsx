@@ -207,7 +207,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     <BcWorkCostLines0553 selectedCode={e.code} presentationNamespace={"bid.budget.working.bc."+e.code.toLowerCase()+".audit"}/>
    </React.Fragment>}/>
  ):null;
- return <section className="p55-panel p553-bc-evidence" data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
+ return <section className="p55-panel p553-bc-evidence" data-cost-owner={e.code} data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
   <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
   <h3>{e.code} — {workingRow.requirement}</h3>
   <BcFinancialIdentityMatrix0553 workingRow={workingRow}/>

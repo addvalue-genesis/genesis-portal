@@ -1,0 +1,67 @@
+/* PJ2608-0553: shared presentation only. No pricing, approval or export logic.
+   Owner labels are authoritative; hue is not an approval signal.
+   Descendant summaries and tables inherit the nearest declared group. */
+.p553-dashboard{--module-accent:#526777;--module-tint:#f0f4f7}
+.p553-dashboard [data-cost-owner="A1"]{--module-accent:#245e9b;--module-tint:#edf5fe}
+.p553-dashboard [data-cost-owner="A2"]{--module-accent:#087c75;--module-tint:#eaf8f5}
+.p553-dashboard [data-cost-owner="A3"]{--module-accent:#945b19;--module-tint:#fff5e8}
+.p553-dashboard [data-cost-owner="A4"]{--module-accent:#6550a1;--module-tint:#f3effc}
+.p553-dashboard [data-cost-owner="A5"]{--module-accent:#526777;--module-tint:#f0f4f7}
+.p553-dashboard [data-cost-owner="B1"]{--module-accent:#245e9b;--module-tint:#edf5fe}
+.p553-dashboard [data-cost-owner="B2"]{--module-accent:#5055a3;--module-tint:#f0f1fc}
+.p553-dashboard [data-cost-owner="B3"]{--module-accent:#aa641a;--module-tint:#fff6e9}
+.p553-dashboard [data-cost-owner="B4"]{--module-accent:#586d79;--module-tint:#f1f5f8}
+.p553-dashboard [data-cost-owner="B5"]{--module-accent:#975c19;--module-tint:#fff4e6}
+.p553-dashboard [data-cost-owner="B6"]{--module-accent:#81691c;--module-tint:#faf6e6}
+.p553-dashboard [data-cost-owner="B7"]{--module-accent:#726047;--module-tint:#f6f2eb}
+.p553-dashboard [data-cost-owner="B8"]{--module-accent:#7950a1;--module-tint:#f5effb}
+.p553-dashboard [data-cost-owner="B9"]{--module-accent:#08766e;--module-tint:#e8f7f4}
+.p553-dashboard [data-cost-owner="B10"]{--module-accent:#8a4c79;--module-tint:#f9eff7}
+.p553-dashboard [data-cost-owner="B11"]{--module-accent:#0d7188;--module-tint:#e9f7fa}
+.p553-dashboard [data-cost-owner="B12"]{--module-accent:#716141;--module-tint:#f7f3ea}
+.p553-dashboard [data-cost-owner="B13"]{--module-accent:#6b658b;--module-tint:#f3f1f8}
+.p553-dashboard [data-cost-owner="B14"]{--module-accent:#526272;--module-tint:#f0f3f6}
+.p553-dashboard [data-cost-owner="C1"]{--module-accent:#835780;--module-tint:#f8eff7}
+.p553-dashboard [data-cost-owner="C2"]{--module-accent:#63528f;--module-tint:#f3effa}
+
+/* B3 work families, consistent across source and downstream views. */
+.p553-dashboard :is(.p553-b3-dossier-rollup--fat,.p553-b3-group--fat,[data-work-family="fat"]){--module-accent:#2666a1;--module-tint:#edf5fe}
+.p553-dashboard :is(.p553-b3-dossier-rollup--survey,[data-work-family="site-survey"]){--module-accent:#178179;--module-tint:#eaf8f3}
+.p553-dashboard :is(.p553-b3-dossier-rollup--sat,.p553-b3-group--sat,[data-work-family="sat-commissioning"]){--module-accent:#aa641a;--module-tint:#fff6e9}
+.p553-dashboard :is(.p553-b3-dossier-rollup--tools,.p553-b3-group--tools,[data-work-family="tools-reserve"]){--module-accent:#6651a5;--module-tint:#f4f1fc}
+.p553-dashboard [data-module-kind="requirement"]{--module-accent:#596775;--module-tint:#f0f3f5;border-left-style:dashed!important}
+.p553-dashboard [data-component-key] :is(details[data-component-key],.p553-b3-dossier-site,.p553-bc-price-doc-group){border-left-color:var(--module-accent)}
+.p553-dashboard [data-component-key] :is(details[data-component-key],.p553-b3-dossier-site,.p553-bc-price-doc-group)>summary{background:var(--module-tint);border-color:var(--module-accent)}
+.p553-dashboard [data-component-key] :is(details[data-component-key],.p553-b3-dossier-site,.p553-bc-price-doc-group)>summary::before{color:var(--module-accent)}
+.p553-dashboard [data-component-key] :is(.p553-b3-level-label,.p553-b2-recalc-num,.p553-bc-price-num,.p553-bc-index,.p553-b3-sequence,.p553-b3-rollup-code){color:var(--module-accent)}
+.p553-dashboard [data-component-key] .p55-table-wrap{border-color:color-mix(in srgb,var(--module-accent) 30%,white);min-width:0}
+.p553-dashboard [data-component-key] .p55-table>thead>tr>th,
+.p553-dashboard [data-component-key] .p55-table>tfoot>tr>:is(th,td),
+.p553-dashboard [data-component-key] .p55-table>tbody>tr>th{background:var(--module-tint);color:#20394b;border-color:color-mix(in srgb,var(--module-accent) 25%,white)}
+.p553-dashboard [data-component-key] .p55-table>tbody>tr>td{background:color-mix(in srgb,var(--module-accent) 2%,white);border-color:color-mix(in srgb,var(--module-accent) 22%,white)}
+.p553-dashboard [data-component-key] .p55-table>tbody>tr:nth-child(even)>td{background:color-mix(in srgb,var(--module-accent) 5%,white)}
+.p553-dashboard [data-component-key] .p55-table>tbody>tr:hover>td,
+.p553-dashboard [data-component-key] .p55-table>tbody>tr.p553-module-nav-focus>td{background:var(--module-tint)}
+.p553-dashboard [data-cost-owner]>.p55-table-wrap,
+.p553-dashboard .p553-owner-reference{border-left:4px solid var(--module-accent)}
+.p553-dashboard .p553-owner-reference{margin:10px 0;padding:12px;background:var(--module-tint);border-radius:6px;line-height:1.55}
+.p553-dashboard .p553-owner-reference>strong{color:var(--module-accent)}
+.p553-dashboard .p553-owner-reference p{margin:6px 0}
+.p553-dashboard .p553-owner-reference button{color:var(--module-accent);border-color:var(--module-accent);background:#fff}
+.p553-dashboard .p553-module-colour-guide{padding:10px 12px;border-left:4px solid #526777;background:#f3f6f8}
+/* Internal web preview only; customer/native workbook styling is preserved. */
+.p553-dashboard [data-owner-colours="true"] .p553-customer-table>tbody>tr[data-cost-owner]>td{background:var(--module-tint);border-color:color-mix(in srgb,var(--module-accent) 25%,white)}
+.p553-dashboard [data-owner-colours="true"] .p553-annex-table[data-cost-owner]>thead>tr>th,
+.p553-dashboard [data-owner-colours="true"] .p553-annex-table[data-cost-owner]>tfoot>tr>th{background:var(--module-tint)}
+@media print{.p553-dashboard .p553-module-colour-guide{display:none}}
+
+.p553-dashboard .p553-service-basis{padding:0;margin:10px 0;border-left:4px solid var(--module-accent)}
+.p553-dashboard .p553-service-basis>summary{cursor:pointer;padding:10px;background:var(--module-tint);color:#20394b}
+.p553-dashboard .p553-service-basis>summary small{display:block;margin-top:4px}
+.p553-dashboard .p553-service-basis>:not(summary){margin:10px}
+.p553-dashboard .p553-service-basis .p55-table{min-width:800px}
+.p553-dashboard .p553-service-basis td small{display:block;margin-top:4px}
+
+.p553-dashboard .p553-service-basis .p55-table{width:100%;table-layout:fixed}
+.p553-dashboard .p553-service-basis .p55-table th{width:auto}
+.p553-dashboard .p553-service-rate-row>.p553-service-basis{margin:0}

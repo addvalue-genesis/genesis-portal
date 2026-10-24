@@ -1,3 +1,4 @@
+import {isOnshoreYardDossierModule0553} from "./moduleDeepLink0553";
 // 0553 Project Module Navigator: discover ACTUAL 10.2 working modules from
 // the controlled B/C ownership registry and canonical source contract.
 // Search/route metadata only: no new prices, quantities or approval state.
@@ -130,6 +131,7 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId,keywords
  });
  const b3Entries=[
+  child(b3Id+".resource-price-dossier.yard-onshore-reference","B3 → B9 Onshore Yard reference · no added price"),
   child(b3Id+".worktype-accordion","B3 — Expandable FAT / SAT / Test Equipment / Audit groups"),
   child(b3Id+".fat","B3.1 — FAT Factory Acceptance Test",b3Id+".fat","FAT witness OEM iFAT China"),
   child(b3Id+".sat","B3.2 — BF Site Verification / Zhuhai Fabrication Yard SAT / GF Offshore Commissioning",b3Id+".sat","BF ZPQ ZWP8 ZWP11 GF ZWP20 ZWP21 ZWP22 ZWP23 Yard Offshore RACI"),
@@ -213,6 +215,7 @@ export function buildBcModuleNavigator0553(){
  // Child-level RQM rows need their own exact anchor, not just the visible
  // section parent. Their parent B3/B9 selection is supplied via owner metadata.
  for(const entry of b3Entries){
+  if(isOnshoreYardDossierModule0553(entry.id)){entry.parentOwner="B9";entry.name="B9 Onshore Yard · "+entry.name;}
   const match=req.rows.find(x=>x.moduleId===entry.id);
   if(match){
    entry.anchorModuleId=entry.id;
@@ -220,6 +223,10 @@ export function buildBcModuleNavigator0553(){
   }
  }
  entries.push(...b3Entries);
+ for(const code of ["B3","B9"]){
+  const id="bid.budget.working.bc."+code.toLowerCase()+".service-commercial-basis";
+  entries.push({id,name:code+" — Included days / Extra day / OT / Standby (DRAFT)",tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",anchorModuleId:id,parentOwner:code,keywords:"onshore offshore 28 days 7+2 12 hours overtime standby rate allowance"});
+ }
  entries.push({
   id:"bid.budget.working.bc.b8.integrated-fat-training-7d",
   name:"B8 — Shared seven-day FAT + Training / SOW-B8 / IC-TRN-001 / WS-B8 / CP-B8 reserved",

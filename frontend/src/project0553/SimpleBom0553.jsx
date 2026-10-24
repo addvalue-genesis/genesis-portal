@@ -163,7 +163,7 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
     {!matches.length&&<span role="status">ไม่พบ Module ใน Working Preview สำหรับคำค้นนี้</span>}
    </div>
   </nav>
-  <details ref={el=>{targetRefs.current.mr0002=el;}} className="p55-panel" style={{scrollMarginTop:90}} data-component-key="bid.budget.bom.mr0002">
+  <details ref={el=>{targetRefs.current.mr0002=el;}} className="p55-panel" style={{scrollMarginTop:90}} data-cost-owner="A2" data-component-key="bid.budget.bom.mr0002">
    <summary style={{cursor:"pointer",fontWeight:700,padding:10}}>MR-0002 · DMR Trunk Radio Working BOM — ZWP20 / ZWP21 / ZWP22 · <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.bom.mr0002"/></summary>
    <MR0002WorkingBom0553 fx={fx}/>
   </details>
@@ -262,12 +262,12 @@ export function SimpleBom0553({focusedLocation=null,fx=null,displayCurrency="THB
    <p className="p55-note">Same canonical counted MTO line projection as individual MR views. Equipment/Bulk working cost evidence only; not customer Working Sell. MR0003 includes preliminary scenario evidence. A5 is included in MR0001 and is NOT added again. Unresolved lines are not zero.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
     <thead><tr><th>Part A</th><th>MR</th><th>Counted lines</th><th>Unresolved lines</th><th>Allocated Working THB</th><th>Evidence</th></tr></thead>
-    <tbody>{allMrRows.map(r=><tr key={r.mr}><td>{r.customerLine}</td><td>{r.mr}</td><td>{r.priced}</td><td>{r.unresolved}</td><td className="is-number">{Number.isFinite(r.amount)?thbMoney(r.amount,"THB"):"FX / currency reconciliation required"}</td><td>{r.scenario?"Scenario/reference — NOT APPROVED":"Working ledger — NOT RELEASED"}</td></tr>)}
+    <tbody>{allMrRows.map(r=><tr key={r.mr} data-cost-owner={r.customerLine}><td>{r.customerLine}</td><td>{r.mr}</td><td>{r.priced}</td><td>{r.unresolved}</td><td className="is-number">{Number.isFinite(r.amount)?thbMoney(r.amount,"THB"):"FX / currency reconciliation required"}</td><td>{r.scenario?"Scenario/reference — NOT APPROVED":"Working ledger — NOT RELEASED"}</td></tr>)}
      <tr><td colSpan={4}><strong>TOTAL A1–A4 (known allocated working cost only)</strong></td><td className="is-number"><strong>{Number.isFinite(allMrTotal)?thbMoney(allMrTotal,"THB"):"NOT ESTABLISHED"}</strong></td><td>{allMrUnresolved} unresolved lines · A5 NON-ADDITIVE</td></tr>
     </tbody></table></div>
    <p className="p55-note">FX: {allMrFx??"required"} THB/USD · Source: compareAEquipmentToLocation0553 → selectWorkingBomProjection0553. This partial subtotal is not a complete bid value, and no margin has been applied.</p>
   </section>
-  <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"10.1.1.3 — System × Location × MTO — "+system+" / "+(site==="ALL"?"All Locations":site)} description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification. Context and Filters support this work; they are not approval gates." defaultOpen>
+  <ControlledModuleSection0553 moduleKey="bid.budget.bom.system-location-mto" title={"10.1.1.3 — System × Location × MTO — "+system+" / "+(site==="ALL"?"All Locations":site)} description="Requirement → Function → Quantity → OEM SKU → Cost Allocation → Verification. Context and Filters support this work; they are not approval gates." ownerCode={{"MR-0001":"A1","MR-0002":"A2","MR-0003":"A3","MR-0004":"A4"}[system]} defaultOpen>
   <p className="p55-note"><strong>BULK ownership supplement (read-only):</strong> this separate location-level evidence table does NOT replace the canonical priced Equipment/MTO rows below, the Bulk Master, the A5 source or any B/C cost ledger. MGW complete MR0002 RF installation remains Vendor Scope; ADDVALUE NEK is only an optional reserve candidate.</p>
   <BulkMrLocationCoverage0553 mr={system} site={site} state={bulkState} focusModuleId={navigationTarget}/>
   <BulkSourceToReleaseAudit0553 mr={system} site={site} focusModuleId={navigationTarget}/>

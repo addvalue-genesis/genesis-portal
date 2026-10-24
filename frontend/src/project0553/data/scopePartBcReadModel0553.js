@@ -1,3 +1,4 @@
+import {selectServiceCommercialBasis0553} from "./serviceCommercialBasis0553";
 // 10.5 read-only B/C customer-scope adapter — no independent cost engine.
 // All B/C data must originate in 10.2 selectBcTurnkeyWorkingCost0553.
 // Backward-compatible fields are retained for existing Scope/Workbook components.
@@ -19,6 +20,7 @@ export function selectScopePartBcWorking0553(){
     mgwPurchasedWorkingSellTHB:r.code==="B3"?(r.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB??null):null
    }),amountTHB:r.workingSellTHB, // Legacy name; this is WORKING SELL only, NEVER cost.
    directCostTHB:r.directCostTHB,
+   serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    b3GroupTrace:b3Source?Object.freeze(b3Source.groupRollups.map(g=>Object.freeze({
     id:g.id,sourceModuleId:g.id,groupKey:g.key,name:g.name,
     workingSellTHB:g.selectedWorkingSellTHB,

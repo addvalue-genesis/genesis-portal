@@ -59,7 +59,7 @@ export function ReleaseSourceNavigator0553({model,onOpenSource}){
        const id=sourceId(row);
        const tone=group.part==="a"?"engineering":CATEGORY_COLOR_0553[row.code]||"commercial";
        const navId="bid.budget.pricing.release.source-navigator."+group.part+"."+row.code.toLowerCase();
-       return <tr key={row.code} className={"p553-rsn-row p553-rsn-row--"+tone}>
+       return <tr key={row.code} data-cost-owner={row.code} className={"p553-rsn-row p553-rsn-row--"+tone}>
         <td>
          <details className="p553-rsn-leaf" data-component-key={navId}>
           <summary><strong>{row.code}</strong> {row.mr||row.description||""}</summary>

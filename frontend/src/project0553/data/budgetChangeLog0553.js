@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R38";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R39";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-08",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"สีต่อเนื่องถึงตารางชั้นใน + จัด Yard onshore group.06 ไว้กับ B9",
+  detail:"ใช้สีเจ้าของงบ A/B/C และกลุ่มงานต่อเนื่องถึงหัวตาราง แถว และยอดรวม; ข้อกำหนดที่ไม่ลงราคาใช้เทาประ. ย้ายการแสดง group.06 พร้อม 14 Yard test rows ไปอยู่ B9 onshore และเก็บจุดเชื่อมจาก B3; Module IDs เดิมค้นหาได้และเปิด B9. งบ B9 480550 กับ B3 2322450 คงเดิม; ยังไม่ปิดประเด็นขอบเขตแรงงาน B3 SAT28 กับ B9 จนกว่าจะเทียบกิจกรรม/วัน/RACI. เพิ่มฐาน B9 7+2 วัน และ B3 SAT28 วัน พร้อม day rate จากต้นทาง; offshore OT เกิน12ชั่วโมง ข้อเสนอ OT1.5×/Standby100% ยังไม่เลือกใช้. Release/Scope รับคำอธิบายจากต้นทางเดียวกัน และแสดงตาราง Day/OT/Standby เปิดทันทีใน Release พร้อมป้าย DRAFT/PROPOSED ไม่ใช่เงื่อนไขที่ตกลง; OT onshore รอชั่วโมงปกติ. ยอดราคาและ native workbook คงเดิม.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.06","bid.budget.working.bc.b9.price-trace.work-scope","bid.budget.working.bc"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: extend colours into every nested table; move incorrectly grouped work; Yard is onshore"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-07",date:"2026-10-24",kind:"UI",tone:"navigation",
   title:"B3 สีเดียวกันตลอดกลุ่ม พร้อมป้ายยอดรวม / รายละเอียดงาน / สถานที่",

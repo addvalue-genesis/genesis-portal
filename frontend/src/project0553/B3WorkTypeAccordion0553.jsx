@@ -1,3 +1,4 @@
+import {ServiceCommercialBasis0553} from "./ServiceCommercialBasis0553";
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {B3WorkingSellBreakdown0553} from "./B3WorkingSellBreakdown0553";
@@ -208,11 +209,12 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
     <button type="button" className="p553-detail-button" onClick={()=>expandAll(false)}>− Collapse All</button>
    </div>
   </div>
+  <ServiceCommercialBasis0553 workingRow={workingRow}/>
   <B3ResourcePriceDossier0553 workingRow={workingRow}/>
   <div className="p55-table-wrap p553-b3-table-scroll">
    <table className="p55-table p553-b3-hierarchical-table">
     <thead><tr>{gridColumns.map(name=><th key={name}>{name}</th>)}</tr></thead>
-    <tbody>{model.groups.map(group=><tr key={group.moduleId} className={"p553-b3-master-row p553-b3-master-row--"+group.kind}>
+    <tbody>{model.groups.map(group=><tr key={group.moduleId} data-work-family={{fat:"fat",sat:"sat-commissioning",tools:"tools-reserve"}[group.kind]} className={"p553-b3-master-row p553-b3-master-row--"+group.kind}>
      <td colSpan={gridColumns.length} className="p553-b3-flat-cell">
       <details className={"p553-b3-table-group p553-b3-table-group--"+group.kind}
        data-component-key={group.moduleId} open={group.kind==="fat"||group.kind==="sat"}>

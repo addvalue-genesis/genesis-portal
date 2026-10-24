@@ -147,7 +147,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   const incomingId=String(item?.sourceModuleId||"");
   // What's New and nested financial IDs carry a Module ID but no B/C code field.
   // Resolve the owner from the existing contract Module ID; do not infer from prices.
-  const ownerFromId=incomingId.match(/^bid\.budget\.working\.bc\.(b(?:[1-9]|1[0-4])|c[12])(?:\.|$)/i)?.[1]||"";
+  const ownerFromId=workingOwnerFromModuleId0553(incomingId)||"";
   const code=String(item?.code||ownerFromId).toUpperCase();
   const isBc=/^(?:B(?:[1-9]|1[0-4])|C[12])$/.test(code);
   const id=String(item?.sourceModuleId||
@@ -187,7 +187,15 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   setNavigationFeedback(null);
  };
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
- return <div className="p55-stack" data-component-key="bid.budget">
+ return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
+  const trigger=event.target.closest?.("button[data-open-source-module]");
+  if(!trigger||!event.currentTarget.contains(trigger))return;
+  event.preventDefault();event.stopPropagation();
+  openReleaseSource({sourceModuleId:trigger.dataset.openSourceModule});
+ }}>
+ <p className="p55-note p553-module-colour-guide"><strong>อ่านสีตามกลุ่มงาน:</strong> หัวกลุ่ม → หัวข้อย่อย → หัวตาราง → แถวรายการ → ยอดรวม ใช้สีต่อเนื่อง.
+  ตรวจรหัสเจ้าของงบ A/B/C ควบคู่กับสีเสมอ; กรอบเทาประ “ข้อกำหนด / ไม่ลงราคา” ไม่ใช่งบเพิ่ม และกรอบอ้างอิงใช้สีของหมวดปลายทาง.
+  สีไม่ใช่สถานะอนุมัติราคา.</p>
  <section className="p55-panel" style={{padding:"10px 14px"}}><strong>Budget Workspace</strong> <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget"/><p className="p55-note" style={{marginTop:4}}>ส่วนงานย่อยมีรหัส canonical key กำกับที่หัวข้อ ใช้คัดลอกเพื่อสั่งแก้ไขหรือค้นหาโค้ดได้</p></section>
  <BudgetChangeSummary0553 onOpenModule={openReleaseSource}/>
  <details className="p55-panel" data-component-key="bid.budget.particular-source-gates">

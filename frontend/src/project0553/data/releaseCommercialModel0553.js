@@ -1,3 +1,4 @@
+import {selectServiceCommercialBasis0553} from "./serviceCommercialBasis0553";
 // PJ2608-0553 · 10.3 Customer Release staging model.
 // NEVER mutate 10.1 / 10.2. Never equate Working SELL with direct COST.
 // A/C: cost × (1 + 20% SAMTEL + 5% ADDVALUE + 5% ADDVALUE omission reserve).
@@ -323,6 +324,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    verifiedDirectCostTHB:null
   }))):null;
   return {code:r.code,description:r.requirement,sourceModuleId:r.moduleId,
+   serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    qty:1,unit:"lot",workingSellTHB:r.workingSellTHB,
    customerSellTHB:price?.customerSellTHB??null,
    samTelDeductionTHB:price?.samTelDeductionTHB??null,

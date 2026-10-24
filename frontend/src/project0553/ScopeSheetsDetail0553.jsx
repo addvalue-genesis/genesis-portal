@@ -1,3 +1,4 @@
+import {ServiceCommercialBasis0553} from "./ServiceCommercialBasis0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
@@ -170,7 +171,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
      <thead><tr><th>10.2 Work Type Source</th><th>Working SELL THB</th><th>10.5 Scope Attribution THB</th>
       <th>Execution & Approval / Cost State</th></tr></thead>
-     <tbody>{scopeBC.lines.B3.b3GroupTrace.map(g=><tr key={g.id}>
+     <tbody>{scopeBC.lines.B3.b3GroupTrace.map(g=><tr key={g.id} data-work-family={g.id.split(".").pop()}>
       <td><strong>{g.name}</strong><small>{g.sourceModuleId}</small></td>
       <td>{cash(g.workingSellTHB)}</td><td>{cash(g.scopeWorkingSellAttributionTHB)}</td>
       <td>{g.status}<small>{g.approvalGate}</small><small>Direct Cost NOT ESTABLISHED · no independent customer line</small></td>
@@ -194,7 +195,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
    const shownAmount=amount;
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
     currentRows?"1 LS ("+currentRows.length+" current Annex rows)":hasChild?"1 LS (Rev08: "+childSource.quantity+" unverified historical item rows)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
-   return <tr key={id}><td>{audited?<button type="button" className="p553-detail-button" onClick={()=>setSheet(SHEETS.find(row=>row[1]===id)[0])}>{id} — View Details</button>:id}</td><td>{desc}</td><td>{qtyDisplay}</td>
+   return <tr key={id} data-cost-owner={id}><td>{audited?<button type="button" className="p553-detail-button" onClick={()=>setSheet(SHEETS.find(row=>row[1]===id)[0])}>{id} — View Details</button>:id}</td><td>{desc}{control?.serviceCommercialBasis&&<ServiceCommercialBasis0553 basis={control.serviceCommercialBasis}/>}</td><td>{qtyDisplay}</td>
     <td className="is-number">{currentRows&&id.startsWith("C")?"NOT QUOTED":id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
     <td className="is-number">{currentRows&&id.startsWith("C")?"NOT QUOTED":id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
     <td className="is-number">{audited?cash(audited.historicalReferenceTHB):"—"}<small>{audited?"Rev08 HISTORICAL ONLY — not additive":""}</small></td>

@@ -1,3 +1,4 @@
+import {ServiceCommercialBasis0553} from "./ServiceCommercialBasis0553";
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {B3B8SevenDayAllocation0553} from "./B3B8SevenDayAllocation0553";
@@ -8,6 +9,8 @@ import {B2WorkingPriceOverview0553} from "./B2WorkingPriceOverview0553";
 import {B2IndependentVdrlRecalculation0553} from "./B2IndependentVdrlRecalculation0553";
 import {selectBcB5HistoricalPriceBridge0553} from "./data/bcB5HistoricalPriceBridge0553";
 import {B5B6B7LinkedLogistics0553} from "./B5B6B7LinkedLogistics0553";
+import {B3DossierStage0553} from "./B3ResourcePriceDossier0553";
+import {selectB3ResourcePriceDossier0553} from "./data/b3ResourcePriceDossier0553";
 import {selectB9YardWorkScopeDossier0553} from "./data/b9YardWorkScopeDossier0553";
 
 // 10.2 owner-local READ ONLY price evidence for B2/B4–B9.
@@ -245,7 +248,9 @@ function Pricing({row}){
 // B9.2 Pricing. All child groups are attribution ONLY, not fresh ledger entries.
 function B9YardWorkScopeDossier0553({workingRow}){
  const model=selectB9YardWorkScopeDossier0553(workingRow);
+ const requirementModel=selectB3ResourcePriceDossier0553(selectBcTurnkeyWorkingCost0553().byCode.B3);
  return <div className="p553-b9-work-scope-dossier">
+  <ServiceCommercialBasis0553 workingRow={workingRow}/>
   <div className="p55-metric-grid">
    <div><strong>Selected B9 Working SELL · 1 LS</strong>
     <p>{fmt(model.selectedWorkingSellTHB)}</p>
@@ -265,6 +270,15 @@ function B9YardWorkScopeDossier0553({workingRow}){
    {" "}Site ZWP20/21/22/23 and MR0001–0004 are technical coverage,
    <strong> not four separately priced field visits or eight new customer rows</strong>.
    {" "}GF Yard SAT crew, ITP and RACI remain to be approved.</p>
+  <aside className="p553-owner-reference" data-module-kind="requirement">
+   <strong>ข้อกำหนด Yard SAT อ้างอิงจาก B3 group.06 — ไม่ใช่งบเพิ่มอีกก้อน</strong>
+   <p>B9 เป็นเจ้าของงบทีม Senior + Field และค่าเดินทางชุดนี้ครั้งเดียว.
+    รายการทดสอบ 14 รายการใน group.06 ยังไม่มีราคาแยก;
+    ต้องเทียบ B3 SAT 28 วันกับ B9 ตามกิจกรรม/วัน/RACI ก่อนปิดประเด็นแรงงานทับซ้อน.</p>
+   <button type="button" className="p553-detail-button" data-open-source-module={model.b3RequirementModuleId}>↧ เปิดข้อกำหนด Onshore Yard — group.06</button>
+  </aside>
+  <B3DossierStage0553 model={requirementModel} i={5} rollup={{name:"B9 · ONSHORE JUTAL Yard / Requirement reference"}}/>
+  <p className="p55-note"><button type="button" className="p553-detail-button" data-open-source-module="bid.budget.working.bc.b3.resource-price-dossier.yard-onshore-reference">↗ กลับ B3 — จุดอ้างอิง Yard</button></p>
   {model.groups.map((g,i)=><details key={g.id}
    className={"p553-bc-price-doc-group p553-b9-dossier-group p553-b9-dossier-group--"+g.key}
    data-component-key={g.id} open={i===0}>
