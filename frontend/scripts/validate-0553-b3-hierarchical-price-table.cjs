@@ -106,4 +106,4 @@ for(const row of m.groups){
   "Navigator missing child "+child.moduleId);
 }
 assert.equal(JSON.stringify(working()),snapshot,"B3 price summary UI changed 10.2 sources");
-console.log("PASS 0553 b3-hierarchical-price-table: current-source checks passed; B3 2,322,450.00 / Part B 4,757,207.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 b3-hierarchical-price-table: current-source checks passed; B3 2,322,450.00 / Part B 4,994,787.13; no selected MGW FAT services; historical evidence nonposting.");

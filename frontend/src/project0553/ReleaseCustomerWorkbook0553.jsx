@@ -231,6 +231,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         const line=bLines.find(r=>r.code===id);
         return <React.Fragment key={id}><tr data-cost-owner={id}><td><strong>{id}</strong></td>
          <td colSpan={3}>{id==="B6"?line?.description:parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}
+          {line?.executionActivities&&<small className="p553-release-activity-text">{line.executionActivities.releaseText}</small>}
           {line?.serviceCommercialBasis&&<ServiceCommercialBasis0553 basis={line.serviceCommercialBasis} compact/>}
          </td>
          <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>

@@ -101,4 +101,4 @@ assert(quoted.includes('"SOW-"+item.code')&&quoted.includes('" WS-"+item.code')&
 assert.equal(current().byCode.B3.workingSellTHB,2322450);
 assert.equal(current().byCode.B8.workingSellTHB,142550);
 assert.equal(JSON.stringify(current()),snapshot);
-console.log("PASS 0553 b3-b8-seven-day-identity: current-source checks passed; B3 2,322,450.00 / Part B 4,757,207.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 b3-b8-seven-day-identity: current-source checks passed; B3 2,322,450.00 / Part B 4,994,787.13; no selected MGW FAT services; historical evidence nonposting.");

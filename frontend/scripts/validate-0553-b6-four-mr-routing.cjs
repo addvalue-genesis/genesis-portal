@@ -40,7 +40,7 @@ const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
 const currentSpareDelta=Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
  sum+source.byCode[code].workingSellTHB-old,0);
 assert.equal(Math.round(currentSpareDelta*100),44034531);
-assert.equal(source.knownWorkingSellTHB,4757207.13);
+assert.equal(source.knownWorkingSellTHB,4994787.13);
 assert.equal(source.byCode.B3.workingSellTHB,2322450);
 assert.equal(source.byCode.B9.workingSellTHB,480550);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit
@@ -51,7 +51,7 @@ assert.equal(
  source.knownWorkingSellTHB+
  (historicalB3ScenarioTHB-source.byCode.B3.workingSellTHB)+
  (historicalB9WorkingSellTHB-source.byCode.B9.workingSellTHB)-
- (source.byCode.B8.workingSellTHB-30000)-currentSpareDelta, // B8 and current spare deltas excluded from historical bridge
+ (source.byCode.B8.workingSellTHB-30000)-currentSpareDelta-(source.byCode.B1.workingSellTHB-211600)-(source.byCode.B6.workingSellTHB-307584), // B8 and current spare deltas excluded from historical bridge
  historicalScenarioPartBTHB
 );
 // Compare integer satang to avoid IEEE-754 drift (e.g. 4032636.8200000003).
@@ -60,16 +60,16 @@ assert.equal(
   source.knownWorkingSellTHB-
   (source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB)-
   (source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB)-
-  (source.byCode.B8.workingSellTHB-30000)-currentSpareDelta
+  (source.byCode.B8.workingSellTHB-30000)-currentSpareDelta-(source.byCode.B1.workingSellTHB-211600)-(source.byCode.B6.workingSellTHB-307584)
  )),
  403263682
 );
-assert.equal(source.byCode.B6.workingSellTHB,307584);
-assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,307584);
-assert.equal(scope.lines.B6.workingSellTHB,307584);
+assert.equal(source.byCode.B6.workingSellTHB,335584);
+assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,335584);
+assert.equal(scope.lines.B6.workingSellTHB,335584);
 assert.equal(source.byCode.B6.directCostTHB,null);
 assert.equal(m.moduleId,"bid.budget.working.bc.b6");
-assert.equal(m.selectedB6WorkingSellTHB,307584);
+assert.equal(m.selectedB6WorkingSellTHB,335584);
 assert.equal(m.nextg.quoteNumber,ng.quoteNumber);
 assert.equal(m.nextg.quotedTotalUSD,191610.15);
 assert.equal(m.nextg.quotedDeliveryTerm,"DAP Ranong, Thailand");
@@ -140,4 +140,4 @@ assert(!view.includes("antennas direct to JUTAL only if"));
 assert(!view.includes("MR0001 direct China PRICE CONFIRMED"));
 assert(babel.transformSync(view,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
-console.log("PASS 0553 B6 ADR68 owner-approved routing: NextG 4 IDU/4 ODU/5 antennas direct MGW, Thai 4 Enclosure+Cisco preassembly to MGW; vendor quote re-route pending, B6 price THB307584 invariant, MGW freight no duplicate, Release HOLD.");
+console.log("PASS 0553 B6 ADR68 owner-approved routing: NextG 4 IDU/4 ODU/5 antennas direct MGW, Thai 4 Enclosure+Cisco preassembly to MGW; vendor quote re-route pending, B6 price THB335584 invariant, MGW freight no duplicate, Release HOLD.");

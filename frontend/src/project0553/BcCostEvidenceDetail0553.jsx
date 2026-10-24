@@ -1,3 +1,4 @@
+import {BcExecutionActivities0553} from "./BcExecutionActivities0553";
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectBcWorkCostLines0553} from "./data/bcWorkCostLines0553";
@@ -100,7 +101,7 @@ function B1IndirectExpenseRegister0553({workingRow}){
    <div><strong>NEW Canonical B1 Working Sell</strong><p>{cash(workingRow.workingSellTHB)}</p><small>New B1.1–B1.8 role-based THB estimate only; old Engineering/PM prices excluded</small></div>
    <div><strong>New B1 Support Working Cost (planning)</strong><p>{cash(workingRow.b1SupportPlanningBudget?.baseWorkingCostTHB)}</p><small>Seven roles + B1.2–B1.8 expenses; NOT verified Direct Cost</small></div>
    <div><strong>Engineering Ownership Review (UNPRICED)</strong><p>{workingRow.b1SupportPlanningBudget?.engineeringScopeReview.length||0} items</p><small>Only distinct ADDVALUE technical engineering may later enter B1 after checking B2/OEM</small></div>
-   <div><strong>Conditional B1 Allowances (SELL)</strong><p>{cash(workingRow.b1SupportPlanningBudget?.conditionalWorkingSellTHB)}</p><small>Legal consultant / statutory permits excluded from Base</small></div>
+   <div><strong>Conditional B1 Allowances (SELL)</strong><p>{cash(workingRow.b1SupportPlanningBudget?.conditionalWorkingSellTHB)}</p><small>Old conditional package superseded; current Myanmar services/fees/reserves included once</small></div>
    <div><strong>B1 source expense objects</strong><p>{ledger.b1.length}</p><small>{ledger.unpricedB1} awaiting cost evidence</small></div>
    <div><strong>Other-owner expense objects</strong><p>{ledger.outside.length}</p><small>Reference only; cannot post into B1</small></div>
    <div><strong>Who/Where/How mapped</strong><p>{ledger.roleMappedCount}/{ledger.rows.length}</p><small>Mapped is not an approved RACI or priced budget</small></div>
@@ -139,19 +140,19 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
     <colgroup><col style={{width:"78%"}}/><col style={{width:"11%"}}/><col style={{width:"11%"}}/></colgroup>
     <thead><tr><th>ประเภทงาน</th><th style={{textAlign:"center"}}>B1</th><th style={{textAlign:"center"}}>B2</th></tr></thead>
     <tbody>{[
-     ["Engineering Design / Technical Review","B1"],
+     ["Residual System Engineering / Interfaces (exclude priced B2 reviews)","B1"],
      ["Technical License Documentation (technical content)","B1"],
      ["Admin Office / Project Coordination","B1"],
      ["Import / Operating License Coordination","B1"],
      ["Permit Application / Official Fees (lawful, evidence required)","B1"],
      ["Visa / Work Permit / Local Consultant (non-duplicated scope)","B1"],
-     ["VDRL / VDRS / Transmittal","B2"],
+     ["VDRL Technical Authoring / Review / VDRS / Transmittal","B2"],
      ["Document Revision / Final Dossier (document control)","B2"]
     ].map(([name,owner])=><tr key={name}><td>{name}</td>{["B1","B2"].map(code=><td key={code} style={{textAlign:"center",fontWeight:700,color:owner===code?"#15803d":undefined}}>{owner===code?"✓":"—"}</td>)}</tr>)}</tbody>
    </table></div>
    <details style={{marginTop:12}}><summary>รายละเอียดขอบเขตและการป้องกันคิดราคาซ้ำ</summary>
-    <p className="p55-note">B1 เป็นเจ้าของงานตรวจเนื้อหาทางเทคนิคและการประสานงานโครงการ รวมถึง Regulatory/Permit support เมื่อมีหลักฐานค่าใช้จ่าย ส่วน B2 จัดการเอกสาร VDRL, transmittal, revision tracking และ final dossier ไม่คิดค่าจัดทำเนื้อหาทางเทคนิคซ้ำ</p>
-    <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; Offshore SAT/SIT execution อยู่ B3; SAMTEL Warehouse FAT Witness อยู่ B3 และเฉพาะ Conditional Yard Senior Engineer + Field Technician อยู่ B9; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยค่าใช้จ่ายที่ปรึกษาและค่าธรรมเนียมราชการที่มีเงื่อนไขยังไม่รวมใน B1 Base และราคา Engineering WBS เก่าถูกตัดจาก B1</p>
+    <p className="p55-note">B1 รับงานวิศวกรรมและ Interface ส่วนที่ไม่รวมใน A/B2 พร้อม PMO และใบอนุญาตเมียนมา; B2 รวมผู้จัดทำ/ตรวจเอกสารตาม VDRL ที่ตั้ง MH ไว้แล้ว รวม transmittal, revision tracking และ final dossier จึงต้องตรวจราย deliverable ก่อนเพิ่มงาน B1</p>
+    <p className="p55-note">Detailed equipment design อยู่กับ OEM/Part A; Offshore SAT/SIT execution อยู่ B3; SAMTEL Warehouse FAT Witness อยู่ B3 และเฉพาะ Conditional Yard Senior Engineer + Field Technician อยู่ B9; customs brokerage และ freight อยู่ B6; งานหรือ Man-hours ที่เกิดขึ้นในหลายหมวดต้องระบุ owner เดียวก่อนรวมราคา โดยแพ็กเกจบริษัทเมียนมา ค่าธรรมเนียมเผื่อ และเงินเผื่ออนุมัติเพิ่มเติมรวมใน B1 Base ใหม่ครั้งเดียว และราคา Engineering WBS เก่าถูกตัดจาก B1</p>
    </details>
   </section>}
   {e.code!=="B1"&&<>
@@ -208,6 +209,7 @@ export function BcCostEvidenceDetail0553({workingRow,navigationTarget=null}){
    </React.Fragment>}/>
  ):null;
  return <section className="p55-panel p553-bc-evidence" data-cost-owner={e.code} data-component-key={e.moduleId+".cost-evidence"} style={{padding:"14px",marginTop:12}}>
+  <BcExecutionActivities0553 row={workingRow}/>
   <div className="p55-eyebrow">10.2 / EVIDENCE-TO-COST TRACE — WORKING ONLY</div>
   <h3>{e.code} — {workingRow.requirement}</h3>
   <BcFinancialIdentityMatrix0553 workingRow={workingRow}/>

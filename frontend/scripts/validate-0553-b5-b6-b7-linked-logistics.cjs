@@ -37,8 +37,8 @@ assert.equal(m.rowsByCode.B5.length,7);
 assert.equal(m.rowsByCode.B6.length,8);
 assert.equal(m.rowsByCode.B7.length,3);
 assert.equal(m.rows.length,18);
-assert.equal(m.selectedThreeOwnerWorkingSellTHB,648768);
-assert.deepEqual(Object.values(m.selectedWorkingSellByCode),[311184,307584,30000]);
+assert.equal(m.selectedThreeOwnerWorkingSellTHB,676768);
+assert.deepEqual(Object.values(m.selectedWorkingSellByCode),[311184,335584,30000]);
 const navIds=new Set(navigator().map(x=>x.id));
 for(const code of ["B5","B6","B7"]){
  const rows=m.rowsByCode[code],expected=m.selectedWorkingSellByCode[code];
@@ -68,10 +68,10 @@ assert.equal(m.rowsByCode.B5.find(x=>x.id==="MGW-SERV3-PACK").supplierQuoteTHBRe
 assert.equal(m.rowsByCode.B6.find(x=>x.id==="B6-MGW-JUTAL-OUT").supplierQuoteTHBReference,null);
 assert.equal(m.rowsByCode.B7.find(x=>x.id==="MGW-WORKSHOP-FREE-3MO").contractFreeMonths,3);
 assert.equal(m.rowsByCode.B7.find(x=>x.id==="CONDITIONAL-ONE-MONTH").selectedReserveWorkingSellTHB,30000);
-assert.equal(bc.knownWorkingSellTHB,4757207.13);
+assert.equal(bc.knownWorkingSellTHB,4994787.13);
 assert.equal(JSON.stringify(current()),before,"Source-to-release link must never mutate canonical SELL");
 const ui=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 assert(ui.includes('<B5B6B7LinkedLogistics0553 workingRow={workingRow}/>'));
 const legacy=fs.readFileSync(path.join(root,"project0553/B5EquationAudit0553.jsx"),"utf8");
 assert(legacy.includes("LEGACY METHOD AUDIT ONLY"));
-console.log("PASS B5/B6/B7 ADR-68 linked logistics: 16 source work-scope lines (7/6/3), TH 4 cabinet sets, NextG 4 IDU/4 ODU/5 antennas, MGW iFAT, SERV-3 USD500 and SERV-5 USD2500 references, B7 3mo free gate; 10.2→10.3 WS 311184/307584/30000 unchanged, no direct COST/posting, 16 unique Navigator/SSR IDs.");
+console.log("PASS B5/B6/B7 ADR-68 linked logistics: 16 source work-scope lines (7/6/3), TH 4 cabinet sets, NextG 4 IDU/4 ODU/5 antennas, MGW iFAT, SERV-3 USD500 and SERV-5 USD2500 references, B7 3mo free gate; 10.2→10.3 WS 311184/335584/30000 unchanged, no direct COST/posting, 16 unique Navigator/SSR IDs.");

@@ -72,3 +72,13 @@
 .p553-dashboard :is(.p55-panel,details,summary){overflow-wrap:anywhere}
 .p553-dashboard .gns-copy-id{min-width:0;max-width:100%;flex-wrap:wrap}
 .p553-dashboard .gns-copy-id code{white-space:normal;overflow-wrap:anywhere}
+
+/* B1 purpose groups retain account IDs and inherit colour through nested tables. */
+.p553-b1-purpose {border:1px solid #9cb9ce;border-left:5px solid #37749c;border-radius:6px;padding:10px;margin:12px 0;min-width:0;background:#f4f9fd;}
+.p553-b1-purpose--myanmar {border-color:#4d9b86;background:#f0faf6;}
+.p553-b1-purpose>summary {cursor:pointer;padding:6px;overflow-wrap:anywhere;}
+.p553-b1-purpose--myanmar .p55-table th {background:#dbeee5;}
+.p553-b1-purpose--myanmar .p55-table tbody tr {background:#f6fcf9;}
+.p553-release-activity-text {display:block;white-space:normal;overflow-wrap:anywhere;margin-top:4px;}
+
+.p553-dashboard .p553-b1-purpose--myanmar {--module-accent:#26775e;--module-tint:#e7f4ee;}

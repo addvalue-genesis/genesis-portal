@@ -7,6 +7,7 @@
 // not ADDVALUE payroll. 22 workdays x 8h, 20% employer-cost loading;
 // 20% target gross margin on labor; 10% handling uplift on non-labor.
 // K groups are unique events (K03-07 and K08-11 shared); physical B2/B3/B5/B6/B9 excluded.
+import {IMPORT_OPERATIONAL_BUDGET_0553,selectImportOperationalBudget0553} from "./importOperationalBudget0553";
 import {selectB1RevKMilestoneCoverage0553} from "./b1RevKMilestoneCoverage0553";
 import {B1_WBS_ACTIVITIES} from "./bcWorkCostLines0553";
 const roundB1Support0553=n=>Math.round((n+Number.EPSILON)*100)/100;
@@ -42,9 +43,7 @@ const NON_LABOR=Object.freeze([
  {id:"B1-EXP-HOTEL",account:"B1.3",wbs:"K02,K13,K18",activity:"Management accommodation for distinct commercial trips",qty:6,unit:"room-night",unitCostTHB:2800,conditional:false,gate:"Trip IDs, room-night itinerary; no B3/B9 duplicates"},
  {id:"B1-EXP-LOCAL",account:"B1.3",wbs:"K02,K13,K18",activity:"Management local transport / airport transfer",qty:2,unit:"trip",unitCostTHB:4000,conditional:false,gate:"Management commercial trip only"},
  {id:"B1-EXP-OFFICE",account:"B1.4",wbs:"K00–K18",activity:"Project-assigned telecom/office/printing/communication allowance",qty:6,unit:"planning month",unitCostTHB:2500,conditional:false,gate:"Six months is a budget assumption, NOT a confirmed project duration or duplicated loaded rate"},
- {id:"B1-EXP-FILING",account:"B1.5",wbs:"K02,K13,K15",activity:"Permit file translation / courier / administrative application preparation",qty:4,unit:"file",unitCostTHB:1800,conditional:false,gate:"Exclude customs broker freight in B6; no statutory charges here"},
- {id:"B1-EXP-LEGAL",account:"B1.6",wbs:"K02,K13,K15",activity:"Licensed local legal / consultant filing service allowance",qty:1,unit:"LS",unitCostTHB:35000,conditional:true,gate:"Only if ADDVALUE is payer; written engagement, deliverable, due diligence and invoice"},
- {id:"B1-EXP-GOV",account:"B1.7",wbs:"K13,K15",activity:"Official published statutory licensing / permit fee allowance",qty:2,unit:"application",unitCostTHB:6000,conditional:true,gate:"Only where legally payable by ADDVALUE; authority fee schedule and official receipt"},
+ ...IMPORT_OPERATIONAL_BUDGET_0553.myanmarLines.map(x=>({...x,wbs:"K02,K13,K15",conditional:false})),
  {id:"B1-EXP-MISC",account:"B1.8",wbs:"K00–K18",activity:"Documented small project expenses not allocated to A/B2–B14",qty:1,unit:"LS",unitCostTHB:8000,conditional:false,gate:"Evidence required and uniqueness check against office and travel allowances"}
 ]);
 const ACCOUNTS=Object.freeze([
@@ -53,8 +52,8 @@ const ACCOUNTS=Object.freeze([
  ["B1.3","Management Travel & Accommodation"],
  ["B1.4","Project Administration, Procurement & Finance"],
  ["B1.5","Regulatory / Permit Coordination"],
- ["B1.6","Legal & Local Consultant Services (conditional)"],
- ["B1.7","Official Licence / Permit Fees (conditional)"],
+ ["B1.6","Myanmar Company Services & Approval Reserves"],
+ ["B1.7","Myanmar Government Fees & Charges — allowance"],
  ["B1.8","Miscellaneous Project Expenses"]
 ]);
 export function selectB1ProjectSupportBudget0553(){
@@ -88,7 +87,7 @@ export function selectB1ProjectSupportBudget0553(){
  const roleLines=milestones.flatMap(x=>x.rows);
  const expenseLines=NON_LABOR.map(x=>Object.freeze({...x,costOwner:"B1",role:"EXTERNAL_OR_ALLOWANCE",
   workingCostTHB:roundB1Support0553(x.qty*x.unitCostTHB),
-  workingSellTHB:roundB1Support0553(x.qty*x.unitCostTHB*expenseSellFactor),
+  workingSellTHB:roundB1Support0553(x.qty*x.unitCostTHB*(x.sellFactor??expenseSellFactor)),
   directCostTHB:null,workingCostClass:"PLANNING_PROJECT_EXPENSE_NOT_VERIFIED",
   verification:x.gate}));
  const engineeringScopeReview=Object.freeze(B1_WBS_ACTIVITIES.map(([group,activity],i)=>{
@@ -97,14 +96,14 @@ export function selectB1ProjectSupportBudget0553(){
   const lower=activity.toLowerCase();
   const isTest=lower.includes("test technical content");
   const isVdrl=lower.includes("ga /")||lower.includes("ifc /")||lower.includes("internal check / revision");
-  const status=isTest?"B3_ITP_TEST_PREPARATION_NOT_B1":
+  const status=isTest?"B2_PROCEDURE_REPORT_AND_B3_EXECUTION_SPLIT":
    isVdrl?"B2_VDRL_OR_OEM_DRAWING_HOLD":
    "B1_TECHNICAL_ENGINEERING_SCOPE_REVIEW_PENDING_ADDVALUE_RACI";
   return Object.freeze({id,group,activity,source:"Rev05 engineering activity TITLE only / MR/BOD/DTS review",
-   proposedOwner:isTest?"B3":isVdrl?"B2_OR_A_OEM":"B1_CANDIDATE",
+   proposedOwner:isTest?"B2/B3":isVdrl?"B2_OR_A_OEM":"B1_CANDIDATE",
    status,ownerVerified:false,nonDuplicateApproval:false,
    quantityMH:null,workingCostTHB:null,workingSellTHB:null,directCostTHB:null,
-   postingAllowed:false,gate:"Compare deliverable, TAG, MGW Part A inclusion and B2 VDRL + B3 test ownership before fresh B1 rate/MH pricing"});
+   postingAllowed:false,gate:"Compare deliverable, TAG, supplier equipment inclusion (MGW equipment only) and B2 VDRL + B3 test ownership before fresh B1 rate/MH pricing"});
  }));
  const lines=Object.freeze([...roleLines,...expenseLines]);
  const labourHours=roleLines.reduce((n,x)=>n+x.qty,0);
@@ -127,11 +126,16 @@ export function selectB1ProjectSupportBudget0553(){
    conditionalWorkingCostTHB:roundB1Support0553(rows.filter(x=>x.conditional).reduce((n,x)=>n+x.workingCostTHB,0)),
    conditionalWorkingSellTHB:roundB1Support0553(rows.filter(x=>x.conditional).reduce((n,x)=>n+x.workingSellTHB,0))});
  }));
+ const displayGroups=Object.freeze([
+  {id:"pmo",label:"ADDVALUE Engineering & PMO",accounts:["B1.1","B1.2","B1.3","B1.4","B1.8"]},
+  {id:"myanmar",label:"Myanmar Import & Operational Licensing",accounts:["B1.5","B1.6","B1.7"]}
+ ].map(g=>({...g,baseWorkingCostTHB:roundB1Support0553(byAccount.filter(a=>g.accounts.includes(a.account)).reduce((n,a)=>n+a.baseWorkingCostTHB,0)),
+  baseWorkingSellTHB:roundB1Support0553(byAccount.filter(a=>g.accounts.includes(a.account)).reduce((n,a)=>n+a.baseWorkingSellTHB,0))})));
  const unique=new Set(lines.map(x=>x.id));
  if(unique.size!==lines.length||milestones.length!==19||labourHours!==242 ||
-  Math.abs(labourWorkingCostTHB-80400)>0.01 || baseExpenseWorkingCostTHB!==101000 ||
-  conditionalWorkingCostTHB!==47000 || baseWorkingSellTHB!==211600 ||
-  conditionalWorkingSellTHB!==51700)throw Error("B1 role/activity scenario arithmetic or unique owner mismatch");
+  Math.abs(labourWorkingCostTHB-80400)>0.01 || baseExpenseWorkingCostTHB!==293800 ||
+  conditionalWorkingCostTHB!==0 || baseWorkingSellTHB!==421180 ||
+  conditionalWorkingSellTHB!==0)throw Error("B1 role/activity scenario arithmetic or unique owner mismatch");
  if(roleLines.some(x=>x.wbs!=="K00"&&!coverage.rows.some(s=>s.stage===x.wbs&&s.chargeableHere)))
   throw Error("B1 support charged to duplicated K shared gate");
  return Object.freeze({
@@ -139,7 +143,8 @@ export function selectB1ProjectSupportBudget0553(){
   costOwner:"B1",category:"INTERNAL_RESIDUAL_PROJECT_SUPPORT_NOT_CUSTOMER_SCOPE_RENAME",
   customerB1Description:"Engineering and design / 1 Lot — ORIGINAL CUSTOMER SCOPE UNCHANGED",
   pricingStatus:"MANAGEMENT_REQUESTED_ROLE_BASED_WORKING_BUDGET__CANONICAL_B1_NO_LEGACY_PRICE",
-  accounts:byAccount,milestones,lines,roleLines,expenseLines,roleRates:B1_SUPPORT_ROLE_RATES_0553,
+  accounts:byAccount,displayGroups,importOperationalBudget:selectImportOperationalBudget0553(),
+  supersededExpenses:Object.freeze([{id:"B1-EXP-FILING",costTHB:7200,sellTHB:7920,reason:"Included in Myanmar agency package"},{id:"B1-EXP-LEGAL",costTHB:35000,sellTHB:38500,reason:"Old conditional allowance superseded, not credited from base"},{id:"B1-EXP-GOV",costTHB:12000,sellTHB:13200,reason:"Old conditional allowance superseded, not credited from base"}]),milestones,lines,roleLines,expenseLines,roleRates:B1_SUPPORT_ROLE_RATES_0553,
   uniqueKChargeEvents:12,coveredMilestones:19,labourHours,
   employerLoadFactor:load,workHoursPerMonth:workingHoursPerMonth,
   laborGrossMarginTarget:0.20,expenseHandlingSellFactor:expenseSellFactor,
@@ -153,7 +158,7 @@ export function selectB1ProjectSupportBudget0553(){
   historicalEngineeringCarryForwardTHB:0,
   historicalPmCarryForwardTHB:0,
   actualDirectCostTHB:null,customerReleasedSellTHB:null,postingAllowed:false,
-  policy:"No USD600 office-admin rate; support is role-based THB; no double posting with existing A/B2–B14; conditional legal/permit fees excluded from base; no unverified cost becomes Actual Direct Cost",
+  policy:"No USD600 office-admin rate; support is role-based THB; no double posting with existing A/B2–B14; Myanmar service/fee/reserve package included once; official fee allowance no uplift; old filing and conditional package superseded; no unverified cost becomes Actual Direct Cost",
   evidence:"Rev.K K00–K18; MGW/JUTAL/ZPQ/ZWP SAT coordination; Thailand 2026 salary benchmarks; management provisional trip/transaction allowances"
  });
 }

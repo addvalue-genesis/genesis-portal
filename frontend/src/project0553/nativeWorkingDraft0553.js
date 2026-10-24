@@ -256,12 +256,13 @@ export async function buildNativeWorkingDraft0553(file,model){
  }
  // Current commercial wording comes from the same B6 source as Working/Release.
  // The original template remains unchanged; do not re-export its superseded DDP heading.
- for(const code of ["B3","B9"]){
-  const line=bc.find(x=>x.code===code),cell="B"+(23+Number(code.slice(1)));
-  if(line?.serviceCommercialBasis?.compactText)write(scope,cell,(sourceText(cell).split(/\r?\nIncluded (?:SAT|Yard support):/)[0]||line.description)+"\n"+line.serviceCommercialBasis.compactText);
+ for(const line of bc){
+  const cell="B"+(23+Number(line.code.slice(1)));
+  const original=sourceText(cell).split(/\r?\n(?:Activities:|Included (?:SAT|Yard support):)/)[0]||line.description;
+  const heading=line.code==="B6"?line.description:original;
+  const notes=[line.executionActivities?.releaseText?"Activities: "+line.executionActivities.releaseText:null,line.serviceCommercialBasis?.compactText].filter(Boolean);
+  if(notes.length||line.code==="B6")write(scope,cell,[heading,...notes].join("\n"));
  }
- const b6=bc.find(x=>x.code==="B6");
- if(b6?.description)write(scope,"B29",b6.description);
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
  for(const row of [41,42]){
   write(scope,"F"+row,"NOT QUOTED");

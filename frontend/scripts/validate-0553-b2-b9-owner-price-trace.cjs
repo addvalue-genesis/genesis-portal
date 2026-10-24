@@ -32,7 +32,7 @@ assert.equal(bc.byCode.B9.workingSellTHB,480550);
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,480550);
 assert.equal(bc.byCode.B8.workingSellTHB,142550);
 assert.equal(bc.byCode.B8.qtyDriver,1);
-assert.equal(bc.byCode.B6.b6FourMrRoutingEvidence.dapCommercialPlanning.workingSellTHB,307584);
+assert.equal(bc.byCode.B6.b6FourMrRoutingEvidence.dapCommercialPlanning.workingSellTHB,335584);
 assert.equal(bc.byCode.B6.b6FourMrRoutingEvidence.dapCommercialPlanning.jutalApprovedDAPDeviation,false);
 assert.equal(bc.byCode.B8.b8FourSystemHybridTraining.rfiRaconPracticalTrainingAllowanceTHB,0);
 assert.equal(bc.byCode.B5.workingSellTHB,311184);

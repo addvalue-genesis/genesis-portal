@@ -324,6 +324,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    verifiedDirectCostTHB:null
   }))):null;
   return {code:r.code,description:r.requirement,sourceModuleId:r.moduleId,
+   executionActivities:r.executionActivities,
    serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    qty:1,unit:"lot",workingSellTHB:r.workingSellTHB,
    customerSellTHB:price?.customerSellTHB??null,

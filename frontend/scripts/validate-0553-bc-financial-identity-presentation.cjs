@@ -23,7 +23,7 @@ const {buildBcModuleNavigator0553:registry}=from("data/bcModuleNavigator0553.js"
 const codes=["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"];
 const source=working(),snap=JSON.stringify(source),sc=scope(),price=release();
 assert.equal(source.rows.length,16);
-assert.equal(source.knownWorkingSellTHB,4757207.13);
+assert.equal(source.knownWorkingSellTHB,4994787.13);
 assert.equal(source.byCode.B3.workingSellTHB,2322450);
 assert.equal(price.b.find(r=>r.code==="B3").customerSellTHB,2322450);
 assert.equal(price.approval.releaseAllowed,false);
@@ -72,4 +72,4 @@ assert.equal(price.b.find(x=>x.code==="B3").samTelDeductionTHB,116122.5);
 assert.equal(price.b.find(x=>x.code==="B3").samTelPurchased20PctCostShareTHB,0);
 assert.equal(price.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,116122.5);
 assert.equal(JSON.stringify(working()),snap,"Presentation must never mutate canonical B/C ledger");
-console.log("PASS 0553 bc-financial-identity-presentation: current-source checks passed; B3 2,322,450.00 / Part B 4,757,207.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 bc-financial-identity-presentation: current-source checks passed; B3 2,322,450.00 / Part B 4,994,787.13; no selected MGW FAT services; historical evidence nonposting.");

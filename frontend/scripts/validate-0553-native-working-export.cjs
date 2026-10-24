@@ -30,7 +30,7 @@ function sheet(index){
  const max=index===1?43:22;
  const cells=[];
  for(let row=1;row<=max;row++){
-  const addresses=index===1?([26,29,32].includes(row)?["B"+row,"F"+row,"G"+row]:row>=8&&row<=11?"ABCDEFG".split("").map(x=>x+row):
+  const addresses=index===1?(row>=24&&row<=37?["B"+row,"F"+row,"G"+row]:row>=8&&row<=11?"ABCDEFG".split("").map(x=>x+row):
    row>=24&&row<=37||row===41||row===42?["F"+row,"G"+row]:row===38?["G38"]:[]):
    row>=6&&row<=18?(index>=5?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]).map(x=>x+row):row===19?["I19"]:[];
   // A previously priced workbook must not leak historical values in unused rows.
@@ -195,6 +195,8 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
     assert(cell(newXml,"B29").includes("CIF Zhuhai Port China"),"Native B6 must use selected source CIF wording, not old template DDP");
     for(const row of real.b){
      const nativeRow=23+Number(row.code.slice(1));
+     const note=row.executionActivities.releaseText.replace(/&/g,'&amp;').replace(/>/g,'&gt;').replace(/</g,'&lt;');
+     assert(cell(newXml,'B'+nativeRow).includes('Activities: '+note),'Source activity note missing in native '+row.code);
      for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':"NOT ESTABLISHED"));
     }
     for(const address of ["F41","G41","F42","G42"])assert(cell(newXml,address).includes("NOT QUOTED"));

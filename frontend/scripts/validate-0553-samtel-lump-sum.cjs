@@ -62,15 +62,15 @@ assert.equal(training.onsiteAlternative.extraPerSpecialist.reduce((n,r)=>n+r.qty
 assert.equal(training.onsiteAlternative.wholeB8IllustrativeTHB,615350);
 assert(!training.onsiteAlternative.selected&&!training.onsiteAlternative.postingAllowed);
 const logistics=get('b5B6B7LinkedLogistics0553').selectSamtelLogisticsEnvelope0553();
-assert.equal(logistics.byCode.B6.find(r=>r.id==='B6-SAMTEL-SAMTEL-EXPORT').workingSellTHB,25000);
+assert.equal(logistics.byCode.B6.find(r=>r.id==='B6-SAMTEL-SAMTEL-EXPORT').workingSellTHB,10000);
 for(const code of ['B5','B6']){
- assert.equal(logistics.byCode[code].reduce((n,r)=>n+r.qty*r.unitRateTHB,0),baseline.b[code]);
+ assert.equal(logistics.byCode[code].reduce((n,r)=>n+r.qty*r.unitRateTHB,0),baseline.b[code]+(code==='B6'?28000:0));
  assert.equal(bc.byCode[code].workingSellTHB,logistics.totals[code]);
  assert(logistics.byCode[code].every(r=>r.verifiedDirectCostTHB===null&&!r.independentPostingAllowed));
 }
 assert.equal(logistics.statutoryThaiDutyVATTHB,null);
 assert.equal(logistics.adequacyVerified,false);
-const deltas={B3:189150,B8:-9000};
+const deltas={B1:209580,B6:28000,B3:189150,B8:-9000};
 for(const row of bc.rows){
  assert.equal(row.workingSellTHB,baseline.b[row.code]===null?null:round(baseline.b[row.code]+(deltas[row.code]||0)),row.code);
  assert.equal(scope.lines[row.code].workingSellTHB,row.workingSellTHB);
@@ -81,7 +81,7 @@ for(const row of bc.rows){
  }
 }
 for(const a of rel.a)assert.deepEqual({code:a.code,previewCostTHB:a.previewCostTHB,previewSellTHB:a.previewSellTHB},baseline.a.find(r=>r.code===a.code));
-assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-baseline.summary.bProvisionalCustomerSellTHB),180150);
+assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-baseline.summary.bProvisionalCustomerSellTHB),180150+237580);
 assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,round(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((n,r)=>n+round(r.workingSellTHB*.05),0)));
 assert.equal(rel.summary.baseCustomerSellTHB,null);
 assert.equal(rel.approval.releaseAllowed,false);

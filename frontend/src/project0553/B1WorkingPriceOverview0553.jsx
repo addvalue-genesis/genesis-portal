@@ -13,10 +13,10 @@ const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function B1WorkingPriceOverview0553({workingRow}){
  if(!workingRow||workingRow.code!=="B1")return null;
  const model=workingRow.b1SupportPlanningBudget;
- if(!model||model.accounts.length!==8||workingRow.workingSellTHB!==211600||
+ if(!model||model.accounts.length!==8||workingRow.workingSellTHB!==421180||
   model.canonicalB1WorkingSellTHB!==workingRow.workingSellTHB||
-  model.baseWorkingCostTHB!==181400||model.labourHours!==242||
-  model.conditionalWorkingSellTHB!==51700||workingRow.directCostTHB!==null)
+  model.baseWorkingCostTHB!==374200||model.labourHours!==242||
+  model.conditionalWorkingSellTHB!==0||workingRow.directCostTHB!==null)
   throw Error("B1 price overview must follow current canonical B1 source, not legacy WBS");
  const baseSell=round(model.accounts.reduce((n,a)=>n+a.baseWorkingSellTHB,0));
  const conditionalSell=round(model.accounts.reduce((n,a)=>n+a.conditionalWorkingSellTHB,0));

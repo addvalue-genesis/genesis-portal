@@ -1,3 +1,4 @@
+import {selectImportOperationalBudget0553} from "./importOperationalBudget0553";
 /**
  * PJ2608-0553 / 10.2 B6 Transportation — current Four-MR route reconciliation.
  *
@@ -45,13 +46,14 @@ const scenarios=freeze([freeze({id:"SC-B6-SAMTEL-CIF-ZHUHAI",status:"OWNER_SELEC
  included:legs.map(x=>x.preferred),additionalThailandTouchpoints:true,additionalChinaInboundTripsPotential:true,
  returnToThailandForFAT:true,workingSellTHB:null,verifiedDirectCostTHB:null,postingAllowed:false})]);
 export function selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB=null,earlierFourCabinetReference=null}={}){
+ const selectedTotal=307584+selectImportOperationalBudget0553().b6IncrementalSellTHB;
  const freight=mgw.services.find(s=>s.id==="SERV-5");
  const packing=mgw.services.find(s=>s.id==="SERV-3");
  if(NEXTG.quoteNumber!=="NG/260916-ADV-DAP1"||NEXTG.quotedGrandTotal!==191610.15||
   NEXTG.sourceDriveId!=="1dwU6mkjm0JOKvbw3fMeCH8alQtKufEyd"||
   freight?.usd!==2500||packing?.usd!==500||freightProof.coverFreightUSD!==2500||
   freightProof.supplierConfirmsRoadFreightIncludesPacking!==true||
-  selectedB6WorkingSellTHB!==307584||legs.length!==8||
+  selectedB6WorkingSellTHB!==selectedTotal||legs.length!==8||
   new Set(legs.map(x=>x.id)).size!==8)
   throw Error("B6 selected owner / NextG DAP Ranong / MGW packing-freight evidence changed");
  if(earlierFourCabinetReference&&
@@ -74,7 +76,7 @@ export function selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB=null
    contractualBaseline:"DDP PURCHASER'YARD — JUTAL Equipment Purchase Contract Article 8.1",
    cclPreviousAlternative:"CCL Samart item12 Accepted/Close CIF Zhuhai Port; COM-D02 China clearance/duty/VAT and port-to-yard Purchaser unless separately agreed",
    workingDecision:"OWNER_SELECTED_PROVISIONAL_BUDGETARY_BASIS__NOT_CLIENT_OR_VENDOR_APPROVED",
-   workingSellTHB:307584,mgwServ5QuotedUSD:2500,mgwServ5QuotedTHB:78750,
+   workingSellTHB:selectedTotal,mgwServ5QuotedUSD:2500,mgwServ5QuotedTHB:78750,
    buyerResponsibleForApplicableImportClearanceUnderDAP:true,
    importVATTHB:null,importDutyTHB:null,domesticChineseSalesVATTHB:null,
    taxSavingsEstablishedTHB:null,deliveryCargoScopeConfirmed:false,
@@ -82,9 +84,9 @@ export function selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB=null
    nextgIncomingChinaRerouteCostConfirmed:false,mgwPackingFreightOverlapResolved:false,
    independentCostPostingAllowed:false,customerReleaseAllowed:false,
    priceClass:"RETAINED_B6_WORKING_SELL_ALLOWANCE__CIF_NEW_LEGS_NOT_YET_COSTED",
-   note:"Keep B6 307584 as provisional 1LS reserve, adequacy UNKNOWN for new route; MGW USD2500 China road freight is NOT Thai sea freight. Cargo ICC(A) to Yard under contract 18.1(c) remains unresolved against CIF port; no automatic exclusion or zero premium."
+   note:"B6 includes revised administration and retained physical route allowances, adequacy UNKNOWN for new route; MGW USD2500 China road freight is NOT Thai sea freight. Cargo ICC(A) to Yard under contract 18.1(c) remains unresolved against CIF port; no automatic exclusion or zero premium."
   }),
-  workingSellAuthority:"10.2 historical Rev08 USD9764.5714 x 31.5 = THB307584; NOT a shipment rate",
+  workingSellAuthority:"Existing route SELL307584 + source-derived administration replacement delta; NOT a shipment rate",
   nextg:freeze({quoteNumber:NEXTG.quoteNumber,sourceUrl:"https://drive.google.com/file/d/"+NEXTG.sourceDriveId+"/view",
    quotedTotalUSD:NEXTG.quotedGrandTotal,quoteValidTo:"2026-10-01",
    quotedDeliveryTerm:"DAP Ranong, Thailand",isDDPThailand:false,
@@ -140,7 +142,7 @@ export function selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB=null
    "MGW RF freight China→Thailand, Thai import/broker/duty and insurance require supported budget allocation; no tax exemption assumed",
    "NextG DAP Ranong and EXION DDP Nonthaburi are not exact SAMTEL address acceptance; retain named-place mismatch",
    "MDS FCA pickup place is unconfirmed; do not infer Schiedam from warranty text",
-   "B6 307584 is retained provisional Working SELL, not proof the new multi-leg CIF scope is fully funded",
+   "B6 is provisional Working SELL with revised administration, not proof the new multi-leg CIF scope is fully funded",
    "CIF Zhuhai Port accepted CCL item12; COM-D02 China clearance/duty/VAT and port→yard Purchaser unless otherwise agreed",
    "Contract 18.1(c) ICC(A) to Yard is stronger than port delivery; reconcile insurance extent and premium without silent removal",
    "B5 sea repacking net of MDS included crates / EXION inland packing; B7 storage and B14 general insurance charged once"

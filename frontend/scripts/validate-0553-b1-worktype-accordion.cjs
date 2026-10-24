@@ -22,12 +22,12 @@ const {BcCostEvidenceDetail0553:Host}=get("BcCostEvidenceDetail0553.jsx");
 const bc=current(),model=b1Source(),b1=bc.byCode.B1;
 const snapshot=JSON.stringify({b1,b3:bc.byCode.B3,partB:bc.knownWorkingSellTHB});
 assert.equal(ROOT,"bid.budget.working.bc.b1");
-assert.equal(model.canonicalB1WorkingSellTHB,211600);
-assert.equal(model.baseWorkingCostTHB,181400);
-assert.equal(model.conditionalWorkingSellTHB,51700);
-assert.equal(b1.workingSellTHB,211600);
+assert.equal(model.canonicalB1WorkingSellTHB,421180);
+assert.equal(model.baseWorkingCostTHB,374200);
+assert.equal(model.conditionalWorkingSellTHB,0);
+assert.equal(b1.workingSellTHB,421180);
 assert.equal(b1.directCostTHB,null);
-assert.equal(bc.knownWorkingSellTHB,4757207.13);
+assert.equal(bc.knownWorkingSellTHB,4994787.13);
 assert.equal(bc.byCode.B3.workingSellTHB,2322450);
 assert.equal(model.accounts.length,8);
 assert.equal(model.roleLines.length,41);
@@ -44,7 +44,7 @@ assert(output.includes('data-component-key="'+ROOT+".worktype-accordion"+'"'));
 assert(output.includes('data-component-key="'+ROOT+".revk-pm-milestones"+'"'));
 assert(output.includes('data-component-key="'+ROOT+".audit"+'"'));
 assert(output.includes("Expand All")&&output.includes("Collapse All"));
-assert(output.includes("THB 211,600.00")&&output.includes("THB 51,700.00"));
+assert(output.includes("THB 421,180.00")&&output.includes("THB 0.00"));
 assert(output.includes("NOT ESTABLISHED"));
 assert(panel.includes("B1.1")&&panel.includes("B1.8"));
 assert(panel.includes("Engineering &amp; Design")||panel.includes("Engineering &amp;amp; Design"));
@@ -99,7 +99,7 @@ assert.equal(keys.length,new Set(keys).size,"Duplicate B1 DOM module anchor");
 const jsx=fs.readFileSync(path.join(root,"project0553/B1RevKMilestoneBudget0553.jsx"),"utf8");
 const css=fs.readFileSync(path.join(root,"project0553/project0553.css"),"utf8");
 const host=fs.readFileSync(path.join(root,"project0553/BcCostEvidenceDetail0553.jsx"),"utf8");
-assert(jsx.includes("querySelectorAll(\"details.p553-b1-group, details.p553-b1-item\")"));
+assert(jsx.includes("querySelectorAll(\"details.p553-b1-purpose, details.p553-b1-group, details.p553-b1-item\")"));
 assert(!jsx.includes("data-component-key={id} defaultOpen={index===0}")&&
  !jsx.includes("data-component-key={moduleId} defaultOpen>"),
  "React <details> must use supported open attr without defaultOpen warnings");
@@ -125,4 +125,4 @@ assert(host.slice(b1At).includes("{sharedEvidence}"),
 assert.equal(JSON.stringify({b1:current().byCode.B1,b3:current().byCode.B3,
  partB:current().knownWorkingSellTHB}),snapshot,
  "Read-only B1 accordion mutated canonical B/C values");
-console.log("PASS B1 hierarchical nested accordion: 8 color-coded accounts + source lines, 19 Rev.K IDs and 27 unpriced engineering titles, audit/ledger preserved, THB211,600 base, THB51,700 conditional excluded; no cost mutation.");
+console.log("PASS B1 hierarchical nested accordion: 8 color-coded accounts + source lines, 19 Rev.K IDs and 27 unpriced engineering titles, audit/ledger preserved, THB421,180 base, THB0.00 conditional excluded; no cost mutation.");

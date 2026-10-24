@@ -22,7 +22,7 @@ const survey=bc.byCode.B3.b3SiteSurveyScope,
  selectedSurvey=bc.byCode.B3.b3SelectedSatSurveyBudget,
  inbound=bc.byCode.B6.b6Mr0001ChinaInboundEvidence,
  storage=bc.byCode.B7.b7ThreeMonthStorageEvidence;
-assert.equal(bc.knownWorkingSellTHB,4757207.13,"Only owner-selected SAT28 + BF Survey5 may replace the prior B3 budget; B6/B7 cannot reprice");
+assert.equal(bc.knownWorkingSellTHB,4994787.13,"Only owner-selected SAT28 + BF Survey5 may replace the prior B3 budget; B6/B7 cannot reprice");
 assert.equal(bc.byCode.B3.workingSellTHB,2322450);
 assert.equal(selectedSurvey.satTeamDays,28);
 assert.equal(selectedSurvey.siteSurveyTeamDays,5);
@@ -31,11 +31,11 @@ assert.equal(selectedSurvey.siteSurveyWorkingSellTHB,252000);
 assert.equal(selectedSurvey.riskTeamDaysNotIncluded,2);
 assert.equal(selectedSurvey.siteSurveyPhysicalVisitConfirmed,false);
 assert.equal(selectedSurvey.directCostTHB,null);
-assert.equal(bc.byCode.B6.workingSellTHB,307584);
+assert.equal(bc.byCode.B6.workingSellTHB,335584);
 assert.equal(bc.byCode.B7.workingSellTHB,30000);
 assert.equal(bc.byCode.B9.workingSellTHB,480550);
 assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2322450);
-assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,307584);
+assert.equal(release.b.find(x=>x.code==="B6").customerSellTHB,335584);
 assert.equal(release.b.find(x=>x.code==="B7").customerSellTHB,30000);
 assert.equal(release.b.find(x=>x.code==="B9").customerSellTHB,480550);
 for(const code of ["B3","B6","B7"])

@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R43";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R44";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-13",date:"2026-10-24",kind:"PRICE",tone:"pricing",
+  title:"B1–B14 activities + Thailand / CIF / Myanmar operations",
+  detail:"Owner-selected cost250000: B6 import30000/export20000 and B1 Myanmar200000. Remove B1 filing7200; supersede old conditional47000 without base credit. Official fee25000 has no uplift; services/reserves factor1.10. B1 cost374200/SELL421180. B6 import SELL12000 replaced33000; old mixed export25000 newly split service15000/physical10000, service replaced22000; B6 SELL335584. B1 two groups and all14 activity owners flow to Release/native. KnownB4994787.13; unpriced items/approvals remain open. Draft only.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1","bid.budget.working.bc.b6","bid.budget.pricing.release.preview"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner24-Oct: approve operation estimate and B1–B14 activities"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-12",date:"2026-10-24",kind:"UI",tone:"navigation",
   title:"Release Excel export: ฟอนต์และช่องพอดีกับข้อความ",

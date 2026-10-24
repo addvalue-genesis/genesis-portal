@@ -20,6 +20,7 @@ export function selectScopePartBcWorking0553(){
     mgwPurchasedWorkingSellTHB:r.code==="B3"?(r.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB??null):null
    }),amountTHB:r.workingSellTHB, // Legacy name; this is WORKING SELL only, NEVER cost.
    directCostTHB:r.directCostTHB,
+   executionActivities:r.executionActivities,
    serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    b3GroupTrace:b3Source?Object.freeze(b3Source.groupRollups.map(g=>Object.freeze({
     id:g.id,sourceModuleId:g.id,groupKey:g.key,name:g.name,

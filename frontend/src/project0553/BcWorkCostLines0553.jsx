@@ -35,7 +35,7 @@ export function BcWorkCostLines0553({selectedCode="ALL",presentationNamespace=nu
     x.qty+" MH × loaded role cost THB "+x.unitCostTHB.toFixed(2)+" (planning) / 0.80 sell factor",
    requiredQuantityStatus:x.conditional?"OPTIONAL_NOT_IN_CANONICAL_B1_BASE":"ROLE/EXPENSE_PLANNING_QTY",
    reconciliationTag:x.conditional?"B1_CONDITIONAL_NO_POST":"B1_1_TO_B1_8_CURRENT_RESOURCE",
-   includedInExistingCostOwner:x.conditional?"EXCLUDED_FROM_BASE_THB51700":null
+   includedInExistingCostOwner:x.conditional?"EXCLUDED_FROM_BASE":null
   })):[]),
   ...(showGroup.includes("B3")?[...b3Current.rows.map(x=>({
    code:"B3",id:"B3-"+x.id,moduleId:"bid.budget.working.bc.b3.current-"+x.id.toLowerCase(),name:x.site+" — "+x.reason,

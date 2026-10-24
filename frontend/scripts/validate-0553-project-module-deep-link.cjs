@@ -102,4 +102,4 @@ const css=fs.readFileSync(path.join(root,"project0553/project0553.css"),"utf8");
 assert(css.includes("[data-component-key].p553-module-nav-focus"));
 assert(!ws.includes("const target=exact||parent"),"Do not silently scroll to parent for failed leaf navigation");
 assert(ws.includes("ยังเปิด Module ปลายทางไม่ได้"));
-console.log("PASS 0553 project-module-deep-link: current-source checks passed; B3 2,322,450.00 / Part B 4,757,207.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 project-module-deep-link: current-source checks passed; B3 2,322,450.00 / Part B 4,994,787.13; no selected MGW FAT services; historical evidence nonposting.");

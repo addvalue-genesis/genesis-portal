@@ -1,3 +1,4 @@
+import {selectImportOperationalBudget0553} from "./importOperationalBudget0553";
 // PJ2608-0553 — 10.2 B5/B6/B7 one physical logistics chain, three cost owners.
 // Read-only source trace. It NEVER posts vendor quotes, guessed crates,
 // storage fees, customs costs or historical estimate fragments to Working SELL.
@@ -29,6 +30,7 @@ const row=(code,id,stage,mr,cargoId,activity,sourceEquipmentQty,sourceEquipmentU
 // 24-Oct internal allocation of the EXISTING B5/B6 envelopes, not freight quotations.
 // One allowance lot per activity; no fabricated crate count, weight, duty exemption or market rate.
 export function selectSamtelLogisticsEnvelope0553(){
+ const operations=selectImportOperationalBudget0553();
  const definitions={
   B5:[
    ["RECEIVE-PRESERVE","Receiving/unpacking/protection of reusable OEM cases at SAMTEL",40000],
@@ -47,28 +49,29 @@ export function selectSamtelLogisticsEnvelope0553(){
    ["MR2-CN-TH","MGW RF equipment China origin → Thailand; EXW/DAP discrepancy remains",60000],
    ["MR3-TH-IN","EXION Nonthaburi → actual SAMTEL address, local delivery reserve",8000],
    ["MR4-FCA-TH","MDS named FCA factory → Thailand; pickup place/cargo dimensions open",65000],
-   ["TH-IMPORT-BROKER","Thailand inbound broker/permit processing, excluding unknown statutory duty/VAT",12000],
-   ["SAMTEL-EXPORT","SAMTEL dispatch loading, truck to port, export broker/terminal handling",25000],
+   ["TH-IMPORT-BROKER","Thailand inbound broker/permit processing, excluding unknown statutory duty/VAT",operations.stages[0].workingSellTHB],
+   ["SAMTEL-EXPORT","SAMTEL physical loading, truck and terminal only — new provisional allocation, adequacy open",operations.b6Replacement.retainedTruckLoadingTerminalSellTHB],
+   ["EXPORT-DOCS","Thai export broker/documents and external JUTAL document support",operations.stages[1].workingSellTHB],
    ["CIF-ZHUHAI-SEA","Thailand port → Zhuhai Port sea freight, all four MR consolidated",80000],
    ["CARGO-RISK","Cargo insurance plus unallocated route-price contingency",22584]
   ]
  };
  const byCode=Object.fromEntries(Object.entries(definitions).map(([code,list])=>[code,freeze(list.map(([id,activity,amount])=>freeze({
   id:code+"-SAMTEL-"+id,code,activity,qty:1,unit:"internal allowance lot",unitRateTHB:amount,
-  workingSellTHB:amount,sourceModuleId:ROOT+"."+code.toLowerCase()+".price-trace.work-scope",
+  workingSellTHB:amount,planningCostTHB:id==="TH-IMPORT-BROKER"?operations.stages[0].costTHB:id==="EXPORT-DOCS"?operations.stages[1].costTHB:null,sourceModuleId:ROOT+"."+code.toLowerCase()+".price-trace.work-scope",
   status:"INTERNAL_ENVELOPE_ALLOCATION_NOT_VENDOR_QUOTE_OR_VERIFIED_ADEQUACY",
   verifiedDirectCostTHB:null,independentPostingAllowed:false
  })))]));
  const totals=Object.fromEntries(Object.entries(byCode).map(([code,rows])=>[code,round(rows.reduce((n,r)=>n+r.workingSellTHB,0))]));
- if(totals.B5!==311184||totals.B6!==307584)throw Error("Existing packing/CIF envelopes allocated more than once");
- return freeze({byCode:freeze(byCode),totals:freeze(totals),adequacyVerified:false,
+ if(totals.B5!==311184||totals.B6!==307584+operations.b6IncrementalSellTHB)throw Error("Existing packing/CIF envelopes allocated more than once");
+ return freeze({byCode:freeze(byCode),totals:freeze(totals),operations,adequacyVerified:false,
   coverage:"All MR0001/2/3/4 7+3+4+3 scope and selected spares; equipment location counts are not shipment package counts",
   statutoryThaiDutyVATTHB:null,clientTravelHotelTHB:null,
   unpricedExposures:freeze(["Thailand import duty/tax regime and recoverable VAT cash flow: amount/payer not established, no exemption assumed", "Actual dimensions/weights/freight surcharges and OEM included freight/packing netting", "Cargo ICC(A) insurance to Yard versus CIF Port: broker extent/premium unconfirmed", "China clearance/duty/VAT/port-to-yard Purchaser per COM-D02; any changed responsibility must be repriced"]),
   customerReleaseAllowed:false});
 }
 export function selectB5B6B7LinkedLogistics0553(){
- const route=selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB:307584});
+ const route=selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB:selectSamtelLogisticsEnvelope0553().totals.B6});
  const earlier=selectB6Mr0001ChinaInboundScenario0553();
  const storage=selectB7ThreeMonthStorageEvidence0553();
  const legacy=selectBcB5HistoricalPriceBridge0553();
@@ -169,7 +172,7 @@ export function selectB5B6B7LinkedLogistics0553(){
  const all=[...b5,...b6,...b7];
  if(new Set(all.map(x=>x.moduleId)).size!==all.length||
   b6.length!==8||b5.length!==7||b7.length!==3||
-  round(Object.values(selectedWorkingSellByCode).reduce((a,b)=>a+b,0))!==648768||
+  round(Object.values(selectedWorkingSellByCode).reduce((a,b)=>a+b,0))!==676768||
   all.some(x=>x.postingAllowed||x.verifiedDirectCostTHB!==null||x.allocatedWorkingSellTHB!==null))
   throw Error("B5/B6/B7 line identity or unpriced-source nonposting reconciliation failed");
  return freeze({
@@ -181,7 +184,7 @@ export function selectB5B6B7LinkedLogistics0553(){
   yardUserDescription:"CIF Zhuhai Port, not JUTAL Yard",
   destinationConflict:"CCL CIF port versus contract ICC(A) insurance to Yard: resolve insurance extent; China clearance and port→yard remain Purchaser under COM-D02",
   fxTHBPerUSD:fx,fxClass:"INTERNAL_PLANNING_FX_NOT_OFFICIAL_VENDOR_THB_INVOICE",
-  selectedWorkingSellByCode,selectedThreeOwnerWorkingSellTHB:648768,
+  selectedWorkingSellByCode,selectedThreeOwnerWorkingSellTHB:676768,
   totalCurrentVerifiedDirectCostTHB:null,
   currentRouteCostReconciled:false,sourcePriceComplete:false,
   independentNewPricingAuthorized:false,customerReleaseAllowed:false,

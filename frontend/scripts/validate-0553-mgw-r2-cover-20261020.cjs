@@ -107,4 +107,4 @@ assert(b6.includes("ALREADY INCLUDED")&&b6.includes("NOT another USD2,500"));
 assert.equal(b.byCode.B3.workingSellTHB,2322450);
 assert.equal(b.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,0);
 assert.equal(JSON.stringify(owners.map(x=>[x,working().byCode[x].workingSellTHB,working().byCode[x].directCostTHB])),before);
-console.log("PASS 0553 mgw-r2-cover-20261020: current-source checks passed; B3 2,322,450.00 / Part B 4,757,207.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 mgw-r2-cover-20261020: current-source checks passed; B3 2,322,450.00 / Part B 4,994,787.13; no selected MGW FAT services; historical evidence nonposting.");

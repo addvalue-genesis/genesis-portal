@@ -41,9 +41,9 @@ export function B5B6B7LinkedLogistics0553({workingRow}){
    <strong> ไม่ใช่ต้นทุน Logistics ที่ตรวจสอบแล้วหรือรายการเรียกเก็บเพิ่ม</strong>.
   </p>
   {m.envelope.byCode[code]&&<>
-   <h4>วงเงินเตรียมแพ็ก/ส่งออกจาก SAMTEL — รวมในยอดเดิมแล้ว</h4>
+   <h4>วงเงินเตรียมแพ็ก/ส่งออกจาก SAMTEL — รวมในยอด Source ปัจจุบันแล้ว</h4>
    <p className="p55-note">จัดสรรวงเงินภายในเพื่อเห็นผู้รับผิดชอบ ไม่ใช่ใบเสนอราคาขนส่งหรือการยืนยันว่างบเพียงพอ.
-    ครบ 7+3+4+3 locations และ selected spares; จำนวน location ไม่ใช่จำนวนลัง. ค่า dispatch/export ให้ SAMTEL/forwarder อยู่ B6-SAMTEL-EXPORT 25,000 บาท.</p>
+    ครบ 7+3+4+3 locations และ selected spares; จำนวน location ไม่ใช่จำนวนลัง. B6 แยกงานรถ/โหลด/Terminal จากค่าตัวแทนและเอกสารส่งออก ตามประมาณการใหม่ใน Source; ไม่มี vendor credit ที่ยืนยันแล้ว.</p>
    <table className="p55-table p55-table--compact"><thead><tr><th>Source activity</th><th>Internal allowance THB</th><th>Basis</th></tr></thead>
     <tbody>{m.envelope.byCode[code].map(x=><tr key={x.id}><td>{x.id}<small>{x.activity}</small></td><td>{fmt(x.workingSellTHB)}</td><td>1 allowance lot · UNQUOTED · already in WS-{code}</td></tr>)}</tbody>
     <tfoot><tr><th>รวมจาก source → Working → Budget/Release draft</th><th>{fmt(m.envelope.totals[code])}</th><th>ไม่บวกซ้ำกับ route audit ด้านล่าง</th></tr></tfoot>
