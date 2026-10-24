@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R45";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R46";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-15",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"10.3.4 Official Release — English / USD",
+  detail:"Customer-only view from 10.3.3; quotation FX31.5, round up each priced summary item to USD100. Annex allocations reconcile. English native-template Excel with no internal notes; missing prices stay to be quoted. Working THB and issue status unchanged.",
+  moduleIds:Object.freeze(["bid.budget.pricing.official","bid.budget.pricing.release.preview"]),
+  priceImpact:"QUOTATION_FX_ROUNDING_ONLY",source:"Owner24-Oct: English official USD release and native Excel export"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-14",date:"2026-10-24",kind:"UI",tone:"navigation",
   title:"Release แสดงยอด A+B เฉพาะรายการที่มีราคา",

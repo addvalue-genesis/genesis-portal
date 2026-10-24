@@ -817,3 +817,5 @@
 .p553-dashboard .p553-integrity-review summary:focus-visible,.p553-integrity-controls button:focus-visible{outline:2px solid #1b638d;outline-offset:3px}
 .p553-dashboard .p553-integrity-review .p55-table-wrap{max-width:100%;overflow-x:auto}
 .p553-dashboard .p553-integrity-review .p55-table{min-width:720px}
+
+.p553-dashboard .p553-pricing-stage--official{--stage-accent:#6b35a5;--stage-tint:#f5effb}

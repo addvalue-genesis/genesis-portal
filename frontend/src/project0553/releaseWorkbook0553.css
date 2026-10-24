@@ -104,3 +104,11 @@
 .p553-annex-table .p553-annex-description small{line-height:1.45}
 .p553-annex-table .p553-annex-specification,
 .p553-annex-table .p553-annex-materials{line-height:1.45}
+
+.p553-official-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.p553-official-service{white-space:pre-line;margin-top:6px;line-height:1.45}
+.p553-official-usd .p553-customer-table{min-width:960px}
+.p553-official-usd .p553-official-annex th:nth-child(5){width:13%}
+.p553-official-usd .p553-official-annex th:nth-child(6){width:5%}
+.p553-official-usd .p553-official-annex th:nth-child(7),
+.p553-official-usd .p553-official-annex th:nth-child(8){width:11%}

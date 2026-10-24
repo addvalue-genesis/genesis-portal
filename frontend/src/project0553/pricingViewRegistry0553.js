@@ -16,6 +16,7 @@ export const PRICING_VIEWS_0553=Object.freeze([
   key:"released",number:"10.3.3",shortLabel:"Release",
   fullLabel:"Released Customer Output",moduleId:"bid.budget.pricing.release",
   lifecycle:"SINGLE_LIVE_CUSTOMER_PREVIEW_APPROVAL_HOLD"
- })
+ }),
+ Object.freeze({key:"official",number:"10.3.4",shortLabel:"Official Release",fullLabel:"Official Release — English / USD",moduleId:"bid.budget.pricing.official",lifecycle:"CUSTOMER_FORMAT_USD_NOT_AUTOMATICALLY_ISSUED"})
 ]);
 export const pricingViewByKey0553=key=>PRICING_VIEWS_0553.find(v=>v.key===key)||PRICING_VIEWS_0553.find(v=>v.key==="released");

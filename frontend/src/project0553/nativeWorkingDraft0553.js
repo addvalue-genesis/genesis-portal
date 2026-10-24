@@ -355,3 +355,98 @@ export async function buildNativeWorkingDraft0553(file,model){
   filename:"PJ2608-0553_ScopeOfSupply_NATIVE_WORKING_DRAFT_NOT_RELEASED_"+date+".xlsx",
   warnings,mappedCells:count};
 }
+
+// Generate a separate English customer workbook from original geometry.
+// Only explicitly selected customer fields are written; no internal model dump,
+// unused shared strings, old amounts or source-workbook custom metadata survive.
+export async function buildNativeOfficialRelease0553(file,model){
+ if(model.currency!=="USD"||!model.policy||model.a.length!==4||model.b.length!==14)throw Error("Invalid official USD quotation model");
+ const entries=entriesFromZip(new Uint8Array(await file.arrayBuffer()));
+ const changes=new Map(),warnings=[],sheets=new Map();
+ for(let i=1;i<=6;i++){
+  const name="xl/worksheets/sheet"+i+".xml",entry=entries.find(e=>e.name===name);
+  if(!entry)throw Error("Original worksheet missing: "+name);
+  // Preserve every cell address/style, row, column, merge, page and print setting.
+  let xml=decode.decode(await readEntry(entry)).replace(/<c\b([^>]*?)(?:\/>|>[\s\S]*?<\/c>)/g,(_,attrs)=>
+   "<c"+attrs.replace(/\s+t="[^"]*"/g,"")+"/>");
+  const cells=new Map(),put=(address,value)=>write(cells,address,value);
+  const price=value=>Number.isFinite(value)?value:"To be quoted";
+  if(i===1){
+   put("A1","Scope of Supply");put("A2","Project");put("B2",model.project);
+   put("A3","Currency");put("B3","USD");put("A4","Package Name");put("B4","Telecommunications Systems");
+   ["Item","Tag No.","Description","Main Specification","Qty","Unit Price (USD)","Amount (USD)","Remarks"].forEach((v,j)=>put("ABCDEFGH"[j]+"5",v));
+   put("A6","Part A: Equipment");put("A7","Main Equipment");
+   model.a.forEach((r,j)=>{const row=8+j;put("A"+row,r.code);put("B"+row,r.mr);put("C"+row,r.description);put("D"+row,r.locations);put("E"+row,"1 lot");put("F"+row,price(r.amountUSD));put("G"+row,price(r.amountUSD));});
+   put("A23","Part B: Services and Other Supplies");
+   const fill=(r,row)=>{put("A"+row,r.code);put("B"+row,[r.description,r.serviceText].filter(Boolean).join("\n"));put("E"+row,"1 lot");put("F"+row,price(r.amountUSD));put("G"+row,price(r.amountUSD));if(model.annex[r.code])put("H"+row,"Refer to Annex "+r.code);};
+   model.b.forEach((r,j)=>fill(r,24+j));model.c.forEach((r,j)=>fill(r,41+j));
+   put("A38","Total A+B (USD)"+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
+   put("A39","Prices cover the items described above and are subject to the stated scope and qualifications.");
+   put("A40","Part C: Options — excluded from Total A+B");
+   put("B43","Delivery: CIF Zhuhai Port, China (Incoterms 2020).");
+  }else{
+   const code=["B10","B11","B13","C1","C2"][i-2],detail=model.annex[code];
+   if(detail.length>13)throw Error(code+" exceeds original annex capacity");
+   put("B2",model.annexTitles[code]);
+   ["Item","Tag No.","Description","Specification","Materials","Qty"].forEach((v,j)=>put("BCDEFG"[j]+"4",v));
+   put("H4","Price (USD)");put("H5","Unit Price (USD)");put("I5","Amount (USD)");
+   if(code.startsWith("C"))put("J5","Lead Time (ARO)");
+   detail.forEach((r,j)=>{const row=6+j;
+    [j+1,r.tagNo,r.description,r.specification,r.materials,r.qty??"TBC",price(r.unitUSD),price(r.totalUSD)].forEach((v,k)=>put("BCDEFGHI"[k]+row,v));
+    if(code.startsWith("C"))put("J"+row,r.leadTime);
+   });
+   put("B19","Total (USD)");put("I19",price([...model.b,...model.c].find(r=>r.code===code).amountUSD));
+  }
+  for(const [address,value] of cells){
+   if(!new RegExp('<c\\b[^>]*r="'+address+'"').test(xml)){
+    const row=address.match(/\d+$/)[0],rowPattern=new RegExp('<row\\b[^>]*r="'+row+'"[^>]*>[\\s\\S]*?</row>');
+    if(!rowPattern.test(xml))throw Error("Original row missing: "+address);
+    xml=xml.replace(rowPattern,body=>body.replace('</row>','<c r="'+address+'" s="'+(body.match(/<c\b[^>]*s="(\d+)"/)?.[1]||0)+'"/></row>'));
+   }
+   xml=replaceCell(xml,address,value);
+  }
+  sheets.set(name,xml);
+ }
+ const style=entries.find(e=>e.name==="xl/styles.xml");
+ if(!style)throw Error("Original styles missing");
+ const fitted=fitNativeReleaseLayout0553(decode.decode(await readEntry(style)),"",sheets,warnings);
+ // Numeric quotation amounts use USD decimals; annex unit rates retain 4 decimals
+ // so Qty x Unit Price rounds exactly to the distributed parent quotation.
+ let styles=fitted.stylesXml;
+ const xfs=styles.match(/<cellXfs\b[^>]*>([\s\S]*?)<\/cellXfs>/);
+ const list=xfs[1].match(/<xf\b[^>]*?(?:\/>|>[\s\S]*?<\/xf>)/g),cache=new Map();
+ for(const [name,input] of fitted.sheets){
+  const main=/sheet1\.xml$/.test(name);
+  const xml=input.replace(/<c\b[^>]*>\s*<v>[^<]+<\/v><\/c>/g,cell=>{
+   const address=cell.match(/\br="([^"]+)"/)[1],col=address.match(/^[A-Z]+/)[0];
+   if(!(main?["F","G"]:["H","I"]).includes(col))return cell;
+   const id=Number(cell.match(/\bs="(\d+)"/)?.[1]||0),format=!main&&col==="H"?164:4,key=id+":"+format;
+   if(!cache.has(key)){
+    let xf=list[id].replace(/\bnumFmtId="\d+"/,'numFmtId="'+format+'"');
+    if(!/applyNumberFormat=/.test(xf))xf=xf.replace("<xf ",'<xf applyNumberFormat="1" ');
+    else xf=xf.replace(/applyNumberFormat="[^"]*"/,'applyNumberFormat="1"');
+    cache.set(key,list.length);list.push(xf);
+   }
+   return /\bs="/.test(cell)?cell.replace(/\bs="\d+"/,'s="'+cache.get(key)+'"'):cell.replace("<c ",'<c s="'+cache.get(key)+'" ');
+  });
+  changes.set(name,encode.encode(xml));
+ }
+ // Original custom format 164 may exist: choose an unused ID for 4-place units.
+ const usedIds=[...styles.matchAll(/<numFmt\b[^>]*numFmtId="(\d+)"/g)].map(x=>Number(x[1]));
+ const unitFormat=Math.max(164,...usedIds)+1;
+ const fmt='<numFmt numFmtId="'+unitFormat+'" formatCode="#,##0.00##"/>';
+ for(const [key,id] of cache)if(key.endsWith(":164"))list[id]=list[id].replace('numFmtId="164"','numFmtId="'+unitFormat+'"');
+ styles=styles.replace(/<cellXfs\b[^>]*>[\s\S]*?<\/cellXfs>/,'<cellXfs count="'+list.length+'">'+list.join("")+'</cellXfs>');
+ if(/<numFmts\b[^>]*>/.test(styles))styles=styles.replace(/<numFmts\b[^>]*>([\s\S]*?)<\/numFmts>/,(_,body)=>'<numFmts count="'+(usedIds.length+1)+'">'+body+fmt+'</numFmts>');
+ else styles=styles.replace(/(<styleSheet\b[^>]*>)/,'$1<numFmts count="1">'+fmt+'</numFmts>');
+ changes.set("xl/styles.xml",encode.encode(styles));
+ changes.set("xl/sharedStrings.xml",encode.encode('<?xml version="1.0" encoding="UTF-8"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"/>'));
+ changes.set("docProps/core.xml",encode.encode('<?xml version="1.0" encoding="UTF-8"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>PJ2608-0553 Scope of Supply USD</dc:title></cp:coreProperties>'));
+ const remove=name=>name.startsWith("customXml/")||name==="xl/calcChain.xml"||name==="docProps/custom.xml";
+ for(const e of entries.filter(e=>e.name.endsWith(".rels")||e.name==="[Content_Types].xml")){
+  const xml=decode.decode(await readEntry(e)).replace(/<(?:Relationship|Override)\b[^>]*(?:\/>|>[\s\S]*?<\/(?:Relationship|Override)>)/g,tag=>/customXml\/|calcChain\.xml|docProps\/custom\.xml/.test(tag)?"":tag);
+  changes.set(e.name,encode.encode(xml));
+ }
+ const result=rebuildZip(entries.filter(e=>!remove(e.name)),changes);
+ return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),filename:"PJ2608-0553_ScopeOfSupply_USD.xlsx",warnings};
+}

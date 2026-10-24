@@ -23,6 +23,7 @@ import {BulkSourceToReleaseAudit0553} from "./BulkSourceToReleaseAudit0553";
 import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
+import {OfficialUsdRelease0553} from "./OfficialUsdRelease0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
 import {ReleaseSourceNavigator0553} from "./ReleaseSourceNavigator0553";
 import {BudgetChangeSummary0553} from "./BudgetChangeSummary0553";
@@ -44,7 +45,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const [recipient,setRecipient]=useState("INTERNAL");
  // These are three workflow navigation shortcuts, NOT three independent price models.
  const [pricingStage,setPricingStage]=useState(()=>
-  ["working","budgetary","released"].includes(initialMode)?initialMode:"released");
+  ["working","budgetary","released","official"].includes(initialMode)?initialMode:"released");
  const [expanded,setExpanded]=useState(new Set(["SUMMARY"]));
  const [bcDetailCode,setBcDetailCode]=useState(null);
  const [bcTab,setBcTab]=useState("ALL");
@@ -128,7 +129,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  const bcPriceAudit=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const releaseModel=buildReleaseCommercialModel0553({thbPerUsd:fx?.thbPerUsd});
- const activePricingView=PRICING_VIEWS_0553.find(view=>view.key==="released");
+ const activePricingView=PRICING_VIEWS_0553.find(view=>view.key===pricingStage)||PRICING_VIEWS_0553.find(view=>view.key==="released");
  const sourceB3=bcWorking.byCode.B3;
  const previewB3=releaseModel.b.find(x=>x.code==="B3");
  if(!sourceB3||!previewB3||previewB3.workingSellTHB!==sourceB3.workingSellTHB||
@@ -175,18 +176,47 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   target.scrollIntoView?.({behavior:"smooth",block:"center"});
   setNavigationFeedback(found?null:"Module "+id+" ยังไม่แสดงใน Filter นี้; เปิด "+fallback+" ให้ตรวจสอบ");
  },[releaseJump,bcTab]);
- const openPricingStage=stage=>{
-  setPricingStage(stage);
-  const id=stage==="working"?"bid.budget.working.bc":
-   stage==="budgetary"?"bid.budget.pricing.budgetary":"bid.budget.pricing.release.preview";
+ const openPricingStage=stage=>{setPricingStage(stage);setNavigationFeedback(null);};
+ React.useEffect(()=>{
+  if(navigationTarget?.startsWith("bid.budget.pricing.official"))setPricingStage("official");
+  else if(navigationTarget)setPricingStage("released");
+ },[navigationTarget,navigationSequence]);
+ React.useEffect(()=>{
+  const id=pricingStage==="official"?"bid.budget.pricing.official":
+   pricingStage==="working"?"bid.budget.working.bc":
+   pricingStage==="budgetary"?"bid.budget.pricing.budgetary":"bid.budget.pricing.release.preview";
   const target=findModuleElement0553(document,id);
-  if(!target){setNavigationFeedback("Pricing view unavailable: "+id);return;}
-  openModuleAncestors0553(target);
-  if(target.tagName==="DETAILS")target.open=true;
-  target.scrollIntoView?.({behavior:"smooth",block:"start"});
-  setNavigationFeedback(null);
- };
+  if(target){openModuleAncestors0553(target);if(target.tagName==="DETAILS")target.open=true;target.scrollIntoView?.({behavior:"smooth",block:"start"});}
+ },[pricingStage]);
+ const pricingNavigation=(
+    <nav className="p553-pricing-stage-nav" aria-label="Pricing workflow stages"
+     data-component-key="bid.budget.pricing.single-release">
+     <button type="button" className={"p553-pricing-stage p553-pricing-stage--working"+(pricingStage==="working"?" is-active":"")}
+      aria-pressed={pricingStage==="working"} onClick={()=>openPricingStage("working")}>
+      <strong>10.3.1 · Working / Edit</strong>
+      {pricingStage!=="official"&&<small>↗ 10.2 · Source details</small>}
+     </button>
+     <button type="button" className={"p553-pricing-stage p553-pricing-stage--budgetary"+(pricingStage==="budgetary"?" is-active":"")}
+      aria-pressed={pricingStage==="budgetary"} onClick={()=>openPricingStage("budgetary")}>
+      <strong>10.3.2 · Budgetary</strong>
+      {pricingStage!=="official"&&<small>↗ TEMP · Historical / audit</small>}
+     </button>
+     <button type="button" className={"p553-pricing-stage p553-pricing-stage--released"+(pricingStage==="released"?" is-active":"")}
+      aria-pressed={pricingStage==="released"} onClick={()=>openPricingStage("released")}>
+      <strong>10.3.3 · Release</strong>
+      {pricingStage!=="official"&&<small>↗ Live Customer Preview · HOLD</small>}
+     </button>
+     <button type="button" className={"p553-pricing-stage p553-pricing-stage--official"+(pricingStage==="official"?" is-active":"")}
+      aria-pressed={pricingStage==="official"} onClick={()=>openPricingStage("official")}>
+      <strong>10.3.4 · Official Release</strong><small>English / USD · Export Excel</small>
+     </button>
+    </nav>
+ );
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
+ if(pricingStage==="official")return <div className="p55-stack">
+  <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
+  <OfficialUsdRelease0553 source={releaseModel}/>
+ </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");
   if(!trigger||!event.currentTarget.contains(trigger))return;
@@ -224,30 +254,13 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <p className="p55-note"><strong>MR0001 Cisco-only preliminary subtotal (NOT total project cost):</strong> THB {BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US")} · {BID_COST_SPINE_0553.pricedRows} provisionally priced source items / {BID_COST_SPINE_0553.unpricedRows} unpriced · Next G / MGW / other vendors / bulk / A+B+C / customer sell NOT included. Source: {BID_COST_SPINE_0553.source}</p>
   <p className="p55-note">This is a controlled WORKSPACE, not a price release. The previously issued SAMTEL file is historical evidence; its exact issued revision must be verified before snapshot registration. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
-    <nav className="p553-pricing-stage-nav" aria-label="Pricing workflow stages"
-     data-component-key="bid.budget.pricing.single-release">
-     <button type="button" className={"p553-pricing-stage p553-pricing-stage--working"+(pricingStage==="working"?" is-active":"")}
-      aria-pressed={pricingStage==="working"} onClick={()=>openPricingStage("working")}>
-      <strong>10.3.1 · Working / Edit</strong>
-      <small>↗ 10.2 · Source details</small>
-     </button>
-     <button type="button" className={"p553-pricing-stage p553-pricing-stage--budgetary"+(pricingStage==="budgetary"?" is-active":"")}
-      aria-pressed={pricingStage==="budgetary"} onClick={()=>openPricingStage("budgetary")}>
-      <strong>10.3.2 · Budgetary</strong>
-      <small>↗ TEMP · Historical / audit</small>
-     </button>
-     <button type="button" className={"p553-pricing-stage p553-pricing-stage--released"+(pricingStage==="released"?" is-active":"")}
-      aria-pressed={pricingStage==="released"} onClick={()=>openPricingStage("released")}>
-      <strong>10.3.3 · Release</strong>
-      <small>↗ Live Customer Preview · HOLD</small>
-     </button>
-    </nav>
+    {pricingNavigation}
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
   </div>
   <p className="p55-note" data-component-key="bid.budget.pricing.view-reference">
    <strong>Current module:</strong> {activePricingView.number} · {activePricingView.fullLabel} ·
    <ComponentCopyId projectId="PJ2608-0553" componentKey={activePricingView.moduleId}/>
-   {" "}· {recipient} · LIVE projection from 10.1 + 10.2 selected source · Approval HOLD; not issued. The three shortcuts change navigation only, not prices.
+   {" "}· {recipient} · LIVE projection from 10.1 + 10.2 selected source · Approval HOLD; not issued. Views share the same source; Official USD applies quotation conversion and rounding.
   </p>
   {recipient==="INTERNAL"&&<PricingCfoDashboard0553 model={releaseModel}/>}
   <>
