@@ -14,16 +14,16 @@ export function CostIntegrityReview0553(){
    <button type="button" onClick={()=>setAll(false)}>− หุบทั้งหมด / Collapse All</button>
   </div>
   <ControlledModuleSection0553 moduleKey="bid.budget.integrity"
-   title="Cost integrity / 8-step verification — INTERNAL ONLY"
+   title="Project-wide legacy cost audit — INTERNAL ONLY"
    description={`${audit.steps.length} verification steps · ${audit.sourceQuoteCount} quotations · NO VERIFIED TOTAL PROJECT COST`}
    className="p553-integrity-root">
   <p className="p55-note">สีแยกหมวดข้อมูล · สถานะตรวจสอบแสดงเป็นข้อความ · ยอดใบเสนอราคาอาจซ้ำข้าม MR จึงไม่รวมเป็นต้นทุนโครงการ</p>
   <ControlledModuleSection0553 moduleKey="bid.budget.integrity.steps"
-   title="1. การตรวจสอบ 8 ขั้นตอน / Verification gates"
+   title="1. ภาพรวมโครงการเดิม / Legacy project evidence"
    description={states}
    className="p553-integrity-steps">
   <p className="p55-note"><strong>Current Working TAG Ledger (MR-0001):</strong> {audit.currentWorkingEvidence.siteCount} locations · {audit.currentWorkingEvidence.allocatedWorkingRows}/{audit.currentWorkingEvidence.sourceRows} source TAGs carry working allocations · original USD {money(audit.currentWorkingEvidence.originalUSD)} + THB {money(audit.currentWorkingEvidence.originalTHB)}. No FX or mixed-currency total is invented here. Budgetary allocation is not OEM approval.</p>
-  <p className="p55-note">Steps 1–8 below are customer/RFQ-to-release evidence gates; their REVIEW/PARTIAL states do not erase current provisional budget calculations. A blocked release gate does not mean that the working model has no cost evidence.</p>
+  <p className="p55-note">ผลตรวจ A1 ปัจจุบันให้ดูตารางผลตรวจทานภายใน SI ที่ System × Location × MTO. ตารางด้านล่างเป็นสถานะภาพรวมโครงการเดิม ไม่ใช่ผลตรวจ A1 ราย TAG. กระบวนการ 1–8 เป็น internal re-check; การอนุมัติ OEM ราคา และการออกเอกสารแยกจากผลตรวจภายใน.</p>
   <p className="p55-note"><strong>NO VERIFIED TOTAL PROJECT COST.</strong> THB {money(audit.knownCiscoSubtotalTHB)} is the LEGACY Cisco-only MR0001 control scenario, NOT a project or all-system BOM total. No Next G, MGW, remaining equipment, bulk or services are included in that amount.</p>
   {audit.integrityIssues.length>0&&<p role="alert" className="p55-note"><strong>RECONCILIATION EXCEPTION — NOT VERIFIED:</strong> {audit.integrityIssues.join("; ")}. Cisco quote original: {audit.ciscoQuoteAmount==null?"UNKNOWN":"THB "+money(audit.ciscoQuoteAmount)}; working subtotal: THB {money(audit.knownCiscoSubtotalTHB)}; variance: {audit.ciscoVarianceTHB==null?"UNKNOWN":"THB "+money(audit.ciscoVarianceTHB)}. Values must not be promoted to a complete budget.</p>}
   <p className="p55-note">Evidence coverage: {audit.mr0001AcceptedPhysicalRows}/{audit.mr0001RequiredSourceRows} MR0001 required source rows have accepted physical SKU/quantities. Registered quotations: {audit.sourceQuoteCount}; unallocated/references: {audit.unallocatedQuoteCount}. A+B+C and customer sell: NOT ESTABLISHED.</p>
@@ -49,3 +49,4 @@ export function CostIntegrityReview0553(){
   <p className="p55-note"><strong>Budgetary rule:</strong> An assumption-based range may be published internally only after every step has a documented basis, calculation, uncertainty and risk allowance. A pending confirmation does not mean zero. No customer release permitted.</p>
  </ControlledModuleSection0553></div>;
 }
+

@@ -5,6 +5,12 @@ export const EVOLUTION_POLICY_0553 = {
 };
 const make=(id,name,layer,inputs,outputs,implementation,invariants)=>({id,name,layer,lifecycleStatus:"ACTIVE_EVOLVING",purpose:name,why:"Keep PJ2608-0553 source evidence and engineering/commercial output traceable without importing PJ2608-0550 project facts.",inputs,outputs,implementation,invariants});
 export const MODULE_REGISTRY_0553=[
+ make("P553-A1-SI-RECHECK","A1 customer requirements and SI internal re-check","PARTICULAR_PROJECT",
+  ["BOD/DTS/MR/SPE/DWG/BLD/LAY","Canonical MR0001 TAG allocations","Recorded review evidence"],
+  ["Per-TAG 1–8 review","Source/Budgetary/Release review identity"],
+  ["frontend/src/project0553/data/a1InternalReview0553.js","frontend/src/project0553/data/a1InternalReviewPolicy0553.json","frontend/src/project0553/data/workingBomReviewedProjection0553.js","frontend/src/project0553/A1InternalReview0553.jsx"],
+  ["Customer requirements remain authoritative","No comment requires recorded evidence","Source/revision changes invalidate review","No automatic price or customer issue approval"]),
+
  make("P553-REPOSITORY","Controlled 0553 Particular Dataset","PARTICULAR_PROJECT",["0553 MTO Rev04","RFQ/TC","Vendor evidence"],["0553 working snapshot"],["frontend/src/project0553/data/repository.js"],["Unknown must remain OPEN; never import 0550 cost data"]),
  make("P553-EVIDENCE","Bid Evidence / Requirement Control","PARTICULAR_PROJECT",["JUTAL RFQ","MR","TC","MTO"],["Source register","Review gates"],["frontend/src/project0553/bidReview.js"],["Evidence mapping is not compliance"]),
  make("P553-SYSTEMS","Telecom Systems Binding","GENERIC_TO_PARTICULAR",["0553 controlled MR list"],["Systems group/focus view"],["frontend/src/project0553/systemsBinding.js"],["Only 0553 MRs and locations appear"]),
@@ -12,3 +18,4 @@ export const MODULE_REGISTRY_0553=[
  make("P553-VENDOR","Vendor Quotation Control","PARTICULAR_PROJECT",["Supplier offers","Commercial terms"],["Quote candidates","Reconciliation actions"],["frontend/src/project0553/vendorEvidence.js"],["Multi-system quotation cannot be blindly allocated"]),
  make("P553-UI","GENESS TPP Shared Workspace","COMMON_UI",["Project manifest","View bindings"],["8-tab workspace"],["frontend/src/common/ui/ProjectWorkspaceShell.jsx","frontend/src/common/ui/ArchitectureView.jsx"],["Keep familiar 0550 interaction patterns; project facts are isolated"])
 ];
+

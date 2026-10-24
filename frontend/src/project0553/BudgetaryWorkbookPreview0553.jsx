@@ -1,10 +1,11 @@
 import React,{useState} from "react";
+import {A1InternalReview0553} from "./A1InternalReview0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {COMMERCIAL_TEMPLATE_0553 as template} from "./commercialWorkbookControl";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
 import {ScopeSheetsDetail0553} from "./ScopeSheetsDetail0553";
-import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
+import {selectWorkingBomProjection0553,workingBomLineCostTHB0553,workingBomTotalTHB0553} from "./data/workingBomReviewedProjection0553";
 import {deriveA5BulkAttribution0553} from "./data/a5BulkAttribution0553";
 import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {selectScopeSheet0553} from "./data/scopeSheetProjection0553";
@@ -40,7 +41,7 @@ export function BudgetaryWorkbookPreview0553(){
   const currencies=projection.currencies||{};
   const unsupported=Object.keys(currencies).filter(k=>k!=="THB"&&k!=="USD");
   const amount=unsupported.length||projection.orphanCurrency||(!currentFx.thbPerUsd&&currencies.USD)?null:
-   Math.round(((currencies.THB||0)+(currencies.USD||0)*(currentFx.thbPerUsd||0))*100)/100;
+   workingBomTotalTHB0553(projection,currentFx.thbPerUsd);
   const labels=["SCADA / AVIAT / Cisco","DMR Trunk Radio","Telephone / sounder / JB","RACON"];
   const tags=projection.lines.filter(x=>x.tag&&x.tag!==x.mr).map(x=>{
    const item=x.item||{};
@@ -50,11 +51,11 @@ export function BudgetaryWorkbookPreview0553(){
    return {tag:x.tag,site:x.site,description:item.description||item.role||"Equipment / interface",
     specification:[item.vendor,item.sku].filter(Boolean).join(" · ")||item.note||"Equipment specification pending verification",
     qty,unit:item.sourceUnit||item.sourceScopeUnit||"",
-    unitTHB:toTHB(unitCost),subtotalTHB:x.counted?toTHB(x.extended):null,
+    unitTHB:toTHB(unitCost),subtotalTHB:workingBomLineCostTHB0553(x,currentFx.thbPerUsd),
     status:item.status||"TECHNICAL VERIFICATION REQUIRED",source:x.source||""};
   });
   const major=[...new Set(tags.map(x=>x.description).filter(Boolean))].slice(0,3).join("; ");
-  return {code:"A"+(index+1),mr,description:labels[index],amount,tags,major,
+  return {code:"A"+(index+1),mr,description:labels[index],amount,tags,major,internalReview:projection.internalReview,
    status:projection.priced+" priced; "+projection.unresolved+" unresolved · Working Scope reference, not released sell"};
  });
  const a5Memo=deriveA5BulkAttribution0553();
@@ -75,6 +76,7 @@ export function BudgetaryWorkbookPreview0553(){
  return <section className="p55-panel" data-component-key="bid.budget.summary.workbook">
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · NATIVE SOURCE WORKBOOK STRUCTURE <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.summary.workbook"/></div>
    <h3>4-Scope of Supply.xlsx · 6 Worksheet Review</h3>
+   <A1InternalReview0553 review={mrPartA[0].internalReview} placement="BUDGETARY"/>
    <p className="p55-note"><strong>TEMPLATE GRID PREVIEW, NOT NEW CUSTOMER PRICE.</strong> Original workbook is the export template. This component renders the original worksheet dimensions and a source-transcribed subset of cell labels, preserving empty rows; full exact-cell fidelity is still pending. Template fidelity, current BOM selling-price mapping and native XLSX export are not implemented yet; release is blocked.</p>
    <div className="p55-filterbar">
     <label>Display currency <select value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD — original Rev08</option><option value="THB">THB — Thai baht</option><option value="CNY">CNY — Chinese yuan (RMB)</option></select></label>
@@ -188,3 +190,4 @@ export function BudgetaryWorkbookPreview0553(){
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
  </section>;
 }
+

@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R43";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R44";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-13",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"A1: ผลตรวจ SI 1–8 แยกจาก OEM พร้อม Source → Budgetary → Release",
+  detail:"แสดงผลตรวจ 55 source TAG/รายการ แยกตรวจแล้วไม่มี comment / มี comment / ยังไม่ได้ตรวจ พร้อมข้อกำหนดลูกค้าและ revision. บันทึกตรวจ MTO owner/quantity และ numerical cost trace ตามขอบเขตที่ระบุ; ประเด็น IDU, Ex, RF, NMS/GPS และ Bulk ยังแสดงตามหลักฐาน. Source เปลี่ยนต้องตรวจใหม่; ไม่มีการปิด comment อัตโนมัติ. ใช้การแปลง/ปัดเศษทีละรายการเดียวกับ Release ให้ Working/Budgetary/Scope รวม A1 THB5,840,703.18 ตรงกัน แก้ส่วนต่างแสดงผล0.03บาท; Release SELL7,592,914.13 และ A/B/C ราคาที่เลือกคงเดิม. Rev01–Rev03 protected source และ native template คงเดิม.",
+  moduleIds:Object.freeze(["bid.budget.bom.system-location-mto","bid.budget.pricing.release"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: client documents govern requirements; 1–8 are internal SI re-checks; correct upstream Working and preserve Budgetary/Release source identity"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-12",date:"2026-10-24",kind:"UI",tone:"navigation",
   title:"Release Excel export: ฟอนต์และช่องพอดีกับข้อความ",
@@ -339,3 +346,4 @@ export const CHANGE_TYPES_0553=Object.freeze({
  PRICE:"Working SELL / Commercial",
  RELEASE:"Customer Release"
 });
+

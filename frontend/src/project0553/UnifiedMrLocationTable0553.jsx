@@ -1,7 +1,8 @@
 import React,{useState} from "react";
+import {A1InternalReview0553} from "./A1InternalReview0553";
 import {bomModuleId0553,bomPriceTHB0553,bomEvidenceDisplay0553} from "./bomPresentationContract0553";
 import {MGW_P26_058_R2_SELECTED_0553} from "./data/mgwP26058R2Selected0553";
-import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
+import {selectWorkingBomProjection0553,workingBomTotalTHB0553} from "./data/workingBomReviewedProjection0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 
 // Read projection only. MR0002/MR0004 use canonical working items;
@@ -15,6 +16,8 @@ const evidenceToRow=(x,i)=>({
  countedInWorkingTotal:Number.isFinite(x.extended),scenarioEvidence:true
 });
 const canonicalRow=(x)=>({...x,scenarioEvidence:false});
+const sourceQty=x=>x.sourceQty??x.qty??x.sourceScopeQty;
+const sourceUnit=x=>x.sourceUnit||x.unit||x.sourceScopeUnit||"";
 const isCounted=x=>x.countedInWorkingTotal===true&&Number.isFinite(x.extended);
 const phoneEvidenceState=x=>({ "EX-PHONE-JB-ENTRIES":"COUNTED: 8 physical M20 entries / 3 budget-active / 5 factory plugs; included in JB assembly", "EX-PHONE-BARTEC-M20-GLAND-SIZE-QTY":"COUNTED: 3 budgetary glands × THB 1,020 = THB 3,060 indicative; not A5 booked without certified SKU", "EX-PHONE-CABLE":"COUNTED: 3 physical circuit functions; length-based cost not established from WIR/TER" })[String(x.id).toUpperCase()]||null;
 const moduleBase=(mr,site)=>"bid.budget.bom."+mr.toLowerCase().replace("-","")+(site?"."+site.toLowerCase():"");
@@ -31,7 +34,7 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
  const hasUsd=Object.prototype.hasOwnProperty.call(totals,"USD");
  const hasThb=Object.prototype.hasOwnProperty.call(totals,"THB");
  const convertible=!hasUsd||(Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0);
- const thbTotal=convertible?workingThb+workingUsd*(fx?.thbPerUsd||0):null;
+ const thbTotal=workingBomTotalTHB0553(projection,fx?.thbPerUsd);
  const candidate=mr==="MR-0003";
  const asThb=(n,c)=>bomPriceTHB0553(n,c,fx).label;
  const checkedRate=(x)=>{if(mr==="MR-0002"&&String(x.id).endsWith("-RFI-BDA")){const line=MGW_P26_058_R2_SELECTED_0553.lines.find(q=>q.id==="UHF-1");if(!line||x.unitCost!==line.unitPriceUSD||x.extended!==line.unitPriceUSD||x.source!==MGW_P26_058_R2_SELECTED_0553.id)return "SOURCE RATE MISMATCH — CHECK MGW R2";}return asThb(x.unitCost,x.currency);};
@@ -42,6 +45,7 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
   {mr==="MR-0002"&&<p className="p55-note" data-testid="mr0002-r2-quote-authority"><strong>Active vendor price authority: MGW P26-058_R2 / UHF-1 · RFI BD4345-00N0-AC + WAROM HRMD95-VIIIB · source package THB conversion from USD 31,474 per site (original USD is stored in vendor registry).</strong> {rows.some(r=>r.items.some(i=>i.id===r.site+"-RFI-BDA"&&i.unitCost!==MGW_P26_058_R2_SELECTED_0553.lines.find(q=>q.id==="UHF-1")?.unitPriceUSD))?"RATE SOURCE MISMATCH — STOP RELEASE":"R2 quote linked to working BOM."}</p>}
   <p className="p55-note"><strong>Display currency: THB only.</strong> {Number.isFinite(fx?.thbPerUsd)&&fx.thbPerUsd>0?`Working FX ${fx.thbPerUsd} THB/USD · ${fx.date||"date not verified"} · ${fx.source||"source not verified"}`:"USD→THB FX rate required; values will not be mislabeled as THB."}</p>
   <p className="p55-note">{candidate?"MR0003: priced vendor/reference evidence and field-bulk candidates only, NOT approved or posted working cost.":"Canonical equipment working lines; INCLUDED and unpriced rows never added again."} Source quote currencies remain preserved in the underlying registry, not shown in this THB working view. Missing prices/quantities are pending, never zero. No released A+B+C total is asserted.</p>
+  {mr==="MR-0001"&&<A1InternalReview0553 review={projection.internalReview} placement="WORKING"/>}
   <div className="p55-source-facts">
    <div><span>Locations with registered lines</span><strong>{withRows.length}</strong></div>
    <div><span>Visible source / working lines</span><strong>{withRows.reduce((n,r)=>n+r.items.length,0)}</strong></div>
@@ -61,11 +65,11 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
      <tr><td><button type="button" className="p55-row-toggle" aria-expanded={open} onClick={()=>setExpanded(o=>({...o,[r.site]:!o[r.site]}))}>{open?"−":"+"}</button></td>
       <td><strong>{r.site}</strong></td><td><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleBase(mr,r.site)} componentName={r.site+" / "+mr+" Engineering BOM"}/></td>
       <td>{r.items.length}</td><td>{r.items.filter(isCounted).length}/{r.items.length}</td>
-      <td>{Object.entries(sub).length?(convertible?fmtLine((sub.THB||0)+(sub.USD||0)*(fx?.thbPerUsd||0)):"FX REQUIRED"):"PENDING"}</td>
+      <td>{Object.entries(sub).length?(convertible?fmtLine(workingBomTotalTHB0553({lines:projection.lines.filter(x=>x.site===r.site)},fx?.thbPerUsd)):"FX REQUIRED"):"PENDING"}</td>
       <td>{r.projectionSource||"SOURCE_EVIDENCE_ONLY"}<small>{r.completeness||""}</small></td></tr>
      {open&&<tr><td colSpan={7}><div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Tag / line</th><th>SKU / Description</th><th>Qty</th><th>Unit rate (THB)</th><th>Extension (THB)</th><th>Ownership / Evidence</th><th>Status / Copy ID</th></tr></thead><tbody>
-      {r.items.map((x,i)=><tr key={x.id+"-"+i}><td><button type="button" className="p55-row-toggle" aria-expanded={!!expandedItems[moduleItem(mr,r.site,x)]} onClick={()=>setExpandedItems(o=>({...o,[moduleItem(mr,r.site,x)]:!o[moduleItem(mr,r.site,x)]}))}>{expandedItems[moduleItem(mr,r.site,x)]?"−":"+"}</button> {x.tag||x.id}<small>{moduleItem(mr,r.site,x)}</small></td><td>{x.sku||"—"}<small>{x.description}</small>{expandedItems[moduleItem(mr,r.site,x)]&&<div className="p55-note"><strong>Requirement → Location → Function → Quantity → Vendor → Cost:</strong> {mr} → {r.site} → {x.tag||x.id} → {x.qty??"NOT VERIFIED"} {x.unit||""} → {budgetRateOwner(mr,x)} → {isCounted(x)?asThb(x.extended,x.currency):"UNPRICED / EXCLUDED"}.<p>Source: {x.source||r.rfqSource||"RFQ cross-reference pending"} · Price basis: {x.priceBasis||r.projectionSource||"Evidence only"} · Cost owner: {x.owner||"Unassigned"} · {x.note||x.costGap||"Engineering verification required before release"}</p><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleItem(mr,r.site,x)+".evidence"} componentName={(x.tag||x.id)+" / Engineering & Cost Evidence"}/></div>}</td>
-       <td>{x.qty??"PENDING"} {x.unit||""}</td><td>{checkedRate(x)}</td>
+      {r.items.map((x,i)=><tr key={x.id+"-"+i}><td><button type="button" className="p55-row-toggle" aria-expanded={!!expandedItems[moduleItem(mr,r.site,x)]} onClick={()=>setExpandedItems(o=>({...o,[moduleItem(mr,r.site,x)]:!o[moduleItem(mr,r.site,x)]}))}>{expandedItems[moduleItem(mr,r.site,x)]?"−":"+"}</button> {x.tag||x.id}<small>{moduleItem(mr,r.site,x)}</small></td><td>{x.sku||"—"}<small>{x.description}</small>{expandedItems[moduleItem(mr,r.site,x)]&&<div className="p55-note"><strong>Requirement → Location → Function → Quantity → Vendor → Cost:</strong> {mr} → {r.site} → {x.tag||x.id} → {sourceQty(x)??"NOT VERIFIED"} {sourceUnit(x)} → {budgetRateOwner(mr,x)} → {isCounted(x)?asThb(x.extended,x.currency):"UNPRICED / EXCLUDED"}.<p>Source: {x.source||r.rfqSource||"RFQ cross-reference pending"} · Price basis: {x.priceBasis||r.projectionSource||"Evidence only"} · Cost owner: {x.owner||"Unassigned"} · {x.note||x.costGap||"Engineering verification required before release"}</p><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleItem(mr,r.site,x)+".evidence"} componentName={(x.tag||x.id)+" / Engineering & Cost Evidence"}/></div>}</td>
+       <td>{sourceQty(x)??"PENDING"} {sourceUnit(x)}</td><td>{checkedRate(x)}</td>
        <td>{isCounted(x)?asThb(x.extended,x.currency):x.displayPrice?includedThb(x):mr==="MR-0003"&&phoneEvidenceState(x)?phoneEvidenceState(x):"NOT COUNTED / PENDING"}</td>
        <td>{budgetRateOwner(mr,x)}<small>{x.source||"Source trace pending"}</small></td>
        <td>{x.status||"—"}<small><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleItem(mr,r.site,x)}/></small></td></tr>)}
@@ -76,3 +80,4 @@ export function UnifiedMrLocationTable0553({mr,site="ALL",fx=null}){
   {!withRows.length&&<p className="p55-note">No mapped source rows for this MR at {site}; absence is not zero cost. Review MR / WP allocation evidence.</p>}
  </section>;
 }
+

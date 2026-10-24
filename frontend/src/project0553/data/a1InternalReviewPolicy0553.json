@@ -1,0 +1,1657 @@
+{
+  "id": "P553-A1-SI-RECHECK-20261024",
+  "revision": "2026-10-24-R1",
+  "customerBasis": [
+    "BOD",
+    "Data Sheet / DTS",
+    "MR / MTO",
+    "SPE",
+    "DWG",
+    "BLD",
+    "LAY"
+  ],
+  "principleTH": "เอกสารลูกค้าเป็นข้อกำหนด; 1–8 เป็นการตรวจทานภายในของ SI. ตรวจแล้วไม่มี comment ให้คงข้อกำหนดเดิม; พบ comment ให้แก้ต้นทางหรือออก clarification/deviation. ยังไม่ได้ตรวจไม่เท่ากับไม่มี comment.",
+  "steps": [
+    {
+      "step": 1,
+      "name": "RFQ / Scope ownership",
+      "nameTH": "ข้อกำหนดและเจ้าของขอบเขต"
+    },
+    {
+      "step": 2,
+      "name": "First Principles",
+      "nameTH": "หน้าที่และปริมาณ"
+    },
+    {
+      "step": 3,
+      "name": "Architecture / Constraints",
+      "nameTH": "ระบบและข้อจำกัด"
+    },
+    {
+      "step": 4,
+      "name": "Document / Revision",
+      "nameTH": "เอกสารและ revision"
+    },
+    {
+      "step": 5,
+      "name": "Physical BOM / Bulk",
+      "nameTH": "อุปกรณ์และวัสดุจริง"
+    },
+    {
+      "step": 6,
+      "name": "Execution WBS / Resources",
+      "nameTH": "งานดำเนินการและทรัพยากร"
+    },
+    {
+      "step": 7,
+      "name": "Vendor / Cost reconciliation",
+      "nameTH": "ผู้ขายและการจัดสรรต้นทุน"
+    },
+    {
+      "step": 8,
+      "name": "Risk / Change",
+      "nameTH": "ความเสี่ยงและการเปลี่ยนแปลง"
+    }
+  ],
+  "comments": [
+    {
+      "id": "A1-C01",
+      "family": [
+        "RADIO",
+        "INDOOR"
+      ],
+      "steps": [
+        2,
+        3,
+        5
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / SI",
+      "textTH": "ตรวจหน้าที่ ODU/IDU ให้ครบ: บาง TAG มีเพียง PoE/power interface; ห้ามถือว่าเป็น IDU ครบชุดโดยไม่มีหลักฐาน equivalence.",
+      "evidence": [
+        "zwp20SiteCost0553.js: MTO row5 / BLD-0001 C1 sheet3 Note8",
+        "zwp8Row43CostTrace.js: ownerCodes / IDU interface"
+      ],
+      "actionTH": "ยืนยัน configuration จากข้อกำหนดและ BLD; หากต้องเพิ่มอุปกรณ์ ให้เพิ่ม SKU/ปริมาณ/ราคาที่ต้นทาง หรือบันทึก deviation."
+    },
+    {
+      "id": "A1-C02",
+      "family": [
+        "RADIO",
+        "ANTENNA"
+      ],
+      "steps": [
+        3,
+        5
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / RF",
+      "textTH": "Region/frequency, capacity, sector pattern และ diversity ยังมีข้อทวนสอบตาม topology แต่ละไซต์.",
+      "evidence": [
+        "zwp8Row43CostTrace.js: SPE-0001 C2 §6.1.3 / BOD-0001 C2 §7.2 / BLD-0001 C1 / RPT-0001 C1",
+        "mr0001TagCostLedger0553.js: ZWP23 diversity / ZWP21 PTP"
+      ],
+      "actionTH": "ปิดเฉพาะข้อขัดแย้งหรือช่องว่างที่พบ; ไม่เปลี่ยนแบบลูกค้าเมื่อผลตรวจไม่มี comment."
+    },
+    {
+      "id": "A1-C03",
+      "family": [
+        "LAN"
+      ],
+      "steps": [
+        3,
+        5
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / Network",
+      "textTH": "Cisco 8-port ถูกจัดสรรราคาแล้ว แต่ port mapping, PoE/65W power และ L3 entitlement ต้องสอดคล้องกับหน้าที่จริง.",
+      "evidence": [
+        "mr0001Rev03CostOverlay0553.js: TC-0001 Item13 / five LAN TAGs"
+      ],
+      "actionTH": "ตรวจจำนวนพอร์ต/โหลดและ license ต่อไซต์; คงชุด 8-port หากเพียงพอ ไม่คืน expansion module โดยอัตโนมัติ."
+    },
+    {
+      "id": "A1-C04",
+      "family": [
+        "DATO"
+      ],
+      "steps": [
+        3,
+        5
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / Ex",
+      "textTH": "ราคาที่เลือกเป็น panel + field plug; หลักฐาน Ex quick-disconnect ครบชุดยังไม่ปรากฏใน working source.",
+      "evidence": [
+        "zwp20SiteCost0553.js: row8 / DATO-507-001",
+        "mr0001TagCostLedger0553.js: DATO assemblies"
+      ],
+      "actionTH": "ตรวจ Ex certification และ assembly ตาม DTS/MR; แก้เฉพาะส่วนที่ไม่ตรง พร้อมคงราคาต้นทางจนมี revision ใหม่."
+    },
+    {
+      "id": "A1-C05",
+      "family": [
+        "ENCLOSURE",
+        "SURGE"
+      ],
+      "steps": [
+        3,
+        5
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / Integration",
+      "textTH": "ตรวจ enclosure/entry/thermal/earthing และ free-issued components; ZWP11 ใช้ตู้เดิม จึงซื้อใหม่ 0 แต่ค่างานดัดแปลงยังต้องแยกตรวจ.",
+      "evidence": [
+        "mr0001TagCostLedger0553.js: ZWP11 row51 / BOD-0001 C2 §8",
+        "zwp20SiteCost0553.js: row9 / row10"
+      ],
+      "actionTH": "จัดเจ้าของ interface และงานดัดแปลงเพียงครั้งเดียว; ไม่เพิ่มตู้ใหม่ทั้งชุดแทนตู้เดิมโดยไม่มีข้อกำหนด."
+    },
+    {
+      "id": "A1-C06",
+      "family": [
+        "BULK"
+      ],
+      "steps": [
+        2,
+        3,
+        5
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / Bulk",
+      "textTH": "ยอดปัจจุบันครอบคลุม CAT6A 69m + M20 gland 1 ชุดต่อไซต์; ไม่ใช่หลักฐานว่าครบ coax/grounding/entry ทุกชนิดตามชื่อ Lot.",
+      "evidence": [
+        "zwp20SiteCost0553.js: row11 / LAY-0001 C1 sheet4 / SPE §6.6",
+        "mr0001BudgetFill0553.js: bulkRate / management allowance"
+      ],
+      "actionTH": "ตรวจ endpoint/run และวัสดุที่ vendor รวมแล้ว; เพิ่มเฉพาะส่วนขาดที่มีฐานปริมาณ/ราคา และไม่บวก A5 ซ้ำ."
+    },
+    {
+      "id": "A1-C07",
+      "family": [
+        "ALL"
+      ],
+      "steps": [
+        4
+      ],
+      "status": "NOT_REVIEWED",
+      "owner": "Document Control / SI",
+      "textTH": "มี MTO Rev04 snapshot และเอกสารอ้างอิง แต่ยังไม่มีบันทึกตรวจเอกสารต้นฉบับปัจจุบันครบทุก TAG.",
+      "evidence": [
+        "snapshots/mr0001.mto.rev04.sourceRows.json: source / rowNumbering"
+      ],
+      "actionTH": "ยืนยัน BOD/DTS/MR/SPE/DWG/BLD/LAY และ revision ที่ใช้; บันทึกผลตรวจพร้อมเอกสาร/ข้อกำหนดก่อนปิด comment."
+    },
+    {
+      "id": "A1-C08",
+      "family": [
+        "ALL"
+      ],
+      "steps": [
+        6
+      ],
+      "status": "NOT_REVIEWED",
+      "owner": "SI / Execution",
+      "textTH": "ต้นทุน A1 เป็น equipment ledger; ต้องตรวจความครอบคลุมงาน interface กับ B/C แยกจากการรับรอง SKU ของ OEM.",
+      "evidence": [
+        "releaseCommercialModel0553.js: A from 10.1 / B from 10.2"
+      ],
+      "actionTH": "ผูกงาน engineering/configuration/FAT/SAT/installation กับเจ้าของ WBS ที่มีอยู่; ตรวจไม่ขาดและไม่คิดซ้ำ."
+    },
+    {
+      "id": "A1-C09",
+      "family": [
+        "ALL"
+      ],
+      "steps": [],
+      "status": "OPEN",
+      "owner": "Procurement / Cost",
+      "textTH": "working cost มีทั้งราคาเสนอเดิม ราคาเทียบเคียง และ allowance; ราคาเหล่านี้ใช้ตั้งงบได้ แต่ไม่ใช่ราคาซื้อที่ยืนยันปัจจุบันทั้งหมด.",
+      "evidence": [
+        "supplierQuoteLines.js: source quotations / validity",
+        "mr0001Rev03CostOverlay0553.js: revised allocation"
+      ],
+      "actionTH": "แสดง price basis ตามจริง; ตรวจ inclusion/currency/quantity และเงื่อนไขที่มีผลต่อ final bid โดยไม่ยกทั้งใบเสนอราคามาบวกซ้ำ.",
+      "kind": "COMMERCIAL_CONFIRMATION"
+    },
+    {
+      "id": "A1-C10",
+      "family": [
+        "ALL"
+      ],
+      "steps": [
+        8
+      ],
+      "status": "NOT_REVIEWED",
+      "owner": "SI / Commercial",
+      "textTH": "เงินเผื่อ 5% ไม่ใช่หลักฐานว่าความเสี่ยงทุก TAG ได้รับการตรวจหรือครอบคลุมแล้ว.",
+      "evidence": [
+        "releaseCommercialModel0553.js: omissionReserveCostPct"
+      ],
+      "actionTH": "ประเมินผล comment ต่อราคา/ขอบเขต; บันทึกยอมรับสมมติฐานหรือแก้ source พร้อมหลักฐาน ไม่ปิดจากการมีเงินเผื่ออย่างเดียว."
+    },
+    {
+      "id": "A1-C11",
+      "family": [
+        "INDOOR"
+      ],
+      "sites": [
+        "ZPQ"
+      ],
+      "tags": [
+        "MR-LQM-202-025B"
+      ],
+      "steps": [
+        2,
+        5,
+        7
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / SI / Cost",
+      "textTH": "MR ระบุ MR-LQM-202-025B เป็น IDU แต่ working configuration ปัจจุบันใช้ B-1/B-2/B-3/B-5 ซึ่งเป็นชุด Radio ODU (USD 7,288.65). ยังสรุปว่าครบหน้าที่ IDU ไม่ได้.",
+      "evidence": [
+        "REQ0553-006 / MR-0001 C1 §5",
+        "mr0001BudgetFill0553.js: configurations.ZPQ / MR-LQM-202-025B"
+      ],
+      "actionTH": "ตรวจ BLD และหน้าที่จริงของ ZPQ ก่อนแก้ SKU/owner/ราคา; ไม่ลดเป็นราคา PoE โดยอัตโนมัติและไม่บวกซ้ำกับ ODU."
+    },
+    {
+      "id": "A1-C12",
+      "family": [
+        "ANTENNA"
+      ],
+      "sites": [
+        "ZWP20"
+      ],
+      "steps": [
+        3,
+        5,
+        8
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / RF",
+      "textTH": "ต้นทุน ZWP20 เลือก B-12 เสา 4ft ตาม budget decision แต่ BOD/RPT ฐานเดิมระบุ 6ft 40.9dBi; ต้องผูกหลักฐาน RF availability และ deviation/clarification ที่รองรับ.",
+      "evidence": [
+        "REQ0553-039 / BOD-0001 C2 §7.2",
+        "REQ0553-087 / RPT-0001 C1 §6.1.1",
+        "zwp20SiteCost0553.js: row6 management downsize"
+      ],
+      "actionTH": "คงงบที่เลือกพร้อมแสดงเงื่อนไข; ปิด comment ด้วยผล RF และฐานเอกสารที่รองรับก่อนยืนยัน final scope."
+    },
+    {
+      "id": "A1-C13",
+      "family": [
+        "RADIO",
+        "INDOOR"
+      ],
+      "steps": [
+        3,
+        5,
+        7,
+        8
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / SI / Vendor",
+      "textTH": "ข้อกำหนดระบุ GPS/time synchronization และขยาย existing ZPQ NMS พร้อม perpetual licence; working allocation ยังไม่มีหลักฐานชัดว่ารวมครบหรือมี cost owner แยก.",
+      "evidence": [
+        "REQ0553-036 / BOD-0001 C2 §6.6",
+        "REQ0553-040 / BOD-0001 C2 §7.2",
+        "REQ0553-051 / DTS-0001 C1 sheet4",
+        "REQ0553-071 / SPE-0001 C2 §6.1.7",
+        "zwp8Row43CostTrace.js: excluded GPS/NMS"
+      ],
+      "actionTH": "ตรวจ supplier inclusions, nodes/licences และ interface; ระบุรวมในชุดหรือเพิ่ม source line ที่มีฐานราคา ห้ามถือ unknown เป็นฟรี."
+    },
+    {
+      "id": "A1-C14",
+      "family": [
+        "ALL"
+      ],
+      "sites": [
+        "ZPQ",
+        "ZWP8"
+      ],
+      "steps": [
+        3,
+        4
+      ],
+      "status": "OPEN",
+      "owner": "Engineering / Document Control",
+      "textTH": "BLD บาง note ยังกล่าวถึง existing ZPQ–ZWP8 แต่ BOD/SPE/DTS กำหนด new/additional link; ต้องรักษา scope ของ link ใหม่และบันทึกข้อขัดแย้งเอกสาร.",
+      "evidence": [
+        "REQ0553-038 / BOD-0001 C2 §7.2",
+        "REQ0553-062 / DTS-0001 C1 Note11",
+        "REQ0553-091 / BLD sheet notes"
+      ],
+      "actionTH": "ยึดข้อกำหนดที่มี authority และ clarification ตาม MR precedence; ไม่ตัด link ใหม่เพราะ note เดิม และไม่รื้อ existing link โดยไม่มีฐาน."
+    }
+  ],
+  "familyOverrides": {
+    "MR-502-005A": "RADIO",
+    "MR-502-005B": "INDOOR",
+    "MR-LQM-202-025A": "RADIO",
+    "MR-LQM-202-025B": "INDOOR"
+  },
+  "reviews": [
+    {
+      "sourceId": "ZWP20::4::MR-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP20\",\"row\":4,\"tag\":\"MR-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":7288.65,\"counted\":true,\"source\":\"MTO Rev04 ZWP20 rows 4–11\",\"sku\":\"Engineering-derived remote radio functional composition\",\"status\":\"BUDGETARY_CALCULATED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP20 row 4 / MR-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP20 row 4 / MR-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP20::5::MR-502-001A",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP20\",\"row\":5,\"tag\":\"MR-502-001A\",\"qty\":1,\"currency\":\"USD\",\"extended\":671.27,\"counted\":true,\"source\":\"MTO Rev04 ZWP20 rows 4–11\",\"sku\":\"PS-DCDC-HAZ-POE-IND-01 + PPT-B (indoor PoE interface only)\",\"status\":\"BUDGETARY_PARTIAL_INTERFACE_ONLY\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP20 row 5 / MR-502-001A / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP20 row 5 / MR-502-001A / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP20::6::ANT-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP20\",\"row\":6,\"tag\":\"ANT-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":4709.77,\"counted\":true,\"source\":\"MTO Rev04 ZWP20 rows 4–11\",\"sku\":\"086-050122-602\",\"status\":\"BUDGETARY_CALCULATED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP20 row 6 / ANT-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP20 row 6 / ANT-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP20::7::LAN-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP20\",\"row\":7,\"tag\":\"LAN-502-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":371580,\"counted\":true,\"source\":\"Rev02 source frozen / TC-0001 Item 13 / VST A-0048/2026 Re1 historical quote\",\"sku\":\"IE-3400-8P2S-E / 8 GE PoE RJ45 + 2 SFP / no IEM-3300-8T\",\"status\":\"TC0001_8PORT_ENGINEERING_REVIEW_PENDING\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP20 row 7 / LAN-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP20 row 7 / LAN-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP20::8::DATO-507-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP20\",\"row\":8,\"tag\":\"DATO-507-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":3076.68,\"counted\":true,\"source\":\"SONIC CCY24-PXC-633 (panel) + RS Thailand 741-7317 (management-approved plug retail budget reference)\",\"sku\":\"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK (budgetary DATO components)\",\"status\":\"MANAGEMENT_APPROVED_BUDGETARY_SELECTION_AND_RATE__EX_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP20 row 8 / DATO-507-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP20 row 8 / DATO-507-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP20::9::TCAB-500-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP20\",\"row\":9,\"tag\":\"TCAB-500-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":39200,\"counted\":true,\"source\":\"MTO Rev04 ZWP20 rows 4–11\",\"sku\":\"A7-3136-4121/Bxxx\",\"status\":\"BUDGETARY_HISTORICAL_COMPARABLE_SELECTED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP20 row 9 / TCAB-500-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP20 row 9 / TCAB-500-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP20::10::SA-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP20\",\"row\":10,\"tag\":\"SA-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":614.2,\"counted\":true,\"source\":\"MTO Rev04 ZWP20 rows 4–11\",\"sku\":\"LP-POE-INL-IND-01\",\"status\":\"BUDGETARY_CALCULATED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP20 row 10 / SA-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP20 row 10 / SA-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP20::11::Bulk Material",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP20\",\"row\":11,\"tag\":\"Bulk Material\",\"qty\":1,\"currency\":\"THB\",\"extended\":37176,\"counted\":true,\"source\":\"MTO Rev04 ZWP20 rows 4–11\",\"sku\":\"CAT6A + certified entry fittings (engineering takeoff)\",\"status\":\"PARTIAL_BULK_2_OF_16_FUNCTIONS_PRICED_60M_PLUS_15PCT\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP20 row 11 / Bulk Material / 1 Lot",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP20 row 11 / Bulk Material / 1 Lot; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP21::13::MR-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP21\",\"row\":13,\"tag\":\"MR-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":7288.65,\"counted\":true,\"source\":\"RPT-0001 C1 ZWP11↔ZWP21 PTP / NG/260916-ADV-DAP1\",\"sku\":\"CONN-OW-HAZ-4958ER-01 + FLK-MAR-4958-EXT-D1 + OPK-3K-REM-UNLMBPS-01 + 3K-LW-MNT-SS-03\",\"status\":\"PTP_PEER_GROUP_C_PROVISIONAL_RADIO_FUNCTIONS__OEM_TO_CONFIRM\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP21 row 13 / MR-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP21 row 13 / MR-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP21::14::MR-502-001A",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP21\",\"row\":14,\"tag\":\"MR-502-001A\",\"qty\":1,\"currency\":\"USD\",\"extended\":671.27,\"counted\":true,\"source\":\"RPT-0001 C1 ZWP11↔ZWP21 PTP / NG/260916-ADV-DAP1\",\"sku\":\"PS-DCDC-HAZ-POE-IND-01 + PPT-B\",\"status\":\"PTP_INDOOR_POWER_INTERFACE_ONLY__IDU_FUNCTION_OPEN\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP21 row 14 / MR-502-001A / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP21 row 14 / MR-502-001A / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP21::15::ANT-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP21\",\"row\":15,\"tag\":\"ANT-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":3214.25,\"counted\":true,\"source\":\"RPT-0001 C1 ZWP11↔ZWP21 PTP / NG/260916-ADV-DAP1\",\"sku\":\"APD-DB-05-3FT-RAD-01\",\"status\":\"PTP_3FT_ANTENNA_RPT_REFERENCE__OEM_TO_CONFIRM\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP21 row 15 / ANT-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP21 row 15 / ANT-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP21::16::LAN-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP21\",\"row\":16,\"tag\":\"LAN-502-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":371580,\"counted\":true,\"source\":\"Rev02 source frozen / TC-0001 Item 13 / VST A-0048/2026 Re1 historical quote\",\"sku\":\"IE-3400-8P2S-E / 8 GE PoE RJ45 + 2 SFP / no IEM-3300-8T\",\"status\":\"TC0001_8PORT_ENGINEERING_REVIEW_PENDING\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP21 row 16 / LAN-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP21 row 16 / LAN-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP21::17::DATO-507-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP21\",\"row\":17,\"tag\":\"DATO-507-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":3076.68,\"counted\":true,\"source\":\"SONIC-CCY24-PXC-633 / RS Thailand indicative / MTO Rev04 ZWP21 Row17\",\"sku\":\"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK\",\"status\":\"PRELIMINARY_DATO_INTERFACE__EX_CERTIFICATION_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP21 row 17 / DATO-507-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP21 row 17 / DATO-507-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP21::18::TCAB-500-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP21\",\"row\":18,\"tag\":\"TCAB-500-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":39200,\"counted\":true,\"source\":\"PROSPER-24051 / 2024 Zawtika 1E / MTO Rev04 ZWP21 Row 18\",\"sku\":\"A7-3136-4121/Bxxx\",\"status\":\"BUDGETARY_HISTORICAL_COMPARABLE__ZWP21_EX_SCOPE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP21 row 18 / TCAB-500-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP21 row 18 / TCAB-500-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP21::19::SA-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP21\",\"row\":19,\"tag\":\"SA-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":614.2,\"counted\":true,\"source\":\"RPT-0001 C1 ZWP11↔ZWP21 PTP / NG/260916-ADV-DAP1\",\"sku\":\"LP-POE-INL-IND-01\",\"status\":\"ETHERNET_SURGE_CANDIDATE_INTERFACE__VERIFY_EX\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP21 row 19 / SA-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP21 row 19 / SA-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP21::20::Bulk Material",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP21\",\"row\":20,\"tag\":\"Bulk Material\",\"qty\":1,\"currency\":\"THB\",\"extended\":37176,\"counted\":true,\"source\":\"MTO Rev04 ZWP21 Row20 / INNOVA QA24-0604 / Approved greenfield base\",\"sku\":\"SCADA CAT6A + indoor certified entry candidate\",\"status\":\"PARTIAL_BULK_BUDGETARY__NOT_MEASURED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP21 row 20 / Bulk Material / 1 Lot",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP21 row 20 / Bulk Material / 1 Lot; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP22::22::MR-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP22\",\"row\":22,\"tag\":\"MR-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":7288.65,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"CONN-OW-HAZ-4958ER-01 + FLK-MAR-4958-EXT-D1 + OPK-3K-REM-UNLMBPS-01 + 3K-LW-MNT-SS-03\",\"status\":\"GREENFIELD_FUNCTIONAL_BUDGET__OEM_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP22 row 22 / MR-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP22 row 22 / MR-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP22::23::MR-502-001A",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP22\",\"row\":23,\"tag\":\"MR-502-001A\",\"qty\":1,\"currency\":\"USD\",\"extended\":671.27,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"PS-DCDC-HAZ-POE-IND-01 + PPT-B\",\"status\":\"GREENFIELD_FUNCTIONAL_BUDGET__OEM_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP22 row 23 / MR-502-001A / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP22 row 23 / MR-502-001A / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP22::24::ANT-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP22\",\"row\":24,\"tag\":\"ANT-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":4709.77,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"086-050122-602\",\"status\":\"GREENFIELD_FUNCTIONAL_BUDGET__OEM_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP22 row 24 / ANT-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP22 row 24 / ANT-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP22::25::LAN-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP22\",\"row\":25,\"tag\":\"LAN-502-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":371580,\"counted\":true,\"source\":\"Rev02 source frozen / TC-0001 Item 13 / VST A-0048/2026 Re1 historical quote\",\"sku\":\"IE-3400-8P2S-E / 8 GE PoE RJ45 + 2 SFP / no IEM-3300-8T\",\"status\":\"TC0001_8PORT_ENGINEERING_REVIEW_PENDING\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP22 row 25 / LAN-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP22 row 25 / LAN-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP22::26::DATO-507-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP22\",\"row\":26,\"tag\":\"DATO-507-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":3076.68,\"counted\":true,\"source\":\"SONIC-CCY24-PXC-633 + RS retail analogue / MTO Rev04\",\"sku\":\"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK\",\"status\":\"BUDGETARY_DATO_ASSEMBLY_EX_COMPLIANCE_NOT_VERIFIED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP22 row 26 / DATO-507-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP22 row 26 / DATO-507-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP22::27::TCAB-500-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP22\",\"row\":27,\"tag\":\"TCAB-500-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":39200,\"counted\":true,\"source\":\"PROSPER-24051 / historical Zawtika 1E\",\"sku\":\"A7-3136-4121/Bxxx\",\"status\":\"BUDGETARY_ENCLOSURE_HISTORICAL_ANALOGUE\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP22 row 27 / TCAB-500-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP22 row 27 / TCAB-500-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP22::28::SA-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP22\",\"row\":28,\"tag\":\"SA-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":614.2,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"LP-POE-INL-IND-01\",\"status\":\"GREENFIELD_FUNCTIONAL_BUDGET__OEM_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP22 row 28 / SA-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP22 row 28 / SA-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP22::29::Bulk Material",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP22\",\"row\":29,\"tag\":\"Bulk Material\",\"qty\":1,\"currency\":\"THB\",\"extended\":37176,\"counted\":true,\"source\":\"MTO Rev04 / INNOVA QA24-0604 / approved greenfield budget basis\",\"sku\":\"CAT6A plus single M20 entry candidate\",\"status\":\"PARTIAL_BULK_ROUTE_ALLOWANCE_NOT_MEASURED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP22 row 29 / Bulk Material / 1 Lot",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP22 row 29 / Bulk Material / 1 Lot; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP23::31::MR-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP23\",\"row\":31,\"tag\":\"MR-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":7288.65,\"counted\":true,\"source\":\"RPT-0001 C1 ZPQ→ZWP23 + MTO Rev04 row31 + NG/260916-ADV-DAP1\",\"sku\":\"CONN-OW-HAZ-4958ER-01 + FLK-MAR-4958-EXT-D1 + OPK-3K-REM-UNLMBPS-01 + 3K-LW-MNT-SS-03\",\"status\":\"ZWP23_PTMP_DIVERSITY_PRELIMINARY_FUNCTION_BUDGET_OEM_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP23 row 31 / MR-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP23 row 31 / MR-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP23::31::MR-502-001A",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP23\",\"row\":31,\"tag\":\"MR-502-001A\",\"qty\":1,\"currency\":\"USD\",\"extended\":671.27,\"counted\":true,\"source\":\"RPT-0001 C1 ZPQ→ZWP23 + MTO Rev04 row31 + NG/260916-ADV-DAP1\",\"sku\":\"PS-DCDC-HAZ-POE-IND-01 + PPT-B\",\"status\":\"ZWP23_PTMP_DIVERSITY_PRELIMINARY_FUNCTION_BUDGET_OEM_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP23 row 31 / MR-502-001A / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP23 row 31 / MR-502-001A / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP23::31::ANT-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP23\",\"row\":31,\"tag\":\"ANT-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":1581.86,\"counted\":true,\"source\":\"RPT-0001 C1 ZPQ→ZWP23 + MTO Rev04 row31 + NG/260916-ADV-DAP1\",\"sku\":\"APD-DB-05-2FT-02\",\"status\":\"ZWP23_PTMP_DIVERSITY_PRELIMINARY_FUNCTION_BUDGET_OEM_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP23 row 31 / ANT-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP23 row 31 / ANT-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP23::31::ANT-502-002",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP23\",\"row\":31,\"tag\":\"ANT-502-002\",\"qty\":1,\"currency\":\"USD\",\"extended\":1581.86,\"counted\":true,\"source\":\"RPT-0001 C1 ZPQ→ZWP23 + MTO Rev04 row31 + NG/260916-ADV-DAP1\",\"sku\":\"APD-DB-05-2FT-02\",\"status\":\"ZWP23_PTMP_DIVERSITY_PRELIMINARY_FUNCTION_BUDGET_OEM_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP23 row 31 / ANT-502-002 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP23 row 31 / ANT-502-002 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP23::32::LAN-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP23\",\"row\":32,\"tag\":\"LAN-502-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":371580,\"counted\":true,\"source\":\"Rev02 source frozen / TC-0001 Item 13 / VST A-0048/2026 Re1 historical quote\",\"sku\":\"IE-3400-8P2S-E / 8 GE PoE RJ45 + 2 SFP / no IEM-3300-8T\",\"status\":\"TC0001_8PORT_ENGINEERING_REVIEW_PENDING\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP23 row 32 / LAN-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP23 row 32 / LAN-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP23::33::DATO-507-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP23\",\"row\":33,\"tag\":\"DATO-507-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":3076.68,\"counted\":true,\"source\":\"SONIC-CCY24-PXC-633 + RS retail analogue / MTO Rev04\",\"sku\":\"FL-PP-RJ45-SC + IE-PS-RJ45-FH-BK\",\"status\":\"BUDGETARY_DATO_ASSEMBLY_EX_COMPLIANCE_NOT_VERIFIED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP23 row 33 / DATO-507-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP23 row 33 / DATO-507-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP23::34::TCAB-500-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP23\",\"row\":34,\"tag\":\"TCAB-500-001\",\"qty\":1,\"currency\":\"THB\",\"extended\":39200,\"counted\":true,\"source\":\"PROSPER-24051 / historical Zawtika 1E\",\"sku\":\"A7-3136-4121/Bxxx\",\"status\":\"BUDGETARY_ENCLOSURE_HISTORICAL_ANALOGUE\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP23 row 34 / TCAB-500-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP23 row 34 / TCAB-500-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP23::35::SA-502-001",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP23\",\"row\":35,\"tag\":\"SA-502-001\",\"qty\":1,\"currency\":\"USD\",\"extended\":614.2,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"LP-POE-INL-IND-01\",\"status\":\"GREENFIELD_FUNCTIONAL_BUDGET__OEM_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP23 row 35 / SA-502-001 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP23 row 35 / SA-502-001 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP23::36::Bulk Material",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP23\",\"row\":36,\"tag\":\"Bulk Material\",\"qty\":1,\"currency\":\"THB\",\"extended\":37176,\"counted\":true,\"source\":\"MTO Rev04 / INNOVA QA24-0604 / approved greenfield budget basis\",\"sku\":\"CAT6A plus single M20 entry candidate\",\"status\":\"PARTIAL_BULK_ROUTE_ALLOWANCE_NOT_MEASURED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP23 row 36 / Bulk Material / 1 Lot",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP23 row 36 / Bulk Material / 1 Lot; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZPQ::39::MR-LQM-202-025A",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZPQ\",\"row\":39,\"tag\":\"MR-LQM-202-025A\",\"qty\":1,\"currency\":\"USD\",\"extended\":13002,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"3K-SC-HAZ-RF4958-GPS-01 + FLK-MAR-4958-EXT-D1 + OPK-3K-ELLIPSE-PMPMAX-01 + 3K-LW-MNT-SS-03\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZPQ row 39 / MR-LQM-202-025A / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZPQ row 39 / MR-LQM-202-025A / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZPQ::39::MR-LQM-202-025B",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZPQ\",\"row\":39,\"tag\":\"MR-LQM-202-025B\",\"qty\":1,\"currency\":\"USD\",\"extended\":7288.65,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"CONN-OW-HAZ-4958ER-01 + FLK-MAR-4958-EXT-D1 + OPK-3K-REM-UNLMBPS-01 + 3K-LW-MNT-SS-03\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZPQ row 39 / MR-LQM-202-025B / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZPQ row 39 / MR-LQM-202-025B / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZPQ::39::ANT-LQM-202-025",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZPQ\",\"row\":39,\"tag\":\"ANT-LQM-202-025\",\"qty\":1,\"currency\":\"USD\",\"extended\":602.69,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"AFS-DBG-0590-02\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZPQ row 39 / ANT-LQM-202-025 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZPQ row 39 / ANT-LQM-202-025 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZPQ::40::SA-LQM-202-025",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZPQ\",\"row\":40,\"tag\":\"SA-LQM-202-025\",\"qty\":1,\"currency\":\"USD\",\"extended\":614.2,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"LP-POE-INL-IND-01\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZPQ row 40 / SA-LQM-202-025 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZPQ row 40 / SA-LQM-202-025 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZPQ::41::Bulk Material",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZPQ\",\"row\":41,\"tag\":\"Bulk Material\",\"qty\":1,\"currency\":\"THB\",\"extended\":37176,\"counted\":true,\"source\":\"MTO Rev04 + INNOVA QA24-0604\",\"sku\":\"TECKNIKABEL CAT6A + 501/453/UNIV/A/M20\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZPQ row 41 / Bulk Material / 1 Lot",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZPQ row 41 / Bulk Material / 1 Lot; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::43::MR-502-003",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":43,\"tag\":\"MR-502-003\",\"qty\":1,\"currency\":\"USD\",\"extended\":13002,\"counted\":true,\"source\":\"ZWP8_ROW43_COST_TRACE / NG/260916-ADV-DAP1\",\"sku\":\"3K-SC-HAZ-RF4958-GPS-01 + FLK-MAR-4958-EXT-D1 + OPK-3K-ELLIPSE-PMPMAX-01 + 3K-LW-MNT-SS-03\",\"status\":\"ZWP8_AFC_FUNCTION_WORKING_BUDGET__OEM_TO_CONFIRM\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 43 / MR-502-003 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 43 / MR-502-003 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::43::MR-502-003A",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":43,\"tag\":\"MR-502-003A\",\"qty\":1,\"currency\":\"USD\",\"extended\":671.27,\"counted\":true,\"source\":\"ZWP8_ROW43_COST_TRACE / NG/260916-ADV-DAP1\",\"sku\":\"PS-DCDC-HAZ-POE-IND-01 + PPT-B\",\"status\":\"ZWP8_AFC_FUNCTION_WORKING_BUDGET__OEM_TO_CONFIRM\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 43 / MR-502-003A / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 43 / MR-502-003A / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::43::ANT-502-002",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":43,\"tag\":\"ANT-502-002\",\"qty\":1,\"currency\":\"USD\",\"extended\":602.69,\"counted\":true,\"source\":\"ZWP8_ROW43_COST_TRACE / NG/260916-ADV-DAP1\",\"sku\":\"AFS-DBG-0590-02\",\"status\":\"ZWP8_AFC_FUNCTION_WORKING_BUDGET__OEM_TO_CONFIRM\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 43 / ANT-502-002 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 43 / ANT-502-002 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::43::MR-502-004",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":43,\"tag\":\"MR-502-004\",\"qty\":1,\"currency\":\"USD\",\"extended\":7288.65,\"counted\":true,\"source\":\"ZWP8_ROW43_COST_TRACE / NG/260916-ADV-DAP1\",\"sku\":\"CONN-OW-HAZ-4958ER-01 + FLK-MAR-4958-EXT-D1 + OPK-3K-REM-UNLMBPS-01 + 3K-LW-MNT-SS-03\",\"status\":\"ZWP8_AFC_FUNCTION_WORKING_BUDGET__OEM_TO_CONFIRM\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 43 / MR-502-004 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 43 / MR-502-004 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::43::MR-502-004A",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":43,\"tag\":\"MR-502-004A\",\"qty\":1,\"currency\":\"USD\",\"extended\":671.27,\"counted\":true,\"source\":\"ZWP8_ROW43_COST_TRACE / NG/260916-ADV-DAP1\",\"sku\":\"PS-DCDC-HAZ-POE-IND-01 + PPT-B\",\"status\":\"ZWP8_AFC_FUNCTION_WORKING_BUDGET__OEM_TO_CONFIRM\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 43 / MR-502-004A / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 43 / MR-502-004A / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::43::ANT-502-003",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":43,\"tag\":\"ANT-502-003\",\"qty\":1,\"currency\":\"USD\",\"extended\":4709.77,\"counted\":true,\"source\":\"ZWP8_ROW43_COST_TRACE / NG/260916-ADV-DAP1\",\"sku\":\"086-050122-602\",\"status\":\"ZWP8_AFC_FUNCTION_WORKING_BUDGET__OEM_TO_CONFIRM\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 43 / ANT-502-003 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 43 / ANT-502-003 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::44::LAN-502-002",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":44,\"tag\":\"LAN-502-002\",\"qty\":1,\"currency\":\"THB\",\"extended\":371580,\"counted\":true,\"source\":\"Rev02 source frozen / TC-0001 Item 13 / VST A-0048/2026 Re1 historical quote\",\"sku\":\"IE-3400-8P2S-E / 8 GE PoE RJ45 + 2 SFP / no IEM-3300-8T\",\"status\":\"TC0001_8PORT_ENGINEERING_REVIEW_PENDING\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 44 / LAN-502-002 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 44 / LAN-502-002 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::45::SA-502-002",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":45,\"tag\":\"SA-502-002\",\"qty\":1,\"currency\":\"USD\",\"extended\":614.2,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"LP-POE-INL-IND-01\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 45 / SA-502-002 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 45 / SA-502-002 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::45::SA-502-003",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":45,\"tag\":\"SA-502-003\",\"qty\":1,\"currency\":\"USD\",\"extended\":614.2,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"LP-POE-INL-IND-01\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 45 / SA-502-003 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 45 / SA-502-003 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::46::TCAB-500-003",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":46,\"tag\":\"TCAB-500-003\",\"qty\":1,\"currency\":\"THB\",\"extended\":39200,\"counted\":true,\"source\":\"MTO Rev04 + PROSPER-24051\",\"sku\":\"A7-3136-4121/Bxxx\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 46 / TCAB-500-003 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 46 / TCAB-500-003 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP8::47::Bulk Material",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP8\",\"row\":47,\"tag\":\"Bulk Material\",\"qty\":1,\"currency\":\"THB\",\"extended\":37176,\"counted\":true,\"source\":\"MTO Rev04 + INNOVA QA24-0604\",\"sku\":\"TECKNIKABEL CAT6A + 501/453/UNIV/A/M20\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP8 row 47 / Bulk Material / 1 Lot",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP8 row 47 / Bulk Material / 1 Lot; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP11::49::MR-502-005A",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP11\",\"row\":49,\"tag\":\"MR-502-005A\",\"qty\":1,\"currency\":\"USD\",\"extended\":7288.65,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"CONN-OW-HAZ-4958ER-01 + FLK-MAR-4958-EXT-D1 + OPK-3K-REM-UNLMBPS-01 + 3K-LW-MNT-SS-03\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP11 row 49 / MR-502-005A / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP11 row 49 / MR-502-005A / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP11::49::MR-502-005B",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP11\",\"row\":49,\"tag\":\"MR-502-005B\",\"qty\":1,\"currency\":\"USD\",\"extended\":671.27,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"PS-DCDC-HAZ-POE-IND-01 + PPT-B\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP11 row 49 / MR-502-005B / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP11 row 49 / MR-502-005B / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP11::49::ANT-502-005",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP11\",\"row\":49,\"tag\":\"ANT-502-005\",\"qty\":1,\"currency\":\"USD\",\"extended\":3214.25,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"APD-DB-05-3FT-RAD-01\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP11 row 49 / ANT-502-005 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP11 row 49 / ANT-502-005 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP11::50::SA-507-005",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP11\",\"row\":50,\"tag\":\"SA-507-005\",\"qty\":1,\"currency\":\"USD\",\"extended\":614.2,\"counted\":true,\"source\":\"MTO Rev04 + NG/260916-ADV-DAP1\",\"sku\":\"LP-POE-INL-IND-01\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP11 row 50 / SA-507-005 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP11 row 50 / SA-507-005 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP11::51::TCAB-500-003",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP11\",\"row\":51,\"tag\":\"TCAB-500-003\",\"qty\":1,\"currency\":\"THB\",\"extended\":0,\"counted\":true,\"source\":\"MTO Rev04 row51 + BOD-0001 Rev.C2 section 8 + PROSPER-24051 historic analogue\",\"sku\":null,\"status\":\"BROWNFIELD_EXISTING_ENCLOSURE_REUSE__NEW_PROCUREMENT_QTY_ZERO__MODIFICATION_NOT_ESTABLISHED\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP11 row 51 / TCAB-500-003 / 1 Set",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP11 row 51 / TCAB-500-003 / 1 Set; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    },
+    {
+      "sourceId": "ZWP11::52::Bulk Material",
+      "steps": [
+        1,
+        7
+      ],
+      "result": "NO_COMMENT",
+      "reviewer": "Codex / source-ledger cross-check",
+      "date": "2026-10-24",
+      "sourceSignature": "{\"site\":\"ZWP11\",\"row\":52,\"tag\":\"Bulk Material\",\"qty\":1,\"currency\":\"THB\",\"extended\":37176,\"counted\":true,\"source\":\"MTO Rev04 + INNOVA QA24-0604\",\"sku\":\"TECKNIKABEL CAT6A + 501/453/UNIV/A/M20\",\"status\":\"BROWNFIELD_REPLACEMENT_EQUIVALENT_ALLOWANCE__REUSE_REVIEW\",\"policyRevision\":\"2026-10-24-R1\",\"requirementRevision\":\"47361:ebce007b\"}",
+      "reviewScope": "Source MTO identity/quantity and numerical cost allocation; native-document, functional, execution and risk checks remain separate.",
+      "evidence": [
+        "MTO Rev04 ZWP11 row 52 / Bulk Material / 1 Lot",
+        "Canonical counted line, currency, one source owner; A1 source-to-Release cost reconciles at THB 5,840,703.18."
+      ],
+      "evidenceByStep": {
+        "1": [
+          "MTO Rev04 ZWP11 row 52 / Bulk Material / 1 Lot; one counted source owner."
+        ],
+        "7": [
+          "Canonical line/currency/selected price basis traced; 55-line sum reconciles to Release A1 THB 5,840,703.18. Commercial re-confirmation remains separate; open technical comments take precedence."
+        ]
+      }
+    }
+  ]
+}

@@ -20,7 +20,7 @@ import {SITE_SYSTEM_COST_RECONCILIATION_0553} from "./data/siteSystemCostReconci
 import {deriveA5BulkAttribution0553} from "./data/a5BulkAttribution0553";
 import {getMR0001LocationCost0553} from "./data/mr0001LocationCostSummary0553";
 import {WORKING_BOM_BY_LOCATION_0553} from "./data/workingBomByLocation";
-import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
+import {selectWorkingBomProjection0553,workingBomTotalTHB0553} from "./data/workingBomReviewedProjection0553";
 const SHEETS=[
  ["Scope of supply","A/B/C","A1–A5 equipment+bulk, B1–B14 services, C1/C2 options"],
  ["B10 CommSpares","B10","Erection, pre-commissioning, commissioning and start-up spare parts"],
@@ -72,7 +72,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
  // Source Ledger is already priced by the MTO's Bulk Material cost owners.
  // The separate SCADA envelope / WP planning routes are scenario views, not additive invoices.
  const a5=deriveA5BulkAttribution0553();
- const scadaLedgerCostTHB=fxValid?round(scadaSourceTHB+scadaSourceUSD*fx.thbPerUsd):null;
+ const scadaLedgerCostTHB=workingBomTotalTHB0553(selectWorkingBomProjection0553({mr:"MR-0001"}),fx?.thbPerUsd);
  const workingScadaEquipment=Number.isFinite(scadaLedgerCostTHB)&&Number.isFinite(a5.a1CostToReclassifyTHB)?
   round(scadaLedgerCostTHB-a5.a1CostToReclassifyTHB):scadaLedgerCostTHB;
  const a5Unpriced=a5.unresolved.length+a5.unknownScadaAccessories.length;
@@ -95,7 +95,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
   const other=Object.keys(projection.currencies).filter(key=>key!=="THB"&&key!=="USD");
   if(other.length)return null;
   const thb=projection.currencies.THB||0,usd=projection.currencies.USD||0;
-  return usd&&!fxValid?null:round(thb+usd*(fx?.thbPerUsd||0));
+  return workingBomTotalTHB0553(projection,fx?.thbPerUsd);
  };
  const a1Combined=projectionTHB(sourceMrProjection.A1);
  // A1 shows the full MR0001 canonical allocated BOM amount, including embedded bulk.
@@ -270,3 +270,4 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
   <p className="p55-note">Do not auto-add historical Rev08 summaries to quotation line costs, options or derived bulk. Zero-price lines and blanks in source are not accepted prices without review. Each sheet must pass Modules 01–08 before new costing/release.</p>
  </section>;
 }
+

@@ -5,7 +5,7 @@ import {selectServiceCommercialBasis0553} from "./serviceCommercialBasis0553";
 // B: canonical 10.2 Working SELL; 5% SAMTEL deduction on ordinary service portion ONLY.
 // Exception MGW purchased FAT service: 20% SAMTEL on QUOTED COST already inside B3 WS;
 // no second standard B 5% deduction against the purchased-service increment.
-import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
+import {selectWorkingBomProjection0553,workingBomLineCostTHB0553} from "./workingBomReviewedProjection0553";
 import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
@@ -118,11 +118,6 @@ const LINE_DESCRIPTION_0553=Object.freeze({
  A1:"MR-0001 SCADA / AVIAT / Cisco",A2:"MR-0002 Trunk Radio",
  A3:"MR-0003 Ex Telephone / Sounder",A4:"MR-0004 RACON"
 });
-const resultMoneyTHB=(line,rate)=>{
- if(!line.counted||!n(line.extended))return null;
- return line.currency==="THB"?round(line.extended):
-  line.currency==="USD"&&positive(rate)?round(line.extended*rate):null;
-};
 // 10.2 -> 10.3 Annex price projection: one source, no second cost posting.
 // B10/B11/B13: currently selected pre-award Working SELL; not verified Direct COST.
 // C1/C2: current historical-based OPTION budget reference, NOT verified OEM cost,
@@ -276,8 +271,9 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
   const bom=selectWorkingBomProjection0553({mr});
   const sourceRows=bom.lines.filter(r=>r.counted).map((line,index)=>{
    const item=line.item||{};
+   const internalReview=bom.internalReview?.rows.find(r=>r.site===line.site&&r.row===item.row&&r.tag===line.tag)||null;
    const rawQty=n(item.sourceQty)?item.sourceQty:n(item.qty)?item.qty:null;
-   const cost=resultMoneyTHB(line,rate);
+   const cost=workingBomLineCostTHB0553(line,rate);
    const unit=n(cost)&&positive(rawQty)?round(cost/rawQty):null;
    const extendedSell=n(cost)?priceAorCFromCost0553(cost).customerSellTHB:null;
    const customerUnitSell=extendedSell!==null&&positive(rawQty)?Math.round(extendedSell/rawQty*10000)/10000:null;
@@ -291,6 +287,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
     customerUnitTHB:customerUnitSell, // 4-decimal rate reconciles against extended sell to 0.01 THB
     customerSellTHB:extendedSell,
     sourcePriceCurrency:line.currency,sourceRef:line.source,
+    internalReviewSourceId:internalReview?.sourceId||null,internalReview,
     status:item.status||"WORKING_EVIDENCE_NOT_APPROVED",verified:false
    };
   });
@@ -300,7 +297,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
     !bom.scenario&&sourceRows.length>0&&countedCosts.length===sourceRows.length&&
     sourceRows.every(x=>positive(x.qty)&&x.tag!=="NOT VERIFIED");
   return {code,mr,description:LINE_DESCRIPTION_0553[code],sourceModuleId:"bid.budget.bom.system-location-mto",
-   sourceRows,previewCostTHB:countedCosts.length?partialCost:null,
+   sourceRows,internalReview:bom.internalReview,previewCostTHB:countedCosts.length?partialCost:null,
    previewSellTHB:countedCosts.length?priceAorCFromCost0553(partialCost).customerSellTHB:null,
    pricedCount:countedCosts.length,unresolvedCount:bom.unresolved,
    state:costComplete?"WORKING_COMPLETE_BUT_NOT_APPROVED":"PARTIAL_WORKING_COST_NOT_CUSTOMER_RELEASE",
@@ -409,10 +406,12 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    baseCustomerSellTHB:aCostComplete&&b.every(x=>n(x.customerSellTHB))?round(aPrice+bPrice):null,
    addvalueRealizedProfitTHB:null // Incomplete verified total cost; never invent profit.
   },
-  sourceCoverage:{aReady:aCostComplete,bSellReady:b.length===bKnown.length,
+  sourceCoverage:{a1InternalReviewReady:a.find(x=>x.code==="A1")?.internalReview?.complete===true,aReady:aCostComplete,bSellReady:b.length===bKnown.length,
    bCostReady:bProfitComplete,cCostReady:cCostComplete,
    annexOverflow,aOverflow,gaps},
   approval:{approved:false,releaseAllowed:false,exportNativeAllowed:false,
+   a1InternalReviewReady:a.find(x=>x.code==="A1")?.internalReview?.complete===true,
    reason:"Commercial snapshot is not approved, source TAG/annex allocation and Cost Ledger incomplete"}
  });
 }
+

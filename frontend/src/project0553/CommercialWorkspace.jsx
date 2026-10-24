@@ -8,6 +8,7 @@ import { InternalBudgetShortcut0553 } from "./InternalBudgetShortcut0553";
 import { ScopeSheetsDetail0553 } from "./ScopeSheetsDetail0553";
 import { BID_COST_SPINE_0553 } from "./data/bidCostSpine";
 import { CostIntegrityReview0553 } from "./CostIntegrityReview0553";
+import {A1InternalReview0553} from "./A1InternalReview0553";
 import {BcCostEvidenceDetail0553} from "./BcCostEvidenceDetail0553";
 import {BcExecutionComplianceAudit0553} from "./BcExecutionComplianceAudit0553";
 import {BcWorkCostLines0553} from "./BcWorkCostLines0553";
@@ -325,6 +326,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     Updated selected source values flow here on the next render; issuing a customer quote still needs approval.
    </p>
    {recipient==="INTERNAL"&&<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>}
+   {recipient==="INTERNAL"&&<A1InternalReview0553 review={releaseModel.a.find(x=>x.code==="A1")?.internalReview} placement="RELEASE"/>}
    {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
    <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} focusAnnexTarget={releaseAnnexTarget} title="10.3 — Released Customer Output (Read-only staging)"/>
    <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
@@ -419,3 +421,4 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  </details>
  </div>;
 }
+

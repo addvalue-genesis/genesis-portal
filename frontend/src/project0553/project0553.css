@@ -817,3 +817,12 @@
 .p553-dashboard .p553-integrity-review summary:focus-visible,.p553-integrity-controls button:focus-visible{outline:2px solid #1b638d;outline-offset:3px}
 .p553-dashboard .p553-integrity-review .p55-table-wrap{max-width:100%;overflow-x:auto}
 .p553-dashboard .p553-integrity-review .p55-table{min-width:720px}
+
+
+/* A1 SI re-check: bounded tables and lazy TAG details for mobile review. */
+.p553-dashboard .p553-a1-review{min-width:0;max-width:100%;border-inline-start:4px solid #28618c;overflow-wrap:anywhere}
+.p553-dashboard .p553-a1-review .p55-table-wrap{max-width:100%;overflow-x:auto}
+.p553-dashboard .p553-a1-review .p55-table{min-width:360px}
+.p553-dashboard .p553-a1-review details{margin-block:8px}
+.p553-dashboard .p553-a1-review summary{cursor:pointer;padding:8px 4px;font-weight:650}
+.p553-dashboard .p553-a1-review summary:focus-visible{outline:2px solid #28618c;outline-offset:2px}
