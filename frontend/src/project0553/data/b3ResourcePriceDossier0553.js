@@ -59,7 +59,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  });
  const fatRows=fat.rows.filter(r=>r.costOwner==="B3"&&!r.optional);
  const fatLines=fatRows.map(r=>make("fat-witness",r.id.toLowerCase(),{
-  group:"FAT_WITNESS",site:"MGW Nantong, China (venue subject to confirmation)",wbs:r.wbs,
+  group:"FAT_WITNESS",site:fat.executionLocation,wbs:r.wbs,
   work:r.description,role:r.id==="B3-FAT-STAFF"?"2 FAT paid witnesses (PM/Chief Telecom Engineer + Sr Telecom Engineer)":
    "FAT witness travel / accommodation / insurance expense",
   people:r.id==="B3-FAT-STAFF"?2:null,
@@ -75,15 +75,15 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  }));
  const onshoreFatPaidRoleTrace=freeze([
   freeze({id:"B3-FAT-SR",role:"Senior Telecom Systems Integration Engineer",
-   onsiteMD:6,travelMD:2,usdPerMD:700,rateTHBPerMD:22050,
-   workingSellTHB:176400,directCostTHB:null}),
+   onsiteMD:6,travelMD:0,usdPerMD:700,rateTHBPerMD:22050,
+   workingSellTHB:132300,directCostTHB:null}),
   freeze({id:"B3-FAT-PM",role:"PM / Chief Engineer — provisional standard USD600 (not unbilled Field standby)",
-   onsiteMD:6,travelMD:2,usdPerMD:600,rateTHBPerMD:18900,
-   workingSellTHB:151200,directCostTHB:null})
+   onsiteMD:6,travelMD:0,usdPerMD:600,rateTHBPerMD:18900,
+   workingSellTHB:113400,directCostTHB:null})
  ]);
- if(round(onshoreFatPaidRoleTrace.reduce((n,x)=>n+x.workingSellTHB,0))!==327600||
+ if(round(onshoreFatPaidRoleTrace.reduce((n,x)=>n+x.workingSellTHB,0))!==245700||
     fatRows.find(x=>x.id==="B3-FAT-STAFF")?.workingSellTHB!==245700||
-    fatRows.find(x=>x.id==="B3-TRAVEL-DAYS")?.workingSellTHB!==81900)
+    fatRows.find(x=>x.id==="B3-TRAVEL-DAYS")?.workingSellTHB!==0)
   throw Error("B3 China FAT paid role rate-to-source bridge missing");
   const mgwLines=mgw.quoteLines.map(q=>make("mgw-vendor",q.serviceId.toLowerCase(),{
   group:"MGW_PURCHASED_FAT",site:mgw.policy.executionLocation,wbs:"K01",
@@ -177,8 +177,8 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   postingClass:"UNPRICED_REQUIREMENT_NONPOSTING",stageAllocationConfirmed:false
  }));
  const stageGroups=freeze([
-  stage("MGW Purchased Factory FAT — Quotation Cost → WS-B3 SELL",mgwLines,"B3.1.1"),
-  stage("ADDVALUE China FAT — Witness / Travel / Hotel / Insurance",fatLines,"B3.1.2"),
+  stage("SAMTEL integration/FAT service reserve — MGW quoted benchmark",mgwLines,"B3.1.1"),
+  stage("SAMTEL Warehouse FAT — Labour / Local Transfers / Work Insurance",fatLines,"B3.1.2"),
   stage("Selected SAT/SIT 28 Team-days / 56 MD",satLines,"B3.2.1"),
   stage("Temporary VeEX MX100+ rental",rental,"B3.3.1"),
   stage("Selected BF Survey 3 site +2 travel Team-days / 10 MD (physical call-out conditional)",freeze([...bfLines,...bfTripLines]),"B3.2.3"),
@@ -250,7 +250,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
     sourceIndexList.some(i=>i<0||i>=stageGroups.length))
   throw Error("B3 group hierarchy cannot omit or duplicate any source stage");
  const rollupTotalTHB=round(groupRollups.reduce((n,g)=>n+g.selectedWorkingSellTHB,0));
- if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="729725|252000|1587600|30000"||
+ if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="570825|252000|1587600|30000"||
     rollupTotalTHB!==workingRow.workingSellTHB)
   throw Error("B3 group hierarchy must reconcile once to canonical WS-B3");
  const priced=stageGroups.slice(0,5);
@@ -263,14 +263,14 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  if(new Set(singleIds).size!==singleIds.length||
     mgwLines.length!==2||fatLines.length!==8||satLines.length!==18||
     bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
-    total(mgwLines)!==307125||total(fatLines)!==422600||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
-    total(rental)!==30000||budgetSelected!==2599325||
-    selectedBaseExcludingConditionalBFTHB!==2347325||bfConditionalBudgetAllowanceTHB!==252000||
+    total(mgwLines)!==307125||total(fatLines)!==263700||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
+    total(rental)!==30000||budgetSelected!==2440425||
+    selectedBaseExcludingConditionalBFTHB!==2188425||bfConditionalBudgetAllowanceTHB!==252000||
     bfSurveyExpenseDrivers.length!==4||
     bfSurveyExpenseDrivers.some(x=>x.workingSellTHB!==null||x.actualDirectCostTHB!==null)||
     riskReserve.some(x=>x.workingSellTHB!==null||x.directCostTHB!==null)||
     workingRow.workingSellTHB!==budgetSelected||
-    picked.join("|")!=="307125|422600|1587600|30000|252000"||
+    picked.join("|")!=="307125|263700|1587600|30000|252000"||
     plan.survey.conditionalLabourSellReferenceTHB!==252000||
     vendorQuoteCostTHB!==236250||
     round(vendorQuoteCostTHB+mgw.samTelMarkupTHB+mgw.addvalueMarkupTHB+
@@ -280,7 +280,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   throw Error("B3 detailed dossier does not reconcile to 10.2 canonical Working SELL");
  return freeze({
   moduleId:root,ownerModuleId:workingRow.moduleId,
-  groupNames:freeze(["MGW Purchased FAT","ADDVALUE FAT witness","Selected SAT 28d priced resource roles",
+  groupNames:freeze(["SAMTEL FAT service reserve","ADDVALUE FAT witness","Selected SAT 28d priced resource roles",
    "VeEX Rental","Selected BF survey working budget","GF Yard SAT","GF Offshore commissioning","SIT/Punch Gate"]),
   groups:stageGroups,groupRollups,rollupTotalTHB,onshoreFatPaidRoleTrace,
   groupAttributionOnly:true,groupIndependentCostPostingAllowed:false,
@@ -302,7 +302,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    unpricedExtraBFExpenseCostTHB:null,
    GFYardAdditionalCostTHB:null,GFOffshoreAdditionalCostTHB:null,
    actualDirectCostTHB:null,commercialReleaseAllowed:false,
-   reconciliation:"2347325 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2599325 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
+   reconciliation:"2188425 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2440425 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
     satSeniorUsd1000DeltaTHB:satSelected.satSeniorRateRevisionDeltaTHB
   }),
   bfSurveyExpenseDrivers,riskReserve,

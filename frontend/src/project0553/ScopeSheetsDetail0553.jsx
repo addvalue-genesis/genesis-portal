@@ -112,8 +112,8 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
    source:"MR0001 TAG Cost Ledger → system-location-mto; A1 is the full allocated amount including bulk. A5 is a non-additive disclosure only",
    status:"WORKING ALLOCATED EQUIPMENT/BULK — INCLUDES A5; same MR0001 BOM total; NOT full A+B+C"},
   A2:sourceLine("A2","MR0002 vendor working lines; engineering/source gates retained"),
-  A3:sourceLine("A3","Selected MGW R2 Gai-Tronics 212-02-6008-410, EATON DB3B and WAROM BXJ-S; 4 sites, external field bulk unpriced"),
-  A4:sourceLine("A4","Selected MGW R2 Tideland SeaBeacon 2 System 6; 3 sites, DB-5P included, control/bulk pending"),
+  A3:sourceLine("A3","Selected EXION Thai 212-02-6008-510 and DB3BDG048N2BNR; 4 sites, JB/glands and external bulk unpriced"),
+  A4:sourceLine("A4","Selected MDS / ORGA SeaBeacon 2; 1-system quote extrapolated to 3 sites, DB-5P/control box included, cable/gland/FAT contradictions open"),
   A5:{amount:a5.a5PriceTHB,source:a5.source+"; exact "+a5.rowCount+" source MTO Bulk cost-owner rows; A1→A5 display reclassification only",
    status:"INCLUDED IN A1 — NON-ADDITIVE MEMO ONLY; "+a5.state+"; "+a5Unpriced+" remaining field-bulk/accessory evidence gaps"}
  };

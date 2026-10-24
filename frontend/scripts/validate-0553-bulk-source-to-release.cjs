@@ -171,7 +171,7 @@ for(const [site,roles] of Object.entries({
 }
 for(const mr of ["MR-0002","MR-0003","MR-0004"]){
  const pairs=matrix.groups.filter(x=>x.mr===mr);
- assert(pairs.every(x=>x.selectedQuoteId===mgw.id));
+ assert(pairs.every(x=>x.selectedQuoteId===({"MR-0002":mgw.id,"MR-0003":"EXION-1260576-REV0","MR-0004":"MDS-QTORG2609244-20260922"})[x.mr]));
  assert(pairs.every(x=>x.sourceMtoRow===null));
  assert(pairs.every(x=>x.releasePart===x.customerLine));
  assert(pairs.every(x=>!x.sourceToReleaseReady));

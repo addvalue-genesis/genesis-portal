@@ -25,23 +25,23 @@ const {BcCostEvidenceDetail0553:Evidence}=get("BcCostEvidenceDetail0553.jsx");
 const r=bc(),b=r.byCode.B3;
 const sourceSnapshot=JSON.stringify({b3:b,overall:r.knownWorkingSellTHB});
 assert.equal(b.moduleId,"bid.budget.working.bc.b3");
-assert.equal(b.workingSellTHB,2599325);
+assert.equal(b.workingSellTHB,2440425);
 assert.equal(b.directCostTHB,null);
 const p=detail(b);
 assert.equal(p.moduleId,"bid.budget.working.bc.b3.working-sell-breakdown");
 assert.equal(p.ownerModuleId,b.moduleId);
-assert.equal(p.totalWorkingSellTHB,2599325);
-assert.deepEqual(p.summary.map(x=>x.workingSellTHB),[1587600,252000,30000,307125,422600]);
+assert.equal(p.totalWorkingSellTHB,2440425);
+assert.deepEqual(p.summary.map(x=>x.workingSellTHB),[1587600,252000,30000,307125,263700]);
 assert.equal(p.offshore.workdays,28);
 assert.equal(p.offshore.people,2);
 assert.equal(p.survey.personDays,10);
 assert.equal(p.survey.workingSellTHB,252000);
 assert.equal(p.offshore.personDays,56);
 assert.equal(p.fat.rows.length,8);
-assert.equal(p.fat.workingSellTHB,422600);
+assert.equal(p.fat.workingSellTHB,263700);
 assert.equal(p.fat.rows.filter(x=>x.costOwner==="B9").length,0);
 assert.equal(p.fat.rows.filter(x=>x.optional).length,0);
-assert.equal(p.fat.rows.reduce((n,x)=>n+x.workingSellTHB,0),422600);
+assert.equal(p.fat.rows.reduce((n,x)=>n+x.workingSellTHB,0),263700);
 assert.equal(p.releaseAllowed,false);
 assert.equal(p.verifiedDirectCostTHB,null);
 const t=trace(),s=matrix();
@@ -55,7 +55,7 @@ assert.equal(s.plannedWorkingDays,40);assert.equal(s.coveredB3SellTHB,2046000);
 assert(s.rows.every(x=>x.workingSellTHB===null&&x.directCostTHB===null));
 const render=(Comp,props)=>renderToStaticMarkup(React.createElement(Comp,props));
 const h=render(Breakdown,{workingRow:b});
-assert(h.includes("2,599,325.00")&&h.includes("1,587,600.00")&&h.includes("252,000.00")&&h.includes("30,000.00")&&h.includes("422,600.00"));
+assert(h.includes("2,440,425.00")&&h.includes("1,587,600.00")&&h.includes("252,000.00")&&h.includes("30,000.00")&&h.includes("263,700.00"));
 assert(h.includes("bid.budget.working.bc.b3.working-sell-breakdown"));
 assert(h.includes("bid.budget.working.bc.b3.fat-staff"));
 assert(h.includes("DIRECT COST NOT ESTABLISHED"));
@@ -78,7 +78,7 @@ assert.equal(new Set(renderedKeys).size,renderedKeys.length,"Visible B3 UI must 
 assert.equal(renderedKeys.filter(x=>x==="bid.budget.working.bc.b3.fat-staff").length,1,
  "Only the original MGW China FAT expense table may own the canonical FAT-STAFF DOM anchor");
 const historicalAudit=fs.readFileSync(path.join(dir,"B3EquationAudit0553.jsx"),"utf8");
-assert(historicalAudit.includes("B3 owns MGW China FAT witness personnel/travel"));
+assert(historicalAudit.includes("B3 owns SAMTEL Warehouse FAT witness personnel/travel"));
 assert(!historicalAudit.includes("B9 MGW China FAT witnesses"));
 
 // Work type owns presentation order: FAT -> SAT -> temporary tools -> cost audit.

@@ -2,8 +2,23 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R31";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R33";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-02",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"Source pricing: EXION + MDS, SAMTEL Warehouse FAT/Training, CIF Zhuhai",
+  detail:"A3 EXION phone/sounder THB828000; JB/glands remain unpriced. A4 MDS one quoted USD75000 system extrapolated to 3 required sites USD225000. A known SELL +THB20831.85. B3 removes only five foreign FAT travel rows THB158900; local labour THB245700, transfers8000, work cover10000 and integration/facility reserve307125 remain. Reserve is not selected MGW purchase or confirmed credit. B3 THB2440425; known B THB4884182.13. B8 training151550 receives no second travel deduction; B9 and offshore remain. B6 CIF eight-leg route has unknown cost adequacy; packing/storage allowances retained. All downstream views derive from source; C optional/unquoted; release HOLD. DB/manual-input work deferred. Original numbered requirements 1–8 not reconstructed.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3","bid.budget.working.bc.b6","bid.budget.pricing.release"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"24-Oct owner handoff; EXION1260576R0; MDS QTORG2609244; CCL item12; COM-D02; Contract18.1(c)"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-01",date:"2026-10-24",kind:"UI",tone:"neutral",
+  title:"10.1 Cost integrity: Color-coded Hierarchical Nested Accordion",
+  detail:"Cost integrity now starts collapsed with its existing Module ID visible. Expand All / Collapse All and independent +/− controls reveal three color-coded table-first groups: verification gates, MR quote coverage, and vendor quote register. Each group exposes Copy ID and its evidence count or source status when collapsed. Tables retain all original fields and currencies with horizontal scrolling. Colors identify categories, not approval.",
+  moduleIds:Object.freeze(["bid.budget.integrity","bid.budget.integrity.steps","bid.budget.integrity.mr-coverage","bid.budget.integrity.vendor-register"]),
+  priceImpact:"NO_PRICE_CHANGE",
+  source:"Owner UI request 2026-10-24; Controlled Module Disclosure & Identity Contract Rev01; existing costIntegrity0553 evidence"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-19",date:"2026-10-22",kind:"PRICE",tone:"neutral",
   title:"B3 Working Budget Selected SAT 28 Days + BF Site Survey 3+2, Not Historical 40 Days",

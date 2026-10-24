@@ -224,7 +224,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        {B_ROWS.map(id=>{
         const line=bLines.find(r=>r.code===id);
         return <React.Fragment key={id}><tr><td><strong>{id}</strong></td>
-         <td colSpan={3}>{parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}</td>
+         <td colSpan={3}>{id==="B6"?line?.description:parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}</td>
          <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td>{workingBudgetaryOwners.has(id)?<>
@@ -267,7 +267,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         <td>1 lot</td><td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
         <td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
         <td>refer to Annex {r.code} · OPTION
-          <small>{r.code==="C1"?"MGW installed RACON comparison only; independent spare OEM quote open":"2-year OEM SPIR/part qty/price open; excludes B10 SKU stock"}</small>
+          <small>{r.code==="C1"?"Independent capital spare OEM quote pending":"2-year OEM SPIR/part qty/price open; excludes B10 SKU stock"}</small>
           {internal&&r.code==="C1"&&Number.isFinite(r.internalNonpostingInstalledPackageComparableTHB)&&
             <small>Separate NONPOSTING installed-package budget comparison: {cash(r.internalNonpostingInstalledPackageComparableTHB)} · not a C1 OEM spare quote / not DDP</small>}
           {internal&&<button type="button" className="p553-detail-button"

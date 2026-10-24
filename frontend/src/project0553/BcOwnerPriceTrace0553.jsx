@@ -176,47 +176,17 @@ function Pricing({row}){
     no automatic reassessment of selected SELL and no duplicate OEM packing.</p>
   </section>}
   {code==="B6"&&<section className="p55-panel" style={{padding:12}}>
-   <h4>B6 — Transportation Working SELL / Proposed DAP JUTAL Zhuhai Yard</h4>
-   <p className="p55-note">{fmt(total)} is a Rev08 transportation Working SELL reference
-    converted using internal planning FX 31.5, <strong>NOT a quotation from MGW</strong>
-    or a shipment-level rate. Supplier USD2500 Nantong→JUTAL road freight is contained
-    ONCE in the 20-Oct MGW cover; it must be reconciled with the B6 cost owner,
-    supplier packing USD500, delivery terms, and original equipment A inclusion.
-    There is no approved allocation of the B6 Working SELL to four MR cargo legs.</p>
-    <p className="p55-note"><strong>Selected Pre-award DAP Planning Basis:</strong>
-    {" "}{row.b6FourMrRoutingEvidence?.dapCommercialPlanning?.proposedDeliveryTerm}.
-    The B6 budgetary Working SELL remains <strong>{fmt(total)}</strong>, with
-    MGW SERV-5 Road Freight USD2,500 only a supplier quote for the outbound
-    China leg. Contract Article 8.1 is still DDP and JUTAL CCL Item12 previously
-    accepted offshore CIF. <strong>DAP is a proposed clarification, NOT
-    JUTAL/MGW accepted commercial terms.</strong> Import duties, import VAT,
-    Chinese domestic sales VAT, bonded status and customs-broker cost are
-    unverified and no 13% VAT reduction has been assumed. MGW receiving,
-    NextG inbound Nantong reroute, four-MR cargo manifest and packing USD500
-    overlap need price reconciliation; no Direct COST or Release posting.</p>
-   <p className="p55-note"><strong>OWNER-APPROVED B6 Physical Routing (ADR-68 · 22-Oct-2026):</strong>
-    NextG <strong>IDU 4 + ODU 4 + ALL 5 Greenfield Antennas</strong> to MGW Nantong
-    directly; Thailand receives <strong>Enclosure + Cisco 4 sets</strong>, performs
-    approved bench preassembly/wiring and preliminary electrical QA, then exports
-    these four protected sets to MGW for final integration/FAT. No antenna diversion
-    direct to JUTAL. MGW MR0002/0003/0004 OEM items remain China-bound for combined FAT,
-    without an artificial Thailand transit. The original NextG
-    <strong> NG/260916-ADV-DAP1 / DAP Ranong</strong> delivery quotation has expired
-    and has NOT been amended to MGW Nantong; destination/Incoterm, freight credit
-    and supplier dispatch still require confirmation.
-    <strong> Selected B6 Working SELL {fmt(total)} remains unchanged.</strong>
-    No verified saving, increment, tariff or actual logistics COST has been posted.</p>
-   <p className="p55-note"><strong>Earlier all-Thailand scenario (comparison only):</strong>
-    four preassembled cabinets (not ODU/antenna freight) to MGW Nantong; planning-only
-    inbound allowance <strong>{fmt(row.b6Mr0001ChinaInboundEvidence?.preliminaryInboundLowTHB)}
-    – {fmt(row.b6Mr0001ChinaInboundEvidence?.preliminaryInboundHighTHB)}</strong> (scenario,
-    NOT additional selected SELL). MGW SERV-5 USD2,500 is Nantong→JUTAL quoted once;
-    the Thailand→Nantong inbound leg, customs, taxes, cargo value and four-set dimensions
-    are not covered by proof. The compared scenario does NOT price the complete
-    NextG radio/antenna shipment. MGW SERV-5 outbound USD2500 includes packing
-    per supplier message; separately quoted SERV-3 USD500 creates an overlap check,
-    not an automatic credit. Compare all four MR legs against B6 owner before
-    selecting an actual delta.</p>
+   <h4>B6 — Transportation / CIF Zhuhai Port China</h4>
+   <p className="p55-note"><strong>{fmt(total)} retained Working SELL allowance.</strong> Current route:
+    NextG/VST + MGW MR0002 imported by ADDVALUE + EXION Thailand + MDS FCA supply → SAMTEL Warehouse
+    Thailand for Integration/FAT/Training → CIF Zhuhai Port China Incoterms 2020.</p>
+   <p className="p55-note">CCL Samart Item12 accepts CIF. COM-D02 places China import clearance,
+    duty/VAT and port-to-yard delivery with Purchaser unless separately agreed. Port is not Yard.
+    Contract 18.1(c) ICC(A) cargo cover to Yard remains an unresolved stronger requirement.</p>
+   <p className="p55-note">The selected allowance has not been allocated to the new freight legs.
+    MGW SERV-5 USD2500 is China road freight, not a quotation for Thailand sea export or Thai import.
+    No assumed credit, duty exemption or new MGW quotation. NextG DAP Ranong / EXION DDP Nonthaburi /
+    MDS FCA named place and actual cargo dimensions remain to reconcile.</p>
   </section>}
   {code==="B7"&&<section className="p55-panel" style={{padding:12}}>
    <h4>B7 — Storage Reserve</h4>

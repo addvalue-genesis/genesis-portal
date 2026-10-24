@@ -12,7 +12,7 @@ const qty=n=>Number.isFinite(n)?n.toLocaleString("en-US",{maximumFractionDigits:
 export function B3SiteMrSatCoverage0553({workingRow=null}){
  const model=selectB3SiteMrSatCoverage0553(),price=model.priceProof;
  // This SAT selector owns only the offshore 40-day labour and VeEX rental.
- // Full B3 additionally includes the already-selected ADDVALUE China FAT witness
+ // Full B3 additionally includes the already-selected ADDVALUE SAMTEL Warehouse FAT witness
  // AND the separately purchased MGW iFAT/FAT Facility quoted services.
  // Read the purchased amount from canonical 10.2, never reprice/add to SAT lines.
  const fat=workingRow?.b3ChinaFatBudget?.fatWorkingSellTHB??null;
@@ -94,12 +94,12 @@ export function B3SiteMrSatCoverage0553({workingRow=null}){
     <tr><td><strong>Selected SAT/SIT Labour 28 Team-days</strong><small>{current?.moduleId}</small></td><td>2 ×28 =56 MD × USD800 × FX31.5</td><td><strong>{fmt(current?.satWorkingSellTHB)}</strong></td><td>Selected Working SELL once</td></tr>
     <tr><td><strong>Selected BF Survey 3 on-site +2 travel Team-days</strong><small>bid.budget.working.bc.b3.site-survey-price</small></td><td>2 ×5 =10 MD × USD800 × FX31.5; physical call-out conditional</td><td><strong>{fmt(current?.siteSurveyWorkingSellTHB)}</strong></td><td>Selected Working SELL allowance; verified direct cost open</td></tr>
     <tr><td><strong>VeEX MX100+ rental</strong><small>bid.budget.working.bc.b3.veex-mx100</small></td><td>{price.veexRentalDays} rental days × {fmt(price.veexRentalRateTHB)}/day</td><td><strong>{fmt(price.veexWorkingSellTHB)}</strong></td><td>One equipment rental allowance, not per MR or per Site</td></tr>
-    <tr><td><strong>ADDVALUE China FAT witness + travel · WS-B3</strong><small>bid.budget.working.bc.b3.revk-china-budget</small></td><td>Separate ADDVALUE factory witness expense; not 40 offshore days</td><td><strong>{fmt(fat)}</strong></td><td>B3 source; NOT B9 conditional Yard</td></tr>
-    <tr><td><strong>MGW Purchased iFAT + FAT Facility · VQ-MGW-SERV-2/4 → WS-B3</strong>
+    <tr><td><strong>ADDVALUE SAMTEL Warehouse FAT witness + travel · WS-B3</strong><small>bid.budget.working.bc.b3.revk-china-budget</small></td><td>Separate ADDVALUE factory witness expense; not 40 offshore days</td><td><strong>{fmt(fat)}</strong></td><td>B3 source; NOT B9 conditional Yard</td></tr>
+    <tr><td><strong>Local Integration / FAT Facility Reserve · VQ-MGW-SERV-2/4 → WS-B3</strong>
      <small>bid.budget.working.bc.b3.mgw-r2-cover-20261020</small></td>
      <td>MGW P26-058_R2 USD 7,500 × THB 31.50 × 1.30 (SAMTEL 20%, ADDVALUE 5%, Reserve 5%)</td>
      <td><strong>{fmt(mgwPurchasedSell)}</strong></td>
-     <td>PURCHASED SERVICE WS ONCE — quoted supplier cost is not verified paid Direct Cost; CP-B3 HOLD</td></tr>
+     <td>RESERVE ONCE — historical MGW benchmark; no selected MGW purchase or vendor credit; CP-B3 HOLD</td></tr>
     <tr><th colSpan={2}>TOTAL B3 — Inspection, Testing &amp; Certification</th><th><strong>{fmt(b3Total)}</strong></th><th>Working SELL / Direct COST pending / Release HOLD</th></tr>
    </tbody></table></div>
   <details className="p55-panel" style={{padding:10,marginTop:12}}>

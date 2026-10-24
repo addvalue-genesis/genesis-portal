@@ -1,3 +1,5 @@
+import {MR0003_MGW_WORKING_BOM_0553 as PHONE} from "./mr0003MgwWorkingBom0553";
+import {MR0004_WORKING_BOM_0553 as RACON} from "./mr0004WorkingBom0553";
 // PJ2608-0553 — source-driven BULK completeness and source-to-release audit.
 // DO NOT treat a priced "1 Lot" as a certified physical takeoff.
 // Read ONLY: requirements and gaps never mutate Cost, Working Sell or Release.
@@ -69,7 +71,7 @@ export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
   const sourceComplianceGates={
    "MR-0001":["TC0001_7_8_FIRE_RATING_CLIENT_REPLY_UNVERIFIED","AFC_CABLE_END_ROUTES_AND_GLAND_OD_OPEN","SUPPLIER_INSTALLED_BULK_INCLUSION_OPEN"],
    "MR-0002":["CURRENT_BUDGETARY_DESIGN_LNA_TO_RFI_BDA_SAME_POSITION_SELECTED","REV00_OMNI_RELOCATION_AND_YBSS6_CHANGES_NOT_ADOPTED","CUSTOMER_BDA_FORMAL_CHANGE_CLOSURE_OPEN","AFC_LAY_TCAB508_ROLE_SITE_SPECIFIC_VERIFIED","MGW_FORLLER_IEC60331_AND_EX_CERT_OPEN","RF_RUNS_AND_CONNECTORS_UNMEASURED","NEK_INSTALLATION_SPARE_SEPARATE_NOT_APPROVED"],
-   "MR-0003":["PHONE_SOUND_DC_POE_TERMINATION_UNVERIFIED","EX_WAROM_GLAND_INCLUDED_CREDIT_AND_OD_UNVERIFIED","SPECIAL_CABLE_IF_REQUIRED_NOT_DERIVED"],
+   "MR-0003":["PHONE_SOUND_DC_POE_TERMINATION_UNVERIFIED","EXION_JB_GLAND_PRICE_MISSING__NO_MGW_CREDIT","SPECIAL_CABLE_IF_REQUIRED_NOT_DERIVED"],
    "MR-0004":["ADAPTER_CHARGING_KIT_ONE_PER_PHASE_VENDOR_PRICE_OPEN","RACON_CONTROL_BOX_AND_PROGRAMMING_INCLUSION_OPEN","RACON_POWER_ALARM_CABLE_END_AND_EX_GLAND_UNVERIFIED"]
   }[g.mr];
   const unverifiedItems=g.items.filter(x=>!x.approvedProcurement&&x.state!=="VENDOR_INCLUDED");
@@ -110,7 +112,7 @@ export function deriveBulkSourceToReleaseTrace0553({releaseModel=null}={}){
     "WORKING_CANONICAL_A_"+g.mr.slice(-1)+"_NO_NEW_BULK_BOOKING",
    workingSourceModuleId:"bid.budget.bom.system-location-mto",
    releaseSourceModuleId:"bid.budget.pricing.release",
-   selectedQuoteId:g.mr==="MR-0001"?null:MGW.id,
+   selectedQuoteId:g.mr==="MR-0001"?null:g.mr==="MR-0003"?PHONE.selectedQuote:g.mr==="MR-0004"?RACON.selectedSource:MGW.id,
    selectedQuoteScopeConfirmed:g.mr==="MR-0001"?null:false,
    countedWorkingLines:countedWorking.length,
    workingAmountByCurrency:Object.freeze(countedWorking.reduce((x,v)=>{

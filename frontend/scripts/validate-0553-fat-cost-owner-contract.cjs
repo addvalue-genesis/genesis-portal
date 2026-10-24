@@ -17,9 +17,9 @@ assert.equal(yard.length,10);
 assert.ok(fat.every(x=>x.costOwner==="B3"&&x.directCostTHB===null&&x.workingCostTHB===null));
 assert.ok(fat.every(x=>x.costAccountingClass==="B3_DIRECT_FAT_WITNESS_EXPENSE_UNVERIFIED"));
 assert.ok(yard.every(x=>x.costOwner==="B9"&&x.directCostTHB===null));
-assert.equal(fat.reduce((sum,x)=>sum+x.workingSellTHB,0),422600);
+assert.equal(fat.reduce((sum,x)=>sum+x.workingSellTHB,0),263700);
 assert.equal(yard.reduce((sum,x)=>sum+x.workingSellTHB,0),480550);
-assert.equal(data.budget.fatWorkingSellTHB,422600);
+assert.equal(data.budget.fatWorkingSellTHB,263700);
 assert.equal(data.budget.b9BaseWorkingSellTHB,480550);
 // B9 was promoted from an optional quote to ONE priced Base contract line by
 // ADR-65. The separate call-out is an execution condition, not a price exclusion.
@@ -72,4 +72,4 @@ assert(ownerDetail.includes('workingRow?.code==="B3"')&&
 assert(ownerDetail.includes("purchasedServices?.selectedIncrementalWorkingSellTHB")&&
  ownerDetail.includes("vendorPurchasedQuoteUSD!==7500"),
  "FAT detail must distinguish MGW quoted supplier cost from the ADDVALUE witness amount");
-console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB422600), B9 Yard conditional THB480550; B9 1 LS in Base; Actual Direct COST unverified and non-posting.");
+console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB263700), B9 Yard conditional THB480550; B9 1 LS in Base; Actual Direct COST unverified and non-posting.");

@@ -40,12 +40,12 @@ const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
 const currentSpareDelta=Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
  sum+source.byCode[code].workingSellTHB-old,0);
 assert.equal(Math.round(currentSpareDelta*100),44034531);
-assert.equal(source.knownWorkingSellTHB,5043082.13);
-assert.equal(source.byCode.B3.workingSellTHB,2599325);
+assert.equal(source.knownWorkingSellTHB,4884182.13);
+assert.equal(source.byCode.B3.workingSellTHB,2440425);
 assert.equal(source.byCode.B9.workingSellTHB,480550);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit
 assert.equal(historicalB3ScenarioTHB-historicalB3BeforeScenarioTHB,352800);
-assert.equal(source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB,201600);
+assert.equal(source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB,42700);
 assert.equal(source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB,246950);
 assert.equal(
  source.knownWorkingSellTHB+
@@ -81,19 +81,19 @@ assert.equal(m.nextg.greenfieldRfQODU,4);
 assert.equal(m.nextg.greenfieldRfQIDU,4);
 assert.equal(m.nextg.greenfieldRfQAntenna,5);
 assert.equal(m.siteAssembly.packedSetCount,4);
-assert.equal(m.siteAssembly.inboundToMgwAcceptedOperationallyByOwner,true);
-assert.equal(m.sourceLegs.length,6);
-assert.equal(new Set(m.sourceLegs.map(x=>x.id)).size,6);
+assert.equal(m.siteAssembly.inboundToMgwAcceptedOperationallyByOwner,false);
+assert.equal(m.sourceLegs.length,8);
+assert.equal(new Set(m.sourceLegs.map(x=>x.id)).size,8);
 assert(m.sourceLegs.every(x=>x.postingAllowed===false&&x.selectedFreightCostTHB===null));
-assert.equal(m.scenarios.length,2);
-assert.equal(m.preferredScenarioId,"SC-B6-B-HYBRID-MGW");
-assert.equal(m.selectedPhysicalRouteId,"SC-B6-B-HYBRID-MGW");
+assert.equal(m.scenarios.length,1);
+assert.equal(m.preferredScenarioId,"SC-B6-SAMTEL-CIF-ZHUHAI");
+assert.equal(m.selectedPhysicalRouteId,"SC-B6-SAMTEL-CIF-ZHUHAI");
 assert.equal(m.physicalRoutingStatus,"OWNER_APPROVED__NOT_VENDOR_RECONFIRMED");
-assert.equal(m.approvedDecisionId,"ADR-68-B6-MR0001-DIRECT-MGW-20261022");
-assert.equal(m.nextg.approvedDirectToMgwNantong,true);
-assert.equal(m.nextg.approvedIdutoMgw,true);
-assert.equal(m.nextg.approvedOdutoMgw,true);
-assert.equal(m.nextg.approvedAllFiveAntennasToMgw,true);
+assert.equal(m.approvedDecisionId,"ADR-URGENT-SAMTEL-CIF-20261024");
+assert.equal(m.nextg.approvedDirectToMgwNantong,false);
+assert.equal(m.nextg.approvedIdutoMgw,false);
+assert.equal(m.nextg.approvedOdutoMgw,false);
+assert.equal(m.nextg.approvedAllFiveAntennasToMgw,false);
 assert.equal(m.nextg.destinationAcceptedInRevisedNextgQuotation,false);
 assert.equal(m.nextg.purchaseOrderDestinationAmended,false);
 assert.equal(m.nextg.dispatchConfirmed,false);
@@ -105,10 +105,10 @@ assert.equal(m.ownerApprovedAntennaCount,5);
 assert.deepEqual([...m.approvedMr0001InboundLotIds],[
  "B6-MR1-NEXTG-IDU","B6-MR1-NEXTG-ODU","B6-MR1-NEXTG-ANT","B6-MR1-TH-ENC-CISCO"
 ]);
-assert(m.sourceLegs.find(x=>x.id==="B6-MR1-NEXTG-ANT").preferred.includes("MGW Nantong"));
+assert(m.sourceLegs.find(x=>x.id==="B6-MR1-NEXTG-ANT").preferred.includes("SAMTEL Warehouse"));
 assert(!m.sourceLegs.find(x=>x.id==="B6-MR1-NEXTG-ANT").preferred.includes("JUTAL"));
-assert.equal(m.scenarios[1].status,"OWNER_APPROVED_PHYSICAL_ROUTE__DELIVERY_REQUOTE_PENDING");
-assert(m.scenarios[1].included.some(x=>x.includes("five greenfield antennas")));
+assert.equal(m.scenarios[0].status,"OWNER_SELECTED__FREIGHT_COST_ALLOCATION_OPEN");
+assert(m.scenarios[0].included.some(x=>x.includes("SAMTEL Warehouse Thailand")));
 assert.equal(m.sourceQuoteRevisionUnchanged,true);
 assert.equal(m.pendingNextgAmendedSupplierOffer,true);
 assert.equal(m.approvedRoutingVsQuotedShippingSeparation,true);
@@ -132,10 +132,10 @@ assert.equal(m.postingAllowed,false);
 assert.equal(m.releaseAllowed,false);
 assert.equal(release.approval.releaseAllowed,false);
 const view=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
-assert(view.includes("NG/260916-ADV-DAP1 / DAP Ranong"));
-assert(view.includes("MR0002/0003/0004"));
-assert(view.includes("OWNER-APPROVED B6 Physical Routing"));
-assert(view.includes("ALL 5 Greenfield Antennas"));
+assert(view.includes("NextG DAP Ranong"));
+assert(view.includes("MGW MR0002"));
+assert(view.includes("CIF Zhuhai Port China"));
+assert(view.includes("COM-D02"));
 assert(!view.includes("antennas direct to JUTAL only if"));
 assert(!view.includes("MR0001 direct China PRICE CONFIRMED"));
 assert(babel.transformSync(view,{babelrc:false,configFile:false,

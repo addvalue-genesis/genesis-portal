@@ -22,7 +22,7 @@ const {BcOwnerPriceTrace0553:Parent}=get("BcOwnerPriceTrace0553.jsx");
 const bc=working(),before=JSON.stringify(bc),b8=bc.byCode.B8,m=hybrid(b8);
 assert.equal(b8.workingSellTHB,151550);
 assert.equal(b8.qtyDriver,1);assert.equal(b8.directCostTHB,null);
-assert.equal(bc.knownWorkingSellTHB,5043082.13);
+assert.equal(bc.knownWorkingSellTHB,4884182.13);
 assert.deepEqual(m.systems.map(x=>x.mr),["MR0001","MR0002","MR0003","MR0004"]);
 assert.deepEqual(m.systems.map(x=>x.hours),[4,4,4,4]);
 assert.deepEqual(m.systems.map(x=>x.day),[1,1,2,2]);
@@ -38,7 +38,7 @@ assert.equal(m.excludedDuplicateTripWorkingSellTHB,85100);
 assert(m.sharedTripDeduplicationApplied&&!m.customerReleaseAllowed&&!m.additionalCustomerLineAllowed);
 assert.equal(m.standaloneTripPreviousWorkingSellTHB,236650);
 assert.equal(m.onsiteSeniorDayOverlapWithB3Pending,true);
-assert.equal(m.selectedTripExpenseBasis,"SHARED_MGW_CHINA_FAT_TRIP__WS_B3_ONCE__NO_SEPARATE_B8_TRAVEL");
+assert.equal(m.selectedTripExpenseBasis,"SAMTEL_LOCAL_TRAINING__HISTORICAL_CHINA_DUPLICATE_ALREADY_EXCLUDED__NO_SECOND_CREDIT");
 assert(m.groups.every(g=>!g.independentPostingAllowed));
 assert(m.groups.flatMap(g=>g.rows).every(x=>x.workingCostTHB===null&&x.actualDirectCostTHB===null&&!x.customerLineAllowed&&
  (x.sharedTripReconciliation?
@@ -66,7 +66,7 @@ assert.equal(r.b.find(x=>x.code==="B8").workingSellTHB,151550);
 assert.equal(s.lines.B8.workingSellTHB,151550);
 assert.equal(s.lines.B8.directCostTHB,null);
 assert.equal(r.b.find(x=>x.code==="B8").releaseAllowed,false);
-assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2599325);
+assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2440425);
 assert.equal(r.b.find(x=>x.code==="B9").customerSellTHB,480550);
 assert.equal(r.b.find(x=>x.code==="B6").customerSellTHB,307584);
 const html=renderToStaticMarkup(React.createElement(View,{workingRow:b8}));

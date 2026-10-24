@@ -35,7 +35,7 @@ assert.equal(costs.currentRows.filter(x=>x.code==="B10").reduce((n,x)=>n+x.qty,0
 assert.equal(costs.b11Requirements.rows.length,5);
 assert(costs.b11Requirements.rows.some(x=>x.compatibilityGate.includes("TETRA_GATEWAY_SCOPE_VS_SELECTED_DMR")));
 assert(costs.currentByCode.C1[0].sourcePriceUSD===null);
-assert.equal(costs.currentByCode.C1[0].internalInstalledComparableUnitUSD,75059);
+assert.equal(costs.currentByCode.C1[0].internalInstalledComparableUnitUSD,75000);
 assert(costs.currentByCode.C2.every(x=>x.qty===null&&x.unitPriceTHB===null));
 for(const code of codes){
  const owner=bc.byCode[code],working=costs.currentBudgetaryByCode[code],sow=scope.lines[code];
@@ -102,8 +102,8 @@ const duplicate=structuredClone(rel.annex);duplicate.C2[1]=duplicate.C2[0];
 assert.throws(()=>auditAnnexBidirectionalTrace0553(costs.currentByCode,duplicate),/BIDIRECTIONAL/);
 // Value-preserving serialization must remain valid; object identity is not evidence parity.
 assert.equal(auditAnnexBidirectionalTrace0553(costs.currentByCode,structuredClone(rel.annex)).totalRows,16);
-assert.equal(bc.knownWorkingSellTHB,5043082.13);
-const unchangedOwners={B1:211600,B2:237121.13,B3:2599325,B4:null,B5:311184,
+assert.equal(bc.knownWorkingSellTHB,4884182.13);
+const unchangedOwners={B1:211600,B2:237121.13,B3:2440425,B4:null,B5:311184,
  B6:307584,B7:30000,B8:151550,B9:480550,B12:null,B14:null};
 for(const [code,value] of Object.entries(unchangedOwners)){
  assert.equal(bc.byCode[code].workingSellTHB,value,code+" checkpoint must not change");

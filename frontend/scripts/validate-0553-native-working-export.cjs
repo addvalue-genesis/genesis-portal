@@ -30,7 +30,7 @@ function sheet(index){
  const max=index===1?43:22;
  const cells=[];
  for(let row=1;row<=max;row++){
-  const addresses=index===1?(row>=8&&row<=11?"ABCDEFG".split("").map(x=>x+row):
+  const addresses=index===1?(row===29?["B29","F29","G29"]:row>=8&&row<=11?"ABCDEFG".split("").map(x=>x+row):
    row>=24&&row<=37||row===41||row===42?["F"+row,"G"+row]:row===38?["G38"]:[]):
    row>=6&&row<=18?(index>=5?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]).map(x=>x+row):row===19?["I19"]:[];
   // A previously priced workbook must not leak historical values in unused rows.
@@ -161,6 +161,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
    assert.equal(normalizeCells(newXml),normalizeCells(oldXml),"Native row geometry/styles/merges changed "+before[i].name);
    const index=Number(before[i].name.match(/sheet(\d+)/)[1]);
    if(index===1){
+    assert(cell(newXml,"B29").includes("CIF Zhuhai Port China"),"Native B6 must use selected source CIF wording, not old template DDP");
     for(const row of real.b){
      const nativeRow=23+Number(row.code.slice(1));
      for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':"NOT ESTABLISHED"));

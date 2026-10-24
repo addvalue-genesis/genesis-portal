@@ -19,7 +19,7 @@ const r=ONSHORE_WORKING_SELL_RATE_0553;
 const seniorRate=r.roleRates.seniorTelecomEngineerTHBPerPersonDay;
 const fieldRate=r.thbPerPersonDay; // USD600/MD × FX31.5
 const sharedFatPaidRoleBlendedRate=round((seniorRate+r.thbPerPersonDay)/2); // 2 different paid roles: 700 + 600, no extra headcount
-const assumptionRows=[
+const historicalAssumptionRows=[
  ["FAT-STAFF","K01","China MGW OEM FAT — PM/Chief Engineer + Senior Telecom Engineer (2 paid witnesses)","person-day",12,sharedFatPaidRoleBlendedRate,"USER_APPROVED_ONSHORE_ROLE_RATES__6_FAT_DAYS_PRE_AWARD","4-MR detailed FAT WBS: 6 days × 2 paid witnesses, with one standby Field Telecom Specialist unbilled. MGW execution & signed ITP pending"],
  ["YARD-STAFF","K08-K12","Senior Telecom Systems Integration Engineer — on-call Yard configuration/integration support","person-day",7,seniorRate,"CONDITIONAL_SR_TELECOM_ENGINEER__7_WORKDAYS_LS","SPE §7.3.2 / §7.3.4: vendor site support at onshore rate when requested. One Sr Telecom Engineer for maximum seven working days; verify post-FAT approved config before changing anything."],
  ["YARD-TRAVEL-DAYS","K08-K12","Senior Telecom Engineer separate Yard trip — mobilization and demobilization labor","person-day",2,seniorRate,"YARD_CALL_OUT_CONDITIONAL","One Sr Telecom Engineer × 2 travel days; separate from FAT witness travel and counted once."],
@@ -39,16 +39,25 @@ const assumptionRows=[
  ["TRAVEL-INSURANCE","K01","Business travel accident/medical insurance for two staff","person-policy",2,2000,"INTERNAL_INSURANCE_ALLOWANCE","Vendor policy coverage/medical benefit and duration pending"],
  ["WORK-INSURANCE","K01","Technical-work accident/employer assignment insurance extension","person-policy",2,5000,"CONDITIONAL_WORK_COVERAGE_ALLOWANCE","Ordinary travel cover can exclude onsite technical work. Insurance broker MUST confirm occupational exposure endorsement"]
 ];
+const removedFatTravel=new Set(["TRAVEL-DAYS","AIRFARE","HOTEL","VISA","TRAVEL-INSURANCE"]);
+const assumptionRows=historicalAssumptionRows.map(row=>{
+ if(removedFatTravel.has(row[0]))return [row[0],row[1],row[2]+" — not selected for local SAMTEL FAT",row[3],0,row[5],
+  "SUPERSEDED_CHINA_TRIP_NONPOSTING", "2026-10-24 SAMTEL Warehouse Thailand; historical quantity "+row[4]+" retained in baseline"];
+ if(row[0]==="FAT-STAFF")return [row[0],row[1],"SAMTEL Warehouse Thailand FAT — PM/Chief + Senior (6 days each)",...row.slice(3)];
+ if(row[0]==="LOCAL-TRAVEL")return [row[0],row[1],"SAMTEL Warehouse local transfers — retained THB8000 allowance",...row.slice(3)];
+ return row;
+});
 export const B9_CHINA_BUDGET_SOURCE_0553=Object.freeze({
  id:"B3-FAT_B9-YARD-REV-K-WORKING-SELL",sourceWbs:"Rev.K K01-K12 / Rev.L / Rev05 B9",
- crew:2,fatDaysEstimate:6,yardTeamDaysWorking:12,hotelNightsPerPerson:7,travelEvents:1,scenarioTravelEventsWithOptionalYard:2,legacyYardTeamDaysOnlyNotSelected:true,
- yardCallOutOnly:true,fatTravelTeamDays:2,yardActualOrStandbyTeamDays:10,
+ crew:2,fatDaysEstimate:6,yardTeamDaysWorking:12,hotelNightsPerPerson:0,travelEvents:1,scenarioTravelEventsWithOptionalYard:2,legacyYardTeamDaysOnlyNotSelected:true,
+ yardCallOutOnly:true,fatTravelTeamDays:0,yardActualOrStandbyTeamDays:10,
  selectedYardRole:"Senior Telecom Systems Integration Engineer",selectedYardFieldRole:"Field Telecom Technician",yardCallOutCrew:2,
  selectedYardWorkingDays:7,selectedYardTravelDays:2,selectedYardRoomNights:9,
  yardConditionalQuoteFormat:"ONE_LUMP_SUM_PACKAGE_ON_WRITTEN_CALL_OUT",
  yardTravelEventId:"B9-YARD-TRIP-01_SEPARATE_FROM_FAT_TRIP",
- travelRoute:"Base: BKK → MGW FAT China → BKK; optional: separate BKK → Zhuhai Yard → BKK for Senior + Field Technician",
- travelBookingState:"FAT_AND_YARD_PRICED_AS_TWO_SEPARATE_TRIPS__RECONCILE_IF_ACTUALLY_COMBINED",
+ executionLocation:"SAMTEL Warehouse, Thailand",
+ travelRoute:"Local SAMTEL Warehouse FAT; B9 remains separate BKK → Zhuhai Yard → BKK",
+ travelBookingState:"LOCAL_SAMTEL_FAT__SEPARATE_B9_YARD_FOREIGN_TRIP",
  fxSource:ONSHORE_WORKING_SELL_RATE_0553.source,
  rateUSDPerPersonDay:r.usdPerPersonDay,rateTHBPerPersonDay:r.thbPerPersonDay,
  onshoreSeniorUSDPerDay:700,onshoreFieldUSDPerDay:600,
@@ -100,7 +109,7 @@ export function selectB9ChinaWorkingBudget0553(){
  const rows=B9_CHINA_WORKING_ROWS_0553;
  const source=B9_CHINA_BUDGET_SOURCE_0553;
  const fatWbs=selectFourMrFatWbs0553();
- if(fatWbs.estimatedFatWitnessDays!==source.fatDaysEstimate||fatWbs.estimatedRoomNightsPerWitness!==source.hotelNightsPerPerson)throw Error("B3 FAT duration/rooms not linked to four-MR WBS");
+ if(fatWbs.estimatedFatWitnessDays!==source.fatDaysEstimate||source.hotelNightsPerPerson!==0)throw Error("B3 FAT duration/rooms not linked to four-MR WBS");
  if(new Set(rows.map(x=>x.expenseKey)).size!==rows.length)throw Error("Duplicate B9 expense item");
  if(new Set(rows.map(x=>x.internalCostLineId)).size!==rows.length||
   rows.some(x=>!x.internalCostLineId.startsWith(x.costOwner==="B3"?"IC-FAT-":"IC-YARD-")||
@@ -113,13 +122,13 @@ export function selectB9ChinaWorkingBudget0553(){
  const total=round(labor+travel);
  const base=round(rows.filter(x=>!x.optional).reduce((n,x)=>n+x.workingSellTHB,0));
  const conditional=round(rows.filter(x=>x.optional).reduce((n,x)=>n+x.workingSellTHB,0));
- if(base!==422600||conditional!==480550||total!==903150||rows.length!==18||source.perDiemSeparate||rows.filter(x=>x.costOwner==="B3").length!==8)
+ if(base!==263700||conditional!==480550||total!==744250||rows.length!==18||source.perDiemSeparate||rows.filter(x=>x.costOwner==="B3").length!==8)
   throw Error("B9 Rev.K budget/Per Diem/equipment duplicate error");
  // One quoted contract line (B9) with conditional execution. conditionalYardSellTHB
  // remains source evidence, NOT a second additional option/price posting.
  return Object.freeze({...source,fatWbs,rows,workingSellTHB:conditional,fatWorkingSellTHB:base,b3FatWorkingSellTHB:base,b9BaseWorkingSellTHB:conditional,conditionalYardSellTHB:conditional,
   fullCombinedVisitScenarioTHB:total,laborWorkingSellTHB:labor,
-  travelAndInsuranceWorkingSellTHB:travel,qtyDerivedManDays:34,
+  travelAndInsuranceWorkingSellTHB:travel,qtyDerivedManDays:30,
   conditionalNotInBase:false,quotedBaseWorkingSell:true,conditionalExecutionOnWrittenCallout:true,priceAlreadyIncludedInB9Base:true,deltaVsLegacyTHB:round(conditional-source.legacyWbsB9SellTHB),
   contractCostOwnerProof:"Original 4-Scope of Supply.xlsx row 26 B3 Inspection, Testing and Certification as per ITP; row 32 B9 Specialist field assistance as per specification",
   workingDirectCostTHB:null,verifiedDirectCostTHB:null,customerReleaseAllowed:false});

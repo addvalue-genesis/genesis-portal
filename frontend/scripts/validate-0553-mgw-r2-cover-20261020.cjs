@@ -104,7 +104,7 @@ const b3=renderToStaticMarkup(React.createElement(CoverUI,{code:"B3"}));
 assert(b3.includes("minimum")&&b3.includes("6 FAT witness days"));
 const b6=renderToStaticMarkup(React.createElement(CoverUI,{code:"B6"}));
 assert(b6.includes("ALREADY INCLUDED")&&b6.includes("NOT another USD2,500"));
-assert.equal(b.byCode.B3.workingSellTHB,2599325);
+assert.equal(b.byCode.B3.workingSellTHB,2440425);
 assert.equal(b.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
 assert.equal(JSON.stringify(owners.map(x=>[x,working().byCode[x].workingSellTHB,working().byCode[x].directCostTHB])),before);
 console.log("PASS MGW R2 20-Oct COVER + chat packing overlap: USD350341 equipment unchanged, services 14500->18500, total 364841->368841 (+4000), iFAT 5000, FAT facility 2500, road freight 2500 counted once, 10.2 B3 management-selected 307125 purchased service markup through controlled WS only, protected historic vendor quote unchanged; customer release HOLD.");

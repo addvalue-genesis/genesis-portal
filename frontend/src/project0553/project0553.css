@@ -791,3 +791,15 @@
 .p553-annex-qty{text-align:center;white-space:normal;font-variant-numeric:tabular-nums}
 .p553-annex-qty small{display:block;color:#697481;font-size:10px;margin-top:3px}
 .p553-annex-description strong{display:block;line-height:1.4}
+/* Cost integrity: scoped disclosure hierarchy; colors identify categories only. */
+.p553-integrity-review{min-width:0;max-width:100%}
+.p553-integrity-controls{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.p553-integrity-controls button{padding:8px 12px;cursor:pointer;border:1px solid #9db5c8;border-radius:5px;background:#f4f8fc;color:#183d58;font:inherit}
+.p553-dashboard .p553-integrity-review .p553-contract-module{border-left:4px solid var(--integrity-accent,#245e89)}
+.p553-dashboard .p553-integrity-review .p553-contract-module__summary{padding:8px;border-radius:4px;background:var(--integrity-tint,#eef5fc)}
+.p553-integrity-steps{--integrity-accent:#286da8;--integrity-tint:#edf5ff}
+.p553-integrity-coverage{--integrity-accent:#167574;--integrity-tint:#eaf7f5}
+.p553-integrity-vendors{--integrity-accent:#946117;--integrity-tint:#fff6e6}
+.p553-dashboard .p553-integrity-review summary:focus-visible,.p553-integrity-controls button:focus-visible{outline:2px solid #1b638d;outline-offset:3px}
+.p553-dashboard .p553-integrity-review .p55-table-wrap{max-width:100%;overflow-x:auto}
+.p553-dashboard .p553-integrity-review .p55-table{min-width:720px}

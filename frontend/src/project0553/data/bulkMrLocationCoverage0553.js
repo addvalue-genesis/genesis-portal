@@ -29,7 +29,8 @@ const sources=Object.freeze({
  mgw:MGW.source,
  bartec:"https://drive.google.com/file/d/1Wai_2lQiiRVNiUkg27bVNmBlOgCJFeX4/view",
  racon:"https://drive.google.com/file/d/1T3c0Cbh2Sw134ddTibe8QEXt1nW_UpXM/view",
- orga:"https://drive.google.com/file/d/1JRZ-Ex0gHg120fwpbfmYJEuhTzU4EJva/view"
+ orga:"https://drive.google.com/file/d/1Wjod3tJNvte2Wrc3p0fmj8-9i664pEMW/view",
+ exion:"https://drive.google.com/file/d/13iGJllNfjuw8iME2mXcddnmRTt4ov-mk/view"
 });
 const make=(id,item,state,owner,source,detail="",qty=null,unit="to derive",rateTHB=null,category="FIELD_BULK")=>({
  id,item,state,owner,source,detail,qty,unit,rateTHB,category,
@@ -143,17 +144,17 @@ function dmrItems(site){
 function phoneItems(){
  return [
   review("PHONE-SPECIAL-CABLE-C1","MR0003 C1 — Special Cable (if required) / Field cable specification",
-   "MGW_PHONE_SYSTEM_WITH_INSTALLATION_BOUNDARY_REVIEW",
+   "EXION_PHONE_SYSTEM_WITH_JB_GLAND_PRICE_GAP",
    "MM-ZTK-1F-GEN-TEL-MR-0003 Rev.C1, page 10–11",
    "Customer MR lists 1 telephone system/site and special cable if required, NOT a separately counted Bulk Material MTO lot. Count only source-driven PoE/control/sounder cables and owner-approved exclusions; do not fabricate one lot/site."),
-  mgwIncluded("PHONE-SET","Gai-Tronics Auteldac 6 / EATON DB3B horn / WAROM BXJ-S JB","PHONE-1","Four complete quoted sets across ZWP20–23; do not separately buy EXION/PROSPER alternatives",1,"set"),
-  mgwIncluded("PHONE-GLAND-CREDIT","WAROM BXJ-S supplied Ex-P SS316L gland","PHONE-1","Supplier says c/w gland, exact installed number/type remains to be confirmed",null,"included (qty open)"),
+  included("PHONE-SET","EXION Auteldac 6 -510 + DB3BDG048N2BNR sounder","EXION_1260576_PAIR",sources.exion,"Four priced pairs only; JB/glands absent; do not inherit MGW PHONE-1 inclusions",1,"set"),
+  review("PHONE-GLAND-CREDIT","No EXION included gland credit established","EXION_MISSING_JB_GLAND_SCOPE",sources.exion,"No priced JB/glands. Actual Ex entries, OD and configuration must be derived; unknown is not zero"),
   field("PHONE-VOIP-CABLE","Ex VoIP SIP/PoE telephone to JB field cable and connector","MR0003_FIELD_CABLE","MR0003 DTS / BLD / WIR/TER","Check Ethernet/PoE DC topology, armour, IEC 60331 and actual physical route"),
   field("PHONE-SOUNDER-CABLE","EATON horn sounder power/trigger control cable","MR0003_FIELD_CONTROL","MR0003 DTS / EATON DB3B datasheet","Sounder cable is not CAT6A by default; verify selected DC voltage and terminal configuration"),
   field("PHONE-UPLINK","JB to E&I/telecom SIP-PABX uplink and separate supply if needed","MR0003_FIELD_NETWORK_POWER","MR0003 BLD / WIR/TER","Count actual individual Ethernet/DC/control circuits; 3 schematic functions do not equal 3 equal cable lengths"),
-  field("PHONE-EX-GLANDS","Additional certified active Ex cable glands/net external entries","MR0003_FIELD_GLAND_NET_WAROM",sources.mgw,"Vendor JB+fitted gland included; cable ends and OD/armour/Ex type must govern purchase"),
-  review("PHONE-JB-TERMINATION","JB Phoenix/terminal blocks, fitted plugs, drain, earth terminals","PHONE1_PACKAGE_FIRST",sources.mgw,
-   "Old BARTEC GA 8×M20 and Prosper 4×M20 are alternative configurations, not selected MGW WAROM components"),
+  field("PHONE-EX-GLANDS","Additional certified active Ex cable glands/net external entries","MR0003_FIELD_GLAND_NO_VENDOR_CREDIT",sources.exion,"No included JB/glands established in EXION; cable ends and Ex type govern purchase"),
+  review("PHONE-JB-TERMINATION","JB Phoenix/terminal blocks, fitted plugs, drain, earth terminals","EXION_JB_PRICE_MISSING",sources.exion,
+   "EXION has no priced JB; BARTEC GA 8×M20 versus Prosper 4×M20 requires exact technical/rate review; no automatic historical rate"),
   field("PHONE-MCT","Ex field MCT / conduit / junction-to-room penetration","MR0003_FIELD_BULK","MR0003 SPE / LAY / ELE-LAY","Confirm segregated route/penetrations and installation owner"),
   field("PHONE-BONDING","External earth, stainless fixing, cable support, tags and ferrules","MR0003_FIELD_SUPPORT",sources.historical,"Subtract factory-provided supports, earth studs and labels")
  ];
@@ -170,17 +171,15 @@ function raconItems(site,routes){
    phaseRequiredQty:1,phaseUnit:"set",siteAllocatedQty:null,
    purchaseQty:null,unitRateTHB:null,onePhaseForSites:["ZWP20","ZWP21","ZWP22"],
    quotedInMGWRev2:false,bookedIncrementalTHB:0},
-  mgwIncluded("RACON-SET","Tideland SeaBeacon 2 System 6 X/S marine RACON","RACON-1","Three quoted sets across ZWP20–22",1,"set"),
-  mgwIncluded("RACON-DB5P","DB-5P Ex d junction/distribution box listed in MGW package","RACON-1","Not a second separately posted enclosure",1,"set"),
-  review("RACON-EX-CONTROL","Separate RACON Ex control box / TCAB-514-002","RACON_VENDOR_CLARIFICATION",sources.mgw,
-   "Not explicit in MGW combined Rev2; ORGA alternate includes, but not transferrable as MGW credit"),
-  review("RACON-PURGE-PROGRAM","Purge kit and USB communication/programming cable","RACON_VENDOR_CLARIFICATION",sources.mgw,
-   "ORGA alternate includes these; MGW Rev2 line does not state inclusions"),
+  included("RACON-SET","MDS / ORGA SeaBeacon 2 System 6","MDS_QTORG2609244",sources.orga,"ONE quoted system, rate extrapolated to 3 required sites",1,"set"),
+  included("RACON-DB5P","MDS DB-5P distribution box","MDS_PACKAGE",sources.orga,"Financial summary includes bracket/DC-DC; no second price",1,"set"),
+  included("RACON-EX-CONTROL","MDS Ex db eb GRP control box / TCAB-514-002","MDS_PACKAGE",sources.orga,"Financial summary inclusion, Ex/interface verification open",1,"set"),
+  review("RACON-PURGE-PROGRAM","MDS quoted purge kit and USB programming cable; phase-kit equivalence open","MDS_PACKAGE",sources.orga,"Do not add B11 purchase without net inclusion review; one phase adapter/charger requirement preserved"),
   ...(route?.rows||[]).map(x=>field("RACON-"+x.id,x.from+" → "+x.to+" / "+x.kind,
-    "RACON_FIELD_CABLE_NET_MGW",sources.racon+"; "+sources.mgw,
-    "Gross cable procurement is preliminary routing assumption, NOT measured; ORGA 5+5+10m cable credit is not applicable to MGW.",x.procurementM,"m")),
-  field("RACON-GLANDS","Ex certified field cable glands / adapters / blank plugs","RACON_FIELD_EX_ENTRIES",sources.mgw,
-   "MGW Rev2 does not commit 6 CMP glands unlike ORGA alternate; count terminations/Ex/cable OD"),
+    "RACON_FIELD_CABLE_MDS_CONFLICT",sources.racon+"; "+sources.orga,
+    "Gross cable procurement is preliminary routing assumption, NOT measured; MDS financial summary lists 5+5+10m but notes exclude cables; no automatic credit until conflict resolved.",x.procurementM,"m")),
+  field("RACON-GLANDS","Ex certified field cable glands / adapters / blank plugs","RACON_FIELD_EX_ENTRIES",sources.orga,
+   "MDS summary lists 6 CMP glands but notes exclude them; count actual entries and retain conflict"),
   field("RACON-EARTH","External earthing / bonding, marine SS fixing and supports","RACON_FIELD_SUPPORT","MR0004 SPE / LAY / "+sources.racon,
    "Verify actual rooftop mounting, earth points and tray attachment"),
   field("RACON-TAGS","External cables tags, ferrules and identification labels","RACON_FIELD_IDENTIFICATION",sources.historical,
@@ -223,7 +222,7 @@ export function deriveBulkMrLocationCoverage0553(){
    moduleId:mr==="MR-0001"?"bid.budget.bom."+site.toLowerCase()+".bulk-material."+result.sourceMtoRow:
     "bid.budget.bom."+site.toLowerCase()+"."+mr.toLowerCase().replace("-","")+".bulk-material",
    bookedA5THB:result.bookedA5THB,
-   selectedPackage:mr==="MR-0001"?"SCADA MTO source Bulk 1 Lot / A5 (partial)":isActive?MGW.quoteNumber:"NOT APPLICABLE / SCOPE CHECK",
+   selectedPackage:mr==="MR-0001"?"SCADA MTO source Bulk 1 Lot / A5 (partial)":isActive?(mr==="MR-0003"?"EXION 1260576 Rev0":mr==="MR-0004"?"MDS QTORG2609244 (1 quoted / 3 budgeted)":MGW.quoteNumber):"NOT APPLICABLE / SCOPE CHECK",
    originalProjectionCount:sourceSystem?.items?.length??0,
    ...summarize(result.items)};
   });
@@ -231,11 +230,11 @@ export function deriveBulkMrLocationCoverage0553(){
  });
  const flat=sites.flatMap(x=>x.byMr);
  return {projectId:"PJ2608-0553",moduleId:"bid.budget.bom.system-location-mto.bulk-material",
-  sites,groups:flat,source:sources,selectedVendorAuthority:MGW.id,
+  sites,groups:flat,source:sources,selectedVendorAuthority:"NEXTG_VST_MR1__MGW_MR2__EXION_MR3__MDS_MR4",
   originalA5BookedTHB:a5.a5PriceTHB,postAdditionalTHB:0,
   customerReleased:false,costMutationAllowed:false,
   rules:["Use actual MR–Location scope, not 28 automatic new purchases",
-   "Legacy SAMART/ORGA/EXION evidence is comparison only; NEK is ADDVALUE optional BULK spare reserve, not MGW installed supply",
+   "EXION and MDS are selected 24-Oct sources; legacy SAMART remains comparison only; NEK optional reserve unchanged",
    "Never double count A5 booked source, MGW inclusions, or factory-installed components",
    "Unknown cable-end quantity/route/rate is NULL, never zero",
    "MR0001 seven MTO Bulk rows retain independent source ID and partial cost owner",

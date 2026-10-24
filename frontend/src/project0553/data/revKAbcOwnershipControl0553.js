@@ -19,8 +19,8 @@ export function selectRevKAbcOwnershipControl0553(working){
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
  if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+307125)||current.B9!==b9.b9BaseWorkingSellTHB||
-    working.knownWorkingSellTHB!==5043082.13 ||
-    working.byCode.B3?.workingSellTHB!==2599325 ||
+    working.knownWorkingSellTHB!==4884182.13 ||
+    working.byCode.B3?.workingSellTHB!==2440425 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))
@@ -79,13 +79,13 @@ export function selectRevKAbcOwnershipControl0553(working){
  }));
  const fatTasks=fat.rows.map(x=>Object.freeze({
   id:"ABC-"+x.id,wbs:"K01/"+x.day,owner:"A",costObject:"OEM_FAT_TECHNICAL_TEST",
-  activity:x.activity,site:"MGW facility China",source:x.requirement,
+  activity:x.activity,site:"SAMTEL Warehouse, Thailand",source:x.requirement,
   quantity:x.hours,unit:"agenda hour",workingSellRateTHB:null,modeledSellTHB:null,directCostTHB:null,
-  posting:"MGW_VENDOR_TEST_PURCHASED_ONCE_AS_B3_SERV_2_4__NOT_A_COST_POST",chargeKey:null
+  posting:"LOCAL_INTEGRATION_FACILITY_RESERVE_IN_B3__NOT_A_COST_POST",chargeKey:null
  }));
  const chinaExpenses=b9.rows.map(x=>Object.freeze({
   id:"ABC-"+x.id,wbs:x.wbs,owner:x.costOwner,costObject:x.optional?"YARD_SPECIALIST_OPTION":"FAT_WITNESS_DIRECT_COST_ACTIVITY",
-  activity:x.description,site:x.optional?"JUTAL Zhuhai Yard (quoted Base, on-call trip)":"MGW China FAT base trip",
+  activity:x.description,site:x.optional?"JUTAL Zhuhai Yard (quoted Base, on-call trip)":"SAMTEL Warehouse local FAT",
   source:x.evidence,quantity:x.qty,unit:x.unit,workingSellRateTHB:x.unitRateTHB,
   modeledSellTHB:x.workingSellTHB,directCostTHB:null,
   posting:x.optional?"INCLUDED_IN_CANONICAL_B9_1LS__ON_CALL_EXECUTION_NONADDITIVE":"INCLUDED_IN_CANONICAL_B3_FAT__NOT_ADDITIVE",
@@ -101,7 +101,7 @@ export function selectRevKAbcOwnershipControl0553(working){
  const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B9").reduce((v,x)=>v+x.modeledSellTHB,0));
  if(b1Engineering.length!==27||pmEvents.length!==41||supportExpenses.length!==9||b1.labourHours!==242||trace.rows.length!==19||
    fatTasks.length!==12||fat.estimatedFatWitnessDays!==6||satSiteLines.length!==9||
-   b3.satTeamDays!==28||b3.siteSurveyTeamDays!==5||historicalB3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==422600||yardTHB!==480550)
+   b3.satTeamDays!==28||b3.siteSurveyTeamDays!==5||historicalB3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==263700||yardTHB!==480550)
   throw Error("Rev.K activity reconciliation mismatch");
  return Object.freeze({
   moduleId:"bid.budget.working.bc.revk-abc-control",
@@ -124,13 +124,13 @@ export function selectRevKAbcOwnershipControl0553(working){
   postedWorkingSellDeltaTHB:0,postingAllowed:false,customerReleaseAllowed:false,
   sourceTrace:"BOD-C2/DTS-C1/SPE-C2/MR-C1 -> Rev.K K00-K18 -> 10.2 B1/B3/B9",
   gates:Object.freeze([
-   "SPE §7.3.2 Yard SAT mandatory under CONTRACTOR/VENDOR RACI; ADDVALUE one Sr Engineer 7d LS included in B9 customer Base, field attendance on signed call-out only, standby labour not charged",
-   "B3 owns MGW FAT 6-day / 2-witness travel and engineering-cost events; manufacturer execution remains A. Signed ITP/TAG repetition pending",
+   "SPE §7.3.2 Yard SAT mandatory under CONTRACTOR/VENDOR RACI; ADDVALUE Senior Engineer + Field Technician 7d LS included in B9 customer Base, field attendance on signed call-out only, standby labour not charged",
+   "B3 owns local SAMTEL FAT 6-day / 2-person labour and integration/facility reserve; OEM included tests remain Part A. Signed ITP/TAG repetition pending",
    "Use 14d for management planning per SPE; BOD 30d notice conflict remains unresolved contract precedence HOLD",
    "Post Yard SAT loose-equipment transfer to ZPQ under SPE §7.3.2 conflicts with as-installed WH assumption; seek written TQ",
    "B1 contains fresh role-based management/admin/accounting/procurement expenses ONLY; legacy B1 engineering price excluded, technical engineering ownership review nonposting; B3 owns FAT Witness",
    "B3 selected SAT28 plus BF Survey3+2 two-person team-days, FAT Witness, VeEX30 rental counted once; old 40d historic audit only, physical BF visit conditional",
-   "Yard Field Telecom Specialist travels as an unbilled companion; THB48,500 minimum cash risk allowance remains nonposting until cost/margin evidence",
+   "Yard Field Technician is the second PAID B9 crew member; do not also post the historical THB48,500 companion allowance",
    "Verified Direct Cost needs actual salary, supplier receipts, Trip/Person keys; no automatic historical posting"
   ])
  });

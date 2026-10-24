@@ -34,7 +34,7 @@ const def=f([
   f({id:"MR0002-RFI-DEMO",activity:"ADDVALUE RFI UHF BDA practical demo: RF gain/alarm/configuration; temporary spectrum/attenuator/load/interconnect test setup",mr:"MR0002",qty:1,unit:"budgetary RF training setup allowance",thbUnit:15000,allowanceOnly:true,
     evidence:"RFI BD Series configuration and RF interface data; ADDVALUE test instrument rental/use not quoted; exclude any B3 FAT/B11 tools duplicate"}),
   f({id:"MR0004-RACON-DEMO",activity:"ADDVALUE RACON programming/interface practical demonstration — temporary laptop interface and simulated alarm tests",mr:"MR0004",qty:1,unit:"budgetary RACON demo setup allowance",thbUnit:5000,allowanceOnly:true,
-    evidence:"MDS ORGA QTORG2609244 is an alternate with included cable/no special tools; MGW Tideland content and actual instructor/tools costs unconfirmed"})
+    evidence:"MDS ORGA QTORG2609244 selected installed package includes programming cable; phase adapter/charger equivalence, training rental overlap and actual instructor rates remain unconfirmed"})
  ])}),
  f({key:"travel",name:"Shared B3 FAT Trip — EXCLUDED Duplicate B8 Travel (Audit)",items:f([
   f({id:"AIRFARE",activity:"Return airfare for one onsite facilitator, budgetary",qty:1,unit:"ticket",thbUnit:15000,sharedTripReconciliation:true}),
@@ -85,7 +85,7 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
   code:"B8",systems,trainees:8,systemsCount:4,onsiteTrainingDays:2,
   onsiteContactHours:16,onsitePaidSeniorCount:1,onsiteFieldCount:0,
   trainingMode:"ON_SITE_HANDS_ON_WITH_REMOTE_OEM_DISCIPLINE_INSTRUCTORS",
-  assumedBudgetaryVenue:"MGW Nantong, China — co-scheduled with MGW FAT, venue/attendance approval OPEN; BOD Yangon training location remains contractual deviation",
+  assumedBudgetaryVenue:"SAMTEL Warehouse, Thailand — training BEFORE FAT; BOD/SPE Yangon and manufacturer-facility requirements remain deviations to reconcile",
   alternateMode:"FULL_OEM_ONSITE_INSTRUCTOR__UNQUOTED_NONPOSTING",
   originalRev05WorkingSellReferenceTHB:30000,originalRev05TrainingMH:44,
   trainingEvidence:Object.freeze({
@@ -93,7 +93,7 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
     rfiBda:Object.freeze({reference:"RFI BD Series UHF BDA technical datasheet",uri:"https://drive.google.com/file/d/1orMpdimoB3vpjyyMDDNnZu2k9YXoGWlb/view?usp=drivesdk",configAndMonitoringInterface:true,rfTestToolsQuoted:false,manufacturerInstructorQuoted:false})
   }),
   groups,pricedRows:priced.length,sourceAuditRows:counted.length,selectedWorkingSellTHB:total,
-  selectedTripExpenseBasis:"SHARED_MGW_CHINA_FAT_TRIP__WS_B3_ONCE__NO_SEPARATE_B8_TRAVEL",
+  selectedTripExpenseBasis:"SAMTEL_LOCAL_TRAINING__HISTORICAL_CHINA_DUPLICATE_ALREADY_EXCLUDED__NO_SECOND_CREDIT",
   standaloneTripPreviousWorkingSellTHB:standaloneReferenceTHB,
   excludedDuplicateTripWorkingSellTHB:sharedTripDeduplication,
   possibleSharedB3B9TripCreditTHB:0, // no SECOND credit; all travel excluded already
@@ -114,9 +114,9 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
    "RFI BDA ADDVALUE practical RF test setup THB15000 and RACON interface demo THB5000 are budgeting allowances only; not permanent tools procurement or confirmed OEM fees",
    "RACON MDS ORGA quote QTORG2609244 is alternate evidence only and DOES NOT prove included programming cable or training on MGW selected Tideland SeaBeacon",
    "One onsite Senior runs demonstration, Q&A, records attendance of eight people, four system training packs and assessment",
-   "Same MGW FAT trip selected: B8 separate airfare, hotel, visa/insurance and travel-day labour EXCLUDED THB85100, already reserved under B3 FAT; no second travel credit",
+   "Historical B8 China travel THB85100 was already excluded; relocating to SAMTEL produces NO further B8 deduction",
    "Confirm whether the SAME B3 FAT Senior performs the two-day B8 onsite facilitation: either document non-overlapping FAT and training work hours or remove duplicated 2 Senior MD THB44100 before customer release",
-   "Confirm purchaser responsibility for eight attendees travel/accommodation to MGW China; attendee transport not budgeted in B8",
+   "Confirm purchaser responsibility for eight attendees travel/accommodation to SAMTEL Warehouse Thailand; attendee transport not budgeted in B8",
    "Source Rev05 THB30000 / 44 MH is superseded as Working SELL but remains historical audit; no payroll or OEM paid direct cost has been established",
    "Training must be onsite for end users even where OEM instructor appears online; fully remote delivery alone is not selected"
   ])

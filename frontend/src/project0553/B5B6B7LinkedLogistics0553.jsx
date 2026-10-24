@@ -16,11 +16,11 @@ export function B5B6B7LinkedLogistics0553({workingRow}){
  const quoteOnly=rows.filter(r=>Number.isFinite(r.supplierQuoteUSD));
  const quotedSum=quoteOnly.reduce((n,r)=>n+r.supplierQuoteTHBReference,0);
  return <section className="p55-panel p553-b567-linked" style={{padding:12,marginTop:12}}>
-  <div className="p55-eyebrow">10.2 / {code} — ADR-68 · CURRENT LINKED LOGISTICS · NONPOSTING AUDIT</div>
+  <div className="p55-eyebrow">10.2 / {code} — 24-Oct CIF · CURRENT LINKED LOGISTICS · NONPOSTING AUDIT</div>
   <h4>{code} — {title} · Source-to-Working Price Breakdown</h4>
-  <p className="p55-note">หนึ่งกระบวนการ: Thailand Enclosure + Cisco (4 sets) และ NextG IDU (4) / ODU (4) /
-   Antennas (5) → MGW Nantong รับของและทำ FAT ร่วมกับ MR0002–MR0004 → JUTAL Yard.
-   <strong> ขนาดลัง/จำนวนลังจริงยังไม่ได้รับอนุมัติ</strong> จึงห้ามใช้จำนวน Set แทนจำนวน Crate.</p>
+  <p className="p55-note">NextG/VST + MGW RF + EXION Thai + MDS RACON → SAMTEL Warehouse Thailand
+   Integration/FAT/Training → CIF Zhuhai Port China. China clearance/tax and port-to-yard: Purchaser
+   under COM-D02 unless separately agreed. Equipment Set quantity is not Crate quantity.</p>
   <div className="p55-metric-grid">
    <div><strong>{code} Selected Working SELL</strong><p>{fmt(selected)}</p>
     <small>งบ Selected 10.2 เดิม — ไม่ใช่ Current Route-derived Direct Cost</small></div>
@@ -77,17 +77,15 @@ export function B5B6B7LinkedLogistics0553({workingRow}){
    an additional B5 sell or verified vendor cost. MGW SERV-3 {usd(m.quotePackingUSD)} could overlap
    packing included in B6 SERV-5 {usd(m.quoteFreightUSD)}; supplier credit remains UNCONFIRMED.</p>}
   {code==="B6"&&<p className="p55-note"><strong>Transportation scope:</strong>
-   original NextG DAP Ranong offer expired and does NOT price the approved direct-to-MGW route.
-   MGW SERV-5 {usd(m.quoteFreightUSD)} is quoted ONCE on vendor cover;
-   check whether cargo includes Thai/NextG free-issued items and whether packing SERV-3 overlaps.
-   No transportation cost or savings is inferred from selected {fmt(selected)}.</p>}
+   Eight cargo legs are unallocated against {fmt(selected)} retained allowance. Original NextG DAP Ranong
+   does not establish SAMTEL handover. MGW SERV-5 {usd(m.quoteFreightUSD)} is a historical China-road
+   benchmark, not a current CIF ocean quotation or extra selected SELL.</p>}
   {code==="B7"&&<p className="p55-note"><strong>Storage scope:</strong>
    customer requires 3 months FREE at vendor workshop, but MGW written confirmation is pending.
    Selected {fmt(selected)} = 1-month conditional contingency SELL, not MGW rent quote or
    additional charge on top of B5/B6; physical pallet-days/CBM and duration are OPEN.</p>}
   <p className="p55-note"><strong>Destination gate:</strong> {m.destinationConflict}.
-   The routing owner approved MGW Nantong → JUTAL Zhuhai; user has called it JUTAL Nantong.
-   Do not switch destination or add a logistics leg without written named-place confirmation.</p>
+   CIF destination is Zhuhai Port. Resolve stronger Yard insurance coverage without silently dropping it.</p>
   <details className="p55-panel" style={{padding:10,marginTop:10}}>
    <summary><strong>Open cross-owner B5 / B6 / B7 requirements and missing quote gates ({m.gates.length})</strong></summary>
    {m.gates.map((g,i)=><p className="p55-note" key={i}><strong>{i+1}.</strong> {g}</p>)}

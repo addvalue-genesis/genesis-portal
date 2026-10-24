@@ -54,14 +54,14 @@ assert.equal(old.number,"B3.4.4");
 assert.equal(scenario.number,"B3.4.5");
 assert.equal(old.historicalTHB,144000);
 assert.equal(old.workingSellTHB,null);
-assert.equal(scenario.referenceTHB,427600);
+assert.equal(scenario.referenceTHB,263700);
 assert.equal(scenario.workingSellTHB,null);
 assert.equal(sections.audit.workingSellTHB,0);
 assert.equal(sections.audit.referenceTHB,null,"Audit references must not be mixed or summed");
-assert.equal(price.totalWorkingSellTHB,2599325);
-assert.equal(b3.workingSellTHB,2599325);
+assert.equal(price.totalWorkingSellTHB,2440425);
+assert.equal(b3.workingSellTHB,2440425);
 assert.equal(b8.workingSellTHB,151550);
-assert.equal(m.proposedB3FatWorkingSellTHB,427600);
+assert.equal(m.proposedB3FatWorkingSellTHB,263700);
 assert.equal(m.workingSellChangeAllowed,false);
 const fatMarkup=renderToStaticMarkup(React.createElement(Detail,{
  budget:b3.b3ChinaFatBudget,selectedOwner:"B3"}));
@@ -69,13 +69,13 @@ for(const token of ["IC-FAT-STAFF-001","IC-FAT-TRAVEL-DAYS-001",
  "IC-FAT-AIRFARE-001","IC-FAT-HOTEL-001","IC-FAT-VISA-001",
  "IC-FAT-LOCAL-TRAVEL-001","IC-FAT-TRAVEL-INSURANCE-001",
  "IC-FAT-WORK-INSURANCE-001","Legacy WBS source: B3-FAT-STAFF",
- "WS-B3","SOW-B3","CP-B3","NOT ISSUED","422,600.00"])
+ "WS-B3","SOW-B3","CP-B3","NOT ISSUED","263,700.00"])
  assert(fatMarkup.includes(token),"FAT internal-price source missing "+token);
 const fullFatMarkup=renderToStaticMarkup(React.createElement(Detail,{
  budget:b3.b3ChinaFatBudget,selectedOwner:"B3",
  purchasedServices:b3.b3MgwPurchasedFatWorkingSell,workingRow:b3
 }));
-assert(fullFatMarkup.includes("2,599,325.00"),"FAT full-B3 card must render canonical WS-B3");
+assert(fullFatMarkup.includes("2,440,425.00"),"FAT full-B3 card must render canonical WS-B3");
 assert(!fullFatMarkup.includes("2,775,725.00"),"Superseded 40d B3 source must not label FULL B3");
 const html=renderToStaticMarkup(React.createElement(Host,{workingRow:b3}));
 assert(html.indexOf("B3.1.1")<html.indexOf("B3.1.2"));
@@ -90,4 +90,4 @@ const ids=new Set(nav().map(x=>x.id));
 for(const name of ["fat-owner-transfer","fat-training-7d-allocation","revk-china-budget"])
  assert(ids.has("bid.budget.working.bc.b3."+name),"legacy deep-link missing "+name);
 assert.equal(JSON.stringify(working()),snapshot,"Identity/audit relocation must not mutate source WBS");
-console.log("PASS B3 IC-FAT internal activity names, B3.1 priced rows only, B3.4 historical/scenario nonposting, current FAT 422600, current B3 2599325; WS/CP/SOW namespaces and all original Module IDs preserved");
+console.log("PASS B3 IC-FAT internal activity names, B3.1 priced rows only, B3.4 historical/scenario nonposting, current FAT 263700, current B3 2440425; WS/CP/SOW namespaces and all original Module IDs preserved");

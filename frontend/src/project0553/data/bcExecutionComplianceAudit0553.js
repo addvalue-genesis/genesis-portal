@@ -87,7 +87,7 @@ const specialToolRequirements=Object.freeze([
 ]);
 
 export function selectBcExecutionComplianceAudit0553(){
- if(FAT_EXECUTION_BASIS_0553.integratedFat.location!=="SAMTEL Bangkok, Thailand")
+ if(FAT_EXECUTION_BASIS_0553.integratedFat.location!=="SAMTEL Warehouse, Thailand")
   throw Error("Audit must follow management-approved integrated FAT location");
  const trips=locations.map(t=>Object.freeze({...t,crew:2,workingPersonDays:t.teamDays*2,
   state:"SOURCE_WBS_REV05_WORKING_NOT_APPROVED_TRAVEL"}));

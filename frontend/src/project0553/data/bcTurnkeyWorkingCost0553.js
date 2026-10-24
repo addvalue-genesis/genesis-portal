@@ -41,7 +41,7 @@ const customerRequirements=Object.freeze({
  B3:"Inspection / FAT / BF Site Survey and SAT — selected SAT 28 productive team-days; BF Survey ZPQ/ZWP8/ZWP11 3 onsite +2 travel Team-days in B3 Working SELL as conditional work allowance; GF Yard and Offshore ADDVALUE RACI open",
  B4:"Painting and protective coating according to MR, when applicable",
  B5:"Packing and marking per shipping instruction",
- B6:"Transportation — APPROVED MR0001 route: NextG IDU/ODU plus 5 greenfield antennas directly to MGW Nantong; Thai Enclosure+Cisco 4 preassembled sets to MGW; MR0002–0004 OEM into MGW China FAT; MGW SERV-5 single outbound freight to JUTAL. Commercial freight credit not yet verified.",
+ B6:"Transportation and cargo insurance to CIF Zhuhai Port China (Incoterms 2020), per COM-D02",
  B7:"Three-month FREE storage at vendor workshop per customer; MGW P26-058_R2 does not separately quote or confirm 3-month free storage. 1-month THB30000 Working SELL reserve remains selected pending inclusion proof",
  B8:"Training for purchaser/end-user personnel",
  B9:"Specialist assistance and mobilization as specified",
@@ -56,9 +56,9 @@ const customerRequirements=Object.freeze({
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
 const executionDecisionByCode=Object.freeze({
- B3:"B3 owns MGW iFAT SERV-2/4 20+5+5, ADDVALUE FAT Witness, SAT 28d and BF Survey 3+2d, temporary VeEX; GF Yard/Offshore RACI open; no duplicate Part A/B9",
- B6:"Project Owner approved NextG IDU/ODU/all 5 antenna direct MGW and Thai-built Enclosure+Cisco 4 sets to MGW; NextG expired DAP Ranong quotation needs destination amendment and price/credit. B6 historical SELL unchanged, B5 packing/B3 FAT ownership separated.",
- B9:"Specialist field assistance: Senior Telecom Engineer USD700 + Field Telecom Technician USD600; 7 Yard days + 2 travel days EACH, B9 1 LS; physical call-out conditional. CCL Item31 18 Yard / 45 Offshore day scope not revised; coverage RACI OPEN. MGW FAT Witness remains B3."
+ B3:"B3 retains integration/facility reserve benchmarked on MGW SERV-2/4 20+5+5; SAMTEL FAT labour, SAT 28d and BF Survey 3+2d, temporary VeEX; GF Yard/Offshore RACI open; no duplicate Part A/B9",
+ B6:"Owner selects SAMTEL Warehouse Thailand FAT/Training and CIF Zhuhai Port. B6 allowance retained pending supported leg-level costing; no assumed vendor credit; B5 packing/B3 testing/B7 storage separate.",
+ B9:"Specialist field assistance: Senior Telecom Engineer USD700 + Field Telecom Technician USD600; 7 Yard days + 2 travel days EACH, B9 1 LS; physical call-out conditional. CCL Item31 18 Yard / 45 Offshore day scope not revised; coverage RACI OPEN. SAMTEL FAT labour remains B3."
 });
 
 export function selectBcTurnkeyWorkingCost0553(){
@@ -107,8 +107,8 @@ export function selectBcTurnkeyWorkingCost0553(){
  // Supplier quote SERV-5 is VQ COST BASIS, not additive to selected WS-B6.
  if(b6RouteDecision.selectedB6WorkingSellTHB!==307584||
     b6RouteDecision.netSavingOrIncreaseTHB!==null||
-    b6RouteDecision.postingAllowed||!b6RouteDecision.siteAssembly.inboundToMgwAcceptedOperationallyByOwner||
-    b6RouteDecision.selectedPhysicalRouteId!=="SC-B6-B-HYBRID-MGW"||
+    b6RouteDecision.postingAllowed||b6RouteDecision.siteAssembly.inboundToMgwAcceptedOperationallyByOwner||
+    b6RouteDecision.selectedPhysicalRouteId!=="SC-B6-SAMTEL-CIF-ZHUHAI"||
     b6RouteDecision.physicalRoutingStatus!=="OWNER_APPROVED__NOT_VENDOR_RECONFIRMED"||
     b6RouteDecision.ownerApprovedAntennaCount!==5||
     b6RouteDecision.selectedAntennaBypassToJutal!==false)
@@ -168,7 +168,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    contractOwner:"SAMTEL",
    turnkeyEstimator:"ADDVALUE_FOR_SAMTEL",
    executionOwner:w.owner, // Execution responsibility never excludes turnkey scope.
-   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"||code==="B3"||code==="B1"||code==="B2"||code==="B8"?1:w.qty,unit:code==="B1"?"LS (internal B1.1–B1.8 resource-cost estimate; customer Engineering & Design 1 Lot)":code==="B2"?"LS (131 VDRL work objects from 143 MR Table 11 obligations; provisional role MH/rate)":code==="B8"?"LS (4 systems / 8 trainees / 2 onsite days; ADDVALUE Senior practical facilitator + four OEM online instructors, approval pending)":code==="B9"?"LS (B9 Senior + Field Technician 2-person Yard package, 7 workdays + 2 travel days each; physical call-out only)":code==="B3"?"LS (MGW iFAT + FAT Witness + 28d SAT/SIT (Senior USD1000/MD + Specialist USD800/MD) + 3d BF Survey + 2d Survey travel + VeEX)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B8"?"B8 two-day four-MR hybrid co-scheduled with MGW FAT: onsite Senior USD700/MD × 2 training days plus 1 prep; four OEM online half-day sessions USD400 each and handouts/AV; B3 FAT already owns shared China-trip air/hotel/travel-day labour/insurance THB85100 deducted from B8; Senior person-day overlap pending confirmation":code==="B9"?"B9 Base 1 LS includes paid Senior USD700/MD + Field Tech USD600/MD for unchanged 7+2 Yard days/person plus two-person allowances; execution requires written request; CCL Item31 remains 18 Yard / 45 Offshore days with scope gap; B3 owns FAT Witness":code==="B3"?"B3: MGW iFAT+facility USD7500 x FX31.5 x 1.30 + FAT witnesses/travel + 28 team-day SAT (28 Senior MD x USD1000 + 28 Specialist MD x USD800) x FX31.5 + BF survey 3 site +2 travel team-days (10 MD at USD800) + VeEX; old 40 historical retained, no double B 5%":code==="B1"?"Current B1 equals NEW B1.1–B1.8 team resource cost + management/project expense allowances only; legacy 27 WBS engineering/964MH prices NOT carried; engineering technical owner review nonposting":code==="B2"?"B2 First Principles: 131 unique VDRL work objects / selected 963.76 MH / historical rate cost proxy × planning load 1.20 ÷ (1-0.20 GM); conditional review and missing inputs OPEN":w.driver,
+   qtyDriver:code==="B7"?b7StorageMonths:code==="B9"||code==="B3"||code==="B1"||code==="B2"||code==="B8"?1:w.qty,unit:code==="B1"?"LS (internal B1.1–B1.8 resource-cost estimate; customer Engineering & Design 1 Lot)":code==="B2"?"LS (131 VDRL work objects from 143 MR Table 11 obligations; provisional role MH/rate)":code==="B8"?"LS (4 systems / 8 trainees / 2 onsite days; ADDVALUE Senior practical facilitator + four OEM online instructors, approval pending)":code==="B9"?"LS (B9 Senior + Field Technician 2-person Yard package, 7 workdays + 2 travel days each; physical call-out only)":code==="B3"?"LS (MGW iFAT + FAT Witness + 28d SAT/SIT (Senior USD1000/MD + Specialist USD800/MD) + 3d BF Survey + 2d Survey travel + VeEX)":w.unit,equations:w.equations||[],basis:code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B8"?"B8 two-day four-MR hybrid at SAMTEL Warehouse before FAT: onsite Senior USD700/MD × 2 training days plus 1 prep; four OEM online half-day sessions USD400 each and handouts/AV; Historical shared China travel THB85100 was already excluded from B8; no further credit; Senior person-day overlap pending confirmation":code==="B9"?"B9 Base 1 LS includes paid Senior USD700/MD + Field Tech USD600/MD for unchanged 7+2 Yard days/person plus two-person allowances; execution requires written request; CCL Item31 remains 18 Yard / 45 Offshore days with scope gap; B3 owns FAT Witness":code==="B3"?"B3: retained local integration/facility reserve benchmark USD7500 x FX31.5 x 1.30 + 6-day SAMTEL FAT crew + local/work cover; foreign FAT trip removed + 28 team-day SAT (28 Senior MD x USD1000 + 28 Specialist MD x USD800) x FX31.5 + BF survey 3 site +2 travel team-days (10 MD at USD800) + VeEX; old 40 historical retained, no double B 5%":code==="B1"?"Current B1 equals NEW B1.1–B1.8 team resource cost + management/project expense allowances only; legacy 27 WBS engineering/964MH prices NOT carried; engineering technical owner review nonposting":code==="B2"?"B2 First Principles: 131 unique VDRL work objects / selected 963.76 MH / historical rate cost proxy × planning load 1.20 ÷ (1-0.20 GM); conditional review and missing inputs OPEN":w.driver,
    sourceRevision:code==="B2"?"B2 FIRST PRINCIPLES REPRICE 2026-10-21 (provisional); VDRL Rev00a source quantities and 2026 planning load/margin":(code==="B1"||code==="B3"||code==="B9")?"Rev.K 2026-10-18 current FAT ownership + Rev05 source bridge":code==="B8"?"B8 2026-10-22 first principles 4-MR hybrid training; Rev05 44MH historical audit":PART_BC_WBS_SOURCE_0553.revision,
    sourceUrl:code==="B2"?b2Recalculated.sourceUrl:PART_BC_WBS_SOURCE_0553.url,
    requirementRows:requirementRows.map(r=>({
@@ -232,7 +232,7 @@ export function selectBcTurnkeyWorkingCost0553(){
     conditionalYardWorkingSellTHB:chinaB9.conditionalYardSellTHB,
     perDiemIncluded:false,travelIncluded:false,accommodationIncluded:false,visaIncluded:false,
     costOwner:"B9",releaseAllowed:false,
-    pricingGate:"B9 1 LS THB480550 includes paid Senior + Field Technician, each 7+2 days, and two-person cash allowances; customer Release HOLD, call-out required. CCL Item31 18 Yard / 45 Offshore days unchanged: gap pending RACI. MGW FAT Witness remains B3."
+    pricingGate:"B9 1 LS THB480550 includes paid Senior + Field Technician, each 7+2 days, and two-person cash allowances; customer Release HOLD, call-out required. CCL Item31 18 Yard / 45 Offshore days unchanged: gap pending RACI. SAMTEL FAT labour remains B3."
    }):null,
    b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
    b10WorkingSellDecision:code==="B10"?Object.freeze({status:"14_KIT_PTTEP_PARAMETRIC_BUDGETARY_2026_10_23",amountTHB:b10WorkingSellTHB,source:"MR0001–0004 Rev.C1 §5 Attachment 5; 4/3/4/3 qty; OEM parts/rates not yet independently quoted",historicalUSD:null,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"PROVISIONAL_WORKING_SELL_ONLY"}):null,
@@ -253,11 +253,11 @@ export function selectBcTurnkeyWorkingCost0553(){
    sourceOwnership:"CUSTOMER_REQUIREMENT_TO_WORKING_SOURCE",
    noDoubleCountRule:"One cost owner per requirement; no posting of historical Rev08 or OEM-included component without explicit exclusion proof",
    executionDecision:executionDecisionByCode[code]?Object.freeze({
-    decisionId:"REV_K_MGW_FOUR_MR_FAT_JUTAL_ZHUHAI_20261018",legacyDecisionId:FAT_EXECUTION_BASIS_0553.id,
-    status:(code==="B3"||code==="B6"||code==="B9")?"REV_K_CHINA_FAT_ZHUHAI_YARD_CURRENT__DAYS_VENUE_APPROVAL_OPEN":FAT_EXECUTION_BASIS_0553.status,
+    decisionId:"SAMTEL_WAREHOUSE_CIF_ZHUHAI_20261024",legacyDecisionId:"REV_K_MGW_FOUR_MR_FAT_JUTAL_ZHUHAI_20261018",
+    status:(code==="B3"||code==="B6"||code==="B9")?"SAMTEL_WAREHOUSE_CIF_CURRENT__DETAIL_COST_APPROVAL_OPEN":FAT_EXECUTION_BASIS_0553.status,
     summary:executionDecisionByCode[code],
     costState:FAT_EXECUTION_BASIS_0553.costState,
-    integratedFatLocation:(code==="B3"||code==="B6"||code==="B9")?"MGW nominated FAT facility, China (city TBC; 6 witness-day planning)":FAT_EXECUTION_BASIS_0553.integratedFat.location,
+    integratedFatLocation:FAT_EXECUTION_BASIS_0553.integratedFat.location,
     finalYard:(code==="B3"||code==="B6"||code==="B9")?"JUTAL Zhuhai Yard, China":FAT_EXECUTION_BASIS_0553.yard.location
    }):null
   });
@@ -294,7 +294,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   return sum+item.workingSellTHB;
  },0));
  if(Math.abs(knownWorkingSellTHB-expectedCurrentBaseTHB)>0.01 ||
-    knownWorkingSellTHB!==5043082.13 ||
+    knownWorkingSellTHB!==4884182.13 ||
     rows.find(x=>x.code==="B2")?.workingSellTHB!==b2CurrentSellTHB ||
     b1Current.baseWorkingSellTHB!==211600 ||
     b1Current.historicalEngineeringCarryForwardTHB!==0 ||

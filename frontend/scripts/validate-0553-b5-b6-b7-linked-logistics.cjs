@@ -21,7 +21,7 @@ const {buildReleaseCommercialModel0553:release}=from("data/releaseCommercialMode
 const {buildBcModuleNavigator0553:navigator}=from("data/bcModuleNavigator0553.js");
 const {BcCostEvidenceDetail0553:Host}=from("BcCostEvidenceDetail0553.jsx");
 const before=JSON.stringify(current()),m=linked(),bc=current(),model=release();
-assert.equal(m.approvedRoutingId,"ADR-68-B6-MR0001-DIRECT-MGW-20261022");
+assert.equal(m.approvedRoutingId,"ADR-URGENT-SAMTEL-CIF-20261024");
 assert.equal(m.routeStatus,"OWNER_APPROVED__NOT_VENDOR_RECONFIRMED");
 assert.equal(m.customerReleaseAllowed,false);
 assert.equal(m.independentNewPricingAuthorized,false);
@@ -34,9 +34,9 @@ assert.equal(m.vendorPackingPossiblyIncludedInFreight,true);
 assert.equal(m.nonpostingThaiPackingReferenceLowTHB,6000);
 assert.equal(m.nonpostingThaiPackingReferenceHighTHB,12000);
 assert.equal(m.rowsByCode.B5.length,7);
-assert.equal(m.rowsByCode.B6.length,6);
+assert.equal(m.rowsByCode.B6.length,8);
 assert.equal(m.rowsByCode.B7.length,3);
-assert.equal(m.rows.length,16);
+assert.equal(m.rows.length,18);
 assert.equal(m.selectedThreeOwnerWorkingSellTHB,648768);
 assert.deepEqual(Object.values(m.selectedWorkingSellByCode),[311184,307584,30000]);
 const navIds=new Set(navigator().map(x=>x.id));
@@ -65,10 +65,10 @@ for(const code of ["B5","B6","B7"]){
  assert.equal(anchors.length,new Set(anchors).size,"Duplicated owner DOM Module ID: "+code);
 }
 assert.equal(m.rowsByCode.B5.find(x=>x.id==="MGW-SERV3-PACK").supplierQuoteTHBReference,15750);
-assert.equal(m.rowsByCode.B6.find(x=>x.id==="B6-MGW-JUTAL-OUT").supplierQuoteTHBReference,78750);
+assert.equal(m.rowsByCode.B6.find(x=>x.id==="B6-MGW-JUTAL-OUT").supplierQuoteTHBReference,null);
 assert.equal(m.rowsByCode.B7.find(x=>x.id==="MGW-WORKSHOP-FREE-3MO").contractFreeMonths,3);
 assert.equal(m.rowsByCode.B7.find(x=>x.id==="CONDITIONAL-ONE-MONTH").selectedReserveWorkingSellTHB,30000);
-assert.equal(bc.knownWorkingSellTHB,5043082.13);
+assert.equal(bc.knownWorkingSellTHB,4884182.13);
 assert.equal(JSON.stringify(current()),before,"Source-to-release link must never mutate canonical SELL");
 const ui=fs.readFileSync(path.join(root,"project0553/BcOwnerPriceTrace0553.jsx"),"utf8");
 assert(ui.includes('<B5B6B7LinkedLogistics0553 workingRow={workingRow}/>'));

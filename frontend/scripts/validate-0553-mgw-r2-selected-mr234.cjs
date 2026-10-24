@@ -43,36 +43,36 @@ for(const [id,model,price,qty] of expected){
 assert(q.lines.find(x=>x.id==="UHF-2").includedComponents.some(x=>x.includes("Solexy RXNMS0200JX0")));
 assert(q.lines.find(x=>x.id==="PHONE-1").includedComponents.some(x=>x.includes("EATON DB3B")));
 assert.equal(mr2.quoteEquipmentTotalUSD,99564);
-assert.equal(mr3.budgetTotalUSD,25600);
-assert.equal(mr4.budgetTotalUSD,225177);
+assert.equal(mr3.budgetTotalTHB,828000);
+assert.equal(mr4.budgetTotalUSD,225000);
 assert.equal(mr3.sites.length,4);
 assert.equal(mr4.sites.length,3);
-assert.equal(mr4.manufacturer,"Tideland");
+assert.equal(mr4.manufacturer,"ORGA / Tideland");
 assert.equal(mr4.historicalAlternative.selected,false);
 assert.deepEqual(mr3.sites.map(x=>x.site),["ZWP20","ZWP21","ZWP22","ZWP23"]);
-for(const [mr,total,n] of [["MR-0002",99564,3],["MR-0003",25600,4],["MR-0004",225177,3]]){
+for(const [mr,total,n,currency] of [["MR-0002",99564,3,"USD"],["MR-0003",828000,4,"THB"],["MR-0004",225000,3,"USD"]]){
  const p=project({mr});
- const booked=p.lines.filter(x=>x.counted&&x.currency==="USD");
+ const booked=p.lines.filter(x=>x.counted&&x.currency===currency);
  const sum=booked.reduce((t,x)=>t+x.extended,0);
  assert.equal(sum,total,mr+" current supplier cost");
  assert.equal(p.invalidPosting.length,0,mr+" invalid cost lines");
  assert.equal(new Set(booked.map(x=>x.site)).size,n,mr+" site count");
  assert(p.lines.filter(x=>x.item.priceInclusion).every(x=>!x.counted),mr+" duplicate vendor accessory");
- assert(!booked.some(x=>/EXION|PROSPER|ORGA|MDS/.test(x.source||"")),mr+" legacy comparator posted");
+ assert(booked.every(x=>mr==="MR-0002"?/MGW/.test(x.source):mr==="MR-0003"?/EXION/.test(x.source):/MDS/.test(x.source)),mr+" selected vendor mismatch");
 }
 const phone=project({mr:"MR-0003"});
 for(const site of ["ZWP20","ZWP21","ZWP22","ZWP23"]){
  const items=phone.lines.filter(x=>x.site===site);
  const parent=items.filter(x=>x.counted);
  assert.equal(parent.length,1);
- assert.equal(parent[0].extended,6400);
- for(const sku of ["212-02-6008-410","DB3B","BXJ-S"])
+ assert.equal(parent[0].extended,207000);
+ for(const sku of ["212-02-6008-510","DB3BDG048N2BNR"])
   assert(items.some(x=>String(x.item.sku||"").includes(sku)),site+" missing "+sku);
 }
 const racon=project({mr:"MR-0004"});
 for(const site of ["ZWP20","ZWP21","ZWP22"]){
  const items=racon.lines.filter(x=>x.site===site);
- assert.equal(items.filter(x=>x.counted).reduce((n,x)=>n+x.extended,0),75059);
+ assert.equal(items.filter(x=>x.counted).reduce((n,x)=>n+x.extended,0),75000);
  assert(items.some(x=>x.item.sku==="DB-5P"&&x.item.priceInclusion));
  assert(items.some(x=>x.item.tag==="TCAB-514-002"&&x.item.extended===null),
   "Separate control-box inclusion is NOT proven by MGW RACON-1");
@@ -82,11 +82,11 @@ for(const s of wpBulk.filter(x=>["ZWP20","ZWP21","ZWP22"].includes(x.wp))){
  const phone=s.systems.find(x=>x.id==="EX_IP_PHONE"),
   racon=s.systems.find(x=>x.id==="MARINE_RACON");
  assert(phone&&racon);
- assert(phone.items.some(x=>/BXJ-S/.test(x.item)&&x.extendedTHB===null));
+ assert(phone.items.some(x=>/NOT priced by EXION/.test(x.item)&&x.extendedTHB===null));
  assert(racon.items.some(x=>/MGW-R2-CONTROL/.test(x.id)&&x.extendedTHB===null));
  assert(racon.items.every(x=>x.rateTHB===null&&x.extendedTHB===null));
 }
-assert.equal(bc().byCode.B3.workingSellTHB,2599325,"MGW purchased iFAT and Facility SERV-2/4 are added to B3 once, while MGW A equipment remains unchanged");
+assert.equal(bc().byCode.B3.workingSellTHB,2440425,"MGW purchased iFAT and Facility SERV-2/4 are added to B3 once, while MGW A equipment remains unchanged");
 assert.equal(bc().byCode.B3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,7500);
 assert.equal(bc().byCode.B3.directCostTHB,null);
 assert.equal(recon.mgwSelectedOverallUSD,364841);
@@ -94,6 +94,6 @@ assert.equal(recon.mgwSelectedEquipmentUSD,350341);
 const otherAssets=fs.readFileSync(path.join(root,"project0553/data/mr0002WorkingBom0553.js"),"utf8");
 assert(otherAssets.includes("MGW_P26_058_R2_SELECTED_0553"));
 const scope=fs.readFileSync(path.join(root,"project0553/ScopeSheetsDetail0553.jsx"),"utf8");
-assert(scope.includes("Selected MGW R2 Tideland"));
-assert(scope.includes("Selected MGW R2 Gai-Tronics"));
+assert(scope.includes("Selected MDS / ORGA"));
+assert(scope.includes("Selected EXION Thai"));
 console.log("PASS MGW P26-058_R2 selected: MR2 USD99564 / 3 WPs; MR3 USD25600 / 4 WPs; MR4 Tideland USD225177 / 3 WPs; shared services USD14500; quote USD364841. No duplicate accessory, no rev03 cost or B3 SELL change.");

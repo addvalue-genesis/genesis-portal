@@ -22,8 +22,8 @@ const audit=from("estimateToBidMapping.js")
  .auditCurrentCustomerProjection0553({canonical,release,scope});
 const current=canonical.byCode;
 const scenarios=canonical.scenarioAudits;
-assert.equal(canonical.knownWorkingSellTHB,5043082.13);
-assert.equal(current.B3.workingSellTHB,2599325);
+assert.equal(canonical.knownWorkingSellTHB,4884182.13);
+assert.equal(current.B3.workingSellTHB,2440425);
 assert.equal(current.B8.workingSellTHB,151550);
 assert.equal(current.B9.workingSellTHB,480550);
 assert.equal(current.B9.b9ChinaBudget.conditionalYardSellTHB,480550);
@@ -32,10 +32,10 @@ assert.equal(release.b.find(x=>x.code==="B9").customerSellTHB,480550);
 assert.equal(release.b.find(x=>x.code==="B9").conditionalOptionIncludedInBase,true);
 assert.equal(release.b.find(x=>x.code==="B9").samTelDeductionTHB,24027.5);
 assert.equal(release.b.find(x=>x.code==="B9").addvalueReceivableTHB,456522.5);
-assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2599325);
-assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,161860);
-assert.equal(release.b.find(x=>x.code==="B3").addvalueReceivableTHB,2437465);
-assert.equal(scope.lines.B3.workingSellTHB,2599325);
+assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2440425);
+assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,153915);
+assert.equal(release.b.find(x=>x.code==="B3").addvalueReceivableTHB,2286510);
+assert.equal(scope.lines.B3.workingSellTHB,2440425);
 assert.equal(scope.lines.B8.workingSellTHB,151550);
 assert.equal(scope.lines.B9.workingSellTHB,480550);
 const lean=scenarios.b3LeanSat28plus2;
@@ -56,14 +56,14 @@ assert.equal(new Set(lean.coveredTestIds).size,21);
 assert(lean.rows.every(x=>x.testIds.length>0&&x.postingAllowed===false));
 assert.equal(lean.directCostTHB,null);
 assert.equal(lean.postingAllowed,false);
-for(const [people,b3Amount,b8Amount] of [[1,343485,38165],[2,305320,76330]]){
+for(const [people,b3Amount,b8Amount] of [[1,200475,22275],[2,178200,44550]]){
  const plan=people===1?scenarios.b3B8FiveDayOneTrainer:
   scenarios.b3B8FiveDayTwoTrainers;
  assert.equal(plan.trainingCrew,people);
  assert.equal(plan.programme.length,5);
  assert.equal(plan.originalExpenseRows,8);
- assert.equal(plan.originalChinaTripSellTHB,422600);
- assert.equal(plan.fiveDayTripReferenceTHB,381650);
+ assert.equal(plan.originalChinaTripSellTHB,263700);
+ assert.equal(plan.fiveDayTripReferenceTHB,222750);
  assert.equal(plan.b3TripAllocatedReferenceTHB,b3Amount);
  assert.equal(plan.b8TripAllocatedReferenceTHB,b8Amount);
  assert.equal(plan.mgwPurchasedInB3WorkingSellTHB,307125);

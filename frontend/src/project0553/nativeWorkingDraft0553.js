@@ -154,6 +154,10 @@ export async function buildNativeWorkingDraft0553(file,model){
   write(scope,"F"+row,round(price)); // B10/B11/B13 current Annex working unit LS must replace original stale F value too.
   write(scope,"G"+row,round(price));
  }
+ // Current commercial wording comes from the same B6 source as Working/Release.
+ // The original template remains unchanged; do not re-export its superseded DDP heading.
+ const b6=bc.find(x=>x.code==="B6");
+ if(b6?.description)write(scope,"B29",b6.description);
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
  for(const row of [41,42]){
   write(scope,"F"+row,"NOT QUOTED");

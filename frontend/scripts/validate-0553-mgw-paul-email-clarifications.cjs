@@ -42,10 +42,10 @@ assert.equal(e.approvedVendorSpareListReceived,false);
 assert.equal(e.customerReleaseAllowed,false);
 for(const site of racon.sites){
  const item=site.items.find(x=>x.id===site.site+"-MGW-RACON-PROGRAMMING-KIT");
- assert(item&&item.priceInclusion==="MGW_EMAIL_INCLUDED_20261020");
+ assert(item&&item.priceInclusion==="MDS_FINANCIAL_SUMMARY_INCLUDED_NON_ADDITIVE");
  assert.equal(item.countedInWorkingTotal,false);
  assert.equal(item.extended,null);
- assert.equal(site.controlledTotalUSD,75059);
+ assert.equal(site.controlledTotalUSD,75000);
  assert(site.items.some(x=>x.id.endsWith("-TOOLS-TEST")&&x.extended===null));
 }
 for(const code of ["B3","B6","B10","B11","C2"]){

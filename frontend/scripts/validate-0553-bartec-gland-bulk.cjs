@@ -13,18 +13,18 @@ require.extensions[".js"]=(mod,file)=>{
 const {deriveBartecGlandBulkSchedule0553:derive,reconcileBartecVerifiedCableEnds0553:reconcile}=require(path.join(root,"project0553/data/bartecGlandBulkSchedule0553.js"));
 const {MR0003_PHONE_BULK_BASIS_0553:phoneSource}=require(path.join(root,"project0553/data/mr0003PhoneBulkDerivation0553.js"));
 const selectedPhoneBasis=source=>typeof source==="string"&&
- source.includes("SELECTED MGW P26-058_R2 PHONE-1")&&
- source.includes("WAROM BXJ-S")&&
+ source.includes("SELECTED EXION 1260576 Rev0")&&
+ source.includes("JB/glands NOT QUOTED")&&
  source.includes("BARTEC GA-1004")&&
  source.includes("COMPARISON ONLY");
 assert.deepEqual(phoneSource.scopeSites,["ZWP20","ZWP21","ZWP22","ZWP23"],
  "MR0003 scope must remain four Greenfield telephone systems");
-assert(phoneSource.conflictWithPrevious.includes("NOW SELECTED")&&
- phoneSource.selectionSource==="MGW P26-058_R2 PHONE-1"&&
- phoneSource.selectedEnclosure==="WAROM BXJ-S",
- "MR0003 must use MGW/WAROM selected basis; BARTEC/PROSPER are historical comparators");
-assert.equal(selectedPhoneBasis("EXION phone/sounder separate; PROSPER historical item3; MGW excluded"),false,
- "Negative supplier-selection fixture must reject superseded EXION/PROSPER as selected");
+assert(phoneSource.conflictWithPrevious.includes("EXION 1260576 has no JB/gland")&&
+ phoneSource.selectionSource==="EXION 1260576 Rev0"&&
+ phoneSource.selectedEnclosure===null,
+ "MR0003 must use EXION selected basis; BARTEC/PROSPER are historical comparators");
+assert.equal(selectedPhoneBasis("SELECTED MGW P26-058_R2 PHONE-1 WAROM BXJ-S; BARTEC GA-1004 COMPARISON ONLY"),false,
+ "Negative supplier-selection fixture must reject superseded MGW/WAROM as selected");
 
 const r=derive();
 assert.equal(r.sites.length,7);
@@ -69,7 +69,7 @@ for(const w of r.sites){
    "Do not claim MGW WAROM has the BARTEC GA-1004 eight-entry configuration");
   assert.equal(phone.historicalBartecEntryComparisonOnly,true);
   assert(selectedPhoneBasis(phone.includedPackageSource),
-   "MR0003 selected MGW/WAROM and historical BARTEC comparator provenance missing: "+w.site);
+   "MR0003 selected EXION and historical BARTEC comparator provenance missing: "+w.site);
   assert(phone.status.includes("GLAND_SKU_PENDING"),
    "No inferred selected or purchased active gland may be posted at "+w.site);
  }else assert(!w.enclosures.some(x=>x.system==="EX_IP_PHONE"),"Do not invent MR0003 scope on brownfield "+w.site);

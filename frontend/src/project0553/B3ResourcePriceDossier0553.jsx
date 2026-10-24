@@ -44,12 +44,12 @@ export function B3ResourcePriceDossier0553({workingRow}){
      <td>Not an incremental invoice cost</td></tr>
     <tr><td>Omission reserve on MGW quote · 5%</td><td>{cash(model.vendorQuoteMarkupBridge.reserve5PctTHB)}</td>
      <td>Do not apply the ordinary B 5% deduction again</td></tr>
-    <tr><th>MGW Purchased FAT Working SELL · selected once</th>
+    <tr><th>SAMTEL FAT service reserve Working SELL · selected once</th>
      <th>{cash(model.vendorQuoteMarkupBridge.selectedWorkingSellTHB)}</th>
      <th>WS-B3, CP-B3 NOT ISSUED</th></tr>
     <tr><td>Base selected B3 Working SELL excluding conditional BF revisit labour</td>
      <td>{cash(model.financialLayers.selectedBaseExcludingBFConditionalTHB)}</td>
-     <td>MGW FAT + ADDVALUE China FAT + SAT28 + VeEX; Actual COST NOT ESTABLISHED</td></tr>
+     <td>MGW FAT + ADDVALUE SAMTEL FAT + SAT28 + VeEX; Actual COST NOT ESTABLISHED</td></tr>
     <tr><td>BF Site Survey conditional labour allowance · 3 onsite + 2 travel team-days</td>
      <td>{cash(model.financialLayers.includedBFConditionalBudgetAllowanceTHB)}</td>
      <td>INCLUDED in pre-award working budget once; NO approved physical revisit</td></tr>
@@ -63,6 +63,9 @@ export function B3ResourcePriceDossier0553({workingRow}){
    Supplier Quotation แสดงราคาซื้อก่อนบวก 20%+5%+5% (เฉพาะ MGW);
    Actual Direct Cost ที่ยังไม่มีใบจ่าย/Payroll ให้แสดง NOT ESTABLISHED ไม่ตีว่าเป็นศูนย์.
    Site/MR Test IDs ไม่ใช่รายการราคาซ้ำ.</p>
+  <p className="p55-note">24-Oct selected basis: SAMTEL Warehouse Thailand. THB307125 is retained
+   integration/facility funding benchmarked on the existing MGW quote; no MGW award or agreed credit.
+   Local scope/rate allocation and OEM/customer FAT acceptance remain open.</p>
   <h4>B3 — Grouped Work Type / Source-to-Release (10.2 → 10.3 → 10.5)</h4>
   <p className="p55-note">Select a colour-coded Work Type to drill down into Site → MR/Activity → Role × Days × Rate.
    Prices in these four headers are an attribution of the SAME WS-B3 1 LS amount, NOT four new customer quotation lines.

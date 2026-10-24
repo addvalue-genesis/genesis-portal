@@ -17,35 +17,35 @@ export function deriveMGWSelectedWpSystemBulk0553(){
   ...w,
   systems:w.systems.map(sys=>{
    if(sys.id==="EX_IP_PHONE"&&phoneSite.has(w.wp)){
-    return {...sys,name:"Gai-Tronics Auteldac 6 / EATON DB3B / WAROM BXJ-S",
+    return {...sys,name:"EXION Auteldac 6 -510 / EATON DB3B; JB/glands unpriced",
      items:[
-      unpriced("MGW-R2-WAROM-JB","WAROM BXJ-S Ex e SS316L junction box and one vendor-quoted Ex-P gland — INCLUDED IN PHONE-1",
-       mgw.id,"QUOTE_INCLUDED_IN_PHONE1_NON_ADDITIVE",1,"included set"),
+      unpriced("MGW-R2-WAROM-JB","Ex junction box and glands NOT priced by EXION; no MGW inclusion credit",
+       mgw.id,"EXION_JB_GLANDS_PRICE_MISSING",1,"included set"),
       unpriced("MGW-R2-PHONE-POE","Ex VoIP telephone PoE/CAT6A route, armoured cable and termination; source Qty/route pending",
        "MR0003/DTS0003/BLD/LAY; "+mgw.id,"CABLE_SPEC_AND_ROUTE_NOT_ESTABLISHED"),
       unpriced("MGW-R2-SOUNDER-DC","EATON DB3B horn 24VDC / relay control cable, as-left termination and MCT",
        "MR0003/DTS0003; "+mgw.id,"HORN_VARIANT_AND_CABLE_ROUTE_NOT_ESTABLISHED"),
-      unpriced("MGW-R2-EX-GLANDS","Site Ex field cable glands, blanking plugs and earthing NET OF WAROM package included gland",
-       "WAROM BXJ-S MGW quote plus site WIR/TER","INSTALLED_ENTRIES_CABLE_OD_AND_VENDOR_CREDIT_PENDING")
+      unpriced("MGW-R2-EX-GLANDS","Site Ex field cable glands, blanking plugs and earthing without inherited MGW gland credit",
+       "EXION 1260576 plus site WIR/TER","INSTALLED_ENTRIES_CABLE_OD_AND_VENDOR_CREDIT_PENDING")
      ],
-     selectedSupplier:"MGW",selectedPackage:"PHONE-1",bulkStatus:"NOT_ESTABLISHED__NO_DUPLICATE_WAROM" };
+     selectedSupplier:"EXION Thailand",selectedPackage:"1260576 Rev0",bulkStatus:"NOT_ESTABLISHED__NO_MGW_INCLUSION_CREDIT" };
    }
    if(sys.id==="MARINE_RACON"&&raconSite.has(w.wp)){
     const basis=routes.find(r=>r.wp===w.wp);
-    return {...sys,name:"Tideland SeaBeacon 2 System 6 / MGW R2",
+    return {...sys,name:"ORGA / Tideland SeaBeacon 2 / MDS",
      items:[
-      unpriced("MGW-R2-DB5P","DB-5P Ex d junction box — INCLUDED IN MGW RACON-1",
+      unpriced("MGW-R2-DB5P","DB-5P Ex d junction box — INCLUDED IN MDS QTORG2609244",
        mgw.id,"QUOTE_INCLUDED_IN_RACON1_NON_ADDITIVE",1,"included set"),
-      unpriced("MGW-R2-CONTROL","RACON separate Ex control box TCAB-514-002, OEM assembly scope unknown",
-       "MR0004/DTS0004/SPE + "+mgw.id,"NOT_EXPLICIT_IN_MGW_QUOTE__PRICE_PENDING"),
+      unpriced("MGW-R2-CONTROL","RACON separate Ex control box TCAB-514-002, included in MDS financial summary; Ex/interface review open",
+       "MR0004/DTS0004/SPE + "+mgw.id,"MDS_FINANCIAL_SUMMARY_INCLUDED__NO_EXTRA_POST"),
       ...((basis?.rows||[]).map(x=>unpriced("MGW-R2-"+x.id,
        x.from+" to "+x.to+" / "+x.kind+" — candidate gross field cable purchase",
-       "MGW R2 quote no stated BFOU cable credit; old ORGA inclusions NOT selected",
+       "MDS summary BFOU 5+5+10m conflicts with notes exclusion; no unproven credit",
        "GROSS_ROUTE_CANDIDATE__CABLE_INCLUSION_AND_RATE_PENDING",x.procurementM,"m"))),
       unpriced("MGW-R2-GLANDS","RACON field cable Ex glands, termination and bonding, vendor inclusion unconfirmed",
        "MGW "+mgw.quoteNumber+"; approved site cable end register","FIELD_EX_ENTRIES_GLAND_SKU_AND_PRICE_OPEN")
      ],
-     selectedSupplier:"MGW",selectedPackage:"RACON-1",bulkStatus:"NOT_ESTABLISHED__NO_ORGA_CABLE_CREDIT"};
+     selectedSupplier:"MDS / ORGA",selectedPackage:"QTORG2609244",bulkStatus:"NOT_ESTABLISHED__MDS_CABLE_GLAND_CONFLICT"};
    }
    return sys;
   }),

@@ -91,7 +91,7 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
        <td>{money(m.addvalueMarkupTHB)}</td><td>Applied to MGW quoted Cost ONCE</td></tr>
       <tr><td>Commercial: Omission Reserve 5%</td><td>—</td><td>—</td>
        <td>{money(m.omissionReserveTHB)}</td><td>Cost allowance / non-duplicated</td></tr>
-      <tr><td colSpan={3}><strong>WS-B3 — MGW Purchased Services SELECTED</strong></td>
+      <tr><td colSpan={3}><strong>WS-B3 — SAMTEL service reserve — MGW quotation benchmark</strong></td>
        <td><strong>{money(m.selectedIncrementalWorkingSellTHB)}</strong></td>
        <td>CP-B3 NOT ISSUED / release HOLD</td></tr>
      </tbody></table></div>
@@ -110,7 +110,10 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
     <MgwPaulVendorClarifications0553 code="B3"/>
     {workingRow.b3FatOwnerTransfer&&<section className="p55-panel"
      data-component-key={ROOT+".fat-owner-transfer"} style={{padding:12,marginTop:12}}>
-     <h4>B3 — FAT Cost Owner Reconciliation / Rev05</h4>
+     <p className="p55-note">24-Oct selected basis: SAMTEL Warehouse Thailand. THB307125 is retained
+   integration/facility funding benchmarked on the existing MGW quote; no MGW award or agreed credit.
+   Local scope/rate allocation and OEM/customer FAT acceptance remain open.</p>
+  <h4>B3 — FAT Cost Owner Reconciliation / Rev05</h4>
      <p className="p55-note">Rev05 Bangkok FAT
       <strong> {money(workingRow.b3FatOwnerTransfer.amountTHB)}</strong> is
       SUPERSEDED, not another source of selected Working SELL. China witness/travel

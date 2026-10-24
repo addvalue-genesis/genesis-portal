@@ -25,20 +25,15 @@ const sites=[...new Set([
 const sourcePrice=(id)=>SUPPLIER_QUOTE_LINES_0553.find(q=>q.id===id);
 const mgwBySystem={"MR-0002":["UHF-1","UHF-2","UHF-3","UHF-4"]};
 // EXION THAI QT 1260576 (4 quoted each); PROSPER JB is 2024 historical Zawtika 1E comparator, not a current 1F firm quote.
-export const MR0003_LEGACY_EXION_RATE_EVIDENCE_0553=Object.freeze({phone:{sku:"212-02-6008-510",rateTHB:145000,quotedQty:4},sounder:{sku:"DB3BDG048N2BNR",rateTHB:62000,quotedQty:4},jb:{sku:"BARTEC-EX-E-TELEPHONE-JB",rateTHB:24500,quotedQty:4,referenceOnly:true},siteBudgetQty:1,assignedSites:["ZWP20","ZWP21","ZWP22"],unallocatedExionQty:1,exionQuote:"1260576",prosperQuote:"Q-PROSRY-24051"});
-// Selected current MR0003 quote: single MGW PHONE-1 package across four
-// sites; EXION 2026 and PROSPER 2024 preserved as historic comparison only.
+export const MR0003_LEGACY_EXION_RATE_EVIDENCE_0553=Object.freeze({phone:{sku:"212-02-6008-510",rateTHB:145000,quotedQty:4},sounder:{sku:"DB3BDG048N2BNR12-48VDC2xM20",rateTHB:62000,quotedQty:4},jb:{sku:"BARTEC-EX-E-TELEPHONE-JB",rateTHB:24500,quotedQty:4,referenceOnly:true},siteBudgetQty:1,assignedSites:["ZWP20","ZWP21","ZWP22"],unallocatedExionQty:1,exionQuote:"1260576",prosperQuote:"Q-PROSRY-24051"});
+// Selected EXION four phone/sounder pairs; historical MGW and PROSPER stay nonposting.
 export const MR0003_SELECTED_RATE_EVIDENCE_0553=Object.freeze({
- quoteId:MGW_P26_058_R2_SELECTED_0553.id,
- quoteNumber:MGW_P26_058_R2_SELECTED_0553.quoteNumber,
- supplier:"MGW Technologies Pte Ltd",
- currency:"USD",sites:["ZWP20","ZWP21","ZWP22","ZWP23"],
- phone:{sku:"212-02-6008-410",quotedQty:4,packageUnitUSD:6400},
- sounder:{sku:"DB3B",quotedQty:4,priceInclusion:"MGW_PHONE1"},
- jb:{sku:"BXJ-S",quotedQty:4,priceInclusion:"MGW_PHONE1"},
- legacyEXION:"1260576",legacyPROSPER:"Q-PROSRY-24051",
- canonicalBOM:"MR0003_MGW_WORKING_BOM_0553",
- selectedWorkingSupplier:true,releaseAllowed:false
+ quoteId:MR0003_MGW_WORKING_BOM_0553.selectedQuote,quoteNumber:"1260576 Rev0",supplier:"EXION Thailand",
+ currency:"THB",sites:["ZWP20","ZWP21","ZWP22","ZWP23"],
+ phone:{sku:"212-02-6008-510",quotedQty:4,rateTHB:145000},
+ sounder:{sku:"DB3BDG048N2BNR12-48VDC2xM20",quotedQty:4,rateTHB:62000},
+ jb:{sku:null,quotedQty:null,priceInclusion:null},
+ canonicalBOM:"MR0003_MGW_WORKING_BOM_0553",selectedWorkingSupplier:true,releaseAllowed:false
 });
 const normalizedMGW=MGW_P26_058_0553.lines.map(([id,sku,description,qty,unit,extended,group])=>({id,sku,description,qty,unit,extended,group}));
 const sharedMGW=normalizedMGW.filter(x=>x.id.startsWith("SERV-"));
@@ -125,13 +120,13 @@ const selectedSystemRows=[
   detailRows:s.items,subtotals:[{currency:"USD",amount:s.controlledTotalUSD}],
   gaps:s.scopeWarnings,projectionSource:"MGW_R2_SELECTED_MR0002",completeness:"WORKING_TECH_HOLD"})),
  ...MR0003_MGW_WORKING_BOM_0553.sites.map(s=>({site:s.site,mr:"MR-0003",
-  name:"Ex Phone / Gai-Tronics EATON WAROM — MGW P26-058_R2",evidence:[],
-  detailRows:s.items,subtotals:[{currency:"USD",amount:s.controlledTotalUSD}],
-  gaps:s.gaps,projectionSource:"MGW_R2_SELECTED_MR0003",completeness:"WORKING_TECH_HOLD"})),
+  name:"Ex Phone / Gai-Tronics EATON — EXION 1260576",evidence:[],
+  detailRows:s.items,subtotals:[{currency:"THB",amount:s.controlledTotalTHB}],
+  gaps:s.gaps,projectionSource:"EXION_SELECTED_MR0003",completeness:"WORKING_TECH_HOLD"})),
  ...MR0004_WORKING_BOM_0553.sites.map(s=>({site:s.site,mr:"MR-0004",
-  name:"Marine RACON — MGW Tideland SeaBeacon 2",evidence:[],
+  name:"Marine RACON — MDS / ORGA SeaBeacon 2",evidence:[],
   detailRows:s.items,subtotals:[{currency:"USD",amount:s.controlledTotalUSD}],
-  gaps:s.gaps,projectionSource:"MGW_R2_SELECTED_MR0004",completeness:"WORKING_TECH_HOLD"}))
+  gaps:s.gaps,projectionSource:"MDS_SELECTED_MR0004",completeness:"WORKING_TECH_HOLD"}))
 ];
 const rows=legacyRows.map(r=>r.site==="ZWP20"&&r.mr==="MR-0001"?
  canonicalZwp20Mr1:

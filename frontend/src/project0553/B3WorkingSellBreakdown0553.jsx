@@ -15,7 +15,7 @@ export function B3WorkingSellBreakdown0553({workingRow}){
    และ §7.3.3 แยก GF Offshore Commissioning หลังติดตั้ง.
    <strong>SAT 28 Team-days / 56 MD + BF Site Survey 3 field +2 travel Team-days / 10 MD เป็น Working Budget ปัจจุบัน; 40d อยู่ใน Historical Audit เท่านั้น.</strong>
    GF Yard/Offshore ADDVALUE people/days และ BF revisit ยังไม่มีอนุมัติหรือ Verified Direct Cost.</p>
-  <p className="p55-note"><strong>ราคาใน B3 นี้เป็น Working SELL ไม่ใช่ Direct Cost.</strong> B3 ครอบคลุม MGW Purchased iFAT/Facility (ต้นทุนซื้อ × 20% SAMTEL + 5% ADDVALUE + 5% Reserve), ADDVALUE China FAT witnesses, SAT 28 productive Team-days และ BF Survey 5 Team-days รวมทั้ง VeEX rental. ตาราง Contract Requirement กับ Site-MR SAT เป็นเอกสาร Coverage/Verification แยกต่างหาก ไม่คิดราคาบวกเพิ่ม.</p>
+  <p className="p55-note"><strong>ราคาใน B3 นี้เป็น Working SELL ไม่ใช่ Direct Cost.</strong> B3 ครอบคลุม Local Integration / FAT Facility Reserve (ต้นทุนซื้อ × 20% SAMTEL + 5% ADDVALUE + 5% Reserve), ADDVALUE SAMTEL Warehouse FAT witnesses, SAT 28 productive Team-days และ BF Survey 5 Team-days รวมทั้ง VeEX rental. ตาราง Contract Requirement กับ Site-MR SAT เป็นเอกสาร Coverage/Verification แยกต่างหาก ไม่คิดราคาบวกเพิ่ม.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Current B3 Cost Owner / Copy ID</th><th>Price driver / Quantity</th><th>Working SELL (THB)</th><th>Pricing / Source status</th></tr></thead>
    <tbody>{m.summary.map(x=><tr key={x.id} data-component-key={m.moduleId+".component-preview."+x.id.toLowerCase()}>
@@ -25,7 +25,7 @@ export function B3WorkingSellBreakdown0553({workingRow}){
    <tr><td colSpan={2}><strong>B3 — Inspection, Testing and Certification / Total Working SELL</strong></td><td><strong>{cash(m.totalWorkingSellTHB)}</strong></td><td>DIRECT COST NOT ESTABLISHED · RELEASE HOLD</td></tr>
    </tbody></table></div>
   <details className="p55-panel" style={{padding:10,marginTop:12}}>
-   <summary><strong>MGW China FAT Witness — Eight source-priced expense lines ({cash(m.fat.workingSellTHB)})</strong></summary>
+   <summary><strong>SAMTEL Warehouse FAT Witness — Eight source-priced expense lines ({cash(m.fat.workingSellTHB)})</strong></summary>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Expense / Module ID</th><th>Qty / Unit</th><th>Working SELL Unit THB</th><th>Working SELL THB</th><th>Source/Status</th></tr></thead>
     <tbody>{m.fat.rows.map(x=><tr key={x.id} data-component-key={m.moduleId+".fat-expense-preview."+x.id.toLowerCase()}>

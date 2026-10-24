@@ -82,7 +82,7 @@ function forCode(code,working){
    const total=round(fat+offshore);
    if(fat!==144000||offshore!==1965600||total!==working.sellTHB)
     throw Error("B3 FAT + offshore working SELL evidence must reconcile to Rev05");
-   if(FAT_EXECUTION_BASIS_0553.integratedFat.location!=="SAMTEL Bangkok, Thailand")
+   if(FAT_EXECUTION_BASIS_0553.integratedFat.location!=="SAMTEL Warehouse, Thailand")
     throw Error("B3 must follow approved integrated FAT location");
    return {sheet,lines:[
     fact("B3-TH-INTEGRATED-FAT","SAMTEL Bangkok Integrated FAT — Rev05 8 team-day allowance (MR1–MR4 test scope to reconfirm)",fatTeamDays,"team-day",thaiFatWorkingTeamRate,fat,e+"; 18_TH_FAT_WBS; selected location approved; duration not approved"),

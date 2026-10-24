@@ -27,20 +27,23 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
  if(!rows.length||Math.abs(rows.reduce((sum,x)=>sum+x.workingSellTHB,0)-total)>0.01)
   throw Error("Contract B3 FAT vs B9 Yard detail ownership/pricing mismatch");
  return <section className="p55-panel" data-component-key={"bid.budget.working.bc."+owner.toLowerCase()+".revk-china-budget"} style={{padding:14,marginTop:12}}>
-  <h4>{isFat?"IC-FAT — ADDVALUE China FAT Witness · Internal Working SELL Detail":"IC-YARD — Specialist Field Assistance · Quoted Base Working SELL (Call-out Execution)"}</h4>
+  <p className="p55-note">24-Oct selected basis: SAMTEL Warehouse Thailand. THB307125 is retained
+   integration/facility funding benchmarked on the existing MGW quote; no MGW award or agreed credit.
+   Local scope/rate allocation and OEM/customer FAT acceptance remain open.</p>
+  <h4>{isFat?"IC-FAT — ADDVALUE SAMTEL FAT Witness · Internal Working SELL Detail":"IC-YARD — Specialist Field Assistance · Quoted Base Working SELL (Call-out Execution)"}</h4>
   <p className="p55-note"><strong>Internal record:</strong> {isFat?"IC-FAT / WS-B3":"IC-YARD / WS-B9"} · <strong>Customer contractual Scope:</strong> {isFat?"SOW-B3":"SOW-B9"} · <strong>Commercial Proposal:</strong> {isFat?"CP-B3":"CP-B9"} NOT ISSUED. These rows are internal estimating activities, not customer B3/B9 quotation line numbers.</p>
   <div className="p55-metric-grid">
    <div><strong>{isFat?"WS-B3 — Current Internal FAT Working SELL":"WS-B9 — Included in Base Once · On-call Yard Working SELL"}</strong><p>{thb(total)}</p>
-    <small>{isFat?"Two ADDVALUE paid witnesses, six budgetary FAT days, one return China trip; OEM executes FAT in Part A":"Two paid staff: Senior USD700/MD + Field Technician USD600/MD · 7 Yard days + 2 travel days EACH"}</small></div>
+    <small>{isFat?"Two ADDVALUE paid witnesses, six budgetary FAT days, no foreign FAT trip; local transfer/work cover retained":"Two paid staff: Senior USD700/MD + Field Technician USD600/MD · 7 Yard days + 2 travel days EACH"}</small></div>
    <div><strong>{isFat?
-    (Number.isFinite(ownerPreviewB3THB)?"WS-B3 — FULL B3 canonical Working SELL (MGW Purchased FAT included once)":"WS-B3 — Full total requires canonical 10.2 owner"):
+    (Number.isFinite(ownerPreviewB3THB)?"WS-B3 — FULL B3 canonical Working SELL (SAMTEL FAT service reserve included once)":"WS-B3 — Full total requires canonical 10.2 owner"):
     "Current B9 Base"}</strong><p>{isFat?thb(ownerPreviewB3THB):thb(budget.b9BaseWorkingSellTHB)}</p>
     <small>{isFat?
-     (Number.isFinite(ownerPreviewB3THB)?"SAT28 + BF conditional Survey + VeEX + ADDVALUE FAT witness + MGW purchased iFAT/Facility included ONCE; vendor quote is not paid cost":"Standalone FAT source detail only; total WS-B3 cannot be inferred from this budget object"):
+     (Number.isFinite(ownerPreviewB3THB)?"SAT28 + BF conditional Survey + VeEX + ADDVALUE FAT witness + SAMTEL integration/facility reserve included ONCE; vendor quote is not paid cost":"Standalone FAT source detail only; total WS-B3 cannot be inferred from this budget object"):
      "B9 1 LS included in quoted Base; actual deployment requires written Yard call-out"}</small></div>
   </div>
   {isFat&&budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}>
-   <summary><strong>MGW FAT / MR0001–MR0004 — 6-Day Estimating Agenda</strong></summary>
+   <summary><strong>SAMTEL FAT / MR0001–MR0004 — 6-Day Estimating Agenda</strong></summary>
    <p className="p55-note">Witness team: {budget.fatWitnessRoles.join(" + ")}. Field Specialist standby unbilled. MGW/OEM provides factory test execution and its calibrated tools. Source: BOD §10.2–10.3 / SPE §7.3.1 / MR/DTS1–4. Six days are internal estimates pending signed OEM ITP and equipment TAG repetition.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Day / Test ID</th><th>MR</th><th>Test Requirement</th><th>Hours</th><th>Evidence</th></tr></thead>
