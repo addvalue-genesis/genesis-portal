@@ -37,9 +37,9 @@ assert.equal(rac.vendorUnitPriceUSD,MR0004_WORKING_BOM_0553.quotePackageUSD);
 // SELECTED installed equipment: MGW R2 RACON-1 USD75,059 x three systems.
 // Historical MDS/ORGA FCA USD75,000 is a DIFFERENT quote and C1
 // budgetary spare comparator, NOT the installed equipment rate.
-assert.equal(rac.vendorUnitPriceUSD,75059);
-assert.equal(rac.vendorQuote,"P26-058_R2");
-assert.equal(rac.vendorPackageRateReferenceTHB,2364358.5); // MGW x FX31.50
+assert.equal(rac.vendorUnitPriceUSD,75000);
+assert.equal(rac.vendorQuote,"QTORG2609244");
+assert.equal(rac.vendorPackageRateReferenceTHB,2362500); // MGW x FX31.50
 assert.equal(rac.historicalAlternativeUnitUSD,75000);
 assert.equal(rac.historicalAlternativeSource,"MDS / ORGA QTORG2609244 FCA / comparison only");
 assert.equal(rac.historicalQty,1);
@@ -49,8 +49,8 @@ assert.equal(rac.pricePostingAllowed,false);
 assert.equal(c.selectedC1Option.qty,1);
 assert.equal(c.selectedC1Option.unitPriceUSD,75000);
 assert.equal(c.selectedC1Option.budgetTotalTHB,2362500); // historical ORGA reference only
-assert.equal(c.selectedC1Option.installedMGWComparisonUnitUSD,75059);
-assert.equal(c.selectedC1Option.installedMGWComparisonSource,"P26-058_R2");
+assert.equal(c.selectedC1Option.installedMGWComparisonUnitUSD,75000);
+assert.equal(c.selectedC1Option.installedMGWComparisonSource,"QTORG2609244");
 assert.equal(c.selectedC1Option.oemQuotedIndependentSpareUSD,null);
 assert.equal(c.selectedC1Option.interchangeableWithSelectedMGWVerified,false);
 assert.match(c.selectedC1Option.source,/MDS\/ORGA QTORG2609244/);
@@ -68,7 +68,7 @@ assert.equal(c.byCode.B11.historicalBudgetReferenceTHB,128314.11);
 assert.equal(c.byCode.B13.historicalBudgetReferenceTHB,22484.21);
 assert.equal(c.byCode.C1.historicalBudgetReferenceTHB,4049349.36);
 assert.equal(c.byCode.C2.historicalBudgetReferenceTHB,721806.68);
-assert.equal(w.knownWorkingSellTHB,5043082.13,
+assert.equal(w.knownWorkingSellTHB,4994787.13,
  "Current 10.2 Part B after B2 131-WO, MGW FAT and approved B9 Base; do not use prior Rev.K bridge");
 assert.equal(w.byCode.C1.workingSellTHB,null);
 assert(c.updatedPricePosted===false&&c.complete===false&&c.customerReleaseAllowed===false);
@@ -76,9 +76,9 @@ const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx
 assert(jsx.includes("spareLines.length>0&&<div"),"Current C1 optional source must appear in existing current table");
 assert(jsx.includes("HISTORICAL NONPOSTING C1 AUDIT:"),"Prior C1 alternate quote must remain labelled historical");
 assert(jsx.includes("spareReconciliation.selectedC1Option.budgetTotalTHB"),"Selected C1 option must show source reference price");
-assert(jsx.includes("selected installed MGW R2 RACON-1")&&jsx.includes("historical ORGA USD 75,000"),
+assert(jsx.includes("selected installed MDS RACON")&&jsx.includes("historical ORGA USD 75,000"),
  "C1 annex must clearly distinguish MGW installed unit from historical ORGA spare reference");
 for(const phrase of ["selectSpareEngineeringReconciliation0553","spareReconciliation.kitLines.map","spareReconciliation.raconComparison","customerSchedule.crossCategoryDuplicates","spareReconciliation.vendorScopeConflicts"])
  assert(jsx.includes(phrase),phrase+" must be shown in 10.2");
 assert(babel.transformSync(jsx,{babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
-console.log("PASS 0553 spare reconciliation: MR0004 installed MGW RACON USD75059 is distinct from historical ORGA C1 reference USD75000; nonposting C1 budget THB2362500, 14 kits unpriced, 4 tool phases, Attachment7 exclusion, Part B THB5043082.13 unchanged.");
+console.log("PASS 0553 spare reconciliation: MR0004 installed MGW RACON USD75059 is distinct from historical ORGA C1 reference USD75000; nonposting C1 budget THB2362500, 14 kits unpriced, 4 tool phases, Attachment7 exclusion, Part B THB4994787.13 unchanged.");

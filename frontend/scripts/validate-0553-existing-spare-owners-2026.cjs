@@ -35,7 +35,7 @@ assert.equal(costs.currentRows.filter(x=>x.code==="B10").reduce((n,x)=>n+x.qty,0
 assert.equal(costs.b11Requirements.rows.length,5);
 assert(costs.b11Requirements.rows.some(x=>x.compatibilityGate.includes("TETRA_GATEWAY_SCOPE_VS_SELECTED_DMR")));
 assert(costs.currentByCode.C1[0].sourcePriceUSD===null);
-assert.equal(costs.currentByCode.C1[0].internalInstalledComparableUnitUSD,75059);
+assert.equal(costs.currentByCode.C1[0].internalInstalledComparableUnitUSD,75000);
 assert(costs.currentByCode.C2.every(x=>x.qty===null&&x.unitPriceTHB===null));
 for(const code of codes){
  const owner=bc.byCode[code],working=costs.currentBudgetaryByCode[code],sow=scope.lines[code];
@@ -102,9 +102,9 @@ const duplicate=structuredClone(rel.annex);duplicate.C2[1]=duplicate.C2[0];
 assert.throws(()=>auditAnnexBidirectionalTrace0553(costs.currentByCode,duplicate),/BIDIRECTIONAL/);
 // Value-preserving serialization must remain valid; object identity is not evidence parity.
 assert.equal(auditAnnexBidirectionalTrace0553(costs.currentByCode,structuredClone(rel.annex)).totalRows,16);
-assert.equal(bc.knownWorkingSellTHB,5043082.13);
-const unchangedOwners={B1:211600,B2:237121.13,B3:2599325,B4:null,B5:311184,
- B6:307584,B7:30000,B8:151550,B9:480550,B12:null,B14:null};
+assert.equal(bc.knownWorkingSellTHB,4994787.13);
+const unchangedOwners={B1:421180,B2:237121.13,B3:2322450,B4:null,B5:311184,
+ B6:335584,B7:30000,B8:142550,B9:480550,B12:null,B14:null};
 for(const [code,value] of Object.entries(unchangedOwners)){
  assert.equal(bc.byCode[code].workingSellTHB,value,code+" checkpoint must not change");
  assert.equal(scope.lines[code].workingSellTHB,value);
@@ -117,7 +117,7 @@ const ui=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553
 const detail=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 const exportSrc=fs.readFileSync(path.join(root,"project0553/nativeWorkingDraft0553.js"),"utf8");
 assert(ui.includes("PTTEP FIRST-PRINCIPLES PARAMETRIC"));
-assert(ui.includes('fullBaseReady?money(provisionalBase):"NOT ESTABLISHED"'));
+assert(ui.includes('money(provisionalBase)'));
 assert(ui.includes("sourceRowModuleId"));
 assert(ui.includes('onOpenSource({...source,sourceModuleId:source.sourceRowModuleId||source.sourceModuleId})'),
  "Trace drawer must return to the same source row, with owner fallback only for non-row sources");
@@ -150,7 +150,8 @@ for(const code of codes){
 const Customer=from("ReleaseCustomerWorkbook0553.jsx").ReleaseCustomerWorkbook0553;
 const html=renderToStaticMarkup(React.createElement(Customer,{model:rel}));
 for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(html.includes(amount));
-assert(html.includes("NOT QUOTED")&&html.includes("NOT ESTABLISHED"));
+assert(html.includes("NOT QUOTED")&&html.includes("Excludes unpriced items: B4, B12, B14."));
+assert(html.includes("27,192,339.36")&&html.includes("WORKING DRAFT"));
 const Scope=from("ScopeSheetsDetail0553.jsx").ScopeSheetsDetail0553;
 const scopeHtml=renderToStaticMarkup(React.createElement(Scope,{fx:{thbPerUsd:31.5},onOpenSource:()=>{},onOpenReleaseRow:()=>{}}));
 for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(scopeHtml.includes(amount));

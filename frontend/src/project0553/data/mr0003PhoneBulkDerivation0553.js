@@ -3,9 +3,9 @@
 // Selected MGW P26-058_R2 Gai-Tronics/EATON/WAROM; EXION/PROSPER remain historical alternatives.
 // A route is a physical circuit candidate, not a measured cable length or verified termination.
 export const MR0003_PHONE_BULK_BASIS_0553=Object.freeze({
- mr:"MR0003",state:"MGW_R2_SELECTED__FIELD_BULK_AND_CABLE_END_CERTIFICATION_OPEN",
+ mr:"MR0003",state:"EXION_SELECTED__JB_GLAND_PRICE_AND_CABLE_END_CERTIFICATION_OPEN",
  scopeSites:["ZWP20","ZWP21","ZWP22","ZWP23"],
- selectedJb:"MGW P26-058_R2 WAROM BXJ-S Ex e SS316L (included in PHONE-1 with quoted Ex-P gland); BARTEC GA-1004/PROSPER historical comparison only",
+ selectedJb:"NOT SELECTED / NOT PRICED BY EXION; BARTEC/PROSPER configuration remains a candidate",
  historicalQuotedJbM20Entries:4,historicalQuotedJbStoppingPlugs:4,
  gaSelectedM20Entries:8,gaSelectedStoppingPlugs:8,
  sparePolicy:{minimumEntries:2,percentOfCapacity:20,ga1004SpareAtThreeActive:5},
@@ -40,11 +40,11 @@ export const MR0003_PHONE_BULK_BASIS_0553=Object.freeze({
  verifiedGlandCableOdMm:null,
  verifiedCableMetres:null,
  pricedMaterialTHB:null,
- vendorIncludedActiveGlands:null,quotedVendorGlandPerSet:1,selectedEnclosureActiveEntryCapacity:null,
- selectionSource:"MGW P26-058_R2 PHONE-1",selectedEnclosure:"WAROM BXJ-S",
+ vendorIncludedActiveGlands:null,quotedVendorGlandPerSet:null,selectedEnclosureActiveEntryCapacity:null,
+ selectionSource:"EXION 1260576 Rev0",selectedEnclosure:null,
  bartecGa1004OnlyHistorical:true,
  rule:"Count distinct cable ends physically entering JB; choose certified Ex gland by actual cable OD/armouring/Ex e assembly and supplier-provided gland list; do not price stopping plugs or drilled capacity as active glands",
- conflictWithPrevious:"MGW P26-058_R2 PHONE-1/WAROM BXJ-S is NOW SELECTED and includes quoted Ex-P SS316L gland. No deduction of MGW included gland for PROSPER-selected BARTEC JB. PROSPER Item3 historical includes two UT2.5 terminal blocks, PE terminal, four fitted plugs and drain valve; GA-1004 has eight factory plugs, locknuts and terminals. Do not double-count those inclusions, and do not treat 4-entry quote rate as confirmed 8-entry configuration pricing."
+ conflictWithPrevious:"MGW PHONE-1 is superseded. EXION 1260576 has no JB/gland price or inclusion. Historical PROSPER/GA configurations are not accepted procurement quantities.",
 });
 export function deriveMR0003PhoneBulk0553(site){
  if(!MR0003_PHONE_BULK_BASIS_0553.scopeSites.includes(site))return null;

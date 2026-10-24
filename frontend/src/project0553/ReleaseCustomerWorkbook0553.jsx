@@ -1,3 +1,5 @@
+import nativeReleaseTemplate0553 from "./data/nativeReleaseTemplate0553.json";
+import {ServiceCommercialBasis0553} from "./ServiceCommercialBasis0553";
 import React,{useEffect,useMemo,useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
@@ -11,7 +13,7 @@ import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrac
 import "./releaseWorkbook0553.css";
 
 // Single customer-format sheet preview. Internal TAG/source drilldowns are UI-only
-// and MUST NOT be included in the unchanged six-sheet native XLSX export.
+// and MUST NOT be included in the six-sheet native XLSX export.
 const WORKSHEETS=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
  ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"]
@@ -74,6 +76,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const bWorkingTotal=model.summary.bProvisionalCustomerSellTHB;
  const provisionalBase=addKnown(model.summary.aProvisionalCustomerSellTHB,bWorkingTotal);
  const fullBaseReady=model.sourceCoverage.aReady&&model.sourceCoverage.bSellReady;
+ const unpricedB=model.b.filter(r=>!Number.isFinite(r.customerSellTHB)).map(r=>r.code).join(", ");
  const workingBudgetaryOwners=new Set(["B10","B11","B13"]);
  const tagCount=model.a.reduce((n,p)=>n+p.sourceRows.length,0);
  const isOverOriginalCapacity=tagCount>15;
@@ -106,9 +109,12 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const canQuote=false; // Final customer-issued XLSX still requires approval.
  const chooseNativeDraft=()=>sourceFileRef.current?.click();
  const exportNativeDraft=async event=>{
-  const file=event.target.files?.[0];
-  event.target.value="";
-  if(!file)return;
+  let file;
+  if(event?.target?.files){file=event.target.files[0];event.target.value="";if(!file)return;}
+  else{
+   const bytes=Uint8Array.from(atob(nativeReleaseTemplate0553.base64),c=>c.charCodeAt(0));
+   file=new File([bytes],nativeReleaseTemplate0553.sourceName,{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  }
   setNativeBusy(true);setNativeReport(null);
   try{
    const result=await buildNativeWorkingDraft0553(file,model);
@@ -131,7 +137,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   <button type="button" className="p553-origin-trace" onClick={()=>openSource(item)}>Trace</button>
  </span>:null;
  const toggleMr=key=>setExpandedMr(old=>({...old,[key]:!old[key]}));
- return <section className="p55-panel p553-release-workbook" data-component-key="bid.budget.pricing.release.preview">
+ return <section className="p55-panel p553-release-workbook" data-owner-colours={internal?"true":"false"} data-component-key="bid.budget.pricing.release.preview">
    <div className="p55-eyebrow">{title} · 10.3 / bid.budget.pricing.release.preview <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing.release.preview"/></div>
    <h3>Customer Excel Format Preview — 4-Scope of Supply.xlsx</h3>
    <p className="p55-note"><strong>PRE-EXPORT PREVIEW / NOT ISSUED.</strong> ตารางนี้เป็น JSX จำลองแบบฟอร์มลูกค้า ไม่ใช่ไฟล์ Excel ที่ Export แล้ว ข้อมูล A1–A4 สรุปทั้ง MR จาก 10.1, B1–B14 จาก Working Sell ของ 10.2, C1/C2 รอ Verified Direct Cost และแยกจาก Base</p>
@@ -147,10 +153,11 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     {recipient==="INTERNAL"&&<>
       <input ref={sourceFileRef} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
        onChange={exportNativeDraft} style={{display:"none"}} aria-label="Select original 4-Scope of Supply.xlsx"/>
-      <button type="button" className="p553-detail-button" onClick={chooseNativeDraft} disabled={nativeBusy}
-       title="Choose original 4-Scope of Supply.xlsx from your computer. File processed only in your browser; outputs a new native-format working draft.">
-       {nativeBusy?"Preparing Native XLSX…":"Export Native XLSX — WORKING DRAFT"}
+      <button type="button" className="p553-detail-button" onClick={()=>exportNativeDraft()} disabled={nativeBusy}
+       title="Generate Excel from current Release data using the original template. No file selection required.">
+       {nativeBusy?"Preparing Excel…":"Export Excel — WORKING DRAFT"}
       </button>
+      <button type="button" className="p553-detail-button" onClick={chooseNativeDraft} disabled={nativeBusy}>Use another original template…</button>
      </>}
     <button type="button" disabled={!canQuote} className="p553-detail-button"
       title="Approved customer XLSX requires signed release and completed checks">Final Customer Release — HOLD</button>
@@ -180,7 +187,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      <div className="p553-preview-totals">
       <span>Part A / 10.1 · <strong>{cash(aWorkingTotal)}</strong></span>
       <span>Part B / 10.2 · <strong>{cash(bWorkingTotal)} (priced working portion, not complete)</strong></span>
-      <span>Base A+B (working only) · <strong>{fullBaseReady?cash(provisionalBase):"NOT ESTABLISHED · priced portion "+cash(provisionalBase)}</strong></span>
+      <span>Base A+B (working only) · <strong>{cash(provisionalBase)}</strong></span>
      </div>
      <div className="p553-sheet-scroll"><table className="p553-customer-table">
       <thead><tr>{RELEASE_CUSTOMER_COLUMNS_0553.scope.map(h=><th key={h}>{h.split(" / ").map((t,i)=><React.Fragment key={i}>{i>0&&<br/>}{t}</React.Fragment>)}</th>)}</tr></thead>
@@ -188,11 +195,11 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-section"><td colSpan={8}>Part A: BASIC<br/>A部分：基本</td></tr>
        <tr className="p553-sheet-subheading"><td colSpan={8}>A1. Main Equipment · Source MR-0001–MR-0004 / Customer Grouping Preview</td></tr>
        {partA.groups.map((part,i)=><React.Fragment key={part.code}>
-        <tr className="p553-mr-preview-row">
+        <tr className="p553-mr-preview-row" data-cost-owner={part.code}>
          <td><strong>{part.code}</strong></td>
          <td><strong>{part.mr}</strong><small>MULTI-TAG / customer grouping subject to approval</small></td>
          <td>{part.description}</td>
-         <td>{part.sourceRows.length} TAG lines across {new Set(part.sourceRows.map(x=>x.site)).size} sites
+         <td>Locations: {[...new Set(part.sourceRows.map(x=>x.site).filter(Boolean))].join(", ")||"TBC"}
            {internal&&<small>{part.unresolvedCount} unpriced / pending</small>}</td>
          <td>1 lot</td>
          <td className="p553-price-cell">{money(part.previewSellTHB)}</td>
@@ -203,7 +210,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
           {sourceButton(part)}
          </>}</td>
         </tr>
-        {internal&&expandedMr[part.code]&&<tr className="p553-drilldown-only"><td colSpan={8}>
+        {internal&&expandedMr[part.code]&&<tr className="p553-drilldown-only" data-cost-owner={part.code}><td colSpan={8}>
          <strong>{part.code} / {part.mr} — Source TAG detail (Internal UI only, not additional XLSX rows)</strong>
          <div className="p553-drilldown-table-wrap"><table className="p553-drilldown-table">
           <thead><tr><th>Site</th><th>TAG No.</th><th>Description</th><th>Qty</th><th>Unit Sell THB</th><th>Sell THB</th><th>Module</th></tr></thead>
@@ -223,8 +230,11 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-section"><td colSpan={8}>Part B: OTHERS<br/>B部分：其它</td></tr>
        {B_ROWS.map(id=>{
         const line=bLines.find(r=>r.code===id);
-        return <React.Fragment key={id}><tr><td><strong>{id}</strong></td>
-         <td colSpan={3}>{parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}</td>
+        return <React.Fragment key={id}><tr data-cost-owner={id}><td><strong>{id}</strong></td>
+         <td colSpan={3}>{id==="B6"?line?.description:parseName(id)} {sourceButton(line||{code:id,sourceModuleId:"bid.budget.working.bc."+id.toLowerCase()})}
+          {line?.executionActivities&&<small className="p553-release-activity-text">{line.executionActivities.releaseText}</small>}
+          {line?.serviceCommercialBasis&&<ServiceCommercialBasis0553 basis={line.serviceCommercialBasis} compact/>}
+         </td>
          <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
          <td>{workingBudgetaryOwners.has(id)?<>
@@ -241,7 +251,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
           <thead><tr><th>10.2 Group Source</th><th>Working SELL THB</th><th>10.3 Customer Preview Attribution THB</th>
            <th>Status</th><th>Go to 10.2 Source</th></tr></thead>
-          <tbody>{line.b3GroupTrace.map(g=><tr key={g.id}>
+          <tbody>{line.b3GroupTrace.map(g=><tr key={g.id} data-work-family={g.id.split(".").pop()}>
            <td>{g.name}<small>{g.id}</small></td>
            <td>{money(g.workingSellTHB)}</td><td>{money(g.customerPreviewAttributionTHB)}</td>
            <td>{g.status}<small>{g.approvalGate}</small></td>
@@ -255,19 +265,18 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         </td></tr>}
         </React.Fragment>;
        })}
-       <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 / Base A+B (WORKING PREVIEW)</td>
-        <td className="p553-price-cell">{fullBaseReady?money(provisionalBase):"NOT ESTABLISHED"}</td>
-        <td><strong>{fullBaseReady?"Working Preview · NOT RELEASED":"INCOMPLETE BASE · not full quotation"}</strong>
-          {internal&&!fullBaseReady&&<small>Priced portion only: {cash(provisionalBase)}; B4/B12/B14 and OEM signoffs remain open</small>}
-        </td></tr>
+       <tr className="p553-sheet-total"><td colSpan={6}>Total 合计 / A+B — priced items (THB)
+         {!fullBaseReady&&<small>Excludes unpriced items{unpricedB?": "+unpricedB:""}.</small>}</td>
+        <td className="p553-price-cell">{money(provisionalBase)}</td>
+        <td><strong>WORKING DRAFT</strong></td></tr>
        <tr className="p553-sheet-highlight"><td colSpan={8}>Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
-       {model.c.map(r=><tr key={r.code}><td><strong>{r.code}</strong></td>
+       {model.c.map(r=><tr key={r.code} data-cost-owner={r.code}><td><strong>{r.code}</strong></td>
         <td colSpan={3}>{parseName(r.code)} {sourceButton(r)}</td>
         <td>1 lot</td><td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
         <td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
         <td>refer to Annex {r.code} · OPTION
-          <small>{r.code==="C1"?"MGW installed RACON comparison only; independent spare OEM quote open":"2-year OEM SPIR/part qty/price open; excludes B10 SKU stock"}</small>
+          <small>{r.code==="C1"?"Independent capital spare OEM quote pending":"2-year OEM SPIR/part qty/price open; excludes B10 SKU stock"}</small>
           {internal&&r.code==="C1"&&Number.isFinite(r.internalNonpostingInstalledPackageComparableTHB)&&
             <small>Separate NONPOSTING installed-package budget comparison: {cash(r.internalNonpostingInstalledPackageComparableTHB)} · not a C1 OEM spare quote / not DDP</small>}
           {internal&&<button type="button" className="p553-detail-button"
@@ -279,7 +288,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      {isOverOriginalCapacity&&<p className="p553-native-warning">
       <strong>Native Excel constraint:</strong> 10.1 has {tagCount} priced TAG rows but the original Part A provides 15 item rows.
       This JSX groups all source data into four MR package rows, with no priced TAG silently discarded.
-      Grouped Tag No. format must be accepted by purchaser before native export; no original cell size/layout changes are allowed.
+      Grouped Tag No. format must be accepted by purchaser before native export; original column widths, page setup and merges are retained; exported text wraps with fitted row heights.
      </p>}
     </>:<>
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
@@ -291,7 +300,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       Description = ซื้ออะไหล่อะไรและใช้ทำอะไร · Detail Specification = คุณสมบัติที่ต้องตรงกับของเดิม ·
       Materials = วัสดุหรือส่วนประกอบ (ถ้าไม่ทราบระบุ TBC) · Related TAGs = อุปกรณ์ที่อาจใช้อะไหล่นี้ร่วมกัน ไม่ใช่จำนวนที่จะซื้อ ·
       <strong> QTY = จำนวนอะไหล่สำรองที่จะซื้อ</strong>. ความเข้ากันได้ของ OEM ยังรอการยืนยัน</p>
-     <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table">
+     <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table" data-cost-owner={code}>
       <thead><tr><th rowSpan={2}>Item<br/>序号</th><th rowSpan={2}>Tag No<br/>位号</th><th rowSpan={2}>Description<br/>描述</th><th rowSpan={2}>Detail Specification<br/>详细规格</th><th rowSpan={2}>Materials<br/>材质</th><th rowSpan={2}>QTY<br/>数量</th><th colSpan={code.startsWith("C")?3:2}>DDP site （DDP现场交货）</th></tr>
        <tr><th>UNIT PRICE (CURRENCY)<br/>单价</th><th>TOTAL PRICE (CURRENCY)<br/>总价</th>
         {code.startsWith("C")&&<th>Lead time (ARO)<br/>交货期 (周)</th>}</tr></thead>
@@ -371,6 +380,6 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      Go to {source.sourceModuleId?.startsWith("bid.budget.bom")?"10.1 Engineering BOM":"10.2 Working BC"} ↗
     </button>
    </div>}
-   <p className="p55-note">Original customer workbook: 6 Sheets, unchanged. Pre-export preview is a read-only JSX layout; it does not prove pixel-perfect native XLSX fidelity. Final native export requires signed line/cell mapping, full cost + TAG reconciliation, verified FX and buyer approval of any grouping.</p>
+   <p className="p55-note">Export retains the original 6 sheets, merged cells and formulas, column widths and page setup, with fitted text and row heights. Pre-export preview is a read-only JSX layout; it does not prove pixel-perfect native XLSX fidelity. Final native export requires signed line/cell mapping, full cost + TAG reconciliation, verified FX and buyer approval of any grouping.</p>
  </section>;
 }

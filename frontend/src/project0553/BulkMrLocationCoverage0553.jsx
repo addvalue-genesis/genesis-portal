@@ -51,7 +51,7 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
   <p className="p55-note"><strong>One MR × Location view:</strong> physical field BULK and supplier-included assemblies are separate from priced equipment.
    Only MR0001 has seven booked source A5 partial floors (THB {fmt(view.originalA5BookedTHB)} total — already inside A1/A5 presentation).
    <strong> This page posts THB 0 additional</strong>. A quantity or quote in this table is evidence, not a released purchase or customer sell price.
-   Non-applicable MR/Location pairs are not automatically purchased. Selected MGW supply for MR0002–MR0004 remains MGW P26-058_R2 combined. MGW is responsible for functional installed RF cabling as complete-system scope; ADDVALUE NEK is a separate optional installation BULK spare reserve. No automatic replacement, no installation shortfall transfer and no B10/C2 double count.</p>
+   Non-applicable MR/Location pairs are not automatically purchased. Current selected supply: MR0002 MGW RF; MR0003 EXION phone/sounder with JB/glands unquoted; MR0004 MDS/ORGA with cable/gland inclusion conflict unresolved. MGW is responsible for functional installed RF cabling as complete-system scope; ADDVALUE NEK is a separate optional installation BULK spare reserve. No automatic replacement, no installation shortfall transfer and no B10/C2 double count.</p>
   <div className="p55-table-wrap p553-module-scroll">
    <table className="p55-table p55-table--compact p55-table--budget">
     <thead><tr><th>+/−</th><th>Location / MR</th><th>Source / Module ID</th><th>BULK functions</th>

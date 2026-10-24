@@ -11,16 +11,16 @@ const mr0002=MR0002_WORKING_BOM_0553.sites.map(s=>({site:s.site,mr:"MR-0002",nam
  projectionSource:"MR0002_WORKING_BOM_CANONICAL",completeness:"PROVISIONAL_SOME_COSTS_EXCLUDED",
  rfqSource:source.systems.find(x=>x.id==="MR-0002")?.rfqSource||null}));
 const mr0003=MR0003_MGW_WORKING_BOM_0553.sites.map(s=>({
- site:s.site,mr:"MR-0003",name:"Ex IP Phone / Gai-Tronics + EATON + WAROM",
+ site:s.site,mr:"MR-0003",name:"Ex IP Phone / EXION Gai-Tronics + EATON",
  detailRows:s.items.map(item=>({...item,row:item.quoteLine||item.id,
   sourceQty:item.qty,sourceUnit:item.unit})),
- subtotals:[{currency:"USD",amount:s.controlledTotalUSD}],gaps:s.gaps,
- projectionSource:"MR0003_MGW_R2_4SITE_WORKING_BOM_SELECTED",
- completeness:"MGW_QUOTE_4_SITES__FIELD_BULK_AND_TECH_OPEN",
+ subtotals:[{currency:"THB",amount:s.controlledTotalTHB}],gaps:s.gaps,
+ projectionSource:"MR0003_EXION_4SITE_WORKING_BOM_SELECTED",
+ completeness:"EXION_QUOTE_4_SITES__JB_GLANDS_AND_TECH_OPEN",
  rfqSource:source.systems.find(x=>x.id==="MR-0003")?.rfqSource||null
 }));
 const mr0004=MR0004_WORKING_BOM_0553.sites.map(site=>({
- site:site.site,mr:"MR-0004",name:"Marine RACON — Tideland SeaBeacon 2 / MGW R2",
+ site:site.site,mr:"MR-0004",name:"Marine RACON — MDS / ORGA SeaBeacon 2",
  detailRows:site.items.map(item=>({...item,row:item.id})),
  evidence:site.evidence,
  subtotals:[{currency:"USD",amount:site.controlledTotalUSD}],gaps:site.gaps,
@@ -37,7 +37,7 @@ export const BOM_READ_MODEL_0553=Object.freeze({
  sites:source.sites,
  rows:unifiedRows,
  byMr:source.systems.map(s=>({...s,rows:unifiedRows.filter(r=>r.mr===s.id)})),
- completeness:"MR0001_PARTIAL_MR0002_MGW_R2_SELECTED_MR0003_MGW_R2_4SITES_MR0004_TIDELAND_MGW_R2__TECH_BULK_UNVERIFIED",
+ completeness:"MR0001_PARTIAL_MR0002_MGW_R2_SELECTED_MR0003_EXION_4SITES_MR0004_MDS_ONE_QUOTED_THREE_BUDGETED__TECH_BULK_UNVERIFIED",
  releaseAllowed:false
 });
 export const bomItems0553=row=>row.detailRows?.length?row.detailRows:[];

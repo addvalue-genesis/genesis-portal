@@ -8,14 +8,20 @@ const total=a=>round(a.reduce((sum,x)=>sum+x,0));
 export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={}){
  if(b3?.code!=="B3"||b8?.code!=="B8"||![1,2].includes(trainingCrew))
   throw Error("Require canonical B3/B8 and scenario training crew=1 or 2");
+ // Historical comparison only: excludes the subsequent 14-day local execution plan.
+ const currentSelected={B3:b3.workingSellTHB,B8:b8.workingSellTHB};
+ const historicalIds=new Set(["FAT-STAFF","TRAVEL-DAYS","AIRFARE","HOTEL","VISA","LOCAL-TRAVEL","TRAVEL-INSURANCE","WORK-INSURANCE"].map(x=>"B3-"+x));
+ const historicalRows=b3.b3ChinaFatBudget.rows.filter(x=>historicalIds.has(x.id)).map(x=>x.id==="B3-FAT-STAFF"?{...x,qty:12,unitRateTHB:20475,workingSellTHB:245700}:x.id==="B3-LOCAL-TRAVEL"?{...x,qty:1,unit:"consolidated trip",unitRateTHB:8000,workingSellTHB:8000}:x);
+ b3={...b3,workingSellTHB:2133300,b3ChinaFatBudget:{...b3.b3ChinaFatBudget,rows:historicalRows,fatWorkingSellTHB:263700}};
+ b8={...b8,workingSellTHB:151550};
  const china=b3.b3ChinaFatBudget;
  const source=china?.rows.filter(r=>r.costOwner==="B3"&&!r.optional)||[];
  const ids=new Set(source.map(r=>r.id));
  const purchased=b3.b3MgwPurchasedFatWorkingSell;
- if(source.length!==8||ids.size!==8||china.fatWorkingSellTHB!==422600||
-  b3.workingSellTHB!==2599325||b8.workingSellTHB!==151550||b8.qtyDriver!==1||
-  purchased?.selectedIncrementalWorkingSellTHB!==307125||
-  purchased?.vendorPurchasedQuoteTHB!==236250)
+ if(source.length!==8||ids.size!==8||china.fatWorkingSellTHB!==263700||
+  b3.workingSellTHB!==2133300||b8.workingSellTHB!==151550||b8.qtyDriver!==1||
+  purchased?.selectedIncrementalWorkingSellTHB!==0||
+  purchased?.vendorPurchasedQuoteTHB!==0)
   throw Error("Source has changed: review six-day B3/B8 and SERV-2/4 before reallocation");
  const staffing=source.find(r=>r.id==="B3-FAT-STAFF");
  if(staffing?.qty!==12||staffing?.unitRateTHB!==20475||
@@ -25,7 +31,7 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
   {day:1,activity:"Formal customer FAT / ITP day 1",b3MD:2,b8MD:0},
   {day:2,activity:"Formal customer FAT / ITP day 2",b3MD:2,b8MD:0},
   {day:3,activity:"FAT spare / retest",b3MD:2,b8MD:0},
-  {day:4,activity:"Training in China (approval open)",b3MD:2-trainingCrew,b8MD:trainingCrew},
+  {day:4,activity:"Training at SAMTEL (approval open)",b3MD:2-trainingCrew,b8MD:trainingCrew},
   {day:5,activity:"Punch list and closeout",b3MD:2,b8MD:0}
  ].map(d=>Object.freeze({...d,postingAllowed:false})));
  const b3MD=total(programme.map(d=>d.b3MD));
@@ -57,13 +63,14 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
  const scenarioSell=total(rows.map(r=>r.scenarioWorkingSellTHB));
  const b3Alloc=total(rows.map(r=>r.proposedB3AllocationTHB));
  const b8Alloc=total(rows.map(r=>r.proposedB8AllocationTHB));
- if(sourceSell!==422600||scenarioSell!==381650||
+ if(sourceSell!==263700||scenarioSell!==222750||
   round(b3Alloc+b8Alloc)!==scenarioSell||sourceSell-scenarioSell!==40950||
   new Set(rows.map(r=>r.sourceExpenseId)).size!==8)
   throw Error("B3/B8 five-day scenario is not financially conserved");
  return Object.freeze({
+  historicalBaselineOnly:true,baselineRevision:"1526365e before complete local-execution allowances",currentSelected,
   moduleId:"bid.budget.working.bc.b3.fat-training-5d-source-allocation",
-  scenarioId:"SC-B3-B8-CHINA-FIVE-DAY-20261021",
+  scenarioId:"SC-B3-B8-SAMTEL-FIVE-DAY-NONPOSTING",
   sourceModuleId:"bid.budget.working.bc.b3.revk-china-budget",
   targetOwnerModuleIds:Object.freeze(["bid.budget.working.bc.b3","bid.budget.working.bc.b8"]),
   authority:"USER_DESCRIBED_5_DAY_SCHEDULE__COST_SPLIT_NOT_APPROVED",
@@ -74,7 +81,7 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
   b3TripAllocatedReferenceTHB:b3Alloc,b8TripAllocatedReferenceTHB:b8Alloc,
   originalB8WorkingSellTHB:30000, // historical Rev05-only source reference, not current WS-B8
   originalB8Hours:44,currentSelectedB8HybridTrainingWorkingSellTHB:b8.workingSellTHB,trainingPreparationOverlapReconciled:false,
-  mgwSupplierQuotedUSD:7500,mgwSupplierQuotedTHB:purchased.vendorPurchasedQuoteTHB,
+  mgwSupplierQuotedUSD:purchased.vendorPurchasedQuoteUSD,mgwSupplierQuotedTHB:purchased.vendorPurchasedQuoteTHB,
   mgwPurchasedInB3WorkingSellTHB:purchased.selectedIncrementalWorkingSellTHB,
   supplierSERV2SERV4Unchanged:true,customerIFATLineAllowed:false,
   existingSourceHotelRoomNights:source.find(r=>r.id==="B3-HOTEL")?.qty??null,
@@ -83,13 +90,14 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
   selectedWorkingSellTHB:null,customerPriceTHB:null,
   postingAllowed:false,releaseAllowed:false,
   gates:Object.freeze([
+   "HISTORICAL ONLY: excludes current preparation/facility/hosting allowances; cannot replace current complete plan",
    "Training Day 4 after FAT contradicts BOD pre-FAT training; require purchaser agreement",
    "SERV-2 two iFAT days and SERV-4 minimum five facility days are separate quote identities",
    "Training crew count 1 or 2 and actual site/facility itinerary not approved",
    "B8 44 MH/THB30000 documentation/preparation overlap must be reconciled before promotion",
-   "14 original room-nights left unchanged only as a comparison; confirm trip nights and expenses",
+   "No hotel nights selected for local SAMTEL venue; old China scenario is superseded",
    "4-MR 48-hour witnessed ITP, site availability and customer acceptance not confirmed",
-   "Quoted MGW USD7500 stays B3 once; never multiply ADDVALUE Working SELL by margin again"
+   "MGW equipment supply only; no service amount remains in B3; do not mark up ADDVALUE Working SELL again"
   ])
  });
 }

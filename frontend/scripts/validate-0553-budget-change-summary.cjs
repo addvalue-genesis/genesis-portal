@@ -19,7 +19,7 @@ assert.equal(new Set(notes.map(x=>x.id)).size,notes.length,"No duplicate change 
 assert(notes.every(x=>x.moduleIds.length>0&&x.moduleIds.every(id=>id.startsWith("bid."))),
  "Every change requires traceable Module IDs");
 assert(notes.every(x=>x.priceImpact==="NO_PRICE_CHANGE"||
- ["WORKING_SOURCE_CHANGED","PRICE_REVIEW_REQUIRED"].includes(x.priceImpact)),
+ ["WORKING_SOURCE_CHANGED","PRICE_REVIEW_REQUIRED","QUOTATION_FX_ROUNDING_ONLY"].includes(x.priceImpact)),
  "Never invent commercial price impact");
 assert(notes.every(x=>x.date&&x.title&&x.detail&&x.source));
 

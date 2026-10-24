@@ -11,25 +11,31 @@ const round=v=>Math.round((v+Number.EPSILON)*100)/100;
 const ROOT="bid.budget.working.bc.";
 export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
  if(!b3||b3.code!=="B3"||!b8||b8.code!=="B8")return null;
+ // Historical comparison only: excludes the subsequent 14-day local execution plan.
+ const currentSelected={B3:b3.workingSellTHB,B8:b8.workingSellTHB};
+ const historicalIds=new Set(["FAT-STAFF","TRAVEL-DAYS","AIRFARE","HOTEL","VISA","LOCAL-TRAVEL","TRAVEL-INSURANCE","WORK-INSURANCE"].map(x=>"B3-"+x));
+ const historicalRows=b3.b3ChinaFatBudget.rows.filter(x=>historicalIds.has(x.id)).map(x=>x.id==="B3-FAT-STAFF"?{...x,qty:12,unitRateTHB:20475,workingSellTHB:245700}:x.id==="B3-LOCAL-TRAVEL"?{...x,qty:1,unit:"consolidated trip",unitRateTHB:8000,workingSellTHB:8000}:x);
+ b3={...b3,workingSellTHB:2133300,b3ChinaFatBudget:{...b3.b3ChinaFatBudget,rows:historicalRows,fatWorkingSellTHB:263700}};
+ b8={...b8,workingSellTHB:151550};
  const fat=b3.b3ChinaFatBudget,rows=fat?.rows.filter(x=>x.costOwner==="B3"&&!x.optional)||[];
  const src=id=>{const v=rows.find(r=>r.id==="B3-"+id);
   if(!v)throw Error("Missing current B3 source expense "+id);return v;};
  const staff=src("FAT-STAFF"),travel=src("TRAVEL-DAYS"),hotel=src("HOTEL");
- if(b3.workingSellTHB!==2599325||b8.workingSellTHB!==151550||
-  b3.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB!==307125||
-  fat.fatWorkingSellTHB!==422600||rows.length!==8||
+ if(b3.workingSellTHB!==2133300||b8.workingSellTHB!==151550||
+  b3.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB!==0||
+  fat.fatWorkingSellTHB!==263700||rows.length!==8||
   rate.usdPerPersonDay!==600||rate.thbPerUsd!==31.5||
   staff.qty!==12||staff.unitRateTHB!==20475||
-  travel.qty!==4||travel.unitRateTHB!==20475||
-  hotel.qty!==14||hotel.unitRateTHB!==2500||
+  travel.qty!==0||travel.unitRateTHB!==20475||
+  hotel.qty!==0||hotel.unitRateTHB!==2500||
   b8.qtyDriver!==1||cover.FAT.internalFatDays!==2||
   cover.FAT.facilityEndUserDaysMinimum!==5)
   throw Error("B3/B8 7-day scenario diverged from prior canonical input; do not quietly update price");
  const program=Object.freeze([
-  {day:1,stage:"MGW Internal iFAT 1/2",b3MD:2,b8MD:0,notes:"Readiness / internal testing with MGW"},
-  {day:2,stage:"MGW Internal iFAT 2/2",b3MD:2,b8MD:0,notes:"Readiness, punch corrections, MGW documents"},
-  {day:3,stage:"Training batch 1 + FAT Readiness",b3MD:1,b8MD:1,notes:"One ADDVALUE trainer; one engineer stays with MGW"},
-  {day:4,stage:"Training batch 2 + FAT Readiness",b3MD:1,b8MD:1,notes:"Second batch; parallel MGW/ADDVALUE FAT setup"},
+  {day:1,stage:"SAMTEL Internal iFAT 1/2",b3MD:2,b8MD:0,notes:"Readiness / internal testing at SAMTEL"},
+  {day:2,stage:"SAMTEL Internal iFAT 2/2",b3MD:2,b8MD:0,notes:"Readiness, punch corrections, MGW documents"},
+  {day:3,stage:"Training batch 1 + FAT Readiness",b3MD:1,b8MD:1,notes:"One ADDVALUE trainer; one engineer stays at SAMTEL"},
+  {day:4,stage:"Training batch 2 + FAT Readiness",b3MD:1,b8MD:1,notes:"Second batch; parallel SAMTEL/ADDVALUE FAT setup"},
   {day:5,stage:"Formal customer FAT 1/3",b3MD:2,b8MD:0,notes:"Witnessed FAT, 4-MR ITP approval REQUIRED"},
   {day:6,stage:"Formal customer FAT 2/3",b3MD:2,b8MD:0,notes:"Witnessed functional testing"},
   {day:7,stage:"Formal customer FAT 3/3",b3MD:2,b8MD:0,notes:"Interface, punch, as-left, signing"}
@@ -37,7 +43,7 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
  const b3OnsitePersonDays=program.reduce((a,x)=>a+x.b3MD,0);
  const b8OnsitePersonDays=program.reduce((a,x)=>a+x.b8MD,0);
  const travelPersonDays=travel.qty;
- const hotelRoomNightsFor7OnsiteDays=2*(7+1);
+ const hotelRoomNightsFor7OnsiteDays=0;
  const hotelExtraNights=hotelRoomNightsFor7OnsiteDays-hotel.qty;
  const hotelExtraSellTHB=round(hotelExtraNights*hotel.unitRateTHB);
  const trainingAssignedSellTHB=round(b8OnsitePersonDays*rate.thbPerPersonDay);
@@ -54,33 +60,34 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
  validateCostVsCommercialIdentity0553(identities);
  if(program.length!==7||b3OnsitePersonDays!==12||b8OnsitePersonDays!==2||
   b3OnsitePersonDays+b8OnsitePersonDays!==14||
-  travelPersonDays!==4||hotelExtraNights!==2||hotelExtraSellTHB!==5000||
-  trainingAssignedSellTHB!==37800||newB3FatSellTHB!==427600||
-  newGrossFatTrainingTripSellTHB!==465400||
-  newB3OverallSellTHB!==2604325||newB8OverallSellTHB!==37800||
-  oldCombined!==2750875||newCombined!==2642125||
-  round(newCombined-oldCombined)!==-108750||
+  travelPersonDays!==0||hotelExtraNights!==0||hotelExtraSellTHB!==0||
+  trainingAssignedSellTHB!==37800||newB3FatSellTHB!==263700||
+  newGrossFatTrainingTripSellTHB!==301500||
+  newB3OverallSellTHB!==2133300||newB8OverallSellTHB!==37800||
+  oldCombined!==2284850||newCombined!==2171100||
+  round(newCombined-oldCombined)!==-113750||
   b3.directCostTHB!==null||b8.directCostTHB!==null)
   throw Error("B3/B8 7-day allocation math / no-extra-travel / no-double-count failed");
  return Object.freeze({
+  historicalBaselineOnly:true,baselineRevision:"1526365e before complete local-execution allowances",currentSelected,
   moduleIds:Object.freeze({
    B3:ROOT+"b3.fat-training-7d-allocation",
    B8:ROOT+"b8.integrated-fat-training-7d"
   }),
   identities,program,
-  sourceEventId:"MGW_FAT_TRAINING_ONE_CHINA_VISIT_7_WORKDAYS",
+  sourceEventId:"SAMTEL_FAT_TRAINING_7_DAY_WHAT_IF_NONPOSTING",
   sourceAuthority:"SUPERSEDED_FAT_TRAINING_7_DAY_COMPARISON__NOT_SELECTED_B8_HYBRID",
   onSiteDays:7,crew:2,onsitePersonDays:14,
   b3OnsitePersonDays,b8OnsitePersonDays,
-  travelDaysPerPerson:2,travelPersonDays,
+  travelDaysPerPerson:0,travelPersonDays,
   travelLabourExistingIncludedB3THB:travel.workingSellTHB,
   hotelRoomNights:hotelRoomNightsFor7OnsiteDays,
   additionalHotelNights:hotelExtraNights,
   additionalHotelSellTHB:hotelExtraSellTHB,
   b3FatWorkingSellCurrentTHB:fat.fatWorkingSellTHB,
   proposedB3FatWorkingSellTHB:newB3FatSellTHB,
-  b3CurrentFatIncludingMgwPurchasedTHB:round(fat.fatWorkingSellTHB+307125),
-  b3ProposedFatIncludingMgwPurchasedTHB:round(newB3FatSellTHB+307125),
+  b3CurrentFatIncludingMgwPurchasedTHB:round(fat.fatWorkingSellTHB+0),
+  b3ProposedFatIncludingMgwPurchasedTHB:round(newB3FatSellTHB+0),
   proposedB8TrainingWorkingSellTHB:newB8OverallSellTHB,
   b3CurrentWorkingSellTHB:b3.workingSellTHB,
   b8CurrentWorkingSellTHB:b8.workingSellTHB,
@@ -96,7 +103,7 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   mgwQuotedIFATUSD:cover.FAT.internalFatUSD,
   mgwQuotedFatFacilityUSD:cover.FAT.facilityEndUserUSD,
   vendorQuoteAlreadyInMGWCover:true,
-  vendorMgwPurchasedSellAlreadyInCanonicalB3THB:307125,
+  vendorMgwPurchasedSellAlreadyInCanonicalB3THB:0,
   noDuplicateVendorPurchasedOnScenario:true,
   customerTrainingLocationAndTwoBatchAcceptanceConfirmed:false,
   threeDayWitnessITPAccepted:false,

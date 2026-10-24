@@ -1,3 +1,4 @@
+import {selectImportOperationalBudget0553} from "./importOperationalBudget0553";
 // PJ2608-0553 — 10.2 B5/B6/B7 one physical logistics chain, three cost owners.
 // Read-only source trace. It NEVER posts vendor quotes, guessed crates,
 // storage fees, customs costs or historical estimate fragments to Working SELL.
@@ -14,7 +15,7 @@ const freeze=Object.freeze;
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 const fx=31.5; // Working preview planning assumption, NOT current BOT / actual invoice FX
 const ROOT="bid.budget.working.bc";
-const ADR="ADR-68-B6-MR0001-DIRECT-MGW-20261022";
+const ADR="ADR-URGENT-SAMTEL-CIF-20261024";
 const row=(code,id,stage,mr,cargoId,activity,sourceEquipmentQty,sourceEquipmentUnit,sourceUrl,status,extra={})=>freeze({
  code,id,stage,mr,cargoId,activity,sourceEquipmentQty,sourceEquipmentUnit,
  moduleId:ROOT+"."+code.toLowerCase()+".price-trace.work-scope."+id.toLowerCase(),
@@ -26,8 +27,51 @@ const row=(code,id,stage,mr,cargoId,activity,sourceEquipmentQty,sourceEquipmentU
  postingAllowed:false,customerReleaseAllowed:false,
  sourceUrl,status,...extra
 });
+// 24-Oct internal allocation of the EXISTING B5/B6 envelopes, not freight quotations.
+// One allowance lot per activity; no fabricated crate count, weight, duty exemption or market rate.
+export function selectSamtelLogisticsEnvelope0553(){
+ const operations=selectImportOperationalBudget0553();
+ const definitions={
+  B5:[
+   ["RECEIVE-PRESERVE","Receiving/unpacking/protection of reusable OEM cases at SAMTEL",40000],
+   ["MR1-SEA-PACK","MR0001 all seven locations: cabinets/radios/Cisco/antennas export protection",64000],
+   ["MR2-SEA-PACK","MR0002 three BDA locations: reusable-case protection/repack",24000],
+   ["MR3-SEA-UPGRADE","MR0003 four phone/sounder locations: upgrade EXION inland packing",32000],
+   ["MR4-CASE-REUSE","MR0004 three RACON locations: inspect/reuse included MDS sea cases",24000],
+   ["SPARE-TOOL-CASES","Selected B10/B11/B13 spares/tools/consumables separate marked cases",28000],
+   ["MARK-PRESERVATION","Shipping marks, desiccants, wood/IPPC compliance and preservation",30000],
+   ["POST-FAT-PACK","Post-FAT dismantle/protection/seal/physical repacking labour",40000],
+   ["WEIGH-MEASURE","Physical package measurement, weighing and label data; B2 controls documents",9184],
+   ["PACK-RISK","Unallocated packing damage/upgrade contingency within existing envelope",20000]
+  ],
+  B6:[
+   ["MR1-TH-IN","NextG/VST/Thai assembly to SAMTEL incl destination-change allowance",35000],
+   ["MR2-CN-TH","MGW RF equipment China origin → Thailand; EXW/DAP discrepancy remains",60000],
+   ["MR3-TH-IN","EXION Nonthaburi → actual SAMTEL address, local delivery reserve",8000],
+   ["MR4-FCA-TH","MDS named FCA factory → Thailand; pickup place/cargo dimensions open",65000],
+   ["TH-IMPORT-BROKER","Thailand inbound broker/permit processing, excluding unknown statutory duty/VAT",operations.stages[0].workingSellTHB],
+   ["SAMTEL-EXPORT","SAMTEL physical loading, truck and terminal only — new provisional allocation, adequacy open",operations.b6Replacement.retainedTruckLoadingTerminalSellTHB],
+   ["EXPORT-DOCS","Thai export broker/documents and external JUTAL document support",operations.stages[1].workingSellTHB],
+   ["CIF-ZHUHAI-SEA","Thailand port → Zhuhai Port sea freight, all four MR consolidated",80000],
+   ["CARGO-RISK","Cargo insurance plus unallocated route-price contingency",22584]
+  ]
+ };
+ const byCode=Object.fromEntries(Object.entries(definitions).map(([code,list])=>[code,freeze(list.map(([id,activity,amount])=>freeze({
+  id:code+"-SAMTEL-"+id,code,activity,qty:1,unit:"internal allowance lot",unitRateTHB:amount,
+  workingSellTHB:amount,planningCostTHB:id==="TH-IMPORT-BROKER"?operations.stages[0].costTHB:id==="EXPORT-DOCS"?operations.stages[1].costTHB:null,sourceModuleId:ROOT+"."+code.toLowerCase()+".price-trace.work-scope",
+  status:"INTERNAL_ENVELOPE_ALLOCATION_NOT_VENDOR_QUOTE_OR_VERIFIED_ADEQUACY",
+  verifiedDirectCostTHB:null,independentPostingAllowed:false
+ })))]));
+ const totals=Object.fromEntries(Object.entries(byCode).map(([code,rows])=>[code,round(rows.reduce((n,r)=>n+r.workingSellTHB,0))]));
+ if(totals.B5!==311184||totals.B6!==307584+operations.b6IncrementalSellTHB)throw Error("Existing packing/CIF envelopes allocated more than once");
+ return freeze({byCode:freeze(byCode),totals:freeze(totals),operations,adequacyVerified:false,
+  coverage:"All MR0001/2/3/4 7+3+4+3 scope and selected spares; equipment location counts are not shipment package counts",
+  statutoryThaiDutyVATTHB:null,clientTravelHotelTHB:null,
+  unpricedExposures:freeze(["Thailand import duty/tax regime and recoverable VAT cash flow: amount/payer not established, no exemption assumed", "Actual dimensions/weights/freight surcharges and OEM included freight/packing netting", "Cargo ICC(A) insurance to Yard versus CIF Port: broker extent/premium unconfirmed", "China clearance/duty/VAT/port-to-yard Purchaser per COM-D02; any changed responsibility must be repriced"]),
+  customerReleaseAllowed:false});
+}
 export function selectB5B6B7LinkedLogistics0553(){
- const route=selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB:307584});
+ const route=selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB:selectSamtelLogisticsEnvelope0553().totals.B6});
  const earlier=selectB6Mr0001ChinaInboundScenario0553();
  const storage=selectB7ThreeMonthStorageEvidence0553();
  const legacy=selectBcB5HistoricalPriceBridge0553();
@@ -45,7 +89,7 @@ export function selectB5B6B7LinkedLogistics0553(){
   throw Error("B5/B6/B7 selected route, quote and historic/nonposting identity mismatch");
  const b5=[
   row("B5","TH-ENC-CISCO-PACK","TH-WORKSHOP","MR-0001","B6-MR1-TH-ENC-CISCO",
-   "Thailand preassembled Enclosure + Cisco: preserve/pack for export to MGW",4,"assembled equipment sets",
+   "Thai enclosure/Cisco: deliver to SAMTEL; sea-export protection after FAT",4,"assembled equipment sets",
    documents.mr0001,"THAI_PACK_VENDOR_QUOTE_AND_ACTUAL_CRATES_OPEN",{
    planningScenarioLowTHB:thaiPackReference.lowTHB,
    planningScenarioHighTHB:thaiPackReference.highTHB,
@@ -54,19 +98,19 @@ export function selectB5B6B7LinkedLogistics0553(){
   }),
   row("B5","NEXTG-OEM-PACK","NEXTG-ORIGIN","MR-0001",
    "B6-MR1-NEXTG-IDU|B6-MR1-NEXTG-ODU|B6-MR1-NEXTG-ANT",
-   "NextG factory export protection of 4 IDU, 4 ODU and ALL 5 antennas before direct MGW dispatch",13,"equipment units (4+4+5), NOT crates",
+   "NextG factory protection before Thailand SAMTEL receiving; no assumed free reroute",13,"equipment units (4+4+5), NOT crates",
    route.nextg.sourceUrl,"NEXTG_AMENDED_OEM_PACK_INCLUSION_AND_CRATE_LIST_PENDING",{
    sourceAuthority:"ADR-68 / NextG expired DAP Ranong is NOT an approved MGW delivery quote"
   }),
   row("B5","MGW-MR234-OEM-PACK","OEM-TO-MGW","MR-0002/0003/0004",
    "B6-MGW-MR234-INTERNAL",
-   "MR0002–MR0004 vendor original protection while delivering to MGW office",null,"physical packages",
+   "MGW MR0002 inbound packing; EXION inland-only protection; MDS sea packing included, net new B5 work only",null,"physical packages",
    MGW.sourceUrl,"MGW_OEM_ORIGIN_PACKING_INCLUSION_PENDING"),
-  row("B5","MGW-POST-FAT-REPACK","MGW-AFTER-FAT","MR-0001..0004",
+  row("B5","MGW-POST-FAT-REPACK","SAMTEL-AFTER-FAT","MR-0001..0004",
    "B6-MGW-JUTAL-OUT",
-   "Unpack, inspect, reuse/reseal or replace crates after MGW FAT; charge only net new work",null,"repacked physical packages",
+   "Unpack, inspect, reuse/reseal or replace crates after SAMTEL FAT; charge only net new work",null,"repacked physical packages",
    documents.annex4,"FAT_OPENED_PKG_IDS_REUSE_QTY_AND_NEW_PACK_RATE_PENDING",{
-   sourceAuthority:"MGW FAT and crate reuse gate; B3 test labour separately"
+   sourceAuthority:"SAMTEL FAT and crate reuse gate; B3 test labour separately"
   }),
   row("B5","MGW-SERV3-PACK","MGW-OUTBOUND","MR-0001..0004",
    "B6-MGW-JUTAL-OUT",
@@ -92,12 +136,12 @@ export function selectB5B6B7LinkedLogistics0553(){
    x.cargo,null,"actual freight consignment / cartons",
    outbound?quoteFreight.sourceUrl:x.id==="B6-MGW-MR234-INTERNAL"?MGW.sourceUrl:
     x.id==="B6-MR1-TH-ENC-CISCO"?documents.mr0001:route.nextg.sourceUrl,
-   outbound?"MGW_SERV5_QUOTED_ONCE__CARGO_AND_PACKING_OVERLAP_PENDING":
+   outbound?"CIF_SEA_FREIGHT_UNQUOTED__MGW_ROAD_QUOTE_NOT_TRANSFERABLE":
     "FREIGHT_RATE_IMPORTER_CARGO_DIMENSIONS_AND_REVISED_TERM_PENDING",{
-    supplierQuoteUSD:outbound?quoteFreight.usd:null,
-    supplierQuoteTHBReference:outbound?round(quoteFreight.usd*fx):null,
-    supplierQuoteId:outbound?"SERV-5":null,
-    quotedFreightAlreadyInVendorCover:outbound,
+    supplierQuoteUSD:null,
+    supplierQuoteTHBReference:null,
+    supplierQuoteId:null,
+    quotedFreightAlreadyInVendorCover:false,
     logisticsOwner:"B6 FREIGHT/BROKER/CUSTOMS/TRANSIT INSURANCE, not physical packing B5"
    });
  }).map(freeze);
@@ -127,19 +171,20 @@ export function selectB5B6B7LinkedLogistics0553(){
  });
  const all=[...b5,...b6,...b7];
  if(new Set(all.map(x=>x.moduleId)).size!==all.length||
-  b6.length!==6||b5.length!==7||b7.length!==3||
-  round(Object.values(selectedWorkingSellByCode).reduce((a,b)=>a+b,0))!==648768||
+  b6.length!==8||b5.length!==7||b7.length!==3||
+  round(Object.values(selectedWorkingSellByCode).reduce((a,b)=>a+b,0))!==676768||
   all.some(x=>x.postingAllowed||x.verifiedDirectCostTHB!==null||x.allocatedWorkingSellTHB!==null))
   throw Error("B5/B6/B7 line identity or unpriced-source nonposting reconciliation failed");
  return freeze({
   moduleId:"bid.budget.working.bc.logistics-linked-audit",
+  envelope:selectSamtelLogisticsEnvelope0553(),
   approvedRoutingId:route.approvedDecisionId,routeStatus:route.physicalRoutingStatus,
-  MGWFatLocation:"MGW office / Nantong, China (route evidence; named FAT venue acceptance OPEN)",
-  yardOwnerRoute:"JUTAL Zhuhai Yard, China per ADR-68",
-  yardUserDescription:"JUTAL Nantong Yard (stated in user review; conflict to verify)",
-  destinationConflict:"MGW Nantong dispatch vs user-named JUTAL Nantong Yard vs owner-approved JUTAL Zhuhai Yard: named receiving yard/address MUST be reconciled, do not silently change approved route",
+  MGWFatLocation:"SAMTEL Warehouse, Thailand — selected working venue; customer acceptance open",
+  yardOwnerRoute:"CIF Zhuhai Port China, COM-D02 port→yard by Purchaser",
+  yardUserDescription:"CIF Zhuhai Port, not JUTAL Yard",
+  destinationConflict:"CCL CIF port versus contract ICC(A) insurance to Yard: resolve insurance extent; China clearance and port→yard remain Purchaser under COM-D02",
   fxTHBPerUSD:fx,fxClass:"INTERNAL_PLANNING_FX_NOT_OFFICIAL_VENDOR_THB_INVOICE",
-  selectedWorkingSellByCode,selectedThreeOwnerWorkingSellTHB:648768,
+  selectedWorkingSellByCode,selectedThreeOwnerWorkingSellTHB:676768,
   totalCurrentVerifiedDirectCostTHB:null,
   currentRouteCostReconciled:false,sourcePriceComplete:false,
   independentNewPricingAuthorized:false,customerReleaseAllowed:false,
@@ -157,15 +202,12 @@ export function selectB5B6B7LinkedLogistics0553(){
   nonpostingThaiPackingReferenceLowTHB:thaiPackReference.lowTHB,
   nonpostingThaiPackingReferenceHighTHB:thaiPackReference.highTHB,
   gates:freeze([
-   "MR0001 4 Thai assembled sets: packing lists, net/new crates, exporter and TH→MGW vendor packing quote",
-   "NextG 4 IDU + 4 ODU + 5 antennas direct MGW: amended DAP Ranong quotation, included crate/transport credits and incoming customs",
-   "MR0002–0004 OEM original crates: inclusion and MGW receiving/inspection; no Thailand return loop",
-   "MGW post-FAT crate reuse/reseal and physical marks: list actual opened crates and qualified replacement works",
-   "MGW SERV-3 USD500 vs SERV-5 USD2500 packing overlap: require written distinct scope/credit, no automatic minus USD500",
-   "MGW outbound SERV-5 USD2500: obtain all four MR cargo manifest, transport/delivery condition and verified insurance",
-   "B7 three-month FREE vendor workshop storage: written inclusion and actual duration; THB30000 additional month is conditional Working SELL reserve, not verified Cost",
-   "Confirm JUTAL Zhuhai vs user reference Nantong, consignee address, Incoterm and delivery milestone",
-   "B2 owns packing-list document creation; B3 FAT labour; B5 physical protection/marking; B6 freight/customs; B7 physical storage; B13 preservation consumables not double billed"
+   ...route.decisionGates,
+   "Sea export packaging after SAMTEL FAT: reuse MDS included sea crates where sound, upgrade EXION inland packing only as needed; no assumed free repack",
+   "MGW SERV-3/5 remain historical source references, not actual CIF outbound quote or agreed credit",
+   "B7 one-month reserve remains conditional beyond included storage; B5 embedded storage excluded",
+   "B2 documents / B3 test labour / B5 packing / B6 freight-cargo insurance / B7 storage / B14 corporate cover are separate owners"
+
   ])
  });
 }

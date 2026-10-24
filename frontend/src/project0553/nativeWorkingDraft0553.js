@@ -1,7 +1,7 @@
 /**
  * PJ2608-0553 / 10.3.3 — Export WORKING DRAFT into an ORIGINAL native .xlsx
  * supplied via local browser file picker.  No template is checked into GitHub,
- * no upload or network request occurs, no worksheet/style/merge/size is created.
+ * no upload or network request occurs. Sheets/merges are retained; exported layout is fitted.
  *
  * 10.1 -> 10.3.3: four GROUPED MR lines within original Part A rows 8..11.
  * 10.2 -> 10.3.3: B1..B14 Working Sell and B10/B11/B13 Annex detail.
@@ -9,7 +9,7 @@
  * RELEASE is always HOLD; this export is INTERNAL / NOT FOR CUSTOMER SUBMISSION.
  *
  * ZIP archive parts are copied unchanged except specified worksheet XML cell
- * value elements.  No dependency/package addition, no historical 'cost' posting.
+ * values and presentation styles/sizes. No dependency addition or price change.
  */
 const SHEETS_0553=Object.freeze([
  "Scope of supply","B10 CommSpares","B11 SpecialTool",
@@ -113,6 +113,98 @@ function write(writes,cell,value){
  if(writes.has(cell))throw Error("Duplicate native mapping "+cell);
  writes.set(cell,value);
 }
+// Owner-requested Release export layout. Original values, formulas, merges,
+// borders, fills and unrelated ZIP parts are retained; body styles are cloned.
+function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
+ const attr=(tag,key)=>tag.match(new RegExp('\\b'+key+'="([^"]*)"'))?.[1];
+ const setAttr=(tag,key,value)=>{
+  const re=new RegExp('\\s'+key+'="[^"]*"');
+  return re.test(tag)?tag.replace(re,' '+key+'="'+value+'"'):tag.replace(/\s*\/?>$/,end=>' '+key+'="'+value+'"'+end);
+ };
+ const section=(xml,name)=>xml.match(new RegExp('<'+name+'\\b[^>]*>([\\s\\S]*?)</'+name+'>'));
+ const fontsSection=section(stylesXml,'fonts'),stylesSection=section(stylesXml,'cellXfs');
+ if(!fontsSection||!stylesSection)throw Error('Native workbook has no usable font/cell styles');
+ const fonts=fontsSection[1].match(/<font\b[^>]*>[\s\S]*?<\/font>/g)||[];
+ const styles=stylesSection[1].match(/<xf\b[^>]*?(?:\/>|>[\s\S]*?<\/xf>)/g)||[];
+ const fontCache=new Map(),styleCache=new Map();
+ const fittedStyle=(id,numeric,header,total=false)=>{
+  const key=id+':'+numeric+':'+header+':'+total;if(styleCache.has(key))return styleCache.get(key);
+  let xf=styles[id];if(!xf)throw Error('Invalid native cell style '+id);
+  const fontId=Number(attr(xf,'fontId')||0);
+  if(!fontCache.has(fontId)){
+   let font=fonts[fontId];if(!font)throw Error('Invalid native font '+fontId);
+   font=font.replace(/<sz\b[^>]*\/>/g,'').replace(/<name\b[^>]*\/>/g,'').replace(/<scheme\b[^>]*\/>/g,'')
+    .replace('</font>','<sz val="10"/><name val="Arial"/></font>');
+   let next=fonts.indexOf(font);if(next<0){next=fonts.length;fonts.push(font);}fontCache.set(fontId,next);
+  }
+  xf=xf.replace(/^<xf\b[^>]*>/,tag=>setAttr(setAttr(setAttr(tag,'fontId',fontCache.get(fontId)),'applyFont',1),'applyAlignment',1));
+  if(total)xf=xf.replace(/^<xf\b[^>]*>/,tag=>setAttr(setAttr(tag,'numFmtId',4),'applyNumberFormat',1));
+  if(xf.endsWith('/>'))xf=xf.slice(0,-2)+'></xf>';
+  xf=xf.replace(/<alignment\b[^>]*?(?:\/>|>[\s\S]*?<\/alignment>)/g,'');
+  xf=xf.replace('</xf>','<alignment horizontal="'+(header?'center':numeric?'right':'left')+'" vertical="'+(header?'center':'top')+'" wrapText="'+(numeric?0:1)+'"/></xf>');
+  let next=styles.indexOf(xf);if(next<0){next=styles.length;styles.push(xf);}styleCache.set(key,next);return next;
+ };
+ const unescape=s=>s.replace(/&#(x[0-9a-f]+|\d+);/gi,(_,n)=>String.fromCodePoint(n[0].toLowerCase()==='x'?parseInt(n.slice(1),16):Number(n)))
+  .replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+ const textOf=xml=>[...xml.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map(x=>unescape(x[1])).join('');
+ const shared=[...(sharedXml||'').matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map(x=>textOf(x[1]));
+ const column=letters=>[...letters].reduce((n,c)=>n*26+c.charCodeAt(0)-64,0);
+ // Conservative Arial 10 metrics at 96dpi, including wide glyphs and long TAGs.
+ const pixels=s=>[...s].reduce((n,c)=>n+(/[^\x00-\x7f]/.test(c)?14:/[MW@%]/.test(c)?12:/[A-Z0-9]/.test(c)?8:/[il.,:;'!| ]/.test(c)?4:7),0);
+ const linesFor=(text,width)=>text.split(/\r?\n/).reduce((total,line)=>{
+  let lines=1,used=0;
+  for(const token of line.split(/(\s+)/).filter(Boolean)){
+   const w=pixels(token);if(used&&used+w>width){lines++;used=0;}
+   if(w>width){const full=Math.ceil(w/width);lines+=full-1;used=w-(full-1)*width;}else used+=w;
+  }
+  return total+lines;
+ },0);
+ const output=new Map();
+ for(const [name,input] of sheets){
+  const main=/sheet1\.xml$/.test(name),last=main?8:/sheet[56]\.xml$/.test(name)?10:9;
+  let xml=input;
+  const originalCols=xml.match(/<cols\b[^>]*>([\s\S]*?)<\/cols>/);
+  if(!originalCols)throw Error('Native worksheet has no column widths: '+name);
+  const cols=originalCols[1].match(/<col\b[^>]*\/>/g)||[];
+  const widths=Array.from({length:last},(_,i)=>{
+   const old=cols.find(c=>Number(attr(c,'min'))<=i+1&&Number(attr(c,'max'))>=i+1);
+   return Number(old&&attr(old,'width')||8.43);
+  });
+  const merges=new Map();
+  for(const m of xml.matchAll(/<mergeCell\b[^>]*ref="([A-Z]+)(\d+):([A-Z]+)(\d+)"[^>]*\/>/g))
+   merges.set(m[1]+m[2],{end:column(m[3]),rowspan:Number(m[4])-Number(m[2])+1});
+  xml=xml.replace(/<row\b[^>]*>[\s\S]*?<\/row>/g,row=>{
+   const r=Number(attr(row,'r')),header=r===4||r===5;
+   const body=main?r>=8&&r<=42&&![23,39,40].includes(r):r>=6&&r<=19;
+   if(!header&&!body)return row;
+   let height=Number(attr(row.match(/^<row\b[^>]*>/)[0],'ht')||15),touched=false;
+   row=row.replace(/<c\b[^>]*?(?:\/>|>[\s\S]*?<\/c>)/g,cell=>{
+    const opening=cell.match(/^<c\b[^>]*>/)[0],address=attr(opening,'r'),col=column(address?.match(/^[A-Z]+/)?.[0]||'A');
+    if(col>last||(!main&&col<2))return cell;
+    const type=attr(opening,'t'),v=cell.match(/<v>([\s\S]*?)<\/v>/)?.[1];
+    const text=type==='s'?shared[Number(v)]||'':type==='inlineStr'?textOf(cell):v||'';
+    if(!text&&!/<f\b/.test(cell))return cell;
+    const numeric=!['s','inlineStr','str'].includes(type)&&v!==undefined&&Number.isFinite(Number(v));
+    const id=fittedStyle(Number(attr(opening,'s')||0),numeric,header,main&&address==='G38'&&numeric);
+    cell=cell.replace(opening,setAttr(opening,'s',id));touched=true;
+    const merge=merges.get(address);
+    if(!merge||merge.rowspan===1){
+     const width=widths.slice(col-1,merge?.end||col).reduce((n,w)=>n+w*7+5,0)-12;
+     const needed=numeric?20:linesFor(text,Math.max(width,20))*14+6;
+     if(needed>409)warnings.push(name+' '+address+': text exceeds Excel maximum row height; review this cell before issue');
+     height=Math.max(height,Math.min(409,needed));
+    }
+    return cell;
+   });
+   if(touched)row=row.replace(/^<row\b[^>]*>/,tag=>setAttr(setAttr(tag,'ht',height),'customHeight',1));
+   return row;
+  });
+  output.set(name,xml);
+ }
+ const replaceSection=(xml,name,items)=>xml.replace(new RegExp('<'+name+'\\b[^>]*>[\\s\\S]*?</'+name+'>'),'<'+name+' count="'+items.length+'">'+items.join('')+'</'+name+'>');
+ return {sheets:output,stylesXml:replaceSection(replaceSection(stylesXml,'fonts',fonts),'cellXfs',styles)};
+}
+
 /**
  * @returns {{blob:Blob,filename:string,warnings:string[],mappedCells:number}}
  */
@@ -131,6 +223,15 @@ export async function buildNativeWorkingDraft0553(file,model){
   if(!names.has(entryName))throw Error("Original worksheet missing: "+entryName);
   sourceXml.set(entryName,decode.decode(await readEntry(entries.find(e=>e.name===entryName))));
  }
+ const sharedEntry=entries.find(e=>e.name==="xl/sharedStrings.xml");
+ const sharedXml=sharedEntry?decode.decode(await readEntry(sharedEntry)):"";
+ const textRuns=xml=>[...xml.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map(x=>x[1]).join("");
+ const sharedStrings=[...sharedXml.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map(x=>textRuns(x[1]));
+ const sourceText=address=>{
+  const cell=sourceXml.get("xl/worksheets/sheet1.xml").match(new RegExp('<c\\b[^>]*r="'+address+'"[^>]*?>[\\s\\S]*?</c>'))?.[0]||"";
+  const text=/\bt="s"/.test(cell)?sharedStrings[Number(cell.match(/<v>(\d+)<\/v>/)?.[1])]||"":textRuns(cell);
+  return text.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,"&");
+ };
  const warnings=["WORKING DRAFT ONLY — NOT RELEASED / NOT FOR CUSTOMER SUBMISSION"];
  const writes=new Map();
  const scope=new Map();
@@ -142,7 +243,7 @@ export async function buildNativeWorkingDraft0553(file,model){
   write(scope,"A"+row,group.code);
   write(scope,"B"+row,group.mr);
   write(scope,"C"+row,group.description);
-  write(scope,"D"+row,"Grouped MR "+group.mr+"; "+group.sourceRows.length+" TAG working lines; verify TAGs before customer issue");
+  write(scope,"D"+row,"Locations: "+([...new Set(group.sourceRows.map(x=>x.site).filter(Boolean))].join(", ")||"TBC"));
   write(scope,"E"+row,1);
   write(scope,"F"+row,round(sum));
   write(scope,"G"+row,round(sum));
@@ -154,13 +255,28 @@ export async function buildNativeWorkingDraft0553(file,model){
   write(scope,"F"+row,round(price)); // B10/B11/B13 current Annex working unit LS must replace original stale F value too.
   write(scope,"G"+row,round(price));
  }
+ // Current commercial wording comes from the same B6 source as Working/Release.
+ // The original template remains unchanged; do not re-export its superseded DDP heading.
+ for(const line of bc){
+  const cell="B"+(23+Number(line.code.slice(1)));
+  const original=sourceText(cell).split(/\r?\n(?:Activities:|Included (?:SAT|Yard support):)/)[0]||line.description;
+  const heading=line.code==="B6"?line.description:original;
+  const notes=[line.executionActivities?.releaseText?"Activities: "+line.executionActivities.releaseText:null,line.serviceCommercialBasis?.compactText].filter(Boolean);
+  if(notes.length||line.code==="B6")write(scope,cell,[heading,...notes].join("\n"));
+ }
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
  for(const row of [41,42]){
   write(scope,"F"+row,"NOT QUOTED");
   write(scope,"G"+row,"NOT QUOTED");
  }
- if(model.sourceCoverage?.aReady===true&&model.sourceCoverage?.bSellReady===true&&Number.isFinite(a)&&Number.isFinite(b))write(scope,"G38",round(a+b));
- else{write(scope,"G38","NOT ESTABLISHED");warnings.push("A+B NOT COMPLETE: priced subtotal only; mandatory items/confirmed supplier evidence pending");}
+ const complete=model.sourceCoverage?.aReady===true&&model.sourceCoverage?.bSellReady===true;
+ const priced=[a,b].filter(Number.isFinite);
+ const unpricedB=bc.filter(r=>!Number.isFinite(r.customerSellTHB)).map(r=>r.code).join(", ");
+ write(scope,"A38","Total 合计 / A+B — priced items (THB)"+
+  (complete?"":"\nExcludes unpriced items"+(unpricedB?": "+unpricedB:"")+"."));
+ write(scope,"G38",priced.length?round(priced.reduce((sum,n)=>sum+n,0)):"NOT ESTABLISHED");
+ write(scope,"H38","WORKING DRAFT");
+ if(!complete)warnings.push("A+B NOT COMPLETE: priced subtotal only; mandatory items/confirmed supplier evidence pending");
  if(model.sourceCoverage?.aOverflow)warnings.push("Original has 15 A TAG slots; 4 grouped MR lines require buyer acceptance before final submission");
  if(!model.sourceCoverage?.aReady)warnings.push("Part A Working equipment cost/TAG evidence still incomplete");
  const changes=new Map();
@@ -224,10 +340,113 @@ export async function buildNativeWorkingDraft0553(file,model){
   if(code.startsWith("C"))warnings.push(code+" optional price not quoted: verified direct cost required");
   replaceAll("xl/worksheets/sheet"+(i+2)+".xml",rows);
  }
- // Re-use each original binary ZIP part as-is; only native cell values in 6 sheets change.
+ // Fit the exported Release workbook, including merged description cells.
+ const styleEntry=entries.find(e=>e.name==="xl/styles.xml");
+ if(!styleEntry)throw Error("Native workbook is missing styles.xml");
+ const fitted=fitNativeReleaseLayout0553(decode.decode(await readEntry(styleEntry)),
+  sharedXml,
+  new Map([...changes].map(([name,bytes])=>[name,decode.decode(bytes)])),warnings);
+ for(const [name,xml] of fitted.sheets)changes.set(name,encode.encode(xml));
+ changes.set("xl/styles.xml",encode.encode(fitted.stylesXml));
+ // All unrelated ZIP parts are copied byte-for-byte.
  const result=rebuildZip(entries,changes);
  const date=new Date().toISOString().slice(0,10).replace(/-/g,"");
  return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),
   filename:"PJ2608-0553_ScopeOfSupply_NATIVE_WORKING_DRAFT_NOT_RELEASED_"+date+".xlsx",
   warnings,mappedCells:count};
+}
+
+// Generate a separate English customer workbook from original geometry.
+// Only explicitly selected customer fields are written; no internal model dump,
+// unused shared strings, old amounts or source-workbook custom metadata survive.
+export async function buildNativeOfficialRelease0553(file,model){
+ if(model.currency!=="USD"||!model.policy||model.a.length!==4||model.b.length!==14)throw Error("Invalid official USD quotation model");
+ const entries=entriesFromZip(new Uint8Array(await file.arrayBuffer()));
+ const changes=new Map(),warnings=[],sheets=new Map();
+ for(let i=1;i<=6;i++){
+  const name="xl/worksheets/sheet"+i+".xml",entry=entries.find(e=>e.name===name);
+  if(!entry)throw Error("Original worksheet missing: "+name);
+  // Preserve every cell address/style, row, column, merge, page and print setting.
+  let xml=decode.decode(await readEntry(entry)).replace(/<c\b([^>]*?)(?:\/>|>[\s\S]*?<\/c>)/g,(_,attrs)=>
+   "<c"+attrs.replace(/\s+t="[^"]*"/g,"")+"/>");
+  const cells=new Map(),put=(address,value)=>write(cells,address,value);
+  const price=value=>Number.isFinite(value)?value:"To be quoted";
+  if(i===1){
+   put("A1","Scope of Supply");put("A2","Project");put("B2",model.project);
+   put("A3","Currency");put("B3","USD");put("A4","Package Name");put("B4","Telecommunications Systems");
+   ["Item","Tag No.","Description","Main Specification","Qty","Unit Price (USD)","Amount (USD)","Remarks"].forEach((v,j)=>put("ABCDEFGH"[j]+"5",v));
+   put("A6","Part A: Equipment");put("A7","Main Equipment");
+   model.a.forEach((r,j)=>{const row=8+j;put("A"+row,r.code);put("B"+row,r.mr);put("C"+row,r.description);put("D"+row,r.locations);put("E"+row,"1 lot");put("F"+row,price(r.amountUSD));put("G"+row,price(r.amountUSD));});
+   put("A23","Part B: Services and Other Supplies");
+   const fill=(r,row)=>{put("A"+row,r.code);put("B"+row,[r.description,r.serviceText].filter(Boolean).join("\n"));put("E"+row,"1 lot");put("F"+row,price(r.amountUSD));put("G"+row,price(r.amountUSD));if(model.annex[r.code])put("H"+row,"Refer to Annex "+r.code);};
+   model.b.forEach((r,j)=>fill(r,24+j));model.c.forEach((r,j)=>fill(r,41+j));
+   put("A38","Total A+B (USD)"+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
+   put("A39","Prices cover the items described above and are subject to the stated scope and qualifications.");
+   put("A40","Part C: Options — excluded from Total A+B");
+   put("B43","Delivery: CIF Zhuhai Port, China (Incoterms 2020).");
+  }else{
+   const code=["B10","B11","B13","C1","C2"][i-2],detail=model.annex[code];
+   if(detail.length>13)throw Error(code+" exceeds original annex capacity");
+   put("B2",model.annexTitles[code]);
+   ["Item","Tag No.","Description","Specification","Materials","Qty"].forEach((v,j)=>put("BCDEFG"[j]+"4",v));
+   put("H4","Price (USD)");put("H5","Unit Price (USD)");put("I5","Amount (USD)");
+   if(code.startsWith("C"))put("J5","Lead Time (ARO)");
+   detail.forEach((r,j)=>{const row=6+j;
+    [j+1,r.tagNo,r.description,r.specification,r.materials,r.qty??"TBC",price(r.unitUSD),price(r.totalUSD)].forEach((v,k)=>put("BCDEFGHI"[k]+row,v));
+    if(code.startsWith("C"))put("J"+row,r.leadTime);
+   });
+   put("B19","Total (USD)");put("I19",price([...model.b,...model.c].find(r=>r.code===code).amountUSD));
+  }
+  for(const [address,value] of cells){
+   if(!new RegExp('<c\\b[^>]*r="'+address+'"').test(xml)){
+    const row=address.match(/\d+$/)[0],rowPattern=new RegExp('<row\\b[^>]*r="'+row+'"[^>]*>[\\s\\S]*?</row>');
+    if(!rowPattern.test(xml))throw Error("Original row missing: "+address);
+    xml=xml.replace(rowPattern,body=>body.replace('</row>','<c r="'+address+'" s="'+(body.match(/<c\b[^>]*s="(\d+)"/)?.[1]||0)+'"/></row>'));
+   }
+   xml=replaceCell(xml,address,value);
+  }
+  sheets.set(name,xml);
+ }
+ const style=entries.find(e=>e.name==="xl/styles.xml");
+ if(!style)throw Error("Original styles missing");
+ const fitted=fitNativeReleaseLayout0553(decode.decode(await readEntry(style)),"",sheets,warnings);
+ // Numeric quotation amounts use USD decimals; annex unit rates retain 4 decimals
+ // so Qty x Unit Price rounds exactly to the distributed parent quotation.
+ let styles=fitted.stylesXml;
+ const xfs=styles.match(/<cellXfs\b[^>]*>([\s\S]*?)<\/cellXfs>/);
+ const list=xfs[1].match(/<xf\b[^>]*?(?:\/>|>[\s\S]*?<\/xf>)/g),cache=new Map();
+ for(const [name,input] of fitted.sheets){
+  const main=/sheet1\.xml$/.test(name);
+  const xml=input.replace(/<c\b[^>]*>\s*<v>[^<]+<\/v><\/c>/g,cell=>{
+   const address=cell.match(/\br="([^"]+)"/)[1],col=address.match(/^[A-Z]+/)[0];
+   if(!(main?["F","G"]:["H","I"]).includes(col))return cell;
+   const id=Number(cell.match(/\bs="(\d+)"/)?.[1]||0),format=!main&&col==="H"?164:4,key=id+":"+format;
+   if(!cache.has(key)){
+    let xf=list[id].replace(/\bnumFmtId="\d+"/,'numFmtId="'+format+'"');
+    if(!/applyNumberFormat=/.test(xf))xf=xf.replace("<xf ",'<xf applyNumberFormat="1" ');
+    else xf=xf.replace(/applyNumberFormat="[^"]*"/,'applyNumberFormat="1"');
+    cache.set(key,list.length);list.push(xf);
+   }
+   return /\bs="/.test(cell)?cell.replace(/\bs="\d+"/,'s="'+cache.get(key)+'"'):cell.replace("<c ",'<c s="'+cache.get(key)+'" ');
+  });
+  changes.set(name,encode.encode(xml));
+ }
+ // Original custom format 164 may exist: choose an unused ID for 4-place units.
+ const usedIds=[...styles.matchAll(/<numFmt\b[^>]*numFmtId="(\d+)"/g)].map(x=>Number(x[1]));
+ const unitFormat=Math.max(164,...usedIds)+1;
+ const fmt='<numFmt numFmtId="'+unitFormat+'" formatCode="#,##0.00##"/>';
+ for(const [key,id] of cache)if(key.endsWith(":164"))list[id]=list[id].replace('numFmtId="164"','numFmtId="'+unitFormat+'"');
+ styles=styles.replace(/<cellXfs\b[^>]*>[\s\S]*?<\/cellXfs>/,'<cellXfs count="'+list.length+'">'+list.join("")+'</cellXfs>');
+ if(/<numFmts\b[^>]*>/.test(styles))styles=styles.replace(/<numFmts\b[^>]*>([\s\S]*?)<\/numFmts>/,(_,body)=>'<numFmts count="'+(usedIds.length+1)+'">'+body+fmt+'</numFmts>');
+ else styles=styles.replace(/(<styleSheet\b[^>]*>)/,'$1<numFmts count="1">'+fmt+'</numFmts>');
+ changes.set("xl/styles.xml",encode.encode(styles));
+ changes.set("xl/sharedStrings.xml",encode.encode('<?xml version="1.0" encoding="UTF-8"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"/>'));
+ changes.set("docProps/core.xml",encode.encode('<?xml version="1.0" encoding="UTF-8"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>PJ2608-0553 Scope of Supply USD</dc:title></cp:coreProperties>'));
+ const remove=name=>name.startsWith("customXml/")||name==="xl/calcChain.xml"||name==="docProps/custom.xml";
+ for(const e of entries.filter(e=>e.name.endsWith(".rels")||e.name==="[Content_Types].xml")){
+  const xml=decode.decode(await readEntry(e)).replace(/<(?:Relationship|Override)\b[^>]*(?:\/>|>[\s\S]*?<\/(?:Relationship|Override)>)/g,tag=>/customXml\/|calcChain\.xml|docProps\/custom\.xml/.test(tag)?"":tag);
+  changes.set(e.name,encode.encode(xml));
+ }
+ const result=rebuildZip(entries.filter(e=>!remove(e.name)),changes);
+ return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),filename:"PJ2608-0553_ScopeOfSupply_USD.xlsx",warnings};
 }

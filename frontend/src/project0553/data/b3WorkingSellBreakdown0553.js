@@ -7,14 +7,14 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
  if(!workingRow||workingRow.code!=="B3")return null;
  const sat=workingRow.b3SelectedSatSurveyBudget,china=workingRow.b3ChinaFatBudget;
  const legacy=workingRow.b3FortyDayBudget;
- if(!sat||!china||!legacy)throw Error("Missing B3 current SAT28+Survey5 or MGW China FAT source");
+ if(!sat||!china||!legacy)throw Error("Missing B3 current SAT28+Survey5 or local execution source");
  const fatRows=china.rows.filter(x=>x.costOwner==="B3"&&!x.optional);
- if(fatRows.length!==8||!fatRows.every(x=>isMoney(x.workingSellTHB)&&x.moduleId))
-  throw Error("MGW FAT source row ownership or working sell missing");
+ if(fatRows.length!==20||!fatRows.every(x=>isMoney(x.workingSellTHB)&&x.moduleId))
+  throw Error("SAMTEL execution source row ownership or working sell missing");
  const fatSell=round(fatRows.reduce((n,x)=>n+x.workingSellTHB,0));
  const purchased=workingRow.b3MgwPurchasedFatWorkingSell;
- if(!purchased||purchased.selectedIncrementalWorkingSellTHB!==307125||
-  purchased.vendorPurchasedQuoteTHB!==236250||purchased.customerReleaseAllowed)
+ if(!purchased||purchased.selectedIncrementalWorkingSellTHB!==0||
+  purchased.vendorPurchasedQuoteTHB!==0||purchased.customerReleaseAllowed)
   throw Error("Missing separately priced MGW purchased 20/5/5 services in B3");
  const fatWithPurchased=round(fatSell+purchased.selectedIncrementalWorkingSellTHB);
  const offshoreLabor=sat.satWorkingSellTHB;
@@ -44,13 +44,9 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
     activity:"Temporary VeEX MX100+ SAT instrument rental",
     driver:veex.quantity+" rental-days × THB"+veex.rateTHB+" /day; ex VAT; no extra B11 tool purchase",
     workingSellTHB:rent,postedWithinB3:true},
-   {id:"MGW-PURCHASED",moduleId:"bid.budget.working.bc.b3.mgw-r2-cover-20261020",
-    activity:"MGW Purchased iFAT + FAT Facility — source USD7500 × FX31.5 × 1.30",
-    driver:"SERV-2 USD5000 + SERV-4 USD2500; SAMTEL20% + ADDVALUE5% + omission5%; Part B normal 5% not applied twice",
-    workingSellTHB:purchased.selectedIncrementalWorkingSellTHB,postedWithinB3:true},
    {id:"MGW-FAT",moduleId:"bid.budget.working.bc.b3.revk-china-budget",
-    activity:"MGW China FAT — 2 paid witnesses, travel, accommodation and insurance",
-    driver:"6 FAT witness workdays × 2 persons + 2 travel days × 2 persons + eight separately owned B3 estimate lines",
+    activity:"SAMTEL Warehouse preparation/FAT — ADDVALUE crew, shared facility/tools, hosting and closeout",
+    driver:"4 prep + FAT(2+1) including closeout; separate B8 training(1+1); 9-day facility/transport, shared tools, meals, OEM support and work cover",
     workingSellTHB:fatSell,postedWithinB3:true}
   ],
   offshore:{workdays:sat.satTeamDays,people:2,personDays:sat.satPersonDays,rateUSD:sat.sourceRateUSDPerPersonDay,roleRates:sat.satRoleRates,workingFx:sat.fxTHBPerUSD,
@@ -63,7 +59,7 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
    purchasedServices:purchased,conditionalYardExcludedTHB:china.conditionalYardSellTHB},
   totalWorkingSellTHB:total,verifiedDirectCostTHB:null,
   excluded:["B9 conditional Yard specialist allowance is NOT B3",
-   "MGW purchased iFAT and Facility SERV-2/4 quoted USD7500 are now in SOW-B3 Working SELL ONCE; Part A equipment quote must not include the same USD7500",
+   "MGW supplies MR0002 equipment only; no purchased integration, FAT, facility or reserve in B3",
    "Rev05 Bangkok FAT THB144,000 is superseded, NOT additive",
    "19 contract trace rows and 21 SAT Test IDs are NON-POSTING engineering evidence",
    "No site-MR SAT Test ID has a separate working day or sell posting"],

@@ -106,6 +106,7 @@ export function BcWorkingHierarchy0553({partBRows,partCRows,partBWorkingSell,par
       });
      }}
      data-component-key={item.moduleId}
+     data-cost-owner={item.code}
      className={"p553-bc-row p553-bc-row--"+tone+
        (navigationTarget===item.moduleId?" p553-module-nav-target":"")}>
      <summary className="p553-bc-row-summary">

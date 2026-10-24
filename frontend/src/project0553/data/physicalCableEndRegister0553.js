@@ -127,26 +127,26 @@ function dmr(site){
 }
 function phone(site){
  const sounder=getTag(site,"LSE-504-001","EX_SOUNDER_NOT_IP_PHONE");
- const note="MR0003 one phone/sounder/JB system/site, Special Cable IF required; never invent one separate bulk 1-Lot line. MGW PHONE-1 JB Ex glands included pending model/gland count.";
+ const note="MR0003 one phone/sounder/JB system/site, Special Cable IF required; never invent one separate bulk 1-Lot line. EXION has no priced JB/glands; no MGW inclusion credit.";
  const sheet=SITE_SHEETS[site]?.[0]||null;
  return [
  make(site,"MR-0003","PHONE-SIP-ETH","Ex Telephone ↔ SIP/PABX / E&I LAN uplink",
   "SIP_PABX_NETWORK_PORT_TBD","IP_PHONE_VOIP_TAG_TBD","Fire-rated Ethernet/CAT6A or approved special cable",
   "MGW_PHONE_COMPLETE_SYSTEM__NETWORK_HANDOFF",{
    drawingSheet:sheet,sourceClause:"MR0003 Rev.C1 / Special Cable if required",
-   vendorIncluded:null,vendorPackageLine:"MGW Full Rev2 PHONE-1",note}),
+   vendorIncluded:null,vendorPackageLine:"EXION 1260576 Rev0",note}),
  make(site,"MR-0003","PHONE-SOUNDER-CTRL","Phone/JB ↔ Ex Sounder DC/control circuit",
-  "PHONE_WAROM_JB_TAG_TBD",sounder?.tag||"LSE-504-001 / Ex sounder",
+  "PHONE_JB_TAG_TBD",sounder?.tag||"LSE-504-001 / Ex sounder",
   "DC/trigger/control cable (not CAT6 by default)",
   "MGW_PHONE_COMPLETE_SYSTEM__FIELD_INTERFACE_REVIEW",{
    drawingSheet:sheet,toAfcConfirmed:Boolean(sounder),toDeck:sounder?.deck||null,
-   vendorIncluded:null,vendorPackageLine:"MGW Full Rev2 PHONE-1",note}),
+   vendorIncluded:null,vendorPackageLine:"EXION 1260576 Rev0",note}),
  make(site,"MR-0003","PHONE-EX-ENTRIES","Ex JB/Telephone cable glands and field bonding",
-  "PLATFORM_EARTH_OR_TRAY_TBD","PHONE_WAROM_JB_TAG_TBD",
+  "PLATFORM_EARTH_OR_TRAY_TBD","PHONE_JB_TAG_TBD",
   "Certified Ex gland, bonding/earth, ferrules and supports",
-  "MGW_WAROM_SUPPLIED_GLAND_CREDIT__ADDITIONAL_ENDS_TBD",{
-   drawingSheet:sheet,vendorIncluded:null,vendorPackageLine:"MGW Full Rev2 PHONE-1",
-   note:"Supplier included Ex-P gland(s); count extras only net of included glands, with actual OD/armour/Ex type. "+note})
+  "EXION_JB_GLANDS_UNPRICED__ENTRIES_TBD",{
+   drawingSheet:sheet,vendorIncluded:null,vendorPackageLine:"EXION 1260576 Rev0",
+   note:"EXION no gland inclusion; derive required glands, with actual OD/armour/Ex type. "+note})
  ];
 }
 function racon(site){
@@ -156,7 +156,7 @@ function racon(site){
  const jb=wp?.equipment.find(x=>x.tag==="TCAB-514-002");
  const common={drawingSheet:SITE_SHEETS[site]?.[0]||null,
   sourceClause:"MR0004 Rev.C1 + BLD Note 4 RACON fault alarm to PCS",
-  vendorIncluded:null,vendorPackageLine:"MGW Full Rev2 RACON-1",
+  vendorIncluded:null,vendorPackageLine:"MDS QTORG2609244",
   note:"Confirm OEM package supply for DB5P/control box, Ex glands, fusing and cable connectors; one phase adapter/charging kit is separate shared noncable asset."};
  return [
  make(site,"MR-0004","RACON-SIGNAL-CONTROL","RACON / Ex d distribution to local control/JB",

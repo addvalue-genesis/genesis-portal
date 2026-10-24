@@ -103,11 +103,11 @@ const pricingViewsBox={};
 vm.runInNewContext(file("pricingViewRegistry0553.js").replace(/\bexport /g,"")+
  ";this.pricingViews=PRICING_VIEWS_0553;this.byKey=pricingViewByKey0553;",pricingViewsBox);
 const pricingViews=pricingViewsBox.pricingViews;
-assert.equal(pricingViews.length,3);
-assert.equal(pricingViews.map(v=>v.number).join(","),"10.3.1,10.3.2,10.3.3");
+assert.equal(pricingViews.length,4);
+assert.equal(pricingViews.map(v=>v.number).join(","),"10.3.1,10.3.2,10.3.3,10.3.4");
 assert.equal(pricingViews.map(v=>v.moduleId).join(","),
- "bid.budget.pricing.working,bid.budget.pricing.budgetary,bid.budget.pricing.release");
-assert.equal(new Set(pricingViews.map(v=>v.moduleId)).size,3);
+ "bid.budget.pricing.working,bid.budget.pricing.budgetary,bid.budget.pricing.release,bid.budget.pricing.official");
+assert.equal(new Set(pricingViews.map(v=>v.moduleId)).size,4);
 assert.equal(pricingViewsBox.byKey("released").fullLabel,"Released Customer Output");
 
 const workspace=file("CommercialWorkspace.jsx");
@@ -187,7 +187,7 @@ assert.match(ui,/10\.2 B1–B14 Working Sell/);
 assert.match(ui,/15 item rows|15 slots|15 item/);
 assert.match(ui,/buyer must accept group-level TAG mapping/);
 assert.match(ui,/const \[viewer,setViewer\]=useState\("CUSTOMER"\)/);
-assert.match(ui,/Export Native XLSX — WORKING DRAFT/);
+assert.match(ui,/Export Excel — WORKING DRAFT/);
 assert.match(ui,/Final Customer Release — HOLD/);
 assert.match(ui,/buildNativeWorkingDraft0553\(file,model\)/);
 assert.match(ui,/sourceFileRef\.current\?\.click\(\)/);

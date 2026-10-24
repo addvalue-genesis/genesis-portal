@@ -1,3 +1,4 @@
+import {isOnshoreYardDossierModule0553} from "./moduleDeepLink0553";
 // 0553 Project Module Navigator: discover ACTUAL 10.2 working modules from
 // the controlled B/C ownership registry and canonical source contract.
 // Search/route metadata only: no new prices, quantities or approval state.
@@ -130,13 +131,14 @@ export function buildBcModuleNavigator0553(){
   anchorModuleId,keywords
  });
  const b3Entries=[
+  child(b3Id+".resource-price-dossier.yard-onshore-reference","B3 → B9 Onshore Yard reference · no added price"),
   child(b3Id+".worktype-accordion","B3 — Expandable FAT / SAT / Test Equipment / Audit groups"),
   child(b3Id+".fat","B3.1 — FAT Factory Acceptance Test",b3Id+".fat","FAT witness OEM iFAT China"),
   child(b3Id+".sat","B3.2 — BF Site Verification / Zhuhai Fabrication Yard SAT / GF Offshore Commissioning",b3Id+".sat","BF ZPQ ZWP8 ZWP11 GF ZWP20 ZWP21 ZWP22 ZWP23 Yard Offshore RACI"),
   child(b3Id+".tools","B3.3 — Temporary Test Equipment (B3) vs B11 O&M Special Tools",
    b3Id+".tools","VeEX rental B11 tool boundary"),
   child(b3Id+".audit","B3.4 — Working Sell and Contract Cost Audit",b3Id+".audit","19 requirements price trace"),
-  child(b3Id+".mgw-r2-cover-20261020","B3.1.1 — MGW SERV-2/4 Purchased FAT · VQ-MGW source and WS-B3 THB307125"),
+  child(b3Id+".mgw-r2-cover-20261020","External FAT services — withdrawn / no current posting"),
   child(b3Id+".fat-owner-transfer","B3.4.4 — Rev05 Historic FAT Owner Reference (Audit Only)"),
   child(b3Id+".fat-training-7d-allocation","B3.4.5 — Seven-day FAT + Training Unapproved Scenario / IC-FAT-001 / CP-B3 NOT ISSUED"),
   child(b3Id+".test-tools-ownership","B3.3.2 — Test Tools / B11 Cost Ownership"),
@@ -148,7 +150,7 @@ export function buildBcModuleNavigator0553(){
    b3Id+".40-day-abc","survey BF only Yard SAT Zhuhai offshore commissioning 28+2 old comparator"),
   child(b3Id+".veex-mx100","B3 — VeEX MX100+ Temporary Test Rental",
    b3Id+".veex-mx100","30 rental days tools SAT"),
-  child(b3Id+".revk-china-budget","IC-FAT — ADDVALUE China FAT Internal Resource Activities / WS-B3 (not CP-B3)"),
+  child(b3Id+".revk-china-budget","IC-FAT — ADDVALUE SAMTEL FAT Internal Resource Activities / WS-B3 (not CP-B3)"),
   child(b3Id+".requirement-crosswalk","B3 — Contract Requirements × Rev.K / BOD SPE DTS MR"),
   child(req.moduleId,"B3 — Requirement Source Register (19)",
    b3Id+".requirement-crosswalk","RQM-01 RQM-19 contract trace"),
@@ -179,6 +181,7 @@ export function buildBcModuleNavigator0553(){
    return [
     child(gid,"B3.R"+(i+1)+" — "+g.name+" / Selected "+g.selectedWorkingSellTHB+" THB",
      gid,"B3 resource cost dossier "+g.name),
+    ...(i===0&&!g.rows.length?[child(gid+".site.01","External FAT services — withdrawn, no current posting",gid+".site.01","superseded service source; equipment supplier only")]:[]),
     ...places.flatMap((site,j)=>{
      const sid=gid+".site."+String(j+1).padStart(2,"0");
      return [
@@ -207,11 +210,12 @@ export function buildBcModuleNavigator0553(){
    ];
   }),
   ...b3.b3ChinaFatBudget.rows.map(r=>child(r.moduleId,r.internalCostLineId+" — "+r.description,
-   r.moduleId,(r.costOwner==="B9"?"B9 optional Yard":"B3 China MGW FAT")+" "+r.id))
+   r.moduleId,(r.costOwner==="B9"?"B9 optional Yard":"B3 SAMTEL Warehouse FAT")+" "+r.id))
  ];
  // Child-level RQM rows need their own exact anchor, not just the visible
  // section parent. Their parent B3/B9 selection is supplied via owner metadata.
  for(const entry of b3Entries){
+  if(isOnshoreYardDossierModule0553(entry.id)){entry.parentOwner="B9";entry.name="B9 Onshore Yard · "+entry.name;}
   const match=req.rows.find(x=>x.moduleId===entry.id);
   if(match){
    entry.anchorModuleId=entry.id;
@@ -219,6 +223,10 @@ export function buildBcModuleNavigator0553(){
   }
  }
  entries.push(...b3Entries);
+ for(const code of ["B3","B9"]){
+  const id="bid.budget.working.bc."+code.toLowerCase()+".service-commercial-basis";
+  entries.push({id,name:code+" — Included days / Extra day / OT / Standby (DRAFT)",tab:"budget",workflowNumber:"10.2",kind:"WORKING_NESTED_MODULE",anchorModuleId:id,parentOwner:code,keywords:"onshore offshore 28 days 7+2 12 hours overtime standby rate allowance"});
+ }
  entries.push({
   id:"bid.budget.working.bc.b8.integrated-fat-training-7d",
   name:"B8 — Shared seven-day FAT + Training / SOW-B8 / IC-TRN-001 / WS-B8 / CP-B8 reserved",

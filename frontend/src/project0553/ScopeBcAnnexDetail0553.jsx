@@ -27,7 +27,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
  const inWorking=mode==="working";
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
  if(!p)return <p role="alert">Unsupported customer scope code: {code}</p>;
- return <section className="p55-panel" data-component-key={moduleId} style={{padding:14}}>
+ return <section className="p55-panel" data-cost-owner={code} data-component-key={moduleId} style={{padding:14}}>
   <div className="p55-eyebrow">{inWorking?"10.2 WORKING COST DETAIL":"10.5 CUSTOMER SCOPE DETAIL"} · PRICE SOURCE AUDIT (THB display)</div>
   <h3>{p.code} — {p.description}</h3>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/>
@@ -101,7 +101,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
   </details>}
   {code==="B1"&&<div className="p55-panel" style={{padding:12}}>
    <h4>B1 — Regulatory, Import &amp; Operating Licence Coordination (ADDVALUE)</h4>
-   <p className="p55-note"><strong>Cost owner:</strong> ADDVALUE · First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model. Historical Rev05 engineering evidence is retained for audit only and NOT carried into current B1 Working SELL. New B1.1–B1.8 role-based project support is the current pricing basis; statutory/consultant conditional costs remain separate.</p>
+   <p className="p55-note"><strong>Cost owner:</strong> ADDVALUE · First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model. Historical Rev05 engineering evidence is retained for audit only and NOT carried into current B1 Working SELL. New B1.1–B1.8 role-based project support is the current pricing basis; current Myanmar service/fee/reserve package is included once. The legacy requirement rows below remain nonposting evidence, not missing current budget.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Internal Ref</th><th>Description</th><th>Role</th><th>Quantity Driver</th><th>Qty</th><th>Unit Rate THB</th><th>Amount THB</th><th>Owner / Source Gate</th></tr></thead>
     <tbody>{b1Regulatory.rows.map(x=><tr key={x.id}>
@@ -230,7 +230,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
      <td>{x.tagNo}</td><td>{x.description}</td><td>{x.qty}</td><td>{thb(x.unitPriceTHB)}</td>
      <td>NOT DERIVED</td><td>NOT ESTABLISHED</td><td>{x.documentMandateStatus}<small>{x.verificationStatus}</small></td>
     </tr>)}</tbody></table></div>
-   <p className="p55-note"><strong>RACON compare — distinct vendor sources:</strong> Rev08 historical full-spare unit {thb(spareReconciliation.raconComparison.historicalUnitPriceTHB)} versus <strong>selected installed MGW R2 RACON-1</strong> {thb(spareReconciliation.raconComparison.vendorPackageRateReferenceTHB)} (USD {spareReconciliation.raconComparison.vendorUnitPriceUSD}). MDS/ORGA QTORG2609244 FCA <strong>USD {spareReconciliation.raconComparison.historicalAlternativeUnitUSD}</strong> is a separate historical alternative, not an MGW vendor price. Difference {thb(spareReconciliation.raconComparison.historicalVsPackageUnitDeltaTHB)} compares Rev08 against the MGW installed unit only; it is NOT an independent spare quote, saving or approval.</p>
+   <p className="p55-note"><strong>RACON compare — distinct vendor sources:</strong> Rev08 historical full-spare unit {thb(spareReconciliation.raconComparison.historicalUnitPriceTHB)} versus <strong>selected installed MDS RACON</strong> {thb(spareReconciliation.raconComparison.vendorPackageRateReferenceTHB)} (USD {spareReconciliation.raconComparison.vendorUnitPriceUSD}). MDS/ORGA QTORG2609244 FCA <strong>USD {spareReconciliation.raconComparison.historicalAlternativeUnitUSD}</strong> is also the current installed-system rate, still not an independent spare offer. Difference {thb(spareReconciliation.raconComparison.historicalVsPackageUnitDeltaTHB)} compares Rev08 against the selected installed unit only; it is NOT an independent spare quote, saving or approval.</p>
   </details>}
   {["B10","B11","B13","C1","C2"].includes(code)&&<details className="p55-panel" style={{padding:12}}>
    <summary><strong>MR Attachment-5 Vendor Spare List — Documentary Completion Gate</strong> ({spareReconciliation.sourceSpecificationChecklist.length} evidence checks)</summary>

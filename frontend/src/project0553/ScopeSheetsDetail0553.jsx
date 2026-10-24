@@ -1,3 +1,4 @@
+import {ServiceCommercialBasis0553} from "./ServiceCommercialBasis0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import React,{useState} from "react";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
@@ -112,8 +113,8 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
    source:"MR0001 TAG Cost Ledger → system-location-mto; A1 is the full allocated amount including bulk. A5 is a non-additive disclosure only",
    status:"WORKING ALLOCATED EQUIPMENT/BULK — INCLUDES A5; same MR0001 BOM total; NOT full A+B+C"},
   A2:sourceLine("A2","MR0002 vendor working lines; engineering/source gates retained"),
-  A3:sourceLine("A3","Selected MGW R2 Gai-Tronics 212-02-6008-410, EATON DB3B and WAROM BXJ-S; 4 sites, external field bulk unpriced"),
-  A4:sourceLine("A4","Selected MGW R2 Tideland SeaBeacon 2 System 6; 3 sites, DB-5P included, control/bulk pending"),
+  A3:sourceLine("A3","Selected EXION Thai 212-02-6008-510 and DB3BDG048N2BNR; 4 sites, JB/glands and external bulk unpriced"),
+  A4:sourceLine("A4","Selected MDS / ORGA SeaBeacon 2; 1-system quote extrapolated to 3 sites, DB-5P/control box included, cable/gland/FAT contradictions open"),
   A5:{amount:a5.a5PriceTHB,source:a5.source+"; exact "+a5.rowCount+" source MTO Bulk cost-owner rows; A1→A5 display reclassification only",
    status:"INCLUDED IN A1 — NON-ADDITIVE MEMO ONLY; "+a5.state+"; "+a5Unpriced+" remaining field-bulk/accessory evidence gaps"}
  };
@@ -170,7 +171,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
      <thead><tr><th>10.2 Work Type Source</th><th>Working SELL THB</th><th>10.5 Scope Attribution THB</th>
       <th>Execution & Approval / Cost State</th></tr></thead>
-     <tbody>{scopeBC.lines.B3.b3GroupTrace.map(g=><tr key={g.id}>
+     <tbody>{scopeBC.lines.B3.b3GroupTrace.map(g=><tr key={g.id} data-work-family={g.id.split(".").pop()}>
       <td><strong>{g.name}</strong><small>{g.sourceModuleId}</small></td>
       <td>{cash(g.workingSellTHB)}</td><td>{cash(g.scopeWorkingSellAttributionTHB)}</td>
       <td>{g.status}<small>{g.approvalGate}</small><small>Direct Cost NOT ESTABLISHED · no independent customer line</small></td>
@@ -194,14 +195,14 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
    const shownAmount=amount;
    const qtyDisplay=id==="A5"?"1 LS ("+a5.rowCount+"/"+a5.expectedMtoBulkLots+" source Bulk MTO lots traced)":
     currentRows?"1 LS ("+currentRows.length+" current Annex rows)":hasChild?"1 LS (Rev08: "+childSource.quantity+" unverified historical item rows)":control?.qty!==null&&Number.isFinite(control?.qty)?control.qty+" "+control.unit:control?.unit||"1 LS (working basis)";
-   return <tr key={id}><td>{audited?<button type="button" className="p553-detail-button" onClick={()=>setSheet(SHEETS.find(row=>row[1]===id)[0])}>{id} — View Details</button>:id}</td><td>{desc}</td><td>{qtyDisplay}</td>
+   return <tr key={id} data-cost-owner={id}><td>{audited?<button type="button" className="p553-detail-button" onClick={()=>setSheet(SHEETS.find(row=>row[1]===id)[0])}>{id} — View Details</button>:id}</td><td>{desc}{control?.executionActivities&&<p className="p55-note">{control.executionActivities.releaseText}</p>}{control?.serviceCommercialBasis&&<ServiceCommercialBasis0553 basis={control.serviceCommercialBasis}/>}</td><td>{qtyDisplay}</td>
     <td className="is-number">{currentRows&&id.startsWith("C")?"NOT QUOTED":id==="A5"&&Number.isFinite(amount)?"Included in A1 ("+cash(amount)+")":Number.isFinite(control?.unitRateTHB)?"WORKING SELL "+cash(control.unitRateTHB):Number.isFinite(amount)?cash(amount):unavailable}</td>
     <td className="is-number">{currentRows&&id.startsWith("C")?"NOT QUOTED":id==="A5"&&Number.isFinite(amount)?"INCLUDED IN A1 · NOT ADDITIVE":Number.isFinite(shownAmount)?(control?"WORKING SELL "+cash(shownAmount):cash(shownAmount)):control?"Current owner / OEM price not established":unavailable}</td>
     <td className="is-number">{audited?cash(audited.historicalReferenceTHB):"—"}<small>{audited?"Rev08 HISTORICAL ONLY — not additive":""}</small></td>
     <td>{control&&<small><strong>{control.financialIdentity.scopeId}</strong> Scope ·
      <strong> {control.financialIdentity.workingSellId}</strong> Working SELL ·
      <strong> {control.financialIdentity.customerProposalId}</strong> NOT ISSUED
-     {Number.isFinite(control.financialIdentity.mgwPurchasedWorkingSellTHB)&&
+     {control.financialIdentity.mgwPurchasedWorkingSellTHB>0&&
       " · VQ-MGW-SERV-2 / SERV-4 supplier quotation → WS-B3 MGW Purchased THB "+
        control.financialIdentity.mgwPurchasedWorkingSellTHB.toLocaleString("en-US")}</small>}
      {currentRows?<><strong>{id.startsWith("C")?"OPTION / NOT QUOTED":"CURRENT PARAMETRIC WORKING SELL / UNQUOTED"}</strong><small>{currentRows.length} current Annex rows · Source: {control?.sourceModuleId} · OEM SKU / SPIR / Ex / DDP OPEN · {control?.priceStatus}</small>

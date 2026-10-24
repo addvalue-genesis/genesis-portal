@@ -2,8 +2,114 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R31";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R46";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-15",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"10.3.4 Official Release — English / USD",
+  detail:"Customer-only view from 10.3.3; quotation FX31.5, round up each priced summary item to USD100. Annex allocations reconcile. English native-template Excel with no internal notes; missing prices stay to be quoted. Working THB and issue status unchanged.",
+  moduleIds:Object.freeze(["bid.budget.pricing.official","bid.budget.pricing.release.preview"]),
+  priceImpact:"QUOTATION_FX_ROUNDING_ONLY",source:"Owner24-Oct: English official USD release and native Excel export"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-14",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release แสดงยอด A+B เฉพาะรายการที่มีราคา",
+  detail:"แสดงยอดรวมจาก Source เดิมทั้ง Customer/Internal Preview และ Native Excel G38 พร้อมระบุรายการยังไม่มีราคา ยอดราคาไม่เปลี่ยน Final Release ยัง HOLD.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: show available quotation total"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-13",date:"2026-10-24",kind:"PRICE",tone:"pricing",
+  title:"B1–B14 activities + Thailand / CIF / Myanmar operations",
+  detail:"Owner-selected cost250000: B6 import30000/export20000 and B1 Myanmar200000. Remove B1 filing7200; supersede old conditional47000 without base credit. Official fee25000 has no uplift; services/reserves factor1.10. B1 cost374200/SELL421180. B6 import SELL12000 replaced33000; old mixed export25000 newly split service15000/physical10000, service replaced22000; B6 SELL335584. B1 two groups and all14 activity owners flow to Release/native. KnownB4994787.13; unpriced items/approvals remain open. Draft only.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1","bid.budget.working.bc.b6","bid.budget.pricing.release.preview"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner24-Oct: approve operation estimate and B1–B14 activities"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-12",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release Excel export: ฟอนต์และช่องพอดีกับข้อความ",
+  detail:"แก้ตัวส่งออก Native XLSX จริง: เนื้อหา Arial 10 pt, Wrap Text, คงขนาดคอลัมน์/กระดาษ/merged ตามต้นฉบับ และความสูงแถวตามข้อความ. คง 6 sheets, สูตร, ข้อมูล, border/fill และราคา; ปรับเฉพาะรูปแบบในสำเนาที่ส่งออก ไฟล์ต้นฉบับไม่เปลี่ยน. ปุ่ม Export Excel ใช้ template ต้นฉบับที่ฝังในระบบ กดแล้วดาวน์โหลดได้เลย ไม่ต้องเลือกไฟล์.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: exported Release Excel text overflows cells; check and fix font/column/row formatting"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-11",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release Main Specification แสดงชื่อ Locations",
+  detail:"ช่อง Main Specification ของ A1–A4 แสดงชื่อ Location ไม่ซ้ำจาก sourceRows ของแต่ละ MR แทนจำนวน TAG/sites; ใช้ทั้ง Customer และ Internal. รายละเอียด TAG ยังเปิดดูได้ตามเดิม ตัวเลขและ source model ไม่เปลี่ยน.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: show actual locations such as ZPQ/ZWP20 in Main Specification"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-10",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release B3/B9: ข้อความสั้นในเซลล์คำอธิบายเดิม",
+  detail:"ย่อวันทำงาน Day / OT / Standby เหลือข้อความ 5 บรรทัดในช่องคำอธิบาย B3/B9 เดิม ไม่มีแถวเพิ่มหรือกรอบใหญ่; รายละเอียดตรวจสอบอยู่ Working ตามเดิม. ใช้ฐานวันและอัตราล่าสุดจากต้นทาง ไม่ใช้ 18/45 วันจาก CCL เก่าที่ส่งมาเป็นตัวอย่างรูปแบบ. ราคาและ native XLSX ไม่เปลี่ยน.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: short text in the same Excel-style cell, not a separate service panel"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-09",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"หน้าพอดีจอ + Release Day / OT / Standby เป็นข้อความ",
+  detail:"แก้กรอบ grid ที่ขยายตามตารางด้านใน; ตาราง BOM และ workbook เลื่อนภายในกรอบ ไม่ดันทั้งหน้าเกินจอ. เปลี่ยนรายละเอียด Day / OT / Standby ใต้ B3/B9 เป็นย่อหน้าตามตำแหน่ง พร้อมฐานจำนวนวัน อัตราทีม และข้อกำหนดเดิม แทนตารางซ้อน. คงสีเจ้าของงบและป้าย DRAFT/PROPOSED; ตัวเลข ต้นทาง และ native workbook ไม่เปลี่ยน.",
+  moduleIds:Object.freeze(["bid.budget.bom.system-location-mto","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct screenshots: page wider than screen; show service terms as text like the actual document"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-08",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"สีต่อเนื่องถึงตารางชั้นใน + จัด Yard onshore group.06 ไว้กับ B9",
+  detail:"ใช้สีเจ้าของงบ A/B/C และกลุ่มงานต่อเนื่องถึงหัวตาราง แถว และยอดรวม; ข้อกำหนดที่ไม่ลงราคาใช้เทาประ. ย้ายการแสดง group.06 พร้อม 14 Yard test rows ไปอยู่ B9 onshore และเก็บจุดเชื่อมจาก B3; Module IDs เดิมค้นหาได้และเปิด B9. งบ B9 480550 กับ B3 2322450 คงเดิม; ยังไม่ปิดประเด็นขอบเขตแรงงาน B3 SAT28 กับ B9 จนกว่าจะเทียบกิจกรรม/วัน/RACI. เพิ่มฐาน B9 7+2 วัน และ B3 SAT28 วัน พร้อม day rate จากต้นทาง; offshore OT เกิน12ชั่วโมง ข้อเสนอ OT1.5×/Standby100% ยังไม่เลือกใช้. Release/Scope รับคำอธิบายจากต้นทางเดียวกัน และแสดงตาราง Day/OT/Standby เปิดทันทีใน Release พร้อมป้าย DRAFT/PROPOSED ไม่ใช่เงื่อนไขที่ตกลง; OT onshore รอชั่วโมงปกติ. ยอดราคาและ native workbook คงเดิม.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.06","bid.budget.working.bc.b9.price-trace.work-scope","bid.budget.working.bc"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: extend colours into every nested table; move incorrectly grouped work; Yard is onshore"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-07",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"B3 สีเดียวกันตลอดกลุ่ม พร้อมป้ายยอดรวม / รายละเอียดงาน / สถานที่",
+  detail:"หัวข้อย่อยและสถานที่ใช้สีของกลุ่มแม่ทั้ง FAT, Survey, SAT/Commissioning และ Tools แทนสีฟ้าเริ่มต้นที่ทำให้เข้าใจว่าเป็นคนละกลุ่ม; เพิ่มป้ายระดับและชื่อกลุ่มต้นทาง พร้อมอธิบายว่ายอดด้านในแจกแจงยอดหัวกลุ่ม ไม่บวกซ้ำ. Module IDs, Source → Working → Budget/Scope → Release และราคา A/B/C คงเดิม.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier","bid.budget.working.bc.b3.resource-price-dossier.rollup.sat-commissioning"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner screenshot24-Oct: mismatched parent/child colours obscure the same work group"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-06",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"Owner duration: FAT2+1 / Training1+1; reserve days included once",
+  detail:"Owner confirms +1 means reserve. FAT2 actual days81900 +1 reserve40950 replaces6-day crew245700; standalone closeout day merged into FAT2+1. Existing4 preparation days retained. Shared facility/transport window9 days, FAT meals3 days; no repeated reserve meal or closeout charge. Local B3 execution452850; full B3 2322450. B8 remains142550:1 teaching +1 reserve day, OEM online base8h +reserve8h, no duplicate trainer day. Combined local FAT/training595400 (-240150); known Part B4757207.13. Twelve FAT requirement IDs remain; earlier48h estimate split32h preparation +16h formal timebox, actual ITP/TAG repetition open. A/B9/spares/C and packing/CIF unchanged; source-derived Scope/Release/native only.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.02.site.01","bid.budget.working.bc.b8.hybrid-training"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner correction24-Oct FAT2+1 Training1+1; explicitly confirmed reserve days"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-05",date:"2026-10-24",kind:"UI",tone:"neutral",
+  title:"B8 Base confirmed by owner: OEM ONLINE + ADDVALUE onsite at SAMTEL",
+  detail:"Owner selects OEM online as the base proposal method. B8 remains142550; onsite OEM615350 stays internal/nonposting and is not C1/C2. Source decision and proposal wording distinguish owner selection from customer acceptance and vendor fee confirmation. No A/B/C price change; all downstream totals unchanged.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b8.hybrid-training","bid.budget.working.bc.b8"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner 24-Oct: กำหนดไปเลย ผมจะเอา OEM online เป็นหลัก"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-04",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"SAMTEL lump sum: preparation, FAT, hosting, shared tools, training and CIF export allocation",
+  detail:"Current local B3 execution allowance693000: 4 prep +6 FAT +1 closeout +1 retest, shared14-day facility/transport, tools, meals and OEM remote FAT support. Total B3 2562600 (+429300). B8 142550 (-9000): demo20000 transferred to B3, catering11000 added; six products/16h, prior content-prep day and separate D5–6 training. OEM onsite alternative615350 nonposting. B5 311184/B6 307584 retain existing envelopes with internal activity allocations, including SAMTEL dispatch/export25000; freight/tax/insurance adequacy not verified. A/B9/spares unchanged. Known Part B4997357.13, net change+420300; source flows to Scope/Release/native draft, no MGW service, no second travel credit. Historical5/7-day comparisons frozen to prior baseline; not current execution plans.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.02.site.01","bid.budget.working.bc.b8.hybrid-training","bid.budget.working.bc.b6.price-trace.work-scope"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner 24-Oct full lump-sum execution scope; internal estimator assumptions explicitly unquoted"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-03",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"MGW supplies MR0002 equipment only — remove all B3 FAT services/reserve",
+  detail:"Owner correction: no MGW integration, iFAT, facility or service reserve. Withdraw THB307125 from the existing B3 source, with no replacement allowance. Active supplier service rows removed; old Module ID returns a withdrawn nonposting notice. Local ADDVALUE FAT remains THB263700 (245700 labour +8000 local transfers +10000 work insurance); B3 THB2133300, Part B THB4577057.13. MR0002 equipment and all other A/B/C owners unchanged. Release/Scope/native values derive from source. Supplier20% deduction removed with its service base; ordinary B5% applies once. Warehouse/tool expenses remain unknown, not assumed free. Prior R33 reserve selection superseded.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.01.site.01","bid.budget.working.bc.b3","bid.budget.pricing.release"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner 24-Oct: MGW เค้าแค่ supply ของ"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-02",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"Source pricing: EXION + MDS, SAMTEL Warehouse FAT/Training, CIF Zhuhai",
+  detail:"A3 EXION phone/sounder THB828000; JB/glands remain unpriced. A4 MDS one quoted USD75000 system extrapolated to 3 required sites USD225000. A known SELL +THB20831.85. B3 removes only five foreign FAT travel rows THB158900; local labour THB245700, transfers8000, work cover10000 and integration/facility reserve307125 remain. Reserve is not selected MGW purchase or confirmed credit. B3 THB2440425; known B THB4884182.13. B8 training151550 receives no second travel deduction; B9 and offshore remain. B6 CIF eight-leg route has unknown cost adequacy; packing/storage allowances retained. All downstream views derive from source; C optional/unquoted; release HOLD. DB/manual-input work deferred. Original numbered requirements 1–8 not reconstructed.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3","bid.budget.working.bc.b6","bid.budget.pricing.release"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"24-Oct owner handoff; EXION1260576R0; MDS QTORG2609244; CCL item12; COM-D02; Contract18.1(c)"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-01",date:"2026-10-24",kind:"UI",tone:"neutral",
+  title:"10.1 Cost integrity: Color-coded Hierarchical Nested Accordion",
+  detail:"Cost integrity now starts collapsed with its existing Module ID visible. Expand All / Collapse All and independent +/− controls reveal three color-coded table-first groups: verification gates, MR quote coverage, and vendor quote register. Each group exposes Copy ID and its evidence count or source status when collapsed. Tables retain all original fields and currencies with horizontal scrolling. Colors identify categories, not approval.",
+  moduleIds:Object.freeze(["bid.budget.integrity","bid.budget.integrity.steps","bid.budget.integrity.mr-coverage","bid.budget.integrity.vendor-register"]),
+  priceImpact:"NO_PRICE_CHANGE",
+  source:"Owner UI request 2026-10-24; Controlled Module Disclosure & Identity Contract Rev01; existing costIntegrity0553 evidence"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-19",date:"2026-10-22",kind:"PRICE",tone:"neutral",
   title:"B3 Working Budget Selected SAT 28 Days + BF Site Survey 3+2, Not Historical 40 Days",
