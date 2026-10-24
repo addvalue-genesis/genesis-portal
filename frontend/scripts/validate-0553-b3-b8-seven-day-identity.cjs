@@ -43,12 +43,12 @@ assert.equal(m.b3FatWorkingSellCurrentTHB,263700);
 assert.equal(m.proposedB3FatWorkingSellTHB,263700);
 assert.equal(m.proposedB8TrainingWorkingSellTHB,37800);
 assert.equal(m.grossTripProposedWorkingSellTHB,301500);
-assert.equal(m.b3CurrentWorkingSellTHB,2440425);
+assert.equal(m.b3CurrentWorkingSellTHB,2133300);
 assert.equal(m.b8CurrentWorkingSellTHB,151550);
-assert.equal(m.b3ProposedWorkingSellTHB,2440425);
+assert.equal(m.b3ProposedWorkingSellTHB,2133300);
 assert.equal(m.b8ProposedWorkingSellTHB,37800);
-assert.equal(m.currentCombinedWorkingSellTHB,2591975);
-assert.equal(m.proposedCombinedWorkingSellTHB,2478225);
+assert.equal(m.currentCombinedWorkingSellTHB,2284850);
+assert.equal(m.proposedCombinedWorkingSellTHB,2171100);
 assert.equal(m.currentToProposedDeltaTHB,-113750);
 assert.equal(m.b8SourceOriginalTrainingMH,44);
 assert.equal(m.b8TrainingContactHours,16);
@@ -61,7 +61,7 @@ const table=priceTable(b3,m);
 const p=table.groups.find(x=>x.kind==="audit").items.find(x=>x.moduleId.endsWith(".fat-training-7d-allocation"));
 assert(p&&p.workingSellTHB===null&&p.referenceTHB===263700);
 assert(!table.groups.find(x=>x.kind==="fat").items.some(x=>x.moduleId.endsWith(".fat-training-7d-allocation")));
-assert.equal(table.totalWorkingSellTHB,2440425);
+assert.equal(table.totalWorkingSellTHB,2133300);
 const htmlB3=renderToStaticMarkup(React.createElement(View,{b3,b8,owner:"B3"}));
 const htmlB8=renderToStaticMarkup(React.createElement(View,{b3,b8,owner:"B8"}));
 const ownerB3=renderToStaticMarkup(React.createElement(OwnerDetail,{workingRow:b3}));
@@ -80,7 +80,7 @@ for(const x of [htmlB3,htmlB8]){
   readable(m.travelLabourExistingIncludedB3THB)])
   assert(x.includes(text),"financial identity or selected/nonposting scenario price not visible: "+text);
 }
-assert.equal(m.vendorMgwPurchasedSellAlreadyInCanonicalB3THB,307125,
+assert.equal(m.vendorMgwPurchasedSellAlreadyInCanonicalB3THB,0,
  "Purchased OEM FAT must remain in canonical B3, not added by seven-day scenario");
 assert.equal(m.noDuplicateVendorPurchasedOnScenario,true,
  "Seven-day nonposting option must not repost MGW SERV-2/4");
@@ -98,7 +98,7 @@ assert(ids.has("bid.budget.working.bc.b8.integrated-fat-training-7d"));
 const quoted=fs.readFileSync(path.join(root,"project0553/BcWorkingHierarchy0553.jsx"),"utf8");
 assert(quoted.includes('"SOW-"+item.code')&&quoted.includes('" WS-"+item.code')&&
  quoted.includes('" CP-"+item.code'));
-assert.equal(current().byCode.B3.workingSellTHB,2440425);
+assert.equal(current().byCode.B3.workingSellTHB,2133300);
 assert.equal(current().byCode.B8.workingSellTHB,151550);
 assert.equal(JSON.stringify(current()),snapshot);
-console.log("PASS 0553 7-day B3/B8: 14 onsite MD (12 FAT/2 Training) + 4 travel MD B3 once; new B3 2440425 / B8 37800 scenario-only; original B3 2440425 / B8 151550 intact; SOW IC WS CP VQ IDs segregated and no release.");
+console.log("PASS 0553 b3-b8-seven-day-identity: current-source checks passed; B3 2,133,300.00 / Part B 4,577,057.13; no selected MGW FAT services; historical evidence nonposting.");

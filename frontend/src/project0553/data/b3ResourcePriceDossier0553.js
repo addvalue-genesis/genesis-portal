@@ -177,7 +177,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   postingClass:"UNPRICED_REQUIREMENT_NONPOSTING",stageAllocationConfirmed:false
  }));
  const stageGroups=freeze([
-  stage("SAMTEL integration/FAT service reserve — MGW quoted benchmark",mgwLines,"B3.1.1"),
+  stage("External FAT service — withdrawn, not selected",mgwLines,"B3.1.1"),
   stage("SAMTEL Warehouse FAT — Labour / Local Transfers / Work Insurance",fatLines,"B3.1.2"),
   stage("Selected SAT/SIT 28 Team-days / 56 MD",satLines,"B3.2.1"),
   stage("Temporary VeEX MX100+ rental",rental,"B3.3.1"),
@@ -219,7 +219,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  // eight original dossier stages. These rollups are NEVER independent WBS sales.
  const rollupDefinitions=freeze([
   freeze({key:"fat",name:"FAT — Factory Acceptance Test",tone:"fat",
-   sourceStageIndices:freeze([0,1]),state:"INCLUDED",approval:"PURCHASED_FAT_QUOTE__ADDVALUE_WITNESS_COST_NOT_VERIFIED"}),
+   sourceStageIndices:freeze([0,1]),state:"INCLUDED",approval:"LOCAL_ADDVALUE_FAT__DIRECT_COST_NOT_VERIFIED"}),
   freeze({key:"site-survey",name:"SITE SURVEY — BF Verification",tone:"survey",
    sourceStageIndices:freeze([4]),state:"INCLUDED_CONDITIONAL",
    approval:"IN_WORKING_BUDGET__PHYSICAL_REVISIT_ON_WRITTEN_CALLOUT_ONLY"}),
@@ -250,7 +250,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
     sourceIndexList.some(i=>i<0||i>=stageGroups.length))
   throw Error("B3 group hierarchy cannot omit or duplicate any source stage");
  const rollupTotalTHB=round(groupRollups.reduce((n,g)=>n+g.selectedWorkingSellTHB,0));
- if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="570825|252000|1587600|30000"||
+ if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="263700|252000|1587600|30000"||
     rollupTotalTHB!==workingRow.workingSellTHB)
   throw Error("B3 group hierarchy must reconcile once to canonical WS-B3");
  const priced=stageGroups.slice(0,5);
@@ -261,18 +261,18 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  const vendorQuoteCostTHB=round(mgwLines.reduce((n,r)=>n+r.quotedVendorCostTHB,0));
  const singleIds=stageGroups.flatMap(g=>g.rows.map(r=>r.id));
  if(new Set(singleIds).size!==singleIds.length||
-    mgwLines.length!==2||fatLines.length!==8||satLines.length!==18||
+    mgwLines.length!==0||fatLines.length!==8||satLines.length!==18||
     bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
-    total(mgwLines)!==307125||total(fatLines)!==263700||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
-    total(rental)!==30000||budgetSelected!==2440425||
-    selectedBaseExcludingConditionalBFTHB!==2188425||bfConditionalBudgetAllowanceTHB!==252000||
+    total(mgwLines)!==0||total(fatLines)!==263700||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
+    total(rental)!==30000||budgetSelected!==2133300||
+    selectedBaseExcludingConditionalBFTHB!==1881300||bfConditionalBudgetAllowanceTHB!==252000||
     bfSurveyExpenseDrivers.length!==4||
     bfSurveyExpenseDrivers.some(x=>x.workingSellTHB!==null||x.actualDirectCostTHB!==null)||
     riskReserve.some(x=>x.workingSellTHB!==null||x.directCostTHB!==null)||
     workingRow.workingSellTHB!==budgetSelected||
-    picked.join("|")!=="307125|263700|1587600|30000|252000"||
+    picked.join("|")!=="0|263700|1587600|30000|252000"||
     plan.survey.conditionalLabourSellReferenceTHB!==252000||
-    vendorQuoteCostTHB!==236250||
+    vendorQuoteCostTHB!==0||
     round(vendorQuoteCostTHB+mgw.samTelMarkupTHB+mgw.addvalueMarkupTHB+
       mgw.omissionReserveTHB)!==mgw.selectedIncrementalWorkingSellTHB||
     stageGroups.slice(5).some(g=>g.selectedWorkingSellTHB!==0||
@@ -302,7 +302,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    unpricedExtraBFExpenseCostTHB:null,
    GFYardAdditionalCostTHB:null,GFOffshoreAdditionalCostTHB:null,
    actualDirectCostTHB:null,commercialReleaseAllowed:false,
-   reconciliation:"2188425 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2440425 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
+   reconciliation:"1881300 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2133300 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
     satSeniorUsd1000DeltaTHB:satSelected.satSeniorRateRevisionDeltaTHB
   }),
   bfSurveyExpenseDrivers,riskReserve,

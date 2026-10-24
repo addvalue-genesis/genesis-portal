@@ -70,7 +70,7 @@ export function ReleaseSourceNavigator0553({model,onOpenSource}){
             <code>{" WS-"+row.code}</code> Internal Working SELL ·
             <code>{" CP-"+row.code}</code> Customer Proposal NOT ISSUED
            </div>}
-           {row.code==="B3"&&Number.isFinite(row.mgwPurchasedServicesSellIncludedTHB)&&
+           {row.code==="B3"&&row.mgwPurchasedServicesSellIncludedTHB>0&&
             <div>VQ-MGW-SERV-2 / VQ-MGW-SERV-4 → IC-FAT-MGW-SERV-2-4 quoted-cost
              → WS-B3 purchased services {currency(row.mgwPurchasedServicesSellIncludedTHB)};
              SAMTEL purchased cost share {currency(row.samTelPurchased20PctCostShareTHB)}

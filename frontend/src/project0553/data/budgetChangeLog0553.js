@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R33";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R34";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-03",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"MGW supplies MR0002 equipment only — remove all B3 FAT services/reserve",
+  detail:"Owner correction: no MGW integration, iFAT, facility or service reserve. Withdraw THB307125 from the existing B3 source, with no replacement allowance. Active supplier service rows removed; old Module ID returns a withdrawn nonposting notice. Local ADDVALUE FAT remains THB263700 (245700 labour +8000 local transfers +10000 work insurance); B3 THB2133300, Part B THB4577057.13. MR0002 equipment and all other A/B/C owners unchanged. Release/Scope/native values derive from source. Supplier20% deduction removed with its service base; ordinary B5% applies once. Warehouse/tool expenses remain unknown, not assumed free. Prior R33 reserve selection superseded.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.01.site.01","bid.budget.working.bc.b3","bid.budget.pricing.release"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner 24-Oct: MGW เค้าแค่ supply ของ"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-02",date:"2026-10-24",kind:"PRICE",tone:"neutral",
   title:"Source pricing: EXION + MDS, SAMTEL Warehouse FAT/Training, CIF Zhuhai",

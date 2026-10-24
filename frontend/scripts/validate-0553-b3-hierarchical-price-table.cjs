@@ -23,21 +23,21 @@ const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 assert.equal(m.moduleId,"bid.budget.working.bc.b3.worktype-accordion");
 assert.equal(m.groups.length,4);
 assert.deepEqual(m.groups.map(x=>x.number),["B3.1","B3.2","B3.3","B3.4"]);
-assert.deepEqual(m.groups.map(x=>x.workingSellTHB),[570825,1839600,30000,0]);
-assert.equal(m.totalWorkingSellTHB,2440425);
+assert.deepEqual(m.groups.map(x=>x.workingSellTHB),[263700,1839600,30000,0]);
+assert.equal(m.totalWorkingSellTHB,2133300);
 assert.equal(m.totalWorkingSellTHB,b3.workingSellTHB);
-assert.equal(m.supplierFatReferenceUSD,7500);
-assert.equal(m.supplierFatReferenceTHB,236250);
+assert.equal(m.supplierFatReferenceUSD,0);
+assert.equal(m.supplierFatReferenceTHB,0);
 assert.equal(m.verifiedDirectCostTHB,null);
 assert.equal(m.customerReleaseAllowed,false);
 const rows=m.groups.flatMap(x=>x.items);
-assert.equal(rows.length,12);
-assert.deepEqual(m.groups.map(x=>x.items.length),[2,3,2,5],
+assert.equal(rows.length,11);
+assert.deepEqual(m.groups.map(x=>x.items.length),[1,3,2,5],
  "B3.1 must have ONLY supplier evidence + current WS; historical & scenario belong to B3.4 audit");
-assert.equal(new Set(rows.map(x=>x.moduleId)).size,12);
-assert.equal(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length,5);
+assert.equal(new Set(rows.map(x=>x.moduleId)).size,11);
+assert.equal(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length,4);
 assert.equal(round(rows.filter(x=>[CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass))
- .reduce((n,x)=>n+x.workingSellTHB,0)),2440425);
+ .reduce((n,x)=>n+x.workingSellTHB,0)),2133300);
 for(const r of rows){
  assert.equal(r.workingSellTHB===null,![CLASS.INCLUDED_WORKING_SELL,CLASS.PURCHASED_SERVICE_WORKING_SELL].includes(r.priceClass),
   "Non-posting module cannot carry included Working SELL "+r.moduleId);
@@ -45,9 +45,7 @@ for(const r of rows){
  assert(r.owner&&r.status&&r.driver&&r.title);
 }
 const quote=rows.find(x=>x.moduleId.endsWith(".mgw-r2-cover-20261020"));
-assert.equal(quote.vendorQuoteUSD,7500);
-assert.deepEqual(quote.supplierRows.map(x=>[x.id,x.usd]),[["SERV-2",5000],["SERV-4",2500]]);
-assert.equal(quote.workingSellTHB,307125);
+assert.equal(quote,undefined,"No supplier FAT row in current hierarchy");
 const integrated=rows.find(x=>x.moduleId.endsWith(".fat-training-7d-allocation"));
 assert(integrated,"Missing seven-day FAT/Training review-only submodule");
 assert.equal(integrated.priceClass,CLASS.NON_POSTING_AUDIT);
@@ -63,7 +61,7 @@ assert(m.groups[3].items.includes(historical),"Historical FAT must be grouped un
 assert(!m.groups[0].items.includes(historical),"Historical FAT no longer belongs in priced B3.1 FAT");
 assert.equal(historical.workingSellTHB,null);
 const audit=rows.find(x=>x.moduleId.endsWith(".working-sell-breakdown"));
-assert.equal(audit.referenceTHB,2440425);
+assert.equal(audit.referenceTHB,2133300);
 assert.equal(audit.workingSellTHB,null);
 const sat=rows.find(x=>x.moduleId.endsWith(".40-day-abc"));
 assert.equal(sat.qty,56);
@@ -79,10 +77,10 @@ assert.equal(veex.unitRateTHB,1000);
 const content=renderToStaticMarkup(React.createElement(Host,{workingRow:b3}));
 assert(content.includes("<table")&&content.includes("p553-b3-hierarchical-table"),
  "Price hierarchy must be a table, not a list of source cards");
-for(const tag of ["MGW Quote USD","MGW Source THB","Historical / Scenario / Audit THB",
+for(const tag of ["Supplier Quote USD","Supplier Source THB","Historical / Scenario / Audit THB",
  "B3 Working SELL THB","Treatment / Owner","Expand All","Collapse All",
- "263,700.00","1,587,600.00","30,000.00","252,000.00","2,440,425.00","236,250.00",
- "7,500.00","144,000.00","307,125.00","5,000.00","2,500.00","NON-POSTING","IC-FAT-STAFF-001"]){
+ "263,700.00","1,587,600.00","30,000.00","252,000.00","2,133,300.00",
+ "144,000.00","NON-POSTING","IC-FAT-STAFF-001"]){
  assert(content.includes(tag),"Price table missing "+tag);
 }
 for(const r of m.groups){
@@ -108,4 +106,4 @@ for(const row of m.groups){
   "Navigator missing child "+child.moduleId);
 }
 assert.equal(JSON.stringify(working()),snapshot,"B3 price summary UI changed 10.2 sources");
-console.log("PASS 0553 B3 priced HIERARCHY TABLE / historical + scenario in B3.4 Audit only: FAT 570825 (= MGW 307125 + Witness 263700) + SAT 1587600 + Survey 252000 + tools 30000 + audit NONPOST = 2440425; purchased MGW USD7500/THB236250 at 20+5+5 into selected THB307125; historical Bangkok THB144000, audit mirror THB2750525 all NONADDITIVE. 4 parent + 12 child IDs; same table columns; no cost mutation.");
+console.log("PASS 0553 b3-hierarchical-price-table: current-source checks passed; B3 2,133,300.00 / Part B 4,577,057.13; no selected MGW FAT services; historical evidence nonposting.");

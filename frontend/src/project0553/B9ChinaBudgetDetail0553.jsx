@@ -14,7 +14,7 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
  const purchasedFatSell=isFat&&Number.isFinite(purchasedServices?.selectedIncrementalWorkingSellTHB)?
   purchasedServices.selectedIncrementalWorkingSellTHB:0;
  if(isFat&&purchasedServices&&
-   (purchasedFatSell!==307125||purchasedServices.vendorPurchasedQuoteUSD!==7500))
+   (purchasedFatSell!==0||purchasedServices.vendorPurchasedQuoteUSD!==0))
   throw Error("B3 purchased MGW FAT quotation and Working SELL source mismatch");
  // FULL B3 must originate from canonical 10.2 owner, not historical 40d
  // SAT THB2,046,000. Missing canonical input means NO full-total claim.
@@ -27,9 +27,7 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
  if(!rows.length||Math.abs(rows.reduce((sum,x)=>sum+x.workingSellTHB,0)-total)>0.01)
   throw Error("Contract B3 FAT vs B9 Yard detail ownership/pricing mismatch");
  return <section className="p55-panel" data-component-key={"bid.budget.working.bc."+owner.toLowerCase()+".revk-china-budget"} style={{padding:14,marginTop:12}}>
-  <p className="p55-note">24-Oct selected basis: SAMTEL Warehouse Thailand. THB307125 is retained
-   integration/facility funding benchmarked on the existing MGW quote; no MGW award or agreed credit.
-   Local scope/rate allocation and OEM/customer FAT acceptance remain open.</p>
+  <p className="p55-note">SAMTEL Warehouse FAT: ADDVALUE labour, local transfers and work insurance only. No purchased supplier FAT or facility reserve.</p>
   <h4>{isFat?"IC-FAT — ADDVALUE SAMTEL FAT Witness · Internal Working SELL Detail":"IC-YARD — Specialist Field Assistance · Quoted Base Working SELL (Call-out Execution)"}</h4>
   <p className="p55-note"><strong>Internal record:</strong> {isFat?"IC-FAT / WS-B3":"IC-YARD / WS-B9"} · <strong>Customer contractual Scope:</strong> {isFat?"SOW-B3":"SOW-B9"} · <strong>Commercial Proposal:</strong> {isFat?"CP-B3":"CP-B9"} NOT ISSUED. These rows are internal estimating activities, not customer B3/B9 quotation line numbers.</p>
   <div className="p55-metric-grid">
@@ -44,7 +42,7 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
   </div>
   {isFat&&budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}>
    <summary><strong>SAMTEL FAT / MR0001–MR0004 — 6-Day Estimating Agenda</strong></summary>
-   <p className="p55-note">Witness team: {budget.fatWitnessRoles.join(" + ")}. Field Specialist standby unbilled. MGW/OEM provides factory test execution and its calibrated tools. Source: BOD §10.2–10.3 / SPE §7.3.1 / MR/DTS1–4. Six days are internal estimates pending signed OEM ITP and equipment TAG repetition.</p>
+   <p className="p55-note">Witness team: {budget.fatWitnessRoles.join(" + ")}. Field Specialist standby unbilled. ADDVALUE performs the selected local FAT work; specific calibrated tools and facility expenses need separate evidence and ownership. Source: BOD §10.2–10.3 / SPE §7.3.1 / MR/DTS1–4. Six days are internal estimates pending signed OEM ITP and equipment TAG repetition.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Day / Test ID</th><th>MR</th><th>Test Requirement</th><th>Hours</th><th>Evidence</th></tr></thead>
     <tbody>{budget.fatWbs.rows.map(x=><tr key={x.id}><td>{x.day} · {x.id}</td><td>{x.mr}</td><td>{x.activity}</td><td>{x.hours}</td><td>{x.evidence}</td></tr>)}</tbody>

@@ -18,9 +18,9 @@ export function selectRevKAbcOwnershipControl0553(working){
  const b9=selectB9ChinaWorkingBudget0553();
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
- if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+307125)||current.B9!==b9.b9BaseWorkingSellTHB||
-    working.knownWorkingSellTHB!==4884182.13 ||
-    working.byCode.B3?.workingSellTHB!==2440425 ||
+ if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+0)||current.B9!==b9.b9BaseWorkingSellTHB||
+    working.knownWorkingSellTHB!==4577057.13 ||
+    working.byCode.B3?.workingSellTHB!==2133300 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))
@@ -114,7 +114,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   b1ConditionalSellTHB:b1.conditionalWorkingSellTHB,b1LegacyEngineeringCarriedTHB:0,
   b3LaborSellTHB:b3.satWorkingSellTHB,b3SurveySellTHB:b3.siteSurveyWorkingSellTHB,
    b3Historical40DayLabourTHB:historicalB3.laborWorkingSellTHB,b3ToolSellTHB:b3.veexWorkingSellTHB,
-  b3MgwPurchasedFatWorkingSellTHB:307125,
+  b3MgwPurchasedFatWorkingSellTHB:0,
   b9FatBaseTHB:0,b3FatWitnessSellTHB:fatTHB,b3FatWitnessDays:fat.estimatedFatWitnessDays,b9FatWitnessDays:fat.estimatedFatWitnessDays,
   b9YardConditionalLumpSumTHB:yardTHB,b9YardQuotedInBaseTHB:current.B9,
   b9YardRole:b9.selectedYardRole,b9YardWorkdays:b9.selectedYardWorkingDays,

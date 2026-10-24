@@ -13,9 +13,9 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
  const ids=new Set(source.map(r=>r.id));
  const purchased=b3.b3MgwPurchasedFatWorkingSell;
  if(source.length!==8||ids.size!==8||china.fatWorkingSellTHB!==263700||
-  b3.workingSellTHB!==2440425||b8.workingSellTHB!==151550||b8.qtyDriver!==1||
-  purchased?.selectedIncrementalWorkingSellTHB!==307125||
-  purchased?.vendorPurchasedQuoteTHB!==236250)
+  b3.workingSellTHB!==2133300||b8.workingSellTHB!==151550||b8.qtyDriver!==1||
+  purchased?.selectedIncrementalWorkingSellTHB!==0||
+  purchased?.vendorPurchasedQuoteTHB!==0)
   throw Error("Source has changed: review six-day B3/B8 and SERV-2/4 before reallocation");
  const staffing=source.find(r=>r.id==="B3-FAT-STAFF");
  if(staffing?.qty!==12||staffing?.unitRateTHB!==20475||
@@ -74,7 +74,7 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
   b3TripAllocatedReferenceTHB:b3Alloc,b8TripAllocatedReferenceTHB:b8Alloc,
   originalB8WorkingSellTHB:30000, // historical Rev05-only source reference, not current WS-B8
   originalB8Hours:44,currentSelectedB8HybridTrainingWorkingSellTHB:b8.workingSellTHB,trainingPreparationOverlapReconciled:false,
-  mgwSupplierQuotedUSD:7500,mgwSupplierQuotedTHB:purchased.vendorPurchasedQuoteTHB,
+  mgwSupplierQuotedUSD:purchased.vendorPurchasedQuoteUSD,mgwSupplierQuotedTHB:purchased.vendorPurchasedQuoteTHB,
   mgwPurchasedInB3WorkingSellTHB:purchased.selectedIncrementalWorkingSellTHB,
   supplierSERV2SERV4Unchanged:true,customerIFATLineAllowed:false,
   existingSourceHotelRoomNights:source.find(r=>r.id==="B3-HOTEL")?.qty??null,
@@ -89,7 +89,7 @@ export function selectB3B8FiveDaySourceAllocation0553({b3,b8,trainingCrew=1}={})
    "B8 44 MH/THB30000 documentation/preparation overlap must be reconciled before promotion",
    "No hotel nights selected for local SAMTEL venue; old China scenario is superseded",
    "4-MR 48-hour witnessed ITP, site availability and customer acceptance not confirmed",
-   "Quoted MGW USD7500 stays B3 once; never multiply ADDVALUE Working SELL by margin again"
+   "MGW equipment supply only; no service amount remains in B3; do not mark up ADDVALUE Working SELL again"
   ])
  });
 }

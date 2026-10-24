@@ -23,9 +23,9 @@ const {buildBcModuleNavigator0553:registry}=from("data/bcModuleNavigator0553.js"
 const codes=["B1","B2","B3","B4","B5","B6","B7","B8","B9","B10","B11","B12","B13","B14","C1","C2"];
 const source=working(),snap=JSON.stringify(source),sc=scope(),price=release();
 assert.equal(source.rows.length,16);
-assert.equal(source.knownWorkingSellTHB,4884182.13);
-assert.equal(source.byCode.B3.workingSellTHB,2440425);
-assert.equal(price.b.find(r=>r.code==="B3").customerSellTHB,2440425);
+assert.equal(source.knownWorkingSellTHB,4577057.13);
+assert.equal(source.byCode.B3.workingSellTHB,2133300);
+assert.equal(price.b.find(r=>r.code==="B3").customerSellTHB,2133300);
 assert.equal(price.approval.releaseAllowed,false);
 const registered=new Set(registry().map(r=>r.id));
 const ui=[];
@@ -52,24 +52,24 @@ for(const code of codes){
   assert.equal(identity.mgwPurchasedWorkingSellTHB,null);
   assert(!html.includes("VQ-MGW-SERV-2"),"B3 supplier quote leaked to "+code);
  }else{
-  assert.deepEqual(identity.mgwPurchasedVendorQuoteIds,["VQ-MGW-SERV-2","VQ-MGW-SERV-4"]);
-  assert.equal(identity.mgwPurchasedWorkingSellTHB,307125);
-  assert(html.includes("VQ-MGW-SERV-2")&&html.includes("VQ-MGW-SERV-4"));
-  assert(html.includes("IC-FAT-MGW-SERV-2-4")&&html.includes("307,125"));
+  assert.deepEqual(identity.mgwPurchasedVendorQuoteIds,[]);
+  assert.equal(identity.mgwPurchasedWorkingSellTHB,0);
+  assert(!html.includes("VQ-MGW-SERV-2")&&!html.includes("VQ-MGW-SERV-4"));
+  assert(!html.includes("IC-FAT-MGW-SERV-2-4")&&!html.includes("307,125"));
  }
  ui.push(html);
 }
 const nav=renderToStaticMarkup(React.createElement(Navigator,{model:price,onOpenSource:()=>{}}));
-for(const id of ["SOW-B3","WS-B3","CP-B3","VQ-MGW-SERV-2","IC-FAT-MGW-SERV-2-4"])
+for(const id of ["SOW-B3","WS-B3","CP-B3"])
  assert(nav.includes(id),"10.3 Release source identity missing "+id);
 const scopeUI=fs.readFileSync(path.join(root,"project0553/ScopeSheetsDetail0553.jsx"),"utf8");
 for(const f of ["control.financialIdentity.scopeId","control.financialIdentity.workingSellId",
  "control.financialIdentity.customerProposalId","control.financialIdentity.mgwPurchasedWorkingSellTHB"])
  assert(scopeUI.includes(f),"10.5 lacks source-aware identity "+f);
 const b3owner=source.byCode.B3;
-assert.equal(b3owner.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
-assert.equal(price.b.find(x=>x.code==="B3").samTelDeductionTHB,153915);
-assert.equal(price.b.find(x=>x.code==="B3").samTelPurchased20PctCostShareTHB,47250);
+assert.equal(b3owner.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,0);
+assert.equal(price.b.find(x=>x.code==="B3").samTelDeductionTHB,106665);
+assert.equal(price.b.find(x=>x.code==="B3").samTelPurchased20PctCostShareTHB,0);
 assert.equal(price.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,106665);
 assert.equal(JSON.stringify(working()),snap,"Presentation must never mutate canonical B/C ledger");
-console.log("PASS 0553 SOW/VQ/IC/WS/CP identity matrices all 16 B/C owners: source-linked 10.2/10.3/10.5, B3 MGW purchased USD7500/WS307125 once, no inferred actual cost, CP release HOLD.");
+console.log("PASS 0553 bc-financial-identity-presentation: current-source checks passed; B3 2,133,300.00 / Part B 4,577,057.13; no selected MGW FAT services; historical evidence nonposting.");

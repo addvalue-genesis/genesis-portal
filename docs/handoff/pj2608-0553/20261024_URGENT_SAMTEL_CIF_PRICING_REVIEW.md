@@ -1,5 +1,7 @@
 # PJ2608-0553 urgent pricing review — 24 October 2026
 
+**Superseded for B3 FAT pricing:** see [MGW equipment-only correction](20261024_MGW_EQUIPMENT_ONLY_FAT_CORRECTION.md). The former THB307,125 service reserve below was subsequently withdrawn by owner instruction. This document preserves the first reviewed revision.
+
 Internal working comparison; NOT a released customer offer. THB excluding VAT, working FX USD/THB31.50. A = source cost ×1.30. B = existing Working SELL, multiplier1.00; retained purchased-service reserve tariff stays cost×1.30 with no second ordinary B 5% deduction. C remains optional and independently unquoted.
 
 ## Verified branch and baseline

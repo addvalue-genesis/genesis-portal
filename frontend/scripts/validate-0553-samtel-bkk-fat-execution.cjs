@@ -44,7 +44,7 @@ for(const c of ["B3","B6","B9"]){
  assert.match(row.executionDecision.integratedFatLocation,/SAMTEL Warehouse/); // Active Rev.K venue overrides historical BKK source only
  assert.equal(row.directCostTHB,null,"Execution location must not invent "+c+" direct cost");
 }
-assert.equal(working.byCode.B3.workingSellTHB,2440425);
+assert.equal(working.byCode.B3.workingSellTHB,2133300);
 assert.equal(working.byCode.B3.b3FortyDayBudget.workdays,40,
  "Legacy Bangkok/40-day pricing basis remains audit-only");
 // Current B3 includes two independent 22-Oct rate deltas (+SAT Senior 176400,
@@ -53,11 +53,11 @@ const satSeniorRateDeltaTHB=28*(1000-800)*31.5;
 const fatWitnessRateDeltaTHB=working.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB+158900-397400;
 assert.equal(satSeniorRateDeltaTHB+fatWitnessRateDeltaTHB,201600);
 assert.equal(working.byCode.B3.workingSellTHB-
- (satSeniorRateDeltaTHB+fatWitnessRateDeltaTHB)+158900+352800,2750525,
+ (satSeniorRateDeltaTHB+fatWitnessRateDeltaTHB)+158900+307125+352800,2750525,
  "Historical B3 scenario must NOT blend 21-Oct SAT change with 22-Oct role revisions");
 assert.equal(working.byCode.B9.workingSellTHB,480550);
 assert.equal(working.byCode.B6.workingSellTHB,307584,"B6 approved pre-award logistics working sell; direct cost stays null");
-assert.equal(working.knownWorkingSellTHB,4884182.13,"Current selected Part B Base: includes SAT28+BF5 in B3; B9 1 LS once");
+assert.equal(working.knownWorkingSellTHB,4577057.13,"Current selected Part B Base: includes SAT28+BF5 in B3; B9 1 LS once");
 assert.equal(working.knownWorkingSellTHB,Math.round(working.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((sum,r)=>sum+r.workingSellTHB,0)*100)/100,"Options excluded from Base");
 assert.equal(working.costComplete,false);
 assert.equal(working.releaseAllowed,false);

@@ -22,8 +22,8 @@ const audit=from("estimateToBidMapping.js")
  .auditCurrentCustomerProjection0553({canonical,release,scope});
 const current=canonical.byCode;
 const scenarios=canonical.scenarioAudits;
-assert.equal(canonical.knownWorkingSellTHB,4884182.13);
-assert.equal(current.B3.workingSellTHB,2440425);
+assert.equal(canonical.knownWorkingSellTHB,4577057.13);
+assert.equal(current.B3.workingSellTHB,2133300);
 assert.equal(current.B8.workingSellTHB,151550);
 assert.equal(current.B9.workingSellTHB,480550);
 assert.equal(current.B9.b9ChinaBudget.conditionalYardSellTHB,480550);
@@ -32,10 +32,10 @@ assert.equal(release.b.find(x=>x.code==="B9").customerSellTHB,480550);
 assert.equal(release.b.find(x=>x.code==="B9").conditionalOptionIncludedInBase,true);
 assert.equal(release.b.find(x=>x.code==="B9").samTelDeductionTHB,24027.5);
 assert.equal(release.b.find(x=>x.code==="B9").addvalueReceivableTHB,456522.5);
-assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2440425);
-assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,153915);
-assert.equal(release.b.find(x=>x.code==="B3").addvalueReceivableTHB,2286510);
-assert.equal(scope.lines.B3.workingSellTHB,2440425);
+assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2133300);
+assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,106665);
+assert.equal(release.b.find(x=>x.code==="B3").addvalueReceivableTHB,2026635);
+assert.equal(scope.lines.B3.workingSellTHB,2133300);
 assert.equal(scope.lines.B8.workingSellTHB,151550);
 assert.equal(scope.lines.B9.workingSellTHB,480550);
 const lean=scenarios.b3LeanSat28plus2;
@@ -66,8 +66,8 @@ for(const [people,b3Amount,b8Amount] of [[1,200475,22275],[2,178200,44550]]){
  assert.equal(plan.fiveDayTripReferenceTHB,222750);
  assert.equal(plan.b3TripAllocatedReferenceTHB,b3Amount);
  assert.equal(plan.b8TripAllocatedReferenceTHB,b8Amount);
- assert.equal(plan.mgwPurchasedInB3WorkingSellTHB,307125);
- assert.equal(plan.mgwSupplierQuotedUSD,7500);
+ assert.equal(plan.mgwPurchasedInB3WorkingSellTHB,0);
+ assert.equal(plan.mgwSupplierQuotedUSD,0);
  assert.equal(plan.originalB8WorkingSellTHB,30000);
  assert.equal(plan.originalB8Hours,44);
  assert.equal(plan.trainingPreparationOverlapReconciled,false);
@@ -102,4 +102,4 @@ const names=from("data/officialWorkbookTemplate0553.js").OFFICIAL_WORKBOOK_TEMPL
 for(const [code,row] of [["B3",26],["B8",31],["B9",32]])
  assert(names.some(x=>x[0]===row&&x[1]===code&&x[2]),"Native description missing "+code);
 assert.equal(release.approval.releaseAllowed,false);
-console.log("PASS 0553 5-day nonposting source allocation / 28+2 SAT 21 Test IDs / B9 Base 1 LS (on-call execution) / 21 A+B+C native parity. Customer RELEASE HOLD.");
+console.log("PASS 0553 b3-b8-five-day-lean-parity: current-source checks passed; B3 2,133,300.00 / Part B 4,577,057.13; no selected MGW FAT services; historical evidence nonposting.");

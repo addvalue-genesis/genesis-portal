@@ -24,7 +24,7 @@ const current=canonical(),b3=current.byCode.B3,original=days(),m=matrix();
 const frozenSnapshot=JSON.stringify({workingSell:b3.workingSellTHB,
  directCost:b3.directCostTHB,source:original.rows,veex:original.veex});
 assert.equal(b3.moduleId,"bid.budget.working.bc.b3");
-assert.equal(b3.workingSellTHB,2440425);
+assert.equal(b3.workingSellTHB,2133300);
 assert.equal(b3.b3SelectedSatSurveyBudget.satWorkingSellTHB,1587600);
 assert.equal(b3.b3SelectedSatSurveyBudget.siteSurveyWorkingSellTHB,252000);
 assert.equal(b3.directCostTHB,null);
@@ -45,9 +45,9 @@ assert.equal(p.veexWorkingSellTHB,30000);
 assert.equal(p.offshoreWorkingSellTHB,2046000);
 assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,263700);
 assert.equal(b3.b3SelectedSatSurveyBudget.includedB3SatSurveyToolsWorkingSellTHB+b3.b3ChinaFatBudget.fatWorkingSellTHB+b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,b3.workingSellTHB);
-assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,7500);
-assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB,236250);
-assert.equal(b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
+assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,0);
+assert.equal(b3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB,0);
+assert.equal(b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,0);
 assert.equal(p.offshoreWorkingSellTHB,2016000+30000);
 const wanted=[
  ["ZPQ",3,6,151200,3],["ZWP8",2,4,100800,1],["ZWP11",2,4,100800,1],
@@ -86,8 +86,8 @@ for(const x of [
  'data-component-key="bid.budget.working.bc.b3.site-mr-sat-matrix"',
  "2 persons","40 days","80 MD","USD 800","50,400.00",
  "Site × Team Workdays × Working SELL","ZWP20","403,200.00",
- "2,016,000.00","1,587,600.00","252,000.00","30,000.00","263,700.00","307,125.00","2,440,425.00",
- "Local Integration / FAT Facility Reserve","VQ-MGW-SERV-2/4","P26-058_R2","CP-B3 HOLD",
+ "2,016,000.00","1,587,600.00","252,000.00","30,000.00","263,700.00","2,133,300.00",
+
  "Shared across MR Test IDs","NOT 8 days per MR","SHARED SITE WORKING SELL"
 ])assert(html.includes(x),"Rendered SAT matrix missing "+x);
 for(const r of m.rows){
@@ -107,7 +107,7 @@ for(const r of m.rows){
   "Shared Site value may not be mistaken for a second per-MR price: "+r.id);
 }
 const parentHtml=renderToStaticMarkup(React.createElement(Parent,{workingRow:b3}));
-assert(parentHtml.includes("2,440,425.00")&&parentHtml.includes("80 MD"));
+assert(parentHtml.includes("2,133,300.00")&&parentHtml.includes("80 MD"));
 assert(parentHtml.includes("2. Site × Team Workdays × Working SELL"));
 const head=renderToStaticMarkup(React.createElement(Breakdown,{workingRow:b3}));
 assert(head.includes("56 Man-days")&&head.includes("28")&&head.includes("site-mr-sat-matrix"));
@@ -122,4 +122,4 @@ assert(workType.includes('<B3SiteMrSatCoverage0553 workingRow={workingRow}/>'),
 assert.equal(JSON.stringify({workingSell:canonical().byCode.B3.workingSellTHB,
  directCost:canonical().byCode.B3.directCostTHB,source:days().rows,veex:days().veex}),frozenSnapshot,
  "UI/matrix may not mutate the 10.2 B3 canonical Working Sell or source days");
-console.log("PASS B3 SAT Matrix cost trace: 2 persons ×40 team-days =80 MD × THB25,200 = THB2,016,000; 9 shared site/SIT/Punch allocations, 21 nonposting Test IDs, +VeEX30,000 +ADDVALUE Witness397,400 +MGW Purchased307,125 = THB2,750,525. No new price posting.");
+console.log("PASS 0553 b3-sat-matrix-price-trace: current-source checks passed; B3 2,133,300.00 / Part B 4,577,057.13; no selected MGW FAT services; historical evidence nonposting.");

@@ -9,7 +9,7 @@ const usd=v=>Number.isFinite(v)?"USD "+v.toLocaleString("en-US",{minimumFraction
 export function BcFinancialIdentityMatrix0553({workingRow}){
  if(!workingRow||!/^(?:B(?:[1-9]|1[0-4])|C[12])$/.test(workingRow.code))return null;
  const code=workingRow.code;
- const mgw=code==="B3"?workingRow.b3MgwPurchasedFatWorkingSell:null;
+ const mgw=code==="B3"&&workingRow.b3MgwPurchasedFatWorkingSell?.includedInB3WorkingSell?workingRow.b3MgwPurchasedFatWorkingSell:null;
  const quoteLines=mgw?.quoteLines||[];
  const rowData=[
   {kind:N.SOW,id:"SOW-"+code,source:"Contract B/C scope",quote:null,quotedCostTHB:null,actualCostTHB:null,sell:null,
@@ -36,9 +36,7 @@ export function BcFinancialIdentityMatrix0553({workingRow}){
   throw Error("B3 financial identity matrix supplier quotation/WS mismatch");
  return <section className="p55-panel" data-component-key={workingRow.moduleId+".financial-identity"}
   style={{padding:12,marginTop:12}}>
-  <p className="p55-note">24-Oct selected basis: SAMTEL Warehouse Thailand. THB307125 is retained
-   integration/facility funding benchmarked on the existing MGW quote; no MGW award or agreed credit.
-   Local scope/rate allocation and OEM/customer FAT acceptance remain open.</p>
+  <p className="p55-note">SAMTEL Warehouse FAT: ADDVALUE labour, local transfers and work insurance only. No purchased supplier FAT or facility reserve.</p>
   <h4>{code} — Financial Identity / Price Authority (SOW · VQ · IC · WS · CP)</h4>
   <p className="p55-note">Contract B-code and technical Module ID remain unchanged.
    The table does not recalculate or post any cost/SELL. Missing VQ or verified IC is NOT zero.

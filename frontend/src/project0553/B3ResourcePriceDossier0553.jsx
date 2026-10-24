@@ -24,9 +24,9 @@ export function B3ResourcePriceDossier0553({workingRow}){
   </div>
   <div className="p55-metric-grid">
    <div><strong>Selected B3 Working SELL · 10.2 → 10.3/10.5</strong>
-    <p>{cash(model.pricedWorkingSellTHB)}</p><small>37 labour/service/rental price lines. Includes Conditional BF Labour, but NO new physical travel approval.</small></div>
+    <p>{cash(model.pricedWorkingSellTHB)}</p><small>35 source labour/expense/rental rows (5 travel rows excluded). Includes Conditional BF Labour, but NO new physical travel approval.</small></div>
    <div><strong>Actual Paid Direct Cost</strong><p>NOT ESTABLISHED</p>
-    <small>MGW Vendor Quotation is a PURCHASE PRICE SOURCE, not verified invoice/payment</small></div>
+    <small>Working SELL rates are estimates; payroll and paid expenses remain unverified</small></div>
    <div><strong>Current physical people × days (GF Yard / Offshore)</strong><p>TO VERIFY</p>
     <small>No approved ADDVALUE RACI, deployment or cash cost</small></div>
    <div><strong>Commercial Release</strong><p>HOLD</p>
@@ -35,21 +35,9 @@ export function B3ResourcePriceDossier0553({workingRow}){
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Financial layer / authority</th><th>Amount THB</th><th>Posting / decision</th></tr></thead>
    <tbody>
-    <tr><td>MGW Vendor Quotation COST basis · SERV-2 + SERV-4 · USD 7,500</td>
-     <td><strong>{cash(model.vendorQuoteMarkupBridge.supplierQuoteTHB)}</strong></td>
-     <td>VQ-MGW supplier quotation; NOT actual paid direct cost</td></tr>
-    <tr><td>SAMTEL markup on MGW quote · 20%</td><td>{cash(model.vendorQuoteMarkupBridge.samtel20PctTHB)}</td>
-     <td>MGW purchased-service price bridge only</td></tr>
-    <tr><td>ADDVALUE markup on MGW quote · 5%</td><td>{cash(model.vendorQuoteMarkupBridge.addvalue5PctTHB)}</td>
-     <td>Not an incremental invoice cost</td></tr>
-    <tr><td>Omission reserve on MGW quote · 5%</td><td>{cash(model.vendorQuoteMarkupBridge.reserve5PctTHB)}</td>
-     <td>Do not apply the ordinary B 5% deduction again</td></tr>
-    <tr><th>SAMTEL FAT service reserve Working SELL · selected once</th>
-     <th>{cash(model.vendorQuoteMarkupBridge.selectedWorkingSellTHB)}</th>
-     <th>WS-B3, CP-B3 NOT ISSUED</th></tr>
     <tr><td>Base selected B3 Working SELL excluding conditional BF revisit labour</td>
      <td>{cash(model.financialLayers.selectedBaseExcludingBFConditionalTHB)}</td>
-     <td>MGW FAT + ADDVALUE SAMTEL FAT + SAT28 + VeEX; Actual COST NOT ESTABLISHED</td></tr>
+     <td>ADDVALUE SAMTEL FAT + SAT28 + VeEX; Actual COST NOT ESTABLISHED</td></tr>
     <tr><td>BF Site Survey conditional labour allowance · 3 onsite + 2 travel team-days</td>
      <td>{cash(model.financialLayers.includedBFConditionalBudgetAllowanceTHB)}</td>
      <td>INCLUDED in pre-award working budget once; NO approved physical revisit</td></tr>
@@ -60,12 +48,10 @@ export function B3ResourcePriceDossier0553({workingRow}){
   </table></div>
   <p className="p55-note"><strong>อ่านตารางนี้อย่างไร:</strong>
    คอลัมน์ Working SELL คือยอดขายที่อยู่ในฐาน 10.2 แล้วเฉพาะรายการระบุ INCLUDED;
-   Supplier Quotation แสดงราคาซื้อก่อนบวก 20%+5%+5% (เฉพาะ MGW);
+   ไม่มีค่าบริการ FAT หรือค่าสถานที่จากผู้ขายอุปกรณ์ในยอดปัจจุบัน;
    Actual Direct Cost ที่ยังไม่มีใบจ่าย/Payroll ให้แสดง NOT ESTABLISHED ไม่ตีว่าเป็นศูนย์.
    Site/MR Test IDs ไม่ใช่รายการราคาซ้ำ.</p>
-  <p className="p55-note">24-Oct selected basis: SAMTEL Warehouse Thailand. THB307125 is retained
-   integration/facility funding benchmarked on the existing MGW quote; no MGW award or agreed credit.
-   Local scope/rate allocation and OEM/customer FAT acceptance remain open.</p>
+  <p className="p55-note">FAT ที่ SAMTEL Warehouse: ค่าแรง ADDVALUE + การเดินทางในพื้นที่ + ประกันการทำงาน ไม่มีค่าซื้อบริการหรือสำรองค่าสถานที่จากผู้ขายอุปกรณ์ ค่าใช้จ่ายสถานที่/เครื่องมือเพิ่มเติมยังต้องแยกหลักฐาน ไม่ถือว่าฟรีหรือรวมแล้ว</p>
   <h4>B3 — Grouped Work Type / Source-to-Release (10.2 → 10.3 → 10.5)</h4>
   <p className="p55-note">Select a colour-coded Work Type to drill down into Site → MR/Activity → Role × Days × Rate.
    Prices in these four headers are an attribution of the SAME WS-B3 1 LS amount, NOT four new customer quotation lines.
@@ -98,6 +84,10 @@ export function B3ResourcePriceDossier0553({workingRow}){
    {rollup.sourceStageIndices.map(i=>{
    const g=model.groups[i];
    const gid=root+".group."+String(i+1).padStart(2,"0");
+   if(i===0&&!g.rows.length)return <details key={gid} data-component-key={gid} className="p553-b3-dossier-group">
+    <summary>บริการ FAT ภายนอก — ยกเลิกจากยอดปัจจุบัน</summary>
+    <p data-component-key={gid+".site.01"}>ไม่เลือกซื้อบริการ integration/FAT หรือสถานที่จากผู้ขายอุปกรณ์ รายการนี้ไม่รวมใน B3</p>
+   </details>;
    const active=i<5;
    const surveyConditional=i===4;
    const sites=[...new Set(g.rows.map(x=>x.site||"Shared"))];
@@ -199,7 +189,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
       not a transfer of the entire B3 Yard SAT. B9 source price details:
       {" "}<code>bid.budget.working.bc.b9.price-trace.work-scope</code>.
       B9's 7+2 paid Senior days and related expenses belong to WS-B9 1 LS only,
-      never to these 14 unpriced B3 Yard Test IDs. MGW Factory FAT remains a separate B3 event.</p>}
+      never to these 14 unpriced B3 Yard Test IDs. SAMTEL local FAT is the selected B3 event.</p>}
      {i===6&&<p className="p55-note">SPE §7.3.3: GF offshore commissioning after installation.
       ADDVALUE crew, mobilization, vessel/POB and RF/RACON support require separate priced evidence and signed RACI.</p>}
     </div>
@@ -220,7 +210,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
   </table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Selected Working SELL reconciliation</th><th>Amount THB</th><th>Cost status / Receiver</th></tr></thead>
-   <tbody>{model.groups.slice(0,5).map((g,i)=><tr key={i}>
+   <tbody>{model.groups.slice(0,5).map((g,i)=>g.rows.length>0&&<tr key={i}>
     <td>B3.R{i+1} — {g.name}</td><td>{cash(g.selectedWorkingSellTHB)}</td>
     <td>Included WS-B3 once / Actual Cost NOT ESTABLISHED</td>
    </tr>)}

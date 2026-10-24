@@ -201,7 +201,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
     <td>{control&&<small><strong>{control.financialIdentity.scopeId}</strong> Scope ·
      <strong> {control.financialIdentity.workingSellId}</strong> Working SELL ·
      <strong> {control.financialIdentity.customerProposalId}</strong> NOT ISSUED
-     {Number.isFinite(control.financialIdentity.mgwPurchasedWorkingSellTHB)&&
+     {control.financialIdentity.mgwPurchasedWorkingSellTHB>0&&
       " · VQ-MGW-SERV-2 / SERV-4 supplier quotation → WS-B3 MGW Purchased THB "+
        control.financialIdentity.mgwPurchasedWorkingSellTHB.toLocaleString("en-US")}</small>}
      {currentRows?<><strong>{id.startsWith("C")?"OPTION / NOT QUOTED":"CURRENT PARAMETRIC WORKING SELL / UNQUOTED"}</strong><small>{currentRows.length} current Annex rows · Source: {control?.sourceModuleId} · OEM SKU / SPIR / Ex / DDP OPEN · {control?.priceStatus}</small>

@@ -28,8 +28,8 @@ const copyInSummary=id=><span className="p553-b3-table-copy"
  </span>;
 const qtyUnit=row=>row.qty===null?"—":row.qty.toLocaleString("en-US")+" "+(row.unit||"");
 const rateSource=row=>row.unitRateTHB===null?"":money(row.unitRateTHB)+" / "+(row.unit||"unit");
-const gridColumns=Object.freeze(["No.","Work Type / Module ID","Qty / Rate","MGW Quote USD",
- "MGW Source THB","Historical / Scenario / Audit THB","B3 Working SELL THB","Treatment / Owner"]);
+const gridColumns=Object.freeze(["No.","Work Type / Module ID","Qty / Rate","Supplier Quote USD",
+ "Supplier Source THB","Historical / Scenario / Audit THB","B3 Working SELL THB","Treatment / Owner"]);
 function TablePriceCells0553({row,number,title,isGroup=false,fx}){
  const quote=Number.isFinite(row.vendorQuoteUSD)?row.vendorQuoteUSD:null;
  const sourceThb=quote===null?null:Math.round((quote*fx+Number.EPSILON)*100)/100;
@@ -68,41 +68,8 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
  const sat=workingRow.b3FortyDayBudget,fat=workingRow.b3ChinaFatBudget,veex=sat.veex;
  const selected=workingRow.b3SelectedSatSurveyBudget;
  switch(suffix){
-  case "mgw-r2-cover-20261020":{
-   const m=workingRow.b3MgwPurchasedFatWorkingSell;
-   if(!m||m.selectedIncrementalWorkingSellTHB!==307125)
-    throw Error("MGW purchased FAT supplier Working SELL evidence missing");
-   return <>
-    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-     <thead><tr><th>Purchased Service / Vendor Quote</th><th>Original Supplier USD</th>
-      <th>Quotation Cost THB</th><th>WS-B3 Quotation SELL THB</th><th>Posting / Owner</th></tr></thead>
-     <tbody>{m.quoteLines.map(x=><tr key={x.serviceId}>
-      <td><strong>{x.vendorQuoteId}</strong><small>{x.description}</small></td>
-      <td>{usd(x.quotedAmountUSD)}</td><td>{money(x.quotedCostTHB)}</td>
-      <td>Part of {money(m.selectedIncrementalWorkingSellTHB)} including cost markup</td>
-      <td>IC-FAT-MGW-SERV-2-4 / SOW-B3 · no Part A duplication</td></tr>)}
-      <tr><td><strong>Source MGW Vendor Quotation / Purchased Base</strong></td>
-       <td>{usd(m.vendorPurchasedQuoteUSD)}</td>
-       <td><strong>{money(m.vendorPurchasedQuoteTHB)}</strong></td>
-       <td>PRE-AWARD / Working SELL</td><td>Quoted source ≠ Paid Direct Cost</td></tr>
-      <tr><td>Commercial: SAMTEL 20%</td><td>—</td><td>—</td>
-       <td>{money(m.samTelMarkupTHB)}</td><td>Applied to MGW quoted Cost ONCE</td></tr>
-      <tr><td>Commercial: ADDVALUE 5%</td><td>—</td><td>—</td>
-       <td>{money(m.addvalueMarkupTHB)}</td><td>Applied to MGW quoted Cost ONCE</td></tr>
-      <tr><td>Commercial: Omission Reserve 5%</td><td>—</td><td>—</td>
-       <td>{money(m.omissionReserveTHB)}</td><td>Cost allowance / non-duplicated</td></tr>
-      <tr><td colSpan={3}><strong>WS-B3 — SAMTEL service reserve — MGW quotation benchmark</strong></td>
-       <td><strong>{money(m.selectedIncrementalWorkingSellTHB)}</strong></td>
-       <td>CP-B3 NOT ISSUED / release HOLD</td></tr>
-     </tbody></table></div>
-    <MgwR2CommercialCover0553 code="B3" purchasedWorkingSell={m}/>
-    <p className="p55-note"><strong>Commercial rule:</strong> MGW Item 3/4 purchased-service quotation
-     is included ONCE in WS-B3 under the 20% SAMTEL + 5% ADDVALUE + 5% Omission
-     cost markup. **DO NOT** apply the standard Part B 5% SAMTEL deduction again
-     on this purchased portion. Quoted cost is not a paid invoice; Part A double-
-     inclusion and payer/RACI must be cleared before Customer Release.</p>
-   </>;
-  }
+  case "mgw-r2-cover-20261020":
+   return <p>บริการ FAT ภายนอกถูกยกเลิกจาก B3; ผู้ขายอุปกรณ์ไม่มีบทบาทดำเนินการ FAT</p>;
   case "revk-china-budget":
    return <B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell} workingRow={workingRow}/>;
   case "fat-owner-transfer":
@@ -110,9 +77,7 @@ function B3DetailContents0553({item,workingRow,b8Row,navigationTarget,auditConte
     <MgwPaulVendorClarifications0553 code="B3"/>
     {workingRow.b3FatOwnerTransfer&&<section className="p55-panel"
      data-component-key={ROOT+".fat-owner-transfer"} style={{padding:12,marginTop:12}}>
-     <p className="p55-note">24-Oct selected basis: SAMTEL Warehouse Thailand. THB307125 is retained
-   integration/facility funding benchmarked on the existing MGW quote; no MGW award or agreed credit.
-   Local scope/rate allocation and OEM/customer FAT acceptance remain open.</p>
+     <p className="p55-note">SAMTEL Warehouse FAT: ADDVALUE labour, local transfers and work insurance only. No purchased supplier FAT or facility reserve.</p>
   <h4>B3 — FAT Cost Owner Reconciliation / Rev05</h4>
      <p className="p55-note">Rev05 Bangkok FAT
       <strong> {money(workingRow.b3FatOwnerTransfer.amountTHB)}</strong> is
@@ -228,11 +193,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
     <p className="p55-note">Module ID: {copyInSummary(model.moduleId)}.
      All B3.1–B3.4 and child prices visible BEFORE expanding. Click ＋ / −
      to inspect details, source expense lines and cost ownership.</p>
-    <p className="p55-note"><strong>Canonical B3 Working SELL {money(model.totalWorkingSellTHB)}</strong>;
-     MGW FAT supplier quote {usd(model.supplierFatReferenceUSD)} =
-     {money(model.supplierFatReferenceTHB)} at FX {model.supplierFxTHBPerUSD}
-     (PURCHASED COST BASIS; cost ×1.30 is already included ONCE in the B3 Working SELL);
-     old Bangkok FAT is HISTORICAL. Direct Cost NOT ESTABLISHED · RELEASE HOLD.</p>
+    <p className="p55-note"><strong>Canonical B3 Working SELL {money(model.totalWorkingSellTHB)}</strong>; ADDVALUE local FAT, BF Survey, SAT and temporary tools only. Actual Direct Cost NOT ESTABLISHED.</p>
     <p className="p55-note"><strong>Source-verified split:</strong>
      BOD Rev.C2 §8 already records prior surveys of ZPQ/ZWP8/ZWP11;
      any new ADDVALUE BF visit is conditional, not a scheduled 7-site Survey.
@@ -285,7 +246,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
             <div className="p553-b3-table-expanded">
              <p className="p55-note">Module ID: {copyInSummary(item.moduleId)} ·
               <strong> Price Class: {item.priceClass}</strong>.
-              Vendor supplier quotations are purchase COST EVIDENCE; only MGW SERV-2/4
+              Vendor supplier quotations are purchase COST EVIDENCE; no withdrawn supplier service
               selected through WS-B3 at 20+5+5 are priced. Historical/audit
               references NEVER add new Working SELL.</p>
              {item.supplierRows.length>0&&<div className="p55-table-wrap">
@@ -321,7 +282,7 @@ export function B3WorkTypeAccordion0553({workingRow,navigationTarget=null,auditC
   </div>
   <p className="p55-note"><strong>Price calculation rule:</strong>
    Working SELL sums INCLUDED_WORKING_SELL plus PURCHASED_SERVICE_WORKING_SELL once.
-   MGW Supplier Quote USD is the purchased cost basis (NOT extra SELL), while
+   Supplier quotations, if selected, are cost evidence;
    historical and Audit mirror THB are separate non-additive reference columns. A future B3 Module MUST declare Module ID, Qty/Rate,
    Cost Owner, Price Class, source evidence and content renderer; the
    normalized table rejects extra/unreconciled postings.</p>

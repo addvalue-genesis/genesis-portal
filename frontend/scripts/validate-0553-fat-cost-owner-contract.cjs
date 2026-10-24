@@ -70,6 +70,6 @@ assert(ownerDetail.includes('workingRow?.code==="B3"')&&
  !ownerDetail.includes("2046000+total+purchasedFatSell"),
  "FAT detail FULL B3 must read canonical WS-B3 and never use historical 40-day base");
 assert(ownerDetail.includes("purchasedServices?.selectedIncrementalWorkingSellTHB")&&
- ownerDetail.includes("vendorPurchasedQuoteUSD!==7500"),
+ ownerDetail.includes("vendorPurchasedQuoteUSD!==0"),
  "FAT detail must distinguish MGW quoted supplier cost from the ADDVALUE witness amount");
 console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB263700), B9 Yard conditional THB480550; B9 1 LS in Base; Actual Direct COST unverified and non-posting.");

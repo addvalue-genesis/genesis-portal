@@ -1,0 +1,59 @@
+{
+  "priorReviewedCommit": "c6699aca5b31be64d8d5a8eba93d48c3fa90f6bf",
+  "status": "WORKING_DRAFT_MGW_EQUIPMENT_ONLY_NOT_CUSTOMER_APPROVED",
+  "a": [
+    {
+      "code": "A1",
+      "previewCostTHB": 5840703.18,
+      "previewSellTHB": 7592914.13
+    },
+    {
+      "code": "A2",
+      "previewCostTHB": 3318837,
+      "previewSellTHB": 4314488.1
+    },
+    {
+      "code": "A3",
+      "previewCostTHB": 828000,
+      "previewSellTHB": 1076400
+    },
+    {
+      "code": "A4",
+      "previewCostTHB": 7087500,
+      "previewSellTHB": 9213750
+    }
+  ],
+  "b": {
+    "B1": 211600,
+    "B2": 237121.13,
+    "B3": 2133300,
+    "B4": null,
+    "B5": 311184,
+    "B6": 307584,
+    "B7": 30000,
+    "B8": 151550,
+    "B9": 480550,
+    "B10": 509827.5,
+    "B11": 157657.5,
+    "B12": null,
+    "B13": 46683,
+    "B14": null,
+    "C1": null,
+    "C2": null
+  },
+  "summary": {
+    "aProvisionalCostTHB": 17075040.18,
+    "aProvisionalCustomerSellTHB": 22197552.23,
+    "aProvisionalSamTelShareTHB": 3415008.04,
+    "aProvisionalAddvalueTargetProfitTHB": 853752.01,
+    "aProvisionalReserveTHB": 853752.01,
+    "bProvisionalCustomerSellTHB": 4577057.13,
+    "bProvisionalSamTelDeductionTHB": 228852.87,
+    "bProvisionalNetReceivableTHB": 4348204.26,
+    "bVerifiedCostTHB": null,
+    "bProfitTHB": null,
+    "cOptionalCustomerSellTHB": null,
+    "baseCustomerSellTHB": null,
+    "addvalueRealizedProfitTHB": null
+  }
+}

@@ -23,20 +23,20 @@ const Host=get("BcCostEvidenceDetail0553.jsx").BcCostEvidenceDetail0553;
 const bc=working(),b3=bc.byCode.B3,before=JSON.stringify(bc),m=dossier(b3);
 assert.equal(m.moduleId,"bid.budget.working.bc.b3.resource-price-dossier");
 assert.equal(m.groups.length,8);
-assert.equal(m.priceRowCount,37);
-assert.deepEqual(m.groups.map(x=>x.rowCount),[2,8,18,1,8,14,14,2]);
+assert.equal(m.priceRowCount,35);
+assert.deepEqual(m.groups.map(x=>x.rowCount),[0,8,18,1,8,14,14,2]);
 assert.deepEqual(m.groups.map(x=>x.selectedWorkingSellTHB),
- [307125,263700,1587600,30000,252000,0,0,0]);
-assert.equal(m.pricedWorkingSellTHB,2440425);
-assert.equal(m.vendorQuoteCostTHB,236250);
+ [0,263700,1587600,30000,252000,0,0,0]);
+assert.equal(m.pricedWorkingSellTHB,2133300);
+assert.equal(m.vendorQuoteCostTHB,0);
 assert.deepEqual(m.vendorQuoteMarkupBridge,{
- supplierQuoteTHB:236250,samtel20PctTHB:47250,
- addvalue5PctTHB:11812.5,reserve5PctTHB:11812.5,
- selectedWorkingSellTHB:307125,verifiedPaidDirectCostTHB:null
+ supplierQuoteTHB:0,samtel20PctTHB:0,
+ addvalue5PctTHB:0,reserve5PctTHB:0,
+ selectedWorkingSellTHB:0,verifiedPaidDirectCostTHB:null
 });
-assert.equal(m.financialLayers.selectedBaseExcludingBFConditionalTHB,2188425);
+assert.equal(m.financialLayers.selectedBaseExcludingBFConditionalTHB,1881300);
 assert.equal(m.financialLayers.includedBFConditionalBudgetAllowanceTHB,252000);
-assert.equal(m.financialLayers.selectedWorkingBudgetPreviewTHB,2440425);
+assert.equal(m.financialLayers.selectedWorkingBudgetPreviewTHB,2133300);
 assert.equal(m.financialLayers.selectedBaseExcludingBFConditionalTHB+
  m.financialLayers.includedBFConditionalBudgetAllowanceTHB,m.pricedWorkingSellTHB);
 assert.equal(m.financialLayers.conditionalBFPhysicalExecutionApproved,false);
@@ -53,12 +53,12 @@ assert.equal(m.actualPaidDirectCostTHB,null);
 assert.equal(m.customerReleaseAllowed,false);
 const paid=m.groups.slice(0,5).flatMap(g=>g.rows);
 const notPaid=m.groups.slice(5).flatMap(g=>g.rows);
-assert.equal(paid.length,37);assert.equal(notPaid.length,30);
+assert.equal(paid.length,35);assert.equal(notPaid.length,30);
 assert(paid.every(x=>Number.isFinite(x.workingSellTHB)&&(x.workingSellTHB>0||(x.workingSellTHB===0&&x.sourceType==="SUPERSEDED_CHINA_TRIP_NONPOSTING"))&&
  x.actualDirectCostTHB===null&&x.postingClass==="INCLUDED_SELECTED_B3_WORKING_SELL"));
 assert(notPaid.every(x=>x.workingSellTHB===null&&x.actualDirectCostTHB===null&&
  x.postingClass!=="INCLUDED_SELECTED_B3_WORKING_SELL"));
-assert.equal(new Set([...paid,...notPaid].map(x=>x.id)).size,67);
+assert.equal(new Set([...paid,...notPaid].map(x=>x.id)).size,65);
 const sat=m.groups[2].rows;
 assert.equal(new Set(sat.map(x=>x.site)).size,9);
 assert.equal(new Set(sat.map(x=>x.role)).size,2);
@@ -73,14 +73,14 @@ assert(sat.every(x=>x.people===1&&x.unit==="person-day"&&x.fxTHBPerUSD===31.5&&
  x.workingSellTHB===x.qty*x.unitRateTHB&&!x.stageAllocationConfirmed));
 assert.equal(sat.reduce((n,x)=>n+x.workingSellTHB,0),1587600);
 const quote=m.groups[0].rows;
-assert.deepEqual(quote.map(x=>x.rateUSDPerUnit),[5000,2500]);
-assert.deepEqual(quote.map(x=>x.quotedVendorCostTHB),[157500,78750]);
-assert.deepEqual(quote.map(x=>x.workingSellTHB),[204750,102375]);
+assert.deepEqual(quote.map(x=>x.rateUSDPerUnit),[]);
+assert.deepEqual(quote.map(x=>x.quotedVendorCostTHB),[]);
+assert.deepEqual(quote.map(x=>x.workingSellTHB),[]);
 assert.equal(m.groups[1].rows.reduce((n,x)=>n+x.workingSellTHB,0),263700);
 assert.deepEqual(m.onshoreFatPaidRoleTrace.map(x=>[x.usdPerMD,x.onsiteMD,x.travelMD,x.workingSellTHB]),
  [[700,6,0,132300],[600,6,0,113400]]);
-assert.deepEqual(m.groupRollups.map(g=>g.selectedWorkingSellTHB),[570825,252000,1587600,30000]);
-assert.equal(m.rollupTotalTHB,2440425);
+assert.deepEqual(m.groupRollups.map(g=>g.selectedWorkingSellTHB),[263700,252000,1587600,30000]);
+assert.equal(m.rollupTotalTHB,2133300);
 assert.equal(m.groupAttributionOnly,true);
 assert(m.groupRollups.every(g=>g.independentPostingAllowed===false&&g.releaseAllowed===false));
 assert.equal(m.groups[3].rows[0].qty,30);
@@ -96,27 +96,27 @@ assert(m.groups[4].rows.every(x=>x.postingClass==="INCLUDED_SELECTED_B3_WORKING_
 assert(m.groups[5].rows.every(x=>x.people===null&&x.teamDays===null&&x.unitRateTHB===null));
 assert(m.groups[6].rows.every(x=>x.people===null&&x.teamDays===null&&x.unitRateTHB===null));
 const r=release.buildReleaseCommercialModel0553();
-assert.equal(r.b.find(x=>x.code==="B3").workingSellTHB,2440425);
-assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2440425);
+assert.equal(r.b.find(x=>x.code==="B3").workingSellTHB,2133300);
+assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2133300);
 assert.equal(r.b.find(x=>x.code==="B3").actualCostTHB,null);
 assert.equal(r.b.find(x=>x.code==="B3").releaseAllowed,false);
 assert.deepEqual(r.b.find(x=>x.code==="B3").b3GroupTrace.map(g=>g.workingSellTHB),
- [570825,252000,1587600,30000]);
+ [263700,252000,1587600,30000]);
 assert(r.b.find(x=>x.code==="B3").b3GroupTrace.every(g=>!g.additionalCustomerLineAllowed));
 const sc=scope();
-assert.equal(sc.lines.B3.workingSellTHB,2440425);
+assert.equal(sc.lines.B3.workingSellTHB,2133300);
 assert.deepEqual(sc.lines.B3.b3GroupTrace.map(g=>g.scopeWorkingSellAttributionTHB),
- [570825,252000,1587600,30000]);
+ [263700,252000,1587600,30000]);
 assert(sc.lines.B3.b3GroupTrace.every(g=>!g.additionalCustomerRowAllowed));
 assert.equal(sc.lines.B3.directCostTHB,null);
 assert.equal(sc.lines.B3.financialIdentity.customerProposalState,"NOT_ISSUED_RELEASE_HOLD");
 const html=renderToStaticMarkup(React.createElement(DossierUI,{workingRow:b3}));
 const host=renderToStaticMarkup(React.createElement(Host,{workingRow:b3}));
-for(const token of ["resource-price-dossier","SAMTEL integration/FAT service reserve","SAMTEL Warehouse FAT",
+for(const token of ["resource-price-dossier","บริการ FAT ภายนอก","SAMTEL Warehouse FAT",
  "Selected SAT/SIT 28 Team-days","Fabrication Yard SAT","Offshore Vendor Commissioning",
- "1,587,600.00","307,125.00","263,700.00","30,000.00",
- "2,440,425.00","236,250.00","252,000.00","NOT ESTABLISHED",
- "2,188,425.00","47,250.00","11,812.50","BF Survey — additional actual cash expense",
+ "1,587,600.00","263,700.00","30,000.00",
+ "2,133,300.00","252,000.00","NOT ESTABLISHED",
+ "1,881,300.00","BF Survey — additional actual cash expense",
  "Offshore POB","NOT INCLUDED in Base","GF FABRICATION YARD SAT",
  "MR0001","MR0002","MR0003","MR0004","Test ID:","Instruments:",
  "Qty × Unit","Expand All","Collapse All"]){
@@ -127,7 +127,7 @@ for(const g of m.groupRollups){
  assert(html.includes('data-component-key="'+g.id+'"'),"B3 group accordion missing "+g.id);
  assert(new Set(nav().map(x=>x.id)).has(g.id),"Missing B3 group Navigator deep link "+g.id);
 }
-for(const money of ["570,825.00","2,188,425.00","1,587,600.00"])
+for(const money of ["263,700.00","1,881,300.00","1,587,600.00"])
  assert(html.includes(money),"Missing visible selected group price "+money);
 const entries=new Set(nav().map(x=>x.id));
 const rootId=m.moduleId;
@@ -156,5 +156,5 @@ assert.equal(htmlIds.length,new Set(htmlIds).size,"B3 dossier must not duplicate
 assert.equal(JSON.stringify(working()),before,"B3 dossier modified canonical source");
 assert(!html.includes("453,600.00"),"Superseded 7-site survey must NOT be a current price");
 assert(!html.includes("2,016,000.00"),"Old 40-day SAT SELL must NOT appear as current resource dossier price");
-assert.equal(bc.knownWorkingSellTHB,4884182.13);
-console.log("PASS 0553 B3 B2-style resource dossier: 37 priced (MGW2 + China FAT8 + SAT18 + VeEX1 + BF Survey8) detailed person-day/qty/rate lines = WS-B3 THB2440425; BF conditional/4 GF Yard/4 Offshore cost TBD nonposting; 10.3/10.5 B3 trace equal/Release HOLD; 67 unique cost-evidence rows (14 GF Yard + 14 GF Offshore Site/MR), zero new postings.");
+assert.equal(bc.knownWorkingSellTHB,4577057.13);
+console.log("PASS 0553 b3-resource-price-dossier: current-source checks passed; B3 2,133,300.00 / Part B 4,577,057.13; no selected MGW FAT services; historical evidence nonposting.");

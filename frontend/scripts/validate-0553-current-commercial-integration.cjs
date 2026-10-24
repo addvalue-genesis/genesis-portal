@@ -26,28 +26,28 @@ for(const line of release.b){
  assert.equal(line.workingSellTHB,owner.workingSellTHB,"Release must read selected 10.2 "+line.code);
  assert.equal(line.customerSellTHB,owner.workingSellTHB,"Release B must not reprice selected "+line.code);
 }
-assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2440425,
+assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2133300,
  "User-selected SAT 28 + BF Survey 3+2 working budget must project once to Release, risk days excluded");
-for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2440425,B8:151550,B9:480550})){
+for(const [code,amount] of Object.entries({B1:211600,B2:237121.13,B3:2133300,B8:151550,B9:480550})){
  assert.equal(by[code].workingSellTHB,amount,"Canonical current "+code+" sell mismatch");
  assert.equal(scope.lines[code].workingSellTHB,amount,"Customer Scope/10.2 "+code+" divergence");
  assert.equal(by[code].directCostTHB,null,"Unverified direct cost posted to "+code);
 }
-assert.equal(budget.knownWorkingSellTHB,4884182.13);
+assert.equal(budget.knownWorkingSellTHB,4577057.13);
 assert.equal(abc.partBBaseTHB,budget.knownWorkingSellTHB);
-assert.equal(abc.currentB1B3B9BaseTHB,3132575); // current B1 211600 + B3 2440425 + B9 480550
+assert.equal(abc.currentB1B3B9BaseTHB,2825450); // current B1 211600 + B3 2133300 + B9 480550
 assert.equal(abc.postedWorkingSellDeltaTHB,0);
 assert.equal(abc.b9YardConditionalLumpSumTHB,480550);
 assert.equal(abc.b3FatWitnessSellTHB,263700);
-assert.equal(by.B3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,7500);
-assert.equal(by.B3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB,236250);
-assert.equal(by.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
+assert.equal(by.B3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,0);
+assert.equal(by.B3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB,0);
+assert.equal(by.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,0);
 assert.equal(by.B3.b3SelectedSatSurveyBudget.satWorkingSellTHB,1587600);
 assert.equal(by.B3.b3SelectedSatSurveyBudget.siteSurveyWorkingSellTHB,252000);
 assert.equal(by.B3.b3SelectedSatSurveyBudget.riskTeamDaysNotIncluded,2);
-assert.equal(release.b.find(x=>x.code==="B3").samTelPurchased20PctCostShareTHB,47250);
+assert.equal(release.b.find(x=>x.code==="B3").samTelPurchased20PctCostShareTHB,0);
 assert.equal(release.b.find(x=>x.code==="B3").samTelOrdinaryB5PctDeductionTHB,106665);
-assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,153915);
+assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,106665);
 assert.equal(abc.b9FatBaseTHB,0);
 assert.ok(by.B3.b3ChinaFatBudget.rows.filter(x=>!x.optional).every(x=>x.costOwner==="B3"));
 assert.ok(by.B9.b9ChinaBudget.rows.filter(x=>x.optional).every(x=>x.costOwner==="B9"));
@@ -83,4 +83,4 @@ assert(workType.includes("<B3SiteMrSatCoverage0553 workingRow={workingRow}/>"),"
 assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell} workingRow={workingRow}/>'),"China FAT witness must receive canonical WS-B3 owner for full total");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(workspace.includes("<RevKAbcOwnershipControl0553 working={bcWorking}/>"),"CFO current ABC not mounted");
-console.log("PASS PJ2608-0553 FULL 10.2/10.5: B1 211,600 B3 2,440,425 (MGW purchased 307,125 + China witness 263,700 included) B9 Base 480,550, execution on written call-out, Part B 4,884,182.13; seven-site 21 test groups, six-day FAT; 7 JSX parse valid.");
+console.log("PASS 0553 current-commercial-integration: current-source checks passed; B3 2,133,300.00 / Part B 4,577,057.13; no selected MGW FAT services; historical evidence nonposting.");

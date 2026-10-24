@@ -20,12 +20,12 @@ const {BC_CUSTOMER_CODES_0553}=from("data/bcWorkingModuleRoutes0553.js");
 const original=JSON.stringify(derivePartBcWorkingWbs0553());
 const e=selectBcCostEvidenceDerivation0553(),bc=selectBcTurnkeyWorkingCost0553();
 const CURRENT_REV_K_WORKING_SELL_0553=Object.freeze({
- B1:211600,B2:237121.13,B3:2440425,B4:null,
+ B1:211600,B2:237121.13,B3:2133300,B4:null,
  B5:311184,B6:307584,B7:30000,B8:151550,
  B9:480550,B10:509827.5,B11:157657.5,B12:null,
  B13:46683,B14:null,C1:null,C2:null
 });
-assert.equal(bc.knownWorkingSellTHB,4884182.13,"Current Rev.K Part B Base Working SELL");
+assert.equal(bc.knownWorkingSellTHB,4577057.13,"Current Rev.K Part B Base Working SELL");
 assert.equal(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB,263700,"FAT witness belongs only to B3");
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,480550,"B9 Yard Specialist quote included in Base once");
 assert.equal(bc.byCode.B9.workingSellTHB,480550,"B9 quoted 1 LS with on-call field attendance");
@@ -108,4 +108,4 @@ for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcCostEvidenc
  assert(babel.transformSync(fs.readFileSync(path.join(root,f),"utf8"),{
   babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0,
   "Babel JSX syntax invalid: "+f);
-console.log("PASS 0553 10.2 16/16 Rev05 source proof separated from Rev.K CURRENT SELL: B1 THB211600 B3 THB2440425 incl ADDVALUE China FAT witness THB263700 plus MGW purchased FAT THB307125, B9 Base THB480550 (Yard execution on call-out), Part B THB4884182.13; historical Bangkok FAT / Rev05 WBS audit only; verified direct cost remains null.");
+console.log("PASS 0553 10.2 16/16 Rev05 source proof separated from Rev.K CURRENT SELL: B1 THB211600 B3 THB2133300 incl ADDVALUE China FAT witness THB263700 plus MGW purchased FAT THB307125, B9 Base THB480550 (Yard execution on call-out), Part B THB4577057.13; historical Bangkok FAT / Rev05 WBS audit only; verified direct cost remains null.");

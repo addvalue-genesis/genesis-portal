@@ -56,7 +56,7 @@ const customerRequirements=Object.freeze({
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
 const executionDecisionByCode=Object.freeze({
- B3:"B3 retains integration/facility reserve benchmarked on MGW SERV-2/4 20+5+5; SAMTEL FAT labour, SAT 28d and BF Survey 3+2d, temporary VeEX; GF Yard/Offshore RACI open; no duplicate Part A/B9",
+ B3:"B3 has no purchased supplier FAT or facility reserve; ADDVALUE SAMTEL FAT labour, SAT 28d and BF Survey 3+2d, temporary VeEX; GF Yard/Offshore RACI open; no duplicate Part A/B9",
  B6:"Owner selects SAMTEL Warehouse Thailand FAT/Training and CIF Zhuhai Port. B6 allowance retained pending supported leg-level costing; no assumed vendor credit; B5 packing/B3 testing/B7 storage separate.",
  B9:"Specialist field assistance: Senior Telecom Engineer USD700 + Field Telecom Technician USD600; 7 Yard days + 2 travel days EACH, B9 1 LS; physical call-out conditional. CCL Item31 18 Yard / 45 Offshore day scope not revised; coverage RACI OPEN. SAMTEL FAT labour remains B3."
 });
@@ -294,7 +294,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   return sum+item.workingSellTHB;
  },0));
  if(Math.abs(knownWorkingSellTHB-expectedCurrentBaseTHB)>0.01 ||
-    knownWorkingSellTHB!==4884182.13 ||
+    knownWorkingSellTHB!==4577057.13 ||
     rows.find(x=>x.code==="B2")?.workingSellTHB!==b2CurrentSellTHB ||
     b1Current.baseWorkingSellTHB!==211600 ||
     b1Current.historicalEngineeringCarryForwardTHB!==0 ||

@@ -15,7 +15,7 @@ export function B3WorkingSellBreakdown0553({workingRow}){
    และ §7.3.3 แยก GF Offshore Commissioning หลังติดตั้ง.
    <strong>SAT 28 Team-days / 56 MD + BF Site Survey 3 field +2 travel Team-days / 10 MD เป็น Working Budget ปัจจุบัน; 40d อยู่ใน Historical Audit เท่านั้น.</strong>
    GF Yard/Offshore ADDVALUE people/days และ BF revisit ยังไม่มีอนุมัติหรือ Verified Direct Cost.</p>
-  <p className="p55-note"><strong>ราคาใน B3 นี้เป็น Working SELL ไม่ใช่ Direct Cost.</strong> B3 ครอบคลุม Local Integration / FAT Facility Reserve (ต้นทุนซื้อ × 20% SAMTEL + 5% ADDVALUE + 5% Reserve), ADDVALUE SAMTEL Warehouse FAT witnesses, SAT 28 productive Team-days และ BF Survey 5 Team-days รวมทั้ง VeEX rental. ตาราง Contract Requirement กับ Site-MR SAT เป็นเอกสาร Coverage/Verification แยกต่างหาก ไม่คิดราคาบวกเพิ่ม.</p>
+  <p className="p55-note"><strong>ราคาใน B3 นี้เป็น Working SELL ไม่ใช่ Direct Cost.</strong> B3 ครอบคลุม ไม่รวมค่าซื้อบริการ FAT ภายนอก; ADDVALUE SAMTEL Warehouse FAT witnesses, SAT 28 productive Team-days และ BF Survey 5 Team-days รวมทั้ง VeEX rental. ตาราง Contract Requirement กับ Site-MR SAT เป็นเอกสาร Coverage/Verification แยกต่างหาก ไม่คิดราคาบวกเพิ่ม.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Current B3 Cost Owner / Copy ID</th><th>Price driver / Quantity</th><th>Working SELL (THB)</th><th>Pricing / Source status</th></tr></thead>
    <tbody>{m.summary.map(x=><tr key={x.id} data-component-key={m.moduleId+".component-preview."+x.id.toLowerCase()}>
@@ -32,7 +32,7 @@ export function B3WorkingSellBreakdown0553({workingRow}){
      <td><strong>{x.description}</strong><ComponentCopyId projectId="PJ2608-0553" componentKey={x.moduleId}/></td>
      <td>{x.qty} {x.unit}</td><td>{cash(x.unitRateTHB)}</td><td>{cash(x.workingSellTHB)}</td><td>{x.status}<small>{x.evidence}</small></td>
     </tr>)}
-    <tr><td colSpan={3}><strong>FAT China base · B3 only</strong></td><td><strong>{cash(m.fat.workingSellTHB)}</strong></td><td>MGW purchased services selected separately in B3.1.1; no B9 FAT duplication</td></tr>
+    <tr><td colSpan={3}><strong>SAMTEL FAT base · B3 only</strong></td><td><strong>{cash(m.fat.workingSellTHB)}</strong></td><td>Local FAT expense only; no external supplier service or B9 duplication</td></tr>
     </tbody></table></div>
   </details>
   <p className="p55-note"><strong>Scope / Commercial exclusions:</strong> {m.excluded.join(" · ")}. Selected SAT28 / BF Survey5 resource-price breakdown appears separately under <code>bid.budget.working.bc.b3.site-mr-sat-matrix</code>. Source values are read-only mirrors of the CURRENT selected B3 Working SELL. Purchased quote is priced once in B3.1; Direct Cost paid invoice and Customer Release remain unverified.</p>

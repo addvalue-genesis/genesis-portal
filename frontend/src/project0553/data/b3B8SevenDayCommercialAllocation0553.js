@@ -15,8 +15,8 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
  const src=id=>{const v=rows.find(r=>r.id==="B3-"+id);
   if(!v)throw Error("Missing current B3 source expense "+id);return v;};
  const staff=src("FAT-STAFF"),travel=src("TRAVEL-DAYS"),hotel=src("HOTEL");
- if(b3.workingSellTHB!==2440425||b8.workingSellTHB!==151550||
-  b3.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB!==307125||
+ if(b3.workingSellTHB!==2133300||b8.workingSellTHB!==151550||
+  b3.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB!==0||
   fat.fatWorkingSellTHB!==263700||rows.length!==8||
   rate.usdPerPersonDay!==600||rate.thbPerUsd!==31.5||
   staff.qty!==12||staff.unitRateTHB!==20475||
@@ -57,8 +57,8 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   travelPersonDays!==0||hotelExtraNights!==0||hotelExtraSellTHB!==0||
   trainingAssignedSellTHB!==37800||newB3FatSellTHB!==263700||
   newGrossFatTrainingTripSellTHB!==301500||
-  newB3OverallSellTHB!==2440425||newB8OverallSellTHB!==37800||
-  oldCombined!==2591975||newCombined!==2478225||
+  newB3OverallSellTHB!==2133300||newB8OverallSellTHB!==37800||
+  oldCombined!==2284850||newCombined!==2171100||
   round(newCombined-oldCombined)!==-113750||
   b3.directCostTHB!==null||b8.directCostTHB!==null)
   throw Error("B3/B8 7-day allocation math / no-extra-travel / no-double-count failed");
@@ -79,8 +79,8 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   additionalHotelSellTHB:hotelExtraSellTHB,
   b3FatWorkingSellCurrentTHB:fat.fatWorkingSellTHB,
   proposedB3FatWorkingSellTHB:newB3FatSellTHB,
-  b3CurrentFatIncludingMgwPurchasedTHB:round(fat.fatWorkingSellTHB+307125),
-  b3ProposedFatIncludingMgwPurchasedTHB:round(newB3FatSellTHB+307125),
+  b3CurrentFatIncludingMgwPurchasedTHB:round(fat.fatWorkingSellTHB+0),
+  b3ProposedFatIncludingMgwPurchasedTHB:round(newB3FatSellTHB+0),
   proposedB8TrainingWorkingSellTHB:newB8OverallSellTHB,
   b3CurrentWorkingSellTHB:b3.workingSellTHB,
   b8CurrentWorkingSellTHB:b8.workingSellTHB,
@@ -96,7 +96,7 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
   mgwQuotedIFATUSD:cover.FAT.internalFatUSD,
   mgwQuotedFatFacilityUSD:cover.FAT.facilityEndUserUSD,
   vendorQuoteAlreadyInMGWCover:true,
-  vendorMgwPurchasedSellAlreadyInCanonicalB3THB:307125,
+  vendorMgwPurchasedSellAlreadyInCanonicalB3THB:0,
   noDuplicateVendorPurchasedOnScenario:true,
   customerTrainingLocationAndTwoBatchAcceptanceConfirmed:false,
   threeDayWitnessITPAccepted:false,
