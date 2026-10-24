@@ -19,8 +19,8 @@ export function selectRevKAbcOwnershipControl0553(working){
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
  if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+0)||current.B9!==b9.b9BaseWorkingSellTHB||
-    working.knownWorkingSellTHB!==4997357.13 ||
-    working.byCode.B3?.workingSellTHB!==2562600 ||
+    working.knownWorkingSellTHB!==4757207.13 ||
+    working.byCode.B3?.workingSellTHB!==2322450 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");
  if(working.byCode.B9.qtyDriver!==1||!working.byCode.B9.unit.startsWith("LS"))
@@ -100,8 +100,8 @@ export function selectRevKAbcOwnershipControl0553(working){
  const fatTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B3").reduce((v,x)=>v+x.modeledSellTHB,0));
  const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B9").reduce((v,x)=>v+x.modeledSellTHB,0));
  if(b1Engineering.length!==27||pmEvents.length!==41||supportExpenses.length!==9||b1.labourHours!==242||trace.rows.length!==19||
-   fatTasks.length!==12||fat.estimatedFatWitnessDays!==6||satSiteLines.length!==9||
-   b3.satTeamDays!==28||b3.siteSurveyTeamDays!==5||historicalB3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==693000||yardTHB!==480550)
+   fatTasks.length!==12||fat.estimatedFatWitnessDays!==3||satSiteLines.length!==9||
+   b3.satTeamDays!==28||b3.siteSurveyTeamDays!==5||historicalB3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==452850||yardTHB!==480550)
   throw Error("Rev.K activity reconciliation mismatch");
  return Object.freeze({
   moduleId:"bid.budget.working.bc.revk-abc-control",

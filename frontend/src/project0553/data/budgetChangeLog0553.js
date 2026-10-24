@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R36";
+export const CHANGE_LOG_VERSION_0553="2026-10-24-R37";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261024-06",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"Owner duration: FAT2+1 / Training1+1; reserve days included once",
+  detail:"Owner confirms +1 means reserve. FAT2 actual days81900 +1 reserve40950 replaces6-day crew245700; standalone closeout day merged into FAT2+1. Existing4 preparation days retained. Shared facility/transport window9 days, FAT meals3 days; no repeated reserve meal or closeout charge. Local B3 execution452850; full B3 2322450. B8 remains142550:1 teaching +1 reserve day, OEM online base8h +reserve8h, no duplicate trainer day. Combined local FAT/training595400 (-240150); known Part B4757207.13. Twelve FAT requirement IDs remain; earlier48h estimate split32h preparation +16h formal timebox, actual ITP/TAG repetition open. A/B9/spares/C and packing/CIF unchanged; source-derived Scope/Release/native only.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.02.site.01","bid.budget.working.bc.b8.hybrid-training"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner correction24-Oct FAT2+1 Training1+1; explicitly confirmed reserve days"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-05",date:"2026-10-24",kind:"UI",tone:"neutral",
   title:"B8 Base confirmed by owner: OEM ONLINE + ADDVALUE onsite at SAMTEL",

@@ -22,7 +22,7 @@ const {B3SiteMrSatCoverage0553:Panel}=from("B3SiteMrSatCoverage0553.jsx");
 const {B3SatMrWorkBreakdown0553:Detail}=from("B3SatMrWorkBreakdown0553.jsx");
 const full=matrix(),owner=canon().byCode.B3,index=navigator();
 const original=JSON.stringify({currentB3:owner.workingSellTHB,days:full.budgetarySiteTimeboxes});
-assert.equal(owner.workingSellTHB,2562600);
+assert.equal(owner.workingSellTHB,2322450);
 assert.equal(owner.b3SelectedSatSurveyBudget.satTeamDays,28);
 assert.equal(owner.b3SelectedSatSurveyBudget.siteSurveyTeamDays,5);
 assert.equal(owner.directCostTHB,null);

@@ -32,7 +32,7 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
   <p className="p55-note"><strong>Internal record:</strong> {isFat?"IC-FAT / WS-B3":"IC-YARD / WS-B9"} · <strong>Customer contractual Scope:</strong> {isFat?"SOW-B3":"SOW-B9"} · <strong>Commercial Proposal:</strong> {isFat?"CP-B3":"CP-B9"} NOT ISSUED. These rows are internal estimating activities, not customer B3/B9 quotation line numbers.</p>
   <div className="p55-metric-grid">
    <div><strong>{isFat?"WS-B3 — Current Internal FAT Working SELL":"WS-B9 — Included in Base Once · On-call Yard Working SELL"}</strong><p>{thb(total)}</p>
-    <small>{isFat?"ADDVALUE Senior + Field execution: 4 prep, 6 FAT, 1 closeout +1 retest; shared14-day facilities/tools/transport":"Two paid staff: Senior USD700/MD + Field Technician USD600/MD · 7 Yard days + 2 travel days EACH"}</small></div>
+    <small>{isFat?"ADDVALUE Senior + Field execution: 4 prep + FAT2+1 including closeout; shared9-day facilities/tools/transport":"Two paid staff: Senior USD700/MD + Field Technician USD600/MD · 7 Yard days + 2 travel days EACH"}</small></div>
    <div><strong>{isFat?
     (Number.isFinite(ownerPreviewB3THB)?"WS-B3 — FULL B3 canonical Working SELL (local execution included once)":"WS-B3 — Full total requires canonical 10.2 owner"):
     "Current B9 Base"}</strong><p>{isFat?thb(ownerPreviewB3THB):thb(budget.b9BaseWorkingSellTHB)}</p>
@@ -41,8 +41,8 @@ export function B9ChinaBudgetDetail0553({budget,selectedOwner="B9",purchasedServ
      "B9 1 LS included in quoted Base; actual deployment requires written Yard call-out"}</small></div>
   </div>
   {isFat&&budget.fatWbs&&<details className="p55-panel" style={{padding:10,marginTop:12}}>
-   <summary><strong>SAMTEL FAT / MR0001–MR0004 — 6-Day Estimating Agenda</strong></summary>
-   <p className="p55-note">Execution team: {budget.fatWitnessRoles.join(" + ")}. Both roles are paid execution staff. Shared tools and facility allowances are in B3; supplier/calibration evidence remains unconfirmed. Source: BOD §10.2–10.3 / SPE §7.3.1 / MR/DTS1–4. Six days are internal estimates pending signed OEM ITP and equipment TAG repetition.</p>
+   <summary><strong>SAMTEL FAT / MR0001–MR0004 — 2 Formal Days +1 Reserve — Owner-selected Budget</strong></summary>
+   <p className="p55-note">Execution team: {budget.fatWitnessRoles.join(" + ")}. Both roles are paid execution staff. Shared tools and facility allowances are in B3; supplier/calibration evidence remains unconfirmed. Source: BOD §10.2–10.3 / SPE §7.3.1 / MR/DTS1–4. Owner selects 2 formal FAT days +1 reserve. The earlier48-hour estimate is allocated32h to preparation and16h to formal demonstration; actual witness points/TAG repetitions need approved ITP and no required test is waived.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Day / Test ID</th><th>MR</th><th>Test Requirement</th><th>Hours</th><th>Evidence</th></tr></thead>
     <tbody>{budget.fatWbs.rows.map(x=><tr key={x.id}><td>{x.day} · {x.id}</td><td>{x.mr}</td><td>{x.activity}</td><td>{x.hours}</td><td>{x.evidence}</td></tr>)}</tbody>

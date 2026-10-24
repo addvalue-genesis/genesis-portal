@@ -24,7 +24,7 @@ export function B3ResourcePriceDossier0553({workingRow}){
   </div>
   <div className="p55-metric-grid">
    <div><strong>Selected B3 Working SELL · 10.2 → 10.3/10.5</strong>
-    <p>{cash(model.pricedWorkingSellTHB)}</p><small>{model.priceRowCount} source labour/expense/rental rows (5 travel rows excluded). Includes Conditional BF Labour, but NO new physical travel approval.</small></div>
+    <p>{cash(model.pricedWorkingSellTHB)}</p><small>{model.priceRowCount} source labour/expense/rental rows (5 travel rows excluded; closeout merged into FAT2+1). Includes Conditional BF Labour, but NO new physical travel approval.</small></div>
    <div><strong>Actual Paid Direct Cost</strong><p>NOT ESTABLISHED</p>
     <small>Working SELL rates are estimates; payroll and paid expenses remain unverified</small></div>
    <div><strong>Current physical people × days (GF Yard / Offshore)</strong><p>TO VERIFY</p>
@@ -51,9 +51,9 @@ export function B3ResourcePriceDossier0553({workingRow}){
    ไม่มีค่าซื้อบริการ FAT จาก MGW; มีงบ ADDVALUE ทำงานและสำรองค่าใช้สถานที่/เครื่องมือที่ SAMTEL;
    Actual Direct Cost ที่ยังไม่มีใบจ่าย/Payroll ให้แสดง NOT ESTABLISHED ไม่ตีว่าเป็นศูนย์.
    Site/MR Test IDs ไม่ใช่รายการราคาซ้ำ.</p>
-  <p className="p55-note">ราคาเหมาจ่ายรวมงานก่อน FAT: เตรียม 4 วัน → อบรม 2 วัน (B8) → FAT 6 วัน → ปิดงาน 1 วัน + เผื่อทดสอบซ้ำ 1 วัน.
-   B3 สำรองค่าไฟ/ทำความสะอาดและบริการสถานที่ 21,000, เช่าโต๊ะ/อุปกรณ์พื้นที่ 14,000, เครื่องมือทดสอบร่วม 55,000,
-   อาหาร FAT 10 คน × 6 วัน × 550 = 33,000 บาท. จำนวนคน/วัน/อัตราเป็นสมมติฐานร่าง ไม่ใช่ใบเสนอราคา SAMTEL หรือการยืนยันผู้เข้าร่วม.</p>
+  <p className="p55-note">ราคาเหมาจ่ายรวมงานก่อน FAT: เตรียม 4 วัน → Training 1 วัน + เผื่อ 1 วัน (B8) → FAT 2 วัน + เผื่อ 1 วัน รวมปิด punch/ทดสอบซ้ำในกรอบนี้ ไม่เพิ่มวันปิดงานอีก.
+   B3 สำรองค่าไฟ/ทำความสะอาดและบริการสถานที่ 13,500, เช่าโต๊ะ/อุปกรณ์พื้นที่ 9,000, เครื่องมือทดสอบร่วม 55,000,
+   อาหาร FAT 10 คน × (2+1) วัน × 550 = 16,500 บาท. จำนวนคน/วัน/อัตราเป็นสมมติฐานร่าง ไม่ใช่ใบเสนอราคา SAMTEL หรือการยืนยันผู้เข้าร่วม.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>ค่าใช้จ่ายตลอดงาน</th><th>เจ้าของงบเดียว</th><th>ขอบเขต / ไม่คิดซ้ำ</th></tr></thead>
    <tbody>{[
@@ -62,8 +62,8 @@ export function B3ResourcePriceDossier0553({workingRow}){
     ["B3","เตรียม / configure / FAT / ปิด punch / เครื่องมือร่วม / อาหาร FAT","ADDVALUE ทำงาน; MGW supply อุปกรณ์ MR0002 เท่านั้น; ไม่มีค่าบริการ MGW"],
     ["B5","แพ็กใหม่หลัง FAT / sea export / marking / preservation","ใช้ลัง MDS ที่รวมมาแล้วตามสภาพ; EXION inland packing ต้องทบทวนก่อนส่งทะเล"],
     ["B6","ขาเข้าไทย / ส่งออกจาก SAMTEL / freight + cargo insurance CIF Zhuhai","รวมค่าเตรียมส่งออกให้ SAMTEL/forwarder ในงบ B6; ไม่ใช่ค่าเช่า B3"],
-    ["B7","เก็บของหลังจบงาน / เกินช่วงที่รวมไว้","สำรอง 1 เดือน 30,000 แยกจากพื้นที่ทำงาน 14 วัน"],
-    ["B8","เอกสารอบรม / วิทยากร / online OEM / onsite ADDVALUE / อาหารอบรม","8 ผู้เรียน + วิทยากร/ผู้ประสาน 2 = 10 คน × 2 วัน × 550; เครื่องมือ demo ย้ายไป B3 ครั้งเดียว"],
+    ["B7","เก็บของหลังจบงาน / เกินช่วงที่รวมไว้","สำรอง 1 เดือน 30,000 แยกจากพื้นที่ทำงาน 9 วัน"],
+    ["B8","เอกสารอบรม / วิทยากร / online OEM / onsite ADDVALUE / อาหารอบรม","8 ผู้เรียน + วิทยากร/ผู้ประสาน 2 = 10 คน × (1 วันจริง +1 วันเผื่อ) × 550; เครื่องมือ demo ย้ายไป B3 ครั้งเดียว"],
     ["B11","เครื่องมือถาวรส่งมอบลูกค้า","แยกจากค่าเช่า/เครื่องมือชั่วคราว B3"],
     ["B14","Bond / ประกันตามสัญญา","ยังมีช่องว่างราคา; ไม่ใช่ประกัน cargo B6 หรือ work cover เฉพาะทีม B3"]
    ].map(([code,activity,basis])=><tr key={code}><td>{activity}</td><td>{code} {c("bid.budget.working.bc."+code.toLowerCase())}</td><td>{basis}</td></tr>)}</tbody>

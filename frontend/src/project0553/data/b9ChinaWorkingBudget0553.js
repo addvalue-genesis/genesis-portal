@@ -33,40 +33,42 @@ const removedFatTravel=new Set(["TRAVEL-DAYS","AIRFARE","HOTEL","VISA","TRAVEL-I
 const localBaselineRows=historicalAssumptionRows.map(row=>{
  if(removedFatTravel.has(row[0]))return [row[0],row[1],row[2]+" — not selected for local SAMTEL FAT",row[3],0,row[5],
   "SUPERSEDED_CHINA_TRIP_NONPOSTING", "2026-10-24 SAMTEL Warehouse Thailand; historical quantity "+row[4]+" retained in baseline"];
- if(row[0]==="FAT-STAFF")return [row[0],row[1],"SAMTEL Warehouse Thailand FAT — ADDVALUE Senior + Field Engineer (6 days each)",...row.slice(3,7),"ADDVALUE executes all four MR; OEM specialist support separately budgeted. MGW supplies RF equipment only."];
+ if(row[0]==="FAT-STAFF")return [row[0],row[1],"SAMTEL Warehouse Thailand FAT — ADDVALUE Senior + Field Engineer (2 formal FAT days each)",row[3],4,row[5],"OWNER_20261024_FAT_TWO_BASE_PLUS_ONE_RESERVE","ADDVALUE executes all four MR; OEM specialist support separately budgeted. MGW supplies RF equipment only."];
  if(row[0]==="LOCAL-TRAVEL")return [row[0],row[1],"SAMTEL Warehouse local transfers — retained THB8000 allowance",...row.slice(3)];
  return row;
 });
 // Internal 24-Oct estimator assumptions, NOT vendor quotations or new contract requirements.
-// One 14-day facility window: preparation 4, training 2, formal FAT 6,
-// closeout 1, retest reserve 1. Senior training preparation is a separate prior day in B8.
+// Owner-confirmed FAT 2+1 and Training 1+1: +1 means reserve, not preparation.
+// Warehouse window: preparation4 + training(1+1) + FAT(2+1) =9 days.
+// Closeout is within FAT2+1, never an extra paid day. B8 content preparation is separate.
 export const SAMTEL_EXECUTION_PLAN_0553=Object.freeze({
- preparationDays:4,trainingDays:2,formalFatDays:6,closeoutDays:1,retestReserveDays:1,
- facilityDays:14,fatAttendees:10,trainingAttendees:10,mealAndBreakTHBPerPersonDay:550,
+ preparationDays:4,trainingDays:2,trainingBaseDays:1,trainingReserveDays:1,formalFatDays:2,closeoutDays:0,retestReserveDays:1,
+ fatBudgetDays:3,dayBasis:"OWNER_CONFIRMED_FAT_2_PLUS_1_TRAINING_1_PLUS_1_RESERVE",
+ facilityDays:9,fatAttendees:10,trainingAttendees:10,mealAndBreakTHBPerPersonDay:550,
  clientWitnessPlanningPlaces:8,executionCrew:2,
  status:"ESTIMATOR_PLANNING_ASSUMPTIONS_NOT_CONFIRMED_ATTENDANCE_OR_SUPPLIER_RATES",
  venue:"SAMTEL Warehouse Thailand",mgwRole:"MR0002 EQUIPMENT SUPPLY ONLY",
- schedule:["B8 training-content preparation: separate prior Senior day", "D1–D4 B3 receiving/configuration/internal pretest", "D5–D6 B8 training: Senior only; no B3 crew day", "D7–D12 B3 formal FAT", "D13 B3 punch/backup/handover", "D14 B3 retest reserve; not a guaranteed extra test day", "B5 sea packing → B6 export/CIF Zhuhai; B2 document control"]
+ schedule:["B8 training-content preparation: separate prior Senior day", "D1–D4 B3 receiving/configuration/internal pretest", "D5 B8 one-day training; D6 B8 training reserve, no B3 execution crew charge", "D7–D8 B3 formal FAT including signed handover", "D9 B3 FAT reserve for punch/retest; no extra closeout day", "B5 sea packing → B6 export/CIF Zhuhai; B2 document control"]
 });
 const localExecutionAdditions=[
  ["PREP-SENIOR","Senior receiving/TAG/configuration and four-MR pretest",4,"person-day",seniorRate,"Technical execution only; B2 authors/controls VDRL, B1 manages project; D1–D4"],
  ["PREP-FIELD","Field engineer assembly/interconnections and safe bench setup",4,"person-day",fieldRate,"D1–D4; check all 7+3+4+3 locations, not 4 crates"],
- ["FACILITY-OPERATIONS","SAMTEL utilities, cleaning and operating support reserve",14,"facility-day",1500,"Use of warehouse permitted; fee/inclusion unconfirmed. Internal allowance, not SAMTEL quote or building rent."],
- ["BENCH-RENTAL","Temporary benches, chairs, leads and test-area fitout rental",14,"facility-day",1000,"Shared prep/FAT/training window once; storage B7 and AV B8 excluded"],
- ["RF-TEST-POOL","Shared calibrated RF spectrum/generator/attenuator/load test setup",1,"14-day setup allowance",30000,"Includes transferred B8 RFI demo 15000; temporary rental only, no B11 permanent tools or VeEX rental duplicate"],
- ["RACON-TEST-POOL","ORGA RACON simulator/interface and OEM-controlled test access",1,"14-day setup allowance",15000,"Includes transferred B8 RACON demo 5000; capability/calibration/OEM method unconfirmed, not vessel acceptance"],
- ["PHONE-NETWORK-POOL","Phone/PABX/PoE/Cisco bench fixtures and temporary connectivity",1,"14-day setup allowance",10000,"Temporary fixtures only; no second delivered Cisco/phone or existing VeEX instrument purchase"],
- ["FAT-CATERING","FAT lunch, water and two meeting breaks: team plus PTTEP/JUTAL/SAMTEL witnesses",60,"person-day",550,"10 planning attendees × 6 formal FAT days; 350 lunch + 2 × 100 breaks. No gifts, flights or hotels; separate from B1 business meetings"],
- ["PREP-CLOSEOUT-MEALS","Two execution staff meals during preparation/closeout/retest",12,"person-day",350,"2 people × (4 preparation + 1 closeout + 1 reserve) days; excludes FAT/B8 meal days"],
- ["CLOSEOUT-CREW","Punch correction, configuration backup and technical handover/refresher",2,"person-day",sharedFatPaidRoleBlendedRate,"1 day × Senior + Field; technical records B3, controlled issue/transmittal B2; not a repeat full B8 course"],
- ["RETEST-CREW","One additional two-person retest day reserve",2,"person-day",sharedFatPaidRoleBlendedRate,"Explicit included lump-sum contingency; release unused reserve only once after schedule review"],
+ ["FACILITY-OPERATIONS","SAMTEL utilities, cleaning and operating support reserve",9,"facility-day",1500,"Use of warehouse permitted; fee/inclusion unconfirmed. Internal allowance, not SAMTEL quote or building rent."],
+ ["BENCH-RENTAL","Temporary benches, chairs, leads and test-area fitout rental",9,"facility-day",1000,"Shared prep/FAT/training window once; storage B7 and AV B8 excluded"],
+ ["RF-TEST-POOL","Shared calibrated RF spectrum/generator/attenuator/load test setup",1,"9-day setup allowance",30000,"Includes transferred B8 RFI demo 15000; temporary rental only, no B11 permanent tools or VeEX rental duplicate"],
+ ["RACON-TEST-POOL","ORGA RACON simulator/interface and OEM-controlled test access",1,"9-day setup allowance",15000,"Includes transferred B8 RACON demo 5000; capability/calibration/OEM method unconfirmed, not vessel acceptance"],
+ ["PHONE-NETWORK-POOL","Phone/PABX/PoE/Cisco bench fixtures and temporary connectivity",1,"9-day setup allowance",10000,"Temporary fixtures only; no second delivered Cisco/phone or existing VeEX instrument purchase"],
+ ["FAT-CATERING","FAT lunch, water and two meeting breaks: team plus PTTEP/JUTAL/SAMTEL witnesses",30,"person-day",550,"10 planning attendees × (2 formal FAT +1 reserve) days; 350 lunch + 2 × 100 breaks. No gifts, flights or hotels; separate from B1 business meetings"],
+ ["PREP-CLOSEOUT-MEALS","Two execution staff meals during four preparation days",8,"person-day",350,"2 people ×4 preparation days; FAT reserve meals already in FAT-CATERING; B8 meals separate"],
+ ["CLOSEOUT-CREW","Punch/backup/handover INCLUDED in FAT2+1 — no separate paid day",0,"person-day",sharedFatPaidRoleBlendedRate,"MERGED_INTO_FAT_2_PLUS_1: preserve source ID, zero extra day; records/control B2 and teaching B8 remain distinct"],
+ ["RETEST-CREW","One two-person FAT +1 reserve for retest/punch",2,"person-day",sharedFatPaidRoleBlendedRate,"The owner-selected FAT +1 day, included once; no further standalone closeout/retest allowance"],
  ["OEM-FAT-SUPPORT","Remote product specialists for FAT issue diagnosis, distinct from training classes",4,"four-hour MR support block",12600,"4 MR × USD400 ×31.5 provisional allowance; MR1 Aviat/Cisco and MR3 phone/sounder split blocks. Suppliers unconfirmed; no MGW execution assumed"]
-].map(([id,description,qty,unit,rate,evidence])=>[id,"K01",description,unit,qty,rate,"20261024_INTERNAL_LUMP_SUM_WORKING_SELL_ALLOWANCE_UNQUOTED",evidence]);
+].map(([id,description,qty,unit,rate,evidence])=>[id,"K01",description,unit,qty,rate,id==="CLOSEOUT-CREW"?"MERGED_INTO_FAT_2_PLUS_1_NONPOSTING":"20261024_INTERNAL_LUMP_SUM_WORKING_SELL_ALLOWANCE_UNQUOTED",evidence]);
 const assumptionRows=[...localBaselineRows.map(row=>row[0]==="LOCAL-TRAVEL"?
- [row[0],row[1],"Local crew transfers to SAMTEL — 14 preparation/training/FAT/closeout days","facility-day",14,1000,"20261024_INTERNAL_LOCAL_TRANSFER_ALLOWANCE","4 preparation + 2 training + 6 FAT + 1 closeout + 1 retest; B8 has no second transport provision; no additional airport trip"]:row),...localExecutionAdditions];
+ [row[0],row[1],"Local crew transfers to SAMTEL — 9 preparation/training/FAT days including reserves","facility-day",9,1000,"20261024_INTERNAL_LOCAL_TRANSFER_ALLOWANCE","4 preparation + (1+1) training + (2+1) FAT; B8 has no second transport provision; no additional airport trip"]:row),...localExecutionAdditions];
 export const B9_CHINA_BUDGET_SOURCE_0553=Object.freeze({
  id:"B3-FAT_B9-YARD-REV-K-WORKING-SELL",sourceWbs:"Rev.K K01-K12 / Rev.L / Rev05 B9",
- crew:2,fatDaysEstimate:6,yardTeamDaysWorking:12,hotelNightsPerPerson:0,travelEvents:1,scenarioTravelEventsWithOptionalYard:2,legacyYardTeamDaysOnlyNotSelected:true,
+ crew:2,fatDaysEstimate:3,yardTeamDaysWorking:12,hotelNightsPerPerson:0,travelEvents:1,scenarioTravelEventsWithOptionalYard:2,legacyYardTeamDaysOnlyNotSelected:true,
  yardCallOutOnly:true,fatTravelTeamDays:0,yardActualOrStandbyTeamDays:10,
  selectedYardRole:"Senior Telecom Systems Integration Engineer",selectedYardFieldRole:"Field Telecom Technician",yardCallOutCrew:2,
  selectedYardWorkingDays:7,selectedYardTravelDays:2,selectedYardRoomNights:9,
@@ -139,13 +141,13 @@ export function selectB9ChinaWorkingBudget0553(){
  const total=round(labor+travel);
  const base=round(rows.filter(x=>!x.optional).reduce((n,x)=>n+x.workingSellTHB,0));
  const conditional=round(rows.filter(x=>x.optional).reduce((n,x)=>n+x.workingSellTHB,0));
- if(base!==693000||conditional!==480550||total!==1173550||rows.length!==30||source.perDiemSeparate||rows.filter(x=>x.costOwner==="B3").length!==20)
+ if(base!==452850||conditional!==480550||total!==933400||rows.length!==30||source.perDiemSeparate||rows.filter(x=>x.costOwner==="B3").length!==20)
   throw Error("B9 Rev.K budget/Per Diem/equipment duplicate error");
  // One quoted contract line (B9) with conditional execution. conditionalYardSellTHB
  // remains source evidence, NOT a second additional option/price posting.
  return Object.freeze({...source,fatWbs,rows,executionPlan:SAMTEL_EXECUTION_PLAN_0553,workingSellTHB:conditional,fatWorkingSellTHB:base,b3FatWorkingSellTHB:base,b9BaseWorkingSellTHB:conditional,conditionalYardSellTHB:conditional,
   fullCombinedVisitScenarioTHB:total,laborWorkingSellTHB:labor,
-  nonLaborWorkingSellTHB:travel,travelAndInsuranceWorkingSellTHB:travel,qtyDerivedManDays:42,
+  nonLaborWorkingSellTHB:travel,travelAndInsuranceWorkingSellTHB:travel,qtyDerivedManDays:32,
   conditionalNotInBase:false,quotedBaseWorkingSell:true,conditionalExecutionOnWrittenCallout:true,priceAlreadyIncludedInB9Base:true,deltaVsLegacyTHB:round(conditional-source.legacyWbsB9SellTHB),
   contractCostOwnerProof:"Original 4-Scope of Supply.xlsx row 26 B3 Inspection, Testing and Certification as per ITP; row 32 B9 Specialist field assistance as per specification",
   workingDirectCostTHB:null,verifiedDirectCostTHB:null,customerReleaseAllowed:false});

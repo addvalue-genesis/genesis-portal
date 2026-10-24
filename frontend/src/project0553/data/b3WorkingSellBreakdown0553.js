@@ -46,7 +46,7 @@ export function selectB3WorkingSellBreakdown0553(workingRow){
     workingSellTHB:rent,postedWithinB3:true},
    {id:"MGW-FAT",moduleId:"bid.budget.working.bc.b3.revk-china-budget",
     activity:"SAMTEL Warehouse preparation/FAT — ADDVALUE crew, shared facility/tools, hosting and closeout",
-    driver:"4 prep + 6 FAT +1 closeout +1 retest crew-days; 2 separate B8 training days; 14-day facility/transport, shared tools, meals, OEM support and work cover",
+    driver:"4 prep + FAT(2+1) including closeout; separate B8 training(1+1); 9-day facility/transport, shared tools, meals, OEM support and work cover",
     workingSellTHB:fatSell,postedWithinB3:true}
   ],
   offshore:{workdays:sat.satTeamDays,people:2,personDays:sat.satPersonDays,rateUSD:sat.sourceRateUSDPerPersonDay,roleRates:sat.satRoleRates,workingFx:sat.fxTHBPerUSD,

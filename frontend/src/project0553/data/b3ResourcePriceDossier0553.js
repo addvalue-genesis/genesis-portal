@@ -63,7 +63,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
   work:r.description,role:r.id==="B3-FAT-STAFF"?"ADDVALUE Senior + Field Engineer execute FAT":
    "ADDVALUE preparation / execution / local expense",
   people:r.id==="B3-FAT-STAFF"?2:null,
-  teamDays:r.id==="B3-FAT-STAFF"?6:r.id==="B3-TRAVEL-DAYS"?2:null,
+  teamDays:r.id==="B3-FAT-STAFF"?2:r.id==="B3-TRAVEL-DAYS"?2:null,
   qty:r.qty,unit:r.unit,unitRateTHB:r.unitRateTHB,
   rateUSDPerUnit:null,fxTHBPerUSD:null,
   calculation:r.qty+" "+r.unit+" × THB "+r.unitRateTHB,
@@ -75,14 +75,14 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  }));
  const onshoreFatPaidRoleTrace=freeze([
   freeze({id:"B3-FAT-SR",role:"Senior Telecom Systems Integration Engineer",
-   onsiteMD:6,travelMD:0,usdPerMD:700,rateTHBPerMD:22050,
-   workingSellTHB:132300,directCostTHB:null}),
+   onsiteMD:2,travelMD:0,usdPerMD:700,rateTHBPerMD:22050,
+   workingSellTHB:44100,directCostTHB:null}),
   freeze({id:"B3-FAT-PM",role:"Field Telecom Engineer — USD600 planning rate",
-   onsiteMD:6,travelMD:0,usdPerMD:600,rateTHBPerMD:18900,
-   workingSellTHB:113400,directCostTHB:null})
+   onsiteMD:2,travelMD:0,usdPerMD:600,rateTHBPerMD:18900,
+   workingSellTHB:37800,directCostTHB:null})
  ]);
- if(round(onshoreFatPaidRoleTrace.reduce((n,x)=>n+x.workingSellTHB,0))!==245700||
-    fatRows.find(x=>x.id==="B3-FAT-STAFF")?.workingSellTHB!==245700||
+ if(round(onshoreFatPaidRoleTrace.reduce((n,x)=>n+x.workingSellTHB,0))!==81900||
+    fatRows.find(x=>x.id==="B3-FAT-STAFF")?.workingSellTHB!==81900||
     fatRows.find(x=>x.id==="B3-TRAVEL-DAYS")?.workingSellTHB!==0)
   throw Error("B3 China FAT paid role rate-to-source bridge missing");
   const mgwLines=mgw.quoteLines.map(q=>make("mgw-vendor",q.serviceId.toLowerCase(),{
@@ -250,7 +250,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
     sourceIndexList.some(i=>i<0||i>=stageGroups.length))
   throw Error("B3 group hierarchy cannot omit or duplicate any source stage");
  const rollupTotalTHB=round(groupRollups.reduce((n,g)=>n+g.selectedWorkingSellTHB,0));
- if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="693000|252000|1587600|30000"||
+ if(groupRollups.map(g=>g.selectedWorkingSellTHB).join("|")!=="452850|252000|1587600|30000"||
     rollupTotalTHB!==workingRow.workingSellTHB)
   throw Error("B3 group hierarchy must reconcile once to canonical WS-B3");
  const priced=stageGroups.slice(0,5);
@@ -263,14 +263,14 @@ export function selectB3ResourcePriceDossier0553(workingRow){
  if(new Set(singleIds).size!==singleIds.length||
     mgwLines.length!==0||fatLines.length!==20||satLines.length!==18||
     bfLines.length!==6||bfTripLines.length!==2||yardLines.length!==14||offshoreLines.length!==14||
-    total(mgwLines)!==0||total(fatLines)!==693000||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
-    total(rental)!==30000||budgetSelected!==2562600||
-    selectedBaseExcludingConditionalBFTHB!==2310600||bfConditionalBudgetAllowanceTHB!==252000||
+    total(mgwLines)!==0||total(fatLines)!==452850||total(satLines)!==1587600||total(bfLines)+total(bfTripLines)!==252000||
+    total(rental)!==30000||budgetSelected!==2322450||
+    selectedBaseExcludingConditionalBFTHB!==2070450||bfConditionalBudgetAllowanceTHB!==252000||
     bfSurveyExpenseDrivers.length!==4||
     bfSurveyExpenseDrivers.some(x=>x.workingSellTHB!==null||x.actualDirectCostTHB!==null)||
     riskReserve.some(x=>x.workingSellTHB!==null||x.directCostTHB!==null)||
     workingRow.workingSellTHB!==budgetSelected||
-    picked.join("|")!=="0|693000|1587600|30000|252000"||
+    picked.join("|")!=="0|452850|1587600|30000|252000"||
     plan.survey.conditionalLabourSellReferenceTHB!==252000||
     vendorQuoteCostTHB!==0||
     round(vendorQuoteCostTHB+mgw.samTelMarkupTHB+mgw.addvalueMarkupTHB+
@@ -302,7 +302,7 @@ export function selectB3ResourcePriceDossier0553(workingRow){
    unpricedExtraBFExpenseCostTHB:null,
    GFYardAdditionalCostTHB:null,GFOffshoreAdditionalCostTHB:null,
    actualDirectCostTHB:null,commercialReleaseAllowed:false,
-   reconciliation:"2310600 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2562600 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
+   reconciliation:"2070450 BASE + 252000 INCLUDED CONDITIONAL LABOUR = 2322450 PRE-AWARD WORKING BUDGET; RELEASE HOLD",
     satSeniorUsd1000DeltaTHB:satSelected.satSeniorRateRevisionDeltaTHB
   }),
   bfSurveyExpenseDrivers,riskReserve,

@@ -22,8 +22,8 @@ const audit=from("estimateToBidMapping.js")
  .auditCurrentCustomerProjection0553({canonical,release,scope});
 const current=canonical.byCode;
 const scenarios=canonical.scenarioAudits;
-assert.equal(canonical.knownWorkingSellTHB,4997357.13);
-assert.equal(current.B3.workingSellTHB,2562600);
+assert.equal(canonical.knownWorkingSellTHB,4757207.13);
+assert.equal(current.B3.workingSellTHB,2322450);
 assert.equal(current.B8.workingSellTHB,142550);
 assert.equal(current.B9.workingSellTHB,480550);
 assert.equal(current.B9.b9ChinaBudget.conditionalYardSellTHB,480550);
@@ -32,10 +32,10 @@ assert.equal(release.b.find(x=>x.code==="B9").customerSellTHB,480550);
 assert.equal(release.b.find(x=>x.code==="B9").conditionalOptionIncludedInBase,true);
 assert.equal(release.b.find(x=>x.code==="B9").samTelDeductionTHB,24027.5);
 assert.equal(release.b.find(x=>x.code==="B9").addvalueReceivableTHB,456522.5);
-assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2562600);
-assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,128130);
-assert.equal(release.b.find(x=>x.code==="B3").addvalueReceivableTHB,2434470);
-assert.equal(scope.lines.B3.workingSellTHB,2562600);
+assert.equal(release.b.find(x=>x.code==="B3").customerSellTHB,2322450);
+assert.equal(release.b.find(x=>x.code==="B3").samTelDeductionTHB,116122.5);
+assert.equal(release.b.find(x=>x.code==="B3").addvalueReceivableTHB,2206327.5);
+assert.equal(scope.lines.B3.workingSellTHB,2322450);
 assert.equal(scope.lines.B8.workingSellTHB,142550);
 assert.equal(scope.lines.B9.workingSellTHB,480550);
 const lean=scenarios.b3LeanSat28plus2;
@@ -102,4 +102,4 @@ const names=from("data/officialWorkbookTemplate0553.js").OFFICIAL_WORKBOOK_TEMPL
 for(const [code,row] of [["B3",26],["B8",31],["B9",32]])
  assert(names.some(x=>x[0]===row&&x[1]===code&&x[2]),"Native description missing "+code);
 assert.equal(release.approval.releaseAllowed,false);
-console.log("PASS 0553 b3-b8-five-day-lean-parity: current-source checks passed; B3 2,562,600.00 / Part B 4,997,357.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 b3-b8-five-day-lean-parity: current-source checks passed; B3 2,322,450.00 / Part B 4,757,207.13; no selected MGW FAT services; historical evidence nonposting.");

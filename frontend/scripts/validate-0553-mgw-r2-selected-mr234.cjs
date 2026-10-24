@@ -86,7 +86,7 @@ for(const s of wpBulk.filter(x=>["ZWP20","ZWP21","ZWP22"].includes(x.wp))){
  assert(racon.items.some(x=>/MGW-R2-CONTROL/.test(x.id)&&x.extendedTHB===null));
  assert(racon.items.every(x=>x.rateTHB===null&&x.extendedTHB===null));
 }
-assert.equal(bc().byCode.B3.workingSellTHB,2562600,"ADDVALUE local execution is in B3 once; MGW equipment remains unchanged and supplier services are excluded");
+assert.equal(bc().byCode.B3.workingSellTHB,2322450,"ADDVALUE local execution is in B3 once; MGW equipment remains unchanged and supplier services are excluded");
 assert.equal(bc().byCode.B3.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteUSD,0);
 assert.equal(bc().byCode.B3.directCostTHB,null);
 assert.equal(recon.mgwSelectedOverallUSD,364841);

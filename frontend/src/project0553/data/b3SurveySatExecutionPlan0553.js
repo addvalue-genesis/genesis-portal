@@ -112,7 +112,7 @@ export function selectB3SurveySatExecutionPlan0553(workingRow=null){
     yardRows.length!==4||offshoreRows.length!==4||
     shared.length!==2||lean.workingTeamDaysWithRisk!==30||
     proposedSATWithRiskSellTHB!==1512000||
-    (workingRow&&currentB3!==2562600))
+    (workingRow&&currentB3!==2322450))
    throw Error("BF-only optional survey and stage-separated SAT cost/readiness boundary divergence");
  return freeze({
   moduleId:"bid.budget.working.bc.b3.field-execution-plan",

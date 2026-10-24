@@ -61,7 +61,7 @@ const table=priceTable(b3,m);
 const p=table.groups.find(x=>x.kind==="audit").items.find(x=>x.moduleId.endsWith(".fat-training-7d-allocation"));
 assert(p&&p.workingSellTHB===null&&p.referenceTHB===263700);
 assert(!table.groups.find(x=>x.kind==="fat").items.some(x=>x.moduleId.endsWith(".fat-training-7d-allocation")));
-assert.equal(table.totalWorkingSellTHB,2562600);
+assert.equal(table.totalWorkingSellTHB,2322450);
 const htmlB3=renderToStaticMarkup(React.createElement(View,{b3,b8,owner:"B3"}));
 const htmlB8=renderToStaticMarkup(React.createElement(View,{b3,b8,owner:"B8"}));
 const ownerB3=renderToStaticMarkup(React.createElement(OwnerDetail,{workingRow:b3}));
@@ -98,7 +98,7 @@ assert(ids.has("bid.budget.working.bc.b8.integrated-fat-training-7d"));
 const quoted=fs.readFileSync(path.join(root,"project0553/BcWorkingHierarchy0553.jsx"),"utf8");
 assert(quoted.includes('"SOW-"+item.code')&&quoted.includes('" WS-"+item.code')&&
  quoted.includes('" CP-"+item.code'));
-assert.equal(current().byCode.B3.workingSellTHB,2562600);
+assert.equal(current().byCode.B3.workingSellTHB,2322450);
 assert.equal(current().byCode.B8.workingSellTHB,142550);
 assert.equal(JSON.stringify(current()),snapshot);
-console.log("PASS 0553 b3-b8-seven-day-identity: current-source checks passed; B3 2,562,600.00 / Part B 4,997,357.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 b3-b8-seven-day-identity: current-source checks passed; B3 2,322,450.00 / Part B 4,757,207.13; no selected MGW FAT services; historical evidence nonposting.");

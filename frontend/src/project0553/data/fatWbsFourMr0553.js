@@ -1,5 +1,6 @@
-// Four-MR 48-hour formal FAT agenda at SAMTEL, executed by ADDVALUE with unconfirmed OEM remote support.
-// Six days is a planning timebox, not a source-mandated duration. Prep/training/closeout are separately budgeted.
+// Owner FAT2+1: two formal days plus one reserve; all12 test identities retained.
+// Prior48h was an internal estimate:32h preparation +16h formal demonstration planned, subject to approved ITP/TAG repetition.
+// No contractual test or required witness point is waived by the timebox.
 // BOD 30-calendar-day notice and ITP approval remain controlling; MGW equipment only.
 const rateHours=8;
 const tasks=[
@@ -16,26 +17,33 @@ const tasks=[
  ["FAT-ALL1","D6","ALL","K01","Cross-MR interface integration, fault/alarm recovery, punch re-verification",4,"BOD §10.3 / SPE §7.3.1 / MR0001–0004","ADDVALUE","End-to-end factory integration / recovery report"],
  ["FAT-ALL2","D6","ALL","K01","Signed FAT, as-left configuration backup, punch disposition and handover list",4,"BOD §10.3 / SPE §7.3.1 / MR FAT/SAT VDRL","ADDVALUE","Signed reports, printouts, licence register, ship list"]
 ];
-export const FAT_FOUR_MR_TASKS_0553=Object.freeze(tasks.map(([id,day,mr,wbs,activity,hours,requirement,executor,evidence])=>
- Object.freeze({id,day,mr,wbs,activity,hours,requirement,executor,evidence,costOwner:"B3_ADDVALUE_LOCAL_EXECUTION",witnessCostOwner:"B3",testTagCountVerified:false,postingAllowed:false})));
+const formalAllocation=Object.freeze({
+ "FAT-00":["D1",1],"FAT-01A":["D1",2],"FAT-01B":["D1",2],"FAT-01C":["D1",1],"FAT-02A":["D1",2],
+ "FAT-02B":["D2",1],"FAT-03A":["D2",1],"FAT-03B":["D2",1],"FAT-04A":["D2",1],"FAT-04B":["D2",1],"FAT-ALL1":["D2",2],"FAT-ALL2":["D2",1]
+});
+export const FAT_FOUR_MR_TASKS_0553=Object.freeze(tasks.map(([id,historicalDay,mr,wbs,activity,historicalHours,requirement,executor,evidence])=>{
+ const [day,hours]=formalAllocation[id];
+ return Object.freeze({id,day,mr,wbs,activity,hours,historicalDay,historicalHours,preparationHours:historicalHours-hours,
+ requirement,executor,evidence,costOwner:"B3_ADDVALUE_LOCAL_EXECUTION",witnessCostOwner:"B3",testTagCountVerified:false,postingAllowed:false});
+}));
 export function selectFourMrFatWbs0553(){
  const rows=FAT_FOUR_MR_TASKS_0553;
  const days=[...new Set(rows.map(x=>x.day))];
- if(days.length!==6||rows.length!==12)throw Error("FAT agenda coverage changed");
+ if(days.length!==2||rows.length!==12)throw Error("FAT agenda coverage changed");
  if(days.some(day=>rows.filter(x=>x.day===day).reduce((v,x)=>v+x.hours,0)!==rateHours))
-  throw Error("FAT six daily 8-hour agenda does not reconcile");
+  throw Error("FAT two daily 8-hour agenda does not reconcile");
  for(const mr of ["MR0001","MR0002","MR0003","MR0004"])
   if(!rows.some(x=>x.mr===mr))throw Error("Missing FAT MR "+mr);
  return Object.freeze({
   moduleId:"bid.budget.working.bc.b9.fat-four-mr-wbs",
-  rows,estimatedFatWitnessDays:days.length,estimatedTestAgendaHours:rows.reduce((v,x)=>v+x.hours,0),
+  rows,estimatedFatWitnessDays:days.length+1,formalFatDays:days.length,reserveDays:1,reserveHours:8,preparationHours:32,historicalAgendaHours:48,estimatedTestAgendaHours:rows.reduce((v,x)=>v+x.hours,0),
   witnessCrew:Object.freeze(["Field Telecom Engineer","Senior Telecom Systems Integration Engineer"]),
   standby:"No additional unbilled execution staff assumed",
   vendorExecutor:"ADDVALUE at SAMTEL Warehouse Thailand; MGW equipment supply only",
   delivery:"ADDVALUE export management B6; CIF Zhuhai Port; Purchaser China clearance/port-to-yard per COM-D02",
   expectedFatTravelDays:0,estimatedRoomNightsPerWitness:0,
   notificationPlanningDays:30,notificationBodMinimumDays:30,notificationConflictUnresolved:false,
-  scheduleApprovalState:"BUDGETARY_6_WITNESS_DAYS_SUBJECT_TO_ADDVALUE_OEM_AGENDA_TEST_COUNTS_ITP",
+  scheduleApprovalState:"OWNER_FAT_2_PLUS_1_TIMEBOX__ITP_AND_TAG_REPETITION_CONFIRMATION_OPEN",
   noDoubleCountRule:"B3 owns ADDVALUE preparation/execution and shared temporary test setups; B8 teaching on separate days; B9 separate Yard assistance",
   postDirectCost:false,customerReleaseAllowed:false
  });

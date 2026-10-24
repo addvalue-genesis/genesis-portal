@@ -102,8 +102,8 @@ const duplicate=structuredClone(rel.annex);duplicate.C2[1]=duplicate.C2[0];
 assert.throws(()=>auditAnnexBidirectionalTrace0553(costs.currentByCode,duplicate),/BIDIRECTIONAL/);
 // Value-preserving serialization must remain valid; object identity is not evidence parity.
 assert.equal(auditAnnexBidirectionalTrace0553(costs.currentByCode,structuredClone(rel.annex)).totalRows,16);
-assert.equal(bc.knownWorkingSellTHB,4997357.13);
-const unchangedOwners={B1:211600,B2:237121.13,B3:2562600,B4:null,B5:311184,
+assert.equal(bc.knownWorkingSellTHB,4757207.13);
+const unchangedOwners={B1:211600,B2:237121.13,B3:2322450,B4:null,B5:311184,
  B6:307584,B7:30000,B8:142550,B9:480550,B12:null,B14:null};
 for(const [code,value] of Object.entries(unchangedOwners)){
  assert.equal(bc.byCode[code].workingSellTHB,value,code+" checkpoint must not change");

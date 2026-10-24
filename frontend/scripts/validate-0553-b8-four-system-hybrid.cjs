@@ -22,12 +22,12 @@ const {BcOwnerPriceTrace0553:Parent}=get("BcOwnerPriceTrace0553.jsx");
 const bc=working(),before=JSON.stringify(bc),b8=bc.byCode.B8,m=hybrid(b8);
 assert.equal(b8.workingSellTHB,142550);
 assert.equal(b8.qtyDriver,1);assert.equal(b8.directCostTHB,null);
-assert.equal(bc.knownWorkingSellTHB,4997357.13);
+assert.equal(bc.knownWorkingSellTHB,4757207.13);
 assert.deepEqual(m.systems.map(x=>x.mr),["MR0001","MR0002","MR0003","MR0004"]);
-assert.deepEqual(m.systems.map(x=>x.hours),[4,4,4,4]);
-assert.deepEqual(m.systems.map(x=>x.day),[1,1,2,2]);
+assert.deepEqual(m.systems.map(x=>x.hours),[2,2,2,2]);
+assert.deepEqual(m.systems.map(x=>x.day),[1,1,1,1]);
 assert.equal(m.trainees,8);assert.equal(m.onsiteTrainingDays,2);
-assert.equal(m.onsiteContactHours,16);
+assert.equal(m.onsiteContactHours,8);
 assert.equal(m.onsitePaidSeniorCount,1);
 assert.deepEqual(m.groups.map(g=>g.workingSellTHB),[66150,50400,26000,0]);
 assert.equal(m.pricedRows,11);
@@ -66,13 +66,13 @@ assert.equal(r.b.find(x=>x.code==="B8").workingSellTHB,142550);
 assert.equal(s.lines.B8.workingSellTHB,142550);
 assert.equal(s.lines.B8.directCostTHB,null);
 assert.equal(r.b.find(x=>x.code==="B8").releaseAllowed,false);
-assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2562600);
+assert.equal(r.b.find(x=>x.code==="B3").customerSellTHB,2322450);
 assert.equal(r.b.find(x=>x.code==="B9").customerSellTHB,480550);
 assert.equal(r.b.find(x=>x.code==="B6").customerSellTHB,307584);
 const html=renderToStaticMarkup(React.createElement(View,{workingRow:b8}));
 const parent=renderToStaticMarkup(React.createElement(Parent,{workingRow:b8}));
 for(const token of ["142,550.00","66,150.00","50,400.00","26,000.00","15,000.00","5,000.00","85,100.00",
- "4 systems","8 customer trainees","2 training days","MR0001","MR0002","MR0003","MR0004",
+ "4 systems","8 customer trainees","1 training day +1 reserve day","MR0001","MR0002","MR0003","MR0004",
  "Online","Senior","NOT ESTABLISHED","SUPERSEDED","Rev05","HOLD"]){
  assert(html.toLowerCase().includes(token.toLowerCase()),"B8 hybrid SSR missing "+token);
 }

@@ -1,3 +1,5 @@
+> Duration and current prices superseded by [owner FAT2+1 / Training1+1 correction](20261024_FAT_2PLUS1_TRAINING_1PLUS1.md). OEM ONLINE Base selection remains unchanged.
+
 # PJ2608-0553 — SAMTEL lump-sum execution budget, 24 October 2026
 
 This revision follows remote `1526365e` (MGW equipment only). It responds to the owner's request to fund preparation, facilities/rental, tools, FAT hosting, training/materials/instructors and dispatch to CIF Zhuhai. It is an internal Working SELL draft, not a vendor quotation, verified cash cost, approved customer deviation or issued offer. Original numbered requirements 1–8 remain unrecovered; none is reconstructed here.

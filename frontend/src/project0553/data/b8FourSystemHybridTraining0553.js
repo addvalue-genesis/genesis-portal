@@ -1,4 +1,4 @@
-// Four-system training at SAMTEL: 8 trainees, 16 hours, 6 product-family slots.
+// Four-system training at SAMTEL: 8 trainees, 8 base teaching hours +8 reserve hours, 6 product-family slots.
 // ADDVALUE onsite + provisional OEM remote instruction; selected Working SELL, not verified cost.
 // Shared instruments charged once in B3. Historical foreign travel remains excluded without a second credit.
 import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
@@ -9,22 +9,22 @@ const rate=ONSHORE_WORKING_SELL_RATE_0553;
 const fx=rate.thbPerUsd;
 const seniorUSD=rate.roleRates.seniorTelecomEngineerUSDPerPersonDay;
 const systems=f([
- f({mr:"MR0001",name:"SCADA / WiMAX / Ethernet Network",day:1,slot:"Morning",hours:4}),
- f({mr:"MR0002",name:"DMR Trunk Radio / BDA",day:1,slot:"Afternoon",hours:4}),
- f({mr:"MR0003",name:"EX Telephone / Sounder",day:2,slot:"Morning",hours:4}),
- f({mr:"MR0004",name:"RACON",day:2,slot:"Afternoon",hours:4})
+ f({mr:"MR0001",name:"SCADA / WiMAX / Ethernet Network",day:1,slot:"09:00–11:00",hours:2,reserveHours:2}),
+ f({mr:"MR0002",name:"DMR Trunk Radio / BDA",day:1,slot:"11:00–13:00",hours:2,reserveHours:2}),
+ f({mr:"MR0003",name:"EX Telephone / Sounder",day:1,slot:"14:00–16:00",hours:2,reserveHours:2}),
+ f({mr:"MR0004",name:"RACON",day:1,slot:"16:00–18:00",hours:2,reserveHours:2})
 ]);
 const def=f([
  f({key:"onsite",name:"Onsite Teaching / Content Preparation · Separate Days from B3",items:f([
-  f({id:"SR-ONSITE",activity:"Senior Telecom Systems Integration Engineer — onsite practical facilitator",qty:2,unit:"person-day",usdUnit:700}),
+  f({id:"SR-ONSITE",activity:"Senior Telecom Systems Integration Engineer — onsite practical facilitator: 1 teaching day +1 reserve day",baseQty:1,reserveQty:1,qty:2,unit:"person-day",usdUnit:700}),
   f({id:"SR-PREP",activity:"Four-system OEM coordination, material/configuration checks and video rehearsal",qty:1,unit:"person-day",usdUnit:700}),
   f({id:"SR-MOB",activity:"Senior Telecom Engineer mobilisation/demobilisation labour — separate-trip reserve",qty:2,unit:"person-day",usdUnit:700,sharedTripReconciliation:true})
  ])}),
  f({key:"oem",name:"Four OEM Remote Instructor Sessions",items:f([
-  ...systems.map(s=>f({id:s.mr+"-ONLINE",activity:s.mr+" — "+s.name+" OEM remote instructor (4-hour interactive class)",mr:s.mr,qty:1,unit:"half-day online session",usdUnit:400,oemFeeNotQuoted:true}))
+  ...systems.map(s=>f({id:s.mr+"-ONLINE",activity:s.mr+" — "+s.name+" OEM online: 2-hour base class +2-hour reserve support",mr:s.mr,baseHours:2,reserveHours:2,qty:1,unit:"2h base +2h reserve block",usdUnit:400,oemFeeNotQuoted:true}))
  ])}),
  f({key:"materials",name:"Training Materials & AV Connectivity",items:f([
-  f({id:"TRAINING-CATERING",activity:"Lunch and two breaks for 8 trainees + facilitator + host; separate training days",qty:20,unit:"person-day",thbUnit:550,allowanceOnly:true}),
+  f({id:"TRAINING-CATERING",activity:"Lunch and two breaks for 8 trainees + facilitator + host; 1 teaching +1 reserve day",baseQty:10,reserveQty:10,qty:20,unit:"person-day",thbUnit:550,allowanceOnly:true}),
   f({id:"TRAINING-PACK",activity:"Four discipline training packs, handouts, exercise checklist, attendee register and assessment for eight people",qty:4,unit:"system training pack",thbUnit:2500}),
   f({id:"VIDEO-CONNECT",activity:"Onsite audio/video, conferencing, connection test and support allowance",qty:1,unit:"two-day session allowance",thbUnit:5000}),
   f({id:"MR0002-RFI-DEMO",activity:"ADDVALUE RFI UHF BDA practical demo: RF gain/alarm/configuration; temporary spectrum/attenuator/load/interconnect test setup",mr:"MR0002",qty:1,unit:"budgetary RF training setup allowance",thbUnit:15000,allowanceOnly:true,transferredToB3:true,
@@ -79,14 +79,15 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
  return f({
   moduleId:ROOT,ownerModuleId:"bid.budget.working.bc.b8",
   code:"B8",systems,productCoverage:f([
- {mr:"MR0001",product:"Aviat RF / SCADA",hours:2,onlineFeeTHB:6300,provider:"NextG/OEM support unconfirmed"},
- {mr:"MR0001",product:"Cisco switching / VLAN",hours:2,onlineFeeTHB:6300,provider:"VST/OEM support unconfirmed"},
- {mr:"MR0002",product:"RFI BDA / RF path",hours:4,onlineFeeTHB:12600,provider:"RFI specialist unconfirmed; MGW equipment only"},
- {mr:"MR0003",product:"Gai-Tronics IP telephone",hours:2,onlineFeeTHB:6300,provider:"EXION/OEM specialist unconfirmed"},
- {mr:"MR0003",product:"Eaton DB3B sounder",hours:2,onlineFeeTHB:6300,provider:"EXION/OEM specialist unconfirmed"},
- {mr:"MR0004",product:"ORGA RACON",hours:4,onlineFeeTHB:12600,provider:"MDS/ORGA specialist unconfirmed"}
- ]),trainees:8,systemsCount:4,onsiteTrainingDays:2,
-  onsiteContactHours:16,onsitePaidSeniorCount:1,onsiteFieldCount:0,
+ {mr:"MR0001",product:"Aviat RF / SCADA",hours:1,reserveHours:1,onlineFeeTHB:6300,provider:"NextG/OEM support unconfirmed"},
+ {mr:"MR0001",product:"Cisco switching / VLAN",hours:1,reserveHours:1,onlineFeeTHB:6300,provider:"VST/OEM support unconfirmed"},
+ {mr:"MR0002",product:"RFI BDA / RF path",hours:2,reserveHours:2,onlineFeeTHB:12600,provider:"RFI specialist unconfirmed; MGW equipment only"},
+ {mr:"MR0003",product:"Gai-Tronics IP telephone",hours:1,reserveHours:1,onlineFeeTHB:6300,provider:"EXION/OEM specialist unconfirmed"},
+ {mr:"MR0003",product:"Eaton DB3B sounder",hours:1,reserveHours:1,onlineFeeTHB:6300,provider:"EXION/OEM specialist unconfirmed"},
+ {mr:"MR0004",product:"ORGA RACON",hours:2,reserveHours:2,onlineFeeTHB:12600,provider:"MDS/ORGA specialist unconfirmed"}
+ ]),trainees:8,systemsCount:4,onsiteTrainingDays:2,baseTrainingDays:1,trainingReserveDays:1,
+  dayBasis:"OWNER_CONFIRMED_ONE_TEACHING_PLUS_ONE_RESERVE",
+  onsiteContactHours:8,trainingReserveHours:8,onsitePaidSeniorCount:1,onsiteFieldCount:0,
   trainingMode:"ON_SITE_HANDS_ON_WITH_REMOTE_OEM_DISCIPLINE_INSTRUCTORS",
   bidBasisDecision:f({
    id:"OWNER_20261024_OEM_ONLINE_BASE",authority:"PROJECT_OWNER_JACK",date:"2026-10-24",
@@ -137,12 +138,12 @@ export function selectB8FourSystemHybridTraining0553(workingRow=null){
   workingSellId:"WS-B8",customerProposalId:"CP-B8",scopeId:"SOW-B8",
   gates:f([
    "Project Owner selects OEM ONLINE with ADDVALUE onsite at SAMTEL as the BASE BID method on 24-Oct-2026. State this delivery basis in the proposal; do not automatically substitute OEM onsite. Historic Yangon/two-batch requirements remain documented qualifications, not a pending internal method choice",
-   "ADDVALUE owns onsite training delivery; four remote OEM support sessions at USD400 each are provisional parametric risk allowances, NOT supplier confirmations",
+   "ADDVALUE owns onsite training delivery; four remote OEM blocks (2h base +2h reserve) at USD400 each are provisional parametric risk allowances, NOT supplier confirmations",
    "Former B8 RFI15000 + RACON5000 transferred to B3 shared temporary setups; B8 posts zero for those stable source IDs; no permanent B11 purchase",
    "Selected MDS/ORGA programming cable is equipment scope; no quoted instructor fee or calibrated simulator supplied for this budget",
    "One onsite Senior runs demonstration, Q&A, records attendance of eight people, four system training packs and assessment",
    "Historical B8 China travel THB85100 was already excluded; relocating to SAMTEL produces NO further B8 deduction",
-   "Planned Senior days do not overlap: prior B8 content-preparation day, B3 D1–4, B8 D5–6, B3 D7–14. Actual attendance/calendar still to confirm",
+   "Owner1+1 training: prior B8 content preparation, B3 D1–4 preparation, B8 D5 teaching/D6 reserve, B3 D7–8 FAT/D9 reserve. No overlapping labour. Session adequacy/ITP still to confirm",
    "Confirm purchaser responsibility for eight attendees travel/accommodation to SAMTEL Warehouse Thailand; attendee transport not budgeted in B8",
    "Source Rev05 THB30000 / 44 MH is superseded as Working SELL but remains historical audit; no payroll or OEM paid direct cost has been established",
    "Training must be onsite for end users even where OEM instructor appears online; fully remote delivery alone is not selected"

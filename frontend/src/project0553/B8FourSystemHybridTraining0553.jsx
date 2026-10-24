@@ -12,7 +12,7 @@ export function B8FourSystemHybridTraining0553({workingRow}){
   data-component-key={m.moduleId} style={{padding:12,marginTop:10}}>
   <div className="p553-bc-price-head">
    <div><h4>B8 — OEM Online Base + ADDVALUE Onsite Training</h4>
-    <p className="p55-note">{copy(m.moduleId)} · 4 systems / 8 customer trainees / 2 training days.
+    <p className="p55-note">{copy(m.moduleId)} · 4 systems / 8 customer trainees / 1 training day +1 reserve day.
      ADDVALUE-led HYBRID Budgetary Working SELL · Manufacturer online specialist time is an UNQUOTED allowance; shared demo setups belong to B3, not verified Direct COST.</p></div>
    <div className="p553-bc-main-actions">
     <button type="button" className="p553-detail-button" onClick={()=>toggleAll(true)}>＋ Expand All</button>
@@ -21,10 +21,10 @@ export function B8FourSystemHybridTraining0553({workingRow}){
   <div className="p55-metric-grid">
    <div><strong>Selected B8 Working SELL · ONE LS</strong><p>{money(m.selectedWorkingSellTHB)}</p>
     <small>10.2 WS-B8 → 10.3 CP-B8 → 10.5 SOW-B8 · Release HOLD</small></div>
-   <div><strong>End Users / Duration</strong><p>{m.trainees} people · {m.onsiteTrainingDays} days</p>
-    <small>Four disciplines · four half-day live sessions (16 contact hours)</small></div>
+   <div><strong>End Users / Duration</strong><p>{m.trainees} people · {m.baseTrainingDays} teaching + {m.trainingReserveDays} reserve day</p>
+    <small>Four disciplines · 8 base contact hours +8 reserve hours</small></div>
    <div><strong>Onsite ADDVALUE Resource</strong><p>1 Senior Telecom Engineer</p>
-    <small>2 training days + 1 preparation day at USD700/MD; NO separate travel-day labour</small></div>
+    <small>1 teaching day +1 reserve day +1 content-preparation day at USD700/MD; NO separate travel-day labour</small></div>
    <div><strong>OEM Technical Support</strong><p>Online · Owner-selected Base</p>
     <small>Four manufacturer discipline support sessions · USD400/session estimated; ADDVALUE owns onsite instruction</small></div>
   </div>
@@ -33,24 +33,24 @@ export function B8FourSystemHybridTraining0553({workingRow}){
   <p className="p55-note"><strong>Proposal delivery basis:</strong> {m.bidBasisDecision.proposalWording}</p>
   <p className="p55-note"><strong>Working venue:</strong> {m.assumedBudgetaryVenue}.
    Physical classroom, live equipment demonstrations, test access and an ADDVALUE engineer MUST be onsite.
-   OEM expert supports remotely under provisional fees. D5–D6 training and the prior content-preparation day are distinct from B3 execution days.
+   OEM expert supports remotely under provisional fees. D5 teaching, D6 reserve and the prior content-preparation day are distinct from B3 execution days.
    The two legacy RFI/RACON demo rows now post zero in B8: shared temporary instruments are budgeted in B3 once.</p>
   <p className="p55-note">Training materials cover lesson preparation, OEM manuals, exercises, configuration examples, attendee register and assessment.
-   B2 owns controlled document submission. Lunch/two breaks: 10 people × 2 days × THB550 = THB11,000.
+   B2 owns controlled document submission. Lunch/two breaks: 10 people × (1 teaching +1 reserve) days × THB550 = THB11,000.
    Client travel/hotel responsibility remains unconfirmed; these are not assumed included or free.</p>
-  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Product</th><th>Hours in existing 16-hour course</th><th>Online fee allocation THB</th><th>Specialist source</th></tr></thead>
-   <tbody>{m.productCoverage.map(x=><tr key={x.product}><td>{x.mr} · {x.product}</td><td>{x.hours}</td><td>{money(x.onlineFeeTHB)}</td><td>{x.provider}</td></tr>)}</tbody></table></div>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact"><thead><tr><th>Product</th><th>Base + reserve hours</th><th>Online fee allocation THB</th><th>Specialist source</th></tr></thead>
+   <tbody>{m.productCoverage.map(x=><tr key={x.product}><td>{x.mr} · {x.product}</td><td>{x.hours} + {x.reserveHours}</td><td>{money(x.onlineFeeTHB)}</td><td>{x.provider}</td></tr>)}</tbody></table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Day / Timebox</th><th>MR / System</th><th>Audience</th><th>Onsite Delivery</th><th>OEM Instructor</th></tr></thead>
    <tbody>{m.systems.map(x=><tr key={x.mr}>
-    <td><strong>Day {x.day} — {x.slot}</strong><small>{x.hours} hours</small></td>
+    <td><strong>Day {x.day} — {x.slot}</strong><small>{x.hours} base hours + {x.reserveHours} reserve hours</small></td>
     <td><strong>{x.mr}</strong> · {x.name}</td>
     <td>8 purchaser/end-user attendees (same cohort)</td>
     <td>ADDVALUE Sr Engineer — demonstration, hands-on, attendance and assessment</td>
     <td>ADDVALUE-led practical / OEM online specialist assistance allowance, awaiting vendor confirmation</td>
    </tr>)}</tbody>
-   <tfoot><tr><th colSpan={4}>Four systems / total classroom training 2 days × 8 attendees</th>
-    <th>16 contact hours · no fourfold multiplication of days</th></tr></tfoot>
+   <tfoot><tr><th colSpan={4}>Four systems / 1 teaching +1 reserve day ×8 attendees</th>
+    <th>8 teaching hours +8 reserve hours; reserve included once</th></tr></tfoot>
   </table></div>
   {m.groups.map((g,i)=><details key={g.id} className={"p553-bc-price-doc-group p553-b8-hybrid-group p553-b8-hybrid-group--"+g.key}
     data-component-key={g.id} open={i===0}>
@@ -93,9 +93,9 @@ export function B8FourSystemHybridTraining0553({workingRow}){
     <tr><td>B3 FAT shared-trip duplication EXCLUDED from B8</td>
      <td>− {money(m.excludedDuplicateTripWorkingSellTHB)}</td>
      <td>ALREADY DEDUCTED · B3 owns common travel, no additional credit</td></tr>
-    <tr><td>B8 onsite Senior labour 2 days · overlap verification</td>
+    <tr><td>B8 onsite Senior: 1 teaching +1 reserve day</td>
      <td>{money(44100)}</td>
-     <td>INCLUDED on separate planned D5–D6; no B3 Senior labour posted on these training days</td></tr></tbody>
+     <td>INCLUDED on D5 teaching +D6 reserve; no B3 Senior labour posted on these training days</td></tr></tbody>
   </table></div>
   <p className="p55-note"><strong>Approval gaps:</strong> {m.gates.join(" · ")}.</p>
   <h4>Full OEM onsite alternative — NOT SELECTED / NOT ADDITIVE</h4>

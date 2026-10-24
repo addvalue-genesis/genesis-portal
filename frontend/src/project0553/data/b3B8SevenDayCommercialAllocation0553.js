@@ -14,7 +14,7 @@ export function selectB3B8SevenDayCommercialAllocation0553({b3,b8}){
  // Historical comparison only: excludes the subsequent 14-day local execution plan.
  const currentSelected={B3:b3.workingSellTHB,B8:b8.workingSellTHB};
  const historicalIds=new Set(["FAT-STAFF","TRAVEL-DAYS","AIRFARE","HOTEL","VISA","LOCAL-TRAVEL","TRAVEL-INSURANCE","WORK-INSURANCE"].map(x=>"B3-"+x));
- const historicalRows=b3.b3ChinaFatBudget.rows.filter(x=>historicalIds.has(x.id)).map(x=>x.id==="B3-LOCAL-TRAVEL"?{...x,qty:1,unit:"consolidated trip",unitRateTHB:8000,workingSellTHB:8000}:x);
+ const historicalRows=b3.b3ChinaFatBudget.rows.filter(x=>historicalIds.has(x.id)).map(x=>x.id==="B3-FAT-STAFF"?{...x,qty:12,unitRateTHB:20475,workingSellTHB:245700}:x.id==="B3-LOCAL-TRAVEL"?{...x,qty:1,unit:"consolidated trip",unitRateTHB:8000,workingSellTHB:8000}:x);
  b3={...b3,workingSellTHB:2133300,b3ChinaFatBudget:{...b3.b3ChinaFatBudget,rows:historicalRows,fatWorkingSellTHB:263700}};
  b8={...b8,workingSellTHB:151550};
  const fat=b3.b3ChinaFatBudget,rows=fat?.rows.filter(x=>x.costOwner==="B3"&&!x.optional)||[];

@@ -27,8 +27,8 @@ assert(model.rows.some(x=>x.id==="B1-REG-07"&&x.riskClass.includes("ANTI_BRIBERY
 assert.equal(model.computedRegulatoryDirectCostTHB,null);
 assert.equal(model.workingSellPosted,false);
 assert.equal(base.byCode.B1.workingSellTHB,211600); // New Rev.K engineering + PM, old 510k audit only
-assert.equal(base.knownWorkingSellTHB,4997357.13);
-assert.equal(base.byCode.B3.workingSellTHB,2562600);
+assert.equal(base.knownWorkingSellTHB,4757207.13);
+assert.equal(base.byCode.B3.workingSellTHB,2322450);
 const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
 const currentSpareDelta=Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
  sum+base.byCode[code].workingSellTHB-old,0);
