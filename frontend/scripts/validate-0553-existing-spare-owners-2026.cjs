@@ -142,7 +142,13 @@ for(const code of codes){
    assert.equal(html.split('data-component-key="'+anchor+'"').length-1,1,"Unique rendered source anchor "+anchor);
   }
   assert(html.includes("10.3 Release"));
-  assert(html.includes("Current row OEM proof — OPEN"));
+  if(code==="B10"&&mode==="scope"){
+   assert(html.includes("B10 — Kit price summary / reconciliation"));
+   assert(html.includes("509,827.50"));
+   assert(!html.includes("B10 — Price-to-Win What-if"));
+   assert(!html.includes("B10 — Original Item / Source"));
+   assert(!html.includes("bid.budget.working.bc.b10.itemized-purchasing-evidence"));
+  }else assert(html.includes("Current row OEM proof — OPEN"));
   if(mode==="scope")assert(html.includes("10.2 Source"));
   if(code.startsWith("C"))assert(html.includes("NOT QUOTED"));
  }
