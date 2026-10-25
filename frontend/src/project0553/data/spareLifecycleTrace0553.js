@@ -67,6 +67,25 @@ export function buildSpareLifecycleTrace0553(schedule,release){
   }
  }
  if(result.length!==16||seen.size!==16)throw Error("0553 five-category lifecycle requires 16 unique financial source records");
+ // These are contractual/application checks, NOT independently verified SKU lists.
+ const requirements=Object.freeze({
+  B10:Object.freeze({source:"MR0001–0004 §5/Attachment 5; SPE §8.1; EXA-A8 Attachment 1",
+   minimum:"14 kit sets across 4/3/4/3 site platforms; parts inside each kit not OEM verified",
+   open:"Select exact Start-up SPIR part number, per-type Qty, Ex rating, stock owner, lead time and price"}),
+  B11:Object.freeze({source:"EXA-A8 Attachment 2 §5 Telecom; SPE §8.2",
+   minimum:(schedule.b11Requirements?.rows||[]).length+" distinct minimum telecom tool functions; not automatically additive to four MR price envelopes",
+   open:"OEM inclusion credits, permanent handover vs B3 SAT rental and TETRA/DMR applicability"}),
+  B13:Object.freeze({source:"MR Attachment 9; preservation, unpacking and SAT method statements",
+   minimum:(schedule.currentByCode.B13||[]).length+" provisional consumable work-scope categories; event consumption not confirmed",
+   open:"Consumption events and extra procurement stock net of B5 packing and A5 installed bulk"}),
+  C1:Object.freeze({source:"MR Attachment 7 / capital spare option",
+   minimum:"One nonposted project-pool RACON spare scenario, not a quoted spare purchase",
+   open:"Independent OEM whole-unit spare SKU/Ex and configuration certificate, lead time, delivery cost"}),
+  C2:Object.freeze({source:"MR0001–0004 Attachment 7 instruction 6; PTTEP TEL-001 §4.7",
+   minimum:"Four MR operating-spare schedules; not a quantified or priced stock takeoff",
+   open:"OEM MTBF-based two-year SPIR, part number, Qty/rate/lead time; omit confirmed B10 identical stock"})
+ });
+ if(requirements.B11.minimum.startsWith("0 "))throw Error("B11 EXA-A8 minimum tool source missing");
  const totals=Object.fromEntries(SPARE_LIFECYCLE_CODES_0553.map(code=>{
   const rows=result.filter(x=>x.code===code),quoted=rows.every(x=>Number.isFinite(x.selectedWorkingSellTHB));
   const subtotal=quoted?round(rows.reduce((s,x)=>s+x.selectedWorkingSellTHB,0)):null;
@@ -82,7 +101,7 @@ export function buildSpareLifecycleTrace0553(schedule,release){
  }
  return Object.freeze({
   moduleId:"bid.budget.working.bc.spare-lifecycle-control",
-  rows:Object.freeze(result),totals:Object.freeze(totals),rules,
+  rows:Object.freeze(result),totals:Object.freeze(totals),rules,requirements,
   alertFamilies:Object.freeze([...(schedule.crossCategoryDuplicates||[])]),
   sourceToReleasePassed:true,releaseToSourcePassed:true,
   confirmedSameSkuCrossCategory:0,
