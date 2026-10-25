@@ -9,7 +9,7 @@ const status=s=>s==="VENDOR_DASH__PRICE_UNKNOWN"?"Vendor dash / price unavailabl
 export function B10ItemizedPurchasingEvidence0553({evidence,context="working"}){
  if(!evidence)return null;
  return <details className="p55-panel p553-b10-purchasing-evidence" open={context==="working"} data-component-key={evidence.moduleId} style={{padding:12}}>
-  <summary><strong>B10 — Itemized quoted SKU / TAG / quantity / unit-price evidence</strong>
+  <summary><strong>B10 — Original Item / Source (quoted SKU / TAG / unit-price evidence)</strong>
    <small>{evidence.supplierRows.length} quoted line identities, {evidence.supplierQuotedCount} with price; full purchase scope NOT established</small></summary>
   <p className="p55-note"><strong>Source:</strong> {evidence.sourceQuote} · supplier quote dated 16 Sep 2026, expired 1 Oct 2026.
    D and E are distinct NextG optional spare-stock groupings; they do not establish the contents of 14 contractual commissioning kits. No sale, cost, inventory or duplicate charge is posted from this evidence.</p>
@@ -19,10 +19,10 @@ export function B10ItemizedPurchasingEvidence0553({evidence,context="working"}){
     <td><strong>{x.id}</strong><small>{x.mr} / {x.locations.join(", ")}</small></td>
     <td>{amount(x.workingTotalSellTHB,"THB")}</td><td>{x.contractKitCount} sets</td><td>NO — itemized OEM SPIR still required</td>
    </tr>)}</tbody></table></div>
-  <h4>B10 purchasable article breakdown — source requirement by physical function</h4>
+  <h4>B10 — MR Physical Requirement / Original Item / Source (SKU not selected)</h4>
   <p className="p55-note"><strong>These 14 rows are article families, NOT 14 spare units or proven OEM procurement SKUs.</strong> Each parent 4/3/4/3 kit value is counted once above; every sub-item is nonposting until a make/model/part no., exact site TAG, approved purchase Qty and separate supplier rate have been evidenced.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-   <thead><tr><th>MR / Parent source</th><th>Physical article/function</th><th>Actual site/TAG candidates</th><th>OEM part number / SKU</th><th>Physical purchase Qty</th><th>Unit price THB</th><th>Vendor quote link / readiness</th></tr></thead>
+   <thead><tr><th>Original Item / Source (MR parent)</th><th>Physical article/function</th><th>Actual site/TAG candidates</th><th>OEM part number / SKU</th><th>Physical purchase Qty</th><th>Unit price THB</th><th>Vendor quote link / readiness</th></tr></thead>
    <tbody>{evidence.requirementArticleRows.map(x=><tr key={x.id} data-b10-requirement-id={x.id}>
     <td><strong>{x.parentB10PriceId}</strong><small>{x.mr} · {x.id}</small></td>
     <td>{x.articleFunction}</td>
@@ -42,9 +42,9 @@ export function B10ItemizedPurchasingEvidence0553({evidence,context="working"}){
     <summary><strong>{group} — {group==="D"?"Base-station":"Remote-terminal"} spare offer</strong>
      <small>{rows.length} supplier lines · quoted quantity is NOT the approved purchase quantity</small></summary>
     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-     <thead><tr><th>Quote line</th><th>Physical product / licence / service</th><th>OEM Part No.</th><th>Related installed TAG (candidate)</th><th>Offered Qty</th><th>B10 purchase Qty</th><th>Unit USD quote</th><th>Budget THB equivalent/unit</th><th>Price / ownership gate</th></tr></thead>
+     <thead><tr><th>Original Item / Source</th><th>Physical product / licence / service</th><th>OEM Part No.</th><th>Related installed TAG (candidate)</th><th>Offered Qty</th><th>B10 purchase Qty</th><th>Unit USD quote</th><th>Budget THB equivalent/unit</th><th>Price / ownership gate</th></tr></thead>
      <tbody>{rows.map(x=><tr key={x.id} data-b10-source-id={x.id} data-component-key={evidence.moduleId+"."+x.id.toLowerCase()}>
-      <td><code>{x.sourceQuoteLine}</code><small>{x.mr}</small></td>
+      <td><code>{x.sourceQuoteLine}</code><small>{x.mr} · {x.quotation}</small><small>{x.sourceDocument}</small></td>
       <td><strong>{x.articleDescription}</strong><small>{x.articleClass}</small></td>
       <td><code>{x.proposedSku}</code><small>Quote SKU, spare interchangeability OPEN</small><small>Same SKU in installed A/B/C quote lines: {x.matchedBaseEquipmentQuoteLines.join(", ")||"not listed"}</small></td>
       <td>{x.candidateInstalledSiteTags.length?
