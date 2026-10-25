@@ -31,6 +31,8 @@ const html=renderToStaticMarkup(React.createElement(OfficialUsdRelease0553,{sour
 assert(html.includes(model.totalUSD.toLocaleString('en-US',{minimumFractionDigits:2})));
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
 assert(html.includes('B4, B12, B14'));assert(html.includes('USD 1,000 / 800/person/day'));
+assert(html.includes('PRE-AWARD / NOT ISSUED.'),'Incomplete quote must be visibly unissued');
+assert(html.includes('Priced A+B subtotal (USD)'),'Incomplete quote must not masquerade as a complete A+B total');
 const native=fs.readFileSync(path.join(root,'project0553/nativeWorkingDraft0553.js'),'utf8'),box={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set};
 vm.runInNewContext(native.replace(/\bexport /g,'')+';this.zip={entriesFromZip,readEntry};',box);
 const template=require('../src/project0553/data/nativeReleaseTemplate0553.json');
@@ -53,6 +55,8 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
   if(i===1){
    assert(cell(xml,'G38').includes('<v>'+model.totalUSD+'</v>'));
    assert(cell(xml,'A38').includes('B4, B12, B14'));
+   assert(cell(xml,'A38').includes('Priced A+B subtotal (USD)'),'Native incomplete subtotal label');
+   assert(cell(xml,'A39').includes('not a complete base quotation'),'Native incomplete scope warning');
    for(const r of model.b)assert(cell(xml,'G'+(23+Number(r.code.slice(1)))).includes(r.amountUSD===null?'To be quoted':'<v>'+r.amountUSD+'</v>'));
    assert(cell(xml,'B26').includes('28 working days'));assert(cell(xml,'B32').includes('7 working days + 2 travel days/person'));
   }else{
