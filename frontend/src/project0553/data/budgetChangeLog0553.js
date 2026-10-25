@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R52";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R53";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-07",date:"2026-10-25",kind:"UI",tone:"navigation",
+  title:"B10 / B11 / B13 / C1 / C2 — bidirectional Release→Source→Release and cross-category lifecycle",
+  detail:"One nonposting, source-owned five-category spare lifecycle registry checks all 16 financial Working rows against 10.3.3 Release and native cell IDs. Adds collapsed trace/requirement/overlap reviewer to Working and internal Release, exact Return-to-10.3.3 row action on Working after Release source lookup, and category-level return when no exact row was selected. Seven controls cover B10/A installed, B10/C1 capital, B10/C2 2-year stock, B11/A licences, B11/B3 contractor test equipment, B13/B5 packing and B13/A5 bulk. Minimum requirements linked to MR Attachments 5/7, SPE, EXA-A8 and OEM. No new SKU/Qty/USD price or posting, no changes to B10 THB509827.50, B11 THB157657.50, B13 THB46683, C1/C2 unquoted, Official USD or native Excel. Build regression blocks incorrect source row mapping; customer release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.spare-lifecycle-control","bid.budget.pricing.release.preview.spare-lifecycle","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner request: cross-category integration and exact Release to Source to Release"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-06",date:"2026-10-25",kind:"ENGINEERING",tone:"neutral",
   title:"B10 ODU/IDU/Cisco and all four telecom MR equipment composition → OEM SPIR coverage",
