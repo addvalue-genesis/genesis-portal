@@ -349,6 +349,18 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        </tr></tbody></table>
        <p className="p55-note">{code.startsWith("C")?"OPTIONAL · Reference value for working review only; customer sell remains Not quote pending OEM verified cost.":"Budgetary Working Sell from 10.2; unresolved variance is not silently added to any spare item."} One priced row = one type of proposed spare stock; many related TAGs do NOT multiply spare Qty. TAGs shown are equipment-function candidates, NOT proof of interchangeable OEM part numbers.</p>
       </div>}
+      {internal&&model.sparePriceEvidence&&<details className="p55-panel" style={{padding:12}}>
+       <summary><strong>10.2 → 10.3 source-only itemization evidence (NOT customer offer / NOT exported)</strong></summary>
+       <p className="p55-note">This preserves all source-linked unapproved Rev08 item candidate rows without double posting against the current commercial Kit/Option lines. No source SKU/price is upgraded to official quoted status.</p>
+       <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+        <thead><tr><th>Source ID</th><th>Physical product candidate</th><th>Rev08 qty</th><th>Rev08 unit USD</th><th>Approved OEM Part No.</th><th>Supplier spare quote</th></tr></thead>
+        <tbody>{(model.sparePriceEvidence.byCode[code]||[]).map(x=><tr key={x.id}>
+         <td>{x.id}</td><td>{x.name}</td><td>{x.historicalQty}</td><td>{formatUnit(x.historicalUnitUSD)}</td><td>NOT VERIFIED</td><td>NOT QUOTED</td>
+        </tr>)}</tbody>
+       </table></div>
+       {code==="C1"&&<p className="p55-note">C1 nonposting full installed RACON package comparator: USD {formatUnit(model.sparePriceEvidence.c1CurrentOptionalReference.referenceFcaUnitUSD)} FCA; one potential replacement budget scenario USD {formatUnit(model.sparePriceEvidence.c1CurrentOptionalReference.indicativeFullReplacementSellScenarioUSD)}. This is NOT a separately priced OEM capital spare and NOT the amount offered to customer.</p>}
+       {code==="C2"&&<p className="p55-note">C2 historical gross USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.grossHistoricalUSD)}; prospective B10 family overlap USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.potentialB10FunctionalOverlapUSD)}, incompatible legacy 7/8-inch feeder USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.incompatibleSevenEighthFeederHistoricalUSD)}; provisional reference residue USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.historicalResidualScreeningUSD)}. No validated OEM part/qty/price and no customer posting.</p>}
+      </details>}
       <p className="p55-note"><strong>Reverse trace:</strong> 10.3 Annex ↔ 10.2 Owner / Spare Source uses the same source row ID.
        Expand TAG details for readability; the native XLSX draft retains the complete source TAG string inside its original fixed cell and cannot fold TAGs in Excel.
        Both presentations carry the same description, specification, materials, Qty and Working Sell; Customer Release remains HOLD.</p>
