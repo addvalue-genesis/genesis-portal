@@ -380,9 +380,9 @@ export async function buildNativeOfficialRelease0553(file,model){
    put("A23","Part B: Services and Other Supplies");
    const fill=(r,row)=>{put("A"+row,r.code);put("B"+row,[r.description,r.serviceText].filter(Boolean).join("\n"));put("E"+row,"1 lot");put("F"+row,price(r.amountUSD));put("G"+row,price(r.amountUSD));if(model.annex[r.code])put("H"+row,"Refer to Annex "+r.code);};
    model.b.forEach((r,j)=>fill(r,24+j));model.c.forEach((r,j)=>fill(r,41+j));
-   put("A38","Total A+B (USD)"+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
-   put("A39","Prices cover the items described above and are subject to the stated scope and qualifications.");
-   put("A40","Part C: Options — excluded from Total A+B");
+   put("A38",(model.unpriced.length?"Priced A+B subtotal (USD)":"Total A+B (USD)")+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
+   put("A39",model.unpriced.length?"This is a priced-items subtotal only, not a complete base quotation. Unpriced items require approval before issue.":"Prices cover the items described above and are subject to the stated scope and qualifications.");
+   put("A40","Part C: Options — excluded from A+B subtotal");
    put("B43","Delivery: CIF Zhuhai Port, China (Incoterms 2020).");
   }else{
    const code=["B10","B11","B13","C1","C2"][i-2],detail=model.annex[code];
