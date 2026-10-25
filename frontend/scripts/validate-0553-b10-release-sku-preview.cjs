@@ -97,6 +97,16 @@ assert(budgetWorkspaceUi.includes('onOpenSource={openReleaseSource}'));
 assert(releaseUi.includes('const targetId="bid.budget.pricing.release.preview.annex."'));
 assert(releaseUi.includes('onOpenSource={onOpenSource} variant="release"'));
 assert(scopeUi.includes('onOpenSource={onOpenSource} onOpenReleaseRow={onOpenReleaseRow}'));
+// Source rows use unitPriceTHB/extendedTHB, not Release customerTotalTHB.
+for(const variant of ["budgetary","scope"]){
+ const priceHtml=common(current,{currency:"THB",total:509827.5,variant});
+ assert(priceHtml.includes("509,827.50"),variant+" source price absent");
+ for(const sourceRow of current)
+  assert(priceHtml.includes(sourceRow.extendedTHB.toLocaleString("en-US",{minimumFractionDigits:2})),
+   variant+" missing source price "+sourceRow.id);
+ assert.throws(()=>common(current.map((r,i)=>i===0?{...r,extendedTHB:undefined}:r),
+  {currency:"THB",total:509827.5,variant}),/missing THB price field/);
+}
 const budgetHtml=common(current,{currency:"THB",total:509827.5,internal:true,variant:"budgetary",onOpenSource:()=>{}});
 assert.equal((budgetHtml.match(/data-source-id=/g)||[]).length,4);
 assert(budgetHtml.includes('bid.budget.pricing.budgetary.annex.b10.'));
