@@ -13,7 +13,7 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
   </div>
   <div className="p553-b10-commercial-heading">
    <strong>B10 — Equipment composition / Spare-Part Coverage</strong>
-   <small>Original B10 Item → Tag → Description → Detail Specification / Part No. → Materials → Qty → Unit USD → Total USD; {annex.rows.length} items, no 13-row clipping</small>
+   <small>Original Item / Source → Tag → Description → Detail Specification / Part No. → Materials → Qty → Unit USD → Total USD; {annex.rows.length} items, no 13-row clipping</small>
   </div>
   <p className="p553-b10-commercial-note"><strong>Delivery basis:</strong> {annex.commercialOfferTerm}.
    Original purchaser form says DDP site; changing that contractual term requires a commercial qualification/acceptance.
