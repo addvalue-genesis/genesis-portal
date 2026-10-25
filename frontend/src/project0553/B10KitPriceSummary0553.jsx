@@ -17,8 +17,14 @@ export function B10KitPriceSummary0553({
   const currentMr=mr[0]||(canonical[i]);
   if(currentMr!==canonical[i])throw Error("B10 kit summary MR row identity/order changed");
   const qty=r.qty;
-  const unit=currency==="USD"?r.unitUSD:variant==="scope"?r.unitPriceTHB:r.customerUnitTHB;
-  const amount=currency==="USD"?r.totalUSD:variant==="scope"?r.extendedTHB:r.customerTotalTHB;
+  // Budgetary/Scope are canonical 10.2 source rows; Release and Official
+  // are projections with distinct field names. This is a READ adapter only.
+  const isSourceRow=variant==="scope"||variant==="budgetary";
+  const unit=currency==="USD"?r.unitUSD:isSourceRow?r.unitPriceTHB:r.customerUnitTHB;
+  const amount=currency==="USD"?r.totalUSD:isSourceRow?r.extendedTHB:r.customerTotalTHB;
+  if(!Number.isFinite(unit)||!Number.isFinite(amount))
+   throw Error("0553 B10 missing "+currency+" price field in "+variant+" for "+(r.sourceId||r.id));
+
   const id=r.sourceId||r.id;
   return {row:r,mr:currentMr,qty,unit,amount,id,
    description:r.displayDescription||r.description,sites:unique(r.sites||r.linkedLocations||[]),
@@ -27,7 +33,7 @@ export function B10KitPriceSummary0553({
  if(normalized.reduce((n,r)=>n+r.qty,0)!==14||
   normalized.some((r,i)=>r.qty!==[4,3,4,3][i]))
   throw Error("0553 B10 MR commissioning kit quantities diverged from source");
- if(Number.isFinite(total)&&Math.abs(normalized.reduce((sum,r)=>sum+(r.amount||0),0)-total)>0.02)
+ if(Number.isFinite(total)&&Math.abs(normalized.reduce((sum,r)=>sum+r.amount,0)-total)>0.02)
   throw Error("0553 B10 source-to-release kit totals do not reconcile");
  return <section className="p553-b10-commercial-summary" data-component-key={variant==="scope"?"bid.budget.scope.b10.kit-summary":
     variant==="budgetary"?"bid.budget.pricing.budgetary.annex.b10.kit-summary":
