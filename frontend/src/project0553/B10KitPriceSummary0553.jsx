@@ -38,7 +38,7 @@ export function B10KitPriceSummary0553({
    <small>4 MR-level financial envelopes · 4/3/4/3 commissioning spare sets · same source-owned prices, no added SKU charges</small>
   </div>
   <div className="p553-b10-commercial-scroll">
-   <table className="p553-b10-commercial-table">
+   <table className={"p553-b10-commercial-table"+(internal?" p553-b10-commercial-table--internal":"")}>
     <thead><tr><th>MR / Item</th><th>Description</th><th>Qty (kit)</th>
      <th>Unit Price ({currency})</th><th>Amount ({currency})</th>{internal&&<th>Source</th>}</tr></thead>
     <tbody>{normalized.map((r,i)=><tr key={r.id}
