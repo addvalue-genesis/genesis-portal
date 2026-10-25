@@ -21,6 +21,8 @@ const scope=selectScopePartBcWorking0553(),release=buildReleaseCommercialModel05
 const current=source.currentByCode.B10,kitRows=release.annex.B10,officialRows=official.annex.B10;
 assert.deepEqual(current.map(x=>x.id),kitRows.map(x=>x.sourceId));
 assert.deepEqual(kitRows.map(x=>x.sourceId),officialRows.map(x=>x.sourceId));
+assert.deepEqual(kitRows.map(x=>x.sourceRowModuleId),officialRows.map(x=>x.sourceRowModuleId));
+assert.deepEqual(kitRows.map(x=>x.traceId),officialRows.map(x=>x.traceId));
 assert.deepEqual(kitRows.map(x=>x.qty),[4,3,4,3]);
 assert.equal(new Set(current.map(x=>x.id)).size,4);
 assert.equal(working.byCode.B10.workingSellTHB,509827.5);
