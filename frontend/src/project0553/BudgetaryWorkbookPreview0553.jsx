@@ -79,12 +79,12 @@ export function BudgetaryWorkbookPreview0553({onOpenSource=null}){
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · {sheet==="B10 CommSpares"?"B10 Commercial Summary":"Native Source Workbook Structure"} {sheet!=="B10 CommSpares"&&<ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.summary.workbook"/>}</div>
    <h3>4-Scope of Supply.xlsx · 6 Worksheet Review</h3>
    <p className="p55-note"><strong>TEMPLATE GRID PREVIEW, NOT NEW CUSTOMER PRICE.</strong> Original workbook is the export template. This component renders the original worksheet dimensions and a source-transcribed subset of cell labels, preserving empty rows; full exact-cell fidelity is still pending. Template fidelity, current BOM selling-price mapping and native XLSX export are not implemented yet; release is blocked.</p>
-   <div className="p55-filterbar">
+   {sheet!=="B10 CommSpares"&&<div className="p55-filterbar">
     <label>Display currency <select value={currency} onChange={e=>setCurrency(e.target.value)}><option value="USD">USD — original Rev08</option><option value="THB">THB — Thai baht</option><option value="CNY">CNY — Chinese yuan (RMB)</option></select></label>
     {currency!=="USD"&&<label>1 USD = <input type="number" min="0" step="any" placeholder={"Verified "+currency+" per USD"} value={fx[currency]} onChange={e=>setFx(s=>({...s,[currency]:e.target.value}))}/> {currency}</label>}
     {currency!=="USD"&&<label>FX date <input type="date" value={fxDate} onChange={e=>setFxDate(e.target.value)}/></label>}
     {currency!=="USD"&&<label>FX source <input value={fxSource} onChange={e=>setFxSource(e.target.value)} placeholder="Source/reference"/></label>}
-    <label>Original worksheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{template.sheets.map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</select></label></div>
+    <label>Original worksheet <select value={sheet} onChange={e=>setSheet(e.target.value)}>{template.sheets.map(s=><option key={s.name} value={s.name}>{s.name}</option>)}</select></label></div>}
    <div className="p55-filterbar" role="group" aria-label="Workbook worksheets">
     {template.sheets.map(item=><button type="button" key={item.name}
       className={"p553-detail-button"+(sheet===item.name?" is-active":"")}
@@ -92,9 +92,11 @@ export function BudgetaryWorkbookPreview0553({onOpenSource=null}){
       style={{fontWeight:sheet===item.name?700:400,border:sheet===item.name?"2px solid #07729a":"1px solid #b7c7d5"}}>
       {item.name}</button>)}
    </div>
+   {sheet!=="B10 CommSpares"&&<>
    <p className="p55-note"><strong>Currency: {currency}</strong> · {currency==="USD"?"Historical source values in original USD; no conversion.":fxReady?"Indicative converted display only, using user-entered "+rate+" "+currency+"/USD on "+fxDate+" · Source: "+fxSource+". Not a verified or approved customer rate.":"Conversion unavailable: enter rate, date and source. USD source amounts are retained unchanged; no implied FX."}</p>
    <label><input type="checkbox" checked={showHistorical} onChange={e=>setShowHistorical(e.target.checked)}/> Show historical Rev08 price comparison (not current bid)</label>
    <label><input type="checkbox" checked={showEmptyRows} onChange={e=>setShowEmptyRows(e.target.checked)}/> Show empty template rows (original Excel layout)</label>
+   </>}
    {sheet!=="B10 CommSpares"&&<>
    <p className="p55-note"><strong>Sheet-specific layout:</strong> {layout.leadTime?"Lead time (ARO) column · ":""}{layout.sourceNotQuote?"Original Not quote cells · ":""}{layout.sections?.remark?"Original remark row "+layout.sections.remark.start:"No remark row in source"}</p>
    <p className="p55-note"><strong>Original worksheet cell layout:</strong> {layout.columns} columns × {layout.maxRow} rows. Blank cells are preserved; historically labelled cells are reference only. Current BOM-derived customer selling prices are not approved and remain blank.</p>
