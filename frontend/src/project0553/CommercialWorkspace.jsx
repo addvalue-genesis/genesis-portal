@@ -162,11 +162,20 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   if(isBc){setBcTab(code);setBcDetailCode(code);}
   if(isBc&&item?.sourceId&&["B10","B11","B13","C1","C2"].includes(code)){
    const released=(releaseModel.annex[code]||[]).find(x=>x.sourceId===item.sourceId);
-   if(!released||released.sourceRowModuleId!==id||
-    (item.traceId&&item.traceId!==released.traceId))
+   // A category-level navigation card is not a physical spare item source.
+   // Only require strict row parity if a genuine source-row key was provided.
+   if(item.sourceRowModuleId&&(!released||released.sourceRowModuleId!==id||
+      (item.traceId&&item.traceId!==released.traceId)))
     throw Error("0553 exact Release→Source navigation refused: orphan or inconsistent "+code+"/"+item.sourceId);
-   setReturnToRelease({code,sourceId:released.sourceId,traceId:released.traceId,
-    sourceRowModuleId:released.sourceRowModuleId});
+   if(released&&released.sourceRowModuleId===id)
+    setReturnToRelease({code,sourceId:released.sourceId,traceId:released.traceId,
+     sourceRowModuleId:released.sourceRowModuleId,originWasExact:true});
+  }else if(isBc&&["B10","B11","B13","C1","C2"].includes(code)){
+   const first=(releaseModel.annex[code]||[])[0];
+   // Category-only Release navigation can return to its selected Annex tab.
+   // This is NOT represented as an exact row that the user originally clicked.
+   if(first)setReturnToRelease({code,sourceId:first.sourceId,traceId:first.traceId,
+    sourceRowModuleId:first.sourceRowModuleId,originWasExact:false});
   }
   if(isBc)setPricingStage("working"); // show canonical source while retaining the exact reverse route
   setReleaseJump(previous=>({id,code,seq:(previous?.seq||0)+1}));
@@ -328,7 +337,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
       <strong>Release → Source → Release</strong>
       <span>Working Source · {returnToRelease.sourceId} · {returnToRelease.traceId}</span>
       <button type="button" className="p553-detail-button"
-       onClick={()=>openReleaseAnnexRow(returnToRelease)}>↩ Return to exact 10.3.3 Release row</button>
+       onClick={()=>openReleaseAnnexRow(returnToRelease)}>↩ {returnToRelease.originWasExact?"Return to exact 10.3.3 Release row":"Return to 10.3.3 "+bcTab+" Annex"}</button>
      </div>}
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working" onOpenReleaseRow={openReleaseAnnexRow}/>} 
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<p className="p55-note"><strong>Selected {bcTab}:</strong> รายละเอียดแสดงโดยตรงด้านล่างตารางจาก Component เดียวกับ 10.5 โดยไม่ต้องกด ＋ Detail อีกครั้ง</p>}
