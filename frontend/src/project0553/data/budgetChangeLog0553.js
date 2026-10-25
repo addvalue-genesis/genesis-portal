@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R57";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R58";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-11",date:"2026-10-25",kind:"DATA_FLOW",tone:"neutral",
+  title:"B10 original Annex eight-column UI + native XLSX same-sheet >13-row mapping; CIF/USD qualification",
+  detail:"Unified original Item/Source, Equipment/Spare Function, Model/Part No., linked MR/TAG, supplier quoted Qty/unit and nonposted reference USD into eight native B10 columns B-I, displayed inside 10.3.2/10.5/10.3.3/10.3.4 B10. Added Internal Original B10 native XLSX export button using the six original customer sheets; expands 35 rows on the SAME B10 CommSpares sheet (22 inserted body rows, Total→row41, Remark→row42, original border/style/merge moved). Footer is NOT QUOTED because original expired supplier quantities/prices reflect installed or optional equipment, NOT approved B10 spare Qty or CIF USD SELL. Internal preview/Excel shows source reference amounts and planning THB→USD conversions marked reference, customer preview shows To be quoted. Original template says DDP; selected commercial proposal is CIF Zhuhai Port China Incoterms2020, subject to purchaser acceptance/qualification and cost refresh. Original Official USD financial parent source/4-kit totals and existing native customer export remain unchanged (HOLD). Source ID/MR/14 spare function review maintained; no double posting or cost reallocation.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10.original-annex-item-map","bid.budget.pricing.release.preview.annex.b10.kit-summary","bid.budget.pricing.official.b10.kit-summary"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner screenshots 25-Oct: map B10 quote evidence to customer's Item/Tag/Description/Spec/Materials/Qty/Unit/Total template; more than13 same-sheet rows; CIF/USD wording"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-10",date:"2026-10-25",kind:"VALIDATION",tone:"neutral",
   title:"Repair What's New VALIDATION category registry; no price posting",
