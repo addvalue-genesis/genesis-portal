@@ -30,6 +30,7 @@ import {selectBcB5HistoricalPriceBridge0553} from "./bcB5HistoricalPriceBridge05
 import {REV08_BASELINE} from "./rev08CommercialBaseline";
 import {selectUnifiedSpareConsumables0553} from "./unifiedSpareConsumables0553";
 import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
+import {selectB10ItemizedPurchaseEvidence0553} from "./b10ItemizedPurchaseEvidence0553";
 import {BC_WORKING_ROUTES_0553,BC_CUSTOMER_CODES_0553,validateBcRoutes0553} from "./bcWorkingModuleRoutes0553";
 
 const activitiesForCustomerCode=Object.freeze({
@@ -95,6 +96,7 @@ export function selectBcTurnkeyWorkingCost0553(){
  const b10DetailUSD=(REV08_BASELINE.detail.B10||[]).reduce((sum,[,qty,unitUSD])=>sum+qty*unitUSD,0);
  if(!Number.isFinite(b10HistoricalUSD)||Math.abs(b10HistoricalUSD-b10DetailUSD)>0.01)throw Error("B10 Rev08 source reconciliation failed");
  const currentSpare=selectSpareCustomerSchedule0553();
+ const b10ItemizedPurchaseEvidence=selectB10ItemizedPurchaseEvidence0553();
  const b10WorkingSellTHB=currentSpare.currentBudgetaryByCode.B10;
  const spareBudget=selectUnifiedSpareConsumables0553();
  const chinaB9=selectB9ChinaWorkingBudget0553();
@@ -191,6 +193,7 @@ export function selectBcTurnkeyWorkingCost0553(){
    b11VendorFollowup:code==="B11"?Object.freeze({status:"UNQUOTED_PARAMETRIC_2026_TOOL_REVIEW",amountTHB:spareSellTHB,source:"MR0001–0004 §5 + MMC25-5001 EXA-A8 Att-2 §5 + SPE §8.2",verifiedDirectCost:false,releaseAllowed:false,verification:"4 MR phase sets, 5 EXA-A8 checks; deduct MGW included and B3 temporary FAT test tools before final rate"}):null,
    unifiedSpareBudget:spareBudgetCodes.has(code)?Object.freeze({amountTHB:spareSellTHB,source:currentSpare.moduleId,fxTHBPerUSD:31.5,pricingClass:Number.isFinite(spareSellTHB)?"UNQUOTED_2026_PARAMETRIC_WORKING_SELL":"OPTIONAL_OEM_QUOTE_NOT_ESTABLISHED",verifiedDirectCost:false,sourceLines:currentSpare.currentByCode[code].length,optional:code.startsWith("C"),releaseAllowed:false}):null,
    spareCurrentLines:spareBudgetCodes.has(code)?currentSpare.currentByCode[code]:null,
+   b10ItemizedPurchaseEvidence:code==="B10"?b10ItemizedPurchaseEvidence:null,
    executionActivities:BC_EXECUTION_ACTIVITIES_0553[code]||null,
    b1SupportPlanningBudget:code==="B1"?b1Current:null,
    b2IndependentRecalculation:code==="B2"?b2Recalculated:null,
