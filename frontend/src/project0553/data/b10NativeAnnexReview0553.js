@@ -9,6 +9,7 @@ const status=x=>x.owner==="B10_SPARE_CANDIDATE_NOT_SELECTED"?"OPTIONAL_VENDOR_SP
 export function selectB10NativeAnnexReview0553(){
  const composition=selectB10PhysicalComposition0553();
  const all=[...composition.installedComponents,...composition.requiredSpareFamilies];
+ const requiredIds=new Set(composition.requiredSpareFamilies.map(x=>x.id));
  const rows=fixed(PHASE.flatMap((mr,mri)=>{
   const group=all.filter(x=>x.mr===mr);
   return group.map((x,i)=>{
@@ -35,7 +36,7 @@ export function selectB10NativeAnnexReview0553(){
     b10UnitSellUSD:x.spareUnitSellUSD??null,
     b10ExtendedSellUSD:null,
     sourceQuoteBasis:"MIXED_SUPPLIER_QUOTATION__NOT_CIF_ZHUHAI",
-    owner,status:x.status,approvedB10PartNo:false,
+    owner,status:x.status,isRequirementFamily:requiredIds.has(x.id),approvedB10PartNo:false,
     candidateB10: candidate||x.owner==="SPIR_COMPONENT_QTY_SKU_PRICE_OPEN",
     postedToPartA:false,postedToB10:false,postedToC2:false,
     customerIssueAllowed:false
@@ -46,7 +47,7 @@ export function selectB10NativeAnnexReview0553(){
  if(rows.length!==all.length||new Set(rows.map(x=>x.id)).size!==rows.length||
   rows.some(x=>x.b10PurchaseQty!==null||x.b10UnitSellUSD!==null))
   throw Error("0553 B10 native candidate count/price guard failed");
- if(rows.filter(x=>x.owner==="OEM_SPIR_REQUIREMENT_UNPRICED").length!==composition.requiredSpareFamilies.length)
+ if(rows.filter(x=>x.isRequirementFamily).length!==composition.requiredSpareFamilies.length)
   throw Error("0553 B10 native review omitted required spare functions");
  return fixed({
   moduleId:"bid.budget.working.bc.b10.original-annex-item-map",
