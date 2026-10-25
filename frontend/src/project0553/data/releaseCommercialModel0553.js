@@ -327,6 +327,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    executionActivities:r.executionActivities,
    serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    b10ItemizedPurchaseEvidence:r.code==="B10"?r.b10ItemizedPurchaseEvidence:null,
+   b10PriceToWinReview:r.code==="B10"?r.b10PriceToWinReview:null,
    qty:1,unit:"lot",workingSellTHB:r.workingSellTHB,
    customerSellTHB:price?.customerSellTHB??null,
    samTelDeductionTHB:price?.samTelDeductionTHB??null,
