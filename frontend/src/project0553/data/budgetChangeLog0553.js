@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R51";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R52";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-06",date:"2026-10-25",kind:"UI",tone:"neutral",
+  title:"Official USD and Native Excel — incomplete A+B priced subtotal / not-issued safeguard",
+  detail:"The current customer-facing Official USD preview and original-format native XLSX distinguish the priced A+B subtotal from an approved complete Base whenever B4/B12/B14 remain unpriced. Both show excluded items; the on-screen pre-award NOT ISSUED notice reinforces the existing approval state. This is presentation and regression only: no Source/Working Sell/release prices, FX31.5, B10 four-kit rows, A/B/C ownership, totals or native template geometry changed. Final customer approval and bid issue remain prohibited.",
+  moduleIds:Object.freeze(["bid.budget.pricing.official","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"25-Oct 0553 rapid audit of incomplete priced A+B USD summary and native A38"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-05",date:"2026-10-25",kind:"UI",tone:"neutral",
   title:"10.5 historical spare reference THB display / source-currency separation",
