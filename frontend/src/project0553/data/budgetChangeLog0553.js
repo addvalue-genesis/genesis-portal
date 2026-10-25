@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R48";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R49";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-03",date:"2026-10-25",kind:"UI",tone:"navigation",
+  title:"B10 10.3.3 Original Item / Source → SKU before MR Kit summary",
+  detail:"10.3.3 B10 Annex now shows a prominent Original Item / Source → quoted Part No. → candidate installed TAG → offered Qty vs approved purchase Qty → vendor USD reference vs nonposting review SELL table ahead of four MR financial-kit rows. Both Customer/Internal preview modes show the item identification; only Internal shows supplier costs and scenario SELL. Huge related-TAG lists are capped with internal scrolling. The original 4/3/4/3 KIT financial lines and THB509827.50, Official USD16200, embedded native Excel, 16 existing financial annex trace IDs and approval gates remain untouched. Supplier quote expiry, unconfirmed spare quantity and Part A/B11/C1/C2 duplicate boundaries are explicit.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview","bid.budget.pricing.release.preview.annex.b10.original-item-source","bid.budget.working.bc.b10.itemized-purchasing-evidence"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner screenshot25-Oct: B10 kit-level instead of SKU and rename evidence Original Item / Source"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-02",date:"2026-10-25",kind:"ENGINEERING",tone:"pricing",
   title:"B10 Price-to-Win what-if 30–50% and supplier market evidence",
