@@ -2,6 +2,7 @@ import React,{useMemo,useState} from "react";
 import {buildOfficialUsdRelease0553,OFFICIAL_SHEETS_0553} from "./data/officialUsdRelease0553";
 import {buildNativeOfficialRelease0553} from "./nativeWorkingDraft0553";
 import template from "./data/nativeReleaseTemplate0553.json";
+import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import "./releaseWorkbook0553.css";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"To be quoted";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"To be quoted";
@@ -41,7 +42,8 @@ export function OfficialUsdRelease0553({source}){
      <tr className="p553-sheet-total"><td colSpan={6}>Total A+B (USD){model.unpriced.length>0&&<small>Excludes items to be quoted: {model.unpriced.join(", ")}.</small>}</td><td className="p553-price-cell">{money(model.totalUSD)}</td><td/></tr>
      <tr className="p553-sheet-section"><td colSpan={8}>Part C: Options — excluded from Total A+B</td></tr>{model.c.map(summaryRow)}
     </tbody>
-   </table>:<table className="p553-customer-table p553-official-annex">
+   </table>:sheet==="B10"?<B10KitPriceSummary0553 rows={model.annex.B10}
+     currency="USD" total={model.b.find(r=>r.code==="B10")?.amountUSD} variant="official"/>:<table className="p553-customer-table p553-official-annex">
     <thead><tr>{["Item","Tag No.","Description","Specification","Materials","Qty","Unit Price (USD)","Amount (USD)"].map(h=><th key={h}>{h}</th>)}</tr></thead>
     <tbody>{model.annex[sheet].map((r,i)=><tr key={r.sourceId}><td>{i+1}</td><td>{r.tagNo}</td><td>{r.description}</td><td>{r.specification}</td><td>{r.materials}</td><td>{r.qty??"TBC"}</td><td className="p553-price-cell">{unit(r.unitUSD)}</td><td className="p553-price-cell">{money(r.totalUSD)}</td></tr>)}
      <tr className="p553-sheet-total"><td colSpan={7}>Total (USD)</td><td className="p553-price-cell">{money([...model.b,...model.c].find(r=>r.code===sheet)?.amountUSD)}</td></tr></tbody>
