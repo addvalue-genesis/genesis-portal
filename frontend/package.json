@@ -146,6 +146,7 @@
     "validate:0553-bc-financial-identity-presentation": "node scripts/validate-0553-bc-financial-identity-presentation.cjs",
     "validate:0553-b8-four-system-hybrid": "node scripts/validate-0553-b8-four-system-hybrid.cjs",
     "validate:0553-existing-spare-owners-2026": "node scripts/validate-0553-existing-spare-owners-2026.cjs",
+    "validate:0553-b10-itemized-purchase-evidence": "node scripts/validate-0553-b10-itemized-purchase-evidence.cjs",
     "validate:0553-urgent-samtel-cif-pricing": "node scripts/validate-0553-urgent-samtel-cif-pricing.cjs",
     "validate:0553-samtel-lump-sum": "node scripts/validate-0553-samtel-lump-sum.cjs",
     "validate:0553-service-commercial-basis": "node scripts/validate-0553-service-commercial-basis.cjs",
