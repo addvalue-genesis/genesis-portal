@@ -142,7 +142,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  </span>:null;
  const toggleMr=key=>setExpandedMr(old=>({...old,[key]:!old[key]}));
  return <section className="p55-panel p553-release-workbook" data-owner-colours={internal?"true":"false"} data-component-key="bid.budget.pricing.release.preview">
-   <div className="p55-eyebrow">{title} · 10.3 / bid.budget.pricing.release.preview <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing.release.preview"/></div>
+   <div className="p55-eyebrow">{title} · 10.3 Customer Price Preview</div>
    <h3>Customer Excel Format Preview — 4-Scope of Supply.xlsx</h3>
    <p className="p55-note"><strong>PRE-EXPORT PREVIEW / NOT ISSUED.</strong> ตารางนี้เป็น JSX จำลองแบบฟอร์มลูกค้า ไม่ใช่ไฟล์ Excel ที่ Export แล้ว ข้อมูล A1–A4 สรุปทั้ง MR จาก 10.1, B1–B14 จาก Working Sell ของ 10.2, C1/C2 รอ Verified Direct Cost และแยกจาก Base</p>
    <div className="p553-release-controls">
