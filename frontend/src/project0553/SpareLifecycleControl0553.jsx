@@ -17,7 +17,7 @@ export function SpareLifecycleControl0553({
     view==="release"?"pricing.release.preview.spare-lifecycle":"working.bc.spare-lifecycle-control")}
    style={{padding:12}}>
   <summary><strong>B10 · B11 · B13 · C1 · C2 — Linked Source / Release / Source Control</strong>
-   <small>16 existing finance rows · no new OEM physical SKU charges · 7 cross-category rules · Release HOLD</small></summary>
+   <small>Current B10 {money(model.totals.B10.workingSellTHB)} ≠ NEW review {money(model.newPriceReview.B10.proposedTHB)} (UNSELECTED) · other owner rates OPEN · Release HOLD</small></summary>
   <p className="p55-note"><strong>Price-selection status:</strong> The Working and Release columns below
    still use the previously selected parametric totals. New calculations are evidence-only scenarios and
    do <strong>NOT</strong> flow into commercial Release. Do not call unchanged WBS amounts newly repriced.</p>
