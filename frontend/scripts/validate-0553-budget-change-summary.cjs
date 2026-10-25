@@ -22,6 +22,9 @@ assert(notes.every(x=>x.priceImpact==="NO_PRICE_CHANGE"||
  ["WORKING_SOURCE_CHANGED","PRICE_REVIEW_REQUIRED","QUOTATION_FX_ROUNDING_ONLY"].includes(x.priceImpact)),
  "Never invent commercial price impact");
 assert(notes.every(x=>Object.hasOwn(changeTypes,x.kind)),"Every change must have a registered visible What's New group");
+assert(notes.some(x=>x.kind==="VALIDATION"),"Historical VALIDATION notes must remain registered, not stripped");
+assert.equal(changeTypes.VALIDATION,"Validation / Reconciliation Controls",
+ "VALIDATION must have a registered customer-visible group label");
 const reviewed=["P553-CHANGE-20261025-08","P553-CHANGE-20261025-09"];
 for(const id of reviewed){
  const row=notes.find(x=>x.id===id);
@@ -69,6 +72,8 @@ assert(workspace.indexOf("<BudgetChangeSummary0553 ")<workspace.indexOf("bid.bud
  "What's New should appear immediately after Budget Workspace heading");
 assert(workspace.includes("buildReleaseCommercialModel0553"),"One live release model preserved");
 const view=read("BudgetChangeSummary0553.jsx");
+assert(view.includes('kinds:["DATA_FLOW","ENGINEERING","COST","PRICE","RELEASE","VALIDATION"]'),
+ "Every VALIDATION note must remain visible inside the Data / Release group");
 assert(view.includes('entry.priceImpact==="PRICE_REVIEW_REQUIRED"?"Budgetary review only · NOT POSTED"'),"No pricing review may masquerade as selected/issued SELL");
 assert(view.includes("onClick={()=>onOpenModule({sourceModuleId:id})}"));
 assert(view.includes("ComponentCopyId"));
