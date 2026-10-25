@@ -395,7 +395,9 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  ];
  return Object.freeze({
   moduleId:"bid.budget.pricing.release",policy:RELEASE_POLICY_0553,
-  a,b,c,annex,annexModels,annexTraceAudit,summary:{
+  a,b,c,annex,annexModels,annexTraceAudit,
+  sparePriceEvidence:spare.sparePriceEvidence, // Read-only item candidate and optional price benchmark; never financial posting
+  summary:{
    aProvisionalCostTHB:aKnown.length?aCost:null,
    aProvisionalCustomerSellTHB:aKnown.length?aPrice:null,
    aProvisionalSamTelShareTHB:aKnown.length?round(aCost*.20):null,
