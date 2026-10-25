@@ -1,3 +1,4 @@
+import {selectSparesPriceEvidence0553} from "./sparePriceEvidence0553";
 import {MR0004_WORKING_BOM_0553} from "./mr0004WorkingBom0553";
 // PJ2608-0553 — customer-style 5-category pre-award read model.
 // Current rows use the locked 2026 parametric checkpoint; rows/byCode retain
@@ -206,6 +207,7 @@ const assessSpareLine0553=(code,description)=>{
   stockInterchangeabilityApproved:false,extraPostingAllowed:false,releaseAllowed:false});
 };
 export function selectSpareCustomerSchedule0553(){
+ const sparePriceEvidence=selectSparesPriceEvidence0553();
  const master=selectUnifiedSpareConsumables0553(),cover=selectSpareCoverageEngineering0553();
  const b11Requirements=selectB11MinimumTools0553();
  if(!MGW_P26_058_R2_SELECTED_0553.lines.some(r=>r.id==="UHF-2"&&r.model.includes("IS-B50LN-C2"))||
@@ -541,6 +543,7 @@ export function selectSpareCustomerSchedule0553(){
  })]));
  return Object.freeze({
   moduleId:"bid.budget.working.bc.customer-spare-schedule",
+  sparePriceEvidence,
   codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,crossCategoryDuplicates,b11Requirements,
   currentRows,currentByCode,currentBudgetaryByCode,
   currentWorkingFxTHBPerUSD:paramFx,currentBudgetaryPricingFactor:commercialFactor,
