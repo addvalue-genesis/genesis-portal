@@ -99,7 +99,7 @@ assert.equal(release.annexTraceAudit.totalRows,16);
 assert.equal(release.annexModels.B10.annexLineTotalTHB,509827.5);
 assert.equal(official.b.find(z=>z.code==="B10").amountUSD,16200);
 assert.equal(official.annex.B10.length,4);
-assert.equal(official.annex.B10.reduce((v,r)=>v+r.totalUSD,0),16200);
+assert.equal(Math.round(official.annex.B10.reduce((v,r)=>v+r.totalUSD,0)*100),1620000);
 assert(!("b10ItemizedPurchaseEvidence" in official));
 assert.equal(release.approval.releaseAllowed,false);
 const React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
