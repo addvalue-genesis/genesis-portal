@@ -13,6 +13,7 @@ import {selectB10ItemizedPurchaseEvidence0553} from "./data/b10ItemizedPurchaseE
 import {B10ItemizedPurchasingEvidence0553} from "./B10ItemizedPurchasingEvidence0553";
 import {B10PriceToWinScenario0553} from "./B10PriceToWinScenario0553";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
+import {SparePricedBudgetReview0553} from "./SparePricedBudgetReview0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
@@ -41,6 +42,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
  </section>;
  return <section className="p55-panel" data-cost-owner={code} data-component-key={moduleId} style={{padding:14}}>
   <div className="p55-eyebrow">{inWorking?"10.2 WORKING COST DETAIL":"10.5 CUSTOMER SCOPE DETAIL"} · PRICE SOURCE AUDIT (THB display)</div>
+  {inWorking&&<SparePricedBudgetReview0553 code={code} onOpenSource={onOpenSource} context="working"/>}
   <h3>{p.code} — {p.description}</h3>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/>
    {" "}· Current cost owner: <code>{p.ownerModuleId}</code>
