@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R53";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R54";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-08",date:"2026-10-25",kind:"PRICING_REVIEW",tone:"caution",
+  title:"Expose NEW B10 researched price vs unchanged 10.2 selected and 10.3 Release; no false repricing for B11/B13/C1/C2",
+  detail:"Owner challenged unchanged B10/B11/B13/C1/C2 financial totals after lifecycle UI update. Cause: canonical Working price owner still uses 2026-10-23 parametric MR envelopes. Latest NextG sourced B10 Price-to-Win is 568083.85 THB scenario / 18100 USD equivalent, but only a nonposting What-if with 100% MR1 envelope credit and unapproved vendor offered quantities. New read-only five-category price comparison now appears in Internal Working and Internal Release (prominent B10 heading), separately from selected B10 THB509827.50, B11 THB157657.50, B13 THB46683; C1 FCA installed equipment comparator THB3071250 is NOT an independent capital spare quote; C2 no new supplier cost. No source ledger/official/native posting, no claim of newly issued price or approved physical SKU. New proposals require OEM SPIR, qty, exact spare price, supplier validity, stock owner and approval before selecting a price.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.spare-lifecycle-control","bid.budget.working.bc.b10.price-to-win-review","bid.budget.pricing.release.preview.spare-lifecycle"]),
+  priceImpact:"NO_SELECTED_PRICE_CHANGE__NEW_NONPOSTING_PROPOSAL_VISIBLE",source:"Owner question 25-Oct: why unchanged legacy selected Working & Release instead of reworked budgetary prices"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-07",date:"2026-10-25",kind:"UI",tone:"navigation",
   title:"B10 / B11 / B13 / C1 / C2 — bidirectional Release→Source→Release and cross-category lifecycle",
