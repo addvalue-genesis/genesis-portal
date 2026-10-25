@@ -18,6 +18,33 @@ export function SpareLifecycleControl0553({
    style={{padding:12}}>
   <summary><strong>B10 · B11 · B13 · C1 · C2 — Linked Source / Release / Source Control</strong>
    <small>16 existing finance rows · no new OEM physical SKU charges · 7 cross-category rules · Release HOLD</small></summary>
+  <p className="p55-note"><strong>Price-selection status:</strong> The Working and Release columns below
+   still use the previously selected parametric totals. New calculations are evidence-only scenarios and
+   do <strong>NOT</strong> flow into commercial Release. Do not call unchanged WBS amounts newly repriced.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact p553-spare-new-price-review">
+   <thead><tr><th>Category</th><th>Selected Working / current Release THB</th>
+    <th>New price proposal / source evidence THB</th><th>Difference THB</th>
+    <th>Pricing authority / blocking action</th></tr></thead>
+   <tbody>{SPARE_LIFECYCLE_CODES_0553.map(code=>{
+    const current=model.totals[code].workingSellTHB,proposal=model.newPriceReview[code],
+     candidate=proposal.proposedTHB,comparable=code==="C1";
+    return <tr key={code} data-new-spare-price-review={code}>
+     <td><strong>{code}</strong></td>
+     <td>{money(current)}<small>{code.startsWith("C")?"Option not quoted":"Current selected source only"}</small></td>
+     <td><strong>{money(candidate)}</strong><small>{proposal.evidenceClass}</small>
+      {comparable&&<small>Installed reference — NOT a separately quoted C1 spare</small>}</td>
+     <td>{Number.isFinite(current)&&Number.isFinite(candidate)?
+       money(Math.round((candidate-current)*100)/100):"Not comparable"}</td>
+     <td><strong>NOT SELECTED / RELEASE HOLD</strong><small>{proposal.priceBasis}</small>
+      <small>To replace: {proposal.missing}</small></td>
+    </tr>;
+   })}</tbody>
+  </table></div>
+  <p className="p55-note">B10 has a newer candidate from the existing Price-to-Win review.
+   The optimistic MR1 credit assumption is not proof of duplicate vendor stock;
+   the proposal is not a priced full OEM SPIR. B11/B13 have no new validated itemized rates;
+   C1 has only an installed FCA equipment price comparator, and C2 has no current two-year supplier offer.
+   No candidate is automatically credited against or added to the selected WBS SELL.</p>
   <p className="p55-note">Price owners are unchanged. A 14-kit B10 contractual minimum does not prove
    the quantity or price of an individual OEM spare article; B11 permanent handover tools differ
    from B3 temporary testing, B13 consumables differ from B5/A5 installed materials, C1/C2 require
