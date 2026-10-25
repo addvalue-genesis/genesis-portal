@@ -4,6 +4,7 @@ import { Home } from "./pages/Home";
 import { Employees } from "./pages/Employees";
 import { PJ26080550 } from "./pages/PJ26080550";
 import { PJ26080553 } from "./pages/PJ26080553";
+import { PriceToWinPage0553 } from "./pages/PriceToWinPage0553";
 
 const STRINGS = {
   th: {
@@ -68,6 +69,7 @@ export function App() {
             <Route path="/" element={<div className="genesis-main--padded"><Home lang={lang} /></div>} />
             <Route path="/projects/pj2608-0550" element={<PJ26080550 lang={lang} />} />
             <Route path="/projects/pj2608-0553" element={<PJ26080553 lang={lang} />} />
+            <Route path="/projects/pj2608-0553/strategy/price-to-win" element={<PriceToWinPage0553 />} />
             <Route path="/employees" element={<div className="genesis-main--padded"><Employees lang={lang} /></div>} />
           </Routes>
         </main>
