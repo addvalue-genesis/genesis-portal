@@ -337,6 +337,36 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    {code==="B11"&&<p className="p55-note"><strong>Customer template delivery basis:</strong> DDP Purchaser’s Yard shown in RFQ; current THB prices are internal budget references only, not a verified DDP delivered quotation. Installation, commissioning and special tools must reconcile with B3/B9 and Part A before customer release. Four MR-phase tool sets and five EXA-A8 minimum applicability checks do NOT mean nine additive tool purchase lines.</p>}
    <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
   </div>}
+  {spareLines.length>0&&customerSchedule.sparePriceEvidence&&<details className="p55-panel p553-itemized-evidence" open={inWorking} style={{padding:12}}>
+   <summary><strong>Physical purchase candidate register — item names / OEM model / Part No. / historical price evidence</strong>
+    <small>10.2 source evidence only · NOT additive to Working SELL / customer Release · no supplier spare quotation implied</small></summary>
+   <p className="p55-note"><strong>Source-to-Working ownership:</strong> {customerSchedule.sparePriceEvidence.moduleId}. Rows below reveal individual legacy candidate parts inside the budget headings without pretending that the 4/3/4/3 kits have approved item contents. A historical quantity is NOT a newly approved purchase quantity. Actual TAG/SKU/rating and commissioned B10 vs C2 stock exclusion must be resolved first.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Source line</th><th>Candidate physical article</th><th>Historically stated qty</th><th>Historical unit USD</th><th>Historical extended USD</th><th>Current approved spare Part No.</th><th>Current purchase qty / spare quotation</th></tr></thead>
+    <tbody>{(customerSchedule.sparePriceEvidence.byCode[code]||[]).map(x=><tr key={x.id} data-spare-evidence-id={x.id}>
+     <td><code>{x.id}</code></td><td>{x.name}</td><td>{x.historicalQty}<small>Rev08 only</small></td>
+     <td>{usd(x.historicalUnitUSD)}</td><td>{usd(x.historicalTotalUSD)}</td>
+     <td>NOT VERIFIED</td><td>NOT VERIFIED<small>{x.status}</small></td>
+    </tr>)}</tbody>
+   </table></div>
+   {(customerSchedule.sparePriceEvidence.directComparablesByCode[code]||[]).length>0&&<>
+    <h4>Selected supplier product evidence — installed-equipment comparable, NOT a separately quoted spare</h4>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+     <thead><tr><th>Supplier / source</th><th>Make / model / item</th><th>Part No.</th><th>Related installed TAG</th><th>Quoted installed-package qty</th><th>Installed quote basis / rate</th><th>Critical difference</th></tr></thead>
+     <tbody>{customerSchedule.sparePriceEvidence.directComparablesByCode[code].map(x=><tr key={x.id}>
+      <td>{x.supplier}</td><td>{x.brand} / {x.model} / {x.name}</td><td><code>{x.partNo}</code></td>
+      <td>{x.installedTag}</td><td>{x.quotedQty??"not itemized"}</td>
+      <td>{Number.isFinite(x.quotedUnitUSD)?usd(x.quotedUnitUSD):Number.isFinite(x.quotedUnitTHB)?thb(x.quotedUnitTHB):"Included / not separately priced"}<small>{x.quoteBasis}</small></td>
+      <td>{x.warning}<small>{x.status}</small></td>
+     </tr>)}</tbody>
+    </table></div>
+   </>}
+   {code==="C1"&&<p className="p55-note"><strong>C1 single complete-RACON optional scenario (NONPOSTING):</strong> FCA installed package comparator USD {customerSchedule.sparePriceEvidence.c1CurrentOptionalReference.referenceFcaUnitUSD.toLocaleString("en-US")} · THB {customerSchedule.sparePriceEvidence.c1CurrentOptionalReference.indicativeFullReplacementSellScenarioTHB.toLocaleString("en-US")} illustrative customer sell (USD {customerSchedule.sparePriceEvidence.c1CurrentOptionalReference.indicativeFullReplacementSellScenarioUSD.toLocaleString("en-US")}) only after x1.30; no independent replacement price, configuration approval or delivery cost. Not authorized for customer export.</p>}
+   {code==="C2"&&<>
+    <p className="p55-note"><strong>C2 historical gross reference:</strong> USD {customerSchedule.sparePriceEvidence.c2Historical.referenceUSD.toLocaleString("en-US",{minimumFractionDigits:2})} across {customerSchedule.sparePriceEvidence.c2Historical.historicalCandidateLines} unverified Rev08 candidate lines. This is NOT verified current Direct Cost and cannot be marked as a customer quotation.</p>
+    <p className="p55-note"><strong>Attachment 7 non-duplication:</strong> {customerSchedule.sparePriceEvidence.duplicates.length} B10/C2 functional candidate overlaps must be reconciled by exact supplier SKU and separate delivered quantity. Historic 7/8-inch feeder conflicts with MGW 1/2-inch feeder; keep out of any approved current C2 takeoff until reconciled.</p>
+   </>}
+  </details>}
   {coverage&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
    <summary><strong>Top-down Engineering Spare Coverage — MR0001–MR0004</strong> (SPQ-001 + existing MAP equations; pre-award scenario only)</summary>
    <p className="p55-note"><strong>Basis:</strong> MR0001 MTO Rev04 / MR0002 AFC TEL-LAY / MR0003–0004 MR Rev.C1 scope. Existing MAP-01/02/05/06/07/08/10 reused; SPQ-001 adds critical-family spare scenario sizing only. A scenario Qty is not an OEM-approved spare quantity or contractual minimum. No prices are newly posted by this assessment.</p>
