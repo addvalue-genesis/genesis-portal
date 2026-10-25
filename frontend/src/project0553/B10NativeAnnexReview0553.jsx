@@ -36,7 +36,7 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
     <td>{x.tag}<small>{x.mr}</small></td>
     <td>{x.description}</td>
     <td><strong>{x.partNo||"OEM SPIR Part No. pending"}</strong>
-     <small>{x.specification}</small>
+     <small>{internal?x.specification:"Technical fit per BOD/MR/DTS/SPE; OEM Spare SPIR compliance and issued Part No./Qty pending"}</small>
      {internal&&<small>Original Item / Source: {x.originalItemSource}</small>}
      {internal&&x.referenceCurrency==="THB"&&<small>Original source THB {money(x.referenceUnit)} @ planning FX {annex.sourceFXTHBPerUSD}</small>}
     </td>
