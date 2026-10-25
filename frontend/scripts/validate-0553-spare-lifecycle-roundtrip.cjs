@@ -27,6 +27,11 @@ assert.equal(model.rules.length,7);
 assert.equal(model.confirmedSameSkuCrossCategory,0);
 assert.equal(model.releaseAllowed,false);
 assert.equal(model.noNewPosting,true);
+assert(model.requirements.B10.minimum.includes("14 kit sets"));
+assert(model.requirements.B11.minimum.includes("5 distinct minimum telecom tool functions"));
+assert(model.requirements.B13.open.includes("B5 packing and A5 installed bulk"));
+assert(model.requirements.C1.open.includes("Independent OEM"));
+assert(model.requirements.C2.open.includes("omit confirmed B10 identical stock"));
 assert.equal(model.completeCategoryReconciliation,false);
 assert(model.rules.some(x=>x.id==="B10-C2"&&x.requirement.includes("Attachment 7 instruction 6")));
 assert(model.rules.some(x=>x.id==="B11-B3"));
@@ -73,6 +78,10 @@ for(const item of model.rows){
 }
 assert(html.includes("10.2 Source"));
 assert(html.includes("10.3.3 Release"));
+assert(html.includes("Customer requirement minimums / next OEM evidence"));
+assert(html.includes("MR0001–0004 Attachment 7 instruction 6"));
+assert(html.includes("TETRA/DMR applicability"));
+assert(html.includes("14 kit sets"));
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 const releaseUi=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
 const detail=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
@@ -82,6 +91,8 @@ const exportJs=fs.readFileSync(path.join(root,"project0553/nativeWorkingDraft055
 for(const phrase of [
  'buildSpareLifecycleTrace0553(selectSpareCustomerSchedule0553(),releaseModel)',
  'setReturnToRelease({code,sourceId:released.sourceId,traceId:released.traceId,',
+ 'originWasExact:true',
+ 'originWasExact:false',
  'released.sourceRowModuleId!==id',
  'setPricingStage("working")',
  'Return to exact 10.3.3 Release row',
