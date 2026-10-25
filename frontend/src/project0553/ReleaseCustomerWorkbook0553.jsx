@@ -56,6 +56,11 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
    for(let node=target;node;node=node.parentElement){
     if(node.tagName==="DETAILS")node.open=true;
    }
+   // The reverse Working->Release leg must visibly identify the same exact row.
+   // Pure DOM highlight, never a change to source prices or workbook cells.
+   document.querySelectorAll(".p553-release-row-focus").forEach(node=>
+    node.classList.remove("p553-release-row-focus"));
+   target.classList.add("p553-release-row-focus");
    target.scrollIntoView?.({behavior:"smooth",block:"center"});
   }
  },[focusKey,sheet]);
