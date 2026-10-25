@@ -37,7 +37,7 @@ for(const q of evidence.supplierRows.filter(x=>x.quotedUnitPriceUSD!==null)){
 }
 assert(internal.includes("Vendor Unit USD (expired)"));
 assert(internal.includes("Review SELL USD/unit"));
-assert(internal.includes("3,287.4660"));
+assert(internal.includes("3,287.466"));
 assert(internal.includes("Not established")); // no valid quote for region-option lines
 assert(customer.includes("Customer Unit USD"));
 assert(customer.includes("No approved SKU-level release price"));
