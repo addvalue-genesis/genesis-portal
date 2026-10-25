@@ -87,6 +87,15 @@ export function selectB10ItemizedPurchaseEvidence0553(){
  const b10ReferenceCostTHB=round(509827.5/1.30);
  if(quoteTotalUSD!==28819.71||quoteCostAtPlanningFxTHB!==907820.87)
   throw Error("D/E quote complete amount or historical FX comparison changed");
+ const quoteCategory=(predicate)=>round(candidateRows.filter(predicate).reduce((a,x)=>a+(x.quotedExtendedUSD||0),0));
+ const proposedB10AccessoryLines=freeze(candidateRows.filter(x=>/RF_FILTER__|POWER_INJECTOR__|POWER_CORD__/.test(x.articleClass)));
+ const proposedB10AccessoriesUSD=quoteCategory(x=>proposedB10AccessoryLines.includes(x));
+ const capitalRadioCandidateUSD=quoteCategory(x=>/RADIO_ASSEMBLY__/.test(x.articleClass));
+ const softwareAndWarrantyUSD=quoteCategory(x=>/SOFTWARE_ENTITLEMENT__|REGION_LICENSE__|WARRANTY_SERVICE__/.test(x.articleClass));
+ if(proposedB10AccessoryLines.length!==6||proposedB10AccessoriesUSD!==6038.92||
+  capitalRadioCandidateUSD!==7168.96||softwareAndWarrantyUSD!==15611.83||
+  round(proposedB10AccessoriesUSD+capitalRadioCandidateUSD+softwareAndWarrantyUSD)!==quoteTotalUSD)
+  throw Error("NextG D/E source spare hardware versus licences/warranties reclassification changed");
  const duplicatedSkus=freeze(unique(candidateRows.map(x=>x.proposedSku).filter(s=>
   candidateRows.filter(x=>x.proposedSku===s).length>1)));
  return freeze({
@@ -102,6 +111,10 @@ export function selectB10ItemizedPurchaseEvidence0553(){
   originalB10WorkingSellTHB:509827.5,originalB10ReferenceCostTHB:b10ReferenceCostTHB,
   costComparisonExceedsEnvelope:quoteCostAtPlanningFxTHB>b10ReferenceCostTHB,
   repeatedSkusAcrossSpareGroups:duplicatedSkus,
+  proposedB10AccessoryLines,proposedB10AccessoriesUSD,
+  capitalRadioCandidateUSD,softwareAndWarrantyUSD,
+  physicalComponentCandidateCount:candidateRows.filter(x=>x.physicalPurchaseCandidate).length,
+  hardwareQuoteUSD:round(proposedB10AccessoriesUSD+capitalRadioCandidateUSD),
   legacyCandidates:legacy,
   budgetEnvelopeRows:freeze(envelopes.map(x=>freeze({id:x.id,mr:x.linkedMR[0],
     locations:x.linkedLocations,contractKitCount:x.qty,
