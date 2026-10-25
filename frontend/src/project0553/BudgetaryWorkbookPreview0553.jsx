@@ -8,6 +8,8 @@ import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
 import {deriveA5BulkAttribution0553} from "./data/a5BulkAttribution0553";
 import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {selectScopeSheet0553} from "./data/scopeSheetProjection0553";
+import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
+import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 
 // Workbook-driven navigation, not an editable BOM and not a released quote.
 // The historical Rev08 amounts are source evidence ONLY; never promote them
@@ -15,7 +17,7 @@ import {selectScopeSheet0553} from "./data/scopeSheetProjection0553";
 const sheetKey=name=>name.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/-$/,"");
 const summaryCellRow={A1:9,A2:10,A3:11,A4:12,A5:13,B1:24,B2:25,B3:26,B4:27,B5:28,B6:29,B7:30,B8:31,B9:32,B10:33,B11:34,B12:35,B13:36,B14:37,C1:41,C2:42};
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
-export function BudgetaryWorkbookPreview0553(){
+export function BudgetaryWorkbookPreview0553({onOpenSource=null}){
  const [sheet,setSheet]=useState(template.sheets[0].name);
  const [showHistorical,setShowHistorical]=useState(false);
  const [showEmptyRows,setShowEmptyRows]=useState(false);
@@ -59,6 +61,7 @@ export function BudgetaryWorkbookPreview0553(){
  });
  const a5Memo=deriveA5BulkAttribution0553();
  const scopePartB=selectScopePartBcWorking0553();
+ const b10Source=selectSpareCustomerSchedule0553();
  const bcSheetCodes=new Set(["B10","B11","B13","C1","C2"]);
  const bcLinked=Object.fromEntries([...bcSheetCodes].map(code=>[code,selectScopeSheet0553(code,{thbPerUsd:currentFx.thbPerUsd})]));
  const bcRowCodes=Object.fromEntries(Object.entries(summaryCellRow).filter(([code])=>code.startsWith("B")||code.startsWith("C")).map(([code,row])=>[row,code]));
@@ -105,6 +108,11 @@ export function BudgetaryWorkbookPreview0553(){
    </div>
    <p className="p55-note">กด + / − เพื่อยุบเฉพาะรายการย่อย (แถว 6–18) โดยหัวเอกสาร หัวตาราง Total และ Remark จะแสดงเสมอ; Excel ต้นฉบับไม่ถูกแก้ไข</p>
    {sheet==="Scope of supply"&&<ScopeSheetsDetail0553 fx={{thbPerUsd:currentFx.thbPerUsd}} view="summary"/>}
+   {sheet==="B10 CommSpares"?<B10KitPriceSummary0553
+     rows={b10Source.currentByCode.B10} currency="THB"
+     total={b10Source.currentBudgetaryByCode.B10}
+     internal={typeof onOpenSource==="function"}
+     onOpenSource={onOpenSource} variant="budgetary"/>:<>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget">
     <thead><tr><th style={{width:45}}>Row</th>{Array.from({length:layout.columns},(_,i)=><th key={i}>{String.fromCharCode(65+i)}</th>)}<th style={{width:85}}>Copy ID</th></tr></thead>
     <tbody>{Array.from({length:layout.maxRow},(_,i)=>i+1).map(rowNum=>{
@@ -181,6 +189,7 @@ export function BudgetaryWorkbookPreview0553(){
      </tr>)}</React.Fragment>;
     })}</tbody>
    </table></div>
+   </>}
    <p className="p55-note"><strong>Part B/C price cells:</strong> source-linked to bid.budget.scope WBS and child Annex projections. Historical Annex values are labelled REFERENCE only, never posted to current turnkey total. Pending costs stay pending, including SAMTEL/OEM execution scopes.</p>
    <p className="p55-note"><strong>Row 38 Total:</strong> NOT ESTABLISHED. Part A currently has cost-only evidence; Part B contains working sell references. They are deliberately NOT summed. Turnkey owner/OEM B costs are incomplete, and C options remain excluded from the base.</p>
    <p className="p55-note">Part A defaults to MR equipment group summary with on-demand TAG drill-down. Detail rows show source TAG and location, with MR as grouping only. Missing specification, quantity and rates are flagged. Quantity 1 package is a display grouping, not an engineering unit count. A5 is included in A1. Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
