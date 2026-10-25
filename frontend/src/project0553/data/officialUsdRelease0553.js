@@ -75,7 +75,7 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
   const items=source.annex[code]||[],parent=rows.find(r=>r.code===code);
   if(items.length!==specifications[code].length||new Set(items.map(r=>r.sourceId)).size!==items.length||items.some(r=>!specificationById[r.sourceId]||!r.sourceId.startsWith(code+"-PTTEP-")))throw Error(code+" customer description mapping needs review");
   if(parent.amountUSD!==null&&Math.abs(items.reduce((n,r)=>n+(r.customerTotalTHB||0),0)-parent.sourceTHB)>0.02)throw Error(code+" source annex total differs from Release");
-  annex[code]=allocateAnnex(items.map((r,i)=>({code,sourceId:r.sourceId,sourceTHB:r.customerTotalTHB,
+  annex[code]=allocateAnnex(items.map((r,i)=>({code,sourceId:r.sourceId,sourceRowModuleId:r.sourceRowModuleId,traceId:r.traceId,sourceTHB:r.customerTotalTHB,
    tagNo:r.tagNo||"COMMON",description:r.description.replace("readiness reserve","set"),
    specification:specificationById[r.sourceId],materials:"Subject to approved OEM specification",qty:r.qty,
    leadTime:"To be confirmed"})),parent.amountUSD);
