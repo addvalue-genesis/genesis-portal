@@ -110,7 +110,7 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
    proposedVsExistingTHB:round2(sellBeforeUsdRoundTHB-b10.originalB10WorkingSellTHB),
    proposedVsExistingOfficialUSD:proposedMainOfficialUSD-originalOfficialUSD},
   assumptions,releaseAllowed:false,postedToWorking:false,postedToOfficial:false,
-  pricesDoNotIncludeReconfirmedOEMPO:false,
+  supplierQuoteRefreshVerified:false,supplierActualPurchasePriceVerified:false,
   sourceQtyComplete:false,sourceUnitPricesComplete:false,installedSkuCompatibilityComplete:false,
   readiness:"NOT_CUSTOMER_ISSUABLE__ITEMIZED_REQUIRED_SPARES_UNCLOSED",
   gapSummary:"Four MR1 hardware-quote lines are priced but cannot establish 4 platform kit contents. MR2-MR4 are parametric cost envelopes, not itemized cost. B5/B6 freight/insurance remain separate; validity and selected stock quantities not evidenced."
