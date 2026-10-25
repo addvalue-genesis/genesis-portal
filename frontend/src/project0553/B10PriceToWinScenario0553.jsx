@@ -15,7 +15,7 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
   mr1PriorEnvelopeCreditPct:mr1Credit,
   includeNorthAmericanCord:includeCord,includeWholeRadio
  }),[profit,risk,mr1Credit,includeCord,includeWholeRadio]);
- if(canonical?.trace?.originalParametricCostUSD!==price.trace.originalParametricCostUSD)
+ if(canonical&&canonical.trace?.originalParametricCostUSD!==price.trace.originalParametricCostUSD)
   throw Error("10.2/10.3 B10 price scenario underlying source changed");
  const value=price.scenario,ass=price.assumptions;
  return <details className="p55-panel p553-b10-ptw" data-component-key={price.moduleId} open={context!=="scope"} style={{padding:12}}>
