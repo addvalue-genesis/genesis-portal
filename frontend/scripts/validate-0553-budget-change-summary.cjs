@@ -69,6 +69,7 @@ assert(workspace.indexOf("<BudgetChangeSummary0553 ")<workspace.indexOf("bid.bud
  "What's New should appear immediately after Budget Workspace heading");
 assert(workspace.includes("buildReleaseCommercialModel0553"),"One live release model preserved");
 const view=read("BudgetChangeSummary0553.jsx");
+assert(view.includes('entry.priceImpact==="PRICE_REVIEW_REQUIRED"?"Budgetary review only · NOT POSTED"'),"No pricing review may masquerade as selected/issued SELL");
 assert(view.includes("onClick={()=>onOpenModule({sourceModuleId:id})}"));
 assert(view.includes("ComponentCopyId"));
 assert(view.includes("window.localStorage.setItem(SEEN_KEY_0553,stamp)"));
