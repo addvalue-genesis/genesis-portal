@@ -9,6 +9,8 @@ import {selectAddvalueB14Insurance0553} from "./data/addvalueB14Insurance0553";
 import {selectB1RegulatoryCost0553} from "./data/b1RegulatoryCost0553";
 import {selectSatToolReadiness0553} from "./data/satToolReadiness0553";
 import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringReconciliation0553";
+import {selectB10ItemizedPurchaseEvidence0553} from "./data/b10ItemizedPurchaseEvidence0553";
+import {B10ItemizedPurchasingEvidence0553} from "./B10ItemizedPurchasingEvidence0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
@@ -23,6 +25,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
  const satToolReadiness=code==="B3"?selectSatToolReadiness0553():null;
  const spareReconciliation=selectSpareEngineeringReconciliation0553();
  const spareLines=customerSchedule.currentByCode?.[code]||customerSchedule.byCode[code]||[];
+ const b10ItemizedEvidence=code==="B10"?selectB10ItemizedPurchaseEvidence0553():null;
  const coverage=["B10","B11","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
  const inWorking=mode==="working";
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
@@ -337,6 +340,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    {code==="B11"&&<p className="p55-note"><strong>Customer template delivery basis:</strong> DDP Purchaser’s Yard shown in RFQ; current THB prices are internal budget references only, not a verified DDP delivered quotation. Installation, commissioning and special tools must reconcile with B3/B9 and Part A before customer release. Four MR-phase tool sets and five EXA-A8 minimum applicability checks do NOT mean nine additive tool purchase lines.</p>}
    <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
   </div>}
+  {code==="B10"&&<B10ItemizedPurchasingEvidence0553 evidence={b10ItemizedEvidence} context={inWorking?"working":"scope"}/>}
   {spareLines.length>0&&customerSchedule.sparePriceEvidence&&<details className="p55-panel p553-itemized-evidence" open={inWorking} style={{padding:12}}>
    <summary><strong>Physical purchase candidate register — item names / OEM model / Part No. / historical price evidence</strong>
     <small>10.2 source evidence only · NOT additive to Working SELL / customer Release · no supplier spare quotation implied</small></summary>
