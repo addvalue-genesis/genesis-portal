@@ -198,3 +198,20 @@
 .p553-b10-composition-table td small{display:block;margin-top:3px;color:#5d7080;font-size:10px}
 .p553-b10-composition-table code{font-size:10px;white-space:normal;overflow-wrap:anywhere}
 .p553-b10-composition-unpriced td{background:#fbfcfd}
+
+/* Nonposting cross-category spare/source round-trip reviewer.
+   Table scrolling stays within its own section; customer native page unchanged. */
+.p553-spare-lifecycle{min-width:0;max-width:100%;box-sizing:border-box}
+.p553-spare-lifecycle>summary{cursor:pointer;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.p553-spare-lifecycle>summary small{display:block;font-size:11px;font-weight:400;color:#536b7b}
+.p553-spare-lifecycle-sub{margin:10px 0;border:1px solid #d5e0e7;border-radius:5px;min-width:0}
+.p553-spare-lifecycle-sub>summary{cursor:pointer;background:#edf3f6;padding:9px 12px}
+.p553-spare-lifecycle-sub .p55-table-wrap{overflow-x:auto;max-width:100%}
+.p553-spare-lifecycle-sub .p55-table{min-width:840px}
+.p553-spare-lifecycle-sub .p55-table td small{display:block;font-size:10px;margin-top:3px;color:#607787}
+.p553-spare-lifecycle-sub .p55-table code{font-size:10px;overflow-wrap:anywhere;white-space:normal}
+.p553-spare-lifecycle-actions{display:flex;flex-wrap:wrap;gap:5px}
+.p553-spare-return-link{display:flex;align-items:center;flex-wrap:wrap;gap:10px;
+ padding:10px 12px;border:1px solid #96b7ca;background:#edf5f8;border-radius:5px;
+ font-size:12px;max-width:100%;box-sizing:border-box}
+.p553-spare-return-link span{color:#435f70;overflow-wrap:anywhere}
