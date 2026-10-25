@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R50";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R51";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-05",date:"2026-10-25",kind:"UI",tone:"neutral",
+  title:"10.5 historical spare reference THB display / source-currency separation",
+  detail:"Fix validate:0553-scope-bc-price-audit assertion 115: additional Rev08 item-candidate audit inadvertently displayed raw USD unit/extended prices in 10.5. These columns now use explicit historical THB conversion at the selected FX; if FX is absent no price is inferred. The original USD remains available as a 10.2 Working-only reference; source quote comparables stay in Working. B10 source→Budgetary→Scope→Release→Official and reverse IDs, THB509827.50 B10, USD16200 Official and all cost owners are unchanged. Targeted regression now checks THB columns and 10.2-only source currency.",
+  moduleIds:Object.freeze(["bid.budget.scope","bid.budget.working.bc.b10","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner validation console 25-Oct: Scope BC price audit failed line 115 on raw historical USD table cells"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-04",date:"2026-10-25",kind:"UI",tone:"navigation",
   title:"B10 Budgetary/Release/Official — four-kit commercial-only view, Source→Release→Source retained",
