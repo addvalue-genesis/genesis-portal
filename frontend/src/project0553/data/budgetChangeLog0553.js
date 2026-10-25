@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R51";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R52";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-06",date:"2026-10-25",kind:"ENGINEERING",tone:"neutral",
+  title:"B10 ODU/IDU/Cisco and all four telecom MR equipment composition → OEM SPIR coverage",
+  detail:"New read-only original item/source physical composition for B10: actual NextG SCADA ODU Base/Remote quote lines, source-only IDU functional requirement, VST Cisco IE3400+PoE PSU+licence, MGW RFI BDA and included RF surge, EXION Ex phone/sounder, MDS RACON, and 14 original MR commissioning spare article functions. Visible below 4 financial kit rows in Budgetary/10.5/10.3.3/10.3.4. Explicitly distinguishes quoted Part A installed Qty and unit reference from unconfirmed B10 spare purchase Qty/rate; 4/3/4/3 MR kits remain B10 THB509827.50 / Official USD16200. Uses same parent sourceId/traceId for Release→Source→Release; document authority MR §5/Attachments 2,5,7, SPE §8.1, BOD §11.1. OEM-approved SPIR and original native XLSX 13-row itemization remain release HOLD. No double count.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10.physical-composition","bid.budget.pricing.release.preview.annex.b10.kit-summary","bid.budget.pricing.official.b10.kit-summary"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner 25-Oct: show what B10 consists of — ODU, IDU, Cisco L3 and vendor SKUs, based on BOD/MR/DTS/SPE and native Excel"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-05",date:"2026-10-25",kind:"UI",tone:"neutral",
   title:"10.5 historical spare reference THB display / source-currency separation",
