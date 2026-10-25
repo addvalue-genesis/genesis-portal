@@ -44,6 +44,7 @@ export function B10KitPriceSummary0553({
     variant==="budgetary"?"bid.budget.pricing.budgetary.annex.b10.kit-summary":
     currency==="USD"?"bid.budget.pricing.official.b10.kit-summary":"bid.budget.pricing.release.preview.annex.b10.kit-summary"}
     data-source-reconciliation="B10_SOURCE_RELEASE_SOURCE">
+  <B10NativeAnnexReview0553 internal={internal} onOpenSource={onOpenSource} variant={variant}/>
   <div className="p553-b10-commercial-heading">
    <strong>B10 — Kit price summary / reconciliation</strong>
    <small>4 MR-level financial envelopes · 4/3/4/3 commissioning spare sets · same source-owned prices, no added SKU charges</small>
@@ -77,7 +78,6 @@ export function B10KitPriceSummary0553({
      <th className="p553-b10-commercial-number">{money(total)}</th>{internal&&<th/>}</tr></tfoot>
    </table>
   </div>
-  <B10NativeAnnexReview0553 internal={internal} onOpenSource={onOpenSource} variant={variant}/>
   <p className="p553-b10-commercial-note">Original Item / Source evidence, related installed TAGs and OEM SKU validation remain in 10.2 Working.
    This summary is for price presentation only; kit quantities are not itemized SKU purchase quantities.</p>
  </section>;
