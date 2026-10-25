@@ -20,7 +20,7 @@ This is **a MANAGEMENT WHAT-IF**, not a new current OEM offer, customer issuance
 
 The current **internal parametric** B10 cost envelopes are USD: MR1 4 kits × 1,400 = 5,600; MR2 3 kits × 700 = 2,100; MR3 4 kits × 550 = 2,200; MR4 3 kits × 850 = 2,550, for USD 12,450 (THB 392,175 at FX 31.5); selected Working SELL = ×1.30 = THB 509,827.50.
 
-We **credit USD 5,600 of MR1 historical source estimate** and replace it with USD 6,031.72 of NextG D/E RF filter+PoE accessory offer. Keep MR2+MR3+MR4 at **USD 6,850 of unitemized planning cost reserves** (not verified supplier cost/Part Nos). This produces **USD 12,881.72** scenario cost, or **THB 405,774.18**. This is **NOT full B10 cost completeness**: B10 MR1 remaining requirement families, Ex/connector spare stock and brownfield applicability are still open.
+We **credit USD 5,600 of MR1 historical source estimate** and replace it with USD 6,031.72 of NextG D/E RF filter+PoE accessory offer. Keep MR2+MR3+MR4 at **USD 6,850 of unitemized planning cost reserves** (not verified supplier cost/Part Nos). This produces the **optimistic 100% MR1 allowance-credit lower-bound scenario** of USD 12,881.72 cost, or THB 405,774.18. It assumes the entire old MR1 USD5,600 allowance is superseded by RF-filter/PoE evidence, **but other unpriced MR1 physical items can be omitted by this assumption**. The UI now also has adjustable MR1 envelope-credit sensitivity at 50% and 0%; these are uncertainty bounds, not evidence that any percentage of parts is duplicated. This is **NOT full B10 cost completeness**: B10 MR1 remaining requirement families, Ex/connector spare stock and brownfield applicability are still open.
 
 Profit policy **internal planning proposal**:
 ```
@@ -39,6 +39,8 @@ The risk allowance is accounted for INSIDE the 1.40 multiplier, not added to B10
 |---|---:|---|---:|---:|
 | Existing canonical B10 | 12,450.00 old parametric, not verified direct cost | existing factor1.30 | 509,827.50 | 16,200 |
 | Default scope: D/E RF filters + PoE only; MR2–4 parametric | 12,881.72 | 1.40 (5% risk/5% SAMTEL/20% profit) | **568,083.85** | **18,100** |
+| MR1 50% assumed allowance credit; unpriced-item reserve | 15,681.72 | 1.40 | 691,563.85 | 22,000 |
+| MR1 0% allowance credit / gross coverage stress (may overlap prior items) | 18,481.72 | 1.40 | 815,043.85 | 25,900 |
 | Add North-American D/E power cords (fit TBD) | 12,888.92 | 1.40 | 568,401.37 | 18,100 |
 | Add complete radio assemblies to default (possible C1 duplication) | 20,050.68 | 1.40 | 884,234.99 | 28,100 |
 
@@ -50,7 +52,7 @@ Proposed default vs existing canonical Working B10 THB +58,256.35. Indicative su
 - Source / review: `frontend/src/project0553/data/b10ItemizedPurchaseEvidence0553.js`, new `data/b10PriceToWinReview0553.js`.
 - 10.2 canonical B10 owner carries **read-only `b10PriceToWinReview`**. `b10WorkingSellTHB`, financial-owner costs, `directCostTHB` and source 4 parent B10 kits **unchanged**.
 - 10.5 Scope B10 propagates the same source-derived review object, no new financial posting.
-- 10.3.3 Internal Release B10 propagates the same read model and allows interactive 15/20/25% after-risk target profit, 0/5/10% risk reserve and US cord / whole-radio stress tests. Customer preview mode **does not display any internal what-if amount**.
+- 10.3.3 Internal Release B10 propagates the same read model and allows interactive 15/20/25% after-risk target profit, 0/5/10% risk reserve, MR1 100/50/0% allowance-credit *scope completeness sensitivities*, and US cord / whole-radio stress tests. Customer preview mode **does not display any internal what-if amount**.
 - 10.3.4 equivalent proposed rounded summary is shown solely as an INTERNAL scenario, not written to customer Official DTO or original Excel. Official 10.3.4 and all six embedded native sheets remain unmodified; none is silently truncated or repriced.
 - Public nonposting comparables never increase cash ledger or become a false OEM quote.
 - Project-change registry annotated `ENGINEERING / NO_PRICE_CHANGE`.
