@@ -450,3 +450,84 @@ export async function buildNativeOfficialRelease0553(file,model){
  const result=rebuildZip(entries.filter(e=>!remove(e.name)),changes);
  return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),filename:"PJ2608-0553_ScopeOfSupply_USD.xlsx",warnings};
 }
+
+
+// INTERNAL B10 original-template review (NOT the Official customer release).
+// Inserts any number of line rows into B10 CommSpares in the SAME native sheet,
+// shifting the original Total and Remark and their merged ranges downward.
+// Source quoted equipment Qty/USD reference is NOT an accepted B10 CIF spare SELL.
+export async function buildNativeB10ItemizedReview0553(file,annex){
+ if(!file||!/\\.xlsx$/i.test(file.name||"")||!annex||annex.originalSheet!=="B10 CommSpares"||
+  !Array.isArray(annex.rows)||annex.rows.length<1||annex.customerReleaseAllowed!==false)
+  throw Error("Native B10 review requires original 4-Scope of Supply.xlsx and the nonposting source item map");
+ if(annex.rows.some(x=>!x.id||!x.parentSourceId||x.b10PurchaseQty!==null||
+  x.b10UnitSellUSD!==null||x.customerIssueAllowed!==false))
+  throw Error("B10 spare buying Qty/SELL may not be assumed from installed quote");
+ const bytes=new Uint8Array(await file.arrayBuffer()),entries=entriesFromZip(bytes);
+ const wb=entries.find(x=>x.name==="xl/workbook.xml"),sheet=entries.find(x=>x.name==="xl/worksheets/sheet2.xml");
+ if(!wb||!sheet)throw Error("Original six-sheet Native B10 template missing");
+ const workbook=decode.decode(await readEntry(wb));
+ if(!SHEETS_0553.every(name=>workbook.includes('name="'+name+'"')))
+  throw Error("B10 output must retain all six original customer worksheets");
+ let xml=decode.decode(await readEntry(sheet));
+ const original13=13,extra=Math.max(0,annex.rows.length-original13);
+ if(extra){
+  const originalRow=xml.match(/<row\\b[^>]*\\br="18"[^>]*>[\\s\\S]*?<\\/row>/)?.[0];
+  if(!originalRow||!xml.includes('<mergeCell ref="B19:H19"')||
+   !xml.includes('<mergeCell ref="B20:E20"'))throw Error("Original B10 styled body/total/remark geometry changed");
+  const shift=row=>{
+   const no=Number(row.match(/^<row\\b[^>]*\\br="(\\d+)"/)?.[1]);
+   if(!Number.isInteger(no)||no<19)return row;
+   const to=no+extra;
+   return row.replace(/^<row\\b[^>]*>/,s=>s.replace(/\\br="\\d+"/,'r="'+to+'"'))
+    .replace(/(<c\\b[^>]*\\br=")([A-Z]+)\\d+(")/g,(_m,a,col,end)=>a+col+to+end);
+  };
+  xml=xml.replace(/<row\\b[^>]*>[\\s\\S]*?<\\/row>/g,shift);
+  const inserted=Array.from({length:extra},(_,i)=>{
+   const to=19+i;
+   return originalRow.replace(/^<row\\b[^>]*>/,s=>s.replace(/\\br="18"/,'r="'+to+'"').replace(/\\bht="[^"]+"/,'ht="56"'))
+    .replace(/(<c\\b[^>]*\\br=")([A-Z]+)18(")/g,(_m,a,col,end)=>a+col+to+end);
+  }).join("");
+  const token='<row r="'+(19+extra)+'"';
+  const index=xml.indexOf(token);
+  if(index<0)throw Error("Native B10 inserted row position missing");
+  xml=xml.slice(0,index)+inserted+xml.slice(index);
+  xml=xml.replace(/(<mergeCell\\b[^>]*\\bref=")([A-Z]+)(\\d+):([A-Z]+)(\\d+)(")/g,
+   (whole,prefix,a,first,b,last,suffix)=>Number(first)>=19?
+    prefix+a+(Number(first)+extra)+":"+b+(Number(last)+extra)+suffix:whole);
+ }
+ const totalRow=19+extra,remarkRow=20+extra;
+ if(totalRow!==6+annex.rows.length)throw Error("B10 native total row not below all physical items");
+ const writes=new Map();
+ write(writes,"H4","CIF ZHUHAI PORT — PROPOSED / SOURCE PRICE NOT CIF");
+ write(writes,"H5","SOURCE UNIT USD (NOT CIF SELL)");
+ write(writes,"I5","SOURCE TOTAL USD (NOT CIF SELL)");
+ for(let j=0;j<annex.rows.length;j++){
+  const r=annex.rows[j],row=6+j;
+  write(writes,"B"+row,r.item);
+  write(writes,"C"+row,r.tag);
+  write(writes,"D"+row,r.description);
+  write(writes,"E"+row,r.specification+" | Original Item / Source: "+r.originalItemSource+
+   (r.referenceCurrency==="THB"&&Number.isFinite(r.referenceUnit)?
+    " | Original THB "+r.referenceUnit+" at INTERNAL planning FX "+annex.sourceFXTHBPerUSD:""));
+  write(writes,"F"+row,r.owner+" — NOT VERIFIED B10 SPARE");
+  write(writes,"G"+row,Number.isFinite(r.referenceQty)?r.referenceQty:"TBC");
+  write(writes,"H"+row,Number.isFinite(r.referenceUnitUSD)?r.referenceUnitUSD:"NOT QUOTED");
+  write(writes,"I"+row,Number.isFinite(r.referenceExtendedUSD)?r.referenceExtendedUSD:"NOT QUOTED");
+ }
+ write(writes,"B"+totalRow,"B10 CIF SPARE SELL TOTAL: TO BE QUOTED (SOURCE REFERENCE NOT ADDITIVE)");
+ write(writes,"I"+totalRow,"NOT QUOTED");
+ write(writes,"B"+remarkRow,"INTERNAL REVIEW — quoted installed/optional Qty and prices are SOURCE REFERENCES only. "+
+  "CIF Zhuhai Port buyer acceptance, OEM B10 SPIR spare Qty/price and no-duplicate owner are PENDING. "+
+  "Do not sum source reference prices as B10 or customer offer.");
+ for(const [cell,value] of writes)xml=replaceCell(xml,cell,value);
+ // Existing 6 original worksheet identities/styles, columns, printing and
+ // unrelated ZIP files remain untouched. The cloned row-18 carries native
+ // borders/fills/column format into all added B10 lines.
+ const out=rebuildZip(entries,new Map([["xl/worksheets/sheet2.xml",encode.encode(xml)]]));
+ return {blob:new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),
+  filename:"PJ2608-0553_B10_ORIGINAL_NATIVE_ITEMIZED_SOURCE_REFERENCE_INTERNAL_NOT_RELEASED.xlsx",
+  rowCount:annex.rows.length,originalCapacity:original13,insertedRows:extra,totalRow,
+  warnings:["INTERNAL NONPOSTING B10 — SOURCE quote Qty and unit USD are NOT approved spare purchase Qty/SELL",
+   "Purchaser original DDP heading changed ONLY in this INTERNAL derivative to proposed CIF Zhuhai; contract deviation acceptance and freight/insurance quote still OPEN"]};
+}
