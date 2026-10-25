@@ -36,6 +36,7 @@ for(const html of [internal,customer]){
 }
 assert(internal.includes("242,460.00"));
 assert(!customer.includes("242,460.00"));
+assert(!customer.includes("NG/260916-ADV-DAP1")&&!customer.includes("VST A-0048"),"Internal vendor quotation references leaked to customer B10 Preview");
 assert(!customer.includes("安装"));
 assert(customer.includes("CIF ZHUHAI PORT — USD OFFER PENDING"));
 assert(customer.includes("To be quoted"));
