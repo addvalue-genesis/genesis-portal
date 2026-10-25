@@ -414,6 +414,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    addvalueRealizedProfitTHB:null // Incomplete verified total cost; never invent profit.
   },
   sourceCoverage:{aReady:aCostComplete,bSellReady:b.length===bKnown.length,
+   b10PurchasableSpirComplete:!bc.byCode.B10.b10ItemizedPurchaseEvidence?.noVerifiedPhysicalPurchaseLine,
    bCostReady:bProfitComplete,cCostReady:cCostComplete,
    annexOverflow,aOverflow,gaps},
   approval:{approved:false,releaseAllowed:false,exportNativeAllowed:false,
