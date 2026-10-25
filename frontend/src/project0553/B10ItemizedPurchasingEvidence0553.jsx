@@ -11,7 +11,7 @@ export function B10ItemizedPurchasingEvidence0553({evidence,context="working"}){
  return <details className="p55-panel p553-b10-purchasing-evidence" open={context==="working"} data-component-key={evidence.moduleId} style={{padding:12}}>
   <summary><strong>B10 — Itemized quoted SKU / TAG / quantity / unit-price evidence</strong>
    <small>{evidence.supplierRows.length} quoted line identities, {evidence.supplierQuotedCount} with price; full purchase scope NOT established</small></summary>
-  <p className="p55-note"><strong>Source:</strong> {evidence.sourceQuote} · expired {evidence.sourceQuoteStatus.replace("EXPIRED_","")}.
+  <p className="p55-note"><strong>Source:</strong> {evidence.sourceQuote} · supplier quote dated 16 Sep 2026, expired 1 Oct 2026.
    D and E are distinct NextG optional spare-stock groupings; they do not establish the contents of 14 contractual commissioning kits. No sale, cost, inventory or duplicate charge is posted from this evidence.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Source / MR</th><th>Selected Working SELL THB</th><th>Original kit Qty</th><th>Contents verified</th></tr></thead>
