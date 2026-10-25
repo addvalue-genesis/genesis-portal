@@ -37,6 +37,18 @@ assert.equal(x.originalB10ReferenceCostTHB,392175);
 assert(x.costComparisonExceedsEnvelope);
 assert.equal(x.sourceQuote,"NG/260916-ADV-DAP1");
 assert.equal(x.legacyCandidates.length,9);
+assert.equal(x.requirementArticleRows.length,14);
+assert.deepEqual([...new Set(x.requirementArticleRows.map(a=>a.parentB10PriceId))],
+ ["B10-PTTEP-01","B10-PTTEP-02","B10-PTTEP-03","B10-PTTEP-04"]);
+for(const article of x.requirementArticleRows){
+ assert.equal(article.approvedPurchaseQty,null);
+ assert.equal(article.exactSpareSku,null);
+ assert.equal(article.approvedSupplierUnitCostTHB,null);
+ assert.equal(article.workingSellAttributionTHB,null);
+ assert.equal(article.postingAllowed,false);
+ assert.equal(article.releaseAllowed,false);
+ assert(article.actualInstalledTagCandidates.every(z=>/^(ZWP|ZPQ)\S* \/ [A-Z]+-\d{3}-\d{3}/.test(z)));
+}
 assert.deepEqual(x.budgetEnvelopeRows.map(z=>z.contractKitCount),[4,3,4,3]);
 assert.deepEqual(x.unquotedOtherMrCodes,["MR-0002","MR-0003","MR-0004"]);
 assert.equal(new Set(x.supplierRows.map(z=>z.id)).size,16);
@@ -45,6 +57,9 @@ for(const a of x.supplierRows){
  const q=supplier.lines.find(z=>z.code===a.sourceQuoteLine);
  assert(q);
  assert.equal(q.partNumber,a.proposedSku);
+ assert.deepEqual(a.matchedBaseEquipmentQuoteLines,supplier.lines.filter(y=>
+  !["D","E"].includes(y.group)&&y.partNumber===q.partNumber).map(y=>y.code));
+
  assert.equal(q.description,a.articleDescription);
  assert.equal(q.qty,a.vendorOfferedQty);
  assert.equal(a.quotedUnitPriceUSD,q.unitPrice);
@@ -91,6 +106,8 @@ const React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
 const {B10ItemizedPurchasingEvidence0553}=from("B10ItemizedPurchasingEvidence0553.jsx");
 const ui=renderToStaticMarkup(React.createElement(B10ItemizedPurchasingEvidence0553,{evidence:x,context:"working"}));
 for(const q of x.supplierRows)assert(ui.includes(q.proposedSku),q.sourceQuoteLine+" missing from Working UI");
+assert.equal((ui.match(/data-b10-requirement-id=/g)||[]).length,14);
+assert.equal((ui.match(/data-b10-source-id=/g)||[]).length,16);
 assert(ui.includes("B10 purchase Qty"));
 assert(ui.includes("NO QUOTED PRICE"));
 assert(ui.includes("NO — itemized OEM SPIR still required"));
