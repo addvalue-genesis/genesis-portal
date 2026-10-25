@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-24-R46";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R47";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-01",date:"2026-10-25",kind:"ENGINEERING",tone:"neutral",
+  title:"B10 deep spare part and supplier quote itemization — nonposting audit",
+  detail:"MR0001–0004 4/3/4/3 commissioning-kit financial envelopes retained. B10 now separates 14 source-derived physical article families (unapproved Part No./physical Qty/cost) from 16 NextG Rev16Sep2026 separately quoted D/E SKU offer rows (14 priced, two dashed), with related installed site/TAG candidates and matched base A/B/C quote SKU links. Six accessory candidates, two major radio assemblies and eight software/licence/warranty lines are separated; physical stock and B10/C1/C2 ownership require approval. Working B10 THB509827.50, Known B THB4994787.13, Official USD B10 16200, native 6-sheet customer workbook unchanged; candidate prices never posted or exported to customer. Final release remains HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10","bid.budget.working.bc.b10.itemized-purchasing-evidence","bid.budget.scope.b10","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner25-Oct: B10 purchasable SKU/TAG/Quantity/Unit Price source audit; NextG 16-Sep-2026 D/E separately quoted spares"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261024-15",date:"2026-10-24",kind:"UI",tone:"navigation",
   title:"10.3.4 Official Release — English / USD",
