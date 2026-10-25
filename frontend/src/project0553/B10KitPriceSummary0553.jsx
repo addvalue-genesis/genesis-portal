@@ -1,4 +1,6 @@
 import React from "react";
+import {selectB10PhysicalComposition0553} from "./data/b10PhysicalComposition0553";
+import {B10CompositionBreakdown0553} from "./B10CompositionBreakdown0553";
 
 // Commercial-only view of EXISTING B10 source row identities.
 // Never turn vendor source candidate quote lines into released SKU stock.
@@ -11,6 +13,9 @@ export function B10KitPriceSummary0553({
 }){
  if(rows.length!==4||new Set(rows.map(x=>x.sourceId||x.id)).size!==4)
   throw Error("0553 B10 kit summary must retain exactly four distinct source-owned MR lines");
+ const composition=selectB10PhysicalComposition0553();
+ if(composition.parentRows.some((p,i)=>p.sourceId!==(rows[i].sourceId||rows[i].id)))
+  throw Error("B10 composition Source→Release IDs mismatch");
  const canonical=["MR-0001","MR-0002","MR-0003","MR-0004"];
  const normalized=rows.map((r,i)=>{
   const mr=unique(r.mr||r.linkedMR||[]);
@@ -72,6 +77,8 @@ export function B10KitPriceSummary0553({
      <th className="p553-b10-commercial-number">{money(total)}</th>{internal&&<th/>}</tr></tfoot>
    </table>
   </div>
+  <B10CompositionBreakdown0553 composition={composition} internal={internal}
+    onOpenSource={onOpenSource} mode={variant}/>
   <p className="p553-b10-commercial-note">Original Item / Source evidence, related installed TAGs and OEM SKU validation remain in 10.2 Working.
    This summary is for price presentation only; kit quantities are not itemized SKU purchase quantities.</p>
  </section>;
