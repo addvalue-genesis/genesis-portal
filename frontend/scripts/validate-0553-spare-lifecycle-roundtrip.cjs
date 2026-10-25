@@ -13,10 +13,27 @@ const {buildReleaseCommercialModel0553}=from("data/releaseCommercialModel0553.js
 const {buildOfficialUsdRelease0553}=from("data/officialUsdRelease0553.js");
 const {buildSpareLifecycleTrace0553,SPARE_LIFECYCLE_CODES_0553}=from("data/spareLifecycleTrace0553.js");
 const {SpareLifecycleControl0553}=from("SpareLifecycleControl0553.jsx");
+const {selectSparePricedBudgetReview0553}=from("data/sparePricedBudgetReview0553.js");
+const {SparePricedBudgetReview0553}=from("SparePricedBudgetReview0553.jsx");
 
 const source=selectSpareCustomerSchedule0553(),release=buildReleaseCommercialModel0553({thbPerUsd:31.5});
 const official=buildOfficialUsdRelease0553(release);
 const model=buildSpareLifecycleTrace0553(source,release);
+const priced=selectSparePricedBudgetReview0553();
+assert.deepEqual(["B11","B13","C1","C2"].map(code=>priced.rows[code].length),[4,3,1,12]);
+assert.equal(priced.totals.B11,157657.5);
+assert.equal(priced.totals.B13,46683);
+assert.equal(priced.totals.C1,3071250);
+assert(Math.abs(priced.totals.C2-721806.60)<0.02);
+assert(priced.c2HistoricalOnly&&priced.c1IncludedInOfficial===false&&priced.c2IncludedInOfficial===false);
+assert(priced.codes.every(code=>priced.rows[code].every(x=>x.quantity>0&&x.unitPriceTHB>0&&x.extendedTHB>0)));
+assert(priced.rows.C2.every(x=>x.customerIssueAllowed===false&&!x.priceSelectedInWorking));
+for(const code of priced.codes){
+ const rendered=renderToStaticMarkup(React.createElement(SparePricedBudgetReview0553,{code,context:"release"}));
+ assert(rendered.includes('data-budget-price-review="'+code+'"'));
+ assert.equal((rendered.match(/data-source-pricing-line=/g)||[]).length,priced.rows[code].length);
+}
+
 assert.deepEqual(SPARE_LIFECYCLE_CODES_0553,["B10","B11","B13","C1","C2"]);
 assert.deepEqual(SPARE_LIFECYCLE_CODES_0553.map(x=>model.totals[x].rows),[4,4,3,1,4]);
 assert.deepEqual(SPARE_LIFECYCLE_CODES_0553.map(x=>model.totals[x].workingSellTHB),
