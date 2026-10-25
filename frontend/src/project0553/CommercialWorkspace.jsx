@@ -26,6 +26,9 @@ import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {OfficialUsdRelease0553} from "./OfficialUsdRelease0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
 import {ReleaseSourceNavigator0553} from "./ReleaseSourceNavigator0553";
+import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
+import {buildSpareLifecycleTrace0553} from "./data/spareLifecycleTrace0553";
+import {SpareLifecycleControl0553} from "./SpareLifecycleControl0553";
 import {BudgetChangeSummary0553} from "./BudgetChangeSummary0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
 import {findModuleElement0553,openModuleAncestors0553,workingOwnerFromModuleId0553} from "./data/moduleDeepLink0553";
@@ -129,6 +132,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  const bcPriceAudit=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const releaseModel=buildReleaseCommercialModel0553({thbPerUsd:fx?.thbPerUsd});
+ const spareLifecycle=buildSpareLifecycleTrace0553(selectSpareCustomerSchedule0553(),releaseModel);
  const activePricingView=PRICING_VIEWS_0553.find(view=>view.key===pricingStage)||PRICING_VIEWS_0553.find(view=>view.key==="released");
  const sourceB3=bcWorking.byCode.B3;
  const previewB3=releaseModel.b.find(x=>x.code==="B3");
@@ -138,6 +142,8 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  // Navigate directly to the selected canonical 10.1/10.2 Module ID.
  // Link navigation is read-only: never modify Working SELL or release status.
  const [releaseJump,setReleaseJump]=useState(null);
+ // UI navigation context only: return to the exact originating Release row.
+ const [returnToRelease,setReturnToRelease]=useState(null);
  const [releaseAnnexTarget,setReleaseAnnexTarget]=useState(null);
  const openReleaseAnnexRow=({code,sourceId})=>{
   if(!["B10","B11","B13","C1","C2"].includes(code)||!sourceId)return;
@@ -154,6 +160,15 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   const id=String(item?.sourceModuleId||
    (isBc?"bid.budget.working.bc."+code.toLowerCase():"bid.budget.bom.system-location-mto"));
   if(isBc){setBcTab(code);setBcDetailCode(code);}
+  if(isBc&&item?.sourceId&&["B10","B11","B13","C1","C2"].includes(code)){
+   const released=(releaseModel.annex[code]||[]).find(x=>x.sourceId===item.sourceId);
+   if(!released||released.sourceRowModuleId!==id||
+    (item.traceId&&item.traceId!==released.traceId))
+    throw Error("0553 exact Release→Source navigation refused: orphan or inconsistent "+code+"/"+item.sourceId);
+   setReturnToRelease({code,sourceId:released.sourceId,traceId:released.traceId,
+    sourceRowModuleId:released.sourceRowModuleId});
+  }
+  if(isBc)setPricingStage("working"); // show canonical source while retaining the exact reverse route
   setReleaseJump(previous=>({id,code,seq:(previous?.seq||0)+1}));
  };
  React.useEffect(()=>{
@@ -301,11 +316,21 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
      <button type="button" className="p553-rsn-return" onClick={()=>openReleaseSource({sourceModuleId:"bid.budget.pricing.release.preview"})}>↗ 10.3 · Go to Release Preview</button>
     </section>
     <RevKAbcOwnershipControl0553 working={bcWorking}/>
+    <SpareLifecycleControl0553 model={spareLifecycle} view="working"
+      onOpenSource={openReleaseSource} onOpenReleaseRow={openReleaseAnnexRow}/>
     <ScopeCategoryTabs0553 value={bcTab} onChange={code=>{setBcTab(code);setBcDetailCode(code==="ALL"?null:code);}}/>
     <p className="p55-note">Selected module: <strong>{bcTab==="ALL"?"All Part B/C — B1–B14 and C1–C2":bcTab+" — "+bcWorking.byCode[bcTab]?.requirement}</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey={bcTab==="ALL"?"bid.budget.working.bc":"bid.budget.working.bc."+bcTab.toLowerCase()}/></p>
     </section>
    {bcTab!=="ALL"&&bcWorking.byCode[bcTab]&&<section className="p55-panel" data-component-key={"bid.budget.working.bc."+bcTab.toLowerCase()+".details"}><h4>{bcTab} — Engineering & Cost Detail</h4><BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/>{!["B1","B2","B3","B4","B5","B6","B7","B8","B9"].includes(bcTab)&&<BcWorkCostLines0553 selectedCode={bcTab}/>}</section>}
-   {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working" onOpenReleaseRow={openReleaseAnnexRow}/>}
+   {bcTab!=="ALL"&&returnToRelease?.code===bcTab&&
+     <div className="p553-spare-return-link" data-spare-return-code={returnToRelease.code}
+      data-spare-return-source-id={returnToRelease.sourceId}>
+      <strong>Release → Source → Release</strong>
+      <span>Working Source · {returnToRelease.sourceId} · {returnToRelease.traceId}</span>
+      <button type="button" className="p553-detail-button"
+       onClick={()=>openReleaseAnnexRow(returnToRelease)}>↩ Return to exact 10.3.3 Release row</button>
+     </div>}
+   {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working" onOpenReleaseRow={openReleaseAnnexRow}/>} 
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<p className="p55-note"><strong>Selected {bcTab}:</strong> รายละเอียดแสดงโดยตรงด้านล่างตารางจาก Component เดียวกับ 10.5 โดยไม่ต้องกด ＋ Detail อีกครั้ง</p>}
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
     <p className="p55-note"><strong>CURRENT FAT / TRAINING / SHIPMENT BASIS (24-Oct-2026):</strong> Integrated FAT and Training at SAMTEL Warehouse, Thailand. MR0001 NextG/VST, MR0002 MGW RF, MR0003 EXION and MR0004 MDS/ORGA feed this local integration point; outbound CIF Zhuhai Port. Purchaser handles China import clearance/duty/VAT and port-to-yard. Contract ICC(A) insurance to Yard remains a separate scope gap. B3 retains 6 days of FAT labour with local transfers/work insurance; no MGW integration, FAT, facility service or reserve is selected. Five foreign FAT travel rows are removed; B8 receives no second travel credit. Offshore SAT and B9 two-person JUTAL Zhuhai Yard, China assistance remain separately priced. B6 freight allowance is provisional, with new-route adequacy unverified. Historical China FAT/DAP routes remain audit evidence only; customer release HOLD.</p>
@@ -339,6 +364,8 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    </p>
    {recipient==="INTERNAL"&&<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>}
    {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
+   {recipient==="INTERNAL"&&<SpareLifecycleControl0553 model={spareLifecycle} view="release"
+     onOpenSource={openReleaseSource} onOpenReleaseRow={openReleaseAnnexRow}/>} 
    <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} focusAnnexTarget={releaseAnnexTarget} title="10.3 — Released Customer Output (Read-only staging)"/>
    <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Gate</th><th>Required check</th><th>Current status</th></tr></thead>
