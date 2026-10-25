@@ -302,14 +302,14 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      <p className="p55-note p553-annex-reading-guide"><strong>วิธีอ่านตารางนี้ / How to read:</strong>
       Description = ซื้ออะไหล่อะไรและใช้ทำอะไร · Detail Specification = คุณสมบัติที่ต้องตรงกับของเดิม ·
       Materials = วัสดุหรือส่วนประกอบ (ถ้าไม่ทราบระบุ TBC) · Related TAGs = อุปกรณ์ที่อาจใช้อะไหล่นี้ร่วมกัน ไม่ใช่จำนวนที่จะซื้อ ·
-      <strong> QTY = จำนวนอะไหล่สำรองที่จะซื้อ</strong>. ความเข้ากันได้ของ OEM ยังรอการยืนยัน</p>
+      <strong> QTY ใน 4 แถว B10 = จำนวน MR commissioning KIT 4/3/4/3 ไม่ใช่จำนวนอะไหล่ต่อ SKU ที่จะซื้อ</strong>. ความเข้ากันได้ของ OEM และปริมาณอะไหล่จริงยังรอการยืนยัน</p>
      {code==="B10"&&<B10ReleaseSkuSchedule0553
        evidence={model.b.find(x=>x.code==="B10")?.b10ItemizedPurchaseEvidence}
        priceReview={model.b.find(x=>x.code==="B10")?.b10PriceToWinReview}
        internal={internal}/>}
      {code==="B10"&&<p className="p55-note"><strong>B10 — Kit price summary / reconciliation:</strong> 4 MR-level financial envelopes below retain 4/3/4/3 sets and THB 509,827.50 Working SELL. The Original Item / Source schedule above lists proposed SKUs without treating offered quantity or expired vendor cost as an issued line price.</p>}
      <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table" data-cost-owner={code}>
-      <thead><tr><th rowSpan={2}>Item<br/>序号</th><th rowSpan={2}>Tag No<br/>位号</th><th rowSpan={2}>Description<br/>描述</th><th rowSpan={2}>Detail Specification<br/>详细规格</th><th rowSpan={2}>Materials<br/>材质</th><th rowSpan={2}>QTY<br/>数量</th><th colSpan={code.startsWith("C")?3:2}>DDP site （DDP现场交货）</th></tr>
+      <thead><tr><th rowSpan={2}>Item<br/>序号</th><th rowSpan={2}>{code==="B10"?"Related Equipment TAG / Kit":"Tag No"}<br/>位号</th><th rowSpan={2}>Description<br/>描述</th><th rowSpan={2}>Detail Specification<br/>详细规格</th><th rowSpan={2}>Materials<br/>材质</th><th rowSpan={2}>QTY<br/>数量</th><th colSpan={code.startsWith("C")?3:2}>DDP site （DDP现场交货）</th></tr>
        <tr><th>UNIT PRICE (CURRENCY)<br/>单价</th><th>TOTAL PRICE (CURRENCY)<br/>总价</th>
         {code.startsWith("C")&&<th>Lead time (ARO)<br/>交货期 (周)</th>}</tr></thead>
       <tbody>{Array.from({length:13},(_,i)=>{
