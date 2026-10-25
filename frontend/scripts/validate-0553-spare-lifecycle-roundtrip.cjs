@@ -103,6 +103,10 @@ for(const phrase of [
 ])assert(workspace.includes(phrase),"Roundtrip UI missing "+phrase);
 assert(releaseUi.includes('focusAnnexTarget.code.toLowerCase()+"."+focusAnnexTarget.sourceId.toLowerCase()'));
 assert(releaseUi.includes('sourceModuleId:item.sourceRowModuleId||item.sourceModuleId'));
+assert(releaseUi.includes('target.classList.add("p553-release-row-focus")'),
+ "After returning from the exact Working source, Release must highlight that very row");
+const css=fs.readFileSync(path.join(root,"project0553/releaseWorkbook0553.css"),"utf8");
+assert(css.includes(".p553-release-row-focus>td"),"Exact Release row highlight style missing");
 assert(detail.includes("onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x.sourceRowModuleId})"));
 assert(modelJs.includes("customerReleaseAllowed:false"));
 assert(officialJs.includes('incrementUSD:100'));
