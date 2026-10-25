@@ -69,7 +69,7 @@ export function App() {
             <Route path="/" element={<div className="genesis-main--padded"><Home lang={lang} /></div>} />
             <Route path="/projects/pj2608-0550" element={<PJ26080550 lang={lang} />} />
             <Route path="/projects/pj2608-0553" element={<PJ26080553 lang={lang} />} />
-            <Route path="/projects/pj2608-0553/strategy/price-to-win" element={<PriceToWinPage0553 />} />
+            {process.env.NODE_ENV !== "production" && <Route path="/projects/pj2608-0553/strategy/price-to-win" element={<PriceToWinPage0553 />} />}
             <Route path="/employees" element={<div className="genesis-main--padded"><Employees lang={lang} /></div>} />
           </Routes>
         </main>
