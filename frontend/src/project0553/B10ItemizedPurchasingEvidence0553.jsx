@@ -19,6 +19,23 @@ export function B10ItemizedPurchasingEvidence0553({evidence,context="working"}){
     <td><strong>{x.id}</strong><small>{x.mr} / {x.locations.join(", ")}</small></td>
     <td>{amount(x.workingTotalSellTHB,"THB")}</td><td>{x.contractKitCount} sets</td><td>NO — itemized OEM SPIR still required</td>
    </tr>)}</tbody></table></div>
+  <h4>B10 purchasable article breakdown — source requirement by physical function</h4>
+  <p className="p55-note"><strong>These 14 rows are article families, NOT 14 spare units or proven OEM procurement SKUs.</strong> Each parent 4/3/4/3 kit value is counted once above; every sub-item is nonposting until a make/model/part no., exact site TAG, approved purchase Qty and separate supplier rate have been evidenced.</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+   <thead><tr><th>MR / Parent source</th><th>Physical article/function</th><th>Actual site/TAG candidates</th><th>OEM part number / SKU</th><th>Physical purchase Qty</th><th>Unit price THB</th><th>Vendor quote link / readiness</th></tr></thead>
+   <tbody>{evidence.requirementArticleRows.map(x=><tr key={x.id} data-b10-requirement-id={x.id}>
+    <td><strong>{x.parentB10PriceId}</strong><small>{x.mr} · {x.id}</small></td>
+    <td>{x.articleFunction}</td>
+    <td>{x.actualInstalledTagCandidates.length?
+     <details><summary>{x.actualInstalledTagCandidates.length} actual site/TAG references</summary>
+      <div>{x.actualInstalledTagCandidates.map(tag=><div key={tag}><code>{tag}</code></div>)}</div>
+     </details>:"TAG cross-reference pending"}
+     <small>Functional only; not proven interchangeable</small></td>
+    <td>NOT SELECTED<small>{x.selectedModel||"OEM model to verify"}</small></td>
+    <td>NOT VERIFIED</td><td>NOT ESTABLISHED</td>
+    <td>{x.skuCandidateQuoteIds.length?x.skuCandidateQuoteIds.join(", "):"No current SKU quote link"}<small>{x.scopeEvidenceClass}</small></td>
+   </tr>)}</tbody>
+  </table></div>
   {["D","E"].map(group=>{
    const rows=evidence.supplierRows.filter(x=>x.sourceGroup===group);
    return <details key={group} className="p55-panel" open={context==="working"} style={{padding:10}}>
