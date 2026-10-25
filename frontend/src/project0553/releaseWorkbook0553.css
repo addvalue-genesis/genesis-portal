@@ -219,3 +219,22 @@
 /* Exact Release row reselected from 10.2 Source, all five spare categories. */
 .p553-release-row-focus>td{background:#eaf4fc!important;box-shadow:inset 0 1px 0 #3e83a9,inset 0 -1px 0 #3e83a9}
 .p553-release-row-focus>td:first-child{box-shadow:inset 4px 0 0 #2373a2,inset 0 1px 0 #3e83a9,inset 0 -1px 0 #3e83a9}
+
+/* Original customer 8-column B10 annex mapped one-to-one from Working sources.
+   Wide 35-row detail scrolls within the module without overflowing the page. */
+.p553-b10-original-annex{min-width:0;max-width:100%;overflow:hidden;box-sizing:border-box}
+.p553-b10-original-annex .p553-b10-commercial-scroll{overflow-x:auto;max-width:100%}
+.p553-b10-original-annex .p553-native-title{font-size:13px;line-height:1.4;text-align:center;padding:9px 8px}
+.p553-b10-original-annex .p553-native-title small{display:block;font-size:11px}
+.p553-b10-native-annex-table{min-width:1060px;width:100%;table-layout:fixed;border-collapse:collapse;font-size:11px}
+.p553-b10-native-annex-table td,.p553-b10-native-annex-table th{border:1px solid #bbc9d2;padding:7px 8px;vertical-align:top;overflow-wrap:anywhere}
+.p553-b10-native-annex-table thead th{background:#e9eff3;text-align:center;font-weight:700}
+.p553-b10-native-annex-table th:nth-child(1){width:6%}
+.p553-b10-native-annex-table th:nth-child(2){width:12%}
+.p553-b10-native-annex-table th:nth-child(3){width:18%}
+.p553-b10-native-annex-table th:nth-child(4){width:27%}
+.p553-b10-native-annex-table th:nth-child(5){width:14%}
+.p553-b10-native-annex-table th:nth-child(6){width:7%}
+.p553-b10-native-annex-table th:nth-child(7),.p553-b10-native-annex-table th:nth-child(8){width:8%}
+.p553-b10-native-annex-table td small{display:block;margin-top:4px;color:#5d7280;font-size:10px;line-height:1.35}
+.p553-b10-native-annex-table tfoot th{background:#edf2f5;text-align:right}
