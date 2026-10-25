@@ -33,6 +33,21 @@ assert(model.requirements.B13.open.includes("B5 packing and A5 installed bulk"))
 assert(model.requirements.C1.open.includes("Independent OEM"));
 assert(model.requirements.C2.open.includes("omit confirmed B10 identical stock"));
 assert.equal(model.completeCategoryReconciliation,false);
+assert.equal(model.newPriceReview.B10.proposedTHB,568083.85);
+assert.equal(model.newPriceReview.B10.officialEquivalentUSD,18100);
+assert.equal(model.newPriceReview.B10.selected,false);
+assert.equal(model.newPriceReview.B10.proposalOnly,true);
+assert(model.newPriceReview.B10.evidenceClass.includes("NONITEMIZED"));
+assert.equal(model.newPriceReview.B11.proposedTHB,null);
+assert.equal(model.newPriceReview.B13.proposedTHB,null);
+assert.equal(model.newPriceReview.C1.proposedTHB,3071250);
+assert(model.newPriceReview.C1.evidenceClass.includes("NOT_OEM_SPARE_QUOTE"));
+assert.equal(model.newPriceReview.C2.proposedTHB,null);
+assert(SPARE_LIFECYCLE_CODES_0553.every(code=>
+ model.newPriceReview[code].selected===false&&
+ model.newPriceReview[code].customerReleaseAllowed===false&&
+ model.newPriceReview[code].proposalOnly===true));
+
 assert(model.rules.some(x=>x.id==="B10-C2"&&x.requirement.includes("Attachment 7 instruction 6")));
 assert(model.rules.some(x=>x.id==="B11-B3"));
 assert(model.rules.some(x=>x.id==="B13-B5"));
@@ -82,6 +97,12 @@ assert(html.includes("Customer requirement minimums / next OEM evidence"));
 assert(html.includes("MR0001–0004 Attachment 7 instruction 6"));
 assert(html.includes("TETRA/DMR applicability"));
 assert(html.includes("14 kit sets"));
+for(const code of SPARE_LIFECYCLE_CODES_0553)
+ assert(html.includes('data-new-spare-price-review="'+code+'"'),"Missing new/old price comparison "+code);
+assert(html.includes("568,083.85"),"B10 new researched candidate not displayed");
+assert(html.includes("3,071,250.00"),"C1 nonposting equipment benchmark not displayed");
+assert(html.includes("NOT SELECTED / RELEASE HOLD"));
+
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 const releaseUi=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
 const detail=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
@@ -113,4 +134,4 @@ assert(officialJs.includes('incrementUSD:100'));
 assert(exportJs.includes('if(detail.length>13)throw Error(code+" exceeds 13 physical rows in original.'));
 assert.equal(release.annexTraceAudit.totalRows,16);
 assert.equal(release.approval.releaseAllowed,false);
-console.log("PASS 0553 five-category 16/16 Working→Release→Source→Release identity; B10/B11/B13 unchanged 509827.50/157657.50/46683.00, C1/C2 unpriced, Official rounding unchanged, seven no-duplicate stock rules HOLD");
+console.log("PASS 0553 five-category: 16/16 roundtrip, selected financial owner preserved; NEW B10 review THB568083.85 vs selected THB509827.50, C1 installed comparator THB3071250 unposted, B11/B13/C2 new rates not established, Official unchanged, seven no-duplicate gates");
