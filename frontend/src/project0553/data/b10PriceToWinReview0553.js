@@ -28,9 +28,10 @@ function costForKit(row){
   throw Error("B10 selected source parametric cost/kit missing: "+row.id);
  return round2(row.qty*row.internalParametricUnitCostUSD);
 }
-export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,riskCostPct=5,samtelSellDeductionPct=5,includeNorthAmericanCord=false,includeWholeRadio=false}={}){
+export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,riskCostPct=5,samtelSellDeductionPct=5,includeNorthAmericanCord=false,includeWholeRadio=false,mr1PriorEnvelopeCreditPct=100}={}){
  for(const [k,v] of Object.entries({targetGrossProfitOfSellPct,riskCostPct,samtelSellDeductionPct}))
   if(!n(v)||v<0||v>=100)throw Error("Invalid proposal review assumption "+k);
+ if(![0,50,100].includes(mr1PriorEnvelopeCreditPct))throw Error("Invalid B10 MR1 scope-credit scenario percentage");
  const denom=1-(targetGrossProfitOfSellPct+samtelSellDeductionPct)/100;
  if(denom<=0)throw Error("Impossible B10 target profit / SAMTEL allocation");
  const multiplier=(1+riskCostPct/100)/denom;
@@ -81,18 +82,21 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
   additiveToCurrentBase:false
  })));
  const residualUSD=round2(residual.reduce((s,r)=>s+r.subtotalCostUSD,0));
- const costUSD=round2(mr1QuoteCostUSD+residualUSD);
+ const mr1PriorEnvelopeUSD=priorByMr.get("MR-0001");
+ const mr1CreditedUSD=round2(mr1PriorEnvelopeUSD*mr1PriorEnvelopeCreditPct/100);
+ const mr1UncreditedCoverageReserveUSD=round2(mr1PriorEnvelopeUSD-mr1CreditedUSD);
+ const costUSD=round2(mr1QuoteCostUSD+residualUSD+mr1UncreditedCoverageReserveUSD);
  const sellBeforeUsdRoundUSD=round2(costUSD*multiplier);
  const sellBeforeUsdRoundTHB=round2(costUSD*OFFICIAL_USD_POLICY_0553.thbPerUsd*multiplier);
  const proposedMainOfficialUSD=quoteUsd0553(sellBeforeUsdRoundTHB,OFFICIAL_USD_POLICY_0553);
  const originalOfficialUSD=quoteUsd0553(b10.originalB10WorkingSellTHB,OFFICIAL_USD_POLICY_0553);
  const originalSourceUSD=round2([...priorByMr.values()].reduce((s,v)=>s+v,0));
- const sourceCreditUSD=priorByMr.get("MR-0001");
+ const sourceCreditUSD=mr1CreditedUSD;
  const sourceScenarioReconciled=round2(originalSourceUSD-sourceCreditUSD+mr1QuoteCostUSD)===costUSD;
  const assumptions=freeze({riskCostPct,samtelSellDeductionPct,targetGrossProfitOfSellPct,
   targetProfitAfterRiskAndSamtelPct:targetGrossProfitOfSellPct,
   multiplier:Math.round(multiplier*1000000)/1000000,
-  includeNorthAmericanCord,includeWholeRadio,workingFxTHBPerUSD:OFFICIAL_USD_POLICY_0553.thbPerUsd,
+  includeNorthAmericanCord,includeWholeRadio,mr1PriorEnvelopeCreditPct,workingFxTHBPerUSD:OFFICIAL_USD_POLICY_0553.thbPerUsd,
   scenarioQtyAuthority:"D/E offered quantities only; no B10 physical required SPIR qty was invented"});
  return freeze({
   moduleId:"bid.budget.working.bc.b10.price-to-win-review",
@@ -101,8 +105,10 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
   selectedSourceQuoteLines:freeze(selected),otherMrCostEnvelopes:residual,
   marketPriceComparables,
   trace:{originalParametricCostUSD:originalSourceUSD,creditSupersededMr1USD:sourceCreditUSD,
+    originalMr1EnvelopeUSD:mr1PriorEnvelopeUSD,uncreditedMr1CoverageReserveUSD:mr1UncreditedCoverageReserveUSD,
     replacementQuotedAccessoryCostUSD:mr1QuoteCostUSD,remainingCostMr234USD:residualUSD,
-    sourceScenarioReconciled,overlapOwnerCounts:{B10:1,A1:0,B5:0,B6:0,B11:0,C1:0,C2:0}},
+    sourceScenarioReconciled,overlapOwnerCounts:{B10:1,A1:0,B5:0,B6:0,B11:0,C1:0,C2:0},
+   creditScenario:"ASSUMED_SCOPE_OVERLAP_SENSITIVITY_ONLY__NOT_EVIDENCE_OF_ITEMS_CREDITED"},
   scenario:{sourceCostUSD:costUSD,sourceCostTHB:round2(costUSD*31.5),
    riskCostUSD:round2(costUSD*riskCostPct/100),
    sellBeforeUsdRoundUSD,sellBeforeUsdRoundTHB,roundedOfficialSummaryUSD:proposedMainOfficialUSD,
@@ -112,6 +118,7 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
   assumptions,releaseAllowed:false,postedToWorking:false,postedToOfficial:false,
   supplierQuoteRefreshVerified:false,supplierActualPurchasePriceVerified:false,
   sourceQtyComplete:false,sourceUnitPricesComplete:false,installedSkuCompatibilityComplete:false,
+  b10MR1UnpricedFunctionsRemain:true,proposedBudgetIsCostFloorOnly:mr1PriorEnvelopeCreditPct===100,
   readiness:"NOT_CUSTOMER_ISSUABLE__ITEMIZED_REQUIRED_SPARES_UNCLOSED",
   gapSummary:"Four MR1 hardware-quote lines are priced but cannot establish 4 platform kit contents. MR2-MR4 are parametric cost envelopes, not itemized cost. B5/B6 freight/insurance remain separate; validity and selected stock quantities not evidenced."
  });
