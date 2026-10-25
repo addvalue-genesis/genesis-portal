@@ -61,9 +61,9 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
    </tbody>
   </table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-   <thead><tr><th>Quoted SKU / Source</th><th>Supplier offered Qty (scenario only)</th><th>Quoted Cost USD / ea</th><th>Proposed Sell USD / ea</th><th>Estimated line SELL USD</th></tr></thead>
+   <thead><tr><th>Quoted SKU / Source / TAG candidates</th><th>Supplier offered Qty (scenario only)</th><th>Quoted Cost USD / ea</th><th>Proposed Sell USD / ea</th><th>Estimated line SELL USD</th></tr></thead>
    <tbody>{price.selectedSourceQuoteLines.map(x=><tr key={x.id}>
-    <td><strong>{x.sku}</strong><small>{x.sourceQuoteLine} / {x.description}</small></td>
+    <td><strong>{x.sku}</strong><small>{x.sourceQuoteLine} / {x.description}</small><small>Candidate installed TAGs: {x.candidateInstalledSiteTags.join(", ")||"mapping pending"} — not yet verified interchangeable</small></td>
     <td>{x.scenarioQty}<small>Actual required Qty = TBC</small></td>
     <td>{f4(x.estimatedUnitCostUSD)}</td><td>{f4(x.indicativeUnitSellUSD)}</td>
     <td>{cash(x.indicativeLineSellUSD)}</td>
