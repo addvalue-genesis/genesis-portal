@@ -11,6 +11,7 @@ import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrace0553";
 import {B10ItemizedPurchasingEvidence0553} from "./B10ItemizedPurchasingEvidence0553";
+import {B10PriceToWinScenario0553} from "./B10PriceToWinScenario0553";
 import "./releaseWorkbook0553.css";
 
 // Single customer-format sheet preview. Internal TAG/source drilldowns are UI-only
@@ -362,6 +363,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        {code==="C1"&&<p className="p55-note">C1 nonposting full installed RACON package comparator: USD {formatUnit(model.sparePriceEvidence.c1CurrentOptionalReference.referenceFcaUnitUSD)} FCA; one potential replacement budget scenario USD {formatUnit(model.sparePriceEvidence.c1CurrentOptionalReference.indicativeFullReplacementSellScenarioUSD)}. This is NOT a separately priced OEM capital spare and NOT the amount offered to customer.</p>}
        {code==="C2"&&<p className="p55-note">C2 historical gross USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.grossHistoricalUSD)}; prospective B10 family overlap USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.potentialB10FunctionalOverlapUSD)}, incompatible legacy 7/8-inch feeder USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.incompatibleSevenEighthFeederHistoricalUSD)}; provisional reference residue USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.historicalResidualScreeningUSD)}. No validated OEM part/qty/price and no customer posting.</p>}
       </details>}
+      {internal&&code==="B10"&&<B10PriceToWinScenario0553 canonical={model.b.find(x=>x.code==="B10")?.b10PriceToWinReview} context="release"/>}
       {internal&&code==="B10"&&<B10ItemizedPurchasingEvidence0553 evidence={model.b.find(x=>x.code==="B10")?.b10ItemizedPurchaseEvidence} context="release"/>}
       <p className="p55-note"><strong>Reverse trace:</strong> 10.3 Annex ↔ 10.2 Owner / Spare Source uses the same source row ID.
        Expand TAG details for readability; the native XLSX draft retains the complete source TAG string inside its original fixed cell and cannot fold TAGs in Excel.
