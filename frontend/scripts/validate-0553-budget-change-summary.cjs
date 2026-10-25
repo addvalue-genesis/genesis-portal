@@ -12,7 +12,7 @@ const model=babel.transformSync(data,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}]]}).code;
 const m={exports:{}};
 require("node:vm").runInNewContext(model,{module:m,exports:m.exports});
-const {CHANGE_LOG_VERSION_0553,RELEASE_NOTES_0553:notes}=m.exports;
+const {CHANGE_LOG_VERSION_0553,RELEASE_NOTES_0553:notes,CHANGE_TYPES_0553:changeTypes}=m.exports;
 assert.match(CHANGE_LOG_VERSION_0553,/^20\d{2}-\d{2}-\d{2}-R\d+$/);
 assert(notes.length>=4,"List recent meaningful changes");
 assert.equal(new Set(notes.map(x=>x.id)).size,notes.length,"No duplicate change entries");
@@ -21,6 +21,15 @@ assert(notes.every(x=>x.moduleIds.length>0&&x.moduleIds.every(id=>id.startsWith(
 assert(notes.every(x=>x.priceImpact==="NO_PRICE_CHANGE"||
  ["WORKING_SOURCE_CHANGED","PRICE_REVIEW_REQUIRED","QUOTATION_FX_ROUNDING_ONLY"].includes(x.priceImpact)),
  "Never invent commercial price impact");
+assert(notes.every(x=>Object.hasOwn(changeTypes,x.kind)),"Every change must have a registered visible What's New group");
+const reviewed=["P553-CHANGE-20261025-08","P553-CHANGE-20261025-09"];
+for(const id of reviewed){
+ const row=notes.find(x=>x.id===id);
+ assert(row&&row.kind==="PRICE"&&row.priceImpact==="PRICE_REVIEW_REQUIRED",
+  "Nonposting price-review note must use registered PRICE kind and PRICE_REVIEW_REQUIRED: "+id);
+ assert(/nonposting|not|ไม่|ตรวจทาน|review|HOLD/i.test(row.detail),
+  "Price review note must explicitly explain issue limitation "+id);
+}
 assert(notes.every(x=>x.date&&x.title&&x.detail&&x.source));
 
 const priorJs=require.extensions[".js"],priorJsx=require.extensions[".jsx"];
