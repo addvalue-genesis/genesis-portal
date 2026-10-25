@@ -99,6 +99,7 @@ assert(!JSON.stringify(official).includes("b10PriceToWinReview"));
 const React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
 const {B10PriceToWinScenario0553}=from("B10PriceToWinScenario0553.jsx");
 const html=renderToStaticMarkup(React.createElement(B10PriceToWinScenario0553,{canonical:base}));
+assert(renderToStaticMarkup(React.createElement(B10PriceToWinScenario0553,{})).includes("B10 — Price-to-Win What-if"));
 for(const phrase of ["Price-to-Win What-if","SOURCE→SCENARIO CHECK PASSED","18,100.00","568,083.85","12,881.72","MR0001 remaining unitemized","FLK-MAR-4958-EXT-D1"])
  assert(html.includes(phrase),"Missing B10 review "+phrase);
 const scopeUi=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
