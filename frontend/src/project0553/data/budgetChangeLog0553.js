@@ -2,21 +2,21 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R55";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R56";
 export const RELEASE_NOTES_0553=Object.freeze([
  Object.freeze({
-  id:"P553-CHANGE-20261025-09",date:"2026-10-25",kind:"PRICING_REVIEW",tone:"caution",
+  id:"P553-CHANGE-20261025-09",date:"2026-10-25",kind:"PRICE",tone:"caution",
   title:"B11 / B13 / C1 / C2 qty × unit price in original native Annex format — internal pricing review",
   detail:"Owner requested actual quantity and unit prices across the four blank original customer Annex tabs. Created an independent INTERNAL budgetary priced XLSX derivative retaining the six original customer sheets: B11 four 10.2 selected MR tool-package cost envelopes 157657.50 THB, B13 three selected preservation/consumable allowances 46683 THB, C1 one RACON installed FCA-equipment comparable 3071250 THB (not verified C1 OEM/DDP spare), C2 twelve Rev08 historic USD source physical candidate rows at planning FX31.5 THB aggregate approx 721806.60, explicitly flagged for B10 overlap/incompatible RF feeder. Added a single read-only code projection and Price Review table in 10.2 Working and 10.3.3 Internal Annex; this does not select C1/C2 selling prices or update issued Official USD/native embedded exporter. Exact Parent Source IDs kept for B11/B13/C1, historic C2 SKUs do not assert a fabricated Parent Source ID. No automatic posting or client issue.",
   moduleIds:Object.freeze(["bid.budget.working.bc.spare-priced-budget-review","bid.budget.pricing.release.preview"]),
-  priceImpact:"NONPOSTING_BUDGET_REVIEW_ONLY",source:"Owner screenshots B11/B13/C1/C2 native blank forms; request complete quantities and unit/total prices from 10.2 Working"
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner screenshots B11/B13/C1/C2 native blank forms; request complete quantities and unit/total prices from 10.2 Working"
  }),
  Object.freeze({
-  id:"P553-CHANGE-20261025-08",date:"2026-10-25",kind:"PRICING_REVIEW",tone:"caution",
+  id:"P553-CHANGE-20261025-08",date:"2026-10-25",kind:"PRICE",tone:"caution",
   title:"Expose NEW B10 researched price vs unchanged 10.2 selected and 10.3 Release; no false repricing for B11/B13/C1/C2",
   detail:"Owner challenged unchanged B10/B11/B13/C1/C2 financial totals after lifecycle UI update. Cause: canonical Working price owner still uses 2026-10-23 parametric MR envelopes. Latest NextG sourced B10 Price-to-Win is 568083.85 THB scenario / 18100 USD equivalent, but only a nonposting What-if with 100% MR1 envelope credit and unapproved vendor offered quantities. New read-only five-category price comparison now appears in Internal Working and Internal Release (prominent B10 heading), separately from selected B10 THB509827.50, B11 THB157657.50, B13 THB46683; C1 FCA installed equipment comparator THB3071250 is NOT an independent capital spare quote; C2 no new supplier cost. No source ledger/official/native posting, no claim of newly issued price or approved physical SKU. New proposals require OEM SPIR, qty, exact spare price, supplier validity, stock owner and approval before selecting a price.",
   moduleIds:Object.freeze(["bid.budget.working.bc.spare-lifecycle-control","bid.budget.working.bc.b10.price-to-win-review","bid.budget.pricing.release.preview.spare-lifecycle"]),
-  priceImpact:"NO_SELECTED_PRICE_CHANGE__NEW_NONPOSTING_PROPOSAL_VISIBLE",source:"Owner question 25-Oct: why unchanged legacy selected Working & Release instead of reworked budgetary prices"
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner question 25-Oct: why unchanged legacy selected Working & Release instead of reworked budgetary prices"
  }),
  Object.freeze({
   id:"P553-CHANGE-20261025-07",date:"2026-10-25",kind:"UI",tone:"navigation",
