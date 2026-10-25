@@ -74,6 +74,8 @@ assert.throws(()=>common([{...kitRows[0],qty:2},...kitRows.slice(1)],{currency:"
 
 const releaseUi=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
 const officialUi=fs.readFileSync(path.join(root,"project0553/OfficialUsdRelease0553.jsx"),"utf8");
+const budgetaryUi=fs.readFileSync(path.join(root,"project0553/BudgetaryWorkbookPreview0553.jsx"),"utf8");
+const budgetWorkspaceUi=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 const scopeUi=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 const css=fs.readFileSync(path.join(root,"project0553/releaseWorkbook0553.css"),"utf8");
 assert(releaseUi.includes('code==="B10"?<B10KitPriceSummary0553'));
@@ -83,6 +85,13 @@ assert(!releaseUi.includes('internal&&code==="B10"&&<B10PriceToWinScenario0553')
 assert(scopeUi.includes('if(code==="B10"&&!inWorking)return'));
 assert(scopeUi.includes('onOpenSource={onOpenSource} onOpenReleaseRow={onOpenReleaseRow}'));
 assert(officialUi.includes('sheet==="B10"?<B10KitPriceSummary0553'));
+assert(budgetaryUi.includes('sheet==="B10 CommSpares"?<B10KitPriceSummary0553'));
+assert(budgetaryUi.includes('onOpenSource={onOpenSource} variant="budgetary"'));
+assert(budgetWorkspaceUi.includes('<BudgetaryWorkbookPreview0553 onOpenSource={openReleaseSource}/>'));
+const budgetHtml=common(current,{currency:"THB",total:509827.5,internal:true,variant:"budgetary",onOpenSource:()=>{}});
+assert.equal((budgetHtml.match(/data-source-id=/g)||[]).length,4);
+assert(budgetHtml.includes('bid.budget.pricing.budgetary.annex.b10.'));
+assert(ReactText(budgetHtml).includes("10.2 Source"));
 assert(css.includes(".p553-b10-commercial-table{width:100%;min-width:0"));
 assert(css.includes(".p553-b10-commercial-scroll{width:100%;max-width:100%;overflow-x:auto"));
 assert(css.includes(".p553-native-sheet{overflow:hidden"));
