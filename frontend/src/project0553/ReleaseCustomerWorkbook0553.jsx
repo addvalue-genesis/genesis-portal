@@ -12,6 +12,7 @@ import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./d
 import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrace0553";
 import {B10ItemizedPurchasingEvidence0553} from "./B10ItemizedPurchasingEvidence0553";
 import {B10ReleaseSkuSchedule0553} from "./B10ReleaseSkuSchedule0553";
+import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {B10PriceToWinScenario0553} from "./B10PriceToWinScenario0553";
 import "./releaseWorkbook0553.css";
 
@@ -294,6 +295,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       Grouped Tag No. format must be accepted by purchaser before native export; original column widths, page setup and merges are retained; exported text wraps with fitted row heights.
      </p>}
     </>:<>
+     {code==="B10"?<B10KitPriceSummary0553 rows={annexLines} total={annexModel?.selectedWorkingTHB} internal={internal} onOpenSource={onOpenSource} variant="release"/>:<>
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
      <p className="p553-native-warning"><strong>{code} — {annexModel?.priceLabel||"WORKING REFERENCE"}</strong>
       {" "}· รายการจาก 10.2 — <code>bid.budget.working.bc.{code.toLowerCase()}</code>
@@ -379,6 +381,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        "Above Price of spare parts is valid up to Two years after Delivery date of purchase order":
        "Please include the costs for installation, commissioning, spare parts and special tools in the total price, and provide a detailed breakdown"}</div>
       <p className="p55-note">10.2 {code}: B Annex shows source-backed Working Sell (NOT direct cost or Released Offer). C Annex shows working reference only in Internal view; customer price remains Not quote until verified OEM cost. Do not double count equipment included in A, startup spares B10, consumables B13 or two-year spares C2.</p>
+     </>}
     </>}
    </div>
    {internal&&source&&<div className="p553-source-drawer" role="region" aria-label="Source trace">
