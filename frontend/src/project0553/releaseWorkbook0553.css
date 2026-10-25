@@ -138,3 +138,35 @@
 .p553-b10-sku-bottom{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:9px;font-size:11px;color:#425869}
 .p553-annex-table .p553-annex-tag-list>div{max-height:148px;overflow-y:auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px}
 .p553-annex-table .p553-annex-tag-list .p553-annex-tag-chip{display:block;font-size:10px;overflow-wrap:anywhere}
+
+/* B10 source-owned commercial presentation shared by Budget/10.3.3/10.3.4.
+   All wider engineering/SKU evidence stays in 10.2 Working, not in issued pages. */
+.p553-release-workbook,.p553-native-sheet,.p553-sheet-scroll,.p553-b10-scope-compact{
+ min-width:0;max-width:100%;box-sizing:border-box;
+}
+.p553-native-sheet{overflow:hidden}
+.p553-sheet-scroll{overflow-x:auto;overscroll-behavior-x:contain}
+.p553-b10-commercial-summary{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+.p553-b10-commercial-heading{display:flex;flex-direction:column;gap:4px;margin:10px 0 12px}
+.p553-b10-commercial-heading strong{font-size:13px;color:#223b4c}
+.p553-b10-commercial-heading small{font-size:11px;line-height:1.5;color:#596b76}
+.p553-b10-commercial-scroll{width:100%;max-width:100%;overflow-x:auto;overscroll-behavior-x:contain}
+.p553-b10-commercial-table{width:100%;min-width:0;table-layout:fixed;border-collapse:collapse;color:#1c2731;background:#fff;font-size:12px}
+.p553-b10-commercial-table th,.p553-b10-commercial-table td{border:1px solid #c6d1d7;padding:8px 9px;vertical-align:middle;line-height:1.4;overflow-wrap:anywhere}
+.p553-b10-commercial-table thead th{background:#e8eef2;text-align:left;font-weight:600}
+.p553-b10-commercial-table th:nth-child(1){width:13%}
+.p553-b10-commercial-table th:nth-child(2){width:39%}
+.p553-b10-commercial-table th:nth-child(3){width:10%}
+.p553-b10-commercial-table th:nth-child(4){width:18%}
+.p553-b10-commercial-table th:nth-child(5){width:20%}
+.p553-b10-commercial-table th:nth-child(6){width:108px}
+.p553-b10-commercial-table td small{display:block;color:#667987;font-size:10px;margin-top:3px}
+.p553-b10-commercial-number{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.p553-b10-commercial-table tfoot th{background:#f1f5f8;text-align:right}
+.p553-b10-commercial-note{font-size:11px;color:#526473;margin:10px 0 0;line-height:1.5}
+@media (max-width:720px){
+ .p553-b10-commercial-scroll{overflow-x:auto}
+ .p553-b10-commercial-table{min-width:650px}
+ .p553-b10-commercial-table th,.p553-b10-commercial-table td{padding:7px 6px}
+ .p553-release-workbook .p553-native-sheet{padding:7px}
+}
