@@ -2,8 +2,16 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R49";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R50";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-04",date:"2026-10-25",kind:"UI",tone:"navigation",
+  title:"B10 Budgetary/Release/Official — four-kit commercial-only view, Source→Release→Source retained",
+  detail:"Removed engineering SKU/evidence/Price-to-Win module panels from Budgetary B10, Scope B10, 10.3.3 B10 and 10.3.4 B10 customer-facing view; now shows compact source-controlled 4 MR kit price summary 4/3/4/3. Row sourceIds and sourceRowModuleIds remain unchanged and Internal 10.3.3 & Scope/Budgetary Source buttons navigate to canonical 10.2; Working keeps full SKU/TAG/vendor-cost review. Official DTO and native original six-sheet XLSX unchanged. THB509827.50 and Official USD16200 are unchanged. Responsive width constrained to container with internal scrolling under 720px. No double posting and final customer issue HOLD.",
+  moduleIds:Object.freeze(["bid.budget.pricing.budgetary","bid.budget.scope.b10","bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner25-Oct screenshot: B10 release modules duplicative/overflow; preserve Source→Release→Source"
+ }),
+
  Object.freeze({
   id:"P553-CHANGE-20261025-03",date:"2026-10-25",kind:"UI",tone:"navigation",
   title:"B10 10.3.3 Original Item / Source → SKU before MR Kit summary",
