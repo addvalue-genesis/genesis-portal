@@ -29,7 +29,7 @@ export function B10ItemizedPurchasingEvidence0553({evidence,context="working"}){
      <tbody>{rows.map(x=><tr key={x.id} data-b10-source-id={x.id} data-component-key={evidence.moduleId+"."+x.id.toLowerCase()}>
       <td><code>{x.sourceQuoteLine}</code><small>{x.mr}</small></td>
       <td><strong>{x.articleDescription}</strong><small>{x.articleClass}</small></td>
-      <td><code>{x.proposedSku}</code><small>Quote SKU, spare interchangeability OPEN</small></td>
+      <td><code>{x.proposedSku}</code><small>Quote SKU, spare interchangeability OPEN</small><small>Same SKU in installed A/B/C quote lines: {x.matchedBaseEquipmentQuoteLines.join(", ")||"not listed"}</small></td>
       <td>{x.candidateInstalledSiteTags.length?
        <details><summary>{x.candidateInstalledSiteTags.length} source Site/TAG candidates</summary>
         <div>{x.candidateInstalledSiteTags.map(tag=><div key={tag}><code>{tag}</code></div>)}</div>
