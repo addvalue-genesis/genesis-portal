@@ -115,7 +115,9 @@ const detail=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.
 const preview=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
 const officialUi=fs.readFileSync(path.join(root,"project0553/OfficialUsdRelease0553.jsx"),"utf8");
 assert(detail.includes("<B10ItemizedPurchasingEvidence0553"));
-assert(preview.includes('internal&&code==="B10"&&<B10ItemizedPurchasingEvidence0553'));
+assert(!preview.includes('internal&&code==="B10"&&<B10ItemizedPurchasingEvidence0553'));
+assert(preview.includes('code==="B10"?<B10KitPriceSummary0553'));
+assert(detail.includes('<B10ItemizedPurchasingEvidence0553'));
 assert(!officialUi.includes("B10ItemizedPurchasingEvidence0553"));
 assert(working.byCode.B10.directCostTHB===null);
 console.log("PASS 0553 B10 itemized evidence: 16 source quote SKU IDs, 14 rates/2 dashes, TAG applicability candidate only, Source→Working→Scope→Internal Release, unchanged 14 kits/THB 509,827.50 and USD 16,200 official envelope, no duplicate posting");
