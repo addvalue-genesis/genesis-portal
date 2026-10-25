@@ -40,6 +40,13 @@ assert(!customer.includes("安装"));
 assert(customer.includes("CIF ZHUHAI PORT — USD OFFER PENDING"));
 assert(customer.includes("To be quoted"));
 
+const kitUI=fs.readFileSync(path.join(root,"project0553/B10KitPriceSummary0553.jsx"),"utf8");
+assert(kitUI.indexOf('<B10NativeAnnexReview0553 internal={internal}') <
+ kitUI.indexOf('<div className="p553-b10-commercial-heading">'),
+ "Original B10 8-column Annex must appear before financial kit reconciliation");
+const previewUi=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
+assert(previewUi.includes('Export B10 — Original Annex Itemized / USD Reference (INTERNAL)'));
+assert(previewUi.includes('buildNativeB10ItemizedReview0553(original,review)'));
 const native=fs.readFileSync(path.join(root,"project0553/nativeWorkingDraft0553.js"),"utf8");
 assert(native.includes("export async function buildNativeB10ItemizedReview0553"));
 const box={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set};
