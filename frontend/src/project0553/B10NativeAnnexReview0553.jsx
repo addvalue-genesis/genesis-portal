@@ -5,7 +5,7 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
  const annex=selectB10NativeAnnexReview0553();
  const byMR=[...new Set(annex.rows.map(x=>x.mr))];
  return <section className="p553-b10-composition p553-b10-original-annex"
-  data-component-key="bid.budget.working.bc.b10.original-annex-item-map.preview"
+  data-component-key={"bid.budget."+(variant==="official"?"pricing.official":variant==="release"?"pricing.release.preview":variant==="scope"?"scope":"pricing.budgetary")+".b10.original-annex-item-map"}
   data-native-original-sheet="B10 CommSpares"
   data-b10-composition-count={annex.rows.length}>
   <div className="p553-native-title">{annex.standardDocumentHeader}
