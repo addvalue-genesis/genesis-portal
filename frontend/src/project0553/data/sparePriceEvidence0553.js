@@ -61,6 +61,21 @@ export function selectSparesPriceEvidence0553(){
    removalApproved:false,needsSkuAndOwnerReconciliation:true,
    action:"MR Attachment 7 instruction 6 — exclude the corresponding actual commissioning-spare line from the 2-year spare offer"});
  }));
+ const c2LegacyOverlapUSD=round(duplicated.reduce((s,x)=>s+x.historicalC2ExposureUSD,0));
+ const wrongSizeFeeder=historical.find(x=>x.code==="C2"&&x.name==="7/8-inch RF cable operating spare (m)");
+ if(!wrongSizeFeeder)throw Error("Legacy RF feeder evidence missing");
+ const c2BudgetScreening=freeze({
+  grossHistoricalUSD:grossHistorical("C2"),
+  potentialB10FunctionalOverlapUSD:c2LegacyOverlapUSD,
+  incompatibleSevenEighthFeederHistoricalUSD:wrongSizeFeeder.historicalTotalUSD,
+  historicalResidualScreeningUSD:round(grossHistorical("C2")-c2LegacyOverlapUSD-wrongSizeFeeder.historicalTotalUSD),
+  historicalResidualScreeningTHB:round((grossHistorical("C2")-c2LegacyOverlapUSD-wrongSizeFeeder.historicalTotalUSD)*31.5),
+  evidenceKind:"NONPOSTING_OLD_REV08_SELL_PRICE_RESIDUAL__NOT_A_CURRENT_OEM_ESTIMATE",
+  actualNetSpareQtyApproved:false,actualNetCostApproved:false,actualNetCustomerPriceApproved:false,
+  stockOwnerCheck:"Potential same-family overlaps excluded for scenario screening ONLY; do not remove/credit until exact vendor SKU, quantity and B10 physical delivered-stock proof",
+  completeness:"Ex phone/sounder and RACON box rate variants, CAT6A/OEM operation requirement and correct RF cable remain unresolved",
+  customerReleaseAllowed:false
+ });
  for(const code of codes){
   const source=REV08_BASELINE.summary.find(x=>x[0]===code)?.[2];
   if(!Number.isFinite(source)||Math.abs(grossHistorical(code)-source)>0.02)
@@ -70,7 +85,7 @@ export function selectSparesPriceEvidence0553(){
   byCode:Object.freeze(Object.fromEntries(codes.map(code=>[code,freeze(historical.filter(x=>x.code===code))]))),
   directComparablesByCode:Object.freeze(Object.fromEntries(codes.map(code=>[code,freeze(evidence.filter(x=>x.code===code))]))),
   historicalGrossByCode:Object.freeze(Object.fromEntries(codes.map(code=>[code,grossHistorical(code)]))),
-  c1CurrentOptionalReference,c2Historical,duplicates:duplicated,
+  c1CurrentOptionalReference,c2Historical,c2BudgetScreening,duplicates:duplicated,
   dataAuthority:"MR0001–MR0004 Rev.C1 Attachment 5/7/8; EXA-A8 Att-1/2; Rev08 historical; selected MDS, MGW and EXION evidence",
   customerPriceAuthority:false,independentSupplierSparePriceEstablished:false,
   sourceToWorkingOnly:true,additionalPostingAllowed:false,
