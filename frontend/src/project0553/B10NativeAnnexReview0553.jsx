@@ -9,7 +9,7 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
   data-native-original-sheet="B10 CommSpares"
   data-b10-composition-count={annex.rows.length}>
   <div className="p553-native-title">{annex.standardDocumentHeader}
-   <small>安装，预试车，试车和开车的备件清单</small>
+   {variant!=="official"&&<small>安装，预试车，试车和开车的备件清单</small>}
   </div>
   <div className="p553-b10-commercial-heading">
    <strong>B10 — Equipment composition / Spare-Part Coverage</strong>
@@ -31,7 +31,7 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
    </thead>
    <tbody>{byMR.flatMap(mr=>annex.rows.filter(x=>x.mr===mr).map(x=><tr key={x.id}
     data-native-b10-source-id={x.id} data-parent-source-id={x.parentSourceId}
-    data-b10-requirement-id={x.owner==="OEM_SPIR_REQUIREMENT_UNPRICED"?x.id:undefined}>
+    data-b10-requirement-id={x.isRequirementFamily?x.id:undefined}>
     <td><strong>{x.item}</strong></td>
     <td>{x.tag}<small>{x.mr}</small></td>
     <td>{x.description}</td>
