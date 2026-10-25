@@ -32,6 +32,16 @@ export function SpareLifecycleControl0553({
    </tr>)}</tbody>
   </table></div>
   <details className="p553-spare-lifecycle-sub">
+   <summary>Customer requirement minimums / next OEM evidence — five linked categories</summary>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Owner</th><th>Authority</th><th>Documented obligation / allowance</th><th>Evidence needed for purchasable SKU release</th></tr></thead>
+    <tbody>{SPARE_LIFECYCLE_CODES_0553.map(code=><tr key={code}>
+     <td><strong>{code}</strong></td><td>{model.requirements[code].source}</td>
+     <td>{model.requirements[code].minimum}</td><td>{model.requirements[code].open}</td>
+    </tr>)}</tbody>
+   </table></div>
+  </details>
+  <details className="p553-spare-lifecycle-sub">
    <summary>Source ↔ Release — all 16 specific line identities</summary>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Owner</th><th>Source Row</th><th>Requirement / MR</th><th>Kit / Working Qty</th><th>Working THB</th><th>Navigation</th></tr></thead>
