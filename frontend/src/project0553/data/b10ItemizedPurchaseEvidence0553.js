@@ -50,7 +50,7 @@ export function selectB10ItemizedPurchaseEvidence0553(){
    vendor:"Next G Solution",mr:"MR-0001",sourceGroup:q.group,
    stockPool:"MR0001_"+q.group+"_SEPARATELY_QUOTED_STOCK",
    groupMeaning:scopeForGroup[q.group],
-   articleDescription:q.description,manufacturer:"AVIAT / OEM model per quote",
+   articleDescription:q.description,manufacturer:"OEM brand not independently verified from quote; exact NextG part number retained",
    proposedSku:q.partNumber,quotedSkuVerified:true,
    selectedSpareSkuVerified:false,partAPriceOwner:"A1_INSTALLED_EQUIPMENT__NO_B10_ADDITION",
    candidateInstalledSiteTags:linkInstalled(coverage,f,q.group),
