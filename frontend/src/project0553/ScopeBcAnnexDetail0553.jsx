@@ -356,14 +356,16 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
     <small>10.2 source evidence only · NOT additive to Working SELL / customer Release · no supplier spare quotation implied</small></summary>
    <p className="p55-note"><strong>Source-to-Working ownership:</strong> {customerSchedule.sparePriceEvidence.moduleId}. Rows below reveal individual legacy candidate parts inside the budget headings without pretending that the 4/3/4/3 kits have approved item contents. A historical quantity is NOT a newly approved purchase quantity. Actual TAG/SKU/rating and commissioned B10 vs C2 stock exclusion must be resolved first.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-    <thead><tr><th>Source line</th><th>Candidate physical article</th><th>Historically stated qty</th><th>Historical unit USD</th><th>Historical extended USD</th><th>Current approved spare Part No.</th><th>Current purchase qty / spare quotation</th></tr></thead>
+    <thead><tr><th>Source line</th><th>Candidate physical article</th><th>Historically stated qty</th><th>Historical unit THB *</th><th>Historical extended THB *</th><th>Current approved spare Part No.</th><th>Current purchase qty / spare quotation</th></tr></thead>
     <tbody>{(customerSchedule.sparePriceEvidence.byCode[code]||[]).map(x=><tr key={x.id} data-spare-evidence-id={x.id}>
      <td><code>{x.id}</code></td><td>{x.name}</td><td>{x.historicalQty}<small>Rev08 only</small></td>
-     <td>{usd(x.historicalUnitUSD)}</td><td>{usd(x.historicalTotalUSD)}</td>
+     <td>{thb(Number.isFinite(p.historicalFxTHBPerUSD)?Math.round((x.historicalUnitUSD*p.historicalFxTHBPerUSD+Number.EPSILON)*100)/100:null)}{inWorking&&<small>Original: {usd(x.historicalUnitUSD)}</small>}</td>
+     <td>{thb(Number.isFinite(p.historicalFxTHBPerUSD)?Math.round((x.historicalTotalUSD*p.historicalFxTHBPerUSD+Number.EPSILON)*100)/100:null)}{inWorking&&<small>Original: {usd(x.historicalTotalUSD)}</small>}</td>
      <td>NOT VERIFIED</td><td>NOT VERIFIED<small>{x.status}</small></td>
     </tr>)}</tbody>
    </table></div>
-   {(customerSchedule.sparePriceEvidence.directComparablesByCode[code]||[]).length>0&&<>
+   <p className="p55-note">* Historical planning conversion at {p.historicalFxTHBPerUSD??"FX NOT ESTABLISHED"} THB/USD; original supplier USD and reference quantities are retained in Source. This is not an approved SKU price or current COST.</p>
+   {inWorking&&(customerSchedule.sparePriceEvidence.directComparablesByCode[code]||[]).length>0&&<>
     <h4>Selected supplier product evidence — installed-equipment comparable, NOT a separately quoted spare</h4>
     <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
      <thead><tr><th>Supplier / source</th><th>Make / model / item</th><th>Part No.</th><th>Related installed TAG</th><th>Quoted installed-package qty</th><th>Installed quote basis / rate</th><th>Critical difference</th></tr></thead>
