@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R56";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R57";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-10",date:"2026-10-25",kind:"VALIDATION",tone:"neutral",
+  title:"Repair What's New VALIDATION category registry; no price posting",
+  detail:"Fix validate:0553-budget-change-summary line24. Historical change notes already contain VALIDATION kind, and BudgetChangeSummary's visible Data group already includes it. The registered CHANGE_TYPES description table omitted VALIDATION, so the new regression incorrectly failed despite correct historical entries. Add the missing description without renaming or suppressing any historical change notes. No Working cost, Source→Release→Source navigation, OEM SKU, pricing, customer quotation or original XLSX cells changed.",
+  moduleIds:Object.freeze(["bid.budget.changes","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner PowerShell validation error 25-Oct-2026 line24 — missing VALIDATION description enum"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-09",date:"2026-10-25",kind:"PRICE",tone:"caution",
   title:"B11 / B13 / C1 / C2 qty × unit price in original native Annex format — internal pricing review",
@@ -422,5 +429,6 @@ export const CHANGE_TYPES_0553=Object.freeze({
  ENGINEERING:"Engineering",
  COST:"Working Cost",
  PRICE:"Working SELL / Commercial",
- RELEASE:"Customer Release"
+ RELEASE:"Customer Release",
+ VALIDATION:"Validation / Reconciliation Controls"
 });
