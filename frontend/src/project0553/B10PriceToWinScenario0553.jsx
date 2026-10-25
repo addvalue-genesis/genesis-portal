@@ -7,12 +7,14 @@ const f4=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2
 export function B10PriceToWinScenario0553({canonical=null,context="working"}){
  const [profit,setProfit]=useState(20);
  const [risk,setRisk]=useState(5);
+ const [mr1Credit,setMr1Credit]=useState(100);
  const [includeCord,setIncludeCord]=useState(false);
  const [includeWholeRadio,setIncludeWholeRadio]=useState(false);
  const price=useMemo(()=>selectB10PriceToWinReview0553({
   targetGrossProfitOfSellPct:profit,riskCostPct:risk,samtelSellDeductionPct:5,
+  mr1PriorEnvelopeCreditPct:mr1Credit,
   includeNorthAmericanCord:includeCord,includeWholeRadio
- }),[profit,risk,includeCord,includeWholeRadio]);
+ }),[profit,risk,mr1Credit,includeCord,includeWholeRadio]);
  if(canonical?.trace?.originalParametricCostUSD!==price.trace.originalParametricCostUSD)
   throw Error("10.2/10.3 B10 price scenario underlying source changed");
  const value=price.scenario,ass=price.assumptions;
@@ -35,6 +37,13 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
      <option value={10}>10% of source cost</option>
     </select>
    </label>
+   <label style={{display:"grid",gap:4}}>MR0001 old allowance credit (sensitivity, not evidence)
+    <select value={mr1Credit} onChange={e=>setMr1Credit(Number(e.target.value))}>
+     <option value={100}>100% credit — optimistic lower bound</option>
+     <option value={50}>50% credit — middle sensitivity (not approved)</option>
+     <option value={0}>0% credit — gross coverage stress (may overlap)</option>
+    </select>
+   </label>
    <label style={{display:"flex",gap:6,alignItems:"center"}}>
     <input type="checkbox" checked={includeCord} onChange={e=>setIncludeCord(e.target.checked)}/>
     Include US/North America power cord D/E (NOT technically approved)
@@ -50,7 +59,8 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
     <tr><td>MR0001 — selected D/E supplier accessory offer, optional whole radio/cord</td>
      <td>{cash(price.trace.creditSupersededMr1USD)}</td>
      <td><strong>{cash(price.trace.replacementQuotedAccessoryCostUSD)}</strong></td>
-     <td><strong>REPLACES MR0001 allowance — do not add both</strong><small>Original quote offers ≠ approved purchase quantity</small></td></tr>
+     <td><strong>MR1 prior allowance credit {mr1Credit}% = {cash(price.trace.creditSupersededMr1USD)}</strong><small>Credit is only scope-overlap sensitivity; 100% credit risks omitting other MR1 parts, 0% may double count. No posting.</small></td></tr>
+    <tr><td>MR0001 remaining unitemized physical spare coverage reserve</td><td>{cash(price.trace.originalMr1EnvelopeUSD)}</td><td><strong>{cash(price.trace.uncreditedMr1CoverageReserveUSD)}</strong></td><td>Assumption, not additional approved SKU or supplier cost</td></tr>
     {price.otherMrCostEnvelopes.map(row=><tr key={row.mr}>
      <td>{row.mr} — unitemized commissioning spare allowance</td><td>{cash(row.subtotalCostUSD)}</td>
      <td>{cash(row.subtotalCostUSD)}</td><td><strong>Engineering estimate only</strong><small>No SKU-by-SKU supplier rate established</small></td>
