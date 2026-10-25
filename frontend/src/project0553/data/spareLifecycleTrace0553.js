@@ -1,6 +1,7 @@
 // PJ2608-0553 | Read-only cross-category spare lifecycle trace.
 // 10.2 canonical Source -> 10.3.3 Release -> exact 10.2 Source -> 10.3.3.
 // Does not allocate vendor SKUs, infer physical spare stock or modify WBS sell.
+import {selectB10PriceToWinReview0553} from "./b10PriceToWinReview0553";
 export const SPARE_LIFECYCLE_CODES_0553=Object.freeze(["B10","B11","B13","C1","C2"]);
 const round=n=>Math.round(n*100)/100;
 const rules=Object.freeze([
@@ -86,6 +87,47 @@ export function buildSpareLifecycleTrace0553(schedule,release){
    open:"OEM MTBF-based two-year SPIR, part number, Qty/rate/lead time; omit confirmed B10 identical stock"})
  });
  if(requirements.B11.minimum.startsWith("0 "))throw Error("B11 EXA-A8 minimum tool source missing");
+ // The 10.2 source contains one newer researched B10 Price-to-Win estimate,
+ // but that review is explicitly NONPOSTING. Display it prominently rather
+ // than falsely describing the unchanged parametric WBS as a new repricing.
+ const b10NewProposal=selectB10PriceToWinReview0553();
+ const c1InstalledComparable=schedule.sparePriceEvidence?.c1CurrentOptionalReference;
+ if(b10NewProposal.postedToWorking||b10NewProposal.postedToOfficial||
+  !b10NewProposal.trace.sourceScenarioReconciled||
+  !Number.isFinite(b10NewProposal.scenario.sellBeforeUsdRoundTHB)||
+  !c1InstalledComparable||c1InstalledComparable.releaseAllowed)
+  throw Error("0553 proposed new spare price evidence cannot be posted as current SELL");
+ const newPriceReview=Object.freeze({
+  B10:Object.freeze({proposedTHB:b10NewProposal.scenario.sellBeforeUsdRoundTHB,
+   sourceModuleId:b10NewProposal.moduleId,
+   evidenceClass:"NEXTG_EXPIRED_QUOTE_PLUS_NONITEMIZED_OTHER_MRS__WHAT_IF",
+   priceBasis:"NextG D/E offered quantity, selected RF/PoE accessory SKU lines; MR2–4 parametric residuals; 100% MR1 overlap credit assumption",
+   missing:"OEM-issued B10 SPIR, per-platform spare Qty, quote refresh, installed interchangeability, remaining MR1 parts and exact no-duplicate owner",
+   selected:false,customerReleaseAllowed:false,proposalOnly:true,
+   officialEquivalentUSD:b10NewProposal.scenario.roundedOfficialSummaryUSD}),
+  B11:Object.freeze({proposedTHB:null,sourceModuleId:"bid.budget.working.bc.b11",
+   evidenceClass:"NO_NEW_ITEMIZED_OEM_TOOL_PRICING",
+   priceBasis:"EXA-A8 five tool functions against four MR phase envelopes",
+   missing:"OEM included-license/tool credit; applicable TETRA-vs-DMR decision; accepted SKU/unit rate/qty",
+   selected:false,customerReleaseAllowed:false,proposalOnly:true}),
+  B13:Object.freeze({proposedTHB:null,sourceModuleId:"bid.budget.working.bc.b13",
+   evidenceClass:"NO_NEW_EVENT_BASED_CONSUMABLE_RATE",
+   priceBasis:"Existing provisional kits only, not selected new vendor/material takeoff",
+   missing:"Preservation event frequency, physical consumable Qty/price, B5/A5 credit",
+   selected:false,customerReleaseAllowed:false,proposalOnly:true}),
+  C1:Object.freeze({proposedTHB:c1InstalledComparable.indicativeFullReplacementSellScenarioTHB,
+   sourceModuleId:"bid.budget.working.bc.spare-price-evidence",
+   evidenceClass:"INSTALLED_RACON_FCA_COMPARABLE__NOT_OEM_SPARE_QUOTE",
+   priceBasis:"One installed MDS/ORGA full RACON package reference × old A/C factor, nonposting; no DDP uplift",
+   missing:"Independent OEM spare variant, included control box, Ex compatibility, quote validity, DDP and delivered Qty",
+   selected:false,customerReleaseAllowed:false,proposalOnly:true}),
+  C2:Object.freeze({proposedTHB:null,sourceModuleId:"bid.budget.working.bc.spare-price-evidence",
+   evidenceClass:"LEGACY_REV08_NETTING_IS_NOT_CURRENT_COST",
+   priceBasis:"Historical Rev08 C2 legacy residual/possible overlap is screening only",
+   missing:"OEM two-year SPIR, MTBF stock quantity, exact B10 SKU exclusion and 2026 commercial quote",
+   selected:false,customerReleaseAllowed:false,proposalOnly:true})
+ });
+
  const totals=Object.fromEntries(SPARE_LIFECYCLE_CODES_0553.map(code=>{
   const rows=result.filter(x=>x.code===code),quoted=rows.every(x=>Number.isFinite(x.selectedWorkingSellTHB));
   const subtotal=quoted?round(rows.reduce((s,x)=>s+x.selectedWorkingSellTHB,0)):null;
@@ -101,7 +143,7 @@ export function buildSpareLifecycleTrace0553(schedule,release){
  }
  return Object.freeze({
   moduleId:"bid.budget.working.bc.spare-lifecycle-control",
-  rows:Object.freeze(result),totals:Object.freeze(totals),rules,requirements,
+  rows:Object.freeze(result),totals:Object.freeze(totals),rules,requirements,newPriceReview,
   alertFamilies:Object.freeze([...(schedule.crossCategoryDuplicates||[])]),
   sourceToReleasePassed:true,releaseToSourcePassed:true,
   confirmedSameSkuCrossCategory:0,
