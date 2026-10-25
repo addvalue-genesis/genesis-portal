@@ -12,6 +12,7 @@ import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringR
 import {selectB10ItemizedPurchaseEvidence0553} from "./data/b10ItemizedPurchaseEvidence0553";
 import {B10ItemizedPurchasingEvidence0553} from "./B10ItemizedPurchasingEvidence0553";
 import {B10PriceToWinScenario0553} from "./B10PriceToWinScenario0553";
+import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
@@ -31,6 +32,13 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
  const inWorking=mode==="working";
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
  if(!p)return <p role="alert">Unsupported customer scope code: {code}</p>;
+ if(code==="B10"&&!inWorking)return <section className="p55-panel p553-b10-scope-compact"
+   data-cost-owner="B10" data-component-key={moduleId} style={{padding:12}}>
+   <B10KitPriceSummary0553 rows={spareLines} currency="THB"
+    total={customerSchedule.currentBudgetaryByCode.B10} variant="scope"
+    internal={typeof onOpenSource==="function"||typeof onOpenReleaseRow==="function"}
+    onOpenSource={onOpenSource} onOpenReleaseRow={onOpenReleaseRow}/>
+ </section>;
  return <section className="p55-panel" data-cost-owner={code} data-component-key={moduleId} style={{padding:14}}>
   <div className="p55-eyebrow">{inWorking?"10.2 WORKING COST DETAIL":"10.5 CUSTOMER SCOPE DETAIL"} · PRICE SOURCE AUDIT (THB display)</div>
   <h3>{p.code} — {p.description}</h3>
