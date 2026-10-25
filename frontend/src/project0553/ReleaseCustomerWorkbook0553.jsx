@@ -4,13 +4,14 @@ import React,{useEffect,useMemo,useRef,useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {REV08_BASELINE} from "./data/rev08CommercialBaseline";
 import {OFFICIAL_WORKBOOK_TEMPLATE_0553} from "./data/officialWorkbookTemplate0553";
-import {buildNativeWorkingDraft0553} from "./nativeWorkingDraft0553";
+import {buildNativeWorkingDraft0553,buildNativeB10ItemizedReview0553} from "./nativeWorkingDraft0553";
 import {auditCurrentCustomerProjection0553} from "./estimateToBidMapping";
 import {selectBcTurnkeyWorkingCost0553} from "./data/bcTurnkeyWorkingCost0553";
 import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrace0553";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
+import {selectB10NativeAnnexReview0553} from "./data/b10NativeAnnexReview0553";
 import {SparePricedBudgetReview0553} from "./SparePricedBudgetReview0553";
 import "./releaseWorkbook0553.css";
 
@@ -135,6 +136,24 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
    setNativeReport({success:false,text:"Native export failed: "+(error?.message||String(error)),warnings:[]});
   }finally{setNativeBusy(false);}
  };
+ const exportB10OriginalAnnexReview=async()=>{
+  if(!internal||code!=="B10")return;
+  setNativeBusy(true);setNativeReport(null);
+  try{
+   const bytes=Uint8Array.from(atob(nativeReleaseTemplate0553.base64),c=>c.charCodeAt(0));
+   const original=new File([bytes],nativeReleaseTemplate0553.sourceName,
+    {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+   const review=selectB10NativeAnnexReview0553();
+   const result=await buildNativeB10ItemizedReview0553(original,review);
+   const url=URL.createObjectURL(result.blob),link=document.createElement("a");
+   link.href=url;link.download=result.filename;document.body.appendChild(link);
+   link.click();link.remove();window.setTimeout(()=>URL.revokeObjectURL(url),15000);
+   setNativeReport({success:true,text:"B10 Internal Native: "+result.filename,
+    mappedCells:result.rowCount*8,warnings:result.warnings});
+  }catch(error){setNativeReport({success:false,
+    text:"B10 itemized Native export failed: "+(error?.message||String(error)),warnings:[]});}
+  finally{setNativeBusy(false);}
+ };
  const openSource=item=>{if(internal)setSource(item);};
  const sourceButton=item=>internal?<span className="p553-origin-actions">
   <button type="button" className={"p553-origin-link "+(item.sourceModuleId?.startsWith("bid.budget.bom")?"p553-origin-link--a":item.code?.startsWith("C")?"p553-origin-link--c":"p553-origin-link--b")}
@@ -157,6 +176,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     </label>
     {recipient==="INTERNAL"&&<button type="button" className="p553-detail-button"
       onClick={()=>setShowChecks(x=>!x)} aria-expanded={showChecks}>{showChecks?"− Hide":"＋ Review"} Export checks ({activeChecks.filter(x=>x.state==="HOLD").length} HOLD)</button>}
+    {internal&&code==="B10"&&<button type="button" className="p553-detail-button"
+      onClick={exportB10OriginalAnnexReview} disabled={nativeBusy}>
+      Export B10 — Original Annex Itemized / USD Reference (INTERNAL)
+     </button>}
     {recipient==="INTERNAL"&&<>
       <input ref={sourceFileRef} type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
        onChange={exportNativeDraft} style={{display:"none"}} aria-label="Select original 4-Scope of Supply.xlsx"/>
