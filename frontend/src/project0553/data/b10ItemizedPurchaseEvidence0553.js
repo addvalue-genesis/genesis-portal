@@ -84,6 +84,53 @@ export function selectB10ItemizedPurchaseEvidence0553(){
   oemSku:null,approvedUnitPrice:null,
   status:"REV08_GENERIC_CANDIDATE__NOT_PURCHASE_AUTHORIZED",postingAllowed:false
  })));
+ // Break the four budget envelopes into physically intelligible REQUIREMENT
+ // article families. Their number is NOT the spare quantity, SKU or quoted stock.
+ // Terms are anchored in the existing MR/current B10 specifications and have
+ // no independent price allocation until compatibility and quantity are proven.
+ const requirementFamilies=freeze([
+  ["B10-PTTEP-01","SCADA / Cisco protective fuse","fuses",/^(LAN|MR)-/,null],
+  ["B10-PTTEP-01","Industrial DC PoE power injector","power injector",/^MR-/,"POWER_INJECTOR__"],
+  ["B10-PTTEP-01","Ethernet surge/protection component","Ethernet",/^(SA|LAN)-/,null],
+  ["B10-PTTEP-01","RF protection assembly","RF",/^(SA|ANT)-/,null],
+  ["B10-PTTEP-02","RFI BDA RF surge/coupler service component","RF surge",/^(SA|TCAB)-/,null],
+  ["B10-PTTEP-02","RF feeder termination / connector","feeder termination",/^ANT-/,null],
+  ["B10-PTTEP-02","Ex enclosure seal/entry spare","Ex seal",/^TCAB-/,null],
+  ["B10-PTTEP-03","Ex IP telephone service component","handset",/^TPH-/,null],
+  ["B10-PTTEP-03","Ex sounder service component","sounder",/^LSE-/,null],
+  ["B10-PTTEP-03","Certified Ex gland/seal","glands",/^TCAB-/,null],
+  ["B10-PTTEP-03","CAT6A service retermination material","CAT6A",/^(TCAB|TPH)-/,null],
+  ["B10-PTTEP-04","RACON control / protection fuse","fuse",/^TCAB-/,null],
+  ["B10-PTTEP-04","RACON control-box gasket","gasket",/^TCAB-/,null],
+  ["B10-PTTEP-04","RACON Ex cable gland/service seal","Ex gland",/^TCAB-/,null]
+ ]);
+ const familyCount=new Map();
+ const requirementArticleRows=freeze(requirementFamilies.map(([parentId,name,term,tagPattern,supplierMatch])=>{
+  const parent=envelopes.find(x=>x.id===parentId);
+  if(!parent||!parent.displaySpecification.toLowerCase().includes(term.toLowerCase()))
+   throw Error("B10 article family no longer anchored in current MR scope: "+parentId+" "+term);
+  const ordinal=(familyCount.get(parentId)||0)+1;familyCount.set(parentId,ordinal);
+  const mr=parent.linkedMR[0];
+  const candidateTags=freeze(unique((coverage.byMr[mr]||[]).filter(x=>
+   parent.linkedLocations.includes(x.site)&&tagPattern.test(x.tag)).map(x=>x.site+" / "+x.tag)));
+  const sourceSupplierLines=freeze(candidateRows.filter(x=>supplierMatch&&x.articleClass.startsWith(supplierMatch)).map(x=>x.id));
+  return freeze({
+   id:parentId+"-F"+String(ordinal).padStart(2,"0"),
+   parentB10PriceId:parentId,mr,articleFunction:name,
+   systemLocations:freeze(parent.linkedLocations.slice()),
+   actualInstalledTagCandidates:candidateTags,
+   skuCandidateQuoteIds:sourceSupplierLines,
+   exactSpareSku:null,selectedManufacturer:null,selectedModel:null,
+   approvedPurchaseQty:null,unit:null,approvedSupplierUnitCostTHB:null,
+   workingSellAttributionTHB:null,customerUnitPriceTHB:null,customerExtendedPriceTHB:null,
+   sourceMrRequirement:parent.evidenceSource,
+   sourceOriginalPhrase:parent.displaySpecification,
+   scopeEvidenceClass:"MR_FUNCTIONAL_SPARE_ARTICLE_ONLY__NO_SELECTED_PART_NO_QTY_PRICE",
+   postingAllowed:false,releaseAllowed:false,
+   inclusionGate:"Confirm OEM part number / installed TAG compatibility, delivered project stock, Part A inclusion, C2 exclusion, exact source unit price and location",
+  });
+ }));
+ if(requirementArticleRows.length!==14)throw Error("B10 article family source inventory changed");
  const quoteTotalUSD=round(candidateRows.reduce((a,x)=>a+(x.quotedExtendedUSD||0),0));
  const quoteCostAtPlanningFxTHB=round(quoteTotalUSD*31.5);
  const b10ReferenceCostTHB=round(509827.5/1.30);
@@ -118,6 +165,7 @@ export function selectB10ItemizedPurchaseEvidence0553(){
   physicalComponentCandidateCount:candidateRows.filter(x=>x.physicalPurchaseCandidate).length,
   hardwareQuoteUSD:round(proposedB10AccessoriesUSD+capitalRadioCandidateUSD),
   legacyCandidates:legacy,
+  requirementArticleRows,
   budgetEnvelopeRows:freeze(envelopes.map(x=>freeze({id:x.id,mr:x.linkedMR[0],
     locations:x.linkedLocations,contractKitCount:x.qty,
     workingUnitSellTHB:x.unitPriceTHB,workingTotalSellTHB:x.extendedTHB,
