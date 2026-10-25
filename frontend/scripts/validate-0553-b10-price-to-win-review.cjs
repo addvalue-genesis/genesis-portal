@@ -106,6 +106,8 @@ const scopeUi=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553
 const releaseUi=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
 const officialUi=fs.readFileSync(path.join(root,"project0553/OfficialUsdRelease0553.jsx"),"utf8");
 assert(scopeUi.includes("B10PriceToWinScenario0553"));
-assert(releaseUi.includes('internal&&code==="B10"&&<B10PriceToWinScenario0553'));
+assert(!releaseUi.includes('internal&&code==="B10"&&<B10PriceToWinScenario0553'));
+assert(releaseUi.includes('code==="B10"?<B10KitPriceSummary0553'));
+assert(scopeUi.includes('B10PriceToWinScenario0553'));
 assert(!officialUi.includes("B10PriceToWinScenario0553"));
 console.log("PASS 0553 B10 price-to-win: quoted D/E credits MR1 cost once; 4 source SKU rates, 3 unitemized MR envelopes, internal 1.40 and 10.3.4-equivalent USD18100; current Release B10 THB509827.50/USD16200 unchanged, no added posting");
