@@ -11,6 +11,7 @@ import {selectScopePartBcWorking0553} from "./data/scopePartBcReadModel0553";
 import {RELEASE_CUSTOMER_COLUMNS_0553,buildPartATagGroupBreakdown0553} from "./data/releaseCommercialModel0553";
 import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrace0553";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
+import {SparePricedBudgetReview0553} from "./SparePricedBudgetReview0553";
 import "./releaseWorkbook0553.css";
 
 // Single customer-format sheet preview. Internal TAG/source drilldowns are UI-only
@@ -345,6 +346,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         <td>{code.startsWith("B")?money(annexModel?.selectedWorkingTHB):"Not quote"}</td>
         {code.startsWith("C")&&<td/>}</tr>
       </tbody></table></div>
+      {internal&&<SparePricedBudgetReview0553 code={code} onOpenSource={onOpenSource} context="release"/>}
       {annexModel&&<div className="p553-annex-reconciliation" role="region" aria-label={code+" source reconciliation"}>
        <table className="p55-table p55-table--compact"><thead>
         <tr><th>Source / Pricing</th><th>10.2 Selected Working/Reference THB</th><th>Σ Qty × Unit (Annex lines) THB</th><th>Difference THB</th><th>Gate</th></tr>
