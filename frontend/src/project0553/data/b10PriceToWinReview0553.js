@@ -61,6 +61,7 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
    throw Error("Unpriced or invalid NextG source cannot enter scenario "+x.id);
   return freeze({
    id:x.id,sourceQuoteLine:x.sourceQuoteLine,sku:x.proposedSku,description:x.articleDescription,
+   candidateInstalledSiteTags:freeze(x.candidateInstalledSiteTags.slice()),
    quotedOfferedQty:x.vendorOfferedQty,scenarioQty:x.vendorOfferedQty,
    scenarioQtyAuthority:"WHAT_IF_ASSUMES_ORIGINAL_VENDOR_OFFER_QTY__NOT_APPROVED_PURCHASE_QTY",
    estimatedUnitCostUSD:x.quotedUnitPriceUSD,estimatedLineCostUSD:x.quotedExtendedUSD,
