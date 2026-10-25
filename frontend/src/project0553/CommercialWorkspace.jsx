@@ -410,7 +410,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   </table></div>
   <p><strong>Workbook source:</strong> {template.sourceName} · {template.revision} · 6 sheets. <strong>Export status:</strong> HOLD — original template fidelity and cross-sheet reconciliation not yet validated.</p>
   </details>
-  <details className="p553-budget-phase" data-component-key="bid.budget.pricing.budgetary"><summary><strong>Previous Budgetary Workbook</strong><small>TEMP · 10.3.2 · Not approved/snapshotted</small></summary><BudgetaryWorkbookPreview0553/><section className="p55-panel">
+  <details className="p553-budget-phase" data-component-key="bid.budget.pricing.budgetary"><summary><strong>Previous Budgetary Workbook</strong><small>TEMP · 10.3.2 · Not approved/snapshotted</small></summary><BudgetaryWorkbookPreview0553 onOpenSource={openReleaseSource}/><section className="p55-panel">
    <div className="p55-eyebrow">BUDGETARY SUBMISSION · SNAPSHOT REGISTRY</div>
    <h3>Frozen Budgetary Issue — Verification Required</h3>
    <p className="p55-note"><strong>NO VERIFIED ISSUED SNAPSHOT REGISTERED.</strong> A historical Rev08 workbook is available but its exact SAMTEL-issued revision and recipients are still unverified. It is not promoted to Budgetary Submission.</p>
