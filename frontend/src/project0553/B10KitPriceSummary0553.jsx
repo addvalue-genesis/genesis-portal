@@ -30,6 +30,7 @@ export function B10KitPriceSummary0553({
  if(Number.isFinite(total)&&Math.abs(normalized.reduce((sum,r)=>sum+(r.amount||0),0)-total)>0.02)
   throw Error("0553 B10 source-to-release kit totals do not reconcile");
  return <section className="p553-b10-commercial-summary" data-component-key={variant==="scope"?"bid.budget.scope.b10.kit-summary":
+    variant==="budgetary"?"bid.budget.pricing.budgetary.annex.b10.kit-summary":
     currency==="USD"?"bid.budget.pricing.official.b10.kit-summary":"bid.budget.pricing.release.preview.annex.b10.kit-summary"}
     data-source-reconciliation="B10_SOURCE_RELEASE_SOURCE">
   <div className="p553-b10-commercial-heading">
@@ -44,7 +45,8 @@ export function B10KitPriceSummary0553({
       data-source-id={r.id}
       data-source-row-module-id={r.sourceRowModuleId}
       data-component-key={(variant==="release"?"bid.budget.pricing.release.preview.annex.b10.":
-        variant==="scope"?"bid.budget.scope.b10.spare-line.":"bid.budget.pricing.official.annex.b10.")+
+        variant==="scope"?"bid.budget.scope.b10.spare-line.":
+        variant==="budgetary"?"bid.budget.pricing.budgetary.annex.b10.":"bid.budget.pricing.official.annex.b10.")+
         (variant==="scope"?r.id.toLowerCase():r.id.toLowerCase())}>
       <td><strong>{r.mr}</strong><small>Item {i+1}</small></td>
       <td>{r.description}<small>{r.sites.length?r.sites.join(", "):"Commissioning spare kit per MR"}</small></td>
