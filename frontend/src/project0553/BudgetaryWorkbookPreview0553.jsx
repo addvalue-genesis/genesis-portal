@@ -76,7 +76,7 @@ export function BudgetaryWorkbookPreview0553({onOpenSource=null}){
   status:"Included in A1, non-additive; "+a5Memo.rowCount+" traced MTO lots"}];
 
  return <section className="p55-panel" data-component-key="bid.budget.summary.workbook">
-   <div className="p55-eyebrow">BUDGETARY SUBMISSION · NATIVE SOURCE WORKBOOK STRUCTURE <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.summary.workbook"/></div>
+   <div className="p55-eyebrow">BUDGETARY SUBMISSION · {sheet==="B10 CommSpares"?"B10 Commercial Summary":"Native Source Workbook Structure"} {sheet!=="B10 CommSpares"&&<ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.summary.workbook"/>}</div>
    <h3>4-Scope of Supply.xlsx · 6 Worksheet Review</h3>
    <p className="p55-note"><strong>TEMPLATE GRID PREVIEW, NOT NEW CUSTOMER PRICE.</strong> Original workbook is the export template. This component renders the original worksheet dimensions and a source-transcribed subset of cell labels, preserving empty rows; full exact-cell fidelity is still pending. Template fidelity, current BOM selling-price mapping and native XLSX export are not implemented yet; release is blocked.</p>
    <div className="p55-filterbar">
@@ -95,6 +95,7 @@ export function BudgetaryWorkbookPreview0553({onOpenSource=null}){
    <p className="p55-note"><strong>Currency: {currency}</strong> · {currency==="USD"?"Historical source values in original USD; no conversion.":fxReady?"Indicative converted display only, using user-entered "+rate+" "+currency+"/USD on "+fxDate+" · Source: "+fxSource+". Not a verified or approved customer rate.":"Conversion unavailable: enter rate, date and source. USD source amounts are retained unchanged; no implied FX."}</p>
    <label><input type="checkbox" checked={showHistorical} onChange={e=>setShowHistorical(e.target.checked)}/> Show historical Rev08 price comparison (not current bid)</label>
    <label><input type="checkbox" checked={showEmptyRows} onChange={e=>setShowEmptyRows(e.target.checked)}/> Show empty template rows (original Excel layout)</label>
+   {sheet!=="B10 CommSpares"&&<>
    <p className="p55-note"><strong>Sheet-specific layout:</strong> {layout.leadTime?"Lead time (ARO) column · ":""}{layout.sourceNotQuote?"Original Not quote cells · ":""}{layout.sections?.remark?"Original remark row "+layout.sections.remark.start:"No remark row in source"}</p>
    <p className="p55-note"><strong>Original worksheet cell layout:</strong> {layout.columns} columns × {layout.maxRow} rows. Blank cells are preserved; historically labelled cells are reference only. Current BOM-derived customer selling prices are not approved and remain blank.</p>
    <div className="p55-panel">
@@ -107,6 +108,7 @@ export function BudgetaryWorkbookPreview0553({onOpenSource=null}){
     <ComponentCopyId projectId="PJ2608-0553" componentKey={"bid.budget.summary.workbook."+sheetKey(sheet)}/>
    </div>
    <p className="p55-note">กด + / − เพื่อยุบเฉพาะรายการย่อย (แถว 6–18) โดยหัวเอกสาร หัวตาราง Total และ Remark จะแสดงเสมอ; Excel ต้นฉบับไม่ถูกแก้ไข</p>
+   </>}
    {sheet==="Scope of supply"&&<ScopeSheetsDetail0553 fx={{thbPerUsd:currentFx.thbPerUsd}} view="summary"/>}
    {sheet==="B10 CommSpares"?<B10KitPriceSummary0553
      rows={b10Source.currentByCode.B10} currency="THB"
@@ -190,10 +192,12 @@ export function BudgetaryWorkbookPreview0553({onOpenSource=null}){
     })}</tbody>
    </table></div>
    </>}
+   {sheet!=="B10 CommSpares"&&<>
    <p className="p55-note"><strong>Part B/C price cells:</strong> source-linked to bid.budget.scope WBS and child Annex projections. Historical Annex values are labelled REFERENCE only, never posted to current turnkey total. Pending costs stay pending, including SAMTEL/OEM execution scopes.</p>
    <p className="p55-note"><strong>Row 38 Total:</strong> NOT ESTABLISHED. Part A currently has cost-only evidence; Part B contains working sell references. They are deliberately NOT summed. Turnkey owner/OEM B costs are incomplete, and C options remain excluded from the base.</p>
    <p className="p55-note">Part A defaults to MR equipment group summary with on-demand TAG drill-down. Detail rows show source TAG and location, with MR as grouping only. Missing specification, quantity and rates are flagged. Quantity 1 package is a display grouping, not an engineering unit count. A5 is included in A1. Historical overlay is OFF by default. Unmapped A1–A5 prices are withheld rather than placed into incorrect worksheet rows. C2 original Not quote entries are preserved. Current approved selling price remains unavailable.</p>
    <p className="p55-note">The native XLSX retains all rows and columns. The JSX keeps worksheet header, totals and remarks visible while item rows can collapse. It hides completely empty rows by default; enable Show empty template rows for a structural audit. Source-transcribed text is a working preview; native merged-cell positioning, styling and exact original formulas are governed by the XLSX master and are not claimed identical yet.</p>
    <p className="p55-note">Worksheets: {template.sheets.map(s=>s.name).join(" · ")}. Original currency USD; converted view requires explicit FX. Export: HOLD until verified mapping of canonical BOM → customer lines, complete native-cell presentation, source template preservation, revision/approval gates and cross-sheet reconciliation.</p>
+   </>}
  </section>;
 }
