@@ -23,6 +23,7 @@ export function selectScopePartBcWorking0553(){
    executionActivities:r.executionActivities,
    serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    b10ItemizedPurchaseEvidence:r.code==="B10"?r.b10ItemizedPurchaseEvidence:null,
+   b10PriceToWinReview:r.code==="B10"?r.b10PriceToWinReview:null,
    b3GroupTrace:b3Source?Object.freeze(b3Source.groupRollups.map(g=>Object.freeze({
     id:g.id,sourceModuleId:g.id,groupKey:g.key,name:g.name,
     workingSellTHB:g.selectedWorkingSellTHB,
