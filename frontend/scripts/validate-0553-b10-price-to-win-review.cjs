@@ -11,6 +11,11 @@ const {selectBcTurnkeyWorkingCost0553}=from("data/bcTurnkeyWorkingCost0553.js");
 const {selectScopePartBcWorking0553}=from("data/scopePartBcReadModel0553.js");
 const {buildReleaseCommercialModel0553}=from("data/releaseCommercialModel0553.js");
 const {buildOfficialUsdRelease0553}=from("data/officialUsdRelease0553.js");
+const {MR0001_OFFER_ALLOCATION_AUDIT}=from("data/mr0001OfferAllocationAudit.js");
+const de=MR0001_OFFER_ALLOCATION_AUDIT.candidates.filter(x=>["D","E"].includes(x.group));
+assert.equal(de.length,16);
+assert(de.every(x=>x.offeredRole==="SPARE_OPTION_SEPARATE"&&
+ x.siteAllocatedQty===null&&x.acceptedCost===undefined&&x.state==="SPARE_SEPARATE_NO_BASE_ALLOCATION"));
 const base=selectB10PriceToWinReview0553();
 assert.equal(base.assumptions.multiplier,1.4);
 assert.equal(base.assumptions.targetGrossProfitOfSellPct,20);
