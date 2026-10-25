@@ -52,6 +52,8 @@ export function selectB10ItemizedPurchaseEvidence0553(){
    groupMeaning:scopeForGroup[q.group],
    articleDescription:q.description,manufacturer:"OEM brand not independently verified from quote; exact NextG part number retained",
    proposedSku:q.partNumber,quotedSkuVerified:true,
+   matchedBaseEquipmentQuoteLines:freeze(NEXTG.lines.filter(y=>!["D","E"].includes(y.group)&&
+     y.partNumber===q.partNumber).map(y=>y.code)),
    selectedSpareSkuVerified:false,partAPriceOwner:"A1_INSTALLED_EQUIPMENT__NO_B10_ADDITION",
    candidateInstalledSiteTags:linkInstalled(coverage,f,q.group),
    installedTagRelation:"FUNCTIONAL_CANDIDATE_ONLY__NO_VENDOR_INTERCHANGEABILITY_PROOF",
