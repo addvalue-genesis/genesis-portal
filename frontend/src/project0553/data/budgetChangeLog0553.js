@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R47";
+export const CHANGE_LOG_VERSION_0553="2026-10-25-R48";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261025-02",date:"2026-10-25",kind:"ENGINEERING",tone:"pricing",
+  title:"B10 Price-to-Win what-if 30–50% and supplier market evidence",
+  detail:"New nonposting B10 price-to-win scenario uses NextG expired D/E accessories priced line-by-line, replaces rather than adds historical MR0001 engineering cost USD5600, and retains clearly unitemized MR0002/3/4 cost envelopes USD6850. Default excludes US power cords and whole capital radios. 5% cost risk and 5% SAMTEL selling deduction with 20% target profit produces multiplier1.40; indicative source USD12881.72, Working-equivalent THB568083.85, USD100-rounded 10.3.4 equivalent USD18100. Source→10.2→10.5→Internal10.3.3 only. Actual B10 Working THB509827.50 and USD16200 Official, known A+B and native customer XLSX are unchanged; no quote issued. Published PolyPhaser/Hawke/Eaton prices are flagged nonposting comparables.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10","bid.budget.working.bc.b10.price-to-win-review","bid.budget.scope.b10","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner25-Oct: test retail O&G bid markup and answer missing prices from evidence before approving B10 quote"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-01",date:"2026-10-25",kind:"ENGINEERING",tone:"neutral",
   title:"B10 deep spare part and supplier quote itemization — nonposting audit",
