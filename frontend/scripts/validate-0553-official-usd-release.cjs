@@ -17,6 +17,32 @@ assert.deepEqual(model.unpriced,['B4','B12','B14']);assert.equal(model.issued,fa
 assert.equal(model.b10ItemizedAnnex.rows.length,14);
 assert.equal(model.b10ItemizedAnnex.totalUSD,16200);
 assert.equal(model.b10ItemizedAnnex.customerIssued,false);
+const other=model.otherSpareItemizedAnnex;
+assert.deepEqual(Array.from(other.codes),["B11","B13","C1","C2"]);
+assert.deepEqual(["B11","B13","C1","C2"].map(code=>other.rows[code].length),[4,3,1,12]);
+assert.equal(other.summaries.B11.totalUSD,5100);
+assert.equal(other.summaries.B13.totalUSD,1500);
+assert.equal(other.summaries.C1.totalUSD,97500);
+assert(Math.abs(other.summaries.C2.totalUSD-22914.5)<0.01);
+assert.equal(other.summaries.C1.selectedWorking,false);
+assert.equal(other.summaries.C2.selectedWorking,false);
+assert.equal(model.c.find(x=>x.code==="C1").amountUSD,null);
+assert.equal(model.c.find(x=>x.code==="C2").amountUSD,null);
+assert(other.rows.C2.every(x=>x.sourceId===null&&x.historicalSourceId&&x.customerIssued===false));
+assert(other.rows.B11.every(x=>x.sourceRowModuleId&&x.sourceId&&x.traceId));
+assert(other.rows.B13.every(x=>x.sourceRowModuleId&&x.sourceId&&x.traceId));
+for(const code of other.codes){
+ assert(other.rows[code].every(x=>Number.isFinite(x.qty)&&x.qty>0&&
+  Number.isFinite(x.unitUSD)&&Number.isFinite(x.totalUSD)&&
+  Math.round(x.qty*x.unitUSD*100)===Math.round(x.totalUSD*100)));
+ const web=renderToStaticMarkup(React.createElement(OtherSpareOriginalAnnex0553,{
+  code,model:other,onOpenSource:()=>{}
+ }));
+ assert.equal((web.match(/data-other-spare-source-id=/g)||[]).length,other.rows[code].length);
+ assert(web.includes(other.summaries[code].totalUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4})));
+ assert(web.includes("Source"));
+ assert(!web.includes("PENDING")&&!web.includes("SPIR pending"));
+}
 assert.equal(new Set(model.b10ItemizedAnnex.rows.map(r=>r.lineSourceId)).size,14);
 assert(model.b10ItemizedAnnex.rows.every(r=>r.qty===1&&r.unit==="LOT"&&
  r.totalUSD===r.unitUSD&&Number.isFinite(r.totalUSD)&&r.issued===false&&
@@ -41,6 +67,7 @@ assert.throws(()=>buildOfficialUsdRelease0553({...source,annex:{...source.annex,
 assert.equal(JSON.stringify(source),before,'Source model must not mutate');
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const {OfficialUsdRelease0553}=require('../src/project0553/OfficialUsdRelease0553');
+const {OtherSpareOriginalAnnex0553}=require('../src/project0553/OtherSpareOriginalAnnex0553');
 const html=renderToStaticMarkup(React.createElement(OfficialUsdRelease0553,{source}));
 assert(html.includes(model.totalUSD.toLocaleString('en-US',{minimumFractionDigits:2})));
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
@@ -76,9 +103,9 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
    assert(cell(xml,'B26').includes('28 working days'));assert(cell(xml,'B32').includes('7 working days + 2 travel days/person'));
   }else{
    const code=['B10','B11','B13','C1','C2'][i-2],parent=[...model.b,...model.c].find(r=>r.code===code);
-   const split=code==="B10"?model.b10ItemizedAnnex.rows:model.annex[code];
+   const split=code==="B10"?model.b10ItemizedAnnex.rows:model.otherSpareItemizedAnnex.rows[code];
    const totalRow=code==="B10"?20:19;
-   assert(cell(xml,'I'+totalRow).includes(parent.amountUSD===null?'To be quoted':'<v>'+parent.amountUSD+'</v>'));
+   assert(cell(xml,'I'+totalRow).includes('<v>'+(code==="B10"?parent.amountUSD:model.otherSpareItemizedAnnex.summaries[code].totalUSD)+'</v>'));
    for(const [j,r] of split.entries()){
     const physicalRow=6+j;
     assert(cell(xml,'I'+physicalRow).includes(r.totalUSD===null?'To be quoted':'<v>'+r.totalUSD+'</v>'));
@@ -89,6 +116,11 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
      assert(cell(xml,'E'+physicalRow).includes(r.specification.replaceAll('&','&amp;')));
      assert(cell(xml,'F'+physicalRow).includes(r.materials.replaceAll('&','&amp;')));
     }
+   }
+   if(code==="C1"||code==="C2"){
+    assert(cell(xml,"B20").includes(code==="C1"?"NONPOSTING OPTION PRICE REFERENCE":"SUPERSEDED REV08 HISTORICAL REFERENCE"),
+     "Original native optional-spare source warning missing");
+    assert(cell(xml,"H4").includes("REFERENCE OPTION USD"));
    }
    if(code==="B10"){
     assert(cell(xml,'B21').includes('PRE-AWARD BUDGETARY FINANCIAL ALLOCATION'));
@@ -101,5 +133,5 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  const again=box.zip.entriesFromZip(new Uint8Array(await second.blob.arrayBuffer()));
  assert((await text('xl/worksheets/sheet1.xml',again)).includes('<v>'+model.totalUSD+'</v>'));
  const arg=process.argv.find(x=>x.startsWith('--output='));if(arg)fs.writeFileSync(arg.slice(9),data);
- console.log('PASS official USD: source unchanged; 31.5 FX; upward USD100 parent rounding; B10 14 priced 1-LOT financial lines USD16200, source-ID parity, original six sheets with B10 extra row, English-only and nonissued; subtotal USD '+model.totalUSD);
+ console.log('PASS 0553 Official native: B10 14/USD16200, B11 4/USD5100, B13 3/USD1500, C1 RACON option/USD97500 comparative, C2 12/USD22914.50 historical nonquoted; 6 original sheets, source unchanged, A+B unchanged, no customer issue');
 })().catch(e=>{console.error(e);process.exitCode=1;});
