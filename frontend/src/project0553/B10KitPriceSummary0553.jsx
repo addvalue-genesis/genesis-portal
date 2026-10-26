@@ -80,7 +80,7 @@ export function B10KitPriceSummary0553({
      <th className="p553-b10-commercial-number">{money(total)}</th>{internal&&<th/>}</tr></tfoot>
    </table>
   </div>
-  <p className="p553-b10-commercial-note">Original Item / Source evidence, related installed TAGs and OEM SKU validation remain in 10.2 Working.
-   This summary is for price presentation only; kit quantities are not itemized SKU purchase quantities.</p>
+  <p className="p553-b10-commercial-note">Above: 14 MR Attachment-5 engineering-screened spare functions linked to 10.1 Installed Required BOM and 10.2 Working; individual OEM Spare Part No., Qty and CIF price remain unconfirmed.
+   Below: four 4/3/4/3 source-owned financial kit envelopes only. These budgets are not fourteen separately priced spare articles; no duplicate Part A or C2 posting.</p>
  </section>;
 }
