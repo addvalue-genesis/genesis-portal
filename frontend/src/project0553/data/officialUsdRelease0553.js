@@ -1,4 +1,5 @@
 import {buildB10OfficialItemizedAnnex0553} from "./b10OfficialItemizedAnnex0553";
+import {buildOtherSpareItemizedPresentation0553} from "./otherSpareItemizedPresentation0553";
 // Customer presentation derived only from the current 10.3.3 release model.
 // The commercial conversion/rounding layer never writes back to Working THB.
 export const OFFICIAL_USD_POLICY_0553=Object.freeze({thbPerUsd:31.5,incrementUSD:100,rounding:"UP_PER_SUMMARY_LINE"});
@@ -88,5 +89,6 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
   unpriced:[...a,...b].filter(r=>r.amountUSD===null).map(r=>r.code),
   unroundedUSD:round2(known.reduce((s,r)=>s+r.sourceTHB/policy.thbPerUsd,0)),
   issued:false};
- return {...document,b10ItemizedAnnex:buildB10OfficialItemizedAnnex0553(document)};
+ return {...document,b10ItemizedAnnex:buildB10OfficialItemizedAnnex0553(document),
+  otherSpareItemizedAnnex:buildOtherSpareItemizedPresentation0553(document)};
 }
