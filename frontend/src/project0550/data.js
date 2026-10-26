@@ -3,6 +3,7 @@
 // behind a controlled JSON/repository boundary.
 import { getProject0550Dataset, getProject0550DataLayerStatus } from "./data/repository";
 import { buildProject0550KnowledgeKernelLibrary } from "./knowledgeKernelBinding";
+import { buildCoverageMatrix } from "./coverageModel";
 
 const DATASET = getProject0550Dataset();
 
@@ -28,6 +29,7 @@ export const BUDGETARY_ESTIMATE = DATASET.budgetaryEstimate;
 export const BUDGETARY_SUBMISSION = DATASET.budgetarySubmission;
 
 export const REQUIREMENT_COMPLETENESS = DATASET.requirementCompleteness;
+export const REQUIREMENT_COVERAGE = buildCoverageMatrix(DATASET);
 
 export const ENGINEERING_LAW_LIBRARY = buildProject0550KnowledgeKernelLibrary(SYSTEMS);
 export const KNOWLEDGE_KERNEL_LIBRARY = ENGINEERING_LAW_LIBRARY;
