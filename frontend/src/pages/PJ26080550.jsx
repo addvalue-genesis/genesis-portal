@@ -28,6 +28,7 @@ import {
 } from "../project0550/data";
 import { exportOriginalPriceFormXlsx } from "../project0550/exportOriginalPriceForm";
 import { CoverageMatrix } from "../project0550/CoverageMatrix";
+import { PagaEvidenceReview } from "../project0550/PagaEvidenceReview";
 import "../project0550/project0550.css";
 
 const TABS = [
@@ -744,7 +745,7 @@ function SystemsView() {
   );
 }
 
-function EngineeringView() {
+function EngineeringView({ evidence, onEvidenceChange }) {
   const completeness = REQUIREMENT_COMPLETENESS;
   const lawLibrary = ENGINEERING_LAW_LIBRARY;
   const audited = (completeness?.systemAudit || []).filter((row) => row.auditState !== "NOT_YET_AUDITED").length;
@@ -752,6 +753,7 @@ function EngineeringView() {
 
   return (
     <div className="p55-stack">
+      <PagaEvidenceReview evidence={evidence} onEvidenceChange={onEvidenceChange} />
       <CoverageMatrix />
       <SectionTitle
         eyebrow="First Principles + Completeness Control"
@@ -2059,6 +2061,7 @@ function DocumentsView() {
 
 export function PJ26080550({ lang = "th" }) {
   const [activeTab, setActiveTab] = useState("overview");
+  const [pagaEvidence, setPagaEvidence] = useState(null);
 
   return (
     <div className="p55">
@@ -2098,7 +2101,7 @@ export function PJ26080550({ lang = "th" }) {
         {activeTab === "overview" ? <Overview /> : null}
         {activeTab === "architecture" ? <ArchitectureView /> : null}
         {activeTab === "systems" ? <SystemsView /> : null}
-        {activeTab === "engineering" ? <EngineeringView /> : null}
+        {activeTab === "engineering" ? <EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /> : null}
         {activeTab === "execution" ? <ExecutionView /> : null}
         {activeTab === "budget" ? <BudgetView /> : null}
         {activeTab === "risk" ? <RiskView /> : null}
