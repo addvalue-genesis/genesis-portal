@@ -46,7 +46,7 @@ assert.deepEqual(Array.from(annex.rows).map(x=>x.budgetaryUnitPriceUSD),
 assert(annex.rows.every(x=>!(/PENDING|SPIR|INTERNAL|BUDGET|WORKING|PRICE/i).test(x.specification+" "+x.materials)),
  "No internal message belongs inside customer Detail Specification or Materials");
 assert(annex.rows.some(x=>x.tag.includes("SA-502-001")));
-assert(annex.rows.some(x=>x.proposedPartNo));
+assert(annex.rows.some(x=>x.sourceQuoteEvidence.length>0)); // Only source candidates, not an approved OEM model
 assert(annex.rows.every(x=>!x.partNo));
 assert(annex.rows.some(x=>x.physicalStageNames.includes("Erection")));
 assert(annex.rows.some(x=>x.physicalStageNames.includes("Pre-commissioning")));
