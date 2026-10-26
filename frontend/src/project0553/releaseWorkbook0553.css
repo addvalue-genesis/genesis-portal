@@ -238,3 +238,20 @@
 .p553-b10-native-annex-table th:nth-child(7),.p553-b10-native-annex-table th:nth-child(8){width:8%}
 .p553-b10-native-annex-table td small{display:block;margin-top:4px;color:#5d7280;font-size:10px;line-height:1.35}
 .p553-b10-native-annex-table tfoot th{background:#edf2f5;text-align:right}
+
+/* B10 equipment-to-commissioning-spare selection; internal-only, compact and scroll-contained. */
+.p553-b10-stage-selection{box-sizing:border-box;max-width:100%;min-width:0}
+.p553-b10-stage-selection>summary{cursor:pointer}
+.p553-b10-stage-selection>summary small{display:block;font-weight:400;font-size:11px;color:#607787}
+.p553-b10-stage-selection .p553-b10-commercial-scroll{max-width:100%;overflow-x:auto}
+.p553-b10-stage-selection-table{width:100%;min-width:1080px;table-layout:fixed;border-collapse:collapse;font-size:11px}
+.p553-b10-stage-selection-table th,.p553-b10-stage-selection-table td{border:1px solid #d1dae0;padding:7px 8px;vertical-align:top;overflow-wrap:anywhere}
+.p553-b10-stage-selection-table th{background:#ecf2f6}
+.p553-b10-stage-selection-table th:nth-child(1){width:17%}
+.p553-b10-stage-selection-table th:nth-child(2){width:19%}
+.p553-b10-stage-selection-table th:nth-child(n+3):nth-child(-n+6){width:7%}
+.p553-b10-stage-selection-table th:nth-child(7){width:20%}
+.p553-b10-stage-selection-table th:nth-child(8){width:9%}
+.p553-b10-stage-selection-table th:nth-child(9){width:14%}
+.p553-b10-stage-selection-table td small{display:block;font-size:10px;margin-top:4px;color:#516b7b}
+.p553-b10-stage-flag{text-align:center;font-weight:700}
