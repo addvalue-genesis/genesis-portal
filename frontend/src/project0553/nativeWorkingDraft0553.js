@@ -420,24 +420,36 @@ export async function buildNativeOfficialRelease0553(file,model){
    put("B43","Delivery: CIF Zhuhai Port, China (Incoterms 2020).");
   }else{
    const code=["B10","B11","B13","C1","C2"][i-2],isB10=code==="B10";
-   const detail=isB10?model.b10ItemizedAnnex?.rows:model.annex[code];
+   // Exactly the same itemized read model drives 10.3.4 JSX and native Excel.
+   // C1/C2 amounts are visible but NOT selected as official option quotations.
+   const detail=isB10?model.b10ItemizedAnnex?.rows:
+    model.otherSpareItemizedAnnex?.rows?.[code];
    if(!Array.isArray(detail)||detail.length>(isB10?14:13)||
       (isB10&&(detail.length!==14||model.b10ItemizedAnnex?.customerIssued!==false)))
     throw Error(code+" original priced Annex capacity or approval gate failed");
    put("B2",model.annexTitles[code]);
    ["Item","Tag No.","Description","Specification","Materials","Qty"].forEach((v,j)=>put("BCDEFG"[j]+"4",v));
-   put("H4",isB10?"PRE-AWARD BUDGET USD / CIF UNCONFIRMED":"Price (USD)");
+   put("H4",isB10?"PRE-AWARD BUDGET USD / CIF UNCONFIRMED":
+    code.startsWith("C")?"REFERENCE OPTION USD — NOT QUOTED / CIF UNVERIFIED":
+    "PRE-AWARD WORKING ALLOCATION USD");
    put("H5","Unit Price (USD)");put("I5","Amount (USD)");
    if(code.startsWith("C"))put("J5","Lead Time (ARO)");
    detail.forEach((r,j)=>{const row=6+j;
-    [isB10?r.item:j+1,isB10?r.tag:r.tagNo,r.description,r.specification,r.materials,
+    [r.item??(j+1),r.tag??r.tagNo,r.description,r.specification,r.materials,
      r.qty??"TBC",price(r.unitUSD),price(r.totalUSD)].forEach((v,k)=>put("BCDEFGHI"[k]+row,v));
     if(code.startsWith("C"))put("J"+row,r.leadTime);
    });
    const totalRow=isB10?20:19;
-   put("B"+totalRow,isB10?"PRE-AWARD B10 FINANCIAL ALLOCATION (USD) — NOT OEM SPARE QUOTE":"Total (USD)");
-   put("I"+totalRow,price([...model.b,...model.c].find(r=>r.code===code).amountUSD));
+   put("B"+totalRow,isB10?"PRE-AWARD B10 FINANCIAL ALLOCATION (USD) — NOT OEM SPARE QUOTE":
+    code.startsWith("C")?"REFERENCE OPTION TOTAL (USD) — NOT QUOTED / NOT OEM OFFER":
+    "PRE-AWARD WORKING PRICE TOTAL (USD) — NOT OEM LINE QUOTE");
+   put("I"+totalRow,price(isB10?
+    [...model.b,...model.c].find(r=>r.code===code).amountUSD:
+    model.otherSpareItemizedAnnex?.summaries?.[code]?.totalUSD));
    if(isB10)put("B21","PRE-AWARD BUDGETARY FINANCIAL ALLOCATION ONLY. Each Qty 1 LOT is a functional budget line, not one physical spare. OEM spare part numbers, actual delivery quantities, quoted CIF unit rates and buyer approval remain outstanding. NOT ISSUED.");
+   if(code==="C1"||code==="C2")put("B20",code==="C1"?
+    "NONPOSTING OPTION PRICE REFERENCE: comparable installed RACON FCA package only; no independent OEM capital spare price or CIF DDP quote.":
+    "SUPERSEDED REV08 HISTORICAL REFERENCE: OEM two-year spare Qty/SKU, B10 exclusion, delivery lead time and 2026 quote unverified; not an offered C2 price.");
   }
   for(const [address,value] of cells){
    if(!new RegExp('<c\\b[^>]*r="'+address+'"').test(xml)){
@@ -490,7 +502,7 @@ export async function buildNativeOfficialRelease0553(file,model){
   changes.set(e.name,encode.encode(xml));
  }
  const result=rebuildZip(entries.filter(e=>!remove(e.name)),changes);
- return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),filename:"PJ2608-0553_ScopeOfSupply_USD.xlsx",warnings};
+ return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),filename:"PJ2608-0553_ScopeOfSupply_USD_PRE_AWARD_NOT_ISSUED.xlsx",warnings:[...warnings,"C1/C2 numbers are nonposting historical/comparable price references, NOT offered optional OEM prices."]};
 }
 
 
