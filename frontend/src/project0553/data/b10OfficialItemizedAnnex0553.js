@@ -12,7 +12,7 @@ export function buildB10OfficialItemizedAnnex0553(official){
   throw Error("0553 B10 Official item allocation needs 4 unissued, priced source MR owners");
  const rows=freeze(parents.flatMap(parent=>{
   const items=base.rows.filter(x=>x.parentSourceId===parent.sourceId);
-  if(!items.length||parent.qty!==[4,3,4,3][parents.indexOf(parent)]||
+  if(!items.length||parent.qty!==({"B10-PTTEP-01":4,"B10-PTTEP-02":3,"B10-PTTEP-03":4,"B10-PTTEP-04":3})[parent.sourceId]||
      !Number.isFinite(parent.totalUSD)||!parent.traceId||!parent.sourceRowModuleId||
      items.some(x=>x.traceId!==parent.traceId||x.sourceRowModuleId!==parent.sourceRowModuleId))
    throw Error("0553 B10 Official cannot map exact functional item to source parent "+parent.sourceId);
