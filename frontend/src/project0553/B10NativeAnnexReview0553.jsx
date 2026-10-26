@@ -43,19 +43,6 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
       <td>{x.tag}<small>{x.mr}</small></td>
       <td><strong>{x.description}</strong></td>
       <td>{x.specification}
-       {internal&&<><small>Source function: {x.originalItemSource}</small>
-        <small>Engineering use: {x.physicalStageNames.join(" / ")}</small>
-        {x.sourceQuoteEvidence.length>0&&<details className="p553-spare-lifecycle-sub">
-         <summary>Optional OEM quote references · not selected as spare cost</summary>
-         {x.sourceQuoteEvidence.map(q=><small key={q.id}>
-          {q.sourceQuoteLine} · {q.partNo} · offered Qty {q.vendorOfferedQty} · USD {money(q.unitCostUSD)}
-         </small>)}
-        </details>}
-        {typeof onOpenSource==="function"&&<button type="button" className="p553-detail-button"
-         onClick={()=>onOpenSource({code:"B10",sourceId:x.parentSourceId,traceId:x.traceId,
-          sourceRowModuleId:x.sourceRowModuleId,sourceModuleId:x.sourceRowModuleId,
-          sourceSelectionId:x.id})}>↗ 10.2 Source {x.id}</button>}
-       </>}
       </td>
       <td>{x.materials}</td>
       <td className="p553-annex-qty">{official?"—":x.presentationQty}
@@ -69,6 +56,24 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
      <th>{official?"To be quoted":money(annex.budgetaryPresentationTotalUSD)}</th></tr></tfoot>
    </table>
   </div>
+  {internal&&<details className="p55-panel p553-b10-source-trace" style={{padding:12}}>
+    <summary><strong>Engineering source / vendor evidence — INTERNAL ONLY</strong>
+     <small>14 individual function trace keys · click to 10.2 Source · no duplicate purchasing post</small></summary>
+    <div className="p553-b10-commercial-scroll"><table className="p55-table p55-table--compact">
+      <thead><tr><th>Function ID</th><th>Stages</th><th>NextG reference / proposed SKU</th><th>Working source</th></tr></thead>
+      <tbody>{annex.rows.map(x=><tr key={x.id}>
+        <td><code>{x.id}</code></td>
+        <td>{x.physicalStageNames.join(" / ")}</td>
+        <td>{x.sourceQuoteEvidence.length?x.sourceQuoteEvidence.map(q=>
+          <small key={q.id}>{q.sourceQuoteLine} · {q.partNo} · USD {money(q.unitCostUSD)}
+           {" "}— expired/unapproved</small>):"No independently priced supplier spare item"}</td>
+        <td>{typeof onOpenSource==="function"&&<button type="button" className="p553-detail-button"
+         onClick={()=>onOpenSource({code:"B10",sourceId:x.parentSourceId,traceId:x.traceId,
+         sourceRowModuleId:x.sourceRowModuleId,sourceModuleId:x.sourceRowModuleId,
+         sourceSelectionId:x.id})}>↗ 10.2 Source</button>}</td>
+      </tr>)}</tbody>
+    </table></div>
+   </details>}
   {internal&&<p className="p553-b10-commercial-note">
    10.2 Source financial owner THB {money(annex.selectedMRKitWorkingSellTHB)}
    {" "}÷ approved planning FX {annex.budgetaryPlanningFX} = USD {money(annex.budgetaryPresentationTotalUSD)}.
