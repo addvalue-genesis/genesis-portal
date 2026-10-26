@@ -84,8 +84,12 @@ for(const html of [internal,external,scopeHtml,officialHtml]){
  assert.equal((html.match(/data-native-b10-source-id=/g)||[]).length,14);
  assert.equal((html.match(/data-b10-requirement-id=/g)||[]).length,14);
  assert(html.includes('data-parent-source-id="B10-PTTEP-01"'));
- if(html===officialHtml)assert(html.includes("To be quoted"));
- else assert(html.includes("16,185.00")&&html.includes("1,820.00"),
+ if(html===officialHtml){
+  assert(html.includes("16,200.00")&&html.includes("1,821.69"),
+   "Official B10 must map USD 16,200 and row rates from its own rounded MR parents");
+  assert(html.includes("PRE-AWARD USD / CIF NOT VERIFIED"));
+  assert(!html.includes("16,185.00"),"Do not display Working-pre-round allocation as Official");
+ }else assert(html.includes("16,185.00")&&html.includes("1,820.00"),
   "Unissued B10 14-line budget split from 10.2 Working missing");
  assert(!html.includes('data-native-b10-source-id="B10-COMP-NG-A-1"'),
   "Part A installed ODU cannot be offered as a physical B10 spare line");
@@ -99,11 +103,14 @@ assert(!officialHtml.includes("Engineering source / vendor evidence — INTERNAL
  "Confidential source evidence must not leak to Official view");
 assert(internal.includes("BUDGETARY WORKING ALLOCATION — USD"),
  "Nonissued allocation must be clearly distinguished from CIF OEM spare unit price");
-assert(officialHtml.includes("CIF ZHUHAI PORT — NOT ISSUED"),
- "Official B10 column heading must not imply CIF spare rates are verified");
+assert(officialHtml.includes("PRE-AWARD USD / CIF NOT VERIFIED"),
+ "Official B10 quoted USD rates must remain conspicuously pre-award and non-OEM");
+assert((officialHtml.match(/data-native-b10-source-id=/g)||[]).length===14);
+assert(!officialHtml.includes("To be quoted"),"Official budgetary lot prices must no longer be blank");
 assert(internal.includes("16,185.00"));
 assert(internal.includes("1,820.00"));
 assert(!officialHtml.includes("16,185.00"),"Official USD source summary may not inherit unissued allocation amounts");
+assert(officialHtml.includes("B10 PRE-AWARD PRICE ALLOCATION — NOT AN OEM SPARE CIF QUOTE"));
 assert(ReactText(internal).includes("10.2 Source"));
 assert(!ReactText(external).includes("10.2 Source"));
 assert(!ReactText(officialHtml).includes("10.2 Source"));
@@ -164,4 +171,4 @@ assert(ReactText(budgetHtml).includes("10.2 Source"));
 assert(css.includes(".p553-b10-commercial-table{width:100%;min-width:0"));
 assert(css.includes(".p553-b10-commercial-scroll{width:100%;max-width:100%;overflow-x:auto"));
 assert(css.includes(".p553-native-sheet{overflow:hidden"));
-console.log("PASS PJ2608-0553 B10: 4 MR kits / 14 Required-BOM stage spare functions, no installed Part A items as B10 purchases, Qty/Unit CIF HOLD, Source→Release→Source THB509827.50/USD16200 preserved");
+console.log("PASS PJ2608-0553 B10: Source 4 MR kits Working THB509827.50 / USD16185, Official 14 source-linked 1-LOT priced budget rows USD16200, two price stages separate, no OEM spare quantity or actual CIF SKU falsely approved");
