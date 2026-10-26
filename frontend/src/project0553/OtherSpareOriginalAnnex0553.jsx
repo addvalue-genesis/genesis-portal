@@ -14,6 +14,7 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null}){
    {option?<><strong>BUDGETARY OPTION REFERENCE ONLY — NOT QUOTED.</strong>
     {" "}{code==="C1"?"The amount uses the installed RACON FCA-equipment commercial comparator; it is not a standalone capital-spare supplier quote.":
      "The amounts are copied from superseded Rev08 historic spare prices, not a current 2026 OEM operating-spares offer. B10 duplicate stock must be excluded."}
+    {" "}C2 historical stock also contains possible B10 duplicate items and an unsupported 7/8-inch RF feeder; it is not a validated material takeoff.
     {" "}These options remain outside the selected A+B quotation.</>:
     <><strong>PRE-AWARD WORKING PRICE BREAKDOWN.</strong>
      {" "}Qty and unit USD derive from the selected {code} Working allowances and reconciled USD Official parent.
@@ -42,6 +43,7 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null}){
   <p className="p553-b10-commercial-note">
    {option?"C1/C2 prices have not been selected as commercial release amounts; the Scope of Supply option price remains Not quoted.":
     "Current selected Working SELL reconciles to 10.3.4 rounded parent. No additional source cost or duplicate posting."}
+   {" "}{code==="B11"?"Exhibit A Annex-8 identifies five telecom tool functions; the four MR phase-price packages do not prove five approved independent tool SKUs, and TETRA versus DMR applicability is open.":""}
    {" "}Original purchaser terms are DDP site; proposed CIF Zhuhai Port requires approval. This is not an issued supplier OEM quotation.
   </p>
  </section>;
