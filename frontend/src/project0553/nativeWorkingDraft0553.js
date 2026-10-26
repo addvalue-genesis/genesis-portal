@@ -461,7 +461,8 @@ export async function buildNativeB10ItemizedReview0553(file,annex){
   !Array.isArray(annex.rows)||annex.rows.length<1||annex.customerReleaseAllowed!==false)
   throw Error("Native B10 review requires original 4-Scope of Supply.xlsx and the nonposting source item map");
  if(annex.rows.some(x=>!x.id||!x.parentSourceId||x.b10PurchaseQty!==null||
-  x.b10UnitSellUSD!==null||x.customerIssueAllowed!==false))
+  x.b10UnitSellUSD!==null||x.customerIssueAllowed!==false||
+  !Number.isFinite(x.budgetaryUnitPriceUSD)||x.presentationQty!==1))
   throw Error("B10 spare buying Qty/SELL may not be assumed from installed quote");
  const bytes=new Uint8Array(await file.arrayBuffer()),entries=entriesFromZip(bytes);
  const wb=entries.find(x=>x.name==="xl/workbook.xml"),sheet=entries.find(x=>x.name==="xl/worksheets/sheet2.xml");
@@ -499,35 +500,34 @@ export async function buildNativeB10ItemizedReview0553(file,annex){
  const totalRow=19+extra,remarkRow=20+extra;
  if(totalRow!==6+annex.rows.length)throw Error("B10 native total row not below all physical items");
  const writes=new Map();
- write(writes,"H4","CIF ZHUHAI PORT — PROPOSED / PRICE NOT CONFIRMED");
- write(writes,"H5","UNIT PRICE (USD) — OEM CIF QUOTE PENDING");
- write(writes,"I5","TOTAL PRICE (USD) — OEM CIF QUOTE PENDING");
+ write(writes,"H4","BUDGETARY WORKING SELL (USD) — NOT ISSUED");
+ write(writes,"H5","UNIT PRICE (USD) — BUDGET LOT");
+ write(writes,"I5","TOTAL PRICE (USD) — BUDGET");
  for(let j=0;j<annex.rows.length;j++){
   const r=annex.rows[j],row=6+j;
   write(writes,"B"+row,r.item);
   write(writes,"C"+row,r.tag);
   write(writes,"D"+row,r.description);
-  write(writes,"E"+row,r.specification+" | Original Item / Source: "+r.originalItemSource+
-   (r.referenceCurrency==="THB"&&Number.isFinite(r.referenceUnit)?
-    " | Original THB "+r.referenceUnit+" at INTERNAL planning FX "+annex.sourceFXTHBPerUSD:""));
-  write(writes,"F"+row,r.owner+" — NOT VERIFIED B10 SPARE");
-  write(writes,"G"+row,Number.isFinite(r.b10PurchaseQty)?r.b10PurchaseQty:"TBC — OEM SPIR");
-  write(writes,"H"+row,Number.isFinite(r.b10UnitSellUSD)?r.b10UnitSellUSD:"NOT QUOTED");
-  write(writes,"I"+row,Number.isFinite(r.b10ExtendedSellUSD)?r.b10ExtendedSellUSD:"NOT QUOTED");
+  write(writes,"E"+row,r.specification);
+  write(writes,"F"+row,r.materials);
+  write(writes,"G"+row,r.presentationQty);
+  write(writes,"H"+row,r.budgetaryUnitPriceUSD);
+  write(writes,"I"+row,r.budgetaryTotalUSD);
  }
- write(writes,"B"+totalRow,"B10 SPARE CIF USD — NOT QUOTED / 14 OEM SPIR FUNCTIONS PENDING");
- write(writes,"I"+totalRow,"NOT QUOTED");
- write(writes,"B"+remarkRow,"INTERNAL REVIEW — selected 14 stage spare functions derived from MR Attachment 5 and Required BOM. "+
-  "CIF Zhuhai Port buyer acceptance, OEM B10 SPIR spare Qty/price and no-duplicate owner are PENDING. "+
-  "Do not sum source reference prices as B10 or customer offer.");
+ write(writes,"B"+totalRow,"B10 TOTAL — ALLOCATED WORKING BUDGET USD / NOT ISSUED");
+ write(writes,"I"+totalRow,annex.budgetaryPresentationTotalUSD);
+ write(writes,"B"+remarkRow,"BUDGETARY WORKING PRICE BREAKDOWN / NOT ISSUED. Each line is 1 LOT functional allowance; "+
+  "its USD Unit Price is the equal share of the corresponding MR kit Working SELL (THB ÷ FX "+annex.budgetaryPlanningFX+"). "+
+  "These amounts are NOT OEM unit rates or confirmed physical spare quantities. "+
+  "Proposed CIF Zhuhai Port requires purchaser acceptance, OEM SPIR, freight/insurance and non-duplication review.");
  for(const [cell,value] of writes)xml=replaceCell(xml,cell,value);
  // Existing 6 original worksheet identities/styles, columns, printing and
  // unrelated ZIP files remain untouched. The cloned row-18 carries native
  // borders/fills/column format into all added B10 lines.
  const out=rebuildZip(entries,new Map([["xl/worksheets/sheet2.xml",encode.encode(xml)]]));
  return {blob:new Blob([out],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),
-  filename:"PJ2608-0553_B10_ORIGINAL_NATIVE_ITEMIZED_SOURCE_REFERENCE_INTERNAL_NOT_RELEASED.xlsx",
+  filename:"PJ2608-0553_B10_ORIGINAL_NATIVE_BUDGETARY_WORKING_ALLOCATION_INTERNAL_NOT_RELEASED.xlsx",
   rowCount:annex.rows.length,originalCapacity:original13,insertedRows:extra,totalRow,
-  warnings:["INTERNAL NONPOSTING B10 — SOURCE quote Qty and unit USD are NOT approved spare purchase Qty/SELL",
-   "Purchaser original DDP heading changed ONLY in this INTERNAL derivative to proposed CIF Zhuhai; contract deviation acceptance and freight/insurance quote still OPEN"]};
+  warnings:["INTERNAL NONPOSTING B10 — USD Unit prices are 10.2 Working envelope allocations, NOT OEM replacement spare rates",
+   "1 LOT means 1 financial allowance line, not one physical spare; purchaser DDP/CIF deviation and final freight/insurance remain open"]};
 }
