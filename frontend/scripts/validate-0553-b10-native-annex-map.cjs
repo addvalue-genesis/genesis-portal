@@ -64,7 +64,8 @@ for(const html of [internal,customer]){
  assert(html.includes("UNIT PRICE (USD)")&&html.includes("TOTAL PRICE (USD)"));
  assert(html.includes("B10 — Original Annex: Spare Part Schedule"));
 }
-assert(internal.includes("Optional OEM quote references · not selected as spare cost"));
+assert(internal.includes("Engineering source / vendor evidence — INTERNAL ONLY"));
+assert(!customer.includes("Engineering source / vendor evidence"));
 assert(internal.includes("sourceSelectionId:x.id")===false); // JSX source expression does not leak to HTML
 assert(!customer.includes("242,460.00"));
 assert(!customer.includes("NG/260916-ADV-DAP1"));
