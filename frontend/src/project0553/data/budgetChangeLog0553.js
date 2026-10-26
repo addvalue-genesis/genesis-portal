@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-26-R59";
+export const CHANGE_LOG_VERSION_0553="2026-10-26-R60";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261026-02",date:"2026-10-26",kind:"PRICE",tone:"caution",
+  title:"B10 original Annex clean technical Description/Materials and 14-line Working budget split",
+  detail:"Removes PENDING/SPIR/internal audit text from B10 customer Detail Specification and Materials cells. 14 MR Attachment-5 functional spare allowance rows remain source-linked, without promoting installed Part A SKU or vendor quote cost into B10 physical stock. Creates read-only 10.2 price attribution: each MR's selected existing kit Working SELL THB is converted to USD using 31.5 and allocated equally across that MR's functional budget lines as 1 LOT presentation units. MR0001 4xUSD1820, MR0002 3xUSD910, MR0003 4xUSD715, MR0004 3xUSD1105; sum USD16185 = current THB509827.50 (FX31.5). This is a FINANCIAL PRESENTATION split, not confirmed OEM spare Qty or per-SKU quote and not issued customer pricing. Adds numeric Qty/Unit/Total to 10.3.3 pre-award preview and six-sheet B10 original Native INTERNAL budget XLSX; moves assumptions to footnote row21, preserves Technical Specification/Materials plain customer-readable, existing B10 source/Release 4 financial parent links, and Official USD16200 summary unchanged. CIF Zhuhai versus original purchaser DDP acceptance remains HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10.budgetary-functional-allocation","bid.budget.working.bc.b10.original-annex-item-map","bid.budget.pricing.release.preview"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner screenshot 26-Oct: Detail Specification and Materials must omit internal notes and B10 price breakdown must use Working"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261026-01",date:"2026-10-26",kind:"ENGINEERING",tone:"neutral",
   title:"B10 Required BOM → four lifecycle stages → original 8-column Annex, not 35 installed items",
