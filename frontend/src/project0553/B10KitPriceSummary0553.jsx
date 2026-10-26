@@ -1,6 +1,7 @@
 import React from "react";
 import {selectB10PhysicalComposition0553} from "./data/b10PhysicalComposition0553";
 import {B10NativeAnnexReview0553} from "./B10NativeAnnexReview0553";
+import {B10StageSpareSelection0553} from "./B10StageSpareSelection0553";
 
 // Commercial-only view of EXISTING B10 source row identities.
 // Never turn vendor source candidate quote lines into released SKU stock.
@@ -45,6 +46,7 @@ export function B10KitPriceSummary0553({
     currency==="USD"?"bid.budget.pricing.official.b10.kit-summary":"bid.budget.pricing.release.preview.annex.b10.kit-summary"}
     data-source-reconciliation="B10_SOURCE_RELEASE_SOURCE">
   <B10NativeAnnexReview0553 internal={internal} onOpenSource={onOpenSource} variant={variant}/>
+  {internal&&<B10StageSpareSelection0553 internal onOpenSource={onOpenSource}/>}
   <div className="p553-b10-commercial-heading">
    <strong>B10 — Kit price summary / reconciliation</strong>
    <small>4 MR-level financial envelopes · 4/3/4/3 commissioning spare sets · same source-owned prices, no added SKU charges</small>
