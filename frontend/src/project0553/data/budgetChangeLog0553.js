@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-25-R58";
+export const CHANGE_LOG_VERSION_0553="2026-10-26-R59";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261026-01",date:"2026-10-26",kind:"ENGINEERING",tone:"neutral",
+  title:"B10 Required BOM → four lifecycle stages → original 8-column Annex, not 35 installed items",
+  detail:"Corrects the critical misclassification of 35 mixed Part A equipment and B10 stock-candidate references as B10 purchasing rows. MR0001 Table5 ZWP20 8 original installed functions (ODU/IDU/ANT/L3/Ex socket/TCAB/SA/Bulk) are verified in a read-only 10.1 required-BOM stage model. All 14 pre-award functional B10 screening candidates derived from MR0001–0004 Attachment 5 and 4 stages Erection/Pre-commissioning/Commissioning/Start-up now drive exactly the same customer-native B-I rows in JSX and a six-sheet working-draft-first Excel export. Original B10 sheet capacity 13 expanded by one row with Total→20 and Remark→21; no additional sheet or loss of other five current Working worksheets. Confirmed B10 physical purchase Qty/unit CIF Sell count still 0; vendor D/E optional old quote prices moved to internal evidence only. Full 4/3/4/3 kit price envelopes and original Working THB509827.50, Official USD16200 retained with Source↔Release parent IDs and exact individual-function navigation. MR Attachment7 excludes proven same B10 stock from C2; Annex8 percentage applies by listed applicable equipment category, NOT every SCADA radio/Cisco unit. Proposed CIF Zhuhai Port is expressly subject to original DDP purchaser form deviation approval. Final customer Release HOLD until OEM SPIR SKU/Qty and CIF unit price established; no invented pricing.",
+  moduleIds:Object.freeze(["bid.budget.bom.zwp20.mr-502-001.4.required-bom","bid.budget.working.bc.b10.stage-spare-selection","bid.budget.working.bc.b10.original-annex-item-map","bid.budget.pricing.release.preview"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner MR0001 Rev.C1 §5, Attachment4/5/7, SPE0001 §8.1, EXA-A8 Attachments 1–2, original 4-Scope of Supply.xlsx"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261025-11",date:"2026-10-25",kind:"DATA_FLOW",tone:"neutral",
   title:"B10 original Annex eight-column UI + native XLSX same-sheet >13-row mapping; CIF/USD qualification",
