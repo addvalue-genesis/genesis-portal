@@ -11,6 +11,35 @@ const from=p=>require(path.join(root,"project0553",p));
 const React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
 const {selectB10NativeAnnexReview0553}=from("data/b10NativeAnnexReview0553.js");
 const {B10NativeAnnexReview0553}=from("B10NativeAnnexReview0553.jsx");
+const {selectB10StageSpareSelection0553}=from("data/b10StageSpareSelection0553.js");
+const {B10StageSpareSelection0553}=from("B10StageSpareSelection0553.jsx");
+const stage=selectB10StageSpareSelection0553();
+assert.equal(stage.upstreamInstalledBomModule,"bid.budget.bom.zwp20.mr-502-001.4.required-bom");
+assert.deepEqual(Array.from(stage.phases),["ERECTION","PRE_COMMISSIONING","COMMISSIONING","START_UP"]);
+assert.equal(stage.originalZwp20RequiredBom.length,8);
+for(const tag of ["MR-502-001","MR-502-001A","ANT-502-001","LAN-502-001",
+ "DATO-507-001","TCAB-500-001","SA-502-001","Bulk Material"]){
+ assert(stage.originalZwp20RequiredBom.some(x=>x.tag===tag),"Installed ZWP20 parent missing "+tag);
+}
+assert.deepEqual(Array.from(stage.commissioningSiteKits).map(x=>x.kits),[4,3,4,3]);
+assert.equal(stage.stageRows.length,14);
+assert(stage.stageRows.every(x=>x.provisionalSelection==="ENGINEERING_SCREENING_CANDIDATE_NOT_CONFIRMED_PURCHASE"&&
+ x.physicalSpareQty===null&&x.replacementSku===null&&x.unitSpareSellUSD===null&&
+ x.oemInterchangeabilityVerified===false));
+assert(stage.stageRows.some(x=>x.phaseApplicability.includes("ERECTION")));
+assert(stage.stageRows.some(x=>x.phaseApplicability.includes("PRE_COMMISSIONING")));
+assert(stage.stageRows.some(x=>x.phaseApplicability.includes("COMMISSIONING")));
+assert(stage.stageRows.some(x=>x.phaseApplicability.includes("START_UP")));
+assert.equal(stage.postingAllowed,false);
+const stageHtml=renderToStaticMarkup(React.createElement(B10StageSpareSelection0553,{internal:true,onOpenSource:()=>{}}));
+assert.equal((stageHtml.match(/data-b10-stage-spare-id=/g)||[]).length,14);
+assert(stageHtml.includes("LAN-502-001")&&stageHtml.includes("MR-502-001"));
+assert(stageHtml.includes("10% rules for PLC Based SCADA"));
+const kitSource=fs.readFileSync(path.join(root,"project0553/B10KitPriceSummary0553.jsx"),"utf8");
+const workingSource=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
+assert(kitSource.includes('<B10StageSpareSelection0553 internal onOpenSource={onOpenSource}/>'));
+assert(workingSource.includes('code==="B10"&&inWorking&&<B10StageSpareSelection0553 internal onOpenSource={onOpenSource}/>'));
+
 const annex=selectB10NativeAnnexReview0553();
 assert.equal(annex.originalSheet,"B10 CommSpares");
 assert.deepEqual(Array.from(annex.layoutColumns),["B","C","D","E","F","G","H","I"]);
