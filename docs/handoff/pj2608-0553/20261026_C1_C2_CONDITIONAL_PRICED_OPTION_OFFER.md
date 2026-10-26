@@ -44,3 +44,15 @@ Check 10.3.3 Part C price THB, C1/C2 annex, 10.3.4 Part C price USD; Export Exce
 
 ## Deliverable
 A separate Part C conditional budgetary quote workbook is prepared from original six-sheet `4-Scope of Supply.xlsx`: `PJ2608-0553_C1_C2_Conditional_Budgetary_Option_Quotation_Rev01.xlsx`. Only Part C Source Summary/Annex fields are newly quoted; other four native template sheets retain their original content and are NOT a standalone complete live project price. This part-C workbook is suitable for internal quotation review, not a firm supplier quotation.
+
+## Final historical C2 Release → Source → Release navigation closure
+- Each of 12 C2 `C2-REV08-01..12` displayed Budgetary Option SKU-family rows retains **its true historical Rev08 source key** (`historicalSourceId`). It is **not** falsely mapped to any of the four new unquoted OEM MR C2 parent lines.
+- `SparePricedBudgetReview0553.jsx` attaches a unique Working-only DOM Module ID `bid.budget.working.bc.c2.priced-budget-review.c2-rev08-##`.
+- `OtherSpareOriginalAnnex0553.jsx` exact “↗ Rev08 Source” navigates to that Working reference row. `CommercialWorkspace.jsx` retains the historic source identity as a separate selection key; the Return action on Working leads to `ReleaseCustomerWorkbook0553.jsx`, which scrolls/highlights the matching `data-other-spare-source-id` C2 Budgetary Annex row.
+- B11/B13 and C1 continue to use their *actual* working financial source row IDs. The 16 original MR financial source→Release traces remain immutable. Historical C2 items do not represent technically approved OEM SKU stock or a confirmed 2026 quotation.
+- `validate-0553-official-usd-release.cjs` now checks historical C2 12/12 selection IDs and read-only exact roundtrip hooks.
+
+## Independent execution and native preview artifact
+A six-sheet **INTERNAL PRE-AWARD REVIEW**, `PJ2608-0553_ABC_Spares_PreAward_Priced_Native_6Sheets_Rev07_INTERNAL.xlsx`, has been generated from the original-format working spreadsheet and conditional Part C candidate workbook. All Annex Qty×Unit and summary totals reconcile: **B10 USD16,200; B11 USD5,100; B13 USD1,500; C1 USD97,500; C2 USD23,000**. The formula error scan reports zero results. Note that this standalone review workbook does not certify a complete issued Part A+B customer proposal. The GENESIS exporter code is independently updated to fill the original six-sheet template; however the user must still run Node/browser regression to confirm its actual output.
+
+For additional confidence the core GitHub **actual JavaScript source functions** `selectSparePricedBudgetReview0553`, `selectOptionBudgetaryOffer0553`, `buildOtherSpareItemizedPresentation0553` and `buildOfficialUsdRelease0553` were dynamically executed in a sandboxed JS test harness with the documented 10.2 Working row values and original Rev08 item list, verifying C1 USD97,500 and C2 12 rows sum USD23,000 while the official A+B main total is independent. This is not the same as `npm run build` on the actual user's entire repository.
