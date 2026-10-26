@@ -35,3 +35,5 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Measure 0550 19-system and 0553 selectors (no financial writes)
         run: node scripts/perf-00-genesis-baseline.cjs
+      - name: Trace 0553 canonical selector duplicate calls (no financial writes)
+        run: node scripts/perf-00-selector-callgraph.cjs
