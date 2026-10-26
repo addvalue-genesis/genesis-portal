@@ -43,6 +43,10 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
          {q.sourceQuoteLine} · {q.partNo} · offered Qty {q.vendorOfferedQty} · vendor reference USD {cash(q.unitCostUSD)}
          {q.quoteExpired?" · expired":""} · NOT APPROVED SPARE SKU</small>)}
        </details>}</>}
+      {internal&&typeof onOpenSource==="function"&&<button type="button" className="p553-detail-button"
+        onClick={()=>onOpenSource({code:"B10",sourceId:x.parentSourceId,traceId:x.traceId,
+        sourceRowModuleId:x.sourceRowModuleId,sourceModuleId:x.sourceRowModuleId,
+        sourceSelectionId:x.id})}>↗ Working Source / {x.id}</button>}
      </td>
      <td>{x.materials}</td><td className="p553-annex-qty">TBC<small>OEM per-type spare Qty, NOT kit count</small></td>
      <td className="p553-b10-commercial-number">To be quoted</td>
