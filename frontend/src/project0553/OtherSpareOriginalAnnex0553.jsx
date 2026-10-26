@@ -32,7 +32,8 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null}){
        onClick={()=>onOpenSource(row.sourceId?{
         code,sourceId:row.sourceId,traceId:row.traceId,
         sourceRowModuleId:row.sourceRowModuleId,sourceModuleId:row.sourceRowModuleId
-       }:{code,sourceModuleId:"bid.budget.working.bc.c2"})}>↗ Source</button>}</td>
+       }:{code,sourceModuleId:"bid.budget.working.bc.c2.priced-budget-review."+row.historicalSourceId.toLowerCase(),
+        historicalSourceId:row.historicalSourceId})}>↗ Rev08 Source</button>}</td>
     <td>{row.tag}</td><td>{row.description}</td><td>{row.specification}</td><td>{row.materials}</td>
     <td>{row.qty} <small>{row.unit}</small></td><td className="p553-price-cell">{fmt(row.unitUSD)}</td>
     <td className="p553-price-cell">{fmt(row.totalUSD)}</td>
