@@ -350,6 +350,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      {code==="B10"?<B10KitPriceSummary0553 rows={annexLines} total={annexModel?.selectedWorkingTHB} internal={internal} onOpenSource={onOpenSource} variant="release"/>:<>
      {["C1","C2"].includes(code)&&<OtherSpareOriginalAnnex0553
        code={code} model={optionItemizedUsd} onOpenSource={internal?onOpenSource:null}/>}
+     <details className="p553-spare-lifecycle-sub" open={!["C1","C2"].includes(code)}>
+      <summary>{["C1","C2"].includes(code)?"Previous 10.2 MR Source / Trace (audit only, not priced option offer)":"Original MR-level Source / Trace"}</summary>
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
      <p className="p553-native-warning"><strong>{code} — {annexModel?.priceLabel||"WORKING REFERENCE"}</strong>
       {" "}· รายการจาก 10.2 — <code>bid.budget.working.bc.{code.toLowerCase()}</code>
@@ -397,6 +399,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         <td>{code.startsWith("B")?money(annexModel?.selectedWorkingTHB):"Not quote"}</td>
         {code.startsWith("C")&&<td/>}</tr>
       </tbody></table></div>
+     </details>
       {internal&&<SparePricedBudgetReview0553 code={code} onOpenSource={onOpenSource} context="release"/>}
       {annexModel&&<div className="p553-annex-reconciliation" role="region" aria-label={code+" source reconciliation"}>
        <table className="p55-table p55-table--compact"><thead>
@@ -407,7 +410,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         <td className="p553-price-cell">{money(annexModel.varianceTHB)}</td>
         <td>{annexModel.reconciled?"Source sums within 0.01 THB · NOT RELEASED":"HOLD — source summary differs from detailed lines"}</td>
        </tr></tbody></table>
-       <p className="p55-note">{code.startsWith("C")?"OPTIONAL · Reference value for working review only; customer sell remains Not quote pending OEM verified cost.":"Budgetary Working Sell from 10.2; unresolved variance is not silently added to any spare item."} One priced row = one type of proposed spare stock; many related TAGs do NOT multiply spare Qty. TAGs shown are equipment-function candidates, NOT proof of interchangeable OEM part numbers.</p>
+       <p className="p55-note">{code.startsWith("C")?"C1/C2 CONDITIONAL BUDGETARY PRICED OPTIONS are prepared; OEM technical/physical SKU/CIF and B10 exclusion remain qualification gates.":"Budgetary Working Sell from 10.2; unresolved variance is not silently added to any spare item."} One priced row = one type of proposed spare stock; many related TAGs do NOT multiply spare Qty. TAGs shown are equipment-function candidates, NOT proof of interchangeable OEM part numbers.</p>
       </div>}
       {internal&&model.sparePriceEvidence&&<details className="p55-panel" style={{padding:12}}>
        <summary><strong>10.2 → 10.3 source-only itemization evidence (NOT customer offer / NOT exported)</strong></summary>
@@ -418,7 +421,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
          <td>{x.id}</td><td>{x.name}</td><td>{x.historicalQty}</td><td>{formatUnit(x.historicalUnitUSD)}</td><td>NOT VERIFIED</td><td>NOT QUOTED</td>
         </tr>)}</tbody>
        </table></div>
-       {code==="C1"&&<p className="p55-note">C1 nonposting full installed RACON package comparator: USD {formatUnit(model.sparePriceEvidence.c1CurrentOptionalReference.referenceFcaUnitUSD)} FCA; one potential replacement budget scenario USD {formatUnit(model.sparePriceEvidence.c1CurrentOptionalReference.indicativeFullReplacementSellScenarioUSD)}. This is NOT a separately priced OEM capital spare and NOT the amount offered to customer.</p>}
+       {code==="C1"&&<p className="p55-note">C1 nonposting full installed RACON package comparator: USD {formatUnit(model.sparePriceEvidence.c1CurrentOptionalReference.referenceFcaUnitUSD)} FCA; one potential replacement budget scenario USD {formatUnit(model.sparePriceEvidence.c1CurrentOptionalReference.indicativeFullReplacementSellScenarioUSD)}. This installed-equipment benchmark is the C1 conditional budgetary option pricing basis, not a firm OEM capital spare rate.</p>}
        {code==="C2"&&<p className="p55-note">C2 historical gross USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.grossHistoricalUSD)}; prospective B10 family overlap USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.potentialB10FunctionalOverlapUSD)}, incompatible legacy 7/8-inch feeder USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.incompatibleSevenEighthFeederHistoricalUSD)}; provisional reference residue USD {formatUnit(model.sparePriceEvidence.c2BudgetScreening.historicalResidualScreeningUSD)}. No validated OEM part/qty/price and no customer posting.</p>}
       </details>}
       <p className="p55-note"><strong>Reverse trace:</strong> 10.3 Annex ↔ 10.2 Owner / Spare Source uses the same source row ID.
@@ -428,7 +431,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       <div className="p553-annex-remark">Remark 注释: {code.startsWith("C")?
        "Above Price of spare parts is valid up to Two years after Delivery date of purchase order":
        "Please include the costs for installation, commissioning, spare parts and special tools in the total price, and provide a detailed breakdown"}</div>
-      <p className="p55-note">10.2 {code}: B Annex shows source-backed Working Sell (NOT direct cost or Released Offer). C Annex shows working reference only in Internal view; customer price remains Not quote until verified OEM cost. Do not double count equipment included in A, startup spares B10, consumables B13 or two-year spares C2.</p>
+      <p className="p55-note">10.2 {code}: B Annex shows source-backed Working Sell (NOT direct cost or Released Offer). C Annex shows owner-selected priced Conditional Budgetary Options, not firm OEM spare cost quotations; excluded from A+B. Do not double count equipment included in A, startup spares B10, consumables B13 or two-year spares C2.</p>
      </>}
     </>}
    </div>
