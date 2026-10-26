@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npm run validate:pj0550-data && npm run validate:pj0550-coverage && webpack --mode production",
+    "build": "npm run validate:pj0550-snapshot && npm run validate:pj0550-data && npm run validate:pj0550-coverage && npm run validate:pj0550-evidence && webpack --mode production",
+    "validate:pj0550-snapshot": "node scripts/validate-pj2608-0550-snapshot.cjs",
+    "validate:pj0550-evidence": "node scripts/validate-pj2608-0550-evidence.cjs",
     "validate:pj0550-coverage": "node scripts/validate-pj2608-0550-coverage.cjs",
     "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs"
   },

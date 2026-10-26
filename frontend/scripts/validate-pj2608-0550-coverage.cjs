@@ -2,7 +2,7 @@
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const path = require("node:path");
-const crypto = require("node:crypto");
+const { assertControlledSnapshot } = require("./assert-pj2608-0550-snapshot.cjs");
 const babel = require("@babel/core");
 const root = path.resolve(__dirname, "../src");
 const previousJs = require.extensions[".js"], previousJsx = require.extensions[".jsx"];
@@ -16,7 +16,7 @@ function resolve(obj, pointer) { return pointer.slice(1).split("/").reduce((v,k)
 try {
   const snapshotFile = path.join(root, "project0550/data/snapshots/pj2608-0550.rev07.json");
   const raw = fs.readFileSync(snapshotFile);
-  assert.equal(crypto.createHash("sha256").update(raw).digest("hex"), "78832b4ea11b3c2781d3fe10183db071967056966e908bd63b570475fb84ed41", "Controlled Rev10 snapshot changed; explicit new authority/revision required");
+  assertControlledSnapshot(raw);
   const source = freeze(JSON.parse(raw));
   const {buildCoverageMatrix, PAGA_REVIEW_PLAN, EQUATION_REUSE_CROSSWALK} = require(path.join(root,"project0550/coverageModel.js"));
   const {MODULE_REGISTRY} = require(path.join(root,"project0550/moduleRegistry.js"));

@@ -1528,3 +1528,10 @@
     gap: 2px;
   }
 }
+.p55-evidence-review small { display: block; line-height: 1.5; }
+.p55-evidence-review details { margin: 8px 0; padding: 10px 12px; }
+.p55-evidence-review summary { cursor: pointer; line-height: 1.5; }
+.p55-evidence-review details[open] > summary { margin-bottom: 12px; font-weight: 600; }
+.p55-evidence-sources { padding-left: 20px; }
+.p55-evidence-sources li { margin: 8px 0; line-height: 1.5; }
+.p55-evidence-sources a { overflow-wrap: anywhere; }

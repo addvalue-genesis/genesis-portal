@@ -31,9 +31,47 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
  await ups.getByText('E01 · Applicability and cost ownership',{exact:true}).waitFor({state:'visible'});
  await click('Budget');
  }
+ if(process.env.PRIVATE_EVIDENCE_FILE) {
+ const assert=require('node:assert/strict'), payload=fs.readFileSync(process.env.PRIVATE_EVIDENCE_FILE,'utf8'), evidence=JSON.parse(payload);
+ await click('First Principles');
+ const panel=page.getByTestId('paga-evidence-review'), input=panel.getByLabel('PAGA Evidence JSON');
+ assert.equal(await panel.locator('[data-requirement-id]').count(),0,'Private evidence must not be bundled');
+ const importStart=Date.now();await input.setInputFiles({name:'private-evidence.json',mimeType:'application/json',buffer:Buffer.from(payload)});
+ await panel.getByText('Final Release: HOLD · Financial posting: NONE',{exact:true}).waitFor();
+ metrics['Evidence import']=[Date.now()-importStart];
+ assert.equal(await panel.locator('[data-requirement-id]').count(),evidence.requirements.length);
+ const groupKeys=[...new Set([...evidence.quantityRows,...evidence.tags].map(r=>`${r.site}/${r.category}`))];
+ assert.equal(await panel.locator('[data-quantity-group]').count(),groupKeys.length);
+ for(const key of groupKeys){
+  const [site,category]=key.split('/'), mr=evidence.quantityRows.filter(q=>q.site===site&&q.category===category), tags=evidence.tags.filter(t=>t.site===site&&t.category===category);
+  const qty=mr.length&&mr.every(r=>r.quantity!==null)?mr.reduce((n,r)=>n+r.quantity,0):null;
+  const count=tags.length?new Set(tags.map(t=>t.tag)).size:null;
+  const cells=await panel.locator(`[data-quantity-group="${key}"] td`).allInnerTexts();
+  assert.equal(cells[1],qty===null?'OPEN':String(qty));assert.equal(cells[2],count===null?'OPEN':String(count));
+ }
+ await panel.locator('[data-requirement-id]').first().locator('summary').click();
+ await panel.getByText('Scope responsibility in source:',{exact:false}).first().waitFor({state:'visible'});
+ if(process.env.EVIDENCE_SCREENSHOT)await page.screenshot({path:process.env.EVIDENCE_SCREENSHOT});
+ await panel.getByText('Source TAG register',{exact:true}).click();
+ assert.equal(await panel.getByRole('table',{name:'PAGA source TAG register'}).locator('tbody tr').count(),evidence.tags.length);
+ await panel.getByLabel('PAGA TAG site').selectOption('ACP');
+ assert.equal(await panel.getByRole('table',{name:'PAGA source TAG register'}).locator('tbody tr').count(),evidence.tags.filter(t=>t.site==='ACP').length);
+ await click('Budget');await save('budgetary');await click('Working Preview');await save('working');await click('Released Customer Output');await save('released');await click('Budgetary Submission');
+ await click('19 Systems');await save('systems');await click('First Principles');
+ assert.equal(await panel.locator('[data-requirement-id]').count(),evidence.requirements.length,'Evidence did not survive tab change');
+ await input.setInputFiles({name:'invalid.json',mimeType:'application/json',buffer:Buffer.from('{"projectId":"PJ2608-0553"}')});
+ await panel.getByRole('alert').waitFor();assert.equal(await panel.locator('[data-requirement-id]').count(),0,'Invalid import retained stale evidence');
+ await input.setInputFiles({name:'private-evidence.json',mimeType:'application/json',buffer:Buffer.from(payload)});
+ await panel.getByText('Final Release: HOLD · Financial posting: NONE',{exact:true}).waitFor();
+ await panel.getByRole('button',{name:'ล้างชุดหลักฐาน',exact:true}).click();
+ assert.equal(await panel.locator('[data-requirement-id]').count(),0,'Clear failed');
+ await input.setInputFiles({name:'private-evidence.json',mimeType:'application/json',buffer:Buffer.from(payload)});
+ await panel.getByText('Final Release: HOLD · Financial posting: NONE',{exact:true}).waitFor();
+ await click('Budget');
+ }
  const start=Date.now(),downloadPromise=page.waitForEvent('download');await page.getByRole('button',{name:'Export SAMTEL Rev00 XLSX',exact:true}).click();const download=await downloadPromise;const bytes=fs.readFileSync(await download.path());hashes.xlsx=hash(bytes);metrics['XLSX download']=[Date.now()-start];
  const details=await page.evaluate(()=>({longtasks:window.__longtasks,domNodes:document.querySelectorAll('*').length,memory:performance.memory?{usedJSHeapSize:performance.memory.usedJSHeapSize}:null,navigation:performance.getEntriesByType('navigation').map(n=>({domContentLoaded:n.domContentLoadedEventEnd,load:n.loadEventEnd}))}));
- const report={coverageInteractions:process.env.CHECK_COVERAGE==='1'?'PASS':'NOT_RUN',browser:await browser.version(),viewport:'1440x1000',method:'production; click-to-two-animation-frames; warm 7 cycles; headless environment, not user Windows; memory coarse; not React Profiler',metrics:Object.fromEntries(Object.entries(metrics).map(([k,v])=>{const a=v.slice().sort((a,b)=>a-b);return[k,{n:a.length,medianMs:+a[Math.floor(a.length/2)].toFixed(3),maxMs:+a.at(-1).toFixed(3)}]})),hashes,errors,...details};if(errors.length)throw new Error('Browser errors: '+errors.join('; '));
+ const report={evidenceInteractions:process.env.PRIVATE_EVIDENCE_FILE?'PASS':'NOT_RUN',coverageInteractions:process.env.CHECK_COVERAGE==='1'?'PASS':'NOT_RUN',browser:await browser.version(),viewport:'1440x1000',method:'production; click-to-two-animation-frames; warm 7 cycles plus optional evidence interactions; import is wall-clock automation time; headless environment, not user Windows; memory coarse; not React Profiler',metrics:Object.fromEntries(Object.entries(metrics).map(([k,v])=>{const a=v.slice().sort((a,b)=>a-b);return[k,{n:a.length,medianMs:+a[Math.floor(a.length/2)].toFixed(3),maxMs:+a.at(-1).toFixed(3)}]})),hashes,errors,...details};if(errors.length)throw new Error('Browser errors: '+errors.join('; '));
  if(process.env.BASELINE_REPORT){
   const before=JSON.parse(fs.readFileSync(process.env.BASELINE_REPORT,'utf8'));
   for(const key of ['systems','budgetary','working','released','xlsx']) {
