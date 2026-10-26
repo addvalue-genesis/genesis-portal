@@ -73,8 +73,11 @@ export function buildOtherSpareItemizedPresentation0553(official){
    displayed=priceRows.map((x,i)=>{
     const c1=code==="C1";
     return freeze({id:x.id,code,item:String(i+1),tag:c1?x.tag:"Two-year operating stock / TAG by OEM",
-     description:x.description,
-     specification:c1?"Complete marine RACON spare equipment assembly for X/S-band service and compatible control/power interfaces.":c2Spec(x.description),
+     description:!c1&&/7\/8-inch RF cable/i.test(x.description)?
+      "RF feeder service cable — compatible with installed feeder size":x.description,
+     specification:c1?"Complete marine RACON spare equipment assembly for X/S-band service and compatible control/power interfaces.":
+      /7\/8-inch RF cable/i.test(x.description)?"RF cable spare to match the installed feeder diameter, impedance, connector and required service length.":
+      c2Spec(x.description),
      materials:c1?"Marine-certified RF beacon, control assembly and mounting/service accessories":
       "OEM replacement component or compatible service material",
      qty:x.qty,unit:x.unit,unitUSD:x.unitUSD,totalUSD:x.totalUSD,
