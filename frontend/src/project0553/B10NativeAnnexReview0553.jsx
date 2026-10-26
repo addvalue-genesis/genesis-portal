@@ -47,7 +47,13 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
     <tbody>{groups.flatMap(mr=>annex.rows.filter(x=>x.mr===mr).map(x=>
      <tr key={x.id} data-native-b10-source-id={x.id}
       data-b10-requirement-id={x.id} data-parent-source-id={x.parentSourceId}>
-      <td><strong>{x.item}</strong></td>
+      <td><strong>{x.item}</strong>
+       {official&&typeof onOpenSource==="function"&&
+        <button type="button" className="p553-detail-button" title={"Review B10 Source "+x.id}
+         onClick={()=>onOpenSource({code:"B10",sourceId:x.parentSourceId,traceId:x.traceId,
+          sourceRowModuleId:x.sourceRowModuleId,sourceModuleId:x.sourceRowModuleId,
+          sourceSelectionId:x.id})}>↗ Source</button>}
+      </td>
       <td>{x.tag}<small>{x.mr}</small></td>
       <td><strong>{x.description}</strong></td>
       <td>{x.specification}
