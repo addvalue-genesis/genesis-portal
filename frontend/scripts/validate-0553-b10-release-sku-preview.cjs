@@ -89,8 +89,11 @@ for(const html of [internal,external,scopeHtml,officialHtml]){
 }
 assert(!external.includes("242,460.00"),"No Part A supplier cost leaked into customer preview");
 assert(!officialHtml.includes("242,460.00"),"No supplier price in Official customer preview");
-assert(internal.includes("Original quote evidence (NOT CIF B10 price)"),
- "Supplier pricing is evidence only, never CIF B10 sell");
+assert(internal.includes("Optional OEM quote references · not selected as spare cost"),
+ "Supplier pricing is evidence only and not OEM CIF B10 sell");
+assert(internal.includes("16,185.00"));
+assert(internal.includes("1,820.00"));
+assert(!officialHtml.includes("16,185.00"),"Official USD source summary may not inherit unissued allocation amounts");
 assert(ReactText(internal).includes("10.2 Source"));
 assert(!ReactText(external).includes("10.2 Source"));
 assert(!ReactText(officialHtml).includes("10.2 Source"));
