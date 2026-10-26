@@ -5,6 +5,8 @@ require.extensions['.css']=()=>{};
 const {buildReleaseCommercialModel0553}=require('../src/project0553/data/releaseCommercialModel0553');
 const {buildOfficialUsdRelease0553,quoteUsd0553}=require('../src/project0553/data/officialUsdRelease0553');
 const {buildNativeOfficialRelease0553}=require('../src/project0553/nativeWorkingDraft0553');
+const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const {OtherSpareOriginalAnnex0553}=require('../src/project0553/OtherSpareOriginalAnnex0553');
 const source=buildReleaseCommercialModel0553({thbPerUsd:31.5}),before=JSON.stringify(source),model=buildOfficialUsdRelease0553(source);
 assert.equal(quoteUsd0553(3150),100);assert.equal(quoteUsd0553(3150.01),200);assert.equal(quoteUsd0553(0),0);assert.equal(quoteUsd0553(null),null);
 assert.throws(()=>quoteUsd0553(-1));assert.throws(()=>quoteUsd0553(1,{thbPerUsd:0,incrementUSD:100}));
@@ -65,9 +67,9 @@ const reordered=buildOfficialUsdRelease0553({...source,annex:{...source.annex,B1
 for(const row of reordered.annex.B10)assert.equal(row.specification,model.annex.B10.find(r=>r.sourceId===row.sourceId).specification);
 assert.throws(()=>buildOfficialUsdRelease0553({...source,annex:{...source.annex,B10:source.annex.B10.map((r,i)=>i===0?{...r,sourceId:'UNKNOWN'}:r)}}));
 assert.equal(JSON.stringify(source),before,'Source model must not mutate');
-const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+
 const {OfficialUsdRelease0553}=require('../src/project0553/OfficialUsdRelease0553');
-const {OtherSpareOriginalAnnex0553}=require('../src/project0553/OtherSpareOriginalAnnex0553');
+
 const html=renderToStaticMarkup(React.createElement(OfficialUsdRelease0553,{source}));
 assert(html.includes(model.totalUSD.toLocaleString('en-US',{minimumFractionDigits:2})));
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
