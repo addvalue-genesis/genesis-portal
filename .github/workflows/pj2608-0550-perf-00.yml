@@ -1,0 +1,41 @@
+name: PJ2608-0550 PERF-00 Baseline
+
+on:
+  push:
+    branches:
+      - "perf/pj2608-0550-baseline-*"
+  pull_request:
+    branches:
+      - "feat/pj2608-0550-tpp-ui-rev04"
+    paths:
+      - "frontend/scripts/perf-00-pj2608-0550.cjs"
+      - ".github/workflows/pj2608-0550-perf-00.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout revision
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install locked packages
+        run: npm ci --no-audit --no-fund
+      - name: Validate 0550 controlled source snapshot
+        run: npm run validate:pj0550-data
+      - name: Run read-only 19-system benchmark
+        run: node scripts/perf-00-pj2608-0550.cjs
+      - name: Production build without changing project data
+        run: npm run build
