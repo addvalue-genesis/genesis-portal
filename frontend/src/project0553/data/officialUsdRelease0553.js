@@ -71,7 +71,21 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
   serviceText:serviceText(r.serviceCommercialBasis),qty:1,unit:"lot",amountUSD:quoteUsd0553(thb,policy),
   sourceTHB:thb??null,sourceModuleId:r.sourceModuleId||r.moduleId,
   locations:[...new Set((r.sourceRows||[]).map(x=>x.site).filter(Boolean))].join(", "),mr:r.mr||""});
- const a=source.a.map(r=>line(r,r.previewSellTHB)),b=source.b.map(r=>line(r,r.customerSellTHB)),c=source.c.map(r=>line(r,r.customerSellTHB));
+ const a=source.a.map(r=>line(r,r.previewSellTHB)),b=source.b.map(r=>line(r,r.customerSellTHB)),
+  c=source.c.map(r=>{
+   const normal=line(r,r.customerSellTHB);
+   if(!r.budgetaryOfferPrepared||!Number.isFinite(r.budgetaryOptionOfferTHB)||
+      !Number.isFinite(r.budgetaryOptionOfferUSD)||Number.isFinite(normal.amountUSD)||
+      r.customerOfferIssued!==false||r.firmOemQuote!==false)
+    throw Error("0553 C1/C2 conditional budgetary option quote lacks source price authority");
+   const budgetUsd=quoteUsd0553(r.budgetaryOptionOfferTHB,policy);
+   if(budgetUsd!==r.budgetaryOptionOfferUSD)
+    throw Error("0553 option quote USD must match canonical 10.3 Source→Release rounding");
+   return {...normal,budgetaryOptionQuoteUSD:budgetUsd,
+    budgetaryOptionOfferTHB:r.budgetaryOptionOfferTHB,conditionalPriceState:r.budgetaryOfferStatus,
+    budgetaryOfferSourceId:r.budgetaryOfferSourceId,budgetaryOfferSourceModuleId:r.budgetaryOfferSourceModuleId,
+    budgetaryOfferPrepared:true,firmOemQuote:false,optionExcludedFromBase:true};
+  });
  const rows=[...a,...b,...c],annex={};
  for(const code of ["B10","B11","B13","C1","C2"]){
   const items=source.annex[code]||[],parent=rows.find(r=>r.code===code);
