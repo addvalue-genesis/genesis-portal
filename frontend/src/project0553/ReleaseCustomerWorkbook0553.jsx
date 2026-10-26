@@ -40,7 +40,7 @@ const addKnown=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?Math.round((a+b)*10
 export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSource=()=>{},focusAnnexTarget=null,title="10.3 — Customer Release"}){
  const [sheet,setSheet]=useState("Scope of supply");
  // Source→Release: resolve one exact B/C spare row, never change a price.
- const focusKey=focusAnnexTarget?.code+"::"+focusAnnexTarget?.sourceId+"::"+focusAnnexTarget?.seq;
+ const focusKey=focusAnnexTarget?.code+"::"+focusAnnexTarget?.sourceId+"::"+(focusAnnexTarget?.sourceSelectionId||"")+"::"+focusAnnexTarget?.seq;
  useEffect(()=>{
   if(!focusAnnexTarget?.code)return;
   const matched=WORKSHEETS.find(([name,code])=>code===focusAnnexTarget.code);
@@ -52,7 +52,11 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   if(!matched||matched[0]!==sheet)return;
   const targetId="bid.budget.pricing.release.preview.annex."+
    focusAnnexTarget.code.toLowerCase()+"."+focusAnnexTarget.sourceId.toLowerCase();
-  const target=[...document.querySelectorAll("[data-component-key]")]
+  const requestedStageRow=focusAnnexTarget.code==="B10"&&focusAnnexTarget.sourceSelectionId;
+  const selectedStage=requestedStageRow?[...document.querySelectorAll("[data-native-b10-source-id]")].
+   find(node=>node.getAttribute("data-native-b10-source-id")===focusAnnexTarget.sourceSelectionId&&
+    node.closest('[data-component-key="bid.budget.pricing.release.preview"]')):null;
+  const target=selectedStage||[...document.querySelectorAll("[data-component-key]")]
    .find(node=>node.getAttribute("data-component-key")===targetId);
   if(target){
    for(let node=target;node;node=node.parentElement){
