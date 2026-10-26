@@ -11,9 +11,9 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null}){
   <div className="p553-b10-commercial-heading"><strong>{code} — Original Annex · Qty × Unit USD × Total USD</strong>
    <small>{rows.length} price lines from {option?"Source comparator / superseded historical reference":"selected 10.2 Working financial source"}</small></div>
   <p className="p553-b10-commercial-note">
-   {option?<><strong>BUDGETARY OPTION REFERENCE ONLY — NOT QUOTED.</strong>
+   {option?<><strong>CONDITIONAL BUDGETARY OFFER — PRICED OPTION.</strong>
     {" "}{code==="C1"?"The amount uses the installed RACON FCA-equipment commercial comparator; it is not a standalone capital-spare supplier quote.":
-     "The amounts are copied from superseded Rev08 historic spare prices, not a current 2026 OEM operating-spares offer. B10 duplicate stock must be excluded."}
+     "The proposed two-year stock option uses a superseded Rev08 pricing baseline with conditional technical substitutions; actual OEM 2026 rates and B10 duplicate stock exclusion must be verified."}
     {" "}C2 historical stock also contains possible B10 duplicate items and an unsupported 7/8-inch RF feeder; it is not a validated material takeoff.
     {" "}These options remain outside the selected A+B quotation.</>:
     <><strong>PRE-AWARD WORKING PRICE BREAKDOWN.</strong>
@@ -37,11 +37,11 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null}){
     <td>{row.qty} <small>{row.unit}</small></td><td className="p553-price-cell">{fmt(row.unitUSD)}</td>
     <td className="p553-price-cell">{fmt(row.totalUSD)}</td>
     {option&&<td>{row.leadTime}</td>}</tr>)}</tbody>
-   <tfoot><tr><th colSpan={7}>TOTAL (USD) — {option?"REFERENCE OPTION, NOT QUOTED":"WORKING/RELEASE PRICE, PRE-AWARD"}</th>
+   <tfoot><tr><th colSpan={7}>TOTAL (USD) — {option?"CONDITIONAL BUDGETARY OPTION SELL — USD":"WORKING/RELEASE PRICE, PRE-AWARD"}</th>
     <th className="p553-price-cell">{fmt(summary.totalUSD)}</th>{option&&<th/>}</tr></tfoot>
   </table></div>
   <p className="p553-b10-commercial-note">
-   {option?"C1/C2 prices have not been selected as commercial release amounts; the Scope of Supply option price remains Not quoted.":
+   {option?"C1/C2 budgetary option prices are proposed commercially on a conditional basis, not supplier-confirmed OEM prices. They are excluded from Total A+B.":
     "Current selected Working SELL reconciles to 10.3.4 rounded parent. No additional source cost or duplicate posting."}
    {" "}{code==="B11"?"Exhibit A Annex-8 identifies five telecom tool functions; the four MR phase-price packages do not prove five approved independent tool SKUs, and TETRA versus DMR applicability is open.":""}
    {" "}Original purchaser terms are DDP site; proposed CIF Zhuhai Port requires approval. This is not an issued supplier OEM quotation.
