@@ -317,21 +317,23 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-highlight"><td colSpan={8}>Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
        {model.c.map(r=>{
-        const reference=optionalPriceReview.totals[r.code];
-        if(!Number.isFinite(reference)||reference<=0||Number.isFinite(r.customerSellTHB))
-         throw Error("0553 Part C requires distinct unissued, positive budget-reference and null offered sell: "+r.code);
-        return <tr key={r.code} data-cost-owner={r.code} data-option-price-status="REFERENCE_NOT_OFFERED">
+        const reference=r.budgetaryOptionOfferTHB;
+        if(!Number.isFinite(reference)||reference<=0||Number.isFinite(r.customerSellTHB)||
+            r.budgetaryOfferStatus!=="CONDITIONAL_BUDGETARY_OFFER"||
+            r.budgetaryOfferPrepared!==true||r.customerOfferIssued!==false)
+         throw Error("0553 Part C must have explicitly prepared conditional budgetary offer: "+r.code);
+        return <tr key={r.code} data-cost-owner={r.code} data-option-price-status="CONDITIONAL_BUDGETARY_OFFER">
          <td><strong>{r.code}</strong></td>
          <td colSpan={3}>{parseName(r.code)} {sourceButton(r)}</td>
-         <td>1 lot <small>Budget reference</small></td>
+         <td>1 lot <small>Conditional budgetary option</small></td>
          <td className="p553-price-cell"><strong>{money(reference)}</strong>
-          <small>THB / reference, NOT QUOTED</small></td>
+          <small>THB · Conditional Budgetary Offer</small></td>
          <td className="p553-price-cell"><strong>{money(reference)}</strong>
-          <small>THB / reference, NOT QUOTED</small></td>
+          <small>THB · Conditional Budgetary Offer</small></td>
          <td>refer to Annex {r.code} · OPTION
           <small>{r.code==="C1"?"Installed RACON FCA equipment comparator; independent OEM capital spare quote unavailable":
            "Superseded Rev08 two-year spares pricing; OEM quantity/SKU and B10 overlap not verified"}</small>
-          <small>Budgetary estimate only · Excluded from Total A+B · No customer price approval</small>
+          <small>PRICE OFFERED — CONDITIONAL BUDGETARY / subject to OEM part, physical Qty, CIF and technical reconciliation · Excluded from Total A+B</small>
           {internal&&<button type="button" className="p553-detail-button"
            onClick={()=>setSheet(WORKSHEETS.find(([,code])=>code===r.code)?.[0]||sheet)}>↗ Annex {r.code}</button>}
          </td></tr>;
