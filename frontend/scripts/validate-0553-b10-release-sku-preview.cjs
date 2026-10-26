@@ -84,7 +84,9 @@ for(const html of [internal,external,scopeHtml,officialHtml]){
  assert.equal((html.match(/data-native-b10-source-id=/g)||[]).length,14);
  assert.equal((html.match(/data-b10-requirement-id=/g)||[]).length,14);
  assert(html.includes('data-parent-source-id="B10-PTTEP-01"'));
- assert(html.includes("TBC")&&html.includes("To be quoted"));
+ if(html===officialHtml)assert(html.includes("To be quoted"));
+ else assert(html.includes("16,185.00")&&html.includes("1,820.00"),
+  "Unissued B10 14-line budget split from 10.2 Working missing");
  assert(!html.includes('data-native-b10-source-id="B10-COMP-NG-A-1"'));
 }
 assert(!external.includes("242,460.00"),"No Part A supplier cost leaked into customer preview");
