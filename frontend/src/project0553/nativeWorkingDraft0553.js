@@ -499,9 +499,9 @@ export async function buildNativeB10ItemizedReview0553(file,annex){
  const totalRow=19+extra,remarkRow=20+extra;
  if(totalRow!==6+annex.rows.length)throw Error("B10 native total row not below all physical items");
  const writes=new Map();
- write(writes,"H4","CIF ZHUHAI PORT — PROPOSED / SOURCE PRICE NOT CIF");
- write(writes,"H5","SOURCE UNIT USD (NOT CIF SELL)");
- write(writes,"I5","SOURCE TOTAL USD (NOT CIF SELL)");
+ write(writes,"H4","CIF ZHUHAI PORT — PROPOSED / PRICE NOT CONFIRMED");
+ write(writes,"H5","UNIT PRICE (USD) — OEM CIF QUOTE PENDING");
+ write(writes,"I5","TOTAL PRICE (USD) — OEM CIF QUOTE PENDING");
  for(let j=0;j<annex.rows.length;j++){
   const r=annex.rows[j],row=6+j;
   write(writes,"B"+row,r.item);
@@ -511,13 +511,13 @@ export async function buildNativeB10ItemizedReview0553(file,annex){
    (r.referenceCurrency==="THB"&&Number.isFinite(r.referenceUnit)?
     " | Original THB "+r.referenceUnit+" at INTERNAL planning FX "+annex.sourceFXTHBPerUSD:""));
   write(writes,"F"+row,r.owner+" — NOT VERIFIED B10 SPARE");
-  write(writes,"G"+row,Number.isFinite(r.referenceQty)?r.referenceQty:"TBC");
-  write(writes,"H"+row,Number.isFinite(r.referenceUnitUSD)?r.referenceUnitUSD:"NOT QUOTED");
-  write(writes,"I"+row,Number.isFinite(r.referenceExtendedUSD)?r.referenceExtendedUSD:"NOT QUOTED");
+  write(writes,"G"+row,Number.isFinite(r.b10PurchaseQty)?r.b10PurchaseQty:"TBC — OEM SPIR");
+  write(writes,"H"+row,Number.isFinite(r.b10UnitSellUSD)?r.b10UnitSellUSD:"NOT QUOTED");
+  write(writes,"I"+row,Number.isFinite(r.b10ExtendedSellUSD)?r.b10ExtendedSellUSD:"NOT QUOTED");
  }
- write(writes,"B"+totalRow,"B10 CIF SPARE SELL TOTAL: TO BE QUOTED (SOURCE REFERENCE NOT ADDITIVE)");
+ write(writes,"B"+totalRow,"B10 SPARE CIF USD — NOT QUOTED / 14 OEM SPIR FUNCTIONS PENDING");
  write(writes,"I"+totalRow,"NOT QUOTED");
- write(writes,"B"+remarkRow,"INTERNAL REVIEW — quoted installed/optional Qty and prices are SOURCE REFERENCES only. "+
+ write(writes,"B"+remarkRow,"INTERNAL REVIEW — selected 14 stage spare functions derived from MR Attachment 5 and Required BOM. "+
   "CIF Zhuhai Port buyer acceptance, OEM B10 SPIR spare Qty/price and no-duplicate owner are PENDING. "+
   "Do not sum source reference prices as B10 or customer offer.");
  for(const [cell,value] of writes)xml=replaceCell(xml,cell,value);
