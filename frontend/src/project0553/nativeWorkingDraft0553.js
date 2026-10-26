@@ -362,7 +362,8 @@ export async function buildNativeWorkingDraft0553(file,model){
 function expandOriginalB10To14Rows0553(xml){
  if(xml.includes('<mergeCell ref="B20:H20"')&&xml.includes('<mergeCell ref="B21:E21"')){
   if(!/<row\b[^>]*\br="19"/.test(xml))throw Error("B10 expanded row 19 absent");
-  return xml;
+  return xml.replace(/<row\b[^>]*\br="21"[^>]*>/,tag=>
+   /\bht=/.test(tag)?tag.replace(/\bht="[^"]*"/,'ht="115"'):tag.replace(">",' ht="115" customHeight="1">'));
  }
  if(!xml.includes('<mergeCell ref="B19:H19"')||!xml.includes('<mergeCell ref="B20:E20"'))
   throw Error("B10 original footer merges changed");
@@ -384,7 +385,8 @@ function expandOriginalB10To14Rows0553(xml){
    a+col1+(Number(r1)+1)+":"+col2+(Number(r2)+1)+q:m);
  if(!xml.includes('<mergeCell ref="B20:H20"')||!xml.includes('<mergeCell ref="B21:E21"'))
   throw Error("B10 footer merge shift failed");
- return xml;
+ return xml.replace(/<row\b[^>]*\br="21"[^>]*>/,tag=>
+  /\bht=/.test(tag)?tag.replace(/\bht="[^"]*"/,'ht="115"'):tag.replace(">",' ht="115" customHeight="1">'));
 }
 
 // Generate a separate English customer workbook from original geometry.
