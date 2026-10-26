@@ -412,7 +412,21 @@ export async function buildNativeOfficialRelease0553(file,model){
    put("A6","Part A: Equipment");put("A7","Main Equipment");
    model.a.forEach((r,j)=>{const row=8+j;put("A"+row,r.code);put("B"+row,r.mr);put("C"+row,r.description);put("D"+row,r.locations);put("E"+row,"1 lot");put("F"+row,price(r.amountUSD));put("G"+row,price(r.amountUSD));});
    put("A23","Part B: Services and Other Supplies");
-   const fill=(r,row)=>{put("A"+row,r.code);put("B"+row,[r.description,r.serviceText].filter(Boolean).join("\n"));put("E"+row,"1 lot");put("F"+row,price(r.amountUSD));put("G"+row,price(r.amountUSD));if(model.annex[r.code])put("H"+row,"Refer to Annex "+r.code);};
+   const fill=(r,row)=>{
+     const isOption=r.code==="C1"||r.code==="C2";
+     const ref=isOption?model.otherSpareItemizedAnnex?.summaries?.[r.code]:null;
+     if(isOption&&(!Number.isFinite(ref?.totalUSD)||ref.selectedWorking!==false||
+        ref.clientOfferApproved!==false||Number.isFinite(r.amountUSD)))
+      throw Error("0553 Native Part C reference must not be selected as an actual offer");
+     const amount=isOption?ref.totalUSD:r.amountUSD;
+     const displayText=[r.description,r.serviceText,
+      isOption?"REFERENCE VALUE ONLY / NOT QUOTED / NOT AN OEM SPARE OFFER":null]
+      .filter(Boolean).join("\n");
+     put("A"+row,r.code);put("B"+row,displayText);put("E"+row,"1 lot");
+     put("F"+row,price(amount));put("G"+row,price(amount));
+     if(model.annex[r.code])put("H"+row,"Refer to Annex "+r.code+
+      (isOption?" / NOT QUOTED / nonposting budget reference / excludes A+B":""));
+    };
    model.b.forEach((r,j)=>fill(r,24+j));model.c.forEach((r,j)=>fill(r,41+j));
    put("A38","Total A+B (USD)"+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
    put("A39","Prices cover the items described above and are subject to the stated scope and qualifications.");
