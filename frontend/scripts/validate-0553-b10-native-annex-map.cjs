@@ -13,6 +13,7 @@ const {selectB10StageSpareSelection0553}=from("data/b10StageSpareSelection0553.j
 const {selectB10NativeAnnexReview0553}=from("data/b10NativeAnnexReview0553.js");
 const {B10StageSpareSelection0553}=from("B10StageSpareSelection0553.jsx");
 const {B10NativeAnnexReview0553}=from("B10NativeAnnexReview0553.jsx");
+const {buildReleaseCommercialModel0553}=from("data/releaseCommercialModel0553.js");
 const stage=selectB10StageSpareSelection0553(),annex=selectB10NativeAnnexReview0553();
 assert.equal(stage.upstreamInstalledBomModule,"bid.budget.bom.zwp20.mr-502-001.4.required-bom");
 assert.deepEqual(Array.from(stage.phases),["ERECTION","PRE_COMMISSIONING","COMMISSIONING","START_UP"]);
@@ -77,12 +78,23 @@ assert(releaseUI.includes("buildNativeB10ItemizedReview0553(workingOriginal,revi
 const native=fs.readFileSync(path.join(root,"project0553/nativeWorkingDraft0553.js"),"utf8");
 assert(native.includes("export async function buildNativeB10ItemizedReview0553"));
 const box={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set};
-vm.runInNewContext(native.replace(/\bexport /g,"")+";this.ext={buildNativeB10ItemizedReview0553,entriesFromZip,readEntry};",box);
+vm.runInNewContext(native.replace(/\bexport /g,"")+";this.ext={buildNativeB10ItemizedReview0553,buildNativeWorkingDraft0553,entriesFromZip,readEntry};",box);
 const embedded=from("data/nativeReleaseTemplate0553.json");
 const bytes=Buffer.from(embedded.base64,"base64");
 const file={name:embedded.sourceName,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.byteLength)};
 const decoder=new TextDecoder();
 (async()=>{
+ const release=buildReleaseCommercialModel0553({thbPerUsd:31.5});
+ const existingWorking=await box.ext.buildNativeWorkingDraft0553(file,release);
+ const reviewOnWorking=await box.ext.buildNativeB10ItemizedReview0553(
+  {name:existingWorking.filename,arrayBuffer:()=>existingWorking.blob.arrayBuffer()},annex);
+ assert.equal(reviewOnWorking.insertedRows,1);
+ const combined=box.ext.entriesFromZip(new Uint8Array(await reviewOnWorking.blob.arrayBuffer()));
+ const main=decoder.decode(await box.ext.readEntry(combined.find(x=>x.name==="xl/worksheets/sheet1.xml")));
+ assert(main.includes("509827.5"),"Same Working B10 price owner must appear in source-linked summary");
+ const checkB10=decoder.decode(await box.ext.readEntry(combined.find(x=>x.name==="xl/worksheets/sheet2.xml")));
+ assert(checkB10.includes(annex.rows[13].description)&&checkB10.includes('<mergeCell ref="B20:H20"'),
+  "New B10 Working→Annex export must retain all 14 candidate functions and moved total");
  const result=await box.ext.buildNativeB10ItemizedReview0553(file,annex);
  assert.equal(result.rowCount,14);assert.equal(result.insertedRows,1);assert.equal(result.totalRow,20);
  const inputZip=box.ext.entriesFromZip(bytes),outputZip=box.ext.entriesFromZip(new Uint8Array(await result.blob.arrayBuffer()));
