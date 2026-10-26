@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-26-R61";
+export const CHANGE_LOG_VERSION_0553="2026-10-26-R62";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261026-04",date:"2026-10-26",kind:"PRICE",tone:"caution",
+  title:"Owner selects PRICED C1/C2 Conditional Budgetary Option Offer in Part C Summary / Annex / Native Excel",
+  detail:"Management explicitly requires C1/C2 offered prices rather than NOT QUOTED. Source-to-Release overlay selects conditional budgetary proposals from existing 10.2 reviewed source: C1 marine RACON capital-spare option THB3071250 from MDS/ORGA installed FCA equipment comparable x1.30 sell scenario, USD97500; C2 12 item two-year spare option historical Rev08 total THB721806.60, converted at FX31.5 and upward USD100 summary rounding USD23000. The selected conditional OPTION sell is reflected in 10.3.3 Source Part C THB, 10.3.4 Official Part C USD, twelve C2 and one C1 Annex line totals, and original six-sheet native XLSX summary F41/G41 F42/G42 and respective Annex tab prices. Retain customerSellTHB null for unverified separate OEM COST; expose explicit budgetaryOptionOfferTHB/USD on canonical option Source/Release rows and distinguish budgetary offer from supplier-confirmed firm prices, without adding C1/C2 into A+B or duplicating B10 physical stock. Legacy four C2 OEM MR source audit remains separately expandable. RF cable 7/8-inch Rev08 historical proxy must be substituted with installed-feeder size on procurement. OEM part no, two-year quantity, technical acceptance, alternative supply Incoterm CIF Zhuhai and exclusion of true B10 identical SKUs remain contract qualification gates. No external quotation actually transmitted or OEM accepted.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.option-budgetary-offer","bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner explicit instruction 26-Oct-2026: ต้องให้เสนอราคามาเลย / Part C price needed immediately"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261026-03",date:"2026-10-26",kind:"PRICE",tone:"caution",
   title:"B10 10.3.4 Official + Original Native Excel — 14 source-linked priced LOT lines from USD16200 parent total",
