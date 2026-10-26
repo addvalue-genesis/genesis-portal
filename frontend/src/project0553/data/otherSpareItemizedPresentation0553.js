@@ -64,8 +64,11 @@ export function buildOtherSpareItemizedPresentation0553(official){
    const offer=conditional.offers[code];
    const target=offer.budgetaryQuoteUSD;
    if(!offer.quotePrepared||offer.customerAccepted||offer.includedInAPlusB||
-      Math.abs(offer.sourceSellTHB-review.totals[code])>0.01)
-    throw Error("0553 budgetary option offer does not reconcile to current Working source "+code);
+      Math.abs(offer.sourceSellTHB-review.totals[code])>0.01||
+      p.budgetaryOptionQuoteUSD!==offer.budgetaryQuoteUSD||
+      p.budgetaryOfferSourceId!==offer.sourceId||
+      p.budgetaryOfferPrepared!==true||p.optionExcludedFromBase!==true)
+    throw Error("0553 budgetary option offer does not reconcile to current 10.3/Official Source "+code);
    const priceRows=allocateByWeights(source,target);
    displayed=priceRows.map((x,i)=>{
     const c1=code==="C1";
