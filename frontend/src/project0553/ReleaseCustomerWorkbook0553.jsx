@@ -14,6 +14,8 @@ import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {selectB10NativeAnnexReview0553} from "./data/b10NativeAnnexReview0553";
 import {SparePricedBudgetReview0553} from "./SparePricedBudgetReview0553";
 import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0553";
+import {buildOfficialUsdRelease0553} from "./data/officialUsdRelease0553";
+import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
 import "./releaseWorkbook0553.css";
 
 // Single customer-format sheet preview. Internal TAG/source drilldowns are UI-only
@@ -41,6 +43,7 @@ const addKnown=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?Math.round((a+b)*10
 export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSource=()=>{},focusAnnexTarget=null,title="10.3 — Customer Release"}){
  const [sheet,setSheet]=useState("Scope of supply");
  const optionalPriceReview=useMemo(()=>selectSparePricedBudgetReview0553(),[]);
+ const optionItemizedUsd=useMemo(()=>buildOfficialUsdRelease0553(model).otherSpareItemizedAnnex,[model]);
  // Source→Release: resolve one exact B/C spare row, never change a price.
  const focusKey=focusAnnexTarget?.code+"::"+focusAnnexTarget?.sourceId+"::"+(focusAnnexTarget?.sourceSelectionId||"")+"::"+focusAnnexTarget?.seq;
  useEffect(()=>{
@@ -343,6 +346,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      </p>}
     </>:<>
      {code==="B10"?<B10KitPriceSummary0553 rows={annexLines} total={annexModel?.selectedWorkingTHB} internal={internal} onOpenSource={onOpenSource} variant="release"/>:<>
+     {["C1","C2"].includes(code)&&<OtherSpareOriginalAnnex0553
+       code={code} model={optionItemizedUsd} onOpenSource={internal?onOpenSource:null}/>}
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
      <p className="p553-native-warning"><strong>{code} — {annexModel?.priceLabel||"WORKING REFERENCE"}</strong>
       {" "}· รายการจาก 10.2 — <code>bid.budget.working.bc.{code.toLowerCase()}</code>
