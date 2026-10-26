@@ -246,7 +246,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  if(pricingStage==="official")return <div className="p55-stack">
   <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
-  <OfficialUsdRelease0553 source={releaseModel}/>
+  <OfficialUsdRelease0553 source={releaseModel} onOpenSource={openReleaseSource}/>
  </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");
