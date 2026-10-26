@@ -25,9 +25,15 @@ assert.deepEqual(["B11","B13","C1","C2"].map(code=>other.rows[code].length),[4,3
 assert.equal(other.summaries.B11.totalUSD,5100);
 assert.equal(other.summaries.B13.totalUSD,1500);
 assert.equal(other.summaries.C1.totalUSD,97500);
-assert(Math.abs(other.summaries.C2.totalUSD-22914.5)<0.01);
+assert.equal(other.summaries.C2.totalUSD,23000);
 assert.equal(other.summaries.C1.selectedWorking,false);
 assert.equal(other.summaries.C2.selectedWorking,false);
+assert.equal(other.summaries.C1.budgetaryOfferPrepared,true);
+assert.equal(other.summaries.C2.budgetaryOfferPrepared,true);
+assert.equal(model.c.find(x=>x.code==="C1").budgetaryOptionQuoteUSD,97500);
+assert.equal(model.c.find(x=>x.code==="C2").budgetaryOptionQuoteUSD,23000);
+assert(model.c.every(x=>x.budgetaryOfferPrepared&&x.optionExcludedFromBase&&x.firmOemQuote===false));
+assert.equal(model.totalUSD,[...model.a,...model.b].reduce((s,x)=>s+(x.amountUSD||0),0));
 assert.equal(model.c.find(x=>x.code==="C1").amountUSD,null);
 assert.equal(model.c.find(x=>x.code==="C2").amountUSD,null);
 assert(model.c.every(x=>x.amountUSD===null),"Option benchmark must NOT overwrite the priced commercial authority");
@@ -44,6 +50,7 @@ for(const code of other.codes){
  assert.equal((web.match(/data-other-spare-source-id=/g)||[]).length,other.rows[code].length);
  assert(web.includes(other.summaries[code].totalUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4})));
  assert(web.includes("Source"));
+ if(code==="C1"||code==="C2")assert(web.includes("CONDITIONAL BUDGETARY OFFER — PRICED OPTION"));
  assert(!web.includes("PENDING")&&!web.includes("SPIR pending"));
 }
 assert.equal(new Set(model.b10ItemizedAnnex.rows.map(r=>r.lineSourceId)).size,14);
@@ -80,19 +87,19 @@ for(const [code,amount] of [["C1","3,071,250.00"],["C2","721,806.60"]]){
  assert(releaseSummaryHtml.includes(amount),
   "10.3.3 Part C "+code+" must display numeric Working reference THB "+amount);
 }
-assert(releaseSummaryHtml.includes('data-option-price-status="REFERENCE_NOT_OFFERED"'));
-assert(releaseSummaryHtml.includes("Budgetary estimate only · Excluded from Total A+B"));
+assert(releaseSummaryHtml.includes('data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"'));
+assert(releaseSummaryHtml.includes("PRICE OFFERED — CONDITIONAL BUDGETARY"));
 assert(!releaseSummaryHtml.includes("INCLUDED IN BASE"),"Options must remain excluded from A+B");
 assert(html.includes(model.totalUSD.toLocaleString('en-US',{minimumFractionDigits:2})));
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
 assert(html.includes('B4, B12, B14'));assert(html.includes('USD 1,000 / 800/person/day'));
-for(const [code,amount] of [["C1",97500],["C2",22914.5]]){
- assert(html.includes('data-option-price-status="REFERENCE_NOT_OFFERED"'),
+for(const [code,amount] of [["C1",97500],["C2",23000]]){
+ assert(html.includes('data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"'),
   "Option price reference row must be distinguished from customer quote");
  assert(html.includes(amount.toLocaleString("en-US",{minimumFractionDigits:2})),
   code+" historical/comparable budget price missing from Part C Summary");
 }
-assert(html.includes("OPTION — excluded from A+B · NOT OFFERED"));
+assert(html.includes("OPTION — PRICE OFFERED CONDITIONALLY; subject to OEM compliance/stock validation · excluded from A+B"));
 
 const native=fs.readFileSync(path.join(root,'project0553/nativeWorkingDraft0553.js'),'utf8'),box={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set};
 vm.runInNewContext(native.replace(/\bexport /g,'')+';this.zip={entriesFromZip,readEntry};',box);
@@ -127,8 +134,8 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
     const amount=model.otherSpareItemizedAnnex.summaries[code].totalUSD;
     assert(cell(xml,'F'+row).includes('<v>'+amount+'</v>'),"Option F price-reference absent: "+code);
     assert(cell(xml,'G'+row).includes('<v>'+amount+'</v>'),"Option G price-reference absent: "+code);
-    assert(cell(xml,'H'+row).includes('NOT QUOTED'),"Option source quote qualification missing: "+code);
-    assert(cell(xml,'B'+row).includes('REFERENCE VALUE ONLY'),"Option reference label missing: "+code);
+    assert(cell(xml,'H'+row).includes('CONDITIONAL BUDGETARY OFFER'),"Conditional option price qualification missing: "+code);
+    assert(cell(xml,'B'+row).includes('CONDITIONAL BUDGETARY OPTION PRICE'),"Option priced offer label missing: "+code);
     assert(model.c.find(x=>x.code===code).amountUSD===null,"Reference improperly posted "+code);
    }
   }else{
@@ -148,9 +155,9 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
     }
    }
    if(code==="C1"||code==="C2"){
-    assert(cell(xml,"B20").includes(code==="C1"?"NONPOSTING OPTION PRICE REFERENCE":"SUPERSEDED REV08 HISTORICAL REFERENCE"),
+    assert(cell(xml,"B20").includes(code==="C1"?"CONDITIONAL BUDGETARY C1 PRICE OFFER":"CONDITIONAL BUDGETARY C2 PRICE OFFER"),
      "Original native optional-spare source warning missing");
-    assert(cell(xml,"H4").includes("REFERENCE OPTION USD"));
+    assert(cell(xml,"H4").includes("CONDITIONAL OPTION BUDGET USD"));
    }
    if(code==="B10"){
     assert(cell(xml,'B21').includes('PRE-AWARD BUDGETARY FINANCIAL ALLOCATION'));
@@ -163,5 +170,5 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  const again=box.zip.entriesFromZip(new Uint8Array(await second.blob.arrayBuffer()));
  assert((await text('xl/worksheets/sheet1.xml',again)).includes('<v>'+model.totalUSD+'</v>'));
  const arg=process.argv.find(x=>x.startsWith('--output='));if(arg)fs.writeFileSync(arg.slice(9),data);
- console.log('PASS 0553 Official + Native: Part C C1 USD97500/C2 USD22914.50 visible as NOT QUOTED option references in summary and annex, B10 USD16200 B11 USD5100 B13 USD1500 unchanged, 6 original sheets, no WBS posting or A+B uplift');
+ console.log('PASS 0553 Official native: B10 USD16200 B11 USD5100 B13 USD1500, C1 USD97500 and C2 USD23000 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, no A+B uplift or false OEM confirmation');
 })().catch(e=>{console.error(e);process.exitCode=1;});
