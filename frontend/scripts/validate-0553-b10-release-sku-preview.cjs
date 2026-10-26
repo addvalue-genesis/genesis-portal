@@ -122,8 +122,13 @@ assert(officialUi.includes('sheet==="B10"?<B10KitPriceSummary0553'));
 assert(budgetaryUi.includes('sheet==="B10 CommSpares"?<B10KitPriceSummary0553'));
 assert(budgetaryUi.includes('onOpenSource={onOpenSource} variant="budgetary"'));
 assert(budgetWorkspaceUi.includes('<BudgetaryWorkbookPreview0553 onOpenSource={openReleaseSource}/>'));
-assert(budgetWorkspaceUi.includes('const openReleaseAnnexRow=({code,sourceId})=>'));
-assert(budgetWorkspaceUi.includes('setPricingStage("released"); // navigation only'));
+// Release navigation now carries the exact B10 spare function key, in addition to its parent source row.
+assert(budgetWorkspaceUi.includes('const openReleaseAnnexRow=({code,sourceId,sourceSelectionId=null})=>'));
+assert(budgetWorkspaceUi.includes('setReleaseAnnexTarget(prev=>({code,sourceId,sourceSelectionId,seq:'));
+assert(budgetWorkspaceUi.includes('setPricingStage("released"); // navigation only, no price posting/approval'));
+assert(budgetWorkspaceUi.includes('sourceSelectionId:item.sourceSelectionId||null,originWasExact:true'));
+assert(budgetWorkspaceUi.includes('onClick={()=>openReleaseAnnexRow(returnToRelease)'));
+assert(releaseUi.includes('const requestedStageRow=focusAnnexTarget.code==="B10"&&focusAnnexTarget.sourceSelectionId'));
 assert(budgetWorkspaceUi.includes('onOpenReleaseRow={openReleaseAnnexRow}'));
 assert(budgetWorkspaceUi.includes('onOpenSource={openReleaseSource}'));
 assert(releaseUi.includes('const targetId="bid.budget.pricing.release.preview.annex."'));
