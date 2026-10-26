@@ -60,9 +60,9 @@ export function selectB3LeanSatScenario0553(workingRow=null){
  const mgwPurchased=workingRow?.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB??null;
  const rental=current.veex.workingSellTHB;
  if(workingRow&&(workingRow.code!=="B3"||!Number.isFinite(mgwFat)||
-  !Number.isFinite(currentB3)||mgwPurchased!==307125||
-  workingRow.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB!==236250||
-  Math.abs(currentB3-(current.laborWorkingSellTHB+rental+mgwFat+mgwPurchased))>0.01))
+  !Number.isFinite(currentB3)||mgwPurchased!==0||
+  workingRow.b3MgwPurchasedFatWorkingSell.vendorPurchasedQuoteTHB!==0||
+  Math.abs(currentB3-(workingRow.b3SelectedSatSurveyBudget.includedB3SatSurveyToolsWorkingSellTHB+mgwFat+mgwPurchased))>0.01))
   throw Error("B3 scenario must use selected canonical FAT and VeEX, without extra posting");
  const illustrativeWhole=Number.isFinite(mgwFat)&&Number.isFinite(mgwPurchased)?
   rounded(scenarioOffshore+rental+mgwFat+mgwPurchased):null;
@@ -87,7 +87,7 @@ export function selectB3LeanSatScenario0553(workingRow=null){
   illustrativeWholeB3THB:illustrativeWhole,
   currentWorkingSellTHB:currentB3,
   comparisonSavingTHB:Number.isFinite(currentB3)&&Number.isFinite(illustrativeWhole)?rounded(currentB3-illustrativeWhole):null,
-  customerContractCostOwner:"SOW-B3 one LS; MGW SERV-2/4 remain WS-B3 once; lean labour is SC only",
+  customerContractCostOwner:"SOW-B3 one LS; no supplier FAT services selected; lean labour is SC only",
   directCostTHB:null,clientPriceTHB:null,managementReserveSellTHB:null,
   proposedCustomerUnit:"1 LS",proposalStatus:"NEEDS_COST_AND_LOGISTICS_APPROVAL",
   postingAllowed:false,releaseAllowed:false,

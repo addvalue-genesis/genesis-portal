@@ -105,7 +105,7 @@ const mobIncluded=evaluateOffshoreMobDemobEconomics0553({
  options:[makeOption("TEST-FIVE",5),makeOption("TEST-FOUR",4,2000)]
 });
 assert.equal(mobIncluded.scenarios[0].extraMobCostTHB,0,"Do not duplicate MOB labor already included in working base");
-assert.equal(FAT_EXECUTION_BASIS_0553.integratedFat.location,"SAMTEL Bangkok, Thailand");
+assert.equal(FAT_EXECUTION_BASIS_0553.integratedFat.location,"SAMTEL Warehouse, Thailand");
 assert.equal(JSON.stringify(derivePartBcWorkingWbs0553()),oldWbs);
 assert.equal(JSON.stringify(selectBcTurnkeyWorkingCost0553()),oldLedger);
 const read=p=>fs.readFileSync(path.join(root,p),"utf8");

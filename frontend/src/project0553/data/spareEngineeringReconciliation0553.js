@@ -67,19 +67,17 @@ export function selectSpareEngineeringReconciliation0553(){
  const raconVendor=MR0004_WORKING_BOM_0553;
  const quoteRateUSD=raconVendor.quotePackageUSD; // MGW R2 INSTALLED equipment
  const legacyAlternative=raconVendor.historicalAlternative; // MDS/ORGA FCA
- const historicalC1ReferenceUSD=legacyAlternative?.packageUSD;
- if(!raconHistory||quoteRateUSD!==75059||raconVendor.quoteNumber!=="P26-058_R2"||
-    historicalC1ReferenceUSD!==75000||legacyAlternative?.quote!=="QTORG2609244"||
-    legacyAlternative.selected!==false||legacyAlternative.additive!==false)
-  throw Error("C1 RACON price identity: selected MGW USD75059 must stay separate from historical ORGA USD75000");
+ const historicalC1ReferenceUSD=75000; // immutable historical MDS reference; not the selected MGW alternate
+ if(!raconHistory||quoteRateUSD!==75000||raconVendor.quoteNumber!=="QTORG2609244"||raconVendor.sourceQuotedQty!==1||legacyAlternative.selected!==false||legacyAlternative.additive!==false)
+  throw Error("Selected MDS installed quote cannot become an independent C1 spare offer");
  const raconComparison=Object.freeze({
   code:"C1",mr:"MR-0004",tagNo:"MAR-514-001",
   historicalDescription:raconHistory.description,
   historicalQty:raconHistory.qty,historicalUnitPriceTHB:raconHistory.unitPriceTHB,
-  vendorDescription:"MGW R2 selected installed Tideland SeaBeacon 2 RACON package (Part A only)",
+  vendorDescription:"MDS selected installed ORGA / Tideland RACON package (Part A only)",
   vendorQuote:MR0004_WORKING_BOM_0553.quoteNumber,
   vendorUnitPriceUSD:quoteRateUSD,
-  vendorSelectedSource:"MGW P26-058_R2 RACON-1 / installed quote only",
+  vendorSelectedSource:"MDS QTORG2609244 / one-system installed quote only",
   historicalAlternativeUnitUSD:historicalC1ReferenceUSD,
   historicalAlternativeSource:"MDS / ORGA QTORG2609244 FCA / comparison only",
   vendorPackageRateReferenceTHB:round(quoteRateUSD*customer.rows[0].workingFxTHBPerUSD),
@@ -103,7 +101,7 @@ export function selectSpareEngineeringReconciliation0553(){
   planningFxTHBPerUSD:customer.rows[0].workingFxTHBPerUSD,
   budgetUnitPriceTHB:round(historicalC1ReferenceUSD*customer.rows[0].workingFxTHBPerUSD),
   budgetTotalTHB:round(historicalC1ReferenceUSD*customer.rows[0].workingFxTHBPerUSD),
-  source:"MDS/ORGA "+legacyAlternative.quote+" — historical installed complete-package FCA benchmark; management C1 spare option",
+  source:"MDS/ORGA "+raconVendor.quoteNumber+" — historical installed complete-package FCA benchmark; management C1 spare option",
   installedMGWComparisonUnitUSD:quoteRateUSD,
   installedMGWComparisonSource:raconVendor.quoteNumber,
   oemQuotedIndependentSpareUSD:null,

@@ -38,6 +38,7 @@ import { STANDARD_PROJECT_TABS, AuditBadge, AuditMetric, AuditTable, AuditSectio
 import { getProject0553Dataset } from "../project0553/data/repository";
 import "../project0550/project0550.css"; // Reuse existing 0550 presentation primitives, never project facts.
 import "../project0553/project0553.css";
+import "../project0553/moduleHierarchy0553.css";
 
 // IDs are stable application route keys. Display order follows the project
 // engineering workflow; Budget is the final workbench after all upstream views.
@@ -69,6 +70,7 @@ export function PJ26080553() {
   {id:"bid.systems.mr0004",name:"MR-0004 Marine RACON",tab:"systems",keywords:"navigation beacon racon"},
   {id:"bid.documents",name:"Source Documents / Evidence Register",tab:"documents",keywords:"source documents original vendor supplier quote"},
   {id:"bid.vendor.products.supplier.quote-lines",name:"Vendor Products / Supplier Quote Lines",tab:"documents",keywords:"supplier mgw rfi cost"},
+  {id:"bid.budget.pricing.official",name:"10.3.4 — Official Release English USD",tab:"budget",keywords:"official quotation USD Excel export"},
   {id:"bid.budget",name:"Budget Workspace",tab:"budget",keywords:"working costing"},
   {id:"bid.budget.bom",name:"Engineering BOM Working Preview",tab:"budget",keywords:"working preview equipment"},
   {id:"bid.budget.working.bc.cost-lines",name:"10.2 — Part B/C WBS Cost Lines / Evidence-Backed Resource Ledger",tab:"budget",keywords:"B1 B2 B3 B6 B9 B10 B11 964 man-hour 39 offshore days 78 man-days special tools cost rate source annex first principles"},

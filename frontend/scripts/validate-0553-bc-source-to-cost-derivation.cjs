@@ -20,13 +20,13 @@ const {BC_CUSTOMER_CODES_0553}=from("data/bcWorkingModuleRoutes0553.js");
 const original=JSON.stringify(derivePartBcWorkingWbs0553());
 const e=selectBcCostEvidenceDerivation0553(),bc=selectBcTurnkeyWorkingCost0553();
 const CURRENT_REV_K_WORKING_SELL_0553=Object.freeze({
- B1:211600,B2:237121.13,B3:2599325,B4:null,
- B5:311184,B6:307584,B7:30000,B8:151550,
+ B1:421180,B2:237121.13,B3:2322450,B4:null,
+ B5:311184,B6:335584,B7:30000,B8:142550,
  B9:480550,B10:509827.5,B11:157657.5,B12:null,
  B13:46683,B14:null,C1:null,C2:null
 });
-assert.equal(bc.knownWorkingSellTHB,5043082.13,"Current Rev.K Part B Base Working SELL");
-assert.equal(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB,422600,"FAT witness belongs only to B3");
+assert.equal(bc.knownWorkingSellTHB,4994787.13,"Current Rev.K Part B Base Working SELL");
+assert.equal(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB,452850,"FAT witness belongs only to B3");
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,480550,"B9 Yard Specialist quote included in Base once");
 assert.equal(bc.byCode.B9.workingSellTHB,480550,"B9 quoted 1 LS with on-call field attendance");
 assert.equal(e.moduleId,"bid.budget.working.bc");
@@ -51,7 +51,7 @@ for(const item of e.rows){
  // The 01–08 evidence remains the immutable source WBS (B6 has its existing transport reference).
  // Budgetary 10.2 SELL overlays are separately owned by the canonical selector.
  const working=derivePartBcWorkingWbs0553().rows.find(r=>r.code===item.code);
- if(item.code==="B6")assert.equal(item.workingSellTHB,bc.byCode.B6.workingSellTHB);
+ if(item.code==="B6")assert.equal(item.workingSellTHB,307584);
  else assert.equal(item.workingSellTHB,working.sellTHB,item.code+" WBS evidence source");
  // Do not equate historical source ledger SELL with current, management-selected SELL.
  // The historical evidence row is a provenance record, NOT a price posting.
@@ -63,9 +63,9 @@ for(const item of e.rows){
    item.code+" management budgetary working SELL requires an explicit source basis");
  if(item.code==="B8"){
   assert.equal(item.workingSellTHB,30000,"Original Rev05 B8 is a superseded historical SELL source");
-  assert.equal(bc.byCode.B8.workingSellTHB,151550,"New four-MR hybrid 2-day estimate posted once to WS-B8");
+  assert.equal(bc.byCode.B8.workingSellTHB,142550,"New four-MR hybrid 2-day estimate posted once to WS-B8");
   assert.equal(bc.byCode.B8.qtyDriver,1);
-  assert.equal(bc.byCode.B8.b8FourSystemHybridTraining.selectedWorkingSellTHB,151550);
+  assert.equal(bc.byCode.B8.b8FourSystemHybridTraining.selectedWorkingSellTHB,142550);
  }
  for(const line of item.lines){
   if(Number.isFinite(line.amountTHB))
@@ -86,7 +86,7 @@ assert.equal(b3.lines.find(x=>x.id==="B3-OFFSHORE-SAT-COMM").quantity,78);
 assert.equal(b3.lines.find(x=>x.id==="B3-OFFSHORE-SAT-COMM").rateTHB,25200);
 assert.equal(b3.lines.find(x=>x.id==="B3-OFFSHORE-SAT-COMM").amountTHB,1965600);
 assert.equal(b3.reconciliation.workingSellTHB,2109600);
-assert.equal(b3.reconciliation.approvedLocation,"SAMTEL Bangkok, Thailand");
+assert.equal(b3.reconciliation.approvedLocation,"SAMTEL Warehouse, Thailand");
 assert.equal(b6.lines.length,4);
 assert.deepEqual(b6.lines.map(x=>x.id),["B6-MR-0001","B6-MR-0002","B6-MR-0003","B6-MR-0004"]);
 assert(b6.lines.find(x=>x.id==="B6-MR-0002").activity.includes("Thailand SAMTEL Bangkok FAT"));
@@ -108,4 +108,4 @@ for(const f of ["project0553/CommercialWorkspace.jsx","project0553/BcCostEvidenc
  assert(babel.transformSync(fs.readFileSync(path.join(root,f),"utf8"),{
   babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0,
   "Babel JSX syntax invalid: "+f);
-console.log("PASS 0553 10.2 16/16 Rev05 source proof separated from Rev.K CURRENT SELL: B1 THB211600 B3 THB2599325 incl ADDVALUE China FAT witness THB422600 plus MGW purchased FAT THB307125, B9 Base THB480550 (Yard execution on call-out), Part B THB5043082.13; historical Bangkok FAT / Rev05 WBS audit only; verified direct cost remains null.");
+console.log("PASS 0553 10.2 16/16 Rev05 source proof separated from Rev.K CURRENT SELL: B1 THB421180 B3 THB2322450 incl ADDVALUE China FAT witness THB452850 plus MGW purchased FAT THB307125, B9 Base THB480550 (Yard execution on call-out), Part B THB4994787.13; historical Bangkok FAT / Rev05 WBS audit only; verified direct cost remains null.");

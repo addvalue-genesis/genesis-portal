@@ -7,6 +7,7 @@ on:
       - "integrate/**"
       - main
       - "fix/pj2608-0553-five-owner-first-principles-existing-modules-20261023"
+      - "fix/pj2608-0553-urgent-thailand-cif-pricing-20261024"
   pull_request:
     branches:
       - main
@@ -31,7 +32,7 @@ jobs:
         run: npm run build
 
   windows-0553:
-    if: github.ref == 'refs/heads/fix/pj2608-0553-five-owner-first-principles-existing-modules-20261023' || github.head_ref == 'fix/pj2608-0553-five-owner-first-principles-existing-modules-20261023'
+    if: github.ref == 'refs/heads/fix/pj2608-0553-urgent-thailand-cif-pricing-20261024' || github.head_ref == 'fix/pj2608-0553-urgent-thailand-cif-pricing-20261024' || github.ref == 'refs/heads/fix/pj2608-0553-five-owner-first-principles-existing-modules-20261023' || github.head_ref == 'fix/pj2608-0553-five-owner-first-principles-existing-modules-20261023'
     runs-on: windows-latest
     timeout-minutes: 45
     defaults:

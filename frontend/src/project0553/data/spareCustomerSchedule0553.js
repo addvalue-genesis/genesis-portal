@@ -1,3 +1,5 @@
+import {selectSparesPriceEvidence0553} from "./sparePriceEvidence0553";
+import {MR0004_WORKING_BOM_0553} from "./mr0004WorkingBom0553";
 // PJ2608-0553 — customer-style 5-category pre-award read model.
 // Current rows use the locked 2026 parametric checkpoint; rows/byCode retain
 // Rev08 exclusively for historical audit. Actual installed TAG identities
@@ -205,6 +207,7 @@ const assessSpareLine0553=(code,description)=>{
   stockInterchangeabilityApproved:false,extraPostingAllowed:false,releaseAllowed:false});
 };
 export function selectSpareCustomerSchedule0553(){
+ const sparePriceEvidence=selectSparesPriceEvidence0553();
  const master=selectUnifiedSpareConsumables0553(),cover=selectSpareCoverageEngineering0553();
  const b11Requirements=selectB11MinimumTools0553();
  if(!MGW_P26_058_R2_SELECTED_0553.lines.some(r=>r.id==="UHF-2"&&r.model.includes("IS-B50LN-C2"))||
@@ -342,9 +345,8 @@ export function selectSpareCustomerSchedule0553(){
  });
  // C1 installed MGW RACON-1 is a current OEM installed PACKAGE comparable, not
  // an independent spare quotation. Keep it OPTION and do not release its price.
- const racon=MGW_P26_058_R2_SELECTED_0553.lines.find(x=>x.id==="RACON-1");
- if(!racon||racon.quantity!==3||racon.unitPriceUSD!==75059)
-  throw Error("Current OEM RACON source quote missing for distinct C1 comparable");
+ const racon={unitPriceUSD:MR0004_WORKING_BOM_0553.quotePackageUSD};
+ if(racon.unitPriceUSD!==75000||MR0004_WORKING_BOM_0553.sourceQuotedQty!==1)throw Error("MDS one-system comparable changed");
  const capital=Object.freeze({
   id:"C1-PTTEP-01",code:"C1",item:1,sourceId:"C1-PTTEP-01",
   sourceRowModuleId:"bid.budget.working.bc.c1.spare-line.c1-pttep-01",
@@ -355,7 +357,7 @@ export function selectSpareCustomerSchedule0553(){
   originalDescription:"SeaBeacon 2 complete RACON capital spare — optional equivalent",
   displayDescription:"SeaBeacon 2 complete RACON capital spare — optional equivalent",
   displayPurpose:"Owner candidate one distinct pool unit, NOT an MR-required extra system",
-  displaySpecification:"Tideland SeaBeacon 2 System 6 X/S; Ex and configuration to match installed MGW quote; OEM spare quote pending",
+  displaySpecification:"Tideland SeaBeacon 2 System 6 X/S; Ex and configuration to match selected MDS package; OEM spare quote pending",
   detailSpecification:"Tideland SeaBeacon 2 System 6 X/S; OEM spare approval required",
   displayMaterials:"Complete Ex certified compatible assembly — OEM verification pending",
   materials:"Complete Ex certified compatible assembly — OEM verification pending",
@@ -367,7 +369,7 @@ export function selectSpareCustomerSchedule0553(){
   internalNonpostingCostReferenceTHB:round(racon.unitPriceUSD*paramFx),
   internalNonpostingSellScenarioTHB:round(racon.unitPriceUSD*paramFx*commercialFactor),
   unitPriceTHB:null,extendedTHB:null,
-  sourceRevision:"MGW_P26_058_R2_RACON_1_INSTALLED_COMPARABLE_ONLY",
+  sourceRevision:"MDS_QTORG2609244_INSTALLED_COMPARABLE_ONLY",
   sourcePriceBasis:"INSTALLED_PACKAGE_COMPARABLE__NOT_SPARE_VENDOR_QUOTE",
   workingStatus:"OPTION_REQUIRES_INDEPENDENT_OEM_SPARE_QUOTE",
   customerReleaseAllowed:false,leadTimeARO:null,option:true
@@ -408,7 +410,7 @@ export function selectSpareCustomerSchedule0553(){
    B10:["OEM_KIT_CONTENTS_OPEN","14 contractual kits do not establish approved contents, spare SKUs or Ex compatibility",
     "Provide itemized commissioning SPIR per MR/platform, installed TAG compatibility, Ex evidence, independent rates and DDP; assign each physical item one cost owner"],
    B11:["OEM_TOOL_INCLUSION_OPEN","Four MR phase sets do not establish five EXA-A8 functions or net OEM-included tools",
-    "Resolve Phase 1E/1F precedence and TETRA applicability; verify five telecom functions, licenses and MGW included RACON kit; exclude B3 testers and Part A inclusions before any authorized price change"],
+    "Resolve Phase 1E/1F precedence and TETRA applicability; verify five telecom functions, licenses and MDS quoted purge/programming kit; adapter/charger equivalence unresolved; exclude B3 testers and Part A inclusions before any authorized price change"],
    B13:["PRESERVATION_CONSUMPTION_OPEN","Preservation activity counts and consumed quantities remain unapproved",
     "Provide preservation/reinspection events and consumption records; exclude B5 shipment packing and A5 installed bulk; no automatic quantity or price posting"],
    C1:["OEM_REPLACEMENT_STRATEGY_OPEN","Installed RACON package is not an independently quoted capital spare",
@@ -417,7 +419,7 @@ export function selectSpareCustomerSchedule0553(){
     "Provide two-year OEM SPIR by MR, maintenance basis, SKU/quantity/lead time and independent quotation; exclude identical B10 stock under Attachment 7 instruction 6"]
   };
   const [category,issue,action]=controls[line.code];
-  const installedCandidateSku=line.code==="C1"?"Tideland SeaBeacon 2 System 6 — MGW RACON-1 installed package only":null;
+  const installedCandidateSku=line.code==="C1"?"ORGA / Tideland SeaBeacon 2 — MDS installed package only":null;
   const engineeringVerification=Object.freeze({
    sourceId:line.id,sourceRowModuleId:line.sourceRowModuleId,
    installedCandidateSku,quotedIndependentSpareSku:null,approvedReplacementSku:null,
@@ -541,6 +543,7 @@ export function selectSpareCustomerSchedule0553(){
  })]));
  return Object.freeze({
   moduleId:"bid.budget.working.bc.customer-spare-schedule",
+  sparePriceEvidence,
   codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,crossCategoryDuplicates,b11Requirements,
   currentRows,currentByCode,currentBudgetaryByCode,
   currentWorkingFxTHBPerUSD:paramFx,currentBudgetaryPricingFactor:commercialFactor,

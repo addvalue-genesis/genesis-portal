@@ -1,3 +1,4 @@
+import {selectServiceCommercialBasis0553} from "./serviceCommercialBasis0553";
 // PJ2608-0553 · 10.3 Customer Release staging model.
 // NEVER mutate 10.1 / 10.2. Never equate Working SELL with direct COST.
 // A/C: cost × (1 + 20% SAMTEL + 5% ADDVALUE + 5% ADDVALUE omission reserve).
@@ -8,6 +9,7 @@ import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
 import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
+import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 
 export const RELEASE_POLICY_0553=Object.freeze({
  id:"P553-RELEASE-PRICING-R01",
@@ -323,6 +325,10 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    verifiedDirectCostTHB:null
   }))):null;
   return {code:r.code,description:r.requirement,sourceModuleId:r.moduleId,
+   executionActivities:r.executionActivities,
+   serviceCommercialBasis:selectServiceCommercialBasis0553(r),
+   b10ItemizedPurchaseEvidence:r.code==="B10"?r.b10ItemizedPurchaseEvidence:null,
+   b10PriceToWinReview:r.code==="B10"?r.b10PriceToWinReview:null,
    qty:1,unit:"lot",workingSellTHB:r.workingSellTHB,
    customerSellTHB:price?.customerSellTHB??null,
    samTelDeductionTHB:price?.samTelDeductionTHB??null,
@@ -346,13 +352,25 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    costComplete:n(r.directCostTHB),releaseAllowed:false,
    sourceStatus:r.priceStatus,workingSellBasis:r.workingSellBasis};
  });
+ const selectedOptionBudgetaryQuote=selectOptionBudgetaryOffer0553();
  const c=bc.rows.filter(r=>r.code.startsWith("C")).map(r=>{
   // "workingSellTHB" is *not* a supplier direct cost. Never markup it by 30%.
   const basis=n(r.directCostTHB)?priceAorCFromCost0553(r.directCostTHB):null;
+  const provisional=selectedOptionBudgetaryQuote.offers[r.code];
+  if(!provisional||!provisional.quotePrepared||provisional.includedInAPlusB||
+     Number.isFinite(basis?.customerSellTHB))
+   throw Error("0553 C1/C2 budget option offer conflicts with independently verified price");
   return {code:r.code,description:r.requirement,sourceModuleId:r.moduleId,
    qty:1,unit:"lot",workingReferenceTHB:r.workingSellTHB,
    verifiedDirectCostTHB:r.directCostTHB,
    customerSellTHB:basis?.customerSellTHB??null,
+   budgetaryOptionOfferTHB:provisional.sourceSellTHB,
+   budgetaryOptionOfferUSD:provisional.budgetaryQuoteUSD,
+   budgetaryOfferStatus:provisional.priceState,
+   budgetaryOfferSourceId:provisional.sourceId,
+   budgetaryOfferSourceModuleId:provisional.sourceModuleId,
+   budgetaryOfferPrepared:true,firmOemQuote:false,customerOfferIssued:false,
+   budgetaryOfferTechnicalGate:provisional.technicalGate,
    samTelShareTHB:basis?.samTelShareTHB??null,
    reserveTHB:basis?.omissionReserveTHB??null,
    addvalueTargetProfitTHB:basis?.addvalueTargetProfitTHB??null,
@@ -392,7 +410,11 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  ];
  return Object.freeze({
   moduleId:"bid.budget.pricing.release",policy:RELEASE_POLICY_0553,
-  a,b,c,annex,annexModels,annexTraceAudit,summary:{
+  a,b,c,annex,annexModels,annexTraceAudit,
+  budgetaryOptionAnnex:Object.freeze(Object.fromEntries(
+   Object.entries(selectedOptionBudgetaryQuote.offers).map(([code,offer])=>[code,offer.rows]))),
+  sparePriceEvidence:spare.sparePriceEvidence, // Read-only item candidate and optional price benchmark; never financial posting
+  summary:{
    aProvisionalCostTHB:aKnown.length?aCost:null,
    aProvisionalCustomerSellTHB:aKnown.length?aPrice:null,
    aProvisionalSamTelShareTHB:aKnown.length?round(aCost*.20):null,
@@ -408,6 +430,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    addvalueRealizedProfitTHB:null // Incomplete verified total cost; never invent profit.
   },
   sourceCoverage:{aReady:aCostComplete,bSellReady:b.length===bKnown.length,
+   b10PurchasableSpirComplete:!bc.byCode.B10.b10ItemizedPurchaseEvidence?.noVerifiedPhysicalPurchaseLine,
    bCostReady:bProfitComplete,cCostReady:cCostComplete,
    annexOverflow,aOverflow,gaps},
   approval:{approved:false,releaseAllowed:false,exportNativeAllowed:false,

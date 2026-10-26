@@ -44,25 +44,17 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
  const satMatrix=selectB3SiteMrSatCoverage0553();
  const crosswalk=selectB3RequirementWbsTrace0553();
  if(quoted.length!==2||quotedUSD!==7500||offshore.laborWorkingSellTHB!==1587600||offshore.surveyLabourWorkingSellTHB!==252000||
-  fat.workingSellTHB!==422600||
-  fat.groupFatWorkingSellTHB!==729725||veex.workingSellTHB!==30000||
+  fat.workingSellTHB!==452850||
+  fat.groupFatWorkingSellTHB!==452850||veex.workingSellTHB!==30000||
   satMatrix.rows.length!==21||crosswalk.rows.length!==19||
   workingRow.b3FatOwnerTransfer?.amountTHB!==144000||
   workingRow.directCostTHB!==null)
   throw Error("B3 normalized table source authority or cost ownership changed");
  const groups=Object.freeze([
   group("B3.1","fat","FAT — Factory Acceptance Test",
-   "MGW purchased service SELL (20+5+5) plus ADDVALUE Witness; supplier cost separate from WS",[
-   item("B3.1.1","mgw-r2-cover-20261020","VQ-MGW / WS-B3 — Purchased iFAT + FAT Facility (20+5+5)",
-    "SERV-2 iFAT USD5,000 + SERV-4 FAT Facility USD2,500 × FX31.5 × 1.30 = THB307,125",
-    C.PURCHASED_SERVICE_WORKING_SELL,{
-     workingSellTHB:workingRow.b3MgwPurchasedFatWorkingSell?.selectedIncrementalWorkingSellTHB??null,
-     vendorQuoteUSD:quotedUSD,qty:2,unit:"supplier service lines",
-     owner:"IC-FAT-MGW-SERV-2-4 / SOW-B3 / WS-B3; CP-B3 NOT ISSUED",
-     status:"SELECTED PURCHASED SERVICE WS — QUOTED COST, A-OWNER DUPLICATION REVIEW OPEN",
-     supplierRows:quoted.map(x=>Object.freeze({id:x.id,usd:x.usd,description:x.description}))}),
-   item("B3.1.2","revk-china-budget","WS-B3 / IC-FAT — ADDVALUE China FAT Witness / Travel / Insurance",
-    "2 witnesses × 6 FAT days + 2 travel days; 8 unique B3 priced expense lines",
+   "ADDVALUE FAT at SAMTEL Warehouse: labour, local transfers and work insurance",[
+   item("B3.1.2","revk-china-budget","WS-B3 / IC-FAT — ADDVALUE SAMTEL FAT crew / Local transfers / Work insurance",
+    "2 roles × 6 FAT days; 5 foreign travel rows zero; local transfers and work cover retained",
     C.INCLUDED_WORKING_SELL,{workingSellTHB:fat.workingSellTHB,qty:1,unit:"FAT trip LS",
      owner:"IC-FAT-001 / WS-B3 (SOW-B3); CP-B3 NOT ISSUED",status:"CURRENT INTERNAL WORKING SELL · DIRECT COST NOT VERIFIED"}),
 
@@ -115,7 +107,7 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
      qty:8,unit:"historical team-days",unitRateTHB:18000,
      owner:"B3 historical only",status:"SUPERSEDED — NON ADDITIVE"}),
    item("B3.4.5","fat-training-7d-allocation","ADDVALUE-only 7-Day Integrated FAT + Training — INTERNAL SCENARIO",
-    "ADDVALUE staff-only 7-day shared proposal; MGW purchased FAT THB307125 remains IN B3.1.1 unchanged and is not re-added",
+    "ADDVALUE staff-only 7-day shared proposal; no purchased supplier FAT or facility reserve",
     C.NON_POSTING_AUDIT,{referenceTHB:integratedScenario?.proposedB3FatWorkingSellTHB??null,
      qty:integratedScenario?.onSiteDays??null,unit:"shared on-site days",
      owner:"IC-FAT-001 / IC-TRN-001 · B3/B8 cross-owner",
@@ -124,15 +116,15 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
  ]);
  const contract=validateWorkingHierarchyPriceTable0553({
   ownerModuleId:ROOT,groups,expectedSellTHB:workingRow.workingSellTHB,
-  knownSupplierReferenceUSD:7500
+  knownSupplierReferenceUSD:0
  });
  const totalSell=round(groups.reduce((n,g)=>n+g.workingSellTHB,0));
  const vendorUSD=round(groups.reduce((n,g)=>n+g.vendorQuoteUSD,0));
- const groupsAsExpected={fat:729725,sat:1839600,tools:30000,audit:0};
- if(totalSell!==2599325||totalSell!==b.totalWorkingSellTHB||
-  vendorUSD!==7500||
+ const groupsAsExpected={fat:452850,sat:1839600,tools:30000,audit:0};
+ if(totalSell!==2322450||totalSell!==b.totalWorkingSellTHB||
+  vendorUSD!==0||
   groups.some(g=>g.workingSellTHB!==groupsAsExpected[g.kind])||
-  groups.flatMap(g=>g.items).filter(x=>[C.INCLUDED_WORKING_SELL,C.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length!==5||
+  groups.flatMap(g=>g.items).filter(x=>[C.INCLUDED_WORKING_SELL,C.PURCHASED_SERVICE_WORKING_SELL].includes(x.priceClass)).length!==4||
   new Set(groups.flatMap(g=>[g.moduleId,...g.items.map(x=>x.moduleId)])).size!==
   groups.reduce((n,g)=>n+g.items.length+1,0))
   throw Error("B3 price hierarchy sum / supplier-reference non-duplication failed");
@@ -145,7 +137,7 @@ export function selectB3HierarchicalPriceTable0553(workingRow,integratedScenario
   supplierFxTHBPerUSD:31.5,
   verifiedDirectCostTHB:null,
   customerReleaseAllowed:false,
-  sourceCostOwner:"B3: MGW purchased FAT, ADDVALUE FAT Witness, SAT28 labour, BF Survey5 labour, VeEX",
-  policy:"Every future module must specify a unique stable ID, priceClass, source, qty, owner and single posting authority. NULL not 0 for non-priced/audit references; purchased MGW iFAT/FAT Facility charged ONCE at 20+5+5 with supplier quotation cost, no Part A or 5% B share duplication."
+  sourceCostOwner:"B3: ADDVALUE local FAT, SAT28 labour, BF Survey5 labour, VeEX",
+  policy:"Every future module must specify a unique stable ID, priceClass, source, qty, owner and single posting authority. NULL not 0 for non-priced/audit references; no MGW FAT service selected; ordinary Part B rule applies."
  });
 }

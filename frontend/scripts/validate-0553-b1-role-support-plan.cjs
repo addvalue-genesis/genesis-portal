@@ -29,14 +29,14 @@ assert.equal(Object.keys(m.roleRates).length,7);
 assert.equal(m.labourHours,242);
 assert.equal(m.labourWorkingCostTHB,80400);
 assert.equal(m.labourWorkingSellTHB,100500);
-assert.equal(m.baseExpenseWorkingCostTHB,101000);
-assert.equal(m.baseExpenseWorkingSellTHB,111100);
-assert.equal(m.baseWorkingCostTHB,181400);
-assert.equal(m.baseWorkingSellTHB,211600);
-assert.equal(m.conditionalWorkingCostTHB,47000);
-assert.equal(m.conditionalWorkingSellTHB,51700);
-assert.equal(m.proposedB1BaseWorkingSellTHB,211600);
-assert.equal(m.canonicalB1WorkingSellTHB,211600);
+assert.equal(m.baseExpenseWorkingCostTHB,293800);
+assert.equal(m.baseExpenseWorkingSellTHB,320680);
+assert.equal(m.baseWorkingCostTHB,374200);
+assert.equal(m.baseWorkingSellTHB,421180);
+assert.equal(m.conditionalWorkingCostTHB,0);
+assert.equal(m.conditionalWorkingSellTHB,0);
+assert.equal(m.proposedB1BaseWorkingSellTHB,421180);
+assert.equal(m.canonicalB1WorkingSellTHB,421180);
 assert.equal(m.historicalEngineeringCarryForwardTHB,0);
 assert.equal(m.historicalPmCarryForwardTHB,0);
 assert.equal(m.engineeringScopeReview.length,27);
@@ -62,7 +62,7 @@ assert.equal(m.milestones.find(x=>x.stage==="K09").chargeOwnerStage,"K08");
 assert.equal(m.milestones.find(x=>x.stage==="K00").rows.every(x=>x.role!=="PM"),true,"K00 PM kickoff included in engineering legacy");
 assert(m.roleLines.filter(x=>x.wbs==="K01").every(x=>!x.roleName.includes("FAT witness")),"B3 factory team not eligible for B1");
 assert(m.expenseLines.filter(x=>x.conditional).every(x=>x.account==="B1.6"||x.account==="B1.7"));
-assert.equal(bc.byCode.B1.workingSellTHB,211600,"B1 must use new role/activity costs only");
+assert.equal(bc.byCode.B1.workingSellTHB,421180,"B1 must use new role/activity costs only");
 assert.equal(bc.byCode.B1.b1SupportPlanningBudget.proposedB1BaseWorkingSellTHB,m.proposedB1BaseWorkingSellTHB);
 // Part B selected pricing has changed since the original B1-only test was
 // authored: B2 Rev05 THB580,000 was replaced with a first-principles
@@ -72,11 +72,11 @@ assert.equal(bc.byCode.B2.workingSellTHB,237121.13,
  "B2 current independent 131-WO VDRL Working SELL must be selected, not Rev05");
 assert.equal(bc.previousB2Rev05ReferenceTHB,580000,
  "Old B2 quoted SELL must remain historical, nonposting evidence");
-assert.equal(bc.byCode.B3.workingSellTHB,2599325,
- "B3 must include sourced MGW purchased FAT in addition to witnesses/SAT");
-assert.equal(bc.byCode.B3.b3OriginalWithoutMgwPurchasedTHB,2292200,
+assert.equal(bc.byCode.B3.workingSellTHB,2322450,
+ "B3 must include ADDVALUE local execution allowances plus unchanged SAT/survey");
+assert.equal(bc.byCode.B3.b3OriginalWithoutMgwPurchasedTHB,2322450,
  "B3 current non-MGW component must include new SAT28, conditional BF Survey and China FAT witness rates only once");
-assert.equal(bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125,
+assert.equal(bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,0,
  "MGW purchased FAT Working SELL must be included once in canonical B3");
 const roundTHB=v=>Math.round((v+Number.EPSILON)*100)/100;
 const historicalB1OnlyBaseTHB=4187590.69; // B1-current, B2 historical Rev05, B3 before MGW purchase and 22-Oct China FAT witness rate revision.
@@ -91,8 +91,9 @@ const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
  +bc.byCode.B9.workingSellTHB
  -(bc.byCode.B3.b3FortyDayBudget.laborWorkingSellTHB-bc.byCode.B3.b3SelectedSatSurveyBudget.laborWorkingSellTHB)
  +(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB-historicalChinaFatWitnessSellTHB)
- +(bc.byCode.B8.workingSellTHB-30000)+currentSpareDelta); // B8 Hybrid and 23-Oct authorized spare revision
-assert.equal(historicalToCurrent,5043082.13,
+ +(bc.byCode.B8.workingSellTHB-30000)+currentSpareDelta
+ +(bc.byCode.B1.workingSellTHB-211600)+(bc.byCode.B6.workingSellTHB-307584)); // B8 Hybrid and 23-Oct authorized spare revision
+assert.equal(historicalToCurrent,4994787.13,
  "Historical B1-only baseline to current B2/B3 price selection bridge failed");
 const sumBaseOwners=roundTHB(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
  .reduce((sum,r)=>sum+r.workingSellTHB,0));
@@ -103,7 +104,7 @@ assert.equal(bc.knownWorkingSellTHB,historicalToCurrent,
 assert.equal(bc.byCode.B9.workingSellTHB,480550);
 assert.equal(bc.byCode.B9.b9ChinaBudget.conditionalYardSellTHB,480550);
 const jsx=fs.readFileSync(path.join(root,"project0553/B1RevKMilestoneBudget0553.jsx"),"utf8");
-for(const token of ["selectB1ProjectSupportBudget0553","model.accounts.map(","model.milestones.map(",
+for(const token of ["selectB1ProjectSupportBudget0553","model.accounts.filter(","model.milestones.map(",
  "model.roleRates","model.baseWorkingCostTHB","model.baseWorkingSellTHB",
  "model.canonicalB1WorkingSellTHB","model.conditionalWorkingSellTHB",
  "roleName","unitCostTHB","workingCostTHB","workingSellTHB"]){
@@ -113,4 +114,4 @@ assert(!jsx.includes("usdPerPersonDay"),"Old USD600 general admin widget still a
 assert(babel.transformSync(jsx,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0,
  "B1 budget JSX Babel syntax invalid");
-console.log("PASS PJ2608-0553 B1 role-based planning: 19 K/12 unique events; 7 roles, 242 MH, THB 80,400 labour cost; THB 181,400 support base cost / THB 211,600 support SELL; THB 51,700 conditional sell; proposed B1 THB 211,600; Part B canonical recalculated with current B1 only.");
+console.log("PASS PJ2608-0553 B1 role-based planning: 19 K/12 unique events; 7 roles, 242 MH, THB 80,400 labour cost; THB 374,200 support base cost / THB 421,180 support SELL; THB 0.00 conditional sell; proposed B1 THB 421,180; Part B canonical recalculated with current B1 only.");

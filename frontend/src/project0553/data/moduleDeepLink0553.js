@@ -12,5 +12,8 @@ export const openModuleAncestors0553=node=>{
  }
  return count;
 };
+export const isOnshoreYardDossierModule0553=id=>
+ /^bid\.budget\.working\.bc\.b3\.resource-price-dossier\.(?:group\.06(?:\.|$)|gf-yard\.)/i.test(String(id||""));
 export const workingOwnerFromModuleId0553=id=>
+ isOnshoreYardDossierModule0553(id)?"B9":
  String(id||"").match(/^bid\.budget\.working\.bc\.(b(?:[1-9]|1[0-4])|c[12])(?:\.|$)/i)?.[1]?.toUpperCase()||null;

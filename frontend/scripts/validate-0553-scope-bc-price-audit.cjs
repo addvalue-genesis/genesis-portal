@@ -112,7 +112,18 @@ for(const snippet of ['data-component-key={moduleId}','p.historicalDetailLines.m
  'p.historicalReferenceTHB','p.historicalDisplayedVsSummaryDeltaTHB','x.historicalUnitTHB','x.historicalExtendedTHB','NO ITEMIZED REV08 ANNEX',
  'NOT VERIFIED / NOT POSTED'])
  assert(detail.includes(snippet),"10.5 child price audit missing: "+snippet);
+// 10.5 must use the same dated FX-controlled historical THB read projection;
+ // unconverted Rev08 USD remains accessible as an explicit 10.2-only source note.
 assert(!detail.includes("<td>{usd(x.historicalUnitUSD)}</td>"),"Current 10.5 screen must show THB not raw USD price columns");
+assert(detail.includes("<th>Historical unit THB *</th>")&&detail.includes("<th>Historical extended THB *</th>"),
+ "Current 10.5 historical evidence columns must be THB labelled");
+assert(detail.includes("x.historicalUnitUSD*p.historicalFxTHBPerUSD")&&
+ detail.includes("x.historicalTotalUSD*p.historicalFxTHBPerUSD"),
+ "Historical source USD must convert using the visible FX reference; never treat raw USD as THB");
+assert(detail.includes("inWorking&&<small>Original: {usd(x.historicalUnitUSD)}</small>"),
+ "Original USD should be preserved only in 10.2 Working source review");
+assert(detail.includes("inWorking&&(customerSchedule.sparePriceEvidence.directComparablesByCode"),
+ "Direct installed-equipment quote currency and supplier evidence belongs to 10.2 Working, not 10.5");
 assert(page.includes('...buildScopeBcModuleNavigator0553()'));
 assert(work.includes('navigationTarget={navigationTarget} navigationSequence={navigationSequence}'));
 assert(!ui.includes('const shownAmount=hasChild?childAmount:amount'),
@@ -123,4 +134,4 @@ for(const file of ["project0553/ScopeSheetsDetail0553.jsx","project0553/ScopeBcA
  }).code;
  assert(compiled?.length>0,"JSX compile failed "+file);
 }
-console.log("PASS 0553 10.2->10.5 Scope B10/B11/B13/B14/C1/C2: B11 THB128314.11 selected budgetary WORKING SELL (not verified Direct Cost, not released quote); 6 Rev08 historical references, 31 child rows, B14 unpriced, current-owner trace and Module ID links.");
+console.log("PASS 0553 10.2->10.5 Scope B10/B11/B13/B14/C1/C2: B11 THB157657.50 selected budgetary WORKING SELL (not verified Direct Cost, not released quote); 6 Rev08 historical references, 31 child rows, B14 unpriced, current-owner trace and Module ID links.");

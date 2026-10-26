@@ -2,8 +2,234 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-22-R31";
+export const CHANGE_LOG_VERSION_0553="2026-10-26-R64";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261026-06",date:"2026-10-26",kind:"VALIDATION",tone:"neutral",
+  title:"Complete A/B export verification and native Rev00 template compatibility",
+  detail:"The supplied Rev00 workbook contained spare prices but placeholder Part A and blank remaining B prices/total. Both native export paths now verify four A groups, fourteen B rows, quantities, unit prices, amounts and the A+B subtotal against current Release before returning a download. Working export rewrites B identifiers/quantities/descriptions and clears stale unused A rows. Added a command-line export using the same Official model and exporter to repair partial templates. Existing USD863900 priced subtotal, unpriced B4/B12/B14 and separate conditional C1/C2 USD120500 are unchanged.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner supplied 4-Scope of Supply Rev00.xlsx on 26-Oct-2026: Part A/B missing"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261026-05",date:"2026-10-26",kind:"VALIDATION",tone:"neutral",
+  title:"C1/C2 priced THB/USD export parity and exact historical Source return",
+  detail:"Closes the 10.3.3 Working Excel path that still exported NOT QUOTED despite prepared C1/C2 offers. THB summary and Annex now share the same 1/12 conditional price rows as Official USD. The 12 C2 Rev08 identities remain separate from the 4 current MR financial parents, including the return banner and exact row highlight. Proposed feeder uses selected MGW UHF-4 1/2-inch 50-ohm evidence; the superseded rate remains a budget proxy and no OEM SKU/price is invented. Preserves original E7 formula with refreshed four-lot cache, merged option remark B21:J21 and four-decimal unit precision; repeated native exports reuse styles. Base A+B and all five selected price amounts are unchanged. OEM compatibility, actual stock exclusion, CIF acceptance and firm quotation gates remain open; no issue or merge.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview","bid.budget.pricing.official","bid.budget.working.bc.c2"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"26-Oct-2026 handoff execution: runtime, browser and original native XLSX regression"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261026-04",date:"2026-10-26",kind:"PRICE",tone:"caution",
+  title:"Owner selects PRICED C1/C2 Conditional Budgetary Option Offer in Part C Summary / Annex / Native Excel",
+  detail:"Management explicitly requires C1/C2 offered prices rather than NOT QUOTED. Source-to-Release overlay selects conditional budgetary proposals from existing 10.2 reviewed source: C1 marine RACON capital-spare option THB3071250 from MDS/ORGA installed FCA equipment comparable x1.30 sell scenario, USD97500; C2 12 item two-year spare option historical Rev08 total THB721806.60, converted at FX31.5 and upward USD100 summary rounding USD23000. The selected conditional OPTION sell is reflected in 10.3.3 Source Part C THB, 10.3.4 Official Part C USD, twelve C2 and one C1 Annex line totals, and original six-sheet native XLSX summary F41/G41 F42/G42 and respective Annex tab prices. Retain customerSellTHB null for unverified separate OEM COST; expose explicit budgetaryOptionOfferTHB/USD on canonical option Source/Release rows and distinguish budgetary offer from supplier-confirmed firm prices, without adding C1/C2 into A+B or duplicating B10 physical stock. Legacy four C2 OEM MR source audit remains separately expandable. RF cable 7/8-inch Rev08 historical proxy must be substituted with installed-feeder size on procurement. OEM part no, two-year quantity, technical acceptance, alternative supply Incoterm CIF Zhuhai and exclusion of true B10 identical SKUs remain contract qualification gates. No external quotation actually transmitted or OEM accepted.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.option-budgetary-offer","bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner explicit instruction 26-Oct-2026: ต้องให้เสนอราคามาเลย / Part C price needed immediately"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261026-03",date:"2026-10-26",kind:"PRICE",tone:"caution",
+  title:"B10 10.3.4 Official + Original Native Excel — 14 source-linked priced LOT lines from USD16200 parent total",
+  detail:"Owner reported B10 Official preview Qty dashes and price To be quoted even though 10.2 Working and 10.3.3 had 14 budget functional allowance amounts. The Official USD model now projects exactly 14 PRE-AWARD priced 1-LOT functional lines from four immutable rounded MR parent USD totals, summing 16200 (working-before-round allocation 16185), using existing sourceId/traceId/sourceRowModuleId per MR plus 14 selection IDs. The same itemized model feeds the Official 8-column UX/UI and six-sheet Native XLSX export: B10 adds one styled body row 19, shifts Total to row20 and Remark to row21; other worksheets remain unchanged. Official local application adds per-line Source button returning to 10.2 Spare Function and existing Release row. Each Qty 1 LOT is financial allowance NOT an OEM physical spare unit, Unit USD is an unissued allocation NOT a verified OEM CIF price, original DDP-to-CIF deviation is outstanding. No selected WBS THB, A/B summary, 10.3.3 financial Source, cross-category stock allocation or customer release authorisation changed; draft gate remains NOT ISSUED.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10","bid.budget.pricing.release.preview","bid.budget.pricing.official.b10.kit-summary"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner screenshot 26-Oct 10.3.4 B10 lacks Qty/Price, demands Source→Release linkage"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261026-02",date:"2026-10-26",kind:"PRICE",tone:"caution",
+  title:"B10 original Annex clean technical Description/Materials and 14-line Working budget split",
+  detail:"Removes PENDING/SPIR/internal audit text from B10 customer Detail Specification and Materials cells. 14 MR Attachment-5 functional spare allowance rows remain source-linked, without promoting installed Part A SKU or vendor quote cost into B10 physical stock. Creates read-only 10.2 price attribution: each MR's selected existing kit Working SELL THB is converted to USD using 31.5 and allocated equally across that MR's functional budget lines as 1 LOT presentation units. MR0001 4xUSD1820, MR0002 3xUSD910, MR0003 4xUSD715, MR0004 3xUSD1105; sum USD16185 = current THB509827.50 (FX31.5). This is a FINANCIAL PRESENTATION split, not confirmed OEM spare Qty or per-SKU quote and not issued customer pricing. Adds numeric Qty/Unit/Total to 10.3.3 pre-award preview and six-sheet B10 original Native INTERNAL budget XLSX; moves assumptions to footnote row21, preserves Technical Specification/Materials plain customer-readable, existing B10 source/Release 4 financial parent links, and Official USD16200 summary unchanged. CIF Zhuhai versus original purchaser DDP acceptance remains HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10.budgetary-functional-allocation","bid.budget.working.bc.b10.original-annex-item-map","bid.budget.pricing.release.preview"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner screenshot 26-Oct: Detail Specification and Materials must omit internal notes and B10 price breakdown must use Working"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261026-01",date:"2026-10-26",kind:"ENGINEERING",tone:"neutral",
+  title:"B10 Required BOM → four lifecycle stages → original 8-column Annex, not 35 installed items",
+  detail:"Corrects the critical misclassification of 35 mixed Part A equipment and B10 stock-candidate references as B10 purchasing rows. MR0001 Table5 ZWP20 8 original installed functions (ODU/IDU/ANT/L3/Ex socket/TCAB/SA/Bulk) are verified in a read-only 10.1 required-BOM stage model. All 14 pre-award functional B10 screening candidates derived from MR0001–0004 Attachment 5 and 4 stages Erection/Pre-commissioning/Commissioning/Start-up now drive exactly the same customer-native B-I rows in JSX and a six-sheet working-draft-first Excel export. Original B10 sheet capacity 13 expanded by one row with Total→20 and Remark→21; no additional sheet or loss of other five current Working worksheets. Confirmed B10 physical purchase Qty/unit CIF Sell count still 0; vendor D/E optional old quote prices moved to internal evidence only. Full 4/3/4/3 kit price envelopes and original Working THB509827.50, Official USD16200 retained with Source↔Release parent IDs and exact individual-function navigation. MR Attachment7 excludes proven same B10 stock from C2; Annex8 percentage applies by listed applicable equipment category, NOT every SCADA radio/Cisco unit. Proposed CIF Zhuhai Port is expressly subject to original DDP purchaser form deviation approval. Final customer Release HOLD until OEM SPIR SKU/Qty and CIF unit price established; no invented pricing.",
+  moduleIds:Object.freeze(["bid.budget.bom.zwp20.mr-502-001.4.required-bom","bid.budget.working.bc.b10.stage-spare-selection","bid.budget.working.bc.b10.original-annex-item-map","bid.budget.pricing.release.preview"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner MR0001 Rev.C1 §5, Attachment4/5/7, SPE0001 §8.1, EXA-A8 Attachments 1–2, original 4-Scope of Supply.xlsx"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-11",date:"2026-10-25",kind:"DATA_FLOW",tone:"neutral",
+  title:"B10 original Annex eight-column UI + native XLSX same-sheet >13-row mapping; CIF/USD qualification",
+  detail:"Unified original Item/Source, Equipment/Spare Function, Model/Part No., linked MR/TAG, supplier quoted Qty/unit and nonposted reference USD into eight native B10 columns B-I, displayed inside 10.3.2/10.5/10.3.3/10.3.4 B10. Added Internal Original B10 native XLSX export button using the six original customer sheets; expands 35 rows on the SAME B10 CommSpares sheet (22 inserted body rows, Total→row41, Remark→row42, original border/style/merge moved). Footer is NOT QUOTED because original expired supplier quantities/prices reflect installed or optional equipment, NOT approved B10 spare Qty or CIF USD SELL. Internal preview/Excel shows source reference amounts and planning THB→USD conversions marked reference, customer preview shows To be quoted. Original template says DDP; selected commercial proposal is CIF Zhuhai Port China Incoterms2020, subject to purchaser acceptance/qualification and cost refresh. Original Official USD financial parent source/4-kit totals and existing native customer export remain unchanged (HOLD). Source ID/MR/14 spare function review maintained; no double posting or cost reallocation.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10.original-annex-item-map","bid.budget.pricing.release.preview.annex.b10.kit-summary","bid.budget.pricing.official.b10.kit-summary"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner screenshots 25-Oct: map B10 quote evidence to customer's Item/Tag/Description/Spec/Materials/Qty/Unit/Total template; more than13 same-sheet rows; CIF/USD wording"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-10",date:"2026-10-25",kind:"VALIDATION",tone:"neutral",
+  title:"Repair What's New VALIDATION category registry; no price posting",
+  detail:"Fix validate:0553-budget-change-summary line24. Historical change notes already contain VALIDATION kind, and BudgetChangeSummary's visible Data group already includes it. The registered CHANGE_TYPES description table omitted VALIDATION, so the new regression incorrectly failed despite correct historical entries. Add the missing description without renaming or suppressing any historical change notes. No Working cost, Source→Release→Source navigation, OEM SKU, pricing, customer quotation or original XLSX cells changed.",
+  moduleIds:Object.freeze(["bid.budget.changes","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner PowerShell validation error 25-Oct-2026 line24 — missing VALIDATION description enum"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-09",date:"2026-10-25",kind:"PRICE",tone:"caution",
+  title:"B11 / B13 / C1 / C2 qty × unit price in original native Annex format — internal pricing review",
+  detail:"Owner requested actual quantity and unit prices across the four blank original customer Annex tabs. Created an independent INTERNAL budgetary priced XLSX derivative retaining the six original customer sheets: B11 four 10.2 selected MR tool-package cost envelopes 157657.50 THB, B13 three selected preservation/consumable allowances 46683 THB, C1 one RACON installed FCA-equipment comparable 3071250 THB (not verified C1 OEM/DDP spare), C2 twelve Rev08 historic USD source physical candidate rows at planning FX31.5 THB aggregate approx 721806.60, explicitly flagged for B10 overlap/incompatible RF feeder. Added a single read-only code projection and Price Review table in 10.2 Working and 10.3.3 Internal Annex; this does not select C1/C2 selling prices or update issued Official USD/native embedded exporter. Exact Parent Source IDs kept for B11/B13/C1, historic C2 SKUs do not assert a fabricated Parent Source ID. No automatic posting or client issue.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.spare-priced-budget-review","bid.budget.pricing.release.preview"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner screenshots B11/B13/C1/C2 native blank forms; request complete quantities and unit/total prices from 10.2 Working"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-08",date:"2026-10-25",kind:"PRICE",tone:"caution",
+  title:"Expose NEW B10 researched price vs unchanged 10.2 selected and 10.3 Release; no false repricing for B11/B13/C1/C2",
+  detail:"Owner challenged unchanged B10/B11/B13/C1/C2 financial totals after lifecycle UI update. Cause: canonical Working price owner still uses 2026-10-23 parametric MR envelopes. Latest NextG sourced B10 Price-to-Win is 568083.85 THB scenario / 18100 USD equivalent, but only a nonposting What-if with 100% MR1 envelope credit and unapproved vendor offered quantities. New read-only five-category price comparison now appears in Internal Working and Internal Release (prominent B10 heading), separately from selected B10 THB509827.50, B11 THB157657.50, B13 THB46683; C1 FCA installed equipment comparator THB3071250 is NOT an independent capital spare quote; C2 no new supplier cost. No source ledger/official/native posting, no claim of newly issued price or approved physical SKU. New proposals require OEM SPIR, qty, exact spare price, supplier validity, stock owner and approval before selecting a price.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.spare-lifecycle-control","bid.budget.working.bc.b10.price-to-win-review","bid.budget.pricing.release.preview.spare-lifecycle"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner question 25-Oct: why unchanged legacy selected Working & Release instead of reworked budgetary prices"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-07",date:"2026-10-25",kind:"UI",tone:"navigation",
+  title:"B10 / B11 / B13 / C1 / C2 — bidirectional Release→Source→Release and cross-category lifecycle",
+  detail:"One nonposting, source-owned five-category spare lifecycle registry checks all 16 financial Working rows against 10.3.3 Release and native cell IDs. Adds collapsed trace/requirement/overlap reviewer to Working and internal Release, exact Return-to-10.3.3 row action on Working after Release source lookup, and category-level return when no exact row was selected. Seven controls cover B10/A installed, B10/C1 capital, B10/C2 2-year stock, B11/A licences, B11/B3 contractor test equipment, B13/B5 packing and B13/A5 bulk. Minimum requirements linked to MR Attachments 5/7, SPE, EXA-A8 and OEM. No new SKU/Qty/USD price or posting, no changes to B10 THB509827.50, B11 THB157657.50, B13 THB46683, C1/C2 unquoted, Official USD or native Excel. Build regression blocks incorrect source row mapping; customer release HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.spare-lifecycle-control","bid.budget.pricing.release.preview.spare-lifecycle","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner request: cross-category integration and exact Release to Source to Release"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-06",date:"2026-10-25",kind:"ENGINEERING",tone:"neutral",
+  title:"B10 ODU/IDU/Cisco and all four telecom MR equipment composition → OEM SPIR coverage",
+  detail:"New read-only original item/source physical composition for B10: actual NextG SCADA ODU Base/Remote quote lines, source-only IDU functional requirement, VST Cisco IE3400+PoE PSU+licence, MGW RFI BDA and included RF surge, EXION Ex phone/sounder, MDS RACON, and 14 original MR commissioning spare article functions. Visible below 4 financial kit rows in Budgetary/10.5/10.3.3/10.3.4. Explicitly distinguishes quoted Part A installed Qty and unit reference from unconfirmed B10 spare purchase Qty/rate; 4/3/4/3 MR kits remain B10 THB509827.50 / Official USD16200. Uses same parent sourceId/traceId for Release→Source→Release; document authority MR §5/Attachments 2,5,7, SPE §8.1, BOD §11.1. OEM-approved SPIR and original native XLSX 13-row itemization remain release HOLD. No double count.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10.physical-composition","bid.budget.pricing.release.preview.annex.b10.kit-summary","bid.budget.pricing.official.b10.kit-summary"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner 25-Oct: show what B10 consists of — ODU, IDU, Cisco L3 and vendor SKUs, based on BOD/MR/DTS/SPE and native Excel"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-05",date:"2026-10-25",kind:"UI",tone:"neutral",
+  title:"10.5 historical spare reference THB display / source-currency separation",
+  detail:"Fix validate:0553-scope-bc-price-audit assertion 115: additional Rev08 item-candidate audit inadvertently displayed raw USD unit/extended prices in 10.5. These columns now use explicit historical THB conversion at the selected FX; if FX is absent no price is inferred. The original USD remains available as a 10.2 Working-only reference; source quote comparables stay in Working. B10 source→Budgetary→Scope→Release→Official and reverse IDs, THB509827.50 B10, USD16200 Official and all cost owners are unchanged. Targeted regression now checks THB columns and 10.2-only source currency.",
+  moduleIds:Object.freeze(["bid.budget.scope","bid.budget.working.bc.b10","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner validation console 25-Oct: Scope BC price audit failed line 115 on raw historical USD table cells"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-04",date:"2026-10-25",kind:"UI",tone:"navigation",
+  title:"B10 Budgetary/Release/Official — four-kit commercial-only view, Source→Release→Source retained",
+  detail:"Removed engineering SKU/evidence/Price-to-Win module panels from Budgetary B10, Scope B10, 10.3.3 B10 and 10.3.4 B10 customer-facing view; now shows compact source-controlled 4 MR kit price summary 4/3/4/3. Row sourceIds and sourceRowModuleIds remain unchanged and Internal 10.3.3 & Scope/Budgetary Source buttons navigate to canonical 10.2; Working keeps full SKU/TAG/vendor-cost review. Official DTO and native original six-sheet XLSX unchanged. THB509827.50 and Official USD16200 are unchanged. Responsive width constrained to container with internal scrolling under 720px. No double posting and final customer issue HOLD.",
+  moduleIds:Object.freeze(["bid.budget.pricing.budgetary","bid.budget.scope.b10","bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner25-Oct screenshot: B10 release modules duplicative/overflow; preserve Source→Release→Source"
+ }),
+
+ Object.freeze({
+  id:"P553-CHANGE-20261025-03",date:"2026-10-25",kind:"UI",tone:"navigation",
+  title:"B10 10.3.3 Original Item / Source → SKU before MR Kit summary",
+  detail:"10.3.3 B10 Annex now shows a prominent Original Item / Source → quoted Part No. → candidate installed TAG → offered Qty vs approved purchase Qty → vendor USD reference vs nonposting review SELL table ahead of four MR financial-kit rows. Both Customer/Internal preview modes show the item identification; only Internal shows supplier costs and scenario SELL. Huge related-TAG lists are capped with internal scrolling. The original 4/3/4/3 KIT financial lines and THB509827.50, Official USD16200, embedded native Excel, 16 existing financial annex trace IDs and approval gates remain untouched. Supplier quote expiry, unconfirmed spare quantity and Part A/B11/C1/C2 duplicate boundaries are explicit.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview","bid.budget.pricing.release.preview.annex.b10.original-item-source","bid.budget.working.bc.b10.itemized-purchasing-evidence"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner screenshot25-Oct: B10 kit-level instead of SKU and rename evidence Original Item / Source"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-02",date:"2026-10-25",kind:"ENGINEERING",tone:"pricing",
+  title:"B10 Price-to-Win what-if 30–50% and supplier market evidence",
+  detail:"New nonposting B10 price-to-win scenario uses NextG expired D/E accessories priced line-by-line, replaces rather than adds historical MR0001 engineering cost USD5600, and retains clearly unitemized MR0002/3/4 cost envelopes USD6850. Default excludes US power cords and whole capital radios and gives optimistic 100% MR1 old-allowance credit (may omit other spares). Uncertain source overlap sensitivity 50% credit gives THB691563.85/USD22000, 0% gross coverage stress gives THB815043.85/USD25900 (may double count); none posts. 5% cost risk and 5% SAMTEL selling deduction with 20% target profit produces multiplier1.40; indicative source USD12881.72, Working-equivalent THB568083.85, USD100-rounded 10.3.4 equivalent USD18100. Source→10.2→10.5→Internal10.3.3 only. Actual B10 Working THB509827.50 and USD16200 Official, known A+B and native customer XLSX are unchanged; no quote issued. Published PolyPhaser/Hawke/Eaton prices are flagged nonposting comparables.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10","bid.budget.working.bc.b10.price-to-win-review","bid.budget.scope.b10","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner25-Oct: test retail O&G bid markup and answer missing prices from evidence before approving B10 quote"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261025-01",date:"2026-10-25",kind:"ENGINEERING",tone:"neutral",
+  title:"B10 deep spare part and supplier quote itemization — nonposting audit",
+  detail:"MR0001–0004 4/3/4/3 commissioning-kit financial envelopes retained. B10 now separates 14 source-derived physical article families (unapproved Part No./physical Qty/cost) from 16 NextG Rev16Sep2026 separately quoted D/E SKU offer rows (14 priced, two dashed), with related installed site/TAG candidates and matched base A/B/C quote SKU links. Six accessory candidates, two major radio assemblies and eight software/licence/warranty lines are separated; physical stock and B10/C1/C2 ownership require approval. Working B10 THB509827.50, Known B THB4994787.13, Official USD B10 16200, native 6-sheet customer workbook unchanged; candidate prices never posted or exported to customer. Final release remains HOLD.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10","bid.budget.working.bc.b10.itemized-purchasing-evidence","bid.budget.scope.b10","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner25-Oct: B10 purchasable SKU/TAG/Quantity/Unit Price source audit; NextG 16-Sep-2026 D/E separately quoted spares"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-15",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"10.3.4 Official Release — English / USD",
+  detail:"Customer-only view from 10.3.3; quotation FX31.5, round up each priced summary item to USD100. Annex allocations reconcile. English native-template Excel with no internal notes; missing prices stay to be quoted. Working THB and issue status unchanged.",
+  moduleIds:Object.freeze(["bid.budget.pricing.official","bid.budget.pricing.release.preview"]),
+  priceImpact:"QUOTATION_FX_ROUNDING_ONLY",source:"Owner24-Oct: English official USD release and native Excel export"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-14",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release แสดงยอด A+B เฉพาะรายการที่มีราคา",
+  detail:"แสดงยอดรวมจาก Source เดิมทั้ง Customer/Internal Preview และ Native Excel G38 พร้อมระบุรายการยังไม่มีราคา ยอดราคาไม่เปลี่ยน Final Release ยัง HOLD.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: show available quotation total"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-13",date:"2026-10-24",kind:"PRICE",tone:"pricing",
+  title:"B1–B14 activities + Thailand / CIF / Myanmar operations",
+  detail:"Owner-selected cost250000: B6 import30000/export20000 and B1 Myanmar200000. Remove B1 filing7200; supersede old conditional47000 without base credit. Official fee25000 has no uplift; services/reserves factor1.10. B1 cost374200/SELL421180. B6 import SELL12000 replaced33000; old mixed export25000 newly split service15000/physical10000, service replaced22000; B6 SELL335584. B1 two groups and all14 activity owners flow to Release/native. KnownB4994787.13; unpriced items/approvals remain open. Draft only.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1","bid.budget.working.bc.b6","bid.budget.pricing.release.preview"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner24-Oct: approve operation estimate and B1–B14 activities"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-12",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release Excel export: ฟอนต์และช่องพอดีกับข้อความ",
+  detail:"แก้ตัวส่งออก Native XLSX จริง: เนื้อหา Arial 10 pt, Wrap Text, คงขนาดคอลัมน์/กระดาษ/merged ตามต้นฉบับ และความสูงแถวตามข้อความ. คง 6 sheets, สูตร, ข้อมูล, border/fill และราคา; ปรับเฉพาะรูปแบบในสำเนาที่ส่งออก ไฟล์ต้นฉบับไม่เปลี่ยน. ปุ่ม Export Excel ใช้ template ต้นฉบับที่ฝังในระบบ กดแล้วดาวน์โหลดได้เลย ไม่ต้องเลือกไฟล์.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: exported Release Excel text overflows cells; check and fix font/column/row formatting"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-11",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release Main Specification แสดงชื่อ Locations",
+  detail:"ช่อง Main Specification ของ A1–A4 แสดงชื่อ Location ไม่ซ้ำจาก sourceRows ของแต่ละ MR แทนจำนวน TAG/sites; ใช้ทั้ง Customer และ Internal. รายละเอียด TAG ยังเปิดดูได้ตามเดิม ตัวเลขและ source model ไม่เปลี่ยน.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: show actual locations such as ZPQ/ZWP20 in Main Specification"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-10",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"Release B3/B9: ข้อความสั้นในเซลล์คำอธิบายเดิม",
+  detail:"ย่อวันทำงาน Day / OT / Standby เหลือข้อความ 5 บรรทัดในช่องคำอธิบาย B3/B9 เดิม ไม่มีแถวเพิ่มหรือกรอบใหญ่; รายละเอียดตรวจสอบอยู่ Working ตามเดิม. ใช้ฐานวันและอัตราล่าสุดจากต้นทาง ไม่ใช้ 18/45 วันจาก CCL เก่าที่ส่งมาเป็นตัวอย่างรูปแบบ. ราคาและ native XLSX ไม่เปลี่ยน.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: short text in the same Excel-style cell, not a separate service panel"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-09",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"หน้าพอดีจอ + Release Day / OT / Standby เป็นข้อความ",
+  detail:"แก้กรอบ grid ที่ขยายตามตารางด้านใน; ตาราง BOM และ workbook เลื่อนภายในกรอบ ไม่ดันทั้งหน้าเกินจอ. เปลี่ยนรายละเอียด Day / OT / Standby ใต้ B3/B9 เป็นย่อหน้าตามตำแหน่ง พร้อมฐานจำนวนวัน อัตราทีม และข้อกำหนดเดิม แทนตารางซ้อน. คงสีเจ้าของงบและป้าย DRAFT/PROPOSED; ตัวเลข ต้นทาง และ native workbook ไม่เปลี่ยน.",
+  moduleIds:Object.freeze(["bid.budget.bom.system-location-mto","bid.budget.pricing.release.preview"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct screenshots: page wider than screen; show service terms as text like the actual document"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-08",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"สีต่อเนื่องถึงตารางชั้นใน + จัด Yard onshore group.06 ไว้กับ B9",
+  detail:"ใช้สีเจ้าของงบ A/B/C และกลุ่มงานต่อเนื่องถึงหัวตาราง แถว และยอดรวม; ข้อกำหนดที่ไม่ลงราคาใช้เทาประ. ย้ายการแสดง group.06 พร้อม 14 Yard test rows ไปอยู่ B9 onshore และเก็บจุดเชื่อมจาก B3; Module IDs เดิมค้นหาได้และเปิด B9. งบ B9 480550 กับ B3 2322450 คงเดิม; ยังไม่ปิดประเด็นขอบเขตแรงงาน B3 SAT28 กับ B9 จนกว่าจะเทียบกิจกรรม/วัน/RACI. เพิ่มฐาน B9 7+2 วัน และ B3 SAT28 วัน พร้อม day rate จากต้นทาง; offshore OT เกิน12ชั่วโมง ข้อเสนอ OT1.5×/Standby100% ยังไม่เลือกใช้. Release/Scope รับคำอธิบายจากต้นทางเดียวกัน และแสดงตาราง Day/OT/Standby เปิดทันทีใน Release พร้อมป้าย DRAFT/PROPOSED ไม่ใช่เงื่อนไขที่ตกลง; OT onshore รอชั่วโมงปกติ. ยอดราคาและ native workbook คงเดิม.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.06","bid.budget.working.bc.b9.price-trace.work-scope","bid.budget.working.bc"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner24-Oct: extend colours into every nested table; move incorrectly grouped work; Yard is onshore"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-07",date:"2026-10-24",kind:"UI",tone:"navigation",
+  title:"B3 สีเดียวกันตลอดกลุ่ม พร้อมป้ายยอดรวม / รายละเอียดงาน / สถานที่",
+  detail:"หัวข้อย่อยและสถานที่ใช้สีของกลุ่มแม่ทั้ง FAT, Survey, SAT/Commissioning และ Tools แทนสีฟ้าเริ่มต้นที่ทำให้เข้าใจว่าเป็นคนละกลุ่ม; เพิ่มป้ายระดับและชื่อกลุ่มต้นทาง พร้อมอธิบายว่ายอดด้านในแจกแจงยอดหัวกลุ่ม ไม่บวกซ้ำ. Module IDs, Source → Working → Budget/Scope → Release และราคา A/B/C คงเดิม.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier","bid.budget.working.bc.b3.resource-price-dossier.rollup.sat-commissioning"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner screenshot24-Oct: mismatched parent/child colours obscure the same work group"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-06",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"Owner duration: FAT2+1 / Training1+1; reserve days included once",
+  detail:"Owner confirms +1 means reserve. FAT2 actual days81900 +1 reserve40950 replaces6-day crew245700; standalone closeout day merged into FAT2+1. Existing4 preparation days retained. Shared facility/transport window9 days, FAT meals3 days; no repeated reserve meal or closeout charge. Local B3 execution452850; full B3 2322450. B8 remains142550:1 teaching +1 reserve day, OEM online base8h +reserve8h, no duplicate trainer day. Combined local FAT/training595400 (-240150); known Part B4757207.13. Twelve FAT requirement IDs remain; earlier48h estimate split32h preparation +16h formal timebox, actual ITP/TAG repetition open. A/B9/spares/C and packing/CIF unchanged; source-derived Scope/Release/native only.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.02.site.01","bid.budget.working.bc.b8.hybrid-training"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner correction24-Oct FAT2+1 Training1+1; explicitly confirmed reserve days"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-05",date:"2026-10-24",kind:"UI",tone:"neutral",
+  title:"B8 Base confirmed by owner: OEM ONLINE + ADDVALUE onsite at SAMTEL",
+  detail:"Owner selects OEM online as the base proposal method. B8 remains142550; onsite OEM615350 stays internal/nonposting and is not C1/C2. Source decision and proposal wording distinguish owner selection from customer acceptance and vendor fee confirmation. No A/B/C price change; all downstream totals unchanged.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b8.hybrid-training","bid.budget.working.bc.b8"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner 24-Oct: กำหนดไปเลย ผมจะเอา OEM online เป็นหลัก"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-04",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"SAMTEL lump sum: preparation, FAT, hosting, shared tools, training and CIF export allocation",
+  detail:"Current local B3 execution allowance693000: 4 prep +6 FAT +1 closeout +1 retest, shared14-day facility/transport, tools, meals and OEM remote FAT support. Total B3 2562600 (+429300). B8 142550 (-9000): demo20000 transferred to B3, catering11000 added; six products/16h, prior content-prep day and separate D5–6 training. OEM onsite alternative615350 nonposting. B5 311184/B6 307584 retain existing envelopes with internal activity allocations, including SAMTEL dispatch/export25000; freight/tax/insurance adequacy not verified. A/B9/spares unchanged. Known Part B4997357.13, net change+420300; source flows to Scope/Release/native draft, no MGW service, no second travel credit. Historical5/7-day comparisons frozen to prior baseline; not current execution plans.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.02.site.01","bid.budget.working.bc.b8.hybrid-training","bid.budget.working.bc.b6.price-trace.work-scope"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner 24-Oct full lump-sum execution scope; internal estimator assumptions explicitly unquoted"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-03",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"MGW supplies MR0002 equipment only — remove all B3 FAT services/reserve",
+  detail:"Owner correction: no MGW integration, iFAT, facility or service reserve. Withdraw THB307125 from the existing B3 source, with no replacement allowance. Active supplier service rows removed; old Module ID returns a withdrawn nonposting notice. Local ADDVALUE FAT remains THB263700 (245700 labour +8000 local transfers +10000 work insurance); B3 THB2133300, Part B THB4577057.13. MR0002 equipment and all other A/B/C owners unchanged. Release/Scope/native values derive from source. Supplier20% deduction removed with its service base; ordinary B5% applies once. Warehouse/tool expenses remain unknown, not assumed free. Prior R33 reserve selection superseded.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3.resource-price-dossier.group.01.site.01","bid.budget.working.bc.b3","bid.budget.pricing.release"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner 24-Oct: MGW เค้าแค่ supply ของ"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-02",date:"2026-10-24",kind:"PRICE",tone:"neutral",
+  title:"Source pricing: EXION + MDS, SAMTEL Warehouse FAT/Training, CIF Zhuhai",
+  detail:"A3 EXION phone/sounder THB828000; JB/glands remain unpriced. A4 MDS one quoted USD75000 system extrapolated to 3 required sites USD225000. A known SELL +THB20831.85. B3 removes only five foreign FAT travel rows THB158900; local labour THB245700, transfers8000, work cover10000 and integration/facility reserve307125 remain. Reserve is not selected MGW purchase or confirmed credit. B3 THB2440425; known B THB4884182.13. B8 training151550 receives no second travel deduction; B9 and offshore remain. B6 CIF eight-leg route has unknown cost adequacy; packing/storage allowances retained. All downstream views derive from source; C optional/unquoted; release HOLD. DB/manual-input work deferred. Original numbered requirements 1–8 not reconstructed.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b3","bid.budget.working.bc.b6","bid.budget.pricing.release"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"24-Oct owner handoff; EXION1260576R0; MDS QTORG2609244; CCL item12; COM-D02; Contract18.1(c)"
+ }),
+ Object.freeze({
+  id:"P553-CHANGE-20261024-01",date:"2026-10-24",kind:"UI",tone:"neutral",
+  title:"10.1 Cost integrity: Color-coded Hierarchical Nested Accordion",
+  detail:"Cost integrity now starts collapsed with its existing Module ID visible. Expand All / Collapse All and independent +/− controls reveal three color-coded table-first groups: verification gates, MR quote coverage, and vendor quote register. Each group exposes Copy ID and its evidence count or source status when collapsed. Tables retain all original fields and currencies with horizontal scrolling. Colors identify categories, not approval.",
+  moduleIds:Object.freeze(["bid.budget.integrity","bid.budget.integrity.steps","bid.budget.integrity.mr-coverage","bid.budget.integrity.vendor-register"]),
+  priceImpact:"NO_PRICE_CHANGE",
+  source:"Owner UI request 2026-10-24; Controlled Module Disclosure & Identity Contract Rev01; existing costIntegrity0553 evidence"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261022-19",date:"2026-10-22",kind:"PRICE",tone:"neutral",
   title:"B3 Working Budget Selected SAT 28 Days + BF Site Survey 3+2, Not Historical 40 Days",
@@ -252,5 +478,6 @@ export const CHANGE_TYPES_0553=Object.freeze({
  ENGINEERING:"Engineering",
  COST:"Working Cost",
  PRICE:"Working SELL / Commercial",
- RELEASE:"Customer Release"
+ RELEASE:"Customer Release",
+ VALIDATION:"Validation / Reconciliation Controls"
 });

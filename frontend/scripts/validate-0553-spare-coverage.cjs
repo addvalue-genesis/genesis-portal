@@ -74,7 +74,7 @@ for(const code of ["B10","B13","C1","C2"]){
  assert.equal(current.byCode[code].workingSellTHB,({B10:509827.5,B13:46683,C1:null,C2:null})[code],"Current 2026 engineering price never inherits Rev08");
  assert.equal(current.byCode[code].directCostTHB,null,"Working SELL is not approved direct cost");
 }
-assert.equal(current.knownWorkingSellTHB,5043082.13,"Protect latest owner-only Part B Base; legacy Rev05 remains audit source");
+assert.equal(current.knownWorkingSellTHB,4994787.13,"Protect latest owner-only Part B Base; legacy Rev05 remains audit source");
 const view=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(view.includes("selectSpareCoverageEngineering0553")&&view.includes("coverage.groups.filter("));
 assert(babel.transformSync(view,{babelrc:false,configFile:false,

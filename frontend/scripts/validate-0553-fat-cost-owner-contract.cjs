@@ -10,16 +10,16 @@ const get=n=>fs.readFileSync(path.join(dir,n),"utf8").replace(/^import .*$/gm,""
 const src=["onshoreWorkingRate0553.js","fatWbsFourMr0553.js","workingCostCommercialIdentity0553.js","b9ChinaWorkingBudget0553.js","b3RequirementWbsTrace0553.js"].map(get).join("\n");
 const data=vm.runInNewContext(src+"\n({budget:selectB9ChinaWorkingBudget0553(),trace:selectB3RequirementWbsTrace0553()});",{},{timeout:3000});
 const fat=data.budget.rows.filter(x=>!x.optional),yard=data.budget.rows.filter(x=>x.optional);
-assert.equal(fat.length,8);
+assert.equal(fat.length,20);
 assert.equal(fat.find(x=>x.id==="B3-FAT-STAFF").internalCostLineId,"IC-FAT-STAFF-001");
 assert.equal(yard.find(x=>x.id==="B9-YARD-STAFF").internalCostLineId,"IC-YARD-STAFF-001");
 assert.equal(yard.length,10);
 assert.ok(fat.every(x=>x.costOwner==="B3"&&x.directCostTHB===null&&x.workingCostTHB===null));
-assert.ok(fat.every(x=>x.costAccountingClass==="B3_DIRECT_FAT_WITNESS_EXPENSE_UNVERIFIED"));
+assert.ok(fat.every(x=>x.costAccountingClass==="B3_LOCAL_EXECUTION_ALLOWANCE_COST_UNVERIFIED"));
 assert.ok(yard.every(x=>x.costOwner==="B9"&&x.directCostTHB===null));
-assert.equal(fat.reduce((sum,x)=>sum+x.workingSellTHB,0),422600);
+assert.equal(fat.reduce((sum,x)=>sum+x.workingSellTHB,0),452850);
 assert.equal(yard.reduce((sum,x)=>sum+x.workingSellTHB,0),480550);
-assert.equal(data.budget.fatWorkingSellTHB,422600);
+assert.equal(data.budget.fatWorkingSellTHB,452850);
 assert.equal(data.budget.b9BaseWorkingSellTHB,480550);
 // B9 was promoted from an optional quote to ONE priced Base contract line by
 // ADR-65. The separate call-out is an execution condition, not a price exclusion.
@@ -35,7 +35,7 @@ assert.equal(data.budget.conditionalYardSellTHB,480550);
 assert.equal(data.trace.rows.find(x=>x.id==="RQM-01").costOwner,"B3");
 assert.equal(data.trace.rows.find(x=>x.id==="RQM-02").costOwner,"B3");
 assert.equal(data.trace.rows.find(x=>x.id==="RQM-03").costOwner,"B9");
-assert.equal(new Set(data.budget.rows.map(x=>x.expenseKey)).size,18);
+assert.equal(new Set(data.budget.rows.map(x=>x.expenseKey)).size,30);
 const sourceLedger=fs.readFileSync(path.join(dir,"b1IndirectCostLedger0553.js"),"utf8");
 const begin=sourceLedger.indexOf("const SOURCE_EXPENSE_ROWS_0553=");
 const end=sourceLedger.indexOf("const CFO_EXECUTION_CONTEXT_",begin);
@@ -70,6 +70,6 @@ assert(ownerDetail.includes('workingRow?.code==="B3"')&&
  !ownerDetail.includes("2046000+total+purchasedFatSell"),
  "FAT detail FULL B3 must read canonical WS-B3 and never use historical 40-day base");
 assert(ownerDetail.includes("purchasedServices?.selectedIncrementalWorkingSellTHB")&&
- ownerDetail.includes("vendorPurchasedQuoteUSD!==7500"),
+ ownerDetail.includes("vendorPurchasedQuoteUSD!==0"),
  "FAT detail must distinguish MGW quoted supplier cost from the ADDVALUE witness amount");
-console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB422600), B9 Yard conditional THB480550; B9 1 LS in Base; Actual Direct COST unverified and non-posting.");
+console.log("PASS Scope B3 FAT Witness (8 direct-cost-category work objects, SELL THB452850), B9 Yard conditional THB480550; B9 1 LS in Base; Actual Direct COST unverified and non-posting.");

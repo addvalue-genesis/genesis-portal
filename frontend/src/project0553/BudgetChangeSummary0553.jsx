@@ -96,7 +96,9 @@ export function BudgetChangeSummary0553({onOpenModule=()=>{}}){
         </div>)}</td>
         <td><strong className={entry.priceImpact==="NO_PRICE_CHANGE"?"p553-changes-impact--none":"p553-changes-impact--changed"}>
          {entry.priceImpact==="NO_PRICE_CHANGE"?"ไม่มีการเปลี่ยนราคา":
-          entry.priceImpact==="WORKING_SOURCE_CHANGED"?"Canonical Working changed":"Price impact: review"}
+          entry.priceImpact==="WORKING_SOURCE_CHANGED"?"Canonical Working changed":
+          entry.priceImpact==="QUOTATION_FX_ROUNDING_ONLY"?"Quotation FX / rounding":
+           entry.priceImpact==="PRICE_REVIEW_REQUIRED"?"Budgetary review only · NOT POSTED":"Price impact: review"}
          </strong><small>Customer Release ยัง HOLD</small></td>
        </tr>)}</tbody>
       </table>

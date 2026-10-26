@@ -9,6 +9,12 @@ import {selectAddvalueB14Insurance0553} from "./data/addvalueB14Insurance0553";
 import {selectB1RegulatoryCost0553} from "./data/b1RegulatoryCost0553";
 import {selectSatToolReadiness0553} from "./data/satToolReadiness0553";
 import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringReconciliation0553";
+import {selectB10ItemizedPurchaseEvidence0553} from "./data/b10ItemizedPurchaseEvidence0553";
+import {B10ItemizedPurchasingEvidence0553} from "./B10ItemizedPurchasingEvidence0553";
+import {B10PriceToWinScenario0553} from "./B10PriceToWinScenario0553";
+import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
+import {B10StageSpareSelection0553} from "./B10StageSpareSelection0553";
+import {SparePricedBudgetReview0553} from "./SparePricedBudgetReview0553";
 
 const thb=n=>Number.isFinite(n)?"THB "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"NOT ESTABLISHED";
 const usd=n=>Number.isFinite(n)?"USD "+n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"NOT ESTABLISHED";
@@ -23,12 +29,23 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
  const satToolReadiness=code==="B3"?selectSatToolReadiness0553():null;
  const spareReconciliation=selectSpareEngineeringReconciliation0553();
  const spareLines=customerSchedule.currentByCode?.[code]||customerSchedule.byCode[code]||[];
+ const b10ItemizedEvidence=code==="B10"?selectB10ItemizedPurchaseEvidence0553():null;
  const coverage=["B10","B11","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
  const inWorking=mode==="working";
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
  if(!p)return <p role="alert">Unsupported customer scope code: {code}</p>;
- return <section className="p55-panel" data-component-key={moduleId} style={{padding:14}}>
+ if(code==="B10"&&!inWorking)return <section className="p55-panel p553-b10-scope-compact"
+   data-cost-owner="B10" data-component-key={moduleId} style={{padding:12}}>
+   <B10KitPriceSummary0553 rows={spareLines} currency="THB"
+    total={customerSchedule.currentBudgetaryByCode.B10} variant="scope"
+    internal={typeof onOpenSource==="function"||typeof onOpenReleaseRow==="function"}
+    onOpenSource={onOpenSource} onOpenReleaseRow={onOpenReleaseRow}/>
+ </section>;
+ return <section className="p55-panel" data-cost-owner={code} data-component-key={moduleId} style={{padding:14}}>
   <div className="p55-eyebrow">{inWorking?"10.2 WORKING COST DETAIL":"10.5 CUSTOMER SCOPE DETAIL"} · PRICE SOURCE AUDIT (THB display)</div>
+  {code==="B10"&&inWorking&&<B10StageSpareSelection0553 internal onOpenSource={onOpenSource}/>}
+
+  {inWorking&&<SparePricedBudgetReview0553 code={code} onOpenSource={onOpenSource} context="working"/>}
   <h3>{p.code} — {p.description}</h3>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/>
    {" "}· Current cost owner: <code>{p.ownerModuleId}</code>
@@ -101,7 +118,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
   </details>}
   {code==="B1"&&<div className="p55-panel" style={{padding:12}}>
    <h4>B1 — Regulatory, Import &amp; Operating Licence Coordination (ADDVALUE)</h4>
-   <p className="p55-note"><strong>Cost owner:</strong> ADDVALUE · First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model. Historical Rev05 engineering evidence is retained for audit only and NOT carried into current B1 Working SELL. New B1.1–B1.8 role-based project support is the current pricing basis; statutory/consultant conditional costs remain separate.</p>
+   <p className="p55-note"><strong>Cost owner:</strong> ADDVALUE · First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model. Historical Rev05 engineering evidence is retained for audit only and NOT carried into current B1 Working SELL. New B1.1–B1.8 role-based project support is the current pricing basis; current Myanmar service/fee/reserve package is included once. The legacy requirement rows below remain nonposting evidence, not missing current budget.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Internal Ref</th><th>Description</th><th>Role</th><th>Quantity Driver</th><th>Qty</th><th>Unit Rate THB</th><th>Amount THB</th><th>Owner / Source Gate</th></tr></thead>
     <tbody>{b1Regulatory.rows.map(x=><tr key={x.id}>
@@ -230,7 +247,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
      <td>{x.tagNo}</td><td>{x.description}</td><td>{x.qty}</td><td>{thb(x.unitPriceTHB)}</td>
      <td>NOT DERIVED</td><td>NOT ESTABLISHED</td><td>{x.documentMandateStatus}<small>{x.verificationStatus}</small></td>
     </tr>)}</tbody></table></div>
-   <p className="p55-note"><strong>RACON compare — distinct vendor sources:</strong> Rev08 historical full-spare unit {thb(spareReconciliation.raconComparison.historicalUnitPriceTHB)} versus <strong>selected installed MGW R2 RACON-1</strong> {thb(spareReconciliation.raconComparison.vendorPackageRateReferenceTHB)} (USD {spareReconciliation.raconComparison.vendorUnitPriceUSD}). MDS/ORGA QTORG2609244 FCA <strong>USD {spareReconciliation.raconComparison.historicalAlternativeUnitUSD}</strong> is a separate historical alternative, not an MGW vendor price. Difference {thb(spareReconciliation.raconComparison.historicalVsPackageUnitDeltaTHB)} compares Rev08 against the MGW installed unit only; it is NOT an independent spare quote, saving or approval.</p>
+   <p className="p55-note"><strong>RACON compare — distinct vendor sources:</strong> Rev08 historical full-spare unit {thb(spareReconciliation.raconComparison.historicalUnitPriceTHB)} versus <strong>selected installed MDS RACON</strong> {thb(spareReconciliation.raconComparison.vendorPackageRateReferenceTHB)} (USD {spareReconciliation.raconComparison.vendorUnitPriceUSD}). MDS/ORGA QTORG2609244 FCA <strong>USD {spareReconciliation.raconComparison.historicalAlternativeUnitUSD}</strong> is also the current installed-system rate, still not an independent spare offer. Difference {thb(spareReconciliation.raconComparison.historicalVsPackageUnitDeltaTHB)} compares Rev08 against the selected installed unit only; it is NOT an independent spare quote, saving or approval.</p>
   </details>}
   {["B10","B11","B13","C1","C2"].includes(code)&&<details className="p55-panel" style={{padding:12}}>
    <summary><strong>MR Attachment-5 Vendor Spare List — Documentary Completion Gate</strong> ({spareReconciliation.sourceSpecificationChecklist.length} evidence checks)</summary>
@@ -337,6 +354,41 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    {code==="B11"&&<p className="p55-note"><strong>Customer template delivery basis:</strong> DDP Purchaser’s Yard shown in RFQ; current THB prices are internal budget references only, not a verified DDP delivered quotation. Installation, commissioning and special tools must reconcile with B3/B9 and Part A before customer release. Four MR-phase tool sets and five EXA-A8 minimum applicability checks do NOT mean nine additive tool purchase lines.</p>}
    <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
   </div>}
+  {code==="B10"&&<B10PriceToWinScenario0553 context={inWorking?"working":"scope"}/>}
+  {code==="B10"&&<B10ItemizedPurchasingEvidence0553 evidence={b10ItemizedEvidence} context={inWorking?"working":"scope"}/>}
+  {spareLines.length>0&&customerSchedule.sparePriceEvidence&&<details className="p55-panel p553-itemized-evidence" open={inWorking} style={{padding:12}}>
+   <summary><strong>Physical purchase candidate register — item names / OEM model / Part No. / historical price evidence</strong>
+    <small>10.2 source evidence only · NOT additive to Working SELL / customer Release · no supplier spare quotation implied</small></summary>
+   <p className="p55-note"><strong>Source-to-Working ownership:</strong> {customerSchedule.sparePriceEvidence.moduleId}. Rows below reveal individual legacy candidate parts inside the budget headings without pretending that the 4/3/4/3 kits have approved item contents. A historical quantity is NOT a newly approved purchase quantity. Actual TAG/SKU/rating and commissioned B10 vs C2 stock exclusion must be resolved first.</p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Source line</th><th>Candidate physical article</th><th>Historically stated qty</th><th>Historical unit THB *</th><th>Historical extended THB *</th><th>Current approved spare Part No.</th><th>Current purchase qty / spare quotation</th></tr></thead>
+    <tbody>{(customerSchedule.sparePriceEvidence.byCode[code]||[]).map(x=><tr key={x.id} data-spare-evidence-id={x.id}>
+     <td><code>{x.id}</code></td><td>{x.name}</td><td>{x.historicalQty}<small>Rev08 only</small></td>
+     <td>{thb(Number.isFinite(p.historicalFxTHBPerUSD)?Math.round((x.historicalUnitUSD*p.historicalFxTHBPerUSD+Number.EPSILON)*100)/100:null)}{inWorking&&<small>Original: {usd(x.historicalUnitUSD)}</small>}</td>
+     <td>{thb(Number.isFinite(p.historicalFxTHBPerUSD)?Math.round((x.historicalTotalUSD*p.historicalFxTHBPerUSD+Number.EPSILON)*100)/100:null)}{inWorking&&<small>Original: {usd(x.historicalTotalUSD)}</small>}</td>
+     <td>NOT VERIFIED</td><td>NOT VERIFIED<small>{x.status}</small></td>
+    </tr>)}</tbody>
+   </table></div>
+   <p className="p55-note">* Historical planning conversion at {p.historicalFxTHBPerUSD??"FX NOT ESTABLISHED"} THB/USD; original supplier USD and reference quantities are retained in Source. This is not an approved SKU price or current COST.</p>
+   {inWorking&&(customerSchedule.sparePriceEvidence.directComparablesByCode[code]||[]).length>0&&<>
+    <h4>Selected supplier product evidence — installed-equipment comparable, NOT a separately quoted spare</h4>
+    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+     <thead><tr><th>Supplier / source</th><th>Make / model / item</th><th>Part No.</th><th>Related installed TAG</th><th>Quoted installed-package qty</th><th>Installed quote basis / rate</th><th>Critical difference</th></tr></thead>
+     <tbody>{customerSchedule.sparePriceEvidence.directComparablesByCode[code].map(x=><tr key={x.id}>
+      <td>{x.supplier}</td><td>{x.brand} / {x.model} / {x.name}</td><td><code>{x.partNo}</code></td>
+      <td>{x.installedTag}</td><td>{x.quotedQty??"not itemized"}</td>
+      <td>{Number.isFinite(x.quotedUnitUSD)?usd(x.quotedUnitUSD):Number.isFinite(x.quotedUnitTHB)?thb(x.quotedUnitTHB):"Included / not separately priced"}<small>{x.quoteBasis}</small></td>
+      <td>{x.warning}<small>{x.status}</small></td>
+     </tr>)}</tbody>
+    </table></div>
+   </>}
+   {code==="C1"&&<p className="p55-note"><strong>C1 single complete-RACON optional scenario (NONPOSTING):</strong> FCA installed package comparator USD {customerSchedule.sparePriceEvidence.c1CurrentOptionalReference.referenceFcaUnitUSD.toLocaleString("en-US")} · THB {customerSchedule.sparePriceEvidence.c1CurrentOptionalReference.indicativeFullReplacementSellScenarioTHB.toLocaleString("en-US")} illustrative customer sell (USD {customerSchedule.sparePriceEvidence.c1CurrentOptionalReference.indicativeFullReplacementSellScenarioUSD.toLocaleString("en-US")}) only after x1.30; no independent replacement price, configuration approval or delivery cost. Not authorized for customer export.</p>}
+   {code==="C2"&&<>
+    <p className="p55-note"><strong>C2 historical gross reference:</strong> USD {customerSchedule.sparePriceEvidence.c2Historical.referenceUSD.toLocaleString("en-US",{minimumFractionDigits:2})} across {customerSchedule.sparePriceEvidence.c2Historical.historicalCandidateLines} unverified Rev08 candidate lines. This is NOT verified current Direct Cost and cannot be marked as a customer quotation.</p>
+    <p className="p55-note"><strong>C2 historical residual scenario — NOT a quotation:</strong> Gross USD {usd(customerSchedule.sparePriceEvidence.c2BudgetScreening.grossHistoricalUSD)} minus potential overlap USD {usd(customerSchedule.sparePriceEvidence.c2BudgetScreening.potentialB10FunctionalOverlapUSD)} and legacy 7/8-inch feeder USD {usd(customerSchedule.sparePriceEvidence.c2BudgetScreening.incompatibleSevenEighthFeederHistoricalUSD)} = <strong>{usd(customerSchedule.sparePriceEvidence.c2BudgetScreening.historicalResidualScreeningUSD)} (THB {thb(customerSchedule.sparePriceEvidence.c2BudgetScreening.historicalResidualScreeningTHB)})</strong>. Purely an older SELL-reference screening, not verified 2026 cost or current required scope; do not post or export.</p>
+    <p className="p55-note"><strong>Attachment 7 non-duplication:</strong> {customerSchedule.sparePriceEvidence.duplicates.length} B10/C2 functional candidate overlaps must be reconciled by exact supplier SKU and separate delivered quantity. Historic 7/8-inch feeder conflicts with MGW 1/2-inch feeder; keep out of any approved current C2 takeoff until reconciled.</p>
+   </>}
+  </details>}
   {coverage&&<details className="p55-panel" open={inWorking} style={{padding:12}}>
    <summary><strong>Top-down Engineering Spare Coverage — MR0001–MR0004</strong> (SPQ-001 + existing MAP equations; pre-award scenario only)</summary>
    <p className="p55-note"><strong>Basis:</strong> MR0001 MTO Rev04 / MR0002 AFC TEL-LAY / MR0003–0004 MR Rev.C1 scope. Existing MAP-01/02/05/06/07/08/10 reused; SPQ-001 adds critical-family spare scenario sizing only. A scenario Qty is not an OEM-approved spare quantity or contractual minimum. No prices are newly posted by this assessment.</p>

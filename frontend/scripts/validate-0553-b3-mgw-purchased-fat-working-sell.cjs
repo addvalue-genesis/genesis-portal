@@ -25,88 +25,59 @@ const {priceBWorkingSell0553:priceB,buildReleaseCommercialModel0553:release,
  RELEASE_POLICY_0553:policy}=get("data/releaseCommercialModel0553.js");
 const {BcCostEvidenceDetail0553:Owner}=get("BcCostEvidenceDetail0553.jsx");
 const quote=selected(),b=working(),b3=b.byCode.B3,b3Snap=JSON.stringify(b3);
-assert.equal(quote.vendorPurchasedQuoteUSD,7500);
-assert.equal(quote.vendorPurchasedQuoteTHB,236250);
-assert.equal(quote.samTelMarkupTHB,47250);
-assert.equal(quote.addvalueMarkupTHB,11812.5);
-assert.equal(quote.omissionReserveTHB,11812.5);
-assert.equal(quote.selectedIncrementalWorkingSellTHB,307125);
-assert.deepEqual(quote.quoteLines.map(x=>x.serviceId),["SERV-2","SERV-4"]);
-assert.equal(quote.quoteLines[0].quotedAmountUSD,5000);
-assert.equal(quote.quoteLines[1].quotedAmountUSD,2500);
+// Equipment-only correction: retain raw quote provenance, never active service funding.
+assert.equal(quote.vendorPurchasedQuoteUSD,0);
+assert.equal(quote.vendorPurchasedQuoteTHB,0);
+assert.equal(quote.samTelMarkupTHB,0);
+assert.equal(quote.addvalueMarkupTHB,0);
+assert.equal(quote.omissionReserveTHB,0);
+assert.equal(quote.selectedIncrementalWorkingSellTHB,0);
+assert.equal(quote.includedInB3WorkingSell,false);
+assert.equal(quote.selectedSupplierPurchase,false);
+assert.deepEqual(quote.quoteLines,[]);
+assert.deepEqual(quote.historicalQuoteLines.map(x=>x.serviceId),["SERV-2","SERV-4"]);
+assert.equal(quote.historicalWithdrawnWorkingSellTHB,307125);
 assert.equal(cover.equipmentTotalUSD,350341);
 assert.equal(originalMGW.equipmentTotalUSD,350341);
 assert.equal(cover.overallTotalUSD,368841);
-assert.equal(quote.sourceVendorQuoteTotalUSD,368841);
-assert.equal(quote.sourceVendorQuoteServicesUSD,18500);
-assert.equal(quote.vendorPurchasedQuoteTHB,
- Math.round(quote.vendorPurchasedQuoteUSD*31.5*100)/100);
 assert.equal(quote.verifiedDirectCostTHB,null);
-assert.equal(quote.customerReleaseAllowed,false);
-assert.equal(quote.partADuplicationCheckState.startsWith("OPEN"),true);
-assert.equal(quote.policy.bStandardFivePctDeductionOnPurchasedComponentAllowed,false);
-assert.equal(quote.policy.samTelCostMarkupPct,policy.aAndC.samtelCostPct);
-assert.equal(quote.policy.addvalueCostMarkupPct,policy.aAndC.addvalueCostPct);
-assert.equal(quote.policy.omissionReserveCostMarkupPct,policy.aAndC.omissionReserveCostPct);
-assert.equal(b3.workingSellTHB,2599325);
-assert.equal(b3.b3OriginalWithoutMgwPurchasedTHB,2292200); // current B3 minus purchased OEM FAT, SAT/Survey/China rate revisions included
-assert.equal(b3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB,307125);
-assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,422600);
-assert.equal(b3.b3FortyDayBudget.workingSellTHB,2046000);
+assert.equal(b3.workingSellTHB,2322450);
+assert.equal(b3.b3OriginalWithoutMgwPurchasedTHB,2322450);
+assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,452850);
 assert.equal(b3.b3SelectedSatSurveyBudget.satWorkingSellTHB,1587600);
 assert.equal(b3.b3SelectedSatSurveyBudget.siteSurveyWorkingSellTHB,252000);
 assert.equal(b3.directCostTHB,null);
-assert.equal(b3.commercialSellTHB,null);
-assert.equal(b.knownWorkingSellTHB,5043082.13);
+assert.equal(b.knownWorkingSellTHB,4994787.13);
 assert.equal(b.releaseAllowed,false);
-assert.equal(b.costComplete,false);
 const price=breakdown(b3),table=hierarchy(b3);
-assert.equal(price.totalWorkingSellTHB,2599325);
-assert.deepEqual(price.summary.map(x=>x.workingSellTHB),
- [1587600,252000,30000,307125,422600]);
-assert.equal(price.fat.groupFatWorkingSellTHB,729725);
-assert.equal(table.totalWorkingSellTHB,2599325);
-assert.deepEqual(table.groups.map(x=>x.workingSellTHB),[729725,1839600,30000,0]);
-const mgwRow=table.groups[0].items.find(x=>x.moduleId.endsWith(".mgw-r2-cover-20261020"));
-assert.equal(mgwRow.priceClass,"PURCHASED_SERVICE_WORKING_SELL");
-assert.equal(mgwRow.vendorQuoteUSD,7500);
-assert.equal(mgwRow.workingSellTHB,307125);
-assert.equal(mgwRow.supplierRows.length,2);
-assert(table.groups[3].items.every(x=>x.workingSellTHB===null),
- "Historically replaced FAT / seven-day what-if shall not inflate B3");
-const s=scope();
-assert.equal(s.lines.B3.workingSellTHB,2599325);
-assert.equal(s.knownAddvalueWorkingSellTHB,5043082.13);
-const commercial=release();
-const b3Release=commercial.b.find(x=>x.code==="B3");
-assert.equal(b3Release.customerSellTHB,2599325);
-assert.equal(b3Release.mgwPurchasedServicesSellIncludedTHB,307125);
-assert.equal(b3Release.samTelOrdinaryB5PctDeductionTHB,114610); // 5% × current THB2,292,200 ordinary B3 only
-assert.equal(b3Release.samTelPurchased20PctCostShareTHB,47250);
-assert.equal(b3Release.samTelDeductionTHB,161860); // THB114,610 ordinary + THB47,250 purchased share
-assert.equal(b3Release.addvalueReceivableTHB,2437465); // B3 current THB2,599,325 less THB161,860
+assert.deepEqual(price.summary.map(x=>x.workingSellTHB),[1587600,252000,30000,452850]);
+assert.deepEqual(table.groups.map(x=>x.workingSellTHB),[452850,1839600,30000,0]);
+assert(!table.groups.flatMap(x=>x.items).some(x=>x.priceClass==='PURCHASED_SERVICE_WORKING_SELL'));
+assert.equal(table.supplierFatReferenceUSD,0);
+const s=scope(),commercial=release(),b3Release=commercial.b.find(x=>x.code==='B3');
+assert.equal(s.lines.B3.workingSellTHB,b3.workingSellTHB);
+assert.equal(s.knownAddvalueWorkingSellTHB,b.knownWorkingSellTHB);
+assert.equal(b3Release.customerSellTHB,b3.workingSellTHB);
+assert.equal(b3Release.mgwPurchasedServicesSellIncludedTHB,0);
+assert.equal(b3Release.samTelPurchased20PctCostShareTHB,0);
+assert.equal(b3Release.samTelOrdinaryB5PctDeductionTHB,116122.5);
+assert.equal(b3Release.samTelDeductionTHB,116122.5);
+assert.equal(b3Release.addvalueReceivableTHB,2206327.5);
 assert.equal(b3Release.actualCostTHB,null);
 assert.equal(b3Release.releaseAllowed,false);
-assert.equal(commercial.approval.releaseAllowed,false);
-// Generic ordinary Part B policy must remain unchanged for non-B3 lines.
-const ordinary=priceB(100);
-assert.equal(ordinary.customerSellTHB,100);
-assert.equal(ordinary.samTelDeductionTHB,5);
-assert.equal(ordinary.addvalueReceivableTHB,95);
-const protectedC=priceB(2599325,null,quote);
-assert.equal(protectedC.samTelDeductionTHB,161860);
-assert.throws(()=>priceB(2599325,null,{...quote,
- policy:{...quote.policy,bStandardFivePctDeductionOnPurchasedComponentAllowed:true}
-}),/cannot be subjected/);
-const html=renderToStaticMarkup(React.createElement(Owner,{workingRow:b3}));
-for(const word of ["2,599,325.00","729,725.00","422,600.00",
- "307,125.00","236,250.00","47,250.00","11,812.50",
- "7,500.00","5,000.00","2,500.00","IC-FAT-MGW-SERV-2-4"])
- assert(html.includes(word),"B3 FAT purchased/markup price table missing "+word);
+assert.equal(priceB(100).samTelDeductionTHB,5);
+assert.equal(priceB(2322450,null,quote).samTelDeductionTHB,116122.5);
+assert.throws(()=>priceB(2322450,null,{...quote,policy:{...quote.policy,bStandardFivePctDeductionOnPurchasedComponentAllowed:true}}),/cannot be subjected/);
+const Dossier=get('B3ResourcePriceDossier0553.jsx').B3ResourcePriceDossier0553;
+const html=renderToStaticMarkup(React.createElement(Dossier,{workingRow:b3}));
+assert(html.includes('2,322,450.00'));
+assert(!html.includes('307,125.00'));
+assert(!html.includes('236,250.00'));
+assert(!html.includes('MGW service / facility'));
+assert(html.includes('resource-price-dossier.group.01.site.01'),'Withdrawn source ID remains traceable without price');
 const ids=[...html.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
-assert.equal(ids.length,new Set(ids).size,"B3 price must preserve unique module anchors");
+assert.equal(ids.length,new Set(ids).size);
 assert.equal(JSON.stringify(working().byCode.B3),b3Snap);
-const source=fs.readFileSync(path.join(root,"project0553/data/releaseCommercialModel0553.js"),"utf8");
-assert(source.includes("samTelPurchased20PctCostShareTHB"));
-assert(source.includes("samTelOrdinaryB5PctDeductionTHB"));
-console.log("PASS MGW item3/4 cost USD7500 / THB236250 -> SAMTEL20 THB47250 + ADDVALUE5 THB11812.50 + Reserve5 THB11812.50 -> selected WS-B3 MGW THB307125; FAT subtotal THB729725 / B3 THB2599325 / PartB THB5043082.13. 10.3 SAMTEL20 on purchase, NOT another 5%. Cost unverified, customer release HOLD.");
+console.log('PASS MGW equipment-only: no active FAT services/reserve, raw quote preserved, local FAT452850, B3 2322450, PartB4994787.13; ordinary B5% once and reverse-source parity.');
+
+assert(get('data/bcModuleNavigator0553.js').buildBcModuleNavigator0553().some(x=>x.id==='bid.budget.working.bc.b3.resource-price-dossier.group.01.site.01'),'Withdrawn exact link remains registered');

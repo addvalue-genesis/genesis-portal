@@ -32,12 +32,12 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
  const model=selectB1ProjectSupportBudget0553();
  const rootRef=React.useRef(null);
  const totalBase=model.accounts.reduce((n,x)=>n+x.baseWorkingCostTHB,0);
- if(model.accounts.length!==8||model.canonicalB1WorkingSellTHB!==211600||
-  model.baseWorkingSellTHB!==211600||model.conditionalWorkingSellTHB!==51700||
+ if(model.accounts.length!==8||model.canonicalB1WorkingSellTHB!==421180||
+  model.baseWorkingSellTHB!==421180||model.conditionalWorkingSellTHB!==0||
   model.actualDirectCostTHB!==null||model.historicalEngineeringCarryForwardTHB!==0)
   throw Error("B1 accordion source/owner reconciliation failed");
  const expandAll=isOpen=>{
-  rootRef.current?.querySelectorAll("details.p553-b1-group, details.p553-b1-item")
+  rootRef.current?.querySelectorAll("details.p553-b1-purpose, details.p553-b1-group, details.p553-b1-item")
    .forEach(node=>{node.open=isOpen;});
  };
  return <section className="p55-panel p553-b1-worktype" ref={rootRef}
@@ -67,14 +67,16 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
    <div><strong>Support Base Working Cost</strong><p>{amount(model.baseWorkingCostTHB)}</p><small>NOT verified Direct Cost</small></div>
    <div><strong>Base Working SELL</strong><p>{amount(model.baseWorkingSellTHB)}</p><small>Same single owner B1</small></div>
    <div><strong>Conditional Expenses / SELL</strong><p>{amount(model.conditionalWorkingSellTHB)}</p>
-    <small>Lawful legal / government fees; NOT in Base</small></div>
+    <small>Old conditional package superseded; Myanmar budget now included once</small></div>
    <div><strong>Historical Carry-forward</strong><p>THB 0.00</p><small>Old engineering / PM excluded</small></div>
   </div>
   <p className="p55-note">Rate assumptions: 22 workdays × 8 h/month, 20% employer load;
-   provisional 20% labour gross-margin target / 10% non-labour handling.
+   provisional 20% labour gross-margin target / 10% service and reserve uplift; official fee allowance 0% uplift.
    All commercial cost and rate inputs require evidence before customer release.</p>
 
-  {model.accounts.map((group,index)=>{
+  {model.displayGroups.map(purpose=><details key={purpose.id} open className={"p553-b1-purpose p553-b1-purpose--"+purpose.id} data-component-key={ROOT+".purpose."+purpose.id}>
+   <summary><strong>{purpose.label}</strong> · Cost {amount(purpose.baseWorkingCostTHB)} · SELL {amount(purpose.baseWorkingSellTHB)}</summary>
+  {model.accounts.filter(a=>purpose.accounts.includes(a.account)).map((group,index)=>{
    const id=b1AccountModuleId0553(group.account),tone=accountTone[group.account];
    const budgetId=id+".budget",gateId=id+".verification";
    return <details key={group.account} className={"p553-b1-group p553-b1-group--"+tone}
@@ -107,6 +109,7 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
     </div>
    </details>;
   })}
+  </details>)}
 
   <details className="p553-b1-group p553-b1-group--audit" data-component-key={ROOT+".audit"}>
    <summary className="p553-b1-summary">

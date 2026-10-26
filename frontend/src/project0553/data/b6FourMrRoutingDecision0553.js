@@ -1,3 +1,4 @@
+import {selectImportOperationalBudget0553} from "./importOperationalBudget0553";
 /**
  * PJ2608-0553 / 10.2 B6 Transportation — current Four-MR route reconciliation.
  *
@@ -31,32 +32,29 @@ import {MGW_ROAD_FREIGHT_PACKING_EVIDENCE_0553 as freightProof} from "./mgwRoadF
 const freeze=x=>Object.freeze(x);
 const PREFIX="bid.budget.working.bc.b6";
 const legs=freeze([
- freeze({id:"B6-MR1-NEXTG-IDU",mr:"MR0001",cargo:"NextG radio/IDU interface equipment",sourceQtyBasis:"RQ2609-1182 greenfield IDU 4; verify split vs wider NG quotation",preferred:"NextG supplier-origin -> MGW Nantong direct",fallback:"NextG DAP Ranong -> Thailand -> MGW Nantong",selectedFreightCostTHB:null,postingAllowed:false}),
- freeze({id:"B6-MR1-NEXTG-ODU",mr:"MR0001",cargo:"NextG ODU / remote radio, accessories and licenses",sourceQtyBasis:"RQ2609-1182 greenfield ODU 4; vendor offer must be reconciled",preferred:"NextG supplier-origin -> MGW Nantong for iFAT/integration",fallback:"NextG DAP Ranong -> Thailand -> MGW Nantong",selectedFreightCostTHB:null,postingAllowed:false}),
- freeze({id:"B6-MR1-NEXTG-ANT",mr:"MR0001",cargo:"Antennas / dish / mount / RF accessories",sourceQtyBasis:"RQ2609-1182 greenfield antennas 5, NOT necessarily 4; approved link-budget SKU/diameter per site open",preferred:"NextG supplier-origin -> MGW Nantong direct for all FIVE greenfield antennas; FAT/staging with IDU/ODU",fallback:"Direct JUTAL antenna bypass is NOT owner-selected; requires a separately approved routing revision",selectedFreightCostTHB:null,postingAllowed:false}),
- freeze({id:"B6-MR1-TH-ENC-CISCO",mr:"MR0001",cargo:"Four enclosure + Cisco assemblies pre-mounted and electrically checked in Thailand; NO NextG IDU/ODU/antenna packed in this lot",sourceQtyBasis:"Owner-approved four sets; Thai supplier PO handover/Ex approvals and acceptance records to verify; not part of NextG radio quote",preferred:"Thai workshop -> MGW Nantong one protected consolidated batch",fallback:"Thai enclosure/Cisco loose parts -> MGW Nantong for all assembly",selectedFreightCostTHB:null,postingAllowed:false}),
- freeze({id:"B6-MGW-MR234-INTERNAL",mr:"MR0002/MR0003/MR0004",cargo:"MGW-procured BDA / telephone + sounder / RACON vendor packages",sourceQtyBasis:"MGW P26-058_R2 equipment quote USD350341; no evidence of Thailand re-import for China FAT",preferred:"OEM/vendor -> MGW Nantong receiving / integration",fallback:"Supplier contracted origins and delivery Incoterms, not automatic Thailand routing",selectedFreightCostTHB:null,postingAllowed:false}),
- freeze({id:"B6-MGW-JUTAL-OUT",mr:"MR0001–MR0004 consolidated (scope to confirm)",cargo:"MGW Nantong -> JUTAL yard outbound road cargo",sourceQtyBasis:"One original supplier quote SERV-5 USD2500; MGW also quotes SERV-3 packing USD500",preferred:"MGW Nantong -> JUTAL nominated site as quoted",fallback:"Confirm source cargo manifest and exact consignee rather than invent extra trip",selectedFreightCostTHB:null,postingAllowed:false})
-]);
-const scenarios=freeze([
- freeze({id:"SC-B6-A-THAILAND-FULL",status:"COMPARISON_ONLY",label:"Full Thailand receiving/assembly, then ship ALL MR0001 equipment to Nantong",
-  included:["NextG equipment via DAP Ranong","Thai enclosures + Cisco assembly","ODU/IDU/antenna China shipment"],
-  additionalThailandTouchpoints:true,additionalChinaInboundTripsPotential:true,
-  returnToThailandForFAT:false,workingSellTHB:null,verifiedDirectCostTHB:null,postingAllowed:false}),
- freeze({id:"SC-B6-B-HYBRID-MGW",status:"OWNER_APPROVED_PHYSICAL_ROUTE__DELIVERY_REQUOTE_PENDING",label:"NextG IDU/ODU plus all 5 antennas direct to MGW; Thai enclosure+Cisco four cabinets preassembled then to MGW",
-  included:["NextG IDU, ODU AND five greenfield antennas directly from vendor supply chain to MGW Nantong","Thai Enclosure + Cisco four sets: qualified bench preassembly, QA/power/wiring check, protected outbound shipment to MGW Nantong","At MGW: combine/stage complete MR0001 with MR0002–0004 and conduct approved FAT before JUTAL delivery"],
-  additionalThailandTouchpoints:false,additionalChinaInboundTripsPotential:true,
-  returnToThailandForFAT:false,workingSellTHB:null,verifiedDirectCostTHB:null,postingAllowed:false})
-]);
+ {id:"B6-MR1-NEXTG-IDU",mr:"MR0001",cargo:"NextG selected IDU/radio equipment",preferred:"NextG quoted DAP Ranong → SAMTEL Warehouse Thailand; changed handover unconfirmed"},
+ {id:"B6-MR1-NEXTG-ODU",mr:"MR0001",cargo:"NextG selected ODU/accessories",preferred:"NextG supplier → Thailand SAMTEL Warehouse; no automatic China routing"},
+ {id:"B6-MR1-NEXTG-ANT",mr:"MR0001",cargo:"Five greenfield antennas; wider selected MR0001 scope separately reconciled",preferred:"NextG → SAMTEL Warehouse Thailand"},
+ {id:"B6-MR1-TH-ENC-CISCO",mr:"MR0001",cargo:"Thai enclosure / VST Cisco current Rev03 composition (5 LAN sets; 4 GF assemblies)",preferred:"Thai suppliers → SAMTEL Warehouse; no direct export to MGW"},
+ {id:"B6-MGW-MR234-INTERNAL",mr:"MR0002",cargo:"MGW BDA/RF 3 systems ONLY; old cargo ID retained for trace",preferred:"MGW China → Thailand; ADDVALUE owns Thai import",sourceQtyBasis:"UHF-1..4 USD99564; EXW detailed vs DAP Nantong cover conflict retained"},
+ {id:"B6-EXION-TH-IN",mr:"MR0003",cargo:"EXION 4 telephone/sounder pairs",preferred:"DDP Nonthaburi → exact SAMTEL Warehouse handover; local transfer if needed"},
+ {id:"B6-MDS-TH-IN",mr:"MR0004",cargo:"MDS / ORGA 3 RACON systems budgeted from 1-system quote",preferred:"FCA Factory (named place TBC) → Thailand import → SAMTEL Warehouse"},
+ {id:"B6-MGW-JUTAL-OUT",mr:"MR0001–MR0004",cargo:"Consolidated tested goods SAMTEL → Thai export port → Zhuhai Port, China; old cargo ID retained",preferred:"CIF Zhuhai Port China Incoterms 2020; China clearance/tax and port→yard Purchaser under COM-D02"}
+].map(x=>freeze({sourceQtyBasis:"Use selected BOM and actual package weights/dimensions; equipment quantity is not crate count",fallback:"Do not assume free freight or tax exemption",selectedFreightCostTHB:null,postingAllowed:false,...x})));
+const scenarios=freeze([freeze({id:"SC-B6-SAMTEL-CIF-ZHUHAI",status:"OWNER_SELECTED__FREIGHT_COST_ALLOCATION_OPEN",
+ label:"All selected suppliers → SAMTEL Warehouse Thailand FAT/Training → CIF Zhuhai Port",
+ included:legs.map(x=>x.preferred),additionalThailandTouchpoints:true,additionalChinaInboundTripsPotential:true,
+ returnToThailandForFAT:true,workingSellTHB:null,verifiedDirectCostTHB:null,postingAllowed:false})]);
 export function selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB=null,earlierFourCabinetReference=null}={}){
+ const selectedTotal=307584+selectImportOperationalBudget0553().b6IncrementalSellTHB;
  const freight=mgw.services.find(s=>s.id==="SERV-5");
  const packing=mgw.services.find(s=>s.id==="SERV-3");
  if(NEXTG.quoteNumber!=="NG/260916-ADV-DAP1"||NEXTG.quotedGrandTotal!==191610.15||
   NEXTG.sourceDriveId!=="1dwU6mkjm0JOKvbw3fMeCH8alQtKufEyd"||
   freight?.usd!==2500||packing?.usd!==500||freightProof.coverFreightUSD!==2500||
   freightProof.supplierConfirmsRoadFreightIncludesPacking!==true||
-  selectedB6WorkingSellTHB!==307584||legs.length!==6||
-  new Set(legs.map(x=>x.id)).size!==6)
+  selectedB6WorkingSellTHB!==selectedTotal||legs.length!==8||
+  new Set(legs.map(x=>x.id)).size!==8)
   throw Error("B6 selected owner / NextG DAP Ranong / MGW packing-freight evidence changed");
  if(earlierFourCabinetReference&&
   (earlierFourCabinetReference.preliminaryInboundLowTHB!==42797||
@@ -67,34 +65,34 @@ export function selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB=null
  return freeze({
   moduleId:PREFIX,
   sourceId:"B6-4MR-LOGISTICS-DECISION-20261021",
-  approvedDecisionId:"ADR-68-B6-MR0001-DIRECT-MGW-20261022",
-  approvedDecisionDate:"2026-10-22",
+  approvedDecisionId:"ADR-URGENT-SAMTEL-CIF-20261024",
+  approvedDecisionDate:"2026-10-24",
   decisionOwner:"PROJECT_OWNER",
   physicalRoutingStatus:"OWNER_APPROVED__NOT_VENDOR_RECONFIRMED",
   sourceQuoteRevisionUnchanged:true,
   selectedB6WorkingSellTHB,
   dapCommercialPlanning:freeze({
-   proposedDeliveryTerm:"DAP JUTAL Zhuhai Yard, Guangdong, China — Incoterms 2020",
+   proposedDeliveryTerm:"CIF Zhuhai Port China — Incoterms 2020",
    contractualBaseline:"DDP PURCHASER'YARD — JUTAL Equipment Purchase Contract Article 8.1",
-   cclPreviousAlternative:"CIF Zhuhai Port for overseas sellers; DAP proposed as new deviation",
+   cclPreviousAlternative:"CCL Samart item12 Accepted/Close CIF Zhuhai Port; COM-D02 China clearance/duty/VAT and port-to-yard Purchaser unless separately agreed",
    workingDecision:"OWNER_SELECTED_PROVISIONAL_BUDGETARY_BASIS__NOT_CLIENT_OR_VENDOR_APPROVED",
-   workingSellTHB:307584,mgwServ5QuotedUSD:2500,mgwServ5QuotedTHB:78750,
+   workingSellTHB:selectedTotal,mgwServ5QuotedUSD:2500,mgwServ5QuotedTHB:78750,
    buyerResponsibleForApplicableImportClearanceUnderDAP:true,
    importVATTHB:null,importDutyTHB:null,domesticChineseSalesVATTHB:null,
    taxSavingsEstablishedTHB:null,deliveryCargoScopeConfirmed:false,
    vendorConfirmedDAPJutal:false,jutalApprovedDAPDeviation:false,
    nextgIncomingChinaRerouteCostConfirmed:false,mgwPackingFreightOverlapResolved:false,
    independentCostPostingAllowed:false,customerReleaseAllowed:false,
-   priceClass:"HISTORICAL_REV08_WORKING_SELL_RETAINED_AS_DAP_BUDGETARY_ALLOWANCE",
-   note:"Keep B6 307584 as 1LS budgeting only; USD2500 outbound quote is not all-in B6, no VAT/duty exemption assumed, no automatic sale/working COST claim"
+   priceClass:"RETAINED_B6_WORKING_SELL_ALLOWANCE__CIF_NEW_LEGS_NOT_YET_COSTED",
+   note:"B6 includes revised administration and retained physical route allowances, adequacy UNKNOWN for new route; MGW USD2500 China road freight is NOT Thai sea freight. Cargo ICC(A) to Yard under contract 18.1(c) remains unresolved against CIF port; no automatic exclusion or zero premium."
   }),
-  workingSellAuthority:"10.2 historical Rev08 USD9764.5714 x 31.5 = THB307584; NOT a shipment rate",
+  workingSellAuthority:"Existing route SELL307584 + source-derived administration replacement delta; NOT a shipment rate",
   nextg:freeze({quoteNumber:NEXTG.quoteNumber,sourceUrl:"https://drive.google.com/file/d/"+NEXTG.sourceDriveId+"/view",
    quotedTotalUSD:NEXTG.quotedGrandTotal,quoteValidTo:"2026-10-01",
    quotedDeliveryTerm:"DAP Ranong, Thailand",isDDPThailand:false,
    directChinaFreightQuoted:false,deliveryRerouteCreditTHB:null,
-   approvedDirectToMgwNantong:true,approvedIdutoMgw:true,
-   approvedOdutoMgw:true,approvedAllFiveAntennasToMgw:true,
+   approvedDirectToMgwNantong:false,approvedIdutoMgw:false,
+   approvedOdutoMgw:false,approvedAllFiveAntennasToMgw:false,
    destinationAcceptedInRevisedNextgQuotation:false,
    purchaseOrderDestinationAmended:false,dispatchConfirmed:false,
    currentQuotationExpired:true,
@@ -109,13 +107,13 @@ export function selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB=null
    enclosureAndCiscoFourSetsFromThailandApproved:true,
    preliminaryWiringAndElectricalQaApproved:true,
    actualAssemblyCompleted:false,
-   operation:"Install/mount Cisco and enclosure accessories in Thailand; reserve IDU interfaces for final MGW assembly",
+   operation:"Install/mount Cisco and enclosure accessories at SAMTEL; integrate all selected suppliers before FAT",
    technicalRequirement:"Do not modify Ex-certified enclosure, penetrations or heat dissipation beyond approved GA/Ex documentation; retain serial/port and FAT photos",
    packedSetCount:4,
-   inboundToMgwAcceptedOperationallyByOwner:true,
+   inboundToMgwAcceptedOperationallyByOwner:false,
    chinaImporterProcedureCostQuoted:false}),
-  sourceLegs:legs,scenarios,preferredScenarioId:scenarios[1].id,
-  selectedPhysicalRouteId:scenarios[1].id,
+  sourceLegs:legs,scenarios,preferredScenarioId:scenarios[0].id,
+  selectedPhysicalRouteId:scenarios[0].id,
   approvedMr0001InboundLotIds:freeze([
    "B6-MR1-NEXTG-IDU","B6-MR1-NEXTG-ODU",
    "B6-MR1-NEXTG-ANT","B6-MR1-TH-ENC-CISCO"
@@ -124,7 +122,10 @@ export function selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB=null
   ownerApprovedAntennaCount:5,
   approvedRoutingVsQuotedShippingSeparation:true,
   pendingNextgAmendedSupplierOffer:true,
-  mr2to4CurrentDirection:"MGW procures vendor packages to China workshop; DO NOT route them to Thailand FAT in new workplan",
+  insuranceExtent:"Contract 18.1(c) ICC(A) to Purchaser Yard vs CIF port: reconcile scope; retain open premium exposure",
+  chinaImportAndPortToYardOwner:"PURCHASER under COM-D02 unless separately agreed",
+  thaiImportOwner:"ADDVALUE for MGW MR0002; MDS importer/tax treatment to confirm",
+  mr2to4CurrentDirection:"MGW MR0002 → Thailand import; EXION MR0003 domestic; MDS MR0004 FCA → Thailand; all to SAMTEL FAT",
   supplierFreightAlreadyQuotedOnce:true,
   sourceOnlyFourCabinetLowTHB:earlierFourCabinetReference?.preliminaryInboundLowTHB??null,
   sourceOnlyFourCabinetHighTHB:earlierFourCabinetReference?.preliminaryInboundHighTHB??null,
@@ -137,14 +138,15 @@ export function selectB6FourMrRoutingDecision0553({selectedB6WorkingSellTHB=null
   prospectiveUpdatedB6WorkingSellTHB:null,
   costRepostingAllowed:false,postingAllowed:false,releaseAllowed:false,
   decisionGates:freeze([
-   "Obtain NextG written revised FCA/DAP MGW Nantong price, same SKU/quantity, freight credit versus expired DAP Ranong quote",
-   "NextG must amend its expired DAP Ranong quotation to deliver the IDU/ODU and ALL five antennas to MGW Nantong; confirm freight credit/new charges and shipper/Incoterm",
-   "Verify exact ODU/IDU and five-antenna SKU, diameter, mass, packaging, partial-shipment count, arrival window and factory ITP",
-   "Keep all five antennas MGW-bound as owner-approved; do NOT route them direct to JUTAL without a NEW explicit owner decision",
-   "Thai enclosure/Cisco preassembly GA, Ex/certification/thermal/grounding and customs export packing proof",
-   "MGW incoming service/Incoterm/import duty/VAT/inspection fees by item; receiving feasible but not proof all costs included",
-   "MGW existing SERV-5 USD2500 and SERV-3 USD500 possible packing overlap; no fabricated supplier credit",
-   "Confirm no extra China/Thailand loop for MGW MR0002/0003/0004 and manifest scope of consolidated outbound freight"
+   "Existing MGW evidence only; no requotation request. EXW detailed vs DAP Nantong cover remains unresolved",
+   "MGW RF freight China→Thailand, Thai import/broker/duty and insurance require supported budget allocation; no tax exemption assumed",
+   "NextG DAP Ranong and EXION DDP Nonthaburi are not exact SAMTEL address acceptance; retain named-place mismatch",
+   "MDS FCA pickup place is unconfirmed; do not infer Schiedam from warranty text",
+   "B6 is provisional Working SELL with revised administration, not proof the new multi-leg CIF scope is fully funded",
+   "CIF Zhuhai Port accepted CCL item12; COM-D02 China clearance/duty/VAT and port→yard Purchaser unless otherwise agreed",
+   "Contract 18.1(c) ICC(A) to Yard is stronger than port delivery; reconcile insurance extent and premium without silent removal",
+   "B5 sea repacking net of MDS included crates / EXION inland packing; B7 storage and B14 general insurance charged once"
+
   ])
  });
 }

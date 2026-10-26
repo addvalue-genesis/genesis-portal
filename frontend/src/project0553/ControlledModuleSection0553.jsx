@@ -5,11 +5,11 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 // copyable stable ID in its COLLAPSED header, not only inside expanded content.
 // Do not use this wrapper for cost math or source-data transformations.
 export function ControlledModuleSection0553({
- moduleKey,title,children,defaultOpen=false,description=null,className=""
+ moduleKey,title,children,ownerCode=null,defaultOpen=false,description=null,className=""
 }){
  if(!moduleKey||!title)throw Error("ControlledModuleSection0553 requires Module ID and title");
  return <details className={"p55-panel p553-contract-module "+className}
-   data-component-key={moduleKey} open={defaultOpen}>
+   data-component-key={moduleKey} data-cost-owner={ownerCode||undefined} open={defaultOpen}>
   <summary className="p553-contract-module__summary">
    <span className="p553-contract-module__title"><strong>{title}</strong>
     {description&&<small>{description}</small>}</span>
