@@ -3,14 +3,14 @@ import {selectB10StageSpareSelection0553} from "./data/b10StageSpareSelection055
 
 const stageTitle={ERECTION:"Erection",PRE_COMMISSIONING:"Pre-commissioning",COMMISSIONING:"Commissioning",START_UP:"Start-up"};
 
-export function B10StageSpareSelection0553({internal=false,onOpenSource=null}){
+export function B10StageSpareSelection0553({internal=false,onOpenSource=null,context="working"}){
  const model=selectB10StageSpareSelection0553();
  if(!internal)return <p className="p553-b10-commercial-note">
   B10 commissioning spare contents require OEM SPIR validation against installed equipment and the applicable Annex-8 minimums.
   The 4/3/4/3 MR kit quantities do not establish an individual spare SKU quantity or CIF USD unit price.
  </p>;
  return <details className="p55-panel p553-b10-stage-selection" open
-   data-component-key={model.moduleId} style={{padding:12}}>
+   data-component-key={context==="working"?model.moduleId:"bid.budget."+context+".b10.stage-spare-selection"} style={{padding:12}}>
   <summary><strong>B10 — Select spares from installed Required BOM / MR Attachment 5</strong>
    <small>14 spare function candidates · 4 stages · source ZWP20 MR-502-001 row 4 · NONPOSTING</small></summary>
   <p className="p55-note"><strong>Selection logic:</strong> Part A BOM identifies installed ODU, IDU, Antenna, L3 Switch,
@@ -25,7 +25,7 @@ export function B10StageSpareSelection0553({internal=false,onOpenSource=null}){
      <th>Required verification / why</th><th>Commissioning Kit Qty</th><th>Physical spare Qty / SKU / CIF USD</th>
     </tr></thead>
     <tbody>{model.stageRows.map(r=><tr key={r.id} data-b10-stage-spare-id={r.id}
-       data-component-key={"bid.budget.working.bc.b10.stage-spare-selection."+r.id.toLowerCase()}
+       data-component-key={context==="working"?"bid.budget.working.bc.b10.stage-spare-selection."+r.id.toLowerCase():"bid.budget."+context+".b10.stage-spare-selection."+r.id.toLowerCase()}
        data-parent-source-id={r.parentSourceId}>
       <td><strong>{r.mr}</strong><small>{r.installedEquipmentTagCandidates.join(" · ")||"Installed TAG compatibility pending"}</small></td>
       <td><strong>{r.requirementFunction}</strong><small>{r.id}</small></td>
