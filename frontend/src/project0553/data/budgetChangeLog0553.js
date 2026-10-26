@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-26-R60";
+export const CHANGE_LOG_VERSION_0553="2026-10-26-R61";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261026-03",date:"2026-10-26",kind:"PRICE",tone:"caution",
+  title:"B10 10.3.4 Official + Original Native Excel — 14 source-linked priced LOT lines from USD16200 parent total",
+  detail:"Owner reported B10 Official preview Qty dashes and price To be quoted even though 10.2 Working and 10.3.3 had 14 budget functional allowance amounts. The Official USD model now projects exactly 14 PRE-AWARD priced 1-LOT functional lines from four immutable rounded MR parent USD totals, summing 16200 (working-before-round allocation 16185), using existing sourceId/traceId/sourceRowModuleId per MR plus 14 selection IDs. The same itemized model feeds the Official 8-column UX/UI and six-sheet Native XLSX export: B10 adds one styled body row 19, shifts Total to row20 and Remark to row21; other worksheets remain unchanged. Official local application adds per-line Source button returning to 10.2 Spare Function and existing Release row. Each Qty 1 LOT is financial allowance NOT an OEM physical spare unit, Unit USD is an unissued allocation NOT a verified OEM CIF price, original DDP-to-CIF deviation is outstanding. No selected WBS THB, A/B summary, 10.3.3 financial Source, cross-category stock allocation or customer release authorisation changed; draft gate remains NOT ISSUED.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10","bid.budget.pricing.release.preview","bid.budget.pricing.official.b10.kit-summary"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner screenshot 26-Oct 10.3.4 B10 lacks Qty/Price, demands Source→Release linkage"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261026-02",date:"2026-10-26",kind:"PRICE",tone:"caution",
   title:"B10 original Annex clean technical Description/Materials and 14-line Working budget split",
