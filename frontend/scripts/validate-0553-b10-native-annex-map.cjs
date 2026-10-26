@@ -79,8 +79,17 @@ assert(previewUi.includes('Export B10 — Original Annex Itemized / USD Referenc
 assert(previewUi.includes('buildNativeB10ItemizedReview0553(original,review)'));
 const native=fs.readFileSync(path.join(root,"project0553/nativeWorkingDraft0553.js"),"utf8");
 assert(native.includes("export async function buildNativeB10ItemizedReview0553"));
-const box={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set};
-vm.runInNewContext(native.replace(/\bexport /g,"")+";this.ext={buildNativeB10ItemizedReview0553,entriesFromZip,readEntry};",box);
+// Babel parses ESM exports before evaluating the original helper functions in a VM.
+// Keep all B10/XLSX business logic untouched; only the validator execution adapter changes.
+const box={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set,exports:{}};
+const vmSource=babel.transformSync(
+ native+"\n;globalThis.ext={buildNativeB10ItemizedReview0553,entriesFromZip,readEntry};",
+ {babelrc:false,configFile:false,
+  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}]]}
+).code;
+vm.runInNewContext(vmSource,box);
+assert.equal(typeof box.ext?.buildNativeB10ItemizedReview0553,"function",
+ "B10 native annex builder missing after ESM transform");
 const embedded=from("data/nativeReleaseTemplate0553.json"),originalBytes=Buffer.from(embedded.base64,"base64");
 const asFile={name:embedded.sourceName,arrayBuffer:async()=>originalBytes.buffer.slice(originalBytes.byteOffset,originalBytes.byteOffset+originalBytes.byteLength)};
 const decoder=new TextDecoder();
