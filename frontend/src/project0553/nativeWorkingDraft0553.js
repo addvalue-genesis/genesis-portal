@@ -457,7 +457,7 @@ export async function buildNativeOfficialRelease0553(file,model){
 // shifting the original Total and Remark and their merged ranges downward.
 // Source quoted equipment Qty/USD reference is NOT an accepted B10 CIF spare SELL.
 export async function buildNativeB10ItemizedReview0553(file,annex){
- if(!file||!/\\.xlsx$/i.test(file.name||"")||!annex||annex.originalSheet!=="B10 CommSpares"||
+ if(!file||!/\.xlsx$/i.test(file.name||"")||!annex||annex.originalSheet!=="B10 CommSpares"||
   !Array.isArray(annex.rows)||annex.rows.length<1||annex.customerReleaseAllowed!==false)
   throw Error("Native B10 review requires original 4-Scope of Supply.xlsx and the nonposting source item map");
  if(annex.rows.some(x=>!x.id||!x.parentSourceId||x.b10PurchaseQty!==null||
@@ -472,27 +472,27 @@ export async function buildNativeB10ItemizedReview0553(file,annex){
  let xml=decode.decode(await readEntry(sheet));
  const original13=13,extra=Math.max(0,annex.rows.length-original13);
  if(extra){
-  const originalRow=xml.match(/<row\\b[^>]*\\br="18"[^>]*>[\\s\\S]*?<\\/row>/)?.[0];
+  const originalRow=xml.match(/<row\b[^>]*\br="18"[^>]*>[\s\S]*?<\/row>/)?.[0];
   if(!originalRow||!xml.includes('<mergeCell ref="B19:H19"')||
    !xml.includes('<mergeCell ref="B20:E20"'))throw Error("Original B10 styled body/total/remark geometry changed");
   const shift=row=>{
-   const no=Number(row.match(/^<row\\b[^>]*\\br="(\\d+)"/)?.[1]);
+   const no=Number(row.match(/^<row\b[^>]*\br="(\d+)"/)?.[1]);
    if(!Number.isInteger(no)||no<19)return row;
    const to=no+extra;
-   return row.replace(/^<row\\b[^>]*>/,s=>s.replace(/\\br="\\d+"/,'r="'+to+'"'))
-    .replace(/(<c\\b[^>]*\\br=")([A-Z]+)\\d+(")/g,(_m,a,col,end)=>a+col+to+end);
+   return row.replace(/^<row\b[^>]*>/,s=>s.replace(/\br="\d+"/,'r="'+to+'"'))
+    .replace(/(<c\b[^>]*\br=")([A-Z]+)\d+(")/g,(_m,a,col,end)=>a+col+to+end);
   };
-  xml=xml.replace(/<row\\b[^>]*>[\\s\\S]*?<\\/row>/g,shift);
+  xml=xml.replace(/<row\b[^>]*>[\s\S]*?<\/row>/g,shift);
   const inserted=Array.from({length:extra},(_,i)=>{
    const to=19+i;
-   return originalRow.replace(/^<row\\b[^>]*>/,s=>s.replace(/\\br="18"/,'r="'+to+'"').replace(/\\bht="[^"]+"/,'ht="56"'))
-    .replace(/(<c\\b[^>]*\\br=")([A-Z]+)18(")/g,(_m,a,col,end)=>a+col+to+end);
+   return originalRow.replace(/^<row\b[^>]*>/,s=>s.replace(/\br="18"/,'r="'+to+'"').replace(/\bht="[^"]+"/,'ht="56"'))
+    .replace(/(<c\b[^>]*\br=")([A-Z]+)18(")/g,(_m,a,col,end)=>a+col+to+end);
   }).join("");
   const token='<row r="'+(19+extra)+'"';
   const index=xml.indexOf(token);
   if(index<0)throw Error("Native B10 inserted row position missing");
   xml=xml.slice(0,index)+inserted+xml.slice(index);
-  xml=xml.replace(/(<mergeCell\\b[^>]*\\bref=")([A-Z]+)(\\d+):([A-Z]+)(\\d+)(")/g,
+  xml=xml.replace(/(<mergeCell\b[^>]*\bref=")([A-Z]+)(\d+):([A-Z]+)(\d+)(")/g,
    (whole,prefix,a,first,b,last,suffix)=>Number(first)>=19?
     prefix+a+(Number(first)+extra)+":"+b+(Number(last)+extra)+suffix:whole);
  }
