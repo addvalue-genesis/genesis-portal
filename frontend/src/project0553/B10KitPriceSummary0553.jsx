@@ -45,7 +45,8 @@ export function B10KitPriceSummary0553({
     variant==="budgetary"?"bid.budget.pricing.budgetary.annex.b10.kit-summary":
     currency==="USD"?"bid.budget.pricing.official.b10.kit-summary":"bid.budget.pricing.release.preview.annex.b10.kit-summary"}
     data-source-reconciliation="B10_SOURCE_RELEASE_SOURCE">
-  <B10NativeAnnexReview0553 internal={internal} onOpenSource={onOpenSource} variant={variant}/>
+  <B10NativeAnnexReview0553 internal={internal} onOpenSource={onOpenSource} variant={variant}
+    officialRows={currency==="USD"?rows:null} officialTotalUSD={currency==="USD"?total:null}/>
   {internal&&<B10StageSpareSelection0553 internal context={variant} onOpenSource={onOpenSource}/>}
   <div className="p553-b10-commercial-heading">
    <strong>B10 — Kit price summary / reconciliation</strong>
