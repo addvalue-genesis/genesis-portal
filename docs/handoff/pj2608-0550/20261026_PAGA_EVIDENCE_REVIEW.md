@@ -63,3 +63,9 @@ node scripts/profile-pj2608-0550-browser.cjs /tmp/paga-review-report.json
 ```
 
 Draft review only. No merge, deployment, customer issue or financial source replacement.
+
+## Windows checkout correction
+
+A Windows checkout produced raw snapshot SHA-256 `acfc30a99bd963947765ea0fb4b8402f303cf6c7d8b419cb8a9c6c469a5834bc`. This is exactly the unchanged controlled LF source converted to CRLF by Git. The original coverage and evidence validators incorrectly rejected that checkout representation.
+
+Both validators now use one integrity assertion which converts CRLF to LF in memory before comparing against the original controlled SHA-256. It does not rewrite the file, parse/reserialize JSON, trim whitespace, remove a BOM or relax the expected digest. All other source changes still fail. The new snapshot regression reproduces the reported Windows hash and checks LF/CRLF/mixed-line-ending acceptance plus state, numeric value, whitespace, BOM and project-change rejection. The build runs that regression first; CI now builds on both Ubuntu and Windows. Browser application code and financial source data are unchanged by this correction.

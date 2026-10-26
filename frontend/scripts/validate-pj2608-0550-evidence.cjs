@@ -1,6 +1,7 @@
 "use strict";
 // Synthetic source records only. Never add private project documents to this fixture.
-const assert=require("node:assert/strict"), fs=require("node:fs"), path=require("node:path"), crypto=require("node:crypto");
+const assert=require("node:assert/strict"), fs=require("node:fs"), path=require("node:path");
+const {assertControlledSnapshot}=require("./assert-pj2608-0550-snapshot.cjs");
 const babel=require("@babel/core"), root=path.resolve(__dirname,"../src");
 const previousJs=require.extensions[".js"], previousJsx=require.extensions[".jsx"];
 const compile=(mod,file)=>mod._compile(babel.transformFileSync(file,{babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code,file);
@@ -65,7 +66,7 @@ try {
   const malicious=clone();malicious.requirements[0].text="<script>alert('x')</script>";
   assert(!renderToStaticMarkup(React.createElement(PagaEvidenceReview,{evidence:parse(malicious),onEvidenceChange:()=>{}})).includes("<script>"));
   const raw=fs.readFileSync(path.join(root,"project0550/data/snapshots/pj2608-0550.rev07.json"));
-  assert.equal(crypto.createHash("sha256").update(raw).digest("hex"),"78832b4ea11b3c2781d3fe10183db071967056966e908bd63b570475fb84ed41");
+  assertControlledSnapshot(raw);
   if(process.env.PRIVATE_EVIDENCE_FILE){
     const privateData=freeze(parsePagaEvidence(fs.readFileSync(process.env.PRIVATE_EVIDENCE_FILE,"utf8"),snapshot));
     const privateReview=buildPagaEvidenceReview(privateData);
