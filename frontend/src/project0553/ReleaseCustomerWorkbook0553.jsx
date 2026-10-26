@@ -147,12 +147,18 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
    const bytes=Uint8Array.from(atob(nativeReleaseTemplate0553.base64),c=>c.charCodeAt(0));
    const original=new File([bytes],nativeReleaseTemplate0553.sourceName,
     {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+   // Populate the other five original sheets from the SAME live 10.2→10.3.3
+   // Working model before replacing B10 Annex with selected SPIR candidates.
+   // This avoids distributing an Excel with Rev08 prices in unrelated sheets.
+   const currentWorking=await buildNativeWorkingDraft0553(original,model);
+   const workingOriginal={name:currentWorking.filename,
+    arrayBuffer:()=>currentWorking.blob.arrayBuffer()};
    const review=selectB10NativeAnnexReview0553();
-   const result=await buildNativeB10ItemizedReview0553(original,review);
+   const result=await buildNativeB10ItemizedReview0553(workingOriginal,review);
    const url=URL.createObjectURL(result.blob),link=document.createElement("a");
    link.href=url;link.download=result.filename;document.body.appendChild(link);
    link.click();link.remove();window.setTimeout(()=>URL.revokeObjectURL(url),15000);
-   setNativeReport({success:true,text:"B10 Internal Native: "+result.filename,
+   setNativeReport({success:true,text:"B10 Source-linked Working + Native: "+result.filename,
     mappedCells:result.rowCount*8,warnings:result.warnings});
   }catch(error){setNativeReport({success:false,
     text:"B10 itemized Native export failed: "+(error?.message||String(error)),warnings:[]});}
