@@ -38,6 +38,20 @@ assert.equal(model.c.find(x=>x.code==="C1").amountUSD,null);
 assert.equal(model.c.find(x=>x.code==="C2").amountUSD,null);
 assert(model.c.every(x=>x.amountUSD===null),"Option benchmark must NOT overwrite the priced commercial authority");
 assert(other.rows.C2.every(x=>x.sourceId===null&&x.historicalSourceId&&x.customerIssued===false));
+assert(new Set(other.rows.C2.map(x=>x.historicalSourceId)).size===12,
+ "C2 historical stock evidence must keep 12 unique Source references, not fabricated MR price rows");
+const historicWork=fs.readFileSync(path.join(root,"project0553/SparePricedBudgetReview0553.jsx"),"utf8");
+const historicAnnex=fs.readFileSync(path.join(root,"project0553/OtherSpareOriginalAnnex0553.jsx"),"utf8");
+const route=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
+const releasePreview=fs.readFileSync(path.join(root,"project0553/ReleaseCustomerWorkbook0553.jsx"),"utf8");
+assert(historicWork.includes('bid.budget.working.bc.c2.priced-budget-review.'),
+ "Working must expose exact historic source row when C2 price offered from Rev08");
+assert(historicAnnex.includes('historicalSourceId:row.historicalSourceId'),
+ "C2 priced Annex must preserve original Rev08 evidence ID in navigation");
+assert(route.includes("originalHistoricSourceId")&&route.includes('sourceSelectionId:code==="C2"'),
+ "Release→historical Source→Release return must not fabricate an MR source ID");
+assert(releasePreview.includes('historicalTarget')&&releasePreview.includes('[data-other-spare-source-id]'),
+ "Returning from C2 historical source must focus the exact priced Annex row");
 assert(other.rows.B11.every(x=>x.sourceRowModuleId&&x.sourceId&&x.traceId));
 assert(other.rows.B13.every(x=>x.sourceRowModuleId&&x.sourceId&&x.traceId));
 for(const code of other.codes){
