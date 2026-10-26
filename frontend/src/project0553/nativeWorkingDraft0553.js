@@ -356,6 +356,37 @@ export async function buildNativeWorkingDraft0553(file,model){
   warnings,mappedCells:count};
 }
 
+// Clone one original B10 body row and move Total/Remark down on the same
+// sheet, preserving customer style/merges. Idempotent on an already expanded
+// original workbook for repeated native USD export.
+function expandOriginalB10To14Rows0553(xml){
+ if(xml.includes('<mergeCell ref="B20:H20"')&&xml.includes('<mergeCell ref="B21:E21"')){
+  if(!/<row\b[^>]*\br="19"/.test(xml))throw Error("B10 expanded row 19 absent");
+  return xml;
+ }
+ if(!xml.includes('<mergeCell ref="B19:H19"')||!xml.includes('<mergeCell ref="B20:E20"'))
+  throw Error("B10 original footer merges changed");
+ const lastBody=xml.match(/<row\b[^>]*\br="18"[^>]*>[\s\S]*?<\/row>/)?.[0];
+ if(!lastBody)throw Error("B10 original native row18 missing");
+ xml=xml.replace(/<row\b[^>]*>[\s\S]*?<\/row>/g,row=>{
+  const n=Number(row.match(/^<row\b[^>]*\br="(\d+)"/)?.[1]);
+  if(!Number.isInteger(n)||n<19)return row;
+  return row.replace(/^<row\b[^>]*>/,h=>h.replace(/\br="\d+"/,'r="'+(n+1)+'"'))
+   .replace(/(<c\b[^>]*\br=")([A-Z]+)\d+(")/g,(_m,a,col,q)=>a+col+(n+1)+q);
+ });
+ const inserted=lastBody.replace(/^<row\b[^>]*>/,h=>h.replace(/\br="18"/,'r="19"'))
+  .replace(/(<c\b[^>]*\br=")([A-Z]+)18(")/g,(_m,a,col,q)=>a+col+"19"+q);
+ const pos=xml.indexOf('<row r="20"');
+ if(pos<0)throw Error("B10 shifted footer missing");
+ xml=xml.slice(0,pos)+inserted+xml.slice(pos);
+ xml=xml.replace(/(<mergeCell\b[^>]*\bref=")([A-Z]+)(\d+):([A-Z]+)(\d+)(")/g,
+  (m,a,col1,r1,col2,r2,q)=>Number(r1)>=19?
+   a+col1+(Number(r1)+1)+":"+col2+(Number(r2)+1)+q:m);
+ if(!xml.includes('<mergeCell ref="B20:H20"')||!xml.includes('<mergeCell ref="B21:E21"'))
+  throw Error("B10 footer merge shift failed");
+ return xml;
+}
+
 // Generate a separate English customer workbook from original geometry.
 // Only explicitly selected customer fields are written; no internal model dump,
 // unused shared strings, old amounts or source-workbook custom metadata survive.
@@ -369,6 +400,7 @@ export async function buildNativeOfficialRelease0553(file,model){
   // Preserve every cell address/style, row, column, merge, page and print setting.
   let xml=decode.decode(await readEntry(entry)).replace(/<c\b([^>]*?)(?:\/>|>[\s\S]*?<\/c>)/g,(_,attrs)=>
    "<c"+attrs.replace(/\s+t="[^"]*"/g,"")+"/>");
+  if(i===2)xml=expandOriginalB10To14Rows0553(xml);
   const cells=new Map(),put=(address,value)=>write(cells,address,value);
   const price=value=>Number.isFinite(value)?value:"To be quoted";
   if(i===1){
@@ -385,17 +417,25 @@ export async function buildNativeOfficialRelease0553(file,model){
    put("A40","Part C: Options — excluded from Total A+B");
    put("B43","Delivery: CIF Zhuhai Port, China (Incoterms 2020).");
   }else{
-   const code=["B10","B11","B13","C1","C2"][i-2],detail=model.annex[code];
-   if(detail.length>13)throw Error(code+" exceeds original annex capacity");
+   const code=["B10","B11","B13","C1","C2"][i-2],isB10=code==="B10";
+   const detail=isB10?model.b10ItemizedAnnex?.rows:model.annex[code];
+   if(!Array.isArray(detail)||detail.length>(isB10?14:13)||
+      (isB10&&(detail.length!==14||model.b10ItemizedAnnex?.customerIssued!==false)))
+    throw Error(code+" original priced Annex capacity or approval gate failed");
    put("B2",model.annexTitles[code]);
    ["Item","Tag No.","Description","Specification","Materials","Qty"].forEach((v,j)=>put("BCDEFG"[j]+"4",v));
-   put("H4","Price (USD)");put("H5","Unit Price (USD)");put("I5","Amount (USD)");
+   put("H4",isB10?"PRE-AWARD BUDGET USD / CIF UNCONFIRMED":"Price (USD)");
+   put("H5","Unit Price (USD)");put("I5","Amount (USD)");
    if(code.startsWith("C"))put("J5","Lead Time (ARO)");
    detail.forEach((r,j)=>{const row=6+j;
-    [j+1,r.tagNo,r.description,r.specification,r.materials,r.qty??"TBC",price(r.unitUSD),price(r.totalUSD)].forEach((v,k)=>put("BCDEFGHI"[k]+row,v));
+    [isB10?r.item:j+1,isB10?r.tag:r.tagNo,r.description,r.specification,r.materials,
+     r.qty??"TBC",price(r.unitUSD),price(r.totalUSD)].forEach((v,k)=>put("BCDEFGHI"[k]+row,v));
     if(code.startsWith("C"))put("J"+row,r.leadTime);
    });
-   put("B19","Total (USD)");put("I19",price([...model.b,...model.c].find(r=>r.code===code).amountUSD));
+   const totalRow=isB10?20:19;
+   put("B"+totalRow,isB10?"PRE-AWARD B10 FINANCIAL ALLOCATION (USD) — NOT OEM SPARE QUOTE":"Total (USD)");
+   put("I"+totalRow,price([...model.b,...model.c].find(r=>r.code===code).amountUSD));
+   if(isB10)put("B21","PRE-AWARD BUDGETARY FINANCIAL ALLOCATION ONLY. Each Qty 1 LOT is a functional budget line, not one physical spare. OEM spare part numbers, actual delivery quantities, quoted CIF unit rates and buyer approval remain outstanding. NOT ISSUED.");
   }
   for(const [address,value] of cells){
    if(!new RegExp('<c\\b[^>]*r="'+address+'"').test(xml)){
