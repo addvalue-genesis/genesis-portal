@@ -68,6 +68,20 @@ function encodeExcelText(text){
  return String(text).replace(/&/g,"&amp;").replace(/</g,"&lt;")
   .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
 }
+// Excel writers may use a default namespace or an explicit x:/ns0: prefix.
+// Canonicalize only SpreadsheetML elements, preserving relationship namespaces.
+function normalizeSpreadsheetXml0553(xml){
+ const ns="http://schemas.openxmlformats.org/spreadsheetml/2006/main";
+ const root=xml.match(/<(?!\?)[A-Za-z_][^>]*>/)?.[0];
+ if(!root)throw Error("Missing SpreadsheetML root");
+ const aliases=[...root.matchAll(/xmlns:([\w.-]+)="([^"]*)"/g)].filter(x=>x[2]===ns).map(x=>x[1]);
+ for(const alias of aliases){
+  const escaped=alias.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+  xml=xml.replace(new RegExp('(<\\/?)'+escaped+':(?=[A-Za-z_])','g'),'$1');
+ }
+ if(aliases.length&&!/\bxmlns="/.test(root))xml=xml.replace(/<(?!\?)[A-Za-z_][^>]*>/,tag=>tag.replace(/>$/,' xmlns="'+ns+'">'));
+ return xml.replace(/<[^>]*>/g,tag=>tag.replace(/\s+\/>$/,"/>"));
+}
 function replaceCell(xml,address,value){
  if(!/^[A-J][1-9][0-9]*$/.test(address))throw Error("Illegal destination "+address);
  if(typeof value!=="string"&&!(typeof value==="number"&&Number.isFinite(value)))
@@ -112,6 +126,47 @@ function write(writes,cell,value){
  if(value===null||value===undefined)return;
  if(writes.has(cell))throw Error("Duplicate native mapping "+cell);
  writes.set(cell,value);
+}
+// Check the completed summary, not just successful ZIP creation or spare annexes.
+// A partially filled customer template must never be reported as a full export.
+export function assertNativeScopeSummary0553(xml,{a,b,total,unpricedText,sharedXml=""}){
+ const unescape=s=>s.replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,"&");
+ const textOf=s=>unescape([...s.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map(x=>x[1]).join(""));
+ const shared=[...sharedXml.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map(x=>textOf(x[1]));
+ const cell=address=>{
+  const match=xml.match(new RegExp('<c\\b[^>]*\\br="'+address+'"[^>]*?(?:/>|>([\\s\\S]*?)</c>)'));
+  if(!match)return null;
+  const value=(match[1]||"").match(/<v>([^<]*)<\/v>/)?.[1];
+  if(/\bt="s"/.test(match[0]))return shared[Number(value)]??null;
+  if(/\bt="inlineStr"/.test(match[0]))return textOf(match[1]||"");
+  return value===undefined?null:Number(value);
+ };
+ const requireCell=(address,expected)=>{
+  if(cell(address)!==expected)throw Error("Incomplete native A/B summary: "+address+" does not match Release");
+ };
+ if(a?.length!==4||b?.length!==14)throw Error("Incomplete native A/B source: expected A1–A4 and B1–B14");
+ for(const [items,prefix,start] of [[a,"A",8],[b,"B",24]])items.forEach((item,i)=>{
+  if(item.code!==prefix+(i+1))throw Error("Incomplete native A/B source: missing or reordered "+prefix+(i+1));
+  const row=start+i;
+  requireCell("A"+row,item.code);requireCell("E"+row,1);
+  const desc=cell((prefix==="A"?"C":"B")+row);
+  if(typeof desc!=="string"||!desc.trim()||/^xxx$/i.test(desc.trim()))throw Error("Incomplete native A/B description: "+item.code);
+  if(prefix==="A"){
+   requireCell("B"+row,item.mr);requireCell("C"+row,item.description);
+   if(typeof cell("D"+row)!=="string"||!cell("D"+row).trim())throw Error("Incomplete native A locations: "+item.code);
+  }
+  const price=Number.isFinite(item.amount)?round(item.amount):unpricedText;
+  requireCell("F"+row,price);requireCell("G"+row,price);
+ });
+ // Spare-only workbooks also omit G38; reject that even when all annexes pass.
+ const sum=round([...a,...b].reduce((n,x)=>n+(Number.isFinite(x.amount)?x.amount:0),0));
+ if(round(total)!==sum)throw Error("Native A+B total does not reconcile to source rows (Part C excluded)");
+ requireCell("G38",sum);
+ for(let row=12;row<=22;row++)for(const col of "ABCDEFG"){
+  const value=cell(col+row);
+  if(value!==null&&value!=="")throw Error("Stale Part A template row: "+col+row);
+ }
+ return {partARows:a.length,partBRows:b.length,total:sum};
 }
 // Owner-requested Release export layout. Original values, formulas, merges,
 // borders, fills and unrelated ZIP parts are retained; body styles are cloned.
@@ -232,10 +287,10 @@ export async function buildNativeWorkingDraft0553(file,model){
  for(let i=1;i<=6;i++){
   const entryName="xl/worksheets/sheet"+i+".xml";
   if(!names.has(entryName))throw Error("Original worksheet missing: "+entryName);
-  sourceXml.set(entryName,decode.decode(await readEntry(entries.find(e=>e.name===entryName))));
+  sourceXml.set(entryName,normalizeSpreadsheetXml0553(decode.decode(await readEntry(entries.find(e=>e.name===entryName)))));
  }
  const sharedEntry=entries.find(e=>e.name==="xl/sharedStrings.xml");
- const sharedXml=sharedEntry?decode.decode(await readEntry(sharedEntry)):"";
+ const sharedXml=sharedEntry?normalizeSpreadsheetXml0553(decode.decode(await readEntry(sharedEntry))):"";
  const textRuns=xml=>[...xml.matchAll(/<t\b[^>]*>([\s\S]*?)<\/t>/g)].map(x=>x[1]).join("");
  const sharedStrings=[...sharedXml.matchAll(/<si\b[^>]*>([\s\S]*?)<\/si>/g)].map(x=>textRuns(x[1]));
  const sourceText=address=>{
@@ -250,18 +305,24 @@ export async function buildNativeWorkingDraft0553(file,model){
   const row=8+i,group=model.a[i];
   if(!group||group.code!=="A"+(i+1))throw Error("Part A source group order mismatch");
   const sum=group.previewSellTHB;
-  if(!Number.isFinite(sum)){warnings.push(group.code+" has no working price");continue;}
+  if(!Number.isFinite(sum))warnings.push(group.code+" has no working price");
   write(scope,"A"+row,group.code);
   write(scope,"B"+row,group.mr);
   write(scope,"C"+row,group.description);
   write(scope,"D"+row,"Locations: "+([...new Set(group.sourceRows.map(x=>x.site).filter(Boolean))].join(", ")||"TBC"));
   write(scope,"E"+row,1);
-  write(scope,"F"+row,round(sum));
-  write(scope,"G"+row,round(sum));
+  write(scope,"F"+row,Number.isFinite(sum)?round(sum):"NOT ESTABLISHED");
+  write(scope,"G"+row,Number.isFinite(sum)?round(sum):"NOT ESTABLISHED");
+ }
+ // Reusing a previously filled template must not keep old equipment/quantities.
+ for(let row=12;row<=22;row++)for(const col of "ABCDEFG"){
+  const address=col+row;
+  if(new RegExp('<c\\b[^>]*\\br="'+address+'"').test(sourceXml.get("xl/worksheets/sheet1.xml")))write(scope,address,"");
  }
  const bc=model.b||[];
  for(let i=1;i<=14;i++){
   const row=23+i,b=bc.find(x=>x.code==="B"+i),price=b?.customerSellTHB;
+  write(scope,"A"+row,"B"+i);write(scope,"E"+row,1);
   if(!Number.isFinite(price)){warnings.push("B"+i+" price NOT ESTABLISHED");write(scope,"F"+row,"NOT ESTABLISHED");write(scope,"G"+row,"NOT ESTABLISHED");continue;}
   write(scope,"F"+row,round(price)); // B10/B11/B13 current Annex working unit LS must replace original stale F value too.
   write(scope,"G"+row,round(price));
@@ -273,7 +334,7 @@ export async function buildNativeWorkingDraft0553(file,model){
   const original=sourceText(cell).split(/\r?\n(?:Activities:|Included (?:SAT|Yard support):)/)[0]||line.description;
   const heading=line.code==="B6"?line.description:original;
   const notes=[line.executionActivities?.releaseText?"Activities: "+line.executionActivities.releaseText:null,line.serviceCommercialBasis?.compactText].filter(Boolean);
-  if(notes.length||line.code==="B6")write(scope,cell,[heading,...notes].join("\n"));
+  write(scope,cell,[heading,...notes].filter(Boolean).join("\n"));
  }
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
  for(const [code,row] of [["C1",41],["C2",42]]){
@@ -391,11 +452,15 @@ export async function buildNativeWorkingDraft0553(file,model){
  // Fit the exported Release workbook, including merged description cells.
  const styleEntry=entries.find(e=>e.name==="xl/styles.xml");
  if(!styleEntry)throw Error("Native workbook is missing styles.xml");
- const fitted=fitNativeReleaseLayout0553(decode.decode(await readEntry(styleEntry)),
+ const fitted=fitNativeReleaseLayout0553(normalizeSpreadsheetXml0553(decode.decode(await readEntry(styleEntry))),
   sharedXml,
   new Map([...changes].map(([name,bytes])=>[name,decode.decode(bytes)])),warnings);
  for(const [name,xml] of fitted.sheets)changes.set(name,encode.encode(xml));
  changes.set("xl/styles.xml",encode.encode(fitted.stylesXml));
+ assertNativeScopeSummary0553(fitted.sheets.get(summarySheet),{
+  a:model.a.map(x=>({...x,amount:x.previewSellTHB})),b:bc.map(x=>({...x,amount:x.customerSellTHB})),
+  total:priced.reduce((sum,n)=>sum+n,0),unpricedText:"NOT ESTABLISHED",sharedXml
+ });
  // All unrelated ZIP parts are copied byte-for-byte.
  const result=rebuildZip(entries,changes);
  const date=new Date().toISOString().slice(0,10).replace(/-/g,"");
@@ -448,13 +513,20 @@ export async function buildNativeOfficialRelease0553(file,model){
  for(let i=1;i<=6;i++){
   const name="xl/worksheets/sheet"+i+".xml",entry=entries.find(e=>e.name===name);
   if(!entry)throw Error("Original worksheet missing: "+name);
+  const preservedFormulas=new Map();
   // Preserve every cell address/style, row, column, merge, page and print setting.
-  let xml=decode.decode(await readEntry(entry)).replace(/<c\b([^>]*?)(?:\/>|>[\s\S]*?<\/c>)/g,(cell,attrs)=>{
+  let xml=normalizeSpreadsheetXml0553(decode.decode(await readEntry(entry))).replace(/<c\b([^>]*?)(?:\/>|>[\s\S]*?<\/c>)/g,(cell,attrs)=>{
    const formula=cell.match(/<f\b[^>]*>[\s\S]*?<\/f>/)?.[0];
    if(formula){
-    if(i!==1||! /\br="E7"/.test(attrs)||formula!=="<f>SUM(E8:E22)</f>")
-     throw Error("Unexpected native formula: preserve and reconcile before export");
-    return "<c"+attrs.replace(/\s+t="[^"]*"/g,"")+">"+formula+"<v>4</v></c>";
+    const address=attrs.match(/\br="([A-Z]+\d+)"/)?.[1];
+    if(i===1&&address==="E7"&&formula==="<f>SUM(E8:E22)</f>")
+     return "<c"+attrs.replace(/\s+t="[^"]*"/g,"")+">"+formula+"<v>4</v></c>";
+    const row=Number(address?.slice(1)),totalRow=i===2?20:19;
+    const line=i>1&&address==="I"+row&&row>=6&&row<totalRow&&
+     ["<f>G"+row+"*H"+row+"</f>","<f>ROUND(G"+row+"*H"+row+",2)</f>"].includes(formula);
+    const total=i>1&&address==="I"+totalRow&&formula==="<f>SUM(I6:I"+(totalRow-1)+")</f>";
+    if(!line&&!total)throw Error("Unexpected native formula: preserve and reconcile before export "+name+"!"+address);
+    preservedFormulas.set(address,formula);
    }
    return "<c"+attrs.replace(/\s+t="[^"]*"/g,"")+"/>";
   });
@@ -532,11 +604,19 @@ export async function buildNativeOfficialRelease0553(file,model){
    }
    xml=replaceCell(xml,address,value);
   }
+  for(const [address,formula] of preservedFormulas){
+   const value=cells.get(address),row=Number(address.slice(1));
+   const calculated=formula.includes('SUM(')?round([...cells].filter(([key,v])=>/^I\d+$/.test(key)&&Number(key.slice(1))>=6&&Number(key.slice(1))<row&&Number.isFinite(v)).reduce((sum,[,v])=>sum+v,0)):
+    round(cells.get('G'+row)*cells.get('H'+row));
+   if(!Number.isFinite(value)||calculated!==round(value))throw Error("Native formula/source mismatch: "+name+"!"+address);
+   const re=new RegExp('(<c\\b[^>]*\\br="'+address+'"[^>]*>)([\\s\\S]*?)(</c>)');
+   xml=xml.replace(re,(_match,start,_body,end)=>start+formula+'<v>'+value+'</v>'+end);
+  }
   sheets.set(name,xml);
  }
  const style=entries.find(e=>e.name==="xl/styles.xml");
  if(!style)throw Error("Original styles missing");
- const fitted=fitNativeReleaseLayout0553(decode.decode(await readEntry(style)),"",sheets,warnings);
+ const fitted=fitNativeReleaseLayout0553(normalizeSpreadsheetXml0553(decode.decode(await readEntry(style))),"",sheets,warnings);
  // Numeric quotation amounts use USD decimals; annex unit rates retain 4 decimals
  // so Qty x Unit Price rounds exactly to the distributed parent quotation.
  let styles=fitted.stylesXml;
@@ -568,6 +648,10 @@ export async function buildNativeOfficialRelease0553(file,model){
   else styles=styles.replace(/(<styleSheet\b[^>]*>)/,'$1<numFmts count="1">'+fmt+'</numFmts>');
  }
  changes.set("xl/styles.xml",encode.encode(styles));
+ assertNativeScopeSummary0553(decode.decode(changes.get("xl/worksheets/sheet1.xml")),{
+  a:model.a.map(x=>({...x,amount:x.amountUSD})),b:model.b.map(x=>({...x,amount:x.amountUSD})),
+  total:model.totalUSD,unpricedText:"To be quoted"
+ });
  changes.set("xl/sharedStrings.xml",encode.encode('<?xml version="1.0" encoding="UTF-8"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"/>'));
  changes.set("docProps/core.xml",encode.encode('<?xml version="1.0" encoding="UTF-8"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>PJ2608-0553 Scope of Supply USD</dc:title></cp:coreProperties>'));
  const remove=name=>name.startsWith("customXml/")||name==="xl/calcChain.xml"||name==="docProps/custom.xml";

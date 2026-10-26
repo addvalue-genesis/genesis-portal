@@ -4,7 +4,7 @@ for(const ext of ['.js','.jsx'])require.extensions[ext]=(m,f)=>f.startsWith(root
 require.extensions['.css']=()=>{};
 const {buildReleaseCommercialModel0553}=require('../src/project0553/data/releaseCommercialModel0553');
 const {buildOfficialUsdRelease0553,quoteUsd0553}=require('../src/project0553/data/officialUsdRelease0553');
-const {buildNativeOfficialRelease0553}=require('../src/project0553/nativeWorkingDraft0553');
+const {buildNativeOfficialRelease0553,assertNativeScopeSummary0553}=require('../src/project0553/nativeWorkingDraft0553');
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const {OtherSpareOriginalAnnex0553}=require('../src/project0553/OtherSpareOriginalAnnex0553');
 const source=buildReleaseCommercialModel0553({thbPerUsd:31.5}),before=JSON.stringify(source),model=buildOfficialUsdRelease0553(source);
@@ -127,7 +127,7 @@ for(const [code,amount] of [["C1",97500],["C2",23000]]){
 assert(html.includes("OPTION — PRICE OFFERED CONDITIONALLY; subject to OEM compliance/stock validation · excluded from A+B"));
 
 const native=fs.readFileSync(path.join(root,'project0553/nativeWorkingDraft0553.js'),'utf8'),box={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set};
-vm.runInNewContext(native.replace(/\bexport /g,'')+';this.zip={entriesFromZip,readEntry};',box);
+vm.runInNewContext(native.replace(/\bexport /g,'')+';this.zip={entriesFromZip,readEntry,rebuildZip};',box);
 const template=require('../src/project0553/data/nativeReleaseTemplate0553.json');
 (async()=>{
  const bytes=Buffer.from(template.base64,'base64'),input={name:template.sourceName,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.length)};
@@ -156,6 +156,19 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
   assert(!/[\u0e00-\u0e7f\u3400-\u9fff]/.test(xml),'Non-English customer text');
   for(const internal of ['THB','INTERNAL','HOLD','WORKING DRAFT','NOT ESTABLISHED','bid.budget','Exchange rate','no duplicate engineering charge'])assert(!xml.includes(internal),name+' leaked '+internal);
   if(i===1){
+   const expected={a:model.a.map(x=>({...x,amount:x.amountUSD})),b:model.b.map(x=>({...x,amount:x.amountUSD})),total:model.totalUSD,unpricedText:'To be quoted'};
+   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:863900});
+   // Reproduce the reported partial workbook: spare prices remain, A/B vanish.
+   const erase=(input,address)=>input.replace(new RegExp('<c\\b[^>]*r="'+address+'"[^>]*?(?:/>|>[\\s\\S]*?</c>)'),'<c r="'+address+'"/>');
+   for(const address of ['A8','B9','C10','D11','E8','F8','G11','A24','B25','E26','F28','G32','G38'])
+    assert.throws(()=>assertNativeScopeSummary0553(erase(xml,address),expected),/Incomplete native/,'Missing '+address+' must block download');
+   assert.throws(()=>assertNativeScopeSummary0553(xml,{...expected,total:model.totalUSD+120500}),/Part C excluded/);
+   assert.throws(()=>assertNativeScopeSummary0553(xml,{...expected,a:expected.a.slice(1)}),/Incomplete native A\/B source/);
+   assert.throws(()=>assertNativeScopeSummary0553(xml,{...expected,b:[expected.b[1],expected.b[0],...expected.b.slice(2)]}),/reordered/);
+   for(const [j,r] of model.a.entries()){
+    assert(cell(xml,'F'+(8+j)).includes('<v>'+r.amountUSD+'</v>'));
+    assert(cell(xml,'G'+(8+j)).includes('<v>'+r.amountUSD+'</v>'));
+   }
    assert(cell(xml,'E7').includes('<f>SUM(E8:E22)</f><v>4</v>'));
    assert(cell(xml,'B43').includes('subject to buyer approval against original DDP site terms'));
    assert(cell(xml,'G38').includes('<v>'+model.totalUSD+'</v>'));
@@ -203,6 +216,34 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  // Values remain current on re-export; no old currency or internal strings return.
  const again=box.zip.entriesFromZip(new Uint8Array(await second.blob.arrayBuffer()));
  assert.deepEqual(new Uint8Array(await second.blob.arrayBuffer()),data,'Official re-export must be byte-idempotent, including styles and formats');
+ // Reproduce SpreadsheetML emitted by another native XLSX writer: prefixed
+ // elements, spaced empty tags and real annex quantity × rate / SUM formulas.
+ const qualified=new Map();
+ for(const e of entries.filter(e=>/^xl\/(worksheets\/sheet\d+\.xml|styles\.xml)$/.test(e.name))){
+  let xml=await text(e.name);
+  const sheet=Number(e.name.match(/sheet(\d+)/)?.[1]);
+  if(sheet>1){
+   const code=['B10','B11','B13','C1','C2'][sheet-2],rows=code==='B10'?model.b10ItemizedAnnex.rows:model.otherSpareItemizedAnnex.rows[code];
+   const last=code==='B10'?20:19;
+   for(const row of [...rows.map((_,j)=>6+j),last]){
+    const formula=row===last?'SUM(I6:I'+(last-1)+')':'ROUND(G'+row+'*H'+row+',2)';
+    xml=xml.replace(new RegExp('(<c\\b[^>]*r="I'+row+'"[^>]*>)(<v>)'),'$1<f>'+formula+'</f>$2');
+   }
+  }
+  xml=xml.replace('xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"','xmlns:x="http://schemas.openxmlformats.org/spreadsheetml/2006/main"')
+   .replace(/<(\/?)([A-Za-z][\w]*)(?=[\s/>])/g,'<$1x:$2').replace(/\/>/g,' />');
+  qualified.set(e.name,new TextEncoder().encode(xml));
+ }
+ const prefixed=box.zip.rebuildZip(entries,qualified);
+ const repaired=await buildNativeOfficialRelease0553({name:'Partial-Rev00.xlsx',arrayBuffer:async()=>prefixed.buffer},model);
+ const repairedParts=box.zip.entriesFromZip(new Uint8Array(await repaired.blob.arrayBuffer()));
+ for(let sheet=2;sheet<=6;sheet++){
+  const xml=await text('xl/worksheets/sheet'+sheet+'.xml',repairedParts);
+  assert(xml.includes('<f>ROUND(G6*H6,2)</f>'),'Preserve quantity × unit formula');
+  assert(xml.includes('<f>SUM(I6:I'+(sheet===2?19:18)+')</f>'),'Preserve Annex total formula');
+ }
+ const bad=box.zip.rebuildZip(entries,new Map([['xl/worksheets/sheet3.xml',new TextEncoder().encode((await text('xl/worksheets/sheet3.xml')).replace(/(<c\b[^>]*r="I6"[^>]*>)/,'$1<f>G6+H6</f>'))]]));
+ await assert.rejects(()=>buildNativeOfficialRelease0553({name:'BadFormula.xlsx',arrayBuffer:async()=>bad.buffer},model),/Unexpected native formula/);
  const arg=process.argv.find(x=>x.startsWith('--output='));if(arg)fs.writeFileSync(arg.slice(9),data);
  console.log('PASS 0553 Official native: B10 USD16200 B11 USD5100 B13 USD1500, C1 USD97500 and C2 USD23000 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, no A+B uplift or false OEM confirmation');
 })().catch(e=>{console.error(e);process.exitCode=1;});

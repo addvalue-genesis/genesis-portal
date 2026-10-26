@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-26-R63";
+export const CHANGE_LOG_VERSION_0553="2026-10-26-R64";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261026-06",date:"2026-10-26",kind:"VALIDATION",tone:"neutral",
+  title:"Complete A/B export verification and native Rev00 template compatibility",
+  detail:"The supplied Rev00 workbook contained spare prices but placeholder Part A and blank remaining B prices/total. Both native export paths now verify four A groups, fourteen B rows, quantities, unit prices, amounts and the A+B subtotal against current Release before returning a download. Working export rewrites B identifiers/quantities/descriptions and clears stale unused A rows. Added a command-line export using the same Official model and exporter to repair partial templates. Existing USD863900 priced subtotal, unpriced B4/B12/B14 and separate conditional C1/C2 USD120500 are unchanged.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner supplied 4-Scope of Supply Rev00.xlsx on 26-Oct-2026: Part A/B missing"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261026-05",date:"2026-10-26",kind:"VALIDATION",tone:"neutral",
   title:"C1/C2 priced THB/USD export parity and exact historical Source return",

@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
+    "export:0553-official-usd": "node scripts/export-0553-official-usd.cjs",
     "validate:0553-build-diagnostics": "node scripts/diagnose-0553-build-validation.cjs",
     "validate:0553-b9-china-budget": "node scripts/validate-0553-b9-china-budget.cjs",
     "validate:0553-fat-cost-owner-contract": "node scripts/validate-0553-fat-cost-owner-contract.cjs",

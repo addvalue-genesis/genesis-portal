@@ -30,7 +30,7 @@ function sheet(index){
  const max=index===1?43:22;
  const cells=[];
  for(let row=1;row<=max;row++){
-  const addresses=index===1?(row>=24&&row<=37?["B"+row,"F"+row,"G"+row]:row>=8&&row<=11?"ABCDEFG".split("").map(x=>x+row):
+  const addresses=index===1?(row>=24&&row<=37?["A"+row,"B"+row,"E"+row,"F"+row,"G"+row]:row>=8&&row<=11?"ABCDEFG".split("").map(x=>x+row):
    row>=24&&row<=37||row===41||row===42?["B"+row,"F"+row,"G"+row,"H"+row]:row===38?["A38","G38","H38"]:[]):
    row>=6&&row<=18?(index>=5?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]).map(x=>x+row):row===19?["B19","I19"]:row===21?["B21"]:row===4?["H4"]:[];
   // A previously priced workbook must not leak historical values in unused rows.
@@ -50,7 +50,7 @@ const inputZip=api.rebuildZip([
 ],new Map());
 const a=[1,2,3,4].map(i=>({code:"A"+i,mr:"MR-000"+i,
  description:"Equipment "+i,previewSellTHB:130*i,sourceRows:[{tag:"TAG-"+i}]}));
-const b=Array.from({length:14},(_,i)=>({code:"B"+(i+1),customerSellTHB:100+i}));
+const b=Array.from({length:14},(_,i)=>({code:"B"+(i+1),description:"Service "+(i+1),customerSellTHB:100+i}));
 const c=["C1","C2"].map(code=>({code}));
 const annexCodes=["B10","B11","B13","C1","C2"];
 const annex=Object.fromEntries(annexCodes.map(code=>[code,[{
@@ -174,6 +174,16 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   const repeated=await api.buildNativeWorkingDraft0553({name:filename,arrayBuffer:async()=>firstBytes.buffer},real);
   assert.deepEqual(new Uint8Array(await repeated.blob.arrayBuffer()),firstBytes,'Repeated export must not duplicate styles/notes');
   const before=api.entriesFromZip(new Uint8Array(bytes)),after=api.entriesFromZip(new Uint8Array(await result.blob.arrayBuffer()));
+  // A reused, partially filled template can contain stale equipment below A4.
+  const mainEntry=before.find(x=>x.name==='xl/worksheets/sheet1.xml');
+  let stale=decoder.decode(await api.readEntry(mainEntry));
+  for(const [address,value] of [['C12','OBSOLETE EQUIPMENT'],['E12',8],['F12',123456],['G12',987648]])stale=api.replaceCell(stale,address,value);
+  const staleBytes=api.rebuildZip(before,new Map([[mainEntry.name,encoder.encode(stale)]]));
+  const cleaned=await api.buildNativeWorkingDraft0553({name:filename,arrayBuffer:async()=>staleBytes.buffer},real);
+  const cleanEntry=api.entriesFromZip(new Uint8Array(await cleaned.blob.arrayBuffer())).find(x=>x.name===mainEntry.name);
+  const cleanXml=decoder.decode(await api.readEntry(cleanEntry));
+  assert(!cleanXml.includes('OBSOLETE EQUIPMENT')&&!cleanXml.includes('<v>987648</v>'));
+  assert(cell(cleanXml,'E7').includes('<v>4</v>'),'Reused template must not inflate MR lot count');
   assert.deepEqual(after.map(x=>x.name),before.map(x=>x.name));
   const normalizeCells=xml=>xml.replace(/<c\b([^>]*?)(?:\s*\/>|>[\s\S]*?<\/c>)/g,
    (_,attrs)=>'<c'+attrs.replace(/\s+t="[^"]*"/g,"")+'/>');

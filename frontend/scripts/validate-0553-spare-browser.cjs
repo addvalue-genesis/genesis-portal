@@ -6,6 +6,9 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const cwd=path.resolve(__dirname,'..'),out=process.env.QA_OUTPUT_DIR||path.join(require('node:os').tmpdir(),'genesis-spare-qa');
 const port=process.env.QA_PORT||'3090';
 const exportsOnly=process.argv.includes('--exports-only');
+const nativeContext={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set};
+require('node:vm').runInNewContext(fs.readFileSync(path.join(cwd,'src/project0553/nativeWorkingDraft0553.js'),'utf8').replace(/\bexport /g,'')+
+ ';this.native={entriesFromZip,readEntry,assertNativeScopeSummary0553};',nativeContext);
 (async()=>{
  fs.mkdirSync(out,{recursive:true});
  const server=spawn(process.execPath,['node_modules/webpack-cli/bin/cli.js','serve','--mode','development','--port',port,'--no-hot','--no-live-reload'],{cwd,stdio:['ignore','pipe','pipe']});
@@ -30,9 +33,17 @@ const exportsOnly=process.argv.includes('--exports-only');
   const summary=await official.innerText();
   for(const amount of ['863,900.00','97,500.00','23,000.00'])assert(summary.includes(amount));
   assert.equal(await official.locator('[data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"]').count(),2);
+  const expectedRows=await official.locator('[data-quote-code]').evaluateAll(rows=>rows.filter(r=>/^[AB]/.test(r.dataset.quoteCode)).map(r=>{
+   const cells=[...r.querySelectorAll('td')],code=r.dataset.quoteCode,text=r.querySelector('.p553-price-cell').textContent;
+   return {code,mr:cells[1].textContent,description:cells[2].textContent,amount:text==='To be quoted'?null:Number(text.replaceAll(',',''))};
+  }));
   const download=page.waitForEvent('download');
   await official.getByRole('button',{name:'Export Excel — English / USD',exact:true}).click();
   await (await download).saveAs(path.join(out,'official.xlsx'));
+  const native=nativeContext.native,downloaded=native.entriesFromZip(new Uint8Array(fs.readFileSync(path.join(out,'official.xlsx'))));
+  const downloadedSummary=new TextDecoder().decode(await native.readEntry(downloaded.find(e=>e.name==='xl/worksheets/sheet1.xml')));
+  native.assertNativeScopeSummary0553(downloadedSummary,{a:expectedRows.filter(r=>r.code.startsWith('A')),b:expectedRows.filter(r=>r.code.startsWith('B')),total:863900,unpricedText:'To be quoted'});
+  console.log('PASS downloaded XLSX: all 4 A and 14 B rows match visible Official Release; A+B USD863900 excludes Part C');
   await official.getByRole('tab',{name:'B10 CommSpares',exact:true}).click();
   const b10ids=exportsOnly?[]:await official.locator('[data-native-b10-source-id]').evaluateAll(rs=>rs.map(r=>r.getAttribute('data-native-b10-source-id')));
   if(!exportsOnly)assert.equal(b10ids.length,14);
