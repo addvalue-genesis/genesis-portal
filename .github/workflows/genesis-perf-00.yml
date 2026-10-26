@@ -4,6 +4,12 @@ on:
   push:
     branches:
       - "perf/genesis-perf-00-*"
+  pull_request:
+    branches:
+      - "fix/pj2608-0553-urgent-thailand-cif-pricing-20261024"
+    paths:
+      - ".github/workflows/genesis-perf-00.yml"
+      - "frontend/scripts/perf-00-genesis-baseline.cjs"
   workflow_dispatch:
 
 permissions:
