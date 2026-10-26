@@ -1,3 +1,4 @@
+import {buildB10OfficialItemizedAnnex0553} from "./b10OfficialItemizedAnnex0553";
 // Customer presentation derived only from the current 10.3.3 release model.
 // The commercial conversion/rounding layer never writes back to Working THB.
 export const OFFICIAL_USD_POLICY_0553=Object.freeze({thbPerUsd:31.5,incrementUSD:100,rounding:"UP_PER_SUMMARY_LINE"});
@@ -81,10 +82,11 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
    leadTime:"To be confirmed"})),parent.amountUSD);
  }
  const known=[...a,...b].filter(r=>r.amountUSD!==null);
- return {moduleId:"bid.budget.pricing.official",sourceModuleId:"bid.budget.pricing.release.preview",currency:"USD",
+ const document={moduleId:"bid.budget.pricing.official",sourceModuleId:"bid.budget.pricing.release.preview",currency:"USD",
   policy:{...policy},a,b,c,annex,annexTitles,project:"ZAWTIKA DEVELOPMENT PROJECT PHASE 1F",
   totalUSD:known.length?round2(known.reduce((s,r)=>s+r.amountUSD,0)):null,
   unpriced:[...a,...b].filter(r=>r.amountUSD===null).map(r=>r.code),
   unroundedUSD:round2(known.reduce((s,r)=>s+r.sourceTHB/policy.thbPerUsd,0)),
   issued:false};
+ return {...document,b10ItemizedAnnex:buildB10OfficialItemizedAnnex0553(document)};
 }
