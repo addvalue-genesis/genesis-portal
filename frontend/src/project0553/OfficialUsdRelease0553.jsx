@@ -21,11 +21,28 @@ export function OfficialUsdRelease0553({source,onOpenSource=null}){
    setTimeout(()=>URL.revokeObjectURL(url),15000);
   }catch(e){setError(e.message||String(e));}finally{setBusy(false);}
  };
- const summaryRow=r=><tr key={r.code} data-quote-code={r.code}>
-  <td>{r.code}</td><td colSpan={3}>{r.description}{r.serviceText&&<div className="p553-official-service">{r.serviceText}</div>}</td>
-  <td>1 lot</td><td className="p553-price-cell">{money(r.amountUSD)}</td><td className="p553-price-cell">{money(r.amountUSD)}</td>
-  <td>{model.annex[r.code]?"Refer to Annex "+r.code:""}</td>
- </tr>;
+ const summaryRow=r=>{
+  const isOption=r.code==="C1"||r.code==="C2";
+  const ref=isOption?model.otherSpareItemizedAnnex?.summaries?.[r.code]:null;
+  if(isOption&&(!Number.isFinite(ref?.totalUSD)||ref.selectedWorking!==false||
+      Number.isFinite(r.amountUSD)||ref.clientOfferApproved!==false))
+   throw Error("0553 Official Part C option reference cannot be promoted to an offered/selected price");
+  const displayed=isOption?ref.totalUSD:r.amountUSD;
+  return <tr key={r.code} data-quote-code={r.code}
+    data-option-price-status={isOption?"REFERENCE_NOT_OFFERED":undefined}>
+   <td>{r.code}</td><td colSpan={3}>{r.description}
+    {r.serviceText&&<div className="p553-official-service">{r.serviceText}</div>}</td>
+   <td>1 lot{isOption&&<small>Budget reference</small>}</td>
+   <td className="p553-price-cell">{money(displayed)}
+    {isOption&&<small>Reference only · NOT QUOTED</small>}</td>
+   <td className="p553-price-cell">{money(displayed)}
+    {isOption&&<small>Reference only · NOT QUOTED</small>}</td>
+   <td>{model.annex[r.code]?"Refer to Annex "+r.code:""}
+    {isOption&&<small>{r.code==="C1"?"Installed RACON FCA-equipment comparator, not an OEM capital spare quotation":
+     "Historical Rev08 two-year spare reference; not a current OEM quotation"}</small>}
+    {isOption&&<small>OPTION — excluded from A+B · NOT OFFERED</small>}</td>
+  </tr>;
+ };
  return <section className="p55-panel p553-release-workbook p553-official-usd" data-component-key="bid.budget.pricing.official">
   <div className="p553-official-toolbar"><h3>10.3.4 · Official Release — English / USD</h3>
    <button type="button" className="p553-detail-button" disabled={busy} onClick={download}>{busy?"Preparing Excel…":"Export Excel — English / USD"}</button></div>
