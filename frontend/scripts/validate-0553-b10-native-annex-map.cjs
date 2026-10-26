@@ -15,6 +15,7 @@ const {selectB10BudgetaryFunctionalAllocation0553}=from("data/b10BudgetaryFuncti
 const {B10StageSpareSelection0553}=from("B10StageSpareSelection0553.jsx");
 const {B10NativeAnnexReview0553}=from("B10NativeAnnexReview0553.jsx");
 const {buildReleaseCommercialModel0553}=from("data/releaseCommercialModel0553.js");
+const {buildOfficialUsdRelease0553}=from("data/officialUsdRelease0553.js");
 const stage=selectB10StageSpareSelection0553(),annex=selectB10NativeAnnexReview0553(),allocation=selectB10BudgetaryFunctionalAllocation0553();
 assert.equal(stage.upstreamInstalledBomModule,"bid.budget.bom.zwp20.mr-502-001.4.required-bom");
 assert.deepEqual(Array.from(stage.phases),["ERECTION","PRE_COMMISSIONING","COMMISSIONING","START_UP"]);
@@ -56,7 +57,11 @@ const stageHtml=renderToStaticMarkup(React.createElement(B10StageSpareSelection0
 assert.equal((stageHtml.match(/data-b10-stage-spare-id=/g)||[]).length,14);
 assert(stageHtml.includes("10% rules for PLC Based SCADA"));
 const internal=renderToStaticMarkup(React.createElement(B10NativeAnnexReview0553,{internal:true,onOpenSource:()=>{},variant:"release"}));
-const customer=renderToStaticMarkup(React.createElement(B10NativeAnnexReview0553,{internal:false,variant:"official"}));
+const official=buildOfficialUsdRelease0553(buildReleaseCommercialModel0553({thbPerUsd:31.5}));
+const customer=renderToStaticMarkup(React.createElement(B10NativeAnnexReview0553,{
+ internal:false,variant:"official",officialRows:official.annex.B10,
+ officialTotalUSD:official.b.find(x=>x.code==="B10").amountUSD
+}));
 for(const html of [internal,customer]){
  assert(html.includes("CIF Zhuhai Port"));
  assert.equal((html.match(/data-native-b10-source-id=/g)||[]).length,14);
@@ -72,9 +77,12 @@ assert(!customer.includes("NG/260916-ADV-DAP1"));
 assert(!customer.includes("安装"));
 assert(internal.includes("16,185.00"));
 assert(internal.includes("1,820.00"));
-assert(customer.includes("To be quoted"));
-assert(!customer.includes("1,820.00"));
-assert(!customer.includes("16,185.00"));
+assert(customer.includes("PRE-AWARD USD / CIF NOT VERIFIED"));
+assert(customer.includes("16,200.00"));
+assert(customer.includes("1,821.69"));
+assert(!customer.includes("16,185.00"),"Do not use pre-round Working sum as Official");
+assert(!customer.includes("242,460.00"),"Part A equipment cost must not leak");
+assert(!customer.includes("To be quoted"),"14 budgetary LOT amounts must populate Official");
 const kit=fs.readFileSync(path.join(root,"project0553/B10KitPriceSummary0553.jsx"),"utf8");
 assert(kit.includes("<B10NativeAnnexReview0553 internal={internal}"));
 assert(kit.includes("<B10StageSpareSelection0553 internal"));
