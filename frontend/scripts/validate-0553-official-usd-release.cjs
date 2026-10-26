@@ -70,8 +70,19 @@ assert.throws(()=>buildOfficialUsdRelease0553({...source,annex:{...source.annex,
 assert.equal(JSON.stringify(source),before,'Source model must not mutate');
 
 const {OfficialUsdRelease0553}=require('../src/project0553/OfficialUsdRelease0553');
+const {ReleaseCustomerWorkbook0553}=require('../src/project0553/ReleaseCustomerWorkbook0553');
 
 const html=renderToStaticMarkup(React.createElement(OfficialUsdRelease0553,{source}));
+const releaseSummaryHtml=renderToStaticMarkup(React.createElement(ReleaseCustomerWorkbook0553,{model:source,recipient:"INTERNAL"}));
+for(const [code,amount] of [["C1","3,071,250.00"],["C2","721,806.60"]]){
+ assert(releaseSummaryHtml.includes('data-cost-owner="'+code+'"'),
+  "10.3.3 Summary must retain "+code+" option source identity");
+ assert(releaseSummaryHtml.includes(amount),
+  "10.3.3 Part C "+code+" must display numeric Working reference THB "+amount);
+}
+assert(releaseSummaryHtml.includes('data-option-price-status="REFERENCE_NOT_OFFERED"'));
+assert(releaseSummaryHtml.includes("Budgetary estimate only · Excluded from Total A+B"));
+assert(!releaseSummaryHtml.includes("INCLUDED IN BASE"),"Options must remain excluded from A+B");
 assert(html.includes(model.totalUSD.toLocaleString('en-US',{minimumFractionDigits:2})));
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
 assert(html.includes('B4, B12, B14'));assert(html.includes('USD 1,000 / 800/person/day'));
