@@ -11,10 +11,11 @@ const from=p=>require(path.join(root,"project0553",p));
 const React=require("react"),{renderToStaticMarkup}=require("react-dom/server");
 const {selectB10StageSpareSelection0553}=from("data/b10StageSpareSelection0553.js");
 const {selectB10NativeAnnexReview0553}=from("data/b10NativeAnnexReview0553.js");
+const {selectB10BudgetaryFunctionalAllocation0553}=from("data/b10BudgetaryFunctionalAllocation0553.js");
 const {B10StageSpareSelection0553}=from("B10StageSpareSelection0553.jsx");
 const {B10NativeAnnexReview0553}=from("B10NativeAnnexReview0553.jsx");
 const {buildReleaseCommercialModel0553}=from("data/releaseCommercialModel0553.js");
-const stage=selectB10StageSpareSelection0553(),annex=selectB10NativeAnnexReview0553();
+const stage=selectB10StageSpareSelection0553(),annex=selectB10NativeAnnexReview0553(),allocation=selectB10BudgetaryFunctionalAllocation0553();
 assert.equal(stage.upstreamInstalledBomModule,"bid.budget.bom.zwp20.mr-502-001.4.required-bom");
 assert.deepEqual(Array.from(stage.phases),["ERECTION","PRE_COMMISSIONING","COMMISSIONING","START_UP"]);
 assert.equal(stage.originalZwp20RequiredBom.length,8);
@@ -34,9 +35,16 @@ assert.equal(annex.rows.filter(x=>x.isRequirementFamily).length,14);
 assert.deepEqual(["MR-0001","MR-0002","MR-0003","MR-0004"].map(mr=>annex.rows.filter(x=>x.mr===mr).length),[4,3,4,3]);
 assert.equal(new Set(annex.rows.map(x=>x.id)).size,14);
 assert(annex.rows.every(x=>x.b10PurchaseQty===null&&x.b10UnitSellUSD===null&&
- x.b10ExtendedSellUSD===null&&!x.customerIssueAllowed&&x.referenceQty===null&&
- x.referenceUnitUSD===null));
+ x.b10ExtendedSellUSD===null&&!x.customerIssueAllowed&&x.presentationQty===1&&
+ x.presentationUnit==="LOT"&&Number.isFinite(x.budgetaryUnitPriceUSD)&&x.budgetaryUnitPriceUSD>0));
 assert.equal(annex.selectedMRKitWorkingSellTHB,509827.5);
+assert.equal(annex.budgetaryPresentationTotalUSD,16185);
+assert.equal(allocation.totalAllocatedUSD,16185);
+assert.deepEqual(Array.from(allocation.byOwner).map(x=>x.sourceTotalUSD),[7280,2730,2860,3315]);
+assert.deepEqual(Array.from(annex.rows).map(x=>x.budgetaryUnitPriceUSD),
+ [1820,1820,1820,1820,910,910,910,715,715,715,715,1105,1105,1105]);
+assert(annex.rows.every(x=>!(/PENDING|SPIR|INTERNAL|BUDGET|WORKING|PRICE/i).test(x.specification+" "+x.materials)),
+ "No internal message belongs inside customer Detail Specification or Materials");
 assert(annex.rows.some(x=>x.tag.includes("SA-502-001")));
 assert(annex.rows.some(x=>x.proposedPartNo));
 assert(annex.rows.every(x=>!x.partNo));
@@ -53,16 +61,19 @@ for(const html of [internal,customer]){
  assert(html.includes("CIF Zhuhai Port"));
  assert.equal((html.match(/data-native-b10-source-id=/g)||[]).length,14);
  assert.equal((html.match(/data-b10-requirement-id=/g)||[]).length,14);
- assert(html.includes("To be quoted"));
- assert(html.includes("TBC"));
  assert(html.includes("UNIT PRICE (USD)")&&html.includes("TOTAL PRICE (USD)"));
+ assert(html.includes("B10 — Original Annex: Spare Part Schedule"));
 }
-assert(internal.includes("Original quote evidence (NOT CIF B10 price)"));
+assert(internal.includes("Optional OEM quote references · not selected as spare cost"));
 assert(internal.includes("sourceSelectionId:x.id")===false); // JSX source expression does not leak to HTML
 assert(!customer.includes("242,460.00"));
 assert(!customer.includes("NG/260916-ADV-DAP1"));
 assert(!customer.includes("安装"));
-assert(customer.includes("14 MR Attachment-5 spare functions"));
+assert(internal.includes("16,185.00"));
+assert(internal.includes("1,820.00"));
+assert(customer.includes("To be quoted"));
+assert(!customer.includes("1,820.00"));
+assert(!customer.includes("16,185.00"));
 const kit=fs.readFileSync(path.join(root,"project0553/B10KitPriceSummary0553.jsx"),"utf8");
 assert(kit.includes("<B10NativeAnnexReview0553 internal={internal}"));
 assert(kit.includes("<B10StageSpareSelection0553 internal"));
@@ -109,13 +120,13 @@ const decoder=new TextDecoder();
  const cell=a=>xml.match(new RegExp('<c\\b[^>]*r="'+a+'"[^>]*>([\\s\\S]*?)<\\/c>'))?.[1]||"";
  assert(cell("B6").includes("1.01"));
  assert(cell("D6").includes(annex.rows[0].description));
- assert(cell("E6").includes("Original Item / Source"));
- assert(cell("G6").includes("TBC"));
- assert(cell("H6").includes("NOT QUOTED"));
- assert(cell("I19").includes("NOT QUOTED"));
- assert(cell("I20").includes("NOT QUOTED"));
- assert(cell("B21").includes("INTERNAL REVIEW"));
- assert(cell("H4").includes("CIF ZHUHAI PORT"));
+ assert(cell("E6").includes("protective fuse"));
+ assert(cell("G6").includes("<v>1</v>"));
+ assert(cell("H6").includes("<v>1820</v>"));
+ assert(cell("I19").includes("<v>1105</v>"));
+ assert(cell("I20").includes("<v>16185</v>"));
+ assert(cell("B21").includes("BUDGETARY WORKING"));
+ assert(cell("H4").includes("BUDGETARY WORKING SELL"));
  for(const row of annex.rows)assert(xml.includes(row.description),"Native missing MR item "+row.id);
- console.log("PASS B10 Required BOM/MR Att5 four-stage selection → 14 source-backed spare functions → same original native B10 sheet, 1 inserted row, Total20, Remark21, 6 sheets; unit Qty/CIF sell unquoted, no Part A dup");
+ console.log("PASS B10 source Working THB509827.50 / USD16185 allocated into 14 functional LOT lines, Spec/Materials customer-clean, 1 extra original B10 row, 6 original sheets and source→release retained; no OEM SKU rate or physical spare Qty falsely approved");
 })().catch(e=>{console.error(e);process.exitCode=1;});
