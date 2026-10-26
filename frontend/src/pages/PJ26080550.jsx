@@ -27,6 +27,7 @@ import {
   SYSTEMS,
 } from "../project0550/data";
 import { exportOriginalPriceFormXlsx } from "../project0550/exportOriginalPriceForm";
+import { CoverageMatrix } from "../project0550/CoverageMatrix";
 import "../project0550/project0550.css";
 
 const TABS = [
@@ -751,6 +752,7 @@ function EngineeringView() {
 
   return (
     <div className="p55-stack">
+      <CoverageMatrix />
       <SectionTitle
         eyebrow="First Principles + Completeness Control"
         title="Requirement threads before release"

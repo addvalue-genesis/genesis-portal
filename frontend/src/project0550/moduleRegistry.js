@@ -85,7 +85,7 @@ export const MODULE_REGISTRY = [
     why: "A priced system is not necessarily a complete system.",
     inputs: ["RFQ/MR/SPE/BOD/TC requirements", "System model", "Commercial/engineering outputs"],
     outputs: ["MAPPED / ORPHAN / OPEN / CONFLICT / UNSUPPORTED states", "Fail-closed release rules"],
-    implementation: ["requirementCompleteness in controlled project dataset"],
+    implementation: ["requirementCompleteness in controlled project dataset", "frontend/src/project0550/coverageModel.js", "frontend/src/project0550/CoverageMatrix.jsx"],
     invariants: [
       "A requirement may be superseded, merged or removed only with traceable rationale and source/revision impact.",
       "No solution element may become a project fact without traceable evidence."
