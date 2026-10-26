@@ -70,7 +70,7 @@ for(const html of [internal,external,scopeHtml,officialHtml]){
   assert(html.includes('data-source-id="'+id+'"'),id+" missing");
   assert(html.includes("bid.budget.working.bc.b10.spare-line."+id.toLowerCase()),id+" reverse source missing");
  }
- assert(!text.includes("bid.budget."),"module key leaked into visible quotation copy");
+ if(html===external||html===officialHtml)assert(!text.includes("bid.budget."),"internal Module ID leaked into customer quotation");
  assert(!text.includes("B10 — Price-to-Win What-if"));
  assert(!text.includes("Original Item / Source → SKU"));
  assert(!text.includes("Next G Solution"));
@@ -80,18 +80,17 @@ for(const html of [internal,external,scopeHtml,officialHtml]){
 assert(ReactText(external).includes("509,827.50"));
 assert(ReactText(officialHtml).includes("16,200.00"));
 for(const html of [internal,external,scopeHtml,officialHtml]){
- assert(html.includes("B10 — Equipment composition / Spare-Part Coverage"));
- assert(html.includes("IE-3400-8P2S-E"));
- assert(html.includes("3K-SC-HAZ-RF4958-GPS-01"));
- assert(html.includes("IDU indoor"));
- assert(html.includes("PWR-IE65W-PC-DC"));
+ assert(html.includes("B10 — Erection / Pre-commissioning / Commissioning / Start-up Spare Part Selection"));
+ assert.equal((html.match(/data-native-b10-source-id=/g)||[]).length,14);
  assert.equal((html.match(/data-b10-requirement-id=/g)||[]).length,14);
- assert(html.includes("data-parent-source-id=\"B10-PTTEP-01\""));
+ assert(html.includes('data-parent-source-id="B10-PTTEP-01"'));
+ assert(html.includes("TBC")&&html.includes("To be quoted"));
+ assert(!html.includes('data-native-b10-source-id="B10-COMP-NG-A-1"'));
 }
 assert(!external.includes("242,460.00"),"No Part A supplier cost leaked into customer preview");
 assert(!officialHtml.includes("242,460.00"),"No supplier price in Official customer preview");
-assert(internal.includes("242,460.00"),"Internal Working source quotation reference missing");
-
+assert(internal.includes("Original quote evidence (NOT CIF B10 price)"),
+ "Supplier pricing is evidence only, never CIF B10 sell");
 assert(ReactText(internal).includes("10.2 Source"));
 assert(!ReactText(external).includes("10.2 Source"));
 assert(!ReactText(officialHtml).includes("10.2 Source"));
@@ -147,4 +146,4 @@ assert(ReactText(budgetHtml).includes("10.2 Source"));
 assert(css.includes(".p553-b10-commercial-table{width:100%;min-width:0"));
 assert(css.includes(".p553-b10-commercial-scroll{width:100%;max-width:100%;overflow-x:auto"));
 assert(css.includes(".p553-native-sheet{overflow:hidden"));
-console.log("PASS PJ2608-0553 B10: 4 MR kit prices and 14 source-backed spare families, ODU/IDU/Cisco physical composition from Working shown in Preview/Official; quantity/rates nonposting, THB509827.50/USD16200 preserved, Source→Release→Source ID parity");
+console.log("PASS PJ2608-0553 B10: 4 MR kits / 14 Required-BOM stage spare functions, no installed Part A items as B10 purchases, Qty/Unit CIF HOLD, Source→Release→Source THB509827.50/USD16200 preserved");
