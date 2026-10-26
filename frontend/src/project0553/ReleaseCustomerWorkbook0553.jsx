@@ -61,7 +61,12 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
   const selectedStage=requestedStageRow?[...document.querySelectorAll("[data-native-b10-source-id]")].
    find(node=>node.getAttribute("data-native-b10-source-id")===focusAnnexTarget.sourceSelectionId&&
     node.closest('[data-component-key="bid.budget.pricing.release.preview"]')):null;
-  const target=selectedStage||[...document.querySelectorAll("[data-component-key]")]
+  const requestedHistoricC2=focusAnnexTarget.code==="C2"&&
+   /^C2-REV08-\d{2}$/.test(String(focusAnnexTarget.sourceSelectionId||""));
+  const historicalTarget=requestedHistoricC2?[...document.querySelectorAll("[data-other-spare-source-id]")].
+   find(node=>node.getAttribute("data-other-spare-source-id")===focusAnnexTarget.sourceSelectionId&&
+    node.closest('[data-component-key="bid.budget.pricing.release.preview"]')):null;
+  const target=selectedStage||historicalTarget||[...document.querySelectorAll("[data-component-key]")]
    .find(node=>node.getAttribute("data-component-key")===targetId);
   if(target){
    for(let node=target;node;node=node.parentElement){
