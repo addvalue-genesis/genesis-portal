@@ -18,7 +18,8 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
   <div className="p553-sheet-scroll"><table className="p553-customer-table p553-annex-table" data-budget-price-review={code}>
    <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification / Source</th><th>Materials</th>
     <th>QTY</th><th>Unit THB · budgetary</th><th>Total THB · budgetary</th>{code.startsWith("C")&&<th>Lead time</th>}</tr></thead>
-   <tbody>{rows.map((r,i)=><tr key={r.id} data-source-pricing-line={r.id}>
+   <tbody>{rows.map((r,i)=><tr key={r.id} data-source-pricing-line={r.id}
+    data-component-key={context==="working"&&code==="C2"?"bid.budget.working.bc.c2.priced-budget-review."+r.id.toLowerCase():undefined}>
      <td>{i+1}</td><td>{r.tag}</td><td><strong>{r.description}</strong></td>
      <td>{r.specification}<small>{r.sourceDocument}</small></td><td>{r.materials}</td>
      <td className="p553-annex-qty">{r.quantity} {r.unit}</td>
