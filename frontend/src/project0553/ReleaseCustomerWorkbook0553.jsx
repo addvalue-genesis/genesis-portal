@@ -13,6 +13,7 @@ import {deriveBulkSourceToReleaseTrace0553} from "./data/bulkSourceToReleaseTrac
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {selectB10NativeAnnexReview0553} from "./data/b10NativeAnnexReview0553";
 import {SparePricedBudgetReview0553} from "./SparePricedBudgetReview0553";
+import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0553";
 import "./releaseWorkbook0553.css";
 
 // Single customer-format sheet preview. Internal TAG/source drilldowns are UI-only
@@ -39,6 +40,7 @@ const ANNEX_TITLE={
 const addKnown=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?Math.round((a+b)*100)/100:null;
 export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSource=()=>{},focusAnnexTarget=null,title="10.3 — Customer Release"}){
  const [sheet,setSheet]=useState("Scope of supply");
+ const optionalPriceReview=useMemo(()=>selectSparePricedBudgetReview0553(),[]);
  // Source→Release: resolve one exact B/C spare row, never change a price.
  const focusKey=focusAnnexTarget?.code+"::"+focusAnnexTarget?.sourceId+"::"+(focusAnnexTarget?.sourceSelectionId||"")+"::"+focusAnnexTarget?.seq;
  useEffect(()=>{
@@ -311,17 +313,26 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
         <td><strong>WORKING DRAFT</strong></td></tr>
        <tr className="p553-sheet-highlight"><td colSpan={8}>Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.</td></tr>
        <tr className="p553-sheet-section"><td colSpan={8}>Part C: OPTIONS<br/>选项</td></tr>
-       {model.c.map(r=><tr key={r.code} data-cost-owner={r.code}><td><strong>{r.code}</strong></td>
-        <td colSpan={3}>{parseName(r.code)} {sourceButton(r)}</td>
-        <td>1 lot</td><td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
-        <td className="p553-price-cell">{Number.isFinite(r.customerSellTHB)?money(r.customerSellTHB):"NOT QUOTED"}</td>
-        <td>refer to Annex {r.code} · OPTION
-          <small>{r.code==="C1"?"Independent capital spare OEM quote pending":"2-year OEM SPIR/part qty/price open; excludes B10 SKU stock"}</small>
-          {internal&&r.code==="C1"&&Number.isFinite(r.internalNonpostingInstalledPackageComparableTHB)&&
-            <small>Separate NONPOSTING installed-package budget comparison: {cash(r.internalNonpostingInstalledPackageComparableTHB)} · not a C1 OEM spare quote / not DDP</small>}
+       {model.c.map(r=>{
+        const reference=optionalPriceReview.totals[r.code];
+        if(!Number.isFinite(reference)||reference<=0||Number.isFinite(r.customerSellTHB))
+         throw Error("0553 Part C requires distinct unissued, positive budget-reference and null offered sell: "+r.code);
+        return <tr key={r.code} data-cost-owner={r.code} data-option-price-status="REFERENCE_NOT_OFFERED">
+         <td><strong>{r.code}</strong></td>
+         <td colSpan={3}>{parseName(r.code)} {sourceButton(r)}</td>
+         <td>1 lot <small>Budget reference</small></td>
+         <td className="p553-price-cell"><strong>{money(reference)}</strong>
+          <small>THB / reference, NOT QUOTED</small></td>
+         <td className="p553-price-cell"><strong>{money(reference)}</strong>
+          <small>THB / reference, NOT QUOTED</small></td>
+         <td>refer to Annex {r.code} · OPTION
+          <small>{r.code==="C1"?"Installed RACON FCA equipment comparator; independent OEM capital spare quote unavailable":
+           "Superseded Rev08 two-year spares pricing; OEM quantity/SKU and B10 overlap not verified"}</small>
+          <small>Budgetary estimate only · Excluded from Total A+B · No customer price approval</small>
           {internal&&<button type="button" className="p553-detail-button"
-            onClick={()=>setSheet(WORKSHEETS.find(([,code])=>code===r.code)?.[0]||sheet)}>↗ Annex {r.code}</button>}
-         </td></tr>)}
+           onClick={()=>setSheet(WORKSHEETS.find(([,code])=>code===r.code)?.[0]||sheet)}>↗ Annex {r.code}</button>}
+         </td></tr>;
+       })}
        <tr className="p553-sheet-highlight"><td colSpan={8}>Remark: Delivery term shall follow program logistic proposal and fixed by each cluster per equipment cargo size.</td></tr>
       </tbody>
      </table></div>
