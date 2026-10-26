@@ -25,6 +25,7 @@ export function B10StageSpareSelection0553({internal=false,onOpenSource=null}){
      <th>Required verification / why</th><th>Commissioning Kit Qty</th><th>Physical spare Qty / SKU / CIF USD</th>
     </tr></thead>
     <tbody>{model.stageRows.map(r=><tr key={r.id} data-b10-stage-spare-id={r.id}
+       data-component-key={"bid.budget.working.bc.b10.stage-spare-selection."+r.id.toLowerCase()}
        data-parent-source-id={r.parentSourceId}>
       <td><strong>{r.mr}</strong><small>{r.installedEquipmentTagCandidates.join(" · ")||"Installed TAG compatibility pending"}</small></td>
       <td><strong>{r.requirementFunction}</strong><small>{r.id}</small></td>
