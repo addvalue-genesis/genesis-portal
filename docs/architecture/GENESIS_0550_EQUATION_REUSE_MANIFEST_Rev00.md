@@ -35,7 +35,7 @@ This is **a method-family crosswalk to verify**, not proof that 0550 consumes th
 | E14 | Shared cost allocation | GEQ-020/022 | Causal allocation, no uniform /19 split |
 | E15 | Variation/retest | GEQ-024/027/028 | Entitlement and change authorisation separate |
 | E16 | Training | GEQ-005/018/026 | Keep 0550 audience/session and instructor evidence |
-| E17 | FX | GEQ-029/033 (commercial control references only) | Use 0550 controlled FX source/date; **GEQ-029 is variance, not FX** |
+| E17 | FX conversion | No dedicated GEQ FX equation verified; GEQ-033 is commercial treatment only | Retain 0550 E17 and controlled 0550 FX source/date; do not import 0553 FX |
 | E18 | Material→installation MH driver | GEQ-002/004/005/032 | Purchase/spares do not automatically become installation MH |
 
 **Note for E17:** There is no independently established dedicated GEQ FX equation in the 33-form register on this review. Do not invent a new GEQ ID. Retain 0550 E17 FX conversion under its own currency policy and evidence.
