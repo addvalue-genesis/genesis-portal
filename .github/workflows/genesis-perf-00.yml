@@ -1,0 +1,31 @@
+name: GENESIS PERF-00 Read-only Baseline
+
+on:
+  push:
+    branches:
+      - "perf/genesis-perf-00-*"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  selector-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout measured commit
+        uses: actions/checkout@v4
+      - name: Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install from lockfile
+        run: npm ci --no-audit --no-fund
+      - name: Measure 0550 19-system and 0553 selectors (no financial writes)
+        run: node scripts/perf-00-genesis-baseline.cjs
