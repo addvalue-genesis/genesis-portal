@@ -416,16 +416,19 @@ export async function buildNativeOfficialRelease0553(file,model){
      const isOption=r.code==="C1"||r.code==="C2";
      const ref=isOption?model.otherSpareItemizedAnnex?.summaries?.[r.code]:null;
      if(isOption&&(!Number.isFinite(ref?.totalUSD)||ref.selectedWorking!==false||
-        ref.clientOfferApproved!==false||Number.isFinite(r.amountUSD)))
-      throw Error("0553 Native Part C reference must not be selected as an actual offer");
-     const amount=isOption?ref.totalUSD:r.amountUSD;
+        ref.budgetaryOfferPrepared!==true||ref.conditionalPriceStatus!=="CONDITIONAL_BUDGETARY_OFFER"||
+        r.budgetaryOptionQuoteUSD!==ref.totalUSD||r.budgetaryOfferPrepared!==true||
+        r.firmOemQuote!==false||r.optionExcludedFromBase!==true||
+        Number.isFinite(r.amountUSD)))
+      throw Error("0553 Native Part C conditional budgetary offer must match canonical 10.3→Official");
+     const amount=isOption?r.budgetaryOptionQuoteUSD:r.amountUSD;
      const displayText=[r.description,r.serviceText,
-      isOption?"REFERENCE VALUE ONLY / NOT QUOTED / NOT AN OEM SPARE OFFER":null]
+      isOption?"CONDITIONAL BUDGETARY OPTION PRICE / OEM TECHNICAL REVIEW REQUIRED / SUBJECT TO CIF CONFIRMATION":null]
       .filter(Boolean).join("\n");
      put("A"+row,r.code);put("B"+row,displayText);put("E"+row,"1 lot");
      put("F"+row,price(amount));put("G"+row,price(amount));
      if(model.annex[r.code])put("H"+row,"Refer to Annex "+r.code+
-      (isOption?" / NOT QUOTED / nonposting budget reference / excludes A+B":""));
+      (isOption?" / CONDITIONAL BUDGETARY OFFER / OEM TECHNICAL QUALIFICATION / excludes A+B":""));
     };
    model.b.forEach((r,j)=>fill(r,24+j));model.c.forEach((r,j)=>fill(r,41+j));
    put("A38","Total A+B (USD)"+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
@@ -444,7 +447,7 @@ export async function buildNativeOfficialRelease0553(file,model){
    put("B2",model.annexTitles[code]);
    ["Item","Tag No.","Description","Specification","Materials","Qty"].forEach((v,j)=>put("BCDEFG"[j]+"4",v));
    put("H4",isB10?"PRE-AWARD BUDGET USD / CIF UNCONFIRMED":
-    code.startsWith("C")?"REFERENCE OPTION USD — NOT QUOTED / CIF UNVERIFIED":
+    code.startsWith("C")?"CONDITIONAL OPTION BUDGET USD / CIF UNVERIFIED":
     "PRE-AWARD WORKING ALLOCATION USD");
    put("H5","Unit Price (USD)");put("I5","Amount (USD)");
    if(code.startsWith("C"))put("J5","Lead Time (ARO)");
@@ -455,15 +458,15 @@ export async function buildNativeOfficialRelease0553(file,model){
    });
    const totalRow=isB10?20:19;
    put("B"+totalRow,isB10?"PRE-AWARD B10 FINANCIAL ALLOCATION (USD) — NOT OEM SPARE QUOTE":
-    code.startsWith("C")?"REFERENCE OPTION TOTAL (USD) — NOT QUOTED / NOT OEM OFFER":
+    code.startsWith("C")?"CONDITIONAL BUDGETARY OPTION SELL (USD) — OEM SUBJECT TO APPROVAL":
     "PRE-AWARD WORKING PRICE TOTAL (USD) — NOT OEM LINE QUOTE");
    put("I"+totalRow,price(isB10?
     [...model.b,...model.c].find(r=>r.code===code).amountUSD:
     model.otherSpareItemizedAnnex?.summaries?.[code]?.totalUSD));
    if(isB10)put("B21","PRE-AWARD BUDGETARY FINANCIAL ALLOCATION ONLY. Each Qty 1 LOT is a functional budget line, not one physical spare. OEM spare part numbers, actual delivery quantities, quoted CIF unit rates and buyer approval remain outstanding. NOT ISSUED.");
    if(code==="C1"||code==="C2")put("B20",code==="C1"?
-    "NONPOSTING OPTION PRICE REFERENCE: comparable installed RACON FCA package only; no independent OEM capital spare price or CIF DDP quote.":
-    "SUPERSEDED REV08 HISTORICAL REFERENCE: OEM two-year spare Qty/SKU, B10 exclusion, delivery lead time and 2026 quote unverified; not an offered C2 price.");
+    "CONDITIONAL BUDGETARY C1 PRICE OFFER: installed RACON FCA package is a rate comparator only; subject to approved capital spare Ex configuration, actual OEM spare rate and CIF delivery.":
+    "CONDITIONAL BUDGETARY C2 PRICE OFFER: Rev08 historical rates are a proposal basis only; replace 7/8-inch cable with installed-system compatible feeder and exclude confirmed B10 duplicate stock; OEM 2026 quote required.");
   }
   for(const [address,value] of cells){
    if(!new RegExp('<c\\b[^>]*r="'+address+'"').test(xml)){
@@ -516,7 +519,7 @@ export async function buildNativeOfficialRelease0553(file,model){
   changes.set(e.name,encode.encode(xml));
  }
  const result=rebuildZip(entries.filter(e=>!remove(e.name)),changes);
- return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),filename:"PJ2608-0553_ScopeOfSupply_USD_PRE_AWARD_NOT_ISSUED.xlsx",warnings:[...warnings,"C1/C2 numbers are nonposting historical/comparable price references, NOT offered optional OEM prices."]};
+ return {blob:new Blob([result],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}),filename:"PJ2608-0553_ScopeOfSupply_USD_PRE_AWARD_NOT_ISSUED.xlsx",warnings:[...warnings,"C1/C2 are CONDITIONAL BUDGETARY PRICED OPTION OFFERS only, not confirmed supplier OEM unit prices; exclude from A+B and verify technical stock/CIF terms before contracting."]};
 }
 
 
