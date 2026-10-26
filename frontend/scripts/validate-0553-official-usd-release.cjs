@@ -14,6 +14,20 @@ for(const r of [...model.a,...model.b,...model.c]){
 }
 assert.equal(model.totalUSD,[...model.a,...model.b].reduce((n,r)=>n+(r.amountUSD||0),0));
 assert.deepEqual(model.unpriced,['B4','B12','B14']);assert.equal(model.issued,false);
+assert.equal(model.b10ItemizedAnnex.rows.length,14);
+assert.equal(model.b10ItemizedAnnex.totalUSD,16200);
+assert.equal(model.b10ItemizedAnnex.customerIssued,false);
+assert.equal(new Set(model.b10ItemizedAnnex.rows.map(r=>r.lineSourceId)).size,14);
+assert(model.b10ItemizedAnnex.rows.every(r=>r.qty===1&&r.unit==="LOT"&&
+ r.totalUSD===r.unitUSD&&Number.isFinite(r.totalUSD)&&r.issued===false&&
+ r.isPhysicalSpareQtyVerified===false&&r.isOemSpareUnitPriceVerified===false));
+assert.deepEqual(model.b10ItemizedAnnex.sourceRowIds,source.annex.B10.map(r=>r.sourceId));
+for(const parent of model.annex.B10){
+ const split=model.b10ItemizedAnnex.rows.filter(r=>r.parentSourceId===parent.sourceId);
+ assert.equal(Math.round(split.reduce((n,r)=>n+r.totalUSD,0)*100),Math.round(parent.totalUSD*100),
+  parent.sourceId+" must reconcile from exact Official rounded MR row");
+ assert(split.every(r=>r.sourceRowModuleId===parent.sourceRowModuleId&&r.traceId===parent.traceId));
+}
 for(const code of ['B10','B11','B13']){
  const parent=model.b.find(r=>r.code===code);
  assert.equal(Math.round(model.annex[code].reduce((n,r)=>n+r.totalUSD,0)*100),parent.amountUSD*100);
@@ -46,7 +60,12 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
   const name='xl/worksheets/sheet'+i+'.xml',xml=await text(name),old=await text(name,originalEntries);
   for(const tag of ['cols','mergeCells','pageMargins','pageSetup','drawing']){
    const get=s=>s.match(new RegExp('<'+tag+'\\b[^>]*(?:/>|>[\\s\\S]*?</'+tag+'>)'))?.[0];
-   assert.equal(get(xml),get(old),name+' original '+tag);
+   if(i===2&&tag==="mergeCells"){
+    assert(xml.includes('<mergeCell ref="B20:H20"')&&xml.includes('<mergeCell ref="B21:E21"'),
+     "B10 original total and remark merges must shift one row");
+    assert(!xml.includes('<mergeCell ref="B19:H19"'),
+     "Native B10 output must add body row 19 without leaving old total");
+   }else assert.equal(get(xml),get(old),name+' original '+tag);
   }
   assert(!/[\u0e00-\u0e7f\u3400-\u9fff]/.test(xml),'Non-English customer text');
   for(const internal of ['THB','INTERNAL','HOLD','WORKING DRAFT','NOT ESTABLISHED','bid.budget','Exchange rate','no duplicate engineering charge'])assert(!xml.includes(internal),name+' leaked '+internal);
@@ -57,8 +76,24 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
    assert(cell(xml,'B26').includes('28 working days'));assert(cell(xml,'B32').includes('7 working days + 2 travel days/person'));
   }else{
    const code=['B10','B11','B13','C1','C2'][i-2],parent=[...model.b,...model.c].find(r=>r.code===code);
-   assert(cell(xml,'I19').includes(parent.amountUSD===null?'To be quoted':'<v>'+parent.amountUSD+'</v>'));
-   for(const [j,r] of model.annex[code].entries())assert(cell(xml,'I'+(6+j)).includes(r.totalUSD===null?'To be quoted':'<v>'+r.totalUSD+'</v>'));
+   const split=code==="B10"?model.b10ItemizedAnnex.rows:model.annex[code];
+   const totalRow=code==="B10"?20:19;
+   assert(cell(xml,'I'+totalRow).includes(parent.amountUSD===null?'To be quoted':'<v>'+parent.amountUSD+'</v>'));
+   for(const [j,r] of split.entries()){
+    const physicalRow=6+j;
+    assert(cell(xml,'I'+physicalRow).includes(r.totalUSD===null?'To be quoted':'<v>'+r.totalUSD+'</v>'));
+    if(code==="B10"){
+     assert(cell(xml,'G'+physicalRow).includes('<v>1</v>'));
+     assert(cell(xml,'H'+physicalRow).includes('<v>'+r.unitUSD+'</v>'));
+     assert(cell(xml,'D'+physicalRow).includes(r.description.replaceAll('&','&amp;')));
+     assert(cell(xml,'E'+physicalRow).includes(r.specification.replaceAll('&','&amp;')));
+     assert(cell(xml,'F'+physicalRow).includes(r.materials.replaceAll('&','&amp;')));
+    }
+   }
+   if(code==="B10"){
+    assert(cell(xml,'B21').includes('PRE-AWARD BUDGETARY FINANCIAL ALLOCATION'));
+    assert(cell(xml,'H4').includes('CIF UNCONFIRMED'));
+   }
   }
  }
  const second=await buildNativeOfficialRelease0553({name:output.filename,arrayBuffer:async()=>data.buffer.slice(data.byteOffset,data.byteOffset+data.length)},model);
@@ -66,5 +101,5 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  const again=box.zip.entriesFromZip(new Uint8Array(await second.blob.arrayBuffer()));
  assert((await text('xl/worksheets/sheet1.xml',again)).includes('<v>'+model.totalUSD+'</v>'));
  const arg=process.argv.find(x=>x.startsWith('--output='));if(arg)fs.writeFileSync(arg.slice(9),data);
- console.log('PASS official USD: source unchanged; 31.5 FX; upward USD100 summary rounding; exact annex quantities/unit/total; English-only six-sheet original geometry; clean metadata; subtotal USD '+model.totalUSD+' vs unrounded '+model.unroundedUSD);
+ console.log('PASS official USD: source unchanged; 31.5 FX; upward USD100 parent rounding; B10 14 priced 1-LOT financial lines USD16200, source-ID parity, original six sheets with B10 extra row, English-only and nonissued; subtotal USD '+model.totalUSD);
 })().catch(e=>{console.error(e);process.exitCode=1;});
