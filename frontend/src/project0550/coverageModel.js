@@ -33,9 +33,9 @@ export const EQUATION_REUSE_CROSSWALK = [
 }));
 
 export const REUSE_COMPATIBILITY = [
-  { family: "GEQ / PEQ", status: "REFERENCE_ONLY", decision: "Keep E01–E18; candidate family crosswalk only. Particular inputs, calibration and runtime equivalence remain OPEN." },
+  { family: "GEQ / PEQ", status: "REFERENCE_ONLY", decision: "Keep E01–E18; candidate family crosswalk only. E01–E18 now execute in the 0550 workbench; particular inputs, calibration and GEQ runtime equivalence remain OPEN." },
   { family: "GMR-001 / 003", status: "OPEN", decision: "Existing 15 module IDs and repository/facade verified; coverage is read-only under MOD-REQ-COMPLETENESS. Full parent-child and source-row contracts remain OPEN." },
-  { family: "GMR-005 / 008", status: "NOT_IMPLEMENTED", decision: "Exact native Source ↔ Release row navigation and ancestor expansion remain to implement; snapshot pointers are not that roundtrip." },
+  { family: "GMR-005 / 008", status: "NOT_IMPLEMENTED", decision: "New bidding rows support exact Source ↔ Release and ancestor expansion. Original RFQ native-sheet roundtrip remains NOT_IMPLEMENTED; snapshot pointers are not that roundtrip." },
   { family: "GMR-009 / 011", status: "OPEN", decision: "Existing budget and export retained. Unique requirement cost owners and per-requirement release/export coverage remain unverified." },
   { family: "GKR", status: "REFERENCE_ONLY", decision: "No reviewed decision-record store imported. Private chats and commercial records are not published." },
   { family: "GPE", status: "REFERENCE_ONLY", decision: "Existing snapshot cache retained. Browser baseline measured; no performance optimization justified or implemented." },

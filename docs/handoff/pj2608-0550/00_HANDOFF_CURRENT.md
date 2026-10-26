@@ -1,5 +1,7 @@
 # PJ2608-0550 Living Handoff / Current Checkpoint
 
+**Latest software checkpoint:** [2026-10-27 active Bidding workflow](20261027_BIDDING_WORKFLOW.md). The baseline narrative below remains historical authority for its snapshot; current bid preparation now has saved inputs and a Working → THB → USD workflow.
+
 **Project:** PJ2608-0550 — SAMTEL / PTTEPI Myanmar ASK Telecom [MMC24-5002]  
 **Working branch:** `feat/pj2608-0550-tpp-ui-rev04`  
 **PR:** #2 — DO NOT MERGE without explicit approval  
