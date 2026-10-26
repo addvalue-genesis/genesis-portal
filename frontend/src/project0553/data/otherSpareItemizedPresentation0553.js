@@ -3,6 +3,7 @@
 // come ONLY from selected Working→official rounded parent. C1/C2 numeric
 // values are strictly NONPOSTING comparables/historical reference options.
 import {selectSparePricedBudgetReview0553} from "./sparePricedBudgetReview0553";
+import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 const freeze=Object.freeze;
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 const round4=n=>Math.round((n+Number.EPSILON)*10000)/10000;
@@ -34,7 +35,7 @@ function allocateByWeights(rows,totalUSD){
  });
 }
 export function buildOtherSpareItemizedPresentation0553(official){
- const review=selectSparePricedBudgetReview0553(),byCode={},summaries={};
+ const review=selectSparePricedBudgetReview0553(),conditional=selectOptionBudgetaryOffer0553(),byCode={},summaries={};
  if(official?.currency!=="USD"||official.issued!==false)throw Error("0553 itemized spare budgets require an unissued USD model");
  for(const code of codeList){
   const source=review.rows[code],p=[...official.b,...official.c].find(x=>x.code===code);
@@ -60,7 +61,11 @@ export function buildOtherSpareItemizedPresentation0553(official){
     selectedWorking:true,priceClass:"OFFICIAL_PARENT_ROUNDED_BUDGET",clientOfferApproved:false});
   }else{
    if(p.amountUSD!==null)throw Error(code+" option source is not approved for official quote");
-   const target=round2(review.totals[code]/official.policy.thbPerUsd);
+   const offer=conditional.offers[code];
+   const target=offer.budgetaryQuoteUSD;
+   if(!offer.quotePrepared||offer.customerAccepted||offer.includedInAPlusB||
+      Math.abs(offer.sourceSellTHB-review.totals[code])>0.01)
+    throw Error("0553 budgetary option offer does not reconcile to current Working source "+code);
    const priceRows=allocateByWeights(source,target);
    displayed=priceRows.map((x,i)=>{
     const c1=code==="C1";
@@ -74,13 +79,17 @@ export function buildOtherSpareItemizedPresentation0553(official){
      sourceRowModuleId:c1?x.sourceRowModuleId:null,
      historicalSourceId:c1?null:x.id,sourceDocument:x.sourceDocument,
      leadTime:x.leadTime||"To be confirmed",
-     status:c1?"INSTALLED_FCA_COMPARABLE__NOT_INDEPENDENT_CAPITAL_SPARE_QUOTE":
-      "SUPERSEDED_REV08_REFERENCE__NOT_CURRENT_OEM_OPERATING_SPARE",
+     status:c1?"CONDITIONAL_C1_BUDGETARY_OFFER__INSTALLED_FCA_COMPARABLE":
+      "CONDITIONAL_C2_BUDGETARY_OFFER__REV08_RATE_AND_TECHNICAL_SUBSTITUTION",
      financialOwnerSelected:false,physicalSkuApproved:false,customerIssued:false});
    });
-   summaries[code]=freeze({sourceId:code,sourceTHB:null,totalUSD:target,selectedWorking:false,
-    priceClass:code==="C1"?"INSTALLED_EQUIPMENT_PRICE_BENCHMARK":
-     "SUPERSEDED_REV08_HISTORICAL_OPTION_REFERENCE",clientOfferApproved:false});
+   summaries[code]=freeze({sourceId:code,sourceTHB:offer.sourceSellTHB,totalUSD:target,selectedWorking:false,
+    budgetaryOfferPrepared:true,conditionalPriceStatus:"CONDITIONAL_BUDGETARY_OFFER",
+    priceClass:code==="C1"?"C1_BUDGETARY_CAPITAL_SPARE_OPTION_FROM_FCA_BENCHMARK":
+     "C2_BUDGETARY_TWO_YEAR_SPARE_OPTION_WITH_HISTORIC_RATE_BASIS",
+    clientOfferApproved:false,firmOemQuote:false,issued:false,optionExcludedFromBase:true,
+    commercialSourceId:offer.sourceId,sourceModuleId:offer.sourceModuleId,
+    technicalGate:offer.technicalGate,evidence:offer.evidence});
   }
   const sum=round2(displayed.reduce((s,r)=>s+r.totalUSD,0));
   if(sum!==summaries[code].totalUSD||displayed.some(r=>round2(r.qty*r.unitUSD)!==r.totalUSD))
@@ -93,6 +102,6 @@ export function buildOtherSpareItemizedPresentation0553(official){
   codes:codeList,rows:freeze(byCode),summaries:freeze(summaries),
   sourceToReleaseSourceByCode:freeze({B11:true,B13:true,C1:true,C2:false}),
   confirmedOemPhysicalSkuQtyCount:0,issued:false,
-  pricingNote:"B11/B13 are selected current Working financial packages; C1 nonposting installed FCA comparable; C2 superseded Rev08 reference. Neither Option is added to A+B. No 2026 OEM C1/C2 quote verified."
+  pricingNote:"B11/B13 selected Working package budgets; C1 and C2 explicitly proposed as USD97500/USD23000 CONDITIONAL BUDGETARY OPTIONS, excluded A+B; OEM SKU/CIF independent quotes/B10 exclusion must be confirmed before binding issue."
  });
 }
