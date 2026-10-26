@@ -9,6 +9,7 @@ const DATASET = getProject0550Dataset();
 
 export const DATA_LAYER_META = DATASET.meta;
 export const DATA_LAYER_STATUS = getProject0550DataLayerStatus();
+export { loadProject0550Bid, saveProject0550Bid } from "./data/repository";
 
 export const PROJECT_0550 = DATASET.project;
 export const COMMERCIAL_POLICY = DATASET.commercialPolicy;

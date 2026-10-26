@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   ARCHITECTURE_MANIFEST,
   BUDGETARY_ESTIMATE,
@@ -29,18 +29,20 @@ import {
 import { exportOriginalPriceFormXlsx } from "../project0550/exportOriginalPriceForm";
 import { CoverageMatrix } from "../project0550/CoverageMatrix";
 import { PagaEvidenceReview } from "../project0550/PagaEvidenceReview";
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {BidWorkspaceProvider,useBidWorkspace} from "../project0550/BidWorkspaceContext";
+import {BidCommercialWorkspace} from "../project0550/BidCommercialWorkspace";
+import {EquationWorkbench} from "../project0550/EquationWorkbench";
+import {VendorWorkspace} from "../project0550/VendorWorkspace";
+import {SchematicWorkspace} from "../project0550/SchematicWorkspace";
+import {BidDataControls,BidSaveStatus} from "../project0550/BidDataControls";
+import {BID_TABS} from "../project0550/biddingNavigation";
+import {SECTION_IDENTITY} from "../project0550/sectionIdentity";
 import "../project0550/project0550.css";
 
-const TABS = [
-  { id: "overview", label: "Executive" },
-  { id: "architecture", label: "Architecture" },
-  { id: "systems", label: "19 Systems" },
-  { id: "engineering", label: "First Principles" },
-  { id: "execution", label: "Execution" },
-  { id: "budget", label: "Budget" },
-  { id: "risk", label: "Risk & Controls" },
-  { id: "documents", label: "Evidence" },
-];
+const TABS = BID_TABS;
+const LegacyIdentityContext = createContext(false);
+
 
 function money(value, currency) {
   if (value === null || value === undefined) return "—";
@@ -93,11 +95,14 @@ function Badge({ children, tone }) {
 }
 
 function SectionTitle({ eyebrow, title, text, action }) {
+  const legacy = useContext(LegacyIdentityContext);
+  const identity = SECTION_IDENTITY.find(s => s.title === title);
   return (
-    <div className="p55-section-title">
+    <div className="p55-section-title" data-component-key={!legacy ? identity?.id : undefined}>
       <div>
         {eyebrow ? <div className="p55-eyebrow">{eyebrow}</div> : null}
         <h2>{title}</h2>
+        {!legacy && identity && <ComponentCopyId componentKey={identity.id}/>}
         {text ? <p>{text}</p> : null}
       </div>
       {action ? <div>{action}</div> : null}
@@ -589,7 +594,8 @@ function ArchitectureView() {
 
 function SystemCard({ system, expanded, onToggle }) {
   return (
-    <article className={"p55-system " + (expanded ? "is-expanded" : "")}>
+    <article data-component-key={"bid.systems."+system.token} className={"p55-system " + (expanded ? "is-expanded" : "")}>
+      <ComponentCopyId componentKey={"bid.systems."+system.token}/>
       <button className="p55-system__summary" onClick={onToggle} type="button">
         <div className="p55-system__no">{String(system.no).padStart(2, "0")}</div>
         <div className="p55-system__title">
@@ -620,9 +626,9 @@ function SystemCard({ system, expanded, onToggle }) {
   );
 }
 
-function SystemsView() {
+function SystemsView({initialSystem="ALL"}) {
   const [viewMode, setViewMode] = useState("group");
-  const [selectedToken, setSelectedToken] = useState("ALL");
+  const [selectedToken, setSelectedToken] = useState(initialSystem);
   const [query, setQuery] = useState("");
   const [expanded, setExpanded] = useState(() => new Set(["TEL-PAGA"]));
   const [openGroups, setOpenGroups] = useState(() => new Set(SYSTEM_GROUPS.map((g) => g.id)));
@@ -1096,7 +1102,7 @@ function ExecutionView() {
   );
 }
 
-function BudgetView() {
+function LegacyBudgetView() {
   const [currency, setCurrency] = useState("USD");
   const [part, setPart] = useState("ALL");
   const [budgetMode, setBudgetMode] = useState("budgetary");
@@ -2059,8 +2065,37 @@ function DocumentsView() {
   );
 }
 
-export function PJ26080550({ lang = "th" }) {
-  const [activeTab, setActiveTab] = useState("overview");
+export function PJ26080550(props) { return <BidWorkspaceProvider><Project0550Bidding {...props}/></BidWorkspaceProvider>; }
+function Project0550Bidding({ lang = "th" }) {
+  const [activeTab, setActiveTab] = useState("budget");
+  const [area,setArea]=useState("B");
+  const [moduleQuery,setModuleQuery]=useState("");
+  const [navigationTarget,setNavigationTarget]=useState(null);
+  const [focusedSystem,setFocusedSystem]=useState("ALL");
+  const {data,model}=useBidWorkspace();
+  const moduleIndex=[{id:"l3.original",title:"Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
+    ...SYSTEMS.map(s=>({id:"bid.systems."+s.token,title:s.name,tab:"systems",system:s.token})),
+    {id:"bid.engineering.equations",title:"Equation Execution / SAT persons days",tab:"engineering"},
+    {id:"bid.vendor.master",title:"Vendor master",tab:"documents"},{id:"bid.vendor.offers",title:"Vendor offers / rates",tab:"documents"},
+    {id:"bid.budget.working.editor",title:"Working source editor",tab:"budget"},{id:"bid.budget.working.lines",title:"Working price lines",tab:"budget"},
+    {id:"bid.budget.budget-thb",title:"Budget THB",tab:"budget"},{id:"bid.budget.release",title:"Release USD",tab:"budget"},
+    {id:"bid.schematic.editor",title:"Schematic nodes / interfaces",tab:"schematic"},
+    ...(model?.lines||[]).flatMap(r=>[{id:r.sourceModuleId,title:r.description+" / Source",tab:"budget"},{id:r.releaseModuleId,title:r.description+" / Release",tab:"budget"}]),
+    ...(data?.calculations||[]).map(c=>({id:"bid.engineering.calculation."+c.id,title:c.title,tab:"engineering"})),
+    ...(data?.vendors||[]).map(v=>({id:"bid.vendor."+v.id,title:v.name,tab:"documents"})),
+    ...(data?.offers||[]).map(o=>({id:"bid.vendor.offer."+o.id,title:o.quoteRef+" / "+o.description,tab:"documents"})),
+    ...(data?.nodes||[]).map(n=>({id:"bid.schematic.node."+n.id,title:n.label,tab:"schematic"})),
+    ...(data?.edges||[]).map(e=>({id:"bid.schematic.edge."+e.id,title:e.label,tab:"schematic"})),
+    ...MODULE_REGISTRY.map(m=>({id:m.id,title:m.name,tab:"registry"})),
+    ...["fx","scope-gates","history"].map(id=>({id:"bid.budget."+id,title:id,tab:"budget"})),
+    ...["storage","modules"].map(id=>({id:"bid.registry."+id,title:id,tab:"registry"})),
+    {id:"bid.schematic.canvas",title:"Overall / Schematic per system",tab:"schematic"},
+    {id:"bid.vendor.controlled-sources",title:"Controlled vendor sources",tab:"documents"},
+    ...(model?.lines||[]).map(r=>({id:"bid.budget.budget-thb.line."+r.id,title:r.description+" / Budget THB",tab:"budget"}))];
+  const query=moduleQuery.trim().replace(/^PJ2608-0550\s*\/\s*/i,"").toLowerCase();
+  const matches=query?moduleIndex.filter(m=>(m.id+" "+m.title).toLowerCase().includes(query)):[];
+  const jump=m=>{setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);};
+  useEffect(()=>{if(!navigationTarget||activeTab==="budget")return;const timer=setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(n=>n.getAttribute("data-component-key")===navigationTarget);if(el){for(let n=el;n;n=n.parentElement)if(n.tagName==="DETAILS")n.open=true;el.scrollIntoView({block:"center"});}},40);return()=>clearTimeout(timer);},[navigationTarget,activeTab,area]);
   const [pagaEvidence, setPagaEvidence] = useState(null);
 
   return (
@@ -2068,13 +2103,13 @@ export function PJ26080550({ lang = "th" }) {
       <header className="p55-hero">
         <div className="p55-hero__top">
           <div>
-            <div className="p55-kicker">GENESS / TPP · INTERNAL PROJECT CONTROL</div>
+            <div className="p55-kicker">GENESIS · L3 TENDERING & BIDDING</div>
             <h1>{PROJECT_0550.id} <span>{PROJECT_0550.shortName}</span></h1>
             <p>{PROJECT_0550.title}</p>
           </div>
           <div className="p55-hero__status">
-            <Badge tone="warn">{PROJECT_0550.state}</Badge>
-            <span>Price date {PROJECT_0550.priceDate}</span>
+            <Badge tone="neutral">BIDDING WORKSPACE</Badge>
+            <span>Working → Budget THB → Release USD</span>
           </div>
         </div>
 
@@ -2083,10 +2118,12 @@ export function PJ26080550({ lang = "th" }) {
           <strong>{PROJECT_0550.method}</strong>
         </div>
 
-        <nav className="p55-tabs" aria-label="PJ2608-0550 sections">
+        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","A · Original RFQ Documents"],["B","B · Engineering & Bid Preparation"],["C","C · Communications & Submissions"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>setArea(id)}>{label}</button>)}</div>
+        {area==="B"&&<nav className="p55-tabs" aria-label="PJ2608-0550 sections">
           {TABS.map((tab) => (
             <button
               key={tab.id}
+              aria-label={tab.aria}
               type="button"
               className={activeTab === tab.id ? "is-active" : ""}
               onClick={() => setActiveTab(tab.id)}
@@ -2094,18 +2131,27 @@ export function PJ26080550({ lang = "th" }) {
               {tab.label}
             </button>
           ))}
-        </nav>
+        </nav>}
       </header>
 
       <main className="p55-main">
-        {activeTab === "overview" ? <Overview /> : null}
-        {activeTab === "architecture" ? <ArchitectureView /> : null}
-        {activeTab === "systems" ? <SystemsView /> : null}
-        {activeTab === "engineering" ? <EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /> : null}
-        {activeTab === "execution" ? <ExecutionView /> : null}
-        {activeTab === "budget" ? <BudgetView /> : null}
-        {activeTab === "risk" ? <RiskView /> : null}
-        {activeTab === "documents" ? <DocumentsView /> : null}
+        <BidSaveStatus/>
+        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId componentKey="l3.original"/><DocumentsView/></section>}
+        {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><ComponentCopyId componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · No new issue or submission recorded.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
+        {area==="B"&&<>
+          <div className="p55-panel p55-module-nav"><label>ค้นหา / วาง Module ID <input aria-label="Project Module Search" value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&matches.length)jump(matches.find(m=>m.id.toLowerCase()===query)||matches[0]);}} placeholder="PJ2608-0550 / bid.budget.release"/></label><div className="p55-module-results">{matches.slice(0,30).map(m=><button type="button" key={m.id} onClick={()=>jump(m)}>{m.title}<small>{m.id}</small></button>)}</div></div>
+          <div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>
+          {activeTab === "overview" ? <Overview /> : null}
+          {activeTab === "architecture" ? <ArchitectureView /> : null}
+          {activeTab === "systems" ? <><SystemsView key={focusedSystem} initialSystem={focusedSystem}/><CoverageMatrix/></> : null}
+          {activeTab === "engineering" ? <><EquationWorkbench/><EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /></> : null}
+          {activeTab === "execution" ? <><EquationWorkbench/><ExecutionView /></> : null}
+          {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
+          {activeTab === "budget" ? <BidCommercialWorkspace navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
+          {activeTab === "risk" ? <RiskView /> : null}
+          {activeTab === "documents" ? <><VendorWorkspace/><details className="p55-panel"><summary>Project evidence / original references</summary><DocumentsView/></details></> : null}
+          {activeTab === "registry" ? <BidDataControls/> : null}
+        </>}
       </main>
 
       <footer className="p55-footer">

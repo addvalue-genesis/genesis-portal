@@ -1,0 +1,11 @@
+import React from "react";
+import {useBidWorkspace,downloadBidFile} from "./BidWorkspaceContext";
+import {Module} from "./BidControls";
+import {MODULE_REGISTRY} from "./data";
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+export function BidSaveStatus(){const {data,error,busy,reload}=useBidWorkspace();return <div className="p55-bid-save" role="status"><span>{busy?"กำลังบันทึก…":data?`บันทึกข้อมูล Bidding ในเบราว์เซอร์นี้ · Revision ${data.revision}`:"กำลังเปิดข้อมูล Bidding…"}</span>{error&&<p role="alert">{error}</p>}<button type="button" disabled={busy} onClick={reload}>โหลดข้อมูลที่บันทึกใหม่</button></div>;}
+export function BidDataControls(){const {data,importFile,busy}=useBidWorkspace();return <div className="p55-stack"><Module id="bid.registry.storage" title="09.1 ฐานข้อมูล Bidding / Backup">
+ <p>Vendor, Offer, สมการ, Working และ Schematic บันทึกใน IndexedDB ของเบราว์เซอร์/URL นี้ เก็บ revision ก่อนหน้าแยกไว้ ไม่มีการเชื่อม ERP หรือส่งข้อมูลออกเซิร์ฟเวอร์</p><p>ควร Export backup หลังจบงานและก่อนเปลี่ยนเครื่อง/port/เบราว์เซอร์ หรือเคลียร์ข้อมูลเว็บไซต์ ไฟล์นำเข้าแทนที่ Working ปัจจุบันใน revision ใหม่ โดยไม่แก้ Rev10</p>
+ <button type="button" disabled={!data||busy} onClick={()=>downloadBidFile(data,`PJ2608-0550_Bidding_Workspace_R${data.revision}.json`)}>Export workspace backup</button><label>Import workspace backup <input aria-label="Import workspace backup" type="file" accept=".json,application/json" disabled={busy} onChange={e=>{importFile(e.target.files[0]);e.target.value="";}}/></label>
+ <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Revision</th><th>Time</th><th>Change</th></tr></thead><tbody>{data?.audit.slice().reverse().map(a=><tr key={a.revision}><td>{a.revision}</td><td>{a.at}</td><td>{a.action}</td></tr>)}</tbody></table></div></Module>
+ <Module id="bid.registry.modules" title="09.2 Module Registry / Stable IDs"><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Module</th><th>Purpose / implementation</th><th>Copy</th></tr></thead><tbody>{MODULE_REGISTRY.map(m=><tr key={m.id} data-component-key={m.id}><td>{m.name}<small>{m.lifecycleStatus}</small></td><td>{m.purpose}<small>{m.implementation.join(" · ")}</small></td><td><ComponentCopyId componentKey={m.id}/></td></tr>)}</tbody></table></div></Module></div>;}

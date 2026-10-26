@@ -26,7 +26,7 @@ export function CoverageMatrix() {
         <thead><tr><th>ระบบ / ต้นทาง</th><th>Engineering / E binding</th><th>BOM / TAG / Owner</th><th>Working → Output</th><th>ช่องว่าง</th></tr></thead>
         <tbody>{coverage.rows.map(r => <tr key={r.systemToken} data-system-token={r.systemToken}>
           <td><button type="button" aria-pressed={selected === r.systemToken} onClick={() => {setSelected(r.systemToken); detailRef.current?.scrollIntoView({block:"start"});}}>{String(r.no).padStart(2,"0")} · {r.systemToken}</button><small>{r.name}</small><small>{r.sourceRef}</small></td>
-          <td>{r.kernelIds.join(" / ") || "KERNEL_REVIEW_REQUIRED"}<small>{r.kernelState}</small><small>{r.systemToken === "TEL-PAGA" ? "Service E bindings: REFERENCE_ONLY; inputs OPEN" : "E binding: OPEN"}</small></td>
+          <td>{r.kernelIds.join(" / ") || "KERNEL_REVIEW_REQUIRED"}<small>{r.kernelState}</small><small>{r.systemToken === "TEL-PAGA" ? "E01–E18 runtime available; controlled BOM bindings / inputs OPEN" : "E binding: OPEN"}</small></td>
           <td>{r.components.length} component records<small>TAG / unique cost owner: OPEN</small><small>{r.quantityState}</small></td>
           <td>{r.workingSourceRowIds.join(", ") || "OPEN"}<small>→ {show(r.releaseRowId)} · {r.traceState}</small><small>Final: {r.finalReleaseGate}</small></td>
           <td>{r.open}<small>Source audit: {r.requirementAuditState}</small></td>
@@ -51,7 +51,7 @@ export function CoverageMatrix() {
           <div><dt>Frozen mapping · MOD-BUDGET-FROZEN</dt><dd>{show(row.tracePointer)} → {show(row.issuedPointer)}</dd></div>
           <div><dt>Release view · MOD-RELEASED-SELL</dt><dd>{show(row.releasePointer)} · {row.releaseState}</dd></div>
         </dl>
-        <p>Mapping: {row.traceState} · รายการที่รวมหลายระบบยังไม่ใช่ Cost Owner แยกรายข้อ · Exact Source ↔ Release navigation: NOT_IMPLEMENTED</p>
+        <p>Mapping: {row.traceState} · รายการที่รวมหลายระบบยังไม่ใช่ Cost Owner แยกรายข้อ · Original RFQ native-sheet roundtrip: NOT_IMPLEMENTED · New Working ↔ Release rows: available in Bidding</p>
       </details>
       {row.unmappedReviewIds.length > 0 && <p role="alert">OPEN — ไม่พบ component ต้นทาง: {row.unmappedReviewIds.join(", ")}</p>}
       <div className="p55-table-wrap" style={{marginTop:16}}>

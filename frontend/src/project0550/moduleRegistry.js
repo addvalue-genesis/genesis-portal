@@ -30,6 +30,8 @@ export const MODULE_REGISTRY = [
     outputs: ["Validated project dataset", "Data-layer status"],
     implementation: [
       "frontend/src/project0550/data/repository.js",
+      "frontend/src/project0550/data/adapters/bidIndexedDbAdapter.js",
+      "frontend/src/project0550/data/bidWorkspaceModel.js",
       "frontend/src/project0550/data/adapters/controlledSnapshotAdapter.js"
     ],
     invariants: [
@@ -73,7 +75,7 @@ export const MODULE_REGISTRY = [
     why: "Separate reusable knowledge from project-specific applicability.",
     inputs: ["19-system list", "COMMON knowledge kernels"],
     outputs: ["System-to-kernel map", "Kernel review status"],
-    implementation: ["frontend/src/project0550/knowledgeKernelBinding.js"],
+    implementation: ["frontend/src/project0550/knowledgeKernelBinding.js", "frontend/src/project0550/SchematicWorkspace.jsx"],
     invariants: ["Unmapped systems are flagged KERNEL_REVIEW_REQUIRED; they are not assumed complete."]
   },
   {
@@ -100,7 +102,7 @@ export const MODULE_REGISTRY = [
     why: "Price, payment, delivery, warranty, validity, tax and logistics terms can all change project cost and delivery.",
     inputs: ["Original vendor quotations", "Commercial clarifications"],
     outputs: ["Full source quotation record", "Terms", "Line items", "Conditions", "Source location"],
-    implementation: ["commercialSources in controlled project dataset"],
+    implementation: ["commercialSources in controlled project dataset", "frontend/src/project0550/VendorWorkspace.jsx"],
     invariants: [
       "Do not show only a quotation total when line items/terms are available.",
       "Commercial source truth must remain separate from internal allowance."
@@ -115,7 +117,7 @@ export const MODULE_REGISTRY = [
     why: "A parent allowance is not auditable unless management can see the work objects, drivers, equations, rates/cash-cost basis, source model and reconciliation state behind it.",
     inputs: ["19-system work objects", "Document lifecycle", "Event/campaign plan", "Trip/cash costs", "Role/rate basis", "OEM/vendor evidence"],
     outputs: ["Man-hour/day derivation", "Service cost basis", "Training/FAT/SAT logic", "Allowance-vs-bottom-up reconciliation state"],
-    implementation: ["frontend/src/project0550/serviceEquationModel.js", "Budget → Part B/C drill-down"],
+    implementation: ["frontend/src/project0550/serviceEquationModel.js", "Budget → Part B/C drill-down", "frontend/src/project0550/serviceEquationRuntime.js", "frontend/src/project0550/EquationWorkbench.jsx"],
     invariants: [
       "Do not replace a recovered bottom-up model with a generic list of activities.",
       "Do not fabricate sub-line allocation merely to reconcile to a parent allowance.",
@@ -131,7 +133,7 @@ export const MODULE_REGISTRY = [
     why: "Management needs a controllable working model before final vendor and engineering closure.",
     inputs: ["19-system scope", "Commercial sources", "Engineering quantities", "Service/logistics/resource assumptions"],
     outputs: ["Part A/B/C direct basis", "Component breakdown", "Price/source trace", "Internal commercial working"],
-    implementation: ["budgetaryEstimate in controlled dataset", "Budget → Working Preview UI"],
+    implementation: ["budgetaryEstimate in controlled dataset", "Budget → Working Preview UI", "frontend/src/project0550/BidCommercialWorkspace.jsx"],
     invariants: [
       "System-level allowance must be distinguishable from source quote.",
       "No back-solving to a management target.",
@@ -159,7 +161,7 @@ export const MODULE_REGISTRY = [
     why: "Budgetary/preliminary output must not be mistaken for final contractual release.",
     inputs: ["Closed engineering/commercial gates", "Release authorization"],
     outputs: ["RELEASED_SELL"],
-    implementation: ["Budget → Released Customer Output UI"],
+    implementation: ["Budget → Released Customer Output UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/exportOriginalPriceForm.js"],
     invariants: ["Remain HOLD until controlled release criteria are satisfied."]
   },
   {
