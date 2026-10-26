@@ -145,9 +145,9 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  // UI navigation context only: return to the exact originating Release row.
  const [returnToRelease,setReturnToRelease]=useState(null);
  const [releaseAnnexTarget,setReleaseAnnexTarget]=useState(null);
- const openReleaseAnnexRow=({code,sourceId})=>{
+ const openReleaseAnnexRow=({code,sourceId,sourceSelectionId=null})=>{
   if(!["B10","B11","B13","C1","C2"].includes(code)||!sourceId)return;
-  setReleaseAnnexTarget(prev=>({code,sourceId,seq:(prev?.seq||0)+1}));
+  setReleaseAnnexTarget(prev=>({code,sourceId,sourceSelectionId,seq:(prev?.seq||0)+1}));
   setPricingStage("released"); // navigation only, no price posting/approval
  };
  const openReleaseSource=item=>{
@@ -169,7 +169,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     throw Error("0553 exact Release→Source navigation refused: orphan or inconsistent "+code+"/"+item.sourceId);
    if(released&&released.sourceRowModuleId===id)
     setReturnToRelease({code,sourceId:released.sourceId,traceId:released.traceId,
-     sourceRowModuleId:released.sourceRowModuleId,originWasExact:true});
+     sourceRowModuleId:released.sourceRowModuleId,sourceSelectionId:item.sourceSelectionId||null,originWasExact:true});
   }else if(isBc&&["B10","B11","B13","C1","C2"].includes(code)){
    const first=(releaseModel.annex[code]||[])[0];
    // Category-only Release navigation can return to its selected Annex tab.
@@ -178,7 +178,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
     sourceRowModuleId:first.sourceRowModuleId,originWasExact:false});
   }
   if(isBc)setPricingStage("working"); // show canonical source while retaining the exact reverse route
-  setReleaseJump(previous=>({id,code,seq:(previous?.seq||0)+1}));
+  setReleaseJump(previous=>({id,code,sourceSelectionId:item?.sourceSelectionId||null,seq:(previous?.seq||0)+1}));
  };
  React.useEffect(()=>{
   if(!releaseJump)return;
@@ -197,7 +197,14 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   if(target.tagName==="DETAILS")target.open=true;
   document.querySelectorAll(".p553-module-nav-focus").forEach(x=>x.classList.remove("p553-module-nav-focus"));
   target.classList.add("p553-module-nav-focus");
-  target.scrollIntoView?.({behavior:"smooth",block:"center"});
+  const selectedStage=releaseJump.sourceSelectionId&&code==="B10"?
+   findModuleElement0553(document,"bid.budget.working.bc.b10.stage-spare-selection."+
+    releaseJump.sourceSelectionId.toLowerCase()):null;
+  if(selectedStage){
+   openModuleAncestors0553(selectedStage);
+   selectedStage.classList.add("p553-module-nav-focus");
+   selectedStage.scrollIntoView?.({behavior:"smooth",block:"center"});
+  }else target.scrollIntoView?.({behavior:"smooth",block:"center"});
   setNavigationFeedback(found?null:"Module "+id+" ยังไม่แสดงใน Filter นี้; เปิด "+fallback+" ให้ตรวจสอบ");
  },[releaseJump,bcTab]);
  const openPricingStage=stage=>{setPricingStage(stage);setNavigationFeedback(null);};
@@ -337,7 +344,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
       <strong>Release → Source → Release</strong>
       <span>Working Source · {returnToRelease.sourceId} · {returnToRelease.traceId}</span>
       <button type="button" className="p553-detail-button"
-       onClick={()=>openReleaseAnnexRow(returnToRelease)}>↩ {returnToRelease.originWasExact?"Return to exact 10.3.3 Release row":"Return to 10.3.3 "+bcTab+" Annex"}</button>
+       onClick={()=>openReleaseAnnexRow(returnToRelease)}>↩ {returnToRelease.sourceSelectionId?"Return to exact B10 spare function in 10.3.3":returnToRelease.originWasExact?"Return to exact 10.3.3 Release row":"Return to 10.3.3 "+bcTab+" Annex"}</button>
      </div>}
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working" onOpenReleaseRow={openReleaseAnnexRow}/>} 
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<p className="p55-note"><strong>Selected {bcTab}:</strong> รายละเอียดแสดงโดยตรงด้านล่างตารางจาก Component เดียวกับ 10.5 โดยไม่ต้องกด ＋ Detail อีกครั้ง</p>}
