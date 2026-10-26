@@ -31,10 +31,10 @@ function sheet(index){
  const cells=[];
  for(let row=1;row<=max;row++){
   const addresses=index===1?(row>=24&&row<=37?["B"+row,"F"+row,"G"+row]:row>=8&&row<=11?"ABCDEFG".split("").map(x=>x+row):
-   row>=24&&row<=37||row===41||row===42?["F"+row,"G"+row]:row===38?["A38","G38","H38"]:[]):
-   row>=6&&row<=18?(index>=5?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]).map(x=>x+row):row===19?["I19"]:[];
+   row>=24&&row<=37||row===41||row===42?["B"+row,"F"+row,"G"+row,"H"+row]:row===38?["A38","G38","H38"]:[]):
+   row>=6&&row<=18?(index>=5?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]).map(x=>x+row):row===19?["B19","I19"]:row===21?["B21"]:row===4?["H4"]:[];
   // A previously priced workbook must not leak historical values in unused rows.
-  const xml=addresses.map(address=>'<c r="'+address+'" s="12"><v>987654321</v></c>').join("");
+  const xml=addresses.map(address=>'<c r="'+address+'" s="12">'+(index===1||row>=6&&row<=18?'<v>987654321</v>':'')+'</c>').join("");
   cells.push('<row r="'+row+'" ht="16" customHeight="1">'+xml+'</row>');
  }
  return '<?xml version="1.0"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'+
@@ -103,10 +103,27 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
  };
  const real=require(path.join(srcRoot,"project0553/data/releaseCommercialModel0553.js")).buildReleaseCommercialModel0553({thbPerUsd:31.5});
  assert.equal(real.annexTraceAudit.totalRows,16);
+ const expectedRows=code=>code.startsWith("B")?real.annex[code]:real.budgetaryOptionAnnex[code].map((x,i)=>({
+  sourceId:x.sourceId||x.historicalSourceId,
+  tagNo:code==="C2"?"Two-year operating stock / TAG by OEM":x.tag,
+  description:x.description,specification:x.specification,materials:x.materials,
+  qty:x.quantity,customerUnitTHB:x.unitPriceTHB,customerTotalTHB:x.extendedTHB,
+  leadTimeARO:x.leadTime,nativeRow:6+i,
+  nativeCells:Object.fromEntries(Object.entries({tagNo:"C",description:"D",specification:"E",materials:"F",qty:"G",unitPrice:"H",totalPrice:"I"}).map(([k,col])=>[k,col+(6+i)]))
+ }));
+ const expectedTotal=code=>code.startsWith("B")?real.annexModels[code].selectedWorkingTHB:real.c.find(x=>x.code===code).budgetaryOptionOfferTHB;
+ const assertOptions=xml=>{
+  for(const [code,row] of [["C1",41],["C2",42]]){
+   for(const col of ["F","G"])assert(cell(xml,col+row).includes('<v>'+expectedTotal(code)+'</v>'));
+   assert(cell(xml,"B"+row).includes("CONDITIONAL BUDGETARY OFFER"));
+  }
+ };
+
  const live=await api.buildNativeWorkingDraft0553(testFile,real);
  const realZip=api.entriesFromZip(new Uint8Array(await live.blob.arrayBuffer()));
  const nativeText=index=>decoder.decode(realZip.find(x=>x.name==="xl/worksheets/sheet"+index+".xml").compressed);
  const cell=(xml,address)=>xml.match(new RegExp('<c r="'+address+'"[^>]*>([\\s\\S]*?)</c>'))?.[1];
+ const escaped=x=>x.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&apos;");
  const nativeScope=nativeText(1);
  for(const row of real.b){
   const nativeRow=23+Number(row.code.slice(1));
@@ -115,36 +132,29 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
    assert(value?.includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':"NOT ESTABLISHED"),row.code+" current summary cell "+col);
   }
  }
- for(const address of ["F41","G41","F42","G42"])assert(cell(nativeScope,address).includes("NOT QUOTED"));
+ assertOptions(nativeScope);
  assert(cell(nativeScope,"G38").includes("<v>27192339.36</v>"));
  assert(cell(nativeScope,"A38").includes("B4, B12, B14"));
  for(const [code,index] of [["B10",2],["B11",3],["B13",4],["C1",5],["C2",6]]){
   const xml=nativeText(index);
   assert(!xml.includes("987654321"),code+" leaked stale native values");
-  for(const row of real.annex[code]){
+  for(const row of expectedRows(code)){
    assert(xml.includes('r="'+row.nativeCells.tagNo+'"'),"Native row missing TAG cell "+row.sourceId);
-   assert(xml.includes(row.tagNo),"Native lost ORIGINAL source TAG string "+row.sourceId);
-   assert(xml.includes(row.description),"Native lost approved simple description "+row.sourceId);
-   assert(xml.includes(row.specification),"Native lost selected specification "+row.sourceId);
-   assert(xml.includes(row.materials),"Native lost material/TBC disclosure "+row.sourceId);
+   assert(xml.includes(escaped(row.tagNo)),"Native lost ORIGINAL source TAG string "+row.sourceId);
+   assert(xml.includes(escaped(row.description)),"Native lost approved simple description "+row.sourceId);
+   assert(xml.includes(escaped(row.specification)),"Native lost selected specification "+row.sourceId);
+   assert(xml.includes(escaped(row.materials)),"Native lost material/TBC disclosure "+row.sourceId);
    assert(xml.includes('r="'+row.nativeCells.qty+'"'),"Native Qty target missing "+row.sourceId);
    assert(cell(xml,row.nativeCells.qty).includes(row.qty===null?"TBC — OEM SPIR":'<v>'+row.qty+'</v>'));
-   if(code.startsWith("B")){
-    assert.equal(cell(xml,row.nativeCells.unitPrice),'<v>'+row.customerUnitTHB+'</v>');
-    assert.equal(cell(xml,row.nativeCells.totalPrice),'<v>'+row.customerTotalTHB+'</v>');
-   }else{
-    assert(cell(xml,row.nativeCells.unitPrice).includes("NOT QUOTED"));
-    assert(cell(xml,row.nativeCells.totalPrice).includes("NOT QUOTED"));
-    assert(cell(xml,"J"+row.nativeRow).includes("OEM confirmation required"));
-   }
-   if(code.startsWith("C"))
-    assert(!new RegExp('<c r="'+row.nativeCells.totalPrice+'"[^>]*><v>').test(xml),
-     "C option cannot become a Released Price "+row.sourceId);
+   assert.equal(cell(xml,row.nativeCells.unitPrice),'<v>'+row.customerUnitTHB+'</v>');
+   assert.equal(cell(xml,row.nativeCells.totalPrice),'<v>'+row.customerTotalTHB+'</v>');
+   assert.equal(Math.round(row.qty*row.customerUnitTHB*100),Math.round(row.customerTotalTHB*100));
+   if(code.startsWith("C"))assert(cell(xml,"J"+row.nativeRow).includes(row.leadTimeARO));
   }
-  for(let row=6+real.annex[code].length;row<=18;row++)
+  for(let row=6+expectedRows(code).length;row<=18;row++)
    for(const col of (code.startsWith("C")?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]))
     assert.equal(cell(xml,col+row),'<is><t xml:space="preserve"></t></is>',code+" must clear unused "+col+row);
-  assert(cell(xml,"I19").includes(code.startsWith("B")?'<v>'+real.annexModels[code].selectedWorkingTHB+'</v>':"NOT QUOTED"));
+  assert(cell(xml,"I19").includes('<v>'+expectedTotal(code)+'</v>'));
  }
  assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.sourceToReleaseMatched),Array(16).fill(true));
  assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.releaseToSourceMatched),Array(16).fill(true));
@@ -189,6 +199,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
    assert.deepEqual(formulas(newXml),formulas(oldXml),'Native formulas preserved');
    const index=Number(before[i].name.match(/sheet(\d+)/)[1]);
    if(index===1){
+    assert(cell(newXml,'E7').includes('<f>SUM(E8:E22)</f><v>4</v>'),'Original quantity formula cache must reflect four current MR lots');
     for(let part=0;part<4;part++)assert(cell(newXml,'D'+(8+part)).includes('Locations: '+[...new Set(real.a[part].sourceRows.map(r=>r.site))].join(', ')));
     for(const code of ['B3','B9']){
      const note=real.b.find(r=>r.code===code).serviceCommercialBasis.compactText;
@@ -201,24 +212,24 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      assert(cell(newXml,'B'+nativeRow).includes('Activities: '+note),'Source activity note missing in native '+row.code);
      for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':"NOT ESTABLISHED"));
     }
-    for(const address of ["F41","G41","F42","G42"])assert(cell(newXml,address).includes("NOT QUOTED"));
+    assertOptions(newXml);
     assert(cell(newXml,"G38").includes("<v>27192339.36</v>"));
     assert(cell(newXml,"A38").includes("B4, B12, B14"));
    }else{
     const code=annexCodes[index-2];
-    for(const row of real.annex[code]){
+    for(const row of expectedRows(code)){
      for(const [field,value] of [["description",row.description],["tagNo",row.tagNo],["specification",row.specification],["materials",row.materials]]){
       const escaped=value.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&apos;");
       assert(cell(newXml,row.nativeCells[field]).includes(escaped),row.sourceId+" native "+field);
      }
      assert(cell(newXml,row.nativeCells.qty).includes(row.qty===null?"TBC — OEM SPIR":'<v>'+row.qty+'</v>'));
      for(const [field,value] of [["unitPrice",row.customerUnitTHB],["totalPrice",row.customerTotalTHB]])
-      assert(cell(newXml,row.nativeCells[field]).includes(code.startsWith("C")?"NOT QUOTED":'<v>'+value+'</v>'));
+      assert(cell(newXml,row.nativeCells[field]).includes('<v>'+value+'</v>'));
     }
-    assert(cell(newXml,"I19").includes(code.startsWith("C")?"NOT QUOTED":'<v>'+real.annexModels[code].selectedWorkingTHB+'</v>'));
+    assert(cell(newXml,"I19").includes('<v>'+expectedTotal(code)+'</v>'));
    }
   }
   console.log("PASS actual native XLSX: six original sheets, 16 current rows, fitted typography/rows, original column widths/page setup, original merges/formulas and unrelated ZIP parts preserved; SHA256 "+require("node:crypto").createHash("sha256").update(bytes).digest("hex"));
  }
- console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 16 bidirectional PTTEP current annex source item rows, C not quoted, layout fitted, structure preserved");
+ console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 16 bidirectional PTTEP current annex source item rows, C1/C2 conditional offers with 1/12 price lines, layout fitted, structure preserved");
 })().catch(e=>{console.error(e);process.exitCode=1;});

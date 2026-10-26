@@ -38,6 +38,17 @@ assert.equal(model.c.find(x=>x.code==="C1").amountUSD,null);
 assert.equal(model.c.find(x=>x.code==="C2").amountUSD,null);
 assert(model.c.every(x=>x.amountUSD===null),"Option benchmark must NOT overwrite the priced commercial authority");
 assert(other.rows.C2.every(x=>x.sourceId===null&&x.historicalSourceId&&x.customerIssued===false));
+const feeder=other.rows.C2.find(x=>x.historicalSourceId==='C2-REV08-09');
+assert(feeder.description.includes('1/2"')&&!feeder.description.includes('7/8'));
+assert(feeder.specification.includes('50-ohm')&&feeder.technicalSourceId==='UHF-4');
+assert.equal(feeder.qty,30);assert.equal(feeder.unit,'m');
+for(const code of ['C1','C2']){
+ const rows=other.rows[code],total=other.summaries[code].sourceTHB;
+ assert.equal(Math.round(rows.reduce((n,x)=>n+x.totalTHB,0)*100),Math.round(total*100));
+ assert(rows.every(x=>Math.round(x.qty*x.unitTHB*100)===Math.round(x.totalTHB*100)));
+ const thbHtml=renderToStaticMarkup(React.createElement(OtherSpareOriginalAnnex0553,{code,model:other,currency:'THB'}));
+ assert(thbHtml.includes('UNIT PRICE (THB)')&&thbHtml.includes(total.toLocaleString('en-US',{minimumFractionDigits:2})));
+}
 assert(new Set(other.rows.C2.map(x=>x.historicalSourceId)).size===12,
  "C2 historical stock evidence must keep 12 unique Source references, not fabricated MR price rows");
 const historicWork=fs.readFileSync(path.join(root,"project0553/SparePricedBudgetReview0553.jsx"),"utf8");
@@ -128,6 +139,10 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  assert((await text('xl/sharedStrings.xml')).includes('uniqueCount="0"'));
  for(let i=1;i<=6;i++){
   const name='xl/worksheets/sheet'+i+'.xml',xml=await text(name),old=await text(name,originalEntries);
+  const rowNumbers=s=>[...s.matchAll(/<row\b[^>]*\br="(\d+)"/g)].map(x=>Number(x[1]));
+  assert.equal(rowNumbers(xml).length,rowNumbers(old).length+(i===2?1:0),name+' row count');
+  assert.equal(new Set(rowNumbers(xml)).size,rowNumbers(xml).length,name+' duplicate row numbers');
+  if(i===2)assert(xml.includes('<dimension ref="B2:I23"/>'));
   for(const tag of ['cols','mergeCells','pageMargins','pageSetup','drawing']){
    const get=s=>s.match(new RegExp('<'+tag+'\\b[^>]*(?:/>|>[\\s\\S]*?</'+tag+'>)'))?.[0];
    if(i===2&&tag==="mergeCells"){
@@ -137,9 +152,12 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
      "Native B10 output must add body row 19 without leaving old total");
    }else assert.equal(get(xml),get(old),name+' original '+tag);
   }
+  assert.deepEqual(xml.match(/<f\b[^>]*>[\s\S]*?<\/f>/g)||[],old.match(/<f\b[^>]*>[\s\S]*?<\/f>/g)||[],name+' original formulas');
   assert(!/[\u0e00-\u0e7f\u3400-\u9fff]/.test(xml),'Non-English customer text');
   for(const internal of ['THB','INTERNAL','HOLD','WORKING DRAFT','NOT ESTABLISHED','bid.budget','Exchange rate','no duplicate engineering charge'])assert(!xml.includes(internal),name+' leaked '+internal);
   if(i===1){
+   assert(cell(xml,'E7').includes('<f>SUM(E8:E22)</f><v>4</v>'));
+   assert(cell(xml,'B43').includes('subject to buyer approval against original DDP site terms'));
    assert(cell(xml,'G38').includes('<v>'+model.totalUSD+'</v>'));
    assert(cell(xml,'A38').includes('B4, B12, B14'));
    for(const r of model.b)assert(cell(xml,'G'+(23+Number(r.code.slice(1)))).includes(r.amountUSD===null?'To be quoted':'<v>'+r.amountUSD+'</v>'));
@@ -160,6 +178,8 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
    for(const [j,r] of split.entries()){
     const physicalRow=6+j;
     assert(cell(xml,'I'+physicalRow).includes(r.totalUSD===null?'To be quoted':'<v>'+r.totalUSD+'</v>'));
+    assert(cell(xml,'G'+physicalRow).includes('<v>'+r.qty+'</v>'));
+    assert(cell(xml,'H'+physicalRow).includes('<v>'+r.unitUSD+'</v>'));
     if(code==="B10"){
      assert(cell(xml,'G'+physicalRow).includes('<v>1</v>'));
      assert(cell(xml,'H'+physicalRow).includes('<v>'+r.unitUSD+'</v>'));
@@ -169,7 +189,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
     }
    }
    if(code==="C1"||code==="C2"){
-    assert(cell(xml,"B20").includes(code==="C1"?"CONDITIONAL BUDGETARY C1 PRICE OFFER":"CONDITIONAL BUDGETARY C2 PRICE OFFER"),
+    assert(cell(xml,"B21").includes(code==="C1"?"CONDITIONAL BUDGETARY C1 PRICE OFFER":"CONDITIONAL BUDGETARY C2 PRICE OFFER"),
      "Original native optional-spare source warning missing");
     assert(cell(xml,"H4").includes("CONDITIONAL OPTION BUDGET USD"));
    }
@@ -182,7 +202,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  const second=await buildNativeOfficialRelease0553({name:output.filename,arrayBuffer:async()=>data.buffer.slice(data.byteOffset,data.byteOffset+data.length)},model);
  // Values remain current on re-export; no old currency or internal strings return.
  const again=box.zip.entriesFromZip(new Uint8Array(await second.blob.arrayBuffer()));
- assert((await text('xl/worksheets/sheet1.xml',again)).includes('<v>'+model.totalUSD+'</v>'));
+ assert.deepEqual(new Uint8Array(await second.blob.arrayBuffer()),data,'Official re-export must be byte-idempotent, including styles and formats');
  const arg=process.argv.find(x=>x.startsWith('--output='));if(arg)fs.writeFileSync(arg.slice(9),data);
  console.log('PASS 0553 Official native: B10 USD16200 B11 USD5100 B13 USD1500, C1 USD97500 and C2 USD23000 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, no A+B uplift or false OEM confirmation');
 })().catch(e=>{console.error(e);process.exitCode=1;});

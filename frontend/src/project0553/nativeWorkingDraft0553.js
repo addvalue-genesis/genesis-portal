@@ -127,8 +127,12 @@ function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
  const fonts=fontsSection[1].match(/<font\b[^>]*>[\s\S]*?<\/font>/g)||[];
  const styles=stylesSection[1].match(/<xf\b[^>]*?(?:\/>|>[\s\S]*?<\/xf>)/g)||[];
  const fontCache=new Map(),styleCache=new Map();
- const fittedStyle=(id,numeric,header,total=false)=>{
-  const key=id+':'+numeric+':'+header+':'+total;if(styleCache.has(key))return styleCache.get(key);
+ const formats=[...stylesXml.matchAll(/<numFmt\b[^>]*numFmtId="(\d+)"[^>]*formatCode="([^"]*)"[^>]*\/>/g)];
+ const unitFormat=formats.find(x=>x[2]==="#,##0.00##");
+ const unitFormatId=unitFormat?Number(unitFormat[1]):Math.max(164,...formats.map(x=>Number(x[1])))+1;
+ let usesUnitFormat=false;
+ const fittedStyle=(id,numeric,header,total=false,unit=false)=>{
+  const key=id+':'+numeric+':'+header+':'+total+':'+unit;if(styleCache.has(key))return styleCache.get(key);
   let xf=styles[id];if(!xf)throw Error('Invalid native cell style '+id);
   const fontId=Number(attr(xf,'fontId')||0);
   if(!fontCache.has(fontId)){
@@ -139,6 +143,7 @@ function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
   }
   xf=xf.replace(/^<xf\b[^>]*>/,tag=>setAttr(setAttr(setAttr(tag,'fontId',fontCache.get(fontId)),'applyFont',1),'applyAlignment',1));
   if(total)xf=xf.replace(/^<xf\b[^>]*>/,tag=>setAttr(setAttr(tag,'numFmtId',4),'applyNumberFormat',1));
+  if(unit){usesUnitFormat=true;xf=xf.replace(/^<xf\b[^>]*>/,tag=>setAttr(setAttr(tag,'numFmtId',unitFormatId),'applyNumberFormat',1));}
   if(xf.endsWith('/>'))xf=xf.slice(0,-2)+'></xf>';
   xf=xf.replace(/<alignment\b[^>]*?(?:\/>|>[\s\S]*?<\/alignment>)/g,'');
   xf=xf.replace('</xf>','<alignment horizontal="'+(header?'center':numeric?'right':'left')+'" vertical="'+(header?'center':'top')+'" wrapText="'+(numeric?0:1)+'"/></xf>');
@@ -173,9 +178,9 @@ function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
   const merges=new Map();
   for(const m of xml.matchAll(/<mergeCell\b[^>]*ref="([A-Z]+)(\d+):([A-Z]+)(\d+)"[^>]*\/>/g))
    merges.set(m[1]+m[2],{end:column(m[3]),rowspan:Number(m[4])-Number(m[2])+1});
-  xml=xml.replace(/<row\b[^>]*>[\s\S]*?<\/row>/g,row=>{
+  xml=xml.replace(/<row\b[^>]*?(?:\/>|>[\s\S]*?<\/row>)/g,row=>{
    const r=Number(attr(row,'r')),header=r===4||r===5;
-   const body=main?r>=8&&r<=42&&![23,39,40].includes(r):r>=6&&r<=19;
+   const body=main?r>=8&&r<=43&&![23,39,40].includes(r):r>=6&&r<=21;
    if(!header&&!body)return row;
    let height=Number(attr(row.match(/^<row\b[^>]*>/)[0],'ht')||15),touched=false;
    row=row.replace(/<c\b[^>]*?(?:\/>|>[\s\S]*?<\/c>)/g,cell=>{
@@ -185,7 +190,8 @@ function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
     const text=type==='s'?shared[Number(v)]||'':type==='inlineStr'?textOf(cell):v||'';
     if(!text&&!/<f\b/.test(cell))return cell;
     const numeric=!['s','inlineStr','str'].includes(type)&&v!==undefined&&Number.isFinite(Number(v));
-    const id=fittedStyle(Number(attr(opening,'s')||0),numeric,header,main&&address==='G38'&&numeric);
+    const id=fittedStyle(Number(attr(opening,'s')||0),numeric,header,
+     numeric&&(main?[6,7].includes(col):col===9),!main&&col===8&&numeric);
     cell=cell.replace(opening,setAttr(opening,'s',id));touched=true;
     const merge=merges.get(address);
     if(!merge||merge.rowspan===1){
@@ -202,6 +208,11 @@ function fitNativeReleaseLayout0553(stylesXml,sharedXml,sheets,warnings){
   output.set(name,xml);
  }
  const replaceSection=(xml,name,items)=>xml.replace(new RegExp('<'+name+'\\b[^>]*>[\\s\\S]*?</'+name+'>'),'<'+name+' count="'+items.length+'">'+items.join('')+'</'+name+'>');
+ if(usesUnitFormat&&!unitFormat){
+  const format='<numFmt numFmtId="'+unitFormatId+'" formatCode="#,##0.00##"/>';
+  if(/<numFmts\b[^>]*>/.test(stylesXml))stylesXml=stylesXml.replace(/<numFmts\b[^>]*>([\s\S]*?)<\/numFmts>/,(_,body)=>'<numFmts count="'+(formats.length+1)+'">'+body+format+'</numFmts>');
+  else stylesXml=stylesXml.replace(/(<styleSheet\b[^>]*>)/,'$1<numFmts count="1">'+format+'</numFmts>');
+ }
  return {sheets:output,stylesXml:replaceSection(replaceSection(stylesXml,'fonts',fonts),'cellXfs',styles)};
 }
 
@@ -265,9 +276,20 @@ export async function buildNativeWorkingDraft0553(file,model){
   if(notes.length||line.code==="B6")write(scope,cell,[heading,...notes].join("\n"));
  }
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
- for(const row of [41,42]){
-  write(scope,"F"+row,"NOT QUOTED");
-  write(scope,"G"+row,"NOT QUOTED");
+ for(const [code,row] of [["C1",41],["C2",42]]){
+  const option=model.c?.find(x=>x.code===code),items=model.budgetaryOptionAnnex?.[code];
+  const offered=option?.budgetaryOfferPrepared===true;
+  if(offered&&(!items?.length||option.budgetaryOfferStatus!=="CONDITIONAL_BUDGETARY_OFFER"||
+    option.customerOfferIssued!==false||Number.isFinite(option.customerSellTHB)||
+    round(items.reduce((sum,x)=>sum+x.extendedTHB,0))!==option.budgetaryOptionOfferTHB||
+    items.some(x=>round(x.quantity*x.unitPriceTHB)!==x.extendedTHB)))
+   throw Error(code+" conditional option source arithmetic/approval mismatch");
+  write(scope,"F"+row,offered?option.budgetaryOptionOfferTHB:"NOT QUOTED");
+  write(scope,"G"+row,offered?option.budgetaryOptionOfferTHB:"NOT QUOTED");
+  if(offered){
+   write(scope,"B"+row,option.description+"\nCONDITIONAL BUDGETARY OFFER (THB) — excluded from A+B");
+   write(scope,"H"+row,"OEM SKU/Qty, B10 exclusion and proposed CIF Zhuhai subject to confirmation; original DDP terms require buyer approval.");
+  }
  }
  const complete=model.sourceCoverage?.aReady===true&&model.sourceCoverage?.bSellReady===true;
  const priced=[a,b].filter(Number.isFinite);
@@ -289,10 +311,19 @@ export async function buildNativeWorkingDraft0553(file,model){
  replaceAll("xl/worksheets/sheet1.xml",scope);
  const annexCodes=["B10","B11","B13","C1","C2"];
  for(let i=0;i<annexCodes.length;i++){
-  const code=annexCodes[i],detail=model.annex?.[code]||[],audit=model.annexModels?.[code];
+  const code=annexCodes[i],option=model.c?.find(x=>x.code===code);
+  const offered=option?.budgetaryOfferPrepared===true;
+  const detail=offered?model.budgetaryOptionAnnex[code].map(x=>({
+   sourceId:x.sourceId,historicalSourceId:x.historicalSourceId,
+   tagNo:code==="C2"?"Two-year operating stock / TAG by OEM":x.tag,
+   description:x.description,specification:x.specification,materials:x.materials,
+   qty:x.quantity,customerUnitTHB:x.unitPriceTHB,customerTotalTHB:x.extendedTHB,
+   leadTimeARO:x.leadTime||"OEM confirmation required"
+  })):model.annex?.[code]||[],audit=model.annexModels?.[code];
   const rows=new Map();
   if(detail.length>13)throw Error(code+" exceeds 13 physical rows in original. Cannot export without layout changes.");
-  const routeTrace=model.annexTraceAudit?.rowTrace?.filter(x=>x.code===code)||null;
+  // The 12 historical C2 price rows are distinct from the 4 current MR parents.
+  const routeTrace=offered?null:model.annexTraceAudit?.rowTrace?.filter(x=>x.code===code)||null;
   if(routeTrace&&routeTrace.length!==detail.length)
    throw Error(code+" native export diverged from bidirectional Source/Release line count");
   // Overwrite every original customer Annex cell so a previously filled
@@ -324,22 +355,39 @@ export async function buildNativeWorkingDraft0553(file,model){
    write(rows,"E"+row,r.specification||"");
    write(rows,"F"+row,r.materials||"");
    write(rows,"G"+row,Number.isFinite(r.qty)?r.qty:"TBC — OEM SPIR");
-   if(code.startsWith("B")){
+   if(code.startsWith("B")||offered){
     write(rows,"H"+row,Number.isFinite(r.customerUnitTHB)?r.customerUnitTHB:"NOT ESTABLISHED");
     write(rows,"I"+row,Number.isFinite(r.customerTotalTHB)?round(r.customerTotalTHB):"NOT ESTABLISHED");
    }
    if(code.startsWith("C")){
-    write(rows,"H"+row,"NOT QUOTED");write(rows,"I"+row,"NOT QUOTED");
+    if(!offered){write(rows,"H"+row,"NOT QUOTED");write(rows,"I"+row,"NOT QUOTED");}
     write(rows,"J"+row,r.leadTimeARO??"OEM confirmation required");
    }
    // C1/C2 require independent OEM spare cost before any commercial price.
   });
-  write(rows,"I19",code.startsWith("B")?(Number.isFinite(audit?.annexLineTotalTHB)?round(audit.annexLineTotalTHB):"NOT ESTABLISHED"):"NOT QUOTED");
+  write(rows,"I19",offered?option.budgetaryOptionOfferTHB:code.startsWith("B")?(Number.isFinite(audit?.annexLineTotalTHB)?round(audit.annexLineTotalTHB):"NOT ESTABLISHED"):"NOT QUOTED");
+  if(offered){
+   write(rows,"H4","CONDITIONAL BUDGETARY OFFER (THB) / CIF SUBJECT TO APPROVAL");
+   write(rows,"B19","CONDITIONAL BUDGETARY OPTION TOTAL (THB) — excluded from A+B");
+   write(rows,"B21",code+" price offered conditionally. "+option.budgetaryOfferTechnicalGate+
+    ". Original DDP site; proposed CIF Zhuhai requires buyer approval. NOT ISSUED.");
+  }
   if(Number.isFinite(audit?.varianceTHB)&&Math.abs(audit.varianceTHB)>0.01)
    warnings.push(code+" line-to-summary variance THB "+audit.varianceTHB.toFixed(2)+" — no balancing item created");
-  if(code.startsWith("C"))warnings.push(code+" optional price not quoted: verified direct cost required");
+  if(code.startsWith("C"))warnings.push(offered?code+" CONDITIONAL BUDGETARY OFFER, excluded from A+B; OEM/CIF and B10 stock exclusion remain open":code+" optional price not quoted: verified direct cost required");
   replaceAll("xl/worksheets/sheet"+(i+2)+".xml",rows);
  }
+ // Refresh the existing quantity formula cache after replacing TAG rows with
+ // four MR lots. Preserve the formula itself and the original workbook parts.
+ const summarySheet="xl/worksheets/sheet1.xml";
+ let summaryXml=decode.decode(changes.get(summarySheet));
+ const quantityTotal=Array.from({length:15},(_,i)=>{
+  const cell=summaryXml.match(new RegExp('<c\\b[^>]*r="E'+(8+i)+'"[^>]*?(?:/>|>([\\s\\S]*?)</c>)'));
+  return cell&&!/\bt="(?:s|inlineStr)"/.test(cell[0])?Number((cell[1]||"").match(/<v>([^<]+)<\/v>/)?.[1]||0):0;
+ }).reduce((sum,n)=>sum+n,0);
+ summaryXml=summaryXml.replace(/(<c\b[^>]*r="E7"[^>]*><f>SUM\(E8:E22\)<\/f>)(?:<v>[^<]*<\/v>)?(<\/c>)/,
+  (_m,start,end)=>start+"<v>"+quantityTotal+"</v>"+end);
+ changes.set(summarySheet,encode.encode(summaryXml));
  // Fit the exported Release workbook, including merged description cells.
  const styleEntry=entries.find(e=>e.name==="xl/styles.xml");
  if(!styleEntry)throw Error("Native workbook is missing styles.xml");
@@ -360,6 +408,7 @@ export async function buildNativeWorkingDraft0553(file,model){
 // sheet, preserving customer style/merges. Idempotent on an already expanded
 // original workbook for repeated native USD export.
 function expandOriginalB10To14Rows0553(xml){
+ xml=xml.replace('<dimension ref="B2:I22"/>','<dimension ref="B2:I23"/>');
  if(xml.includes('<mergeCell ref="B20:H20"')&&xml.includes('<mergeCell ref="B21:E21"')){
   if(!/<row\b[^>]*\br="19"/.test(xml))throw Error("B10 expanded row 19 absent");
   return xml.replace(/<row\b[^>]*\br="21"[^>]*>/,tag=>
@@ -369,7 +418,7 @@ function expandOriginalB10To14Rows0553(xml){
   throw Error("B10 original footer merges changed");
  const lastBody=xml.match(/<row\b[^>]*\br="18"[^>]*>[\s\S]*?<\/row>/)?.[0];
  if(!lastBody)throw Error("B10 original native row18 missing");
- xml=xml.replace(/<row\b[^>]*>[\s\S]*?<\/row>/g,row=>{
+ xml=xml.replace(/<row\b[^>]*?(?:\/>|>[\s\S]*?<\/row>)/g,row=>{
   const n=Number(row.match(/^<row\b[^>]*\br="(\d+)"/)?.[1]);
   if(!Number.isInteger(n)||n<19)return row;
   return row.replace(/^<row\b[^>]*>/,h=>h.replace(/\br="\d+"/,'r="'+(n+1)+'"'))
@@ -400,8 +449,15 @@ export async function buildNativeOfficialRelease0553(file,model){
   const name="xl/worksheets/sheet"+i+".xml",entry=entries.find(e=>e.name===name);
   if(!entry)throw Error("Original worksheet missing: "+name);
   // Preserve every cell address/style, row, column, merge, page and print setting.
-  let xml=decode.decode(await readEntry(entry)).replace(/<c\b([^>]*?)(?:\/>|>[\s\S]*?<\/c>)/g,(_,attrs)=>
-   "<c"+attrs.replace(/\s+t="[^"]*"/g,"")+"/>");
+  let xml=decode.decode(await readEntry(entry)).replace(/<c\b([^>]*?)(?:\/>|>[\s\S]*?<\/c>)/g,(cell,attrs)=>{
+   const formula=cell.match(/<f\b[^>]*>[\s\S]*?<\/f>/)?.[0];
+   if(formula){
+    if(i!==1||! /\br="E7"/.test(attrs)||formula!=="<f>SUM(E8:E22)</f>")
+     throw Error("Unexpected native formula: preserve and reconcile before export");
+    return "<c"+attrs.replace(/\s+t="[^"]*"/g,"")+">"+formula+"<v>4</v></c>";
+   }
+   return "<c"+attrs.replace(/\s+t="[^"]*"/g,"")+"/>";
+  });
   if(i===2)xml=expandOriginalB10To14Rows0553(xml);
   const cells=new Map(),put=(address,value)=>write(cells,address,value);
   const price=value=>Number.isFinite(value)?value:"To be quoted";
@@ -410,7 +466,7 @@ export async function buildNativeOfficialRelease0553(file,model){
    put("A3","Currency");put("B3","USD");put("A4","Package Name");put("B4","Telecommunications Systems");
    ["Item","Tag No.","Description","Main Specification","Qty","Unit Price (USD)","Amount (USD)","Remarks"].forEach((v,j)=>put("ABCDEFGH"[j]+"5",v));
    put("A6","Part A: Equipment");put("A7","Main Equipment");
-   model.a.forEach((r,j)=>{const row=8+j;put("A"+row,r.code);put("B"+row,r.mr);put("C"+row,r.description);put("D"+row,r.locations);put("E"+row,"1 lot");put("F"+row,price(r.amountUSD));put("G"+row,price(r.amountUSD));});
+   model.a.forEach((r,j)=>{const row=8+j;put("A"+row,r.code);put("B"+row,r.mr);put("C"+row,r.description);put("D"+row,r.locations);put("E"+row,1);put("F"+row,price(r.amountUSD));put("G"+row,price(r.amountUSD));});
    put("A23","Part B: Services and Other Supplies");
    const fill=(r,row)=>{
      const isOption=r.code==="C1"||r.code==="C2";
@@ -425,7 +481,7 @@ export async function buildNativeOfficialRelease0553(file,model){
      const displayText=[r.description,r.serviceText,
       isOption?"CONDITIONAL BUDGETARY OPTION PRICE / OEM TECHNICAL REVIEW REQUIRED / SUBJECT TO CIF CONFIRMATION":null]
       .filter(Boolean).join("\n");
-     put("A"+row,r.code);put("B"+row,displayText);put("E"+row,"1 lot");
+     put("A"+row,r.code);put("B"+row,displayText);put("E"+row,1);
      put("F"+row,price(amount));put("G"+row,price(amount));
      if(model.annex[r.code])put("H"+row,"Refer to Annex "+r.code+
       (isOption?" / CONDITIONAL BUDGETARY OFFER / OEM TECHNICAL QUALIFICATION / excludes A+B":""));
@@ -434,11 +490,11 @@ export async function buildNativeOfficialRelease0553(file,model){
    put("A38","Total A+B (USD)"+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
    put("A39","Prices cover the items described above and are subject to the stated scope and qualifications.");
    put("A40","Part C: Options — excluded from Total A+B");
-   put("B43","Delivery: CIF Zhuhai Port, China (Incoterms 2020).");
+   put("B43","Proposed delivery: CIF Zhuhai Port, China (Incoterms 2020), subject to buyer approval against original DDP site terms.");
   }else{
    const code=["B10","B11","B13","C1","C2"][i-2],isB10=code==="B10";
    // Exactly the same itemized read model drives 10.3.4 JSX and native Excel.
-   // C1/C2 amounts are visible but NOT selected as official option quotations.
+   // C1/C2 are conditional budgetary options, separate from firm OEM pricing.
    const detail=isB10?model.b10ItemizedAnnex?.rows:
     model.otherSpareItemizedAnnex?.rows?.[code];
    if(!Array.isArray(detail)||detail.length>(isB10?14:13)||
@@ -464,7 +520,7 @@ export async function buildNativeOfficialRelease0553(file,model){
     [...model.b,...model.c].find(r=>r.code===code).amountUSD:
     model.otherSpareItemizedAnnex?.summaries?.[code]?.totalUSD));
    if(isB10)put("B21","PRE-AWARD BUDGETARY FINANCIAL ALLOCATION ONLY. Each Qty 1 LOT is a functional budget line, not one physical spare. OEM spare part numbers, actual delivery quantities, quoted CIF unit rates and buyer approval remain outstanding. NOT ISSUED.");
-   if(code==="C1"||code==="C2")put("B20",code==="C1"?
+   if(code==="C1"||code==="C2")put("B21",code==="C1"?
     "CONDITIONAL BUDGETARY C1 PRICE OFFER: installed RACON FCA package is a rate comparator only; subject to approved capital spare Ex configuration, actual OEM spare rate and CIF delivery.":
     "CONDITIONAL BUDGETARY C2 PRICE OFFER: Rev08 historical rates are a proposal basis only; replace 7/8-inch cable with installed-system compatible feeder and exclude confirmed B10 duplicate stock; OEM 2026 quote required.");
   }
@@ -484,6 +540,9 @@ export async function buildNativeOfficialRelease0553(file,model){
  // Numeric quotation amounts use USD decimals; annex unit rates retain 4 decimals
  // so Qty x Unit Price rounds exactly to the distributed parent quotation.
  let styles=fitted.stylesXml;
+ const formats=[...styles.matchAll(/<numFmt\b[^>]*numFmtId="(\d+)"[^>]*formatCode="([^"]*)"[^>]*\/>/g)];
+ const existingUnitFormat=formats.find(x=>x[2]==="#,##0.00##");
+ const unitFormat=existingUnitFormat?Number(existingUnitFormat[1]):Math.max(164,...formats.map(x=>Number(x[1])))+1;
  const xfs=styles.match(/<cellXfs\b[^>]*>([\s\S]*?)<\/cellXfs>/);
  const list=xfs[1].match(/<xf\b[^>]*?(?:\/>|>[\s\S]*?<\/xf>)/g),cache=new Map();
  for(const [name,input] of fitted.sheets){
@@ -491,25 +550,23 @@ export async function buildNativeOfficialRelease0553(file,model){
   const xml=input.replace(/<c\b[^>]*>\s*<v>[^<]+<\/v><\/c>/g,cell=>{
    const address=cell.match(/\br="([^"]+)"/)[1],col=address.match(/^[A-Z]+/)[0];
    if(!(main?["F","G"]:["H","I"]).includes(col))return cell;
-   const id=Number(cell.match(/\bs="(\d+)"/)?.[1]||0),format=!main&&col==="H"?164:4,key=id+":"+format;
+   const id=Number(cell.match(/\bs="(\d+)"/)?.[1]||0),format=!main&&col==="H"?unitFormat:4,key=id+":"+format;
    if(!cache.has(key)){
     let xf=list[id].replace(/\bnumFmtId="\d+"/,'numFmtId="'+format+'"');
     if(!/applyNumberFormat=/.test(xf))xf=xf.replace("<xf ",'<xf applyNumberFormat="1" ');
     else xf=xf.replace(/applyNumberFormat="[^"]*"/,'applyNumberFormat="1"');
-    cache.set(key,list.length);list.push(xf);
+    let next=list.indexOf(xf);if(next<0){next=list.length;list.push(xf);}cache.set(key,next);
    }
    return /\bs="/.test(cell)?cell.replace(/\bs="\d+"/,'s="'+cache.get(key)+'"'):cell.replace("<c ",'<c s="'+cache.get(key)+'" ');
   });
   changes.set(name,encode.encode(xml));
  }
- // Original custom format 164 may exist: choose an unused ID for 4-place units.
- const usedIds=[...styles.matchAll(/<numFmt\b[^>]*numFmtId="(\d+)"/g)].map(x=>Number(x[1]));
- const unitFormat=Math.max(164,...usedIds)+1;
- const fmt='<numFmt numFmtId="'+unitFormat+'" formatCode="#,##0.00##"/>';
- for(const [key,id] of cache)if(key.endsWith(":164"))list[id]=list[id].replace('numFmtId="164"','numFmtId="'+unitFormat+'"');
  styles=styles.replace(/<cellXfs\b[^>]*>[\s\S]*?<\/cellXfs>/,'<cellXfs count="'+list.length+'">'+list.join("")+'</cellXfs>');
- if(/<numFmts\b[^>]*>/.test(styles))styles=styles.replace(/<numFmts\b[^>]*>([\s\S]*?)<\/numFmts>/,(_,body)=>'<numFmts count="'+(usedIds.length+1)+'">'+body+fmt+'</numFmts>');
- else styles=styles.replace(/(<styleSheet\b[^>]*>)/,'$1<numFmts count="1">'+fmt+'</numFmts>');
+ if(!existingUnitFormat){
+  const fmt='<numFmt numFmtId="'+unitFormat+'" formatCode="#,##0.00##"/>';
+  if(/<numFmts\b[^>]*>/.test(styles))styles=styles.replace(/<numFmts\b[^>]*>([\s\S]*?)<\/numFmts>/,(_,body)=>'<numFmts count="'+(formats.length+1)+'">'+body+fmt+'</numFmts>');
+  else styles=styles.replace(/(<styleSheet\b[^>]*>)/,'$1<numFmts count="1">'+fmt+'</numFmts>');
+ }
  changes.set("xl/styles.xml",encode.encode(styles));
  changes.set("xl/sharedStrings.xml",encode.encode('<?xml version="1.0" encoding="UTF-8"?><sst xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="0" uniqueCount="0"/>'));
  changes.set("docProps/core.xml",encode.encode('<?xml version="1.0" encoding="UTF-8"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/"><dc:title>PJ2608-0553 Scope of Supply USD</dc:title></cp:coreProperties>'));

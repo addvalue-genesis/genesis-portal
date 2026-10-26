@@ -354,7 +354,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
     </>:<>
      {code==="B10"?<B10KitPriceSummary0553 rows={annexLines} total={annexModel?.selectedWorkingTHB} internal={internal} onOpenSource={onOpenSource} variant="release"/>:<>
      {["C1","C2"].includes(code)&&<OtherSpareOriginalAnnex0553
-       code={code} model={optionItemizedUsd} onOpenSource={internal?onOpenSource:null}/>}
+       code={code} model={optionItemizedUsd} currency="THB" onOpenSource={internal?onOpenSource:null}/>}
      <details className="p553-spare-lifecycle-sub" open={!["C1","C2"].includes(code)}>
       <summary>{["C1","C2"].includes(code)?"Previous 10.2 MR Source / Trace (audit only, not priced option offer)":"Original MR-level Source / Trace"}</summary>
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
@@ -434,7 +434,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        Both presentations carry the same description, specification, materials, Qty and Working Sell; Customer Release remains HOLD.</p>
       {annexOverflow.length>0&&<p className="p553-native-warning">HOLD — {code}: {annexOverflow.length} source lines exceed the original 13 annex slots. No rows are discarded from the source; native export requires reconciliation.</p>}
       <div className="p553-annex-remark">Remark 注释: {code.startsWith("C")?
-       "Above Price of spare parts is valid up to Two years after Delivery date of purchase order":
+       "Conditional budgetary option only. OEM price validity, spare configuration and CIF delivery terms require confirmation before firm issue.":
        "Please include the costs for installation, commissioning, spare parts and special tools in the total price, and provide a detailed breakdown"}</div>
       <p className="p55-note">10.2 {code}: B Annex shows source-backed Working Sell (NOT direct cost or Released Offer). C Annex shows owner-selected priced Conditional Budgetary Options, not firm OEM spare cost quotations; excluded from A+B. Do not double count equipment included in A, startup spares B10, consumables B13 or two-year spares C2.</p>
      </>}

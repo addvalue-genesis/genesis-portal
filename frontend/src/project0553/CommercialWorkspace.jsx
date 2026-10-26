@@ -160,7 +160,13 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   const id=String(item?.sourceModuleId||
    (isBc?"bid.budget.working.bc."+code.toLowerCase():"bid.budget.bom.system-location-mto"));
   if(isBc){setBcTab(code);setBcDetailCode(code);}
-  if(isBc&&item?.sourceId&&["B10","B11","B13","C1","C2"].includes(code)){
+  if(code==="C2"&&item?.historicalSourceId){
+   const historic=releaseModel.budgetaryOptionAnnex.C2.find(x=>x.historicalSourceId===item.historicalSourceId);
+   const expected=historic&&"bid.budget.working.bc.c2.priced-budget-review."+historic.id.toLowerCase();
+   if(!historic||id!==expected)throw Error("C2 historical source row/module mismatch");
+   setReturnToRelease({code,sourceId:historic.id,traceId:null,sourceRowModuleId:id,
+    sourceSelectionId:historic.id,originalHistoricSourceId:historic.id,originWasExact:true});
+  }else if(isBc&&item?.sourceId&&["B10","B11","B13","C1","C2"].includes(code)){
    const released=(releaseModel.annex[code]||[]).find(x=>x.sourceId===item.sourceId);
    // A category-level navigation card is not a physical spare item source.
    // Only require strict row parity if a genuine source-row key was provided.

@@ -1,6 +1,7 @@
 import React from "react";
 import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0553";
 const m=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
+const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"Not established";
 export function SparePricedBudgetReview0553({code,onOpenSource=null,context="working"}){
  const review=selectSparePricedBudgetReview0553();
  if(!review.codes.includes(code))return null;
@@ -23,7 +24,7 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
      <td>{i+1}</td><td>{r.tag}</td><td><strong>{r.description}</strong></td>
      <td>{r.specification}<small>{r.sourceDocument}</small></td><td>{r.materials}</td>
      <td className="p553-annex-qty">{r.quantity} {r.unit}</td>
-     <td className="p553-price-cell">{m(r.unitPriceTHB)}</td>
+     <td className="p553-price-cell">{unit(r.unitPriceTHB)}</td>
      <td className="p553-price-cell">{m(r.extendedTHB)}</td>
      {code.startsWith("C")&&<td>{r.leadTime||"Not established"}</td>}
     </tr>)}
@@ -36,8 +37,8 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
       sourceRowModuleId:r.sourceRowModuleId,sourceModuleId:r.sourceRowModuleId})}>
      ↗ 10.2 Source {r.sourceId}</button>)}
   </div>}
-  <p className="p55-note">{code==="C2"?"12 historical line items, including potential B10 duplicate functions and incompatible 7/8-inch RF feeder, are NOT selected in the current C2 offer.":
-    code==="C1"?"One C1 option uses installed-equipment FCA price × 31.5 × 1.30 only for nonposting budget sensitivity. DDP increment and independently compatible OEM spare price are not established.":
+  <p className="p55-note">{code==="C2"?"These 12 historical rates support the conditional C2 budgetary offer. The proposed feeder must match the installed system; B10 identical stock must be excluded before firm issue. Original historical descriptions are retained here as evidence.":
+    code==="C1"?"The C1 conditional budgetary option uses installed-equipment FCA price × 31.5 × 1.30. It is excluded from Base A+B; independent OEM spare compatibility and CIF delivery price remain unconfirmed.":
     "Quantity and rate are from the existing 10.2 Working financial owner, still pending itemized OEM SKU and delivery evidence."}</p>
  </details>;
 }

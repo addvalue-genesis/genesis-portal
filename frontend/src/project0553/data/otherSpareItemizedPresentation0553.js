@@ -1,7 +1,7 @@
 // PJ2608-0553 — ONE itemized source for B11, B13, C1 and C2 in
 // 10.3.4 preview + the six-sheet original Excel. Existing B11/B13 amounts
 // come ONLY from selected Working→official rounded parent. C1/C2 numeric
-// values are strictly NONPOSTING comparables/historical reference options.
+// values are conditional budgetary offers, excluded from Base A+B.
 import {selectSparePricedBudgetReview0553} from "./sparePricedBudgetReview0553";
 import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 const freeze=Object.freeze;
@@ -19,8 +19,6 @@ const specification=freeze({
  ["Telecom maintenance cleaning and re-termination consumables for the commissioning service activities.","Approved cleaning media and data/RF termination consumables"],
  ["Replacement protective seals and inspection-labelling project consumables.","Protective seals, preservation labels and identification materials"]])
 });
-const c2Spec=desc=>"Two-year operating spare for "+desc.replace(/ operating spare[s]?/gi,"").replace(/ spare[s]?/gi,"")+
- "; part type and performance to match the installed equipment configuration.";
 function allocateByWeights(rows,totalUSD){
  const cents=Math.round(totalUSD*100),weights=rows.map(x=>x.extendedTHB);
  const base=weights.reduce((s,v)=>s+v,0);
@@ -69,21 +67,17 @@ export function buildOtherSpareItemizedPresentation0553(official){
       p.budgetaryOfferSourceId!==offer.sourceId||
       p.budgetaryOfferPrepared!==true||p.optionExcludedFromBase!==true)
     throw Error("0553 budgetary option offer does not reconcile to current 10.3/Official Source "+code);
-   const priceRows=allocateByWeights(source,target);
+   const priceRows=allocateByWeights(offer.rows,target);
    displayed=priceRows.map((x,i)=>{
     const c1=code==="C1";
     return freeze({id:x.id,code,item:String(i+1),tag:c1?x.tag:"Two-year operating stock / TAG by OEM",
-     description:!c1&&/7\/8-inch RF cable/i.test(x.description)?
-      "RF feeder service cable — compatible with installed feeder size":x.description,
-     specification:c1?"Complete marine RACON spare equipment assembly for X/S-band service and compatible control/power interfaces.":
-      /7\/8-inch RF cable/i.test(x.description)?"RF cable spare to match the installed feeder diameter, impedance, connector and required service length.":
-      c2Spec(x.description),
-     materials:c1?"Marine-certified RF beacon, control assembly and mounting/service accessories":
-      "OEM replacement component or compatible service material",
+     description:x.description,specification:x.specification,materials:x.materials,
      qty:x.qty,unit:x.unit,unitUSD:x.unitUSD,totalUSD:x.totalUSD,
+     unitTHB:x.unitPriceTHB,totalTHB:x.extendedTHB,
      sourceId:c1?x.sourceId:null,traceId:c1?x.traceId:null,
      sourceRowModuleId:c1?x.sourceRowModuleId:null,
      historicalSourceId:c1?null:x.id,sourceDocument:x.sourceDocument,
+     technicalSourceId:x.technicalSourceId,technicalSourceUrl:x.technicalSourceUrl,
      leadTime:x.leadTime||"To be confirmed",
      status:c1?"CONDITIONAL_C1_BUDGETARY_OFFER__INSTALLED_FCA_COMPARABLE":
       "CONDITIONAL_C2_BUDGETARY_OFFER__REV08_RATE_AND_TECHNICAL_SUBSTITUTION",

@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-26-R62";
+export const CHANGE_LOG_VERSION_0553="2026-10-26-R63";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261026-05",date:"2026-10-26",kind:"VALIDATION",tone:"neutral",
+  title:"C1/C2 priced THB/USD export parity and exact historical Source return",
+  detail:"Closes the 10.3.3 Working Excel path that still exported NOT QUOTED despite prepared C1/C2 offers. THB summary and Annex now share the same 1/12 conditional price rows as Official USD. The 12 C2 Rev08 identities remain separate from the 4 current MR financial parents, including the return banner and exact row highlight. Proposed feeder uses selected MGW UHF-4 1/2-inch 50-ohm evidence; the superseded rate remains a budget proxy and no OEM SKU/price is invented. Preserves original E7 formula with refreshed four-lot cache, merged option remark B21:J21 and four-decimal unit precision; repeated native exports reuse styles. Base A+B and all five selected price amounts are unchanged. OEM compatibility, actual stock exclusion, CIF acceptance and firm quotation gates remain open; no issue or merge.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview","bid.budget.pricing.official","bid.budget.working.bc.c2"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"26-Oct-2026 handoff execution: runtime, browser and original native XLSX regression"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261026-04",date:"2026-10-26",kind:"PRICE",tone:"caution",
   title:"Owner selects PRICED C1/C2 Conditional Budgetary Option Offer in Part C Summary / Annex / Native Excel",
