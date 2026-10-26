@@ -80,19 +80,27 @@ for(const html of [internal,external,scopeHtml,officialHtml]){
 assert(ReactText(external).includes("509,827.50"));
 assert(ReactText(officialHtml).includes("16,200.00"));
 for(const html of [internal,external,scopeHtml,officialHtml]){
- assert(html.includes("B10 — Erection / Pre-commissioning / Commissioning / Start-up Spare Part Selection"));
+ assert(html.includes("B10 — Original Annex: Spare Part Schedule"),"B10 Original Annex title must match the current customer-safe UI");
  assert.equal((html.match(/data-native-b10-source-id=/g)||[]).length,14);
  assert.equal((html.match(/data-b10-requirement-id=/g)||[]).length,14);
  assert(html.includes('data-parent-source-id="B10-PTTEP-01"'));
  if(html===officialHtml)assert(html.includes("To be quoted"));
  else assert(html.includes("16,185.00")&&html.includes("1,820.00"),
   "Unissued B10 14-line budget split from 10.2 Working missing");
- assert(!html.includes('data-native-b10-source-id="B10-COMP-NG-A-1"'));
+ assert(!html.includes('data-native-b10-source-id="B10-COMP-NG-A-1"'),
+  "Part A installed ODU cannot be offered as a physical B10 spare line");
+ assert(html.includes('data-b10-original-template="B-I"'),"B10 Preview must use original 8-column B-I geometry");
 }
 assert(!external.includes("242,460.00"),"No Part A supplier cost leaked into customer preview");
 assert(!officialHtml.includes("242,460.00"),"No supplier price in Official customer preview");
 assert(internal.includes("Engineering source / vendor evidence — INTERNAL ONLY"),
  "Internal supplier evidence must sit outside customer-facing Specification/Materials cells");
+assert(!officialHtml.includes("Engineering source / vendor evidence — INTERNAL ONLY"),
+ "Confidential source evidence must not leak to Official view");
+assert(internal.includes("BUDGETARY WORKING ALLOCATION — USD"),
+ "Nonissued allocation must be clearly distinguished from CIF OEM spare unit price");
+assert(officialHtml.includes("CIF ZHUHAI PORT — NOT ISSUED"),
+ "Official B10 column heading must not imply CIF spare rates are verified");
 assert(internal.includes("16,185.00"));
 assert(internal.includes("1,820.00"));
 assert(!officialHtml.includes("16,185.00"),"Official USD source summary may not inherit unissued allocation amounts");
