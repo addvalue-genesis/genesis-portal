@@ -28,7 +28,7 @@ const combine=parts=>{
  const n=parts.reduce((s,x)=>s+x.length,0),all=new Uint8Array(n);
  let at=0;for(const p of parts){all.set(p,at);at+=p.length;}return all;
 };
-function entriesFromZip(bytes){
+export function entriesFromZip(bytes){
  if(bytes.length<22||bytes.length>25_000_000)throw Error("Expected original .xlsx size within 25 MB");
  const v=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);
  let end=-1;
@@ -55,7 +55,7 @@ function entriesFromZip(bytes){
  }
  return out;
 }
-async function readEntry(entry){
+export async function readEntry(entry){
  if(entry.method===0)return entry.compressed;
  if(entry.method!==8)throw Error("Unsupported source compression "+entry.name);
  if(typeof DecompressionStream!=="function")throw Error("Native XLSX export needs Chromium with DecompressionStream");
@@ -98,7 +98,7 @@ function replaceCell(xml,address,value){
   "<v>"+value+"</v>";
  return xml.replace(match[0],start+contents+"</c>");
 }
-function rebuildZip(entries,changes){
+export function rebuildZip(entries,changes){
  const localParts=[],centralParts=[];let offset=0;
  for(const e of entries){
   const uncompressed=changes.get(e.name);

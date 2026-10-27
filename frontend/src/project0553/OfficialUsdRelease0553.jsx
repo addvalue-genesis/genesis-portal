@@ -4,18 +4,22 @@ import {buildNativeOfficialRelease0553} from "./nativeWorkingDraft0553";
 import template from "./data/nativeReleaseTemplate0553.json";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
+import {CustomerPriceBreakdown0553} from "./CustomerPriceBreakdown0553";
+import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
+import {buildNativePriceBreakdown0553} from "./nativePriceBreakdown0553";
 import "./releaseWorkbook0553.css";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"To be quoted";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"To be quoted";
-export function OfficialUsdRelease0553({source,onOpenSource=null}){
+export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=null,showPriceDetails,onPriceDetailsChange,breakdownView,onBreakdownViewChange}){
  const model=useMemo(()=>buildOfficialUsdRelease0553(source),[source]);
  const [sheet,setSheet]=useState("SUMMARY"),[busy,setBusy]=useState(false),[error,setError]=useState("");
- const download=async()=>{
+ const download=async(breakdown=false)=>{
   setBusy(true);setError("");
   try{
    const bytes=Uint8Array.from(atob(template.base64),c=>c.charCodeAt(0));
    const file=new File([bytes],template.sourceName,{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-   const result=await buildNativeOfficialRelease0553(file,model);
+   const result=breakdown?await buildNativePriceBreakdown0553(file,model,buildCustomerPriceBreakdown0553(source,model)):
+    await buildNativeOfficialRelease0553(file,model);
    const url=URL.createObjectURL(result.blob),link=document.createElement("a");
    link.href=url;link.download=result.filename;document.body.appendChild(link);link.click();link.remove();
    setTimeout(()=>URL.revokeObjectURL(url),15000);
@@ -48,7 +52,8 @@ export function OfficialUsdRelease0553({source,onOpenSource=null}){
  };
  return <section className="p55-panel p553-release-workbook p553-official-usd" data-component-key="bid.budget.pricing.official">
   <div className="p553-official-toolbar"><h3>10.3.4 · Official Release — English / USD</h3>
-   <button type="button" className="p553-detail-button" disabled={busy} onClick={download}>{busy?"Preparing Excel…":"Export Excel — English / USD"}</button></div>
+   <button type="button" className="p553-detail-button" disabled={busy} onClick={()=>download()}>{busy?"Preparing Excel…":"Export Excel — English / USD"}</button>
+   <button type="button" className="p553-detail-button" disabled={busy} onClick={()=>download(true)}>Export Breakdown — Draft / 10 sheets</button></div>
   {error&&<p role="alert">Export failed: {error}</p>}
   <div className="p553-release-tabs" role="tablist" aria-label="Quotation worksheets">{OFFICIAL_SHEETS_0553.map(([name,code])=><button type="button" key={code} role="tab" aria-selected={sheet===code} className={sheet===code?"is-active":""} onClick={()=>setSheet(code)}>{name}</button>)}</div>
   <div className="p553-native-sheet">
@@ -73,5 +78,6 @@ export function OfficialUsdRelease0553({source,onOpenSource=null}){
      <tr className="p553-sheet-total"><td colSpan={7}>Total (USD)</td><td className="p553-price-cell">{money([...model.b,...model.c].find(r=>r.code===sheet)?.amountUSD)}</td></tr></tbody>
    </table>}</div>
   </div>
+  <CustomerPriceBreakdown0553 source={source} official={model} onOpenSource={onOpenSource} origin="official" view={breakdownView} onViewChange={onBreakdownViewChange} focus={breakdownFocus} showPriceDetails={showPriceDetails} onPriceDetailsChange={onPriceDetailsChange}/>
  </section>;
 }
