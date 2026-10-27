@@ -1571,3 +1571,19 @@
 .p55-bid-content button:disabled { opacity:.55; cursor:default; }
 
 .p55-source-text { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 28rem; overflow: auto; font: inherit; padding: 1rem; background: #f5f8fc; color: #172b4d; }
+
+/* 0550 Official / History contexts share equations, never price snapshots. */
+.p55-context-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.p55-review-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:16px; }
+.p55-review-toolbar h2 { margin:0; flex:1; }
+.p55-review-fields,.p55-price-group { margin:12px 0; padding:14px; border:1px solid #cddbe7; border-radius:8px; background:#fff; }
+.p55-review-fields>summary,.p55-price-group>summary { cursor:pointer; font-weight:700; color:#064c66; }
+.p55-review-fields>summary span { display:inline-block; margin-left:12px; font-weight:500; }
+.p55-review-fields select[multiple] { width:100%; min-height:120px; }
+.p55-customer-form { min-width:1050px; }
+.p55-customer-form th:nth-child(3) { width:30%; }
+.p55-customer-section { background:#005570; color:white; font-weight:700; }
+.p55-customer-group,.p55-customer-total { background:#e8f0f6; font-weight:700; }
+.p55-customer-line td:nth-child(3) { padding-left:28px; }
+.p55-source-trace { margin-top:8px; font-weight:400; }
+@media(max-width:700px) { .p55-context-tabs { grid-template-columns:1fr; } .p55-price-group { padding:8px; } }

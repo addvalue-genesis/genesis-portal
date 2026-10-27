@@ -47,6 +47,33 @@ try {
  const promotion=clone();promotion.releaseAllowed=true;assert.throws(()=>validate(promotion),/Unsupported/);
  const {buildBidReviewXlsx}=require(path.join(root,"project0550/exportOriginalPriceForm.js"));
  const usd=Buffer.from(buildBidReviewXlsx(model,"USD")).toString("utf8");assert(usd.includes("3960"));assert(!usd.includes("Synthetic vendor"));assert(!usd.includes("96000"));assert(usd.includes("NOT ISSUED"));
+
+ // Official reviews use synthetic evidence only; never migrate historical prices.
+ const {blankOfficialReview,blankCustomerReview,officialLineBasisKey,customerScopeBasisKey,compareOfficialHistory,officialCustomerRows}=require(path.join(root,"project0550/data/officialPricing0550.js"));
+ const {buildOfficialCustomerXlsx}=require(path.join(root,"project0550/exportOriginalPriceForm.js"));
+ assert.equal(model.official.selectedUSD,null);assert.equal(model.official.lines[0].calculatedCustomerUSD,3960);
+ assert.equal(model.official.schedule.find(r=>r.code==="B4").customerUSD,null);
+ const reviewed=clone();reviewed.sourceIntake={schema:"genesis.0550.source-intake.v1",projectId:"PJ2608-0550",batchId:"TEST",reviewedOn:"2026-10-27",coverageNote:"SYNTHETIC ONLY",findings:[],milestones:[],sources:[{id:"RFQ-TEST",provider:"GDRIVE",title:"Synthetic current tender",documentNo:"TEST-TEL-MR-001",revision:"B1",issuedDate:"2026-10-01",receivedDate:"2026-10-01",url:"https://drive.google.com/file/d/SYNTHETIC-TEST/view",readState:"TEXT_READ",authority:"CURRENT_TENDER",content:"Synthetic terms",note:"",replaces:[]}]};
+ const evidence={sourceIds:["RFQ-TEST"],locator:"p1 clause1",reason:"Synthetic scope review",reviewer:"TEST REVIEWER",date:"2026-10-27"};
+ reviewed.lines[0].customerRowCode="B4";reviewed.lines[0].officialReview={...blankOfficialReview(),...evidence,decision:"RECALCULATE",engineeringBasis:"TEST 2 events x 3 days x 4 persons",commercialBasis:"TEST cost and sell verified"};
+ const stampLine=d=>{d.lines[0].officialReview.basisKey=officialLineBasisKey(d,d.lines[0]);};stampLine(reviewed);
+ assert.equal(derive(reviewed).official.selectedUSD,3960);assert.equal(derive(reviewed).official.baseUSD,null);
+ reviewed.customerReviews=derive(reviewed).official.schedule.map(r=>({...blankCustomerReview(r.code),...evidence,status:r.code==="B4"?"REVIEWED":"EXCLUDED"}));
+ const stampScopes=d=>d.customerReviews.forEach(r=>r.basisKey=customerScopeBasisKey(d,r.code,r));stampScopes(reviewed);
+ let off=derive(reviewed).official;assert.equal(off.baseUSD,3960);assert.equal(off.optionsUSD,null);assert.equal(off.scopeReviewed,true);assert.equal(off.releaseAllowed,false);
+ const copyReviewed=()=>JSON.parse(JSON.stringify(reviewed));
+ for(const mutate of [d=>d.lines[0].sellRate=160,d=>d.calculations[0].inputs.crew=5,d=>d.offers[0].unitCost=120,d=>d.fx.thbPerUSD=41,d=>d.sourceIntake.sources[0].revision="B2",d=>d.lines[0].customerRowCode="B3"]){const d=copyReviewed();mutate(d);const changed=derive(d).official;assert.equal(changed.selectedUSD,null);assert.equal(changed.baseUSD,null);assert.equal(changed.lines[0].reviewState,"STALE");}
+ for(const mutate of [d=>{d.sourceIntake.sources[0].readState="METADATA_ONLY";d.sourceIntake.sources[0].content="";},d=>d.sourceIntake.sources[0].authority="HISTORICAL",d=>d.sourceIntake.sources[0].revision="",d=>d.sourceIntake.sources.push({...d.sourceIntake.sources[0],id:"RFQ-NEW",revision:"B2",replaces:["RFQ-TEST"]}),d=>d.sourceIntake.sources.push({...d.sourceIntake.sources[0],id:"RFQ-CONFLICT",revision:"B2"})]){const d=copyReviewed();mutate(d);stampLine(d);stampScopes(d);assert.equal(derive(d).official.selectedUSD,null,"unqualified RFQ must block even after recording review");}
+ const removed=copyReviewed();removed.lines[0].officialReview.decision="REMOVE";stampLine(removed);assert.equal(derive(removed).official.selectedUSD,null);
+ const dupScope=copyReviewed();dupScope.customerReviews.push({...dupScope.customerReviews[0]});assert.throws(()=>validate(dupScope),/customer reviews/);
+ const wrongMap=copyReviewed();wrongMap.lines[0].customerRowCode="A1-05";stampLine(wrongMap);assert.equal(derive(wrongMap).official.unmapped.length,1);
+ const addLine=copyReviewed();addLine.lines.push({...addLine.lines[0],id:"LINE-ADDED",scopeKey:"NEW"});assert.equal(derive(addLine).official.baseUSD,null,"new child must invalidate parent completeness");
+ const fakeHistory={id:"TEST-HISTORY",customerRows:[{code:"B4",customerUsd:3000}]};assert.equal(compareOfficialHistory(off,fakeHistory).find(r=>r.code==="B4").deltaUSD,null);
+ const group=reviewed.customerReviews.find(r=>r.code==="B4");group.sameScopeAsHistory=true;group.historySnapshotId="TEST-HISTORY";stampScopes(reviewed);off=derive(reviewed).official;assert.equal(compareOfficialHistory(off,fakeHistory).find(r=>r.code==="B4").deltaUSD,960);
+ const officialFile=Buffer.from(buildOfficialCustomerXlsx(off)).toString();assert(officialFile.includes("3960"));assert(officialFile.includes("NOT ISSUED"));for(const secret of ["96000","144000","TEST REVIEWER","Synthetic vendor","TEST-QUOTE"])assert(!officialFile.includes(secret),"Customer file leaked "+secret);
+ const openFile=Buffer.from(buildOfficialCustomerXlsx(model.official)).toString();assert(!openFile.includes("3960"));assert(openFile.includes("OPEN"));assert.throws(()=>buildOfficialCustomerXlsx(model),/Official pricing/);
+ assert.equal(officialCustomerRows(off).filter(r=>r.kind==="group").length,24);
+ console.log("PASS Official: review + customer scope gates; source/quote/quantity/FX staleness; exclusions and options; comparable history; shared 8-column export; no historical fallback.");
  const {assertControlledSnapshot}=require("./assert-pj2608-0550-snapshot.cjs");assertControlledSnapshot(fs.readFileSync(path.join(root,"project0550/data/snapshots/pj2608-0550.rev07.json")));
  console.log("PASS 0550 Bidding: all E01–E18 + 4 engineering functions, manual/source inputs, unique ownership, offer/FX/unit gates, same THB/USD projection, options separation, review export and immutable Rev10; synthetic prices only.");
 }finally{require.extensions[".js"]=old;}

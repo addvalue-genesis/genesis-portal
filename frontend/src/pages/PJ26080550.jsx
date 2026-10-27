@@ -2060,14 +2060,17 @@ function Project0550Bidding({ lang = "th" }) {
   const [navigationTarget,setNavigationTarget]=useState(null);
   const [focusedSystem,setFocusedSystem]=useState("ALL");
   const {data,model}=useBidWorkspace();
-  const moduleIndex=[{id:"l3.original",title:"Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
+  const moduleIndex=[{id:"l3.original",title:"RFQ-02 Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
     ...(data?.sourceIntake?.sources||[]).map(s=>({id:"bid.documents.source."+s.id,title:s.title,tab:"documents"})),
     ...(data?.sourceIntake?.findings||[]).map(f=>({id:"bid.documents.finding."+f.id,title:f.category,tab:"documents"})),
     ...SYSTEMS.map(s=>({id:"bid.systems."+s.token,title:s.name,tab:"systems",system:s.token})),
     {id:"bid.engineering.equations",title:"Equation Execution / SAT persons days",tab:"engineering"},
     {id:"bid.vendor.master",title:"Vendor master",tab:"documents"},{id:"bid.vendor.offers",title:"Vendor offers / rates",tab:"documents"},
     {id:"bid.budget.working.editor",title:"Working source editor",tab:"budget"},{id:"bid.budget.working.lines",title:"Working price lines",tab:"budget"},
-    {id:"bid.budget.budget-thb",title:"Budget THB",tab:"budget"},{id:"bid.budget.release",title:"Release USD",tab:"budget"},
+    {id:"bid.budget.official",title:"OFF-03 Official Tender Working",tab:"budget"},
+    ...["source-impact","customer-scope","history-comparison"].map(id=>({id:"bid.budget.official."+id,title:"OFF-03 "+id,tab:"budget"})),
+    ...(model?.official?.schedule||[]).flatMap(r=>[{id:r.sourceModuleId,title:"OFF-03 "+r.code+" scope review",tab:"budget"},{id:r.releaseModuleId,title:"REL-04 "+r.code+" customer row",tab:"budget"}]),
+    {id:"bid.budget.budget-thb",title:"Budget THB",tab:"budget"},{id:"bid.budget.release",title:"REL-04 Release Preview USD",tab:"budget"},
     {id:"bid.schematic.editor",title:"Schematic nodes / interfaces",tab:"schematic"},
     ...(model?.lines||[]).flatMap(r=>[{id:r.sourceModuleId,title:r.description+" / Source",tab:"budget"},{id:r.releaseModuleId,title:r.description+" / Release",tab:"budget"}]),
     ...(data?.calculations||[]).map(c=>({id:"bid.engineering.calculation."+c.id,title:c.title,tab:"engineering"})),
@@ -2076,7 +2079,7 @@ function Project0550Bidding({ lang = "th" }) {
     ...(data?.nodes||[]).map(n=>({id:"bid.schematic.node."+n.id,title:n.label,tab:"schematic"})),
     ...(data?.edges||[]).map(e=>({id:"bid.schematic.edge."+e.id,title:e.label,tab:"schematic"})),
     ...MODULE_REGISTRY.map(m=>({id:m.id,title:m.name,tab:"registry"})),
-    ...["fx","scope-gates","history"].map(id=>({id:"bid.budget."+id,title:id,tab:"budget"})),
+    ...["fx","scope-gates","history"].map(id=>({id:"bid.budget."+id,title:id==="history"?"HIS-01 Budget History":id,tab:"budget"})),
     ...["storage","modules"].map(id=>({id:"bid.registry."+id,title:id,tab:"registry"})),
     {id:"bid.schematic.canvas",title:"Overall / Schematic per system",tab:"schematic"},
     {id:"bid.vendor.controlled-sources",title:"Controlled vendor sources",tab:"documents"},
@@ -2136,7 +2139,7 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "engineering" ? <><EquationWorkbench/><EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /></> : null}
           {activeTab === "execution" ? <><EquationWorkbench/><ExecutionView /></> : null}
           {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
-          {activeTab === "budget" ? <BidCommercialWorkspace navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
+          {activeTab === "budget" ? <BidCommercialWorkspace onOpenSource={id=>jump({id,tab:"documents",area:"A"})} navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
           {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
           {activeTab === "documents" ? <><details className="p55-panel"><summary>Project evidence / original references</summary><DocumentsView navigationTarget={navigationTarget}/></details><VendorWorkspace/></> : null}
           {activeTab === "registry" ? <BidDataControls/> : null}

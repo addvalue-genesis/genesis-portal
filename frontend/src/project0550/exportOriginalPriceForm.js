@@ -1,3 +1,4 @@
+import {officialCustomerRows,CUSTOMER_FORM_0550} from "./data/officialPricing0550";
 function esc(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -239,12 +240,27 @@ export function buildBidReviewXlsx(model,currency) {
   rows.push(["","","Part C — optional, excluded from Base A+B","","","",currency==="USD"?model.optionsUSD:model.optionsTHB]);
   rows.push(["","","Part C is optional; no automatic customer issue or financial approval."]);
   const xml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols><col min="1" max="2" width="20" customWidth="1"/><col min="3" max="3" width="58" customWidth="1"/><col min="4" max="8" width="22" customWidth="1"/></cols><sheetData>${rows.map((r,i)=>`<row r="${i+1}">${r.map((v,j)=>cellXml(v,i+1,j,i<2?1:i===2?2:typeof v==="number"?4:0)).join("")}</row>`).join("")}</sheetData><pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/></worksheet>`;
+  return packReviewSheet(xml,`Bid Review ${currency}`);
+}
+function packReviewSheet(xml,sheetName){
   return zipStore({
     "[Content_Types].xml":`<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`,
     "_rels/.rels":`<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`,
-    "xl/workbook.xml":`<?xml version="1.0"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Bid Review ${currency}" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    "xl/workbook.xml":`<?xml version="1.0"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="${esc(sheetName)}" sheetId="1" r:id="rId1"/></sheets></workbook>`,
     "xl/_rels/workbook.xml.rels":`<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
     "xl/styles.xml":stylesXml(),"xl/worksheets/sheet1.xml":xml
   });
 }
 export function exportBidReviewXlsx(model,currency){const bytes=buildBidReviewXlsx(model,currency),url=URL.createObjectURL(new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));const a=document.createElement("a");a.href=url;a.download=`PJ2608-0550_BID_${currency}_REVIEW_R${model.revision}.xlsx`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+
+export function buildOfficialCustomerXlsx(official){
+ if(!Array.isArray(official?.schedule))throw Error("Official pricing projection required");
+ const rows=[{kind:"title",cells:["PJ2608-0550 · OFFICIAL TENDER WORKING PREVIEW — NOT ISSUED"]},{kind:"title",cells:[`REL-04 | Working R${official.revision} | USD | HOLD | OPEN = not reviewed; detail rows included in group totals`]}, {kind:"header",cells:CUSTOMER_FORM_0550.columns},...officialCustomerRows(official)];
+ const merges=rows.flatMap((r,i)=>r.kind==="title"?[`A${i+1}:H${i+1}`]:[]);
+ const xml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="3" topLeftCell="A4" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="1" width="9" customWidth="1"/><col min="2" max="2" width="20" customWidth="1"/><col min="3" max="3" width="58" customWidth="1"/><col min="4" max="5" width="12" customWidth="1"/><col min="6" max="7" width="20" customWidth="1"/><col min="8" max="8" width="36" customWidth="1"/></cols><sheetData>${rows.map((r,i)=>`<row r="${i+1}" ht="42" customHeight="1">${r.cells.map((v,j)=>cellXml(v,i+1,j,typeof v==="number"?4:["title","header","section","group","total"].includes(r.kind)?1:0)).join("")}</row>`).join("")}</sheetData><mergeCells count="${merges.length}">${merges.map(ref=>`<mergeCell ref="${ref}"/>`).join("")}</mergeCells><pageMargins left="0.25" right="0.25" top="0.5" bottom="0.5" header="0.2" footer="0.2"/><pageSetup paperSize="9" orientation="landscape"/></worksheet>`;
+ return packReviewSheet(xml,"Official Working USD");
+}
+export function exportOfficialCustomerXlsx(official){
+ const bytes=buildOfficialCustomerXlsx(official),url=URL.createObjectURL(new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+ const a=document.createElement("a");a.href=url;a.download=`PJ2608-0550_REL-04_OFFICIAL_DRAFT_R${official.revision}.xlsx`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
