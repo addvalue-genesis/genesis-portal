@@ -45,6 +45,19 @@ try {
  const option=clone();option.lines.push({...line,id:"LINE-OPTION",scopeKey:"OPTION",wbs:"C2"});assert.equal(derive(option).baseTHB,158400);assert.equal(derive(option).optionsTHB,158400);
  const bad=clone();bad.projectId="PJ2608-0553";assert.throws(()=>validate(bad),/project/);const badDate=clone();badDate.fx.date="2026-02-30";assert.throws(()=>validate(badDate),/date/);
  const promotion=clone();promotion.releaseAllowed=true;assert.throws(()=>validate(promotion),/Unsupported/);
+ // Synthetic, unrelated policy percentages exercise same-base equipment allocation.
+ const {readEquipmentPolicyFile}=require(path.join(root,"project0550/data/bidWorkspaceModel.js"));
+ const equipment=clone();equipment.equipmentPolicy={method:"SAME_COST_BASE",primePct:17,feePct:4,reservePct:3,source:"SYNTHETIC TEST",date:"2026-10-27"};
+ equipment.lines[0]={...line,wbs:"A",pricingKind:"EQUIPMENT",costBasis:"ESTIMATE",calculationId:"",quantity:2,offerId:"",manualCost:1000,currency:"THB",unit:"U"};
+ let er=derive(equipment).lines[0];assert.equal(er.customerTHB,2480);assert.equal(er.workingSellTHB,2140);assert.deepEqual(er.equipmentBreakdown,{primeTHB:340,feeTHB:80,reserveTHB:60});
+ assert.equal(er.customerUSD,62);assert.notEqual(er.customerTHB,2503.8,"Must not compound prime on fee and reserve");
+ equipment.lines[0].costBasis="ACTUAL";equipment.lines[0].manualCost=1500;assert.equal(derive(equipment).selectedTHB,3720,"Actual replaces estimate, never adds it");
+ equipment.lines.push({...line,id:"SERVICE",scopeKey:"SERVICE"});assert.equal(derive(equipment).lines[1].customerTHB,158400,"Service method unchanged");
+ const mixedBackup=JSON.parse(JSON.stringify(equipment));assert.equal(derive(mixedBackup).selectedTHB,162120,"Policy and basis survive backup roundtrip");
+ equipment.lines[0].costBasis="";assert.equal(derive(equipment).lines[0].customerTHB,null);equipment.lines[0].costBasis="ESTIMATE";
+ equipment.equipmentPolicy.reservePct=null;assert.throws(()=>validate(equipment),/percentage/);equipment.equipmentPolicy.reservePct=3;
+ const policyFile={schema:"genesis.0550.equipment-policy.v1",projectId:"PJ2608-0550",policy:equipment.equipmentPolicy};assert.deepEqual(readEquipmentPolicyFile(policyFile),equipment.equipmentPolicy);assert.throws(()=>readEquipmentPolicyFile({...policyFile,projectId:"PJ2608-0553"}),/project/);
+ equipment.equipmentPolicy.date="2026-02-30";assert.throws(()=>validate(equipment),/date/);delete equipment.equipmentPolicy;assert.equal(derive(equipment).lines[0].customerTHB,null,"Old workspace loads but equipment stays OPEN until policy is supplied");
  const {buildBidReviewXlsx}=require(path.join(root,"project0550/exportOriginalPriceForm.js"));
  const usd=Buffer.from(buildBidReviewXlsx(model,"USD")).toString("utf8");assert(usd.includes("3960"));assert(!usd.includes("Synthetic vendor"));assert(!usd.includes("96000"));assert(usd.includes("NOT ISSUED"));
  const {assertControlledSnapshot}=require("./assert-pj2608-0550-snapshot.cjs");assertControlledSnapshot(fs.readFileSync(path.join(root,"project0550/data/snapshots/pj2608-0550.rev07.json")));

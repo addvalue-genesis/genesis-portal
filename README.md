@@ -1,3 +1,9 @@
+## PJ2608-0550 working version
+
+Use **0550-20261027.1** on `fix/pj2608-0550-canonical-workspace-20261027`, based on the existing bidding workflow. From this checkout, double-click `START-0550.cmd` on Windows, or run `npm ci` then `npm run start:0550` in `frontend`. The only recommended local entry is `http://localhost:3001/projects/pj2608-0550`. Stop an older server on port 3001 before launching; do not move to another port to resolve a conflict.
+
+The page header must show **WORKSPACE 0550-20261027.1**. Export the current browser workspace before updating or moving between ports. Private equipment policy rates are configured/imported in Working Preview; no project percentages are published in the source. See [the current handoff](docs/handoff/pj2608-0550/20261027_CANONICAL_WORKSPACE.md).
+
 # Addvalue GENESIS Portal
 
 Official Development Repository for Add Value System Co., Ltd.

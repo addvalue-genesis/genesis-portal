@@ -4,7 +4,7 @@ export const BID_TABS=[
  {id:"engineering",label:"02 First Principles",aria:"First Principles",moduleId:"MOD-SERVICE-EQUATION"},
  {id:"architecture",label:"03 Architecture",aria:"Architecture",moduleId:"MOD-PROJECT-SHELL"},
  {id:"systems",label:"04 Systems / Requirements",aria:"19 Systems",moduleId:"MOD-REQ-COMPLETENESS"},
- {id:"schematic",label:"05.3 Schematic",aria:"Schematic",moduleId:"MOD-KNOWLEDGE-BINDING"},
+ {id:"schematic",label:"05 Schematic",aria:"Schematic",moduleId:"MOD-KNOWLEDGE-BINDING"},
  {id:"execution",label:"06 Execution / Resources",aria:"Execution",moduleId:"MOD-EXECUTION"},
  {id:"documents",label:"07 Vendors / Evidence",aria:"Vendors and Evidence",moduleId:"MOD-COMMERCIAL-SOURCE"},
  {id:"risk",label:"08 Risk / Gates",aria:"Risk & Controls",moduleId:"MOD-RISK"},
