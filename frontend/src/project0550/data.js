@@ -50,3 +50,5 @@ export { MYANMAR_REGULATORY_KNOWLEDGE } from "../knowledge-kernels/regulatoryMya
 
 export { PROJECT_0550_FACTS } from "./projectFacts";
 export { validateSourceIntake, applySourceIntake, deriveSourceIntake, deriveDocumentRevisionRegister, safeSourceUrl } from "./data/sourceIntakeModel";
+
+export { PROJECT_0550_PRESENTATION } from "./data/referenceRepository";

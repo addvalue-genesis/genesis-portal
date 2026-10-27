@@ -18,6 +18,7 @@ import {
   OPTIONS,
   PROJECT_0550,
   PROJECT_0550_FACTS,
+  PROJECT_0550_PRESENTATION,
   REQUIREMENT_COMPLETENESS,
   RISK_SCENARIOS,
   SERVICE_EQUATION_SOURCE,
@@ -127,7 +128,7 @@ function B1CostLineageTable() {
 
   return (
     <div className="p55-derivation-block">
-      <div className="p55-eyebrow" style={{ marginBottom: 8 }}>B1 — 24M control total reconciliation</div>
+      <div className="p55-eyebrow" style={{ marginBottom: 8 }}>B1 — {compactMoney(lineage.currentAllowanceThb, "THB")} control total reconciliation</div>
 
       <div className="p55-table-wrap">
         <table className="p55-table p55-table--compact p55-table--derivation">
@@ -135,7 +136,7 @@ function B1CostLineageTable() {
             <tr>
               <th>Layer</th>
               <th className="is-number">MH</th>
-              <th className="is-number">Equivalent person-days @ 8h</th>
+              <th className="is-number">Equivalent person-days @ {PROJECT_0550_PRESENTATION.b1EquivalentHoursPerDay}h</th>
               <th className="is-number">THB</th>
               <th>Evidence state</th>
             </tr>
@@ -232,7 +233,7 @@ function B1CostLineageTable() {
                 <th>System / Token</th>
                 <th className="is-number">Underlying rows</th>
                 <th className="is-number">MH</th>
-                <th className="is-number">Eq. person-days @ 8h</th>
+                <th className="is-number">Eq. person-days @ {PROJECT_0550_PRESENTATION.b1EquivalentHoursPerDay}h</th>
                 <th className="is-number">Model base THB</th>
                 <th className="is-number">Internal cost THB</th>
                 <th>People / crew interpretation</th>
@@ -375,18 +376,18 @@ function Overview() {
         />
         <MetricCard
           label="Budgetary base"
-          value={compactMoney(submission?.baseBeforeOptionsUsd || 0, "USD")}
+          value={compactMoney(submission?.baseBeforeOptionsUsd, "USD")}
           sub="Part A + customer B1-B6 · issued 08-Oct-2026"
           tone="good"
         />
         <MetricCard
           label="C2 + C3 options"
-          value={compactMoney(submission?.optionsC2C3Usd || 0, "USD")}
+          value={compactMoney(submission?.optionsC2C3Usd, "USD")}
           sub="C1 physical installation excluded"
         />
         <MetricCard
           label="Management envelope"
-          value={compactMoney(submission?.managementEnvelopeUsd || 0, "USD")}
+          value={compactMoney(submission?.managementEnvelopeUsd, "USD")}
           sub="Budgetary reference only · do not back-solve"
           tone="warn"
         />
@@ -1115,8 +1116,8 @@ function LegacyBudgetView() {
   const budget = BUDGETARY_ESTIMATE;
   const submission = BUDGETARY_SUBMISSION;
 
-  const directTotal = budget?.directDeliveryBasisThb || 0;
-  const calculated = budget?.calculatedCustomerBeforeRoundingThb || 0;
+  const directTotal = budget?.directDeliveryBasisThb;
+  const calculated = budget?.calculatedCustomerBeforeRoundingThb;
 
   const submissionBaseRows = (submission?.customerRows || []).filter(
     (row) => row.code.startsWith("A1-") || ["B1","B2","B3","B4","B5","B6"].includes(row.code)
@@ -1169,7 +1170,7 @@ function LegacyBudgetView() {
             <MetricCard label="Part C direct" value={compactMoney(budget.partCDirectThb, "THB")} sub="C2 + C3; C1 excluded" />
             <MetricCard label="Direct delivery basis" value={compactMoney(directTotal, "THB")} sub="Internal working basis" />
             <MetricCard label="Commercialized working" value={compactMoney(calculated, "THB")} sub="Before management envelope / quote replacement" />
-            <MetricCard label="FX working" value="33.6335" sub="THB/USD used for 08-Oct snapshot; refresh for next issue" />
+            <MetricCard label="FX working" value={budget.fxThbUsdWorking ?? "—"} sub="THB/USD used for 08-Oct snapshot; refresh for next issue" />
           </div>
 
           <section className="p55-panel">
@@ -1721,7 +1722,7 @@ function LegacyBudgetView() {
                         <td><strong>{row.code}</strong></td>
                         <td>{row.description}</td>
                         <td className="is-number">{row.directThb === null ? "—" : money(row.directThb, "THB")}</td>
-                        <td className="is-number">{row.code === "C1" ? "EXCLUDED" : money(issued?.customerUsd || 0, "USD")}</td>
+                        <td className="is-number">{row.code === "C1" ? "EXCLUDED" : money(issued?.customerUsd, "USD")}</td>
                         <td>
                           {row.code === "C1"
                             ? "CNEEC optional physical installation boundary; reopen only by controlled scope change."
@@ -1757,7 +1758,7 @@ function LegacyBudgetView() {
             />
             <MetricCard label="PAGA selected" value={money(paga.knownSelectedSubtotalEur, "EUR")} sub={paga.vendor + " · " + paga.offer} tone="good" />
             <MetricCard label="Project Total" value="HOLD" sub="Final release requires controlled closure / authorization" tone="warn" />
-            <MetricCard label="Emergency snapshot" value={money(submission?.baseBeforeOptionsUsd || 0, "USD")} sub="Budgetary only — not RELEASED_SELL" />
+            <MetricCard label="Emergency snapshot" value={money(submission?.baseBeforeOptionsUsd, "USD")} sub="Budgetary only — not RELEASED_SELL" />
           </div>
 
           <div className="p55-filterbar p55-filterbar--simple">

@@ -103,7 +103,7 @@ function sheetRows(submission) {
   const aCodes = Array.from({ length: 15 }, (_, i) => "A1-" + String(i + 1).padStart(2, "0"));
   aCodes.forEach((code) => {
     const r = byCode[code] || {};
-    rows.push([r.sn || "", "", r.description || code, r.qty || 1, r.unit || "Lot", r.customerUsd ?? "", r.customerUsd ?? "", r.remark || ""]);
+    rows.push([r.sn || "", "", r.description || code, r.qty ?? "", r.unit ?? "", r.customerUsd ?? "", r.customerUsd ?? "", r.remark || ""]);
     rows.push(blank());
     rows.push(blank());
   });
@@ -112,17 +112,17 @@ function sheetRows(submission) {
   rows.push(["Part B: OTHERS\nB部分：其它", "", "", "", "", "", "", ""]);
   ["B1","B2","B3","B4","B5","B6"].forEach((code) => {
     const r = byCode[code] || {};
-    rows.push([code, "", r.description || code, r.qty || 1, r.unit || "Lot", r.customerUsd ?? "", r.customerUsd ?? "", r.remark || ""]);
+    rows.push([code, "", r.description || code, r.qty ?? "", r.unit ?? "", r.customerUsd ?? "", r.customerUsd ?? "", r.remark || ""]);
     rows.push(blank());
   });
 
-  rows.push(["Total 合计", "", "", "", "", "", submission.baseBeforeOptionsUsd || "", "Total excludes Part C optional items and VAT."]);
+  rows.push(["Total 合计", "", "", "", "", "", submission.baseBeforeOptionsUsd ?? "", "Total excludes Part C optional items and VAT."]);
   rows.push(["Prices shall include for all the scope of supply and work as specified in the Material Requisition, but not limited to above items.\n价格应包括技术请购单中所要求的供货范围和工作范围，并不仅限于上面这些项。", "", "", "", "", "", "", ""]);
   rows.push(["Part C: OPTIONS\n选项", "", "", "", "", "", "", ""]);
 
   ["C1","C2","C3"].forEach((code) => {
     const r = byCode[code] || {};
-    rows.push([code, "", r.description || code, r.qty || 1, r.unit || "Lot", r.customerUsd ?? "", r.customerUsd ?? "", r.remark || ""]);
+    rows.push([code, "", r.description || code, r.qty ?? "", r.unit ?? "", r.customerUsd ?? "", r.customerUsd ?? "", r.remark || ""]);
   });
 
   rows.push(["", "", "Remark: Delivery term shall follow program logistic proposal and fixed by each cluster per equipment cargo size.", "", "", "", "", ""]);
@@ -223,7 +223,7 @@ export function exportOriginalPriceFormXlsx(submission) {
 }
 
 // New bidding schedule uses the SAME derived selected rows as Budget/Release.
-// Separate review artifact; original issued-workbook code above stays byte-identical.
+// Separate review artifact; issued-workbook bytes are regression-checked against the frozen output.
 export function buildBidReviewXlsx(model,currency) {
   if(!["THB","USD"].includes(currency))throw Error("Unsupported review currency");
   const key=currency==="USD"?"customerUSD":"customerTHB";
