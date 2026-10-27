@@ -4,8 +4,11 @@ import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
 import "./customerPriceBreakdown0553.css";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 
-export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin="released",focus=null}){
+export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin="released",focus=null,showPriceDetails,onPriceDetailsChange}){
  const model=useMemo(()=>buildCustomerPriceBreakdown0553(source,official),[source,official]);
+ const [localPrices,setLocalPrices]=useState(false);
+ const showPrices=showPriceDetails??localPrices;
+ const setPrices=onPriceDetailsChange||setLocalPrices;
  const root=useRef(null);
  useEffect(()=>{
   if(!focus?.key)return;
@@ -16,6 +19,12 @@ export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin=
  },[focus]);
  return <section className="p553-breakdown" ref={root} aria-label="Price breakdown review">
   <h3>Part A · MR / Location / Item price breakdown</h3>
+  <div className="p553-breakdown-display" role="group" aria-label="Part A price display">
+   <span>การแสดงราคาย่อย Part A</span>
+   <button type="button" aria-pressed={!showPrices} onClick={()=>setPrices(false)}>ซ่อนราคาย่อย</button>
+   <button type="button" aria-pressed={showPrices} onClick={()=>setPrices(true)}>แสดงราคาย่อย</button>
+  </div>
+  <p className="p55-note">{showPrices?"แสดงราคาต่อหน่วยและราคารวมรายอุปกรณ์":"แสดงรายการและจำนวน พร้อมยอดรวมแต่ละระบบ โดยซ่อนราคาย่อย"} · ตัวเลือกนี้ใช้กับหน้าจอเท่านั้น รูปแบบ Export คงเดิม</p>
   <p className="p55-note">Draft allocation from the selected Release prices. Submitted proposal comparison: <strong>NOT VERIFIED</strong>.
    Existing A1–A4 totals are retained. Package contents carry no second charge. Unpriced rows remain visible.</p>
   <div className="p553-breakdown-checks"><strong>{model.reconciled?"A1–A4 totals match":"Price reconciliation required"}</strong>
@@ -26,14 +35,14 @@ export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin=
     <span>Difference: {money(g.varianceUSD)}</span></summary>
    {(!g.sourceComplete||g.quantityPendingCount>0)&&<p className="p55-note">Source completeness requires review{g.quantityPendingCount?"; quantity/unit missing on "+g.quantityPendingCount+" priced rows":""}. A matching subtotal does not close technical or price gaps.</p>}
    <div className="p553-sheet-scroll"><table className="p55-table p55-table--compact"><thead><tr>
-    {["Item / TAG","Location","Description","Qty / Unit","Unit USD","Amount USD","State / Source"].map(h=><th key={h}>{h}</th>)}
+    {["Item / TAG","Location","Description","Qty / Unit",...(showPrices?["Unit USD","Amount USD"]:[]),"State / Source"].map(h=><th key={h}>{h}</th>)}
    </tr></thead><tbody>{g.rows.map((r,i)=><tr key={r.key} tabIndex={-1} data-breakdown-key={r.key}
      className={focus?.key===r.key?"p553-release-row-focus":""}>
     <td>{g.code}.{i+1}<small>{r.tag}</small></td><td>{r.site}</td><td>{r.description}</td>
-    <td>{r.qty??"TBC"} {r.unit}</td><td>{r.unitUSD===null?"—":r.unitUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:8})}</td>
-    <td>{money(r.amountUSD)}</td><td><strong>{r.status}</strong>{r.quantityPending&&<small>Quantity / unit review</small>}
+    <td>{r.qty??"TBC"} {r.unit}</td>{showPrices&&<><td className="p553-breakdown-price" data-price-detail="unit">{r.unitUSD===null?"—":r.unitUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:8})}</td>
+    <td className="p553-breakdown-price" data-price-detail="amount">{money(r.amountUSD)}</td></>}<td><strong>{r.status}</strong>{r.quantityPending&&<small>Quantity / unit review</small>}
      {onOpenSource&&<button type="button" onClick={()=>onOpenSource({...r,breakdownKey:r.key,breakdownOrigin:origin})}>↗ Source</button>}</td>
-   </tr>)}<tr className="p553-sheet-total"><td colSpan={5}>Priced subtotal · {g.mr}</td><td>{money(g.totalUSD)}</td><td>Difference {money(g.varianceUSD)}</td></tr></tbody></table></div>
+   </tr>)}<tr className="p553-sheet-total"><td colSpan={showPrices?5:4}>Priced subtotal · {g.mr}</td><td className="p553-breakdown-price">USD {money(g.totalUSD)}</td>{showPrices&&<td>Difference {money(g.varianceUSD)}</td>}</tr></tbody></table></div>
   </details>)}
  </section>;
 }

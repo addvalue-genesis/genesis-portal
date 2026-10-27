@@ -13,6 +13,10 @@ The project-hub commit `6b3b7448` has an older 0553 Release model without the la
 - Existing `bid.budget.pricing.official` / 10.3.4: breakdown review and **Export Breakdown — Draft / 10 sheets**.
 - Existing module IDs, quantities, FX policy, margins, financial owners and six original export sheets are retained.
 
+### Display choice (user clarification)
+
+Part A breakdown now has **ซ่อนราคาย่อย / แสดงราคาย่อย** controls in both Release views. The default hides equipment unit and line prices while keeping all items, quantities, statuses, MR totals and A+B visible. Showing prices restores those two columns. The selected display mode survives Source roundtrips and switching between Release and Official within the workspace. This is a screen preference only; the existing Excel buttons and exported workbook contents are unchanged. It is not an access-control or redaction mechanism for the internal source workspace.
+
 ## Price and trace contract
 
 The canonical System × Location × MTO projection remains the source. The breakdown contains all 141 rows: 83 priced, 23 included without another charge, and 35 not priced. It is not a new price ledger.

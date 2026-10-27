@@ -36,6 +36,10 @@ const {renderToStaticMarkup}=require('react-dom/server'),React=require('react');
 const {CustomerPriceBreakdown0553}=require('../src/project0553/CustomerPriceBreakdown0553');
 const html=renderToStaticMarkup(React.createElement(CustomerPriceBreakdown0553,{source,official}));
 assert(html.includes('NOT VERIFIED'));assert.equal((html.match(/data-breakdown-key=/g)||[]).length,model.groups.reduce((s,g)=>s+g.rows.length,0));
+assert(!html.includes('data-price-detail='),'Default hides detail price cells from the DOM');
+const detailedHtml=renderToStaticMarkup(React.createElement(CustomerPriceBreakdown0553,{source,official,showPriceDetails:true}));
+assert.equal((detailedHtml.match(/data-price-detail=/g)||[]).length,282);
+for(const g of model.groups)assert(html.includes(g.parentUSD.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})),'Hidden-price mode retains system totals');
 assert.equal(JSON.stringify(source),before);
 (async()=>{
  const template=require('../src/project0553/data/nativeReleaseTemplate0553.json'),bytes=Buffer.from(template.base64,'base64');

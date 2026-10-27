@@ -148,6 +148,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const [returnToRelease,setReturnToRelease]=useState(null);
  const [breakdownSelection,setBreakdownSelection]=useState(null);
  const [breakdownFocus,setBreakdownFocus]=useState(null);
+ const [breakdownPrices,setBreakdownPrices]=useState(false);
  const openBreakdownFromSource=key=>{
   if(!buildCustomerPriceBreakdown0553(releaseModel).groups.some(g=>g.rows.some(r=>r.key===key)))
    throw Error("Source item is not mapped to a Breakdown row");
@@ -279,7 +280,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  if(pricingStage==="official")return <div className="p55-stack">
   <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
-  <OfficialUsdRelease0553 source={releaseModel} onOpenSource={openReleaseSource} breakdownFocus={breakdownFocus}/>
+  <OfficialUsdRelease0553 source={releaseModel} onOpenSource={openReleaseSource} breakdownFocus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>
  </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");
@@ -415,7 +416,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    </p>
    {recipient==="INTERNAL"&&<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>}
    {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
-   {recipient==="INTERNAL"&&<CustomerPriceBreakdown0553 source={releaseModel} onOpenSource={openReleaseSource} focus={breakdownFocus}/>}
+   {recipient==="INTERNAL"&&<CustomerPriceBreakdown0553 source={releaseModel} onOpenSource={openReleaseSource} focus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>}
    {recipient==="INTERNAL"&&<SpareLifecycleControl0553 model={spareLifecycle} view="release"
      onOpenSource={openReleaseSource} onOpenReleaseRow={openReleaseAnnexRow}/>} 
    <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} focusAnnexTarget={releaseAnnexTarget} title="10.3 — Released Customer Output (Read-only staging)"/>

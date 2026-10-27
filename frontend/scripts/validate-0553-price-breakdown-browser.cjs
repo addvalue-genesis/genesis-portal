@@ -17,6 +17,10 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   const review=official.getByRole('region',{name:'Price breakdown review'});
   const keys=await review.locator('[data-breakdown-key]').evaluateAll(rs=>rs.map(r=>r.dataset.breakdownKey));
   assert.equal(keys.length,141);assert.equal(new Set(keys).size,141);
+  assert.equal(await review.locator('[data-price-detail]').count(),0);
+  const systemTotals=await review.locator('summary').allTextContents();
+  await review.getByRole('button',{name:'แสดงราคาย่อย',exact:true}).click();
+  assert.equal(await review.locator('[data-price-detail]').count(),282);
   for(const [index,key] of keys.entries()){
    if(process.env.QA_SAMPLE&&!new Set([0,54,55,56,57,87,88,89,90,119,120,121,140]).has(index))continue;
    const row=review.locator('[data-breakdown-key]').nth(index);
@@ -30,12 +34,18 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    if((index+1)%25===0)console.log('Verified '+(index+1)+' exact roundtrips');
   }
   assert.deepEqual(await official.locator('[data-quote-code]').allTextContents(),summaryBefore);
+  assert.equal(await review.getByRole('button',{name:'แสดงราคาย่อย',exact:true}).getAttribute('aria-pressed'),'true','Display preference survives Source roundtrips');
+  await review.getByRole('button',{name:'ซ่อนราคาย่อย',exact:true}).click();
+  assert.equal(await review.locator('[data-price-detail]').count(),0);
+  assert.deepEqual(await review.locator('summary').allTextContents(),systemTotals);
+  assert.equal(await review.locator('[data-breakdown-key]').count(),141);
   const download=page.waitForEvent('download');await official.getByRole('button',{name:'Export Breakdown — Draft / 10 sheets',exact:true}).click();
   const downloaded=await download;assert(downloaded.suggestedFilename().endsWith('DRAFT_NOT_ISSUED.xlsx'));
   const output=process.env.QA_OUTPUT_DIR;if(output){fs.mkdirSync(output,{recursive:true});await downloaded.saveAs(path.join(output,'breakdown-browser.xlsx'));}
   // Also verify the internal Release view's return destination, not only Official.
   await page.getByRole('button',{name:/10\.3\.3 · Release/}).click();
   const internal=page.getByRole('region',{name:'Price breakdown review'});
+  assert.equal(await internal.locator('[data-price-detail]').count(),0,'Display preference shared across Release views');
   await internal.locator('details').first().evaluate(d=>d.open=true);
   const first=internal.locator('[data-breakdown-key]').first(),key=await first.getAttribute('data-breakdown-key');
   await first.getByRole('button',{name:'↗ Source',exact:true}).click();
