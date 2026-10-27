@@ -1,5 +1,7 @@
 # PJ2608-0550 Living Handoff / Current Checkpoint
 
+**Current source inventory checkpoint:** [2026-10-27 private GDrive/Gmail source intake](20261027_SOURCE_INTAKE.md). Use the existing controlled-source-inventory module; reviewed private data is imported separately from public code. This does not change frozen pricing or authorize release.
+
 **Latest software checkpoint:** [2026-10-27 active Bidding workflow](20261027_BIDDING_WORKFLOW.md). The baseline narrative below remains historical authority for its snapshot; current bid preparation now has saved inputs and a Working → THB → USD workflow.
 
 **Project:** PJ2608-0550 — SAMTEL / PTTEPI Myanmar ASK Telecom [MMC24-5002]  

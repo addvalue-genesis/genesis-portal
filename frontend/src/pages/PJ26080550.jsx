@@ -22,7 +22,6 @@ import {
   RISK_SCENARIOS,
   SERVICE_EQUATION_SOURCE,
   SERVICE_LINE_DERIVATION,
-  SOURCE_REGISTER,
   SYSTEM_GROUPS,
   SYSTEMS,
 } from "../project0550/data";
@@ -37,6 +36,7 @@ import {VendorWorkspace} from "../project0550/VendorWorkspace";
 import {SchematicWorkspace} from "../project0550/SchematicWorkspace";
 import {BidDataControls,BidSaveStatus} from "../project0550/BidDataControls";
 import {BID_TABS} from "../project0550/biddingNavigation";
+import {ControlledSourceInventory, SourceCommunications, SourceFindings} from "../project0550/ControlledSourceInventory";
 import {SECTION_IDENTITY} from "../project0550/sectionIdentity";
 import "../project0550/project0550.css";
 
@@ -1871,11 +1871,13 @@ function RiskView() {
   );
 }
 
-function DocumentsView() {
+function DocumentsView({ navigationTarget }) {
   const facts = PROJECT_0550_FACTS;
 
   return (
     <div className="p55-stack">
+      <ControlledSourceInventory navigationTarget={navigationTarget}/>
+      <details className="p55-panel"><summary>Historical project facts / reference baseline</summary>
       <SectionTitle
         eyebrow="Evidence control"
         title="Project facts, source register & traceability"
@@ -2043,24 +2045,8 @@ function DocumentsView() {
         </div>
       </section>
 
-      <section className="p55-panel">
-        <SectionTitle eyebrow="Source register" title="Controlled source inventory" />
-        <div className="p55-table-wrap">
-          <table className="p55-table p55-table--compact">
-            <thead><tr><th>ID</th><th>Source</th><th>Use</th><th>State</th></tr></thead>
-            <tbody>
-              {SOURCE_REGISTER.map((source) => (
-                <tr key={source.id}>
-                  <td><strong>{source.id}</strong></td>
-                  <td>{source.name}</td>
-                  <td>{source.use}</td>
-                  <td><Badge>{source.state}</Badge></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+
+      </details>
     </div>
   );
 }
@@ -2074,6 +2060,8 @@ function Project0550Bidding({ lang = "th" }) {
   const [focusedSystem,setFocusedSystem]=useState("ALL");
   const {data,model}=useBidWorkspace();
   const moduleIndex=[{id:"l3.original",title:"Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
+    ...(data?.sourceIntake?.sources||[]).map(s=>({id:"bid.documents.source."+s.id,title:s.title,tab:"documents"})),
+    ...(data?.sourceIntake?.findings||[]).map(f=>({id:"bid.documents.finding."+f.id,title:f.category,tab:"documents"})),
     ...SYSTEMS.map(s=>({id:"bid.systems."+s.token,title:s.name,tab:"systems",system:s.token})),
     {id:"bid.engineering.equations",title:"Equation Execution / SAT persons days",tab:"engineering"},
     {id:"bid.vendor.master",title:"Vendor master",tab:"documents"},{id:"bid.vendor.offers",title:"Vendor offers / rates",tab:"documents"},
@@ -2136,8 +2124,8 @@ function Project0550Bidding({ lang = "th" }) {
 
       <main className="p55-main">
         <BidSaveStatus/>
-        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId componentKey="l3.original"/><DocumentsView/></section>}
-        {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><ComponentCopyId componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · No new issue or submission recorded.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
+        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId componentKey="l3.original"/><DocumentsView navigationTarget={navigationTarget}/></section>}
+        {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><SourceCommunications/><ComponentCopyId componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · No new issue or submission recorded.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
         {area==="B"&&<>
           <div className="p55-panel p55-module-nav"><label>ค้นหา / วาง Module ID <input aria-label="Project Module Search" value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&matches.length)jump(matches.find(m=>m.id.toLowerCase()===query)||matches[0]);}} placeholder="PJ2608-0550 / bid.budget.release"/></label><div className="p55-module-results">{matches.slice(0,30).map(m=><button type="button" key={m.id} onClick={()=>jump(m)}>{m.title}<small>{m.id}</small></button>)}</div></div>
           <div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>
@@ -2148,8 +2136,8 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "execution" ? <><EquationWorkbench/><ExecutionView /></> : null}
           {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
           {activeTab === "budget" ? <BidCommercialWorkspace navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
-          {activeTab === "risk" ? <RiskView /> : null}
-          {activeTab === "documents" ? <><VendorWorkspace/><details className="p55-panel"><summary>Project evidence / original references</summary><DocumentsView/></details></> : null}
+          {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
+          {activeTab === "documents" ? <><details className="p55-panel"><summary>Project evidence / original references</summary><DocumentsView navigationTarget={navigationTarget}/></details><VendorWorkspace/></> : null}
           {activeTab === "registry" ? <BidDataControls/> : null}
         </>}
       </main>
