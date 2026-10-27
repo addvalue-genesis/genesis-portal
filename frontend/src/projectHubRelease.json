@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-27.2",
-  "branch": "feat/genesis-project-hub-20261027",
-  "source0550": "ec4363818663d37d5c3b8a549f414cdaf939ea46",
-  "capability": "0550 Source Intake / GDrive"
+  "version": "2026-10-28.1-preview",
+  "branch": "feat/pj2608-0550-official-working-20261028",
+  "source0550": "b000ee553400c64f51203cad7b9d7711a4badedb",
+  "capability": "0550 Official Working Preview / HIS-01 / OFF-03 / REL-04"
 }

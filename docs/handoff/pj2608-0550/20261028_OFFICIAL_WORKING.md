@@ -39,3 +39,47 @@ Review fingerprints are change detectors, not authenticated signatures. They do 
 The browser regression covers real form saves/reviews, Source/Release navigation, persistent stale state, backup/import, duplicate cost ownership, concurrent writes, schematic navigation and the historical issued XLSX SHA-256.
 
 Validated on this branch: data validator, expanded bidding validator, full production build, Chromium 131 browser regression (12 checks; no console errors), and independent XLSX loading with openpyxl. The existing issued export SHA-256 remains `2065bb70efa3e8b3bb90b4fbe64f099e02d1ae6c73a73d03b8e745987becafc6`, including the new top History export button. Webpack retains an asset-size warning. These tests establish software behavior with synthetic fixtures, not correctness of unreviewed private project inputs.
+
+
+## Windows review launch — existing Hub preserved
+
+PR #53 is a Draft against the Hub, not a standalone 0550 application. The review
+branch contains the same four-project navigation. Its home-page identifier is
+`2026-10-28.1-preview · 0550 Official Working Preview / HIS-01 / OFF-03 / REL-04`.
+GitHub reports no merge conflict as of 28 October 2026; no PR workflow run was
+reported. Local validation results above remain the test evidence.
+
+Before first opening the review version, use **Data and Trace → Export workspace
+backup** on the existing localhost:3001 application. New review records extend
+the persisted workspace schema; returning to older software requires the earlier
+backup. Keep that file private. Stop the current server using Ctrl+C in its own
+terminal. Do not change browser host/port or clear browser storage.
+
+Run the following in PowerShell. It creates a detached review worktree beside the
+existing Hub; local edits in the Hub (including package-lock.json) are preserved.
+The script stops if the review folder already exists, rather than overwriting it.
+
+```powershell
+$repo = (Join-Path $env:USERPROFILE 'DEV\genesis-project-hub').Replace('\', '/')
+$review = Join-Path $env:USERPROFILE 'DEV\genesis-hub-0550-official-review'
+$branch = 'feat/pj2608-0550-official-working-20261028'
+if (!(Test-Path (Join-Path $repo '.git'))) { throw "Repository not found: $repo" }
+if (Test-Path $review) { throw "Review folder already exists: $review" }
+git -c "safe.directory=$repo" -C "$repo" fetch origin "refs/heads/${branch}:refs/remotes/origin/${branch}"
+if ($LASTEXITCODE -ne 0) { throw 'Git fetch failed' }
+git -c "safe.directory=$repo" -C "$repo" worktree add --detach "$review" "origin/$branch"
+if ($LASTEXITCODE -ne 0) { throw 'Review worktree creation failed' }
+Set-Location (Join-Path $review 'frontend')
+npm ci
+if ($LASTEXITCODE -ne 0) { throw 'npm ci failed' }
+npm start -- --port 3001
+```
+
+Open `http://localhost:3001/` to check the version, then
+`http://localhost:3001/projects/pj2608-0550`. Select **10 Bidding / Commercial**:
+OFF-03 and HIS-01 must be visible, and REL-04 is the Release Preview USD stage.
+Use the existing browser profile to retain private data. If a custom Drive path
+was configured in the old terminal, retain the same `GENESIS_0550_PROJECT_DIR`
+setting in this terminal. The new software does not manufacture Official prices:
+unreviewed inputs show OPEN until the user completes line and customer-scope
+review against the actual RFQ and quotations.
