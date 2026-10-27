@@ -1,0 +1,32 @@
+{
+  "id": "ASK-TSI-PRICE-BREAKDOWN-REFERENCE",
+  "sourceUrl": "https://docs.google.com/spreadsheets/d/1H7loF4o4qrKOm0pHfox8xsPXDCCnLtsY/edit",
+  "status": "REFERENCE_FORMAT_REQUIRES_CURRENT_TENDER_REVIEW",
+  "columns": ["S.N", "Tag No.", "Description", "Qty", "Unit", "Unit Price", "Sub-Total", "Remark"],
+  "rows": [
+    {"code":"A1-01","part":"A","sn":"1","description":"Network System (KU Band Internet)","systems":["TEL-LAN","TEL-VSAT-KU"]},
+    {"code":"A1-02","part":"A","sn":"2","description":"VSAT System","systems":["TEL-VSAT"]},
+    {"code":"A1-03","part":"A","sn":"3","description":"Video Conference System (VCS)","systems":["TEL-LAN-VCS"]},
+    {"code":"A1-04","part":"A","sn":"4","description":"IP Telephony and PABX","systems":["TEL-PABX","TEL-IPP"]},
+    {"code":"A1-05","part":"A","sn":"5","description":"Public Address and General Alarm (PAGA)","systems":["TEL-PAGA"]},
+    {"code":"A1-06","part":"A","sn":"6","description":"Closed Circuit Television (CCTV) System","systems":["TEL-CCTV"]},
+    {"code":"A1-07","part":"A","sn":"7","description":"VHF DMR Radio System","systems":["TEL-RADIO-DTRS"]},
+    {"code":"A1-08","part":"A","sn":"8","description":"VHF-FM Marine Radio","systems":["TEL-RADIO-MARINE","TEL-AIS"]},
+    {"code":"A1-09","part":"A","sn":"9","description":"VHF-AM Aeronautical Radio","systems":["TEL-RADIO-AERO"]},
+    {"code":"A1-10","part":"A","sn":"10","description":"MF/HF SSB Radio","systems":["TEL-RADIO-SSB"]},
+    {"code":"A1-11","part":"A","sn":"11","description":"Microwave System (Telecommunication Tower)","systems":["TEL-DMR","TEL-TELT"]},
+    {"code":"A1-12","part":"A","sn":"12","description":"Entertainment System","systems":["TEL-ES"]},
+    {"code":"A1-13","part":"A","sn":"13","description":"Fiber Optic Communication and Installation","systems":["TEL-FO"]},
+    {"code":"A1-14","part":"A","sn":"14","description":"Meteorological System","systems":["TEL-MET"]},
+    {"code":"A1-15","part":"A","sn":"15","description":"Non-Directional Beacon (NDB) System","systems":["TEL-NDB"]},
+    {"code":"B1","part":"B","sn":"B1","description":"Detail Design Engineering","systems":[]},
+    {"code":"B2","part":"B","sn":"B2","description":"Transportation to FOB/CIF Purchaser Port","systems":[]},
+    {"code":"B3","part":"B","sn":"B3","description":"Training for Enduser / Purchaser Personnel","systems":[]},
+    {"code":"B4","part":"B","sn":"B4","description":"Specialist Field Assistance as per Specification","systems":[]},
+    {"code":"B5","part":"B","sn":"B5","description":"Pre-commissioning, Commissioning and Start-up Spares","systems":[]},
+    {"code":"B6","part":"B","sn":"B6","description":"Special Tools for Operation and Maintenance","systems":[]},
+    {"code":"C1","part":"C","sn":"C1","description":"On-site Installation Construction","systems":[]},
+    {"code":"C2","part":"C","sn":"C2","description":"Capital Spares For Ten Years","systems":[]},
+    {"code":"C3","part":"C","sn":"C3","description":"2 years Normal Operation Spare Parts","systems":[]}
+  ]
+}

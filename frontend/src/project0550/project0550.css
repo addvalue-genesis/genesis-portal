@@ -1563,11 +1563,55 @@
 
 /* All active bidding tabs remain visible; no hidden horizontal-only tabs. */
 .p55 .p55-tabs { flex-wrap:wrap; overflow-x:visible; }
-[data-testid="bid-commercial"] > .p55-metric-grid { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
-[data-testid="bid-commercial"] > .p55-metric-grid .p55-metric > span,
-[data-testid="bid-commercial"] > .p55-metric-grid .p55-metric > small { display:block; line-height:1.5; }
-[data-testid="bid-commercial"] > .p55-metric-grid .p55-metric > strong { display:block; font-size:24px; margin:8px 0; }
+[data-component-key="bid.budget.official.summary"] .p55-metric-grid { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
+[data-component-key="bid.budget.official.summary"] .p55-metric-grid .p55-metric > span,
+[data-component-key="bid.budget.official.summary"] .p55-metric-grid .p55-metric > small { display:block; line-height:1.5; }
+[data-component-key="bid.budget.official.summary"] .p55-metric-grid .p55-metric > strong { display:block; font-size:24px; margin:8px 0; }
 .p55-bid-content button:not(.gns-copy-id button), .p55-bid-save button { padding:7px 10px; border:1px solid #9eb9c9; border-radius:6px; background:#f0f7fb; color:#123951; }
 .p55-bid-content button:disabled { opacity:.55; cursor:default; }
 
 .p55-source-text { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 28rem; overflow: auto; font: inherit; padding: 1rem; background: #f5f8fc; color: #172b4d; }
+
+/* 0550 Official / History contexts share equations, never price snapshots. */
+.p55-context-tabs { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.p55-review-toolbar { display:flex; flex-wrap:wrap; align-items:center; gap:12px; margin-bottom:16px; }
+.p55-review-toolbar h2 { margin:0; flex:1; }
+.p55-review-fields,.p55-price-group { margin:12px 0; padding:14px; border:1px solid #cddbe7; border-radius:8px; background:#fff; }
+.p55-review-fields>summary,.p55-price-group>summary { cursor:pointer; font-weight:700; color:#064c66; }
+.p55-review-fields>summary>.p55-group-total { display:inline-block; margin-left:12px; font-weight:500; }
+.p55-review-fields select[multiple] { width:100%; min-height:120px; }
+.p55-customer-form { min-width:1050px; }
+.p55-customer-form th:nth-child(3) { width:30%; }
+.p55-customer-section { background:#005570; color:white; font-weight:700; }
+.p55-customer-group,.p55-customer-total { background:#e8f0f6; font-weight:700; }
+.p55-customer-line td:nth-child(3) { padding-left:28px; }
+.p55-source-trace { margin-top:8px; font-weight:400; }
+@media(max-width:700px) { .p55-context-tabs { grid-template-columns:1fr; } .p55-price-group { padding:8px; } }
+
+/* Numbered, copyable 0550 presentation: scoped away from frozen history/0553. */
+.p55-bid-presentation { --bid-accent:#526777; --bid-tint:#f0f4f7; grid-template-columns:minmax(0,1fr); }
+.p55-bid-presentation :is(.p55-panel,.p55-price-group,.p55-review-fields,.p55-table-wrap) { min-width:0; max-width:100%; }
+.p55-module-heading { display:flex; align-items:flex-start; justify-content:space-between; flex-wrap:wrap; gap:8px 16px; width:100%; min-width:0; }
+.p55-module-heading__title { display:flex; flex-wrap:wrap; align-items:baseline; gap:8px; min-width:0; }
+.p55-module-heading__title>strong { overflow-wrap:anywhere; }
+.p55-module-number { display:inline-block; background:var(--bid-tint,#f0f4f7); color:var(--bid-accent,#526777); border:1px solid currentColor; border-radius:4px; padding:2px 7px; font-variant-numeric:tabular-nums; font-size:14px; }
+.p55-module-copy { min-width:0; max-width:100%; }
+.p55-bid-presentation .gns-copy-id { min-width:0; }
+.p55-bid-presentation .gns-copy-id code { white-space:normal; overflow-wrap:anywhere; }
+.p55-bid-presentation .gns-copy-id input { min-width:0; max-width:100%; }
+.p55-bid-presentation .p55-bid-module>summary { display:list-item; }
+.p55-bid-presentation :is(.p55-price-group,.p55-review-fields)[data-bid-owner] { border-left:5px solid var(--bid-accent); }
+.p55-bid-presentation [data-bid-owner]>summary { background:var(--bid-tint); color:#173349; padding:10px; border-radius:5px; }
+.p55-bid-presentation [data-bid-owner] .p55-table>thead>tr>th { background:var(--bid-tint); color:#173349; border-color:var(--bid-accent); }
+.p55-bid-presentation [data-bid-owner] .p55-table>tbody>tr>td,
+.p55-bid-presentation .p55-table>tbody>tr[data-bid-owner]>td { background:color-mix(in srgb,var(--bid-tint) 55%,white); border-color:color-mix(in srgb,var(--bid-accent) 30%,white); }
+.p55-bid-presentation .p55-customer-form>tbody>tr.p55-customer-section>td { background:var(--bid-accent); color:white; }
+.p55-group-total { display:block; margin-top:8px; padding:5px 8px; color:var(--bid-accent); background:var(--bid-tint); font-weight:700; }
+.p55-module-principles { margin:12px 0; padding:10px; border:1px dashed #8b9da9; border-radius:6px; background:#f6f8fa; }
+.p55-module-principles>summary { cursor:pointer; }
+.p55-module-principles table { margin-top:12px; }
+.p55-module-principles th { width:25%; }
+.p55-colour-key { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:8px; margin:12px 0; }
+.p55-owner-key { display:flex; flex-direction:column; gap:4px; padding:10px; border-left:5px solid var(--bid-accent); background:var(--bid-tint); color:#173349; }
+.p55-bid-presentation [data-module-focused] { outline:3px solid #d87c12; outline-offset:3px; scroll-margin-top:90px; }
+@media(max-width:700px) { .p55-bid-presentation .p55-bid-fields { grid-template-columns:minmax(0,1fr); } .p55-module-heading { flex-direction:column; } .p55-module-copy { width:100%; } }
