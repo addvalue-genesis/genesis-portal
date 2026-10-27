@@ -36,6 +36,15 @@ try {
   const sameCopy=JSON.parse(JSON.stringify(revisions));sameCopy.sources.push({...source,id:'SECOND-COPY'});assert.equal(deriveDocumentRevisionRegister(sameCopy)[0].status,'CURRENT_PACKAGE');assert.equal(deriveDocumentRevisionRegister(sameCopy)[0].current.length,2);
   for(const mutate of [d=>d.sources[0].revisionHistory[0].issuedDate='2026-02-30',d=>d.sources[0].revisionHistory.push({...d.sources[0].revisionHistory[0]}),d=>{d.sources[0].readState='METADATA_ONLY';d.sources[0].content='';},d=>d.sources[0].packageName=42]) {const bad=JSON.parse(JSON.stringify(revisions));mutate(bad);assert.throws(()=>validate(bad,ids));}
   assert.deepEqual(deriveDocumentRevisionRegister(null),[]);
+  const packages=clone();
+  packages.sourcePackages=[{id:'FIRST',title:'Synthetic package',stage:'FIRST',url:source.url,sourceIds:[source.id],note:'Inventory only'}];
+  packages.packageComparisons=[{id:'COMPARE',title:'Synthetic comparison',firstSummary:'Earlier',officialSummary:'Current',change:'Selected evidence',note:'Not a complete redline',firstSourceIds:[source.id],officialSourceIds:[source.id],basis:'SELECTED_TEXT'}];
+  validate(packages,ids);
+  const imported=applySourceIntake(workspace,packages,ids);
+  assert.deepEqual(validateBidWorkspace(JSON.parse(JSON.stringify(imported)),baseline,ids).sourceIntake,packages);
+  assert.deepEqual(deriveBidWorkspace(imported,ids,'2026-10-27'),deriveBidWorkspace(workspace,ids,'2026-10-27'));
+  for(const mutate of [d=>d.sourcePackages[0].sourceIds=['MISSING'],d=>d.sourcePackages[0].url='https://evil.example',d=>d.sourcePackages[0].stage='APPROVED',d=>d.packageComparisons[0].firstSourceIds=[],d=>d.packageComparisons[0].officialSourceIds=['MISSING'],d=>d.packageComparisons.push({...d.packageComparisons[0]}),d=>{d.milestones=[];d.sources[0].readState='METADATA_ONLY';d.sources[0].content='';}]) {const bad=JSON.parse(JSON.stringify(packages));mutate(bad);assert.throws(()=>validate(bad,ids));}
+  const inventory=JSON.parse(JSON.stringify(packages));inventory.milestones=[];inventory.sources[0].readState='METADATA_ONLY';inventory.sources[0].content='';inventory.packageComparisons[0].basis='INVENTORY';validate(inventory,ids);
   if(process.argv[2]) {const real=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));validate(real,ids);validateBidWorkspace(applySourceIntake(workspace,real,ids),baseline,ids);assert.deepEqual(deriveBidWorkspace(applySourceIntake(workspace,real,ids),ids,'2026-10-27'),deriveBidWorkspace(workspace,ids,'2026-10-27'));console.log('PASS private payload schema, backup compatibility and unchanged financial projection (content not printed)');}
   console.log('PASS source intake: old workspace compatibility, strict references, URL safety, revision replacement, unknown timezone, evidence/approval separation, backup roundtrip and unchanged financial projections.');
 } finally {require.extensions['.js']=old;}

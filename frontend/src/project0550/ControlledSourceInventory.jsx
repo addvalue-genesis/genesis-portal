@@ -15,6 +15,15 @@ function SourceRefs({ ids, sources }) {
 function RevisionSource({ source }) {
   return <div><SourceLink source={source}/><small>{source.packageName || "ชุดเอกสารไม่ระบุ"} · {source.issuedDate || "วันที่ไม่ยืนยัน"} · {source.issuePurpose || "Purpose ไม่ยืนยัน"}</small></div>;
 }
+export function PackageComparison({ intake }) {
+  if (!intake?.packageComparisons?.length) return null;
+  const evidence = ids => <details><summary>หลักฐาน {ids.length} รายการ</summary><SourceRefs ids={ids} sources={intake.sources}/></details>;
+  return <details open><summary>เปรียบเทียบชุดแรก → Official Tender</summary>
+    <p>ตารางนี้แยกรอบส่งเอกสารออกจาก revision · รายการไฟล์และชื่อ revision ไม่ยืนยันว่าเนื้อหาเหมือนกัน · ไม่พบไฟล์ในชุดหนึ่งไม่ได้แปลว่ายกเลิกข้อกำหนด</p>
+    <div className="p55-table-wrap"><table className="p55-table" aria-label="First and official package comparison"><thead><tr><th>กลุ่มเอกสาร</th><th>ชุดแรก / เอกสารธุรกิจเดิม</th><th>Official Tender</th><th>ความเปลี่ยนแปลง / ขอบเขตการตรวจ</th></tr></thead><tbody>{intake.packageComparisons.map(c => <tr key={c.id}><td>{c.title}</td><td>{c.firstSummary}{evidence(c.firstSourceIds)}</td><td>{c.officialSummary}{evidence(c.officialSourceIds)}</td><td>{c.change}<small>{c.note}</small><small>{c.basis === "SELECTED_TEXT" ? "ตรวจข้อความเฉพาะส่วน — ยังไม่ใช่ redline ทุกข้อ" : "เทียบรายการ / ชื่อไฟล์ / revision — ยังไม่ยืนยันเนื้อหาทุกหน้า"}</small></td></tr>)}</tbody></table></div>
+    {intake.sourcePackages?.length > 0 && <details><summary>ตำแหน่งชุดเอกสารและขอบเขตที่ตรวจ</summary><div className="p55-table-wrap"><table className="p55-table" aria-label="Source package locations"><thead><tr><th>ชุด / รอบ</th><th>จำนวนรายการในทะเบียน</th><th>ขอบเขต</th></tr></thead><tbody>{intake.sourcePackages.map(p => <tr key={p.id}><td><SourceLink source={p}/><small>{p.stage}</small></td><td>{p.sourceIds.length}{evidence(p.sourceIds)}</td><td>{p.note}</td></tr>)}</tbody></table></div></details>}
+  </details>;
+}
 export function DocumentRevisionRegister({ intake }) {
   const rows = deriveDocumentRevisionRegister(intake);
   if (!rows.length) return null;
@@ -74,6 +83,7 @@ export function ControlledSourceInventory({ navigationTarget }) {
       {error && <p role="alert">{error}</p>}
       {pending && <div className="p55-panel" role="region" aria-label="Source import preview"><strong>{pending.batchId} · ตรวจวันที่ {pending.reviewedOn}</strong><p>{pending.sources.length} แหล่ง · {pending.findings.length} ข้อค้นพบ · {pending.milestones.length} กำหนดส่ง</p><p>{pending.coverageNote}</p><p>อัปเดตทะเบียนปัจจุบัน {intake?.sources.length || 0} รายการเป็นชุดนี้ เก็บ revision ก่อนหน้าไว้ ราคา/FX/Working เดิมคงเดิม</p><button type="button" disabled={busy} onClick={apply}>Apply source intake</button><button type="button" disabled={busy} onClick={() => setPending(null)}>Cancel source import</button></div>}
       {intake ? <><p><strong>ตรวจล่าสุด: {intake.reviewedOn}</strong> · {model.sources.length} แหล่ง · อ่านข้อความ {model.readCount} · รออ่าน/ตรวจภาพ {model.unreadCount} · ประเด็น OPEN/CONFLICT {model.openCount}</p><p>{intake.coverageNote}</p><button type="button" onClick={() => downloadBidFile(intake, "PJ2608-0550_Source_Intake_" + intake.reviewedOn + ".json")}>Export source intake</button></> : <p>ยังไม่ได้นำเข้าทะเบียนล่าสุด — รายการเดิมอยู่ใน Historical source register ด้านล่าง</p>}
+      <PackageComparison intake={intake}/>
       <DocumentRevisionRegister intake={intake}/>
       <div className="p55-bid-form"><label>ค้นหาเอกสาร <input aria-label="Search source inventory" value={query} onChange={e => setQuery(e.target.value)}/></label><label>แหล่ง <select aria-label="Source provider" value={provider} onChange={e => setProvider(e.target.value)}><option value="ALL">ทั้งหมด</option><option value="GDRIVE">GDrive</option><option value="GMAIL">Gmail</option></select></label></div>
       <div className="p55-table-wrap"><table className="p55-table" aria-label="Controlled source inventory"><thead><tr><th>Source / เอกสาร</th><th>Revision / วันที่</th><th>Authority / อ่านถึงไหน</th><th>รายละเอียดต้นทาง</th></tr></thead><tbody>{rows.map(s => <tr key={s.id} data-component-key={"bid.documents.source." + s.id}><td><SourceLink source={s}/><small>{s.id} · {s.provider}</small><ComponentCopyId componentKey={"bid.documents.source." + s.id}/></td><td>{s.revision || "ไม่ระบุ"}<small>{s.issuedDate || "วันที่ออกไม่ยืนยัน"}</small></td><td>{s.effectiveAuthority}<small>{s.readState}</small></td><td>{s.note}{s.replaces.length > 0 && <small>แทนที่: {s.replaces.join(", ")}</small>}{s.content && <details><summary>อ่านข้อความต้นทางที่ดึงมา</summary><pre className="p55-source-text">{s.content}</pre></details>}</td></tr>)}</tbody></table></div>

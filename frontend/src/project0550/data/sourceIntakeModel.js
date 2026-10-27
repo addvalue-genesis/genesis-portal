@@ -20,7 +20,7 @@ export function safeSourceUrl(value) {
   try { const url = new URL(value); return url.protocol === "https:" && ["drive.google.com", "docs.google.com", "mail.google.com"].includes(url.hostname) && !url.username && !url.password ? url.href : null; } catch { return null; }
 }
 export function validateSourceIntake(data, systems) {
-  fields(data, ["schema", "projectId", "batchId", "reviewedOn", "coverageNote", "sources", "findings", "milestones"]);
+  fields(data, ["schema", "projectId", "batchId", "reviewedOn", "coverageNote", "sources", "findings", "milestones", "sourcePackages", "packageComparisons"]);
   if (data.schema !== SOURCE_INTAKE_SCHEMA || data.projectId !== "PJ2608-0550") fail("Wrong source project/schema");
   text(data.batchId, "batch ID", 100); date(data.reviewedOn, "review date"); text(data.coverageNote, "coverage note");
   for (const key of ["sources", "findings", "milestones"]) {
@@ -63,6 +63,26 @@ export function validateSourceIntake(data, systems) {
   const byId = new Map(data.sources.map(s => [s.id, s])), done = new Set(), active = new Set();
   function visit(id) { if (active.has(id)) fail("Replacement cycle"); if (done.has(id)) return; active.add(id); byId.get(id).replaces.forEach(visit); active.delete(id); done.add(id); }
   data.sources.forEach(s => visit(s.id));
+  // Package membership is receipt context, not evidence of document authority.
+  for (const key of ["sourcePackages", "packageComparisons"]) {
+    if (data[key] === undefined) continue;
+    list(data[key], key);
+    const ids = data[key].map(row => row?.id);
+    if (ids.some(id => typeof id !== "string" || !/^[\w.-]{1,100}$/.test(id)) || new Set(ids).size !== ids.length) fail("Duplicate/invalid " + key + " ID");
+  }
+  for (const p of data.sourcePackages || []) {
+    fields(p, ["id", "title", "stage", "url", "sourceIds", "note"]);
+    ["title", "note"].forEach(key => text(p[key], key));
+    if (!["FIRST", "UPDATE", "OFFICIAL", "REISSUE"].includes(p.stage) || !p.title.trim() || !safeSourceUrl(p.url)) fail("Invalid source package");
+    refs(p.sourceIds, "package source");
+  }
+  for (const c of data.packageComparisons || []) {
+    fields(c, ["id", "title", "firstSummary", "officialSummary", "change", "note", "firstSourceIds", "officialSourceIds", "basis"]);
+    ["title", "firstSummary", "officialSummary", "change", "note"].forEach(key => text(c[key], key));
+    refs(c.firstSourceIds, "first package source"); refs(c.officialSourceIds, "official package source");
+    if (!["INVENTORY", "SELECTED_TEXT"].includes(c.basis)) fail("Invalid comparison basis");
+    if (c.basis === "SELECTED_TEXT" && [...c.firstSourceIds, ...c.officialSourceIds].some(id => byId.get(id).readState === "METADATA_ONLY")) fail("Text comparison needs read evidence");
+  }
   for (const f of data.findings) {
     fields(f, ["id", "category", "systemTokens", "sourceIds", "locator", "statement", "impact", "state"]);
     ["category", "locator", "statement", "impact"].forEach(key => text(f[key], key));

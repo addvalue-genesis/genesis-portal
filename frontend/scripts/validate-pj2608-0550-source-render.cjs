@@ -20,6 +20,11 @@ try {
   state.data.sourceIntake=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
   html=render(ControlledSourceInventory);const ids=[...html.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);assert.equal(new Set(ids).size,ids.length);
   assert.equal((html.match(/data-component-key="bid.documents.source\./g)||[]).length,state.data.sourceIntake.sources.length);
+  if(state.data.sourceIntake.packageComparisons?.length) {
+   assert(html.includes('First and official package comparison'));
+   assert(html.includes('Source package locations'));
+   for(const row of state.data.sourceIntake.packageComparisons) assert(html.includes(row.title));
+  }
   assert(html.includes('Document revisions MR'));assert(html.includes('Document revisions SPE'));assert(html.includes('Document revisions DTS'));assert(html.includes('Issued for Tender'));assert(html.includes('NO_CURRENT_SOURCE'));
   const mail=render(SourceCommunications);assert(mail.includes('Source deadlines'));assert(mail.includes('Source communications'));
   assert(render(SourceFindings).includes('Source findings'));
