@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useBidWorkspace, downloadBidFile } from "./BidWorkspaceContext";
-import { SYSTEMS, SOURCE_REGISTER, validateSourceIntake, applySourceIntake, deriveSourceIntake, safeSourceUrl } from "./data";
+import { SYSTEMS, SOURCE_REGISTER, validateSourceIntake, applySourceIntake, deriveSourceIntake, deriveDocumentRevisionRegister, safeSourceUrl } from "./data";
 import { Module } from "./BidControls";
 import { ComponentCopyId } from "../common/ui/ComponentCopyId";
 
@@ -11,6 +11,20 @@ export function SourceLink({ source }) {
 }
 function SourceRefs({ ids, sources }) {
   return ids.map(id => <div key={id}><SourceLink source={sources.find(s => s.id === id)} /></div>);
+}
+function RevisionSource({ source }) {
+  return <div><SourceLink source={source}/><small>{source.packageName || "ชุดเอกสารไม่ระบุ"} · {source.issuedDate || "วันที่ไม่ยืนยัน"} · {source.issuePurpose || "Purpose ไม่ยืนยัน"}</small></div>;
+}
+export function DocumentRevisionRegister({ intake }) {
+  const rows = deriveDocumentRevisionRegister(intake);
+  if (!rows.length) return null;
+  const families = [...new Set(rows.map(r => r.family))].sort();
+  return <details open><summary>ทะเบียนเทียบ Revision ตามเลขเอกสาร · {rows.length} เลขเอกสาร</summary>
+    <p>ฉบับใช้งานอิงชุดเอกสารที่ตรวจยืนยัน ไม่เรียงตัวอักษร revision หรือวันอัปโหลด · B/C มีความหมายตามหน้าปกแต่ละชุด · ประวัติบนหน้าปกไม่ใช่หลักฐานว่าได้อ่านเนื้อหาทุก revision</p>
+    {families.map(family => <details key={family} open={family === "MR"}><summary>{family} · {rows.filter(r => r.family === family).length} เลขเอกสาร</summary>
+      <div className="p55-table-wrap"><table className="p55-table" aria-label={"Document revisions " + family}><thead><tr><th>เลขเอกสาร / สถานะ</th><th>ฉบับใน Current Tender</th><th>ประวัติ Revision จากหน้าปก</th><th>ฉบับเก่า / อ้างอิง / ถูกแทนที่</th></tr></thead><tbody>{rows.filter(r => r.family === family).map(row => <tr key={row.documentNo}><td>{row.documentNo}<small>{row.status}</small></td><td>{row.current.length ? row.current.map(s => <RevisionSource key={s.id} source={s}/>) : "ยังไม่พบฉบับยืนยันสำหรับ Current Tender"}</td><td>{row.current.map(s => <div key={s.id}><strong>{s.revision || "ไม่ระบุ"}</strong>{s.revisionHistory?.length ? <ul>{s.revisionHistory.map(h => <li key={h.revision}>{h.revision} · {h.issuedDate} · {h.purpose}</li>)}</ul> : <small>ยังไม่ได้ตรวจตารางประวัติ revision</small>}<small>{s.readState}</small></div>)}</td><td>{row.reference.length ? row.reference.map(s => <div key={s.id}><RevisionSource source={s}/><small>{s.effectiveAuthority}</small></div>) : "ยังไม่ได้รับ/ลงทะเบียนฉบับเก่า"}</td></tr>)}</tbody></table></div>
+    </details>)}
+  </details>;
 }
 export function SourceFindings({ compact = false, navigationTarget }) {
   const { data } = useBidWorkspace();
@@ -60,6 +74,7 @@ export function ControlledSourceInventory({ navigationTarget }) {
       {error && <p role="alert">{error}</p>}
       {pending && <div className="p55-panel" role="region" aria-label="Source import preview"><strong>{pending.batchId} · ตรวจวันที่ {pending.reviewedOn}</strong><p>{pending.sources.length} แหล่ง · {pending.findings.length} ข้อค้นพบ · {pending.milestones.length} กำหนดส่ง</p><p>{pending.coverageNote}</p><p>อัปเดตทะเบียนปัจจุบัน {intake?.sources.length || 0} รายการเป็นชุดนี้ เก็บ revision ก่อนหน้าไว้ ราคา/FX/Working เดิมคงเดิม</p><button type="button" disabled={busy} onClick={apply}>Apply source intake</button><button type="button" disabled={busy} onClick={() => setPending(null)}>Cancel source import</button></div>}
       {intake ? <><p><strong>ตรวจล่าสุด: {intake.reviewedOn}</strong> · {model.sources.length} แหล่ง · อ่านข้อความ {model.readCount} · รออ่าน/ตรวจภาพ {model.unreadCount} · ประเด็น OPEN/CONFLICT {model.openCount}</p><p>{intake.coverageNote}</p><button type="button" onClick={() => downloadBidFile(intake, "PJ2608-0550_Source_Intake_" + intake.reviewedOn + ".json")}>Export source intake</button></> : <p>ยังไม่ได้นำเข้าทะเบียนล่าสุด — รายการเดิมอยู่ใน Historical source register ด้านล่าง</p>}
+      <DocumentRevisionRegister intake={intake}/>
       <div className="p55-bid-form"><label>ค้นหาเอกสาร <input aria-label="Search source inventory" value={query} onChange={e => setQuery(e.target.value)}/></label><label>แหล่ง <select aria-label="Source provider" value={provider} onChange={e => setProvider(e.target.value)}><option value="ALL">ทั้งหมด</option><option value="GDRIVE">GDrive</option><option value="GMAIL">Gmail</option></select></label></div>
       <div className="p55-table-wrap"><table className="p55-table" aria-label="Controlled source inventory"><thead><tr><th>Source / เอกสาร</th><th>Revision / วันที่</th><th>Authority / อ่านถึงไหน</th><th>รายละเอียดต้นทาง</th></tr></thead><tbody>{rows.map(s => <tr key={s.id} data-component-key={"bid.documents.source." + s.id}><td><SourceLink source={s}/><small>{s.id} · {s.provider}</small><ComponentCopyId componentKey={"bid.documents.source." + s.id}/></td><td>{s.revision || "ไม่ระบุ"}<small>{s.issuedDate || "วันที่ออกไม่ยืนยัน"}</small></td><td>{s.effectiveAuthority}<small>{s.readState}</small></td><td>{s.note}{s.replaces.length > 0 && <small>แทนที่: {s.replaces.join(", ")}</small>}{s.content && <details><summary>อ่านข้อความต้นทางที่ดึงมา</summary><pre className="p55-source-text">{s.content}</pre></details>}</td></tr>)}</tbody></table></div>
       <details><summary>Historical source register — controlled snapshot (read-only)</summary><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>ID</th><th>Source</th><th>Use / historical state</th></tr></thead><tbody>{SOURCE_REGISTER.map(s => <tr key={s.id}><td>{s.id}</td><td>{s.name}</td><td>{s.use}<small>{s.state}</small></td></tr>)}</tbody></table></div></details>

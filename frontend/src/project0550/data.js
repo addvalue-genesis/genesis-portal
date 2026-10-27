@@ -49,4 +49,4 @@ export { PROJECT_0550_REGULATORY_BINDING } from "./regulatoryBinding";
 export { MYANMAR_REGULATORY_KNOWLEDGE } from "../knowledge-kernels/regulatoryMyanmar";
 
 export { PROJECT_0550_FACTS } from "./projectFacts";
-export { validateSourceIntake, applySourceIntake, deriveSourceIntake, safeSourceUrl } from "./data/sourceIntakeModel";
+export { validateSourceIntake, applySourceIntake, deriveSourceIntake, deriveDocumentRevisionRegister, safeSourceUrl } from "./data/sourceIntakeModel";

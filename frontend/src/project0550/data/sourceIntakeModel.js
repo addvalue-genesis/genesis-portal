@@ -34,8 +34,20 @@ export function validateSourceIntake(data, systems) {
     if (new Set(ids).size !== ids.length || ids.some(id => !sourceIds.has(id))) fail("Unknown/duplicate " + name);
   };
   for (const s of data.sources) {
-    fields(s, ["id", "provider", "title", "documentNo", "revision", "issuedDate", "receivedDate", "url", "readState", "authority", "content", "note", "replaces"]);
+    fields(s, ["id", "provider", "title", "documentNo", "revision", "issuedDate", "receivedDate", "url", "readState", "authority", "content", "note", "replaces", "packageName", "issuePurpose", "revisionHistory"]);
     ["title", "documentNo", "revision", "note"].forEach(key => text(s[key], key));
+    for (const key of ["packageName", "issuePurpose"]) if (s[key] !== undefined) text(s[key], key, 500);
+    if (s.revisionHistory !== undefined) {
+      list(s.revisionHistory, "revision history", 50);
+      if (s.revisionHistory.length && (s.readState === "METADATA_ONLY" || !s.documentNo.trim())) fail("Revision history needs document text and number");
+      const revisions = new Set();
+      for (const h of s.revisionHistory) {
+        fields(h, ["revision", "issuedDate", "purpose"]);
+        text(h.revision, "history revision", 100); text(h.purpose, "history purpose", 500); date(h.issuedDate, "history issue date");
+        if (!h.revision.trim() || revisions.has(h.revision)) fail("Duplicate/empty history revision");
+        revisions.add(h.revision);
+      }
+    }
     text(s.content, "source text", 500000); date(s.issuedDate, "issue date", true); date(s.receivedDate, "receipt date", true);
     if (!s.title.trim() || !safeSourceUrl(s.url)) fail("Source title/URL required");
     if (!["GDRIVE", "GMAIL"].includes(s.provider)) fail("Invalid provider");
@@ -86,4 +98,24 @@ export function deriveSourceIntake(intake, reviewDate) {
     unreadCount: intake.sources.filter(s => s.readState !== "TEXT_READ").length,
     openCount: intake.findings.filter(f => f.state !== "SOURCE_SUPPORTED").length
   };
+}
+
+// Authority is an explicit intake decision. Never rank revision letters or upload
+// dates: an older Basic Engineering C-revision can precede an EPC B-revision.
+export function deriveDocumentRevisionRegister(intake) {
+  const sources = deriveSourceIntake(intake, "").sources;
+  const groups = new Map();
+  for (const source of sources) {
+    const documentNo = source.documentNo.trim().toUpperCase();
+    if (source.provider !== "GDRIVE" || !documentNo) continue;
+    if (!groups.has(documentNo)) groups.set(documentNo, []);
+    groups.get(documentNo).push(source);
+  }
+  return [...groups].map(([documentNo, copies]) => {
+    const current = copies.filter(s => s.effectiveAuthority === "CURRENT_TENDER");
+    const reference = copies.filter(s => s.effectiveAuthority !== "CURRENT_TENDER");
+    const revisions = [...new Set(current.map(s => s.revision.trim().toUpperCase()))];
+    const status = !current.length ? "NO_CURRENT_SOURCE" : revisions.length > 1 ? "CURRENT_REVISION_CONFLICT" : !revisions[0] ? "REVISION_UNCONFIRMED" : "CURRENT_PACKAGE";
+    return { documentNo, family: documentNo.match(/-TEL-([A-Z]+)-/)?.[1] || "OTHER", current, reference, status };
+  }).sort((a, b) => a.documentNo.localeCompare(b.documentNo));
 }

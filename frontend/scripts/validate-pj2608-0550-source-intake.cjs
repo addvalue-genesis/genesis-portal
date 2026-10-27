@@ -2,7 +2,7 @@ const assert = require('node:assert/strict'), path = require('node:path'), fs = 
 const root = path.resolve(__dirname, '../src'), old = require.extensions['.js'];
 require.extensions['.js'] = (mod, file) => file.startsWith(root + path.sep) ? mod._compile(babel.transformFileSync(file, {babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}]]}).code,file) : old(mod,file);
 try {
-  const {validateSourceIntake:validate, applySourceIntake, deriveSourceIntake} = require(path.join(root,'project0550/data/sourceIntakeModel.js'));
+  const {validateSourceIntake:validate, applySourceIntake, deriveSourceIntake, deriveDocumentRevisionRegister} = require(path.join(root,'project0550/data/sourceIntakeModel.js'));
   const {emptyBidWorkspace,validateBidWorkspace,deriveBidWorkspace} = require(path.join(root,'project0550/data/bidWorkspaceModel.js'));
   const {DATA_LAYER_META,SYSTEMS} = require(path.join(root,'project0550/data.js'));
   const ids = SYSTEMS.map(s=>s.token), baseline = DATA_LAYER_META.datasetId;
@@ -27,6 +27,15 @@ try {
     d=>{d.sources.push({...source,id:'TEST-OLD',replaces:['TEST-SOURCE']});d.sources[0].replaces=['TEST-OLD'];}
   ]) {const bad=clone();mutate(bad);assert.throws(()=>validate(bad,ids));}
   const replacement=clone();replacement.sources.push({...source,id:'TEST-OLD',revision:'A1',authority:'HISTORICAL'});replacement.sources[0].replaces=['TEST-OLD'];validate(replacement,ids);assert.equal(deriveSourceIntake(replacement,'2026-10-27').sources[1].effectiveAuthority,'REPLACED_COPY');
-  if(process.argv[2]) {const real=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));validate(real,ids);validateBidWorkspace(applySourceIntake(workspace,real,ids),baseline,ids);console.log('PASS private payload schema and backup compatibility (content not printed)');}
+  const revisions=clone();revisions.sources[0].packageName='Current EPC';revisions.sources[0].issuePurpose='Issued for Tender';revisions.sources[0].revisionHistory=[{revision:'B1',issuedDate:'2026-10-01',purpose:'Issued for Tender'},{revision:'A1',issuedDate:'2026-08-01',purpose:'Issued for Review'}];
+  revisions.sources.push({...source,id:'FEED',revision:'C4',issuedDate:'2023-01-26',authority:'HISTORICAL',packageName:'Basic Engineering'});
+  validate(revisions,ids);const grouped=deriveDocumentRevisionRegister(revisions);assert.equal(grouped.length,1);assert.equal(grouped[0].current[0].revision,'B1');assert.equal(grouped[0].reference[0].revision,'C4');assert.equal(grouped[0].status,'CURRENT_PACKAGE');
+  const conflicting=JSON.parse(JSON.stringify(revisions));conflicting.sources.push({...source,id:'OTHER-CURRENT',revision:'B2'});assert.equal(deriveDocumentRevisionRegister(conflicting)[0].status,'CURRENT_REVISION_CONFLICT');
+  conflicting.sources[2].replaces=['TEST-SOURCE'];assert.equal(deriveDocumentRevisionRegister(conflicting)[0].current[0].revision,'B2');assert.equal(deriveDocumentRevisionRegister(conflicting)[0].current.length,1);
+  const oldOnly=JSON.parse(JSON.stringify(revisions));oldOnly.sources[0].authority='UNCONFIRMED';assert.equal(deriveDocumentRevisionRegister(oldOnly)[0].status,'NO_CURRENT_SOURCE');
+  const sameCopy=JSON.parse(JSON.stringify(revisions));sameCopy.sources.push({...source,id:'SECOND-COPY'});assert.equal(deriveDocumentRevisionRegister(sameCopy)[0].status,'CURRENT_PACKAGE');assert.equal(deriveDocumentRevisionRegister(sameCopy)[0].current.length,2);
+  for(const mutate of [d=>d.sources[0].revisionHistory[0].issuedDate='2026-02-30',d=>d.sources[0].revisionHistory.push({...d.sources[0].revisionHistory[0]}),d=>{d.sources[0].readState='METADATA_ONLY';d.sources[0].content='';},d=>d.sources[0].packageName=42]) {const bad=JSON.parse(JSON.stringify(revisions));mutate(bad);assert.throws(()=>validate(bad,ids));}
+  assert.deepEqual(deriveDocumentRevisionRegister(null),[]);
+  if(process.argv[2]) {const real=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));validate(real,ids);validateBidWorkspace(applySourceIntake(workspace,real,ids),baseline,ids);assert.deepEqual(deriveBidWorkspace(applySourceIntake(workspace,real,ids),ids,'2026-10-27'),deriveBidWorkspace(workspace,ids,'2026-10-27'));console.log('PASS private payload schema, backup compatibility and unchanged financial projection (content not printed)');}
   console.log('PASS source intake: old workspace compatibility, strict references, URL safety, revision replacement, unknown timezone, evidence/approval separation, backup roundtrip and unchanged financial projections.');
 } finally {require.extensions['.js']=old;}
