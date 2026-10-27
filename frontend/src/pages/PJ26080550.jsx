@@ -1,3 +1,4 @@
+import {WORKSPACE_VERSION} from "../project0550/workspaceVersion";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   ARCHITECTURE_MANIFEST,
@@ -2087,7 +2088,7 @@ function Project0550Bidding({ lang = "th" }) {
     ...(data?.nodes||[]).map(n=>({id:"bid.schematic.node."+n.id,title:n.label,tab:"schematic"})),
     ...(data?.edges||[]).map(e=>({id:"bid.schematic.edge."+e.id,title:e.label,tab:"schematic"})),
     ...MODULE_REGISTRY.map(m=>({id:m.id,title:m.name,tab:"registry"})),
-    ...["fx","scope-gates","history"].map(id=>({id:"bid.budget."+id,title:id,tab:"budget"})),
+    ...["fx","equipment-policy","scope-gates","history"].map(id=>({id:"bid.budget."+id,title:id,tab:"budget"})),
     ...["storage","modules"].map(id=>({id:"bid.registry."+id,title:id,tab:"registry"})),
     {id:"bid.schematic.canvas",title:"Overall / Schematic per system",tab:"schematic"},
     {id:"bid.vendor.controlled-sources",title:"Controlled vendor sources",tab:"documents"},
@@ -2108,8 +2109,8 @@ function Project0550Bidding({ lang = "th" }) {
             <p>{PROJECT_0550.title}</p>
           </div>
           <div className="p55-hero__status">
-            <Badge tone="neutral">BIDDING WORKSPACE</Badge>
-            <span>Working → Budget THB → Release USD</span>
+            <Badge tone="neutral">WORKSPACE {WORKSPACE_VERSION}</Badge>
+            <span>Working → Budget THB → USD Review</span>
           </div>
         </div>
 
@@ -2118,7 +2119,7 @@ function Project0550Bidding({ lang = "th" }) {
           <strong>{PROJECT_0550.method}</strong>
         </div>
 
-        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","A · Original RFQ Documents"],["B","B · Engineering & Bid Preparation"],["C","C · Communications & Submissions"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>setArea(id)}>{label}</button>)}</div>
+        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","เอกสารต้นทาง / RFQ"],["B","วิศวกรรมและราคา"],["C","การสื่อสารและการส่งเอกสาร"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>setArea(id)}>{label}</button>)}</div>
         {area==="B"&&<nav className="p55-tabs" aria-label="PJ2608-0550 sections">
           {TABS.map((tab) => (
             <button
@@ -2136,8 +2137,9 @@ function Project0550Bidding({ lang = "th" }) {
 
       <main className="p55-main">
         <BidSaveStatus/>
+        {typeof window!=="undefined"&&window.location.hostname==="localhost"&&window.location.port!=="3001"&&<section className="p55-panel" role="status"><strong>ทางเข้าหลัก: localhost:3001/projects/pj2608-0550</strong><p>หน้าปัจจุบันเปิดคนละพอร์ต ข้อมูล Working แยกกันตามพอร์ต ให้ Export backup จาก 09 Data / Trace ก่อนย้าย แล้ว Import ที่ทางเข้าหลัก</p><button onClick={()=>jump({tab:"registry",id:"bid.registry.storage"})}>เปิด Backup</button></section>}
         {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId componentKey="l3.original"/><DocumentsView/></section>}
-        {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><ComponentCopyId componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · No new issue or submission recorded.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
+        {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>การสื่อสารและการส่งเอกสาร</h2><p>หน้านี้แสดงประวัติการออกเอกสารที่บันทึกไว้ ยังไม่ได้เชื่อม Gmail หรือรวบรวมอีเมลที่ส่งต่อในบทสนทนา</p><ComponentCopyId componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · No new issue or submission recorded.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด USD Review ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
         {area==="B"&&<>
           <div className="p55-panel p55-module-nav"><label>ค้นหา / วาง Module ID <input aria-label="Project Module Search" value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&matches.length)jump(matches.find(m=>m.id.toLowerCase()===query)||matches[0]);}} placeholder="PJ2608-0550 / bid.budget.release"/></label><div className="p55-module-results">{matches.slice(0,30).map(m=><button type="button" key={m.id} onClick={()=>jump(m)}>{m.title}<small>{m.id}</small></button>)}</div></div>
           <div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>
@@ -2145,11 +2147,11 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "architecture" ? <ArchitectureView /> : null}
           {activeTab === "systems" ? <><SystemsView key={focusedSystem} initialSystem={focusedSystem}/><CoverageMatrix/></> : null}
           {activeTab === "engineering" ? <><EquationWorkbench/><EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /></> : null}
-          {activeTab === "execution" ? <><EquationWorkbench/><ExecutionView /></> : null}
+          {activeTab === "execution" ? <><section className="p55-panel"><p>บันทึกสมการและแผนคน–วันที่ First Principles แล้วเลือกใช้ในแถว Working</p><button onClick={()=>jump({tab:"engineering",id:"bid.engineering.equations"})}>เปิดสมการและแผนคน–วัน</button></section><ExecutionView /></> : null}
           {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
           {activeTab === "budget" ? <BidCommercialWorkspace navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
           {activeTab === "risk" ? <RiskView /> : null}
-          {activeTab === "documents" ? <><VendorWorkspace/><details className="p55-panel"><summary>Project evidence / original references</summary><DocumentsView/></details></> : null}
+          {activeTab === "documents" ? <><VendorWorkspace/><section className="p55-panel"><button onClick={()=>jump({area:"A",tab:"documents",id:"l3.original"})}>เปิดทะเบียนเอกสารต้นทาง / RFQ</button></section></> : null}
           {activeTab === "registry" ? <BidDataControls/> : null}
         </>}
       </main>

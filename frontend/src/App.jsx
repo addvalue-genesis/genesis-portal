@@ -9,14 +9,14 @@ const STRINGS = {
     appTitle: "GENESIS",
     subtitle: "ADDVALUE Digital Backbone",
     home: "หน้าแรก",
-    project0550: "PJ2608-0550 TPP",
+    project0550: "PJ2608-0550 Workspace",
     employees: "พนักงาน",
   },
   en: {
     appTitle: "GENESIS",
     subtitle: "ADDVALUE Digital Backbone",
     home: "Home",
-    project0550: "PJ2608-0550 TPP",
+    project0550: "PJ2608-0550 Workspace",
     employees: "Employees",
   },
 };

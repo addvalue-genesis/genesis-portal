@@ -9,7 +9,8 @@
     "validate:pj0550-snapshot": "node scripts/validate-pj2608-0550-snapshot.cjs",
     "validate:pj0550-evidence": "node scripts/validate-pj2608-0550-evidence.cjs",
     "validate:pj0550-coverage": "node scripts/validate-pj2608-0550-coverage.cjs",
-    "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs"
+    "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs",
+    "start:0550": "node scripts/start-pj0550.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",

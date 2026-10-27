@@ -10,13 +10,14 @@ const fail=m=>{throw Error(m);};
 export function emptyBidWorkspace(snapshotId){return {schema:BID_SCHEMA,projectId:"PJ2608-0550",baselineSnapshotId:snapshotId,revision:0,vendors:[],offers:[],calculations:[],lines:[],nodes:[],edges:[],fx:{thbPerUSD:null,thbPerEUR:null,source:"",date:""},audit:[]};}
 export function validateBidWorkspace(data,snapshotId,systems){
  if(!data||data.schema!==BID_SCHEMA||data.projectId!=="PJ2608-0550"||data.baselineSnapshotId!==snapshotId)fail("Wrong project/schema/baseline");
- const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit"];
+ const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","equipmentPolicy"];
  if(Object.keys(data).some(k=>!keys.includes(k)))fail("Unsupported workspace field");
  if(!Number.isSafeInteger(data.revision)||data.revision<0)fail("Invalid revision");
  for(const key of ["vendors","offers","calculations","lines","nodes","edges","audit"]){
   if(!Array.isArray(data[key])||data[key].length>2000)fail("Invalid "+key);
   if(key!=="audit"&&(data[key].some(r=>!r||typeof r.id!=="string"||!/^[\w.-]{1,100}$/.test(r.id))||new Set(data[key].map(r=>r.id)).size!==data[key].length))fail("Duplicate/invalid "+key+" ID");
  }
+ if(data.equipmentPolicy!=null)validateEquipmentPolicy(data.equipmentPolicy);
  const string=(v,k,max=4000)=>{if(typeof v!=="string"||v.length>max)fail("Invalid "+k);};
  const date=(v,k)=>{string(v,k,10);if(v&&(!/^\d{4}-\d{2}-\d{2}$/.test(v)||!Number.isFinite(new Date(v).getTime())||new Date(v).toISOString().slice(0,10)!==v))fail("Invalid "+k);};
  const fields=(o,allowed)=>{if(Object.keys(o).some(k=>!allowed.includes(k)))fail("Unsupported record field");};
@@ -25,7 +26,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  for(const v of data.vendors){fields(v,["id","name","kind","reference"]);["name","kind","reference"].forEach(k=>string(v[k],k));if(!v.name.trim())fail("Vendor name required");}
  for(const o of data.offers){fields(o,["id","vendorId","description","brand","quoteRef","sourceRef","date","validUntil","currency","unit","unitCost"]);["description","brand","quoteRef","sourceRef"].forEach(k=>string(o[k],k));date(o.date,"quote date");date(o.validUntil,"quote validity");if(o.date&&o.validUntil&&o.validUntil<o.date)fail("Quote validity precedes quote date");if(!data.vendors.some(v=>v.id===o.vendorId))fail("Offer vendor missing");if(!["THB","USD","EUR"].includes(o.currency)||!BID_UNITS.includes(o.unit))fail("Invalid offer currency/unit");number(o.unitCost);}
  for(const c of data.calculations){fields(c,["id","title","systemToken","equationId","inputs","sourceRef"]);string(c.title,"calculation title");string(c.sourceRef,"calculation source");system(c.systemToken);if(!c.inputs||typeof c.inputs!=="object"||Array.isArray(c.inputs))fail("Invalid equation inputs");if(evaluateServiceEquation(c.equationId,c.inputs).errors?.includes("Unknown equation"))fail("Unknown equation");}
- for(const l of data.lines){fields(l,["id","systemToken","wbs","description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey","quantity","unit","currency","manualCost","sellMode","sellRate","markupPct","marginPct","primePct","selected"]);system(l.systemToken);if(!BID_WBS.includes(l.wbs))fail("Unknown 0550 WBS");["description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey"].forEach(k=>string(l[k],k));if(!BID_UNITS.includes(l.unit)||!["THB","USD","EUR"].includes(l.currency)||!["DIRECT","MARKUP","MARGIN"].includes(l.sellMode)||typeof l.selected!=="boolean")fail("Invalid line selection/unit/currency/pricing");["quantity","manualCost","sellRate","markupPct","marginPct","primePct"].forEach(k=>number(l[k]));}
+ for(const l of data.lines){fields(l,["id","systemToken","wbs","description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey","quantity","unit","currency","manualCost","sellMode","sellRate","markupPct","marginPct","primePct","selected","pricingKind","costBasis"]);if(l.pricingKind!==undefined&&!["EQUIPMENT","SERVICE"].includes(l.pricingKind))fail("Invalid pricing kind");if(l.costBasis!==undefined&&!["","ESTIMATE","ACTUAL"].includes(l.costBasis))fail("Invalid cost basis");system(l.systemToken);if(!BID_WBS.includes(l.wbs))fail("Unknown 0550 WBS");["description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey"].forEach(k=>string(l[k],k));if(!BID_UNITS.includes(l.unit)||!["THB","USD","EUR"].includes(l.currency)||!["DIRECT","MARKUP","MARGIN"].includes(l.sellMode)||typeof l.selected!=="boolean")fail("Invalid line selection/unit/currency/pricing");["quantity","manualCost","sellRate","markupPct","marginPct","primePct"].forEach(k=>number(l[k]));}
  for(const n of data.nodes){fields(n,["id","systemToken","site","label","kind","sourceRef"]);system(n.systemToken);["site","label","kind","sourceRef"].forEach(k=>string(n[k],k));}
  for(const e of data.edges){fields(e,["id","from","to","label","sourceRef"]);["from","to","label","sourceRef"].forEach(k=>string(e[k],k));if(!data.nodes.some(n=>n.id===e.from)||!data.nodes.some(n=>n.id===e.to)||e.from===e.to)fail("Invalid schematic edge");}
  if(!data.fx||typeof data.fx!=="object")fail("Missing FX record");fields(data.fx,["thbPerUSD","thbPerEUR","source","date"]);number(data.fx.thbPerUSD);number(data.fx.thbPerEUR);string(data.fx.source,"FX source");date(data.fx.date,"FX date");
@@ -66,19 +67,33 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate){
   if(!nonnegative(costRate))problems.push("Cost rate OPEN");
   const factor=fx(currency);if(factor===null)problems.push("FX source/date/rate OPEN");
   const costNative=finite(quantity)&&nonnegative(costRate)?quantity*costRate:null;
-  let addvalueSell=null;
-  if(l.sellMode==="DIRECT")addvalueSell=finite(quantity)&&nonnegative(l.sellRate)?eq("E10",{rows:[{id:l.id,quantity,sellRate:l.sellRate}],other:0}):null;
-  else if(l.sellMode==="MARKUP")addvalueSell=costNative!==null&&nonnegative(l.markupPct)?eq("E11",{cost:costNative,markup:l.markupPct/100}):null;
-  else addvalueSell=costNative!==null&&nonnegative(l.marginPct)?eq("E12",{cost:costNative,margin:l.marginPct/100}):null;
-  if(addvalueSell===null)problems.push("Working sell inputs OPEN/invalid");
-  const customerNative=addvalueSell!==null&&nonnegative(l.primePct)?eq("E13",{sell:addvalueSell,primeMarkup:l.primePct/100}):null;
-  if(customerNative===null)problems.push("Prime commercial treatment OPEN/invalid");
+  const equipment=(l.pricingKind|| (l.wbs==="A"?"EQUIPMENT":"SERVICE"))==="EQUIPMENT";
+  let addvalueSell=null,customerNative=null,allocation=null;
+  if(equipment){
+   if(!["ESTIMATE","ACTUAL"].includes(l.costBasis))problems.push("Select actual or estimated equipment cost basis");
+   const p=data.equipmentPolicy;
+   if(!p)problems.push("Equipment policy OPEN — set private workspace rates");
+   else if(costNative!==null){
+    allocation={prime:costNative*p.primePct/100,fee:costNative*p.feePct/100,reserve:costNative*p.reservePct/100};
+    addvalueSell=costNative+allocation.fee+allocation.reserve;
+    customerNative=addvalueSell+allocation.prime;
+   }
+  }else{
+   if(l.sellMode==="DIRECT")addvalueSell=finite(quantity)&&nonnegative(l.sellRate)?eq("E10",{rows:[{id:l.id,quantity,sellRate:l.sellRate}],other:0}):null;
+   else if(l.sellMode==="MARKUP")addvalueSell=costNative!==null&&nonnegative(l.markupPct)?eq("E11",{cost:costNative,markup:l.markupPct/100}):null;
+   else addvalueSell=costNative!==null&&nonnegative(l.marginPct)?eq("E12",{cost:costNative,margin:l.marginPct/100}):null;
+   if(addvalueSell===null)problems.push("Working sell inputs OPEN/invalid");
+   customerNative=addvalueSell!==null&&nonnegative(l.primePct)?eq("E13",{sell:addvalueSell,primeMarkup:l.primePct/100}):null;
+   if(customerNative===null)problems.push("Prime commercial treatment OPEN/invalid");
+  }
   if(factor!==null&&[customerNative,costNative,addvalueSell].some(n=>n!==null&&(!Number.isFinite(n*factor)||Math.abs(n*factor)>Number.MAX_SAFE_INTEGER/100)))problems.push("Converted amount exceeds supported precision");
   const ready=problems.length===0;
-  const customerTHB=ready?round(customerNative*factor):null;
+  const costTHB=ready?round(costNative*factor):null;
+  const equipmentBreakdown=ready&&allocation?{primeTHB:round(allocation.prime*factor),feeTHB:round(allocation.fee*factor),reserveTHB:round(allocation.reserve*factor)}:null;
+  const customerTHB=ready?(equipmentBreakdown?round(costTHB+equipmentBreakdown.primeTHB+equipmentBreakdown.feeTHB+equipmentBreakdown.reserveTHB):round(customerNative*factor)):null;
   const usdRate=fx("USD");
   const usdValue=ready&&usdRate!==null?eq("E17",{THB:customerTHB,fx:usdRate}):null;
-  return {...l,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+  return {...l,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB,equipment,equipmentBreakdown,workingSellTHB:ready?(equipmentBreakdown?round(costTHB+equipmentBreakdown.feeTHB+equipmentBreakdown.reserveTHB):round(addvalueSell*factor)):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  });
  const selected=lines.filter(l=>l.selected);
  const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);
@@ -87,4 +102,18 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate){
  const missingSystems=systemTokens.filter(t=>!selected.some(l=>l.systemToken===t&&l.wbs==="A"));
  const missingWbs=BID_WBS.filter(c=>c!=="A"&&c!=="C1"&&!selected.some(l=>l.wbs===c));
  return {lines,selected,groups,complete,missingSystems,missingWbs,baseTHB:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerTHB"),baseUSD:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerUSD"),optionsTHB:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerTHB"),optionsUSD:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerUSD"),knownTHB:sum(selected.filter(l=>l.customerTHB!==null),"customerTHB"),selectedTHB:sum(selected,"customerTHB"),selectedUSD:sum(selected,"customerUSD"),releaseAllowed:false,releaseState:"HOLD",scopeComplete:missingSystems.length===0&&missingWbs.length===0,revision:data.revision};
+}
+
+// Rates are private workspace inputs, never project defaults in the public bundle.
+export function validateEquipmentPolicy(p){
+ const keys=["method","primePct","feePct","reservePct","source","date"];
+ if(!p||typeof p!=="object"||Array.isArray(p)||Object.keys(p).some(k=>!keys.includes(k))||p.method!=="SAME_COST_BASE")fail("Invalid equipment policy");
+ for(const k of ["primePct","feePct","reservePct"])if(!nonnegative(p[k])||p[k]>1000)fail("Invalid equipment policy percentage");
+ if(typeof p.source!=="string"||!p.source.trim()||p.source.length>4000)fail("Equipment policy source required");
+ if(typeof p.date!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(p.date)||!Number.isFinite(new Date(p.date).getTime())||new Date(p.date).toISOString().slice(0,10)!==p.date)fail("Invalid equipment policy date");
+ return p;
+}
+export function readEquipmentPolicyFile(payload){
+ if(!payload||payload.projectId!=="PJ2608-0550"||payload.schema!=="genesis.0550.equipment-policy.v1"||Object.keys(payload).some(k=>!["projectId","schema","policy"].includes(k)))fail("Wrong project or equipment policy file");
+ return validateEquipmentPolicy(payload.policy);
 }
