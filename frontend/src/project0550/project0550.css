@@ -1528,29 +1528,44 @@
     gap: 2px;
   }
 }
+.p55-evidence-review small { display: block; line-height: 1.5; }
+.p55-evidence-review details { margin: 8px 0; padding: 10px 12px; }
+.p55-evidence-review summary { cursor: pointer; line-height: 1.5; }
+.p55-evidence-review details[open] > summary { margin-bottom: 12px; font-weight: 600; }
+.p55-evidence-sources { padding-left: 20px; }
+.p55-evidence-sources li { margin: 8px 0; line-height: 1.5; }
+.p55-evidence-sources a { overflow-wrap: anywhere; }
 
+/* Active bidding controls. */
+.p55-bid-areas, .p55-bid-stages { display:flex; flex-wrap:wrap; gap:10px; margin:16px 0; }
+.p55-bid-areas button, .p55-bid-stages button { padding:12px 16px; border:1px solid #9ab3c4; border-radius:8px; background:#fff; color:#123951; cursor:pointer; }
+.p55-bid-areas button[aria-pressed="true"], .p55-bid-stages button.is-active { background:#07557b; color:#fff; border-color:#07557b; }
+.p55-bid-stages button { flex:1 1 220px; text-align:left; }
+.p55-bid-stages small, .p55-bid-content small { display:block; line-height:1.5; }
+.p55-bid-module > summary { display:flex; flex-wrap:wrap; justify-content:space-between; align-items:center; gap:12px; cursor:pointer; font-size:17px; }
+.p55-bid-content { padding-top:16px; }
+.p55-bid-content form { padding:14px; margin:12px 0; border:1px solid #c6d8e4; border-radius:8px; background:#f7fafc; }
+.p55-bid-fields { display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:14px; margin-bottom:16px; }
+.p55-bid-field { display:flex; flex-direction:column; gap:6px; font-size:14px; }
+.p55-bid-field input, .p55-bid-field select, .p55-module-nav input { width:100%; padding:10px; box-sizing:border-box; border:1px solid #97b0c1; border-radius:6px; font-size:15px; background:#fff; color:#102e44; }
+.p55-bid-result { display:block; padding:14px; background:#e5f4f6; border:1px solid #69a9b2; margin:14px 0; font-weight:700; font-size:18px; }
+.p55-bid-content button { margin:4px; cursor:pointer; }
+.p55-bid-content tr:focus { outline:3px solid #eea22d; outline-offset:-3px; background:#fff5d9; }
+.gns-copy-id { display:inline-flex; flex-wrap:wrap; align-items:center; gap:6px; margin:5px 0; max-width:100%; font-size:11px; font-weight:400; }
+.gns-copy-id code { overflow-wrap:anywhere; color:#356078; }
+.gns-copy-id button { font-size:11px; border:1px solid #acc4d3; border-radius:4px; background:#edf5fa; color:#144861; padding:4px 7px; cursor:pointer; }
+.gns-copy-id input { min-width:260px; }
+.p55-current-module, .p55-bid-save { display:flex; flex-wrap:wrap; align-items:center; gap:14px; padding:12px; margin-bottom:16px; border:1px solid #bed1de; border-radius:8px; background:#f5fafc; }
+.p55-bid-save [role="alert"] { flex-basis:100%; color:#a12424; }
+.p55-module-results { display:flex; flex-wrap:wrap; gap:6px; max-height:230px; overflow:auto; }
+.p55-module-results button { padding:8px; margin-top:8px; text-align:left; border:1px solid #bbd1df; background:#f1f8fc; border-radius:6px; cursor:pointer; }
+.p55-module-results small { display:block; }
 
-/* Shared formula inventory: readable 2-level hierarchy, both 0550/0553. */
-.p55-formula-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 14px;background:#f3f7fb;border:1px solid #d9e4ef;border-radius:9px;margin:10px 0}
-.p55-formula-toolbar strong{display:block;font-size:15px;color:#143957}
-.p55-formula-toolbar small{display:block;margin-top:5px;font-size:12px;color:#45637a}
-.p55-formula-actions{display:flex;gap:7px}
-.p55-formula-actions button{border:1px solid #adc1d1;background:#fff;color:#184466;border-radius:6px;padding:7px 12px;font-weight:650;cursor:pointer}
-.p55-formula-table td,.p55-formula-table th{vertical-align:top}
-.p55-formula-table .p55-formula-group td{background:#dfeaf4;border-top:2px solid #92b2ce;padding-top:12px;padding-bottom:12px}
-.p55-formula-group td strong{font-size:15px;color:#0d3555;display:block}
-.p55-formula-group small,.p55-formula-item small{display:block;color:#4e697d;font-size:11px;margin-top:5px;line-height:1.5}
-.p55-formula-count{font-weight:700;color:#174363}
-.p55-formula-category{display:inline-block;background:#c2d8e9;border:1px solid #91b2cb;border-radius:5px;color:#133d5c;padding:3px 7px;font-weight:700;font-size:11px}
-.p55-formula-table .p55-formula-item td{background:#fff;padding-top:11px;padding-bottom:11px}
-.p55-formula-table .p55-formula-item:nth-of-type(2n) td{background:#f8fafc}
-.p55-formula-subtitle{font-size:13px;color:#234962;display:block;line-height:1.5}
-.p55-formula-expression{white-space:normal;overflow-wrap:anywhere;font-size:12px}
-.p55-formula-state{font-size:12px;font-weight:700;color:#1e4f71}
-.p55-formula-table .p55-formula-detail td{background:#f3f8fc!important;padding:16px}
-.p55-formula-detail-title{font-size:14px;font-weight:750;color:#173c59;margin-bottom:12px}
-.p55-formula-dl{display:grid;grid-template-columns:minmax(100px,160px) 1fr;gap:12px;margin:0 0 10px}
-.p55-formula-dl dt{font-weight:700;color:#244d69}
-.p55-formula-dl dd{margin:0;min-width:0;overflow-wrap:anywhere}
-.p55-formula-dl ul{margin:0;padding-left:20px}
-@media(max-width:760px){.p55-formula-dl{grid-template-columns:1fr;gap:5px}.p55-formula-table{min-width:780px}}
+/* All active bidding tabs remain visible; no hidden horizontal-only tabs. */
+.p55 .p55-tabs { flex-wrap:wrap; overflow-x:visible; }
+[data-testid="bid-commercial"] > .p55-metric-grid { grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); }
+[data-testid="bid-commercial"] > .p55-metric-grid .p55-metric > span,
+[data-testid="bid-commercial"] > .p55-metric-grid .p55-metric > small { display:block; line-height:1.5; }
+[data-testid="bid-commercial"] > .p55-metric-grid .p55-metric > strong { display:block; font-size:24px; margin:8px 0; }
+.p55-bid-content button:not(.gns-copy-id button), .p55-bid-save button { padding:7px 10px; border:1px solid #9eb9c9; border-radius:6px; background:#f0f7fb; color:#123951; }
+.p55-bid-content button:disabled { opacity:.55; cursor:default; }

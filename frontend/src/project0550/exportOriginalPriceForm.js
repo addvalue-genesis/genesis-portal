@@ -221,3 +221,30 @@ export function exportOriginalPriceFormXlsx(submission) {
   a.remove();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+// New bidding schedule uses the SAME derived selected rows as Budget/Release.
+// Separate review artifact; original issued-workbook code above stays byte-identical.
+export function buildBidReviewXlsx(model,currency) {
+  if(!["THB","USD"].includes(currency))throw Error("Unsupported review currency");
+  const key=currency==="USD"?"customerUSD":"customerTHB";
+  const rows=[
+    ["PJ2608-0550 — BID PRICE REVIEW — NOT ISSUED"],
+    [`Revision ${model.revision} | ${currency} | Selected scope only | Customer-form regrouping / release approval pending`],
+    ["WBS","System","Description","Qty","Unit",`Unit sell ${currency}`,`Total ${currency}`,"Status"]
+  ];
+  model.selected.forEach(r=>rows.push([r.wbs,r.systemToken,r.description,r.quantity,r.unit,r[key]!==null&&r.quantity>0?r[key]/r.quantity:null,r[key],r[key]===null?"OPEN":"WORKING PRICE"]));
+  const subtotal=currency==="USD"?model.selectedUSD:model.selectedTHB;
+  rows.push(["","","Selected line subtotal — not complete project total","","","",subtotal,subtotal===null?"INCOMPLETE":"REVIEW ONLY"]);
+  rows.push(["","","Base A+B — selected scope only","","","",currency==="USD"?model.baseUSD:model.baseTHB]);
+  rows.push(["","","Part C — optional, excluded from Base A+B","","","",currency==="USD"?model.optionsUSD:model.optionsTHB]);
+  rows.push(["","","Part C is optional; no automatic customer issue or financial approval."]);
+  const xml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><cols><col min="1" max="2" width="20" customWidth="1"/><col min="3" max="3" width="58" customWidth="1"/><col min="4" max="8" width="22" customWidth="1"/></cols><sheetData>${rows.map((r,i)=>`<row r="${i+1}">${r.map((v,j)=>cellXml(v,i+1,j,i<2?1:i===2?2:typeof v==="number"?4:0)).join("")}</row>`).join("")}</sheetData><pageMargins left="0.3" right="0.3" top="0.5" bottom="0.5" header="0.2" footer="0.2"/></worksheet>`;
+  return zipStore({
+    "[Content_Types].xml":`<?xml version="1.0"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>`,
+    "_rels/.rels":`<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>`,
+    "xl/workbook.xml":`<?xml version="1.0"?><workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets><sheet name="Bid Review ${currency}" sheetId="1" r:id="rId1"/></sheets></workbook>`,
+    "xl/_rels/workbook.xml.rels":`<?xml version="1.0"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
+    "xl/styles.xml":stylesXml(),"xl/worksheets/sheet1.xml":xml
+  });
+}
+export function exportBidReviewXlsx(model,currency){const bytes=buildBidReviewXlsx(model,currency),url=URL.createObjectURL(new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));const a=document.createElement("a");a.href=url;a.download=`PJ2608-0550_BID_${currency}_REVIEW_R${model.revision}.xlsx`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}

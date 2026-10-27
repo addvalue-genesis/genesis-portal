@@ -1,58 +1,35 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { PROJECTS, projectText } from "../projectRegistry";
+import "./projectHub.css";
 
 export function Home({ lang }) {
-  const th = lang === "th";
-
-  return (
-    <div>
-      <section className="home-hero">
-        <small>ADDVALUE · GENESIS PORTAL</small>
-        <h1>{th ? "ศูนย์กลางงานโครงการและข้อมูลวิศวกรรม" : "Project & Engineering Control Center"}</h1>
-        <p>
-          {th
-            ? "GENESIS รวมโครงการ วิศวกรรม ต้นทุน เอกสาร บุคลากร และการเชื่อมต่อ ERP ไว้ใน workspace เดียว โดย PJ2608-0550 เป็น TPP pilot ที่ใช้ First Principles + Constraint-Based Engineering + Parametric Cost Model"
-            : "GENESIS unifies projects, engineering, cost, documents, people and ERP integration. PJ2608-0550 is the TPP pilot using First Principles + Constraint-Based Engineering + Parametric Cost Model."}
-        </p>
-      </section>
-
-      <section className="home-section">
-        <h2>{th ? "Workspace ที่พร้อมตรวจ" : "Available workspaces"}</h2>
-        <div className="home-card-grid">
-          <Link className="home-card" to="/projects/pj2608-0550">
-            <span className="home-card__tag">TPP · ACTIVE</span>
-            <h3>PJ2608-0550 · ASK Onshore Telecom</h3>
-            <p>
-              {th
-                ? "19 ระบบ · First-Principles control spine · Resource-protected pricing · FAT/SAT execution · Logistics / Permit / Insurance / Risk"
-                : "19 systems · First-Principles control spine · Resource-protected pricing · FAT/SAT execution · Logistics / Permit / Insurance / Risk"}
-            </p>
-            <div className="home-card__meta">Budgetary Rev10 · SAMTEL Rev00 issued · Final RELEASED_SELL still HOLD</div>
-          </Link>
-
-          <Link className="home-card" to="/employees">
-            <span className="home-card__tag">CORE MODULE</span>
-            <h3>{th ? "บุคลากร / Competence" : "Employees / Competence"}</h3>
-            <p>
-              {th
-                ? "ข้อมูลพนักงาน หนังสือเดินทาง ใบรับรองสุขภาพ และการเตรียมความพร้อมสำหรับงานโครงการ"
-                : "Employee records, passport, health certificates and project resource readiness."}
-            </p>
-            <div className="home-card__meta">{th ? "Phase 1.1 · เชื่อม Backend แล้ว" : "Phase 1.1 · Backend-ready"}</div>
-          </Link>
-
-          <article className="home-card">
-            <span className="home-card__tag">PLANNED</span>
-            <h3>{th ? "Project Cost Engine" : "Project Cost Engine"}</h3>
-            <p>
-              {th
-                ? "COMMON equation kernel, productivity library, cost/sell separation และ actual-data calibration สำหรับใช้ซ้ำทุกโครงการ"
-                : "Reusable COMMON equation kernel, productivity library, cost/sell separation and actual-data calibration."}
-            </p>
-            <div className="home-card__meta">COMMON → GENERIC DOMAIN → PARTICULAR PROJECT</div>
-          </article>
-        </div>
-      </section>
-    </div>
-  );
+  const th = lang !== "en";
+  const available = PROJECTS.filter(project => project.available).length;
+  return <div className="project-hub">
+    <section className="home-hero">
+      <small>ADDVALUE · GENESIS PORTAL</small>
+      <h1>{th ? "โครงการทั้งหมด" : "All projects"}</h1>
+      <p>{th ? "เลือกโครงการเพื่อเปิดงานวิศวกรรม เสนอราคา หรือเอกสาร SAT ของโครงการนั้น" : "Choose a project to open its engineering, bidding or SAT document workspace."}</p>
+      <p className="project-hub-summary">{th ? `${PROJECTS.length} โครงการในรายการ · ${available} workspace พร้อมเปิด · ${PROJECTS.length - available} รอเชื่อม workspace เดิม` : `${PROJECTS.length} listed projects · ${available} available workspaces · ${PROJECTS.length - available} awaiting workspace recovery`}</p>
+    </section>
+    <section className="home-section" aria-label={th ? "รายการโครงการ" : "Project list"}>
+      <div className="project-hub-grid">
+        {PROJECTS.map(project => <Link key={project.code} to={project.route}
+          data-project-code={project.code}
+          className={`home-card project-hub-card${project.available ? "" : " project-hub-card--pending"}`}>
+          <div className="project-hub-card-top">
+            <span className="project-hub-code">{project.id || project.code}</span>
+            <span className="home-card__tag">{project.available ? (th ? "มี workspace" : "Workspace available") : (th ? "รอเชื่อม workspace" : "Workspace pending")}</span>
+          </div>
+          <h2>{project.title}</h2>
+          <span className="project-hub-kind">{project.kind}</span>
+          <p>{projectText(project, "description", lang)}</p>
+          <p className="project-hub-note">{projectText(project, "note", lang)}</p>
+          <span className="project-hub-action">{project.available ? (th ? "เปิดโครงการ" : "Open project") : (th ? "ดูสถานะ 0541" : "View 0541 status")} →</span>
+        </Link>)}
+      </div>
+    </section>
+    <aside className="project-hub-support"><Link to="/employees">{th ? "บุคลากร / Competence" : "Employees / Competence"}</Link></aside>
+  </div>;
 }
