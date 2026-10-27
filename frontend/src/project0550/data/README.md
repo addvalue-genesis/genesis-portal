@@ -2,6 +2,22 @@
 
 Status: INTERNAL / WORKING / REVIEW REQUIRED
 
+## 27 October 2026 update
+
+The older Rev07 narrative below is historical. The current controlled file retains its
+`rev07` filename but is protected as the issued Rev10 snapshot. Current bidding inputs
+are stored through the workspace adapter; reviewed private source intake loads from
+the local Drive Desktop bridge.
+
+Preserved project facts, B1 lineage, method references and project bindings now live in
+`reference/pj2608-0550.reference-registers.json`, accessed through
+`referenceRepository.js`. This is versioned reference JSON, not current bid input or
+new evidence approval. Changes require a reviewed revision and rebuild. Formula code
+stays separate. Run `npm run validate:pj0550-references` to verify migration parity,
+reference integrity, original issued XLSX bytes and missing-value handling.
+
+See [the audit and remaining limitations](../../../../docs/handoff/pj2608-0550/20261027_HARDCODE_AUDIT.md).
+
 ## Purpose
 
 Move PJ2608-0550 from React-owned static values toward:

@@ -1,4 +1,5 @@
 import { evaluateServiceEquation } from "../serviceEquationRuntime";
+import { validateSourceIntake } from "./sourceIntakeModel";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
@@ -10,7 +11,7 @@ const fail=m=>{throw Error(m);};
 export function emptyBidWorkspace(snapshotId){return {schema:BID_SCHEMA,projectId:"PJ2608-0550",baselineSnapshotId:snapshotId,revision:0,vendors:[],offers:[],calculations:[],lines:[],nodes:[],edges:[],fx:{thbPerUSD:null,thbPerEUR:null,source:"",date:""},audit:[]};}
 export function validateBidWorkspace(data,snapshotId,systems){
  if(!data||data.schema!==BID_SCHEMA||data.projectId!=="PJ2608-0550"||data.baselineSnapshotId!==snapshotId)fail("Wrong project/schema/baseline");
- const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit"];
+ const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake"];
  if(Object.keys(data).some(k=>!keys.includes(k)))fail("Unsupported workspace field");
  if(!Number.isSafeInteger(data.revision)||data.revision<0)fail("Invalid revision");
  for(const key of ["vendors","offers","calculations","lines","nodes","edges","audit"]){
@@ -30,6 +31,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  for(const e of data.edges){fields(e,["id","from","to","label","sourceRef"]);["from","to","label","sourceRef"].forEach(k=>string(e[k],k));if(!data.nodes.some(n=>n.id===e.from)||!data.nodes.some(n=>n.id===e.to)||e.from===e.to)fail("Invalid schematic edge");}
  if(!data.fx||typeof data.fx!=="object")fail("Missing FX record");fields(data.fx,["thbPerUSD","thbPerEUR","source","date"]);number(data.fx.thbPerUSD);number(data.fx.thbPerEUR);string(data.fx.source,"FX source");date(data.fx.date,"FX date");
  for(const a of data.audit){fields(a,["revision","at","action"]);if(!Number.isSafeInteger(a.revision)||a.revision<1)fail("Invalid audit revision");string(a.at,"audit time",100);string(a.action,"audit action");}
+ if(data.sourceIntake!==undefined)validateSourceIntake(data.sourceIntake,systems);
  return data;
 }
 export function deriveBidWorkspace(data,systemTokens,reviewDate){

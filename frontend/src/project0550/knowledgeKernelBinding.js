@@ -1,26 +1,8 @@
 import { ENGINEERING_LAW_KERNELS, KNOWLEDGE_KERNEL_DOMAINS, KNOWLEDGE_KERNEL_POLICY } from "../knowledge-kernels/library";
 
-const PROJECT_KERNEL_BINDINGS = {
-  "TEL-LAN": ["OPTICAL", "POWER", "NET-CAP", "RELIABILITY"],
-  "TEL-LAN-VCS": ["NET-CAP"],
-  "TEL-VSAT": ["RF-PROP", "RELIABILITY"],
-  "TEL-VSAT-KU": ["RF-PROP"],
-  "TEL-PABX": ["NET-CAP", "RELIABILITY"],
-  "TEL-IPP": [],
-  "TEL-PAGA": ["ACOUSTIC", "POWER", "RELIABILITY"],
-  "TEL-CCTV": ["VIDEO", "POWER", "NET-CAP", "RELIABILITY"],
-  "TEL-RADIO-DTRS": ["RF-PROP", "POWER", "RELIABILITY", "MECH"],
-  "TEL-RADIO-MARINE": ["RF-PROP", "MECH"],
-  "TEL-RADIO-AERO": ["RF-PROP", "MECH"],
-  "TEL-RADIO-SSB": ["RF-PROP"],
-  "TEL-DMR": ["RF-PROP", "POWER", "RELIABILITY", "MECH"],
-  "TEL-ES": [],
-  "TEL-FO": ["OPTICAL"],
-  "TEL-TELT": ["MECH"],
-  "TEL-MET": [],
-  "TEL-NDB": ["RF-PROP", "POWER", "RELIABILITY"],
-  "TEL-AIS": [],
-};
+import { getProject0550References } from "./data/referenceRepository";
+
+const PROJECT_KERNEL_BINDINGS = getProject0550References().kernelBindings;
 
 export function buildProject0550KnowledgeKernelLibrary(systems = []) {
   return {

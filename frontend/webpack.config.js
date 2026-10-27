@@ -46,6 +46,10 @@ module.exports = {
     ]
   },
   devServer: {
+    setupMiddlewares: (middlewares) => {
+      middlewares.unshift({name: "local-private-source-0550", middleware: require("./scripts/source-drive-0550.cjs").createMiddleware()});
+      return middlewares;
+    },
     static: {
       directory: path.join(__dirname, "public")
     },

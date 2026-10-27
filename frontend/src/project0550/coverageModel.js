@@ -2,44 +2,15 @@
 import { buildProject0550KnowledgeKernelLibrary } from "./knowledgeKernelBinding";
 import { SERVICE_EQUATIONS, SERVICE_LINE_DERIVATION } from "./serviceEquationModel";
 
-// Review candidates derived from the existing PAGA component register, not approved
-// requirement extractions, installed TAGs, SKU matches or posting instructions.
-export const PAGA_REVIEW_PLAN = [
-  { componentId: "TEL-PAGA-C01", kernels: ["RELIABILITY"], serviceLines: ["B1"], deliverable: "Cabinet / location reconciliation, architecture and controlled TAG list" },
-  { componentId: "TEL-PAGA-C02", kernels: ["ACOUSTIC", "POWER", "RELIABILITY"], serviceLines: ["B1"], deliverable: "Amplifier loading, speaker tap schedule and redundant loop proof" },
-  { componentId: "TEL-PAGA-C03", kernels: ["POWER"], serviceLines: ["B1"], deliverable: "Access / call-station quantity and location reconciliation" },
-  { componentId: "TEL-PAGA-C04", kernels: ["ACOUSTIC"], serviceLines: ["B1"], deliverable: "RPT-0005, noise / SPL criteria, speaker layout and final MTO" },
-  { componentId: "TEL-PAGA-C05", kernels: ["POWER", "RELIABILITY"], serviceLines: ["B1", "B4"], deliverable: "Beacon control / monitoring interface and acceptance test evidence" },
-  { componentId: "TEL-PAGA-C06", kernels: ["RELIABILITY"], serviceLines: ["B1", "B4"], deliverable: "ACT-IP / activation / SIP licence and interface inclusion reconciliation" },
-  { componentId: "TEL-PAGA-C07", kernels: ["ACOUSTIC", "POWER"], serviceLines: ["B1"], deliverable: "Controlled acoustic and amplifier / loop calculation reports" },
-  { componentId: "TEL-PAGA-C08", kernels: ["POWER"], serviceLines: ["B1"], deliverable: "6-hour autonomy: approved load, efficiency, derating and UPS scope" },
-  { componentId: "TEL-PAGA-C09", kernels: [], serviceLines: ["B4"], deliverable: "OEM FAT inclusion versus ADDVALUE / OEM site SAT, crew-days and trips" },
-  { componentId: "TEL-PAGA-C10", kernels: ["RELIABILITY"], serviceLines: ["B5", "B6", "C2", "C3"], deliverable: "Separate startup, special tools, 10-year and 2-year lists; deduct proven inclusions" },
-];
+import { getProject0550References } from "./data/referenceRepository";
 
-export const EQUATION_REUSE_CROSSWALK = [
-  ["E01", ["001", "004", "005", "026"]], ["E02", ["009", "010", "024"]],
-  ["E03", ["005", "008", "020"]], ["E04", ["025"]],
-  ["E05", ["005", "006", "023"]], ["E06", ["006", "007"]],
-  ["E07", ["008", "018"]], ["E08", ["013", "014", "015", "016", "017"]],
-  ["E09", ["018", "020", "021"]], ["E10", ["033"]], ["E11", ["033"]],
-  ["E12", ["033"]], ["E13", ["033"]], ["E14", ["020", "022"]],
-  ["E15", ["024", "027", "028"]], ["E16", ["005", "018", "026"]],
-  ["E17", []], ["E18", ["002", "004", "005", "032"]],
-].map(([equationId, ids]) => ({
-  equationId, geqReferences: ids.map(id => `GEQ-${id}`), status: "REFERENCE_ONLY",
-  implementation: "EXISTS_VERIFIED", // Existing formula definition, not evaluated project compliance.
-  control: SERVICE_EQUATIONS.find(e => e.id === equationId)?.control,
+// Review candidates and compatibility decisions retain their original evidence states.
+const references = getProject0550References();
+export const PAGA_REVIEW_PLAN = references.pagaReviewPlan;
+export const EQUATION_REUSE_CROSSWALK = references.equationReuseCrosswalk.map(row => ({
+  ...row, control: SERVICE_EQUATIONS.find(e => e.id === row.equationId).control,
 }));
-
-export const REUSE_COMPATIBILITY = [
-  { family: "GEQ / PEQ", status: "REFERENCE_ONLY", decision: "Keep E01–E18; candidate family crosswalk only. E01–E18 now execute in the 0550 workbench; particular inputs, calibration and GEQ runtime equivalence remain OPEN." },
-  { family: "GMR-001 / 003", status: "OPEN", decision: "Existing 15 module IDs and repository/facade verified; coverage is read-only under MOD-REQ-COMPLETENESS. Full parent-child and source-row contracts remain OPEN." },
-  { family: "GMR-005 / 008", status: "NOT_IMPLEMENTED", decision: "New bidding rows support exact Source ↔ Release and ancestor expansion. Original RFQ native-sheet roundtrip remains NOT_IMPLEMENTED; snapshot pointers are not that roundtrip." },
-  { family: "GMR-009 / 011", status: "OPEN", decision: "Existing budget and export retained. Unique requirement cost owners and per-requirement release/export coverage remain unverified." },
-  { family: "GKR", status: "REFERENCE_ONLY", decision: "No reviewed decision-record store imported. Private chats and commercial records are not published." },
-  { family: "GPE", status: "REFERENCE_ONLY", decision: "Existing snapshot cache retained. Browser baseline measured; no performance optimization justified or implemented." },
-];
+export const REUSE_COMPATIBILITY = references.reuseCompatibility;
 
 const pointer = (...parts) => "/" + parts.map(p => String(p).replace(/~/g, "~0").replace(/\//g, "~1")).join("/");
 

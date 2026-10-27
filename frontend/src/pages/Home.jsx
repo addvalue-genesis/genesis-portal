@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { PROJECTS, projectText } from "../projectRegistry";
+import release from "../projectHubRelease.json";
 import "./projectHub.css";
 
 export function Home({ lang }) {
@@ -12,6 +13,7 @@ export function Home({ lang }) {
       <h1>{th ? "โครงการทั้งหมด" : "All projects"}</h1>
       <p>{th ? "เลือกโครงการเพื่อเปิดงานวิศวกรรม เสนอราคา หรือเอกสาร SAT ของโครงการนั้น" : "Choose a project to open its engineering, bidding or SAT document workspace."}</p>
       <p className="project-hub-summary">{th ? `${PROJECTS.length} โครงการในรายการ · ${available} workspace พร้อมเปิด · ${PROJECTS.length - available} รอเชื่อม workspace เดิม` : `${PROJECTS.length} listed projects · ${available} available workspaces · ${PROJECTS.length - available} awaiting workspace recovery`}</p>
+      <p data-testid="hub-version">{th ? "เวอร์ชันชุดงาน" : "Workspace version"}: {release.version} · {release.capability}</p>
     </section>
     <section className="home-section" aria-label={th ? "รายการโครงการ" : "Project list"}>
       <div className="project-hub-grid">

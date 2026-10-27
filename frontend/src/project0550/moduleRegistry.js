@@ -213,7 +213,7 @@ export const MODULE_REGISTRY = [
     why: "Every important requirement, quantity, term and decision must be traceable.",
     inputs: ["RFQ/MR/SPE/BOD/TC/vendor/source artifacts"],
     outputs: ["Source IDs", "Use/purpose", "State"],
-    implementation: ["sourceRegister in controlled dataset"],
+    implementation: ["sourceRegister in controlled dataset", "frontend/src/project0550/ControlledSourceInventory.jsx", "frontend/src/project0550/data/sourceIntakeModel.js"],
     invariants: ["Methodology references must never become project facts."]
   }
 ];
