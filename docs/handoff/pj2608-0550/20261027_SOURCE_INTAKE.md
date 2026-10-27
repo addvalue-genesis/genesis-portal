@@ -40,6 +40,8 @@ The latest private batch is `PJ2608-0550-SOURCE-INTAKE-REV02-20261027`, replacin
 
 ## Validation
 
+Screenshot follow-up: a blank current inventory followed by an expanded historical register made the imported-data requirement easy to miss. The module now always shows its loaded batch/source/comparison count or missing-intake status. The comparison section remains visible when no comparison data is loaded, and the empty inventory has a file-picker button. Empty search results have a separate clear-filter action. Historical rows are explicitly labelled as the old register, not the latest review. This changes display guidance only; it does not auto-import private evidence or overwrite the user's workspace.
+
 - `npm run build`: controlled snapshot, dataset, coverage, PAGA evidence, bidding and source-intake validators, production webpack.
 - `node scripts/validate-pj2608-0550-source-intake.cjs [PRIVATE_JSON]`: strict IDs/references/project boundary, replacement DAG, safe URLs, read-state controls, unknown timezone preservation, backup compatibility, unchanged financial derivation.
 - `node scripts/validate-pj2608-0550-source-render.cjs [PRIVATE_JSON]`: server rendering of the stable inventory, communications, deadlines and findings; unique rendered source IDs; escaped source content and safe links.
