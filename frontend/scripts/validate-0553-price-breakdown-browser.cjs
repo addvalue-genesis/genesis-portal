@@ -15,6 +15,19 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   const official=page.locator('[data-component-key="bid.budget.pricing.official"]');await official.waitFor();
   const summaryBefore=await official.locator('[data-quote-code]').allTextContents();
   const review=official.getByRole('region',{name:'Price breakdown review'});
+  assert.equal(await review.locator('[data-customer-summary-key]').count(),17);
+  assert.equal(await review.locator('[data-breakdown-key]').count(),0);
+  assert.equal(await review.locator('[data-price-detail]').count(),0);
+  const summaryRows=await review.locator('[data-customer-summary-key]').evaluateAll(rs=>rs.map(r=>r.dataset.customerSummaryKey));
+  const customerTotals=await review.locator('summary').allTextContents();
+  await review.getByRole('button',{name:'แสดงราคาย่อย',exact:true}).click();
+  assert.equal(await review.locator('[data-price-detail]').count(),34);
+  assert.deepEqual(await review.locator('summary').allTextContents(),customerTotals);
+  if(process.env.QA_OUTPUT_DIR){fs.mkdirSync(process.env.QA_OUTPUT_DIR,{recursive:true});await review.screenshot({path:path.join(process.env.QA_OUTPUT_DIR,'customer-mr-summary.png')});}
+  await review.getByRole('button',{name:'ซ่อนราคาย่อย',exact:true}).click();
+  await review.getByRole('button',{name:'Internal · รายละเอียด 141 แถว',exact:true}).click();
+  const internalMapped=await review.locator('[data-mr-summary-key]').evaluateAll(rs=>rs.map(r=>r.dataset.mrSummaryKey));
+  assert(internalMapped.every(k=>summaryRows.includes(k)));
   const keys=await review.locator('[data-breakdown-key]').evaluateAll(rs=>rs.map(r=>r.dataset.breakdownKey));
   assert.equal(keys.length,141);assert.equal(new Set(keys).size,141);
   assert.equal(await review.locator('[data-price-detail]').count(),0);
@@ -39,6 +52,10 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   assert.equal(await review.locator('[data-price-detail]').count(),0);
   assert.deepEqual(await review.locator('summary').allTextContents(),systemTotals);
   assert.equal(await review.locator('[data-breakdown-key]').count(),141);
+  await review.getByRole('button',{name:'Customer · สรุปตาม MR',exact:true}).click();
+  assert.equal(await review.locator('[data-customer-summary-key]').count(),17);
+  assert.equal(await review.locator('[data-breakdown-key]').count(),0);
+  assert.deepEqual(await review.locator('summary').allTextContents(),customerTotals);
   const download=page.waitForEvent('download');await official.getByRole('button',{name:'Export Breakdown — Draft / 10 sheets',exact:true}).click();
   const downloaded=await download;assert(downloaded.suggestedFilename().endsWith('DRAFT_NOT_ISSUED.xlsx'));
   const output=process.env.QA_OUTPUT_DIR;if(output){fs.mkdirSync(output,{recursive:true});await downloaded.saveAs(path.join(output,'breakdown-browser.xlsx'));}
@@ -64,6 +81,6 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.locator('[data-breakdown-source-key]').getByRole('button').click();
   }
   if(output){await internal.locator('details').nth(1).evaluate(d=>d.open=true);await internal.screenshot({path:path.join(output,'breakdown-review.png')});}
-  assert.deepEqual(errors,[]);console.log('PASS browser: '+(process.env.QA_SAMPLE?'13 sampled':'141')+' exact Official→Source→same-row roundtrips, four MR Source→Release→Source routes, internal Release return, source prices unchanged, draft Excel downloaded, no runtime errors.');
+  assert.deepEqual(errors,[]);console.log('PASS browser: 17-row Customer summary, 141-row Internal view, both price modes, all source rows mapped; '+(process.env.QA_SAMPLE?'13 sampled':'141')+' exact Official→Source→same-row roundtrips, four MR Source→Release→Source routes, internal Release return, source prices unchanged, draft Excel downloaded, no runtime errors.');
  }finally{await browser.close();server?.kill('SIGTERM');}
 })().catch(e=>{console.error(e);process.exitCode=1;});

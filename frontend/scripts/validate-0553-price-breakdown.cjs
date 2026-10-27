@@ -40,6 +40,37 @@ assert(!html.includes('data-price-detail='),'Default hides detail price cells fr
 const detailedHtml=renderToStaticMarkup(React.createElement(CustomerPriceBreakdown0553,{source,official,showPriceDetails:true}));
 assert.equal((detailedHtml.match(/data-price-detail=/g)||[]).length,282);
 for(const g of model.groups)assert(html.includes(g.parentUSD.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})),'Hidden-price mode retains system totals');
+const {buildMrCustomerSummary0553}=require('../src/project0553/data/mrCustomerSummary0553');
+const summary=buildMrCustomerSummary0553(model),allKeys=summary.groups.flatMap(g=>g.rows.flatMap(r=>r.sourceKeys));
+assert.deepEqual(summary.groups.map(g=>g.rows.length),[7,3,4,3]);
+assert.equal(allKeys.length,141);assert.equal(new Set(allKeys).size,141);
+assert.deepEqual([...allKeys].sort(),model.groups.flatMap(g=>g.rows.map(r=>r.key)).sort());
+for(const g of summary.groups){
+ assert.equal(g.totalUSD,g.parentUSD);
+ assert.equal(g.rows.reduce((n,r)=>n+Math.round(r.amountUSD*100),0),Math.round(g.parentUSD*100));
+ for(const r of g.rows){
+  assert(r.mrReference.endsWith('Rev.C1 §5'));
+  const children=model.groups.find(x=>x.code===g.code).rows.filter(x=>r.sourceKeys.includes(x.key));
+  assert(children.every(x=>x.site===r.site&&x.mr===r.mr));
+  assert.equal(Math.round(r.amountUSD*100),children.reduce((n,x)=>n+Math.round((x.amountUSD??0)*100),0));
+  if(r.qty!==null)assert.equal(Math.round(r.qty*r.unitUSD*100),Math.round(r.amountUSD*100));
+ }
+}
+assert.deepEqual(summary.groups[0].rows.filter(r=>r.qty===null).map(r=>r.site),['ZPQ','ZWP8','ZWP11']);
+assert.equal(summary.groups[2].rows.find(r=>r.site==='ZWP23').qty,1);
+assert(!summary.groups[3].rows.some(r=>r.site==='ZWP23'));
+assert.throws(()=>buildMrCustomerSummary0553({...model,groups:model.groups.map((g,i)=>i?g:{...g,rows:g.rows.map((r,j)=>j?r:{...r,site:'UNKNOWN'})})}),/Unmapped/);
+assert.throws(()=>buildMrCustomerSummary0553({...model,groups:model.groups.map((g,i)=>i?g:{...g,rows:g.rows.filter(r=>r.site!=='ZPQ')})}),/Missing/);
+assert.throws(()=>buildMrCustomerSummary0553({...model,groups:model.groups.map((g,i)=>i?g:{...g,rows:[...g.rows,g.rows[0]]})}),/exactly once/);
+for(const showPriceDetails of [false,true]){
+ const customer=renderToStaticMarkup(React.createElement(CustomerPriceBreakdown0553,{source,official,origin:'official',showPriceDetails}));
+ assert.equal((customer.match(/data-customer-summary-key=/g)||[]).length,17);
+ assert.equal((customer.match(/data-price-detail=/g)||[]).length,showPriceDetails?34:0);
+ assert(!customer.includes('data-breakdown-key='));
+ assert(!customer.includes('↗ Source'));
+ for(const term of ['MGW R2','customerSellTHB','EXION','MANAGEMENT_SELECTED','parentPackage'])assert(!customer.includes(term),'customer presentation leaked '+term);
+ assert(customer.includes('NOT VERIFIED'));
+}
 assert.equal(JSON.stringify(source),before);
 (async()=>{
  const template=require('../src/project0553/data/nativeReleaseTemplate0553.json'),bytes=Buffer.from(template.base64,'base64');
@@ -58,6 +89,7 @@ assert.equal(JSON.stringify(source),before);
  }
  assert.equal(JSON.stringify(source),before);
  const out=process.argv.find(x=>x.startsWith('--output='));if(out)fs.writeFileSync(out.slice(9),data);
+ console.log('PASS MR summary: 17 site packages; all 141 source rows mapped exactly once; unknown brownfield quantities retained; Customer/Internal privacy and price modes.');
  console.log('PASS breakdown: '+model.groups.reduce((s,g)=>s+g.rows.length,0)+' source rows; 83 priced; exact four MR totals; deterministic cents; missing/included retained; original six sheets preserved; four formula-linked appendices; no financial writeback.');
  console.log(JSON.stringify(model.groups.map(({code,parentUSD,pricedCount,includedCount,pendingCount,quantityPendingCount})=>({code,parentUSD,pricedCount,includedCount,pendingCount,quantityPendingCount}))));
 })().catch(e=>{console.error(e);process.exitCode=1;});

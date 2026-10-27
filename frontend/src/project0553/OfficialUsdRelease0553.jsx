@@ -10,7 +10,7 @@ import {buildNativePriceBreakdown0553} from "./nativePriceBreakdown0553";
 import "./releaseWorkbook0553.css";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"To be quoted";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"To be quoted";
-export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=null,showPriceDetails,onPriceDetailsChange}){
+export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=null,showPriceDetails,onPriceDetailsChange,breakdownView,onBreakdownViewChange}){
  const model=useMemo(()=>buildOfficialUsdRelease0553(source),[source]);
  const [sheet,setSheet]=useState("SUMMARY"),[busy,setBusy]=useState(false),[error,setError]=useState("");
  const download=async(breakdown=false)=>{
@@ -78,6 +78,6 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
      <tr className="p553-sheet-total"><td colSpan={7}>Total (USD)</td><td className="p553-price-cell">{money([...model.b,...model.c].find(r=>r.code===sheet)?.amountUSD)}</td></tr></tbody>
    </table>}</div>
   </div>
-  <CustomerPriceBreakdown0553 source={source} official={model} onOpenSource={onOpenSource} origin="official" focus={breakdownFocus} showPriceDetails={showPriceDetails} onPriceDetailsChange={onPriceDetailsChange}/>
+  <CustomerPriceBreakdown0553 source={source} official={model} onOpenSource={onOpenSource} origin="official" view={breakdownView} onViewChange={onBreakdownViewChange} focus={breakdownFocus} showPriceDetails={showPriceDetails} onPriceDetailsChange={onPriceDetailsChange}/>
  </section>;
 }

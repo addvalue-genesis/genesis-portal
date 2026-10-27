@@ -1,11 +1,16 @@
 import React,{useEffect,useMemo,useRef,useState} from "react";
 import {buildCustomerPriceBreakdown0553,breakdownKey0553} from "./data/customerPriceBreakdown0553";
 import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
+import {buildMrCustomerSummary0553,mrSummaryKey0553} from "./data/mrCustomerSummary0553";
 import "./customerPriceBreakdown0553.css";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 
-export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin="released",focus=null,showPriceDetails,onPriceDetailsChange}){
+export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin="released",focus=null,showPriceDetails,onPriceDetailsChange,view,onViewChange}){
  const model=useMemo(()=>buildCustomerPriceBreakdown0553(source,official),[source,official]);
+ const summary=useMemo(()=>buildMrCustomerSummary0553(model),[model]);
+ const [localView,setLocalView]=useState(origin==="official"?"customer":"internal");
+ const activeView=view??localView,setView=onViewChange||setLocalView;
+ const customer=activeView==="customer";
  const [localPrices,setLocalPrices]=useState(false);
  const showPrices=showPriceDetails??localPrices;
  const setPrices=onPriceDetailsChange||setLocalPrices;
@@ -16,35 +21,54 @@ export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin=
   if(!row)return;
   for(let p=row.parentElement;p;p=p.parentElement)if(p.tagName==="DETAILS")p.open=true;
   row.focus({preventScroll:true});row.scrollIntoView?.({behavior:"instant",block:"center"});
- },[focus]);
+ },[focus,activeView]);
  return <section className="p553-breakdown" ref={root} aria-label="Price breakdown review">
-  <h3>Part A · MR / Location / Item price breakdown</h3>
+  <h3>Part A · {customer?"MR scope summary":"Internal item breakdown"}</h3>
+  <div className="p553-breakdown-display" role="group" aria-label="Part A breakdown view">
+   <button type="button" aria-pressed={customer} onClick={()=>setView("customer")}>Customer · สรุปตาม MR</button>
+   <button type="button" aria-pressed={!customer} onClick={()=>setView("internal")}>Internal · รายละเอียด {model.groups.reduce((n,g)=>n+g.rows.length,0)} แถว</button>
+  </div>
   <div className="p553-breakdown-display" role="group" aria-label="Part A price display">
    <span>การแสดงราคาย่อย Part A</span>
    <button type="button" aria-pressed={!showPrices} onClick={()=>setPrices(false)}>ซ่อนราคาย่อย</button>
    <button type="button" aria-pressed={showPrices} onClick={()=>setPrices(true)}>แสดงราคาย่อย</button>
   </div>
-  <p className="p55-note">{showPrices?"แสดงราคาต่อหน่วยและราคารวมรายอุปกรณ์":"แสดงรายการและจำนวน พร้อมยอดรวมแต่ละระบบ โดยซ่อนราคาย่อย"} · ตัวเลือกนี้ใช้กับหน้าจอเท่านั้น รูปแบบ Export คงเดิม</p>
+  <p className="p55-note">{showPrices?(customer?"แสดงราคาชุดระบบตามสถานที่ ไม่ใช่ราคาต่ออุปกรณ์":"แสดงราคาต่อหน่วยและราคารวมรายอุปกรณ์"):"แสดงรายการและจำนวน พร้อมยอดรวมแต่ละระบบ โดยซ่อนราคาย่อย"} · ตัวเลือกนี้ใช้กับหน้าจอเท่านั้น Export Breakdown ยังคงเป็นฉบับรายละเอียด 141 แถวสำหรับตรวจทาน</p>
   <p className="p55-note">Draft allocation from the selected Release prices. Submitted proposal comparison: <strong>NOT VERIFIED</strong>.
-   Existing A1–A4 totals are retained. Package contents carry no second charge. Unpriced rows remain visible.</p>
+   Existing A1–A4 totals are retained. {customer?"Summary based on the received MR scope and current offer, subject to stated qualifications. Services and spares remain under their existing B/C items.":"Package contents carry no second charge. Unpriced rows remain visible."}</p>
+  {customer&&<p className="p55-note">{summary.groups.reduce((n,g)=>n+g.rows.length,0)} รายการสรุปตาม MR / สถานที่ · S คือเลขลำดับสรุป ไม่ใช่เลขบรรทัดใน MR · จำนวนชุดอ้างอิง MR; งาน brownfield ที่ไม่มีจำนวนรวมชัดเจนแสดง See MR §5</p>}
   <div className="p553-breakdown-checks"><strong>{model.reconciled?"A1–A4 totals match":"Price reconciliation required"}</strong>
    <span>Priced A+B: USD {money(model.totalUSD)}</span><span>C1/C2: separate conditional options</span></div>
-  {model.groups.map(g=><details key={g.code} className="p553-breakdown-group">
+  {customer?<MrScopeSummary0553 model={summary} showPrices={showPrices}/>:model.groups.map(g=><details key={g.code} className="p553-breakdown-group">
    <summary><strong>{g.code} · {g.mr}</strong><span>USD {money(g.parentUSD)}</span>
     <span>{g.pricedCount} priced / {g.includedCount} included / {g.pendingCount} not priced</span>
     <span>Difference: {money(g.varianceUSD)}</span></summary>
    {(!g.sourceComplete||g.quantityPendingCount>0)&&<p className="p55-note">Source completeness requires review{g.quantityPendingCount?"; quantity/unit missing on "+g.quantityPendingCount+" priced rows":""}. A matching subtotal does not close technical or price gaps.</p>}
    <div className="p553-sheet-scroll"><table className="p55-table p55-table--compact"><thead><tr>
     {["Item / TAG","Location","Description","Qty / Unit",...(showPrices?["Unit USD","Amount USD"]:[]),"State / Source"].map(h=><th key={h}>{h}</th>)}
-   </tr></thead><tbody>{g.rows.map((r,i)=><tr key={r.key} tabIndex={-1} data-breakdown-key={r.key}
+   </tr></thead><tbody>{g.rows.map((r,i)=><tr key={r.key} tabIndex={-1} data-breakdown-key={r.key} data-mr-summary-key={mrSummaryKey0553(r.mr,r.site)}
      className={focus?.key===r.key?"p553-release-row-focus":""}>
-    <td>{g.code}.{i+1}<small>{r.tag}</small></td><td>{r.site}</td><td>{r.description}</td>
+    <td>{g.code}.{i+1}<small>{r.tag}</small><small>MR summary: {summary.groups.find(x=>x.code===g.code).rows.find(x=>x.site===r.site).item}</small></td><td>{r.site}</td><td>{r.description}</td>
     <td>{r.qty??"TBC"} {r.unit}</td>{showPrices&&<><td className="p553-breakdown-price" data-price-detail="unit">{r.unitUSD===null?"—":r.unitUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:8})}</td>
     <td className="p553-breakdown-price" data-price-detail="amount">{money(r.amountUSD)}</td></>}<td><strong>{r.status}</strong>{r.quantityPending&&<small>Quantity / unit review</small>}
      {onOpenSource&&<button type="button" onClick={()=>onOpenSource({...r,breakdownKey:r.key,breakdownOrigin:origin})}>↗ Source</button>}</td>
    </tr>)}<tr className="p553-sheet-total"><td colSpan={showPrices?5:4}>Priced subtotal · {g.mr}</td><td className="p553-breakdown-price">USD {money(g.totalUSD)}</td>{showPrices&&<td>Difference {money(g.varianceUSD)}</td>}</tr></tbody></table></div>
   </details>)}
  </section>;
+}
+
+function MrScopeSummary0553({model,showPrices}){
+ return model.groups.map(g=><details key={g.code} open className="p553-breakdown-group" data-mr-summary-group={g.code}>
+  <summary><strong>{g.code} · {g.mr} · {g.description}</strong><span>USD {money(g.parentUSD)}</span></summary>
+  <p className="p55-note">{g.qualification}</p>
+  <div className="p553-sheet-scroll"><table className="p55-table p55-table--compact"><thead><tr>
+   {["Summary item","Location","MR scope","Qty / Unit",...(showPrices?["Unit USD","Amount USD"]:[]),"MR reference"].map(h=><th key={h}>{h}</th>)}
+  </tr></thead><tbody>{g.rows.map(r=><tr key={r.key} data-customer-summary-key={r.key}>
+   <td>{r.item}</td><td>{r.site}</td><td>{r.description}</td><td>{r.qty??""} {r.unit}</td>
+   {showPrices&&<><td className="p553-breakdown-price" data-price-detail="unit">{money(r.unitUSD)}</td><td className="p553-breakdown-price" data-price-detail="amount">{money(r.amountUSD)}</td></>}
+   <td>{r.mrReference}</td>
+  </tr>)}<tr className="p553-sheet-total"><td colSpan={showPrices?5:4}>Subtotal · {g.mr}</td><td className="p553-breakdown-price">USD {money(g.totalUSD)}</td>{showPrices&&<td/>}</tr></tbody></table></div>
+ </details>);
 }
 
 export function BreakdownSourceRow0553({selection,onReturn}){
