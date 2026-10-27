@@ -18,11 +18,11 @@ import {
   OPTIONS,
   PROJECT_0550,
   PROJECT_0550_FACTS,
+  PROJECT_0550_PRESENTATION,
   REQUIREMENT_COMPLETENESS,
   RISK_SCENARIOS,
   SERVICE_EQUATION_SOURCE,
   SERVICE_LINE_DERIVATION,
-  SOURCE_REGISTER,
   SYSTEM_GROUPS,
   SYSTEMS,
 } from "../project0550/data";
@@ -37,6 +37,7 @@ import {VendorWorkspace} from "../project0550/VendorWorkspace";
 import {SchematicWorkspace} from "../project0550/SchematicWorkspace";
 import {BidDataControls,BidSaveStatus} from "../project0550/BidDataControls";
 import {BID_TABS} from "../project0550/biddingNavigation";
+import {ControlledSourceInventory, SourceCommunications, SourceFindings} from "../project0550/ControlledSourceInventory";
 import {SECTION_IDENTITY} from "../project0550/sectionIdentity";
 import "../project0550/project0550.css";
 
@@ -127,7 +128,7 @@ function B1CostLineageTable() {
 
   return (
     <div className="p55-derivation-block">
-      <div className="p55-eyebrow" style={{ marginBottom: 8 }}>B1 — 24M control total reconciliation</div>
+      <div className="p55-eyebrow" style={{ marginBottom: 8 }}>B1 — {compactMoney(lineage.currentAllowanceThb, "THB")} control total reconciliation</div>
 
       <div className="p55-table-wrap">
         <table className="p55-table p55-table--compact p55-table--derivation">
@@ -135,7 +136,7 @@ function B1CostLineageTable() {
             <tr>
               <th>Layer</th>
               <th className="is-number">MH</th>
-              <th className="is-number">Equivalent person-days @ 8h</th>
+              <th className="is-number">Equivalent person-days @ {PROJECT_0550_PRESENTATION.b1EquivalentHoursPerDay}h</th>
               <th className="is-number">THB</th>
               <th>Evidence state</th>
             </tr>
@@ -232,7 +233,7 @@ function B1CostLineageTable() {
                 <th>System / Token</th>
                 <th className="is-number">Underlying rows</th>
                 <th className="is-number">MH</th>
-                <th className="is-number">Eq. person-days @ 8h</th>
+                <th className="is-number">Eq. person-days @ {PROJECT_0550_PRESENTATION.b1EquivalentHoursPerDay}h</th>
                 <th className="is-number">Model base THB</th>
                 <th className="is-number">Internal cost THB</th>
                 <th>People / crew interpretation</th>
@@ -375,18 +376,18 @@ function Overview() {
         />
         <MetricCard
           label="Budgetary base"
-          value={compactMoney(submission?.baseBeforeOptionsUsd || 0, "USD")}
+          value={compactMoney(submission?.baseBeforeOptionsUsd, "USD")}
           sub="Part A + customer B1-B6 · issued 08-Oct-2026"
           tone="good"
         />
         <MetricCard
           label="C2 + C3 options"
-          value={compactMoney(submission?.optionsC2C3Usd || 0, "USD")}
+          value={compactMoney(submission?.optionsC2C3Usd, "USD")}
           sub="C1 physical installation excluded"
         />
         <MetricCard
           label="Management envelope"
-          value={compactMoney(submission?.managementEnvelopeUsd || 0, "USD")}
+          value={compactMoney(submission?.managementEnvelopeUsd, "USD")}
           sub="Budgetary reference only · do not back-solve"
           tone="warn"
         />
@@ -1115,8 +1116,8 @@ function LegacyBudgetView() {
   const budget = BUDGETARY_ESTIMATE;
   const submission = BUDGETARY_SUBMISSION;
 
-  const directTotal = budget?.directDeliveryBasisThb || 0;
-  const calculated = budget?.calculatedCustomerBeforeRoundingThb || 0;
+  const directTotal = budget?.directDeliveryBasisThb;
+  const calculated = budget?.calculatedCustomerBeforeRoundingThb;
 
   const submissionBaseRows = (submission?.customerRows || []).filter(
     (row) => row.code.startsWith("A1-") || ["B1","B2","B3","B4","B5","B6"].includes(row.code)
@@ -1169,7 +1170,7 @@ function LegacyBudgetView() {
             <MetricCard label="Part C direct" value={compactMoney(budget.partCDirectThb, "THB")} sub="C2 + C3; C1 excluded" />
             <MetricCard label="Direct delivery basis" value={compactMoney(directTotal, "THB")} sub="Internal working basis" />
             <MetricCard label="Commercialized working" value={compactMoney(calculated, "THB")} sub="Before management envelope / quote replacement" />
-            <MetricCard label="FX working" value="33.6335" sub="THB/USD used for 08-Oct snapshot; refresh for next issue" />
+            <MetricCard label="FX working" value={budget.fxThbUsdWorking ?? "—"} sub="THB/USD used for 08-Oct snapshot; refresh for next issue" />
           </div>
 
           <section className="p55-panel">
@@ -1721,7 +1722,7 @@ function LegacyBudgetView() {
                         <td><strong>{row.code}</strong></td>
                         <td>{row.description}</td>
                         <td className="is-number">{row.directThb === null ? "—" : money(row.directThb, "THB")}</td>
-                        <td className="is-number">{row.code === "C1" ? "EXCLUDED" : money(issued?.customerUsd || 0, "USD")}</td>
+                        <td className="is-number">{row.code === "C1" ? "EXCLUDED" : money(issued?.customerUsd, "USD")}</td>
                         <td>
                           {row.code === "C1"
                             ? "CNEEC optional physical installation boundary; reopen only by controlled scope change."
@@ -1757,7 +1758,7 @@ function LegacyBudgetView() {
             />
             <MetricCard label="PAGA selected" value={money(paga.knownSelectedSubtotalEur, "EUR")} sub={paga.vendor + " · " + paga.offer} tone="good" />
             <MetricCard label="Project Total" value="HOLD" sub="Final release requires controlled closure / authorization" tone="warn" />
-            <MetricCard label="Emergency snapshot" value={money(submission?.baseBeforeOptionsUsd || 0, "USD")} sub="Budgetary only — not RELEASED_SELL" />
+            <MetricCard label="Emergency snapshot" value={money(submission?.baseBeforeOptionsUsd, "USD")} sub="Budgetary only — not RELEASED_SELL" />
           </div>
 
           <div className="p55-filterbar p55-filterbar--simple">
@@ -1871,11 +1872,13 @@ function RiskView() {
   );
 }
 
-function DocumentsView() {
+function DocumentsView({ navigationTarget }) {
   const facts = PROJECT_0550_FACTS;
 
   return (
     <div className="p55-stack">
+      <ControlledSourceInventory navigationTarget={navigationTarget}/>
+      <details className="p55-panel"><summary>Historical project facts / reference baseline</summary>
       <SectionTitle
         eyebrow="Evidence control"
         title="Project facts, source register & traceability"
@@ -2043,24 +2046,8 @@ function DocumentsView() {
         </div>
       </section>
 
-      <section className="p55-panel">
-        <SectionTitle eyebrow="Source register" title="Controlled source inventory" />
-        <div className="p55-table-wrap">
-          <table className="p55-table p55-table--compact">
-            <thead><tr><th>ID</th><th>Source</th><th>Use</th><th>State</th></tr></thead>
-            <tbody>
-              {SOURCE_REGISTER.map((source) => (
-                <tr key={source.id}>
-                  <td><strong>{source.id}</strong></td>
-                  <td>{source.name}</td>
-                  <td>{source.use}</td>
-                  <td><Badge>{source.state}</Badge></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+
+      </details>
     </div>
   );
 }
@@ -2074,6 +2061,8 @@ function Project0550Bidding({ lang = "th" }) {
   const [focusedSystem,setFocusedSystem]=useState("ALL");
   const {data,model}=useBidWorkspace();
   const moduleIndex=[{id:"l3.original",title:"Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
+    ...(data?.sourceIntake?.sources||[]).map(s=>({id:"bid.documents.source."+s.id,title:s.title,tab:"documents"})),
+    ...(data?.sourceIntake?.findings||[]).map(f=>({id:"bid.documents.finding."+f.id,title:f.category,tab:"documents"})),
     ...SYSTEMS.map(s=>({id:"bid.systems."+s.token,title:s.name,tab:"systems",system:s.token})),
     {id:"bid.engineering.equations",title:"Equation Execution / SAT persons days",tab:"engineering"},
     {id:"bid.vendor.master",title:"Vendor master",tab:"documents"},{id:"bid.vendor.offers",title:"Vendor offers / rates",tab:"documents"},
@@ -2136,8 +2125,8 @@ function Project0550Bidding({ lang = "th" }) {
 
       <main className="p55-main">
         <BidSaveStatus/>
-        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId componentKey="l3.original"/><DocumentsView/></section>}
-        {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><ComponentCopyId componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · No new issue or submission recorded.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
+        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId componentKey="l3.original"/><DocumentsView navigationTarget={navigationTarget}/></section>}
+        {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><SourceCommunications/><ComponentCopyId componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · No new issue or submission recorded.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
         {area==="B"&&<>
           <div className="p55-panel p55-module-nav"><label>ค้นหา / วาง Module ID <input aria-label="Project Module Search" value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&matches.length)jump(matches.find(m=>m.id.toLowerCase()===query)||matches[0]);}} placeholder="PJ2608-0550 / bid.budget.release"/></label><div className="p55-module-results">{matches.slice(0,30).map(m=><button type="button" key={m.id} onClick={()=>jump(m)}>{m.title}<small>{m.id}</small></button>)}</div></div>
           <div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>
@@ -2148,8 +2137,8 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "execution" ? <><EquationWorkbench/><ExecutionView /></> : null}
           {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
           {activeTab === "budget" ? <BidCommercialWorkspace navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
-          {activeTab === "risk" ? <RiskView /> : null}
-          {activeTab === "documents" ? <><VendorWorkspace/><details className="p55-panel"><summary>Project evidence / original references</summary><DocumentsView/></details></> : null}
+          {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
+          {activeTab === "documents" ? <><details className="p55-panel"><summary>Project evidence / original references</summary><DocumentsView navigationTarget={navigationTarget}/></details><VendorWorkspace/></> : null}
           {activeTab === "registry" ? <BidDataControls/> : null}
         </>}
       </main>

@@ -1569,3 +1569,5 @@
 [data-testid="bid-commercial"] > .p55-metric-grid .p55-metric > strong { display:block; font-size:24px; margin:8px 0; }
 .p55-bid-content button:not(.gns-copy-id button), .p55-bid-save button { padding:7px 10px; border:1px solid #9eb9c9; border-radius:6px; background:#f0f7fb; color:#123951; }
 .p55-bid-content button:disabled { opacity:.55; cursor:default; }
+
+.p55-source-text { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 28rem; overflow: auto; font: inherit; padding: 1rem; background: #f5f8fc; color: #172b4d; }

@@ -4,12 +4,15 @@
   "private": true,
   "scripts": {
     "start": "webpack serve --mode development",
-    "build": "npm run validate:pj0550-snapshot && npm run validate:pj0550-data && npm run validate:pj0550-coverage && npm run validate:pj0550-evidence && npm run validate:pj0550-bidding && webpack --mode production",
+    "build": "npm run validate:pj0550-snapshot && npm run validate:pj0550-data && npm run validate:pj0550-coverage && npm run validate:pj0550-evidence && npm run validate:pj0550-bidding && npm run validate:pj0550-source-intake && npm run validate:pj0550-source-drive && npm run validate:pj0550-references && webpack --mode production",
     "validate:pj0550-bidding": "node scripts/validate-pj2608-0550-bidding.cjs",
     "validate:pj0550-snapshot": "node scripts/validate-pj2608-0550-snapshot.cjs",
     "validate:pj0550-evidence": "node scripts/validate-pj2608-0550-evidence.cjs",
     "validate:pj0550-coverage": "node scripts/validate-pj2608-0550-coverage.cjs",
-    "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs"
+    "validate:pj0550-data": "node scripts/validate-pj2608-0550-data.cjs",
+    "validate:pj0550-source-intake": "node scripts/validate-pj2608-0550-source-intake.cjs",
+    "validate:pj0550-source-drive": "node scripts/validate-pj2608-0550-source-drive.cjs",
+    "validate:pj0550-references": "node scripts/validate-pj2608-0550-references.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",

@@ -1,5 +1,9 @@
 # PJ2608-0550 Living Handoff / Current Checkpoint
 
+**Data separation audit:** [2026-10-27 hardcode findings and migration](20261027_HARDCODE_AUDIT.md). Project reference registries now live in validated JSON; existing prices/evidence states are preserved, missing amounts are not zero, and the issued XLSX retains exact byte parity. Current inputs remain separate workspace data. Historical UI copy/configuration still contains documented literals; do not claim the whole app is hardcode-free.
+
+**Current source inventory checkpoint:** [2026-10-27 private GDrive/Gmail source intake and first-versus-Official package comparison](20261027_SOURCE_INTAKE.md). Use the existing controlled-source-inventory module and private batch Rev02. Its package table preserves the five reviewed folder locations, intermediate issue, archive members and same-revision replacement separately. Document-number comparison separates current EPC, earlier package copies and cover revision history; never select a revision by alphabet or upload date. Reviewed private data loads from Google Drive for Desktop through the local development bridge; manual import is a fallback. Restart the dev server after pulling this change. This does not change frozen pricing or authorize release. Active review URL uses port 3001; follow the latest workflow checkpoint rather than the historical port below.
+
 **Latest software checkpoint:** [2026-10-27 active Bidding workflow](20261027_BIDDING_WORKFLOW.md). The baseline narrative below remains historical authority for its snapshot; current bid preparation now has saved inputs and a Working → THB → USD workflow.
 
 **Project:** PJ2608-0550 — SAMTEL / PTTEPI Myanmar ASK Telecom [MMC24-5002]  
