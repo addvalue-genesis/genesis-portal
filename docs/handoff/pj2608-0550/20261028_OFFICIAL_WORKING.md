@@ -45,7 +45,7 @@ Validated on this branch: data validator, expanded bidding validator, full produ
 
 PR #53 is a Draft against the Hub, not a standalone 0550 application. The review
 branch contains the same four-project navigation. Its home-page identifier is
-`2026-10-28.1-preview · 0550 Official Working Preview / HIS-01 / OFF-03 / REL-04`.
+`2026-10-28.2-preview · 0550 Official Working / Numbered Modules / Copy ID`.
 GitHub reports no merge conflict as of 28 October 2026; no PR workflow run was
 reported. Local validation results above remain the test evidence.
 
@@ -83,3 +83,42 @@ was configured in the old terminal, retain the same `GENESIS_0550_PROJECT_DIR`
 setting in this terminal. The new software does not manufacture Official prices:
 unreviewed inputs show OPEN until the user completes line and customer-scope
 review against the actual RFQ and quotations.
+
+
+## Module presentation correction — 28 October 2026
+
+The presentation registry `bidPresentation0550.js` now supplies the human outline,
+module search and stable existing IDs together. The 15 architectural modules,
+price model, persisted input schema and export projection are unchanged.
+
+- 10.0: structure and colour guide; 10.O / 10.O.1: Official context and totals;
+  10.H: History. These are readable UI references, not financial WBS codes.
+- 10.1: source inputs; 10.1.1 RFQ impact, 10.1.2 FX, 10.1.3 line editor.
+- 10.2: A/B/C hierarchy; A has COMMON .00 and the existing 19-system order;
+  B1–B9 and C1–C3 retain 0550 names. Row R01/R02 are display ordinals, not
+  permanent identities. Copy the full Module ID to identify a row over time.
+- 10.3.1: customer-scope review; 10.3.2: THB; 10.3.3: USD; 10.4: comparison;
+  10.5: remaining gates. Existing Source ↔ Release IDs are unchanged.
+- Every numbered module/group/row has its own project-qualified Copy ID. Search
+  accepts that ID, the displayed number or the exact HIS/RFQ/OFF/REL tag; a match
+  opens its ancestors and highlights the target. Copy does not toggle an accordion.
+- Module principles explain purpose, inputs, method, outputs, limits and next view.
+- Colours inherit from the nearest work group through its headings, tables and
+  rollups. Individual rows retain their source-owner colour in THB/USD. A customer
+  group with one owner uses that colour; a mixed group uses its Part colour.
+  Labels remain authoritative; colours can repeat and never indicate approval.
+- Colour/number/Copy ID chrome is internal UI only; native customer XLSX and
+  frozen History output remain unchanged. Mobile IDs wrap and wide tables scroll.
+
+The existing browser regression now checks group Copy ID without expansion,
+full-ID/number navigation, module-specific principles, mobile containment,
+source-owner colour continuity and Budget row copying in addition to the prior
+pricing, persistence, navigation and export checks.
+
+
+Validation of the presentation correction: full Hub build chain passed, followed
+by final production compilation and 14 Chromium checks with no console errors.
+The expanded checks exercise the user's copy/search/number/colour workflow and
+390px containment. The data and bidding validators pass; the frozen History XLSX
+still has the same SHA-256 recorded above. Price/equation/input/export source
+files have no changes in this correction. Existing asset-size warnings remain.

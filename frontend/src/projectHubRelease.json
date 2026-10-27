@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-28.1-preview",
+  "version": "2026-10-28.2-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "source0550": "b000ee553400c64f51203cad7b9d7711a4badedb",
-  "capability": "0550 Official Working Preview / HIS-01 / OFF-03 / REL-04"
+  "capability": "0550 Official Working / Numbered Modules / Copy ID"
 }
