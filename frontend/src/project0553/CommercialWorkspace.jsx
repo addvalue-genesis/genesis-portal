@@ -24,6 +24,8 @@ import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {OfficialUsdRelease0553} from "./OfficialUsdRelease0553";
+import {CustomerPriceBreakdown0553,BreakdownSourceRow0553,BreakdownSourcePicker0553} from "./CustomerPriceBreakdown0553";
+import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
 import {ReleaseSourceNavigator0553} from "./ReleaseSourceNavigator0553";
 import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
@@ -144,6 +146,19 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const [releaseJump,setReleaseJump]=useState(null);
  // UI navigation context only: return to the exact originating Release row.
  const [returnToRelease,setReturnToRelease]=useState(null);
+ const [breakdownSelection,setBreakdownSelection]=useState(null);
+ const [breakdownFocus,setBreakdownFocus]=useState(null);
+ const openBreakdownFromSource=key=>{
+  if(!buildCustomerPriceBreakdown0553(releaseModel).groups.some(g=>g.rows.some(r=>r.key===key)))
+   throw Error("Source item is not mapped to a Breakdown row");
+  setRecipient("INTERNAL");setPricingStage("released");setBreakdownSelection(null);
+  setBreakdownFocus({key,seq:(breakdownFocus?.seq||0)+1});
+ };
+ const returnToBreakdown=()=>{
+  setPricingStage(breakdownSelection.origin);
+  setBreakdownFocus({key:breakdownSelection.key,seq:(breakdownFocus?.seq||0)+1});
+  setBreakdownSelection(null);
+ };
  const [releaseAnnexTarget,setReleaseAnnexTarget]=useState(null);
  const openReleaseAnnexRow=({code,sourceId,sourceSelectionId=null})=>{
   if(!["B10","B11","B13","C1","C2"].includes(code)||!sourceId)return;
@@ -151,6 +166,14 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   setPricingStage("released"); // navigation only, no price posting/approval
  };
  const openReleaseSource=item=>{
+  if(item?.breakdownKey){
+   const row=buildCustomerPriceBreakdown0553(releaseModel).groups.flatMap(g=>g.rows).find(r=>r.key===item.breakdownKey);
+   if(!row||row.code!==item.code||row.id!==item.id||row.site!==item.site||row.mr!==item.mr)
+    throw Error("Breakdown navigation refused: inconsistent source identity");
+   setBreakdownSelection({...row,origin:item.breakdownOrigin==="official"?"official":"released",seq:(breakdownSelection?.seq||0)+1});
+   setPricingStage("working");
+   return;
+  }
   const incomingId=String(item?.sourceModuleId||"");
   // What's New and nested financial IDs carry a Module ID but no B/C code field.
   // Resolve the owner from the existing contract Module ID; do not infer from prices.
@@ -216,18 +239,19 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   }else target.scrollIntoView?.({behavior:"smooth",block:"center"});
   setNavigationFeedback(found?null:"Module "+id+" ยังไม่แสดงใน Filter นี้; เปิด "+fallback+" ให้ตรวจสอบ");
  },[releaseJump,bcTab]);
- const openPricingStage=stage=>{setPricingStage(stage);setNavigationFeedback(null);};
+ const openPricingStage=stage=>{setPricingStage(stage);setNavigationFeedback(null);setBreakdownFocus(null);setBreakdownSelection(null);};
  React.useEffect(()=>{
   if(navigationTarget?.startsWith("bid.budget.pricing.official"))setPricingStage("official");
   else if(navigationTarget)setPricingStage("released");
  },[navigationTarget,navigationSequence]);
  React.useEffect(()=>{
+  if(breakdownSelection||breakdownFocus)return; // exact row navigation owns scroll position
   const id=pricingStage==="official"?"bid.budget.pricing.official":
    pricingStage==="working"?"bid.budget.working.bc":
    pricingStage==="budgetary"?"bid.budget.pricing.budgetary":"bid.budget.pricing.release.preview";
   const target=findModuleElement0553(document,id);
   if(target){openModuleAncestors0553(target);if(target.tagName==="DETAILS")target.open=true;target.scrollIntoView?.({behavior:"smooth",block:"start"});}
- },[pricingStage]);
+ },[pricingStage,breakdownSelection,breakdownFocus]);
  const pricingNavigation=(
     <nav className="p553-pricing-stage-nav" aria-label="Pricing workflow stages"
      data-component-key="bid.budget.pricing.single-release">
@@ -255,7 +279,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  if(pricingStage==="official")return <div className="p55-stack">
   <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
-  <OfficialUsdRelease0553 source={releaseModel} onOpenSource={openReleaseSource}/>
+  <OfficialUsdRelease0553 source={releaseModel} onOpenSource={openReleaseSource} breakdownFocus={breakdownFocus}/>
  </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");
@@ -320,6 +344,8 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <p className="p55-note"><strong>INPUT:</strong> RFQ/MR/MTO/BLD/DTS/RPT/Standards · <strong>DERIVE:</strong> Link/Capacity/Interface Constraints → Physical BOM and quantity → Vendor technical evaluation → WBS Services → Equipment/Service Cost and risk · <strong>OUTPUT:</strong> reviewed engineering working cost. Current MTO sets and quoted vendor quantities are input evidence, NOT verified physical SKU quantities.</p>
   </section>
   <details className="p553-budget-phase" open data-component-key="bid.budget.bom"><summary><strong>10.1 — Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
+   <BreakdownSourceRow0553 selection={breakdownSelection} onReturn={returnToBreakdown}/>
+   <BreakdownSourcePicker0553 onOpenRow={openBreakdownFromSource}/>
    <CostIntegrityReview0553/>
    <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency} navigationTarget={navigationTarget} navigationSequence={navigationSequence}/>
   </details>
@@ -389,6 +415,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    </p>
    {recipient==="INTERNAL"&&<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>}
    {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
+   {recipient==="INTERNAL"&&<CustomerPriceBreakdown0553 source={releaseModel} onOpenSource={openReleaseSource} focus={breakdownFocus}/>}
    {recipient==="INTERNAL"&&<SpareLifecycleControl0553 model={spareLifecycle} view="release"
      onOpenSource={openReleaseSource} onOpenReleaseRow={openReleaseAnnexRow}/>} 
    <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} focusAnnexTarget={releaseAnnexTarget} title="10.3 — Released Customer Output (Read-only staging)"/>
