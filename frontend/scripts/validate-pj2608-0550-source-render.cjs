@@ -15,7 +15,7 @@ try {
  const empty=render(ControlledSourceInventory);
  assert(empty.includes('Source intake loaded status'));
  assert(empty.includes('Package comparison awaiting data'));
- assert(empty.includes('เลือกไฟล์ Source Intake JSON'));
+ assert(empty.includes('ตรวจข้อมูลจาก Drive อีกครั้ง'));
  assert(empty.includes('ทะเบียนเดิม ไม่ใช่ผลตรวจล่าสุด'));
  const source={id:'TEST',provider:'GDRIVE',title:'<script>alert(1)</script>',documentNo:'TEST',revision:'A1',issuedDate:'2026-10-01',receivedDate:'',url:'https://drive.google.com/file/d/test/view',readState:'TEXT_READ',authority:'CURRENT_TENDER',content:'<img src=x onerror=alert(1)>',note:'Synthetic only',replaces:[]};
  state.data.sourceIntake={schema:'genesis.0550.source-intake.v1',projectId:'PJ2608-0550',batchId:'TEST',reviewedOn:'2026-10-27',coverageNote:'Synthetic',sources:[source],findings:[],milestones:[]};
