@@ -45,9 +45,12 @@ Validated on this branch: data validator, expanded bidding validator, full produ
 
 PR #53 is a Draft against the Hub, not a standalone 0550 application. The review
 branch contains the same four-project navigation. Its home-page identifier is
-`2026-10-28.2-preview · 0550 Official Working / Numbered Modules / Copy ID`.
-GitHub reports no merge conflict as of 28 October 2026; no PR workflow run was
-reported. Local validation results above remain the test evidence.
+`2026-10-28.3-preview · 0550 Official Working / Module Colours / Numbered Modules / Copy ID`.
+The earlier checkpoint reported no merge conflict; the latest handoff check on
+28 October 2026 now reports `mergeable=false / dirty`. PR #53 remains Draft and
+unmerged. Resolve and validate integration separately before any future merge.
+Local validation results above and the latest colour correction below remain the
+software test evidence; no claim of a PR CI pass is made.
 
 Before first opening the review version, use **Data and Trace → Export workspace
 backup** on the existing localhost:3001 application. New review records extend

@@ -1,3 +1,11 @@
+> **Latest new-chat checkpoint, 28-Oct-2026:** Read
+> [PJ2608-0550 detailed handoff](PJ2608-0550_NEW_CHAT_HANDOFF_20261028.md) first.
+> Review branch `feat/pj2608-0550-official-working-20261028`, UI `.3-preview`,
+> application commit `eb8dda6b`; 15 browser checks passed. User installation of
+> `.3-preview` and actual Official prices remain unverified. PR #53 is Draft;
+> latest GitHub check reports `mergeable=false / dirty`, not merged. Older branch,
+> intake and mergeability checkpoints below are historical, not current runtime state.
+
 > **Hub checkpoint, 27-Oct-2026:** The unified launch branch is
 > `feat/genesis-project-hub-20261027` with 0550 source `ec436381`.
 > See `docs/project-hub-20261027.md`; Windows folder `genesis-project-hub`,
