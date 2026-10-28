@@ -165,3 +165,33 @@ asset-size warning. Chromium verified all ten clipboard values, copying from
 collapsed groups without toggling, project-qualified search reopening/scrolling,
 13 source roundtrips and four MR forward routes. Downloaded XLSX is byte-identical
 to Hub 2026-10-28.1. 0550/0510/shared code and dependencies are untouched.
+
+## Sheet A Excel — version 2026-10-28.3
+
+Official Release now includes **A Equipment / Export Excel** beside B10. Search
+`PJ2608-0553 / bid.budget.pricing.official.sheet.a` to open it; the common Copy ID
+control is visible on the sheet. The standard Official Excel button and the
+Sheet A button export six unchanged native sheets plus `A Equipment`. The
+existing 10-sheet Internal Breakdown export remains separate.
+
+Sheet A has twelve display rows. A1 groups its 55 source rows into ODU 8 Set,
+IDU/interface 8 Set, antenna 9 Set, L3 switch 5 Set, DATO 4 Set, new enclosures
+5 Set, existing enclosure reuse 1 Set, surge protection 8 Set and bulk 7 Lot.
+A2/A3/A4 use MR contractual quantities of 3 sets / 4 systems / 3 sets; package
+components and the one-per-phase RACON adapter are not added as extra systems.
+All 141 source identities map exactly once. Qty/Unit and prices are read-only.
+
+The Sheet A price selector controls the actual exported values. Hidden mode
+contains no item rate/amount values or formulas, and keeps linked A1–A4
+subtotals. Other quotation sheets retain their existing prices. Visible mode
+sums the existing allocated amounts; it supplies a unit rate only where common
+source configuration/rates support it. Part A stays USD704800, priced A+B
+USD863900. This does not verify the previously submitted quote or permit issue.
+The ZPQ IDU specification conflict, unpriced field scope and existing technical
+qualifications remain visible. No new equipment price or procurement decision.
+
+Validation: `validate-0553-sheet-a.cjs` checks exact quantity/unit, source coverage,
+price reconciliation, hidden-value omission and byte-preservation of the original
+six worksheets. Existing price breakdown, Official USD, module deep-link and
+budget change validators remain applicable. Browser coverage includes both new
+downloads, Sheet A search and existing Source→Release→Source navigation.

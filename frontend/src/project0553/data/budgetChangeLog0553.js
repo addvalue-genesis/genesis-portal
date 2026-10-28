@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-28-R66";
+export const CHANGE_LOG_VERSION_0553="2026-10-28-R67";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261028-03",date:"2026-10-28",kind:"UI",tone:"neutral",
+  title:"Sheet A equipment summary — actual Qty/Unit and Excel price visibility",
+  detail:"Adds A Equipment / Export Excel beside B10 in Official Release. Twelve summary rows cover all 141 source identities once: nine A1 equipment rows, plus three MR system rows. Keeps new enclosures separate from existing reuse, flags ZPQ IDU configuration conflict and retains the one-per-phase RACON kit qualification. Seven-sheet export preserves the six original sheets; Sheet A omits detail price values when hidden and retains A1–A4 subtotals. Existing internal 10-sheet export remains available. No source, quantity, FX, margin or parent-price changes; no approved customer issue.",
+  moduleIds:Object.freeze(["bid.budget.pricing.official.sheet.a","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner 28-Oct: add Sheet A with Qty/Unit and show/hide detail prices like the B10 export tab"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261028-02",date:"2026-10-28",kind:"UI",tone:"neutral",
   title:"Part A Breakdown — visible Copy ID, numbered headings and exact module search",

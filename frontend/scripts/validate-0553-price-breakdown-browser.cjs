@@ -14,6 +14,25 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
   await search.fill('bid.budget.pricing.official');await search.press('Enter');
   const official=page.locator('[data-component-key="bid.budget.pricing.official"]');await official.waitFor();
   const summaryBefore=await official.locator('[data-quote-code]').allTextContents();
+  await official.getByRole('tab',{name:'A Equipment / Export Excel',exact:true}).click();
+  const sheetA=official.getByRole('region',{name:'Sheet A equipment export'});
+  assert.equal(await sheetA.locator('[data-sheet-a-item]').count(),12);
+  assert.equal(await sheetA.locator('[data-sheet-a-price]').count(),0);
+  const a1Qty=await sheetA.locator('[data-sheet-a-group="A1"] [data-sheet-a-item]').evaluateAll(rs=>rs.map(r=>[r.cells[3].textContent,r.cells[4].textContent]));
+  assert.deepEqual(a1Qty.map(r=>Number(r[0])),[8,8,9,5,4,5,1,8,7]);
+  for(const show of [false,true]){
+   await sheetA.getByRole('button',{name:show?'แสดงราคาย่อยใน Sheet A':'ซ่อนราคาย่อยใน Sheet A',exact:true}).click();
+   assert.equal(await sheetA.locator('[data-sheet-a-price]').count(),show?24:0);
+   const pending=page.waitForEvent('download');await sheetA.getByRole('button',{name:'Export Excel — Sheet A / 7 sheets',exact:true}).click();
+   const excel=await pending;assert(excel.suggestedFilename().includes(show?'WithDetailPrices':'WithoutDetailPrices'));
+   if(process.env.QA_OUTPUT_DIR){fs.mkdirSync(process.env.QA_OUTPUT_DIR,{recursive:true});await excel.saveAs(path.join(process.env.QA_OUTPUT_DIR,excel.suggestedFilename()));}
+  }
+  if(process.env.QA_OUTPUT_DIR)await sheetA.screenshot({path:path.join(process.env.QA_OUTPUT_DIR,'sheet-a.png')});
+  await official.getByRole('tab',{name:'Scope of supply',exact:true}).click();
+  await search.fill('PJ2608-0553 / bid.budget.pricing.official.sheet.a');await search.press('Enter');
+  await sheetA.waitFor({state:'visible'});
+  assert.equal(await sheetA.getByRole('button',{name:'Copy component ID bid.budget.pricing.official.sheet.a',exact:true}).count(),1);
+  await official.getByRole('tab',{name:'Scope of supply',exact:true}).click();
   const review=official.getByRole('region',{name:'Price breakdown review'});
   assert.equal(await review.locator('[data-customer-summary-key]').count(),17);
   assert.equal(await review.locator('[data-breakdown-key]').count(),0);

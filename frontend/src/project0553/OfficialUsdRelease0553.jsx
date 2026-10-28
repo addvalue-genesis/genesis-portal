@@ -1,25 +1,34 @@
-import React,{useMemo,useState} from "react";
+import React,{useEffect,useMemo,useState} from "react";
 import {buildOfficialUsdRelease0553,OFFICIAL_SHEETS_0553} from "./data/officialUsdRelease0553";
-import {buildNativeOfficialRelease0553} from "./nativeWorkingDraft0553";
 import template from "./data/nativeReleaseTemplate0553.json";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
 import {CustomerPriceBreakdown0553} from "./CustomerPriceBreakdown0553";
 import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
 import {buildNativePriceBreakdown0553} from "./nativePriceBreakdown0553";
+import {buildNativePartASummary0553} from "./nativePartASummary0553";
+import {PartAEquipmentSheet0553,PART_A_SHEET_MODULE_0553} from "./PartAEquipmentSheet0553";
 import "./releaseWorkbook0553.css";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"To be quoted";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"To be quoted";
-export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=null,showPriceDetails,onPriceDetailsChange,breakdownView,onBreakdownViewChange}){
+export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=null,showPriceDetails,onPriceDetailsChange,breakdownView,onBreakdownViewChange,navigationTarget,navigationSequence}){
  const model=useMemo(()=>buildOfficialUsdRelease0553(source),[source]);
+ const breakdownModel=useMemo(()=>buildCustomerPriceBreakdown0553(source,model),[source,model]);
+ const [sheetAPrices,setSheetAPrices]=useState(false);
  const [sheet,setSheet]=useState("SUMMARY"),[busy,setBusy]=useState(false),[error,setError]=useState("");
+ useEffect(()=>{if(navigationTarget===PART_A_SHEET_MODULE_0553)setSheet("A");},[navigationTarget,navigationSequence]);
+ useEffect(()=>{
+  if(sheet!=="A"||navigationTarget!==PART_A_SHEET_MODULE_0553)return;
+  const token=requestAnimationFrame(()=>document.querySelector('[data-component-key="'+PART_A_SHEET_MODULE_0553+'"]')?.scrollIntoView({block:"center"}));
+  return ()=>cancelAnimationFrame(token);
+ },[sheet,navigationTarget,navigationSequence]);
  const download=async(breakdown=false)=>{
   setBusy(true);setError("");
   try{
    const bytes=Uint8Array.from(atob(template.base64),c=>c.charCodeAt(0));
    const file=new File([bytes],template.sourceName,{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-   const result=breakdown?await buildNativePriceBreakdown0553(file,model,buildCustomerPriceBreakdown0553(source,model)):
-    await buildNativeOfficialRelease0553(file,model);
+   const result=breakdown?await buildNativePriceBreakdown0553(file,model,breakdownModel):
+    await buildNativePartASummary0553(file,model,breakdownModel,{showPrices:sheetAPrices});
    const url=URL.createObjectURL(result.blob),link=document.createElement("a");
    link.href=url;link.download=result.filename;document.body.appendChild(link);link.click();link.remove();
    setTimeout(()=>URL.revokeObjectURL(url),15000);
@@ -56,9 +65,10 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
    <button type="button" className="p553-detail-button" disabled={busy} onClick={()=>download(true)}>Export Breakdown — Draft / 10 sheets</button></div>
   {!model.issued&&<p className="p55-note" data-issue-state="NOT_ISSUED"><strong>PRE-AWARD / NOT ISSUED.</strong> This price preview is not an approved customer submission. {model.unpriced.length>0&&<>Priced A+B subtotal excludes: {model.unpriced.join(", ")}. </>}A separate commercial approval is required before issue.</p>}
   {error&&<p role="alert">Export failed: {error}</p>}
-  <div className="p553-release-tabs" role="tablist" aria-label="Quotation worksheets">{OFFICIAL_SHEETS_0553.map(([name,code])=><button type="button" key={code} role="tab" aria-selected={sheet===code} className={sheet===code?"is-active":""} onClick={()=>setSheet(code)}>{name}</button>)}</div>
+  <p className="p55-note">Export Excel: 6 original sheets + A Equipment · Sheet A: {sheetAPrices?"แสดงราคาย่อย":"ซ่อนราคาย่อย"} · เลือกได้ในแท็บ A Equipment / Export Excel</p>
+  <div className="p553-release-tabs" role="tablist" aria-label="Quotation worksheets">{[OFFICIAL_SHEETS_0553[0],["A Equipment / Export Excel","A"],...OFFICIAL_SHEETS_0553.slice(1)].map(([name,code])=><button type="button" key={code} role="tab" aria-selected={sheet===code} className={sheet===code?"is-active":""} onClick={()=>setSheet(code)}>{name}</button>)}</div>
   <div className="p553-native-sheet">
-   <div className="p553-native-title">{sheet==="SUMMARY"?"Scope of Supply":model.annexTitles[sheet]}</div>
+   <div className="p553-native-title">{sheet==="SUMMARY"?"Scope of Supply":sheet==="A"?"Part A — Equipment Summary":model.annexTitles[sheet]}</div>
    <div className="p553-sheet-meta"><strong>Project</strong><span>{model.project}</span><strong>Currency</strong><span>USD</span></div>
    <div className="p553-sheet-scroll">{sheet==="SUMMARY"?<table className="p553-customer-table">
     <thead><tr>{["Item","Tag No.","Description","Main Specification","Qty","Unit Price (USD)","Amount (USD)","Remarks"].map(h=><th key={h}>{h}</th>)}</tr></thead>
@@ -69,7 +79,7 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
      <tr className="p553-sheet-total"><td colSpan={6}>{model.unpriced.length?"Priced A+B subtotal (USD)":"Total A+B (USD)"}{model.unpriced.length>0&&<small>Excludes items to be quoted: {model.unpriced.join(", ")}.</small>}</td><td className="p553-price-cell">{money(model.totalUSD)}</td><td/></tr>
      <tr className="p553-sheet-section"><td colSpan={8}>Part C: Options — excluded from A+B subtotal</td></tr>{model.c.map(summaryRow)}
     </tbody>
-   </table>:sheet==="B10"?<B10KitPriceSummary0553 rows={model.annex.B10}
+   </table>:sheet==="A"?<PartAEquipmentSheet0553 breakdown={breakdownModel} showPrices={sheetAPrices} onPricesChange={setSheetAPrices} onExport={()=>download()} busy={busy}/>:sheet==="B10"?<B10KitPriceSummary0553 rows={model.annex.B10}
      currency="USD" total={model.b.find(r=>r.code==="B10")?.amountUSD} variant="official"
       onOpenSource={onOpenSource}/>:["B11","B13","C1","C2"].includes(sheet)?
      <OtherSpareOriginalAnnex0553 code={sheet} model={model.otherSpareItemizedAnnex}

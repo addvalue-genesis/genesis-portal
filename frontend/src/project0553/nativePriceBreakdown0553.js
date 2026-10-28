@@ -4,14 +4,14 @@ import {customerBreakdownRows0553} from "./data/customerPriceBreakdown0553";
 const enc=new TextEncoder(),dec=new TextDecoder();
 const esc=x=>String(x??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 const ns="http://schemas.openxmlformats.org/spreadsheetml/2006/main";
-function emptyEntry(name){
+export function emptyEntry(name){
  const bytes=enc.encode(name),local=new Uint8Array(30+bytes.length),central=new Uint8Array(46+bytes.length);
  const l=new DataView(local.buffer),c=new DataView(central.buffer);
  l.setUint32(0,0x04034b50,true);l.setUint16(4,20,true);l.setUint16(26,bytes.length,true);local.set(bytes,30);
  c.setUint32(0,0x02014b50,true);c.setUint16(4,20,true);c.setUint16(6,20,true);c.setUint16(28,bytes.length,true);central.set(bytes,46);
  return {name,local,central,flags:0,method:0,rawSize:0,crc:0,compressed:new Uint8Array()};
 }
-function addStyles(xml){
+export function addStyles(xml){
  const append=(tag,parts)=>{
   const re=new RegExp('<'+tag+'\\b[^>]*count="(\\d+)"[^>]*>([\\s\\S]*?)</'+tag+'>'),match=xml.match(re);
   if(!match)throw Error("Missing workbook "+tag);

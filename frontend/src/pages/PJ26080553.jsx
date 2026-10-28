@@ -1,4 +1,4 @@
-import {BREAKDOWN_MODULES_0553} from "../project0553/pricingViewRegistry0553";
+import {BREAKDOWN_MODULES_0553,PART_A_EXPORT_MODULE_0553} from "../project0553/pricingViewRegistry0553";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import { CommercialWorkspace0553 } from "../project0553/CommercialWorkspace";
 import { WorkflowNavigator0553 } from "../project0553/WorkflowNavigator0553";
@@ -88,7 +88,7 @@ export function PJ26080553() {
  ];
  // Derive B/C search results from the SAME controlled 10.2 source and module IDs
  // rendered in Budgetary; avoid isolated manually-maintained search aliases.
- const navigableModules=[...mainModuleIndex,...BREAKDOWN_MODULES_0553,...buildBcModuleNavigator0553(),...buildScopeBcModuleNavigator0553(),...buildBulkModuleNavigator0553()];
+ const navigableModules=[...mainModuleIndex,...BREAKDOWN_MODULES_0553,PART_A_EXPORT_MODULE_0553,...buildBcModuleNavigator0553(),...buildScopeBcModuleNavigator0553(),...buildBulkModuleNavigator0553()];
  // Accept either a bare Module ID or the project-qualified Copy ID text.
  const searchableQuery=moduleQuery.trim().replace(/^PJ2608-0553\s*\/\s*/i,"").trim().toLowerCase();
  const searchMatches=searchableQuery?

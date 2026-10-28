@@ -243,6 +243,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  },[releaseJump,bcTab]);
  const openPricingStage=stage=>{setPricingStage(stage);setNavigationFeedback(null);setBreakdownFocus(null);setBreakdownSelection(null);};
  React.useEffect(()=>{
+  if(navigationTarget==="bid.budget.pricing.official.sheet.a"){setBreakdownFocus(null);setBreakdownSelection(null);setRecipient("INTERNAL");}
   if(/^bid\.budget\.pricing\.(?:official|release\.preview)\.breakdown(?:\.a[1-4])?$/.test(navigationTarget||"")){setBreakdownFocus(null);setBreakdownSelection(null);setRecipient("INTERNAL");}
   if(navigationTarget?.startsWith("bid.budget.pricing.official"))setPricingStage("official");
   else if(navigationTarget)setPricingStage("released");
@@ -283,7 +284,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  if(pricingStage==="official")return <div className="p55-stack">
   <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
-  <OfficialUsdRelease0553 breakdownView={officialBreakdownView} onBreakdownViewChange={setOfficialBreakdownView} source={releaseModel} onOpenSource={openReleaseSource} breakdownFocus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>
+  <OfficialUsdRelease0553 navigationTarget={breakdownFocus||breakdownSelection?null:navigationTarget} navigationSequence={navigationSequence} breakdownView={officialBreakdownView} onBreakdownViewChange={setOfficialBreakdownView} source={releaseModel} onOpenSource={openReleaseSource} breakdownFocus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>
  </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");
