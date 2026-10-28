@@ -142,6 +142,36 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
   assert.equal(hashes.xlsx,'2065bb70efa3e8b3bb90b4fbe64f099e02d1ae6c73a73d03b8e745987becafc6');
   const topExport=page.waitForEvent('download');await page.getByRole('button',{name:'Export HIS-01 · SAMTEL Rev00 XLSX',exact:true}).click();assert.equal(hash(fs.readFileSync(await(await topExport).path())),hashes.xlsx);
   await fill('Project Module Search','OFF-03');await page.getByLabel('Project Module Search').press('Enter');await page.locator('[data-component-key="bid.budget.official"]').waitFor({state:'visible'});await fill('Project Module Search','REL-04');await page.getByLabel('Project Module Search').press('Enter');await page.getByRole('table',{name:'Official customer form',exact:true}).waitFor();await page.waitForFunction(()=>document.querySelector('[data-component-key="bid.budget.release"]')?.getAttribute('data-module-focused')==='true');await fill('Project Module Search','RFQ-02');await page.getByLabel('Project Module Search').press('Enter');await page.locator('[data-component-key="l3.original"]').waitFor();await page.getByRole('button',{name:'B · Engineering & Bid Preparation',exact:true}).click();await nav('Budget');await fill('Project Module Search','HIS-01');await page.getByLabel('Project Module Search').press('Enter');await page.locator('.p55-legacy-history').waitFor();await fill('Project Module Search','');checks.push('HIS-01 top export byte parity and all four tag navigation targets');
+  // Satellite supply responsibility: a saved mixed package cannot silently
+  // enter the current bid; COMPANY records remain auditable but leave exports.
+  await nav('Data and Trace');const beforeSatellite=await db();
+  const satelliteWorkspace=JSON.parse(JSON.stringify(beforeSatellite));
+  const satBase={...satelliteWorkspace.lines[0],systemToken:'TEL-VSAT',wbs:'A',scopeKey:'SAT.SYNTHETIC',customerRowCode:'A1-02',description:'Synthetic satellite package',vendorId:'',offerId:'',calculationId:'',quantity:1,unit:'Lot',currency:'THB',manualCost:111,sellRate:222,sellMode:'DIRECT',primePct:0,selected:true,requirementRef:'SYNTHETIC clause',sourceRef:'SYNTHETIC source',scopeBasis:'SYNTHETIC component boundary'};
+  delete satBase.officialReview;
+  satelliteWorkspace.fx={thbPerUSD:40,thbPerEUR:null,date:'2026-10-28',source:'SYNTHETIC FX'};
+  satelliteWorkspace.lines=[{...satBase,id:'SAT-OLD',description:'Synthetic old bundled package'},
+   {...satBase,id:'SAT-CPY',scopeKey:'SAT.CPY',description:'Synthetic company terminal',satelliteScope:'COMPANY_SUPPLY'},
+   {...satBase,id:'SAT-TSI',scopeKey:'SAT.TSI',description:'Synthetic retained cabinet',satelliteScope:'TSI_EQUIPMENT'},
+   {...satBase,id:'SAT-KU',systemToken:'TEL-VSAT-KU',customerRowCode:'A1-01',scopeKey:'SAT.KU',description:'Synthetic unresolved Internet',satelliteScope:'CLARIFICATION'}];
+  await importFile(satelliteWorkspace);await page.waitForFunction(rev=>document.querySelector('.p55-bid-save').textContent.includes('Revision '+(rev+1)),beforeSatellite.revision);
+  await nav('Budget');await page.getByRole('group',{name:'Budget context'}).getByRole('button',{name:/OFF-03/}).click();await page.getByRole('button',{name:'Working · ราคาเดิมรออัปเดต',exact:true}).click();
+  await expand('bid.budget.working.part.A');await expand('bid.budget.working.group.TEL-VSAT');
+  const satelliteRow=id=>page.locator('[data-component-key="bid.budget.working.line.'+id+'"]');
+  assert((await satelliteRow('SAT-OLD').innerText()).includes('SATELLITE_SCOPE_OPEN'));
+  assert((await satelliteRow('SAT-CPY').innerText()).includes('COMPANY จัดหา · ไม่รวมราคา'));
+  assert((await satelliteRow('SAT-TSI').innerText()).includes('222.00'));
+  await satelliteRow('SAT-OLD').getByRole('button',{name:'แก้ไข / ทบทวน',exact:true}).click();
+  await select('Satellite scope responsibility','COMPANY_SUPPLY');await fill('Satellite scope basis','SYNTHETIC confirmed company hardware');await save('บันทึกแถว Working');
+  const savedSatellite=await db();const company=savedSatellite.lines.find(r=>r.id==='SAT-OLD');assert.equal(company.selected,false);assert.equal(company.manualCost,111);assert.equal(company.sellRate,222);assert.equal(company.satelliteScope,'COMPANY_SUPPLY');
+  // Excluded source navigation targets its retained customer group.
+  await satelliteRow('SAT-OLD').getByRole('button',{name:'ไป REL-04',exact:true}).click();
+  const satelliteRelease=page.getByRole('table',{name:'Official customer form',exact:true});await satelliteRelease.waitFor();
+  const satelliteText=await satelliteRelease.innerText();assert(satelliteText.includes('Synthetic retained cabinet'));assert(satelliteText.includes('5.55'));assert(!satelliteText.includes('Synthetic company terminal'));assert(!satelliteText.includes('Synthetic old bundled package'));assert(satelliteText.includes('Synthetic unresolved Internet'));assert(satelliteText.includes('OPEN'));
+  const satelliteDownload=page.waitForEvent('download');await page.getByRole('button',{name:'Export REL-04 · Provisional Draft XLSX',exact:true}).click();const satelliteBytes=fs.readFileSync(await(await satelliteDownload).path()).toString();assert(!satelliteBytes.includes('Synthetic company terminal'));assert(!satelliteBytes.includes('Synthetic old bundled package'));assert(satelliteBytes.includes('Synthetic retained cabinet'));assert(satelliteBytes.includes('clarification'));
+  if(process.env.SATELLITE_SCREENSHOT)await page.screenshot({path:process.env.SATELLITE_SCREENSHOT,fullPage:false});
+  await page.reload();await page.locator('.p55-bid-save').filter({hasText:'Revision'}).waitFor();assert.equal((await db()).lines.find(r=>r.id==='SAT-OLD').satelliteScope,'COMPANY_SUPPLY');
+  await nav('Data and Trace');const revisionBeforeRestore=(await db()).revision;await importFile(beforeSatellite);await page.waitForFunction(rev=>document.querySelector('.p55-bid-save').textContent.includes('Revision '+(rev+1)),revisionBeforeRestore);
+  checks.push('Satellite scope: old bundle and KU OPEN; COMPANY excluded from draft totals/export with source trace; TSI retained; editor, reload and backup restore preserve values');
   if(process.env.BASELINE_REPORT){const before=JSON.parse(fs.readFileSync(process.env.BASELINE_REPORT,'utf8'));for(const key of ['budgetary','working','released','xlsx'])assert.equal(hashes[key],before.hashes[key],'Protected output '+key);}
   for(const name of ['Executive','First Principles','Architecture','19 Systems','Schematic','Execution','Vendors and Evidence','Risk & Controls','Data and Trace','Budget']){await nav(name);const ids=await page.locator('[data-component-key]').evaluateAll(nodes=>nodes.map(n=>n.getAttribute('data-component-key')));assert.equal(new Set(ids).size,ids.length,'Duplicate Module ID in '+name);}
   checks.push('All 10 tabs render without duplicate component IDs or console errors');

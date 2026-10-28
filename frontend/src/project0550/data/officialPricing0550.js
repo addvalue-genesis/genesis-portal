@@ -1,6 +1,8 @@
 import form from "./customerForm0550.json";
 import {deriveSourceIntake, deriveDocumentRevisionRegister} from "./sourceIntakeModel";
 
+import {isSatelliteScope0550,SATELLITE_SCOPE_VERSION} from "./satelliteScope0550";
+
 export const CUSTOMER_FORM_0550 = form;
 export const BID_CONTEXT_TAGS = Object.freeze({history:"HIS-01",source:"RFQ-02",working:"OFF-03",release:"REL-04"});
 export const REVIEW_DECISIONS = ["OPEN","KEEP","RECALCULATE","ADD","REMOVE"];
@@ -37,12 +39,13 @@ function evidenceProblems(data,review,today){
 export function officialLineBasisKey(data,line,review=line.officialReview){
  const {officialReview,...inputs}=line;
  const {basisKey,...decision}=review||{};
- return fingerprint({method:"0550-official-review-v1",inputs,decision,offer:data.offers.find(o=>o.id===line.offerId)||null,calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
+ return fingerprint({method:"0550-official-review-v1",...(isSatelliteScope0550(line)?{scopePolicy:SATELLITE_SCOPE_VERSION}:{}),inputs,decision,offer:data.offers.find(o=>o.id===line.offerId)||null,calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
 }
 export function customerScopeBasisKey(data,code,review){
  const {basisKey,...decision}=review;
  return fingerprint({code,decision,form,lines:data.lines.filter(l=>l.selected&&l.customerRowCode===code).map(l=>({id:l.id,key:officialLineBasisKey(data,l),review:l.officialReview})).sort((a,b)=>a.id.localeCompare(b.id)),sources:sourceBasis(data,review.sourceIds),fx:data.fx});
 }
+const customerSatelliteRemark = row => row.code==="A1-02"?"TSI supporting equipment and services only; COMPANY-supplied VSAT terminal hardware and three-link communication services excluded. Final interfaces subject to clarification.":row.systems.includes("TEL-VSAT-KU")?"KU/C Band Internet terminal and service supply responsibility remains subject to clarification; no automatic exclusion.":"";
 const round = x=>Math.round((x+Number.EPSILON)*100)/100;
 export const sumOfficial = (rows,key) => rows.length&&rows.every(r=>Number.isFinite(r[key]))?round(rows.reduce((n,r)=>n+r[key],0)):null;
 
@@ -60,7 +63,7 @@ export function deriveOfficialPricing(data,calculated,today){
   if(r&&r.basisKey!==officialLineBasisKey(data,raw,r))problems.push("STALE: ข้อมูลหรือหลักฐานเปลี่ยน ต้องทบทวนใหม่");
   problems.push(...row.problems);
   const reviewed=problems.length===0;
-  return {...row,calculatedCustomerTHB:row.customerTHB,calculatedCustomerUSD:row.customerUSD,reviewProblems:problems,reviewState:reviewed?"REVIEWED_WORKING":problems.some(p=>p.startsWith("STALE"))?"STALE":"OPEN",costTHB:reviewed?row.costTHB:null,workingSellTHB:reviewed?row.workingSellTHB:null,customerTHB:reviewed?row.customerTHB:null,customerUSD:reviewed?row.customerUSD:null};
+  return {...row,calculatedCustomerTHB:row.customerTHB,calculatedCustomerUSD:row.customerUSD,reviewProblems:problems,reviewState:row.satelliteScopeState?.excluded?"COMPANY_SUPPLY":reviewed?"REVIEWED_WORKING":problems.some(p=>p.startsWith("STALE"))?"STALE":"OPEN",costTHB:reviewed?row.costTHB:null,workingSellTHB:reviewed?row.workingSellTHB:null,customerTHB:reviewed?row.customerTHB:null,customerUSD:reviewed?row.customerUSD:null};
  });
  const selected=lines.filter(r=>r.selected);
  const unmapped=selected.filter(r=>!mappingValid(r));
@@ -74,7 +77,7 @@ export function deriveOfficialPricing(data,calculated,today){
   const ready=problems.length===0,excluded=ready&&review?.status==="EXCLUDED";
   const customerTHB=ready&&!excluded?sumOfficial(children,"customerTHB"):null;
   const customerUSD=ready&&!excluded?sumOfficial(children,"customerUSD"):null;
-  return {...template,children,review,problems,ready,excluded,state:excluded?"EXCLUDED":ready?"REVIEWED_WORKING":"OPEN",qty:1,unit:"Lot",customerTHB,customerUSD,customerRemark:review?.customerRemark||"",sourceModuleId:"bid.budget.working.customer."+template.code,releaseModuleId:"bid.budget.release.customer."+template.code};
+  return {...template,children,review,problems,ready,excluded,state:excluded?"EXCLUDED":ready?"REVIEWED_WORKING":"OPEN",qty:1,unit:"Lot",customerTHB,customerUSD,customerRemark:[customerSatelliteRemark(template),review?.customerRemark].filter(Boolean).join(" "),sourceModuleId:"bid.budget.working.customer."+template.code,releaseModuleId:"bid.budget.release.customer."+template.code};
  });
  const total=(part,key)=>{const rows=schedule.filter(r=>part.includes(r.part));const included=rows.filter(r=>!r.excluded);return !unmapped.length&&rows.every(r=>r.ready)?sumOfficial(included,key):null;};
  return {lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),baseTHB:total("AB","customerTHB"),baseUSD:total("AB","customerUSD"),optionsTHB:total("C","customerTHB"),optionsUSD:total("C","customerUSD"),reviewedCount:selected.filter(r=>r.reviewState==="REVIEWED_WORKING").length,scopeReviewed:!unmapped.length&&schedule.every(r=>r.ready),releaseAllowed:false,releaseState:"HOLD"};
@@ -83,11 +86,11 @@ export function deriveOfficialPricing(data,calculated,today){
 // Reuses the canonical equation results; it never stamps an Official review.
 export function deriveProvisionalPricing(data,calculated){
  const lines=calculated.lines.map(r=>({...r,costTHB:r.provisionalCostTHB,workingSellTHB:r.provisionalSellTHB,customerTHB:r.provisionalCustomerTHB,customerUSD:r.provisionalCustomerUSD,
-  calculatedCustomerTHB:r.provisionalCustomerTHB,reviewState:"PROVISIONAL — ราคาเดิม / รออัปเดต",reviewProblems:[...r.problems,"ตรวจ MR / ปริมาณ / ราคาอัปเดตก่อนออกข้อเสนอจริง"]}));
+  calculatedCustomerTHB:r.provisionalCustomerTHB,reviewState:r.satelliteScopeState?.excluded?"COMPANY_SUPPLY":r.satelliteScopeState?.problems.length?"SCOPE OPEN":"PROVISIONAL — ราคาเดิม / รออัปเดต",reviewProblems:[...r.problems,"ตรวจ MR / ปริมาณ / ราคาอัปเดตก่อนออกข้อเสนอจริง"]}));
  const selected=lines.filter(r=>r.selected),unmapped=selected.filter(r=>!mappingValid(r));
  const schedule=form.rows.map(t=>{
   const children=selected.filter(r=>mappingValid(r)&&r.customerRowCode===t.code),customerTHB=sumOfficial(children,"customerTHB"),customerUSD=sumOfficial(children,"customerUSD");
-  return {...t,children,review:null,problems:["Selected vendor scope only; completeness and updated quotations pending"],ready:children.length>0,excluded:false,state:"PROVISIONAL",qty:1,unit:"Lot",customerTHB,customerUSD,customerRemark:"Provisional pricing for listed scope; subject to scope confirmation and updated quotations.",sourceModuleId:"bid.budget.working.customer."+t.code,releaseModuleId:"bid.budget.release.customer."+t.code};
+  return {...t,children,review:null,problems:["Selected vendor scope only; completeness and updated quotations pending"],ready:children.length>0,excluded:false,state:"PROVISIONAL",qty:1,unit:"Lot",customerTHB,customerUSD,customerRemark:[customerSatelliteRemark(t),"Provisional pricing for listed scope; subject to scope confirmation and updated quotations."].filter(Boolean).join(" "),sourceModuleId:"bid.budget.working.customer."+t.code,releaseModuleId:"bid.budget.release.customer."+t.code};
  });
  const total=(parts,key)=>{const rows=schedule.filter(r=>parts.includes(r.part));return !unmapped.length&&rows.every(r=>r.children.length)?sumOfficial(rows,key):null;};
  return {pricingBasis:"PROVISIONAL_VENDOR",lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),

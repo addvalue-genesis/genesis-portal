@@ -1,6 +1,7 @@
 import { evaluateServiceEquation } from "../serviceEquationRuntime";
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
+import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
@@ -27,7 +28,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  for(const v of data.vendors){fields(v,["id","name","kind","reference"]);["name","kind","reference"].forEach(k=>string(v[k],k));if(!v.name.trim())fail("Vendor name required");}
  for(const o of data.offers){fields(o,["id","vendorId","description","brand","quoteRef","sourceRef","date","validUntil","currency","unit","unitCost"]);["description","brand","quoteRef","sourceRef"].forEach(k=>string(o[k],k));date(o.date,"quote date");date(o.validUntil,"quote validity");if(o.date&&o.validUntil&&o.validUntil<o.date)fail("Quote validity precedes quote date");if(!data.vendors.some(v=>v.id===o.vendorId))fail("Offer vendor missing");if(!["THB","USD","EUR"].includes(o.currency)||!BID_UNITS.includes(o.unit))fail("Invalid offer currency/unit");number(o.unitCost);}
  for(const c of data.calculations){fields(c,["id","title","systemToken","equationId","inputs","sourceRef"]);string(c.title,"calculation title");string(c.sourceRef,"calculation source");system(c.systemToken);if(!c.inputs||typeof c.inputs!=="object"||Array.isArray(c.inputs))fail("Invalid equation inputs");if(evaluateServiceEquation(c.equationId,c.inputs).errors?.includes("Unknown equation"))fail("Unknown equation");}
- for(const l of data.lines){fields(l,["id","systemToken","wbs","description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey","quantity","unit","currency","manualCost","sellMode","sellRate","markupPct","marginPct","primePct","selected","customerRowCode","customerRemark","brand","officialReview"]);system(l.systemToken);if(l.officialReview!==undefined)validateOfficialReview(l.officialReview);for(const k of ["customerRowCode","customerRemark","brand"])if(l[k]!==undefined)string(l[k],k);if(!BID_WBS.includes(l.wbs))fail("Unknown 0550 WBS");["description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey"].forEach(k=>string(l[k],k));if(!BID_UNITS.includes(l.unit)||!["THB","USD","EUR"].includes(l.currency)||!["DIRECT","MARKUP","MARGIN"].includes(l.sellMode)||typeof l.selected!=="boolean")fail("Invalid line selection/unit/currency/pricing");["quantity","manualCost","sellRate","markupPct","marginPct","primePct"].forEach(k=>number(l[k]));}
+ for(const l of data.lines){fields(l,["id","systemToken","wbs","description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey","quantity","unit","currency","manualCost","sellMode","sellRate","markupPct","marginPct","primePct","selected","customerRowCode","customerRemark","brand","officialReview","satelliteScope","scopeBasis"]);system(l.systemToken);if(l.satelliteScope!==undefined&&!SATELLITE_SCOPE_OPTIONS.some(([key])=>key===l.satelliteScope))fail("Invalid satellite scope");if(l.scopeBasis!==undefined)string(l.scopeBasis,"scope basis");if(l.officialReview!==undefined)validateOfficialReview(l.officialReview);for(const k of ["customerRowCode","customerRemark","brand"])if(l[k]!==undefined)string(l[k],k);if(!BID_WBS.includes(l.wbs))fail("Unknown 0550 WBS");["description","scopeKey","tagRef","requirementRef","sourceRef","vendorId","offerId","calculationId","resultKey"].forEach(k=>string(l[k],k));if(!BID_UNITS.includes(l.unit)||!["THB","USD","EUR"].includes(l.currency)||!["DIRECT","MARKUP","MARGIN"].includes(l.sellMode)||typeof l.selected!=="boolean")fail("Invalid line selection/unit/currency/pricing");["quantity","manualCost","sellRate","markupPct","marginPct","primePct"].forEach(k=>number(l[k]));}
  for(const n of data.nodes){fields(n,["id","systemToken","site","label","kind","sourceRef"]);system(n.systemToken);["site","label","kind","sourceRef"].forEach(k=>string(n[k],k));}
  for(const e of data.edges){fields(e,["id","from","to","label","sourceRef"]);["from","to","label","sourceRef"].forEach(k=>string(e[k],k));if(!data.nodes.some(n=>n.id===e.from)||!data.nodes.some(n=>n.id===e.to)||e.from===e.to)fail("Invalid schematic edge");}
  if(!data.fx||typeof data.fx!=="object")fail("Missing FX record");fields(data.fx,["thbPerUSD","thbPerEUR","source","date"]);number(data.fx.thbPerUSD);number(data.fx.thbPerEUR);string(data.fx.source,"FX source");date(data.fx.date,"FX date");
@@ -41,12 +42,13 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate){
  const eq=(id,inputs)=>evaluateServiceEquation(id,inputs).value;
  const fxReady=Boolean(data.fx.source.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(data.fx.date));
  const fx=currency=>currency==="THB"?1:fxReady&&finite(data.fx["thbPer"+currency])&&data.fx["thbPer"+currency]>0?data.fx["thbPer"+currency]:null;
- const counts=new Map();data.lines.filter(l=>l.selected&&l.scopeKey.trim()).forEach(l=>{const k=l.scopeKey.trim().toLowerCase();counts.set(k,(counts.get(k)||0)+1);});
+ const counts=new Map();data.lines.filter(l=>l.selected&&!satelliteScope0550(l).excluded&&l.scopeKey.trim()).forEach(l=>{const k=l.scopeKey.trim().toLowerCase();counts.set(k,(counts.get(k)||0)+1);});
  const lines=data.lines.map(l=>{
-  const problems=[],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
+  const satelliteScope=satelliteScope0550(l),selected=l.selected&&!satelliteScope.excluded;
+  const problems=[...satelliteScope.problems],offer=data.offers.find(o=>o.id===l.offerId),calc=data.calculations.find(c=>c.id===l.calculationId);
   let quantity=l.quantity,unit=l.unit,currency=l.currency,costRate=l.manualCost,result=null;
   if(!l.description.trim()||!l.sourceRef.trim()||!l.scopeKey.trim())problems.push("Description, scope key and source/basis required");
-  if(counts.get(l.scopeKey.trim().toLowerCase())>1&&l.selected)problems.push("DUPLICATE_SCOPE_OWNER");
+  if(counts.get(l.scopeKey.trim().toLowerCase())>1&&selected)problems.push("DUPLICATE_SCOPE_OWNER");
   if(l.vendorId&&!data.vendors.some(v=>v.id===l.vendorId))problems.push("Vendor missing");
   if(l.offerId){
    if(!offer)problems.push("Selected offer missing");
@@ -90,7 +92,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate){
   const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):null;
   const provisional={provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
    provisionalCostTHB:nativeReady&&factor!==null?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
-  return {...l,...provisional,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+  return {...l,...provisional,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  });
  const selected=lines.filter(l=>l.selected);
  const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);

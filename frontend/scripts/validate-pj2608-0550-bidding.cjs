@@ -104,6 +104,40 @@ try {
  const draftFile=Buffer.from(buildOfficialCustomerXlsx(draft.provisional)).toString();assert(draftFile.includes("PROVISIONAL"));assert(draftFile.includes("NOT ISSUED"));assert(draftFile.includes("OPEN"));for(const secret of ["226454.05","MASTER TOWER","QT2026","A20261632"])assert(!draftFile.includes(secret),"Internal vendor source leaked: "+secret);
  assert.equal(officialCustomerRows(draft.provisional).filter(r=>r.kind==="group").length,24);
  console.log("PASS existing vendor basis: 9 offers / 7 selected / 2 alternatives; THB 4,700,150 + EUR 231,678.05 cost; additive idempotent migration, preserved edits, native pricing without FX, provisional customer export, no Official review bypass.");
+ // Satellite boundary uses explicit, evidenced component ownership, not a
+ // keyword-based subtraction from legacy package totals. All values synthetic.
+ const satellite=clone();satellite.calculations=[];satellite.offers=[];satellite.vendors=[];
+ const satRow={...line,id:"SAT-BUNDLE",systemToken:"TEL-VSAT",wbs:"A",description:"Synthetic old whole VSAT package",scopeKey:"SAT.TEST",customerRowCode:"A1-02",offerId:"",vendorId:"",calculationId:"",quantity:1,unit:"Lot",currency:"THB",manualCost:100,sellRate:200,primePct:0};
+ satellite.lines=[satRow];const satBytes=JSON.stringify(satellite);
+ assert.equal(derive(satellite).provisional.selectedTHB,null,"Old unclassified VSAT packages must not flow into provisional totals");
+ assert.equal(derive(satellite).knownTHB,null);assert.equal(JSON.stringify(satellite),satBytes,"Projection cannot edit private saved inputs");
+ assert(derive(satellite).lines[0].problems.some(p=>p.startsWith("SATELLITE_SCOPE_OPEN")));
+ satellite.lines[0]={...satRow,satelliteScope:"COMPANY_SUPPLY",scopeBasis:"Synthetic supplied-by-company clause"};
+ let sat=derive(satellite);assert.equal(sat.selected.length,0);assert.equal(sat.provisional.selected.length,0);assert.equal(sat.official.selected.length,0);
+ assert.equal(satellite.lines[0].selected,true,"Projection preserves original selection for audit");
+ assert.equal(sat.lines[0].costTHB,null);assert.equal(sat.lines[0].provisionalCustomerNative,null);assert.equal(sat.provisional.baseUSD,null);
+ assert.equal(sat.provisional.schedule.find(r=>r.code==="A1-02").excluded,false,"Company terminal supply does not remove all TSI scope");
+ assert(!officialCustomerRows(sat.provisional).some(r=>r.key===satRow.id));assert(!Buffer.from(buildOfficialCustomerXlsx(sat.provisional)).toString().includes(satRow.description));
+ // The same scope key on an excluded source cannot create a false duplicate cost.
+ satellite.lines.push({...satRow,id:"SAT-TSI",description:"Synthetic retained cabinet",satelliteScope:"TSI_EQUIPMENT",scopeBasis:"Synthetic retained-equipment clause"});
+ sat=derive(satellite);assert.equal(sat.provisional.selectedTHB,200);assert.equal(sat.provisional.selectedUSD,5);assert.equal(sat.selected.length,1);assert.equal(sat.lines[1].problems.length,0);
+ assert.equal(sat.groups.find(r=>r.code==="A").customerTHB,200);assert.equal(sat.provisional.schedule.find(r=>r.code==="A1-02").customerTHB,200);
+ satellite.lines.push({...satRow,id:"SAT-COMMISSION",description:"Synthetic retained commissioning",scopeKey:"SAT.COMMISSION",wbs:"B4",customerRowCode:"B4",satelliteScope:"TSI_SERVICES",scopeBasis:"Synthetic retained-service clause"});
+ assert.equal(derive(satellite).provisional.selectedTHB,400,"Retain TSI service cost separately");
+ const missingBasis=JSON.parse(JSON.stringify(satellite));missingBasis.lines[0].scopeBasis="";assert.equal(derive(missingBasis).provisional.selectedTHB,null,"Unsupported company exclusion must stay OPEN");
+ for(const token of ["TEL-VSAT","TEL-VSAT-KU"]){
+  const pending=clone();pending.lines=[{...satRow,systemToken:token,customerRowCode:token==="TEL-VSAT"?"A1-02":"A1-01"}];
+  assert.equal(derive(pending).provisional.selectedTHB,null);assert.equal(derive(pending).selected.length,1);
+  pending.lines[0].satelliteScope="CLARIFICATION";assert.equal(derive(pending).provisional.selectedTHB,null);
+ }
+ const alias=clone();alias.lines=[{...satRow,systemToken:"COMMON"}];assert.equal(derive(alias).provisional.selectedTHB,null,"A1-02 mapping cannot bypass scope review");
+ const entertainment=clone();entertainment.lines=[{...satRow,systemToken:"TEL-ES",customerRowCode:"A1-12",description:"Synthetic C-Band entertainment dish"}];assert.equal(derive(entertainment).provisional.selectedTHB,200,"Entertainment must not be removed with VSAT");
+ const badRole=JSON.parse(JSON.stringify(satellite));badRole.lines[1].satelliteScope="TSI_SERVICES";assert.equal(derive(badRole).provisional.selectedTHB,null,"Service cannot silently use Part A");
+ badRole.lines[1].satelliteScope="INVALID";assert.throws(()=>validate(badRole),/satellite scope/);
+ const reviewedSat=copyReviewed();reviewedSat.lines=[{...reviewedSat.lines[0],...satellite.lines[1]}];stampLine(reviewedSat);
+ assert.equal(derive(reviewedSat).official.selectedTHB,200);reviewedSat.lines[0].scopeBasis+=" changed";assert.equal(derive(reviewedSat).official.lines[0].reviewState,"STALE");
+ assert.deepEqual(validate(JSON.parse(JSON.stringify(satellite))),satellite,"Backup roundtrip preserves scope classification and original values");
+ console.log("PASS satellite scope: unclassified/mixed and KU clarification OPEN; evidenced COMPANY supply excluded in all projections/exports; retained TSI equipment/services and Entertainment priced; no raw mutation, duplicate cost or zero fallback; review staleness and backup roundtrip.");
  const {assertControlledSnapshot}=require("./assert-pj2608-0550-snapshot.cjs");assertControlledSnapshot(fs.readFileSync(path.join(root,"project0550/data/snapshots/pj2608-0550.rev07.json")));
  console.log("PASS 0550 Bidding: all E01–E18 + 4 engineering functions, manual/source inputs, unique ownership, offer/FX/unit gates, same THB/USD projection, options separation, review export and immutable Rev10; synthetic prices only.");
 }finally{require.extensions[".js"]=old;}

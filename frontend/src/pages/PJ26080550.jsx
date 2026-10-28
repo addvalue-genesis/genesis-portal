@@ -1,3 +1,4 @@
+import {satelliteScopeNote0550} from "../project0550/data/satelliteScope0550";
 import {bidPresentationIndex,BID_TAG_TARGETS_0550} from "../project0550/bidPresentation0550";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
@@ -598,6 +599,7 @@ function SystemCard({ system, expanded, onToggle }) {
   return (
     <article data-component-key={"bid.systems."+system.token} className={"p55-system " + (expanded ? "is-expanded" : "")}>
       <ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.systems."+system.token}/>
+      {satelliteScopeNote0550(system.token)&&<p className="p55-open-item"><strong>Current Working scope</strong> {satelliteScopeNote0550(system.token)} ข้อมูล owner / cost basis ด้านล่างเป็น snapshot เดิม; ไม่ใช่อนุมัติจัดหาครบชุดในรอบนี้</p>}
       <button className="p55-system__summary" onClick={onToggle} type="button">
         <div className="p55-system__no">{String(system.no).padStart(2, "0")}</div>
         <div className="p55-system__title">

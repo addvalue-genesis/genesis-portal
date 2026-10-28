@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-28.5-preview",
+  "version": "2026-10-28.6-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "source0550": "b000ee553400c64f51203cad7b9d7711a4badedb",
-  "capability": "0550 existing vendor prices / provisional proposal / MR work process"
+  "capability": "0550 satellite COMPANY / TSI scope separation / retained services"
 }
