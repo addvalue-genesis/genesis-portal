@@ -156,7 +156,9 @@ for(const code of codes){
 const Customer=from("ReleaseCustomerWorkbook0553.jsx").ReleaseCustomerWorkbook0553;
 const html=renderToStaticMarkup(React.createElement(Customer,{model:rel}));
 for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(html.includes(amount));
-assert(html.includes("NOT QUOTED")&&html.includes("Excludes unpriced items: B4, B12, B14."));
+assert(html.includes("CONDITIONAL BUDGETARY")&&html.includes("Excludes unpriced items: B4, B12, B14."));
+for(const amount of ["3,071,250.00","721,806.60"])assert(html.includes(amount));
+assert.equal((html.match(/data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"/g)||[]).length,2);
 assert(html.includes("27,192,339.36")&&html.includes("WORKING DRAFT"));
 const Scope=from("ScopeSheetsDetail0553.jsx").ScopeSheetsDetail0553;
 const scopeHtml=renderToStaticMarkup(React.createElement(Scope,{fx:{thbPerUsd:31.5},onOpenSource:()=>{},onOpenReleaseRow:()=>{}}));

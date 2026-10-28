@@ -91,3 +91,51 @@ Update the existing checkout using `git pull --ff-only origin
 feat/genesis-project-hub-20261027`, then restart the existing port-3001 server.
 No new dependency installation is required for this update; package-lock is
 unchanged. Never delete browser data to resolve a missing Drive load.
+
+
+## 0553 breakdown integration — version 2026-10-28.1
+
+The owner authorized integrating the reviewed 0553 work into this existing Hub
+preview branch. Sources: Hub `6b3b7448` and 0553 `f0bc67dd` (Draft PR #52).
+The merge includes the intervening 0553 spare-annex and conditional-option work
+needed by the breakdown. It retains the Hub's incomplete priced-subtotal and
+PRE-AWARD / NOT ISSUED safeguards in the screen and native workbook. Delivery
+wording remains proposed CIF, subject to buyer approval against original DDP
+terms. No commercial issue or deployment is implied by this code integration.
+
+Open **0553 → 10.3.4 Official Release** (search Module ID
+`bid.budget.pricing.official`). Customer shows 17 MR/location summaries;
+Internal retains all 141 rows and exact Source roundtrips. Both show/hide
+price modes retain the existing A1–A4 and priced A+B subtotal USD 863,900.
+C1/C2 remain separate conditional options. The downloaded 10-sheet breakdown
+is still a detailed draft, independent of the screen mode.
+
+0550 project/page/source-intake files, 0510, shared navigation and webpack
+Drive middleware are byte-identical to Hub `6b3b7448`; package-lock and
+runtime dependencies are unchanged. The build command combines both branches'
+validators. This integration does not absorb work on other unmerged 0550
+branches or mark the originally submitted 0553 proposal as reconciled.
+
+Use the same Windows checkout and port 3001. Stop that server using Ctrl+C,
+then `git pull --ff-only origin feat/genesis-project-hub-20261027` and restart
+from `frontend` with `npm start -- --port 3001`. No dependency installation is
+required if the existing Hub installation is working. Do not reset/discard
+local modifications or remove browser data. Homepage version: **2026-10-28.1**.
+
+
+### Validation of version 2026-10-28.1
+
+- Full combined `npm run build`: passed, 171 PASS markers, production webpack
+  completed with one existing asset-size warning.
+- Chromium: all four project cards and direct reloads, same-tab transitions,
+  0510 SAT tests, truthful 0541 status, language/aliases/fallback/mobile width.
+- Chromium 0553: Customer 17 rows, Internal 141 rows, both price modes, complete
+  source-to-summary mapping, 13 sampled exact reverse roundtrips, four MR
+  forward routes and actual draft workbook download; no page errors.
+- Byte comparison: 0550, 0510, shared code/pages/routes, webpack middleware,
+  package-lock and the 0510 service unchanged from Hub `6b3b7448`.
+- Package build retains both branches' validation commands once each.
+- Merged native-export tests preserve the Hub subtotal/NOT ISSUED safeguards
+  and the 0553 conditional-option and itemized-annex controls. Workbook text
+  therefore differs from the earlier standalone feature export; prices are
+  unchanged. Submitted-proposal comparison and commercial issue remain open.

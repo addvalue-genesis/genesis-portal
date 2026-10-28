@@ -1,4 +1,7 @@
 import React from "react";
+import {selectB10PhysicalComposition0553} from "./data/b10PhysicalComposition0553";
+import {B10NativeAnnexReview0553} from "./B10NativeAnnexReview0553";
+import {B10StageSpareSelection0553} from "./B10StageSpareSelection0553";
 
 // Commercial-only view of EXISTING B10 source row identities.
 // Never turn vendor source candidate quote lines into released SKU stock.
@@ -11,6 +14,9 @@ export function B10KitPriceSummary0553({
 }){
  if(rows.length!==4||new Set(rows.map(x=>x.sourceId||x.id)).size!==4)
   throw Error("0553 B10 kit summary must retain exactly four distinct source-owned MR lines");
+ const composition=selectB10PhysicalComposition0553();
+ if(composition.parentRows.some((p,i)=>p.sourceId!==(rows[i].sourceId||rows[i].id)))
+  throw Error("B10 composition Source→Release IDs mismatch");
  const canonical=["MR-0001","MR-0002","MR-0003","MR-0004"];
  const normalized=rows.map((r,i)=>{
   const mr=unique(r.mr||r.linkedMR||[]);
@@ -39,6 +45,9 @@ export function B10KitPriceSummary0553({
     variant==="budgetary"?"bid.budget.pricing.budgetary.annex.b10.kit-summary":
     currency==="USD"?"bid.budget.pricing.official.b10.kit-summary":"bid.budget.pricing.release.preview.annex.b10.kit-summary"}
     data-source-reconciliation="B10_SOURCE_RELEASE_SOURCE">
+  <B10NativeAnnexReview0553 internal={internal} onOpenSource={onOpenSource} variant={variant}
+    officialRows={currency==="USD"?rows:null} officialTotalUSD={currency==="USD"?total:null}/>
+  {internal&&<B10StageSpareSelection0553 internal context={variant} onOpenSource={onOpenSource}/>}
   <div className="p553-b10-commercial-heading">
    <strong>B10 — Kit price summary / reconciliation</strong>
    <small>4 MR-level financial envelopes · 4/3/4/3 commissioning spare sets · same source-owned prices, no added SKU charges</small>
@@ -72,7 +81,7 @@ export function B10KitPriceSummary0553({
      <th className="p553-b10-commercial-number">{money(total)}</th>{internal&&<th/>}</tr></tfoot>
    </table>
   </div>
-  <p className="p553-b10-commercial-note">Original Item / Source evidence, related installed TAGs and OEM SKU validation remain in 10.2 Working.
-   This summary is for price presentation only; kit quantities are not itemized SKU purchase quantities.</p>
+  <p className="p553-b10-commercial-note">Above: 14 MR Attachment-5 engineering-screened spare functions linked to 10.1 Installed Required BOM and 10.2 Working; individual OEM Spare Part No., Qty and CIF price remain unconfirmed.
+   Below: four 4/3/4/3 source-owned financial kit envelopes only. These budgets are not fourteen separately priced spare articles; no duplicate Part A or C2 posting.</p>
  </section>;
 }

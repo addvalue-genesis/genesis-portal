@@ -9,6 +9,7 @@ import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
 import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
+import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 
 export const RELEASE_POLICY_0553=Object.freeze({
  id:"P553-RELEASE-PRICING-R01",
@@ -351,13 +352,25 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
    costComplete:n(r.directCostTHB),releaseAllowed:false,
    sourceStatus:r.priceStatus,workingSellBasis:r.workingSellBasis};
  });
+ const selectedOptionBudgetaryQuote=selectOptionBudgetaryOffer0553();
  const c=bc.rows.filter(r=>r.code.startsWith("C")).map(r=>{
   // "workingSellTHB" is *not* a supplier direct cost. Never markup it by 30%.
   const basis=n(r.directCostTHB)?priceAorCFromCost0553(r.directCostTHB):null;
+  const provisional=selectedOptionBudgetaryQuote.offers[r.code];
+  if(!provisional||!provisional.quotePrepared||provisional.includedInAPlusB||
+     Number.isFinite(basis?.customerSellTHB))
+   throw Error("0553 C1/C2 budget option offer conflicts with independently verified price");
   return {code:r.code,description:r.requirement,sourceModuleId:r.moduleId,
    qty:1,unit:"lot",workingReferenceTHB:r.workingSellTHB,
    verifiedDirectCostTHB:r.directCostTHB,
    customerSellTHB:basis?.customerSellTHB??null,
+   budgetaryOptionOfferTHB:provisional.sourceSellTHB,
+   budgetaryOptionOfferUSD:provisional.budgetaryQuoteUSD,
+   budgetaryOfferStatus:provisional.priceState,
+   budgetaryOfferSourceId:provisional.sourceId,
+   budgetaryOfferSourceModuleId:provisional.sourceModuleId,
+   budgetaryOfferPrepared:true,firmOemQuote:false,customerOfferIssued:false,
+   budgetaryOfferTechnicalGate:provisional.technicalGate,
    samTelShareTHB:basis?.samTelShareTHB??null,
    reserveTHB:basis?.omissionReserveTHB??null,
    addvalueTargetProfitTHB:basis?.addvalueTargetProfitTHB??null,
@@ -398,6 +411,8 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  return Object.freeze({
   moduleId:"bid.budget.pricing.release",policy:RELEASE_POLICY_0553,
   a,b,c,annex,annexModels,annexTraceAudit,
+  budgetaryOptionAnnex:Object.freeze(Object.fromEntries(
+   Object.entries(selectedOptionBudgetaryQuote.offers).map(([code,offer])=>[code,offer.rows]))),
   sparePriceEvidence:spare.sparePriceEvidence, // Read-only item candidate and optional price benchmark; never financial posting
   summary:{
    aProvisionalCostTHB:aKnown.length?aCost:null,

@@ -24,8 +24,13 @@ import { CustomerProposalPreview0553 } from "./CustomerProposalPreview0553";
 import { BudgetaryWorkbookPreview0553 } from "./BudgetaryWorkbookPreview0553";
 import {PricingCfoDashboard0553} from "./PricingCfoDashboard0553";
 import {OfficialUsdRelease0553} from "./OfficialUsdRelease0553";
+import {CustomerPriceBreakdown0553,BreakdownSourceRow0553,BreakdownSourcePicker0553} from "./CustomerPriceBreakdown0553";
+import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
 import {ReleaseCustomerWorkbook0553} from "./ReleaseCustomerWorkbook0553";
 import {ReleaseSourceNavigator0553} from "./ReleaseSourceNavigator0553";
+import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
+import {buildSpareLifecycleTrace0553} from "./data/spareLifecycleTrace0553";
+import {SpareLifecycleControl0553} from "./SpareLifecycleControl0553";
 import {BudgetChangeSummary0553} from "./BudgetChangeSummary0553";
 import {buildReleaseCommercialModel0553} from "./data/releaseCommercialModel0553";
 import {findModuleElement0553,openModuleAncestors0553,workingOwnerFromModuleId0553} from "./data/moduleDeepLink0553";
@@ -129,6 +134,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const price=(n,from="USD")=>formatCommercialAmount(n,from,displayCurrency,fx);
  const bcPriceAudit=selectScopeBcPriceAudit0553({thbPerUsd:fx?.thbPerUsd});
  const releaseModel=buildReleaseCommercialModel0553({thbPerUsd:fx?.thbPerUsd});
+ const spareLifecycle=buildSpareLifecycleTrace0553(selectSpareCustomerSchedule0553(),releaseModel);
  const activePricingView=PRICING_VIEWS_0553.find(view=>view.key===pricingStage)||PRICING_VIEWS_0553.find(view=>view.key==="released");
  const sourceB3=bcWorking.byCode.B3;
  const previewB3=releaseModel.b.find(x=>x.code==="B3");
@@ -138,13 +144,38 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  // Navigate directly to the selected canonical 10.1/10.2 Module ID.
  // Link navigation is read-only: never modify Working SELL or release status.
  const [releaseJump,setReleaseJump]=useState(null);
+ // UI navigation context only: return to the exact originating Release row.
+ const [returnToRelease,setReturnToRelease]=useState(null);
+ const [breakdownSelection,setBreakdownSelection]=useState(null);
+ const [breakdownFocus,setBreakdownFocus]=useState(null);
+ const [breakdownPrices,setBreakdownPrices]=useState(false);
+ const [officialBreakdownView,setOfficialBreakdownView]=useState("customer");
+ const openBreakdownFromSource=key=>{
+  if(!buildCustomerPriceBreakdown0553(releaseModel).groups.some(g=>g.rows.some(r=>r.key===key)))
+   throw Error("Source item is not mapped to a Breakdown row");
+  setRecipient("INTERNAL");setPricingStage("released");setBreakdownSelection(null);
+  setBreakdownFocus({key,seq:(breakdownFocus?.seq||0)+1});
+ };
+ const returnToBreakdown=()=>{
+  setPricingStage(breakdownSelection.origin);
+  setBreakdownFocus({key:breakdownSelection.key,seq:(breakdownFocus?.seq||0)+1});
+  setBreakdownSelection(null);
+ };
  const [releaseAnnexTarget,setReleaseAnnexTarget]=useState(null);
- const openReleaseAnnexRow=({code,sourceId})=>{
+ const openReleaseAnnexRow=({code,sourceId,sourceSelectionId=null})=>{
   if(!["B10","B11","B13","C1","C2"].includes(code)||!sourceId)return;
-  setReleaseAnnexTarget(prev=>({code,sourceId,seq:(prev?.seq||0)+1}));
+  setReleaseAnnexTarget(prev=>({code,sourceId,sourceSelectionId,seq:(prev?.seq||0)+1}));
   setPricingStage("released"); // navigation only, no price posting/approval
  };
  const openReleaseSource=item=>{
+  if(item?.breakdownKey){
+   const row=buildCustomerPriceBreakdown0553(releaseModel).groups.flatMap(g=>g.rows).find(r=>r.key===item.breakdownKey);
+   if(!row||row.code!==item.code||row.id!==item.id||row.site!==item.site||row.mr!==item.mr)
+    throw Error("Breakdown navigation refused: inconsistent source identity");
+   setBreakdownSelection({...row,origin:item.breakdownOrigin==="official"?"official":"released",seq:(breakdownSelection?.seq||0)+1});
+   setPricingStage("working");
+   return;
+  }
   const incomingId=String(item?.sourceModuleId||"");
   // What's New and nested financial IDs carry a Module ID but no B/C code field.
   // Resolve the owner from the existing contract Module ID; do not infer from prices.
@@ -154,7 +185,34 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   const id=String(item?.sourceModuleId||
    (isBc?"bid.budget.working.bc."+code.toLowerCase():"bid.budget.bom.system-location-mto"));
   if(isBc){setBcTab(code);setBcDetailCode(code);}
-  setReleaseJump(previous=>({id,code,seq:(previous?.seq||0)+1}));
+  if(code==="C2"&&item?.historicalSourceId){
+   const historic=releaseModel.budgetaryOptionAnnex.C2.find(x=>x.historicalSourceId===item.historicalSourceId);
+   const expected=historic&&"bid.budget.working.bc.c2.priced-budget-review."+historic.id.toLowerCase();
+   if(!historic||id!==expected)throw Error("C2 historical source row/module mismatch");
+   setReturnToRelease({code,sourceId:historic.id,traceId:null,sourceRowModuleId:id,
+    sourceSelectionId:historic.id,originalHistoricSourceId:historic.id,originWasExact:true});
+  }else if(isBc&&item?.sourceId&&["B10","B11","B13","C1","C2"].includes(code)){
+   const released=(releaseModel.annex[code]||[]).find(x=>x.sourceId===item.sourceId);
+   // A category-level navigation card is not a physical spare item source.
+   // Only require strict row parity if a genuine source-row key was provided.
+   if(item.sourceRowModuleId&&(!released||released.sourceRowModuleId!==id||
+      (item.traceId&&item.traceId!==released.traceId)))
+    throw Error("0553 exact Release→Source navigation refused: orphan or inconsistent "+code+"/"+item.sourceId);
+   if(released&&released.sourceRowModuleId===id)
+    setReturnToRelease({code,sourceId:released.sourceId,traceId:released.traceId,
+     sourceRowModuleId:released.sourceRowModuleId,sourceSelectionId:item.sourceSelectionId||null,originWasExact:true});
+  }else if(isBc&&["B10","B11","B13","C1","C2"].includes(code)){
+   const first=(releaseModel.annex[code]||[])[0];
+   // Category-only Release navigation can return to its selected Annex tab.
+   // This is NOT represented as an exact row that the user originally clicked.
+   if(first)setReturnToRelease({code,sourceId:first.sourceId,traceId:first.traceId,
+    sourceRowModuleId:first.sourceRowModuleId,
+    sourceSelectionId:code==="C2"?(item?.historicalSourceId||null):null,
+    originalHistoricSourceId:code==="C2"?(item?.historicalSourceId||null):null,
+    originWasExact:false});
+  }
+  if(isBc)setPricingStage("working"); // show canonical source while retaining the exact reverse route
+  setReleaseJump(previous=>({id,code,sourceSelectionId:item?.sourceSelectionId||null,seq:(previous?.seq||0)+1}));
  };
  React.useEffect(()=>{
   if(!releaseJump)return;
@@ -173,21 +231,29 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   if(target.tagName==="DETAILS")target.open=true;
   document.querySelectorAll(".p553-module-nav-focus").forEach(x=>x.classList.remove("p553-module-nav-focus"));
   target.classList.add("p553-module-nav-focus");
-  target.scrollIntoView?.({behavior:"smooth",block:"center"});
+  const selectedStage=releaseJump.sourceSelectionId&&code==="B10"?
+   findModuleElement0553(document,"bid.budget.working.bc.b10.stage-spare-selection."+
+    releaseJump.sourceSelectionId.toLowerCase()):null;
+  if(selectedStage){
+   openModuleAncestors0553(selectedStage);
+   selectedStage.classList.add("p553-module-nav-focus");
+   selectedStage.scrollIntoView?.({behavior:"smooth",block:"center"});
+  }else target.scrollIntoView?.({behavior:"smooth",block:"center"});
   setNavigationFeedback(found?null:"Module "+id+" ยังไม่แสดงใน Filter นี้; เปิด "+fallback+" ให้ตรวจสอบ");
  },[releaseJump,bcTab]);
- const openPricingStage=stage=>{setPricingStage(stage);setNavigationFeedback(null);};
+ const openPricingStage=stage=>{setPricingStage(stage);setNavigationFeedback(null);setBreakdownFocus(null);setBreakdownSelection(null);};
  React.useEffect(()=>{
   if(navigationTarget?.startsWith("bid.budget.pricing.official"))setPricingStage("official");
   else if(navigationTarget)setPricingStage("released");
  },[navigationTarget,navigationSequence]);
  React.useEffect(()=>{
+  if(breakdownSelection||breakdownFocus)return; // exact row navigation owns scroll position
   const id=pricingStage==="official"?"bid.budget.pricing.official":
    pricingStage==="working"?"bid.budget.working.bc":
    pricingStage==="budgetary"?"bid.budget.pricing.budgetary":"bid.budget.pricing.release.preview";
   const target=findModuleElement0553(document,id);
   if(target){openModuleAncestors0553(target);if(target.tagName==="DETAILS")target.open=true;target.scrollIntoView?.({behavior:"smooth",block:"start"});}
- },[pricingStage]);
+ },[pricingStage,breakdownSelection,breakdownFocus]);
  const pricingNavigation=(
     <nav className="p553-pricing-stage-nav" aria-label="Pricing workflow stages"
      data-component-key="bid.budget.pricing.single-release">
@@ -215,7 +281,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  if(pricingStage==="official")return <div className="p55-stack">
   <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
-  <OfficialUsdRelease0553 source={releaseModel}/>
+  <OfficialUsdRelease0553 breakdownView={officialBreakdownView} onBreakdownViewChange={setOfficialBreakdownView} source={releaseModel} onOpenSource={openReleaseSource} breakdownFocus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>
  </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");
@@ -280,6 +346,8 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    <p className="p55-note"><strong>INPUT:</strong> RFQ/MR/MTO/BLD/DTS/RPT/Standards · <strong>DERIVE:</strong> Link/Capacity/Interface Constraints → Physical BOM and quantity → Vendor technical evaluation → WBS Services → Equipment/Service Cost and risk · <strong>OUTPUT:</strong> reviewed engineering working cost. Current MTO sets and quoted vendor quantities are input evidence, NOT verified physical SKU quantities.</p>
   </section>
   <details className="p553-budget-phase" open data-component-key="bid.budget.bom"><summary><strong>10.1 — Engineering Basis & Required BOM</strong><small>bid.budget.bom · MR / MTO / RF proof</small></summary>
+   <BreakdownSourceRow0553 selection={breakdownSelection} onReturn={returnToBreakdown}/>
+   <BreakdownSourcePicker0553 onOpenRow={openBreakdownFromSource}/>
    <CostIntegrityReview0553/>
    <SimpleBom0553 focusedLocation={focusedLocation} fx={fx} displayCurrency={displayCurrency} navigationTarget={navigationTarget} navigationSequence={navigationSequence}/>
   </details>
@@ -301,11 +369,21 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
      <button type="button" className="p553-rsn-return" onClick={()=>openReleaseSource({sourceModuleId:"bid.budget.pricing.release.preview"})}>↗ 10.3 · Go to Release Preview</button>
     </section>
     <RevKAbcOwnershipControl0553 working={bcWorking}/>
+    <SpareLifecycleControl0553 model={spareLifecycle} view="working"
+      onOpenSource={openReleaseSource} onOpenReleaseRow={openReleaseAnnexRow}/>
     <ScopeCategoryTabs0553 value={bcTab} onChange={code=>{setBcTab(code);setBcDetailCode(code==="ALL"?null:code);}}/>
     <p className="p55-note">Selected module: <strong>{bcTab==="ALL"?"All Part B/C — B1–B14 and C1–C2":bcTab+" — "+bcWorking.byCode[bcTab]?.requirement}</strong> · <ComponentCopyId projectId="PJ2608-0553" componentKey={bcTab==="ALL"?"bid.budget.working.bc":"bid.budget.working.bc."+bcTab.toLowerCase()}/></p>
     </section>
    {bcTab!=="ALL"&&bcWorking.byCode[bcTab]&&<section className="p55-panel" data-component-key={"bid.budget.working.bc."+bcTab.toLowerCase()+".details"}><h4>{bcTab} — Engineering & Cost Detail</h4><BcCostEvidenceDetail0553 workingRow={bcWorking.byCode[bcTab]} navigationTarget={navigationTarget}/>{!["B1","B2","B3","B4","B5","B6","B7","B8","B9"].includes(bcTab)&&<BcWorkCostLines0553 selectedCode={bcTab}/>}</section>}
-   {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working" onOpenReleaseRow={openReleaseAnnexRow}/>}
+   {bcTab!=="ALL"&&returnToRelease?.code===bcTab&&
+     <div className="p553-spare-return-link" data-spare-return-code={returnToRelease.code}
+      data-spare-return-source-id={returnToRelease.sourceId}>
+      <strong>Release → Source → Release</strong>
+      <span>Working Source · {returnToRelease.sourceId} · {returnToRelease.traceId}</span>
+      <button type="button" className="p553-detail-button"
+       onClick={()=>openReleaseAnnexRow(returnToRelease)}>↩ {returnToRelease.originalHistoricSourceId?"Return to exact C2 Rev08 priced reference in 10.3.3":returnToRelease.sourceSelectionId?"Return to exact B10 spare function in 10.3.3":returnToRelease.originWasExact?"Return to exact 10.3.3 Release row":"Return to 10.3.3 "+bcTab+" Annex"}</button>
+     </div>}
+   {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<ScopeBcAnnexDetail0553 code={bcTab} fx={fx} mode="working" onOpenReleaseRow={openReleaseAnnexRow}/>} 
    {bcTab!=="ALL"&&bcPriceAudit.byCode[bcTab]&&<p className="p55-note"><strong>Selected {bcTab}:</strong> รายละเอียดแสดงโดยตรงด้านล่างตารางจาก Component เดียวกับ 10.5 โดยไม่ต้องกด ＋ Detail อีกครั้ง</p>}
    <p className="p55-note">WBS values are WORKING SELL references, not complete turnkey costs. SAMTEL/OEM execution remains in turnkey responsibility; missing cost is not zero.</p>
     <p className="p55-note"><strong>CURRENT FAT / TRAINING / SHIPMENT BASIS (24-Oct-2026):</strong> Integrated FAT and Training at SAMTEL Warehouse, Thailand. MR0001 NextG/VST, MR0002 MGW RF, MR0003 EXION and MR0004 MDS/ORGA feed this local integration point; outbound CIF Zhuhai Port. Purchaser handles China import clearance/duty/VAT and port-to-yard. Contract ICC(A) insurance to Yard remains a separate scope gap. B3 retains 6 days of FAT labour with local transfers/work insurance; no MGW integration, FAT, facility service or reserve is selected. Five foreign FAT travel rows are removed; B8 receives no second travel credit. Offshore SAT and B9 two-person JUTAL Zhuhai Yard, China assistance remain separately priced. B6 freight allowance is provisional, with new-route adequacy unverified. Historical China FAT/DAP routes remain audit evidence only; customer release HOLD.</p>
@@ -339,6 +417,9 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    </p>
    {recipient==="INTERNAL"&&<BulkSourceToReleaseAudit0553 releaseModel={releaseModel} placement="RELEASE"/>}
    {recipient==="INTERNAL"&&<ReleaseSourceNavigator0553 model={releaseModel} onOpenSource={openReleaseSource}/>}
+   {recipient==="INTERNAL"&&<CustomerPriceBreakdown0553 source={releaseModel} onOpenSource={openReleaseSource} focus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>}
+   {recipient==="INTERNAL"&&<SpareLifecycleControl0553 model={spareLifecycle} view="release"
+     onOpenSource={openReleaseSource} onOpenReleaseRow={openReleaseAnnexRow}/>} 
    <ReleaseCustomerWorkbook0553 model={releaseModel} recipient={recipient} onOpenSource={openReleaseSource} focusAnnexTarget={releaseAnnexTarget} title="10.3 — Released Customer Output (Read-only staging)"/>
    <p className="p55-note">No JUTAL customer-priced release is authorized. Rev08 historical values and working internal costs are intentionally hidden from this view. Choosing this tab does not approve or issue any document.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--budget"><thead><tr><th>Gate</th><th>Required check</th><th>Current status</th></tr></thead>
