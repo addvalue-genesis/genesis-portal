@@ -23,7 +23,7 @@ export const BID_SECTIONS_0550=[
  entry("bid.budget.scope-gates","10.4","Coverage / gaps ก่อนอนุมัติข้อเสนอ","เห็นประเด็นที่ยังต้องแก้ก่อนเสนอ","สถานะรายการ / Mapping / Customer scope","รวบรวมรายการที่ยังไม่ผ่าน","รายการ OPEN / STALE และขอบเขตที่ขาด","ไม่อนุมัติหรือส่งเอกสารอัตโนมัติ","กลับไปแก้ต้นทางที่เกี่ยวข้อง")
 ];
 export const BID_GROUPS_0550=[
- ...MR_SUPPLY_ORDER_0550.flatMap(g=>g.systems.map(token=>({code:token,part:"A",mrAppendix:g.appendix,title:"App. "+g.appendix+" · "+(SYSTEMS.find(s=>s.token===token)?.name||"COMMON · อุปกรณ์ใช้ร่วม")}))).map((g,i)=>({...g,number:"10.2.A."+String(i+1).padStart(2,"0")})),
+ ...MR_SUPPLY_ORDER_0550.flatMap(g=>g.systems.map(token=>({code:token,part:"A",mrAppendix:g.appendix,title:"App. "+g.appendix+" · "+(token==="TEL-VSAT"?"งานประกอบและเชื่อมต่อ VSAT — ขอบเขต TSI":SYSTEMS.find(s=>s.token===token)?.name||"COMMON · อุปกรณ์ใช้ร่วม")}))).map((g,i)=>({...g,number:"10.2.A."+String(i+1).padStart(2,"0")})),
  ...[...BUDGETARY_ESTIMATE.partB,...BUDGETARY_ESTIMATE.partC].map(r=>({code:r.code,part:r.code[0],number:"10.2."+r.code,title:r.code+" · "+r.description}))
 ];
 export const BID_PALETTE_0550=[

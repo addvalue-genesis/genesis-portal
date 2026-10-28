@@ -12,7 +12,7 @@ export function isSatelliteScope0550(line) {
  return ["TEL-VSAT", "TEL-VSAT-KU"].includes(line.systemToken) || line.customerRowCode === "A1-02";
 }
 export function satelliteScopeNote0550(token) {
- if(token === "TEL-VSAT") return "MR Rev.B1 p07 §2.2(a), p12–13 App.1.2: COMPANY จัดหาอุปกรณ์ VSAT หลักและบริการ 3 links; TSI ยังรับผิดชอบ Cabinet / Router / Cable และงาน Engineering / Installation / Integration / Testing / Commissioning. Network equipment และสถานที่ APF/ACP ต้อง clarification. แยกราคาเหมารวมก่อนใช้ใน Working.";
+ if(token === "TEL-VSAT") return "MR Rev.B1 p07 §2.2(a), p12–13 App.1.2: COMPANY จัดหาอุปกรณ์ VSAT หลักและบริการ 3 links; กลุ่มทำราคา TSI ใช้สำหรับ Cabinet / Installation Kit / Cable และงาน Engineering / Installation / Integration / Testing / Commissioning ที่เกี่ยวข้อง. Router / Network equipment และสถานที่ APF/ACP ยังรอยืนยันขอบเขต. อุปกรณ์หลักและบริการที่ COMPANY จัดหาอยู่ในข้อมูลอ้างอิง ไม่รวมข้อเสนอ TSI. แยกราคาเหมารวมก่อนใช้ใน Working.";
  if(token === "TEL-VSAT-KU") return "MR Rev.B1 p12–13 App.1.2: KU/C Band Internet ที่ APF / ACP ยังรอยืนยันผู้จัดหาอุปกรณ์หลักและค่าบริการ; ห้ามตัดทั้งระบบหรือถือว่า COMPANY จัดหาโดยอัตโนมัติ. แยกอุปกรณ์ประกอบและงาน TSI ออกจากส่วนรอ clarification.";
  return "";
 }

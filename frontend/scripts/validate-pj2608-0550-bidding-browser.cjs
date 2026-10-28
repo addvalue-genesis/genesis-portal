@@ -32,8 +32,10 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
   checks.push('Initial import: 264 MR requirements across 19 systems and B/C plus 9 existing vendor rows; idempotent reload, preserved EUR basis and draft export');
   await page.getByRole('group',{name:'Bidding pricing stages'}).getByRole('button',{name:/^Working Preview/}).click();
   await expand('bid.budget.working.part.A');await expand('bid.budget.working.group.TEL-VSAT');
-  const vsatTable=page.getByRole('table',{name:'Working cost lines TEL-VSAT',exact:true});assert.equal(await vsatTable.locator('tbody tr').count(),16);
-  assert((await vsatTable.innerText()).includes('VSAT Cabinet'));assert((await vsatTable.innerText()).includes('COMPANY จัดหา · ไม่รวมราคา'));assert((await vsatTable.innerText()).includes('MR_CLARIFICATION'));
+  const vsatTable=page.getByRole('table',{name:'Working cost lines TEL-VSAT',exact:true});assert.equal(await vsatTable.locator('tbody tr').count(),11);
+  assert((await vsatTable.innerText()).includes('VSAT Cabinet'));assert(!(await vsatTable.innerText()).includes('COMPANY จัดหา · ไม่รวมราคา'));
+  const companyRefs=page.locator('[data-company-reference="TEL-VSAT"]');assert.equal(await companyRefs.evaluate(n=>n.open),false);await companyRefs.locator(':scope > summary').click();const companyTable=page.getByRole('table',{name:'COMPANY scope references TEL-VSAT',exact:true});assert.equal(await companyTable.locator('tbody tr').count(),5);assert(!(await companyTable.innerText()).includes('Cost THB'));assert((await page.locator('[data-component-key="bid.budget.working.group.TEL-VSAT"] > summary').innerText()).includes('งานประกอบและเชื่อมต่อ VSAT — ขอบเขต TSI'));
+  const companySourceId=await companyTable.locator('tbody tr').first().getAttribute('data-component-key');await companyRefs.locator(':scope > summary').click();await fill('Project Module Search','PJ2608-0550 / '+companySourceId);await page.getByLabel('Project Module Search').press('Enter');await page.locator('[data-component-key="'+companySourceId+'"]').waitFor({state:'visible'});assert.equal(await companyRefs.evaluate(n=>n.open),true);assert((await vsatTable.innerText()).includes('MR_CLARIFICATION'));
   const cabinetId='REQ-MR-B1-12-APF-01-CAB',cabinet=page.locator('[data-component-key="bid.budget.working.line.'+cabinetId+'"]');
   await cabinet.getByRole('button',{name:'แก้ไข / ทบทวน',exact:true}).click();assert.equal(await page.getByLabel('Manual quantity',{exact:true}).inputValue(),'2');await fill('Manual unit cost',123);await save('บันทึกแถว Working');
   await page.reload();await page.locator('.p55-bid-save').filter({hasText:'Revision 2'}).waitFor();assert.equal((await db()).lines.find(l=>l.id===cabinetId).manualCost,123);assert.equal((await db()).lines.length,273);
@@ -43,7 +45,7 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
   await page.getByRole('group',{name:'Bidding pricing stages'}).getByRole('button',{name:/^Release Preview USD/}).click();
   assert((await page.getByRole('table',{name:'Official customer form'}).innerText()).includes('INCLUDED'));
   await page.locator('[data-component-key="bid.budget.release.line.REQ-MR-B1-11-APF-08"]').getByRole('button',{name:/^กลับ Source/}).click();await page.locator('[data-component-key="bid.budget.working.line.REQ-MR-B1-11-APF-08"]').waitFor({state:'visible'});
-  checks.push('MR Working visible without file transfer: 16 VSAT supply rows, COMPANY exclusions, router clarification, exact cabinet quantity/edit/reload, two towers under one price owner and Release-to-Source trace');
+  checks.push('MR Working visible without file transfer: 11 VSAT pricing/clarification rows and 5 collapsed COMPANY references with no price columns, renamed TSI group and source search, router clarification, exact cabinet quantity/edit/reload, two towers under one price owner and Release-to-Source trace');
   // Reset isolated test data while preserving the one-time migration marker.
   await page.evaluate(()=>new Promise((resolve,reject)=>{const r=indexedDB.open('GENESIS-PJ2608-0550-BIDDING',1);r.onsuccess=()=>{const d=r.result,t=d.transaction('workspace','readwrite'),store=t.objectStore('workspace'),q=store.get('active');q.onsuccess=()=>{const v=q.result;for(const k of ['vendors','offers','calculations','nodes','edges','audit'])v[k]=[];v.lines=v.lines.filter(l=>l.mrRequirementId).map(l=>({...l,selected:false,responsibility:'COMPANY',scopeBasis:'SYNTHETIC EXCLUSION FOR ISOLATED REGRESSION',coveredByLineId:'',coverageBasis:'',...(l.satelliteScope?{satelliteScope:'COMPANY_SUPPLY'}:{})}));v.revision=0;store.put(v,'active');};t.oncomplete=()=>{d.close();resolve();};t.onerror=()=>reject(t.error);};}));
   await page.reload();await page.locator('.p55-bid-save').filter({hasText:'Revision 0'}).waitFor();await officialView();
@@ -173,6 +175,7 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
   await expand('bid.budget.working.part.A');await expand('bid.budget.working.group.TEL-VSAT');
   const satelliteRow=id=>page.locator('[data-component-key="bid.budget.working.line.'+id+'"]');
   assert((await satelliteRow('SAT-OLD').innerText()).includes('SATELLITE_SCOPE_OPEN'));
+  await page.locator('[data-company-reference="TEL-VSAT"] > summary').click();
   assert((await satelliteRow('SAT-CPY').innerText()).includes('COMPANY จัดหา · ไม่รวมราคา'));
   assert((await satelliteRow('SAT-TSI').innerText()).includes('222.00'));
   await satelliteRow('SAT-OLD').getByRole('button',{name:'แก้ไข / ทบทวน',exact:true}).click();
