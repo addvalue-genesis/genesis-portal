@@ -39,7 +39,8 @@ function evidenceProblems(data,review,today){
 export function officialLineBasisKey(data,line,review=line.officialReview){
  const {officialReview,...inputs}=line;
  const {basisKey,...decision}=review||{};
- return fingerprint({method:"0550-official-review-v1",...(isSatelliteScope0550(line)?{scopePolicy:SATELLITE_SCOPE_VERSION}:{}),inputs,decision,offer:data.offers.find(o=>o.id===line.offerId)||null,calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
+ const owner=line.coveredByLineId?data.lines.find(l=>l.id===line.coveredByLineId):null;
+ return fingerprint({method:"0550-official-review-v1",...(isSatelliteScope0550(line)?{scopePolicy:SATELLITE_SCOPE_VERSION}:{}),inputs,decision,...(line.coveredByLineId?{coverageOwner:owner,ownerOffer:data.offers.find(o=>o.id===owner?.offerId)||null,ownerCalculation:data.calculations.find(c=>c.id===owner?.calculationId)||null}:{}),offer:data.offers.find(o=>o.id===line.offerId)||null,calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
 }
 export function customerScopeBasisKey(data,code,review){
  const {basisKey,...decision}=review;
@@ -63,13 +64,14 @@ export function deriveOfficialPricing(data,calculated,today){
   if(r&&r.basisKey!==officialLineBasisKey(data,raw,r))problems.push("STALE: ข้อมูลหรือหลักฐานเปลี่ยน ต้องทบทวนใหม่");
   problems.push(...row.problems);
   const reviewed=problems.length===0;
-  return {...row,calculatedCustomerTHB:row.customerTHB,calculatedCustomerUSD:row.customerUSD,reviewProblems:problems,reviewState:row.satelliteScopeState?.excluded?"COMPANY_SUPPLY":reviewed?"REVIEWED_WORKING":problems.some(p=>p.startsWith("STALE"))?"STALE":"OPEN",costTHB:reviewed?row.costTHB:null,workingSellTHB:reviewed?row.workingSellTHB:null,customerTHB:reviewed?row.customerTHB:null,customerUSD:reviewed?row.customerUSD:null};
+  return {...row,calculatedCustomerTHB:row.customerTHB,calculatedCustomerUSD:row.customerUSD,reviewProblems:problems,reviewState:row.mrScopeState?.covered?"INCLUDED_IN_OWNER":row.mrScopeState?.excluded||row.satelliteScopeState?.excluded?"COMPANY_SUPPLY":reviewed?"REVIEWED_WORKING":problems.some(p=>p.startsWith("STALE"))?"STALE":"OPEN",costTHB:reviewed?row.costTHB:null,workingSellTHB:reviewed?row.workingSellTHB:null,customerTHB:reviewed?row.customerTHB:null,customerUSD:reviewed?row.customerUSD:null};
  });
+ const scopeGaps=[...(calculated.requirementGaps||[]),...lines.filter(r=>r.mrScopeState?.covered&&lines.find(o=>o.id===r.coveredByLineId)?.reviewState!=="REVIEWED_WORKING").map(r=>({id:r.mrRequirementId,code:r.customerRowCode,reason:"INCLUDED OWNER REVIEW OPEN"}))];
  const selected=lines.filter(r=>r.selected);
  const unmapped=selected.filter(r=>!mappingValid(r));
  const schedule=form.rows.map(template=>{
   const children=selected.filter(r=>mappingValid(r)&&r.customerRowCode===template.code),review=data.customerReviews?.find(r=>r.code===template.code);
-  const problems=evidenceProblems(data,review,today);
+  const problems=[...evidenceProblems(data,review,today),...scopeGaps.filter(g=>g.code===template.code).map(g=>g.reason+" / "+g.id)];
   if(!review||review.status==="OPEN")problems.push("ตรวจความครบถ้วนของขอบเขต Customer row");
   if(review&&review.basisKey!==customerScopeBasisKey(data,template.code,review))problems.push("STALE: รายการย่อยหรือฐานตรวจเปลี่ยน");
   if(review?.status==="EXCLUDED"&&children.length)problems.push("EXCLUDED: ยังมีรายการที่เลือกอยู่");
@@ -79,21 +81,21 @@ export function deriveOfficialPricing(data,calculated,today){
   const customerUSD=ready&&!excluded?sumOfficial(children,"customerUSD"):null;
   return {...template,children,review,problems,ready,excluded,state:excluded?"EXCLUDED":ready?"REVIEWED_WORKING":"OPEN",qty:1,unit:"Lot",customerTHB,customerUSD,customerRemark:[customerSatelliteRemark(template),review?.customerRemark].filter(Boolean).join(" "),sourceModuleId:"bid.budget.working.customer."+template.code,releaseModuleId:"bid.budget.release.customer."+template.code};
  });
- const total=(part,key)=>{const rows=schedule.filter(r=>part.includes(r.part));const included=rows.filter(r=>!r.excluded);return !unmapped.length&&rows.every(r=>r.ready)?sumOfficial(included,key):null;};
- return {lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),baseTHB:total("AB","customerTHB"),baseUSD:total("AB","customerUSD"),optionsTHB:total("C","customerTHB"),optionsUSD:total("C","customerUSD"),reviewedCount:selected.filter(r=>r.reviewState==="REVIEWED_WORKING").length,scopeReviewed:!unmapped.length&&schedule.every(r=>r.ready),releaseAllowed:false,releaseState:"HOLD"};
+ const total=(part,key)=>{const rows=schedule.filter(r=>part.includes(r.part));const included=rows.filter(r=>!r.excluded);return !unmapped.length&&!(calculated.requirementGaps||[]).some(g=>!g.code)&&rows.every(r=>r.ready)?sumOfficial(included,key):null;};
+ return {requirementGaps:scopeGaps,lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),baseTHB:total("AB","customerTHB"),baseUSD:total("AB","customerUSD"),optionsTHB:total("C","customerTHB"),optionsUSD:total("C","customerUSD"),reviewedCount:selected.filter(r=>r.reviewState==="REVIEWED_WORKING").length,scopeReviewed:!unmapped.length&&schedule.every(r=>r.ready),releaseAllowed:false,releaseState:"HOLD"};
 }
 // Draft pricing while vendor refreshes and engineering review remain pending.
 // Reuses the canonical equation results; it never stamps an Official review.
 export function deriveProvisionalPricing(data,calculated){
  const lines=calculated.lines.map(r=>({...r,costTHB:r.provisionalCostTHB,workingSellTHB:r.provisionalSellTHB,customerTHB:r.provisionalCustomerTHB,customerUSD:r.provisionalCustomerUSD,
-  calculatedCustomerTHB:r.provisionalCustomerTHB,reviewState:r.satelliteScopeState?.excluded?"COMPANY_SUPPLY":r.satelliteScopeState?.problems.length?"SCOPE OPEN":"PROVISIONAL — ราคาเดิม / รออัปเดต",reviewProblems:[...r.problems,"ตรวจ MR / ปริมาณ / ราคาอัปเดตก่อนออกข้อเสนอจริง"]}));
+  calculatedCustomerTHB:r.provisionalCustomerTHB,reviewState:r.mrScopeState?.covered?"INCLUDED_IN_OWNER":r.mrScopeState?.excluded||r.satelliteScopeState?.excluded?"COMPANY_SUPPLY":r.mrScopeState?.problems.length||r.satelliteScopeState?.problems.length?"SCOPE OPEN":"PROVISIONAL — ราคาเดิม / รออัปเดต",reviewProblems:[...r.problems,"ตรวจ MR / ปริมาณ / ราคาอัปเดตก่อนออกข้อเสนอจริง"]}));
  const selected=lines.filter(r=>r.selected),unmapped=selected.filter(r=>!mappingValid(r));
  const schedule=form.rows.map(t=>{
-  const children=selected.filter(r=>mappingValid(r)&&r.customerRowCode===t.code),customerTHB=sumOfficial(children,"customerTHB"),customerUSD=sumOfficial(children,"customerUSD");
-  return {...t,children,review:null,problems:["Selected vendor scope only; completeness and updated quotations pending"],ready:children.length>0,excluded:false,state:"PROVISIONAL",qty:1,unit:"Lot",customerTHB,customerUSD,customerRemark:[customerSatelliteRemark(t),"Provisional pricing for listed scope; subject to scope confirmation and updated quotations."].filter(Boolean).join(" "),sourceModuleId:"bid.budget.working.customer."+t.code,releaseModuleId:"bid.budget.release.customer."+t.code};
+  const children=selected.filter(r=>mappingValid(r)&&r.customerRowCode===t.code),gaps=(calculated.requirementGaps||[]).filter(g=>g.code===t.code),customerTHB=gaps.length?null:sumOfficial(children,"customerTHB"),customerUSD=gaps.length?null:sumOfficial(children,"customerUSD");
+  return {...t,children,review:null,problems:["Selected vendor scope only; completeness and updated quotations pending",...gaps.map(g=>g.reason+" / "+g.id)],ready:children.length>0&&!gaps.length,excluded:false,state:"PROVISIONAL",qty:1,unit:"Lot",customerTHB,customerUSD,customerRemark:[customerSatelliteRemark(t),"Provisional pricing for listed scope; subject to scope confirmation and updated quotations."].filter(Boolean).join(" "),sourceModuleId:"bid.budget.working.customer."+t.code,releaseModuleId:"bid.budget.release.customer."+t.code};
  });
- const total=(parts,key)=>{const rows=schedule.filter(r=>parts.includes(r.part));return !unmapped.length&&rows.every(r=>r.children.length)?sumOfficial(rows,key):null;};
- return {pricingBasis:"PROVISIONAL_VENDOR",lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),
+ const total=(parts,key)=>{const rows=schedule.filter(r=>parts.includes(r.part));return !unmapped.length&&!(calculated.requirementGaps||[]).some(g=>!g.code)&&rows.every(r=>r.ready)?sumOfficial(rows,key):null;};
+ return {pricingBasis:"PROVISIONAL_VENDOR",requirementGaps:calculated.requirementGaps||[],lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),
   knownTHB:sumOfficial(selected.filter(r=>Number.isFinite(r.customerTHB)),"customerTHB"),knownUSD:sumOfficial(selected.filter(r=>Number.isFinite(r.customerUSD)),"customerUSD"),
   baseTHB:total("AB","customerTHB"),baseUSD:total("AB","customerUSD"),optionsTHB:total("C","customerTHB"),optionsUSD:total("C","customerUSD"),reviewedCount:0,scopeReviewed:false,releaseAllowed:false,releaseState:"HOLD"};
 }
@@ -112,8 +114,11 @@ export function officialCustomerRows(official){
   for(const group of official.schedule.filter(r=>r.part===part)){
    const value=group.excluded?"EXCLUDED":group.customerUSD??"OPEN";
    rows.push({kind:"group",key:group.code,moduleId:group.releaseModuleId,sourceId:group.sourceModuleId,cells:[group.sn,"",group.description,group.qty,group.unit,value,value,group.excluded?"EXCLUDED — "+group.customerRemark:group.customerRemark]});
+   for(const line of official.lines.filter(l=>l.mrScopeState?.covered&&l.customerRowCode===group.code)){
+    rows.push({kind:"line",key:line.id,moduleId:line.releaseModuleId,sourceId:line.sourceModuleId,cells:["",line.tagRef,line.description,line.quantity??"OPEN",line.unit,"INCLUDED","INCLUDED","Non-additive scope under "+line.mrScopeState.owner.description+"; owner price/review governs."]});
+   }
    for(const line of group.children){
-    const total=group.ready?line.customerUSD:null;
+    const total=official.pricingBasis==="PROVISIONAL_VENDOR"||group.ready?line.customerUSD:null;
     rows.push({kind:"line",key:line.id,moduleId:line.releaseModuleId,sourceId:line.sourceModuleId,cells:["",line.tagRef,[line.description,line.brand].filter(Boolean).join(" · "),line.quantity??"OPEN",line.unit,Number.isFinite(total)&&line.quantity>0?round(total/line.quantity):"OPEN",total??"OPEN",line.customerRemark||""]});
    }
   }
