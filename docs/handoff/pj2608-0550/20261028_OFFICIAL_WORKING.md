@@ -122,3 +122,27 @@ The expanded checks exercise the user's copy/search/number/colour workflow and
 390px containment. The data and bidding validators pass; the frozen History XLSX
 still has the same SHA-256 recorded above. Price/equation/input/export source
 files have no changes in this correction. Existing asset-size warnings remain.
+
+## Module-level colour correction — preview 2026-10-28.3
+
+The user's screenshot exposed a gap in preview .2: colour was attached to WBS
+owners, so top-level Official, summary and workflow modules still appeared white.
+The presentation registry now also assigns workflow families to existing module
+IDs. Official/Working is blue; Source/RFQ/FX is teal; customer scope is purple;
+Budget THB is orange; Release USD is mauve; History/comparison is olive-brown;
+guide/gaps is slate. The colour guide explains both workflow and cost-owner colours.
+
+Module headers use solid family colour with readable Copy IDs, principles and
+summary cards use a light family tint, and inactive tabs retain their family tint.
+Child source modules share the Source family. WBS row colours continue to override
+workflow colours so Source-to-Release ownership remains traceable. Numbering,
+module IDs, calculation inputs and customer exports are unchanged.
+
+Browser coverage now reproduces the screenshot with an empty workspace, checks
+Official/summary headers, Source children, inactive tabs and active THB/USD tab-to-
+header colour consistency, plus mobile containment and the prior integration suite.
+
+Validation: production build passed (existing asset-size warning); all 15 Chromium
+integration checks passed with zero console errors. Desktop and mobile screenshots
+were inspected. Frozen SAMTEL Rev00 XLSX SHA-256 remains
+`2065bb70efa3e8b3bb90b4fbe64f099e02d1ae6c73a73d03b8e745987becafc6`.

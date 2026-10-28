@@ -31,6 +31,31 @@ export const BID_PALETTE_0550=[
  {name:"ส้ม",accent:"#985817",tint:"#fff4e6"}, {name:"ม่วง",accent:"#6550a1",tint:"#f3effc"},
  {name:"ชมพูม่วง",accent:"#8a4c79",tint:"#f9eff7"}, {name:"เขียวมะกอก",accent:"#716141",tint:"#f7f3ea"}
 ];
+// Workflow colours identify modules; WBS colours below still identify cost owners.
+export const BID_MODULE_COLORS_0550={
+ guide:{label:"10.0 · คู่มือ / 10.5 · ตรวจช่องว่าง",accent:"#526777",tint:"#e9eff4"},
+ official:{label:"10.O / 10.2 · Official / Working",accent:"#245e9b",tint:"#e4effc"},
+ source:{label:"10.1 · ข้อมูลต้นทาง / RFQ / FX",accent:"#08766e",tint:"#ddf2ed"},
+ scope:{label:"10.3.1 · ตรวจขอบเขตลูกค้า",accent:"#6550a1",tint:"#ede6fa"},
+ budget:{label:"10.3.2 · Budget THB",accent:"#985817",tint:"#ffedd6"},
+ release:{label:"10.3.3 · Release USD",accent:"#8a4c79",tint:"#f5e4f0"},
+ history:{label:"10.H / 10.4 · History / เปรียบเทียบ",accent:"#716141",tint:"#f0eadc"}
+};
+export function bidModuleFamily0550(id){
+ const number=bidSection0550(id.replace(/\.principles$/,""))?.number;
+ if(!number)return undefined;
+ if(number.startsWith("10.1"))return "source";
+ if(number.startsWith("10.3.1"))return "scope";
+ if(number.startsWith("10.3.2"))return "budget";
+ if(number.startsWith("10.3.3"))return "release";
+ if(number.startsWith("10.H")||number.startsWith("10.4"))return "history";
+ if(number.startsWith("10.O")||number.startsWith("10.2"))return "official";
+ return "guide";
+}
+export function bidModuleProps0550(id){
+ const family=bidModuleFamily0550(id),color=BID_MODULE_COLORS_0550[family];
+ return color?{"data-bid-module-color":family,style:{"--bid-accent":color.accent,"--bid-tint":color.tint}}:{};
+}
 export function bidOwnerStyle(owner){
  const group=BID_GROUPS_0550.find(g=>g.code===owner);
  const index=group?BID_GROUPS_0550.filter(g=>g.part===group.part).findIndex(g=>g.code===owner):["A","B","C"].indexOf(owner);

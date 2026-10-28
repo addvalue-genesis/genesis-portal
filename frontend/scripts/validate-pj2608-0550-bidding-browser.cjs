@@ -39,6 +39,28 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
   await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Module IDs must wrap; tables must scroll inside panels');await page.setViewportSize({width:1440,height:1000});
   await fill('Project Module Search','');checks.push('Numbered modules: own Copy ID, copy without collapse, full-ID search, number search, focus and principles, mobile containment');
 
+  // Reproduce the screenshot regression with an empty workspace: colour cannot depend on price rows.
+  const surface=async selector=>page.locator(selector).evaluate(el=>({background:getComputedStyle(el).backgroundColor,accent:getComputedStyle(el).getPropertyValue('--bid-accent').trim()}));
+  const moduleHeader=id=>surface(`[data-component-key="${id}"] > summary`);
+  const summaryColour=await moduleHeader('bid.budget.official.summary');
+  assert.equal(summaryColour.background,'rgb(36, 94, 155)');
+  assert.equal((await surface('[data-component-key="bid.budget.official"] > .p55-module-heading')).background,summaryColour.background);
+  const sourceColour=await moduleHeader('bid.budget.working.sources');
+  assert.notEqual(sourceColour.background,summaryColour.background);
+  for(const id of ['bid.budget.official.source-impact','bid.budget.fx','bid.budget.working.editor'])assert.equal((await moduleHeader(id)).background,sourceColour.background,'Source child inherits its module family colour');
+  const tabColours=await page.getByRole('group',{name:'Bidding pricing stages'}).locator('button').evaluateAll(nodes=>nodes.map(n=>getComputedStyle(n).backgroundColor));
+  assert.equal(new Set(tabColours).size,3);assert(!tabColours.includes('rgb(255, 255, 255)'),'Inactive stage tabs retain category colours');
+  for(const [name,id] of [['Budget THB','bid.budget.budget-thb'],['Release Preview USD','bid.budget.release']]){
+   await stage(name);const header=await moduleHeader(id),tab=await surface('.p55-bid-stages[aria-label="Bidding pricing stages"] button.is-active');assert.equal(header.background,tab.background);assert.notEqual(header.background,summaryColour.background);
+  }
+  await stage('Working Preview');
+  await page.locator('[data-component-key="bid.budget.official"]').scrollIntoViewIfNeeded();
+  if(process.env.BIDDING_MODULE_SCREENSHOT)await page.screenshot({path:process.env.BIDDING_MODULE_SCREENSHOT});
+  await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1));
+  if(process.env.BIDDING_MODULE_MOBILE_SCREENSHOT)await page.screenshot({path:process.env.BIDDING_MODULE_MOBILE_SCREENSHOT});
+  await page.setViewportSize({width:1440,height:1000});
+  checks.push('Empty workspace: coloured Official banner, summary, Source family and children, inactive stage tabs, THB/USD active tab/header match, mobile containment');
+
   for(let i=0;i<5;i++)for(const name of ['First Principles','Schematic','Budget']){
    const duration=await page.evaluate(async name=>{const b=document.querySelector(`nav.p55-tabs button[aria-label="${name}"]`),t=performance.now();b.click();await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));return performance.now()-t;},name);(metrics[name]??=[]).push(duration);
   }
