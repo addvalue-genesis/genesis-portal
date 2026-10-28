@@ -1,3 +1,4 @@
+import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
 import {importMrWorkingBasis0550} from "./data/mrWorkingBasis0550";
 import React,{createContext,useContext,useEffect,useMemo,useRef,useState} from "react";
 import {loadProject0550Bid,saveProject0550Bid,SYSTEMS,DATA_LAYER_META,BUDGETARY_ESTIMATE,COMMERCIAL_SOURCES,COMMERCIAL_POLICY} from "./data";
@@ -15,8 +16,9 @@ export function BidWorkspaceProvider({children}){
   try{
    let current=await loadProject0550Bid();
    const vendorPrepared=importLegacyVendorBasis0550(current,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},reviewDate);
-   const prepared=importMrWorkingBasis0550(vendorPrepared,COMMERCIAL_POLICY,reviewDate);
-   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare existing vendor basis and MR Working requirements / "+prepared.mrWorkingImport.version);
+   const mrPrepared=importMrWorkingBasis0550(vendorPrepared,COMMERCIAL_POLICY,reviewDate);
+   const prepared=importMgwVendorBasis0550(mrPrepared,reviewDate);
+   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor offers and MR Working requirements / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    try {

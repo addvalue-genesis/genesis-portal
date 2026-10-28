@@ -23,7 +23,7 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
   const stage=async name=>{await officialView();await page.getByRole('group',{name:'Bidding pricing stages'}).getByRole('button',{name:new RegExp('^'+name)}).click();};
   const money=async(table,value)=>assert((await page.getByRole('table',{name:table,exact:true}).innerText()).includes(value),table+' missing '+value);
   await page.goto(url);await page.locator('.p55-bid-save').filter({hasText:'Revision 1'}).waitFor();
-  const seeded=await db();assert.equal(seeded.offers.length,9);assert.equal(seeded.lines.filter(r=>!r.mrRequirementId&&r.selected).length,7);assert.equal(seeded.lines.filter(r=>r.mrRequirementId).length,264);assert.equal(seeded.lines.length,273);assert.equal(new Set(seeded.lines.filter(r=>r.mrRequirementId&&r.systemToken!=='COMMON').map(r=>r.systemToken)).size,19);
+  const seeded=await db();assert.equal(seeded.offers.length,139);assert.equal(seeded.offers.filter(o=>o.mgwQuoteLineId).length,130);assert.equal(seeded.vendors.filter(v=>/MGW|Megaway/i.test(v.name)).length,1);assert.equal(seeded.lines.filter(r=>!r.mrRequirementId&&r.selected).length,7);assert.equal(seeded.lines.filter(r=>r.mrRequirementId).length,264);assert.equal(seeded.lines.length,273);assert.equal(new Set(seeded.lines.filter(r=>r.mrRequirementId&&r.systemToken!=='COMMON').map(r=>r.systemToken)).size,19);
   assert.equal(await page.getByRole('button',{name:'Working · ราคาเดิมรออัปเดต',exact:true}).getAttribute('aria-pressed'),'true');
   await expand('bid.budget.working.part.A');await expand('bid.budget.working.group.TEL-PAGA');await money('Working cost lines TEL-PAGA','226,454.05');
   await page.getByRole('group',{name:'Bidding pricing stages'}).getByRole('button',{name:/^Release Preview USD/}).click();
@@ -31,6 +31,18 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
   await page.reload();await page.locator('.p55-bid-save').filter({hasText:'Revision 1'}).waitFor();assert.equal((await db()).lines.length,273);
   checks.push('Initial import: 264 MR requirements across 19 systems and B/C plus 9 existing vendor rows; idempotent reload, preserved EUR basis and draft export');
   await page.getByRole('group',{name:'Bidding pricing stages'}).getByRole('button',{name:/^Working Preview/}).click();
+  await fill('Project Module Search','PJ2608-0550 / bid.vendor.offers');await page.getByLabel('Project Module Search').press('Enter');
+  await page.getByRole('table',{name:'MGW quotation reconciliation'}).waitFor({state:'visible'});const reconciliation=await page.getByRole('table',{name:'MGW quotation reconciliation'}).innerText();for(const amount of ['133,072','482,142','891,222','881,760'])assert(reconciliation.includes(amount));
+  assert.equal(await page.locator('[data-mgw-section] [data-mgw-item]').count(),130);
+  await fill('Project Module Search','PJ2608-0550 / bid.vendor.offer.OFFER-MGW-Q26-063-CCTV-011');await page.getByLabel('Project Module Search').press('Enter');
+  const mgwSource=page.locator('[data-component-key="bid.vendor.offer.OFFER-MGW-Q26-063-CCTV-011"]');await mgwSource.waitFor({state:'visible'});assert((await mgwSource.innerText()).includes('9,947'));assert((await mgwSource.innerText()).includes('24 SET'));
+  if(process.env.MGW_VENDOR_SCREENSHOT)await page.screenshot({path:process.env.MGW_VENDOR_SCREENSHOT});
+  await fill('Project Module Search','PJ2608-0550 / bid.budget.working.group.TEL-CCTV');await page.getByLabel('Project Module Search').press('Enter');
+  const candidates=page.locator('[data-mgw-quotes="TEL-CCTV"]');await candidates.waitFor({state:'visible'});await candidates.locator(':scope > summary').click();assert.equal(await candidates.locator('[data-mgw-item]').count(),28);
+  await select('MGW target MR TEL-CCTV','REQ-MR-B1-13-APF-01');await candidates.locator('[data-mgw-item="MGW-Q26-063-CCTV-011"]').getByRole('button',{name:'ใช้ราคาเข้าร่าง MR',exact:true}).click();
+  await page.getByLabel('MGW price selection basis',{exact:true}).waitFor({state:'visible'});assert.equal(await page.getByLabel('Selected offer',{exact:true}).inputValue(),'OFFER-MGW-Q26-063-CCTV-011');assert.equal(await page.getByLabel('Manual quantity',{exact:true}).inputValue(),'20');assert.equal(await page.getByLabel('MGW price selection basis',{exact:true}).inputValue(),'');assert.equal((await db()).lines.find(l=>l.id==='REQ-MR-B1-13-APF-01').offerId,'');
+  await page.reload();await page.locator('.p55-bid-save').filter({hasText:'Revision 1'}).waitFor();assert.equal((await db()).offers.length,139);
+  checks.push('MGW: one vendor / 130 visible source offers; CCTV and LAN reconciliation; source Module ID navigation; 28 CCTV candidates; selecting quoted 24 cameras at USD 9,947 preserves draft MR quantity 20 and existing saved prices until explicit save');
   await expand('bid.budget.working.part.A');await expand('bid.budget.working.group.TEL-VSAT');
   const vsatTable=page.getByRole('table',{name:'Working cost lines TEL-VSAT',exact:true});assert.equal(await vsatTable.locator('tbody tr').count(),11);
   assert((await vsatTable.innerText()).includes('VSAT Cabinet'));assert(!(await vsatTable.innerText()).includes('COMPANY จัดหา · ไม่รวมราคา'));

@@ -162,6 +162,37 @@ try {
  const childBasis=officialLineBasisKey(mr,mr.lines.find(l=>l.id===towerReq.id));const changedOwner=JSON.parse(JSON.stringify(mr));changedOwner.lines.find(l=>l.id===towerReq.mrScopeState.owner.id).description+=" changed scope";assert.notEqual(officialLineBasisKey(changedOwner,changedOwner.lines.find(l=>l.id===towerReq.id)),childBasis,"Included requirement review follows owner changes");
  assert(mrModel.official.requirementGaps.some(g=>g.id===towerReq.mrRequirementId&&g.reason==="INCLUDED OWNER REVIEW OPEN"));
  console.log("PASS MR Working: 264 requirements / 19 systems / all B-C owners; additive idempotent import, preserved edits, 6 COMPANY exclusions, exact tower price owner, non-additive package components, OPEN missing units/quantities, missing/conflicting requirements and unchanged vendor subtotal.");
+ {
+ // MGW source import is additive and never silently substitutes an existing supplier.
+ const {MGW_QUOTE_0550:mgwCatalog,importMgwVendorBasis0550,mgwQuoteItem0550,mgwOfferDraft0550,mgwOffersFor0550}=require(path.join(root,"project0550/data/mgwVendorBasis0550.js"));
+ const mrBytes=JSON.stringify(mr),mgw=importMgwVendorBasis0550(mr,"2026-10-28");validate(mgw);
+ assert.equal(JSON.stringify(mr),mrBytes);assert.equal(mgw.offers.length,139);assert.equal(mgw.vendors.length,mr.vendors.length+1);assert.deepEqual(mgw.lines,mr.lines);assert.deepEqual(mgw.fx,mr.fx);
+ assert.equal(mgwCatalog.rows.length,130);assert.equal(mgwCatalog.rows.filter(r=>r.unitCost!==null).length,129);assert.equal(mgwCatalog.rows.filter(r=>r.unit===null).length,10);
+ for(const r of mgwCatalog.rows){assert(r.systemTokens.every(t=>t==="COMMON"||ids.includes(t)),r.id);if(r.unitCost!==null)assert.equal(Math.round(r.quantity*r.unitCost*100),Math.round(r.extended*100),r.id);}
+ assert.deepEqual(mgwCatalog.sections.filter(s=>s.status==="TOTAL_CONFLICT").map(s=>[s.id,s.coverTotal,s.detailTotal]),[["CCTV",133072,482142],["LAN",891222,881760]]);
+ assert.equal(mgwOffersFor0550(mgw,"TEL-CCTV").length,28);assert.equal(importMgwVendorBasis0550(mgw,"2026-10-29"),mgw);
+ const mgwEdited=JSON.parse(JSON.stringify(mgw));mgwEdited.offers.find(mgwQuoteItem0550).unitCost=987;delete mgwEdited.mgwQuoteImport;
+ assert.deepEqual(importMgwVendorBasis0550(mgwEdited,"2026-10-28").offers,mgwEdited.offers);
+ const alias=emptyBidWorkspace(snapshot);alias.vendors=[{id:"VEN-EXISTING",name:"Megaway Technologies",kind:"SUPPLIER",reference:"Saved identity"}];
+ const reused=importMgwVendorBasis0550(alias,"2026-10-28");assert.equal(reused.vendors.length,1);assert(reused.offers.every(o=>o.vendorId==="VEN-EXISTING"));
+ const existing=JSON.parse(JSON.stringify(reused));delete existing.mgwQuoteImport;existing.offers[0].id="SAVED-OFFER";delete existing.offers[0].mgwQuoteLineId;existing.offers[0].unitCost=654;
+ const recovered=importMgwVendorBasis0550(existing,"2026-10-28");assert.equal(recovered.offers.length,130);assert.equal(recovered.offers[0].unitCost,654);assert(mgwQuoteItem0550(recovered.offers[0]));
+ alias.vendors.push({id:"VEN-SECOND",name:"MGW",kind:"SUPPLIER",reference:"Ambiguous"});const ambiguous=importMgwVendorBasis0550(alias,"2026-10-28");assert.equal(ambiguous.offers.length,0);assert.equal(ambiguous.mgwQuoteImport.conflicts.length,1);
+ const collision=emptyBidWorkspace(snapshot);collision.vendors=mgw.vendors;collision.offers=[{...mgw.offers.find(mgwQuoteItem0550),mgwQuoteLineId:undefined,description:"Different saved offer"}];
+ const collided=importMgwVendorBasis0550(collision,"2026-10-28");assert.equal(collided.mgwQuoteImport.conflicts.length,1);assert.equal(collided.offers[0].description,"Different saved offer");
+ const camera=mgw.lines.find(l=>l.id==="REQ-MR-B1-13-APF-01"),cameraOffer=mgw.offers.find(o=>o.id==="OFFER-MGW-Q26-063-CCTV-011");
+ assert.equal(camera.quantity,20);assert.equal(mgwQuoteItem0550(cameraOffer).quantity,24);
+ const selectedCamera=mgwOfferDraft0550(camera,cameraOffer);assert.equal(selectedCamera.quantity,20);assert.equal(selectedCamera.marginPct,camera.marginPct);assert.equal(selectedCamera.coverageBasis,"");assert.equal(selectedCamera.currency,"USD");assert.equal(camera.offerId,"");
+ const mgwWorking={...mgw,fx:data.fx,lines:[selectedCamera]};let mgwModel=derive(mgwWorking);assert.equal(mgwModel.lines[0].provisionalCostNative,null);assert(mgwModel.lines[0].problems.some(p=>p.startsWith("MGW_SCOPE_REVIEW_OPEN")));
+ selectedCamera.coverageBasis="SYNTHETIC TEST ONLY: unit rate confirmed for 20 MR cameras, supplier total discrepancy reviewed";
+ mgwModel=derive(mgwWorking);assert.equal(mgwModel.lines[0].provisionalCostNative,198940);assert.equal(mgwModel.lines[0].costTHB,7957600);assert.equal(mgwModel.official.lines[0].customerUSD,null);assert.equal(mgwModel.releaseAllowed,false);
+ const unknownUnit=mgw.offers.find(o=>mgwQuoteItem0550(o)?.unit===null);assert.equal(mgwOfferDraft0550(camera,unknownUnit),camera);
+ const unitWorking={...mgwWorking,lines:[{...selectedCamera,offerId:unknownUnit.id,unit:unknownUnit.unit}]};assert(derive(unitWorking).lines[0].problems.some(p=>p.startsWith("MGW_UNIT_OPEN")));
+ assert.notEqual(mgwOfferDraft0550(camera,{...unknownUnit,unit:"SET",unitBasis:"SYNTHETIC TEST unit confirmation"}),camera);
+ assert.equal(mgwOfferDraft0550(camera,mgw.offers.find(o=>mgwQuoteItem0550(o)&&o.unitCost===null)),camera);
+ const mgwStamp=officialLineBasisKey(mgwWorking,selectedCamera);const repriced=JSON.parse(JSON.stringify(mgwWorking));repriced.offers.find(o=>o.id===cameraOffer.id).unitCost=10000;assert.notEqual(officialLineBasisKey(repriced,repriced.lines[0]),mgwStamp);
+ console.log("PASS MGW: 130 multi-system offers / 129 prices / one vendor; 2 source-total conflicts, 10 unspecified units and TBD retained; additive/idempotent import preserves rates, identities, MR quantities and selected vendors; explicit rate basis, native cost/FX calculation and unchanged Official gates.");
+ }
  const {assertControlledSnapshot}=require("./assert-pj2608-0550-snapshot.cjs");assertControlledSnapshot(fs.readFileSync(path.join(root,"project0550/data/snapshots/pj2608-0550.rev07.json")));
  console.log("PASS 0550 Bidding: all E01–E18 + 4 engineering functions, manual/source inputs, unique ownership, offer/FX/unit gates, same THB/USD projection, options separation, review export and immutable Rev10; synthetic prices only.");
 }finally{require.extensions[".js"]=old;}

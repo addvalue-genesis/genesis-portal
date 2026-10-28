@@ -1,0 +1,3095 @@
+{
+  "version": "0550-mgw-q26-063-20261028-1",
+  "vendorName": "MGW GROUP CO, LTD",
+  "vendorAliases": [
+    "MGW Technologies",
+    "Megaway"
+  ],
+  "quoteRef": "Q26-063 / ver1.0",
+  "date": "2026-10-09",
+  "validUntil": "2026-11-08",
+  "validityBasis": "30 days from quotation date; computed exclusive date +30 days",
+  "currency": "USD",
+  "sourceUrl": "https://drive.google.com/file/d/1uWxdcJ6z1a7FFb0DV05es7YvRtnQApEQ/view",
+  "sourceName": "Q26-063 Samtel_ASK Onshore_ver1.0.pdf",
+  "sourceSha256": "6d11565391a0ca5760cdcc76e9f12e191de44004d59dd7865ae8237b1f2b2a31",
+  "pages": 26,
+  "coverEquipmentTotal": 2220345,
+  "coverServiceTotal": 255500,
+  "coverOverallTotal": 2475845,
+  "terms": [
+    "Delivery: 6–8 months after drawings and documents approved",
+    "Payment: According to business contract",
+    "Delivery destination is blank",
+    "Prices based on MR; supplier reserves revised offer if changed",
+    "On-site service TBD"
+  ],
+  "sections": [
+    {
+      "id": "PAGA",
+      "title": "PAGA",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "coverTotal": 254700,
+      "detailTotal": 254700.0,
+      "status": "MATCH"
+    },
+    {
+      "id": "BULK",
+      "title": "Bulk Material",
+      "systemTokens": [
+        "COMMON",
+        "TEL-FO"
+      ],
+      "coverTotal": 15744,
+      "detailTotal": 15744.0,
+      "status": "MATCH"
+    },
+    {
+      "id": "RADIO",
+      "title": "Radio",
+      "systemTokens": [
+        "TEL-RADIO-DTRS",
+        "TEL-RADIO-MARINE",
+        "TEL-RADIO-AERO",
+        "TEL-RADIO-SSB"
+      ],
+      "coverTotal": 700501,
+      "detailTotal": 700501.0,
+      "status": "MATCH"
+    },
+    {
+      "id": "CCTV",
+      "title": "CCTV",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "coverTotal": 133072,
+      "detailTotal": 482142.0,
+      "status": "TOTAL_CONFLICT"
+    },
+    {
+      "id": "ENTERTAINMENT",
+      "title": "Entertainment",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "coverTotal": 21933,
+      "detailTotal": 21933.0,
+      "status": "MATCH"
+    },
+    {
+      "id": "PABX",
+      "title": "PABX / IP Telephone",
+      "systemTokens": [
+        "TEL-PABX",
+        "TEL-IPP"
+      ],
+      "coverTotal": 78797,
+      "detailTotal": 78797.0,
+      "status": "MATCH"
+    },
+    {
+      "id": "LAN",
+      "title": "LAN",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "coverTotal": 891222,
+      "detailTotal": 881760.0,
+      "status": "TOTAL_CONFLICT"
+    },
+    {
+      "id": "MET",
+      "title": "Meteorology",
+      "systemTokens": [
+        "TEL-MET"
+      ],
+      "coverTotal": 34316,
+      "detailTotal": null,
+      "status": "COVER_ONLY"
+    },
+    {
+      "id": "NDB",
+      "title": "NDB",
+      "systemTokens": [
+        "TEL-NDB"
+      ],
+      "coverTotal": 90060,
+      "detailTotal": null,
+      "status": "COVER_ONLY"
+    },
+    {
+      "id": "SERVICES",
+      "title": "Other charges / services",
+      "systemTokens": [
+        "COMMON"
+      ],
+      "coverTotal": 255500,
+      "detailTotal": null,
+      "status": "COVER_ONLY"
+    }
+  ],
+  "rows": [
+    {
+      "id": "MGW-Q26-063-PAGA-001",
+      "section": "PAGA",
+      "page": 2,
+      "sn": "1.1",
+      "site": "APF Control Building",
+      "description": "PAGA Main Cabinet (TAG: PAGA-303-351)",
+      "brand": "BOSCH",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 94981.0,
+      "extended": 94981.0,
+      "detail": "~1x Pre-assembled cabinet floor 19'', 42HU 800x800x2000 mm,\nRAL7035, Single Glazed Front Door, Double Metal Rear Doors,\nLOCAL\nWith thermostat activated ventilation fan, LED lighting by door switch,MCB,bottom cable entry gland plate, termination\nblocks,cable trunking,PE&IE bar,Service Socket Strip,etc\nComprising:\n~2x System Controller,\n•Capability to control a system with up to 250 devices, serving more than 500 zones. PRA-SCL\n•Messages and tones are stored as high definition uncompressed wav files.\n~2x Multifunction power supply,\n•Power up to three amplifiers and one host device\n•Up to two call stations via PoE\n•Integrated 6-port network switch (Gigabit)\nPRA-MPS3\n•3 RJ45 ports\n•2 RJ45 ports with PoE power (15.4W)\n•1 SFP slot for fibre optic transceiver module\n•8 Control Inputs, Monitored\n~1x Control interface module\n• Sixteen general purpose inputs for control actions from external switches\n• Eight general purpose relay outputs to activate external control circuits\nPRA-IM16C8\n• Two supervised trigger outputs for NAC boosters\n• PoE powered device with dual redundant Gigabit network interface\n• LED status indicators for all inputs and outputs\n~1x Audio Transmitter\n•Interface for matching the number of microphones or auxiliary inputs\n•Four balanced line outputs can be used simultaneously, and all audio channels are used\n•together with the Dante network PRA-IM2A2\n•4 balanced microphones/auxiliary inputs, and 4 outputs using Phoenix connectors\n•CAT5/6 network cable connected to Dante network\n•Integrated mounting bracket that can be installed in very limited space\n~1x Music source, USB, SD, Tuner\n•Interface for matching the number of microphones or auxiliary inputs\n•Four balanced line outputs can be used simultaneously, and all audio channels are used\n•together with the Dante network PRM-UST\n•4 balanced microphones/auxiliary inputs, and 4 outputs using Phoenix connectors\n•CAT5/6 network cable connected to Dante network\n•Integrated mounting bracket that can be installed in very limited space\n~2 x Access Layer Switch, 24 x 10/100/1000 PoE+ Ports with 195w Power budget, 4x 10 Gigabit SFP+,Rack-\nCISCO / C1200-24T-4X\nmountable, 2x 10G SFP+ Module\n~3x Power Amplifier\n•4-channel, 600W arbitrary distribution to 8 output channels\n•Frequency Response: 20Hz~20kHz (+0.5/-3dB)\n•Signal-to-noise ratio: >110dBA\n•Each amplifier channel has A road / B road outputs\nPRA-AD604\n•Class-A speaker line redundancy\n•Built-in DSP, each output channel can be independently set DSP\n•Built-in 600W spare amplifier channel\n•Integrated 2-port network switch\n•Seaker line terminal monitoring\n~1x Beacon Monitoring Module\nAQ-BEOL-R\n•24V, DC, beacon monitoring with LED lgihts, 275 beacon loops in total\n~1x Beacon EOL\nAQ-BEOL-E\n•24V, DC, beacon EOL, 3 modules per loop, 825 PCs in total\n~3 x SIL-3 relay for F&G, ICSS，actual Qty to be provided as per design requirement\nSub Cabinet\nLocation: APF Catering Building, 8 ea Speakers",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-002",
+      "section": "PAGA",
+      "page": 2,
+      "sn": "2.1",
+      "site": "APF Catering Building, 8 ea Speakers",
+      "description": "Sub Cabinet (TAG: PAGA-303-201)",
+      "brand": "WAROM",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 207.0,
+      "extended": 207.0,
+      "detail": "~1x Junction box, 4x M20 cable glands\nNote, Only 8 ea speakers in catering building, the speaker loop will connect directly to PAGA main cabinet, and use\none junction box instead of sub cabinet.\nAND GENERAL ALARM (PAGA) System\nLocation: APF Warehouse & Workshop Building, 13 ea Speakers",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-003",
+      "section": "PAGA",
+      "page": 3,
+      "sn": "2.2",
+      "site": "APF Warehouse & Workshop Building, 13 ea Speakers",
+      "description": "Sub Cabinet (TAG: PAGA-303-401)",
+      "brand": "WAROM",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 207.0,
+      "extended": 207.0,
+      "detail": "~1x Junction box, 4x M20 cable glands\nNote, Only 13 ea speakers in Warehouse & Workshop Building, the speaker loop will connect directly to PAGA main\ncabinet, and use one junction box instead of sub cabinet.\nLocation: APF Accommodation Building, 45 ea Speakers",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-004",
+      "section": "PAGA",
+      "page": 3,
+      "sn": "2.3",
+      "site": "APF Accommodation Building, 45 ea Speakers",
+      "description": "Sub Cabinet (TAG: PAGA-303-251)",
+      "brand": "BOSCH",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 11135.0,
+      "extended": 11135.0,
+      "detail": "~1x Pre-assembled cabinet floor 19'', 12HU 600x400x498.5 mm,\nRAL7035, Single Glazed Front Door,\nLOCAL\nWith thermostat activated ventilation fan, MCB,bottom cable entry gland plate, termination blocks,cable\ntrunking,PE&IE bar,etc\nComprising:\n~1x Power Amplifier\n•4-channel, 600W arbitrary distribution to 8 output channels\n•Frequency Response: 20Hz~20kHz (+0.5/-3dB)\n•Signal-to-noise ratio: >110dBA\n•Each amplifier channel has A road / B road outputs\nPRA-AD604\n•Class-A speaker line redundancy\n•Built-in DSP, each output channel can be independently set DSP\n•Built-in 600W spare amplifier channel\n•Integrated 2-port network switch\n•Seaker line terminal monitoring\n~1x Power Unit for Amplifier, 48V, DC, power unit, 5A\nLocation: APF Office Building, 11 ea Speakers",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-005",
+      "section": "PAGA",
+      "page": 3,
+      "sn": "2.4",
+      "site": "APF Office Building, 11 ea Speakers",
+      "description": "Sub Cabinet (TAG: PAGA-303-151)",
+      "brand": "WAROM",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 207.0,
+      "extended": 207.0,
+      "detail": "~1x Junction box, 4x M20 cable glands\nNote, Only 11 ea speakers in Office Building, the speaker loop will connect directly to PAGA main cabinet, and use\none junction box instead of sub cabinet.\nLocation: APF Store Building, 5 ea Speakers",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-006",
+      "section": "PAGA",
+      "page": 3,
+      "sn": "2.5",
+      "site": "APF Store Building, 5 ea Speakers",
+      "description": "Sub Cabinet (TAG: PAGA-303-451)",
+      "brand": "WAROM",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 207.0,
+      "extended": 207.0,
+      "detail": "~1x Junction box, 4x M20 cable glands\nNote, Only 5 ea speakers in Store Building, the speaker loop will connect directly to PAGA main cabinet, and use one\njunction box instead of sub cabinet.\nLocation: APF Security Building, 9 ea Speakers",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-007",
+      "section": "PAGA",
+      "page": 3,
+      "sn": "2.6",
+      "site": "APF Security Building, 9 ea Speakers",
+      "description": "Sub Cabinet (TAG: PAGA-303-501)",
+      "brand": "WAROM",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 207.0,
+      "extended": 207.0,
+      "detail": "~1x Junction box, 4x M20 cable glands\nNote, Only 9 ea speakers in Security Building, the speaker loop will connect directly to PAGA main cabinet, and use\none junction box instead of sub cabinet.\nLocation: APF Fire/Safety Building, 9 ea Speakers",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-008",
+      "section": "PAGA",
+      "page": 3,
+      "sn": "2.7",
+      "site": "APF Fire/Safety Building, 9 ea Speakers",
+      "description": "Sub Cabinet (TAG: PAGA-303-501)",
+      "brand": "WAROM",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 207.0,
+      "extended": 207.0,
+      "detail": "~1x Junction box, 4x M20 cable glands\nNote, Only 9 ea speakers in Fire/Safety Building, the speaker loop will connect directly to PAGA main cabinet, and\nuse one junction box instead of sub cabinet.\nLocation: APF Truck Loading Control Building, ?? ea Speakers",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-009",
+      "section": "PAGA",
+      "page": 3,
+      "sn": "2.8",
+      "site": "APF Truck Loading Control Building, ?? ea Speakers",
+      "description": "Sub Cabinet (TAG: PAGA-303-??)",
+      "brand": "BOSCH",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 11135.0,
+      "extended": 11135.0,
+      "detail": "~1x Pre-assembled cabinet floor 19'', 12HU 600x400x498.5 mm,\nRAL7035, Single Glazed Front Door,\nLOCAL\nWith thermostat activated ventilation fan, MCB,bottom cable entry gland plate, termination blocks,cable\ntrunking,PE&IE bar,etc\nComprising:\nAND GENERAL ALARM (PAGA) System\n~1x Power Amplifier\n•4-channel, 600W arbitrary distribution to 8 output channels\n•Frequency Response: 20Hz~20kHz (+0.5/-3dB)\n•Signal-to-noise ratio: >110dBA\n•Each amplifier channel has A road / B road outputs\nPRA-AD604\n•Class-A speaker line redundancy\n•Built-in DSP, each output channel can be independently set DSP\n•Built-in 600W spare amplifier channel\n•Integrated 2-port network switch\n•Seaker line terminal monitoring\n~1x Power Unit for Amplifier, 48V, DC, power unit, 5A\nNote, the quantiy of speaker in APF Truck Loading Control Building to be clarified during detailed design.\nField Equipment for APF",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-010",
+      "section": "PAGA",
+      "page": 4,
+      "sn": "3.1",
+      "site": "APF field equipment",
+      "description": "PAGA Operator Access Panel (OAP)",
+      "brand": "BOSCH",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 2381.0,
+      "extended": 4762.0,
+      "detail": "~1x Call Stations,\n•Desktop call station with gooseneck microphone\n•4.3\" full colour touch screen\n•Microphone Signal to Noise Ratio: >96dB\n•Status Indicators (LED ring for call status, power supply and equipment failure indicators) PRA-CSLD\n•PTT buttons\n•Built-in monitor speaker with volume control\n•Dual redundant PoE power supply interfaces\n•Microphone audio processing\n~1x Extension Panels for Call Stations\n•Connection of up to four PRA-CSE extensions, eachwith twelve buttons. The buttons can be configured for various\nPRA-CSE\nfunctions, but they are especially useful for zone selection, giving a clear overview of accessible zones and the LED\nindicators for each button show the status of the respective zone (like being selected, occupied or at fault).",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-011",
+      "section": "PAGA",
+      "page": 4,
+      "sn": "3.2",
+      "site": "APF field equipment",
+      "description": "PAGA Override Control Unit (OCU)",
+      "brand": "AQUIFER",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 10928.0,
+      "extended": 21856.0,
+      "detail": "~1x Ex Call station microphone for outdoor\n•Microphone Signal to Noise Ratio: >96dB\n•PTT buttons\nPRA-CSMEDB-E01\n•Built-in monitor speaker\n•Dual redundant PoE power supply interfaces\n•Microphone audio processing",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-012",
+      "section": "PAGA",
+      "page": 4,
+      "sn": "3.3",
+      "site": "APF field equipment",
+      "description": "Explosion Proof Horn Loudspeaker - 25W (Outdoor)",
+      "brand": "SORTERIA",
+      "quantity": 55,
+      "unit": "SET",
+      "unitCost": 395.0,
+      "extended": 21725.0,
+      "detail": "~ Housing Material: GRP, Hood: PC, Colour: black, Mounting Bracket: 316L stainless steel LS5\n~ Termination : screwt, Weight : 6kg\n~ IP rating : IP66. Max/min ambient temp : -40℃ ~ 70℃\n~ Rated Power : 25W\n~ SPL 1W/1m: 103.5dB, SPL rated power: 115.6dB\n~ Nominal tappings 3W, 5W, 8W,15W, 25W\n~ Ex-mark:\nEx db eb IIC T6...T4 Gb, Ex tb IIIC T85°C...T135°C Db IP66/IP67 ( -40℃ ~ +70℃), Zone 1\n~ 2 x M20 Nickle Plated Brass Cable Gland\n~1x Stainless steel Junction Box,170mm * 150mm * 120mm, 3 x M20 Nickle Plated Brass Cable Gland",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-013",
+      "section": "PAGA",
+      "page": 4,
+      "sn": "3.4",
+      "site": "APF field equipment",
+      "description": "Ceiling Speaker - 6W (Indoor)",
+      "brand": "BOSCH",
+      "quantity": 121,
+      "unit": "SET",
+      "unitCost": 219.0,
+      "extended": 26499.0,
+      "detail": "~ Material : ABS+Metal / White RAL 9003, Mounting : 3 spring clamps LCM-06MWE\n~ Weight : 0.94kg.\n~ IP rating : IP21C, Max/min ambient temperature : -10℃ ~ 55℃\n~ Rated power : 6W\n~ SPL 1W/1m : 90dB, SPL rated power : 98dB\n~ Nominal tappings: 3.0W, 6.0W\n~ 2 x M20 Cable Gland\n~1x Junction Box,170mm * 150mm * 120mm, 3 x M20 Cable Gland\nAND GENERAL ALARM (PAGA) System",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-014",
+      "section": "PAGA",
+      "page": 5,
+      "sn": "3.5",
+      "site": "APF field equipment",
+      "description": "EX Flashing Beacon",
+      "brand": "SORTERIA",
+      "quantity": 5,
+      "unit": "SET",
+      "unitCost": 891.0,
+      "extended": 4455.0,
+      "detail": "~ 1 x Red Colour ExLB-X15\n~ Energy: 20 Joules, Xenon light source\n~ Material : SS316L, IP66, 5.1kg, Mounting Bracket: 316L stainless steel\n~ IECEx, Ex d IIC T3 Gb T4/T5 Gb\n~ Power 230V ac 50/60Hz, Lens colour Red\n~ Ex-mark: Ex db ⅡC T6 …T4 Gb, Ex tb ⅢC T85°C...T135°C Db IP66/IP67, Zone 1\n~ 2 x M20 Nickle Plated Brass Cable Gland, Armored dual seal\n~1x Stainless steel Junction Box,170mm * 150mm * 120mm, 3 x M20 Nickle Plated Brass Cable Gland",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-015",
+      "section": "PAGA",
+      "page": 5,
+      "sn": "3.6",
+      "site": "APF field equipment",
+      "description": "Speaker EOL",
+      "brand": "BOSCH",
+      "quantity": 11,
+      "unit": "SET",
+      "unitCost": 76.0,
+      "extended": 836.0,
+      "detail": "~IP30, Plastic, 0.025kg, PRA-EOL\n~ Line shorted & line interrupted detection, 100mw, 100V\nLocation: ACP Office/Gurad House building",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-016",
+      "section": "PAGA",
+      "page": 5,
+      "sn": "4.1",
+      "site": "ACP Office/Gurad House building",
+      "description": "PAGA Main Cabinet (TAG: ??)",
+      "brand": "BOSCH",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 30138.0,
+      "extended": 30138.0,
+      "detail": "~1x Pre-assembled cabinet floor 19'', 30U 800x800x1500 mm,\nRAL7035, Single Glazed Front Door, Single Metal Rear Doors,\nLOCAL\nWith thermostat activated ventilation fan, LED lighting by door switch,MCB,bottom cable entry gland plate, termination\nblocks,cable trunking,PE&IE bar,Service Socket Strip,etc\nComprising:\n~1x System Controller,\nPRA-SCS\n•Capability to control a system with up to 48 zones, built-in supervised storage for messsages and tone files.\n~1x Multifunction power supply,\n•Power up to three amplifiers and one host device\n•Up to two call stations via PoE\n•Integrated 6-port network switch (Gigabit)\nPRA-MPS3\n•3 RJ45 ports\n•2 RJ45 ports with PoE power (15.4W)\n•1 SFP slot for fibre optic transceiver module\n•8 Control Inputs, Monitored\n~1x Control interface module\n• Sixteen general purpose inputs for control actions from external switches\n• Eight general purpose relay outputs to activate external control circuits\nPRA-IM16C8\n• Two supervised trigger outputs for NAC boosters\n• PoE powered device with dual redundant Gigabit network interface\n• LED status indicators for all inputs and outputs\n~1x Music source, USB, SD, Tuner\n•Interface for matching the number of microphones or auxiliary inputs\n•Four balanced line outputs can be used simultaneously, and all audio channels are used\n•together with the Dante network PRM-UST\n•4 balanced microphones/auxiliary inputs, and 4 outputs using Phoenix connectors\n•CAT5/6 network cable connected to Dante network\n•Integrated mounting bracket that can be installed in very limited space\n~1 x Access Layer Switch, 24 x 10/100/1000 PoE+ Ports with 195w Power budget, 4x 10 Gigabit SFP+,Rack-\nCISCO / C1200-24T-4X\nmountable, 2x 10G SFP+ Module\n~1x Power Amplifier\n•4-channel, 600W arbitrary distribution to 8 output channels\n•Frequency Response: 20Hz~20kHz (+0.5/-3dB)\n•Signal-to-noise ratio: >110dBA\n•Each amplifier channel has A road / B road outputs\nPRA-AD604\n•Class-A speaker line redundancy\n•Built-in DSP, each output channel can be independently set DSP\n•Built-in 600W spare amplifier channel\n•Integrated 2-port network switch\n•Seaker line terminal monitoring\n~1x Beacon Monitoring Module\nAQ-BEOL-R\n•24V, DC, beacon monitoring with LED lgihts, 275 beacon loops in total\n~1x Beacon EOL\nAQ-BEOL-E\n•24V, DC, beacon EOL, 3 modules per loop, 825 PCs in total\n~3 x SIL-3 relay for F&G, ICSS，actual Qty to be provided as per design requirement\nAND GENERAL ALARM (PAGA) System\nField Equipment for ACP",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-017",
+      "section": "PAGA",
+      "page": 6,
+      "sn": "6.1",
+      "site": "ACP field equipment",
+      "description": "PAGA Operator Access Panel (OAP)",
+      "brand": "BOSCH",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 2381.0,
+      "extended": 4762.0,
+      "detail": "~1x Call Stations,\n•Desktop call station with gooseneck microphone\n•4.3\" full colour touch screen\n•Microphone Signal to Noise Ratio: >96dB\n•Status Indicators (LED ring for call status, power supply and equipment failure indicators) PRA-CSLD\n•PTT buttons\n•Built-in monitor speaker with volume control\n•Dual redundant PoE power supply interfaces\n•Microphone audio processing\n~1x Extension Panels for Call Stations\n•Connection of up to four PRA-CSE extensions, eachwith twelve buttons. The buttons can be configured for various\nPRA-CSE\nfunctions, but they are especially useful for zone selection, giving a clear overview of accessible zones and the LED\nindicators for each button show the status of the respective zone (like being selected, occupied or at fault).",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-018",
+      "section": "PAGA",
+      "page": 6,
+      "sn": "6.2",
+      "site": "ACP field equipment",
+      "description": "Explosion Proof Horn Loudspeaker - 25W (Outdoor)",
+      "brand": "SORTERIA",
+      "quantity": 12,
+      "unit": "SET",
+      "unitCost": 395.0,
+      "extended": 4740.0,
+      "detail": "~ Housing Material: GRP, Hood: PC, Colour: black, Mounting Bracket: 316L stainless steel LS5\n~ Termination : screwt, Weight : 6kg\n~ IP rating : IP66. Max/min ambient temp : -40℃ ~ 70℃\n~ Rated Power : 25W\n~ SPL 1W/1m: 103.5dB, SPL rated power: 115.6dB\n~ Nominal tappings 3W, 5W, 8W,15W, 25W\n~ Ex-mark:\nEx db eb IIC T6...T4 Gb, Ex tb IIIC T85°C...T135°C Db IP66/IP67 ( -40℃ ~ +70℃), Zone 1\n~ 2 x M20 Nickle Plated Brass Cable Gland\n~1x Stainless steel Junction Box,170mm * 150mm * 120mm, 3 x M20 Nickle Plated Brass Cable Gland",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-019",
+      "section": "PAGA",
+      "page": 6,
+      "sn": "6.3",
+      "site": "ACP field equipment",
+      "description": "Ceiling Speaker - 6W (Indoor)",
+      "brand": "BOSCH",
+      "quantity": 10,
+      "unit": "SET",
+      "unitCost": 219.0,
+      "extended": 2190.0,
+      "detail": "~ Material : ABS+Metal / White RAL 9003, Mounting : 3 spring clamps LCM-06MWE\n~ Weight : 0.94kg.\n~ IP rating : IP21C, Max/min ambient temperature : -10℃ ~ 55℃\n~ Rated power : 6W\n~ SPL 1W/1m : 90dB, SPL rated power : 98dB\n~ Nominal tappings: 3.0W, 6.0W\n~ 2 x M20 Cable Gland\n~1x Junction Box,170mm * 150mm * 120mm, 3 x M20 Cable Gland",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-020",
+      "section": "PAGA",
+      "page": 6,
+      "sn": "6.4",
+      "site": "ACP field equipment",
+      "description": "EX Flashing Beacon",
+      "brand": "SORTERIA",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 891.0,
+      "extended": 1782.0,
+      "detail": "~ 1 x Red Colour ExLB-X15\n~ Energy: 20 Joules, Xenon light source\n~ Material : SS316L, IP66, 5.1kg, Mounting Bracket: 316L stainless steel\n~ IECEx, Ex d IIC T3 Gb T4/T5 Gb\n~ Power 230V ac 50/60Hz, Lens colour Red\n~ Ex-mark: Ex db ⅡC T6 …T4 Gb, Ex tb ⅢC T85°C...T135°C Db IP66/IP67, Zone 1\n~ 2 x M20 Nickle Plated Brass Cable Gland, Armored dual seal\n~1x Stainless steel Junction Box,170mm * 150mm * 120mm, 3 x M20 Nickle Plated Brass Cable Gland",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-021",
+      "section": "PAGA",
+      "page": 6,
+      "sn": "6.5",
+      "site": "ACP field equipment",
+      "description": "Speaker EOL",
+      "brand": "BOSCH",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 76.0,
+      "extended": 152.0,
+      "detail": "~IP30, Plastic, 0.025kg, PRA-EOL\n~ Line shorted & line interrupted detection, 100mw, 100V",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PAGA-022",
+      "section": "PAGA",
+      "page": 6,
+      "sn": "7",
+      "site": "Project-wide",
+      "description": "PAGA Coverage Study",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 12310.0,
+      "extended": 12310.0,
+      "detail": "~ Coverage study on the existing location\nAND GENERAL ALARM (PAGA) System\n~ Limited to 3 revisions. Additional revisions shall be charged accordingly",
+      "systemTokens": [
+        "TEL-PAGA"
+      ],
+      "wbs": "B1",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": [
+        "VENDOR_ALTERNATIVE: BOSCH scope; existing INDUSTRONIC selection is retained"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-BULK-001",
+      "section": "BULK",
+      "page": 8,
+      "sn": "1 BULK",
+      "site": "ABV01",
+      "description": "Bulk Material",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 935.0,
+      "extended": 935.0,
+      "detail": "72 x CAT 6A UTP Ethernet CABLE\n24 x CAT 6A-SWA CABLE S/FTP-32 CAT6A\n840 x FOC 24C-SWA CABLE (single mode) GYXTW\n132 x FOC 12C-SWA CABLE (single mode)\n132 x 2C x 2.5 SQ.MM\n3 x CCTV POLE 3 M. HEIGHT, CS-GALV.\nACP",
+      "systemTokens": [
+        "COMMON",
+        "TEL-FO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-BULK-002",
+      "section": "BULK",
+      "page": 8,
+      "sn": "1 BULK",
+      "site": "ACP",
+      "description": "Bulk Material",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 2073.0,
+      "extended": 2073.0,
+      "detail": "PLAIN TINNED COPPER (CLASS 2), XLPE FLAME RETARDANT, LSZH\n216 x 2Cx2.5 SQ.MM ARMORED\nPLAIN TINNED COPPER (CLASS 2), XLPE FLAME RETARDANT, LSZH, STEEL WIRE ARMORED\n222 x 2Px1.5 SQ.MM ARMORED\n36 x 2Cx2.5 SQ.MM ARMORED\nPLAIN TINNED COPPER (CLASS 2), XLPE FIRE RESISTANT, LSZH\n234 x 4Cx1.5 SQ.MM\nPLAIN TINNED COPPER (CLASS 2), XLPE FIRE RESISTANT, LSZH, STEEL WIRE ARMORED (SWA)\n48 x 2Cx1.5 SQ.MM ARMORED\n36 x 2Cx2.5 SQ.MM ARMORED\n1416 x 4Cx1.5 SQ.MM ARMORED\n432 x FLAME RETARDANT, FOAM DIELECTRIC, COPPER CLAD, ALUMINIUM CONDUCTOR, 50Ω COAXIAL\nRFLLF1/2\n480 x CAT 6A UNSHIELDED TWISTED PAIR (UTP) 100Ω DATA CABLE\n216 x CAT 6A SHIELDED TWISTED PAIR (STP) LSZH, OUTDOOR STEEL WIRE ARMORED (SWA) S/FTP-32 CAT6A\n852 x FOC 24 CORE ARMORED\n12 x RS-485 CABLE 6x1\n18 x CCTV AND PAGA SPEAKER POLE 5 M. HEIGHT, CS-GALV.\nBULK MATERIAL",
+      "systemTokens": [
+        "COMMON",
+        "TEL-FO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-BULK-003",
+      "section": "BULK",
+      "page": 8,
+      "sn": "1 BULK\nSTRANDED",
+      "site": "TELECOMMUNICATION BULK MATERIAL — site not stated",
+      "description": "Bulk Material",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 12736.0,
+      "extended": 12736.0,
+      "detail": "390 x 2P x 1.5 SQ.MM\nPLAIN TINNED COPPER (CLASS 2), XLPE FIRE RESISTANT, LSZH\n4296 x 2C x 2.5 SQ.MM\n516 x 4C x 2.5 SQ.MM\nPLAIN TINNED COPPER (CLASS 2), XLPE FIRE RESISTANT, LSZH, STEEL WIRE ARMORED (SWA)\n6204 x 2C+Ex 2.5 SQ.MM\n1116 x 2C x 2.5 SQ.MM\n21408 x 4C x 2.5 SQ.MM\n480 x FOAM DIELECTRIC, COPPER CLAD, ALUMINIUM CONDUCTOR, 50Ω COAXIAL CABLE FLAME\nRFLLF1/2\n1128 x COPPER CONDUCTOR, 75Ω COAXIAL CABLE, FLAME RETARDANT, LSZH, STEEL WIRE ARMORED\nRF-600-75\n10428 x CAT 6A UNSHIELDED TWISTED PAIR (UTP) 100Ω DATA CABLE\n534 x CAT 6A SHIELDED TWISTED PAIR (STP) LSZH, OUTDOOR STEEL WIRE ARMORED (SWA)\n3132 x FOC 12 CORE SINGLE MODE ARMORED\n15590.4 x FOC 24 CORE SINGLE MODE ARMORED\n12 x RS-485 CABLE\n74 x CCTV AND PAGA SPEAKER POLE 5 M. HEIGHT, CS-GALV.",
+      "systemTokens": [
+        "COMMON",
+        "TEL-FO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-001",
+      "section": "RADIO",
+      "page": 9,
+      "sn": "1",
+      "site": "ACO",
+      "description": "VHF DMR Radio System",
+      "brand": "MOTOROLA",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 113259.0,
+      "extended": 113259.0,
+      "detail": "~ 1 x TUTENG Radio System Cabinet G26642\n~ 1 x DMR Tier III Access Switch LS-5135S-24T4S-EI\n~ 3 x VHF DMR Repeater SLR5500\n~ 3 x Outdoor Antenna TQJ-150I\n~ 3 x Lighting Arresters LX-BLQ-400-N\n~ 3 x Carrier Combiner WLHL-150 F3\n~ 3 x channel splitter WLFL-150-3\n~ 4 x Bandpass Duplexer WLSGQ-150\n~ 1 x DMR Tier III Access Router MSR 3610-XS\n~ 1 x DELL PowerEdge Dispatching Server R740\n~ 1 x Dispatching Software GMVN6044B\n~ 1 x Network Management System HKVN4315A\n~ 1 x SmartPTT VHF‑DMR IP gateway RG-2000\nLicense:\n~ 3 x DMR Tier III Repeater Software License HKVN4356A\n~ 1 x DMR Tier III CAPACITY MAX SYSTEM CONTROLLER LICENSE HKVN4313A\n~ 1 x DMR Tier III CAPACITY MAX MNIS VRC GATEWAY LICENSE HKVN4317A\n~ 5 x DMR Tier III CAPACITY MAX SINGLE VOICE TALKPATH LICENSE HKVN4318A\n~ 1 x DMR Tier III CAPACITY MAX MNIS DATA GATEWAY LICENSE HKVN4321A\n~ 1 x DMR Tier III Repeater Connection License HKVN4314A\n~ 1 x Capacity Max connectivity, one license GMVN6146A\n~ 1 x Dispatch Voice Recording License GMVN6057A\n~ 122 x End User Machine License GMVN6050A\nRemark:The number of End User Machine Licenses is currently determined by the existing solution'sfixed radios and\nhandheld devices. If device in other solution need connected to this system, the quantity of licenses must be\nincreased\n~ 1 x VHF DMR Radio Mobile M8668i\n~ 1 x Outdoor Antenna TQJ-150I\n~ 1 x Lighting Arresters LX-BLQ-400-N\nRemark:\n~ 1 x DMR Tier III System Server-CAPACITY MAX (handle by GTPL contractor) DL20 Gen10\nThe DMR Tier III System Server use existing DMR system which will be moved and installed at APF\nDELL PC Workstation\n~ 1 x Dell Desktop OptiPlex Tower computer Intel® Core™ i5 vPro® processors OptiPlex Tower\n~ 1 x Dell UltraSharp 24 Monitor U2424H\n~ 1 x Keyboard and mouse /\n~ 1 x Desk loudspeaker box\n~ 1 x Desk microphone",
+      "systemTokens": [
+        "TEL-RADIO-DTRS"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-002",
+      "section": "RADIO",
+      "page": 9,
+      "sn": "2",
+      "site": "ACO",
+      "description": "VHF-FM Marine Radio System",
+      "brand": "SAILOR",
+      "quantity": 2,
+      "unit": "Lot",
+      "unitCost": 13839.0,
+      "extended": 27678.0,
+      "detail": "~ 2 x VHF-FM Marine Radio Fixed， include：\n- Transceiver Unit (SAILOR 6210 VHF)\n- SAILOR 6202 Hand Microphone with spiral cable\n- User and installation maual\n- Installation guide\nSailor 6210\n- Mounting bracket with two wheel knobs\n- Connectors for cables\n- Power cable, fittings and fuses\n- Sun Screen (click on) for front plate protection\n- Kit for flush mount installation, including gasket\n~ 1 x VHF-FM Marine Antenna VHF74\n~ 1 x VHF-FM Rarine IP Gateway RGW-7700\n~ 1 x 230VAC ~24VDC Power Supply Unit, XDR-240",
+      "systemTokens": [
+        "TEL-RADIO-MARINE"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-003",
+      "section": "RADIO",
+      "page": 9,
+      "sn": "3",
+      "site": "ACO",
+      "description": "MF/HF Radio",
+      "brand": "Sailor",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 20869.0,
+      "extended": 20869.0,
+      "detail": "Description: Sailor 6320\n· MF/HF radiotelephone with DSC facility\n· Fully meets GMDSS carriage requirements for SOLAS ships.\n· Meets the new ITU recommendation on digital selective calling system for use in the Maritime Mobile Service, ITU-\nR M.493-14\n· Frequency range: receiver: 150 KHz to 30 MHz, antenna tuning unit:1.6MHz - 27.5MHz\nUser-programmable channels 199 frequency pairs with mode (1-199)\nSimplex and semi-duplex SSB telephony, DSC, TELEX and AM broadcast reception\n· Class of Emission:J3E.A3E. J2B\n· RF Output Power:250 W pep\n· DSC Receiving Frequency: All DSC frequencies in MF/HF\n· Distress and salely:Dsc distress/safety frequencies:\n2187.5 kHz, 4207.5 kHz, 6312.0 KHz, 8414.5 KHz, 12577.0 KHz, 16804.5 KH\n· Interface with TMS, ESD, GPS\nComprising:\n~ 1 x SAILOR 6301 Control Unit DSC Class A SAILOR 6301\n~ 1 x Lightning protect device for Antenna\n~ 1 x MF/HF SSB IP Gateway\n~ 1 x 230VAC ~24VDC Power Supply Unit, XDR-960",
+      "systemTokens": [
+        "TEL-RADIO-SSB"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-004",
+      "section": "RADIO",
+      "page": 10,
+      "sn": "4",
+      "site": "ACO",
+      "description": "Radio Console",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Pc",
+      "unitCost": 1988.0,
+      "extended": 1988.0,
+      "detail": "~ 1 x Radio Console /",
+      "systemTokens": [
+        "TEL-RADIO-DTRS",
+        "TEL-RADIO-MARINE",
+        "TEL-RADIO-SSB",
+        "TEL-RADIO-AERO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Pc",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-005",
+      "section": "RADIO",
+      "page": 10,
+      "sn": "5",
+      "site": "ACO",
+      "description": "Antenna Cable",
+      "brand": "YONGDING",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 2604.0,
+      "extended": 2604.0,
+      "detail": "~ 700 x Antenna Feeder Cable(m) HCAAYZ-50-12\n~ 40 x RF Jumper cable\n~ 1 x Auxiliary Material\nLocation: APM\nVHF DMR Radio System GTPL\nAccording to MM-ASK-1A-APF-TEL-SPE-0009 SPEC FOR VHF DMR RADIO,the existing DMR controller,\nDispatcher and Repeater Base Station (GRS#2)will be moved and installed at APF (Control Building and New\nTelecommunication Tower 60M.),this scope will be handle by GTPL contractor.\n~ 1 x Radio System Cabinet\n~ 1 x Radio Console\n~ 1 x VHF DMR Radio Fixed\n~ 1 x DMR IP Gateway\n~ 1 x DMR Omni Antenna\nEtc.",
+      "systemTokens": [
+        "TEL-RADIO-DTRS",
+        "TEL-RADIO-MARINE",
+        "TEL-RADIO-SSB",
+        "TEL-RADIO-AERO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-006",
+      "section": "RADIO",
+      "page": 10,
+      "sn": "2",
+      "site": "APM",
+      "description": "VHF-FM Marine Radio System",
+      "brand": "SAILOR",
+      "quantity": 2,
+      "unit": "Lot",
+      "unitCost": 13739.0,
+      "extended": 27478.0,
+      "detail": "~ 2 x VHF-FM Marine Radio Fixed， include：\n- Transceiver Unit (SAILOR 6210 VHF)\n- SAILOR 6202 Hand Microphone with spiral cable\n- User and installation maual\n- Installation guide\nSailor 6210\n- Mounting bracket with two wheel knobs\n- Connectors for cables\n- Power cable, fittings and fuses\n- Sun Screen (click on) for front plate protection\n- Kit for flush mount installation, including gasket\n~ 1 x VHF-FM Marine Antenna VHF74\n~ 1 x VHF-FM Rarine IP Gateway RGW-7700\n~ 1 x 230VAC ~24VDC Power Supply Unit, XDR-240",
+      "systemTokens": [
+        "TEL-RADIO-MARINE"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-007",
+      "section": "RADIO",
+      "page": 10,
+      "sn": "3",
+      "site": "APM",
+      "description": "Radio Console",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": null,
+      "unitCost": 1988.0,
+      "extended": 1988.0,
+      "detail": "~ 1 x Radio Console /",
+      "systemTokens": [
+        "TEL-RADIO-DTRS",
+        "TEL-RADIO-MARINE",
+        "TEL-RADIO-SSB",
+        "TEL-RADIO-AERO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-008",
+      "section": "RADIO",
+      "page": 10,
+      "sn": "4",
+      "site": "APM",
+      "description": "Antenna Cable",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 1000.0,
+      "extended": 1000.0,
+      "detail": "~1 x 500m Antenna Cable /\nLocation: APF",
+      "systemTokens": [
+        "TEL-RADIO-DTRS",
+        "TEL-RADIO-MARINE",
+        "TEL-RADIO-SSB",
+        "TEL-RADIO-AERO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-009",
+      "section": "RADIO",
+      "page": 10,
+      "sn": "1",
+      "site": "APF",
+      "description": "VHF DMR Radio System",
+      "brand": "MOTOROLA",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 360036.0,
+      "extended": 360036.0,
+      "detail": "~ 26 x VHF DMR Radio Mobile,with suction cup antenna M8668i\n~ 96 x VHF DMR Handheld Radio (ATEX) XIR-P8668ex\n~ 122 x DMR Tier III CAPACITY MAX ADVANTAGE SUBSCRIBER LICENSE HKVN4350A\nVHF DMR Radio System Accessaries MOTOROLA\n~ 1 x Six-Port Smart Charger PMPN4296\n~ 1 x ATEX Remote Speaker /Microphone PMNN4067",
+      "systemTokens": [
+        "TEL-RADIO-DTRS"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-010",
+      "section": "RADIO",
+      "page": 10,
+      "sn": "2",
+      "site": "APF",
+      "description": "VHF-FM Marine Radio System",
+      "brand": "SAILOR",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 45118.0,
+      "extended": 45118.0,
+      "detail": "~ 1 x Radio System Cabinet MGW\n~ 2 x VHF-FM Marine Radio Fixed， include：\n- Transceiver Unit (SAILOR 6210 VHF)\n- SAILOR 6202 Hand Microphone with spiral cable\n- User and installation maual\n- Installation guide\nSailor 6210\n- Mounting bracket with two wheel knobs\n- Connectors for cables\n- Power cable, fittings and fuses\n- Sun Screen (click on) for front plate protection\n- Kit for flush mount installation, including gasket\n~ 2 x VHF-FM Marine Antenna VHF74\n~ 2 x VHF-FM Rarine IP Gateway RGW-7700\n~ 2 x 230VAC ~24VDC Power Supply Unit, XDR240\nSAILOR SP3530\n- Charger\n- AC/DC converter/adaptor\n- DC connection\n- Operators manual\nIntrinsically Safe, II 2G Ex ib II C T 4",
+      "systemTokens": [
+        "TEL-RADIO-MARINE"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-011",
+      "section": "RADIO",
+      "page": 11,
+      "sn": "3",
+      "site": "APF",
+      "description": "MF/HF Radio",
+      "brand": "Sailor",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 30448.0,
+      "extended": 30448.0,
+      "detail": "Description: Sailor 6320\n· MF/HF radiotelephone with DSC facility\n· Fully meets GMDSS carriage requirements for SOLAS ships.\n· Meets the new ITU recommendation on digital selective calling system for use in the Maritime Mobile Service, ITU-\nR M.493-14\n· Frequency range: receiver: 150 KHz to 30 MHz, antenna tuning unit:1.6MHz - 27.5MHz\nUser-programmable channels 199 frequency pairs with mode (1-199)\nSimplex and semi-duplex SSB telephony, DSC, TELEX and AM broadcast reception\n· Class of Emission:J3E.A3E. J2B\n· RF Output Power:250 W pep\n· DSC Receiving Frequency: All DSC frequencies in MF/HF\n· Distress and salely:Dsc distress/safety frequencies:\n2187.5 kHz, 4207.5 kHz, 6312.0 KHz, 8414.5 KHz, 12577.0 KHz, 16804.5 KH\n· Interface with TMS, ESD, GPS\nComprising:\n~ 1 x SAILOR 6301 Control Unit DSC Class A SAILOR 6301\n~ 1 x 6m 12 POL CAN cable (CU-TU)\n~ 1 x Handset SAILOR 6201\n~ 1 x SAILOR 6368 MF/HF 250W Transceiver Unit DSC Class A SAILOR 6368\n~ 1 x SAILOR 6384 Antenna Tuning Unit SAILOR 6384\n~ 1 x 8m MF/HF Antenna with install kit HF8000\n~ 1 x Lightning protect device for Antenna\n~ 1 x MF/HF SSB IP Gateway RGW-7700\n~ 1 x 230VAC ~24VDC Power Supply Unit, XDR-960",
+      "systemTokens": [
+        "TEL-RADIO-SSB"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-012",
+      "section": "RADIO",
+      "page": 11,
+      "sn": "4",
+      "site": "APF",
+      "description": "FIXED AM VHF Radio Telephone",
+      "brand": "Jotron",
+      "quantity": 1,
+      "unit": null,
+      "unitCost": 14680.0,
+      "extended": 14680.0,
+      "detail": "Description:\nTR-910\nFrequency range: 118~137MHz\nPower: 230VAC, 50Hz\nComprising:\n~1 x Transceiver unit, flush mount, 1.95kg\n~1 x Handheld Microphone\n~1 x Whip Antenna\n~1 x Lightning protection device for Antenna\n~1x SIL3 Safety relay for ESD\n~1x 230VAC Power Supply, Output 13.8V DC",
+      "systemTokens": [
+        "TEL-RADIO-AERO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-013",
+      "section": "RADIO",
+      "page": 11,
+      "sn": "",
+      "site": "APF",
+      "description": "Portable VHF Airband Radio",
+      "brand": "JOTRON",
+      "quantity": 4,
+      "unit": "SET",
+      "unitCost": 3511.0,
+      "extended": 14044.0,
+      "detail": "Description: TRON TR30 AIR\n· Frequency, 2 channels：121.5 MHz, 123.1 MHz\n· Modulation：AM\n· Channel spacing：25 kHz\nComprising:\n~ 1 x Transceiver unit with antenna\n~ 1 x Emergency Lithium Battery (sealed)\n~ 1 x Test Battery\n~ 1 x Battery Charger,230VAC Power Supply\n~ 1 x Wrist strap",
+      "systemTokens": [
+        "TEL-RADIO-AERO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-014",
+      "section": "RADIO",
+      "page": 11,
+      "sn": "5",
+      "site": "APF",
+      "description": "Antenna Cable",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 3334.0,
+      "extended": 3334.0,
+      "detail": "~1 x 500m Antenna Cable /",
+      "systemTokens": [
+        "TEL-RADIO-DTRS",
+        "TEL-RADIO-MARINE",
+        "TEL-RADIO-SSB",
+        "TEL-RADIO-AERO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-015",
+      "section": "RADIO",
+      "page": 11,
+      "sn": "6",
+      "site": "APF",
+      "description": "Radio Console",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": null,
+      "unitCost": 1988.0,
+      "extended": 1988.0,
+      "detail": "~ 1 x Radio Console /\nLocation: APM",
+      "systemTokens": [
+        "TEL-RADIO-DTRS",
+        "TEL-RADIO-MARINE",
+        "TEL-RADIO-SSB",
+        "TEL-RADIO-AERO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-016",
+      "section": "RADIO",
+      "page": 11,
+      "sn": "1",
+      "site": "APM",
+      "description": "VHF DMR Radio System",
+      "brand": "MOTOROLA",
+      "quantity": 1,
+      "unit": null,
+      "unitCost": 3524.0,
+      "extended": 3524.0,
+      "detail": "~ 1 x Radio Console MGW\n~ 1 x VHF DMR Radio Mobile M8668i\n~ 1 x Outdoor Antenna TQJ-150I\n~ 1 x Lighting Arresters LX-BLQ-400-N",
+      "systemTokens": [
+        "TEL-RADIO-DTRS"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate",
+        "DESCRIPTION_CONFLICT: title says VHF DMR Radio System, but component says Radio Console"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-017",
+      "section": "RADIO",
+      "page": 11,
+      "sn": "2",
+      "site": "APM",
+      "description": "VHF-FM Marine Radio System",
+      "brand": "Sailor",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 29465.0,
+      "extended": 29465.0,
+      "detail": "~ 1 x Radio System Cabinet MGW\nSailor 6210\n- Mounting bracket with two wheel knobs\n- Connectors for cables\n- Power cable, fittings and fuses\n- Sun Screen (click on) for front plate protection\n- Kit for flush mount installation, including gasket\n~ 2 x VHF-FM Marine Antenna VHF74\n~ 2 x VHF-FM Rarine IP Gateway RGW-7700\n~ 2 x 230VAC ~24VDC Power Supply Unit, XDR240",
+      "systemTokens": [
+        "TEL-RADIO-MARINE"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-RADIO-018",
+      "section": "RADIO",
+      "page": 12,
+      "sn": "3",
+      "site": "APM",
+      "description": "Antenna Cable",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 1000.0,
+      "extended": 1000.0,
+      "detail": "~1 x 150m Antenna Cable /",
+      "systemTokens": [
+        "TEL-RADIO-DTRS",
+        "TEL-RADIO-MARINE",
+        "TEL-RADIO-SSB",
+        "TEL-RADIO-AERO"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-001",
+      "section": "CCTV",
+      "page": 13,
+      "sn": "1",
+      "site": "ABV01",
+      "description": "Hazardous Area PTZ Camera Station",
+      "brand": "Hikvision",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 9947.0,
+      "extended": 9947.0,
+      "detail": "DS-2DY7436IXG-\n~ 1 x PTZ Camera Housing\nCXLWF316L\nExplosion-proof design\nATEX: Ex II 2GD Ex db IIC T6 Gb /Ex tb IIIC T80℃ Db;\nIP grade:IP68\nSUS316L stainless steel with anti-corrosion surface spray treatment\nWiper,IR lamp 200m,Sunshade\n1/1.8\" progressive scan CMOS\nUp to 2560 × 1440 @30 fps resolution\n36 × optical zoom, 16 × digital zoom\nMin. illumination:Color: 0.005 Lux @(F1.6, AGC ON)，B/W: 0.001 Lux @(F1.6, AGC ON)，0 Lux with IR;\nSupport H.265+/H.265 video compression\nDS-2XE2705-M04(316L)(O-\n~1 x Ex-Proof Junction Box , Fiber\nSTD)\nStainless steel 316L with anti-corrosion surface spray treatment\nATEX and IECEx certified explosion-proof performance\nIP grade IP68\n4 cable outlets with Ex gland",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-002",
+      "section": "CCTV",
+      "page": 13,
+      "sn": "2",
+      "site": "ABV01",
+      "description": "Hazardous Area FIXED Camera",
+      "brand": "Hikvision",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 4382.0,
+      "extended": 4382.0,
+      "detail": "DS-2XE6422FWD-IZHRS(D)\n~ 1 x Gun Type Fixed Camera Housing\n(2.8 to 12 mm)\nExplosion-proof design\nATEX: II 2 G Ex db op is IIC T6 Gb/ II 2D Ex tb op is IIIC T80°C Db\nIP grade:IP68\n316L stainless steel enclosure\nWiper,IR lamp 80m,Sunshade\n1/1.8\" progressive scan CMOS\nUp to 1920 × 1080 resolution\nAuto Focus, focal length 2.8 to 12 mm\nColor: 0.0005 Lux @ (F1.2, AGC ON), B/W: 0.0001 Lux @ (F1.2, AGC ON), 0 Lux with IR\nIR cut filter with auto switch\nMain Profile H.265\nDS-2XE2705-M04(316L)(O-\n~1 x Ex-Proof Junction Box , Fiber\nSTD)\nStainless steel 316L with anti-corrosion surface spray treatment\nATEX and IECEx certified explosion-proof performance\nIP grade IP68\n4 cable outlets with Ex gland",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-003",
+      "section": "CCTV",
+      "page": 13,
+      "sn": "3",
+      "site": "ABV01",
+      "description": "PTZ Dome Camera",
+      "brand": "Hikvision",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 682.0,
+      "extended": 682.0,
+      "detail": "~ 1 x Camera Unit DS-2DE4225IW-DE\n1/2.8\" Progressive Scan CMOS\nResolution 1920X1080\n25 x optical zoom 4.8-120 mm and 16x digital zoom\nUp to 100 m IR\nSupport H.265 video compression\nPan:360° , Tilt: -15° to 90° (auto flip)\nWater and dust resistant: IP66\n~ 1 x Wall mount bracket",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-004",
+      "section": "CCTV",
+      "page": 13,
+      "sn": "4",
+      "site": "ABV01",
+      "description": "Media Converter",
+      "brand": "Tplink",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 469.0,
+      "extended": 469.0,
+      "detail": "~ 2 x Fiber optic media Converter , Single mode , SC\n~ 1 x Rackmount Chassis for single-port fiber transceiver , built-in switching power supply , 2U\n~ 2 x FO patch cord,1.5m\nNote :\nABV01 CCTV devices share within MPLS system cabinet\nThe network positions corresponding to the cameras are assigned by the switches of the LAN system\nLocation: ACO",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-005",
+      "section": "CCTV",
+      "page": 14,
+      "sn": "5",
+      "site": "ACO",
+      "description": "Hazardous Area PTZ Camera Station",
+      "brand": "Hikvision",
+      "quantity": 6,
+      "unit": "SET",
+      "unitCost": 9947.0,
+      "extended": 59682.0,
+      "detail": "DS-2DY7436IXG-\n~ 1 x PTZ Camera Housing\nCXLWF316L\nExplosion-proof design\nATEX: Ex II 2GD Ex db IIC T6 Gb /Ex tb IIIC T80℃ Db;\nIP grade:IP68\nSUS316L stainless steel with anti-corrosion surface spray treatment\nWiper,IR lamp 200m,Sunshade\n1/1.8\" progressive scan CMOS\nUp to 2560 × 1440 @30 fps resolution\n36 × optical zoom, 16 × digital zoom\nMin. illumination:Color: 0.005 Lux @(F1.6, AGC ON)，B/W: 0.001 Lux @(F1.6, AGC ON)，0 Lux with IR;\nSupport H.265+/H.265 video compression\nDS-2XE2705-M04(316L)(O-\n~1 x Ex-Proof Junction Box , Fiber\nSTD)\nStainless steel 316L with anti-corrosion surface spray treatment\nATEX and IECEx certified explosion-proof performance\nIP grade IP68\n4 cable outlets with Ex gland",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-006",
+      "section": "CCTV",
+      "page": 14,
+      "sn": "6",
+      "site": "ACO",
+      "description": "Hazardous Area FIXED Camera",
+      "brand": "Hikvision",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 4382.0,
+      "extended": 4382.0,
+      "detail": "DS-2XE6422FWD-IZHRS(D)\n~ 1 x Gun Type Fixed Camera Housing\n(2.8 to 12 mm)\nExplosion-proof design\nATEX: II 2 G Ex db op is IIC T6 Gb/ II 2D Ex tb op is IIIC T80°C Db\nIP grade:IP68\n316L stainless steel enclosure\nWiper,IR lamp 80m,Sunshade\n1/1.8\" progressive scan CMOS\nUp to 1920 × 1080 resolution\nAuto Focus, focal length 2.8 to 12 mm\nColor: 0.0005 Lux @ (F1.2, AGC ON), B/W: 0.0001 Lux @ (F1.2, AGC ON), 0 Lux with IR\nIR cut filter with auto switch\nMain Profile H.265\nDS-2XE2705-M04(316L)(O-\n~1 x Ex-Proof Junction Box , Fiber\nSTD)\nStainless steel 316L with anti-corrosion surface spray treatment\nATEX and IECEx certified explosion-proof performance\nIP grade IP68\n4 cable outlets with Ex gland",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-007",
+      "section": "CCTV",
+      "page": 14,
+      "sn": "7",
+      "site": "ACO",
+      "description": "Fixed Lens Type Dome Camera",
+      "brand": "Hikvision",
+      "quantity": 5,
+      "unit": "SET",
+      "unitCost": 108.0,
+      "extended": 540.0,
+      "detail": "DS-2CD3121G2E-\n~1 x Indoor Fixed Lens Dome Network Camera\nLIU(2.8mm)\nResolution 1920 × 1080\nAngle Adjustment:Pan: 0° to 355°, tilt: 0° to 75°, rotate: 0° to 355° Manual\nFixed focal lens 2.8 mm\nWater and dust resistant: IP67\nIR Up to 30 m\nSupport H.265 video compression\nCeiling mounted",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-008",
+      "section": "CCTV",
+      "page": 15,
+      "sn": "8",
+      "site": "ACO",
+      "description": "NVR",
+      "brand": "Hikvision",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 3955.0,
+      "extended": 3955.0,
+      "detail": "~ 1 x NVR DS-8632NI-K8\n•Up to 16-ch IP camera inputs\n•Up to 2-ch@32 MP + 2-ch@8 MP/10-ch@8 MP/20-ch@4MP/40-ch@1080p decoding capacity\n•Up to 400 Mbps incoming bandwidth and 400 Mbps outgoing bandwidth 2 HDMI (different source) and 2 VGA\n(different source)\ninterfaces, 8K or dual 4K video outputs\n•Supports special cameras, including people counting camera,ANPR (automatic number plate recognition) camera,\nand fisheye camera\n•Advanced streaming technology enables smooth live view in poor network conditions\n•Supports RAID 0, 1, 5, 6, 10 and N+M hot spare for even more reliable data storage, effectively avoids data loss\nrisks\n~ Hard Disk 10T (4 ), Raid 6 disk array, meet 30-day storage with continuous recording 1080p 10fps .\nNote: Storage calculated based upon recording Qty. 12+3 Camera stations each with 30 Days.\nRaid 6 have the ability to cater for up to two hard disk failures without the loss of data.",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-009",
+      "section": "CCTV",
+      "page": 15,
+      "sn": "9",
+      "site": "ACO",
+      "description": "Media Converter",
+      "brand": "Tplink",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 1366.0,
+      "extended": 1366.0,
+      "detail": "~ 7 x Fiber optic media Converter , Single mode , SC\n~ 1 x Rackmount Chassis for single-port fiber transceiver , built-in switching power supply , 2U\n~ 7 x FO patch cord,1.5m",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-010",
+      "section": "CCTV",
+      "page": 15,
+      "sn": "10",
+      "site": "ACO",
+      "description": "CCTV Workstation",
+      "brand": "",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 2765.0,
+      "extended": 2765.0,
+      "detail": "~1 x OptiPlex Tower Plus 7020 ,Intel Core i7, 1 x 16 GB, DDR5 ,512 GB Dell 7020\n~ 1 x Desk type keybaord & mouse Dell\n~1 x Joystick Hikvision\n~1 x Windows 11 pro, 64-bit Windows\n~1 x 27\" monitor Dell\n~ 1 x CCTV client Software Hikvision\nNote :\nACO CCTV devices share within LAN cabinet installed in Office/Guard House Building\nThe network positions corresponding to the cameras are assigned by the switches of the LAN system\nLocation: APF",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-011",
+      "section": "CCTV",
+      "page": 15,
+      "sn": "11",
+      "site": "APF",
+      "description": "Hazardous Area PTZ Camera Station",
+      "brand": "Hikvision",
+      "quantity": 24,
+      "unit": "SET",
+      "unitCost": 9947.0,
+      "extended": 238728.0,
+      "detail": "DS-2DY7436IXG-\n~ 1 x PTZ Camera Housing\nCXLWF316L\nExplosion-proof design\nATEX: Ex II 2GD Ex db IIC T6 Gb /Ex tb IIIC T80℃ Db;\nIP grade:IP68\nSUS316L stainless steel with anti-corrosion surface spray treatment\nWiper,IR lamp 200m,Sunshade\n1/1.8\" progressive scan CMOS\nUp to 2560 × 1440 @30 fps resolution\n36 × optical zoom, 16 × digital zoom\nMin. illumination:Color: 0.005 Lux @(F1.6, AGC ON)，B/W: 0.001 Lux @(F1.6, AGC ON)，0 Lux with IR;\nSupport H.265+/H.265 video compression\nDS-2XE2705-M04(316L)(O-\n~1 x Ex-Proof Junction Box , Fiber\nSTD)\nStainless steel 316L with anti-corrosion surface spray treatment\nATEX and IECEx certified explosion-proof performance\nIP grade IP68\n4 cable outlets with Ex gland",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-012",
+      "section": "CCTV",
+      "page": 15,
+      "sn": "12",
+      "site": "APF",
+      "description": "Hazardous Area FIXED Camera",
+      "brand": "Hikvision",
+      "quantity": 4,
+      "unit": "SET",
+      "unitCost": 4382.0,
+      "extended": 17528.0,
+      "detail": "DS-2XE6422FWD-IZHRS(D)\n~ 1 x Gun Type Fixed Camera Housing\n(2.8 to 12 mm)\nExplosion-proof design\nATEX: II 2 G Ex db op is IIC T6 Gb/ II 2D Ex tb op is IIIC T80°C Db\nIP grade:IP68\n316L stainless steel enclosure\nWiper,IR lamp 80m,Sunshade\n1/1.8\" progressive scan CMOS\nUp to 1920 × 1080 resolution\nAuto Focus, focal length 2.8 to 12 mm\nColor: 0.0005 Lux @ (F1.2, AGC ON), B/W: 0.0001 Lux @ (F1.2, AGC ON), 0 Lux with IR\nIR cut filter with auto switch\nMain Profile H.265\nDS-2XE2705-M04(316L)(O-\n~1 x Ex-Proof Junction Box , Fiber\nSTD)\nStainless steel 316L with anti-corrosion surface spray treatment\nATEX and IECEx certified explosion-proof performance\nIP grade IP68\n4 cable outlets with Ex gland",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-013",
+      "section": "CCTV",
+      "page": 16,
+      "sn": "13",
+      "site": "APF",
+      "description": "Fixed Lens Type Dome Camera",
+      "brand": "Hikvision",
+      "quantity": 43,
+      "unit": "SET",
+      "unitCost": 108.0,
+      "extended": 4644.0,
+      "detail": "DS-2CD3121G2E-\n~1 x Indoor Fixed Lens Dome Network Camera\nLIU(2.8mm)\nResolution 1920 × 1080\nAngle Adjustment:Pan: 0° to 355°, tilt: 0° to 75°, rotate: 0° to 355° Manual\nFixed focal lens 2.8 mm\nWater and dust resistant: IP67\nIR Up to 30 m\nSupport H.265 video compression\nCeiling mounted",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-014",
+      "section": "CCTV",
+      "page": 16,
+      "sn": "14",
+      "site": "APF",
+      "description": "CCTV cabinet",
+      "brand": "Rittal",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 30562.0,
+      "extended": 30562.0,
+      "detail": "- 1 x 42U 19\" Floor Mounted Cabinet 800Wx1000Dx2200Hmm(including 100m H Base Plinth). VX25\nLockable single front metal doors, lockable single metal rear doors,\nRAL 7035 colour with thermostat activated ventilation fan, fluorescent lighting by door switch, MCB,\nbottom cable entry plate, termination blocks, cable trunking, earth bar,etc\n- 1 x KVM, Keyboard, video and Mouse integration device,support 1 or 8 CH Video Input\n- 4 x removable eyebolts with 4 blanking plugs\n- 1 x Document holder: A4/A3 size at side door\nlocal : nstrument & Telecom Room.",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-015",
+      "section": "CCTV",
+      "page": 16,
+      "sn": "15",
+      "site": "APF",
+      "description": "FO Patch/Manage Panel",
+      "brand": "Putian",
+      "quantity": 3,
+      "unit": "SET",
+      "unitCost": 395.0,
+      "extended": 1185.0,
+      "detail": "~ 1 x Discrete distribution module Panel, SL, STP, 1U, 24 port Set\n~ 48 x FO Shielded Keystone Jack, Tool less\n~ 1 x Manage Panel, 1U,Brush type\n~ 48 x FO patch cord,0.5m",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-016",
+      "section": "CCTV",
+      "page": 16,
+      "sn": "16",
+      "site": "APF",
+      "description": "24 Ports PoE+ Access Switch",
+      "brand": "Cisco",
+      "quantity": 4,
+      "unit": "SET",
+      "unitCost": 5061.0,
+      "extended": 20244.0,
+      "detail": "~ 1 x 24x 10/100/1000 PoE+ ports with 375W power budget ，4x 10 Gigabit SFP+ C9200L-24P-4G\n~ 1 x AC power supply",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-017",
+      "section": "CCTV",
+      "page": 17,
+      "sn": "17",
+      "site": "APF",
+      "description": "24 Ports CAT6A Patch/Manage Panel",
+      "brand": "Putian",
+      "quantity": 3,
+      "unit": "SET",
+      "unitCost": 368.0,
+      "extended": 1104.0,
+      "detail": "~ 1 x Discrete distribution module Panel, SL, STP, 1U, 24 port Set\n~ 24 x Cat6A 180° FTP Shielded Keystone Jack, Tool less\n~ 1 x Manage Panel, 1U,Brush type\n~ 24 x CAT6A patch cord,0.5m",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-018",
+      "section": "CCTV",
+      "page": 17,
+      "sn": "18",
+      "site": "APF",
+      "description": "NVR",
+      "brand": "Hikvision",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 18485.0,
+      "extended": 18485.0,
+      "detail": "~ 1 x NVR DS-96128NI-M16\n•Up to 128-ch IP camera inputs\n•Up to 2-ch@32 MP + 2-ch@8 MP/10-ch@8 MP/20-ch@4MP/40-ch@1080p decoding capacity\n•Up to 400 Mbps incoming bandwidth and 400 Mbps outgoing bandwidth 2 HDMI (different source) and 2 VGA\n(different source)\ninterfaces, 8K or dual 4K video outputs\n•Supports special cameras, including people counting camera,ANPR (automatic number plate recognition) camera,\nand fisheye camera\n•Advanced streaming technology enables smooth live view in poor network conditions\n•Supports RAID 0, 1, 5, 6, 10 and N+M hot spare for even more reliable data storage, effectively avoids data loss\nrisks\n~ Hard Disk 16T ( 10 ), Raid 6 disk array, meet 30-day storage with continuous recording 1080p 10fps .\nNote: Storage calculated based upon recording Qty. 93 + 19 Camera stations each with 30 Days.\nRaid 6 have the ability to cater for up to two hard disk failures without the loss of data.",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-019",
+      "section": "CCTV",
+      "page": 17,
+      "sn": "19",
+      "site": "APF",
+      "description": "Media Converter",
+      "brand": "Tplink",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 5242.0,
+      "extended": 5242.0,
+      "detail": "~ 28 x Fiber optic media Converter , Single mode , SC\n~ 2 x Rackmount Chassis for single-port fiber transceiver , built-in switching power supply , 2U\n~ 28 x FO patch cord,1.5m",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-020",
+      "section": "CCTV",
+      "page": 17,
+      "sn": "20",
+      "site": "APF",
+      "description": "CCTV Workstation",
+      "brand": "",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 2765.0,
+      "extended": 5530.0,
+      "detail": "~1 x OptiPlex Tower Plus 7020 ,Intel Core i7, 1 x 16 GB, DDR5 ,512 GB Dell 7020\n~ 1 x Desk type keybaord & mouse Dell\n~1 x Joystick Hikvision\n~1 x Windows 11 pro, 64-bit Windows\n~1 x 27\" monitor Dell\n~ 1 x CCTV client Software Hikvision",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-021",
+      "section": "CCTV",
+      "page": 17,
+      "sn": "21",
+      "site": "APF",
+      "description": "CCTV Workstation",
+      "brand": "",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 3321.0,
+      "extended": 6642.0,
+      "detail": "~1 x OptiPlex Tower Plus 7020 ,Intel Core i7, 1 x 16 GB, DDR5 ,512 GB Dell 7020\n~ 1 x Desk type keybaord & mouse Dell\n~1 x Joystick Hikvision\n~1 x Windows 11 pro, 64-bit Windows\n~1 x 75\" monitor TCL\n~ 1 x CCTV client Software Hikvision\nNote :\nAPF CCTV Cabinet shall be installed in Instrument & Telecom Room\nCCTV monitor 27\" and 70\" will be installed in Control room and Security Building\nLocation: APM",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-022",
+      "section": "CCTV",
+      "page": 17,
+      "sn": "22",
+      "site": "APM",
+      "description": "Hazardous Area PTZ Camera Station",
+      "brand": "Hikvision",
+      "quantity": 3,
+      "unit": "SET",
+      "unitCost": 9947.0,
+      "extended": 29841.0,
+      "detail": "DS-2DY7436IXG-\n~ 1 x PTZ Camera Housing\nCXLWF316L\nExplosion-proof design\nATEX: Ex II 2GD Ex db IIC T6 Gb /Ex tb IIIC T80℃ Db;\nIP grade:IP68\nSUS316L stainless steel with anti-corrosion surface spray treatment\nWiper,IR lamp 200m,Sunshade\n1/1.8\" progressive scan CMOS\nUp to 2560 × 1440 @30 fps resolution\n36 × optical zoom, 16 × digital zoom\nMin. illumination:Color: 0.005 Lux @(F1.6, AGC ON)，B/W: 0.001 Lux @(F1.6, AGC ON)，0 Lux with IR;\nSupport H.265+/H.265 video compression\nDS-2XE2705-M04(316L)(O-\n~1 x Ex-Proof Junction Box , Fiber\nSTD)\nStainless steel 316L with anti-corrosion surface spray treatment\nATEX and IECEx certified explosion-proof performance\nIP grade IP68\n4 cable outlets with Ex gland",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-023",
+      "section": "CCTV",
+      "page": 18,
+      "sn": "23",
+      "site": "APM",
+      "description": "Hazardous Area FIXED Camera",
+      "brand": "Hikvision",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 4382.0,
+      "extended": 4382.0,
+      "detail": "DS-2XE6422FWD-IZHRS(D)\n~ 1 x Gun Type Fixed Camera Housing\n(2.8 to 12 mm)\nExplosion-proof design\nATEX: II 2 G Ex db op is IIC T6 Gb/ II 2D Ex tb op is IIIC T80°C Db\nIP grade:IP68\n316L stainless steel enclosure\nWiper,IR lamp 80m,Sunshade\n1/1.8\" progressive scan CMOS\nUp to 1920 × 1080 resolution\nAuto Focus, focal length 2.8 to 12 mm\nColor: 0.0005 Lux @ (F1.2, AGC ON), B/W: 0.0001 Lux @ (F1.2, AGC ON), 0 Lux with IR\nIR cut filter with auto switch\nMain Profile H.265\nDS-2XE2705-M04(316L)(O-\n~1 x Ex-Proof Junction Box , Fiber\nSTD)\nStainless steel 316L with anti-corrosion surface spray treatment\nATEX and IECEx certified explosion-proof performance\nIP grade IP68\n4 cable outlets with Ex gland",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-024",
+      "section": "CCTV",
+      "page": 18,
+      "sn": "24",
+      "site": "APM",
+      "description": "PTZ Dome Camera",
+      "brand": "Hikvision",
+      "quantity": 3,
+      "unit": "SET",
+      "unitCost": 682.0,
+      "extended": 2046.0,
+      "detail": "~ 1 x Camera Unit DS-2DE4225IW-DE\n1/2.8\" Progressive Scan CMOS\nResolution 1920X1080\n25 x optical zoom 4.8-120 mm and 16x digital zoom\nUp to 100 m IR\nSupport H.265 video compression\nPan:360° , Tilt: -15° to 90° (auto flip)\nWater and dust resistant: IP66\n~ 1 x Wall mount bracket",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-025",
+      "section": "CCTV",
+      "page": 18,
+      "sn": "25",
+      "site": "APM",
+      "description": "NVR",
+      "brand": "Hikvision",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 3955.0,
+      "extended": 3955.0,
+      "detail": "~ 1 x NVR DS-8632NI-K8\n•Up to 16-ch IP camera inputs\n•Up to 2-ch@32 MP + 2-ch@8 MP/10-ch@8 MP/20-ch@4MP/40-ch@1080p decoding capacity\n•Up to 400 Mbps incoming bandwidth and 400 Mbps outgoing bandwidth 2 HDMI (different source) and 2 VGA\n(different source)\ninterfaces, 8K or dual 4K video outputs\n•Supports special cameras, including people counting camera,ANPR (automatic number plate recognition) camera,\nand fisheye camera\n•Advanced streaming technology enables smooth live view in poor network conditions\n•Supports RAID 0, 1, 5, 6, 10 and N+M hot spare for even more reliable data storage, effectively avoids data loss\nrisks\n~ Hard Disk 10T ( 4 ), Raid 6 disk array, meet 30-day storage with continuous recording 1080p 10fps .\nNote: Storage calculated based upon recording Qty. 7 + 2 Camera stations each with 30 Days.\nRaid 6 have the ability to cater for up to two hard disk failures without the loss of data.",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-026",
+      "section": "CCTV",
+      "page": 18,
+      "sn": "26",
+      "site": "APM",
+      "description": "Media Converter",
+      "brand": "Tplink",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 828.0,
+      "extended": 828.0,
+      "detail": "~ 4 x Fiber optic media Converter , Single mode , SC\n~ 1 x Rackmount Chassis for single-port fiber transceiver , built-in switching power supply , 2U\n~ 4 x FO patch cord,1.5m",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-027",
+      "section": "CCTV",
+      "page": 19,
+      "sn": "27",
+      "site": "APM",
+      "description": "CCTV Workstation",
+      "brand": "",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 2765.0,
+      "extended": 2765.0,
+      "detail": "~1 x OptiPlex Tower Plus 7020 ,Intel Core i7, 1 x 16 GB, DDR5 ,512 GB Dell 7020\n~ 1 x Desk type keybaord & mouse Dell\n~1 x Joystick Hikvision\n~1 x Windows 11 pro, 64-bit Windows\n~1 x 27\" monitor Dell\n~ 1 x CCTV client Software Hikvision\nNote :\nAPM CCTV devices share within LAN cabinet installed in Office/Guard House.\nThe network positions corresponding to the cameras are assigned by the switches of the LAN system",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-CCTV-028",
+      "section": "CCTV",
+      "page": 19,
+      "sn": "28",
+      "site": "APM",
+      "description": "Nameplate",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": null,
+      "unitCost": 261.0,
+      "extended": 261.0,
+      "detail": "316 stainless steel nameplate for outside equipment\nInterface to:\n- LAN , Network access device management\n- Master Clock, time synchronization\n- TMS, Power failure and High temperature Alarm",
+      "systemTokens": [
+        "TEL-CCTV"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate",
+        "TOTAL_CONFLICT: cover USD 133,072.00; detailed lines USD 482,142.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-001",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "1",
+      "site": "APF",
+      "description": "KU Band Satellite Dish",
+      "brand": "BWEI",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 192.0,
+      "extended": 192.0,
+      "detail": "~ 1 x KU band 120cm*132cm dish antenna Ku-120\nKU Band Gain 12.5GHz , 43dB\nMaterial ,steel board\n~ 1 x Universal KU Band Quad LNBF\nLocal at Accommodation of APF",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-002",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "2",
+      "site": "APF",
+      "description": "KU Band Satellite Dish",
+      "brand": "BWEI",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 188.0,
+      "extended": 188.0,
+      "detail": "~ 1 x KU band 120cm*132cm dish antenna Ku-120\nKU Band Gain 12.5GHz , 43dB\nMaterial ,steel board\n~ 1 x KU Band Dual LNB\nLocal at Catering Building of APF",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-003",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "3",
+      "site": "APF",
+      "description": "Karaoke",
+      "brand": "",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 919.0,
+      "extended": 919.0,
+      "detail": "- 1 x International version jukebox with touch screen , 3T storage , Desktop mounted , Hichang\n- 1 x Wireless microphone , include two microphones JBL VM200\nSupport AC230V/50Hz power\nLocal at Recreation Room of APF",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-004",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "4",
+      "site": "APF",
+      "description": "Surround Sound Bar with Subwoofer",
+      "brand": "Philips",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 676.0,
+      "extended": 676.0,
+      "detail": "- 1 x audio complement main unit , Desktop mounted , TAB8510\n- 1 x Subwoofer wireless , Desktop mounted\n- 1 x Auxiliary cables\nSupport AC230V/50Hz power\nLocal at Recreation Room of APF",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-005",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "5",
+      "site": "APF",
+      "description": "Blu-ray Disc Player",
+      "brand": "Panasonic",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 1000.0,
+      "extended": 1000.0,
+      "detail": "- 1 x Blu-ray Disc Player , Brazil-specific, compatible with local formats and standards.\nSupports DVD, CD, and Blu-ray discs for high-quality video and audio playback.",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-006",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "6",
+      "site": "APF",
+      "description": "SMART TV 55\"",
+      "brand": "TCL",
+      "quantity": 5,
+      "unit": "SET",
+      "unitCost": 575.0,
+      "extended": 2875.0,
+      "detail": "- 1x 55’’ smart TV with swivel TV mounting bracket 55T5M Plus\nSupport AC230V/50Hz power",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-007",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "7",
+      "site": "APF",
+      "description": "SMART TV 75\"",
+      "brand": "TCL",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 873.0,
+      "extended": 873.0,
+      "detail": "- 1x 75’’ smart TV with Fixed Wall Mounting Bracket 75V8M Pro\nSupport AC230V/50Hz power",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-008",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "8",
+      "site": "APF",
+      "description": "Projector",
+      "brand": "Panasonic",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 7314.0,
+      "extended": 7314.0,
+      "detail": "- 1 x Projection , with ceiling mounting bracket and accessories PT-MZ880\n- 1 x Screen , Electric remote control sceen for projector JK\nsize 180 inch , 16:9 or 16:10 , wall mounted\n- 1 x Hdmi cable 20m\nAccessories\nSound Audio Cable and Audio connector",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-009",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "9",
+      "site": "APF",
+      "description": "TV Receiver",
+      "brand": "Domestic",
+      "quantity": 6,
+      "unit": "SET",
+      "unitCost": 91.0,
+      "extended": 546.0,
+      "detail": "- 1 x RF DVB-S/S2 receiver supports , Power Supply AC230V/50Hz\n- 1 x Mounting kit for STBs on Wall\n- 1 x HDMI patch cord , 1m",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-010",
+      "section": "ENTERTAINMENT",
+      "page": 20,
+      "sn": "10",
+      "site": "APF",
+      "description": "1 - Port CAT6 RJ45 Telecommunication Outlet, for IPTV , Wall Mount",
+      "brand": "Putian",
+      "quantity": 6,
+      "unit": "SET",
+      "unitCost": 13.0,
+      "extended": 78.0,
+      "detail": "~ 1 x 1 Port Faceplate, white SPFA3-08/C1A\n~ 1 x Cat6A 180° FTP Shielded Keystone Jack, Tool less SPL5.566.2008\n~ 1 x Back Box\n- 1 x CAT6A patch cord ,1.5m",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-011",
+      "section": "ENTERTAINMENT",
+      "page": 21,
+      "sn": "11",
+      "site": "APF",
+      "description": "Coaxial Cable",
+      "brand": "",
+      "quantity": 600,
+      "unit": "m",
+      "unitCost": 9.0,
+      "extended": 5400.0,
+      "detail": "75 Ohm Coaxial Cable per metre , low smoke, halogen free RF 400-75",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "m",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-012",
+      "section": "ENTERTAINMENT",
+      "page": 21,
+      "sn": "12",
+      "site": "APF",
+      "description": "Coaxial Cable",
+      "brand": "",
+      "quantity": 600,
+      "unit": "m",
+      "unitCost": 3.0,
+      "extended": 1800.0,
+      "detail": "75 Ohm Coaxial Cable per metre , low smoke, halogen free RF6",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "m",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-ENTERTAINMENT-013",
+      "section": "ENTERTAINMENT",
+      "page": 21,
+      "sn": "13",
+      "site": "APF",
+      "description": "Lightning arrester",
+      "brand": "Domestic",
+      "quantity": 6,
+      "unit": "SET",
+      "unitCost": 12.0,
+      "extended": 72.0,
+      "detail": "- 1 x 0-3 GHz 90V Coaxial Lightning Protector\nInterface to:",
+      "systemTokens": [
+        "TEL-ES"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-PABX-001",
+      "section": "PABX",
+      "page": 22,
+      "sn": "4.0",
+      "site": "ABV01",
+      "description": "Indoor desktop IP phone",
+      "brand": "AVAYA",
+      "quantity": 1,
+      "unit": null,
+      "unitCost": 230.0,
+      "extended": 230.0,
+      "detail": "~ 1 x J139 IP PHONE J139\nLocation: ACO",
+      "systemTokens": [
+        "TEL-PABX"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PABX-002",
+      "section": "PABX",
+      "page": 22,
+      "sn": "4.0",
+      "site": "ACO",
+      "description": "Indoor desktop IP phone",
+      "brand": "AVAYA",
+      "quantity": 14,
+      "unit": null,
+      "unitCost": 230.0,
+      "extended": 3220.0,
+      "detail": "~ 1 x J139 IP PHONE J139\nLocation: APF",
+      "systemTokens": [
+        "TEL-PABX"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PABX-003",
+      "section": "PABX",
+      "page": 22,
+      "sn": "4.0",
+      "site": "APF",
+      "description": "Indoor desktop IP phone",
+      "brand": "AVAYA",
+      "quantity": 130,
+      "unit": null,
+      "unitCost": 230.0,
+      "extended": 29900.0,
+      "detail": "~ 1 x J139 IP PHONE J139",
+      "systemTokens": [
+        "TEL-PABX"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PABX-004",
+      "section": "PABX",
+      "page": 22,
+      "sn": "5.0",
+      "site": "APF",
+      "description": "Ex-Proof Telephone (IP Type) , IP66",
+      "brand": "J&R",
+      "quantity": 3,
+      "unit": "SET",
+      "unitCost": 3456.0,
+      "extended": 10368.0,
+      "detail": "~ 1 x EX-Proof Telephone, c/w wall mount bracket,IP66, Ex eb ib [ib Gb] mb IIC T6/T5 Gb JREX106-SIP\n~ 1 x Ex-Proof Headset with 15m cable, Ex ib IIB T4 Gb MRC MRN-2000IS\n~ 1 x Ex-proof Alarm Horn Sounder &Xenon Strobe Beacon, len locor \"yellow\", 230VAC, 50/60Hz WAROM BBJ81\n~ 1 x Exe junction box , SS316L, c/w Ex-P brass nickeled Gland, Ex eb IIC T6 WAROM BXJ-S\n~ 1 x Marine Acoustic Hood, Noise Attenuation up to 23 db, SS316 wall mounting bracket J&R JR-TH-01",
+      "systemTokens": [
+        "TEL-IPP"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": []
+    },
+    {
+      "id": "MGW-Q26-063-PABX-005",
+      "section": "PABX",
+      "page": 22,
+      "sn": "7.0",
+      "site": "APF",
+      "description": "PABX Server",
+      "brand": "AVAYA",
+      "quantity": 1,
+      "unit": null,
+      "unitCost": 34099.0,
+      "extended": 34099.0,
+      "detail": "~ 1 x Dell R250 4*3.5 E-2334G /16G/2*2T SATA Server\n~ 3 x IPO R12 SE LIC\n~ 2 x IP500 V2A CNTRL UNIT\n~ 2 x IPO 500 MC VCM 64 V2\n~ 2 x IPO 500 TRNK ANLG 4 UNI V2\n~ 1 x IPO 500 TRNK PRI UNI SINGLE\n~ 30 x IPO R10+ SIP TRNK 1 LIC\n~ 2 x IPO IP500 EXTN CARD PHONE 8\n~ 200 x IPO R12 AV IP ENDPT 1 LIC\n~ 1 x ASBCE R10 SFTW ONLY IPO ENABLE\n~ 30 x ASBCE R10 IPO LIC\nLocation: APM",
+      "systemTokens": [
+        "TEL-PABX"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-PABX-006",
+      "section": "PABX",
+      "page": 22,
+      "sn": "4.0",
+      "site": "APM",
+      "description": "Indoor desktop IP phone",
+      "brand": "AVAYA",
+      "quantity": 5,
+      "unit": null,
+      "unitCost": 196.0,
+      "extended": 980.0,
+      "detail": "~ 1 x J139 IP PHONE J139\nNote: All PoE switches used for PABX have been included in LAN system.",
+      "systemTokens": [
+        "TEL-PABX"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": null,
+      "issues": [
+        "UNIT_NOT_STATED: source quantity has no explicit unit; confirm before selecting a rate"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-001",
+      "section": "LAN",
+      "page": 23,
+      "sn": "5.0",
+      "site": "ABV01",
+      "description": "MPLS System Cabinet, IP54",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 4193.0,
+      "extended": 4193.0,
+      "detail": "~ 1 x 42U 19\" Floor Mounted Cabinet 800Wx1000Dx2100Hmm(including 100m H Base Plinth),RAL 7035\nLockable Single front metal doors, single metal rear doors, with thermostat activated ventilation fan\nLED lighting by door switch, MCB, termination blocks, cable trunking, earth bar, bottom cable entry, etc\n~ 4 x removable eyebolts with 4 blanking plugs\n~ 1 x Document holder: A4/A3 size at side door",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-002",
+      "section": "LAN",
+      "page": 23,
+      "sn": "",
+      "site": "ABV01",
+      "description": "24 Ports Fiber Patch Panel",
+      "brand": "Putian",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 288.0,
+      "extended": 576.0,
+      "detail": "~ 1 x 1U Fiber Optic Patch Panel,unloaded, Black WL-OFSM-24(LC)\n~ 1 x Adapter Pack with 12 LC duplex SM adapters, blue\n~ 1 x Fusion Splice Wallet Kit with splice trays\n~ 24 x LC Fiber Pigtail 9/125μm, OS2, LSZH, SM, Blue Connector, 1m Putian WLSMUPC1LC-1M\nPutian WLSMUPC-2(LC-LC)-\n~ 1 Lot x LC-LC Duplex Fiber Optic Patch Cord 9/125μm, OS2, LSZH&OFNR,SM, Yellow Jacket Color, 2m\n2M",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-003",
+      "section": "LAN",
+      "page": 23,
+      "sn": "",
+      "site": "ABV01",
+      "description": "MPLS L3 Switch",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 23660.0,
+      "extended": 47320.0,
+      "detail": "~ 1 x Catalyst 9300 24-port 10G/mGig with modular uplink, UPOE, Network Advantage C9300-24UX-A\nSwitching capacity:640Gbps, Forwarding rate:476.19 Mpps\n~ 1 x BAS 8X5XNBD Catalyst 9300 24-port mGig and UPOE, Network Adv CON-SNT-C93024XU\n~ 1 x Catalyst 9300 Series 8x 10G/1G Network Module C9300-NM-8X\n~ 1 x C9300 Cisco DNA Advantage, 24-port, 3 Year Term license C9300-DNA-A-24-3Y\n~ 2 x PWR-C1-1100WAC-P PWR-C5-600WAC\n~ 2 x 10GBASE-LR SFP Module SFP-10G-LR",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-004",
+      "section": "LAN",
+      "page": 23,
+      "sn": "",
+      "site": "ABV01",
+      "description": "24 Ports CAT6A Patch Panel",
+      "brand": "Putian",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 243.0,
+      "extended": 243.0,
+      "detail": "~ Discrete distribution module Panel, SL, STP, 1U, 24 port SPFA3-08/C8B\n~ 24 x Cat6A 180° FTP Shielded Keystone Jack, Tool less SPL5.566.2008\n~ 1 Lot x CAT6A patch cord, 0.5m\nLocation: ACO",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-005",
+      "section": "LAN",
+      "page": 23,
+      "sn": "5.0",
+      "site": "ACO",
+      "description": "LAN Cabinet, IP54",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 4193.0,
+      "extended": 4193.0,
+      "detail": "~ 1 x 42U 19\" Floor Mounted Cabinet 800Wx1000Dx2100Hmm(including 100m H Base Plinth),RAL 7035\nLockable Single front metal doors, single metal rear doors, with thermostat activated ventilation fan\nLED lighting by door switch, MCB, termination blocks, cable trunking, earth bar, bottom cable entry, etc\n~ 4 x removable eyebolts with 4 blanking plugs\n~ 1 x Document holder: A4/A3 size at side door\nNote: This LAN Cabinet shall be installed in Office/Guard House Building",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-006",
+      "section": "LAN",
+      "page": 23,
+      "sn": "",
+      "site": "ACO",
+      "description": "24 Ports Fiber Patch Panel",
+      "brand": "Putian",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 288.0,
+      "extended": 576.0,
+      "detail": "~ 1 x 1U Fiber Optic Patch Panel,unloaded, Black WL-OFSM-24(LC)\n~ 1 x Adapter Pack with 12 LC duplex SM adapters, blue\n~ 1 x Fusion Splice Wallet Kit with splice trays\n~ 24 x LC Fiber Pigtail 9/125μm, OS2, LSZH, SM, Blue Connector, 1m Putian WLSMUPC1LC-1M\nPutian WLSMUPC-2(LC-LC)-\n~ 1 Lot x LC-LC Duplex Fiber Optic Patch Cord 9/125μm, OS2, LSZH&OFNR,SM, Yellow Jacket Color, 2m\n2M",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-007",
+      "section": "LAN",
+      "page": 23,
+      "sn": "",
+      "site": "ACO",
+      "description": "Firewall",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 81888.0,
+      "extended": 163776.0,
+      "detail": "~1 x Cisco Secure Firewall 3110 NGFW Appliance, 1U FPR3110-NGFW-K9\n~1 x SNTC-8X5XNBD Cisco Secure Firewall 3110 NGFW Applianc\n~1 x Cisco Secure Firewall 3100 8X1G Copper FTW Netmod, RJ45\n~1 x SNTC-8X5XNBD Cisco Secure Firewall 3100 8X1G Copper F\n~ 1x Cisco Secure Firewall 3110 Adv Malware Protection 3Y Subs",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-008",
+      "section": "LAN",
+      "page": 24,
+      "sn": "",
+      "site": "ACO",
+      "description": "Distribution Switch L3",
+      "brand": "Cisco",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 14304.0,
+      "extended": 14304.0,
+      "detail": "~ 1 x Catalyst 9300 24-port 1G copper with fixed 4x10G/1G SFP+ uplinks, PoE+ Network Advantage C9300L-24P-4X-A\nSwitching capacity:128Gbps, Forwarding rate95.23 Mpps\n~ 1 x BAS 8X5XNBD Catalyst 9300L 24p PoE, Network Advantage ,4x10G CON-SNT-C93024PX\n~ 1 x C9300L Cisco DNA Advantage, 24-port, 3 Year Term license C9300L-DNA-A-24-3Y\n~ 1 x 715WAC power supply spare PWR-C1-715WAC-P\n~ 2 x 10G SFP+ Module SFP-10G-LR",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-009",
+      "section": "LAN",
+      "page": 24,
+      "sn": "",
+      "site": "ACO",
+      "description": "Access Switch L3",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 9578.0,
+      "extended": 19156.0,
+      "detail": "~ 1 × Catalyst 9200L 24-port PoE+ 4x10G uplink Switch, Network Advantage C9200L-24P-4X-A\nSwitching capacity:128Gbps, Forwarding rate95.23 Mpps\n~ 1 x BAS 8X5XNBD Catalyst 9200L 24-port PoE+, 4 x 10G, Network Ad CON-SNT-C920L24P\n~1 x C9200L Cisco DNA Advantage, 24-port, 3 Year Term license C9200L-DNA-A-24-3Y\n~ 1 x 600W AC Config 5 Power Supply PWR-C5-600WAC\n~ 2 x 10G SFP+ Module SFP-10G-LR",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-010",
+      "section": "LAN",
+      "page": 24,
+      "sn": "",
+      "site": "ACO",
+      "description": "24 Ports CAT6A Patch Panel",
+      "brand": "Putian",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 243.0,
+      "extended": 486.0,
+      "detail": "~ Discrete distribution module Panel, SL, STP, 1U, 24 port SPFA3-08/C8B\n~ 24 x Cat6A 180° FTP Shielded Keystone Jack, Tool less SPL5.566.2008\n~ 1 Lot x CAT6A patch cord, 0.5m",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-011",
+      "section": "LAN",
+      "page": 24,
+      "sn": "6.0",
+      "site": "ACO",
+      "description": "LAN Cabinet, IP54",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 4193.0,
+      "extended": 4193.0,
+      "detail": "~ 1 x 42U 19\" Floor Mounted Cabinet 800Wx1000Dx2100Hmm(including 100m H Base Plinth),RAL 7035\nLockable Single front metal doors, single metal rear doors, with thermostat activated ventilation fan\nLED lighting by door switch, MCB, termination blocks, cable trunking, earth bar, bottom cable entry, etc\n~ 4 x removable eyebolts with 4 blanking plugs\n~ 1 x Document holder: A4/A3 size at side door\nNote: This LAN Cabinet shall be installed in Truck Loading Building",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-012",
+      "section": "LAN",
+      "page": 24,
+      "sn": "",
+      "site": "ACO",
+      "description": "24 Ports Fiber Patch Panel",
+      "brand": "Putian",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 288.0,
+      "extended": 576.0,
+      "detail": "~ 1 x 1U Fiber Optic Patch Panel,unloaded, Black WL-OFSM-24(LC)\n~ 1 x Adapter Pack with 12 LC duplex SM adapters, blue\n~ 1 x Fusion Splice Wallet Kit with splice trays\n~ 24 x LC Fiber Pigtail 9/125μm, OS2, LSZH, SM, Blue Connector, 1m Putian WLSMUPC1LC-1M\nPutian WLSMUPC-2(LC-LC)-\n~ 1 Lot x LC-LC Duplex Fiber Optic Patch Cord 9/125μm, OS2, LSZH&OFNR,SM, Yellow Jacket Color, 2m\n2M",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-013",
+      "section": "LAN",
+      "page": 24,
+      "sn": "",
+      "site": "ACO",
+      "description": "Access Switch L3",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 9578.0,
+      "extended": 19156.0,
+      "detail": "~ 1 × Catalyst 9200L 24-port PoE+ 4x10G uplink Switch, Network Advantage C9200L-24P-4X-A\nSwitching capacity:128Gbps, Forwarding rate95.23 Mpps\n~ 1 x BAS 8X5XNBD Catalyst 9200L 24-port PoE+, 4 x 10G, Network Ad CON-SNT-C920L24P\n~1 x C9200L Cisco DNA Advantage, 24-port, 3 Year Term license C9200L-DNA-A-24-3Y\n~ 1 x 600W AC Config 5 Power Supply PWR-C5-600WAC\n~ 2 x 10G SFP+ Module SFP-10G-LR",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-014",
+      "section": "LAN",
+      "page": 24,
+      "sn": "",
+      "site": "ACO",
+      "description": "24 Ports CAT6A Patch Panel",
+      "brand": "Putian",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 243.0,
+      "extended": 486.0,
+      "detail": "~ Discrete distribution module Panel, SL, STP, 1U, 24 port SPFA3-08/C8B\n~ 24 x Cat6A 180° FTP Shielded Keystone Jack, Tool less SPL5.566.2008\n~ 1 Lot x CAT6A patch cord, 0.5m",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-015",
+      "section": "LAN",
+      "page": 24,
+      "sn": "8.0",
+      "site": "ACO",
+      "description": "Indoor Access Point, IP20, Ceiling Mount",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 368.0,
+      "extended": 736.0,
+      "detail": "~ 1 x Cisco Catalyst 9105 Series AP C9105AXI-H\nLocation: APF",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-016",
+      "section": "LAN",
+      "page": 24,
+      "sn": "6.0",
+      "site": "APF",
+      "description": "Indoor Access Point, IP20, Ceiling Mount",
+      "brand": "Cisco",
+      "quantity": 24,
+      "unit": "SET",
+      "unitCost": 368.0,
+      "extended": 8832.0,
+      "detail": "~ 1 x Cisco Catalyst 9105 Series AP C9105AXI-H",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-017",
+      "section": "LAN",
+      "page": 24,
+      "sn": "7.0",
+      "site": "APF",
+      "description": "LAN Cabinet, IP54",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 4193.0,
+      "extended": 4193.0,
+      "detail": "~ 1 x 42U 19\" Floor Mounted Cabinet 800Wx1000Dx2100Hmm(including 100m H Base Plinth),RAL 7035\nNote: This LAN Cabinet shall be installed in Instrument & Telecom Room",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-018",
+      "section": "LAN",
+      "page": 25,
+      "sn": "",
+      "site": "APF",
+      "description": "24 Ports Fiber Patch Panel",
+      "brand": "Putian",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 288.0,
+      "extended": 576.0,
+      "detail": "~ 1 x 1U Fiber Optic Patch Panel,unloaded, Black WL-OFSM-24(LC)\n~ 1 x Adapter Pack with 12 LC duplex SM adapters, blue\n~ 1 x Fusion Splice Wallet Kit with splice trays\n~ 24 x LC Fiber Pigtail 9/125μm, OS2, LSZH, SM, Blue Connector, 1m Putian WLSMUPC1LC-1M\nPutian WLSMUPC-2(LC-LC)-\n~ 1 Lot x LC-LC Duplex Fiber Optic Patch Cord 9/125μm, OS2, LSZH&OFNR,SM, Yellow Jacket Color, 2m\n2M",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-019",
+      "section": "LAN",
+      "page": 25,
+      "sn": "",
+      "site": "APF",
+      "description": "Firewall",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 81888.0,
+      "extended": 163776.0,
+      "detail": "~1 x Cisco Secure Firewall 3110 NGFW Appliance, 1U FPR3110-NGFW-K9\n~1 x SNTC-8X5XNBD Cisco Secure Firewall 3110 NGFW Applianc\n~1 x Cisco Secure Firewall 3100 8X1G Copper FTW Netmod, RJ45\n~1 x SNTC-8X5XNBD Cisco Secure Firewall 3100 8X1G Copper F\n~ 1x Cisco Secure Firewall 3110 Adv Malware Protection 3Y Subs",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-020",
+      "section": "LAN",
+      "page": 25,
+      "sn": "",
+      "site": "APF",
+      "description": "Core Switch L3",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 135202.0,
+      "extended": 270404.0,
+      "detail": "~ 1 x Cisco Catalyst 9400 Series 4 slot chassis C9404R\n~ 1 x BAS 8X5XNBD Cisco Catalyst 9400 Series 4 slot chassis CON-SNT-C9404R\n~ 1 x Cisco Catalyst 9400 Series Supervisor 2 Module C9400X-SUP-2\n~ 1 x Cisco Catalyst 9400 Series 48-Port 10/100/1000 (RJ-45) C9400-LC-48T (=)\n~ 1 x Cisco Catalyst 9400 Series 48-Port 10G (SFP+) C9400-LC-48XS (=)\n~ 2 x Cisco Catalyst 9400 Series 2100W AC Power Supply C9400-PWR-2100AC (=)\n~ 1 x Cisco Catalyst 9400 Cisco DNA Advantage 3 Year License C9400-DNA-A-3Y\n~ 48 x 10G SFP+ Module SFP-10G-LR\nNote: two two cores switches will be connected via StackWise Virtual technology, redundancy design.",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-021",
+      "section": "LAN",
+      "page": 25,
+      "sn": "",
+      "site": "APF",
+      "description": "Distribution Switch L3",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 14304.0,
+      "extended": 28608.0,
+      "detail": "~ 1 x Catalyst 9300 24-port 1G copper with fixed 4x10G/1G SFP+ uplinks, PoE+ Network Advantage C9300L-24P-4X-A\nSwitching capacity:128Gbps, Forwarding rate95.23 Mpps\n~ 1 x BAS 8X5XNBD Catalyst 9300L 24p PoE, Network Advantage ,4x10G CON-SNT-C93024PX\n~ 1 x C9300L Cisco DNA Advantage, 24-port, 3 Year Term license C9300L-DNA-A-24-3Y\n~ 1 x 715WAC power supply spare PWR-C1-715WAC-P\n~ 2 x 10G SFP+ Module SFP-10G-LR",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-022",
+      "section": "LAN",
+      "page": 25,
+      "sn": "",
+      "site": "APF",
+      "description": "Access Switch L3",
+      "brand": "Cisco",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 9578.0,
+      "extended": 9578.0,
+      "detail": "~ 1 × Catalyst 9200L 24-port PoE+ 4x10G uplink Switch, Network Advantage C9200L-24P-4X-A\nSwitching capacity:128Gbps, Forwarding rate95.23 Mpps\n~ 1 x BAS 8X5XNBD Catalyst 9200L 24-port PoE+, 4 x 10G, Network Ad CON-SNT-C920L24P\n~1 x C9200L Cisco DNA Advantage, 24-port, 3 Year Term license C9200L-DNA-A-24-3Y\n~ 1 x 600W AC Config 5 Power Supply PWR-C5-600WAC\n~ 2 x 10G SFP+ Module SFP-10G-LR",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-023",
+      "section": "LAN",
+      "page": 25,
+      "sn": "",
+      "site": "APF",
+      "description": "24 Ports CAT6A Patch Panel",
+      "brand": "Putian",
+      "quantity": 3,
+      "unit": "SET",
+      "unitCost": 243.0,
+      "extended": 729.0,
+      "detail": "~ Discrete distribution module Panel, SL, STP, 1U, 24 port SPFA3-08/C8B\n~ 24 x Cat6A 180° FTP Shielded Keystone Jack, Tool less SPL5.566.2008\n~ 1 Lot x CAT6A patch cord, 0.5m",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-024",
+      "section": "LAN",
+      "page": 25,
+      "sn": "",
+      "site": "APF",
+      "description": "Wireless Controller",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 15858.0,
+      "extended": 31716.0,
+      "detail": "~ 1 x Catalyst 9800-L wireless controller, c/w 50 AP license 9800-L-C-K9\n~ 1 x BAS 8X5XNBD Cisco Catalyst 9800-L Wireless Controller_Copper",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-025",
+      "section": "LAN",
+      "page": 25,
+      "sn": "8.0",
+      "site": "APF",
+      "description": "LAN Cabinet, IP54",
+      "brand": "MGW",
+      "quantity": 9,
+      "unit": "Lot",
+      "unitCost": 4193.0,
+      "extended": 37737.0,
+      "detail": "~ 1 x Document holder: A4/A3 size at side door\nNote: This LAN Cabinet shall be installed in Caterinr Building, Warehouse & Workshop Building, Accommaodation\nBuilding, Truck Loading Building, Office Building, Store Building, Sub Station Building, Security Building and\nFire/Safety Building-",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": [
+        "CABINET_MULTIPLICITY_OPEN: cabinet quantity is 9 while following accessory quantities are separately printed; do not multiply accessories by 9 without clarification",
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-026",
+      "section": "LAN",
+      "page": 26,
+      "sn": "",
+      "site": "APF",
+      "description": "24 Ports Fiber Patch Panel",
+      "brand": "Putian",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 381.0,
+      "extended": 381.0,
+      "detail": "~ 1 x 1U Fiber Optic Patch Panel,unloaded, Black WL-OFSM-24(LC)\n~ 1 x Adapter Pack with 12 LC duplex SM adapters, blue\n~ 1 x Fusion Splice Wallet Kit with splice trays\n~ 24 x LC Fiber Pigtail 9/125μm, OS2, LSZH, SM, Blue Connector, 1m Putian WLSMUPC1LC-1M\nPutian WLSMUPC-2(LC-LC)-\n~ 1 Lot x LC-LC Duplex Fiber Optic Patch Cord 9/125μm, OS2, LSZH&OFNR,SM, Yellow Jacket Color, 2m\n2M",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "CABINET_MULTIPLICITY_OPEN: cabinet quantity is 9 while following accessory quantities are separately printed; do not multiply accessories by 9 without clarification",
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-027",
+      "section": "LAN",
+      "page": 26,
+      "sn": "",
+      "site": "APF",
+      "description": "Access Switch L3",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 9578.0,
+      "extended": 19156.0,
+      "detail": "~ 1 × Catalyst 9200L 24-port PoE+ 4x10G uplink Switch, Network Advantage C9200L-24P-4X-A\nSwitching capacity:128Gbps, Forwarding rate95.23 Mpps\n~ 1 x BAS 8X5XNBD Catalyst 9200L 24-port PoE+, 4 x 10G, Network Ad CON-SNT-C920L24P\n~1 x C9200L Cisco DNA Advantage, 24-port, 3 Year Term license C9200L-DNA-A-24-3Y\n~ 1 x 600W AC Config 5 Power Supply PWR-C5-600WAC\n~ 2 x 10G SFP+ Module SFP-10G-LR",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "CABINET_MULTIPLICITY_OPEN: cabinet quantity is 9 while following accessory quantities are separately printed; do not multiply accessories by 9 without clarification",
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-028",
+      "section": "LAN",
+      "page": 26,
+      "sn": "",
+      "site": "APF",
+      "description": "24 Ports CAT6A Patch Panel",
+      "brand": "Putian",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 243.0,
+      "extended": 486.0,
+      "detail": "~ Discrete distribution module Panel, SL, STP, 1U, 24 port SPFA3-08/C8B\n~ 24 x Cat6A 180° FTP Shielded Keystone Jack, Tool less SPL5.566.2008\n~ 1 Lot x CAT6A patch cord, 0.5m\nLocation: APM",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "CABINET_MULTIPLICITY_OPEN: cabinet quantity is 9 while following accessory quantities are separately printed; do not multiply accessories by 9 without clarification",
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-029",
+      "section": "LAN",
+      "page": 26,
+      "sn": "5.0",
+      "site": "APM",
+      "description": "LAN Cabinet, IP54",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "unitCost": 4193.0,
+      "extended": 4193.0,
+      "detail": "~ 1 x 42U 19\" Floor Mounted Cabinet 800Wx1000Dx2100Hmm(including 100m H Base Plinth),RAL 7035\nLockable Single front metal doors, single metal rear doors, with thermostat activated ventilation fan\nLED lighting by door switch, MCB, termination blocks, cable trunking, earth bar, bottom cable entry, etc\n~ 4 x removable eyebolts with 4 blanking plugs\n~ 1 x Document holder: A4/A3 size at side door\nNote: This LAN Cabinet shall be installed in Office/Guard House",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "Lot",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-030",
+      "section": "LAN",
+      "page": 26,
+      "sn": "",
+      "site": "APM",
+      "description": "24 Ports Fiber Patch Panel",
+      "brand": "Putian",
+      "quantity": 1,
+      "unit": "SET",
+      "unitCost": 381.0,
+      "extended": 381.0,
+      "detail": "~ 1 x 1U Fiber Optic Patch Panel,unloaded, Black WL-OFSM-24(LC)\n~ 1 x Adapter Pack with 12 LC duplex SM adapters, blue\n~ 1 x Fusion Splice Wallet Kit with splice trays\n~ 24 x LC Fiber Pigtail 9/125μm, OS2, LSZH, SM, Blue Connector, 1m Putian WLSMUPC1LC-1M\nPutian WLSMUPC-2(LC-LC)-\n~ 1 Lot x LC-LC Duplex Fiber Optic Patch Cord 9/125μm, OS2, LSZH&OFNR,SM, Yellow Jacket Color, 2m\n2M",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-031",
+      "section": "LAN",
+      "page": 26,
+      "sn": "",
+      "site": "APM",
+      "description": "Access Switch L3",
+      "brand": "Cisco",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 9578.0,
+      "extended": 19156.0,
+      "detail": "~ 1 × Catalyst 9200L 24-port PoE+ 4x10G uplink Switch, Network Advantage C9200L-24P-4X-A\nSwitching capacity:128Gbps, Forwarding rate95.23 Mpps\n~ 1 x BAS 8X5XNBD Catalyst 9200L 24-port PoE+, 4 x 10G, Network Ad CON-SNT-C920L24P\n~1 x C9200L Cisco DNA Advantage, 24-port, 3 Year Term license C9200L-DNA-A-24-3Y\n~ 1 x 600W AC Config 5 Power Supply PWR-C5-600WAC\n~ 2 x 10G SFP+ Module SFP-10G-LR",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-LAN-032",
+      "section": "LAN",
+      "page": 26,
+      "sn": "",
+      "site": "APM",
+      "description": "24 Ports CAT6A Patch Panel",
+      "brand": "Putian",
+      "quantity": 2,
+      "unit": "SET",
+      "unitCost": 944.0,
+      "extended": 1888.0,
+      "detail": "~ Discrete distribution module Panel, SL, STP, 1U, 24 port SPFA3-08/C8B\n~ 24 x Cat6A 180° FTP Shielded Keystone Jack, Tool less SPL5.566.2008\n~ 1 Lot x CAT6A patch cord, 0.5m",
+      "systemTokens": [
+        "TEL-LAN"
+      ],
+      "wbs": "A",
+      "kind": "DETAIL",
+      "sourceUnit": "SET",
+      "issues": [
+        "TOTAL_CONFLICT: cover USD 891,222.00; detailed lines USD 881,760.00; supplier clarification required"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-MET-COVER",
+      "section": "MET",
+      "page": 1,
+      "sn": "8",
+      "site": "Project-wide",
+      "description": "Meteorology — cover-only package",
+      "brand": "VAISALA",
+      "quantity": 1,
+      "unit": "Lot",
+      "sourceUnit": null,
+      "unitCost": 34316,
+      "extended": 34316,
+      "systemTokens": [
+        "TEL-MET"
+      ],
+      "wbs": "A",
+      "kind": "COVER_ONLY",
+      "detail": "Only the cover amount is provided in this 26-page source. Quantity 1 Lot is a package representation of that amount, not an extracted detailed BOM.",
+      "issues": [
+        "COVER_ONLY: detailed quantities and inclusions not supplied in this PDF"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-NDB-COVER",
+      "section": "NDB",
+      "page": 1,
+      "sn": "9",
+      "site": "Project-wide",
+      "description": "NDB — cover-only package",
+      "brand": "Nautel",
+      "quantity": 1,
+      "unit": "Lot",
+      "sourceUnit": null,
+      "unitCost": 90060,
+      "extended": 90060,
+      "systemTokens": [
+        "TEL-NDB"
+      ],
+      "wbs": "A",
+      "kind": "COVER_ONLY",
+      "detail": "Only the cover amount is provided in this 26-page source. Quantity 1 Lot is a package representation of that amount, not an extracted detailed BOM.",
+      "issues": [
+        "COVER_ONLY: detailed quantities and inclusions not supplied in this PDF"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-SERVICES-001",
+      "section": "SERVICES",
+      "page": 1,
+      "sn": "1",
+      "site": "Project-wide",
+      "description": "Design Engineering and Project Management",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "sourceUnit": null,
+      "unitCost": 120000,
+      "extended": 120000,
+      "systemTokens": [
+        "COMMON"
+      ],
+      "wbs": "B1",
+      "kind": "COVER_ONLY",
+      "detail": "Cover other-charge amount represented as 1 Lot. Check OEM package inclusions, customer mapping and overlap with existing B/C tasks; no invented unit-rate breakdown.",
+      "issues": [
+        "SERVICE_BOUNDARY_OPEN: scope and price ownership need review"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-SERVICES-002",
+      "section": "SERVICES",
+      "page": 1,
+      "sn": "2",
+      "site": "Project-wide",
+      "description": "Drawings and Documentation",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "sourceUnit": null,
+      "unitCost": 50000,
+      "extended": 50000,
+      "systemTokens": [
+        "COMMON"
+      ],
+      "wbs": "B1",
+      "kind": "COVER_ONLY",
+      "detail": "Cover other-charge amount represented as 1 Lot. Check OEM package inclusions, customer mapping and overlap with existing B/C tasks; no invented unit-rate breakdown.",
+      "issues": [
+        "SERVICE_BOUNDARY_OPEN: scope and price ownership need review"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-SERVICES-003",
+      "section": "SERVICES",
+      "page": 1,
+      "sn": "3",
+      "site": "Project-wide",
+      "description": "Integration, Assembly, Inspection & FAT",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "sourceUnit": null,
+      "unitCost": 80000,
+      "extended": 80000,
+      "systemTokens": [
+        "COMMON"
+      ],
+      "wbs": "B4",
+      "kind": "COVER_ONLY",
+      "detail": "Cover other-charge amount represented as 1 Lot. Check OEM package inclusions, customer mapping and overlap with existing B/C tasks; no invented unit-rate breakdown.",
+      "issues": [
+        "SERVICE_BOUNDARY_OPEN: scope and price ownership need review"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-SERVICES-004",
+      "section": "SERVICES",
+      "page": 1,
+      "sn": "4",
+      "site": "Project-wide",
+      "description": "Packing, Marking and Delivery",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "sourceUnit": null,
+      "unitCost": 5000,
+      "extended": 5000,
+      "systemTokens": [
+        "COMMON"
+      ],
+      "wbs": "B2",
+      "kind": "COVER_ONLY",
+      "detail": "Cover other-charge amount represented as 1 Lot. Check OEM package inclusions, customer mapping and overlap with existing B/C tasks; no invented unit-rate breakdown.",
+      "issues": [
+        "SERVICE_BOUNDARY_OPEN: scope and price ownership need review"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-SERVICES-005",
+      "section": "SERVICES",
+      "page": 1,
+      "sn": "5",
+      "site": "Project-wide",
+      "description": "Equipment Tagging",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "sourceUnit": null,
+      "unitCost": 500,
+      "extended": 500,
+      "systemTokens": [
+        "COMMON"
+      ],
+      "wbs": "B1",
+      "kind": "COVER_ONLY",
+      "detail": "Cover other-charge amount represented as 1 Lot. Check OEM package inclusions, customer mapping and overlap with existing B/C tasks; no invented unit-rate breakdown.",
+      "issues": [
+        "SERVICE_BOUNDARY_OPEN: scope and price ownership need review"
+      ]
+    },
+    {
+      "id": "MGW-Q26-063-SERVICES-006",
+      "section": "SERVICES",
+      "page": 1,
+      "sn": "6",
+      "site": "Project-wide",
+      "description": "On-site service",
+      "brand": "MGW",
+      "quantity": 1,
+      "unit": "Lot",
+      "sourceUnit": null,
+      "unitCost": null,
+      "extended": null,
+      "systemTokens": [
+        "COMMON"
+      ],
+      "wbs": "B4",
+      "kind": "COVER_ONLY",
+      "detail": "Cover other-charge amount represented as 1 Lot. Check OEM package inclusions, customer mapping and overlap with existing B/C tasks; no invented unit-rate breakdown.",
+      "issues": [
+        "SERVICE_BOUNDARY_OPEN: scope and price ownership need review",
+        "TBD: no source price"
+      ]
+    }
+  ]
+}
