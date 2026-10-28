@@ -17,11 +17,14 @@ assert(page.includes('getProject0553Dataset()'),"0553 UI must consume project re
 assert(page.includes('ProjectTabs')&&page.includes('STANDARD_PROJECT_TABS'),"0553 UI must reuse standard tabs");
 assert(page.includes('common/cost/derivationKernel'),"0553 UI must use shared cost kernel");
 assert(!page.includes('from "../project0550/data"'),"0553 UI imports particular 0550 data");
-assert(app.includes('path="/projects/pj2608-0550"')&&app.includes('path="/projects/pj2608-0553"'),"Project routes not isolated");
+const projectRegistry=read("projectRegistry.js");
+assert(projectRegistry.includes('route: "/projects/pj2608-0550"')&&projectRegistry.includes('route: "/projects/pj2608-0553"')&&app.includes('path={project.route}'),"Project registry routes not isolated");
 assert(p0550.includes('from "../project0550/data"'),"0550 regression guard: original facade not found");
 const engineering=read("common/ui/EngineeringView.jsx");
 const binding=read("project0553/engineeringViewModel.js");
-assert(p0550.includes("SharedEngineeringView") && page.includes("SharedEngineeringView"),"First Principles must use the same shared component for 0550 and 0553");
+// 0550's approved 26-Oct bidding branch has its own executable equation workbench.
+// Keep 0553 on the established shared engineering view and 0550 on its own data.
+assert(p0550.includes('from "../project0550/EquationWorkbench"') && p0550.includes("<EquationWorkbench/>") && page.includes("SharedEngineeringView"),"Integrated 0550 equation workbench / 0553 shared engineering view missing");
 assert(!/PROJECT_0550|REQUIREMENT_COMPLETENESS|PJ2608-0550 contains/.test(engineering),"Shared First Principles has 0550 particular dependencies");
 assert(!/project0550\/data|TEL-LAN|RC-0550-001/.test(binding),"0553 First Principles binding inherited 0550 particular facts");
 assert(binding.includes("BID_0553_GATES")&&binding.includes("TECHNICAL_HOLDS"),"0553 requirement control must be evidence-bound");

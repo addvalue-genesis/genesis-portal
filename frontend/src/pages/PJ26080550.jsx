@@ -1,9 +1,4 @@
-import { SERVICE_EQUATIONS as COMMON_SERVICE_EQUATIONS } from "../common/cost/serviceEquations";
-import { EngineeringView as SharedEngineeringView } from "../common/ui/EngineeringView";
-import { ArchitectureView as SharedArchitectureView } from "../common/ui/ArchitectureView";
-import { SystemsView as SharedSystemsView } from "../common/ui/SystemsView";
-import { ProjectWorkspaceShell } from "../common/ui/ProjectWorkspaceShell";
-import React, { useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import {
   ARCHITECTURE_MANIFEST,
   BUDGETARY_ESTIMATE,
@@ -23,27 +18,32 @@ import {
   OPTIONS,
   PROJECT_0550,
   PROJECT_0550_FACTS,
+  PROJECT_0550_PRESENTATION,
   REQUIREMENT_COMPLETENESS,
   RISK_SCENARIOS,
   SERVICE_EQUATION_SOURCE,
   SERVICE_LINE_DERIVATION,
-  SOURCE_REGISTER,
   SYSTEM_GROUPS,
   SYSTEMS,
 } from "../project0550/data";
 import { exportOriginalPriceFormXlsx } from "../project0550/exportOriginalPriceForm";
+import { CoverageMatrix } from "../project0550/CoverageMatrix";
+import { PagaEvidenceReview } from "../project0550/PagaEvidenceReview";
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {BidWorkspaceProvider,useBidWorkspace} from "../project0550/BidWorkspaceContext";
+import {BidCommercialWorkspace} from "../project0550/BidCommercialWorkspace";
+import {EquationWorkbench} from "../project0550/EquationWorkbench";
+import {VendorWorkspace} from "../project0550/VendorWorkspace";
+import {SchematicWorkspace} from "../project0550/SchematicWorkspace";
+import {BidDataControls,BidSaveStatus} from "../project0550/BidDataControls";
+import {BID_TABS} from "../project0550/biddingNavigation";
+import {ControlledSourceInventory, SourceCommunications, SourceFindings} from "../project0550/ControlledSourceInventory";
+import {SECTION_IDENTITY} from "../project0550/sectionIdentity";
 import "../project0550/project0550.css";
 
-const TABS = [
-  { id: "overview", label: "Executive" },
-  { id: "architecture", label: "Architecture" },
-  { id: "systems", label: "19 Systems" },
-  { id: "engineering", label: "First Principles" },
-  { id: "execution", label: "Execution" },
-  { id: "budget", label: "Budget" },
-  { id: "risk", label: "Risk & Controls" },
-  { id: "documents", label: "Evidence" },
-];
+const TABS = BID_TABS;
+const LegacyIdentityContext = createContext(false);
+
 
 function money(value, currency) {
   if (value === null || value === undefined) return "—";
@@ -96,11 +96,14 @@ function Badge({ children, tone }) {
 }
 
 function SectionTitle({ eyebrow, title, text, action }) {
+  const legacy = useContext(LegacyIdentityContext);
+  const identity = SECTION_IDENTITY.find(s => s.title === title);
   return (
-    <div className="p55-section-title">
+    <div className="p55-section-title" data-component-key={!legacy ? identity?.id : undefined}>
       <div>
         {eyebrow ? <div className="p55-eyebrow">{eyebrow}</div> : null}
         <h2>{title}</h2>
+        {!legacy && identity && <ComponentCopyId projectId="PJ2608-0550" componentKey={identity.id}/>}
         {text ? <p>{text}</p> : null}
       </div>
       {action ? <div>{action}</div> : null}
@@ -125,7 +128,7 @@ function B1CostLineageTable() {
 
   return (
     <div className="p55-derivation-block">
-      <div className="p55-eyebrow" style={{ marginBottom: 8 }}>B1 — 24M control total reconciliation</div>
+      <div className="p55-eyebrow" style={{ marginBottom: 8 }}>B1 — {compactMoney(lineage.currentAllowanceThb, "THB")} control total reconciliation</div>
 
       <div className="p55-table-wrap">
         <table className="p55-table p55-table--compact p55-table--derivation">
@@ -133,7 +136,7 @@ function B1CostLineageTable() {
             <tr>
               <th>Layer</th>
               <th className="is-number">MH</th>
-              <th className="is-number">Equivalent person-days @ 8h</th>
+              <th className="is-number">Equivalent person-days @ {PROJECT_0550_PRESENTATION.b1EquivalentHoursPerDay}h</th>
               <th className="is-number">THB</th>
               <th>Evidence state</th>
             </tr>
@@ -230,7 +233,7 @@ function B1CostLineageTable() {
                 <th>System / Token</th>
                 <th className="is-number">Underlying rows</th>
                 <th className="is-number">MH</th>
-                <th className="is-number">Eq. person-days @ 8h</th>
+                <th className="is-number">Eq. person-days @ {PROJECT_0550_PRESENTATION.b1EquivalentHoursPerDay}h</th>
                 <th className="is-number">Model base THB</th>
                 <th className="is-number">Internal cost THB</th>
                 <th>People / crew interpretation</th>
@@ -373,18 +376,18 @@ function Overview() {
         />
         <MetricCard
           label="Budgetary base"
-          value={compactMoney(submission?.baseBeforeOptionsUsd || 0, "USD")}
+          value={compactMoney(submission?.baseBeforeOptionsUsd, "USD")}
           sub="Part A + customer B1-B6 · issued 08-Oct-2026"
           tone="good"
         />
         <MetricCard
           label="C2 + C3 options"
-          value={compactMoney(submission?.optionsC2C3Usd || 0, "USD")}
+          value={compactMoney(submission?.optionsC2C3Usd, "USD")}
           sub="C1 physical installation excluded"
         />
         <MetricCard
           label="Management envelope"
-          value={compactMoney(submission?.managementEnvelopeUsd || 0, "USD")}
+          value={compactMoney(submission?.managementEnvelopeUsd, "USD")}
           sub="Budgetary reference only · do not back-solve"
           tone="warn"
         />
@@ -472,13 +475,555 @@ function Overview() {
   );
 }
 
-function ArchitectureView(){return <SharedArchitectureView manifest={ARCHITECTURE_MANIFEST} modules={MODULE_REGISTRY}/>;}
+function ArchitectureView() {
+  const manifest = ARCHITECTURE_MANIFEST;
 
-function SystemsView() {
- return <SharedSystemsView initialExpandedTokens={["TEL-PAGA"]} systems={SYSTEMS} systemGroups={SYSTEM_GROUPS} title="System group view" description="Expand by discipline, or switch to a single-system focus view. Each system keeps proof state, quantity state, commercial basis and closure action visible." />;
+  return (
+    <div className="p55-stack">
+      <SectionTitle
+        eyebrow="Smart Code / Self-Describing Architecture"
+        title={manifest.title}
+        text={manifest.background}
+      />
+
+      <section className="p55-callout">
+        <strong>{manifest.governingMethod}</strong>
+        <p>{manifest.architecture}</p>
+      </section>
+
+      <div className="p55-grid p55-grid--2">
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Why this code exists" title="Smart-code principles" />
+          <ul className="p55-rule-list">
+            {manifest.smartCodePrinciples.map((rule) => <li key={rule}>{rule}</li>)}
+          </ul>
+        </section>
+
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Review contract" title="Questions every module must answer" />
+          <ul className="p55-rule-list">
+            {manifest.reviewQuestions.map((rule) => <li key={rule}>{rule}</li>)}
+          </ul>
+        </section>
+      </div>
+
+      <section className="p55-panel">
+        <SectionTitle eyebrow="Evolution policy" title="Preserve knowledge — not necessarily implementation" />
+        <div className="p55-grid p55-grid--2">
+          <div className="p55-evidence-card">
+            <div className="p55-eyebrow">Allowed architectural change</div>
+            <ul className="p55-rule-list">
+              {manifest.evolutionPolicy.allowedChanges.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </div>
+          <div className="p55-evidence-card">
+            <div className="p55-eyebrow">Required controls</div>
+            <ul className="p55-rule-list">
+              {manifest.evolutionPolicy.requiredControls.map((item) => <li key={item}>{item}</li>)}
+            </ul>
+          </div>
+        </div>
+        <p className="p55-note"><strong>Principle:</strong> {manifest.evolutionPolicy.principle}</p>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Module registry"
+          title="What we have, what it does, and why"
+          text="This registry is part of the codebase so a new engineer or external AI reviewer can understand the architecture without relying on chat history."
+        />
+        <div className="p55-table-wrap">
+          <table className="p55-table">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>Lifecycle</th>
+                <th>Layer</th>
+                <th>Purpose</th>
+                <th>Why</th>
+                <th>Inputs</th>
+                <th>Outputs</th>
+                <th>Implementation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {MODULE_REGISTRY.map((module) => (
+                <tr key={module.id}>
+                  <td><strong>{module.name}</strong><small>{module.id}</small></td>
+                  <td><Badge>{module.lifecycleStatus}</Badge></td>
+                  <td><Badge tone="neutral">{module.layer}</Badge></td>
+                  <td>{module.purpose}</td>
+                  <td>{module.why}</td>
+                  <td>{module.inputs.join(" · ")}</td>
+                  <td>{module.outputs.join(" · ")}</td>
+                  <td>{module.implementation.join(" · ")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Refactor / evolution governance"
+          title="What may change, what must be migrated, and why"
+          text="Architecture is allowed to evolve. A change is controlled when the rationale, impact, migration/replacement decision and historical evidence are explicit."
+        />
+        <div className="p55-groups">
+          {MODULE_REGISTRY.map((module) => (
+            <section className="p55-group" key={module.id}>
+              <div className="p55-group__head">
+                <div>
+                  <strong>{module.name}</strong>
+                  <span>{module.id}</span>
+                </div>
+                <Badge tone="neutral">{module.invariants.length} invariants</Badge>
+              </div>
+              <div className="p55-system__detail">
+                <ul className="p55-rule-list">
+                  {module.invariants.map((rule) => <li key={rule}>{rule}</li>)}
+                </ul>
+              </div>
+            </section>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
 }
 
-function EngineeringView(){return <SharedEngineeringView model={{serviceEquations:COMMON_SERVICE_EQUATIONS,projectId:"PJ2608-0550",completeness:REQUIREMENT_COMPLETENESS,lawLibrary:ENGINEERING_LAW_LIBRARY,systems:SYSTEMS,chain:FIRST_PRINCIPLES_CHAIN,domains:KNOWLEDGE_KERNEL_DOMAINS,controlRules:CONTROL_RULES,costEquations:["Customer Service = ADDVALUE Sell × 1.05","Goods Customer = Cost × 1.20 / 0.95"]}}/>;}
+function SystemCard({ system, expanded, onToggle }) {
+  return (
+    <article data-component-key={"bid.systems."+system.token} className={"p55-system " + (expanded ? "is-expanded" : "")}>
+      <ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.systems."+system.token}/>
+      <button className="p55-system__summary" onClick={onToggle} type="button">
+        <div className="p55-system__no">{String(system.no).padStart(2, "0")}</div>
+        <div className="p55-system__title">
+          <strong>{system.name}</strong>
+          <span>{system.token}</span>
+        </div>
+        <div className="p55-system__badges">
+          <Badge>{system.proofState}</Badge>
+          <Badge>{system.costBasis}</Badge>
+        </div>
+        <span className="p55-chevron">{expanded ? "−" : "+"}</span>
+      </button>
+      {expanded ? (
+        <div className="p55-system__detail">
+          <dl className="p55-detail-grid">
+            <div><dt>Project reference</dt><dd>{system.ref}</dd></div>
+            <div><dt>Engineering proof</dt><dd>{system.proof}</dd></div>
+            <div><dt>Quantity state</dt><dd><Badge>{system.quantityState}</Badge></dd></div>
+            <div><dt>Execution / boundary</dt><dd>{system.owner}</dd></div>
+          </dl>
+          <div className="p55-open-item">
+            <span>OPEN CLOSURE</span>
+            <strong>{system.open}</strong>
+          </div>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+function SystemsView({initialSystem="ALL"}) {
+  const [viewMode, setViewMode] = useState("group");
+  const [selectedToken, setSelectedToken] = useState(initialSystem);
+  const [query, setQuery] = useState("");
+  const [expanded, setExpanded] = useState(() => new Set(["TEL-PAGA"]));
+  const [openGroups, setOpenGroups] = useState(() => new Set(SYSTEM_GROUPS.map((g) => g.id)));
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return SYSTEMS.filter((system) => {
+      if (selectedToken !== "ALL" && system.token !== selectedToken) return false;
+      if (!q) return true;
+      return [system.name, system.token, system.ref, system.proof, system.open]
+        .join(" ")
+        .toLowerCase()
+        .includes(q);
+    });
+  }, [query, selectedToken]);
+
+  function toggleSystem(token) {
+    setExpanded((current) => {
+      const next = new Set(current);
+      if (next.has(token)) next.delete(token);
+      else next.add(token);
+      return next;
+    });
+  }
+
+  function toggleGroup(id) {
+    setOpenGroups((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  const groups = SYSTEM_GROUPS.map((group) => ({
+    ...group,
+    systems: filtered.filter((s) => s.groupId === group.id),
+  })).filter((group) => group.systems.length > 0);
+
+  return (
+    <div className="p55-stack">
+      <SectionTitle
+        eyebrow="19-system control"
+        title="System group view"
+        text="Expand by discipline, or switch to a single-system focus view. Each system keeps proof state, quantity state, commercial basis and closure action visible."
+      />
+
+      <div className="p55-filterbar">
+        <div className="p55-segmented" aria-label="View mode">
+          <button className={viewMode === "group" ? "is-active" : ""} onClick={() => setViewMode("group")} type="button">Group view</button>
+          <button className={viewMode === "focus" ? "is-active" : ""} onClick={() => setViewMode("focus")} type="button">System focus</button>
+        </div>
+        <label>
+          <span>System</span>
+          <select
+            value={selectedToken}
+            onChange={(e) => {
+              setSelectedToken(e.target.value);
+              if (e.target.value !== "ALL") {
+                setViewMode("focus");
+                setExpanded(new Set([e.target.value]));
+              }
+            }}
+          >
+            <option value="ALL">All 19 systems</option>
+            {SYSTEMS.map((s) => <option value={s.token} key={s.token}>{String(s.no).padStart(2, "0")} — {s.name}</option>)}
+          </select>
+        </label>
+        <label className="p55-search">
+          <span>Search</span>
+          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="PAGA, coverage, quote…" />
+        </label>
+      </div>
+
+      {viewMode === "focus" ? (
+        <div className="p55-system-list">
+          {filtered.map((system) => (
+            <SystemCard
+              key={system.token}
+              system={system}
+              expanded={expanded.has(system.token)}
+              onToggle={() => toggleSystem(system.token)}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="p55-groups">
+          {groups.map((group) => {
+            const isOpen = openGroups.has(group.id);
+            return (
+              <section className="p55-group" key={group.id}>
+                <button className="p55-group__head" onClick={() => toggleGroup(group.id)} type="button">
+                  <div>
+                    <strong>{group.name}</strong>
+                    <span>{group.description}</span>
+                  </div>
+                  <div className="p55-group__right">
+                    <Badge tone="neutral">{group.systems.length} systems</Badge>
+                    <span className="p55-chevron">{isOpen ? "−" : "+"}</span>
+                  </div>
+                </button>
+                {isOpen ? (
+                  <div className="p55-system-list">
+                    {group.systems.map((system) => (
+                      <SystemCard
+                        key={system.token}
+                        system={system}
+                        expanded={expanded.has(system.token)}
+                        onToggle={() => toggleSystem(system.token)}
+                      />
+                    ))}
+                  </div>
+                ) : null}
+              </section>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function EngineeringView({ evidence, onEvidenceChange }) {
+  const completeness = REQUIREMENT_COMPLETENESS;
+  const lawLibrary = ENGINEERING_LAW_LIBRARY;
+  const audited = (completeness?.systemAudit || []).filter((row) => row.auditState !== "NOT_YET_AUDITED").length;
+  const notAudited = (completeness?.systemAudit || []).filter((row) => row.auditState === "NOT_YET_AUDITED").length;
+
+  return (
+    <div className="p55-stack">
+      <PagaEvidenceReview evidence={evidence} onEvidenceChange={onEvidenceChange} />
+      <CoverageMatrix />
+      <SectionTitle
+        eyebrow="First Principles + Completeness Control"
+        title="Requirement threads before release"
+        text="The chain remains the governing method, but release control now starts from source requirements. A system is not complete merely because a main equipment line or price exists."
+      />
+
+      <div className="p55-grid p55-grid--2">
+        <section className="p55-callout p55-callout--warning">
+          <strong>Completeness audit: {completeness?.state || "AUDIT REQUIRED"}</strong>
+          <p>{completeness?.doctrine}</p>
+        </section>
+        <section className="p55-callout">
+          <strong>Audit coverage</strong>
+          <p>{audited} system(s) started · {notAudited} system(s) still NOT_YET_AUDITED. No 100% completeness claim is allowed until source extraction and thread mapping are finished.</p>
+        </section>
+      </div>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Known gap caught by the new control"
+          title="Seed requirement finding"
+          text="NMS is the first proof that system-level pricing alone is not a sufficient completeness check."
+        />
+        {(completeness?.seedFindings || []).map((finding) => (
+          <div className="p55-open-item" key={finding.id}>
+            <span>{finding.id}</span>
+            <div>
+              <strong>{finding.title} · {finding.systemToken}</strong>
+              <p className="p55-note p55-note--top">{finding.sourceFact}</p>
+              <div className="p55-system__badges" style={{justifyContent:"flex-start"}}>
+                <Badge>{finding.mappingState}</Badge>
+                <Badge>{finding.threadState}</Badge>
+              </div>
+              <ul className="p55-rule-list" style={{marginTop:10}}>
+                {finding.missingControls.map((item) => <li key={item}>{item}</li>)}
+              </ul>
+              <p className="p55-note"><strong>Release effect:</strong> {finding.releaseEffect}</p>
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="19-system audit"
+          title="Requirement completeness state"
+          text="NOT_YET_AUDITED means unknown completeness, not zero gaps."
+        />
+        <div className="p55-table-wrap">
+          <table className="p55-table">
+            <thead>
+              <tr><th>No.</th><th>System</th><th>Audit state</th><th>Known finding</th></tr>
+            </thead>
+            <tbody>
+              {(completeness?.systemAudit || []).map((row) => (
+                <tr key={row.token}>
+                  <td>{String(row.no).padStart(2, "0")}</td>
+                  <td><strong>{row.name}</strong><small>{row.token}</small></td>
+                  <td><Badge>{row.auditState}</Badge></td>
+                  <td>{row.knownFinding || "— audit not yet performed —"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div className="p55-grid p55-grid--2">
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Cross-system obligations" title="Common / shared mapping queue" />
+          <div className="p55-policy-list">
+            {(completeness?.crossSystemObligations || []).map((item) => (
+              <div className="p55-policy" key={item.id}>
+                <div>
+                  <strong>{item.title}</strong>
+                  <p>{item.source}</p>
+                </div>
+                <Badge>{item.mappingState}</Badge>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Fail-closed release gate" title="Final release rules" />
+          <ul className="p55-rule-list">
+            {(completeness?.releaseRules || []).map((rule) => <li key={rule}>{rule}</li>)}
+          </ul>
+        </section>
+      </div>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Audit dimensions"
+          title="What must be checked for every extracted requirement"
+          text="These dimensions are an audit checklist, not an assertion that every dimension applies to every system."
+        />
+        <div className="p55-control-grid">
+          {(completeness?.auditDimensions || []).map((item) => (
+            <div className="p55-control" key={item}>
+              <div className="p55-control__dot" />
+              <div><strong>{item}</strong></div>
+              <Badge tone="neutral">CHECK</Badge>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <SectionTitle
+        eyebrow="Governing method"
+        title="First-Principles engineering chain"
+        text="Every mapped requirement then moves through the same controlled causal chain. A formula producing a number does not upgrade evidence status."
+      />
+
+      <section className="p55-panel">
+        <div className="p55-chain p55-chain--full">
+          {FIRST_PRINCIPLES_CHAIN.map((step, index) => (
+            <React.Fragment key={step}>
+              <div className="p55-chain__node">
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{step}</strong>
+              </div>
+              {index < FIRST_PRINCIPLES_CHAIN.length - 1 ? <div className="p55-chain__line" /> : null}
+            </React.Fragment>
+          ))}
+        </div>
+      </section>
+
+      <SectionTitle
+        eyebrow="Knowledge Kernels"
+        title="Multidisciplinary decision kernels"
+        text="COMMON knowledge is separated from project facts. Mathematics, physics, telecom, network, power, economics, commercial, logistics, project management and governance are invoked only where the requirement needs them."
+      />
+
+      <section className="p55-callout">
+        <strong>{lawLibrary?.state || "COMMON_GENERIC_KERNEL"}</strong>
+        <p>{lawLibrary?.evidenceRule}</p>
+      </section>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Knowledge architecture"
+          title="COMMON → GENERIC DOMAIN → PARTICULAR PROJECT"
+          text="The common layer contains reusable knowledge and equations; PJ2608-0550 contains only project evidence, requirements, constraints, inputs and system bindings."
+        />
+        <div className="p55-control-grid">
+          {(KNOWLEDGE_KERNEL_DOMAINS || []).map((domain) => (
+            <div className="p55-control" key={domain.id}>
+              <div className="p55-control__dot" />
+              <div>
+                <strong>{domain.name}</strong>
+                <p>{domain.purpose}</p>
+                <small>{domain.topics.join(" · ")}</small>
+              </div>
+              <Badge tone="neutral">{domain.id}</Badge>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <div className="p55-grid p55-grid--2">
+        {(lawLibrary?.kernels || []).map((kernel) => (
+          <section className="p55-panel" key={kernel.id}>
+            <div className="p55-panel__head">
+              <div>
+                <div className="p55-eyebrow">{kernel.domain} · {kernel.id}</div>
+                <h3>{kernel.name}</h3>
+              </div>
+              <Badge tone="neutral">{kernel.appliesTo.length} mappings</Badge>
+            </div>
+            <div className="p55-equations">
+              {kernel.equations.map((eq) => (
+                <code key={eq.name}>
+                  <strong>{eq.name}</strong>{" — "}{eq.formula}
+                </code>
+              ))}
+            </div>
+            <p className="p55-note"><strong>Output:</strong> {kernel.output}</p>
+            <ul className="p55-rule-list">
+              {kernel.controls.map((rule) => <li key={rule}>{rule}</li>)}
+            </ul>
+          </section>
+        ))}
+      </div>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="System-to-kernel map"
+          title="Which physics/math model checks each system"
+          text="MAPPED_PRELIMINARY means the generic kernel applies; project inputs, standards and source evidence still need system-by-system audit."
+        />
+        <div className="p55-table-wrap">
+          <table className="p55-table">
+            <thead><tr><th>System</th><th>Engineering kernels</th><th>State</th></tr></thead>
+            <tbody>
+              {(lawLibrary?.systemKernelMap || []).map((row) => (
+                <tr key={row.token}>
+                  <td><strong>{row.name}</strong><small>{row.token}</small></td>
+                  <td>{row.kernelIds.length ? row.kernelIds.join(" · ") : "—"}</td>
+                  <td><Badge>{row.auditState}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <div className="p55-grid p55-grid--2">
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Control doctrine" title="No-guess rules" />
+          <ul className="p55-rule-list">
+            {CONTROL_RULES.map((rule) => <li key={rule}>{rule}</li>)}
+          </ul>
+        </section>
+
+        <section className="p55-panel">
+          <SectionTitle eyebrow="Parametric Cost Kernel" title="Math after engineering quantity" />
+          <div className="p55-equations">
+            <code>MH = I × Q × UMH × F</code>
+            <code>Duration = MH / (Persons × H/day × η)</code>
+            <code>Internal Labor Cost = Σ MH × Loaded Cost Rate</code>
+            <code>Service Sell = Σ MH/MD × Protected Selling Rate</code>
+            <code>Customer Service = ADDVALUE Sell × 1.05</code>
+            <code>Goods Customer = Cost × 1.20 / 0.95</code>
+          </div>
+        </section>
+      </div>
+
+      <section className="p55-panel">
+        <SectionTitle
+          eyebrow="Proof matrix"
+          title="Engineering proof readiness"
+          text="Select any system in the 19-System view to inspect the source binding, proof and open closure in detail."
+        />
+        <div className="p55-table-wrap">
+          <table className="p55-table">
+            <thead>
+              <tr>
+                <th>No.</th>
+                <th>System</th>
+                <th>Required proof</th>
+                <th>Proof state</th>
+                <th>Quantity state</th>
+              </tr>
+            </thead>
+            <tbody>
+              {SYSTEMS.map((system) => (
+                <tr key={system.token}>
+                  <td>{String(system.no).padStart(2, "0")}</td>
+                  <td><strong>{system.name}</strong><small>{system.token}</small></td>
+                  <td>{system.proof}</td>
+                  <td><Badge>{system.proofState}</Badge></td>
+                  <td><Badge>{system.quantityState}</Badge></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+  );
+}
 
 function ExecutionView() {
   return (
@@ -558,7 +1103,7 @@ function ExecutionView() {
   );
 }
 
-function BudgetView() {
+function LegacyBudgetView() {
   const [currency, setCurrency] = useState("USD");
   const [part, setPart] = useState("ALL");
   const [budgetMode, setBudgetMode] = useState("budgetary");
@@ -571,8 +1116,8 @@ function BudgetView() {
   const budget = BUDGETARY_ESTIMATE;
   const submission = BUDGETARY_SUBMISSION;
 
-  const directTotal = budget?.directDeliveryBasisThb || 0;
-  const calculated = budget?.calculatedCustomerBeforeRoundingThb || 0;
+  const directTotal = budget?.directDeliveryBasisThb;
+  const calculated = budget?.calculatedCustomerBeforeRoundingThb;
 
   const submissionBaseRows = (submission?.customerRows || []).filter(
     (row) => row.code.startsWith("A1-") || ["B1","B2","B3","B4","B5","B6"].includes(row.code)
@@ -625,7 +1170,7 @@ function BudgetView() {
             <MetricCard label="Part C direct" value={compactMoney(budget.partCDirectThb, "THB")} sub="C2 + C3; C1 excluded" />
             <MetricCard label="Direct delivery basis" value={compactMoney(directTotal, "THB")} sub="Internal working basis" />
             <MetricCard label="Commercialized working" value={compactMoney(calculated, "THB")} sub="Before management envelope / quote replacement" />
-            <MetricCard label="FX working" value="33.6335" sub="THB/USD used for 08-Oct snapshot; refresh for next issue" />
+            <MetricCard label="FX working" value={budget.fxThbUsdWorking ?? "—"} sub="THB/USD used for 08-Oct snapshot; refresh for next issue" />
           </div>
 
           <section className="p55-panel">
@@ -1177,7 +1722,7 @@ function BudgetView() {
                         <td><strong>{row.code}</strong></td>
                         <td>{row.description}</td>
                         <td className="is-number">{row.directThb === null ? "—" : money(row.directThb, "THB")}</td>
-                        <td className="is-number">{row.code === "C1" ? "EXCLUDED" : money(issued?.customerUsd || 0, "USD")}</td>
+                        <td className="is-number">{row.code === "C1" ? "EXCLUDED" : money(issued?.customerUsd, "USD")}</td>
                         <td>
                           {row.code === "C1"
                             ? "CNEEC optional physical installation boundary; reopen only by controlled scope change."
@@ -1213,7 +1758,7 @@ function BudgetView() {
             />
             <MetricCard label="PAGA selected" value={money(paga.knownSelectedSubtotalEur, "EUR")} sub={paga.vendor + " · " + paga.offer} tone="good" />
             <MetricCard label="Project Total" value="HOLD" sub="Final release requires controlled closure / authorization" tone="warn" />
-            <MetricCard label="Emergency snapshot" value={money(submission?.baseBeforeOptionsUsd || 0, "USD")} sub="Budgetary only — not RELEASED_SELL" />
+            <MetricCard label="Emergency snapshot" value={money(submission?.baseBeforeOptionsUsd, "USD")} sub="Budgetary only — not RELEASED_SELL" />
           </div>
 
           <div className="p55-filterbar p55-filterbar--simple">
@@ -1327,11 +1872,13 @@ function RiskView() {
   );
 }
 
-function DocumentsView() {
+function DocumentsView({ navigationTarget }) {
   const facts = PROJECT_0550_FACTS;
 
   return (
     <div className="p55-stack">
+      <ControlledSourceInventory navigationTarget={navigationTarget}/>
+      <details className="p55-panel"><summary>Historical project facts / reference baseline</summary>
       <SectionTitle
         eyebrow="Evidence control"
         title="Project facts, source register & traceability"
@@ -1499,46 +2046,107 @@ function DocumentsView() {
         </div>
       </section>
 
-      <section className="p55-panel">
-        <SectionTitle eyebrow="Source register" title="Controlled source inventory" />
-        <div className="p55-table-wrap">
-          <table className="p55-table p55-table--compact">
-            <thead><tr><th>ID</th><th>Source</th><th>Use</th><th>State</th></tr></thead>
-            <tbody>
-              {SOURCE_REGISTER.map((source) => (
-                <tr key={source.id}>
-                  <td><strong>{source.id}</strong></td>
-                  <td>{source.name}</td>
-                  <td>{source.use}</td>
-                  <td><Badge>{source.state}</Badge></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+
+      </details>
     </div>
   );
 }
 
-export function PJ26080550({ lang = "th" }) {
-  const project = {
-    id: PROJECT_0550.id,
-    shortName: PROJECT_0550.shortName,
-    title: PROJECT_0550.title,
-    state: PROJECT_0550.state,
-    statusDetail: "Price date " + PROJECT_0550.priceDate,
-    method: PROJECT_0550.method
-  };
-  const views = {
-    overview: <Overview />,
-    architecture: <ArchitectureView />,
-    systems: <SystemsView />,
-    engineering: <EngineeringView />,
-    execution: <ExecutionView />,
-    budget: <BudgetView />,
-    risk: <RiskView />,
-    documents: <DocumentsView />
-  };
-  return <ProjectWorkspaceShell project={project} lang={lang} tabs={TABS} views={views} />;
+export function PJ26080550(props) { return <BidWorkspaceProvider><Project0550Bidding {...props}/></BidWorkspaceProvider>; }
+function Project0550Bidding({ lang = "th" }) {
+  const [activeTab, setActiveTab] = useState("budget");
+  const [area,setArea]=useState("B");
+  const [moduleQuery,setModuleQuery]=useState("");
+  const [navigationTarget,setNavigationTarget]=useState(null);
+  const [focusedSystem,setFocusedSystem]=useState("ALL");
+  const {data,model}=useBidWorkspace();
+  const moduleIndex=[{id:"l3.original",title:"Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
+    ...(data?.sourceIntake?.sources||[]).map(s=>({id:"bid.documents.source."+s.id,title:s.title,tab:"documents"})),
+    ...(data?.sourceIntake?.findings||[]).map(f=>({id:"bid.documents.finding."+f.id,title:f.category,tab:"documents"})),
+    ...SYSTEMS.map(s=>({id:"bid.systems."+s.token,title:s.name,tab:"systems",system:s.token})),
+    {id:"bid.engineering.equations",title:"Equation Execution / SAT persons days",tab:"engineering"},
+    {id:"bid.vendor.master",title:"Vendor master",tab:"documents"},{id:"bid.vendor.offers",title:"Vendor offers / rates",tab:"documents"},
+    {id:"bid.budget.working.editor",title:"Working source editor",tab:"budget"},{id:"bid.budget.working.lines",title:"Working price lines",tab:"budget"},
+    {id:"bid.budget.budget-thb",title:"Budget THB",tab:"budget"},{id:"bid.budget.release",title:"Release USD",tab:"budget"},
+    {id:"bid.schematic.editor",title:"Schematic nodes / interfaces",tab:"schematic"},
+    ...(model?.lines||[]).flatMap(r=>[{id:r.sourceModuleId,title:r.description+" / Source",tab:"budget"},{id:r.releaseModuleId,title:r.description+" / Release",tab:"budget"}]),
+    ...(data?.calculations||[]).map(c=>({id:"bid.engineering.calculation."+c.id,title:c.title,tab:"engineering"})),
+    ...(data?.vendors||[]).map(v=>({id:"bid.vendor."+v.id,title:v.name,tab:"documents"})),
+    ...(data?.offers||[]).map(o=>({id:"bid.vendor.offer."+o.id,title:o.quoteRef+" / "+o.description,tab:"documents"})),
+    ...(data?.nodes||[]).map(n=>({id:"bid.schematic.node."+n.id,title:n.label,tab:"schematic"})),
+    ...(data?.edges||[]).map(e=>({id:"bid.schematic.edge."+e.id,title:e.label,tab:"schematic"})),
+    ...MODULE_REGISTRY.map(m=>({id:m.id,title:m.name,tab:"registry"})),
+    ...["fx","scope-gates","history"].map(id=>({id:"bid.budget."+id,title:id,tab:"budget"})),
+    ...["storage","modules"].map(id=>({id:"bid.registry."+id,title:id,tab:"registry"})),
+    {id:"bid.schematic.canvas",title:"Overall / Schematic per system",tab:"schematic"},
+    {id:"bid.vendor.controlled-sources",title:"Controlled vendor sources",tab:"documents"},
+    ...(model?.lines||[]).map(r=>({id:"bid.budget.budget-thb.line."+r.id,title:r.description+" / Budget THB",tab:"budget"}))];
+  const query=moduleQuery.trim().replace(/^PJ2608-0550\s*\/\s*/i,"").toLowerCase();
+  const matches=query?moduleIndex.filter(m=>(m.id+" "+m.title).toLowerCase().includes(query)):[];
+  const jump=m=>{setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);};
+  useEffect(()=>{if(!navigationTarget||activeTab==="budget")return;const timer=setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(n=>n.getAttribute("data-component-key")===navigationTarget);if(el){for(let n=el;n;n=n.parentElement)if(n.tagName==="DETAILS")n.open=true;el.scrollIntoView({block:"center"});}},40);return()=>clearTimeout(timer);},[navigationTarget,activeTab,area]);
+  const [pagaEvidence, setPagaEvidence] = useState(null);
+
+  return (
+    <div className="p55">
+      <header className="p55-hero">
+        <div className="p55-hero__top">
+          <div>
+            <div className="p55-kicker">GENESIS · L3 TENDERING & BIDDING</div>
+            <h1>{PROJECT_0550.id} <span>{PROJECT_0550.shortName}</span></h1>
+            <p>{PROJECT_0550.title}</p>
+          </div>
+          <div className="p55-hero__status">
+            <Badge tone="neutral">BIDDING WORKSPACE</Badge>
+            <span>Working → Budget THB → Release USD</span>
+          </div>
+        </div>
+
+        <div className="p55-hero__method">
+          <span>METHOD</span>
+          <strong>{PROJECT_0550.method}</strong>
+        </div>
+
+        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","A · Original RFQ Documents"],["B","B · Engineering & Bid Preparation"],["C","C · Communications & Submissions"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>setArea(id)}>{label}</button>)}</div>
+        {area==="B"&&<nav className="p55-tabs" aria-label="PJ2608-0550 sections">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              aria-label={tab.aria}
+              type="button"
+              className={activeTab === tab.id ? "is-active" : ""}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </nav>}
+      </header>
+
+      <main className="p55-main">
+        <BidSaveStatus/>
+        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.original"/><DocumentsView navigationTarget={navigationTarget}/></section>}
+        {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><SourceCommunications/><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · No new issue or submission recorded.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
+        {area==="B"&&<>
+          <div className="p55-panel p55-module-nav"><label>ค้นหา / วาง Module ID <input aria-label="Project Module Search" value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&matches.length)jump(matches.find(m=>m.id.toLowerCase()===query)||matches[0]);}} placeholder="PJ2608-0550 / bid.budget.release"/></label><div className="p55-module-results">{matches.slice(0,30).map(m=><button type="button" key={m.id} onClick={()=>jump(m)}>{m.title}<small>{m.id}</small></button>)}</div></div>
+          <div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>
+          {activeTab === "overview" ? <Overview /> : null}
+          {activeTab === "architecture" ? <ArchitectureView /> : null}
+          {activeTab === "systems" ? <><SystemsView key={focusedSystem} initialSystem={focusedSystem}/><CoverageMatrix/></> : null}
+          {activeTab === "engineering" ? <><EquationWorkbench/><EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /></> : null}
+          {activeTab === "execution" ? <><EquationWorkbench/><ExecutionView /></> : null}
+          {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
+          {activeTab === "budget" ? <BidCommercialWorkspace navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
+          {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
+          {activeTab === "documents" ? <><details className="p55-panel"><summary>Project evidence / original references</summary><DocumentsView navigationTarget={navigationTarget}/></details><VendorWorkspace/></> : null}
+          {activeTab === "registry" ? <BidDataControls/> : null}
+        </>}
+      </main>
+
+      <footer className="p55-footer">
+        <span>{PROJECT_0550.id} · Internal working control</span>
+        <span>{lang === "th" ? "ข้อมูลที่เป็น TBC/OPEN ต้องไม่ถูกตีความเป็นศูนย์" : "TBC / OPEN inputs must never be interpreted as zero."}</span>
+      </footer>
+    </div>
+  );
 }

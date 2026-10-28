@@ -1,7 +1,11 @@
 # PJ2608-0553 — Living Handoff / Bid Delivery Checkpoint
-**Status:** INITIAL HANDOFF / SOURCE VERIFICATION REQUIRED
+**Current checkpoint (28 October 2026):** Project Hub integration for internal review; NOT ISSUED.
+**Current preview branch:** `feat/genesis-project-hub-20261027` (version `2026-10-28.1`).
+Read `docs/project-hub-20261027.md` and `20261028_CUSTOMER_PRICE_BREAKDOWN.md` for current preview/navigation/validation. The initial handoff below is retained as historical context.
+
+**Historical initial status:** INITIAL HANDOFF / SOURCE VERIFICATION REQUIRED
 **Project:** PJ2608-0553 — ZM169-RFQ-TE-001 Telecom Package (JUTAL)
-**Working branch:** `feat/pj2608-0553-tpp-bid-handoff`
+**Historical initial branch:** `feat/pj2608-0553-tpp-bid-handoff`
 **Inherited code reference:** `feat/pj2608-0550-tpp-ui-rev04` at branch creation; do NOT merge PR #2 or modify 0550 merely to develop 0553.
 **Mission:** Reuse proven GENESS/TPP architecture to produce controlled 0553 technical and priced bid deliverables rapidly, without leaking or importing 0550 facts.
 

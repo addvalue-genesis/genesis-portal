@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const {execFileSync} = require("node:child_process");
 
 // This is build identification only. No files are written and no price source is modified.
@@ -16,6 +17,7 @@ const currentGitRevision = () => {
 module.exports = {
   entry: "./src/index.jsx",
   plugins: [
+    new MiniCssExtractPlugin({filename: "bundle.css", chunkFilename: "[id].css"}),
     new webpack.DefinePlugin({
       __PJ0553_BUILD_REVISION__:JSON.stringify(currentGitRevision())
     })
@@ -30,6 +32,7 @@ module.exports = {
   },
   module: {
     rules: [
+      {test: /\.css$/, use: [MiniCssExtractPlugin.loader, "css-loader"]},
       {
         test: /\.(js|jsx)$/,
         exclude: /node_modules/,
@@ -43,6 +46,10 @@ module.exports = {
     ]
   },
   devServer: {
+    setupMiddlewares: (middlewares) => {
+      middlewares.unshift({name: "local-private-source-0550", middleware: require("./scripts/source-drive-0550.cjs").createMiddleware()});
+      return middlewares;
+    },
     static: {
       directory: path.join(__dirname, "public")
     },

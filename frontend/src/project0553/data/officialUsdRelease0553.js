@@ -1,3 +1,5 @@
+import {buildB10OfficialItemizedAnnex0553} from "./b10OfficialItemizedAnnex0553";
+import {buildOtherSpareItemizedPresentation0553} from "./otherSpareItemizedPresentation0553";
 // Customer presentation derived only from the current 10.3.3 release model.
 // The commercial conversion/rounding layer never writes back to Working THB.
 export const OFFICIAL_USD_POLICY_0553=Object.freeze({thbPerUsd:31.5,incrementUSD:100,rounding:"UP_PER_SUMMARY_LINE"});
@@ -69,7 +71,21 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
   serviceText:serviceText(r.serviceCommercialBasis),qty:1,unit:"lot",amountUSD:quoteUsd0553(thb,policy),
   sourceTHB:thb??null,sourceModuleId:r.sourceModuleId||r.moduleId,
   locations:[...new Set((r.sourceRows||[]).map(x=>x.site).filter(Boolean))].join(", "),mr:r.mr||""});
- const a=source.a.map(r=>line(r,r.previewSellTHB)),b=source.b.map(r=>line(r,r.customerSellTHB)),c=source.c.map(r=>line(r,r.customerSellTHB));
+ const a=source.a.map(r=>line(r,r.previewSellTHB)),b=source.b.map(r=>line(r,r.customerSellTHB)),
+  c=source.c.map(r=>{
+   const normal=line(r,r.customerSellTHB);
+   if(!r.budgetaryOfferPrepared||!Number.isFinite(r.budgetaryOptionOfferTHB)||
+      !Number.isFinite(r.budgetaryOptionOfferUSD)||Number.isFinite(normal.amountUSD)||
+      r.customerOfferIssued!==false||r.firmOemQuote!==false)
+    throw Error("0553 C1/C2 conditional budgetary option quote lacks source price authority");
+   const budgetUsd=quoteUsd0553(r.budgetaryOptionOfferTHB,policy);
+   if(budgetUsd!==r.budgetaryOptionOfferUSD)
+    throw Error("0553 option quote USD must match canonical 10.3 Source→Release rounding");
+   return {...normal,budgetaryOptionQuoteUSD:budgetUsd,
+    budgetaryOptionOfferTHB:r.budgetaryOptionOfferTHB,conditionalPriceState:r.budgetaryOfferStatus,
+    budgetaryOfferSourceId:r.budgetaryOfferSourceId,budgetaryOfferSourceModuleId:r.budgetaryOfferSourceModuleId,
+    budgetaryOfferPrepared:true,firmOemQuote:false,optionExcludedFromBase:true};
+  });
  const rows=[...a,...b,...c],annex={};
  for(const code of ["B10","B11","B13","C1","C2"]){
   const items=source.annex[code]||[],parent=rows.find(r=>r.code===code);
@@ -81,10 +97,12 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
    leadTime:"To be confirmed"})),parent.amountUSD);
  }
  const known=[...a,...b].filter(r=>r.amountUSD!==null);
- return {moduleId:"bid.budget.pricing.official",sourceModuleId:"bid.budget.pricing.release.preview",currency:"USD",
+ const document={moduleId:"bid.budget.pricing.official",sourceModuleId:"bid.budget.pricing.release.preview",currency:"USD",
   policy:{...policy},a,b,c,annex,annexTitles,project:"ZAWTIKA DEVELOPMENT PROJECT PHASE 1F",
   totalUSD:known.length?round2(known.reduce((s,r)=>s+r.amountUSD,0)):null,
   unpriced:[...a,...b].filter(r=>r.amountUSD===null).map(r=>r.code),
   unroundedUSD:round2(known.reduce((s,r)=>s+r.sourceTHB/policy.thbPerUsd,0)),
   issued:false};
+ return {...document,b10ItemizedAnnex:buildB10OfficialItemizedAnnex0553(document),
+  otherSpareItemizedAnnex:buildOtherSpareItemizedPresentation0553(document)};
 }

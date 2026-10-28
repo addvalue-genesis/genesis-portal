@@ -3,11 +3,13 @@
 // behind a controlled JSON/repository boundary.
 import { getProject0550Dataset, getProject0550DataLayerStatus } from "./data/repository";
 import { buildProject0550KnowledgeKernelLibrary } from "./knowledgeKernelBinding";
+import { buildCoverageMatrix } from "./coverageModel";
 
 const DATASET = getProject0550Dataset();
 
 export const DATA_LAYER_META = DATASET.meta;
 export const DATA_LAYER_STATUS = getProject0550DataLayerStatus();
+export { loadProject0550Bid, saveProject0550Bid } from "./data/repository";
 
 export const PROJECT_0550 = DATASET.project;
 export const COMMERCIAL_POLICY = DATASET.commercialPolicy;
@@ -28,6 +30,7 @@ export const BUDGETARY_ESTIMATE = DATASET.budgetaryEstimate;
 export const BUDGETARY_SUBMISSION = DATASET.budgetarySubmission;
 
 export const REQUIREMENT_COMPLETENESS = DATASET.requirementCompleteness;
+export const REQUIREMENT_COVERAGE = buildCoverageMatrix(DATASET);
 
 export const ENGINEERING_LAW_LIBRARY = buildProject0550KnowledgeKernelLibrary(SYSTEMS);
 export const KNOWLEDGE_KERNEL_LIBRARY = ENGINEERING_LAW_LIBRARY;
@@ -46,3 +49,6 @@ export { PROJECT_0550_REGULATORY_BINDING } from "./regulatoryBinding";
 export { MYANMAR_REGULATORY_KNOWLEDGE } from "../knowledge-kernels/regulatoryMyanmar";
 
 export { PROJECT_0550_FACTS } from "./projectFacts";
+export { validateSourceIntake, applySourceIntake, deriveSourceIntake, deriveDocumentRevisionRegister, safeSourceUrl } from "./data/sourceIntakeModel";
+
+export { PROJECT_0550_PRESENTATION } from "./data/referenceRepository";

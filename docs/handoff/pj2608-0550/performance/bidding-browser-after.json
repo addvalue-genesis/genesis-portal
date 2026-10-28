@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "browser": "131.0.6778.0",
+  "method": "Headless production build; synthetic UI-created inputs; 1440x1000; 5 warm tab cycles to two animation frames. New content, not a like-for-like speedup claim.",
+  "checks": [
+    "10 active L3 tabs; default Working; no seeded financial data",
+    "Existing private PAGA evidence importer: requirement and TAG counts match supplied source; no financial posting",
+    "Vendor/offer and E05 manual attendance 24 MD / 192 MH; 19-system coverage retained",
+    "One model: 96,000 cost / 158,400 THB customer / 3,960 USD; exact Source↔Release and Copy ID",
+    "Input change propagates into both currencies; reload persists same revision",
+    "Backup/import; foreign project rejected; duplicate cost ownership blocks totals",
+    "Concurrent stale write rejected without losing form",
+    "Persisted overall/per-system schematic; node opens exact system",
+    "Module search resolves persisted Offer and original module registry IDs",
+    "All 10 tabs render without duplicate component IDs or console errors",
+    "Protected Rev10 three views and issued XLSX byte parity"
+  ],
+  "metrics": {
+    "First Principles": {
+      "n": 5,
+      "medianMs": 47,
+      "maxMs": 84.4
+    },
+    "Schematic": {
+      "n": 5,
+      "medianMs": 23.8,
+      "maxMs": 30.3
+    },
+    "Budget": {
+      "n": 5,
+      "medianMs": 29.7,
+      "maxMs": 34.7
+    }
+  },
+  "hashes": {
+    "reviewUSD": "b7d8547fcb8fb5b8db2a1a27994c1a3d60c4b749a2aef0c161cda435f27aa460",
+    "budgetary": "2a09eaff6a53bbabebd4275fb249e02fb2d3f32c9005fc8b4e8f199efe91c07c",
+    "working": "8426905ced0ca4c111cec85c62de18f174bb9492176074e0f52792e3c38bf064",
+    "released": "ec70ce29870db0ddf6214481504c7cd706680abcec4722dde7b66cd9cfe85134",
+    "xlsx": "2065bb70efa3e8b3bb90b4fbe64f099e02d1ae6c73a73d03b8e745987becafc6"
+  },
+  "errors": [],
+  "longtasks": [
+    {
+      "start": 2013.2999999970198,
+      "duration": 50
+    }
+  ],
+  "navigation": [
+    {
+      "domContentLoaded": 37.79999999701977,
+      "load": 41.19999999552965
+    }
+  ]
+}

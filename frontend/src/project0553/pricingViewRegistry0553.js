@@ -20,3 +20,19 @@ export const PRICING_VIEWS_0553=Object.freeze([
  Object.freeze({key:"official",number:"10.3.4",shortLabel:"Official Release",fullLabel:"Official Release — English / USD",moduleId:"bid.budget.pricing.official",lifecycle:"CUSTOMER_FORMAT_USD_NOT_AUTOMATICALLY_ISSUED"})
 ]);
 export const pricingViewByKey0553=key=>PRICING_VIEWS_0553.find(v=>v.key===key)||PRICING_VIEWS_0553.find(v=>v.key==="released");
+
+// Addresses inside the existing Release/Official views; no new price owner or stage.
+export const breakdownModule0553=(origin="released",code=null)=>{
+ const view=pricingViewByKey0553(origin==="official"?"official":"released");
+ const base=origin==="official"?view.moduleId:"bid.budget.pricing.release.preview";
+ return {id:base+".breakdown"+(code?"."+code.toLowerCase():""),
+  number:view.number+"."+(code||"A")};
+};
+export const BREAKDOWN_MODULES_0553=Object.freeze(["released","official"].flatMap(origin=>
+ [null,"A1","A2","A3","A4"].map(code=>{
+  const module=breakdownModule0553(origin,code);
+  return Object.freeze({...module,name:module.number+" — Part A Breakdown"+(code?" / "+code:""),
+   tab:"budget",keywords:"price breakdown MR customer internal รายละเอียดราคา สรุป"});
+ })));
+export const PART_A_EXPORT_MODULE_0553=Object.freeze({id:"bid.budget.pricing.official.sheet.a",number:"10.3.4.A",
+ name:"10.3.4.A — Sheet A Equipment / Export Excel",tab:"budget",keywords:"Sheet A Excel export equipment Qty Unit อุปกรณ์ ส่งออก"});
