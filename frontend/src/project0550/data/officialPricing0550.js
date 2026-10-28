@@ -79,6 +79,21 @@ export function deriveOfficialPricing(data,calculated,today){
  const total=(part,key)=>{const rows=schedule.filter(r=>part.includes(r.part));const included=rows.filter(r=>!r.excluded);return !unmapped.length&&rows.every(r=>r.ready)?sumOfficial(included,key):null;};
  return {lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),baseTHB:total("AB","customerTHB"),baseUSD:total("AB","customerUSD"),optionsTHB:total("C","customerTHB"),optionsUSD:total("C","customerUSD"),reviewedCount:selected.filter(r=>r.reviewState==="REVIEWED_WORKING").length,scopeReviewed:!unmapped.length&&schedule.every(r=>r.ready),releaseAllowed:false,releaseState:"HOLD"};
 }
+// Draft pricing while vendor refreshes and engineering review remain pending.
+// Reuses the canonical equation results; it never stamps an Official review.
+export function deriveProvisionalPricing(data,calculated){
+ const lines=calculated.lines.map(r=>({...r,costTHB:r.provisionalCostTHB,workingSellTHB:r.provisionalSellTHB,customerTHB:r.provisionalCustomerTHB,customerUSD:r.provisionalCustomerUSD,
+  calculatedCustomerTHB:r.provisionalCustomerTHB,reviewState:"PROVISIONAL — ราคาเดิม / รออัปเดต",reviewProblems:[...r.problems,"ตรวจ MR / ปริมาณ / ราคาอัปเดตก่อนออกข้อเสนอจริง"]}));
+ const selected=lines.filter(r=>r.selected),unmapped=selected.filter(r=>!mappingValid(r));
+ const schedule=form.rows.map(t=>{
+  const children=selected.filter(r=>mappingValid(r)&&r.customerRowCode===t.code),customerTHB=sumOfficial(children,"customerTHB"),customerUSD=sumOfficial(children,"customerUSD");
+  return {...t,children,review:null,problems:["Selected vendor scope only; completeness and updated quotations pending"],ready:children.length>0,excluded:false,state:"PROVISIONAL",qty:1,unit:"Lot",customerTHB,customerUSD,customerRemark:"Provisional pricing for listed scope; subject to scope confirmation and updated quotations.",sourceModuleId:"bid.budget.working.customer."+t.code,releaseModuleId:"bid.budget.release.customer."+t.code};
+ });
+ const total=(parts,key)=>{const rows=schedule.filter(r=>parts.includes(r.part));return !unmapped.length&&rows.every(r=>r.children.length)?sumOfficial(rows,key):null;};
+ return {pricingBasis:"PROVISIONAL_VENDOR",lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),
+  knownTHB:sumOfficial(selected.filter(r=>Number.isFinite(r.customerTHB)),"customerTHB"),knownUSD:sumOfficial(selected.filter(r=>Number.isFinite(r.customerUSD)),"customerUSD"),
+  baseTHB:total("AB","customerTHB"),baseUSD:total("AB","customerUSD"),optionsTHB:total("C","customerTHB"),optionsUSD:total("C","customerUSD"),reviewedCount:0,scopeReviewed:false,releaseAllowed:false,releaseState:"HOLD"};
+}
 export function compareOfficialHistory(official,history){return official.schedule.map(row=>{
  const old=history.customerRows.find(r=>r.code===row.code),same=row.review?.sameScopeAsHistory===true&&row.review.historySnapshotId===history.id;
  const comparable=same&&row.ready&&!row.excluded&&Number.isFinite(row.customerUSD)&&Number.isFinite(old?.customerUsd);
@@ -100,6 +115,7 @@ export function officialCustomerRows(official){
    }
   }
  }
+ if(official.pricingBasis==="PROVISIONAL_VENDOR")rows.push({kind:"total",key:"known",cells:["","","Known priced items only — incomplete scope","","","",official.knownUSD??"OPEN","Missing amounts are not zero; subject to updated quotations."]});
  rows.push({kind:"total",key:"base",cells:["","","Base A+B — group totals only","","","",official.baseUSD??"OPEN",""]});
  rows.push({kind:"total",key:"options",cells:["","","Part C — Optional","","","",official.optionsUSD??"OPEN",""]});
  return rows;

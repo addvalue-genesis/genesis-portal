@@ -1,7 +1,8 @@
 import React,{createContext,useContext,useEffect,useMemo,useRef,useState} from "react";
-import {loadProject0550Bid,saveProject0550Bid,SYSTEMS,DATA_LAYER_META} from "./data";
+import {loadProject0550Bid,saveProject0550Bid,SYSTEMS,DATA_LAYER_META,BUDGETARY_ESTIMATE,COMMERCIAL_SOURCES,COMMERCIAL_POLICY} from "./data";
 import {deriveBidWorkspace,validateBidWorkspace} from "./data/bidWorkspaceModel";
 import {fetchAutomaticSource,selectAutomaticSource,sourceLoadMessage} from "./data/sourceAutoLoad";
+import {importLegacyVendorBasis0550} from "./data/legacyVendorBasis0550";
 const Context=createContext(null);
 export const useBidWorkspace=()=>useContext(Context);
 export function downloadBidFile(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -11,7 +12,10 @@ export function BidWorkspaceProvider({children}){
  const reload=async()=>{
   if(lock.current)return;lock.current=true;setBusy(true);
   try{
-   let current=await loadProject0550Bid();setData(current);setError("");
+   let current=await loadProject0550Bid();
+   const prepared=importLegacyVendorBasis0550(current,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},reviewDate);
+   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Use existing vendor price basis while updates are pending / "+prepared.vendorBasisImport.version);
+   setData(current);setError("");
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    try {
     const intake=await fetchAutomaticSource(),selected=selectAutomaticSource(current,intake,SYSTEMS.map(s=>s.token));

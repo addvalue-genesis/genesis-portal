@@ -1,6 +1,6 @@
 import { evaluateServiceEquation } from "../serviceEquationRuntime";
 import { validateSourceIntake } from "./sourceIntakeModel";
-import {validateOfficialReview,deriveOfficialPricing} from "./officialPricing0550";
+import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
@@ -12,7 +12,7 @@ const fail=m=>{throw Error(m);};
 export function emptyBidWorkspace(snapshotId){return {schema:BID_SCHEMA,projectId:"PJ2608-0550",baselineSnapshotId:snapshotId,revision:0,vendors:[],offers:[],calculations:[],lines:[],nodes:[],edges:[],fx:{thbPerUSD:null,thbPerEUR:null,source:"",date:""},audit:[]};}
 export function validateBidWorkspace(data,snapshotId,systems){
  if(!data||data.schema!==BID_SCHEMA||data.projectId!=="PJ2608-0550"||data.baselineSnapshotId!==snapshotId)fail("Wrong project/schema/baseline");
- const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews"];
+ const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport"];
  if(Object.keys(data).some(k=>!keys.includes(k)))fail("Unsupported workspace field");
  if(!Number.isSafeInteger(data.revision)||data.revision<0)fail("Invalid revision");
  for(const key of ["vendors","offers","calculations","lines","nodes","edges","audit"]){
@@ -33,6 +33,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  if(!data.fx||typeof data.fx!=="object")fail("Missing FX record");fields(data.fx,["thbPerUSD","thbPerEUR","source","date"]);number(data.fx.thbPerUSD);number(data.fx.thbPerEUR);string(data.fx.source,"FX source");date(data.fx.date,"FX date");
  for(const a of data.audit){fields(a,["revision","at","action"]);if(!Number.isSafeInteger(a.revision)||a.revision<1)fail("Invalid audit revision");string(a.at,"audit time",100);string(a.action,"audit action");}
  if(data.customerReviews!==undefined){if(!Array.isArray(data.customerReviews)||data.customerReviews.length>24||new Set(data.customerReviews.map(r=>r.code)).size!==data.customerReviews.length)fail("Invalid customer reviews");data.customerReviews.forEach(r=>validateOfficialReview(r,true));}
+ if(data.vendorBasisImport!==undefined){const r=data.vendorBasisImport;fields(r,["version","date","importedLineIds","skippedSystems"]);string(r.version,"vendor import version",100);date(r.date,"vendor import date");for(const k of ["importedLineIds","skippedSystems"]){if(!Array.isArray(r[k])||r[k].length>2000||r[k].some(v=>typeof v!=="string"||v.length>100))fail("Invalid vendor import list");}}
  if(data.sourceIntake!==undefined)validateSourceIntake(data.sourceIntake,systems);
  return data;
 }
@@ -51,9 +52,10 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate){
    if(!offer)problems.push("Selected offer missing");
    else {currency=offer.currency;unit=offer.unit;costRate=offer.unitCost;
     if(offer.vendorId!==l.vendorId)problems.push("Vendor/offer mismatch");
-    if(!offer.quoteRef.trim()||!offer.sourceRef.trim()||!offer.date||!offer.validUntil)problems.push("Quote source/date/validity missing");
-    else if(offer.date>reviewDate)problems.push("Quote dated in future — confirm source date");
-    else if(offer.validUntil<reviewDate)problems.push("Quote expired — review replacement source");
+    if(!offer.quoteRef.trim()||!offer.sourceRef.trim())problems.push("Quote source missing");
+    if(!offer.date||!offer.validUntil)problems.push("Quote date/validity missing");
+    if(offer.date&&offer.date>reviewDate)problems.push("Quote dated in future — confirm source date");
+    if(offer.validUntil&&offer.validUntil<reviewDate)problems.push("Quote expired — review replacement source");
    }
   }
   if(l.calculationId){
@@ -82,7 +84,13 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate){
   const customerTHB=ready?round(customerNative*factor):null;
   const usdRate=fx("USD");
   const usdValue=ready&&usdRate!==null?eq("E17",{THB:customerTHB,fx:usdRate}):null;
-  return {...l,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
+  const provisionalProblems=problems.filter(p=>!["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN"].includes(p));
+  const nativeReady=provisionalProblems.length===0&&[costNative,addvalueSell,customerNative].every(n=>Number.isFinite(n)&&Math.abs(n)<=Number.MAX_SAFE_INTEGER/100);
+  const provisionalCustomerTHB=nativeReady&&factor!==null?round(customerNative*factor):null;
+  const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):null;
+  const provisional={provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
+   provisionalCostTHB:nativeReady&&factor!==null?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
+  return {...l,...provisional,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  });
  const selected=lines.filter(l=>l.selected);
  const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);
@@ -91,5 +99,5 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate){
  const missingSystems=systemTokens.filter(t=>!selected.some(l=>l.systemToken===t&&l.wbs==="A"));
  const missingWbs=BID_WBS.filter(c=>c!=="A"&&c!=="C1"&&!selected.some(l=>l.wbs===c));
  const result={lines,selected,groups,complete,missingSystems,missingWbs,baseTHB:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerTHB"),baseUSD:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerUSD"),optionsTHB:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerTHB"),optionsUSD:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerUSD"),knownTHB:sum(selected.filter(l=>l.customerTHB!==null),"customerTHB"),selectedTHB:sum(selected,"customerTHB"),selectedUSD:sum(selected,"customerUSD"),releaseAllowed:false,releaseState:"HOLD",scopeComplete:missingSystems.length===0&&missingWbs.length===0,revision:data.revision};
- return {...result,official:deriveOfficialPricing(data,result,reviewDate)};
+ return {...result,official:deriveOfficialPricing(data,result,reviewDate),provisional:deriveProvisionalPricing(data,result)};
 }

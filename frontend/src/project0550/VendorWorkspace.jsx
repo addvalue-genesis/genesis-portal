@@ -13,6 +13,7 @@ export function VendorWorkspace(){
  const setV=(k,v)=>setVendor(x=>({...x,[k]:v})),setO=(k,v)=>setOffer(x=>({...x,[k]:v}));
  return <div className="p55-stack">
  <Module id="bid.vendor.master" title="07.1 Vendor / Service Provider">
+ <p>ราคาเดิมที่นำเข้า: {data.vendorBasisImport?.importedLineIds.length||0} รายการ · รอปรับปรุงราคาใหม่ · วันที่/Validity ที่ไม่ทราบคงว่างตามหลักฐาน</p>
  <p>ผู้ขายหนึ่งรายมีหลายใบเสนอราคา/เรตได้ แยกต้นทุนจากราคาขาย และเลือกเรตไปใช้ใน Working โดยอ้างอิง Offer ID</p>
  <form onSubmit={async e=>{e.preventDefault();if(await put("vendors",{...vendor,id:vendor.id||newId("VEN")}))setVendor({id:"",name:"",kind:"SUPPLIER",reference:""});}}>
  <div className="p55-bid-fields"><Field label="Vendor name" value={vendor.name} onChange={v=>setV("name",v)} required/><Select label="Vendor type" value={vendor.kind} onChange={v=>setV("kind",v)} options={["SUPPLIER","OEM","SERVICE_PROVIDER","INTERNAL_TEAM"]}/><Field label="Vendor reference" value={vendor.reference} onChange={v=>setV("reference",v)}/></div><Save busy={busy}>บันทึก Vendor</Save></form>

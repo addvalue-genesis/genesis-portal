@@ -229,11 +229,11 @@ export function buildBidReviewXlsx(model,currency) {
   if(!["THB","USD"].includes(currency))throw Error("Unsupported review currency");
   const key=currency==="USD"?"customerUSD":"customerTHB";
   const rows=[
-    ["PJ2608-0550 — BID PRICE REVIEW — NOT ISSUED"],
+    [model.pricingBasis==="PROVISIONAL_VENDOR"?"PJ2608-0550 — PROVISIONAL VENDOR PRICE BASIS — UPDATE PENDING / NOT ISSUED":"PJ2608-0550 — BID PRICE REVIEW — NOT ISSUED"],
     [`Revision ${model.revision} | ${currency} | Selected scope only | Customer-form regrouping / release approval pending`],
     ["WBS","System","Description","Qty","Unit",`Unit sell ${currency}`,`Total ${currency}`,"Status"]
   ];
-  model.selected.forEach(r=>rows.push([r.wbs,r.systemToken,r.description,r.quantity,r.unit,r[key]!==null&&r.quantity>0?r[key]/r.quantity:null,r[key],r[key]===null?"OPEN":"WORKING PRICE"]));
+  model.selected.forEach(r=>rows.push([r.wbs,r.systemToken,r.description,r.quantity,r.unit,r[key]!==null&&r.quantity>0?r[key]/r.quantity:null,r[key],r[key]===null?"OPEN":model.pricingBasis==="PROVISIONAL_VENDOR"?"PROVISIONAL / UPDATE PENDING":"WORKING PRICE"]));
   const subtotal=currency==="USD"?model.selectedUSD:model.selectedTHB;
   rows.push(["","","Selected line subtotal — not complete project total","","","",subtotal,subtotal===null?"INCOMPLETE":"REVIEW ONLY"]);
   rows.push(["","","Base A+B — selected scope only","","","",currency==="USD"?model.baseUSD:model.baseTHB]);
@@ -255,12 +255,13 @@ export function exportBidReviewXlsx(model,currency){const bytes=buildBidReviewXl
 
 export function buildOfficialCustomerXlsx(official){
  if(!Array.isArray(official?.schedule))throw Error("Official pricing projection required");
- const rows=[{kind:"title",cells:["PJ2608-0550 · OFFICIAL TENDER WORKING PREVIEW — NOT ISSUED"]},{kind:"title",cells:[`REL-04 | Working R${official.revision} | USD | HOLD | OPEN = not reviewed; detail rows included in group totals`]}, {kind:"header",cells:CUSTOMER_FORM_0550.columns},...officialCustomerRows(official)];
+ const provisional=official.pricingBasis==="PROVISIONAL_VENDOR";
+ const rows=[{kind:"title",cells:[provisional?"PJ2608-0550 · PROVISIONAL VENDOR PRICE BASIS — UPDATE PENDING / NOT ISSUED":"PJ2608-0550 · OFFICIAL TENDER WORKING PREVIEW — NOT ISSUED"]},{kind:"title",cells:[`REL-04 | Working R${official.revision} | USD | HOLD | ${provisional?"Existing vendor prices; scope and quotation updates pending; OPEN = missing price/FX":"OPEN = not reviewed"}; detail rows included in group totals`]}, {kind:"header",cells:CUSTOMER_FORM_0550.columns},...officialCustomerRows(official)];
  const merges=rows.flatMap((r,i)=>r.kind==="title"?[`A${i+1}:H${i+1}`]:[]);
  const xml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="3" topLeftCell="A4" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="1" width="9" customWidth="1"/><col min="2" max="2" width="20" customWidth="1"/><col min="3" max="3" width="58" customWidth="1"/><col min="4" max="5" width="12" customWidth="1"/><col min="6" max="7" width="20" customWidth="1"/><col min="8" max="8" width="36" customWidth="1"/></cols><sheetData>${rows.map((r,i)=>`<row r="${i+1}" ht="42" customHeight="1">${r.cells.map((v,j)=>cellXml(v,i+1,j,typeof v==="number"?4:["title","header","section","group","total"].includes(r.kind)?1:0)).join("")}</row>`).join("")}</sheetData><mergeCells count="${merges.length}">${merges.map(ref=>`<mergeCell ref="${ref}"/>`).join("")}</mergeCells><pageMargins left="0.25" right="0.25" top="0.5" bottom="0.5" header="0.2" footer="0.2"/><pageSetup paperSize="9" orientation="landscape"/></worksheet>`;
  return packReviewSheet(xml,"Official Working USD");
 }
 export function exportOfficialCustomerXlsx(official){
  const bytes=buildOfficialCustomerXlsx(official),url=URL.createObjectURL(new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
- const a=document.createElement("a");a.href=url;a.download=`PJ2608-0550_REL-04_OFFICIAL_DRAFT_R${official.revision}.xlsx`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+ const a=document.createElement("a");a.href=url;a.download=`PJ2608-0550_REL-04_${official.pricingBasis==="PROVISIONAL_VENDOR"?"PROVISIONAL":"OFFICIAL"}_DRAFT_R${official.revision}.xlsx`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }

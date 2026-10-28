@@ -85,6 +85,25 @@ try {
  const openFile=Buffer.from(buildOfficialCustomerXlsx(model.official)).toString();assert(!openFile.includes("3960"));assert(openFile.includes("OPEN"));assert.throws(()=>buildOfficialCustomerXlsx(model),/Official pricing/);
  assert.equal(officialCustomerRows(off).filter(r=>r.kind==="group").length,24);
  console.log("PASS Official: review + customer scope gates; source/quote/quantity/FX staleness; exclusions and options; comparable history; shared 8-column export; no historical fallback.");
+ const {legacyVendorCatalog0550,importLegacyVendorBasis0550}=require(path.join(root,"project0550/data/legacyVendorBasis0550.js"));
+ const dataset=JSON.parse(fs.readFileSync(path.join(root,"project0550/data/snapshots/pj2608-0550.rev07.json"),"utf8"));
+ const catalog=legacyVendorCatalog0550(dataset);assert.equal(catalog.length,9);assert.equal(catalog.filter(r=>r.alternative).length,2);
+ const blank=emptyBidWorkspace(snapshot),blankBytes=JSON.stringify(blank),seed=importLegacyVendorBasis0550(blank,dataset,"2026-10-28");
+ assert.equal(JSON.stringify(blank),blankBytes);validate(seed);assert.equal(seed.offers.length,9);assert.equal(seed.lines.filter(r=>r.selected).length,7);assert.equal(importLegacyVendorBasis0550(seed,dataset,"2026-10-29"),seed);
+ let draft=derive(seed);assert.equal(draft.provisional.selected.filter(r=>r.currency==="THB").reduce((n,r)=>n+r.provisionalCostNative,0),4700150);
+ assert.equal(draft.provisional.selected.filter(r=>r.currency==="EUR").reduce((n,r)=>n+r.provisionalCostNative,0),231678.05);
+ assert.equal(draft.provisional.baseTHB,null);assert.equal(draft.provisional.selectedUSD,null);assert.equal(draft.official.selectedTHB,null);assert.equal(draft.provisional.releaseAllowed,false);
+ assert(seed.lines.every(r=>!r.officialReview));assert(seed.lines.filter(r=>["TEL-MET","TEL-NDB"].includes(r.systemToken)).every(r=>!r.selected));
+ const updated=JSON.parse(JSON.stringify(seed));delete updated.vendorBasisImport;updated.offers[0].unitCost=123;const updatedBytes=JSON.stringify(updated);
+ const preserved=importLegacyVendorBasis0550(updated,dataset,"2026-10-28");assert.equal(JSON.stringify(updated),updatedBytes);assert.deepEqual(preserved.lines,updated.lines);assert.deepEqual(preserved.offers,updated.offers);
+ const occupied=clone();occupied.lines[0].wbs="A";occupied.lines[0].customerRowCode="A1-05";const merged=importLegacyVendorBasis0550(occupied,dataset,"2026-10-28");assert.equal(merged.lines.filter(r=>r.systemToken==="TEL-PAGA").length,1);assert(merged.vendorBasisImport.skippedSystems.includes("TEL-PAGA"));
+ assert.equal(derive(expired).provisional.selectedUSD,3960);assert.equal(derive(duplicate).provisional.selectedUSD,3960);duplicate.lines[1].selected=true;assert.equal(derive(duplicate).provisional.selectedUSD,null);
+ const future=clone();future.offers[0].date="2026-11-01";future.offers[0].validUntil="";assert.equal(derive(future).provisional.selectedUSD,null,"Future quote date must block even without validity");
+ seed.fx={thbPerUSD:40,thbPerEUR:42,source:"SYNTHETIC FX ONLY",date:"2026-10-27"};draft=derive(seed);
+ assert(draft.provisional.selectedUSD>0);assert.equal(draft.official.selectedUSD,null);assert.equal(draft.provisional.baseUSD,null);
+ const draftFile=Buffer.from(buildOfficialCustomerXlsx(draft.provisional)).toString();assert(draftFile.includes("PROVISIONAL"));assert(draftFile.includes("NOT ISSUED"));assert(draftFile.includes("OPEN"));for(const secret of ["226454.05","MASTER TOWER","QT2026","A20261632"])assert(!draftFile.includes(secret),"Internal vendor source leaked: "+secret);
+ assert.equal(officialCustomerRows(draft.provisional).filter(r=>r.kind==="group").length,24);
+ console.log("PASS existing vendor basis: 9 offers / 7 selected / 2 alternatives; THB 4,700,150 + EUR 231,678.05 cost; additive idempotent migration, preserved edits, native pricing without FX, provisional customer export, no Official review bypass.");
  const {assertControlledSnapshot}=require("./assert-pj2608-0550-snapshot.cjs");assertControlledSnapshot(fs.readFileSync(path.join(root,"project0550/data/snapshots/pj2608-0550.rev07.json")));
  console.log("PASS 0550 Bidding: all E01–E18 + 4 engineering functions, manual/source inputs, unique ownership, offer/FX/unit gates, same THB/USD projection, options separation, review export and immutable Rev10; synthetic prices only.");
 }finally{require.extensions[".js"]=old;}
