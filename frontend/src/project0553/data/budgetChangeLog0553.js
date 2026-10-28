@@ -2,8 +2,15 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-28-R65";
+export const CHANGE_LOG_VERSION_0553="2026-10-28-R66";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({
+  id:"P553-CHANGE-20261028-02",date:"2026-10-28",kind:"UI",tone:"neutral",
+  title:"Part A Breakdown — visible Copy ID, numbered headings and exact module search",
+  detail:"Restore the existing module presentation contract in the newly added breakdown: project-qualified Copy ID on the parent and A1–A4 collapsed headers, numbered 10.3.3/10.3.4 headings and existing owner colours. Ten stable addresses are registered under the existing Release/Official views; copied IDs reopen the exact group. Copy does not toggle the accordion. No price, quantity, FX, source identity or Excel changes.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview.breakdown","bid.budget.pricing.official.breakdown"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner 28-Oct screenshot: missing Module ID / Copy control in Part A breakdown"
+ }),
  Object.freeze({
   id:"P553-CHANGE-20261028-01",date:"2026-10-28",kind:"UI",tone:"neutral",
   title:"Project Hub — MR customer summary and internal Source roundtrip",

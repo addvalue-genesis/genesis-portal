@@ -139,3 +139,29 @@ local modifications or remove browser data. Homepage version: **2026-10-28.1**.
   and the 0553 conditional-option and itemized-annex controls. Workbook text
   therefore differs from the earlier standalone feature export; prices are
   unchanged. Submitted-proposal comparison and commercial issue remain open.
+
+
+## Breakdown module identity fix — version 2026-10-28.2
+
+Restore visible module identity on the breakdown parent and A1–A4 headers in
+both Customer and Internal modes. Existing module IDs are not renamed. Ten
+nested addresses under the existing pricing views are shared by the UI and
+project search registry:
+
+- Release parent: `bid.budget.pricing.release.preview.breakdown`
+- Official parent: `bid.budget.pricing.official.breakdown`
+- Each parent has `.a1`, `.a2`, `.a3`, `.a4` children.
+
+The common Copy ID control copies `PJ2608-0553 / <id>`. Pasting it into the
+project search opens and scrolls to that exact parent/group. Copy remains
+available on collapsed headers and does not toggle the group. Headings show
+10.3.3.A / 10.3.4.A and their A1–A4 subheadings; existing owner colours apply.
+The controls are UI identifiers only and do not enter the native workbook.
+Update the same Hub checkout and restart port 3001; no dependency changes.
+
+Validation: targeted breakdown/native-export, Official USD, module navigation and
+change-registry validators passed; production build passed with the existing
+asset-size warning. Chromium verified all ten clipboard values, copying from
+collapsed groups without toggling, project-qualified search reopening/scrolling,
+13 source roundtrips and four MR forward routes. Downloaded XLSX is byte-identical
+to Hub 2026-10-28.1. 0550/0510/shared code and dependencies are untouched.

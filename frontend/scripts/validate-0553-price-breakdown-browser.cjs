@@ -81,6 +81,27 @@ const {chromium}=require(process.env.PLAYWRIGHT_MODULE||'playwright');
    await page.locator('[data-breakdown-source-key]').getByRole('button').click();
   }
   if(output){await internal.locator('details').nth(1).evaluate(d=>d.open=true);await internal.screenshot({path:path.join(output,'breakdown-review.png')});}
+  // Copy a project-qualified module ID, search it, and reopen its exact group.
+  await page.context().grantPermissions(['clipboard-read','clipboard-write']);
+  for(const parent of ['bid.budget.pricing.official.breakdown','bid.budget.pricing.release.preview.breakdown']){
+   for(const suffix of ['', '.a1','.a2','.a3','.a4']){
+    const id=parent+suffix;
+    await search.fill('PJ2608-0553 / '+id);await search.press('Enter');
+    const target=page.locator('[data-component-key="'+id+'"]');await target.waitFor({state:'visible'});
+    const button=target.getByRole('button',{name:'Copy component ID '+id,exact:true});
+    if(suffix){
+     await target.evaluate(d=>d.open=false);
+     await button.click();
+     assert.equal(await target.evaluate(d=>d.open),false,'Copy must not toggle the collapsed group');
+    }else await button.click();
+    assert.equal(await page.evaluate(()=>navigator.clipboard.readText()),'PJ2608-0553 / '+id);
+    await search.fill(await page.evaluate(()=>navigator.clipboard.readText()));await search.press('Enter');
+    if(suffix)await page.waitForFunction(id=>[...document.querySelectorAll('details[data-component-key]')].some(d=>d.dataset.componentKey===id&&d.open),id);
+    await page.waitForFunction(id=>{const d=[...document.querySelectorAll('[data-component-key]')].find(d=>d.dataset.componentKey===id);const r=d?.getBoundingClientRect();return r&&r.top>=-5&&r.top<innerHeight-60;},id);
+   }
+  }
+  if(output){const v=page.getByRole('region',{name:'Price breakdown review'});await v.screenshot({path:path.join(output,'breakdown-copy-id.png')});}
+  assert.deepEqual(errors,[]);console.log('PASS Copy ID: ten unique project-qualified parent/A1–A4 addresses, clipboard values, closed-header behavior, exact search reopening and scrolling.');
   assert.deepEqual(errors,[]);console.log('PASS browser: 17-row Customer summary, 141-row Internal view, both price modes, all source rows mapped; '+(process.env.QA_SAMPLE?'13 sampled':'141')+' exact Official→Source→same-row roundtrips, four MR Source→Release→Source routes, internal Release return, source prices unchanged, draft Excel downloaded, no runtime errors.');
  }finally{await browser.close();server?.kill('SIGTERM');}
 })().catch(e=>{console.error(e);process.exitCode=1;});

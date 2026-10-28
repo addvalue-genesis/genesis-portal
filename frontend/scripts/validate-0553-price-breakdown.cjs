@@ -71,6 +71,20 @@ for(const showPriceDetails of [false,true]){
  for(const term of ['MGW R2','customerSellTHB','EXION','MANAGEMENT_SELECTED','parentPackage'])assert(!customer.includes(term),'customer presentation leaked '+term);
  assert(customer.includes('NOT VERIFIED'));
 }
+const {BREAKDOWN_MODULES_0553}=require('../src/project0553/pricingViewRegistry0553');
+assert.equal(BREAKDOWN_MODULES_0553.length,10);
+assert.equal(new Set(BREAKDOWN_MODULES_0553.map(x=>x.id)).size,10);
+for(const origin of ['official','released'])for(const view of ['customer','internal']){
+ const markup=renderToStaticMarkup(React.createElement(CustomerPriceBreakdown0553,{source,official,origin,view}));
+ const prefix=origin==='official'?'bid.budget.pricing.official.breakdown':'bid.budget.pricing.release.preview.breakdown';
+ for(const entry of BREAKDOWN_MODULES_0553.filter(m=>m.id.startsWith(prefix))){
+  assert(markup.includes('data-component-key="'+entry.id+'"'));
+  assert(markup.includes('aria-label="Copy component ID '+entry.id+'"'));
+  assert(markup.includes('PJ2608-0553 / '+entry.id));
+  assert(markup.includes(entry.number));
+ }
+ for(const owner of ['A1','A2','A3','A4'])assert(markup.includes('data-cost-owner="'+owner+'"'));
+}
 assert.equal(JSON.stringify(source),before);
 (async()=>{
  const template=require('../src/project0553/data/nativeReleaseTemplate0553.json'),bytes=Buffer.from(template.base64,'base64');

@@ -243,6 +243,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  },[releaseJump,bcTab]);
  const openPricingStage=stage=>{setPricingStage(stage);setNavigationFeedback(null);setBreakdownFocus(null);setBreakdownSelection(null);};
  React.useEffect(()=>{
+  if(/^bid\.budget\.pricing\.(?:official|release\.preview)\.breakdown(?:\.a[1-4])?$/.test(navigationTarget||"")){setBreakdownFocus(null);setBreakdownSelection(null);setRecipient("INTERNAL");}
   if(navigationTarget?.startsWith("bid.budget.pricing.official"))setPricingStage("official");
   else if(navigationTarget)setPricingStage("released");
  },[navigationTarget,navigationSequence]);
@@ -251,9 +252,10 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   const id=pricingStage==="official"?"bid.budget.pricing.official":
    pricingStage==="working"?"bid.budget.working.bc":
    pricingStage==="budgetary"?"bid.budget.pricing.budgetary":"bid.budget.pricing.release.preview";
-  const target=findModuleElement0553(document,id);
+  const breakdownTarget=/^bid\.budget\.pricing\.(?:official|release\.preview)\.breakdown(?:\.a[1-4])?$/.test(navigationTarget||"");
+  const target=findModuleElement0553(document,breakdownTarget&&navigationTarget.startsWith(id+".breakdown")?navigationTarget:id);
   if(target){openModuleAncestors0553(target);if(target.tagName==="DETAILS")target.open=true;target.scrollIntoView?.({behavior:"smooth",block:"start"});}
- },[pricingStage,breakdownSelection,breakdownFocus]);
+ },[pricingStage,breakdownSelection,breakdownFocus,navigationTarget,navigationSequence]);
  const pricingNavigation=(
     <nav className="p553-pricing-stage-nav" aria-label="Pricing workflow stages"
      data-component-key="bid.budget.pricing.single-release">

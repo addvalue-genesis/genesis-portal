@@ -1,3 +1,5 @@
+import {ComponentCopyId} from "../common/ui/ComponentCopyId";
+import {breakdownModule0553} from "./pricingViewRegistry0553";
 import React,{useEffect,useMemo,useRef,useState} from "react";
 import {buildCustomerPriceBreakdown0553,breakdownKey0553} from "./data/customerPriceBreakdown0553";
 import {selectWorkingBomProjection0553} from "./data/workingBomAggregation0553";
@@ -5,7 +7,15 @@ import {buildMrCustomerSummary0553,mrSummaryKey0553} from "./data/mrCustomerSumm
 import "./customerPriceBreakdown0553.css";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 
+function BreakdownCopyId0553({origin,code=null}){
+ const module=breakdownModule0553(origin,code);
+ return <span className="p553-breakdown-identity" onClick={e=>{e.preventDefault();e.stopPropagation();}} onKeyDown={e=>e.stopPropagation()}>
+  <ComponentCopyId projectId="PJ2608-0553" componentKey={module.id}/>
+ </span>;
+}
+
 export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin="released",focus=null,showPriceDetails,onPriceDetailsChange,view,onViewChange}){
+ const module=breakdownModule0553(origin);
  const model=useMemo(()=>buildCustomerPriceBreakdown0553(source,official),[source,official]);
  const summary=useMemo(()=>buildMrCustomerSummary0553(model),[model]);
  const [localView,setLocalView]=useState(origin==="official"?"customer":"internal");
@@ -22,8 +32,8 @@ export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin=
   for(let p=row.parentElement;p;p=p.parentElement)if(p.tagName==="DETAILS")p.open=true;
   row.focus({preventScroll:true});row.scrollIntoView?.({behavior:"instant",block:"center"});
  },[focus,activeView]);
- return <section className="p553-breakdown" ref={root} aria-label="Price breakdown review">
-  <h3>Part A · {customer?"MR scope summary":"Internal item breakdown"}</h3>
+ return <section className="p553-breakdown" ref={root} aria-label="Price breakdown review" data-component-key={module.id}>
+  <div className="p553-breakdown-heading"><h3>{module.number} · Part A · {customer?"MR scope summary":"Internal item breakdown"}</h3><BreakdownCopyId0553 origin={origin}/></div>
   <div className="p553-breakdown-display" role="group" aria-label="Part A breakdown view">
    <button type="button" aria-pressed={customer} onClick={()=>setView("customer")}>Customer · สรุปตาม MR</button>
    <button type="button" aria-pressed={!customer} onClick={()=>setView("internal")}>Internal · รายละเอียด {model.groups.reduce((n,g)=>n+g.rows.length,0)} แถว</button>
@@ -39,10 +49,10 @@ export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin=
   {customer&&<p className="p55-note">{summary.groups.reduce((n,g)=>n+g.rows.length,0)} รายการสรุปตาม MR / สถานที่ · S คือเลขลำดับสรุป ไม่ใช่เลขบรรทัดใน MR · จำนวนชุดอ้างอิง MR; งาน brownfield ที่ไม่มีจำนวนรวมชัดเจนแสดง See MR §5</p>}
   <div className="p553-breakdown-checks"><strong>{model.reconciled?"A1–A4 totals match":"Price reconciliation required"}</strong>
    <span>Priced A+B: USD {money(model.totalUSD)}</span><span>C1/C2: separate conditional options</span></div>
-  {customer?<MrScopeSummary0553 model={summary} showPrices={showPrices}/>:model.groups.map(g=><details key={g.code} className="p553-breakdown-group">
-   <summary><strong>{g.code} · {g.mr}</strong><span>USD {money(g.parentUSD)}</span>
+  {customer?<MrScopeSummary0553 model={summary} showPrices={showPrices} origin={origin}/>:model.groups.map(g=><details key={g.code} className="p553-breakdown-group" data-component-key={breakdownModule0553(origin,g.code).id} data-cost-owner={g.code}>
+   <summary><strong>{breakdownModule0553(origin,g.code).number} · {g.code} · {g.mr}</strong><span>USD {money(g.parentUSD)}</span>
     <span>{g.pricedCount} priced / {g.includedCount} included / {g.pendingCount} not priced</span>
-    <span>Difference: {money(g.varianceUSD)}</span></summary>
+    <span>Difference: {money(g.varianceUSD)}</span><BreakdownCopyId0553 origin={origin} code={g.code}/></summary>
    {(!g.sourceComplete||g.quantityPendingCount>0)&&<p className="p55-note">Source completeness requires review{g.quantityPendingCount?"; quantity/unit missing on "+g.quantityPendingCount+" priced rows":""}. A matching subtotal does not close technical or price gaps.</p>}
    <div className="p553-sheet-scroll"><table className="p55-table p55-table--compact"><thead><tr>
     {["Item / TAG","Location","Description","Qty / Unit",...(showPrices?["Unit USD","Amount USD"]:[]),"State / Source"].map(h=><th key={h}>{h}</th>)}
@@ -57,9 +67,9 @@ export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin=
  </section>;
 }
 
-function MrScopeSummary0553({model,showPrices}){
- return model.groups.map(g=><details key={g.code} open className="p553-breakdown-group" data-mr-summary-group={g.code}>
-  <summary><strong>{g.code} · {g.mr} · {g.description}</strong><span>USD {money(g.parentUSD)}</span></summary>
+function MrScopeSummary0553({model,showPrices,origin}){
+ return model.groups.map(g=><details key={g.code} open className="p553-breakdown-group" data-mr-summary-group={g.code} data-component-key={breakdownModule0553(origin,g.code).id} data-cost-owner={g.code}>
+  <summary><strong>{breakdownModule0553(origin,g.code).number} · {g.code} · {g.mr} · {g.description}</strong><span>USD {money(g.parentUSD)}</span><BreakdownCopyId0553 origin={origin} code={g.code}/></summary>
   <p className="p55-note">{g.qualification}</p>
   <div className="p553-sheet-scroll"><table className="p55-table p55-table--compact"><thead><tr>
    {["Summary item","Location","MR scope","Qty / Unit",...(showPrices?["Unit USD","Amount USD"]:[]),"MR reference"].map(h=><th key={h}>{h}</th>)}
