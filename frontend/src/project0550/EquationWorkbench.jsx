@@ -4,6 +4,7 @@ import {newId} from "./data/bidWorkspaceModel";
 import {EQUATION_INPUTS,evaluateServiceEquation} from "./serviceEquationRuntime";
 import {SERVICE_EQUATIONS,SYSTEMS} from "./data";
 import {Module,Field,Select,Save} from "./BidControls";
+import {BidInheritedBasis} from "./BidInheritedBasis";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 export function EquationWorkbench(){
  const {data,put,busy}=useBidWorkspace();
@@ -13,11 +14,12 @@ export function EquationWorkbench(){
  const definition=EQUATION_INPUTS[form.equationId],result=evaluateServiceEquation(form.equationId,form.inputs),method=SERVICE_EQUATIONS.find(e=>e.id===form.equationId);
  const field=(k,v)=>setForm(f=>({...f,[k]:v}));const input=(k,v)=>setForm(f=>({...f,inputs:{...f.inputs,[k]:v}}));
  return <Module id="bid.engineering.equations" title="02.1 Equation Execution — คำนวณและบันทึก Driver">
+ <BidInheritedBasis/>
  <p>ตัวเลขคน/วันเป็นค่าแผนงานที่กรอกเองได้ ผลที่บันทึกเลือกไปใช้เป็น Quantity/MD/MH ใน Working ได้โดยไม่คัดลอกตัวเลขซ้ำ สมการคำนวณไม่ใช่การรับรอง Engineering หรืออนุมัติราคา</p>
  <form onSubmit={async e=>{e.preventDefault();if(await put("calculations",{...form,id:form.id||newId("CAL")}))setForm(blank());}}>
  <div className="p55-bid-fields"><Field label="Calculation title" value={form.title} onChange={v=>field("title",v)} placeholder="เช่น PAGA SAT — Telecom Engineer" required/>
  <Select label="Calculation system" value={form.systemToken} onChange={v=>field("systemToken",v)} options={[["COMMON","COMMON / shared"],...SYSTEMS.map(s=>[s.token,s.name])]}/>
- <Select label="Equation" value={form.equationId} onChange={v=>setForm(f=>({...f,equationId:v,inputs:{}}))} options={Object.keys(EQUATION_INPUTS).map(id=>[id,id+" · "+(SERVICE_EQUATIONS.find(e=>e.id===id)?.purpose||EQUATION_INPUTS[id].formula)])}/>
+ <Select label="Equation" value={form.equationId} onChange={v=>setForm(f=>({...f,equationId:v,inputs:v==="E17"&&data.fx.source&&data.fx.date&&data.fx.thbPerUSD>0?{fx:data.fx.thbPerUSD}:{}}))} options={Object.keys(EQUATION_INPUTS).map(id=>[id,id+" · "+(SERVICE_EQUATIONS.find(e=>e.id===id)?.purpose||EQUATION_INPUTS[id].formula)])}/>
  <Field label="Calculation source / planning basis" value={form.sourceRef} onChange={v=>field("sourceRef",v)} required/></div>
  <p><strong>{method?.equation||definition.formula}</strong></p><p>{method?.control}</p>
  <div className="p55-bid-fields">{definition.fields.map(f=><Field key={f.key} label={f.label} type="number" step="any" min={f.min} max={f.max} value={form.inputs[f.key]} onChange={v=>input(f.key,v)}/>)}</div>

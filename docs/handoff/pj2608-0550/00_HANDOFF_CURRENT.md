@@ -1,4 +1,11 @@
-> **Latest new-chat checkpoint, 28-Oct-2026:** Read
+> **Current correction, 28-Oct-2026:** Read
+> [MR work process and inherited bases](20261028_WORK_PROCESS_DEFAULTS.md).
+> UI `.4-preview` on the same Official Working review branch, draft PR #53.
+> This applies the current chat's process order and reuse of 01–08 bases to the
+> earlier handoff. Stable IDs and frozen prices remain unchanged. Actual customer
+> prices and user installation are not verified; release remains HOLD.
+
+> **Earlier new-chat checkpoint, 28-Oct-2026:** Read
 > [PJ2608-0550 detailed handoff](PJ2608-0550_NEW_CHAT_HANDOFF_20261028.md) first.
 > Review branch `feat/pj2608-0550-official-working-20261028`, UI `.3-preview`,
 > application commit `eb8dda6b`; 15 browser checks passed. User installation of

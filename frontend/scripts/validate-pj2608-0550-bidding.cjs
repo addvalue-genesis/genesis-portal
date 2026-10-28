@@ -19,6 +19,17 @@ try {
  assert.equal(e("E18",{rows:[{id:"DUP",qtyInstalled:1,UMH:1},{id:"DUP",qtyInstalled:1,UMH:1}]}).state,"INVALID");
  const {emptyBidWorkspace,validateBidWorkspace,deriveBidWorkspace}=require(path.join(root,"project0550/data/bidWorkspaceModel.js"));
  const {DATA_LAYER_META,SYSTEMS,MODULE_REGISTRY}=require(path.join(root,"project0550/data.js")),ids=SYSTEMS.map(s=>s.token),snapshot=DATA_LAYER_META.datasetId;
+ const {policyDefaults0550,applyPolicyDraft0550,applyRoleDraft0550,calculationBinding0550,MR_SUPPLY_ORDER_0550}=require(path.join(root,"project0550/bidWorkingBasis0550.js"));
+ const {COMMERCIAL_POLICY,CORE_TEAM}=require(path.join(root,"project0550/data.js"));
+ assert.deepEqual(policyDefaults0550(COMMERCIAL_POLICY,"Goods / Procured Cost"),{sellMode:"MARGIN",marginPct:5,primePct:20});
+ assert.equal(policyDefaults0550([{title:"Goods / Procured Cost",formula:"changed unknown policy"}],"Goods / Procured Cost"),null);
+ const prior={currency:"EUR",unit:"Lot",manualCost:321,primePct:11,sourceRef:"kept source"},priorBytes=JSON.stringify(prior);
+ const policyDraft=applyPolicyDraft0550(prior,COMMERCIAL_POLICY,"Professional Service");assert.equal(policyDraft.primePct,5);assert.equal(policyDraft.manualCost,321);assert.equal(JSON.stringify(prior),priorBytes);
+ assert.equal(applyRoleDraft0550(prior,CORE_TEAM[0],null),prior,"Never reinterpret existing EUR/Lot manual cost as USD/MD");
+ const roleDraft=applyRoleDraft0550({...prior,manualCost:null},CORE_TEAM[0],null);assert.equal(roleDraft.sellRate,CORE_TEAM[0].protectedUsdDay);assert.equal(roleDraft.manualCost,null);assert.equal(roleDraft.currency,"USD");
+ assert.equal(applyRoleDraft0550(prior,CORE_TEAM[0],{currency:"EUR",unit:"MD"}),prior,"Do not mix USD role rate with EUR quote");
+ assert.equal(calculationBinding0550({id:"CAL",equationId:"E02"},null,null).unit,"MH");assert.equal(calculationBinding0550({id:"CAL",equationId:"E05"},"MH",{currency:"USD",unit:"MD"}).unit,undefined,"Quote unit must remain authoritative; mismatch is gated");
+ const ordered=MR_SUPPLY_ORDER_0550.flatMap(g=>g.systems);assert.equal(new Set(ordered).size,20);assert.deepEqual([...ordered].sort(),[...ids,"COMMON"].sort());
  const data=emptyBidWorkspace(snapshot);data.vendors=[{id:"VEN-TEST",name:"Synthetic vendor",kind:"SERVICE_PROVIDER",reference:"TEST ONLY"}];
  data.offers=[{id:"OFFER-TEST",vendorId:"VEN-TEST",description:"Synthetic engineer",brand:"",quoteRef:"TEST-QUOTE",sourceRef:"Synthetic test source",date:"2026-10-01",validUntil:"2027-12-31",currency:"USD",unit:"MD",unitCost:100}];
  data.calculations=[{id:"CAL-TEST",title:"Synthetic SAT",systemToken:"TEL-PAGA",equationId:"E05",inputs:examples.E05[0],sourceRef:"Synthetic plan"}];

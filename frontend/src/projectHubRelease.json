@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-28.3-preview",
+  "version": "2026-10-28.4-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "source0550": "b000ee553400c64f51203cad7b9d7711a4badedb",
-  "capability": "0550 Official Working / Module Colours / Numbered Modules / Copy ID"
+  "capability": "0550 MR work process / inherited project bases / numbered Source-to-Release workflow"
 }

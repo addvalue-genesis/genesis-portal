@@ -22,7 +22,7 @@ function EvidenceFields({value,onChange,prefix}){
 }
 export function OfficialLineReviewFields({value,onChange}){
  const {data}=useBidWorkspace(),r=value||blankOfficialReview();
- return <details className="p55-review-fields" open data-component-key="bid.budget.working.editor.review" data-module-number="10.1.3.1"><summary><BidHeading id="bid.budget.working.editor.review"/></summary>
+ return <details className="p55-review-fields" open data-component-key="bid.budget.working.editor.review" data-module-number="10.2.1.1"><summary><BidHeading id="bid.budget.working.editor.review"/></summary>
  <div className="p55-bid-fields"><Select label="Official decision" value={r.decision} onChange={v=>onChange({...r,decision:v})} options={[["OPEN","OPEN · รอตรวจ"],["KEEP","KEEP · ตรวจแล้วใช้ต่อ"],["RECALCULATE","RECALCULATE · คำนวณใหม่"],["ADD","ADD · เพิ่มตามข้อกำหนด"],["REMOVE","REMOVE · ยกเลิกพร้อมเหตุผล"]]}/><Select label="RFQ comparison" value={r.comparisonId} onChange={v=>onChange({...r,comparisonId:v})} options={[["","อ้างข้อกำหนดโดยตรง"],...(data.sourceIntake?.packageComparisons||[]).map(c=>[c.id,c.title+" · "+c.basis])]}/><Field label="Engineering / quantity / ownership basis" value={r.engineeringBasis} onChange={v=>onChange({...r,engineeringBasis:v})}/><Field label="Cost / commercial / Incoterm / warranty basis" value={r.commercialBasis} onChange={v=>onChange({...r,commercialBasis:v})}/></div>
  <EvidenceFields prefix="Line review" value={r} onChange={onChange}/>
  <p>บันทึกผลทบทวนสำหรับข้อมูลชุดนี้ · การเปลี่ยน Qty / Quote / Formula / FX / หลักฐาน จะทำให้กลับเป็น STALE · เป็นผลทบทวนภายใน ไม่ใช่การอนุมัติส่งลูกค้า</p>
@@ -41,7 +41,7 @@ function CustomerScopeReview({row}){
  const {change,busy}=useBidWorkspace();
  const [draft,setDraft]=useState(null),value=draft||row.review||blankCustomerReview(row.code);
  const save=async e=>{e.preventDefault();if(await change(current=>{const record={...value,basisKey:customerScopeBasisKey(current,row.code,value)};return {...current,customerReviews:[...(current.customerReviews||[]).filter(r=>r.code!==row.code),record]};},"Review OFF-03 customer scope / "+row.code))setDraft(null);};
- return <details className="p55-review-fields" data-component-key={row.sourceModuleId} data-module-number={"10.3.1."+row.code} data-bid-owner={customerOwner0550(row)} style={bidOwnerStyle(customerOwner0550(row))}><summary><BidHeading id={row.sourceModuleId} number={"10.3.1."+row.code} title={row.code+" · "+row.description}/><span className="p55-group-total">{row.state} · {amount(row.customerUSD,"USD")}</span></summary>
+ return <details className="p55-review-fields" data-component-key={row.sourceModuleId} data-module-number={"10.3."+row.code} data-bid-owner={customerOwner0550(row)} style={bidOwnerStyle(customerOwner0550(row))}><summary><BidHeading id={row.sourceModuleId} number={"10.3."+row.code} title={row.code+" · "+row.description}/><span className="p55-group-total">{row.state} · {amount(row.customerUSD,"USD")}</span></summary>
  <p>รายการที่เลือก: {row.children.length} · {row.problems.join(" · ")}</p>
  <form onSubmit={save}><Select label={row.code+" scope decision"} value={value.status} onChange={v=>setDraft({...value,status:v})} options={[["OPEN","OPEN · ยังไม่ครบ"],["REVIEWED","REVIEWED · ตรวจขอบเขตและรายการย่อยครบ"],["EXCLUDED","EXCLUDED · ไม่เสนอ พร้อมหลักฐาน / ไม่มีรายการที่เลือก"]]}/>
  <EvidenceFields prefix={row.code} value={value} onChange={setDraft}/>

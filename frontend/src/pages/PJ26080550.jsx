@@ -2141,7 +2141,7 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "engineering" ? <><EquationWorkbench/><EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /></> : null}
           {activeTab === "execution" ? <><EquationWorkbench/><ExecutionView /></> : null}
           {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
-          {activeTab === "budget" ? <BidCommercialWorkspace onOpenSource={id=>jump({id,tab:"documents",area:"A"})} navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
+          {activeTab === "budget" ? <BidCommercialWorkspace onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}} onOpenSource={id=>jump({id,tab:"documents",area:"A"})} navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
           {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
           {activeTab === "documents" ? <><details className="p55-panel"><summary>Project evidence / original references</summary><DocumentsView navigationTarget={navigationTarget}/></details><VendorWorkspace/></> : null}
           {activeTab === "registry" ? <BidDataControls/> : null}
