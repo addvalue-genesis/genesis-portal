@@ -85,6 +85,7 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
   <div className="p55-wp-header"><div><h2>Working Preview · สมอง System Integrator · 1–8</h2><p>A ลูกค้า ↔ วิเคราะห์ / CAL–RPT / รวมระบบ ↔ B Supplier → Working → Budgetary → Release → Source</p></div><ComponentCopyId projectId="PJ2608-0550" componentKey="bid.working-preview"/></div>
   <div className="p55-review-toolbar"><Select label="Working Preview system" value={system} onChange={setSystem} options={systemOptions}/><button type="button" onClick={()=>{setExpanded(true);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=true);}}>ขยาย 1–8</button><button type="button" onClick={()=>{setExpanded(false);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=false);}}>หุบ 1–8</button></div>
   <div className="p55-wp-status" role="status" aria-live="polite">{saved||`${model.scopes.length} ระบบ/งานร่วม · ${model.requirements.length} requirement records · ${model.proofs.length} derived CAL/RPT · ${model.activities.length} activities/deliverables · ข้อที่ยังไม่อ่าน/วิเคราะห์แสดง OPEN`}</div>
+  <button type="button" onClick={()=>onOpenSource("bid.documents.si-work-package")}>นำเข้าผลวิเคราะห์ SI จากเอกสาร</button>
   {WORKING_PREVIEW_STAGES_0550.map(renderStage)}
  </section>;
 }

@@ -195,3 +195,12 @@ It preserves the selected INDUSTRONIC deviation work and distinguishes existing
 checks from remaining impact-graph, schema and issue/transmittal work. Domain
 principles, proof acceptance criteria, financial inputs, template and Release HOLD
 remain controlled as described above.
+
+## 9. Private SI draft package checkpoint — 29-Oct-2026
+
+The [SI work-package checkpoint](../handoff/pj2608-0550/20261029_SI_WORK_PACKAGE.md)
+records an additive intake into the existing canonical Integration workspace.
+Source-version checks, unstamped DRAFT-only ingestion, preservation of existing
+user records and financial/history invariants execute at import. Private source
+reading and derived desk assessments are delivered separately; importing them
+does not establish full clause coverage, adequate system design or issue approval.

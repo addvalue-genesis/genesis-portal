@@ -3,11 +3,16 @@ import { useBidWorkspace, downloadBidFile } from "./BidWorkspaceContext";
 import { SYSTEMS, SOURCE_REGISTER, validateSourceIntake, applySourceIntake, deriveSourceIntake, deriveDocumentRevisionRegister, safeSourceUrl } from "./data";
 import { Module } from "./BidControls";
 import { ComponentCopyId } from "../common/ui/ComponentCopyId";
+import {SiWorkPackage0550} from "./SiWorkPackage0550";
 
 const TOKENS = SYSTEMS.map(s => s.token);
 export function SourceLink({ source }) {
   const url = safeSourceUrl(source?.url);
   return url ? <a href={url} target="_blank" rel="noopener noreferrer">{source.title}</a> : <span>{source?.title || "OPEN"}</span>;
+}
+function SourceText({content}) {
+  const [open,setOpen]=useState(false);
+  return <details onToggle={e=>setOpen(e.currentTarget.open)}><summary>อ่านข้อความต้นทางที่ดึงมา</summary>{open&&<pre className="p55-source-text">{content}</pre>}</details>;
 }
 function SourceRefs({ ids, sources }) {
   return ids.map(id => <div key={id}><SourceLink source={sources.find(s => s.id === id)} /></div>);
@@ -62,14 +67,15 @@ export function SourceCommunications() {
 }
 export function ControlledSourceInventory({ navigationTarget }) {
   const { data, busy, change, reviewDate, reload, sourceSync } = useBidWorkspace();
+  const [visibleCount,setVisibleCount]=useState(50);
   const [pending, setPending] = useState(null), [error, setError] = useState(""), [query, setQuery] = useState(""), [provider, setProvider] = useState("ALL");
   const intake = data?.sourceIntake;
-  useEffect(() => { if (navigationTarget?.startsWith("bid.documents.source.")) { setQuery(""); setProvider("ALL"); } }, [navigationTarget]);
+  useEffect(() => { if (navigationTarget?.startsWith("bid.documents.source.")) { setQuery(""); setProvider("ALL"); setVisibleCount(Math.max(50,(data?.sourceIntake?.sources.findIndex(s=>"bid.documents.source."+s.id===navigationTarget)??0)+1)); } }, [navigationTarget]);
   const model = useMemo(() => deriveSourceIntake(intake, reviewDate), [intake, reviewDate]);
   const rows = model.sources.filter(s => (provider === "ALL" || s.provider === provider) && (s.title + " " + s.documentNo + " " + s.id + " " + s.note).toLowerCase().includes(query.toLowerCase()));
   async function preview(file) {
     setPending(null); setError(""); if (!file) return;
-    try { if (file.size > 5 * 1024 * 1024) throw Error("Source intake exceeds 5 MiB"); setPending(validateSourceIntake(JSON.parse(await file.text()), TOKENS)); } catch (e) { setError(e.message); }
+    try { if (file.size > 16 * 1024 * 1024) throw Error("Source intake exceeds 16 MiB"); setPending(validateSourceIntake(JSON.parse(await file.text()), TOKENS)); } catch (e) { setError(e.message); }
   }
   async function apply() {
     const ok = await change(current => applySourceIntake(current, pending, TOKENS), "Import source inventory / " + pending.batchId);
@@ -86,10 +92,12 @@ export function ControlledSourceInventory({ navigationTarget }) {
       {intake ? <><p><strong>ตรวจล่าสุด: {intake.reviewedOn}</strong> · {model.sources.length} แหล่ง · อ่านข้อความ {model.readCount} · รออ่าน/ตรวจภาพ {model.unreadCount} · ประเด็น OPEN/CONFLICT {model.openCount}</p><p>{intake.coverageNote}</p><button type="button" onClick={() => downloadBidFile(intake, "PJ2608-0550_Source_Intake_" + intake.reviewedOn + ".json")}>Export source intake</button></> : <p>ยังไม่มีทะเบียนจาก Drive ใน workspace นี้ — รายการ Historical ด้านล่างเป็นข้อมูลเดิม</p>}
       <PackageComparison intake={intake}/>
       <DocumentRevisionRegister intake={intake}/>
-      <div className="p55-bid-form"><label>ค้นหาเอกสาร <input aria-label="Search source inventory" value={query} onChange={e => setQuery(e.target.value)}/></label><label>แหล่ง <select aria-label="Source provider" value={provider} onChange={e => setProvider(e.target.value)}><option value="ALL">ทั้งหมด</option><option value="GDRIVE">GDrive</option><option value="GMAIL">Gmail</option></select></label></div>
-      <div className="p55-table-wrap"><table className="p55-table" aria-label="Controlled source inventory"><thead><tr><th>Source / เอกสาร</th><th>Revision / วันที่</th><th>Authority / อ่านถึงไหน</th><th>รายละเอียดต้นทาง</th></tr></thead><tbody>{!rows.length && <tr><td colSpan={4}>{!intake ? <><strong>ทะเบียนปัจจุบันว่าง — รอโหลดข้อมูลจาก Drive</strong><p>รายการ Historical ด้านล่างเป็นข้อมูลเดิม ไม่ใช่ผลตรวจเอกสารล่าสุด</p><button type="button" disabled={!data || busy} onClick={reload}>ตรวจข้อมูลจาก Drive อีกครั้ง</button></> : <><strong>{model.sources.length ? "ไม่พบเอกสารตามตัวกรอง" : "ชุดข้อมูลที่โหลดไม่มีรายการเอกสาร"}</strong>{model.sources.length > 0 && <button type="button" onClick={() => { setQuery(""); setProvider("ALL"); }}>ล้างตัวกรอง</button>}</>}</td></tr>}{rows.map(s => <tr key={s.id} data-component-key={"bid.documents.source." + s.id}><td><SourceLink source={s}/><small>{s.id} · {s.provider}</small><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.documents.source." + s.id}/></td><td>{s.revision || "ไม่ระบุ"}<small>{s.issuedDate || "วันที่ออกไม่ยืนยัน"}</small></td><td>{s.effectiveAuthority}<small>{s.readState}</small></td><td>{s.note}{s.replaces.length > 0 && <small>แทนที่: {s.replaces.join(", ")}</small>}{s.content && <details><summary>อ่านข้อความต้นทางที่ดึงมา</summary><pre className="p55-source-text">{s.content}</pre></details>}</td></tr>)}</tbody></table></div>
+      <div className="p55-bid-form"><label>ค้นหาเอกสาร <input aria-label="Search source inventory" value={query} onChange={e => {setQuery(e.target.value);setVisibleCount(50);}}/></label><label>แหล่ง <select aria-label="Source provider" value={provider} onChange={e => {setProvider(e.target.value);setVisibleCount(50);}}><option value="ALL">ทั้งหมด</option><option value="GDRIVE">GDrive</option><option value="GMAIL">Gmail</option></select></label></div>
+      <div className="p55-table-wrap"><table className="p55-table" aria-label="Controlled source inventory"><thead><tr><th>Source / เอกสาร</th><th>Revision / วันที่</th><th>Authority / อ่านถึงไหน</th><th>รายละเอียดต้นทาง</th></tr></thead><tbody>{!rows.length && <tr><td colSpan={4}>{!intake ? <><strong>ทะเบียนปัจจุบันว่าง — รอโหลดข้อมูลจาก Drive</strong><p>รายการ Historical ด้านล่างเป็นข้อมูลเดิม ไม่ใช่ผลตรวจเอกสารล่าสุด</p><button type="button" disabled={!data || busy} onClick={reload}>ตรวจข้อมูลจาก Drive อีกครั้ง</button></> : <><strong>{model.sources.length ? "ไม่พบเอกสารตามตัวกรอง" : "ชุดข้อมูลที่โหลดไม่มีรายการเอกสาร"}</strong>{model.sources.length > 0 && <button type="button" onClick={() => { setQuery(""); setProvider("ALL"); }}>ล้างตัวกรอง</button>}</>}</td></tr>}{rows.slice(0,visibleCount).map(s => <tr key={s.id} data-component-key={"bid.documents.source." + s.id}><td><SourceLink source={s}/><small>{s.id} · {s.provider}</small><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.documents.source." + s.id}/></td><td>{s.revision || "ไม่ระบุ"}<small>{s.issuedDate || "วันที่ออกไม่ยืนยัน"}</small></td><td>{s.effectiveAuthority}<small>{s.readState}</small></td><td>{s.note}{s.replaces.length > 0 && <small>แทนที่: {s.replaces.join(", ")}</small>}{s.content && <SourceText content={s.content}/>}</td></tr>)}</tbody></table></div>
+      {rows.length>visibleCount&&<button type="button" onClick={()=>setVisibleCount(n=>n+50)}>แสดงเอกสารเพิ่มอีก 50 รายการ ({Math.min(visibleCount,rows.length)} / {rows.length})</button>}
       <details><summary>Historical source register — ทะเบียนเดิม ไม่ใช่ผลตรวจล่าสุด (read-only)</summary><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>ID</th><th>Source</th><th>Use / historical state</th></tr></thead><tbody>{SOURCE_REGISTER.map(s => <tr key={s.id}><td>{s.id}</td><td>{s.name}</td><td>{s.use}<small>{s.state}</small></td></tr>)}</tbody></table></div></details>
     </Module>
+    <SiWorkPackage0550/>
     <SourceFindings navigationTarget={navigationTarget}/>
   </div>;
 }

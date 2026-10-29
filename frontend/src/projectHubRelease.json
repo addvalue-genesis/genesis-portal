@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-29.5-preview",
+  "version": "2026-10-29.6-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "source0550": "56ba1f060b38fe54ba6c72ff137d0e2e9b5d70b5",
-  "capability": "0550 Deviation Release / native eleven-column XLSX draft + selected INDUSTRONIC AVL draft + SI operating controls / decimal rounding / unit-amount reconciliation / HOLD"
+  "capability": "0550 SI engineering work-package import / canonical draft merge + Deviation Release XLSX + selected INDUSTRONIC AVL draft + SI operating controls / HOLD"
 }

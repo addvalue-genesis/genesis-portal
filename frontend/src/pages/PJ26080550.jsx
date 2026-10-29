@@ -2069,6 +2069,7 @@ function Project0550Bidding({ lang = "th" }) {
   const [focusedSystem,setFocusedSystem]=useState("ALL");
   const {data,model}=useBidWorkspace();
   const baseModuleIndex=[{id:"l3.original",title:"RFQ-02 Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
+    {id:"bid.documents.si-work-package",title:"Import System Integrator engineering drafts",area:"A",tab:"documents"},
     {id:"bid.working-preview",title:"Working Preview / System Integrator 1–8",tab:"budget"},
     {id:"bid.working-preview.particulars",title:"System Particular / Document reading ledger",tab:"budget"},
     ...(model?.integration?.requirements||[]).map(r=>({id:"bid.working-preview.requirement."+r.id,title:r.title+" / "+r.systemToken,tab:"budget"})),

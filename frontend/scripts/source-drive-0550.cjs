@@ -3,7 +3,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const ENDPOINT = '/api/local/pj2608-0550/source-intake';
-const MAX_BYTES = 5 * 1024 * 1024;
+const MAX_BYTES = 16 * 1024 * 1024;
 const PROJECT = /^PJ2608-0550(?:[ _-]|$)/;
 const FILENAME = /^PJ2608-0550_Source_Intake_Rev\d+_\d{8}\.json$/;
 const batchKey = value => {

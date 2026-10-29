@@ -33,8 +33,8 @@ export async function fetchAutomaticSource(fetcher=fetch) {
     const response=await fetcher('/api/local/pj2608-0550/source-intake',{cache:'no-store',signal:controller.signal});
     if(!response.headers.get('content-type')?.includes('application/json'))throw Error('SOURCE_BRIDGE_UNAVAILABLE');
     if(!response.ok) {const error=await response.json();throw Error(error.code || 'SOURCE_BRIDGE_UNAVAILABLE');}
-    if(Number(response.headers.get('content-length'))>5*1024*1024)throw Error('SOURCE_FILE_TOO_LARGE');
-    const body=await response.text();if(new Blob([body]).size>5*1024*1024)throw Error('SOURCE_FILE_TOO_LARGE');
+    if(Number(response.headers.get('content-length'))>16*1024*1024)throw Error('SOURCE_FILE_TOO_LARGE');
+    const body=await response.text();if(new Blob([body]).size>16*1024*1024)throw Error('SOURCE_FILE_TOO_LARGE');
     return JSON.parse(body);
   }finally{clearTimeout(timeout);}
 }
