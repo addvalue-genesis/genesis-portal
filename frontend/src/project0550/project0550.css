@@ -1652,3 +1652,13 @@
 .p55-working-preview .p55-table-wrap { max-width: 100%; }
 .p55-working-preview td { overflow-wrap: anywhere; }
 @media (max-width: 640px) { .p55-wp-header { flex-direction: column; } .p55-working-preview .p55-bid-fields { grid-template-columns: 1fr; } }
+.p55-si-principles { border: 1px solid #9bb6c8; background: #f4f8fc; border-radius: 10px; padding: 16px; margin-block: 12px; color: #17344b; min-width: 0; }
+.p55-si-architecture { grid-template-columns: minmax(0, 1fr); }
+.p55-si-architecture > * { min-width: 0; }
+.p55-si-principles p { line-height: 1.65; }
+.p55-si-equation { font-family: ui-monospace, monospace; font-weight: 700; overflow-wrap: anywhere; padding: 12px; border-left: 4px solid #08766e; background: #e3f1ed; }
+.p55-si-roles { display: grid; grid-template-columns: 1fr 1.6fr 1fr; gap: 12px; }
+.p55-si-roles > div { border: 1px solid #9bb6c8; border-radius: 8px; padding: 12px; background: #fff; min-width: 0; }
+.p55-si-principles code { overflow-wrap: anywhere; }
+.p55-si-principles summary { cursor: pointer; padding-block: 10px; font-weight: 700; }
+@media (max-width: 760px) { .p55-si-roles { grid-template-columns: 1fr; } .p55-si-principles { padding: 10px; } }

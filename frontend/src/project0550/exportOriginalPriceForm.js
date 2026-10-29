@@ -1,4 +1,5 @@
 import {officialCustomerRows,CUSTOMER_FORM_0550} from "./data/officialPricing0550";
+import {displayPriceCheck0550} from "./data/money0550";
 function esc(value) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -233,7 +234,7 @@ export function buildBidReviewXlsx(model,currency) {
     [`Revision ${model.revision} | ${currency} | Selected scope only | Customer-form regrouping / release approval pending`],
     ["WBS","System","Description","Qty","Unit",`Unit sell ${currency}`,`Total ${currency}`,"Status"]
   ];
-  model.selected.forEach(r=>rows.push([r.wbs,r.systemToken,r.description,r.quantity,r.unit,r[key]!==null&&r.quantity>0?r[key]/r.quantity:null,r[key],r[key]===null?"OPEN":model.pricingBasis==="PROVISIONAL_VENDOR"?"PROVISIONAL / UPDATE PENDING":"WORKING PRICE"]));
+  model.selected.forEach(r=>{const display=displayPriceCheck0550(r[key],r.quantity);rows.push([r.wbs,r.systemToken,r.description,r.quantity,r.unit,display.unitPrice,r[key],r[key]===null?"OPEN":!display.matches?"ROUNDING REVIEW REQUIRED":model.pricingBasis==="PROVISIONAL_VENDOR"?"PROVISIONAL / UPDATE PENDING":"WORKING PRICE"]);});
   const subtotal=currency==="USD"?model.selectedUSD:model.selectedTHB;
   rows.push(["","","Selected line subtotal — not complete project total","","","",subtotal,subtotal===null?"INCOMPLETE":"REVIEW ONLY"]);
   rows.push(["","","Base A+B — selected scope only","","","",currency==="USD"?model.baseUSD:model.baseTHB]);

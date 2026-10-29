@@ -5,6 +5,7 @@ import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
+import {roundMoney0550 as round,sumMoney0550} from "./money0550";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
@@ -20,7 +21,6 @@ export function newId(prefix){
 }
 const finite=n=>typeof n==="number"&&Number.isFinite(n);
 const nonnegative=n=>finite(n)&&n>=0;
-const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const fail=m=>{throw Error(m);};
 export function emptyBidWorkspace(snapshotId){return {schema:BID_SCHEMA,projectId:"PJ2608-0550",baselineSnapshotId:snapshotId,revision:0,vendors:[],offers:[],calculations:[],lines:[],nodes:[],edges:[],fx:{thbPerUSD:null,thbPerEUR:null,source:"",date:""},audit:[]};}
 export function validateBidWorkspace(data,snapshotId,systems){
@@ -111,7 +111,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
  });
  const selected=lines.filter(l=>l.selected);
  const complete=selected.length>0&&selected.every(l=>l.customerTHB!==null);
- const sum=(rows,key)=>rows.length&&rows.every(r=>r[key]!==null)?round(rows.reduce((n,r)=>n+r[key],0)):null;
+ const sum=(rows,key)=>sumMoney0550(rows.map(r=>r[key]));
  const groups=BID_WBS.map(code=>{const rows=selected.filter(l=>l.wbs===code);return {code,rows,costTHB:sum(rows,"costTHB"),customerTHB:sum(rows,"customerTHB"),customerUSD:sum(rows,"customerUSD")};});
  const missingSystems=systemTokens.filter(t=>!selected.some(l=>l.systemToken===t&&l.wbs==="A"));
  const missingWbs=BID_WBS.filter(c=>c!=="A"&&c!=="C1"&&!selected.some(l=>l.wbs===c));

@@ -3,6 +3,7 @@ import {deriveSourceIntake, deriveDocumentRevisionRegister} from "./sourceIntake
 import {deriveIntegration0550,integrationLineProblems0550,integrationLineBasis0550} from "./integrationWorkspace0550";
 
 import {isSatelliteScope0550,SATELLITE_SCOPE_VERSION} from "./satelliteScope0550";
+import {roundMoney0550 as round,sumMoney0550,displayPriceCheck0550,PRICING_POLICY_0550} from "./money0550";
 
 export const CUSTOMER_FORM_0550 = form;
 export const BID_CONTEXT_TAGS = Object.freeze({history:"HIS-01",source:"RFQ-02",working:"OFF-03",release:"REL-04"});
@@ -41,15 +42,14 @@ export function officialLineBasisKey(data,line,review=line.officialReview){
  const {officialReview,...inputs}=line;
  const {basisKey,...decision}=review||{};
  const owner=line.coveredByLineId?data.lines.find(l=>l.id===line.coveredByLineId):null;
- return fingerprint({method:"0550-official-review-v1",...(data.integrationWorkspace?{integration:integrationLineBasis0550(data,line)}:{}),...(isSatelliteScope0550(line)?{scopePolicy:SATELLITE_SCOPE_VERSION}:{}),inputs,decision,...(line.coveredByLineId?{coverageOwner:owner,ownerOffer:data.offers.find(o=>o.id===owner?.offerId)||null,ownerCalculation:data.calculations.find(c=>c.id===owner?.calculationId)||null}:{}),offer:data.offers.find(o=>o.id===line.offerId)||null,calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
+ return fingerprint({method:"0550-official-review-v1",pricingPolicy:PRICING_POLICY_0550,...(data.integrationWorkspace?{integration:integrationLineBasis0550(data,line)}:{}),...(isSatelliteScope0550(line)?{scopePolicy:SATELLITE_SCOPE_VERSION}:{}),inputs,decision,...(line.coveredByLineId?{coverageOwner:owner,ownerOffer:data.offers.find(o=>o.id===owner?.offerId)||null,ownerCalculation:data.calculations.find(c=>c.id===owner?.calculationId)||null}:{}),offer:data.offers.find(o=>o.id===line.offerId)||null,calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
 }
 export function customerScopeBasisKey(data,code,review){
  const {basisKey,...decision}=review;
  return fingerprint({code,decision,form,lines:data.lines.filter(l=>l.selected&&l.customerRowCode===code).map(l=>({id:l.id,key:officialLineBasisKey(data,l),review:l.officialReview})).sort((a,b)=>a.id.localeCompare(b.id)),sources:sourceBasis(data,review.sourceIds),fx:data.fx});
 }
 const customerSatelliteRemark = row => row.code==="A1-02"?"TSI supporting equipment and services only; COMPANY-supplied VSAT terminal hardware and three-link communication services excluded. Final interfaces subject to clarification.":row.systems.includes("TEL-VSAT-KU")?"KU/C Band Internet terminal and service supply responsibility remains subject to clarification; no automatic exclusion.":"";
-const round = x=>Math.round((x+Number.EPSILON)*100)/100;
-export const sumOfficial = (rows,key) => rows.length&&rows.every(r=>Number.isFinite(r[key]))?round(rows.reduce((n,r)=>n+r[key],0)):null;
+export const sumOfficial = (rows,key) => sumMoney0550(rows.map(r=>r[key]));
 
 // Projection of deriveBidWorkspace's computed amounts. No second price equation,
 // no historical prices, and no fallback to budgetary values.
@@ -65,6 +65,7 @@ export function deriveOfficialPricing(data,calculated,today,integrationModel){
   if(!mappingValid(raw))problems.push("REL-04: ต้องระบุ Customer row ที่ตรงหมวด");
   if(r&&r.basisKey!==officialLineBasisKey(data,raw,r))problems.push("STALE: ข้อมูลหรือหลักฐานเปลี่ยน ต้องทบทวนใหม่");
   problems.push(...row.problems);
+  if(row.selected && Number.isFinite(row.customerUSD) && !displayPriceCheck0550(row.customerUSD,row.quantity).matches)problems.push("DISPLAY_UNIT_AMOUNT_MISMATCH: ตรวจ Unit Price × Qty กับ Amount ตามแบบลูกค้า");
   if(integration)problems.push(...integrationLineProblems0550(integration,raw));
   const reviewed=problems.length===0;
   return {...row,calculatedCustomerTHB:row.customerTHB,calculatedCustomerUSD:row.customerUSD,reviewProblems:problems,reviewState:row.mrScopeState?.covered?"INCLUDED_IN_OWNER":row.mrScopeState?.excluded||row.satelliteScopeState?.excluded?"COMPANY_SUPPLY":reviewed?"REVIEWED_WORKING":problems.some(p=>p.startsWith("STALE"))?"STALE":"OPEN",costTHB:reviewed?row.costTHB:null,workingSellTHB:reviewed?row.workingSellTHB:null,customerTHB:reviewed?row.customerTHB:null,customerUSD:reviewed?row.customerUSD:null};
@@ -122,7 +123,9 @@ export function officialCustomerRows(official){
    }
    for(const line of group.children){
     const total=official.pricingBasis==="PROVISIONAL_VENDOR"||group.ready?line.customerUSD:null;
-    rows.push({kind:"line",key:line.id,moduleId:line.releaseModuleId,sourceId:line.sourceModuleId,cells:["",line.tagRef,[line.description,line.brand].filter(Boolean).join(" · "),line.quantity??"OPEN",line.unit,Number.isFinite(total)&&line.quantity>0?round(total/line.quantity):"OPEN",total??"OPEN",line.customerRemark||""]});
+    const display=displayPriceCheck0550(total,line.quantity);
+    const remark=[line.customerRemark,Number.isFinite(total)&&!display.matches?"ROUNDING REVIEW REQUIRED: displayed unit price x quantity differs from line amount.":""].filter(Boolean).join(" ");
+    rows.push({kind:"line",key:line.id,moduleId:line.releaseModuleId,sourceId:line.sourceModuleId,cells:["",line.tagRef,[line.description,line.brand].filter(Boolean).join(" · "),line.quantity??"OPEN",line.unit,display.unitPrice??"OPEN",total??"OPEN",remark]});
    }
   }
  }

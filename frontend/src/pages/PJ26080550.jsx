@@ -33,6 +33,7 @@ import { CoverageMatrix } from "../project0550/CoverageMatrix";
 import { PagaEvidenceReview } from "../project0550/PagaEvidenceReview";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {BidWorkspaceProvider,useBidWorkspace} from "../project0550/BidWorkspaceContext";
+import {SiOperatingPrinciples0550} from "../project0550/SiOperatingPrinciples0550";
 import {BidCommercialWorkspace} from "../project0550/BidCommercialWorkspace";
 import {EquationWorkbench} from "../project0550/EquationWorkbench";
 import {DeviationWorkspace0550} from "../project0550/ParticularDeviationWorkspace0550";
@@ -478,11 +479,11 @@ function Overview() {
   );
 }
 
-function ArchitectureView() {
+function ArchitectureView({onNavigate}) {
   const manifest = ARCHITECTURE_MANIFEST;
 
   return (
-    <div className="p55-stack">
+    <div className="p55-stack p55-si-architecture">
       <SectionTitle
         eyebrow="Smart Code / Self-Describing Architecture"
         title={manifest.title}
@@ -493,6 +494,8 @@ function ArchitectureView() {
         <strong>{manifest.governingMethod}</strong>
         <p>{manifest.architecture}</p>
       </section>
+
+      <SiOperatingPrinciples0550 onNavigate={onNavigate}/>
 
       <div className="p55-grid p55-grid--2">
         <section className="p55-panel">
@@ -2148,7 +2151,7 @@ function Project0550Bidding({ lang = "th" }) {
           <div className="p55-panel p55-module-nav"><label>ค้นหา / วาง Module ID <input aria-label="Project Module Search" value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&matches.length)jump(matches.find(m=>m.id.toLowerCase()===query||m.number?.toLowerCase()===query)||matches[0]);}} placeholder="PJ2608-0550 / bid.budget.release"/></label><div className="p55-module-results">{matches.slice(0,30).map(m=><button type="button" key={m.id} onClick={()=>jump(m)}>{m.number?m.number+" · ":""}{m.title}<small>{m.id}</small></button>)}</div></div>
           <div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>
           {activeTab === "overview" ? <Overview /> : null}
-          {activeTab === "architecture" ? <ArchitectureView /> : null}
+          {activeTab === "architecture" ? <ArchitectureView onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
           {activeTab === "systems" ? <><SystemsView key={focusedSystem} initialSystem={focusedSystem}/><CoverageMatrix/></> : null}
           {activeTab === "engineering" ? <><EquationWorkbench/><EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /></> : null}
           {activeTab === "execution" ? <><button type="button" onClick={()=>jump({id:"bid.engineering.equations",tab:"engineering"})}>เปิดสมการกลาง / ผลคำนวณที่ใช้ใน Working</button><ExecutionView /></> : null}

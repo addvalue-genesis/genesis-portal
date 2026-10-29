@@ -183,3 +183,15 @@ CAL/RPT completion remain engineering work. Method/input/criterion explanations
 and visual references are reviewed records, not automatically authenticated facts.
 Final release authorization remains HOLD. Principles 1–14 remain the governing
 contract; this checkpoint changes implementation status, not their meaning.
+
+## 8. SI equation / monetary display checkpoint — 29-Oct-2026
+
+The reviewed [SI equation Rev03](PJ2608-0550_SI_Equation_Rev03.md) now has a shared
+Architecture/Guide presentation with runtime diagnostics and links through existing
+module IDs. [The implementation checkpoint](../handoff/pj2608-0550/20261029_SI_OPERATING_CONTROLS.md)
+records decimal rounding at the existing monetary boundaries, policy-dependent
+Official review invalidation, unit/amount reconciliation and actual checks run.
+It preserves the selected INDUSTRONIC deviation work and distinguishes existing
+checks from remaining impact-graph, schema and issue/transmittal work. Domain
+principles, proof acceptance criteria, financial inputs, template and Release HOLD
+remain controlled as described above.

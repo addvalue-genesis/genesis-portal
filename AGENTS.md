@@ -7,6 +7,13 @@ execution, document control, pricing, release or their UI, read
 [`docs/architecture/ADR-0550-001-integrator-traceability.md`](docs/architecture/ADR-0550-001-integrator-traceability.md).
 It records the user's accepted customer–integrator–supplier domain principles.
 
+For the SI equation/module responsibility map and pricing/display review, also read
+[`docs/architecture/PJ2608-0550_SI_Equation_Rev03.md`](docs/architecture/PJ2608-0550_SI_Equation_Rev03.md)
+and the implementation checkpoint
+[`docs/handoff/pj2608-0550/20261029_SI_OPERATING_CONTROLS.md`](docs/handoff/pj2608-0550/20261029_SI_OPERATING_CONTROLS.md).
+The equation document is the reviewed design reference; the checkpoint records
+what was actually implemented. Do not treat outstanding design goals as runtime checks.
+
 The ADR distinguishes domain A/customer and B/supplier from existing UI areas and
 commercial Part A/B/C. Do not rename or migrate those namespaces implicitly.
 Preserve source/version lineage, stable IDs, user decisions, single cost ownership

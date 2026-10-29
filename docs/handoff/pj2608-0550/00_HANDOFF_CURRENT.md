@@ -1,3 +1,10 @@
+> **SI operating controls, 29-Oct-2026:** See
+> [equation, module map and monetary/display controls](20261029_SI_OPERATING_CONTROLS.md)
+> for UI `2026-10-29.4-preview` on the existing Official Working branch.
+> Architecture/Guide use live shared-model diagnostics. Decimal line rounding
+> and a unit-price/amount gate require old Official reviews to be checked again.
+> Inputs/history are preserved; project engineering remains OPEN and Release HOLD.
+
 > **Selected AVL deviation, 29-Oct-2026:** Read
 > [Selected PAGA AVL deviation](20261029_SELECTED_AVL_DEVIATION.md) for UI
 > `2026-10-29.3-preview`. The existing register now prepares and saves the selected
