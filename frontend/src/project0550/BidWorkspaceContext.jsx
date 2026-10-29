@@ -7,11 +7,13 @@ import {loadProject0550Bid,saveProject0550Bid,SYSTEMS,DATA_LAYER_META,BUDGETARY_
 import {deriveBidWorkspace,validateBidWorkspace} from "./data/bidWorkspaceModel";
 import {fetchAutomaticSource,selectAutomaticSource,sourceLoadMessage} from "./data/sourceAutoLoad";
 import {importLegacyVendorBasis0550} from "./data/legacyVendorBasis0550";
+import {workspaceDiagnostic0550} from "./data/workspaceRecovery0550";
 const Context=createContext(null);
 export const useBidWorkspace=()=>useContext(Context);
 export function downloadBidFile(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 export function BidWorkspaceProvider({children}){
  const [data,setData]=useState(null),[error,setError]=useState(""),[busy,setBusy]=useState(false),lock=useRef(false);
+ const [recovery,setRecovery]=useState(null);
  const [sourceSync,setSourceSync]=useState({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
  const reload=async()=>{
   if(lock.current)return;lock.current=true;setBusy(true);
@@ -21,7 +23,7 @@ export function BidWorkspaceProvider({children}){
    const mrPrepared=importMrWorkingBasis0550(vendorPrepared,COMMERCIAL_POLICY,reviewDate);
    const prepared=preparePagaAvlDeviation0550(importMgwVendorBasis0550(mrPrepared,reviewDate));
    if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor offers, MR Working requirements and selected PAGA AVL deviation / "+prepared.mgwQuoteImport.version);
-   setData(current);setError("");
+   setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    try {
     const intake=await fetchAutomaticSource(),selected=selectAutomaticSource(current,intake,SYSTEMS.map(s=>s.token));
@@ -33,7 +35,10 @@ export function BidWorkspaceProvider({children}){
     const code=e.name==="AbortError"?"DRIVE_TIMEOUT":e.message;
     setSourceSync({state:"UNAVAILABLE",code,message:sourceLoadMessage(code)});
    }
-  }catch(e){setError(e.message);}finally{lock.current=false;setBusy(false);}
+  }catch(e){
+   setData(null);setError(e.message);
+   setRecovery({rawWorkspace:e.rawWorkspace||null,diagnostic:workspaceDiagnostic0550(e,e.rawWorkspace,globalThis.location?.origin||"")});
+  }finally{lock.current=false;setBusy(false);}
  };
  useEffect(()=>{reload();},[]);
  const reviewDate=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Bangkok",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
@@ -41,5 +46,5 @@ export function BidWorkspaceProvider({children}){
  async function change(transform,action){if(!data||lock.current)return false;lock.current=true;setBusy(true);try{const next=transform(data);setData(await saveProject0550Bid(next,data.revision,action));setError("");return true;}catch(e){setError(e.message);return false;}finally{lock.current=false;setBusy(false);}}
  const put=(collection,record)=>change(d=>({...d,[collection]:d[collection].some(r=>r.id===record.id)?d[collection].map(r=>r.id===record.id?record:r):[...d[collection],record]}),"Save "+collection+" / "+record.id);
  async function importFile(file){if(!file)return;try{if(file.size>16*1024*1024)throw Error("Workspace exceeds 16 MiB");const imported=validateBidWorkspace(JSON.parse(await file.text()),DATA_LAYER_META.datasetId,SYSTEMS.map(s=>s.token));await change(current=>({...imported,revision:current.revision,audit:current.audit}),"Import reviewed 0550 workspace backup");}catch(e){setError(e.message);}}
- return <Context.Provider value={{data,model,error,busy,change,put,reload,importFile,reviewDate,sourceSync}}>{children}</Context.Provider>;
+ return <Context.Provider value={{data,model,error,busy,recovery,change,put,reload,importFile,reviewDate,sourceSync}}>{children}</Context.Provider>;
 }

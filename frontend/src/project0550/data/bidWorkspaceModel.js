@@ -7,6 +7,7 @@ import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
+export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease"];
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
 export function newId(prefix){
@@ -25,8 +26,8 @@ const fail=m=>{throw Error(m);};
 export function emptyBidWorkspace(snapshotId){return {schema:BID_SCHEMA,projectId:"PJ2608-0550",baselineSnapshotId:snapshotId,revision:0,vendors:[],offers:[],calculations:[],lines:[],nodes:[],edges:[],fx:{thbPerUSD:null,thbPerEUR:null,source:"",date:""},audit:[]};}
 export function validateBidWorkspace(data,snapshotId,systems){
  if(!data||data.schema!==BID_SCHEMA||data.projectId!=="PJ2608-0550"||data.baselineSnapshotId!==snapshotId)fail("Wrong project/schema/baseline");
- const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease"];
- if(Object.keys(data).some(k=>!keys.includes(k)))fail("Unsupported workspace field");
+ const unsupportedFields=Object.keys(data).filter(k=>!BID_WORKSPACE_FIELDS_0550.includes(k)).sort();
+ if(unsupportedFields.length){const error=Error("Unsupported workspace field: "+unsupportedFields.join(", "));error.code="WORKSPACE_UNSUPPORTED_FIELDS";error.unsupportedFields=unsupportedFields;throw error;}
  if(!Number.isSafeInteger(data.revision)||data.revision<0)fail("Invalid revision");
  for(const key of ["vendors","offers","calculations","lines","nodes","edges","audit"]){
   if(!Array.isArray(data[key])||data[key].length>2000)fail("Invalid "+key);
