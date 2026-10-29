@@ -38,7 +38,7 @@ function u32(n) {
   return [n & 255, (n >>> 8) & 255, (n >>> 16) & 255, (n >>> 24) & 255];
 }
 
-function zipStore(fileMap) {
+export function zipStore(fileMap) {
   const enc = new TextEncoder();
   const locals = [];
   const centrals = [];

@@ -1,3 +1,4 @@
+import "../project0550/deviationRelease0550.css";
 import {satelliteScopeNote0550} from "../project0550/data/satelliteScope0550";
 import {bidPresentationIndex,BID_TAG_TARGETS_0550} from "../project0550/bidPresentation0550";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
@@ -2074,7 +2075,7 @@ function Project0550Bidding({ lang = "th" }) {
     ...(model?.integration?.proofs||[]).map(r=>({id:"bid.working-preview.proof."+r.id,title:r.title,tab:"budget"})),
     ...(model?.integration?.activities||[]).map(r=>({id:"bid.working-preview.activity."+r.id,title:r.title,tab:"budget"})),
     ...(model?.integration?.particulars||[]).map(r=>({id:"bid.working-preview.particular."+r.id,title:r.title,tab:"budget"})),
-    ...["avl","register"].map(id=>({id:"bid.deviations."+id,title:"AVL / Deviation "+id,tab:"deviations"})),
+    ...["avl","register","release"].map(id=>({id:"bid.deviations."+id,title:"AVL / Deviation "+id,tab:"deviations"})),
     ...(model?.integration?.avlChecks||[]).map(r=>({id:"bid.deviations.avl."+r.id,title:r.manufacturer+" / "+r.model,tab:"deviations"})),
     ...(model?.integration?.deviations||[]).map(r=>({id:"bid.deviations.record."+r.id,title:r.vendorDeviation,tab:"deviations"})),
     ...(data?.sourceIntake?.sources||[]).map(s=>({id:"bid.documents.source."+s.id,title:s.title,tab:"documents",area:"A"})),
@@ -2160,7 +2161,7 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
           {activeTab === "documents" ? <><section className="p55-panel"><h2>Supplier evidence / Shared source register</h2><p>เอกสารลูกค้าและทะเบียนต้นฉบับอยู่ที่ A · ข้อเสนอและ Supplier master ใช้ข้อมูลกลางร่วมกับ Working Preview 1–8</p><button type="button" onClick={()=>jump({id:"l3.original",area:"A",tab:"documents"})}>เปิด A · Source Register</button><button type="button" onClick={()=>jump({id:"bid.working-preview.step.7",tab:"budget"})}>เปิด Mapping ลูกค้า ↔ Integrator ↔ Supplier</button></section><VendorWorkspace/></> : null}
           {activeTab === "registry" ? <BidDataControls/> : null}
-          {activeTab === "deviations" ? <DeviationWorkspace0550 onOpenSource={id=>jump({id,tab:"documents",area:"A"})} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
+          {activeTab === "deviations" ? <DeviationWorkspace0550 navigationTarget={navigationTarget} onOpenSource={id=>jump({id,tab:"documents",area:"A"})} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
         </>}
       </main>
 

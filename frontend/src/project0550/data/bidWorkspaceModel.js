@@ -25,7 +25,7 @@ const fail=m=>{throw Error(m);};
 export function emptyBidWorkspace(snapshotId){return {schema:BID_SCHEMA,projectId:"PJ2608-0550",baselineSnapshotId:snapshotId,revision:0,vendors:[],offers:[],calculations:[],lines:[],nodes:[],edges:[],fx:{thbPerUSD:null,thbPerEUR:null,source:"",date:""},audit:[]};}
 export function validateBidWorkspace(data,snapshotId,systems){
  if(!data||data.schema!==BID_SCHEMA||data.projectId!=="PJ2608-0550"||data.baselineSnapshotId!==snapshotId)fail("Wrong project/schema/baseline");
- const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace"];
+ const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease"];
  if(Object.keys(data).some(k=>!keys.includes(k)))fail("Unsupported workspace field");
  if(!Number.isSafeInteger(data.revision)||data.revision<0)fail("Invalid revision");
  for(const key of ["vendors","offers","calculations","lines","nodes","edges","audit"]){
@@ -50,6 +50,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  if(data.mgwQuoteImport!==undefined){const r=data.mgwQuoteImport;fields(r,["version","date","importedOfferIds","conflicts"]);string(r.version,"MGW version",100);date(r.date,"MGW import date");for(const key of ["importedOfferIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>400))fail("Invalid MGW import list");}}
  if(data.mrWorkingImport!==undefined){const r=data.mrWorkingImport;fields(r,["version","date","importedLineIds","conflicts"]);string(r.version,"MR import version",100);date(r.date,"MR import date");for(const key of ["importedLineIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>100))fail("Invalid MR import list");}}
  if(data.sourceIntake!==undefined)validateSourceIntake(data.sourceIntake,systems);
+ if(data.deviationRelease!==undefined){const r=data.deviationRelease;fields(r,["projectNo","project","requisition","description","vendor"]);for(const k of ["projectNo","project","requisition","description","vendor"])string(r[k],"deviation release "+k,4000);}
  validateIntegration0550(data);
  return data;
 }

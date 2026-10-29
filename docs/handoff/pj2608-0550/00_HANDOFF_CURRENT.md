@@ -1,3 +1,10 @@
+> **Deviation Release, 29-Oct-2026:** See
+> [Release preview and Excel export](20261029_DEVIATION_RELEASE.md) for UI
+> `2026-10-29.5-preview`. New `bid.deviations.release` tab previews/exports saved
+> deviations in the attached eleven-column Deviation List format (.xlsx).
+> Existing INDUSTRONIC and SI controls are preserved. Output is DRAFT / NOT ISSUED;
+> issue authorization/transmittal remains outstanding. Pull then `npm ci`.
+
 > **SI operating controls, 29-Oct-2026:** See
 > [equation, module map and monetary/display controls](20261029_SI_OPERATING_CONTROLS.md)
 > for UI `2026-10-29.4-preview` on the existing Official Working branch.
