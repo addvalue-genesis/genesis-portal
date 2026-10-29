@@ -18,6 +18,21 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  await page.getByRole('button',{name:'Working · ราคาเดิมรออัปเดต',exact:true}).click();
  console.log('CHECK release table');
  const release=page.locator('[data-component-key="bid.budget.release"]'),identity=release.getByRole('region',{name:'Release table Module ID'}),table=release.getByRole('table',{name:'Official customer form',exact:true});
+ if(process.env.PJ0550_FULL_BID_ONLY){
+  const inventory=release.getByRole('region',{name:'Part A Full Bid inventory'}),full=release.getByRole('table',{name:'Full Bid systems',exact:true});
+  await inventory.waitFor({state:'visible'});assert.equal(await full.locator('tbody>tr[data-full-bid-system]').count(),20);
+  assert.equal(await full.locator('tbody>tr').first().getAttribute('data-full-bid-system'),'TEL-VSAT');
+  const ais=full.locator('[data-full-bid-system="TEL-AIS"]'),common=full.locator('[data-full-bid-system="COMMON"]');
+  assert((await ais.innerText()).includes('COMPANY supply'));assert((await ais.innerText()).includes('BID · TSI'));
+  await common.locator('details>summary').click();assert((await common.innerText()).includes('MR-B1-11-APF-05'));assert((await common.innerText()).includes('MAPPING OPEN'));
+  await inventory.getByRole('button',{name:'Bid · TSI / OPEN',exact:true}).click();assert(await ais.isVisible());assert(await full.locator('[data-full-bid-system="TEL-FO"]').isVisible());
+  await inventory.getByRole('button',{name:'Full · ทุกระบบ',exact:true}).click();assert.equal(await full.locator('tbody>tr[data-full-bid-system]').count(),20);
+  if(process.env.PJ0550_SUMMARY_QA_DIR){fs.mkdirSync(process.env.PJ0550_SUMMARY_QA_DIR,{recursive:true});await inventory.getByRole('heading').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(process.env.PJ0550_SUMMARY_QA_DIR,'full-bid-desktop.png')});}
+  await common.getByRole('button',{name:'เปิด Working · COMMON',exact:true}).click();await page.locator('[data-component-key="bid.budget.working.group.COMMON"]').waitFor({state:'visible'});
+  await nav('bid.budget.release.part.A');await full.waitFor({state:'visible'});await page.setViewportSize({width:390,height:844});assert(await inventory.evaluate(e=>e.closest('.p55-table-wrap').getBoundingClientRect().width<=innerWidth),'Wide customer tables remain inside their mobile scroll container');
+  assert.deepEqual(await read(),initial);assert.deepEqual(errors,[]);
+  console.log('PASS Full/Bid browser: 19 systems plus COMMON, actual MR page order, COMPANY hardware/TSI services split, all unmapped COMMON source details, unresolved Bid scope retained, Full/Bid switching, existing COMMON Source navigation, Part A reveal, mobile containment, unchanged IndexedDB and no page errors.');return;
+ }
  if(process.env.PJ0550_PART_ID_ONLY){
   await release.getByRole('group',{name:'Release expand collapse'}).getByRole('button',{name:'− หุบทั้งหมด',exact:true}).click();
   await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.releaseCopyValue=value;}}}));

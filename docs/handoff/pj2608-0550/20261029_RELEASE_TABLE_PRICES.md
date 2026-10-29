@@ -93,3 +93,43 @@ Production compilation passed (existing size warning). The focused browser test
 passed all three full-ID clipboard payloads on collapsed headers, independent
 +/- operation, search-to-Part-B expansion, mobile copy visibility, unchanged
 IndexedDB and no page errors. `git diff --check` passed.
+
+## Follow-up — Full / Bid system inventory inside Part A
+
+Base `be0f7d14`. The user requested all existing systems and what must be bid,
+independently of the 15 commercial Lot headings. The existing Part A now contains
+a read-only Full/Bid table. Full takes the union of system registry, MR catalog,
+Working lines and structured Integration requirements (currently 19 systems plus
+COMMON). It is not capped by the vendor quote or customer-form systems list.
+
+Every catalog requirement remains inspectable, including the 30 Part-A COMMON
+records without a Lot, COMPANY supply, unselected rows, missing/duplicate Working
+records and records without prices. Source quantities/units and locators remain
+source values. The table sorts by the first Part-A source page/position, including
+the p07/p08 scope clauses before the Appendix equipment schedule. The existing
+priced-detail hierarchy and customer export keep their prior ordering.
+
+Equipment A and B/C obligations have separate TSI / COMPANY / CLARIFICATION / OPEN
+counts. Bid keeps TSI obligations and unresolved scope; selection/price does not
+define applicability. AIS remains in Bid for TSI engineering/testing even though
+its main hardware is COMPANY supply. Entirely COMPANY-only systems with no extra
+selected work are omitted only from Bid, not Full. No disposition or approval is
+written. Reference Lot associations and actual Working Lot values are separate;
+missing mapping is counted with the existing mapping validator. Price counts
+use selected additive owners, not scope-detail rows or a copied package amount.
+
+Existing Working group/line IDs provide Source navigation and Copy ID. No new
+top-level module, financial data, source record, selection, quantity, rate, FX,
+margin, review or customer XLSX is introduced or changed.
+
+ADR principles **2–3, 5–6, 8, 10–14** apply. Tests cover the 20-row union, every
+catalog requirement once, unresolved/new systems, missing/unselected COMMON,
+COMPANY hardware with TSI services, COMPANY-only Bid filtering, source-page order,
+real SSR and unchanged raw data/customer rows. SI controls, frozen commercial
+issue regressions and production compilation pass (existing bundle-size warning).
+The inventory exposes current evidence and gaps; it does not certify that every
+customer document/clause has been read or that engineering/issue review is complete.
+The focused browser regression passed Full/Bid switching, 20 system rows, AIS
+equipment/services split, unmapped COMMON details and Source navigation, Part A
+reveal, mobile scroll containment, unchanged IndexedDB and no page errors. The
+desktop screenshot was inspected. A final mode label/highlight is presentation only.

@@ -30,6 +30,21 @@ const {releasePricePresentation0550}=require(root+'/project0550/releasePricePres
 const {officialCustomerRows}=require(root+'/project0550/data/officialPricing0550.js');
 const {releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
 const rowsBefore=officialCustomerRows(m.provisional),notes=releasePricePresentation0550(m.provisional);
+const {releaseFullBid0550}=require(root+'/project0550/releaseFullBid0550.js');
+const inventory=releaseFullBid0550(d,m.provisional,D.SYSTEMS),get=token=>inventory.find(r=>r.token===token);
+assert.equal(inventory.length,20);assert.equal(new Set(inventory.map(r=>r.token)).size,20);assert.equal(inventory.flatMap(r=>r.records).length,MR.MR_WORKING_CATALOG_0550.rows.length,'All catalog requirements appear, including unselected/unmapped/COMPANY and B/C');
+assert.deepEqual(inventory.slice(0,3).map(r=>r.token),['TEL-VSAT','TEL-AIS','TEL-RADIO-DTRS'],'Scope clauses on p07/p08 precede the p09 equipment schedule');
+assert.equal(get('COMMON').records.filter(r=>r.requirement.wbs==='A').length,30);assert.equal(get('COMMON').mappingOpen>0,true);
+assert.equal(get('TEL-AIS').a.COMPANY,1);assert.equal(get('TEL-AIS').bc.TSI,2);assert.equal(get('TEL-AIS').bid,true,'COMPANY hardware does not exclude TSI services');
+const companyOnly={...m.provisional,lines:m.provisional.lines.map(l=>l.systemToken==='TEL-AIS'?{...l,selected:false,mrScopeState:{...l.mrScopeState,excluded:true,responsibility:'COMPANY'}}:l)};
+assert.equal(releaseFullBid0550(d,companyOnly,D.SYSTEMS).find(r=>r.token==='TEL-AIS').bid,false,'An entirely COMPANY scope with no selected additional work is omitted only from Bid, never Full');
+assert.equal(get('TEL-FO').bid,true);assert.equal(get('TEL-VSAT-KU').bid,true,'Unresolved scope stays in Bid view');
+const unselected={...m.provisional,lines:m.provisional.lines.map(l=>({...l,selected:false,requestedSelected:false}))};
+assert.equal(releaseFullBid0550(d,unselected,D.SYSTEMS).length,20);assert(releaseFullBid0550(d,unselected,D.SYSTEMS).every(r=>r.priced===0),'Selection and price never define the Full scope denominator');
+const commonIds=new Set(MR.MR_WORKING_CATALOG_0550.rows.filter(r=>r.wbs==='A'&&r.systemToken==='COMMON').map(r=>r.id));
+const missing={...m.provisional,lines:m.provisional.lines.filter(l=>!commonIds.has(l.mrRequirementId))};
+const common=releaseFullBid0550(d,missing,D.SYSTEMS).find(r=>r.token==='COMMON');assert.equal(common.missing,30);assert.equal(common.records.filter(r=>r.requirement.wbs==='A').length,30);
+const extra=releaseFullBid0550({...d,lines:[...d.lines,{systemToken:'SYNTHETIC-NEW-SYSTEM'}]},m.provisional,D.SYSTEMS).find(r=>r.token==='SYNTHETIC-NEW-SYSTEM');assert(extra&&extra.bid&&extra.records.length===0,'No fixed 19-system cap hides newly registered scope');
 const hierarchy=releaseHierarchy0550(m.provisional,rowsBefore);
 const retained=hierarchy.entries.filter(row=>!row.kind.startsWith('mr-')).map(({parents,toggle,mrReferences,mrReference,sectionModuleId,...row})=>row);
 const canonical=rows=>[...rows].sort((a,b)=>a.key.localeCompare(b.key));
@@ -62,9 +77,10 @@ const releaseHtml=renderToStaticMarkup(React.createElement(OfficialCustomerForm,
 assert(releaseHtml.includes('Release table Module ID'));assert(releaseHtml.includes('Copy component ID bid.budget.release'));
 assert(releaseHtml.includes('เหตุผลที่ยังเป็น OPEN'));assert(releaseHtml.includes('ยังไม่จัดสรรราคา package นี้เข้าแถว MR'));
 assert(releaseHtml.includes('ราคาย่อยที่คำนวณได้'));assert(releaseHtml.includes('HOLD / NOT ISSUED'));
+assert(releaseHtml.includes('Full Bid systems'));for(const row of inventory)assert(releaseHtml.includes('data-full-bid-system="'+row.token+'"'));assert(releaseHtml.includes('MR-B1-11-APF-05'));
 const registry=require(root+'/project0550/bidPresentation0550.js').bidPresentationIndex(d.lines);
 for(const part of ['A','B','C']){const id='bid.budget.release.part.'+part;assert.equal(registry.filter(r=>r.id===id).length,1);assert(releaseHtml.includes('data-component-key="'+id+'"'));assert(releaseHtml.includes('Copy component ID '+id));}
 assert.equal(JSON.stringify(d),before,'Rendering release diagnostics never changes raw prices, selections, FX, reviews or history');
 const zero={...m.provisional,lines:[{...priced,id:'ZERO',releaseModuleId:'zero',customerUSD:0,customerTHB:0}],schedule:[{...m.provisional.schedule[0],releaseModuleId:'group-zero',customerUSD:null,children:[{...priced,customerUSD:0}],problems:['scope pending']} ]};
 assert.equal(releasePricePresentation0550(zero).get('group-zero').known.amount,0,'Actual zero price stays distinct from missing');
-console.log('PASS 0550 summary/release: MR Appendix 1.1–1.8 hierarchy, actual first-appearance order, unique rows/IDs, cross-appendix Lot once, site source order, default collapse, known prices/OPEN/native FX diagnostics, Official gates and unchanged customer export cells/financial/history records.');
+console.log('PASS 0550 summary/release: Full/Bid 19 systems + COMMON, all source requirements including unmapped/unselected/COMPANY, split equipment/services obligations, unresolved/new scope retained, actual source page order, MR hierarchy/cross-appendix Lot once, copyable IDs, Official gates and unchanged export cells/financial/history records.');
