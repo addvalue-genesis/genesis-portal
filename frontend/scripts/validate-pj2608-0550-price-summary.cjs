@@ -28,7 +28,23 @@ const source=fs.readFileSync(root+'/project0550/BidCommercialWorkspace.jsx','utf
 // The same known amounts must be inspectable in the actual 10.7 table.
 const {releasePricePresentation0550}=require(root+'/project0550/releasePricePresentation0550.js');
 const {officialCustomerRows}=require(root+'/project0550/data/officialPricing0550.js');
+const {releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
 const rowsBefore=officialCustomerRows(m.provisional),notes=releasePricePresentation0550(m.provisional);
+const hierarchy=releaseHierarchy0550(m.provisional,rowsBefore);
+const retained=hierarchy.entries.filter(row=>!row.kind.startsWith('mr-')).map(({parents,toggle,mrReferences,mrReference,...row})=>row);
+const canonical=rows=>[...rows].sort((a,b)=>a.key.localeCompare(b.key));
+assert.deepEqual(canonical(retained),canonical(rowsBefore),'Every projected row, ID, quantity, unit, amount and remark retained exactly once');
+assert.equal(new Set(hierarchy.controls.map(n=>n.key)).size,hierarchy.controls.length,'Unique UI expansion keys');
+assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='mr-category').slice(0,8).map(r=>r.key),['mr:1.1','mr:1.2','mr:1.3','mr:1.4','mr:1.5','mr:1.6','mr:1.7','mr:1.8']);
+assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='group').slice(0,4).map(r=>r.key),['A1-07','A1-08','A1-10','A1-09'],'Actual MR first occurrence puts MF/HF before Aeronautical');
+for(const control of hierarchy.controls.filter(c=>c.key.includes('/site/'))){
+ const ids=hierarchy.entries.filter(r=>r.kind==='line'&&r.parents.includes(control.key)).map(r=>m.provisional.lines.find(l=>l.id===r.key)?.mrRequirementId).filter(Boolean);
+ const positions=ids.map(id=>MR.MR_WORKING_CATALOG_0550.rows.findIndex(r=>r.id===id));assert.deepEqual(positions,[...positions].sort((a,b)=>a-b));
+}
+assert(hierarchy.entries.filter(r=>r.kind==='group').every(r=>r.toggle.defaultOpen===false),'Default overview collapses system details');
+assert.equal(hierarchy.entries.filter(r=>r.moduleId==='bid.budget.release.customer.A1-11').length,1,'Cross-appendix Microwave/Tower has one Lot amount/ID');
+assert(hierarchy.entries.some(r=>r.kind==='mr-system'&&r.lotModuleId==='bid.budget.release.customer.A1-11'&&r.parents.includes('mr:1.5')),'Microwave detail remains under its actual Appendix 1.5');
+assert.deepEqual(hierarchy.entries.filter(r=>r.kind==='total').map(r=>r.cells),rowsBefore.filter(r=>r.kind==='total').map(r=>r.cells));
 const priced=m.provisional.selected.find(l=>Number.isFinite(l.customerUSD)&&l.customerUSD>0);
 assert(priced);assert.equal(rowsBefore.find(r=>r.key===priced.id).cells[6],priced.customerUSD);
 const mr=m.provisional.lines.find(l=>l.selected&&l.mrScopeState?.candidates.length&&l.customerUSD==null);
@@ -49,4 +65,4 @@ assert(releaseHtml.includes('ราคาย่อยที่คำนวณไ
 assert.equal(JSON.stringify(d),before,'Rendering release diagnostics never changes raw prices, selections, FX, reviews or history');
 const zero={...m.provisional,lines:[{...priced,id:'ZERO',releaseModuleId:'zero',customerUSD:0,customerTHB:0}],schedule:[{...m.provisional.schedule[0],releaseModuleId:'group-zero',customerUSD:null,children:[{...priced,customerUSD:0}],problems:['scope pending']} ]};
 assert.equal(releasePricePresentation0550(zero).get('group-zero').known.amount,0,'Actual zero price stays distinct from missing');
-console.log('PASS 0550 summary/release prices: canonical known prices in 10.7, Module ID/copy at table, OPEN reasons, linked unallocated package candidates without MR price substitution, native FX diagnostics, incomplete Lot amounts, Official gates, zero/missing distinction, unchanged customer cells and raw financial/history records.');
+console.log('PASS 0550 summary/release: MR Appendix 1.1–1.8 hierarchy, actual first-appearance order, unique rows/IDs, cross-appendix Lot once, site source order, default collapse, known prices/OPEN/native FX diagnostics, Official gates and unchanged customer export cells/financial/history records.');

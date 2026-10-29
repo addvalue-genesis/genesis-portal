@@ -44,3 +44,35 @@ approval of the remaining engineering/mapping gaps or a customer submission.
   no Thai font; Thai rendering on the user's Windows browser was not inspected.
 - `git diff --check` passed. The user's private Windows saved workspace was not
   read or replaced; actual remaining MR allocation decisions are still required.
+
+## Follow-up — MR hierarchy and +/- controls
+
+Base `58ea0e95`. The actual 10.7 table now groups Part A by MR App.1.1–1.8,
+then system/customer Lot, then source site. Appendix and system placement use
+the first actual catalog occurrence; item order within each site uses the same
+catalog position, not alphabetic descriptions or the old customer-form numbering.
+The original customer S.N, Lot codes and module IDs remain visible and unchanged.
+
+A Lot spanning appendices has one original summary/amount/Module ID. Its detail
+rows appear under their actual Appendix; continuation headers link back to that
+summary and carry no additional amount or navigational Module ID. Non-MR Working
+packages appear separately after the source Appendix sections. Services/Options
+retain their customer-schedule grouping; this does not turn planning activities
+into approved MR facts. Unselected/unmapped records retain their existing area.
+
+Part, Appendix, system and site have native +/- buttons, plus expand/collapse all.
+Systems initially collapse to an overview. Hidden descendants remain in the DOM;
+the existing Module Search target opens their ancestor paths before focus/scroll.
+The browser remembers independent expansion preferences in a project-scoped
+localStorage key. This is UI state only; financial IndexedDB/revisions are untouched.
+
+ADR principles **5, 8, 10–12** govern this change. The pure hierarchy regression
+checks every original row/cell/ID exactly once, all eight Appendix sections, actual
+MF/HF-before-Aeronautical order, site positions, one cross-Appendix Microwave/Tower
+Lot, unchanged totals/export and no raw workspace mutation. Existing SI controls,
+commercial issue/frozen history and Bidding regressions pass; production compilation
+passes with the existing asset-size warning. No engineering/release gate is relaxed.
+The extended browser regression also passes: nested +/- and keyboard toggles,
+collapsed-row Module Search reveal, independent saved expansion after reload,
+source/package navigation, desktop/mobile containment, unchanged IndexedDB and
+no page errors. The collapsed desktop overview screenshot was visually inspected.

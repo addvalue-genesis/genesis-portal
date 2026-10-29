@@ -1595,6 +1595,12 @@
 .p55-release-price-notes details { margin-top:8px; }
 .p55-release-price-notes summary { cursor:pointer; color:#7c4208; font-weight:600; }
 .p55-release-price-notes ul { padding-left:18px; margin:6px 0; }
+.p55-customer-form tr[hidden] { display:none; }
+.p55-release-toggle { font-weight:700; text-align:left; }
+.p55-release-toggle>span { display:inline-block; min-width:18px; font-size:18px; }
+.p55-release-mr-category td { background:#dce9f3; color:#173349; border-top:2px solid #587b98; }
+.p55-release-mr-site td { background:#f1f5f8; padding-left:36px; }
+.p55-release-mr-system td { background:#edf1f6; padding-left:24px; }
 @media(max-width:820px) { .p55-release-table-identity { position:static; } }
 @media(max-width:700px) { .p55-context-tabs { grid-template-columns:1fr; } .p55-price-group { padding:8px; } }
 

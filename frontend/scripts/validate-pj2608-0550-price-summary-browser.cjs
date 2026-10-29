@@ -18,6 +18,19 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  await page.getByRole('button',{name:'Working · ราคาเดิมรออัปเดต',exact:true}).click();
  console.log('CHECK release table');
  const release=page.locator('[data-component-key="bid.budget.release"]'),identity=release.getByRole('region',{name:'Release table Module ID'}),table=release.getByRole('table',{name:'Official customer form',exact:true});
+ const radioId='bid.budget.release.line.REQ-MR-B1-11-APF-01',radio=table.locator('[data-component-key="'+radioId+'"]');
+ const radioToggle=table.locator('[data-release-toggle="bid.budget.release.customer.A1-07"]');
+ assert.equal(await radio.isVisible(),false,'System details are collapsed in the initial overview');
+ if(process.env.PJ0550_SUMMARY_QA_DIR){fs.mkdirSync(process.env.PJ0550_SUMMARY_QA_DIR,{recursive:true});await identity.scrollIntoViewIfNeeded();await page.screenshot({path:path.join(process.env.PJ0550_SUMMARY_QA_DIR,'release-mr-collapsed.png')});}
+ assert.deepEqual(await table.locator('tr.p55-customer-group').evaluateAll(rows=>rows.slice(0,4).map(r=>r.getAttribute('data-component-key'))),['A1-07','A1-08','A1-10','A1-09'].map(c=>'bid.budget.release.customer.'+c));
+ await radioToggle.click();assert.equal(await radio.isVisible(),true);
+ const siteToggle=table.locator('[data-release-toggle="bid.budget.release.customer.A1-07/site/APF"]');
+ await siteToggle.focus();await siteToggle.press('Enter');assert.equal(await radio.isVisible(),false,'Keyboard collapses its own site');
+ await siteToggle.press('Enter');assert.equal(await radio.isVisible(),true);
+ await release.getByRole('group',{name:'Release expand collapse'}).getByRole('button',{name:'− หุบทั้งหมด',exact:true}).click();
+ await nav(radioId);await radio.waitFor({state:'visible'});assert.equal(await radioToggle.getAttribute('aria-expanded'),'true','Module search opens all collapsed ancestors');
+ await nav('bid.budget.release');
+ await release.getByRole('group',{name:'Release expand collapse'}).getByRole('button',{name:'+ ขยายทั้งหมด',exact:true}).click();
  await identity.scrollIntoViewIfNeeded();assert((await identity.innerText()).includes('PJ2608-0550 /'));assert((await identity.innerText()).includes('bid.budget.release'));
  await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.releaseCopyValue=value;}}}));
  await identity.getByRole('button',{name:'Copy component ID bid.budget.release',exact:true}).click();assert.equal(await page.evaluate(()=>window.releaseCopyValue),'PJ2608-0550 / bid.budget.release');
@@ -42,6 +55,10 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  if(process.env.PJ0550_SUMMARY_QA_DIR)await summary.screenshot({path:path.join(process.env.PJ0550_SUMMARY_QA_DIR,'summary-mobile.png')});
  await nav('bid.budget.release');await identity.scrollIntoViewIfNeeded();assert(await identity.evaluate(e=>e.getBoundingClientRect().width<=innerWidth),'Release identity fits mobile viewport');
  if(process.env.PJ0550_SUMMARY_QA_DIR)await page.screenshot({path:path.join(process.env.PJ0550_SUMMARY_QA_DIR,'release-mobile.png')});
+ await page.setViewportSize({width:1440,height:1100});await radioToggle.click();
+ await page.reload();await page.locator('.p55-bid-save').filter({hasText:'Revision 1'}).waitFor();await nav('bid.budget.release');
+ assert.equal(await radioToggle.getAttribute('aria-expanded'),'false','Per-system UI preference survives reload');assert.equal(await radio.isVisible(),false);
+ assert.equal(await table.locator('[data-release-toggle="bid.budget.release.customer.A1-08"]').getAttribute('aria-expanded'),'true','Other systems keep independent UI state');
  assert.deepEqual(await read(),initial);assert.deepEqual(errors,[]);
- console.log('PASS summary/release browser: numeric prices in actual 10.7 table, table Module ID copy, OPEN reasons and incomplete Lot subtotals, unallocated package source navigation, Official/Provisional and Working/Release navigation, desktop/mobile containment, unchanged IndexedDB prices/history and no page errors.');
+ console.log('PASS summary/release browser: MR order and nested +/- toggles, keyboard operation, collapsed-row module navigation, independent persisted state after reload, actual price cells/copy/OPEN/package navigation, desktop/mobile containment, unchanged IndexedDB and no page errors.');
  }finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1;});
