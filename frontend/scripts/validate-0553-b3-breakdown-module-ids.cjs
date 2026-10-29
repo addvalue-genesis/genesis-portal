@@ -108,4 +108,4 @@ assert.equal(r.byCode.B11.directCostTHB,null,"B11 tool ownership note must not b
 assert.equal(JSON.stringify({b3:bc().byCode.B3,overall:bc().knownWorkingSellTHB}),sourceSnapshot,"Rendering must never mutate current B3 pricing");
 const host=fs.readFileSync(path.join(dir,"BcCostEvidenceDetail0553.jsx"),"utf8");
 assert(host.includes("<B3WorkTypeAccordion0553 workingRow={workingRow}"));
-console.log("PASS 0553 b3-breakdown-module-ids: current-source checks passed; B3 2,322,450.00 / Part B 4,994,787.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 b3-breakdown-module-ids: current-source checks passed; B3 2,322,450.00 / Part B 5,782,287.13; no selected MGW FAT services; historical evidence nonposting.");

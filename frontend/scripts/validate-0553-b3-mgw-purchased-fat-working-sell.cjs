@@ -47,7 +47,7 @@ assert.equal(b3.b3ChinaFatBudget.fatWorkingSellTHB,452850);
 assert.equal(b3.b3SelectedSatSurveyBudget.satWorkingSellTHB,1587600);
 assert.equal(b3.b3SelectedSatSurveyBudget.siteSurveyWorkingSellTHB,252000);
 assert.equal(b3.directCostTHB,null);
-assert.equal(b.knownWorkingSellTHB,4994787.13);
+assert.equal(b.knownWorkingSellTHB,5782287.13);
 assert.equal(b.releaseAllowed,false);
 const price=breakdown(b3),table=hierarchy(b3);
 assert.deepEqual(price.summary.map(x=>x.workingSellTHB),[1587600,252000,30000,452850]);
@@ -78,6 +78,6 @@ assert(html.includes('resource-price-dossier.group.01.site.01'),'Withdrawn sourc
 const ids=[...html.matchAll(/data-component-key="([^"]+)"/g)].map(x=>x[1]);
 assert.equal(ids.length,new Set(ids).size);
 assert.equal(JSON.stringify(working().byCode.B3),b3Snap);
-console.log('PASS MGW equipment-only: no active FAT services/reserve, raw quote preserved, local FAT452850, B3 2322450, PartB4994787.13; ordinary B5% once and reverse-source parity.');
+console.log('PASS MGW equipment-only: no active FAT services/reserve, raw quote preserved, local FAT452850, B3 2322450, PartB5782287.13; ordinary B5% once and reverse-source parity.');
 
 assert(get('data/bcModuleNavigator0553.js').buildBcModuleNavigator0553().some(x=>x.id==='bid.budget.working.bc.b3.resource-price-dossier.group.01.site.01'),'Withdrawn exact link remains registered');

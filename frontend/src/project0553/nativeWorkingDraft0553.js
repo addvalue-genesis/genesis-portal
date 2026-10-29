@@ -155,7 +155,7 @@ export function assertNativeScopeSummary0553(xml,{a,b,total,unpricedText,sharedX
    requireCell("B"+row,item.mr);requireCell("C"+row,item.description);
    if(typeof cell("D"+row)!=="string"||!cell("D"+row).trim())throw Error("Incomplete native A locations: "+item.code);
   }
-  const price=Number.isFinite(item.amount)?round(item.amount):unpricedText;
+  const price=Number.isFinite(item.amount)?round(item.amount):(item.priceText||item.offerTreatment?.priceText||unpricedText);
   requireCell("F"+row,price);requireCell("G"+row,price);
  });
  // Spare-only workbooks also omit G38; reject that even when all annexes pass.
@@ -323,7 +323,12 @@ export async function buildNativeWorkingDraft0553(file,model){
  for(let i=1;i<=14;i++){
   const row=23+i,b=bc.find(x=>x.code==="B"+i),price=b?.customerSellTHB;
   write(scope,"A"+row,"B"+i);write(scope,"E"+row,1);
-  if(!Number.isFinite(price)){warnings.push("B"+i+" price NOT ESTABLISHED");write(scope,"F"+row,"NOT ESTABLISHED");write(scope,"G"+row,"NOT ESTABLISHED");continue;}
+  if(!Number.isFinite(price)){
+   const text=b?.offerTreatment?.priceText||"NOT ESTABLISHED";
+   if(b?.offerTreatment?.status!=="NOT_QUOTED_EXCLUDED")warnings.push("B"+i+" price NOT ESTABLISHED");
+   write(scope,"F"+row,text);write(scope,"G"+row,text);
+   continue;
+  }
   write(scope,"F"+row,round(price)); // B10/B11/B13 current Annex working unit LS must replace original stale F value too.
   write(scope,"G"+row,round(price));
  }
@@ -332,8 +337,8 @@ export async function buildNativeWorkingDraft0553(file,model){
  for(const line of bc){
   const cell="B"+(23+Number(line.code.slice(1)));
   const original=sourceText(cell).split(/\r?\n(?:Activities:|Included (?:SAT|Yard support):)/)[0]||line.description;
-  const heading=line.code==="B6"?line.description:original;
-  const notes=[line.executionActivities?.releaseText?"Activities: "+line.executionActivities.releaseText:null,line.serviceCommercialBasis?.compactText].filter(Boolean);
+  const heading=line.offerTreatment||line.code==="B6"?line.description:original;
+  const notes=[line.offerTreatment?.remark,line.executionActivities?.releaseText?"Activities: "+line.executionActivities.releaseText:null,line.serviceCommercialBasis?.compactText].filter(Boolean);
   write(scope,cell,[heading,...notes].filter(Boolean).join("\n"));
  }
  const a=model.summary?.aProvisionalCustomerSellTHB,b=model.summary?.bProvisionalCustomerSellTHB;
@@ -354,8 +359,10 @@ export async function buildNativeWorkingDraft0553(file,model){
  }
  const complete=model.sourceCoverage?.aReady===true&&model.sourceCoverage?.bSellReady===true;
  const priced=[a,b].filter(Number.isFinite);
- const unpricedB=bc.filter(r=>!Number.isFinite(r.customerSellTHB)).map(r=>r.code).join(", ");
+ const unpricedB=bc.filter(r=>!Number.isFinite(r.customerSellTHB)&&r.offerTreatment?.status!=="NOT_QUOTED_EXCLUDED").map(r=>r.code).join(", ");
+ const excludedB=bc.filter(r=>r.offerTreatment?.status==="NOT_QUOTED_EXCLUDED").map(r=>r.code).join(", ");
  write(scope,"A38","Total 合计 / A+B — priced items (THB)"+
+  (excludedB?"\nNot quoted / excluded: "+excludedB+".":"")+
   (complete?"":"\nExcludes unpriced items"+(unpricedB?": "+unpricedB:"")+"."));
  write(scope,"G38",priced.length?round(priced.reduce((sum,n)=>sum+n,0)):"NOT ESTABLISHED");
  write(scope,"H38","WORKING DRAFT");
@@ -554,12 +561,13 @@ export async function buildNativeOfficialRelease0553(file,model){
       isOption?"CONDITIONAL BUDGETARY OPTION PRICE / OEM TECHNICAL REVIEW REQUIRED / SUBJECT TO CIF CONFIRMATION":null]
       .filter(Boolean).join("\n");
      put("A"+row,r.code);put("B"+row,displayText);put("E"+row,1);
-     put("F"+row,price(amount));put("G"+row,price(amount));
+     put("F"+row,amount===null&&r.priceText?r.priceText:price(amount));put("G"+row,amount===null&&r.priceText?r.priceText:price(amount));
+     if(r.commercialRemark)put("H"+row,r.commercialRemark);
      if(model.annex[r.code])put("H"+row,"Refer to Annex "+r.code+
       (isOption?" / CONDITIONAL BUDGETARY OFFER / OEM TECHNICAL QUALIFICATION / excludes A+B":""));
     };
    model.b.forEach((r,j)=>fill(r,24+j));model.c.forEach((r,j)=>fill(r,41+j));
-   put("A38","Total A+B (USD)"+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
+   put("A38","Total A+B (USD)"+(model.excluded?.length?"\nNot quoted / excluded: "+model.excluded.join(", ")+".":"")+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
    put("A39","Prices cover the items described above and are subject to the stated scope and qualifications.");
    put("A40","Part C: Options — excluded from Total A+B");
    put("B43","Proposed delivery: CIF Zhuhai Port, China (Incoterms 2020), subject to buyer approval against original DDP site terms.");

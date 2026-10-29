@@ -2,8 +2,18 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-26-R64";
+export const CHANGE_LOG_VERSION_0553="2026-10-29-R66";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261029-02",date:"2026-10-29",kind:"PRICE",tone:"neutral",
+  title:"Owner selects B14 USD25000 budgetary insurance allowance",
+  detail:"B14 canonical Working SELL THB787500 at unchanged31.5 FX flows once to Scope, Release and THB/USD native Excel. A+B changes USD863900→888900; known Part B THB4994787.13→5782287.13. AIG CPOC7-Jun-2023 CGL375000 and WCEL132500 remain historical references, not current premium/direct cost; THB280000 is gross SELL planning headroom. Owner CPOC actual contractUSD180000 is separate from historical AIG estimateUSD250000. Added RFQ Template Article18 and CCL Rev05 item31 evidence. Cargo stays B6; SAMTEL bonds excluded; existing B3/B9 THB24000 has no automatic credit. Other selected prices, FX and commercial policy unchanged. B4/B12 remain N/A/excluded. Current insurer coverage, signed terms and customer issue approval remain open.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b14","bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner instruction commit/pull 29-Oct-2026 after USD25000 proposal"}),
+ Object.freeze({id:"P553-CHANGE-20261029-01",date:"2026-10-29",kind:"DATA_FLOW",tone:"neutral",
+  title:"B4/B12 not quoted; B14 ADDVALUE insurance ownership and coverage review",
+  detail:"Owner instruction applied as a commercial overlay on original requirements: B4/B12 show N/A with Not quoted; excluded from this offer in Source, Release THB/USD and native XLSX. Null amounts are retained and quotation exclusions are separate from B14 pending pricing. B14 now identifies ADDVALUE as owner, current B3 SAT28/B9 Yard7+2 basis, coverage review and existing non-additive B3/B9 insurance allowances. SAMTEL reported resale10% is not an insurance premium. Additional B14 premium remains null pending contract/policy/broker evidence; historical Rev05 allowance stays separate. No existing price, FX, markup policy or customer issue status changes.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b4","bid.budget.working.bc.b12","bid.budget.working.bc.b14","bid.budget.pricing.release.source-navigator","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner instruction 29-Oct-2026"}),
  Object.freeze({
   id:"P553-CHANGE-20261026-06",date:"2026-10-26",kind:"VALIDATION",tone:"neutral",
   title:"Complete A/B export verification and native Rev00 template compatibility",

@@ -40,7 +40,7 @@ const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
 const currentSpareDelta=Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
  sum+source.byCode[code].workingSellTHB-old,0);
 assert.equal(Math.round(currentSpareDelta*100),44034531);
-assert.equal(source.knownWorkingSellTHB,4994787.13);
+assert.equal(source.knownWorkingSellTHB,5782287.13);
 assert.equal(source.byCode.B3.workingSellTHB,2322450);
 assert.equal(source.byCode.B9.workingSellTHB,480550);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit
@@ -48,7 +48,7 @@ assert.equal(historicalB3ScenarioTHB-historicalB3BeforeScenarioTHB,352800);
 assert.equal(source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB,-75275);
 assert.equal(source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB,246950);
 assert.equal(
- source.knownWorkingSellTHB+
+ source.knownWorkingSellTHB-source.byCode.B14.workingSellTHB+
  (historicalB3ScenarioTHB-source.byCode.B3.workingSellTHB)+
  (historicalB9WorkingSellTHB-source.byCode.B9.workingSellTHB)-
  (source.byCode.B8.workingSellTHB-30000)-currentSpareDelta-(source.byCode.B1.workingSellTHB-211600)-(source.byCode.B6.workingSellTHB-307584), // B8 and current spare deltas excluded from historical bridge
@@ -57,7 +57,7 @@ assert.equal(
 // Compare integer satang to avoid IEEE-754 drift (e.g. 4032636.8200000003).
 assert.equal(
  Math.round(100*(
-  source.knownWorkingSellTHB-
+  source.knownWorkingSellTHB-source.byCode.B14.workingSellTHB-
   (source.byCode.B3.workingSellTHB-historicalB3BeforeScenarioTHB)-
   (source.byCode.B9.workingSellTHB-historicalB9WorkingSellTHB)-
   (source.byCode.B8.workingSellTHB-30000)-currentSpareDelta-(source.byCode.B1.workingSellTHB-211600)-(source.byCode.B6.workingSellTHB-307584)

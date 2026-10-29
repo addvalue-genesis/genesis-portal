@@ -23,7 +23,7 @@ const snapshot=JSON.stringify(canonical);
 assert.equal(codes.length,16);
 assert.equal(B.length,14);
 assert.equal(C.length,2);
-assert.equal(pb,4994787.13);
+assert.equal(pb,5782287.13);
 assert.equal(canonical.byCode.B1.workingSellTHB,421180);
 assert.equal(canonical.byCode.B3.workingSellTHB,2322450);
 assert.equal(canonical.byCode.B1.directCostTHB,null);
@@ -69,4 +69,4 @@ assert(ws.includes('if(bcTab==="ALL"){setBcTab(owner);setBcDetailCode(owner);ret
  "Navigator must select owner before resolving collapsed nested Module IDs");
 assert.equal(JSON.stringify(cost()),snapshot,
  "16 B/C work-type accordion changed canonical cost/Working SELL/ownership");
-console.log("PASS 10.2 B/C 16-owner color-coded hierarchical accordion: B1.1–B1.8 visible by default, 16 copyable IDs, unique shared cost-line view, B1 421,180, B3 2,440,425 selected SAT28/BF5 and Part B 4,994,787.13; legacy 40d audit preserved.");
+console.log("PASS 10.2 B/C 16-owner color-coded hierarchical accordion: B1.1–B1.8 visible by default, 16 copyable IDs, unique shared cost-line view, B1 421,180, B3 2,440,425 selected SAT28/BF5 and Part B 5,782,287.13; legacy 40d audit preserved.");

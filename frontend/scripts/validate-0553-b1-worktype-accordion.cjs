@@ -27,7 +27,7 @@ assert.equal(model.baseWorkingCostTHB,374200);
 assert.equal(model.conditionalWorkingSellTHB,0);
 assert.equal(b1.workingSellTHB,421180);
 assert.equal(b1.directCostTHB,null);
-assert.equal(bc.knownWorkingSellTHB,4994787.13);
+assert.equal(bc.knownWorkingSellTHB,5782287.13);
 assert.equal(bc.byCode.B3.workingSellTHB,2322450);
 assert.equal(model.accounts.length,8);
 assert.equal(model.roleLines.length,41);

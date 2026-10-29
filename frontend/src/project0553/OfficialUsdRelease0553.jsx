@@ -40,11 +40,11 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
    <td>{r.code}</td><td colSpan={3}>{r.description}
     {r.serviceText&&<div className="p553-official-service">{r.serviceText}</div>}</td>
    <td>1 lot{isOption&&<small>Conditional budgetary offer</small>}</td>
-   <td className="p553-price-cell">{money(displayed)}
+   <td className="p553-price-cell">{r.priceText&&displayed===null?r.priceText:money(displayed)}
     {isOption&&<small>Conditional Budgetary Offer · USD</small>}</td>
-   <td className="p553-price-cell">{money(displayed)}
+   <td className="p553-price-cell">{r.priceText&&displayed===null?r.priceText:money(displayed)}
     {isOption&&<small>Conditional Budgetary Offer · USD</small>}</td>
-   <td>{model.annex[r.code]?"Refer to Annex "+r.code:""}
+   <td>{r.commercialRemark|| (model.annex[r.code]?"Refer to Annex "+r.code:"")}
     {isOption&&<small>{r.code==="C1"?"Installed RACON FCA-equipment comparator, not an OEM capital spare quotation":
      "Historical Rev08 two-year spare reference; not a current OEM quotation"}</small>}
     {isOption&&<small>OPTION — PRICE OFFERED CONDITIONALLY; subject to OEM compliance/stock validation · excluded from A+B</small>}</td>
@@ -65,7 +65,7 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
      {model.a.map(r=><tr key={r.code} data-quote-code={r.code}><td>{r.code}</td><td>{r.mr}</td><td>{r.description}</td><td>{r.locations}</td><td>1 lot</td><td className="p553-price-cell">{money(r.amountUSD)}</td><td className="p553-price-cell">{money(r.amountUSD)}</td><td/></tr>)}
      <tr className="p553-sheet-section"><td colSpan={8}>Part B: Services and Other Supplies</td></tr>
      {model.b.map(summaryRow)}
-     <tr className="p553-sheet-total"><td colSpan={6}>Total A+B (USD){model.unpriced.length>0&&<small>Excludes items to be quoted: {model.unpriced.join(", ")}.</small>}</td><td className="p553-price-cell">{money(model.totalUSD)}</td><td/></tr>
+     <tr className="p553-sheet-total"><td colSpan={6}>Total A+B (USD){model.excluded.length>0&&<small>Not quoted / excluded: {model.excluded.join(", ")}.</small>}{model.unpriced.length>0&&<small>Excludes items to be quoted: {model.unpriced.join(", ")}.</small>}</td><td className="p553-price-cell">{money(model.totalUSD)}</td><td/></tr>
      <tr className="p553-sheet-section"><td colSpan={8}>Part C: Options — excluded from Total A+B</td></tr>{model.c.map(summaryRow)}
     </tbody>
    </table>:sheet==="B10"?<B10KitPriceSummary0553 rows={model.annex.B10}

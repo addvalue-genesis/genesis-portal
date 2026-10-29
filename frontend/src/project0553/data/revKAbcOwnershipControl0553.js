@@ -1,3 +1,4 @@
+import {ADDVALUE_B14_SELECTED_BUDGET_0553} from "./addvalueB14Insurance0553";
 // PJ2608-0553 / READ-ONLY CFO bridge from current 10.2 B1/B3/B9 to source WBS.
 // A current budget component is shown once. This overlay NEVER posts extra sell.
 // Evidence: BOD-C2 + SPE-C2 + DTS-C1 + MR1..4 -> Rev.K -> role/owner/qty -> SELL.
@@ -19,7 +20,8 @@ export function selectRevKAbcOwnershipControl0553(working){
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
  if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+0)||current.B9!==b9.b9BaseWorkingSellTHB||
-    working.knownWorkingSellTHB!==4994787.13 ||
+    working.knownWorkingSellTHB!==roundRevKAbc0553(4994787.13+ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB) ||
+    working.byCode.B14?.workingSellTHB!==ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB ||
     working.byCode.B3?.workingSellTHB!==2322450 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
   throw Error("Rev.K B1/B3/B9 / Part B canonical Working Sell divergence");

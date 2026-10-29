@@ -92,8 +92,9 @@ const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
  -(bc.byCode.B3.b3FortyDayBudget.laborWorkingSellTHB-bc.byCode.B3.b3SelectedSatSurveyBudget.laborWorkingSellTHB)
  +(bc.byCode.B3.b3ChinaFatBudget.fatWorkingSellTHB-historicalChinaFatWitnessSellTHB)
  +(bc.byCode.B8.workingSellTHB-30000)+currentSpareDelta
- +(bc.byCode.B1.workingSellTHB-211600)+(bc.byCode.B6.workingSellTHB-307584)); // B8 Hybrid and 23-Oct authorized spare revision
-assert.equal(historicalToCurrent,4994787.13,
+ +(bc.byCode.B1.workingSellTHB-211600)+(bc.byCode.B6.workingSellTHB-307584)
+ +bc.byCode.B14.workingSellTHB); // B8 Hybrid and 23-Oct authorized spare revision
+assert.equal(historicalToCurrent,5782287.13,
  "Historical B1-only baseline to current B2/B3 price selection bridge failed");
 const sumBaseOwners=roundTHB(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
  .reduce((sum,r)=>sum+r.workingSellTHB,0));

@@ -122,4 +122,4 @@ assert(workType.includes('<B3SiteMrSatCoverage0553 workingRow={workingRow}/>'),
 assert.equal(JSON.stringify({workingSell:canonical().byCode.B3.workingSellTHB,
  directCost:canonical().byCode.B3.directCostTHB,source:days().rows,veex:days().veex}),frozenSnapshot,
  "UI/matrix may not mutate the 10.2 B3 canonical Working Sell or source days");
-console.log("PASS 0553 b3-sat-matrix-price-trace: current-source checks passed; B3 2,322,450.00 / Part B 4,994,787.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 b3-sat-matrix-price-trace: current-source checks passed; B3 2,322,450.00 / Part B 5,782,287.13; no selected MGW FAT services; historical evidence nonposting.");

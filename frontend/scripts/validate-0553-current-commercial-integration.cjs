@@ -33,7 +33,7 @@ for(const [code,amount] of Object.entries({B1:421180,B2:237121.13,B3:2322450,B8:
  assert.equal(scope.lines[code].workingSellTHB,amount,"Customer Scope/10.2 "+code+" divergence");
  assert.equal(by[code].directCostTHB,null,"Unverified direct cost posted to "+code);
 }
-assert.equal(budget.knownWorkingSellTHB,4994787.13);
+assert.equal(budget.knownWorkingSellTHB,5782287.13);
 assert.equal(abc.partBBaseTHB,budget.knownWorkingSellTHB);
 assert.equal(abc.currentB1B3B9BaseTHB,3224180); // current B1 421180 + B3 2322450 + B9 480550
 assert.equal(abc.postedWorkingSellDeltaTHB,0);
@@ -83,4 +83,4 @@ assert(workType.includes("<B3SiteMrSatCoverage0553 workingRow={workingRow}/>"),"
 assert(workType.includes('<B9ChinaBudgetDetail0553 budget={fat} selectedOwner="B3" purchasedServices={workingRow.b3MgwPurchasedFatWorkingSell} workingRow={workingRow}/>'),"China FAT witness must receive canonical WS-B3 owner for full total");
 const workspace=fs.readFileSync(path.join(root,"project0553/CommercialWorkspace.jsx"),"utf8");
 assert(workspace.includes("<RevKAbcOwnershipControl0553 working={bcWorking}/>"),"CFO current ABC not mounted");
-console.log("PASS 0553 current-commercial-integration: current-source checks passed; B3 2,322,450.00 / Part B 4,994,787.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 current-commercial-integration: current-source checks passed; B3 2,322,450.00 / Part B 5,782,287.13; no selected MGW FAT services; historical evidence nonposting.");

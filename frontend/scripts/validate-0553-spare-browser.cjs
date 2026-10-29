@@ -31,7 +31,7 @@ require('node:vm').runInNewContext(fs.readFileSync(path.join(cwd,'src/project055
   const official=page.locator('[data-component-key="bid.budget.pricing.official"]');
   await official.waitFor();
   const summary=await official.innerText();
-  for(const amount of ['863,900.00','97,500.00','23,000.00'])assert(summary.includes(amount));
+  for(const amount of ['888,900.00','97,500.00','23,000.00'])assert(summary.includes(amount));
   assert.equal(await official.locator('[data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"]').count(),2);
   const expectedRows=await official.locator('[data-quote-code]').evaluateAll(rows=>rows.filter(r=>/^[AB]/.test(r.dataset.quoteCode)).map(r=>{
    const cells=[...r.querySelectorAll('td')],code=r.dataset.quoteCode,text=r.querySelector('.p553-price-cell').textContent;
@@ -42,8 +42,8 @@ require('node:vm').runInNewContext(fs.readFileSync(path.join(cwd,'src/project055
   await (await download).saveAs(path.join(out,'official.xlsx'));
   const native=nativeContext.native,downloaded=native.entriesFromZip(new Uint8Array(fs.readFileSync(path.join(out,'official.xlsx'))));
   const downloadedSummary=new TextDecoder().decode(await native.readEntry(downloaded.find(e=>e.name==='xl/worksheets/sheet1.xml')));
-  native.assertNativeScopeSummary0553(downloadedSummary,{a:expectedRows.filter(r=>r.code.startsWith('A')),b:expectedRows.filter(r=>r.code.startsWith('B')),total:863900,unpricedText:'To be quoted'});
-  console.log('PASS downloaded XLSX: all 4 A and 14 B rows match visible Official Release; A+B USD863900 excludes Part C');
+  native.assertNativeScopeSummary0553(downloadedSummary,{a:expectedRows.filter(r=>r.code.startsWith('A')),b:expectedRows.filter(r=>r.code.startsWith('B')),total:888900,unpricedText:'To be quoted'});
+  console.log('PASS downloaded XLSX: all 4 A and 14 B rows match visible Official Release; A+B USD888900 excludes Part C');
   await official.getByRole('tab',{name:'B10 CommSpares',exact:true}).click();
   const b10ids=exportsOnly?[]:await official.locator('[data-native-b10-source-id]').evaluateAll(rs=>rs.map(r=>r.getAttribute('data-native-b10-source-id')));
   if(!exportsOnly)assert.equal(b10ids.length,14);
@@ -95,7 +95,7 @@ require('node:vm').runInNewContext(fs.readFileSync(path.join(cwd,'src/project055
   const release=page.locator('[data-component-key="bid.budget.pricing.release.preview"]');
   await release.getByRole('tab',{name:'Scope of supply',exact:true}).click();
   const body=await release.innerText();
-  for(const amount of ['27,192,339.36','3,071,250.00','721,806.60'])assert(body.includes(amount));
+  for(const amount of ['27,979,839.36','3,071,250.00','721,806.60'])assert(body.includes(amount));
   const workingDownload=page.waitForEvent('download');
   await release.getByRole('button',{name:'Export Excel — WORKING DRAFT',exact:true}).click();
   await (await workingDownload).saveAs(path.join(out,'working.xlsx'));

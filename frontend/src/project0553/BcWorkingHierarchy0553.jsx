@@ -120,7 +120,8 @@ export function BcWorkingHierarchy0553({partBRows,partCRows,partBWorkingSell,par
        <code>{item.moduleId}</code>
       </span>
       <span className="p553-bc-row-sell">
-       <strong>{money(item.workingSellTHB)}</strong>
+       <strong>{item.offerTreatment?.priceText&&!Number.isFinite(item.workingSellTHB)?item.offerTreatment.priceText:money(item.workingSellTHB)}</strong>
+       {item.offerTreatment&&<small>{item.offerTreatment.remark}</small>}
        <small>INTERNAL WS · NOT CUSTOMER PROPOSAL · {Number.isFinite(item.directCostTHB)?
         "Direct cost verified separately":"Direct Cost NOT ESTABLISHED"}</small>
       </span>

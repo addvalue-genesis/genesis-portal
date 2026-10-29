@@ -67,7 +67,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const partBWorkingSell=bcSellSum(pricedB);
  const partCWorkingSell=bcSellSum(pricedC);
  const combinedBCWorkingSell=Math.round((partBWorkingSell+partCWorkingSell)*100)/100;
- const missingB=partBRows.filter(r=>!Number.isFinite(r.workingSellTHB)).map(r=>r.code);
+ const missingB=partBRows.filter(r=>!Number.isFinite(r.workingSellTHB)&&r.offerTreatment?.status!=="NOT_QUOTED_EXCLUDED").map(r=>r.code);
  const missingC=partCRows.filter(r=>!Number.isFinite(r.workingSellTHB)).map(r=>r.code);
  if(Math.abs(partBWorkingSell-bcWorking.knownWorkingSellTHB)>0.01)throw Error("10.2 Part B summary mismatch");
 

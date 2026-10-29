@@ -326,6 +326,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
   }))):null;
   return {code:r.code,description:r.requirement,sourceModuleId:r.moduleId,
    executionActivities:r.executionActivities,
+   offerTreatment:r.offerTreatment,insurancePlan:r.insurancePlan,executionOwner:r.executionOwner,
    serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    b10ItemizedPurchaseEvidence:r.code==="B10"?r.b10ItemizedPurchaseEvidence:null,
    b10PriceToWinReview:r.code==="B10"?r.b10PriceToWinReview:null,

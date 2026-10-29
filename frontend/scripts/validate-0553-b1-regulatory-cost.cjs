@@ -27,7 +27,7 @@ assert(model.rows.some(x=>x.id==="B1-REG-07"&&x.riskClass.includes("ANTI_BRIBERY
 assert.equal(model.computedRegulatoryDirectCostTHB,null);
 assert.equal(model.workingSellPosted,false);
 assert.equal(base.byCode.B1.workingSellTHB,421180); // New Rev.K engineering + PM, old 510k audit only
-assert.equal(base.knownWorkingSellTHB,4994787.13);
+assert.equal(base.knownWorkingSellTHB,5782287.13);
 assert.equal(base.byCode.B3.workingSellTHB,2322450);
 const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
 const currentSpareDelta=Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
@@ -36,7 +36,7 @@ assert.equal(Math.round(currentSpareDelta*100),44034531);
 // 21-Oct audit bridge is NONPOSTING. The 22-Oct revision changed BOTH B3
 // FAT/SAT role rates and B9 onshore Senior; remove both current deltas.
 assert.equal(Math.round(100*(
- base.knownWorkingSellTHB+
+ base.knownWorkingSellTHB-base.byCode.B14.workingSellTHB+
  (2750525-base.byCode.B3.workingSellTHB)+
  (233600-base.byCode.B9.workingSellTHB)+
  (30000-base.byCode.B8.workingSellTHB)-currentSpareDelta-(base.byCode.B1.workingSellTHB-211600)-(base.byCode.B6.workingSellTHB-307584) // exclude current B8 and spare deltas from 21-Oct audit
