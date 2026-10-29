@@ -47,7 +47,7 @@ export function SourceFindings({ compact = false, navigationTarget }) {
   const intake = data?.sourceIntake;
   if (!intake) return null;
   const findings = intake.findings.filter(f => system === "ALL" || f.systemTokens.includes(system));
-  return <Module id={compact ? "bid.risk.source-findings" : "bid.documents.source-findings"} title="หลักฐาน → ข้อกำหนด / ผลกระทบ / ประเด็นรอปิด">
+  return <Module id={compact ? "bid.risk.source-findings" : "bid.documents.source-findings"} title="หลักฐาน → ข้อกำหนด / ผลกระทบ / ประเด็นรอปิด" showToggle={!compact}>
     <label>ระบบ <select aria-label="Source finding system" value={system} onChange={e => setSystem(e.target.value)}><option value="ALL">ทุกระบบ / งานร่วม</option>{SYSTEMS.map(s => <option key={s.token} value={s.token}>{s.name}</option>)}</select></label>
     <p>การอ่านพบข้อกำหนดไม่ใช่การอนุมัติผลคำนวณ ปริมาณ หรือราคา ประเด็น OPEN/CONFLICT ยังต้องตรวจปิดก่อน Release</p>
     <div className="p55-table-wrap"><table className="p55-table" aria-label="Source findings"><thead><tr><th>ประเด็น / ระบบ</th><th>ข้อค้นพบ</th><th>ผลต่อ Engineering / WBS</th><th>หลักฐาน / Clause</th><th>สถานะ</th></tr></thead><tbody>{findings.map(f => <tr key={f.id} data-component-key={(compact ? "bid.risk.finding." : "bid.documents.finding.") + f.id}><td>{f.category}<small>{f.id} · {f.systemTokens.join(", ") || "COMMON"}</small></td><td>{f.statement}</td><td>{f.impact}</td><td><SourceRefs ids={f.sourceIds} sources={intake.sources}/><small>{f.locator}</small></td><td>{f.state}</td></tr>)}</tbody></table></div>
@@ -82,7 +82,7 @@ export function ControlledSourceInventory({ navigationTarget }) {
     if (ok) setPending(null);
   }
   return <div className="p55-stack">
-    <Module id="bid.documents.controlled-source-inventory" title="Controlled source inventory">
+    <Module id="bid.documents.controlled-source-inventory" title="Controlled source inventory" showToggle>
       <p>ทะเบียน GDrive / Gmail ที่ตรวจอ่านล่าสุด พร้อมเอกสารย้อนหลังและข้อมูลที่ยังอ่านไม่ครบ</p>
       <p>โหลดทะเบียนที่ตรวจแล้วจาก Google Drive for Desktop อัตโนมัติเมื่อเปิดโครงการ · ข้อมูลบันทึกใน workspace และ backup · เอกสารต้นฉบับใหม่ยังต้องผ่านการตรวจและอัปเดตทะเบียน</p>
       <div className="p55-panel" role="status" aria-label="Source intake loaded status"><p>{sourceSync?.message || "ตรวจทะเบียนจาก Google Drive for Desktop เมื่อเปิดโครงการ"}</p><button type="button" disabled={!data || busy} onClick={reload}>ตรวจข้อมูลจาก Drive อีกครั้ง</button><strong>{intake ? "Batch ที่โหลดอยู่: " + intake.batchId : "ยังไม่ได้โหลดทะเบียนเอกสารล่าสุดใน workspace นี้"}</strong><p>{intake ? `${intake.sources.length} แหล่ง · ${intake.packageComparisons?.length || 0} กลุ่มเปรียบเทียบ` : "เปิด Google Drive for Desktop และรอให้โฟลเดอร์โครงการพร้อมใช้งาน โปรแกรมจะโหลดทะเบียนใน 90_SYSTEM_WORKING/DATA"}</p></div>

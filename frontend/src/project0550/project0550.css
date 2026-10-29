@@ -1686,3 +1686,40 @@
 .p55-si-principles code { overflow-wrap: anywhere; }
 .p55-si-principles summary { cursor: pointer; padding-block: 10px; font-weight: 700; }
 @media (max-width: 760px) { .p55-si-roles { grid-template-columns: 1fr; } .p55-si-principles { padding: 10px; } }
+/* Explicit disclosure for the existing A source inventory; native details keeps
+   keyboard interaction and module navigation's automatic ancestor expansion. */
+.p55-bid-module[data-toggle-indicator="true"] > summary {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-items: flex-start;
+  list-style: none;
+}
+.p55-bid-module[data-toggle-indicator="true"] > summary::-webkit-details-marker { display: none; }
+.p55-module-toggle {
+  display: inline-flex;
+  flex: 0 0 30px;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid currentColor;
+  border-radius: 6px;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1;
+}
+.p55-module-toggle-heading {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.p55-module-toggle__open { display: none; }
+.p55-bid-module[open] > summary > .p55-module-toggle .p55-module-toggle__closed { display: none; }
+.p55-bid-module[open] > summary > .p55-module-toggle .p55-module-toggle__open { display: inline; }
+.p55-bid-module[data-toggle-indicator="true"] > summary:focus-visible { outline: 2px solid #245e9b; outline-offset: 4px; }
