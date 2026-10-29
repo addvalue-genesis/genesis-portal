@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-29.8-preview",
+  "version": "2026-10-29.9-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "d32de1a5761c656dad54c74e24b173a1d41c7578",
-  "capability": "0550 all-system AVL from canonical Working 1\u20138 / sources / offers + deviation drafts and XLSX + workspace recovery + SI import / HOLD"
+  "source0550": "a4fa70a67a10b7941cbd8b99c283db1b95b2c605",
+  "capability": "0550 all-system AVL + controlled commercial issue / frozen history / transmittal evidence + E06 day and schematic review controls + SI import / workspace recovery"
 }

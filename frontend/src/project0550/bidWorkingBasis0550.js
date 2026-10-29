@@ -1,6 +1,6 @@
 // Read existing project bases without promoting historical amounts to current bid inputs.
 // These helpers only prepare editor drafts. Saved lines and review fingerprints are unchanged.
-import {EQUATION_INPUTS} from "./serviceEquationRuntime";
+import {EQUATION_INPUTS,bidQuantityUnit0550} from "./serviceEquationRuntime";
 export function policyDefaults0550(policies, kind) {
  const policy=policies.find(p=>p.title===kind);
  if(!policy)return null;
@@ -29,7 +29,7 @@ export function calculationBinding0550(calculation, resultKey, offer) {
  if(!calculation)return {calculationId:""};
  const key=resultKey||(calculation.equationId==="E05"?"MD":"value");
  const unit=calculation.equationId==="E05"&&key==="MH"?"MH":EQUATION_INPUTS[calculation.equationId]?.unit;
- return {calculationId:calculation.id,resultKey:key,...(!offer&&["MH","MD","DAYS"].includes(unit)?{unit}:{})};
+ return {calculationId:calculation.id,resultKey:key,...(!offer&&["MH","MD","DAYS"].includes(unit)?{unit:bidQuantityUnit0550(unit)}:{})};
 }
 // MR Rev.B1, printed p02 of 52: ordering aid only, not a reviewed scope decision.
 // System-to-appendix associations are working mappings; exact requirements stay on each line.

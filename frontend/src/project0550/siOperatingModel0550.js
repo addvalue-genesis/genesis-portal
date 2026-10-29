@@ -33,6 +33,6 @@ export function siOperatingChecks0550(model) {
   check("ฐานทบทวนเปลี่ยน / STALE",records.filter(r=>r.state==="STALE"||r.problems?.includes("STALE_DEPENDENCIES")).length+o.lines.filter(r=>r.reviewState==="STALE").length,"bid.working-preview.step.8"),
   {label:"ความพร้อม Integration ครบโครงการ",state:i.ready?"READY":"OPEN",target:"bid.working-preview.step.8"},
   {label:"Customer form / รวมขอบเขต Official",state:o.scopeReviewed?"REVIEWED":"OPEN",target:"bid.budget.official.customer-scope"},
-  {label:"อนุมัติออกเอกสาร",state:"HOLD / NOT ISSUED",target:"bid.budget.release"}
+  {label:"อนุมัติออกเอกสาร",state:model.releaseControl?.state&&model.releaseControl.state!=="HOLD"?model.releaseControl.state:"HOLD / NOT ISSUED",target:"bid.budget.release"}
  ];
 }

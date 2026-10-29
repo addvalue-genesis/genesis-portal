@@ -23,6 +23,6 @@ export function SiOperatingPrinciples0550({onNavigate,compact=false}) {
    <p>CLEAR หมายถึงไม่พบปัญหาในรายการตรวจแถวนั้น ไม่รับรองว่าค้นพบข้อกำหนดลูกค้าครบแล้ว จำนวนแต่ละแถวอาจทับกันจึงไม่บวกรวม · READY/REVIEWED ไม่ใช่การอนุมัติ Release</p>
   </details>
   {compact?<button type="button" onClick={()=>open("bid.architecture")}>เปิด 03 Architecture · สมการและการเชื่อมโมดูลทั้งหมด</button>:<div className="p55-table-wrap"><table className="p55-table" aria-label="SI module responsibilities"><thead><tr><th>โมดูล / เปิดทำงาน</th><th>หน้าที่ในสมการ</th><th>Module ID</th></tr></thead><tbody>{SI_MODULE_LINKS_0550.map(m=><tr key={m.id}><td><button type="button" onClick={()=>open(m.id)}>{m.title}</button></td><td>{m.purpose}</td><td><ComponentCopyId projectId="PJ2608-0550" componentKey={m.id}/></td></tr>)}</tbody></table></div>}
-  <p>ข้อจำกัดที่ยังต้องพัฒนาหรือตรวจจริง: รายการผลกระทบหลายชั้นที่แจกแจงครบ, Shared Proof/Activity Mapping, Tolerance ตามเกณฑ์ที่ยอมรับ และ Controlled Issue/Transmittal · การมีไฟล์หรือคำว่า Comply ไม่ยืนยันความเพียงพอทางวิศวกรรม</p>
+  <p>10.7 มีการตรวจความพร้อม ตรึงฉบับพร้อมฐานข้อมูลและราคา เก็บบันทึกผู้อนุมัติ และบันทึกหลักฐานส่งแยกกันแล้ว · ยังต้องตรวจจริง: ข้อกำหนดและ engineering ทั้งโครงการ รายการผลกระทบหลายชั้น Shared Proof/Activity Mapping และ Tolerance ที่ยอมรับ · บันทึกชื่อไม่ใช่ลายเซ็นยืนยันตัวตน และโปรแกรมไม่ได้ส่งอีเมลให้</p>
  </section>;
 }

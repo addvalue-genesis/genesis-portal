@@ -5,6 +5,7 @@ import {bidPresentationIndex,bidOwnerStyle,lineOwner0550} from "./bidPresentatio
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {CUSTOMER_FORM_0550,officialCustomerRows} from "./data/officialPricing0550";
 import {exportOfficialCustomerXlsx} from "./exportOriginalPriceForm";
+import {ReleaseIssueControls0550} from "./ReleaseIssueControls0550";
 export function OfficialCustomerForm({official,onSource}){
  const {data}=useBidWorkspace(),identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
  const rows=officialCustomerRows(official),provisional=official.pricingBasis==="PROVISIONAL_VENDOR";
@@ -15,5 +16,6 @@ export function OfficialCustomerForm({official,onSource}){
  <p>OPEN หมายถึง {provisional?"ข้อมูลราคา / FX ยังไม่ครบ":"ยังไม่มีราคาที่ทบทวนครบ"} · EXCLUDED ต้องมีการตรวจขอบเขตและหลักฐาน · Export เป็น Draft และไม่เปลี่ยนสถานะเป็นส่งลูกค้า</p>
  <p>รวม Base/Options จากยอด Lot เท่านั้น ไม่ SUM ทั้งคอลัมน์ที่มีทั้ง Lot และรายละเอียด · Unit Price × Qty ต้องตรง Amount; ถ้าไม่ตรงให้กลับ Source ตรวจฐานตามแบบลูกค้า ระบบไม่ปรับราคาเพื่อชดเชยเอง</p>
  {official.lines.filter(r=>(!r.selected&&!r.mrScopeState?.covered)||official.unmapped.some(x=>x.id===r.id)).map(r=><div key={r.id} data-component-key={r.releaseModuleId} data-module-number={identity(r.releaseModuleId)?.number} data-bid-owner={lineOwner0550(r)} style={bidOwnerStyle(lineOwner0550(r))} tabIndex={-1}><BidHeading {...identity(r.releaseModuleId)}/><strong>{r.selected?"MAPPING OPEN":"NOT SELECTED"}</strong><button type="button" onClick={()=>onSource(r.sourceModuleId)}>กลับ Source</button></div>)}
+ <ReleaseIssueControls0550 provisional={provisional}/>
  </Module>;
 }

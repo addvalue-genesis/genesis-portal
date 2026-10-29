@@ -9,6 +9,7 @@ import {deriveBidWorkspace,validateBidWorkspace} from "./data/bidWorkspaceModel"
 import {fetchAutomaticSource,selectAutomaticSource,sourceLoadMessage} from "./data/sourceAutoLoad";
 import {importLegacyVendorBasis0550} from "./data/legacyVendorBasis0550";
 import {workspaceDiagnostic0550} from "./data/workspaceRecovery0550";
+import {deriveReleaseControl0550,mergeReleaseRegister0550} from "./data/releaseIssue0550";
 const Context=createContext(null);
 export const useBidWorkspace=()=>useContext(Context);
 export function downloadBidFile(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -45,9 +46,9 @@ export function BidWorkspaceProvider({children}){
  };
  useEffect(()=>{reload();},[]);
  const reviewDate=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Bangkok",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
- const model=useMemo(()=>{if(!data)return null;const integration=deriveIntegration0550(data,SYSTEMS,reviewDate);return {...deriveBidWorkspace(data,SYSTEMS.map(s=>s.token),reviewDate,integration),integration,avlReconciliation:deriveAvlReconciliation0550(data,integration)};},[data,reviewDate]);
+ const model=useMemo(()=>{if(!data)return null;const integration=deriveIntegration0550(data,SYSTEMS,reviewDate),derived={...deriveBidWorkspace(data,SYSTEMS.map(s=>s.token),reviewDate,integration),integration,avlReconciliation:deriveAvlReconciliation0550(data,integration)};const releaseControl=deriveReleaseControl0550(data,derived,reviewDate);return {...derived,releaseControl,official:{...derived.official,releaseAllowed:releaseControl.releaseAllowed,releaseState:releaseControl.state}};},[data,reviewDate]);
  async function change(transform,action){if(!data||lock.current)return false;lock.current=true;setBusy(true);try{const transformed=transform(data);const next=prepareSystemAvlDeviations0550(transformed,deriveIntegration0550(transformed,SYSTEMS,reviewDate));setData(await saveProject0550Bid(next,data.revision,action));setError("");return true;}catch(e){setError(e.message);return false;}finally{lock.current=false;setBusy(false);}}
  const put=(collection,record)=>change(d=>({...d,[collection]:d[collection].some(r=>r.id===record.id)?d[collection].map(r=>r.id===record.id?record:r):[...d[collection],record]}),"Save "+collection+" / "+record.id);
- async function importFile(file){if(!file)return;try{if(file.size>16*1024*1024)throw Error("Workspace exceeds 16 MiB");const imported=validateBidWorkspace(JSON.parse(await file.text()),DATA_LAYER_META.datasetId,SYSTEMS.map(s=>s.token));await change(current=>({...imported,revision:current.revision,audit:current.audit}),"Import reviewed 0550 workspace backup");}catch(e){setError(e.message);}}
+ async function importFile(file){if(!file)return;try{if(file.size>64*1024*1024)throw Error("Workspace exceeds 64 MiB");const imported=validateBidWorkspace(JSON.parse(await file.text()),DATA_LAYER_META.datasetId,SYSTEMS.map(s=>s.token));await change(current=>{const releaseRegister=mergeReleaseRegister0550(current.releaseRegister,imported.releaseRegister);return {...imported,revision:current.revision,audit:current.audit,...(releaseRegister?{releaseRegister}:{})};},"Import reviewed 0550 workspace backup / merge frozen history");}catch(e){setError(e.message);}}
  return <Context.Provider value={{data,model,error,busy,recovery,change,put,reload,importFile,reviewDate,sourceSync}}>{children}</Context.Provider>;
 }

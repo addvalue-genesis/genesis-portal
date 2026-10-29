@@ -254,15 +254,17 @@ function packReviewSheet(xml,sheetName){
 }
 export function exportBidReviewXlsx(model,currency){const bytes=buildBidReviewXlsx(model,currency),url=URL.createObjectURL(new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));const a=document.createElement("a");a.href=url;a.download=`PJ2608-0550_BID_${currency}_REVIEW_R${model.revision}.xlsx`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 
-export function buildOfficialCustomerXlsx(official){
- if(!Array.isArray(official?.schedule))throw Error("Official pricing projection required");
- const provisional=official.pricingBasis==="PROVISIONAL_VENDOR";
- const rows=[{kind:"title",cells:[provisional?"PJ2608-0550 · PROVISIONAL VENDOR PRICE BASIS — UPDATE PENDING / NOT ISSUED":"PJ2608-0550 · OFFICIAL TENDER WORKING PREVIEW — NOT ISSUED"]},{kind:"title",cells:[`REL-04 | Working R${official.revision} | USD | HOLD | ${provisional?"Existing vendor prices; scope and quotation updates pending; OPEN = missing price/FX":"OPEN = not reviewed"}; detail rows included in group totals`]}, {kind:"header",cells:CUSTOMER_FORM_0550.columns},...officialCustomerRows(official)];
+export function buildOfficialCustomerXlsx(official,issue=null){
+ if(!issue&&!Array.isArray(official?.schedule))throw Error("Official pricing projection required");
+ const provisional=official?.pricingBasis==="PROVISIONAL_VENDOR";
+ const customerRows=issue?issue.customerRows:officialCustomerRows(official);
+ if(issue&&official&&(provisional||!official.scopeReviewed||JSON.stringify(issue.customerRows)!==JSON.stringify(officialCustomerRows(official))||issue.baseUSD!==official.baseUSD||issue.optionsUSD!==official.optionsUSD))throw Error("Frozen issue output differs from its reviewed basis");
+ const rows=[{kind:"title",cells:[issue?`PJ2608-0550 · COMMERCIAL PROPOSAL · ${issue.number}`:provisional?"PJ2608-0550 · PROVISIONAL VENDOR PRICE BASIS — UPDATE PENDING / NOT ISSUED":"PJ2608-0550 · OFFICIAL TENDER WORKING PREVIEW — NOT ISSUED"]},{kind:"title",cells:[issue?`USD | ${issue.authorizedOn} | Detail rows included in group totals; Part C excluded from Base A+B`:`REL-04 | Working R${official.revision} | USD | HOLD | ${provisional?"Existing vendor prices; scope and quotation updates pending; OPEN = missing price/FX":"OPEN = not reviewed"}; detail rows included in group totals`]}, {kind:"header",cells:issue?issue.customerColumns:CUSTOMER_FORM_0550.columns},...customerRows];
  const merges=rows.flatMap((r,i)=>r.kind==="title"?[`A${i+1}:H${i+1}`]:[]);
  const xml=`<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="3" topLeftCell="A4" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="1" width="9" customWidth="1"/><col min="2" max="2" width="20" customWidth="1"/><col min="3" max="3" width="58" customWidth="1"/><col min="4" max="5" width="12" customWidth="1"/><col min="6" max="7" width="20" customWidth="1"/><col min="8" max="8" width="36" customWidth="1"/></cols><sheetData>${rows.map((r,i)=>`<row r="${i+1}" ht="42" customHeight="1">${r.cells.map((v,j)=>cellXml(v,i+1,j,typeof v==="number"?4:["title","header","section","group","total"].includes(r.kind)?1:0)).join("")}</row>`).join("")}</sheetData><mergeCells count="${merges.length}">${merges.map(ref=>`<mergeCell ref="${ref}"/>`).join("")}</mergeCells><pageMargins left="0.25" right="0.25" top="0.5" bottom="0.5" header="0.2" footer="0.2"/><pageSetup paperSize="9" orientation="landscape"/></worksheet>`;
  return packReviewSheet(xml,"Official Working USD");
 }
-export function exportOfficialCustomerXlsx(official){
- const bytes=buildOfficialCustomerXlsx(official),url=URL.createObjectURL(new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
- const a=document.createElement("a");a.href=url;a.download=`PJ2608-0550_REL-04_${official.pricingBasis==="PROVISIONAL_VENDOR"?"PROVISIONAL":"OFFICIAL"}_DRAFT_R${official.revision}.xlsx`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+export function exportOfficialCustomerXlsx(official,issue=null){
+ const bytes=buildOfficialCustomerXlsx(official,issue),url=URL.createObjectURL(new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"}));
+ const a=document.createElement("a");a.href=url;a.download=issue?`PJ2608-0550_Commercial_${issue.number.replace(/[^\w.-]/g,"_")}.xlsx`:`PJ2608-0550_REL-04_${official.pricingBasis==="PROVISIONAL_VENDOR"?"PROVISIONAL":"OFFICIAL"}_DRAFT_R${official.revision}.xlsx`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }

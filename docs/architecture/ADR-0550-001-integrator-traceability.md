@@ -204,3 +204,12 @@ Source-version checks, unstamped DRAFT-only ingestion, preservation of existing
 user records and financial/history invariants execute at import. Private source
 reading and derived desk assessments are delivered separately; importing them
 does not establish full clause coverage, adequate system design or issue approval.
+
+## 10. Commercial issue recording checkpoint — 29-Oct-2026
+
+The [commercial issue checkpoint](../handoff/pj2608-0550/20261029_COMMERCIAL_ISSUE_CONTROLS.md)
+records elapsed-day binding, schematic dependencies, runtime readiness, explicit
+authorization, append-only frozen issues and separate transmittal evidence. These
+controls preserve recorded decisions and commercial snapshots. They do not prove
+actual project engineering completion, authenticate an approver, or transmit a
+proposal. Missing project inputs and approvals remain OPEN.

@@ -18,6 +18,10 @@ For private SI draft ingestion, see
 [`docs/handoff/pj2608-0550/20261029_SI_WORK_PACKAGE.md`](docs/handoff/pj2608-0550/20261029_SI_WORK_PACKAGE.md).
 An imported DRAFT is preparation, not approved mapping or engineering acceptance.
 
+For E06 units, schematic review dependencies and the controlled commercial issue /
+backup-history contract, read
+[`docs/handoff/pj2608-0550/20261029_COMMERCIAL_ISSUE_CONTROLS.md`](docs/handoff/pj2608-0550/20261029_COMMERCIAL_ISSUE_CONTROLS.md).
+
 The ADR distinguishes domain A/customer and B/supplier from existing UI areas and
 commercial Part A/B/C. Do not rename or migrate those namespaces implicitly.
 Preserve source/version lineage, stable IDs, user decisions, single cost ownership

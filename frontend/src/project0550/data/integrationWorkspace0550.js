@@ -2,7 +2,7 @@
 // This module derives workflow state; it never writes quantities, prices or approvals.
 import mr from "./mrWorkingCatalog0550.json";
 import {deriveSourceIntake,deriveDocumentRevisionRegister} from "./sourceIntakeModel";
-import {evaluateServiceEquation} from "../serviceEquationRuntime";
+import {evaluateServiceEquation,bidQuantityUnit0550} from "../serviceEquationRuntime";
 import {DOCUMENT_FAMILIES_0550,DELIVERY_KINDS_0550} from "../workingPreviewStages0550";
 import {SUBVENDOR_REFERENCE_0550,subvendorRow0550,subvendorReferenceProblems0550,isSubvendorDeclarationSource0550} from "./subvendorReference0550";
 export const INTEGRATION_SCHEMA_0550="genesis.0550.integration.v1";
@@ -32,10 +32,19 @@ export function integrationRequirements0550(data){const overrides=new Map((data.
 export const blankRequirement0550=(id,systemToken="COMMON")=>({...requirementSeed0550({id:"",systemToken,site:"",description:"",reference:"",responsibility:"CLARIFICATION"}),id,workLineIds:[]});
 const sourcesFor=(data,ids)=>{const all=data.sourceIntake?.sources||[],replaced=new Set(all.flatMap(s=>s.replaces));return all.filter(s=>ids.includes(s.id)).map(s=>({...s,effectiveAuthority:replaced.has(s.id)?"REPLACED_COPY":s.authority}));};
 const lineBasis=l=>l&&Object.fromEntries(["id","systemToken","wbs","scopeKey","quantity","unit","selected","offerId","calculationId","resultKey","coveredByLineId","coverageBasis","responsibility","scopeBasis","customerRowCode"].map(k=>[k,l[k]]));
+// Include relevant nodes, cross-system interfaces and shared infrastructure.
+// An unrelated isolated system does not invalidate this system's reviews.
+export function integrationTopologyBasis0550(data,token){
+ const all=data.nodes||[],nodes=all.filter(n=>token==="COMMON"||n.systemToken===token||n.systemToken==="COMMON"),ids=new Set(nodes.map(n=>n.id));
+ const edges=(data.edges||[]).filter(e=>ids.has(e.from)||ids.has(e.to));
+ const related=new Set([...ids,...edges.flatMap(e=>[e.from,e.to])]);
+ return {nodes:all.filter(n=>related.has(n.id)).sort((a,b)=>a.id.localeCompare(b.id)),edges:[...edges].sort((a,b)=>a.id.localeCompare(b.id))};
+}
 export function integrationRecordBasis0550(data,collection,r){
  const w={...emptyIntegration0550(),...data.integrationWorkspace},reqs=integrationRequirements0550(data),req=collection==="requirements"?r:reqs.find(q=>q.id===r.requirementId);
  const ids=[...new Set([...(collection==="documentReviews"?[r.id]:[]),...(r.sourceIds||[]),...(r.approvalSourceIds||[]),...(r.references||[]).map(x=>x.sourceId),...(req?.sourceIds||[]),...(req?.supplierSourceIds||[])])];
  const common={record:clean(r),requirement:clean(req),sources:ids.map(id=>sourcesFor(data,[id])[0]||{id,missing:true}),offers:(req?.offerIds||[]).map(id=>data.offers.find(o=>o.id===id)||{id,missing:true}),lines:(req?.workLineIds||[]).map(id=>lineBasis(data.lines.find(l=>l.id===id))||{id,missing:true})};
+ if(req)common.topology=integrationTopologyBasis0550(data,req.systemToken);
  if(collection==="proofs")common.calculation=data.calculations.find(c=>c.id===r.calculationId)||null;
  if(req&&collection!=="particulars")common.particulars=w.particulars.filter(p=>particularApplies0550(p,req)).map(p=>({record:p,sources:p.references.map(ref=>sourcesFor(data,[ref.sourceId])[0]||{id:ref.sourceId,missing:true})}));
  if(collection==="avlChecks"){
@@ -50,7 +59,7 @@ export function integrationRecordBasis0550(data,collection,r){
   common.deviations=w.deviations.filter(d=>d.requirementId===r.id);
  }
  if(collection==="activities"){common.calculation=data.calculations.find(c=>c.id===r.calculationId)||null;common.owner=lineBasis(data.lines.find(l=>l.id===r.workLineId));}
- if(collection==="scopeReviews")return integrationFingerprint0550({record:clean(r),inventory:data.sourceIntake||null,requirements:reqs.filter(q=>q.systemToken===r.id).map(clean),particulars:w.particulars.filter(p=>p.systemToken==="COMMON"||p.systemToken===r.id)});
+ if(collection==="scopeReviews")return integrationFingerprint0550({record:clean(r),topology:integrationTopologyBasis0550(data,r.id),inventory:data.sourceIntake||null,requirements:reqs.filter(q=>q.systemToken===r.id).map(clean),particulars:w.particulars.filter(p=>p.systemToken==="COMMON"||p.systemToken===r.id)});
  return integrationFingerprint0550(common);
 }
 export function stampIntegration0550(data,collection,row){const w={...emptyIntegration0550(),...data.integrationWorkspace},next={...w,[collection]:[...w[collection].filter(r=>r.id!==row.id),row]};return {...row,basisKey:integrationRecordBasis0550({...data,integrationWorkspace:next},collection,row)};}
@@ -123,7 +132,7 @@ export function deriveIntegration0550(data,systems,today){
   if(!req)problems.push("REQUIREMENT_MISSING");
   if(!has(a.responsible)||!has(a.scopeBasis)||!has(a.acceptanceCriteria)||!has(a.deliverable))problems.push("ACTIVITY_OWNER_ACCEPTANCE_DELIVERABLE_OPEN");
   if(!Number.isFinite(a.quantity)||a.quantity<=0||!has(a.unit))problems.push("ACTIVITY_QUANTITY_UNIT_OPEN");
-  if(a.calculationId&&(!c||result.state!=="CALCULATED"||result.unit!==a.unit||result.value!==a.quantity))problems.push("ACTIVITY_DRIVER_MISMATCH");
+  if(a.calculationId&&(!c||result.state!=="CALCULATED"||bidQuantityUnit0550(result.unit)!==bidQuantityUnit0550(a.unit)||result.value!==a.quantity))problems.push("ACTIVITY_DRIVER_MISMATCH");
   if(!a.workLineId||!data.lines.some(l=>l.id===a.workLineId&&(req?.workLineIds||[]).includes(l.id)))problems.push("ACTIVITY_COST_OWNER_OPEN");
   return {...a,problems,state:problems.length?"OPEN":"REVIEWED_PLAN"};
  });

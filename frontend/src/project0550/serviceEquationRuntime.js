@@ -32,6 +32,8 @@ export const EQUATION_INPUTS = {
  "FO-LOSS":{fields:[f("lengthKm","Route length km"),f("dBperKm","Fiber attenuation dB/km"),f("splices","Splices"),f("spliceLoss","Loss per splice dB"),f("connectors","Connectors"),f("connectorLoss","Loss per connector dB"),f("margin","Design margin dB")],unit:"dB",formula:"Required optical budget = km × dB/km + splices × loss + connectors × loss + margin"},
  "RF-MARGIN":{fields:[f("txDBm","Transmit power dBm",-200,200),f("txGain","Tx antenna gain dBi",-100,200),f("rxGain","Rx antenna gain dBi",-100,200),f("lossDB","Total verified path/feed losses dB"),f("sensitivityDBm","Receiver threshold dBm",-300,200)],unit:"dB",formula:"Receive margin = Tx dBm + gains − verified losses − receiver threshold dBm"}
 };
+// Equation units remain scientific/model units; bidding uses its existing day code.
+export const bidQuantityUnit0550 = unit => unit === "DAYS" ? "day" : unit;
 export function evaluateServiceEquation(id, inputs={}) {
  const definition=EQUATION_INPUTS[id];
  if(!definition)return {state:"INVALID",value:null,errors:["Unknown equation"],unit:null};

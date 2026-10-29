@@ -1,13 +1,14 @@
 import {mgwOfferProblems0550,MGW_QUOTE_0550} from "./mgwVendorBasis0550";
 import {mrLineScope0550,mrWorkingGaps0550,MR_WORKING_CATALOG_0550} from "./mrWorkingBasis0550";
-import { evaluateServiceEquation } from "../serviceEquationRuntime";
+import { evaluateServiceEquation,bidQuantityUnit0550 } from "../serviceEquationRuntime";
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
+import {validateReleaseRegister0550} from "./releaseIssue0550";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
-export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease"];
+export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister"];
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
 export function newId(prefix){
@@ -53,6 +54,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  if(data.sourceIntake!==undefined)validateSourceIntake(data.sourceIntake,systems);
  if(data.deviationRelease!==undefined){const r=data.deviationRelease;fields(r,["projectNo","project","requisition","description","vendor"]);for(const k of ["projectNo","project","requisition","description","vendor"])string(r[k],"deviation release "+k,4000);}
  validateIntegration0550(data);
+ validateReleaseRegister0550(data,snapshot=>validateBidWorkspace(snapshot,snapshotId,systems));
  return data;
 }
 export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel){
@@ -83,7 +85,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
     if(calc.systemToken!==l.systemToken&&calc.systemToken!=="COMMON")problems.push("Calculation system mismatch");
     if(!calc.sourceRef.trim())problems.push("Calculation source required");
     const outputUnit=l.resultKey==="MD"?"MD":l.resultKey==="MH"&&calc.equationId==="E05"?"MH":result.unit;
-    if(unit!==outputUnit)problems.push("Equation output/rate unit mismatch");
+    if(unit!==bidQuantityUnit0550(outputUnit))problems.push("Equation output/rate unit mismatch");
     if(result.state!=="CALCULATED")problems.push(...result.errors);
    }
   }
