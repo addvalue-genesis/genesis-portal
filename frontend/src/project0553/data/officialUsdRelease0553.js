@@ -21,7 +21,7 @@ const descriptions={
  B11:"Special tools for operation and maintenance. Refer to Annex B11.",
  B12:"First-filling materials, where required by the equipment specification.",
  B13:"Consumables for preservation, operation and maintenance. Refer to Annex B13.",
- B14:"Commercial bonds and insurance in accordance with contract requirements.",
+ B14:"Budgetary insurance allowance for ADDVALUE services in accordance with the stated scope and qualifications.",
  C1:"Capital spares. Refer to Annex C1.",
  C2:"Two years of normal operation spare parts. Refer to Annex C2."
 };

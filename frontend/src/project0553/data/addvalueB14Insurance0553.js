@@ -1,12 +1,55 @@
 import {selectB3SelectedSatSurveyPrice0553} from "./b3SelectedSatSurveyPrice0553";
 import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
-// PJ2608-0553 B14 — ADDVALUE PERSONNEL ONLY.
+import {ONSHORE_WORKING_SELL_RATE_0553} from "./onshoreWorkingRate0553";
+// Original personnel-only allowance below is historical and non-posting.
 // 4 management roles; SAT / offshore roster limited to Senior Telecom
 // Technician and Chief Telecom Technician per management instruction.
 // No SAMTEL bonds, cargo, EPC all-risks, VAT or insurer-approved quotations.
 // Published PA rate and explicitly non-binding offshore/China allowances remain separate.
 import {derivePartBcWorkingWbs0553} from "./partBCWorkingWbs0553";
 const R=n=>Math.round((n+Number.EPSILON)*100)/100;
+// Owner selected USD25,000 budgetary SELL on 29-Oct-2026. This is not a
+// current insurer quote, verified direct cost, insured limit or issue approval.
+const selectedUSD=25000;
+const selectedTHB=R(selectedUSD*ONSHORE_WORKING_SELL_RATE_0553.thbPerUsd);
+const historicalCglTHB=375000,historicalWcelTHB=132500;
+export const ADDVALUE_B14_SELECTED_BUDGET_0553=Object.freeze({
+ sourceModuleId:"bid.budget.working.bc.b14",decisionDate:"2026-10-29",
+ authority:"OWNER_SELECTED_BUDGETARY_ALLOWANCE_20261029",
+ workingSellUSD:selectedUSD,workingSellTHB:selectedTHB,
+ fxTHBPerUSD:ONSHORE_WORKING_SELL_RATE_0553.thbPerUsd,
+ historicalSourceUrl:"https://drive.google.com/file/d/1-1gNwz3a7Ka7pjdYi_gAxU4xAIfbw2xd/view",
+ historicalQuote:"AIG CQ 004-23 (R), 7-Jun-2023, ADDVALUE / CPOC",
+ historicalCglTHB,historicalWcelTHB,
+ historicalPremiumBeforeTaxTHB:R(historicalCglTHB+historicalWcelTHB),
+ nonPremiumPlanningAllowanceTHB:R(selectedTHB-historicalCglTHB-historicalWcelTHB),
+ historicalPeriodMonths:2,historicalEmployees:8,historicalLiabilityLimitUSD:1000000,
+ cpocActualContractUSD:180000,cpocActualValueAuthority:"Owner statement 29-Oct-2026",
+ insurerHistoricalEstimatedContractUSD:250000,
+ historicalExclusions:Object.freeze(["Property in care, custody or control","Properties being worked upon","Professional liability","Contractual liability"]),
+ note:"THB280000 is gross SELL headroom for commercial treatment, taxes, territory/duration/scope changes and uncertainty; not a separate insurer premium or guaranteed sufficiency. Do not scale historical minimum premium by project value or headcount.",
+ coverageChain:Object.freeze(["ADDVALUE","SAMTEL","JUTAL","PTTEP"]),
+ allChainPartiesAutomaticallyInsured:false,automaticExistingAllowanceCreditTHB:0,
+ excludesB6Cargo:true,excludesSamtelBonds:true,
+ currentInsurerQuoteTHB:null,verifiedDirectCostTHB:null,
+ selectedForWorkingSell:true,firmInsurerQuote:false,customerIssueApproved:false
+});
+export const ADDVALUE_B14_CONTRACT_SOURCE_0553=Object.freeze({
+ url:"https://drive.google.com/file/d/1wGyiYwVi1iXicZzWslqmYhTxgXIs_Iup/view",
+ document:"Equipment Purchase Contract Template-090526, Article 18, pages 33-34",
+ evidenceClass:"RFQ_CONTRACT_TEMPLATE_NOT_SIGNED_CONTRACT",
+ clauses:Object.freeze({equipment:"18.1(a): seller construction equipment at purchaser site",
+  personnel:"18.1(b): workers compensation / employers liability or applicable statutory system",
+  cargo:"18.1(c): marine cargo Institute Cargo Clauses (A) to purchaser yard",
+  other:"18.1(d): other insurance required by applicable law",
+  certificate:"18.2: evidence of cover and premium payment within 10 days after effective date",
+  notice:"18.3: 60-day notice for cancellation, material alteration or expiry"}),
+ finalTermsConfirmed:false,
+ cclSourceUrl:"https://docs.google.com/spreadsheets/d/1rEMxJBvlsJXhT9czbs8GU9HluqXxH29h/edit",
+ cclRevision:"FOR SAMTEL REVIEW Rev05 28-Oct-2026, item31",
+ cclExposure:Object.freeze({yardDays:18,offshoreDays:45,surveyDays:5,crew:2,trainingDays:2}),
+ workingDeploymentIsNotFullContractInsurancePeriod:true
+});
 export const ADDVALUE_INSURED_ROLES_0553=Object.freeze([
  {id:"PM-CHIEF",role:"Project Manager / Chief Telecom",personCount:1,sat:false},
  {id:"SR-TELECOM",role:"Senior Telecom Engineer",personCount:1,sat:false},
@@ -69,6 +112,7 @@ export function selectAddvalueServiceInsurancePlan0553(){
  ].map(x=>Object.freeze({...x,requiredByVerifiedContract:false,verifiedPremiumTHB:null,additionalPostingTHB:null,status:"COVERAGE_AND_QUOTATION_REVIEW_REQUIRED"}));
  return Object.freeze({owner:"ADDVALUE",decisionSource:"Owner instruction 2026-10-29",
   sourceModuleId:"bid.budget.working.bc.b14",quoteRequired:true,
+  selectedBudget:ADDVALUE_B14_SELECTED_BUDGET_0553,contractSource:ADDVALUE_B14_CONTRACT_SOURCE_0553,
   samtelReportedResaleMarkupPct:10,resaleMarkupIsInsurancePremium:false,
   currentDeployment:Object.freeze({satTeamDays:sat.satTeamDays,satCrew:sat.satRoleRates.length,
    satWorkingPersonDays:sat.satPersonDays,yardWorkDays:yard.selectedYardWorkingDays,
@@ -77,7 +121,7 @@ export function selectAddvalueServiceInsurancePlan0553(){
    deploymentConfirmed:false,insuredCalendarDays:null}),
   coverages:Object.freeze(coverages),existingAllowances:Object.freeze(existing),
   existingNonAdditiveAllowanceTHB:R(existing.reduce((n,x)=>n+x.allowanceTHB,0)),
-  additionalB14BudgetTHB:null,verifiedPremiumTHB:null,customerReleaseAllowed:false,
+  additionalB14BudgetTHB:ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB,verifiedPremiumTHB:null,customerReleaseAllowed:false,
   pricingRule:"B14 additional cost = quoted project premium + attributable policy extensions/fees - confirmed existing coverage credits; reconcile B3/B9 once, without subtracting unlike Working SELL from insurer cost. Bond face value and refundable collateral are not expenses.",
   pendingInputs:Object.freeze(["ADDVALUE subcontract insurance/indemnity/bond clauses","Existing ADDVALUE and EPC/SAMTEL policy schedules and deductibles","Insurer confirmation for Thailand, China yard and Myanmar offshore work","Insured values/limits, calendar dates, crew roster and broker quote","Reconcile existing B3/B9 allowances before any B14 posting"])
  });

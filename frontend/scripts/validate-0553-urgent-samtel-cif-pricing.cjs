@@ -47,7 +47,7 @@ assert.equal(rows.find(x=>x.id==='B3-FAT-STAFF').workingSellTHB,2*(700+600)*31.5
 assert.equal(rows.find(x=>x.id==='B3-LOCAL-TRAVEL').workingSellTHB,9000);
 assert.equal(rows.find(x=>x.id==='B3-WORK-INSURANCE').workingSellTHB,10000);
 for(const row of bc.rows){
- if(!['B3','B8'].includes(row.code))assert.equal(row.workingSellTHB,row.code==='B1'?before.b.B1+209580:row.code==='B6'?before.b.B6+28000:before.b[row.code],row.code+' unauthorized repricing');
+ if(!['B3','B8'].includes(row.code))assert.equal(row.workingSellTHB,row.code==='B14'?787500:row.code==='B1'?before.b.B1+209580:row.code==='B6'?before.b.B6+28000:before.b[row.code],row.code+' unauthorized repricing');
  assert.equal(scope.lines[row.code].workingSellTHB,row.workingSellTHB);
  if(row.code.startsWith('B')){
   const out=rel.b.find(x=>x.code===row.code);
@@ -80,10 +80,10 @@ assert.equal(coverage.originalA5BookedTHB,260232);assert.equal(coverage.postAddi
 assert.equal(rel.summary.baseCustomerSellTHB,null);assert.equal(rel.approval.releaseAllowed,false);
 assert.equal(rel.summary.cOptionalCustomerSellTHB,null);
 assert.equal(round(rel.summary.aProvisionalCustomerSellTHB-before.summary.aProvisionalCustomerSellTHB),20831.85);
-assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-before.summary.bProvisionalCustomerSellTHB),-285875+237580);
+assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-before.summary.bProvisionalCustomerSellTHB),-285875+237580+787500);
 console.log('PASS urgent pricing: supplier identity/currency, exact foreign FAT travel removal, B9 unchanged, B8 no second credit, 8 CIF legs, 16 bidirectional annex rows, A5 non-additive, corruption detection and FX sensitivity; draft only.');
 
 const reviewed=require('../audit-fixtures/urgent-pricing-reviewed-20261024.json');
 assert.equal(bc.byCode.B3.workingSellTHB,reviewed.b.B3-307125+189150);
 for(const a of rel.a)assert.deepEqual({code:a.code,previewCostTHB:a.previewCostTHB,previewSellTHB:a.previewSellTHB},reviewed.a.find(x=>x.code===a.code),'All equipment including MGW RF stays unchanged');
-assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,round(reviewed.summary.bProvisionalSamTelDeductionTHB-47250+(180150+237580)*.05));
+assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,round(reviewed.summary.bProvisionalSamTelDeductionTHB-47250+(180150+237580+787500)*.05));

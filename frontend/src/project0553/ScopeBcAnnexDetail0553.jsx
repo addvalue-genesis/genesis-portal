@@ -160,7 +160,18 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
   </div>}
   {code==="B14"&&<div className="p55-panel" style={{padding:12}}>
    <h4>ADDVALUE — Service Insurance Review and Budget (B14)</h4>
-   <p className="p55-note"><strong>Owner instruction 29-Oct-2026:</strong> B14 is ADDVALUE service insurance. SAMTEL reported resale markup 10% is separate from ADDVALUE premiums, coverage and bank guarantees. <strong>Additional B14 budget: quotation required.</strong></p>
+   <p className="p55-note"><strong>Owner instruction 29-Oct-2026:</strong> B14 is ADDVALUE service insurance. SAMTEL reported resale markup 10% is separate from ADDVALUE premiums, coverage and bank guarantees. <strong>Selected B14 budgetary SELL: {thb(insurancePlan.selectedBudget.workingSellTHB)} / USD {insurancePlan.selectedBudget.workingSellUSD.toLocaleString("en-US")}. Current insurer quotation pending.</strong></p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Budget basis</th><th>THB</th><th>Authority / qualification</th></tr></thead>
+    <tbody><tr><td>CGL historical reference</td><td>{thb(insurancePlan.selectedBudget.historicalCglTHB)}</td><td>AIG CQ 004-23 (R), 7-Jun-2023; CPOC, not a current 0553 quotation</td></tr>
+     <tr><td>WCEL historical reference</td><td>{thb(insurancePlan.selectedBudget.historicalWcelTHB)}</td><td>Historical 2 months / 8 employees; not automatically scaled to 0553</td></tr>
+     <tr><td>Gross SELL planning headroom</td><td>{thb(insurancePlan.selectedBudget.nonPremiumPlanningAllowanceTHB)}</td><td>Commercial treatment, taxes, territories, duration and scope uncertainty; not an insurer premium</td></tr></tbody>
+    <tfoot><tr><th>Selected B14 Working SELL</th><th>{thb(insurancePlan.selectedBudget.workingSellTHB)}</th><th>USD {insurancePlan.selectedBudget.workingSellUSD.toLocaleString("en-US")} at existing FX {insurancePlan.selectedBudget.fxTHBPerUSD}</th></tr></tfoot>
+   </table></div>
+   <p className="p55-note"><strong>Historical value reconciliation:</strong> CPOC actual contract USD {insurancePlan.selectedBudget.cpocActualContractUSD.toLocaleString("en-US")} per owner; AIG historical estimated contract USD {insurancePlan.selectedBudget.insurerHistoricalEstimatedContractUSD.toLocaleString("en-US")} retained separately.</p>
+   <p className="p55-note"><strong>RFQ contract evidence:</strong> <a href={insurancePlan.contractSource.url} target="_blank" rel="noreferrer">{insurancePlan.contractSource.document}</a>. {Object.values(insurancePlan.contractSource.clauses).join("; ")}. Final signed terms and named/additional insured acceptance remain open.</p>
+   <p className="p55-note"><strong>CCL item31 exposure:</strong> Yard {insurancePlan.contractSource.cclExposure.yardDays} days, Offshore {insurancePlan.contractSource.cclExposure.offshoreDays} days, Survey {insurancePlan.contractSource.cclExposure.surveyDays} days; 2 persons. Current Working days below do not establish the full policy calendar period.</p>
+   <p className="p55-note"><strong>Historical CGL exclusions:</strong> {insurancePlan.selectedBudget.historicalExclusions.join("; ")}. Confirm goods/equipment cover separately; project participants are not automatically insured.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Cover to review</th><th>Single cost owner</th><th>Exposure</th><th>Evidence needed before pricing</th></tr></thead>
     <tbody>{insurancePlan.coverages.map(x=><tr key={x.id}><td>{x.name}</td><td>{x.costOwner}</td><td>{x.basis}</td><td>{x.gate}<small>Additional premium: to be quoted</small></td></tr>)}</tbody>

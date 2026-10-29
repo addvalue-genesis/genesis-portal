@@ -77,7 +77,7 @@ export function ReleaseSourceNavigator0553({model,onOpenSource}){
              counted ONCE · CP-B3 HOLD</div>}
            <div>Commercial owner: {group.part==="a"?"10.1 Equipment":row.executionOwner||row.code+" selected Working Owner"}</div>
            {row.offerTreatment&&<div>{row.offerTreatment.priceText} — {row.offerTreatment.remark}</div>}
-           {row.insurancePlan&&<div>ADDVALUE coverage review: {row.insurancePlan.coverages.map(x=>x.name+" / "+x.costOwner).join("; ")}. Additional premium not established; existing B3/B9 insurance allowances are non-additive.</div>}
+           {row.insurancePlan&&<div>ADDVALUE coverage review: {row.insurancePlan.coverages.map(x=>x.name+" / "+x.costOwner).join("; ")}. Selected budgetary SELL {currency(row.insurancePlan.selectedBudget.workingSellTHB)}; current insurer premium not established; existing B3/B9 allowances are non-additive and not automatically credited.</div>}
            <div>Preview: {currency(itemPrice(group.part,row))} · {group.part==="c"?"OPTIONAL / not included in Base":group.part==="a"?"Provisional Equipment":"B Working SELL passed unchanged"}</div>
           </div>
          </details>

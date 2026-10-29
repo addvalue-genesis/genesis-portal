@@ -21,6 +21,7 @@ export function selectScopePartBcWorking0553(){
    }),amountTHB:r.workingSellTHB, // Legacy name; this is WORKING SELL only, NEVER cost.
    directCostTHB:r.directCostTHB,
    executionActivities:r.executionActivities,
+   offerTreatment:r.offerTreatment,insurancePlan:r.insurancePlan,budgetOwner:r.budgetOwner,
    serviceCommercialBasis:selectServiceCommercialBasis0553(r),
    b10ItemizedPurchaseEvidence:r.code==="B10"?r.b10ItemizedPurchaseEvidence:null,
    b10PriceToWinReview:r.code==="B10"?r.b10PriceToWinReview:null,

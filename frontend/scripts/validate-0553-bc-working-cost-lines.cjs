@@ -48,11 +48,11 @@ for(const code of codes){
  assert.deepEqual(b.byCode[code].workCostLines,m.byCode[code]);
  assert.equal(b.byCode[code].workCostLineCount,m.byCode[code].length);
  assert.equal(b.byCode[code].workCostLineModuleId,m.moduleId);
- assert.equal(b.byCode[code].workingSellTHB,({B1:421180,B2:237121.13,B3:2322450,B8:142550,B9:480550,B5:311184,B6:335584,B7:30000,B10:509827.5,B13:46683,C1:null,C2:null,B11:157657.5})[code]??m.workingSellByCode[code]);
+ assert.equal(b.byCode[code].workingSellTHB,({B1:421180,B2:237121.13,B3:2322450,B8:142550,B9:480550,B5:311184,B6:335584,B7:30000,B10:509827.5,B13:46683,C1:null,C2:null,B11:157657.5,B14:787500})[code]??m.workingSellByCode[code]);
 }
 assert.equal(b.workCostLineCount,111);
 assert.equal(b.workCostLineAuditCount,40);
-assert.equal(b.knownWorkingSellTHB,4994787.13);
+assert.equal(b.knownWorkingSellTHB,5782287.13);
 assert.equal(b.rows.filter(x=>x.baseScope&&Number.isFinite(x.workingSellTHB)).reduce((sum,x)=>Math.round((sum+x.workingSellTHB)*100)/100,0),b.knownWorkingSellTHB,"Base-only budget sum; optional C1/C2 excluded");
 assert.equal(b.knownDirectCostTHB,null);
 const b1=m.byCode.B1.filter(x=>x.id.startsWith("B1-WBS-"));

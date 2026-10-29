@@ -47,6 +47,10 @@ for(const code of codes){
    assert.equal(a.directCostTHB,null,"B11 OEM tool quotation/inclusion not yet verified");
    assert.equal(a.commercialSellTHB,null,"B11 budget approval does not release customer price");
   }
+ }else if(code==="B14"){
+  assert.equal(a.workingSellTHB,787500);
+  assert.equal(b.insurancePlan.selectedBudget.workingSellUSD,25000);
+  assert.equal(b.insurancePlan.verifiedPremiumTHB,null);
  }else assert.equal(a.workingSellTHB,null,"No selected current Working Sell "+code);
  assert.equal(a.historicalReferenceUSD,s[2]);
  assert.equal(a.historicalReferenceUSD,expectedUSD[code]);
@@ -134,4 +138,4 @@ for(const file of ["project0553/ScopeSheetsDetail0553.jsx","project0553/ScopeBcA
  }).code;
  assert(compiled?.length>0,"JSX compile failed "+file);
 }
-console.log("PASS 0553 10.2->10.5 Scope B10/B11/B13/B14/C1/C2: B11 THB157657.50 selected budgetary WORKING SELL (not verified Direct Cost, not released quote); 6 Rev08 historical references, 31 child rows, B14 unpriced, current-owner trace and Module ID links.");
+console.log("PASS 0553 10.2->10.5 Scope B10/B11/B13/B14/C1/C2: B11 THB157657.50 selected budgetary WORKING SELL (not verified Direct Cost, not released quote); 6 Rev08 historical references, 31 child rows, B14 USD25000 selected budgetary SELL, current-owner trace and Module ID links.");

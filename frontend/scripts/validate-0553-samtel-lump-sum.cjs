@@ -72,7 +72,7 @@ assert.equal(logistics.statutoryThaiDutyVATTHB,null);
 assert.equal(logistics.adequacyVerified,false);
 const deltas={B1:209580,B6:28000,B3:189150,B8:-9000};
 for(const row of bc.rows){
- assert.equal(row.workingSellTHB,baseline.b[row.code]===null?null:round(baseline.b[row.code]+(deltas[row.code]||0)),row.code);
+ assert.equal(row.workingSellTHB,row.code==='B14'?787500:baseline.b[row.code]===null?null:round(baseline.b[row.code]+(deltas[row.code]||0)),row.code);
  assert.equal(scope.lines[row.code].workingSellTHB,row.workingSellTHB);
  if(row.code.startsWith('B')){
   const out=rel.b.find(r=>r.code===row.code);
@@ -81,7 +81,7 @@ for(const row of bc.rows){
  }
 }
 for(const a of rel.a)assert.deepEqual({code:a.code,previewCostTHB:a.previewCostTHB,previewSellTHB:a.previewSellTHB},baseline.a.find(r=>r.code===a.code));
-assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-baseline.summary.bProvisionalCustomerSellTHB),180150+237580);
+assert.equal(round(rel.summary.bProvisionalCustomerSellTHB-baseline.summary.bProvisionalCustomerSellTHB),180150+237580+787500);
 assert.equal(rel.summary.bProvisionalSamTelDeductionTHB,round(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB)).reduce((n,r)=>n+round(r.workingSellTHB*.05),0)));
 assert.equal(rel.summary.baseCustomerSellTHB,null);
 assert.equal(rel.approval.releaseAllowed,false);
