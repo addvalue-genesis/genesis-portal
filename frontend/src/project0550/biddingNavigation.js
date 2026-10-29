@@ -10,5 +10,6 @@ export const BID_TABS=[
  {id:"risk",label:"08 Risk / Gates",aria:"Risk & Controls",moduleId:"MOD-RISK"},
  {id:"registry",label:"09 Data / Trace",aria:"Data and Trace",moduleId:"MOD-DATA-REPOSITORY"},
  {id:"budget",label:"10 Bidding / Commercial",aria:"Budget",moduleId:"MOD-BUDGET-WORKING"},
+ {id:"technical",label:"Volume II · Technical Proposal",aria:"Technical Proposal",moduleId:"MOD-PROJECT-SHELL"},
  {id:"deviations",label:"AVL / Deviation",aria:"AVL and Deviation",moduleId:"MOD-REQ-COMPLETENESS"}
 ];

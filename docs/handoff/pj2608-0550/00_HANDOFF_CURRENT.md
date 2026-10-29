@@ -1,3 +1,9 @@
+> **Volume II, 29-Oct-2026:** Read [Technical Proposal authoring](20261029_VOLUME_II_TECHNICAL_PROPOSAL.md).
+> Menu B has `bid.technical`, five CNEEC sections, a 19-system + COMMON checklist,
+> canonical source/SI/vendor/Working links, physical details and printable DRAFT
+> export. Existing Module IDs, financial inputs and frozen history are retained.
+> Authored technical drafts do not authorize a customer issue.
+
 > **All-system AVL, 29-Oct-2026:** Read
 > [canonical Working 1–8 → AVL → Deviation](20261029_ALL_SYSTEM_AVL.md), UI
 > `2026-10-29.8-preview`. Existing WP.7 / AVL / Release share an all-system audit.

@@ -42,6 +42,7 @@ import {VendorWorkspace} from "../project0550/VendorWorkspace";
 import {SchematicWorkspace} from "../project0550/SchematicWorkspace";
 import {BidDataControls,BidSaveStatus} from "../project0550/BidDataControls";
 import {BID_TABS} from "../project0550/biddingNavigation";
+import {TechnicalProposalWorkspace0550,TECHNICAL_PANELS_0550} from "../project0550/TechnicalProposalWorkspace0550.jsx";
 import {ControlledSourceInventory, SourceCommunications, SourceFindings} from "../project0550/ControlledSourceInventory";
 import {SECTION_IDENTITY} from "../project0550/sectionIdentity";
 import "../project0550/project0550.css";
@@ -2067,9 +2068,11 @@ function Project0550Bidding({ lang = "th" }) {
   const [moduleQuery,setModuleQuery]=useState("");
   const [navigationTarget,setNavigationTarget]=useState(null);
   const [focusedSystem,setFocusedSystem]=useState("ALL");
+  const [technicalDirty,setTechnicalDirty]=useState(false);
   const {data,model}=useBidWorkspace();
   const baseModuleIndex=[{id:"l3.original",title:"RFQ-02 Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
     {id:"bid.documents.si-work-package",title:"Import System Integrator engineering drafts",area:"A",tab:"documents"},
+    ...TECHNICAL_PANELS_0550.map(s=>({id:"bid.technical."+s.id,title:"Volume II / "+s.title,tab:"technical"})),
     {id:"bid.working-preview",title:"Working Preview / System Integrator 1–8",tab:"budget"},
     {id:"bid.working-preview.particulars",title:"System Particular / Document reading ledger",tab:"budget"},
     ...(model?.integration?.requirements||[]).map(r=>({id:"bid.working-preview.requirement."+r.id,title:r.title+" / "+r.systemToken,tab:"budget"})),
@@ -2105,7 +2108,7 @@ function Project0550Bidding({ lang = "th" }) {
   const moduleIndex=[...new Map([...baseModuleIndex,...bidPresentationIndex(data?.lines||[])].map(m=>[m.id,m])).values()];
   const query=moduleQuery.trim().replace(/^PJ2608-0550\s*\/\s*/i,"").toLowerCase();
   const matches=query?moduleIndex.filter(m=>BID_TAG_TARGETS_0550[query]?m.id===BID_TAG_TARGETS_0550[query]:(m.id+" "+m.title+" "+(m.number||"")).toLowerCase().includes(query)):[];
-  const jump=m=>{setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);};
+  const jump=m=>{if(technicalDirty)return;setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);};
   useEffect(()=>{if(!navigationTarget||activeTab==="budget")return;const timer=setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(n=>n.getAttribute("data-component-key")===navigationTarget);if(el){for(let n=el;n;n=n.parentElement)if(n.tagName==="DETAILS")n.open=true;el.scrollIntoView({block:"center"});}},40);return()=>clearTimeout(timer);},[navigationTarget,activeTab,area]);
   const [pagaEvidence, setPagaEvidence] = useState(null);
 
@@ -2129,7 +2132,7 @@ function Project0550Bidding({ lang = "th" }) {
           <strong>{PROJECT_0550.method}</strong>
         </div>
 
-        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","A · Original RFQ Documents"],["B","B · Engineering & Bid Preparation"],["C","C · Communications & Submissions"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>setArea(id)}>{label}</button>)}</div>
+        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","A · Original RFQ Documents"],["B","B · Engineering & Bid Preparation"],["C","C · Communications & Submissions"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>{if(!technicalDirty)setArea(id);}}>{label}</button>)}</div>
         {area==="B"&&<nav className="p55-tabs" aria-label="PJ2608-0550 sections">
           {TABS.map((tab) => (
             <button
@@ -2137,7 +2140,7 @@ function Project0550Bidding({ lang = "th" }) {
               aria-label={tab.aria}
               type="button"
               className={activeTab === tab.id ? "is-active" : ""}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => {if(!technicalDirty)setActiveTab(tab.id);}}
             >
               {tab.label}
             </button>
@@ -2147,6 +2150,7 @@ function Project0550Bidding({ lang = "th" }) {
 
       <main className="p55-main">
         <BidSaveStatus/>
+        {technicalDirty&&<p className="p55-panel" role="status">มีร่าง Volume II ที่ยังไม่บันทึก · บันทึกหรือยกเลิกก่อนเปลี่ยนแท็บ/พื้นที่ทำงาน</p>}
         {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.original"/><DocumentsView navigationTarget={navigationTarget}/></section>}
         {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><SourceCommunications/><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · {data?.releaseRegister?.issues.length||0} authorized snapshots · {data?.releaseRegister?.transmittals.length||0} recorded transmittals.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
         {area==="B"&&<>
@@ -2162,6 +2166,7 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
           {activeTab === "documents" ? <><section className="p55-panel"><h2>Supplier evidence / Shared source register</h2><p>เอกสารลูกค้าและทะเบียนต้นฉบับอยู่ที่ A · ข้อเสนอและ Supplier master ใช้ข้อมูลกลางร่วมกับ Working Preview 1–8</p><button type="button" onClick={()=>jump({id:"l3.original",area:"A",tab:"documents"})}>เปิด A · Source Register</button><button type="button" onClick={()=>jump({id:"bid.working-preview.step.7",tab:"budget"})}>เปิด Mapping ลูกค้า ↔ Integrator ↔ Supplier</button></section><VendorWorkspace/></> : null}
           {activeTab === "registry" ? <BidDataControls/> : null}
+          {activeTab === "technical" ? <TechnicalProposalWorkspace0550 navigationTarget={navigationTarget} onDirtyChange={setTechnicalDirty} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
           {activeTab === "deviations" ? <DeviationWorkspace0550 navigationTarget={navigationTarget} onOpenSource={id=>jump({id,tab:"documents",area:"A"})} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
         </>}
       </main>

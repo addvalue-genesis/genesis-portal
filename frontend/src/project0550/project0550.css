@@ -1658,6 +1658,24 @@
 .p55-bid-presentation [data-component-key="bid.budget.official.summary"] .p55-metric { border-top:3px solid var(--bid-accent); background:var(--bid-tint); }
 @media(max-width:700px) { .p55-bid-presentation .p55-bid-fields { grid-template-columns:minmax(0,1fr); } .p55-module-heading { flex-direction:column; } .p55-module-copy { width:100%; } }
 .p55-working-preview { margin: 1rem 0; }
+.p55-technical { min-width:0; }
+.p55-technical-intro { border-top:5px solid #167b79; background:#eef8f7; }
+.p55-technical-tabs { display:flex; flex-wrap:wrap; gap:8px; margin:16px 0; }
+.p55-technical-tabs button { border:1px solid #167b79; border-radius:6px; padding:10px 14px; color:#125451; background:#edf8f7; cursor:pointer; }
+.p55-technical-tabs button[aria-pressed="true"] { color:white; background:#126966; }
+.p55-technical .p55-table-wrap { max-width:100%; overflow-x:auto; }
+.p55-technical .p55-table { min-width:760px; }
+.p55-technical label { display:block; margin:12px 0; min-width:0; }
+.p55-technical input,.p55-technical select,.p55-technical textarea { display:block; max-width:100%; width:100%; padding:8px; border:1px solid #a9c1ca; border-radius:4px; font:inherit; }
+.p55-technical select[multiple] { min-height:140px; }
+.p55-technical textarea { min-height:200px; }
+.p55-technical form { margin:16px 0; padding:16px; border:1px solid #c9dfdf; border-radius:8px; background:#f6fbfb; }
+.p55-technical p,.p55-technical td,.p55-technical small { overflow-wrap:anywhere; }
+.p55-technical-response { white-space:pre-wrap; }
+.p55-technical .p55-review-toolbar { flex-wrap:wrap; }
+.p55-technical details { margin:12px 0; }
+.p55-technical summary { cursor:pointer; padding:10px 0; font-weight:700; }
+@media(max-width:700px) { .p55-technical .p55-bid-fields { grid-template-columns:minmax(0,1fr); } .p55-technical form { padding:10px; } }
 .p55-wp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1rem; color: #07334b; background: #e4eff7; border-radius: .7rem; }
 .p55-wp-header h2 { margin: 0 0 .5rem; }
 .p55-wp-header p { margin: 0; }

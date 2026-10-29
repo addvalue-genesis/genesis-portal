@@ -16,7 +16,7 @@ export const MODULE_REGISTRY = [
     why: "Keep all project decisions and views in one controlled workspace without mixing customer output and internal analysis.",
     inputs: ["Controlled project dataset", "Knowledge-kernel bindings", "Commercial sources"],
     outputs: ["Executive view", "19-System view", "First Principles", "Execution", "Budget", "Risk & Controls", "Evidence"],
-    implementation: ["frontend/src/pages/PJ26080550.jsx"],
+    implementation: ["frontend/src/pages/PJ26080550.jsx", "frontend/src/project0550/TechnicalProposalWorkspace0550.jsx", "frontend/src/project0550/data/technicalProposal0550.js", "frontend/src/project0550/exportTechnicalProposal0550.js"],
     invariants: [
       "Do not merge frozen customer submission with evolving working state.",
       "Apply ADR-0550-001: map customer requirements to supplier evidence and integrator work in both directions, through Working/Budgetary/Release back to both source sides.",

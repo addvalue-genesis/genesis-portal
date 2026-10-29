@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-29.12-preview",
+  "version": "2026-10-29.13-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "628133c2482160630b6fa9e9dc17fa20cf89dac1",
-  "capability": "0550 visible known Working prices in summary, with missing counts and native currencies; complete and Official totals retain readiness controls"
+  "source0550": "fe312f501ba04e5ec40c4448eaee407517534f0d",
+  "capability": "0550 Volume II Technical Proposal authoring from canonical SI/source/vendor/Working records, draft checklist, physical details, current dependency review and printable draft export"
 }

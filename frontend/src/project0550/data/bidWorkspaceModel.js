@@ -8,8 +8,9 @@ import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
 import {validateReleaseRegister0550} from "./releaseIssue0550";
+import {validateTechnicalProposal0550} from "./technicalProposal0550";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
-export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport"];
+export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal"];
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
 export function newId(prefix){
@@ -57,6 +58,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  if(data.mgwDetailPricingImport!==undefined){const r=data.mgwDetailPricingImport;fields(r,["version","date","importedLineIds","conflicts","replacedLineIds","decision"]);if(r.decision!==undefined)string(r.decision,"MGW pricing decision");if(r.replacedLineIds!==undefined&&(!Array.isArray(r.replacedLineIds)||r.replacedLineIds.some(v=>typeof v!=="string"||v.length>100)))fail("Invalid replaced MGW owner list");string(r.version,"MGW pricing preparation version",100);date(r.date,"MGW pricing preparation date");for(const key of ["importedLineIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>400))fail("Invalid MGW pricing preparation list");}}
  if(data.repositoryBasisImport!==undefined){const r=data.repositoryBasisImport;fields(r,["version","snapshotId","preparedOn","fxInherited"]);string(r.version,"repository preparation version",100);if(r.snapshotId!==snapshotId||typeof r.fxInherited!=="boolean")fail("Invalid repository preparation");date(r.preparedOn,"repository preparation date");}
  validateIntegration0550(data);
+ validateTechnicalProposal0550(data.technicalProposal,[...new Set([...systems,...(data.integrationWorkspace?.requirements||[]).map(r=>r.systemToken)])]);
  validateReleaseRegister0550(data,snapshot=>validateBidWorkspace(snapshot,snapshotId,systems));
  return data;
 }
