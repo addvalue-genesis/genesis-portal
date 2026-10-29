@@ -27,6 +27,7 @@ export function releaseFullBid0550(data,official,systems){
   const bid=a.TSI+bc.TSI>0||a.CLARIFICATION+bc.CLARIFICATION+a.OPEN+bc.OPEN>0||!records.length||extraSelected>0;
   return {token,name:systems.find(s=>s.token===token)?.name||(token==="COMMON"?"Shared equipment / common obligations":token),index,first,
    references:[...new Set(sourceOrder.map(r=>r.reference))],appendices:[...new Set(sourceOrder.map(r=>appendix(r.reference)).filter(Boolean))],
+   mrDocuments:records.length?[MR_WORKING_CATALOG_0550.document]:[],mrReferences:[...new Set(records.map(r=>r.requirement.reference))],
    records,a,bc,bid,extraSelected,integrationCount:integration.length,
    sourceLots:CUSTOMER_FORM_0550.rows.filter(r=>r.systems.includes(token)).map(r=>r.code),
    workingLots:[...new Set(work.map(r=>r.customerRowCode).filter(Boolean))],

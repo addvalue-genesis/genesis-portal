@@ -133,3 +133,22 @@ The focused browser regression passed Full/Bid switching, 20 system rows, AIS
 equipment/services split, unmapped COMMON details and Source navigation, Part A
 reveal, mobile scroll containment, unchanged IndexedDB and no page errors. The
 desktop screenshot was inspected. A final mode label/highlight is presentation only.
+
+## Follow-up — Explicit MR column
+
+Base `07353620`. Full/Bid now has a dedicated MR document / revision / locator
+column instead of folding one abbreviated reference into the ordinal. Document
+identity comes from the existing MR catalog header; all original system-specific
+clause/page/Appendix locators, including B/C obligations, are available in an
+expandable list. The current source-backed rows share
+`MM-ASK-1A-APF-TEL-MR-0001 Rev.B1`; different MR numbers are not invented for
+individual systems. A system with no catalog record shows MR OPEN.
+
+ADR principles **2, 8, 10–12**: source context is visible without changing source
+facts, dispositions, prices or exports. The canonical/SSR test verifies explicit
+document/revision across all 20 source-backed rows, both main VSAT clauses and
+Appendix references, unknown-system OPEN and unchanged financial/customer records.
+Production compilation and the focused Full/Bid browser regression pass, including
+the dedicated MR column, full document/revision in every current system row,
+expanded main-clause/Appendix references, Source navigation and unchanged IndexedDB.
+The existing bundle-size warning remains; `git diff --check` passed.

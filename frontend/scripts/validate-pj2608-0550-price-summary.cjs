@@ -33,6 +33,8 @@ const rowsBefore=officialCustomerRows(m.provisional),notes=releasePricePresentat
 const {releaseFullBid0550}=require(root+'/project0550/releaseFullBid0550.js');
 const inventory=releaseFullBid0550(d,m.provisional,D.SYSTEMS),get=token=>inventory.find(r=>r.token===token);
 assert.equal(inventory.length,20);assert.equal(new Set(inventory.map(r=>r.token)).size,20);assert.equal(inventory.flatMap(r=>r.records).length,MR.MR_WORKING_CATALOG_0550.rows.length,'All catalog requirements appear, including unselected/unmapped/COMPANY and B/C');
+assert(inventory.every(r=>r.mrDocuments.length===1&&r.mrDocuments[0]===MR.MR_WORKING_CATALOG_0550.document),'Every source-backed system identifies the catalog MR document/revision explicitly');
+assert(get('TEL-VSAT').mrReferences.some(r=>r.includes('p07'))&&get('TEL-VSAT').mrReferences.some(r=>r.includes('App.1.2')),'Main clauses and Appendix locators both retained');
 assert.deepEqual(inventory.slice(0,3).map(r=>r.token),['TEL-VSAT','TEL-AIS','TEL-RADIO-DTRS'],'Scope clauses on p07/p08 precede the p09 equipment schedule');
 assert.equal(get('COMMON').records.filter(r=>r.requirement.wbs==='A').length,30);assert.equal(get('COMMON').mappingOpen>0,true);
 assert.equal(get('TEL-AIS').a.COMPANY,1);assert.equal(get('TEL-AIS').bc.TSI,2);assert.equal(get('TEL-AIS').bid,true,'COMPANY hardware does not exclude TSI services');
@@ -45,6 +47,7 @@ const commonIds=new Set(MR.MR_WORKING_CATALOG_0550.rows.filter(r=>r.wbs==='A'&&r
 const missing={...m.provisional,lines:m.provisional.lines.filter(l=>!commonIds.has(l.mrRequirementId))};
 const common=releaseFullBid0550(d,missing,D.SYSTEMS).find(r=>r.token==='COMMON');assert.equal(common.missing,30);assert.equal(common.records.filter(r=>r.requirement.wbs==='A').length,30);
 const extra=releaseFullBid0550({...d,lines:[...d.lines,{systemToken:'SYNTHETIC-NEW-SYSTEM'}]},m.provisional,D.SYSTEMS).find(r=>r.token==='SYNTHETIC-NEW-SYSTEM');assert(extra&&extra.bid&&extra.records.length===0,'No fixed 19-system cap hides newly registered scope');
+assert.equal(extra.mrDocuments.length,0,'No MR identity invented for a system without a catalog record');
 const hierarchy=releaseHierarchy0550(m.provisional,rowsBefore);
 const retained=hierarchy.entries.filter(row=>!row.kind.startsWith('mr-')).map(({parents,toggle,mrReferences,mrReference,sectionModuleId,...row})=>row);
 const canonical=rows=>[...rows].sort((a,b)=>a.key.localeCompare(b.key));
@@ -78,6 +81,7 @@ assert(releaseHtml.includes('Release table Module ID'));assert(releaseHtml.inclu
 assert(releaseHtml.includes('เหตุผลที่ยังเป็น OPEN'));assert(releaseHtml.includes('ยังไม่จัดสรรราคา package นี้เข้าแถว MR'));
 assert(releaseHtml.includes('ราคาย่อยที่คำนวณได้'));assert(releaseHtml.includes('HOLD / NOT ISSUED'));
 assert(releaseHtml.includes('Full Bid systems'));for(const row of inventory)assert(releaseHtml.includes('data-full-bid-system="'+row.token+'"'));assert(releaseHtml.includes('MR-B1-11-APF-05'));
+assert(releaseHtml.includes('MR อ้างอิง / Revision / หน้า / Appendix'));assert(releaseHtml.includes(MR.MR_WORKING_CATALOG_0550.document));
 const registry=require(root+'/project0550/bidPresentation0550.js').bidPresentationIndex(d.lines);
 for(const part of ['A','B','C']){const id='bid.budget.release.part.'+part;assert.equal(registry.filter(r=>r.id===id).length,1);assert(releaseHtml.includes('data-component-key="'+id+'"'));assert(releaseHtml.includes('Copy component ID '+id));}
 assert.equal(JSON.stringify(d),before,'Rendering release diagnostics never changes raw prices, selections, FX, reviews or history');

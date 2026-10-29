@@ -21,10 +21,14 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  if(process.env.PJ0550_FULL_BID_ONLY){
   const inventory=release.getByRole('region',{name:'Part A Full Bid inventory'}),full=release.getByRole('table',{name:'Full Bid systems',exact:true});
   await inventory.waitFor({state:'visible'});assert.equal(await full.locator('tbody>tr[data-full-bid-system]').count(),20);
+  assert(await full.getByRole('columnheader',{name:'MR อ้างอิง / Revision / หน้า / Appendix',exact:true}).isVisible());
+  assert.equal(await full.locator('.p55-full-bid-mr').count(),20);
+  assert(await full.locator('.p55-full-bid-mr').evaluateAll(cells=>cells.every(c=>c.textContent.includes('MM-ASK-1A-APF-TEL-MR-0001 Rev.B1'))),'Every current system shows its full MR identity and revision');
+  const vsatMr=full.locator('[data-full-bid-system="TEL-VSAT"] .p55-full-bid-mr');await vsatMr.locator('details>summary').click();assert((await vsatMr.innerText()).includes('p07'));assert((await vsatMr.innerText()).includes('App.1.2'));
   assert.equal(await full.locator('tbody>tr').first().getAttribute('data-full-bid-system'),'TEL-VSAT');
   const ais=full.locator('[data-full-bid-system="TEL-AIS"]'),common=full.locator('[data-full-bid-system="COMMON"]');
   assert((await ais.innerText()).includes('COMPANY supply'));assert((await ais.innerText()).includes('BID · TSI'));
-  await common.locator('details>summary').click();assert((await common.innerText()).includes('MR-B1-11-APF-05'));assert((await common.innerText()).includes('MAPPING OPEN'));
+  await common.locator('summary').filter({hasText:'Full MR / Bid'}).click();assert((await common.innerText()).includes('MR-B1-11-APF-05'));assert((await common.innerText()).includes('MAPPING OPEN'));
   await inventory.getByRole('button',{name:'Bid · TSI / OPEN',exact:true}).click();assert(await ais.isVisible());assert(await full.locator('[data-full-bid-system="TEL-FO"]').isVisible());
   await inventory.getByRole('button',{name:'Full · ทุกระบบ',exact:true}).click();assert.equal(await full.locator('tbody>tr[data-full-bid-system]').count(),20);
   if(process.env.PJ0550_SUMMARY_QA_DIR){fs.mkdirSync(process.env.PJ0550_SUMMARY_QA_DIR,{recursive:true});await inventory.getByRole('heading').scrollIntoViewIfNeeded();await page.screenshot({path:path.join(process.env.PJ0550_SUMMARY_QA_DIR,'full-bid-desktop.png')});}
