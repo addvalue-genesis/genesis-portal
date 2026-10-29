@@ -91,6 +91,32 @@ assert.equal(derived.official.releaseAllowed,false);assert.equal(derived.officia
 assert.deepEqual({lines:d.lines,offers:d.offers,fx:d.fx,calculations:d.calculations},financial,'Integration controls never rewrite costs/quantities/FX');
 assert.deepEqual(JSON.parse(JSON.stringify(d)).integrationWorkspace,d.integrationWorkspace,'Backup roundtrip');
 assert.throws(()=>validateBidWorkspace({...d,integrationWorkspace:{...w,foreign:true}},DATA_LAYER_META.datasetId,tokens),/Integration/);
+// A vendor-prepared list is evidence of a declaration, never customer approval.
+const V=require(root+'/project0550/data/subvendorReference0550.js');
+const catalog=V.SUBVENDOR_REFERENCE_0550,groups=V.groupedSubvendors0550();
+assert.equal(catalog.rows.length,10);assert.equal(groups.length,5);
+assert.deepEqual(groups.map(g=>g.sourceRows),[[1,6],[2,7],[3,8],[4,9],[5,10]]);
+assert.deepEqual(groups.map(g=>g.vendor),['TIDELAND','Redline','RADWIN','GAI-Tronics','MOTOROLA']);
+assert.equal(groups[2].countryOfOrigin,'ISARAEL','Preserve the source spelling');
+assert(catalog.rows.every(row=>row.makeModel===''));assert.equal(catalog.source.authority,'VENDOR_DECLARATION');
+const declared=clone(d),declaredId='DRV-'+catalog.source.driveFileId;
+declared.sourceIntake.sources.push(source(declaredId,'Redline'));
+const draft=V.subvendorDraftFields0550(groups[1].id);
+assert.equal(draft.model,'');assert.equal(draft.result,'OPEN');assert.deepEqual(draft.sourceIds,[]);
+let candidate={...declared.integrationWorkspace.avlChecks[0],...draft,model:'Synthetic model',result:'LISTED',sourceIds:[declaredId],sourceLocator:'p1 table 1 row 2',sourceExcerpt:'Redline',status:'REVIEWED',reviewer:'test',reviewedOn:today};
+candidate=M.stampIntegration0550(declared,'avlChecks',candidate);declared.integrationWorkspace.avlChecks[0]=candidate;
+validateBidWorkspace(declared,DATA_LAYER_META.datasetId,tokens);
+let declarationModel=M.deriveIntegration0550(declared,SYSTEMS,today);
+assert.equal(declarationModel.avlChecks[0].state,'OPEN');
+assert(declarationModel.avlChecks[0].problems.includes('VENDOR_DECLARATION_IS_NOT_CUSTOMER_AVL'));
+assert.deepEqual({...declared,sourceIntake:d.sourceIntake,integrationWorkspace:d.integrationWorkspace},d,'Preparing a declaration never changes financial/project records');
+assert.equal(JSON.parse(JSON.stringify(candidate)).vendorListRowId,groups[1].id);
+assert(V.subvendorReferenceProblems0550({...candidate,vendorListSourceHash:'0'.repeat(64)}).includes('VENDOR_LIST_SOURCE_CHANGED'));
+assert(V.subvendorReferenceProblems0550({...candidate,manufacturer:'Different manufacturer'}).includes('DECLARED_VENDOR_RECONCILIATION_OPEN'));
+const oldBackup=clone(d);delete oldBackup.integrationWorkspace.avlChecks[0].vendorListRowId;delete oldBackup.integrationWorkspace.avlChecks[0].vendorListSourceHash;
+validateBidWorkspace(oldBackup,DATA_LAYER_META.datasetId,tokens);
+assert.throws(()=>V.subvendorDraftFields0550('UNKNOWN'),/Unknown/);
+
 // SSR covers real modules and escaping; browser interactions are checked separately.
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const context=require(root+'/project0550/BidWorkspaceContext.jsx');
@@ -104,6 +130,10 @@ assert(html.includes('System Particular ที่ใช้ในขั้นน�
 assert(renderToStaticMarkup(React.createElement(ParticularWorkspace0550,props)).includes('Document reading ledger'));
 const devHtml=renderToStaticMarkup(React.createElement(DeviationWorkspace0550,props));
 for(const col of M.DEVIATION_COLUMNS_0550)assert(devHtml.includes(col));
+assert(devHtml.includes('Subcontractors and sub-vendors declared list'));
+for(const group of groups)assert(devHtml.includes(group.vendor));
+const {SubvendorReference0550}=require(root+'/project0550/SubvendorReference0550.jsx');
+assert.equal((renderToStaticMarkup(React.createElement(SubvendorReference0550,{onPrepare:()=>{}})).match(/data-subvendor-row=/g)||[]).length,5);
 const {BidCommercialWorkspace}=require(root+'/project0550/BidCommercialWorkspace.jsx');
 assert(renderToStaticMarkup(React.createElement(BidCommercialWorkspace,props)).includes('ข้อกำหนด / CAL–RPT / Supplier'),'Working price rows retain reverse engineering trace');
 console.log('PASS 0550 Working 1–8: all systems; executable engineering checks; source/particular/CAL/offer staleness; visual and full-page review; AVL/deviation evidence; lifecycle activity gaps; unchanged financial inputs; backup validation; real SSR modules.');

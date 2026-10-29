@@ -1,3 +1,10 @@
+> **AVL update, 29-Oct-2026:** Read
+> [Sub-vendor source reference](20261029_AVL_SUBVENDOR_REFERENCE.md) for UI
+> `2026-10-29.2-preview`. The existing `bid.deviations.avl` now shows the supplied
+> vendor-prepared list with 10 original rows / 5 grouped declarations, draft
+> preparation and approval-evidence separation. Models/applicability/AVL approval
+> remain OPEN. Same review branch and preserved financial inputs.
+
 > **Current implementation, 29-Oct-2026:** Read
 > [Working Preview 1–8 / Particular / AVL–Deviation](20261029_WORKING_PREVIEW_1_TO_8.md)
 > first. Same review branch, UI `2026-10-29.1-preview`. New workspace controls,

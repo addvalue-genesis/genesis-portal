@@ -1,0 +1,228 @@
+{
+  "schema": "genesis.0550.subvendor-reference.v1",
+  "source": {
+    "name": "6-List of Subcontractors Sub-vendors.docx",
+    "driveFileId": "1Qy6PWe1OnSfxLLB4bIoNS2inRoT2N1wf",
+    "sha256": "f9c69e09cb69019c2987a9e5b641bcee21ed3d62d0eca5595941d191beb1344f",
+    "title": "List of Subcontractors/Sub-vendors 分包/分供应商清单",
+    "preparedByLabel": "By Vendor",
+    "classification": "Internal",
+    "authority": "VENDOR_DECLARATION",
+    "revision": null,
+    "sourceProjectId": null,
+    "page": 1,
+    "table": 1,
+    "snapshotReviewedOn": "2026-10-29"
+  },
+  "columns": [
+    "Discipline",
+    "Group",
+    "Sub Group",
+    "Item Description",
+    "VENDORS",
+    "Make & Model",
+    "Country of Origin"
+  ],
+  "rows": [
+    {
+      "id": "SUBVENDOR-0550-ROW-01",
+      "sourceRow": 1,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "MARINE RADAR BEACON (RACON)",
+        "MARINE RADAR BEACON (RACON)",
+        "TIDELAND",
+        "　",
+        "USA"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "MARINE RADAR BEACON (RACON)",
+      "itemDescription": "MARINE RADAR BEACON (RACON)",
+      "vendor": "TIDELAND",
+      "makeModel": "",
+      "countryOfOrigin": "USA"
+    },
+    {
+      "id": "SUBVENDOR-0550-ROW-02",
+      "sourceRow": 2,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "SCADA Radio",
+        "SCADA Radio",
+        "Redline",
+        "　",
+        "CANADA"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "SCADA Radio",
+      "itemDescription": "SCADA Radio",
+      "vendor": "Redline",
+      "makeModel": "",
+      "countryOfOrigin": "CANADA"
+    },
+    {
+      "id": "SUBVENDOR-0550-ROW-03",
+      "sourceRow": 3,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "SCADA Radio",
+        "SCADA Radio",
+        "RADWIN",
+        "　",
+        "ISARAEL"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "SCADA Radio",
+      "itemDescription": "SCADA Radio",
+      "vendor": "RADWIN",
+      "makeModel": "",
+      "countryOfOrigin": "ISARAEL"
+    },
+    {
+      "id": "SUBVENDOR-0550-ROW-04",
+      "sourceRow": 4,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "Telephone",
+        "Ex-Telephone",
+        "GAI-Tronics",
+        "　",
+        "USA"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "Telephone",
+      "itemDescription": "Ex-Telephone",
+      "vendor": "GAI-Tronics",
+      "makeModel": "",
+      "countryOfOrigin": "USA"
+    },
+    {
+      "id": "SUBVENDOR-0550-ROW-05",
+      "sourceRow": 5,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "UHF, VHF radio repeater /base station /trunking system",
+        "UHF, VHF radio repeater /base station\n/trunking system",
+        "MOTOROLA",
+        "　",
+        "FRANCE"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "UHF, VHF radio repeater /base station /trunking system",
+      "itemDescription": "UHF, VHF radio repeater /base station\n/trunking system",
+      "vendor": "MOTOROLA",
+      "makeModel": "",
+      "countryOfOrigin": "FRANCE"
+    },
+    {
+      "id": "SUBVENDOR-0550-ROW-06",
+      "sourceRow": 6,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "MARINE RADAR BEACON (RACON)",
+        "MARINE RADAR BEACON (RACON)",
+        "TIDELAND",
+        "　",
+        "USA"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "MARINE RADAR BEACON (RACON)",
+      "itemDescription": "MARINE RADAR BEACON (RACON)",
+      "vendor": "TIDELAND",
+      "makeModel": "",
+      "countryOfOrigin": "USA"
+    },
+    {
+      "id": "SUBVENDOR-0550-ROW-07",
+      "sourceRow": 7,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "SCADA Radio",
+        "SCADA Radio",
+        "Redline",
+        "　",
+        "CANADA"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "SCADA Radio",
+      "itemDescription": "SCADA Radio",
+      "vendor": "Redline",
+      "makeModel": "",
+      "countryOfOrigin": "CANADA"
+    },
+    {
+      "id": "SUBVENDOR-0550-ROW-08",
+      "sourceRow": 8,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "SCADA Radio",
+        "SCADA Radio",
+        "RADWIN",
+        "　",
+        "ISARAEL"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "SCADA Radio",
+      "itemDescription": "SCADA Radio",
+      "vendor": "RADWIN",
+      "makeModel": "",
+      "countryOfOrigin": "ISARAEL"
+    },
+    {
+      "id": "SUBVENDOR-0550-ROW-09",
+      "sourceRow": 9,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "Telephone",
+        "Ex-Telephone",
+        "GAI-Tronics",
+        "　",
+        "USA"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "Telephone",
+      "itemDescription": "Ex-Telephone",
+      "vendor": "GAI-Tronics",
+      "makeModel": "",
+      "countryOfOrigin": "USA"
+    },
+    {
+      "id": "SUBVENDOR-0550-ROW-10",
+      "sourceRow": 10,
+      "rawCells": [
+        "Telecommunication",
+        "Telecommunication Equipment",
+        "UHF, VHF radio repeater /base station /trunking system",
+        "UHF, VHF radio repeater /base station\n/trunking system",
+        "MOTOROLA",
+        "　",
+        "FRANCE"
+      ],
+      "discipline": "Telecommunication",
+      "group": "Telecommunication Equipment",
+      "subGroup": "UHF, VHF radio repeater /base station /trunking system",
+      "itemDescription": "UHF, VHF radio repeater /base station\n/trunking system",
+      "vendor": "MOTOROLA",
+      "makeModel": "",
+      "countryOfOrigin": "FRANCE"
+    }
+  ]
+}

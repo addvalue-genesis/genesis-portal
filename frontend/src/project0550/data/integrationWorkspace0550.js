@@ -4,6 +4,7 @@ import mr from "./mrWorkingCatalog0550.json";
 import {deriveSourceIntake,deriveDocumentRevisionRegister} from "./sourceIntakeModel";
 import {evaluateServiceEquation} from "../serviceEquationRuntime";
 import {DOCUMENT_FAMILIES_0550,DELIVERY_KINDS_0550} from "../workingPreviewStages0550";
+import {SUBVENDOR_REFERENCE_0550,subvendorRow0550,subvendorReferenceProblems0550,isSubvendorDeclarationSource0550} from "./subvendorReference0550";
 export const INTEGRATION_SCHEMA_0550="genesis.0550.integration.v1";
 export const emptyIntegration0550=()=>({schema:INTEGRATION_SCHEMA_0550,requirements:[],proofs:[],activities:[],scopeReviews:[],particulars:[],avlChecks:[],deviations:[],documentReviews:[]});
 export const blankDocumentReview0550=id=>({id,systemTokens:[],expectedPages:null,reviewedPages:"",notesReviewed:false,colourReviewed:false,appendicesReviewed:false,categories:[],basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});
@@ -18,7 +19,7 @@ export function obligationCandidates0550(source){
 export const DEVIATION_TEMPLATE_URL_0550="https://docs.google.com/spreadsheets/d/1buIoOV4Q7lVFuOcewFZ6yJ_ankWkkEYT/edit";
 export const DEVIATION_COLUMNS_0550=["SN","CONTRACTOR Doc No, Para, Desciption","VENDOR Deviation","Reason/Justification","CONTRACTOR Response 1","VENDOR Response 1","COMPANY Respone","Resolution","Status","Final Closure"];
 export const blankParticular0550=id=>({id,systemToken:"COMMON",requirementIds:[],title:"",kind:"NOTE",text:"",interpretation:"",impact:"",obligationKinds:[],relationship:"ADDITIONAL",processSteps:["1","2","3","4","5","6","7","8"],references:[],reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});
-export const blankAvlCheck0550=id=>({id,requirementId:"",offerId:"",manufacturer:"",model:"",sourceIds:[],sourceLocator:"",sourceExcerpt:"",result:"OPEN",basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});
+export const blankAvlCheck0550=id=>({id,requirementId:"",offerId:"",manufacturer:"",model:"",sourceIds:[],sourceLocator:"",sourceExcerpt:"",result:"OPEN",basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:"",vendorListRowId:"",vendorListSourceHash:""});
 export const blankDeviation0550=id=>({id,requirementId:"",avlCheckId:"",systemToken:"COMMON",offerIds:[],mrRef:"",vendorQuoteRef:"",queryDate:"",vendorSignature:"",sn:"",contractorDocument:"",vendorDeviation:"",justification:"",contractorResponse1:"",vendorResponse1:"",companyResponse:"",resolution:"",templateStatus:"OPEN",finalClosure:"",workflowStatus:"DRAFT",approvalDecision:"PENDING",approvalSourceIds:[],approvalLocator:"",approvalExcerpt:"",templateUrl:DEVIATION_TEMPLATE_URL_0550,reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});
 export const particularApplies0550=(p,r)=>p.requirementIds.length?p.requirementIds.includes(r.id):p.systemToken==="COMMON"||p.systemToken===r.systemToken;
 const clean=r=>Object.fromEntries(Object.entries(r||{}).filter(([k])=>!["basisKey","reviewer","reviewedOn","status"].includes(k)));
@@ -37,7 +38,10 @@ export function integrationRecordBasis0550(data,collection,r){
  const common={record:clean(r),requirement:clean(req),sources:ids.map(id=>sourcesFor(data,[id])[0]||{id,missing:true}),offers:(req?.offerIds||[]).map(id=>data.offers.find(o=>o.id===id)||{id,missing:true}),lines:(req?.workLineIds||[]).map(id=>lineBasis(data.lines.find(l=>l.id===id))||{id,missing:true})};
  if(collection==="proofs")common.calculation=data.calculations.find(c=>c.id===r.calculationId)||null;
  if(req&&collection!=="particulars")common.particulars=w.particulars.filter(p=>particularApplies0550(p,req)).map(p=>({record:p,sources:p.references.map(ref=>sourcesFor(data,[ref.sourceId])[0]||{id:ref.sourceId,missing:true})}));
- if(collection==="avlChecks")common.offer=data.offers.find(o=>o.id===r.offerId)||null;
+ if(collection==="avlChecks"){
+  common.offer=data.offers.find(o=>o.id===r.offerId)||null;
+  if(r.vendorListRowId)common.vendorDeclaration={source:SUBVENDOR_REFERENCE_0550.source,row:subvendorRow0550(r.vendorListRowId)};
+ }
  if(collection==="deviations"){common.avl=w.avlChecks.find(a=>a.id===r.avlCheckId)||null;common.proposedOffers=r.offerIds.map(id=>data.offers.find(o=>o.id===id)||{id,missing:true});}
  if(collection==="requirements"){
   common.proofs=w.proofs.filter(p=>p.requirementId===r.id).map(p=>({...p,calculation:data.calculations.find(c=>c.id===p.calculationId)||null}));
@@ -106,11 +110,13 @@ export function deriveIntegration0550(data,systems,today){
  });
  const avlChecks=w.avlChecks.map(a=>{
   const problems=reviewProblems(data,"avlChecks",a,today);
+  problems.push(...subvendorReferenceProblems0550(a));
+  if(sourcesFor(data,a.sourceIds).some(isSubvendorDeclarationSource0550))problems.push("VENDOR_DECLARATION_IS_NOT_CUSTOMER_AVL");
   if(!requirements.some(r=>r.id===a.requirementId)||!data.offers.some(o=>o.id===a.offerId))problems.push("AVL_REQUIREMENT_OFFER_MISSING");
   if(!has(a.manufacturer)||!has(a.model)||!has(a.basis)||a.result==="OPEN")problems.push("AVL_CHECK_OPEN");
   problems.push(...evidenceProblems(data,a.sourceIds,a.sourceLocator,a.sourceExcerpt));
   if(a.result==="NOT_LISTED"&&!deviations.some(d=>d.avlCheckId===a.id&&d.requirementId===a.requirementId&&d.offerIds.includes(a.offerId)&&d.state==="ACCEPTED_DEVIATION"))problems.push("AVL_DEVIATION_REQUIRED");
-  return {...a,problems,state:problems.length?"OPEN":"REVIEWED_AVL"};
+  return {...a,vendorListEntry:subvendorRow0550(a.vendorListRowId),problems,state:problems.length?"OPEN":"REVIEWED_AVL"};
  });
  const activities=w.activities.map(a=>{
   const req=requirements.find(r=>r.id===a.requirementId),problems=reviewProblems(data,"activities",a,today),c=data.calculations.find(c=>c.id===a.calculationId),result=c?evaluateServiceEquation(c.equationId,c.inputs):null;
@@ -173,7 +179,7 @@ export function validateIntegration0550(data){
  allowed.documentReviews=Object.keys(blankDocumentReview0550("DOC"));
  for(const [collection,keys] of Object.entries(allowed)){
   const rows=w[collection];if(!Array.isArray(rows)||rows.length>2000||new Set(rows.map(r=>r?.id)).size!==rows.length)fail("invalid collection "+collection);
-  for(const r of rows){obj(r,keys);for(const k of keys){const v=r[k];if(k==="references"){if(!Array.isArray(v)||v.length>100)fail("invalid particular references");for(const ref of v){obj(ref,["sourceId","locator","excerpt","appearance","visualEvidenceRef"]);if(["sourceId","locator","excerpt","appearance","visualEvidenceRef"].some(f=>typeof ref[f]!=="string"||ref[f].length>12000))fail("invalid particular reference");}}else if(["sourceIds","supplierSourceIds","offerIds","workLineIds","activityKinds","families","requirementIds","processSteps","approvalSourceIds","systemTokens","categories","obligationKinds"].includes(k)){if(!Array.isArray(v)||v.length>500||v.some(x=>typeof x!=="string"||x.length>100)||new Set(v).size!==v.length)fail("invalid list "+k);}else if(["limit","quantity","expectedPages"].includes(k)){if(v!==null&&(!Number.isFinite(v)||Math.abs(v)>1e12))fail("invalid number");}else if(["notesReviewed","colourReviewed","appendicesReviewed"].includes(k)){if(typeof v!=="boolean")fail("invalid review flag");}else if(typeof v!=="string"||v.length>12000)fail("invalid text "+k);}
+  for(const r of rows){obj(r,keys);for(const k of keys){const v=r[k];if(collection==="avlChecks"&&["vendorListRowId","vendorListSourceHash"].includes(k)&&v===undefined)continue;if(k==="references"){if(!Array.isArray(v)||v.length>100)fail("invalid particular references");for(const ref of v){obj(ref,["sourceId","locator","excerpt","appearance","visualEvidenceRef"]);if(["sourceId","locator","excerpt","appearance","visualEvidenceRef"].some(f=>typeof ref[f]!=="string"||ref[f].length>12000))fail("invalid particular reference");}}else if(["sourceIds","supplierSourceIds","offerIds","workLineIds","activityKinds","families","requirementIds","processSteps","approvalSourceIds","systemTokens","categories","obligationKinds"].includes(k)){if(!Array.isArray(v)||v.length>500||v.some(x=>typeof x!=="string"||x.length>100)||new Set(v).size!==v.length)fail("invalid list "+k);}else if(["limit","quantity","expectedPages"].includes(k)){if(v!==null&&(!Number.isFinite(v)||Math.abs(v)>1e12))fail("invalid number");}else if(["notesReviewed","colourReviewed","appendicesReviewed"].includes(k)){if(typeof v!=="boolean")fail("invalid review flag");}else if(typeof v!=="string"||v.length>12000)fail("invalid text "+k);}
    if(!/^[\w.-]{1,100}$/.test(r.id))fail("invalid ID");
    if(!["DRAFT","REVIEWED"].includes(r.status))fail("invalid review state");
    for(const k of ["reviewedOn","dueDate","queryDate"])if(r[k]&&(!/^\d{4}-\d{2}-\d{2}$/.test(r[k])||!Number.isFinite(Date.parse(r[k]))||new Date(r[k]).toISOString().slice(0,10)!==r[k]))fail("invalid date");
@@ -184,6 +190,7 @@ export function validateIntegration0550(data){
    if(collection==="particulars"&&(!["NOTE","APPENDIX","ADDENDUM","COLOURED_TEXT","OTHER"].includes(r.kind)||!["ADDITIONAL","CONFIRMING","CONFLICT"].includes(r.relationship)||r.processSteps.some(s=>!(/^[1-8]$/).test(s))))fail("invalid particular");
    if(collection==="particulars"&&r.obligationKinds.some(k=>!DELIVERY_KINDS_0550.includes(k)))fail("invalid particular obligation");
    if(collection==="avlChecks"&&!["OPEN","LISTED","NOT_LISTED","NOT_APPLICABLE"].includes(r.result))fail("invalid AVL result");
+   if(collection==="avlChecks"&&r.vendorListSourceHash&&!/^[a-f0-9]{64}$/.test(r.vendorListSourceHash))fail("invalid vendor-list hash");
    if(collection==="deviations"&&(!["DRAFT","SUBMITTED","UNDER_REVIEW","APPROVED","REJECTED","CLOSED"].includes(r.workflowStatus)||!["PENDING","ACCEPTED","REJECTED"].includes(r.approvalDecision)||r.templateUrl!==DEVIATION_TEMPLATE_URL_0550))fail("invalid deviation");
   }
  }
