@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-29.13-preview",
+  "version": "2026-10-29.14-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "fe312f501ba04e5ec40c4448eaee407517534f0d",
-  "capability": "0550 Volume II Technical Proposal authoring from canonical SI/source/vendor/Working records, draft checklist, physical details, current dependency review and printable draft export"
+  "source0550": "131c642f777061eabb295fc0bbc7afb93dae151f",
+  "capability": "0550 A RFQ input receipt/readiness and shared document reading before v2 commercial issue; preserves linked Volume II technical proposal authoring, financial inputs and history"
 }

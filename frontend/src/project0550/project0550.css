@@ -1741,3 +1741,13 @@
 .p55-bid-module[open] > summary > .p55-module-toggle .p55-module-toggle__closed { display: none; }
 .p55-bid-module[open] > summary > .p55-module-toggle .p55-module-toggle__open { display: inline; }
 .p55-bid-module[data-toggle-indicator="true"] > summary:focus-visible { outline: 2px solid #245e9b; outline-offset: 4px; }
+
+/* A uses the same canonical controls as B, with its own contained source tables. */
+.p55 [data-component-key="l3.original"] .p55-stack { grid-template-columns:minmax(0,1fr); min-width:0; }
+.p55 [data-component-key="l3.original"] :is(.p55-panel,.p55-bid-content,.p55-a-readiness) { min-width:0; max-width:100%; }
+.p55-a-readiness { overflow-wrap:anywhere; }
+.p55-a-readiness .p55-table { min-width:900px; }
+.p55-a-readiness .p55-table-wrap { max-width:100%; }
+.p55-a-readiness .p55-review-toolbar>* { min-width:0; max-width:100%; }
+@media(max-width:640px) { .p55-a-readiness .p55-bid-fields { grid-template-columns:minmax(0,1fr); } }
+.p55 [data-component-key="l3.original"] :is(input,select,textarea) { min-width:0; max-width:100%; box-sizing:border-box; }

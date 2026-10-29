@@ -26,6 +26,10 @@ For Volume II authoring and its optional canonical workspace records, also read
 [`docs/handoff/pj2608-0550/20261029_VOLUME_II_TECHNICAL_PROPOSAL.md`](docs/handoff/pj2608-0550/20261029_VOLUME_II_TECHNICAL_PROPOSAL.md).
 Draft technical review/export does not authorize a technical or commercial submission.
 
+For A expected RFQ inputs, shared reading and the versioned commercial-issue gate,
+read [`docs/handoff/pj2608-0550/20261029_A_INPUT_CONTROLS.md`](docs/handoff/pj2608-0550/20261029_A_INPUT_CONTROLS.md).
+Receipt/readiness is not source-clause completeness or engineering approval.
+
 The ADR distinguishes domain A/customer and B/supplier from existing UI areas and
 commercial Part A/B/C. Do not rename or migrate those namespaces implicitly.
 Preserve source/version lineage, stable IDs, user decisions, single cost ownership

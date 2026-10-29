@@ -24,6 +24,7 @@ export function siOperatingChecks0550(model) {
  const req=i.requirements, records=[...req,...i.proofs,...i.activities,...i.particulars,...i.documentReviews,...i.avlChecks,...i.deviations,...i.scopes];
  const check=(label,count,target)=>({label,count,target,state:count===0?"CLEAR":"OPEN"});
  return [
+  {label:"A · เอกสารตาม RFQ พร้อมให้ B ใช้",state:model.sourceReadiness?.state||"A_OPEN",target:"l3.original"},
   check("อ่านต้นทางและฉบับเอกสาร",i.documentGaps.length,"bid.working-preview.step.1"),
   check("ข้อกำหนด / Mapping ที่ยังไม่ครบ",req.filter(r=>r.problems.length).length,"bid.working-preview.step.4"),
   check("Proof / เกณฑ์วิศวกรรมที่ยังไม่ครบ",req.filter(r=>r.problems.includes("ENGINEERING_PROOF_OPEN")).length+i.proofs.filter(p=>p.problems.length).length,"bid.working-preview.step.2"),

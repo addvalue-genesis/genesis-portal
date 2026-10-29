@@ -1,0 +1,865 @@
+{
+  "schema": "genesis.0550.rfq-input-catalog.v1",
+  "version": "0550-rfq-inputs-20261029-1",
+  "projectId": "PJ2608-0550",
+  "basis": {
+    "documentNo": "MM-ASK-1A-APF-TEL-MR-0001",
+    "revision": "B1",
+    "sha256": "5199bb61c01db86f7c971117ad5e54b7d04e70061d6ad999b72f858122a0de5a",
+    "locator": "Appendix 2 / PDF p31-35 / printed p29-33",
+    "numberedEntries": 78
+  },
+  "coverageNote": "Expected-input metadata only, not private document text or proof of receipt. MR Appendix 2 plus procurement envelope. Further RFQ and cross-reference inputs must be added and the denominator reviewed. SDRL/ITR embedded in MR are received inputs; future supplier deliverables are not missing customer attachments.",
+  "inputs": [
+    {
+      "id": "RFQ-001",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-MR-0001",
+      "revision": "B1",
+      "title": "Request for Quotation for Telecommunication System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-002",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-PHI-0001",
+      "revision": "B1",
+      "title": "Telecommunication Design Philosophy",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-003",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-PHI-0002",
+      "revision": "B1",
+      "title": "Telecommunication Interface Philosophy",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-004",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-PHI-0003",
+      "revision": "B1",
+      "title": "Telecommunication Shutdown Philosophy",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-005",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-PHI-0004",
+      "revision": "B1",
+      "title": "Telecommunication Tie-In Philosophy",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-006",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LIS-0004",
+      "revision": "B1",
+      "title": "Telecommunication Interface Matrix",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-007",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0001",
+      "revision": "B1",
+      "title": "Specification for Design, Supply and Installation of Telecommunications Systems",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-008",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0002",
+      "revision": "B1",
+      "title": "Specification for Network System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-009",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0003",
+      "revision": "B1",
+      "title": "Specification for IP Telephony and PABX System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-010",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0004",
+      "revision": "B1",
+      "title": "Specification for Public Address and General Alarm (PAGA) System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-011",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0005",
+      "revision": "B1",
+      "title": "Specification for Closed Circuit Television System (CCTV)",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-012",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0006",
+      "revision": "B1",
+      "title": "Specification for Satellite Communications Equipment (VSAT)",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-013",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0007",
+      "revision": "B1",
+      "title": "Specification for VHF-FM Marine Radio",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-014",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0008",
+      "revision": "B1",
+      "title": "Specification for VHF-AM Aeronautical Radio",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-015",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0009",
+      "revision": "B1",
+      "title": "Specification for VHF DMR Radio",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-016",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0010",
+      "revision": "B1",
+      "title": "Specification for MF/HF SSB Radio",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-017",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0011",
+      "revision": "B1",
+      "title": "Specification for Microwave System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-018",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0012",
+      "revision": "B1",
+      "title": "Specification for Entertainment System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-019",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0013",
+      "revision": "B1",
+      "title": "Specification for Fiber Optic Communication and Installation",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-020",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0014",
+      "revision": "B1",
+      "title": "Specification for Meteorological System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-021",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-SPE-0015",
+      "revision": "B1",
+      "title": "Specification Non-Directional Beacon (NDB)",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-022",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0001",
+      "revision": "B1",
+      "title": "Datasheet for Network and WIFI System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-023",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0002",
+      "revision": "B1",
+      "title": "Datasheet for IP Telephony and PABX System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-024",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0003",
+      "revision": "B1",
+      "title": "Datasheet for Public Address and General Alarm (PAGA)",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-025",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0004",
+      "revision": "B1",
+      "title": "Datasheet for Closed Circuit Television System (CCTV)",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-026",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0005",
+      "revision": "B1",
+      "title": "Datasheet for Satellite Communication Equipment (VSAT)",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-027",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0006",
+      "revision": "B1",
+      "title": "Datasheet for VHF-FM Marine Radio",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-028",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0007",
+      "revision": "B1",
+      "title": "Datasheet for VHF-AM Aeronautical Radio",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-029",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0008",
+      "revision": "B1",
+      "title": "Datasheet for VHF DMR Radio",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-030",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0009",
+      "revision": "B1",
+      "title": "Datasheet for MF/HF SSB Radio",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-031",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0010",
+      "revision": "B1",
+      "title": "Datasheet for Microwave System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-032",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0011",
+      "revision": "B1",
+      "title": "Datasheet for Entertainment System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-033",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0012",
+      "revision": "B1",
+      "title": "Datasheet for Fiber Optic Communication and Installation",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-034",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0013",
+      "revision": "B1",
+      "title": "Datasheet for Meteorological System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-035",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-DTS-0014",
+      "revision": "B1",
+      "title": "Datasheet for Non-Directional Beacon (NDB)",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p31 / printed p29",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-036",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-BLD-0001",
+      "revision": "C6",
+      "title": "Telecommunication Overall Block Diagram",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-037",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-BLD-0002",
+      "revision": "C5",
+      "title": "Telecommunication System Block for Network System IP Telephony and CCTV",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-038",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-BLD-0004",
+      "revision": "C4",
+      "title": "Telecommunication System Block for PAGA",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-039",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-BLD-0005",
+      "revision": "C1",
+      "title": "Telecommunication System Block for Non Directional Beacon System (NDB)",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-040",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-BLD-0006",
+      "revision": "C1",
+      "title": "Telecommunication System Block Diagram for VSAT",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-041",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-BLD-0007",
+      "revision": "C3",
+      "title": "Telecommunication System Block Diagram for Radio System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-042",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-BLD-0011",
+      "revision": "C3",
+      "title": "Telecommunication System Block Diagram for Microwave",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-043",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-BLD-0012",
+      "revision": "C1",
+      "title": "Telecommunication System Block Diagram for Entertainment",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-044",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-ACP-TEL-BLD-0001",
+      "revision": "C3",
+      "title": "Telecommunication System Block Diagram for ACP",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-045",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0001",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF-Control Building",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-046",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0002",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF-Catering Building",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-047",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0003",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF-Catering Building",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-048",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0004",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF-Catering Building",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-049",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0005",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF-Accommodation",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-050",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0007",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF - Office",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-051",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0008",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF - Store",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-052",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0009",
+      "revision": "C4",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF - Sub-Station",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-053",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0010",
+      "revision": "C4",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF - Overall Area",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-054",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0016",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF - Security Building",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-055",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LAY-0017",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for APF - Fire/Safety Building",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-056",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-ACP-TEL-LAY-0001",
+      "revision": "C2",
+      "title": "Telecommunication Equipment Layout and Cable Routing for ACP - Office Building",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-057",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-ACP-TEL-LAY-0002",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for ACP - Guard House",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-058",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-ACP-TEL-LAY-0003",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for ACP - Overall Area",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-059",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-ACP-TEL-LAY-0004",
+      "revision": "C1",
+      "title": "Telecommunication Equipment Layout and Cable Routing for ACP - E&I Cabin",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p32 / printed p30",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-060",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-001",
+      "revision": "R00",
+      "title": "Design, Supply and Installation of Telecommunication Systems",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-061",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-004",
+      "revision": "R01",
+      "title": "Point to Point Microwave Links",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-062",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-005",
+      "revision": "R01",
+      "title": "Point to Multipoint Radio Network",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-063",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-006",
+      "revision": "R00",
+      "title": "Marine and Air/Ground Radio Links",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-064",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-007",
+      "revision": "R00",
+      "title": "Public Address and General Alarm Systems",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-065",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-008",
+      "revision": "R00",
+      "title": "Design, Supply and Installation of Satellite Telecommunication Systems",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-066",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-009",
+      "revision": "R00",
+      "title": "Design and Installation of CCTV System",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-067",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-011",
+      "revision": "R00",
+      "title": "Telecommunications Engineering Services",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-068",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-012",
+      "revision": "R00",
+      "title": "Engineering and Installation to Telecommunication",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-069",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-TEL-018",
+      "revision": "R00",
+      "title": "Design and Installation of Communications Network",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-070",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-ICT-003",
+      "revision": "R00",
+      "title": "Telecommunication Cables",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-071",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-ICT-004",
+      "revision": "R00",
+      "title": "Onshore Office Set up",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-072",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-ICT-007",
+      "revision": "R00",
+      "title": "Merger and Acquisition ICT infrastructure Integration",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-073",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-GEN-003",
+      "revision": "R00",
+      "title": "Minimum Requirements for Vendor’s Documentation",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-074",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-GEN-004",
+      "revision": "R00",
+      "title": "Minimum Requirements for Contractor’s Final Document",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-075",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-GEN-005",
+      "revision": "R00",
+      "title": "Quality Requirements for Contractor / Vendor",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-076",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-INT-001",
+      "revision": "R00",
+      "title": "Inspection and Testing Requirement",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-077",
+      "kind": "DOCUMENT",
+      "documentNo": "10008-STD-6-ELE-001",
+      "revision": "R00",
+      "title": "Electrical Engineering Guideline",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p33 / printed p31",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-078",
+      "kind": "DOCUMENT",
+      "documentNo": "MM-ASK-1A-APF-TEL-LIS-0003",
+      "revision": "C3",
+      "title": "Telecommunication Vendor List",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2",
+      "locator": "PDF p35 / printed p33",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-SDRL",
+      "kind": "EMBEDDED",
+      "documentNo": "MM-ASK-1A-APF-TEL-MR-0001",
+      "revision": "B1",
+      "title": "Supplier Documentation Requirements List",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2 Section 3",
+      "locator": "PDF p36-42 / Appendix 3",
+      "sourceExcerpt": "SUPPLIER DOCUMENTATION REQUIREMENT"
+    },
+    {
+      "id": "RFQ-ITR",
+      "kind": "EMBEDDED",
+      "documentNo": "MM-ASK-1A-APF-TEL-MR-0001",
+      "revision": "B1",
+      "title": "Inspection and Testing Requirements",
+      "requiredBy": "MM-ASK-1A-APF-TEL-MR-0001 Rev.B1 / Appendix 2 Section 3",
+      "locator": "PDF p43-44 / Appendix 4",
+      "sourceExcerpt": "INSPECTION & TESTING REQUIREMENTS"
+    },
+    {
+      "id": "RFQ-AVL",
+      "kind": "ATTACHMENT",
+      "documentNo": "",
+      "revision": "",
+      "title": "PTTEP Approved Vendors and Sub-Contractor List",
+      "requiredBy": "MR Appendix 2 Section 4",
+      "locator": "MR PDF p35 / printed p33",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-NOTICE",
+      "kind": "ATTACHMENT",
+      "documentNo": "",
+      "revision": "",
+      "title": "Official Procurement Notice / current tender instructions",
+      "requiredBy": "Official procurement package",
+      "locator": "Procurement notice",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-CONTRACT",
+      "kind": "ATTACHMENT",
+      "documentNo": "",
+      "revision": "",
+      "title": "Contract documents and their attachments",
+      "requiredBy": "Official Procurement Notice",
+      "locator": "Notice attachment: Contract Documents",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-INVITATION",
+      "kind": "ATTACHMENT",
+      "documentNo": "",
+      "revision": "",
+      "title": "Invitation to tender and its attachments",
+      "requiredBy": "Official Procurement Notice",
+      "locator": "Notice attachment: INVITATION",
+      "sourceExcerpt": ""
+    },
+    {
+      "id": "RFQ-PRICE-FORM",
+      "kind": "ATTACHMENT",
+      "documentNo": "",
+      "revision": "",
+      "title": "ASK-TSI Priced Breakdown List.xlsx / customer price form",
+      "requiredBy": "Official tender commercial proposal",
+      "locator": "PriceBreakdown / A:H",
+      "sourceExcerpt": ""
+    }
+  ]
+}

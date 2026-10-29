@@ -17,6 +17,7 @@ export function ReleaseIssueControls0550({provisional=false}){
  const transmit=async e=>{e.preventDefault();if(await change(d=>recordReleaseTransmittal0550(d,{...sent,id:newId("TX")},reviewDate),"Record actual commercial transmittal / "+sent.reference))setMessage("บันทึกหลักฐานการส่งแล้ว · โปรแกรมไม่ได้ส่งอีเมลให้อัตโนมัติ");};
  const exportIssue=issue=>{try{exportOfficialCustomerXlsx(null,issue);setMessage("ส่งออกจากข้อมูลและราคาที่ตรึงไว้ในฉบับ "+issue.number);}catch(e){setMessage(e.message);}};
  const backlog=[
+  ...(model.sourceReadiness?.rows||[]).filter(r=>r.problems.length).map(r=>({type:"A_INPUT",id:r.id,title:r.documentNo+" "+r.revision+" / "+r.title,locator:r.locator,sourceIds:r.binding?.sourceIds||[],problems:r.problems})),
   ...(model.integration?.documentGaps||[]).map(r=>({type:"DOCUMENT",id:r.id,problems:[r.reason]})),
   ...(model.integration?.requirements||[]).filter(r=>r.problems.length).map(r=>({type:"REQUIREMENT",id:r.id,system:r.systemToken,title:r.title,sourceIds:r.sourceIds,locator:r.sourceLocator,problems:r.problems})),
   ...model.official.selected.filter(r=>r.reviewProblems.length).map(r=>({type:"PRICE",id:r.id,customerRow:r.customerRowCode,title:r.description,problems:r.reviewProblems})),

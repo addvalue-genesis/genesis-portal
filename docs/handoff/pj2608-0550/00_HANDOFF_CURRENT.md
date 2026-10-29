@@ -1,3 +1,5 @@
+> **A input controls, 29-Oct-2026:** Read [RFQ expected inputs and shared reading](20261029_A_INPUT_CONTROLS.md), UI `2026-10-29.14-preview`. Existing A now has receipt/version bindings, additional expected inputs, shared document reading and a current A-readiness check. New commercial issues require A readiness; old frozen history remains preserved. This does not declare the actual project corpus complete.
+
 > **Volume II, 29-Oct-2026:** Read [Technical Proposal authoring](20261029_VOLUME_II_TECHNICAL_PROPOSAL.md).
 > Menu B has `bid.technical`, five CNEEC sections, a 19-system + COMMON checklist,
 > canonical source/SI/vendor/Working links, physical details and printable DRAFT
