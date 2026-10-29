@@ -1586,6 +1586,16 @@
 .p55-customer-group,.p55-customer-total { background:#e8f0f6; font-weight:700; }
 .p55-customer-line td:nth-child(3) { padding-left:28px; }
 .p55-source-trace { margin-top:8px; font-weight:400; }
+.p55-release-table-identity { position:sticky; top:96px; z-index:3; display:flex; flex-wrap:wrap; align-items:center; gap:8px 16px; padding:12px; margin:12px 0 0; border:2px solid var(--bid-accent,#526777); border-radius:8px; background:#edf5fa; color:#123951; box-shadow:0 2px 5px #0002; }
+.p55-release-table-identity>span { display:flex; flex-wrap:wrap; align-items:center; gap:4px; min-width:0; }
+.p55-release-table-identity .gns-copy-id code { font-size:14px; }
+.p55-release-table-identity>small { flex-basis:100%; }
+.p55-release-price-notes { min-width:230px; max-width:32rem; font-weight:400; overflow-wrap:anywhere; }
+.p55-release-price-notes p { margin:6px 0; }
+.p55-release-price-notes details { margin-top:8px; }
+.p55-release-price-notes summary { cursor:pointer; color:#7c4208; font-weight:600; }
+.p55-release-price-notes ul { padding-left:18px; margin:6px 0; }
+@media(max-width:820px) { .p55-release-table-identity { position:static; } }
 @media(max-width:700px) { .p55-context-tabs { grid-template-columns:1fr; } .p55-price-group { padding:8px; } }
 
 /* Numbered, copyable 0550 presentation: scoped away from frozen history/0553. */
