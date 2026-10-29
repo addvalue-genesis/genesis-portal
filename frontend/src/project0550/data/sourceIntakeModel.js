@@ -135,7 +135,8 @@ export function deriveDocumentRevisionRegister(intake) {
     const current = copies.filter(s => s.effectiveAuthority === "CURRENT_TENDER");
     const reference = copies.filter(s => s.effectiveAuthority !== "CURRENT_TENDER");
     const revisions = [...new Set(current.map(s => s.revision.trim().toUpperCase()))];
-    const status = !current.length ? "NO_CURRENT_SOURCE" : revisions.length > 1 ? "CURRENT_REVISION_CONFLICT" : !revisions[0] ? "REVISION_UNCONFIRMED" : "CURRENT_PACKAGE";
-    return { documentNo, family: documentNo.match(/-TEL-([A-Z]+)-/)?.[1] || "OTHER", current, reference, status };
+    const copyReview=current.length>1&&(current.some(s=>s.readState!=="TEXT_READ")||new Set(current.map(s=>s.content.replace(/\s+/g," ").trim())).size>1);
+    const status = !current.length ? "NO_CURRENT_SOURCE" : revisions.length > 1 ? "CURRENT_REVISION_CONFLICT" : !revisions[0] ? "REVISION_UNCONFIRMED" : copyReview ? "CURRENT_COPY_RECONCILIATION_REQUIRED" : "CURRENT_PACKAGE";
+    return { documentNo, family: documentNo.match(/(?:-|\b)(MR|PHI|BOD|DTS|SPE|BLD|LAY|DWG|LIS|MTO|RPT|CAL|STD)(?:-|\b)/)?.[1] || "OTHER", current, reference, status };
   }).sort((a, b) => a.documentNo.localeCompare(b.documentNo));
 }

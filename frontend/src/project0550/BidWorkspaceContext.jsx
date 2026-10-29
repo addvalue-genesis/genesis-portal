@@ -1,4 +1,5 @@
 import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
+import {deriveIntegration0550} from "./data/integrationWorkspace0550";
 import {importMrWorkingBasis0550} from "./data/mrWorkingBasis0550";
 import React,{createContext,useContext,useEffect,useMemo,useRef,useState} from "react";
 import {loadProject0550Bid,saveProject0550Bid,SYSTEMS,DATA_LAYER_META,BUDGETARY_ESTIMATE,COMMERCIAL_SOURCES,COMMERCIAL_POLICY} from "./data";
@@ -35,7 +36,7 @@ export function BidWorkspaceProvider({children}){
  };
  useEffect(()=>{reload();},[]);
  const reviewDate=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Bangkok",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
- const model=useMemo(()=>data?deriveBidWorkspace(data,SYSTEMS.map(s=>s.token),reviewDate):null,[data,reviewDate]);
+ const model=useMemo(()=>{if(!data)return null;const integration=deriveIntegration0550(data,SYSTEMS,reviewDate);return {...deriveBidWorkspace(data,SYSTEMS.map(s=>s.token),reviewDate,integration),integration};},[data,reviewDate]);
  async function change(transform,action){if(!data||lock.current)return false;lock.current=true;setBusy(true);try{const next=transform(data);setData(await saveProject0550Bid(next,data.revision,action));setError("");return true;}catch(e){setError(e.message);return false;}finally{lock.current=false;setBusy(false);}}
  const put=(collection,record)=>change(d=>({...d,[collection]:d[collection].some(r=>r.id===record.id)?d[collection].map(r=>r.id===record.id?record:r):[...d[collection],record]}),"Save "+collection+" / "+record.id);
  async function importFile(file){if(!file)return;try{if(file.size>5*1024*1024)throw Error("Workspace exceeds 5 MiB");const imported=validateBidWorkspace(JSON.parse(await file.text()),DATA_LAYER_META.datasetId,SYSTEMS.map(s=>s.token));await change(current=>({...imported,revision:current.revision,audit:current.audit}),"Import reviewed 0550 workspace backup");}catch(e){setError(e.message);}}

@@ -1,3 +1,10 @@
+> **Current implementation, 29-Oct-2026:** Read
+> [Working Preview 1–8 / Particular / AVL–Deviation](20261029_WORKING_PREVIEW_1_TO_8.md)
+> first. Same review branch, UI `2026-10-29.1-preview`. New workspace controls,
+> source-to-proof mapping, document reading ledger and deviation gates are
+> implemented and tested. Actual project-wide source review and engineering proof
+> are still OPEN; Release remains HOLD. Earlier checkpoints below are historical.
+
 > **Current correction, 28-Oct-2026:** Read
 > [MR work process and inherited bases](20261028_WORK_PROCESS_DEFAULTS.md).
 > UI `.4-preview` on the same Official Working review branch, draft PR #53.

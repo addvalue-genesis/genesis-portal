@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-28.9-preview",
+  "version": "2026-10-29.1-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "source0550": "b000ee553400c64f51203cad7b9d7711a4badedb",
-  "capability": "0550 MGW Q26-063 / multi-system offers / source reconciliation and MR rate selection"
+  "capability": "0550 Working 1–8 / integrator CAL-RPT / multi-document particulars / reading ledger / AVL and technical deviations"
 }

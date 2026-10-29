@@ -1633,3 +1633,22 @@
 .p55-bid-presentation .p55-structure-guide tr[data-bid-module-color]>td { background:var(--bid-tint); }
 .p55-bid-presentation [data-component-key="bid.budget.official.summary"] .p55-metric { border-top:3px solid var(--bid-accent); background:var(--bid-tint); }
 @media(max-width:700px) { .p55-bid-presentation .p55-bid-fields { grid-template-columns:minmax(0,1fr); } .p55-module-heading { flex-direction:column; } .p55-module-copy { width:100%; } }
+.p55-working-preview { margin: 1rem 0; }
+.p55-wp-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; padding: 1rem; color: #07334b; background: #e4eff7; border-radius: .7rem; }
+.p55-wp-header h2 { margin: 0 0 .5rem; }
+.p55-wp-header p { margin: 0; }
+.p55-wp-status { padding: .75rem 0; color: #264c61; overflow-wrap: anywhere; }
+.p55-working-preview select[multiple] { min-height: 8rem; max-width: 100%; }
+.p55-working-preview textarea { width: 100%; min-height: 5rem; padding: .5rem; box-sizing: border-box; }
+.p55-working-preview form { margin: 1rem 0; padding: 1rem; background: #f5f9fc; border: 1px solid #cbdce7; border-radius: .6rem; }
+.p55-working-preview .p55-bid-field { min-width: 0; }
+.p55-wp-current { padding: .75rem; background: #edf4f8; border-radius: .5rem; margin-bottom: 1rem; }
+.p55-wp-problems { margin: .25rem 0; padding-left: 1.25rem; color: #75440b; overflow-wrap: anywhere; }
+.p55-wp-reviewed { color: #12684b; }
+.p55-wp-excerpt pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 24rem; overflow-y: auto; }
+.p55-wp-system { margin: .5rem 0; }
+.p55-wp-particulars { padding: .75rem 1rem; border-left: 4px solid #a83838; background: #fff5f1; margin: .75rem 0; }
+.p55-working-preview fieldset { margin: .75rem 0; border: 1px solid #cbdce7; padding: .75rem; min-width: 0; }
+.p55-working-preview .p55-table-wrap { max-width: 100%; }
+.p55-working-preview td { overflow-wrap: anywhere; }
+@media (max-width: 640px) { .p55-wp-header { flex-direction: column; } .p55-working-preview .p55-bid-fields { grid-template-columns: 1fr; } }

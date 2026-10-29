@@ -1,6 +1,10 @@
 // PJ2608-0550 Smart-Code Module Registry
 // Self-describing registry: what each module is, why it exists, what it consumes,
 // what it produces, its lifecycle state, and what must be preserved or deliberately migrated during refactor.
+// Accepted domain contract: docs/architecture/ADR-0550-001-integrator-traceability.md.
+// Domain A = customer sources; domain B = supplier sources; the web app is the
+// System Integrator between them. These roles do not rename existing UI areas or
+// commercial Part A/B/C. The ADR records target invariants, not completed gates.
 
 export const MODULE_REGISTRY = [
   {
@@ -15,6 +19,7 @@ export const MODULE_REGISTRY = [
     implementation: ["frontend/src/pages/PJ26080550.jsx"],
     invariants: [
       "Do not merge frozen customer submission with evolving working state.",
+      "Apply ADR-0550-001: map customer requirements to supplier evidence and integrator work in both directions, through Working/Budgetary/Release back to both source sides.",
       "Traceability/detail capability may be redesigned or replaced, but any removal requires an explicit migration/replacement decision.",
       "Unknown/TBC must never silently become zero."
     ]
@@ -214,7 +219,11 @@ export const MODULE_REGISTRY = [
     inputs: ["RFQ/MR/SPE/BOD/TC/vendor/source artifacts"],
     outputs: ["Source IDs", "Use/purpose", "State"],
     implementation: ["sourceRegister in controlled dataset", "frontend/src/project0550/ControlledSourceInventory.jsx", "frontend/src/project0550/data/sourceIntakeModel.js"],
-    invariants: ["Methodology references must never become project facts."]
+    invariants: [
+      "Methodology references must never become project facts.",
+      "Source registration is not content review or requirement coverage; preserve document version and exact evidence location.",
+      "Separate original evidence, integrator interpretation, supplier coverage and unresolved scope; use shared canonical records rather than editable copies."
+    ]
   }
 ];
 

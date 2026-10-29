@@ -4,10 +4,20 @@ import { evaluateServiceEquation } from "../serviceEquationRuntime";
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
+import {validateIntegration0550} from "./integrationWorkspace0550";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
-export const newId=prefix=>prefix+"-"+globalThis.crypto.randomUUID();
+export function newId(prefix){
+ // UUIDs identify workspace records, never authentication or approvals. Preview
+ // origins may expose getRandomValues without the secure-context randomUUID API.
+ const crypto=globalThis.crypto;
+ if(typeof crypto?.randomUUID==="function")return prefix+"-"+crypto.randomUUID();
+ const bytes=crypto.getRandomValues(new Uint8Array(16));
+ bytes[6]=(bytes[6]&15)|64;bytes[8]=(bytes[8]&63)|128;
+ const hex=Array.from(bytes,b=>b.toString(16).padStart(2,"0")).join("");
+ return prefix+"-"+[hex.slice(0,8),hex.slice(8,12),hex.slice(12,16),hex.slice(16,20),hex.slice(20)].join("-");
+}
 const finite=n=>typeof n==="number"&&Number.isFinite(n);
 const nonnegative=n=>finite(n)&&n>=0;
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
@@ -15,7 +25,7 @@ const fail=m=>{throw Error(m);};
 export function emptyBidWorkspace(snapshotId){return {schema:BID_SCHEMA,projectId:"PJ2608-0550",baselineSnapshotId:snapshotId,revision:0,vendors:[],offers:[],calculations:[],lines:[],nodes:[],edges:[],fx:{thbPerUSD:null,thbPerEUR:null,source:"",date:""},audit:[]};}
 export function validateBidWorkspace(data,snapshotId,systems){
  if(!data||data.schema!==BID_SCHEMA||data.projectId!=="PJ2608-0550"||data.baselineSnapshotId!==snapshotId)fail("Wrong project/schema/baseline");
- const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport"];
+ const keys=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace"];
  if(Object.keys(data).some(k=>!keys.includes(k)))fail("Unsupported workspace field");
  if(!Number.isSafeInteger(data.revision)||data.revision<0)fail("Invalid revision");
  for(const key of ["vendors","offers","calculations","lines","nodes","edges","audit"]){
@@ -40,9 +50,10 @@ export function validateBidWorkspace(data,snapshotId,systems){
  if(data.mgwQuoteImport!==undefined){const r=data.mgwQuoteImport;fields(r,["version","date","importedOfferIds","conflicts"]);string(r.version,"MGW version",100);date(r.date,"MGW import date");for(const key of ["importedOfferIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>400))fail("Invalid MGW import list");}}
  if(data.mrWorkingImport!==undefined){const r=data.mrWorkingImport;fields(r,["version","date","importedLineIds","conflicts"]);string(r.version,"MR import version",100);date(r.date,"MR import date");for(const key of ["importedLineIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>100))fail("Invalid MR import list");}}
  if(data.sourceIntake!==undefined)validateSourceIntake(data.sourceIntake,systems);
+ validateIntegration0550(data);
  return data;
 }
-export function deriveBidWorkspace(data,systemTokens,reviewDate){
+export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel){
  const eq=(id,inputs)=>evaluateServiceEquation(id,inputs).value;
  const fxReady=Boolean(data.fx.source.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(data.fx.date));
  const fx=currency=>currency==="THB"?1:fxReady&&finite(data.fx["thbPer"+currency])&&data.fx["thbPer"+currency]>0?data.fx["thbPer"+currency]:null;
@@ -107,5 +118,5 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate){
  const requirementGaps=mrWorkingGaps0550(data,lines);
  const baseScopeOpen=requirementGaps.some(g=>!g.code||!g.code.startsWith("C")),optionScopeOpen=requirementGaps.some(g=>!g.code||g.code.startsWith("C"));
  const result={requirementGaps,lines,selected,groups,complete:complete&&!requirementGaps.length,missingSystems,missingWbs,baseTHB:baseScopeOpen?null:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerTHB"),baseUSD:baseScopeOpen?null:sum(selected.filter(l=>!l.wbs.startsWith("C")),"customerUSD"),optionsTHB:optionScopeOpen?null:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerTHB"),optionsUSD:optionScopeOpen?null:sum(selected.filter(l=>l.wbs.startsWith("C")),"customerUSD"),knownTHB:sum(selected.filter(l=>l.customerTHB!==null),"customerTHB"),selectedTHB:sum(selected,"customerTHB"),selectedUSD:sum(selected,"customerUSD"),releaseAllowed:false,releaseState:"HOLD",scopeComplete:missingSystems.length===0&&missingWbs.length===0&&requirementGaps.length===0,revision:data.revision};
- return {...result,official:deriveOfficialPricing(data,result,reviewDate),provisional:deriveProvisionalPricing(data,result)};
+ return {...result,official:deriveOfficialPricing(data,result,reviewDate,integrationModel),provisional:deriveProvisionalPricing(data,result)};
 }

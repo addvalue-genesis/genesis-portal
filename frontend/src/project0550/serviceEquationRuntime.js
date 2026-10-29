@@ -23,7 +23,14 @@ export const EQUATION_INPUTS = {
  "PAGA-SPL":{fields:[f("ambient","Ambient noise dBA"),f("margin","Required SNR margin dB")],unit:"dBA",formula:"SPL_required = Ambient_Noise + Required_SNR_Margin"},
  "PAGA-UPS":{fields:[f("loadW","Alarm load W"),f("hours","Autonomy hours"),f("efficiency","Efficiency 0–1",0.000001,1),f("DoD","Depth of discharge 0–1",0.000001,1),f("derating","Derating factor 0–1",0.000001,1)],unit:"Wh",formula:"E_required = P_load × t / (η × DoD × Derating)"},
  "PAGA-AMPLIFIER":{fields:[f("tapW","Total speaker tap load W"),f("lossW","Loop losses W"),f("ratedW","Rated amplifier capacity W",0.000001),f("usable","Usable fraction 0–1",0.000001,1)],unit:"W",formula:"Headroom = Rated × Usable − (Speaker taps + Loop losses)"},
- "AVAILABILITY":{fields:[f("MTBF","MTBF hours",0.000001),f("MTTR","MTTR hours")],unit:"RATIO",formula:"A = MTBF / (MTBF + MTTR)"}
+ "AVAILABILITY":{fields:[f("MTBF","MTBF hours",0.000001),f("MTTR","MTTR hours")],unit:"RATIO",formula:"A = MTBF / (MTBF + MTTR)"},
+ "CCTV-STORAGE":{fields:[f("cameras","Recording streams"),f("Mbps","Mbps per stream"),f("days","Retention days"),f("overhead","Overhead multiplier",1),f("usable","Usable storage fraction",0.000001,1)],unit:"TB",formula:"Required decimal TB = streams × Mbps × days × 86400 × overhead / (8 × 1000000 × usable)"},
+ "NETWORK-HEADROOM":{fields:[f("capacityMbps","Link capacity Mbps"),f("usable","Usable fraction",0.000001,1),f("demandMbps","Aggregate demand Mbps")],unit:"Mbps",formula:"Headroom Mbps = capacity × usable − aggregate demand"},
+ "POWER-HEADROOM":{fields:[f("capacityW","Available power W"),f("usable","Usable fraction",0.000001,1),f("demandW","Connected load W")],unit:"W",formula:"Power headroom = capacity × usable − connected load"},
+ "PORT-HEADROOM":{fields:[f("available","Available compatible ports"),f("connected","Connected ports"),f("reserved","Required spare ports")],unit:"PORT",formula:"Port headroom = available − connected − required spares"},
+ "LICENSE-HEADROOM":{fields:[f("licensed","Licensed matching functions/channels"),f("required","Required matching functions/channels")],unit:"LICENSE",formula:"License headroom = licensed − required (same license metric)"},
+ "FO-LOSS":{fields:[f("lengthKm","Route length km"),f("dBperKm","Fiber attenuation dB/km"),f("splices","Splices"),f("spliceLoss","Loss per splice dB"),f("connectors","Connectors"),f("connectorLoss","Loss per connector dB"),f("margin","Design margin dB")],unit:"dB",formula:"Required optical budget = km × dB/km + splices × loss + connectors × loss + margin"},
+ "RF-MARGIN":{fields:[f("txDBm","Transmit power dBm",-200,200),f("txGain","Tx antenna gain dBi",-100,200),f("rxGain","Rx antenna gain dBi",-100,200),f("lossDB","Total verified path/feed losses dB"),f("sensitivityDBm","Receiver threshold dBm",-300,200)],unit:"dB",formula:"Receive margin = Tx dBm + gains − verified losses − receiver threshold dBm"}
 };
 export function evaluateServiceEquation(id, inputs={}) {
  const definition=EQUATION_INPUTS[id];
@@ -44,6 +51,7 @@ export function evaluateServiceEquation(id, inputs={}) {
  if(id==="E04"&&Array.isArray(inputs.rows)&&inputs.rows.some(r=>r&&r.I!==null&&r.I!==undefined&&![0,1].includes(r.I)))errors.push("Applicability must be 0 or 1");
  if(id==="E05")for(const key of ["events","crew"])if(inputs[key]!==null&&inputs[key]!==undefined&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
  if(id==="E14"&&inputs.driver>inputs.totalDrivers)errors.push("Driver exceeds total drivers");
+ if(["PORT-HEADROOM","LICENSE-HEADROOM","CCTV-STORAGE","FO-LOSS"].includes(id))for(const key of ({"PORT-HEADROOM":["available","connected","reserved"],"LICENSE-HEADROOM":["licensed","required"],"CCTV-STORAGE":["cameras"],"FO-LOSS":["splices","connectors"]}[id]))if(inputs[key]!=null&&!Number.isInteger(inputs[key]))errors.push(key+" must be a whole count");
  if(errors.length||missing.length)return {state:errors.length?"INVALID":"OPEN",value:null,errors:[...errors,...missing.map(k=>"Missing "+k)],unit:definition.unit};
  const x=inputs, sum=fn=>x.rows.reduce((n,r)=>n+fn(r),0);
  const calculations={
@@ -55,7 +63,13 @@ export function evaluateServiceEquation(id, inputs={}) {
   E14:()=>x.pool*x.driver/x.totalDrivers,E15:()=>x.laborDelta+x.tripDelta+x.OEMDelta,
   E16:()=>x.sessions*x.days*x.trainers*x.Hday+x.prepMH+x.closeMH,E17:()=>x.THB/x.fx,E18:()=>sum(r=>r.qtyInstalled*r.UMH),
   "PAGA-SPL":()=>x.ambient+x.margin,"PAGA-UPS":()=>x.loadW*x.hours/(x.efficiency*x.DoD*x.derating),
-  "PAGA-AMPLIFIER":()=>x.ratedW*x.usable-x.tapW-x.lossW,"AVAILABILITY":()=>x.MTBF/(x.MTBF+x.MTTR)
+  "PAGA-AMPLIFIER":()=>x.ratedW*x.usable-x.tapW-x.lossW,"AVAILABILITY":()=>x.MTBF/(x.MTBF+x.MTTR),
+  "CCTV-STORAGE":()=>x.cameras*x.Mbps*x.days*86400*x.overhead/(8*1000000*x.usable),
+  "NETWORK-HEADROOM":()=>x.capacityMbps*x.usable-x.demandMbps,
+  "POWER-HEADROOM":()=>x.capacityW*x.usable-x.demandW,
+  "PORT-HEADROOM":()=>x.available-x.connected-x.reserved,"LICENSE-HEADROOM":()=>x.licensed-x.required,
+  "FO-LOSS":()=>x.lengthKm*x.dBperKm+x.splices*x.spliceLoss+x.connectors*x.connectorLoss+x.margin,
+  "RF-MARGIN":()=>x.txDBm+x.txGain+x.rxGain-x.lossDB-x.sensitivityDBm
  };
  const value=calculations[id]();
  if(!Number.isFinite(value)||Math.abs(value)>Number.MAX_SAFE_INTEGER||(id==="E05"&&value*x.Hday>Number.MAX_SAFE_INTEGER))return {state:"INVALID",value:null,unit:definition.unit,errors:["Result overflow"]};

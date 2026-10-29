@@ -2,9 +2,12 @@
 import {MR_SUPPLY_ORDER_0550} from "./bidWorkingBasis0550";
 import {SYSTEMS,BUDGETARY_ESTIMATE} from "./data";
 import {CUSTOMER_FORM_0550,mappingValid} from "./data/officialPricing0550";
+import {WORKING_PREVIEW_STAGES_0550} from "./workingPreviewStages0550";
 export const BID_TAG_TARGETS_0550=Object.freeze({"his-01":"bid.budget.history","rfq-02":"l3.original","off-03":"bid.budget.official","rel-04":"bid.budget.release"});
 const entry=(id,number,title,purpose,inputs,method,outputs,limits,next)=>({id,number,title,purpose,inputs,method,outputs,limits,next});
 export const BID_SECTIONS_0550=[
+ ...WORKING_PREVIEW_STAGES_0550,
+ entry("bid.working-preview.particulars","WP.P","System Particular / Document reading ledger","เก็บข้อกำหนดแฝงและบันทึกการอ่านทุกเอกสาร","PHI / BOD / DTS / SPE / LIS / notes / appendix / ข้อความสี","รวมหลายต้นทางต่อข้อ แยกข้อความและคำตีความ ตรวจทุกหน้าและภาพ","Particular และผลกระทบใน Working 1–8","สีไม่ตัดสิน authority; ค้น keyword ไม่เท่ากับอ่านครบ","WP.1–WP.8 / AVL / Deviation"),
  entry("bid.budget.guide","10.0","แผนผังและหลักการอ่านโมดูล","ระบุตำแหน่งที่กำลังทำงานและจุดที่ต้องการสอบถาม","เลขหัวข้อ / หมวดงาน / Module ID","เลขหัวข้อบอกลำดับอ่าน; Module ID เป็นที่อยู่ถาวร","ค้นหาและคัดลอกตำแหน่งเดียวกันได้","สีไม่ใช่สถานะอนุมัติ; HIS/OFF/REL เป็นชื่อเรียกสั้น","10.1 ต้นทาง → 10.2 ราคา → 10.3 ตรวจและเสนอ"),
  entry("bid.budget.guide.colors","10.0.1","คู่มือสีตามหมวดงาน","อ่านความสัมพันธ์ของหัวข้อและตาราง","Part / System / WBS","สีต่อเนื่องตามหมวดที่แสดง","เห็นเจ้าของงานในแต่ละระดับ","สีไม่ใช่สถานะอนุมัติ","10.2 และ 10.3"),
  entry("bid.budget.working.sources","10.1","ฐานข้อเสนอและค่าเริ่มต้นจาก 01–08","เตรียมฐานก่อนตรวจราคา","MR Rev.B1 / ค่าเริ่มต้น 01–08 / FX รอบนี้","ตรวจ MR → รับฐานเดิมจาก 01–08 → ตรวจ FX รอบนี้","ข้อมูลพร้อมสำหรับ Working","ยังต้องทบทวนผลคำนวณและขอบเขตลูกค้า","10.2 Working Cost / Sell"),
@@ -44,6 +47,7 @@ export const BID_MODULE_COLORS_0550={
 export function bidModuleFamily0550(id){
  const key=id.replace(/\.principles$/,""),meta=bidSection0550(key);
  if(!meta)return undefined;
+ if(meta.family)return meta.family;
  if(["bid.budget.working.sources","bid.budget.official.source-impact","bid.budget.fx"].includes(key))return "source";
  if(key==="bid.budget.official.customer-scope")return "scope";
  if(key==="bid.budget.budget-thb")return "budget";

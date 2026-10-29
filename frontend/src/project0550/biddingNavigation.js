@@ -9,5 +9,6 @@ export const BID_TABS=[
  {id:"documents",label:"07 Vendors / Evidence",aria:"Vendors and Evidence",moduleId:"MOD-COMMERCIAL-SOURCE"},
  {id:"risk",label:"08 Risk / Gates",aria:"Risk & Controls",moduleId:"MOD-RISK"},
  {id:"registry",label:"09 Data / Trace",aria:"Data and Trace",moduleId:"MOD-DATA-REPOSITORY"},
- {id:"budget",label:"10 Bidding / Commercial",aria:"Budget",moduleId:"MOD-BUDGET-WORKING"}
+ {id:"budget",label:"10 Bidding / Commercial",aria:"Budget",moduleId:"MOD-BUDGET-WORKING"},
+ {id:"deviations",label:"AVL / Deviation",aria:"AVL and Deviation",moduleId:"MOD-REQ-COMPLETENESS"}
 ];
