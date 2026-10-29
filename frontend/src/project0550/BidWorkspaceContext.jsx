@@ -1,4 +1,5 @@
 import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
+import {preparePagaAvlDeviation0550} from "./data/avlDeviationBasis0550";
 import {deriveIntegration0550} from "./data/integrationWorkspace0550";
 import {importMrWorkingBasis0550} from "./data/mrWorkingBasis0550";
 import React,{createContext,useContext,useEffect,useMemo,useRef,useState} from "react";
@@ -18,8 +19,8 @@ export function BidWorkspaceProvider({children}){
    let current=await loadProject0550Bid();
    const vendorPrepared=importLegacyVendorBasis0550(current,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},reviewDate);
    const mrPrepared=importMrWorkingBasis0550(vendorPrepared,COMMERCIAL_POLICY,reviewDate);
-   const prepared=importMgwVendorBasis0550(mrPrepared,reviewDate);
-   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor offers and MR Working requirements / "+prepared.mgwQuoteImport.version);
+   const prepared=preparePagaAvlDeviation0550(importMgwVendorBasis0550(mrPrepared,reviewDate));
+   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor offers, MR Working requirements and selected PAGA AVL deviation / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    try {

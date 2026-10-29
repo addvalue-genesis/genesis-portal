@@ -1,3 +1,10 @@
+> **Selected AVL deviation, 29-Oct-2026:** Read
+> [Selected PAGA AVL deviation](20261029_SELECTED_AVL_DEVIATION.md) for UI
+> `2026-10-29.3-preview`. The existing register now prepares and saves the selected
+> INDUSTRONIC draft with source/offer lineage, preserves user records and separates
+> request progress from customer acceptance. MASTER TOWER is not automatically
+> treated as an AVL deviation. Same branch; financial inputs and Release HOLD remain.
+
 > **AVL update, 29-Oct-2026:** Read
 > [Sub-vendor source reference](20261029_AVL_SUBVENDOR_REFERENCE.md) for UI
 > `2026-10-29.2-preview`. The existing `bid.deviations.avl` now shows the supplied
