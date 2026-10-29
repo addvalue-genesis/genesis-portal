@@ -28,7 +28,7 @@ adapter.load=async()=>raw;adapter.save=async()=>{saves++;throw Error('must never
   const context=require(root+'/project0550/BidWorkspaceContext.jsx');context.useBidWorkspace=()=>({data:null,error:loadError.message,busy:false,reload:()=>{},recovery:{rawWorkspace:raw,diagnostic:diag}});
   const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),{BidSaveStatus}=require(root+'/project0550/BidDataControls.jsx');
   const html=renderToStaticMarkup(React.createElement(BidSaveStatus));
-  for(const text of ['Workspace load recovery','RAW backup','futureBidWorkflow','คัดลอกข้อมูลตรวจสอบ','2026-10-29.7-preview'])assert(html.includes(text));
+  for(const text of ['Workspace load recovery','RAW backup','futureBidWorkflow','คัดลอกข้อมูลตรวจสอบ',require('../src/projectHubRelease.json').version])assert(html.includes(text));
   assert(!html.includes('SYNTHETIC PRIVATE VALUE'));assert.equal(JSON.stringify(raw),before);
   adapter.load=async()=>d;assert.equal(await loadProject0550Bid(),d);assert.equal(saves,0,'valid reload does not migrate or save');
   console.log('PASS 0550 workspace recovery: exact unknown-field diagnostics, original raw record retained, strict save validation, zero recovery writes, private values excluded from diagnostics, accessible backup UI and valid legacy optional fields.');

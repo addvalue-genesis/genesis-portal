@@ -1,3 +1,10 @@
+> **All-system AVL, 29-Oct-2026:** Read
+> [canonical Working 1–8 → AVL → Deviation](20261029_ALL_SYSTEM_AVL.md), UI
+> `2026-10-29.8-preview`. Existing WP.7 / AVL / Release share an all-system audit.
+> Selected INDUSTRONIC is retained; MGW J&R Ex-Telephone gains a proposal-stage
+> draft, excluded from export until Working selection is reconciled. No repricing,
+> auto-approval, added architectural IDs or issued release. Preserves SI import.
+
 > **Deviation Release, 29-Oct-2026:** See
 > [Release preview and Excel export](20261029_DEVIATION_RELEASE.md) for UI
 > `2026-10-29.5-preview`. New `bid.deviations.release` tab previews/exports saved

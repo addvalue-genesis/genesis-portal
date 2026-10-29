@@ -1,3 +1,4 @@
+import {deriveAvlReconciliation0550} from "./avlReconciliation0550";
 import layout from "./deviationReleaseLayout0550.json";
 import template from "./deviationReleaseTemplate0550.json";
 import {zipStore} from "../exportOriginalPriceForm";
@@ -23,6 +24,8 @@ export function deriveDeviationRelease0550(data,integration,selectedIds){
  const records=ids.map(id=>all.find(d=>d.id===id)).filter(Boolean);
  if(records.length!==ids.length)issues.push("มีรายการที่เลือกไม่อยู่ในทะเบียนปัจจุบัน");
  const groups=[];
+ const automated=records.filter(d=>d.id.startsWith("DEV-AVL-"));
+ if(automated.length&&deriveAvlReconciliation0550(data,integration).referenceConflict)issues.push("ฐาน AVL เปลี่ยน/ถูกแทนที่ กรุณาทบทวนร่างก่อนส่งออก");
  for(const d of records){
   const defaults=deviationReleaseDefaults0550(d,integration.requirements),value=k=>text(d[k]===undefined?defaults[k]:d[k]);
   const document=value("releaseDocument");let group=groups.find(g=>g.document===document);
@@ -32,6 +35,7 @@ export function deriveDeviationRelease0550(data,integration,selectedIds){
   if(!integration.requirements.some(r=>r.id===d.requirementId))issues.push(d.id+": ยังไม่ผูก Requirement");
   if(!d.offerIds.length||d.offerIds.some(id=>!data.offers.some(o=>o.id===id)))issues.push(d.id+": ข้อเสนอที่อ้างอิงไม่ครบ");
   if(d.offerIds.some(id=>!data.lines.some(l=>l.selected&&l.systemToken===d.systemToken&&l.offerId===id)))issues.push(d.id+": ข้อเสนอที่อ้างอิงไม่ได้อยู่ในตัวเลือก Working ปัจจุบัน");
+  if(d.id.startsWith("DEV-AVL-")){const a=integration.avlChecks.find(a=>a.id===d.avlCheckId);if(d.offerIds.some(id=>{const o=data.offers.find(o=>o.id===id);return o&&(o.quoteRef!==d.vendorQuoteRef||(a?.manufacturer&&o.brand?.trim()&&o.brand.trim().toUpperCase()!==a.manufacturer.trim().toUpperCase()));}))issues.push(d.id+": ยี่ห้อหรือเลขข้อเสนอเปลี่ยน กรุณาทบทวนร่าง");}
   const height=rowHeight(cells);if(height>409)issues.push(d.id+": ข้อความยาวเกินความสูงแถว Excel กรุณาย่อข้อความหรือแยกเป็นหลายรายการ");
   group.rows.push({id:d.id,cells,height});
  }

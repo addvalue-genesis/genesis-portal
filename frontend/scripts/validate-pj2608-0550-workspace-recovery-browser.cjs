@@ -18,7 +18,7 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
   const fixture=await read();await page.reload();
   await page.getByRole('alert').filter({hasText:'Unsupported workspace field: futureBidWorkflow'}).waitFor();
   const recovery=page.getByRole('region',{name:'Workspace load recovery'});await recovery.waitFor();
-  assert((await recovery.innerText()).includes('2026-10-29.7-preview'));
+  assert((await recovery.innerText()).includes(require('../src/projectHubRelease.json').version));
   assert((await page.locator('.p55-bid-save').innerText()).includes('เปิดข้อมูล Bidding ไม่สำเร็จ'));
   assert.deepEqual(await read(),fixture,'Failed load cannot overwrite the active record or history');
   const [download]=await Promise.all([page.waitForEvent('download'),recovery.getByRole('button',{name:'สำรองข้อมูลเดิม (RAW backup)',exact:true}).click()]);

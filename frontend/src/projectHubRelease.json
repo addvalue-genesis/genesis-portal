@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-29.7-preview",
+  "version": "2026-10-29.8-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "a9eed7b0f91e7bf26d2fd6a6626ead6f3079f450",
-  "capability": "0550 workspace field diagnostics / original-data backup on load failure + SI draft intake + Deviation Release / HOLD"
+  "source0550": "d32de1a5761c656dad54c74e24b173a1d41c7578",
+  "capability": "0550 all-system AVL from canonical Working 1\u20138 / sources / offers + deviation drafts and XLSX + workspace recovery + SI import / HOLD"
 }

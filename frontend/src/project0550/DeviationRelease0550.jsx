@@ -1,12 +1,13 @@
+import {AvlReconciliation0550} from "./AvlReconciliation0550";
 import React,{useState} from "react";
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {Module,Field} from "./BidControls";
 import {deviationReleaseMetadata0550,deriveDeviationRelease0550,exportDeviationRelease0550,DEVIATION_RELEASE_LAYOUT_0550 as layout} from "./data/deviationRelease0550";
 const labels={projectNo:"Project No.",project:"Project",requisition:"Requisition",description:"REQ Description",vendor:"Vendor"};
-export function DeviationRelease0550({onEdit,selection,onSelectionChange}){
+export function DeviationRelease0550({onEdit,selection,onSelectionChange,onNavigate,onOpenSource}){
  const {data,model,change,busy}=useBidWorkspace();
  const [metadata,setMetadata]=useState(()=>deviationReleaseMetadata0550(data));
- const [localSelection,setLocalSelection]=useState(()=>model.integration.deviations.map(d=>d.id));
+ const [localSelection,setLocalSelection]=useState(()=>model.integration.deviations.filter(d=>!deriveDeviationRelease0550(data,model.integration,[d.id]).issues.length).map(d=>d.id));
  const selected=selection??localSelection,setSelected=update=>onSelectionChange?onSelectionChange(update(selected)):setLocalSelection(update);
  const [message,setMessage]=useState("");
  const saved=deviationReleaseMetadata0550(data),dirty=JSON.stringify(saved)!==JSON.stringify(metadata);
@@ -15,10 +16,10 @@ export function DeviationRelease0550({onEdit,selection,onSelectionChange}){
  return <Module id="bid.deviations.release" title="Release · Deviation List — English / Draft">
  <div className="p55-deviation-release-actions"><p><strong>DRAFT / NOT ISSUED</strong> · {release.count} รายการที่เลือก · Workspace revision {data.revision}</p><button type="button" className="p55-export-button" onClick={exportFile} disabled={busy||dirty||Boolean(release.issues.length)}>Export Excel — Deviation List</button></div>
  <p>ใช้ข้อมูลที่บันทึกในทะเบียน · รูปแบบ 11 คอลัมน์ตาม 5-Deviation List.xls · ดาวน์โหลดเป็น .xlsx · การส่งคำขอพิจารณาไม่ต้องรอการอนุมัติ Deviation</p>
- <details><summary>หัวเอกสาร / เลือกรายการที่จะส่งออก</summary>
+ <AvlReconciliation0550 onNavigate={onNavigate} onOpenSource={onOpenSource}/><details open><summary>หัวเอกสาร / เลือกรายการที่จะส่งออก</summary>
  <div className="p55-bid-fields">{Object.entries(labels).map(([key,label])=><Field key={key} label={label} value={metadata[key]} onChange={v=>setMetadata(m=>({...m,[key]:v}))}/>)}</div>
  <button type="button" disabled={busy||!dirty} onClick={async()=>{if(await change(d=>({...d,deviationRelease:{...metadata}}),"Save deviation release document header"))setMessage("บันทึกหัวเอกสารแล้ว");}}>บันทึกหัวเอกสาร</button>
- {model.integration.deviations.map(d=><div key={d.id}><label><input type="checkbox" checked={selected.includes(d.id)} onChange={e=>setSelected(ids=>e.target.checked?[...ids,d.id]:ids.filter(id=>id!==d.id))}/> {d.systemToken} / {d.vendorQuoteRef||d.id} / {d.vendorDeviation}</label><button type="button" onClick={()=>onEdit(d.id)}>แก้รายการต้นทาง</button></div>)}
+ {model.integration.deviations.map(d=><div key={d.id}><label><input type="checkbox" checked={selected.includes(d.id)} onChange={e=>setSelected(ids=>e.target.checked?[...ids,d.id]:ids.filter(id=>id!==d.id))}/> {d.systemToken} / {d.vendorQuoteRef||d.id} / {d.vendorDeviation}{deriveDeviationRelease0550(data,model.integration,[d.id]).issues.length>0&&<small>ยังไม่พร้อมส่งออก: {deriveDeviationRelease0550(data,model.integration,[d.id]).issues.join(" · ")}</small>}</label><button type="button" onClick={()=>onEdit(d.id)}>แก้รายการต้นทาง</button></div>)}
  </details>
  {dirty&&<p role="status">หัวเอกสารมีการแก้ไข · บันทึกก่อน Preview / Export ใช้ค่าที่บันทึกแล้ว</p>}
  <div role="status" aria-live="polite">{message}</div>

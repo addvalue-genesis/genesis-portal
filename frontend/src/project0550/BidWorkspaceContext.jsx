@@ -1,3 +1,4 @@
+import {deriveAvlReconciliation0550,prepareSystemAvlDeviations0550} from "./data/avlReconciliation0550";
 import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
 import {preparePagaAvlDeviation0550} from "./data/avlDeviationBasis0550";
 import {deriveIntegration0550} from "./data/integrationWorkspace0550";
@@ -21,13 +22,15 @@ export function BidWorkspaceProvider({children}){
    let current=await loadProject0550Bid();
    const vendorPrepared=importLegacyVendorBasis0550(current,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},reviewDate);
    const mrPrepared=importMrWorkingBasis0550(vendorPrepared,COMMERCIAL_POLICY,reviewDate);
-   const prepared=preparePagaAvlDeviation0550(importMgwVendorBasis0550(mrPrepared,reviewDate));
-   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor offers, MR Working requirements and selected PAGA AVL deviation / "+prepared.mgwQuoteImport.version);
+   const vendorDraft=preparePagaAvlDeviation0550(importMgwVendorBasis0550(mrPrepared,reviewDate));
+   const prepared=prepareSystemAvlDeviations0550(vendorDraft,deriveIntegration0550(vendorDraft,SYSTEMS,reviewDate));
+   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor offers, MR Working requirements and all-system AVL preparation drafts / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    try {
     const intake=await fetchAutomaticSource(),selected=selectAutomaticSource(current,intake,SYSTEMS.map(s=>s.token));
-    if(selected.state==="UPDATED")current=await saveProject0550Bid(selected.workspace,current.revision,"Load reviewed source from Drive Desktop / "+intake.batchId);
+    const sourced=prepareSystemAvlDeviations0550(selected.workspace,deriveIntegration0550(selected.workspace,SYSTEMS,reviewDate));
+    if(sourced!==current)current=await saveProject0550Bid(sourced,current.revision,"Load source and reconcile system AVL drafts / "+intake.batchId);
     setData(current);setSourceSync({state:selected.state,message:selected.state==="LOCAL_NEWER"?"ข้อมูลที่บันทึกอยู่ใหม่กว่าชุดบน Drive จึงเก็บข้อมูลเดิมไว้":"โหลดทะเบียนจาก Google Drive for Desktop แล้ว",batchId:current.sourceIntake?.batchId});
    }catch(e){
     // Another tab can save while Drive is loading. Reload it rather than writing stale data.
@@ -42,8 +45,8 @@ export function BidWorkspaceProvider({children}){
  };
  useEffect(()=>{reload();},[]);
  const reviewDate=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Bangkok",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
- const model=useMemo(()=>{if(!data)return null;const integration=deriveIntegration0550(data,SYSTEMS,reviewDate);return {...deriveBidWorkspace(data,SYSTEMS.map(s=>s.token),reviewDate,integration),integration};},[data,reviewDate]);
- async function change(transform,action){if(!data||lock.current)return false;lock.current=true;setBusy(true);try{const next=transform(data);setData(await saveProject0550Bid(next,data.revision,action));setError("");return true;}catch(e){setError(e.message);return false;}finally{lock.current=false;setBusy(false);}}
+ const model=useMemo(()=>{if(!data)return null;const integration=deriveIntegration0550(data,SYSTEMS,reviewDate);return {...deriveBidWorkspace(data,SYSTEMS.map(s=>s.token),reviewDate,integration),integration,avlReconciliation:deriveAvlReconciliation0550(data,integration)};},[data,reviewDate]);
+ async function change(transform,action){if(!data||lock.current)return false;lock.current=true;setBusy(true);try{const transformed=transform(data);const next=prepareSystemAvlDeviations0550(transformed,deriveIntegration0550(transformed,SYSTEMS,reviewDate));setData(await saveProject0550Bid(next,data.revision,action));setError("");return true;}catch(e){setError(e.message);return false;}finally{lock.current=false;setBusy(false);}}
  const put=(collection,record)=>change(d=>({...d,[collection]:d[collection].some(r=>r.id===record.id)?d[collection].map(r=>r.id===record.id?record:r):[...d[collection],record]}),"Save "+collection+" / "+record.id);
  async function importFile(file){if(!file)return;try{if(file.size>16*1024*1024)throw Error("Workspace exceeds 16 MiB");const imported=validateBidWorkspace(JSON.parse(await file.text()),DATA_LAYER_META.datasetId,SYSTEMS.map(s=>s.token));await change(current=>({...imported,revision:current.revision,audit:current.audit}),"Import reviewed 0550 workspace backup");}catch(e){setError(e.message);}}
  return <Context.Provider value={{data,model,error,busy,recovery,change,put,reload,importFile,reviewDate,sourceSync}}>{children}</Context.Provider>;
