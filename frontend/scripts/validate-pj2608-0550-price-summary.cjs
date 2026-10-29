@@ -31,7 +31,7 @@ const {officialCustomerRows}=require(root+'/project0550/data/officialPricing0550
 const {releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
 const rowsBefore=officialCustomerRows(m.provisional),notes=releasePricePresentation0550(m.provisional);
 const hierarchy=releaseHierarchy0550(m.provisional,rowsBefore);
-const retained=hierarchy.entries.filter(row=>!row.kind.startsWith('mr-')).map(({parents,toggle,mrReferences,mrReference,...row})=>row);
+const retained=hierarchy.entries.filter(row=>!row.kind.startsWith('mr-')).map(({parents,toggle,mrReferences,mrReference,sectionModuleId,...row})=>row);
 const canonical=rows=>[...rows].sort((a,b)=>a.key.localeCompare(b.key));
 assert.deepEqual(canonical(retained),canonical(rowsBefore),'Every projected row, ID, quantity, unit, amount and remark retained exactly once');
 assert.equal(new Set(hierarchy.controls.map(n=>n.key)).size,hierarchy.controls.length,'Unique UI expansion keys');
@@ -62,6 +62,8 @@ const releaseHtml=renderToStaticMarkup(React.createElement(OfficialCustomerForm,
 assert(releaseHtml.includes('Release table Module ID'));assert(releaseHtml.includes('Copy component ID bid.budget.release'));
 assert(releaseHtml.includes('เหตุผลที่ยังเป็น OPEN'));assert(releaseHtml.includes('ยังไม่จัดสรรราคา package นี้เข้าแถว MR'));
 assert(releaseHtml.includes('ราคาย่อยที่คำนวณได้'));assert(releaseHtml.includes('HOLD / NOT ISSUED'));
+const registry=require(root+'/project0550/bidPresentation0550.js').bidPresentationIndex(d.lines);
+for(const part of ['A','B','C']){const id='bid.budget.release.part.'+part;assert.equal(registry.filter(r=>r.id===id).length,1);assert(releaseHtml.includes('data-component-key="'+id+'"'));assert(releaseHtml.includes('Copy component ID '+id));}
 assert.equal(JSON.stringify(d),before,'Rendering release diagnostics never changes raw prices, selections, FX, reviews or history');
 const zero={...m.provisional,lines:[{...priced,id:'ZERO',releaseModuleId:'zero',customerUSD:0,customerTHB:0}],schedule:[{...m.provisional.schedule[0],releaseModuleId:'group-zero',customerUSD:null,children:[{...priced,customerUSD:0}],problems:['scope pending']} ]};
 assert.equal(releasePricePresentation0550(zero).get('group-zero').known.amount,0,'Actual zero price stays distinct from missing');

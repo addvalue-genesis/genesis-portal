@@ -18,6 +18,24 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  await page.getByRole('button',{name:'Working · ราคาเดิมรออัปเดต',exact:true}).click();
  console.log('CHECK release table');
  const release=page.locator('[data-component-key="bid.budget.release"]'),identity=release.getByRole('region',{name:'Release table Module ID'}),table=release.getByRole('table',{name:'Official customer form',exact:true});
+ if(process.env.PJ0550_PART_ID_ONLY){
+  await release.getByRole('group',{name:'Release expand collapse'}).getByRole('button',{name:'− หุบทั้งหมด',exact:true}).click();
+  await page.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async value=>{window.releaseCopyValue=value;}}}));
+  for(const part of ['A','B','C']){
+   const id='bid.budget.release.part.'+part,row=table.locator('[data-component-key="'+id+'"]'),toggle=row.locator('[data-release-toggle="part:'+part+'"]');
+   assert(await row.isVisible());assert.equal(await toggle.getAttribute('aria-expanded'),'false');
+   await row.getByRole('button',{name:'Copy component ID '+id,exact:true}).click();assert.equal(await page.evaluate(()=>window.releaseCopyValue),'PJ2608-0550 / '+id);
+   assert.equal(await toggle.getAttribute('aria-expanded'),'false','Copy must not toggle the section');
+   await toggle.click();assert.equal(await toggle.getAttribute('aria-expanded'),'true');await toggle.click();
+  }
+  await nav('bid.budget.release.part.B');
+  await page.waitForFunction(()=>document.querySelector('[data-release-toggle="part:B"]')?.getAttribute('aria-expanded')==='true');
+  assert.equal(await table.locator('[data-release-toggle="part:A"]').getAttribute('aria-expanded'),'false');
+  await page.setViewportSize({width:390,height:844});
+  for(const part of ['A','B','C'])assert(await table.locator('[data-component-key="bid.budget.release.part.'+part+'"]').getByRole('button',{name:'Copy component ID bid.budget.release.part.'+part,exact:true}).isVisible());
+  assert.deepEqual(await read(),initial);assert.deepEqual(errors,[]);
+  console.log('PASS Release A/B/C IDs: all three collapsed headers expose unique IDs and copy full project-qualified values, copy preserves +/- state, toggles remain independent, Module Search opens Part B, mobile header copies remain visible, unchanged IndexedDB and no page errors.');return;
+ }
  const radioId='bid.budget.release.line.REQ-MR-B1-11-APF-01',radio=table.locator('[data-component-key="'+radioId+'"]');
  const radioToggle=table.locator('[data-release-toggle="bid.budget.release.customer.A1-07"]');
  assert.equal(await radio.isVisible(),false,'System details are collapsed in the initial overview');

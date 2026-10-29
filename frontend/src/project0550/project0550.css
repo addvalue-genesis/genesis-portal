@@ -1601,6 +1601,8 @@
 .p55-release-mr-category td { background:#dce9f3; color:#173349; border-top:2px solid #587b98; }
 .p55-release-mr-site td { background:#f1f5f8; padding-left:36px; }
 .p55-release-mr-system td { background:#edf1f6; padding-left:24px; }
+.p55-release-part-id { display:block; margin-top:6px; }
+.p55-customer-section .p55-release-part-id .gns-copy-id code { color:white; }
 @media(max-width:820px) { .p55-release-table-identity { position:static; } }
 @media(max-width:700px) { .p55-context-tabs { grid-template-columns:1fr; } .p55-price-group { padding:8px; } }
 

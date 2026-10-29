@@ -70,10 +70,11 @@ export const lineOwner0550=line=>line.wbs==="A"?line.systemToken:line.wbs;
 export function customerOwner0550(row){const owners=[...new Set(row.children.map(lineOwner0550))];return owners.length===1?owners[0]:row.part;}
 export function bidPresentationIndex(lines=[]){
  const parts=["A","B","C"].map(part=>({id:"bid.budget.working.part."+part,number:"10.2."+part,title:part+" · "+({A:"Equipment",B:"Services",C:"Options"}[part]),owner:part}));
+ const releaseParts=parts.map(part=>({...part,id:part.id.replace(".working.",".release."),number:part.number.replace("10.2.","10.7.")}));
  const groups=BID_GROUPS_0550.map(g=>({id:"bid.budget.working.group."+g.code,number:g.number,title:g.title,owner:g.code}));
  const customer=CUSTOMER_FORM_0550.rows.flatMap(r=>{const owner=customerOwner0550({...r,children:lines.filter(l=>l.selected&&mappingValid(l)&&l.customerRowCode===r.code)});return [{id:"bid.budget.working.customer."+r.code,number:"10.3."+r.code,title:r.code+" · "+r.description,owner},{id:"bid.budget.release.customer."+r.code,number:"10.7."+r.code,title:r.code+" · "+r.description,owner}];});
  const ordinals=new Map();
  const items=lines.flatMap((r,i)=>{const group=BID_GROUPS_0550.find(g=>g.code===lineOwner0550(r));const owner=lineOwner0550(r),ordinal=(ordinals.get(owner)||0)+1;ordinals.set(owner,ordinal);const suffix=".R"+String(ordinal).padStart(2,"0");return [{id:"bid.budget.working.line."+r.id,number:(group?.number||"10.2")+suffix,title:r.description,owner:lineOwner0550(r)},{id:"bid.budget.budget-thb.line."+r.id,number:"10.6.R"+String(i+1).padStart(2,"0"),title:r.description,owner:lineOwner0550(r)},{id:"bid.budget.release.line."+r.id,number:"10.7.R"+String(i+1).padStart(2,"0"),title:r.description,owner:lineOwner0550(r)}];});
- return [...BID_SECTIONS_0550,...BID_SECTIONS_0550.filter(r=>!["bid.budget.guide","bid.budget.guide.colors","bid.budget.official","bid.budget.history","bid.budget.working.editor.review"].includes(r.id)).map(r=>({id:r.id+".principles",number:r.number+".0",title:"หลักการ · "+r.title})),...parts,...groups,...customer,...items].map(r=>({...r,tab:"budget"}));
+ return [...BID_SECTIONS_0550,...BID_SECTIONS_0550.filter(r=>!["bid.budget.guide","bid.budget.guide.colors","bid.budget.official","bid.budget.history","bid.budget.working.editor.review"].includes(r.id)).map(r=>({id:r.id+".principles",number:r.number+".0",title:"หลักการ · "+r.title})),...parts,...releaseParts,...groups,...customer,...items].map(r=>({...r,tab:"budget"}));
 }
 export const bidSection0550=id=>BID_SECTIONS_0550.find(r=>r.id===id);

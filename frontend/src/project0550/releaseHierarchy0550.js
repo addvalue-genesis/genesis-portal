@@ -13,7 +13,7 @@ export function releaseHierarchy0550(official,customerRows){
  const heading=(key,label,parents,defaultOpen=true)=>{const node={key,label,parents,defaultOpen};controls.push(node);return node;};
  for(const part of ["A","B","C"]){
   const section=heading("part:"+part,part+" · "+(part==="A"?"Equipment":part==="B"?"Services":"Optional"),[]);
-  entries.push({...customerRows.find(row=>row.kind==="section"&&row.key===part),parents:[],toggle:section});
+  entries.push({...customerRows.find(row=>row.kind==="section"&&row.key===part),sectionModuleId:"bid.budget.release.part."+part,parents:[],toggle:section});
   const buckets=new Map();
   const categoryFor=appendix=>part!=="A"?"part:"+part+":other":appendix?"mr:"+appendix:"working:A";
   const bucket=(key,appendix)=>{

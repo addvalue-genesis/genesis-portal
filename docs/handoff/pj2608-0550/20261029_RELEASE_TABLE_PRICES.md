@@ -76,3 +76,20 @@ The extended browser regression also passes: nested +/- and keyboard toggles,
 collapsed-row Module Search reveal, independent saved expansion after reload,
 source/package navigation, desktop/mobile containment, unchanged IndexedDB and
 no page errors. The collapsed desktop overview screenshot was visually inspected.
+
+## Follow-up — Part A/B/C header IDs
+
+Base `ba9579a7`. The prior hierarchy supplied +/- controls but omitted copyable
+identities on the three Part headers. Added presentation child anchors
+`bid.budget.release.part.A`, `.B`, `.C` to the existing Release and its search
+index. Each collapsed header now exposes Copy ID; copying never toggles it.
+Searching a Part opens that Part while preserving other expansion preferences.
+Existing module/row IDs, financial records, customer cells/export and top-level
+modules are unchanged. ADR principles **8, 10–12** apply. The pure hierarchy/SSR
+regression checks all three unique searchable rendered IDs and copy controls,
+along with canonical row/cell conservation. This does not close project scope,
+engineering or pricing gaps or authorize issue.
+Production compilation passed (existing size warning). The focused browser test
+passed all three full-ID clipboard payloads on collapsed headers, independent
++/- operation, search-to-Part-B expansion, mobile copy visibility, unchanged
+IndexedDB and no page errors. `git diff --check` passed.
