@@ -2,6 +2,16 @@ const assert=require('node:assert/strict'),path=require('node:path'),fs=require(
 const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
 const compile=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);
 require.extensions['.js']=compile;require.extensions['.jsx']=compile;
+// Exercise webpack's .js-before-.jsx resolution with Windows-like basename
+// lookup. Native Linux compilation alone cannot detect this regression.
+const casePath=p=>{try{if(fs.existsSync(p))return p;const dir=path.dirname(p),name=fs.readdirSync(dir).find(n=>n.toLowerCase()===path.basename(p).toLowerCase());return name?path.join(dir,name):p;}catch{return p;}};
+const windowsFs=new Proxy(fs,{get(target,key){return ['statSync','readFileSync','readlinkSync','realpathSync','readdirSync'].includes(key)?(p,...args)=>target[key](casePath(p),...args):target[key];}});
+const resolveWindows=require('enhanced-resolve').create.sync({extensions:['.js','.jsx'],fileSystem:windowsFs});
+const legacy=fs.mkdtempSync(path.join(require('node:os').tmpdir(),'0550-case-regression-'));
+try{fs.writeFileSync(path.join(legacy,'Widget.jsx'),'export const Widget=()=>null');fs.writeFileSync(path.join(legacy,'widget.js'),'export const widget=()=>[]');assert.equal(path.extname(resolveWindows(legacy,'./Widget')),'.js','Legacy case-only stems reproduce the Windows wrong-module selection');}finally{fs.rmSync(legacy,{recursive:true,force:true});}
+const componentPath=resolveWindows(root+'/project0550','./ReleaseFullBid0550');
+assert.equal(path.basename(componentPath),'ReleaseFullBid0550.jsx');assert.equal(typeof require(componentPath).ReleaseFullBid0550,'function');
+assert.equal(path.basename(resolveWindows(root+'/project0550','./fullBidInventoryModel0550')),'fullBidInventoryModel0550.js');
 const D=require(root+'/project0550/data.js'),W=require(root+'/project0550/data/bidWorkspaceModel.js'),V=require(root+'/project0550/data/legacyVendorBasis0550.js'),MR=require(root+'/project0550/data/mrWorkingBasis0550.js'),Q=require(root+'/project0550/data/mgwVendorBasis0550.js'),G=require(root+'/project0550/data/mgwDetailPricing0550.js'),Repo=require(root+'/project0550/data/repositoryBidBasis0550.js');
 const {knownPriceGroups0550,BidKnownPrices0550}=require(root+'/project0550/BidKnownPrices0550.jsx'),React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const today='2026-10-29',tokens=D.SYSTEMS.map(s=>s.token);
@@ -30,7 +40,7 @@ const {releasePricePresentation0550}=require(root+'/project0550/releasePricePres
 const {officialCustomerRows}=require(root+'/project0550/data/officialPricing0550.js');
 const {releaseHierarchy0550}=require(root+'/project0550/releaseHierarchy0550.js');
 const rowsBefore=officialCustomerRows(m.provisional),notes=releasePricePresentation0550(m.provisional);
-const {releaseFullBid0550}=require(root+'/project0550/releaseFullBid0550.js');
+const {releaseFullBid0550}=require(root+'/project0550/fullBidInventoryModel0550.js');
 const inventory=releaseFullBid0550(d,m.provisional,D.SYSTEMS),get=token=>inventory.find(r=>r.token===token);
 assert.equal(inventory.length,20);assert.equal(new Set(inventory.map(r=>r.token)).size,20);assert.equal(inventory.flatMap(r=>r.records).length,MR.MR_WORKING_CATALOG_0550.rows.length,'All catalog requirements appear, including unselected/unmapped/COMPANY and B/C');
 assert(inventory.every(r=>r.mrDocuments.length===1&&r.mrDocuments[0]===MR.MR_WORKING_CATALOG_0550.document),'Every source-backed system identifies the catalog MR document/revision explicitly');

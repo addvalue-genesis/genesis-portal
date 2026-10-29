@@ -1,6 +1,6 @@
 import React,{useState} from "react";
 import {SYSTEMS} from "./data";
-import {releaseFullBid0550} from "./releaseFullBid0550";
+import {releaseFullBid0550} from "./fullBidInventoryModel0550";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 
 function Disposition({value}){

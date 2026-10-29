@@ -9,7 +9,7 @@ import {ReleaseIssueControls0550} from "./ReleaseIssueControls0550";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {releasePricePresentation0550} from "./releasePricePresentation0550";
 import {releaseHierarchy0550} from "./releaseHierarchy0550";
-import {ReleaseFullBid0550} from "./ReleaseFullBid0550";
+import {ReleaseFullBid0550} from "./ReleaseFullBid0550.jsx";
 
 const EXPANSION_KEY="GENESIS.PJ2608-0550.release.expanded.v1";
 const loadExpansion=()=>{try{const value=JSON.parse(globalThis.localStorage?.getItem(EXPANSION_KEY)||"{}");return value&&typeof value==="object"&&!Array.isArray(value)?Object.fromEntries(Object.entries(value).slice(0,1000).filter(([key,v])=>key.length<250&&typeof v==="boolean")):{};}catch{return {};}};

@@ -152,3 +152,25 @@ Production compilation and the focused Full/Bid browser regression pass, includi
 the dedicated MR column, full document/revision in every current system row,
 expanded main-clause/Appendix references, Source navigation and unchanged IndexedDB.
 The existing bundle-size warning remains; `git diff --check` passed.
+
+## Follow-up — Windows component/model filename collision
+
+Base `12afc847`, preserving the latest A-source +/- work. The user's Windows
+webpack resolver selected `releaseFullBid0550.js` for `./ReleaseFullBid0550`,
+because .js precedes .jsx and the filesystem does not distinguish case. The Linux
+build had resolved the exact-case JSX file, so that build did not catch the bug.
+
+Renamed the pure model to `fullBidInventoryModel0550.js`, updated its imports and
+test path, and made the component import explicitly `./ReleaseFullBid0550.jsx`.
+There is no case-only basename pair left in the 0550 JavaScript/JSX directory.
+No model equation, data, navigation ID, customer export or history changed.
+
+ADR principles **10–12** apply. The regression uses webpack's enhanced-resolve
+with a Windows-like case-insensitive filesystem adapter: a legacy synthetic
+Widget.jsx/widget.js fixture reproduces wrong .js selection, while the actual
+component resolves to JSX with the required export and the model resolves to its
+separate JS path. Canonical/SSR scope, MR and financial invariance checks also run.
+This is a resolver simulation on Linux, not a test on the user's native Windows.
+The resolver/canonical/SSR tests and production compilation passed. The build
+has no missing-export/module warning; only the existing asset-size warning remains.
+`git diff --check` passed.
