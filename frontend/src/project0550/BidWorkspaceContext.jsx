@@ -1,3 +1,4 @@
+import {prepareMgwDetailPricing0550} from "./data/mgwDetailPricing0550";
 import {deriveAvlReconciliation0550,prepareSystemAvlDeviations0550} from "./data/avlReconciliation0550";
 import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
 import {preparePagaAvlDeviation0550} from "./data/avlDeviationBasis0550";
@@ -25,7 +26,8 @@ export function BidWorkspaceProvider({children}){
    const vendorPrepared=importLegacyVendorBasis0550(current,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},reviewDate);
    const mrPrepared=importMrWorkingBasis0550(vendorPrepared,COMMERCIAL_POLICY,reviewDate);
    const vendorDraft=preparePagaAvlDeviation0550(importMgwVendorBasis0550(mrPrepared,reviewDate));
-   const avlPrepared=prepareSystemAvlDeviations0550(vendorDraft,deriveIntegration0550(vendorDraft,SYSTEMS,reviewDate));
+   const priced=prepareMgwDetailPricing0550(vendorDraft,COMMERCIAL_POLICY,reviewDate);
+   const avlPrepared=prepareSystemAvlDeviations0550(priced,deriveIntegration0550(priced,SYSTEMS,reviewDate));
    const prepared=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
    if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare repository pricing basis, vendor offers, MR Working requirements and all-system AVL drafts / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");setRecovery(null);

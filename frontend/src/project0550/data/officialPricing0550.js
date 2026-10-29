@@ -1,3 +1,4 @@
+import {mgwDetailGroupBasis0550} from "./mgwDetailPricing0550";
 import form from "./customerForm0550.json";
 import {deriveSourceIntake, deriveDocumentRevisionRegister} from "./sourceIntakeModel";
 import {deriveIntegration0550,integrationLineProblems0550,integrationLineBasis0550} from "./integrationWorkspace0550";
@@ -42,7 +43,7 @@ export function officialLineBasisKey(data,line,review=line.officialReview){
  const {officialReview,...inputs}=line;
  const {basisKey,...decision}=review||{};
  const owner=line.coveredByLineId?data.lines.find(l=>l.id===line.coveredByLineId):null;
- return fingerprint({method:"0550-official-review-v1",pricingPolicy:PRICING_POLICY_0550,...(data.integrationWorkspace?{integration:integrationLineBasis0550(data,line)}:{}),...(isSatelliteScope0550(line)?{scopePolicy:SATELLITE_SCOPE_VERSION}:{}),inputs,decision,...(line.coveredByLineId?{coverageOwner:owner,ownerOffer:data.offers.find(o=>o.id===owner?.offerId)||null,ownerCalculation:data.calculations.find(c=>c.id===owner?.calculationId)||null}:{}),offer:data.offers.find(o=>o.id===line.offerId)||null,calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
+ return fingerprint({method:"0550-official-review-v1",pricingPolicy:PRICING_POLICY_0550,...(data.integrationWorkspace?{integration:integrationLineBasis0550(data,line)}:{}),...(isSatelliteScope0550(line)?{scopePolicy:SATELLITE_SCOPE_VERSION}:{}),inputs,decision,...(line.mgwDetailGroupId?{mgwDetail:mgwDetailGroupBasis0550(data,line.mgwDetailGroupId,line)}:{}),...(line.coveredByLineId?{coverageOwner:owner,ownerOffer:data.offers.find(o=>o.id===owner?.offerId)||null,ownerCalculation:data.calculations.find(c=>c.id===owner?.calculationId)||null}:{}),offer:data.offers.find(o=>o.id===line.offerId)||null,calculation:data.calculations.find(c=>c.id===line.calculationId)||null,fx:data.fx,sources:sourceBasis(data,review?.sourceIds),comparison:data.sourceIntake?.packageComparisons?.find(c=>c.id===review?.comparisonId)||null});
 }
 export function customerScopeBasisKey(data,code,review){
  const {basisKey,...decision}=review;

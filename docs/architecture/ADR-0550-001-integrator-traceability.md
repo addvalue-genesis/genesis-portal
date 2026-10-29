@@ -223,3 +223,12 @@ FX fields, preserving saved values and deliberate later edits. Working and draft
 Release continue from the canonical repository basis without requiring a browser
 backup. Missing actual inputs and engineering/commercial acceptance remain OPEN;
 source availability is not equivalent to a complete authorized project price.
+
+## 12. MGW detail pricing / FX entry checkpoint — 29-Oct-2026
+
+The [MGW detail and FX checkpoint](../handoff/pj2608-0550/20261029_MGW_DETAIL_PRICING_AND_FX.md)
+records the user's chosen detailed-price basis, corrected MGW radio selection and
+inclusion of known supplier other charges. Canonical source offers feed quoted-scope
+Working packages, with overlap checks and review dependencies. Direct/cross FX entry
+and preview execute independently of engineering approval. These are priced drafts,
+not automatic MR coverage, system adequacy, customer acceptance or formal issue.
