@@ -129,12 +129,12 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   const nativeRow=23+Number(row.code.slice(1));
   for(const col of ["F","G"]){
    const value=cell(nativeScope,col+nativeRow);
-   assert(value?.includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':"NOT ESTABLISHED"),row.code+" current summary cell "+col);
+   assert(value?.includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':(row.offerTreatment?.priceText||"NOT ESTABLISHED")),row.code+" current summary cell "+col);
   }
  }
  assertOptions(nativeScope);
  assert(cell(nativeScope,"G38").includes("<v>27192339.36</v>"));
- assert(cell(nativeScope,"A38").includes("B4, B12, B14"));
+ assert(cell(nativeScope,"A38").includes("B4, B12"));
  for(const [code,index] of [["B10",2],["B11",3],["B13",4],["C1",5],["C2",6]]){
   const xml=nativeText(index);
   assert(!xml.includes("987654321"),code+" leaked stale native values");
@@ -220,11 +220,11 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      const nativeRow=23+Number(row.code.slice(1));
      const note=row.executionActivities.releaseText.replace(/&/g,'&amp;').replace(/>/g,'&gt;').replace(/</g,'&lt;');
      assert(cell(newXml,'B'+nativeRow).includes('Activities: '+note),'Source activity note missing in native '+row.code);
-     for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':"NOT ESTABLISHED"));
+     for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':(row.offerTreatment?.priceText||"NOT ESTABLISHED")));
     }
     assertOptions(newXml);
     assert(cell(newXml,"G38").includes("<v>27192339.36</v>"));
-    assert(cell(newXml,"A38").includes("B4, B12, B14"));
+    assert(cell(newXml,"A38").includes("B4, B12"));
    }else{
     const code=annexCodes[index-2];
     for(const row of expectedRows(code)){

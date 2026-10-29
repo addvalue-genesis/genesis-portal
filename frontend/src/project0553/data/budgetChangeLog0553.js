@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-26-R64";
+export const CHANGE_LOG_VERSION_0553="2026-10-29-R65";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261029-01",date:"2026-10-29",kind:"COMMERCIAL_SCOPE",tone:"neutral",
+  title:"B4/B12 not quoted; B14 ADDVALUE insurance ownership and coverage review",
+  detail:"Owner instruction applied as a commercial overlay on original requirements: B4/B12 show N/A with Not quoted; excluded from this offer in Source, Release THB/USD and native XLSX. Null amounts are retained and quotation exclusions are separate from B14 pending pricing. B14 now identifies ADDVALUE as owner, current B3 SAT28/B9 Yard7+2 basis, coverage review and existing non-additive B3/B9 insurance allowances. SAMTEL reported resale10% is not an insurance premium. Additional B14 premium remains null pending contract/policy/broker evidence; historical Rev05 allowance stays separate. No existing price, FX, markup policy or customer issue status changes.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b4","bid.budget.working.bc.b12","bid.budget.working.bc.b14","bid.budget.pricing.release.source-navigator","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE__B14_QUOTE_PENDING",source:"Owner instruction 29-Oct-2026"}),
  Object.freeze({
   id:"P553-CHANGE-20261026-06",date:"2026-10-26",kind:"VALIDATION",tone:"neutral",
   title:"Complete A/B export verification and native Rev00 template compatibility",

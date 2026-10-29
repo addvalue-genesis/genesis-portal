@@ -1,3 +1,5 @@
+import {selectB3SelectedSatSurveyPrice0553} from "./b3SelectedSatSurveyPrice0553";
+import {selectB9ChinaWorkingBudget0553} from "./b9ChinaWorkingBudget0553";
 // PJ2608-0553 B14 — ADDVALUE PERSONNEL ONLY.
 // 4 management roles; SAT / offshore roster limited to Senior Telecom
 // Technician and Chief Telecom Technician per management instruction.
@@ -45,5 +47,38 @@ export function selectAddvalueB14Insurance0553(){
   managementBudgetOnly:true,workingSellPosted:false,verifiedInsuranceQuoteTHB:null,
   excludesSAMTELBond:true,customerReleaseAllowed:false,
   warnings:["Generic annual accident product cannot be used for offshore oil/gas work without explicit endorsement and insurer confirmation.","4-person group PA may be under minimum policy size; require insurer offer or existing ADDVALUE policy.","B9 two-person China yard roster is provisional; do not charge all four roles for offshore visits."]
+ });
+}
+
+// Current review, independent of the Rev05 historical allowance above. No rate invented.
+export function selectAddvalueServiceInsurancePlan0553(){
+ const sat=selectB3SelectedSatSurveyPrice0553(),yard=selectB9ChinaWorkingBudget0553();
+ const existing=yard.rows.filter(x=>/INSURANCE/.test(x.id)&&x.qty>0).map(x=>({
+  id:x.id,sourceModuleId:x.moduleId,costOwner:x.costOwner,allowanceTHB:x.workingSellTHB,
+  verifiedPremium:false,additionalB14PostingAllowed:false
+ }));
+ const coverages=[
+  {id:"AV-EMPLOYER",name:"Workmen compensation / employers liability",costOwner:"B14",basis:"ADDVALUE employees during workshop FAT/training, China yard and offshore technical work",gate:"Check existing employer policy, overseas territory and occupational coverage",sourceUrl:"https://www.chubb.com/th-th/business/workmen-compensation-employer-liability.html"},
+  {id:"AV-MEDICAL",name:"Work accident / medical / evacuation and repatriation",costOwner:"B14",basis:"Offshore SAT personnel plus overseas technical assignments",gate:"Explicit offshore oil/gas, technical work, emergency evacuation and destinations endorsement; do not assume ordinary travel cover",sourceUrl:"https://www.chubb.com/th-en/business/onshore-offshore-liability-insurance.html"},
+  {id:"AV-LIABILITY",name:"Public / offshore contractors liability",costOwner:"B14",basis:"Third-party bodily injury, existing customer property and contract liability during ADDVALUE services",gate:"Check limits, deductibles, additional insured, waiver/subrogation and contractual indemnities against actual subcontract",sourceUrl:"https://www.chubb.com/th-en/business/onshore-offshore-liability-insurance.html"},
+  {id:"AV-EAR",name:"Erection all risks / testing and commissioning",costOwner:"B14 gap only",basis:"Equipment in ADDVALUE care during integration, testing and commissioning",gate:"Confirm EPC/SAMTEL master policy names ADDVALUE and covers these phases before buying only uncovered scope",sourceUrl:"https://www.msig-thai.com/en/business-insurance/erection-all-risks-insurance"},
+  {id:"AV-CUSTODY",name:"Workshop / storage property and care-custody-control",costOwner:"B14 gap only",basis:"Goods held for assembly, FAT, training and storage at SAMTEL Warehouse",gate:"Confirm stock ownership, values, storage period and SAMTEL property policy; check care-custody-control terms and gaps before buying cover",sourceUrl:"https://www.chubb.com/th-th/business/contract-works-insurance.html"},
+  {id:"AV-PI",name:"Professional indemnity / errors and omissions",costOwner:"B14 if required",basis:"ADDVALUE engineering, design, configuration and systems integration liability",gate:"Confirm contract requirement and existing professional indemnity; request insurer limits and exclusions",sourceUrl:"https://www.chubb.com/th-en/business/professional-indemnity-insurance.html"},
+  {id:"AV-CARGO",name:"Marine / transit cargo",costOwner:"B6",basis:"Goods during import/export and agreed transport legs",gate:"Keep existing CIF Zhuhai source; do not change to CIP or add duplicate cargo premium in B14",sourceUrl:"https://iccwbo.org/business-solutions/incoterms-rules/incoterms-2020/"},
+  {id:"AV-BOND",name:"Performance / advance-payment / warranty guarantees",costOwner:"SAMTEL; ADDVALUE only if subcontract requires",basis:"Bank guarantee obligation is separate from insurance premium",gate:"SAMTEL resale markup reported as 10% is not evidence of ADDVALUE guarantee duty, bank fee or insurance coverage",sourceUrl:null}
+ ].map(x=>Object.freeze({...x,requiredByVerifiedContract:false,verifiedPremiumTHB:null,additionalPostingTHB:null,status:"COVERAGE_AND_QUOTATION_REVIEW_REQUIRED"}));
+ return Object.freeze({owner:"ADDVALUE",decisionSource:"Owner instruction 2026-10-29",
+  sourceModuleId:"bid.budget.working.bc.b14",quoteRequired:true,
+  samtelReportedResaleMarkupPct:10,resaleMarkupIsInsurancePremium:false,
+  currentDeployment:Object.freeze({satTeamDays:sat.satTeamDays,satCrew:sat.satRoleRates.length,
+   satWorkingPersonDays:sat.satPersonDays,yardWorkDays:yard.selectedYardWorkingDays,
+   yardTravelDays:yard.selectedYardTravelDays,yardCrew:yard.yardCallOutCrew,
+   yardWorkAndTravelPersonDays:yard.yardCallOutCrew*(yard.selectedYardWorkingDays+yard.selectedYardTravelDays),
+   deploymentConfirmed:false,insuredCalendarDays:null}),
+  coverages:Object.freeze(coverages),existingAllowances:Object.freeze(existing),
+  existingNonAdditiveAllowanceTHB:R(existing.reduce((n,x)=>n+x.allowanceTHB,0)),
+  additionalB14BudgetTHB:null,verifiedPremiumTHB:null,customerReleaseAllowed:false,
+  pricingRule:"B14 additional cost = quoted project premium + attributable policy extensions/fees - confirmed existing coverage credits; reconcile B3/B9 once, without subtracting unlike Working SELL from insurer cost. Bond face value and refundable collateral are not expenses.",
+  pendingInputs:Object.freeze(["ADDVALUE subcontract insurance/indemnity/bond clauses","Existing ADDVALUE and EPC/SAMTEL policy schedules and deductibles","Insurer confirmation for Thailand, China yard and Myanmar offshore work","Insured values/limits, calendar dates, crew roster and broker quote","Reconcile existing B3/B9 allowances before any B14 posting"])
  });
 }

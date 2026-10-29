@@ -67,10 +67,16 @@ function allocateAnnex(rows,target){
  });
 }
 export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_0553){
- const line=(r,thb)=>({code:r.code,description:descriptions[r.code]||r.description,
+ const line=(r,thb)=>{
+  if(r.offerTreatment?.status==="NOT_QUOTED_EXCLUDED"&&Number.isFinite(thb))
+   throw Error(r.code+" excluded offer cannot carry a quoted price");
+  return {code:r.code,description:descriptions[r.code]||r.description,
   serviceText:serviceText(r.serviceCommercialBasis),qty:1,unit:"lot",amountUSD:quoteUsd0553(thb,policy),
+  offerTreatment:r.offerTreatment||null,
+  priceText:r.offerTreatment?.priceText||null,commercialRemark:r.offerTreatment?.remark||"",
   sourceTHB:thb??null,sourceModuleId:r.sourceModuleId||r.moduleId,
-  locations:[...new Set((r.sourceRows||[]).map(x=>x.site).filter(Boolean))].join(", "),mr:r.mr||""});
+  locations:[...new Set((r.sourceRows||[]).map(x=>x.site).filter(Boolean))].join(", "),mr:r.mr||""};
+ };
  const a=source.a.map(r=>line(r,r.previewSellTHB)),b=source.b.map(r=>line(r,r.customerSellTHB)),
   c=source.c.map(r=>{
    const normal=line(r,r.customerSellTHB);
@@ -100,7 +106,8 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
  const document={moduleId:"bid.budget.pricing.official",sourceModuleId:"bid.budget.pricing.release.preview",currency:"USD",
   policy:{...policy},a,b,c,annex,annexTitles,project:"ZAWTIKA DEVELOPMENT PROJECT PHASE 1F",
   totalUSD:known.length?round2(known.reduce((s,r)=>s+r.amountUSD,0)):null,
-  unpriced:[...a,...b].filter(r=>r.amountUSD===null).map(r=>r.code),
+  unpriced:[...a,...b].filter(r=>r.amountUSD===null&&r.offerTreatment?.status!=="NOT_QUOTED_EXCLUDED").map(r=>r.code),
+  excluded:b.filter(r=>r.offerTreatment?.status==="NOT_QUOTED_EXCLUDED").map(r=>r.code),
   unroundedUSD:round2(known.reduce((s,r)=>s+r.sourceTHB/policy.thbPerUsd,0)),
   issued:false};
  return {...document,b10ItemizedAnnex:buildB10OfficialItemizedAnnex0553(document),

@@ -15,7 +15,33 @@ for(const r of [...model.a,...model.b,...model.c]){
  assert.equal(r.amountUSD%100,0);assert(r.amountUSD>=r.sourceTHB/31.5-1e-8);assert(r.amountUSD-r.sourceTHB/31.5<100+1e-8);
 }
 assert.equal(model.totalUSD,[...model.a,...model.b].reduce((n,r)=>n+(r.amountUSD||0),0));
-assert.deepEqual(model.unpriced,['B4','B12','B14']);assert.equal(model.issued,false);
+assert.deepEqual(model.unpriced,['B14']);assert.deepEqual(model.excluded,['B4','B12']);assert.equal(model.issued,false);
+for(const code of ['B4','B12']){
+ const row=source.b.find(x=>x.code===code),official=model.b.find(x=>x.code===code);
+ assert.equal(row.offerTreatment.status,'NOT_QUOTED_EXCLUDED');
+ assert.equal(row.offerTreatment.technicalApplicabilityConfirmed,false);
+ assert.equal(row.customerSellTHB,null);assert.equal(official.amountUSD,null);
+ assert.equal(official.priceText,'N/A');assert.equal(official.commercialRemark,'Not quoted; excluded from this offer.');
+ assert.equal(official.sourceModuleId,'bid.budget.working.bc.'+code.toLowerCase());
+}
+assert.throws(()=>buildOfficialUsdRelease0553({...source,b:source.b.map(r=>r.code==='B4'?{...r,customerSellTHB:0}:r)}),/excluded offer cannot carry a quoted price/);
+const b14=source.b.find(x=>x.code==='B14'),plan=b14.insurancePlan;
+assert.equal(b14.executionOwner,'ADDVALUE');assert.equal(b14.customerSellTHB,null);
+assert.equal(plan.owner,'ADDVALUE');assert.equal(plan.additionalB14BudgetTHB,null);
+assert.equal(plan.verifiedPremiumTHB,null);assert.equal(plan.customerReleaseAllowed,false);
+assert.equal(plan.currentDeployment.satTeamDays,28);assert.equal(plan.currentDeployment.satWorkingPersonDays,56);
+assert.equal(plan.currentDeployment.yardWorkDays,7);assert.equal(plan.currentDeployment.yardTravelDays,2);
+assert.equal(plan.currentDeployment.yardWorkAndTravelPersonDays,18);
+assert.equal(plan.samtelReportedResaleMarkupPct,10);assert.equal(plan.resaleMarkupIsInsurancePremium,false);
+assert.equal(plan.coverages.find(x=>x.id==='AV-CARGO').costOwner,'B6');
+assert(plan.coverages.every(x=>x.verifiedPremiumTHB===null&&x.additionalPostingTHB===null));
+assert(plan.existingAllowances.length>0&&plan.existingAllowances.every(x=>['B3','B9'].includes(x.costOwner)&&!x.additionalB14PostingAllowed));
+assert.equal(plan.existingNonAdditiveAllowanceTHB,plan.existingAllowances.reduce((n,x)=>n+x.allowanceTHB,0));
+const {ScopeBcAnnexDetail0553}=require('../src/project0553/ScopeBcAnnexDetail0553');
+const insuranceHtml=renderToStaticMarkup(React.createElement(ScopeBcAnnexDetail0553,{code:'B14',mode:'working',fx:{thbPerUsd:31.5}}));
+assert(insuranceHtml.includes('Service Insurance Review')&&insuranceHtml.includes('28')&&insuranceHtml.includes('Already inside B3/B9'));
+console.log('PASS B4/B12 exclusions and ADDVALUE B14 coverage review; existing B3/B9 non-additive allowance THB '+plan.existingNonAdditiveAllowanceTHB);
+
 assert.equal(model.b10ItemizedAnnex.rows.length,14);
 assert.equal(model.b10ItemizedAnnex.totalUSD,16200);
 assert.equal(model.b10ItemizedAnnex.customerIssued,false);
@@ -117,7 +143,7 @@ assert(releaseSummaryHtml.includes("PRICE OFFERED — CONDITIONAL BUDGETARY"));
 assert(!releaseSummaryHtml.includes("INCLUDED IN BASE"),"Options must remain excluded from A+B");
 assert(html.includes(model.totalUSD.toLocaleString('en-US',{minimumFractionDigits:2})));
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
-assert(html.includes('B4, B12, B14'));assert(html.includes('USD 1,000 / 800/person/day'));
+assert(html.includes('B4, B12')&&html.includes('Not quoted; excluded from this offer.'));assert(html.includes('USD 1,000 / 800/person/day'));
 for(const [code,amount] of [["C1",97500],["C2",23000]]){
  assert(html.includes('data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"'),
   "Option price reference row must be distinguished from customer quote");
@@ -172,8 +198,10 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
    assert(cell(xml,'E7').includes('<f>SUM(E8:E22)</f><v>4</v>'));
    assert(cell(xml,'B43').includes('subject to buyer approval against original DDP site terms'));
    assert(cell(xml,'G38').includes('<v>'+model.totalUSD+'</v>'));
-   assert(cell(xml,'A38').includes('B4, B12, B14'));
-   for(const r of model.b)assert(cell(xml,'G'+(23+Number(r.code.slice(1)))).includes(r.amountUSD===null?'To be quoted':'<v>'+r.amountUSD+'</v>'));
+   assert(cell(xml,'A38').includes('B4, B12')&&cell(xml,'A38').includes('B14'));
+   for(const row of [27,35]){assert(cell(xml,'F'+row).includes('N/A'));assert(cell(xml,'G'+row).includes('N/A'));assert(cell(xml,'H'+row).includes('Not quoted; excluded from this offer.'));}
+   assert(cell(xml,'H37').includes('ADDVALUE service insurance'));
+   for(const r of model.b)assert(cell(xml,'G'+(23+Number(r.code.slice(1)))).includes(r.amountUSD===null?(r.priceText||'To be quoted'):'<v>'+r.amountUSD+'</v>'));
    assert(cell(xml,'B26').includes('28 working days'));assert(cell(xml,'B32').includes('7 working days + 2 travel days/person'));
    for(const [code,row] of [["C1",41],["C2",42]]){
     const amount=model.otherSpareItemizedAnnex.summaries[code].totalUSD;

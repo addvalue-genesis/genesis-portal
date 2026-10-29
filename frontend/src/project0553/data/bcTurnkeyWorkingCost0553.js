@@ -1,3 +1,4 @@
+import {selectAddvalueServiceInsurancePlan0553} from "./addvalueB14Insurance0553";
 import {BC_EXECUTION_ACTIVITIES_0553} from "./bcExecutionActivities0553";
 // PJ2608-0553 / 10.2 — CANONICAL B/C TURNKEY WORKING COST CONTRACT.
 // Customer scope codes are governed by the native 4-Scope of Supply workbook.
@@ -56,6 +57,12 @@ const customerRequirements=Object.freeze({
  B14:"Commercial bonds and insurance under the contract",
  C1:"Capital spares — optional; separate supplier-priced inventory",
  C2:"Two-year normal operation spares — optional; separate supplier-priced inventory"
+});
+// Owner instruction 29-Oct-2026: quotation exclusion is not OEM technical N/A.
+export const BC_OFFER_TREATMENT_0553=Object.freeze({
+ B4:Object.freeze({status:"NOT_QUOTED_EXCLUDED",priceText:"N/A",remark:"Not quoted; excluded from this offer.",source:"Owner instruction 2026-10-29",technicalApplicabilityConfirmed:false}),
+ B12:Object.freeze({status:"NOT_QUOTED_EXCLUDED",priceText:"N/A",remark:"Not quoted; excluded from this offer.",source:"Owner instruction 2026-10-29",technicalApplicabilityConfirmed:false}),
+ B14:Object.freeze({status:"ADDVALUE_INSURANCE_QUOTE_REQUIRED",priceText:"To be quoted",remark:"ADDVALUE service insurance; scope and premium to be confirmed. SAMTEL bonds excluded.",source:"Owner instruction 2026-10-29",costOwner:"ADDVALUE",samtelReportedResaleMarkupPct:10,resaleMarkupIsInsurancePremium:false})
 });
 const round=x=>Math.round((x+Number.EPSILON)*100)/100;
 // A management-approved execution location is NOT a verified logistics rate.
@@ -173,8 +180,11 @@ export function selectBcTurnkeyWorkingCost0553(){
    routeSourceModules:route.source.slice(),
    costOwnerModule:"bid.budget.working.bc",
    contractOwner:"SAMTEL",
+   budgetOwner:code==="B14"?"ADDVALUE":w.owner,
+   offerTreatment:BC_OFFER_TREATMENT_0553[code]||null,
+   insurancePlan:code==="B14"?selectAddvalueServiceInsurancePlan0553():null,
    turnkeyEstimator:"ADDVALUE_FOR_SAMTEL",
-   executionOwner:w.owner, // Execution responsibility never excludes turnkey scope.
+   executionOwner:code==="B14"?"ADDVALUE":w.owner, // Execution responsibility never excludes turnkey scope.
    qtyDriver:code==="B7"?b7StorageMonths:code==="B9"||code==="B3"||code==="B1"||code==="B2"||code==="B8"?1:w.qty,unit:code==="B1"?"LS (internal B1.1–B1.8 resource-cost estimate; customer Engineering & Design 1 Lot)":code==="B2"?"LS (131 VDRL work objects from 143 MR Table 11 obligations; provisional role MH/rate)":code==="B8"?"LS (4 systems / 8 trainees / 1 teaching +1 reserve day; owner-selected OEM online blocks + ADDVALUE Senior onsite practical facilitator)":code==="B9"?"LS (B9 Senior + Field Technician 2-person Yard package, 7 workdays + 2 travel days each; physical call-out only)":code==="B3"?"LS (ADDVALUE SAMTEL preparation/FAT/hosting/tools + 28d SAT/SIT (Senior USD1000/MD + Specialist USD800/MD) + 3d BF Survey + 2d Survey travel + VeEX)":w.unit,equations:w.equations||[],basis:code==="B6"?"Existing physical route allowances plus owner24-Oct import/export administration replacement; cost30000/20000 at service factor1.10; new internal mixed-envelope split, physical adequacy open":code==="B7"?"Conditional 1-month incremental storage reserve, excluded from B5 packing-only sell":code==="B8"?"Owner-selected BASE BID: OEM ONLINE + ADDVALUE onsite; B8 one teaching +one reserve day four-MR hybrid at SAMTEL Warehouse before FAT: onsite Senior USD700/MD × (1 teaching +1 reserve) plus 1 content-prep day; four OEM online half-day blocks USD400 each across six product families, handouts/AV and training catering; former demo allowances20000 moved to B3; Historical shared China travel THB85100 was already excluded from B8; no further credit; planned training and FAT person-days do not overlap":code==="B9"?"B9 Base 1 LS includes paid Senior USD700/MD + Field Tech USD600/MD for unchanged 7+2 Yard days/person plus two-person allowances; execution requires written request; CCL Item31 remains 18 Yard / 45 Offshore days with scope gap; B3 owns FAT Witness":code==="B3"?"B3 ADDVALUE SAMTEL lump sum: 4 preparation days, FAT2+1 including closeout/retest, shared9-day facility/tools, meals and remote OEM FAT support; B8 training days separate; SAT28, BF3+2 and VeEX unchanged; MGW equipment only":code==="B1"?"Current B1 includes role-based PMO and Myanmar import/operational services, official fee allowance and reserves; filing overlap removed; legacy 27 WBS engineering/964MH prices NOT carried; engineering technical owner review nonposting":code==="B2"?"B2 First Principles: 131 unique VDRL work objects / selected 963.76 MH / historical rate cost proxy × planning load 1.20 ÷ (1-0.20 GM); conditional review and missing inputs OPEN":w.driver,
    sourceRevision:(code==="B1"||code==="B6")?"Owner24-Oct approved three-stage operations / source replacement, unverified planning cost":code==="B2"?"B2 FIRST PRINCIPLES REPRICE 2026-10-21 (provisional); VDRL Rev00a source quantities and 2026 planning load/margin":(code==="B1"||code==="B3"||code==="B9")?"Rev.K 2026-10-18 current FAT ownership + Rev05 source bridge":code==="B8"?"B8 2026-10-22 first principles 4-MR hybrid training; Rev05 44MH historical audit":PART_BC_WBS_SOURCE_0553.revision,
    sourceUrl:code==="B2"?b2Recalculated.sourceUrl:PART_BC_WBS_SOURCE_0553.url,

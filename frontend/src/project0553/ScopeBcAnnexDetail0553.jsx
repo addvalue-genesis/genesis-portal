@@ -5,7 +5,7 @@ import {selectUnifiedSpareConsumables0553} from "./data/unifiedSpareConsumables0
 import {selectSpareCoverageEngineering0553} from "./data/spareCoverageEngineering0553";
 import {selectSpareCustomerSchedule0553} from "./data/spareCustomerSchedule0553";
 import {selectDocumentSpareObligations0553} from "./data/documentSpareObligations0553";
-import {selectAddvalueB14Insurance0553} from "./data/addvalueB14Insurance0553";
+import {selectAddvalueB14Insurance0553,selectAddvalueServiceInsurancePlan0553} from "./data/addvalueB14Insurance0553";
 import {selectB1RegulatoryCost0553} from "./data/b1RegulatoryCost0553";
 import {selectSatToolReadiness0553} from "./data/satToolReadiness0553";
 import {selectSpareEngineeringReconciliation0553} from "./data/spareEngineeringReconciliation0553";
@@ -24,6 +24,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
  const shared=selectUnifiedSpareConsumables0553();
  const customerSchedule=selectSpareCustomerSchedule0553();
  const documentObligations=selectDocumentSpareObligations0553();
+ const insurancePlan=code==="B14"?selectAddvalueServiceInsurancePlan0553():null;
  const addvalueInsurance=code==="B14"?selectAddvalueB14Insurance0553():null;
  const b1Regulatory=code==="B1"?selectB1RegulatoryCost0553():null;
  const satToolReadiness=code==="B3"?selectSatToolReadiness0553():null;
@@ -158,7 +159,17 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    <p className="p55-note"><strong>Ledger policy:</strong> No automatic posting. Existing RF Explorer PO is not a new purchase cost; OEM-included ORGA purge/programming kits require confirmation in the current MGW offer. Rental, calibration, marine vessel and travel costs require evidence and explicit owner allocation.</p>
   </div>}
   {code==="B14"&&<div className="p55-panel" style={{padding:12}}>
-   <h4>ADDVALUE — Personnel &amp; Work-Related Insurance Budget (B14)</h4>
+   <h4>ADDVALUE — Service Insurance Review and Budget (B14)</h4>
+   <p className="p55-note"><strong>Owner instruction 29-Oct-2026:</strong> B14 is ADDVALUE service insurance. SAMTEL reported resale markup 10% is separate from ADDVALUE premiums, coverage and bank guarantees. <strong>Additional B14 budget: quotation required.</strong></p>
+   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
+    <thead><tr><th>Cover to review</th><th>Single cost owner</th><th>Exposure</th><th>Evidence needed before pricing</th></tr></thead>
+    <tbody>{insurancePlan.coverages.map(x=><tr key={x.id}><td>{x.name}</td><td>{x.costOwner}</td><td>{x.basis}</td><td>{x.gate}<small>Additional premium: to be quoted</small></td></tr>)}</tbody>
+   </table></div>
+   <p className="p55-note"><strong>Current service source:</strong> SAT {insurancePlan.currentDeployment.satTeamDays} team working days / {insurancePlan.currentDeployment.satWorkingPersonDays} person-days; Yard {insurancePlan.currentDeployment.yardWorkDays} working + {insurancePlan.currentDeployment.yardTravelDays} travel days × {insurancePlan.currentDeployment.yardCrew} persons. Policy calendar dates and mobilisation remain unconfirmed.</p>
+   <p className="p55-note"><strong>Already inside B3/B9:</strong> {insurancePlan.existingAllowances.map(x=>x.id+" "+thb(x.allowanceTHB)).join("; ")}. Total {thb(insurancePlan.existingNonAdditiveAllowanceTHB)} is an existing Working SELL allowance, not verified premium and not a second B14 posting.</p>
+   <p className="p55-note">{insurancePlan.pricingRule}</p>
+   <p className="p55-note"><strong>Required inputs:</strong> {insurancePlan.pendingInputs.join("; ")}.</p>
+   <details><summary>Historical Rev05 personnel allowance — not the current deployment or a selected price</summary>
    <p className="p55-note"><strong>ADDVALUE only:</strong> no SAMTEL bond, bank guarantee or EPC master insurance is added. Four personnel roles are registered; only Senior Telecom Technician and Chief Telecom Technician are assigned to SAT/offshore for this budget.</p>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Item</th><th>Insurance / Work Scope</th><th>Persons</th><th>Days / Period</th><th>Qty</th><th>Budget Rate THB</th><th>Amount THB</th><th>Evidence / Qualification</th></tr></thead>
@@ -172,6 +183,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    <p className="p55-note"><strong>Four ADDVALUE positions:</strong> {addvalueInsurance.roles.map(x=>x.role).join("; ")}. <strong>SAT offshore team:</strong> {addvalueInsurance.offshoreSATCrew.join(" + ")}. Offshore {addvalueInsurance.b3OffshoreWorkingPersonDays} person-days; provisional China Yard {addvalueInsurance.b9ChinaProvisionalPersonDays} person-days (actual travelers pending).</p>
    <p className="p55-note"><strong>Safety/coverage gate:</strong> General PA and travel insurance can EXCLUDE offshore oil/gas work. The offshore rate is a management allowance only, NOT evidence that the worker is insured. Obtain a policy explicitly covering offshore telecom work, medical treatment and evacuation before mobilization. Existing company policies and any EPC coverage must be deducted to avoid duplication.</p>
    <p className="p55-note">Original Rev08 B14 {thb(p.historicalReferenceTHB)} remains a separate summary-only SAMTEL bond/insurance reference. It is NOT added to the ADDVALUE-only allowance.</p>
+   </details>
   </div>}
   {["B10","B11","B13","C1","C2"].includes(code)&&<details className="p55-panel" open={code==="C1"||code==="B10"} style={{padding:12}}>
    <summary><strong>02 Document-Driven Quantity Basis → 10.2 {code}</strong> · MR0001–0004 (not an additional price)</summary>

@@ -75,7 +75,9 @@ export function ReleaseSourceNavigator0553({model,onOpenSource}){
              → WS-B3 purchased services {currency(row.mgwPurchasedServicesSellIncludedTHB)};
              SAMTEL purchased cost share {currency(row.samTelPurchased20PctCostShareTHB)}
              counted ONCE · CP-B3 HOLD</div>}
-           <div>Commercial owner: {group.part==="a"?"10.1 Equipment":row.code+" selected Working Owner"}</div>
+           <div>Commercial owner: {group.part==="a"?"10.1 Equipment":row.executionOwner||row.code+" selected Working Owner"}</div>
+           {row.offerTreatment&&<div>{row.offerTreatment.priceText} — {row.offerTreatment.remark}</div>}
+           {row.insurancePlan&&<div>ADDVALUE coverage review: {row.insurancePlan.coverages.map(x=>x.name+" / "+x.costOwner).join("; ")}. Additional premium not established; existing B3/B9 insurance allowances are non-additive.</div>}
            <div>Preview: {currency(itemPrice(group.part,row))} · {group.part==="c"?"OPTIONAL / not included in Base":group.part==="a"?"Provisional Equipment":"B Working SELL passed unchanged"}</div>
           </div>
          </details>
@@ -90,7 +92,7 @@ export function ReleaseSourceNavigator0553({model,onOpenSource}){
          </span>
         </td>
         <td className="is-number">{currency(itemCost(group.part,row))}</td>
-        <td className="is-number"><strong>{currency(itemPrice(group.part,row))}</strong></td>
+        <td className="is-number"><strong>{row.offerTreatment?.priceText&&!Number.isFinite(itemPrice(group.part,row))?row.offerTreatment.priceText:currency(itemPrice(group.part,row))}</strong></td>
         <td><small>{group.part==="c"?"OPTION · HOLD":"PREVIEW · HOLD"}</small></td>
        </tr>;
       })}

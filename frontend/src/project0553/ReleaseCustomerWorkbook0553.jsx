@@ -98,7 +98,7 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const bWorkingTotal=model.summary.bProvisionalCustomerSellTHB;
  const provisionalBase=addKnown(model.summary.aProvisionalCustomerSellTHB,bWorkingTotal);
  const fullBaseReady=model.sourceCoverage.aReady&&model.sourceCoverage.bSellReady;
- const unpricedB=model.b.filter(r=>!Number.isFinite(r.customerSellTHB)).map(r=>r.code).join(", ");
+ const unpricedB=model.b.filter(r=>!Number.isFinite(r.customerSellTHB)&&r.offerTreatment?.status!=="NOT_QUOTED_EXCLUDED").map(r=>r.code).join(", ");
  const workingBudgetaryOwners=new Set(["B10","B11","B13"]);
  const tagCount=model.a.reduce((n,p)=>n+p.sourceRows.length,0);
  const isOverOriginalCapacity=tagCount>15;
@@ -285,15 +285,15 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
           {line?.executionActivities&&<small className="p553-release-activity-text">{line.executionActivities.releaseText}</small>}
           {line?.serviceCommercialBasis&&<ServiceCommercialBasis0553 basis={line.serviceCommercialBasis} compact/>}
          </td>
-         <td>1 lot</td><td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
-         <td className="p553-price-cell">{money(line?.customerSellTHB)}</td>
-         <td>{workingBudgetaryOwners.has(id)?<>
+         <td>1 lot</td><td className="p553-price-cell">{line?.offerTreatment?.priceText&&!Number.isFinite(line?.customerSellTHB)?line.offerTreatment.priceText:money(line?.customerSellTHB)}</td>
+         <td className="p553-price-cell">{line?.offerTreatment?.priceText&&!Number.isFinite(line?.customerSellTHB)?line.offerTreatment.priceText:money(line?.customerSellTHB)}</td>
+         <td>{line?.offerTreatment?.remark|| (workingBudgetaryOwners.has(id)?<>
  <span>refer to Annex {id}</span>
  <small>2026 PTTEP FIRST-PRINCIPLES PARAMETRIC · OEM SPIR / rate and DDP not verified</small>
  {internal&&<button type="button" className="p553-detail-button"
   onClick={()=>setSheet(WORKSHEETS.find(([,code])=>code===id)?.[0]||sheet)}>↗ {id} Annex</button>}
  </>:id==="B12"?"refer to Annex B12":
- line?.executionConditional&&internal?"Quoted in Base · attendance on written call-out":line?.conditional&&internal?"Conditional — verify before release":""}</td>
+ line?.executionConditional&&internal?"Quoted in Base · attendance on written call-out":line?.conditional&&internal?"Conditional — verify before release":"")}</td>
         </tr>
         {internal&&id==="B3"&&line?.b3GroupTrace&&<tr className="p553-drilldown-only"
          data-component-key="bid.budget.pricing.release.b3.group-trace"><td colSpan={8}>
