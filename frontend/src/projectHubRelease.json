@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-29.11-preview",
+  "version": "2026-10-29.12-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "source0550": "628133c2482160630b6fa9e9dc17fa20cf89dac1",
-  "capability": "0550 MGW detailed-price Working packages + direct/cross currency conversion + preserved vendor decisions and frozen history"
+  "capability": "0550 visible known Working prices in summary, with missing counts and native currencies; complete and Official totals retain readiness controls"
 }
