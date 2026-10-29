@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict'),path=require('node:path'),babel=require('@babel/core');
+const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];require.extensions['.js']=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}]]}).code,f):old(m,f);
+const D=require(root+'/project0550/data.js'),W=require(root+'/project0550/data/bidWorkspaceModel.js'),R=require(root+'/project0550/data/repositoryBidBasis0550.js'),V=require(root+'/project0550/data/legacyVendorBasis0550.js'),M=require(root+'/project0550/data/mrWorkingBasis0550.js'),G=require(root+'/project0550/data/mgwVendorBasis0550.js'),I=require(root+'/project0550/data/integrationWorkspace0550.js'),F=require(root+'/project0550/data/releaseIssue0550.js');
+const repo={meta:D.DATA_LAYER_META,budgetaryEstimate:D.BUDGETARY_ESTIMATE},today='2026-10-29',clone=x=>JSON.parse(JSON.stringify(x));
+let d=W.emptyBidWorkspace(repo.meta.datasetId);d=V.importLegacyVendorBasis0550(d,{...repo,commercialSources:D.COMMERCIAL_SOURCES,commercialPolicy:D.COMMERCIAL_POLICY},today);d=G.importMgwVendorBasis0550(M.importMrWorkingBasis0550(d,D.COMMERCIAL_POLICY,today),today);
+const before=clone(d),p=R.prepareRepositoryBidBasis0550(d,repo,today);
+assert.deepEqual(d,before);assert.equal(p.fx.thbPerUSD,33.6335);assert.equal(p.fx.date,'2026-10-08');assert.equal(p.fx.thbPerEUR,null);assert(p.fx.source.includes('historical planning'));assert.equal(R.prepareRepositoryBidBasis0550(p,repo,today),p);
+for(const key of ['lines','vendors','offers','calculations','nodes','edges','audit','releaseRegister'])assert.deepEqual(p[key],before[key]);
+assert.equal(p.lines.filter(l=>l.mrRequirementId).length,264);assert.equal(p.offers.length,139);W.validateBidWorkspace(p,repo.meta.datasetId,D.SYSTEMS.map(s=>s.token));
+let model=W.deriveBidWorkspace(p,D.SYSTEMS.map(s=>s.token),today,I.deriveIntegration0550(p,D.SYSTEMS,today));
+assert(model.provisional.knownUSD>0);assert.equal(model.provisional.baseUSD,null);assert.equal(model.official.baseUSD,null);assert.equal(model.official.releaseAllowed,false);assert(model.lines.filter(l=>l.systemToken==='TEL-PAGA'&&l.selected).every(l=>l.customerUSD===null),'No invented EUR conversion');
+const cleared={...p,fx:before.fx};assert.equal(R.prepareRepositoryBidBasis0550(cleared,repo,today),cleared,'Intentional later clearing is preserved');
+for(const fx of [{...before.fx,source:'User incomplete basis'},{...before.fx,thbPerUSD:35.42},{thbPerUSD:35.42,thbPerEUR:40,date:today,source:'User basis'}]){const u={...before,fx};assert.deepEqual(R.prepareRepositoryBidBasis0550(u,repo,today).fx,fx,'Never replace partial or complete saved FX');}
+assert.throws(()=>R.prepareRepositoryBidBasis0550(before,{...repo,meta:{...repo.meta,projectCode:'PJ2608-0553'}},today),/mismatch/);
+const future=R.prepareRepositoryBidBasis0550(before,{...repo,meta:{...repo.meta,snapshotDate:'2027-01-01'}},today);assert.deepEqual(future.fx,before.fx);
+assert.equal(F.releaseBasisKey0550(p),F.releaseBasisKey0550({...p,repositoryBasisImport:undefined}),'Administrative marker alone cannot invalidate a frozen price basis');
+console.log('PASS repository pricing preparation: actual GitHub MR264/Offer139, inherited historical USD FX and original date, known draft USD prices, EUR and full project remain OPEN, idempotent/nonmutating, user FX/edits/history preserved, future/foreign source rejected.');

@@ -8,7 +8,7 @@ import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
 import {validateReleaseRegister0550} from "./releaseIssue0550";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
-export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister"];
+export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport"];
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
 export function newId(prefix){
@@ -53,6 +53,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  if(data.mrWorkingImport!==undefined){const r=data.mrWorkingImport;fields(r,["version","date","importedLineIds","conflicts"]);string(r.version,"MR import version",100);date(r.date,"MR import date");for(const key of ["importedLineIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>100))fail("Invalid MR import list");}}
  if(data.sourceIntake!==undefined)validateSourceIntake(data.sourceIntake,systems);
  if(data.deviationRelease!==undefined){const r=data.deviationRelease;fields(r,["projectNo","project","requisition","description","vendor"]);for(const k of ["projectNo","project","requisition","description","vendor"])string(r[k],"deviation release "+k,4000);}
+ if(data.repositoryBasisImport!==undefined){const r=data.repositoryBasisImport;fields(r,["version","snapshotId","preparedOn","fxInherited"]);string(r.version,"repository preparation version",100);if(r.snapshotId!==snapshotId||typeof r.fxInherited!=="boolean")fail("Invalid repository preparation");date(r.preparedOn,"repository preparation date");}
  validateIntegration0550(data);
  validateReleaseRegister0550(data,snapshot=>validateBidWorkspace(snapshot,snapshotId,systems));
  return data;

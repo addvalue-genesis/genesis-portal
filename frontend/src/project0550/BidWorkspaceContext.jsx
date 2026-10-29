@@ -10,6 +10,7 @@ import {fetchAutomaticSource,selectAutomaticSource,sourceLoadMessage} from "./da
 import {importLegacyVendorBasis0550} from "./data/legacyVendorBasis0550";
 import {workspaceDiagnostic0550} from "./data/workspaceRecovery0550";
 import {deriveReleaseControl0550,mergeReleaseRegister0550} from "./data/releaseIssue0550";
+import {prepareRepositoryBidBasis0550} from "./data/repositoryBidBasis0550";
 const Context=createContext(null);
 export const useBidWorkspace=()=>useContext(Context);
 export function downloadBidFile(data,name){const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=document.createElement("a");a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
@@ -24,8 +25,9 @@ export function BidWorkspaceProvider({children}){
    const vendorPrepared=importLegacyVendorBasis0550(current,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},reviewDate);
    const mrPrepared=importMrWorkingBasis0550(vendorPrepared,COMMERCIAL_POLICY,reviewDate);
    const vendorDraft=preparePagaAvlDeviation0550(importMgwVendorBasis0550(mrPrepared,reviewDate));
-   const prepared=prepareSystemAvlDeviations0550(vendorDraft,deriveIntegration0550(vendorDraft,SYSTEMS,reviewDate));
-   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor offers, MR Working requirements and all-system AVL preparation drafts / "+prepared.mgwQuoteImport.version);
+   const avlPrepared=prepareSystemAvlDeviations0550(vendorDraft,deriveIntegration0550(vendorDraft,SYSTEMS,reviewDate));
+   const prepared=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
+   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare repository pricing basis, vendor offers, MR Working requirements and all-system AVL drafts / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    try {

@@ -213,3 +213,13 @@ authorization, append-only frozen issues and separate transmittal evidence. Thes
 controls preserve recorded decisions and commercial snapshots. They do not prove
 actual project engineering completion, authenticate an approver, or transmit a
 proposal. Missing project inputs and approvals remain OPEN.
+
+## 11. Repository pricing preparation checkpoint — 29-Oct-2026
+
+The user directed continued pricing from the JSON/code already in GitHub.
+The [repository preparation checkpoint](../handoff/pj2608-0550/20261029_REPOSITORY_PRICE_PREPARATION.md)
+records one-time carry-forward of the original dated planning FX into wholly blank
+FX fields, preserving saved values and deliberate later edits. Working and draft
+Release continue from the canonical repository basis without requiring a browser
+backup. Missing actual inputs and engineering/commercial acceptance remain OPEN;
+source availability is not equivalent to a complete authorized project price.

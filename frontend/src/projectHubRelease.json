@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-29.9-preview",
+  "version": "2026-10-29.10-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "a4fa70a67a10b7941cbd8b99c283db1b95b2c605",
-  "capability": "0550 all-system AVL + controlled commercial issue / frozen history / transmittal evidence + E06 day and schematic review controls + SI import / workspace recovery"
+  "source0550": "c5948a228a44fa22f9b1e876f0c1cfbe4bf2f1f2",
+  "capability": "0550 repository JSON bid preparation / historical FX carry-forward + all-system AVL + controlled commercial issue / frozen history"
 }
