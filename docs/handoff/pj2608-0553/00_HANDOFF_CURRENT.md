@@ -507,3 +507,9 @@ This audit is additive and controls where it is more specific than earlier histo
 - SI144h are six new estimator decision packages with unapproved RACI, using existing PM salary90k as a clearly labelled SI cost proxy. Do not present as a verified engineer rate or complete approved engineering scope. B2 already has963.76 MH/131 objects; all six packages need per-deliverable overlap checks with B2/A/OEM/B3/B9. Do not restore old964-MH B1 price.
 - Existing Myanmar package Cost200k including96250 reserve remains once. Instrument Wireless Gateway/Antenna extra price stays NULL, and the earlier illustrative USD1600 is not added. Partner quote/models/quantities/serials/actual fee and validity period remain open. No assumption that reserves are all free.
 - New model sensitivity/invalid inputs/nonmutation and existing B1 role/accordion validators passed; Official/native USD XLSX passed; production webpack passed with3 standard bundle warnings. Interactive browser QA could not run: Chromium absent and browser download returned invalid ZIP; server-rendered panel passed. No merge or customer issue.
+
+
+### 30-Oct-2026 follow-up — Instrument licence allowance THB100,000
+- Owner requested approximately THB100,000 for the new Instrument licence. Assistant explicitly interpreted this as incremental provisional SELL, replacing the prior illustrativeUSD1600, and recorded it in the existing non-posting B1 review. Actual partner cost/fee/quote remains NULL; no automatic10% uplift or reserve credit.
+- Earlier review Instrument SELL=NULL statements above are superseded. Full-project duration/SI cases remain unselected; Working/Scope/Release/native prices unchanged.
+- Combined6/9/12-month candidate B1 USD23,800/27,400/31,000. Nine-month THB862,675.74 is converted and rounded once; increaseUSD14,000 over original B1USD13,400, potential A+BUSD902,900. Never add separately rounded licenceUSD3200 to baseUSD24300.

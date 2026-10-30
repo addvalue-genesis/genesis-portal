@@ -12,6 +12,11 @@ export const B1_LIFECYCLE_REVIEW_0553=Object.freeze({
  meetingsPerQuarter:1,engineeringProxyRole:"PM",
  sourceModuleId:"bid.budget.working.bc.b1.audit.engineering-review",
  authority:"ESTIMATOR_WHAT_IF_NOT_OWNER_SELECTED",postingAllowed:false,
+ instrumentLicenceAllowance:Object.freeze({sellTHB:100000,
+  authority:"USER_SELECTED_INCREMENTAL_SELL_ALLOWANCE_20261030",
+  classification:"PROVISIONAL_SELL_NOT_VERIFIED_COST",currency:"THB",
+  scope:"Additional Myanmar licensing service for Instrument Wireless Gateway and Antenna",
+  replacesIllustrativeUSD:1600,verifiedCostTHB:null,firmPartnerQuote:false}),
  engineering:Object.freeze([
   {id:"SI-01",title:"Cross-system responsibility and technical exception decisions",qty:4,hoursPerUnit:8,boundary:"Four MR decision packages; excludes B2 requirement/document review and OEM design"},
   {id:"SI-02",title:"Integration/interface decisions across the four MR systems",qty:4,hoursPerUnit:8,boundary:"Design authority decisions only; excludes drawing authorship and B9 onsite configuration"},
@@ -55,6 +60,9 @@ export function evaluateB1LifecycleReview0553({months=9,weeklyHours={},regulator
  const candidateCostTHB=round(floorCost+technical.planningCostTHB);
  const currentOfficialUSD=quoteUsd0553(base.baseWorkingSellTHB);
  const candidateOfficialUSD=quoteUsd0553(candidateSellTHB);
+ const instrumentExtraSellTHB=cfg.instrumentLicenceAllowance.sellTHB;
+ const withInstrumentSellTHB=round(candidateSellTHB+instrumentExtraSellTHB);
+ const withInstrumentOfficialUSD=quoteUsd0553(withInstrumentSellTHB);
  const b2=evaluateB2VdrlIndependentScenario0553();
  return {moduleId:cfg.sourceModuleId,months,weeks,support,regulatory,expenses,engineering,
   technical:{...technical,proxy:true,sourceRole:cfg.engineeringProxyRole,ownerVerified:false},
@@ -67,14 +75,17 @@ export function evaluateB1LifecycleReview0553({months=9,weeklyHours={},regulator
   b2SelectedMH:b2.result.selectedB2MH,b2TechnicalAuthorExcludedMH:b2.result.excludedOtherOwnerMH,
   b2SourceUrl:b2.sourceUrl,existingMyanmarExternalCostTHB:expenses.filter(r=>r.id.startsWith("B1-MM-")).reduce((n,r)=>n+r.planningCostTHB,0),
   existingMyanmarReservesCostTHB:expenses.filter(r=>["B1-MM-ADDITIONAL","B1-MM-REWORK"].includes(r.id)).reduce((n,r)=>n+r.planningCostTHB,0),
-  instrumentExtraCostTHB:null,instrumentExtraSellTHB:null,instrumentExtraIncluded:false,
+  instrumentAllowance:cfg.instrumentLicenceAllowance,
+  instrumentExtraCostTHB:null,instrumentExtraSellTHB,instrumentExtraIncluded:true,
+  withInstrumentSellTHB,withInstrumentOfficialUSD,withInstrumentCostTHB:null,
+  withInstrumentDeltaOfficialUSD:withInstrumentOfficialUSD-currentOfficialUSD,
   verifiedDirectCostTHB:null,postingAllowed:false,customerReleaseAllowed:false,selected:false,
   openGates:["Confirm award-to-final-acceptance duration, licensing lead time and extension/warranty support obligations.",
    "Approve weekly role utilisation and actual loaded payroll; the six/nine/twelve month cases are assumptions.",
    "Check every SI decision package against B2's 131 work objects, Part A OEM design and B3/B9 execution before accepting any technical hours.",
    "Replace the PM salary proxy with an agreed SI engineering role rate; 144 hours are new estimator assumptions, not historical 964-MH carry-forward.",
    "Confirm actual meeting/trip counts; this case retains two management person-trips and six room-nights.",
-   "Obtain Myanmar partner quote and model/quantity/serial data for Instrument Wireless Gateway and Antenna. No extra USD1600 is posted.",
+   "Owner selected THB100000 incremental Instrument licence SELL allowance, replacing the illustrative USD1600. Actual cost, partner quotation, models, quantities and serials remain unconfirmed; no automatic posting or claim of firm premium/fee.",
    "Review use of existing THB96250 Myanmar reserves; never treat them as wholly free or automatically add another reserve for the same work.",
    "Check recurring licence/third-party charges and government fees if applicable; existing external package is not proof of validity for every duration."]};
 }

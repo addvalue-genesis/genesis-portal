@@ -1,6 +1,6 @@
 # PJ2608-0553 — B1 full-project budget review, 30-Oct-2026
 
-Status: ESTIMATOR PROPOSAL / NOT SELECTED / NO PRICE POSTING.
+Status: FULL-PROJECT SCENARIO NOT SELECTED / INSTRUMENT INCREMENTAL SELL ALLOWANCE THB100,000 OWNER SELECTED FOR REVIEW / NO PRICE POSTING.
 
 Owner requested a review of all B1 engineering, SI and project management work through licence acquisition and project completion. This is not limited to the new Instrument licence request. Keep existing module IDs, Source → Working → Scope → Release and reverse trace.
 
@@ -50,7 +50,17 @@ The 144 hours are NEW ESTIMATOR ASSUMPTIONS, not approved scope/productivity. Th
 
 ## Instrument and Myanmar reserve treatment
 
-Original Myanmar external package Cost THB 200,000 is included once, comprising agency 78,750, government fee allowance 25,000, additional approval reserve 75,000 and rework reserve 21,250. Total existing reserves THB 96,250 are not all free funds. No extra USD 1,600 Instrument allowance is added here. New Wireless Gateway/Antenna models, quantities, serial numbers, filing requirements and partner quote are unknown. Instrument extra Cost/SELL remain NULL; existing statutory fees, validity periods and third-party charges are not verified for all project durations. Confirm overlap before using a reserve or adding money.
+Original Myanmar external package Cost THB 200,000 is included once, comprising agency 78,750, government fee allowance 25,000, additional approval reserve 75,000 and rework reserve 21,250. Total existing reserves THB 96,250 are not all free funds. The owner subsequently requested THB100,000 for the new Instrument licence. This review explicitly treats it as incremental provisional SELL, replacing the earlier illustrative USD1,600; it does not add a second10% markup or deduct the existing reserves automatically. Actual Instrument cost is NULL. New Wireless Gateway/Antenna models, quantities, serial numbers, filing requirements and partner quote are unknown; existing statutory fees, validity periods and third-party charges are not verified for all project durations. Confirm overlap before using a reserve or adding money.
+
+## Owner-selected additional Instrument allowance — THB100,000 SELL
+
+| Assumed months | Base + SI candidate SELL / THB | With Instrument SELL / THB | Combined B1 / USD | Increase over current B1 / USD |
+|---|---:|---:|---:|---:|
+| 6 | 649,245.35 | 749,245.35 | 23,800 | 10,400 |
+| 9 | 762,675.74 | 862,675.74 | 27,400 | 14,000 |
+| 12 | 876,106.14 | 976,106.14 | 31,000 | 17,600 |
+
+One B1 THB subtotal is converted at31.50 and rounded up to USD100 once. Do not add a separately rounded USD3,200 licence to an already rounded B1 base. For9 months, USD24,300 + USD3,200 would incorrectly give USD27,500; correct combined comparison is USD27,400. A+B comparison would be888,900 −13,400 +27,400 = USD902,900. This remains a non-posting scenario: duration/SI not selected; the actual total cost including Instrument is unknown. The100k is a SELL allowance, not100k verified cost or official licence fee.
 
 ## Unchanged financial controls
 

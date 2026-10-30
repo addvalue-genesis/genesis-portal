@@ -12,6 +12,8 @@ const cases=[6,9,12].map(months=>evaluate({months}));
 assert.deepEqual(cases.map(m=>m.candidateOfficialUSD),[20700,24300,27900]);
 assert.deepEqual(cases.map(m=>m.supportAndExistingScopeOfficialUSD),[17200,20800,24400]);
 assert.deepEqual(cases.map(m=>m.proposedSupportHours),[481,721.5,962]);
+assert.deepEqual(cases.map(m=>m.withInstrumentOfficialUSD),[23800,27400,31000]);
+assert.deepEqual(cases.map(m=>m.withInstrumentDeltaOfficialUSD),[10400,14000,17600]);
 for(const m of cases){
  assert.equal(m.currentSupportHours,230);
  assert.equal(m.b2SelectedMH,963.76);
@@ -25,12 +27,19 @@ for(const m of cases){
  assert.equal(m.expenses.find(r=>r.id==='B1-MM-GOV').candidateSellTHB,25000);
  assert.equal(m.expenses.find(r=>r.id==='B1-EXP-AIR').qty,2);
  assert.equal(m.expenses.find(r=>r.id==='B1-EXP-HOTEL').qty,6);
- assert.equal(m.instrumentExtraIncluded,false);assert.equal(m.instrumentExtraCostTHB,null);
- assert.equal(m.instrumentExtraSellTHB,null);assert.equal(m.verifiedDirectCostTHB,null);
+ assert.equal(m.instrumentExtraIncluded,true);assert.equal(m.instrumentExtraCostTHB,null);
+ assert.equal(m.instrumentExtraSellTHB,100000);assert.equal(m.verifiedDirectCostTHB,null);
+ assert.equal(m.instrumentAllowance.authority,'USER_SELECTED_INCREMENTAL_SELL_ALLOWANCE_20261030');
+ assert.equal(m.instrumentAllowance.firmPartnerQuote,false);assert.equal(m.withInstrumentCostTHB,null);
+ assert.equal(Math.round((m.withInstrumentSellTHB-m.candidateSellTHB)*100)/100,100000);
  assert.equal(m.postingAllowed,false);assert.equal(m.customerReleaseAllowed,false);assert.equal(m.selected,false);
  assert.equal(m.regulatory.hours,40);
 }
 const nine=cases[1],noTech=evaluate({engineeringHours:0});
+assert.equal(nine.withInstrumentSellTHB,862675.74);
+assert.equal(888900-nine.currentOfficialUSD+nine.withInstrumentOfficialUSD,902900);
+assert.equal(nine.withInstrumentOfficialUSD,Math.ceil(nine.withInstrumentSellTHB/31.5/100-1e-10)*100);
+assert.notEqual(nine.withInstrumentOfficialUSD,nine.candidateOfficialUSD+Math.ceil(100000/31.5/100)*100,'Do not round the licence separately before combining B1');
 assert.equal(noTech.candidateSellTHB,nine.supportAndExistingScopeSellTHB);
 const extraPm=evaluate({weeklyHours:{PM:5}});
 assert.equal(extraPm.support.find(r=>r.key==='PM').hours-nine.support.find(r=>r.key==='PM').hours,39);

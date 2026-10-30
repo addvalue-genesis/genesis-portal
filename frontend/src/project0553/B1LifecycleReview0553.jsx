@@ -16,9 +16,9 @@ export function B1LifecycleReview0553(){
    งาน SI ที่เสนอเพิ่มต้องตรวจผู้รับผิดชอบกับ <a href={m.b2SourceUrl} target="_blank" rel="noreferrer">131 work objects ของ B2</a>,
    A/OEM และ B3/B9 รายกิจกรรมก่อนเลือกใช้</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
-   <thead><tr><th>สมมติฐานระยะเวลา</th><th>PMO + ใบอนุญาตเดิม / USD</th><th>รวม SI 144h ตามอัตราแทน / USD</th><th>เพิ่มจาก B1 เดิม / USD</th></tr></thead>
+   <thead><tr><th>สมมติฐานระยะเวลา</th><th>PMO + ใบอนุญาตเดิม / USD</th><th>รวม SI 144h ตามอัตราแทน / USD</th><th>รวมใบอนุญาต Instrument เพิ่ม THB100,000 / USD</th><th>เพิ่มจาก B1 เดิม / USD</th></tr></thead>
    <tbody>{cases.map(c=><tr key={c.months}><td>{c.months} เดือน</td><td>{money(c.supportAndExistingScopeOfficialUSD)}</td>
-    <td>{money(c.candidateOfficialUSD)}</td><td>{money(c.deltaOfficialUSD)}</td></tr>)}</tbody>
+    <td>{money(c.candidateOfficialUSD)}</td><td>{money(c.withInstrumentOfficialUSD)}</td><td>{money(c.withInstrumentDeltaOfficialUSD)}</td></tr>)}</tbody>
   </table></div>
   <p><label>ดูฐานคำนวณ: <select aria-label="B1 review duration months" value={months} onChange={e=>setMonths(Number(e.target.value))}>
    {B1_LIFECYCLE_REVIEW_0553.durationMonths.map(v=><option key={v} value={v}>{v} เดือน</option>)}</select></label>
@@ -50,9 +50,14 @@ export function B1LifecycleReview0553(){
   <p className="p55-note"><strong>รวมกรณี {months} เดือนพร้อม SI ที่ยังรอตรวจ:</strong> Planning Cost THB {money(m.candidateCostTHB)};
    Candidate SELL THB {money(m.candidateSellTHB)}; Official comparison USD {money(m.candidateOfficialUSD)}.
    ราคา USD ใช้ FX/การปัดเดิม ไม่ใช่ราคาเสนอที่เลือกแล้วหรือกำไรจริง</p>
-  <p className="p55-note"><strong>Instrument Wireless Gateway / Antenna: ยังไม่ตั้งราคาเพิ่มในกรณีนี้.</strong>
+  <p className="p55-note"><strong>Instrument Wireless Gateway / Antenna: เจ้าของเลือกวงเงินเสนอเพิ่ม (SELL) THB {money(m.instrumentExtraSellTHB)}.</strong>
+   แทนวงเงิน USD1600 เดิม เป็น Provisional Allowance; ต้นทุนจริงและราคาบริษัทเมียนมายังไม่ยืนยัน.
    คงแพ็กเกจเมียนมาเดิม Cost THB {money(m.existingMyanmarExternalCostTHB)} รวม reserve THB {money(m.existingMyanmarReservesCostTHB)} เพียงครั้งเดียว.
-   ค่า Instrument/การต่ออายุ/ข้อกำหนดใหม่ต้องตรวจขอบเขตและใบเสนอราคา ห้ามบวก USD1600 เดิมอัตโนมัติ</p>
+   ไม่มีการบวก USD1600 หรือปรับเพิ่ม 10% บน SELL100,000 ซ้ำ</p>
+  <p className="p55-note"><strong>รวม B1 กรณี {months} เดือน + SI + ใบอนุญาตใหม่:</strong> Candidate SELL THB {money(m.withInstrumentSellTHB)};
+   Official comparison USD {money(m.withInstrumentOfficialUSD)}; เพิ่มจาก B1 เดิม USD {money(m.withInstrumentDeltaOfficialUSD)}.
+   รวมยอด THB ก่อนแปลงและปัด USD เพียงครั้งเดียว; ต้นทุนรวมกรณีนี้ยังไม่ทราบเพราะต้นทุนใบอนุญาตเพิ่มยังไม่ยืนยัน.
+   ยังไม่เลือกใช้ราคากรณีระยะเวลาโครงการนี้ใน Working/Release</p>
   <details><summary>ข้อมูลที่ต้องปิดก่อนเลือกราคา B1 ใหม่</summary><ul>{m.openGates.map(s=><li key={s}>{s}</li>)}</ul></details>
  </div>;
 }
