@@ -1,3 +1,5 @@
+> **Dedicated 0550 launch, 30-Oct-2026:** Read [0550-only navigation and port 3050](20261030_DEDICATED_0550_LAUNCH.md), UI `2026-10-30.2-preview`. This branch opens only 0550; other project URLs redirect to it. A/B/C, Module IDs, saved inputs and history are retained. The separate Hub branch still contains older integrated copies.
+
 > **A input controls, 29-Oct-2026:** Read [RFQ expected inputs and shared reading](20261029_A_INPUT_CONTROLS.md), UI `2026-10-29.14-preview`. Existing A now has receipt/version bindings, additional expected inputs, shared document reading and a current A-readiness check. New commercial issues require A readiness; old frozen history remains preserved. This does not declare the actual project corpus complete.
 
 > **Volume II, 29-Oct-2026:** Read [Technical Proposal authoring](20261029_VOLUME_II_TECHNICAL_PROPOSAL.md).

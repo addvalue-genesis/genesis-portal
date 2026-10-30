@@ -54,6 +54,6 @@ module.exports = {
       directory: path.join(__dirname, "public")
     },
     historyApiFallback: true,
-    port: 3000
+    port: 3050
   }
 };
