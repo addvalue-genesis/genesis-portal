@@ -89,7 +89,7 @@ export function ControlledSourceInventory({ navigationTarget }) {
       <SourceReadiness0550 onOpenSource={openSource}/>
       <SourceEvidenceSearch0550 onOpenSource={openSource}/>
       <p>ทะเบียน GDrive / Gmail ที่ตรวจอ่านล่าสุด พร้อมเอกสารย้อนหลังและข้อมูลที่ยังอ่านไม่ครบ</p>
-      <p>โหลดทะเบียนที่ตรวจแล้วจาก Google Drive for Desktop อัตโนมัติเมื่อเปิดโครงการ · ข้อมูลบันทึกใน workspace และ backup · เอกสารต้นฉบับใหม่ยังต้องผ่านการตรวจและอัปเดตทะเบียน</p>
+      <p>เปิดโครงการแล้วโหลดทะเบียน JSON และชุดเตรียม A ที่ตรงกันจาก DATA อัตโนมัติ เข้าสู่ workspace เดียวที่ B ใช้ · เก็บรายการที่คุณแก้ไขไว้ · เอกสารใหม่ยังต้องตรวจอ่านและทบทวนตามเกณฑ์เดิม</p>
       <div className="p55-panel" role="status" aria-label="Source intake loaded status"><p>{sourceSync?.message || "ตรวจทะเบียนจาก Google Drive for Desktop เมื่อเปิดโครงการ"}</p><button type="button" disabled={!data || busy} onClick={reload}>ตรวจข้อมูลจาก Drive อีกครั้ง</button><strong>{intake ? "Batch ที่โหลดอยู่: " + intake.batchId : "ยังไม่ได้โหลดทะเบียนเอกสารล่าสุดใน workspace นี้"}</strong><p>{intake ? `${intake.sources.length} แหล่ง · ${intake.packageComparisons?.length || 0} กลุ่มเปรียบเทียบ` : "เปิด Google Drive for Desktop และรอให้โฟลเดอร์โครงการพร้อมใช้งาน โปรแกรมจะโหลดทะเบียนใน 90_SYSTEM_WORKING/DATA"}</p></div>
       <details><summary>นำเข้าไฟล์ด้วยตนเอง / ทางเลือกสำรอง</summary><label>Import source intake <input aria-label="Import source intake" type="file" accept=".json,application/json" disabled={!data || busy} onChange={e => { preview(e.target.files[0]); e.target.value = ""; }}/></label>
       {error && <p role="alert">{error}</p>}

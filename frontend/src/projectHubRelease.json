@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-30.2-preview",
+  "version": "2026-10-30.3-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "f5cc9a759e7bcb0014d2e642efd86c3fc6557e4b",
-  "capability": "Dedicated 0550 navigation and routes; preserves A linked source preparation, canonical B drafts, financial inputs and history"
+  "source0550": "055ddb00",
+  "capability": "Dedicated 0550 on 3050 with automatic paired JSON source/A preparation into the existing B workspace; preserves local edits/deletions, financial inputs and frozen history"
 }

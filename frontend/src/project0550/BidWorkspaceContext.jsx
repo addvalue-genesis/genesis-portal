@@ -7,7 +7,8 @@ import {importMrWorkingBasis0550} from "./data/mrWorkingBasis0550";
 import React,{createContext,useContext,useEffect,useMemo,useRef,useState} from "react";
 import {loadProject0550Bid,saveProject0550Bid,SYSTEMS,DATA_LAYER_META,BUDGETARY_ESTIMATE,COMMERCIAL_SOURCES,COMMERCIAL_POLICY} from "./data";
 import {deriveBidWorkspace,validateBidWorkspace} from "./data/bidWorkspaceModel";
-import {fetchAutomaticSource,selectAutomaticSource,sourceLoadMessage} from "./data/sourceAutoLoad";
+import {sourceLoadMessage} from "./data/sourceAutoLoad";
+import {fetchAutomaticSourceWorkspace0550,selectAutomaticSourceWorkspace0550} from "./data/sourceWorkspaceAuto0550";
 import {importLegacyVendorBasis0550} from "./data/legacyVendorBasis0550";
 import {workspaceDiagnostic0550} from "./data/workspaceRecovery0550";
 import {deriveReleaseControl0550,mergeReleaseRegister0550} from "./data/releaseIssue0550";
@@ -34,10 +35,11 @@ export function BidWorkspaceProvider({children}){
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    try {
-    const intake=await fetchAutomaticSource(),selected=selectAutomaticSource(current,intake,SYSTEMS.map(s=>s.token));
+    const bundle=await fetchAutomaticSourceWorkspace0550(),intake=bundle.sourceIntake,selected=selectAutomaticSourceWorkspace0550(current,bundle,SYSTEMS.map(s=>s.token));
     const sourced=prepareSystemAvlDeviations0550(selected.workspace,deriveIntegration0550(selected.workspace,SYSTEMS,reviewDate));
-    if(sourced!==current)current=await saveProject0550Bid(sourced,current.revision,"Load source and reconcile system AVL drafts / "+intake.batchId);
-    setData(current);setSourceSync({state:selected.state,message:selected.state==="LOCAL_NEWER"?"ข้อมูลที่บันทึกอยู่ใหม่กว่าชุดบน Drive จึงเก็บข้อมูลเดิมไว้":"โหลดทะเบียนจาก Google Drive for Desktop แล้ว",batchId:current.sourceIntake?.batchId});
+    if(sourced!==current)current=await saveProject0550Bid(sourced,current.revision,"Load canonical source/A preparation and reconcile system AVL drafts / "+intake.batchId);
+    const messages={APPLIED:"โหลดข้อมูล JSON และชุดเตรียม A ให้ B ใช้แล้วอัตโนมัติ",PRESERVED_EDITS:"โหลดชุดเตรียม A แล้ว โดยคงรายการที่คุณแก้ไขไว้",ADOPTED:"ใช้ชุดเตรียม A ที่บันทึกไว้แล้ว โดยคงงานที่แก้ไขและรายการที่ลบไว้",CURRENT:"ข้อมูล JSON และชุดเตรียม A ใน workspace เป็นชุดปัจจุบันแล้ว",NOT_FOUND:"โหลดทะเบียน JSON แล้ว แต่ยังไม่พบชุดเตรียม A ที่ตรงกันใน DATA",LOCAL_NEWER:"ข้อมูลที่บันทึกอยู่ใหม่กว่าชุดบน Drive จึงเก็บข้อมูลเดิมไว้"};
+    setData(current);setSourceSync({state:selected.state,message:messages[selected.preparationState],preparationState:selected.preparationState,preparationStats:selected.stats,batchId:current.sourceIntake?.batchId});
    }catch(e){
     // Another tab can save while Drive is loading. Reload it rather than writing stale data.
     setData(await loadProject0550Bid());

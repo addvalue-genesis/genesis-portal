@@ -3,9 +3,11 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
 const ENDPOINT = '/api/local/pj2608-0550/source-intake';
+const WORKSPACE_ENDPOINT = '/api/local/pj2608-0550/source-workspace';
 const MAX_BYTES = 16 * 1024 * 1024;
 const PROJECT = /^PJ2608-0550(?:[ _-]|$)/;
 const FILENAME = /^PJ2608-0550_Source_Intake_Rev\d+_\d{8}\.json$/;
+const PREPARATION_FILE = /^PJ2608-0550_A_Work_Package_(?:Rev\d+_)?\d{8}\.json$/;
 const batchKey = value => {
   const m = /^PJ2608-0550-SOURCE-INTAKE-REV(\d+)-(\d{8})$/.exec(value || '');
   return m && {revision:Number(m[1]),date:m[2]};
@@ -37,7 +39,7 @@ async function discoverProjects({roots = defaultRoots(), projectDir = process.en
   }
   return [...new Set(projects)];
 }
-async function readCandidate(file) {
+async function readJson(file) {
   const handle=await fs.open(file,'r');
   try {
     const stat=await handle.stat();
@@ -48,12 +50,15 @@ async function readCandidate(file) {
     if(size>MAX_BYTES)throw fail('SOURCE_FILE_TOO_LARGE');
     const body=buffer.subarray(0,size).toString('utf8').replace(/^\uFEFF/,'');
     let intake;try{intake=JSON.parse(body);}catch{throw fail('SOURCE_FILE_INVALID');}
-    const key=batchKey(intake.batchId);
-    if(intake.projectId!=='PJ2608-0550'||intake.schema!=='genesis.0550.source-intake.v1'||!key||intake.reviewedOn?.replace(/-/g,'')!==key.date||!Array.isArray(intake.sources))throw fail('SOURCE_FILE_INVALID');
-    return {body,intake,key,hash:crypto.createHash('sha256').update(body).digest('hex')};
+    return {body,intake,hash:crypto.createHash('sha256').update(body).digest('hex')};
   } finally {await handle.close();}
 }
-async function loadDriveIntake(options) {
+async function readCandidate(file){
+ const result=await readJson(file),{intake}=result,key=batchKey(intake.batchId);
+ if(intake.projectId!=='PJ2608-0550'||intake.schema!=='genesis.0550.source-intake.v1'||!key||intake.reviewedOn?.replace(/-/g,'')!==key.date||!Array.isArray(intake.sources))throw fail('SOURCE_FILE_INVALID');
+ return {...result,key};
+}
+async function selectDriveIntake(options) {
   const projects=await discoverProjects(options),files=[];
   for(const project of projects) {
     const dir=path.join(project,'90_SYSTEM_WORKING','DATA');
@@ -67,7 +72,29 @@ async function loadDriveIntake(options) {
   candidates.sort((a,b)=>b.key.date.localeCompare(a.key.date)||b.key.revision-a.key.revision);
   const latest=candidates[0];
   if(candidates.some(c=>c.intake.batchId===latest.intake.batchId&&c.hash!==latest.hash))throw fail('SOURCE_BATCH_CONFLICT',409);
-  return latest.body;
+  return {latest,projects};
+}
+async function loadDriveIntake(options){return (await selectDriveIntake(options)).latest.body;}
+async function loadDriveSourceWorkspace(options){
+ const {latest,projects}=await selectDriveIntake(options),files=[];
+ for(const project of projects){
+  const dir=path.join(project,'90_SYSTEM_WORKING','DATA');let entries;
+  try{entries=await fs.readdir(dir,{withFileTypes:true});}catch(e){if(e.code==='ENOENT')continue;throw fail('DRIVE_UNREADABLE');}
+  files.push(...entries.filter(e=>e.isFile()&&PREPARATION_FILE.test(e.name)).map(e=>path.join(dir,e.name)));
+ }
+ if(files.length>50)throw fail('A_PREPARATION_FILE_LIMIT');
+ const matches=[];
+ for(const file of files){
+  const row=await readJson(file),p=row.intake;
+  if(p.projectId!=='PJ2608-0550'||p.schema!=='genesis.0550.si-work-package.v2')throw fail('A_PREPARATION_FILE_INVALID');
+  if(p.sourceBatchId!==latest.intake.batchId)continue;
+  if(typeof p.preparedOn!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(p.preparedOn)||!Number.isFinite(Date.parse(p.preparedOn))||new Date(p.preparedOn).toISOString().slice(0,10)!==p.preparedOn)throw fail('A_PREPARATION_FILE_INVALID');
+  matches.push(row);
+ }
+ matches.sort((a,b)=>b.intake.preparedOn.localeCompare(a.intake.preparedOn));
+ const chosen=matches[0];
+ if(chosen&&matches.some(r=>(r.intake.batchId===chosen.intake.batchId||r.intake.preparedOn===chosen.intake.preparedOn)&&r.hash!==chosen.hash))throw fail('A_PREPARATION_CONFLICT',409);
+ return JSON.stringify({schema:'genesis.0550.source-workspace.v1',sourceIntake:latest.intake,aWorkPackage:chosen?.intake||null});
 }
 function permitted(req) {
   if(!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket?.remoteAddress))return false;
@@ -79,17 +106,18 @@ function permitted(req) {
     return true;
   }catch{return false;}
 }
-function createMiddleware(loader=()=>loadDriveIntake()) {
-  let inFlight=null;
+function createMiddleware(loader=()=>loadDriveIntake(),workspaceLoader=()=>loadDriveSourceWorkspace()) {
+  const pending=new Map();
   return async(req,res,next)=>{
-    if(req.url.split('?')[0]!==ENDPOINT)return next();
+    const endpoint=req.url.split('?')[0];
+    if(![ENDPOINT,WORKSPACE_ENDPOINT].includes(endpoint))return next();
     res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('X-Content-Type-Options','nosniff');
     if(!permitted(req)){res.statusCode=403;return res.end(JSON.stringify({code:'LOCAL_ACCESS_ONLY'}));}
     if(req.method!=='GET'){res.statusCode=405;return res.end(JSON.stringify({code:'METHOD_NOT_ALLOWED'}));}
     try {
-      if(!inFlight)inFlight=loader().finally(()=>{inFlight=null;});
-      res.end(await inFlight);
+      if(!pending.has(endpoint))pending.set(endpoint,(endpoint===ENDPOINT?loader:workspaceLoader)().finally(()=>pending.delete(endpoint)));
+      res.end(await pending.get(endpoint));
     }catch(e){res.statusCode=e.status||503;res.end(JSON.stringify({code:e.status?e.code:'DRIVE_UNREADABLE'}));}
   };
 }
-module.exports={ENDPOINT,MAX_BYTES,batchKey,discoverProjects,loadDriveIntake,createMiddleware,permitted};
+module.exports={ENDPOINT,WORKSPACE_ENDPOINT,MAX_BYTES,batchKey,discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,createMiddleware,permitted};

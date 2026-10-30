@@ -1,6 +1,7 @@
 import { validateSourceIntake, applySourceIntake } from './sourceIntakeModel';
 
 export function sourceLoadMessage(code) {
+  if(code.startsWith('A_PREPARATION')||code.startsWith('SI work package:')||code==='SOURCE_WORKSPACE_INVALID')return 'ข้อมูล JSON กับชุดเตรียม A ยังไม่ตรงกันหรือมีชุดซ้ำขัดแย้ง จึงเก็บ workspace เดิมไว้และรอตรวจชุดข้อมูลกลาง';
   if(code==='SOURCE_BATCH_CONFLICT')return 'พบข้อมูลต่างกันภายใต้ Batch เดียวกัน จึงเก็บข้อมูลเดิมไว้และรอตรวจทะเบียน';
   if(['SOURCE_HISTORY_MISSING','SOURCE_LOCAL_REVIEW_REQUIRED','SOURCE_BATCH_INVALID','SOURCE_FILE_INVALID'].includes(code))return 'ทะเบียนบน Drive ยังไม่ผ่านการตรวจความต่อเนื่องหรือรูปแบบ จึงเก็บข้อมูลเดิมไว้';
   if(code==='SOURCE_BRIDGE_UNAVAILABLE')return 'ยังไม่มีบริการอ่าน Drive ในโปรแกรมที่เปิดอยู่ ให้ใช้เวอร์ชันล่าสุดผ่าน npm start บนเครื่องนี้';

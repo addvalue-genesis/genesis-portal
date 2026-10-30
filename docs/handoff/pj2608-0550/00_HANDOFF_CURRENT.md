@@ -75,6 +75,8 @@
 
 # PJ2608-0550 Living Handoff / Current Checkpoint
 
+**30-Oct automatic JSON correction:** [A/B automatic paired JSON](20261030_A_AUTO_JSON.md), UI `2026-10-30.3-preview`. Normal startup loads existing DATA source/preparation directly into the saved canonical workspace. ZIP/manual import is fallback only. Local edits and deletions, pricing and history are preserved; dedicated 0550 / 3050 remains.
+
 **30-Oct A preparation:** [Canonical source search, linked import and native reading](20261030_A_SOURCE_PREPARATION.md), UI `2026-10-30.1-preview`. Private Rev08: 676 sources; linked preparation: 100/107 receipt obligations, 249 reading jobs and 140 clause drafts covering 19 systems plus COMMON. Imported reading/engineering remain DRAFT and actual A stays OPEN; seven exact inputs and TEL018 R00 integrity/applicability remain unresolved. Financial inputs and history preserved.
 
 **Official working update (isolated branch, not deployed):** [Official Tender review and customer form](20261028_OFFICIAL_WORKING.md). HIS-01 / RFQ-02 / OFF-03 / REL-04 separate historical output, current evidence, reviewed working prices and customer draft. No historical price fallback; final issue remains HOLD.

@@ -32,7 +32,7 @@ export function SourceReadiness0550({onOpenSource=()=>{}}){
    <button type="button" disabled={busy||!sources.length} onClick={()=>save(bindUniqueSourceInputs0550,"bind unique exact document/version candidates")}>ผูกเฉพาะเลข/ฉบับที่ตรงและมีต้นฉบับปัจจุบันเดียว</button>
    <button type="button" disabled={busy} onClick={()=>setExtra(blankExtra())}>เพิ่มเอกสารที่ RFQ / เอกสารอ้างอิงกำหนด</button>
    <button type="button" disabled={busy} onClick={()=>setReview({...control.review})}>ทบทวนความครบของ A</button>
-   <button type="button" onClick={()=>onOpenSource("bid.documents.si-work-package")}>นำเข้าชุดเตรียม A / ข้อกำหนดให้ B</button>
+   <button type="button" onClick={()=>onOpenSource("bid.documents.si-work-package")}>ทางเลือกสำรอง: นำเข้าชุดเตรียม A / ข้อกำหนดให้ B</button>
    <button type="button" onClick={()=>downloadBidFile({projectId:data.projectId,revision:data.revision,sourceBatchId:data.sourceIntake?.batchId,state:readiness.state,basisKey:readiness.basisKey,checks:readiness.problems,expectedInputs:readiness.rows.map(({bound,candidates,related,...r})=>({...r,boundSourceIds:bound.map(s=>s.id),candidateSourceIds:candidates.map(s=>s.id),relatedSourceIds:related.map(s=>s.id)}))},`PJ2608-0550_A_Input_Review_R${data.revision}.json`)}>Export A input review</button>
   </div>
   {readiness.problems.length>0&&<p><strong>ยังส่งต่อเป็นฐานที่พร้อมไม่ได้:</strong> {readiness.problems.join(" / ")}</p>}
