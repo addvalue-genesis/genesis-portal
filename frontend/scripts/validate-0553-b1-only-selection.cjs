@@ -33,5 +33,5 @@ assert.equal(selected.roleLines.filter(r=>r.isTechnical).reduce((n,r)=>n+r.qty,0
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const html=renderToStaticMarkup(React.createElement(from('B1WorkingPriceOverview0553.jsx').B1WorkingPriceOverview0553,{workingRow:from('data/bcTurnkeyWorkingCost0553').selectBcTurnkeyWorkingCost0553().byCode.B1}));
 assert(html.includes('862,675.74')&&html.includes('647,996.59')&&html.includes('NOT ESTABLISHED'));
-const pkg=require('../package.json');assert.equal(pkg.scripts['start:0553'],'webpack serve --mode development --port 3053');assert.equal(pkg.scripts.start,'webpack serve --mode development');
+const pkg=require('../package.json');assert.equal(pkg.scripts['start:0553'],'webpack serve --mode development --env project=0553 --port 3053');assert.equal(pkg.scripts.start,'webpack serve --mode development');
 console.log('PASS B1-only selection: every other A/B/C Source and Official row plus annex is byte-equivalent to captured pre-change fingerprints; B1 USD27400 / A+B902900; Instrument SELL100k once with COST null; old source IDs retained; dedicated start:0553 port3053.');

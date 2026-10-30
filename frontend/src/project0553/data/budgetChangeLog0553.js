@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-30-R67";
+export const CHANGE_LOG_VERSION_0553="2026-10-30-R68";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261030-02",date:"2026-10-30",kind:"UI",tone:"neutral",
+  title:"Dedicated0553 workspace on port3053 shows only PJ2608-0553",
+  detail:"start:0553 now builds a dedicated entry with0553-only header and routes. Brand/root/unknown URLs return to0553, and no0550 or Employees page is imported by this entry. Browser title identifies PJ2608-0553. The standard portal entry remains available for other checkouts; no project data or business module IDs are removed. Current B1USD27400, A+BUSD902900 and all other prices remain unchanged.",
+  moduleIds:Object.freeze(["bid.overview","bid.budget.pricing.official"]),priceImpact:"NO_PRICE_CHANGE",
+  source:"Owner30-Oct2026: show only0553 on3053 to avoid project confusion"}),
  Object.freeze({id:"P553-CHANGE-20261030-01",date:"2026-10-30",kind:"PRICE",tone:"neutral",
   title:"Owner selects B1 nine-month lifecycle and Instrument licence allowance; dedicated port3053",
   detail:"Only B1 repriced: Working SELL THB421180→862675.74; Official USD13400→27400; A+B USD888900→902900. Nine-month recurring support replaces old milestone hours, SI144h proxy budget is included and Instrument licence incremental SELL100000 counted once. Total planning COST remains unknown because Instrument cost/partner quote is unconfirmed; known partial planning cost647996.59 is not actual Direct Cost. B2 and all other A/B/C prices, quantities, FX and policies unchanged. Existing B1 module IDs and role source IDs retained. npm run start:0553 opens port3053 without changing other start commands. Schedule, SI RACI/rate and final licence details remain open.",

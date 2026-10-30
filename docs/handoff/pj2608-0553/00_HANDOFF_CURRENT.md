@@ -524,3 +524,11 @@ This audit is additive and controls where it is more specific than earlier histo
 - Regression baseline changes outside B1 are updated aggregate expected totals only, not other item prices. Existing B14/C1/C2 values and exclusions remain locked. No merge or customer issue.
 
 - Final validation for selected B1: all151 validator steps in the152-step build chain checked, updating only stale aggregate/B1 expectations and resuming failed steps; production webpack passed with3 standard bundle warnings. B1-only Source/Official/annex fingerprints pass; original B1 source IDs retained; native THB/USD XLSX passes. Dedicated npm run start:0553 compiled successfully and served http://localhost:3053/projects/pj2608-0553 with HTTP200/browser HTML Accept. Full interactive Chromium QA remains unavailable as previously recorded.
+
+
+### 30-Oct-2026 — Dedicated0553 entry/navigation on3053
+- User screenshot still showed portal Home/0550/Employees links. start:0553 now selects webpack env project=0553 with src/index0553.jsx and App0553.jsx. Only0553 is visible in the header; root,0550,employees and unknown paths redirect to /projects/pj2608-0553. Browser title identifies0553.
+- This dedicated bundle never imports the portal App/Home/Employees/PJ26080550 page. Shared UI/styles remain reused. Default portal entry and other projects are preserved. No business module IDs, prices, quantities or cost policies change; B1USD27400/A+BUSD902900 retained.
+- Commands: npm run start:0553 (3053); npm run build:0553 for the dedicated production entry. Default npm start/build compatibility preserved.
+- New route/header/config isolation validator and existing B1-only fingerprint, project isolation, change-log validators pass. Dedicated webpack module graph and server smoke checks recorded below after completion. Full interactive Chromium QA unavailable as previously recorded.
+- Final dedicated-entry QA: production build zero errors/3 standard bundle warnings; recursive webpack module graph excludes App.jsx, Home.jsx, Employees.jsx and PJ26080550.jsx and includes index0553. CurrentR68 confirmed in output. Live start:0553 served its dedicated index0553/App0553 bundle on3053 with other page markers absent. Header SSR/route fallbacks, default entry compatibility, unchanged B1-only price fingerprints and existing project isolation checks passed.
