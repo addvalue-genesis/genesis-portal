@@ -1,6 +1,6 @@
 // Estimator assumptions for owner review, 30-Oct-2026. No canonical price import/write.
 // Duration and utilisation are NOT an agreed schedule or approved staffing plan.
-import {selectB1ProjectSupportBudget0553} from "./b1ProjectSupportBudget0553";
+import {selectB1ProjectSupportBaseline0553} from "./b1ProjectSupportBaseline0553";
 import {evaluateB2VdrlIndependentScenario0553} from "./b2IndependentVdrlRecalculation0553";
 import {quoteUsd0553} from "./officialUsdRelease0553";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
@@ -27,7 +27,7 @@ export const B1_LIFECYCLE_REVIEW_0553=Object.freeze({
  ])
 });
 export function evaluateB1LifecycleReview0553({months=9,weeklyHours={},regulatoryHours=B1_LIFECYCLE_REVIEW_0553.regulatoryHours,engineeringHours=null}={}){
- const cfg=B1_LIFECYCLE_REVIEW_0553,base=selectB1ProjectSupportBudget0553();
+ const cfg=B1_LIFECYCLE_REVIEW_0553,base=selectB1ProjectSupportBaseline0553();
  if(!Number.isFinite(months)||months<=0||months>36||!Number.isFinite(regulatoryHours)||regulatoryHours<0||regulatoryHours>2000)
   throw Error("Invalid B1 review duration or regulatory hours");
  if(Object.keys(weeklyHours).some(k=>!(k in cfg.weeklyHours)))throw Error("Unknown B1 support role");

@@ -47,7 +47,7 @@ assert(extraPm.candidateSellTHB>nine.candidateSellTHB);
 for(const args of [{months:0},{months:NaN},{weeklyHours:{PM:-1}},{weeklyHours:{TYPO:1}},{regulatoryHours:-1},{engineeringHours:-1}])assert.throws(()=>evaluate(args));
 assert.equal(JSON.stringify({base:base(),release:release({thbPerUsd:31.5})}),before,'Review must not change selected Source or Release');
 const quoted=official(release({thbPerUsd:31.5}));
-assert.equal(quoted.b.find(r=>r.code==='B1').amountUSD,13400);assert.equal(quoted.totalUSD,888900);
+assert.equal(quoted.b.find(r=>r.code==='B1').amountUSD,27400);assert.equal(quoted.totalUSD,902900);
 assert.equal(quoted.b.find(r=>r.code==='B14').amountUSD,25000);
 assert.deepEqual(quoted.c.map(r=>r.budgetaryOptionQuoteUSD),[97500,23000]);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');

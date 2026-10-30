@@ -51,7 +51,7 @@ assert.equal(release.b.find(x=>x.code==="B10").customerSellTHB,509827.5);
 assert.equal(release.annexModels.B10.annexLineTotalTHB,509827.5);
 assert.equal(official.b.find(x=>x.code==="B10").amountUSD,16200);
 assert.equal(Math.round(officialRows.reduce((n,x)=>n+x.totalUSD,0)*100),1620000);
-assert.equal(working.knownWorkingSellTHB,5782287.13);
+assert.equal(working.knownWorkingSellTHB,6223782.87);
 assert.equal(release.annexTraceAudit.totalRows,16);
 assert.equal(auditAnnexBidirectionalTrace0553(source.currentByCode,release.annex).sourceToReleasePassed,true);
 assert.equal(auditAnnexBidirectionalTrace0553(source.currentByCode,release.annex).releaseToSourcePassed,true);

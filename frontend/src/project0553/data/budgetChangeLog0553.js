@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-29-R66";
+export const CHANGE_LOG_VERSION_0553="2026-10-30-R67";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261030-01",date:"2026-10-30",kind:"PRICE",tone:"neutral",
+  title:"Owner selects B1 nine-month lifecycle and Instrument licence allowance; dedicated port3053",
+  detail:"Only B1 repriced: Working SELL THB421180→862675.74; Official USD13400→27400; A+B USD888900→902900. Nine-month recurring support replaces old milestone hours, SI144h proxy budget is included and Instrument licence incremental SELL100000 counted once. Total planning COST remains unknown because Instrument cost/partner quote is unconfirmed; known partial planning cost647996.59 is not actual Direct Cost. B2 and all other A/B/C prices, quantities, FX and policies unchanged. Existing B1 module IDs and role source IDs retained. npm run start:0553 opens port3053 without changing other start commands. Schedule, SI RACI/rate and final licence details remain open.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b1","bid.budget.pricing.official"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner request30-Oct2026: apply B1 only and move0553 to port3053"}),
  Object.freeze({id:"P553-CHANGE-20261029-02",date:"2026-10-29",kind:"PRICE",tone:"neutral",
   title:"Owner selects B14 USD25000 budgetary insurance allowance",
   detail:"B14 canonical Working SELL THB787500 at unchanged31.5 FX flows once to Scope, Release and THB/USD native Excel. A+B changes USD863900→888900; known Part B THB4994787.13→5782287.13. AIG CPOC7-Jun-2023 CGL375000 and WCEL132500 remain historical references, not current premium/direct cost; THB280000 is gross SELL planning headroom. Owner CPOC actual contractUSD180000 is separate from historical AIG estimateUSD250000. Added RFQ Template Article18 and CCL Rev05 item31 evidence. Cargo stays B6; SAMTEL bonds excluded; existing B3/B9 THB24000 has no automatic credit. Other selected prices, FX and commercial policy unchanged. B4/B12 remain N/A/excluded. Current insurer coverage, signed terms and customer issue approval remain open.",

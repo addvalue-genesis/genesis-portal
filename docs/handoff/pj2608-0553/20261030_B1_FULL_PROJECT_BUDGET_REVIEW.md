@@ -1,16 +1,16 @@
 # PJ2608-0553 — B1 full-project budget review, 30-Oct-2026
 
-Status: FULL-PROJECT SCENARIO NOT SELECTED / INSTRUMENT INCREMENTAL SELL ALLOWANCE THB100,000 OWNER SELECTED FOR REVIEW / NO PRICE POSTING.
+Status: OWNER SELECTED B1 ONLY — NINE-MONTH BUDGET + INSTRUMENT SELL THB100,000; WORKING/RELEASE UPDATED; NO CUSTOMER ISSUE.
 
 Owner requested a review of all B1 engineering, SI and project management work through licence acquisition and project completion. This is not limited to the new Instrument licence request. Keep existing module IDs, Source → Working → Scope → Release and reverse trace.
 
-## Current selected basis
+## Previous selected basis — retained as history
 
 B1 Planning Cost THB 374,200.00; Working SELL THB 421,180.00; Official USD 13,400.00. Current PM support is 48 hours; Coordinator 98 hours; combined non-regulatory support 230 hours; regulatory support 12 hours. Existing office expense uses six months, but role hours do not recur for those six months. The old 964-hour B1 WBS and prices are not carried forward.
 
 ## Duration sensitivity
 
-No final project completion schedule is confirmed by this estimate. Six/nine/twelve months are explicit award-to-final-acceptance assumptions, not a contract schedule. A supplier delivery lead time is not proof of the entire project duration. Nine months is the initial review display, not an owner selection. Warranty/retention support and extensions must be scoped separately where required.
+No final project completion schedule is confirmed by this estimate. Six/nine/twelve months are explicit award-to-final-acceptance assumptions, not a contract schedule. A supplier delivery lead time is not proof of the entire project duration. Owner subsequently selected the nine-month pricing assumption on30-Oct2026 when instructing B1-only implementation; this is not evidence of an agreed final project schedule. Warranty/retention support and extensions must be scoped separately where required.
 
 | Assumed months | Cost incl. provisional SI / THB | Candidate SELL / THB | PMO + existing licensing only / USD | With provisional SI / USD | Increase over current B1 / USD |
 |---|---:|---:|---:|---:|---:|
@@ -60,11 +60,11 @@ Original Myanmar external package Cost THB 200,000 is included once, comprising 
 | 9 | 762,675.74 | 862,675.74 | 27,400 | 14,000 |
 | 12 | 876,106.14 | 976,106.14 | 31,000 | 17,600 |
 
-One B1 THB subtotal is converted at31.50 and rounded up to USD100 once. Do not add a separately rounded USD3,200 licence to an already rounded B1 base. For9 months, USD24,300 + USD3,200 would incorrectly give USD27,500; correct combined comparison is USD27,400. A+B comparison would be888,900 −13,400 +27,400 = USD902,900. This remains a non-posting scenario: duration/SI not selected; the actual total cost including Instrument is unknown. The100k is a SELL allowance, not100k verified cost or official licence fee.
+One B1 THB subtotal is converted at31.50 and rounded up to USD100 once. Do not add a separately rounded USD3,200 licence to an already rounded B1 base. For9 months, USD24,300 + USD3,200 would incorrectly give USD27,500; correct combined comparison is USD27,400. A+B comparison would be888,900 −13,400 +27,400 = USD902,900. Owner subsequently selected the9-month B1 budget for Working/Release. The6/12-month cases remain nonposting comparisons. The actual total cost including Instrument is unknown. The100k is a SELL allowance, not100k verified cost or official licence fee.
 
 ## Unchanged financial controls
 
-Selected B1 remains THB 421,180 / USD 13,400; B14 USD 25,000; B4/B12 N/A; C1 USD 97,500 and C2 USD 23,000 are conditional options excluded from base. A+B remains USD 888,900. Scenario prices, rates, duration and quantities do not post to Source, Scope, Release or native XLSX. The existing ordinary-B 5% SAMTEL deduction remains unchanged; a planning margin before this deduction is not verified net profit. No merge/customer issue is authorized by this review.
+Only B1 is repriced to THB862,675.74 / USD27,400; A+B becomes USD902,900. B14USD25,000; B4/B12 N/A; C1USD97,500 and C2USD23,000 conditional options excluded from base remain unchanged. Every non-B1 Source/Official row and the entire spare annex must match captured pre-change SHA256 fingerprints. The selected9-month case flows through existing Source/Working/Scope/Release/native XLSX. All existing B1 source row IDs remain and newly priced SI decision rows remain inside B1.1. Historical monthly/milestone wages are replaced, never added again. The existing ordinary-B 5% SAMTEL deduction remains unchanged; a planning margin before this deduction is not verified net profit. No merge/customer issue is authorized by this review.
 
 ## Existing UI and source
 
@@ -72,7 +72,8 @@ Existing module: PJ2608-0553 / bid.budget.working.bc.b1.audit.engineering-review
 
 - b1LifecycleReview0553.js: assumptions and pure calculation.
 - B1LifecycleReview0553.jsx: duration comparison within existing B1 audit.
-- b1ProjectSupportBudget0553.js: unchanged selected role rates and budget.
+- b1ProjectSupportBudget0553.js: selected9-month B1 account ledger; complete planning cost NULL, known partial647,996.59; Instrument cost NULL.
+- b1ProjectSupportBaseline0553.js: unchanged24-Oct comparison assumptions and existing salary rates, nonposting history.
 - b2IndependentVdrlRecalculation0553.js: unchanged 131-object owner boundary.
 - importOperationalBudget0553.js: unchanged selected licence package.
 
@@ -88,3 +89,11 @@ Existing module: PJ2608-0553 / bid.budget.working.bc.b1.audit.engineering-review
 - Check recurring licence/third-party charges and government fees if applicable; existing external package is not proof of validity for every duration.
 
 Validation: new scenario sensitivity/invalid-input/owner-boundary tests; unchanged selected Source and Release comparison; existing role support and B1 accordion validators; Official/native USD XLSX validator. Production webpack and browser verification recorded after completion in handoff.
+
+## Dedicated0553 development command
+
+Run `npm run start:0553` inside the0553 worktree frontend. The script uses port3053. Open http://localhost:3053/projects/pj2608-0553. The default `npm start` and other project commands are unchanged. Restart this0553 server after fetching the selected commit. Do not run this command from a0550 checkout.
+
+## Selected B1 validation completed
+
+All151 validator steps in the production chain checked, resuming after correcting stale B1/aggregate expectations; webpack passed with3 standard bundle warnings. Independent pre-change fingerprints prove all19 non-B1 Source and Official rows plus the spare annex unchanged. Existing B1 role and expense source IDs retained. Native THB/USD Excel and exact source roundtrips passed. The dedicated start:0553 command compiled and served the project route on3053 with HTTP200 (browser HTML Accept header). Full interactive Chromium testing remains unavailable; server-rendered B1 overview/accordion tests passed. No merge or customer issue.

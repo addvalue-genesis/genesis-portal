@@ -93,7 +93,7 @@ assert.equal(working.byCode.B10.workingSellTHB,509827.5);
 assert.equal(scope.lines.B10.workingSellTHB,509827.5);
 assert.equal(release.b.find(z=>z.code==="B10").customerSellTHB,509827.5);
 assert.equal(schedule.currentBudgetaryByCode.B10,509827.5);
-assert.equal(working.knownWorkingSellTHB,5782287.13);
+assert.equal(working.knownWorkingSellTHB,6223782.87);
 assert.equal(release.annex.B10.length,4);
 assert.equal(release.annexTraceAudit.totalRows,16);
 assert.equal(release.annexModels.B10.annexLineTotalTHB,509827.5);

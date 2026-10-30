@@ -166,5 +166,5 @@ assert.equal(bc.byCode.B9.workingSellTHB,480550);
 assert.equal(JSON.stringify(working()),before,"B3 dossier modified canonical source");
 assert(!html.includes("453,600.00"),"Superseded 7-site survey must NOT be a current price");
 assert(!html.includes("2,016,000.00"),"Old 40-day SAT SELL must NOT appear as current resource dossier price");
-assert.equal(bc.knownWorkingSellTHB,5782287.13);
-console.log("PASS 0553 b3-resource-price-dossier: current-source checks passed; B3 2,322,450.00 / Part B 5,782,287.13; no selected MGW FAT services; historical evidence nonposting.");
+assert.equal(bc.knownWorkingSellTHB,6223782.87);
+console.log("PASS 0553 b3-resource-price-dossier: current-source checks passed; B3 2,322,450.00 / Part B 6,223,782.87; no selected MGW FAT services; historical evidence nonposting.");

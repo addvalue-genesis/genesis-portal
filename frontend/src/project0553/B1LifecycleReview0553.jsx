@@ -7,10 +7,10 @@ export function B1LifecycleReview0553(){
  const cases=B1_LIFECYCLE_REVIEW_0553.durationMonths.map(months=>evaluateB1LifecycleReview0553({months}));
  return <div data-b1-lifecycle-review="NON_POSTING">
   <h4>ทบทวนงบ B1 จนปิดโครงการ — 30-Oct-2026</h4>
-  <p className="p55-note"><strong>ประมาณการเพื่อพิจารณา / ยังไม่ได้เลือกราคาใหม่</strong> ครอบคลุม SI Engineering,
+  <p className="p55-note"><strong>เลือกงบ B1 ฐาน 9 เดือนแล้ว / Actual Cost และ RACI ยังรอยืนยัน</strong> ครอบคลุม SI Engineering,
    PM, จัดซื้อ, ธุรการ/บัญชี และใบอนุญาตจน Final Acceptance ตามขอบเขตที่ตกลง
    ระยะเวลา 6/9/12 เดือนเป็นสมมติฐาน ไม่ใช่แผนที่ลูกค้ายืนยัน
-   Working SELL เดิม THB {money(m.currentSellTHB)} / Official USD {money(m.currentOfficialUSD)} ยังใช้ตามเดิม</p>
+   ฐานเดิมสำหรับเปรียบเทียบ THB {money(m.currentSellTHB)} / Official USD {money(m.currentOfficialUSD)} เป็นประวัติอ้างอิง</p>
   <p className="p55-note">ค่าแรงต่อเนื่องด้านล่าง <strong>แทน</strong> ชั่วโมง milestone เดิม {m.currentSupportHours} ชั่วโมง;
    ไม่บวกซ้ำ B2 มี {m.b2SelectedMH} MH สำหรับเอกสารและตรวจทานแล้ว
    งาน SI ที่เสนอเพิ่มต้องตรวจผู้รับผิดชอบกับ <a href={m.b2SourceUrl} target="_blank" rel="noreferrer">131 work objects ของ B2</a>,
@@ -57,7 +57,7 @@ export function B1LifecycleReview0553(){
   <p className="p55-note"><strong>รวม B1 กรณี {months} เดือน + SI + ใบอนุญาตใหม่:</strong> Candidate SELL THB {money(m.withInstrumentSellTHB)};
    Official comparison USD {money(m.withInstrumentOfficialUSD)}; เพิ่มจาก B1 เดิม USD {money(m.withInstrumentDeltaOfficialUSD)}.
    รวมยอด THB ก่อนแปลงและปัด USD เพียงครั้งเดียว; ต้นทุนรวมกรณีนี้ยังไม่ทราบเพราะต้นทุนใบอนุญาตเพิ่มยังไม่ยืนยัน.
-   ยังไม่เลือกใช้ราคากรณีระยะเวลาโครงการนี้ใน Working/Release</p>
+   Working/Release เลือกฐาน 9 เดือน: THB862,675.74 / USD27,400; กรณี 6/12 เดือนเป็น sensitivity เท่านั้น</p>
   <details><summary>ข้อมูลที่ต้องปิดก่อนเลือกราคา B1 ใหม่</summary><ul>{m.openGates.map(s=><li key={s}>{s}</li>)}</ul></details>
  </div>;
 }
