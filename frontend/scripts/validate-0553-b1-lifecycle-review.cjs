@@ -1,0 +1,48 @@
+const assert=require('node:assert/strict'),path=require('node:path');
+const root=path.resolve(__dirname,'../src'),babel=require('@babel/core'),old=require.extensions['.js'];
+for(const ext of ['.js','.jsx'])require.extensions[ext]=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'}}],'@babel/preset-react']}).code,f):old(m,f);
+require.extensions['.css']=()=>{};
+const from=p=>require(path.join(root,'project0553',p));
+const {evaluateB1LifecycleReview0553:evaluate}=from('data/b1LifecycleReview0553');
+const {selectB1ProjectSupportBudget0553:base}=from('data/b1ProjectSupportBudget0553');
+const {buildReleaseCommercialModel0553:release}=from('data/releaseCommercialModel0553');
+const {buildOfficialUsdRelease0553:official}=from('data/officialUsdRelease0553');
+const before=JSON.stringify({base:base(),release:release({thbPerUsd:31.5})});
+const cases=[6,9,12].map(months=>evaluate({months}));
+assert.deepEqual(cases.map(m=>m.candidateOfficialUSD),[20700,24300,27900]);
+assert.deepEqual(cases.map(m=>m.supportAndExistingScopeOfficialUSD),[17200,20800,24400]);
+assert.deepEqual(cases.map(m=>m.proposedSupportHours),[481,721.5,962]);
+for(const m of cases){
+ assert.equal(m.currentSupportHours,230);
+ assert.equal(m.b2SelectedMH,963.76);
+ assert.equal(m.b2TechnicalAuthorExcludedMH,0.52);
+ assert.equal(m.technical.hours,144);assert.equal(m.technical.proxy,true);
+ assert(m.engineering.every(r=>r.ownerVerified===false));
+ assert.equal(m.candidateSellTHB,Math.round((m.supportAndExistingScopeSellTHB+m.technical.candidateSellTHB)*100)/100);
+ assert.equal(m.existingMyanmarExternalCostTHB,200000);
+ assert.equal(m.existingMyanmarReservesCostTHB,96250);
+ assert.equal(m.expenses.filter(r=>r.id==='B1-MM-GOV').length,1);
+ assert.equal(m.expenses.find(r=>r.id==='B1-MM-GOV').candidateSellTHB,25000);
+ assert.equal(m.expenses.find(r=>r.id==='B1-EXP-AIR').qty,2);
+ assert.equal(m.expenses.find(r=>r.id==='B1-EXP-HOTEL').qty,6);
+ assert.equal(m.instrumentExtraIncluded,false);assert.equal(m.instrumentExtraCostTHB,null);
+ assert.equal(m.instrumentExtraSellTHB,null);assert.equal(m.verifiedDirectCostTHB,null);
+ assert.equal(m.postingAllowed,false);assert.equal(m.customerReleaseAllowed,false);assert.equal(m.selected,false);
+ assert.equal(m.regulatory.hours,40);
+}
+const nine=cases[1],noTech=evaluate({engineeringHours:0});
+assert.equal(noTech.candidateSellTHB,nine.supportAndExistingScopeSellTHB);
+const extraPm=evaluate({weeklyHours:{PM:5}});
+assert.equal(extraPm.support.find(r=>r.key==='PM').hours-nine.support.find(r=>r.key==='PM').hours,39);
+assert(extraPm.candidateSellTHB>nine.candidateSellTHB);
+for(const args of [{months:0},{months:NaN},{weeklyHours:{PM:-1}},{weeklyHours:{TYPO:1}},{regulatoryHours:-1},{engineeringHours:-1}])assert.throws(()=>evaluate(args));
+assert.equal(JSON.stringify({base:base(),release:release({thbPerUsd:31.5})}),before,'Review must not change selected Source or Release');
+const quoted=official(release({thbPerUsd:31.5}));
+assert.equal(quoted.b.find(r=>r.code==='B1').amountUSD,13400);assert.equal(quoted.totalUSD,888900);
+assert.equal(quoted.b.find(r=>r.code==='B14').amountUSD,25000);
+assert.deepEqual(quoted.c.map(r=>r.budgetaryOptionQuoteUSD),[97500,23000]);
+const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
+const html=renderToStaticMarkup(React.createElement(from('B1LifecycleReview0553.jsx').B1LifecycleReview0553));
+for(const text of ['NON_POSTING','20,700.00','24,300.00','27,900.00','963.76','96250','144'])
+ assert(html.includes(text)||text==='96250'&&html.includes('96,250.00'),text+' missing from review');
+console.log('PASS B1 lifecycle review: 6/9/12-month sensitivity, replacement labour, explicit SI proxy/RACI and Instrument gates, single existing licence reserve, unchanged B1/B14/C1/C2 and A+B.');

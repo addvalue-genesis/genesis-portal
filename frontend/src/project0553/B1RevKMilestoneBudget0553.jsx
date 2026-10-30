@@ -2,6 +2,7 @@ import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectB1ProjectSupportBudget0553} from "./data/b1ProjectSupportBudget0553";
 import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553} from "./data/b1AccordionModuleIds0553";
+import {B1LifecycleReview0553} from "./B1LifecycleReview0553";
 
 // 10.2 / B1. Presentation ONLY: canonical B1.1–B1.8 source accounts, no repricing.
 // B1.A is AUDIT (never an additional contractual or financial cost account).
@@ -73,6 +74,7 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
   <p className="p55-note">Rate assumptions: 22 workdays × 8 h/month, 20% employer load;
    provisional 20% labour gross-margin target / 10% service and reserve uplift; official fee allowance 0% uplift.
    All commercial cost and rate inputs require evidence before customer release.</p>
+  <p className="p55-note"><strong>Full-project B1 budget review:</strong> เปิด B1.A.3 ใน Audit ด้านล่าง เพื่อเทียบ 6/9/12 เดือนและงาน SI ที่เหลือจริง; ยังไม่เปลี่ยนราคาที่เลือก</p>
 
   {model.displayGroups.map(purpose=><details key={purpose.id} open className={"p553-b1-purpose p553-b1-purpose--"+purpose.id} data-component-key={ROOT+".purpose."+purpose.id}>
    <summary><strong>{purpose.label}</strong> · Cost {amount(purpose.baseWorkingCostTHB)} · SELL {amount(purpose.baseWorkingSellTHB)}</summary>
@@ -147,6 +149,7 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
       </tr>)}</tbody></table></div>
     </B1AuditLeaf0553>
     <B1AuditLeaf0553 number="B1.A.3" kind="engineering-review" title="27 Engineering Scope Titles — Ownership Review Only">
+     <B1LifecycleReview0553/>
      <p className="p55-note">Legacy technical engineering WBS activities are unpriced review items.
       Distinct ADDVALUE engineering must be checked against OEM Part A, B2 VDRL and B3 testing.
       No 964-MH historical Engineering price or quantity is carried into current B1.</p>
