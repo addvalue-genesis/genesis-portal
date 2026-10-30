@@ -14,14 +14,14 @@ assert.equal(plan.b6IncrementalSellTHB,28000);
 assert.equal(plan.governmentFeeSellTHB,plan.governmentFeeAllowanceTHB);
 const gov=b1.lines.find(l=>l.id==='B1-MM-GOV');
 assert.equal(gov.workingCostTHB,25000);assert.equal(gov.workingSellTHB,25000);
-assert.equal(b1.baseWorkingCostTHB,181400-7200+200000);
-assert.equal(b1.baseWorkingSellTHB,211600-7920+217500);
+assert.equal(b1.baseWorkingCostTHB,null);
+assert.equal(b1.baseWorkingSellTHB,862675.74);
 assert.equal(b1.conditionalWorkingSellTHB,0);
 assert(!b1.lines.some(l=>['B1-EXP-FILING','B1-EXP-LEGAL','B1-EXP-GOV'].includes(l.id)));
 assert.equal(b1.supersededExpenses.length,3);
-assert.equal(b1.labourHours,242,'No duplicated admin/accounting/logistics staff');
-assert.deepEqual(b1.displayGroups.map(g=>g.baseWorkingCostTHB),[169700,204500]);
-assert.deepEqual(b1.displayGroups.map(g=>g.baseWorkingSellTHB),[198055,223125]);
+assert.equal(b1.labourHours,905.5,'No duplicated admin/accounting/logistics staff');
+assert.deepEqual(b1.displayGroups.map(g=>g.baseWorkingCostTHB),[432996.59,null]);
+assert.deepEqual(b1.displayGroups.map(g=>g.baseWorkingSellTHB),[526425.74,336250]);
 assert.equal(new Set(b1.displayGroups.flatMap(g=>g.accounts)).size,8);
 const logistics=source.byCode.B6.localLogisticsEnvelope;
 assert.equal(logistics.byCode.B6.find(x=>x.id.endsWith('TH-IMPORT-BROKER')).workingSellTHB,33000);
@@ -40,7 +40,7 @@ for(let i=1;i<=14;i++){
  assert.equal(r.directCostTHB,null);
 }
 assert.deepEqual(['B4','B12','B14'].map(c=>source.byCode[c].workingSellTHB),[null,null,787500]);
-assert.equal(source.knownWorkingSellTHB,4757207.13+209580+28000+787500);
+assert.equal(source.knownWorkingSellTHB,4757207.13+209580+28000+787500+441495.74);
 assert.equal(release.approval.releaseAllowed,false);
 assert.equal(b1.engineeringScopeReview.filter(r=>r.proposedOwner==='B2/B3').length,2);
 assert(b1.engineeringScopeReview.every(r=>r.workingSellTHB===null));

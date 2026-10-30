@@ -20,20 +20,20 @@ const {BcWorkingHierarchy0553:All}=from("BcWorkingHierarchy0553.jsx");
 const source=current(),B1=source.byCode.B1;
 const snap=JSON.stringify({row:B1,partB:source.knownWorkingSellTHB});
 const m=B1.b1SupportPlanningBudget;
-assert.equal(B1.workingSellTHB,421180);
+assert.equal(B1.workingSellTHB,862675.74);
 assert.equal(B1.directCostTHB,null);
-assert.equal(m.baseWorkingCostTHB,374200);
+assert.equal(m.baseWorkingCostTHB,null);
 assert.equal(m.conditionalWorkingSellTHB,0);
-assert.equal(m.labourHours,242);
+assert.equal(m.labourHours,905.5);
 assert.equal(m.accounts.length,8);
 assert.equal(m.accounts.reduce((n,x)=>n+x.qtyRows,0),m.lines.length);
 const html=renderToStaticMarkup(React.createElement(Quick,{workingRow:B1}));
 const full=renderToStaticMarkup(React.createElement(Host,{workingRow:B1}));
 assert(html.includes('data-component-key="bid.budget.working.bc.b1.price-overview"'));
-assert(html.includes("THB 421,180.00"));
-assert(html.includes("THB 374,200.00"));
+assert(html.includes("THB 862,675.74"));
+assert(html.includes("THB 647,996.59"));
 assert(html.includes("THB 0.00"));
-assert(html.includes("242 MH"));
+assert(html.includes("905.5 MH"));
 assert(html.includes("Working Cost THB"));
 assert(html.includes("Base Working SELL THB"));
 assert(html.includes("Qty × Rate × Amount"));
@@ -51,7 +51,7 @@ for(const [i,a] of m.accounts.entries()){
  assert(html.includes("View Qty × Rate × Amount"),"Drilldown action missing");
  assert(full.includes('data-component-key="'+id+'"'),
   "The clickable account must have a matching target with actual detailed source lines: "+a.account);
- assert(Number.isFinite(a.baseWorkingCostTHB)&&Number.isFinite(a.baseWorkingSellTHB));
+ assert(Number.isFinite(a.baseWorkingSellTHB));assert.equal(a.baseWorkingCostTHB===null,a.account==="B1.6");
 }
 assert(html.includes("964 MH is excluded from current B1 pricing"),
  "Historical Engineering 964 MH must be labeled as EXCLUDED, not presented as current priced activity");
@@ -84,4 +84,4 @@ assert(all.includes('data-component-key="bid.budget.working.bc.b1.price-overview
  "The 10.2 ALL view must render B1 itemized overview as soon as B1 is opened by default");
 assert.equal(JSON.stringify({row:current().byCode.B1,partB:current().knownWorkingSellTHB}),snap,
  "B1 preview must never change the canonical 10.2 pricing source");
-console.log("PASS B1 visible detail: 8 account price/MH totals, one-click actual source-line drilldowns, current Working SELL 421,180, cost 374,200, conditional 0.00 (excluded) and 242 MH; no source/price mutation.");
+console.log("PASS B1 visible detail: 8 account price/MH totals, one-click actual source-line drilldowns, current Working SELL 862,675.74, complete cost unknown, conditional 0.00 (excluded) and 905.5 MH; no source/price mutation.");

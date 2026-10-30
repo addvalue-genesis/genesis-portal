@@ -86,9 +86,9 @@ assert.equal(release.b.find(x=>x.code==="B10").b10PriceToWinReview.scenario.sour
 assert.equal(ws.byCode.B10.workingSellTHB,509827.5);
 assert.equal(scope.lines.B10.workingSellTHB,509827.5);
 assert.equal(release.b.find(x=>x.code==="B10").customerSellTHB,509827.5);
-assert.equal(ws.knownWorkingSellTHB,5782287.13);
+assert.equal(ws.knownWorkingSellTHB,6223782.87);
 assert.equal(official.b.find(x=>x.code==="B10").amountUSD,16200);
-assert.equal(official.totalUSD,888900);
+assert.equal(official.totalUSD,902900);
 assert.equal(official.annex.B10.length,4);
 assert.equal(release.annexTraceAudit.totalRows,16);
 assert.equal(release.approval.releaseAllowed,false);

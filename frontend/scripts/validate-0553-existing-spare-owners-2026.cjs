@@ -102,8 +102,8 @@ const duplicate=structuredClone(rel.annex);duplicate.C2[1]=duplicate.C2[0];
 assert.throws(()=>auditAnnexBidirectionalTrace0553(costs.currentByCode,duplicate),/BIDIRECTIONAL/);
 // Value-preserving serialization must remain valid; object identity is not evidence parity.
 assert.equal(auditAnnexBidirectionalTrace0553(costs.currentByCode,structuredClone(rel.annex)).totalRows,16);
-assert.equal(bc.knownWorkingSellTHB,5782287.13);
-const unchangedOwners={B1:421180,B2:237121.13,B3:2322450,B4:null,B5:311184,
+assert.equal(bc.knownWorkingSellTHB,6223782.87);
+const unchangedOwners={B1:862675.74,B2:237121.13,B3:2322450,B4:null,B5:311184,
  B6:335584,B7:30000,B8:142550,B9:480550,B12:null,B14:787500};
 for(const [code,value] of Object.entries(unchangedOwners)){
  assert.equal(bc.byCode[code].workingSellTHB,value,code+" checkpoint must not change");
@@ -159,7 +159,7 @@ for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(html.includes
 assert(html.includes("CONDITIONAL BUDGETARY")&&html.includes("Not quoted; excluded from this offer."));
 for(const amount of ["3,071,250.00","721,806.60"])assert(html.includes(amount));
 assert.equal((html.match(/data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"/g)||[]).length,2);
-assert(html.includes("27,979,839.36")&&html.includes("WORKING DRAFT"));
+assert(html.includes("28,421,335.10")&&html.includes("WORKING DRAFT"));
 const Scope=from("ScopeSheetsDetail0553.jsx").ScopeSheetsDetail0553;
 const scopeHtml=renderToStaticMarkup(React.createElement(Scope,{fx:{thbPerUsd:31.5},onOpenSource:()=>{},onOpenReleaseRow:()=>{}}));
 for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(scopeHtml.includes(amount));

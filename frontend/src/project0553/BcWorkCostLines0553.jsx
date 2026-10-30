@@ -30,8 +30,8 @@ export function BcWorkCostLines0553({selectedCode="ALL",presentationNamespace=nu
    workingSellTHB:x.workingSellTHB,historicalCostProxyTHB:null,
    owner:"B1",sourceRef:x.verification,
    scopeGate:x.conditional?"CONDITIONAL_B1_LAWFUL_SCOPE_ONLY_EXCLUDED_FROM_BASE":"NEW_B1_RESOURCE_BASE_UNVERIFIED_PAYROLL",
-   equation:x.role==="EXTERNAL_OR_ALLOWANCE"?
-    x.qty+" × THB "+x.unitCostTHB.toFixed(2)+" cost × 1.10 sell handling":
+   equation:x.unitCostTHB===null?"Owner-selected provisional SELL allowance; COST NOT ESTABLISHED":x.role==="EXTERNAL_OR_ALLOWANCE"?
+    x.qty+" × THB "+x.unitCostTHB.toFixed(2)+" cost × "+(x.sellFactor??b1Current.expenseHandlingSellFactor)+" sell handling":
     x.qty+" MH × loaded role cost THB "+x.unitCostTHB.toFixed(2)+" (planning) / 0.80 sell factor",
    requiredQuantityStatus:x.conditional?"OPTIONAL_NOT_IN_CANONICAL_B1_BASE":"ROLE/EXPENSE_PLANNING_QTY",
    reconciliationTag:x.conditional?"B1_CONDITIONAL_NO_POST":"B1_1_TO_B1_8_CURRENT_RESOURCE",

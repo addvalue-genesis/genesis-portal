@@ -22,7 +22,7 @@ const audit=from("estimateToBidMapping.js")
  .auditCurrentCustomerProjection0553({canonical,release,scope});
 const current=canonical.byCode;
 const scenarios=canonical.scenarioAudits;
-assert.equal(canonical.knownWorkingSellTHB,5782287.13);
+assert.equal(canonical.knownWorkingSellTHB,6223782.87);
 assert.equal(current.B3.workingSellTHB,2322450);
 assert.equal(current.B8.workingSellTHB,142550);
 assert.equal(current.B9.workingSellTHB,480550);
@@ -102,4 +102,4 @@ const names=from("data/officialWorkbookTemplate0553.js").OFFICIAL_WORKBOOK_TEMPL
 for(const [code,row] of [["B3",26],["B8",31],["B9",32]])
  assert(names.some(x=>x[0]===row&&x[1]===code&&x[2]),"Native description missing "+code);
 assert.equal(release.approval.releaseAllowed,false);
-console.log("PASS 0553 b3-b8-five-day-lean-parity: current-source checks passed; B3 2,322,450.00 / Part B 5,782,287.13; no selected MGW FAT services; historical evidence nonposting.");
+console.log("PASS 0553 b3-b8-five-day-lean-parity: current-source checks passed; B3 2,322,450.00 / Part B 6,223,782.87; no selected MGW FAT services; historical evidence nonposting.");

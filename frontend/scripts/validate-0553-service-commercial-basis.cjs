@@ -42,6 +42,6 @@ for(const m of [sat,yard]){
 }
 assert.equal(release.b.find(x=>x.code==='B3').customerSellTHB,2322450);
 assert.equal(release.b.find(x=>x.code==='B9').customerSellTHB,480550);
-assert.equal(bc.knownWorkingSellTHB,5782287.13);
+assert.equal(bc.knownWorkingSellTHB,6223782.87);
 assert.equal(JSON.stringify(bc),before);
 console.log('PASS service basis: source days/rates, B3 28x2/12h and B9 7+2x2, OT/standby proposal unselected, Scope/Release parity, no new amount or customer-agreed rate.');

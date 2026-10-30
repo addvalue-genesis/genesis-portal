@@ -22,15 +22,15 @@ const {BcCostEvidenceDetail0553:Host}=get("BcCostEvidenceDetail0553.jsx");
 const bc=current(),model=b1Source(),b1=bc.byCode.B1;
 const snapshot=JSON.stringify({b1,b3:bc.byCode.B3,partB:bc.knownWorkingSellTHB});
 assert.equal(ROOT,"bid.budget.working.bc.b1");
-assert.equal(model.canonicalB1WorkingSellTHB,421180);
-assert.equal(model.baseWorkingCostTHB,374200);
+assert.equal(model.canonicalB1WorkingSellTHB,862675.74);
+assert.equal(model.baseWorkingCostTHB,null);
 assert.equal(model.conditionalWorkingSellTHB,0);
-assert.equal(b1.workingSellTHB,421180);
+assert.equal(b1.workingSellTHB,862675.74);
 assert.equal(b1.directCostTHB,null);
-assert.equal(bc.knownWorkingSellTHB,5782287.13);
+assert.equal(bc.knownWorkingSellTHB,6223782.87);
 assert.equal(bc.byCode.B3.workingSellTHB,2322450);
 assert.equal(model.accounts.length,8);
-assert.equal(model.roleLines.length,41);
+assert.equal(model.roleLines.length,47);
 assert.equal(model.milestones.length,19);
 assert.equal(model.engineeringScopeReview.length,27);
 assert.equal(model.historicalEngineeringCarryForwardTHB,0);
@@ -44,7 +44,7 @@ assert(output.includes('data-component-key="'+ROOT+".worktype-accordion"+'"'));
 assert(output.includes('data-component-key="'+ROOT+".revk-pm-milestones"+'"'));
 assert(output.includes('data-component-key="'+ROOT+".audit"+'"'));
 assert(output.includes("Expand All")&&output.includes("Collapse All"));
-assert(output.includes("THB 421,180.00")&&output.includes("THB 0.00"));
+assert(output.includes("THB 862,675.74")&&output.includes("THB 0.00"));
 assert(output.includes("NOT ESTABLISHED"));
 assert(panel.includes("B1.1")&&panel.includes("B1.8"));
 assert(panel.includes("Engineering &amp; Design")||panel.includes("Engineering &amp;amp; Design"));
@@ -125,4 +125,4 @@ assert(host.slice(b1At).includes("{sharedEvidence}"),
 assert.equal(JSON.stringify({b1:current().byCode.B1,b3:current().byCode.B3,
  partB:current().knownWorkingSellTHB}),snapshot,
  "Read-only B1 accordion mutated canonical B/C values");
-console.log("PASS B1 hierarchical nested accordion: 8 color-coded accounts + source lines, 19 Rev.K IDs and 27 unpriced engineering titles, audit/ledger preserved, THB421,180 base, THB0.00 conditional excluded; no cost mutation.");
+console.log("PASS B1 hierarchical nested accordion: 8 color-coded accounts + source lines, 19 Rev.K IDs and 27 unpriced engineering titles, audit/ledger preserved, THB862,675.74 base, THB0.00 conditional excluded; no cost mutation.");

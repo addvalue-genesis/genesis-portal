@@ -20,7 +20,7 @@ export function selectRevKAbcOwnershipControl0553(working){
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
  if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+0)||current.B9!==b9.b9BaseWorkingSellTHB||
-    working.knownWorkingSellTHB!==roundRevKAbc0553(4994787.13+ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB) ||
+    working.knownWorkingSellTHB!==roundRevKAbc0553(4994787.13+ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB+b1.baseWorkingSellTHB-421180) ||
     working.byCode.B14?.workingSellTHB!==ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB ||
     working.byCode.B3?.workingSellTHB!==2322450 ||
     working.byCode.B2?.workingSellTHB!==237121.13)
@@ -101,9 +101,9 @@ export function selectRevKAbcOwnershipControl0553(working){
  const pmWorkingSellTHB=b1.labourWorkingSellTHB;
  const fatTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B3").reduce((v,x)=>v+x.modeledSellTHB,0));
  const yardTHB=roundRevKAbc0553(chinaExpenses.filter(x=>x.owner==="B9").reduce((v,x)=>v+x.modeledSellTHB,0));
- if(b1Engineering.length!==27||pmEvents.length!==41||supportExpenses.length!==10||b1.labourHours!==242||trace.rows.length!==19||
+ if(b1Engineering.length!==27||pmEvents.length!==47||supportExpenses.length!==11||b1.labourHours!==905.5||trace.rows.length!==19||
    fatTasks.length!==12||fat.estimatedFatWitnessDays!==3||satSiteLines.length!==9||
-   b3.satTeamDays!==28||b3.siteSurveyTeamDays!==5||historicalB3.workdays!==40||pmWorkingSellTHB!==100500||fatTHB!==452850||yardTHB!==480550)
+   b3.satTeamDays!==28||b3.siteSurveyTeamDays!==5||historicalB3.workdays!==40||pmWorkingSellTHB!==436495.74||fatTHB!==452850||yardTHB!==480550)
   throw Error("Rev.K activity reconciliation mismatch");
  return Object.freeze({
   moduleId:"bid.budget.working.bc.revk-abc-control",
@@ -111,7 +111,7 @@ export function selectRevKAbcOwnershipControl0553(working){
   currentWorkingSellTHB:Object.freeze({...current}),
   currentB1B3B9BaseTHB:roundRevKAbc0553(current.B1+current.B3+current.B9),
   partBBaseTHB:working.knownWorkingSellTHB,b1PmProxyTHB:0,
-  b1EngineeringSellTHB:0,b1OfficePmIncludedTHB:pmWorkingSellTHB,
+  b1EngineeringSellTHB:b1.technicalBudgetSellTHB,b1OfficePmIncludedTHB:roundRevKAbc0553(pmWorkingSellTHB-b1.technicalBudgetSellTHB),
   b1SupportSellTHB:b1.baseWorkingSellTHB,b1SupportCostTHB:b1.baseWorkingCostTHB,
   b1ConditionalSellTHB:b1.conditionalWorkingSellTHB,b1LegacyEngineeringCarriedTHB:0,
   b3LaborSellTHB:b3.satWorkingSellTHB,b3SurveySellTHB:b3.siteSurveyWorkingSellTHB,

@@ -19,38 +19,38 @@ assert.equal(m.moduleId,"bid.budget.working.bc.b1.revk-pm-milestones");
 assert.equal(m.coveredMilestones,19);
 assert.equal(m.uniqueKChargeEvents,12);
 assert.equal(m.milestones.length,19);
-assert.equal(m.roleLines.length,41);
+assert.equal(m.roleLines.length,47);
 assert.equal(m.roleRates.PM.monthlyTHB,90000);
 assert.equal(m.roleRates.ADMIN.monthlyTHB,25000);
 assert.equal(m.roleRates.ACCOUNTANT.monthlyTHB,35000);
 assert.equal(m.roleRates.PROCUREMENT.monthlyTHB,38000);
 assert.equal(m.roleRates.COORD.monthlyTHB,42000);
 assert.equal(Object.keys(m.roleRates).length,7);
-assert.equal(m.labourHours,242);
-assert.equal(m.labourWorkingCostTHB,80400);
-assert.equal(m.labourWorkingSellTHB,100500);
-assert.equal(m.baseExpenseWorkingCostTHB,293800);
-assert.equal(m.baseExpenseWorkingSellTHB,320680);
-assert.equal(m.baseWorkingCostTHB,374200);
-assert.equal(m.baseWorkingSellTHB,421180);
+assert.equal(m.labourHours,905.5);
+assert.equal(m.labourWorkingCostTHB,349196.59);
+assert.equal(m.labourWorkingSellTHB,436495.74);
+assert.equal(m.baseExpenseWorkingCostTHB,null);
+assert.equal(m.baseExpenseWorkingSellTHB,426180);
+assert.equal(m.baseWorkingCostTHB,null);
+assert.equal(m.baseWorkingSellTHB,862675.74);
 assert.equal(m.conditionalWorkingCostTHB,0);
 assert.equal(m.conditionalWorkingSellTHB,0);
-assert.equal(m.proposedB1BaseWorkingSellTHB,421180);
-assert.equal(m.canonicalB1WorkingSellTHB,421180);
+assert.equal(m.proposedB1BaseWorkingSellTHB,862675.74);
+assert.equal(m.canonicalB1WorkingSellTHB,862675.74);
 assert.equal(m.historicalEngineeringCarryForwardTHB,0);
 assert.equal(m.historicalPmCarryForwardTHB,0);
 assert.equal(m.engineeringScopeReview.length,27);
 assert(m.engineeringScopeReview.every(x=>x.workingSellTHB===null&&x.quantityMH===null&&x.postingAllowed===false));
-assert.equal(m.canonicalPriceSource,"NEW_2026_ROLE_ACTIVITY_RESOURCE_COST_ONLY");
+assert.equal(m.canonicalPriceSource,"OWNER_SELECTED_9_MONTH_LIFECYCLE_AND_INSTRUMENT_ALLOWANCE_20261030");
 assert.equal(m.actualDirectCostTHB,null);
 assert.equal(m.customerReleasedSellTHB,null);
 assert.equal(m.postingAllowed,false);
 assert.equal(m.accounts.length,8);
 assert.deepEqual(m.accounts.map(x=>x.account),["B1.1","B1.2","B1.3","B1.4","B1.5","B1.6","B1.7","B1.8"]);
-assert.equal(m.accounts.reduce((n,x)=>Math.round((n+x.baseWorkingCostTHB)*100)/100,0),m.baseWorkingCostTHB);
+assert.equal(m.accounts.reduce((n,x)=>Math.round((n+x.knownPlanningCostTHB)*100)/100,0),m.knownPlanningCostTHB);assert.equal(m.baseWorkingCostTHB,null);
 assert.equal(m.accounts.reduce((n,x)=>Math.round((n+x.baseWorkingSellTHB)*100)/100,0),m.baseWorkingSellTHB);
 assert.equal(new Set(m.lines.map(x=>x.id)).size,m.lines.length);
-assert.equal(m.roleLines.reduce((n,x)=>n+x.qty,0),242);
+assert.equal(Math.round(m.roleLines.reduce((n,x)=>n+x.qty,0)*100)/100,905.5);
 assert(m.roleLines.every(x=>x.costOwner==="B1"&&x.unit==="MH"&&x.directCostTHB===null));
 assert(m.expenseLines.every(x=>x.costOwner==="B1"&&x.directCostTHB===null));
 assert(m.roleLines.every(x=>x.unitCostTHB<1000),"Admin/payroll cost rates must not inherit USD600/specialist sale rate");
@@ -62,7 +62,7 @@ assert.equal(m.milestones.find(x=>x.stage==="K09").chargeOwnerStage,"K08");
 assert.equal(m.milestones.find(x=>x.stage==="K00").rows.every(x=>x.role!=="PM"),true,"K00 PM kickoff included in engineering legacy");
 assert(m.roleLines.filter(x=>x.wbs==="K01").every(x=>!x.roleName.includes("FAT witness")),"B3 factory team not eligible for B1");
 assert(m.expenseLines.filter(x=>x.conditional).every(x=>x.account==="B1.6"||x.account==="B1.7"));
-assert.equal(bc.byCode.B1.workingSellTHB,421180,"B1 must use new role/activity costs only");
+assert.equal(bc.byCode.B1.workingSellTHB,862675.74,"B1 must use new role/activity costs only");
 assert.equal(bc.byCode.B1.b1SupportPlanningBudget.proposedB1BaseWorkingSellTHB,m.proposedB1BaseWorkingSellTHB);
 // Part B selected pricing has changed since the original B1-only test was
 // authored: B2 Rev05 THB580,000 was replaced with a first-principles
@@ -94,7 +94,7 @@ const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
  +(bc.byCode.B8.workingSellTHB-30000)+currentSpareDelta
  +(bc.byCode.B1.workingSellTHB-211600)+(bc.byCode.B6.workingSellTHB-307584)
  +bc.byCode.B14.workingSellTHB); // B8 Hybrid and 23-Oct authorized spare revision
-assert.equal(historicalToCurrent,5782287.13,
+assert.equal(historicalToCurrent,6223782.87,
  "Historical B1-only baseline to current B2/B3 price selection bridge failed");
 const sumBaseOwners=roundTHB(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
  .reduce((sum,r)=>sum+r.workingSellTHB,0));
@@ -115,4 +115,4 @@ assert(!jsx.includes("usdPerPersonDay"),"Old USD600 general admin widget still a
 assert(babel.transformSync(jsx,{babelrc:false,configFile:false,
  presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0,
  "B1 budget JSX Babel syntax invalid");
-console.log("PASS PJ2608-0553 B1 role-based planning: 19 K/12 unique events; 7 roles, 242 MH, THB 80,400 labour cost; THB 374,200 support base cost / THB 421,180 support SELL; THB 0.00 conditional sell; proposed B1 THB 421,180; Part B canonical recalculated with current B1 only.");
+console.log("PASS PJ2608-0553 B1 role-based planning: 19 K/12 unique events; 7 roles, 905.5 MH, THB349196.59 planning labour cost; Complete planning cost unknown / known partial THB647996.59 / THB 862,675.74 support SELL; THB 0.00 conditional sell; proposed B1 THB 862,675.74; Part B canonical recalculated with current B1 only.");

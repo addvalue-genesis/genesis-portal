@@ -2,6 +2,7 @@ import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectB1ProjectSupportBudget0553} from "./data/b1ProjectSupportBudget0553";
 import {B1_ACCORDION_ROOT_0553,b1AccountModuleId0553,b1AccountLineModuleId0553} from "./data/b1AccordionModuleIds0553";
+import {B1LifecycleReview0553} from "./B1LifecycleReview0553";
 
 // 10.2 / B1. Presentation ONLY: canonical B1.1–B1.8 source accounts, no repricing.
 // B1.A is AUDIT (never an additional contractual or financial cost account).
@@ -31,9 +32,9 @@ function B1AuditLeaf0553({number,kind,title,children}){
 export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null}){
  const model=selectB1ProjectSupportBudget0553();
  const rootRef=React.useRef(null);
- const totalBase=model.accounts.reduce((n,x)=>n+x.baseWorkingCostTHB,0);
- if(model.accounts.length!==8||model.canonicalB1WorkingSellTHB!==421180||
-  model.baseWorkingSellTHB!==421180||model.conditionalWorkingSellTHB!==0||
+ const totalBase=model.accounts.every(a=>a.baseWorkingCostTHB!==null)?model.accounts.reduce((n,x)=>n+x.baseWorkingCostTHB,0):null;
+ if(model.accounts.length!==8||model.canonicalB1WorkingSellTHB!==862675.74||
+  model.baseWorkingSellTHB!==862675.74||model.conditionalWorkingSellTHB!==0||
   model.actualDirectCostTHB!==null||model.historicalEngineeringCarryForwardTHB!==0)
   throw Error("B1 accordion source/owner reconciliation failed");
  const expandAll=isOpen=>{
@@ -46,12 +47,12 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
   <div className="p553-b1-header" data-component-key={ROOT+".worktype-accordion"}>
    <div><h3>B1 — Engineering &amp; Design / Internal Project Cost Groups</h3>
     <p className="p55-note"><strong>Canonical B1 Working SELL: {amount(model.canonicalB1WorkingSellTHB)}</strong>
-     {" "}· Planning Working Cost {amount(model.baseWorkingCostTHB)}
+     {" "}· Complete Planning Working Cost {amount(model.baseWorkingCostTHB)} · Known partial {amount(model.knownPlanningCostTHB)}
      {" "}· Conditional SELL {amount(model.conditionalWorkingSellTHB)} (EXCLUDED FROM BASE).
      Direct Cost NOT ESTABLISHED · Customer RELEASE HOLD.</p>
     <p className="p55-note">Customer B1 = Engineering and Design / 1 Lot (unchanged).
      B1.1–B1.8 below are INTERNAL project support cost accounts. B1.A is read-only Audit.
-     No historical 964-MH engineering or old PM rate is reposted.</p>
+     Selected nine-month lifecycle + SI144h proxy + Instrument SELL100k. Actual total cost and SI ownership remain open; no historical964-MH price is reposted.</p>
     <p className="p55-note"><strong>Module ID:</strong> {copy(ROOT+".revk-pm-milestones")}</p>
     <p className="p55-note"><strong>Accordion UI Module:</strong> {copy(ROOT+".worktype-accordion")}</p>
    </div>
@@ -61,10 +62,10 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
    </div>
   </div>
   <div className="p55-metric-grid">
-   <div><strong>Support Labour ({Object.keys(model.roleRates).length} roles / {model.labourHours} MH)</strong>
+   <div><strong>Support / SI Labour ({Object.keys(model.roleRates).length} roles / {model.labourHours} MH)</strong>
     <p>{amount(model.labourWorkingCostTHB)}</p><small>Planning loaded salary, not payroll</small></div>
    <div><strong>Base Project Expenses</strong><p>{amount(model.baseExpenseWorkingCostTHB)}</p><small>Non-labour base only</small></div>
-   <div><strong>Support Base Working Cost</strong><p>{amount(model.baseWorkingCostTHB)}</p><small>NOT verified Direct Cost</small></div>
+   <div><strong>Support Base Working Cost</strong><p>{amount(model.baseWorkingCostTHB)}</p><small>Instrument cost pending; known partial {amount(model.knownPlanningCostTHB)}. NOT verified Direct Cost</small></div>
    <div><strong>Base Working SELL</strong><p>{amount(model.baseWorkingSellTHB)}</p><small>Same single owner B1</small></div>
    <div><strong>Conditional Expenses / SELL</strong><p>{amount(model.conditionalWorkingSellTHB)}</p>
     <small>Old conditional package superseded; Myanmar budget now included once</small></div>
@@ -73,6 +74,7 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
   <p className="p55-note">Rate assumptions: 22 workdays × 8 h/month, 20% employer load;
    provisional 20% labour gross-margin target / 10% service and reserve uplift; official fee allowance 0% uplift.
    All commercial cost and rate inputs require evidence before customer release.</p>
+  <p className="p55-note"><strong>Full-project B1 budget review:</strong> เปิด B1.A.3 ใน Audit ด้านล่าง เพื่อเทียบ 6/9/12 เดือนและงาน SI ที่เหลือจริง; เลือกฐาน 9 เดือนรวม Instrument100k แล้ว</p>
 
   {model.displayGroups.map(purpose=><details key={purpose.id} open className={"p553-b1-purpose p553-b1-purpose--"+purpose.id} data-component-key={ROOT+".purpose."+purpose.id}>
    <summary><strong>{purpose.label}</strong> · Cost {amount(purpose.baseWorkingCostTHB)} · SELL {amount(purpose.baseWorkingSellTHB)}</summary>
@@ -131,7 +133,7 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
      </table></div>
     </B1AuditLeaf0553>
     <B1AuditLeaf0553 number="B1.A.2" kind="revk-events" title="K00–K18 Unique Role / Milestone Allocation">
-     <p className="p55-note">12 unique project-support charging events across 19 Rev.K stages.
+     <p className="p55-note">Nine-month recurring role hours are allocated across 12 existing events / 19 Rev.K stages; SI144h is listed separately in B1.1.
       Shared K03–07 and K08–11 are charged only once.</p>
      <div className="p55-table-wrap"><table className="p55-table p55-table--compact" style={{minWidth:1090}}>
       <thead><tr><th>Rev.K / Module ID</th><th>Milestone</th><th>Role / Hours</th><th>Support MH</th>
@@ -147,6 +149,7 @@ export function B1RevKMilestoneBudget0553({sourceLedger=null,sourceEvidence=null
       </tr>)}</tbody></table></div>
     </B1AuditLeaf0553>
     <B1AuditLeaf0553 number="B1.A.3" kind="engineering-review" title="27 Engineering Scope Titles — Ownership Review Only">
+     <B1LifecycleReview0553/>
      <p className="p55-note">Legacy technical engineering WBS activities are unpriced review items.
       Distinct ADDVALUE engineering must be checked against OEM Part A, B2 VDRL and B3 testing.
       No 964-MH historical Engineering price or quantity is carried into current B1.</p>

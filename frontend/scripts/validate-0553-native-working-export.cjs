@@ -133,7 +133,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   }
  }
  assertOptions(nativeScope);
- assert(cell(nativeScope,"G38").includes("<v>27979839.36</v>"));
+ assert(cell(nativeScope,"G38").includes("<v>28421335.1</v>"));
  assert(cell(nativeScope,"A38").includes("B4, B12"));
  for(const [code,index] of [["B10",2],["B11",3],["B13",4],["C1",5],["C2",6]]){
   const xml=nativeText(index);
@@ -223,7 +223,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':(row.offerTreatment?.priceText||"NOT ESTABLISHED")));
     }
     assertOptions(newXml);
-    assert(cell(newXml,"G38").includes("<v>27979839.36</v>"));
+    assert(cell(newXml,"G38").includes("<v>28421335.1</v>"));
     assert(cell(newXml,"A38").includes("B4, B12"));
    }else{
     const code=annexCodes[index-2];

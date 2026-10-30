@@ -40,7 +40,7 @@ const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
 const currentSpareDelta=Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
  sum+source.byCode[code].workingSellTHB-old,0);
 assert.equal(Math.round(currentSpareDelta*100),44034531);
-assert.equal(source.knownWorkingSellTHB,5782287.13);
+assert.equal(source.knownWorkingSellTHB,6223782.87);
 assert.equal(source.byCode.B3.workingSellTHB,2322450);
 assert.equal(source.byCode.B9.workingSellTHB,480550);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit

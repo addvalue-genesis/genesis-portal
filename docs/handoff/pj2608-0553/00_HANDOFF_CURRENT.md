@@ -495,3 +495,40 @@ This audit is additive and controls where it is more specific than earlier histo
 - Selected Part B Working SELL THB5,782,287.13; Source A+B THB27,979,839.36; rounded Official A+B USD888,900. C1 USD97,500 / C2 USD23,000 remain separate conditional options. All other selected prices and existing commercial-policy parameters stay unchanged.
 - User must fetch/pull the exact review branch in an isolated review worktree if their current checkout is 0550; never pull this branch into 0550 as an implicit merge.
 - Validation completed: all149 validator steps in the production build chain checked (failed legacy total guards corrected and resumed), production webpack passed with3 bundle-size warnings; Official USD/native THB/Excel repeat-export, price breakdown, current integration, scope and CFO checks passed. No customer issue or merge performed.
+
+
+## 30-Oct-2026 — B1 full-project review, not a selected reprice
+- User clarified B1 includes SI Engineering, PM, procurement, administration/finance and licensing until project completion; review the whole B1 budget, not only Instrument import licensing.
+- Review branch `review/pj2608-0553-b1-lifecycle-20261030`, based on selected B14 commit `59190ad6`. Detailed assumptions: `20261030_B1_FULL_PROJECT_BUDGET_REVIEW.md`.
+- Reused existing module `bid.budget.working.bc.b1.audit.engineering-review` (B1.A.3); no module IDs renamed. Added explicit non-posting duration comparison and source calculation.
+- Current selected B1 THB421,180 / USD13,400 is unchanged. A+B USD888,900, B14 USD25,000, B4/B12 N/A, and C1/C2 USD97,500/23,000 unchanged in Source/Scope/Release/native XLSX.
+- Six/nine/twelve-month cases with unverified residual SI block: candidate B1 USD20,700/24,300/27,900; increases USD7,300/10,900/14,500. PMO + existing licensing before the SI block: USD17,200/20,800/24,400. No duration is owner selected or a verified final project schedule.
+- Weekly role assumptions replace existing milestone labour, not add to it: PM4h, Coordinator8h, Admin3h, Procurement2h, Accountant1h, FinanceManager0.5h. Nine-month case is39 weeks /721.5 combined support hours. Regulatory40h replaces old12h. Same existing monthly salary/load/GM assumptions.
+- SI144h are six new estimator decision packages with unapproved RACI, using existing PM salary90k as a clearly labelled SI cost proxy. Do not present as a verified engineer rate or complete approved engineering scope. B2 already has963.76 MH/131 objects; all six packages need per-deliverable overlap checks with B2/A/OEM/B3/B9. Do not restore old964-MH B1 price.
+- Existing Myanmar package Cost200k including96250 reserve remains once. Instrument Wireless Gateway/Antenna extra price stays NULL, and the earlier illustrative USD1600 is not added. Partner quote/models/quantities/serials/actual fee and validity period remain open. No assumption that reserves are all free.
+- New model sensitivity/invalid inputs/nonmutation and existing B1 role/accordion validators passed; Official/native USD XLSX passed; production webpack passed with3 standard bundle warnings. Interactive browser QA could not run: Chromium absent and browser download returned invalid ZIP; server-rendered panel passed. No merge or customer issue.
+
+
+### 30-Oct-2026 follow-up — Instrument licence allowance THB100,000
+- Owner requested approximately THB100,000 for the new Instrument licence. Assistant explicitly interpreted this as incremental provisional SELL, replacing the prior illustrativeUSD1600, and recorded it in the existing non-posting B1 review. Actual partner cost/fee/quote remains NULL; no automatic10% uplift or reserve credit.
+- Earlier review Instrument SELL=NULL statements above are superseded. Full-project duration/SI cases remain unselected; Working/Scope/Release/native prices unchanged.
+- Combined6/9/12-month candidate B1 USD23,800/27,400/31,000. Nine-month THB862,675.74 is converted and rounded once; increaseUSD14,000 over original B1USD13,400, potential A+BUSD902,900. Never add separately rounded licenceUSD3200 to baseUSD24300.
+
+
+### 30-Oct-2026 — Owner selects B1-only implementation and port3053
+- User request: verify only B1 changes, apply the reviewed price and open0553 on3053. Nine-month B1 now selected at THB862,675.74 / USD27,400; A+B USD902,900; PartB THB6,223,782.87. Delta from previous selected B1 THB441,495.74 / OfficialUSD14,000.
+- Source: b1ProjectSupportBudget0553.js uses existing lifecycle evaluator + user Instrument100k SELL. Prior24-Oct budget is isolated as b1ProjectSupportBaseline0553.js; no964-MH legacy price restoration. All prior B1 role/expense IDs retained, recurring roles replace old hours, SI144h budget appears within B1.1, Instrument SELL100k once in B1.6. Eight account IDs unchanged.
+- Complete planning cost remains NULL due to Instrument cost unknown; known partial THB647,996.59 is labelled partial. Direct Cost/profit, SI actual rate/RACI, actual project schedule, partner quote/fees remain open despite owner budget selection. No automatic second reserve,1600USD,10% uplift or price-policy change.
+- Snapshot fixture0553-before-b1-selection-20261030.json captures every other Source/Official A/B/C row and annex fingerprints. New B1-only validator must prove exact equivalence outside B1, correct rounded totals and preserved historical IDs.
+- Dedicated command: npm run start:0553 uses3053; default start and all0550 commands unchanged. URL http://localhost:3053/projects/pj2608-0553 . Use this branch in the separate0553 worktree, never switch the0550 working folder for this change.
+- Regression baseline changes outside B1 are updated aggregate expected totals only, not other item prices. Existing B14/C1/C2 values and exclusions remain locked. No merge or customer issue.
+
+- Final validation for selected B1: all151 validator steps in the152-step build chain checked, updating only stale aggregate/B1 expectations and resuming failed steps; production webpack passed with3 standard bundle warnings. B1-only Source/Official/annex fingerprints pass; original B1 source IDs retained; native THB/USD XLSX passes. Dedicated npm run start:0553 compiled successfully and served http://localhost:3053/projects/pj2608-0553 with HTTP200/browser HTML Accept. Full interactive Chromium QA remains unavailable as previously recorded.
+
+
+### 30-Oct-2026 — Dedicated0553 entry/navigation on3053
+- User screenshot still showed portal Home/0550/Employees links. start:0553 now selects webpack env project=0553 with src/index0553.jsx and App0553.jsx. Only0553 is visible in the header; root,0550,employees and unknown paths redirect to /projects/pj2608-0553. Browser title identifies0553.
+- This dedicated bundle never imports the portal App/Home/Employees/PJ26080550 page. Shared UI/styles remain reused. Default portal entry and other projects are preserved. No business module IDs, prices, quantities or cost policies change; B1USD27400/A+BUSD902900 retained.
+- Commands: npm run start:0553 (3053); npm run build:0553 for the dedicated production entry. Default npm start/build compatibility preserved.
+- New route/header/config isolation validator and existing B1-only fingerprint, project isolation, change-log validators pass. Dedicated webpack module graph and server smoke checks recorded below after completion. Full interactive Chromium QA unavailable as previously recorded.
+- Final dedicated-entry QA: production build zero errors/3 standard bundle warnings; recursive webpack module graph excludes App.jsx, Home.jsx, Employees.jsx and PJ26080550.jsx and includes index0553. CurrentR68 confirmed in output. Live start:0553 served its dedicated index0553/App0553 bundle on3053 with other page markers absent. Header SSR/route fallbacks, default entry compatibility, unchanged B1-only price fingerprints and existing project isolation checks passed.

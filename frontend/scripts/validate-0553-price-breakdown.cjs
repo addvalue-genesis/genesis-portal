@@ -9,7 +9,7 @@ const {allocateBreakdown0553,breakdownKey0553,buildCustomerPriceBreakdown0553,cu
 const {buildNativePriceBreakdown0553}=require('../src/project0553/nativePriceBreakdown0553');
 const {buildNativeOfficialRelease0553,entriesFromZip,readEntry}=require('../src/project0553/nativeWorkingDraft0553');
 const source=buildReleaseCommercialModel0553({thbPerUsd:31.5}),official=buildOfficialUsdRelease0553(source),before=JSON.stringify(source),model=buildCustomerPriceBreakdown0553(source,official);
-assert.equal(official.totalUSD,888900);assert.equal(model.reconciled,true);assert.equal(model.releaseAllowed,false);
+assert.equal(official.totalUSD,902900);assert.equal(model.reconciled,true);assert.equal(model.releaseAllowed,false);
 assert.equal(model.baselineState,'SUBMITTED_PROPOSAL_NOT_VERIFIED');
 for(const group of model.groups){
  const canonical=selectWorkingBomProjection0553({mr:group.mr}).lines;
