@@ -2,6 +2,8 @@
 
 ## PJ2608-0550
 
+Latest A preparation: read [linked source preparation and native reading](docs/handoff/pj2608-0550/20261030_A_SOURCE_PREPARATION.md), UI `2026-10-30.1-preview`. Private Rev08 and linked drafts are distributed separately; actual A is still OPEN. Search/preparation does not approve engineering or issue a Release.
+
 Before changing 0550 evidence intake, requirements, supplier mapping, engineering,
 execution, document control, pricing, release or their UI, read
 [`docs/architecture/ADR-0550-001-integrator-traceability.md`](docs/architecture/ADR-0550-001-integrator-traceability.md).

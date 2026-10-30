@@ -8,6 +8,7 @@ import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {WORKING_PREVIEW_STAGES_0550,DOCUMENT_FAMILIES_0550,DELIVERY_KINDS_0550} from "./workingPreviewStages0550";
 import {blankRequirement0550,documentFamily0550,emptyIntegration0550,stampIntegration0550} from "./data/integrationWorkspace0550";
 import {mgwQuoteItem0550} from "./data/mgwVendorBasis0550";
+import {SourceEvidenceSearch0550} from "./SourceEvidenceSearch0550";
 
 const ids=a=>a.map(x=>[x.id,x.title||x.description||x.id]);
 export function Multi({label,value,onChange,options}){return <Field label={label}><select multiple size={Math.min(6,Math.max(3,options.length))} aria-label={label} value={value} onChange={e=>onChange(Array.from(e.target.selectedOptions,o=>o.value))}>{options.map(([v,t])=><option key={v} value={v}>{t}</option>)}</select></Field>;}
@@ -88,6 +89,7 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
   <div className="p55-review-toolbar"><Select label="Working Preview system" value={system} onChange={setSystem} options={systemOptions}/><button type="button" onClick={()=>{setExpanded(true);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=true);}}>ขยาย 1–8</button><button type="button" onClick={()=>{setExpanded(false);root.current?.querySelectorAll(":scope > details").forEach(d=>d.open=false);}}>หุบ 1–8</button></div>
   <div className="p55-wp-status" role="status" aria-live="polite">{saved||`${model.scopes.length} ระบบ/งานร่วม · ${model.requirements.length} requirement records · ${model.proofs.length} derived CAL/RPT · ${model.activities.length} activities/deliverables · ข้อที่ยังไม่อ่าน/วิเคราะห์แสดง OPEN`}</div>
   <button type="button" onClick={()=>onOpenSource("bid.documents.si-work-package")}>นำเข้าผลวิเคราะห์ SI จากเอกสาร</button>
+  <SourceEvidenceSearch0550 onOpenSource={onOpenSource}/>
   {WORKING_PREVIEW_STAGES_0550.map(renderStage)}
  </section>;
 }

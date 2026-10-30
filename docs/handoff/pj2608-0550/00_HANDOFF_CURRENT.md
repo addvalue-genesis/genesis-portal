@@ -71,6 +71,8 @@
 
 # PJ2608-0550 Living Handoff / Current Checkpoint
 
+**30-Oct A preparation:** [Canonical source search, linked import and native reading](20261030_A_SOURCE_PREPARATION.md), UI `2026-10-30.1-preview`. Private Rev08: 676 sources; linked preparation: 100/107 receipt obligations, 249 reading jobs and 140 clause drafts covering 19 systems plus COMMON. Imported reading/engineering remain DRAFT and actual A stays OPEN; seven exact inputs and TEL018 R00 integrity/applicability remain unresolved. Financial inputs and history preserved.
+
 **Official working update (isolated branch, not deployed):** [Official Tender review and customer form](20261028_OFFICIAL_WORKING.md). HIS-01 / RFQ-02 / OFF-03 / REL-04 separate historical output, current evidence, reviewed working prices and customer draft. No historical price fallback; final issue remains HOLD.
 
 **Data separation audit:** [2026-10-27 hardcode findings and migration](20261027_HARDCODE_AUDIT.md). Project reference registries now live in validated JSON; existing prices/evidence states are preserved, missing amounts are not zero, and the issued XLSX retains exact byte parity. Current inputs remain separate workspace data. Historical UI copy/configuration still contains documented literals; do not claim the whole app is hardcode-free.

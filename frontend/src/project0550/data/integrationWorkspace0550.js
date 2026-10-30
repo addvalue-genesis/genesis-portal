@@ -5,6 +5,7 @@ import {deriveSourceIntake,deriveDocumentRevisionRegister} from "./sourceIntakeM
 import {evaluateServiceEquation,bidQuantityUnit0550} from "../serviceEquationRuntime";
 import {DOCUMENT_FAMILIES_0550,DELIVERY_KINDS_0550} from "../workingPreviewStages0550";
 import {SUBVENDOR_REFERENCE_0550,subvendorRow0550,subvendorReferenceProblems0550,isSubvendorDeclarationSource0550} from "./subvendorReference0550";
+import {documentReadingUnits0550} from "./documentReadingUnits0550";
 export const INTEGRATION_SCHEMA_0550="genesis.0550.integration.v1";
 export const emptyIntegration0550=()=>({schema:INTEGRATION_SCHEMA_0550,requirements:[],proofs:[],activities:[],scopeReviews:[],particulars:[],avlChecks:[],deviations:[],documentReviews:[]});
 export const blankDocumentReview0550=id=>({id,systemTokens:[],expectedPages:null,reviewedPages:"",notesReviewed:false,colourReviewed:false,appendicesReviewed:false,categories:[],basis:"",reviewer:"",reviewedOn:"",status:"DRAFT",basisKey:""});
@@ -94,6 +95,10 @@ export function deriveIntegrationProof0550(data,p,today){
 export function deriveIntegration0550(data,systems,today){
  const w={...emptyIntegration0550(),...data.integrationWorkspace},requirements=integrationRequirements0550(data),proofs=w.proofs.map(p=>deriveIntegrationProof0550(data,p,today));
  const documentReviews=w.documentReviews.map(d=>{const problems=reviewProblems(data,"documentReviews",d,today),s=sourcesFor(data,[d.id])[0],pages=reviewedPageSet0550(d.reviewedPages);
+  if(d.readingKind&&d.readingKind!=="PDF_PAGE"){
+   const native=documentReadingUnits0550(s);
+   if(native.kind!==d.readingKind||!native.units.length||d.expectedPages!==native.units.length)problems.push("NATIVE_READING_UNITS_OPEN");
+  }
   if(!s||s.readState!=="TEXT_READ")problems.push("FULL_SOURCE_TEXT_REVIEW_OPEN");
   if(!Number.isInteger(d.expectedPages)||d.expectedPages<1||!pages||pages.size!==d.expectedPages||[...pages].some(p=>p>d.expectedPages))problems.push("DOCUMENT_PAGES_UNREVIEWED");
   if(!d.notesReviewed||!d.colourReviewed||!d.appendicesReviewed||!has(d.basis)||!d.systemTokens.length)problems.push("NOTES_COLOUR_APPENDICES_REVIEW_OPEN");
@@ -188,9 +193,10 @@ export function validateIntegration0550(data){
  const releaseFields=["releaseDocument","releasePageRef","purchaserRequirement","bidderClarification","bidderProposal","purchaserReply","releaseRemarks"];
  allowed.deviations.push(...releaseFields);
  allowed.documentReviews=Object.keys(blankDocumentReview0550("DOC"));
+ allowed.documentReviews.push("readingKind");
  for(const [collection,keys] of Object.entries(allowed)){
   const rows=w[collection];if(!Array.isArray(rows)||rows.length>2000||new Set(rows.map(r=>r?.id)).size!==rows.length)fail("invalid collection "+collection);
-  for(const r of rows){obj(r,keys);for(const k of keys){const v=r[k];if(collection==="avlChecks"&&["vendorListRowId","vendorListSourceHash"].includes(k)&&v===undefined)continue;if(collection==="deviations"&&releaseFields.includes(k)&&v===undefined)continue;if(k==="references"){if(!Array.isArray(v)||v.length>100)fail("invalid particular references");for(const ref of v){obj(ref,["sourceId","locator","excerpt","appearance","visualEvidenceRef"]);if(["sourceId","locator","excerpt","appearance","visualEvidenceRef"].some(f=>typeof ref[f]!=="string"||ref[f].length>12000))fail("invalid particular reference");}}else if(["sourceIds","supplierSourceIds","offerIds","workLineIds","activityKinds","families","requirementIds","processSteps","approvalSourceIds","systemTokens","categories","obligationKinds"].includes(k)){if(!Array.isArray(v)||v.length>500||v.some(x=>typeof x!=="string"||x.length>100)||new Set(v).size!==v.length)fail("invalid list "+k);}else if(["limit","quantity","expectedPages"].includes(k)){if(v!==null&&(!Number.isFinite(v)||Math.abs(v)>1e12))fail("invalid number");}else if(["notesReviewed","colourReviewed","appendicesReviewed"].includes(k)){if(typeof v!=="boolean")fail("invalid review flag");}else if(typeof v!=="string"||v.length>12000)fail("invalid text "+k);}
+  for(const r of rows){obj(r,keys);for(const k of keys){const v=r[k];if(k==="readingKind"){if(v!==undefined&&!["PDF_PAGE","SHEET","TEXT_BLOCK","ARCHIVE_MEMBER"].includes(v))fail("invalid reading kind");continue;}if(collection==="avlChecks"&&["vendorListRowId","vendorListSourceHash"].includes(k)&&v===undefined)continue;if(collection==="deviations"&&releaseFields.includes(k)&&v===undefined)continue;if(k==="references"){if(!Array.isArray(v)||v.length>100)fail("invalid particular references");for(const ref of v){obj(ref,["sourceId","locator","excerpt","appearance","visualEvidenceRef"]);if(["sourceId","locator","excerpt","appearance","visualEvidenceRef"].some(f=>typeof ref[f]!=="string"||ref[f].length>12000))fail("invalid particular reference");}}else if(["sourceIds","supplierSourceIds","offerIds","workLineIds","activityKinds","families","requirementIds","processSteps","approvalSourceIds","systemTokens","categories","obligationKinds"].includes(k)){if(!Array.isArray(v)||v.length>500||v.some(x=>typeof x!=="string"||x.length>100)||new Set(v).size!==v.length)fail("invalid list "+k);}else if(["limit","quantity","expectedPages"].includes(k)){if(v!==null&&(!Number.isFinite(v)||Math.abs(v)>1e12))fail("invalid number");}else if(["notesReviewed","colourReviewed","appendicesReviewed"].includes(k)){if(typeof v!=="boolean")fail("invalid review flag");}else if(typeof v!=="string"||v.length>12000)fail("invalid text "+k);}
    if(!/^[\w.-]{1,100}$/.test(r.id))fail("invalid ID");
    if(!["DRAFT","REVIEWED"].includes(r.status))fail("invalid review state");
    for(const k of ["reviewedOn","dueDate","queryDate"])if(r[k]&&(!/^\d{4}-\d{2}-\d{2}$/.test(r[k])||!Number.isFinite(Date.parse(r[k]))||new Date(r[k]).toISOString().slice(0,10)!==r[k]))fail("invalid date");

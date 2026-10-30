@@ -5,6 +5,7 @@ import { Module } from "./BidControls";
 import { ComponentCopyId } from "../common/ui/ComponentCopyId";
 import {SiWorkPackage0550} from "./SiWorkPackage0550";
 import {SourceReadiness0550} from "./SourceReadiness0550";
+import {SourceEvidenceSearch0550} from "./SourceEvidenceSearch0550";
 
 const TOKENS = SYSTEMS.map(s => s.token);
 export function SourceLink({ source }) {
@@ -82,9 +83,11 @@ export function ControlledSourceInventory({ navigationTarget }) {
     const ok = await change(current => applySourceIntake(current, pending, TOKENS), "Import source inventory / " + pending.batchId);
     if (ok) setPending(null);
   }
+  const openSource=id=>{setQuery("");setProvider("ALL");const index=intake?.sources.findIndex(s=>"bid.documents.source."+s.id===id)??-1;setVisibleCount(Math.max(50,index+1));setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(e=>e.getAttribute("data-component-key")===id);if(el){for(let node=el;node;node=node.parentElement)if(node.tagName==="DETAILS")node.open=true;el.scrollIntoView({block:"center"});}},40);};
   return <div className="p55-stack">
     <Module id="bid.documents.controlled-source-inventory" title="Controlled source inventory" showToggle>
-      <SourceReadiness0550 onOpenSource={id=>{setQuery("");setProvider("ALL");const index=intake?.sources.findIndex(s=>"bid.documents.source."+s.id===id)??-1;setVisibleCount(Math.max(50,index+1));setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(e=>e.getAttribute("data-component-key")===id);el?.scrollIntoView({block:"center"});},40);}}/>
+      <SourceReadiness0550 onOpenSource={openSource}/>
+      <SourceEvidenceSearch0550 onOpenSource={openSource}/>
       <p>ทะเบียน GDrive / Gmail ที่ตรวจอ่านล่าสุด พร้อมเอกสารย้อนหลังและข้อมูลที่ยังอ่านไม่ครบ</p>
       <p>โหลดทะเบียนที่ตรวจแล้วจาก Google Drive for Desktop อัตโนมัติเมื่อเปิดโครงการ · ข้อมูลบันทึกใน workspace และ backup · เอกสารต้นฉบับใหม่ยังต้องผ่านการตรวจและอัปเดตทะเบียน</p>
       <div className="p55-panel" role="status" aria-label="Source intake loaded status"><p>{sourceSync?.message || "ตรวจทะเบียนจาก Google Drive for Desktop เมื่อเปิดโครงการ"}</p><button type="button" disabled={!data || busy} onClick={reload}>ตรวจข้อมูลจาก Drive อีกครั้ง</button><strong>{intake ? "Batch ที่โหลดอยู่: " + intake.batchId : "ยังไม่ได้โหลดทะเบียนเอกสารล่าสุดใน workspace นี้"}</strong><p>{intake ? `${intake.sources.length} แหล่ง · ${intake.packageComparisons?.length || 0} กลุ่มเปรียบเทียบ` : "เปิด Google Drive for Desktop และรอให้โฟลเดอร์โครงการพร้อมใช้งาน โปรแกรมจะโหลดทะเบียนใน 90_SYSTEM_WORKING/DATA"}</p></div>

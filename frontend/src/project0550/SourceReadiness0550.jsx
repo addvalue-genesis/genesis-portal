@@ -6,6 +6,7 @@ import {deriveSourceReadiness0550,emptySourceControl0550,bindUniqueSourceInputs0
 import {newId} from "./data/bidWorkspaceModel";
 import {blankDocumentReview0550,stampIntegration0550,emptyIntegration0550} from "./data/integrationWorkspace0550";
 import {DELIVERY_KINDS_0550} from "./workingPreviewStages0550";
+import {DocumentReadingCoverage0550} from "./DocumentReadingCoverage0550";
 
 // Part of the existing A controlled-source-inventory module, not a new module ID.
 export function SourceReadiness0550({onOpenSource=()=>{}}){
@@ -31,6 +32,7 @@ export function SourceReadiness0550({onOpenSource=()=>{}}){
    <button type="button" disabled={busy||!sources.length} onClick={()=>save(bindUniqueSourceInputs0550,"bind unique exact document/version candidates")}>ผูกเฉพาะเลข/ฉบับที่ตรงและมีต้นฉบับปัจจุบันเดียว</button>
    <button type="button" disabled={busy} onClick={()=>setExtra(blankExtra())}>เพิ่มเอกสารที่ RFQ / เอกสารอ้างอิงกำหนด</button>
    <button type="button" disabled={busy} onClick={()=>setReview({...control.review})}>ทบทวนความครบของ A</button>
+   <button type="button" onClick={()=>onOpenSource("bid.documents.si-work-package")}>นำเข้าชุดเตรียม A / ข้อกำหนดให้ B</button>
    <button type="button" onClick={()=>downloadBidFile({projectId:data.projectId,revision:data.revision,sourceBatchId:data.sourceIntake?.batchId,state:readiness.state,basisKey:readiness.basisKey,checks:readiness.problems,expectedInputs:readiness.rows.map(({bound,candidates,related,...r})=>({...r,boundSourceIds:bound.map(s=>s.id),candidateSourceIds:candidates.map(s=>s.id),relatedSourceIds:related.map(s=>s.id)}))},`PJ2608-0550_A_Input_Review_R${data.revision}.json`)}>Export A input review</button>
   </div>
   {readiness.problems.length>0&&<p><strong>ยังส่งต่อเป็นฐานที่พร้อมไม่ได้:</strong> {readiness.problems.join(" / ")}</p>}
@@ -38,7 +40,7 @@ export function SourceReadiness0550({onOpenSource=()=>{}}){
   {doc&&<form onSubmit={async e=>{e.preventDefault();const ok=await change(d=>{const w={...emptyIntegration0550(),...d.integrationWorkspace};return {...d,integrationWorkspace:{...w,documentReviews:[...w.documentReviews.filter(r=>r.id!==doc.id),stampIntegration0550(d,"documentReviews",doc)]}};},"A document reading / "+doc.id);if(ok){setDoc(null);setMessage("บันทึกการอ่านในทะเบียนกลางแล้ว · A และ B ใช้ผลตรวจเดียวกัน");}}}>
    <h4>ตรวจอ่านต้นฉบับใน A · {sources.find(s=>s.id===doc.id)?.title}</h4>
    <div className="p55-bid-fields"><Multi label="A document applicable systems" value={doc.systemTokens} onChange={v=>setDoc(f=>({...f,systemTokens:v}))} options={(model?.integration?.scopes||[]).map(s=>[s.id,s.id])}/>
-   <Field label="A document total PDF pages" type="number" min="1" value={doc.expectedPages} onChange={v=>setDoc(f=>({...f,expectedPages:v}))}/><Field label="A reviewed PDF pages / ranges" value={doc.reviewedPages} onChange={v=>setDoc(f=>({...f,reviewedPages:v}))}/>
+   <DocumentReadingCoverage0550 source={sources.find(s=>s.id===doc.id)} doc={doc} setDoc={setDoc} prefix="A "/>
    <Multi label="A document obligation categories reviewed" value={doc.categories} onChange={v=>setDoc(f=>({...f,categories:v}))} options={DELIVERY_KINDS_0550.map(k=>[k,k])}/>
    <Field label="A document review basis / exceptions" value={doc.basis} onChange={v=>setDoc(f=>({...f,basis:v}))}/>
    {[["notesReviewed","ตรวจ notes / ข้อความท้ายตาราง"],["colourReviewed","ตรวจภาพ สี ไฮไลต์ และ annotations"],["appendicesReviewed","ตรวจ appendix / attachments และอ้างอิง"]].map(([k,label])=><label key={k}><input type="checkbox" checked={doc[k]} onChange={e=>setDoc(f=>({...f,[k]:e.target.checked}))}/>{label}</label>)}

@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-29.14-preview",
+  "version": "2026-10-30.1-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "131c642f777061eabb295fc0bbc7afb93dae151f",
-  "capability": "0550 A RFQ input receipt/readiness and shared document reading before v2 commercial issue; preserves linked Volume II technical proposal authoring, financial inputs and history"
+  "source0550": "730e0437da3ec117b6fdc85880605272ffb481a6",
+  "capability": "0550 A linked source preparation, native evidence search and canonical draft requirements for B; preserves source reading gates, commercial issue, Volume II, financial inputs and history"
 }
