@@ -8,6 +8,40 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  const read=()=>page.evaluate(()=>new Promise(resolve=>{const q=indexedDB.open('GENESIS-PJ2608-0550-BIDDING',1);q.onsuccess=()=>{const db=q.result,t=db.transaction('workspace','readonly'),r=t.objectStore('workspace').get('active');r.onsuccess=()=>resolve(r.result);t.oncomplete=()=>db.close();};}));
  const nav=async id=>{await page.getByLabel('Project Module Search').fill(id);await page.getByLabel('Project Module Search').press('Enter');};
  const initial=await read();await nav('bid.budget.official.summary');
+ // Top-level reading order is independent of shortcuts and pricing basis.
+ const expected=Array.from({length:9},(_,i)=>'10.'+i);
+ const sections=page.locator('[data-testid="bid-commercial"] > details[data-module-number]');
+ const checkOrder=async()=>{
+  assert.deepEqual(await sections.evaluateAll(nodes=>nodes.map(n=>n.dataset.moduleNumber)),expected);
+  for(const section of await sections.all())assert(await section.locator(':scope > summary').isVisible(),'Every top-level heading stays visible');
+  const working=page.locator('[data-component-key="bid.budget.working.lines"]');
+  assert.equal(await working.locator('[data-component-key="bid.working-preview.particulars"]').count(),1);
+  for(let step=1;step<=8;step++)assert.equal(await working.locator('[data-component-key="bid.working-preview.step.'+step+'"]').count(),1);
+  assert.equal(await page.locator('[data-component-key="bid.budget.official.summary"]').count(),1);
+  assert.equal(await page.locator('[data-component-key="bid.budget.fx"]').count(),1);
+ };
+ await checkOrder();
+ const stages=page.getByRole('group',{name:'Bidding pricing stages'});
+ for(const [label,id] of [['Budget THB','bid.budget.budget-thb'],['Release Preview USD','bid.budget.release'],['Working Preview','bid.budget.working.lines']]){
+  await stages.getByRole('button').filter({hasText:label}).click();
+  await page.locator('[data-module-focused="true"][data-component-key="'+id+'"]').waitFor({state:'visible'});
+  assert(await page.locator('[data-component-key="'+id+'"]').evaluate(e=>e.open));await checkOrder();
+ }
+ await nav('bid.working-preview.step.7');
+ await page.locator('[data-component-key="bid.working-preview.step.7"]').waitFor({state:'visible'});
+ await nav('bid.budget.official.summary');
+ assert.deepEqual(await read(),initial,'Ordering, shortcuts and nested WP navigation never rewrite canonical data');
+ await sections.evaluateAll(nodes=>nodes.forEach(n=>{n.open=false;}));
+ await checkOrder();await page.setViewportSize({width:390,height:844});await checkOrder();
+ assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Numbered overview fits mobile');
+ if(process.env.PJ0550_SUMMARY_QA_DIR){
+  fs.mkdirSync(process.env.PJ0550_SUMMARY_QA_DIR,{recursive:true});
+  await sections.first().scrollIntoViewIfNeeded();await page.locator('[data-testid="bid-commercial"]').screenshot({path:path.join(process.env.PJ0550_SUMMARY_QA_DIR,'ordered-overview-mobile.png')});
+ }
+ await page.setViewportSize({width:1440,height:1100});
+ if(process.env.PJ0550_SUMMARY_QA_DIR){await sections.first().scrollIntoViewIfNeeded();await page.locator('[data-testid="bid-commercial"]').screenshot({path:path.join(process.env.PJ0550_SUMMARY_QA_DIR,'ordered-overview-desktop.png')});}
+ await nav('bid.budget.official.summary');
+ console.log('CHECK fixed 10.0–10.8 order, nested WP, unique summary/FX, shortcuts and mobile overview');
  console.log('CHECK summary navigation');
  const summary=page.locator('[data-component-key="bid.budget.official.summary"]');await summary.getByRole('table',{name:'Known customer prices by part',exact:true}).waitFor();
  const customer=summary.getByRole('table',{name:'Known customer prices by part',exact:true}),native=summary.getByRole('table',{name:'Known native Working prices',exact:true});

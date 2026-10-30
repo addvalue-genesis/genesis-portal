@@ -18,7 +18,8 @@ const server=http.createServer((req,res)=>{
   await page.goto(`http://127.0.0.1:${server.address().port}/projects/pj2608-0550`);
   await page.locator('.p55-bid-save').filter({hasText:'Revision 1'}).waitFor();const before=await db();
   await nav('Architecture');const principles=page.getByRole('region',{name:'หลักการทำงาน System Integrator 0550'});
-  await principles.getByRole('table',{name:'SI runtime controls'}).waitFor();assert.equal(await principles.getByRole('table',{name:'SI runtime controls'}).locator('tbody tr').count(),10);
+  await principles.getByRole('table',{name:'SI runtime controls'}).waitFor();assert.equal(await principles.getByRole('table',{name:'SI runtime controls'}).locator('tbody tr').count(),11);
+  assert((await principles.getByRole('table',{name:'SI runtime controls'}).locator('tbody tr').first().innerText()).includes('A · เอกสารตาม RFQ พร้อมให้ B ใช้'),'Current baseline includes the existing A readiness check');
   assert((await principles.innerText()).includes('F_SI(A, S; K, D, Θ)'));assert((await principles.innerText()).includes('HOLD / NOT ISSUED'));
   assert.equal(await principles.getByRole('table',{name:'SI module responsibilities'}).locator('tbody tr').count(),15);
   await principles.getByRole('button',{name:'เปิด A · ต้นทางลูกค้า',exact:true}).click();await page.locator('[data-component-key="l3.original"]').waitFor({state:'visible'});

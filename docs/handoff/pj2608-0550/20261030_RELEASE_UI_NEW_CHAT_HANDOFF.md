@@ -4,6 +4,8 @@
 ผู้ใช้: Jack  
 บทบาทที่ต้องทำต่อ: Principal Telecom Systems Integration Engineer & GENESIS Software Architect
 
+> Latest navigation continuation: [20261030_COMMERCIAL_SECTION_ORDER.md](20261030_COMMERCIAL_SECTION_ORDER.md), UI `2026-10-30.5-preview`. This adds fixed section ordering on top of the historical baseline below. Check current GitHub HEAD before continuing.
+
 ## 1. เริ่มจากตรงนี้
 
 - Repository: `addvalue-genesis/genesis-portal`

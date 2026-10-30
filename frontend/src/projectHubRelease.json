@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-30.4-preview",
+  "version": "2026-10-30.5-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "3997e0579a514f3d7659d2e6e486262132752815",
-  "capability": "Dedicated 0550 on 3050; automatic paired JSON A/B preparation with optional Volume II drafts; preserves local authored slots/deletions, financial inputs and frozen history"
+  "source0550": "2494e5692c633cb682ac4f209fc3227bec46e4f6",
+  "capability": "Dedicated 0550 on 3050; fixed 10.0–10.8 sections with nested WP.1–8 and navigation shortcuts; automatic paired JSON A/B and Volume II drafts; preserves authored data, financial inputs and frozen history"
 }

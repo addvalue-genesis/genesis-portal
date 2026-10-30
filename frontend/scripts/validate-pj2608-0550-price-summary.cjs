@@ -34,7 +34,7 @@ assert(ng.some(g=>g.native.some(n=>n.currency==='USD'&&n.customer.value>0)),'Nat
 const fixture={selected:[{selected:true,wbs:'A',currency:'USD',customerTHB:0,customerUSD:0,provisionalCostNative:0,provisionalSellNative:0,provisionalCustomerNative:0},{selected:true,wbs:'A',currency:'USD',customerTHB:null,customerUSD:null,provisionalCostNative:null,provisionalSellNative:null,provisionalCustomerNative:null},{selected:false,wbs:'A',currency:'USD',customerTHB:999999,customerUSD:999999},{selected:true,wbs:'C1',currency:'EUR',customerTHB:17,customerUSD:11,provisionalCostNative:5,provisionalSellNative:6,provisionalCustomerNative:7}]};
 const fg=knownPriceGroups0550(fixture);assert.deepEqual(fg[0].usd,{value:0,priced:1,missing:1});assert.equal(fg[2].usd.value,11);assert.equal(fg[1].usd.value,null);assert.equal(fg[2].native[0].currency,'EUR');assert.equal(fg[0].native[0].customer.value,0,'Explicit zero retained; missing/unselected never substituted or summed');
 assert(knownPriceGroups0550({selected:[]}).every(g=>g.usd.value===null));
-const source=fs.readFileSync(root+'/project0550/BidCommercialWorkspace.jsx','utf8');assert.equal((source.match(/<BidKnownPrices0550 /g)||[]).length,2,'Working and Budget/Release use the same summary');
+const source=fs.readFileSync(root+'/project0550/BidCommercialWorkspace.jsx','utf8');assert.equal((source.match(/<BidKnownPrices0550 /g)||[]).length,1,'All navigation shortcuts share one mounted summary');
 // The same known amounts must be inspectable in the actual 10.7 table.
 const {releasePricePresentation0550}=require(root+'/project0550/releasePricePresentation0550.js');
 const {officialCustomerRows}=require(root+'/project0550/data/officialPricing0550.js');

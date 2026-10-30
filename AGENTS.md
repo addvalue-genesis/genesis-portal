@@ -2,6 +2,8 @@
 
 ## PJ2608-0550
 
+Latest commercial navigation: [fixed 10.0–10.8 order and nested SI steps](docs/handoff/pj2608-0550/20261030_COMMERCIAL_SECTION_ORDER.md), UI `2026-10-30.5-preview`. Working/Budget/Release shortcuts open existing sections; preserve IDs, automatic data loading, financial values and frozen history.
+
 Latest SI/Volume II continuation: [linked drafts and evidence review](docs/handoff/pj2608-0550/20261030_SI_VOLUME_II_CONTINUATION.md), UI `2026-10-30.4-preview`. Optional technical drafts use the existing automatic paired JSON path; preserve authored IDs/slots, local document metadata, deleted records, financial values and history. Actual project engineering/source gaps remain OPEN.
 
 Latest source loading: [automatic existing JSON into A/B](docs/handoff/pj2608-0550/20261030_A_AUTO_JSON.md), UI `2026-10-30.3-preview`. Normal startup must not require downloading/selecting/importing A files. Preserve canonical workspace receipts, user edits/deletions, dedicated 0550 routes/3050, pricing and frozen history.
