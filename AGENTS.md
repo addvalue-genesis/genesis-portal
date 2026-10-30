@@ -2,6 +2,8 @@
 
 ## PJ2608-0550
 
+Latest SI/Volume II continuation: [linked drafts and evidence review](docs/handoff/pj2608-0550/20261030_SI_VOLUME_II_CONTINUATION.md), UI `2026-10-30.4-preview`. Optional technical drafts use the existing automatic paired JSON path; preserve authored IDs/slots, local document metadata, deleted records, financial values and history. Actual project engineering/source gaps remain OPEN.
+
 Latest source loading: [automatic existing JSON into A/B](docs/handoff/pj2608-0550/20261030_A_AUTO_JSON.md), UI `2026-10-30.3-preview`. Normal startup must not require downloading/selecting/importing A files. Preserve canonical workspace receipts, user edits/deletions, dedicated 0550 routes/3050, pricing and frozen history.
 
 Latest A preparation: read [linked source preparation and native reading](docs/handoff/pj2608-0550/20261030_A_SOURCE_PREPARATION.md), UI `2026-10-30.1-preview`. Private Rev08 and linked drafts are distributed separately; actual A is still OPEN. Search/preparation does not approve engineering or issue a Release.

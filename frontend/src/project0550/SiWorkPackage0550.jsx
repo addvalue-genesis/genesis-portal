@@ -13,10 +13,10 @@ export function SiWorkPackage0550(){
  }
  async function apply(){
   const ok=await change(current=>planSiWorkPackage0550(current,pack,tokens).workspace,"Import SI engineering drafts / "+pack.batchId);
-  if(ok){setMessage("นำเข้าผลวิเคราะห์แล้ว เปิด Working Preview 1–8 เพื่อตรวจข้อกำหนด CAL/RPT และกิจกรรม · รายการเดิมที่เคยแก้ไขคงไว้ตามตาราง");setPack(null);setPlan(null);}
+  if(ok){setMessage("นำเข้า DRAFT แล้ว เปิด Working Preview 1–8 และ Volume II เพื่อตรวจเนื้อหาและหลักฐาน · รายการเดิมที่เคยแก้ไขคงไว้ตามตาราง · ยังไม่อนุมัติวิศวกรรมหรือออกเอกสารลูกค้า");setPack(null);setPlan(null);}
  }
  return <Module id="bid.documents.si-work-package" title="นำเข้าผลวิเคราะห์ System Integrator">
-  <p>ชุดเตรียม A จาก DATA โหลดอัตโนมัติเมื่อเปิดโครงการ · ส่วนนี้เป็นทางเลือกสำรองสำหรับนำเข้าหรือใช้ตรวจชุดผลวิเคราะห์ SI · ใช้ข้อกำหนด CAL/RPT และกิจกรรมใน Working Preview ชุดเดียวกัน รายการนำเข้าเป็น DRAFT และยังต้องผ่านเกณฑ์ของแต่ละโมดูล</p>
+  <p>ชุดเตรียม A จาก DATA โหลดอัตโนมัติเมื่อเปิดโครงการ · ส่วนนี้เป็นทางเลือกสำรองสำหรับนำเข้าหรือใช้ตรวจผลวิเคราะห์ SI และเนื้อหา Volume II · ใช้ workspace เดิม เติมเฉพาะรายการที่ยังไม่มี คงเนื้อหาและ ID ที่เคยบันทึกไว้ · ข้อมูลที่เพิ่มเป็น DRAFT และยังต้องผ่านเกณฑ์ของแต่ละโมดูล</p>
   <label>SI work package <input aria-label="Import SI work package" type="file" accept=".json,application/json" disabled={!data||busy} onChange={e=>{preview(e.target.files[0]);e.target.value="";}}/></label>
   {error&&<p role="alert">{error}</p>}{message&&<p role="status">{message}</p>}
   {pack&&plan&&<div className="p55-panel" aria-label="SI work package preview"><strong>{pack.batchId} · {pack.preparedOn}</strong><p>{pack.coverageNote}</p>

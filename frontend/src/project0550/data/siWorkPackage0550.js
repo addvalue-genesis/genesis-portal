@@ -4,6 +4,7 @@ import {validateSourceIntake} from "./sourceIntakeModel";
 import {selectAutomaticSource} from "./sourceAutoLoad";
 import {emptyIntegration0550,validateIntegration0550,integrationFingerprint0550} from "./integrationWorkspace0550";
 import {emptySourceControl0550,validateSourceControl0550} from "./sourceReadiness0550";
+import {emptyTechnicalProposal0550,validateTechnicalProposal0550} from "./technicalProposal0550";
 
 export const SI_WORK_PACKAGE_SCHEMA_0550="genesis.0550.si-work-package.v1";
 // v2 references the installed intake, avoiding a second 14+ MB copy of sources.
@@ -15,7 +16,7 @@ const fail=m=>{throw Error("SI work package: "+m);};
 const keys=(o,allowed)=>{if(!o||typeof o!=="object"||Array.isArray(o)||Object.keys(o).some(k=>!allowed.includes(k)))fail("unsupported fields");};
 export function validateSiWorkPackage0550(pack,systems,intake){
  const linked=pack?.schema===A_WORK_PACKAGE_SCHEMA_0550;
- keys(pack,linked?["schema","projectId","batchId","preparedOn","coverageNote","sourceBatchId","sourceBasisKey","sourceControl","integrationWorkspace"]:["schema","projectId","batchId","preparedOn","coverageNote","sourceIntake","integrationWorkspace"]);
+ keys(pack,linked?["schema","projectId","batchId","preparedOn","coverageNote","sourceBatchId","sourceBasisKey","sourceControl","integrationWorkspace","technicalProposal"]:["schema","projectId","batchId","preparedOn","coverageNote","sourceIntake","integrationWorkspace"]);
  if(![SI_WORK_PACKAGE_SCHEMA_0550,A_WORK_PACKAGE_SCHEMA_0550].includes(pack.schema)||pack.projectId!=="PJ2608-0550")fail("wrong project/schema");
  if(typeof pack.batchId!=="string"||!/^PJ2608-0550-SI-[\w.-]{1,80}$/.test(pack.batchId))fail("invalid batch");
  if(typeof pack.preparedOn!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(pack.preparedOn)||!Number.isFinite(Date.parse(pack.preparedOn))||new Date(pack.preparedOn).toISOString().slice(0,10)!==pack.preparedOn)fail("invalid date");
@@ -53,6 +54,17 @@ export function validateSiWorkPackage0550(pack,systems,intake){
    if(!ref.locator.trim()||!ref.excerpt.trim()||!s.content.replace(/\s+/g," ").includes(ref.excerpt.replace(/\s+/g," ")))fail("particular excerpt missing from source / "+r.id);
   }
   if(r.requirementId&&!reqs.has(r.requirementId))fail("requirement missing / "+r.requirementId);
+ }
+ if(pack.technicalProposal!==undefined){
+  validateTechnicalProposal0550(pack.technicalProposal,systems);
+  for(const r of pack.technicalProposal.records){
+   if(r.status!=="DRAFT"||r.basisKey||r.reviewer||r.reviewedOn)fail("technical authoring must be an unstamped draft");
+   for(const id of r.sourceIds)if(!sources.has(id))fail("technical source missing / "+id);
+   for(const [field,collection] of [["requirementIds","requirements"],["proofIds","proofs"],["activityIds","activities"]])for(const id of r[field])if(!pack.integrationWorkspace[collection].some(x=>x.id===id))fail("technical linked record missing / "+id);
+  }
+  // Physical details need line-level evidence reviewed in the existing authoring
+  // UI. A package cannot invent weights or assign a cabinet size to a priced Lot.
+  if(pack.technicalProposal.equipmentDetails.length)fail("technical physical details require local line review");
  }
  return pack;
 }
@@ -92,9 +104,25 @@ export function planSiWorkPackage0550(data,pack,systems){
   // Existing manifest review is retained; additions naturally make it stale.
   sourceControl=next;
  }
+ let technicalProposal=data.technicalProposal;
+ if(pack.technicalProposal){
+  const old=technicalProposal||emptyTechnicalProposal0550(),added=[],same=[],preserved=[];
+  for(const r of pack.technicalProposal.records){
+   const existing=old.records.find(x=>x.id===r.id||x.sectionId===r.sectionId&&x.systemToken===r.systemToken);
+   if(!existing)added.push(r);
+   else if(JSON.stringify(existing)===JSON.stringify(r))same.push(r.id);
+   else preserved.push(r.id+" / existing "+existing.id);
+   for(const id of r.offerIds)if(!data.offers.some(o=>o.id===id))fail("technical offer missing / "+id);
+  }
+  if(added.length)technicalProposal={...old,records:[...old.records,...JSON.parse(JSON.stringify(added))]};
+  stats.push({collection:"technicalProposal.records",added:added.length,unchanged:same.length,preserved});
+  // Existing document metadata, equipment details and authored slots always win.
+  // Even blank metadata is a local decision, not an importable document number.
+ }
  const changed=selected.workspace!==data||stats.some(s=>s.added);
- const workspace=changed?{...selected.workspace,integrationWorkspace:merged,...(sourceControl?{sourceControl}:{})}:data;
+ const workspace=changed?{...selected.workspace,integrationWorkspace:merged,...(sourceControl?{sourceControl}:{}),...(technicalProposal?{technicalProposal}:{})}:data;
  validateIntegration0550(workspace);
  validateSourceControl0550(workspace);
+ validateTechnicalProposal0550(workspace.technicalProposal,[...new Set([...systems,...merged.requirements.map(r=>r.systemToken)])]);
  return {workspace,stats,sourceState:selected.state,changed};
 }
