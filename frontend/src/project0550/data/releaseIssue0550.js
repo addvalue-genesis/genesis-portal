@@ -4,6 +4,7 @@ import {integrationFingerprint0550} from "./integrationWorkspace0550";
 import {officialCustomerRows,CUSTOMER_FORM_0550} from "./officialPricing0550";
 import {deriveSourceReadiness0550} from "./sourceReadiness0550";
 import {deriveBidVolumes0550} from "./bidVolumes0550";
+import {nativeExhibitProblems0550} from "../exhibitCNative0550";
 import {freezeBidPackageOutput0550,validateFrozenBidPackage0550} from "./bidPackageOutput0550";
 const clone=v=>JSON.parse(JSON.stringify(v));
 const canonical=v=>JSON.stringify(v,(_,x)=>x&&typeof x==="object"&&!Array.isArray(x)?Object.fromEntries(Object.keys(x).sort().map(k=>[k,x[k]])):x);
@@ -24,7 +25,7 @@ export function mergeReleaseRegister0550(local,incoming){
  }
  return result;
 }
-export function releaseReadiness0550(data,model,today,{legacySnapshot=false}={}){
+export function releaseReadiness0550(data,model,today,{legacySnapshot=false,legacyExhibit=false}={}){
  const o=model.official,i=model.integration,problems=[];
  if(!legacySnapshot&&!deriveSourceReadiness0550(data,i,today).ready)problems.push("A_INPUT_READINESS_OPEN");
  if(!i?.ready)problems.push("INTEGRATION_OPEN");
@@ -35,7 +36,7 @@ export function releaseReadiness0550(data,model,today,{legacySnapshot=false}={})
  if(data.sourceIntake?.findings.some(f=>f.state!=="SOURCE_SUPPORTED"))problems.push("SOURCE_FINDINGS_OPEN");
  if(!text(data.fx.source)||!date(data.fx.date)||data.fx.date>today||!(data.fx.thbPerUSD>0))problems.push("CURRENT_FX_OPEN");
  if(o?.requirementGaps.length||o?.unmapped.length)problems.push("REQUIREMENT_OR_PRICE_MAPPING_OPEN");
- if(data.bidVolumes){const systems=(i?.scopes||[]).map(s=>({token:s.id,name:s.id}));const volumes=deriveBidVolumes0550(data,model,systems,today);if(!volumes.ready)problems.push(...volumes.problems.map(p=>"BID_PACKAGE: "+p));}
+ if(data.bidVolumes){const systems=(i?.scopes||[]).map(s=>({token:s.id,name:s.id}));const volumes=deriveBidVolumes0550(data,model,systems,today);if(!volumes.ready)problems.push(...volumes.problems.map(p=>"BID_PACKAGE: "+p));if(!legacyExhibit)problems.push(...nativeExhibitProblems0550(volumes).map(p=>"NATIVE_EXHIBIT_C: "+p));}
  return {ready:!problems.length,problems};
 }
 export function deriveReleaseControl0550(data,model,today){
@@ -89,9 +90,10 @@ export function validateReleaseTransition0550(previous,next,today,derive,{restor
   if(!restore&&(!previous||!equal(issue.snapshot,releaseSnapshot0550(previous))||!equal(releaseSnapshot0550(next),releaseSnapshot0550(previous))))fail("issue must freeze the currently saved workspace");
   if(!restore&&issue.snapshot.bidVolumes&&issue.schema!=="genesis.0550.commercial-issue.v3")fail("new bid package requires frozen Volume outputs");
   const model=derive(issue.snapshot,issue.authorizedOn);
-  if(issue.schema==="genesis.0550.commercial-issue.v3"&&!equal(issue.bidPackage,freezeBidPackageOutput0550(issue.snapshot,model,issue.number,issue.authorizedOn)))fail("frozen bid package output changed");
+  if(!restore&&issue.schema==="genesis.0550.commercial-issue.v3"&&!issue.bidPackage.nativeExhibitVersion)fail("new bid package requires frozen native Word output");
+  if(issue.schema==="genesis.0550.commercial-issue.v3"&&!equal(issue.bidPackage,freezeBidPackageOutput0550(issue.snapshot,model,issue.number,issue.authorizedOn,{legacy:!issue.bidPackage.nativeExhibitVersion})))fail("frozen bid package output changed");
   const legacySnapshot=restore&&issue.schema==="genesis.0550.commercial-issue.v1";
-  if(!releaseReadiness0550(issue.snapshot,model,issue.authorizedOn,{legacySnapshot}).ready||issue.authorizedOn>today||!equal(issue.customerColumns,CUSTOMER_FORM_0550.columns)||!equal(issue.customerRows,officialCustomerRows(model.official))||issue.baseUSD!==model.official.baseUSD||issue.optionsUSD!==model.official.optionsUSD)fail("issue readiness/output changed");
+  if(!releaseReadiness0550(issue.snapshot,model,issue.authorizedOn,{legacySnapshot,legacyExhibit:restore&&!issue.bidPackage?.nativeExhibitVersion}).ready||issue.authorizedOn>today||!equal(issue.customerColumns,CUSTOMER_FORM_0550.columns)||!equal(issue.customerRows,officialCustomerRows(model.official))||issue.baseUSD!==model.official.baseUSD||issue.optionsUSD!==model.official.optionsUSD)fail("issue readiness/output changed");
  }
  for(const t of reg.transmittals.slice(old.transmittals.length))recordReleaseTransmittal0550({...next,releaseRegister:{issues:reg.issues,transmittals:[]}},t,today);
 }

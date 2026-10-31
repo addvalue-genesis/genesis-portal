@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-31.1-preview",
+  "version": "2026-10-31.2-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "f81dec7d23401e618f653ac2a1384019212254ee",
-  "capability": "0550 three-volume preparation: numbered 11 Quotation / 12 Technical-VDRL / 13 Commercial / 14 Deviation; canonical Schedule allocation; bounded input impact; reviewed package gate and exact frozen v3 outputs; preserved financials/history and automatic sources on 3050"
+  "source0550": "a5bdd4b6c7f99bfdabbdf065f5abd24c041a5b26",
+  "capability": "0550 native Exhibit C: visible original Schedule A/A1/A2/B/C/C1\u2013C8 forms, template-preserving Word and print/PDF, canonical Working values and CIF/FOB columns, per-equipment/continued forms, versioned frozen native Word; preserve IDs, sources, financials and history on 3050"
 }

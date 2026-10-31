@@ -32,12 +32,14 @@ export const QUALIFICATIONS_0550=[
 export const VOLUME_SCHEMA_0550='genesis.0550.bid-volumes.v1';
 export const emptyBidVolumes0550=()=>({schema:VOLUME_SCHEMA_0550,documentNo:'',revision:'Rev00',records:[],bindings:[],vdrl:[],commercialDeviations:[]});
 const reviewFields={reviewer:'',reviewedOn:'',status:'DRAFT',basisKey:''};
-export const blankVolumeRecord0550=key=>({id:key,content:'',owner:'',sourceIds:[],locator:'',disposition:'REQUIRED',reason:'',...reviewFields});
-export const blankScheduleBinding0550=lineId=>({id:lineId,lineId,schedule:'C1',summary:'GOODS',treatment:'BASE',sourceIds:[],locator:'',basis:'',mainEquipment:'',partNo:'',interchangeA:'',interchangeB:'',specification:'',deliveryTerm:'',delivery:'',origin:'',shippingFrom:'',hoursPerDay:null,...reviewFields});
+export const blankVolumeRecord0550=key=>({id:key,content:'',owner:'',sourceIds:[],locator:'',disposition:'REQUIRED',reason:'',nativeFields:{},...reviewFields});
+export const blankScheduleBinding0550=lineId=>({id:lineId,lineId,schedule:'C1',summary:'GOODS',treatment:'BASE',sourceIds:[],locator:'',basis:'',mainEquipment:'',partNo:'',interchangeA:'',interchangeB:'',specification:'',deliveryTerm:'',delivery:'',origin:'',shippingFrom:'',hoursPerDay:null,vendorEquipmentNo:'',referenceDrawings:'',...reviewFields});
 export const blankVdrl0550=id=>({id,documentNo:'',title:'',systemToken:'COMMON',phase:'BID',sectionIds:[],technicalRecordIds:[],sourceIds:[],locator:'',owner:'',dueOn:'',deliverableRef:'',reason:'',...reviewFields});
 export const blankCommercialDeviation0550=id=>({id,title:'',sourceIds:[],locator:'',requirement:'',proposal:'',reason:'',approvalSourceIds:[],approvalLocator:'',approvalExcerpt:'',decision:'PENDING',...reviewFields});
 const trim=v=>typeof v==='string'&&v.trim();
-const clean=r=>Object.fromEntries(Object.entries(r).filter(([k])=>!['reviewer','reviewedOn','status','basisKey'].includes(k)));
+// Empty optional native-form metadata must not stale legacy reviews on opening
+// or first save. Nonempty changes remain part of the existing basis fingerprint.
+const clean=r=>Object.fromEntries(Object.entries(r).filter(([k,v])=>!['reviewer','reviewedOn','status','basisKey'].includes(k)&&!(k==='nativeFields'&&!Object.keys(v||{}).length)&&!(['vendorEquipmentNo','referenceDrawings'].includes(k)&&!v)));
 const sources=(data,ids)=>(ids||[]).map(id=>data.sourceIntake?.sources.find(s=>s.id===id)||{id,missing:true});
 const currentSourceProblems=(data,ids,locator)=>{
  const problems=[];if(!ids.length||!trim(locator))problems.push('SOURCE_LOCATOR_OPEN');
@@ -154,8 +156,9 @@ export function validateBidVolumes0550(data){
  const keys={records:Object.keys(blankVolumeRecord0550('')),bindings:Object.keys(blankScheduleBinding0550('')),vdrl:Object.keys(blankVdrl0550('')),commercialDeviations:Object.keys(blankCommercialDeviation0550(''))};
  for(const [collection,fields] of Object.entries(keys)){
   const rows=p[collection];if(!Array.isArray(rows)||rows.length>2000||new Set(rows.map(r=>r?.id)).size!==rows.length)fail('invalid collection '+collection);
-  for(const r of rows){obj(r,fields);for(const [k,v] of Object.entries(r)){
-   if(k==='hoursPerDay'){if(v!==null&&(!Number.isFinite(v)||v<=0||v>24))fail('hours/day');}
+  for(const r of rows){const optional=['nativeFields','vendorEquipmentNo','referenceDrawings'];obj({...Object.fromEntries(optional.filter(k=>fields.includes(k)).map(k=>[k,k==='nativeFields'?{}:''])),...r},fields);for(const [k,v] of Object.entries(r)){
+   if(k==='nativeFields'){if(!v||typeof v!=='object'||Array.isArray(v)||Object.keys(v).some(k=>!['agreementNo','vendorNameAddress','sitePeriodDays','trainingPeriodDays'].includes(k))||Object.values(v).some(x=>typeof x!=='string'||x.length>2000))fail('native form metadata');}
+   else if(k==='hoursPerDay'){if(v!==null&&(!Number.isFinite(v)||v<=0||v>24))fail('hours/day');}
    else if(k.endsWith('Ids')){if(!Array.isArray(v)||v.length>500||new Set(v).size!==v.length||v.some(id=>typeof id!=='string'||id.length>100))fail('reference list');}
    else if(typeof v!=='string'||v.length>12000)fail('text');
   }
