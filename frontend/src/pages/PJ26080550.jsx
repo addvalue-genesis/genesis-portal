@@ -2077,6 +2077,8 @@ function Project0550Bidding({ lang = "th" }) {
     ...TECHNICAL_PANELS_0550.map((s,i)=>({id:"bid.technical."+s.id,title:"12 Volume II / "+s.title,number:s.id==="vdrl"?"12.V":s.id==="preview"?"12.P":"12."+i,tab:"technical"})),
     ...[{id:"overview",number:"11.0",title:"Overview"},{id:"cover",number:"11.1",title:"Power of Attorney"},...SCHEDULES_0550.map(s=>({...s,number:"11."+s.id})),{id:"mapping",number:"11.M",title:"Schedule allocation"},{id:"preview",number:"11.P",title:"Export"}].map(s=>({id:"bid.quotation."+s.id,title:s.title,number:s.number,tab:"quotation"})),
     ...[{id:"overview",number:"13.0",title:"Overview"},...QUALIFICATIONS_0550.map(q=>({...q,number:"13."+q.id})),{id:"deviations",number:"13.D",title:"Commercial Deviations"},{id:"preview",number:"13.P",title:"Export"}].map(s=>({id:"bid.commercial."+s.id,title:s.title,number:s.number,tab:"commercial"})),
+    ...(data?.lines||[]).map(l=>({id:"bid.quotation.line."+l.id,title:"11.M Schedule / "+l.description,number:"11.M",tab:"quotation"})),
+    ...[...new Set([...SYSTEMS.map(s=>s.token),"COMMON",...(model?.integration?.requirements||[]).map(r=>r.systemToken)])].flatMap(token=>TECHNICAL_PANELS_0550.filter(s=>!["overview","vdrl","preview"].includes(s.id)).map(s=>({id:"bid.technical."+s.id+".system."+token,title:"12 / "+token+" / "+s.title,tab:"technical"}))),
     {id:"bid.registry.impact",title:"Inputs / Change impact",number:"09.3",tab:"registry"},
     {id:"bid.working-preview",title:"Working Preview / System Integrator 1–8",tab:"budget"},
     {id:"bid.working-preview.particulars",title:"System Particular / Document reading ledger",tab:"budget"},

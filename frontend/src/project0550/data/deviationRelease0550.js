@@ -1,3 +1,4 @@
+import {workingOffers0550,activeSupply0550} from './workingOffers0550';
 import {deriveAvlReconciliation0550} from "./avlReconciliation0550";
 import layout from "./deviationReleaseLayout0550.json";
 import template from "./deviationReleaseTemplate0550.json";
@@ -35,7 +36,7 @@ export function deriveDeviationRelease0550(data,integration,selectedIds){
   if(!document.trim()||[1,2,4,6].some(i=>!cells[i].trim()))issues.push(d.id+": ระบุ Document, Page/Clause, Requirement, Deviation และ Justification ให้ครบ");
   if(!integration.requirements.some(r=>r.id===d.requirementId))issues.push(d.id+": ยังไม่ผูก Requirement");
   if(!d.offerIds.length||d.offerIds.some(id=>!data.offers.some(o=>o.id===id)))issues.push(d.id+": ข้อเสนอที่อ้างอิงไม่ครบ");
-  if(d.offerIds.some(id=>!data.lines.some(l=>l.selected&&l.systemToken===d.systemToken&&l.offerId===id)))issues.push(d.id+": ข้อเสนอที่อ้างอิงไม่ได้อยู่ในตัวเลือก Working ปัจจุบัน");
+  if(d.offerIds.some(id=>!data.lines.some(l=>activeSupply0550(l)&&l.systemToken===d.systemToken&&workingOffers0550(data,l).some(o=>o.id===id))))issues.push(d.id+": ข้อเสนอที่อ้างอิงไม่ได้อยู่ในตัวเลือก Working ปัจจุบัน");
   if(d.id.startsWith("DEV-AVL-")){const a=integration.avlChecks.find(a=>a.id===d.avlCheckId);if(d.offerIds.some(id=>{const o=data.offers.find(o=>o.id===id);return o&&(o.quoteRef!==d.vendorQuoteRef||(a?.manufacturer&&o.brand?.trim()&&o.brand.trim().toUpperCase()!==a.manufacturer.trim().toUpperCase()));}))issues.push(d.id+": ยี่ห้อหรือเลขข้อเสนอเปลี่ยน กรุณาทบทวนร่าง");}
   const height=rowHeight(cells);if(height>409)issues.push(d.id+": ข้อความยาวเกินความสูงแถว Excel กรุณาย่อข้อความหรือแยกเป็นหลายรายการ");
   group.rows.push({id:d.id,cells,height});

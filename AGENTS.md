@@ -1,3 +1,5 @@
+Latest live Volume II / SDRL: [document-first technical projection, qualification checklist and package AVL amendments](docs/handoff/pj2608-0550/20261101_LIVE_DOSSIER_AND_SDRL.md), UI `2026-11-01.1-preview`. Keep explicit missing-draft preparation, native With Bid blanks, canonical financial inputs, authored choices and legacy frozen outputs. Supplier sourceRef can contain costs and must not be copied into the technical dossier.
+
 Latest Working → Schedule preview: [existing Working/MGW prices, draft allocation and C1 component references](docs/handoff/pj2608-0550/20261031_WORKING_TO_SCHEDULE_PREVIEW.md), UI `2026-10-31.3-preview`. Opening/exporting is read-only; source costs stay internal, component references are non-additive, and draft visibility does not bypass issue review.
 
 Latest native Exhibit C: [original Schedule screens and Word export](docs/handoff/pj2608-0550/20261031_NATIVE_EXHIBIT_C_FORMS.md), UI `2026-10-31.2-preview`. Keep native table structures/notes, canonical Working ownership, legacy package restore and exact frozen Word bytes. XLSX remains a data worksheet.

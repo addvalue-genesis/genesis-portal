@@ -2,7 +2,7 @@
 import {PAGA_AVL_BASIS_0550} from './avlDeviationBasis0550';
 import {integrationRequirements0550,blankRequirement0550,blankAvlCheck0550,blankDeviation0550,emptyIntegration0550,integrationFingerprint0550} from './integrationWorkspace0550';
 import {mgwQuoteItem0550} from './mgwVendorBasis0550';
-import {satelliteScope0550} from './satelliteScope0550';
+import {workingOffers0550,activeSupply0550} from './workingOffers0550';
 
 // Bounded facts visually checked in native Annex 2_1, PDF p13 / printed p11 of 12.
 // Brand inclusion is not approval of models, origin, qualifications or engineering.
@@ -33,7 +33,7 @@ const quoteSourceIds=(data,offer)=>{
 };
 function assess(data,token,offer,basis,lines,reqs){
  const description=offer.description||'',cat=categoryFor(token,description),brand=offer.brand?.trim()||'';
- const selected=lines.some(l=>l.offerId===offer.id),allocated=reqs.filter(r=>r.offerIds.includes(offer.id));
+ const selected=lines.some(l=>workingOffers0550(data,l).some(o=>o.id===offer.id)),allocated=reqs.filter(r=>r.offerIds.includes(offer.id));
  const quote=mgwQuoteItem0550(offer);
  const result=quote&&!quote.systemTokens.includes(token)?'OFFER_SYSTEM_CONFLICT':!cat?'CATEGORY_NOT_ESTABLISHED':unknown(brand)?'OEM_UNRESOLVED':cat.brands.some(b=>norm(b)===norm(brand))?'BRAND_LISTED':'NOT_LISTED';
  return {id:token+'/'+offer.id,systemToken:token,offerId:offer.id,brand,description,quoteRef:offer.quoteRef,sourceRef:offer.sourceRef,basis,selected,allocated:allocated.length>0,category:cat,
@@ -42,8 +42,8 @@ function assess(data,token,offer,basis,lines,reqs){
 export function deriveAvlReconciliation0550(data,integration){
  const requirements=integration.requirements||integrationRequirements0550(data),w={...emptyIntegration0550(),...data.integrationWorkspace};
  const systems=integration.scopes.map(scope=>{
-  const token=scope.id,reqs=requirements.filter(r=>r.systemToken===token),lines=data.lines.filter(l=>l.systemToken===token&&l.selected&&l.wbs==='A'&&!satelliteScope0550(l).excluded);
-  const chosenIds=uniq([...lines.map(l=>l.offerId).filter(Boolean),...reqs.filter(r=>r.disposition!=='NOT_APPLICABLE'&&r.responsibility!=='COMPANY').flatMap(r=>r.offerIds)]);
+  const token=scope.id,reqs=requirements.filter(r=>r.systemToken===token),lines=data.lines.filter(l=>l.systemToken===token&&activeSupply0550(l)&&l.wbs==='A');
+  const chosenIds=uniq([...lines.flatMap(l=>workingOffers0550(data,l).map(o=>o.id)),...reqs.filter(r=>r.disposition!=='NOT_APPLICABLE'&&r.responsibility!=='COMPANY').flatMap(r=>r.offerIds)]);
   const chosen=data.offers.filter(o=>chosenIds.includes(o.id));
   const offered=data.offers.filter(o=>mgwQuoteItem0550(o)?.systemTokens.includes(token)&&mgwQuoteItem0550(o)?.wbs==='A'&&!chosenIds.includes(o.id));
   const chosenKnown=chosen.some(o=>!unknown(o.brand));
@@ -62,8 +62,9 @@ export function deriveAvlReconciliation0550(data,integration){
   let c=candidates.find(c=>c.key===key);if(!c){c={key,systemToken:s.id,category:item.category,brand:item.brand,quoteRef:item.quoteRef,items:[]};candidates.push(c);}c.items.push(item);
  }
  for(const c of candidates){c.selected=c.items.some(i=>i.selected);c.allocated=c.items.some(i=>i.allocated);c.offerIds=uniq(c.items.map(i=>i.offerId));
-  c.existing=w.deviations.filter(d=>d.systemToken===c.systemToken&&d.offerIds.some(id=>c.offerIds.includes(id))&&(/AVL|Annex.?2|Vendor List/i.test(d.contractorDocument+' '+d.vendorDeviation)||d.avlCheckId));
-  c.manualCheck=w.avlChecks.some(a=>c.offerIds.includes(a.offerId));
+  const currentManufacturer=d=>{const a=w.avlChecks.find(a=>a.id===d.avlCheckId);return norm(a?.manufacturer)===norm(c.brand)&&d.vendorQuoteRef===c.quoteRef;};
+  c.existing=w.deviations.filter(d=>currentManufacturer(d)&&d.systemToken===c.systemToken&&d.offerIds.some(id=>c.offerIds.includes(id))&&(/AVL|Annex.?2|Vendor List/i.test(d.contractorDocument+' '+d.vendorDeviation)||d.avlCheckId));
+  c.manualCheck=w.avlChecks.some(a=>c.offerIds.includes(a.offerId)&&norm(a.manufacturer)===norm(c.brand)&&!w.deviations.some(d=>d.avlCheckId===a.id&&!currentManufacturer(d)));
  }
  const source=(data.sourceIntake?.sources||[]).find(s=>s.id===PAGA_AVL_BASIS_0550.sourceId);
  const replaced=(data.sourceIntake?.sources||[]).some(s=>s.replaces.includes(PAGA_AVL_BASIS_0550.sourceId));
@@ -80,7 +81,7 @@ export function prepareSystemAvlDeviations0550(data,integration){
   const locator='Exhibit A-Annex 2_1 / PDF p13 / printed p11 of 12 / '+c.category.title;
   const excerpt=c.category.brands[0],statement=c.category.title+': listed manufacturers are '+c.category.brands.join(', ')+'.';
   const linked=integration.requirements.filter(r=>r.systemToken===c.systemToken&&r.offerIds.some(id=>c.offerIds.includes(id)));
-  const lines=data.lines.filter(l=>l.systemToken===c.systemToken&&l.selected&&c.offerIds.includes(l.offerId));
+  const lines=data.lines.filter(l=>l.systemToken===c.systemToken&&activeSupply0550(l)&&workingOffers0550(data,l).some(o=>c.offerIds.includes(o.id)));
   const r={...blankRequirement0550(rid,c.systemToken),title:c.category.title+' / manufacturer AVL reconciliation',statement,reference:locator,sourceIds:[audit.sourceId],sourceLocator:locator,sourceExcerpt:excerpt,
    need:'Request acceptance of '+c.brand+' outside the applicable AVL category.',criteria:'Recorded purchaser/company manufacturer acceptance and supporting evidence.',offerIds:c.offerIds,
    supplierSourceIds:uniq(c.items.flatMap(i=>i.sourceIds)),supplierLocator:c.items.map(i=>i.sourceRef).join('\n').slice(0,12000),supplierBasis:'Existing supplier proposal / '+c.quoteRef+'; linked Working requirements: '+linked.map(r=>r.id).join(', '),

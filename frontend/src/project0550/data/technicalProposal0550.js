@@ -1,3 +1,4 @@
+import {workingOffers0550} from './workingOffers0550';
 // ADR-0550-001 §§1–4,6,8–14. Authoring records link canonical SI data;
 // derivation/export never approves engineering or creates a customer issue.
 import {integrationFingerprint0550,integrationRecordBasis0550,integrationTopologyBasis0550,integrationRequirements0550} from "./integrationWorkspace0550";
@@ -49,6 +50,7 @@ export function technicalRecordBasis0550(data,r){
  return integrationFingerprint0550({policy:"0550-volume-ii-draft-v1",documentNo:p.documentNo,revision:p.revision,record:content,
   sources:byIds(data.sourceIntake?.sources||[],r.sourceIds),requirements,
   proofs:byIds(w.proofs||[],r.proofIds).map(q=>q.missing?q:{record:q,basis:integrationRecordBasis0550(data,"proofs",q)}),offers:byIds(data.offers,r.offerIds),activities:byIds(w.activities||[],r.activityIds).map(q=>q.missing?q:{record:q,basis:integrationRecordBasis0550(data,"activities",q)}),
+  ...((data.lines.some(l=>l.systemToken===r.systemToken&&l.mgwDetailGroupId))?{packageOffers:data.lines.filter(l=>l.systemToken===r.systemToken&&l.mgwDetailGroupId).flatMap(l=>workingOffers0550(data,l))}:{}),
   lines:data.lines.filter(l=>l.systemToken===r.systemToken),topology:integrationTopologyBasis0550(data,r.systemToken),
   equipment:r.sectionId==="equipment"?p.equipmentDetails.filter(d=>data.lines.some(l=>l.id===d.lineId&&l.systemToken===r.systemToken)).map(d=>({...d,sources:byIds(data.sourceIntake?.sources||[],d.sourceIds)})):[],
   deviations:r.sectionId==="deviations"?(w.deviations||[]).filter(d=>r.systemToken==="COMMON"||d.systemToken===r.systemToken):[]});
