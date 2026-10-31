@@ -47,6 +47,8 @@ import {ControlledSourceInventory, SourceCommunications, SourceFindings} from ".
 import {SECTION_IDENTITY} from "../project0550/sectionIdentity";
 import "../project0550/project0550.css";
 
+import {BidVolumesWorkspace0550,InputImpact0550} from "../project0550/BidVolumesWorkspace0550";
+import {SCHEDULES_0550,QUALIFICATIONS_0550} from "../project0550/data/bidVolumes0550";
 const TABS = BID_TABS;
 const LegacyIdentityContext = createContext(false);
 
@@ -2070,9 +2072,12 @@ function Project0550Bidding({ lang = "th" }) {
   const [focusedSystem,setFocusedSystem]=useState("ALL");
   const [technicalDirty,setTechnicalDirty]=useState(false);
   const {data,model}=useBidWorkspace();
-  const baseModuleIndex=[{id:"l3.original",title:"RFQ-02 Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
+  const baseModuleIndex=[{id:"l3.original",title:"RFQ-02 Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,number:t.label.split(" ")[0],tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
     {id:"bid.documents.si-work-package",title:"Import System Integrator engineering drafts",area:"A",tab:"documents"},
-    ...TECHNICAL_PANELS_0550.map(s=>({id:"bid.technical."+s.id,title:"Volume II / "+s.title,tab:"technical"})),
+    ...TECHNICAL_PANELS_0550.map((s,i)=>({id:"bid.technical."+s.id,title:"12 Volume II / "+s.title,number:s.id==="vdrl"?"12.V":s.id==="preview"?"12.P":"12."+i,tab:"technical"})),
+    ...[{id:"overview",number:"11.0",title:"Overview"},{id:"cover",number:"11.1",title:"Power of Attorney"},...SCHEDULES_0550.map(s=>({...s,number:"11."+s.id})),{id:"mapping",number:"11.M",title:"Schedule allocation"},{id:"preview",number:"11.P",title:"Export"}].map(s=>({id:"bid.quotation."+s.id,title:s.title,number:s.number,tab:"quotation"})),
+    ...[{id:"overview",number:"13.0",title:"Overview"},...QUALIFICATIONS_0550.map(q=>({...q,number:"13."+q.id})),{id:"deviations",number:"13.D",title:"Commercial Deviations"},{id:"preview",number:"13.P",title:"Export"}].map(s=>({id:"bid.commercial."+s.id,title:s.title,number:s.number,tab:"commercial"})),
+    {id:"bid.registry.impact",title:"Inputs / Change impact",number:"09.3",tab:"registry"},
     {id:"bid.working-preview",title:"Working Preview / System Integrator 1–8",tab:"budget"},
     {id:"bid.working-preview.particulars",title:"System Particular / Document reading ledger",tab:"budget"},
     ...(model?.integration?.requirements||[]).map(r=>({id:"bid.working-preview.requirement."+r.id,title:r.title+" / "+r.systemToken,tab:"budget"})),
@@ -2150,7 +2155,7 @@ function Project0550Bidding({ lang = "th" }) {
 
       <main className="p55-main">
         <BidSaveStatus/>
-        {technicalDirty&&<p className="p55-panel" role="status">มีร่าง Volume II ที่ยังไม่บันทึก · บันทึกหรือยกเลิกก่อนเปลี่ยนแท็บ/พื้นที่ทำงาน</p>}
+        {technicalDirty&&<p className="p55-panel" role="status">มีร่างชุดข้อเสนอที่ยังไม่บันทึก · บันทึกหรือยกเลิกก่อนเปลี่ยนแท็บ/พื้นที่ทำงาน</p>}
         {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.original"/><DocumentsView navigationTarget={navigationTarget}/></section>}
         {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><SourceCommunications/><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · {data?.releaseRegister?.issues.length||0} authorized snapshots · {data?.releaseRegister?.transmittals.length||0} recorded transmittals.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
         {area==="B"&&<>
@@ -2165,9 +2170,10 @@ function Project0550Bidding({ lang = "th" }) {
           {activeTab === "budget" ? <BidCommercialWorkspace onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}} onOpenSource={id=>jump({id,tab:"documents",area:"A"})} navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
           {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
           {activeTab === "documents" ? <><section className="p55-panel"><h2>Supplier evidence / Shared source register</h2><p>เอกสารลูกค้าและทะเบียนต้นฉบับอยู่ที่ A · ข้อเสนอและ Supplier master ใช้ข้อมูลกลางร่วมกับ Working Preview 1–8</p><button type="button" onClick={()=>jump({id:"l3.original",area:"A",tab:"documents"})}>เปิด A · Source Register</button><button type="button" onClick={()=>jump({id:"bid.working-preview.step.7",tab:"budget"})}>เปิด Mapping ลูกค้า ↔ Integrator ↔ Supplier</button></section><VendorWorkspace/></> : null}
-          {activeTab === "registry" ? <BidDataControls/> : null}
+          {activeTab === "registry" ? <><BidDataControls/><InputImpact0550 onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/></> : null}
+          {activeTab === "quotation" || activeTab === "commercial" ? <BidVolumesWorkspace0550 key={activeTab} volume={activeTab==="quotation"?"I":"III"} navigationTarget={navigationTarget} onDirtyChange={setTechnicalDirty} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
           {activeTab === "technical" ? <TechnicalProposalWorkspace0550 navigationTarget={navigationTarget} onDirtyChange={setTechnicalDirty} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
-          {activeTab === "deviations" ? <DeviationWorkspace0550 navigationTarget={navigationTarget} onOpenSource={id=>jump({id,tab:"documents",area:"A"})} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
+          {activeTab === "deviations" ? <DeviationWorkspace0550 onDirtyChange={setTechnicalDirty} navigationTarget={navigationTarget} onOpenSource={id=>jump({id,tab:"documents",area:"A"})} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
         </>}
       </main>
 

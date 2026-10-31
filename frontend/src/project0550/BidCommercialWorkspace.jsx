@@ -115,7 +115,7 @@ export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onN
  <button type="button" onClick={()=>exportBidReviewXlsx(official,"THB")}>Export THB review XLSX</button>
  <div className="p55-table-wrap"><table className="p55-table" aria-label="Budget THB lines"><thead><tr><th>Customer row / WBS</th><th>Description</th><th>Qty / unit</th><th>Customer THB</th><th>Trace</th></tr></thead><tbody>{official.selected.map(r=><tr key={r.id} data-component-key={"bid.budget.budget-thb.line."+r.id} data-module-number={identity("bid.budget.budget-thb.line."+r.id)?.number} data-bid-owner={lineOwner0550(r)} style={bidOwnerStyle(lineOwner0550(r))}><td>{r.customerRowCode||"OPEN"} / {r.wbs}</td><td><BidHeading {...identity("bid.budget.budget-thb.line."+r.id)}/></td><td>{r.quantity??"OPEN"} {r.unit}</td><td>{amount(r.customerTHB)}</td><td>{r.reviewState}<button type="button" onClick={()=>go("working",r.sourceModuleId)}>กลับ Source</button></td></tr>)}</tbody></table></div>
  </Module>
- <OfficialCustomerForm official={official} open={false} navigationTarget={target} onSource={id=>go("working",id)}>
+ <OfficialCustomerForm onNavigate={onNavigate} official={official} open={false} navigationTarget={target} onSource={id=>go("working",id)}>
  <section className="p55-panel"><strong>Volume II · Technical Proposal</strong><p>ชุดเทคนิคใช้ Requirements / CAL–RPT / Supplier / Working ร่วมกัน สถานะเอกสารเทคนิคต้องตรวจแยกจากการอนุมัติราคานี้</p><button type="button" onClick={()=>onNavigate?.("bid.technical.overview")}>เปิด Volume II · Technical Proposal</button></section>
  </OfficialCustomerForm>
  <OfficialHistoryComparison/>

@@ -3,6 +3,8 @@
 import {integrationFingerprint0550} from "./integrationWorkspace0550";
 import {officialCustomerRows,CUSTOMER_FORM_0550} from "./officialPricing0550";
 import {deriveSourceReadiness0550} from "./sourceReadiness0550";
+import {deriveBidVolumes0550} from "./bidVolumes0550";
+import {freezeBidPackageOutput0550,validateFrozenBidPackage0550} from "./bidPackageOutput0550";
 const clone=v=>JSON.parse(JSON.stringify(v));
 const canonical=v=>JSON.stringify(v,(_,x)=>x&&typeof x==="object"&&!Array.isArray(x)?Object.fromEntries(Object.keys(x).sort().map(k=>[k,x[k]])):x);
 const equal=(a,b)=>canonical(a)===canonical(b);
@@ -33,6 +35,7 @@ export function releaseReadiness0550(data,model,today,{legacySnapshot=false}={})
  if(data.sourceIntake?.findings.some(f=>f.state!=="SOURCE_SUPPORTED"))problems.push("SOURCE_FINDINGS_OPEN");
  if(!text(data.fx.source)||!date(data.fx.date)||data.fx.date>today||!(data.fx.thbPerUSD>0))problems.push("CURRENT_FX_OPEN");
  if(o?.requirementGaps.length||o?.unmapped.length)problems.push("REQUIREMENT_OR_PRICE_MAPPING_OPEN");
+ if(data.bidVolumes){const systems=(i?.scopes||[]).map(s=>({token:s.id,name:s.id}));const volumes=deriveBidVolumes0550(data,model,systems,today);if(!volumes.ready)problems.push(...volumes.problems.map(p=>"BID_PACKAGE: "+p));}
  return {ready:!problems.length,problems};
 }
 export function deriveReleaseControl0550(data,model,today){
@@ -48,7 +51,7 @@ export function prepareReleaseIssue0550(data,model,authorization,today){
  if(!/^[\w.-]{1,100}$/.test(id)||![number,authorizedBy,authorizationRef].every(text)||!date(authorizedOn)||authorizedOn>today||customerFormConfirmed!==true)fail("authorization and current customer-form confirmation required");
  const reg=data.releaseRegister||{issues:[],transmittals:[]};
  if(reg.issues.some(r=>r.id===id||r.number.trim().toUpperCase()===number.trim().toUpperCase()))fail("duplicate issue number/ID");
- const issue={schema:"genesis.0550.commercial-issue.v2",id,number:number.trim(),authorizedBy:authorizedBy.trim(),authorizedOn,authorizationRef:authorizationRef.trim(),customerFormConfirmed:true,basisKey:releaseBasisKey0550(data),snapshot:releaseSnapshot0550(data),customerColumns:clone(CUSTOMER_FORM_0550.columns),customerRows:officialCustomerRows(model.official),baseUSD:model.official.baseUSD,optionsUSD:model.official.optionsUSD};
+ const issue={schema:data.bidVolumes?"genesis.0550.commercial-issue.v3":"genesis.0550.commercial-issue.v2",...(data.bidVolumes?{bidPackage:freezeBidPackageOutput0550(data,model,number,today)}:{}),id,number:number.trim(),authorizedBy:authorizedBy.trim(),authorizedOn,authorizationRef:authorizationRef.trim(),customerFormConfirmed:true,basisKey:releaseBasisKey0550(data),snapshot:releaseSnapshot0550(data),customerColumns:clone(CUSTOMER_FORM_0550.columns),customerRows:officialCustomerRows(model.official),baseUSD:model.official.baseUSD,optionsUSD:model.official.optionsUSD};
  return {...data,releaseRegister:{...reg,issues:[...reg.issues,issue]}};
 }
 export function recordReleaseTransmittal0550(data,record,today){
@@ -64,8 +67,8 @@ export function validateReleaseRegister0550(data,validateSnapshot){
  for(const key of ["issues","transmittals"])if(!Array.isArray(reg[key])||reg[key].length>100||new Set(reg[key].map(r=>r?.id)).size!==reg[key].length)fail("invalid "+key);
  if(new Set(reg.issues.map(r=>r.number?.trim().toUpperCase())).size!==reg.issues.length)fail("duplicate issue number");
  for(const r of reg.issues){
-  fields(r,["schema","id","number","authorizedBy","authorizedOn","authorizationRef","customerFormConfirmed","basisKey","snapshot","customerColumns","customerRows","baseUSD","optionsUSD"]);
-  if(!["genesis.0550.commercial-issue.v1","genesis.0550.commercial-issue.v2"].includes(r.schema)||!/^[\w.-]{1,100}$/.test(r.id)||![r.number,r.authorizedBy,r.authorizationRef].every(text)||!date(r.authorizedOn)||r.customerFormConfirmed!==true||!r.snapshot||r.snapshot.releaseRegister!==undefined||r.basisKey!==releaseBasisKey0550(r.snapshot)||!Array.isArray(r.customerRows)||!Number.isFinite(r.baseUSD)||(r.optionsUSD!==null&&!Number.isFinite(r.optionsUSD)))fail("invalid frozen issue");
+  fields(r,[...(r.schema==="genesis.0550.commercial-issue.v3"?["bidPackage"]:[]),"schema","id","number","authorizedBy","authorizedOn","authorizationRef","customerFormConfirmed","basisKey","snapshot","customerColumns","customerRows","baseUSD","optionsUSD"]);
+  if(!["genesis.0550.commercial-issue.v1","genesis.0550.commercial-issue.v2","genesis.0550.commercial-issue.v3"].includes(r.schema)||!/^[\w.-]{1,100}$/.test(r.id)||![r.number,r.authorizedBy,r.authorizationRef].every(text)||!date(r.authorizedOn)||r.customerFormConfirmed!==true||!r.snapshot||r.snapshot.releaseRegister!==undefined||r.basisKey!==releaseBasisKey0550(r.snapshot)||!Array.isArray(r.customerRows)||!Number.isFinite(r.baseUSD)||(r.optionsUSD!==null&&!Number.isFinite(r.optionsUSD)))fail("invalid frozen issue");
   validateSnapshot(r.snapshot);
   if(!Array.isArray(r.customerColumns)||r.customerColumns.length!==8||!r.customerColumns.every(text)||r.customerRows.length>20000||r.customerRows.some(row=>!row||!text(row.kind)||!text(row.key)||!Array.isArray(row.cells)||row.cells.length!==8||row.cells.some(v=>typeof v!=="string"&&!(typeof v==="number"&&Number.isFinite(v)))))fail("invalid frozen customer table");
  }
@@ -74,16 +77,19 @@ export function validateReleaseRegister0550(data,validateSnapshot){
 // Called inside the same IndexedDB write transaction as the revision check.
 // Old backup imports and other tabs cannot remove or rewrite frozen history.
 export function validateReleaseTransition0550(previous,next,today,derive,{restore=false}={}){
+ if(previous?.bidVolumes&&!next.bidVolumes)fail('bid package controls cannot be removed; preserve the document register when restoring an older workspace');
  const old=previous?.releaseRegister||{issues:[],transmittals:[]},reg=next.releaseRegister||{issues:[],transmittals:[]};
  for(const key of ["issues","transmittals"]){if(reg[key].length<old[key].length||!equal(reg[key].slice(0,old[key].length),old[key]))fail("frozen history is append-only");}
  const added=reg.issues.slice(old.issues.length);
  if(!restore&&added.length>1)fail("authorize one issue at a time");
  for(const issue of added){
-  if(!restore&&issue.schema!=="genesis.0550.commercial-issue.v2")fail("new authorization requires the A input readiness policy");
+  if(!restore&&!["genesis.0550.commercial-issue.v2","genesis.0550.commercial-issue.v3"].includes(issue.schema))fail("new authorization requires the A input readiness policy");
   // The frozen basis must equal the actual saved pre-issue workspace, not a
   // different imported snapshot. Recompute prerequisites rather than trusting UI.
   if(!restore&&(!previous||!equal(issue.snapshot,releaseSnapshot0550(previous))||!equal(releaseSnapshot0550(next),releaseSnapshot0550(previous))))fail("issue must freeze the currently saved workspace");
+  if(!restore&&issue.snapshot.bidVolumes&&issue.schema!=="genesis.0550.commercial-issue.v3")fail("new bid package requires frozen Volume outputs");
   const model=derive(issue.snapshot,issue.authorizedOn);
+  if(issue.schema==="genesis.0550.commercial-issue.v3"&&!equal(issue.bidPackage,freezeBidPackageOutput0550(issue.snapshot,model,issue.number,issue.authorizedOn)))fail("frozen bid package output changed");
   const legacySnapshot=restore&&issue.schema==="genesis.0550.commercial-issue.v1";
   if(!releaseReadiness0550(issue.snapshot,model,issue.authorizedOn,{legacySnapshot}).ready||issue.authorizedOn>today||!equal(issue.customerColumns,CUSTOMER_FORM_0550.columns)||!equal(issue.customerRows,officialCustomerRows(model.official))||issue.baseUSD!==model.official.baseUSD||issue.optionsUSD!==model.official.optionsUSD)fail("issue readiness/output changed");
  }

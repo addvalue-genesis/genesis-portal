@@ -1,3 +1,5 @@
+Latest three-volume preparation: [numbered proposal tabs, VDRL, input impact and frozen package outputs](docs/handoff/pj2608-0550/20261031_THREE_VOLUMES_VDRL_AND_IMPACT.md), UI `2026-10-31.1-preview`. Preserve canonical inputs, existing IDs, source loading/3050 and frozen history. New `bidVolumes` records activate package readiness; legacy commercial-only issues are not evidence of complete tender submission.
+
 # Project architecture instructions
 
 ## PJ2608-0550

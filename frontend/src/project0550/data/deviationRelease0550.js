@@ -27,6 +27,7 @@ export function deriveDeviationRelease0550(data,integration,selectedIds){
  const automated=records.filter(d=>d.id.startsWith("DEV-AVL-"));
  if(automated.length&&deriveAvlReconciliation0550(data,integration).referenceConflict)issues.push("ฐาน AVL เปลี่ยน/ถูกแทนที่ กรุณาทบทวนร่างก่อนส่งออก");
  for(const d of records){
+  if(d.problems?.includes("STALE_DEPENDENCIES"))issues.push(d.id+": หลักฐานหรือข้อเสนอเปลี่ยน ต้องทบทวน Deviation ก่อนส่งออก");
   const defaults=deviationReleaseDefaults0550(d,integration.requirements),value=k=>text(d[k]===undefined?defaults[k]:d[k]);
   const document=value("releaseDocument");let group=groups.find(g=>g.document===document);
   if(!group){group={document,number:groups.length+1,rows:[]};groups.push(group);}

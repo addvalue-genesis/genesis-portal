@@ -13,6 +13,7 @@ import {DELIVERY_KINDS_0550} from "./workingPreviewStages0550";
 import {PAGA_AVL_BASIS_0550,selectedPagaOffer0550,deviationProgress0550} from "./data/avlDeviationBasis0550";
 import {DeviationRelease0550} from "./DeviationRelease0550";
 import {deviationReleaseDefaults0550} from "./data/deviationRelease0550";
+import {BidVolumesWorkspace0550,PackageConsistency0550} from "./BidVolumesWorkspace0550";
 const set=(setter,key,value)=>setter(r=>({...r,[key]:value}));
 function useIntegrationSave(){const {data,model,change,busy,reviewDate}=useBidWorkspace();const [message,setMessage]=useState("");const save=async(collection,row)=>{const record=stampIntegration0550(data,collection,row);const ok=await change(d=>{const w={...emptyIntegration0550(),...d.integrationWorkspace};return {...d,integrationWorkspace:{...w,[collection]:[...w[collection].filter(r=>r.id!==row.id),record]}};},"Integrator / "+collection+" / "+row.id);if(ok)setMessage("บันทึก "+row.id+" แล้ว · สถานะพิจารณาจากเงื่อนไขจริง");return ok;};return {data,model:model?.integration,busy,reviewDate,message,save};}
 
@@ -40,11 +41,12 @@ export function ParticularWorkspace0550({onOpenSource}){
  </Module>;
 }
 
-export function DeviationWorkspace0550({onOpenSource,onNavigate,navigationTarget}){
+export function DeviationWorkspace0550({onOpenSource,onNavigate,navigationTarget,onDirtyChange}){
  const {model}=useBidWorkspace();
+ const [dirty,setDirty]=useState(false);
  const [tab,setTab]=useState("working"),[editId,setEditId]=useState(""),[releaseSelection,setReleaseSelection]=useState(null);
  useEffect(()=>{if(navigationTarget?.startsWith("bid.deviations.release"))setTab("release");else if(navigationTarget?.startsWith("bid.deviations.")){setTab("working");if(navigationTarget.startsWith("bid.deviations.record."))setEditId(navigationTarget.slice("bid.deviations.record.".length));}},[navigationTarget]);
- return <div><div role="tablist" aria-label="Deviation work areas" className="p55-deviation-tabs">{[["working","AVL / Working"],["release","Release"]].map(([key,label])=><button type="button" role="tab" key={key} id={"deviation-tab-"+key} aria-selected={tab===key} aria-controls="deviation-active-panel" onClick={()=>setTab(key)}>{label}</button>)}</div><div role="tabpanel" id="deviation-active-panel" aria-labelledby={"deviation-tab-"+tab}>{tab==="release"&&!model?.integration?<p>กำลังเปิด Release…</p>:tab==="release"?<DeviationRelease0550 onNavigate={onNavigate} onOpenSource={onOpenSource} selection={releaseSelection} onSelectionChange={setReleaseSelection} onEdit={id=>{setEditId(id);setTab("working");}}/>:<DeviationWorking0550 onOpenSource={onOpenSource} onNavigate={onNavigate} editId={editId}/>}</div></div>;
+ return <div><div role="tablist" aria-label="Deviation work areas" className="p55-deviation-tabs">{[["working","14.1 AVL / Technical"],["commercial","14.2 Commercial"],["release","14.3 Technical Export"]].map(([key,label])=><button type="button" role="tab" key={key} id={"deviation-tab-"+key} aria-selected={tab===key} aria-controls="deviation-active-panel" onClick={()=>{if(!dirty)setTab(key);}}>{label}</button>)}</div><div role="tabpanel" id="deviation-active-panel" aria-labelledby={"deviation-tab-"+tab}>{tab==="commercial"?<BidVolumesWorkspace0550 volume="III" navigationTarget="bid.commercial.deviations" onNavigate={onNavigate} onDirtyChange={v=>{setDirty(v);onDirtyChange?.(v);}}/>:tab==="release"&&!model?.integration?<p>กำลังเปิด Release…</p>:tab==="release"?<DeviationRelease0550 onNavigate={onNavigate} onOpenSource={onOpenSource} selection={releaseSelection} onSelectionChange={setReleaseSelection} onEdit={id=>{setEditId(id);setTab("working");}}/>:<DeviationWorking0550 onOpenSource={onOpenSource} onNavigate={onNavigate} editId={editId}/>}</div></div>;
 }
 function DeviationWorking0550({onOpenSource,onNavigate,editId}){
  const {data,model,busy,reviewDate,message,save}=useIntegrationSave(),[avl,setAvl]=useState(null),[dev,setDev]=useState(null);

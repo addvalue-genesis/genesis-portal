@@ -24,7 +24,7 @@ function PriceNotes({note,onSource}){
   {note.candidates?.length>0&&<details><summary>มีราคา package ผู้ขายให้ตรวจ Mapping ({note.candidates.length})</summary><p>ยังไม่จัดสรรราคา package นี้เข้าแถว MR — ต้องตรวจขอบเขตและเจ้าของราคาก่อน ไม่แบ่งราคาหรือบวกซ้ำอัตโนมัติ</p>{note.candidates.map(c=><p key={c.id}><button type="button" onClick={()=>onSource(c.sourceModuleId)}>ตรวจ package · {c.description}</button><small>ราคา Customer ต้นทาง · PROVISIONAL: {amount(c.provisionalCustomerNative,c.currency)} · {c.offer?.quoteRef||c.sourceRef}</small></p>)}</details>}
  </div>;
 }
-export function OfficialCustomerForm({official,onSource,navigationTarget,open=true,children}){
+export function OfficialCustomerForm({official,onSource,navigationTarget,open=true,children,onNavigate}){
  const {data}=useBidWorkspace(),identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
  const rows=useMemo(()=>officialCustomerRows(official),[official]),provisional=official.pricingBasis==="PROVISIONAL_VENDOR",notes=releasePricePresentation0550(official);
  const hierarchy=useMemo(()=>releaseHierarchy0550(official,rows),[official,rows]);
@@ -49,6 +49,6 @@ export function OfficialCustomerForm({official,onSource,navigationTarget,open=tr
  <p>OPEN หมายถึง {provisional?"ข้อมูลราคา / FX ยังไม่ครบ":"ยังไม่มีราคาที่ทบทวนครบ"} · EXCLUDED ต้องมีการตรวจขอบเขตและหลักฐาน · Export เป็น Draft และไม่เปลี่ยนสถานะเป็นส่งลูกค้า</p>
  <p>รวม Base/Options จากยอด Lot เท่านั้น ไม่ SUM ทั้งคอลัมน์ที่มีทั้ง Lot และรายละเอียด · Unit Price × Qty ต้องตรง Amount; ถ้าไม่ตรงให้กลับ Source ตรวจฐานตามแบบลูกค้า ระบบไม่ปรับราคาเพื่อชดเชยเอง</p>
  {official.lines.filter(r=>(!r.selected&&!r.mrScopeState?.covered)||official.unmapped.some(x=>x.id===r.id)).map(r=><div key={r.id} data-component-key={r.releaseModuleId} data-module-number={identity(r.releaseModuleId)?.number} data-bid-owner={lineOwner0550(r)} style={bidOwnerStyle(lineOwner0550(r))} tabIndex={-1}><BidHeading {...identity(r.releaseModuleId)}/><strong>{r.selected?"MAPPING OPEN":"NOT SELECTED"}</strong><button type="button" onClick={()=>onSource(r.sourceModuleId)}>กลับ Source</button></div>)}
- <ReleaseIssueControls0550 provisional={provisional}/>
+ <ReleaseIssueControls0550 provisional={provisional} onNavigate={onNavigate}/>
  </Module>;
 }

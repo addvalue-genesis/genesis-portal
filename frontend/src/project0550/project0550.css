@@ -1751,3 +1751,12 @@
 .p55-a-readiness .p55-review-toolbar>* { min-width:0; max-width:100%; }
 @media(max-width:640px) { .p55-a-readiness .p55-bid-fields { grid-template-columns:minmax(0,1fr); } }
 .p55 [data-component-key="l3.original"] :is(input,select,textarea) { min-width:0; max-width:100%; box-sizing:border-box; }
+
+/* Three-volume preparation uses the existing shell and bounded table containers. */
+.p55-technical :is(input,select,textarea) { box-sizing:border-box; }
+.p55-technical :is(.p55-panel,.p55-bid-fields,form) { min-width:0; max-width:100%; }
+.p55-technical .p55-review-toolbar { display:flex; flex-wrap:wrap; gap:8px; }
+.p55 [data-component-key="bid.registry.impact"] { min-width:0; overflow-wrap:anywhere; }
+.p55 [data-component-key="bid.registry.impact"] select { width:100%; max-width:100%; box-sizing:border-box; }
+.p55 [aria-label="Bid package consistency"] { min-width:0; max-width:100%; overflow-wrap:anywhere; }
+.p55 [aria-label="Bid package consistency"] .p55-review-toolbar { display:flex; flex-wrap:wrap; gap:8px; }
