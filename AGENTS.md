@@ -1,3 +1,5 @@
+Latest Working → Schedule preview: [existing Working/MGW prices, draft allocation and C1 component references](docs/handoff/pj2608-0550/20261031_WORKING_TO_SCHEDULE_PREVIEW.md), UI `2026-10-31.3-preview`. Opening/exporting is read-only; source costs stay internal, component references are non-additive, and draft visibility does not bypass issue review.
+
 Latest native Exhibit C: [original Schedule screens and Word export](docs/handoff/pj2608-0550/20261031_NATIVE_EXHIBIT_C_FORMS.md), UI `2026-10-31.2-preview`. Keep native table structures/notes, canonical Working ownership, legacy package restore and exact frozen Word bytes. XLSX remains a data worksheet.
 
 Latest three-volume preparation: [numbered proposal tabs, VDRL, input impact and frozen package outputs](docs/handoff/pj2608-0550/20261031_THREE_VOLUMES_VDRL_AND_IMPACT.md), UI `2026-10-31.1-preview`. Preserve canonical inputs, existing IDs, source loading/3050 and frozen history. New `bidVolumes` records activate package readiness; legacy commercial-only issues are not evidence of complete tender submission.

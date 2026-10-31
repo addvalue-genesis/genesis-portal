@@ -87,6 +87,8 @@ export function deriveBidVolumes0550(data,model,systems,today){
   if(b.schedule==='C8'&&line?.unit!=='MD')problems.push('C8_MAN_DAY_BASIS_OPEN');
   if(b.schedule==='C6'&&!trim(b.specification))problems.push('CONSUMABLE_SPECIFICATION_OPEN');
   const part=line?.wbs.startsWith('C')?'OPTION':'BASE';
+  if(b.schedule==='A1'&&(b.treatment!=='BASE'||!['INSPECTION','PACKING','VENDOR_DOCUMENTS','OTHER'].includes(b.summary)))problems.push('DIRECT_A1_SUMMARY_ALLOCATION_OPEN');
+  if(b.schedule==='A2'&&(b.treatment!=='OPTION'||b.summary!=='OTHER'))problems.push('DIRECT_A2_OPTION_ALLOCATION_OPEN');
   if(b.treatment==='CALLOFF'){if(b.schedule!=='C8'||line?.selected)problems.push('CALLOFF_MUST_BE_UNSELECTED_C8_RATE');}
   else if(line&&b.treatment!==part)problems.push('WORKING_BASE_OPTION_TREATMENT_MISMATCH');
   if(['C1','C2','C5'].includes(b.schedule)&&b.treatment!=='BASE')problems.push('BASE_SCHEDULE_TREATMENT_MISMATCH');
@@ -165,7 +167,7 @@ export function validateBidVolumes0550(data){
   if(!/^[\w.-]{1,100}$/.test(r.id)||!['DRAFT','REVIEWED'].includes(r.status))fail('ID/review');
   for(const k of ['reviewedOn','dueOn'])if(r[k]&&(!/^\d{4}-\d{2}-\d{2}$/.test(r[k])||!Number.isFinite(Date.parse(r[k]))||new Date(r[k]).toISOString().slice(0,10)!==r[k]))fail('date');
   if(collection==='records'&&(!['I.cover','II.vdrl-scope',...SCHEDULES_0550.map(s=>'I.'+s.id),...QUALIFICATIONS_0550.map(q=>'III.'+q.id)].includes(r.id)||!['REQUIRED','NOT_APPLICABLE'].includes(r.disposition)))fail('record section/disposition');
-  if(collection==='bindings'&&(r.id!==r.lineId||!/^C[1-8]$/.test(r.schedule)||!['BASE','OPTION','CALLOFF'].includes(r.treatment)))fail('schedule binding');
+  if(collection==='bindings'&&(r.id!==r.lineId||!/^C[1-8]$|^A[12]$/.test(r.schedule)||!['BASE','OPTION','CALLOFF'].includes(r.treatment)))fail('schedule binding');
   if(collection==='vdrl'&&(!['BID','POST_AWARD','NOT_APPLICABLE'].includes(r.phase)||r.sectionIds.some(id=>!TECHNICAL_SECTIONS_0550.some(s=>s.id===id))))fail('VDRL phase/section');
   if(collection==='commercialDeviations'&&!['PENDING','ACCEPTED','REJECTED'].includes(r.decision))fail('commercial decision');
   }

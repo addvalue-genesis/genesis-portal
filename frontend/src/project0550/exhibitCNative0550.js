@@ -32,7 +32,7 @@ function fill(id,values,format){
  });
 }
 function nativePages(view,id){
- const rows=view.scheduleRows(id),pages=[],issues=[];
+ const rows=id==='C1'&&view.workingPreview?view.nativeC1:view.scheduleRows(id),pages=[],issues=[];
  const add=(values={},detail='')=>pages.push({id,values,detail});
  const set=(v,r,c,x)=>{v[`${id}_${r}_${c}`]=x;};
  const prices=(v,r,start,b)=>{const t=term(b);set(v,r,start,t==='CIF'?number(b.unitPrice):'');set(v,r,start+1,t==='FOB'?number(b.unitPrice):'');set(v,r,start+2,t==='CIF'?number(b.amount):'');set(v,r,start+3,t==='FOB'?number(b.amount):'');if(!t){set(v,r,start,'OPEN');set(v,r,start+2,'OPEN');issues.push('Customer CIF/FOB term OPEN: '+b.lineId);}};
@@ -43,13 +43,13 @@ function nativePages(view,id){
   const groups=new Map();for(const b of eligible){const r=slot(b);if(r===undefined){issues.push('A1 summary row OPEN: '+b.lineId);continue;}if(!groups.has(r))groups.set(r,[]);groups.get(r).push(b);}
   for(const [r,bs] of groups){
    const amount=sum(bs),terms=new Set(bs.map(term));set(v,r,3,r===8&&base?'Day':'Lot');set(v,r,4,r===8&&base?value(field(view,'C7','sitePeriodDays')):1);
-   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));set(v,r,7,bs.map(b=>b.line.description).join('; ')+(terms.has('')?' / Customer delivery term OPEN':''));}
+   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));set(v,r,7,(view.workingPreview&&bs.length>3?bs.length+' quoted items; scope and allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer delivery term OPEN':''));}
    else{
     if(r===6||r===7)set(v,r,1,bs.map(b=>b.line.description).join('; '));
     const diemQty=r===4&&bs.every(b=>b.line.unit==='MD'&&Number.isFinite(b.line.quantity))?bs.reduce((n,b)=>n+b.line.quantity,0):null;
     if(r===4){set(v,r,3,'MD');set(v,r,4,value(diemQty));if(!diemQty||terms.size>1)issues.push('A2 DIEM quantity/rate basis OPEN');}
     for(const [t,rate,total] of [['CIF',5,7],['FOB',6,8]]){const selected=bs.filter(b=>term(b)===t);if(selected.length){set(v,r,rate,r===4?diemQty>0&&terms.size===1?number(sum(selected)/diemQty):'OPEN':number(sum(selected)));set(v,r,total,number(sum(selected)));}}
-    set(v,r,9,bs.map(b=>b.line.description).join('; ')+(terms.has('')?' / Customer CIF/FOB term OPEN':''));if(terms.has('')){set(v,r,5,'OPEN');set(v,r,7,'OPEN');issues.push('A2 customer term OPEN');}
+    set(v,r,9,(view.workingPreview&&bs.length>3?bs.length+' quoted items; scope and allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer CIF/FOB term OPEN':''));if(terms.has('')){set(v,r,5,'OPEN');set(v,r,7,'OPEN');issues.push('A2 customer term OPEN');}
    }
   }
   if(base){set(v,12,1,'In figures: USD '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned));}
@@ -59,7 +59,7 @@ function nativePages(view,id){
  if(id==='B'||id==='C'){add();return {pages,issues};}
  if(['C1','C5','C6'].includes(id)){
   const capacity=id==='C1'?32:7;
-  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id);group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,number(b.unitPrice));set(v,r,5,number(b.amount));set(v,r,6,b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?'USD '+number(sum(rows)):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'');});
+  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id);group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?'USD '+number(sum(rows.filter(b=>!b.nonAdditive))):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'');});
  }
  if(['C2','C3','C4'].includes(id)){
   const groups=new Map();for(const b of rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set('OPEN',[]);
@@ -84,6 +84,11 @@ function renderPage(view,page,format){
  if(page.id==='A'){
   const vals=['OPEN','OPEN',number(view.baseAssigned),words(view.baseAssigned),number(view.optionsAssigned),words(view.optionsAssigned)];let i=0;
   result=result.replace(/_{5,}/g,()=>escape(vals[i++]||'OPEN'));
+ }
+ if(view.workingPreview&&page.id==='C1'&&view.nativeC1?.some(b=>b.nonAdditive)){
+  const note='[1] Component quantities follow the MGW package basis stored in Working; MR reconciliation remains pending. Included components form part of their parent package amount and are not charged again.';
+  if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>${escape(note)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);
+  else result+=`<p class="native-response">${escape(note)}</p>`;
  }
  const response=view.getRecord('I.'+page.id).content;
  if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',response?.trim()?`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">BIDDER response: ${escape(response).replace(/\n/g,'</w:t><w:br/><w:t xml:space="preserve">')}</w:t></w:r></w:p>`:'');
@@ -116,6 +121,7 @@ export function nativeExhibitHtml0550(view,only,includeCover=false){
  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Exhibit C / ${escape(only||'All Schedules')}</title><style>${nativeFormCss0550}</style></head><body>${cover}${ids.map(id=>nativeSchedule0550(view,id).html).join('')}</body></html>`;
 }
 export function buildNativeExhibitDocx0550(view,only){
+ if(view.workingPreview&&/AUTHORIZED|ISSUED/.test(view.outputLabel||''))throw Error('Working Preview is not an authorized package');
  const blocks=Object.fromEntries(Object.keys(template.schedules).map(id=>[id,nativePages(view,id).pages.map(page=>renderPage(view,page,'xml')).join('')]));
  let xml=template.document.replace(/\{\{SCHEDULE_(\w+)_XML\}\}/g,(_,id)=>blocks[id]);
  if(only){
@@ -123,6 +129,15 @@ export function buildNativeExhibitDocx0550(view,only){
   const start=xml.indexOf('<w:body>')+8,end=xml.lastIndexOf('<w:sectPr');
   xml=xml.slice(0,start)+blocks[only]+xml.slice(end);
  }
+ if(view.workingPreview)xml=xml.replace(/<w:tbl(?:\s[^>]*)?>[\s\S]*?<\/w:tbl>/g,table=>{
+  if(!table.includes('Component: '))return table;let index=0;
+  return table.replace(/<w:tr(?:\s[^>]*)?>[\s\S]*?<\/w:tr>/g,row=>{
+   const header=index++<2,component=row.includes('Component: ');if(!header&&!component)return row;
+   const flag=header?'tblHeader':'cantSplit';if(row.includes('<w:'+flag))return row;
+   row=row.replace('<w:trPr/>','<w:trPr></w:trPr>');
+   return /<w:trPr(?:\s[^>]*)?>/.test(row)?row.replace(/(<w:trPr(?:\s[^>]*)?>)/,'$1<w:'+flag+'/>'):row.replace(/(<w:tr(?:\s[^>]*)?>)/,'$1<w:trPr><w:'+flag+'/></w:trPr>');
+  });
+ });
  const lastParagraph=xml.lastIndexOf('</w:p>');
  xml=xml.slice(0,lastParagraph)+'<w:bookmarkStart w:id="90550" w:name="PJ0550_EXHIBIT_END"/><w:bookmarkEnd w:id="90550"/>'+xml.slice(lastParagraph);
  if(/[\x00-\x08\x0b\x0c\x0e-\x1f]/.test(xml))throw Error('Unsupported XML control character in Exhibit C');

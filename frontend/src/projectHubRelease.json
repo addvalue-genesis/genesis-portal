@@ -1,6 +1,6 @@
 {
-  "version": "2026-10-31.2-preview",
+  "version": "2026-10-31.3-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "a5bdd4b6c7f99bfdabbdf065f5abd24c041a5b26",
-  "capability": "0550 native Exhibit C: visible original Schedule A/A1/A2/B/C/C1\u2013C8 forms, template-preserving Word and print/PDF, canonical Working values and CIF/FOB columns, per-equipment/continued forms, versioned frozen native Word; preserve IDs, sources, financials and history on 3050"
+  "source0550": "953003baa046312c2aa0adc30d28ac4a05c76fa1",
+  "capability": "0550 live Working-to-Schedule drafts: existing price equations, automatic SI allocation suggestions, direct A1/A2 summaries, MGW 28-line CCTV source view and non-additive package components on C1, explicit price gaps, strict review/issue separation and unchanged financials/history on 3050"
 }
