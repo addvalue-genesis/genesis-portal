@@ -1,3 +1,4 @@
+import {evaluateServiceEquation} from '../serviceEquationRuntime';
 // ADR 2,3,5,6,8–12: an unsaved document projection of the existing Working.
 // Suggestions are SI draft allocations, never a source fact or an approval.
 import {blankScheduleBinding0550,deriveBidVolumes0550,emptyBidVolumes0550,saveBidVolumeRecord0550} from './bidVolumes0550';
@@ -21,6 +22,10 @@ const rules={
  C2:['C4','CAPITAL_SPARES','Capital spares → C4, not Exhibit C C2'],
  C3:['C3','OPERATION_SPARES','Two-year operation spares → C3; base/option source conflict remains OPEN']
 };
+export function scheduleHoursFromCalculation0550(data,line){
+ const c=data.calculations.find(c=>c.id===line?.calculationId);
+ return line?.unit==='MD'&&line.resultKey==='MD'&&c?.equationId==='E05'&&c.sourceRef.trim()&&[line.systemToken,'COMMON'].includes(c.systemToken)&&evaluateServiceEquation(c.equationId,c.inputs).state==='CALCULATED'&&c.inputs.Hday>0&&c.inputs.Hday<=24?{hoursPerDay:c.inputs.Hday,calculationId:c.id}:null;
+}
 export function scheduleAllocationPlan0550(data,savedView){
  const requirements=integrationRequirements0550(data),knownSources=new Set((data.sourceIntake?.sources||[]).map(s=>s.id));
  return savedView.unallocated.map(line=>{
@@ -36,7 +41,8 @@ export function scheduleAllocationPlan0550(data,savedView){
    if(quotedIds[0]==='MGW-Q26-063-SERVICES-004'){schedule='A1';summary='PACKING';reason='MGW expressly bundled Packing/Marking/Delivery → proposed A1 Packing; one owner, no split or duplicate freight';}
   }
   const sourceIds=[...new Set([...(raw.officialReview?.sourceIds||[]),...requirements.filter(r=>r.workLineIds.includes(raw.id)).flatMap(r=>r.sourceIds||[])])].filter(id=>knownSources.has(id));
-  const proposal={...blankScheduleBinding0550(raw.id),schedule,summary,treatment:raw.wbs.startsWith('C')?'OPTION':'BASE',sourceIds,locator:[raw.requirementRef,raw.sourceRef].filter(Boolean).join(' / '),basis:'SI DRAFT / '+reason+' / Working WBS '+raw.wbs+' / '+(raw.customerRowCode||'customer row OPEN')};
+  const hours=schedule==='C7'?scheduleHoursFromCalculation0550(data,raw):null;
+  const proposal={...blankScheduleBinding0550(raw.id),...(hours?{hoursPerDay:hours.hoursPerDay}:{}),schedule,summary,treatment:raw.wbs.startsWith('C')?'OPTION':'BASE',sourceIds,locator:[raw.requirementRef,raw.sourceRef].filter(Boolean).join(' / '),basis:'SI DRAFT / '+reason+' / Working WBS '+raw.wbs+' / '+(raw.customerRowCode||'customer row OPEN')+(hours?' / MD→MH hours from '+hours.calculationId+' / Hday='+hours.hoursPerDay:'')};
   return {line,proposal,reason};
  });
 }
@@ -54,10 +60,11 @@ export function deriveBidVolumeWorkingPreview0550(data,model,systems,today,saved
  const plan=scheduleAllocationPlan0550(data,savedView),proposed=plan.filter(p=>p.proposal),priceBasis=new Map();
  const lines=model.official.lines.map(line=>{
   const working=model.lines.find(l=>l.id===line.id),reviewed=Number.isFinite(line.customerUSD),current=Number.isFinite(working?.customerUSD),provisional=Number.isFinite(working?.provisionalCustomerUSD);
-  const basis=reviewed?'REVIEWED_WORKING':current?'WORKING_PENDING_REVIEW':provisional?'PROVISIONAL_VENDOR':'PRICE_OPEN';priceBasis.set(line.id,basis);
+  const basis=reviewed?'REVIEWED_WORKING':current?'WORKING_PENDING_REVIEW':provisional?(working?.sellBasisState==='WORKING_SELL_KNOWN_COST_UNESTABLISHED'?'WORKING_SELL_COST_PENDING':'PROVISIONAL_VENDOR'):'PRICE_OPEN';priceBasis.set(line.id,basis);
   return {...line,customerUSD:reviewed?line.customerUSD:current?working.customerUSD:provisional?working.provisionalCustomerUSD:null};
  });
- const previewData={...data,bidVolumes:{...(data.bidVolumes||emptyBidVolumes0550()),bindings:[...(data.bidVolumes?.bindings||[]),...proposed.map(p=>p.proposal)]}};
+ const existingBindings=(data.bidVolumes?.bindings||[]).map(b=>{const raw=data.lines.find(l=>l.id===b.lineId),hours=b.schedule==='C7'&&b.hoursPerDay===null?scheduleHoursFromCalculation0550(data,raw):null;return hours?{...b,hoursPerDay:hours.hoursPerDay}:b;});
+ const previewData={...data,bidVolumes:{...(data.bidVolumes||emptyBidVolumes0550()),bindings:[...existingBindings,...proposed.map(p=>p.proposal)]}};
  const projected=deriveBidVolumes0550(previewData,{...model,official:{...model.official,lines}},systems,today);
  const bindings=projected.bindings.map(b=>({...b,priceBasis:priceBasis.get(b.lineId),suggested:proposed.some(p=>p.line.id===b.lineId)}));
  const priced=projected.active.filter(l=>Number.isFinite(l.customerUSD)),unknown=projected.active.filter(l=>!Number.isFinite(l.customerUSD));

@@ -1,3 +1,5 @@
+Latest existing-basis audit / C1→A1: [known-subtotal display and recovered-work reconciliation](20261101_EXISTING_BASIS_AUDIT_AND_A1.md), UI `2026-11-01.2-preview`. Blank Working fields are not proof of missing source data. Rev04 MH and the Rev10 THB580M estimate are historical references, never automatic current bid inputs. Preserve strict issued totals and all saved financial values/history.
+
 Latest completion: [live technical dossier, native SDRL, qualification checklist and package-aware AVL](20261101_LIVE_DOSSIER_AND_SDRL.md), UI `2026-11-01.1-preview`, follows `feddbbe`. Read this checkpoint first. Current pages use canonical data; actual engineering/evidence gaps stay OPEN. Windows deployment is not inferred.
 
 Latest three-volume preparation: [numbered proposal tabs, VDRL, input impact and frozen package outputs](20261031_THREE_VOLUMES_VDRL_AND_IMPACT.md), UI `2026-10-31.1-preview`. Preserve canonical inputs, existing IDs, source loading/3050 and frozen history. New `bidVolumes` records activate package readiness; legacy commercial-only issues are not evidence of complete tender submission.

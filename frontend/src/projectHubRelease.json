@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-01.1-preview",
+  "version": "2026-11-01.2-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "feddbbece772c6cabf51e52eb87276ab387e8d82",
-  "capability": "0550 live Volume II SI dossier and matching HTML export, source-backed 131-code SDRL reference, explicit missing-draft preparation, Volume III qualification evidence checklist, per-system/line Volume I-II links, package-aware AVL amendments with unchanged financials and frozen history"
+  "source0550": "0465063db7f8b378ce244f9814dd6f63523a484c",
+  "capability": "0550 recheck against 0553 Release method: independent known DIRECT Working SELL vs unestablished cost, native USD preview without fabricated FX, C1-to-A1 known subtotal/partial counts, explicit historical-budget reference vs current inputs, lifecycle work/resource/owner traces; unchanged strict issue gates and saved financial/history records; C7 MD-to-MH uses the linked current E05 Hday without overwriting saved hours"
 }

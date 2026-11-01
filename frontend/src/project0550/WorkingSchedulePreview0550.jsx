@@ -7,6 +7,7 @@ export function WorkingScheduleStatus0550({view,onSave,onAllocate,onNavigate,dis
  return <section className="p55-panel" aria-label="Working to Schedule status"><h3>ข้อมูลจาก Working → แบบฟอร์มข้อเสนอ</h3>
   <p>เลือกไว้ {s.active} รายการ · มีการจัดหมวดที่บันทึกแล้ว {s.saved} · ระบบแนะนำเพิ่ม {s.suggested} · ยังตัดสินใจไม่ได้ {s.unresolved}</p>
   <p><strong>ราคาขายที่คำนวณได้ USD {money(s.knownUSD)} จาก {s.priced} รายการ</strong> · อีก {s.unpriced} รายการราคายัง OPEN · ยอดที่ทราบนี้ยังไม่ใช่ราคาครบทั้งโครงการ</p>
+  {view.bindings?.some(b=>Number.isFinite(b.amount)&&b.line?.sellBasisState==="WORKING_SELL_KNOWN_COST_UNESTABLISHED")&&<p>มีราคาขาย DIRECT ที่ระบุปริมาณและเรตแล้ว โดยต้นทุนภายในยังไม่ยืนยัน · แสดงราคาขายแยกจากต้นทุน ไม่ถือว่าต้นทุนเป็นศูนย์ และยังไม่ผ่าน Release</p>}
   <p>รายการและราคามาจาก Working ปัจจุบัน รวมราคาผู้ขายที่ยังรอทบทวน · การจัดหมวดอัตโนมัติเป็นข้อเสนอของ SI · ยังไม่อนุมัติหรือออก Release</p>
   <div className="p55-review-toolbar"><button type="button" disabled={disabled||!s.suggested} onClick={onSave}>บันทึกการจัดหมวดร่าง {s.suggested} รายการ</button><button type="button" disabled={disabled} onClick={onAllocate}>ตรวจ / แก้การจัดรายการ 11.M</button></div>
   {view.priceGaps?.length>0&&<details><summary>ดูสาเหตุที่ราคาขายยัง OPEN · {view.priceGaps.length} รายการ</summary>{view.priceGaps.map(g=><p key={g.id}>{g.description} · {g.problems.join(' / ')} <button type="button" disabled={disabled} onClick={()=>onNavigate?.('bid.budget.working.line.'+g.id)}>เปิด Working / แก้ที่ต้นทาง</button></p>)}</details>}

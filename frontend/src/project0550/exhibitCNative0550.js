@@ -2,6 +2,7 @@
 // notes and fixed labels. Only bidder response slots are substituted here.
 import template from './data/exhibitCNativeTemplate0550.json';
 import {sumMoney0550} from './data/money0550';
+import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {zipStore} from './exportOriginalPriceForm';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
@@ -10,6 +11,8 @@ const escape=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const number=v=>typeof v==='number'&&Number.isFinite(v)?v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2}):'OPEN';
 const value=v=>v===null||v===undefined||v===''?'OPEN':String(v);
 const sum=rows=>sumMoney0550(rows.map(b=>b.amount));
+const shownSum=(view,rows)=>view.workingPreview?scheduleRollup0550(rows).knownUSD:sum(rows);
+const subtotalNote=(view,rows)=>view.workingPreview?rollupNote0550(scheduleRollup0550(rows)):'';
 const chunks=(rows,n)=>Array.from({length:Math.max(1,Math.ceil(rows.length/n))},(_,i)=>rows.slice(i*n,(i+1)*n));
 const field=(view,id,name)=>view.getRecord('I.'+id).nativeFields?.[name]||'';
 const term=b=>/\bCIF\b/i.test(b.deliveryTerm)&&!/\bFOB\b/i.test(b.deliveryTerm)?'CIF':/\bFOB\b/i.test(b.deliveryTerm)&&!/\bCIF\b/i.test(b.deliveryTerm)?'FOB':'';
@@ -42,8 +45,8 @@ function nativePages(view,id){
   const slot=b=>base?b.schedule==='C2'?5:b.schedule==='C5'?7:b.schedule==='C7'?8:b.schedule==='C8'?9:({GOODS:2,INSPECTION:3,PACKING:4,VENDOR_DOCUMENTS:10,OTHER:11}[role(b)]):b.schedule==='C4'?3:b.schedule==='C7'?4:b.schedule==='C6'?5:b.schedule==='C3'?6:7;
   const groups=new Map();for(const b of eligible){const r=slot(b);if(r===undefined){issues.push('A1 summary row OPEN: '+b.lineId);continue;}if(!groups.has(r))groups.set(r,[]);groups.get(r).push(b);}
   for(const [r,bs] of groups){
-   const amount=sum(bs),terms=new Set(bs.map(term));set(v,r,3,r===8&&base?'Day':'Lot');set(v,r,4,r===8&&base?value(field(view,'C7','sitePeriodDays')):1);
-   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));set(v,r,7,(view.workingPreview&&bs.length>3?bs.length+' quoted items; scope and allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer delivery term OPEN':''));}
+   const amount=shownSum(view,bs),terms=new Set(bs.map(term));set(v,r,3,r===8&&base?'Day':'Lot');set(v,r,4,r===8&&base?value(field(view,'C7','sitePeriodDays')):1);
+   if(base){set(v,r,5,r===8?value(field(view,'C7','sitePeriodDays'))+' days included in Lump Sum':number(amount));if(r===9){const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null;set(v,r,3,'Day');set(v,r,4,value(qty));set(v,r,5,qty>0&&Number.isFinite(amount)?number(amount/qty):'OPEN');}set(v,r,6,number(amount));set(v,r,7,(view.workingPreview&&subtotalNote(view,bs)?(()=>{const p=scheduleRollup0550(bs);return p.priced+'/'+p.count+' priced; '+p.open+' OPEN. Known subtotal only'+(terms.has('')?' / Delivery term OPEN':'');})():(view.workingPreview&&bs.length>3?bs.length+' Working owners; allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer delivery term OPEN':'')));}
    else{
     if(r===6||r===7)set(v,r,1,bs.map(b=>b.line.description).join('; '));
     const diemQty=r===4&&bs.every(b=>b.line.unit==='MD'&&Number.isFinite(b.line.quantity))?bs.reduce((n,b)=>n+b.line.quantity,0):null;
@@ -52,14 +55,14 @@ function nativePages(view,id){
     set(v,r,9,(view.workingPreview&&bs.length>3?bs.length+' quoted items; scope and allocation pending review':bs.map(b=>b.line.description).join('; '))+(terms.has('')?' / Customer CIF/FOB term OPEN':''));if(terms.has('')){set(v,r,5,'OPEN');set(v,r,7,'OPEN');issues.push('A2 customer term OPEN');}
    }
   }
-  if(base){set(v,12,1,'In figures: USD '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned));}
+  if(base){const partial=subtotalNote(view,eligible);set(v,12,1,'In figures: USD '+number(view.baseAssigned)+'\nIn Words: '+words(view.baseAssigned)+(partial?'\nKnown subtotal: USD '+number(shownSum(view,eligible))+' / '+partial:''));}
   else for(const [r,t] of [[8,'CIF'],[9,'FOB']]){const bs=eligible.filter(b=>term(b)===t);set(v,r,2,'In figures: '+(eligible.some(b=>!term(b))?'OPEN':bs.length?'USD '+number(sum(bs)):'OPEN')+'\nIn Words: '+(bs.length?words(sum(bs)):'OPEN'));}
   add(v);return {pages,issues};
  }
  if(id==='B'||id==='C'){add();return {pages,issues};}
  if(['C1','C5','C6'].includes(id)){
   const capacity=id==='C1'?32:7;
-  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id);group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?'USD '+number(sum(rows.filter(b=>!b.nonAdditive))):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'');});
+  chunks(rows,capacity).forEach((group,pi)=>{const v=blankValues(id);group.forEach((b,i)=>{const r=i+2;set(v,r,0,pi*capacity+i+1);set(v,r,1,b.line.description);if(id==='C1'){set(v,r,2,b.unit);set(v,r,3,value(b.quantity));set(v,r,4,b.nonAdditive?'Included':number(b.unitPrice));set(v,r,5,b.nonAdditive?'Included':number(b.amount));set(v,r,6,b.nativeNote||b.deliveryTerm||'Customer delivery term OPEN');}else{const offset=id==='C6'?1:0;if(offset)set(v,r,2,value(b.specification));set(v,r,2+offset,b.unit);set(v,r,3+offset,value(b.quantity));prices(v,r,4+offset,b);}});if(id==='C1')set(v,34,1,pi===chunks(rows,capacity).length-1?'USD '+number(shownSum(view,rows.filter(b=>!b.nonAdditive)))+(subtotalNote(view,rows)?' / '+subtotalNote(view,rows):''):'Continued on next form');add(v,pi?'Continuation '+(pi+1):'');});
  }
  if(['C2','C3','C4'].includes(id)){
   const groups=new Map();for(const b of rows){const key=b.mainEquipment||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}if(!groups.size)groups.set('OPEN',[]);
@@ -69,13 +72,13 @@ function nativePages(view,id){
   const site=rows.filter(b=>role(b)==='FIELD_SERVICE'),training=rows.filter(b=>role(b)==='TRAINING'),unknown=rows.filter(b=>!['FIELD_SERVICE','TRAINING'].includes(role(b)));
   for(const b of unknown)issues.push('Select Site Service / Training in allocation: '+b.lineId);
   const count=Math.max(1,Math.ceil(site.length/4),Math.ceil(training.length/4));
-  for(let p=0;p<count;p++){const v=blankValues(id);for(const [bs,start,subtotal] of [[site,1,5],[training,6,10]]){const group=bs.slice(p*4,(p+1)*4);group.forEach((b,i)=>{set(v,start+i,2,b.line.description);set(v,start+i,3,b.unit==='MH'?value(b.quantity):'OPEN');set(v,start+i,4,b.unit==='MH'?number(b.unitPrice):'OPEN');set(v,start+i,5,number(b.amount));});set(v,subtotal,1,number(sum(group)));}set(v,11,1,unknown.length?'OPEN':number(sum([...site.slice(p*4,(p+1)*4),...training.slice(p*4,(p+1)*4)])));set(v,1,6,value(field(view,id,'sitePeriodDays'))+' days');set(v,6,6,value(field(view,id,'trainingPeriodDays'))+' days');add(v,p?'Continuation '+(p+1):'');}
+  for(let p=0;p<count;p++){const v=blankValues(id);for(const [bs,start,subtotal] of [[site,1,5],[training,6,10]]){const group=bs.slice(p*4,(p+1)*4);group.forEach((b,i)=>{set(v,start+i,2,b.line.description);set(v,start+i,3,b.unit==='MH'?value(b.quantity):'OPEN');set(v,start+i,4,b.unit==='MH'?number(b.unitPrice):'OPEN');set(v,start+i,5,number(b.amount));});set(v,subtotal,1,number(shownSum(view,group)));}set(v,11,1,unknown.length?'OPEN':number(shownSum(view,[...site.slice(p*4,(p+1)*4),...training.slice(p*4,(p+1)*4)])));set(v,1,6,value(field(view,id,'sitePeriodDays'))+' days');set(v,6,6,value(field(view,id,'trainingPeriodDays'))+' days');add(v,p?'Continuation '+(p+1):'');}
  }
  if(id==='C8'){
   const v=blankValues(id),rowMap={OFFICE:1,TRANSPORT:2,AIRPORT:3,OFFICE_CONSUMABLES:4,WORKING_LUNCH:5};
   for(const b of rows)if(!rowMap[role(b)])issues.push('Select native C8 facility row in allocation: '+b.lineId);
-  for(const [key,r] of Object.entries(rowMap)){const bs=rows.filter(b=>role(b)===key);if(!bs.length)continue;const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null,amount=sum(bs);set(v,r,3,key==='AIRPORT'?'':value(qty));set(v,r,4,bs.length===1?number(bs[0].unitPrice):'OPEN');set(v,r,5,number(amount));set(v,r,6,bs.map(b=>b.line.description+' / '+b.treatment).join('; '));if(bs.length>1)issues.push('C8 native row has multiple Working rates; review consolidation: '+key);}
-  set(v,6,1,rows.some(b=>!rowMap[role(b)])?'OPEN':number(sum(rows)));add(v);
+  for(const [key,r] of Object.entries(rowMap)){const bs=rows.filter(b=>role(b)===key);if(!bs.length)continue;const qty=bs.every(b=>b.unit==='MD'&&Number.isFinite(b.quantity))?bs.reduce((n,b)=>n+b.quantity,0):null,amount=shownSum(view,bs);set(v,r,3,key==='AIRPORT'?'':value(qty));set(v,r,4,bs.length===1?number(bs[0].unitPrice):'OPEN');set(v,r,5,number(amount));set(v,r,6,bs.map(b=>b.line.description+' / '+b.treatment).join('; '));if(bs.length>1)issues.push('C8 native row has multiple Working rates; review consolidation: '+key);}
+  set(v,6,1,rows.some(b=>!rowMap[role(b)])?'OPEN':number(shownSum(view,rows)));add(v);
  }
  return {pages,issues};
 }
@@ -90,6 +93,8 @@ function renderPage(view,page,format){
   if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t>${escape(note)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);
   else result+=`<p class="native-response">${escape(note)}</p>`;
  }
+ const partialNote=view.workingPreview&&['C1','C7','C8'].includes(page.id)?subtotalNote(view,view.scheduleRows(page.id)):'';
+ if(partialNote){if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',`<w:p><w:r><w:t>${escape(partialNote)}</w:t></w:r></w:p>{{NATIVE_RESPONSE}}`);else result+=`<p class="native-response">${escape(partialNote)}</p>`;}
  const response=view.getRecord('I.'+page.id).content;
  if(format==='xml')result=result.replace('{{NATIVE_RESPONSE}}',response?.trim()?`<w:p><w:r><w:rPr><w:rFonts w:ascii="Arial" w:hAnsi="Arial"/><w:sz w:val="20"/></w:rPr><w:t xml:space="preserve">BIDDER response: ${escape(response).replace(/\n/g,'</w:t><w:br/><w:t xml:space="preserve">')}</w:t></w:r></w:p>`:'');
  else if(response?.trim())result+=`<p class="native-response"><b>BIDDER response:</b> ${escape(response).replace(/\n/g,'<br>')}</p>`;

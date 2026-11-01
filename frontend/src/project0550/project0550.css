@@ -1763,3 +1763,7 @@
 
 /* Original Exhibit C is the primary visible document, with compact form tabs. */
 .p55-volume-intro h2{margin:0 0 6px}.p55-volume-intro p{margin:4px 0}.p55-volume-intro .p55-review-toolbar{margin:8px 0 0}
+/* Source-backed lifecycle reconciliation stays inside its existing WP.6/11.M container. */
+.p55-lifecycle{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.p55-lifecycle>details{min-width:0;max-width:100%}
+.p55-lifecycle select{width:100%;max-width:100%;min-width:0;box-sizing:border-box}

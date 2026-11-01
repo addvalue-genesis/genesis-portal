@@ -1,3 +1,4 @@
+import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {nativeExhibitHtml0550} from './exhibitCNative0550';
 import {zipStore} from './exportOriginalPriceForm';
 import {SCHEDULES_0550,QUALIFICATIONS_0550} from './data/bidVolumes0550';
@@ -9,7 +10,7 @@ export function scheduleTable0550(view,id){
  if(['A1','A2'].includes(id)){
   const part=id==='A1'?'BASE':'OPTION',groups=new Map();
   for(const b of view.bindings.filter(b=>b.line&&b.treatment===part)){const key=b.summary||'OPEN';if(!groups.has(key))groups.set(key,[]);groups.get(key).push(b);}
-  return {heads:['Description','Unit','Qty','Unit Price (USD)','Total Price (USD)','Breakdown'],rows:[...[...groups].map(([name,bs])=>[name,'Lot',1,sumMoney0550(bs.map(b=>b.amount)),sumMoney0550(bs.map(b=>b.amount)),[...new Set(bs.map(b=>b.schedule))].join(', ')]),['Lump Sum '+(part==='BASE'?'Base':'Optional'),'Lot',1,part==='BASE'?view.baseAssigned:view.optionsAssigned,part==='BASE'?view.baseAssigned:view.optionsAssigned,'OPEN until complete mapping / review']]};
+  return {heads:['Description','Unit','Qty','Unit Price (USD)','Total Price (USD)','Breakdown'],rows:[...[...groups].map(([name,bs])=>[name,'Lot',1,view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),view.workingPreview?scheduleRollup0550(bs).knownUSD:sumMoney0550(bs.map(b=>b.amount)),[...new Set(bs.map(b=>b.schedule))].join(', ')+(view.workingPreview?' / '+rollupNote0550(scheduleRollup0550(bs)):'')]),['Lump Sum '+(part==='BASE'?'Base':'Optional'),'Lot',1,part==='BASE'?view.baseAssigned:view.optionsAssigned,part==='BASE'?view.baseAssigned:view.optionsAssigned,'OPEN until complete mapping / review']]};
  }
  if(id==='B')return {heads:['Payment milestone','Percentage / response'],rows:[['Advance','10%'],['Engineering approval','5%'],['Major materials PO','15%'],['Ready for shipment / FAT / B/L or AWB','30%'],['Site receipt','20%'],['PAC','10%'],['FAC','10%'],['BIDDER response',view.getRecord('I.B').content||'OPEN']]};
  if(id==='C')return {heads:['Schedule','Title','Rows','Review'],rows:SCHEDULES_0550.filter(s=>/^C[1-8]$/.test(s.id)).map(s=>[s.id,s.title,view.scheduleRows(s.id).length,view.scheduleRows(s.id).length?view.scheduleRows(s.id).every(b=>b.state==='REVIEWED')?'REVIEWED':'OPEN':view.getRecord('I.'+s.id).state])};

@@ -117,12 +117,15 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const customerTHB=ready?round(customerNative*factor):null;
   const usdRate=fx("USD");
   const usdValue=ready&&usdRate!==null?eq("E17",{THB:customerTHB,fx:usdRate}):null;
-  const provisionalProblems=problems.filter(p=>!["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN"].includes(p));
-  const nativeReady=provisionalProblems.length===0&&[costNative,addvalueSell,customerNative].every(n=>Number.isFinite(n)&&Math.abs(n)<=Number.MAX_SAFE_INTEGER/100);
+  // A sourced DIRECT selling rate is independent of unestablished internal cost.
+  // Cost stays null; the strict Working/Official problems above are retained.
+  const provisionalProblems=problems.filter(p=>!["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN",...(l.sellMode==="DIRECT"?["Cost rate OPEN"]:[])].includes(p));
+  const nativeReady=provisionalProblems.length===0&&(l.sellMode==="DIRECT"?[addvalueSell,customerNative]:[costNative,addvalueSell,customerNative]).every(n=>Number.isFinite(n)&&Math.abs(n)<=Number.MAX_SAFE_INTEGER/100);
   const provisionalCustomerTHB=nativeReady&&factor!==null?round(customerNative*factor):null;
-  const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):null;
-  const provisional={provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
-   provisionalCostTHB:nativeReady&&factor!==null?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
+  // Keep the established FX/rounding path when available; native USD needs no invented FX.
+  const provisionalUSD=provisionalCustomerTHB!==null&&usdRate!==null?eq("E17",{THB:provisionalCustomerTHB,fx:usdRate}):nativeReady&&currency==="USD"?customerNative:null;
+  const provisional={costState:Number.isFinite(costNative)?"COST_INPUT_PRESENT":"COST_UNESTABLISHED",sellBasisState:nativeReady&&l.sellMode==="DIRECT"&&!Number.isFinite(costNative)?"WORKING_SELL_KNOWN_COST_UNESTABLISHED":"STANDARD_COST_AND_SELL_CHECKS",provisionalProblems,provisionalCostNative:nativeReady?round(costNative):null,provisionalSellNative:nativeReady?round(addvalueSell):null,provisionalCustomerNative:nativeReady?round(customerNative):null,
+   provisionalCostTHB:nativeReady&&factor!==null&&Number.isFinite(costNative)?round(costNative*factor):null,provisionalSellTHB:nativeReady&&factor!==null?round(addvalueSell*factor):null,provisionalCustomerTHB,provisionalCustomerUSD:provisionalUSD===null?null:round(provisionalUSD)};
   return {...l,...provisional,selected,requestedSelected:l.selected,satelliteScopeState:satelliteScope,mrScopeState:mrScope,quantity,unit,currency,costRate,offer,calculation:calc,result,problems,state:ready?"PRICED_WORKING":"OPEN",costTHB:ready?round(costNative*factor):null,workingSellTHB:ready?round(addvalueSell*factor):null,customerTHB,customerUSD:usdValue===null?null:round(usdValue),sourceModuleId:"bid.budget.working.line."+l.id,releaseModuleId:"bid.budget.release.line."+l.id,traceId:"PJ2608-0550/"+l.id};
  });
  const selected=lines.filter(l=>l.selected);
