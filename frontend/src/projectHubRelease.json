@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-01.5-preview",
+  "version": "2026-11-01.6-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "fad8a7bc3eede9e66aaf541040b4265f3006c215",
-  "capability": "0550 canonical system constraint continuation inside existing WP.1: separate system and COMMON review context, source receipt/text vs interpretation and supplier bindings, received vs derived CAL/RPT, activities/resource drivers and original Working/Budget/Volumes/Release links; no data preparation, pricing, approval or frozen-history writes."
+  "source0550": "9301be02931e9d64549e8330a7dbf0b90ed4246b",
+  "capability": "0550 authored EPC/TSI source/engineering continuation: exact Rev09 with protected v3-to-v4 draft enrichment, preserved edits/deletions and canonical IDs, source-bound contract requirements, system SI reports/activities and Volume I-II-III/deviation drafts; no repricing, imported approval or frozen-history changes."
 }
