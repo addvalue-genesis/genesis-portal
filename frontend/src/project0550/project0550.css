@@ -1771,3 +1771,9 @@
 .p55-lifecycle{min-width:0;max-width:100%;overflow-wrap:anywhere}
 .p55-lifecycle>details{min-width:0;max-width:100%}
 .p55-lifecycle select{width:100%;max-width:100%;min-width:0;box-sizing:border-box}
+
+/* Keep active Working price references within the existing mobile panels. */
+.p55-working-price,.p55-known-prices { min-width:0; max-width:100%; overflow-wrap:anywhere; }
+.p55-working-price button { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+
+.p55-release-table-identity>strong { min-width:0; max-width:100%; overflow-wrap:anywhere; }

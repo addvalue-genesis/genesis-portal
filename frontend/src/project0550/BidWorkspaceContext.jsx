@@ -12,7 +12,9 @@ import {fetchAutomaticSourceWorkspace0550,selectAutomaticSourceWorkspace0550} fr
 import {importLegacyVendorBasis0550} from "./data/legacyVendorBasis0550";
 import {workspaceDiagnostic0550} from "./data/workspaceRecovery0550";
 import {deriveReleaseControl0550,mergeReleaseRegister0550} from "./data/releaseIssue0550";
-import {prepareRepositoryBidBasis0550} from "./data/repositoryBidBasis0550";
+import {prepareRepositoryBidBasis0550,prepareAuthorizedEurThb0550} from "./data/repositoryBidBasis0550";
+import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550} from "./data/tsiActivityBudget0550";
+import {CORE_TEAM} from "./data";
 import {deriveSourceReadiness0550} from "./data/sourceReadiness0550";
 const Context=createContext(null);
 export const useBidWorkspace=()=>useContext(Context);
@@ -30,8 +32,10 @@ export function BidWorkspaceProvider({children}){
    const vendorDraft=preparePagaAvlDeviation0550(importMgwVendorBasis0550(mrPrepared,reviewDate));
    const priced=prepareMgwDetailPricing0550(vendorDraft,COMMERCIAL_POLICY,reviewDate);
    const avlPrepared=prepareSystemAvlDeviations0550(priced,deriveIntegration0550(priced,SYSTEMS,reviewDate));
-   const prepared=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
-   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare repository pricing basis, vendor offers, MR Working requirements and all-system AVL drafts / "+prepared.mgwQuoteImport.version);
+   const repository=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
+   const labour=prepareTsiActivityBudget0550(prepareAuthorizedEurThb0550(repository,reviewDate),COMMERCIAL_POLICY,CORE_TEAM,reviewDate);
+   const prepared=prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate);
+   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, authorised EUR-to-THB and TSI activity estimates; preserve edited records / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    try {
