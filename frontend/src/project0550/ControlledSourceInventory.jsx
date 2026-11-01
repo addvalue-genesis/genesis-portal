@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useBidWorkspace, downloadBidFile } from "./BidWorkspaceContext";
 import { SYSTEMS, SOURCE_REGISTER, validateSourceIntake, applySourceIntake, deriveSourceIntake, deriveDocumentRevisionRegister, safeSourceUrl } from "./data";
 import { Module } from "./BidControls";
@@ -6,6 +6,8 @@ import { ComponentCopyId } from "../common/ui/ComponentCopyId";
 import {SiWorkPackage0550} from "./SiWorkPackage0550";
 import {SourceReadiness0550} from "./SourceReadiness0550";
 import {SourceEvidenceSearch0550} from "./SourceEvidenceSearch0550";
+import {MrSourceReader0550} from "./MrSourceReader0550";
+import {MR_READER_PROFILE_0550} from "./data/mrReaderProfile0550";
 
 const TOKENS = SYSTEMS.map(s => s.token);
 export function SourceLink({ source }) {
@@ -67,12 +69,13 @@ export function SourceCommunications() {
     </>}
   </Module>;
 }
-export function ControlledSourceInventory({ navigationTarget }) {
+export function ControlledSourceInventory({ navigationTarget,onNavigate }) {
   const { data, busy, change, reviewDate, reload, sourceSync } = useBidWorkspace();
   const [visibleCount,setVisibleCount]=useState(50);
+  const [toolsOpen,setToolsOpen]=useState(false),tools=useRef(null);
   const [pending, setPending] = useState(null), [error, setError] = useState(""), [query, setQuery] = useState(""), [provider, setProvider] = useState("ALL");
   const intake = data?.sourceIntake;
-  useEffect(() => { if (navigationTarget?.startsWith("bid.documents.source.")) { setQuery(""); setProvider("ALL"); setVisibleCount(Math.max(50,(data?.sourceIntake?.sources.findIndex(s=>"bid.documents.source."+s.id===navigationTarget)??0)+1)); } }, [navigationTarget]);
+  useEffect(() => { if (navigationTarget?.startsWith("bid.documents.source.")||navigationTarget==="bid.documents.si-work-package"||navigationTarget?.startsWith("bid.documents.finding.")) setToolsOpen(true); if (navigationTarget?.startsWith("bid.documents.source.")) { setQuery(""); setProvider("ALL"); setVisibleCount(Math.max(50,(data?.sourceIntake?.sources.findIndex(s=>"bid.documents.source."+s.id===navigationTarget)??0)+1)); } }, [navigationTarget]);
   const model = useMemo(() => deriveSourceIntake(intake, reviewDate), [intake, reviewDate]);
   const rows = model.sources.filter(s => (provider === "ALL" || s.provider === provider) && (s.title + " " + s.documentNo + " " + s.id + " " + s.note).toLowerCase().includes(query.toLowerCase()));
   async function preview(file) {
@@ -83,9 +86,12 @@ export function ControlledSourceInventory({ navigationTarget }) {
     const ok = await change(current => applySourceIntake(current, pending, TOKENS), "Import source inventory / " + pending.batchId);
     if (ok) setPending(null);
   }
-  const openSource=id=>{setQuery("");setProvider("ALL");const index=intake?.sources.findIndex(s=>"bid.documents.source."+s.id===id)??-1;setVisibleCount(Math.max(50,index+1));setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(e=>e.getAttribute("data-component-key")===id);if(el){for(let node=el;node;node=node.parentElement)if(node.tagName==="DETAILS")node.open=true;el.scrollIntoView({block:"center"});}},40);};
+  const openSource=id=>{setToolsOpen(true);setQuery("");setProvider("ALL");const index=intake?.sources.findIndex(s=>"bid.documents.source."+s.id===id)??-1;setVisibleCount(Math.max(50,index+1));setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(e=>e.getAttribute("data-component-key")===id);if(el){for(let node=el;node;node=node.parentElement)if(node.tagName==="DETAILS")node.open=true;el.scrollIntoView({block:"center"});}},40);};
+  const openTools=()=>{setToolsOpen(true);setTimeout(()=>tools.current?.scrollIntoView({block:"start"}),40);};
   return <div className="p55-stack">
     <Module id="bid.documents.controlled-source-inventory" title="Controlled source inventory" showToggle>
+      <MrSourceReader0550 navigationTarget={navigationTarget} onNavigate={onNavigate} onOpenSource={openSource} onOpenTools={openTools}/>
+      <details className="p55-a-operating-tools" ref={tools} open={toolsOpen} onToggle={e=>setToolsOpen(e.currentTarget.open)}><summary>ทะเบียนและเครื่องมือตรวจต้นฉบับ · ผูกเอกสาร / ตรวจอ่าน / ค้นข้อความ</summary>
       <SourceReadiness0550 onOpenSource={openSource}/>
       <SourceEvidenceSearch0550 onOpenSource={openSource}/>
       <p>ทะเบียน GDrive / Gmail ที่ตรวจอ่านล่าสุด พร้อมเอกสารย้อนหลังและข้อมูลที่ยังอ่านไม่ครบ</p>
@@ -98,11 +104,12 @@ export function ControlledSourceInventory({ navigationTarget }) {
       <PackageComparison intake={intake}/>
       <DocumentRevisionRegister intake={intake}/>
       <div className="p55-bid-form"><label>ค้นหาเอกสาร <input aria-label="Search source inventory" value={query} onChange={e => {setQuery(e.target.value);setVisibleCount(50);}}/></label><label>แหล่ง <select aria-label="Source provider" value={provider} onChange={e => {setProvider(e.target.value);setVisibleCount(50);}}><option value="ALL">ทั้งหมด</option><option value="GDRIVE">GDrive</option><option value="GMAIL">Gmail</option></select></label></div>
-      <div className="p55-table-wrap"><table className="p55-table" aria-label="Controlled source inventory"><thead><tr><th>Source / เอกสาร</th><th>Revision / วันที่</th><th>Authority / อ่านถึงไหน</th><th>รายละเอียดต้นทาง</th></tr></thead><tbody>{!rows.length && <tr><td colSpan={4}>{!intake ? <><strong>ทะเบียนปัจจุบันว่าง — รอโหลดข้อมูลจาก Drive</strong><p>รายการ Historical ด้านล่างเป็นข้อมูลเดิม ไม่ใช่ผลตรวจเอกสารล่าสุด</p><button type="button" disabled={!data || busy} onClick={reload}>ตรวจข้อมูลจาก Drive อีกครั้ง</button></> : <><strong>{model.sources.length ? "ไม่พบเอกสารตามตัวกรอง" : "ชุดข้อมูลที่โหลดไม่มีรายการเอกสาร"}</strong>{model.sources.length > 0 && <button type="button" onClick={() => { setQuery(""); setProvider("ALL"); }}>ล้างตัวกรอง</button>}</>}</td></tr>}{rows.slice(0,visibleCount).map(s => <tr key={s.id} data-component-key={"bid.documents.source." + s.id}><td><SourceLink source={s}/><small>{s.id} · {s.provider}</small><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.documents.source." + s.id}/></td><td>{s.revision || "ไม่ระบุ"}<small>{s.issuedDate || "วันที่ออกไม่ยืนยัน"}</small></td><td>{s.effectiveAuthority}<small>{s.readState}</small></td><td>{s.note}{s.replaces.length > 0 && <small>แทนที่: {s.replaces.join(", ")}</small>}{s.content && <SourceText content={s.content}/>}</td></tr>)}</tbody></table></div>
+      <div className="p55-table-wrap"><table className="p55-table" aria-label="Controlled source inventory"><thead><tr><th>Source / เอกสาร</th><th>Revision / วันที่</th><th>Authority / อ่านถึงไหน</th><th>รายละเอียดต้นทาง</th></tr></thead><tbody>{!rows.length && <tr><td colSpan={4}>{!intake ? <><strong>ทะเบียนปัจจุบันว่าง — รอโหลดข้อมูลจาก Drive</strong><p>รายการ Historical ด้านล่างเป็นข้อมูลเดิม ไม่ใช่ผลตรวจเอกสารล่าสุด</p><button type="button" disabled={!data || busy} onClick={reload}>ตรวจข้อมูลจาก Drive อีกครั้ง</button></> : <><strong>{model.sources.length ? "ไม่พบเอกสารตามตัวกรอง" : "ชุดข้อมูลที่โหลดไม่มีรายการเอกสาร"}</strong>{model.sources.length > 0 && <button type="button" onClick={() => { setQuery(""); setProvider("ALL"); }}>ล้างตัวกรอง</button>}</>}</td></tr>}{rows.slice(0,visibleCount).map(s => <tr key={s.id} data-component-key={"bid.documents.source." + s.id}><td><SourceLink source={s}/><small>{s.id} · {s.provider}</small><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.documents.source." + s.id}/>{s.documentNo===MR_READER_PROFILE_0550.documentNo&&s.revision===MR_READER_PROFILE_0550.revision&&<button type="button" onClick={()=>onNavigate?.("bid.documents.controlled-source-inventory.mr.page.5")}>อ่านตามโครงสร้าง MR</button>}</td><td>{s.revision || "ไม่ระบุ"}<small>{s.issuedDate || "วันที่ออกไม่ยืนยัน"}</small></td><td>{s.effectiveAuthority}<small>{s.readState}</small></td><td>{s.note}{s.replaces.length > 0 && <small>แทนที่: {s.replaces.join(", ")}</small>}{s.content && <SourceText content={s.content}/>}</td></tr>)}</tbody></table></div>
       {rows.length>visibleCount&&<button type="button" onClick={()=>setVisibleCount(n=>n+50)}>แสดงเอกสารเพิ่มอีก 50 รายการ ({Math.min(visibleCount,rows.length)} / {rows.length})</button>}
       <details><summary>Historical source register — ทะเบียนเดิม ไม่ใช่ผลตรวจล่าสุด (read-only)</summary><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>ID</th><th>Source</th><th>Use / historical state</th></tr></thead><tbody>{SOURCE_REGISTER.map(s => <tr key={s.id}><td>{s.id}</td><td>{s.name}</td><td>{s.use}<small>{s.state}</small></td></tr>)}</tbody></table></div></details>
+      </details>
     </Module>
-    <SiWorkPackage0550/>
-    <SourceFindings navigationTarget={navigationTarget}/>
+    <details open={toolsOpen} onToggle={e=>{if(e.currentTarget.open)setToolsOpen(true);}}><summary>ชุดเตรียม SI และข้อค้นพบจากต้นฉบับ</summary><SiWorkPackage0550/>
+    <SourceFindings navigationTarget={navigationTarget}/></details>
   </div>;
 }

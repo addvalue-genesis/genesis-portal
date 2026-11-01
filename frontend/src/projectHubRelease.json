@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-01.2-preview",
+  "version": "2026-11-01.3-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "0465063db7f8b378ce244f9814dd6f63523a484c",
-  "capability": "0550 recheck against 0553 Release method: independent known DIRECT Working SELL vs unestablished cost, native USD preview without fabricated FX, C1-to-A1 known subtotal/partial counts, explicit historical-budget reference vs current inputs, lifecycle work/resource/owner traces; unchanged strict issue gates and saved financial/history records; C7 MD-to-MH uses the linked current E05 Hday without overwriting saved hours"
+  "source0550": "6a3eea13b27fe8ad85fdbabb757567a091091d68",
+  "capability": "0550 MR-driven A.1\u2013A.4: all 54 physical pages and Appendix 1.0\u201314, original page/heading discrepancies, current canonical text and existing MR items, all-system reading context, transitive project references, explicit shared SI draft preparation during A HOLD, row Source\u2013Working\u2013Release\u2013Source navigation; unchanged monetary inputs, issue gates and frozen history."
 }

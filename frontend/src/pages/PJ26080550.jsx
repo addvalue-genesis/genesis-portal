@@ -1,4 +1,5 @@
 import "../project0550/deviationRelease0550.css";
+import "../project0550/mrSourceReader0550.css";
 import {satelliteScopeNote0550} from "../project0550/data/satelliteScope0550";
 import {bidPresentationIndex,BID_TAG_TARGETS_0550} from "../project0550/bidPresentation0550";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
@@ -1883,12 +1884,12 @@ function RiskView() {
   );
 }
 
-function DocumentsView({ navigationTarget }) {
+function DocumentsView({ navigationTarget,onNavigate }) {
   const facts = PROJECT_0550_FACTS;
 
   return (
     <div className="p55-stack">
-      <ControlledSourceInventory navigationTarget={navigationTarget}/>
+      <ControlledSourceInventory navigationTarget={navigationTarget} onNavigate={onNavigate}/>
       <details className="p55-panel"><summary>Historical project facts / reference baseline</summary>
       <SectionTitle
         eyebrow="Evidence control"
@@ -2073,6 +2074,8 @@ function Project0550Bidding({ lang = "th" }) {
   const [technicalDirty,setTechnicalDirty]=useState(false);
   const {data,model}=useBidWorkspace();
   const baseModuleIndex=[{id:"l3.original",title:"RFQ-02 Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,number:t.label.split(" ")[0],tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
+    ...[["mr","A.1","อ่านตาม MR"],["systems","A.2","ดูตามระบบ"],["references","A.3","เอกสารอ้างอิง"],["coverage","A.4","ตรวจความครบถ้วน"]].map(([id,number,title])=>({id:"bid.documents.controlled-source-inventory."+id,number,title,area:"A",tab:"documents"})),
+    ...Array.from({length:54},(_,i)=>({id:"bid.documents.controlled-source-inventory.mr.page."+(i+1),number:"A.1",title:"MR B1 / PDF "+(i+1)+(i>=2?" / printed "+(i-1):" / front matter"),area:"A",tab:"documents"})),
     {id:"bid.documents.si-work-package",title:"Import System Integrator engineering drafts",area:"A",tab:"documents"},
     ...TECHNICAL_PANELS_0550.map((s,i)=>({id:"bid.technical."+s.id,title:"12 Volume II / "+s.title,number:s.id==="vdrl"?"12.V":s.id==="preview"?"12.P":"12."+i,tab:"technical"})),
     ...[{id:"overview",number:"11.0",title:"Overview"},{id:"cover",number:"11.1",title:"Power of Attorney"},...SCHEDULES_0550.map(s=>({...s,number:"11."+s.id})),{id:"mapping",number:"11.M",title:"Schedule allocation"},{id:"preview",number:"11.P",title:"Export"}].map(s=>({id:"bid.quotation."+s.id,title:s.title,number:s.number,tab:"quotation"})),
@@ -2158,10 +2161,10 @@ function Project0550Bidding({ lang = "th" }) {
       <main className="p55-main">
         <BidSaveStatus/>
         {technicalDirty&&<p className="p55-panel" role="status">มีร่างชุดข้อเสนอที่ยังไม่บันทึก · บันทึกหรือยกเลิกก่อนเปลี่ยนแท็บ/พื้นที่ทำงาน</p>}
-        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / Source Register</h2><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.original"/><DocumentsView navigationTarget={navigationTarget}/></section>}
+          <div className="p55-panel p55-module-nav"><label>ค้นหา / วาง Module ID <input aria-label="Project Module Search" value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&matches.length)jump(matches.find(m=>m.id.toLowerCase()===query||m.number?.toLowerCase()===query)||matches[0]);}} placeholder="PJ2608-0550 / bid.budget.release"/></label><div className="p55-module-results">{matches.slice(0,30).map(m=><button type="button" key={m.id} onClick={()=>jump(m)}>{m.number?m.number+" · ":""}{m.title}<small>{m.id}</small></button>)}</div></div>
+        {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / อ่านข้อกำหนดตาม MR</h2><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.original"/><DocumentsView navigationTarget={navigationTarget} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/></section>}
         {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><SourceCommunications/><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · {data?.releaseRegister?.issues.length||0} authorized snapshots · {data?.releaseRegister?.transmittals.length||0} recorded transmittals.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
         {area==="B"&&<>
-          <div className="p55-panel p55-module-nav"><label>ค้นหา / วาง Module ID <input aria-label="Project Module Search" value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&matches.length)jump(matches.find(m=>m.id.toLowerCase()===query||m.number?.toLowerCase()===query)||matches[0]);}} placeholder="PJ2608-0550 / bid.budget.release"/></label><div className="p55-module-results">{matches.slice(0,30).map(m=><button type="button" key={m.id} onClick={()=>jump(m)}>{m.number?m.number+" · ":""}{m.title}<small>{m.id}</small></button>)}</div></div>
           <div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>
           {activeTab === "overview" ? <Overview /> : null}
           {activeTab === "architecture" ? <ArchitectureView onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}

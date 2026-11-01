@@ -1,3 +1,5 @@
+Latest MR-driven A: [original-order reading, all-system views, references and canonical continuation](20261101_MR_DRIVEN_A_READER.md), UI `2026-11-01.3-preview`. Read this checkpoint first. A.1–A.4 project the existing source module; use available text/catalogue/Particular work instead of blanket OPEN. Draft work can continue during A HOLD. Exact source/version/offset validation, formal issue gates and all saved prices/history remain controlled.
+
 Latest existing-basis audit / C1→A1: [known-subtotal display and recovered-work reconciliation](20261101_EXISTING_BASIS_AUDIT_AND_A1.md), UI `2026-11-01.2-preview`. Blank Working fields are not proof of missing source data. Rev04 MH and the Rev10 THB580M estimate are historical references, never automatic current bid inputs. Preserve strict issued totals and all saved financial values/history.
 
 Latest completion: [live technical dossier, native SDRL, qualification checklist and package-aware AVL](20261101_LIVE_DOSSIER_AND_SDRL.md), UI `2026-11-01.1-preview`, follows `feddbbe`. Read this checkpoint first. Current pages use canonical data; actual engineering/evidence gaps stay OPEN. Windows deployment is not inferred.

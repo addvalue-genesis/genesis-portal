@@ -35,7 +35,7 @@ export function SourceReadiness0550({onOpenSource=()=>{}}){
    <button type="button" onClick={()=>onOpenSource("bid.documents.si-work-package")}>ทางเลือกสำรอง: นำเข้าชุดเตรียม A / ข้อกำหนดให้ B</button>
    <button type="button" onClick={()=>downloadBidFile({projectId:data.projectId,revision:data.revision,sourceBatchId:data.sourceIntake?.batchId,state:readiness.state,basisKey:readiness.basisKey,checks:readiness.problems,expectedInputs:readiness.rows.map(({bound,candidates,related,...r})=>({...r,boundSourceIds:bound.map(s=>s.id),candidateSourceIds:candidates.map(s=>s.id),relatedSourceIds:related.map(s=>s.id)}))},`PJ2608-0550_A_Input_Review_R${data.revision}.json`)}>Export A input review</button>
   </div>
-  {readiness.problems.length>0&&<p><strong>ยังส่งต่อเป็นฐานที่พร้อมไม่ได้:</strong> {readiness.problems.join(" / ")}</p>}
+  {readiness.problems.length>0&&<p><strong>ยังรับรองความพร้อม A ทั้งชุดไม่ได้:</strong> {readiness.problems.join(" / ")} · ใช้ข้อความและรายการที่มีหลักฐานเตรียมงานใน B ต่อได้ โดยแยกข้อที่ยังต้องทบทวน; เกณฑ์ออก Issue ยังคงเดิม</p>}
   {(edit||extra||review||doc)&&<div ref={editor}/>}
   {doc&&<form onSubmit={async e=>{e.preventDefault();const ok=await change(d=>{const w={...emptyIntegration0550(),...d.integrationWorkspace};return {...d,integrationWorkspace:{...w,documentReviews:[...w.documentReviews.filter(r=>r.id!==doc.id),stampIntegration0550(d,"documentReviews",doc)]}};},"A document reading / "+doc.id);if(ok){setDoc(null);setMessage("บันทึกการอ่านในทะเบียนกลางแล้ว · A และ B ใช้ผลตรวจเดียวกัน");}}}>
    <h4>ตรวจอ่านต้นฉบับใน A · {sources.find(s=>s.id===doc.id)?.title}</h4>
