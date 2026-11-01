@@ -14,16 +14,25 @@ export const A_CORPUS_WORK_PACKAGE_SCHEMA_0550="genesis.0550.si-work-package.v3"
 // Explicit v3 successor: enrich only unchanged predecessor requirement drafts.
 // Private DATA, user choices and issued outputs remain in their canonical stores.
 export const EPC_WORK_PACKAGE_SCHEMA_0550="genesis.0550.si-work-package.v4";
-const linkedPackage=p=>[A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550].includes(p?.schema);
+export const A_AUDIT_WORK_PACKAGE_SCHEMA_0550="genesis.0550.si-work-package.v5";
+const linkedPackage=p=>[A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550,A_AUDIT_WORK_PACKAGE_SCHEMA_0550].includes(p?.schema);
+export function preparationAncestors0550(pack){
+ const rows=[],seen=new Set([pack]),batches=new Set([pack?.batchId]);let p=pack;
+ while(p?.predecessor){const prior=p.predecessor;if(rows.length>=8||seen.has(prior)||batches.has(prior.batchId))throw Error("SI work package: invalid predecessor chain");rows.push(prior);seen.add(prior);batches.add(prior.batchId);p=prior;}return rows;
+}
+// Validate inherited excerpts against the expanded source text, while retaining
+// the original predecessor objects/hashes for receipt and edit comparisons.
+function rebasedPreparation(pack,source){return {...pack,sourceBatchId:source.batchId,sourceBasisKey:sourcePackageBasis0550(source),...(pack.predecessor?{predecessor:rebasedPreparation(pack.predecessor,source)}:{})};}
 export const sourcePackageBasis0550=intake=>integrationFingerprint0550(intake);
-export const SI_FILE_LIMIT_0550=16*1024*1024;
+export const SI_FILE_LIMIT_0550=32*1024*1024;
 const collections=Object.keys(emptyIntegration0550()).filter(k=>k!=="schema");
 const fail=m=>{throw Error("SI work package: "+m);};
 const keys=(o,allowed)=>{if(!o||typeof o!=="object"||Array.isArray(o)||Object.keys(o).some(k=>!allowed.includes(k)))fail("unsupported fields");};
 export function validateSiWorkPackage0550(pack,systems,intake){
- const linked=linkedPackage(pack),corpus=pack?.schema===A_CORPUS_WORK_PACKAGE_SCHEMA_0550,epc=pack?.schema===EPC_WORK_PACKAGE_SCHEMA_0550;
+ preparationAncestors0550(pack);
+ const linked=linkedPackage(pack),corpus=pack?.schema===A_CORPUS_WORK_PACKAGE_SCHEMA_0550,audit=pack?.schema===A_AUDIT_WORK_PACKAGE_SCHEMA_0550,epc=pack?.schema===EPC_WORK_PACKAGE_SCHEMA_0550||audit;
  keys(pack,linked?["schema","projectId","batchId","preparedOn","coverageNote","sourceBatchId","sourceBasisKey","sourceControl","integrationWorkspace","technicalProposal",...((corpus||epc)?["predecessor"]:[]),...(epc?["bidVolumes"]:[])]:["schema","projectId","batchId","preparedOn","coverageNote","sourceIntake","integrationWorkspace"]);
- if(![SI_WORK_PACKAGE_SCHEMA_0550,A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550].includes(pack.schema)||pack.projectId!=="PJ2608-0550")fail("wrong project/schema");
+ if(![SI_WORK_PACKAGE_SCHEMA_0550,A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550,A_AUDIT_WORK_PACKAGE_SCHEMA_0550].includes(pack.schema)||pack.projectId!=="PJ2608-0550")fail("wrong project/schema");
  if(typeof pack.batchId!=="string"||!/^PJ2608-0550-SI-[\w.-]{1,80}$/.test(pack.batchId))fail("invalid batch");
  if(typeof pack.preparedOn!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(pack.preparedOn)||!Number.isFinite(Date.parse(pack.preparedOn))||new Date(pack.preparedOn).toISOString().slice(0,10)!==pack.preparedOn)fail("invalid date");
  if(typeof pack.coverageNote!=="string"||!pack.coverageNote.trim()||pack.coverageNote.length>6000)fail("coverage note required");
@@ -33,8 +42,8 @@ export function validateSiWorkPackage0550(pack,systems,intake){
  if(corpus){const prev=pack.predecessor;if(!prev||prev.schema!==A_WORK_PACKAGE_SCHEMA_0550||prev.projectId!==pack.projectId||prev.batchId===pack.batchId||prev.preparedOn>=pack.preparedOn)fail("invalid predecessor preparation");validateSiWorkPackage0550({...prev,sourceBatchId:source.batchId,sourceBasisKey:sourcePackageBasis0550(source)},systems,source);}
  if(epc){
   const prev=pack.predecessor;
-  if(!prev||prev.schema!==A_CORPUS_WORK_PACKAGE_SCHEMA_0550||prev.projectId!==pack.projectId||prev.batchId===pack.batchId||prev.preparedOn>pack.preparedOn||prev.sourceBatchId!==pack.sourceBatchId||prev.sourceBasisKey!==pack.sourceBasisKey)fail("invalid EPC predecessor");
-  validateSiWorkPackage0550(prev,systems,source);
+  if(!prev||!(audit?[EPC_WORK_PACKAGE_SCHEMA_0550,A_AUDIT_WORK_PACKAGE_SCHEMA_0550]:[A_CORPUS_WORK_PACKAGE_SCHEMA_0550]).includes(prev.schema)||prev.projectId!==pack.projectId||prev.batchId===pack.batchId||prev.preparedOn>pack.preparedOn||(!audit&&(prev.sourceBatchId!==pack.sourceBatchId||prev.sourceBasisKey!==pack.sourceBasisKey)))fail("invalid EPC predecessor");
+  validateSiWorkPackage0550(audit?rebasedPreparation(prev,source):prev,systems,source);
   for(const collection of collections)for(const r of prev.integrationWorkspace[collection]||[])if(!pack.integrationWorkspace?.[collection]?.some(n=>n.id===r.id))fail("EPC predecessor record omitted / "+r.id);
  }
  if(linked){
@@ -58,7 +67,7 @@ export function validateSiWorkPackage0550(pack,systems,intake){
   if(collection==="deviations"&&(r.workflowStatus!=="DRAFT"||r.approvalDecision!=="PENDING"))fail("deviation approval cannot be imported");
   for(const id of [...(r.sourceIds||[]),...(r.supplierSourceIds||[]),...(r.approvalSourceIds||[]),...(r.references||[]).map(ref=>ref.sourceId)])if(!sources.has(id))fail("source missing / "+id);
   if(collection==="documentReviews"&&!sources.has(r.id))fail("document review source missing / "+r.id);
-  if(linked&&collection==="documentReviews"&&(r.reviewedPages||r.notesReviewed||r.colourReviewed||r.appendicesReviewed))fail("A reading jobs cannot import completed page/visual attestations");
+  if(linked&&collection==="documentReviews"&&(r.notesReviewed||r.colourReviewed||r.appendicesReviewed||(!audit&&r.reviewedPages)))fail("A reading jobs cannot import completed page/visual attestations");
   if(linked&&collection==="requirements"&&r.sourceExcerpt){
    if(!r.sourceLocator.trim()||!r.sourceIds.some(id=>source.sources.find(s=>s.id===id)?.content.replace(/\s+/g," ").includes(r.sourceExcerpt.replace(/\s+/g," "))))fail("requirement excerpt missing from source / "+r.id);
   }
@@ -97,13 +106,13 @@ export function planSiWorkPackage0550(data,pack,systems){
  const selected=linked?{workspace:data,state:"LINKED_CURRENT"}:selectAutomaticSource(data,pack.sourceIntake,systems);
  if(selected.state==="LOCAL_NEWER")fail("local source is newer; reconcile this package before import");
  const w={...emptyIntegration0550(),...data.integrationWorkspace},stats=[];
- const epc=pack.schema===EPC_WORK_PACKAGE_SCHEMA_0550;
+ const audit=pack.schema===A_AUDIT_WORK_PACKAGE_SCHEMA_0550,epc=pack.schema===EPC_WORK_PACKAGE_SCHEMA_0550||audit;
  if(epc){
   const own=(data.sourcePreparationImports||[]).find(r=>r.batchId===pack.batchId);
   if(own&&own.packageKey!==integrationFingerprint0550(pack))fail('EPC preparation batch changed');
   if(own||(data.audit||[]).some(a=>a.action==='Import SI engineering drafts / '+pack.batchId))return {workspace:data,stats:[],sourceState:selected.state,changed:false};
  }
- const chain=epc?[pack.predecessor,pack.predecessor.predecessor]:[pack.predecessor];
+ const chain=epc?preparationAncestors0550(pack):[pack.predecessor];
  for(const prior of chain.filter(Boolean)){const receipt=(data.sourcePreparationImports||[]).find(r=>r.batchId===prior.batchId);if(receipt&&receipt.packageKey!==integrationFingerprint0550(prior))fail('predecessor preparation changed');}
  const wasConsumed=p=>p&&((data.sourcePreparationImports||[]).some(r=>r.batchId===p.batchId&&r.packageKey===integrationFingerprint0550(p))||(data.audit||[]).some(a=>a.action==='Import SI engineering drafts / '+p.batchId));
  const previous=chain.find(wasConsumed)||pack.predecessor,consumed=wasConsumed(previous);
@@ -127,7 +136,7 @@ export function planSiWorkPackage0550(data,pack,systems){
    if(epc&&(deletedReqs.has(r.requirementId)||(r.requirementIds||[]).some(id=>deletedReqs.has(id)))){preserved.push(r.id+' / dependency deliberately deleted');continue;}
    if(!ids.has(r.id))added.push(r);
    else if(JSON.stringify(ids.get(r.id))===JSON.stringify(r))same.push(r.id);
-   else if(epc&&consumed&&collection==="requirements"&&previous.integrationWorkspace.requirements.some(p=>p.id===r.id&&integrationFingerprint0550(p)===integrationFingerprint0550(ids.get(r.id))))updated.push(r);
+   else if(epc&&consumed&&(collection==="requirements"||audit&&collection==="documentReviews")&&previous.integrationWorkspace[collection].some(p=>p.id===r.id&&integrationFingerprint0550(p)===integrationFingerprint0550(ids.get(r.id))))updated.push(r);
    else preserved.push(r.id);
   }
   merged[collection]=[...old.map(r=>JSON.parse(JSON.stringify(updated.find(n=>n.id===r.id)||r))),...JSON.parse(JSON.stringify(added))];
@@ -154,7 +163,7 @@ export function planSiWorkPackage0550(data,pack,systems){
  }
  let technicalProposal=data.technicalProposal;
  if(pack.technicalProposal){
-  const old=technicalProposal||emptyTechnicalProposal0550(),added=[],same=[],preserved=[];
+  const old=technicalProposal||emptyTechnicalProposal0550(),added=[],same=[],preserved=[],updated=[];
   for(const raw of pack.technicalProposal.records){
    const r=epc?resolve(raw):raw;
    if(epc&&r.requirementIds.some(id=>deletedReqs.has(id))){preserved.push(r.id+' / dependency deliberately deleted');continue;}
@@ -162,12 +171,14 @@ export function planSiWorkPackage0550(data,pack,systems){
    const existing=old.records.find(x=>x.id===r.id||x.sectionId===r.sectionId&&x.systemToken===r.systemToken);
    if(!existing)added.push(r);
    else if(JSON.stringify(existing)===JSON.stringify(r))same.push(r.id);
+   else if(audit&&consumed&&existing.id===r.id&&previous.technicalProposal?.records.some(p=>p.id===r.id&&integrationFingerprint0550(p)===integrationFingerprint0550(existing)))updated.push(r);
    else preserved.push(r.id+" / existing "+existing.id);
    for(const id of r.offerIds)if(!data.offers.some(o=>o.id===id))fail("technical offer missing / "+id);
   }
-  if(added.length)technicalProposal={...old,records:[...old.records,...JSON.parse(JSON.stringify(added))]};
-  stats.push({collection:"technicalProposal.records",added:added.length,unchanged:same.length,preserved});
-  // Existing document metadata, equipment details and authored slots always win.
+  if(added.length||updated.length)technicalProposal={...old,records:[...old.records.map(r=>JSON.parse(JSON.stringify(updated.find(n=>n.id===r.id)||r))),...JSON.parse(JSON.stringify(added))]};
+  stats.push({collection:"technicalProposal.records",added:added.length,updated:updated.length,unchanged:same.length,preserved});
+  // Owner edits/deletions, document metadata and equipment details always win.
+  // Only exact unchanged audit-predecessor drafts may receive the new reading.
   // Even blank metadata is a local decision, not an importable document number.
  }
  let bidVolumes=data.bidVolumes;

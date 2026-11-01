@@ -1,6 +1,6 @@
 // One existing workspace: private JSON receipt + preparation, not a second DB.
 import {fetchAutomaticSource,selectAutomaticSource} from "./sourceAutoLoad";
-import {planSiWorkPackage0550,validateSiWorkPackage0550,A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550} from "./siWorkPackage0550";
+import {planSiWorkPackage0550,validateSiWorkPackage0550,A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550,A_AUDIT_WORK_PACKAGE_SCHEMA_0550,preparationAncestors0550,sourcePackageBasis0550} from "./siWorkPackage0550";
 import {integrationFingerprint0550} from "./integrationWorkspace0550";
 const SCHEMA="genesis.0550.source-workspace.v1";
 const fail=code=>{throw Error(code);};
@@ -16,9 +16,18 @@ export function validateSourcePreparationImports0550(records){
 export function selectAutomaticSourceWorkspace0550(data,bundle,systems){
  if(!bundle||bundle.schema!==SCHEMA||Object.keys(bundle).some(k=>!["schema","sourceIntake","aWorkPackage"].includes(k))||bundle.aWorkPackage===undefined)fail("SOURCE_WORKSPACE_INVALID");
  validateSourcePreparationImports0550(data.sourcePreparationImports);
+ // A new source pass may not overwrite a locally amended predecessor intake.
+ if(bundle.aWorkPackage?.schema===A_AUDIT_WORK_PACKAGE_SCHEMA_0550&&data.sourceIntake){
+  const prior=preparationAncestors0550(bundle.aWorkPackage).find(p=>p.sourceBatchId===data.sourceIntake.batchId);
+  if(prior&&sourcePackageBasis0550(data.sourceIntake)!==prior.sourceBasisKey)fail("SOURCE_LOCAL_REVIEW_REQUIRED");
+ }
+ if(bundle.aWorkPackage?.schema===A_AUDIT_WORK_PACKAGE_SCHEMA_0550&&data.sourceIntake&&data.sourceIntake.batchId!==bundle.sourceIntake?.batchId){
+  const byId=new Map((bundle.sourceIntake?.sources||[]).map(s=>[s.id,s]));
+  for(const old of data.sourceIntake.sources){const next=byId.get(old.id);if(!next||!next.content.startsWith(old.content)||["authority","documentNo","revision","replaces"].some(k=>JSON.stringify(next[k])!==JSON.stringify(old[k])))fail("SOURCE_HISTORY_MISSING");}
+ }
  const selected=selectAutomaticSource(data,bundle.sourceIntake,systems),pack=bundle.aWorkPackage;
  if(selected.state==="LOCAL_NEWER"||!pack)return {...selected,preparationState:selected.state==="LOCAL_NEWER"?"LOCAL_NEWER":"NOT_FOUND",stats:[]};
- if(![A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550].includes(pack.schema))fail("A_PREPARATION_FILE_INVALID");
+ if(![A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550,A_AUDIT_WORK_PACKAGE_SCHEMA_0550].includes(pack.schema))fail("A_PREPARATION_FILE_INVALID");
  validateSiWorkPackage0550(pack,systems,selected.workspace.sourceIntake);
  const receipts=data.sourcePreparationImports||[],packageKey=integrationFingerprint0550(pack),receipt=receipts.find(r=>r.batchId===pack.batchId);
  if(receipt&&receipt.packageKey!==packageKey)fail("A_PREPARATION_BATCH_CHANGED");
@@ -29,9 +38,9 @@ export function selectAutomaticSourceWorkspace0550(data,bundle,systems){
  const adopted=(data.audit||[]).some(a=>a.action==="Import SI engineering drafts / "+pack.batchId);
  const plan=adopted?{workspace:selected.workspace,stats:[]}:planSiWorkPackage0550(selected.workspace,pack,systems);
  const receiptFor=p=>({batchId:p.batchId,sourceBatchId:p.sourceBatchId,preparedOn:p.preparedOn,sourceBasisKey:p.sourceBasisKey,packageKey:integrationFingerprint0550(p)});
- // A v4 load consumes the embedded v3/v2 content too. Retain those exact
- // receipts so a later missing v4 file cannot reimport/refill its ancestors.
- const ancestors=pack.schema===EPC_WORK_PACKAGE_SCHEMA_0550?[pack.predecessor.predecessor,pack.predecessor]:[];
+ // A v4/v5 load consumes its embedded ancestor content too. Retain exact
+ // receipts so a later missing successor cannot reimport/refill ancestors.
+ const ancestors=[EPC_WORK_PACKAGE_SCHEMA_0550,A_AUDIT_WORK_PACKAGE_SCHEMA_0550].includes(pack.schema)?preparationAncestors0550(pack).reverse():[];
  const imports=[...receipts,...ancestors.filter(p=>!receipts.some(r=>r.batchId===p.batchId)).map(receiptFor),receiptFor(pack)];
  validateSourcePreparationImports0550(imports);
  return {...selected,workspace:{...plan.workspace,sourcePreparationImports:imports},preparationState:adopted?"ADOPTED":plan.stats.some(s=>s.preserved.length)?"PRESERVED_EDITS":"APPLIED",stats:plan.stats};
@@ -43,7 +52,7 @@ export async function fetchAutomaticSourceWorkspace0550(fetcher=fetch){
   // Older local bridges can still load source-only data; no manual import flow.
   if(!response.headers.get('content-type')?.includes('application/json'))return {schema:SCHEMA,sourceIntake:await fetchAutomaticSource(fetcher),aWorkPackage:null};
   if(!response.ok){const error=await response.json();throw Error(error.code||'SOURCE_BRIDGE_UNAVAILABLE');}
-  const limit=32*1024*1024+1024;
+  const limit=64*1024*1024+1024;
   if(Number(response.headers.get('content-length'))>limit)fail('SOURCE_FILE_TOO_LARGE');
   const text=await response.text();if(new Blob([text]).size>limit)fail('SOURCE_FILE_TOO_LARGE');
   return JSON.parse(text);

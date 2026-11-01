@@ -4,7 +4,7 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const ENDPOINT = '/api/local/pj2608-0550/source-intake';
 const WORKSPACE_ENDPOINT = '/api/local/pj2608-0550/source-workspace';
-const MAX_BYTES = 16 * 1024 * 1024;
+const MAX_BYTES = 32 * 1024 * 1024;
 const PROJECT = /^PJ2608-0550(?:[ _-]|$)/;
 const FILENAME = /^PJ2608-0550_Source_Intake_Rev\d+_\d{8}\.json$/;
 const PREPARATION_FILE = /^PJ2608-0550_A_Work_Package_(?:Rev\d+_)?\d{8}\.json$/;
@@ -86,7 +86,7 @@ async function loadDriveSourceWorkspace(options){
  const matches=[];
  for(const file of files){
   const row=await readJson(file),p=row.intake;
-  if(p.projectId!=='PJ2608-0550'||!['genesis.0550.si-work-package.v2','genesis.0550.si-work-package.v3','genesis.0550.si-work-package.v4'].includes(p.schema))throw fail('A_PREPARATION_FILE_INVALID');
+  if(p.projectId!=='PJ2608-0550'||!['genesis.0550.si-work-package.v2','genesis.0550.si-work-package.v3','genesis.0550.si-work-package.v4','genesis.0550.si-work-package.v5'].includes(p.schema)||Buffer.byteLength(row.body)>32*1024*1024)throw fail('A_PREPARATION_FILE_INVALID');
   if(p.sourceBatchId!==latest.intake.batchId)continue;
   if(typeof p.preparedOn!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(p.preparedOn)||!Number.isFinite(Date.parse(p.preparedOn))||new Date(p.preparedOn).toISOString().slice(0,10)!==p.preparedOn)throw fail('A_PREPARATION_FILE_INVALID');
   matches.push(row);
@@ -97,7 +97,7 @@ async function loadDriveSourceWorkspace(options){
  const canonical=value=>JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
  // Same-day continuation is ordered only by its exact embedded predecessor,
  // never filename/revision/upload time. Diverging candidates remain a conflict.
- const ancestor=(child,parent)=>{let p=child.intake;for(let n=0;n<3&&p?.predecessor;n++){if(canonical(p.predecessor)===canonical(parent.intake))return true;p=p.predecessor;}return false;};
+ const ancestor=(child,parent)=>{let p=child.intake;for(let n=0;n<8&&p?.predecessor;n++){if(canonical(p.predecessor)===canonical(parent.intake))return true;p=p.predecessor;}return false;};
  const tips=peers.filter(r=>peers.every(other=>r.hash===other.hash||ancestor(r,other)));
  const chosen=tips[0];
  if(peers.length&&(!chosen||tips.some(r=>r.hash!==chosen.hash)))throw fail('A_PREPARATION_CONFLICT',409);

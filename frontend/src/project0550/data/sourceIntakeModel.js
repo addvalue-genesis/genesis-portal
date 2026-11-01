@@ -48,7 +48,7 @@ export function validateSourceIntake(data, systems) {
         revisions.add(h.revision);
       }
     }
-    text(s.content, "source text", 500000); date(s.issuedDate, "issue date", true); date(s.receivedDate, "receipt date", true);
+    text(s.content, "source text", 1000000); date(s.issuedDate, "issue date", true); date(s.receivedDate, "receipt date", true);
     if (!s.title.trim() || !safeSourceUrl(s.url)) fail("Source title/URL required");
     if (!["GDRIVE", "GMAIL"].includes(s.provider)) fail("Invalid provider");
     if ((s.provider === "GMAIL") !== (new URL(s.url).hostname === "mail.google.com")) fail("Source provider/URL mismatch");

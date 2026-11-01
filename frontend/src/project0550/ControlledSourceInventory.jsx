@@ -80,7 +80,7 @@ export function ControlledSourceInventory({ navigationTarget,onNavigate }) {
   const rows = model.sources.filter(s => (provider === "ALL" || s.provider === provider) && (s.title + " " + s.documentNo + " " + s.id + " " + s.note).toLowerCase().includes(query.toLowerCase()));
   async function preview(file) {
     setPending(null); setError(""); if (!file) return;
-    try { if (file.size > 16 * 1024 * 1024) throw Error("Source intake exceeds 16 MiB"); setPending(validateSourceIntake(JSON.parse(await file.text()), TOKENS)); } catch (e) { setError(e.message); }
+    try { if (file.size > 32 * 1024 * 1024) throw Error("Source intake exceeds 32 MiB"); setPending(validateSourceIntake(JSON.parse(await file.text()), TOKENS)); } catch (e) { setError(e.message); }
   }
   async function apply() {
     const ok = await change(current => applySourceIntake(current, pending, TOKENS), "Import source inventory / " + pending.batchId);

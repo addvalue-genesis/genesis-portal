@@ -5,7 +5,8 @@ export function sourceReadingPasses0550(source){
  let previous=0,pass;
  markers.forEach((m,i)=>{
   const number=Number(m[1]);
-  if(!pass||(number===1&&previous>1)){pass={index:passes.length,pages:[]};passes.push(pass);}
+  const explicitPass=number===1&&i>0&&/\[NATIVE FULL-FILE TEXT PASS /.test(content.slice(markers[i-1].index+markers[i-1][0].length,m.index));
+  if(!pass||(number===1&&(previous>1||explicitPass))){pass={index:passes.length,pages:[]};passes.push(pass);}
   const printed=m[2]?.match(/printed\s+(\d+)\b/i)?.[1];
   pass.pages.push({number,printed:printed?Number(printed):null,marker:m[0],start:m.index+m[0].length,end:markers[i+1]?.index??content.length,text:content.slice(m.index+m[0].length,markers[i+1]?.index??content.length)});previous=number;
  });

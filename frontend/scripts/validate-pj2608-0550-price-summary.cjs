@@ -29,7 +29,11 @@ const html=renderToStaticMarkup(React.createElement(BidKnownPrices0550,{provisio
 assert(html.includes('Known customer prices by part'));assert(html.includes('PROVISIONAL'));assert(html.includes('Known native Working prices'));assert(html.includes('เปิด Working'));assert(html.includes('Optional'));assert.equal(JSON.stringify(d),before,'Summary rendering must not change any raw saved data');
 const noFx=JSON.parse(before);noFx.fx={thbPerUSD:null,thbPerEUR:null,source:'',date:''};
 const nf=W.deriveBidWorkspace(noFx,tokens,today),ng=knownPriceGroups0550(nf.provisional);
-assert(ng.every(g=>g.usd.value===null),"USD conversion remains OPEN without FX; native THB needs no conversion");
+assert(nf.provisional.selected.filter(r=>r.currency!=="USD").every(r=>r.customerUSD===null),"Non-USD conversion remains OPEN without FX");
+const nativeUsd=nf.provisional.selected.filter(r=>r.currency==="USD"&&Number.isFinite(r.provisionalCustomerNative));
+assert(nativeUsd.length>0&&nativeUsd.every(r=>r.customerUSD===r.provisionalCustomerNative),"Native USD customer prices need no conversion or invented FX");
+assert(ng.some(g=>g.usd.value>0),"Known native USD remains visible while converted totals stay OPEN");
+assert.equal(nf.official.baseUSD,null,"Missing FX cannot complete the official Base");
 assert(ng.some(g=>g.native.some(n=>n.currency==='USD'&&n.customer.value>0)),'Native known prices survive missing FX');
 const fixture={selected:[{selected:true,wbs:'A',currency:'USD',customerTHB:0,customerUSD:0,provisionalCostNative:0,provisionalSellNative:0,provisionalCustomerNative:0},{selected:true,wbs:'A',currency:'USD',customerTHB:null,customerUSD:null,provisionalCostNative:null,provisionalSellNative:null,provisionalCustomerNative:null},{selected:false,wbs:'A',currency:'USD',customerTHB:999999,customerUSD:999999},{selected:true,wbs:'C1',currency:'EUR',customerTHB:17,customerUSD:11,provisionalCostNative:5,provisionalSellNative:6,provisionalCustomerNative:7}]};
 const fg=knownPriceGroups0550(fixture);assert.deepEqual(fg[0].usd,{value:0,priced:1,missing:1});assert.equal(fg[2].usd.value,11);assert.equal(fg[1].usd.value,null);assert.equal(fg[2].native[0].currency,'EUR');assert.equal(fg[0].native[0].customer.value,0,'Explicit zero retained; missing/unselected never substituted or summed');

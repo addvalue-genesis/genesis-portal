@@ -18,7 +18,10 @@ assert(page.includes('ProjectTabs')&&page.includes('STANDARD_PROJECT_TABS'),"055
 assert(page.includes('common/cost/derivationKernel'),"0553 UI must use shared cost kernel");
 assert(!page.includes('from "../project0550/data"'),"0553 UI imports particular 0550 data");
 const projectRegistry=read("projectRegistry.js");
-assert(projectRegistry.includes('route: "/projects/pj2608-0550"')&&projectRegistry.includes('route: "/projects/pj2608-0553"')&&app.includes('path={project.route}'),"Project registry routes not isolated");
+assert(projectRegistry.includes('route: "/projects/pj2608-0550"')&&projectRegistry.includes('route: "/projects/pj2608-0553"'),"Project registry identities/routes missing");
+// The dedicated 0550 branch mounts its own route; other registered workspaces
+// remain in separate checkouts/servers, not the old registry-driven router.
+assert(app.includes('const PROJECT_ROUTE = "/projects/pj2608-0550"')&&app.includes('path={PROJECT_ROUTE}')&&app.includes('import("./pages/PJ26080550")')&&!/pages\/PJ26080553|path=\{project.route\}/.test(app),"Dedicated 0550 router must mount only its own workspace");
 assert(p0550.includes('from "../project0550/data"'),"0550 regression guard: original facade not found");
 const engineering=read("common/ui/EngineeringView.jsx");
 const binding=read("project0553/engineeringViewModel.js");
