@@ -1,6 +1,6 @@
 // One existing workspace: private JSON receipt + preparation, not a second DB.
 import {fetchAutomaticSource,selectAutomaticSource} from "./sourceAutoLoad";
-import {planSiWorkPackage0550,validateSiWorkPackage0550,A_WORK_PACKAGE_SCHEMA_0550} from "./siWorkPackage0550";
+import {planSiWorkPackage0550,validateSiWorkPackage0550,A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550} from "./siWorkPackage0550";
 import {integrationFingerprint0550} from "./integrationWorkspace0550";
 const SCHEMA="genesis.0550.source-workspace.v1";
 const fail=code=>{throw Error(code);};
@@ -18,7 +18,7 @@ export function selectAutomaticSourceWorkspace0550(data,bundle,systems){
  validateSourcePreparationImports0550(data.sourcePreparationImports);
  const selected=selectAutomaticSource(data,bundle.sourceIntake,systems),pack=bundle.aWorkPackage;
  if(selected.state==="LOCAL_NEWER"||!pack)return {...selected,preparationState:selected.state==="LOCAL_NEWER"?"LOCAL_NEWER":"NOT_FOUND",stats:[]};
- if(pack.schema!==A_WORK_PACKAGE_SCHEMA_0550)fail("A_PREPARATION_FILE_INVALID");
+ if(![A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550].includes(pack.schema))fail("A_PREPARATION_FILE_INVALID");
  validateSiWorkPackage0550(pack,systems,selected.workspace.sourceIntake);
  const receipts=data.sourcePreparationImports||[],packageKey=integrationFingerprint0550(pack),receipt=receipts.find(r=>r.batchId===pack.batchId);
  if(receipt&&receipt.packageKey!==packageKey)fail("A_PREPARATION_BATCH_CHANGED");

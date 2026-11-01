@@ -9,21 +9,24 @@ import {emptyTechnicalProposal0550,validateTechnicalProposal0550} from "./techni
 export const SI_WORK_PACKAGE_SCHEMA_0550="genesis.0550.si-work-package.v1";
 // v2 references the installed intake, avoiding a second 14+ MB copy of sources.
 export const A_WORK_PACKAGE_SCHEMA_0550="genesis.0550.si-work-package.v2";
+export const A_CORPUS_WORK_PACKAGE_SCHEMA_0550="genesis.0550.si-work-package.v3";
+const linkedPackage=p=>[A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550].includes(p?.schema);
 export const sourcePackageBasis0550=intake=>integrationFingerprint0550(intake);
 export const SI_FILE_LIMIT_0550=16*1024*1024;
 const collections=Object.keys(emptyIntegration0550()).filter(k=>k!=="schema");
 const fail=m=>{throw Error("SI work package: "+m);};
 const keys=(o,allowed)=>{if(!o||typeof o!=="object"||Array.isArray(o)||Object.keys(o).some(k=>!allowed.includes(k)))fail("unsupported fields");};
 export function validateSiWorkPackage0550(pack,systems,intake){
- const linked=pack?.schema===A_WORK_PACKAGE_SCHEMA_0550;
- keys(pack,linked?["schema","projectId","batchId","preparedOn","coverageNote","sourceBatchId","sourceBasisKey","sourceControl","integrationWorkspace","technicalProposal"]:["schema","projectId","batchId","preparedOn","coverageNote","sourceIntake","integrationWorkspace"]);
- if(![SI_WORK_PACKAGE_SCHEMA_0550,A_WORK_PACKAGE_SCHEMA_0550].includes(pack.schema)||pack.projectId!=="PJ2608-0550")fail("wrong project/schema");
+ const linked=linkedPackage(pack),corpus=pack?.schema===A_CORPUS_WORK_PACKAGE_SCHEMA_0550;
+ keys(pack,linked?["schema","projectId","batchId","preparedOn","coverageNote","sourceBatchId","sourceBasisKey","sourceControl","integrationWorkspace","technicalProposal",...(corpus?["predecessor"]:[])]:["schema","projectId","batchId","preparedOn","coverageNote","sourceIntake","integrationWorkspace"]);
+ if(![SI_WORK_PACKAGE_SCHEMA_0550,A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550].includes(pack.schema)||pack.projectId!=="PJ2608-0550")fail("wrong project/schema");
  if(typeof pack.batchId!=="string"||!/^PJ2608-0550-SI-[\w.-]{1,80}$/.test(pack.batchId))fail("invalid batch");
  if(typeof pack.preparedOn!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(pack.preparedOn)||!Number.isFinite(Date.parse(pack.preparedOn))||new Date(pack.preparedOn).toISOString().slice(0,10)!==pack.preparedOn)fail("invalid date");
  if(typeof pack.coverageNote!=="string"||!pack.coverageNote.trim()||pack.coverageNote.length>6000)fail("coverage note required");
  const source=linked?intake:pack.sourceIntake;
  if(linked&&(!source||pack.sourceBatchId!==source.batchId||pack.sourceBasisKey!==sourcePackageBasis0550(source)))fail("A source basis changed or missing; load the matching source intake and prepare again");
  validateSourceIntake(source,systems);
+ if(corpus){const prev=pack.predecessor;if(!prev||prev.schema!==A_WORK_PACKAGE_SCHEMA_0550||prev.projectId!==pack.projectId||prev.batchId===pack.batchId||prev.preparedOn>=pack.preparedOn)fail("invalid predecessor preparation");validateSiWorkPackage0550({...prev,sourceBatchId:source.batchId,sourceBasisKey:sourcePackageBasis0550(source)},systems,source);}
  if(linked){
   if(!pack.sourceControl)fail("A source control required");
   validateSourceControl0550({sourceControl:pack.sourceControl});
@@ -69,16 +72,21 @@ export function validateSiWorkPackage0550(pack,systems,intake){
  return pack;
 }
 export function planSiWorkPackage0550(data,pack,systems){
- const linked=pack?.schema===A_WORK_PACKAGE_SCHEMA_0550;
+ const linked=linkedPackage(pack);
  validateSiWorkPackage0550(pack,systems,data.sourceIntake);
  const selected=linked?{workspace:data,state:"LINKED_CURRENT"}:selectAutomaticSource(data,pack.sourceIntake,systems);
  if(selected.state==="LOCAL_NEWER")fail("local source is newer; reconcile this package before import");
  const w={...emptyIntegration0550(),...data.integrationWorkspace},stats=[];
+ const previous=pack.predecessor;
+ const priorReceipt=previous&&(data.sourcePreparationImports||[]).find(r=>r.batchId===previous.batchId);
+ if(priorReceipt&&priorReceipt.packageKey!==integrationFingerprint0550(previous))fail('predecessor preparation changed');
+ const consumed=previous&&((data.sourcePreparationImports||[]).some(r=>r.batchId===previous.batchId&&r.packageKey===integrationFingerprint0550(previous))||(data.audit||[]).some(a=>a.action==='Import SI engineering drafts / '+previous.batchId));
  const merged={...w};
  for(const collection of collections){
   const old=w[collection],ids=new Map(old.map(r=>[r.id,r]));
   const added=[],same=[],preserved=[];
   for(const r of pack.integrationWorkspace[collection]||[]){
+   if(consumed&&!ids.has(r.id)&&previous.integrationWorkspace[collection]?.some(p=>p.id===r.id)){preserved.push(r.id+' / deliberate deletion from prior preparation');continue;}
    if(!ids.has(r.id))added.push(r);
    else if(JSON.stringify(ids.get(r.id))===JSON.stringify(r))same.push(r.id);
    else preserved.push(r.id);
@@ -93,6 +101,7 @@ export function planSiWorkPackage0550(data,pack,systems){
   for(const [field,key] of [["extraInputs","id"],["bindings","inputId"]]){
    const ids=new Map(old[field].map(r=>[r[key],r])),added=[],same=[];
    for(const row of pack.sourceControl[field]){
+    if(consumed&&!ids.has(row[key])&&previous.sourceControl[field]?.some(p=>p[key]===row[key])){preserved.push(field+' / '+row[key]+' / prior deletion');continue;}
     if(field==="bindings"&&conflictingInputs.has(row.inputId)){preserved.push(field+" / "+row.inputId);continue;}
     if(!ids.has(row[key]))added.push(row);
     else if(JSON.stringify(ids.get(row[key]))===JSON.stringify(row))same.push(row[key]);
@@ -108,6 +117,7 @@ export function planSiWorkPackage0550(data,pack,systems){
  if(pack.technicalProposal){
   const old=technicalProposal||emptyTechnicalProposal0550(),added=[],same=[],preserved=[];
   for(const r of pack.technicalProposal.records){
+   if(consumed&&!old.records.some(p=>p.id===r.id)&&previous.technicalProposal?.records.some(p=>p.id===r.id)){preserved.push(r.id+' / prior deletion');continue;}
    const existing=old.records.find(x=>x.id===r.id||x.sectionId===r.sectionId&&x.systemToken===r.systemToken);
    if(!existing)added.push(r);
    else if(JSON.stringify(existing)===JSON.stringify(r))same.push(r.id);

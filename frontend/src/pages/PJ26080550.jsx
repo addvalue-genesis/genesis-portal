@@ -2093,6 +2093,7 @@ function Project0550Bidding({ lang = "th" }) {
     ...(model?.integration?.avlChecks||[]).map(r=>({id:"bid.deviations.avl."+r.id,title:r.manufacturer+" / "+r.model,tab:"deviations"})),
     ...(model?.integration?.deviations||[]).map(r=>({id:"bid.deviations.record."+r.id,title:r.vendorDeviation,tab:"deviations"})),
     ...(data?.sourceIntake?.sources||[]).map(s=>({id:"bid.documents.source."+s.id,title:s.title,tab:"documents",area:"A"})),
+    ...(data?.sourceIntake?.sources||[]).map(s=>({id:"bid.documents.controlled-source-inventory.document."+s.id,title:"A.1 / "+s.title,number:"A.1",tab:"documents",area:"A"})),
     ...(data?.sourceIntake?.findings||[]).map(f=>({id:"bid.documents.finding."+f.id,title:f.category,tab:"documents",area:"A"})),
     ...SYSTEMS.map(s=>({id:"bid.systems."+s.token,title:s.name,tab:"systems",system:s.token})),
     {id:"bid.engineering.equations",title:"Equation Execution / SAT persons days",tab:"engineering"},

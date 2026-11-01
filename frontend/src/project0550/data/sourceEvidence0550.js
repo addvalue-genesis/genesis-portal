@@ -16,7 +16,7 @@ export function searchSourceEvidence0550(data,query,{authority="CURRENT_TENDER",
    const start=Math.max(0,match.index-180,s.content.lastIndexOf("\n",Math.max(0,match.index-180))+1);
    let end=s.content.indexOf("\n",match.index+match[0].length+260);if(end<0)end=s.content.length;
    end=Math.max(match.index+match[0].length,Math.min(end,Math.max(start+1800,match.index+match[0].length)));
-   const prefix=s.content.slice(0,match.index),marker=[...prefix.matchAll(/\[(?:PDF PAGE (\d+)|(?:SHEET|OOXML PART) [^\]\n]+)\]/g)].at(-1),page=marker?.[1];
+   const prefix=s.content.slice(0,match.index),marker=[...prefix.matchAll(/\[(?:PDF PAGE (\d+)(?:;[^\]\n]*)?|(?:SHEET|OOXML PART) [^\]\n]+)\]/g)].at(-1),page=marker?.[1];
    const native=marker?.[0];
    const line=prefix.split("\n").length;
    key=key||integrationFingerprint0550(s);

@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-01.3-preview",
+  "version": "2026-11-01.4-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "6a3eea13b27fe8ad85fdbabb757567a091091d68",
-  "capability": "0550 MR-driven A.1\u2013A.4: all 54 physical pages and Appendix 1.0\u201314, original page/heading discrepancies, current canonical text and existing MR items, all-system reading context, transitive project references, explicit shared SI draft preparation during A HOLD, row Source\u2013Working\u2013Release\u2013Source navigation; unchanged monetary inputs, issue gates and frozen history."
+  "source0550": "ba72c8932658b672691cd88884f8bcfc0c9aa1c8",
+  "capability": "0550 whole-corpus A: MR plus PHI/LIS/DTS/SPE/STD and drawings, exact source/pass/page coordinates, existing multi-source SI constraints and transitive references, direct canonical draft preparation, protected v3 continuation retaining prior user deletions; unchanged prices, equation inputs, approvals and frozen release history."
 }

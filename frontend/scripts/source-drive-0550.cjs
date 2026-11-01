@@ -86,7 +86,7 @@ async function loadDriveSourceWorkspace(options){
  const matches=[];
  for(const file of files){
   const row=await readJson(file),p=row.intake;
-  if(p.projectId!=='PJ2608-0550'||p.schema!=='genesis.0550.si-work-package.v2')throw fail('A_PREPARATION_FILE_INVALID');
+  if(p.projectId!=='PJ2608-0550'||!['genesis.0550.si-work-package.v2','genesis.0550.si-work-package.v3'].includes(p.schema))throw fail('A_PREPARATION_FILE_INVALID');
   if(p.sourceBatchId!==latest.intake.batchId)continue;
   if(typeof p.preparedOn!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(p.preparedOn)||!Number.isFinite(Date.parse(p.preparedOn))||new Date(p.preparedOn).toISOString().slice(0,10)!==p.preparedOn)throw fail('A_PREPARATION_FILE_INVALID');
   matches.push(row);
