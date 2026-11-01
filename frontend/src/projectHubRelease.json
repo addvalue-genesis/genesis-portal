@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-01.4-preview",
+  "version": "2026-11-01.5-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "ba72c8932658b672691cd88884f8bcfc0c9aa1c8",
-  "capability": "0550 whole-corpus A: MR plus PHI/LIS/DTS/SPE/STD and drawings, exact source/pass/page coordinates, existing multi-source SI constraints and transitive references, direct canonical draft preparation, protected v3 continuation retaining prior user deletions; unchanged prices, equation inputs, approvals and frozen release history."
+  "source0550": "fad8a7bc3eede9e66aaf541040b4265f3006c215",
+  "capability": "0550 canonical system constraint continuation inside existing WP.1: separate system and COMMON review context, source receipt/text vs interpretation and supplier bindings, received vs derived CAL/RPT, activities/resource drivers and original Working/Budget/Volumes/Release links; no data preparation, pricing, approval or frozen-history writes."
 }

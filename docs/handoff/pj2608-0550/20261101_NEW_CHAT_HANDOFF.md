@@ -1,3 +1,5 @@
+> Subsequent implementation: [system constraint continuation / actual existing-work audit](20261101_SYSTEM_CONSTRAINT_CONTINUATION.md), UI `2026-11-01.5-preview`, extends existing WP.1 after `fad8a7bc`. The original handoff snapshot below retains its original baseline and DATA contract.
+
 # PJ2608-0550 — ส่งต่องานเข้าแชตใหม่ / 1 November 2026
 
 เอกสารนี้รวมสถานะที่ตรวจจาก GitHub โค้ด และ checkpoints ที่มีอยู่ เพื่อเริ่มทำงานต่อได้ทันทีโดยไม่สร้างระบบหรือข้อมูลเดิมซ้ำ เป็น **documentation-only handoff** ไม่ใช่การรับรองความครบถ้วนทางวิศวกรรม การปรับราคา หรือการออกข้อเสนอให้ลูกค้า
