@@ -1,3 +1,5 @@
+Latest multi-document continuation: [Invitation corpus reconciliation and pending-QA results](20261101_ALL_DOCUMENTS_CONTINUATION_QA.md). Reuse 2fb25eb / UI 2026-11-01.5-preview. Whole-document SI is one workstream; do not wait for an MR-only phase before PHI/DTS/SPE/contracts. Existing 17/17 Invitation files and current counterparts are retained; complete engineering is not inferred.
+
 Latest continuation: [actual existing-work audit and system constraint worklist](20261101_SYSTEM_CONSTRAINT_CONTINUATION.md), UI `2026-11-01.5-preview`. Extends WP.1; reuses Rev09/v3, existing findings and IDs, with system/COMMON separation and no financial/history writes. Full SI engineering and Windows deployment remain unverified.
 
 **Start a new chat here:** [1-Nov-2026 consolidated handoff](20261101_NEW_CHAT_HANDOFF.md). Verified application baseline `8eae7633`, UI `2026-11-01.4-preview`; exact private DATA links, completed implementation, tests, remaining SI work and a pasteable continuation prompt. Documentation-only; older checkpoints below retain historical branches/ports and do not override this launch state.
