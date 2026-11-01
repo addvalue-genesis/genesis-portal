@@ -1,3 +1,5 @@
+**Latest Windows launch evidence:** [user pull/start confirmed at 524f31a8](20261101_WINDOWS_524F31A8_CONFIRMED.md). Fast-forward and npm start/3050/webpack success confirmed by the supplied Windows log; UI per code 2026-11-01.5-preview. DATA sync/browser workspace and project readiness are not inferred. Read this launch/status handoff before older unverified-launch notes below.
+
 Latest multi-document continuation: [Invitation corpus reconciliation and pending-QA results](20261101_ALL_DOCUMENTS_CONTINUATION_QA.md). Reuse 2fb25eb / UI 2026-11-01.5-preview. Whole-document SI is one workstream; do not wait for an MR-only phase before PHI/DTS/SPE/contracts. Existing 17/17 Invitation files and current counterparts are retained; complete engineering is not inferred.
 
 Latest continuation: [actual existing-work audit and system constraint worklist](20261101_SYSTEM_CONSTRAINT_CONTINUATION.md), UI `2026-11-01.5-preview`. Extends WP.1; reuses Rev09/v3, existing findings and IDs, with system/COMMON separation and no financial/history writes. Full SI engineering and Windows deployment remain unverified.

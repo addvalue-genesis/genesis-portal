@@ -1,3 +1,5 @@
+> **Later verified checkpoints:** pending browser QA below was completed in [524f31a8 / whole-document QA](20261101_ALL_DOCUMENTS_CONTINUATION_QA.md). [User Windows pull/start evidence](20261101_WINDOWS_524F31A8_CONFIRMED.md) now confirms deployment through 524f31a8 and successful development compilation, separately from DATA receipt and engineering completion. The original observations below remain historical.
+
 # 0550 — Existing-work audit and system constraint continuation
 
 1 November 2026, Asia/Bangkok. Base fad8a7bc3eede9e66aaf541040b4265f3006c215; prior application baseline 8eae7633. UI after this increment: **2026-11-01.5-preview**. Same branch feat/pj2608-0550-official-working-20261028 and port 3050.

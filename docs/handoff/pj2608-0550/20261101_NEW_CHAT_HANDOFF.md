@@ -1,3 +1,5 @@
+> **Latest user launch confirmation:** [Windows pull to 524f31a8 and successful npm start/3050](20261101_WINDOWS_524F31A8_CONFIRMED.md). The supplied terminal log supersedes earlier unconfirmed Windows pull/start statements only; DATA receipt, browser state and SI completion remain distinct. Read this newer handoff first.
+
 > **Later continuation:** application `2fb25eb`, UI `2026-11-01.5-preview`: read [system/COMMON SI audit](20261101_SYSTEM_CONSTRAINT_CONTINUATION.md) and [whole-document Invitation reconciliation / QA](20261101_ALL_DOCUMENTS_CONTINUATION_QA.md) before using the older baseline below. The user paused UX/UI redesign and requires MR, technical sources, standards and tender/contract documents to be analysed together.
 
 > Subsequent implementation: [system constraint continuation / actual existing-work audit](20261101_SYSTEM_CONSTRAINT_CONTINUATION.md), UI `2026-11-01.5-preview`, extends existing WP.1 after `fad8a7bc`. The original handoff snapshot below retains its original baseline and DATA contract.
