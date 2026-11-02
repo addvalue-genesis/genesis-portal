@@ -15,6 +15,17 @@ cross-check. This does not establish two additional purchases, change quantities
 or prices, resolve every DTS/LIS discrepancy, change source authority, or represent
 customer acceptance. MR and all applicable documents continue to govern the scope.
 
+Owner clarification on 2-Nov-2026: **MR, DTS, SPE and PHI are the primary customer
+requirement basis together**, with other applicable received documents. Supplier
+quotations are compared to that basis; they do not lower it. This is not an
+invented contractual precedence order among those four document families. Use
+controlled revisions and applicability; record conflicts and ask the owner one
+concrete question at a time when a decision is needed. The DTS 11-TAG choice is
+a specific working-basis decision, not a general override of MR/SPE/PHI.
+The 48-port DTS versus 24-port MGW observation therefore remains a discrepancy;
+24 ports is not silently accepted or repriced as compliant. Reconcile the relevant
+MR/SPE/PHI clauses and actual design before any alternative/deviation decision.
+
 ## Code behavior
 
 Existing WP.7 mapping rows now show the current saved B07 description/brand,
@@ -84,4 +95,7 @@ The targeted supplier-evidence browser check passed on the bounded retry: actual
 native components expanded in WP.7, navigation reached the existing B07 offer,
 mobile containment and no page errors, with unchanged IndexedDB. Its requirement
 fixture is synthetic and its quote component data is the repository catalogue.
+The subsequent customer-basis clarification changes guidance text and these
+operating instructions only. Its supplier-evidence and Working Preview model/SSR
+checks are rerun; it does not add a new runtime precedence or engineering gate.
 No full monorepo build/test chain, customer approval, message or issue is included.

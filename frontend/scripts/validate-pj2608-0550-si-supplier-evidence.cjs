@@ -15,4 +15,5 @@ const unsafe=render({...offer,description:'<script>unsafe</script>'});assert(uns
 const generic=render({id:'OTHER',description:'Other supplier',quoteRef:'Other quote'});assert(!generic.includes('C9300L-DNA'));assert(!generic.includes('ส่วนประกอบ / License'));
 assert(render(null).includes('OFFER MISSING'));
 const source=require('node:fs').readFileSync(root+'/project0550/WorkingPreview0550.jsx','utf8');assert(source.includes('if(stage.step===7)'));assert(source.includes('bid.vendor.offer.'));assert(source.includes('bid.budget.working.line.'));assert(!source.includes('bid.quotation.mapping'),'SI mapping is not moved into Volume I');
+assert(source.includes('MR / DTS / SPE / PHI'));assert(source.includes('ไม่ลดข้อกำหนดตามสิ่งที่ Vendor เสนอ'));assert(source.includes('ไม่ตั้งลำดับอำนาจจากประเภทเอกสารเอง'));
 console.log('PASS SI supplier evidence: current B07 offer edits + actual native SET/license/support/PSU/SFP evidence, source quantities/locators, no mutation/price copy/approval, missing/generic offers and escaped text; existing WP.7 / Offer / Working IDs retained.');
