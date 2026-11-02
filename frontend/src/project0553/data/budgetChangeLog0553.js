@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-02-R74";
+export const CHANGE_LOG_VERSION_0553="2026-11-02-R75";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261102-07",date:"2026-11-02",kind:"PRICE",tone:"caution",
+  title:"Select six-row C1 across Source/Working/Scope/Release/Excel; withdraw separate B11 price",
+  detail:"Owner authorizes actual financial selection after screenshots showed a six-row C1 preview but old RACON-only Summary/Excel. C1 now selects items1.1/1.2/2/3/4/5 at USD16500/9100/1800/15300/40900/97500, totalUSD181100 and THB5704650, using the existing release factor once and reconciled USD100 unit rounding. Prior RACON-only USD97500 and raw SELL5703921.43 remain audit evidence; the THB728.57 rounding attribution is not an additional charge. B11 is N/A/not separately quoted: withdraw THB157657.50 Working allowance and USD5100 rounded Official amount; PartB Working6066125.37 and A+BUSD897800. Included equipment tools remain included. Customer C1/C2/B11/B13 annex and native USD wording now use simple commercial labels without internal comparator/allocation/sell text. USD six-sheet, THB six-sheet and ten-sheet Breakdown read selected canonical data. C1 remains outside A+B; C2USD23000, all other financial rows, quantities, FX and raw source IDs remain unchanged. Supplier SKU/quantity/compatibility and delivery confirmations remain open; financial selection is not technical approval or customer issue.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b11","bid.budget.working.bc.c1","bid.budget.pricing.official"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner02-Nov2026: B11 N/A and reduce total; link changed C1 to Summary/all Excel; remove internal words"}),
  Object.freeze({id:"P553-CHANGE-20261102-06",date:"2026-11-02",kind:"UI",tone:"neutral",
   title:"C1 preview rounds unit prices to whole USD100 and reconciles the unchanged category total",
   detail:"Owner screenshot showed fractional C1 row rates because only the category had been rounded. The preview now rounds unit prices to nearestUSD100 and reconciles any residual on Qty1 rows without altering source quantities or costs. Items1.1/1.2/2/3/4/5 show unitUSD16500/9100/900/15300/40900/97500; PoE Qty2 amount1800; sumUSD181100. Source subtotal181076.87 and net allocation23.13 stay in a collapsed row-level audit, not an added rounding line. Every displayed Qty×Unit equals amount and the displayed rows sum to the category. RACON item5, C2, current Official C1USD97500/native Excel, A+BUSD902900, source FX/1.30 factor and all identifiers remain unchanged. Invalid/nonreconcilable quantities/targets fail explicitly. No new module or financial selection.",

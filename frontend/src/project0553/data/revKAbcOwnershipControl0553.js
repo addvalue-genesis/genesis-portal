@@ -20,7 +20,7 @@ export function selectRevKAbcOwnershipControl0553(working){
  const fat=selectFourMrFatWbs0553();
  const current={B1:working.byCode.B1?.workingSellTHB,B3:working.byCode.B3?.workingSellTHB,B9:working.byCode.B9?.workingSellTHB};
  if(current.B1!==b1.baseWorkingSellTHB||current.B3!==roundRevKAbc0553(b3.includedB3SatSurveyToolsWorkingSellTHB+b9.fatWorkingSellTHB+0)||current.B9!==b9.b9BaseWorkingSellTHB||
-    working.knownWorkingSellTHB!==roundRevKAbc0553(4994787.13+ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB+b1.baseWorkingSellTHB-421180) ||
+    working.knownWorkingSellTHB!==roundRevKAbc0553(4994787.13-157657.5+ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB+b1.baseWorkingSellTHB-421180) ||
     working.byCode.B14?.workingSellTHB!==ADDVALUE_B14_SELECTED_BUDGET_0553.workingSellTHB ||
     working.byCode.B3?.workingSellTHB!==2322450 ||
     working.byCode.B2?.workingSellTHB!==237121.13)

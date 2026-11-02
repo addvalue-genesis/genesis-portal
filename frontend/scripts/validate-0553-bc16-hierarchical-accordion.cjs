@@ -23,7 +23,7 @@ const snapshot=JSON.stringify(canonical);
 assert.equal(codes.length,16);
 assert.equal(B.length,14);
 assert.equal(C.length,2);
-assert.equal(pb,6223782.87);
+assert.equal(pb,6066125.37);
 assert.equal(canonical.byCode.B1.workingSellTHB,862675.74);
 assert.equal(canonical.byCode.B3.workingSellTHB,2322450);
 assert.equal(canonical.byCode.B1.directCostTHB,null);

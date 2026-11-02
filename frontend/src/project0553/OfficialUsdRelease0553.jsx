@@ -4,7 +4,6 @@ import {buildNativeOfficialRelease0553} from "./nativeWorkingDraft0553";
 import template from "./data/nativeReleaseTemplate0553.json";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
-import {C1C2EngineeringControl0553} from "./C1C2EngineeringControl0553";
 import {CustomerPriceBreakdown0553} from "./CustomerPriceBreakdown0553";
 import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
 import {buildNativePriceBreakdown0553} from "./nativePriceBreakdown0553";
@@ -14,7 +13,7 @@ const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits
 export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=null,showPriceDetails,onPriceDetailsChange,breakdownView,onBreakdownViewChange}){
  const model=useMemo(()=>buildOfficialUsdRelease0553(source),[source]);
  const [sheet,setSheet]=useState("SUMMARY"),[busy,setBusy]=useState(false),[error,setError]=useState("");
- const SelectedSheet=sheet==="C1"?"details":"div";
+ const SelectedSheet="div";
  const selectedSheetRef=useRef(null);
  useEffect(()=>{
   let restore=null;
@@ -49,15 +48,13 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
     data-option-price-status={isOption?"CONDITIONAL_BUDGETARY_OFFER":undefined}>
    <td>{r.code}</td><td colSpan={3}>{r.description}
     {r.serviceText&&<div className="p553-official-service">{r.serviceText}</div>}</td>
-   <td>1 lot{isOption&&<small>Conditional budgetary offer</small>}</td>
+   <td>1 lot{isOption&&<small>Optional</small>}</td>
    <td className="p553-price-cell">{r.priceText&&displayed===null?r.priceText:money(displayed)}
-    {isOption&&<small>Conditional Budgetary Offer · USD</small>}</td>
+    {isOption&&<small>USD</small>}</td>
    <td className="p553-price-cell">{r.priceText&&displayed===null?r.priceText:money(displayed)}
-    {isOption&&<small>Conditional Budgetary Offer · USD</small>}</td>
+    {isOption&&<small>USD</small>}</td>
    <td>{r.commercialRemark|| (model.annex[r.code]?"Refer to Annex "+r.code:"")}
-    {isOption&&<small>{r.code==="C1"?"Installed RACON FCA-equipment comparator, not an OEM capital spare quotation":
-     "Historical Rev08 two-year spare reference; not a current OEM quotation"}</small>}
-    {isOption&&<small>OPTION — PRICE OFFERED CONDITIONALLY; subject to OEM compliance/stock validation · excluded from A+B</small>}</td>
+    {isOption&&<small>Optional spares; excluded from Total A+B.</small>}</td>
   </tr>;
  };
  return <section className="p55-panel p553-release-workbook p553-official-usd" data-component-key="bid.budget.pricing.official">
@@ -66,9 +63,9 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
    <button type="button" className="p553-detail-button" disabled={busy} onClick={()=>download(true)}>Export Breakdown — Draft / 10 sheets</button></div>
   {error&&<p role="alert">Export failed: {error}</p>}
   <div className="p553-release-tabs" role="tablist" aria-label="Quotation worksheets">{OFFICIAL_SHEETS_0553.map(([name,code])=><button type="button" key={code} role="tab" aria-selected={sheet===code} className={sheet===code?"is-active":""} onClick={()=>setSheet(code)}>{name}</button>)}</div>
-  {sheet==="C1"&&<C1C2EngineeringControl0553 code="C1" onOpenSource={onOpenSource}/>}
+
   <SelectedSheet ref={selectedSheetRef} className={sheet==="C1"?"p55-panel p553-c1-selected-source":"p553-selected-sheet"}>
-   {sheet==="C1"&&<summary>Current selected C1 / Original Excel — USD {money(model.otherSpareItemizedAnnex.summaries.C1.totalUSD)} · earlier RACON-only comparator</summary>}
+
   <div className="p553-native-sheet">
    <div className="p553-native-title">{sheet==="SUMMARY"?"Scope of Supply":model.annexTitles[sheet]}</div>
    <div className="p553-sheet-meta"><strong>Project</strong><span>{model.project}</span><strong>Currency</strong><span>USD</span></div>
@@ -92,7 +89,6 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
    </table>}</div>
   </div>
   </SelectedSheet>
-  {sheet==="C2"&&<C1C2EngineeringControl0553 code="C2" onOpenSource={onOpenSource}/>}
   <CustomerPriceBreakdown0553 source={source} official={model} onOpenSource={onOpenSource} origin="official" view={breakdownView} onViewChange={onBreakdownViewChange} focus={breakdownFocus} showPriceDetails={showPriceDetails} onPriceDetailsChange={onPriceDetailsChange}/>
  </section>;
 }

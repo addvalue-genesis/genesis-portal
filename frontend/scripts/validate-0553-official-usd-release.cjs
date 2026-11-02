@@ -15,7 +15,7 @@ for(const r of [...model.a,...model.b,...model.c]){
  assert.equal(r.amountUSD%100,0);assert(r.amountUSD>=r.sourceTHB/31.5-1e-8);assert(r.amountUSD-r.sourceTHB/31.5<100+1e-8);
 }
 assert.equal(model.totalUSD,[...model.a,...model.b].reduce((n,r)=>n+(r.amountUSD||0),0));
-assert.deepEqual(model.unpriced,[]);assert.deepEqual(model.excluded,['B4','B12']);assert.equal(model.issued,false);
+assert.deepEqual(model.unpriced,[]);assert.deepEqual(model.excluded,['B4','B11','B12']);assert.equal(model.issued,false);
 for(const code of ['B4','B12']){
  const row=source.b.find(x=>x.code===code),official=model.b.find(x=>x.code===code);
  assert.equal(row.offerTreatment.status,'NOT_QUOTED_EXCLUDED');
@@ -49,8 +49,8 @@ assert.equal(b14.actualCostTHB,null);assert.equal(b14.profitTHB,null);
 assert.equal(b14.samTelDeductionTHB,39375);
 assert.equal(b14.addvalueReceivableTHB,748125);
 assert.equal(model.b.find(x=>x.code==='B14').amountUSD,25000);
-assert.equal(model.totalUSD,902900);
-assert.equal(model.totalUSD-model.b.find(x=>x.code==='B14').amountUSD,877900,'Current A+B excluding B14 includes the selected B1 delta only');
+assert.equal(model.totalUSD,897800);
+assert.equal(model.totalUSD-model.b.find(x=>x.code==='B14').amountUSD,872800,'Current A+B excluding B14 includes the selected B1 delta only');
 
 assert.equal(plan.coverages.find(x=>x.id==='AV-CARGO').costOwner,'B6');
 assert(plan.coverages.every(x=>x.verifiedPremiumTHB===null&&x.additionalPostingTHB===null));
@@ -66,16 +66,16 @@ assert.equal(model.b10ItemizedAnnex.totalUSD,16200);
 assert.equal(model.b10ItemizedAnnex.customerIssued,false);
 const other=model.otherSpareItemizedAnnex;
 assert.deepEqual(Array.from(other.codes),["B11","B13","C1","C2"]);
-assert.deepEqual(["B11","B13","C1","C2"].map(code=>other.rows[code].length),[4,3,1,12]);
-assert.equal(other.summaries.B11.totalUSD,5100);
+assert.deepEqual(["B11","B13","C1","C2"].map(code=>other.rows[code].length),[4,3,6,12]);
+assert.equal(other.summaries.B11.totalUSD,null);
 assert.equal(other.summaries.B13.totalUSD,1500);
-assert.equal(other.summaries.C1.totalUSD,97500);
+assert.equal(other.summaries.C1.totalUSD,181100);
 assert.equal(other.summaries.C2.totalUSD,23000);
 assert.equal(other.summaries.C1.selectedWorking,false);
 assert.equal(other.summaries.C2.selectedWorking,false);
 assert.equal(other.summaries.C1.budgetaryOfferPrepared,true);
 assert.equal(other.summaries.C2.budgetaryOfferPrepared,true);
-assert.equal(model.c.find(x=>x.code==="C1").budgetaryOptionQuoteUSD,97500);
+assert.equal(model.c.find(x=>x.code==="C1").budgetaryOptionQuoteUSD,181100);
 assert.equal(model.c.find(x=>x.code==="C2").budgetaryOptionQuoteUSD,23000);
 assert(model.c.every(x=>x.budgetaryOfferPrepared&&x.optionExcludedFromBase&&x.firmOemQuote===false));
 assert.equal(model.totalUSD,[...model.a,...model.b].reduce((s,x)=>s+(x.amountUSD||0),0));
@@ -111,6 +111,7 @@ assert(releasePreview.includes('historicalTarget')&&releasePreview.includes('[da
 assert(other.rows.B11.every(x=>x.sourceRowModuleId&&x.sourceId&&x.traceId));
 assert(other.rows.B13.every(x=>x.sourceRowModuleId&&x.sourceId&&x.traceId));
 for(const code of other.codes){
+ if(code==="B11"){assert(other.rows.B11.every(x=>x.unitUSD===null&&x.totalUSD===null&&x.priceText==="N/A"));continue;}
  assert(other.rows[code].every(x=>Number.isFinite(x.qty)&&x.qty>0&&
   Number.isFinite(x.unitUSD)&&Number.isFinite(x.totalUSD)&&
   Math.round(x.qty*x.unitUSD*100)===Math.round(x.totalUSD*100)));
@@ -120,7 +121,7 @@ for(const code of other.codes){
  assert.equal((web.match(/data-other-spare-source-id=/g)||[]).length,other.rows[code].length);
  assert(web.includes(other.summaries[code].totalUSD.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4})));
  assert(web.includes("Source"));
- if(code==="C1"||code==="C2")assert(web.includes("CONDITIONAL BUDGETARY OFFER — PRICED OPTION"));
+ if(code==="C1"||code==="C2")assert(web.includes("Optional spares; excluded from Total A+B."));
  assert(!web.includes("PENDING")&&!web.includes("SPIR pending"));
 }
 assert.equal(new Set(model.b10ItemizedAnnex.rows.map(r=>r.lineSourceId)).size,14);
@@ -151,7 +152,7 @@ const {ReleaseCustomerWorkbook0553}=require('../src/project0553/ReleaseCustomerW
 
 const html=renderToStaticMarkup(React.createElement(OfficialUsdRelease0553,{source}));
 const releaseSummaryHtml=renderToStaticMarkup(React.createElement(ReleaseCustomerWorkbook0553,{model:source,recipient:"INTERNAL"}));
-for(const [code,amount] of [["C1","3,071,250.00"],["C2","721,806.60"]]){
+for(const [code,amount] of [["C1","5,704,650.00"],["C2","721,806.60"]]){
  assert(releaseSummaryHtml.includes('data-cost-owner="'+code+'"'),
   "10.3.3 Summary must retain "+code+" option source identity");
  assert(releaseSummaryHtml.includes(amount),
@@ -162,14 +163,14 @@ assert(releaseSummaryHtml.includes("PRICE OFFERED — CONDITIONAL BUDGETARY"));
 assert(!releaseSummaryHtml.includes("INCLUDED IN BASE"),"Options must remain excluded from A+B");
 assert(html.includes(model.totalUSD.toLocaleString('en-US',{minimumFractionDigits:2})));
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
-assert(html.includes('B4, B12')&&html.includes('Not quoted; excluded from this offer.'));assert(html.includes('USD 1,000 / 800/person/day'));
-for(const [code,amount] of [["C1",97500],["C2",23000]]){
+assert(html.includes('B4, B11, B12')&&html.includes('Not quoted; excluded from this offer.'));assert(html.includes('USD 1,000 / 800/person/day'));
+for(const [code,amount] of [["C1",181100],["C2",23000]]){
  assert(html.includes('data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"'),
   "Option price reference row must be distinguished from customer quote");
  assert(html.includes(amount.toLocaleString("en-US",{minimumFractionDigits:2})),
   code+" historical/comparable budget price missing from Part C Summary");
 }
-assert(html.includes("OPTION — PRICE OFFERED CONDITIONALLY; subject to OEM compliance/stock validation · excluded from A+B"));
+assert(html.includes("Optional spares; excluded from Total A+B."));
 
 const native=fs.readFileSync(path.join(root,'project0553/nativeWorkingDraft0553.js'),'utf8'),box={Blob,TextEncoder,TextDecoder,Response,DecompressionStream,Uint8Array,DataView,Date,Map,Set};
 vm.runInNewContext(native.replace(/\bexport /g,'')+';this.zip={entriesFromZip,readEntry,rebuildZip};',box);
@@ -202,7 +203,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
   for(const internal of ['THB','INTERNAL','HOLD','WORKING DRAFT','NOT ESTABLISHED','bid.budget','Exchange rate','no duplicate engineering charge'])assert(!xml.includes(internal),name+' leaked '+internal);
   if(i===1){
    const expected={a:model.a.map(x=>({...x,amount:x.amountUSD})),b:model.b.map(x=>({...x,amount:x.amountUSD})),total:model.totalUSD,unpricedText:'To be quoted'};
-   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:902900});
+   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:897800});
    // Reproduce the reported partial workbook: spare prices remain, A/B vanish.
    const erase=(input,address)=>input.replace(new RegExp('<c\\b[^>]*r="'+address+'"[^>]*?(?:/>|>[\\s\\S]*?</c>)'),'<c r="'+address+'"/>');
    for(const address of ['A8','B9','C10','D11','E8','F8','G11','A24','B25','E26','F28','G32','G38'])
@@ -217,7 +218,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
    assert(cell(xml,'E7').includes('<f>SUM(E8:E22)</f><v>4</v>'));
    assert(cell(xml,'B43').includes('subject to buyer approval against original DDP site terms'));
    assert(cell(xml,'G38').includes('<v>'+model.totalUSD+'</v>'));
-   assert(cell(xml,'A38').includes('B4, B12')&&!cell(xml,'A38').includes('B14'));
+   assert(cell(xml,'A38').includes('B4, B11, B12')&&!cell(xml,'A38').includes('B14'));
    assert(cell(xml,'G37').includes('<v>25000</v>'));
    for(const row of [27,35]){assert(cell(xml,'F'+row).includes('N/A'));assert(cell(xml,'G'+row).includes('N/A'));assert(cell(xml,'H'+row).includes('Not quoted; excluded from this offer.'));}
    assert(cell(xml,'H37').includes('Budgetary insurance allowance'));
@@ -227,15 +228,15 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
     const amount=model.otherSpareItemizedAnnex.summaries[code].totalUSD;
     assert(cell(xml,'F'+row).includes('<v>'+amount+'</v>'),"Option F price-reference absent: "+code);
     assert(cell(xml,'G'+row).includes('<v>'+amount+'</v>'),"Option G price-reference absent: "+code);
-    assert(cell(xml,'H'+row).includes('CONDITIONAL BUDGETARY OFFER'),"Conditional option price qualification missing: "+code);
-    assert(cell(xml,'B'+row).includes('CONDITIONAL BUDGETARY OPTION PRICE'),"Option priced offer label missing: "+code);
+    assert(cell(xml,'H'+row).includes('Optional; excluded from Total A+B'),"Conditional option price qualification missing: "+code);
+    assert(cell(xml,'B'+row).includes('Refer to Annex'),"Option priced offer label missing: "+code);
     assert(model.c.find(x=>x.code===code).amountUSD===null,"Reference improperly posted "+code);
    }
   }else{
    const code=['B10','B11','B13','C1','C2'][i-2],parent=[...model.b,...model.c].find(r=>r.code===code);
-   const split=code==="B10"?model.b10ItemizedAnnex.rows:model.otherSpareItemizedAnnex.rows[code];
+   const split=code==="B11"?[]:code==="B10"?model.b10ItemizedAnnex.rows:model.otherSpareItemizedAnnex.rows[code];
    const totalRow=code==="B10"?20:19;
-   assert(cell(xml,'I'+totalRow).includes('<v>'+(code==="B10"?parent.amountUSD:model.otherSpareItemizedAnnex.summaries[code].totalUSD)+'</v>'));
+   assert(cell(xml,'I'+totalRow).includes(code==="B11"?"N/A":'<v>'+(code==="B10"?parent.amountUSD:model.otherSpareItemizedAnnex.summaries[code].totalUSD)+'</v>'));
    for(const [j,r] of split.entries()){
     const physicalRow=6+j;
     assert(cell(xml,'I'+physicalRow).includes(r.totalUSD===null?'To be quoted':'<v>'+r.totalUSD+'</v>'));
@@ -250,13 +251,13 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
     }
    }
    if(code==="C1"||code==="C2"){
-    assert(cell(xml,"B21").includes(code==="C1"?"CONDITIONAL BUDGETARY C1 PRICE OFFER":"CONDITIONAL BUDGETARY C2 PRICE OFFER"),
+    assert(cell(xml,"B21").includes("Optional spares; excluded from Total A+B"),
      "Original native optional-spare source warning missing");
-    assert(cell(xml,"H4").includes("CONDITIONAL OPTION BUDGET USD"));
+    assert(cell(xml,"H4").includes("Price (USD)"));
    }
    if(code==="B10"){
-    assert(cell(xml,'B21').includes('PRE-AWARD BUDGETARY FINANCIAL ALLOCATION'));
-    assert(cell(xml,'H4').includes('CIF UNCONFIRMED'));
+    assert(!cell(xml,'B21').includes('PRE-AWARD BUDGETARY FINANCIAL ALLOCATION'));
+    assert(cell(xml,'H4').includes('Price (USD)'));
    }
   }
  }
@@ -286,6 +287,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  const repaired=await buildNativeOfficialRelease0553({name:'Partial-Rev00.xlsx',arrayBuffer:async()=>prefixed.buffer},model);
  const repairedParts=box.zip.entriesFromZip(new Uint8Array(await repaired.blob.arrayBuffer()));
  for(let sheet=2;sheet<=6;sheet++){
+  if(sheet===3)continue;
   const xml=await text('xl/worksheets/sheet'+sheet+'.xml',repairedParts);
   assert(xml.includes('<f>ROUND(G6*H6,2)</f>'),'Preserve quantity × unit formula');
   assert(xml.includes('<f>SUM(I6:I'+(sheet===2?19:18)+')</f>'),'Preserve Annex total formula');
@@ -293,5 +295,5 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  const bad=box.zip.rebuildZip(entries,new Map([['xl/worksheets/sheet3.xml',new TextEncoder().encode((await text('xl/worksheets/sheet3.xml')).replace(/(<c\b[^>]*r="I6"[^>]*>)/,'$1<f>G6+H6</f>'))]]));
  await assert.rejects(()=>buildNativeOfficialRelease0553({name:'BadFormula.xlsx',arrayBuffer:async()=>bad.buffer},model),/Unexpected native formula/);
  const arg=process.argv.find(x=>x.startsWith('--output='));if(arg)fs.writeFileSync(arg.slice(9),data);
- console.log('PASS 0553 Official native: B10 USD16200 B11 USD5100 B13 USD1500, C1 USD97500 and C2 USD23000 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, B14 USD25000 selected once; no spare-option uplift or false OEM confirmation');
+ console.log('PASS 0553 Official native: B10 USD16200 B11 N/A B13 USD1500, C1 USD181100 and C2 USD23000 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, B14 USD25000 selected once; no spare-option uplift or false OEM confirmation');
 })().catch(e=>{console.error(e);process.exitCode=1;});

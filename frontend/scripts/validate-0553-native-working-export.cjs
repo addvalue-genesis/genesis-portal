@@ -103,7 +103,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
  };
  const real=require(path.join(srcRoot,"project0553/data/releaseCommercialModel0553.js")).buildReleaseCommercialModel0553({thbPerUsd:31.5});
  assert.equal(real.annexTraceAudit.totalRows,16);
- const expectedRows=code=>code.startsWith("B")?real.annex[code]:real.budgetaryOptionAnnex[code].map((x,i)=>({
+ const expectedRows=code=>code==="B11"?[]:code.startsWith("B")?real.annex[code]:real.budgetaryOptionAnnex[code].map((x,i)=>({
   sourceId:x.sourceId||x.historicalSourceId,
   tagNo:code==="C2"?"Two-year operating stock / TAG by OEM":x.tag,
   description:x.description,specification:x.specification,materials:x.materials,
@@ -133,8 +133,8 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   }
  }
  assertOptions(nativeScope);
- assert(cell(nativeScope,"G38").includes("<v>28421335.1</v>"));
- assert(cell(nativeScope,"A38").includes("B4, B12"));
+ assert(cell(nativeScope,"G38").includes("<v>28263677.6</v>"));
+ assert(cell(nativeScope,"A38").includes("B4, B11, B12"));
  for(const [code,index] of [["B10",2],["B11",3],["B13",4],["C1",5],["C2",6]]){
   const xml=nativeText(index);
   assert(!xml.includes("987654321"),code+" leaked stale native values");
@@ -151,10 +151,10 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
    assert.equal(Math.round(row.qty*row.customerUnitTHB*100),Math.round(row.customerTotalTHB*100));
    if(code.startsWith("C"))assert(cell(xml,"J"+row.nativeRow).includes(row.leadTimeARO));
   }
-  for(let row=6+expectedRows(code).length;row<=18;row++)
+  for(let row=(code==="B11"?7:6+expectedRows(code).length);row<=18;row++)
    for(const col of (code.startsWith("C")?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]))
     assert.equal(cell(xml,col+row),'<is><t xml:space="preserve"></t></is>',code+" must clear unused "+col+row);
-  assert(cell(xml,"I19").includes('<v>'+expectedTotal(code)+'</v>'));
+  assert(cell(xml,"I19").includes(code==="B11"?"N/A":'<v>'+expectedTotal(code)+'</v>'));
  }
  assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.sourceToReleaseMatched),Array(16).fill(true));
  assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.releaseToSourceMatched),Array(16).fill(true));
@@ -223,8 +223,8 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':(row.offerTreatment?.priceText||"NOT ESTABLISHED")));
     }
     assertOptions(newXml);
-    assert(cell(newXml,"G38").includes("<v>28421335.1</v>"));
-    assert(cell(newXml,"A38").includes("B4, B12"));
+    assert(cell(newXml,"G38").includes("<v>28263677.6</v>"));
+    assert(cell(newXml,"A38").includes("B4, B11, B12"));
    }else{
     const code=annexCodes[index-2];
     for(const row of expectedRows(code)){
@@ -236,10 +236,10 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      for(const [field,value] of [["unitPrice",row.customerUnitTHB],["totalPrice",row.customerTotalTHB]])
       assert(cell(newXml,row.nativeCells[field]).includes('<v>'+value+'</v>'));
     }
-    assert(cell(newXml,"I19").includes('<v>'+expectedTotal(code)+'</v>'));
+    assert(cell(newXml,"I19").includes(code==="B11"?"N/A":'<v>'+expectedTotal(code)+'</v>'));
    }
   }
   console.log("PASS actual native XLSX: six original sheets, 16 current rows, fitted typography/rows, original column widths/page setup, original merges/formulas and unrelated ZIP parts preserved; SHA256 "+require("node:crypto").createHash("sha256").update(bytes).digest("hex"));
  }
- console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 16 bidirectional PTTEP current annex source item rows, C1/C2 conditional offers with 1/12 price lines, layout fitted, structure preserved");
+ console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 16 bidirectional PTTEP current annex source item rows, C1/C2 conditional offers with 6/12 price lines, layout fitted, structure preserved");
 })().catch(e=>{console.error(e);process.exitCode=1;});

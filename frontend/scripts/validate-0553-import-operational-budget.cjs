@@ -40,7 +40,7 @@ for(let i=1;i<=14;i++){
  assert.equal(r.directCostTHB,null);
 }
 assert.deepEqual(['B4','B12','B14'].map(c=>source.byCode[c].workingSellTHB),[null,null,787500]);
-assert.equal(source.knownWorkingSellTHB,4757207.13+209580+28000+787500+441495.74);
+assert.equal(source.knownWorkingSellTHB,4757207.13+209580+28000+787500+441495.74-157657.5);
 assert.equal(release.approval.releaseAllowed,false);
 assert.equal(b1.engineeringScopeReview.filter(r=>r.proposedOwner==='B2/B3').length,2);
 assert(b1.engineeringScopeReview.every(r=>r.workingSellTHB===null));

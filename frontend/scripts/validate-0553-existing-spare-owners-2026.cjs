@@ -40,7 +40,7 @@ assert(costs.currentByCode.C2.every(x=>x.qty===null&&x.unitPriceTHB===null));
 for(const code of codes){
  const owner=bc.byCode[code],working=costs.currentBudgetaryByCode[code],sow=scope.lines[code];
  assert.equal(owner.moduleId,"bid.budget.working.bc."+code.toLowerCase());
- assert.equal(owner.workingSellTHB,expected[code]);
+ assert.equal(owner.workingSellTHB,code==="B11"?null:code==="C1"?5704650:expected[code]);
  assert.equal(working,expected[code]);
  assert.equal(sow.sourceModuleId,owner.moduleId);
  assert.equal(sow.workingSellTHB,owner.workingSellTHB);
@@ -68,14 +68,18 @@ for(const code of codes){
   assert.equal(projected[i].engineeringProofComplete,false);
   assert(projected[i].nativeRow<=18);
  }
- if(code.startsWith("B")){
+ if(code==="B11"){
+  assert.equal(rel.b.find(x=>x.code===code).customerSellTHB,null);
+  assert.equal(rel.annexModels[code].selectedWorkingTHB,null);
+  assert.equal(rel.annexModels[code].annexLineTotalTHB,157657.5);
+ }else if(code.startsWith("B")){
   assert.equal(rel.b.find(x=>x.code===code).customerSellTHB,working);
   assert.equal(rel.annexModels[code].selectedWorkingTHB,working);
   assert.equal(rel.annexModels[code].annexLineTotalTHB,working);
   assert(rel.annexModels[code].reconciled);
  }else{
   assert.equal(rel.c.find(x=>x.code===code).customerSellTHB,null);
-  assert.equal(rel.annexModels[code].selectedWorkingTHB,code==="C1"?null:null);
+  assert.equal(rel.annexModels[code].selectedWorkingTHB,code==="C1"?5704650:null);
  }
 }
 assert.equal(rel.annexTraceAudit.totalRows,16);
@@ -102,7 +106,7 @@ const duplicate=structuredClone(rel.annex);duplicate.C2[1]=duplicate.C2[0];
 assert.throws(()=>auditAnnexBidirectionalTrace0553(costs.currentByCode,duplicate),/BIDIRECTIONAL/);
 // Value-preserving serialization must remain valid; object identity is not evidence parity.
 assert.equal(auditAnnexBidirectionalTrace0553(costs.currentByCode,structuredClone(rel.annex)).totalRows,16);
-assert.equal(bc.knownWorkingSellTHB,6223782.87);
+assert.equal(bc.knownWorkingSellTHB,6066125.37);
 const unchangedOwners={B1:862675.74,B2:237121.13,B3:2322450,B4:null,B5:311184,
  B6:335584,B7:30000,B8:142550,B9:480550,B12:null,B14:787500};
 for(const [code,value] of Object.entries(unchangedOwners)){
@@ -155,14 +159,14 @@ for(const code of codes){
 }
 const Customer=from("ReleaseCustomerWorkbook0553.jsx").ReleaseCustomerWorkbook0553;
 const html=renderToStaticMarkup(React.createElement(Customer,{model:rel}));
-for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(html.includes(amount));
+for(const amount of ["509,827.50","46,683.00"])assert(html.includes(amount));
 assert(html.includes("CONDITIONAL BUDGETARY")&&html.includes("Not quoted; excluded from this offer."));
-for(const amount of ["3,071,250.00","721,806.60"])assert(html.includes(amount));
+for(const amount of ["5,704,650.00","721,806.60"])assert(html.includes(amount));
 assert.equal((html.match(/data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"/g)||[]).length,2);
-assert(html.includes("28,421,335.10")&&html.includes("WORKING DRAFT"));
+assert(html.includes("28,263,677.60")&&html.includes("WORKING DRAFT"));
 const Scope=from("ScopeSheetsDetail0553.jsx").ScopeSheetsDetail0553;
 const scopeHtml=renderToStaticMarkup(React.createElement(Scope,{fx:{thbPerUsd:31.5},onOpenSource:()=>{},onOpenReleaseRow:()=>{}}));
-for(const amount of ["509,827.50","157,657.50","46,683.00"])assert(scopeHtml.includes(amount));
+for(const amount of ["509,827.50","46,683.00"])assert(scopeHtml.includes(amount));
 assert(scopeHtml.includes("4 current Annex rows")&&scopeHtml.includes("3 current Annex rows"));
 assert(scopeHtml.includes("NOT QUOTED")&&scopeHtml.includes("10.2 Source")&&scopeHtml.includes("10.3 Annex"));
-console.log("PASS 0553 existing B10/B11/B13/C1/C2: PTTEP 14 kits, new provisional Working 509827.50/157657.50/46683.00, C option quote HOLD; 16 bidirectional row mappings, no old Rev08 rates, incomplete customer A+B total");
+console.log("PASS 0553 existing B10/B11/B13/C1/C2: PTTEP 14 kits, Working B10 509827.50 / B11N/A / B13 46683.00, C1 selected5704650, C option quote HOLD; 16 bidirectional row mappings, no old Rev08 rates, incomplete customer A+B total");

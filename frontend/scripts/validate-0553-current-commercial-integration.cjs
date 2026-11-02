@@ -33,7 +33,7 @@ for(const [code,amount] of Object.entries({B1:862675.74,B2:237121.13,B3:2322450,
  assert.equal(scope.lines[code].workingSellTHB,amount,"Customer Scope/10.2 "+code+" divergence");
  assert.equal(by[code].directCostTHB,null,"Unverified direct cost posted to "+code);
 }
-assert.equal(budget.knownWorkingSellTHB,6223782.87);
+assert.equal(budget.knownWorkingSellTHB,6066125.37);
 assert.equal(abc.partBBaseTHB,budget.knownWorkingSellTHB);
 assert.equal(abc.currentB1B3B9BaseTHB,3665675.74); // current B1 862675.74 + B3 2322450 + B9 480550
 assert.equal(abc.postedWorkingSellDeltaTHB,0);

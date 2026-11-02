@@ -1,6 +1,7 @@
 // C1 left requirement -> right supplier quote/TAG -> SI budget decision.
 // This is an explicit priced planning scenario, not a firm spare quotation or
-// an automatic replacement of the previously submitted C1 commercial option.
+// a verified procurement cost. Owner selected these six financial rows on 02-Nov-2026;
+// the option adapter posts rounded SELL, while technical approvals remain open.
 import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
 import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
 import {MR0001_WORKING_PRICED_BOM,L3_PORT_DECISION_0553} from "./mr0001WorkingPricedBom";
@@ -162,6 +163,6 @@ export function selectC1SiTagBudget0553(){
   unselectedWarrantyLines:freeze(["D-7","D-8","E-7","E-8"].map(code=>{const q=NEXTG.lines.find(x=>x.code===code);return freeze({code,partNo:q.partNumber,unitPrice:q.unitPrice,description:q.description});})),
   ownerDecisions:freeze({l3:L3_PORT_DECISION_0553,mds:MDS_SCOPE_DECISION_0553}),
   calculationStatus:"SI_EQUIPMENT_BUDGET_CALCULATED",technicalStatus:"OEM_CONFIGURATION_AND_TERMS_REVIEW_OPEN",
-  verifiedDirectCostTHB:null,customerIssueAllowed:false,selectedInCommercialOffer:false,postToPricing:false,
+  verifiedDirectCostTHB:null,customerIssueAllowed:false,selectedInCommercialOffer:true,postToPricing:false,
   qualification:"Equipment budget only; all spare quantities still require independent SI review, including supplier D/E quantities. Owner confirms L3 8 copper + 2 SFP and MDS FAT/cable/gland exclusions with ADDVALUE execution/supply. Existing B3/field-bulk budgets and any applicability to C1 spare delivery require reconciliation, not a second automatic charge. Region keys, warranty, complete IDU function, licence, quote validity and delivery/insurance remain qualified. Reconcile B10/C2 stock. D/E prices take precedence as rate evidence, not quantity approval; fallback TAG rates are not independent OEM spare quotes."});
 }

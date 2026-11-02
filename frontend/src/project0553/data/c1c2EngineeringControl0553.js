@@ -138,7 +138,7 @@ export function selectC1C2EngineeringControl0553({inputs={},b10Stock=[],b10Stock
    const key=code+"|"+f.id,e=inputs[key]||{};
    const assessment=evaluateC1C2Candidate0553({code,installedCount:count,evidence:e,b10Stock,b10StockVerified,
     otherOptionStock:otherStock.filter(x=>x.key!==key)});
-   const refs=code==="C1"?(f.family==="MARINE_RACON_MAIN"?["C1-REF-MDS-RACON-1"]:[]):familyInfo[f.family][1];
+   const refs=code==="C1"?({ODU_OR_RADIO:["C1-SI-ODU-BASE","C1-SI-ODU-REMOTE"],IDU:["C1-SI-INDOOR"],SCADA_NETWORK_SWITCH:["C1-SI-L3"],DMR_BDA_ENCLOSURE_ASSEMBLY:["C1-SI-BDA"],MARINE_RACON_MAIN:["C1-SI-RACON"],MARINE_RACON_CONTROL:["C1-SI-RACON"]}[f.family]||[]):familyInfo[f.family][1];
    const offerRefs=offer.offers[code].rows.filter(x=>refs.includes(x.id));
    return freeze({...f,groups:undefined,key,label:familyInfo[f.family][0],
     installedCount:count,installedRecordCount:distinctRows.length,
@@ -171,7 +171,7 @@ export function selectC1C2EngineeringControl0553({inputs={},b10Stock=[],b10Stock
    evidencedReviewQuoteUSD:sum===null?null:Math.ceil(sum/offer.policy.fxTHBPerUSD/offer.policy.summaryRoundingUSD-1e-10)*offer.policy.summaryRoundingUSD,
    status:quotationReviewComplete?"SCENARIO_REVIEW_ONLY":complete?
     "NO_RECOMMENDED_ITEMS__PURCHASER_DISPOSITION_REQUIRED":"REQUIRED_QUOTATION_INCOMPLETE",
-   currentPriceBasis:code==="C1"?"USD75,000 installed FCA comparator × 1.30 × 1 selected scenario unit = USD97,500":
+   currentPriceBasis:code==="C1"?"Six selected SI/TAG rows; once-only release factor and reconciled USD100 unit rounding = USD181,100":
     "12 historic Qty × SELL rates = THB721,806.60 ÷ 31.50; round total upward once to USD100 = USD23,000",
    offerIsFullCoverageProof:false,postToPricing:false,customerReleaseAllowed:false})];
  }));

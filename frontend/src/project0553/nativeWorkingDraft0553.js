@@ -380,9 +380,10 @@ export async function buildNativeWorkingDraft0553(file,model){
  const annexCodes=["B10","B11","B13","C1","C2"];
  for(let i=0;i<annexCodes.length;i++){
   const code=annexCodes[i],option=model.c?.find(x=>x.code===code);
+  const excluded=model.b?.find(x=>x.code===code)?.offerTreatment?.status==="NOT_QUOTED_EXCLUDED";
   const offered=option?.budgetaryOfferPrepared===true;
-  const detail=offered?model.budgetaryOptionAnnex[code].map(x=>({
-   sourceId:x.sourceId,historicalSourceId:x.historicalSourceId,
+  const detail=excluded?[]:offered?model.budgetaryOptionAnnex[code].map(x=>({
+   sourceId:x.sourceId,item:x.item,historicalSourceId:x.historicalSourceId,
    tagNo:code==="C2"?"Two-year operating stock / TAG by OEM":x.tag,
    description:x.description,specification:x.specification,materials:x.materials,
    qty:x.quantity,customerUnitTHB:x.unitPriceTHB,customerTotalTHB:x.extendedTHB,
@@ -391,14 +392,14 @@ export async function buildNativeWorkingDraft0553(file,model){
   const rows=new Map();
   if(detail.length>13)throw Error(code+" exceeds 13 physical rows in original. Cannot export without layout changes.");
   // The 12 historical C2 price rows are distinct from the 4 current MR parents.
-  const routeTrace=offered?null:model.annexTraceAudit?.rowTrace?.filter(x=>x.code===code)||null;
+  const routeTrace=offered||excluded?null:model.annexTraceAudit?.rowTrace?.filter(x=>x.code===code)||null;
   if(routeTrace&&routeTrace.length!==detail.length)
    throw Error(code+" native export diverged from bidirectional Source/Release line count");
   // Overwrite every original customer Annex cell so a previously filled
   // workbook cannot leak stale Rev08 Qty/prices into the working draft.
   for(let j=detail.length;j<13;j++){
    const row=j+6;
-   for(const col of ["B","C","D","E","F","G","H","I"])write(rows,col+row,"");
+   for(const col of ["B","C","D","E","F","G","H","I"])if(!(excluded&&row===6&&["D","H","I"].includes(col)))write(rows,col+row,"");
    if(code.startsWith("C"))write(rows,"J"+row,"");
   }
   detail.forEach((r,j)=>{
@@ -415,7 +416,7 @@ export async function buildNativeWorkingDraft0553(file,model){
       routeTrace[j].sourceModuleId!==r.sourceRowModuleId||
       routeTrace[j].workingTotalTHB!==r.workingTotalTHB))
     throw Error(code+" RELEASE→SOURCE→NATIVE mismatch: "+r.sourceId);
-   write(rows,"B"+row,j+1);
+   write(rows,"B"+row,r.item||j+1);
    // Native customer worksheet retains ALL original candidate TAG references.
    // Count/expand is a browser UI presentation and cannot fit the frozen template.
    write(rows,"C"+row,r.tagNo||"COMMON");
@@ -424,8 +425,8 @@ export async function buildNativeWorkingDraft0553(file,model){
    write(rows,"F"+row,r.materials||"");
    write(rows,"G"+row,Number.isFinite(r.qty)?r.qty:"TBC — OEM SPIR");
    if(code.startsWith("B")||offered){
-    write(rows,"H"+row,Number.isFinite(r.customerUnitTHB)?r.customerUnitTHB:"NOT ESTABLISHED");
-    write(rows,"I"+row,Number.isFinite(r.customerTotalTHB)?round(r.customerTotalTHB):"NOT ESTABLISHED");
+    write(rows,"H"+row,Number.isFinite(r.customerUnitTHB)?r.customerUnitTHB:excluded?"N/A":"NOT ESTABLISHED");
+    write(rows,"I"+row,Number.isFinite(r.customerTotalTHB)?round(r.customerTotalTHB):excluded?"N/A":"NOT ESTABLISHED");
    }
    if(code.startsWith("C")){
     if(!offered){write(rows,"H"+row,"NOT QUOTED");write(rows,"I"+row,"NOT QUOTED");}
@@ -433,12 +434,12 @@ export async function buildNativeWorkingDraft0553(file,model){
    }
    // C1/C2 require independent OEM spare cost before any commercial price.
   });
-  write(rows,"I19",offered?option.budgetaryOptionOfferTHB:code.startsWith("B")?(Number.isFinite(audit?.annexLineTotalTHB)?round(audit.annexLineTotalTHB):"NOT ESTABLISHED"):"NOT QUOTED");
+  if(excluded){write(rows,"D6","Not separately quoted. Tools expressly included in the equipment supply remain included.");write(rows,"H6","N/A");write(rows,"I6","N/A");}
+  write(rows,"I19",excluded?"N/A":offered?option.budgetaryOptionOfferTHB:code.startsWith("B")?(Number.isFinite(audit?.annexLineTotalTHB)?round(audit.annexLineTotalTHB):"NOT ESTABLISHED"):"NOT QUOTED");
   if(offered){
-   write(rows,"H4","CONDITIONAL BUDGETARY OFFER (THB) / CIF SUBJECT TO APPROVAL");
-   write(rows,"B19","CONDITIONAL BUDGETARY OPTION TOTAL (THB) — excluded from A+B");
-   write(rows,"B21",code+" price offered conditionally. "+option.budgetaryOfferTechnicalGate+
-    ". Original DDP site; proposed CIF Zhuhai requires buyer approval. NOT ISSUED.");
+   write(rows,"H4","Price (THB)");
+   write(rows,"B19","Total (THB)");
+   write(rows,"B21","Optional spares; excluded from Total A+B. Final configuration and delivery terms subject to agreement.");
   }
   if(Number.isFinite(audit?.varianceTHB)&&Math.abs(audit.varianceTHB)>0.01)
    warnings.push(code+" line-to-summary variance THB "+audit.varianceTHB.toFixed(2)+" — no balancing item created");
@@ -558,13 +559,13 @@ export async function buildNativeOfficialRelease0553(file,model){
       throw Error("0553 Native Part C conditional budgetary offer must match canonical 10.3→Official");
      const amount=isOption?r.budgetaryOptionQuoteUSD:r.amountUSD;
      const displayText=[r.description,r.serviceText,
-      isOption?"CONDITIONAL BUDGETARY OPTION PRICE / OEM TECHNICAL REVIEW REQUIRED / SUBJECT TO CIF CONFIRMATION":null]
+      null]
       .filter(Boolean).join("\n");
      put("A"+row,r.code);put("B"+row,displayText);put("E"+row,1);
      put("F"+row,amount===null&&r.priceText?r.priceText:price(amount));put("G"+row,amount===null&&r.priceText?r.priceText:price(amount));
      if(r.commercialRemark)put("H"+row,r.commercialRemark);
-     if(model.annex[r.code])put("H"+row,"Refer to Annex "+r.code+
-      (isOption?" / CONDITIONAL BUDGETARY OFFER / OEM TECHNICAL QUALIFICATION / excludes A+B":""));
+     if(model.annex[r.code]&&!r.commercialRemark)put("H"+row,"Refer to Annex "+r.code+
+      (isOption?" / Optional; excluded from Total A+B":""));
     };
    model.b.forEach((r,j)=>fill(r,24+j));model.c.forEach((r,j)=>fill(r,41+j));
    put("A38","Total A+B (USD)"+(model.excluded?.length?"\nNot quoted / excluded: "+model.excluded.join(", ")+".":"")+(model.unpriced.length?"\nExcludes items to be quoted: "+model.unpriced.join(", ")+".":""));put("G38",price(model.totalUSD));
@@ -575,34 +576,29 @@ export async function buildNativeOfficialRelease0553(file,model){
    const code=["B10","B11","B13","C1","C2"][i-2],isB10=code==="B10";
    // Exactly the same itemized read model drives 10.3.4 JSX and native Excel.
    // C1/C2 are conditional budgetary options, separate from firm OEM pricing.
-   const detail=isB10?model.b10ItemizedAnnex?.rows:
+   const detail=code==="B11"?[]:isB10?model.b10ItemizedAnnex?.rows:
     model.otherSpareItemizedAnnex?.rows?.[code];
    if(!Array.isArray(detail)||detail.length>(isB10?14:13)||
       (isB10&&(detail.length!==14||model.b10ItemizedAnnex?.customerIssued!==false)))
     throw Error(code+" original priced Annex capacity or approval gate failed");
    put("B2",model.annexTitles[code]);
    ["Item","Tag No.","Description","Specification","Materials","Qty"].forEach((v,j)=>put("BCDEFG"[j]+"4",v));
-   put("H4",isB10?"PRE-AWARD BUDGET USD / CIF UNCONFIRMED":
-    code.startsWith("C")?"CONDITIONAL OPTION BUDGET USD / CIF UNVERIFIED":
-    "PRE-AWARD WORKING ALLOCATION USD");
+   put("H4","Price (USD)");
    put("H5","Unit Price (USD)");put("I5","Amount (USD)");
    if(code.startsWith("C"))put("J5","Lead Time (ARO)");
    detail.forEach((r,j)=>{const row=6+j;
     [r.item??(j+1),r.tag??r.tagNo,r.description,r.specification,r.materials,
-     r.qty??"TBC",price(r.unitUSD),price(r.totalUSD)].forEach((v,k)=>put("BCDEFGHI"[k]+row,v));
+     r.qty??"TBC",r.priceText||price(r.unitUSD),r.priceText||price(r.totalUSD)].forEach((v,k)=>put("BCDEFGHI"[k]+row,v));
     if(code.startsWith("C"))put("J"+row,r.leadTime);
    });
    const totalRow=isB10?20:19;
-   put("B"+totalRow,isB10?"PRE-AWARD B10 FINANCIAL ALLOCATION (USD) — NOT OEM SPARE QUOTE":
-    code.startsWith("C")?"CONDITIONAL BUDGETARY OPTION SELL (USD) — OEM SUBJECT TO APPROVAL":
-    "PRE-AWARD WORKING PRICE TOTAL (USD) — NOT OEM LINE QUOTE");
-   put("I"+totalRow,price(isB10?
-    [...model.b,...model.c].find(r=>r.code===code).amountUSD:
-    model.otherSpareItemizedAnnex?.summaries?.[code]?.totalUSD));
-   if(isB10)put("B21","PRE-AWARD BUDGETARY FINANCIAL ALLOCATION ONLY. Each Qty 1 LOT is a functional budget line, not one physical spare. OEM spare part numbers, actual delivery quantities, quoted CIF unit rates and buyer approval remain outstanding. NOT ISSUED.");
-   if(code==="C1"||code==="C2")put("B21",code==="C1"?
-    "CONDITIONAL BUDGETARY C1 PRICE OFFER: installed RACON FCA package is a rate comparator only; subject to approved capital spare Ex configuration, actual OEM spare rate and CIF delivery.":
-    "CONDITIONAL BUDGETARY C2 PRICE OFFER: Rev08 historical rates are a proposal basis only; replace 7/8-inch cable with installed-system compatible feeder and exclude confirmed B10 duplicate stock; OEM 2026 quote required.");
+   const summary=model.otherSpareItemizedAnnex?.summaries?.[code];
+   put("B"+totalRow,"Total (USD)");
+   put("I"+totalRow,summary?.priceText||price(isB10?
+    [...model.b,...model.c].find(r=>r.code===code).amountUSD:summary?.totalUSD));
+   if(code.startsWith("C"))put("B21","Optional spares; excluded from Total A+B. Final configuration and delivery terms subject to agreement.");
+   if(code==="B11"){put("D6","Not separately quoted. Tools expressly included in the equipment supply remain included.");put("H6","N/A");put("I6","N/A");}
+
   }
   for(const [address,value] of cells){
    if(!new RegExp('<c\\b[^>]*r="'+address+'"').test(xml)){
@@ -614,6 +610,7 @@ export async function buildNativeOfficialRelease0553(file,model){
   }
   for(const [address,formula] of preservedFormulas){
    const value=cells.get(address),row=Number(address.slice(1));
+   if(i===3||value==="")continue; // Withdrawn B11 and cleared surplus rows must not retain old price formulas.
    const calculated=formula.includes('SUM(')?round([...cells].filter(([key,v])=>/^I\d+$/.test(key)&&Number(key.slice(1))>=6&&Number(key.slice(1))<row&&Number.isFinite(v)).reduce((sum,[,v])=>sum+v,0)):
     round(cells.get('G'+row)*cells.get('H'+row));
    if(!Number.isFinite(value)||calculated!==round(value))throw Error("Native formula/source mismatch: "+name+"!"+address);

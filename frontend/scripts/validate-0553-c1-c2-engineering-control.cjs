@@ -18,8 +18,8 @@ for(const code of ['C1','C2']){
  assert.equal(c.physicalSupplyInBase,false);assert.equal(c.purchaseSelectionRequired,true);
  assert.equal(c.evidencedReviewQuoteUSD,null);assert.equal(c.quantityReviewComplete,false);
  assert.equal(c.offerIsFullCoverageProof,false);assert.equal(c.postToPricing,false);
- assert.equal(c.currentOfferUSD,code==='C1'?97500:23000);
- assert.equal(c.currentOfferTHB,code==='C1'?3071250:721806.6);
+ assert.equal(c.currentOfferUSD,code==='C1'?181100:23000);
+ assert.equal(c.currentOfferTHB,code==='C1'?5704650:721806.6);
  assert.deepEqual([...new Set(c.rows.map(r=>r.mr))],['MR-0001','MR-0002','MR-0003','MR-0004']);
  for(const family of ['ODU_OR_RADIO','IDU','SCADA_NETWORK_SWITCH','DMR_BDA_ENCLOSURE_ASSEMBLY','EX_TELEPHONE','EX_SOUNDER','MARINE_RACON_MAIN'])
   assert(c.rows.some(r=>r.family===family),code+' missing system '+family);
@@ -38,7 +38,7 @@ for(const code of ['C1','C2']){
   ['ZWP20','TCAB-508-002'],['ZWP21','TCAB-508-001'],['ZWP22','TCAB-508-001']]);
  assert(!c.rows.filter(r=>r.mr==='MR-0004').some(r=>r.installedSites.includes('ZWP23')));
 }
-assert.deepEqual(model.codes.C1.rows.filter(r=>r.offeredReferenceIds.length).map(r=>r.family),['MARINE_RACON_MAIN']);
+assert.deepEqual(model.codes.C1.rows.filter(r=>r.offeredReferenceIds.length).map(r=>r.family),['ODU_OR_RADIO','IDU','SCADA_NETWORK_SWITCH','DMR_BDA_ENCLOSURE_ASSEMBLY','MARINE_RACON_MAIN']);
 assert.deepEqual(model.codes.C2.rows.find(r=>r.family==='SCADA_NETWORK_SWITCH').offeredReferenceIds,['C2-REV08-02']);
 assert(model.requirements.some(r=>r.id==='SPE-8')&&model.requirements.some(r=>r.id==='MR4-A7'));
 assert.equal(model.potentialB10C2Overlaps.length,7);
@@ -105,7 +105,7 @@ const collisions=select({inputs:{...inputs,[first]:{...inputs[first],stockId:'SH
 assert.equal(collisions.codes.C1.rows[0].assessment.reviewSellTHB,null);
 assert.equal(collisions.codes.C2.rows[0].assessment.reviewSellTHB,null);
 assert.equal(JSON.stringify({source:buildReleaseCommercialModel0553({thbPerUsd:31.5}),official:buildOfficialUsdRelease0553(source)}),frozenPrice,'All pricing/trace models must remain byte-equivalent after scenarios');
-assert.equal(official.totalUSD,902900);
+assert.equal(official.totalUSD,897800);
 
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const {C1C2EngineeringControl0553}=from('C1C2EngineeringControl0553.jsx');
@@ -121,9 +121,6 @@ for(const code of ['C1','C2']){
  assert(working.includes('data-c1c2-engineering-control="'+code+'"'));
 }
 const officialView=fs.readFileSync(path.join(root,'project0553/OfficialUsdRelease0553.jsx'),'utf8');
-assert(officialView.includes('sheet==="C1"&&<C1C2EngineeringControl0553 code="C1"'));
-assert(officialView.includes('sheet==="C2"&&<C1C2EngineeringControl0553 code="C2"'));
-assert(officialView.indexOf('code="C1" onOpenSource')<officialView.indexOf('<SelectedSheet'),
- 'New C1 review precedes the separately labelled current selected Excel source');
+assert(!officialView.includes('earlier RACON-only comparator'));
 assert.equal(renderToStaticMarkup(React.createElement(C1C2EngineeringControl0553,{code:'B11'})),'');
 console.log('PASS C1/C2: all four MR / six main systems, exact installed source identities, OPEN quantities/prices without evidence, SPQ-002 two-year calculation, OEM/minimum/Ex/stock/price/lead-time gates, manufacturer+part B10 exclusion, distinct C1/C2 stock, one category FX rounding, unchanged all financial models and module IDs.');

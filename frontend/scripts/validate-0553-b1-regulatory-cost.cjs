@@ -27,12 +27,12 @@ assert(model.rows.some(x=>x.id==="B1-REG-07"&&x.riskClass.includes("ANTI_BRIBERY
 assert.equal(model.computedRegulatoryDirectCostTHB,null);
 assert.equal(model.workingSellPosted,false);
 assert.equal(base.byCode.B1.workingSellTHB,862675.74); // New Rev.K engineering + PM, old 510k audit only
-assert.equal(base.knownWorkingSellTHB,6223782.87);
+assert.equal(base.knownWorkingSellTHB,6066125.37);
 assert.equal(base.byCode.B3.workingSellTHB,2322450);
 const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
 const currentSpareDelta=Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
  sum+base.byCode[code].workingSellTHB-old,0);
-assert.equal(Math.round(currentSpareDelta*100),44034531);
+assert.equal(Math.round(currentSpareDelta*100),28268781);
 // 21-Oct audit bridge is NONPOSTING. The 22-Oct revision changed BOTH B3
 // FAT/SAT role rates and B9 onshore Senior; remove both current deltas.
 assert.equal(Math.round(100*(

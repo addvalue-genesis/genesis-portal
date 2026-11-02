@@ -81,8 +81,7 @@ assert.equal((c2html.match(/data-c2-tag-row=/g)||[]).length,12);
 assert(c2html.includes('TPH-504-001')&&c2html.includes('TCAB-514-001')&&c2html.includes('EXION'));
 assert(!c2html.includes('data-component-key='),'Existing C2 parent owns the preview; no new business module ID');
 const officialView=fs.readFileSync(path.join(root,'project0553/OfficialUsdRelease0553.jsx'),'utf8');
-assert(officialView.indexOf('code="C1" onOpenSource')<officialView.indexOf('<SelectedSheet'));
-assert(officialView.includes('Current selected C1 / Original Excel'));
+assert(!officialView.includes('earlier RACON-only comparator'));
 assert.equal(JSON.stringify(build()),before,'Review views must not mutate selected financial/native models');
 const selectedC2=build().official.otherSpareItemizedAnnex.rows.C2;
 assert.equal(Math.round(selectedC2.reduce((n,r)=>n+r.totalUSD,0)*100),2300000,

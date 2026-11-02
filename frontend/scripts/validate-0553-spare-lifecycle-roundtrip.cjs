@@ -69,7 +69,7 @@ assert(model.rules.some(x=>x.id==="B10-C2"&&x.requirement.includes("Attachment 7
 assert(model.rules.some(x=>x.id==="B11-B3"));
 assert(model.rules.some(x=>x.id==="B13-B5"));
 assert(model.rules.some(x=>x.id==="B13-A5"));
-const expectedOfficial={B10:16200,B11:5100,B13:1500};
+const expectedOfficial={B10:16200,B11:null,B13:1500};
 for(const code of SPARE_LIFECYCLE_CODES_0553){
  const rows=model.rows.filter(x=>x.code===code),working=source.currentByCode[code],shown=release.annex[code];
  assert.equal(rows.length,working.length);

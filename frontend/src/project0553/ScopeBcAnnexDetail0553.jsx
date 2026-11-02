@@ -53,7 +53,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    {" "}· <strong>{p.optional?"PART C OPTION — NOT IN BASE":"PART B — BASE SCOPE REQUIREMENT"}</strong></p>
   <div className="p55-metric-grid">
    <div><strong>Current Turnkey Direct COST</strong><p>{thb(p.directCostTHB)}</p><small>Source-verified Cost Rate × Verified Qty required</small></div>
-   <div><strong>New PTTEP First-Principles Working Estimate</strong><p>{thb(p.workingSellTHB)}</p><small>{["B10","B11","B13","C1","C2"].includes(code)?"Unquoted Engineering Parametric Allowance · 2026 planning only · OEM SPIR, SKU, DDP proof OPEN":"Current Working SELL"}</small></div>
+   <div><strong>New PTTEP First-Principles Working Estimate</strong><p>{p.offerTreatment?.priceText||thb(p.workingSellTHB)}</p><small>{["B10","B11","B13","C1","C2"].includes(code)?"Unquoted Engineering Parametric Allowance · 2026 planning only · OEM SPIR, SKU, DDP proof OPEN":"Current Working SELL"}</small></div>
    <div><strong>Historical Rev08 Reference</strong><p>{thb(p.historicalReferenceTHB)}</p><small>Native USD source retained for audit · {p.historicalFxState}</small></div>
   </div>
   <p className="p55-note"><strong>Scope price status:</strong> {p.currentPriceState} · {p.costState} · <strong>Historical references must NOT post to the current cost/sell ledger.</strong> {p.controlNote}</p>
@@ -329,7 +329,8 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    <p className="p55-note"><strong>C1 management-selected BUDGETARY spare option (NONPOSTING):</strong> {thb(spareReconciliation.selectedC1Option.budgetTotalTHB)} · {spareReconciliation.selectedC1Option.source}. Based on historical ORGA USD 75,000 FCA, NOT the installed MGW USD 75,059 equipment quotation. Separate OEM replacement-spare quotation and technical interchangeability with MGW Tideland are PENDING. Not DDP Purchaser's Yard, not a verified direct cost, not posted to Part A/Part B/C1 Customer SELL.</p>
    <p className="p55-note"><strong>Historical Rev08:</strong> {thb(customerSchedule.summary.C1.workingReferenceTHB)} preserved for audit only; no automatic addition to selected C1 option or A+B base.</p>
   </details>}
-  {spareLines.length>0&&<div className="p55-panel" style={{padding:12}}>
+  {spareLines.length>0&&<details className="p55-panel" style={{padding:12}} open={!["B11","C1"].includes(code)}>
+   <summary>{code==="B11"?"Withdrawn B11 allowance — audit only / N/A in current offer":code==="C1"?"Earlier source parent — audit only":"Source schedule"}</summary>
    <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (PTTEP 2026 First-Principles Working Preview)</h4>
    <p className="p55-note"><strong>Coverage readiness:</strong> {customerSchedule.engineeringReadiness.installedTagInstances} source site-TAG instances / {customerSchedule.engineeringReadiness.criticalTagFunctionGroups} critical TAG families. Confirmed replacement SKU mappings in this model: {customerSchedule.engineeringReadiness.confirmedReplacementSkuGroups}. Verdict: <strong>{customerSchedule.engineeringReadiness.verdict}</strong> — budget price rows exist, but complete Commissioning Spare coverage and major-equipment provision have not yet been demonstrated.</p>
    <p className="p55-note"><strong>วิธีอ่านราคาอะไหล่:</strong> Description = รายการที่จะซื้อและหน้าที่ใช้งาน ·
@@ -376,7 +377,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    <p className="p55-note"><strong>CURRENT PARAMETRIC WORKING SELL:</strong> {thb(customerSchedule.currentBudgetaryByCode?.[code])} · Unquoted cost allowance × {customerSchedule.currentBudgetaryPricingFactor} × FX {customerSchedule.currentWorkingFxTHBPerUSD}. Each estimate row exposes qty, rate basis, and requirement. <strong>OEM quote/SPIR/Ex compatibility/DDP remain open.</strong> Rev08 is archived and excluded from current cost.</p>
    {code==="B11"&&<p className="p55-note"><strong>Customer template delivery basis:</strong> DDP Purchaser’s Yard shown in RFQ; current THB prices are internal budget references only, not a verified DDP delivered quotation. Installation, commissioning and special tools must reconcile with B3/B9 and Part A before customer release. Four MR-phase tool sets and five EXA-A8 minimum applicability checks do NOT mean nine additive tool purchase lines.</p>}
    <p className="p55-note">Linked Tag candidates are not approved spare-to-installed-equipment matches. B10/B13 base and C1/C2 options remain separated. This table is a working engineering view; customer DDP currency and Incoterm conflict must be resolved before release.</p>
-  </div>}
+  </details>}
   {code==="B10"&&<B10PriceToWinScenario0553 context={inWorking?"working":"scope"}/>}
   {code==="B10"&&<B10ItemizedPurchasingEvidence0553 evidence={b10ItemizedEvidence} context={inWorking?"working":"scope"}/>}
   {spareLines.length>0&&customerSchedule.sparePriceEvidence&&<details className="p55-panel p553-itemized-evidence" open={inWorking} style={{padding:12}}>

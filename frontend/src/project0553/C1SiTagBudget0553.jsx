@@ -57,7 +57,7 @@ export function C1SiTagBudget0553(){
    {" "}→ ÷ {model.fxTHBPerUSD} → ปัดขึ้น USD100 ที่ยอดรวมครั้งเดียว
    {" "}· ผลต่างการปัดเศษรายแถวกับยอดรวม THB {money(model.rowRoundingResidualTHB)}</p>
   <p className="p55-note"><strong>ราคาเสนอเดิม USD {money(model.priorQuotedUSD)} / งบใหม่เพิ่ม USD {money(model.deltaUSD)}.</strong>
-   {" "}งบใหม่แสดงให้ตรวจทานก่อนเลือกแทนราคาข้อเสนอเดิม จึงไม่เปลี่ยน Excel ใบเสนอราคาเดิมโดยอัตโนมัติ</p>
+   {" "}เลือกใช้ C1 ชุด 6 แถวนี้แล้ว ราคา Summary, Release และ Excel ใช้ข้อมูลชุดเดียวกัน</p>
   <details><summary>รายการที่ยังต้องยืนยัน โดยไม่ปิดกั้นการคำนวณงบที่มีฐานราคาแล้ว</summary>
    <p className="p55-note">{model.qualification}</p>
    <ul>{model.openSourceLines.map(x=><li key={x.code}>{x.code} · {x.partNo}: ยังไม่มีราคาแยก ไม่ใช่ราคายืนยันศูนย์</li>)}</ul>

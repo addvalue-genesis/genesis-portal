@@ -9,8 +9,8 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
  const rows=review.rows[code],onlyHistorical=code==="C2",onlyComparable=code==="C1";
  return <>{["C1","C2"].includes(code)&&<C1C2EngineeringControl0553 code={code} onOpenSource={onOpenSource} open={context==="working"}/>}
  <details className="p55-panel p553-spare-priced-review" data-component-key={"bid.budget.working.bc."+code.toLowerCase()+".priced-budget-review"}
-  style={{padding:12}} open={context==="working"&&code!=="C1"}>
-  <summary><strong>{code} — Quantity × Unit Price · Original Annex format (INTERNAL REVIEW)</strong>
+  style={{padding:12}} open={context==="working"&&!["C1","B11"].includes(code)}>
+  <summary><strong>{code}{code==="B11"?" — Withdrawn allowance / not separately quoted":""} — Quantity × Unit Price · Original Annex format (INTERNAL REVIEW)</strong>
    <small>{rows.length} line(s) · estimated THB {m(review.totals[code])} · NOT CUSTOMER RELEASE</small></summary>
   {code==="C1"&&<p className="p55-note">Earlier RACON-only comparator / ฐานราคาชุดเดิมสำหรับตรวจย้อนกลับ.
    {" "}ดูงบ C1 จากซ้าย–ขวา–SI ครบ 5 กลุ่มด้านบนสำหรับตัวเลขที่คำนวณใหม่</p>}

@@ -41,36 +41,37 @@ export function buildOtherSpareItemizedPresentation0553(official){
   let displayed;
   if(code==="B11"||code==="B13"){
    const officialParent=official.annex[code];
-   if(p.amountUSD===null||officialParent.length!==source.length||specification[code].length!==source.length)
+   const excluded=p.offerTreatment?.status==="NOT_QUOTED_EXCLUDED";
+   if((p.amountUSD===null&&!excluded)||officialParent.length!==source.length||specification[code].length!==source.length)
     throw Error("0553 selected Working spare parent does not reconcile "+code);
    displayed=source.map((x,i)=>{
     const o=officialParent.find(z=>z.sourceId===x.sourceId),tech=specification[code][i];
     if(!o||o.traceId!==x.traceId||o.sourceRowModuleId!==x.sourceRowModuleId||
-       !Number.isFinite(o.unitUSD)||!Number.isFinite(o.totalUSD)||o.qty!==x.quantity)
+       (!excluded&&(!Number.isFinite(o.unitUSD)||!Number.isFinite(o.totalUSD)))||o.qty!==x.quantity)
      throw Error("0553 exact source→Official row missing "+x.id);
     return freeze({id:x.id,code,item:String(i+1),tag:x.tag,
      description:x.description,specification:tech[0],materials:tech[1],qty:o.qty,
-     unit:x.unit,unitUSD:o.unitUSD,totalUSD:o.totalUSD,sourceId:o.sourceId,
+     priceText:excluded?"N/A":null,unit:x.unit,unitUSD:o.unitUSD,totalUSD:o.totalUSD,sourceId:o.sourceId,
      traceId:o.traceId,sourceRowModuleId:o.sourceRowModuleId,sourceDocument:x.sourceDocument,
      leadTime:null,status:"SELECTED_WORKING_PARAMETRIC__NOT_OEM_TOOL_RATE",
-     financialOwnerSelected:true,physicalSkuApproved:false,customerIssued:false});
+     financialOwnerSelected:!excluded,physicalSkuApproved:false,customerIssued:false});
    });
    summaries[code]=freeze({sourceId:code,sourceTHB:p.sourceTHB,totalUSD:p.amountUSD,
-    selectedWorking:true,priceClass:"OFFICIAL_PARENT_ROUNDED_BUDGET",clientOfferApproved:false});
+    excluded,priceText:excluded?"N/A":null,selectedWorking:!excluded,priceClass:excluded?"NOT_QUOTED_EXCLUDED":"OFFICIAL_PARENT_ROUNDED_BUDGET",clientOfferApproved:false});
   }else{
    if(p.amountUSD!==null)throw Error(code+" option source is not approved for official quote");
    const offer=conditional.offers[code];
    const target=offer.budgetaryQuoteUSD;
    if(!offer.quotePrepared||offer.customerAccepted||offer.includedInAPlusB||
-      Math.abs(offer.sourceSellTHB-review.totals[code])>0.01||
+      (code==="C2"&&Math.abs(offer.sourceSellTHB-review.totals[code])>0.01)||
       p.budgetaryOptionQuoteUSD!==offer.budgetaryQuoteUSD||
       p.budgetaryOfferSourceId!==offer.sourceId||
       p.budgetaryOfferPrepared!==true||p.optionExcludedFromBase!==true)
     throw Error("0553 budgetary option offer does not reconcile to current 10.3/Official Source "+code);
-   const priceRows=allocateByWeights(offer.rows,target);
+   const priceRows=code==="C1"?offer.rows.map(x=>({...x,qty:x.quantity})):allocateByWeights(offer.rows,target);
    displayed=priceRows.map((x,i)=>{
     const c1=code==="C1";
-    return freeze({id:x.id,code,item:String(i+1),tag:c1?x.tag:"Two-year operating stock / TAG by OEM",
+    return freeze({id:x.id,code,item:x.item||String(i+1),sourceSelectionId:x.sourceSelectionId,tag:c1?x.tag:"Two-year operating stock / TAG by OEM",
      description:x.description,specification:x.specification,materials:x.materials,
      qty:x.qty,unit:x.unit,unitUSD:x.unitUSD,totalUSD:x.totalUSD,
      unitTHB:x.unitPriceTHB,totalTHB:x.extendedTHB,
@@ -79,29 +80,29 @@ export function buildOtherSpareItemizedPresentation0553(official){
      historicalSourceId:c1?null:x.id,sourceDocument:x.sourceDocument,
      technicalSourceId:x.technicalSourceId,technicalSourceUrl:x.technicalSourceUrl,
      leadTime:x.leadTime||"To be confirmed",
-     status:c1?"CONDITIONAL_C1_BUDGETARY_OFFER__INSTALLED_FCA_COMPARABLE":
+     status:c1?"OWNER_SELECTED_C1_SIX_ROW_CONDITIONAL_BUDGET":
       "CONDITIONAL_C2_BUDGETARY_OFFER__REV08_RATE_AND_TECHNICAL_SUBSTITUTION",
      financialOwnerSelected:false,physicalSkuApproved:false,customerIssued:false});
    });
    summaries[code]=freeze({sourceId:code,sourceTHB:offer.sourceSellTHB,totalUSD:target,selectedWorking:false,
     budgetaryOfferPrepared:true,conditionalPriceStatus:"CONDITIONAL_BUDGETARY_OFFER",
-    priceClass:code==="C1"?"C1_BUDGETARY_CAPITAL_SPARE_OPTION_FROM_FCA_BENCHMARK":
+    priceClass:code==="C1"?"C1_SELECTED_SIX_ROW_CAPITAL_SPARE_OPTION":
      "C2_BUDGETARY_TWO_YEAR_SPARE_OPTION_WITH_HISTORIC_RATE_BASIS",
     clientOfferApproved:false,firmOemQuote:false,issued:false,optionExcludedFromBase:true,
     commercialSourceId:offer.sourceId,sourceModuleId:offer.sourceModuleId,
     technicalGate:offer.technicalGate,evidence:offer.evidence});
   }
   const sum=round2(displayed.reduce((s,r)=>s+r.totalUSD,0));
-  if(sum!==summaries[code].totalUSD||displayed.some(r=>round2(r.qty*r.unitUSD)!==r.totalUSD))
+  if(!summaries[code].excluded&&(sum!==summaries[code].totalUSD||displayed.some(r=>round2(r.qty*r.unitUSD)!==r.totalUSD)))
    throw Error("0553 other spare itemized budget arithmetic error "+code);
   byCode[code]=freeze(displayed);
  }
- if(byCode.B11.length!==4||byCode.B13.length!==3||byCode.C1.length!==1||byCode.C2.length!==12)
+ if(byCode.B11.length!==4||byCode.B13.length!==3||byCode.C1.length!==6||byCode.C2.length!==12)
   throw Error("0553 original Annex item counts changed");
  return freeze({moduleId:"bid.budget.pricing.official.other-spare-budgetary",
   codes:codeList,rows:freeze(byCode),summaries:freeze(summaries),
   sourceToReleaseSourceByCode:freeze({B11:true,B13:true,C1:true,C2:false}),
   confirmedOemPhysicalSkuQtyCount:0,issued:false,
-  pricingNote:"B11/B13 selected Working package budgets; C1 and C2 explicitly proposed as USD97500/USD23000 CONDITIONAL BUDGETARY OPTIONS, excluded A+B; OEM SKU/CIF independent quotes/B10 exclusion must be confirmed before binding issue."
+  pricingNote:"B11 not separately quoted; B13 selected Working budget; C1 and C2 proposed as USD181100/USD23000 CONDITIONAL BUDGETARY OPTIONS, excluded A+B; OEM SKU/CIF independent quotes/B10 exclusion must be confirmed before binding issue."
  });
 }

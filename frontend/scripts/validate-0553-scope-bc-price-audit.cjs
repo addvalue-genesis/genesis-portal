@@ -33,15 +33,15 @@ for(const code of codes){
  assert.equal(a.directCostTHB,null,"No Rev08 amount may be posted as current cost "+code);
  // Working SELL budget approvals in 10.2 are distinct from historical source
  // and do not constitute direct COST or customer-released quotation.
- const budgetSell={B10:509827.5,B11:157657.5,B13:46683,C1:null,C2:null};
+ const budgetSell={B10:509827.5,B11:null,B13:46683,C1:5704650,C2:null};
  if(Object.hasOwn(budgetSell,code)){
   assert.equal(a.workingSellTHB,budgetSell[code],code+" approved pre-award budgetary working sell");
-  assert.equal(b.unifiedSpareBudget?.pricingClass,code.startsWith("C")?"OPTIONAL_OEM_QUOTE_NOT_ESTABLISHED":"UNQUOTED_2026_PARAMETRIC_WORKING_SELL");
+  assert.equal(b.unifiedSpareBudget?.pricingClass,code==="B11"?"NOT_QUOTED_EXCLUDED":code==="C1"?"OWNER_SELECTED_CONDITIONAL_C1_SIX_ROW_BUDGET":code.startsWith("C")?"OPTIONAL_OEM_QUOTE_NOT_ESTABLISHED":"UNQUOTED_2026_PARAMETRIC_WORKING_SELL");
   assert.equal(b.unifiedSpareBudget?.verifiedDirectCost,false);
   assert.equal(b.unifiedSpareBudget?.releaseAllowed,false);
   if(code==="B11"){
-   assert.equal(b.b11VendorFollowup?.status,"UNQUOTED_PARAMETRIC_2026_TOOL_REVIEW");
-   assert.equal(b.b11VendorFollowup?.amountTHB,157657.5);
+   assert.equal(b.b11VendorFollowup?.status,"WITHDRAWN_NOT_SEPARATELY_QUOTED");
+   assert.equal(b.b11VendorFollowup?.amountTHB,null);
    assert.equal(b.b11VendorFollowup?.verifiedDirectCost,false);
    assert.equal(b.b11VendorFollowup?.releaseAllowed,false);
    assert.equal(a.directCostTHB,null,"B11 OEM tool quotation/inclusion not yet verified");

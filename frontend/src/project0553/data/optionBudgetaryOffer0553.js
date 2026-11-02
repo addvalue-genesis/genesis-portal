@@ -4,6 +4,7 @@
 // User requested explicitly on 26-Oct-2026: "ต้องให้เสนอราคามาเลย".
 import {selectSparePricedBudgetReview0553} from "./sparePricedBudgetReview0553";
 import {selectMGWR2Selected0553} from "./mgwP26058R2Selected0553";
+import {selectC1SiTagBudget0553} from "./c1SiTagBudget0553";
 const freeze=Object.freeze;
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export const OPTION_BUDGETARY_QUOTE_POLICY_0553=freeze({
@@ -14,12 +15,14 @@ export const OPTION_BUDGETARY_QUOTE_POLICY_0553=freeze({
 });
 export function selectOptionBudgetaryOffer0553(){
  const review=selectSparePricedBudgetReview0553();
+ const selectedC1=selectC1SiTagBudget0553();
  const feeder=selectMGWR2Selected0553("UHF-4");
  if(!feeder||!feeder.model.includes('1/2"')||!feeder.includedComponents.some(x=>x.includes('50-ohm')))
   throw Error("C2 feeder substitution must be reconciled to the selected MGW UHF-4 evidence");
  const sources=freeze({
-  C1:freeze({thb:review.totals.C1,
-   evidence:"MDS/ORGA installed RACON FCA USD75000 × FX31.5 × previous 1.30 working sell scenario; not OEM standalone capital spare price",
+  C1:freeze({thb:round2(selectedC1.annexSubtotalUSD*31.5),
+   rawSellTHB:selectedC1.budgetSellTHB,roundingTHB:round2(selectedC1.annexSubtotalUSD*31.5-selectedC1.budgetSellTHB),
+   evidence:"Owner selected 2026-11-02: six C1 SI/TAG rows, existing release factor once, USD100 unit rounding reconciled to USD181100; prior RACON-only option retained in audit",
    sourceModuleId:"bid.budget.working.bc.c1.spare-line.c1-pttep-01",
    sourceId:"C1-PTTEP-01",technicalGate:"Confirm independent OEM capital spare variant, Ex compatibility, accessories, CIF uplift and offered stock count"}),
   C2:freeze({thb:review.totals.C2,
@@ -34,7 +37,10 @@ export function selectOptionBudgetaryOffer0553(){
   return [code,freeze({...r,code,sourceSellTHB:thb,
    // A separate offer projection preserves every historical/current source ID.
    // Technical substitution changes the proposal wording, never the source rate.
-   rows:freeze(review.rows[code].map(x=>freeze({...x,
+   rows:code==="C1"?freeze(selectedC1.annexRows.map(x=>freeze({...x,tag:x.tagNo,quantity:x.quantity,
+    sourceId:r.sourceId,sourceRowModuleId:r.sourceModuleId,sourceSelectionId:x.id,
+    traceId:"C1::"+r.sourceId,unitPriceTHB:round2(x.unitUSD*31.5),extendedTHB:round2(x.totalUSD*31.5),
+    sourceDocument:r.evidence,leadTime:"To be confirmed"}))):freeze(review.rows[code].map(x=>freeze({...x,
     historicalSourceId:code==="C2"?x.id:null,
     description:/7\/8-inch RF cable/i.test(x.description)?
      "RF feeder service cable — "+feeder.model+" (m)":x.description,
@@ -52,8 +58,8 @@ export function selectOptionBudgetaryOffer0553(){
    includedInAPlusB:false,customerAccepted:false,supplierOemConfirmed:false,
    subjectToExclusionAndSubstitution:true,offeredQty:1,unit:"LOT"})];
  }));
- if(offers.C1.sourceSellTHB!==3071250||offers.C2.sourceSellTHB!==721806.6||
-  offers.C1.budgetaryQuoteUSD!==97500||offers.C2.budgetaryQuoteUSD!==23000)
+ if(offers.C1.sourceSellTHB!==5704650||offers.C2.sourceSellTHB!==721806.6||
+  offers.C1.budgetaryQuoteUSD!==181100||offers.C2.budgetaryQuoteUSD!==23000)
   throw Error("0553 chosen Part C Budgetary Sell source/FX/rounding changed");
  return freeze({
   moduleId:"bid.budget.working.bc.option-budgetary-offer",

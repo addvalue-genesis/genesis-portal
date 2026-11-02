@@ -54,7 +54,7 @@ assert.equal(fat.integratedFat.location,'SAMTEL Warehouse, Thailand');
 const c1=from('data/c1SiTagBudget0553').selectC1SiTagBudget0553();
 assert(c1.rows.every(x=>x.quantityApproved===false));
 assert.equal(c1.ownerDecisions.l3,l3);assert.equal(c1.ownerDecisions.mds,d);
-assert.equal(c1.proposedQuoteUSD,181100);assert.equal(c1.selectedInCommercialOffer,false);
+assert.equal(c1.proposedQuoteUSD,181100);assert.equal(c1.selectedInCommercialOffer,true);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const html=renderToStaticMarkup(React.createElement(from('C1SiTagBudget0553.jsx').C1SiTagBudget0553));
 assert(html.includes('data-c1-owner-scope="2026-11-02"'));

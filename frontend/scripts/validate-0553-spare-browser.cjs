@@ -42,8 +42,8 @@ require('node:vm').runInNewContext(fs.readFileSync(path.join(cwd,'src/project055
   await (await download).saveAs(path.join(out,'official.xlsx'));
   const native=nativeContext.native,downloaded=native.entriesFromZip(new Uint8Array(fs.readFileSync(path.join(out,'official.xlsx'))));
   const downloadedSummary=new TextDecoder().decode(await native.readEntry(downloaded.find(e=>e.name==='xl/worksheets/sheet1.xml')));
-  native.assertNativeScopeSummary0553(downloadedSummary,{a:expectedRows.filter(r=>r.code.startsWith('A')),b:expectedRows.filter(r=>r.code.startsWith('B')),total:902900,unpricedText:'To be quoted'});
-  console.log('PASS downloaded XLSX: all 4 A and 14 B rows match visible Official Release; A+B USD902900 excludes Part C');
+  native.assertNativeScopeSummary0553(downloadedSummary,{a:expectedRows.filter(r=>r.code.startsWith('A')),b:expectedRows.filter(r=>r.code.startsWith('B')),total:897800,unpricedText:'To be quoted'});
+  console.log('PASS downloaded XLSX: all 4 A and 14 B rows match visible Official Release; A+B USD897800 excludes Part C');
   await official.getByRole('tab',{name:'B10 CommSpares',exact:true}).click();
   const b10ids=exportsOnly?[]:await official.locator('[data-native-b10-source-id]').evaluateAll(rs=>rs.map(r=>r.getAttribute('data-native-b10-source-id')));
   if(!exportsOnly)assert.equal(b10ids.length,14);

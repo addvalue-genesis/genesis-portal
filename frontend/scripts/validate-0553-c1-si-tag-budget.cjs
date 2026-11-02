@@ -37,11 +37,11 @@ for(const row of m.rows)for(const left of row.left){
  assert(src&&src.counted&&src.tag===left.tag&&src.site===left.site,'Exact existing TAG identity required');
 }
 assert.equal(m.verifiedDirectCostTHB,null);assert.equal(m.postToPricing,false);
-assert.equal(m.customerIssueAllowed,false);assert.equal(m.selectedInCommercialOffer,false);
+assert.equal(m.customerIssueAllowed,false);assert.equal(m.selectedInCommercialOffer,true);
 assert.equal(JSON.stringify({source:buildReleaseCommercialModel0553({thbPerUsd:31.5}),official:buildOfficialUsdRelease0553(source)}),before);
-assert.equal(official.c.find(r=>r.code==='C1').budgetaryOptionQuoteUSD,97500);
+assert.equal(official.c.find(r=>r.code==='C1').budgetaryOptionQuoteUSD,181100);
 assert.equal(official.c.find(r=>r.code==='C2').budgetaryOptionQuoteUSD,23000);
-assert.equal(official.totalUSD,902900);
+assert.equal(official.totalUSD,897800);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const {C1SiTagBudget0553}=from('C1SiTagBudget0553.jsx');
 const html=renderToStaticMarkup(React.createElement(C1SiTagBudget0553));
@@ -52,4 +52,4 @@ const {C1C2EngineeringControl0553}=from('C1C2EngineeringControl0553.jsx');
 assert(renderToStaticMarkup(React.createElement(C1C2EngineeringControl0553,{code:'C1'})).includes('data-c1-si-tag-budget="CALCULATED"'));
 assert(!renderToStaticMarkup(React.createElement(C1C2EngineeringControl0553,{code:'C2'})).includes('data-c1-si-tag-budget='));
 assert(!html.includes('data-component-key='),'Existing C1 parent owns this view; no new business module');
-console.log('PASS C1 SI: actual Next G D/E spare rates before selected TAG fallback; five groups/six rows; two PoE sets owned once; exact TAG provenance; no expansion/warranty/unknown-key double charge; THB4387631.87 cost scenario ×1.30 = THB5703921.43 → USD181100 once-rounded; prior quote/other prices unchanged.');
+console.log('PASS C1 SI: actual Next G D/E spare rates before selected TAG fallback; five groups/six rows; two PoE sets owned once; exact TAG provenance; no expansion/warranty/unknown-key double charge; THB4387631.87 cost scenario ×1.30 = THB5703921.43 → USD181100 once-rounded; selected C1USD181100 / B11N/A / A+B897800; other prices preserved.');
