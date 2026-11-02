@@ -33,14 +33,14 @@ assert(c1.annexRows.find(x=>x.item==='4').tagNo.includes('TCAB-508-002 / ZWP20')
 assert(c1.annexRows.find(x=>x.item==='4').specification.includes('RAD-508-001'));
 assert(c1.annexRows.find(x=>x.item==='5').specification.includes('DB-5P'));
 const c2=from('data/c2TagReview0553').selectC2TagReview0553();
-assert.equal(c2.rows.length,12);assert.equal(c2.b10PotentialRows,7);assert.equal(c2.c1PotentialRows,3);
-assert.equal(c2.historicalSubtotalTHB,721806.6);assert.equal(c2.currentOfferUSD,23000);
+assert.equal(c2.rows.length,12);assert.equal(c2.b10PotentialRows,7);assert.equal(c2.c1PotentialRows,2);
+assert.equal(c2.historicalSubtotalTHB,721806.6);assert.equal(c2.currentOfferUSD,13900);
 const installed=from('data/spareCoverageEngineering0553').selectSpareCoverageEngineering0553().installed;
 const source=from('data/sparePricedBudgetReview0553').selectSparePricedBudgetReview0553().rows.C2;
 for(const r of c2.rows){
  const src=source.find(x=>x.id===r.sourceId);assert(src);
  assert.equal(r.quantity,src.quantity);assert.equal(r.extendedTHB,src.extendedTHB);assert.equal(r.unitPriceTHB,src.unitPriceTHB);
- assert.equal(r.quantityApproved,false);assert.equal(r.stockRemovalApproved,false);
+ assert.equal(r.quantityApproved,false);assert.equal(r.stockRemovalApproved,r.id==='C2-REV08-07');
  assert.equal(r.partReference.spareRateConfirmed,false);
  for(const tag of r.tagRefs){const exact=installed.find(x=>x.key===tag.key);assert(exact);assert.equal(exact.site,tag.site);assert.equal(exact.tag,tag.tag);}
 }
@@ -77,14 +77,14 @@ assert.throws(()=>allocate(sample,3301),/target/);
 assert.throws(()=>allocate([{id:'bad',quantity:0,sourceTotalUSD:100}],100),/source/);
 assert(c1html.includes('data-c1-si-audit-row='),'Original source audit retained behind details');
 const c2html=renderToStaticMarkup(React.createElement(from('C2TagReview0553.jsx').C2TagReview0553));
-assert.equal((c2html.match(/data-c2-tag-row=/g)||[]).length,12);
+assert.equal((c2html.match(/data-c2-tag-row=/g)||[]).length,11);
 assert(c2html.includes('TPH-504-001')&&c2html.includes('TCAB-514-001')&&c2html.includes('EXION'));
 assert(!c2html.includes('data-component-key='),'Existing C2 parent owns the preview; no new business module ID');
 const officialView=fs.readFileSync(path.join(root,'project0553/OfficialUsdRelease0553.jsx'),'utf8');
 assert(!officialView.includes('earlier RACON-only comparator'));
 assert.equal(JSON.stringify(build()),before,'Review views must not mutate selected financial/native models');
 const selectedC2=build().official.otherSpareItemizedAnnex.rows.C2;
-assert.equal(Math.round(selectedC2.reduce((n,r)=>n+r.totalUSD,0)*100),2300000,
- 'Largest-remainder allocation must reconcile exactly to the selected USD23000 category');
+assert.equal(Math.round(selectedC2.reduce((n,r)=>n+r.totalUSD,0)*100),1390000,
+ 'Largest-remainder allocation must reconcile exactly to the selected USD13900 category');
 for(const r of selectedC2)assert.equal(Math.round(r.qty*r.unitUSD*100),Math.round(r.totalUSD*100));
-console.log('PASS spare TAG preview: six C1 whole-USD100 unit prices, Qty×Unit and USD181100 total; USD23.13 distributed once with unchanged raw costs, item5 and sources; residual/invalid-input guards; C2 identities/part/stock review and original prices unchanged.');
+console.log('PASS spare TAG preview: six C1 whole-USD100 unit prices, Qty×Unit and USD181100 total; USD23.13 distributed once with unchanged raw costs, item5 and sources; residual/invalid-input guards; C2 source identities retained, owner DB-5P excluded from current13900 offer.');

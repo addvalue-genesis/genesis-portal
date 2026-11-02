@@ -103,7 +103,7 @@ export function buildOtherSpareItemizedPresentation0553(official){
    const offer=conditional.offers[code];
    const target=offer.budgetaryQuoteUSD;
    if(!offer.quotePrepared||offer.customerAccepted||offer.includedInAPlusB||
-      (code==="C2"&&Math.abs(offer.sourceSellTHB-review.totals[code])>0.01)||
+      (code==="C2"&&Math.abs(offer.sourceSellTHB-round2(review.totals[code]-offer.excludedRows.reduce((n,x)=>n+x.extendedTHB,0)))>0.01)||
       p.budgetaryOptionQuoteUSD!==offer.budgetaryQuoteUSD||
       p.budgetaryOfferSourceId!==offer.sourceId||
       p.budgetaryOfferPrepared!==true||p.optionExcludedFromBase!==true)
@@ -138,12 +138,12 @@ export function buildOtherSpareItemizedPresentation0553(official){
    throw Error("0553 other spare itemized budget arithmetic error "+code);
   byCode[code]=freeze(displayed);
  }
- if(byCode.B11.length!==4||byCode.B13.length!==3||byCode.C1.length!==6||byCode.C2.length!==12)
+ if(byCode.B11.length!==4||byCode.B13.length!==3||byCode.C1.length!==6||byCode.C2.length!==11)
   throw Error("0553 original Annex item counts changed");
  return freeze({moduleId:"bid.budget.pricing.official.other-spare-budgetary",
   codes:codeList,rows:freeze(byCode),summaries:freeze(summaries),
   sourceToReleaseSourceByCode:freeze({B11:true,B13:true,C1:true,C2:false}),
   confirmedOemPhysicalSkuQtyCount:0,issued:false,
-  pricingNote:"B11 not separately quoted; B13 selected Working budget; C1 and C2 proposed as USD181100/USD23000 CONDITIONAL BUDGETARY OPTIONS, excluded A+B; OEM SKU/CIF independent quotes/B10 exclusion must be confirmed before binding issue."
+  pricingNote:"B11 not separately quoted; B13 selected Working budget; C1 and C2 proposed as USD181100/USD13900 CONDITIONAL BUDGETARY OPTIONS, excluded A+B; OEM SKU/CIF independent quotes/B10 exclusion must be confirmed before binding issue."
  });
 }

@@ -172,7 +172,7 @@ export function selectC1C2EngineeringControl0553({inputs={},b10Stock=[],b10Stock
    status:quotationReviewComplete?"SCENARIO_REVIEW_ONLY":complete?
     "NO_RECOMMENDED_ITEMS__PURCHASER_DISPOSITION_REQUIRED":"REQUIRED_QUOTATION_INCOMPLETE",
    currentPriceBasis:code==="C1"?"Six selected SI/TAG rows; once-only release factor and reconciled USD100 unit rounding = USD181,100":
-    "12 historic Qty × SELL rates = THB721,806.60 ÷ 31.50; round total upward once to USD100 = USD23,000",
+    selected.rows.length+" selected operating-spare references = THB"+selected.sourceSellTHB.toFixed(2)+" / FX"+offer.policy.fxTHBPerUSD+"; USD100 category roundup = USD"+selected.budgetaryQuoteUSD+"; additional DB-5P excluded by owner",
    offerIsFullCoverageProof:false,postToPricing:false,customerReleaseAllowed:false})];
  }));
  return freeze({codes:freeze(codes),requirements:C1C2_REQUIREMENT_EVIDENCE_0553,

@@ -9,7 +9,7 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
  const rows=review.rows[code],onlyHistorical=code==="C2",onlyComparable=code==="C1";
  return <>{["C1","C2"].includes(code)&&<C1C2EngineeringControl0553 code={code} onOpenSource={onOpenSource} open={context==="working"}/>}
  <details className="p55-panel p553-spare-priced-review" data-component-key={"bid.budget.working.bc."+code.toLowerCase()+".priced-budget-review"}
-  style={{padding:12}} open={context==="working"&&!["C1","B11","B13"].includes(code)}>
+  style={{padding:12}} open={context==="working"&&!["C1","B11","B13","C2"].includes(code)}>
   <summary><strong>{code}{code==="B11"?" — Withdrawn allowance / not separately quoted":""} — Quantity × Unit Price · Original Annex format (INTERNAL REVIEW)</strong>
    <small>{rows.length} line(s) · estimated THB {m(review.totals[code])} · NOT CUSTOMER RELEASE</small></summary>
   {code==="C1"&&<p className="p55-note">Earlier RACON-only comparator / ฐานราคาชุดเดิมสำหรับตรวจย้อนกลับ.
@@ -41,7 +41,7 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
       sourceRowModuleId:r.sourceRowModuleId,sourceModuleId:r.sourceRowModuleId})}>
      ↗ 10.2 Source {r.sourceId}</button>)}
   </div>}
-  <p className="p55-note">{code==="C2"?"These 12 historical rates support the conditional C2 budgetary offer. The proposed feeder must match the installed system; B10 identical stock must be excluded before firm issue. Original historical descriptions are retained here as evidence.":
+  <p className="p55-note">{code==="C2"?"The 12 historical rates remain original evidence; the selected C2 offer excludes the additional DB-5P per the owner instruction. The proposed feeder must match the installed system; B10 identical stock must be excluded before firm issue. Original historical descriptions are retained here as evidence.":
     code==="C1"?"The C1 conditional budgetary option uses installed-equipment FCA price × 31.5 × 1.30. It is excluded from Base A+B; independent OEM spare compatibility and CIF delivery price remain unconfirmed.":
     "Quantity and rate are from the existing 10.2 Working financial owner, still pending itemized OEM SKU and delivery evidence."}</p>
  </details></>;

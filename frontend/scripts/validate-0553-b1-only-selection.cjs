@@ -22,8 +22,8 @@ const selected=from('data/b1ProjectSupportBudget0553').selectB1ProjectSupportBud
 const legacy=from('data/b1ProjectSupportBaseline0553').selectB1ProjectSupportBaseline0553();
 const source=from('data/releaseCommercialModel0553').buildReleaseCommercialModel0553({thbPerUsd:31.5});
 const quote=from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(source);
-for(const expected of before.sourceRows.filter(x=>!["B11","C1"].includes(x.code))){const row=[...source.a,...source.b,...source.c].find(r=>r.code===expected.code);assert.equal(hash(fingerprintRow(row)),expected.sha256,expected.code+' Source changed outside B1 / explicit R72 A4 status metadata');}
-for(const expected of before.officialRows.filter(x=>!["B11","C1"].includes(x.code))){const row=[...quote.a,...quote.b,...quote.c].find(r=>r.code===expected.code);assert.equal(hash(fingerprintRow(row)),expected.sha256,expected.code+' Official changed outside B1 / explicit R72 A4 status metadata');}
+for(const expected of before.sourceRows.filter(x=>!["B11","C1","C2"].includes(x.code))){const row=[...source.a,...source.b,...source.c].find(r=>r.code===expected.code);assert.equal(hash(fingerprintRow(row)),expected.sha256,expected.code+' Source changed outside B1 / explicit R72 A4 status metadata');}
+for(const expected of before.officialRows.filter(x=>!["B11","C1","C2"].includes(x.code))){const row=[...quote.a,...quote.b,...quote.c].find(r=>r.code===expected.code);assert.equal(hash(fingerprintRow(row)),expected.sha256,expected.code+' Official changed outside B1 / explicit R72 A4 status metadata');}
 const pre= require('./fixtures/0553-before-b11-c1-selection-20261102.json');
 for(const [code,h] of Object.entries(pre.annex).filter(([code])=>code!=="B11"))assert.equal(hash(source.annex[code]),h,code+' unaffected source annex');
 assert.equal(source.b.find(r=>r.code==='B1').customerSellTHB,862675.74);

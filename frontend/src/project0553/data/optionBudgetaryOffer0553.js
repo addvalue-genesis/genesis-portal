@@ -13,6 +13,13 @@ export const OPTION_BUDGETARY_QUOTE_POLICY_0553=freeze({
  authority:"MANAGEMENT_BUDGETARY_OPTION_FOR_PRICE_SUBMISSION",
  incorporatedInBase:false,firmOemOffer:false
 });
+// Owner 03-Nov-2026: no additional DB-5P operating spare in C2.
+// Keep the historical reference and included Part A / C1 package scope intact.
+export const C2_OWNER_STOCK_DECISION_0553=freeze({date:"2026-11-03",
+ excludedHistoricalIds:freeze(["C2-REV08-07"]),
+ authority:"OWNER_EXCLUDES_ADDITIONAL_DB5P_FROM_C2",
+ reason:"Additional RACON DB-5P spare not required by owner. Included Part A and C1 package components remain included.",
+ source:"Owner reply: ไม่ต้อง — additional DB-5P in C2"});
 const round4=n=>Math.round((n+Number.EPSILON)*10000)/10000;
 function allocateOptionByWeights(rows,totalUSD){
  const cents=Math.round(totalUSD*100),weights=rows.map(x=>x.extendedTHB);
@@ -30,6 +37,10 @@ function allocateOptionByWeights(rows,totalUSD){
 export function selectOptionBudgetaryOffer0553(){
  const review=selectSparePricedBudgetReview0553();
  const selectedC1=selectC1SiTagBudget0553();
+ const excludedC2=review.rows.C2.filter(x=>C2_OWNER_STOCK_DECISION_0553.excludedHistoricalIds.includes(x.id));
+ const selectedC2=review.rows.C2.filter(x=>!C2_OWNER_STOCK_DECISION_0553.excludedHistoricalIds.includes(x.id));
+ if(excludedC2.length!==1||selectedC2.length!==11)throw Error("C2 owner exclusion/source identities diverged");
+ const selectedC2THB=round2(selectedC2.reduce((n,x)=>n+x.extendedTHB,0));
  const feeder=selectMGWR2Selected0553("UHF-4");
  if(!feeder||!feeder.model.includes('1/2"')||!feeder.includedComponents.some(x=>x.includes('50-ohm')))
   throw Error("C2 feeder substitution must be reconciled to the selected MGW UHF-4 evidence");
@@ -39,8 +50,9 @@ export function selectOptionBudgetaryOffer0553(){
    evidence:"Owner selected 2026-11-02: six C1 SI/TAG rows, existing release factor once, USD100 unit rounding reconciled to USD181100; prior RACON-only option retained in audit",
    sourceModuleId:"bid.budget.working.bc.c1.spare-line.c1-pttep-01",
    sourceId:"C1-PTTEP-01",technicalGate:"Confirm independent OEM capital spare variant, Ex compatibility, accessories, CIF uplift and offered stock count"}),
-  C2:freeze({thb:review.totals.C2,
-   evidence:"12 Rev08 Two-Year Spare references repriced only by existing FX31.5; 7/8-inch feeder not the current selected feeder and B10 shared-function duplicates OPEN",
+  C2:freeze({thb:selectedC2THB,historicalReferenceTHB:review.totals.C2,
+   excludedRows:freeze(excludedC2),ownerStockDecision:C2_OWNER_STOCK_DECISION_0553,
+   evidence:"11 selected operating-spare references at existing FX31.5; owner excludes additional DB-5P (C2-REV08-07), retained in history; 7/8-inch feeder not the current selected feeder and B10 shared-function duplicates OPEN",
    sourceModuleId:"bid.budget.working.bc.c2",sourceId:"C2-OPTION-REV08-12",
    technicalGate:"Replace incompatible feeder with technically compliant current OEM SKU, exclude proven B10 duplicate stock, verify two-year quantities and rates"})
  });
@@ -54,7 +66,7 @@ export function selectOptionBudgetaryOffer0553(){
    rows:code==="C1"?freeze(selectedC1.annexRows.map(x=>freeze({...x,tag:x.tagNo,quantity:x.quantity,
     sourceId:r.sourceId,sourceRowModuleId:r.sourceModuleId,sourceSelectionId:x.id,
     traceId:"C1::"+r.sourceId,unitPriceTHB:round2(x.unitUSD*31.5),extendedTHB:round2(x.totalUSD*31.5),
-    sourceDocument:r.evidence,leadTime:"To be confirmed"}))):freeze(review.rows[code].map(x=>freeze({...x,
+    sourceDocument:r.evidence,leadTime:"To be confirmed"}))):freeze((code==="C2"?selectedC2:review.rows[code]).map(x=>freeze({...x,
     historicalSourceId:code==="C2"?x.id:null,
     description:/7\/8-inch RF cable/i.test(x.description)?
      "RF feeder service cable — "+feeder.model+" (m)":x.description,
@@ -78,8 +90,8 @@ export function selectOptionBudgetaryOffer0553(){
   }
   return [code,freeze(offer)];
  }));
- if(offers.C1.sourceSellTHB!==5704650||offers.C2.sourceSellTHB!==721806.6||
-  offers.C1.budgetaryQuoteUSD!==181100||offers.C2.budgetaryQuoteUSD!==23000)
+ if(offers.C1.sourceSellTHB!==5704650||offers.C2.sourceSellTHB!==436595.65||
+  offers.C1.budgetaryQuoteUSD!==181100||offers.C2.budgetaryQuoteUSD!==13900)
   throw Error("0553 chosen Part C Budgetary Sell source/FX/rounding changed");
  return freeze({
   moduleId:"bid.budget.working.bc.option-budgetary-offer",

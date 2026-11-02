@@ -1,3 +1,4 @@
+import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 // Read-only review of the twelve existing C2 price references. Equipment TAG
 // associations are candidates, never proof of compatible spare SKU or stock.
 import {selectSparePricedBudgetReview0553} from "./sparePricedBudgetReview0553";
@@ -19,6 +20,7 @@ const historicalDescriptions=freeze([
 ]);
 export function selectC2TagReview0553(){
  const source=selectSparePricedBudgetReview0553().rows.C2;
+ const offer=selectOptionBudgetaryOffer0553().offers.C2,activeIds=new Set(offer.rows.map(x=>x.id));
  const installed=selectSpareCoverageEngineering0553().installed;
  const evidence=selectSparesPriceEvidence0553();
  const phone=EXION.lines.find(x=>x.code==="1"),horn=EXION.lines.find(x=>x.code==="2");
@@ -74,8 +76,9 @@ export function selectC2TagReview0553(){
    tagRefs:freeze(tags),partReference,c1Refs:freeze(c1Refs),b10Refs:freeze(b10),action,
    quantity:r.quantity,unit:r.unit,unitPriceTHB:r.unitPriceTHB,extendedTHB:r.extendedTHB,
    sourceDocument:r.sourceDocument,sourceId:r.id,quantityApproved:false,
-   suitabilityStatus:i===6?"INDEPENDENT_JUSTIFICATION_REQUIRED":"CONDITIONAL_MAINTENANCE_SPARE_CANDIDATE",
-   suitabilityReason:i===6?"DB-5P is included in the complete RACON/C1 package but has no current independent spare quote or demonstrated two-year failure/maintenance need. Confirm OEM recommendation and distinct stock; do not net against an unpurchased C1 option.":
+   offered:activeIds.has(r.id),ownerExcluded:!activeIds.has(r.id),
+   suitabilityStatus:i===6?"OWNER_EXCLUDED_FROM_C2":"CONDITIONAL_MAINTENANCE_SPARE_CANDIDATE",
+   suitabilityReason:i===6?"Owner excluded this additional DB-5P spare on 03-Nov-2026; retained only as historical reference. Included Part A / C1 components remain unchanged.":
     "Function is a plausible maintenance spare; exact OEM compatibility, two-year quantity, current rate and B10 exclusion still require evidence.",
    rateReconciliation:i===0?freeze({supplier:NEXTG.quoteNumber,
     sourceLines:freeze(["D-5","D-6","E-5","E-6"]),
@@ -84,11 +87,13 @@ export function selectC2TagReview0553(){
     existingC2RateReplaced:false,decision:"Current supplier spare-rate evidence exists; reconcile exact SKU, scope and terms against the historic C2 budget before selecting a new rate."}):null,
    currentOemSpareRateVerified:false,twoYearQuantityVerified:false,
    tagMappingStatus:"REFERENCE_EQUIPMENT_ONLY__OEM_SKU_AND_POOLING_OPEN",
-   stockRemovalApproved:false,postToPricing:false,customerIssueAllowed:false});
+   stockRemovalApproved:!activeIds.has(r.id),postToPricing:false,customerIssueAllowed:false});
  });
  return freeze({rows:freeze(rows),historicalSubtotalTHB:selectSparePricedBudgetReview0553().totals.C2,
-  currentOfferUSD:23000,b10PotentialRows:rows.filter(x=>x.b10Refs.length).length,
-  c1PotentialRows:rows.filter(x=>x.c1Refs.length).length,
+  currentOfferUSD:offer.budgetaryQuoteUSD,selectedSubtotalTHB:offer.sourceSellTHB,
+  quotedRowCount:offer.rows.length,excludedRows:offer.excludedRows,ownerStockDecision:offer.ownerStockDecision,
+  b10PotentialRows:rows.filter(x=>x.offered&&x.b10Refs.length).length,
+  c1PotentialRows:rows.filter(x=>x.offered&&x.c1Refs.length).length,
   tagPolicy:"Reference equipment TAG + site + OEM spare part number; cable endpoints or parent enclosure TAG for untagged parts",
   independentJustificationRows:freeze(rows.filter(x=>x.suitabilityStatus==="INDEPENDENT_JUSTIFICATION_REQUIRED").map(x=>x.id)),
   firmPurchaseRecommendationComplete:false,allCurrentOemRatesVerified:false,

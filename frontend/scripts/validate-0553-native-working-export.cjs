@@ -247,5 +247,5 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   }
   console.log("PASS actual native XLSX: six original sheets, 16 current rows, fitted typography/rows, original column widths/page setup, original merges/formulas and unrelated ZIP parts preserved; SHA256 "+require("node:crypto").createHash("sha256").update(bytes).digest("hex"));
  }
- console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 16 bidirectional PTTEP current annex source item rows, C1/C2 conditional offers with 6/12 price lines, layout fitted, structure preserved");
+ console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 16 bidirectional PTTEP current annex source item rows, C1/C2 conditional offers with 6/11 price lines, layout fitted, structure preserved");
 })().catch(e=>{console.error(e);process.exitCode=1;});

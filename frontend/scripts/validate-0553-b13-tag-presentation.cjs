@@ -47,13 +47,13 @@ const scopeHtml=renderToStaticMarkup(React.createElement(from('ScopeBcAnnexDetai
 assert(scopeHtml.includes('Equipment TAG references for B13')&&scopeHtml.includes('46,683.00'));
 const c2=quote.otherSpareItemizedAnnex.rows.C2,option=from('data/optionBudgetaryOffer0553').selectOptionBudgetaryOffer0553().offers.C2;
 assert(c2.every(x=>Number.isInteger(x.unitUSD)&&x.qty*x.unitUSD===x.totalUSD));
-assert.equal(c2.reduce((n,x)=>n+x.totalUSD,0),23000);assert.equal(option.sourceSellTHB,721806.6);
+assert.equal(c2.reduce((n,x)=>n+x.totalUSD,0),13900);assert.equal(option.sourceSellTHB,436595.65);
 assert.equal(c2.reduce((n,x)=>n+Math.round(x.roundingAdjustmentUSD*100),0),0);
-assert.deepEqual(c2.map(x=>x.unitUSD),[990,582,5842,2501,364,568,9093,5,17,25,33,49]);
+assert.deepEqual(c2.map(x=>x.unitUSD),[990,584,5838,2500,363,567,5,17,25,33,49]);
 assert.equal(rows.reduce((n,x)=>n+x.roundingAdjustmentUSD,0),0);
 const c2Review=from('data/c2TagReview0553').selectC2TagReview0553();
-assert.equal(c2Review.b10PotentialRows,7);assert.equal(c2Review.c1PotentialRows,3);
-assert.deepEqual(c2Review.independentJustificationRows,['C2-REV08-07']);
+assert.equal(c2Review.b10PotentialRows,7);assert.equal(c2Review.c1PotentialRows,2);
+assert.deepEqual(c2Review.independentJustificationRows,[]);
 assert.equal(c2Review.firmPurchaseRecommendationComplete,false);
 assert.equal(c2Review.rows[0].rateReconciliation.poeCostUSD,667.67);
 assert.equal(c2Review.rows[0].rateReconciliation.existingC2RateReplaced,false);
@@ -86,5 +86,5 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*>([\\s\\
   assert(!(out.warnings||[]).some(x=>x.includes('sheet4.xml')&&x.includes('maximum row height')));
   if(currency==='USD')fs.writeFileSync('/tmp/PJ2608-0553-B13-TAG-QA.xlsx',Buffer.from(await out.blob.arrayBuffer()));
  }
- console.log('PASS B13: three unchanged price parents USD1500/THB46683; whole-USD B13/C2 units reconcile to unchanged1500/23000; C2 suitability and supplier-rate gaps explicit; five exact TAG/site groups cover62 source records, no fictitious consumable TAG or per-TAG quantity; B5/Ex/hardware exclusions; OPEN consumption; Source/Working/Scope/USD/THB/Breakdown presentation parity.');
+ console.log('PASS B13: three unchanged price parents USD1500/THB46683; whole-USD B13/C2 units reconcile to 1500/13900 after owner DB-5P exclusion; C2 suitability and supplier-rate gaps explicit; five exact TAG/site groups cover62 source records, no fictitious consumable TAG or per-TAG quantity; B5/Ex/hardware exclusions; OPEN consumption; Source/Working/Scope/USD/THB/Breakdown presentation parity.');
 })().catch(e=>{console.error(e);process.exitCode=1;});
