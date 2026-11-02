@@ -114,7 +114,7 @@ export function ScopeSheetsDetail0553({fx=null,view="full",navigationTarget=null
    status:"WORKING ALLOCATED EQUIPMENT/BULK — INCLUDES A5; same MR0001 BOM total; NOT full A+B+C"},
   A2:sourceLine("A2","MR0002 vendor working lines; engineering/source gates retained"),
   A3:sourceLine("A3","Selected EXION Thai 212-02-6008-510 and DB3BDG048N2BNR; 4 sites, JB/glands and external bulk unpriced"),
-  A4:sourceLine("A4","Selected MDS / ORGA SeaBeacon 2; 1-system quote extrapolated to 3 sites, DB-5P/control box included, cable/gland/FAT contradictions open"),
+  A4:sourceLine("A4","Selected MDS / ORGA SeaBeacon 2; 1-system quote extrapolated to 3 sites; DB-5P/control box included; owner excludes FAT/cables/glands, ADDVALUE B3/field bulk supplies; cost reconciliation open"),
   A5:{amount:a5.a5PriceTHB,source:a5.source+"; exact "+a5.rowCount+" source MTO Bulk cost-owner rows; A1→A5 display reclassification only",
    status:"INCLUDED IN A1 — NON-ADDITIVE MEMO ONLY; "+a5.state+"; "+a5Unpriced+" remaining field-bulk/accessory evidence gaps"}
  };

@@ -10,6 +10,10 @@ export function C1SiTagBudget0553(){
    {" "}· SELL THB {money(model.budgetSellTHB)} · ยังไม่ใช่ต้นทุนจัดซื้อหรือราคา supplier ที่ยืนยันใหม่</p>
   <p className="p55-note">ใช้ราคาอะไหล่ D/E ที่ Next G เสนอโดยตรงก่อน ส่วน L3, BDA และ RACON ใช้ราคาชุดที่เลือกไว้ของ TAG เดิม
    โดย SI ตั้งสมมติฐานสำรองอย่างละ 1 ชุดสำหรับงบโครงการ จำนวนนี้ยังไม่ใช่จำนวนที่ลูกค้าหรือ OEM อนุมัติ</p>
+  <p className="p55-note" data-c1-owner-scope="2026-11-02"><strong>ฐานงานที่เจ้าของโครงการเลือก:</strong>
+   {" "}L3 Switch {model.ownerDecisions.l3.selectedCopperPorts} copper ports + {model.ownerDecisions.l3.selectedSfpPorts} SFP ตาม TC-0001 Item 13;
+   {" "}MDS ไม่รวม FAT สายเชื่อมต่อ/สายภาคสนาม และ Cable glands — ADDVALUE ดำเนินการ FAT ใน B3 ที่ SAMTEL Thailand และจัดหาวัสดุผ่าน MR0004 field bulk
+   {" "}ต้องตรวจงบเดิมก่อนเพิ่มค่าใช้จ่าย จำนวนสำรองทุกแถวรวม D/E ยังต้องผ่าน SI ตรวจซ้ำ</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>กลุ่ม / รายการสำรอง</th><th>ซ้าย — MR / TAG ที่ต้องรองรับ</th><th>ขวา — ราคาอ้างอิง</th><th>จำนวนสำรอง</th><th>ต้นทุนฐานงบ</th><th>SELL ฐานงบ THB</th><th>SI decision</th></tr></thead>
    <tbody>{model.rows.map(r=><tr key={r.id} data-c1-si-price-row={r.id}>

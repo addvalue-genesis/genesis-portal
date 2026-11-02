@@ -5,12 +5,25 @@ require.extensions['.css']=()=>{};
 const from=p=>require(path.join(root,'project0553',p));
 const before=require('./fixtures/0553-before-b1-selection-20261030.json');
 const hash=x=>crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
+// R72 owner disposition changes only the three A4 source-row status labels.
+// Normalize that exact metadata exception; every financial value, row identity,
+// other status and annex must still match the original protected fingerprint.
+const fingerprintRow=row=>{
+ if(row.code!=="A4"||!row.sourceRows)return row;
+ const copy=JSON.parse(JSON.stringify(row));
+ assert.equal(copy.sourceRows.length,3);
+ for(const item of copy.sourceRows){
+  assert.equal(item.status,"MDS_SELECTED__OWNER_EXCLUDES_FAT_CABLE_GLAND__COST_RECONCILIATION_OPEN");
+  item.status="MDS_SELECTED__FCA_PLACE_FAT_CABLE_GLAND_CONFLICT_OPEN";
+ }
+ return copy;
+};
 const selected=from('data/b1ProjectSupportBudget0553').selectB1ProjectSupportBudget0553();
 const legacy=from('data/b1ProjectSupportBaseline0553').selectB1ProjectSupportBaseline0553();
 const source=from('data/releaseCommercialModel0553').buildReleaseCommercialModel0553({thbPerUsd:31.5});
 const quote=from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(source);
-for(const expected of before.sourceRows){const row=[...source.a,...source.b,...source.c].find(r=>r.code===expected.code);assert.equal(hash(row),expected.sha256,expected.code+' Source changed outside B1');}
-for(const expected of before.officialRows){const row=[...quote.a,...quote.b,...quote.c].find(r=>r.code===expected.code);assert.equal(hash(row),expected.sha256,expected.code+' Official changed outside B1');}
+for(const expected of before.sourceRows){const row=[...source.a,...source.b,...source.c].find(r=>r.code===expected.code);assert.equal(hash(fingerprintRow(row)),expected.sha256,expected.code+' Source changed outside B1 / explicit R72 A4 status metadata');}
+for(const expected of before.officialRows){const row=[...quote.a,...quote.b,...quote.c].find(r=>r.code===expected.code);assert.equal(hash(fingerprintRow(row)),expected.sha256,expected.code+' Official changed outside B1 / explicit R72 A4 status metadata');}
 assert.equal(hash(source.annex),before.annexSha256,'Spare annex outside B1 changed');
 assert.equal(source.b.find(r=>r.code==='B1').customerSellTHB,862675.74);
 assert.equal(quote.b.find(r=>r.code==='B1').amountUSD,27400);
@@ -34,4 +47,4 @@ const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const html=renderToStaticMarkup(React.createElement(from('B1WorkingPriceOverview0553.jsx').B1WorkingPriceOverview0553,{workingRow:from('data/bcTurnkeyWorkingCost0553').selectBcTurnkeyWorkingCost0553().byCode.B1}));
 assert(html.includes('862,675.74')&&html.includes('647,996.59')&&html.includes('NOT ESTABLISHED'));
 const pkg=require('../package.json');assert.equal(pkg.scripts['start:0553'],'webpack serve --mode development --env project=0553 --port 3053');assert.equal(pkg.scripts.start,'webpack serve --mode development');
-console.log('PASS B1-only selection: every other A/B/C Source and Official row plus annex is byte-equivalent to captured pre-change fingerprints; B1 USD27400 / A+B902900; Instrument SELL100k once with COST null; old source IDs retained; dedicated start:0553 port3053.');
+console.log('PASS protected prices: all non-B1 Source/Official rows and annex match pre-change fingerprints after only three explicitly verified R72 A4 status-label normalizations; B1 USD27400 / A+B902900, source IDs and start:0553 port3053 retained.');

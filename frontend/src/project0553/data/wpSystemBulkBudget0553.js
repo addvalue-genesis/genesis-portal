@@ -61,10 +61,10 @@ export function deriveWpSystemBulkBudget0553(){
    {id:"MARINE_RACON",name:"Marine RACON",equipment:found("MARINE_RACON"),route:cableRoute("MARINE_RACON"),
     items:(raconBudget.find(x=>x.wp===w.wp)?.rows||[]).map(v=>({
      id:"RACON-"+v.id,item:v.from+" to "+v.to+" / "+v.kind,unit:"m",qty:v.additionalPurchaseM,
-     rateTHB:null,source:"ORGA QTORG2609244 p4 included 5m/5m/10m and CMP glands; Tideland 070.1016-DWG p3",
-     owner:"FIELD_RACON_BULK_NET_OF_VENDOR_INCLUSION",
-     status:"REPLACEMENT_SCENARIO__RATE_PENDING",
-     note:"Gross "+v.procurementM+"m; ORGA cut length "+v.vendorIncludedM+"m; shortfall "+v.extensionShortfallM+"m; full-run replacement "+v.replacementFullRunM+"m. No field splice presumed."
+     rateTHB:null,source:"Owner02-Nov selects QTORG2609244 cable/gland exclusions; ADDVALUE supply; Tideland 070.1016-DWG p3",
+     owner:"ADDVALUE_MR0004_FIELD_BULK",
+     status:"ADDVALUE_SUPPLY__ROUTE_SCENARIO_RATE_PENDING",
+     note:"ADDVALUE purchase "+v.procurementM+"m; effective vendor cable credit "+v.vendorIncludedM+"m. Route scenario only; measured takeoff and matched rate pending."
     }))}
   ];
   return {wp:w.wp,systems:systems.map(sys=>({...sys,items:sys.items.map(it=>({

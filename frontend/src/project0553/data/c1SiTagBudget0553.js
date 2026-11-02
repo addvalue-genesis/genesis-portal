@@ -3,8 +3,8 @@
 // an automatic replacement of the previously submitted C1 commercial option.
 import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
 import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
-import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
-import {MR0004_WORKING_BOM_0553} from "./mr0004WorkingBom0553";
+import {MR0001_WORKING_PRICED_BOM,L3_PORT_DECISION_0553} from "./mr0001WorkingPricedBom";
+import {MR0004_WORKING_BOM_0553,MDS_SCOPE_DECISION_0553} from "./mr0004WorkingBom0553";
 import {selectMGWR2Selected0553} from "./mgwP26058R2Selected0553";
 import {priceAorCFromCost0553,RELEASE_POLICY_0553} from "./releaseCommercialModel0553";
 import {OPTION_BUDGETARY_QUOTE_POLICY_0553} from "./optionBudgetaryOffer0553";
@@ -42,7 +42,7 @@ export function selectC1SiTagBudget0553(){
    components:MR0001_WORKING_PRICED_BOM.cisco.items.map(q=>freeze({quote:MR0001_WORKING_PRICED_BOM.cisco.sourceQuote,quoteLine:q.quoteLine,
     partNo:q.sku,description:q.description,quantity:1,currency:"THB",unitCost:q.unitPrice,amount:q.unitPrice,
     kind:"SELECTED_TAG_QUOTE_COMPOSITION"})),
-   decision:"SI planning assumption: one project spare matching the selected TAG. Original five-unit supplier quantity is not the spare quantity; excluded expansion module is not restored."},
+   decision:"Owner confirms 8 copper ports + 2 SFP per TC-0001 Item13; no expansion module. One project spare remains an SI quantity assumption; port choice does not approve spare quantity, PoE load or licence terms."},
   {id:"C1-SI-BDA",group:4,groupTitle:"BDA / LNA replacement assembly",description:"RFI BDA + WAROM Ex d enclosure, current UHF-1 bundle",family:"DMR_BDA_ENCLOSURE_ASSEMBLY",left:[bda],quantity:1,
    components:[freeze({quote:"MGW P26-058_R2",quoteLine:"UHF-1",partNo:selectMGWR2Selected0553("UHF-1").model,
     description:selectMGWR2Selected0553("UHF-1").includedComponents.join('; '),quantity:1,currency:"USD",
@@ -53,7 +53,7 @@ export function selectC1SiTagBudget0553(){
    components:[freeze({quote:MR0004_WORKING_BOM_0553.quoteNumber,quoteLine:"MDS-FINANCIAL-SUMMARY",partNo:racon.item.sku,
     description:racon.item.description,quantity:1,currency:"USD",unitCost:MR0004_WORKING_BOM_0553.quotePackageUSD,
     amount:MR0004_WORKING_BOM_0553.quotePackageUSD,kind:"SELECTED_TAG_INSTALLED_PACKAGE_COMPARABLE"})],
-   decision:"Retain one complete-system spare scenario. DB-5P/control-box/programming-kit inclusions are not additional C1 lines; FCA/delivery and inclusion conflicts remain qualified."}
+   decision:"Retain one complete-system spare scenario, quantity not approved. DB-5P/control-box/programming kit stay non-additive. Owner excludes FAT/field cables/glands from MDS: ADDVALUE B3/field bulk owns them; reconcile costs and spare-delivery applicability before adopting."}
  ];
  const used=new Set();
  const rows=definitions.map(d=>{
@@ -79,7 +79,7 @@ export function selectC1SiTagBudget0553(){
    budgetSellTHB:priceAorCFromCost0553(amountTHB).customerSellTHB,
    quantityAuthority:d.codes?"SUPPLIER_EXPLICIT_SPARE_QTY":"SI_ONE_PROJECT_SPARE_PLANNING_ASSUMPTION",
    rateBasis:d.codes?"SUPPLIER_SPARE_QUOTE":"EXISTING_SELECTED_TAG_RATE_COMPARABLE",
-   siDecision:d.decision,budgetCalculated:true,firmSpareQuoteConfirmed:false});
+   siDecision:d.decision,budgetCalculated:true,quantityApproved:false,firmSpareQuoteConfirmed:false});
  });
  // Cross-check the fallback against actual selected TAG costs, not quote-wide totals.
  for(const id of ["C1-SI-L3","C1-SI-BDA","C1-SI-RACON"]){
@@ -98,7 +98,8 @@ export function selectC1SiTagBudget0553(){
   rowRoundingResidualTHB:round(budgetSellTHB-rows.reduce((n,r)=>n+r.budgetSellTHB,0)),
   openSourceLines:freeze(["D-4","E-4"].map(code=>{const q=NEXTG.lines.find(x=>x.code===code);return freeze({code,partNo:q.partNumber,unitPrice:q.unitPrice,reason:"Dash is unpriced, not a verified zero. Region entitlement needs confirmation."});})),
   unselectedWarrantyLines:freeze(["D-7","D-8","E-7","E-8"].map(code=>{const q=NEXTG.lines.find(x=>x.code===code);return freeze({code,partNo:q.partNumber,unitPrice:q.unitPrice,description:q.description});})),
+  ownerDecisions:freeze({l3:L3_PORT_DECISION_0553,mds:MDS_SCOPE_DECISION_0553}),
   calculationStatus:"SI_EQUIPMENT_BUDGET_CALCULATED",technicalStatus:"OEM_CONFIGURATION_AND_TERMS_REVIEW_OPEN",
   verifiedDirectCostTHB:null,customerIssueAllowed:false,selectedInCommercialOffer:false,postToPricing:false,
-  qualification:"Equipment budget only. Region-key increments, optional warranty choice, dedicated IDU equivalence, licence terms, quote validity and additional delivery/insurance costs remain qualified. Reconcile B10/C2 physical stock before adopting or purchasing the scenario. D/E spare prices take precedence; fallback TAG comparables are not represented as independent OEM spare quotes."});
+  qualification:"Equipment budget only; all spare quantities still require independent SI review, including supplier D/E quantities. Owner confirms L3 8 copper + 2 SFP and MDS FAT/cable/gland exclusions with ADDVALUE execution/supply. Existing B3/field-bulk budgets and any applicability to C1 spare delivery require reconciliation, not a second automatic charge. Region keys, warranty, complete IDU function, licence, quote validity and delivery/insurance remain qualified. Reconcile B10/C2 stock. D/E prices take precedence as rate evidence, not quantity approval; fallback TAG rates are not independent OEM spare quotes."});
 }

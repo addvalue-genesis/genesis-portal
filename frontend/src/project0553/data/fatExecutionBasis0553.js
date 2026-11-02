@@ -1,6 +1,7 @@
 // PJ2608-0553 | management-controlled FAT execution decision, 2026-10-15.
 // Records the user's chosen execution location. Does NOT create a supplier
 // quotation, a customs permit, a new B3/B6/B9 cost posting or a customer release.
+import {MDS_SCOPE_DECISION_0553} from "./mr0004WorkingBom0553";
 export const FAT_EXECUTION_BASIS_0553=Object.freeze({
  id:"FAT-EXEC-0553-20261015-BKK",
  projectId:"PJ2608-0553",
@@ -35,7 +36,7 @@ export const FAT_EXECUTION_BASIS_0553=Object.freeze({
   {mr:"MR-0001",vendor:"Next G / associated OEMs",origin:"SUPPLIER_DELIVERY_PER_ISSUED_QUOTE_DAP_RANONG__RENEGOTIATE",routing:"Vendor → SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Confirm supplier release point, domestic freight, Thailand-China export and China import with nominated broker",source:"NG/260916-ADV-DAP1 DAP Ranong",quotedTransportIncludedUnknown:true},
   {mr:"MR-0002",vendor:"MGW equipment supplier",origin:"EXW_NANTONG_CHINA",routing:"Nantong/China supplier → Thailand SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Cost BOTH China export → Thailand import for FAT AND Thailand re-export → China import; temporary admission/re-export only if broker confirms eligibility",source:"MGW P26-058 EXW Nantong; MGW SERV-2 Nantong FAT quote is a separate quoted service, not Bangkok integrated FAT",quotedTransportIncludedUnknown:true},
   {mr:"MR-0003",vendor:"EXION Thailand",origin:"DDP_NONTHABURI_THAILAND",routing:"EXION Thailand → SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Confirm EXION transport handover, Bangkok FAT facility interface and subsequent Thailand export → China import",source:"EXION 1260576 Rev.0 DDP Nonthaburi (quote validity expired)",quotedTransportIncludedUnknown:true},
-  {mr:"MR-0004",vendor:"MDS / ORGA",origin:"FCA_FACTORY__NAMED_PLACE_UNCONFIRMED",routing:"ORGA/MDS origin → SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Confirm origin/export, international freight to Thailand, then Thailand-China freight and China import",source:"ORGA QTORG2609244 p5 FAT included versus p7 FAT/R-FAT excluded — unresolved quotation conflict",quotedTransportIncludedUnknown:true}
+  {mr:"MR-0004",vendor:"MDS / ORGA",origin:"FCA_FACTORY__NAMED_PLACE_UNCONFIRMED",routing:"ORGA/MDS origin → SAMTEL Bangkok FAT → CIF Zhuhai Port China",fat:"INTEGRATED_AT_SAMTEL_BKK",logistics:"Confirm origin/export, international freight to Thailand, then Thailand-China freight and China import",source:"ORGA QTORG2609244 p5 FAT included versus p7 FAT/R-FAT excluded — raw source contradiction retained; owner02-Nov selects supplier FAT exclusion and ADDVALUE B3 execution",scopeDecision:MDS_SCOPE_DECISION_0553,quotedTransportIncludedUnknown:true}
  ],
  costRouting:{
   B1:"Integration engineering, ITP, procedure and system interface preparation; avoid duplicate B3 physical test labor",
