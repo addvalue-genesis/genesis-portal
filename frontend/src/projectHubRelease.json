@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-02.5-preview",
+  "version": "2026-11-02.6-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "47feeb5a6ad9b53f547b0fd0f8f67ce7e5c38b4a",
-  "capability": "0550 SI WP.7 reads existing B07 offer IDs and native SET/license/accessory details with source quantities, review gaps and links to existing Working owners. No new modules or financial/source/approval changes; Volume I remains an output projection."
+  "source0550": "ec916e28a7b44965334dfc1f6d4ba0fa4d54b7a9",
+  "capability": "0550 Volume I defaults to Schedule C1/C2 in tabs and 11.P preview. Existing Schedule module links reveal the full list; per-Schedule exports, canonical Working prices, full-package exports and release gates are preserved."
 }

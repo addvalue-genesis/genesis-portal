@@ -46,7 +46,22 @@ try{
  if(process.env.PJ0550_VOLUME_FIXTURE)fs.writeFileSync(process.env.PJ0550_VOLUME_FIXTURE,JSON.stringify(d));
  if(process.env.PJ0550_VOLUME_XLSX)fs.writeFileSync(process.env.PJ0550_VOLUME_XLSX,bytes);
  const ctx=require(root+'/project0550/BidWorkspaceContext.jsx');ctx.useBidWorkspace=()=>({data:d,model:derive(d),reviewDate:today,busy:false,change:async()=>true});const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),UI=require(root+'/project0550/BidVolumesWorkspace0550.jsx');
- assert(renderToStaticMarkup(React.createElement(UI.BidVolumesWorkspace0550,{volume:'I'})).includes('11 · Volume I'));assert(renderToStaticMarkup(React.createElement(UI.BidVolumesWorkspace0550,{volume:'III'})).includes('13 · Volume III'));assert(renderToStaticMarkup(React.createElement(UI.VdrlWorkspace0550,{})).includes('12.V'));
+ {
+  const registryBefore=JSON.stringify(V.SCHEDULES_0550),workspaceBefore=JSON.stringify(d);
+  assert.deepEqual(UI.quotationSchedules0550().map(s=>s.id),['C1','C2']);
+  assert.deepEqual(UI.quotationSchedules0550(true),V.SCHEDULES_0550);
+  assert(UI.quotationSchedules0550().every(s=>s===V.SCHEDULES_0550.find(r=>r.id===s.id)),'Focus reuses canonical Schedule objects');
+  const quotationHtml=renderToStaticMarkup(React.createElement(UI.BidVolumesWorkspace0550,{volume:'I'}));
+  assert(quotationHtml.includes('11 · Volume I'));
+  assert(quotationHtml.includes('data-component-key="bid.quotation.C1"'),'Volume I opens existing C1 module');
+  const quotationNav=quotationHtml.match(/<nav[^>]*aria-label="Volume I sections"[^>]*>([\s\S]*?)<\/nav>/)?.[1]||'';
+  assert(quotationNav.includes('>11.C1</button>')&&quotationNav.includes('>11.C2</button>'));
+  for(const id of V.SCHEDULES_0550.filter(s=>!['C1','C2'].includes(s.id)).map(s=>s.id))assert(!quotationNav.includes('>11.'+id+'</button>'),'Hidden Schedule '+id);
+  const commercialHtml=renderToStaticMarkup(React.createElement(UI.BidVolumesWorkspace0550,{volume:'III'}));
+  assert(commercialHtml.includes('13 · Volume III'));assert(!commercialHtml.includes('aria-label="Schedules shown"'));
+  assert(renderToStaticMarkup(React.createElement(UI.VdrlWorkspace0550,{})).includes('12.V'));
+  assert.equal(JSON.stringify(V.SCHEDULES_0550),registryBefore);assert.equal(JSON.stringify(d),workspaceBefore,'Opening the focused view preserves the workspace');
+ }
  assert.deepEqual(require(root+'/project0550/biddingNavigation.js').BID_TABS.slice(-4).map(t=>t.id),['quotation','technical','commercial','deviations']);assert.equal(D.MODULE_REGISTRY.length,15);
  console.log('PASS bid volumes: canonical unchanged financials; optional strict schema/roundtrip; schedule allocation/unknown totals; A/Offer staleness; selected-offer mismatches; VDRL With-Bid/Invitation crosswalk; pending deviations HOLD; cyclic impact traversal; v3 exact frozen outputs/history; escaped native XLSX/HTML and numbered React views.');
 }finally{fs.rmSync(dir,{recursive:true,force:true});}
