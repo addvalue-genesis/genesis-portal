@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-10-30-R68";
+export const CHANGE_LOG_VERSION_0553="2026-11-02-R69";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261102-01",date:"2026-11-02",kind:"ENGINEERING",tone:"caution",
+  title:"C1/C2 all-system evidence and quantity review linked to existing equations",
+  detail:"C1/C2 now show all applicable installed-source families across four MR: SCADA radio/IDU, L3 switch, BDA, Ex phone/sounder and RACON. Existing MAP-02/06/07/08 and SPQ-002 are reused in a nonposting evidence adapter; missing OEM part/quantity/rate, configuration, Ex/interchangeability, stock-policy, B10 reconciliation, delivery or lead-time proof remains OPEN. C2 reliability horizon is two years; an assumed SPQ-001 commissioning unit or design MTBF cannot silently become an accepted C1/C2 quantity. Original BOD/SPE/STD and four MR clauses are linked. Current one-line C1 RACON comparator USD97500 and twelve-line C2 historical USD23000 remain separate from the unpriced all-system review, excluded A+B. C1/C2 shared physical stock and manufacturer/part-identical B10 duplicates block review pricing. The review appears in existing Working C1/C2 and below the selected Official C1/C2 sheet, outside the native customer worksheet; Excel exports and all source/annex/financial module IDs and prices unchanged.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.c1","bid.budget.working.bc.c2","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner 02-Nov-2026: read BOD/DTS/SPE/STD, show C1/C2 first and implement existing equation controls"}),
  Object.freeze({id:"P553-CHANGE-20261030-02",date:"2026-10-30",kind:"UI",tone:"neutral",
   title:"Dedicated0553 workspace on port3053 shows only PJ2608-0553",
   detail:"start:0553 now builds a dedicated entry with0553-only header and routes. Brand/root/unknown URLs return to0553, and no0550 or Employees page is imported by this entry. Browser title identifies PJ2608-0553. The standard portal entry remains available for other checkouts; no project data or business module IDs are removed. Current B1USD27400, A+BUSD902900 and all other prices remain unchanged.",

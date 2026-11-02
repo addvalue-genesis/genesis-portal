@@ -4,6 +4,7 @@ import {buildNativeOfficialRelease0553} from "./nativeWorkingDraft0553";
 import template from "./data/nativeReleaseTemplate0553.json";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
+import {C1C2EngineeringControl0553} from "./C1C2EngineeringControl0553";
 import {CustomerPriceBreakdown0553} from "./CustomerPriceBreakdown0553";
 import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
 import {buildNativePriceBreakdown0553} from "./nativePriceBreakdown0553";
@@ -78,6 +79,7 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
      <tr className="p553-sheet-total"><td colSpan={7}>Total (USD)</td><td className="p553-price-cell">{money([...model.b,...model.c].find(r=>r.code===sheet)?.amountUSD)}</td></tr></tbody>
    </table>}</div>
   </div>
+  {["C1","C2"].includes(sheet)&&<C1C2EngineeringControl0553 code={sheet} onOpenSource={onOpenSource}/>}
   <CustomerPriceBreakdown0553 source={source} official={model} onOpenSource={onOpenSource} origin="official" view={breakdownView} onViewChange={onBreakdownViewChange} focus={breakdownFocus} showPriceDetails={showPriceDetails} onPriceDetailsChange={onPriceDetailsChange}/>
  </section>;
 }

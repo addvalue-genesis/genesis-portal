@@ -1,12 +1,14 @@
 import React from "react";
 import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0553";
+import {C1C2EngineeringControl0553} from "./C1C2EngineeringControl0553";
 const m=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"Not established";
 export function SparePricedBudgetReview0553({code,onOpenSource=null,context="working"}){
  const review=selectSparePricedBudgetReview0553();
  if(!review.codes.includes(code))return null;
  const rows=review.rows[code],onlyHistorical=code==="C2",onlyComparable=code==="C1";
- return <details className="p55-panel p553-spare-priced-review" data-component-key={"bid.budget.working.bc."+code.toLowerCase()+".priced-budget-review"}
+ return <>{["C1","C2"].includes(code)&&<C1C2EngineeringControl0553 code={code} onOpenSource={onOpenSource} open={context==="working"}/>}
+ <details className="p55-panel p553-spare-priced-review" data-component-key={"bid.budget.working.bc."+code.toLowerCase()+".priced-budget-review"}
   style={{padding:12}} open={context==="working"}>
   <summary><strong>{code} — Quantity × Unit Price · Original Annex format (INTERNAL REVIEW)</strong>
    <small>{rows.length} line(s) · estimated THB {m(review.totals[code])} · NOT CUSTOMER RELEASE</small></summary>
@@ -40,5 +42,5 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
   <p className="p55-note">{code==="C2"?"These 12 historical rates support the conditional C2 budgetary offer. The proposed feeder must match the installed system; B10 identical stock must be excluded before firm issue. Original historical descriptions are retained here as evidence.":
     code==="C1"?"The C1 conditional budgetary option uses installed-equipment FCA price × 31.5 × 1.30. It is excluded from Base A+B; independent OEM spare compatibility and CIF delivery price remain unconfirmed.":
     "Quantity and rate are from the existing 10.2 Working financial owner, still pending itemized OEM SKU and delivery evidence."}</p>
- </details>;
+ </details></>;
 }
