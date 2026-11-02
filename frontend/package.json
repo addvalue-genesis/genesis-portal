@@ -205,7 +205,9 @@
     "validate:pj0550-system-constraints-browser": "node scripts/validate-pj2608-0550-system-constraints-browser.cjs",
     "validate:pj0550-a-native-audit": "node scripts/validate-pj2608-0550-a-native-audit.cjs",
     "validate:pj0550-activity-budget": "node scripts/validate-pj2608-0550-activity-budget.cjs",
-    "validate:pj0550-activity-budget-browser": "node scripts/validate-pj2608-0550-activity-budget-browser.cjs"
+    "validate:pj0550-activity-budget-browser": "node scripts/validate-pj2608-0550-activity-budget-browser.cjs",
+    "validate:pj0550-si-supplier-evidence": "node scripts/validate-pj2608-0550-si-supplier-evidence.cjs",
+    "validate:pj0550-si-supplier-evidence-browser": "node scripts/validate-pj2608-0550-si-supplier-evidence-browser.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",
