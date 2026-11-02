@@ -1,3 +1,4 @@
+import {activeSupplyLine0550} from "./supplyProposalDraft0550";
 // ADR-0550-001 principles 1–6,8–14. New document views reuse canonical
 // engineering, offers and prices. No allowance, supplier choice or approval is inferred.
 import {integrationFingerprint0550,integrationRecordBasis0550,integrationRequirements0550} from './integrationWorkspace0550';
@@ -49,7 +50,7 @@ const currentSourceProblems=(data,ids,locator)=>{
 export function volumeRecordBasis0550(data,collection,r){
  const p=data.bidVolumes||emptyBidVolumes0550(),w=data.integrationWorkspace||{},base={policy:VOLUME_SCHEMA_0550,documentNo:p.documentNo,revision:p.revision,record:clean(r),sources:sources(data,r.sourceIds),approvalSources:sources(data,r.approvalSourceIds)};
  if(collection==='bindings'){
-  const l=data.lines.find(l=>l.id===r.lineId),reqs=integrationRequirements0550(data).filter(q=>q.workLineIds.includes(r.lineId));
+  const l=activeSupplyLine0550(data.lines.find(l=>l.id===r.lineId)),reqs=integrationRequirements0550(data).filter(q=>q.workLineIds.includes(r.lineId));
   Object.assign(base,{line:l,offer:data.offers.find(o=>o.id===l?.offerId),calculation:data.calculations.find(c=>c.id===l?.calculationId),fx:data.fx,requirements:reqs.map(q=>({record:q,key:integrationRecordBasis0550(data,'requirements',q)})),physical:data.technicalProposal?.equipmentDetails.find(e=>e.lineId===r.lineId)});
   // Quoted packages have multiple canonical offer rows, rather than line.offerId.
   if(l?.mgwDetailGroupId)base.packageOffers=data.offers.filter(o=>mgwDetailGroup0550(l.mgwDetailGroupId)?.rowIds.includes(o.mgwQuoteLineId));

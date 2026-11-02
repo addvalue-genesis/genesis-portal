@@ -1,3 +1,4 @@
+import {activeSupplyLine0550} from "./supplyProposalDraft0550";
 // ADR-0550-001 §§5–6,8–14. Local issue records, not identity authentication
 // or an email transport. No approval is created by derivation or file export.
 import {integrationFingerprint0550} from "./integrationWorkspace0550";
@@ -13,7 +14,7 @@ const text=v=>typeof v==="string"&&Boolean(v.trim())&&v.length<=4000;
 const date=v=>typeof v==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(v)&&Number.isFinite(Date.parse(v))&&new Date(v).toISOString().slice(0,10)===v;
 const fail=m=>{throw Error("Release: "+m);};
 export const releaseSnapshot0550=data=>{const {releaseRegister,...snapshot}=data;return clone(snapshot);};
-export const releaseBasisKey0550=data=>{const {revision,audit,releaseRegister,repositoryBasisImport,mgwDetailPricingImport,...basis}=data;return integrationFingerprint0550({policy:"0550-controlled-issue-v1",basis});};
+export const releaseBasisKey0550=data=>{const {revision,audit,releaseRegister,repositoryBasisImport,mgwDetailPricingImport,...basis}=data;return integrationFingerprint0550({policy:"0550-controlled-issue-v1",basis:{...basis,lines:basis.lines.map(activeSupplyLine0550)}});};
 export function mergeReleaseRegister0550(local,incoming){
  if(!local)return incoming?clone(incoming):undefined;
  if(!incoming)return local;

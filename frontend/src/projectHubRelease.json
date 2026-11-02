@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-01.9-preview",
+  "version": "2026-11-02.2-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "87b2a44d2d3b01a38475a17d5f5567bbe793ca92",
-  "capability": "0550 visible Working THB prices: owner-authorised EUR conversion, 24 activity-based TSI labour estimates plus shared travel/expense allowances with existing protected rates, explicit cost gaps and Base/Option separation. Existing price/FX edits, deleted work, source lineage and frozen issues preserved; partial priced subtotal is not complete bid scope or engineering/issue approval."
+  "source0550": "2ece6ad8a0d9338fa30f5ee5c17bd4a79b6cad9f",
+  "capability": "0550 separate supplier/direct-ADDVALUE proposal drafts within existing Working, distinct upstream costs and unselected package selling inputs, bidirectional canonical B service/SI activity references and overlap diagnostics. No active price, quantity, FX, service-selection, approval or frozen-history migration."
 }
