@@ -13,25 +13,26 @@ import {OPTION_BUDGETARY_QUOTE_POLICY_0553} from "./optionBudgetaryOffer0553";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const freeze=Object.freeze;
 const identity=x=>JSON.stringify([x.mr,x.site,String(x.id)]);
-// Preview allocation only: source cost/SELL and the once-rounded category
-// target remain unchanged. Whole USD100 unit prices must multiply exactly by
-// quantity; any residual is reconciled on Qty1 rows, never hidden in a false
-// line amount or posted back to the financial source.
-export function roundC1AnnexUnits0553(rows,targetUSD,incrementUSD=100){
+// Shared unit-price allocation: raw source inputs and category totals stay
+// fixed. C1 uses USD100; B13/C2 use USD1. Reconcile residuals on Qty1 rows
+// without a separate balancing charge or a second commercial factor.
+export function roundC1AnnexUnits0553(rows,targetUSD,incrementUSD=100,{residualMetric="absolute"}={}){
+ if(!["absolute","squared"].includes(residualMetric))throw Error("Invalid annex residual metric");
+ const deviationCost=x=>residualMetric==="squared"?x*x:Math.abs(x);
  if(!Number.isSafeInteger(incrementUSD)||incrementUSD<=0||!Number.isSafeInteger(targetUSD)||targetUSD<0||targetUSD%incrementUSD!==0||!rows.length)
   throw Error("Invalid C1 unit-rounding target/increment");
  const rounded=rows.map(r=>{
   if(!Number.isSafeInteger(r.quantity)||r.quantity<=0||!Number.isFinite(r.sourceTotalUSD)||r.sourceTotalUSD<0)
    throw Error("Invalid C1 unit-rounding source "+r.id);
   const sourceUnitUSD=round(r.sourceTotalUSD/r.quantity);
-  return {...r,sourceUnitUSD,unitUSD:Math.round(sourceUnitUSD/incrementUSD)*incrementUSD};
+  return {...r,sourceUnitUSD,unitUSD:Math.round(r.sourceTotalUSD/r.quantity/incrementUSD)*incrementUSD};
  });
  let residual=targetUSD-rounded.reduce((n,r)=>n+r.quantity*r.unitUSD,0),steps=0;
  while(residual!==0){
   if(++steps>1000)throw Error("C1 rounding residual outside presentation bound");
   const sign=Math.sign(residual);
   const candidates=rounded.map((r,index)=>({r,index})).filter(({r})=>r.quantity===1&&r.unitUSD+sign*incrementUSD>=0)
-   .map(({r,index})=>({index,errorIncrease:Math.abs(r.unitUSD+sign*incrementUSD-r.sourceTotalUSD)-Math.abs(r.unitUSD-r.sourceTotalUSD)}))
+   .map(({r,index})=>({index,errorIncrease:deviationCost(r.unitUSD+sign*incrementUSD-r.sourceTotalUSD)-deviationCost(r.unitUSD-r.sourceTotalUSD)}))
    .sort((a,b)=>a.errorIncrease-b.errorIncrease||a.index-b.index);
   if(!candidates.length)throw Error("C1 target cannot reconcile with whole-unit prices; quantity-one adjustment required");
   rounded[candidates[0].index].unitUSD+=sign*incrementUSD;
@@ -40,6 +41,8 @@ export function roundC1AnnexUnits0553(rows,targetUSD,incrementUSD=100){
  return freeze(rounded.map(r=>freeze({...r,totalUSD:r.quantity*r.unitUSD,
   roundingAdjustmentUSD:round(r.quantity*r.unitUSD-r.sourceTotalUSD)})));
 }
+// Same controlled allocation kernel, also used for whole-USD B13/C2 unit prices.
+export const roundAnnexUnitPrices0553=roundC1AnnexUnits0553;
 // Customer-style wording is a view of the existing six budget rows, not a
 // second spare ledger. Reference equipment TAGs are not new spare asset TAGs.
 const annexText=freeze({

@@ -6,7 +6,7 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null,curren
  const rows=model?.rows?.[code],summary=model?.summaries?.[code];
  if(!rows||!summary||!headings[code])throw Error("0553 spare Annex unavailable "+code);
  const option=code==="C1"||code==="C2";
- if(!["USD","THB"].includes(currency)||currency==="THB"&&!option)throw Error("Unsupported spare Annex currency");
+ if(!["USD","THB"].includes(currency)||currency==="THB"&&!option&&code!=="B13")throw Error("Unsupported spare Annex currency");
  return <section className="p553-b10-original-annex" data-original-spare-annex={code} data-price-status={summary.priceClass}>
   <div className="p553-native-title">{headings[code]}</div>
   {summary.excluded?<p>N/A — Not separately quoted. Tools expressly included in the equipment supply remain included.</p>:<>
@@ -25,7 +25,21 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null,curren
     {option&&<td>{row.leadTime}</td>}</tr>)}</tbody>
    <tfoot><tr><th colSpan={7}>TOTAL ({currency})</th><th className="p553-price-cell">{fmt(currency==="THB"?summary.sourceTHB:summary.totalUSD)}</th>{option&&<th/>}</tr></tfoot>
   </table></div>
+  {code==="B13"&&<B13TagReferences0553 presentation={{tagGroups:summary.tagSchedule,commercialNote:summary.commercialNote}}/>}
   {option&&<p className="p553-b10-commercial-note">Optional spares; excluded from Total A+B. Final configuration and delivery terms subject to agreement.</p>}
   </>}
+ </section>;
+}
+
+export function B13TagReferences0553({presentation}){
+ if(!presentation?.tagGroups?.length)throw Error("B13 equipment TAG references missing");
+ return <section data-b13-tag-references="equipment-only">
+  <h4>Equipment TAG references for B13 shared consumables</h4>
+  <div className="p553-b10-commercial-scroll"><table className="p553-customer-table">
+   <thead><tr><th>System</th><th>Reference equipment TAG</th><th>Site(s)</th></tr></thead>
+   <tbody>{presentation.tagGroups.map(group=><tr key={group.mr+group.sites.join("|")} data-b13-tag-group={group.mr}>
+    <td>{group.mr}<br/>{group.system}</td><td>{group.tags.join("; ")}</td><td>{group.sites.join(", ")}</td>
+   </tr>)}</tbody>
+  </table></div><p className="p553-b10-commercial-note">{presentation.commercialNote}</p>
  </section>;
 }

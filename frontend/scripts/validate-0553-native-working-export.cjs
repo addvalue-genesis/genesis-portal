@@ -58,7 +58,7 @@ const annex=Object.fromEntries(annexCodes.map(code=>[code,[{
  qty:2,customerUnitTHB:code.startsWith("B")?10:null,customerTotalTHB:code.startsWith("B")?20:null
 }]]));
 const annexModels=Object.fromEntries(annexCodes.map(code=>[code,{annexLineTotalTHB:20,varianceTHB:0.02}]));
-const model={a,b,c,annex,annexModels,summary:{aProvisionalCustomerSellTHB:1300,bProvisionalCustomerSellTHB:1491},
+const model={a,b,c,annex,annexModels,b13TagPresentation:{rows:[{sourceId:undefined,qty:2,totalTHB:20,tag:"SOURCE TAG",description:"Spare B13",specification:"OEM / MODEL TBC",materials:"METAL"}],tagGroups:[{mr:"MR-0001",system:"Synthetic system",sites:["TEST"],tags:["SOURCE TAG"]}]},summary:{aProvisionalCustomerSellTHB:1300,bProvisionalCustomerSellTHB:1491},
  sourceCoverage:{aOverflow:false,aReady:false}};
 const filename="4-Scope of Supply.xlsx";
 const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZip.byteOffset,inputZip.byteOffset+inputZip.byteLength)};
@@ -103,7 +103,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
  };
  const real=require(path.join(srcRoot,"project0553/data/releaseCommercialModel0553.js")).buildReleaseCommercialModel0553({thbPerUsd:31.5});
  assert.equal(real.annexTraceAudit.totalRows,16);
- const expectedRows=code=>code==="B11"?[]:code.startsWith("B")?real.annex[code]:real.budgetaryOptionAnnex[code].map((x,i)=>({
+ const expectedRows=code=>code==="B11"?[]:code==="B13"?real.annex.B13.map(r=>{const p=real.b13TagPresentation.rows.find(x=>x.sourceId===r.sourceId);return {...r,tagNo:p.tag,description:p.description,specification:p.specification,materials:p.materials};}):code.startsWith("B")?real.annex[code]:real.budgetaryOptionAnnex[code].map((x,i)=>({
   sourceId:x.sourceId||x.historicalSourceId,
   tagNo:code==="C2"?"Two-year operating stock / TAG by OEM":x.tag,
   description:x.description,specification:x.specification,materials:x.materials,
@@ -153,7 +153,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   }
   for(let row=(code==="B11"?7:6+expectedRows(code).length);row<=18;row++)
    for(const col of (code.startsWith("C")?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]))
-    assert.equal(cell(xml,col+row),'<is><t xml:space="preserve"></t></is>',code+" must clear unused "+col+row);
+    if(!(code==="B13"&&row>=10&&row<=15&&["B","C","D","E","F"].includes(col)))assert.equal(cell(xml,col+row),'<is><t xml:space="preserve"></t></is>',code+" must clear unused "+col+row);
   assert(cell(xml,"I19").includes(code==="B11"?"N/A":'<v>'+expectedTotal(code)+'</v>'));
  }
  assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.sourceToReleaseMatched),Array(16).fill(true));
@@ -204,7 +204,13 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
    }
    const oldXml=decoder.decode(a),newXml=decoder.decode(b);
    const structure=xml=>normalizeCells(xml).replace(/<row\b[^>]*>/g,t=>t.replace(/\s(?:ht|customHeight)="[^"]*"/g,'')).replace(/<c\b[^>]*>/g,t=>t.replace(/\ss="[^"]*"/g,''));
-   assert.equal(structure(newXml),structure(oldXml),"Native structural content/merges changed "+before[i].name);
+   if(before[i].name==="xl/worksheets/sheet4.xml"){
+    const refs=xml=>[...xml.matchAll(/<mergeCell\b[^>]*ref="([^"]+)"/g)].map(x=>x[1]);
+    assert(refs(oldXml).every(ref=>refs(newXml).includes(ref)),"B13 preserves original merges");
+    assert.equal(refs(newXml).length,refs(oldXml).length+12,"B13 adds only reference-area merges");
+    const withoutMerges=xml=>structure(xml).replace(/<mergeCells\b[^>]*>[\s\S]*?<\/mergeCells>/,'');
+    assert.equal(withoutMerges(newXml),withoutMerges(oldXml),"B13 preserves non-merge structure");
+   }else assert.equal(structure(newXml),structure(oldXml),"Native structural content/merges changed "+before[i].name);
    const formulas=xml=>xml.match(/<f\b[^>]*>[\s\S]*?<\/f>/g)||[];
    assert.deepEqual(formulas(newXml),formulas(oldXml),'Native formulas preserved');
    const index=Number(before[i].name.match(/sheet(\d+)/)[1]);

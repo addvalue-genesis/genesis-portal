@@ -1,3 +1,5 @@
+import {selectB13TagPresentation0553} from "./data/otherSpareItemizedPresentation0553";
+import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {selectScopeBcPriceAudit0553} from "./data/scopeBcPriceAudit0553";
@@ -33,6 +35,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
  const b10ItemizedEvidence=code==="B10"?selectB10ItemizedPurchaseEvidence0553():null;
  const coverage=["B10","B11","B13","C1","C2"].includes(code)?selectSpareCoverageEngineering0553():null;
  const inWorking=mode==="working";
+ const b13=code==="B13"?selectB13TagPresentation0553():null;
  const moduleId=inWorking?"bid.budget.working.bc."+String(code||"").toLowerCase()+".detail":p?.moduleId;
  if(!p)return <p role="alert">Unsupported customer scope code: {code}</p>;
  if(code==="B10"&&!inWorking)return <section className="p55-panel p553-b10-scope-compact"
@@ -46,6 +49,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
   <div className="p55-eyebrow">{inWorking?"10.2 WORKING COST DETAIL":"10.5 CUSTOMER SCOPE DETAIL"} · PRICE SOURCE AUDIT (THB display)</div>
   {code==="B10"&&inWorking&&<B10StageSpareSelection0553 internal onOpenSource={onOpenSource}/>}
 
+  {b13&&<OtherSpareOriginalAnnex0553 code="B13" currency="THB" model={{rows:{B13:b13.rows},summaries:{B13:b13.summary}}} onOpenSource={onOpenSource}/>}
   {inWorking&&<SparePricedBudgetReview0553 code={code} onOpenSource={onOpenSource} context="working"/>}
   <h3>{p.code} — {p.description}</h3>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/>
@@ -329,8 +333,8 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
    <p className="p55-note"><strong>C1 management-selected BUDGETARY spare option (NONPOSTING):</strong> {thb(spareReconciliation.selectedC1Option.budgetTotalTHB)} · {spareReconciliation.selectedC1Option.source}. Based on historical ORGA USD 75,000 FCA, NOT the installed MGW USD 75,059 equipment quotation. Separate OEM replacement-spare quotation and technical interchangeability with MGW Tideland are PENDING. Not DDP Purchaser's Yard, not a verified direct cost, not posted to Part A/Part B/C1 Customer SELL.</p>
    <p className="p55-note"><strong>Historical Rev08:</strong> {thb(customerSchedule.summary.C1.workingReferenceTHB)} preserved for audit only; no automatic addition to selected C1 option or A+B base.</p>
   </details>}
-  {spareLines.length>0&&<details className="p55-panel" style={{padding:12}} open={!["B11","C1"].includes(code)}>
-   <summary>{code==="B11"?"Withdrawn B11 allowance — audit only / N/A in current offer":code==="C1"?"Earlier source parent — audit only":"Source schedule"}</summary>
+  {spareLines.length>0&&<details className="p55-panel" style={{padding:12}} open={!["B11","B13","C1"].includes(code)}>
+   <summary>{code==="B11"?"Withdrawn B11 allowance — audit only / N/A in current offer":code==="C1"?"Earlier source parent — audit only":code==="B13"?"Original B13 allowance source — audit only":"Source schedule"}</summary>
    <h4>{code==="B11"?"SUPPLIER RECOMMENDATION FOR SPECIAL TOOLS — 供货商推荐的特殊工具":"Customer Schedule — "+shared.descriptions[code]} (PTTEP 2026 First-Principles Working Preview)</h4>
    <p className="p55-note"><strong>Coverage readiness:</strong> {customerSchedule.engineeringReadiness.installedTagInstances} source site-TAG instances / {customerSchedule.engineeringReadiness.criticalTagFunctionGroups} critical TAG families. Confirmed replacement SKU mappings in this model: {customerSchedule.engineeringReadiness.confirmedReplacementSkuGroups}. Verdict: <strong>{customerSchedule.engineeringReadiness.verdict}</strong> — budget price rows exist, but complete Commissioning Spare coverage and major-equipment provision have not yet been demonstrated.</p>
    <p className="p55-note"><strong>วิธีอ่านราคาอะไหล่:</strong> Description = รายการที่จะซื้อและหน้าที่ใช้งาน ·

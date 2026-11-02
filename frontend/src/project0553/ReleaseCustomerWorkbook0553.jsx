@@ -353,10 +353,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
      </p>}
     </>:<>
      {code==="B10"?<B10KitPriceSummary0553 rows={annexLines} total={annexModel?.selectedWorkingTHB} internal={internal} onOpenSource={onOpenSource} variant="release"/>:<>
-     {["C1","C2"].includes(code)&&<OtherSpareOriginalAnnex0553
+     {["B13","C1","C2"].includes(code)&&<OtherSpareOriginalAnnex0553
        code={code} model={optionItemizedUsd} currency="THB" onOpenSource={internal?onOpenSource:null}/>}
-     <details className="p553-spare-lifecycle-sub" open={!["C1","C2"].includes(code)}>
-      <summary>{["C1","C2"].includes(code)?"Previous 10.2 MR Source / Trace (audit only, not priced option offer)":"Original MR-level Source / Trace"}</summary>
+     <details className="p553-spare-lifecycle-sub" open={!["B13","C1","C2"].includes(code)}>
+      <summary>{["B13","C1","C2"].includes(code)?"Previous 10.2 MR Source / Trace (audit only, not priced option offer)":"Original MR-level Source / Trace"}</summary>
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
      <p className="p553-native-warning"><strong>{code} — {annexModel?.priceLabel||"WORKING REFERENCE"}</strong>
       {" "}· รายการจาก 10.2 — <code>bid.budget.working.bc.{code.toLowerCase()}</code>

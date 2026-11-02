@@ -3,6 +3,7 @@
 import {selectSparePricedBudgetReview0553} from "./sparePricedBudgetReview0553";
 import {selectSpareCoverageEngineering0553} from "./spareCoverageEngineering0553";
 import {selectSparesPriceEvidence0553} from "./sparePriceEvidence0553";
+import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
 import EXION from "./quotes/EXION-1260576-R0.current.json";
 import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {selectMGWR2Selected0553} from "./mgwP26058R2Selected0553";
@@ -44,7 +45,7 @@ export function selectC2TagReview0553(){
    "ระบุ Ethernet/PoE surge ต่างจาก RF surge และตรวจ B10; TAG เป็นอุปกรณ์อ้างอิงเท่านั้น"],
   ["RACON distribution box spare",x=>mr4(x)&&x.tag==="TCAB-514-001",["C1-SI-RACON"],
    ref("DB-5P","MDS QTORG2609244","Included in C1 complete RACON scenario; no standalone 2026 replacement rate"),
-   "ตรวจความจำเป็นของ DB-5P แยกจาก C1 รายการ 5; ไม่ใช้ stock ชุดเดียวคิดสองหมวด"],
+   "ขอ OEM ยืนยันเหตุผลและราคา DB-5P สำหรับสองปี; C1 เป็นทางเลือก จึงห้ามหัก C2 อัตโนมัติ และห้ามคิด stock ชุดเดียวซ้ำ"],
   ["Operating fuse spares",x=>lan(x)||cabinet(x),[],
    ref(null,"OEM wiring/BOM required","Parent equipment TAG only; fuse rating and exact protected circuit are unknown"),
    "แยก fuse ตามชนิด/กระแส/แรงดันจาก wiring และตรวจ B10; จำนวน 8 เดิมยังไม่ยืนยัน"],
@@ -73,6 +74,15 @@ export function selectC2TagReview0553(){
    tagRefs:freeze(tags),partReference,c1Refs:freeze(c1Refs),b10Refs:freeze(b10),action,
    quantity:r.quantity,unit:r.unit,unitPriceTHB:r.unitPriceTHB,extendedTHB:r.extendedTHB,
    sourceDocument:r.sourceDocument,sourceId:r.id,quantityApproved:false,
+   suitabilityStatus:i===6?"INDEPENDENT_JUSTIFICATION_REQUIRED":"CONDITIONAL_MAINTENANCE_SPARE_CANDIDATE",
+   suitabilityReason:i===6?"DB-5P is included in the complete RACON/C1 package but has no current independent spare quote or demonstrated two-year failure/maintenance need. Confirm OEM recommendation and distinct stock; do not net against an unpurchased C1 option.":
+    "Function is a plausible maintenance spare; exact OEM compatibility, two-year quantity, current rate and B10 exclusion still require evidence.",
+   rateReconciliation:i===0?freeze({supplier:NEXTG.quoteNumber,
+    sourceLines:freeze(["D-5","D-6","E-5","E-6"]),
+    poeCostUSD:NEXTG.lines.find(x=>x.code==="D-5").unitPrice,
+    cordCostUSD:NEXTG.lines.find(x=>x.code==="D-6").unitPrice,
+    existingC2RateReplaced:false,decision:"Current supplier spare-rate evidence exists; reconcile exact SKU, scope and terms against the historic C2 budget before selecting a new rate."}):null,
+   currentOemSpareRateVerified:false,twoYearQuantityVerified:false,
    tagMappingStatus:"REFERENCE_EQUIPMENT_ONLY__OEM_SKU_AND_POOLING_OPEN",
    stockRemovalApproved:false,postToPricing:false,customerIssueAllowed:false});
  });
@@ -80,5 +90,7 @@ export function selectC2TagReview0553(){
   currentOfferUSD:23000,b10PotentialRows:rows.filter(x=>x.b10Refs.length).length,
   c1PotentialRows:rows.filter(x=>x.c1Refs.length).length,
   tagPolicy:"Reference equipment TAG + site + OEM spare part number; cable endpoints or parent enclosure TAG for untagged parts",
+  independentJustificationRows:freeze(rows.filter(x=>x.suitabilityStatus==="INDEPENDENT_JUSTIFICATION_REQUIRED").map(x=>x.id)),
+  firmPurchaseRecommendationComplete:false,allCurrentOemRatesVerified:false,
   fullSystemCoverageConfirmed:false,postToPricing:false,customerIssueAllowed:false});
 }

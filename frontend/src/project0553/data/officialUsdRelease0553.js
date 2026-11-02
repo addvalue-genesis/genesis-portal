@@ -1,3 +1,4 @@
+import {roundAnnexUnitPrices0553} from "./c1SiTagBudget0553";
 import {buildB10OfficialItemizedAnnex0553} from "./b10OfficialItemizedAnnex0553";
 import {buildOtherSpareItemizedPresentation0553} from "./otherSpareItemizedPresentation0553";
 // Customer presentation derived only from the current 10.3.3 release model.
@@ -102,6 +103,9 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
    specification:specificationById[r.sourceId],materials:"Subject to approved OEM specification",qty:r.qty,
    leadTime:"To be confirmed"})),parent.amountUSD);
  }
+ // Round unit prices at the Official owner; all downstream B13 views/exports
+ // consume these same rows. Original THB source and total USD1500 stay intact.
+ annex.B13=roundAnnexUnitPrices0553(annex.B13.map(x=>({...x,id:x.sourceId,quantity:x.qty,sourceTotalUSD:x.totalUSD})),b.find(x=>x.code==="B13").amountUSD,1,{residualMetric:"squared"});
  const known=[...a,...b].filter(r=>r.amountUSD!==null);
  const document={moduleId:"bid.budget.pricing.official",sourceModuleId:"bid.budget.pricing.release.preview",currency:"USD",
   policy:{...policy},a,b,c,annex,annexTitles,project:"ZAWTIKA DEVELOPMENT PROJECT PHASE 1F",

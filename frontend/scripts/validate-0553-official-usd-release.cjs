@@ -196,6 +196,10 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
      "B10 original total and remark merges must shift one row");
     assert(!xml.includes('<mergeCell ref="B19:H19"'),
      "Native B10 output must add body row 19 without leaving old total");
+   }else if(i===4&&tag==="mergeCells"){
+    const refs=s=>[...s.matchAll(/<mergeCell\b[^>]*ref="([^"]+)"/g)].map(x=>x[1]);
+    assert(refs(old).every(ref=>refs(xml).includes(ref)),"B13 must preserve every original merge");
+    assert.equal(refs(xml).length,refs(old).length+12,"Only B13 unpriced reference-area merges added");
    }else assert.equal(get(xml),get(old),name+' original '+tag);
   }
   assert.deepEqual(xml.match(/<f\b[^>]*>[\s\S]*?<\/f>/g)||[],old.match(/<f\b[^>]*>[\s\S]*?<\/f>/g)||[],name+' original formulas');

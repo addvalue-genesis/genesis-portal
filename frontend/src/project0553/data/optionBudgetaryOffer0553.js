@@ -4,7 +4,7 @@
 // User requested explicitly on 26-Oct-2026: "ต้องให้เสนอราคามาเลย".
 import {selectSparePricedBudgetReview0553} from "./sparePricedBudgetReview0553";
 import {selectMGWR2Selected0553} from "./mgwP26058R2Selected0553";
-import {selectC1SiTagBudget0553} from "./c1SiTagBudget0553";
+import {selectC1SiTagBudget0553,roundAnnexUnitPrices0553} from "./c1SiTagBudget0553";
 const freeze=Object.freeze;
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export const OPTION_BUDGETARY_QUOTE_POLICY_0553=freeze({
@@ -13,6 +13,20 @@ export const OPTION_BUDGETARY_QUOTE_POLICY_0553=freeze({
  authority:"MANAGEMENT_BUDGETARY_OPTION_FOR_PRICE_SUBMISSION",
  incorporatedInBase:false,firmOemOffer:false
 });
+const round4=n=>Math.round((n+Number.EPSILON)*10000)/10000;
+function allocateOptionByWeights(rows,totalUSD){
+ const cents=Math.round(totalUSD*100),weights=rows.map(x=>x.extendedTHB);
+ const base=weights.reduce((s,v)=>s+v,0);
+ if(base<=0||weights.some(x=>!Number.isFinite(x)||x<=0))throw Error("0553 option reference rate unavailable");
+ const raw=weights.map((v,i)=>{const exact=cents*v/base;return {i,cents:Math.floor(exact),frac:exact-Math.floor(exact)};});
+ let remain=cents-raw.reduce((s,x)=>s+x.cents,0);
+ for(const x of [...raw].sort((a,b)=>b.frac-a.frac||a.i-b.i).slice(0,remain))x.cents++;
+ return rows.map((x,i)=>{
+  const total=raw[i].cents/100,unit=round4(total/x.quantity);
+  if(round2(unit*x.quantity)!==total)throw Error("0553 priced C2 Qty×Unit USD rounding mismatch "+x.id);
+  return freeze({...x,qty:x.quantity,unitUSD:unit,totalUSD:total});
+ });
+}
 export function selectOptionBudgetaryOffer0553(){
  const review=selectSparePricedBudgetReview0553();
  const selectedC1=selectC1SiTagBudget0553();
@@ -34,7 +48,7 @@ export function selectOptionBudgetaryOffer0553(){
   const thb=round2(r.thb),usd=Math.ceil(thb/OPTION_BUDGETARY_QUOTE_POLICY_0553.fxTHBPerUSD/
    OPTION_BUDGETARY_QUOTE_POLICY_0553.summaryRoundingUSD-1e-10)*
    OPTION_BUDGETARY_QUOTE_POLICY_0553.summaryRoundingUSD;
-  return [code,freeze({...r,code,sourceSellTHB:thb,
+  const offer={...r,code,sourceSellTHB:thb,
    // A separate offer projection preserves every historical/current source ID.
    // Technical substitution changes the proposal wording, never the source rate.
    rows:code==="C1"?freeze(selectedC1.annexRows.map(x=>freeze({...x,tag:x.tagNo,quantity:x.quantity,
@@ -47,7 +61,7 @@ export function selectOptionBudgetaryOffer0553(){
     specification:code==="C1"?
      "Complete marine RACON spare assembly; independent OEM configuration and CIF quote subject to confirmation.":
      /7\/8-inch RF cable/i.test(x.description)?
-      "1/2-inch, 50-ohm RF feeder to match selected MGW UHF-4 ("+feeder.manufacturer+"); exact OEM SKU, connectors and service length subject to approval. Historical rate retained as budget only.":
+      "1/2-inch, 50-ohm RF feeder to match selected MGW UHF-4 ("+feeder.manufacturer+"); exact OEM SKU, connectors and service length subject to approval.":
       "Two-year operating spare compatible with installed equipment; OEM SKU/quantity and exclusion of B10 identical stock subject to confirmation.",
     technicalSourceId:/7\/8-inch RF cable/i.test(x.description)?feeder.id:null,
     technicalSourceUrl:/7\/8-inch RF cable/i.test(x.description)?feeder.source:null,
@@ -56,7 +70,13 @@ export function selectOptionBudgetaryOffer0553(){
    }))),
    budgetaryQuoteUSD:usd,priceState:"CONDITIONAL_BUDGETARY_OFFER",quotePrepared:true,
    includedInAPlusB:false,customerAccepted:false,supplierOemConfirmed:false,
-   subjectToExclusionAndSubstitution:true,offeredQty:1,unit:"LOT"})];
+   subjectToExclusionAndSubstitution:true,offeredQty:1,unit:"LOT"};
+  if(code==="C2"){
+   const raw=allocateOptionByWeights(offer.rows,usd);
+   offer.rows=roundAnnexUnitPrices0553(raw.map(x=>({...x,sourceTotalUSD:x.totalUSD})),usd,1,{residualMetric:"squared"});
+   offer.unitRoundingUSD=1;offer.rawPriceRows=freeze(raw);
+  }
+  return [code,freeze(offer)];
  }));
  if(offers.C1.sourceSellTHB!==5704650||offers.C2.sourceSellTHB!==721806.6||
   offers.C1.budgetaryQuoteUSD!==181100||offers.C2.budgetaryQuoteUSD!==23000)
