@@ -1,5 +1,11 @@
 # PJ2608-0553 — C1/C2 evidence and quantity control, 2 November 2026
 
+## Corrected quotation obligation — R70
+
+The owner correctly challenged the earlier phrase "optional quotation". Fresh original-document readback confirms BOD §11.1 and SPE §8.1 require priced **both capital and two-year spare lists**, with part numbers and lead times. All four MR §5 require the two-year quotation; their "quotation only" qualifies separate purchaser selection of physical supply, not permission to omit the bid schedule. DTS0001–0004 establish equipment characteristics and do not remove this BOD/SPE obligation. No complete-unit spare quantity is inferred from these clauses.
+
+`c1QuotationRequired=true` and `c2QuotationRequired=true` are now explicit for each MR review. Legacy `c1Mandatory=false` is retained only for the historical **mandatory complete-unit** question and must never be used to decide whether C1 needs to be quoted. The C1/C2 UI states REQUIRED QUOTATION. Individual item-level NOT_RECOMMENDED evidence can be recorded, but an all-excluded scenario cannot produce a complete priced quotation or a zero total; purchaser disposition is required. The lifecycle requirement source now correctly cites BOD/SPE for capital spares, rather than MR Attachment7 (which concerns two-year spares). Current C1/C2 conditional quoted amounts and the financial/export sources remain unchanged and do not prove schedule completeness.
+
 The owner's customer asked why the offered C1 included a complete RACON spare but no comparable capital-spare treatment for SCADA, L3 switch, BDA, IP phone or sounder. The owner instructed review of original BOD, DTS, SPE and STD and then implementation of the existing quantity controls for C1/C2 only. This change connects the existing installed-source coverage to a nonposting engineering review. It does not reprice the offer or create new business modules.
 
 ## Requirements read

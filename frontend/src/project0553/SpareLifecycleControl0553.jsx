@@ -6,8 +6,8 @@ const titles={
  B10:"Erection / Pre-commissioning / Commissioning / Start-up spares",
  B11:"Operation & Maintenance Special Tools",
  B13:"Preservation / Commissioning Consumables",
- C1:"Capital Spares — optional quotation",
- C2:"Two-year Operating Spares — optional quotation"
+ C1:"Capital Spares — required quotation; purchase selected separately",
+ C2:"Two-year Operating Spares — required quotation; purchase selected separately"
 };
 export function SpareLifecycleControl0553({
  model,view="working",onOpenSource=null,onOpenReleaseRow=null

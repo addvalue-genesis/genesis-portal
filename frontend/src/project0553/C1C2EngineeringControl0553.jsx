@@ -2,7 +2,7 @@ import React,{useMemo} from "react";
 import {selectC1C2EngineeringControl0553} from "./data/c1c2EngineeringControl0553";
 
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"OPEN — ยังไม่มีข้อมูลยืนยัน";
-const labels={CLASSIFICATION_DECISION:"เลือก C1/C2 หรือไม่เสนอ",CLASSIFICATION_REASON_AND_SOURCE:"เหตุผลและข้อกำหนดอ้างอิง",
+const labels={CLASSIFICATION_DECISION:"การแนะนำอะไหล่รายรายการ",CLASSIFICATION_REASON_AND_SOURCE:"เหตุผลและข้อกำหนดอ้างอิงรายรายการ",
  INSTALLED_PHYSICAL_COUNT:"จำนวนติดตั้ง",INSTALLED_CONFIGURATION_VERIFIED:"รุ่นและจำนวนติดตั้งที่ใช้ฐานเดียวกัน",
  OEM_PART_NUMBER_AND_SOURCE:"OEM Part No. และหลักฐาน",EX_RATING_VARIANT_AND_INTERCHANGEABILITY:"รุ่น/Ex/การใช้แทนกัน",
  STOCK_LOCATION_AND_POOLING_POLICY:"สถานที่เก็บและการใช้ stock ร่วมกัน",INDEPENDENT_PHYSICAL_STOCK_OWNER:"เจ้าของ stock แยกจากของติดตั้ง",
@@ -19,6 +19,10 @@ export function C1C2EngineeringControl0553({code,onOpenSource=null,open=true}){
    data-c1c2-engineering-control={code}>
   <summary><strong>{code} — ตรวจครบทุกระบบ / Quantity & Price Control</strong>
    <small>{item.openCount}/{item.totalFamilies} equipment families OPEN · งบเดิม USD {money(item.currentOfferUSD)} · ไม่ใช่หลักฐานครบทุกระบบ</small></summary>
+  <p className="p55-note" data-c1c2-quotation-obligation="REQUIRED"><strong>ต้องจัดทำรายการและเสนอราคา {code} — REQUIRED QUOTATION.</strong>
+   {" "}{item.quotationRequirementSource}. คำว่า quotation only / Part C option หมายถึงเสนอราคาแยกให้ลูกค้าเลือกสั่งซื้อ
+   ไม่ใช่เลือกว่าจะจัดทำ C1/C2 หรือไม่ ข้อมูล OPEN คือรายการเสนอราคาที่ยังทำไม่ครบ
+   {" "}การไม่แนะนำอะไหล่รายชิ้นต้องมีเหตุผลและหลักฐาน และไม่ยกเว้นหน้าที่จัดทำรายการเสนอราคาทั้งหมวด</p>
   <p className="p55-note"><strong>INTERNAL ENGINEERING REVIEW — NOT AN ADDITIONAL OFFER.</strong>
    {" "}ตารางนี้ตรวจ SCADA, L3 switch, BDA, IP phone, sounder และ RACON จาก Source เดิม
    โดยยังไม่กำหนดอะไหล่หนึ่งเครื่องต่อระบบหรือรวมจำนวนข้ามสถานที่เอง

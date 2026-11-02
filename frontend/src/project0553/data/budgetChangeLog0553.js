@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-02-R69";
+export const CHANGE_LOG_VERSION_0553="2026-11-02-R70";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261102-02",date:"2026-11-02",kind:"ENGINEERING",tone:"caution",
+  title:"C1/C2 quotations are required; separate purchaser selection concerns physical supply",
+  detail:"Re-read original BOD Rev.C2 section11.1, SPE Rev.C2 section8.1, all four MR Rev.C1 and DTS0001–0004. BOD/SPE require priced capital/two-year spare lists with part numbers and lead times. MR quotation only does not permit omission. Added explicit C1 quotation-required flag alongside existing C2 flag, retaining unknown complete-unit quantities and no automatic base supply. Existing C1/C2 panels now distinguish REQUIRED QUOTATION from purchaser-selected Part C delivery. Individual sourced exclusions cannot turn both required schedules into a complete zero-price scenario. Corrected lifecycle C1 source to BOD/SPE; no financial source/annex prices, quantities, FX, modules or customer-issue authority changed.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.c1","bid.budget.working.bc.c2","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner02-Nov2026: BOD/MR/DTS/SPE require both C1 and C2; recheck obligation"}),
  Object.freeze({id:"P553-CHANGE-20261102-01",date:"2026-11-02",kind:"ENGINEERING",tone:"caution",
   title:"C1/C2 all-system evidence and quantity review linked to existing equations",
   detail:"C1/C2 now show all applicable installed-source families across four MR: SCADA radio/IDU, L3 switch, BDA, Ex phone/sounder and RACON. Existing MAP-02/06/07/08 and SPQ-002 are reused in a nonposting evidence adapter; missing OEM part/quantity/rate, configuration, Ex/interchangeability, stock-policy, B10 reconciliation, delivery or lead-time proof remains OPEN. C2 reliability horizon is two years; an assumed SPQ-001 commissioning unit or design MTBF cannot silently become an accepted C1/C2 quantity. Original BOD/SPE/STD and four MR clauses are linked. Current one-line C1 RACON comparator USD97500 and twelve-line C2 historical USD23000 remain separate from the unpriced all-system review, excluded A+B. C1/C2 shared physical stock and manufacturer/part-identical B10 duplicates block review pricing. The review appears in existing Working C1/C2 and below the selected Official C1/C2 sheet, outside the native customer worksheet; Excel exports and all source/annex/financial module IDs and prices unchanged.",

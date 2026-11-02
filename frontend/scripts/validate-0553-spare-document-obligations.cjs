@@ -23,6 +23,8 @@ assert(d.brownfieldRows.every(x=>x.commissioningKitQuantity===null&&x.commercial
 assert.equal(d.totals.specialToolMrPhaseRequirements,4);
 assert(d.rows.every(x=>x.commissioningKitContents===null&&!x.c1Mandatory&&x.c1CompleteEquipmentRequiredQuantity===null));
 assert(d.rows.every(x=>x.c2QuotationRequired&&!x.c2MandatoryEquipmentDelivery&&x.specialToolPhaseSets===1));
+assert(d.rows.every(x=>x.c1QuotationRequired&&!x.c1MandatoryEquipmentDelivery&&x.c1QuotationSource.includes('SPE')));
+assert(SPARE_DOCUMENT_METHOD_0553.categoryPolicy.C1.startsWith('Required priced'));
 assert.equal(SPARE_DOCUMENT_METHOD_0553.noAssumedSparePartQuantity,true);
 assert.equal(d.contractSpareContentComplete,false);
 assert.equal(d.pricePostingAllowed,false);

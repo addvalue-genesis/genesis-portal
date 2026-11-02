@@ -13,6 +13,9 @@ assert(model.existingEquationIds.includes('SPQ-002')&&model.existingEquationIds.
 for(const code of ['C1','C2']){
  const c=model.codes[code];
  assert.equal(c.openCount,c.totalFamilies);assert.equal(c.evidencedReviewSellTHB,null);
+ assert.equal(c.quotationRequired,true);assert.equal(c.quotationReviewComplete,false);
+ assert.equal(c.status,'REQUIRED_QUOTATION_INCOMPLETE');
+ assert.equal(c.physicalSupplyInBase,false);assert.equal(c.purchaseSelectionRequired,true);
  assert.equal(c.evidencedReviewQuoteUSD,null);assert.equal(c.quantityReviewComplete,false);
  assert.equal(c.offerIsFullCoverageProof,false);assert.equal(c.postToPricing,false);
  assert.equal(c.currentOfferUSD,code==='C1'?97500:23000);
@@ -76,6 +79,15 @@ const exclusion=evaluate({code:'C1',installedCount:null,evidence:{decision:'NOT_
 assert.equal(exclusion.status,'EXCLUSION_FOR_REVIEW');assert.equal(exclusion.reviewQuantity,0);
 assert.equal(exclusion.reviewSellTHB,null,'A sourced exclusion is not a zero-price offer');
 assert.equal(evaluate({code:'C1',evidence:{decision:'NOT_RECOMMENDED'}}).status,'OPEN_INPUT');
+const excludedInputs={};
+for(const code of ['C1','C2'])for(const row of model.codes[code].rows)
+ excludedInputs[row.key]={decision:'NOT_RECOMMENDED',reason:'Synthetic individual exclusion only',classificationEvidence:'test OEM source'};
+const allExcluded=select({inputs:excludedInputs});
+for(const c of Object.values(allExcluded.codes)){
+ assert.equal(c.quotationRequired,true);assert.equal(c.quotationReviewComplete,false);
+ assert.equal(c.evidencedReviewSellTHB,null);assert.equal(c.evidencedReviewQuoteUSD,null);
+ assert.equal(c.status,'NO_RECOMMENDED_ITEMS__PURCHASER_DISPOSITION_REQUIRED');
+}
 
 const inputs={};
 for(const code of ['C1','C2'])for(const row of model.codes[code].rows)
@@ -103,6 +115,7 @@ for(const code of ['C1','C2']){
  assert.equal((html.match(/data-c1c2-family=/g)||[]).length,model.codes[code].totalFamilies);
  for(const label of ['SCADA','L3 network switch','BDA','IP phone','sounder','RACON','SPQ-002','Current price Source'])assert(html.includes(label));
  assert(html.includes('NOT AN ADDITIONAL OFFER')&&html.includes('OPEN_INPUT'));
+ assert(html.includes('REQUIRED QUOTATION')&&html.includes('data-c1c2-quotation-obligation="REQUIRED"'));
  assert(!html.includes('data-component-key='),'Reuse existing parent module IDs; no new business anchor');
  const working=renderToStaticMarkup(React.createElement(SparePricedBudgetReview0553,{code}));
  assert(working.includes('data-c1c2-engineering-control="'+code+'"'));

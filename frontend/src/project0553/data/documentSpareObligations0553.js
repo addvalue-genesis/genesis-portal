@@ -25,8 +25,8 @@ export const SPARE_DOCUMENT_METHOD_0553=Object.freeze({
   B10:"1 documented spare KIT per platform per MR; physical contents remain independently specified",
   B11:"1 special tool SET per phase per MR; common tools pooled only when explicitly compatible",
   B13:"Use document/OEM preservation and maintenance activity; not automatically 1 kit per platform",
-  C1:"Optional capital spare quote, never infer one complete equipment spare from installed-set count",
-  C2:"2-year recommended operation spares quotation only, no automatic physical supply in base"
+  C1:"Required priced capital-spare list under BOD §11.1 / SPE §8.1; purchaser selects supply separately; no inferred complete-unit quantity",
+  C2:"Required priced two-year operating-spare list; quotation-only means separate purchase selection, not permission to omit the list"
  },
  control:"SPQ-001 risk scenario may flag a gap; it must never create mandatory spare BOM quantity."
 });
@@ -54,8 +54,13 @@ export function selectDocumentSpareObligations0553(){
   commissioningKitContents:null,commissioningKitContentsState:"DOCUMENT_AND_OEM_PART_LIST_REQUIRED",
   specialToolPhaseSets:1,specialToolUnit:"set/phase",
   specialToolEquation:"MR §5: 1 tool set per phase per MR; shared scope requires explicit compatibility proof",
+  // Legacy c1Mandatory describes a mandatory COMPLETE UNIT, not whether the
+  // capital-spare quotation must be submitted. Quote obligations are explicit.
   c1CompleteEquipmentRequiredQuantity:null,c1Mandatory:false,
+  c1QuotationRequired:true,c1MandatoryEquipmentDelivery:false,
+  c1QuotationSource:"BOD Rev.C2 §11.1 / SPE Rev.C2 §8.1",
   c2QuotationRequired:true,c2MandatoryEquipmentDelivery:false,
+  c2QuotationSource:"BOD Rev.C2 §11.1 / SPE Rev.C2 §8.1 / MR Rev.C1 §5 and Attachment 7",
   minimumProof:"MR Rev.C1 §5 + SPE §8.1 + EXA-A8 applicability; no inferred spare SKU",
   customerReleaseAllowed:false
  }));

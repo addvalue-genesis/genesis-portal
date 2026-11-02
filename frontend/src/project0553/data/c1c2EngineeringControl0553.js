@@ -4,6 +4,7 @@ import {selectSpareCoverageEngineering0553} from "./spareCoverageEngineering0553
 import {deriveSpareReliabilityDemand0553} from "./spareRiskQuantity0553";
 import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 import {selectSparesPriceEvidence0553} from "./sparePriceEvidence0553";
+import {selectDocumentSpareObligations0553} from "./documentSpareObligations0553";
 
 const freeze=Object.freeze;
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
@@ -115,6 +116,7 @@ export function evaluateC1C2Candidate0553({code,installedCount,evidence={},
 
 export function selectC1C2EngineeringControl0553({inputs={},b10Stock=[],b10StockVerified=false}={}){
  const coverage=selectSpareCoverageEngineering0553(),offer=selectOptionBudgetaryOffer0553();
+ const obligations=selectDocumentSpareObligations0553();
  const priceEvidence=selectSparesPriceEvidence0553();
  const families=new Map();
  for(const g of coverage.groups){
@@ -153,14 +155,22 @@ export function selectC1C2EngineeringControl0553({inputs={},b10Stock=[],b10Stock
   const rows=byCode[code],selected=offer.offers[code];
   const open=rows.filter(x=>x.assessment.status==="OPEN_INPUT");
   const complete=open.length===0;
-  const sum=complete?round(rows.reduce((n,x)=>n+(x.assessment.reviewSellTHB??0),0)):null;
+  const quotationRequired=obligations.rows.every(x=>x[code.toLowerCase()+"QuotationRequired"]===true);
+  if(!quotationRequired)throw Error("BOD/SPE required C1/C2 quotation obligation missing "+code);
+  const pricedRecommendationCount=rows.filter(x=>x.assessment.status==="EVIDENCED_SCENARIO_FOR_REVIEW"&&x.assessment.reviewQuantity>0).length;
+  const quotationReviewComplete=complete&&pricedRecommendationCount>0;
+  const sum=quotationReviewComplete?round(rows.reduce((n,x)=>n+(x.assessment.reviewSellTHB??0),0)):null;
   return [code,freeze({code,rows,openCount:open.length,totalFamilies:rows.length,
+   quotationRequired,quotationRequirementSource:code==="C1"?obligations.rows[0].c1QuotationSource:obligations.rows[0].c2QuotationSource,
+   physicalSupplyInBase:false,purchaseSelectionRequired:true,
+   quotationReviewComplete,pricedRecommendationCount,
    currentOfferUSD:selected.budgetaryQuoteUSD,currentOfferTHB:selected.sourceSellTHB,
    offerSourceId:selected.sourceId,offerSourceModuleId:selected.sourceModuleId,
    currentOfferLines:selected.rows.length,quantityReviewComplete:complete,
    evidencedReviewSellTHB:sum,
    evidencedReviewQuoteUSD:sum===null?null:Math.ceil(sum/offer.policy.fxTHBPerUSD/offer.policy.summaryRoundingUSD-1e-10)*offer.policy.summaryRoundingUSD,
-   status:complete?"SCENARIO_REVIEW_ONLY":"INCOMPLETE_SYSTEM_COVERAGE",
+   status:quotationReviewComplete?"SCENARIO_REVIEW_ONLY":complete?
+    "NO_RECOMMENDED_ITEMS__PURCHASER_DISPOSITION_REQUIRED":"REQUIRED_QUOTATION_INCOMPLETE",
    currentPriceBasis:code==="C1"?"USD75,000 installed FCA comparator × 1.30 × 1 selected scenario unit = USD97,500":
     "12 historic Qty × SELL rates = THB721,806.60 ÷ 31.50; round total upward once to USD100 = USD23,000",
    offerIsFullCoverageProof:false,postToPricing:false,customerReleaseAllowed:false})];
