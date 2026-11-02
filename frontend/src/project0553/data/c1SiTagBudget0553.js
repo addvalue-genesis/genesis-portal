@@ -12,6 +12,33 @@ import {OPTION_BUDGETARY_QUOTE_POLICY_0553} from "./optionBudgetaryOffer0553";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const freeze=Object.freeze;
 const identity=x=>JSON.stringify([x.mr,x.site,String(x.id)]);
+// Preview allocation only: source cost/SELL and the once-rounded category
+// target remain unchanged. Whole USD100 unit prices must multiply exactly by
+// quantity; any residual is reconciled on Qty1 rows, never hidden in a false
+// line amount or posted back to the financial source.
+export function roundC1AnnexUnits0553(rows,targetUSD,incrementUSD=100){
+ if(!Number.isSafeInteger(incrementUSD)||incrementUSD<=0||!Number.isSafeInteger(targetUSD)||targetUSD<0||targetUSD%incrementUSD!==0||!rows.length)
+  throw Error("Invalid C1 unit-rounding target/increment");
+ const rounded=rows.map(r=>{
+  if(!Number.isSafeInteger(r.quantity)||r.quantity<=0||!Number.isFinite(r.sourceTotalUSD)||r.sourceTotalUSD<0)
+   throw Error("Invalid C1 unit-rounding source "+r.id);
+  const sourceUnitUSD=round(r.sourceTotalUSD/r.quantity);
+  return {...r,sourceUnitUSD,unitUSD:Math.round(sourceUnitUSD/incrementUSD)*incrementUSD};
+ });
+ let residual=targetUSD-rounded.reduce((n,r)=>n+r.quantity*r.unitUSD,0),steps=0;
+ while(residual!==0){
+  if(++steps>1000)throw Error("C1 rounding residual outside presentation bound");
+  const sign=Math.sign(residual);
+  const candidates=rounded.map((r,index)=>({r,index})).filter(({r})=>r.quantity===1&&r.unitUSD+sign*incrementUSD>=0)
+   .map(({r,index})=>({index,errorIncrease:Math.abs(r.unitUSD+sign*incrementUSD-r.sourceTotalUSD)-Math.abs(r.unitUSD-r.sourceTotalUSD)}))
+   .sort((a,b)=>a.errorIncrease-b.errorIncrease||a.index-b.index);
+  if(!candidates.length)throw Error("C1 target cannot reconcile with whole-unit prices; quantity-one adjustment required");
+  rounded[candidates[0].index].unitUSD+=sign*incrementUSD;
+  residual-=sign*incrementUSD;
+ }
+ return freeze(rounded.map(r=>freeze({...r,totalUSD:r.quantity*r.unitUSD,
+  roundingAdjustmentUSD:round(r.quantity*r.unitUSD-r.sourceTotalUSD)})));
+}
 // Customer-style wording is a view of the existing six budget rows, not a
 // second spare ledger. Reference equipment TAGs are not new spare asset TAGs.
 const annexText=freeze({
@@ -112,21 +139,23 @@ export function selectC1SiTagBudget0553(){
  const budgetSellTHB=priceAorCFromCost0553(equipmentCostTHB).customerSellTHB;
  const proposedQuoteUSD=Math.ceil(budgetSellTHB/fx/OPTION_BUDGETARY_QUOTE_POLICY_0553.summaryRoundingUSD-1e-10)*OPTION_BUDGETARY_QUOTE_POLICY_0553.summaryRoundingUSD;
  const priorQuotedUSD=97500;
- const annexRows=freeze(rows.map(r=>{
+ const rawAnnexRows=rows.map(r=>{
   const text=annexText[r.id];if(!text)throw Error("Missing C1 Annex wording "+r.id);
-  const totalUSD=round(r.budgetSellTHB/fx),unitUSD=round(totalUSD/r.quantity);
-  if(round(unitUSD*r.quantity)!==totalUSD)throw Error("C1 Annex displayed Qty x Unit mismatch "+r.id);
-  return freeze({id:r.id,item:text[0],tagNo:r.left.map(x=>x.tag+" / "+x.site).join("; "),
+  return {id:r.id,item:text[0],tagNo:r.left.map(x=>x.tag+" / "+x.site).join("; "),
    referenceTagKeys:freeze(r.left.map(x=>x.key)),description:text[1],specification:text[2],materials:text[3],
-   quantity:r.quantity,unit:r.unit,unitUSD,totalUSD,sourceRowId:r.id,
-   referenceTagOnly:true,quantityApproved:false,customerIssueAllowed:false});
- }));
+   quantity:r.quantity,unit:r.unit,sourceTotalUSD:round(r.budgetSellTHB/fx),sourceRowId:r.id,
+   referenceTagOnly:true,quantityApproved:false,customerIssueAllowed:false};
+ });
+ const annexSourceSubtotalUSD=round(rawAnnexRows.reduce((n,r)=>n+r.sourceTotalUSD,0));
+ const annexRows=roundC1AnnexUnits0553(rawAnnexRows,proposedQuoteUSD);
  const annexSubtotalUSD=round(annexRows.reduce((n,r)=>n+r.totalUSD,0));
  return freeze({rows:freeze(rows),groups:freeze([1,2,3,4,5].map(group=>freeze({group,title:rows.find(r=>r.group===group).groupTitle,
   equipmentCostTHB:round(rows.filter(r=>r.group===group).reduce((n,r)=>n+r.equipmentCostTHB,0)),
   rows:freeze(rows.filter(r=>r.group===group))}))),
   equipmentCostTHB,budgetSellTHB,proposedQuoteUSD,priorQuotedUSD,deltaUSD:proposedQuoteUSD-priorQuotedUSD,
-  annexRows,annexSubtotalUSD,annexRoundingUSD:round(proposedQuoteUSD-annexSubtotalUSD),
+  annexRows,annexSubtotalUSD,annexSourceSubtotalUSD,
+  annexRoundingUSD:round(proposedQuoteUSD-annexSourceSubtotalUSD),
+  annexUnallocatedRoundingUSD:round(proposedQuoteUSD-annexSubtotalUSD),annexUnitIncrementUSD:100,
   fxTHBPerUSD:fx,priceFactor:RELEASE_POLICY_0553.aAndC.priceFactor,
   rowRoundingResidualTHB:round(budgetSellTHB-rows.reduce((n,r)=>n+r.budgetSellTHB,0)),
   openSourceLines:freeze(["D-4","E-4"].map(code=>{const q=NEXTG.lines.find(x=>x.code===code);return freeze({code,partNo:q.partNumber,unitPrice:q.unitPrice,reason:"Dash is unpriced, not a verified zero. Region entitlement needs confirmation."});})),

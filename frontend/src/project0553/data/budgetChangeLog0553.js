@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-02-R73";
+export const CHANGE_LOG_VERSION_0553="2026-11-02-R74";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261102-06",date:"2026-11-02",kind:"UI",tone:"neutral",
+  title:"C1 preview rounds unit prices to whole USD100 and reconciles the unchanged category total",
+  detail:"Owner screenshot showed fractional C1 row rates because only the category had been rounded. The preview now rounds unit prices to nearestUSD100 and reconciles any residual on Qty1 rows without altering source quantities or costs. Items1.1/1.2/2/3/4/5 show unitUSD16500/9100/900/15300/40900/97500; PoE Qty2 amount1800; sumUSD181100. Source subtotal181076.87 and net allocation23.13 stay in a collapsed row-level audit, not an added rounding line. Every displayed Qty×Unit equals amount and the displayed rows sum to the category. RACON item5, C2, current Official C1USD97500/native Excel, A+BUSD902900, source FX/1.30 factor and all identifiers remain unchanged. Invalid/nonreconcilable quantities/targets fail explicitly. No new module or financial selection.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.c1","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner02-Nov2026 screenshot: ทำไมไม่ปัดเศษ — apply whole-unit-price rounding in C1 preview"}),
  Object.freeze({id:"P553-CHANGE-20261102-05",date:"2026-11-02",kind:"UI",tone:"caution",
   title:"C1 eight-column TAG preview retains RACON item5; C2 parent-TAG and stock review",
   detail:"Owner requests preview of latest C1 items1.1/1.2/2/3/4/5 in original Item/Tag/Description/Detail Specification/Materials/QTY/UnitUSD/TotalUSD layout. Six rows reuse existing exact MR/site/TAG and calculation identities; no invented spare asset TAG. Item5 RACON stays USD97500, C1 subtotalUSD181076.87 plus explicitly displayed once-only roundingUSD23.13 gives proposed181100. C1 preview now precedes the separately labelled current selected97500 original Excel source; no native/customer price selection. C2 review retains twelve historical IDs/rates/quantities, shows exact parent or endpoint Site/TAG candidates and OEM parts where evidenced, and flags seven B10 plus three C1 potential overlaps without automatic removal. Selected EXION -510 phone/sounder and MGW1/2-inch feeder references are distinguished from historical rates/7/8-inch source. Fuse/gland/cable stock gets no fabricated equipment TAG; shared compatibility and two-year quantities remain open. No new business module, cost/quantity/FX/margin posting or customer issue.",

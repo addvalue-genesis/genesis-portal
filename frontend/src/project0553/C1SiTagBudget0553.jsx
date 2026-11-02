@@ -24,14 +24,22 @@ export function C1SiTagBudget0553(){
      <td>{r.item}</td><td>{r.tagNo}</td><td>{r.description}</td><td>{r.specification}</td><td>{r.materials}</td>
      <td>{r.quantity} {r.unit}{r.quantity>1?"s":""}</td><td className="p553-price-cell">{money(r.unitUSD)}</td><td className="p553-price-cell">{money(r.totalUSD)}</td>
     </tr>)}</tbody>
-    <tfoot><tr><th colSpan={7}>ITEM SUBTOTAL (USD)</th><th>{money(model.annexSubtotalUSD)}</th></tr>
-     <tr><th colSpan={7}>CATEGORY ROUNDING (USD)</th><th>{money(model.annexRoundingUSD)}</th></tr>
-     <tr><th colSpan={7}>C1 PROPOSED BUDGET (USD)</th><th>{money(model.proposedQuoteUSD)}</th></tr></tfoot>
+    <tfoot><tr><th colSpan={7}>TOTAL C1 PROPOSED BUDGET (USD)</th><th>{money(model.proposedQuoteUSD)}</th></tr></tfoot>
    </table></div>
+   <p className="p55-note">Unit prices rounded to USD {model.annexUnitIncrementUSD}; Qty × Unit = Total on every row.
+    {" "}Rounded rows reconcile to the category total; no additional rounding charge.</p>
    <p className="p55-note">Item 5 retained. MDS field/interconnection cables, cable glands and FAT are excluded;
     {" "}ADDVALUE supplies/executes through field bulk and B3. Applicability and existing budget coverage must be reconciled before any additional charge.</p>
   </div>
   <details><summary>Source → TAG → SI calculation / ฐานต้นทุนและการตรวจย้อนกลับ</summary>
+  <p className="p55-note">ก่อนปัด USD {money(model.annexSourceSubtotalUSD)} → ยอดหมวด USD {money(model.proposedQuoteUSD)}
+   {" "}· ส่วนต่าง USD {money(model.annexRoundingUSD)} กระจายในราคาย่อยแล้ว ไม่บวกซ้ำท้ายตาราง
+   {" "}· ส่วนต่างที่ยังไม่กระจาย USD {money(model.annexUnallocatedRoundingUSD)}</p>
+  <div className="p55-table-wrap"><table className="p55-table p55-table--compact" data-c1-rounding-audit="USD100_UNIT">
+   <thead><tr><th>Item</th><th>Source unit USD</th><th>Source amount USD</th><th>Rounded unit USD</th><th>Rounded amount USD</th><th>Adjustment USD</th></tr></thead>
+   <tbody>{model.annexRows.map(r=><tr key={r.id}><td>{r.item}</td><td>{money(r.sourceUnitUSD)}</td><td>{money(r.sourceTotalUSD)}</td>
+    <td>{money(r.unitUSD)}</td><td>{money(r.totalUSD)}</td><td>{money(r.roundingAdjustmentUSD)}</td></tr>)}</tbody>
+  </table></div>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>กลุ่ม / รายการสำรอง</th><th>ซ้าย — MR / TAG ที่ต้องรองรับ</th><th>ขวา — ราคาอ้างอิง</th><th>จำนวนสำรอง</th><th>ต้นทุนฐานงบ</th><th>SELL ฐานงบ THB</th><th>SI decision</th></tr></thead>
    <tbody>{model.rows.map(r=><tr key={r.id} data-c1-si-audit-row={r.id}>

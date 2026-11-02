@@ -10,16 +10,20 @@ const build=()=>{
 const before=JSON.stringify(build());
 const c1=from('data/c1SiTagBudget0553').selectC1SiTagBudget0553();
 assert.deepEqual(c1.annexRows.map(x=>x.item),['1.1','1.2','2','3','4','5']);
-assert.deepEqual(c1.annexRows.map(x=>x.unitUSD),[16503.84,9076.48,872.65,15335.05,40916.20,97500]);
+assert.deepEqual(c1.annexRows.map(x=>x.unitUSD),[16500,9100,900,15300,40900,97500]);
 assert.deepEqual(c1.annexRows.map(x=>x.quantity),[1,1,2,1,1,1]);
-assert.equal(c1.annexSubtotalUSD,181076.87);assert.equal(c1.annexRoundingUSD,23.13);
-assert.equal(Math.round((c1.annexSubtotalUSD+c1.annexRoundingUSD)*100),c1.proposedQuoteUSD*100);
+assert.equal(c1.annexSourceSubtotalUSD,181076.87);assert.equal(c1.annexRoundingUSD,23.13);
+assert.equal(c1.annexSubtotalUSD,181100);assert.equal(c1.annexUnallocatedRoundingUSD,0);
+assert.equal(Math.round((c1.annexSourceSubtotalUSD+c1.annexRoundingUSD)*100),c1.proposedQuoteUSD*100);
+assert.deepEqual(c1.annexRows.map(x=>x.roundingAdjustmentUSD),[-3.84,23.52,54.7,-35.05,-16.2,0]);
+assert.equal(Math.round(c1.annexRows.reduce((n,r)=>n+r.roundingAdjustmentUSD,0)*100),2313);
 assert.equal(c1.proposedQuoteUSD,181100);
 const sourceRows=new Map(c1.rows.map(x=>[x.id,x]));
 for(const r of c1.annexRows){
  const src=sourceRows.get(r.sourceRowId);assert(src);
  assert.deepEqual(r.referenceTagKeys,src.left.map(x=>x.key));
  assert.equal(r.referenceTagOnly,true);assert.equal(r.quantityApproved,false);
+ assert.equal(r.unitUSD%100,0);assert.equal(r.totalUSD%100,0);
  assert.equal(Math.round(r.quantity*r.unitUSD*100),Math.round(r.totalUSD*100));
 }
 assert(c1.annexRows.find(x=>x.item==='2').tagNo.includes('MR-502-003A / ZWP8'));
@@ -58,6 +62,19 @@ const preview=c1html.match(/data-c1-annex-preview="DRAFT"[\s\S]*?<thead>([\s\S]*
 assert(preview);assert.equal((preview[1].match(/<th>/g)||[]).length,8);
 assert.equal((c1html.match(/data-c1-si-price-row=/g)||[]).length,6);
 assert(c1html.includes('181,076.87')&&c1html.includes('23.13')&&c1html.includes('97,500.00'));
+const nativeTable=c1html.match(/data-c1-annex-preview="DRAFT"[\s\S]*?<\/table>/)[0];
+assert(!nativeTable.includes('CATEGORY ROUNDING'),'Rounding is already in rows, never an extra charge');
+assert(!nativeTable.includes('16,503.84')&&!nativeTable.includes('872.65'),'Raw fractional unit rates stay in audit only');
+assert(nativeTable.includes('16,500.00')&&nativeTable.includes('1,800.00'));
+const {roundC1AnnexUnits0553:allocate}=from('data/c1SiTagBudget0553');
+const sample=Object.freeze([Object.freeze({id:'two',quantity:2,sourceTotalUSD:1750}),Object.freeze({id:'one',quantity:1,sourceTotalUSD:1550})]);
+const sampleBefore=JSON.stringify(sample),adjusted=allocate(sample,3300);
+assert.equal(JSON.stringify(sample),sampleBefore);
+assert.deepEqual(adjusted.map(x=>x.unitUSD),[900,1500]);
+assert.equal(adjusted.reduce((n,r)=>n+r.quantity*r.unitUSD,0),3300);
+assert.throws(()=>allocate([{id:'two',quantity:2,sourceTotalUSD:700}],700),/cannot reconcile/);
+assert.throws(()=>allocate(sample,3301),/target/);
+assert.throws(()=>allocate([{id:'bad',quantity:0,sourceTotalUSD:100}],100),/source/);
 assert(c1html.includes('data-c1-si-audit-row='),'Original source audit retained behind details');
 const c2html=renderToStaticMarkup(React.createElement(from('C2TagReview0553.jsx').C2TagReview0553));
 assert.equal((c2html.match(/data-c2-tag-row=/g)||[]).length,12);
@@ -71,4 +88,4 @@ const selectedC2=build().official.otherSpareItemizedAnnex.rows.C2;
 assert.equal(Math.round(selectedC2.reduce((n,r)=>n+r.totalUSD,0)*100),2300000,
  'Largest-remainder allocation must reconcile exactly to the selected USD23000 category');
 for(const r of selectedC2)assert.equal(Math.round(r.qty*r.unitUSD*100),Math.round(r.totalUSD*100));
-console.log('PASS spare TAG preview: eight C1 columns/six stable rows including item5; exact source TAGs and Qty×Unit; USD23.13 once-rounded; C2 twelve identities/parent or endpoint TAGs, seven B10 and three C1 reviews, selected EXION/feeder references, no price or stock posting.');
+console.log('PASS spare TAG preview: six C1 whole-USD100 unit prices, Qty×Unit and USD181100 total; USD23.13 distributed once with unchanged raw costs, item5 and sources; residual/invalid-input guards; C2 identities/part/stock review and original prices unchanged.');
