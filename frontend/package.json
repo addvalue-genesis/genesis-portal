@@ -161,6 +161,7 @@
     "validate:pj0550-working-preview": "node scripts/validate-pj2608-0550-working-preview.cjs",
     "validate:pj0550-supply-proposal-draft": "node scripts/validate-pj2608-0550-supply-proposal-draft.cjs",
     "validate:pj0550-supply-proposal-draft-browser": "node scripts/validate-pj2608-0550-supply-proposal-draft-browser.cjs",
+    "validate:pj0550-schedule-diagnostics": "node scripts/validate-pj2608-0550-schedule-diagnostics.cjs",
     "validate:pj0550-evidence-pass": "node scripts/validate-pj2608-0550-evidence-pass.cjs",
     "build:portal": "webpack --mode production",
     "validate:project-hub-browser": "node scripts/validate-project-hub-browser.cjs",

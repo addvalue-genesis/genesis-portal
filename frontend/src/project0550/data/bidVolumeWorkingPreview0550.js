@@ -32,6 +32,9 @@ export function scheduleAllocationPlan0550(data,savedView){
   const raw=data.lines.find(l=>l.id===line.id),base=rules[raw?.wbs];
   if(!raw||!base)return {line,proposal:null,reason:'No source category rule; SI must decide the destination'};
   let [schedule,summary,reason]=base;
+  if((data.repositoryBasisImport?.tsiActivityBudget?.expenseLineIds||[]).includes(raw.id)){
+   schedule='A1';summary='OTHER';reason='Shared SI travel / mobilisation expense → A1 Others; retain one existing owner, not C7 labour hours or C8 purchaser facilities';
+  }
   if(['MR-ACT-B4-D01','MR-ACT-B4-D02'].includes(raw.mrRequirementId)){schedule='A1';summary='INSPECTION';reason='FAT / IFAT support → A1 Inspection and tests; source review pending';}
   if(raw.wbs==='B1'&&['MR-ACT-B1-D02','MR-ACT-B1-D03','MR-ACT-B1-D04'].includes(raw.mrRequirementId)){summary='VENDOR_DOCUMENTS';reason='Design / CAL-RPT / VDRL documents → A1 Vendor Documents; source review pending';}
   const quotedIds=raw.mgwDetailGroupId?mgwDetailGroup0550(raw.mgwDetailGroupId)?.rowIds||[]:[mgwQuoteItem0550(data.offers.find(o=>o.id===raw.offerId))?.id].filter(Boolean);

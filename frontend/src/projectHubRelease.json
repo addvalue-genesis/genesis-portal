@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-02.3-preview",
+  "version": "2026-11-02.4-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "1c1f4c9f90d1f81c3de3b080fe605a536dca6e1b",
-  "capability": "0550 performance: pass-local evidence normalization and revision lookup, local Working editor and Module Search keystrokes. Same source/engineering/Official results and monetary inputs; fresh checks after source changes; existing direct-supply drafts and B activity links retained. No new modules, price migration or approval bypass."
+  "source0550": "4bcc87b47158b5f78c497e084d7602448de81328",
+  "capability": "0550 Schedule price diagnostics and deferred native previews. Show existing Working amounts, missing quantities/prices and separate CIF/FOB allocation; retain single SI expense owners. No new modules or financial input changes; existing mappings, reviews and frozen history preserved."
 }

@@ -4,6 +4,7 @@ import template from './data/exhibitCNativeTemplate0550.json';
 import {sumMoney0550} from './data/money0550';
 import {scheduleRollup0550,rollupNote0550} from './data/scheduleRollup0550';
 import {zipStore} from './exportOriginalPriceForm';
+import {customerPriceColumn0550} from './data/scheduleDiagnostics0550';
 
 export const NATIVE_SUMMARIES_0550=[['GOODS','GOODS / C1'],['INSPECTION','Inspection and tests'],['PACKING','Preservation and packing'],['COMMISSIONING_SPARES','Commissioning spares / C2'],['OPERATION_SPARES','Two-year operation spares / C3'],['CAPITAL_SPARES','Capital spares / C4'],['SPECIAL_TOOLS','Special tools / C5'],['CONSUMABLES','Filling materials / C6'],['FIELD_SERVICE','Site Service / C7'],['TRAINING','Training / C7'],['OFFICE','Office / C8'],['TRANSPORT','In-city Transportation / C8'],['AIRPORT','Airport Pick-up & Drop-off / C8'],['OFFICE_CONSUMABLES','Office consumables / C8'],['WORKING_LUNCH','Working Launch / C8 (source label)'],['VENDOR_DOCUMENTS','Vendor Documents'],['OTHER','Others (Please specify)']];
 export const NATIVE_FIELDS_0550={A:[['agreementNo','Agreement / Contract No.']],C2:[['vendorNameAddress','VENDOR name and address']],C3:[['vendorNameAddress','VENDOR name and address']],C4:[['vendorNameAddress','VENDOR name and address']],C7:[['sitePeriodDays','Free site service period in days'],['trainingPeriodDays','Proposed training period in days']]};
@@ -15,7 +16,7 @@ const shownSum=(view,rows)=>view.workingPreview?scheduleRollup0550(rows).knownUS
 const subtotalNote=(view,rows)=>view.workingPreview?rollupNote0550(scheduleRollup0550(rows)):'';
 const chunks=(rows,n)=>Array.from({length:Math.max(1,Math.ceil(rows.length/n))},(_,i)=>rows.slice(i*n,(i+1)*n));
 const field=(view,id,name)=>view.getRecord('I.'+id).nativeFields?.[name]||'';
-const term=b=>/\bCIF\b/i.test(b.deliveryTerm)&&!/\bFOB\b/i.test(b.deliveryTerm)?'CIF':/\bFOB\b/i.test(b.deliveryTerm)&&!/\bCIF\b/i.test(b.deliveryTerm)?'FOB':'';
+const term=customerPriceColumn0550;
 const normalize=s=>String(s||'').trim().toUpperCase();
 const aliases={GOODS:'GOODS','SITE SERVICE':'FIELD_SERVICE',TRAINING:'TRAINING',OFFICE:'OFFICE','IN-CITY TRANSPORTATION':'TRANSPORT','AIRPORT PICK-UP & DROP-OFF':'AIRPORT','OFFICE CONSUMABLES':'OFFICE_CONSUMABLES','WORKING LAUNCH':'WORKING_LUNCH'};
 const role=b=>aliases[normalize(b.summary)]||normalize(b.summary);
@@ -107,17 +108,17 @@ export function nativeSchedule0550(view,id){
  const html=pages.map(page=>`<article class="p55-native-paper" data-native-schedule="${id}"><header><img alt="CNEEC" src="${logo}"><span>Supply of Export XXX for Onshore Processing Facilities and Associated<br>Onshore Pipelines for Aung Sinkha Development Project<br>AGREEMENT No.: ${escape(field(view,'A','agreementNo')||'OPEN')}</span></header><p class="native-status">${escape(label)} / ${escape(view.proposal.documentNo||'OPEN')} / ${escape(view.proposal.revision)}${page.detail?' / '+escape(page.detail):''}</p>${renderPage(view,page,'html')}<footer><span>Exhibit C - Commercial Terms</span><span>Source page ${template.schedules[id].page} of 18${page.detail?' / '+escape(page.detail):''}</span></footer></article>`).join('');
  return {html,issues,pages};
 }
-export function nativeExhibitProblems0550(view){
- const problems=Object.keys(template.schedules).flatMap(id=>nativePages(view,id).issues.map(p=>id+' / '+p));
+export function nativeExhibitProblems0550(view,only){
+ const ids=only?[only]:Object.keys(template.schedules),problems=ids.flatMap(id=>nativePages(view,id).issues.map(p=>id+' / '+p));
  // Only active detail forms need these header/period values. Empty schedules keep
  // their explicit applicability review in the existing package model.
- for(const id of ['C2','C3','C4'])if(view.scheduleRows(id).length){
+ for(const id of ['C2','C3','C4'].filter(id=>!only||only===id))if(view.scheduleRows(id).length){
   if(!field(view,id,'vendorNameAddress').trim())problems.push(id+' / VENDOR name and address OPEN');
   if(view.scheduleRows(id).some(b=>!b.vendorEquipmentNo?.trim()||!b.referenceDrawings?.trim()))problems.push(id+' / Equipment header references OPEN');
   const equipment=new Set(view.scheduleRows(id).map(b=>b.mainEquipment));
   for(const main of equipment)if(['vendorEquipmentNo','referenceDrawings'].some(key=>new Set(view.scheduleRows(id).filter(b=>b.mainEquipment===main).map(b=>b[key])).size>1))problems.push(id+' / Conflicting equipment header references: '+main);
  }
- for(const [r,key] of [['FIELD_SERVICE','sitePeriodDays'],['TRAINING','trainingPeriodDays']])if(view.scheduleRows('C7').some(b=>role(b)===r)&&!field(view,'C7',key).trim())problems.push('C7 / '+key+' OPEN');
+ for(const [r,key] of [['FIELD_SERVICE','sitePeriodDays'],['TRAINING','trainingPeriodDays']])if((!only||only==='C7')&&view.scheduleRows('C7').some(b=>role(b)===r)&&!field(view,'C7',key).trim())problems.push('C7 / '+key+' OPEN');
  return problems;
 }
 export function nativeExhibitHtml0550(view,only,includeCover=false){
