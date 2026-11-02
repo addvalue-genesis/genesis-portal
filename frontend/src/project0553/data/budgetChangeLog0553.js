@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-02-R70";
+export const CHANGE_LOG_VERSION_0553="2026-11-02-R71";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261102-03",date:"2026-11-02",kind:"PRICE",tone:"caution",
+  title:"C1 left/right/SI budget calculated from Next G D/E spare prices and selected TAG comparables",
+  detail:"Owner authorized existing TAG product prices when separate spare rates are absent. Uploaded Next G16-Sep PDF actually includes D Base Station Spare and E Subscriber Spare; all16 D/E rates/dashes match existing source JSON. A six-row/five-group SI scenario now prices base/subscriber radio spares from D1-3/E1-3, two indoor PoE+cord sets from D5-6/E5-6, one selected Cisco TAG package THB371580, one MGW R2 UHF1 BDA+enclosure USD31474 and one MDS RACON USD75000. Exact MR/site/TAG source keys and quoted components are visible. Equipment cost scenario THB4387631.87, existing1.30 factor SELL THB5703921.43, FX31.5 and single USD100 roundup give proposed USD181100. This is a read-only planning proposal, not a replacement of current C1USD97500 or C2USD23000; A+BUSD902900/native quote unchanged. Supplier spare quantity drives D/E; other one-unit stocks are explicit SI planning assumptions. Region-key dashes remain null, warranty terms unselected, IDU complete-function and delivery/quote validity remain qualified; no extra BDA enclosure/RACON box or duplicate PoE charge. Firm technical gates remain separately expandable. No new business module ID.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.c1","bid.budget.pricing.official"]),
+  priceImpact:"PRICE_REVIEW_REQUIRED",source:"Owner02-Nov2026 left/right/SI instruction and uploaded Next G/VST quotations, DTS0001-4 and SPE Rev.C2"}),
  Object.freeze({id:"P553-CHANGE-20261102-02",date:"2026-11-02",kind:"ENGINEERING",tone:"caution",
   title:"C1/C2 quotations are required; separate purchaser selection concerns physical supply",
   detail:"Re-read original BOD Rev.C2 section11.1, SPE Rev.C2 section8.1, all four MR Rev.C1 and DTS0001–0004. BOD/SPE require priced capital/two-year spare lists with part numbers and lead times. MR quotation only does not permit omission. Added explicit C1 quotation-required flag alongside existing C2 flag, retaining unknown complete-unit quantities and no automatic base supply. Existing C1/C2 panels now distinguish REQUIRED QUOTATION from purchaser-selected Part C delivery. Individual sourced exclusions cannot turn both required schedules into a complete zero-price scenario. Corrected lifecycle C1 source to BOD/SPE; no financial source/annex prices, quantities, FX, modules or customer-issue authority changed.",
