@@ -60,3 +60,17 @@ Playwright/browser tests, private-workspace or Windows checks. The repository's
 existing Frontend Build workflow runs on pushes to this feature branch; its
 result must be checked separately. The added/updated checks are not reported as
 passing merely because they were authored.
+
+## First CI run and follow-up
+
+[Frontend Build run 41483955935](https://github.com/addvalue-genesis/genesis-portal/actions/runs/41483955935)
+on `4d062574` executed Node/Babel and React SSR. The changed bid-volumes suite
+passed, including the new C1/C2 assertions; Working-to-Schedules and native
+Exhibit C suites also passed. The run then stopped in the existing SI work-package
+test at line 34: it still expected 32 MiB although the previously implemented
+available-document continuation sets preparation to 40 MiB. The existing
+available-document handoff explicitly documents that limit and its boundary
+checks. The follow-up changes only that stale test expectation to 40 MiB; no
+runtime limit is increased and no production guard is relaxed.
+
+Full production build and browser verification remain unconfirmed at this point.

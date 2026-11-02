@@ -31,7 +31,8 @@ const newer=structuredClone(plan.workspace);newer.sourceIntake.batchId='PJ2608-0
 assert.throws(()=>planSiWorkPackage0550(newer,pack,tokens),/local source is newer/);
 const conflict=structuredClone(plan.workspace);conflict.sourceIntake.coverageNote='local edit';
 assert.throws(()=>planSiWorkPackage0550(conflict,pack,tokens),/SOURCE_BATCH_CONFLICT/);
-assert.equal(SI_FILE_LIMIT_0550,32*1024*1024);
+// Available-document continuation already uses a bounded 40 MiB preparation file.
+assert.equal(SI_FILE_LIMIT_0550,40*1024*1024);
 const context=require(root+'/project0550/BidWorkspaceContext.jsx');context.useBidWorkspace=()=>({data,change:()=>{},busy:false});
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),{SiWorkPackage0550}=require(root+'/project0550/SiWorkPackage0550.jsx');
 const html=renderToStaticMarkup(React.createElement(SiWorkPackage0550));
