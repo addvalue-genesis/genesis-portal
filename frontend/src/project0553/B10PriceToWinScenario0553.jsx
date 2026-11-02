@@ -18,9 +18,10 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
  if(canonical&&canonical.trace?.originalParametricCostUSD!==price.trace.originalParametricCostUSD)
   throw Error("10.2/10.3 B10 price scenario underlying source changed");
  const value=price.scenario,ass=price.assumptions;
- return <details className="p55-panel p553-b10-ptw" data-component-key={price.moduleId} open={context!=="scope"} style={{padding:12}}>
+ return <details className="p55-panel p553-b10-ptw" data-component-key={price.moduleId} open={!price.supersededByOwnerScope&&context!=="scope"} style={{padding:12}}>
   <summary><strong>B10 — Price-to-Win What-if (INTERNAL / NONPOSTING)</strong>
-   <small>Same Source→Working→Scope→Release evidence · proposed USD summary only; NOT customer 10.3.4 or Excel</small></summary>
+   <small>Historical RF-filter scenario — superseded by owner surge-only scope; NOT current offer or Excel</small></summary>
+  <p className="p55-note"><strong>Historical calculation only:</strong> {price.scopeReviewNote}</p>
   <p className="p55-note"><strong>Purpose:</strong> show a controlled estimate rather than automatically applying retail markup to the released price. The NextG quote expired on 1 Oct 2026, and the supplier's D/E quantity is <strong>NOT</strong> the approved commissioning-spare purchase quantity. MR0002–0004 remain unitemized planning allowances, not vendor quotes.</p>
   <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"end"}}>
    <label style={{display:"grid",gap:4}}>Target ADDVALUE profit after risk &amp; SAMTEL

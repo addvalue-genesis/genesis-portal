@@ -18,6 +18,8 @@ assert(de.every(x=>x.offeredRole==="SPARE_OPTION_SEPARATE"&&
  x.siteAllocatedQty===null&&x.acceptedCost===undefined&&x.state==="SPARE_SEPARATE_NO_BASE_ALLOCATION"));
 const base=selectB10PriceToWinReview0553();
 assert.equal(base.assumptions.multiplier,1.4);
+assert.equal(base.supersededByOwnerScope,true);
+assert(base.scopeReviewNote.includes("not the current B10 offer"));
 assert.equal(base.assumptions.targetGrossProfitOfSellPct,20);
 assert.equal(base.assumptions.samtelSellDeductionPct,5);
 assert.equal(base.assumptions.riskCostPct,5);

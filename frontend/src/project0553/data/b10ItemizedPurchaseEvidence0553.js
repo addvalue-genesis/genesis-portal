@@ -54,7 +54,8 @@ export function selectB10ItemizedPurchaseEvidence0553(){
    proposedSku:q.partNumber,quotedSkuVerified:true,
    matchedBaseEquipmentQuoteLines:freeze(NEXTG.lines.filter(y=>!["D","E"].includes(y.group)&&
      y.partNumber===q.partNumber).map(y=>y.code)),
-   selectedSpareSkuVerified:false,partAPriceOwner:"A1_INSTALLED_EQUIPMENT__NO_B10_ADDITION",
+   selectedSpareSkuVerified:false,b10OwnerExcluded:f.startsWith("RF_FILTER__"),
+   b10OwnerScopeNote:f.startsWith("RF_FILTER__")?"Owner03-Nov2026: B10 SCADA surge only; RF filter excluded. Original supplier evidence retained; not a surge quote.":null,partAPriceOwner:"A1_INSTALLED_EQUIPMENT__NO_B10_ADDITION",
    candidateInstalledSiteTags:linkInstalled(coverage,f,q.group),
    installedTagRelation:"FUNCTIONAL_CANDIDATE_ONLY__NO_VENDOR_INTERCHANGEABILITY_PROOF",
    articleClass:f,physicalPurchaseCandidate:isPhysical,
@@ -92,7 +93,7 @@ export function selectB10ItemizedPurchaseEvidence0553(){
   ["B10-PTTEP-01","SCADA / Cisco protective fuse","fuses",/^(LAN|MR)-/,null],
   ["B10-PTTEP-01","Industrial DC PoE power injector","power injector",/^MR-/,"POWER_INJECTOR__"],
   ["B10-PTTEP-01","Ethernet surge/protection component","Ethernet",/^(SA|LAN)-/,null],
-  ["B10-PTTEP-01","RF protection assembly","RF",/^(SA|ANT)-/,null],
+  ["B10-PTTEP-01","RF surge-protection spare assembly","RF",/^(SA|ANT)-/,null],
   ["B10-PTTEP-02","RFI BDA RF surge/coupler service component","RF surge",/^(SA|TCAB)-/,null],
   ["B10-PTTEP-02","RF feeder termination / connector","feeder termination",/^ANT-/,null],
   ["B10-PTTEP-02","Ex enclosure seal/entry spare","Ex seal",/^TCAB-/,null],

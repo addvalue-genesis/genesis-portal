@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R77";
+export const CHANGE_LOG_VERSION_0553="2026-11-03-R78";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261103-02",date:"2026-11-03",kind:"ENGINEERING",tone:"caution",
+  title:"B10 SCADA RF surge only; RACON spare scope checked against MDS",
+  detail:"Owner excludes RF filter from B10 function1.04. Description, technical specification and materials now specify an RF surge arrester only, preserving source IDB10-PTTEP-01-F04, TAG references and all14 financial allocations. Shared native/Official exports consume the same schedule. Original NextG D/E RF-filter quote lines remain source evidence with explicit B10 exclusion; the old filter-based what-if is labelled superseded historical calculation and collapsed. No surge SKU or vendor rate is invented and no RF-filter cost is transferred to surge. QTORG2609244 p4 includes purge/programming cable and RACON/control/DB assemblies, but does not separately price B10 fuse/gasket/gland stock. Preserve prior owner ADDVALUE cable/gland supply decision despite contradictory p4/p8 wording. Exact replaceable parts, OEM instruction, physical quantities and spare rates require supplier confirmation. Existing PartA/C1 quoted equipment composition, B10USD16200, A+BUSD897800 and all module/source IDs unchanged.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.b10.stage-spare-selection","bid.budget.working.bc.b10.original-annex-item-map","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner03-Nov2026: SCADA surge only, no RF filter in selected B10 row; review RACON QTORG2609244"}),
  Object.freeze({id:"P553-CHANGE-20261103-01",date:"2026-11-03",kind:"PRICE",tone:"caution",
   title:"Owner excludes additional DB-5P from C2; selected option and Excel recalculated",
   detail:"Owner says no additional RACON DB-5P spare is required in C2. Exclude historical rowC2-REV08-07 from the selected offer while preserving its source record and included PartA/C1 components. The canonical option owner removes THB285210.95 from the unchanged12-row referenceTHB721806.60, leaving11 selected rows/THB436595.65. Existing FX31.5 and USD100 category roundup yieldC2USD13900; whole-USD units reconcile without an extra charge. This is a USD9100 category reduction from23000, not subtraction of the earlier already-rounded allocation9093. Summary, active review and native USD/THB/Breakdown consume the same11 rows. All remaining source quantities/rates, C1USD181100, B13USD1500, A+BUSD897800 and module IDs remain unchanged. Historical DB-5P stays audit-only, with an explicit owner exclusion; this does not technically certify every remaining spare or OEM rate.",

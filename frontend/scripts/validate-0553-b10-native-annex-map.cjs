@@ -30,6 +30,12 @@ assert(stage.stageRows.every(x=>x.physicalSpareQty===null&&x.unitSpareSellUSD===
 assert.equal(annex.originalSheet,"B10 CommSpares");
 assert.deepEqual(Array.from(annex.layoutColumns),["B","C","D","E","F","G","H","I"]);
 assert.equal(annex.rows.length,14);
+const surge=annex.rows.find(x=>x.id==="B10-PTTEP-01-F04");
+assert.equal(surge.description,"RF surge-protection spare assembly");
+assert(/surge/i.test(surge.specification)&&/surge arrester/i.test(surge.materials));
+assert(!/filter/i.test(surge.description+surge.specification+surge.materials));
+assert.equal(surge.physicalSpareQty,null);assert.equal(surge.sourceQuoteEvidence.length,0);
+
 assert.equal(annex.totalRow,20);
 assert.equal(annex.originalDataCapacity,13);
 assert.equal(annex.rows.filter(x=>x.isRequirementFamily).length,14);
@@ -70,6 +76,10 @@ for(const html of [internal,customer]){
  assert(html.includes("B10 — Original Annex: Spare Part Schedule"));
 }
 assert(internal.includes("Engineering source / vendor evidence — INTERNAL ONLY"));
+assert(internal.includes('data-b10-racon-quote-review="QTORG2609244"'));
+assert(internal.includes("No extra RF coaxial feeder"));
+assert(!customer.includes('data-b10-racon-quote-review'));
+assert(customer.includes(surge.description)&&!customer.includes("RF filter"));
 assert(!customer.includes("Engineering source / vendor evidence"));
 assert(internal.includes("sourceSelectionId:x.id")===false); // JSX source expression does not leak to HTML
 assert(!customer.includes("242,460.00"));
@@ -130,6 +140,10 @@ const decoder=new TextDecoder();
  assert(cell("B6").includes("1.01"));
  assert(cell("D6").includes(annex.rows[0].description));
  assert(cell("E6").includes("protective fuse"));
+ assert(cell("D9").includes(surge.description));
+ assert(cell("E9").includes(surge.specification));
+ assert(cell("F9").includes(surge.materials));
+ assert(!xml.includes("RF filter"),"B10 export must not propose a filter as a surge spare");
  assert(cell("G6").includes("<v>1</v>"));
  assert(cell("H6").includes("<v>1820</v>"));
  assert(cell("I19").includes("<v>1105</v>"));

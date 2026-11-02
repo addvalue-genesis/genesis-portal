@@ -101,6 +101,8 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
  return freeze({
   moduleId:"bid.budget.working.bc.b10.price-to-win-review",
   parentOwner:"B10",sourceModuleId:b10.moduleId,
+  supersededByOwnerScope:true,
+  scopeReviewNote:"Historical scenario includes RF filters D-2/E-2, excluded from B10 by owner03-Nov2026. It is not the current B10 offer or a surge quotation. Retain arithmetic for audit only; obtain an exact surge quote before a new estimate.",
   sourceStatus:"INTERNAL_EXPIRED_VENDOR_QUOTE_PLUS_UNITEMIZED_PARAMETRIC_ENVELOPES",
   selectedSourceQuoteLines:freeze(selected),otherMrCostEnvelopes:residual,
   marketPriceComparables,
