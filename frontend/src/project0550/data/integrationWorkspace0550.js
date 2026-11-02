@@ -66,20 +66,28 @@ export function integrationRecordBasis0550(data,collection,r){
 export function stampIntegration0550(data,collection,row){const w={...emptyIntegration0550(),...data.integrationWorkspace},next={...w,[collection]:[...w[collection].filter(r=>r.id!==row.id),row]};return {...row,basisKey:integrationRecordBasis0550({...data,integrationWorkspace:next},collection,row)};}
 const has=v=>typeof v==="string"&&Boolean(v.trim());
 const normalize=s=>s.replace(/\s+/g," ").trim();
-function evidenceProblems(data,ids,locator,excerpt,customer=true){
- const out=[];if(!ids.length)out.push(customer?"CUSTOMER_SOURCE_OPEN":"SUPPLIER_SOURCE_OPEN");
- const sources=ids.map(id=>sourcesFor(data,[id])[0]);
- for(let i=0;i<ids.length;i++){const s=sources[i];if(!s)out.push("SOURCE_MISSING / "+ids[i]);else {if(customer&&s.effectiveAuthority!=="CURRENT_TENDER")out.push("CURRENT_SOURCE_OPEN / "+s.id);if(s.readState==="METADATA_ONLY")out.push("CONTENT_UNREAD / "+s.id);}}
- if(customer&&sources.some(Boolean)){const revisions=deriveDocumentRevisionRegister(data.sourceIntake);for(const s of sources.filter(Boolean)){const state=revisions.find(r=>r.documentNo===s.documentNo.trim().toUpperCase())?.status;if(state&&state!=="CURRENT_PACKAGE")out.push("SOURCE_REVISION_OR_COPY_OPEN / "+s.id);}}
- if(!has(locator)||!has(excerpt))out.push("CLAUSE_LOCATOR_OR_EXCERPT_OPEN");
- if(has(excerpt)&&!sources.some(s=>s?.content&&normalize(s.content).includes(normalize(excerpt))))out.push("EXCERPT_NOT_IN_REVIEWED_TEXT");
- return out;
+// A fresh reader per synchronous derivation. Never retain source content or
+// authority across saves: in-place edits must be visible on the next call.
+function evidenceReader0550(data){
+ const all=data.sourceIntake?.sources||[],replaced=new Set(all.flatMap(s=>s.replaces)),byId=new Map(),normalized=new Map();
+ for(const s of all)if(!byId.has(s.id))byId.set(s.id,{...s,effectiveAuthority:replaced.has(s.id)?"REPLACED_COPY":s.authority});
+ let revisions;
+ const normalizedContent=s=>{if(!normalized.has(s.id))normalized.set(s.id,normalize(s.content));return normalized.get(s.id);};
+ return (ids,locator,excerpt,customer=true)=>{
+  const out=[];if(!ids.length)out.push(customer?"CUSTOMER_SOURCE_OPEN":"SUPPLIER_SOURCE_OPEN");
+  const sources=ids.map(id=>byId.get(id));
+  for(let i=0;i<ids.length;i++){const s=sources[i];if(!s)out.push("SOURCE_MISSING / "+ids[i]);else {if(customer&&s.effectiveAuthority!=="CURRENT_TENDER")out.push("CURRENT_SOURCE_OPEN / "+s.id);if(s.readState==="METADATA_ONLY")out.push("CONTENT_UNREAD / "+s.id);}}
+  if(customer&&sources.some(Boolean)){if(!revisions)revisions=new Map(deriveDocumentRevisionRegister(data.sourceIntake).map(r=>[r.documentNo,r.status]));for(const s of sources.filter(Boolean)){const state=revisions.get(s.documentNo.trim().toUpperCase());if(state&&state!=="CURRENT_PACKAGE")out.push("SOURCE_REVISION_OR_COPY_OPEN / "+s.id);}}
+  if(!has(locator)||!has(excerpt))out.push("CLAUSE_LOCATOR_OR_EXCERPT_OPEN");
+  if(has(excerpt)){const sought=normalize(excerpt);if(!sources.some(s=>s?.content&&normalizedContent(s).includes(sought)))out.push("EXCERPT_NOT_IN_REVIEWED_TEXT");}
+  return out;
+ };
 }
 function reviewProblems(data,collection,r,today){const out=[];if(r.status!=="REVIEWED"||!has(r.reviewer)||!r.reviewedOn||r.reviewedOn>today)out.push("REVIEW_OPEN");if(r.status==="REVIEWED"&&!r.basisKey)out.push("REVIEW_BASIS_OPEN");else if(r.basisKey&&r.basisKey!==integrationRecordBasis0550(data,collection,r))out.push("STALE_DEPENDENCIES");return out;}
-export function deriveIntegrationProof0550(data,p,today){
+export function deriveIntegrationProof0550(data,p,today,readEvidence=evidenceReader0550(data)){
  const r=integrationRequirements0550(data).find(r=>r.id===p.requirementId),problems=reviewProblems(data,"proofs",p,today);
  if(!r)problems.push("REQUIREMENT_MISSING");
- else problems.push(...evidenceProblems(data,r.sourceIds,r.sourceLocator,r.sourceExcerpt));
+ else problems.push(...readEvidence(r.sourceIds,r.sourceLocator,r.sourceExcerpt));
  if(!has(p.method)||!has(p.inputsBasis)||!has(p.criteria)||!has(p.limitations))problems.push("METHOD_INPUT_CRITERIA_LIMITS_OPEN");
  const c=data.calculations.find(c=>c.id===p.calculationId),result=c?evaluateServiceEquation(c.equationId,c.inputs):null;
  let passes=false;
@@ -93,7 +101,8 @@ export function deriveIntegrationProof0550(data,p,today){
  return {...p,result,passes,problems,state:problems.length?(problems.includes("STALE_DEPENDENCIES")?"STALE":"OPEN"):"REVIEWED_PROOF",fieldTestAccepted:false};
 }
 export function deriveIntegration0550(data,systems,today){
- const w={...emptyIntegration0550(),...data.integrationWorkspace},requirements=integrationRequirements0550(data),proofs=w.proofs.map(p=>deriveIntegrationProof0550(data,p,today));
+ const readEvidence=evidenceReader0550(data);
+ const w={...emptyIntegration0550(),...data.integrationWorkspace},requirements=integrationRequirements0550(data),proofs=w.proofs.map(p=>deriveIntegrationProof0550(data,p,today,readEvidence));
  const documentReviews=w.documentReviews.map(d=>{const problems=reviewProblems(data,"documentReviews",d,today),s=sourcesFor(data,[d.id])[0],pages=reviewedPageSet0550(d.reviewedPages);
   if(d.readingKind&&d.readingKind!=="PDF_PAGE"){
    const native=documentReadingUnits0550(s);
@@ -107,7 +116,7 @@ export function deriveIntegration0550(data,systems,today){
  const particulars=w.particulars.map(p=>{
   const problems=reviewProblems(data,"particulars",p,today);
   if(!p.references.length||!has(p.text)||!has(p.interpretation)||!has(p.impact)||!p.processSteps.length)problems.push("PARTICULAR_TEXT_INTERPRETATION_IMPACT_OPEN");
-  for(const ref of p.references){problems.push(...evidenceProblems(data,[ref.sourceId],ref.locator,ref.excerpt));if(p.kind==="COLOURED_TEXT"&&(!has(ref.appearance)||!has(ref.visualEvidenceRef)))problems.push("COLOUR_VISUAL_REVIEW_OPEN");}
+  for(const ref of p.references){problems.push(...readEvidence([ref.sourceId],ref.locator,ref.excerpt));if(p.kind==="COLOURED_TEXT"&&(!has(ref.appearance)||!has(ref.visualEvidenceRef)))problems.push("COLOUR_VISUAL_REVIEW_OPEN");}
   if(p.relationship==="CONFLICT")problems.push("PARTICULAR_SOURCE_CONFLICT");
   if(p.requirementIds.some(id=>!requirements.some(r=>r.id===id)))problems.push("PARTICULAR_REQUIREMENT_MISSING");
   return {...p,problems,state:problems.length?"OPEN":"REVIEWED_PARTICULAR"};
@@ -119,7 +128,7 @@ export function deriveIntegration0550(data,systems,today){
   if(!d.offerIds.length||d.offerIds.some(id=>!data.offers.some(o=>o.id===id)))problems.push("DEVIATION_OFFER_OPEN");
   const approved=["APPROVED","CLOSED"].includes(d.workflowStatus)&&d.approvalDecision==="ACCEPTED";
   if(!approved||!has(d.companyResponse)||!has(d.resolution)||!has(d.finalClosure))problems.push("CUSTOMER_DEVIATION_APPROVAL_OPEN");
-  if(approved)problems.push(...evidenceProblems(data,d.approvalSourceIds,d.approvalLocator,d.approvalExcerpt,false));
+  if(approved)problems.push(...readEvidence(d.approvalSourceIds,d.approvalLocator,d.approvalExcerpt,false));
   return {...d,problems,state:problems.length?"OPEN":"ACCEPTED_DEVIATION"};
  });
  const avlChecks=w.avlChecks.map(a=>{
@@ -128,7 +137,7 @@ export function deriveIntegration0550(data,systems,today){
   if(sourcesFor(data,a.sourceIds).some(isSubvendorDeclarationSource0550))problems.push("VENDOR_DECLARATION_IS_NOT_CUSTOMER_AVL");
   if(!requirements.some(r=>r.id===a.requirementId)||!data.offers.some(o=>o.id===a.offerId))problems.push("AVL_REQUIREMENT_OFFER_MISSING");
   if(!has(a.manufacturer)||!has(a.model)||!has(a.basis)||a.result==="OPEN")problems.push("AVL_CHECK_OPEN");
-  problems.push(...evidenceProblems(data,a.sourceIds,a.sourceLocator,a.sourceExcerpt));
+  problems.push(...readEvidence(a.sourceIds,a.sourceLocator,a.sourceExcerpt));
   if(a.result==="NOT_LISTED"&&!deviations.some(d=>d.avlCheckId===a.id&&d.requirementId===a.requirementId&&d.offerIds.includes(a.offerId)&&d.state==="ACCEPTED_DEVIATION"))problems.push("AVL_DEVIATION_REQUIRED");
   return {...a,vendorListEntry:subvendorRow0550(a.vendorListRowId),problems,state:problems.length?"OPEN":"REVIEWED_AVL"};
  });
@@ -142,7 +151,7 @@ export function deriveIntegration0550(data,systems,today){
   return {...a,problems,state:problems.length?"OPEN":"REVIEWED_PLAN"};
  });
  const rows=requirements.map(r=>{
-  const problems=[...evidenceProblems(data,r.sourceIds,r.sourceLocator,r.sourceExcerpt),...reviewProblems(data,"requirements",r,today)];
+  const problems=[...readEvidence(r.sourceIds,r.sourceLocator,r.sourceExcerpt),...reviewProblems(data,"requirements",r,today)];
   const relatedProofs=proofs.filter(p=>p.requirementId===r.id),relatedActivities=activities.filter(a=>a.requirementId===r.id);
   for(const d of deviations.filter(d=>d.requirementId===r.id))if(d.problems.length)problems.push("TECHNICAL_DEVIATION_OPEN / "+d.id);
   const relatedParticulars=particulars.filter(p=>particularApplies0550(p,r));
@@ -153,7 +162,7 @@ export function deriveIntegration0550(data,systems,today){
    if(r.responsibility==="CLARIFICATION"||!has(r.responsibility))problems.push("RESPONSIBILITY_OPEN");
    if(r.responsibility!=="COMPANY"){
     if(!r.offerIds.length||!has(r.supplierBasis))problems.push("SUPPLIER_ALLOCATION_OPEN");
-    problems.push(...evidenceProblems(data,r.supplierSourceIds,r.supplierLocator,r.supplierExcerpt,false));
+    problems.push(...readEvidence(r.supplierSourceIds,r.supplierLocator,r.supplierExcerpt,false));
    }
    if(r.offerIds.some(id=>!data.offers.some(o=>o.id===id)))problems.push("OFFER_MISSING");
    for(const offerId of r.offerIds)if(!avlChecks.some(a=>a.requirementId===r.id&&a.offerId===offerId&&a.state==="REVIEWED_AVL"))problems.push("AVL_REVIEW_OPEN / "+offerId);

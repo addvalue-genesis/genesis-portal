@@ -8,7 +8,7 @@ import {WorkingPreview0550} from "./WorkingPreview0550";
 import {ParticularWorkspace0550} from "./ParticularDeviationWorkspace0550";
 import {mgwQuoteItem0550} from "./data/mgwVendorBasis0550";
 import {MR_WORKING_CATALOG_0550,mrRequirement0550} from "./data/mrWorkingBasis0550";
-import React,{useEffect,useState} from "react";
+import React,{useEffect,useState,useRef} from "react";
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {BID_WBS,BID_UNITS,newId} from "./data/bidWorkspaceModel";
 import {SYSTEMS,BUDGETARY_ESTIMATE,BUDGETARY_SUBMISSION,COMMERCIAL_POLICY,CORE_TEAM,PROJECT_0550,DATA_LAYER_META} from "./data";
@@ -25,7 +25,13 @@ import {SATELLITE_SCOPE_OPTIONS,isSatelliteScope0550,satelliteScopeNote0550} fro
 const companyReference=line=>Boolean(line.mrScopeState?.excluded||line.satelliteScopeState?.excluded);
 const blankLine=()=>({id:"",systemToken:"COMMON",wbs:"A",description:"",scopeKey:"",tagRef:"",requirementRef:"",sourceRef:"",vendorId:"",offerId:"",calculationId:"",resultKey:"value",quantity:null,unit:"Lot",currency:"THB",manualCost:null,sellMode:"DIRECT",sellRate:null,markupPct:null,marginPct:null,primePct:null,selected:true});
 const wbsOptions=BID_WBS.map(code=>[code,code+" · "+(code==="A"?"Equipment":[...BUDGETARY_ESTIMATE.partB,...BUDGETARY_ESTIMATE.partC].find(r=>r.code===code)?.description||code)]);
-function LineEditor({form,setForm,onNavigate}){
+function LineEditor({initialForm,editorState,onNavigate}){
+ // Retain the unsaved editor value when the Official/History context unmounts
+ // this form, without propagating every keystroke into the large parent view.
+ const [form,setLocalForm]=useState(()=>editorState.current?.initialForm===initialForm?editorState.current.value:initialForm);
+ const current=useRef(form),selected=useRef(initialForm);
+ const setForm=value=>{const next=typeof value==="function"?value(current.current):value;current.current=next;editorState.current={initialForm,value:next};setLocalForm(next);};
+ useEffect(()=>{if(selected.current!==initialForm){selected.current=initialForm;setForm(initialForm);}},[initialForm]);
  const {data,put,busy}=useBidWorkspace();
  const [reviewSave,setReviewSave]=useState(false);
  const field=(k,v)=>setForm(f=>({...f,[k]:v}));
@@ -79,6 +85,7 @@ function WorkingHierarchy({model,integration,data,onEdit,onRelease,onNew,onNavig
 }
 export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onNavigate}){
  const {data,model,change,busy}=useBidWorkspace();
+ const editorState=useRef(null);
  const [mode,setMode]=useState("working"),[priceView,setPriceView]=useState("provisional"),[form,setForm]=useState(blankLine),[context,setContext]=useState("official"),[target,setTarget]=useState(null);
  useEffect(()=>{if(navigationTarget){setContext(navigationTarget.startsWith("bid.budget.history")?"history":"official");setMode(navigationTarget.startsWith("bid.budget.release")?"released":navigationTarget.startsWith("bid.budget.budget-thb")?"budgetary":"working");setTarget(navigationTarget);}else setTarget(null);},[navigationTarget]);
  useEffect(()=>{if(!target)return;const timer=setTimeout(()=>{const element=[...document.querySelectorAll("[data-component-key]")].find(n=>n.getAttribute("data-component-key")===target);if(element){for(let n=element;n;n=n.parentElement)if(n.tagName==="DETAILS")n.open=true;document.querySelectorAll("[data-module-focused]").forEach(n=>n.removeAttribute("data-module-focused"));element.setAttribute("data-module-focused","true");element.setAttribute("tabindex","-1");element.scrollIntoView({block:"center"});element.focus?.({preventScroll:true});}},30);return()=>clearTimeout(timer);},[target,mode,context,data]);
@@ -106,7 +113,7 @@ export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onN
  <p>เริ่มจากรายการที่จะเสนอใน Release แล้วแตกอุปกรณ์และกิจกรรม · หมวด A เรียงการทำงานตาม MR; แบบ Release คงรหัสและลำดับเดิม · การเลือกปลายทางยังไม่ใช่ผลตรวจ scope</p>
  <div className="p55-table-wrap"><table className="p55-table" aria-label="Proposal work plan"><thead><tr><th>รายการปลายทาง</th><th>MR / ขอบเขตที่ต้องตรวจ</th><th>รายการที่ผูกแล้ว</th><th>ทำงานต่อ</th></tr></thead><tbody>{[...CUSTOMER_FORM_0550.rows].sort((a,b)=>{const rank=r=>r.part==="A"?Math.min(...MR_SUPPLY_ORDER_0550.map((g,i)=>g.systems.some(t=>r.systems.includes(t))?i:99)):r.part==="B"?100:200;return rank(a)-rank(b);}).map(r=><tr key={r.code}><td><strong>{r.code}</strong> · {r.description}</td><td>{mrBasisForCustomer0550(r)}</td><td>{data.lines.filter(l=>l.customerRowCode===r.code).length}</td><td><button type="button" onClick={()=>startLine({customerRowCode:r.code,systemToken:r.systems.length===1?r.systems[0]:"COMMON",wbs:r.part==="A"?"A":r.code})}>เตรียม {r.code}</button></td></tr>)}</tbody></table></div>
  <WorkingHierarchy integration={model.integration} onNavigate={onNavigate} model={official} data={data} onNew={startLine} onEdit={row=>{setForm({...row});go("working","bid.budget.working.editor");}} onRelease={id=>go("released",id)}/>
- <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor form={form} setForm={setForm} onNavigate={onNavigate}/></Module></Module>
+ <Module id="bid.budget.working.editor" title="รายละเอียดรายการ — ขอบเขต / Driver / Cost / Sell" open={false}><LineEditor initialForm={form} editorState={editorState} onNavigate={onNavigate}/></Module></Module>
  <OfficialCustomerScope/>
  <Module id="bid.budget.scope-gates" title="OFF-03 · Coverage / gaps ก่อนอนุมัติข้อเสนอ" open={false}><p>Customer rows รอตรวจ: {official.schedule.filter(r=>!r.ready).map(r=>r.code).join(", ")||"ไม่มี"}</p><p>รายการยังไม่ระบุ Customer row: {official.unmapped.length} · แถวรอทบทวน: {official.selected.length-official.reviewedCount}</p><p>MR requirements ยังเปิด: {official.requirementGaps?.length||0} · Import conflicts: {data.mrWorkingImport?.conflicts.join(", ")||"ไม่มี"}</p><p>Engineering/TAG completeness, quote validity, ownership และ customer-form mapping ต้องตรวจครบ · C1 ต้องมีการตัดสินใจและหลักฐาน · Part C แยกเป็น Option · ผลทบทวนนี้เป็น Working review; การอนุมัติและบันทึกส่งลูกค้ายังเป็น HOLD</p></Module>
  <Module id="bid.budget.official.summary" open={true} title="สรุปสถานะและยอดราคา">

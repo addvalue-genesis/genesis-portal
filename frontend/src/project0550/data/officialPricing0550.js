@@ -28,10 +28,12 @@ export function validateOfficialReview(r,group=false){
 export function suggestedCustomerCode(line){return line.wbs==="A"?form.rows.find(r=>r.systems.includes(line.systemToken))?.code||"":form.rows.some(r=>r.code===line.wbs)?line.wbs:"";}
 export function mappingValid(line){const row=form.rows.find(r=>r.code===line.customerRowCode);return Boolean(row&&(line.wbs==="A"?row.part==="A":line.wbs.startsWith("B")?row.part==="B":row.code===line.wbs));}
 function sourceBasis(data,ids){return (ids||[]).map(id=>data.sourceIntake?.sources.find(s=>s.id===id)||{id,missing:true});}
-function evidenceProblems(data,review,today,systemTokens){
- const problems=[];const sources=deriveSourceIntake(data.sourceIntake,today).sources;
+function evidenceReader0550(data){
+ let sources,revisions;
+ return (review,today,systemTokens)=>{
+ const problems=[];if(!sources)sources=deriveSourceIntake(data.sourceIntake,today).sources;
  if(!review?.sourceIds.length)problems.push("RFQ-02: เลือกหลักฐาน Current Tender");
- const revisions=deriveDocumentRevisionRegister(data.sourceIntake);
+ if(!revisions&&(review?.sourceIds.length||0))revisions=deriveDocumentRevisionRegister(data.sourceIntake);
  for(const id of review?.sourceIds||[]){const s=sources.find(x=>x.id===id);if(!s||s.effectiveAuthority!=="CURRENT_TENDER")problems.push("RFQ-02: แหล่งไม่ใช่ Current Tender / "+id);else if(s.readState==="METADATA_ONLY")problems.push("RFQ-02: ยังไม่ได้อ่านเนื้อหา / "+id);
   const revisionState=s?.documentNo&&revisions.find(r=>r.documentNo===s.documentNo.trim().toUpperCase())?.status;
   if(["CURRENT_REVISION_CONFLICT","REVISION_UNCONFIRMED","CURRENT_COPY_RECONCILIATION_REQUIRED"].includes(revisionState))problems.push("RFQ-02: Revision / สำเนายังไม่ตรวจยืนยัน / "+id);
@@ -39,6 +41,7 @@ function evidenceProblems(data,review,today,systemTokens){
  }
  if(!review?.locator.trim()||!review?.reason.trim()||!review?.reviewer.trim()||!dateOK(review?.date)||review.date>today)problems.push("ระบุ Clause / เหตุผล / ผู้ทบทวน / วันที่ที่ถูกต้อง");
  return problems;
+ };
 }
 export function officialLineBasisKey(data,line,review=line.officialReview){
  const {officialReview,...inputs}=activeSupplyLine0550(line);
@@ -56,10 +59,11 @@ export const sumOfficial = (rows,key) => sumMoney0550(rows.map(r=>r[key]));
 // Projection of deriveBidWorkspace's computed amounts. No second price equation,
 // no historical prices, and no fallback to budgetary values.
 export function deriveOfficialPricing(data,calculated,today,integrationModel){
+ const readEvidence=evidenceReader0550(data);
  const integration=integrationModel||(data.integrationWorkspace?deriveIntegration0550(data,[],today):null);
  const lines=calculated.lines.map(row=>{
   const raw=data.lines.find(l=>l.id===row.id),r=raw.officialReview;
-  const problems=evidenceProblems(data,r,today,[raw.systemToken]);
+  const problems=readEvidence(r,today,[raw.systemToken]);
   if(!r||r.decision==="OPEN")problems.push("OFF-03: รอทบทวนรายการ");
   if(!r?.engineeringBasis.trim()||!r?.commercialBasis.trim()||!raw.requirementRef.trim())problems.push("OFF-03: ฐาน Engineering / Cost / Commercial ไม่ครบ");
   if(r?.decision==="REMOVE"&&raw.selected)problems.push("REMOVE: ต้องยกเลิกการเลือกแถว");
@@ -77,7 +81,7 @@ export function deriveOfficialPricing(data,calculated,today,integrationModel){
  const unmapped=selected.filter(r=>!mappingValid(r));
  const schedule=form.rows.map(template=>{
   const children=selected.filter(r=>mappingValid(r)&&r.customerRowCode===template.code),review=data.customerReviews?.find(r=>r.code===template.code);
-  const problems=[...evidenceProblems(data,review,today,template.systems.length?template.systems:undefined),...scopeGaps.filter(g=>g.code===template.code).map(g=>g.reason+" / "+g.id)];
+  const problems=[...readEvidence(review,today,template.systems.length?template.systems:undefined),...scopeGaps.filter(g=>g.code===template.code).map(g=>g.reason+" / "+g.id)];
   if(!review||review.status==="OPEN")problems.push("ตรวจความครบถ้วนของขอบเขต Customer row");
   if(review&&review.basisKey!==customerScopeBasisKey(data,template.code,review))problems.push("STALE: รายการย่อยหรือฐานตรวจเปลี่ยน");
   if(review?.status==="EXCLUDED"&&children.length)problems.push("EXCLUDED: ยังมีรายการที่เลือกอยู่");

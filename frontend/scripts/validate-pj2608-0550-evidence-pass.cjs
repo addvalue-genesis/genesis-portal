@@ -1,0 +1,27 @@
+// Synthetic evidence only. Exercises fresh source checks after in-place edits;
+// no timing assertion or project approval is derived from this fixture.
+const assert=require('node:assert/strict'),path=require('node:path'),babel=require('@babel/core');
+const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
+const compile=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);require.extensions['.js']=compile;require.extensions['.jsx']=compile;
+const I=require(root+'/project0550/data/integrationWorkspace0550.js'),W=require(root+'/project0550/data/bidWorkspaceModel.js'),O=require(root+'/project0550/data/officialPricing0550.js'),today='2026-11-02';
+const data=W.emptyBidWorkspace('SYNTHETIC'),source=(id,doc,authority,content)=>({id,provider:'GDRIVE',title:'Synthetic '+id,documentNo:doc,revision:'B1',authority,readState:'TEXT_READ',content,replaces:[]});
+const s=source('SOURCE-QA','SYNTHETIC-MR-1','CURRENT_TENDER','Synthetic header\n alpha\t beta\n'+'Shared synthetic source.\n'.repeat(4000));
+data.sourceIntake={sources:[s,source('VENDOR-QA','SYNTHETIC-DATASHEET','UNCONFIRMED','vendor evidence')],findings:[],milestones:[],packageComparisons:[]};data.integrationWorkspace=I.emptyIntegration0550();
+for(let i=0;i<240;i++)data.integrationWorkspace.requirements.push({...I.blankRequirement0550('REQ-QA-'+i),statement:'Synthetic statement',need:'Synthetic need',criteria:'Synthetic criterion',interfaceBasis:'Synthetic interface',reason:'Synthetic purpose',responsibility:'TSI',sourceIds:[s.id],sourceLocator:'Synthetic p1',sourceExcerpt:'alpha beta',supplierSourceIds:['VENDOR-QA'],supplierLocator:'Synthetic datasheet',supplierExcerpt:'vendor evidence',supplierBasis:'Synthetic evidence',proofMode:'NOT_REQUIRED'});
+let model=I.deriveIntegration0550(data,[],today),row=()=>model.requirements.find(r=>r.id==='REQ-QA-0');assert(!row().problems.includes('EXCERPT_NOT_IN_REVIEWED_TEXT'));
+const own=data.integrationWorkspace.requirements[0];own.status='REVIEWED';own.reviewer='Synthetic reviewer';own.reviewedOn=today;Object.assign(own,I.stampIntegration0550(data,'requirements',own));
+const proof={id:'RPT-QA',requirementId:own.id,kind:'RPT',status:'DRAFT',basisKey:'',reviewer:'',reviewedOn:'',calculationId:'',method:'Synthetic method',inputsBasis:'Synthetic input',criteria:'Synthetic criterion',limitations:'Synthetic only',outcome:'OPEN',report:'Synthetic report'};
+assert(!I.deriveIntegrationProof0550(data,proof,today).problems.includes('EXCERPT_NOT_IN_REVIEWED_TEXT'));
+s.content='Changed in place: prior excerpt removed';model=I.deriveIntegration0550(data,[],today);assert(row().problems.includes('EXCERPT_NOT_IN_REVIEWED_TEXT'));assert(row().problems.includes('STALE_DEPENDENCIES'));assert(I.deriveIntegrationProof0550(data,proof,today).problems.includes('EXCERPT_NOT_IN_REVIEWED_TEXT'),'Standalone proof uses a fresh reader');
+s.content='alpha beta';s.authority='HISTORICAL';model=I.deriveIntegration0550(data,[],today);assert(row().problems.includes('CURRENT_SOURCE_OPEN / '+s.id));
+s.authority='CURRENT_TENDER';data.sourceIntake.sources.push(source('COPY-QA',s.documentNo,'CURRENT_TENDER','a different copy'));model=I.deriveIntegration0550(data,[],today);assert(row().problems.includes('SOURCE_REVISION_OR_COPY_OPEN / '+s.id));
+data.sourceIntake.sources[2].content='alpha\n beta';model=I.deriveIntegration0550(data,[],today);assert(!row().problems.includes('SOURCE_REVISION_OR_COPY_OPEN / '+s.id));
+data.sourceIntake.sources[2].replaces=[s.id];model=I.deriveIntegration0550(data,[],today);assert(row().problems.includes('CURRENT_SOURCE_OPEN / '+s.id));
+data.sourceIntake.sources[2].replaces=[];data.integrationWorkspace.requirements[0].sourceIds=['MISSING-QA'];model=I.deriveIntegration0550(data,[],today);assert(row().problems.includes('SOURCE_MISSING / MISSING-QA'));
+const review={...O.blankOfficialReview(),sourceIds:[s.id],locator:'Synthetic p1',reason:'Synthetic',reviewer:'QA',date:today};
+const raw={id:'LINE-QA',wbs:'A',systemToken:'COMMON',customerRowCode:'A1-05',selected:true,offerId:'',calculationId:'',sourceRef:'Synthetic',scopeKey:'QA',requirementRef:'Synthetic',officialReview:review};data.lines=[raw];
+const calculated={lines:[{...raw,problems:[],customerUSD:null}],requirementGaps:[]},integration={ready:false,requirements:[]};
+const official=()=>O.deriveOfficialPricing(data,calculated,today,integration).lines[0];assert(!official().reviewProblems.some(p=>p.includes('แหล่งไม่ใช่ Current Tender')));
+s.authority='HISTORICAL';assert(official().reviewProblems.some(p=>p.includes('แหล่งไม่ใช่ Current Tender')),'Official evidence cannot retain earlier authority');
+s.authority='CURRENT_TENDER';data.sourceIntake.sources[2].content='conflicting revision copy';assert(official().reviewProblems.some(p=>p.includes('Revision / สำเนา')),'Official evidence rechecks copy edits');
+console.log('PASS 0550 evidence pass: shared clauses, whitespace, same-object source text/authority/copy/replacement edits, missing sources, reviewed-dependency staleness and standalone-proof/Official checks stay fresh; no cross-call source cache or approval bypass.');
