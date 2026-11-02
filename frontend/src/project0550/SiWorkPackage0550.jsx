@@ -9,7 +9,7 @@ export function SiWorkPackage0550(){
  const [pack,setPack]=useState(null),[plan,setPlan]=useState(null),[error,setError]=useState(""),[message,setMessage]=useState("");
  async function preview(file){
   setPack(null);setPlan(null);setError("");setMessage("");if(!file)return;
-  try{if(file.size>SI_FILE_LIMIT_0550)throw Error("SI work package exceeds 16 MiB");const p=JSON.parse(await file.text());const next=planSiWorkPackage0550(data,p,tokens);setPack(p);setPlan(next);}catch(e){setError(e.message);}
+  try{if(file.size>SI_FILE_LIMIT_0550)throw Error(`SI work package exceeds ${SI_FILE_LIMIT_0550/1024/1024} MiB`);const p=JSON.parse(await file.text());const next=planSiWorkPackage0550(data,p,tokens);setPack(p);setPlan(next);}catch(e){setError(e.message);}
  }
  async function apply(){
   const ok=await change(current=>planSiWorkPackage0550(current,pack,tokens).workspace,"Import SI engineering drafts / "+pack.batchId);

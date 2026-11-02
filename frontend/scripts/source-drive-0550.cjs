@@ -5,6 +5,9 @@ const crypto = require('node:crypto');
 const ENDPOINT = '/api/local/pj2608-0550/source-intake';
 const WORKSPACE_ENDPOINT = '/api/local/pj2608-0550/source-workspace';
 const MAX_BYTES = 32 * 1024 * 1024;
+// Exact predecessor snapshots are retained in the next reading continuation.
+// Bound preparation separately; source-only and paired-response limits stay fixed.
+const MAX_PREPARATION_BYTES = 40 * 1024 * 1024;
 const PROJECT = /^PJ2608-0550(?:[ _-]|$)/;
 const FILENAME = /^PJ2608-0550_Source_Intake_Rev\d+_\d{8}\.json$/;
 const PREPARATION_FILE = /^PJ2608-0550_A_Work_Package_(?:Rev\d+_)?\d{8}\.json$/;
@@ -39,15 +42,15 @@ async function discoverProjects({roots = defaultRoots(), projectDir = process.en
   }
   return [...new Set(projects)];
 }
-async function readJson(file) {
+async function readJson(file, maxBytes = MAX_BYTES) {
   const handle=await fs.open(file,'r');
   try {
     const stat=await handle.stat();
-    if(!stat.isFile() || stat.size>MAX_BYTES) throw fail('SOURCE_FILE_TOO_LARGE');
+    if(!stat.isFile() || stat.size>maxBytes) throw fail('SOURCE_FILE_TOO_LARGE');
     // Bounded read also protects against a file growing during cloud sync.
-    const buffer=Buffer.alloc(MAX_BYTES+1);let size=0;
+    const buffer=Buffer.alloc(maxBytes+1);let size=0;
     while(size<buffer.length) {const r=await handle.read(buffer,size,buffer.length-size,null);if(!r.bytesRead)break;size+=r.bytesRead;}
-    if(size>MAX_BYTES)throw fail('SOURCE_FILE_TOO_LARGE');
+    if(size>maxBytes)throw fail('SOURCE_FILE_TOO_LARGE');
     const body=buffer.subarray(0,size).toString('utf8').replace(/^\uFEFF/,'');
     let intake;try{intake=JSON.parse(body);}catch{throw fail('SOURCE_FILE_INVALID');}
     return {body,intake,hash:crypto.createHash('sha256').update(body).digest('hex')};
@@ -85,8 +88,8 @@ async function loadDriveSourceWorkspace(options){
  if(files.length>50)throw fail('A_PREPARATION_FILE_LIMIT');
  const matches=[];
  for(const file of files){
-  const row=await readJson(file),p=row.intake;
-  if(p.projectId!=='PJ2608-0550'||!['genesis.0550.si-work-package.v2','genesis.0550.si-work-package.v3','genesis.0550.si-work-package.v4','genesis.0550.si-work-package.v5'].includes(p.schema)||Buffer.byteLength(row.body)>32*1024*1024)throw fail('A_PREPARATION_FILE_INVALID');
+  const row=await readJson(file,MAX_PREPARATION_BYTES),p=row.intake;
+  if(p.projectId!=='PJ2608-0550'||!['genesis.0550.si-work-package.v2','genesis.0550.si-work-package.v3','genesis.0550.si-work-package.v4','genesis.0550.si-work-package.v5'].includes(p.schema)||Buffer.byteLength(row.body)>MAX_PREPARATION_BYTES)throw fail('A_PREPARATION_FILE_INVALID');
   if(p.sourceBatchId!==latest.intake.batchId)continue;
   if(typeof p.preparedOn!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(p.preparedOn)||!Number.isFinite(Date.parse(p.preparedOn))||new Date(p.preparedOn).toISOString().slice(0,10)!==p.preparedOn)throw fail('A_PREPARATION_FILE_INVALID');
   matches.push(row);
@@ -128,4 +131,4 @@ function createMiddleware(loader=()=>loadDriveIntake(),workspaceLoader=()=>loadD
     }catch(e){res.statusCode=e.status||503;res.end(JSON.stringify({code:e.status?e.code:'DRIVE_UNREADABLE'}));}
   };
 }
-module.exports={ENDPOINT,WORKSPACE_ENDPOINT,MAX_BYTES,batchKey,discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,createMiddleware,permitted};
+module.exports={ENDPOINT,WORKSPACE_ENDPOINT,MAX_BYTES,MAX_PREPARATION_BYTES,batchKey,discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,createMiddleware,permitted};

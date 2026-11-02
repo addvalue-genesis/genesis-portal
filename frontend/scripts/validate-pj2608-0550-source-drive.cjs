@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path'),http=require('node:http'),babel=require('@babel/core');
-const {discoverProjects,loadDriveIntake,createMiddleware,permitted,MAX_BYTES}=require('./source-drive-0550.cjs');
+const {discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,createMiddleware,permitted,MAX_BYTES,MAX_PREPARATION_BYTES}=require('./source-drive-0550.cjs');
 const root=path.resolve(__dirname,'../src'),oldJS=require.extensions['.js'];
 require.extensions['.js']=(mod,file)=>file.startsWith(root+path.sep)?mod._compile(babel.transformFileSync(file,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}]]}).code,file):oldJS(mod,file);
 (async()=>{
@@ -32,6 +32,14 @@ require.extensions['.js']=(mod,file)=>file.startsWith(root+path.sep)?mod._compil
   assert.equal(JSON.parse(await loadDriveIntake({roots:[tmp]})).batchId,intake.batchId);
   await fs.writeFile(older,JSON.stringify({...intake,coverageNote:'conflicting content'}));await assert.rejects(loadDriveIntake({roots:[tmp]}),/CONFLICT/);await fs.unlink(older);
   const original=await fs.readFile(file);await fs.writeFile(file,' '.repeat(MAX_BYTES+1));await assert.rejects(loadDriveIntake({roots:[tmp]}),/TOO_LARGE/);await fs.writeFile(file,original);
+  // A retained-history preparation can exceed 32 MiB; source reads still cannot.
+  assert.equal(MAX_BYTES,32*1024*1024);assert.equal(MAX_PREPARATION_BYTES,40*1024*1024);
+  assert.equal(require(path.join(root,'project0550/data/siWorkPackage0550.js')).SI_FILE_LIMIT_0550,MAX_PREPARATION_BYTES);
+  const prep=path.join(dir,'PJ2608-0550_A_Work_Package_Rev07_20261102.json');
+  await fs.writeFile(prep,JSON.stringify({schema:'genesis.0550.si-work-package.v5',projectId:'PJ2608-0550',batchId:'SYNTHETIC-BOUNDED-PREPARATION',preparedOn:'2026-11-02',sourceBatchId:intake.batchId,coverageNote:'x'.repeat(MAX_BYTES)}));
+  assert.equal(JSON.parse(await loadDriveSourceWorkspace({projectDir:project})).aWorkPackage.batchId,'SYNTHETIC-BOUNDED-PREPARATION');
+  const prepHandle=await fs.open(prep,'w');await prepHandle.truncate(MAX_PREPARATION_BYTES+1);await prepHandle.close();
+  await assert.rejects(loadDriveSourceWorkspace({projectDir:project}),/TOO_LARGE/);await fs.unlink(prep);
   const request={socket:{remoteAddress:'127.0.0.1'},headers:{host:'localhost:3001',origin:'http://localhost:3001','sec-fetch-site':'same-origin'}};
   assert(permitted(request));assert(!permitted({...request,socket:{remoteAddress:'192.168.1.10'}}));
   assert(!permitted({...request,headers:{...request.headers,origin:'https://evil.example'}}));
