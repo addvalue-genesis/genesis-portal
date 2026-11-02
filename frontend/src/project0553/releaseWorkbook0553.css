@@ -255,3 +255,18 @@
 .p553-b10-stage-selection-table th:nth-child(9){width:14%}
 .p553-b10-stage-selection-table td small{display:block;font-size:10px;margin-top:4px;color:#516b7b}
 .p553-b10-stage-flag{text-align:center;font-weight:700}
+
+/* Compact eight-column C1/C2 review preview; original customer Excel untouched. */
+.p553-spare-tag-preview .p553-b10-native-annex-table{min-width:1120px}
+.p553-spare-tag-preview .p553-b10-native-annex-table thead tr,
+.p553-spare-tag-preview .p553-b10-native-annex-table thead th{height:auto;min-height:0;vertical-align:top}
+.p553-spare-tag-preview .p553-b10-native-annex-table th:nth-child(1){width:5%}
+.p553-spare-tag-preview .p553-b10-native-annex-table th:nth-child(2){width:16%}
+.p553-spare-tag-preview .p553-b10-native-annex-table th:nth-child(3){width:17%}
+.p553-spare-tag-preview .p553-b10-native-annex-table th:nth-child(4){width:26%}
+.p553-spare-tag-preview .p553-b10-native-annex-table th:nth-child(5){width:13%}
+.p553-spare-tag-preview .p553-b10-native-annex-table th:nth-child(6){width:7%}
+.p553-spare-tag-preview .p553-b10-native-annex-table th:nth-child(7),
+.p553-spare-tag-preview .p553-b10-native-annex-table th:nth-child(8){width:8%}
+.p553-spare-tag-preview .p553-c2-tag-list{margin-top:4px;max-height:120px;overflow:auto}
+@media print{.p553-c1-selected-source>summary{display:none!important}}

@@ -14,9 +14,27 @@ export function C1SiTagBudget0553(){
    {" "}L3 Switch {model.ownerDecisions.l3.selectedCopperPorts} copper ports + {model.ownerDecisions.l3.selectedSfpPorts} SFP ตาม TC-0001 Item 13;
    {" "}MDS ไม่รวม FAT สายเชื่อมต่อ/สายภาคสนาม และ Cable glands — ADDVALUE ดำเนินการ FAT ใน B3 ที่ SAMTEL Thailand และจัดหาวัสดุผ่าน MR0004 field bulk
    {" "}ต้องตรวจงบเดิมก่อนเพิ่มค่าใช้จ่าย จำนวนสำรองทุกแถวรวม D/E ยังต้องผ่าน SI ตรวจซ้ำ</p>
+  <div className="p553-b10-original-annex p553-spare-tag-preview" data-c1-annex-preview="DRAFT">
+   <div className="p553-native-title">SUPPLIER RECOMMENDATION FOR CAPITAL SPARE PARTS — C1 REVIEW PREVIEW</div>
+   <p className="p55-note">Reference equipment TAG / site only; not a new spare asset TAG or confirmation of interchangeability.
+    {" "}QTY is project spare stock, not quantity per reference TAG. Conditional budgetary preview; excluded from A+B.</p>
+   <div className="p553-b10-commercial-scroll"><table className="p553-customer-table p553-b10-native-annex-table">
+    <thead><tr>{["Item","Tag No. / Reference site","Description","Detail Specification","Materials","QTY","UNIT PRICE (USD)","TOTAL PRICE (USD)"].map(h=><th key={h}>{h}</th>)}</tr></thead>
+    <tbody>{model.annexRows.map(r=><tr key={r.id} data-c1-si-price-row={r.id}>
+     <td>{r.item}</td><td>{r.tagNo}</td><td>{r.description}</td><td>{r.specification}</td><td>{r.materials}</td>
+     <td>{r.quantity} {r.unit}{r.quantity>1?"s":""}</td><td className="p553-price-cell">{money(r.unitUSD)}</td><td className="p553-price-cell">{money(r.totalUSD)}</td>
+    </tr>)}</tbody>
+    <tfoot><tr><th colSpan={7}>ITEM SUBTOTAL (USD)</th><th>{money(model.annexSubtotalUSD)}</th></tr>
+     <tr><th colSpan={7}>CATEGORY ROUNDING (USD)</th><th>{money(model.annexRoundingUSD)}</th></tr>
+     <tr><th colSpan={7}>C1 PROPOSED BUDGET (USD)</th><th>{money(model.proposedQuoteUSD)}</th></tr></tfoot>
+   </table></div>
+   <p className="p55-note">Item 5 retained. MDS field/interconnection cables, cable glands and FAT are excluded;
+    {" "}ADDVALUE supplies/executes through field bulk and B3. Applicability and existing budget coverage must be reconciled before any additional charge.</p>
+  </div>
+  <details><summary>Source → TAG → SI calculation / ฐานต้นทุนและการตรวจย้อนกลับ</summary>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>กลุ่ม / รายการสำรอง</th><th>ซ้าย — MR / TAG ที่ต้องรองรับ</th><th>ขวา — ราคาอ้างอิง</th><th>จำนวนสำรอง</th><th>ต้นทุนฐานงบ</th><th>SELL ฐานงบ THB</th><th>SI decision</th></tr></thead>
-   <tbody>{model.rows.map(r=><tr key={r.id} data-c1-si-price-row={r.id}>
+   <tbody>{model.rows.map(r=><tr key={r.id} data-c1-si-audit-row={r.id}>
     <td><strong>{r.group}. {r.groupTitle}</strong><small>{r.description}</small></td>
     <td>{r.left.map(x=><p key={x.key}><strong>{x.site} · {x.tag}</strong><small>{x.mr} · source item {x.id}</small><small>{x.source}</small></p>)}</td>
     <td><strong>{r.rateBasis}</strong><details><summary>{r.right.length} quoted component(s)</summary>
@@ -26,7 +44,7 @@ export function C1SiTagBudget0553(){
     <td>{money(r.budgetSellTHB)}</td><td>{r.siDecision}</td>
    </tr>)}</tbody>
    <tfoot><tr><th colSpan={4}>C1 equipment-budget total</th><th>THB {money(model.equipmentCostTHB)}</th><th>{money(model.budgetSellTHB)}</th><th>USD {money(model.proposedQuoteUSD)}</th></tr></tfoot>
-  </table></div>
+  </table></div></details>
   <p className="p55-note">สมการเดิม: Σ(จำนวนสำรอง × ราคาอ้างอิง × FX) × {model.priceFactor.toFixed(2)}
    {" "}→ ÷ {model.fxTHBPerUSD} → ปัดขึ้น USD100 ที่ยอดรวมครั้งเดียว
    {" "}· ผลต่างการปัดเศษรายแถวกับยอดรวม THB {money(model.rowRoundingResidualTHB)}</p>

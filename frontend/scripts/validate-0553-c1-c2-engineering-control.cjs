@@ -121,6 +121,9 @@ for(const code of ['C1','C2']){
  assert(working.includes('data-c1c2-engineering-control="'+code+'"'));
 }
 const officialView=fs.readFileSync(path.join(root,'project0553/OfficialUsdRelease0553.jsx'),'utf8');
-assert(officialView.includes('["C1","C2"].includes(sheet)&&<C1C2EngineeringControl0553'));
+assert(officialView.includes('sheet==="C1"&&<C1C2EngineeringControl0553 code="C1"'));
+assert(officialView.includes('sheet==="C2"&&<C1C2EngineeringControl0553 code="C2"'));
+assert(officialView.indexOf('code="C1" onOpenSource')<officialView.indexOf('<SelectedSheet'),
+ 'New C1 review precedes the separately labelled current selected Excel source');
 assert.equal(renderToStaticMarkup(React.createElement(C1C2EngineeringControl0553,{code:'B11'})),'');
 console.log('PASS C1/C2: all four MR / six main systems, exact installed source identities, OPEN quantities/prices without evidence, SPQ-002 two-year calculation, OEM/minimum/Ex/stock/price/lead-time gates, manufacturer+part B10 exclusion, distinct C1/C2 stock, one category FX rounding, unchanged all financial models and module IDs.');

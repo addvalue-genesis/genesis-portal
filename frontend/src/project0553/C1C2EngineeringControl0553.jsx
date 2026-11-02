@@ -1,6 +1,7 @@
 import React,{useMemo} from "react";
 import {selectC1C2EngineeringControl0553} from "./data/c1c2EngineeringControl0553";
 import {C1SiTagBudget0553} from "./C1SiTagBudget0553";
+import {C2TagReview0553} from "./C2TagReview0553";
 
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"OPEN — ยังไม่มีข้อมูลยืนยัน";
 const labels={CLASSIFICATION_DECISION:"การแนะนำอะไหล่รายรายการ",CLASSIFICATION_REASON_AND_SOURCE:"เหตุผลและข้อกำหนดอ้างอิงรายรายการ",
@@ -16,7 +17,7 @@ export function C1C2EngineeringControl0553({code,onOpenSource=null,open=true}){
  const model=useMemo(()=>selectC1C2EngineeringControl0553(),[]);
  const item=model.codes[code];
  if(!item)return null;
- return <>{code==="C1"&&<C1SiTagBudget0553/>}
+ return <>{code==="C1"&&<C1SiTagBudget0553/>}{code==="C2"&&<C2TagReview0553/>}
  <details className="p55-panel p553-c1c2-engineering-review" open={code==="C1"?false:open} style={{padding:12,marginTop:12}}
    data-c1c2-engineering-control={code}>
   <summary><strong>{code} — ตรวจครบทุกระบบ / Quantity & Price Control</strong>

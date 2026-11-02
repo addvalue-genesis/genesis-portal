@@ -12,6 +12,28 @@ import {OPTION_BUDGETARY_QUOTE_POLICY_0553} from "./optionBudgetaryOffer0553";
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const freeze=Object.freeze;
 const identity=x=>JSON.stringify([x.mr,x.site,String(x.id)]);
+// Customer-style wording is a view of the existing six budget rows, not a
+// second spare ledger. Reference equipment TAGs are not new spare asset TAGs.
+const annexText=freeze({
+ "C1-SI-ODU-BASE":["1.1","SCADA base-station spare assembly",
+  "RDL3000 Ellipse 4.9–5.8 GHz base radio with marine RF filter and PMP capacity key, per Next G D-1/D-2/D-3.",
+  "OEM radio assembly, RF filter and software entitlement"],
+ "C1-SI-ODU-REMOTE":["1.2","SCADA subscriber spare assembly",
+  "Connect-OW-ER 4.9–5.8 GHz remote radio with marine RF filter and PTP/PMP remote capacity key, per Next G E-1/E-2/E-3.",
+  "OEM radio assembly, RF filter and software entitlement"],
+ "C1-SI-INDOOR":["2","Radio PoE power-supply spare sets",
+  "PS-DCDC-HAZ-POE-IND-01 power supply with PPT-B cord. Quoted indoor power interface; complete IDU equivalence subject to confirmation.",
+  "Industrial PoE power supply and power cord"],
+ "C1-SI-L3":["3","L3 network-switch spare package",
+  "Cisco IE-3400-8P2S-E: 8 copper ports + 2 SFP; quoted PWR-IE65W-PC-DC, SmartNet and DNA 3-year licence. Expansion module excluded.",
+  "Industrial Ethernet switch, DC power module and software/support"],
+ "C1-SI-BDA":["4","DMR BDA spare assembly",
+  "RFI BD4345-00N0-AC with WAROM HRMD95-VIIIB enclosure per MGW UHF-1. Original LNA requirement RAD-508-001; final RF/Ex configuration subject to approval.",
+  "RFI BDA and WAROM Ex d enclosure per quoted package"],
+ "C1-SI-RACON":["5","Complete RACON capital-spare package",
+  "SeaBeacon-2 System 6 Ex (X/S band), including Ex control box, DB-5P, purge kit, programming cable and quoted package accessories.",
+  "RACON assembly, control/interface boxes and included accessories"]
+});
 export function selectC1SiTagBudget0553(){
  const projection=selectWorkingBomProjection0553(),fx=OPTION_BUDGETARY_QUOTE_POLICY_0553.fxTHBPerUSD;
  const tag=(mr,site,name)=>{
@@ -90,10 +112,21 @@ export function selectC1SiTagBudget0553(){
  const budgetSellTHB=priceAorCFromCost0553(equipmentCostTHB).customerSellTHB;
  const proposedQuoteUSD=Math.ceil(budgetSellTHB/fx/OPTION_BUDGETARY_QUOTE_POLICY_0553.summaryRoundingUSD-1e-10)*OPTION_BUDGETARY_QUOTE_POLICY_0553.summaryRoundingUSD;
  const priorQuotedUSD=97500;
+ const annexRows=freeze(rows.map(r=>{
+  const text=annexText[r.id];if(!text)throw Error("Missing C1 Annex wording "+r.id);
+  const totalUSD=round(r.budgetSellTHB/fx),unitUSD=round(totalUSD/r.quantity);
+  if(round(unitUSD*r.quantity)!==totalUSD)throw Error("C1 Annex displayed Qty x Unit mismatch "+r.id);
+  return freeze({id:r.id,item:text[0],tagNo:r.left.map(x=>x.tag+" / "+x.site).join("; "),
+   referenceTagKeys:freeze(r.left.map(x=>x.key)),description:text[1],specification:text[2],materials:text[3],
+   quantity:r.quantity,unit:r.unit,unitUSD,totalUSD,sourceRowId:r.id,
+   referenceTagOnly:true,quantityApproved:false,customerIssueAllowed:false});
+ }));
+ const annexSubtotalUSD=round(annexRows.reduce((n,r)=>n+r.totalUSD,0));
  return freeze({rows:freeze(rows),groups:freeze([1,2,3,4,5].map(group=>freeze({group,title:rows.find(r=>r.group===group).groupTitle,
   equipmentCostTHB:round(rows.filter(r=>r.group===group).reduce((n,r)=>n+r.equipmentCostTHB,0)),
   rows:freeze(rows.filter(r=>r.group===group))}))),
   equipmentCostTHB,budgetSellTHB,proposedQuoteUSD,priorQuotedUSD,deltaUSD:proposedQuoteUSD-priorQuotedUSD,
+  annexRows,annexSubtotalUSD,annexRoundingUSD:round(proposedQuoteUSD-annexSubtotalUSD),
   fxTHBPerUSD:fx,priceFactor:RELEASE_POLICY_0553.aAndC.priceFactor,
   rowRoundingResidualTHB:round(budgetSellTHB-rows.reduce((n,r)=>n+r.budgetSellTHB,0)),
   openSourceLines:freeze(["D-4","E-4"].map(code=>{const q=NEXTG.lines.find(x=>x.code===code);return freeze({code,partNo:q.partNumber,unitPrice:q.unitPrice,reason:"Dash is unpriced, not a verified zero. Region entitlement needs confirmation."});})),

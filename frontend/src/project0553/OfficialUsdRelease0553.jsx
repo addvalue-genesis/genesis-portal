@@ -1,4 +1,4 @@
-import React,{useMemo,useState} from "react";
+import React,{useEffect,useMemo,useRef,useState} from "react";
 import {buildOfficialUsdRelease0553,OFFICIAL_SHEETS_0553} from "./data/officialUsdRelease0553";
 import {buildNativeOfficialRelease0553} from "./nativeWorkingDraft0553";
 import template from "./data/nativeReleaseTemplate0553.json";
@@ -14,6 +14,15 @@ const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits
 export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=null,showPriceDetails,onPriceDetailsChange,breakdownView,onBreakdownViewChange}){
  const model=useMemo(()=>buildOfficialUsdRelease0553(source),[source]);
  const [sheet,setSheet]=useState("SUMMARY"),[busy,setBusy]=useState(false),[error,setError]=useState("");
+ const SelectedSheet=sheet==="C1"?"details":"div";
+ const selectedSheetRef=useRef(null);
+ useEffect(()=>{
+  let restore=null;
+  const before=()=>{const el=selectedSheetRef.current;if(el?.tagName==="DETAILS"){restore={el,open:el.open};el.open=true;}};
+  const after=()=>{if(restore){restore.el.open=restore.open;restore=null;}};
+  window.addEventListener("beforeprint",before);window.addEventListener("afterprint",after);
+  return ()=>{after();window.removeEventListener("beforeprint",before);window.removeEventListener("afterprint",after);};
+ },[]);
  const download=async(breakdown=false)=>{
   setBusy(true);setError("");
   try{
@@ -57,6 +66,9 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
    <button type="button" className="p553-detail-button" disabled={busy} onClick={()=>download(true)}>Export Breakdown — Draft / 10 sheets</button></div>
   {error&&<p role="alert">Export failed: {error}</p>}
   <div className="p553-release-tabs" role="tablist" aria-label="Quotation worksheets">{OFFICIAL_SHEETS_0553.map(([name,code])=><button type="button" key={code} role="tab" aria-selected={sheet===code} className={sheet===code?"is-active":""} onClick={()=>setSheet(code)}>{name}</button>)}</div>
+  {sheet==="C1"&&<C1C2EngineeringControl0553 code="C1" onOpenSource={onOpenSource}/>}
+  <SelectedSheet ref={selectedSheetRef} className={sheet==="C1"?"p55-panel p553-c1-selected-source":"p553-selected-sheet"}>
+   {sheet==="C1"&&<summary>Current selected C1 / Original Excel — USD {money(model.otherSpareItemizedAnnex.summaries.C1.totalUSD)} · earlier RACON-only comparator</summary>}
   <div className="p553-native-sheet">
    <div className="p553-native-title">{sheet==="SUMMARY"?"Scope of Supply":model.annexTitles[sheet]}</div>
    <div className="p553-sheet-meta"><strong>Project</strong><span>{model.project}</span><strong>Currency</strong><span>USD</span></div>
@@ -79,7 +91,8 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
      <tr className="p553-sheet-total"><td colSpan={7}>Total (USD)</td><td className="p553-price-cell">{money([...model.b,...model.c].find(r=>r.code===sheet)?.amountUSD)}</td></tr></tbody>
    </table>}</div>
   </div>
-  {["C1","C2"].includes(sheet)&&<C1C2EngineeringControl0553 code={sheet} onOpenSource={onOpenSource}/>}
+  </SelectedSheet>
+  {sheet==="C2"&&<C1C2EngineeringControl0553 code="C2" onOpenSource={onOpenSource}/>}
   <CustomerPriceBreakdown0553 source={source} official={model} onOpenSource={onOpenSource} origin="official" view={breakdownView} onViewChange={onBreakdownViewChange} focus={breakdownFocus} showPriceDetails={showPriceDetails} onPriceDetailsChange={onPriceDetailsChange}/>
  </section>;
 }
