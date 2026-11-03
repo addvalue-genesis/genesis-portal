@@ -318,7 +318,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <div className="p55-eyebrow">COMMERCIAL WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing"/></div>
   <h2>Engineering → BOM/MTO → Cost → Customer Scope of Supply</h2>
   <p className="p55-note"><strong>MR0001 Cisco-only preliminary subtotal (NOT total project cost):</strong> THB {BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US")} · {BID_COST_SPINE_0553.pricedRows} provisionally priced source items / {BID_COST_SPINE_0553.unpricedRows} unpriced · Next G / MGW / other vendors / bulk / A+B+C / customer sell NOT included. Source: {BID_COST_SPINE_0553.source}</p>
-  <p className="p55-note">This is a controlled WORKSPACE, not a price release. The previously issued SAMTEL file is historical evidence; its exact issued revision must be verified before snapshot registration. No 0550 rates or facts transferred.</p>
+  <p className="p55-note">This is a controlled WORKSPACE, not a price release. Official Release defaults to the verified submitted SAMTEL Rev02 archive. Working changes do not overwrite that submitted workbook. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
     {pricingNavigation}
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
@@ -326,9 +326,9 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <p className="p55-note" data-component-key="bid.budget.pricing.view-reference">
    <strong>Current module:</strong> {activePricingView.number} · {activePricingView.fullLabel} ·
    <ComponentCopyId projectId="PJ2608-0553" componentKey={activePricingView.moduleId}/>
-   {" "}· {recipient} · LIVE projection from 10.1 + 10.2 selected source · Approval HOLD; not issued. Views share the same source; Official USD applies quotation conversion and rounding.
+   {pricingStage==="official"?<> · {recipient} · Official defaults to submitted Rev02, 30-Oct-2026. Working draft is selected separately inside that view.</>:<> · {recipient} · LIVE projection from 10.1 + 10.2 selected source · Approval HOLD; not issued.</>}
   </p>
-  {recipient==="INTERNAL"&&<PricingCfoDashboard0553 model={releaseModel}/>}
+  {recipient==="INTERNAL"&&pricingStage!=="official"&&<PricingCfoDashboard0553 model={releaseModel}/>}
   <>
   <section className="p55-panel">
    <div className="p55-eyebrow">CURRENCY VIEW / ORIGINAL CURRENCY RETAINED</div>
@@ -513,3 +513,4 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  </details>
  </div>;
 }
+

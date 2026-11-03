@@ -5,6 +5,23 @@ import {roundAnnexUnitPrices0553} from "./c1SiTagBudget0553";
 import {buildB10OfficialItemizedAnnex0553} from "./b10OfficialItemizedAnnex0553";
 import {buildOtherSpareItemizedPresentation0553} from "./otherSpareItemizedPresentation0553";
 import SUBMITTED_SAMTEL_REV02_0553 from "./snapshots/submitted.samtel.rev02.20261030.json";
+const freezeRelease0553=value=>{
+ if(value&&typeof value==="object"&&!Object.isFrozen(value)){
+  Object.values(value).forEach(freezeRelease0553);Object.freeze(value);
+ }
+ return value;
+};
+const submittedRev02=freezeRelease0553(SUBMITTED_SAMTEL_REV02_0553);
+export const selectSubmittedRev02Release0553=()=>submittedRev02;
+export const MTO_C1_RELEASE_CONFIRMATION_0553=Object.freeze({
+ date:"2026-11-03",authority:"PROJECT_OWNER_USER",releaseRevision:"Rev02",
+ releaseSourceDriveId:"14WGYqVhcrqxL0CVvrcT95yQ8nosYwgMt",
+ releaseBaseUSD:902900,priceChangeUSD:0,
+ mto:"MM-ZTK-1F-GEN-TEL-MTO-0001 Rev.C1",
+ scope:"All materials and associated costs marked Supplied by Telecom Vendor are included in the submitted commercial proposal.",
+ submittedPriceUnchanged:true,internalCostFinalizationPending:true,
+ supplierTechnicalApproval:false,confirmationEmailSent:false
+});
 // Customer presentation derived only from the current 10.3.3 release model.
 // The commercial conversion/rounding layer never writes back to Working THB.
 export const OFFICIAL_USD_POLICY_0553=Object.freeze({thbPerUsd:31.5,incrementUSD:100,rounding:"UP_UNIT_TO_TENS_THEN_ROLLUP",unitIncrementUSD:10,summarySeedRounding:"UP_PER_SUMMARY_LINE"});
