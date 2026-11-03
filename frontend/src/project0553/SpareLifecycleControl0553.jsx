@@ -6,13 +6,13 @@ const titles={
  B10:"Erection / Pre-commissioning / Commissioning / Start-up spares",
  B11:"Operation & Maintenance Special Tools",
  B13:"Preservation / Commissioning Consumables",
- C1:"Capital Spares — optional quotation",
- C2:"Two-year Operating Spares — optional quotation"
+ C1:"Capital Spares — required quotation; purchase selected separately",
+ C2:"Two-year Operating Spares — required quotation; purchase selected separately"
 };
 export function SpareLifecycleControl0553({
  model,view="working",onOpenSource=null,onOpenReleaseRow=null
 }){
- if(!model||model.rows.length!==16||model.releaseAllowed!==false)throw Error("0553 spare lifecycle view requires 16 unissued source rows");
+ if(!model||model.rows.length!==15||model.releaseAllowed!==false)throw Error("0553 spare lifecycle view requires 15 selected unissued source rows");
  return <details className="p55-panel p553-spare-lifecycle" data-component-key={"bid.budget."+(
     view==="release"?"pricing.release.preview.spare-lifecycle":"working.bc.spare-lifecycle-control")}
    style={{padding:12}}>
@@ -45,7 +45,7 @@ export function SpareLifecycleControl0553({
    the proposal is not a priced full OEM SPIR. B11/B13 have no new validated itemized rates;
    C1 has only an installed FCA equipment price comparator, and C2 has no current two-year supplier offer.
    No candidate is automatically credited against or added to the selected WBS SELL.</p>
-  <p className="p55-note">Price owners are unchanged. A 14-kit B10 contractual minimum does not prove
+  <p className="p55-note">RACON B10 allowance is owner-excluded; remaining source owners are unchanged. A 14-kit B10 contractual minimum does not prove
    the quantity or price of an individual OEM spare article; B11 permanent handover tools differ
    from B3 temporary testing, B13 consumables differ from B5/A5 installed materials, C1/C2 require
    separate OEM stock ownership. All source references below open exact Working / Release records.</p>
@@ -69,7 +69,7 @@ export function SpareLifecycleControl0553({
    </table></div>
   </details>
   <details className="p553-spare-lifecycle-sub">
-   <summary>Source ↔ Release — all 16 specific line identities</summary>
+   <summary>Source ↔ Release — all 15 selected line identities</summary>
    <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
     <thead><tr><th>Owner</th><th>Source Row</th><th>Requirement / MR</th><th>Kit / Working Qty</th><th>Working THB</th><th>Navigation</th></tr></thead>
     <tbody>{model.rows.map(x=><tr key={x.id}
@@ -104,7 +104,7 @@ export function SpareLifecycleControl0553({
     <tbody>{model.alertFamilies.map((x,i)=><tr key={x.family+":"+i}>
      <td>{x.family}</td><td>{x.categories.join(" / ")}</td><td>{x.decision}</td></tr>)}</tbody></table></div>
   </details>}
-  <p className="p55-note"><strong>Reconciliation:</strong> 16/16 parent Source / Release IDs
+  <p className="p55-note"><strong>Reconciliation:</strong> 15/15 parent Source / Release IDs
    and amounts match. SKU/stock allocation is NOT approved. Neither this screen nor navigation changes
    WBS SELL, Official USD, native Excel or customer release authority.</p>
  </details>;

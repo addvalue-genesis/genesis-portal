@@ -35,11 +35,11 @@ for(const code of priced.codes){
 }
 
 assert.deepEqual(SPARE_LIFECYCLE_CODES_0553,["B10","B11","B13","C1","C2"]);
-assert.deepEqual(SPARE_LIFECYCLE_CODES_0553.map(x=>model.totals[x].rows),[4,4,3,1,4]);
+assert.deepEqual(SPARE_LIFECYCLE_CODES_0553.map(x=>model.totals[x].rows),[3,4,3,1,4]);
 assert.deepEqual(SPARE_LIFECYCLE_CODES_0553.map(x=>model.totals[x].workingSellTHB),
- [509827.5,157657.5,46683,null,null]);
-assert.equal(model.rows.length,16);
-assert.equal(new Set(model.rows.map(x=>x.sourceId)).size,16);
+ [405405,157657.5,46683,null,null]);
+assert.equal(model.rows.length,15);
+assert.equal(new Set(model.rows.map(x=>x.sourceId)).size,15);
 assert.equal(model.rules.length,7);
 assert.equal(model.confirmedSameSkuCrossCategory,0);
 assert.equal(model.releaseAllowed,false);
@@ -69,7 +69,7 @@ assert(model.rules.some(x=>x.id==="B10-C2"&&x.requirement.includes("Attachment 7
 assert(model.rules.some(x=>x.id==="B11-B3"));
 assert(model.rules.some(x=>x.id==="B13-B5"));
 assert(model.rules.some(x=>x.id==="B13-A5"));
-const expectedOfficial={B10:16200,B11:5100,B13:1500};
+const expectedOfficial={B10:12960,B11:null,B13:1530};
 for(const code of SPARE_LIFECYCLE_CODES_0553){
  const rows=model.rows.filter(x=>x.code===code),working=source.currentByCode[code],shown=release.annex[code];
  assert.equal(rows.length,working.length);
@@ -101,7 +101,7 @@ for(const code of SPARE_LIFECYCLE_CODES_0553){
 const html=renderToStaticMarkup(React.createElement(SpareLifecycleControl0553,{
  model,view:"release",onOpenSource:()=>{},onOpenReleaseRow:()=>{}
 }));
-assert.equal((html.match(/data-spare-roundtrip-row=/g)||[]).length,16);
+assert.equal((html.match(/data-spare-roundtrip-row=/g)||[]).length,15);
 assert(html.includes("Release HOLD"));
 for(const item of model.rows){
  assert(html.includes('data-spare-roundtrip-row="'+item.sourceId+'"'));
@@ -149,6 +149,6 @@ assert(detail.includes("onOpenReleaseRow({code,sourceId:x.id,sourceRowModuleId:x
 assert(modelJs.includes("customerReleaseAllowed:false"));
 assert(officialJs.includes('incrementUSD:100'));
 assert(exportJs.includes('if(detail.length>13)throw Error(code+" exceeds 13 physical rows in original.'));
-assert.equal(release.annexTraceAudit.totalRows,16);
+assert.equal(release.annexTraceAudit.totalRows,15);
 assert.equal(release.approval.releaseAllowed,false);
-console.log("PASS 0553 five-category: 16/16 roundtrip, selected financial owner preserved; NEW B10 review THB568083.85 vs selected THB509827.50, C1 installed comparator THB3071250 unposted, B11/B13/C2 new rates not established, Official unchanged, seven no-duplicate gates");
+console.log("PASS 0553 five-category: 15/15 selected roundtrip, selected financial owner preserved; NEW B10 review THB568083.85 vs selected THB405405.00, C1 installed comparator THB3071250 unposted, B11/B13/C2 new rates not established, Official unchanged, seven no-duplicate gates");

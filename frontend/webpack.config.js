@@ -13,8 +13,8 @@ const currentGitRevision = () => {
   } catch (_) {return "UNAVAILABLE";}
 };
 
-module.exports = {
-  entry: "./src/index.jsx",
+module.exports = (env = {}) => ({
+  entry: env.project === "0553" ? "./src/index0553.jsx" : "./src/index.jsx",
   plugins: [
     new webpack.DefinePlugin({
       __PJ0553_BUILD_REVISION__:JSON.stringify(currentGitRevision())
@@ -49,4 +49,4 @@ module.exports = {
     historyApiFallback: true,
     port: 3000
   }
-};
+});

@@ -47,7 +47,7 @@ export function selectScopeBcPriceAudit0553({thbPerUsd=null}={}){
    code,description:historic[1],moduleId:"bid.budget.scope."+code.toLowerCase(),
    ownerModuleId:current.moduleId,sourceModuleId:canonical.moduleId,
    sourceUrl:current.sourceUrl,sourceRevision:current.sourceRevision,
-   workingSellTHB:current.workingSellTHB,directCostTHB:current.directCostTHB,
+   offerTreatment:current.offerTreatment,workingSellTHB:current.workingSellTHB,directCostTHB:current.directCostTHB,
    commercialSellTHB:current.commercialSellTHB,costState:current.costState,
    priceStatus:current.priceStatus,optional:isOptional,baseScope:!isOptional,
    historicalReferenceUSD:summaryUSD,historicalReferenceTHB:money(summaryUSD,fx),

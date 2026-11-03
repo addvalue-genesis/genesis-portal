@@ -16,7 +16,7 @@ const mr0003=MR0003_MGW_WORKING_BOM_0553.sites.map(s=>({
   sourceQty:item.qty,sourceUnit:item.unit})),
  subtotals:[{currency:"THB",amount:s.controlledTotalTHB}],gaps:s.gaps,
  projectionSource:"MR0003_EXION_4SITE_WORKING_BOM_SELECTED",
- completeness:"EXION_QUOTE_4_SITES__JB_GLANDS_AND_TECH_OPEN",
+ completeness:"EXION_PAIRS_AND_OWNER_SELECTED_JB_ALLOWANCE__GLANDS_AND_TECH_OPEN",
  rfqSource:source.systems.find(x=>x.id==="MR-0003")?.rfqSource||null
 }));
 const mr0004=MR0004_WORKING_BOM_0553.sites.map(site=>({

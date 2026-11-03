@@ -21,6 +21,14 @@ const unitOriginal=originalSwitchOffers.reduce((n,x)=>n+(x?.unitPrice||0),0);
 const unitReduction=removedSwitchOffers.reduce((n,x)=>n+(x?.unitPrice||0),0);
 const tc0001Ref="MM-ZTK-1F-GEN-TEL-TC-0001 / Item 13";
 const tc0001Gate="ENGINEERING_REVIEW_PENDING_SITE_PORT_MAPPING_POE_POWER_AND_L3_LICENCE";
+export const L3_PORT_DECISION_0553=Object.freeze({
+ date:"2026-11-02",authority:"PROJECT_MANAGEMENT_USER",source:"TC-0001 Item 13",
+ selectedCopperPorts:8,selectedSfpPorts:2,expansionSelected:false,
+ status:"OWNER_CONFIRMED_8_COPPER_PLUS_2_SFP",
+ evidence:"Owner confirmed: เอาตามนี้ — L3 Switch 8 ports per TC-0001 Item 13",
+ remainingChecks:Object.freeze(["Per-site port allocation","PoE load and 65W power supply","L3 licence entitlement","Ex installation"]),
+ customerTechnicalApproval:false,spareQuantityApproved:false,pricePostingAllowed:false
+});
 const lineQtyText=r=>r.sourceQuantityText.split(/\n/).map(s=>s.trim()).filter(Boolean);
 const rows=MTO.itemRows.flatMap(r=>{
  const tags=r.sourceItemCodes.length?r.sourceItemCodes:[r.sourcePartText];
@@ -55,6 +63,7 @@ export const MR0001_WORKING_PRICED_BOM=Object.freeze({
  items:rows,sourceRowCount:MTO.itemRows.length,sourceItemCount:rows.length,
  cisco:{siteCount:scoped.length,sourceScopeSets:scoped.reduce((n,r)=>n+(r.sourceScopeQty||0),0),
   sourceQuote:"A-0048/2026_Re1",quoteQty:5,currency:"THB",
+  portDecision:L3_PORT_DECISION_0553,
   items:switchOffers,originalQuoteItems:originalSwitchOffers,removedItems:removedSwitchOffers,
   unitPackageQuotedSumTHB:perSwitch,originalUnitQuotedTHB:unitOriginal,
   removedUnitTHB:unitReduction,removedTotalTHB:unitReduction*scoped.reduce((n,r)=>n+(r.sourceScopeQty||0),0),

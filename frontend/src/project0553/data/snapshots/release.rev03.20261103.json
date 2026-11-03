@@ -1,0 +1,6154 @@
+{
+  "revision": "Rev03",
+  "receivedDate": "2026-11-03",
+  "authority": "OWNER_PROVIDED_WORKBOOK",
+  "state": "CURRENT_PRICE_REFERENCE_NOT_ISSUED",
+  "filename": "4-Scope of Supply Rev03.xlsx",
+  "libraryFileId": "libfile_01d1763dc65c8191903ca64b2297eeb6",
+  "sourceWorkbookSha256": "d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e",
+  "sourceSizeBytes": 146675,
+  "worksheetCount": 6,
+  "currency": "USD",
+  "totalBaseUSD": 894910,
+  "totalSourceCell": "Scope of supply!G38",
+  "rows": [
+    {
+      "code": "A1",
+      "amountUSD": 241290,
+      "priceText": null,
+      "sourceCell": "G8"
+    },
+    {
+      "code": "A2",
+      "amountUSD": 137130,
+      "priceText": null,
+      "sourceCell": "G9"
+    },
+    {
+      "code": "A3",
+      "amountUSD": 34200,
+      "priceText": null,
+      "sourceCell": "G10"
+    },
+    {
+      "code": "A4",
+      "amountUSD": 292500,
+      "priceText": null,
+      "sourceCell": "G11"
+    },
+    {
+      "code": "B1",
+      "amountUSD": 27400,
+      "priceText": null,
+      "sourceCell": "G24"
+    },
+    {
+      "code": "B2",
+      "amountUSD": 7600,
+      "priceText": null,
+      "sourceCell": "G25"
+    },
+    {
+      "code": "B3",
+      "amountUSD": 73800,
+      "priceText": null,
+      "sourceCell": "G26"
+    },
+    {
+      "code": "B4",
+      "amountUSD": null,
+      "priceText": "N/A",
+      "sourceCell": "G27"
+    },
+    {
+      "code": "B5",
+      "amountUSD": 9900,
+      "priceText": null,
+      "sourceCell": "G28"
+    },
+    {
+      "code": "B6",
+      "amountUSD": 10700,
+      "priceText": null,
+      "sourceCell": "G29"
+    },
+    {
+      "code": "B7",
+      "amountUSD": 1000,
+      "priceText": null,
+      "sourceCell": "G30"
+    },
+    {
+      "code": "B8",
+      "amountUSD": 4600,
+      "priceText": null,
+      "sourceCell": "G31"
+    },
+    {
+      "code": "B9",
+      "amountUSD": 15300,
+      "priceText": null,
+      "sourceCell": "G32"
+    },
+    {
+      "code": "B10",
+      "amountUSD": 12960,
+      "priceText": null,
+      "sourceCell": "G33"
+    },
+    {
+      "code": "B11",
+      "amountUSD": null,
+      "priceText": "N/A",
+      "sourceCell": "G34"
+    },
+    {
+      "code": "B12",
+      "amountUSD": null,
+      "priceText": "N/A",
+      "sourceCell": "G35"
+    },
+    {
+      "code": "B13",
+      "amountUSD": 1530,
+      "priceText": null,
+      "sourceCell": "G36"
+    },
+    {
+      "code": "B14",
+      "amountUSD": 25000,
+      "priceText": null,
+      "sourceCell": "G37"
+    },
+    {
+      "code": "C1",
+      "amountUSD": 181100,
+      "priceText": null,
+      "sourceCell": "G41"
+    },
+    {
+      "code": "C2",
+      "amountUSD": 27220,
+      "priceText": null,
+      "sourceCell": "G42"
+    }
+  ],
+  "issued": false,
+  "sourceDriveId": "1WH3MEJifWoSZ9R_CLLhg7GNu8fSK0dnA",
+  "sourceUrl": "https://docs.google.com/spreadsheets/d/1WH3MEJifWoSZ9R_CLLhg7GNu8fSK0dnA/edit",
+  "ownerSelectedQuotation": true,
+  "readOnly": true,
+  "originalWorkbookPath": "/project0553/releases/Rev03/4-Scope-of-Supply-Rev03.xlsx",
+  "originalWorkbookSizeBytes": 146675,
+  "sourceWorkbookHash": "d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e",
+  "worksheets": [
+    {
+      "name": "Scope of supply",
+      "rows": [
+        [
+          {
+            "value": "Scope of Supply",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Project",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZAWTIKA DEVELOPMENT PROJECT PHASE 1F",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Currency",
+            "numberFormat": "General"
+          },
+          {
+            "value": "USD",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Package Name",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Telecommunications Systems",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Item",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Tag No.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Description",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Main Specification",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Qty",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Unit Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Amount (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Remarks",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Part A: Equipment",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Main Equipment",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 4,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "A1",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-0001",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-0001 SCADA / AVIAT / Cisco",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20, ZWP21, ZWP22, ZWP23, ZPQ, ZWP8, ZWP11",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 241290,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 241290,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "A2",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-0002",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-0002 Trunk Radio",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20, ZWP21, ZWP22",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 137130,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 137130,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "A3",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-0003",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-0003 Ex Telephone / Sounder",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20, ZWP21, ZWP22, ZWP23",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 34200,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 34200,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "A4",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-0004",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-0004 RACON",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20, ZWP21, ZWP22",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 292500,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 292500,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Part B: Services and Other Supplies",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B1",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Engineering and design; project management and coordination; Myanmar import and operating approval services, including applicable government fees.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 27400,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 27400,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B2",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Engineering documentation, test procedures and reports, as-built documents and final dossier in accordance with the VDRL.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 7600,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 7600,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B3",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Inspection, testing and certification. Preparation and FAT at SAMTEL Warehouse: 2 days plus 1 reserve day; shared facilities, test tools and closeout. Survey and offshore SAT included as specified below.\nIncluded: 2 persons; 28 working days; 12 hours/day.\nAdditional labour (Senior / Field): USD 1,000 / 800/person/day.\nProposed OT after 12 hours/day: USD 125 / 100/person/hour.\nProposed standby: USD 1,000 / 800/person/day. Additional services require written agreement; extra travel/accommodation excluded; no overlapping time charges.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 73800,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 73800,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B4",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Painting and protective coating in accordance with the specification, where required.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": "N/A",
+            "numberFormat": "General"
+          },
+          {
+            "value": "N/A",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Not quoted; excluded from this offer.",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B5",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Export packing, preservation and shipping marks in accordance with packing and shipping instructions.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 9900,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 9900,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B6",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Transportation, export documentation and cargo insurance to CIF Zhuhai Port, China (Incoterms 2020); import/export administration and supporting documents for JUTAL.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 10700,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 10700,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B7",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Additional storage allowance beyond included storage.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1000,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 1000,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B8",
+            "numberFormat": "General"
+          },
+          {
+            "value": "End-user training at SAMTEL Warehouse: 1 day plus 1 reserve day; OEM online instruction with ADDVALUE onsite facilitation, training materials and session facilities.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 4600,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 4600,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B9",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Onshore specialist assistance at JUTAL Zhuhai Fabrication Yard, including configuration, integration, mobilisation and accommodation.\nIncluded: 2 persons; 7 working days + 2 travel days/person.\nAdditional labour (Senior / Field): USD 700 / 600/person/day.\nOnshore working hours and OT rates: to be agreed.\nProposed standby: USD 700 / 600/person/day. Additional services require written agreement; extra travel/accommodation excluded; no overlapping time charges.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 15300,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 15300,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B10",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Erection, pre-commissioning, commissioning and start-up spares. Refer to Annex B10.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 12960,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 12960,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "Refer to Annex B10. RACON commissioning spares excluded.",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B11",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Special tools for operation and maintenance. Refer to Annex B11.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": "N/A",
+            "numberFormat": "General"
+          },
+          {
+            "value": "N/A",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Not separately quoted. Tools expressly included in the equipment supply remain included.",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B12",
+            "numberFormat": "General"
+          },
+          {
+            "value": "First-filling materials, where required by the equipment specification.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": "N/A",
+            "numberFormat": "General"
+          },
+          {
+            "value": "N/A",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Not quoted; excluded from this offer.",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B13",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Consumables for preservation, operation and maintenance. Refer to Annex B13.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1530,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 1530,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "Refer to Annex B13",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "B14",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Budgetary insurance allowance for ADDVALUE services in accordance with the stated scope and qualifications.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 25000,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 25000,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "Budgetary insurance allowance for ADDVALUE services; coverage and policy terms subject to confirmation. Cargo insurance in B6; SAMTEL bonds excluded.",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Total A+B (USD)\nNot quoted / excluded: B4, B11, B12.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 894910,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Prices cover the items described above and are subject to the stated scope and qualifications.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "Part C: Options — excluded from Total A+B",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "C1",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Capital spares. Refer to Annex C1.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 181100,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 181100,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "Refer to Annex C1 / Optional; excluded from Total A+B",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": "C2",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Two years of normal operation spare parts. Refer to Annex C2.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 27220,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": 27220,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "Refer to Annex C2 / Optional; excluded from Total A+B",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Proposed delivery: CIF Zhuhai Port, China (Incoterms 2020), subject to buyer approval against original DDP site terms.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ]
+      ],
+      "merges": [
+        {
+          "minRow": 42,
+          "maxRow": 42,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 39,
+          "maxRow": 39,
+          "minCol": 1,
+          "maxCol": 8
+        },
+        {
+          "minRow": 38,
+          "maxRow": 38,
+          "minCol": 1,
+          "maxCol": 4
+        },
+        {
+          "minRow": 1,
+          "maxRow": 1,
+          "minCol": 1,
+          "maxCol": 8
+        },
+        {
+          "minRow": 29,
+          "maxRow": 29,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 6,
+          "maxRow": 6,
+          "minCol": 1,
+          "maxCol": 8
+        },
+        {
+          "minRow": 34,
+          "maxRow": 34,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 28,
+          "maxRow": 28,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 37,
+          "maxRow": 37,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 30,
+          "maxRow": 30,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 24,
+          "maxRow": 24,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 33,
+          "maxRow": 33,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 36,
+          "maxRow": 36,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 41,
+          "maxRow": 41,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 35,
+          "maxRow": 35,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 43,
+          "maxRow": 43,
+          "minCol": 2,
+          "maxCol": 8
+        },
+        {
+          "minRow": 32,
+          "maxRow": 32,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 26,
+          "maxRow": 26,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 23,
+          "maxRow": 23,
+          "minCol": 1,
+          "maxCol": 8
+        },
+        {
+          "minRow": 25,
+          "maxRow": 25,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 31,
+          "maxRow": 31,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 27,
+          "maxRow": 27,
+          "minCol": 2,
+          "maxCol": 4
+        },
+        {
+          "minRow": 40,
+          "maxRow": 40,
+          "minCol": 1,
+          "maxCol": 8
+        }
+      ]
+    },
+    {
+      "name": "B10 CommSpares",
+      "rows": [
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Erection, Pre-commissioning, Commissioning and Start-up Spares",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Item",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Tag No.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Description",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Specification",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Materials",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Qty",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Unit Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Amount (USD)",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "1.01",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / MR-502-001; ZWP20 / MR-502-001A; ZWP20 / LAN-502-001; ZWP21 / MR-502-001; ZWP21 / MR-502-001A; ZWP21 / LAN-502-001; ZWP22 / MR-502-001; ZWP22 / MR-502-001A; ZWP22 / LAN-502-001; ZWP23 / MR-502-001; ZWP23 / MR-502-001A; ZWP23 / LAN-502-001",
+            "numberFormat": "General"
+          },
+          {
+            "value": "SCADA / Cisco protective fuse",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Replaceable protective fuse set for SCADA radio indoor power interfaces and Layer 3 network equipment; to match installed fuse ratings and form factors.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Electrical protection fuse cartridges and compatible fuse holders",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1830,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 1830,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "1.02",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / MR-502-001; ZWP20 / MR-502-001A; ZWP21 / MR-502-001; ZWP21 / MR-502-001A; ZWP22 / MR-502-001; ZWP22 / MR-502-001A; ZWP23 / MR-502-001; ZWP23 / MR-502-001A; ZWP20 / LAN-502-001",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Industrial DC PoE power injector",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Industrial DC-to-PoE replacement power/interface assembly for the SCADA radio equipment; supply voltage, PoE rating and connection to match installed units.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Industrial power conversion module, electrical terminals and mounting components",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1830,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 1830,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "1.03",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / LAN-502-001; ZWP20 / SA-502-001; ZWP21 / LAN-502-001; ZWP21 / SA-502-001; ZWP22 / LAN-502-001; ZWP22 / SA-502-001; ZWP23 / LAN-502-001; ZWP23 / SA-502-001",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Ethernet surge/protection component",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Outdoor Ethernet surge-protection replacement assembly for SCADA data links; Ethernet interface, surge rating and mounting arrangement to match installed SA equipment.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Surge protection element, industrial connector housing and mounting fittings",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1830,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 1830,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "1.04",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / ANT-502-001; ZWP20 / SA-502-001; ZWP21 / ANT-502-001; ZWP21 / SA-502-001; ZWP22 / ANT-502-001; ZWP22 / SA-502-001; ZWP23 / ANT-502-001; ZWP23 / ANT-502-002; ZWP23 / SA-502-001; ZWP20 / MR-502-001",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RF surge-protection spare assembly",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Replaceable RF surge-protection assembly for the installed SCADA antenna path, matching operating frequency, impedance, connector interfaces and applicable hazardous-area requirements.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RF surge arrester with matching coaxial connectors and earthing fittings",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1830,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 1830,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "2.01",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / TCAB-508-001; ZWP20 / TCAB-508-002; ZWP21 / TCAB-508-001; ZWP21 / TCAB-508-002; ZWP22 / TCAB-508-001; ZWP22 / TCAB-508-002",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RFI BDA RF surge/coupler service component",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Replaceable RF surge-protection or coupling assembly suitable for the installed trunk-radio RFI BDA system and Ex enclosure interfaces.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RF surge/coupling module and matching coaxial connectors",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 920,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 920,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "2.02",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / ANT-508-001; ZWP20 / ANT-508-002; ZWP21 / ANT-508-001; ZWP21 / ANT-508-002; ZWP22 / ANT-508-001; ZWP22 / ANT-508-002",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RF feeder termination / connector",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RF feeder cable-end termination and repair fittings suitable for the installed BDA antenna cable type, diameter and connector configuration.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RF connectors, cable-end sealing and termination accessories",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 920,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 920,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "2.03",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / TCAB-508-001; ZWP20 / TCAB-508-002; ZWP21 / TCAB-508-001; ZWP21 / TCAB-508-002; ZWP22 / TCAB-508-001; ZWP22 / TCAB-508-002",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Ex enclosure seal/entry spare",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Service seal and cable-entry replacement set suitable for the installed hazardous-area RFI BDA enclosure and cable entry sizes.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Ex-rated gland fittings, gaskets, seals and washers",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 920,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 920,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "3.01",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / TPH-504-001; ZWP21 / TPH-504-001; ZWP22 / TPH-504-001; ZWP23 / TPH-504-001",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Ex IP telephone service component",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Field-replaceable service component set for the installed explosion-proof SIP telephone assembly, maintaining the certified telephone configuration.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Telephone service components, seals and associated fittings",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 720,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 720,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "3.02",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / LSE-504-001; ZWP21 / LSE-504-001; ZWP22 / LSE-504-001; ZWP23 / LSE-504-001",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Ex sounder service component",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Replaceable component set for the installed hazardous-area audible sounder, matching its electrical supply rating and certified enclosure.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Sounder service subassemblies, electrical terminals and seals",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 720,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 720,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "3.03",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / TCAB-504-001; ZWP21 / TCAB-504-001; ZWP22 / TCAB-504-001; ZWP23 / TCAB-504-001",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Certified Ex gland/seal",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Certified cable-gland and sealing replacements for the Ex IP telephone junction box, suitable for selected M20 entries and installed cable sizes.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Ex-rated metal cable glands, sealing elements and stopping fittings",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 720,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 720,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "3.04",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ZWP20 / TPH-504-001; ZWP20 / TCAB-504-001; ZWP21 / TPH-504-001; ZWP21 / TCAB-504-001; ZWP22 / TPH-504-001; ZWP22 / TCAB-504-001; ZWP23 / TPH-504-001; ZWP23 / TCAB-504-001",
+            "numberFormat": "General"
+          },
+          {
+            "value": "CAT6A service retermination material",
+            "numberFormat": "General"
+          },
+          {
+            "value": "CAT6A cable re-termination service materials for the IP telephone circuit, with cable compatibility and shielding maintained.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Shielded CAT6A termination parts and cable protection accessories",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 720,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 720,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Total (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 12960,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ]
+      ],
+      "merges": [
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 2,
+          "maxCol": 2
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 3,
+          "maxCol": 3
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 6,
+          "maxCol": 6
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 5,
+          "maxCol": 5
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 4,
+          "maxCol": 4
+        },
+        {
+          "minRow": 21,
+          "maxRow": 21,
+          "minCol": 2,
+          "maxCol": 5
+        },
+        {
+          "minRow": 2,
+          "maxRow": 3,
+          "minCol": 2,
+          "maxCol": 9
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 7,
+          "maxCol": 7
+        },
+        {
+          "minRow": 4,
+          "maxRow": 4,
+          "minCol": 8,
+          "maxCol": 9
+        },
+        {
+          "minRow": 20,
+          "maxRow": 20,
+          "minCol": 2,
+          "maxCol": 8
+        }
+      ]
+    },
+    {
+      "name": "B11 SpecialTool",
+      "rows": [
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Special Tools for Operation and Maintenance",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Item",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Tag No.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Description",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Specification",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Materials",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Qty",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Unit Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Amount (USD)",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Not separately quoted. Tools expressly included in the equipment supply remain included.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "N/A",
+            "numberFormat": "General"
+          },
+          {
+            "value": "N/A",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Total (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "N/A",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ]
+      ],
+      "merges": [
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 2,
+          "maxCol": 2
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 3,
+          "maxCol": 3
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 6,
+          "maxCol": 6
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 5,
+          "maxCol": 5
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 4,
+          "maxCol": 4
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 7,
+          "maxCol": 7
+        },
+        {
+          "minRow": 2,
+          "maxRow": 3,
+          "minCol": 2,
+          "maxCol": 9
+        },
+        {
+          "minRow": 4,
+          "maxRow": 4,
+          "minCol": 8,
+          "maxCol": 9
+        },
+        {
+          "minRow": 19,
+          "maxRow": 19,
+          "minCol": 2,
+          "maxCol": 8
+        }
+      ]
+    },
+    {
+      "name": "B13 Consumerables",
+      "rows": [
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Preservation, Operation and Maintenance Consumables",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Item",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Tag No.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Description",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Specification",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Materials",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Qty",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Unit Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Amount (USD)",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "1",
+            "numberFormat": "General"
+          },
+          {
+            "value": "COMMON",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Replacement desiccant and moisture-indicator sets",
+            "numberFormat": "General"
+          },
+          {
+            "value": "For additional preservation or reinspection after initial packing; pack size and quantity to suit the approved preservation procedure.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Desiccant sachets and humidity indicators; moisture-barrier bags where required",
+            "numberFormat": "General"
+          },
+          {
+            "value": 4,
+            "numberFormat": "General"
+          },
+          {
+            "value": 160,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 640,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "2",
+            "numberFormat": "General"
+          },
+          {
+            "value": "COMMON",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Equipment-cleaning consumable sets",
+            "numberFormat": "General"
+          },
+          {
+            "value": "For routine cleaning of accessible equipment surfaces; cleaning agents must be compatible with the OEM instructions. No opening of sealed Ex equipment.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Low-lint wipes, soft cleaning swabs and suitable cleaning agent",
+            "numberFormat": "General"
+          },
+          {
+            "value": 4,
+            "numberFormat": "General"
+          },
+          {
+            "value": 130,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 520,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "3",
+            "numberFormat": "General"
+          },
+          {
+            "value": "COMMON",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Packaging resealing and inspection-label stock",
+            "numberFormat": "General"
+          },
+          {
+            "value": "For resealing protective packaging and renewing inspection identification; excludes equipment gaskets, Ex seals and permanent equipment labels.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Packaging resealing tape, temporary protective covers and inspection labels",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 370,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 370,
+            "numberFormat": "#,##0.00"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Total (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 1530,
+            "numberFormat": "#,##0.00"
+          }
+        ]
+      ],
+      "merges": [
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 2,
+          "maxCol": 2
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 3,
+          "maxCol": 3
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 6,
+          "maxCol": 6
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 5,
+          "maxCol": 5
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 4,
+          "maxCol": 4
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 7,
+          "maxCol": 7
+        },
+        {
+          "minRow": 2,
+          "maxRow": 3,
+          "minCol": 2,
+          "maxCol": 9
+        },
+        {
+          "minRow": 4,
+          "maxRow": 4,
+          "minCol": 8,
+          "maxCol": 9
+        },
+        {
+          "minRow": 19,
+          "maxRow": 19,
+          "minCol": 2,
+          "maxCol": 8
+        }
+      ]
+    },
+    {
+      "name": "C1 CapitalSpares",
+      "rows": [
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Capital Spares",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Item",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Tag No.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Description",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Specification",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Materials",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Qty",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Unit Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Amount (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Lead Time (ARO)",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "1.1",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-502-003 / ZWP8",
+            "numberFormat": "General"
+          },
+          {
+            "value": "SCADA base-station spare assembly",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RDL3000 Ellipse 4.9–5.8 GHz base radio with marine RF filter and PMP capacity key, per Next G D-1/D-2/D-3.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "OEM radio assembly, RF filter and software entitlement",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 16500,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 16500,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "To be confirmed",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "1.2",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-502-001 / ZWP22",
+            "numberFormat": "General"
+          },
+          {
+            "value": "SCADA subscriber spare assembly",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Connect-OW-ER 4.9–5.8 GHz remote radio with marine RF filter and PTP/PMP remote capacity key, per Next G E-1/E-2/E-3.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "OEM radio assembly, RF filter and software entitlement",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 9100,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 9100,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "To be confirmed",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "2",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-502-003A / ZWP8; MR-502-001A / ZWP22",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Radio PoE power-supply spare sets",
+            "numberFormat": "General"
+          },
+          {
+            "value": "PS-DCDC-HAZ-POE-IND-01 power supply with PPT-B cord. Quoted indoor power interface; complete IDU equivalence subject to confirmation.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Industrial PoE power supply and power cord",
+            "numberFormat": "General"
+          },
+          {
+            "value": 2,
+            "numberFormat": "General"
+          },
+          {
+            "value": 900,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 1800,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "To be confirmed",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "3",
+            "numberFormat": "General"
+          },
+          {
+            "value": "LAN-502-001 / ZWP20",
+            "numberFormat": "General"
+          },
+          {
+            "value": "L3 network-switch spare package",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Cisco IE-3400-8P2S-E: 8 copper ports + 2 SFP; quoted PWR-IE65W-PC-DC, SmartNet and DNA 3-year licence. Expansion module excluded.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Industrial Ethernet switch, DC power module and software/support",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 15300,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 15300,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "To be confirmed",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "4",
+            "numberFormat": "General"
+          },
+          {
+            "value": "TCAB-508-002 / ZWP20",
+            "numberFormat": "General"
+          },
+          {
+            "value": "DMR BDA spare assembly",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RFI BD4345-00N0-AC with WAROM HRMD95-VIIIB enclosure per MGW UHF-1. Original LNA requirement RAD-508-001; final RF/Ex configuration subject to approval.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RFI BDA and WAROM Ex d enclosure per quoted package",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 40900,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 40900,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "To be confirmed",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "5",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MAR-514-001 / ZWP20",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Complete RACON capital-spare package",
+            "numberFormat": "General"
+          },
+          {
+            "value": "SeaBeacon-2 System 6 Ex (X/S band), including Ex control box, DB-5P, purge kit, programming cable and quoted package accessories.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RACON assembly, control/interface boxes and included accessories",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 97500,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 97500,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "To be confirmed",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Total (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 181100,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Optional spares; excluded from Total A+B. Final configuration and delivery terms subject to agreement.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ]
+      ],
+      "merges": [
+        {
+          "minRow": 2,
+          "maxRow": 3,
+          "minCol": 2,
+          "maxCol": 10
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 2,
+          "maxCol": 2
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 3,
+          "maxCol": 3
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 6,
+          "maxCol": 6
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 4,
+          "maxCol": 4
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 5,
+          "maxCol": 5
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 7,
+          "maxCol": 7
+        },
+        {
+          "minRow": 4,
+          "maxRow": 4,
+          "minCol": 8,
+          "maxCol": 10
+        },
+        {
+          "minRow": 19,
+          "maxRow": 19,
+          "minCol": 2,
+          "maxCol": 8
+        },
+        {
+          "minRow": 21,
+          "maxRow": 21,
+          "minCol": 2,
+          "maxCol": 10
+        }
+      ]
+    },
+    {
+      "name": "C2 2Y-Spares",
+      "rows": [
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Two-year Operation Spare Parts",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Item",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Tag No.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Description",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Specification",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Materials",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Qty",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Unit Price (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Amount (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Lead Time (ARO)",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "1",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-502-001A / ZWP20, ZWP21, ZWP22, ZWP23; MR-502-003A / ZWP8; MR-502-004A / ZWP8; MR-502-005A / ZWP11",
+            "numberFormat": "General"
+          },
+          {
+            "value": "SCADA radio DC-to-PoE power-supply spare",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Reference part: PS-DCDC-HAZ-POE-IND-01. Industrial DC-to-PoE power supply for the referenced SCADA indoor radio interface. Match installed input voltage, output/PoE rating and terminals. Power cord supplied only if required by the selected interface.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Industrial power-supply module and compatible connection fittings",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 990,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 990,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "OEM lead-time not established",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "2",
+            "numberFormat": "General"
+          },
+          {
+            "value": "LAN-502-001 / ZWP20, ZWP21, ZWP22, ZWP23; LAN-502-002 / ZWP8",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Cisco L3 switch DC power-supply spare",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Reference part: PWR-IE65W-PC-DC. Replaceable DC power module for Cisco IE-3400-8P2S-E; match the selected PWR-IE65W-PC-DC configuration, input supply and power capacity. Complete switch and software licences are excluded.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Cisco industrial DC power-supply module",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 590,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 590,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "OEM lead-time not established",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "3",
+            "numberFormat": "General"
+          },
+          {
+            "value": "TPH-504-001 / ZWP20, ZWP21, ZWP22, ZWP23",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Explosion-proof SIP telephone spare",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Reference part: 212-02-6008-510. GAI-TRONICS Auteldac 6 SIP telephone, reference 212-02-6008-510. Match installed Ex certification, SIP/network interface, supply and mounting. Complete telephone assembly.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Hazardous-area telephone body, handset and supplied service fittings",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 5840,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 5840,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "OEM lead-time not established",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "4",
+            "numberFormat": "General"
+          },
+          {
+            "value": "LSE-504-001 / ZWP20, ZWP21, ZWP22, ZWP23",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Explosion-proof sounder spare",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Reference part: DB3BDG048N2BNR. Eaton DB3B sounder, reference DB3BDG048N2BNR. Match installed supply voltage, tone/output configuration, enclosure and Ex certification.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Certified sounder assembly with terminals and enclosure",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 2500,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 2500,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "OEM lead-time not established",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "5",
+            "numberFormat": "General"
+          },
+          {
+            "value": "TCAB-508-001 / ZWP20; TCAB-508-002 / ZWP21, ZWP22",
+            "numberFormat": "General"
+          },
+          {
+            "value": "BDA antenna-path RF surge-arrester spares",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RF coaxial surge arresters for the referenced DMR/BDA antenna path. PolyPhaser IS-B50LN-C2 is the installed-package reference; confirm exact replaceable device, operating band, 50-ohm interfaces, earthing and hazardous-area installation. Ex coupling components are not automatically interchangeable.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "RF surge arrester bodies with matching coaxial and earthing connections",
+            "numberFormat": "General"
+          },
+          {
+            "value": 2,
+            "numberFormat": "General"
+          },
+          {
+            "value": 370,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 740,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "OEM lead-time not established",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "6",
+            "numberFormat": "General"
+          },
+          {
+            "value": "SA-502-001 / ZWP20, ZWP21, ZWP22, ZWP23; SA-502-002 / ZWP8; SA-502-003 / ZWP8; SA-507-005 / ZWP11",
+            "numberFormat": "General"
+          },
+          {
+            "value": "SCADA Ethernet/PoE surge-arrester spares",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Reference part: LP-POE-INL-IND-01. Industrial Ethernet/PoE surge protection, reference LP-POE-INL-IND-01. Match installed data rate, PoE/supply rating, connector/shielding and earthing arrangement; this is separate from RF coaxial protection.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Ethernet/PoE surge-protection devices and connection fittings",
+            "numberFormat": "General"
+          },
+          {
+            "value": 2,
+            "numberFormat": "General"
+          },
+          {
+            "value": 570,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 1140,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "OEM lead-time not established",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "7",
+            "numberFormat": "General"
+          },
+          {
+            "value": "COMMON — Reference: LAN-502-001; TCAB-500-001; LAN-502-002; TCAB-500-003; TCAB-508-001; TCAB-508-002; TCAB-504-001; TCAB-514-001; TCAB-514-002",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Equipment protective-fuse stock",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Replacement fuse cartridges for the referenced equipment power/control circuits. Select exact current/voltage, breaking capacity, speed and physical size from approved OEM wiring and fuse schedules; quantity is shared stock, not per TAG.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "OEM-compatible electrical fuse cartridges",
+            "numberFormat": "General"
+          },
+          {
+            "value": 8,
+            "numberFormat": "General"
+          },
+          {
+            "value": 10,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 80,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "OEM lead-time not established",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "8",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ANT-508-001 / ZWP20, ZWP21, ZWP22; ANT-508-002 / ZWP20, ZWP21, ZWP22",
+            "numberFormat": "General"
+          },
+          {
+            "value": "BDA RF feeder spare — CommScope 1/2-inch, 305m drum",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Reference part: LDF4RK-50A. CommScope HELIAX LDF4RK-50A, 1/2-inch, 50-ohm RF coaxial cable. One drum containing 305 metres continuous cable for BDA antenna-path spare stock. Final technical acceptance, connector compatibility and drum packing subject to confirmation. Connectors excluded.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "50-ohm RF coaxial cable on drum; connectors excluded",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 6930,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 6930,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "To be confirmed",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "9",
+            "numberFormat": "General"
+          },
+          {
+            "value": "MR-502-001A / ZWP20, ZWP21, ZWP22, ZWP23; LAN-502-001 / ZWP20, ZWP21, ZWP22, ZWP23; MR-502-003A / ZWP8; MR-502-004A / ZWP8; LAN-502-002 / ZWP8; MR-502-005A / ZWP11",
+            "numberFormat": "General"
+          },
+          {
+            "value": "SCADA CAT6A spare cable — 300m drum",
+            "numberFormat": "General"
+          },
+          {
+            "value": "TECKNIKABEL CAT6A S/FTP 4P23/7AWG, GSWB armoured, SHF1, grey. One drum containing 300 metres continuous cable, shared project spare stock, additional to installed Part A cable. Final OEM part number and drum packing subject to confirmation.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Armoured shielded CAT6A cable on drum; connectors and glands excluded",
+            "numberFormat": "General"
+          },
+          {
+            "value": 1,
+            "numberFormat": "General"
+          },
+          {
+            "value": 8050,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 8050,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "To be confirmed",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "10",
+            "numberFormat": "General"
+          },
+          {
+            "value": "ANT-508-001 / ZWP20, ZWP21, ZWP22; ANT-508-002 / ZWP20, ZWP21, ZWP22",
+            "numberFormat": "General"
+          },
+          {
+            "value": "BDA RF feeder Type-N male spare connectors",
+            "numberFormat": "General"
+          },
+          {
+            "value": "50-ohm Type-N male cable connectors to suit the selected 1/2-inch RF feeder and mating antenna-path equipment. Confirm exact cable family, connector assembly method and sealing/weatherproofing requirements.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Type-N male coaxial connectors and compatible sealing fittings",
+            "numberFormat": "General"
+          },
+          {
+            "value": 4,
+            "numberFormat": "General"
+          },
+          {
+            "value": 40,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 160,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "OEM lead-time not established",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "11",
+            "numberFormat": "General"
+          },
+          {
+            "value": "COMMON — Reference: TCAB-504-001 / ZWP20, ZWP21, ZWP22, ZWP23",
+            "numberFormat": "General"
+          },
+          {
+            "value": "M20 Ex cable-gland spare sets",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Complete M20 Ex cable-gland sets for the referenced telephone junction boxes. Match certified enclosure entry, cable outside diameter, armour/seal range and required Ex protection. Spare stock is additional to installed glands; quantity is not per TAG.",
+            "numberFormat": "General"
+          },
+          {
+            "value": "Certified metal glands with compatible seals and washers",
+            "numberFormat": "General"
+          },
+          {
+            "value": 4,
+            "numberFormat": "General"
+          },
+          {
+            "value": 50,
+            "numberFormat": "#,##0.00##"
+          },
+          {
+            "value": 200,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": "OEM lead-time not established",
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Total (USD)",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": 27220,
+            "numberFormat": "#,##0.00"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ],
+        [
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": "Optional spares; excluded from Total A+B. Final configuration and delivery terms subject to agreement.",
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          },
+          {
+            "value": null,
+            "numberFormat": "General"
+          }
+        ]
+      ],
+      "merges": [
+        {
+          "minRow": 2,
+          "maxRow": 3,
+          "minCol": 2,
+          "maxCol": 10
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 2,
+          "maxCol": 2
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 3,
+          "maxCol": 3
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 6,
+          "maxCol": 6
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 4,
+          "maxCol": 4
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 5,
+          "maxCol": 5
+        },
+        {
+          "minRow": 4,
+          "maxRow": 5,
+          "minCol": 7,
+          "maxCol": 7
+        },
+        {
+          "minRow": 4,
+          "maxRow": 4,
+          "minCol": 8,
+          "maxCol": 10
+        },
+        {
+          "minRow": 19,
+          "maxRow": 19,
+          "minCol": 2,
+          "maxCol": 8
+        },
+        {
+          "minRow": 21,
+          "maxRow": 21,
+          "minCol": 2,
+          "maxCol": 10
+        }
+      ]
+    }
+  ]
+}

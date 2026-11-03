@@ -66,10 +66,10 @@ for(const code of ["B10","C2"]){
   assert.notEqual(item.displayDescription,item.description,"Complex spare label must be simplified "+item.id);
 }
 const release=buildReleaseCommercialModel0553();
-assert.equal(release.annexTraceAudit.totalRows,16);
+assert.equal(release.annexTraceAudit.totalRows,15);
 assert.equal(release.annexTraceAudit.sourceToReleasePassed,true);
 assert.equal(release.annexTraceAudit.releaseToSourcePassed,true);
-assert.equal(release.annexTraceAudit.rowTrace.length,16);
+assert.equal(release.annexTraceAudit.rowTrace.length,15);
 assert(release.annexTraceAudit.rowTrace.every(r=>r.sourceToReleaseMatched&&r.releaseToSourceMatched&&!r.customerReleaseAllowed));
 const nativeNames={B10:"B10 CommSpares",B11:"B11 SpecialTool",B13:"B13 Consumerables",
  C1:"C1 CapitalSpares",C2:"C2 2Y-Spares"};
@@ -187,10 +187,10 @@ assert.equal(x.summary.B11.workingReferenceTHB,128314.11);
 assert.equal(x.summary.B13.workingReferenceTHB,22484.21);
 assert.equal(x.summary.C1.workingReferenceTHB,4049349.36);
 assert.equal(x.summary.C2.workingReferenceTHB,721806.68);
-assert.equal(bc.byCode.B11.workingSellTHB,157657.5,"2026 B11 four MR phase-tool parametric budget, not OEM direct cost");
+assert.equal(bc.byCode.B11.workingSellTHB,null,"2026 B11 four MR phase-tool parametric budget, not OEM direct cost");
 for(const code of ["B10","B13","C1","C2"])
- assert.equal(bc.byCode[code].workingSellTHB,x.currentBudgetaryByCode[code]);
-assert.equal(bc.knownWorkingSellTHB,5782287.13,"Current Part B Base includes B2 131-WO, MGW Purchased FAT and B9 quoted Base once; Rev08 spare lines remain audit");
+ assert.equal(bc.byCode[code].workingSellTHB,code==="C1"?5704650:x.currentBudgetaryByCode[code]);
+assert.equal(bc.knownWorkingSellTHB,5961702.87,"Current Part B Base includes B2 131-WO, MGW Purchased FAT and B9 quoted Base once; Rev08 spare lines remain audit");
 assert.equal(x.riskCandidates.length,1);
 assert(x.crossCategoryDuplicates.some(z=>z.family==="SCADA_POE"&&z.categories.includes("B10")&&z.categories.includes("C2")),"B10-C2 PoE overlap must be flagged for stock-quantity reconciliation");
 assert(x.byCode.B13.every(r=>r.activityBasedQuantityEquation==="SPQ-003"&&r.activityBasedQuantityState==="OPEN_INPUT"),"B13 must not claim evidence-based activity consumption from old spreadsheet");

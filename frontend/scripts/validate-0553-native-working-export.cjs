@@ -58,7 +58,7 @@ const annex=Object.fromEntries(annexCodes.map(code=>[code,[{
  qty:2,customerUnitTHB:code.startsWith("B")?10:null,customerTotalTHB:code.startsWith("B")?20:null
 }]]));
 const annexModels=Object.fromEntries(annexCodes.map(code=>[code,{annexLineTotalTHB:20,varianceTHB:0.02}]));
-const model={a,b,c,annex,annexModels,summary:{aProvisionalCustomerSellTHB:1300,bProvisionalCustomerSellTHB:1491},
+const model={a,b,c,annex,annexModels,b13TagPresentation:{rows:[{sourceId:undefined,qty:2,totalTHB:20,tag:"SOURCE TAG",description:"Spare B13",specification:"OEM / MODEL TBC",materials:"METAL"}],tagGroups:[{mr:"MR-0001",system:"Synthetic system",sites:["TEST"],tags:["SOURCE TAG"]}]},summary:{aProvisionalCustomerSellTHB:1300,bProvisionalCustomerSellTHB:1491},
  sourceCoverage:{aOverflow:false,aReady:false}};
 const filename="4-Scope of Supply.xlsx";
 const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZip.byteOffset,inputZip.byteOffset+inputZip.byteLength)};
@@ -102,10 +102,10 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   }else originalLoader(mod,file);
  };
  const real=require(path.join(srcRoot,"project0553/data/releaseCommercialModel0553.js")).buildReleaseCommercialModel0553({thbPerUsd:31.5});
- assert.equal(real.annexTraceAudit.totalRows,16);
- const expectedRows=code=>code.startsWith("B")?real.annex[code]:real.budgetaryOptionAnnex[code].map((x,i)=>({
+ assert.equal(real.annexTraceAudit.totalRows,15);
+ const expectedRows=code=>code==="B11"?[]:code==="B13"?real.annex.B13.map(r=>{const p=real.b13TagPresentation.rows.find(x=>x.sourceId===r.sourceId);return {...r,tagNo:p.tag,description:p.description,specification:p.specification,materials:p.materials};}):code.startsWith("B")?real.annex[code]:real.budgetaryOptionAnnex[code].map((x,i)=>({
   sourceId:x.sourceId||x.historicalSourceId,
-  tagNo:code==="C2"?"Two-year operating stock / TAG by OEM":x.tag,
+  tagNo:x.tag,
   description:x.description,specification:x.specification,materials:x.materials,
   qty:x.quantity,customerUnitTHB:x.unitPriceTHB,customerTotalTHB:x.extendedTHB,
   leadTimeARO:x.leadTime,nativeRow:6+i,
@@ -133,8 +133,8 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
   }
  }
  assertOptions(nativeScope);
- assert(cell(nativeScope,"G38").includes("<v>27979839.36</v>"));
- assert(cell(nativeScope,"A38").includes("B4, B12"));
+ assert(cell(nativeScope,"G38").includes("<v>28159255.1</v>"));
+ assert(cell(nativeScope,"A38").includes("B4, B11, B12"));
  for(const [code,index] of [["B10",2],["B11",3],["B13",4],["C1",5],["C2",6]]){
   const xml=nativeText(index);
   assert(!xml.includes("987654321"),code+" leaked stale native values");
@@ -151,13 +151,13 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
    assert.equal(Math.round(row.qty*row.customerUnitTHB*100),Math.round(row.customerTotalTHB*100));
    if(code.startsWith("C"))assert(cell(xml,"J"+row.nativeRow).includes(row.leadTimeARO));
   }
-  for(let row=6+expectedRows(code).length;row<=18;row++)
+  for(let row=(code==="B11"?7:6+expectedRows(code).length);row<=18;row++)
    for(const col of (code.startsWith("C")?["B","C","D","E","F","G","H","I","J"]:["B","C","D","E","F","G","H","I"]))
-    assert.equal(cell(xml,col+row),'<is><t xml:space="preserve"></t></is>',code+" must clear unused "+col+row);
-  assert(cell(xml,"I19").includes('<v>'+expectedTotal(code)+'</v>'));
+    if(!(code==="B13"&&row>=10&&row<=15&&["B","C","D","E","F"].includes(col)))assert.equal(cell(xml,col+row),'<is><t xml:space="preserve"></t></is>',code+" must clear unused "+col+row);
+  assert(cell(xml,"I19").includes(code==="B11"?"N/A":'<v>'+expectedTotal(code)+'</v>'));
  }
- assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.sourceToReleaseMatched),Array(16).fill(true));
- assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.releaseToSourceMatched),Array(16).fill(true));
+ assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.sourceToReleaseMatched),Array(15).fill(true));
+ assert.deepEqual(real.annexTraceAudit.rowTrace.map(x=>x.releaseToSourceMatched),Array(15).fill(true));
  // Optional private original binary verification; never commit the customer file.
  // npm run validate:0553-native-working-export -- --template="C:\\path\\4-Scope of Supply.xlsx"
  const templateArg=process.argv.find(x=>x.startsWith("--template="));
@@ -204,7 +204,13 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
    }
    const oldXml=decoder.decode(a),newXml=decoder.decode(b);
    const structure=xml=>normalizeCells(xml).replace(/<row\b[^>]*>/g,t=>t.replace(/\s(?:ht|customHeight)="[^"]*"/g,'')).replace(/<c\b[^>]*>/g,t=>t.replace(/\ss="[^"]*"/g,''));
-   assert.equal(structure(newXml),structure(oldXml),"Native structural content/merges changed "+before[i].name);
+   if(before[i].name==="xl/worksheets/sheet4.xml"){
+    const refs=xml=>[...xml.matchAll(/<mergeCell\b[^>]*ref="([^"]+)"/g)].map(x=>x[1]);
+    assert(refs(oldXml).every(ref=>refs(newXml).includes(ref)),"B13 preserves original merges");
+    assert.equal(refs(newXml).length,refs(oldXml).length,"B13 export preserves only original merges");
+    const withoutMerges=xml=>structure(xml).replace(/<mergeCells\b[^>]*>[\s\S]*?<\/mergeCells>/,'');
+    assert.equal(withoutMerges(newXml),withoutMerges(oldXml),"B13 preserves non-merge structure");
+   }else assert.equal(structure(newXml),structure(oldXml),"Native structural content/merges changed "+before[i].name);
    const formulas=xml=>xml.match(/<f\b[^>]*>[\s\S]*?<\/f>/g)||[];
    assert.deepEqual(formulas(newXml),formulas(oldXml),'Native formulas preserved');
    const index=Number(before[i].name.match(/sheet(\d+)/)[1]);
@@ -223,8 +229,8 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      for(const col of ["F","G"])assert(cell(newXml,col+nativeRow).includes(Number.isFinite(row.customerSellTHB)?'<v>'+row.customerSellTHB+'</v>':(row.offerTreatment?.priceText||"NOT ESTABLISHED")));
     }
     assertOptions(newXml);
-    assert(cell(newXml,"G38").includes("<v>27979839.36</v>"));
-    assert(cell(newXml,"A38").includes("B4, B12"));
+    assert(cell(newXml,"G38").includes("<v>28159255.1</v>"));
+    assert(cell(newXml,"A38").includes("B4, B11, B12"));
    }else{
     const code=annexCodes[index-2];
     for(const row of expectedRows(code)){
@@ -236,10 +242,10 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
      for(const [field,value] of [["unitPrice",row.customerUnitTHB],["totalPrice",row.customerTotalTHB]])
       assert(cell(newXml,row.nativeCells[field]).includes('<v>'+value+'</v>'));
     }
-    assert(cell(newXml,"I19").includes('<v>'+expectedTotal(code)+'</v>'));
+    assert(cell(newXml,"I19").includes(code==="B11"?"N/A":'<v>'+expectedTotal(code)+'</v>'));
    }
   }
-  console.log("PASS actual native XLSX: six original sheets, 16 current rows, fitted typography/rows, original column widths/page setup, original merges/formulas and unrelated ZIP parts preserved; SHA256 "+require("node:crypto").createHash("sha256").update(bytes).digest("hex"));
+  console.log("PASS actual native XLSX: six original sheets, 15 selected rows, fitted typography/rows, original column widths/page setup, original merges/formulas and unrelated ZIP parts preserved; SHA256 "+require("node:crypto").createHash("sha256").update(bytes).digest("hex"));
  }
- console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 16 bidirectional PTTEP current annex source item rows, C1/C2 conditional offers with 1/12 price lines, layout fitted, structure preserved");
+ console.log("PASS PJ2608-0553 native working draft ZIP: 6 original-style sheets, A+B mapped, 15 selected bidirectional PTTEP current annex source item rows, C1/C2 conditional offers with 6/11 price lines, layout fitted, structure preserved");
 })().catch(e=>{console.error(e);process.exitCode=1;});

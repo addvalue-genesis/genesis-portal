@@ -1,0 +1,182 @@
+{
+  "sourceCommit": "7b3a03c985b3d97be7d89851e06a137bf7a564e8",
+  "b1THB": 421180,
+  "b1USD": 13400,
+  "totalUSD": 888900,
+  "sourceRows": [
+    {
+      "code": "A1",
+      "sha256": "d191629132c14d91cde7915e7d730fd0f9cf02fb8541d4610ff78d1dcc5d394b",
+      "sellTHB": 7592914.13
+    },
+    {
+      "code": "A2",
+      "sha256": "c2c5725c834b0cdb9f4bb211ef10c7fe92e410ce06e5c754dee1903799bb0caf",
+      "sellTHB": 4314488.1
+    },
+    {
+      "code": "A3",
+      "sha256": "25cb54d18ce2bf4a4b7be21ca388ed73a966c23c5cdd53b67ebf7afe99e4d37e",
+      "sellTHB": 1076400
+    },
+    {
+      "code": "A4",
+      "sha256": "73185fa71ec148a9bac71a47330d23e9f300d5c1e4ecc4205d797a9ffba9f354",
+      "sellTHB": 9213750
+    },
+    {
+      "code": "B2",
+      "sha256": "9728f743f3abbeea3e9376c195da6ea493fe70e11bd70a914598f0685f5b2e6d",
+      "sellTHB": 237121.13
+    },
+    {
+      "code": "B3",
+      "sha256": "3cdf04228cbff44862051b913aa4f3317558cd6a9e0b7a968b19f2102c0744e2",
+      "sellTHB": 2322450
+    },
+    {
+      "code": "B4",
+      "sha256": "64ed49f07c7eaed7a598d3a31612ad008c845b2fb43e3467c190d6109cb755a9",
+      "sellTHB": null
+    },
+    {
+      "code": "B5",
+      "sha256": "f1c89efacac9d5b174a374a3381b15a67eff61b1dad91d04c7f9536e1b7c238f",
+      "sellTHB": 311184
+    },
+    {
+      "code": "B6",
+      "sha256": "5be34d1e6639b703f993f5f7e03290f7a1b36d9878029d9312fac3ca609cdde5",
+      "sellTHB": 335584
+    },
+    {
+      "code": "B7",
+      "sha256": "66b3789c31a94a891d84f7b3447305de410312b895eb594dc910082474c7b516",
+      "sellTHB": 30000
+    },
+    {
+      "code": "B8",
+      "sha256": "5390519a3aeee41061a705cd9dab5b0302a1fd033eaa2f2160a0d46427061ee0",
+      "sellTHB": 142550
+    },
+    {
+      "code": "B9",
+      "sha256": "f7f24c0f61159738ca1b27983157dac9f4560873b2df82cd84534d0704ff6b42",
+      "sellTHB": 480550
+    },
+    {
+      "code": "B10",
+      "sha256": "0d7a32ea4e1edaddda0f424b5add4d5ee616903ca30c8ccd2cf7e68ab63b146d",
+      "sellTHB": 509827.5
+    },
+    {
+      "code": "B11",
+      "sha256": "0b29125e0aa0082f6aa87d464e9ec909577b82a1e94c9bcde991ef329794d976",
+      "sellTHB": 157657.5
+    },
+    {
+      "code": "B12",
+      "sha256": "6c00f79db6ec01df92b7a586f1b63fc7c35caebf4c21200855502db387369356",
+      "sellTHB": null
+    },
+    {
+      "code": "B13",
+      "sha256": "2fa74a872052553c9221de1e48688c2854d660f916147ab033c7ad1f39276ed6",
+      "sellTHB": 46683
+    },
+    {
+      "code": "B14",
+      "sha256": "9e85f7d5eee46c583eb1e2a8592b8ddd100d49e609475fe329607f24daa42450",
+      "sellTHB": 787500
+    },
+    {
+      "code": "C1",
+      "sha256": "063002aa138ae093f69a6a711f426738e27791d6020376feb4a86c13dafe7a6c",
+      "sellTHB": null
+    },
+    {
+      "code": "C2",
+      "sha256": "19fb521a7b55e8edb45cb09972440c5f979d0f0ad7e6383e03e0702d15762d63",
+      "sellTHB": null
+    }
+  ],
+  "annexSha256": "2e0aae79f18cf811185788e0a23438b8ba860f646ef305f76d04eeefdbd9e65b",
+  "officialRows": [
+    {
+      "code": "A1",
+      "sha256": "12372ad02d3ce3499ecac491077e55f8a63995e7556e2274feee97ab044087c5"
+    },
+    {
+      "code": "A2",
+      "sha256": "15f5f61c4e039eb77703081069fec2f21bd275aa5a45fb33783b7159da822586"
+    },
+    {
+      "code": "A3",
+      "sha256": "b1fb395b7718bd6e3a7b6364b7cb1035dd635f44679ea5b00a8c0b36c7133092"
+    },
+    {
+      "code": "A4",
+      "sha256": "3a3599472e8afb8e34f57058a3e568d7b5680aaffb84d20518c1f3a5fc168077"
+    },
+    {
+      "code": "B2",
+      "sha256": "28e7d49eb894f9ed704e488612ea2aa9679697936695de462cec53cbcbe4d5f3"
+    },
+    {
+      "code": "B3",
+      "sha256": "00964d1b7711164fd898ad99e01b016266542a41273f43fe3e4a09b26c3b8ea4"
+    },
+    {
+      "code": "B4",
+      "sha256": "af1249f33789ef822a1e05febd54aed7cf560b64237fc3bb237d151cc70684e3"
+    },
+    {
+      "code": "B5",
+      "sha256": "7ba26c59010865b38468932142984aded9c3f7e947d9baeb080bc36d3961176c"
+    },
+    {
+      "code": "B6",
+      "sha256": "4e2c11c52f356e999f6a33df5b96665ecd735f1543236f622d5ecbf28f4b3c81"
+    },
+    {
+      "code": "B7",
+      "sha256": "48bb02ed0afaaa61dad9a63b3f82f95b05e9d732f9576923dc4ad2dbf251555a"
+    },
+    {
+      "code": "B8",
+      "sha256": "0258d0f12c2d905ee242e8058102275c3d3a549d6670a478fca553948f48fa14"
+    },
+    {
+      "code": "B9",
+      "sha256": "790e24eaa92447db5102e99eabbdc2724e744d9c1952955ed949291777d04a81"
+    },
+    {
+      "code": "B10",
+      "sha256": "73d5cea1b8cbec02e834f30676e87bfc2f81c45d6e92922fe591142e8a65e7dc"
+    },
+    {
+      "code": "B11",
+      "sha256": "23910458ccd5a37fad1dac5e63287d2cbe0ffe0186726d5e4f0434de5d4291ad"
+    },
+    {
+      "code": "B12",
+      "sha256": "fedc231a83ecf3bc44490508c01d5689276ce01e664a8a5dd7a4e6ee88815355"
+    },
+    {
+      "code": "B13",
+      "sha256": "e16e25bc588868169c7ef706f63e0a2a334117eb5223fd101911b5558ff9b30d"
+    },
+    {
+      "code": "B14",
+      "sha256": "c6f6831e6241b8e8666c996c655732441977b8167dcbd7f8d3296d82c72c8aa5"
+    },
+    {
+      "code": "C1",
+      "sha256": "7e4ae41cc4b49c1b11434082bc23efe527abf3e9c2268b746c91151a433f9643"
+    },
+    {
+      "code": "C2",
+      "sha256": "654fe6474ff27ba8ecaa3edb4008c8f63e9499a6cf84a038c3843cc2ed489599"
+    }
+  ]
+}

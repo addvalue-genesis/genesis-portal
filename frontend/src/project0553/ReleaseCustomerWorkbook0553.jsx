@@ -14,7 +14,8 @@ import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {selectB10NativeAnnexReview0553} from "./data/b10NativeAnnexReview0553";
 import {SparePricedBudgetReview0553} from "./SparePricedBudgetReview0553";
 import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0553";
-import {buildOfficialUsdRelease0553} from "./data/officialUsdRelease0553";
+import {buildOfficialUsdRelease0553,selectCurrentReleaseRev03_0553} from "./data/officialUsdRelease0553";
+import {buildCustomerPriceBreakdown0553,customerBreakdownRows0553} from "./data/customerPriceBreakdown0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
 import "./releaseWorkbook0553.css";
 
@@ -22,8 +23,24 @@ import "./releaseWorkbook0553.css";
 // and MUST NOT be included in the six-sheet native XLSX export.
 const WORKSHEETS=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
- ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"]
+ ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"],
+ ["A1 MR0001","A1"],["A2 MR0002","A2"],["A3 MR0003","A3"],["A4 MR0004","A4"]
 ]);
+// Same preserved worksheet cells/merges; changing the display location never
+// rewrites the submitted workbook or substitutes current Working prices.
+export function SubmittedWorksheet0553({sheet}){
+ return <div className="p553-sheet-scroll"><table className="p553-customer-table"><tbody>
+  {sheet.rows.map((row,ri)=><tr key={ri}>{row.map((cell,ci)=>{
+   const merge=sheet.merges.find(m=>ri+1>=m.minRow&&ri+1<=m.maxRow&&ci+1>=m.minCol&&ci+1<=m.maxCol);
+   if(merge&&(ri+1!==merge.minRow||ci+1!==merge.minCol))return null;
+   const value=cell.value;
+   const decimal=String(cell.numberFormat||"").split(";")[0].match(/\.([0#]+)/);
+   const digits=decimal?Math.min(decimal[1].length,8):0;
+   const shown=typeof value==="number"?value.toLocaleString("en-US",decimal?{minimumFractionDigits:digits,maximumFractionDigits:digits}:{maximumFractionDigits:8}):value??"";
+   return <td key={ci} colSpan={merge?merge.maxCol-merge.minCol+1:undefined} rowSpan={merge?merge.maxRow-merge.minRow+1:undefined} style={{whiteSpace:"pre-wrap"}}>{shown}</td>;
+  })}</tr>)}
+ </tbody></table></div>;
+}
 const B_ROWS=Array.from({length:14},(_,i)=>"B"+(i+1));
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 const cash=n=>Number.isFinite(n)?"THB "+money(n):"PENDING";
@@ -43,7 +60,9 @@ const addKnown=(a,b)=>Number.isFinite(a)&&Number.isFinite(b)?Math.round((a+b)*10
 export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSource=()=>{},focusAnnexTarget=null,title="10.3 — Customer Release"}){
  const [sheet,setSheet]=useState("Scope of supply");
  const optionalPriceReview=useMemo(()=>selectSparePricedBudgetReview0553(),[]);
- const optionItemizedUsd=useMemo(()=>buildOfficialUsdRelease0553(model).otherSpareItemizedAnnex,[model]);
+ const quotedRelease=useMemo(()=>buildOfficialUsdRelease0553(model),[model]);
+ const optionItemizedUsd=quotedRelease.otherSpareItemizedAnnex;
+ const quotedBreakdown=useMemo(()=>buildCustomerPriceBreakdown0553(model,quotedRelease),[model,quotedRelease]);
  // Source→Release: resolve one exact B/C spare row, never change a price.
  const focusKey=focusAnnexTarget?.code+"::"+focusAnnexTarget?.sourceId+"::"+(focusAnnexTarget?.sourceSelectionId||"")+"::"+focusAnnexTarget?.seq;
  useEffect(()=>{
@@ -89,6 +108,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const [nativeReport,setNativeReport]=useState(null);
  const internal=recipient==="INTERNAL"&&viewer==="INTERNAL";
  const code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
+ const agreed=selectCurrentReleaseRev03_0553();
+ const agreedAnnex=["B10","B11","B13","C1","C2"].includes(code)?agreed.worksheets.find(s=>s.name===sheet):null;
+ const releasePartA=/^A[1-4]$/.test(code)?quotedBreakdown.groups.find(g=>g.code===code):null;
+ const releasePartARows=releasePartA?customerBreakdownRows0553(releasePartA):[];
  const partA=buildPartATagGroupBreakdown0553(model);
  const annexLines=model.annex[code]||[];
  const annexModel=model.annexModels?.[code]||null;
@@ -351,12 +374,31 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       This JSX groups all source data into four MR package rows, with no priced TAG silently discarded.
       Grouped Tag No. format must be accepted by purchaser before native export; original column widths, page setup and merges are retained; exported text wraps with fitted row heights.
      </p>}
-    </>:<>
+    </>:releasePartA?<div data-release-part-a={code} data-release-revision={quotedRelease.releasePriceReference.revision}>
+     <p className="p55-note"><strong>{sheet} · {quotedRelease.releasePriceReference.revision} · USD</strong><br/>
+      รายละเอียดจาก Source / Working ปัจจุบัน → Release ตามราคา {quotedRelease.releasePriceReference.filename} · A+B USD {money(quotedRelease.totalUSD)}</p>
+     <div className="p553-sheet-scroll"><table className="p553-customer-table">
+      <thead><tr>{["Item","Location","TAG","Description","Qty","Unit","Unit price USD","Amount USD","Remarks"].map(h=><th key={h}>{h}</th>)}</tr></thead>
+      <tbody>{releasePartARows.map((r,i)=><tr key={releasePartA.rows[i].key} data-release-a-source-key={releasePartA.rows[i].key}>
+       <td>{r.item}</td><td>{r.site}</td><td>{r.tag}</td><td>{r.description}</td><td>{r.qty??"TBC"}</td><td>{r.unit}</td>
+       <td className="p553-price-cell">{formatUnit(r.unitUSD)}</td><td className="p553-price-cell">{money(r.amountUSD)}</td>
+       <td>{r.remark}{internal&&<button type="button" onClick={()=>onOpenSource({...releasePartA.rows[i],breakdownKey:releasePartA.rows[i].key,breakdownOrigin:"released"})}>↗ Source</button>}</td>
+      </tr>)}
+       <tr className="p553-sheet-total"><td colSpan={7}>Priced subtotal</td><td className="p553-price-cell">{money(releasePartA.totalUSD)}</td><td/></tr>
+       <tr className="p553-sheet-total"><td colSpan={7}>Release summary amount</td><td className="p553-price-cell">{money(releasePartA.parentUSD)}</td><td/></tr>
+       <tr className="p553-sheet-total"><td colSpan={7}>Difference</td><td className="p553-price-cell">{money(releasePartA.varianceUSD)}</td><td/></tr>
+      </tbody>
+     </table></div>
+    </div>:agreedAnnex&&!internal&&!focusAnnexTarget?.code?<div data-release-agreed-annex={code} data-release-revision="Rev03">
+     <p className="p55-note"><strong>{code} · Rev03 · Agreed quotation / USD</strong><br/>
+      <a href={agreed.sourceUrl} target="_blank" rel="noopener noreferrer">Open agreed source workbook</a></p>
+     <SubmittedWorksheet0553 sheet={agreedAnnex}/>
+    </div>:<>
      {code==="B10"?<B10KitPriceSummary0553 rows={annexLines} total={annexModel?.selectedWorkingTHB} internal={internal} onOpenSource={onOpenSource} variant="release"/>:<>
-     {["C1","C2"].includes(code)&&<OtherSpareOriginalAnnex0553
+     {["B13","C1","C2"].includes(code)&&<OtherSpareOriginalAnnex0553
        code={code} model={optionItemizedUsd} currency="THB" onOpenSource={internal?onOpenSource:null}/>}
-     <details className="p553-spare-lifecycle-sub" open={!["C1","C2"].includes(code)}>
-      <summary>{["C1","C2"].includes(code)?"Previous 10.2 MR Source / Trace (audit only, not priced option offer)":"Original MR-level Source / Trace"}</summary>
+     <details className="p553-spare-lifecycle-sub" open={!["B13","C1","C2"].includes(code)}>
+      <summary>{["B13","C1","C2"].includes(code)?"Previous 10.2 MR Source / Trace (audit only, not priced option offer)":"Original MR-level Source / Trace"}</summary>
      <div className="p553-native-title">{ANNEX_TITLE[code]?.[0]}<br/>{ANNEX_TITLE[code]?.[1]}</div>
      <p className="p553-native-warning"><strong>{code} — {annexModel?.priceLabel||"WORKING REFERENCE"}</strong>
       {" "}· รายการจาก 10.2 — <code>bid.budget.working.bc.{code.toLowerCase()}</code>

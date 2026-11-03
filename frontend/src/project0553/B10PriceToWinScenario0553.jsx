@@ -18,9 +18,10 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
  if(canonical&&canonical.trace?.originalParametricCostUSD!==price.trace.originalParametricCostUSD)
   throw Error("10.2/10.3 B10 price scenario underlying source changed");
  const value=price.scenario,ass=price.assumptions;
- return <details className="p55-panel p553-b10-ptw" data-component-key={price.moduleId} open={context!=="scope"} style={{padding:12}}>
+ return <details className="p55-panel p553-b10-ptw" data-component-key={price.moduleId} open={!price.supersededByOwnerScope&&context!=="scope"} style={{padding:12}}>
   <summary><strong>B10 — Price-to-Win What-if (INTERNAL / NONPOSTING)</strong>
-   <small>Same Source→Working→Scope→Release evidence · proposed USD summary only; NOT customer 10.3.4 or Excel</small></summary>
+   <small>Historical RF-filter scenario — superseded by owner surge-only scope; NOT current offer or Excel</small></summary>
+  <p className="p55-note"><strong>Historical calculation only:</strong> {price.scopeReviewNote}</p>
   <p className="p55-note"><strong>Purpose:</strong> show a controlled estimate rather than automatically applying retail markup to the released price. The NextG quote expired on 1 Oct 2026, and the supplier's D/E quantity is <strong>NOT</strong> the approved commissioning-spare purchase quantity. MR0002–0004 remain unitemized planning allowances, not vendor quotes.</p>
   <div style={{display:"flex",gap:12,flexWrap:"wrap",alignItems:"end"}}>
    <label style={{display:"grid",gap:4}}>Target ADDVALUE profit after risk &amp; SAMTEL
@@ -87,7 +88,7 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
     <tr><td>Proposed B10 SELL — before USD100 summary rounding</td><td>{cash(value.sellBeforeUsdRoundUSD)}</td><td><strong>{cash(value.sellBeforeUsdRoundTHB,"THB")}</strong></td></tr>
     <tr><td>10.3.4-equivalent proposed SUMMARY, rounded USD100</td><td><strong>{cash(value.roundedOfficialSummaryUSD)}</strong></td>
      <td>For management review only — no Excel/official posting</td></tr>
-    <tr><td>Current 10.3.3 Working SELL / current 10.3.4 USD</td><td>{cash(value.existingOfficialSummaryUSD)}</td><td>{cash(value.existingWorkingSellTHB,"THB")}</td></tr>
+    <tr><td>Historical Working SELL / quote before USD10 unit rounding</td><td>{cash(value.existingOfficialSummaryUSD)}</td><td>{cash(value.existingWorkingSellTHB,"THB")}</td></tr>
     <tr><td>What-if uplift vs current unrounded THB</td><td>{cash(value.proposedVsExistingOfficialUSD)}</td><td>{cash(value.proposedVsExistingTHB,"THB")}</td></tr>
    </tbody>
   </table></div>
@@ -99,6 +100,6 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
     <td><a href={r.url} target="_blank" rel="noreferrer">{Number.isFinite(r.usdUnit)?cash(r.usdUnit):cash(r.thbUnit,"THB")} / unit (external)</a>
      <small>{r.quoteType}</small></td><td>{r.relevance}</td></tr>)}</tbody>
   </table></div>
-  <p className="p55-note"><strong>Quotation hold:</strong> Original 14 contractual kits remain in financial Release B10. None of these scenario item prices is automatically a customer approved unit price. Before actual itemized 10.3.4/Excel, establish full B10 SPIR, exact SKU-to-TAG compatibility and quantity, receive/quote basis and no duplicate Part A/B5/B6/B11/C1/C2; the real price will then replace this scenario, not stack over it.</p>
+  <p className="p55-note"><strong>Quotation hold:</strong> Selected Release contains 11 kits for MR0001–0003; RACON B10 is owner-excluded. Historical14-kit arithmetic below is superseded. None of these scenario item prices is automatically a customer approved unit price. Before actual itemized 10.3.4/Excel, establish full B10 SPIR, exact SKU-to-TAG compatibility and quantity, receive/quote basis and no duplicate Part A/B5/B6/B11/C1/C2; the real price will then replace this scenario, not stack over it.</p>
  </details>;
 }

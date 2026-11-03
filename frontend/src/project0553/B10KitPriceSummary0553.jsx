@@ -12,8 +12,8 @@ export function B10KitPriceSummary0553({
  rows=[], currency="THB", total=null, internal=false,
  onOpenSource=null,onOpenReleaseRow=null,variant="release"
 }){
- if(rows.length!==4||new Set(rows.map(x=>x.sourceId||x.id)).size!==4)
-  throw Error("0553 B10 kit summary must retain exactly four distinct source-owned MR lines");
+ if(rows.length!==3||new Set(rows.map(x=>x.sourceId||x.id)).size!==3)
+  throw Error("0553 B10 kit summary must retain exactly three selected distinct source-owned MR lines");
  const composition=selectB10PhysicalComposition0553();
  if(composition.parentRows.some((p,i)=>p.sourceId!==(rows[i].sourceId||rows[i].id)))
   throw Error("B10 composition Source→Release IDs mismatch");
@@ -36,8 +36,8 @@ export function B10KitPriceSummary0553({
    description:r.displayDescription||r.description,sites:unique(r.sites||r.linkedLocations||[]),
    sourceRowModuleId:r.sourceRowModuleId||("bid.budget.working.bc.b10.spare-line."+id.toLowerCase())};
  });
- if(normalized.reduce((n,r)=>n+r.qty,0)!==14||
-  normalized.some((r,i)=>r.qty!==[4,3,4,3][i]))
+ if(normalized.reduce((n,r)=>n+r.qty,0)!==11||
+  normalized.some((r,i)=>r.qty!==[4,3,4][i]))
   throw Error("0553 B10 MR commissioning kit quantities diverged from source");
  if(Number.isFinite(total)&&Math.abs(normalized.reduce((sum,r)=>sum+r.amount,0)-total)>0.02)
   throw Error("0553 B10 source-to-release kit totals do not reconcile");
@@ -50,7 +50,7 @@ export function B10KitPriceSummary0553({
   {internal&&<B10StageSpareSelection0553 internal context={variant} onOpenSource={onOpenSource}/>}
   <div className="p553-b10-commercial-heading">
    <strong>B10 — Kit price summary / reconciliation</strong>
-   <small>4 MR-level financial envelopes · 4/3/4/3 commissioning spare sets · same source-owned prices, no added SKU charges</small>
+   <small>3 MR-level financial envelopes · 4/3/4 commissioning spare sets · same source-owned prices, no added SKU charges</small>
   </div>
   <div className="p553-b10-commercial-scroll">
    <table className={"p553-b10-commercial-table"+(internal?" p553-b10-commercial-table--internal":"")}>
@@ -81,7 +81,7 @@ export function B10KitPriceSummary0553({
      <th className="p553-b10-commercial-number">{money(total)}</th>{internal&&<th/>}</tr></tfoot>
    </table>
   </div>
-  <p className="p553-b10-commercial-note">Above: 14 MR Attachment-5 engineering-screened spare functions linked to 10.1 Installed Required BOM and 10.2 Working; individual OEM Spare Part No., Qty and CIF price remain unconfirmed.
-   Below: four 4/3/4/3 source-owned financial kit envelopes only. These budgets are not fourteen separately priced spare articles; no duplicate Part A or C2 posting.</p>
+  <p className="p553-b10-commercial-note">Above: 11 MR Attachment-5 engineering-screened spare functions linked to 10.1 Installed Required BOM and 10.2 Working; individual OEM Spare Part No., Qty and CIF price remain unconfirmed.
+   Below: three 4/3/4 source-owned financial kit envelopes only. These budgets are not eleven independently quoted spare articles; no duplicate Part A or C2 posting.</p>
  </section>;
 }

@@ -1,6 +1,7 @@
 // PJ2608-0553 MR0004 — management-selected MDS/ORGA; MGW alternative excluded.
 // Source distinction: MR0004 C1 = 3 site quantities; QTORG2609244 = one quoted package.
 // Pricing three sites is an internal scenario, not proof of supplier three-unit commercial offer.
+import {MDS_SCOPE_DECISION_0553} from "./mr0004WorkingBom0553";
 export const MR0004_SELECTED_PRICE_0553=Object.freeze({
  mr:"MR0004",supplier:"MDS / ORGA",manufacturer:"ORGA / Tideland",model:"SeaBeacon-2 System 6 Ex",
  quotation:"QTORG2609244",quotationDate:"2026-09-22",currency:"USD",quotedPackageRateUSD:75000,
@@ -11,6 +12,7 @@ export const MR0004_SELECTED_PRICE_0553=Object.freeze({
  scenarioStatus:"PARAMETRIC_PRICE_PROJECTION_NOT_VENDOR_THREE_SET_QUOTE_NOT_POSTED",
  excludedAlternative:"MGW RACON-1 MSM-RBM04-EX / USD 60667 not selected — keep original vendor evidence only",
  packageIncluded:["RACON","RACON junction box","Ex control box","DB-5P","Purge kit","Programming cable","Packing","Documentation"],
+ scopeDecision:MDS_SCOPE_DECISION_0553,
  phaseItems:[{id:"ADAPTER_CHARGING",required:1,unit:"set per phase",includedInVendorQuote:null,gate:"Programming cable is not evidence of complete adapter/charging kit"},{id:"SPECIAL_TOOLS",required:1,unit:"set per phase",includedInVendorQuote:null,gate:"Confirm vendor contents and Annex-8"}],
  revisionC1BlueRequirements:[
   {clause:"Section 5 p10",category:"MANDATORY",text:"Offshore commissioning and startup spare parts — 1 set per platform",qty:3,unit:"set",costOwner:"STARTUP_SPARES",note:"Reconcile with commissioning/startup spares line above; do not automatically buy two sets per platform"},
@@ -18,8 +20,8 @@ export const MR0004_SELECTED_PRICE_0553=Object.freeze({
   {clause:"Section 5 p11 b",category:"MANDATORY_REGULATORY",text:"Vendor responsible for necessary Thailand import approvals for assembly/FAT and export of complete telecom equipment to China construction yard",costOwner:"REGULATORY_LOGISTICS",amount:null},
   {clause:"Section 5 p12 Optional a",category:"OPTIONAL",text:"Vendor responsible for necessary approvals for import into China fabrication yard and export from China to Myanmar",costOwner:"OPTIONAL_REGULATORY",amount:null}
  ],
- supplyGates:["ORGA p4 quotes 5m+5m+10m BFOU cable and six glands; p8 general exclusion conflicts — seek written reconciliation",
-  "FAT listed as included p5 but excluded p7 — vendor clarification",
+ supplyGates:["Owner selects cable/gland exclusions: ADDVALUE supplies full field requirements; no supplier credit, final takeoff and rates pending",
+  "Owner selects FAT exclusion: ADDVALUE B3 integrated FAT at SAMTEL Thailand; reconcile existing budget before any extra charge",
   "Commissioning/start-up spare set per platform and two-year operating spares quote require separate tracking",
   "Inspect actual offshore Ex installation, gland compatibility and terminal/cable routing",
   "Imported/operational licence and offshore SAT/commissioning scope not assumed in USD 75000",

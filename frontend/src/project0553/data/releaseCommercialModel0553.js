@@ -9,6 +9,7 @@ import {selectWorkingBomProjection0553} from "./workingBomAggregation0553";
 import {selectBcTurnkeyWorkingCost0553} from "./bcTurnkeyWorkingCost0553";
 import {selectB3ResourcePriceDossier0553} from "./b3ResourcePriceDossier0553";
 import {selectSpareCustomerSchedule0553} from "./spareCustomerSchedule0553";
+import {selectB13TagPresentation0553} from "./otherSpareItemizedPresentation0553";
 import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 
 export const RELEASE_POLICY_0553=Object.freeze({
@@ -133,6 +134,7 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
  const isBase=["B10","B11","B13"].includes(code);
  const isOption=["C1","C2"].includes(code);
  if(!isBase&&!isOption)throw Error("Unsupported 10.3 annex code "+code);
+ const excluded=owner?.offerTreatment?.status==="NOT_QUOTED_EXCLUDED";
  const selected=amount(isBase?owner?.workingSellTHB:owner?.workingReferenceTHB);
  const rows=sourceRows.map((x,i)=>{
   const qty=amount(x.qty),priceUSD=amount(x.sourcePriceUSD),fx=amount(x.workingFxTHBPerUSD);
@@ -171,8 +173,9 @@ export function buildAnnexWorkingPriceBridge0553({code,sourceRows=[],owner=null}
    mr:x.linkedMR,sites:x.linkedLocations,
    referenceUnitTHB:unitReference,referenceTotalTHB:extReference,
    workingUnitTHB:unitPrecision4,workingTotalTHB:extReference,
-   customerUnitTHB:isBase?unitPrecision4:null,
-   customerTotalTHB:isBase?extReference:null,
+   customerUnitTHB:isBase&&!excluded?unitPrecision4:null,
+   ...(excluded?{offerExcluded:true,priceText:"N/A"}:{}),
+   customerTotalTHB:isBase&&!excluded?extReference:null,
    priceClass:x.sourcePriceBasis||"OEM_SPIR_PENDING",
    mappingStatus:x.mappingStatus,workingStatus:x.workingStatus,
    independentOemSkuVerified:false,independentOemUnitRateVerified:false,
@@ -226,7 +229,7 @@ export function auditAnnexBidirectionalTrace0553(sourceByCode,annexByCode){
     x.qty===row.qty&&x.unit===row.unit&&x.workingTotalTHB===row.extendedTHB&&
     x.referenceUnitTHB===row.unitPriceTHB&&
     (n(row.unitPriceTHB)?n(x.workingUnitTHB)&&Math.abs(x.workingUnitTHB-row.unitPriceTHB)<=0.005:x.workingUnitTHB===null)&&
-    (code.startsWith("B")?x.customerUnitTHB===x.workingUnitTHB&&x.customerTotalTHB===row.extendedTHB:
+    (code.startsWith("B")&&!x.offerExcluded?x.customerUnitTHB===x.workingUnitTHB&&x.customerTotalTHB===row.extendedTHB:
      x.customerUnitTHB===null&&x.customerTotalTHB===null)&&
     JSON.stringify(x.mr)===JSON.stringify(row.linkedMR)&&
     JSON.stringify(x.sites)===JSON.stringify(row.linkedLocations)&&
@@ -387,7 +390,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  })]));
  const annex=Object.fromEntries(annexCodes.map(code=>[code,annexModels[code].rows]));
  const annexTraceAudit=auditAnnexBidirectionalTrace0553(spare.currentByCode,annex);
- if(annexTraceAudit.totalRows!==16)throw Error("0553 16 PTTEP current-source Annex identity inventory changed");
+ if(annexTraceAudit.totalRows!==15)throw Error("0553 15 selected PTTEP source Annex identity inventory changed");
  const aKnown=a.filter(x=>n(x.previewSellTHB));
  const bKnown=b.filter(x=>n(x.customerSellTHB));
  const cKnown=c.filter(x=>n(x.customerSellTHB));
@@ -411,7 +414,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  ];
  return Object.freeze({
   moduleId:"bid.budget.pricing.release",policy:RELEASE_POLICY_0553,
-  a,b,c,annex,annexModels,annexTraceAudit,
+  a,b,c,annex,annexModels,annexTraceAudit,b10OwnerDecision:spare.b10OwnerDecision,excludedB10Rows:spare.excludedB10Rows,b13TagPresentation:selectB13TagPresentation0553(),
   budgetaryOptionAnnex:Object.freeze(Object.fromEntries(
    Object.entries(selectedOptionBudgetaryQuote.offers).map(([code,offer])=>[code,offer.rows]))),
   sparePriceEvidence:spare.sparePriceEvidence, // Read-only item candidate and optional price benchmark; never financial posting

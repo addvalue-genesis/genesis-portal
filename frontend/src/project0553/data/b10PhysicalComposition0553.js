@@ -49,8 +49,8 @@ export function selectB10PhysicalComposition0553(){
  const schedule=selectSpareCustomerSchedule0553();
  const purchase=selectB10ItemizedPurchaseEvidence0553();
  const owners=schedule.currentByCode.B10;
- if(owners.length!==4||owners.reduce((s,r)=>s+r.qty,0)!==14||
- owners.reduce((s,r)=>s+r.extendedTHB,0)!==509827.50)throw Error("B10 canonical 14-kit price owner changed");
+ if(owners.length!==3||owners.reduce((s,r)=>s+r.qty,0)!==11||
+ owners.reduce((s,r)=>s+r.extendedTHB,0)!==405405)throw Error("B10 canonical 14-kit price owner changed");
  const cisco=SUPPLIER_QUOTE_LINES_0553.find(q=>q.id==="VST-0048-RE1");
  const vc=code=>{const a=cisco?.lines.find(x=>x[0]===code);
   if(!a)throw Error("VST Cisco installed quote missing "+code);return a;};
@@ -98,7 +98,7 @@ export function selectB10PhysicalComposition0553(){
    evidence:"One installed-unit FCA supplier quotation extrapolated in Part A to three locations, NOT one B10 spare",
    status:"ONE_SYSTEM_INSTALLATION_QUOTE__THREE_SITE_BUDGET_EXTRAPOLATION"})
  ];
- const sourceInstalled=lock([...mr1,...mr2,...mr3,...mr4]);
+ const sourceInstalled=lock([...mr1,...mr2,...mr3]);
  const requirementFamilies=lock(purchase.requirementArticleRows.map(x=>e(x.id,x.mr,"REQUIRED COMMISSIONING SPARE ARTICLE",x.articleFunction,null,null,null,null,
    x.sourceMrRequirement||x.sourceOriginalPhrase,{
    owner:OPEN,sourceType:"MR_ATTACHMENT5_FUNCTIONAL_REQUIREMENT",
@@ -120,8 +120,8 @@ export function selectB10PhysicalComposition0553(){
    "EXA-A8 Attachment 1 (verify cited MMC23-5025 vs accessible MMC25-5001 edition)",
    "4-Scope of Supply.xlsx / B10 CommSpares (original 13 empty physical article rows)"
   ]),
-  parentRows,installedComponents:sourceInstalled,requiredSpareFamilies:requirementFamilies,
-  deliveredCommissioningKits:14,originalWorkingSellTHB:509827.5,
+  parentRows,excludedInstalledComponents:lock(mr4),installedComponents:sourceInstalled,requiredSpareFamilies:requirementFamilies,
+  deliveredCommissioningKits:11,originalWorkingSellTHB:405405,excludedSourceRows:schedule.excludedB10Rows,
   procurementSkuApprovedCount:0,approvedB10SpareStockQtyCount:0,additionalPostingAllowed:false,
   allSpareSkuRatesVerified:false,sourceToReleaseParentIds:parentRows.map(x=>x.sourceId),
   quoteExpiryNote:"NextG 01-Oct-2026; VST 30-Sep-2026 expired; installed-quote component prices NOT B10 spare rates",

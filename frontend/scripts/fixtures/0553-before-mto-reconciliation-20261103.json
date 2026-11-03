@@ -1,0 +1,1210 @@
+{
+  "baselineCommit": "eb67cb2fd57650dea3e1e8d6b7877e242a35e1e1",
+  "a": [
+    {
+      "code": "A1",
+      "description": "MR-0001 SCADA / AVIAT / Cisco",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 242910,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 7643874.13,
+      "sourceModuleId": "bid.budget.bom.system-location-mto",
+      "locations": "ZWP20, ZWP21, ZWP22, ZWP23, ZPQ, ZWP8, ZWP11",
+      "mr": "MR-0001",
+      "preTensAmountUSD": 242700
+    },
+    {
+      "code": "A2",
+      "description": "MR-0002 Trunk Radio",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 137130,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 4314488.1,
+      "sourceModuleId": "bid.budget.bom.system-location-mto",
+      "locations": "ZWP20, ZWP21, ZWP22",
+      "mr": "MR-0002",
+      "preTensAmountUSD": 137000
+    },
+    {
+      "code": "A3",
+      "description": "MR-0003 Ex Telephone / Sounder",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 34200,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 1076400,
+      "sourceModuleId": "bid.budget.bom.system-location-mto",
+      "locations": "ZWP20, ZWP21, ZWP22, ZWP23",
+      "mr": "MR-0003"
+    },
+    {
+      "code": "A4",
+      "description": "MR-0004 RACON",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 292500,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 9213750,
+      "sourceModuleId": "bid.budget.bom.system-location-mto",
+      "locations": "ZWP20, ZWP21, ZWP22",
+      "mr": "MR-0004"
+    }
+  ],
+  "b": [
+    {
+      "code": "B1",
+      "description": "Engineering and design; project management and coordination; Myanmar import and operating approval services, including applicable government fees.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 27400,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 862675.74,
+      "sourceModuleId": "bid.budget.working.bc.b1",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B2",
+      "description": "Engineering documentation, test procedures and reports, as-built documents and final dossier in accordance with the VDRL.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 7600,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 237121.13,
+      "sourceModuleId": "bid.budget.working.bc.b2",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B3",
+      "description": "Inspection, testing and certification. Preparation and FAT at SAMTEL Warehouse: 2 days plus 1 reserve day; shared facilities, test tools and closeout. Survey and offshore SAT included as specified below.",
+      "serviceText": "Included: 2 persons; 28 working days; 12 hours/day.\nAdditional labour (Senior / Field): USD 1,000 / 800/person/day.\nProposed OT after 12 hours/day: USD 125 / 100/person/hour.\nProposed standby: USD 1,000 / 800/person/day. Additional services require written agreement; extra travel/accommodation excluded; no overlapping time charges.",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 73800,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 2322450,
+      "sourceModuleId": "bid.budget.working.bc.b3",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B4",
+      "description": "Painting and protective coating in accordance with the specification, where required.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": null,
+      "offerTreatment": {
+        "status": "NOT_QUOTED_EXCLUDED",
+        "priceText": "N/A",
+        "remark": "Not quoted; excluded from this offer.",
+        "source": "Owner instruction 2026-10-29",
+        "technicalApplicabilityConfirmed": false
+      },
+      "priceText": "N/A",
+      "commercialRemark": "Not quoted; excluded from this offer.",
+      "sourceTHB": null,
+      "sourceModuleId": "bid.budget.working.bc.b4",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B5",
+      "description": "Export packing, preservation and shipping marks in accordance with packing and shipping instructions.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 9900,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 311184,
+      "sourceModuleId": "bid.budget.working.bc.b5",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B6",
+      "description": "Transportation, export documentation and cargo insurance to CIF Zhuhai Port, China (Incoterms 2020); import/export administration and supporting documents for JUTAL.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 10700,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 335584,
+      "sourceModuleId": "bid.budget.working.bc.b6",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B7",
+      "description": "Additional storage allowance beyond included storage.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 1000,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 30000,
+      "sourceModuleId": "bid.budget.working.bc.b7",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B8",
+      "description": "End-user training at SAMTEL Warehouse: 1 day plus 1 reserve day; OEM online instruction with ADDVALUE onsite facilitation, training materials and session facilities.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 4600,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 142550,
+      "sourceModuleId": "bid.budget.working.bc.b8",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B9",
+      "description": "Onshore specialist assistance at JUTAL Zhuhai Fabrication Yard, including configuration, integration, mobilisation and accommodation.",
+      "serviceText": "Included: 2 persons; 7 working days + 2 travel days/person.\nAdditional labour (Senior / Field): USD 700 / 600/person/day.\nOnshore working hours and OT rates: to be agreed.\nProposed standby: USD 700 / 600/person/day. Additional services require written agreement; extra travel/accommodation excluded; no overlapping time charges.",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 15300,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 480550,
+      "sourceModuleId": "bid.budget.working.bc.b9",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B10",
+      "description": "Erection, pre-commissioning, commissioning and start-up spares. Refer to Annex B10.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 12960,
+      "offerTreatment": {
+        "status": "PARTIAL_SCOPE_EXCLUSION",
+        "priceText": null,
+        "remark": "Refer to Annex B10. RACON commissioning spares excluded.",
+        "source": "Owner instruction 2026-11-03",
+        "technicalApplicabilityConfirmed": false
+      },
+      "priceText": null,
+      "commercialRemark": "Refer to Annex B10. RACON commissioning spares excluded.",
+      "sourceTHB": 405405,
+      "sourceModuleId": "bid.budget.working.bc.b10",
+      "locations": "",
+      "mr": "",
+      "preTensAmountUSD": 12900
+    },
+    {
+      "code": "B11",
+      "description": "Special tools for operation and maintenance. Refer to Annex B11.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": null,
+      "offerTreatment": {
+        "status": "NOT_QUOTED_EXCLUDED",
+        "priceText": "N/A",
+        "remark": "Not separately quoted. Tools expressly included in the equipment supply remain included.",
+        "source": "Owner instruction 2026-11-02",
+        "technicalApplicabilityConfirmed": false
+      },
+      "priceText": "N/A",
+      "commercialRemark": "Not separately quoted. Tools expressly included in the equipment supply remain included.",
+      "sourceTHB": null,
+      "sourceModuleId": "bid.budget.working.bc.b11",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B12",
+      "description": "First-filling materials, where required by the equipment specification.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": null,
+      "offerTreatment": {
+        "status": "NOT_QUOTED_EXCLUDED",
+        "priceText": "N/A",
+        "remark": "Not quoted; excluded from this offer.",
+        "source": "Owner instruction 2026-10-29",
+        "technicalApplicabilityConfirmed": false
+      },
+      "priceText": "N/A",
+      "commercialRemark": "Not quoted; excluded from this offer.",
+      "sourceTHB": null,
+      "sourceModuleId": "bid.budget.working.bc.b12",
+      "locations": "",
+      "mr": ""
+    },
+    {
+      "code": "B13",
+      "description": "Consumables for preservation, operation and maintenance. Refer to Annex B13.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 1530,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": 46683,
+      "sourceModuleId": "bid.budget.working.bc.b13",
+      "locations": "",
+      "mr": "",
+      "preTensAmountUSD": 1500
+    },
+    {
+      "code": "B14",
+      "description": "Budgetary insurance allowance for ADDVALUE services in accordance with the stated scope and qualifications.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": 25000,
+      "offerTreatment": {
+        "status": "OWNER_SELECTED_BUDGETARY_INSURANCE_ALLOWANCE",
+        "priceText": null,
+        "remark": "Budgetary insurance allowance for ADDVALUE services; coverage and policy terms subject to confirmation. Cargo insurance in B6; SAMTEL bonds excluded.",
+        "source": "Owner instruction 2026-10-29",
+        "costOwner": "ADDVALUE",
+        "samtelReportedResaleMarkupPct": 10,
+        "resaleMarkupIsInsurancePremium": false
+      },
+      "priceText": null,
+      "commercialRemark": "Budgetary insurance allowance for ADDVALUE services; coverage and policy terms subject to confirmation. Cargo insurance in B6; SAMTEL bonds excluded.",
+      "sourceTHB": 787500,
+      "sourceModuleId": "bid.budget.working.bc.b14",
+      "locations": "",
+      "mr": ""
+    }
+  ],
+  "c": [
+    {
+      "code": "C1",
+      "description": "Capital spares. Refer to Annex C1.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": null,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": null,
+      "sourceModuleId": "bid.budget.working.bc.c1",
+      "locations": "",
+      "mr": "",
+      "budgetaryOptionQuoteUSD": 181100,
+      "budgetaryOptionOfferTHB": 5704650,
+      "conditionalPriceState": "CONDITIONAL_BUDGETARY_OFFER",
+      "budgetaryOfferSourceId": "C1-PTTEP-01",
+      "budgetaryOfferSourceModuleId": "bid.budget.working.bc.c1.spare-line.c1-pttep-01",
+      "budgetaryOfferPrepared": true,
+      "firmOemQuote": false,
+      "optionExcludedFromBase": true
+    },
+    {
+      "code": "C2",
+      "description": "Two years of normal operation spare parts. Refer to Annex C2.",
+      "serviceText": "",
+      "qty": 1,
+      "unit": "lot",
+      "amountUSD": null,
+      "offerTreatment": null,
+      "priceText": null,
+      "commercialRemark": "",
+      "sourceTHB": null,
+      "sourceModuleId": "bid.budget.working.bc.c2",
+      "locations": "",
+      "mr": "",
+      "budgetaryOptionQuoteUSD": 27220,
+      "budgetaryOptionOfferTHB": 852086.5,
+      "conditionalPriceState": "CONDITIONAL_BUDGETARY_OFFER",
+      "budgetaryOfferSourceId": "C2-OPTION-REV08-12",
+      "budgetaryOfferSourceModuleId": "bid.budget.working.bc.c2",
+      "budgetaryOfferPrepared": true,
+      "firmOemQuote": false,
+      "optionExcludedFromBase": true
+    }
+  ],
+  "totalUSD": 896530,
+  "rows": [
+    {
+      "key": "[\"MR-0001\",\"ZWP20\",\"4-0\"]",
+      "qty": 1,
+      "unitUSD": 9480,
+      "amountUSD": 9480
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP20\",\"5-0\"]",
+      "qty": 1,
+      "unitUSD": 880,
+      "amountUSD": 880
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP20\",\"6-0\"]",
+      "qty": 1,
+      "unitUSD": 6130,
+      "amountUSD": 6130
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP20\",\"7-0\"]",
+      "qty": 1,
+      "unitUSD": 15340,
+      "amountUSD": 15340
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP20\",\"8-0\"]",
+      "qty": 1,
+      "unitUSD": 130,
+      "amountUSD": 130
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP20\",\"9-0\"]",
+      "qty": 1,
+      "unitUSD": 1620,
+      "amountUSD": 1620
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP20\",\"10-0\"]",
+      "qty": 1,
+      "unitUSD": 800,
+      "amountUSD": 800
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP20\",\"11-0\"]",
+      "qty": 1,
+      "unitUSD": 1540,
+      "amountUSD": 1540
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP21\",\"MR-502-001\"]",
+      "qty": 1,
+      "unitUSD": 9480,
+      "amountUSD": 9480
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP21\",\"MR-502-001A\"]",
+      "qty": 1,
+      "unitUSD": 880,
+      "amountUSD": 880
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP21\",\"ANT-502-001\"]",
+      "qty": 1,
+      "unitUSD": 4180,
+      "amountUSD": 4180
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP21\",\"LAN-502-001\"]",
+      "qty": 1,
+      "unitUSD": 15340,
+      "amountUSD": 15340
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP21\",\"DATO-507-001\"]",
+      "qty": 1,
+      "unitUSD": 130,
+      "amountUSD": 130
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP21\",\"TCAB-500-001\"]",
+      "qty": 1,
+      "unitUSD": 1620,
+      "amountUSD": 1620
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP21\",\"SA-502-001\"]",
+      "qty": 1,
+      "unitUSD": 800,
+      "amountUSD": 800
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP21\",\"Bulk Material\"]",
+      "qty": 1,
+      "unitUSD": 1540,
+      "amountUSD": 1540
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP22\",\"MR-502-001\"]",
+      "qty": 1,
+      "unitUSD": 9480,
+      "amountUSD": 9480
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP22\",\"MR-502-001A\"]",
+      "qty": 1,
+      "unitUSD": 880,
+      "amountUSD": 880
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP22\",\"ANT-502-001\"]",
+      "qty": 1,
+      "unitUSD": 6130,
+      "amountUSD": 6130
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP22\",\"LAN-502-001\"]",
+      "qty": 1,
+      "unitUSD": 15340,
+      "amountUSD": 15340
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP22\",\"DATO-507-001\"]",
+      "qty": 1,
+      "unitUSD": 130,
+      "amountUSD": 130
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP22\",\"TCAB-500-001\"]",
+      "qty": 1,
+      "unitUSD": 1620,
+      "amountUSD": 1620
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP22\",\"SA-502-001\"]",
+      "qty": 1,
+      "unitUSD": 800,
+      "amountUSD": 800
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP22\",\"Bulk Material\"]",
+      "qty": 1,
+      "unitUSD": 1540,
+      "amountUSD": 1540
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP23\",\"MR-502-001\"]",
+      "qty": 1,
+      "unitUSD": 9480,
+      "amountUSD": 9480
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP23\",\"MR-502-001A\"]",
+      "qty": 1,
+      "unitUSD": 880,
+      "amountUSD": 880
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP23\",\"ANT-502-001\"]",
+      "qty": 1,
+      "unitUSD": 2060,
+      "amountUSD": 2060
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP23\",\"ANT-502-002\"]",
+      "qty": 1,
+      "unitUSD": 2060,
+      "amountUSD": 2060
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP23\",\"LAN-502-001\"]",
+      "qty": 1,
+      "unitUSD": 15340,
+      "amountUSD": 15340
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP23\",\"DATO-507-001\"]",
+      "qty": 1,
+      "unitUSD": 130,
+      "amountUSD": 130
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP23\",\"TCAB-500-001\"]",
+      "qty": 1,
+      "unitUSD": 1620,
+      "amountUSD": 1620
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP23\",\"SA-502-001\"]",
+      "qty": 1,
+      "unitUSD": 800,
+      "amountUSD": 800
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP23\",\"Bulk Material\"]",
+      "qty": 1,
+      "unitUSD": 1540,
+      "amountUSD": 1540
+    },
+    {
+      "key": "[\"MR-0001\",\"ZPQ\",\"MR-LQM-202-025A\"]",
+      "qty": 1,
+      "unitUSD": 16910,
+      "amountUSD": 16910
+    },
+    {
+      "key": "[\"MR-0001\",\"ZPQ\",\"MR-LQM-202-025B\"]",
+      "qty": 1,
+      "unitUSD": 9480,
+      "amountUSD": 9480
+    },
+    {
+      "key": "[\"MR-0001\",\"ZPQ\",\"ANT-LQM-202-025\"]",
+      "qty": 1,
+      "unitUSD": 790,
+      "amountUSD": 790
+    },
+    {
+      "key": "[\"MR-0001\",\"ZPQ\",\"SA-LQM-202-025\"]",
+      "qty": 1,
+      "unitUSD": 800,
+      "amountUSD": 800
+    },
+    {
+      "key": "[\"MR-0001\",\"ZPQ\",\"Bulk Material\"]",
+      "qty": 1,
+      "unitUSD": 1540,
+      "amountUSD": 1540
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-003\"]",
+      "qty": 1,
+      "unitUSD": 16910,
+      "amountUSD": 16910
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-003A\"]",
+      "qty": 1,
+      "unitUSD": 880,
+      "amountUSD": 880
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"ANT-502-002\"]",
+      "qty": 1,
+      "unitUSD": 790,
+      "amountUSD": 790
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-004\"]",
+      "qty": 1,
+      "unitUSD": 9480,
+      "amountUSD": 9480
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"MR-502-004A\"]",
+      "qty": 1,
+      "unitUSD": 880,
+      "amountUSD": 880
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"ANT-502-003\"]",
+      "qty": 1,
+      "unitUSD": 6130,
+      "amountUSD": 6130
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"LAN-502-002\"]",
+      "qty": 1,
+      "unitUSD": 15340,
+      "amountUSD": 15340
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"SA-502-002\"]",
+      "qty": 1,
+      "unitUSD": 800,
+      "amountUSD": 800
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"SA-502-003\"]",
+      "qty": 1,
+      "unitUSD": 800,
+      "amountUSD": 800
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"TCAB-500-003\"]",
+      "qty": 1,
+      "unitUSD": 1620,
+      "amountUSD": 1620
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP8\",\"Bulk Material\"]",
+      "qty": 1,
+      "unitUSD": 1540,
+      "amountUSD": 1540
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP11\",\"MR-502-005A\"]",
+      "qty": 1,
+      "unitUSD": 9480,
+      "amountUSD": 9480
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP11\",\"MR-502-005B\"]",
+      "qty": 1,
+      "unitUSD": 880,
+      "amountUSD": 880
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP11\",\"ANT-502-005\"]",
+      "qty": 1,
+      "unitUSD": 4180,
+      "amountUSD": 4180
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP11\",\"SA-507-005\"]",
+      "qty": 1,
+      "unitUSD": 800,
+      "amountUSD": 800
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP11\",\"TCAB-500-003\"]",
+      "qty": 1,
+      "unitUSD": 1620,
+      "amountUSD": 1620
+    },
+    {
+      "key": "[\"MR-0001\",\"ZWP11\",\"Bulk Material\"]",
+      "qty": 1,
+      "unitUSD": 1540,
+      "amountUSD": 1540
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-RFI-BDA\"]",
+      "qty": 1,
+      "unitUSD": 40930,
+      "amountUSD": 40930
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-RFI-BDA-EXD-ENCLOSURE\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-BDA-M20-GLANDS\"]",
+      "qty": 2,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-BDA-RF-FEEDTHROUGHS\"]",
+      "qty": 2,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-BULK-RF-GROUND\"]",
+      "qty": 1,
+      "unitUSD": 40,
+      "amountUSD": 40
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-BULK-RF-TAPE\"]",
+      "qty": 1,
+      "unitUSD": 90,
+      "amountUSD": 90
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-BULK-EX-SURGE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-BULK-LNA-BOX\"]",
+      "qty": 1,
+      "unitUSD": 2400,
+      "amountUSD": 2400
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-UHF-2\"]",
+      "qty": 1,
+      "unitUSD": 1110,
+      "amountUSD": 1110
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-UHF-3\"]",
+      "qty": 1,
+      "unitUSD": 30,
+      "amountUSD": 30
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP20\",\"ZWP20-UHF-4\"]",
+      "qty": 1,
+      "unitUSD": 1110,
+      "amountUSD": 1110
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-RFI-BDA\"]",
+      "qty": 1,
+      "unitUSD": 40930,
+      "amountUSD": 40930
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-RFI-BDA-EXD-ENCLOSURE\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-BDA-M20-GLANDS\"]",
+      "qty": 2,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-BDA-RF-FEEDTHROUGHS\"]",
+      "qty": 2,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-BULK-RF-GROUND\"]",
+      "qty": 1,
+      "unitUSD": 40,
+      "amountUSD": 40
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-BULK-RF-TAPE\"]",
+      "qty": 1,
+      "unitUSD": 90,
+      "amountUSD": 90
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-BULK-EX-SURGE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-BULK-LNA-BOX\"]",
+      "qty": 1,
+      "unitUSD": 2400,
+      "amountUSD": 2400
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-UHF-2\"]",
+      "qty": 1,
+      "unitUSD": 1110,
+      "amountUSD": 1110
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-UHF-3\"]",
+      "qty": 1,
+      "unitUSD": 30,
+      "amountUSD": 30
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP21\",\"ZWP21-UHF-4\"]",
+      "qty": 1,
+      "unitUSD": 1110,
+      "amountUSD": 1110
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-RFI-BDA\"]",
+      "qty": 1,
+      "unitUSD": 40930,
+      "amountUSD": 40930
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-RFI-BDA-EXD-ENCLOSURE\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-BDA-M20-GLANDS\"]",
+      "qty": 2,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-BDA-RF-FEEDTHROUGHS\"]",
+      "qty": 2,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-BULK-RF-GROUND\"]",
+      "qty": 1,
+      "unitUSD": 40,
+      "amountUSD": 40
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-BULK-RF-TAPE\"]",
+      "qty": 1,
+      "unitUSD": 90,
+      "amountUSD": 90
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-BULK-EX-SURGE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-BULK-LNA-BOX\"]",
+      "qty": 1,
+      "unitUSD": 2400,
+      "amountUSD": 2400
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-UHF-2\"]",
+      "qty": 1,
+      "unitUSD": 1110,
+      "amountUSD": 1110
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-UHF-3\"]",
+      "qty": 1,
+      "unitUSD": 30,
+      "amountUSD": 30
+    },
+    {
+      "key": "[\"MR-0002\",\"ZWP22\",\"ZWP22-UHF-4\"]",
+      "qty": 1,
+      "unitUSD": 1110,
+      "amountUSD": 1110
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MGW-PHONE-1\"]",
+      "qty": 1,
+      "unitUSD": 8550,
+      "amountUSD": 8550
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MGW-PHONE1-PHONE\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MGW-PHONE1-HORN\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MGW-PHONE1-JB\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MR0003-BULK-PHONE-IP-POWER-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MR0003-BULK-HORN-DC-SIGNAL-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MR0003-BULK-FIELD-EX-GLANDS\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP20\",\"ZWP20-MR0003-BULK-FIELD-BULK-ACCESSORIES\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MGW-PHONE-1\"]",
+      "qty": 1,
+      "unitUSD": 8550,
+      "amountUSD": 8550
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MGW-PHONE1-PHONE\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MGW-PHONE1-HORN\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MGW-PHONE1-JB\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MR0003-BULK-PHONE-IP-POWER-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MR0003-BULK-HORN-DC-SIGNAL-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MR0003-BULK-FIELD-EX-GLANDS\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP21\",\"ZWP21-MR0003-BULK-FIELD-BULK-ACCESSORIES\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MGW-PHONE-1\"]",
+      "qty": 1,
+      "unitUSD": 8550,
+      "amountUSD": 8550
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MGW-PHONE1-PHONE\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MGW-PHONE1-HORN\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MGW-PHONE1-JB\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MR0003-BULK-PHONE-IP-POWER-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MR0003-BULK-HORN-DC-SIGNAL-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MR0003-BULK-FIELD-EX-GLANDS\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP22\",\"ZWP22-MR0003-BULK-FIELD-BULK-ACCESSORIES\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MGW-PHONE-1\"]",
+      "qty": 1,
+      "unitUSD": 8550,
+      "amountUSD": 8550
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MGW-PHONE1-PHONE\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MGW-PHONE1-HORN\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MGW-PHONE1-JB\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MR0003-BULK-PHONE-IP-POWER-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MR0003-BULK-HORN-DC-SIGNAL-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MR0003-BULK-FIELD-EX-GLANDS\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0003\",\"ZWP23\",\"ZWP23-MR0003-BULK-FIELD-BULK-ACCESSORIES\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP20\",\"ZWP20-MGW-RACON-1\"]",
+      "qty": 1,
+      "unitUSD": 97500,
+      "amountUSD": 97500
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP20\",\"ZWP20-MGW-DB5P\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP20\",\"ZWP20-MGW-RACON-CONTROL-JB\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP20\",\"ZWP20-MGW-RACON-PROGRAMMING-KIT\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP20\",\"ZWP20-MR0004-BFOU-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP20\",\"ZWP20-MR0004-FIELD-GLANDS\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP20\",\"ZWP20-MR0004-TOOLS-TEST\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP21\",\"ZWP21-MGW-RACON-1\"]",
+      "qty": 1,
+      "unitUSD": 97500,
+      "amountUSD": 97500
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP21\",\"ZWP21-MGW-DB5P\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP21\",\"ZWP21-MGW-RACON-CONTROL-JB\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP21\",\"ZWP21-MGW-RACON-PROGRAMMING-KIT\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP21\",\"ZWP21-MR0004-BFOU-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP21\",\"ZWP21-MR0004-FIELD-GLANDS\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP21\",\"ZWP21-MR0004-TOOLS-TEST\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP22\",\"ZWP22-MGW-RACON-1\"]",
+      "qty": 1,
+      "unitUSD": 97500,
+      "amountUSD": 97500
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP22\",\"ZWP22-MGW-DB5P\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP22\",\"ZWP22-MGW-RACON-CONTROL-JB\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP22\",\"ZWP22-MGW-RACON-PROGRAMMING-KIT\"]",
+      "qty": 1,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP22\",\"ZWP22-MR0004-BFOU-CABLE\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP22\",\"ZWP22-MR0004-FIELD-GLANDS\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    },
+    {
+      "key": "[\"MR-0004\",\"ZWP22\",\"ZWP22-MR0004-TOOLS-TEST\"]",
+      "qty": null,
+      "unitUSD": null,
+      "amountUSD": null
+    }
+  ]
+}

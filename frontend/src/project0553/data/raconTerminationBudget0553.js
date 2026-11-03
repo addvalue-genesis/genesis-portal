@@ -1,8 +1,10 @@
 import {Z1F_TEL_LAYOUT_INDEX_0553} from "./z1fTelLayoutIndex0553";
 import {APPROVED_0553_BUDGET_BASIS} from "./approvedBudgetBasis0553";
+import {MDS_SCOPE_DECISION_0553} from "./mr0004WorkingBom0553";
 
 // Information-only Tideland 070.1016-DWG Rev.C (2 sheets) and
-// SEABEACON-2 application diagram page 3. Supplier budget quote separately includes three specific BFOU cable runs and six gland sets.
+// SEABEACON-2 application diagram page 3. Raw quote inclusion/exclusion
+// contradictions stay below; owner's decision governs effective supply credits.
 // Lengths below are explicit engineering scenarios, not dimensions taken from GA.
 export const RACON_TERMINATION_POLICY_0553=Object.freeze({
  state:"PRELIMINARY_BUDGETARY_ROUTE_SCENARIO_NOT_MEASURED",
@@ -11,7 +13,8 @@ export const RACON_TERMINATION_POLICY_0553=Object.freeze({
  terminalCount:17,procurementAllowancePct:APPROVED_0553_BUDGET_BASIS.greenfield.cableProcurementAllowancePct,
  modelledLengthsM:{outdoorAdjacent:6,fieldToIndoor:60,indoorInterface:6},
  packageOwner:"RACON_VENDOR_PACKAGE",
- excludedFromVendor:"QTORG2609244 p8 general exclusion conflicts with p4 included 3 BFOU cable runs and six glands; treat p4 explicitly included quantities as provisional credit and flag clarification.",
+ excludedFromVendor:"Owner 02-Nov-2026 selects FAT/cable/gland exclusion. ADDVALUE supplies; no provisional vendor credit. Raw QTORG2609244 contradictions remain source evidence only.",
+ scopeDecision:MDS_SCOPE_DECISION_0553,
  quotation:{number:"QTORG2609244",date:"2026-09-22",packageUSD:75000,packageBasis:"ONE_QUOTED_SYSTEM__DO_NOT_MULTIPLY_BY_WP_WITHOUT_SCOPE_CHECK",cablesIncluded:[{id:"RACON_TO_CONTROL_A",lengthM:5},{id:"RACON_TO_CONTROL_B",lengthM:5},{id:"CONTROL_TO_DB",lengthM:10}],cableSpec:"BFOU 12C x 1.5mm2",glandsIncluded:6,includes:["SeaBeacon-2 System 6 Ex","Ex RACON control box","DB-5P with DC-DC converter and bracket","Purge kit","Programming cable","Packing","Standard documentation"],fatCommercialConflict:"Financial Summary p5 FAT included; Nontechnical p7 FAT/R-FAT excluded",cableCommercialConflict:"Financial Summary p4 20m BFOU + 6 glands included; p8 general cable/gland exclusion",vendorClarificationRequired:true},
  connectionTypes:[
   {id:"RACON_TO_CONTROL_A",from:"RACON JB 630.1421-00",to:"Control box 630.1422-00",kind:"BFOU 12C x 1.5mm2",category:"outdoorAdjacent",circuits:1,evidence:"Application diagram p3 first system cable; 10C 1.5mm2"},
@@ -25,7 +28,7 @@ export const RACON_TERMINATION_POLICY_0553=Object.freeze({
  flags:["Page3 cable sizes stated FOR REFERENCE ONLY; verify against electrical design, offshore cable rating and cable schedule",
  "Page2 terminal TB1 1-17 is not a 17-conductor cable purchase quantity",
  "Vendor-supplied RACON, control enclosure, JB and Ex blank plugs are not charged twice",
- "Vendor information GA and termination diagram have potentially different entry gland inclusion; treat field glands as candidate pending delivery scope"]
+ "Owner selected ADDVALUE cable/gland supply; final gland size and active entry count still require cable-end/Ex verification"]
 });
 const ceilPurchase=m=>Math.ceil(m*(1+RACON_TERMINATION_POLICY_0553.procurementAllowancePct/100));
 export function deriveRaconTerminationBudget0553(){
@@ -34,17 +37,19 @@ export function deriveRaconTerminationBudget0553(){
   const lines=p.connectionTypes.map(v=>{
    const budgetLengthM=p.modelledLengthsM[v.category];
    const totalProcurementM=ceilPurchase(budgetLengthM)*v.circuits;
-   const provided=p.quotation.cablesIncluded.find(c=>c.id===v.id);
+   const quotedProvided=p.quotation.cablesIncluded.find(c=>c.id===v.id);
+   const provided=p.scopeDecision.vendorCableCreditM===0?null:quotedProvided;
    const includedM=provided?.lengthM??0;
    const shortfallM=Math.max(0,totalProcurementM-includedM);
    const replacementFullRunM=provided&&shortfallM>0?totalProcurementM:0;
    const additionalM=provided?replacementFullRunM:totalProcurementM;
    return {id:v.id,wp:w.wp,...v,designBudgetM:budgetLengthM,
     procurementM:totalProcurementM,vendorIncludedM:includedM,extensionShortfallM:shortfallM,replacementFullRunM,additionalPurchaseM:additionalM,
-    vendorIncludedBasis:provided?"ORGA_QUOTE_P4_INCLUSION_PROVISIONAL":"NO_QUOTED_VENDOR_CABLE",
+    quotedVendorCableM:quotedProvided?.lengthM??0,
+    vendorIncludedBasis:"OWNER_EXCLUDES_CABLES__ADDVALUE_SUPPLY",
     cableUseRule:provided&&shortfallM>0?"REPLACE_FULL_RUN_UNLESS_ENGINEERED_JOIN_APPROVED":"NO_JOIN_REQUIRED",
     unitRateTHB:p.webBudgetRates?.[v.kind]?.thbPerM??null,extendedTHB:Number.isFinite(p.webBudgetRates?.[v.kind]?.thbPerM)?Math.round(additionalM*p.webBudgetRates[v.kind].thbPerM*100)/100:null,workingZeroDisplayTHB:0,
-    costOwner:"FIELD_RACON_BULK_NET_OF_VENDOR_INCLUSION",state:additionalM?(Number.isFinite(p.webBudgetRates?.[v.kind]?.thbPerM)?"WEB_BUDGET_RATE_EX_WORKS_NOT_LANDED":"ADDITIONAL_CABLE_RATE_PENDING"):"VENDOR_INCLUDED_ONLY"};
+    costOwner:p.scopeDecision.cableOwner,state:additionalM?(Number.isFinite(p.webBudgetRates?.[v.kind]?.thbPerM)?"WEB_BUDGET_RATE_EX_WORKS_NOT_LANDED":"ADDITIONAL_CABLE_RATE_PENDING"):"NO_CABLE_PURCHASE"};
   });
   const types=[...new Set(lines.map(x=>x.kind))].map(kind=>({kind,
    distinctRuns:lines.filter(x=>x.kind===kind).reduce((n,x)=>n+x.circuits,0),
@@ -54,15 +59,16 @@ export function deriveRaconTerminationBudget0553(){
    vendorIncludedCableM:lines.reduce((n,x)=>n+x.vendorIncludedM,0),
    additionalCablePurchaseM:lines.reduce((n,x)=>n+x.additionalPurchaseM,0),
    extensionShortfallOnlyM:lines.reduce((n,x)=>n+x.extensionShortfallM,0),
-   supplyRisk:"ORGA included short pre-cut cable runs cannot be combined or extended without approved certified joints; purchasing full replacement length is a conservative separate scenario, not a confirmed necessary purchase",
-   fieldGlandCandidateQty:lines.length*2,vendorIncludedGlandQty:p.quotation.glandsIncluded,
-   additionalGlandCandidateQty:Math.max(0,lines.length*2-p.quotation.glandsIncluded),
-   glandState:"6 CMP T3CDS GLANDS PROVISIONALLY QUOTED INCLUDED; ONLY UNMATCHED EX FIELD ENTRIES MAY REQUIRE PURCHASE",
+   supplyRisk:"ADDVALUE supplies full routed cable lengths; six route functions and budget lengths are scenarios, not a measured cable schedule",
+   fieldGlandCandidateQty:lines.length*2,vendorIncludedGlandQty:p.scopeDecision.vendorGlandCreditQty,
+   additionalGlandCandidateQty:Math.max(0,lines.length*2-p.scopeDecision.vendorGlandCreditQty),
+   glandState:"OWNER_EXCLUDES_GLANDS__ADDVALUE_SUPPLY__FINAL_EX_END_REGISTER_PENDING",
    knownVendorEnclosureCostExtraTHB:0,
    pricedSubtotalTHB:lines.some(x=>x.extendedTHB!==null)?Math.round(lines.reduce((n,x)=>n+(x.extendedTHB??0),0)*100)/100:null,displayWorkingTHB:0,
    pricedCoverageCount:lines.filter(x=>x.extendedTHB!==null).length,unpricedCoverageCount:lines.filter(x=>x.extendedTHB===null).length,
-   completionState:"NET_OF_VENDOR_INCLUDED__PRICE_AND_COMMERCIAL_CLARIFICATION_PENDING",
+   completionState:"ADDVALUE_SUPPLY_CONFIRMED__TAKEOFF_AND_RATES_PENDING",
    quotation:p.quotation,
-   caveat:"Conservative full replacement of any quoted pre-cut run shorter than target is separately shown. Direct splice/extension of certified cable is NOT assumed. 60m field control-box-to-indoor DB and 6m local runs are assumptions, not measured routes. ORGA supplies 5m+5m+10m BFOU 12C and six glands per quoted package. These are provisional credits; p8 exclusions and p5/p7 FAT contradiction must be clarified."};
+   scopeDecision:p.scopeDecision,
+   caveat:"Owner selects FAT/cable/gland exclusions: ADDVALUE B3 owns integrated FAT; ADDVALUE field bulk owns cables/glands. Supplier credits are zero. Raw p4/p5 inclusions and p7/p8 exclusions are retained, not supplier-confirmed resolution. 60m field and 6m local runs plus cable types/end counts remain engineering assumptions. No measured takeoff, matched purchase rate or new cost posting is implied."};
  });
 }

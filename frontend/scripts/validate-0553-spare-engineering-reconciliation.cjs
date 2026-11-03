@@ -68,12 +68,12 @@ assert.equal(c.byCode.B11.historicalBudgetReferenceTHB,128314.11);
 assert.equal(c.byCode.B13.historicalBudgetReferenceTHB,22484.21);
 assert.equal(c.byCode.C1.historicalBudgetReferenceTHB,4049349.36);
 assert.equal(c.byCode.C2.historicalBudgetReferenceTHB,721806.68);
-assert.equal(w.knownWorkingSellTHB,5782287.13,
+assert.equal(w.knownWorkingSellTHB,5961702.87,
  "Current 10.2 Part B after B2 131-WO, MGW FAT and approved B9 Base; do not use prior Rev.K bridge");
-assert.equal(w.byCode.C1.workingSellTHB,null);
+assert.equal(w.byCode.C1.workingSellTHB,5704650);
 assert(c.updatedPricePosted===false&&c.complete===false&&c.customerReleaseAllowed===false);
 const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
-assert(jsx.includes("spareLines.length>0&&<div"),"Current C1 optional source must appear in existing current table");
+assert(jsx.includes("spareLines.length>0&&<details"),"Current C1 optional source must appear in existing current table");
 assert(jsx.includes("HISTORICAL NONPOSTING C1 AUDIT:"),"Prior C1 alternate quote must remain labelled historical");
 assert(jsx.includes("spareReconciliation.selectedC1Option.budgetTotalTHB"),"Selected C1 option must show source reference price");
 assert(jsx.includes("selected installed MDS RACON")&&jsx.includes("historical ORGA USD 75,000"),
@@ -81,4 +81,4 @@ assert(jsx.includes("selected installed MDS RACON")&&jsx.includes("historical OR
 for(const phrase of ["selectSpareEngineeringReconciliation0553","spareReconciliation.kitLines.map","spareReconciliation.raconComparison","customerSchedule.crossCategoryDuplicates","spareReconciliation.vendorScopeConflicts"])
  assert(jsx.includes(phrase),phrase+" must be shown in 10.2");
 assert(babel.transformSync(jsx,{babelrc:false,configFile:false,presets:[["@babel/preset-env",{targets:{node:"current"},modules:"commonjs"}],"@babel/preset-react"]}).code.length>0);
-console.log("PASS 0553 spare reconciliation: MR0004 installed MGW RACON USD75059 is distinct from historical ORGA C1 reference USD75000; nonposting C1 budget THB2362500, 14 kits unpriced, 4 tool phases, Attachment7 exclusion, Part B THB5782287.13 unchanged.");
+console.log("PASS 0553 spare reconciliation: MR0004 installed MGW RACON USD75059 is distinct from historical ORGA C1 reference USD75000; nonposting C1 budget THB2362500, 14 kits unpriced, 4 tool phases, Attachment7 exclusion, Part B THB5961702.87 unchanged.");

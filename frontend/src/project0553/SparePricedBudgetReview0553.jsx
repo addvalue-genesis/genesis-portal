@@ -1,15 +1,22 @@
 import React from "react";
 import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0553";
+import {C1C2EngineeringControl0553} from "./C1C2EngineeringControl0553";
+import {selectOptionBudgetaryOffer0553} from "./data/optionBudgetaryOffer0553";
 const m=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"Not established";
 export function SparePricedBudgetReview0553({code,onOpenSource=null,context="working"}){
  const review=selectSparePricedBudgetReview0553();
  if(!review.codes.includes(code))return null;
  const rows=review.rows[code],onlyHistorical=code==="C2",onlyComparable=code==="C1";
- return <details className="p55-panel p553-spare-priced-review" data-component-key={"bid.budget.working.bc."+code.toLowerCase()+".priced-budget-review"}
-  style={{padding:12}} open={context==="working"}>
-  <summary><strong>{code} — Quantity × Unit Price · Original Annex format (INTERNAL REVIEW)</strong>
+ const offer=code==="C2"?selectOptionBudgetaryOffer0553().offers.C2:null;
+ const cableReplacements=offer?[offer.ownerCableReplacement,offer.ownerRfCableReplacement].filter(Boolean):[];
+ return <>{["C1","C2"].includes(code)&&<C1C2EngineeringControl0553 code={code} onOpenSource={onOpenSource} open={context==="working"}/>}
+ <details className="p55-panel p553-spare-priced-review" data-component-key={"bid.budget.working.bc."+code.toLowerCase()+".priced-budget-review"}
+  style={{padding:12}} open={context==="working"&&!["C1","B11","B13","C2"].includes(code)}>
+  <summary><strong>{code}{code==="B11"?" — Withdrawn allowance / not separately quoted":""} — Quantity × Unit Price · Original Annex format (INTERNAL REVIEW)</strong>
    <small>{rows.length} line(s) · estimated THB {m(review.totals[code])} · NOT CUSTOMER RELEASE</small></summary>
+  {code==="C1"&&<p className="p55-note">Earlier RACON-only comparator / ฐานราคาชุดเดิมสำหรับตรวจย้อนกลับ.
+   {" "}ดูงบ C1 จากซ้าย–ขวา–SI ครบ 5 กลุ่มด้านบนสำหรับตัวเลขที่คำนวณใหม่</p>}
   <p className="p55-note"><strong>{onlyHistorical?"HISTORICAL Rev08 USD → THB PRICE REFERENCE ONLY":
     onlyComparable?"INSTALLED RACON FCA COMPARABLE, NOT AN OEM CAPITAL-SPARE PRICE":
     "SELECTED 10.2 WORKING PARAMETRIC SELL (OEM TOOL/CONSUMABLE SKU STILL OPEN)"}</strong>.
@@ -20,7 +27,7 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
    <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification / Source</th><th>Materials</th>
     <th>QTY</th><th>Unit THB · budgetary</th><th>Total THB · budgetary</th>{code.startsWith("C")&&<th>Lead time</th>}</tr></thead>
    <tbody>{rows.map((r,i)=><tr key={r.id} data-source-pricing-line={r.id}
-    data-component-key={context==="working"&&code==="C2"?"bid.budget.working.bc.c2.priced-budget-review."+r.id.toLowerCase():undefined}>
+    data-component-key={context==="working"&&code==="C2"&&!cableReplacements.some(x=>r.id===x.decision.historicalSourceId)?"bid.budget.working.bc.c2.priced-budget-review."+r.id.toLowerCase():undefined}>
      <td>{i+1}</td><td>{r.tag}</td><td><strong>{r.description}</strong></td>
      <td>{r.specification}<small>{r.sourceDocument}</small></td><td>{r.materials}</td>
      <td className="p553-annex-qty">{r.quantity} {r.unit}</td>
@@ -37,8 +44,15 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
       sourceRowModuleId:r.sourceRowModuleId,sourceModuleId:r.sourceRowModuleId})}>
      ↗ 10.2 Source {r.sourceId}</button>)}
   </div>}
-  <p className="p55-note">{code==="C2"?"These 12 historical rates support the conditional C2 budgetary offer. The proposed feeder must match the installed system; B10 identical stock must be excluded before firm issue. Original historical descriptions are retained here as evidence.":
+  {cableReplacements.map(cable=><p key={cable.decision.historicalSourceId} className="p55-note" data-c2-cable-source-decision={cable.decision.historicalSourceId} data-component-key={context==="working"?cable.decision.sourceModuleId:undefined}>
+   <strong>Current item{Number(cable.decision.historicalSourceId.slice(-2))} replacement — INTERNAL:</strong> {cable.decision.manufacturer} {cable.decision.partNo||""} {cable.decision.description},
+   1 drum ×{cable.decision.totalLengthM}m. Budget cost{cable.decision.totalLengthM} ×THB{m(cable.decision.budgetCostTHBPerM)}/m =THB{m(cable.costTHB)}; Release ×1.30 once =THB{m(cable.sellTHB)};
+   USD{m(cable.sellTHB/31.5)} before upward USD10 rounding. This replaces the old metre-priced row, not an additional charge.
+   Historical quote rate THB{m(cable.decision.historicalRateTHBPerM)}/m remains evidence. Selected basis: {cable.decision.costBasis}. Current price, final SKU, factory drum packing and separate freight/packing cost are unconfirmed.
+   <a href={cable.decision.historicalQuoteURL} target="_blank" rel="noreferrer"> {cable.decision.historicalQuote}</a>
+  </p>)}
+  <p className="p55-note">{code==="C2"?"The 12 historical rates remain original evidence; the selected C2 offer excludes the additional DB-5P per the owner instruction. The proposed feeder must match the installed system; B10 identical stock must be excluded before firm issue. Original historical descriptions are retained here as evidence.":
     code==="C1"?"The C1 conditional budgetary option uses installed-equipment FCA price × 31.5 × 1.30. It is excluded from Base A+B; independent OEM spare compatibility and CIF delivery price remain unconfirmed.":
     "Quantity and rate are from the existing 10.2 Working financial owner, still pending itemized OEM SKU and delivery evidence."}</p>
- </details>;
+ </details></>;
 }

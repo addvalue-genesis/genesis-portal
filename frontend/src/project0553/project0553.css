@@ -819,3 +819,5 @@
 .p553-dashboard .p553-integrity-review .p55-table{min-width:720px}
 
 .p553-dashboard .p553-pricing-stage--official{--stage-accent:#6b35a5;--stage-tint:#f5effb}
+/* Internal C1/C2 engineering evidence is outside the customer native worksheet. */
+@media print{.p553-c1c2-engineering-review{display:none!important}}

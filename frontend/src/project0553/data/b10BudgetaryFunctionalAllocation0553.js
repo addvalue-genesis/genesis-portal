@@ -8,7 +8,7 @@ export function selectB10BudgetaryFunctionalAllocation0553(){
  const s=selectSpareCustomerSchedule0553(),stage=selectB10StageSpareSelection0553();
  const parents=s.currentByCode.B10;
  const fx=parents[0]?.workingFxTHBPerUSD;
- if(parents.length!==4||!Number.isFinite(fx)||fx<=0||
+ if(parents.length!==3||!Number.isFinite(fx)||fx<=0||
     parents.some(p=>p.workingFxTHBPerUSD!==fx))throw Error("B10 Working FX/source owner changed");
  const totalTHB=round2(parents.reduce((n,p)=>n+p.extendedTHB,0));
  const byOwner=freeze(parents.map(p=>{
@@ -35,7 +35,7 @@ export function selectB10BudgetaryFunctionalAllocation0553(){
  }));
  const all=freeze(byOwner.flatMap(x=>x.items));
  const totalUSD=round2(byOwner.reduce((n,x)=>n+x.sourceTotalUSD,0));
- if(all.length!==14||totalTHB!==509827.5||
+ if(all.length!==11||totalTHB!==405405||
   Math.abs(totalUSD-round2(totalTHB/fx))>0.01||
   Math.abs(round2(all.reduce((s,r)=>s+r.allocatedBudgetaryTotalUSD,0))-totalUSD)>0.01)
   throw Error("0553 B10 functional budgetary allocation differs from selected 10.2 Working");

@@ -67,11 +67,11 @@ export function buildSpareLifecycleTrace0553(schedule,release){
    }));
   }
  }
- if(result.length!==16||seen.size!==16)throw Error("0553 five-category lifecycle requires 16 unique financial source records");
+ if(result.length!==15||seen.size!==15)throw Error("0553 five-category lifecycle requires 15 selected financial source records");
  // These are contractual/application checks, NOT independently verified SKU lists.
  const requirements=Object.freeze({
   B10:Object.freeze({source:"MR0001–0004 §5/Attachment 5; SPE §8.1; EXA-A8 Attachment 1",
-   minimum:"14 kit sets across 4/3/4/3 site platforms; parts inside each kit not OEM verified",
+   minimum:"Original MR: 14 kit sets across 4/3/4/3 platforms. Selected offer: 11 kits across MR0001–0003; RACON B10 excluded by owner, purchaser acceptance pending",
    open:"Select exact Start-up SPIR part number, per-type Qty, Ex rating, stock owner, lead time and price"}),
   B11:Object.freeze({source:"EXA-A8 Attachment 2 §5 Telecom; SPE §8.2",
    minimum:(schedule.b11Requirements?.rows||[]).length+" distinct minimum telecom tool functions; not automatically additive to four MR price envelopes",
@@ -79,8 +79,8 @@ export function buildSpareLifecycleTrace0553(schedule,release){
   B13:Object.freeze({source:"MR Attachment 9; preservation, unpacking and SAT method statements",
    minimum:(schedule.currentByCode.B13||[]).length+" provisional consumable work-scope categories; event consumption not confirmed",
    open:"Consumption events and extra procurement stock net of B5 packing and A5 installed bulk"}),
-  C1:Object.freeze({source:"MR Attachment 7 / capital spare option",
-   minimum:"One nonposted project-pool RACON spare scenario, not a quoted spare purchase",
+  C1:Object.freeze({source:"BOD Rev.C2 §11.1 / SPE Rev.C2 §8.1 — required capital-spare quotation",
+   minimum:"Required priced capital-spare list across applicable supplied systems; current one-RACON comparator does not establish completeness",
    open:"Independent OEM whole-unit spare SKU/Ex and configuration certificate, lead time, delivery cost"}),
   C2:Object.freeze({source:"MR0001–0004 Attachment 7 instruction 6; PTTEP TEL-001 §4.7",
    minimum:"Four MR operating-spare schedules; not a quantified or priced stock takeoff",
@@ -150,6 +150,6 @@ export function buildSpareLifecycleTrace0553(schedule,release){
   physicalSkuOwnershipComplete:false,
   completeCategoryReconciliation:false,
   noNewPosting:true,releaseAllowed:false,
-  priceOwnerStatement:"16 source-owned financial rows unchanged; unverified physical SKU quantities, invoices or spare quotes NEVER posted"
+  priceOwnerStatement:"15 selected source-owned financial rows; RACON B10 owner-excluded; unverified physical SKU quantities, invoices or spare quotes NEVER posted"
  });
 }

@@ -13,14 +13,14 @@ const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 export function B1WorkingPriceOverview0553({workingRow}){
  if(!workingRow||workingRow.code!=="B1")return null;
  const model=workingRow.b1SupportPlanningBudget;
- if(!model||model.accounts.length!==8||workingRow.workingSellTHB!==421180||
+ if(!model||model.accounts.length!==8||workingRow.workingSellTHB!==862675.74||
   model.canonicalB1WorkingSellTHB!==workingRow.workingSellTHB||
-  model.baseWorkingCostTHB!==374200||model.labourHours!==242||
+  model.baseWorkingCostTHB!==null||model.knownPlanningCostTHB!==647996.59||model.labourHours!==905.5||
   model.conditionalWorkingSellTHB!==0||workingRow.directCostTHB!==null)
   throw Error("B1 price overview must follow current canonical B1 source, not legacy WBS");
  const baseSell=round(model.accounts.reduce((n,a)=>n+a.baseWorkingSellTHB,0));
  const conditionalSell=round(model.accounts.reduce((n,a)=>n+a.conditionalWorkingSellTHB,0));
- const baseCost=round(model.accounts.reduce((n,a)=>n+a.baseWorkingCostTHB,0));
+ const baseCost=model.accounts.every(a=>a.baseWorkingCostTHB!==null)?round(model.accounts.reduce((n,a)=>n+a.baseWorkingCostTHB,0)):null;
  if(baseSell!==workingRow.workingSellTHB||conditionalSell!==model.conditionalWorkingSellTHB||
   baseCost!==model.baseWorkingCostTHB)
   throw Error("B1 summary source-account amounts fail no-double-count reconciliation");
@@ -49,7 +49,7 @@ export function B1WorkingPriceOverview0553({workingRow}){
    <div><strong>Current B1 Working SELL</strong><p>{display(workingRow.workingSellTHB)}</p>
     <small>Selected one-time B1 owner</small></div>
    <div><strong>Planning Working Cost</strong><p>{display(model.baseWorkingCostTHB)}</p>
-    <small>Not actual verified Direct Cost</small></div>
+    <small>Known partial planning cost {display(model.knownPlanningCostTHB)}; Instrument cost pending. Not actual verified Direct Cost</small></div>
    <div><strong>Staff / Project Support</strong><p>{model.labourHours} MH</p>
     <small>{Object.keys(model.roleRates).length} role definitions; not 964 legacy engineering MH</small></div>
    <div><strong>Conditional Working SELL</strong><p>{display(model.conditionalWorkingSellTHB)}</p>

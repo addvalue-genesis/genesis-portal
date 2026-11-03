@@ -1,0 +1,1160 @@
+{
+  "baseline": "R81 /9ec2938bb3d4ebd17059b6a21d461bf20038d6bc / before owner CAT6A drum selection",
+  "sourceRows": [
+    {
+      "code": "A1",
+      "sha256": "d191629132c14d91cde7915e7d730fd0f9cf02fb8541d4610ff78d1dcc5d394b"
+    },
+    {
+      "code": "A2",
+      "sha256": "c2c5725c834b0cdb9f4bb211ef10c7fe92e410ce06e5c754dee1903799bb0caf"
+    },
+    {
+      "code": "A3",
+      "sha256": "25cb54d18ce2bf4a4b7be21ca388ed73a966c23c5cdd53b67ebf7afe99e4d37e"
+    },
+    {
+      "code": "A4",
+      "sha256": "e930da223a8d190b8f7daba5f4e8c4e907735990d6fb638e6a8559747989a8c1"
+    },
+    {
+      "code": "B1",
+      "sha256": "65f5a00477c947e14639ae5286eb19c5a4048d513e7dfa5c9794934a585892ab"
+    },
+    {
+      "code": "B2",
+      "sha256": "9728f743f3abbeea3e9376c195da6ea493fe70e11bd70a914598f0685f5b2e6d"
+    },
+    {
+      "code": "B3",
+      "sha256": "3cdf04228cbff44862051b913aa4f3317558cd6a9e0b7a968b19f2102c0744e2"
+    },
+    {
+      "code": "B4",
+      "sha256": "64ed49f07c7eaed7a598d3a31612ad008c845b2fb43e3467c190d6109cb755a9"
+    },
+    {
+      "code": "B5",
+      "sha256": "f1c89efacac9d5b174a374a3381b15a67eff61b1dad91d04c7f9536e1b7c238f"
+    },
+    {
+      "code": "B6",
+      "sha256": "5be34d1e6639b703f993f5f7e03290f7a1b36d9878029d9312fac3ca609cdde5"
+    },
+    {
+      "code": "B7",
+      "sha256": "66b3789c31a94a891d84f7b3447305de410312b895eb594dc910082474c7b516"
+    },
+    {
+      "code": "B8",
+      "sha256": "5390519a3aeee41061a705cd9dab5b0302a1fd033eaa2f2160a0d46427061ee0"
+    },
+    {
+      "code": "B9",
+      "sha256": "f7f24c0f61159738ca1b27983157dac9f4560873b2df82cd84534d0704ff6b42"
+    },
+    {
+      "code": "B10",
+      "sha256": "7ac9934d9e3eeab250bcb03fe8e4b12f8a547fc383bb76c3e79d4d8255ff9617"
+    },
+    {
+      "code": "B11",
+      "sha256": "682f2579b5288516ea14b3b7e3bbec2043ab49ae2b6998334433d6489b8ba234"
+    },
+    {
+      "code": "B12",
+      "sha256": "6c00f79db6ec01df92b7a586f1b63fc7c35caebf4c21200855502db387369356"
+    },
+    {
+      "code": "B13",
+      "sha256": "2fa74a872052553c9221de1e48688c2854d660f916147ab033c7ad1f39276ed6"
+    },
+    {
+      "code": "B14",
+      "sha256": "9e85f7d5eee46c583eb1e2a8592b8ddd100d49e609475fe329607f24daa42450"
+    },
+    {
+      "code": "C1",
+      "sha256": "70459f2a50afa2dd97c57f2610d9ec61798f27c9175485fbfc9b29cc7e5a643d"
+    },
+    {
+      "code": "C2",
+      "sha256": "d58cb87e1af6fe6788ddfefa7f80c10876b5d5b4e3be39bb92d427df01cb700b"
+    }
+  ],
+  "officialRows": [
+    {
+      "code": "A1",
+      "sha256": "3d76961aa5fcce3f9ba591f0918e064b263a4ea5c0ff5d9a4b666d696be54960"
+    },
+    {
+      "code": "A2",
+      "sha256": "4ded3f075e2c1409188b7bb417bf41291add3f30dd273fe29abc01eda2ce59c7"
+    },
+    {
+      "code": "A3",
+      "sha256": "b1fb395b7718bd6e3a7b6364b7cb1035dd635f44679ea5b00a8c0b36c7133092"
+    },
+    {
+      "code": "A4",
+      "sha256": "3a3599472e8afb8e34f57058a3e568d7b5680aaffb84d20518c1f3a5fc168077"
+    },
+    {
+      "code": "B1",
+      "sha256": "f371ec085a6d4fb10604c5a2b3f5c7b6c93929ee34e4bd3e01518a343ce063e4"
+    },
+    {
+      "code": "B2",
+      "sha256": "28e7d49eb894f9ed704e488612ea2aa9679697936695de462cec53cbcbe4d5f3"
+    },
+    {
+      "code": "B3",
+      "sha256": "00964d1b7711164fd898ad99e01b016266542a41273f43fe3e4a09b26c3b8ea4"
+    },
+    {
+      "code": "B4",
+      "sha256": "af1249f33789ef822a1e05febd54aed7cf560b64237fc3bb237d151cc70684e3"
+    },
+    {
+      "code": "B5",
+      "sha256": "7ba26c59010865b38468932142984aded9c3f7e947d9baeb080bc36d3961176c"
+    },
+    {
+      "code": "B6",
+      "sha256": "4e2c11c52f356e999f6a33df5b96665ecd735f1543236f622d5ecbf28f4b3c81"
+    },
+    {
+      "code": "B7",
+      "sha256": "48bb02ed0afaaa61dad9a63b3f82f95b05e9d732f9576923dc4ad2dbf251555a"
+    },
+    {
+      "code": "B8",
+      "sha256": "0258d0f12c2d905ee242e8058102275c3d3a549d6670a478fca553948f48fa14"
+    },
+    {
+      "code": "B9",
+      "sha256": "790e24eaa92447db5102e99eabbdc2724e744d9c1952955ed949291777d04a81"
+    },
+    {
+      "code": "B10",
+      "sha256": "617b3b673736f5c7a58c77aafa25132a5a6bb8328d5256726d7193cf517aa582"
+    },
+    {
+      "code": "B11",
+      "sha256": "a7d1de440f183c4c375ec575704888f50452770def282adf8737b97f01543ae6"
+    },
+    {
+      "code": "B12",
+      "sha256": "fedc231a83ecf3bc44490508c01d5689276ce01e664a8a5dd7a4e6ee88815355"
+    },
+    {
+      "code": "B13",
+      "sha256": "9745483bda7a8357d2907151bba2889a9de4bc0cccd2e41fd2d2a7a6f984e17a"
+    },
+    {
+      "code": "B14",
+      "sha256": "c6f6831e6241b8e8666c996c655732441977b8167dcbd7f8d3296d82c72c8aa5"
+    },
+    {
+      "code": "C1",
+      "sha256": "19ef112dfc3257f4d5c01410d2078873353af747262ff670a9007f904c08e5ec"
+    },
+    {
+      "code": "C2",
+      "sha256": "f5763f1735cae569caef022d6186f2894a5e39e5bd2223aec9ea0842c7c08bff"
+    }
+  ],
+  "c1": "e0438204d351c1836f632f23cf6ebc4153cd1fbf14fc9e5072a50abe4fb9f518",
+  "workingAnnex": "cae97cbbb3011df0ea6f23e810ec9a0d17a930dbd3ec0ce10b6d3227857152d5",
+  "rawC2": "929bffd7c27db16b71d2f9f3e69df012b8fd885f821fe53e18945f6e5b7f97b1",
+  "c2": {
+    "rows": [
+      {
+        "id": "C2-REV08-01",
+        "code": "C2",
+        "tag": "MR-502-001A / ZWP20, ZWP21, ZWP22, ZWP23; MR-502-003A / ZWP8; MR-502-004A / ZWP8; MR-502-005A / ZWP11",
+        "description": "SCADA radio DC-to-PoE power-supply spare",
+        "specification": "Reference part: PS-DCDC-HAZ-POE-IND-01. Industrial DC-to-PoE power supply for the referenced SCADA indoor radio interface. Match installed input voltage, output/PoE rating and terminals. Power cord supplied only if required by the selected interface.",
+        "materials": "Industrial power-supply module and compatible connection fittings",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 1,
+        "unit": "EA",
+        "unitPriceTHB": 30894.6834,
+        "extendedTHB": 30894.68,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 1",
+        "conflict": "B10_SPARE_FAMILY_POTENTIAL_OVERLAP",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-01",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": "PS-DCDC-HAZ-POE-IND-01",
+        "tagRefs": [
+          {
+            "key": "MR-0001|ZWP20|MR-502-001A",
+            "mr": "MR-0001",
+            "site": "ZWP20",
+            "tag": "MR-502-001A"
+          },
+          {
+            "key": "MR-0001|ZWP21|MR-502-001A",
+            "mr": "MR-0001",
+            "site": "ZWP21",
+            "tag": "MR-502-001A"
+          },
+          {
+            "key": "MR-0001|ZWP22|MR-502-001A",
+            "mr": "MR-0001",
+            "site": "ZWP22",
+            "tag": "MR-502-001A"
+          },
+          {
+            "key": "MR-0001|ZWP23|MR-502-001A",
+            "mr": "MR-0001",
+            "site": "ZWP23",
+            "tag": "MR-502-001A"
+          },
+          {
+            "key": "MR-0001|ZWP8|MR-502-003A",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "MR-502-003A"
+          },
+          {
+            "key": "MR-0001|ZWP8|MR-502-004A",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "MR-502-004A"
+          },
+          {
+            "key": "MR-0001|ZWP11|MR-502-005A",
+            "mr": "MR-0001",
+            "site": "ZWP11",
+            "tag": "MR-502-005A"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 1,
+        "unitUSD": 990,
+        "totalUSD": 990,
+        "sourceTotalUSD": 983.6,
+        "sourceUnitUSD": 983.6,
+        "roundingAdjustmentUSD": 6.4,
+        "preTensUnitUSD": 990,
+        "preTensTotalUSD": 990,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 0
+      },
+      {
+        "id": "C2-REV08-02",
+        "code": "C2",
+        "tag": "LAN-502-001 / ZWP20, ZWP21, ZWP22, ZWP23; LAN-502-002 / ZWP8",
+        "description": "Cisco L3 switch DC power-supply spare",
+        "specification": "Reference part: PWR-IE65W-PC-DC. Replaceable DC power module for Cisco IE-3400-8P2S-E; match the selected PWR-IE65W-PC-DC configuration, input supply and power capacity. Complete switch and software licences are excluded.",
+        "materials": "Cisco industrial DC power-supply module",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 1,
+        "unit": "EA",
+        "unitPriceTHB": 18113.6844,
+        "extendedTHB": 18113.68,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 2",
+        "conflict": "B10_SPARE_FAMILY_POTENTIAL_OVERLAP",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-02",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": "PWR-IE65W-PC-DC",
+        "tagRefs": [
+          {
+            "key": "MR-0001|ZWP20|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP20",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP21|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP21",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP22|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP22",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP23|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP23",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP8|LAN-502-002",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "LAN-502-002"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 1,
+        "unitUSD": 590,
+        "totalUSD": 590,
+        "sourceTotalUSD": 576.69,
+        "sourceUnitUSD": 576.69,
+        "roundingAdjustmentUSD": 13.31,
+        "preTensUnitUSD": 584,
+        "preTensTotalUSD": 584,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 6
+      },
+      {
+        "id": "C2-REV08-03",
+        "code": "C2",
+        "tag": "TPH-504-001 / ZWP20, ZWP21, ZWP22, ZWP23",
+        "description": "Explosion-proof SIP telephone spare",
+        "specification": "Reference part: 212-02-6008-510. GAI-TRONICS Auteldac 6 SIP telephone, reference 212-02-6008-510. Match installed Ex certification, SIP/network interface, supply and mounting. Complete telephone assembly.",
+        "materials": "Hazardous-area telephone body, handset and supplied service fittings",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 1,
+        "unit": "EA",
+        "unitPriceTHB": 183157.89345,
+        "extendedTHB": 183157.89,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 3",
+        "conflict": "OEM_PRICE_AND_SKU_OPEN",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-03",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": "212-02-6008-510",
+        "tagRefs": [
+          {
+            "key": "MR-0003|ZWP20|TPH-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP20",
+            "tag": "TPH-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP21|TPH-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP21",
+            "tag": "TPH-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP22|TPH-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP22",
+            "tag": "TPH-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP23|TPH-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP23",
+            "tag": "TPH-504-001"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 1,
+        "unitUSD": 5840,
+        "totalUSD": 5840,
+        "sourceTotalUSD": 5831.24,
+        "sourceUnitUSD": 5831.24,
+        "roundingAdjustmentUSD": 8.76,
+        "preTensUnitUSD": 5838,
+        "preTensTotalUSD": 5838,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 2
+      },
+      {
+        "id": "C2-REV08-04",
+        "code": "C2",
+        "tag": "LSE-504-001 / ZWP20, ZWP21, ZWP22, ZWP23",
+        "description": "Explosion-proof sounder spare",
+        "specification": "Reference part: DB3BDG048N2BNR. Eaton DB3B sounder, reference DB3BDG048N2BNR. Match installed supply voltage, tone/output configuration, enclosure and Ex certification.",
+        "materials": "Certified sounder assembly with terminals and enclosure",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 1,
+        "unit": "EA",
+        "unitPriceTHB": 78315.78825,
+        "extendedTHB": 78315.79,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 4",
+        "conflict": "OEM_PRICE_AND_SKU_OPEN",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-04",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": "DB3BDG048N2BNR",
+        "tagRefs": [
+          {
+            "key": "MR-0003|ZWP20|LSE-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP20",
+            "tag": "LSE-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP21|LSE-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP21",
+            "tag": "LSE-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP22|LSE-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP22",
+            "tag": "LSE-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP23|LSE-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP23",
+            "tag": "LSE-504-001"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 1,
+        "unitUSD": 2500,
+        "totalUSD": 2500,
+        "sourceTotalUSD": 2493.36,
+        "sourceUnitUSD": 2493.36,
+        "roundingAdjustmentUSD": 6.64,
+        "preTensUnitUSD": 2500,
+        "preTensTotalUSD": 2500,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 0
+      },
+      {
+        "id": "C2-REV08-05",
+        "code": "C2",
+        "tag": "TCAB-508-001 / ZWP20; TCAB-508-002 / ZWP21, ZWP22",
+        "description": "BDA antenna-path RF surge-arrester spares",
+        "specification": "RF coaxial surge arresters for the referenced DMR/BDA antenna path. PolyPhaser IS-B50LN-C2 is the installed-package reference; confirm exact replaceable device, operating band, 50-ohm interfaces, earthing and hazardous-area installation. Ex coupling components are not automatically interchangeable.",
+        "materials": "RF surge arrester bodies with matching coaxial and earthing connections",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 2,
+        "unit": "EA",
+        "unitPriceTHB": 11413.89585,
+        "extendedTHB": 22827.79,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 5",
+        "conflict": "B10_SPARE_FAMILY_POTENTIAL_OVERLAP",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-05",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": null,
+        "tagRefs": [
+          {
+            "key": "MR-0002|ZWP20|TCAB-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP20",
+            "tag": "TCAB-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP21|TCAB-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP21",
+            "tag": "TCAB-508-002"
+          },
+          {
+            "key": "MR-0002|ZWP22|TCAB-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP22",
+            "tag": "TCAB-508-002"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 2,
+        "unitUSD": 370,
+        "totalUSD": 740,
+        "sourceTotalUSD": 726.77,
+        "sourceUnitUSD": 363.39,
+        "roundingAdjustmentUSD": 13.23,
+        "preTensUnitUSD": 363,
+        "preTensTotalUSD": 726,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 14
+      },
+      {
+        "id": "C2-REV08-06",
+        "code": "C2",
+        "tag": "SA-502-001 / ZWP20, ZWP21, ZWP22, ZWP23; SA-502-002 / ZWP8; SA-502-003 / ZWP8; SA-507-005 / ZWP11",
+        "description": "SCADA Ethernet/PoE surge-arrester spares",
+        "specification": "Reference part: LP-POE-INL-IND-01. Industrial Ethernet/PoE surge protection, reference LP-POE-INL-IND-01. Match installed data rate, PoE/supply rating, connector/shielding and earthing arrangement; this is separate from RF coaxial protection.",
+        "materials": "Ethernet/PoE surge-protection devices and connection fittings",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 2,
+        "unit": "EA",
+        "unitPriceTHB": 17810.52525,
+        "extendedTHB": 35621.05,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 6",
+        "conflict": "B10_SPARE_FAMILY_POTENTIAL_OVERLAP",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-06",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": "LP-POE-INL-IND-01",
+        "tagRefs": [
+          {
+            "key": "MR-0001|ZWP20|SA-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP20",
+            "tag": "SA-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP21|SA-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP21",
+            "tag": "SA-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP22|SA-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP22",
+            "tag": "SA-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP23|SA-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP23",
+            "tag": "SA-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP8|SA-502-002",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "SA-502-002"
+          },
+          {
+            "key": "MR-0001|ZWP8|SA-502-003",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "SA-502-003"
+          },
+          {
+            "key": "MR-0001|ZWP11|SA-507-005",
+            "mr": "MR-0001",
+            "site": "ZWP11",
+            "tag": "SA-507-005"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 2,
+        "unitUSD": 570,
+        "totalUSD": 1140,
+        "sourceTotalUSD": 1134.08,
+        "sourceUnitUSD": 567.04,
+        "roundingAdjustmentUSD": 5.92,
+        "preTensUnitUSD": 567,
+        "preTensTotalUSD": 1134,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 6
+      },
+      {
+        "id": "C2-REV08-08",
+        "code": "C2",
+        "tag": "COMMON — Reference: LAN-502-001; TCAB-500-001; LAN-502-002; TCAB-500-003; TCAB-508-001; TCAB-508-002; TCAB-504-001; TCAB-514-001; TCAB-514-002",
+        "description": "Equipment protective-fuse stock",
+        "specification": "Replacement fuse cartridges for the referenced equipment power/control circuits. Select exact current/voltage, breaking capacity, speed and physical size from approved OEM wiring and fuse schedules; quantity is shared stock, not per TAG.",
+        "materials": "OEM-compatible electrical fuse cartridges",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 8,
+        "unit": "EA",
+        "unitPriceTHB": 151.578,
+        "extendedTHB": 1212.62,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 8",
+        "conflict": "B10_SPARE_FAMILY_POTENTIAL_OVERLAP",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-08",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": null,
+        "tagRefs": [
+          {
+            "key": "MR-0001|ZWP20|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP20",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP20|TCAB-500-001",
+            "mr": "MR-0001",
+            "site": "ZWP20",
+            "tag": "TCAB-500-001"
+          },
+          {
+            "key": "MR-0001|ZWP21|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP21",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP21|TCAB-500-001",
+            "mr": "MR-0001",
+            "site": "ZWP21",
+            "tag": "TCAB-500-001"
+          },
+          {
+            "key": "MR-0001|ZWP22|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP22",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP22|TCAB-500-001",
+            "mr": "MR-0001",
+            "site": "ZWP22",
+            "tag": "TCAB-500-001"
+          },
+          {
+            "key": "MR-0001|ZWP23|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP23",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP23|TCAB-500-001",
+            "mr": "MR-0001",
+            "site": "ZWP23",
+            "tag": "TCAB-500-001"
+          },
+          {
+            "key": "MR-0001|ZWP8|LAN-502-002",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "LAN-502-002"
+          },
+          {
+            "key": "MR-0001|ZWP8|TCAB-500-003",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "TCAB-500-003"
+          },
+          {
+            "key": "MR-0001|ZWP11|TCAB-500-003",
+            "mr": "MR-0001",
+            "site": "ZWP11",
+            "tag": "TCAB-500-003"
+          },
+          {
+            "key": "MR-0002|ZWP20|TCAB-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP20",
+            "tag": "TCAB-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP20|TCAB-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP20",
+            "tag": "TCAB-508-002"
+          },
+          {
+            "key": "MR-0002|ZWP21|TCAB-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP21",
+            "tag": "TCAB-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP21|TCAB-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP21",
+            "tag": "TCAB-508-002"
+          },
+          {
+            "key": "MR-0002|ZWP22|TCAB-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP22",
+            "tag": "TCAB-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP22|TCAB-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP22",
+            "tag": "TCAB-508-002"
+          },
+          {
+            "key": "MR-0003|ZWP20|TCAB-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP20",
+            "tag": "TCAB-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP21|TCAB-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP21",
+            "tag": "TCAB-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP22|TCAB-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP22",
+            "tag": "TCAB-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP23|TCAB-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP23",
+            "tag": "TCAB-504-001"
+          },
+          {
+            "key": "MR-0004|ZWP20|TCAB-514-001",
+            "mr": "MR-0004",
+            "site": "ZWP20",
+            "tag": "TCAB-514-001"
+          },
+          {
+            "key": "MR-0004|ZWP20|TCAB-514-002",
+            "mr": "MR-0004",
+            "site": "ZWP20",
+            "tag": "TCAB-514-002"
+          },
+          {
+            "key": "MR-0004|ZWP21|TCAB-514-001",
+            "mr": "MR-0004",
+            "site": "ZWP21",
+            "tag": "TCAB-514-001"
+          },
+          {
+            "key": "MR-0004|ZWP21|TCAB-514-002",
+            "mr": "MR-0004",
+            "site": "ZWP21",
+            "tag": "TCAB-514-002"
+          },
+          {
+            "key": "MR-0004|ZWP22|TCAB-514-001",
+            "mr": "MR-0004",
+            "site": "ZWP22",
+            "tag": "TCAB-514-001"
+          },
+          {
+            "key": "MR-0004|ZWP22|TCAB-514-002",
+            "mr": "MR-0004",
+            "site": "ZWP22",
+            "tag": "TCAB-514-002"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 8,
+        "unitUSD": 10,
+        "totalUSD": 80,
+        "sourceTotalUSD": 38.61,
+        "sourceUnitUSD": 4.83,
+        "roundingAdjustmentUSD": 41.39,
+        "preTensUnitUSD": 5,
+        "preTensTotalUSD": 40,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 40
+      },
+      {
+        "id": "C2-REV08-09",
+        "code": "C2",
+        "tag": "ANT-508-001 / ZWP20, ZWP21, ZWP22; ANT-508-002 / ZWP20, ZWP21, ZWP22",
+        "description": "BDA antenna RF feeder spare cable (1/2\")",
+        "specification": "1/2-inch, 50-ohm RF feeder matching the selected MGW UHF-4 installation; quoted reference FORLLER RF LLF 1/2. Match cable construction, jacket/fire requirements and approved antenna-path loss. Supply as measured spare cable length; connectors listed separately.",
+        "materials": "50-ohm coaxial feeder cable with marine-suitable jacket",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 30,
+        "unit": "m",
+        "unitPriceTHB": 545.68395,
+        "extendedTHB": 16370.52,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 9",
+        "conflict": "INCOMPATIBLE_7_8_RF_FEEDER",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-09",
+        "technicalSourceId": "UHF-4",
+        "technicalSourceUrl": "https://drive.google.com/file/d/1DLaku-mj2uYI-7A_E3z5QFZQgbz6OozA/view",
+        "referencePartNo": null,
+        "tagRefs": [
+          {
+            "key": "MR-0002|ZWP20|ANT-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP20",
+            "tag": "ANT-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP20|ANT-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP20",
+            "tag": "ANT-508-002"
+          },
+          {
+            "key": "MR-0002|ZWP21|ANT-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP21",
+            "tag": "ANT-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP21|ANT-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP21",
+            "tag": "ANT-508-002"
+          },
+          {
+            "key": "MR-0002|ZWP22|ANT-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP22",
+            "tag": "ANT-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP22|ANT-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP22",
+            "tag": "ANT-508-002"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 30,
+        "unitUSD": 20,
+        "totalUSD": 600,
+        "sourceTotalUSD": 521.19,
+        "sourceUnitUSD": 17.37,
+        "roundingAdjustmentUSD": 78.81,
+        "preTensUnitUSD": 17,
+        "preTensTotalUSD": 510,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 90
+      },
+      {
+        "id": "C2-REV08-10",
+        "code": "C2",
+        "tag": "MR-502-001A / ZWP20, ZWP21, ZWP22, ZWP23; LAN-502-001 / ZWP20, ZWP21, ZWP22, ZWP23; MR-502-003A / ZWP8; MR-502-004A / ZWP8; LAN-502-002 / ZWP8; MR-502-005A / ZWP11",
+        "description": "SCADA data-link CAT6A spare cable",
+        "specification": "CAT6A data cable for the referenced SCADA radio indoor interface and L3 network connections. Match installed shielding, jacket/fire rating, environment, connector and gland compatibility. Spare cable length excludes installed Part A cable.",
+        "materials": "Shielded CAT6A data cable, approved installation type",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 50,
+        "unit": "m",
+        "unitPriceTHB": 794.2725,
+        "extendedTHB": 39713.63,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 10",
+        "conflict": "A5_B13_CABLE_OVERLAP",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-10",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": null,
+        "tagRefs": [
+          {
+            "key": "MR-0001|ZWP20|MR-502-001A",
+            "mr": "MR-0001",
+            "site": "ZWP20",
+            "tag": "MR-502-001A"
+          },
+          {
+            "key": "MR-0001|ZWP20|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP20",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP21|MR-502-001A",
+            "mr": "MR-0001",
+            "site": "ZWP21",
+            "tag": "MR-502-001A"
+          },
+          {
+            "key": "MR-0001|ZWP21|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP21",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP22|MR-502-001A",
+            "mr": "MR-0001",
+            "site": "ZWP22",
+            "tag": "MR-502-001A"
+          },
+          {
+            "key": "MR-0001|ZWP22|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP22",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP23|MR-502-001A",
+            "mr": "MR-0001",
+            "site": "ZWP23",
+            "tag": "MR-502-001A"
+          },
+          {
+            "key": "MR-0001|ZWP23|LAN-502-001",
+            "mr": "MR-0001",
+            "site": "ZWP23",
+            "tag": "LAN-502-001"
+          },
+          {
+            "key": "MR-0001|ZWP8|MR-502-003A",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "MR-502-003A"
+          },
+          {
+            "key": "MR-0001|ZWP8|MR-502-004A",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "MR-502-004A"
+          },
+          {
+            "key": "MR-0001|ZWP8|LAN-502-002",
+            "mr": "MR-0001",
+            "site": "ZWP8",
+            "tag": "LAN-502-002"
+          },
+          {
+            "key": "MR-0001|ZWP11|MR-502-005A",
+            "mr": "MR-0001",
+            "site": "ZWP11",
+            "tag": "MR-502-005A"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 50,
+        "unitUSD": 30,
+        "totalUSD": 1500,
+        "sourceTotalUSD": 1264.37,
+        "sourceUnitUSD": 25.29,
+        "roundingAdjustmentUSD": 235.63,
+        "preTensUnitUSD": 25,
+        "preTensTotalUSD": 1250,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 250
+      },
+      {
+        "id": "C2-REV08-11",
+        "code": "C2",
+        "tag": "ANT-508-001 / ZWP20, ZWP21, ZWP22; ANT-508-002 / ZWP20, ZWP21, ZWP22",
+        "description": "BDA RF feeder Type-N male spare connectors",
+        "specification": "50-ohm Type-N male cable connectors to suit the selected 1/2-inch RF feeder and mating antenna-path equipment. Confirm exact cable family, connector assembly method and sealing/weatherproofing requirements.",
+        "materials": "Type-N male coaxial connectors and compatible sealing fittings",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 4,
+        "unit": "EA",
+        "unitPriceTHB": 1045.8945,
+        "extendedTHB": 4183.58,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 11",
+        "conflict": "B10_SPARE_FAMILY_POTENTIAL_OVERLAP",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-11",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": null,
+        "tagRefs": [
+          {
+            "key": "MR-0002|ZWP20|ANT-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP20",
+            "tag": "ANT-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP20|ANT-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP20",
+            "tag": "ANT-508-002"
+          },
+          {
+            "key": "MR-0002|ZWP21|ANT-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP21",
+            "tag": "ANT-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP21|ANT-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP21",
+            "tag": "ANT-508-002"
+          },
+          {
+            "key": "MR-0002|ZWP22|ANT-508-001",
+            "mr": "MR-0002",
+            "site": "ZWP22",
+            "tag": "ANT-508-001"
+          },
+          {
+            "key": "MR-0002|ZWP22|ANT-508-002",
+            "mr": "MR-0002",
+            "site": "ZWP22",
+            "tag": "ANT-508-002"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 4,
+        "unitUSD": 40,
+        "totalUSD": 160,
+        "sourceTotalUSD": 133.19,
+        "sourceUnitUSD": 33.3,
+        "roundingAdjustmentUSD": 26.81,
+        "preTensUnitUSD": 33,
+        "preTensTotalUSD": 132,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 28
+      },
+      {
+        "id": "C2-REV08-12",
+        "code": "C2",
+        "tag": "COMMON — Reference: TCAB-504-001 / ZWP20, ZWP21, ZWP22, ZWP23",
+        "description": "M20 Ex cable-gland spare sets",
+        "specification": "Complete M20 Ex cable-gland sets for the referenced telephone junction boxes. Match certified enclosure entry, cable outside diameter, armour/seal range and required Ex protection. Spare stock is additional to installed glands; quantity is not per TAG.",
+        "materials": "Certified metal glands with compatible seals and washers",
+        "sourceId": null,
+        "sourceRowModuleId": null,
+        "traceId": null,
+        "quantity": 4,
+        "unit": "EA",
+        "unitPriceTHB": 1546.10505,
+        "extendedTHB": 6184.42,
+        "evidenceClass": "HISTORICAL_REV08_REFERENCE_ONLY_NO_CURRENT_OEM_QUOTE",
+        "sourceDocument": "4-Scope of Supply.xlsx Rev08 / C2 item 12",
+        "conflict": "B10_SPARE_FAMILY_POTENTIAL_OVERLAP",
+        "priceSelectedInWorking": false,
+        "independentlyVerifiedOemSku": false,
+        "ddpVerified": false,
+        "duplicatePhysicalStockCleared": false,
+        "customerIssueAllowed": false,
+        "leadTime": "OEM lead-time not established",
+        "historicalSourceId": "C2-REV08-12",
+        "technicalSourceId": null,
+        "technicalSourceUrl": null,
+        "referencePartNo": null,
+        "tagRefs": [
+          {
+            "key": "MR-0003|ZWP20|TCAB-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP20",
+            "tag": "TCAB-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP21|TCAB-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP21",
+            "tag": "TCAB-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP22|TCAB-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP22",
+            "tag": "TCAB-504-001"
+          },
+          {
+            "key": "MR-0003|ZWP23|TCAB-504-001",
+            "mr": "MR-0003",
+            "site": "ZWP23",
+            "tag": "TCAB-504-001"
+          }
+        ],
+        "referenceTagOnly": true,
+        "physicalSkuApproved": false,
+        "quantityApproved": false,
+        "qty": 4,
+        "unitUSD": 50,
+        "totalUSD": 200,
+        "sourceTotalUSD": 196.9,
+        "sourceUnitUSD": 49.23,
+        "roundingAdjustmentUSD": 3.1,
+        "preTensUnitUSD": 49,
+        "preTensTotalUSD": 196,
+        "unitRoundingUSD": 10,
+        "upwardRoundingUSD": 4
+      }
+    ],
+    "sourceSellTHB": 436595.65,
+    "budgetaryQuoteUSD": 14340,
+    "preTensQuoteUSD": 13900
+  }
+}

@@ -34,7 +34,7 @@ export function CustomerPriceBreakdown0553({source,official,onOpenSource,origin=
    <button type="button" aria-pressed={showPrices} onClick={()=>setPrices(true)}>แสดงราคาย่อย</button>
   </div>
   <p className="p55-note">{showPrices?(customer?"แสดงราคาชุดระบบตามสถานที่ ไม่ใช่ราคาต่ออุปกรณ์":"แสดงราคาต่อหน่วยและราคารวมรายอุปกรณ์"):"แสดงรายการและจำนวน พร้อมยอดรวมแต่ละระบบ โดยซ่อนราคาย่อย"} · ตัวเลือกนี้ใช้กับหน้าจอเท่านั้น Export Breakdown ยังคงเป็นฉบับรายละเอียด 141 แถวสำหรับตรวจทาน</p>
-  <p className="p55-note">Draft allocation from the selected Release prices. Submitted proposal comparison: <strong>NOT VERIFIED</strong>.
+  <p className="p55-note">{model.priceReference?<>Current Source / Working detail allocated to <strong>{model.priceReference.revision}</strong> · {model.priceReference.filename}. Price totals reconcile; technical and supplier scope review remains open.</>:<>Draft allocation from the selected Release prices. Submitted proposal comparison: <strong>NOT VERIFIED</strong>.</>}
    Existing A1–A4 totals are retained. {customer?"Summary based on the received MR scope and current offer, subject to stated qualifications. Services and spares remain under their existing B/C items.":"Package contents carry no second charge. Unpriced rows remain visible."}</p>
   {customer&&<p className="p55-note">{summary.groups.reduce((n,g)=>n+g.rows.length,0)} รายการสรุปตาม MR / สถานที่ · S คือเลขลำดับสรุป ไม่ใช่เลขบรรทัดใน MR · จำนวนชุดอ้างอิง MR; งาน brownfield ที่ไม่มีจำนวนรวมชัดเจนแสดง See MR §5</p>}
   <div className="p553-breakdown-checks"><strong>{model.reconciled?"A1–A4 totals match":"Price reconciliation required"}</strong>

@@ -11,7 +11,7 @@ const spec=freeze({
  "B10-PTTEP-01-F01":freeze({spec:"Replaceable protective fuse set for SCADA radio indoor power interfaces and Layer 3 network equipment; to match installed fuse ratings and form factors.",material:"Electrical protection fuse cartridges and compatible fuse holders"}),
  "B10-PTTEP-01-F02":freeze({spec:"Industrial DC-to-PoE replacement power/interface assembly for the SCADA radio equipment; supply voltage, PoE rating and connection to match installed units.",material:"Industrial power conversion module, electrical terminals and mounting components"}),
  "B10-PTTEP-01-F03":freeze({spec:"Outdoor Ethernet surge-protection replacement assembly for SCADA data links; Ethernet interface, surge rating and mounting arrangement to match installed SA equipment.",material:"Surge protection element, industrial connector housing and mounting fittings"}),
- "B10-PTTEP-01-F04":freeze({spec:"RF filter / protection service assembly suitable for the installed SCADA radio operating band, antenna path, RF connector type and impedance.",material:"RF filter or surge-protection device with coaxial connectors"}),
+ "B10-PTTEP-01-F04":freeze({spec:"Replaceable RF surge-protection assembly for the installed SCADA antenna path, matching operating frequency, impedance, connector interfaces and applicable hazardous-area requirements.",material:"RF surge arrester with matching coaxial connectors and earthing fittings"}),
  "B10-PTTEP-02-F01":freeze({spec:"Replaceable RF surge-protection or coupling assembly suitable for the installed trunk-radio RFI BDA system and Ex enclosure interfaces.",material:"RF surge/coupling module and matching coaxial connectors"}),
  "B10-PTTEP-02-F02":freeze({spec:"RF feeder cable-end termination and repair fittings suitable for the installed BDA antenna cable type, diameter and connector configuration.",material:"RF connectors, cable-end sealing and termination accessories"}),
  "B10-PTTEP-02-F03":freeze({spec:"Service seal and cable-entry replacement set suitable for the installed hazardous-area RFI BDA enclosure and cable entry sizes.",material:"Ex-rated gland fittings, gaskets, seals and washers"}),
@@ -68,7 +68,7 @@ export function selectB10NativeAnnexReview0553(){
    isRequirementFamily:true,postingAllowed:false
   });
  }));
- if(rows.length!==14||new Set(rows.map(x=>x.id)).size!==14||
+ if(rows.length!==11||new Set(rows.map(x=>x.id)).size!==11||
   rows.some(x=>!Number.isFinite(x.budgetaryUnitPriceUSD)||x.budgetaryUnitPriceUSD<=0||
    x.b10PurchaseQty!==null||x.b10UnitSellUSD!==null))
   throw Error("0553 original B10 14 function budget breakdown invalid");
@@ -81,11 +81,11 @@ export function selectB10NativeAnnexReview0553(){
   moduleId:"bid.budget.working.bc.b10.original-annex-item-map",
   sourceModuleId:selection.moduleId,
   originalSheet:"B10 CommSpares",layoutColumns:freeze(["B","C","D","E","F","G","H","I"]),
-  dataFirstRow:6,originalDataCapacity:13,totalRow:6+rows.length,
+  dataFirstRow:6,originalDataCapacity:13,totalRow:19,
   standardDocumentHeader:"ERECTION, PRECOMMISSIONNING, COMMISSIONNING, START UP SPARE PARTS LISTS",
   commercialOfferTerm:"CIF Zhuhai Port, China — proposed; purchaser deviation acceptance required",
   customerOriginalIncoterm:"DDP site (purchaser original)",
-  rows,requiredPartFamilies:14,selectedMRKitQty:14,
+  rows,requiredPartFamilies:11,selectedMRKitQty:11,excludedRows:selection.excludedRows,ownerDecision:selection.ownerDecision,
   selectedMRKitWorkingSellTHB:alloc.original10_2WorkingSellTHB,
   budgetaryPresentationTotalUSD:alloc.totalAllocatedUSD,
   budgetaryPlanningFX:alloc.planningFxTHBPerUSD,
@@ -93,6 +93,6 @@ export function selectB10NativeAnnexReview0553(){
   sourceToReleaseParentIds:alloc.selectedFinancialSourceRows,
   b10CifUnitSellConfirmedCount:0,physicalSpareQtyConfirmedCount:0,
   sourceTotalIsB10Cost:false,customerReleaseAllowed:false,
-  note:"14 functional budget allocations (1 LOT each) reconcile to 10.2 MR kit Working SELL, not OEM unit prices/physical spare quantities. Exact parts/CIF quotation require OEM SPIR."
+  note:"11 selected functional budget allocations (1 LOT each) reconcile to 10.2 MR kit Working SELL, not OEM unit prices/physical spare quantities. Exact parts/CIF quotation require OEM SPIR."
  });
 }

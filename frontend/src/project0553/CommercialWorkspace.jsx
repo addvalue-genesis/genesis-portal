@@ -149,7 +149,6 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const [breakdownSelection,setBreakdownSelection]=useState(null);
  const [breakdownFocus,setBreakdownFocus]=useState(null);
  const [breakdownPrices,setBreakdownPrices]=useState(false);
- const [officialBreakdownView,setOfficialBreakdownView]=useState("customer");
  const openBreakdownFromSource=key=>{
   if(!buildCustomerPriceBreakdown0553(releaseModel).groups.some(g=>g.rows.some(r=>r.key===key)))
    throw Error("Source item is not mapped to a Breakdown row");
@@ -172,7 +171,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    const row=buildCustomerPriceBreakdown0553(releaseModel).groups.flatMap(g=>g.rows).find(r=>r.key===item.breakdownKey);
    if(!row||row.code!==item.code||row.id!==item.id||row.site!==item.site||row.mr!==item.mr)
     throw Error("Breakdown navigation refused: inconsistent source identity");
-   setBreakdownSelection({...row,origin:item.breakdownOrigin==="official"?"official":"released",seq:(breakdownSelection?.seq||0)+1});
+   setBreakdownSelection({...row,origin:"released",seq:(breakdownSelection?.seq||0)+1});
    setPricingStage("working");
    return;
   }
@@ -281,7 +280,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  if(pricingStage==="official")return <div className="p55-stack">
   <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
-  <OfficialUsdRelease0553 breakdownView={officialBreakdownView} onBreakdownViewChange={setOfficialBreakdownView} source={releaseModel} onOpenSource={openReleaseSource} breakdownFocus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>
+  <OfficialUsdRelease0553 source={releaseModel} onOpenSource={openReleaseSource}/>
  </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");
@@ -318,7 +317,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <div className="p55-eyebrow">COMMERCIAL WORKING PREVIEW <ComponentCopyId projectId="PJ2608-0553" componentKey="bid.budget.pricing"/></div>
   <h2>Engineering → BOM/MTO → Cost → Customer Scope of Supply</h2>
   <p className="p55-note"><strong>MR0001 Cisco-only preliminary subtotal (NOT total project cost):</strong> THB {BID_COST_SPINE_0553.knownPreliminaryCost.THB.toLocaleString("en-US")} · {BID_COST_SPINE_0553.pricedRows} provisionally priced source items / {BID_COST_SPINE_0553.unpricedRows} unpriced · Next G / MGW / other vendors / bulk / A+B+C / customer sell NOT included. Source: {BID_COST_SPINE_0553.source}</p>
-  <p className="p55-note">This is a controlled WORKSPACE, not a price release. The previously issued SAMTEL file is historical evidence; its exact issued revision must be verified before snapshot registration. No 0550 rates or facts transferred.</p>
+  <p className="p55-note">This is a controlled WORKSPACE, not a price release. Official Release defaults to the owner-selected Rev03 quotation. Submitted Rev02 is available only as history; Working changes do not overwrite either source workbook. No 0550 rates or facts transferred.</p>
   <div className="p55-filterbar p55-filterbar--simple">
     {pricingNavigation}
     <label>Customer / viewer <select value={recipient} onChange={e=>setRecipient(e.target.value)}>{template.policy.recipients.map(x=><option key={x}>{x}</option>)}</select></label>
@@ -326,9 +325,9 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
   <p className="p55-note" data-component-key="bid.budget.pricing.view-reference">
    <strong>Current module:</strong> {activePricingView.number} · {activePricingView.fullLabel} ·
    <ComponentCopyId projectId="PJ2608-0553" componentKey={activePricingView.moduleId}/>
-   {" "}· {recipient} · LIVE projection from 10.1 + 10.2 selected source · Approval HOLD; not issued. Views share the same source; Official USD applies quotation conversion and rounding.
+   {pricingStage==="official"?<> · {recipient} · Official defaults to the agreed Rev03 quotation. Historical Rev02 and Working calculation are separate choices.</>:<> · {recipient} · LIVE projection from 10.1 + 10.2 selected source · Approval HOLD; not issued.</>}
   </p>
-  {recipient==="INTERNAL"&&<PricingCfoDashboard0553 model={releaseModel}/>}
+  {recipient==="INTERNAL"&&pricingStage!=="official"&&<PricingCfoDashboard0553 model={releaseModel}/>}
   <>
   <section className="p55-panel">
    <div className="p55-eyebrow">CURRENCY VIEW / ORIGINAL CURRENCY RETAINED</div>
@@ -513,3 +512,4 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  </details>
  </div>;
 }
+

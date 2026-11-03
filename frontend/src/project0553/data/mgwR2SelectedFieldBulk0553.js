@@ -40,12 +40,12 @@ export function deriveMGWSelectedWpSystemBulk0553(){
        "MR0004/DTS0004/SPE + "+mgw.id,"MDS_FINANCIAL_SUMMARY_INCLUDED__NO_EXTRA_POST"),
       ...((basis?.rows||[]).map(x=>unpriced("MGW-R2-"+x.id,
        x.from+" to "+x.to+" / "+x.kind+" — candidate gross field cable purchase",
-       "MDS summary BFOU 5+5+10m conflicts with notes exclusion; no unproven credit",
-       "GROSS_ROUTE_CANDIDATE__CABLE_INCLUSION_AND_RATE_PENDING",x.procurementM,"m"))),
-      unpriced("MGW-R2-GLANDS","RACON field cable Ex glands, termination and bonding, vendor inclusion unconfirmed",
+       "Owner02-Nov selects MDS cable exclusion; ADDVALUE supplies full routed cable; zero supplier credit",
+       "ADDVALUE_SUPPLY__ROUTE_AND_RATE_PENDING",x.procurementM,"m"))),
+      unpriced("MGW-R2-GLANDS","RACON field cable Ex glands, termination and bonding: ADDVALUE supply, zero MDS gland credit",
        "MGW "+mgw.quoteNumber+"; approved site cable end register","FIELD_EX_ENTRIES_GLAND_SKU_AND_PRICE_OPEN")
      ],
-     selectedSupplier:"MDS / ORGA",selectedPackage:"QTORG2609244",bulkStatus:"NOT_ESTABLISHED__MDS_CABLE_GLAND_CONFLICT"};
+     selectedSupplier:"MDS / ORGA",selectedPackage:"QTORG2609244",bulkStatus:"ADDVALUE_SUPPLY_SELECTED__TAKEOFF_AND_RATE_PENDING"};
    }
    return sys;
   }),
