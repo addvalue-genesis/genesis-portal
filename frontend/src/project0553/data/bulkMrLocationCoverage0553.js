@@ -1,3 +1,4 @@
+import CUSTOMER_MTO_C1_0553 from "./snapshots/telecom.bulk.mto.c1.20261029.json";
 // PJ2608-0553 BULK engineering evidence register for 10.1.1.2 / 10.1.1.3.
 // Read only: never re-post A5, MGW included accessories, alternative vendors or price candidates.
 import {deriveMGWSelectedWpSystemBulk0553} from "./mgwR2SelectedFieldBulk0553";
@@ -230,6 +231,7 @@ export function deriveBulkMrLocationCoverage0553(){
  });
  const flat=sites.flatMap(x=>x.byMr);
  return {projectId:"PJ2608-0553",moduleId:"bid.budget.bom.system-location-mto.bulk-material",
+  customerMtoC1Coverage:deriveCustomerMtoC1Coverage0553(),
   sites,groups:flat,source:sources,selectedVendorAuthority:"NEXTG_VST_MR1__MGW_MR2__EXION_MR3__MDS_MR4",
   originalA5BookedTHB:a5.a5PriceTHB,postAdditionalTHB:0,
   customerReleased:false,costMutationAllowed:false,
@@ -244,6 +246,21 @@ export function deriveBulkMrLocationCoverage0553(){
 }
 export const selectBulkMrLocationCoverage0553=({mr="ALL",site="ALL",state="ALL"}={})=>{
  const m=deriveBulkMrLocationCoverage0553();
- return {...m,groups:m.groups.filter(g=>(mr==="ALL"||g.mr===mr)&&(site==="ALL"||g.site===site))
+ return {...m,customerMtoC1Coverage:deriveCustomerMtoC1Coverage0553({mr,site}),groups:m.groups.filter(g=>(mr==="ALL"||g.mr===mr)&&(site==="ALL"||g.site===site))
   .map(g=>({...g,visibleItems:g.items.filter(i=>state==="ALL"||i.state===state)}))};
 };
+
+
+// Customer MTO is gross contractual demand, distinct from the older equipment
+// MTO and partial source-owned prices. Do not spread GF aggregates over sites.
+export function deriveCustomerMtoC1Coverage0553({mr="ALL",site="ALL"}={}){
+ const all=CUSTOMER_MTO_C1_0553.rows;
+ const gfSites=["ZWP20","ZWP21","ZWP22","ZWP23"];
+ const rows=all.filter(r=>(mr==="ALL"||r.mr===mr||r.mr==="SHARED")&&
+  (site==="ALL"||r.site===site||(r.site.startsWith("GF ")&&gfSites.includes(site))));
+ return {document:CUSTOMER_MTO_C1_0553.document,revision:"C1",
+  source:CUSTOMER_MTO_C1_0553.source,allRowCount:all.length,rows,
+  quantitiesComplete:all.length===57,pricesComplete:false,incrementalCost:null,
+  budgetComparison:CUSTOMER_MTO_C1_0553.bulkBudgetComparison,quantitySummary:CUSTOMER_MTO_C1_0553.summary,
+  note:"GF quantities are source aggregates, not per-site quantities. Source contingency is already included. Unknown net purchases/prices stay NULL; quoted packages and existing partial allowances require exact matching before deduction."};
+}

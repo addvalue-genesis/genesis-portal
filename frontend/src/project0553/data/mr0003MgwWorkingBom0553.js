@@ -27,10 +27,19 @@ const sites=["ZWP20","ZWP21","ZWP22","ZWP23"].map(site=>{
   ["FIELD-EX-GLANDS","Certified cable glands, plugs and bonding; no inherited MGW credit"],
   ["FIELD-BULK-ACCESSORIES","External supports, MCT, terminations and connections"]
  ].map(([id,description])=>({id:id==="JB"?site+"-MGW-PHONE1-JB":site+"-MR0003-BULK-"+id,
-  site,mr:"MR-0003",tag:null,sku:null,description,qty:null,unit:null,currency:null,
+  site,mr:"MR-0003",tag:id==="JB"?"TCAB-504-001":null,sku:null,description,qty:id==="JB"?1:null,unit:id==="JB"?"set":null,currency:null,
   unitCost:null,extended:null,source,sourceUrl,priceInclusion:null,
   owner:"MR0003_FIELD_BULK_PENDING_VERIFIED_TAKEOFF",countedInWorkingTotal:false,
-  status:"NOT_PRICED__NOT_ZERO__EXION_SCOPE_GAP"}));
+  status:"NOT_PRICED__NOT_ZERO__EXION_SCOPE_GAP",
+  ...(id==="JB"?{requiredQtySource:"MTO-0001 C1 29-Oct-2026 p3 A-3: four JB, one per ZWP20/21/22/23",
+   requiredDimensionsMm:[200,120,200],requiredMaterial:"SS316L",requiredProtection:"Ex eb IP66",
+   requiredCableEntries:4,requiredSpareEntries:1,
+   budgetReference:{quote:"Q-PROSRY-24051 Rev0",date:"2024-07-12",line:"4",sku:"07-56D2-0411",
+    unitCostTHB:22000,sourceDimensionsMm:[200,200,120],sourceCableEntries:3,sourceDrainEntries:1,
+    sourceUrl:"https://drive.google.com/file/d/19XSRRU_p8S-2JlSin82T4pdoOD4QOMGh/view",
+    sourceQuoteQty:3,requiredProjectQty:4,selected:false,additive:false,
+    state:"ENVELOPE_COMPARABLE__ENTRY_CONFIGURATION_AND_CURRENT_PRICE_UNVERIFIED",
+    note:"Same three nominal dimensions with different axis order; confirm approved GA orientation. Historical box has three M20 cable entries plus dedicated drain, while MTO requires four entries plus one spare. Drain is not a spare cable entry. Do not post this rate as a completed MTO assembly or inherit old 3-set quantity."}}:{})}));
  return Object.freeze({site,mr:"MR-0003",items:[primary,...components,...missing],
   controlledTotalTHB:primary.extended,controlledTotalUSD:null,
   gaps:["JB/glands have no EXION quote; existing BARTEC/PROSPER alternatives require current quantity/rate/Ex review",

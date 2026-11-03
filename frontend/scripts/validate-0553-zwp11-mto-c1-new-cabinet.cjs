@@ -51,24 +51,31 @@ async function main(){
  assert.equal(cab.originProcurementQty,0);assert.equal(cab.originRawTHB,0);
  assert.equal(cab.ownerDecision.date,'2026-11-03');
  assert.equal(official.a.find(x=>x.code==='A1').amountUSD,242910);
- assert.equal(official.totalUSD,896530);assert.equal(official.totalUSD-baseline.totalUSD,1620);
- for(const row of official.a.filter(x=>x.code!=='A1'))assert.deepEqual(row,baseline.a.find(x=>x.code===row.code));
+ const leafNow=breakdown.groups.flatMap(g=>g.rows);
+ const deduped=leafNow.filter(r=>r.id.endsWith('-BULK-LNA-BOX')&&r.status==='INCLUDED').length===3;
+ assert.equal(official.totalUSD,deduped?889270:896530);
+ assert.equal(official.totalUSD-baseline.totalUSD,deduped?-5640:1620);
+ for(const row of official.a.filter(x=>x.code!=='A1'&&!(deduped&&x.code==='A2')))assert.deepEqual(row,baseline.a.find(x=>x.code===row.code));
  assert.deepEqual(official.b,baseline.b);assert.deepEqual(official.c,baseline.c);
  const leaf=breakdown.groups.flatMap(g=>g.rows);
  assert.equal(leaf.length,baseline.rows.length);
  const changed=[];
  for(const row of leaf){
   const old=baseline.rows.find(x=>x.key===row.key);assert(old,'Untracked quote row');
-  assert.equal(row.qty,old.qty,'Unrelated quoted quantity changed');
+  if(row.id.endsWith('-MGW-PHONE1-JB')&&row.tag==='TCAB-504-001')assert.equal(row.qty,1);
+  else assert.equal(row.qty,old.qty,'Unrelated quoted quantity changed');
   if(row.unitUSD!==old.unitUSD||row.amountUSD!==old.amountUSD)changed.push(row);
  }
- assert.equal(changed.length,1,'Only the ZWP11 cabinet price changes');
+ const zwp11Changes=changed.filter(r=>!(deduped&&r.code==='A2'&&(/-BULK-LNA-BOX$|-RFI-BDA$|-UHF-4$/.test(r.id))));
+ assert.equal(changed.length,deduped?10:1);
+ assert.equal(zwp11Changes.length,1,'Only ZWP11 changes outside the separately validated DMR de-duplication');
+ changed.splice(0,changed.length,...zwp11Changes);
  assert.equal(changed[0].site,'ZWP11');assert.equal(changed[0].tag,'TCAB-500-003');
  assert.equal(changed[0].amountUSD,1620);assert.equal(changed[0].customerSellTHB,50960);
  for(const g of breakdown.groups){assert.equal(g.varianceUSD,0);assert.equal(g.rows.reduce((n,r)=>n+(r.amountUSD??0),0),g.parentUSD);}
  assert.equal(breakdown.reconciled,true);assert.equal(official.issued,false);
  const owned=source.a.find(x=>x.code==='A1').sourceRows.filter(r=>r.site==='ZWP11'&&r.tag==='TCAB-500-003');
  assert.equal(owned.length,1);assert.equal(owned[0].costTHB,39200);
- console.log('PASS ZWP11 MTO C1: 1 new cabinet, existing THB39200 cost once; quote +USD1620; A1 242910; A+B 896530; other 140 leaf prices, B/C and frozen source unchanged.');
+ console.log('PASS ZWP11 MTO C1: 1 new cabinet, existing THB39200 cost once; ZWP11 quote USD1620; A1 242910; independent DMR correction allowed and validated separately; B/C and frozen source unchanged.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

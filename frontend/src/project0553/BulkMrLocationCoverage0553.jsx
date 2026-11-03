@@ -51,7 +51,21 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
   <p className="p55-note"><strong>One MR × Location view:</strong> physical field BULK and supplier-included assemblies are separate from priced equipment.
    Only MR0001 has seven booked source A5 partial floors (THB {fmt(view.originalA5BookedTHB)} total — already inside A1/A5 presentation).
    <strong> This page posts THB 0 additional</strong>. A quantity or quote in this table is evidence, not a released purchase or customer sell price.
-   Non-applicable MR/Location pairs are not automatically purchased. Current selected supply: MR0002 MGW RF; MR0003 EXION phone/sounder with JB/glands unquoted; MR0004 MDS/ORGA with cable/gland inclusion conflict unresolved. MGW is responsible for functional installed RF cabling as complete-system scope; ADDVALUE NEK is a separate optional installation BULK spare reserve. No automatic replacement, no installation shortfall transfer and no B10/C2 double count.</p>
+   Non-applicable MR/Location pairs are not automatically purchased. Current selected supply: MR0002 MGW RF; MR0003 EXION phone/sounder with JB/glands unquoted; MR0004 MDS/ORGA; ADDVALUE owns field cables/glands with zero supplier credit. MGW is responsible for functional installed RF cabling as complete-system scope; ADDVALUE NEK is a separate optional installation BULK spare reserve. No automatic replacement, no installation shortfall transfer and no B10/C2 double count.</p>
+  <details><summary>Customer Telecom BULK MTO C1 — {view.customerMtoC1Coverage.rows.length} / {view.customerMtoC1Coverage.allRowCount} source rows</summary>
+   <p className="p55-note">{view.customerMtoC1Coverage.note} This source table follows MR/Location filters; the BULK status filter applies to the existing engineering rows below.</p>
+   <div className="p55-table-wrap p553-module-scroll"><table className="p55-table p55-table--compact">
+    <thead><tr><th>MTO location / page / item</th><th>Requirement / size</th><th>Gross MTO quantity</th><th>Owner / coverage</th><th>Included / net purchase / incremental cost</th><th>Reconciliation</th></tr></thead>
+    <tbody>{view.customerMtoC1Coverage.rows.map(r=><tr key={r.id}>
+     <td>{r.site}<small>p.{r.printedPage} / {r.sourceItem}</small></td>
+     <td>{r.description}<small>{r.tag} / {r.size}</small></td>
+     <td>{r.requiredQty} {r.unit}<small>{r.site.startsWith("GF ")?"GF AGGREGATE — NOT PER SITE":"SOURCE TOTAL"}</small></td>
+     <td>{r.part}<small>{r.costOwner}</small><strong>{r.coverageState}</strong></td>
+     <td>Matching included quantity: {countFmt(r.provenIncludedQty)}<small>Additional purchase: {countFmt(r.netAdditionalPurchaseQty)}</small><small>Incremental cost: {r.incrementalCost===null?"TBC":fmt(r.incrementalCost)}</small></td>
+     <td>{r.note}</td>
+    </tr>)}</tbody>
+   </table></div>
+  </details>
   <div className="p55-table-wrap p553-module-scroll">
    <table className="p55-table p55-table--compact p55-table--budget">
     <thead><tr><th>+/−</th><th>Location / MR</th><th>Source / Module ID</th><th>BULK functions</th>
@@ -100,3 +114,4 @@ export function BulkMrLocationCoverage0553({mr="MR-0001",site="ALL",state="ALL",
   {!detail&&<p className="p55-note">Filtering is shared with 10.1.1.2 System / Location / BULK Status. The 10.1.1.3 equipment MTO count continues to mean original source TAGs, not an approved physical cable or accessory count. Engineering cable-end/register verification is required before procurement.</p>}
  </section>;
 }
+

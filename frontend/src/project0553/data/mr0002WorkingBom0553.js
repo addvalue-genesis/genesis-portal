@@ -86,6 +86,7 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
   const fieldBulk=(priorBulk?.rows||[]).filter(b=>!overlapping.has(b.id)).map(b=>{
    const duplicate=overlapping.has(b.id);
    const includedSurge=b.id==="EX-SURGE";
+   const supersededLnaEnclosure=b.id==="LNA-BOX";
    const allowance=includedSurge?null:selectMR0002Rate0553(b.id);
    const priceKnown=Number.isFinite(b.amount)||Boolean(allowance);
    return {id:site+"-BULK-"+b.id,site,mr:"MR-0002",tag:"BULK-"+b.id,
@@ -94,7 +95,19 @@ const bySite=Z1F_TEL_LAYOUT_INDEX_0553.byWP
     priceBasis:allowance?.priceType??"EXISTING_PRIOR_BULK_CALCULATION",
     status:includedSurge?"PRICE_INCLUDED_IN_UHF2_POLYPHASER__EX_SURGE_COMPLIANCE_VERIFY":obsoleteLnaBulk.has(b.id)?"SUPERSEDED_LNA_INTERFACE__BDA_REDESIGN_REQUIRED":duplicate?"INCLUDED_IN_MGW_UHF4__NOT_ADDITIVE":allowance?"BUDGETARY_ALLOWANCE_SUBJECT_TO_INTERFACE_CONFIRMATION":b.state,
     owner:includedSurge?"MGW_UHF2_POLYPHASER_INCLUDED_NON_ADDITIVE":obsoleteLnaBulk.has(b.id)?"HISTORICAL_LNA_BULK_NOT_ADDITIVE":duplicate?"MGW_UHF4_INCLUDED":"FIELD_BULK_PREVIOUS_BUDGET",
-    countedInWorkingTotal:!includedSurge&&!duplicate&&!obsoleteLnaBulk.has(b.id)&&priceKnown,
+    countedInWorkingTotal:!includedSurge&&!supersededLnaEnclosure&&!duplicate&&!obsoleteLnaBulk.has(b.id)&&priceKnown,
+    ...(supersededLnaEnclosure?{
+     description:"Legacy LNA enclosure allowance superseded by the WAROM enclosure included with selected RFI BDA",
+     historicalUnitCostTHB:allowance?.unitRate??b.rate,
+     historicalExtendedTHB:allowance?Math.round(allowance.qty*allowance.unitRate*100)/100:b.amount??null,
+     currency:"USD",unitCost:null,extended:null,
+     source:MGW_P26_058_R2_SELECTED_0553.id+" / UHF-1; historical LNA-BOX rate is unselected",
+     quoteLine:"UHF-1",parentPackage:site+"-RFI-BDA",
+     priceInclusion:"LNA_ENCLOSURE_SUPERSEDED_BY_INCLUDED_WAROM_UHF1",
+     status:"UNSELECTED_LEGACY_LNA_ENCLOSURE__WAROM_INCLUDED_NON_ADDITIVE",
+     owner:"MGW_UHF1_WAROM_ENCLOSURE_INCLUDED_NON_ADDITIVE",
+     note:"The rate registry marks LNA-BOX selected:false / SUPERSEDED_LNA_ONLY. The current BDA replaces the original LNA at its function-defined position and already includes WAROM. Preserve this historical row ID without a second enclosure posting. Separate RF surge enclosure and M25 glands remain technical scope checks; no claim that all surge assembly parts are included."
+    }:{}),
     ...(includedSurge?{source:MGW_P26_058_R2_SELECTED_0553.id+" / UHF-2; TEL-LAY "+surgeTag,quoteLine:"UHF-2",sku:"PolyPhaser IS-B50LN-C2",description:"PolyPhaser IS-B50LN-C2 plus Solexy RXNMS0200JX0 included in selected MGW R2 UHF-2 Yagi set; completed Ex assembly for "+surgeTag+" not established",currency:"USD",unitCost:null,extended:null,priceInclusion:"INCLUDED_IN_MGW_R2_UHF2",parentPackage:site+"-UHF-2",evidenceState:"QUOTE_INCLUDED_TECHNICAL_EQUIVALENCE_UNVERIFIED",displayPrice:"INCLUDED IN UHF-2 (USD 847 / SET)",note:"PolyPhaser IS-B50LN-C2 and Solexy RXNMS0200JX0 are included in the quoted Yagi set, without individual prices. Do not add the former THB 25,000 EX-SURGE management allowance. Separate hazardous-area surge assembly requirements remain to be checked against MR, layout and certification; no claim of complete Ex compliance."}:{}),
     costGap:!includedSurge&&!duplicate&&!priceKnown?"ACCESSORY_ALLOWANCE_REQUIRES_BASIS":null};
   });
