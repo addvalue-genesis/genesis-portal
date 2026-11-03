@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-03.3-preview",
+  "version": "2026-11-03.4-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "a58fff2a8208abceeaae0c243d4ecfc63e6f600f",
-  "capability": "0550 A review accepts copied full input IDs and focuses the addressed row. Reference/history registers and SI findings start collapsed independently. A.4 separates receipt-passed inputs, exact-number candidates and content review using existing canonical results. Source authority, review gates, prices, colours, saved work and frozen history remain unchanged."
+  "source0550": "d34d8cb7f7d561092d089f3274a347a110cb7edb",
+  "capability": "0550 PAGA supplier revision enters existing canonical source/SI/B07/Working records through controlled private SI import. Preserves selected prices/quantities/FX, edits/deletions and frozen history; draft net package remains unselected and component/options evidence non-additive. No new module IDs or engineering/release approval."
 }

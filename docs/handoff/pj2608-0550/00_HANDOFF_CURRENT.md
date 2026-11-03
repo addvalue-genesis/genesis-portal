@@ -1,3 +1,5 @@
+Latest: [PAGA supplier revision canonical continuation](20261103_PAGA_SUPPLIER_REVISION.md), parent `d34d8cb7`. Code + private controlled import are separate from Windows saved data. Preserve existing selections and complete PAGA reconciliation before the remaining18 systems.
+
 Latest A focus/count correction: [single-input navigation and actual Rev11/Rev07 diagnosis](20261103_A_INPUT_FOCUS_AND_RECEIPT_COUNTS.md), UI `2026-11-03.3-preview`, parent `a58fff2a`. Full copied IDs work in the local A filter; reference/history registers and SI findings start collapsed independently. Receipt-passed, exact-number candidates and reviewed content remain separate; no source/review/price/history writes.
 
 Latest A input review: [copyable panel/row addresses, existing RFQ IDs and code-first investigation](20261103_A_INPUT_COPY_IDS.md), UI `2026-11-03.2-preview`, parent `b41f2d47`. Existing controls/data/gates remain authoritative; do not equate copied IDs or UI fixes with completed reading/mapping.

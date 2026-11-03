@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_A_INPUT_FOCUS_AND_RECEIPT_COUNTS.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_PAGA_SUPPLIER_REVISION.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -16,7 +16,8 @@
     "docs/handoff/pj2608-0550/00_HANDOFF_CURRENT.md",
     "docs/handoff/pj2608-0550/20261103_CONTINUITY_AND_TAB_PERFORMANCE.md",
     "docs/handoff/pj2608-0550/20261103_A_INPUT_COPY_IDS.md",
-    "docs/handoff/pj2608-0550/20261103_A_INPUT_FOCUS_AND_RECEIPT_COUNTS.md"
+    "docs/handoff/pj2608-0550/20261103_A_INPUT_FOCUS_AND_RECEIPT_COUNTS.md",
+    "docs/handoff/pj2608-0550/20261103_PAGA_SUPPLIER_REVISION.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -45,9 +46,9 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
-    "Actual Rev11/Rev07 reconstruction: receipt100/107, exact-number candidates73, reviewed0,95 unique current reading gaps. MR RFQ-001 has no receipt problems but TEXT_PARTIAL and shared review DRAFT/OPEN. Continue semantic/native reading using the received-document basis; do not request every row screenshot or stamp approval to clear counters. Verify single-row navigation and source reveal in a browser.",
-    "Continue C1 customer TAG to supplier component/Working owner reconciliation, then C2 startup spares.",
-    "Close evidence/engineering/pricing gaps before controlled issue; do not substitute build success for project readiness."
+    "PAGA first: private supplier-revision transaction supports canonical source/SI/B07/Working candidate continuation. Deliver controlled import JSON separately; source95 draft /217 TAG /26 topic review remains DRAFT and net owner unselected. Do not infer Windows IndexedDB installation.",
+    "Reconcile PAGA node/site/speaker/beacon/OCU/UPS/licence/bulk/service/spares/AVL gaps, legacy addition rationale and financial adoption before Release10.7; preserve old selected values, quantities/FX and frozen history.",
+    "Then continue the other18 systems from existing authored requirements; actual A receipt/readiness and project-wide engineering remain OPEN."
   ],
   "historicalState": "The prior 2026-10-09 branch/PR2/port3000/STAGING checkpoint remains in Git history; it is not the current launch instruction."
 }

@@ -1,0 +1,56 @@
+// Synthetic regression only. Never commit actual quote/source/import files.
+const assert=require('node:assert/strict'),path=require('path'),fs=require('fs'),babel=require('@babel/core');
+const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
+// Register JSX separately for the real import surface SSR below.
+const transform=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);
+require.extensions['.js']=transform;require.extensions['.jsx']=transform;
+const W=require(root+'/project0550/data/bidWorkspaceModel.js'),I=require(root+'/project0550/data/integrationWorkspace0550.js'),R=require(root+'/project0550/data/supplierRevision0550.js'),A=require(root+'/project0550/data/sourceWorkspaceAuto0550.js'),D=require(root+'/project0550/data.js'),tokens=D.SYSTEMS.map(s=>s.token);
+const source={id:'SYNTHETIC-CUSTOMER',provider:'GDRIVE',title:'Synthetic only',documentNo:'SYNTHETIC-MR',revision:'B1',issuedDate:'',receivedDate:'',url:'https://drive.google.com/file/d/SYNTHETIC/view',readState:'TEXT_PARTIAL',authority:'CURRENT_TENDER',content:'Synthetic tag requirement',note:'',replaces:[]};
+const intake={schema:'genesis.0550.source-intake.v1',projectId:'PJ2608-0550',batchId:'PJ2608-0550-SOURCE-INTAKE-REV11-20261101',reviewedOn:'2026-11-01',coverageNote:'Synthetic only',sources:[source],findings:[],milestones:[]};
+const base=I.blankRequirement0550('REQ-EXISTING','TEL-PAGA');
+const vendor={id:'VEN-SYNTHETIC',name:'Synthetic supplier',kind:'SUPPLIER',reference:'Synthetic only'};
+const net={id:'OFFER-SYNTHETIC-NET',vendorId:vendor.id,description:'Synthetic net package',brand:'SYNTHETIC',quoteRef:'SYNTHETIC-REV2',sourceRef:'Synthetic quote p2',date:'2026-11-02',validUntil:'2026-12-31',currency:'EUR',unit:'Lot',unitCost:100,supplierQuoteRow:{sourceId:'SYNTHETIC-SUPPLIER',itemCode:'NET',classification:'NET_PACKAGE',quantity:1,quotedUnit:'Lot',parentOfferId:'OFFER-SYNTHETIC-NET',discountable:false}};
+const detail={...net,id:'OFFER-SYNTHETIC-REV2-5010',unit:'U',unitCost:125,supplierQuoteRow:{...net.supplierQuoteRow,itemCode:'5010',classification:'BASE_PRICE',quantity:1,quotedUnit:'U',discountable:true}};
+const line={id:'LINE-SYNTHETIC',systemToken:'TEL-PAGA',wbs:'A',description:'Synthetic only',scopeKey:'SYNTHETIC-SCOPE',tagRef:'',requirementRef:'',sourceRef:'Synthetic quote p2',vendorId:vendor.id,offerId:net.id,calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'EUR',manualCost:null,sellMode:'MARGIN',sellRate:null,markupPct:null,marginPct:null,primePct:null,selected:false};
+const data={...W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),vendors:[vendor],sourceIntake:intake,integrationWorkspace:{...I.emptyIntegration0550(),requirements:[base]}};
+const pack={schema:R.SUPPLIER_REVISION_SCHEMA_0550,projectId:'PJ2608-0550',batchId:'SYNTHETIC-REVISION',preparedOn:'2026-11-03',coverageNote:'Synthetic only',commercialTotals:{gross:125,discountable:125,discount:25,net:100,discountPercent:20},sourceIntake:{...intake,batchId:'PJ2608-0550-SOURCE-INTAKE-REV12-20261103',reviewedOn:'2026-11-03',sources:[source,{...source,id:'SYNTHETIC-SUPPLIER',documentNo:'SYNTHETIC-REV2',authority:'INTERNAL_REFERENCE'}]},predecessorSourceKey:I.integrationFingerprint0550(intake),vendor,offers:[net,detail],line,requirements:[{...base,supplierBasis:'New revision evidence; acceptance OPEN'}, {...I.blankRequirement0550('REQ-TAG-SYNTHETIC','TEL-PAGA'),site:'APF',sourceIds:[source.id],sourceExcerpt:source.content,offerIds:[detail.id],supplierSourceIds:['SYNTHETIC-SUPPLIER'],workLineIds:[line.id]}],particulars:[],expectedRequirements:[{id:base.id,basisKey:I.integrationFingerprint0550(base)}]};
+const before=JSON.stringify(data),result=R.planSupplierRevision0550(data,pack,tokens),next=result.workspace;
+assert.equal(JSON.stringify(data),before);assert.equal(next.offers.length,2);assert.equal(next.lines[0].selected,false);assert.equal(next.integrationWorkspace.requirements.length,2);assert.equal(next.integrationWorkspace.requirements[0].supplierBasis,pack.requirements[0].supplierBasis);
+for(const k of ['fx','audit','releaseRegister','customerReviews','calculations','nodes','edges','vendors'])assert.deepEqual(next[k],data[k]);
+assert.equal(R.planSupplierRevision0550(next,pack,tokens).workspace,next);
+const deleted=structuredClone(next);deleted.offers=[];deleted.lines=[];deleted.integrationWorkspace.requirements=[];
+assert.equal(R.planSupplierRevision0550(deleted,pack,tokens).workspace,deleted,'Consumed imports must not refill deletions');
+const edited=structuredClone(data);edited.integrationWorkspace.requirements[0].need='User edit';assert.equal(R.planSupplierRevision0550(edited,pack,tokens).workspace.integrationWorkspace.requirements[0].need,'User edit');
+const absent=structuredClone(data);absent.integrationWorkspace.requirements=[];assert(!R.planSupplierRevision0550(absent,pack,tokens).workspace.integrationWorkspace.requirements.some(r=>r.id===base.id),'Missing prior requirements are not recreated');
+for(const fn of [p=>p.line.selected=true,p=>p.line.quantity=2,p=>p.sourceIntake.sources[0].content+='changed',p=>p.requirements[0].status='REVIEWED',p=>p.requirements[1].offerIds=['MISSING'],p=>p.offers[1].supplierQuoteRow.sourceId='MISSING',p=>p.offers[1].supplierQuoteRow.classification='INVALID',p=>p.projectId='PJ2608-0553',p=>p.line.fx={},p=>p.commercialTotals.net=101,p=>p.offers[1].unitCost=126]){const invalid=structuredClone(pack);fn(invalid);assert.throws(()=>R.planSupplierRevision0550(data,invalid,tokens));}
+const changed=structuredClone(pack);changed.coverageNote+='changed';assert.throws(()=>R.planSupplierRevision0550(next,changed,tokens),/consumed batch changed/);
+const conflict=structuredClone(data);conflict.offers=[{...detail,unitCost:999}];assert.throws(()=>R.planSupplierRevision0550(conflict,pack,tokens),/conflicts with saved/);
+const picked=structuredClone(next);picked.lines=[{...line,selected:true,offerId:detail.id,unit:'U'}];assert.equal(W.deriveBidWorkspace(picked,tokens,'2026-11-03').lines[0].costRate,null,'Gross components/options cannot become additive costs under a net owner');
+const oldCode=structuredClone(data);oldCode.offers=[{...detail,id:'OFFER-SYNTHETIC-REV1-5010',quoteRef:'SYNTHETIC-REV1',unitCost:999}];assert.equal(R.planSupplierRevision0550(oldCode,pack,tokens).workspace.offers.length,3,'Same itemcode in different revisions retains both identities');
+const ctx=require(root+'/project0550/BidWorkspaceContext.jsx');ctx.useBidWorkspace=()=>({data,change:()=>{},busy:false});const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');assert(renderToStaticMarkup(React.createElement(require(root+'/project0550/SiWorkPackage0550.jsx').SiWorkPackage0550)).includes('Import SI work package'));
+ctx.useBidWorkspace=()=>({data:next,put:()=>{},busy:false});assert(renderToStaticMarkup(React.createElement(require(root+'/project0550/VendorWorkspace.jsx').VendorWorkspace)).includes('SYNTHETIC-REV2'));
+console.log('PASS supplier revision: exact ancestor preservation, same-code revision identity, canonical SI/offer/Working writes, no active repricing, edits/deletions/FX/history preservation, non-additive evidence, receipt idempotence/tamper/conflict checks, real import surface SSR.');
+if(process.argv[2]){
+ const privatePack=JSON.parse(fs.readFileSync(process.argv[2])),prep=JSON.parse(fs.readFileSync(process.argv[3])),source=JSON.parse(fs.readFileSync(process.argv[4]));
+ const B=require(root+'/project0550/data/legacyVendorBasis0550.js'),M=require(root+'/project0550/data/mrWorkingBasis0550.js'),G=require(root+'/project0550/data/mgwVendorBasis0550.js'),P=require(root+'/project0550/data/repositoryBidBasis0550.js');
+ let actual=B.importLegacyVendorBasis0550(W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),{meta:D.DATA_LAYER_META,budgetaryEstimate:D.BUDGETARY_ESTIMATE,commercialSources:D.COMMERCIAL_SOURCES,commercialPolicy:D.COMMERCIAL_POLICY},'2026-11-03');
+ actual=M.importMrWorkingBasis0550(actual,D.COMMERCIAL_POLICY,'2026-11-03');actual=G.importMgwVendorBasis0550(actual,'2026-11-03');actual=P.prepareRepositoryBidBasis0550(actual,{meta:D.DATA_LAYER_META,budgetaryEstimate:D.BUDGETARY_ESTIMATE},'2026-11-03');actual=P.prepareAuthorizedEurThb0550(actual,'2026-11-03');
+ actual.sourceIntake=source;actual.integrationWorkspace=prep.integrationWorkspace;
+ // Test a frozen pre-change legacy issue without inventing approvals.
+ const originalLines=JSON.stringify(actual.lines),originalOffers=JSON.stringify(actual.offers),priceBefore=W.deriveBidWorkspace(actual,tokens,'2026-11-03');
+ const output=R.planSupplierRevision0550(actual,privatePack,tokens);
+ assert.equal(JSON.stringify(output.workspace.lines.slice(0,actual.lines.length)),originalLines);assert.equal(JSON.stringify(output.workspace.offers.slice(0,actual.offers.length)),originalOffers);
+ const afterPrice=W.deriveBidWorkspace(output.workspace,tokens,'2026-11-03');
+ for(const k of ['knownTHB','selectedTHB','selectedUSD','baseTHB','baseUSD','optionsTHB','optionsUSD'])assert.deepEqual(afterPrice[k],priceBefore[k]);
+ for(const k of ['knownTHB','knownUSD','baseTHB','baseUSD','optionsTHB','optionsUSD'])assert.deepEqual(afterPrice.provisional[k],priceBefore.provisional[k]);
+ assert.equal(output.workspace.offers.length-actual.offers.length,40);assert.equal(output.workspace.integrationWorkspace.requirements.length-actual.integrationWorkspace.requirements.length,217);assert.equal(output.stats.find(s=>s.collection==='requirements').updated,95);assert.equal(output.workspace.integrationWorkspace.particulars.length-actual.integrationWorkspace.particulars.length,26);
+ const normalize=s=>s.replace(/\s+/g,' ').trim(),sources=new Map(output.workspace.sourceIntake.sources.map(s=>[s.id,s]));
+ const tagRows=privatePack.requirements.filter(r=>!privatePack.expectedRequirements.some(e=>e.id===r.id));
+ assert.equal(new Set(tagRows.map(r=>r.site+'/'+r.id)).size,217);
+ for(const r of tagRows){assert(r.sourceIds.some(id=>normalize(sources.get(id).content).includes(normalize(r.sourceExcerpt))),'Exact customer evidence / '+r.id);if(r.offerIds.length)assert(r.supplierSourceIds.some(id=>normalize(sources.get(id).content).includes(normalize(r.supplierExcerpt))),'Exact supplier evidence / '+r.id);}
+ assert.equal(output.workspace.lines.at(-1).selected,false);assert.equal(output.workspace.offers.find(o=>o.id===privatePack.line.offerId).unitCost,privatePack.commercialTotals.net);
+ assert.equal(A.selectAutomaticSourceWorkspace0550(output.workspace,{schema:'genesis.0550.source-workspace.v1',sourceIntake:source,aWorkPackage:null},tokens).state,'LOCAL_NEWER','Old automatic source cannot revert the successor');
+ assert(!I.deriveIntegration0550(output.workspace,D.SYSTEMS,'2026-11-03').ready);
+ if(process.env.PJ0550_PRIVATE_OUTPUT)fs.writeFileSync(process.env.PJ0550_PRIVATE_OUTPUT,JSON.stringify(output.workspace));
+ console.log('PASS actual recovered PAGA: Rev11 exact679-source successor; 95 existing drafts updated +217 TAG candidates +26 topics +40 offers; base18/options5/references16 preserved; reconciled net base unselected; legacy selected prices/quantities/FX unchanged; older automatic reload retained; engineering HOLD.');
+}
