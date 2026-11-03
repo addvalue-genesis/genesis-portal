@@ -149,7 +149,6 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const [breakdownSelection,setBreakdownSelection]=useState(null);
  const [breakdownFocus,setBreakdownFocus]=useState(null);
  const [breakdownPrices,setBreakdownPrices]=useState(false);
- const [officialBreakdownView,setOfficialBreakdownView]=useState("customer");
  const openBreakdownFromSource=key=>{
   if(!buildCustomerPriceBreakdown0553(releaseModel).groups.some(g=>g.rows.some(r=>r.key===key)))
    throw Error("Source item is not mapped to a Breakdown row");
@@ -172,7 +171,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
    const row=buildCustomerPriceBreakdown0553(releaseModel).groups.flatMap(g=>g.rows).find(r=>r.key===item.breakdownKey);
    if(!row||row.code!==item.code||row.id!==item.id||row.site!==item.site||row.mr!==item.mr)
     throw Error("Breakdown navigation refused: inconsistent source identity");
-   setBreakdownSelection({...row,origin:item.breakdownOrigin==="official"?"official":"released",seq:(breakdownSelection?.seq||0)+1});
+   setBreakdownSelection({...row,origin:"released",seq:(breakdownSelection?.seq||0)+1});
    setPricingStage("working");
    return;
   }
@@ -281,7 +280,7 @@ export function CommercialWorkspace0553({focusedLocation=null,initialMode="worki
  const pendingBudget=selectBcOutstandingBudgetReferences0553();
  if(pricingStage==="official")return <div className="p55-stack">
   <div className="p55-filterbar p55-filterbar--simple">{pricingNavigation}</div>
-  <OfficialUsdRelease0553 breakdownView={officialBreakdownView} onBreakdownViewChange={setOfficialBreakdownView} source={releaseModel} onOpenSource={openReleaseSource} breakdownFocus={breakdownFocus} showPriceDetails={breakdownPrices} onPriceDetailsChange={setBreakdownPrices}/>
+  <OfficialUsdRelease0553 source={releaseModel} onOpenSource={openReleaseSource}/>
  </div>;
  return <div className="p55-stack" data-component-key="bid.budget" onClick={event=>{
   const trigger=event.target.closest?.("button[data-open-source-module]");

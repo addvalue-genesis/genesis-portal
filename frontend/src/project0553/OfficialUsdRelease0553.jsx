@@ -4,19 +4,19 @@ import {buildNativeOfficialRelease0553} from "./nativeWorkingDraft0553";
 import template from "./data/nativeReleaseTemplate0553.json";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
-import {CustomerPriceBreakdown0553} from "./CustomerPriceBreakdown0553";
+import {SubmittedWorksheet0553} from "./ReleaseCustomerWorkbook0553";
 import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
 import {buildNativePriceBreakdown0553} from "./nativePriceBreakdown0553";
 import "./releaseWorkbook0553.css";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"To be quoted";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"To be quoted";
-export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=null,showPriceDetails,onPriceDetailsChange,breakdownView,onBreakdownViewChange}){
+export function OfficialUsdRelease0553({source,onOpenSource=null}){
  const [releaseVersion,setReleaseVersion]=useState("SUBMITTED_REV02");
  const [submittedSheet,setSubmittedSheet]=useState("Scope of supply");
  const submitted=selectSubmittedRev02Release0553();
- const archivedSheet=submitted.worksheets.find(s=>s.name===submittedSheet)||submitted.worksheets[0];
+ const officialWorksheets=submitted.worksheets.filter(s=>!/^A[1-4] MR000[1-4]$/.test(s.name));
+ const archivedSheet=officialWorksheets.find(s=>s.name===submittedSheet)||officialWorksheets[0];
  const model=useMemo(()=>releaseVersion==="WORKING_DRAFT"?buildOfficialUsdRelease0553(source):null,[source,releaseVersion]);
- useEffect(()=>{if(breakdownFocus)setReleaseVersion("WORKING_DRAFT");},[breakdownFocus]);
  const [sheet,setSheet]=useState("SUMMARY"),[busy,setBusy]=useState(false),[error,setError]=useState("");
  const SelectedSheet="div";
  const selectedSheetRef=useRef(null);
@@ -73,18 +73,8 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
    <p><strong>{submitted.filename} · Submitted to SAMTEL · 30 October 2026</strong><br/>Total A+B: <strong>USD {money(submitted.totalBaseUSD)}</strong>. These are the preserved submitted values.</p>
    <p>{MTO_C1_RELEASE_CONFIRMATION_0553.mto}: materials and associated costs marked “Supplied by Telecom Vendor” are included. Submitted price unchanged. Confirmation reply prepared; not sent.</p>
    <p><a className="p553-detail-button" href={submitted.originalWorkbookPath} download={submitted.filename}>Download original submitted Rev02</a>{" · "}<a href={submitted.sourceUrl} target="_blank" rel="noopener noreferrer">Open source workbook</a></p>
-   <div className="p553-release-tabs" role="tablist" aria-label="Submitted Rev02 worksheets">{submitted.worksheets.map(s=><button key={s.name} type="button" role="tab" aria-selected={s.name===submittedSheet} onClick={()=>setSubmittedSheet(s.name)}>{s.name}</button>)}</div>
-   <div className="p553-sheet-scroll"><table className="p553-customer-table"><tbody>
-    {archivedSheet.rows.map((row,ri)=><tr key={ri}>{row.map((cell,ci)=>{
-     const merge=archivedSheet.merges.find(m=>ri+1>=m.minRow&&ri+1<=m.maxRow&&ci+1>=m.minCol&&ci+1<=m.maxCol);
-     if(merge&&(ri+1!==merge.minRow||ci+1!==merge.minCol))return null;
-     const value=cell.value;
-     const decimal=String(cell.numberFormat||"").split(";")[0].match(/\.([0#]+)/);
-     const digits=decimal?Math.min(decimal[1].length,8):0;
-     const shown=typeof value==="number"?value.toLocaleString("en-US",decimal?{minimumFractionDigits:digits,maximumFractionDigits:digits}:{maximumFractionDigits:8}):value??"";
-     return <td key={ci} colSpan={merge?merge.maxCol-merge.minCol+1:undefined} rowSpan={merge?merge.maxRow-merge.minRow+1:undefined} style={{whiteSpace:"pre-wrap"}}>{shown}</td>;
-    })}</tr>)}
-   </tbody></table></div>
+   <div className="p553-release-tabs" role="tablist" aria-label="Submitted Rev02 worksheets">{officialWorksheets.map(s=><button key={s.name} type="button" role="tab" aria-selected={s.name===submittedSheet} onClick={()=>setSubmittedSheet(s.name)}>{s.name}</button>)}</div>
+   <SubmittedWorksheet0553 sheet={archivedSheet}/>
   </div>:<>
   <p className="p55-note">Working draft calculated from current inputs. It has not replaced submitted Rev02.</p>
   {error&&<p role="alert">Export failed: {error}</p>}
@@ -115,7 +105,6 @@ export function OfficialUsdRelease0553({source,onOpenSource=null,breakdownFocus=
    </table>}</div>
   </div>
   </SelectedSheet>
-  <CustomerPriceBreakdown0553 source={source} official={model} onOpenSource={onOpenSource} origin="official" view={breakdownView} onViewChange={onBreakdownViewChange} focus={breakdownFocus} showPriceDetails={showPriceDetails} onPriceDetailsChange={onPriceDetailsChange}/>
  </>}
  </section>;
 }

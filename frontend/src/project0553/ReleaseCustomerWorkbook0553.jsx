@@ -14,7 +14,7 @@ import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {selectB10NativeAnnexReview0553} from "./data/b10NativeAnnexReview0553";
 import {SparePricedBudgetReview0553} from "./SparePricedBudgetReview0553";
 import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0553";
-import {buildOfficialUsdRelease0553} from "./data/officialUsdRelease0553";
+import {buildOfficialUsdRelease0553,selectSubmittedRev02Release0553} from "./data/officialUsdRelease0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
 import "./releaseWorkbook0553.css";
 
@@ -22,8 +22,24 @@ import "./releaseWorkbook0553.css";
 // and MUST NOT be included in the six-sheet native XLSX export.
 const WORKSHEETS=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
- ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"]
+ ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"],
+ ["A1 MR0001","A1"],["A2 MR0002","A2"],["A3 MR0003","A3"],["A4 MR0004","A4"]
 ]);
+// Same preserved worksheet cells/merges; changing the display location never
+// rewrites the submitted workbook or substitutes current Working prices.
+export function SubmittedWorksheet0553({sheet}){
+ return <div className="p553-sheet-scroll"><table className="p553-customer-table"><tbody>
+  {sheet.rows.map((row,ri)=><tr key={ri}>{row.map((cell,ci)=>{
+   const merge=sheet.merges.find(m=>ri+1>=m.minRow&&ri+1<=m.maxRow&&ci+1>=m.minCol&&ci+1<=m.maxCol);
+   if(merge&&(ri+1!==merge.minRow||ci+1!==merge.minCol))return null;
+   const value=cell.value;
+   const decimal=String(cell.numberFormat||"").split(";")[0].match(/\.([0#]+)/);
+   const digits=decimal?Math.min(decimal[1].length,8):0;
+   const shown=typeof value==="number"?value.toLocaleString("en-US",decimal?{minimumFractionDigits:digits,maximumFractionDigits:digits}:{maximumFractionDigits:8}):value??"";
+   return <td key={ci} colSpan={merge?merge.maxCol-merge.minCol+1:undefined} rowSpan={merge?merge.maxRow-merge.minRow+1:undefined} style={{whiteSpace:"pre-wrap"}}>{shown}</td>;
+  })}</tr>)}
+ </tbody></table></div>;
+}
 const B_ROWS=Array.from({length:14},(_,i)=>"B"+(i+1));
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"—";
 const cash=n=>Number.isFinite(n)?"THB "+money(n):"PENDING";
@@ -89,6 +105,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const [nativeReport,setNativeReport]=useState(null);
  const internal=recipient==="INTERNAL"&&viewer==="INTERNAL";
  const code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
+ const submitted=selectSubmittedRev02Release0553();
+ const submittedPartA=/^A[1-4]$/.test(code)?submitted.worksheets.find(s=>s.name===sheet):null;
  const partA=buildPartATagGroupBreakdown0553(model);
  const annexLines=model.annex[code]||[];
  const annexModel=model.annexModels?.[code]||null;
@@ -351,7 +369,11 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
       This JSX groups all source data into four MR package rows, with no priced TAG silently discarded.
       Grouped Tag No. format must be accepted by purchaser before native export; original column widths, page setup and merges are retained; exported text wraps with fitted row heights.
      </p>}
-    </>:<>
+    </>:submittedPartA?<div data-release-part-a={code} data-release-revision={submitted.revision}>
+     <p className="p55-note"><strong>{sheet} · Submitted {submitted.revision} · USD</strong><br/>
+      รายละเอียดจากชุดเสนอราคา 30-Oct-2026 ย้ายมาแสดงที่ 10.3.3 Release · คงข้อมูลและราคาเดิม</p>
+     <SubmittedWorksheet0553 sheet={submittedPartA}/>
+    </div>:<>
      {code==="B10"?<B10KitPriceSummary0553 rows={annexLines} total={annexModel?.selectedWorkingTHB} internal={internal} onOpenSource={onOpenSource} variant="release"/>:<>
      {["B13","C1","C2"].includes(code)&&<OtherSpareOriginalAnnex0553
        code={code} model={optionItemizedUsd} currency="THB" onOpenSource={internal?onOpenSource:null}/>}

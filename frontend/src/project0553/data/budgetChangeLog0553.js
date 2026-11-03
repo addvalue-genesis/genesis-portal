@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R86";
+export const CHANGE_LOG_VERSION_0553="2026-11-03-R87";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261103-11",date:"2026-11-03",kind:"UI",tone:"neutral",
+  title:"Move A1–A4 worksheet tabs from Official to Release",
+  detail:"Owner requests A1 MR0001, A2 MR0002, A3 MR0003 and A4 MR0004 under10.3.3 Release afterC2. Reuse the exact frozen submitted Rev02 worksheet cells, values, number formats and merges with an explicit revision label.10.3.4 shows only Scope of supply and the five B/C tabs; PartA summary totals remain. Detailed PartA review and Source return navigation belong to Release. Original ten-sheet Rev02 download and current draft exports remain intact. No financial, quantity, FX, cost-owner or module-ID changes.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE",source:"Owner03-Nov2026: move A1–A4 from10.3.4 to10.3.3 Release"}),
  Object.freeze({id:"P553-CHANGE-20261103-10",date:"2026-11-03",kind:"PRICE",tone:"caution",
   title:"Restore existing telephone JB allowance to active Working cost",
   detail:"Owner reconfirms telephone JB was already budgeted. Reuse MR0003_SELECTED_PRICE_0553 PROSPER item3 THB24500 per JB, one each at ZWP20/21/22/23. Stable PHONE1-JB rows now post THB98000 once, alongside unchanged EXION phone/sounder THB828000, for equipment Working THB926000. Product ledger and active BOM reconcile; field-bulk JB mirror stays non-additive. This is an internal historical allowance, not confirmation of current MTO size/entry/Ex compliance or additional glands. Alternative item4 THB22000 remains unselected. A3 customer price held at submitted USD34200; immutable Rev02 A+BUSD902900 and separate current draftUSD894590 remain unchanged. No module IDs, FX, markup, quantities or supplier quote changed.",
