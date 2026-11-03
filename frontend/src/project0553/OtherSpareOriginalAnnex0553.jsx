@@ -7,11 +7,11 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null,curren
  if(!rows||!summary||!headings[code])throw Error("0553 spare Annex unavailable "+code);
  const option=code==="C1"||code==="C2";
  if(!["USD","THB"].includes(currency)||currency==="THB"&&!option&&code!=="B13")throw Error("Unsupported spare Annex currency");
- return <section className="p553-b10-original-annex" data-original-spare-annex={code} data-price-status={summary.priceClass}>
+ return <section className={"p553-b10-original-annex"+(option?" p553-spare-option-annex":"")} data-original-spare-annex={code} data-price-status={summary.priceClass}>
   <div className="p553-native-title">{headings[code]}</div>
   {summary.excluded?<p>N/A — Not separately quoted. Tools expressly included in the equipment supply remain included.</p>:<>
   <div className="p553-b10-commercial-scroll"><table className="p553-customer-table p553-b10-native-annex-table">
-   {code==="C2"&&<colgroup>{[6,17,16,24,12,5,7,7,6].map((width,i)=><col key={i} style={{width:width+"%"}}/>)}</colgroup>}
+   {option&&<colgroup>{[6,17,16,24,12,5,7,7,6].map((width,i)=><col key={i} style={{width:width+"%"}}/>)}</colgroup>}
    <thead><tr><th>Item</th><th>Tag No. / Reference site</th><th>Description</th><th>Detail Specification</th>
     <th>Materials</th><th>QTY</th><th>UNIT PRICE ({currency})</th><th>TOTAL PRICE ({currency})</th>
     {option&&<th>Lead time (ARO)</th>}</tr></thead>

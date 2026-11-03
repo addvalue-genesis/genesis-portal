@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R83";
+export const CHANGE_LOG_VERSION_0553="2026-11-03-R84";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261103-08",date:"2026-11-03",kind:"UI",tone:"neutral",
+  title:"Apply the nine-column compact layout to C1 as well as C2",
+  detail:"Owner screenshot shows C1 Capital Spares still has tall header/body rows. Previous layout correction targeted C2 only. Both optional Annexes have nine columns, so use the same option-only class and explicit100% colgroup,1280px minimum width,12px font and content-sized rows for C1/C2. Lead time keeps usable width instead of forcing vertical text. B11/B13 and other tables stay outside this rule; Source buttons, text, financial values, module IDs and native Excel geometry unchanged. C1USD181100, C2USD20890 and A+BUSD894910 retained.",
+  moduleIds:Object.freeze(["bid.budget.pricing.official"]),priceImpact:"NO_PRICE_CHANGE",
+  source:"Owner03-Nov2026: Capital Spares screenshot — why are the rows so tall?"}),
  Object.freeze({id:"P553-CHANGE-20261103-07",date:"2026-11-03",kind:"UI",tone:"neutral",
   title:"Give C2 all nine columns usable widths and compact content-driven rows",
   detail:"Owner requests readable C2 display width. The shared eight-column header widths consumed100% before the ninth Lead time column, squeezing its text vertically and expanding row heights. C2 now uses an explicit nine-column100% colgroup with room for TAG/specification, quantity, both prices and Lead time; a scoped1280px minimum keeps narrow screens horizontally scrollable inside the existing container. Header widths reset only for C2, text uses12px and rows fit content. Source buttons, all text/TAGs and all prices remain intact. C2USD20890, CAT6A300m drumUSD8050, C1USD181100 and A+BUSD894910 unchanged. Browser presentation only; Excel geometry/export values and business module IDs unchanged.",

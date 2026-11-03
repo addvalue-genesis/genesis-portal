@@ -239,18 +239,18 @@
 .p553-b10-native-annex-table td small{display:block;margin-top:4px;color:#5d7280;font-size:10px;line-height:1.35}
 .p553-b10-native-annex-table tfoot th{background:#edf2f5;text-align:right}
 
-/* C2 has NINE columns. The eight-column100% header widths squeezed lead time
+/* C1 and C2 have NINE columns. The eight-column100% header widths squeezed lead time
    into a near-zero ninth column and stretched every row vertically.
    These browser-only widths do not change the native Excel geometry. */
-.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table{
+.p553-b10-original-annex.p553-spare-option-annex .p553-b10-native-annex-table{
  width:100%;min-width:1280px;height:auto;font-size:12px;
 }
-.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table th{
+.p553-b10-original-annex.p553-spare-option-annex .p553-b10-native-annex-table th{
  width:auto;
 }
-.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table tr,
-.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table th,
-.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table td{
+.p553-b10-original-annex.p553-spare-option-annex .p553-b10-native-annex-table tr,
+.p553-b10-original-annex.p553-spare-option-annex .p553-b10-native-annex-table th,
+.p553-b10-original-annex.p553-spare-option-annex .p553-b10-native-annex-table td{
  height:auto;min-height:0;vertical-align:top;line-height:1.4;
 }
 
