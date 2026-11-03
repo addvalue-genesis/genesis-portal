@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-03.2-preview",
+  "version": "2026-11-03.3-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "b41f2d479b16907193e4aa83e8c5717330b24cb4",
-  "capability": "0550 A expected-input review shows copyable panel/row addresses using existing RFQ input IDs. Module Search opens the existing A tools and reveals the addressed row. Canonical source controls, readiness checks, prices, colours, saved work and frozen history remain unchanged."
+  "source0550": "a58fff2a8208abceeaae0c243d4ecfc63e6f600f",
+  "capability": "0550 A review accepts copied full input IDs and focuses the addressed row. Reference/history registers and SI findings start collapsed independently. A.4 separates receipt-passed inputs, exact-number candidates and content review using existing canonical results. Source authority, review gates, prices, colours, saved work and frozen history remain unchanged."
 }

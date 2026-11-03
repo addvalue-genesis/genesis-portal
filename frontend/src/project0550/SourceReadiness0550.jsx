@@ -2,7 +2,7 @@ import React,{useState,useMemo,useRef,useEffect} from "react";
 import {useBidWorkspace,downloadBidFile} from "./BidWorkspaceContext";
 import {Field,Select,Save} from "./BidControls";
 import {Multi} from "./WorkingPreview0550";
-import {deriveSourceReadiness0550,emptySourceControl0550,bindUniqueSourceInputs0550,stampSourceControl0550,SOURCE_INPUT_PANEL_0550,sourceInputRowId0550,isSourceInputTarget0550} from "./data/sourceReadiness0550";
+import {deriveSourceReadiness0550,emptySourceControl0550,bindUniqueSourceInputs0550,stampSourceControl0550,SOURCE_INPUT_PANEL_0550,sourceInputRowId0550,isSourceInputTarget0550,sourceInputQuery0550,filterSourceInputRows0550} from "./data/sourceReadiness0550";
 import {newId} from "./data/bidWorkspaceModel";
 import {blankDocumentReview0550,stampIntegration0550,emptyIntegration0550} from "./data/integrationWorkspace0550";
 import {DELIVERY_KINDS_0550} from "./workingPreviewStages0550";
@@ -12,14 +12,14 @@ import {DocumentReadingCoverage0550} from "./DocumentReadingCoverage0550";
 // Part of the existing A controlled-source-inventory module, not a new module ID.
 export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
  const {data,model,busy,change,reviewDate}=useBidWorkspace();
- const [query,setQuery]=useState(""),[openOnly,setOpenOnly]=useState(false),[edit,setEdit]=useState(null),[extra,setExtra]=useState(null),[review,setReview]=useState(null),[doc,setDoc]=useState(null),[message,setMessage]=useState("");
+ const [query,setQuery]=useState(()=>isSourceInputTarget0550(navigationTarget)?sourceInputQuery0550(navigationTarget):""),[openOnly,setOpenOnly]=useState(false),[edit,setEdit]=useState(null),[extra,setExtra]=useState(null),[review,setReview]=useState(null),[doc,setDoc]=useState(null),[message,setMessage]=useState("");
  const editor=useRef(null);
- useEffect(()=>{if(isSourceInputTarget0550(navigationTarget)){setQuery("");setOpenOnly(false);}},[navigationTarget]);
+ useEffect(()=>{if(isSourceInputTarget0550(navigationTarget)){setQuery(sourceInputQuery0550(navigationTarget));setOpenOnly(false);}},[navigationTarget]);
  useEffect(()=>{editor.current?.scrollIntoView({block:"start"});},[edit?.inputId,extra?.id,doc?.id,Boolean(review)]);
  const readiness=useMemo(()=>model?.sourceReadiness||(data?deriveSourceReadiness0550(data,model?.integration,reviewDate):null),[data,model,reviewDate]);
  if(!readiness)return null;
  const control=data.sourceControl||emptySourceControl0550(),sources=data.sourceIntake?.sources||[];
- const rows=readiness.rows.filter(r=>(!openOnly||r.problems.length)&&(r.id+" "+r.documentNo+" "+r.title+" "+r.revision).toLowerCase().includes(query.toLowerCase()));
+ const rows=filterSourceInputRows0550(readiness.rows,query,openOnly);
  const save=async(transform,action)=>{const ok=await change(d=>({...d,sourceControl:transform(d)}),"A input control / "+action);if(ok)setMessage("บันทึกแล้ว · ตรวจสถานะ A ด้านล่าง; ยังไม่ใช่การอนุมัติ Engineering หรือ Release");return ok;};
  const showSource=s=>onOpenSource("bid.documents.source."+s.id);
  const blankExtra=()=>({id:newId("RFQ-EXTRA"),kind:"DOCUMENT",documentNo:"",revision:"",title:"",requiredBy:"",locator:"",sourceExcerpt:""});
@@ -73,7 +73,7 @@ export function SourceReadiness0550({onOpenSource=()=>{},navigationTarget}){
    <Save busy={busy}>บันทึกผลทบทวน A</Save><button type="button" onClick={()=>setReview(null)}>ปิด</button>
   </form>}
   <div className="p55-review-toolbar"><Field label="Search A expected inputs" value={query} onChange={setQuery}/><label><input type="checkbox" checked={openOnly} onChange={e=>setOpenOnly(e.target.checked)}/>เฉพาะรายการยังไม่ครบ</label></div>
-  <div className="p55-table-wrap"><table className="p55-table" aria-label="A expected versus received inputs"><thead><tr><th>เอกสารที่ต้องมี / เหตุผล</th><th>พบต้นฉบับ / ฉบับใกล้เคียง</th><th>ต้นฉบับที่ผูก / อ่าน</th><th>สถานะ / ทำต่อ</th></tr></thead><tbody>{rows.map(r=><tr key={r.id} data-component-key={sourceInputRowId0550(r.id)} tabIndex={-1}>
+  <div className="p55-table-wrap"><table className="p55-table" aria-label="A expected versus received inputs"><thead><tr><th>เอกสารที่ต้องมี / เหตุผล</th><th>พบต้นฉบับ / ฉบับใกล้เคียง</th><th>ต้นฉบับที่ผูก / อ่าน</th><th>สถานะ / ทำต่อ</th></tr></thead><tbody>{!rows.length&&<tr><td colSpan={4}>ไม่พบรายการตามตัวกรอง <button type="button" onClick={()=>{setQuery("");setOpenOnly(false);}}>ล้างตัวกรองรายการ A</button></td></tr>}{rows.map(r=><tr key={r.id} data-component-key={sourceInputRowId0550(r.id)} tabIndex={-1}>
    <td><strong>{r.documentNo||r.title} {r.revision}</strong><small>{r.title} / {r.id}</small><ComponentCopyId projectId="PJ2608-0550" componentKey={sourceInputRowId0550(r.id)}/><small>ต้องมีเพราะ: {r.requiredBy} / {r.locator}</small></td>
    <td>{r.candidates.length?`${r.candidates.length} ต้นฉบับเลข/ฉบับตรง`:(r.kind==="ATTACHMENT"?"ต้องเลือกเอกสารแนบจริง":"ยังไม่พบเลข/ฉบับตรง")}{r.related.length>0&&<details><summary>มีฉบับ/เลขอื่นให้ตรวจ {r.related.length}</summary>{r.related.map(s=><p key={s.id}><button type="button" onClick={()=>showSource(s)}>{s.title}</button> {s.revision} / {s.authority}</p>)}</details>}</td>
    <td>{r.bound.map(s=><div key={s.id}><button type="button" onClick={()=>showSource(s)}>{s.title}</button><small>{s.readState} / {s.effectiveAuthority}</small><button type="button" onClick={()=>setDoc(data.integrationWorkspace?.documentReviews.find(r=>r.id===s.id)||blankDocumentReview0550(s.id))}>ตรวจอ่านทุกหน้าใน A</button></div>)}{!r.bound.length&&"ยังไม่ผูกต้นฉบับ"}<small>{r.binding?.locator}</small></td>

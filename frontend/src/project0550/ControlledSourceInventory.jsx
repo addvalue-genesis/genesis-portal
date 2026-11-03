@@ -73,10 +73,10 @@ export function SourceCommunications() {
 export function ControlledSourceInventory({ navigationTarget,onNavigate }) {
   const { data, busy, change, reviewDate, reload, sourceSync } = useBidWorkspace();
   const [visibleCount,setVisibleCount]=useState(50);
-  const [toolsOpen,setToolsOpen]=useState(false),tools=useRef(null);
+  const [toolsOpen,setToolsOpen]=useState(false),[siOpen,setSiOpen]=useState(false),tools=useRef(null);
   const [pending, setPending] = useState(null), [error, setError] = useState(""), [query, setQuery] = useState(""), [provider, setProvider] = useState("ALL");
   const intake = data?.sourceIntake;
-  useEffect(() => { if (isSourceInputTarget0550(navigationTarget)||navigationTarget?.startsWith("bid.documents.source.")||navigationTarget==="bid.documents.si-work-package"||navigationTarget?.startsWith("bid.documents.finding.")) setToolsOpen(true); if (navigationTarget?.startsWith("bid.documents.source.")) { setQuery(""); setProvider("ALL"); setVisibleCount(Math.max(50,(data?.sourceIntake?.sources.findIndex(s=>"bid.documents.source."+s.id===navigationTarget)??0)+1)); } }, [navigationTarget]);
+  useEffect(() => { if(navigationTarget==="bid.documents.si-work-package"||navigationTarget?.startsWith("bid.documents.finding."))setSiOpen(true); if (isSourceInputTarget0550(navigationTarget)||navigationTarget?.startsWith("bid.documents.source.")||navigationTarget==="bid.documents.si-work-package"||navigationTarget?.startsWith("bid.documents.finding.")) setToolsOpen(true); if (navigationTarget?.startsWith("bid.documents.source.")) { setQuery(""); setProvider("ALL"); setVisibleCount(Math.max(50,(data?.sourceIntake?.sources.findIndex(s=>"bid.documents.source."+s.id===navigationTarget)??0)+1)); } }, [navigationTarget]);
   const model = useMemo(() => deriveSourceIntake(intake, reviewDate), [intake, reviewDate]);
   const rows = model.sources.filter(s => (provider === "ALL" || s.provider === provider) && (s.title + " " + s.documentNo + " " + s.id + " " + s.note).toLowerCase().includes(query.toLowerCase()));
   async function preview(file) {
@@ -92,7 +92,7 @@ export function ControlledSourceInventory({ navigationTarget,onNavigate }) {
   return <div className="p55-stack">
     <Module id="bid.documents.controlled-source-inventory" title="Controlled source inventory" showToggle>
       <MrSourceReader0550 navigationTarget={navigationTarget} onNavigate={onNavigate} onOpenSource={openSource} onOpenTools={openTools}/>
-      <details className="p55-a-operating-tools" ref={tools} open={toolsOpen} onToggle={e=>setToolsOpen(e.currentTarget.open)}><summary>ทะเบียนและเครื่องมือตรวจต้นฉบับ · ผูกเอกสาร / ตรวจอ่าน / ค้นข้อความ</summary>
+      <details className="p55-a-operating-tools" ref={tools} open={toolsOpen} onToggle={e=>{if(e.target===e.currentTarget)setToolsOpen(e.currentTarget.open);}}><summary>ทะเบียนและเครื่องมือตรวจต้นฉบับ · ผูกเอกสาร / ตรวจอ่าน / ค้นข้อความ</summary>
       <SourceReadiness0550 onOpenSource={openSource} navigationTarget={navigationTarget}/>
       <SourceEvidenceSearch0550 onOpenSource={openSource}/>
       <p>ทะเบียน GDrive / Gmail ที่ตรวจอ่านล่าสุด พร้อมเอกสารย้อนหลังและข้อมูลที่ยังอ่านไม่ครบ</p>
@@ -101,7 +101,8 @@ export function ControlledSourceInventory({ navigationTarget,onNavigate }) {
       <details><summary>นำเข้าไฟล์ด้วยตนเอง / ทางเลือกสำรอง</summary><label>Import source intake <input aria-label="Import source intake" type="file" accept=".json,application/json" disabled={!data || busy} onChange={e => { preview(e.target.files[0]); e.target.value = ""; }}/></label>
       {error && <p role="alert">{error}</p>}
       {pending && <div className="p55-panel" role="region" aria-label="Source import preview"><strong>{pending.batchId} · ตรวจวันที่ {pending.reviewedOn}</strong><p>{pending.sources.length} แหล่ง · {pending.findings.length} ข้อค้นพบ · {pending.milestones.length} กำหนดส่ง</p><p>{pending.coverageNote}</p><p>อัปเดตทะเบียนปัจจุบัน {intake?.sources.length || 0} รายการเป็นชุดนี้ เก็บ revision ก่อนหน้าไว้ ราคา/FX/Working เดิมคงเดิม</p><button type="button" disabled={busy} onClick={apply}>Apply source intake</button><button type="button" disabled={busy} onClick={() => setPending(null)}>Cancel source import</button></div>}</details>
-      {intake ? <><p><strong>ตรวจล่าสุด: {intake.reviewedOn}</strong> · {model.sources.length} แหล่ง · อ่านข้อความ {model.readCount} · รออ่าน/ตรวจภาพ {model.unreadCount} · ประเด็น OPEN/CONFLICT {model.openCount}</p><p>{intake.coverageNote}</p><button type="button" onClick={() => downloadBidFile(intake, "PJ2608-0550_Source_Intake_" + intake.reviewedOn + ".json")}>Export source intake</button></> : <p>ยังไม่มีทะเบียนจาก Drive ใน workspace นี้ — รายการ Historical ด้านล่างเป็นข้อมูลเดิม</p>}
+      {intake ? <><p><strong>ตรวจล่าสุด: {intake.reviewedOn}</strong> · {model.sources.length} แหล่ง · อ่านข้อความ {model.readCount} · รออ่าน/ตรวจภาพ {model.unreadCount} · ประเด็น OPEN/CONFLICT {model.openCount}</p><details><summary>ขอบเขตและข้อจำกัดของการตรวจทะเบียน</summary><p>{intake.coverageNote}</p></details><button type="button" onClick={() => downloadBidFile(intake, "PJ2608-0550_Source_Intake_" + intake.reviewedOn + ".json")}>Export source intake</button></> : <p>ยังไม่มีทะเบียนจาก Drive ใน workspace นี้ — รายการ Historical ด้านล่างเป็นข้อมูลเดิม</p>}
+      <details className="p55-a-reference-registers"><summary>ทะเบียนอ้างอิงทั้งหมด / เปรียบเทียบชุดเอกสาร / Revision · {model.sources.length} แหล่ง</summary>
       <PackageComparison intake={intake}/>
       <DocumentRevisionRegister intake={intake}/>
       <div className="p55-bid-form"><label>ค้นหาเอกสาร <input aria-label="Search source inventory" value={query} onChange={e => {setQuery(e.target.value);setVisibleCount(50);}}/></label><label>แหล่ง <select aria-label="Source provider" value={provider} onChange={e => {setProvider(e.target.value);setVisibleCount(50);}}><option value="ALL">ทั้งหมด</option><option value="GDRIVE">GDrive</option><option value="GMAIL">Gmail</option></select></label></div>
@@ -109,8 +110,9 @@ export function ControlledSourceInventory({ navigationTarget,onNavigate }) {
       {rows.length>visibleCount&&<button type="button" onClick={()=>setVisibleCount(n=>n+50)}>แสดงเอกสารเพิ่มอีก 50 รายการ ({Math.min(visibleCount,rows.length)} / {rows.length})</button>}
       <details><summary>Historical source register — ทะเบียนเดิม ไม่ใช่ผลตรวจล่าสุด (read-only)</summary><div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>ID</th><th>Source</th><th>Use / historical state</th></tr></thead><tbody>{SOURCE_REGISTER.map(s => <tr key={s.id}><td>{s.id}</td><td>{s.name}</td><td>{s.use}<small>{s.state}</small></td></tr>)}</tbody></table></div></details>
       </details>
+      </details>
     </Module>
-    <details open={toolsOpen} onToggle={e=>{if(e.currentTarget.open)setToolsOpen(true);}}><summary>ชุดเตรียม SI และข้อค้นพบจากต้นฉบับ</summary><SiWorkPackage0550/>
+    <details open={siOpen} onToggle={e=>{if(e.target===e.currentTarget)setSiOpen(e.currentTarget.open);}}><summary>ชุดเตรียม SI และข้อค้นพบจากต้นฉบับ</summary><SiWorkPackage0550/>
     <SourceFindings navigationTarget={navigationTarget}/></details>
   </div>;
 }

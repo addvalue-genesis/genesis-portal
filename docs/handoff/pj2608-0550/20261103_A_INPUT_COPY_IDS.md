@@ -1,5 +1,9 @@
 # 0550 A input review: copyable existing-record addresses
 
+Subsequent correction: [single-row local/global search, collapsed references and
+actual receipt-versus-reading diagnosis](20261103_A_INPUT_FOCUS_AND_RECEIPT_COUNTS.md).
+That checkpoint supersedes the filter-clearing behavior described below.
+
 3-Nov-2026, Asia/Bangkok. Parent `b41f2d47`, existing branch/3050.
 UI `2026-11-03.2-preview`.
 

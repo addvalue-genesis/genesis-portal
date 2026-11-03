@@ -19,6 +19,8 @@ export function sourceExpectedInputs0550(data){return [...catalog.inputs,...(dat
 // Presentation anchors under the existing source module; never new data/module identities.
 export const SOURCE_INPUT_PANEL_0550="bid.documents.controlled-source-inventory.inputs";
 export const sourceInputRowId0550=inputId=>"bid.documents.controlled-source-inventory.input."+inputId;
+export function sourceInputQuery0550(value){const q=String(value||"").trim().replace(/^PJ2608-0550\s*\/\s*/i,"");return q===SOURCE_INPUT_PANEL_0550?"":q.startsWith(sourceInputRowId0550(""))?q.slice(sourceInputRowId0550("").length):q;}
+export function filterSourceInputRows0550(rows,query,openOnly=false){const q=sourceInputQuery0550(query).toLowerCase(),exact=rows.find(r=>r.id.toLowerCase()===q);return rows.filter(r=>(!openOnly||r.problems.length)&&(exact?r===exact:(r.id+" "+r.documentNo+" "+r.title+" "+r.revision).toLowerCase().includes(q)));}
 export const isSourceInputTarget0550=target=>target===SOURCE_INPUT_PANEL_0550||Boolean(target?.startsWith("bid.documents.controlled-source-inventory.input."));
 export function sourceInputNavigation0550(data){return [{id:SOURCE_INPUT_PANEL_0550,title:"A · RFQ expected / received input review",area:"A",tab:"documents"},...sourceExpectedInputs0550(data||{}).map(r=>({id:sourceInputRowId0550(r.id),title:"A / "+r.id+" / "+(r.documentNo||r.title)+" / "+r.revision,area:"A",tab:"documents"}))];}
 

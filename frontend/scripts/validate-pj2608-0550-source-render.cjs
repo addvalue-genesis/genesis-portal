@@ -16,6 +16,8 @@ try {
  assert(empty.includes('title="PJ2608-0550 / bid.documents.controlled-source-inventory"'), 'Inventory Copy ID must carry its project identity in the shared hub');
  assert(!empty.includes('undefined /'), 'Missing project ID in the shared Copy ID component');
  assert(empty.includes('Source intake loaded status'));
+ assert(empty.includes('<details class="p55-a-reference-registers">'),'Reference register remains present but starts collapsed');
+ assert(empty.includes('<details><summary>ชุดเตรียม SI'),'Opening A tools does not open all SI findings');
  assert(empty.includes('Package comparison awaiting data'));
  assert(empty.includes('ตรวจข้อมูลจาก Drive อีกครั้ง'));
  assert(empty.includes('ทะเบียนเดิม ไม่ใช่ผลตรวจล่าสุด'));

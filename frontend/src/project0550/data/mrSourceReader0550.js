@@ -104,7 +104,7 @@ export function mrReaderAvailability0550(s,review){
 export function mrReaderCoverage0550(data,model,source){
  const pages=mrReaderPages0550(source),numbers=unique(pages.map(p=>p.number)),integration=model?.integration;
  return {expectedPhysical:profile.physicalPages,availablePhysical:numbers.filter(n=>n>=1&&n<=profile.physicalPages).length,duplicatePhysical:unique(pages.filter((p,i)=>pages.findIndex(q=>q.number===p.number)!==i).map(p=>p.number)),
-  received:model?.sourceReadiness?.matched??null,expectedInputs:model?.sourceReadiness?.expected??null,reviewedInputs:model?.sourceReadiness?.reviewed??null,
+  received:model?.sourceReadiness?.matched??null,boundInputs:model?.sourceReadiness?.bound??null,receiptOpenInputs:model?.sourceReadiness?.rows?.filter(r=>r.receiptProblems.length).length??null,expectedInputs:model?.sourceReadiness?.expected??null,reviewedInputs:model?.sourceReadiness?.reviewed??null,
   recordedRequirements:(integration?.requirements||integrationRequirements0550(data)).length,reviewedRequirements:integration?.requirements?.filter(r=>r.state==='REVIEWED_MAPPING'||r.state==='NOT_APPLICABLE').length??null,
   authoredRequirements:data.integrationWorkspace?.requirements?.length||0,
   // There is deliberately no inferred clause-completeness percentage.
