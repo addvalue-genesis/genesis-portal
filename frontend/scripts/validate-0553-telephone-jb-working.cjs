@@ -67,7 +67,7 @@ async function main(){
  assert.equal(a3.previewSellTHB,1203800);assert.equal(a3.costComplete,false);
  assert.equal(x.before,x.after,'Release must not mutate Working costs');
  assert.equal(x.official.a.find(r=>r.code==='A3').amountUSD,34200);
- assert.equal(x.official.totalUSD,894590);assert.equal(x.official.issued,false);
+ assert.equal(x.official.totalUSD,894910);assert.equal(x.official.issued,false);
  const g=x.official.customerPriceBreakdown.groups.find(r=>r.code==='A3');
  assert.equal(g.rows.filter(r=>r.id.endsWith('-MGW-PHONE1-JB')&&r.amountUSD>0).length,4);
  assert.equal(g.rows.reduce((n,r)=>n+(r.amountUSD||0),0),34200);

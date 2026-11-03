@@ -74,8 +74,8 @@ async function main(){
  assert.equal(x.mto.quantitySummary.automaticCableCreditAllowed,false);
  assert.equal(x.mto.quantitySummary.netAdditionalUnpricedScopeTHB,null);
  assert.equal(x.bulk.postAdditionalTHB,0);assert.equal(x.mto.pricesComplete,false);
- assert.equal(x.official.a.find(r=>r.code==='A2').amountUSD,137000);
- assert.equal(x.official.totalUSD,894590);assert.equal(x.official.totalUSD-baseline.totalUSD,-1940);
+ assert.equal(x.official.a.find(r=>r.code==='A2').amountUSD,137130);
+ assert.equal(x.official.totalUSD,894910);assert.equal(x.official.totalUSD-baseline.totalUSD,-1620);
  for(const row of x.official.a.filter(r=>r.code==='A4')){const {commercialScopeInclusion,...unchanged}=row;assert.deepEqual(unchanged,baseline.a.find(r=>r.code===row.code));}
  assert.deepEqual(x.official.b,baseline.b);assert.deepEqual(x.official.c,baseline.c);
  const changed=[];
@@ -88,6 +88,6 @@ async function main(){
  for(const r of changed)assert(['A1','A2','A3'].includes(r.code),'Fixed-price allocation is restricted to A1/A2/A3');
  assert.equal(changed.filter(r=>r.id.endsWith('-BULK-LNA-BOX')&&r.status==='INCLUDED'&&r.amountUSD===null).length,3);
  assert.equal(x.breakdown.reconciled,true);assert.equal(x.official.issued,false);
- console.log('PASS MTO C1: 57 exact source rows; 3 unselected LNA allowances nonposting; 4 JB allowances restored at24500, alternative22000 not posted; cable overlap not credited; owner-held A1/A2 prices 241100/137000 and A+B894590; unchanged A3/A4 customer totals and B/C.');
+ console.log('PASS MTO C1: 57 exact source rows; 3 unselected LNA allowances nonposting; 4 JB allowances restored at24500, alternative22000 not posted; cable overlap not credited; Rev03 A1/A2 prices 241290/137130 and A+B894910; unchanged A3/A4 customer totals and B/C.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

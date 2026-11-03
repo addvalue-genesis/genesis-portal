@@ -26,7 +26,8 @@ async function main(){
  }
 
  const submitted=JSON.parse(fs.readFileSync(path.join(root,'snapshots/submitted.samtel.rev02.20261030.json'),'utf8'));
- const quote=new Map(submitted.rows.map(r=>[r.code,r.amountUSD]));
+ const reference=JSON.parse(fs.readFileSync(path.join(root,'snapshots/release.rev03.20261103.json'),'utf8'));
+ const quote=new Map(reference.rows.map(r=>[r.code,r.amountUSD]));
  assert.equal(submitted.totalBaseUSD,902900);
  assert.equal(submitted.rows.filter(r=>/^[AB]/.test(r.code)).reduce((n,r)=>n+(r.amountUSD||0),0),902900);
  assert.equal(submitted.messageId,'1a18a66100a2e5e0');
@@ -49,14 +50,14 @@ async function main(){
  assert.equal(x.sourceBefore,x.sourceAfter,'Commercial override mutated working cost');
  assert.equal(x.breakdown.groups.flatMap(g=>g.rows).filter(r=>r.customerBudgetIncluded).length,10);
  assert.equal(x.customerA3.filter(r=>r.remark==='Included in quoted Part A budget; no additional charge.').length,4);
- for(const r of x.official.a)assert.equal(r.amountUSD,quote.get(r.code),'Retain submitted Part A prices');
- assert.equal(x.official.a.reduce((n,r)=>n+r.amountUSD,0),704800);
+ for(const r of x.official.a)assert.equal(r.amountUSD,quote.get(r.code),'Retain current owner Rev03 Part A prices');
+ assert.equal(x.official.a.reduce((n,r)=>n+r.amountUSD,0),705120);
  assert.equal(x.official.b.find(r=>r.code==='B10').amountUSD,12960);
  assert.equal(x.official.b.find(r=>r.code==='B11').amountUSD,null);
  assert.equal(x.official.b.find(r=>r.code==='B13').amountUSD,1530);
  for(const r of x.official.b.filter(r=>!['B10','B11','B13'].includes(r.code)))assert.equal(r.amountUSD,quote.get(r.code));
- assert.equal(x.official.totalUSD,894590);
- assert.equal(x.official.totalUSD-submitted.totalBaseUSD,-8310);
+ assert.equal(x.official.totalUSD,894910);
+ assert.equal(x.official.totalUSD-submitted.totalBaseUSD,-7990);
  assert.equal(x.official.issued,false);assert.equal(x.official.commercialPriceHold.additionalPartAChargeUSD,0);
  assert.equal(x.official.commercialPriceHold.directCostComplete,false);
  assert.equal(x.zwp11.find(r=>r.row===51).extended,39200);
@@ -70,6 +71,6 @@ async function main(){
  const invalid={...x.source,a:x.source.a.map(r=>r.code==='A1'?{...r,sourceRows:r.sourceRows.map((v,i)=>i? v:{...v,qty:2})}:r)};
  const module=get(path.join(root,'officialUsdRelease0553.js'));
  assert.throws(()=>module.namespace.buildOfficialUsdRelease0553(invalid),/fixed price allocation requires/);
- console.log('PASS commercial hold: submitted A1/A2/A3 241100/137000/34200 retained; working costs unchanged; B10/B11/B13 adjusted; base894590, delta-8310; fixed total child allocation reconciles; missing cost stays open.');
+ console.log('PASS commercial hold: current Rev03 A1/A2/A3 241290/137130/34200 retained; working costs unchanged; B10/B11/B13 adjusted; base894910, delta-7990; fixed total child allocation reconciles; missing cost stays open.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

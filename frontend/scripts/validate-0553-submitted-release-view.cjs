@@ -20,7 +20,11 @@ release.require=id=>{
  if(id==='react/jsx-runtime')return {jsx:node,jsxs:node,Fragment:'FRAGMENT'};
  if(id==='./data/officialUsdRelease0553')return {
   selectSubmittedRev02Release0553:()=>snapshot,
-  buildOfficialUsdRelease0553:()=>({otherSpareItemizedAnnex:{}})
+  buildOfficialUsdRelease0553:()=>({otherSpareItemizedAnnex:{},totalUSD:894910,releasePriceReference:{revision:'Rev03',filename:'4-Scope of Supply Rev03.xlsx'}})
+ };
+ if(id==='./data/customerPriceBreakdown0553')return {
+  buildCustomerPriceBreakdown0553:()=>({groups:['A1','A2','A3','A4'].map((code,i)=>({code,mr:'MR-000'+(i+1),rows:[{key:code+'-CURRENT'}],totalUSD:[241290,137130,34200,292500][i],parentUSD:[241290,137130,34200,292500][i],varianceUSD:0}))}),
+  customerBreakdownRows0553:g=>[{item:g.code+'.1',site:'ZWP20',tag:'CURRENT-TAG',description:'CURRENT_WORKING_DETAIL',qty:1,unit:'set',unitUSD:g.parentUSD,amountUSD:g.parentUSD,remark:''}]
  };
  if(id==='./data/rev08CommercialBaseline')return {REV08_BASELINE:{summary:[]}};
  if(id==='./data/officialWorkbookTemplate0553')return {OFFICIAL_WORKBOOK_TEMPLATE_0553:{sheets:[]}};
@@ -64,7 +68,7 @@ tree=render();assert.equal(liveCalls,0);assert(text(tree).includes('16,200'));as
 assert(!all(tree).some(n=>['input','textarea','select'].includes(n.type)),'Archived prices must have no editable fields');
 const working=all(tree).find(n=>n.type==='button'&&text(n).includes('Working draft'));assert(working);working.props.onClick();
 assert.throws(render,/LIVE_MODEL_SELECTED/);assert.equal(liveCalls,1,'Live model is selected only by explicit version switch');
-// The four original Part A sheets now belong to the existing 10.3.3 tab bar.
+// Part A tabs must render current calculated rows matching Rev03, not archived Rev02 cells.
 states.length=0;states[0]='A1 MR0001';
 const releaseModel={a:[],b:[],c:[],annex:{},annexModels:{},summary:{},
  sourceCoverage:{annexOverflow:[]}};
@@ -76,11 +80,15 @@ for(const name of expected.slice(6)){
  const tab=all(releaseTree).find(n=>n.props.role==='tab'&&text(n).trim()===name);tab.props.onClick();
  releaseTree=renderRelease();
  assert(all(releaseTree).some(n=>n.props['data-release-part-a']===name.slice(0,2)));
- assert(all(releaseTree).some(n=>n.type===sheetRenderer&&n.props.sheet===snapshot.worksheets.find(s=>s.name===name)));
- assert(/Submitted\s+Rev02/.test(text(releaseTree)));
+ assert(!all(releaseTree).some(n=>n.type===sheetRenderer),'Release Part A must not render frozen Rev02');
+ assert(all(releaseTree).some(n=>n.props['data-release-a-source-key']===name.slice(0,2)+'-CURRENT'));
+ assert(text(releaseTree).includes('CURRENT_WORKING_DETAIL'));
+ assert(text(releaseTree).includes('894,910.00'));
+ assert(text(releaseTree).includes('Rev03'));
+ assert(!/Submitted\s+Rev02/.test(text(releaseTree)));
  assert.equal(all(releaseTree).filter(n=>n.props.role==='tab'&&n.props['aria-selected']).length,1);
 }
 assert.equal(JSON.stringify(snapshot),snapshotBefore,'Moving tabs must not mutate issued worksheets');
 const officialSource=fs.readFileSync(file,'utf8');
 assert(!officialSource.includes('<CustomerPriceBreakdown0553'),'Part A detail remains in Release only');
-console.log('PASS Release tabs: Official has six Scope/B/C tabs; Release has four original A1-A4 sheets after C2, exact immutable worksheet objects/values/merges; original ten-sheet download and explicit Working selection preserved.');
+console.log('PASS Release tabs: Official has six Scope/B/C tabs; Release has four live A1-A4 tabs after C2 with current source rows and Rev03 prices; no archived Part A renderer; original ten-sheet download and explicit Working selection preserved.');

@@ -1,0 +1,137 @@
+{
+  "revision": "Rev03",
+  "receivedDate": "2026-11-03",
+  "authority": "OWNER_PROVIDED_WORKBOOK",
+  "state": "CURRENT_PRICE_REFERENCE_NOT_ISSUED",
+  "filename": "4-Scope of Supply Rev03.xlsx",
+  "libraryFileId": "libfile_01d1763dc65c8191903ca64b2297eeb6",
+  "sourceWorkbookSha256": "d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e",
+  "sourceSizeBytes": 146675,
+  "worksheetCount": 6,
+  "currency": "USD",
+  "totalBaseUSD": 894910,
+  "totalSourceCell": "Scope of supply!G38",
+  "rows": [
+    {
+      "code": "A1",
+      "amountUSD": 241290,
+      "priceText": null,
+      "sourceCell": "G8"
+    },
+    {
+      "code": "A2",
+      "amountUSD": 137130,
+      "priceText": null,
+      "sourceCell": "G9"
+    },
+    {
+      "code": "A3",
+      "amountUSD": 34200,
+      "priceText": null,
+      "sourceCell": "G10"
+    },
+    {
+      "code": "A4",
+      "amountUSD": 292500,
+      "priceText": null,
+      "sourceCell": "G11"
+    },
+    {
+      "code": "B1",
+      "amountUSD": 27400,
+      "priceText": null,
+      "sourceCell": "G24"
+    },
+    {
+      "code": "B2",
+      "amountUSD": 7600,
+      "priceText": null,
+      "sourceCell": "G25"
+    },
+    {
+      "code": "B3",
+      "amountUSD": 73800,
+      "priceText": null,
+      "sourceCell": "G26"
+    },
+    {
+      "code": "B4",
+      "amountUSD": null,
+      "priceText": "N/A",
+      "sourceCell": "G27"
+    },
+    {
+      "code": "B5",
+      "amountUSD": 9900,
+      "priceText": null,
+      "sourceCell": "G28"
+    },
+    {
+      "code": "B6",
+      "amountUSD": 10700,
+      "priceText": null,
+      "sourceCell": "G29"
+    },
+    {
+      "code": "B7",
+      "amountUSD": 1000,
+      "priceText": null,
+      "sourceCell": "G30"
+    },
+    {
+      "code": "B8",
+      "amountUSD": 4600,
+      "priceText": null,
+      "sourceCell": "G31"
+    },
+    {
+      "code": "B9",
+      "amountUSD": 15300,
+      "priceText": null,
+      "sourceCell": "G32"
+    },
+    {
+      "code": "B10",
+      "amountUSD": 12960,
+      "priceText": null,
+      "sourceCell": "G33"
+    },
+    {
+      "code": "B11",
+      "amountUSD": null,
+      "priceText": "N/A",
+      "sourceCell": "G34"
+    },
+    {
+      "code": "B12",
+      "amountUSD": null,
+      "priceText": "N/A",
+      "sourceCell": "G35"
+    },
+    {
+      "code": "B13",
+      "amountUSD": 1530,
+      "priceText": null,
+      "sourceCell": "G36"
+    },
+    {
+      "code": "B14",
+      "amountUSD": 25000,
+      "priceText": null,
+      "sourceCell": "G37"
+    },
+    {
+      "code": "C1",
+      "amountUSD": 181100,
+      "priceText": null,
+      "sourceCell": "G41"
+    },
+    {
+      "code": "C2",
+      "amountUSD": 27220,
+      "priceText": null,
+      "sourceCell": "G42"
+    }
+  ],
+  "issued": false
+}

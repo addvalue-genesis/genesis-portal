@@ -53,9 +53,9 @@ async function main(){
  assert.equal(original.length,261978);
  assert.equal(crypto.createHash('sha256').update(original).digest('hex'),s.sourceWorkbookHash);
  assert.equal(s.sourceWorkbookHash,'e5f044a5e309af29cd39395632dbefa6267daa722d5c16df79b4bf7c2189aa9f');
- assert.equal(x.working.totalUSD,894590);assert.equal(x.working.issued,false);
+ assert.equal(x.working.totalUSD,894910);assert.equal(x.working.issued,false);
  assert.equal(x.confirmation.releaseBaseUSD,902900);assert.equal(x.confirmation.priceChangeUSD,0);
  assert.equal(x.confirmation.submittedPriceUnchanged,true);assert.equal(x.confirmation.confirmationEmailSent,false);
- console.log('PASS submitted Release Rev02: 10 immutable worksheets, original XLSX hash exact, total902900 and all submitted A/B/C retained; Working894590 separate; MTO confirmation price change0.');
+ console.log('PASS submitted Release Rev02: 10 immutable worksheets, original XLSX hash exact, total902900 and all submitted A/B/C retained; Working Rev03 894910 separate; MTO confirmation price change0.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

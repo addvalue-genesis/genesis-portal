@@ -16,6 +16,8 @@ export function buildCustomerPriceBreakdown0553(source,official=buildOfficialUsd
 
 // Explicit export allowlist. Do not serialize internal source objects into the customer workbook.
 function customerDescription(row){
+ if(row.code==='A3'&&row.status==='PRICED'&&row.id.endsWith('-JB'))
+  return 'Explosion-proof telephone junction box; final assembly configuration subject to confirmation.';
  if(row.customerBudgetIncluded&&row.code==='A3'&&row.id.endsWith('-JB'))
   return 'Explosion-proof junction box, terminals and cable glands in accordance with MTO C1.';
  if(row.customerBudgetIncluded&&row.code==='A3')

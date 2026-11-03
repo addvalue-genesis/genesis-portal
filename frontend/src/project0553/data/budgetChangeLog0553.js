@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R87";
+export const CHANGE_LOG_VERSION_0553="2026-11-03-R88";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261103-12",date:"2026-11-03",kind:"PRICE",tone:"caution",
+  title:"Use live Source/Working detail and owner Rev03 prices in Release A1–A4",
+  detail:"Correct the prior tab move: A1–A4 must render current source-linked calculated rows, not preserved Rev02 worksheets. Owner uploads4-Scope of Supply Rev03.xlsx, SHA256 d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e. Exact targets A1USD241290/A2USD137130/A3USD34200/A4USD292500; A+BUSD894910; C1USD181100/C2USD27220 excluded. All20 summary lines including N/A reconcile. Current quantities, supplier costs, FX31.5, markup and row/module identities remain; four JB allowancesTHB98000 stay inside MR0003 equipment costTHB926000. Existing fixed-total allocation uses current source rows with zero MR variance; no cost/rate or margin backsolve. Rev02USD902900 is retained only as historical archive. User workbook is a price reference, not proof of issuance. Original customer XLSX history unchanged; active ten-sheet export verified against Rev03.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"OWNER_REV03_REFERENCE_SELECTED__WORKING_COST_UNCHANGED",source:"Owner03-Nov2026 correction and uploaded4-Scope of Supply Rev03.xlsx"}),
  Object.freeze({id:"P553-CHANGE-20261103-11",date:"2026-11-03",kind:"UI",tone:"neutral",
   title:"Move A1–A4 worksheet tabs from Official to Release",
   detail:"Owner requests A1 MR0001, A2 MR0002, A3 MR0003 and A4 MR0004 under10.3.3 Release afterC2. Reuse the exact frozen submitted Rev02 worksheet cells, values, number formats and merges with an explicit revision label.10.3.4 shows only Scope of supply and the five B/C tabs; PartA summary totals remain. Detailed PartA review and Source return navigation belong to Release. Original ten-sheet Rev02 download and current draft exports remain intact. No financial, quantity, FX, cost-owner or module-ID changes.",

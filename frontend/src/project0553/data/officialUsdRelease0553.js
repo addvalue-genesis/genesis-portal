@@ -5,6 +5,7 @@ import {roundAnnexUnitPrices0553} from "./c1SiTagBudget0553";
 import {buildB10OfficialItemizedAnnex0553} from "./b10OfficialItemizedAnnex0553";
 import {buildOtherSpareItemizedPresentation0553} from "./otherSpareItemizedPresentation0553";
 import SUBMITTED_SAMTEL_REV02_0553 from "./snapshots/submitted.samtel.rev02.20261030.json";
+import CURRENT_RELEASE_REV03_0553 from "./snapshots/release.rev03.20261103.json";
 const freezeRelease0553=value=>{
  if(value&&typeof value==="object"&&!Object.isFrozen(value)){
   Object.values(value).forEach(freezeRelease0553);Object.freeze(value);
@@ -13,6 +14,7 @@ const freezeRelease0553=value=>{
 };
 const submittedRev02=freezeRelease0553(SUBMITTED_SAMTEL_REV02_0553);
 export const selectSubmittedRev02Release0553=()=>submittedRev02;
+export const RELEASE_PRICE_REFERENCE_0553=freezeRelease0553(CURRENT_RELEASE_REV03_0553);
 export const MTO_C1_RELEASE_CONFIRMATION_0553=Object.freeze({
  date:"2026-11-03",authority:"PROJECT_OWNER_USER",releaseRevision:"Rev02",
  releaseSourceDriveId:"14WGYqVhcrqxL0CVvrcT95yQ8nosYwgMt",
@@ -25,17 +27,19 @@ export const MTO_C1_RELEASE_CONFIRMATION_0553=Object.freeze({
 // Customer presentation derived only from the current 10.3.3 release model.
 // The commercial conversion/rounding layer never writes back to Working THB.
 export const OFFICIAL_USD_POLICY_0553=Object.freeze({thbPerUsd:31.5,incrementUSD:100,rounding:"UP_UNIT_TO_TENS_THEN_ROLLUP",unitIncrementUSD:10,summarySeedRounding:"UP_PER_SUMMARY_LINE"});
-// Owner commercial direction: retain submitted Part A prices and absorb MTO
-// reconciliation inside that budget. This does not turn missing direct cost into zero.
+// The legacy export name remains stable; current target prices come from the
+// owner's Rev03 reference, while the submitted Rev02 archive stays immutable.
 export const PART_A_SUBMITTED_PRICE_HOLD_0553=Object.freeze({
  date:"2026-11-03",authority:"PROJECT_OWNER_USER",
- baseline:"4-Scope of Supply Rev02.xlsx sent to SAMTEL 30-Oct-2026",
- baselineMessageId:"1a18a66100a2e5e0",
- quotedUSD:Object.freeze(Object.fromEntries(SUBMITTED_SAMTEL_REV02_0553.rows.filter(r=>["A1","A2","A3"].includes(r.code)).map(r=>[r.code,r.amountUSD]))),
+ baseline:RELEASE_PRICE_REFERENCE_0553.filename,
+ revision:RELEASE_PRICE_REFERENCE_0553.revision,
+ sourceWorkbookSha256:RELEASE_PRICE_REFERENCE_0553.sourceWorkbookSha256,
+ sourceLibraryFileId:RELEASE_PRICE_REFERENCE_0553.libraryFileId,
+ quotedUSD:Object.freeze(Object.fromEntries(RELEASE_PRICE_REFERENCE_0553.rows.filter(r=>["A1","A2","A3"].includes(r.code)).map(r=>[r.code,r.amountUSD]))),
  scope:"Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge",
  internalBudgetTransferAllowed:true,additionalPartAChargeUSD:0,
  directCostComplete:false,technicalApproval:false,customerIssued:false,
- note:"Retain internal ZWP11 new cabinet cost, remove superseded LNA duplicate cost and restore the existing telephone JB allowance. A1/A2/A3 savings and overruns are managed internally, not passed through as a Part A price change. B10 RACON deletion, B11 deletion and B13 update remain separate price adjustments."
+ note:"Use the owner-provided Rev03 commercial targets with current Source/Working detail. Retain ZWP11 new cabinet cost, superseded LNA nonposting treatment and the restored telephone JB allowance. Allocate current priced rows to Rev03 A1/A2/A3 totals, without changing supplier cost, FX, quantities or markup. The submitted Rev02 archive remains unchanged."
 });
 export const OFFICIAL_SHEETS_0553=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
@@ -205,7 +209,7 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
  const annex={...seed.annex,B10:b10Parents,B13:b13Rows};
  const document={...seed,policy:{...seed.policy,seedIncrementUSD:policy.seedIncrementUSD??policy.incrementUSD,incrementUSD:10},a,b,annex,totalUSD:Math.round([...a,...b].reduce((n,x)=>n+(x.amountUSD||0),0)*100)/100,
   quotedUnitRounding:{incrementUSD:10,direction:"UP",fixedTotalAllocationExceptions:Object.keys(PART_A_SUBMITTED_PRICE_HOLD_0553.quotedUSD),rollup:"SUM_ROUNDED_CHILD_AMOUNTS",workingTHBUnchanged:true},
-  commercialPriceHold:PART_A_SUBMITTED_PRICE_HOLD_0553,
+  commercialPriceHold:PART_A_SUBMITTED_PRICE_HOLD_0553,releasePriceReference:RELEASE_PRICE_REFERENCE_0553,
   preTensTotalUSD:seed.totalUSD};
  const prior=seed.otherSpareItemizedAnnex;
  const b13=prior.rows.B13.map(x=>{const priced=b13Rows.find(r=>r.sourceId===x.sourceId);return {...x,preTensUnitUSD:x.unitUSD,preTensTotalUSD:x.totalUSD,unitUSD:priced.unitUSD,totalUSD:priced.totalUSD,roundingAdjustmentUSD:Math.round((priced.totalUSD-x.sourceTotalUSD)*100)/100};});
@@ -218,6 +222,6 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
  const commercialGroups=groups.map(g=>({...g,rows:g.rows.map(r=>isMtoBudgetIncluded(r)?{...r,
   customerBudgetIncluded:true,internalCostStatus:"NOT_PRICED",
   commercialScopeBasis:"OWNER_CONFIRMED_MTO_C1_WITHIN_EXISTING_PART_A_BUDGET"}:r)}));
- document.customerPriceBreakdown={...raw,groups:commercialGroups,totalUSD:document.totalUSD,reconciled:groups.every(g=>g.matched)};
+ document.customerPriceBreakdown={...raw,groups:commercialGroups,totalUSD:document.totalUSD,reconciled:groups.every(g=>g.matched),priceReference:RELEASE_PRICE_REFERENCE_0553};
  return document;
 }
