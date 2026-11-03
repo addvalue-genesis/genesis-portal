@@ -2,7 +2,7 @@ import "../project0550/deviationRelease0550.css";
 import "../project0550/mrSourceReader0550.css";
 import {satelliteScopeNote0550} from "../project0550/data/satelliteScope0550";
 import {bidPresentationIndex,BID_TAG_TARGETS_0550} from "../project0550/bidPresentation0550";
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useState, useCallback, useRef } from "react";
 import {
   ARCHITECTURE_MANIFEST,
   BUDGETARY_ESTIMATE,
@@ -2073,6 +2073,7 @@ function ProjectModuleSearch0550({moduleIndex,onJump}){
 }
 
 export function PJ26080550(props) { return <BidWorkspaceProvider><Project0550Bidding {...props}/></BidWorkspaceProvider>; }
+const RetainedCommercial0550=React.memo(BidCommercialWorkspace);
 function Project0550Bidding({ lang = "th" }) {
   const [activeTab, setActiveTab] = useState("budget");
   const [area,setArea]=useState("B");
@@ -2080,6 +2081,7 @@ function Project0550Bidding({ lang = "th" }) {
   const [focusedSystem,setFocusedSystem]=useState("ALL");
   const [technicalDirty,setTechnicalDirty]=useState(false);
   const {data,model}=useBidWorkspace();
+  const moduleIndex=useMemo(()=>{
   const baseModuleIndex=[{id:"l3.original",title:"RFQ-02 Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,number:t.label.split(" ")[0],tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
     ...[["mr","A.1","อ่านตาม MR"],["systems","A.2","ดูตามระบบ"],["references","A.3","เอกสารอ้างอิง"],["coverage","A.4","ตรวจความครบถ้วน"]].map(([id,number,title])=>({id:"bid.documents.controlled-source-inventory."+id,number,title,area:"A",tab:"documents"})),
     ...Array.from({length:54},(_,i)=>({id:"bid.documents.controlled-source-inventory.mr.page."+(i+1),number:"A.1",title:"MR B1 / PDF "+(i+1)+(i>=2?" / printed "+(i-1):" / front matter"),area:"A",tab:"documents"})),
@@ -2123,8 +2125,14 @@ function Project0550Bidding({ lang = "th" }) {
     {id:"bid.schematic.canvas",title:"Overall / Schematic per system",tab:"schematic"},
     {id:"bid.vendor.controlled-sources",title:"Controlled vendor sources",tab:"documents"},
     ...(model?.lines||[]).map(r=>({id:"bid.budget.budget-thb.line."+r.id,title:r.description+" / Budget THB",tab:"budget"}))];
-  const moduleIndex=[...new Map([...baseModuleIndex,...bidPresentationIndex(data?.lines||[])].map(m=>[m.id,m])).values()];
-  const jump=m=>{if(technicalDirty)return;setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);};
+  return [...new Map([...baseModuleIndex,...bidPresentationIndex(data?.lines||[])].map(m=>[m.id,m])).values()];
+  },[data,model]);
+  const jump=useCallback(m=>{if(technicalDirty)return;setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);},[technicalDirty]);
+  const navigate=useCallback(id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);},[moduleIndex,jump]);
+  const openSource=useCallback(id=>jump({id,tab:"documents",area:"A"}),[jump]);
+  const legacyBudget=useMemo(()=><LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>,[]);
+  const budgetTarget=useRef(null);
+  if(area==="B"&&activeTab==="budget")budgetTarget.current=navigationTarget;
   useEffect(()=>{if(!navigationTarget||activeTab==="budget")return;const timer=setTimeout(()=>{const el=[...document.querySelectorAll("[data-component-key]")].find(n=>n.getAttribute("data-component-key")===navigationTarget);if(el){for(let n=el;n;n=n.parentElement)if(n.tagName==="DETAILS")n.open=true;el.scrollIntoView({block:"center"});}},40);return()=>clearTimeout(timer);},[navigationTarget,activeTab,area]);
   const [pagaEvidence, setPagaEvidence] = useState(null);
 
@@ -2170,15 +2178,20 @@ function Project0550Bidding({ lang = "th" }) {
         <ProjectModuleSearch0550 moduleIndex={moduleIndex} onJump={jump}/>
         {area==="A"&&<section className="p55-panel" data-component-key="l3.original"><h2>Original RFQ / อ่านข้อกำหนดตาม MR</h2><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.original"/><DocumentsView navigationTarget={navigationTarget} onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/></section>}
         {area==="C"&&<section className="p55-panel" data-component-key="l3.submissions"><h2>Communications & Submissions</h2><SourceCommunications/><ComponentCopyId projectId="PJ2608-0550" componentKey="l3.submissions"/><p>Current bidding: Working revision {data?.revision??"OPEN"} · {data?.releaseRegister?.issues.length||0} authorized snapshots · {data?.releaseRegister?.transmittals.length||0} recorded transmittals.</p><p>Historical issue: {BUDGETARY_SUBMISSION.revision} · {BUDGETARY_SUBMISSION.submittedDate} · {BUDGETARY_SUBMISSION.route}</p><p>{BUDGETARY_SUBMISSION.customerFileName}</p><button type="button" onClick={()=>jump({tab:"budget",id:"bid.budget.release"})}>เปิด Release USD ตรวจข้อเสนอรอบใหม่</button><p>การมี Preview หรือ Export ไม่เท่ากับส่งเอกสารให้ลูกค้า หลักฐาน transmittal และการอนุมัติยังต้องแยกบันทึก</p></section>}
+        {area==="B"&&<div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>}
+        {/* Retain the existing Working editor and visited projections across tabs. */}
+        <div hidden={area!=="B"||activeTab!=="budget"} data-retained-workspace="budget">
+          <RetainedCommercial0550 onNavigate={navigate} onOpenSource={openSource} navigationTarget={budgetTarget.current} legacy={legacyBudget}/>
+        </div>
         {area==="B"&&<>
-          <div className="p55-current-module" data-component-key={"bid."+activeTab}><strong>{TABS.find(t=>t.id===activeTab)?.label}</strong><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid."+activeTab}/><small>{TABS.find(t=>t.id===activeTab)?.moduleId}</small></div>
+
           {activeTab === "overview" ? <Overview /> : null}
           {activeTab === "architecture" ? <ArchitectureView onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/> : null}
           {activeTab === "systems" ? <><SystemsView key={focusedSystem} initialSystem={focusedSystem}/><CoverageMatrix/></> : null}
           {activeTab === "engineering" ? <><EquationWorkbench/><EngineeringView evidence={pagaEvidence} onEvidenceChange={setPagaEvidence} /></> : null}
           {activeTab === "execution" ? <><button type="button" onClick={()=>jump({id:"bid.engineering.equations",tab:"engineering"})}>เปิดสมการกลาง / ผลคำนวณที่ใช้ใน Working</button><ExecutionView /></> : null}
           {activeTab === "schematic" ? <SchematicWorkspace navigationTarget={navigationTarget} onOpenSystem={token=>{setFocusedSystem(token);setActiveTab("systems");}}/> : null}
-          {activeTab === "budget" ? <BidCommercialWorkspace onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}} onOpenSource={id=>jump({id,tab:"documents",area:"A"})} navigationTarget={navigationTarget} legacy={<LegacyIdentityContext.Provider value={true}><LegacyBudgetView/></LegacyIdentityContext.Provider>}/> : null}
+
           {activeTab === "risk" ? <><SourceFindings compact/><RiskView /></> : null}
           {activeTab === "documents" ? <><section className="p55-panel"><h2>Supplier evidence / Shared source register</h2><p>เอกสารลูกค้าและทะเบียนต้นฉบับอยู่ที่ A · ข้อเสนอและ Supplier master ใช้ข้อมูลกลางร่วมกับ Working Preview 1–8</p><button type="button" onClick={()=>jump({id:"l3.original",area:"A",tab:"documents"})}>เปิด A · Source Register</button><button type="button" onClick={()=>jump({id:"bid.working-preview.step.7",tab:"budget"})}>เปิด Mapping ลูกค้า ↔ Integrator ↔ Supplier</button></section><VendorWorkspace/></> : null}
           {activeTab === "registry" ? <><BidDataControls/><InputImpact0550 onNavigate={id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);}}/></> : null}

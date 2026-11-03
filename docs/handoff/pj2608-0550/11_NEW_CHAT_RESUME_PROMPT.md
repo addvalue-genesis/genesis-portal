@@ -1,27 +1,27 @@
-# New Chat Resume Prompt — PJ2608-0550
+# Resume PJ2608-0550 from the current repository
 
-Continue **PJ2608-0550 only**.
+Continue PJ2608-0550 only on the existing Official Working branch. Read root
+AGENTS.md, `01_CURRENT_STATE.json`, its `requiredReading` and latest checkpoint.
+Run `npm run context:pj0550` in frontend; record actual branch/HEAD/dirty changes.
+The command prints canonical module/presentation/colour sources and actual Git
+history; read applicable contracts and callers before editing. Do not use the old
+Oct9 PR2/port3000/staging task as a current instruction. Current launch is3050;
+PR53 is a draft checkpoint, so verify its live status separately.
 
-Do not redesign from scratch and do not rely on chat memory as the source of truth.
+Distinguish existing Git code/reference seeds, private paired Source/Preparation,
+saved browser IndexedDB and unsaved form memory. Read receipts/diagnostics before
+claiming installed DATA, retained work or a completed deployment. Preserve authored
+edits/deletions, exact source lineage and frozen issues.
 
-Before making changes, read:
-1. `docs/handoff/pj2608-0550/00_HANDOFF_CURRENT.md`
-2. `frontend/src/project0550/architectureManifest.js`
-3. `frontend/src/project0550/moduleRegistry.js`
-4. `frontend/src/project0550/projectFacts.js`
-5. `frontend/src/project0550/data/snapshots/pj2608-0550.rev07.json`
-6. `frontend/src/project0550/serviceEquationModel.js`
-7. `frontend/src/project0550/b1CostLineage.js`
-8. `frontend/src/knowledge-kernels/library.js`
-9. `frontend/src/project0550/knowledgeKernelBinding.js`
-10. `frontend/src/knowledge-kernels/regulatoryMyanmar.js`
-11. `frontend/src/project0550/regulatoryBinding.js`
-12. `frontend/src/pages/PJ26080550.jsx`
+For each proposed edit identify existing architectural/display Module IDs,
+purpose/input/method/output/limits/downstream, module-family/WBS-owner colour
+functions, explicit dependency paths and affected price/export/history checks.
+No new module or renamed ID, copied price store, duplicate cost, invented zero or
+automatic acceptance. A graph is not complete engineering impact analysis.
 
-Governing method: **First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model + Evidence Control**
-
-Rules: preserve knowledge/evidence/decision history; COMMON/GENERIC is not duplicated into project facts; project facts need evidence state/source; TBC/OPEN ≠ zero; do not force reconciliation; do not promote unsupported solution claims; frozen submissions are immutable; use grid tables for audit data; show full source detail when available; do not merge PR #2 without explicit instruction.
-
-Immediate task: **prepare/deploy a secure STAGING version for mobile/iPad access, preferably GitHub → Cloudflare Pages → Cloudflare Access, with LOCAL/STAGING/RELEASED separation and protection of internal pricing/vendor/project evidence.**
-
-Before deployment changes, inspect the current branch/build configuration and report the exact deployment architecture and any required account/domain choices.
+Current work: finish tab-performance verification, then continue existing C1
+Customer TAG → Supplier components → SI proof/activity → Working-owner mapping
+and C2 startup spares. Keep all customer systems/shared scope; use received
+MR/DTS/SPE/PHI and applicable references together. No unsolicited UI redesign or
+customer issue/merge. Report changes, actual checks and remaining limits; update
+current state/latest checkpoint before handing over.

@@ -1,28 +1,51 @@
 {
-  "schema": "pj2608-0550-handoff/1.0",
-  "generatedDate": "2026-10-09",
+  "schema": "pj2608-0550-handoff/2.0",
+  "updatedDate": "2026-11-03",
   "repo": "addvalue-genesis/genesis-portal",
-  "branch": "feat/pj2608-0550-tpp-ui-rev04",
-  "pr": 2,
-  "mergePolicy": "DO_NOT_MERGE_WITHOUT_EXPLICIT_APPROVAL",
-  "method": "First Principles + Telecom Constraint-Based Engineering + Parametric Cost Model",
-  "localRoute": "http://localhost:3000/projects/pj2608-0550",
-  "build": {
-    "command": "npm run build",
-    "dev": "npm start",
-    "lastKnownFix": "PROJECT_0550_FACTS facade export fixed in 208c6be8"
+  "branch": "feat/pj2608-0550-official-working-20261028",
+  "pr": 53,
+  "mergePolicy": "DRAFT_NO_CUSTOMER_ISSUE_OR_MERGE_WITHOUT_AUTHORIZATION",
+  "localRoute": "http://localhost:3050/projects/pj2608-0550",
+  "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
+  "contextCommand": "npm run context:pj0550",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_CONTINUITY_AND_TAB_PERFORMANCE.md",
+  "requiredReading": [
+    "AGENTS.md",
+    "docs/architecture/ADR-0550-001-integrator-traceability.md",
+    "docs/architecture/PJ2608-0550_SI_Equation_Rev03.md",
+    "docs/handoff/pj2608-0550/00_HANDOFF_CURRENT.md",
+    "docs/handoff/pj2608-0550/20261103_CONTINUITY_AND_TAB_PERFORMANCE.md"
+  ],
+  "canonicalContracts": {
+    "architecture": "frontend/src/project0550/architectureManifest.js",
+    "modules": "frontend/src/project0550/moduleRegistry.js",
+    "presentation": "frontend/src/project0550/bidPresentation0550.js",
+    "headingsAndPrinciples": "frontend/src/project0550/BidModulePresentation.jsx",
+    "tabs": "frontend/src/project0550/biddingNavigation.js",
+    "dataDependencies": "frontend/src/project0550/data/changeImpact0550.js",
+    "storage": "frontend/src/project0550/data/adapters/bidIndexedDbAdapter.js",
+    "startup": "frontend/src/project0550/BidWorkspaceContext.jsx",
+    "release": "frontend/src/project0550/data/releaseIssue0550.js"
   },
-  "b1": {
-    "controlAllowanceThb": 24000000,
-    "recoveredBottomUpThb": 11155029.32325,
-    "unreconciledGapThb": 12844970.67675,
-    "rule": "NO_FORCED_RECONCILIATION"
+  "dataContinuity": {
+    "repository": "Code, governed references, defaults and handoffs. Git pull is not a backup of saved browser work.",
+    "privateSource": "Latest documented private source Rev11 / preparation Rev07 use the existing paired loader; inspect its receipt before claiming this is installed.",
+    "savedWorkspace": "IndexedDB GENESIS-PJ2608-0550-BIDDING / workspace:active and revisions; separate from Git and origin-bound.",
+    "inMemoryDrafts": "Uncommitted forms are not a saved workspace. Retained Working tab state survives tab changes, not browser close/reload.",
+    "crossSession": "Read current Git/operating contracts, then loader receipts and saved workspace diagnostics. Do not infer a user workspace from repository seeds."
   },
-  "nextTask": "SECURE_STAGING_FOR_MOBILE_IPAD",
-  "preferredDeployment": "GitHub branch -> Cloudflare Pages -> Cloudflare Access",
-  "environments": [
-    "LOCAL",
-    "STAGING",
-    "RELEASED"
-  ]
+  "invariants": [
+    "Keep existing Module IDs and Copy ID. Display numbering is not record identity.",
+    "Read purpose, inputs, method, outputs, limits and downstream links before changing a module.",
+    "Use existing module-family and WBS owner colour functions; colour never grants approval.",
+    "Use one canonical source/requirement/offer/Working owner; no duplicate costs.",
+    "Keep missing values OPEN, source authority and engineering acceptance independent.",
+    "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
+  ],
+  "nextWork": [
+    "Finish and verify tab-performance changes against this checkpoint.",
+    "Continue C1 customer TAG to supplier component/Working owner reconciliation, then C2 startup spares.",
+    "Close evidence/engineering/pricing gaps before controlled issue; do not substitute build success for project readiness."
+  ],
+  "historicalState": "The prior 2026-10-09 branch/PR2/port3000/STAGING checkpoint remains in Git history; it is not the current launch instruction."
 }

@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-02.6-preview",
+  "version": "2026-11-03.1-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "ec916e28a7b44965334dfc1f6d4ba0fa4d54b7a9",
-  "capability": "0550 Volume I defaults to Schedule C1/C2 in tabs and 11.P preview. Existing Schedule module links reveal the full list; per-Schedule exports, canonical Working prices, full-package exports and release gates are preserved."
+  "source0550": "99651ff349601a5f644e473e6c7d4ca8d4bdb00a",
+  "capability": "0550 current-context preflight reuses canonical module IDs, principles and colour maps. Working tab is retained and unopened WP.1\u20138 bodies are deferred; source/price/issue models and C1/C2 focus remain. See the 3-Nov continuity/performance checkpoint for actual validation and browser limits."
 }

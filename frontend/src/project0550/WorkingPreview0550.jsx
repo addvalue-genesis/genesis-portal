@@ -57,7 +57,8 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
  const requirementSelect=(form,setter)=><Select label="Linked requirement" value={form.requirementId} onChange={v=>setField(setter,"requirementId",v)} options={[["","เลือกข้อกำหนด"],...requirementOptions]}/>;
  const selection=<div className="p55-wp-current"><strong>ข้อกำหนดที่เลือก: {current?current.site+" · "+current.title:"ยังไม่มีรายการ"}</strong>{current&&<><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.working-preview.requirement."+current.id}/><Select label="Working requirement" value={current.id} onChange={setSelected} options={requirementOptions}/></>}</div>;
  const sourceCounts=DOCUMENT_FAMILIES_0550.map(f=>({family:f,sources:model.sources.filter(s=>documentFamily0550(s)===f)}));
- const renderStage=stage=>{
+ const targetStage=navigationTarget?.match(/^bid\.working-preview\.step\.([1-8])$/)?.[1]||(/\.requirement\./.test(navigationTarget||"")?"4":/\.proof\./.test(navigationTarget||"")?"2":/\.activity\./.test(navigationTarget||"")?"6":null);
+ const renderStage=stage=><Module key={stage.id} id={stage.id} title={stage.title} open={expanded||String(stage.step)===targetStage} defer>{()=>{
   const common=<div className="p55-review-toolbar"><button type="button" onClick={()=>stage.target==="l3.original"?onOpenSource("l3.original"):onNavigate(stage.target)}>เปิดโมดูลต้นทาง {stage.step.toString().padStart(2,"0")}</button></div>;
   let body;
   if(stage.step===1)body=<>
@@ -99,8 +100,8 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
    <button type="button" onClick={()=>downloadBidFile(data,`PJ2608-0550_Working_1-8_R${data.revision}.json`)}>Export Working 1–8 พร้อมข้อมูลกลาง</button><Note>ADR-0550-001 ข้อ 1–14 · ข้อมูลจาก IndexedDB ชุดเดียวกับ Working/Budget/Release; export นี้เป็น backup ภายใน</Note>
   </>;
   const particulars=model.particulars.filter(p=>p.processSteps.includes(String(stage.step))&&(system==="ALL"||p.systemToken==="COMMON"||p.systemToken===system));
-  return <Module key={stage.id} id={stage.id} title={stage.title} open={expanded}>{common}{particulars.length>0&&<aside className="p55-wp-particulars" aria-label={"System Particular WP."+stage.step}><strong>System Particular ที่ใช้ในขั้นนี้</strong>{particulars.map(p=><details key={p.id}><summary>{p.title} · {p.state}</summary><p>{p.text}</p><p>ผลต่อการทำงาน: {p.impact}</p>{p.references.map((ref,i)=><button type="button" key={i} onClick={()=>onOpenSource("bid.documents.source."+ref.sourceId)}>{ref.locator} / {ref.appearance||"ข้อความ"}</button>)}<Problems items={p.problems}/></details>)}</aside>}{body}</Module>;
- };
+  return <>{common}{particulars.length>0&&<aside className="p55-wp-particulars" aria-label={"System Particular WP."+stage.step}><strong>System Particular ที่ใช้ในขั้นนี้</strong>{particulars.map(p=><details key={p.id}><summary>{p.title} · {p.state}</summary><p>{p.text}</p><p>ผลต่อการทำงาน: {p.impact}</p>{p.references.map((ref,i)=><button type="button" key={i} onClick={()=>onOpenSource("bid.documents.source."+ref.sourceId)}>{ref.locator} / {ref.appearance||"ข้อความ"}</button>)}<Problems items={p.problems}/></details>)}</aside>}{body}</>;
+ }}</Module>;
  return <section ref={root} className="p55-working-preview" data-component-key="bid.working-preview" aria-label="Working Preview 1–8">
   <aside className="p55-callout" aria-label="A readiness before B"><strong>ฐานข้อมูล A: {bidModel.sourceReadiness?.state||"A_OPEN"}</strong><p>{bidModel.sourceReadiness?.ready?"A ผ่านการตรวจรับและอ่านตามทะเบียนแล้ว · ยังต้องตรวจ SI 1–8 และ Release ต่อ":"ทำงานร่างต่อจากข้อมูลที่มีหลักฐานได้ · A ยังมีรายการรับเอกสาร/อ่าน/ทบทวนค้าง ไม่ได้แปลว่าทุกระบบไม่มีข้อมูล · การออก Issue ยังคงตรวจความพร้อมและอนุมัติตามเกณฑ์เดิม"}</p><button type="button" onClick={()=>onOpenSource("l3.original")}>กลับ A · ตรวจเอกสารที่ RFQ ต้องมี</button></aside>
   <div className="p55-wp-header"><div><h2>Working Preview · สมอง System Integrator · 1–8</h2><p>A ลูกค้า ↔ วิเคราะห์ / CAL–RPT / รวมระบบ ↔ B Supplier → Working → Budgetary → Release → Source</p></div><ComponentCopyId projectId="PJ2608-0550" componentKey="bid.working-preview"/></div>

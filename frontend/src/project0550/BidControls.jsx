@@ -1,14 +1,17 @@
-import React from "react";
+import React,{useState} from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {BidHeading,BidPrinciples} from "./BidModulePresentation";
 import {bidSection0550,bidModuleProps0550} from "./bidPresentation0550";
 export const amount=(n,currency="THB")=>typeof n==="number"&&Number.isFinite(n)?new Intl.NumberFormat("en-US",{style:"currency",currency}).format(n):"OPEN";
-export function Module({id,title,children,open=true,showToggle=false}){
+export function Module({id,title,children,open=true,showToggle=false,defer=false}){
+ // Defer only opt-in projections. Once opened, retain their editors on collapse.
+ const [visited,setVisited]=useState(false);
+ const mounted=!defer||open||visited;
  const meta=bidSection0550(id);
  const heading=meta?<BidHeading id={id} title={title}/>:<><strong>{title}</strong><ComponentCopyId projectId="PJ2608-0550" componentKey={id}/></>;
- return <details className="p55-panel p55-bid-module" data-component-key={id} data-module-number={meta?.number} data-toggle-indicator={showToggle?"true":undefined} {...bidModuleProps0550(id)} open={open}>
+ return <details className="p55-panel p55-bid-module" data-component-key={id} data-module-number={meta?.number} data-toggle-indicator={showToggle?"true":undefined} {...bidModuleProps0550(id)} open={open} onToggle={defer?e=>{if(e.target===e.currentTarget&&e.currentTarget.open)setVisited(true);}:undefined}>
   <summary>{showToggle?<><span className="p55-module-toggle" aria-hidden="true"><span className="p55-module-toggle__closed">+</span><span className="p55-module-toggle__open">−</span></span><span className="p55-module-toggle-heading">{heading}</span></>:heading}</summary>
-  <div className="p55-bid-content">{meta&&<BidPrinciples id={id}/>} {children}</div>
+  {mounted&&<div className="p55-bid-content">{meta&&<BidPrinciples id={id}/>} {typeof children==="function"?children():children}</div>}
  </details>;
 }
 export function Field({label,value,onChange,type="text",children,...props}){return <label className="p55-bid-field"><span>{label}</span>{children||<input aria-label={label} type={type} value={value??""} onChange={e=>onChange(type==="number"?(e.target.value===""?null:Number(e.target.value)):e.target.value)} {...props}/>}</label>;}

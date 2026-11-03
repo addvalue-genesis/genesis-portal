@@ -126,7 +126,18 @@ const {ParticularWorkspace0550,DeviationWorkspace0550}=require(root+'/project055
 const props={onNavigate:()=>{},onOpenSource:()=>{}};
 const html=renderToStaticMarkup(React.createElement(WorkingPreview0550,props));
 for(const stage of stages){assert(html.includes(`data-component-key="${stage.id}"`));assert(html.includes(stage.title.replace(/&/g,'&amp;')));}
-assert(html.includes('System Particular ที่ใช้ในขั้นนี้'));
+assert(!html.includes('Customer integrator supplier mapping'),'Unopened WP tables are deferred, not eagerly rendered');
+const openedStages=stages.map(stage=>renderToStaticMarkup(React.createElement(WorkingPreview0550,{...props,navigationTarget:stage.id})));
+assert(openedStages.some(markup=>markup.includes('System Particular ที่ใช้ในขั้นนี้')));
+assert(openedStages[6].includes('Customer integrator supplier mapping'),'Direct WP.7 navigation renders its unchanged mapping table');
+const {Module}=require(root+'/project0550/BidControls.jsx');
+let bodyCalls=0;const deferredBody=()=>{bodyCalls++;return React.createElement('input',{'aria-label':'Deferred draft input',defaultValue:'unsaved synthetic draft'});};
+const closedModule=renderToStaticMarkup(React.createElement(Module,{id:'bid.budget.working.lines',title:'Synthetic deferred test',open:false,defer:true},deferredBody));
+assert.equal(bodyCalls,0,'Closed opt-in body must not be evaluated');assert(closedModule.includes('Copy component ID bid.budget.working.lines'));assert(!closedModule.includes('Deferred draft input'));
+const openModule=renderToStaticMarkup(React.createElement(Module,{id:'bid.budget.working.lines',title:'Synthetic deferred test',open:true,defer:true},deferredBody));
+assert.equal(bodyCalls,1);assert(openModule.includes('Deferred draft input'));assert(openModule.includes('data-bid-module-color="official"'));
+renderToStaticMarkup(React.createElement(Module,{id:'bid.budget.working.lines',title:'Default eager test',open:false},deferredBody));assert.equal(bodyCalls,2,'Non-opt-in module compatibility');
+
 assert(renderToStaticMarkup(React.createElement(ParticularWorkspace0550,props)).includes('Document reading ledger'));
 const devHtml=renderToStaticMarkup(React.createElement(DeviationWorkspace0550,props));
 for(const col of M.DEVIATION_COLUMNS_0550)assert(devHtml.includes(col));
