@@ -105,7 +105,7 @@ export function buildOtherSpareItemizedPresentation0553(official){
    const offer=conditional.offers[code];
    const target=offer.budgetaryQuoteUSD;
    if(!offer.quotePrepared||offer.customerAccepted||offer.includedInAPlusB||
-      (code==="C2"&&Math.abs(offer.sourceSellTHB-round2(review.totals[code]-offer.excludedRows.reduce((n,x)=>n+x.extendedTHB,0)+(offer.ownerCableReplacement?.sourceReplacementDeltaTHB||0)))>0.01)||
+      (code==="C2"&&Math.abs(offer.sourceSellTHB-round2(review.totals[code]-offer.excludedRows.reduce((n,x)=>n+x.extendedTHB,0)+(offer.ownerCableReplacement?.sourceReplacementDeltaTHB||0)+(offer.ownerRfCableReplacement?.sourceReplacementDeltaTHB||0)))>0.01)||
       p.budgetaryOptionQuoteUSD!==offer.budgetaryQuoteUSD||
       p.budgetaryOfferSourceId!==offer.sourceId||
       p.budgetaryOfferPrepared!==true||p.optionExcludedFromBase!==true)
@@ -124,7 +124,7 @@ export function buildOtherSpareItemizedPresentation0553(official){
      technicalSourceId:x.technicalSourceId,technicalSourceUrl:x.technicalSourceUrl,
      leadTime:x.leadTime||"To be confirmed",
      status:c1?"OWNER_SELECTED_C1_SIX_ROW_CONDITIONAL_BUDGET":
-     (x.budgetDecision?"OWNER_SELECTED_CAT6A_DRUM_BUDGET":"CONDITIONAL_C2_BUDGETARY_OFFER__REV08_RATE_AND_TECHNICAL_SUBSTITUTION"),
+     (x.id==="C2-REV08-09"?"OWNER_SELECTED_CSS_RF_DRUM_BUDGET":x.budgetDecision?"OWNER_SELECTED_CAT6A_DRUM_BUDGET":"CONDITIONAL_C2_BUDGETARY_OFFER__REV08_RATE_AND_TECHNICAL_SUBSTITUTION"),
      financialOwnerSelected:false,physicalSkuApproved:false,customerIssued:false});
    });
    summaries[code]=freeze({sourceId:code,sourceTHB:offer.sourceSellTHB,totalUSD:target,selectedWorking:false,unitRoundingUSD:offer.unitRoundingUSD||100,
@@ -146,6 +146,6 @@ export function buildOtherSpareItemizedPresentation0553(official){
   codes:codeList,rows:freeze(byCode),summaries:freeze(summaries),
   sourceToReleaseSourceByCode:freeze({B11:true,B13:true,C1:true,C2:false}),
   confirmedOemPhysicalSkuQtyCount:0,issued:false,
-  pricingNote:"B11 not separately quoted; B13 selected Working budget; C1 and C2 proposed as USD181100/USD20890 CONDITIONAL BUDGETARY OPTIONS, excluded A+B; OEM SKU/CIF independent quotes/B10 exclusion must be confirmed before binding issue."
+  pricingNote:"B11 not separately quoted; B13 selected Working budget; C1 and C2 proposed as USD181100/USD27220 CONDITIONAL BUDGETARY OPTIONS, excluded A+B; OEM SKU/CIF independent quotes/B10 exclusion must be confirmed before binding issue."
  });
 }

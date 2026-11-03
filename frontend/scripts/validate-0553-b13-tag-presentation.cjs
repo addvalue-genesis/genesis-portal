@@ -54,9 +54,9 @@ const withSource=renderToStaticMarkup(React.createElement(from('OtherSpareOrigin
 assert(!withSource.includes('data-b13-tag-group'),'Source callback must not grant internal visibility');
 const c2=quote.otherSpareItemizedAnnex.rows.C2,option=from('data/optionBudgetaryOffer0553').selectOptionBudgetaryOffer0553().offers.C2;
 assert(c2.every(x=>Number.isInteger(x.unitUSD)&&x.qty*x.unitUSD===x.totalUSD));
-assert.equal(c2.reduce((n,x)=>n+x.totalUSD,0),20890);assert.equal(option.sourceSellTHB,650382.02);
-assert.equal(c2.reduce((n,x)=>n+Math.round(x.roundingAdjustmentUSD*100),0),20675);
-assert.deepEqual(c2.map(x=>x.unitUSD),[990,590,5840,2500,370,570,10,20,8050,40,50]);
+assert.equal(c2.reduce((n,x)=>n+x.totalUSD,0),27220);assert.equal(option.sourceSellTHB,852086.5);
+assert.equal(c2.reduce((n,x)=>n+Math.round(x.roundingAdjustmentUSD*100),0),13492);
+assert.deepEqual(c2.map(x=>x.unitUSD),[990,590,5840,2500,370,570,10,6930,8050,40,50]);
 assert.equal(rows.reduce((n,x)=>n+Math.round(x.roundingAdjustmentUSD*100),0),3000);
 const c2Review=from('data/c2TagReview0553').selectC2TagReview0553();
 assert.equal(c2Review.b10PotentialRows,7);assert.equal(c2Review.c1PotentialRows,2);
@@ -104,5 +104,5 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*?(?:/>|>
   const xml=new TextDecoder().decode(await native.readEntry(zip.find(x=>x.name==='xl/worksheets/sheet4.xml')));
   assert(!xml.includes('Reference equipment TAG'));assert(!xml.includes('ref="C10:D10"')&&!xml.includes('ref="F10:I10"'));
  }
- console.log('PASS B13: three unchanged source parents / rounded quote USD1530/THB46683; whole-USD B13/C2 units reconcile to 1530/20890 after owner DB-5P exclusion; C2 suitability and supplier-rate gaps explicit; five TAG groups/62 source records retained internally; supplementary table internal Working only, collapsed by default and excluded from customer UI/USD/THB/Breakdown and old filled files, no fictitious consumable TAG or per-TAG quantity; B5/Ex/hardware exclusions; OPEN consumption; Source/Working/Scope/USD/THB/Breakdown presentation parity.');
+ console.log('PASS B13: three unchanged source parents / rounded quote USD1530/THB46683; whole-USD B13/C2 units reconcile to 1530/27220 after owner DB-5P exclusion; C2 suitability and supplier-rate gaps explicit; five TAG groups/62 source records retained internally; supplementary table internal Working only, collapsed by default and excluded from customer UI/USD/THB/Breakdown and old filled files, no fictitious consumable TAG or per-TAG quantity; B5/Ex/hardware exclusions; OPEN consumption; Source/Working/Scope/USD/THB/Breakdown presentation parity.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

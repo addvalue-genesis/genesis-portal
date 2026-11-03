@@ -18,8 +18,8 @@ for(const code of ['C1','C2']){
  assert.equal(c.physicalSupplyInBase,false);assert.equal(c.purchaseSelectionRequired,true);
  assert.equal(c.evidencedReviewQuoteUSD,null);assert.equal(c.quantityReviewComplete,false);
  assert.equal(c.offerIsFullCoverageProof,false);assert.equal(c.postToPricing,false);
- assert.equal(c.currentOfferUSD,code==='C1'?181100:20890);
- assert.equal(c.currentOfferTHB,code==='C1'?5704650:650382.02);
+ assert.equal(c.currentOfferUSD,code==='C1'?181100:27220);
+ assert.equal(c.currentOfferTHB,code==='C1'?5704650:852086.5);
  assert.deepEqual([...new Set(c.rows.map(r=>r.mr))],['MR-0001','MR-0002','MR-0003','MR-0004']);
  for(const family of ['ODU_OR_RADIO','IDU','SCADA_NETWORK_SWITCH','DMR_BDA_ENCLOSURE_ASSEMBLY','EX_TELEPHONE','EX_SOUNDER','MARINE_RACON_MAIN'])
   assert(c.rows.some(r=>r.family===family),code+' missing system '+family);

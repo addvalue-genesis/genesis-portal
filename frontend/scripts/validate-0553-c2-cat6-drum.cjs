@@ -13,7 +13,7 @@ for(const [name,rows] of [['sourceRows',[...source.a,...source.b,...source.c]],[
 assert.equal(hash(source.annex),prior.workingAnnex,'Raw Working Annex remains unchanged');
 assert.equal(hash(official.otherSpareItemizedAnnex.rows.C1),prior.c1);
 assert.equal(hash(from('data/sparePricedBudgetReview0553').selectSparePricedBudgetReview0553().rows.C2),prior.rawC2);
-for(const p of prior.c2.rows.filter(x=>x.id!=='C2-REV08-10'))assert.deepEqual(option.rows.find(x=>x.id===p.id),p,'Other C2 row changed '+p.id);
+for(const p of prior.c2.rows.filter(x=>!['C2-REV08-10','C2-REV08-09'].includes(x.id)))assert.deepEqual(option.rows.find(x=>x.id===p.id),p,'Other C2 row changed '+p.id);
 assert.equal(option.rows.length,11);assert(!option.rows.some(x=>x.id==='C2-REV08-07'));
 const r=option.rows.find(x=>x.id==='C2-REV08-10'),d=r.budgetDecision;
 assert.equal(d.historicalRateTHBPerM,524);assert.equal(d.budgetCostTHBPerM,650);
@@ -30,12 +30,12 @@ assert(!d.factoryDrumLengthConfirmed&&!d.currentSupplierPriceConfirmed&&!d.procu
 assert.equal(d.separatePackingAndFreightCostTHB,null);
 assert.equal(r.sourceRowModuleId,'bid.budget.working.bc.c2.priced-budget-review.c2-rev08-10');
 assert.equal(option.ownerCableReplacement.priorRow.quantity,50);assert.equal(option.ownerCableReplacement.priorRow.totalUSD,1500);
-assert.equal(option.sourceSellTHB,650382.02);assert.equal(option.priorSelectedSourceSellTHB,436595.65);
-assert.equal(option.budgetaryQuoteUSD,prior.c2.budgetaryQuoteUSD-1500+8050);assert.equal(option.budgetaryQuoteUSD,20890);
-assert.equal(option.rows.reduce((n,x)=>n+x.totalUSD,0),20890);assert.equal(option.ownerCableReplacement.quoteDeltaUSD,6550);
-assert.equal(source.c.find(x=>x.code==='C2').budgetaryOptionOfferTHB,650382.02);
-assert.equal(source.c.find(x=>x.code==='C2').budgetaryOptionOfferUSD,20890);
-assert.equal(official.c.find(x=>x.code==='C2').budgetaryOptionQuoteUSD,20890);assert.equal(official.totalUSD,894910);
+assert.equal(option.sourceSellTHB,852086.5);assert.equal(option.priorSelectedSourceSellTHB,436595.65);
+assert.equal(option.budgetaryQuoteUSD,prior.c2.budgetaryQuoteUSD-1500+8050+option.ownerRfCableReplacement.quoteDeltaUSD);assert.equal(option.budgetaryQuoteUSD,27220);
+assert.equal(option.rows.reduce((n,x)=>n+x.totalUSD,0),27220);assert.equal(option.ownerCableReplacement.quoteDeltaUSD,6550);
+assert.equal(source.c.find(x=>x.code==='C2').budgetaryOptionOfferTHB,852086.5);
+assert.equal(source.c.find(x=>x.code==='C2').budgetaryOptionOfferUSD,27220);
+assert.equal(official.c.find(x=>x.code==='C2').budgetaryOptionQuoteUSD,27220);assert.equal(official.totalUSD,894910);
 const shown=official.otherSpareItemizedAnnex.rows.C2.find(x=>x.id===r.id);
 assert.equal(shown.qty,1);assert.equal(shown.unit,'drum');assert.equal(shown.totalUSD,8050);assert.equal(shown.totalTHB,253500);
 assert(shown.specification.includes('300 metres continuous cable')&&shown.specification.includes('connectors')===false);
@@ -46,13 +46,13 @@ assert.equal(css[1].partNo,'AVA5RK-50');assert.equal(css[1].unit,'EA');assert.eq
 assert(css.every(x=>!x.postToPricing&&!x.purchaseConfirmed&&!x.equivalenceToSelectedForllerConfirmed&&!x.quotationSaysFactoryDrum));
 const React=require('react'),render=require('react-dom/server').renderToStaticMarkup;
 const internal=render(React.createElement(from('C2TagReview0553').C2TagReview0553));
-assert(internal.includes('1 drum')&&internal.includes('300m continuous length')&&internal.includes('195,000.00')&&internal.includes('20,890.00'));
+assert(internal.includes('1 drum')&&internal.includes('300m continuous length')&&internal.includes('195,000.00')&&internal.includes('27,220.00'));
 const sourcePanel=render(React.createElement(from('SparePricedBudgetReview0553').SparePricedBudgetReview0553,{code:'C2',context:'working'}));
 assert.equal((sourcePanel.match(/data-component-key="bid\.budget\.working\.bc\.c2\.priced-budget-review\.c2-rev08-10"/g)||[]).length,1,'One existing source anchor must open the current replacement');
 assert(sourcePanel.includes('Current item10 replacement')&&sourcePanel.includes('253,500.00'));
 
 const customer=render(React.createElement(from('OtherSpareOriginalAnnex0553').OtherSpareOriginalAnnex0553,{code:'C2',model:official.otherSpareItemizedAnnex}));
-assert(customer.includes('300 metres')&&customer.includes('8,050.00')&&customer.includes('20,890.00'));
+assert(customer.includes('300 metres')&&customer.includes('8,050.00')&&customer.includes('27,220.00'));
 for(const text of ['OWNER_PLANNING','THB650','195,000','CSS RF cable','QT-H670003342'])assert(!customer.includes(text),'Internal reference leak '+text);
 const native=from('nativeWorkingDraft0553'),template=from('data/nativeReleaseTemplate0553.json'),bytes=Buffer.from(template.base64,'base64');
 const file={name:template.sourceName,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.length)};
@@ -64,8 +64,8 @@ const value=(xml,a,n)=>assert(cell(xml,a).includes('<v>'+n+'</v>'),a+' stale, ex
  for(const [kind,out] of [['USD',usd],['THB',thb],['Breakdown',breakdown]]){
   const zip=native.entriesFromZip(new Uint8Array(await out.blob.arrayBuffer())),read=async i=>new TextDecoder().decode(await native.readEntry(zip.find(x=>x.name==='xl/worksheets/sheet'+i+'.xml')));
   const scope=await read(1),annex=await read(6),isThb=kind==='THB';
-  value(scope,'F42',isThb?650382.02:20890);value(scope,'G42',isThb?650382.02:20890);
-  value(annex,'G14',1);value(annex,'H14',isThb?253500:8050);value(annex,'I14',isThb?253500:8050);value(annex,'I19',isThb?650382.02:20890);
+  value(scope,'F42',isThb?852086.5:27220);value(scope,'G42',isThb?852086.5:27220);
+  value(annex,'G14',1);value(annex,'H14',isThb?253500:8050);value(annex,'I14',isThb?253500:8050);value(annex,'I19',isThb?852086.5:27220);
   assert(cell(annex,'D14').includes('300m drum'));assert(cell(annex,'E14').includes('TECKNIKABEL'));
   assert(cell(annex,'E14').includes('300 metres continuous cable'));
   for(const text of ['OWNER_PLANNING','195000','budgetCostTHBPerM','QT-H670003342'])assert(!annex.includes(text),'Internal cost/reference exported '+text);
@@ -81,5 +81,5 @@ const value=(xml,a,n)=>assert(cell(xml,a).includes('<v>'+n+'</v>'),a+' stale, ex
  const fixed=await native.buildNativeOfficialRelease0553(oldFile,official),again=await native.buildNativeOfficialRelease0553({name:usd.filename,arrayBuffer:()=>usd.blob.arrayBuffer()},official);
  assert.deepEqual(new Uint8Array(await fixed.blob.arrayBuffer()),new Uint8Array(await usd.blob.arrayBuffer()));
  assert.deepEqual(new Uint8Array(await again.blob.arrayBuffer()),new Uint8Array(await usd.blob.arrayBuffer()));
- console.log('PASS C2 CAT6A: owner300m drum / THB650 planning cost /195000×1.30÷31.5→USD8050; C220890, A+B894910; other ten C2 rows and all A/B/C1/raw sources unchanged; Source/Scope/UI/USD/THB/Breakdown/stale/repeated exports agree; CSS quotes nonposting.');
+ console.log('PASS C2 CAT6A: owner300m drum / THB650 planning cost /195000×1.30÷31.5→USD8050; C227220, A+B894910; all unrelated C2 rows and A/B/C1/raw sources unchanged; subsequent RF owner replacement checked separately; Source/Scope/UI/USD/THB/Breakdown/stale/repeated exports agree; CSS quotes nonposting.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

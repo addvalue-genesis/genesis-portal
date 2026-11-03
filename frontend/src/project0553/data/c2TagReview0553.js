@@ -10,6 +10,7 @@ import EXION from "./quotes/EXION-1260576-R0.current.json";
 import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {selectMGWR2Selected0553} from "./mgwP26058R2Selected0553";
 import {C2_CAT6A_DRUM_DECISION_0553 as cableDrum} from "./c2Cat6aDrumDecision0553";
+import {C2_RF_DRUM_DECISION_0553 as rfDrum} from "./c2RfDrumDecision0553";
 import {CSS_RF_CABLE_REFERENCES_0553} from "./cssRfCableReferences0553";
 const freeze=Object.freeze;
 const mr1=x=>x.mr==="MR-0001",mr2=x=>x.mr==="MR-0002",mr3=x=>x.mr==="MR-0003",mr4=x=>x.mr==="MR-0004";
@@ -55,8 +56,8 @@ export function selectC2TagReview0553(){
    ref(null,"OEM wiring/BOM required","Parent equipment TAG only; fuse rating and exact protected circuit are unknown"),
    "แยก fuse ตามชนิด/กระแส/แรงดันจาก wiring และตรวจ B10; จำนวน 8 เดิมยังไม่ยืนยัน"],
   ["RF feeder operating-spare cable",dmrAntenna,[],
-   ref(feeder.model,"MGW P26-058_R2 UHF-4","Selected installed 1/2-inch 50-ohm package; old 7/8-inch unit rate is not a verified replacement rate"),
-   "ทบทวน 7/8 นิ้วเดิมเทียบชุดที่เลือก 1/2 นิ้ว; ต้องปิดข้อกำหนด/technical acceptance และราคาต่อเมตรใหม่"],
+   ref(rfDrum.partNo,rfDrum.historicalQuote,"Owner-selected CSS CommScope1/2-inch305m drum at historical THB550/m. Selected installed FORLLER UHF-4 remains unchanged; technical equivalence, connectors and factory packing still require confirmation."),
+   "เสนอ CSS CommScope LDF4RK-50A1/2 นิ้ว 1Drum305m; ตรวจเทียบสาย FORLLER ที่ติดตั้ง การสูญเสีย RF หัวต่อ ข้อกำหนดไฟ/สิ่งแวดล้อม และบรรจุภัณฑ์"],
   ["CAT6A data cable operating spare",x=>lan(x)||idu(x),[],
    ref(null,cableDrum.historicalQuote,"Owner selects TECKNIKABEL CAT6A S/FTP GSWB SHF1, one300m drum; THB650/m is planning cost, not a new supplier quote. Final SKU/technical compatibility and factory drum size unconfirmed."),
    "แยก stock C2 ทั้ง Drum300m จากวัสดุติดตั้ง A/field bulk และ B13; ยืนยันรุ่น บรรจุภัณฑ์และราคาปัจจุบัน"],

@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R84";
+export const CHANGE_LOG_VERSION_0553="2026-11-03-R85";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261103-09",date:"2026-11-03",kind:"PRICE",tone:"caution",
+  title:"Offer C2 RF cable as one CSS CommScope1/2-inch305m drum",
+  detail:"Owner replaces current C2 RF cable30m row with a drum using CSS1/2-inch reference. Existing rowC2-REV08-09 now offers1drum×305m CommScope HELIAX LDF4RK-50A. CSS QT-H670003342 dated30-Jan-2024 to Royaltec quotes305MT atTHB550/MT; no new price or factory drum/MOQ confirmation is implied. Cost167750×existingRelease1.30=SELL218075 /31.5=USD6923.02, rounded UP toUSD6930 per drum. Replace oldUSD600/SELLTHB16370.52 once, without repricing the other ten C2 rows. C2USD20890→27220 (+6330); SourceSELLTHB650382.02→852086.50. Existing CAT6A300m drumUSD8050, four separate Type-N connectorsUSD40 each, C1USD181100 and A+BUSD894910 remain. CSS quote4.3-10 connectors are not selected and not added; reconcile exact cable/connector compatibility before purchase. PartA installed FORLLER/UHF4 and all source history/FX/module IDs unchanged. Source/Scope/Release/Annex/USD/THB/Breakdown consume the same option owner. RF technical acceptance, current quote, factory packing and separate freight/packing remain unconfirmed; no purchase or customer issue approval.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.c2","bid.budget.pricing.official"]),priceImpact:"WORKING_SOURCE_CHANGED",
+  source:"Owner03-Nov2026: selected RF item should be offered as a drum using CSS1/2-inch cable"}),
  Object.freeze({id:"P553-CHANGE-20261103-08",date:"2026-11-03",kind:"UI",tone:"neutral",
   title:"Apply the nine-column compact layout to C1 as well as C2",
   detail:"Owner screenshot shows C1 Capital Spares still has tall header/body rows. Previous layout correction targeted C2 only. Both optional Annexes have nine columns, so use the same option-only class and explicit100% colgroup,1280px minimum width,12px font and content-sized rows for C1/C2. Lead time keeps usable width instead of forcing vertical text. B11/B13 and other tables stay outside this rule; Source buttons, text, financial values, module IDs and native Excel geometry unchanged. C1USD181100, C2USD20890 and A+BUSD894910 retained.",

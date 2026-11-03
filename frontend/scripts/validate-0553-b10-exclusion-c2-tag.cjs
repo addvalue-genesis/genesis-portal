@@ -23,9 +23,9 @@ assert(b10.every(x=>Number.isInteger(x.unitUSD)&&x.qty*x.unitUSD===x.totalUSD));
 assert(official.annex.B10.every(x=>Number.isInteger(x.unitUSD)&&x.qty*x.unitUSD===x.totalUSD));
 for(const p of official.annex.B10)assert.equal(b10.filter(x=>x.parentSourceId===p.sourceId).reduce((n,x)=>n+x.totalUSD,0),p.totalUSD);
 const money=rows=>rows.map(x=>({id:x.id,qty:x.qty,unitUSD:x.unitUSD,totalUSD:x.totalUSD}));
-assert.deepEqual(money(audit.rows(c2).filter(x=>x.id!=='C2-REV08-10')),money(before.c2.filter(x=>x.id!=='C2-REV08-10')));assert.deepEqual(money(audit.rows(b13)),money(before.b13));
+assert.deepEqual(money(audit.rows(c2).filter(x=>!['C2-REV08-10','C2-REV08-09'].includes(x.id))),money(before.c2.filter(x=>!['C2-REV08-10','C2-REV08-09'].includes(x.id))));assert.deepEqual(money(audit.rows(b13)),money(before.b13));
 assert(c2.every(x=>x.tag&&!x.tag.includes('TAG by OEM')&&x.specification.length>70));
-assert(c2.every(x=>Number.isInteger(x.unitUSD)&&x.qty*x.unitUSD===x.totalUSD));assert.equal(c2.reduce((n,x)=>n+x.totalUSD,0),20890);
+assert(c2.every(x=>Number.isInteger(x.unitUSD)&&x.qty*x.unitUSD===x.totalUSD));assert.equal(c2.reduce((n,x)=>n+x.totalUSD,0),27220);
 assert(c2.find(x=>x.id==='C2-REV08-03').specification.includes('212-02-6008-510'));assert(c2.find(x=>x.id==='C2-REV08-02').specification.includes('PWR-IE65W-PC-DC'));
 assert(c2.find(x=>x.id==='C2-REV08-05').tag.includes('TCAB-508-'));assert(c2.find(x=>x.id==='C2-REV08-08').tag.startsWith('COMMON'));assert(b13.every(x=>x.tag==='COMMON'));
 const installed=new Set(from('data/spareCoverageEngineering0553').selectSpareCoverageEngineering0553().installed.map(x=>x.key));
@@ -54,5 +54,5 @@ const xmls=async blob=>{const entries=native.entriesFromZip(new Uint8Array(await
  const bad=native.rebuildZip(entries,new Map([['xl/worksheets/sheet2.xml',new TextEncoder().encode(stale)]])),badFile={name:'Previous-B10.xlsx',arrayBuffer:async()=>bad.buffer.slice(bad.byteOffset,bad.byteOffset+bad.byteLength)};
  const repaired=await native.buildNativeOfficialRelease0553(badFile,official);assert(!(await xmls(repaired.blob))[2].includes('RACON control-box gasket'));
  const review=await native.buildNativeB10ItemizedReview0553(badFile,from('data/b10NativeAnnexReview0553').selectB10NativeAnnexReview0553());assert.equal(review.rowCount,11);assert(!(await xmls(review.blob))[2].includes('RACON control-box gasket'));
- console.log('PASS B10 RACON exclusion: raw source preserved, THB104422.50 removed, USD12960/total894910, 11 whole-USD rows; C2 exact TAG/specification with only owner-selected CAT6A drum changed, B13 COMMON; actual USD/THB, stale and repeated native exports reconcile.');
+ console.log('PASS B10 RACON exclusion: raw source preserved, THB104422.50 removed, USD12960/total894910, 11 whole-USD rows; C2 exact TAG/specification with only owner-selected cable drums changed, B13 COMMON; actual USD/THB, stale and repeated native exports reconcile.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

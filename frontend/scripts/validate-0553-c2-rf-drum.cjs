@@ -1,0 +1,70 @@
+// Independent R84 baseline: only the owner-selected RF spare row may change.
+const assert=require('node:assert/strict'),path=require('node:path'),crypto=require('node:crypto'),babel=require('@babel/core');
+const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
+for(const e of ['.js','.jsx'])require.extensions[e]=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'}}],'@babel/preset-react']}).code,f):old(m,f);
+require.extensions['.css']=()=>{};
+const from=p=>require(path.join(root,'project0553',p)),hash=x=>crypto.createHash('sha256').update(JSON.stringify(x)).digest('hex');
+const before=require('./fixtures/0553-before-c2-rf-drum-20261103.json');
+const source=from('data/releaseCommercialModel0553').buildReleaseCommercialModel0553({thbPerUsd:31.5});
+const official=from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(source);
+const offer=from('data/optionBudgetaryOffer0553').selectOptionBudgetaryOffer0553().offers.C2;
+for(const [name,rows] of [['sourceRows',[...source.a,...source.b,...source.c]],['officialRows',[...official.a,...official.b,...official.c]]])
+ for(const p of before[name].filter(x=>x.code!=='C2'))assert.equal(hash(rows.find(x=>x.code===p.code)),p.sha256,'Unrelated parent changed '+name+'/'+p.code);
+assert.equal(hash(source.annex),before.workingAnnex);assert.equal(hash(official.otherSpareItemizedAnnex.rows.C1),before.c1);
+assert.equal(hash(from('data/sparePricedBudgetReview0553').selectSparePricedBudgetReview0553().rows.C2),before.rawC2);
+for(const p of before.c2.rows.filter(x=>x.id!=='C2-REV08-09'))assert.deepEqual(offer.rows.find(x=>x.id===p.id),p,'Unrelated C2 row changed '+p.id);
+const rf=offer.rows.find(x=>x.id==='C2-REV08-09'),d=rf.budgetDecision,change=offer.ownerRfCableReplacement;
+assert.equal(d.partNo,'LDF4RK-50A');assert.equal(d.supplier,'CSS');assert.equal(d.historicalQuoteDate,'2024-01-30');
+assert.equal(d.budgetCostTHBPerM,550);assert.equal(d.historicalRateTHBPerM,550);
+assert.equal(d.totalLengthM,305);assert.equal(d.lengthPerDrumM,305);assert.equal(rf.quantity,1);assert.equal(rf.qty,1);assert.equal(rf.unit,'drum');
+assert.equal(rf.extendedCostTHB,305*550);assert.equal(rf.extendedCostTHB,167750);
+assert.deepEqual(rf.pricingBasis,{directCostTHB:167750,samTelShareTHB:33550,addvalueTargetProfitTHB:8387.5,omissionReserveTHB:8387.5,customerSellTHB:218075});
+assert.equal(rf.unitPriceTHB,218075);assert.equal(rf.extendedTHB,218075);
+assert.equal(rf.sourceTotalUSD,Math.round(218075/31.5*100)/100);
+assert.equal(rf.unitUSD,Math.ceil((167750*1.3/31.5)/10)*10);assert.equal(rf.unitUSD,6930);assert.equal(rf.totalUSD,6930);
+assert.equal(rf.roundingAdjustmentUSD,6.98);assert.equal(rf.preTensTotalUSD,6923.02);
+assert.equal(change.priorRow.quantity,30);assert.equal(change.priorRow.totalUSD,600);assert.equal(change.priorRow.extendedTHB,16370.52);
+assert.equal(change.quoteDeltaUSD,6330);assert.equal(change.sourceReplacementDeltaTHB,201704.48);
+assert.equal(offer.sourceSellTHB,before.c2.sourceSellTHB+change.sourceReplacementDeltaTHB);assert.equal(offer.sourceSellTHB,852086.5);
+assert.equal(offer.budgetaryQuoteUSD,before.c2.budgetaryQuoteUSD-600+6930);assert.equal(offer.budgetaryQuoteUSD,27220);
+assert.equal(offer.rows.reduce((n,r)=>n+r.totalUSD,0),27220);assert.equal(offer.rows.length,11);
+assert.equal(offer.rows.find(x=>x.id==='C2-REV08-10').totalUSD,8050);
+const connectors=offer.rows.find(x=>x.id==='C2-REV08-11');assert.equal(connectors.quantity,4);assert.equal(connectors.unitUSD,40);assert.equal(connectors.totalUSD,160);
+assert(!rf.materials.includes('connectors included'));assert(rf.materials.includes('connectors excluded'));
+assert(!d.currentSupplierPriceConfirmed&&!d.factoryDrumLengthConfirmed&&!d.technicalCompatibilityConfirmed&&!d.procurementApproved);
+assert.equal(d.separatePackingAndFreightCostTHB,null);assert.equal(rf.evidenceClass,'HISTORICAL_CSS_QUOTE_NOT_CURRENT_VENDOR_QUOTE');
+const a=from('data/mgwP26058R2Selected0553').selectMGWR2Selected0553('UHF-4');assert.equal(a.manufacturer,'FORLLER');assert.equal(a.unitPriceUSD,846);assert.equal(a.quantity,3);
+assert.equal(official.totalUSD,894910);assert.equal(official.c.find(x=>x.code==='C2').budgetaryOptionQuoteUSD,27220);
+const React=require('react'),render=require('react-dom/server').renderToStaticMarkup;
+const customer=render(React.createElement(from('OtherSpareOriginalAnnex0553').OtherSpareOriginalAnnex0553,{code:'C2',model:official.otherSpareItemizedAnnex}));
+for(const text of ['LDF4RK-50A','305 metres','6,930.00','27,220.00'])assert(customer.includes(text));
+for(const text of ['167,750','550.00','QT-H670003342','HISTORICAL_CSS_QUOTE'])assert(!customer.includes(text));
+const panel=render(React.createElement(from('SparePricedBudgetReview0553').SparePricedBudgetReview0553,{code:'C2',context:'working'}));
+for(const suffix of ['09','10'])assert.equal((panel.match(new RegExp('data-component-key="bid\\.budget\\.working\\.bc\\.c2\\.priced-budget-review\\.c2-rev08-'+suffix+'"','g'))||[]).length,1);
+assert(panel.includes('167,750.00')&&panel.includes('218,075.00')&&panel.includes('305m'));
+const native=from('nativeWorkingDraft0553'),t=from('data/nativeReleaseTemplate0553.json'),bytes=Buffer.from(t.base64,'base64');
+const file={name:t.sourceName,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.length)};
+const cell=(xml,a)=>xml.match(new RegExp('<c\\b[^>]*r="'+a+'"[^>]*?(?:/>|>([\\s\\S]*?)</c>)'))?.[1]||'',num=(xml,a,n)=>assert(cell(xml,a).includes('<v>'+n+'</v>'),a+' stale, expected '+n);
+(async()=>{
+ const usd=await native.buildNativeOfficialRelease0553(file,official),thb=await native.buildNativeWorkingDraft0553(file,source);
+ const breakdown=await from('nativePriceBreakdown0553').buildNativePriceBreakdown0553(file,official,from('data/customerPriceBreakdown0553').buildCustomerPriceBreakdown0553(source,official));
+ for(const [kind,out] of [['USD',usd],['THB',thb],['Breakdown',breakdown]]){
+  const zip=native.entriesFromZip(new Uint8Array(await out.blob.arrayBuffer())),read=async i=>new TextDecoder().decode(await native.readEntry(zip.find(x=>x.name==='xl/worksheets/sheet'+i+'.xml')));
+  const scope=await read(1),c2=await read(6),isThb=kind==='THB';
+  for(const col of ['F42','G42'])num(scope,col,isThb?852086.5:27220);
+  num(c2,'G13',1);num(c2,'H13',isThb?218075:6930);num(c2,'I13',isThb?218075:6930);num(c2,'I19',isThb?852086.5:27220);
+  num(c2,'G14',1);num(c2,'I14',isThb?253500:8050);num(c2,'G15',4);num(c2,'I15',isThb?connectors.extendedTHB:160);
+  assert(cell(c2,'E13').includes('LDF4RK-50A')&&cell(c2,'E13').includes('305 metres'));
+  for(const text of ['167750','budgetCostTHBPerM','CSS QT-H670003342'])assert(!c2.includes(text));
+  if(!isThb)num(scope,'G38',894910);
+ }
+ // An old30m/USD600 filled export must update without residual cells or repeated uplift.
+ const entries=native.entriesFromZip(new Uint8Array(await usd.blob.arrayBuffer()));
+ let xml=new TextDecoder().decode(await native.readEntry(entries.find(x=>x.name==='xl/worksheets/sheet6.xml')));
+ for(const [a,v] of [['G13',30],['H13',20],['I13',600],['I19',20890]])xml=xml.replace(new RegExp('(<c\\b[^>]*r="'+a+'"[^>]*>)[\\s\\S]*?</c>'),'$1<v>'+v+'</v></c>');
+ const oldBytes=native.rebuildZip(entries,new Map([['xl/worksheets/sheet6.xml',new TextEncoder().encode(xml)]]));
+ const repaired=await native.buildNativeOfficialRelease0553({name:'Old30m.xlsx',arrayBuffer:async()=>oldBytes.buffer.slice(oldBytes.byteOffset,oldBytes.byteOffset+oldBytes.length)},official);
+ assert.deepEqual(new Uint8Array(await repaired.blob.arrayBuffer()),new Uint8Array(await usd.blob.arrayBuffer()));
+ assert.deepEqual(from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(source),official);
+ console.log('PASS RF CSS drum305m:550THB/m,167750×1.30÷31.5→USD6930; C227220/A+B894910; other ten C2 rows/CAT6A/Type-N4 and A/B/C1/raw history unchanged; Source/Scope/UI/USD/THB/Breakdown/stale export agree.');
+})().catch(e=>{console.error(e);process.exitCode=1;});

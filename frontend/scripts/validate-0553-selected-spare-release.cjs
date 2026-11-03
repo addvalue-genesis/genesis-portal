@@ -31,7 +31,7 @@ assert.deepEqual(rows.map(x=>x.unitUSD),[16500,9100,900,15300,40900,97500]);
 assert.deepEqual(rows.map(x=>x.qty),[1,1,2,1,1,1]);
 assert.equal(rows.reduce((s,x)=>s+x.totalUSD,0),181100);
 for(const x of rows){assert.equal(x.qty*x.unitUSD,x.totalUSD);assert.equal(x.totalTHB,x.totalUSD*31.5);assert(x.sourceSelectionId);assert.equal(x.sourceId,'C1-PTTEP-01');assert.equal(x.physicalSkuApproved,false);}
-assert.equal(quote.c.find(x=>x.code==='C2').budgetaryOptionQuoteUSD,20890);
+assert.equal(quote.c.find(x=>x.code==='C2').budgetaryOptionQuoteUSD,27220);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 for(const code of ['B11','B13','C1','C2']){
  const html=renderToStaticMarkup(React.createElement(from('OtherSpareOriginalAnnex0553').OtherSpareOriginalAnnex0553,{code,model:quote.otherSpareItemizedAnnex}));
