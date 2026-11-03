@@ -199,7 +199,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
    }else if(i===4&&tag==="mergeCells"){
     const refs=s=>[...s.matchAll(/<mergeCell\b[^>]*ref="([^"]+)"/g)].map(x=>x[1]);
     assert(refs(old).every(ref=>refs(xml).includes(ref)),"B13 must preserve every original merge");
-    assert.equal(refs(xml).length,refs(old).length+12,"Only B13 unpriced reference-area merges added");
+    assert.equal(refs(xml).length,refs(old).length,"B13 customer export preserves only original merges");
    }else assert.equal(get(xml),get(old),name+' original '+tag);
   }
   assert.deepEqual(xml.match(/<f\b[^>]*>[\s\S]*?<\/f>/g)||[],old.match(/<f\b[^>]*>[\s\S]*?<\/f>/g)||[],name+' original formulas');

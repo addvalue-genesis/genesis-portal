@@ -207,7 +207,7 @@ const testFile={name:filename,arrayBuffer:async()=>inputZip.buffer.slice(inputZi
    if(before[i].name==="xl/worksheets/sheet4.xml"){
     const refs=xml=>[...xml.matchAll(/<mergeCell\b[^>]*ref="([^"]+)"/g)].map(x=>x[1]);
     assert(refs(oldXml).every(ref=>refs(newXml).includes(ref)),"B13 preserves original merges");
-    assert.equal(refs(newXml).length,refs(oldXml).length+12,"B13 adds only reference-area merges");
+    assert.equal(refs(newXml).length,refs(oldXml).length,"B13 export preserves only original merges");
     const withoutMerges=xml=>structure(xml).replace(/<mergeCells\b[^>]*>[\s\S]*?<\/mergeCells>/,'');
     assert.equal(withoutMerges(newXml),withoutMerges(oldXml),"B13 preserves non-merge structure");
    }else assert.equal(structure(newXml),structure(oldXml),"Native structural content/merges changed "+before[i].name);

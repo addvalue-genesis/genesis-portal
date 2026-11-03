@@ -449,10 +449,9 @@ export async function buildNativeWorkingDraft0553(file,model){
   if(Number.isFinite(audit?.varianceTHB)&&Math.abs(audit.varianceTHB)>0.01)
    warnings.push(code+" line-to-summary variance THB "+audit.varianceTHB.toFixed(2)+" — no balancing item created");
   if(code.startsWith("C"))warnings.push(offered?code+" CONDITIONAL BUDGETARY OFFER, excluded from A+B; OEM/CIF and B10 stock exclusion remain open":code+" optional price not quoted: verified direct cost required");
-  if(code==="B13")writeB13TagReferences0553(rows,model.b13TagPresentation);
   const sheetName="xl/worksheets/sheet"+(i+2)+".xml";
   replaceAll(sheetName,rows);
-  if(code==="B13")changes.set(sheetName,encode.encode(mergeB13TagReferences0553(decode.decode(changes.get(sheetName)),model.b13TagPresentation)));
+  if(code==="B13")changes.set(sheetName,encode.encode(removeB13ReferenceMerges0553(decode.decode(changes.get(sheetName)))));
  }
  // Refresh the existing quantity formula cache after replacing TAG rows with
  // four MR lots. Preserve the formula itself and the original workbook parts.
@@ -519,35 +518,15 @@ function expandOriginalB10To14Rows0553(xml){
   /\bht=/.test(tag)?tag.replace(/\bht="[^"]*"/,'ht="115"'):tag.replace(">",' ht="115" customHeight="1">'));
 }
 
-// Reference rows are unpriced and may only occupy the original blank body.
-// They never enter Qty×Unit, category totals or independent stock counts.
-function writeB13TagReferences0553(cells,presentation){
- if(!presentation?.tagGroups?.length||presentation.tagGroups.length>6)throw Error("B13 native TAG schedule missing");
- const put=(address,value)=>{
-  if(cells.has(address)&&cells.get(address)!=="")throw Error("B13 reference would overwrite a price/source cell "+address);
-  cells.set(address,value);
- };
- [["B","Ref."],["C","Reference equipment TAG"],["D",""],["E","Site(s)"],["F","System"]].forEach(([col,text])=>put(col+"10",text));
- presentation.tagGroups.forEach((g,i)=>{
-  const row=11+i;
-  [["B",String(i+1)],["C",g.tags.join("; ")],["D",""],["E",g.sites.join(", ")],["F",g.mr+" / "+g.system]].forEach(([col,text])=>put(col+row,text));
- });
- // Explicit empty quantity/price cells also suppress obsolete template formulas.
- for(let row=10;row<=16;row++)for(const col of ["G","H","I"])put(col+row,"");
-}
-function mergeB13TagReferences0553(xml,presentation){
- const wanted=[];
- for(let row=10;row<11+presentation.tagGroups.length;row++)wanted.push("C"+row+":D"+row,"F"+row+":I"+row);
+// Owner03-Nov2026 removes the supplementary B13 equipment-reference table.
+// Body cells are already cleared by both exporters; also remove only the
+// reference-table merges introduced by earlier versions when reusing a file.
+function removeB13ReferenceMerges0553(xml){
  const section=xml.match(/<mergeCells\b[^>]*>([\s\S]*?)<\/mergeCells>/);
- if(!section)throw Error("B13 original merge section missing");
- const existing=[...section[1].matchAll(/<mergeCell\b[^>]*ref="([^"]+)"[^>]*\/>/g)].map(x=>x[1]);
- for(const ref of existing){
-  const m=ref.match(/^([A-Z]+)(\d+):([A-Z]+)(\d+)$/);
-  if(m&&Number(m[2])<=10+presentation.tagGroups.length&&Number(m[4])>=10&&!wanted.includes(ref))
-   throw Error("B13 reference area conflicts with original merge "+ref);
- }
- const all=[...new Set([...existing,...wanted])];
- return xml.replace(section[0],'<mergeCells count="'+all.length+'">'+all.map(ref=>'<mergeCell ref="'+ref+'"/>').join("")+'</mergeCells>');
+ if(!section)return xml;
+ const owned=new Set();for(let row=10;row<=16;row++){owned.add("C"+row+":D"+row);owned.add("F"+row+":I"+row);}
+ const kept=[...section[1].matchAll(/<mergeCell\b[^>]*ref="([^"]+)"[^>]*\/>/g)].map(x=>x[1]).filter(ref=>!owned.has(ref));
+ return xml.replace(section[0],'<mergeCells count="'+kept.length+'">'+kept.map(ref=>'<mergeCell ref="'+ref+'"/>').join("")+'</mergeCells>');
 }
 // Generate a separate English customer workbook from original geometry.
 // Only explicitly selected customer fields are written; no internal model dump,
@@ -634,7 +613,6 @@ export async function buildNativeOfficialRelease0553(file,model){
    put("B"+totalRow,"Total (USD)");
    put("I"+totalRow,summary?.priceText||price(isB10?
     [...model.b,...model.c].find(r=>r.code===code).amountUSD:summary?.totalUSD));
-   if(code==="B13")writeB13TagReferences0553(cells,{tagGroups:summary.tagSchedule});
    if(code.startsWith("C"))put("B21","Optional spares; excluded from Total A+B. Final configuration and delivery terms subject to agreement.");
    if(code==="B11"){put("D6","Not separately quoted. Tools expressly included in the equipment supply remain included.");put("H6","N/A");put("I6","N/A");}
 
@@ -656,7 +634,7 @@ export async function buildNativeOfficialRelease0553(file,model){
    const re=new RegExp('(<c\\b[^>]*\\br="'+address+'"[^>]*>)([\\s\\S]*?)(</c>)');
    xml=xml.replace(re,(_match,start,_body,end)=>start+formula+'<v>'+value+'</v>'+end);
   }
-  if(i===4)xml=mergeB13TagReferences0553(xml,{tagGroups:model.otherSpareItemizedAnnex.summaries.B13.tagSchedule});
+  if(i===4)xml=removeB13ReferenceMerges0553(xml);
   sheets.set(name,xml);
  }
  const style=entries.find(e=>e.name==="xl/styles.xml");

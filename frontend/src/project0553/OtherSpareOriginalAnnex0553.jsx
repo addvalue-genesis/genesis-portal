@@ -2,7 +2,7 @@ import React from "react";
 const fmt=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"N/A";
 const headings={B11:"SPECIAL TOOLS FOR OPERATION AND MAINTENANCE",B13:"CONSUMABLES",
  C1:"CAPITAL SPARE PARTS",C2:"TWO YEARS OPERATION SPARE PARTS"};
-export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null,currency="USD"}){
+export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null,currency="USD",internal=false}){
  const rows=model?.rows?.[code],summary=model?.summaries?.[code];
  if(!rows||!summary||!headings[code])throw Error("0553 spare Annex unavailable "+code);
  const option=code==="C1"||code==="C2";
@@ -25,21 +25,15 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null,curren
     {option&&<td>{row.leadTime}</td>}</tr>)}</tbody>
    <tfoot><tr><th colSpan={7}>TOTAL ({currency})</th><th className="p553-price-cell">{fmt(currency==="THB"?summary.sourceTHB:summary.totalUSD)}</th>{option&&<th/>}</tr></tfoot>
   </table></div>
-  {code==="B13"&&<B13TagReferences0553 presentation={{tagGroups:summary.tagSchedule,commercialNote:summary.commercialNote}}/>}
+  {code==="B13"&&internal&&<details className="p553-c1c2-engineering-review" data-b13-internal-reference="true">
+   <summary>INTERNAL ONLY — Equipment TAG references for B13</summary>
+   <p>Reference equipment only. COMMON quantities are shared stock, not quantity per TAG. This table is excluded from customer previews and Excel.</p>
+   <table className="p553-customer-table"><thead><tr><th>Ref.</th><th>Reference equipment TAG</th><th>Site(s)</th><th>System</th></tr></thead>
+    <tbody>{(summary.tagSchedule||[]).map((group,i)=><tr key={group.mr+group.sites.join("/")} data-b13-tag-group={i+1}>
+     <td>{i+1}</td><td>{group.tags.join("; ")}</td><td>{group.sites.join(", ")}</td><td>{group.mr} / {group.system}</td>
+    </tr>)}</tbody></table>
+  </details>}
   {option&&<p className="p553-b10-commercial-note">Optional spares; excluded from Total A+B. TAGs identify reference equipment; quantities are shared project stock, not quantity per TAG. Final configuration and delivery terms subject to agreement.</p>}
   </>}
- </section>;
-}
-
-export function B13TagReferences0553({presentation}){
- if(!presentation?.tagGroups?.length)throw Error("B13 equipment TAG references missing");
- return <section data-b13-tag-references="equipment-only">
-  <h4>Equipment TAG references for B13 shared consumables</h4>
-  <div className="p553-b10-commercial-scroll"><table className="p553-customer-table">
-   <thead><tr><th>System</th><th>Reference equipment TAG</th><th>Site(s)</th></tr></thead>
-   <tbody>{presentation.tagGroups.map(group=><tr key={group.mr+group.sites.join("|")} data-b13-tag-group={group.mr}>
-    <td>{group.mr}<br/>{group.system}</td><td>{group.tags.join("; ")}</td><td>{group.sites.join(", ")}</td>
-   </tr>)}</tbody>
-  </table></div><p className="p553-b10-commercial-note">{presentation.commercialNote}</p>
  </section>;
 }

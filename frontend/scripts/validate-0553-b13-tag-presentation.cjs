@@ -41,10 +41,17 @@ assert(review.tagGroups.some(x=>x.tags.includes('ANT-502-002')&&x.sites.join()==
 assert(!review.tagGroups.some(x=>['MR-0002','MR-0004'].includes(x.mr)&&x.sites.includes('ZWP23')));
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const html=renderToStaticMarkup(React.createElement(from('OtherSpareOriginalAnnex0553').OtherSpareOriginalAnnex0553,{code:'B13',model:quote.otherSpareItemizedAnnex}));
-assert.equal((html.match(/data-b13-tag-group=/g)||[]).length,5);assert(html.includes('MR-502-001A')&&html.includes('MAR-514-001'));
+assert(!html.includes('data-b13-tag-group')&&!html.includes('Reference equipment TAG'));assert(!html.includes('MR-502-001A')&&!html.includes('MAR-514-001'));assert(html.includes('COMMON'));
 assert(!html.includes('SYSTEM SPARES / MULTI'));assert(!html.includes('INTERNAL')&&!html.includes('PARAMETRIC'));
 const scopeHtml=renderToStaticMarkup(React.createElement(from('ScopeBcAnnexDetail0553').ScopeBcAnnexDetail0553,{code:'B13',mode:'working',fx:{thbPerUsd:31.5}}));
 assert(scopeHtml.includes('Equipment TAG references for B13')&&scopeHtml.includes('46,683.00'));
+assert.equal((scopeHtml.match(/data-b13-tag-group=/g)||[]).length,5);
+assert(scopeHtml.includes('INTERNAL ONLY')&&scopeHtml.includes('MAR-514-001'));
+assert(!/<details[^>]*data-b13-internal-reference="true"[^>]*\sopen(?:[ =>])/.test(scopeHtml),'Internal reference is collapsed by default');
+const customerScope=renderToStaticMarkup(React.createElement(from('ScopeBcAnnexDetail0553').ScopeBcAnnexDetail0553,{code:'B13',mode:'scope',fx:{thbPerUsd:31.5}}));
+assert(!customerScope.includes('data-b13-tag-group')&&!customerScope.includes('Reference equipment TAG'));
+const withSource=renderToStaticMarkup(React.createElement(from('OtherSpareOriginalAnnex0553').OtherSpareOriginalAnnex0553,{code:'B13',model:quote.otherSpareItemizedAnnex,onOpenSource:()=>{}}));
+assert(!withSource.includes('data-b13-tag-group'),'Source callback must not grant internal visibility');
 const c2=quote.otherSpareItemizedAnnex.rows.C2,option=from('data/optionBudgetaryOffer0553').selectOptionBudgetaryOffer0553().offers.C2;
 assert(c2.every(x=>Number.isInteger(x.unitUSD)&&x.qty*x.unitUSD===x.totalUSD));
 assert.equal(c2.reduce((n,x)=>n+x.totalUSD,0),14340);assert.equal(option.sourceSellTHB,436595.65);
@@ -62,7 +69,7 @@ const originalRows=Object.freeze([Object.freeze({id:'four',quantity:4,sourceTota
 const snapshot=JSON.stringify(originalRows);assert.deepEqual(kernel(originalRows,1500,1,{residualMetric:'squared'}).map(x=>x.unitUSD),[158,125,368]);assert.equal(JSON.stringify(originalRows),snapshot);
 const native=from('nativeWorkingDraft0553'),template=from('data/nativeReleaseTemplate0553.json');
 const bytes=Buffer.from(template.base64,'base64'),file={name:template.sourceName,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.length)};
-const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*>([\\s\\S]*?)</c>'))?.[1]||'';
+const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*?(?:/>|>([\\s\\S]*?)</c>)'))?.[1]||'';
 (async()=>{
  const usd=await native.buildNativeOfficialRelease0553(file,quote),thb=await native.buildNativeWorkingDraft0553(file,source);
  const breakdown=await from('nativePriceBreakdown0553').buildNativePriceBreakdown0553(file,quote,from('data/customerPriceBreakdown0553').buildCustomerPriceBreakdown0553(source,quote));
@@ -76,15 +83,26 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*>([\\s\\
    assert(cell(xml,'H'+(6+i)).includes('<v>'+(currency==='THB'?row.unitTHB:row.unitUSD)+'</v>'));
    assert(cell(xml,'I'+(6+i)).includes('<v>'+(currency==='THB'?row.totalTHB:row.totalUSD)+'</v>'));
   }
-  for(const [i,group] of review.tagGroups.entries()){
-   const row=11+i;assert(cell(xml,'C'+row).includes(group.tags.join('; ')));
-   assert(cell(xml,'E'+row).includes(group.sites.join(', ')));
-   assert(xml.includes('ref="C'+row+':D'+row+'"'));assert(xml.includes('ref="F'+row+':I'+row+'"'));
-   for(const col of ['G','H','I'])assert(!cell(xml,col+row).includes('<v>'),'Reference has quantity/price: '+col+row);
-  }
+  assert(!xml.includes('Reference equipment TAG')&&!xml.includes('MAR-514-001'));
+  for(let row=9;row<=18;row++)for(const col of ['B','C','D','E','F','G','H','I'])
+   assert.equal(cell(xml,col+row).replace(/<[^>]+>/g,'').trim(),'','Removed reference body must be empty '+col+row);
+  for(let row=10;row<=16;row++)assert(!xml.includes('ref="C'+row+':D'+row+'"')&&!xml.includes('ref="F'+row+':I'+row+'"'));
   assert(xml.includes('ref="B19:H19"'),'Original total merge preserved');
   assert(!(out.warnings||[]).some(x=>x.includes('sheet4.xml')&&x.includes('maximum row height')));
   if(currency==='USD')fs.writeFileSync('/tmp/PJ2608-0553-B13-TAG-QA.xlsx',Buffer.from(await out.blob.arrayBuffer()));
  }
- console.log('PASS B13: three unchanged source parents / rounded quote USD1530/THB46683; whole-USD B13/C2 units reconcile to 1530/14340 after owner DB-5P exclusion; C2 suitability and supplier-rate gaps explicit; five exact TAG/site groups cover62 source records, no fictitious consumable TAG or per-TAG quantity; B5/Ex/hardware exclusions; OPEN consumption; Source/Working/Scope/USD/THB/Breakdown presentation parity.');
+ // Simulate a previously exported reference table and its added merges.
+ const oldParts=native.entriesFromZip(new Uint8Array(await usd.blob.arrayBuffer()));
+ let oldXml=new TextDecoder().decode(await native.readEntry(oldParts.find(x=>x.name==='xl/worksheets/sheet4.xml')));
+ oldXml=oldXml.replace(/<c\b[^>]*r="C10"[^>]*?(?:\/>|>[\s\S]*?<\/c>)/,'<c r="C10" t="inlineStr"><is><t>Reference equipment TAG</t></is></c>');
+ const section=oldXml.match(/<mergeCells\b[^>]*>([\s\S]*?)<\/mergeCells>/),refs=[...section[1].matchAll(/<mergeCell\b/g)].length;
+ oldXml=oldXml.replace(section[0],'<mergeCells count="'+(refs+2)+'">'+section[1]+'<mergeCell ref="C10:D10"/><mergeCell ref="F10:I10"/></mergeCells>');
+ const oldBytes=native.rebuildZip(oldParts,new Map([['xl/worksheets/sheet4.xml',new TextEncoder().encode(oldXml)]]));
+ const oldFile={name:'Previous-B13-reference.xlsx',arrayBuffer:async()=>oldBytes.buffer.slice(oldBytes.byteOffset,oldBytes.byteOffset+oldBytes.length)};
+ for(const repaired of [await native.buildNativeOfficialRelease0553(oldFile,quote),await native.buildNativeWorkingDraft0553(oldFile,source)]){
+  const zip=native.entriesFromZip(new Uint8Array(await repaired.blob.arrayBuffer()));
+  const xml=new TextDecoder().decode(await native.readEntry(zip.find(x=>x.name==='xl/worksheets/sheet4.xml')));
+  assert(!xml.includes('Reference equipment TAG'));assert(!xml.includes('ref="C10:D10"')&&!xml.includes('ref="F10:I10"'));
+ }
+ console.log('PASS B13: three unchanged source parents / rounded quote USD1530/THB46683; whole-USD B13/C2 units reconcile to 1530/14340 after owner DB-5P exclusion; C2 suitability and supplier-rate gaps explicit; five TAG groups/62 source records retained internally; supplementary table internal Working only, collapsed by default and excluded from customer UI/USD/THB/Breakdown and old filled files, no fictitious consumable TAG or per-TAG quantity; B5/Ex/hardware exclusions; OPEN consumption; Source/Working/Scope/USD/THB/Breakdown presentation parity.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

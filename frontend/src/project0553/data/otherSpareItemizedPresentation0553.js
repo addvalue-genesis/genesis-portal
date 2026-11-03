@@ -18,6 +18,8 @@ const specification=freeze({
  ["Marine RACON configuration and charging/service tools suitable for the installed radar-beacon system.","RACON programming/charging interface and maintenance accessories"]])
 });
 // B13 is shared consumable stock. TAGs identify the related equipment packages,
+// Owner03-Nov2026: retain TAG mapping in code for internal Working review only.
+// Never render this supplementary mapping in customer previews or any Excel export.
 // never a new consumable asset or an assertion of one kit per equipment TAG.
 export function selectB13TagPresentation0553(){
  const source=selectSpareCustomerSchedule0553().currentByCode.B13;

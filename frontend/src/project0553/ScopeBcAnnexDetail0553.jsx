@@ -49,7 +49,7 @@ export function ScopeBcAnnexDetail0553({code,fx=null,mode="scope",onOpenReleaseR
   <div className="p55-eyebrow">{inWorking?"10.2 WORKING COST DETAIL":"10.5 CUSTOMER SCOPE DETAIL"} · PRICE SOURCE AUDIT (THB display)</div>
   {code==="B10"&&inWorking&&<B10StageSpareSelection0553 internal onOpenSource={onOpenSource}/>}
 
-  {b13&&<OtherSpareOriginalAnnex0553 code="B13" currency="THB" model={{rows:{B13:b13.rows},summaries:{B13:b13.summary}}} onOpenSource={onOpenSource}/>}
+  {b13&&<OtherSpareOriginalAnnex0553 code="B13" currency="THB" internal={inWorking} model={{rows:{B13:b13.rows},summaries:{B13:b13.summary}}} onOpenSource={onOpenSource}/>}
   {inWorking&&<SparePricedBudgetReview0553 code={code} onOpenSource={onOpenSource} context="working"/>}
   <h3>{p.code} — {p.description}</h3>
   <p className="p55-note"><ComponentCopyId projectId="PJ2608-0553" componentKey={moduleId}/>
