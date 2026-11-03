@@ -26,7 +26,7 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null,curren
    <tfoot><tr><th colSpan={7}>TOTAL ({currency})</th><th className="p553-price-cell">{fmt(currency==="THB"?summary.sourceTHB:summary.totalUSD)}</th>{option&&<th/>}</tr></tfoot>
   </table></div>
   {code==="B13"&&<B13TagReferences0553 presentation={{tagGroups:summary.tagSchedule,commercialNote:summary.commercialNote}}/>}
-  {option&&<p className="p553-b10-commercial-note">Optional spares; excluded from Total A+B. Final configuration and delivery terms subject to agreement.</p>}
+  {option&&<p className="p553-b10-commercial-note">Optional spares; excluded from Total A+B. TAGs identify reference equipment; quantities are shared project stock, not quantity per TAG. Final configuration and delivery terms subject to agreement.</p>}
   </>}
  </section>;
 }

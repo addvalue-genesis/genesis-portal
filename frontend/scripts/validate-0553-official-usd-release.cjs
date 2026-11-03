@@ -49,8 +49,8 @@ assert.equal(b14.actualCostTHB,null);assert.equal(b14.profitTHB,null);
 assert.equal(b14.samTelDeductionTHB,39375);
 assert.equal(b14.addvalueReceivableTHB,748125);
 assert.equal(model.b.find(x=>x.code==='B14').amountUSD,25000);
-assert.equal(model.totalUSD,897800);
-assert.equal(model.totalUSD-model.b.find(x=>x.code==='B14').amountUSD,872800,'Current A+B excluding B14 includes the selected B1 delta only');
+assert.equal(model.totalUSD,894500);
+assert.equal(model.totalUSD-model.b.find(x=>x.code==='B14').amountUSD,869500,'Current A+B excluding B14 includes the selected B1 delta only');
 
 assert.equal(plan.coverages.find(x=>x.id==='AV-CARGO').costOwner,'B6');
 assert(plan.coverages.every(x=>x.verifiedPremiumTHB===null&&x.additionalPostingTHB===null));
@@ -61,8 +61,8 @@ const insuranceHtml=renderToStaticMarkup(React.createElement(ScopeBcAnnexDetail0
 assert(insuranceHtml.includes('Service Insurance Review')&&insuranceHtml.includes('28')&&insuranceHtml.includes('Already inside B3/B9'));
 console.log('PASS B4/B12 exclusions and ADDVALUE B14 coverage review; existing B3/B9 non-additive allowance THB '+plan.existingNonAdditiveAllowanceTHB);
 
-assert.equal(model.b10ItemizedAnnex.rows.length,14);
-assert.equal(model.b10ItemizedAnnex.totalUSD,16200);
+assert.equal(model.b10ItemizedAnnex.rows.length,11);
+assert.equal(model.b10ItemizedAnnex.totalUSD,12900);
 assert.equal(model.b10ItemizedAnnex.customerIssued,false);
 const other=model.otherSpareItemizedAnnex;
 assert.deepEqual(Array.from(other.codes),["B11","B13","C1","C2"]);
@@ -124,7 +124,7 @@ for(const code of other.codes){
  if(code==="C1"||code==="C2")assert(web.includes("Optional spares; excluded from Total A+B."));
  assert(!web.includes("PENDING")&&!web.includes("SPIR pending"));
 }
-assert.equal(new Set(model.b10ItemizedAnnex.rows.map(r=>r.lineSourceId)).size,14);
+assert.equal(new Set(model.b10ItemizedAnnex.rows.map(r=>r.lineSourceId)).size,11);
 assert(model.b10ItemizedAnnex.rows.every(r=>r.qty===1&&r.unit==="LOT"&&
  r.totalUSD===r.unitUSD&&Number.isFinite(r.totalUSD)&&r.issued===false&&
  r.isPhysicalSpareQtyVerified===false&&r.isOemSpareUnitPriceVerified===false));
@@ -207,7 +207,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
   for(const internal of ['THB','INTERNAL','HOLD','WORKING DRAFT','NOT ESTABLISHED','bid.budget','Exchange rate','no duplicate engineering charge'])assert(!xml.includes(internal),name+' leaked '+internal);
   if(i===1){
    const expected={a:model.a.map(x=>({...x,amount:x.amountUSD})),b:model.b.map(x=>({...x,amount:x.amountUSD})),total:model.totalUSD,unpricedText:'To be quoted'};
-   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:897800});
+   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:894500});
    // Reproduce the reported partial workbook: spare prices remain, A/B vanish.
    const erase=(input,address)=>input.replace(new RegExp('<c\\b[^>]*r="'+address+'"[^>]*?(?:/>|>[\\s\\S]*?</c>)'),'<c r="'+address+'"/>');
    for(const address of ['A8','B9','C10','D11','E8','F8','G11','A24','B25','E26','F28','G32','G38'])
@@ -299,5 +299,5 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  const bad=box.zip.rebuildZip(entries,new Map([['xl/worksheets/sheet3.xml',new TextEncoder().encode((await text('xl/worksheets/sheet3.xml')).replace(/(<c\b[^>]*r="I6"[^>]*>)/,'$1<f>G6+H6</f>'))]]));
  await assert.rejects(()=>buildNativeOfficialRelease0553({name:'BadFormula.xlsx',arrayBuffer:async()=>bad.buffer},model),/Unexpected native formula/);
  const arg=process.argv.find(x=>x.startsWith('--output='));if(arg)fs.writeFileSync(arg.slice(9),data);
- console.log('PASS 0553 Official native: B10 USD16200 B11 N/A B13 USD1500, C1 USD181100 and C2 USD13900 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, B14 USD25000 selected once; no spare-option uplift or false OEM confirmation');
+ console.log('PASS 0553 Official native: B10 USD12900 B11 N/A B13 USD1500, C1 USD181100 and C2 USD13900 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, B14 USD25000 selected once; no spare-option uplift or false OEM confirmation');
 })().catch(e=>{console.error(e);process.exitCode=1;});

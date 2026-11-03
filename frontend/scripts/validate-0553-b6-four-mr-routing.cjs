@@ -39,8 +39,8 @@ const historicalScenarioPartBTHB=4385436.82;
 const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
 const currentSpareDelta=Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
  sum+source.byCode[code].workingSellTHB-old,0);
-assert.equal(Math.round(currentSpareDelta*100),28268781);
-assert.equal(source.knownWorkingSellTHB,6066125.37);
+assert.equal(Math.round(currentSpareDelta*100),17826531);
+assert.equal(source.knownWorkingSellTHB,5961702.87);
 assert.equal(source.byCode.B3.workingSellTHB,2322450);
 assert.equal(source.byCode.B9.workingSellTHB,480550);
 assert.equal(source.byCode.B3.b3FortyDayBudget.workdays,40); // superseded audit

@@ -25,13 +25,13 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
   <p className="p553-b10-commercial-note">
    {!official?<>
     <strong>Budgetary price breakdown from selected 10.2 Working SELL.</strong>
-    {" "}Each of 14 functional spare groups is shown as 1 LOT; Unit USD is a financial allocation
-    of the four MR commissioning-kit envelopes, <strong>not an independently quoted OEM
+    {" "}Each of 11 functional spare groups is shown as 1 LOT; Unit USD is a financial allocation
+    of the three selected MR commissioning-kit envelopes, <strong>not an independently quoted OEM
     spare-part rate or confirmed number of physical spare units.</strong>
     {" "}Prices are for pre-award review only, not customer issued.
    </>:<>
     <strong>Pre-award Budgetary Allocation — NOT ISSUED.</strong>
-    {" "}14 functional allowance lines are priced from the same four rounded
+    {" "}11 functional allowance lines are priced from the same three rounded
     10.3.4 MR financial owners. Qty 1 LOT is a budget allocation, not one spare
     unit. OEM spare SKUs, actual quantities and supplier CIF unit rates are not verified.
    </>}
@@ -72,7 +72,7 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
   </div>
   {internal&&<details className="p55-panel p553-b10-source-trace" style={{padding:12}}>
     <summary><strong>Engineering source / vendor evidence — INTERNAL ONLY</strong>
-     <small>14 individual function trace keys · click to 10.2 Source · no duplicate purchasing post</small></summary>
+     <small>11 individual function trace keys · click to 10.2 Source · no duplicate purchasing post</small></summary>
     <div className="p553-b10-commercial-scroll"><table className="p55-table p55-table--compact">
       <thead><tr><th>Function ID</th><th>Stages</th><th>NextG reference / proposed SKU</th><th>Working source</th></tr></thead>
       <tbody>{annex.rows.map(x=><tr key={x.id}>
@@ -88,16 +88,10 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
       </tr>)}</tbody>
     </table></div>
    </details>}
+  <p className="p553-b10-commercial-note">RACON commissioning spares are excluded from B10.</p>
   {internal&&<details className="p55-panel" data-b10-racon-quote-review="QTORG2609244" style={{padding:12}}>
-   <summary><strong>RACON — MDS quotation / B10 spare preparation</strong></summary>
-   <p className="p55-note">QTORG2609244, 22 Sep 2026, p4–8: RACON, Ex control box, DB-5P, purge kit and USB programming cable belong to the equipment package. Do not quote them again as B10 stock without an independently justified additional quantity. Section3.6 states no special tools required; laptop is excluded.</p>
-   <table className="p55-table p55-table--compact"><thead><tr><th>Preparation</th><th>Owner / evidence required</th></tr></thead><tbody>
-    <tr><td>B10 4.01 — replacement protective fuses</td><td>Request MDS/ORGA service BOM: replaceable location, fuse type/rating, OEM part number, recommended commissioning quantity and unit spare price. Not separately listed in this quotation.</td></tr>
-    <tr><td>B10 4.02 — replacement control-box gasket</td><td>Include only if the OEM service procedure requires replacement on opening; confirm exact enclosure and certified gasket. This quotation does not prove an extra gasket is supplied or needed.</td></tr>
-    <tr><td>B10 4.03 — spare Ex gland / entry seal</td><td>Match selected ADDVALUE field cable, actual diameter/armour, entry thread and Ex certification. Separate additional commissioning replacement stock from Part A installed glands; final quantity/rate is unconfirmed.</td></tr>
-    <tr><td>Cable re-termination stock</td><td>Review OEM-approved terminals, ferrules/lugs and cable repair/replacement lengths against the approved interconnection schedule. No extra RF coaxial feeder is evidenced by this offer. No new price or quantity selected.</td></tr>
-   </tbody></table>
-   <p className="p55-note">Page4 lists BFOU 12C×1.5mm² runs 5m+5m+10m and six glands as included; p8 excludes cables/glands. Preserve the owner02-Nov ADDVALUE supply decision: installed field cables/glands remain MR0004 Part A bulk, with no supplier credit. These quoted lengths are not approved site takeoff or B10 spare quantities. Obtain a separate priced commissioning SPIR and reconcile against Part A/C2 before purchase; the three budget rows are not OEM spare quotations.</p>
+   <summary><strong>RACON — owner-excluded from B10</strong></summary>
+   <p className="p55-note">Owner03-Nov2026 removes functions4.01–4.03 and the full MR0004 B10 allowance THB104,422.50. MDS has no separately priced commissioning-spare list in QTORG2609244. Original source B10-PTTEP-04 and its three function IDs remain historical evidence, not offered stock. Original MR spare obligations are not waived by supplier omission; purchaser acceptance of this exclusion remains unconfirmed. Part A RACON/control/DB-5P, included purge/programming cable and ADDVALUE installed cable/gland ownership remain unchanged.</p>
   </details>}
   {internal&&<p className="p553-b10-commercial-note">
    10.2 Source financial owner THB {money(annex.selectedMRKitWorkingSellTHB)}

@@ -33,8 +33,8 @@ const linkInstalled=(coverage,family,group)=>{
 export function selectB10ItemizedPurchaseEvidence0553(){
  const source=selectSpareCustomerSchedule0553(),coverage=selectSpareCoverageEngineering0553();
  const envelopes=source.currentByCode.B10;
- if(envelopes.length!==4||envelopes.reduce((a,x)=>a+x.qty,0)!==14||
-  envelopes.reduce((a,x)=>a+x.extendedTHB,0)!==509827.5)
+ if(envelopes.length!==3||envelopes.reduce((a,x)=>a+x.qty,0)!==11||
+  envelopes.reduce((a,x)=>a+x.extendedTHB,0)!==405405)
   throw Error("B10 budget envelope changed; item evidence cannot be silently posted");
  const supplierLines=NEXTG.lines.filter(x=>["D","E"].includes(x.group));
  if(supplierLines.length!==16||new Set(supplierLines.map(x=>x.code)).size!==16)
@@ -106,7 +106,7 @@ export function selectB10ItemizedPurchaseEvidence0553(){
   ["B10-PTTEP-04","RACON Ex cable gland/service seal","Ex gland",/^TCAB-/,null]
  ]);
  const familyCount=new Map();
- const requirementArticleRows=freeze(requirementFamilies.map(([parentId,name,term,tagPattern,supplierMatch])=>{
+ const requirementArticleRows=freeze(requirementFamilies.filter(x=>!source.b10OwnerDecision.excludedSourceIds.includes(x[0])).map(([parentId,name,term,tagPattern,supplierMatch])=>{
   const parent=envelopes.find(x=>x.id===parentId);
   if(!parent||!parent.displaySpecification.toLowerCase().includes(term.toLowerCase()))
    throw Error("B10 article family no longer anchored in current MR scope: "+parentId+" "+term);
@@ -131,7 +131,8 @@ export function selectB10ItemizedPurchaseEvidence0553(){
    inclusionGate:"Confirm OEM part number / installed TAG compatibility, delivered project stock, Part A inclusion, C2 exclusion, exact source unit price and location",
   });
  }));
- if(requirementArticleRows.length!==14)throw Error("B10 article family source inventory changed");
+ if(requirementArticleRows.length!==11)throw Error("B10 article family source inventory changed");
+ const historicalBudgetEnvelopeRows=freeze(source.originalCurrentByCode.B10.map(x=>freeze({id:x.id,mr:x.linkedMR[0],locations:x.linkedLocations,contractKitCount:x.qty,workingUnitSellTHB:x.unitPriceTHB,workingTotalSellTHB:x.extendedTHB,physicalStockContentsVerified:false,selectedOemSparePartsCount:0})));
  const quoteTotalUSD=round(candidateRows.reduce((a,x)=>a+(x.quotedExtendedUSD||0),0));
  const quoteCostAtPlanningFxTHB=round(quoteTotalUSD*31.5);
  const b10ReferenceCostTHB=round(509827.5/1.30);
@@ -158,7 +159,8 @@ export function selectB10ItemizedPurchaseEvidence0553(){
   relatedInstalledTagsAreCompatibleSpareSkus:false,
   quotedOfferedQtyIsPurchaseQty:false,
   quotedSpareGroupUSD:quoteTotalUSD,quotedSpareGroupTHB:quoteCostAtPlanningFxTHB,
-  originalB10WorkingSellTHB:509827.5,originalB10ReferenceCostTHB:b10ReferenceCostTHB,
+  originalB10WorkingSellTHB:509827.5,selectedB10WorkingSellTHB:405405,
+  historicalBudgetEnvelopeRows,excludedRows:source.excludedB10Rows,ownerDecision:source.b10OwnerDecision,originalB10ReferenceCostTHB:b10ReferenceCostTHB,
   costComparisonExceedsEnvelope:quoteCostAtPlanningFxTHB>b10ReferenceCostTHB,
   repeatedSkusAcrossSpareGroups:duplicatedSkus,
   proposedB10AccessoryLines,proposedB10AccessoriesUSD,
@@ -171,10 +173,10 @@ export function selectB10ItemizedPurchaseEvidence0553(){
     locations:x.linkedLocations,contractKitCount:x.qty,
     workingUnitSellTHB:x.unitPriceTHB,workingTotalSellTHB:x.extendedTHB,
     physicalStockContentsVerified:false,selectedOemSparePartsCount:0}))),
-  unquotedOtherMrCodes:freeze(CODES.slice(1)),
+  unquotedOtherMrCodes:freeze(CODES.slice(1,3)),
   noVerifiedPhysicalPurchaseLine:true,
   sourceToWorkingReconciled:true,postingAllowed:false,
-  releaseAllowed:false,changeToSelectedB10SellTHB:0,
-  releaseStatement:"Customer cannot order physical B10 parts solely from four kit lines. D/E supplier SKU evidence is separately quoted/expired, does not establish required B10 item quantity, and exceeds the existing 14-kit engineering allowance."
+  releaseAllowed:false,changeToSelectedB10SellTHB:-104422.5,
+  releaseStatement:"Customer cannot order physical B10 parts solely from three selected kit lines. RACON B10 allowance excluded by owner; contractual compliance requires purchaser agreement. D/E supplier SKU evidence is separately quoted/expired, does not establish required B10 item quantity, and exceeds the existing 14-kit engineering allowance."
  });
 }

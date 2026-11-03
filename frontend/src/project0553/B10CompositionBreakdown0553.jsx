@@ -5,10 +5,10 @@ import React from "react";
 const val=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
 export function B10CompositionBreakdown0553({composition,internal=false,onOpenSource=null,mode="release"}){
  if(!composition)return null;
- if(composition.parentRows.length!==4||composition.deliveredCommissioningKits!==14)
-  throw Error("B10 composition must retain 4 MR financial owners and 14 commissioning kits");
+ if(composition.parentRows.length!==3||composition.deliveredCommissioningKits!==11)
+  throw Error("B10 composition must retain 3 selected MR financial owners and 11 commissioning kits");
  const ids=new Set(composition.parentRows.map(x=>x.sourceId));
- if(ids.size!==4||composition.installedComponents.some(x=>!ids.has(x.parentSourceId)))
+ if(ids.size!==3||composition.installedComponents.some(x=>!ids.has(x.parentSourceId)))
   throw Error("B10 composition orphaned from Source");
  return <section className="p553-b10-composition" data-component-key="bid.budget.working.bc.b10.physical-composition.preview"
   data-b10-composition-count={composition.installedComponents.length}>
@@ -53,8 +53,8 @@ export function B10CompositionBreakdown0553({composition,internal=false,onOpenSo
        sourceRowModuleId:parent.sourceRowModuleId,sourceModuleId:parent.sourceRowModuleId})}>
       ↗ 10.2 Working Source · {parent.mr}</button>}
   </details>)}
-  <p className="p553-b10-commercial-note"><strong>Source / Release gate:</strong> Same parent Source IDs B10-PTTEP-01..04.
-   The component rows are supporting evidence, not additive commercial lines. `B10` totals and native Excel source cells remain unchanged.
+  <p className="p553-b10-commercial-note"><strong>Source / Release gate:</strong> Selected parent Source IDs B10-PTTEP-01..03; RACON B10-PTTEP-04 is owner-excluded.
+   The component rows are supporting evidence, not additive commercial lines. The excluded RACON allowance is removed from B10 totals and native Excel.
    Outstanding: OEM SPIR per unit and equipment function, DDP quotation, stock ownership and Attachment-7 C2 de-duplication.</p>
  </section>;
 }

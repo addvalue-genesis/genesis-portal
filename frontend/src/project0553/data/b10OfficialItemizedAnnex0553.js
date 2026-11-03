@@ -8,20 +8,21 @@ export function buildB10OfficialItemizedAnnex0553(official){
  const base=selectB10NativeAnnexReview0553();
  const parents=official?.annex?.B10||[],summary=official?.b?.find(x=>x.code==="B10");
  if(official?.currency!=="USD"||official.issued!==false||
-    parents.length!==4||!Number.isFinite(summary?.amountUSD))
-  throw Error("0553 B10 Official item allocation needs 4 unissued, priced source MR owners");
+    parents.length!==3||!Number.isFinite(summary?.amountUSD))
+  throw Error("0553 B10 Official item allocation needs 3 unissued, priced source MR owners");
  const rows=freeze(parents.flatMap(parent=>{
   const items=base.rows.filter(x=>x.parentSourceId===parent.sourceId);
   if(!items.length||parent.qty!==({"B10-PTTEP-01":4,"B10-PTTEP-02":3,"B10-PTTEP-03":4,"B10-PTTEP-04":3})[parent.sourceId]||
      !Number.isFinite(parent.totalUSD)||!parent.traceId||!parent.sourceRowModuleId||
      items.some(x=>x.traceId!==parent.traceId||x.sourceRowModuleId!==parent.sourceRowModuleId))
    throw Error("0553 B10 Official cannot map exact functional item to source parent "+parent.sourceId);
-  const cents=Math.round(parent.totalUSD*100);
-  const per=Math.floor(cents/items.length),remaining=cents-per*items.length;
+  const dollars=parent.totalUSD;
+  if(!Number.isInteger(dollars))throw Error("B10 rounded parent must be whole USD");
+  const per=Math.floor(dollars/items.length),remaining=dollars-per*items.length;
   return items.map((row,i)=>freeze({
    ...row,officialPriceClass:"PROVISIONAL_PARENT_ROUNDING_ALLOCATION_NOT_OEM_SKU_PRICE",
-   qty:1,unit:"LOT",unitUSD:(per+(i<remaining?1:0))/100,
-   totalUSD:(per+(i<remaining?1:0))/100,
+   qty:1,unit:"LOT",unitUSD:per+(i<remaining?1:0),
+   totalUSD:per+(i<remaining?1:0),
    parentOfficialUSD:parent.totalUSD,
    parentWorkingTHB:parent.sourceTHB,
    isPhysicalSpareQtyVerified:false,isOemSpareUnitPriceVerified:false,
@@ -31,11 +32,11 @@ export function buildB10OfficialItemizedAnnex0553(official){
  }));
  const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
  const total=round2(rows.reduce((n,x)=>n+x.totalUSD,0));
- if(rows.length!==14||new Set(rows.map(x=>x.id)).size!==14||
+ if(rows.length!==11||new Set(rows.map(x=>x.id)).size!==11||
    total!==summary.amountUSD||
    parents.some(p=>round2(rows.filter(x=>x.parentSourceId===p.sourceId)
     .reduce((n,x)=>n+x.totalUSD,0))!==p.totalUSD))
-  throw Error("0553 B10 Official 14-line split does not reconcile to 4 existing rounded MR prices");
+  throw Error("0553 B10 Official 11-line split does not reconcile to 3 existing rounded MR prices");
  return freeze({rows,totalUSD:total,currency:"USD",
   sourceModelId:"bid.budget.pricing.release.preview",
   sourceRowIds:freeze(parents.map(x=>x.sourceId)),

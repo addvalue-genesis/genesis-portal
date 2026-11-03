@@ -12,7 +12,7 @@ export function B10StageSpareSelection0553({internal=false,onOpenSource=null,con
  return <details className="p55-panel p553-b10-stage-selection" open
    data-component-key={context==="working"?model.moduleId:"bid.budget."+context+".b10.stage-spare-selection"} style={{padding:12}}>
   <summary><strong>B10 — Select spares from installed Required BOM / MR Attachment 5</strong>
-   <small>14 spare function candidates · 4 stages · source ZWP20 MR-502-001 row 4 · NONPOSTING</small></summary>
+   <small>11 selected spare function candidates · 4 stages · source ZWP20 MR-502-001 row 4 · NONPOSTING</small></summary>
   <p className="p55-note"><strong>Selection logic:</strong> Part A BOM identifies installed ODU, IDU, Antenna, L3 Switch,
    Ethernet socket, Enclosure, Surge Arrestor and bulk. For B10, choose only replaceable items needed during
    Erection, Pre-commissioning, Commissioning or Start-up. Then qualify exact OEM Part No., per-kit

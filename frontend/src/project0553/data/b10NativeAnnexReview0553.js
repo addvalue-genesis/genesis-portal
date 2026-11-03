@@ -68,7 +68,7 @@ export function selectB10NativeAnnexReview0553(){
    isRequirementFamily:true,postingAllowed:false
   });
  }));
- if(rows.length!==14||new Set(rows.map(x=>x.id)).size!==14||
+ if(rows.length!==11||new Set(rows.map(x=>x.id)).size!==11||
   rows.some(x=>!Number.isFinite(x.budgetaryUnitPriceUSD)||x.budgetaryUnitPriceUSD<=0||
    x.b10PurchaseQty!==null||x.b10UnitSellUSD!==null))
   throw Error("0553 original B10 14 function budget breakdown invalid");
@@ -81,11 +81,11 @@ export function selectB10NativeAnnexReview0553(){
   moduleId:"bid.budget.working.bc.b10.original-annex-item-map",
   sourceModuleId:selection.moduleId,
   originalSheet:"B10 CommSpares",layoutColumns:freeze(["B","C","D","E","F","G","H","I"]),
-  dataFirstRow:6,originalDataCapacity:13,totalRow:6+rows.length,
+  dataFirstRow:6,originalDataCapacity:13,totalRow:19,
   standardDocumentHeader:"ERECTION, PRECOMMISSIONNING, COMMISSIONNING, START UP SPARE PARTS LISTS",
   commercialOfferTerm:"CIF Zhuhai Port, China — proposed; purchaser deviation acceptance required",
   customerOriginalIncoterm:"DDP site (purchaser original)",
-  rows,requiredPartFamilies:14,selectedMRKitQty:14,
+  rows,requiredPartFamilies:11,selectedMRKitQty:11,excludedRows:selection.excludedRows,ownerDecision:selection.ownerDecision,
   selectedMRKitWorkingSellTHB:alloc.original10_2WorkingSellTHB,
   budgetaryPresentationTotalUSD:alloc.totalAllocatedUSD,
   budgetaryPlanningFX:alloc.planningFxTHBPerUSD,
@@ -93,6 +93,6 @@ export function selectB10NativeAnnexReview0553(){
   sourceToReleaseParentIds:alloc.selectedFinancialSourceRows,
   b10CifUnitSellConfirmedCount:0,physicalSpareQtyConfirmedCount:0,
   sourceTotalIsB10Cost:false,customerReleaseAllowed:false,
-  note:"14 functional budget allocations (1 LOT each) reconcile to 10.2 MR kit Working SELL, not OEM unit prices/physical spare quantities. Exact parts/CIF quotation require OEM SPIR."
+  note:"11 selected functional budget allocations (1 LOT each) reconcile to 10.2 MR kit Working SELL, not OEM unit prices/physical spare quantities. Exact parts/CIF quotation require OEM SPIR."
  });
 }

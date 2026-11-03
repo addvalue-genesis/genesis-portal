@@ -390,7 +390,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  })]));
  const annex=Object.fromEntries(annexCodes.map(code=>[code,annexModels[code].rows]));
  const annexTraceAudit=auditAnnexBidirectionalTrace0553(spare.currentByCode,annex);
- if(annexTraceAudit.totalRows!==16)throw Error("0553 16 PTTEP current-source Annex identity inventory changed");
+ if(annexTraceAudit.totalRows!==15)throw Error("0553 15 selected PTTEP source Annex identity inventory changed");
  const aKnown=a.filter(x=>n(x.previewSellTHB));
  const bKnown=b.filter(x=>n(x.customerSellTHB));
  const cKnown=c.filter(x=>n(x.customerSellTHB));
@@ -414,7 +414,7 @@ export function buildReleaseCommercialModel0553({thbPerUsd=null}={}){
  ];
  return Object.freeze({
   moduleId:"bid.budget.pricing.release",policy:RELEASE_POLICY_0553,
-  a,b,c,annex,annexModels,annexTraceAudit,b13TagPresentation:selectB13TagPresentation0553(),
+  a,b,c,annex,annexModels,annexTraceAudit,b10OwnerDecision:spare.b10OwnerDecision,excludedB10Rows:spare.excludedB10Rows,b13TagPresentation:selectB13TagPresentation0553(),
   budgetaryOptionAnnex:Object.freeze(Object.fromEntries(
    Object.entries(selectedOptionBudgetaryQuote.offers).map(([code,offer])=>[code,offer.rows]))),
   sparePriceEvidence:spare.sparePriceEvidence, // Read-only item candidate and optional price benchmark; never financial posting

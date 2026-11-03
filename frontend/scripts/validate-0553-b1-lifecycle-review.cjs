@@ -47,9 +47,9 @@ assert(extraPm.candidateSellTHB>nine.candidateSellTHB);
 for(const args of [{months:0},{months:NaN},{weeklyHours:{PM:-1}},{weeklyHours:{TYPO:1}},{regulatoryHours:-1},{engineeringHours:-1}])assert.throws(()=>evaluate(args));
 assert.equal(JSON.stringify({base:base(),release:release({thbPerUsd:31.5})}),before,'Review must not change selected Source or Release');
 const quoted=official(release({thbPerUsd:31.5}));
-assert.equal(quoted.b.find(r=>r.code==='B1').amountUSD,27400);assert.equal(quoted.totalUSD,897800);
+assert.equal(quoted.b.find(r=>r.code==='B1').amountUSD,27400);assert.equal(quoted.totalUSD,894500);
 assert.equal(quoted.b.find(r=>r.code==='B14').amountUSD,25000);
-assert.deepEqual(quoted.c.map(r=>r.budgetaryOptionQuoteUSD),[181100,23000]);
+assert.deepEqual(quoted.c.map(r=>r.budgetaryOptionQuoteUSD),[181100,13900]);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const html=renderToStaticMarkup(React.createElement(from('B1LifecycleReview0553.jsx').B1LifecycleReview0553));
 for(const text of ['NON_POSTING','20,700.00','24,300.00','27,900.00','963.76','96250','144'])

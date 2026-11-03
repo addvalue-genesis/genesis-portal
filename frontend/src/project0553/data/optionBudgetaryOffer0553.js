@@ -1,3 +1,4 @@
+import {selectC2CustomerSchedule0553} from "./c2CustomerSchedule0553";
 // PJ2608-0553 — MANAGEMENT-REQUESTED conditional priced Part C options.
 // This is the one authoritative budgetary OPTION BID basis, independent from
 // the unverified OEM direct-COST posting ledger and the base A+B quotation.
@@ -37,6 +38,7 @@ function allocateOptionByWeights(rows,totalUSD){
 export function selectOptionBudgetaryOffer0553(){
  const review=selectSparePricedBudgetReview0553();
  const selectedC1=selectC1SiTagBudget0553();
+ const c2Technical=selectC2CustomerSchedule0553();
  const excludedC2=review.rows.C2.filter(x=>C2_OWNER_STOCK_DECISION_0553.excludedHistoricalIds.includes(x.id));
  const selectedC2=review.rows.C2.filter(x=>!C2_OWNER_STOCK_DECISION_0553.excludedHistoricalIds.includes(x.id));
  if(excludedC2.length!==1||selectedC2.length!==11)throw Error("C2 owner exclusion/source identities diverged");
@@ -78,7 +80,8 @@ export function selectOptionBudgetaryOffer0553(){
     technicalSourceId:/7\/8-inch RF cable/i.test(x.description)?feeder.id:null,
     technicalSourceUrl:/7\/8-inch RF cable/i.test(x.description)?feeder.source:null,
     materials:code==="C1"?"Marine-certified beacon and compatible service accessories":
-     "OEM replacement component or compatible service material"
+     "OEM replacement component or compatible service material",
+    ...(code==="C2"?c2Technical[x.id]:{})
    }))),
    budgetaryQuoteUSD:usd,priceState:"CONDITIONAL_BUDGETARY_OFFER",quotePrepared:true,
    includedInAPlusB:false,customerAccepted:false,supplierOemConfirmed:false,

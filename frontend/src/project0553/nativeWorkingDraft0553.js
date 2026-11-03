@@ -384,7 +384,7 @@ export async function buildNativeWorkingDraft0553(file,model){
   const offered=option?.budgetaryOfferPrepared===true;
   const sourceDetail=excluded?[]:offered?model.budgetaryOptionAnnex[code].map(x=>({
    sourceId:x.sourceId,item:x.item,historicalSourceId:x.historicalSourceId,
-   tagNo:code==="C2"?"Two-year operating stock / TAG by OEM":x.tag,
+   tagNo:x.tag,
    description:x.description,specification:x.specification,materials:x.materials,
    qty:x.quantity,customerUnitTHB:x.unitPriceTHB,customerTotalTHB:x.extendedTHB,
    leadTimeARO:x.leadTime||"OEM confirmation required"
@@ -617,7 +617,7 @@ export async function buildNativeOfficialRelease0553(file,model){
    const detail=code==="B11"?[]:isB10?model.b10ItemizedAnnex?.rows:
     model.otherSpareItemizedAnnex?.rows?.[code];
    if(!Array.isArray(detail)||detail.length>(isB10?14:13)||
-      (isB10&&(detail.length!==14||model.b10ItemizedAnnex?.customerIssued!==false)))
+      (isB10&&(detail.length!==11||model.b10ItemizedAnnex?.customerIssued!==false)))
     throw Error(code+" original priced Annex capacity or approval gate failed");
    put("B2",model.annexTitles[code]);
    ["Item","Tag No.","Description","Specification","Materials","Qty"].forEach((v,j)=>put("BCDEFG"[j]+"4",v));
@@ -649,7 +649,7 @@ export async function buildNativeOfficialRelease0553(file,model){
   }
   for(const [address,formula] of preservedFormulas){
    const value=cells.get(address),row=Number(address.slice(1));
-   if(i===3||value==="")continue; // Withdrawn B11 and cleared surplus rows must not retain old price formulas.
+   if(i===3||value===""||!cells.has(address))continue; // Withdrawn B11 and cleared surplus rows must not retain old price formulas.
    const calculated=formula.includes('SUM(')?round([...cells].filter(([key,v])=>/^I\d+$/.test(key)&&Number(key.slice(1))>=6&&Number(key.slice(1))<row&&Number.isFinite(v)).reduce((sum,[,v])=>sum+v,0)):
     round(cells.get('G'+row)*cells.get('H'+row));
    if(!Number.isFinite(value)||calculated!==round(value))throw Error("Native formula/source mismatch: "+name+"!"+address);
@@ -728,8 +728,9 @@ export async function buildNativeB10ItemizedReview0553(file,annex){
  if(!SHEETS_0553.every(name=>workbook.includes('name="'+name+'"')))
   throw Error("B10 output must retain all six original customer worksheets");
  let xml=decode.decode(await readEntry(sheet));
- const original13=13,extra=Math.max(0,annex.rows.length-original13);
- if(extra){
+ const original13=13,alreadyExpanded=xml.includes('<mergeCell ref="B20:H20"');
+ const extra=Math.max(alreadyExpanded?1:0,annex.rows.length-original13);
+ if(extra&&!alreadyExpanded){
   const originalRow=xml.match(/<row\b[^>]*\br="18"[^>]*>[\s\S]*?<\/row>/)?.[0];
   if(!originalRow||!xml.includes('<mergeCell ref="B19:H19"')||
    !xml.includes('<mergeCell ref="B20:E20"'))throw Error("Original B10 styled body/total/remark geometry changed");
@@ -755,7 +756,7 @@ export async function buildNativeB10ItemizedReview0553(file,annex){
     prefix+a+(Number(first)+extra)+":"+b+(Number(last)+extra)+suffix:whole);
  }
  const totalRow=19+extra,remarkRow=20+extra;
- if(totalRow!==6+annex.rows.length)throw Error("B10 native total row not below all physical items");
+ if(totalRow<6+annex.rows.length)throw Error("B10 native total row not below all physical items");
  const writes=new Map();
  write(writes,"H4","BUDGETARY WORKING SELL (USD) — NOT ISSUED");
  write(writes,"H5","UNIT PRICE (USD) — BUDGET LOT");
@@ -771,6 +772,7 @@ export async function buildNativeB10ItemizedReview0553(file,annex){
   write(writes,"H"+row,r.budgetaryUnitPriceUSD);
   write(writes,"I"+row,r.budgetaryTotalUSD);
  }
+ for(let j=annex.rows.length;j<original13+extra;j++)for(const col of ["B","C","D","E","F","G","H","I"])write(writes,col+(6+j),"");
  write(writes,"B"+totalRow,"B10 TOTAL — ALLOCATED WORKING BUDGET USD / NOT ISSUED");
  write(writes,"I"+totalRow,annex.budgetaryPresentationTotalUSD);
  write(writes,"B"+remarkRow,"BUDGETARY WORKING PRICE BREAKDOWN / NOT ISSUED. Each line is 1 LOT functional allowance; "+

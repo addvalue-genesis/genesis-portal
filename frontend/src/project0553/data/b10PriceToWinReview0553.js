@@ -36,13 +36,13 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
  if(denom<=0)throw Error("Impossible B10 target profit / SAMTEL allocation");
  const multiplier=(1+riskCostPct/100)/denom;
  const b10=selectB10ItemizedPurchaseEvidence0553();
- const entries=b10.budgetEnvelopeRows;
+ const entries=b10.historicalBudgetEnvelopeRows;
  if(entries.length!==4||b10.originalB10WorkingSellTHB!==509827.5)throw Error("Current B10 policy baseline changed");
  // B10 source cost assumptions are persisted in existing spareCustomerSchedule.
  // The single MR1 historical parametric envelope is *replaced* by NextG
  // accessory scenario, not added on top. MR2-4 remain a shared UNITEMIZED
  // budget reserve; no one may present their amounts as per-SKU quotations.
- const sourceCosts=b10.budgetEnvelopeRows.map(x=>({
+ const sourceCosts=b10.historicalBudgetEnvelopeRows.map(x=>({
   ...x,parametricUnitCostUSD:round2(x.workingUnitSellTHB/(31.5*1.30))
  }));
  const priorByMr=new Map(sourceCosts.map(x=>[x.mr,round2(x.contractKitCount*x.parametricUnitCostUSD)]));
@@ -89,7 +89,7 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
  const sellBeforeUsdRoundUSD=round2(costUSD*multiplier);
  const sellBeforeUsdRoundTHB=round2(costUSD*OFFICIAL_USD_POLICY_0553.thbPerUsd*multiplier);
  const proposedMainOfficialUSD=quoteUsd0553(sellBeforeUsdRoundTHB,OFFICIAL_USD_POLICY_0553);
- const originalOfficialUSD=quoteUsd0553(b10.originalB10WorkingSellTHB,OFFICIAL_USD_POLICY_0553);
+ const originalOfficialUSD=quoteUsd0553(b10.selectedB10WorkingSellTHB,OFFICIAL_USD_POLICY_0553);
  const originalSourceUSD=round2([...priorByMr.values()].reduce((s,v)=>s+v,0));
  const sourceCreditUSD=mr1CreditedUSD;
  const sourceScenarioReconciled=round2(originalSourceUSD-sourceCreditUSD+mr1QuoteCostUSD)===costUSD;
@@ -102,7 +102,7 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
   moduleId:"bid.budget.working.bc.b10.price-to-win-review",
   parentOwner:"B10",sourceModuleId:b10.moduleId,
   supersededByOwnerScope:true,
-  scopeReviewNote:"Historical scenario includes RF filters D-2/E-2, excluded from B10 by owner03-Nov2026. It is not the current B10 offer or a surge quotation. Retain arithmetic for audit only; obtain an exact surge quote before a new estimate.",
+  scopeReviewNote:"Historical scenario includes RF filters D-2/E-2, excluded from B10 by owner03-Nov2026. It is not the current B10 offer or a surge quotation. RACON B10 stock has also been excluded by owner. Retain historical arithmetic for audit only; obtain an exact surge quote before a new estimate.",
   sourceStatus:"INTERNAL_EXPIRED_VENDOR_QUOTE_PLUS_UNITEMIZED_PARAMETRIC_ENVELOPES",
   selectedSourceQuoteLines:freeze(selected),otherMrCostEnvelopes:residual,
   marketPriceComparables,
@@ -114,8 +114,8 @@ export function selectB10PriceToWinReview0553({targetGrossProfitOfSellPct=20,ris
   scenario:{sourceCostUSD:costUSD,sourceCostTHB:round2(costUSD*31.5),
    riskCostUSD:round2(costUSD*riskCostPct/100),
    sellBeforeUsdRoundUSD,sellBeforeUsdRoundTHB,roundedOfficialSummaryUSD:proposedMainOfficialUSD,
-   existingWorkingSellTHB:b10.originalB10WorkingSellTHB,existingOfficialSummaryUSD:originalOfficialUSD,
-   proposedVsExistingTHB:round2(sellBeforeUsdRoundTHB-b10.originalB10WorkingSellTHB),
+   existingWorkingSellTHB:b10.selectedB10WorkingSellTHB,existingOfficialSummaryUSD:originalOfficialUSD,
+   proposedVsExistingTHB:round2(sellBeforeUsdRoundTHB-b10.selectedB10WorkingSellTHB),
    proposedVsExistingOfficialUSD:proposedMainOfficialUSD-originalOfficialUSD},
   assumptions,releaseAllowed:false,postedToWorking:false,postedToOfficial:false,
   supplierQuoteRefreshVerified:false,supplierActualPurchasePriceVerified:false,

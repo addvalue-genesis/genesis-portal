@@ -14,7 +14,7 @@ const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 const freeze=Object.freeze;
 const identity=x=>JSON.stringify([x.mr,x.site,String(x.id)]);
 // Shared unit-price allocation: raw source inputs and category totals stay
-// fixed. C1 uses USD100; B13/C2 use USD1. Reconcile residuals on Qty1 rows
+// fixed. C1 uses USD100; B10/B13/C2 use USD1. Reconcile residuals on Qty1 rows
 // without a separate balancing charge or a second commercial factor.
 export function roundC1AnnexUnits0553(rows,targetUSD,incrementUSD=100,{residualMetric="absolute"}={}){
  if(!["absolute","squared"].includes(residualMetric))throw Error("Invalid annex residual metric");
@@ -41,7 +41,7 @@ export function roundC1AnnexUnits0553(rows,targetUSD,incrementUSD=100,{residualM
  return freeze(rounded.map(r=>freeze({...r,totalUSD:r.quantity*r.unitUSD,
   roundingAdjustmentUSD:round(r.quantity*r.unitUSD-r.sourceTotalUSD)})));
 }
-// Same controlled allocation kernel, also used for whole-USD B13/C2 unit prices.
+// Same controlled allocation kernel, also used for whole-USD B10/B13/C2 unit prices.
 export const roundAnnexUnitPrices0553=roundC1AnnexUnits0553;
 // Customer-style wording is a view of the existing six budget rows, not a
 // second spare ledger. Reference equipment TAGs are not new spare asset TAGs.

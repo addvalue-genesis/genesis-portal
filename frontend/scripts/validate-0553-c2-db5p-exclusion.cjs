@@ -6,15 +6,16 @@ const from=p=>require(path.join(root,'project0553',p)),hash=x=>crypto.createHash
 const before=require('./fixtures/0553-before-c2-db5p-removal-20261103.json');
 const source=from('data/releaseCommercialModel0553').buildReleaseCommercialModel0553({thbPerUsd:31.5}),official=from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(source);
 for(const [key,rows] of [['sourceRows',[...source.a,...source.b,...source.c]],['officialRows',[...official.a,...official.b,...official.c]]])
- for(const expected of before[key].filter(x=>x.code!=='C2'))assert.equal(hash(rows.find(x=>x.code===expected.code)),expected.sha256,key+' unexpected price/scope change '+expected.code);
-assert.equal(hash(source.annex),before.annex);assert.equal(hash(official.otherSpareItemizedAnnex.rows.C1),before.c1Rows);assert.equal(hash(official.otherSpareItemizedAnnex.rows.B13),before.b13Rows);
+ for(const expected of before[key].filter(x=>!['B10','C2'].includes(x.code)))assert.equal(hash(rows.find(x=>x.code===expected.code)),expected.sha256,key+' unexpected price/scope change '+expected.code);
+const originalB10=from('data/releaseCommercialModel0553').buildAnnexWorkingPriceBridge0553({code:'B10',sourceRows:from('data/spareCustomerSchedule0553').selectSpareCustomerSchedule0553().originalCurrentByCode.B10,owner:{workingSellTHB:509827.5}}).rows;
+assert.equal(hash({...source.annex,B10:originalB10}),before.annex);assert.equal(hash(official.otherSpareItemizedAnnex.rows.C1),before.c1Rows);assert.equal(hash(official.otherSpareItemizedAnnex.rows.B13.map(x=>({...x,tag:'Shared stock; TAG references below. Qty is not per TAG.'}))),before.b13Rows);
 const option=from('data/optionBudgetaryOffer0553').selectOptionBudgetaryOffer0553().offers.C2;
 const raw=from('data/sparePricedBudgetReview0553').selectSparePricedBudgetReview0553();
 assert.equal(raw.rows.C2.length,12);assert.equal(raw.totals.C2,721806.6);
 assert.equal(option.excludedRows.length,1);assert.equal(option.excludedRows[0].id,'C2-REV08-07');assert.equal(option.excludedRows[0].extendedTHB,285210.95);
 assert.equal(option.sourceSellTHB,436595.65);assert.equal(option.rows.length,11);
 assert.equal(option.budgetaryQuoteUSD,Math.ceil(option.sourceSellTHB/31.5/100-1e-10)*100);assert.equal(option.budgetaryQuoteUSD,13900);assert.equal(before.oldC2USD-option.budgetaryQuoteUSD,9100);
-assert.equal(option.sourceId,'C2-OPTION-REV08-12');assert.equal(official.totalUSD,897800);
+assert.equal(option.sourceId,'C2-OPTION-REV08-12');assert.equal(official.totalUSD,894500);
 assert(!option.rows.some(x=>x.id==='C2-REV08-07'));
 for(const row of option.rows){const original=raw.rows.C2.find(x=>x.id===row.id);assert.equal(row.quantity,original.quantity);assert.equal(row.unitPriceTHB,original.unitPriceTHB);assert.equal(row.extendedTHB,original.extendedTHB);assert(Number.isInteger(row.unitUSD));assert.equal(row.unitUSD*row.quantity,row.totalUSD);}
 assert.equal(option.rows.reduce((s,x)=>s+x.totalUSD,0),13900);
@@ -32,7 +33,7 @@ const cell=(xml,a)=>xml.match(new RegExp('<c\\b[^>]*r="'+a+'"[^>]*>([\\s\\S]*?)<
   assert(cell(summary,'G42').includes('<v>'+total+'</v>'));assert(cell(c2,'I19').includes('<v>'+total+'</v>'));
   assert(!c2.includes('RACON distribution box spare'));assert(!c2.includes('DB-5P'));assert(c1.includes('DB-5P'));
   assert(!cell(c2,'I17').includes('<v>'),'Old twelfth price must be cleared');
-  if(kind!=='THB')assert(cell(summary,'G38').includes('<v>897800</v>'));
+  if(kind!=='THB')assert(cell(summary,'G38').includes('<v>894500</v>'));
  }
  console.log('PASS C2 owner DB-5P exclusion: 11 selected / 12 historical, THB436595.65 -> USD13900; all other financial parents, C1/Part A DB-5P inclusions and B13 unchanged; active UI and USD/THB/Breakdown synchronized.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -100,6 +100,6 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
     <td><a href={r.url} target="_blank" rel="noreferrer">{Number.isFinite(r.usdUnit)?cash(r.usdUnit):cash(r.thbUnit,"THB")} / unit (external)</a>
      <small>{r.quoteType}</small></td><td>{r.relevance}</td></tr>)}</tbody>
   </table></div>
-  <p className="p55-note"><strong>Quotation hold:</strong> Original 14 contractual kits remain in financial Release B10. None of these scenario item prices is automatically a customer approved unit price. Before actual itemized 10.3.4/Excel, establish full B10 SPIR, exact SKU-to-TAG compatibility and quantity, receive/quote basis and no duplicate Part A/B5/B6/B11/C1/C2; the real price will then replace this scenario, not stack over it.</p>
+  <p className="p55-note"><strong>Quotation hold:</strong> Selected Release contains 11 kits for MR0001–0003; RACON B10 is owner-excluded. Historical14-kit arithmetic below is superseded. None of these scenario item prices is automatically a customer approved unit price. Before actual itemized 10.3.4/Excel, establish full B10 SPIR, exact SKU-to-TAG compatibility and quantity, receive/quote basis and no duplicate Part A/B5/B6/B11/C1/C2; the real price will then replace this scenario, not stack over it.</p>
  </details>;
 }

@@ -1,3 +1,4 @@
+import {selectC2CustomerSchedule0553} from "./c2CustomerSchedule0553";
 import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 // Read-only review of the twelve existing C2 price references. Equipment TAG
 // associations are candidates, never proof of compatible spare SKU or stock.
@@ -19,7 +20,7 @@ const historicalDescriptions=freeze([
  "7/8-inch RF cable operating spare (m)","CAT6A data cable operating spare (m)","N-male termination spares","M20 complete gland spares"
 ]);
 export function selectC2TagReview0553(){
- const source=selectSparePricedBudgetReview0553().rows.C2;
+ const source=selectSparePricedBudgetReview0553().rows.C2,customer=selectC2CustomerSchedule0553();
  const offer=selectOptionBudgetaryOffer0553().offers.C2,activeIds=new Set(offer.rows.map(x=>x.id));
  const installed=selectSpareCoverageEngineering0553().installed;
  const evidence=selectSparesPriceEvidence0553();
@@ -87,6 +88,7 @@ export function selectC2TagReview0553(){
     existingC2RateReplaced:false,decision:"Current supplier spare-rate evidence exists; reconcile exact SKU, scope and terms against the historic C2 budget before selecting a new rate."}):null,
    currentOemSpareRateVerified:false,twoYearQuantityVerified:false,
    tagMappingStatus:"REFERENCE_EQUIPMENT_ONLY__OEM_SKU_AND_POOLING_OPEN",
+   ...(activeIds.has(r.id)?{description:customer[r.id].description,tagRefs:customer[r.id].tagRefs}:{}),
    stockRemovalApproved:!activeIds.has(r.id),postToPricing:false,customerIssueAllowed:false});
  });
  return freeze({rows:freeze(rows),historicalSubtotalTHB:selectSparePricedBudgetReview0553().totals.C2,

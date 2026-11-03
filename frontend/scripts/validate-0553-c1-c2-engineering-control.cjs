@@ -105,7 +105,7 @@ const collisions=select({inputs:{...inputs,[first]:{...inputs[first],stockId:'SH
 assert.equal(collisions.codes.C1.rows[0].assessment.reviewSellTHB,null);
 assert.equal(collisions.codes.C2.rows[0].assessment.reviewSellTHB,null);
 assert.equal(JSON.stringify({source:buildReleaseCommercialModel0553({thbPerUsd:31.5}),official:buildOfficialUsdRelease0553(source)}),frozenPrice,'All pricing/trace models must remain byte-equivalent after scenarios');
-assert.equal(official.totalUSD,897800);
+assert.equal(official.totalUSD,894500);
 
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const {C1C2EngineeringControl0553}=from('C1C2EngineeringControl0553.jsx');

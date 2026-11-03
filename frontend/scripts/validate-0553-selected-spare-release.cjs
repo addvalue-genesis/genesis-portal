@@ -9,13 +9,13 @@ const scope=from('data/scopePartBcReadModel0553').selectScopePartBcWorking0553()
 const source=from('data/releaseCommercialModel0553').buildReleaseCommercialModel0553({thbPerUsd:31.5});
 const quote=from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(source);
 for(const [key,actual] of [['sourceRows',[...source.a,...source.b,...source.c]],['officialRows',[...quote.a,...quote.b,...quote.c]]]){
- for(const expected of before[key].filter(x=>!['B11','C1','C2'].includes(x.code)))
+ for(const expected of before[key].filter(x=>!['B10','B11','C1','C2'].includes(x.code)))
   assert.equal(hash(actual.find(x=>x.code===expected.code)),expected.sha256,key+' unexpected change '+expected.code);
 }
-for(const [code,h] of Object.entries(before.annex).filter(([code])=>code!=='B11'))assert.equal(hash(source.annex[code]),h,code+' original source identity changed');
+for(const [code,h] of Object.entries(before.annex).filter(([code])=>!['B10','B11'].includes(code)))assert.equal(hash(source.annex[code]),h,code+' original source identity changed');
 assert.equal(working.byCode.B11.workingSellTHB,null);assert.equal(scope.lines.B11.amountTHB,null);
 assert.equal(scope.lines.B11.offerTreatment.priceText,'N/A');assert.equal(working.byCode.B11.b11VendorFollowup.withdrawnAllowanceTHB,157657.5);
-assert.equal(working.knownWorkingSellTHB,6066125.37);assert.equal(quote.totalUSD,897800);assert.equal(before.totalUSD-quote.totalUSD,5100);
+assert.equal(working.knownWorkingSellTHB,5961702.87);assert.equal(quote.totalUSD,894500);assert.equal(before.totalUSD-quote.totalUSD,8400);
 assert.equal(quote.b.find(x=>x.code==='B11').priceText,'N/A');
 assert(source.annex.B11.every(x=>x.customerUnitTHB===null&&x.customerTotalTHB===null&&x.offerExcluded));
 assert.equal(Math.round(source.annex.B11.reduce((s,x)=>s+x.referenceTotalTHB,0)*100),15765750);
@@ -61,7 +61,7 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*>([\\s\\
    assert(cell(c1,'I'+(6+i)).includes('<v>'+r.totalUSD*factor+'</v>'));
   }
   if(kind!=='THB'){
-   assert(cell(summary,'G38').includes('<v>897800</v>'));
+   assert(cell(summary,'G38').includes('<v>894500</v>'));
    for(const internal of ['CONDITIONAL BUDGETARY OPTION SELL','installed RACON FCA package is a rate comparator','PRE-AWARD WORKING ALLOCATION','PRE-AWARD WORKING PRICE TOTAL'])assert(!c1.includes(internal),kind+' leaked '+internal);
   }
  }
@@ -78,5 +78,5 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*>([\\s\\
  const repairedParts=native.entriesFromZip(new Uint8Array(await repaired.blob.arrayBuffer()));
  const fixed=new TextDecoder().decode(await native.readEntry(repairedParts.find(x=>x.name==='xl/worksheets/sheet3.xml')));
  assert(cell(fixed,'I19').includes('N/A'));assert(!fixed.includes('<f>'));assert(!fixed.includes('<v>5100</v>'));
- console.log('PASS selected spare release: only B11/C1 financial rows changed; Source/Working/Scope/Release/6-sheet USD and THB/10-sheet Breakdown agree, A+B897800, C1181100, B11N/A; raw source trace and other prices preserved.');
+ console.log('PASS selected spare release: B11/C1 selection retained; subsequent owner B10/C2 decisions applied; Source/Working/Scope/Release/6-sheet USD and THB/10-sheet Breakdown agree, A+B894500, C1181100, B11N/A; raw source trace and other prices preserved.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

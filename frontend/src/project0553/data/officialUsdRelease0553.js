@@ -96,7 +96,7 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
  const rows=[...a,...b,...c],annex={};
  for(const code of ["B10","B11","B13","C1","C2"]){
   const items=source.annex[code]||[],parent=rows.find(r=>r.code===code);
-  if(items.length!==specifications[code].length||new Set(items.map(r=>r.sourceId)).size!==items.length||items.some(r=>!specificationById[r.sourceId]||!r.sourceId.startsWith(code+"-PTTEP-")))throw Error(code+" customer description mapping needs review");
+  if(items.length!==(code==="B10"?3:specifications[code].length)||new Set(items.map(r=>r.sourceId)).size!==items.length||items.some(r=>!specificationById[r.sourceId]||!r.sourceId.startsWith(code+"-PTTEP-")))throw Error(code+" customer description mapping needs review");
   if(parent.amountUSD!==null&&Math.abs(items.reduce((n,r)=>n+(r.customerTotalTHB||0),0)-parent.sourceTHB)>0.02)throw Error(code+" source annex total differs from Release");
   annex[code]=allocateAnnex(items.map((r,i)=>({code,sourceId:r.sourceId,sourceRowModuleId:r.sourceRowModuleId,traceId:r.traceId,sourceTHB:r.customerTotalTHB,
    tagNo:r.tagNo||"COMMON",description:r.description.replace("readiness reserve","set"),
@@ -105,6 +105,7 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
  }
  // Round unit prices at the Official owner; all downstream B13 views/exports
  // consume these same rows. Original THB source and total USD1500 stay intact.
+ annex.B10=roundAnnexUnitPrices0553(annex.B10.map(x=>({...x,id:x.sourceId,quantity:x.qty,sourceTotalUSD:x.totalUSD})),b.find(x=>x.code==="B10").amountUSD,1,{residualMetric:"squared"});
  annex.B13=roundAnnexUnitPrices0553(annex.B13.map(x=>({...x,id:x.sourceId,quantity:x.qty,sourceTotalUSD:x.totalUSD})),b.find(x=>x.code==="B13").amountUSD,1,{residualMetric:"squared"});
  const known=[...a,...b].filter(r=>r.amountUSD!==null);
  const document={moduleId:"bid.budget.pricing.official",sourceModuleId:"bid.budget.pricing.release.preview",currency:"USD",

@@ -23,33 +23,33 @@ assert.equal(stage.originalZwp20RequiredBom.length,8);
 for(const tag of ["MR-502-001","MR-502-001A","ANT-502-001","LAN-502-001",
  "DATO-507-001","TCAB-500-001","SA-502-001","Bulk Material"])
  assert(stage.originalZwp20RequiredBom.some(x=>x.tag===tag),"Missing ZWP20 installed BOM "+tag);
-assert.deepEqual(Array.from(stage.commissioningSiteKits).map(x=>x.kits),[4,3,4,3]);
-assert.equal(stage.stageRows.length,14);
+assert.deepEqual(Array.from(stage.commissioningSiteKits).map(x=>x.kits),[4,3,4]);
+assert.equal(stage.stageRows.length,11);
 assert(stage.stageRows.every(x=>x.physicalSpareQty===null&&x.unitSpareSellUSD===null&&
  x.replacementSku===null&&!x.commercialReleaseAllowed));
 assert.equal(annex.originalSheet,"B10 CommSpares");
 assert.deepEqual(Array.from(annex.layoutColumns),["B","C","D","E","F","G","H","I"]);
-assert.equal(annex.rows.length,14);
+assert.equal(annex.rows.length,11);
 const surge=annex.rows.find(x=>x.id==="B10-PTTEP-01-F04");
 assert.equal(surge.description,"RF surge-protection spare assembly");
 assert(/surge/i.test(surge.specification)&&/surge arrester/i.test(surge.materials));
 assert(!/filter/i.test(surge.description+surge.specification+surge.materials));
 assert.equal(surge.physicalSpareQty,null);assert.equal(surge.sourceQuoteEvidence.length,0);
 
-assert.equal(annex.totalRow,20);
+assert.equal(annex.totalRow,19);
 assert.equal(annex.originalDataCapacity,13);
-assert.equal(annex.rows.filter(x=>x.isRequirementFamily).length,14);
-assert.deepEqual(["MR-0001","MR-0002","MR-0003","MR-0004"].map(mr=>annex.rows.filter(x=>x.mr===mr).length),[4,3,4,3]);
-assert.equal(new Set(annex.rows.map(x=>x.id)).size,14);
+assert.equal(annex.rows.filter(x=>x.isRequirementFamily).length,11);
+assert.deepEqual(["MR-0001","MR-0002","MR-0003","MR-0004"].map(mr=>annex.rows.filter(x=>x.mr===mr).length),[4,3,4,0]);
+assert.equal(new Set(annex.rows.map(x=>x.id)).size,11);
 assert(annex.rows.every(x=>x.b10PurchaseQty===null&&x.b10UnitSellUSD===null&&
  x.b10ExtendedSellUSD===null&&!x.customerIssueAllowed&&x.presentationQty===1&&
  x.presentationUnit==="LOT"&&Number.isFinite(x.budgetaryUnitPriceUSD)&&x.budgetaryUnitPriceUSD>0));
-assert.equal(annex.selectedMRKitWorkingSellTHB,509827.5);
-assert.equal(annex.budgetaryPresentationTotalUSD,16185);
-assert.equal(allocation.totalAllocatedUSD,16185);
-assert.deepEqual(Array.from(allocation.byOwner).map(x=>x.sourceTotalUSD),[7280,2730,2860,3315]);
+assert.equal(annex.selectedMRKitWorkingSellTHB,405405);
+assert.equal(annex.budgetaryPresentationTotalUSD,12870);
+assert.equal(allocation.totalAllocatedUSD,12870);
+assert.deepEqual(Array.from(allocation.byOwner).map(x=>x.sourceTotalUSD),[7280,2730,2860]);
 assert.deepEqual(Array.from(annex.rows).map(x=>x.budgetaryUnitPriceUSD),
- [1820,1820,1820,1820,910,910,910,715,715,715,715,1105,1105,1105]);
+ [1820,1820,1820,1820,910,910,910,715,715,715,715]);
 assert(annex.rows.every(x=>!(/PENDING|SPIR|INTERNAL|BUDGET|WORKING|PRICE/i).test(x.specification+" "+x.materials)),
  "No internal message belongs inside customer Detail Specification or Materials");
 assert(annex.rows.some(x=>x.tag.includes("SA-502-001")));
@@ -60,7 +60,7 @@ assert(annex.rows.some(x=>x.physicalStageNames.includes("Pre-commissioning")));
 assert(annex.rows.some(x=>x.physicalStageNames.includes("Commissioning")));
 assert(annex.rows.some(x=>x.physicalStageNames.includes("Start-up")));
 const stageHtml=renderToStaticMarkup(React.createElement(B10StageSpareSelection0553,{internal:true,onOpenSource:()=>{}}));
-assert.equal((stageHtml.match(/data-b10-stage-spare-id=/g)||[]).length,14);
+assert.equal((stageHtml.match(/data-b10-stage-spare-id=/g)||[]).length,11);
 assert(stageHtml.includes("10% rules for PLC Based SCADA"));
 const internal=renderToStaticMarkup(React.createElement(B10NativeAnnexReview0553,{internal:true,onOpenSource:()=>{},variant:"release"}));
 const official=buildOfficialUsdRelease0553(buildReleaseCommercialModel0553({thbPerUsd:31.5}));
@@ -70,14 +70,14 @@ const customer=renderToStaticMarkup(React.createElement(B10NativeAnnexReview0553
 }));
 for(const html of [internal,customer]){
  assert(html.includes("CIF Zhuhai Port"));
- assert.equal((html.match(/data-native-b10-source-id=/g)||[]).length,14);
- assert.equal((html.match(/data-b10-requirement-id=/g)||[]).length,14);
+ assert.equal((html.match(/data-native-b10-source-id=/g)||[]).length,11);
+ assert.equal((html.match(/data-b10-requirement-id=/g)||[]).length,11);
  assert(html.includes("UNIT PRICE (USD)")&&html.includes("TOTAL PRICE (USD)"));
  assert(html.includes("B10 — Original Annex: Spare Part Schedule"));
 }
 assert(internal.includes("Engineering source / vendor evidence — INTERNAL ONLY"));
 assert(internal.includes('data-b10-racon-quote-review="QTORG2609244"'));
-assert(internal.includes("No extra RF coaxial feeder"));
+assert(internal.includes("owner-excluded from B10"));
 assert(!customer.includes('data-b10-racon-quote-review'));
 assert(customer.includes(surge.description)&&!customer.includes("RF filter"));
 assert(!customer.includes("Engineering source / vendor evidence"));
@@ -85,12 +85,12 @@ assert(internal.includes("sourceSelectionId:x.id")===false); // JSX source expre
 assert(!customer.includes("242,460.00"));
 assert(!customer.includes("NG/260916-ADV-DAP1"));
 assert(!customer.includes("安装"));
-assert(internal.includes("16,185.00"));
+assert(internal.includes("12,870.00"));
 assert(internal.includes("1,820.00"));
 assert(customer.includes("PRE-AWARD USD / CIF NOT VERIFIED"));
-assert(customer.includes("16,200.00"));
-assert(customer.includes("1,821.69"));
-assert(!customer.includes("16,185.00"),"Do not use pre-round Working sum as Official");
+assert(customer.includes("12,900.00"));
+assert(customer.includes("1,824.00"));
+assert(!customer.includes("12,870.00"),"Do not use pre-round Working sum as Official");
 assert(!customer.includes("242,460.00"),"Part A equipment cost must not leak");
 assert(!customer.includes("To be quoted"),"14 budgetary LOT amounts must populate Official");
 const kit=fs.readFileSync(path.join(root,"project0553/B10KitPriceSummary0553.jsx"),"utf8");
@@ -118,24 +118,24 @@ const decoder=new TextDecoder();
  const existingWorking=await box.ext.buildNativeWorkingDraft0553(file,release);
  const reviewOnWorking=await box.ext.buildNativeB10ItemizedReview0553(
   {name:existingWorking.filename,arrayBuffer:()=>existingWorking.blob.arrayBuffer()},annex);
- assert.equal(reviewOnWorking.insertedRows,1);
+ assert.equal(reviewOnWorking.insertedRows,0);
  const combined=box.ext.entriesFromZip(new Uint8Array(await reviewOnWorking.blob.arrayBuffer()));
  const main=decoder.decode(await box.ext.readEntry(combined.find(x=>x.name==="xl/worksheets/sheet1.xml")));
- assert(main.includes("509827.5"),"Same Working B10 price owner must appear in source-linked summary");
+ assert(main.includes("405405"),"Same Working B10 price owner must appear in source-linked summary");
  const checkB10=decoder.decode(await box.ext.readEntry(combined.find(x=>x.name==="xl/worksheets/sheet2.xml")));
- assert(checkB10.includes(annex.rows[13].description)&&checkB10.includes('<mergeCell ref="B20:H20"'),
+ assert(checkB10.includes(annex.rows[10].description)&&checkB10.includes('<mergeCell ref="B19:H19"'),
   "New B10 Working→Annex export must retain all 14 candidate functions and moved total");
  const result=await box.ext.buildNativeB10ItemizedReview0553(file,annex);
- assert.equal(result.rowCount,14);assert.equal(result.insertedRows,1);assert.equal(result.totalRow,20);
+ assert.equal(result.rowCount,11);assert.equal(result.insertedRows,0);assert.equal(result.totalRow,19);
  const inputZip=box.ext.entriesFromZip(bytes),outputZip=box.ext.entriesFromZip(new Uint8Array(await result.blob.arrayBuffer()));
  assert.deepEqual(outputZip.map(e=>e.name),inputZip.map(e=>e.name));
  for(let i=0;i<inputZip.length;i++)if(inputZip[i].name!=="xl/worksheets/sheet2.xml")
   assert.deepEqual(Array.from(await box.ext.readEntry(outputZip[i])),Array.from(await box.ext.readEntry(inputZip[i])),
    "Original unrelated XLSX ZIP part modified: "+inputZip[i].name);
  const xml=decoder.decode(await box.ext.readEntry(outputZip.find(e=>e.name==="xl/worksheets/sheet2.xml")));
- assert(xml.includes('<mergeCell ref="B20:H20"'));
- assert(xml.includes('<mergeCell ref="B21:E21"'));
- assert(!xml.includes('<mergeCell ref="B19:H19"'));
+ assert(xml.includes('<mergeCell ref="B19:H19"'));
+ assert(xml.includes('<mergeCell ref="B20:E20"'));
+ assert(!xml.includes('<mergeCell ref="B20:H20"'));
  const cell=a=>xml.match(new RegExp('<c\\b[^>]*r="'+a+'"[^>]*>([\\s\\S]*?)<\\/c>'))?.[1]||"";
  assert(cell("B6").includes("1.01"));
  assert(cell("D6").includes(annex.rows[0].description));
@@ -146,10 +146,10 @@ const decoder=new TextDecoder();
  assert(!xml.includes("RF filter"),"B10 export must not propose a filter as a surge spare");
  assert(cell("G6").includes("<v>1</v>"));
  assert(cell("H6").includes("<v>1820</v>"));
- assert(cell("I19").includes("<v>1105</v>"));
- assert(cell("I20").includes("<v>16185</v>"));
- assert(cell("B21").includes("BUDGETARY WORKING"));
+ assert(cell("I16").includes("<v>715</v>"));
+ assert(cell("I19").includes("<v>12870</v>"));
+ assert(cell("B20").includes("BUDGETARY WORKING"));
  assert(cell("H4").includes("BUDGETARY WORKING SELL"));
  for(const row of annex.rows)assert(xml.includes(row.description),"Native missing MR item "+row.id);
- console.log("PASS B10 source Working THB509827.50 / USD16185 allocated into 14 functional LOT lines, Spec/Materials customer-clean, 1 extra original B10 row, 6 original sheets and source→release retained; no OEM SKU rate or physical spare Qty falsely approved");
+ console.log("PASS B10 source Working THB405405.00 / USD12870 allocated into 11 selected functional LOT lines, Spec/Materials customer-clean, original 13-slot B10 geometry retained, 6 original sheets and source→release retained; no OEM SKU rate or physical spare Qty falsely approved");
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -53,7 +53,7 @@ export function selectB13TagPresentation0553(){
  if(source.length!==3||!tagGroups.length||!installed.length)throw Error("B13 source scope/TAG grouping changed; review applicability");
  const rows=freeze(source.map((x,i)=>freeze({id:x.id,sourceId:x.sourceId,traceId:x.traceId,
   sourceRowModuleId:x.sourceRowModuleId,item:String(i+1),
-  tag:"Shared stock; TAG references below. Qty is not per TAG.",description:contents[i][0],
+  tag:"COMMON",description:contents[i][0],
   specification:contents[i][1],materials:contents[i][2],qty:x.qty,unit:x.unit,
   unitTHB:x.unitPriceTHB,totalTHB:x.extendedTHB,unitUSD:null,totalUSD:null,
   referenceTagOnly:true,physicalContentsApproved:false,quantityApproved:false})));
@@ -111,7 +111,7 @@ export function buildOtherSpareItemizedPresentation0553(official){
    const priceRows=offer.rows.map(x=>({...x,qty:x.quantity}));
    displayed=priceRows.map((x,i)=>{
     const c1=code==="C1";
-    return freeze({id:x.id,code,item:x.item||String(i+1),sourceSelectionId:x.sourceSelectionId,tag:c1?x.tag:"Two-year operating stock / TAG by OEM",
+    return freeze({id:x.id,code,item:x.item||String(i+1),sourceSelectionId:x.sourceSelectionId,tag:x.tag,
      description:x.description,specification:x.specification,materials:x.materials,
      qty:x.qty,unit:x.unit,unitUSD:x.unitUSD,totalUSD:x.totalUSD,
      ...(code==="C2"?{sourceTotalUSD:x.sourceTotalUSD,roundingAdjustmentUSD:x.roundingAdjustmentUSD}:{}),

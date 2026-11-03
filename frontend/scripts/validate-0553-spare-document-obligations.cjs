@@ -28,7 +28,7 @@ assert(SPARE_DOCUMENT_METHOD_0553.categoryPolicy.C1.startsWith('Required priced'
 assert.equal(SPARE_DOCUMENT_METHOD_0553.noAssumedSparePartQuantity,true);
 assert.equal(d.contractSpareContentComplete,false);
 assert.equal(d.pricePostingAllowed,false);
-assert.equal(c.knownWorkingSellTHB,6066125.37,"Current 10.2 Part B after B2 and purchased FAT reprice, B9 Base once");
+assert.equal(c.knownWorkingSellTHB,5961702.87,"Current 10.2 Part B after B2 and purchased FAT reprice, B9 Base once");
 assert.equal(c.byCode.C1.workingSellTHB,5704650);
 const jsx=fs.readFileSync(path.join(root,"project0553/ScopeBcAnnexDetail0553.jsx"),"utf8");
 assert(jsx.includes("selectDocumentSpareObligations0553"));

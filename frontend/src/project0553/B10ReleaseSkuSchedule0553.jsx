@@ -31,7 +31,7 @@ export function B10ReleaseSkuSchedule0553({evidence,priceReview=null,internal=fa
     <small>Source-linked item identification · {rows.length} original quote lines; {evidence.supplierQuotedCount} price references · no selected spare purchase quantity yet</small></div>
    <span className="p553-b10-sku-state">PRE-AWARD · NOT ISSUED</span>
   </div>
-  <p className="p55-note">The four priced B10 MR kits below are <strong>financial envelopes, not purchasable SKU lines</strong>.
+  <p className="p55-note">The three selected B10 MR kits below are <strong>financial envelopes, not purchasable SKU lines</strong>.
    Source D/E offered quantities are not commissioning spare quantities. OEM interchangeability and Ex/technical suitability are pending.
    {internal?" Displayed USD is the expired NextG vendor reference; review SELL is a nonposting scenario, not the current Release unit price.":" No SKU-level customer price has been approved or issued."}</p>
   <div className="p553-b10-sku-scroll">
@@ -83,7 +83,7 @@ export function B10ReleaseSkuSchedule0553({evidence,priceReview=null,internal=fa
    </table>
   </div>
   <div className="p553-b10-sku-bottom">
-   <span>Price owner: B10 · 4 MR kit rows · THB {evidence.originalB10WorkingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})} unchanged</span>
+   <span>Price owner: B10 · 3 MR kit rows · THB {evidence.selectedB10WorkingSellTHB.toLocaleString("en-US",{minimumFractionDigits:2})} after RACON exclusion</span>
    <span>Source quote rows = <strong>NONPOSTING</strong> · 10.3.4 / native Excel remain unchanged</span>
   </div>
  </section>;

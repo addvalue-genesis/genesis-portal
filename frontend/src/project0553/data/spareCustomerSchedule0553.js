@@ -439,14 +439,22 @@ export function selectSpareCustomerSchedule0553(){
    commonSpareInterchangeabilityVerified:false
   });
  }));
- const currentByCode=Object.fromEntries(CODES.map(code=>[code,
+ const originalCurrentByCode=Object.fromEntries(CODES.map(code=>[code,
   Object.freeze(currentRows.filter(x=>x.code===code))]));
+ // Owner03-Nov2026 removes unquoted RACON B10 stock and its full allowance.
+ // Retain original source IDs/quantities/rates for audit; never redistribute it.
+ const excludedB10Rows=Object.freeze(originalCurrentByCode.B10.filter(x=>x.id==="B10-PTTEP-04"));
+ const b10OwnerDecision=Object.freeze({date:"2026-11-03",excludedSourceIds:Object.freeze(["B10-PTTEP-04"]),
+  reason:"Owner excludes RACON commissioning spares: no separate MDS spare offer.",
+  excludedWorkingSellTHB:round(excludedB10Rows.reduce((n,x)=>n+x.extendedTHB,0)),
+  contractualComplianceConfirmed:false,customerAccepted:false});
+ const currentByCode={...originalCurrentByCode,B10:Object.freeze(originalCurrentByCode.B10.filter(x=>!b10OwnerDecision.excludedSourceIds.includes(x.id)))};
  const currentBudgetaryByCode=Object.fromEntries(CODES.map(code=>[code,
   currentByCode[code].length&&currentByCode[code].every(x=>Number.isFinite(x.extendedTHB))?
    round(currentByCode[code].reduce((n,x)=>n+x.extendedTHB,0)):null]));
  const docKits={"MR-0001":4,"MR-0002":3,"MR-0003":4,"MR-0004":3};
- if(currentByCode.B10.reduce((n,r)=>n+r.qty,0)!==14||
-  Object.entries(docKits).some(([mr,qty])=>currentByCode.B10.find(r=>r.linkedMR[0]===mr)?.qty!==qty)||
+ if(originalCurrentByCode.B10.reduce((n,r)=>n+r.qty,0)!==14||
+  Object.entries(docKits).some(([mr,qty])=>originalCurrentByCode.B10.find(r=>r.linkedMR[0]===mr)?.qty!==qty)||
   currentByCode.B11.length!==4||currentByCode.B13.length!==3||
   currentByCode.C1.length!==1||currentByCode.C2.length!==4||
   new Set(currentRows.map(x=>x.id)).size!==currentRows.length||
@@ -545,7 +553,7 @@ export function selectSpareCustomerSchedule0553(){
   moduleId:"bid.budget.working.bc.customer-spare-schedule",
   sparePriceEvidence,
   codes:CODES,rows,byCode,summary:pricedCategorySummary,riskCandidates,crossCategoryDuplicates,b11Requirements,
-  currentRows,currentByCode,currentBudgetaryByCode,
+  currentRows,currentByCode,originalCurrentByCode,excludedB10Rows,b10OwnerDecision,currentBudgetaryByCode,
   currentWorkingFxTHBPerUSD:paramFx,currentBudgetaryPricingFactor:commercialFactor,
   currentPriceAuthority:"ENGINEERING_PARAMETRIC_SCENARIO_NOT_OEM_VENDOR_QUOTE",
   installedSourceCount:cover.installed.length,engineeringReadiness,

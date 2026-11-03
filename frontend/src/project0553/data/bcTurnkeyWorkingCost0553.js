@@ -62,6 +62,7 @@ const customerRequirements=Object.freeze({
 });
 // Owner instruction 29-Oct-2026: quotation exclusion is not OEM technical N/A.
 export const BC_OFFER_TREATMENT_0553=Object.freeze({
+ B10:Object.freeze({status:"PARTIAL_SCOPE_EXCLUSION",priceText:null,remark:"Refer to Annex B10. RACON commissioning spares excluded.",source:"Owner instruction 2026-11-03",technicalApplicabilityConfirmed:false}),
  B4:Object.freeze({status:"NOT_QUOTED_EXCLUDED",priceText:"N/A",remark:"Not quoted; excluded from this offer.",source:"Owner instruction 2026-10-29",technicalApplicabilityConfirmed:false}),
  B11:Object.freeze({status:"NOT_QUOTED_EXCLUDED",priceText:"N/A",remark:"Not separately quoted. Tools expressly included in the equipment supply remain included.",source:"Owner instruction 2026-11-02",technicalApplicabilityConfirmed:false}),
  B12:Object.freeze({status:"NOT_QUOTED_EXCLUDED",priceText:"N/A",remark:"Not quoted; excluded from this offer.",source:"Owner instruction 2026-10-29",technicalApplicabilityConfirmed:false}),
@@ -261,7 +262,7 @@ export function selectBcTurnkeyWorkingCost0553(){
     pricingGate:"B9 1 LS THB480550 includes paid Senior + Field Technician, each 7+2 days, and two-person cash allowances; customer Release HOLD, call-out required. CCL Item31 18 Yard / 45 Offshore days unchanged: gap pending RACI. SAMTEL FAT labour remains B3."
    }):null,
    b7StorageReserve:code==="B7"?Object.freeze({status:"CONDITIONAL_BUDGETARY_WORKING_SELL",months:b7StorageMonths,amountTHB:b7WorkingSellTHB,source:"MANAGEMENT_BUDGETARY_DECISION_2026_10_18",originalThreeMonthStorageTHB:b5PriceReference.nonAdditiveStorageTHB,includedInB5CurrentSell:false,activateIf:"Additional one-month offsite storage charge not included by OEM/SAMTEL",verifiedDirectCost:false,customerReleaseAllowed:false}):null,
-   b10WorkingSellDecision:code==="B10"?Object.freeze({status:"14_KIT_PTTEP_PARAMETRIC_BUDGETARY_2026_10_23",amountTHB:b10WorkingSellTHB,source:"MR0001–0004 Rev.C1 §5 Attachment 5; 4/3/4/3 qty; OEM parts/rates not yet independently quoted",historicalUSD:null,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"PROVISIONAL_WORKING_SELL_ONLY"}):null,
+   b10WorkingSellDecision:code==="B10"?Object.freeze({status:"OWNER_EXCLUDES_RACON_B10_2026_11_03",excludedWorkingSellTHB:currentSpare.b10OwnerDecision.excludedWorkingSellTHB,amountTHB:b10WorkingSellTHB,source:"Selected MR0001–0003 4/3/4 kits; owner excludes RACON B10 and THB104422.50. Original MR0004 requirement retained; purchaser compliance not confirmed",historicalUSD:null,fxTHBPerUSD:31.5,costOwner:"B10",verifiedDirectCost:false,customerReleaseAllowed:false,postingClass:"PROVISIONAL_WORKING_SELL_ONLY"}):null,
    localLogisticsEnvelope:["B5","B6"].includes(code)?logisticsEnvelope:null,
    b5PriceReference:code==="B5"?b5PriceReference:null,
    b5WorkingSellDecision:code==="B5"?Object.freeze({status:"MANAGEMENT_ACCEPTED_WORKING_SELL_2026_10_15",amountTHB:b5ApprovedSellTHB,source:b5PriceReference.sourceRevision,costOwner:"B5",excludedB7StorageTHB:b5PriceReference.nonAdditiveStorageTHB,verifiedDirectCost:false,customerReleaseAllowed:false}):null,
@@ -321,7 +322,7 @@ export function selectBcTurnkeyWorkingCost0553(){
   return sum+item.workingSellTHB;
  },0));
  if(Math.abs(knownWorkingSellTHB-expectedCurrentBaseTHB)>0.01 ||
-    knownWorkingSellTHB!==round(4994787.13-157657.5+b14Selected.workingSellTHB+b1Current.baseWorkingSellTHB-421180) ||
+    knownWorkingSellTHB!==round(4994787.13-157657.5+b14Selected.workingSellTHB+b1Current.baseWorkingSellTHB-421180-currentSpare.b10OwnerDecision.excludedWorkingSellTHB) ||
     rows.find(x=>x.code==="B2")?.workingSellTHB!==b2CurrentSellTHB ||
     b1Current.baseWorkingSellTHB!==862675.74 ||
     b1Current.historicalEngineeringCarryForwardTHB!==0 ||

@@ -84,7 +84,7 @@ const historicalChinaFatWitnessSellTHB=397400; // pre-22-Oct audit snapshot; NON
 const historicalSpareSell={B10:123024.37,B11:128314.11,B13:22484.21};
 const currentSpareDelta=roundTHB(Object.entries(historicalSpareSell).reduce((sum,[code,old])=>
  sum+bc.byCode[code].workingSellTHB-old,0));
-assert.equal(currentSpareDelta,282687.81);
+assert.equal(currentSpareDelta,178265.31);
 const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
  -(bc.previousB2Rev05ReferenceTHB-bc.byCode.B2.workingSellTHB)
  +bc.byCode.B3.b3MgwPurchasedFatWorkingSell.selectedIncrementalWorkingSellTHB
@@ -94,7 +94,7 @@ const historicalToCurrent=roundTHB(historicalB1OnlyBaseTHB
  +(bc.byCode.B8.workingSellTHB-30000)+currentSpareDelta
  +(bc.byCode.B1.workingSellTHB-211600)+(bc.byCode.B6.workingSellTHB-307584)
  +bc.byCode.B14.workingSellTHB); // B8 Hybrid and 23-Oct authorized spare revision
-assert.equal(historicalToCurrent,6066125.37,
+assert.equal(historicalToCurrent,5961702.87,
  "Historical B1-only baseline to current B2/B3 price selection bridge failed");
 const sumBaseOwners=roundTHB(bc.rows.filter(r=>r.baseScope&&Number.isFinite(r.workingSellTHB))
  .reduce((sum,r)=>sum+r.workingSellTHB,0));

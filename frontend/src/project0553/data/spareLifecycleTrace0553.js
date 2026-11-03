@@ -67,11 +67,11 @@ export function buildSpareLifecycleTrace0553(schedule,release){
    }));
   }
  }
- if(result.length!==16||seen.size!==16)throw Error("0553 five-category lifecycle requires 16 unique financial source records");
+ if(result.length!==15||seen.size!==15)throw Error("0553 five-category lifecycle requires 15 selected financial source records");
  // These are contractual/application checks, NOT independently verified SKU lists.
  const requirements=Object.freeze({
   B10:Object.freeze({source:"MR0001–0004 §5/Attachment 5; SPE §8.1; EXA-A8 Attachment 1",
-   minimum:"14 kit sets across 4/3/4/3 site platforms; parts inside each kit not OEM verified",
+   minimum:"Original MR: 14 kit sets across 4/3/4/3 platforms. Selected offer: 11 kits across MR0001–0003; RACON B10 excluded by owner, purchaser acceptance pending",
    open:"Select exact Start-up SPIR part number, per-type Qty, Ex rating, stock owner, lead time and price"}),
   B11:Object.freeze({source:"EXA-A8 Attachment 2 §5 Telecom; SPE §8.2",
    minimum:(schedule.b11Requirements?.rows||[]).length+" distinct minimum telecom tool functions; not automatically additive to four MR price envelopes",
@@ -150,6 +150,6 @@ export function buildSpareLifecycleTrace0553(schedule,release){
   physicalSkuOwnershipComplete:false,
   completeCategoryReconciliation:false,
   noNewPosting:true,releaseAllowed:false,
-  priceOwnerStatement:"16 source-owned financial rows unchanged; unverified physical SKU quantities, invoices or spare quotes NEVER posted"
+  priceOwnerStatement:"15 selected source-owned financial rows; RACON B10 owner-excluded; unverified physical SKU quantities, invoices or spare quotes NEVER posted"
  });
 }

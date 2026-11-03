@@ -12,7 +12,7 @@ export function B10ItemizedPurchasingEvidence0553({evidence,context="working"}){
   <summary><strong>B10 — Original Item / Source (quoted SKU / TAG / unit-price evidence)</strong>
    <small>{evidence.supplierRows.length} quoted line identities, {evidence.supplierQuotedCount} with price; full purchase scope NOT established</small></summary>
   <p className="p55-note"><strong>Source:</strong> {evidence.sourceQuote} · supplier quote dated 16 Sep 2026, expired 1 Oct 2026.
-   D and E are distinct NextG optional spare-stock groupings; they do not establish the contents of 14 contractual commissioning kits. No sale, cost, inventory or duplicate charge is posted from this evidence.</p>
+   D and E are distinct NextG optional spare-stock groupings; they do not establish the contents of 11 selected commissioning kits; original RACON B10 scope is owner-excluded. No sale, cost, inventory or duplicate charge is posted from this evidence.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Source / MR</th><th>Selected Working SELL THB</th><th>Original kit Qty</th><th>Contents verified</th></tr></thead>
    <tbody>{evidence.budgetEnvelopeRows.map(x=><tr key={x.id}>
@@ -20,7 +20,7 @@ export function B10ItemizedPurchasingEvidence0553({evidence,context="working"}){
     <td>{amount(x.workingTotalSellTHB,"THB")}</td><td>{x.contractKitCount} sets</td><td>NO — itemized OEM SPIR still required</td>
    </tr>)}</tbody></table></div>
   <h4>B10 — MR Physical Requirement / Original Item / Source (SKU not selected)</h4>
-  <p className="p55-note"><strong>These 14 rows are article families, NOT 14 spare units or proven OEM procurement SKUs.</strong> Each parent 4/3/4/3 kit value is counted once above; every sub-item is nonposting until a make/model/part no., exact site TAG, approved purchase Qty and separate supplier rate have been evidenced.</p>
+  <p className="p55-note"><strong>These 11 selected rows are article families, NOT 11 spare units or proven OEM procurement SKUs.</strong> Each selected parent 4/3/4 kit value is counted once above; every sub-item is nonposting until a make/model/part no., exact site TAG, approved purchase Qty and separate supplier rate have been evidenced.</p>
   <div className="p55-table-wrap"><table className="p55-table p55-table--compact">
    <thead><tr><th>Original Item / Source (MR parent)</th><th>Physical article/function</th><th>Actual site/TAG candidates</th><th>OEM part number / SKU</th><th>Physical purchase Qty</th><th>Unit price THB</th><th>Vendor quote link / readiness</th></tr></thead>
    <tbody>{evidence.requirementArticleRows.map(x=><tr key={x.id} data-b10-requirement-id={x.id}>
