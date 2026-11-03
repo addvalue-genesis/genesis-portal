@@ -239,6 +239,21 @@
 .p553-b10-native-annex-table td small{display:block;margin-top:4px;color:#5d7280;font-size:10px;line-height:1.35}
 .p553-b10-native-annex-table tfoot th{background:#edf2f5;text-align:right}
 
+/* C2 has NINE columns. The eight-column100% header widths squeezed lead time
+   into a near-zero ninth column and stretched every row vertically.
+   These browser-only widths do not change the native Excel geometry. */
+.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table{
+ width:100%;min-width:1280px;height:auto;font-size:12px;
+}
+.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table th{
+ width:auto;
+}
+.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table tr,
+.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table th,
+.p553-b10-original-annex[data-original-spare-annex="C2"] .p553-b10-native-annex-table td{
+ height:auto;min-height:0;vertical-align:top;line-height:1.4;
+}
+
 /* B10 equipment-to-commissioning-spare selection; internal-only, compact and scroll-contained. */
 .p553-b10-stage-selection{box-sizing:border-box;max-width:100%;min-width:0}
 .p553-b10-stage-selection>summary{cursor:pointer}

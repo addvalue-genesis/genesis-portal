@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R82";
+export const CHANGE_LOG_VERSION_0553="2026-11-03-R83";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261103-07",date:"2026-11-03",kind:"UI",tone:"neutral",
+  title:"Give C2 all nine columns usable widths and compact content-driven rows",
+  detail:"Owner requests readable C2 display width. The shared eight-column header widths consumed100% before the ninth Lead time column, squeezing its text vertically and expanding row heights. C2 now uses an explicit nine-column100% colgroup with room for TAG/specification, quantity, both prices and Lead time; a scoped1280px minimum keeps narrow screens horizontally scrollable inside the existing container. Header widths reset only for C2, text uses12px and rows fit content. Source buttons, all text/TAGs and all prices remain intact. C2USD20890, CAT6A300m drumUSD8050, C1USD181100 and A+BUSD894910 unchanged. Browser presentation only; Excel geometry/export values and business module IDs unchanged.",
+  moduleIds:Object.freeze(["bid.budget.pricing.official"]),priceImpact:"NO_PRICE_CHANGE",
+  source:"Owner03-Nov2026: adjust C2 display width from screenshot"}),
  Object.freeze({id:"P553-CHANGE-20261103-06",date:"2026-11-03",kind:"PRICE",tone:"caution",
   title:"Replace C2 CAT6A50m with owner-selected TECKNIKABEL300m drum budget",
   detail:"Owner selects TECKNIKABEL CAT6A S/FTP4P23/7AWG GSWB SHF1 grey, whole drum against QA24-0604 showing300m. One offered300m drum at planning THB650/m gives Cost195000; existing Release1.30 once gives SELL253500 /31.5 =USD8047.62, rounded UP toUSD8050 per drum. THB650/m is an internal planning allowance, not a current internet/vendor quote; original15-Jul-2024 rate524/m and raw50m Rev08 row remain immutable.300m factory packing/final OEMSKU and freight/packing remain unconfirmed; no invented actual cost. Replace previous C2 lineUSD1500/THB39713.63 once, do not redistribute other ten prices. C2USD14340→20890 (+6550), Source SELLTHB436595.65→650382.02; active11/historical12 rows and owner DB-5P exclusion remain. Scope/Source/Release/Annex and six-/ten-sheet native exports use the same owner. A+BUSD894910, C1USD181100, RF cable30m/USDrate20 and connectors4/USDrate40, all PartA/B budgets/FX/modules unchanged. CSS RF quotations retained as nonposting evidence only; no RF substitution or purchase approval.",

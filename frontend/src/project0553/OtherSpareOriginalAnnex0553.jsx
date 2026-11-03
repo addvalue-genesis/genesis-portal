@@ -11,6 +11,7 @@ export function OtherSpareOriginalAnnex0553({code,model,onOpenSource=null,curren
   <div className="p553-native-title">{headings[code]}</div>
   {summary.excluded?<p>N/A — Not separately quoted. Tools expressly included in the equipment supply remain included.</p>:<>
   <div className="p553-b10-commercial-scroll"><table className="p553-customer-table p553-b10-native-annex-table">
+   {code==="C2"&&<colgroup>{[6,17,16,24,12,5,7,7,6].map((width,i)=><col key={i} style={{width:width+"%"}}/>)}</colgroup>}
    <thead><tr><th>Item</th><th>Tag No. / Reference site</th><th>Description</th><th>Detail Specification</th>
     <th>Materials</th><th>QTY</th><th>UNIT PRICE ({currency})</th><th>TOTAL PRICE ({currency})</th>
     {option&&<th>Lead time (ARO)</th>}</tr></thead>
