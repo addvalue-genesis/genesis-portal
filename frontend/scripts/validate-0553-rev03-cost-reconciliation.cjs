@@ -87,8 +87,8 @@ for(const site of siteNames){
 assert.equal(rowCount,55);
 assert.equal(costed,55);
 const revisionTotal=money(sumTHB+sumUSD*31.5);
-assert.equal(revisionTotal,5840703.15);
-assert.equal(money(revisionTotal+policy.excludedTotalTHB),6100453.15);
+assert.equal(revisionTotal,5879903.15); // Includes owner-confirmed ZWP11 new cabinet.
+assert.equal(money(revisionTotal-39200+policy.excludedTotalTHB),6100453.15); // Preserve original TC-0001 bridge.
 assert.equal(money(summary("ZWP20").subtotals.THB+summary("ZWP20").subtotals.USD*31.5),869475.22);
 assert.equal(money(summary("ZWP8").subtotals.THB+summary("ZWP8").subtotals.USD*31.5),1335438.58);
 const totalA1=projected({mr:"MR-0001"});
@@ -112,4 +112,5 @@ assert.throws(()=>validateOwners(one.map(r=>r.tag==="LAN-502-001"?{...r,extended
 assert.throws(()=>validateOwners(one.map(r=>r.tag==="LAN-502-001"?{...r,parentPackage:true}:r),"ZWP20"),/Double-posted included package/);
 const consumer=fs.readFileSync(path.join(root,"project0553/data/workingBomAggregation0553.js"),"utf8");
 assert(consumer.includes("mr0001Rev03CostOverlay0553"));
-console.log("PASS Rev03 TC-0001: 55/55 TAGs, 5 LAN costs THB 371,580, 7 locations THB 5,840,703.15, Rev02 bridge THB 259,750; pinned frozen sources unchanged, A5 and sell non-additive, negative fixtures.");
+console.log("PASS Rev03 TC-0001: 55/55 TAGs, 5 LAN costs THB 371,580, 7 locations THB 5,879,903.15 including ZWP11 new cabinet, Rev02 bridge THB 259,750; pinned frozen sources unchanged, A5 and sell non-additive, negative fixtures.");
+

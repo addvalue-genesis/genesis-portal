@@ -9,7 +9,7 @@ const {allocateBreakdown0553,breakdownKey0553,buildCustomerPriceBreakdown0553,cu
 const {buildNativePriceBreakdown0553}=require('../src/project0553/nativePriceBreakdown0553');
 const {buildNativeOfficialRelease0553,entriesFromZip,readEntry}=require('../src/project0553/nativeWorkingDraft0553');
 const source=buildReleaseCommercialModel0553({thbPerUsd:31.5}),official=buildOfficialUsdRelease0553(source),before=JSON.stringify(source),model=buildCustomerPriceBreakdown0553(source,official);
-assert.equal(official.totalUSD,894910);assert.equal(model.reconciled,true);assert.equal(model.releaseAllowed,false);
+assert.equal(official.totalUSD,896530);assert.equal(model.reconciled,true);assert.equal(model.releaseAllowed,false);
 assert.equal(model.baselineState,'SUBMITTED_PROPOSAL_NOT_VERIFIED');
 for(const group of model.groups){
  const canonical=selectWorkingBomProjection0553({mr:group.mr}).lines;
@@ -93,3 +93,4 @@ assert.equal(JSON.stringify(source),before);
  console.log('PASS breakdown: '+model.groups.reduce((s,g)=>s+g.rows.length,0)+' source rows; 83 priced; exact four MR totals; deterministic cents; missing/included retained; original six sheets preserved; four formula-linked appendices; no financial writeback.');
  console.log(JSON.stringify(model.groups.map(({code,parentUSD,pricedCount,includedCount,pendingCount,quantityPendingCount})=>({code,parentUSD,pricedCount,includedCount,pendingCount,quantityPendingCount}))));
 })().catch(e=>{console.error(e);process.exitCode=1;});
+

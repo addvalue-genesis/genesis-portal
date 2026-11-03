@@ -49,7 +49,7 @@ assert.equal(b14.actualCostTHB,null);assert.equal(b14.profitTHB,null);
 assert.equal(b14.samTelDeductionTHB,39375);
 assert.equal(b14.addvalueReceivableTHB,748125);
 assert.equal(model.b.find(x=>x.code==='B14').amountUSD,25000);
-assert.equal(model.totalUSD,894910);
+assert.equal(model.totalUSD,896530);
 assert.equal(model.totalUSD-model.b.find(x=>x.code==='B14').amountUSD,869910,'Current A+B excluding B14 includes the selected B1 delta only');
 
 assert.equal(plan.coverages.find(x=>x.id==='AV-CARGO').costOwner,'B6');
@@ -207,7 +207,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
   for(const internal of ['THB','INTERNAL','HOLD','WORKING DRAFT','NOT ESTABLISHED','bid.budget','Exchange rate','no duplicate engineering charge'])assert(!xml.includes(internal),name+' leaked '+internal);
   if(i===1){
    const expected={a:model.a.map(x=>({...x,amount:x.amountUSD})),b:model.b.map(x=>({...x,amount:x.amountUSD})),total:model.totalUSD,unpricedText:'To be quoted'};
-   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:894910});
+   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:896530});
    // Reproduce the reported partial workbook: spare prices remain, A/B vanish.
    const erase=(input,address)=>input.replace(new RegExp('<c\\b[^>]*r="'+address+'"[^>]*?(?:/>|>[\\s\\S]*?</c>)'),'<c r="'+address+'"/>');
    for(const address of ['A8','B9','C10','D11','E8','F8','G11','A24','B25','E26','F28','G32','G38'])
@@ -301,3 +301,4 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  const arg=process.argv.find(x=>x.startsWith('--output='));if(arg)fs.writeFileSync(arg.slice(9),data);
  console.log('PASS 0553 Official native: B10 USD12960 B11 N/A B13 USD1530, C1 USD181100 and C2 USD27220 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, B14 USD25000 selected once; no spare-option uplift or false OEM confirmation');
 })().catch(e=>{console.error(e);process.exitCode=1;});
+

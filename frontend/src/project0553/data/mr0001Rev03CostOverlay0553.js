@@ -1,10 +1,22 @@
 // PJ2608-0553 Rev03 / TC-0001 Item 13 — ADDITIVE read-only cost overlay.
 // Rev01/Rev02 protected source files stay byte-for-byte frozen; this projection
-// adjusts only the five identified LAN TAG working-cost views. No customer sell.
+// adjusts five identified LAN TAGs and the owner-confirmed ZWP11 new enclosure.
+// Original source decisions remain immutable; current decisions live in this overlay.
 // Requirement -> physical interface -> vendor SKU -> working TAG -> verification.
 import {selectMR0001TagCostRows0553} from "./mr0001TagCostLedger0553";
 import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 
+export const ZWP11_MTO_C1_NEW_SUPPLY_DECISION_0553=Object.freeze({
+ date:"2026-11-03",authority:"PROJECT_OWNER_USER",
+ evidence:"งั้นเรายืนยันจากเอกสารล่าสุด MTO",
+ source:"MM-ZTK-1F-GEN-TEL-MTO-0001 Rev.C1, 29-Oct-2026, printed page7 A-1",
+ site:"ZWP11",tag:"TCAB-500-003",sourceRow:51,
+ requiredQty:1,procurementQty:1,procurementUnit:"Set",
+ sizeMm:[600,210,400],material:"SS316L",protection:"Ex eb IP66",
+ supersedes:"BOD C2 reuse / 13-Oct code new procurement zero",
+ costBasis:"Existing historical PROSPER-24051 reference rate; not a new OEM quote",
+ technicalApproved:false,customerReleaseAllowed:false
+});
 const round=n=>Math.round((n+Number.EPSILON)*100)/100;
 export const REV03_TC0001_SITES_0553=Object.freeze([
  {site:"ZWP20",tag:"LAN-502-001",row:7},
@@ -41,6 +53,30 @@ export const REV03_TC0001_COST_POLICY_0553=Object.freeze({
 });
 export function selectMR0001Rev03TagCostRows0553(site){
  const raw=selectMR0001TagCostRows0553(site);
+ if(site==="ZWP11"){
+  const matched=raw.filter(r=>r.row===51&&r.tag==="TCAB-500-003");
+  if(matched.length!==1||matched[0].sourceQty!==1||matched[0].procurementQty!==0||
+   !Number.isFinite(matched[0].referenceUnitCost)||matched[0].referenceUnitCost<=0)
+   throw Error("ZWP11 MTO C1 new enclosure requires one protected source row and its existing reference rate");
+  const existing=matched[0],rate=existing.referenceUnitCost;
+  return raw.map(r=>r===existing?{...r,
+   procurementQty:1,procurementUnit:"Set",unitCost:rate,extended:round(rate),
+   countedInWorkingTotal:true,
+   status:"OWNER_CONFIRMED_MTO_C1_NEW_ENCLOSURE__HISTORICAL_RATE_BUDGET",
+   priceClass:"MTO_C1_NEW_SUPPLY_EXISTING_HISTORICAL_RATE",
+   changeId:"ZWP11-MTO-C1-NEW-SUPPLY-20261103",
+   originRawTHB:r.extended,originProcurementQty:r.procurementQty,
+   originSource:r.source,ownerDecision:ZWP11_MTO_C1_NEW_SUPPLY_DECISION_0553,
+   source:ZWP11_MTO_C1_NEW_SUPPLY_DECISION_0553.source+" / PROSPER-24051 historical comparable",
+   vendor:"BARTEC / Prosper historical comparable; current OEM quote required",
+   quantityBasis:"Owner confirms latest MTO C1: supply one NEW ZWP11 enclosure; former reuse/new procurement zero superseded in working overlay only",
+   assumptions:["SS316L Ex eb IP66, 600x210x400mm, certified terminals and accessories per MTO C1",
+    "Retain existing historical unit cost; verify current cabinet assembly, entry pattern and OEM quote",
+    "New cabinet replaces the former reuse budget treatment; do not add another cabinet owner",
+    "Field glands, cables and installation are separately reconciled; no automatic package inclusion"],
+   technicalApproved:false,releaseAllowed:false
+  }:r);
+ }
  const expected=bySite.get(site);
  if(!expected)return raw;
  const selected=raw.filter(r=>r.row===expected.row&&r.tag===expected.tag);
@@ -93,3 +129,4 @@ export function selectRev03Tc0001ChangeRows0553(){
    customerSellChanged:false};
  });
 }
+
