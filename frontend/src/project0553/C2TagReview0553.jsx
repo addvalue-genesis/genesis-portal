@@ -24,8 +24,8 @@ export function C2TagReview0553(){
       {r.tagRefs.map(x=><small key={x.key}>{x.mr} · {x.site} / {x.tag}<br/>{x.source}</small>)}</details></td>
     <td>{r.description}<small>Original source: {r.historicalDescription}</small></td>
     <td>{r.partReference.partNo||"Exact OEM part number pending"}<small>{r.partReference.source}</small><small>{r.partReference.note}</small></td>
-    <td>{r.action}{r.rateReconciliation&&<small>Next G มีราคา PoE USD {money(r.rateReconciliation.poeCostUSD)} และสาย USD {money(r.rateReconciliation.cordCostUSD)} เป็นข้อมูลเทียบ; ราคา C2 ปัจจุบันยังเป็นงบเดิมที่ต้องตรวจเงื่อนไขก่อนเลือกอัตราใหม่</small>}<small>{r.suitabilityStatus==="INDEPENDENT_JUSTIFICATION_REQUIRED"?"ต้องขอ OEM ยืนยันความจำเป็นเพิ่มเติม":"อะไหล่บำรุงรักษาที่ต้องยืนยันรุ่นและจำนวน"}</small><small>{[...r.b10Refs,...r.c1Refs].join(" / ")||"OEM scope / stock review"}</small></td>
-    <td>{r.quantity} {r.unit}<small>Quantity unapproved</small></td>
+    <td>{r.action}{r.rateReconciliation&&<small>Next G มีราคา PoE USD {money(r.rateReconciliation.poeCostUSD)} และสาย USD {money(r.rateReconciliation.cordCostUSD)} เป็นข้อมูลเทียบ; ราคา C2 ปัจจุบันยังเป็นงบเดิมที่ต้องตรวจเงื่อนไขก่อนเลือกอัตราใหม่</small>}{quoted.get(r.id).budgetDecision&&<small>Owner budget: {quoted.get(r.id).budgetDecision.totalLengthM}m × THB {money(quoted.get(r.id).budgetDecision.budgetCostTHBPerM)}/m = Cost THB {money(quoted.get(r.id).extendedCostTHB)}; existing Release factor ×1.30 once. Historical supplier rate THB524/m; THB650/m is a planning allowance, not a new vendor quote. Factory drum size, final SKU, packing/freight and technical compliance remain unconfirmed.</small>}<small>{r.suitabilityStatus==="INDEPENDENT_JUSTIFICATION_REQUIRED"?"ต้องขอ OEM ยืนยันความจำเป็นเพิ่มเติม":"อะไหล่บำรุงรักษาที่ต้องยืนยันรุ่นและจำนวน"}</small><small>{[...r.b10Refs,...r.c1Refs].join(" / ")||"OEM scope / stock review"}</small></td>
+    <td>{quoted.get(r.id).quantity} {quoted.get(r.id).unit}<small>{quoted.get(r.id).budgetDecision?"300m continuous length; owner budget quantity, OEM packing pending":"Quantity unapproved"}</small></td>
     <td className="p553-price-cell">{money(quoted.get(r.id).unitUSD)}</td><td className="p553-price-cell">{money(quoted.get(r.id).totalUSD)}</td>
    </tr>)}</tbody>
    <tfoot><tr><th colSpan={7}>C2 BUDGET TOTAL — USD</th><th>{money(offer.budgetaryQuoteUSD)}</th></tr></tfoot>
@@ -35,7 +35,12 @@ export function C2TagReview0553(){
     <tbody>{model.rows.map(r=><tr key={r.id}><td>{r.item} · {r.historicalDescription}{r.ownerExcluded&&" — excluded from current C2"}</td><td>{money(r.unitPriceTHB)}</td><td>{money(r.extendedTHB)}</td></tr>)}</tbody>
     <tfoot><tr><th colSpan={2}>Historical source total THB</th><th>{money(model.historicalSubtotalTHB)}</th></tr></tfoot>
    </table></details>
-  <p className="p55-note">ราคาที่เสนอด้านบนปัดราคาต่อหน่วยขึ้นเป็นหลักสิบ USDและรวม USD {money(offer.budgetaryQuoteUSD)}; ฐานอ้างอิง THB อยู่ใน audit ไม่ใช่ราคาต้นทุน Supplier ใหม่ และห้ามคูณ 1.30 ซ้ำ
+  <details><summary>CSS RF cable quotations — INTERNAL reference only</summary>
+   <table className="p553-customer-table"><thead><tr><th>Quote / Customer</th><th>Cable</th><th>Quoted quantity / unit</th><th>Unit THB, ex VAT</th><th>Use</th></tr></thead>
+    <tbody>{model.rfCableReferences.map(x=><tr key={x.quote}><td><a href={x.url} target="_blank" rel="noreferrer">{x.quote}</a><small>{x.date} / {x.customer}</small></td><td>{x.manufacturer} {x.partNo} / {x.diameter}</td><td>{x.quantity} {x.unit}</td><td>{money(x.unitPriceTHB)}</td><td>{x.sourceNote} No current price, purchase or substitution approval; not posted to C2.</td></tr>)}</tbody>
+   </table>
+  </details>
+  <p className="p55-note">ราคาที่เสนอด้านบนปัดราคาต่อหน่วยขึ้นเป็นหลักสิบ USDและรวม USD {money(offer.budgetaryQuoteUSD)}; CAT6A คิดทั้ง Drum 300m ตามงบเจ้าของโครงการ ×สมการ Release ครั้งเดียว รายการอื่นคงราคาขายเดิม ห้ามคูณ 1.30 ซ้ำ ฐานราคาเก่า THB อยู่ใน audit
    {" "}ต้องตรวจ C2 ทุกระบบต่อจากตาราง Quantity &amp; Price Control ด้านล่าง; การมี C1 ให้เลือกซื้อไม่ยืนยันว่า C2 ครบแล้ว</p>
  </section>;
 }

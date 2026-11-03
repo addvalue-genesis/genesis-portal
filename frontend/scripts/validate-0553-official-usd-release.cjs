@@ -70,13 +70,13 @@ assert.deepEqual(["B11","B13","C1","C2"].map(code=>other.rows[code].length),[4,3
 assert.equal(other.summaries.B11.totalUSD,null);
 assert.equal(other.summaries.B13.totalUSD,1530);
 assert.equal(other.summaries.C1.totalUSD,181100);
-assert.equal(other.summaries.C2.totalUSD,14340);
+assert.equal(other.summaries.C2.totalUSD,20890);
 assert.equal(other.summaries.C1.selectedWorking,false);
 assert.equal(other.summaries.C2.selectedWorking,false);
 assert.equal(other.summaries.C1.budgetaryOfferPrepared,true);
 assert.equal(other.summaries.C2.budgetaryOfferPrepared,true);
 assert.equal(model.c.find(x=>x.code==="C1").budgetaryOptionQuoteUSD,181100);
-assert.equal(model.c.find(x=>x.code==="C2").budgetaryOptionQuoteUSD,14340);
+assert.equal(model.c.find(x=>x.code==="C2").budgetaryOptionQuoteUSD,20890);
 assert(model.c.every(x=>x.budgetaryOfferPrepared&&x.optionExcludedFromBase&&x.firmOemQuote===false));
 assert.equal(model.totalUSD,[...model.a,...model.b].reduce((s,x)=>s+(x.amountUSD||0),0));
 assert.equal(model.c.find(x=>x.code==="C1").amountUSD,null);
@@ -152,7 +152,7 @@ const {ReleaseCustomerWorkbook0553}=require('../src/project0553/ReleaseCustomerW
 
 const html=renderToStaticMarkup(React.createElement(OfficialUsdRelease0553,{source}));
 const releaseSummaryHtml=renderToStaticMarkup(React.createElement(ReleaseCustomerWorkbook0553,{model:source,recipient:"INTERNAL"}));
-for(const [code,amount] of [["C1","5,704,650.00"],["C2","436,595.65"]]){
+for(const [code,amount] of [["C1","5,704,650.00"],["C2","650,382.02"]]){
  assert(releaseSummaryHtml.includes('data-cost-owner="'+code+'"'),
   "10.3.3 Summary must retain "+code+" option source identity");
  assert(releaseSummaryHtml.includes(amount),
@@ -164,7 +164,7 @@ assert(!releaseSummaryHtml.includes("INCLUDED IN BASE"),"Options must remain exc
 assert(html.includes(model.totalUSD.toLocaleString('en-US',{minimumFractionDigits:2})));
 for(const text of ['INTERNAL','WORKING DRAFT','HOLD','THB','NOT ESTABLISHED','31.5'])assert(!html.includes(text),text+' leaked to customer view');
 assert(html.includes('B4, B11, B12')&&html.includes('Not quoted; excluded from this offer.'));assert(html.includes('USD 1,000 / 800/person/day'));
-for(const [code,amount] of [["C1",181100],["C2",14340]]){
+for(const [code,amount] of [["C1",181100],["C2",20890]]){
  assert(html.includes('data-option-price-status="CONDITIONAL_BUDGETARY_OFFER"'),
   "Option price reference row must be distinguished from customer quote");
  assert(html.includes(amount.toLocaleString("en-US",{minimumFractionDigits:2})),
@@ -299,5 +299,5 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
  const bad=box.zip.rebuildZip(entries,new Map([['xl/worksheets/sheet3.xml',new TextEncoder().encode((await text('xl/worksheets/sheet3.xml')).replace(/(<c\b[^>]*r="I6"[^>]*>)/,'$1<f>G6+H6</f>'))]]));
  await assert.rejects(()=>buildNativeOfficialRelease0553({name:'BadFormula.xlsx',arrayBuffer:async()=>bad.buffer},model),/Unexpected native formula/);
  const arg=process.argv.find(x=>x.startsWith('--output='));if(arg)fs.writeFileSync(arg.slice(9),data);
- console.log('PASS 0553 Official native: B10 USD12960 B11 N/A B13 USD1530, C1 USD181100 and C2 USD14340 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, B14 USD25000 selected once; no spare-option uplift or false OEM confirmation');
+ console.log('PASS 0553 Official native: B10 USD12960 B11 N/A B13 USD1530, C1 USD181100 and C2 USD20890 both PRICED CONDITIONAL BUDGETARY OFFERS in summary/annex/native, B14 USD25000 selected once; no spare-option uplift or false OEM confirmation');
 })().catch(e=>{console.error(e);process.exitCode=1;});

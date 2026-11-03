@@ -40,7 +40,7 @@ assert.equal(m.verifiedDirectCostTHB,null);assert.equal(m.postToPricing,false);
 assert.equal(m.customerIssueAllowed,false);assert.equal(m.selectedInCommercialOffer,true);
 assert.equal(JSON.stringify({source:buildReleaseCommercialModel0553({thbPerUsd:31.5}),official:buildOfficialUsdRelease0553(source)}),before);
 assert.equal(official.c.find(r=>r.code==='C1').budgetaryOptionQuoteUSD,181100);
-assert.equal(official.c.find(r=>r.code==='C2').budgetaryOptionQuoteUSD,14340);
+assert.equal(official.c.find(r=>r.code==='C2').budgetaryOptionQuoteUSD,20890);
 assert.equal(official.totalUSD,894910);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const {C1SiTagBudget0553}=from('C1SiTagBudget0553.jsx');

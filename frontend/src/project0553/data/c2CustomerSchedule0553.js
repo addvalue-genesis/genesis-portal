@@ -2,6 +2,7 @@
 import {selectSpareCoverageEngineering0553} from './spareCoverageEngineering0553';
 import {MR0001_WORKING_PRICED_BOM} from './mr0001WorkingPricedBom';
 import EXION from './quotes/EXION-1260576-R0.current.json';
+import {C2_CAT6A_DRUM_DECISION_0553 as cableDrum} from './c2Cat6aDrumDecision0553';
 const freeze=Object.freeze;
 export function selectC2CustomerSchedule0553(){
  const installed=selectSpareCoverageEngineering0553().installed;
@@ -34,9 +35,8 @@ export function selectC2CustomerSchedule0553(){
   ['09','BDA antenna RF feeder spare cable (1/2")',x=>mr2(x)&&/^ANT-/.test(x.tag),false,null,
    '1/2-inch, 50-ohm RF feeder matching the selected MGW UHF-4 installation; quoted reference FORLLER RF LLF 1/2. Match cable construction, jacket/fire requirements and approved antenna-path loss. Supply as measured spare cable length; connectors listed separately.',
    '50-ohm coaxial feeder cable with marine-suitable jacket'],
-  ['10','SCADA data-link CAT6A spare cable',x=>mr1(x)&&(/^LAN-/.test(x.tag)||/^MR-.*A$/.test(x.tag)),false,null,
-   'CAT6A data cable for the referenced SCADA radio indoor interface and L3 network connections. Match installed shielding, jacket/fire rating, environment, connector and gland compatibility. Spare cable length excludes installed Part A cable.',
-   'Shielded CAT6A data cable, approved installation type'],
+  ['10','SCADA CAT6A spare cable — 300m drum',x=>mr1(x)&&(/^LAN-/.test(x.tag)||/^MR-.*A$/.test(x.tag)),false,null,
+   cableDrum.customerSpecification,cableDrum.materials],
   ['11','BDA RF feeder Type-N male spare connectors',x=>mr2(x)&&/^ANT-/.test(x.tag),false,null,
    '50-ohm Type-N male cable connectors to suit the selected 1/2-inch RF feeder and mating antenna-path equipment. Confirm exact cable family, connector assembly method and sealing/weatherproofing requirements.',
    'Type-N male coaxial connectors and compatible sealing fittings'],

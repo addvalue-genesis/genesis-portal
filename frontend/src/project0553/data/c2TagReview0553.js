@@ -9,6 +9,8 @@ import NEXTG from "./quotes/NG-260916-ADV-DAP1.full.json";
 import EXION from "./quotes/EXION-1260576-R0.current.json";
 import {MR0001_WORKING_PRICED_BOM} from "./mr0001WorkingPricedBom";
 import {selectMGWR2Selected0553} from "./mgwP26058R2Selected0553";
+import {C2_CAT6A_DRUM_DECISION_0553 as cableDrum} from "./c2Cat6aDrumDecision0553";
+import {CSS_RF_CABLE_REFERENCES_0553} from "./cssRfCableReferences0553";
 const freeze=Object.freeze;
 const mr1=x=>x.mr==="MR-0001",mr2=x=>x.mr==="MR-0002",mr3=x=>x.mr==="MR-0003",mr4=x=>x.mr==="MR-0004";
 const idu=x=>mr1(x)&&/^MR-.*A$/.test(x.tag),lan=x=>mr1(x)&&/^LAN-/.test(x.tag);
@@ -56,8 +58,8 @@ export function selectC2TagReview0553(){
    ref(feeder.model,"MGW P26-058_R2 UHF-4","Selected installed 1/2-inch 50-ohm package; old 7/8-inch unit rate is not a verified replacement rate"),
    "ทบทวน 7/8 นิ้วเดิมเทียบชุดที่เลือก 1/2 นิ้ว; ต้องปิดข้อกำหนด/technical acceptance และราคาต่อเมตรใหม่"],
   ["CAT6A data cable operating spare",x=>lan(x)||idu(x),[],
-   ref(null,"MR0001 cable schedule / OEM approved cable","Cable is referenced by endpoints, not an invented equipment TAG"),
-   "แยก stock C2 จากวัสดุติดตั้ง A/field bulk และวัสดุใช้สิ้นเปลือง B13; ยืนยันชนิดและความยาว"],
+   ref(null,cableDrum.historicalQuote,"Owner selects TECKNIKABEL CAT6A S/FTP GSWB SHF1, one300m drum; THB650/m is planning cost, not a new supplier quote. Final SKU/technical compatibility and factory drum size unconfirmed."),
+   "แยก stock C2 ทั้ง Drum300m จากวัสดุติดตั้ง A/field bulk และ B13; ยืนยันรุ่น บรรจุภัณฑ์และราคาปัจจุบัน"],
   ["Type N male RF connector operating spares",dmrAntenna,[],
    ref(null,"MGW UHF-4 connector inclusion / approved feeder SKU","Connector type, cable OD and 50-ohm compatibility still require exact SKU"),
    "จับคู่ขนาด feeder/หัวต่อและตรวจ B10; ห้ามใช้ Type N ทั่วไปแทนกันโดยไม่ตรวจรุ่น"],
@@ -91,7 +93,7 @@ export function selectC2TagReview0553(){
    ...(activeIds.has(r.id)?{description:customer[r.id].description,tagRefs:customer[r.id].tagRefs}:{}),
    stockRemovalApproved:!activeIds.has(r.id),postToPricing:false,customerIssueAllowed:false});
  });
- return freeze({rows:freeze(rows),historicalSubtotalTHB:selectSparePricedBudgetReview0553().totals.C2,
+ return freeze({rows:freeze(rows),rfCableReferences:CSS_RF_CABLE_REFERENCES_0553,historicalSubtotalTHB:selectSparePricedBudgetReview0553().totals.C2,
   currentOfferUSD:offer.budgetaryQuoteUSD,selectedSubtotalTHB:offer.sourceSellTHB,
   quotedRowCount:offer.rows.length,excludedRows:offer.excludedRows,ownerStockDecision:offer.ownerStockDecision,
   b10PotentialRows:rows.filter(x=>x.offered&&x.b10Refs.length).length,

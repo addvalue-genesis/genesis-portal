@@ -34,7 +34,7 @@ assert(c1.annexRows.find(x=>x.item==='4').specification.includes('RAD-508-001'))
 assert(c1.annexRows.find(x=>x.item==='5').specification.includes('DB-5P'));
 const c2=from('data/c2TagReview0553').selectC2TagReview0553();
 assert.equal(c2.rows.length,12);assert.equal(c2.b10PotentialRows,7);assert.equal(c2.c1PotentialRows,2);
-assert.equal(c2.historicalSubtotalTHB,721806.6);assert.equal(c2.currentOfferUSD,14340);
+assert.equal(c2.historicalSubtotalTHB,721806.6);assert.equal(c2.currentOfferUSD,20890);
 const installed=from('data/spareCoverageEngineering0553').selectSpareCoverageEngineering0553().installed;
 const source=from('data/sparePricedBudgetReview0553').selectSparePricedBudgetReview0553().rows.C2;
 for(const r of c2.rows){
@@ -84,7 +84,7 @@ const officialView=fs.readFileSync(path.join(root,'project0553/OfficialUsdReleas
 assert(!officialView.includes('earlier RACON-only comparator'));
 assert.equal(JSON.stringify(build()),before,'Review views must not mutate selected financial/native models');
 const selectedC2=build().official.otherSpareItemizedAnnex.rows.C2;
-assert.equal(Math.round(selectedC2.reduce((n,r)=>n+r.totalUSD,0)*100),1434000,
- 'Largest-remainder allocation must reconcile exactly to the selected USD14340 category');
+assert.equal(Math.round(selectedC2.reduce((n,r)=>n+r.totalUSD,0)*100),2089000,
+ 'Largest-remainder allocation must reconcile exactly to the selected USD20890 category');
 for(const r of selectedC2)assert.equal(Math.round(r.qty*r.unitUSD*100),Math.round(r.totalUSD*100));
-console.log('PASS spare TAG preview: six C1 whole-USD100 unit prices, Qty×Unit and USD181100 total; USD23.13 distributed once with unchanged raw costs, item5 and sources; residual/invalid-input guards; C2 source identities retained, owner DB-5P excluded from current14340 offer.');
+console.log('PASS spare TAG preview: six C1 whole-USD100 unit prices, Qty×Unit and USD181100 total; USD23.13 distributed once with unchanged raw costs, item5 and sources; residual/invalid-input guards; C2 source identities retained, owner DB-5P excluded from current20890 offer.');

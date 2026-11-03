@@ -1,12 +1,14 @@
 import React from "react";
 import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0553";
 import {C1C2EngineeringControl0553} from "./C1C2EngineeringControl0553";
+import {selectOptionBudgetaryOffer0553} from "./data/optionBudgetaryOffer0553";
 const m=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"Not established";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"Not established";
 export function SparePricedBudgetReview0553({code,onOpenSource=null,context="working"}){
  const review=selectSparePricedBudgetReview0553();
  if(!review.codes.includes(code))return null;
  const rows=review.rows[code],onlyHistorical=code==="C2",onlyComparable=code==="C1";
+ const cable=code==="C2"?selectOptionBudgetaryOffer0553().offers.C2.ownerCableReplacement:null;
  return <>{["C1","C2"].includes(code)&&<C1C2EngineeringControl0553 code={code} onOpenSource={onOpenSource} open={context==="working"}/>}
  <details className="p55-panel p553-spare-priced-review" data-component-key={"bid.budget.working.bc."+code.toLowerCase()+".priced-budget-review"}
   style={{padding:12}} open={context==="working"&&!["C1","B11","B13","C2"].includes(code)}>
@@ -24,7 +26,7 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
    <thead><tr><th>Item</th><th>Tag No.</th><th>Description</th><th>Detail Specification / Source</th><th>Materials</th>
     <th>QTY</th><th>Unit THB · budgetary</th><th>Total THB · budgetary</th>{code.startsWith("C")&&<th>Lead time</th>}</tr></thead>
    <tbody>{rows.map((r,i)=><tr key={r.id} data-source-pricing-line={r.id}
-    data-component-key={context==="working"&&code==="C2"?"bid.budget.working.bc.c2.priced-budget-review."+r.id.toLowerCase():undefined}>
+    data-component-key={context==="working"&&code==="C2"&&!(cable&&r.id===cable.decision.historicalSourceId)?"bid.budget.working.bc.c2.priced-budget-review."+r.id.toLowerCase():undefined}>
      <td>{i+1}</td><td>{r.tag}</td><td><strong>{r.description}</strong></td>
      <td>{r.specification}<small>{r.sourceDocument}</small></td><td>{r.materials}</td>
      <td className="p553-annex-qty">{r.quantity} {r.unit}</td>
@@ -41,6 +43,13 @@ export function SparePricedBudgetReview0553({code,onOpenSource=null,context="wor
       sourceRowModuleId:r.sourceRowModuleId,sourceModuleId:r.sourceRowModuleId})}>
      ↗ 10.2 Source {r.sourceId}</button>)}
   </div>}
+  {cable&&<p className="p55-note" data-c2-cable-source-decision="C2-REV08-10" data-component-key={context==="working"?cable.decision.sourceModuleId:undefined}>
+   <strong>Current item10 replacement — INTERNAL:</strong> TECKNIKABEL CAT6A S/FTP 4P23/7AWG GSWB SHF1 grey,
+   1 drum ×300m. Owner planning cost300 ×THB650/m =THB{m(cable.costTHB)}; Release ×1.30 once =THB{m(cable.sellTHB)};
+   USD{m(cable.sellTHB/31.5)} before upward USD10 rounding. This replaces the old50m row, not an additional charge.
+   Historical QA24-0604 THB524/m remains evidence. Current supplier price, final SKU, factory drum packing and separate freight/packing cost are unconfirmed.
+   <a href={cable.decision.historicalQuoteURL} target="_blank" rel="noreferrer"> INNOVA QA24-0604</a>
+  </p>}
   <p className="p55-note">{code==="C2"?"The 12 historical rates remain original evidence; the selected C2 offer excludes the additional DB-5P per the owner instruction. The proposed feeder must match the installed system; B10 identical stock must be excluded before firm issue. Original historical descriptions are retained here as evidence.":
     code==="C1"?"The C1 conditional budgetary option uses installed-equipment FCA price × 31.5 × 1.30. It is excluded from Base A+B; independent OEM spare compatibility and CIF delivery price remain unconfirmed.":
     "Quantity and rate are from the existing 10.2 Working financial owner, still pending itemized OEM SKU and delivery evidence."}</p>

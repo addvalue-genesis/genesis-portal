@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R81";
+export const CHANGE_LOG_VERSION_0553="2026-11-03-R82";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261103-06",date:"2026-11-03",kind:"PRICE",tone:"caution",
+  title:"Replace C2 CAT6A50m with owner-selected TECKNIKABEL300m drum budget",
+  detail:"Owner selects TECKNIKABEL CAT6A S/FTP4P23/7AWG GSWB SHF1 grey, whole drum against QA24-0604 showing300m. One offered300m drum at planning THB650/m gives Cost195000; existing Release1.30 once gives SELL253500 /31.5 =USD8047.62, rounded UP toUSD8050 per drum. THB650/m is an internal planning allowance, not a current internet/vendor quote; original15-Jul-2024 rate524/m and raw50m Rev08 row remain immutable.300m factory packing/final OEMSKU and freight/packing remain unconfirmed; no invented actual cost. Replace previous C2 lineUSD1500/THB39713.63 once, do not redistribute other ten prices. C2USD14340→20890 (+6550), Source SELLTHB436595.65→650382.02; active11/historical12 rows and owner DB-5P exclusion remain. Scope/Source/Release/Annex and six-/ten-sheet native exports use the same owner. A+BUSD894910, C1USD181100, RF cable30m/USDrate20 and connectors4/USDrate40, all PartA/B budgets/FX/modules unchanged. CSS RF quotations retained as nonposting evidence only; no RF substitution or purchase approval.",
+  moduleIds:Object.freeze(["bid.budget.working.bc.c2","bid.budget.pricing.official"]),
+  priceImpact:"WORKING_SOURCE_CHANGED",source:"Owner03-Nov2026: use TECKNIKABEL, full drum, proceed with attached INNOVA QA24-0604"}),
  Object.freeze({id:"P553-CHANGE-20261103-05",date:"2026-11-03",kind:"UI",tone:"neutral",
   title:"Keep B13 equipment-TAG references internal in code and Working only",
   detail:"Owner removes the confusing unpriced equipment-reference table beneath B13. Customer Scope/Release/Official previews now show only the three COMMON consumable rows. Retain the five reference groups/62 source records in code and a collapsed INTERNAL ONLY Working panel, hidden in print. Explicit internal opt-in is required; a Source callback does not expose it. USD/THB native and ten-sheet Breakdown no longer write the reference block; reusing an older file clears its body cells and removes only the added reference-table merges, retaining original totals/geometry. Internal TAG metadata/source trace stays available. No change to the three source IDs, quantities, USD10 rounding, B13USD1530, C2USD14340, A+BUSD894910 or any other price/module.",

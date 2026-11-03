@@ -1,5 +1,7 @@
 import {roundQuotedRowsUp0553} from "./quoteUnitRounding0553";
 import {selectC2CustomerSchedule0553} from "./c2CustomerSchedule0553";
+import {C2_CAT6A_DRUM_DECISION_0553} from "./c2Cat6aDrumDecision0553";
+import {priceAorCFromCost0553} from "./releaseCommercialModel0553";
 // PJ2608-0553 — MANAGEMENT-REQUESTED conditional priced Part C options.
 // This is the one authoritative budgetary OPTION BID basis, independent from
 // the unverified OEM direct-COST posting ledger and the base A+B quotation.
@@ -98,10 +100,45 @@ export function selectOptionBudgetaryOffer0553(){
   offer.budgetaryQuoteUSD=round2(offer.rows.reduce((n,x)=>n+x.totalUSD,0));
   offer.unitRoundingUSD=10;
   offer.upwardUnitRoundingUSD=round2(offer.budgetaryQuoteUSD-offer.preTensQuoteUSD);
+  if(code==="C2"){
+   // Replace just the owner-selected cable line AFTER the historical allocation.
+   // Reallocating the entire category would silently reprice the other ten items.
+   const decision=C2_CAT6A_DRUM_DECISION_0553;
+   const prior=offer.rows.find(x=>x.id===decision.historicalSourceId);
+   if(!prior||prior.quantity!==50||prior.unit!=="m")throw Error("C2 CAT6A historical source changed");
+   const costTHB=round2(decision.totalLengthM*decision.budgetCostTHBPerM);
+   const pricing=priceAorCFromCost0553(costTHB);
+   const sourceTotalUSD=round2(pricing.customerSellTHB/OPTION_BUDGETARY_QUOTE_POLICY_0553.fxTHBPerUSD);
+   const pre={...prior,quantity:decision.quantity,qty:decision.quantity,unit:decision.unit,
+    unitCostTHB:costTHB,extendedCostTHB:costTHB,
+    unitPriceTHB:pricing.customerSellTHB,extendedTHB:pricing.customerSellTHB,
+    unitUSD:sourceTotalUSD,totalUSD:sourceTotalUSD,sourceTotalUSD,sourceUnitUSD:sourceTotalUSD,
+    sourceDocument:decision.historicalQuote+" / owner03-Nov2026 whole-drum budget",
+    evidenceClass:decision.costBasis,technicalSourceId:decision.historicalQuote,
+    technicalSourceUrl:decision.historicalQuoteURL,sourceRowModuleId:decision.sourceModuleId,
+    budgetDecision:decision,pricingBasis:freeze(pricing),
+    leadTime:"To be confirmed",roundingAdjustmentUSD:0};
+   // Input is the unrounded whole drum, never the already-rounded old per-metre price.
+   delete pre.preTensUnitUSD;delete pre.preTensTotalUSD;delete pre.upwardRoundingUSD;
+   const [replacement]=roundQuotedRowsUp0553([pre],{quantityKey:"quantity"});
+   offer.priorSelectedSourceSellTHB=offer.sourceSellTHB;
+   offer.priorSelectedQuoteUSD=offer.budgetaryQuoteUSD;
+   offer.ownerCableReplacement=freeze({decision,priorRow:prior,costTHB,
+    sellTHB:pricing.customerSellTHB,sourceReplacementDeltaTHB:round2(pricing.customerSellTHB-prior.extendedTHB),
+    quoteDeltaUSD:round2(replacement.totalUSD-prior.totalUSD)});
+   offer.rows=freeze(offer.rows.map(x=>x.id===prior.id?freeze(replacement):x));
+   offer.preTensRows=freeze(offer.preTensRows.map(x=>x.id===prior.id?freeze(pre):x));
+   offer.preTensQuoteUSD=round2(offer.preTensRows.reduce((n,x)=>n+x.totalUSD,0));
+   offer.sourceSellTHB=round2(offer.rows.reduce((n,x)=>n+x.extendedTHB,0));
+   offer.thb=offer.sourceSellTHB;
+   offer.budgetaryQuoteUSD=round2(offer.rows.reduce((n,x)=>n+x.totalUSD,0));
+   offer.upwardUnitRoundingUSD=round2(offer.budgetaryQuoteUSD-offer.preTensQuoteUSD);
+   offer.evidence+="; item10 superseded by owner300m TECKNIKABEL drum at estimated THB650/m, Cost×existing1.30 once, USD10 whole-drum roundup; other ten quoted lines unchanged";
+  }
   return [code,freeze(offer)];
  }));
- if(offers.C1.sourceSellTHB!==5704650||offers.C2.sourceSellTHB!==436595.65||
-  offers.C1.budgetaryQuoteUSD!==181100||offers.C2.budgetaryQuoteUSD!==14340)
+ if(offers.C1.sourceSellTHB!==5704650||offers.C2.sourceSellTHB!==650382.02||
+  offers.C1.budgetaryQuoteUSD!==181100||offers.C2.budgetaryQuoteUSD!==20890)
   throw Error("0553 chosen Part C Budgetary Sell source/FX/rounding changed");
  return freeze({
   moduleId:"bid.budget.working.bc.option-budgetary-offer",

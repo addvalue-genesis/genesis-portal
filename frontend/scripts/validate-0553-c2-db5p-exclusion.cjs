@@ -14,27 +14,27 @@ const option=from('data/optionBudgetaryOffer0553').selectOptionBudgetaryOffer055
 const raw=from('data/sparePricedBudgetReview0553').selectSparePricedBudgetReview0553();
 assert.equal(raw.rows.C2.length,12);assert.equal(raw.totals.C2,721806.6);
 assert.equal(option.excludedRows.length,1);assert.equal(option.excludedRows[0].id,'C2-REV08-07');assert.equal(option.excludedRows[0].extendedTHB,285210.95);
-assert.equal(option.sourceSellTHB,436595.65);assert.equal(option.rows.length,11);
-assert.equal(option.preTensQuoteUSD,Math.ceil(option.sourceSellTHB/31.5/100-1e-10)*100);assert.equal(option.budgetaryQuoteUSD,14340);assert.equal(before.oldC2USD-option.preTensQuoteUSD,9100);
+assert.equal(option.sourceSellTHB,650382.02);assert.equal(option.rows.length,11);
+assert.equal(option.priorSelectedSourceSellTHB,436595.65);assert.equal(option.preTensQuoteUSD,20697.62);assert.equal(option.budgetaryQuoteUSD,20890);assert.equal(before.oldC2USD-Math.ceil(option.priorSelectedSourceSellTHB/31.5/100-1e-10)*100,9100);
 assert.equal(option.sourceId,'C2-OPTION-REV08-12');assert.equal(official.totalUSD,894910);
 assert(!option.rows.some(x=>x.id==='C2-REV08-07'));
-for(const row of option.rows){const original=raw.rows.C2.find(x=>x.id===row.id);assert.equal(row.quantity,original.quantity);assert.equal(row.unitPriceTHB,original.unitPriceTHB);assert.equal(row.extendedTHB,original.extendedTHB);assert(Number.isInteger(row.unitUSD));assert.equal(row.unitUSD*row.quantity,row.totalUSD);}
-assert.equal(option.rows.reduce((s,x)=>s+x.totalUSD,0),14340);
+for(const row of option.rows.filter(x=>x.id!=='C2-REV08-10')){const original=raw.rows.C2.find(x=>x.id===row.id);assert.equal(row.quantity,original.quantity);assert.equal(row.unitPriceTHB,original.unitPriceTHB);assert.equal(row.extendedTHB,original.extendedTHB);assert(Number.isInteger(row.unitUSD));assert.equal(row.unitUSD*row.quantity,row.totalUSD);}
+assert.equal(option.rows.reduce((s,x)=>s+x.totalUSD,0),20890);
 assert(official.otherSpareItemizedAnnex.rows.C1.find(x=>x.item==='5').specification.includes('DB-5P'));
-const c2Review=from('data/c2TagReview0553').selectC2TagReview0553();assert.equal(c2Review.currentOfferUSD,14340);assert.equal(c2Review.quotedRowCount,11);assert.equal(c2Review.c1PotentialRows,2);assert(c2Review.rows.find(x=>x.id==='C2-REV08-07').ownerExcluded);
+const c2Review=from('data/c2TagReview0553').selectC2TagReview0553();assert.equal(c2Review.currentOfferUSD,20890);assert.equal(c2Review.quotedRowCount,11);assert.equal(c2Review.c1PotentialRows,2);assert(c2Review.rows.find(x=>x.id==='C2-REV08-07').ownerExcluded);
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
-const html=renderToStaticMarkup(React.createElement(from('C2TagReview0553').C2TagReview0553));assert.equal((html.match(/data-c2-tag-row=/g)||[]).length,11);assert(!html.includes('data-c2-tag-row="C2-REV08-07"'));assert(html.includes('14,340.00'));
+const html=renderToStaticMarkup(React.createElement(from('C2TagReview0553').C2TagReview0553));assert.equal((html.match(/data-c2-tag-row=/g)||[]).length,11);assert(!html.includes('data-c2-tag-row="C2-REV08-07"'));assert(html.includes('20,890.00'));
 const native=from('nativeWorkingDraft0553'),t=from('data/nativeReleaseTemplate0553.json'),bytes=Buffer.from(t.base64,'base64'),file={name:t.sourceName,arrayBuffer:async()=>bytes.buffer.slice(bytes.byteOffset,bytes.byteOffset+bytes.length)};
 const cell=(xml,a)=>xml.match(new RegExp('<c\\b[^>]*r="'+a+'"[^>]*>([\\s\\S]*?)</c>'))?.[1]||'';
 (async()=>{
  const usd=await native.buildNativeOfficialRelease0553(file,official),thb=await native.buildNativeWorkingDraft0553(file,source),breakdown=await from('nativePriceBreakdown0553').buildNativePriceBreakdown0553(file,official,from('data/customerPriceBreakdown0553').buildCustomerPriceBreakdown0553(source,official));
  for(const [kind,out] of [['USD',usd],['THB',thb],['Breakdown',breakdown]]){
   const zip=native.entriesFromZip(new Uint8Array(await out.blob.arrayBuffer())),read=async n=>new TextDecoder().decode(await native.readEntry(zip.find(x=>x.name==='xl/worksheets/sheet'+n+'.xml')));
-  const summary=await read(1),c1=await read(5),c2=await read(6),total=kind==='THB'?436595.65:14340;
+  const summary=await read(1),c1=await read(5),c2=await read(6),total=kind==='THB'?650382.02:20890;
   assert(cell(summary,'G42').includes('<v>'+total+'</v>'));assert(cell(c2,'I19').includes('<v>'+total+'</v>'));
   assert(!c2.includes('RACON distribution box spare'));assert(!c2.includes('DB-5P'));assert(c1.includes('DB-5P'));
   assert(!cell(c2,'I17').includes('<v>'),'Old twelfth price must be cleared');
   if(kind!=='THB')assert(cell(summary,'G38').includes('<v>894910</v>'));
  }
- console.log('PASS C2 owner DB-5P exclusion: 11 selected / 12 historical, THB436595.65 -> USD14340; all other financial parents, C1/Part A DB-5P inclusions and B13 unchanged; active UI and USD/THB/Breakdown synchronized.');
+ console.log('PASS C2 owner DB-5P exclusion: 11 selected / 12 historical, THB650382.02 -> USD20890; all other financial parents, C1/Part A DB-5P inclusions and B13 unchanged; active UI and USD/THB/Breakdown synchronized.');
 })().catch(e=>{console.error(e);process.exitCode=1;});
