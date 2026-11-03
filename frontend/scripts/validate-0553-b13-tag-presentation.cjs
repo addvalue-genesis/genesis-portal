@@ -8,10 +8,10 @@ const quote=from('data/officialUsdRelease0553').buildOfficialUsdRelease0553(sour
 const review=from('data/otherSpareItemizedPresentation0553').selectB13TagPresentation0553();
 const rows=quote.otherSpareItemizedAnnex.rows.B13,raw=from('data/spareCustomerSchedule0553').selectSpareCustomerSchedule0553().currentByCode.B13;
 const installed=from('data/spareCoverageEngineering0553').selectSpareCoverageEngineering0553().installed;
-assert.equal(quote.totalUSD,894500);assert.equal(quote.b.find(x=>x.code==='B13').amountUSD,1500);
-assert.deepEqual(rows.map(x=>x.qty),[4,4,1]);assert.deepEqual(rows.map(x=>x.totalUSD),[632,500,368]);
-assert.deepEqual(rows.map(x=>x.unitUSD),[158,125,368]);
-assert.equal(rows.reduce((n,x)=>Math.round((n+x.totalUSD)*100)/100,0),1500);
+assert.equal(quote.totalUSD,894910);assert.equal(quote.b.find(x=>x.code==='B13').amountUSD,1530);
+assert.deepEqual(rows.map(x=>x.qty),[4,4,1]);assert.deepEqual(rows.map(x=>x.totalUSD),[640,520,370]);
+assert.deepEqual(rows.map(x=>x.unitUSD),[160,130,370]);
+assert.equal(rows.reduce((n,x)=>Math.round((n+x.totalUSD)*100)/100,0),1530);
 assert.equal(review.summary.sourceTHB,46683);assert.equal(review.priceChangeTHB,0);
 assert.equal(review.quantityReview.status,'OPEN_INPUT');assert.equal(review.quantityReview.quantity,null);
 assert(review.quantityReview.missing.includes('activityCount'));assert.equal(review.verifiedPurchaseCostTHB,null);
@@ -47,10 +47,10 @@ const scopeHtml=renderToStaticMarkup(React.createElement(from('ScopeBcAnnexDetai
 assert(scopeHtml.includes('Equipment TAG references for B13')&&scopeHtml.includes('46,683.00'));
 const c2=quote.otherSpareItemizedAnnex.rows.C2,option=from('data/optionBudgetaryOffer0553').selectOptionBudgetaryOffer0553().offers.C2;
 assert(c2.every(x=>Number.isInteger(x.unitUSD)&&x.qty*x.unitUSD===x.totalUSD));
-assert.equal(c2.reduce((n,x)=>n+x.totalUSD,0),13900);assert.equal(option.sourceSellTHB,436595.65);
-assert.equal(c2.reduce((n,x)=>n+Math.round(x.roundingAdjustmentUSD*100),0),0);
-assert.deepEqual(c2.map(x=>x.unitUSD),[990,584,5838,2500,363,567,5,17,25,33,49]);
-assert.equal(rows.reduce((n,x)=>n+x.roundingAdjustmentUSD,0),0);
+assert.equal(c2.reduce((n,x)=>n+x.totalUSD,0),14340);assert.equal(option.sourceSellTHB,436595.65);
+assert.equal(c2.reduce((n,x)=>n+Math.round(x.roundingAdjustmentUSD*100),0),44000);
+assert.deepEqual(c2.map(x=>x.unitUSD),[990,590,5840,2500,370,570,10,20,30,40,50]);
+assert.equal(rows.reduce((n,x)=>n+Math.round(x.roundingAdjustmentUSD*100),0),3000);
 const c2Review=from('data/c2TagReview0553').selectC2TagReview0553();
 assert.equal(c2Review.b10PotentialRows,7);assert.equal(c2Review.c1PotentialRows,2);
 assert.deepEqual(c2Review.independentJustificationRows,[]);
@@ -70,7 +70,7 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*>([\\s\\
   const parts=native.entriesFromZip(new Uint8Array(await out.blob.arrayBuffer()));
   const xml=new TextDecoder().decode(await native.readEntry(parts.find(x=>x.name==='xl/worksheets/sheet4.xml')));
   assert(!xml.includes('SYSTEM SPARES / MULTI'));assert(!xml.includes('cleaning/termination'));
-  assert(cell(xml,'I19').includes('<v>'+(currency==='THB'?46683:1500)+'</v>'));
+  assert(cell(xml,'I19').includes('<v>'+(currency==='THB'?46683:1530)+'</v>'));
   for(const [i,row] of rows.entries()){
    assert(cell(xml,'D'+(6+i)).includes(row.description));
    assert(cell(xml,'H'+(6+i)).includes('<v>'+(currency==='THB'?row.unitTHB:row.unitUSD)+'</v>'));
@@ -86,5 +86,5 @@ const cell=(xml,addr)=>xml.match(new RegExp('<c\\b[^>]*r="'+addr+'"[^>]*>([\\s\\
   assert(!(out.warnings||[]).some(x=>x.includes('sheet4.xml')&&x.includes('maximum row height')));
   if(currency==='USD')fs.writeFileSync('/tmp/PJ2608-0553-B13-TAG-QA.xlsx',Buffer.from(await out.blob.arrayBuffer()));
  }
- console.log('PASS B13: three unchanged price parents USD1500/THB46683; whole-USD B13/C2 units reconcile to 1500/13900 after owner DB-5P exclusion; C2 suitability and supplier-rate gaps explicit; five exact TAG/site groups cover62 source records, no fictitious consumable TAG or per-TAG quantity; B5/Ex/hardware exclusions; OPEN consumption; Source/Working/Scope/USD/THB/Breakdown presentation parity.');
+ console.log('PASS B13: three unchanged source parents / rounded quote USD1530/THB46683; whole-USD B13/C2 units reconcile to 1530/14340 after owner DB-5P exclusion; C2 suitability and supplier-rate gaps explicit; five exact TAG/site groups cover62 source records, no fictitious consumable TAG or per-TAG quantity; B5/Ex/hardware exclusions; OPEN consumption; Source/Working/Scope/USD/THB/Breakdown presentation parity.');
 })().catch(e=>{console.error(e);process.exitCode=1;});

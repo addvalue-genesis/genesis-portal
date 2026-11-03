@@ -35,7 +35,7 @@ export function C2TagReview0553(){
     <tbody>{model.rows.map(r=><tr key={r.id}><td>{r.item} · {r.historicalDescription}{r.ownerExcluded&&" — excluded from current C2"}</td><td>{money(r.unitPriceTHB)}</td><td>{money(r.extendedTHB)}</td></tr>)}</tbody>
     <tfoot><tr><th colSpan={2}>Historical source total THB</th><th>{money(model.historicalSubtotalTHB)}</th></tr></tfoot>
    </table></details>
-  <p className="p55-note">ราคาที่เสนอด้านบนปัดหน่วยเป็น USD เต็มและรวม USD {money(offer.budgetaryQuoteUSD)}; ฐานอ้างอิง THB อยู่ใน audit ไม่ใช่ราคาต้นทุน Supplier ใหม่ และห้ามคูณ 1.30 ซ้ำ
+  <p className="p55-note">ราคาที่เสนอด้านบนปัดราคาต่อหน่วยขึ้นเป็นหลักสิบ USDและรวม USD {money(offer.budgetaryQuoteUSD)}; ฐานอ้างอิง THB อยู่ใน audit ไม่ใช่ราคาต้นทุน Supplier ใหม่ และห้ามคูณ 1.30 ซ้ำ
    {" "}ต้องตรวจ C2 ทุกระบบต่อจากตาราง Quantity &amp; Price Control ด้านล่าง; การมี C1 ให้เลือกซื้อไม่ยืนยันว่า C2 ครบแล้ว</p>
  </section>;
 }

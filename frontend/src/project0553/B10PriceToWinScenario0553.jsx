@@ -88,7 +88,7 @@ export function B10PriceToWinScenario0553({canonical=null,context="working"}){
     <tr><td>Proposed B10 SELL — before USD100 summary rounding</td><td>{cash(value.sellBeforeUsdRoundUSD)}</td><td><strong>{cash(value.sellBeforeUsdRoundTHB,"THB")}</strong></td></tr>
     <tr><td>10.3.4-equivalent proposed SUMMARY, rounded USD100</td><td><strong>{cash(value.roundedOfficialSummaryUSD)}</strong></td>
      <td>For management review only — no Excel/official posting</td></tr>
-    <tr><td>Current 10.3.3 Working SELL / current 10.3.4 USD</td><td>{cash(value.existingOfficialSummaryUSD)}</td><td>{cash(value.existingWorkingSellTHB,"THB")}</td></tr>
+    <tr><td>Historical Working SELL / quote before USD10 unit rounding</td><td>{cash(value.existingOfficialSummaryUSD)}</td><td>{cash(value.existingWorkingSellTHB,"THB")}</td></tr>
     <tr><td>What-if uplift vs current unrounded THB</td><td>{cash(value.proposedVsExistingOfficialUSD)}</td><td>{cash(value.proposedVsExistingTHB,"THB")}</td></tr>
    </tbody>
   </table></div>

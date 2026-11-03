@@ -49,8 +49,8 @@ assert.equal(working.byCode.B10.workingSellTHB,405405);
 assert.equal(scope.lines.B10.workingSellTHB,405405);
 assert.equal(release.b.find(x=>x.code==="B10").customerSellTHB,405405);
 assert.equal(release.annexModels.B10.annexLineTotalTHB,405405);
-assert.equal(official.b.find(x=>x.code==="B10").amountUSD,12900);
-assert.equal(Math.round(officialRows.reduce((n,x)=>n+x.totalUSD,0)*100),1290000);
+assert.equal(official.b.find(x=>x.code==="B10").amountUSD,12960);
+assert.equal(Math.round(officialRows.reduce((n,x)=>n+x.totalUSD,0)*100),1296000);
 assert.equal(working.knownWorkingSellTHB,5961702.87);
 assert.equal(release.annexTraceAudit.totalRows,15);
 assert.equal(auditAnnexBidirectionalTrace0553(source.currentByCode,release.annex).sourceToReleasePassed,true);
@@ -61,7 +61,7 @@ const common=(rows,options={})=>renderToStaticMarkup(React.createElement(B10KitP
 const internal=common(kitRows,{currency:"THB",total:405405,internal:true,variant:"release",onOpenSource:()=>{}});
 const external=common(kitRows,{currency:"THB",total:405405,variant:"release"});
 const scopeHtml=renderToStaticMarkup(React.createElement(ScopeBcAnnexDetail0553,{code:"B10",mode:"scope",onOpenSource:()=>{},onOpenReleaseRow:()=>{}}));
-const officialHtml=common(officialRows,{currency:"USD",total:12900,variant:"official"});
+const officialHtml=common(officialRows,{currency:"USD",total:12960,variant:"official"});
 for(const html of [internal,external,scopeHtml,officialHtml]){
  const text=ReactText(html);
  assert(text.includes("B10 — Kit price summary / reconciliation"));
@@ -78,14 +78,14 @@ for(const html of [internal,external,scopeHtml,officialHtml]){
  assert(!text.includes("PTTEP FIRST-PRINCIPLES PARAMETRIC"));
 }
 assert(ReactText(external).includes("405,405.00"));
-assert(ReactText(officialHtml).includes("12,900.00"));
+assert(ReactText(officialHtml).includes("12,960.00"));
 for(const html of [internal,external,scopeHtml,officialHtml]){
  assert(html.includes("B10 — Original Annex: Spare Part Schedule"),"B10 Original Annex title must match the current customer-safe UI");
  assert.equal((html.match(/data-native-b10-source-id=/g)||[]).length,11);
  assert.equal((html.match(/data-b10-requirement-id=/g)||[]).length,11);
  assert(html.includes('data-parent-source-id="B10-PTTEP-01"'));
  if(html===officialHtml){
-  assert(html.includes("12,900.00")&&html.includes("1,824.00"),
+  assert(html.includes("12,960.00")&&html.includes("1,830.00"),
    "Official B10 must map USD 16,200 and row rates from its own rounded MR parents");
   assert(html.includes("PRE-AWARD USD / CIF NOT VERIFIED"));
   assert(!html.includes("12,870.00"),"Do not display Working-pre-round allocation as Official");
@@ -171,4 +171,4 @@ assert(ReactText(budgetHtml).includes("10.2 Source"));
 assert(css.includes(".p553-b10-commercial-table{width:100%;min-width:0"));
 assert(css.includes(".p553-b10-commercial-scroll{width:100%;max-width:100%;overflow-x:auto"));
 assert(css.includes(".p553-native-sheet{overflow:hidden"));
-console.log("PASS PJ2608-0553 B10: Source 3 MR owners Working THB405405.00 / USD12870, Official 11 source-linked 1-LOT priced budget rows USD12900, two price stages separate, no OEM spare quantity or actual CIF SKU falsely approved");
+console.log("PASS PJ2608-0553 B10: Source 3 MR owners Working THB405405.00 / USD12870, Official 11 source-linked 1-LOT priced budget rows USD12960, two price stages separate, no OEM spare quantity or actual CIF SKU falsely approved");

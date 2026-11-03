@@ -1,3 +1,4 @@
+import {roundQuotedRowsUp0553} from "./quoteUnitRounding0553";
 import {selectC2CustomerSchedule0553} from "./c2CustomerSchedule0553";
 // PJ2608-0553 — MANAGEMENT-REQUESTED conditional priced Part C options.
 // This is the one authoritative budgetary OPTION BID basis, independent from
@@ -9,7 +10,7 @@ import {selectC1SiTagBudget0553,roundAnnexUnitPrices0553} from "./c1SiTagBudget0
 const freeze=Object.freeze;
 const round2=n=>Math.round((n+Number.EPSILON)*100)/100;
 export const OPTION_BUDGETARY_QUOTE_POLICY_0553=freeze({
- fxTHBPerUSD:31.5,summaryRoundingUSD:100,
+ fxTHBPerUSD:31.5,summaryRoundingUSD:100,unitRoundingUSD:10,unitRounding:"UP_UNITS_THEN_SUM",
  basis:"OWNER_SELECTED_CONDITIONAL_BUDGETARY_OFFER_2026_10_26",
  authority:"MANAGEMENT_BUDGETARY_OPTION_FOR_PRICE_SUBMISSION",
  incorporatedInBase:false,firmOemOffer:false
@@ -91,10 +92,16 @@ export function selectOptionBudgetaryOffer0553(){
    offer.rows=roundAnnexUnitPrices0553(raw.map(x=>({...x,sourceTotalUSD:x.totalUSD})),usd,1,{residualMetric:"squared"});
    offer.unitRoundingUSD=1;offer.rawPriceRows=freeze(raw);
   }
+  offer.preTensQuoteUSD=offer.budgetaryQuoteUSD;
+  offer.preTensRows=offer.rows;
+  offer.rows=freeze(roundQuotedRowsUp0553(offer.rows,{quantityKey:"quantity"}));
+  offer.budgetaryQuoteUSD=round2(offer.rows.reduce((n,x)=>n+x.totalUSD,0));
+  offer.unitRoundingUSD=10;
+  offer.upwardUnitRoundingUSD=round2(offer.budgetaryQuoteUSD-offer.preTensQuoteUSD);
   return [code,freeze(offer)];
  }));
  if(offers.C1.sourceSellTHB!==5704650||offers.C2.sourceSellTHB!==436595.65||
-  offers.C1.budgetaryQuoteUSD!==181100||offers.C2.budgetaryQuoteUSD!==13900)
+  offers.C1.budgetaryQuoteUSD!==181100||offers.C2.budgetaryQuoteUSD!==14340)
   throw Error("0553 chosen Part C Budgetary Sell source/FX/rounding changed");
  return freeze({
   moduleId:"bid.budget.working.bc.option-budgetary-offer",

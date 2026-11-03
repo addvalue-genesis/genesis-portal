@@ -101,7 +101,7 @@ export function B10NativeAnnexReview0553({internal=false,onOpenSource=null,varia
   </p>}
   {official&&<p className="p553-b10-commercial-note">
    PRE-AWARD BUDGETARY FINANCIAL DISTRIBUTION ONLY: Total USD {money(officialPricing.totalUSD)}
-   reconciles to the selected 10.3.4 B10 price, including the USD100 summary rounding.
+   reconciles to the selected 10.3.4 B10 price, after rounding quoted unit prices up to USD10.
    Actual OEM spare Part No., physical Qty and CIF delivery unit price remain subject to
    supplier confirmation and purchaser acceptance. No customer issue/approval is recorded.
   </p>}

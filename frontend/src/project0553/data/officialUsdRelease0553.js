@@ -1,9 +1,12 @@
+import {buildRawCustomerPriceBreakdown0553} from "./customerPriceBreakdownCore0553";
+import {roundQuotedRowsUp0553,roundQuoteUnitUp0553} from "./quoteUnitRounding0553";
+import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 import {roundAnnexUnitPrices0553} from "./c1SiTagBudget0553";
 import {buildB10OfficialItemizedAnnex0553} from "./b10OfficialItemizedAnnex0553";
 import {buildOtherSpareItemizedPresentation0553} from "./otherSpareItemizedPresentation0553";
 // Customer presentation derived only from the current 10.3.3 release model.
 // The commercial conversion/rounding layer never writes back to Working THB.
-export const OFFICIAL_USD_POLICY_0553=Object.freeze({thbPerUsd:31.5,incrementUSD:100,rounding:"UP_PER_SUMMARY_LINE"});
+export const OFFICIAL_USD_POLICY_0553=Object.freeze({thbPerUsd:31.5,incrementUSD:100,rounding:"UP_UNIT_TO_TENS_THEN_ROLLUP",unitIncrementUSD:10,summarySeedRounding:"UP_PER_SUMMARY_LINE"});
 export const OFFICIAL_SHEETS_0553=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
  ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"]
@@ -67,12 +70,12 @@ function allocateAnnex(rows,target){
   return {...r,unitUSD,totalUSD};
  });
 }
-export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_0553){
+function buildOfficialUsdReleaseSeed0553(source,policy){
  const line=(r,thb)=>{
   if(r.offerTreatment?.status==="NOT_QUOTED_EXCLUDED"&&Number.isFinite(thb))
    throw Error(r.code+" excluded offer cannot carry a quoted price");
   return {code:r.code,description:descriptions[r.code]||r.description,
-  serviceText:serviceText(r.serviceCommercialBasis),qty:1,unit:"lot",amountUSD:quoteUsd0553(thb,policy),
+  serviceText:serviceText(r.serviceCommercialBasis),qty:1,unit:"lot",amountUSD:quoteUsd0553(thb,{...policy,incrementUSD:policy.seedIncrementUSD??policy.incrementUSD}),
   offerTreatment:r.offerTreatment||null,
   priceText:r.offerTreatment?.priceText||null,commercialRemark:r.offerTreatment?.remark||"",
   sourceTHB:thb??null,sourceModuleId:r.sourceModuleId||r.moduleId,
@@ -85,7 +88,9 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
       !Number.isFinite(r.budgetaryOptionOfferUSD)||Number.isFinite(normal.amountUSD)||
       r.customerOfferIssued!==false||r.firmOemQuote!==false)
     throw Error("0553 C1/C2 conditional budgetary option quote lacks source price authority");
-   const budgetUsd=quoteUsd0553(r.budgetaryOptionOfferTHB,policy);
+   const option=selectOptionBudgetaryOffer0553().offers[r.code];
+   if(policy.thbPerUsd!==31.5||option.sourceSellTHB!==r.budgetaryOptionOfferTHB)throw Error("Option source/FX mismatch");
+   const budgetUsd=option.budgetaryQuoteUSD;
    if(budgetUsd!==r.budgetaryOptionOfferUSD)
     throw Error("0553 option quote USD must match canonical 10.3 Source→Release rounding");
    return {...normal,budgetaryOptionQuoteUSD:budgetUsd,
@@ -117,4 +122,34 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
   issued:false};
  return {...document,b10ItemizedAnnex:buildB10OfficialItemizedAnnex0553(document),
   otherSpareItemizedAnnex:buildOtherSpareItemizedPresentation0553(document)};
+}
+
+// The quoted customer USD authority. Round children once, then roll parents up.
+// Working THB costs, quantities, FX and markup remain immutable source evidence.
+export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_0553){
+ const seed=buildOfficialUsdReleaseSeed0553(source,policy);
+ const raw=buildRawCustomerPriceBreakdown0553(source,seed);
+ const groups=raw.groups.map(g=>{
+  if(g.parentUSD===null)return {...g,rows:g.rows.map(x=>({...x}))};
+  const rows=roundQuotedRowsUp0553(g.rows,{amountKey:"amountUSD"});
+  if(rows.some(x=>x.amountUSD!==null&&x.unitUSD===null))throw Error(g.code+" cannot round unknown priced unit");
+  const totalUSD=Math.round(rows.reduce((n,x)=>n+(x.amountUSD||0),0)*100)/100;
+  return {...g,rows,preTensParentUSD:g.parentUSD,parentUSD:totalUSD,totalUSD,varianceUSD:0,matched:true};
+ });
+ const a=seed.a.map(x=>{const amountUSD=groups.find(g=>g.code===x.code).totalUSD;return amountUSD===x.amountUSD?x:{...x,preTensAmountUSD:x.amountUSD,amountUSD};});
+ const b10Parents=roundQuotedRowsUp0553(seed.annex.B10);
+ const b13Rows=roundQuotedRowsUp0553(seed.annex.B13);
+ const b=seed.b.map(x=>{const amountUSD=x.code==="B10"?b10Parents.reduce((n,r)=>n+r.totalUSD,0):
+  x.code==="B13"?b13Rows.reduce((n,r)=>n+r.totalUSD,0):roundQuoteUnitUp0553(x.amountUSD);return amountUSD===x.amountUSD?x:{...x,preTensAmountUSD:x.amountUSD,amountUSD};});
+ const annex={...seed.annex,B10:b10Parents,B13:b13Rows};
+ const document={...seed,policy:{...seed.policy,seedIncrementUSD:policy.seedIncrementUSD??policy.incrementUSD,incrementUSD:10},a,b,annex,totalUSD:Math.round([...a,...b].reduce((n,x)=>n+(x.amountUSD||0),0)*100)/100,
+  quotedUnitRounding:{incrementUSD:10,direction:"UP",rollup:"SUM_ROUNDED_CHILD_AMOUNTS",workingTHBUnchanged:true},
+  preTensTotalUSD:seed.totalUSD};
+ const prior=seed.otherSpareItemizedAnnex;
+ const b13=prior.rows.B13.map(x=>{const priced=b13Rows.find(r=>r.sourceId===x.sourceId);return {...x,preTensUnitUSD:x.unitUSD,preTensTotalUSD:x.totalUSD,unitUSD:priced.unitUSD,totalUSD:priced.totalUSD,roundingAdjustmentUSD:Math.round((priced.totalUSD-x.sourceTotalUSD)*100)/100};});
+ document.b10ItemizedAnnex=buildB10OfficialItemizedAnnex0553(document);
+ document.otherSpareItemizedAnnex={...prior,rows:{...prior.rows,B13:b13},summaries:{...prior.summaries,
+  B13:{...prior.summaries.B13,totalUSD:b.find(x=>x.code==="B13").amountUSD,unitRoundingUSD:10}}};
+ document.customerPriceBreakdown={...raw,groups,totalUSD:document.totalUSD,reconciled:groups.every(g=>g.matched)};
+ return document;
 }
