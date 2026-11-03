@@ -16,6 +16,10 @@ export function buildCustomerPriceBreakdown0553(source,official=buildOfficialUsd
 
 // Explicit export allowlist. Do not serialize internal source objects into the customer workbook.
 function customerDescription(row){
+ if(row.customerBudgetIncluded&&row.code==='A3'&&row.id.endsWith('-JB'))
+  return 'Explosion-proof junction box, terminals and cable glands in accordance with MTO C1.';
+ if(row.customerBudgetIncluded&&row.code==='A3')
+  return 'Certified cable glands, plugs and bonding in accordance with MTO C1.';
  const suffixes={
   'A2':[
    ['-RFI-BDA-EXD-ENCLOSURE','WAROM HRMD95-VIIIB Ex d enclosure supplied with the RFI BDA package.'],
@@ -42,7 +46,7 @@ export function customerBreakdownRows0553(group){
   tag:r.tag===r.id&&/(?:MGW|MR000)/.test(r.tag)?"TBC":r.tag,
   description:customerDescription(r),
   qty:r.qty,unit:r.status==='INCLUDED'?"":r.unit,unitUSD:r.unitUSD,amountUSD:r.amountUSD,
-  remark:r.status==="INCLUDED"?"Included in package; no separate charge":
+  remark:r.customerBudgetIncluded?"Included in quoted Part A budget; no additional charge.":r.status==="INCLUDED"?"Included in package; no separate charge":
    r.status==="NOT PRICED"?"Not priced; scope confirmation required":
    r.quantityPending?"Quantity / unit confirmation required":""}));
 }

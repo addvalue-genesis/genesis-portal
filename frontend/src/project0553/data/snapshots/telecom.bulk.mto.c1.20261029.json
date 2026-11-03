@@ -2592,5 +2592,20 @@
     "mgwQuotedCoaxConnectors": 18,
     "mgwQuotedFeederM": 300,
     "netAdditionalUnpricedScopeTHB": null
+  },
+  "commercialScopeDecision": {
+    "date": "2026-11-03",
+    "authority": "PROJECT_OWNER_USER",
+    "scopeIncludedInPartA": true,
+    "additionalPartAChargeUSD": 0,
+    "submittedPriceHoldUSD": {
+      "A1": 241100,
+      "A2": 137000
+    },
+    "budgetSufficiencyVerified": false,
+    "directCostComplete": false,
+    "technicalApproval": false,
+    "customerIssued": false,
+    "meaning": "MTO Telecom Vendor scope included commercially within retained Part A price; unresolved procurement costs remain NULL, not zero."
   }
 }

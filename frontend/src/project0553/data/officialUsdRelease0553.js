@@ -4,9 +4,22 @@ import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 import {roundAnnexUnitPrices0553} from "./c1SiTagBudget0553";
 import {buildB10OfficialItemizedAnnex0553} from "./b10OfficialItemizedAnnex0553";
 import {buildOtherSpareItemizedPresentation0553} from "./otherSpareItemizedPresentation0553";
+import SUBMITTED_SAMTEL_REV02_0553 from "./snapshots/submitted.samtel.rev02.20261030.json";
 // Customer presentation derived only from the current 10.3.3 release model.
 // The commercial conversion/rounding layer never writes back to Working THB.
 export const OFFICIAL_USD_POLICY_0553=Object.freeze({thbPerUsd:31.5,incrementUSD:100,rounding:"UP_UNIT_TO_TENS_THEN_ROLLUP",unitIncrementUSD:10,summarySeedRounding:"UP_PER_SUMMARY_LINE"});
+// Owner commercial direction: retain submitted Part A prices and absorb MTO
+// reconciliation inside that budget. This does not turn missing direct cost into zero.
+export const PART_A_SUBMITTED_PRICE_HOLD_0553=Object.freeze({
+ date:"2026-11-03",authority:"PROJECT_OWNER_USER",
+ baseline:"4-Scope of Supply Rev02.xlsx sent to SAMTEL 30-Oct-2026",
+ baselineMessageId:"1a18a66100a2e5e0",
+ quotedUSD:Object.freeze(Object.fromEntries(SUBMITTED_SAMTEL_REV02_0553.rows.filter(r=>["A1","A2"].includes(r.code)).map(r=>[r.code,r.amountUSD]))),
+ scope:"Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge",
+ internalBudgetTransferAllowed:true,additionalPartAChargeUSD:0,
+ directCostComplete:false,technicalApproval:false,customerIssued:false,
+ note:"Retain internal ZWP11 new cabinet cost and remove superseded LNA duplicate cost. A1/A2 savings and overruns are managed internally, not passed through as a Part A price change. B10 RACON deletion, B11 deletion and B13 update remain separate price adjustments."
+});
 export const OFFICIAL_SHEETS_0553=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
  ["B13 Consumerables","B13"],["C1 CapitalSpares","C1"],["C2 2Y-Spares","C2"]
@@ -98,6 +111,15 @@ function buildOfficialUsdReleaseSeed0553(source,policy){
     budgetaryOfferSourceId:r.budgetaryOfferSourceId,budgetaryOfferSourceModuleId:r.budgetaryOfferSourceModuleId,
     budgetaryOfferPrepared:true,firmOemQuote:false,optionExcludedFromBase:true};
   });
+ for(const row of a){
+  row.commercialScopeInclusion=PART_A_SUBMITTED_PRICE_HOLD_0553.scope;
+  const fixedUSD=PART_A_SUBMITTED_PRICE_HOLD_0553.quotedUSD[row.code];
+  if(fixedUSD!==undefined){
+   row.costDerivedSeedUSD=row.amountUSD;
+   row.amountUSD=fixedUSD;
+   row.commercialPriceHold=PART_A_SUBMITTED_PRICE_HOLD_0553;
+  }
+ }
  const rows=[...a,...b,...c],annex={};
  for(const code of ["B10","B11","B13","C1","C2"]){
   const items=source.annex[code]||[],parent=rows.find(r=>r.code===code);
@@ -131,6 +153,28 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
  const raw=buildRawCustomerPriceBreakdown0553(source,seed);
  const groups=raw.groups.map(g=>{
   if(g.parentUSD===null)return {...g,rows:g.rows.map(x=>({...x}))};
+  if(Object.hasOwn(PART_A_SUBMITTED_PRICE_HOLD_0553.quotedUSD,g.code)){
+   const fixedUSD=PART_A_SUBMITTED_PRICE_HOLD_0553.quotedUSD[g.code];
+   // A fixed customer total is allocated to its existing priced rows in USD10
+   // units. Upward rounding every row would increase the approved total.
+   const priced=g.rows.filter(r=>r.amountUSD!==null&&r.customerSellTHB>0);
+   if(fixedUSD%10!==0||!priced.length||priced.some(r=>r.qty!==1))
+    throw Error(g.code+" fixed price allocation requires USD10 total and one-set source rows");
+   const weight=priced.reduce((n,r)=>n+r.customerSellTHB,0),units=fixedUSD/10;
+   const shares=priced.map(r=>{const exact=units*r.customerSellTHB/weight;return {key:r.key,units:Math.floor(exact),fraction:exact-Math.floor(exact)};});
+   const order=[...shares].sort((a,b)=>b.fraction-a.fraction||(a.key<b.key?-1:a.key>b.key?1:0));
+   const residual=units-shares.reduce((n,r)=>n+r.units,0);
+   if(residual<0||residual>shares.length)throw Error(g.code+" fixed price allocation cannot reconcile");
+   for(let i=0;i<residual;i++)order[i].units++;
+   const byKey=new Map(shares.map(r=>[r.key,r.units*10]));
+   const rows=g.rows.map(r=>byKey.has(r.key)?{...r,preFixedPriceAmountUSD:r.amountUSD,
+    unitUSD:byKey.get(r.key),amountUSD:byKey.get(r.key),unitRoundingUSD:10,
+    commercialAllocation:"OWNER_FIXED_TOTAL_IN_USD10_UNITS"}:{...r});
+   const totalUSD=rows.reduce((n,r)=>n+(r.amountUSD||0),0);
+   if(totalUSD!==fixedUSD)throw Error(g.code+" fixed customer price changed");
+   return {...g,rows,parentUSD:fixedUSD,totalUSD,varianceUSD:0,matched:true,
+    commercialPriceHold:PART_A_SUBMITTED_PRICE_HOLD_0553};
+  }
   const rows=roundQuotedRowsUp0553(g.rows,{amountKey:"amountUSD"});
   if(rows.some(x=>x.amountUSD!==null&&x.unitUSD===null))throw Error(g.code+" cannot round unknown priced unit");
   const totalUSD=Math.round(rows.reduce((n,x)=>n+(x.amountUSD||0),0)*100)/100;
@@ -143,13 +187,20 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
   x.code==="B13"?b13Rows.reduce((n,r)=>n+r.totalUSD,0):roundQuoteUnitUp0553(x.amountUSD);return amountUSD===x.amountUSD?x:{...x,preTensAmountUSD:x.amountUSD,amountUSD};});
  const annex={...seed.annex,B10:b10Parents,B13:b13Rows};
  const document={...seed,policy:{...seed.policy,seedIncrementUSD:policy.seedIncrementUSD??policy.incrementUSD,incrementUSD:10},a,b,annex,totalUSD:Math.round([...a,...b].reduce((n,x)=>n+(x.amountUSD||0),0)*100)/100,
-  quotedUnitRounding:{incrementUSD:10,direction:"UP",rollup:"SUM_ROUNDED_CHILD_AMOUNTS",workingTHBUnchanged:true},
+  quotedUnitRounding:{incrementUSD:10,direction:"UP",fixedTotalAllocationExceptions:["A1","A2"],rollup:"SUM_ROUNDED_CHILD_AMOUNTS",workingTHBUnchanged:true},
+  commercialPriceHold:PART_A_SUBMITTED_PRICE_HOLD_0553,
   preTensTotalUSD:seed.totalUSD};
  const prior=seed.otherSpareItemizedAnnex;
  const b13=prior.rows.B13.map(x=>{const priced=b13Rows.find(r=>r.sourceId===x.sourceId);return {...x,preTensUnitUSD:x.unitUSD,preTensTotalUSD:x.totalUSD,unitUSD:priced.unitUSD,totalUSD:priced.totalUSD,roundingAdjustmentUSD:Math.round((priced.totalUSD-x.sourceTotalUSD)*100)/100};});
  document.b10ItemizedAnnex=buildB10OfficialItemizedAnnex0553(document);
  document.otherSpareItemizedAnnex={...prior,rows:{...prior.rows,B13:b13},summaries:{...prior.summaries,
   B13:{...prior.summaries.B13,totalUSD:b.find(x=>x.code==="B13").amountUSD,unitRoundingUSD:10}}};
- document.customerPriceBreakdown={...raw,groups,totalUSD:document.totalUSD,reconciled:groups.every(g=>g.matched)};
+ const isMtoBudgetIncluded=r=>r.status==="NOT PRICED"&&(
+  (r.code==="A2"&&/-BDA-M20-GLANDS$|-BDA-RF-FEEDTHROUGHS$/.test(r.id))||
+  (r.code==="A3"&&/-MGW-PHONE1-JB$|-FIELD-EX-GLANDS$/.test(r.id)));
+ const commercialGroups=groups.map(g=>({...g,rows:g.rows.map(r=>isMtoBudgetIncluded(r)?{...r,
+  customerBudgetIncluded:true,internalCostStatus:"NOT_PRICED",
+  commercialScopeBasis:"OWNER_CONFIRMED_MTO_C1_WITHIN_EXISTING_PART_A_BUDGET"}:r)}));
+ document.customerPriceBreakdown={...raw,groups:commercialGroups,totalUSD:document.totalUSD,reconciled:groups.every(g=>g.matched)};
  return document;
 }

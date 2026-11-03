@@ -12,7 +12,9 @@ assert.equal(quoteUsd0553(3150),100);assert.equal(quoteUsd0553(3150.01),200);ass
 assert.throws(()=>quoteUsd0553(-1));assert.throws(()=>quoteUsd0553(1,{thbPerUsd:0,incrementUSD:100}));
 for(const r of [...model.a,...model.b,...model.c]){
  if(r.sourceTHB===null){assert.equal(r.amountUSD,null);continue;}
- assert.equal(r.amountUSD%10,0);assert(r.amountUSD>=r.sourceTHB/31.5-1e-8);assert(r.amountUSD>=r.sourceTHB/31.5-1e-8); // Child unit ceilings determine the uplift.
+ assert.equal(r.amountUSD%10,0);
+ if(r.commercialPriceHold)assert.equal(r.amountUSD,r.commercialPriceHold.quotedUSD[r.code]);
+ else assert(r.amountUSD>=r.sourceTHB/31.5-1e-8); // Owner-held totals are a documented commercial exception.
 }
 assert.equal(model.totalUSD,[...model.a,...model.b].reduce((n,r)=>n+(r.amountUSD||0),0));
 assert.deepEqual(model.unpriced,[]);assert.deepEqual(model.excluded,['B4','B11','B12']);assert.equal(model.issued,false);
@@ -49,7 +51,7 @@ assert.equal(b14.actualCostTHB,null);assert.equal(b14.profitTHB,null);
 assert.equal(b14.samTelDeductionTHB,39375);
 assert.equal(b14.addvalueReceivableTHB,748125);
 assert.equal(model.b.find(x=>x.code==='B14').amountUSD,25000);
-assert.equal(model.totalUSD,889270);
+assert.equal(model.totalUSD,894590);
 assert.equal(model.totalUSD-model.b.find(x=>x.code==='B14').amountUSD,869910,'Current A+B excluding B14 includes the selected B1 delta only');
 
 assert.equal(plan.coverages.find(x=>x.id==='AV-CARGO').costOwner,'B6');
@@ -207,7 +209,7 @@ const template=require('../src/project0553/data/nativeReleaseTemplate0553.json')
   for(const internal of ['THB','INTERNAL','HOLD','WORKING DRAFT','NOT ESTABLISHED','bid.budget','Exchange rate','no duplicate engineering charge'])assert(!xml.includes(internal),name+' leaked '+internal);
   if(i===1){
    const expected={a:model.a.map(x=>({...x,amount:x.amountUSD})),b:model.b.map(x=>({...x,amount:x.amountUSD})),total:model.totalUSD,unpricedText:'To be quoted'};
-   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:889270});
+   assert.deepEqual(assertNativeScopeSummary0553(xml,expected),{partARows:4,partBRows:14,total:894590});
    // Reproduce the reported partial workbook: spare prices remain, A/B vanish.
    const erase=(input,address)=>input.replace(new RegExp('<c\\b[^>]*r="'+address+'"[^>]*?(?:/>|>[\\s\\S]*?</c>)'),'<c r="'+address+'"/>');
    for(const address of ['A8','B9','C10','D11','E8','F8','G11','A24','B25','E26','F28','G32','G38'])

@@ -1,0 +1,164 @@
+{
+  "projectId": "PJ2608-0553",
+  "snapshotType": "EMAIL_VERIFIED_SUBMITTED_SUMMARY_EVIDENCE",
+  "filename": "4-Scope of Supply Rev02.xlsx",
+  "revision": "Rev02",
+  "submittedAt": "2026-10-30T08:21:24+07:00",
+  "submittedBy": "suriyapong@addvaluesystem.com",
+  "recipients": [
+    "kunakorn.t@samtel.com",
+    "wachira.k@samtel.com"
+  ],
+  "messageId": "1a18a66100a2e5e0",
+  "emailSubject": "JUTAL Z1F – ZM169-RFQ-TE-001 – Updated Scope of Supply Rev02",
+  "currency": "USD",
+  "totalBaseUSD": 902900,
+  "partCExcludedFromBase": true,
+  "rows": [
+    {
+      "code": "A1",
+      "amountUSD": 241100,
+      "priceText": "241100",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 8
+    },
+    {
+      "code": "A2",
+      "amountUSD": 137000,
+      "priceText": "137000",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 9
+    },
+    {
+      "code": "A3",
+      "amountUSD": 34200,
+      "priceText": "34200",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 10
+    },
+    {
+      "code": "A4",
+      "amountUSD": 292500,
+      "priceText": "292500",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 11
+    },
+    {
+      "code": "B1",
+      "amountUSD": 27400,
+      "priceText": "27400",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 24
+    },
+    {
+      "code": "B2",
+      "amountUSD": 7600,
+      "priceText": "7600",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 25
+    },
+    {
+      "code": "B3",
+      "amountUSD": 73800,
+      "priceText": "73800",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 26
+    },
+    {
+      "code": "B4",
+      "amountUSD": null,
+      "priceText": "N/A",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 27
+    },
+    {
+      "code": "B5",
+      "amountUSD": 9900,
+      "priceText": "9900",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 28
+    },
+    {
+      "code": "B6",
+      "amountUSD": 10700,
+      "priceText": "10700",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 29
+    },
+    {
+      "code": "B7",
+      "amountUSD": 1000,
+      "priceText": "1000",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 30
+    },
+    {
+      "code": "B8",
+      "amountUSD": 4600,
+      "priceText": "4600",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 31
+    },
+    {
+      "code": "B9",
+      "amountUSD": 15300,
+      "priceText": "15300",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 32
+    },
+    {
+      "code": "B10",
+      "amountUSD": 16200,
+      "priceText": "16200",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 33
+    },
+    {
+      "code": "B11",
+      "amountUSD": 5100,
+      "priceText": "5100",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 34
+    },
+    {
+      "code": "B12",
+      "amountUSD": null,
+      "priceText": "N/A",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 35
+    },
+    {
+      "code": "B13",
+      "amountUSD": 1500,
+      "priceText": "1500",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 36
+    },
+    {
+      "code": "B14",
+      "amountUSD": 25000,
+      "priceText": "25000",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 37
+    },
+    {
+      "code": "C1",
+      "amountUSD": 97500,
+      "priceText": "97500",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 41
+    },
+    {
+      "code": "C2",
+      "amountUSD": 23000,
+      "priceText": "23000",
+      "sourceSheet": "Scope of supply",
+      "sourceRow": 42
+    }
+  ],
+  "submissionEvidenceVerified": true,
+  "customerAcceptanceVerified": false,
+  "sourceWorkbookHash": null,
+  "historyCompleteness": "SUMMARY_ONLY__NOT_FULL_WORKBOOK_SNAPSHOT",
+  "immutableHistoricalEvidence": true
+}
