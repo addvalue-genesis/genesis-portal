@@ -53,10 +53,11 @@ try{
   assert(UI.quotationSchedules0550().every(s=>s===V.SCHEDULES_0550.find(r=>r.id===s.id)),'Focus reuses canonical Schedule objects');
   const quotationHtml=renderToStaticMarkup(React.createElement(UI.BidVolumesWorkspace0550,{volume:'I'}));
   assert(quotationHtml.includes('11 · Volume I'));
-  assert(quotationHtml.includes('data-component-key="bid.quotation.C1"'),'Volume I opens existing C1 module');
+  assert(quotationHtml.includes('data-component-key="bid.quotation.A1"'),'Volume I opens existing A1 module');
   const quotationNav=quotationHtml.match(/<nav[^>]*aria-label="Volume I sections"[^>]*>([\s\S]*?)<\/nav>/)?.[1]||'';
   assert(quotationNav.includes('>11.C1</button>')&&quotationNav.includes('>11.C2</button>'));
-  for(const id of V.SCHEDULES_0550.filter(s=>!['C1','C2'].includes(s.id)).map(s=>s.id))assert(!quotationNav.includes('>11.'+id+'</button>'),'Hidden Schedule '+id);
+  for(const id of V.SCHEDULES_0550.map(s=>s.id))assert(quotationNav.includes('>11.'+id+'</button>'),'Existing Schedule visible by default '+id);
+  assert(quotationHtml.includes('value="ALL" selected=""'),'All schedules selected by default');
   const commercialHtml=renderToStaticMarkup(React.createElement(UI.BidVolumesWorkspace0550,{volume:'III'}));
   assert(commercialHtml.includes('13 · Volume III'));assert(!commercialHtml.includes('aria-label="Schedules shown"'));
   assert(renderToStaticMarkup(React.createElement(UI.VdrlWorkspace0550,{})).includes('12.V'));

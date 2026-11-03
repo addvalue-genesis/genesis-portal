@@ -1,3 +1,5 @@
+Latest owner correction: [restore existing Schedule A/A1/A2 visibility and audit the actual A-to-SI boundary](20261103_RESTORE_SCHEDULE_A_FORMS.md), UI `2026-11-03.5-preview`. Open A1 and all native Schedules by default;10 links to existing forms. No new IDs or financial changes. Prior PAGA217 candidate mapping is DTS-based, not a complete multi-document engineering result. Use the existing models to complete outputs10/11/12 and retain OPEN scope/proof/AVL.
+
 Latest: [PAGA supplier revision canonical continuation](20261103_PAGA_SUPPLIER_REVISION.md), parent `d34d8cb7`. Code + private controlled import are separate from Windows saved data. Preserve existing selections and complete PAGA reconciliation before the remaining18 systems.
 
 Latest A focus/count correction: [single-input navigation and actual Rev11/Rev07 diagnosis](20261103_A_INPUT_FOCUS_AND_RECEIPT_COUNTS.md), UI `2026-11-03.3-preview`, parent `a58fff2a`. Full copied IDs work in the local A filter; reference/history registers and SI findings start collapsed independently. Receipt-passed, exact-number candidates and reviewed content remain separate; no source/review/price/history writes.

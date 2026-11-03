@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-03.4-preview",
+  "version": "2026-11-03.5-preview",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "d34d8cb7f7d561092d089f3274a347a110cb7edb",
-  "capability": "0550 PAGA supplier revision enters existing canonical source/SI/B07/Working records through controlled private SI import. Preserves selected prices/quantities/FX, edits/deletions and frozen history; draft net package remains unselected and component/options evidence non-additive. No new module IDs or engineering/release approval."
+  "source0550": "2d4ee1c2",
+  "capability": "Restore all existing Exhibit C Schedules including A/A1/A2 by default and open the existing A1 form. Keep optional C1/C2 focus and add existing A/A1/A2 shortcuts from10. Canonical prices, source/SI records, quantity/FX, module IDs and frozen history unchanged."
 }

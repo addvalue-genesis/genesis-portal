@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_PAGA_SUPPLIER_REVISION.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_RESTORE_SCHEDULE_A_FORMS.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -17,7 +17,8 @@
     "docs/handoff/pj2608-0550/20261103_CONTINUITY_AND_TAB_PERFORMANCE.md",
     "docs/handoff/pj2608-0550/20261103_A_INPUT_COPY_IDS.md",
     "docs/handoff/pj2608-0550/20261103_A_INPUT_FOCUS_AND_RECEIPT_COUNTS.md",
-    "docs/handoff/pj2608-0550/20261103_PAGA_SUPPLIER_REVISION.md"
+    "docs/handoff/pj2608-0550/20261103_PAGA_SUPPLIER_REVISION.md",
+    "docs/handoff/pj2608-0550/20261103_RESTORE_SCHEDULE_A_FORMS.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -46,9 +47,10 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
-    "PAGA first: private supplier-revision transaction supports canonical source/SI/B07/Working candidate continuation. Deliver controlled import JSON separately; source95 draft /217 TAG /26 topic review remains DRAFT and net owner unselected. Do not infer Windows IndexedDB installation.",
-    "Reconcile PAGA node/site/speaker/beacon/OCU/UPS/licence/bulk/service/spares/AVL gaps, legacy addition rationale and financial adoption before Release10.7; preserve old selected values, quantities/FX and frozen history.",
-    "Then continue the other18 systems from existing authored requirements; actual A receipt/readiness and project-wide engineering remain OPEN."
+    "Existing Schedule A/A1/A2 restored: default all13 native forms, initial A1, shortcuts from10. Continue using existing Working/Schedule/Technical records for outputs10/11/12; no replacement form or module.",
+    "PAGA multi-source clause/engineering reconciliation remains OPEN:217 new TAG candidates are DTS-only customer evidence,95 old authored drafts were retained;16 derived MR defaults still need exact sources,5 prior RPTs OPEN and no closed PAGA scope review. The revision importer is not full A/SI acceptance.",
+    "Private PAGA outputs10/11/12 and v2 technical draft package are separate from Git and Windows saved data. Do not treat a qualified quoted-package pricing scenario as complete customer CIF/FOB price or adopt it automatically.",
+    "GitHub push remains blocked by automatic approval review pending explicit payload/destination authorization; do not bypass."
   ],
   "historicalState": "The prior 2026-10-09 branch/PR2/port3000/STAGING checkpoint remains in Git history; it is not the current launch instruction."
 }
