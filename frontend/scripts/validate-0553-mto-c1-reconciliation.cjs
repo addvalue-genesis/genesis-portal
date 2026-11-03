@@ -55,8 +55,8 @@ async function main(){
  }
  for(const site of x.phone.sites){
   const jb=site.items.find(r=>r.id.endsWith('-MGW-PHONE1-JB'));
-  assert.equal(jb.qty,1);assert.equal(jb.tag,'TCAB-504-001');assert.equal(jb.extended,null);
-  assert.equal(jb.countedInWorkingTotal,false);assert.equal(jb.budgetReference.unitCostTHB,22000);
+  assert.equal(jb.qty,1);assert.equal(jb.tag,'TCAB-504-001');assert.equal(jb.extended,24500);
+  assert.equal(jb.countedInWorkingTotal,true);assert.equal(jb.budgetAllowance.currentSupplierQuoteVerified,false);assert.equal(jb.budgetReference.unitCostTHB,22000);
   assert.equal(jb.budgetReference.sourceCableEntries,3);assert.equal(jb.requiredCableEntries,4);
   assert.equal(jb.budgetReference.selected,false);assert.equal(jb.budgetReference.additive,false);
  }
@@ -76,7 +76,7 @@ async function main(){
  assert.equal(x.bulk.postAdditionalTHB,0);assert.equal(x.mto.pricesComplete,false);
  assert.equal(x.official.a.find(r=>r.code==='A2').amountUSD,137000);
  assert.equal(x.official.totalUSD,894590);assert.equal(x.official.totalUSD-baseline.totalUSD,-1940);
- for(const row of x.official.a.filter(r=>!['A1','A2'].includes(r.code))){const {commercialScopeInclusion,...unchanged}=row;assert.deepEqual(unchanged,baseline.a.find(r=>r.code===row.code));}
+ for(const row of x.official.a.filter(r=>r.code==='A4')){const {commercialScopeInclusion,...unchanged}=row;assert.deepEqual(unchanged,baseline.a.find(r=>r.code===row.code));}
  assert.deepEqual(x.official.b,baseline.b);assert.deepEqual(x.official.c,baseline.c);
  const changed=[];
  for(const row of x.breakdown.groups.flatMap(g=>g.rows)){
@@ -85,9 +85,9 @@ async function main(){
   if(row.amountUSD!==old.amountUSD||row.unitUSD!==old.unitUSD)changed.push(row);
  }
  assert(changed.length>0);
- for(const r of changed)assert(['A1','A2'].includes(r.code),'Fixed-price allocation is restricted to A1/A2');
+ for(const r of changed)assert(['A1','A2','A3'].includes(r.code),'Fixed-price allocation is restricted to A1/A2/A3');
  assert.equal(changed.filter(r=>r.id.endsWith('-BULK-LNA-BOX')&&r.status==='INCLUDED'&&r.amountUSD===null).length,3);
  assert.equal(x.breakdown.reconciled,true);assert.equal(x.official.issued,false);
- console.log('PASS MTO C1: 57 exact source rows; 3 unselected LNA allowances nonposting; 4 JB quantities sourced, candidate cost not posted; cable overlap not credited; owner-held A1/A2 prices 241100/137000 and A+B894590; unchanged A3/A4/B/C.');
+ console.log('PASS MTO C1: 57 exact source rows; 3 unselected LNA allowances nonposting; 4 JB allowances restored at24500, alternative22000 not posted; cable overlap not credited; owner-held A1/A2 prices 241100/137000 and A+B894590; unchanged A3/A4 customer totals and B/C.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});

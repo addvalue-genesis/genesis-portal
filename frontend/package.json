@@ -173,7 +173,8 @@
     "validate:0553-c1-c2-engineering-control": "node scripts/validate-0553-c1-c2-engineering-control.cjs",
     "validate:0553-c1-si-tag-budget": "node scripts/validate-0553-c1-si-tag-budget.cjs",
     "validate:0553-owner-supply-scope": "node scripts/validate-0553-owner-supply-scope.cjs",
-    "validate:0553-spare-tag-preview": "node scripts/validate-0553-spare-tag-preview.cjs"
+    "validate:0553-spare-tag-preview": "node scripts/validate-0553-spare-tag-preview.cjs",
+    "validate:0553-telephone-jb-working": "node scripts/validate-0553-telephone-jb-working.cjs"
   },
   "dependencies": {
     "react": "^18.0.0",

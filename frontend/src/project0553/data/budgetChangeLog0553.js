@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R85";
+export const CHANGE_LOG_VERSION_0553="2026-11-03-R86";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261103-10",date:"2026-11-03",kind:"PRICE",tone:"caution",
+  title:"Restore existing telephone JB allowance to active Working cost",
+  detail:"Owner reconfirms telephone JB was already budgeted. Reuse MR0003_SELECTED_PRICE_0553 PROSPER item3 THB24500 per JB, one each at ZWP20/21/22/23. Stable PHONE1-JB rows now post THB98000 once, alongside unchanged EXION phone/sounder THB828000, for equipment Working THB926000. Product ledger and active BOM reconcile; field-bulk JB mirror stays non-additive. This is an internal historical allowance, not confirmation of current MTO size/entry/Ex compliance or additional glands. Alternative item4 THB22000 remains unselected. A3 customer price held at submitted USD34200; immutable Rev02 A+BUSD902900 and separate current draftUSD894590 remain unchanged. No module IDs, FX, markup, quantities or supplier quote changed.",
+  moduleIds:Object.freeze(["bid.budget.bom.system-location-mto","bid.budget.pricing.official"]),
+  priceImpact:"WORKING_SOURCE_CHANGED__CUSTOMER_PRICE_UNCHANGED",source:"Owner03-Nov2026 reconfirms previously instructed JB cost; approvedBudgetBasis0553 + mr0003SelectedPrice0553"}),
  Object.freeze({id:"P553-CHANGE-20261103-09",date:"2026-11-03",kind:"PRICE",tone:"caution",
   title:"Offer C2 RF cable as one CSS CommScope1/2-inch305m drum",
   detail:"Owner replaces current C2 RF cable30m row with a drum using CSS1/2-inch reference. Existing rowC2-REV08-09 now offers1drum×305m CommScope HELIAX LDF4RK-50A. CSS QT-H670003342 dated30-Jan-2024 to Royaltec quotes305MT atTHB550/MT; no new price or factory drum/MOQ confirmation is implied. Cost167750×existingRelease1.30=SELL218075 /31.5=USD6923.02, rounded UP toUSD6930 per drum. Replace oldUSD600/SELLTHB16370.52 once, without repricing the other ten C2 rows. C2USD20890→27220 (+6330); SourceSELLTHB650382.02→852086.50. Existing CAT6A300m drumUSD8050, four separate Type-N connectorsUSD40 each, C1USD181100 and A+BUSD894910 remain. CSS quote4.3-10 connectors are not selected and not added; reconcile exact cable/connector compatibility before purchase. PartA installed FORLLER/UHF4 and all source history/FX/module IDs unchanged. Source/Scope/Release/Annex/USD/THB/Breakdown consume the same option owner. RF technical acceptance, current quote, factory packing and separate freight/packing remain unconfirmed; no purchase or customer issue approval.",

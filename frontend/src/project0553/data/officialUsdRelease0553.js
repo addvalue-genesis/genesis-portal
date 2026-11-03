@@ -31,11 +31,11 @@ export const PART_A_SUBMITTED_PRICE_HOLD_0553=Object.freeze({
  date:"2026-11-03",authority:"PROJECT_OWNER_USER",
  baseline:"4-Scope of Supply Rev02.xlsx sent to SAMTEL 30-Oct-2026",
  baselineMessageId:"1a18a66100a2e5e0",
- quotedUSD:Object.freeze(Object.fromEntries(SUBMITTED_SAMTEL_REV02_0553.rows.filter(r=>["A1","A2"].includes(r.code)).map(r=>[r.code,r.amountUSD]))),
+ quotedUSD:Object.freeze(Object.fromEntries(SUBMITTED_SAMTEL_REV02_0553.rows.filter(r=>["A1","A2","A3"].includes(r.code)).map(r=>[r.code,r.amountUSD]))),
  scope:"Telecom Vendor materials in MTO-0001 C1, 29-Oct-2026, included within existing Part A budget; no additional Part A charge",
  internalBudgetTransferAllowed:true,additionalPartAChargeUSD:0,
  directCostComplete:false,technicalApproval:false,customerIssued:false,
- note:"Retain internal ZWP11 new cabinet cost and remove superseded LNA duplicate cost. A1/A2 savings and overruns are managed internally, not passed through as a Part A price change. B10 RACON deletion, B11 deletion and B13 update remain separate price adjustments."
+ note:"Retain internal ZWP11 new cabinet cost, remove superseded LNA duplicate cost and restore the existing telephone JB allowance. A1/A2/A3 savings and overruns are managed internally, not passed through as a Part A price change. B10 RACON deletion, B11 deletion and B13 update remain separate price adjustments."
 });
 export const OFFICIAL_SHEETS_0553=Object.freeze([
  ["Scope of supply","SUMMARY"],["B10 CommSpares","B10"],["B11 SpecialTool","B11"],
@@ -204,7 +204,7 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
   x.code==="B13"?b13Rows.reduce((n,r)=>n+r.totalUSD,0):roundQuoteUnitUp0553(x.amountUSD);return amountUSD===x.amountUSD?x:{...x,preTensAmountUSD:x.amountUSD,amountUSD};});
  const annex={...seed.annex,B10:b10Parents,B13:b13Rows};
  const document={...seed,policy:{...seed.policy,seedIncrementUSD:policy.seedIncrementUSD??policy.incrementUSD,incrementUSD:10},a,b,annex,totalUSD:Math.round([...a,...b].reduce((n,x)=>n+(x.amountUSD||0),0)*100)/100,
-  quotedUnitRounding:{incrementUSD:10,direction:"UP",fixedTotalAllocationExceptions:["A1","A2"],rollup:"SUM_ROUNDED_CHILD_AMOUNTS",workingTHBUnchanged:true},
+  quotedUnitRounding:{incrementUSD:10,direction:"UP",fixedTotalAllocationExceptions:Object.keys(PART_A_SUBMITTED_PRICE_HOLD_0553.quotedUSD),rollup:"SUM_ROUNDED_CHILD_AMOUNTS",workingTHBUnchanged:true},
   commercialPriceHold:PART_A_SUBMITTED_PRICE_HOLD_0553,
   preTensTotalUSD:seed.totalUSD};
  const prior=seed.otherSpareItemizedAnnex;

@@ -9,6 +9,7 @@ import {deriveRaconTerminationBudget0553} from "./raconTerminationBudget0553";
 import {MGW_P26_058_R2_SELECTED_0553 as MGW} from "./mgwP26058R2Selected0553";
 import {deriveMR0002RfFeederQualification0553} from "./mr0002RfFeederQualification0553";
 import {deriveMR0002RfPhysicalRouteReconciliation0553} from "./mr0002RfPhysicalRouteReconciliation0553";
+import {MR0003_MGW_WORKING_BOM_0553} from "./mr0003MgwWorkingBom0553";
 
 export const BULK_MR_SITE_ORDER_0553=Object.freeze(["ZWP20","ZWP21","ZWP22","ZWP23","ZPQ","ZWP8","ZWP11"]);
 export const BULK_MR_LIST_0553=Object.freeze(["MR-0001","MR-0002","MR-0003","MR-0004"]);
@@ -254,7 +255,11 @@ export const selectBulkMrLocationCoverage0553=({mr="ALL",site="ALL",state="ALL"}
 // Customer MTO is gross contractual demand, distinct from the older equipment
 // MTO and partial source-owned prices. Do not spread GF aggregates over sites.
 export function deriveCustomerMtoC1Coverage0553({mr="ALL",site="ALL"}={}){
- const all=CUSTOMER_MTO_C1_0553.rows;
+ const all=CUSTOMER_MTO_C1_0553.rows.map(r=>r.mr==="MR-0003"&&r.sourceItem==="A-3"?{...r,
+  coverageState:"OWNER_JB_BUDGET_ALLOWANCE_COUNTED__MTO_CONFIGURATION_OPEN",
+  budgetAllowanceTHB:MR0003_MGW_WORKING_BOM_0553.jbBudgetAllowanceTHB,
+  note:"Existing owner-selected PROSPER item3 internal JB allowance is counted once at THB24500 per site, four sites, THB98000 total. EXION phone/sounder quote is separate. Historical item3 and item4 configurations do not prove the current MTO assembly; dimensions, entries, Ex certification and current quote remain open. Do not add the alternative THB22000 rate or post this MTO mirror again."
+ }:r);
  const gfSites=["ZWP20","ZWP21","ZWP22","ZWP23"];
  const rows=all.filter(r=>(mr==="ALL"||r.mr===mr||r.mr==="SHARED")&&
   (site==="ALL"||r.site===site||(r.site.startsWith("GF ")&&gfSites.includes(site))));

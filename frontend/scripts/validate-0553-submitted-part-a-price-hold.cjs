@@ -47,8 +47,8 @@ async function main(){
  await entry.link((s,ref)=>get(resolve(s,ref.identifier)));await entry.evaluate();
  const x=JSON.parse(JSON.stringify(entry.namespace.result));
  assert.equal(x.sourceBefore,x.sourceAfter,'Commercial override mutated working cost');
- assert.equal(x.breakdown.groups.flatMap(g=>g.rows).filter(r=>r.customerBudgetIncluded).length,14);
- assert.equal(x.customerA3.filter(r=>r.remark==='Included in quoted Part A budget; no additional charge.').length,8);
+ assert.equal(x.breakdown.groups.flatMap(g=>g.rows).filter(r=>r.customerBudgetIncluded).length,10);
+ assert.equal(x.customerA3.filter(r=>r.remark==='Included in quoted Part A budget; no additional charge.').length,4);
  for(const r of x.official.a)assert.equal(r.amountUSD,quote.get(r.code),'Retain submitted Part A prices');
  assert.equal(x.official.a.reduce((n,r)=>n+r.amountUSD,0),704800);
  assert.equal(x.official.b.find(r=>r.code==='B10').amountUSD,12960);
@@ -65,11 +65,11 @@ async function main(){
   assert.equal(g.parentUSD,g.rows.reduce((n,r)=>n+(r.amountUSD||0),0));assert.equal(g.varianceUSD,0);
   for(const r of g.rows)if(r.amountUSD!==null){assert.equal(r.unitUSD%10,0);assert.equal(r.amountUSD,r.unitUSD*r.qty);}
  }
- assert(x.breakdown.groups.find(g=>g.code==='A3').rows.some(r=>r.id.endsWith('-MGW-PHONE1-JB')&&r.amountUSD===null));
+ assert(x.breakdown.groups.find(g=>g.code==='A3').rows.some(r=>r.id.endsWith('-MGW-PHONE1-JB')&&r.amountUSD>0));
  // Invalid fixed-price quantities must fail instead of silently altering approved totals.
  const invalid={...x.source,a:x.source.a.map(r=>r.code==='A1'?{...r,sourceRows:r.sourceRows.map((v,i)=>i? v:{...v,qty:2})}:r)};
  const module=get(path.join(root,'officialUsdRelease0553.js'));
  assert.throws(()=>module.namespace.buildOfficialUsdRelease0553(invalid),/fixed price allocation requires/);
- console.log('PASS commercial hold: submitted A1/A2 241100/137000 retained; working costs unchanged; B10/B11/B13 adjusted; base894590, delta-8310; fixed total child allocation reconciles; missing cost stays open.');
+ console.log('PASS commercial hold: submitted A1/A2/A3 241100/137000/34200 retained; working costs unchanged; B10/B11/B13 adjusted; base894590, delta-8310; fixed total child allocation reconciles; missing cost stays open.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});
