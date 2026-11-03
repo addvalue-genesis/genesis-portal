@@ -2,8 +2,13 @@
 // Update RELEASE_NOTES_0553 on each meaningful UI/data/pricing code change.
 // An automatically embedded build Git SHA separately detects an unseen Pull.
 // Do not claim a source-price change unless a canonical owner was actually updated.
-export const CHANGE_LOG_VERSION_0553="2026-11-03-R88";
+export const CHANGE_LOG_VERSION_0553="2026-11-03-R89";
 export const RELEASE_NOTES_0553=Object.freeze([
+ Object.freeze({id:"P553-CHANGE-20261103-13",date:"2026-11-03",kind:"UI",tone:"caution",
+  title:"Official defaults to exact agreed Rev03; old Rev02 is history only",
+  detail:"Owner identifies Drive1WH3MEJifWoSZ9R_CLLhg7GNu8fSK0dnA as the agreed quotation. Its original146675-byte XLSX matches the uploaded Rev03 SHA256d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e. Prior bug left10.3.4 defaulting to old submitted Rev02 despite current Working changes. Official now defaults to the exact six-sheet owner-selected Rev03, with its correct source link and original file download. B10 has11 priced rows/USD12960; B11 is not separately quoted, zero offered rows; B13 has3 rows/USD1530; optionalC1 six rows/USD181100 andC2 eleven rows/USD27220. Verified every offered item/TAG/description/specification/material/Qty/unit/amount/lead time against the linked workbook, not just summary totals.10.3.3 customer Annex tabs use the same agreed sheets; internal source trace remains separate. A1–A4 stay live in10.3.3. Rev02 requires explicit History selection; neither source file nor Working costs/FX/markup/quantities/module IDs are changed. A+BUSD894910 unchanged; no new submission or customer acceptance asserted.",
+  moduleIds:Object.freeze(["bid.budget.pricing.release.preview","bid.budget.pricing.official"]),
+  priceImpact:"NO_PRICE_CHANGE__CURRENT_QUOTATION_DISPLAY_CORRECTED",source:"Owner03-Nov2026 screenshot and agreed Drive Rev03 file1WH3MEJifWoSZ9R_CLLhg7GNu8fSK0dnA"}),
  Object.freeze({id:"P553-CHANGE-20261103-12",date:"2026-11-03",kind:"PRICE",tone:"caution",
   title:"Use live Source/Working detail and owner Rev03 prices in Release A1–A4",
   detail:"Correct the prior tab move: A1–A4 must render current source-linked calculated rows, not preserved Rev02 worksheets. Owner uploads4-Scope of Supply Rev03.xlsx, SHA256 d350b023e3b24a2fbdbf2ed9285e55fc10d956235461edc906bc34e23fb6333e. Exact targets A1USD241290/A2USD137130/A3USD34200/A4USD292500; A+BUSD894910; C1USD181100/C2USD27220 excluded. All20 summary lines including N/A reconcile. Current quantities, supplier costs, FX31.5, markup and row/module identities remain; four JB allowancesTHB98000 stay inside MR0003 equipment costTHB926000. Existing fixed-total allocation uses current source rows with zero MR variance; no cost/rate or margin backsolve. Rev02USD902900 is retained only as historical archive. User workbook is a price reference, not proof of issuance. Original customer XLSX history unchanged; active ten-sheet export verified against Rev03.",

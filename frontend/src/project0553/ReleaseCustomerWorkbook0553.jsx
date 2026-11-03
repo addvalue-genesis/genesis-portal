@@ -14,7 +14,7 @@ import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {selectB10NativeAnnexReview0553} from "./data/b10NativeAnnexReview0553";
 import {SparePricedBudgetReview0553} from "./SparePricedBudgetReview0553";
 import {selectSparePricedBudgetReview0553} from "./data/sparePricedBudgetReview0553";
-import {buildOfficialUsdRelease0553} from "./data/officialUsdRelease0553";
+import {buildOfficialUsdRelease0553,selectCurrentReleaseRev03_0553} from "./data/officialUsdRelease0553";
 import {buildCustomerPriceBreakdown0553,customerBreakdownRows0553} from "./data/customerPriceBreakdown0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
 import "./releaseWorkbook0553.css";
@@ -108,6 +108,8 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
  const [nativeReport,setNativeReport]=useState(null);
  const internal=recipient==="INTERNAL"&&viewer==="INTERNAL";
  const code=WORKSHEETS.find(x=>x[0]===sheet)?.[1]||"SUMMARY";
+ const agreed=selectCurrentReleaseRev03_0553();
+ const agreedAnnex=["B10","B11","B13","C1","C2"].includes(code)?agreed.worksheets.find(s=>s.name===sheet):null;
  const releasePartA=/^A[1-4]$/.test(code)?quotedBreakdown.groups.find(g=>g.code===code):null;
  const releasePartARows=releasePartA?customerBreakdownRows0553(releasePartA):[];
  const partA=buildPartATagGroupBreakdown0553(model);
@@ -387,6 +389,10 @@ export function ReleaseCustomerWorkbook0553({model,recipient="INTERNAL",onOpenSo
        <tr className="p553-sheet-total"><td colSpan={7}>Difference</td><td className="p553-price-cell">{money(releasePartA.varianceUSD)}</td><td/></tr>
       </tbody>
      </table></div>
+    </div>:agreedAnnex&&!internal&&!focusAnnexTarget?.code?<div data-release-agreed-annex={code} data-release-revision="Rev03">
+     <p className="p55-note"><strong>{code} · Rev03 · Agreed quotation / USD</strong><br/>
+      <a href={agreed.sourceUrl} target="_blank" rel="noopener noreferrer">Open agreed source workbook</a></p>
+     <SubmittedWorksheet0553 sheet={agreedAnnex}/>
     </div>:<>
      {code==="B10"?<B10KitPriceSummary0553 rows={annexLines} total={annexModel?.selectedWorkingTHB} internal={internal} onOpenSource={onOpenSource} variant="release"/>:<>
      {["B13","C1","C2"].includes(code)&&<OtherSpareOriginalAnnex0553

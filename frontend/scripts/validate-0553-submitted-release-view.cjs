@@ -4,6 +4,8 @@ const file=path.resolve(__dirname,'../src/project0553/OfficialUsdRelease0553.jsx
 const snapshot=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../src/project0553/data/snapshots/submitted.samtel.rev02.20261030.json'),'utf8'));
 const releaseFile=path.resolve(__dirname,'../src/project0553/ReleaseCustomerWorkbook0553.jsx');
 const snapshotBefore=JSON.stringify(snapshot);
+const current=JSON.parse(fs.readFileSync(path.resolve(__dirname,'../src/project0553/data/snapshots/release.rev03.20261103.json'),'utf8'));
+const currentBefore=JSON.stringify(current);
 let compile;
 try{const b=require('@babel/core');compile=(target=file)=>b.transformFileSync(target,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'}}],'@babel/preset-react']}).code;}
 catch(e){
@@ -19,7 +21,7 @@ release.require=id=>{
  if(id==='react')return React;
  if(id==='react/jsx-runtime')return {jsx:node,jsxs:node,Fragment:'FRAGMENT'};
  if(id==='./data/officialUsdRelease0553')return {
-  selectSubmittedRev02Release0553:()=>snapshot,
+  selectSubmittedRev02Release0553:()=>snapshot,selectCurrentReleaseRev03_0553:()=>current,
   buildOfficialUsdRelease0553:()=>({otherSpareItemizedAnnex:{},totalUSD:894910,releasePriceReference:{revision:'Rev03',filename:'4-Scope of Supply Rev03.xlsx'}})
  };
  if(id==='./data/customerPriceBreakdown0553')return {
@@ -45,7 +47,7 @@ own.require=id=>{
  if(id==='react/jsx-runtime')return {jsx:node,jsxs:node,Fragment:'FRAGMENT'};
  if(id==='./ReleaseCustomerWorkbook0553')return release.exports;
  if(id==='./data/officialUsdRelease0553')return {
-  selectSubmittedRev02Release0553:()=>snapshot,
+  selectSubmittedRev02Release0553:()=>snapshot,selectCurrentReleaseRev03_0553:()=>current,
   MTO_C1_RELEASE_CONFIRMATION_0553:{mto:'MM-ZTK-1F-GEN-TEL-MTO-0001 Rev.C1'},
   buildOfficialUsdRelease0553:()=>{liveCalls++;throw Error('LIVE_MODEL_SELECTED');},OFFICIAL_SHEETS_0553:[]
  };
@@ -58,16 +60,31 @@ const render=()=>{cursor=0;return own.exports.OfficialUsdRelease0553({source:{un
 const all=tree=>{const nodes=[];const visit=n=>{if(Array.isArray(n))return n.forEach(visit);if(n&&typeof n==='object'){nodes.push(n);visit(n.type===sheetRenderer?sheetRenderer(n.props):n.props?.children);}};visit(tree);return nodes;};
 const text=tree=>{let out='';const visit=n=>{if(Array.isArray(n))return n.forEach(visit);if(n&&typeof n==='object')visit(n.type===sheetRenderer?sheetRenderer(n.props):n.props?.children);else if(n!==null&&n!==undefined)out+=String(n)+' ';};visit(tree);return out;};
 let tree=render();assert.equal(liveCalls,0);
-assert(all(tree).some(n=>n.props['data-release-state']==='SUBMITTED_TO_SAMTEL'));
+assert(all(tree).some(n=>n.props['data-release-state']==='OWNER_SELECTED_REV03'));
+assert(text(tree).includes('894,910.00'));
+const download=all(tree).find(n=>n.type==='a'&&n.props.download===current.filename);
+assert(download);assert.equal(download.props.href,current.originalWorkbookPath);
+assert(all(tree).some(n=>n.type==='a'&&n.props.href===current.sourceUrl));
+assert.deepEqual(all(tree).filter(n=>n.props.role==='tab').map(n=>text(n).trim()),current.worksheets.map(s=>s.name));
+for(const name of current.worksheets.slice(1).map(s=>s.name)){
+ const tab=all(tree).find(n=>n.props.role==='tab'&&text(n).trim()===name);tab.props.onClick();tree=render();
+ assert.equal(liveCalls,0);
+ assert(all(tree).some(n=>n.type===sheetRenderer&&n.props.sheet===current.worksheets.find(s=>s.name===name)));
+ if(name==='B11 SpecialTool'){
+  assert(text(tree).includes('Not separately quoted. Tools expressly included in the equipment supply remain included.'));
+  assert(!text(tree).includes('2,781.8200'));assert(!text(tree).includes('5,100'));
+ }
+}
+assert(!all(tree).some(n=>['input','textarea','select'].includes(n.type)),'Agreed prices must have no editable fields');
+const history=all(tree).find(n=>n.type==='button'&&text(n).includes('History Rev02'));history.props.onClick();tree=render();
+assert(all(tree).some(n=>n.props['data-release-state']==='HISTORICAL_SUBMITTED_REV02'));
 assert(text(tree).includes('902,900.00'));
-const download=all(tree).find(n=>n.type==='a'&&n.props.download===snapshot.filename);
-assert(download);assert.equal(download.props.href,snapshot.originalWorkbookPath);
-assert.deepEqual(all(tree).filter(n=>n.props.role==='tab').map(n=>text(n).trim()),snapshot.worksheets.slice(0,6).map(s=>s.name));
-const b10=all(tree).find(n=>n.type==='button'&&text(n).trim()==='B10 CommSpares');assert(b10);b10.props.onClick();
-tree=render();assert.equal(liveCalls,0);assert(text(tree).includes('16,200'));assert(!text(tree).includes('12,960'));
-assert(!all(tree).some(n=>['input','textarea','select'].includes(n.type)),'Archived prices must have no editable fields');
-const working=all(tree).find(n=>n.type==='button'&&text(n).includes('Working draft'));assert(working);working.props.onClick();
-assert.throws(render,/LIVE_MODEL_SELECTED/);assert.equal(liveCalls,1,'Live model is selected only by explicit version switch');
+const b11=all(tree).find(n=>n.props.role==='tab'&&text(n).trim()==='B11 SpecialTool');b11.props.onClick();tree=render();
+assert(text(tree).includes('5,100'));
+const latest=all(tree).find(n=>n.type==='button'&&text(n).includes('Current Rev03'));latest.props.onClick();tree=render();
+assert(text(tree).includes('Not separately quoted. Tools expressly included in the equipment supply remain included.'));
+const working=all(tree).find(n=>n.type==='button'&&text(n).includes('Working draft'));working.props.onClick();
+assert.throws(render,/LIVE_MODEL_SELECTED/);assert.equal(liveCalls,1,'Live calculation is selected only explicitly');
 // Part A tabs must render current calculated rows matching Rev03, not archived Rev02 cells.
 states.length=0;states[0]='A1 MR0001';
 const releaseModel={a:[],b:[],c:[],annex:{},annexModels:{},summary:{},
@@ -88,7 +105,13 @@ for(const name of expected.slice(6)){
  assert(!/Submitted\s+Rev02/.test(text(releaseTree)));
  assert.equal(all(releaseTree).filter(n=>n.props.role==='tab'&&n.props['aria-selected']).length,1);
 }
+for(const name of expected.slice(1,6)){
+ const tab=all(releaseTree).find(n=>n.props.role==='tab'&&text(n).trim()===name);tab.props.onClick();releaseTree=renderRelease();
+ assert(all(releaseTree).some(n=>n.props['data-release-agreed-annex']===name.split(' ')[0]));
+ assert(all(releaseTree).some(n=>n.type===sheetRenderer&&n.props.sheet===current.worksheets.find(s=>s.name===name)));
+}
+assert.equal(JSON.stringify(current),currentBefore,'Display must not change agreed quotation');
 assert.equal(JSON.stringify(snapshot),snapshotBefore,'Moving tabs must not mutate issued worksheets');
 const officialSource=fs.readFileSync(file,'utf8');
 assert(!officialSource.includes('<CustomerPriceBreakdown0553'),'Part A detail remains in Release only');
-console.log('PASS Release tabs: Official has six Scope/B/C tabs; Release has four live A1-A4 tabs after C2 with current source rows and Rev03 prices; no archived Part A renderer; original ten-sheet download and explicit Working selection preserved.');
+console.log('PASS Rev03 default and all five exact Annexes, explicit historical Rev02 and Working separation; Release tabs: Official has six Scope/B/C tabs; Release has four live A1-A4 tabs after C2 with current source rows and Rev03 prices; no archived Part A renderer; original ten-sheet download and explicit Working selection preserved.');

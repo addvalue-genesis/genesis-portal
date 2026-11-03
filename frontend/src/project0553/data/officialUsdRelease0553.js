@@ -15,6 +15,7 @@ const freezeRelease0553=value=>{
 const submittedRev02=freezeRelease0553(SUBMITTED_SAMTEL_REV02_0553);
 export const selectSubmittedRev02Release0553=()=>submittedRev02;
 export const RELEASE_PRICE_REFERENCE_0553=freezeRelease0553(CURRENT_RELEASE_REV03_0553);
+export const selectCurrentReleaseRev03_0553=()=>RELEASE_PRICE_REFERENCE_0553;
 export const MTO_C1_RELEASE_CONFIRMATION_0553=Object.freeze({
  date:"2026-11-03",authority:"PROJECT_OWNER_USER",releaseRevision:"Rev02",
  releaseSourceDriveId:"14WGYqVhcrqxL0CVvrcT95yQ8nosYwgMt",

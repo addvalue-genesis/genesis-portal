@@ -80,6 +80,26 @@ async function main(){
  assert.equal(x.archive.totalBaseUSD,902900);assert.equal(x.archive.rows.find(r=>r.code==='A1').amountUSD,241100);
  assert.equal(x.archive.rows.find(r=>r.code==='A2').amountUSD,137000);
  assert.equal(x.official.issued,false);assert.equal(x.official.releasePriceReference.state,'CURRENT_PRICE_REFERENCE_NOT_ISSUED');
- console.log('PASS uploaded Rev03: all20 A/B/C targets, A+B894910, current source rows and four priced JBs, positive ZWP11 enclosure, exact Qty x Unit -> MR -> total and actual ten-sheet XLSX XML; Working cost and historical Rev02 unchanged.');
+ const crypto=require('node:crypto');
+ assert.equal(reference.sourceDriveId,'1WH3MEJifWoSZ9R_CLLhg7GNu8fSK0dnA');
+ const bytes=fs.readFileSync(path.resolve(__dirname,'../public'+reference.originalWorkbookPath));
+ assert.equal(bytes.length,146675);assert.equal(crypto.createHash('sha256').update(bytes).digest('hex'),reference.sourceWorkbookSha256);
+ const codes=['B10','B11','B13','C1','C2'];
+ const normalized=v=>String(v??'').replace(/\\s+/g,' ').trim();
+ for(const code of codes){
+  const sheet=reference.worksheets.find(s=>s.name.startsWith(code+' '));assert(sheet);
+  const expected=sheet.rows.filter(row=>typeof row[6]?.value==='number'&&typeof row[7]?.value==='number');
+  const actual=code==='B11'&&x.official.otherSpareItemizedAnnex.summaries.B11.excluded?[]:code==='B10'?x.official.b10ItemizedAnnex.rows:x.official.otherSpareItemizedAnnex.rows[code];
+  assert.equal(actual.length,expected.length,code+' exact agreed row count');
+  for(const [i,r] of actual.entries()){
+   const e=expected[i],pairs=[[r.item,e[1].value],[r.tag,e[2].value],[r.description,e[3].value],[r.specification,e[4].value],[r.materials,e[5].value]];
+   for(const [a,b] of pairs)assert.equal(normalized(a),normalized(b),code+' row'+(i+1)+' text/TAG/specification');
+   assert.equal(r.qty,e[6].value);assert.equal(r.unitUSD,e[7].value);assert.equal(r.totalUSD,e[8].value);
+   if(code.startsWith('C'))assert.equal(r.leadTime,e[9].value);
+  }
+  assert.equal(expected.reduce((n,r)=>n+r[8].value,0),code==='B11'?0:reference.rows.find(r=>r.code===code).amountUSD);
+ }
+ assert.equal(x.official.otherSpareItemizedAnnex.summaries.B11.excluded,true);
+ console.log('PASS linked agreed Rev03 five Annexes, every item/TAG/spec/material/Qty/unit/amount/lead-time and exact original XLSX hash; uploaded Rev03: all20 A/B/C targets, A+B894910, current source rows and four priced JBs, positive ZWP11 enclosure, exact Qty x Unit -> MR -> total and actual ten-sheet XLSX XML; Working cost and historical Rev02 unchanged.');
 }
 main().catch(error=>{console.error(error);process.exitCode=1;});
