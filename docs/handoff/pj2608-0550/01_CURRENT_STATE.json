@@ -8,13 +8,14 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_CONTINUITY_AND_TAB_PERFORMANCE.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_A_INPUT_COPY_IDS.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
     "docs/architecture/PJ2608-0550_SI_Equation_Rev03.md",
     "docs/handoff/pj2608-0550/00_HANDOFF_CURRENT.md",
-    "docs/handoff/pj2608-0550/20261103_CONTINUITY_AND_TAB_PERFORMANCE.md"
+    "docs/handoff/pj2608-0550/20261103_CONTINUITY_AND_TAB_PERFORMANCE.md",
+    "docs/handoff/pj2608-0550/20261103_A_INPUT_COPY_IDS.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -43,7 +44,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
-    "Finish and verify tab-performance changes against this checkpoint.",
+    "Investigate existing A input receipt/content reasons from current code and available controlled JSON; preserve source review/issue gates and verify new row Copy ID/search in browser.",
     "Continue C1 customer TAG to supplier component/Working owner reconciliation, then C2 startup spares.",
     "Close evidence/engineering/pricing gaps before controlled issue; do not substitute build success for project readiness."
   ],

@@ -16,6 +16,12 @@ const fail=m=>{throw Error("A source control: "+m);};
 const fields=(v,keys)=>{if(!v||typeof v!=="object"||Array.isArray(v)||Object.keys(v).some(k=>!keys.includes(k))||keys.some(k=>v[k]===undefined))fail("unsupported/missing fields");};
 export function emptySourceControl0550(){return {schema:SOURCE_CONTROL_SCHEMA_0550,catalogVersion:catalog.version,extraInputs:[],bindings:[],review:{status:"DRAFT",reviewer:"",reviewedOn:"",basis:"",rfqReviewed:false,receivedSetReviewed:false,referencesReviewed:false,basisKey:""}};}
 export function sourceExpectedInputs0550(data){return [...catalog.inputs,...(data.sourceControl?.extraInputs||[])];}
+// Presentation anchors under the existing source module; never new data/module identities.
+export const SOURCE_INPUT_PANEL_0550="bid.documents.controlled-source-inventory.inputs";
+export const sourceInputRowId0550=inputId=>"bid.documents.controlled-source-inventory.input."+inputId;
+export const isSourceInputTarget0550=target=>target===SOURCE_INPUT_PANEL_0550||Boolean(target?.startsWith("bid.documents.controlled-source-inventory.input."));
+export function sourceInputNavigation0550(data){return [{id:SOURCE_INPUT_PANEL_0550,title:"A · RFQ expected / received input review",area:"A",tab:"documents"},...sourceExpectedInputs0550(data||{}).map(r=>({id:sourceInputRowId0550(r.id),title:"A / "+r.id+" / "+(r.documentNo||r.title)+" / "+r.revision,area:"A",tab:"documents"}))];}
+
 export function validateSourceControl0550(data){
  const c=data.sourceControl;if(c===undefined)return;
  fields(c,["schema","catalogVersion","extraInputs","bindings","review"]);

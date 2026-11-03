@@ -45,6 +45,7 @@ import {BidDataControls,BidSaveStatus} from "../project0550/BidDataControls";
 import {BID_TABS} from "../project0550/biddingNavigation";
 import {TechnicalProposalWorkspace0550,TECHNICAL_PANELS_0550} from "../project0550/TechnicalProposalWorkspace0550.jsx";
 import {ControlledSourceInventory, SourceCommunications, SourceFindings} from "../project0550/ControlledSourceInventory";
+import {sourceInputNavigation0550} from "../project0550/data/sourceReadiness0550";
 import {SECTION_IDENTITY} from "../project0550/sectionIdentity";
 import "../project0550/project0550.css";
 
@@ -2084,6 +2085,7 @@ function Project0550Bidding({ lang = "th" }) {
   const moduleIndex=useMemo(()=>{
   const baseModuleIndex=[{id:"l3.original",title:"RFQ-02 Original RFQ Documents",area:"A",tab:"documents"},{id:"l3.submissions",title:"Communications and Submissions",area:"C",tab:"overview"},...TABS.map(t=>({id:"bid."+t.id,title:t.label,number:t.label.split(" ")[0],tab:t.id})),...SECTION_IDENTITY.filter(s=>s.tab!=="budget"),
     ...[["mr","A.1","อ่านตาม MR"],["systems","A.2","ดูตามระบบ"],["references","A.3","เอกสารอ้างอิง"],["coverage","A.4","ตรวจความครบถ้วน"]].map(([id,number,title])=>({id:"bid.documents.controlled-source-inventory."+id,number,title,area:"A",tab:"documents"})),
+    ...sourceInputNavigation0550(data),
     ...Array.from({length:54},(_,i)=>({id:"bid.documents.controlled-source-inventory.mr.page."+(i+1),number:"A.1",title:"MR B1 / PDF "+(i+1)+(i>=2?" / printed "+(i-1):" / front matter"),area:"A",tab:"documents"})),
     {id:"bid.documents.si-work-package",title:"Import System Integrator engineering drafts",area:"A",tab:"documents"},
     ...TECHNICAL_PANELS_0550.map((s,i)=>({id:"bid.technical."+s.id,title:"12 Volume II / "+s.title,number:s.id==="vdrl"?"12.V":s.id==="preview"?"12.P":"12."+i,tab:"technical"})),

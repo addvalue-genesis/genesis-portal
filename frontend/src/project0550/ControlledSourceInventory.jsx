@@ -4,6 +4,7 @@ import { SYSTEMS, SOURCE_REGISTER, validateSourceIntake, applySourceIntake, deri
 import { Module } from "./BidControls";
 import { ComponentCopyId } from "../common/ui/ComponentCopyId";
 import {SiWorkPackage0550} from "./SiWorkPackage0550";
+import {isSourceInputTarget0550} from "./data/sourceReadiness0550";
 import {SourceReadiness0550} from "./SourceReadiness0550";
 import {SourceEvidenceSearch0550} from "./SourceEvidenceSearch0550";
 import {MrSourceReader0550} from "./MrSourceReader0550";
@@ -75,7 +76,7 @@ export function ControlledSourceInventory({ navigationTarget,onNavigate }) {
   const [toolsOpen,setToolsOpen]=useState(false),tools=useRef(null);
   const [pending, setPending] = useState(null), [error, setError] = useState(""), [query, setQuery] = useState(""), [provider, setProvider] = useState("ALL");
   const intake = data?.sourceIntake;
-  useEffect(() => { if (navigationTarget?.startsWith("bid.documents.source.")||navigationTarget==="bid.documents.si-work-package"||navigationTarget?.startsWith("bid.documents.finding.")) setToolsOpen(true); if (navigationTarget?.startsWith("bid.documents.source.")) { setQuery(""); setProvider("ALL"); setVisibleCount(Math.max(50,(data?.sourceIntake?.sources.findIndex(s=>"bid.documents.source."+s.id===navigationTarget)??0)+1)); } }, [navigationTarget]);
+  useEffect(() => { if (isSourceInputTarget0550(navigationTarget)||navigationTarget?.startsWith("bid.documents.source.")||navigationTarget==="bid.documents.si-work-package"||navigationTarget?.startsWith("bid.documents.finding.")) setToolsOpen(true); if (navigationTarget?.startsWith("bid.documents.source.")) { setQuery(""); setProvider("ALL"); setVisibleCount(Math.max(50,(data?.sourceIntake?.sources.findIndex(s=>"bid.documents.source."+s.id===navigationTarget)??0)+1)); } }, [navigationTarget]);
   const model = useMemo(() => deriveSourceIntake(intake, reviewDate), [intake, reviewDate]);
   const rows = model.sources.filter(s => (provider === "ALL" || s.provider === provider) && (s.title + " " + s.documentNo + " " + s.id + " " + s.note).toLowerCase().includes(query.toLowerCase()));
   async function preview(file) {
@@ -92,7 +93,7 @@ export function ControlledSourceInventory({ navigationTarget,onNavigate }) {
     <Module id="bid.documents.controlled-source-inventory" title="Controlled source inventory" showToggle>
       <MrSourceReader0550 navigationTarget={navigationTarget} onNavigate={onNavigate} onOpenSource={openSource} onOpenTools={openTools}/>
       <details className="p55-a-operating-tools" ref={tools} open={toolsOpen} onToggle={e=>setToolsOpen(e.currentTarget.open)}><summary>ทะเบียนและเครื่องมือตรวจต้นฉบับ · ผูกเอกสาร / ตรวจอ่าน / ค้นข้อความ</summary>
-      <SourceReadiness0550 onOpenSource={openSource}/>
+      <SourceReadiness0550 onOpenSource={openSource} navigationTarget={navigationTarget}/>
       <SourceEvidenceSearch0550 onOpenSource={openSource}/>
       <p>ทะเบียน GDrive / Gmail ที่ตรวจอ่านล่าสุด พร้อมเอกสารย้อนหลังและข้อมูลที่ยังอ่านไม่ครบ</p>
       <p>เปิดโครงการแล้วโหลดทะเบียน JSON และชุดเตรียม A ที่ตรงกันจาก DATA อัตโนมัติ เข้าสู่ workspace เดียวที่ B ใช้ · เก็บรายการที่คุณแก้ไขไว้ · เอกสารใหม่ยังต้องตรวจอ่านและทบทวนตามเกณฑ์เดิม</p>
