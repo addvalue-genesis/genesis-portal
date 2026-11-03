@@ -1,11 +1,12 @@
 import React from "react";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 import {SiOperatingPrinciples0550} from "./SiOperatingPrinciples0550";
+import {workspaceAlias0550} from './workspaceLabels0550';
 import {BID_SECTIONS_0550,BID_GROUPS_0550,BID_MODULE_COLORS_0550,bidOwnerStyle,bidSection0550,bidModuleProps0550} from "./bidPresentation0550";
 
 export function BidHeading({id,title,number}){
  const meta=bidSection0550(id),label=title||meta?.title||id,n=number||meta?.number;
- return <span className="p55-module-heading"><span className="p55-module-heading__title">{n&&<strong className="p55-module-number">{n}</strong>}<strong>{label}</strong></span><span className="p55-module-copy" onClick={e=>e.stopPropagation()}><ComponentCopyId projectId="PJ2608-0550" componentKey={id}/></span></span>;
+ return <span className="p55-module-heading"><span className="p55-module-heading__title">{n&&<strong className="p55-module-number">{n}</strong>}<span className="p55-workspace-alias">{workspaceAlias0550(id)}</span><strong>{label}</strong></span><span className="p55-module-copy" onClick={e=>e.stopPropagation()}><ComponentCopyId projectId="PJ2608-0550" componentKey={id}/></span></span>;
 }
 export function BidPrinciples({id}){
  const meta=bidSection0550(id);if(!meta)return null;
@@ -15,6 +16,7 @@ export function BidStructureGuide({onNavigate}){
  const sections=[...BID_SECTIONS_0550].sort((a,b)=>a.number.localeCompare(b.number,"en",{numeric:true})).filter(r=>!["bid.budget.guide","bid.budget.working.editor.review"].includes(r.id));
  return <details className="p55-panel p55-bid-module p55-structure-guide" data-component-key="bid.budget.guide" data-module-number="10.0" {...bidModuleProps0550("bid.budget.guide")}><summary><BidHeading id="bid.budget.guide"/></summary>
  <p>หัวข้อ 10.0–10.8 เรียงตามลำดับงานและแสดงครบเสมอ · WP.P / WP.1–WP.8 เป็นขั้นตอนภายใน 10.2 · Module ID เป็นที่อยู่ถาวร · กด Copy ID ที่จุดที่ติดปัญหา แล้วส่งพร้อมคำถามหรือภาพหน้าจอ</p>
+ <p>CUS = ข้อกำหนดลูกค้าฝั่งซ้าย · SI = กระบวนการ Integrator · VND = ข้อเสนอผู้ขายฝั่งขวา · SI-WP-01–08 คือขั้นตอนทำงาน ไม่ใช่หมวดต้นทุน B1–B8 · Schedule A/A1/A2/B/C1–C8 คงชื่อตามลูกค้า · รหัสเรียกสั้นไม่เปลี่ยน Module ID หรือข้อมูลเดิม</p>
  <SiOperatingPrinciples0550 onNavigate={onNavigate} compact/>
  <p>10.1 ฐานข้อเสนอ → 10.2 Particular / WP.1–WP.8 / รายการ A/B/C → 10.3 ตรวจขอบเขต → 10.4 ช่องว่าง → 10.5 สรุป → 10.6 THB → 10.7 USD → 10.8 เทียบ History · ใช้ปุ่มกลับ Source เพื่อตรวจที่มา</p>
  <div className="p55-table-wrap"><table className="p55-table" aria-label="แผนผังโมดูล 0550"><thead><tr><th>เลข / เปิดหัวข้อ</th><th>หน้าที่</th><th>Module ID</th></tr></thead><tbody>{sections.map(r=><tr key={r.id} {...bidModuleProps0550(r.id)}><td><button type="button" onClick={()=>onNavigate(r.id)}>{r.number} · {r.title}</button></td><td>{r.purpose}</td><td><ComponentCopyId projectId="PJ2608-0550" componentKey={r.id}/></td></tr>)}</tbody></table></div>

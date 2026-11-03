@@ -8,7 +8,7 @@ import {MR_READER_PROFILE_0550 as profile,MR_READER_SECTIONS_0550 as sections,MR
 import {mrReaderSource0550,mrReaderPages0550,mrReaderBlocks0550,mrReaderPageSection0550,mrReaderPageRequirements0550,mrReaderPageParticulars0550,mrReaderTrace0550,prepareMrReaderRequirement0550,mrReaderSourceUrl0550,mrReaderReferences0550,mrReaderReferenceChain0550,mrReaderAvailability0550,mrReaderCoverage0550} from './data/mrSourceReader0550';
 
 const BASE='bid.documents.controlled-source-inventory';
-const views=[['mr','A.1 อ่านตาม MR'],['systems','A.2 ดูตามระบบ'],['references','A.3 เอกสารอ้างอิง'],['coverage','A.4 ตรวจความครบถ้วน']];
+const views=[['mr','CUS.1 อ่านตาม MR'],['systems','CUS.2 ดูตามระบบ'],['references','CUS.3 เอกสารอ้างอิง'],['coverage','CUS.4 ตรวจความครบถ้วน']];
 const initialUI=()=>{try{return JSON.parse(sessionStorage.getItem('GENESIS-0550-MR-READER-UI'))||{};}catch{return {};}};
 const stateText=r=>r.state==='REVIEWED_MAPPING'?'ตรวจ Mapping แล้ว':r.state==='NOT_APPLICABLE'?'ไม่เกี่ยวข้องตามผลตรวจ':r.state==='STALE'?'ฐานเปลี่ยน / ทบทวนใหม่':r.problems?.some(p=>/CONFLICT/.test(p))?'มีข้อมูลขัดกัน':'มีรายการให้ทำงานต่อ / รอทบทวน';
 const plain=s=>String(s||'').replace(/\s+/g,' ').trim();

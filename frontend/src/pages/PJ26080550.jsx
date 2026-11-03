@@ -2,6 +2,7 @@ import "../project0550/deviationRelease0550.css";
 import "../project0550/mrSourceReader0550.css";
 import {satelliteScopeNote0550} from "../project0550/data/satelliteScope0550";
 import {bidPresentationIndex,BID_TAG_TARGETS_0550} from "../project0550/bidPresentation0550";
+import {workspaceAlias0550} from '../project0550/workspaceLabels0550';
 import React, { createContext, useContext, useEffect, useMemo, useState, useCallback, useRef } from "react";
 import {
   ARCHITECTURE_MANIFEST,
@@ -2069,7 +2070,7 @@ function DocumentsView({ navigationTarget,onNavigate }) {
 function ProjectModuleSearch0550({moduleIndex,onJump}){
  const [moduleQuery,setModuleQuery]=useState("");
  const query=moduleQuery.trim().replace(/^PJ2608-0550\s*\/\s*/i,"").toLowerCase();
- const matches=query?moduleIndex.filter(m=>BID_TAG_TARGETS_0550[query]?m.id===BID_TAG_TARGETS_0550[query]:(m.id+" "+m.title+" "+(m.number||"")).toLowerCase().includes(query)):[];
+ const matches=query?moduleIndex.filter(m=>BID_TAG_TARGETS_0550[query]?m.id===BID_TAG_TARGETS_0550[query]:(m.id+" "+m.title+" "+(m.number||"")+" "+(m.alias||workspaceAlias0550(m.id))).toLowerCase().includes(query)):[];
  return <div className="p55-panel p55-module-nav"><label>ค้นหา / วาง Module ID <input aria-label="Project Module Search" value={moduleQuery} onChange={e=>setModuleQuery(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"&&matches.length)onJump(matches.find(m=>m.id.toLowerCase()===query||m.number?.toLowerCase()===query)||matches[0]);}} placeholder="PJ2608-0550 / bid.budget.release"/></label><div className="p55-module-results">{matches.slice(0,30).map(m=><button type="button" key={m.id} onClick={()=>onJump(m)}>{m.number?m.number+" · ":""}{m.title}<small>{m.id}</small></button>)}</div></div>;
 }
 
@@ -2158,7 +2159,7 @@ function Project0550Bidding({ lang = "th" }) {
           <strong>{PROJECT_0550.method}</strong>
         </div>
 
-        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","A · Original RFQ Documents"],["B","B · Engineering & Bid Preparation"],["C","C · Communications & Submissions"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>{if(!technicalDirty)setArea(id);}}>{label}</button>)}</div>
+        <div className="p55-bid-areas" role="group" aria-label="Bidding work areas">{[["A","CUS · Customer Requirements"],["B","SI · Engineering & Bid Preparation"],["C","COM · Communications & Submissions"]].map(([id,label])=><button key={id} type="button" aria-pressed={area===id} onClick={()=>{if(!technicalDirty)setArea(id);}}>{label}</button>)}<button type="button" aria-pressed={area==='B'&&activeTab==='documents'} onClick={()=>{if(!technicalDirty){setArea('B');setActiveTab('documents');}}}>VND · Vendor Offers / Evidence</button></div>
         {area==="B"&&<nav className="p55-tabs" aria-label="PJ2608-0550 sections">
           {TABS.map((tab) => (
             <button
@@ -2168,7 +2169,7 @@ function Project0550Bidding({ lang = "th" }) {
               className={activeTab === tab.id ? "is-active" : ""}
               onClick={() => {if(!technicalDirty)setActiveTab(tab.id);}}
             >
-              {tab.label}
+              <small className="p55-workspace-alias">{workspaceAlias0550('bid.'+tab.id)}</small> {tab.label}
             </button>
           ))}
         </nav>}

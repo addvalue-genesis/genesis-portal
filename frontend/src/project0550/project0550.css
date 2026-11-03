@@ -1778,3 +1778,4 @@
 
 .p55-release-table-identity>strong { min-width:0; max-width:100%; overflow-wrap:anywhere; }
 .p55-working-preview [data-supplier-mapping-offer] pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+.p55-workspace-alias{display:inline-block;font-size:11px;font-weight:500;border:1px solid var(--bid-accent,#526777);color:inherit;padding:1px 5px;border-radius:3px;white-space:nowrap;background:var(--bid-tint,transparent)}

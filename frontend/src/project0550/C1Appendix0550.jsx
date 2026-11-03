@@ -1,0 +1,68 @@
+import React,{useMemo,useState} from 'react';
+import {ComponentCopyId} from '../common/ui/ComponentCopyId';
+import {bidOwnerStyle} from './bidPresentation0550';
+import {deriveC1Appendix0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
+
+export function C1Appendix0550({view,onNavigate,disabled=false}){
+ const projection=useMemo(()=>deriveC1Appendix0550(view),[view]);
+ const [opened,setOpened]=useState({}),[documentMode,setDocumentMode]=useState(false),[selected,setSelected]=useState('MR-B1-13-APF-09');
+ const expanded=(key,component=false)=>documentMode||(opened[key]??!component);
+ const toggle=(key,component=false)=>setOpened(s=>({...s,[key]:!(s[key]??!component)}));
+ const setAll=mode=>{const next={};for(const g of projection.groups){next['APP:'+g.id]=mode!=='OVERVIEW';for(const s of g.systems){next['SYS:'+g.id+':'+s.name]=true;for(const site of s.sites){next['SITE:'+g.id+':'+s.name+':'+site.name]=true;for(const r of site.rows)next[r.key]=mode==='ALL';}}}setOpened(next);};
+ const active=projection.rows.find(r=>r.key===selected)||projection.rows[0];
+ const navigate=(id)=>{if(!disabled)onNavigate?.(id);};
+ const button=(key,label,component=false)=>documentMode?(component?null:<span>{label}</span>):<button type="button" className={component?'p55-c1-item-toggle':'p55-c1-group-toggle'} aria-expanded={expanded(key,component)} aria-label={label} onClick={()=>toggle(key,component)}><span aria-hidden="true">{expanded(key,component)?'−':'+'}</span>{!component&&<span>{label}</span>}</button>;
+ const traceIds=active?Array.from(new Set([...(active.ownerIds||[]),...(active.raws||[]).map(l=>l.id)])):[];
+ return <section className="p55-c1-workspace" aria-label="C1 Appendix workspace">
+  <style>{c1AppendixCss0550}</style>
+  <div className="p55-c1-screen-head"><span>PJ2608-0550 / 11 · Quotation / C1</span><span>SI-OUT / Schedule C1</span></div>
+  <h3>C1 · ภาพรวมทั้ง 8 Appendix</h3>
+  <div className="p55-c1-controls">
+   <button type="button" aria-pressed={!documentMode} onClick={()=>setDocumentMode(false)}>ดูแบบ +/−</button>
+   <button type="button" aria-pressed={documentMode} onClick={()=>setDocumentMode(true)}>ดูเอกสารขยายครบ</button>
+   {!documentMode&&<><button type="button" onClick={()=>setAll('OVERVIEW')}>ยุบเหลือ 8 หมวด</button><button type="button" onClick={()=>setAll('MAIN')}>แสดงรายการหลักทั้งหมด</button><button type="button" onClick={()=>setAll('ALL')}>ขยายส่วนประกอบทั้งหมด</button></>}
+  </div>
+  <nav className="p55-c1-jumps" aria-label="C1 Appendices">{projection.groups.filter(g=>g.id!=='OTHER').map(g=><button type="button" key={g.id} onClick={()=>{setOpened(s=>({...s,['APP:'+g.id]:true}));document.getElementById('p55-c1-app-'+g.id)?.scrollIntoView({block:'start'});}}>{g.id}</button>)}</nav>
+  <p className="p55-c1-screen-note">CUS · MR Rev.B1 → SI → VND → Working · ราคาขายจาก Working ที่เลือกตามมุมมองปัจจุบัน · “—” คือยังไม่แสดงค่า ไม่ใช่ศูนย์ · DRAFT จนกว่าจะผ่านการออก Release</p>
+  <details className="p55-c1-trace" aria-label="C1 internal trace"><summary>CUS ↔ SI ↔ VND / Working · Module ID และผลตรวจภายใน</summary>
+   <ComponentCopyId projectId="PJ2608-0550" componentKey="bid.quotation.C1"/>
+   <label>รายการ C1 ที่ต้องการตรวจ<select aria-label="C1 trace row" value={active?.key||''} onChange={e=>setSelected(e.target.value)}>{projection.rows.map(r=><option key={r.key} value={r.key}>{r.sn} · {r.site} · {r.description}</option>)}</select></label>
+   {active&&<><p>{active.mr?.reference||active.description}</p>
+    {active.mr&&<><button type="button" disabled={disabled} onClick={()=>navigate('bid.documents.controlled-source-inventory.mr.page.'+(Number(active.mr.reference.match(/\/\s*p(\d+)/)?.[1]||0)+2))}>CUS · เปิด MR ต้นทาง</button>{(active.mr.canonicalIds||[active.mr.id]).map(id=><button type="button" key={id} disabled={disabled} onClick={()=>navigate('bid.working-preview.requirement.REQDEF-'+id)}>SI-REQ · เปิดข้อกำหนด {active.mr.canonicalIds?id:''}</button>)}</>}
+    <button type="button" disabled={disabled} onClick={()=>navigate('bid.working-preview.step.7')}>SI-WP-07 · Mapping กับ VND</button>
+    {traceIds.map(id=><div key={id}><ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.budget.working.line.'+id}/><button type="button" disabled={disabled} onClick={()=>navigate('bid.budget.working.line.'+id)}>SI-COST · เปิดเจ้าของงาน/ราคา</button><button type="button" disabled={disabled} onClick={()=>navigate('bid.quotation.line.'+id)}>ตรวจ Schedule allocation</button></div>)}
+    {Array.from(new Set([...(active.requirements||[]).flatMap(r=>r.offerIds||[]),...(active.priceOwners||[]).map(b=>b.line.offerId).filter(Boolean)])).map(id=><button type="button" key={id} disabled={disabled} onClick={()=>navigate('bid.vendor.offer.'+id)}>VND · {id}</button>)}
+   </>}
+   <p>{projection.rows.filter(r=>r.kind==='MR').length} แถว MR · {projection.bindings.length} เจ้าของราคา C1 · ไม่แบ่งราคา package ตามสัดส่วนโดยไม่มีฐาน</p>
+   {projection.problems.length>0&&<ul>{projection.problems.map(p=><li key={p}>{p}</li>)}</ul>}
+  </details>
+  <div className="p55-c1-scroll">
+  <article className={'p55-c1-document'+(documentMode?' p55-c1-expanded':'')} data-native-schedule="C1">
+   <div className="p55-c1-document-meta"><span>PJ2608-0550 · ASK TELECOMMUNICATION &amp; SECURITY SYSTEM</span><span>DRAFT — NOT FOR SUBMISSION</span></div>
+   <h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY</h2>
+   <table aria-label="Schedule C1 preview"><colgroup><col style={{width:'6%'}}/><col style={{width:'42%'}}/><col style={{width:'7%'}}/><col style={{width:'7%'}}/><col style={{width:'11%'}}/><col style={{width:'11%'}}/><col style={{width:'16%'}}/></colgroup>
+    <thead><tr><th rowSpan={2}>SN</th><th rowSpan={2}>Item Description</th><th rowSpan={2}>Unit</th><th rowSpan={2}>Qty.</th><th colSpan={2}>CIF or FOB (USD or RMB)</th><th rowSpan={2}>Notes</th></tr><tr><th>Unit Rates</th><th>Total Price</th></tr></thead>
+    {projection.groups.map(g=><tbody key={g.id}>
+     <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={7}>{button('APP:'+g.id,g.id==='OTHER'?g.title.toUpperCase():'APPENDIX '+g.id+' · '+g.title.toUpperCase())}</td></tr>
+     {expanded('APP:'+g.id)&&g.systems.map(sys=><React.Fragment key={sys.name}>
+      <tr className="c1-system"><td colSpan={7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td></tr>
+      {expanded('SYS:'+g.id+':'+sys.name)&&sys.sites.map(site=><React.Fragment key={site.name}>
+       <tr className="c1-site"><td colSpan={7}>{button('SITE:'+g.id+':'+sys.name+':'+site.name,site.name)}</td></tr>
+       {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=><React.Fragment key={r.key}>
+        <tr data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}><td>{r.sn}</td><td>{(r.components.length>0||r.intro||r.notes?.length>0)&&button(r.key,'ส่วนประกอบ '+r.description+' / '+r.site,true)}{r.description}</td><td>{r.unit||'—'}</td><td className="number">{r.quantity??'—'}</td><td className="number">{c1Display0550(r.unitPrice)}</td><td className="number">{c1Display0550(r.amount)}</td><td>{r.note}</td></tr>
+        {expanded(r.key,true)&&r.intro&&<tr className="c1-detail-note"><td/><td colSpan={6}>{r.intro}</td></tr>}
+        {expanded(r.key,true)&&r.components.map((c,i)=><tr className="c1-component" key={i}><td>{r.sn+'.'+(i+1)}</td><td>{c.description}</td><td>{c.unit||'—'}</td><td className="number">{c.quantity??'—'}</td><td className="number">—</td><td className="number">—</td><td/></tr>)}
+        {expanded(r.key,true)&&(r.notes||[]).map((note,i)=><tr className="c1-detail-note" key={'note'+i}><td/><td colSpan={6}>{note}</td></tr>)}
+       </React.Fragment>)}
+      </React.Fragment>)}
+     </React.Fragment>)}
+     {expanded('APP:'+g.id)&&<tr className="c1-subtotal"><td colSpan={5}>{g.id==='OTHER'?'OTHER BASE SUPPLY':'APPENDIX '+g.id} — SUBTOTAL</td><td className="number">{c1Display0550(g.amount)}</td><td/></tr>}
+    </tbody>)}
+    <tfoot><tr><td colSpan={5}>TOTAL — BASE SCOPE OF SUPPLY</td><td className="number">{c1Display0550(projection.amount)}</td><td/></tr></tfoot>
+   </table>
+   {view.getRecord('I.C1').content&&<p>{view.getRecord('I.C1').content}</p>}
+   <footer>Schedule C1 · {view.proposal.documentNo} / {view.proposal.revision}</footer>
+  </article>
+  </div>
+ </section>;
+}

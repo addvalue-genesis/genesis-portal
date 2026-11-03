@@ -148,7 +148,7 @@ export function deriveBidVolumes0550(data,model,systems,today){
  if(consistency.length)problems.push('VOLUME_I_II_OR_TECHNICAL_DEVIATION_OPEN');
  if(getRecord('II.vdrl-scope').state!=='REVIEWED'||!vdrl.length||vdrl.some(r=>r.problems.length)||vdrlGaps.length)problems.push('VDRL_WITH_BID_COVERAGE_OPEN');
  if(QUALIFICATIONS_0550.some(q=>getRecord('III.'+q.id).state!=='REVIEWED')||commercialDeviations.some(r=>r.problems.length))problems.push('VOLUME_III_OPEN');
- return {proposal:p,records,getRecord,bindings,active,available,unallocated,technical,technicalRequired,vdrl,vdrlGaps,commercialDeviations,consistency,scheduleRows,baseAssigned,optionsAssigned,priceProblems,problems:[...new Set(problems)],ready:problems.length===0,state:problems.length?'HOLD':'REVIEWED_PACKAGE_NOT_ISSUED'};
+ return {proposal:p,records,getRecord,bindings,active,available,unallocated,technical,technicalRequired,vdrl,vdrlGaps,commercialDeviations,consistency,scheduleRows,baseAssigned,optionsAssigned,priceProblems,problems:[...new Set(problems)],ready:problems.length===0,state:problems.length?'HOLD':'REVIEWED_PACKAGE_NOT_ISSUED',c1Context:{lines:data.lines,requirements:model.integration?.requirements||[]}};
 }
 
 export function validateBidVolumes0550(data){

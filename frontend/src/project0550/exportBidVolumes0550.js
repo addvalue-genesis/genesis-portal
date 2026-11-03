@@ -3,8 +3,10 @@ import {nativeExhibitHtml0550} from './exhibitCNative0550';
 import {zipStore} from './exportOriginalPriceForm';
 import {SCHEDULES_0550,QUALIFICATIONS_0550} from './data/bidVolumes0550';
 import {sumMoney0550} from './data/money0550';
+import {C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
 const esc=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function scheduleTable0550(view,id){
+ if(id==='C1'&&view.c1LayoutVersion===C1_APPENDIX_LAYOUT_0550)return c1AppendixTable0550(view);
  const rows=view.scheduleRows(id);
  if(id==='A')return {heads:['Description','Amount (USD)','Notes'],rows:[['Base Scope',view.baseAssigned,'A1 — mapped canonical Working only'],['Optional Scope',view.optionsAssigned,'A2 — excluded from Base'],['Initial Contract Price','OPEN','Confirm ordered options and contract scope; do not add options automatically.']]};
  if(['A1','A2'].includes(id)){

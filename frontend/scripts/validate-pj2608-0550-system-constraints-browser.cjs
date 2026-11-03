@@ -20,7 +20,7 @@ const server = http.createServer((req, res) => {
   const navigate = async id => {const search = page.locator('input[aria-label="Project Module Search"]'); await search.fill(id); await page.locator('.p55-module-results button').filter({has: page.getByText(id, {exact: true})}).click();};
   await page.goto('http://127.0.0.1:' + server.address().port + '/projects/pj2608-0550');
   console.log('CHECK constraints: page loaded; waiting for canonical DATA receipt');
-  await page.getByRole('button', {name: 'A · Original RFQ Documents', exact: true}).click();
+  await page.getByRole('button', {name: 'CUS · Customer Requirements', exact: true}).click();
   await page.locator('.p55-a-operating-tools > summary').click();
   await page.getByLabel('Source intake loaded status', {exact: true}).filter({hasText: bundle.sourceIntake.batchId}).waitFor();
   const before = await read(); console.log('CHECK constraints: DATA receipt saved', before.sourceIntake.sources.length); await navigate('bid.working-preview.step.1');

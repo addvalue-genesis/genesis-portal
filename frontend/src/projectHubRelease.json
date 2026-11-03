@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-03.5-preview",
+  "version": "2026-11-03.6",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "source0550": "2d4ee1c2",
-  "capability": "Restore all existing Exhibit C Schedules including A/A1/A2 by default and open the existing A1 form. Keep optional C1/C2 focus and add existing A/A1/A2 shortcuts from10. Canonical prices, source/SI records, quantity/FX, module IDs and frozen history unchanged."
+  "capability": "C1 Appendix 1.1\u20131.8 production presentation with MR/system/site/component +/\u2212, existing Module IDs/Copy ID/owner colours, CUS/SI/VND display aliases and canonical Working links. Customer HTML/Word/XLSX exclude internal diagnostics. Canonical quantities/prices/FX and legacy frozen outputs unchanged; customer issue remains gated."
 }

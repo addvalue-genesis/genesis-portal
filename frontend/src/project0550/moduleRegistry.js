@@ -138,7 +138,7 @@ export const MODULE_REGISTRY = [
     why: "Management needs a controllable working model before final vendor and engineering closure.",
     inputs: ["19-system scope", "Commercial sources", "Engineering quantities", "Service/logistics/resource assumptions"],
     outputs: ["Part A/B/C direct basis", "Component breakdown", "Price/source trace", "Internal commercial working"],
-    implementation: ["budgetaryEstimate in controlled dataset", "Budget → Working Preview UI", "frontend/src/project0550/BidCommercialWorkspace.jsx"],
+    implementation: ["budgetaryEstimate in controlled dataset", "Budget → Working Preview UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/C1Appendix0550.jsx", "frontend/src/project0550/data/c1Appendix0550.js", "frontend/src/project0550/data/c1MrDetails0550.json", "frontend/src/project0550/workspaceLabels0550.js"],
     invariants: [
       "System-level allowance must be distinguishable from source quote.",
       "No back-solving to a management target.",
@@ -166,7 +166,7 @@ export const MODULE_REGISTRY = [
     why: "Budgetary/preliminary output must not be mistaken for final contractual release.",
     inputs: ["Closed engineering/commercial gates", "Release authorization"],
     outputs: ["RELEASED_SELL"],
-    implementation: ["Budget → Released Customer Output UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/exportOriginalPriceForm.js"],
+    implementation: ["Budget → Released Customer Output UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/exportOriginalPriceForm.js", "frontend/src/project0550/exhibitCNative0550.js", "frontend/src/project0550/data/bidPackageOutput0550.js", "frontend/src/project0550/data/releaseIssue0550.js"],
     invariants: ["Remain HOLD until controlled release criteria are satisfied."]
   },
   {

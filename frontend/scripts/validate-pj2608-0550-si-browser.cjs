@@ -23,7 +23,7 @@ const server=http.createServer((req,res)=>{
   assert((await principles.innerText()).includes('F_SI(A, S; K, D, Θ)'));assert((await principles.innerText()).includes('HOLD / NOT ISSUED'));
   assert.equal(await principles.getByRole('table',{name:'SI module responsibilities'}).locator('tbody tr').count(),15);
   await principles.getByRole('button',{name:'เปิด A · ต้นทางลูกค้า',exact:true}).click();await page.locator('[data-component-key="l3.original"]').waitFor({state:'visible'});
-  await page.getByRole('button',{name:'B · Engineering & Bid Preparation',exact:true}).click();await nav('Architecture');
+  await page.getByRole('button',{name:'SI · Engineering & Bid Preparation',exact:true}).click();await nav('Architecture');
   await principles.getByRole('button',{name:'เปิดข้อมูล Supplier',exact:true}).click();await page.locator('[data-component-key="bid.vendor.offers"]').waitFor({state:'visible'});
   await nav('Architecture');await principles.getByRole('button',{name:'10.7 Release Preview USD',exact:true}).click();
   await page.getByRole('table',{name:'Official customer form',exact:true}).waitFor({state:'visible'});
@@ -50,7 +50,7 @@ const server=http.createServer((req,res)=>{
    for(const key of ['requirements','proofs','activities'])for(const record of pack.integrationWorkspace[key])assert(imported.integrationWorkspace[key].some(r=>r.id===record.id));
    assert(imported.integrationWorkspace.requirements.some(r=>r.id==='REQ-AVL-PAGA-INDUSTRONIC'),'Existing selected PAGA AVL work survives import');
    await page.reload();await page.locator('.p55-bid-save').filter({hasText:'Revision '+imported.revision}).waitFor();
-   await page.getByRole('button',{name:'A · Original RFQ Documents',exact:true}).click();await page.locator('.p55-a-operating-tools > summary').click();
+   await page.getByRole('button',{name:'CUS · Customer Requirements',exact:true}).click();await page.locator('.p55-a-operating-tools > summary').click();
    await page.getByLabel('Import SI work package').setInputFiles(process.env.SI_WORK_PACKAGE_PATH);
    await page.getByRole('table',{name:'SI draft import changes'}).waitFor();
    assert(await page.getByRole('button',{name:'Apply SI work package',exact:true}).isDisabled(),'Reimport must add no duplicate records');

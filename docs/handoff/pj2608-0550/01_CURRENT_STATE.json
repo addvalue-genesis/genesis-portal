@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_RESTORE_SCHEDULE_A_FORMS.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_C1_APPENDIX_AND_WORKSPACE_ALIASES.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -18,7 +18,8 @@
     "docs/handoff/pj2608-0550/20261103_A_INPUT_COPY_IDS.md",
     "docs/handoff/pj2608-0550/20261103_A_INPUT_FOCUS_AND_RECEIPT_COUNTS.md",
     "docs/handoff/pj2608-0550/20261103_PAGA_SUPPLIER_REVISION.md",
-    "docs/handoff/pj2608-0550/20261103_RESTORE_SCHEDULE_A_FORMS.md"
+    "docs/handoff/pj2608-0550/20261103_RESTORE_SCHEDULE_A_FORMS.md",
+    "docs/handoff/pj2608-0550/20261103_C1_APPENDIX_AND_WORKSPACE_ALIASES.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -29,7 +30,9 @@
     "dataDependencies": "frontend/src/project0550/data/changeImpact0550.js",
     "storage": "frontend/src/project0550/data/adapters/bidIndexedDbAdapter.js",
     "startup": "frontend/src/project0550/BidWorkspaceContext.jsx",
-    "release": "frontend/src/project0550/data/releaseIssue0550.js"
+    "release": "frontend/src/project0550/data/releaseIssue0550.js",
+    "c1Presentation": "frontend/src/project0550/data/c1Appendix0550.js",
+    "workspaceAliases": "frontend/src/project0550/workspaceLabels0550.js"
   },
   "dataContinuity": {
     "repository": "Code, governed references, defaults and handoffs. Git pull is not a backup of saved browser work.",
@@ -47,10 +50,10 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
-    "Existing Schedule A/A1/A2 restored: default all13 native forms, initial A1, shortcuts from10. Continue using existing Working/Schedule/Technical records for outputs10/11/12; no replacement form or module.",
+    "C1 now presents179 native MR rows under Appendix1.1–1.8 with local +/−, stable IDs/colour and customer-only grouped exports. CUS/SI/VND are display aliases. Continue canonical source/SI/vendor/Working reconciliation; do not infer project readiness from the new presentation.",
     "PAGA multi-source clause/engineering reconciliation remains OPEN:217 new TAG candidates are DTS-only customer evidence,95 old authored drafts were retained;16 derived MR defaults still need exact sources,5 prior RPTs OPEN and no closed PAGA scope review. The revision importer is not full A/SI acceptance.",
     "Private PAGA outputs10/11/12 and v2 technical draft package are separate from Git and Windows saved data. Do not treat a qualified quoted-package pricing scenario as complete customer CIF/FOB price or adopt it automatically.",
-    "GitHub push remains blocked by automatic approval review pending explicit payload/destination authorization; do not bypass."
+    "Implementation verification and existing-branch delivery are recorded in the latest checkpoint. No customer issue or PR merge is authorised by presentation completion."
   ],
   "historicalState": "The prior 2026-10-09 branch/PR2/port3000/STAGING checkpoint remains in Git history; it is not the current launch instruction."
 }

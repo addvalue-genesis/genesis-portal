@@ -1,0 +1,42 @@
+// Synthetic contracts for CUS/SI/VND aliases and the read-only C1 projection.
+const assert=require('node:assert/strict'),path=require('node:path'),fs=require('node:fs'),babel=require('@babel/core');
+const root=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
+const compile=(m,f)=>f.startsWith(root+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);
+require.extensions['.js']=compile;require.extensions['.jsx']=compile;
+const C=require(root+'/project0550/data/c1Appendix0550'),M=require(root+'/project0550/data/mrWorkingBasis0550'),L=require(root+'/project0550/workspaceLabels0550'),N=require(root+'/project0550/exhibitCNative0550');
+const D=require(root+'/project0550/data'),catalog=M.MR_WORKING_CATALOG_0550;
+const data=M.importMrWorkingBasis0550({lines:[],offers:[]},D.COMMERCIAL_POLICY,'2026-11-03');
+for(const l of data.lines)Object.assign(l,{selected:false,responsibility:'COMPANY',scopeBasis:'Synthetic COMPANY disposition',coveredByLineId:'',coverageBasis:''});
+const id='REQ-MR-B1-13-APF-09',lan=data.lines.find(l=>l.id===id);
+Object.assign(lan,{selected:true,responsibility:'TSI',quantity:1,unit:'Lot',manualCost:987654.32,sourceRef:'PRIVATE COST 987654.32; do not publish',offerId:'SYNTHETIC-OFFER'});
+const make=(d,bindings)=>({proposal:{documentNo:'SYNTHETIC',revision:'TEST'},c1LayoutVersion:C.C1_APPENDIX_LAYOUT_0550,workingPreview:true,
+ c1Context:{lines:d.lines,requirements:[{id:'REQDEF-MR-B1-13-APF-09',workLineIds:[id],offerIds:['SYNTHETIC-OFFER']}]},bindings,scheduleRows:key=>key==='C1'?bindings:[],getRecord:()=>({nativeFields:{}})});
+const binding=(line,amount=1234.56)=>({lineId:line.id,line,quantity:line.quantity,unit:line.unit,amount,unitPrice:amount/line.quantity,schedule:'C1',treatment:'BASE'});
+const view=make(data,[binding(lan)]),before=JSON.stringify(data),p=C.deriveC1Appendix0550(view);
+assert.equal(p.groups.length,8);assert.equal(p.rows.filter(r=>r.kind==='MR').length,179);assert.equal(p.problems.length,0,p.problems.join('\n'));assert.equal(p.amount,1234.56);
+const row=p.rows.find(r=>r.key==='MR-B1-13-APF-09');assert.equal(row.amount,1234.56);assert.equal(row.components.length,8);assert(row.ownerIds.includes(id));assert.equal(row.components.find(c=>c.description.includes('Core Switch')).quantity,2);
+assert(row.notes.some(n=>n.includes('Instrument & Telecom Room')));assert(row.intro.includes('comprised of'));
+const radio=p.rows.find(r=>r.key==='MR-B1-11-APF-01');assert(radio.components.some(c=>c.description.includes('ABV01, ACP and MOGE')&&c.quantity===98));
+const details=require(root+'/project0550/data/c1MrDetails0550.json');assert.equal(Object.keys(details.rows).length,179);assert(p.rows.filter(r=>r.kind==='MR').every(r=>details.rows[r.key]));
+const satellite=structuredClone(data),ku=satellite.lines.find(l=>l.systemToken==='TEL-VSAT-KU'&&l.wbs==='A');Object.assign(ku,{responsibility:'TSI',satelliteScope:'COMPANY_SUPPLY',selected:true});assert(C.deriveC1Appendix0550(make(satellite,[binding(lan)])).rows.find(r=>r.key===ku.mrRequirementId).excluded);
+assert(!p.rows.some(r=>r.key==='MR-B1-13-APF-09-PBX'),'Derived PBX is not another charge row');
+const shared=structuredClone(data),second=shared.lines.find(l=>l.id==='REQ-MR-B1-13-APF-10');const packageOwner={...lan,id:'SYNTHETIC-PACKAGE',mrRequirementId:'',scopeKey:'SYNTHETIC-SHARED',description:'PRIVATE package label',coveredByLineId:''};shared.lines.push(packageOwner);
+for(const l of [shared.lines.find(l=>l.id===id),second])Object.assign(l,{selected:true,responsibility:'TSI',coveredByLineId:packageOwner.id,coverageBasis:'Synthetic explicit package coverage',scopeBasis:'Synthetic TSI supply'});
+const ps=C.deriveC1Appendix0550(make(shared,[binding(packageOwner,5000)]));assert.equal(ps.amount,5000);assert.equal(ps.rows.filter(r=>r.amount===5000).length,1);assert(ps.rows.find(r=>r.key==='MR-B1-13-APF-09').note.startsWith('Included in item '));assert.equal(ps.rows.filter(r=>r.kind==='PACKAGE').length,1);
+const invalid=structuredClone(shared);invalid.lines.find(l=>l.id===id).coverageBasis='';assert(C.deriveC1Appendix0550(make(invalid,[binding(packageOwner,5000)])).problems.some(p=>p.includes('COVERAGE_OWNER_UNRESOLVED')));
+const missing=make(data,[]);assert.equal(C.deriveC1Appendix0550(missing).amount,null);assert(C.deriveC1Appendix0550(missing).problems.some(p=>p.includes('MR_C1_OWNER_UNRESOLVED')));
+const duplicate=C.deriveC1Appendix0550(make(data,[binding(lan),binding(lan)]));assert(duplicate.problems.some(p=>p.includes('DUPLICATE_C1_OWNER')));assert.equal(duplicate.amount,null);
+const unsafe=make(data,[binding({...lan,customerRemark:'<script>unsafe()</script>'})]);const html=C.c1AppendixHtml0550(view);assert(html.includes('1,234.56'));for(const internal of ['987654.32','PRIVATE COST','PRIVATE package label','SI-COST','REQ-MR','mapping pending','OPEN'])assert(!html.includes(internal),internal);
+assert.equal((html.match(/APPENDIX 1\.[1-8] ·/g)||[]).length,8);assert(!C.c1AppendixHtml0550(unsafe).includes('<script>'));
+const word=C.c1AppendixWord0550(view);assert(word.includes('1,234.56'));assert(!word.includes('987654.32'));assert(word.includes('w:tblHeader'));assert(!word.includes('REQ-MR'));
+const table=C.c1AppendixTable0550(view),lanTable=table.rows.find(r=>r[1]==='LAN Cabinet'&&r[5]===1234.56);assert(lanTable);assert.equal(lanTable[3],1);assert(table.rows.filter(r=>/^\d+\.\d+$/.test(String(r[0]))).every(r=>r[4]===null&&r[5]===null));
+assert(word.includes('<w:gridSpan w:val="2"/>'));assert(word.includes('<w:vMerge w:val="restart"/>'));
+// Guard exact historical v1 rendering against the pre-change a0d4f948 baseline.
+const legacy={proposal:{documentNo:'SYNTHETIC-V1',revision:'TEST'},outputLabel:'AUTHORIZED COPY / SYNTHETIC / 2026-11-03',bindings:[],scheduleRows:()=>[],getRecord:()=>({nativeFields:{},content:''}),baseAssigned:null,optionsAssigned:null};
+const hash=x=>require('node:crypto').createHash('sha256').update(x).digest('hex');
+assert.equal(hash(N.nativeExhibitHtml0550(legacy)),'c79d51d9455a4a9d08e6e3c1c89dba49113ad8eb73bc881f481fba1c23532629');
+assert.equal(hash(N.buildNativeExhibitDocx0550(legacy)),'483b6798186c84a26cd1100974b2e511f76a71ae17b04860d40bcb901ff3be3c');
+assert.equal(L.workspaceAlias0550('l3.original'),'CUS');assert.equal(L.workspaceAlias0550('bid.vendor.offers'),'VND');assert.equal(L.workspaceAlias0550('bid.working-preview.step.7'),'SI-WP-07');assert.equal(L.workspaceAlias0550('bid.budget.working.group.TEL-LAN'),'SI-COST');assert.equal(L.WORKSPACE_ALIAS_TARGETS_0550['si-wp-07'],'bid.working-preview.step.7');
+const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),UI=require(root+'/project0550/C1Appendix0550.jsx');const rendered=renderToStaticMarkup(React.createElement(UI.C1Appendix0550,{view}));assert(rendered.includes('bid.quotation.C1'));assert(rendered.includes('bid.budget.working.line.'+id));assert(rendered.includes('C1 internal trace'));assert(rendered.includes('data-c1-mr-id="MR-B1-13-APF-09"'));assert(rendered.includes('--bid-tint'));assert.equal(JSON.stringify(data),before);
+if(process.env.PJ0550_C1_FIXTURE)fs.writeFileSync(process.env.PJ0550_C1_FIXTURE,JSON.stringify(data));
+console.log('PASS C1 Appendix: 179 MR rows / 8 groups, stable identity and aliases, LAN parent/components, one shared package owner, invalid coverage/missing/duplicate gates, source/customer-price separation, escaped HTML/Word, colours/Copy IDs, readonly React SSR and unchanged data.');
