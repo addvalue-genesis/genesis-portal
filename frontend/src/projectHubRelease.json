@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.12",
+  "version": "2026-11-04.13",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "972898b8",
-  "capability": "Existing11.M shows known Working Base/Option prices and the filtered row subtotal alongside strict saved/reviewed reconciliation. Private Source Rev11/A Rev08 adds exact-source bindings to13 existing B7-B9 identities with no price/quantity/FX/selection adoption. Bound exact-lineage preparation48MiB and paired loader80MiB+1024; source32MiB/Vendor/backup/review/issue limits retained."
+  "source0550": "5e6160fb",
+  "capability": "Existing C1 Appendix1.4 retains the known selling-price subtotal when expanded; separate package-price blocks appear before the location detail in the interactive screen. Cost remains in existing VND/10.2 Working. Preserve native MR order, strict totals, export bytes, financial inputs, mapping gaps and frozen history; no new tab/module or automatic coverage acceptance."
 }

@@ -3,6 +3,10 @@ import {ComponentCopyId} from '../common/ui/ComponentCopyId';
 import {bidOwnerStyle} from './bidPresentation0550';
 import {deriveC1Appendix0550,c1AppendixOverview0550,c1Display0550,c1AppendixCss0550} from './data/c1Appendix0550';
 
+// Keep the native MR rows in order. In the interactive screen, put a separate
+// package-price block first so an expanded Appendix still reveals its price.
+const screenSites=(sites,documentMode)=>documentMode?sites:[...sites.filter(s=>s.rows.every(r=>r.kind==='PACKAGE')),...sites.filter(s=>!s.rows.every(r=>r.kind==='PACKAGE'))];
+
 export function C1Appendix0550({view,onNavigate,disabled=false}){
  const projection=useMemo(()=>deriveC1Appendix0550(view),[view]);
  const overview=useMemo(()=>c1AppendixOverview0550(projection),[projection]);
@@ -46,11 +50,11 @@ export function C1Appendix0550({view,onNavigate,disabled=false}){
    <h2>SCHEDULE C1 - BREAKDOWN OF LUMP SUM INITIAL CONTRACT PRICE FOR BASE SCOPE OF SUPPY</h2>
    <table aria-label="Schedule C1 preview"><colgroup><col style={{width:'9%'}}/><col style={{width:'39%'}}/><col style={{width:'7%'}}/><col style={{width:'7%'}}/><col style={{width:'11%'}}/><col style={{width:'11%'}}/><col style={{width:'16%'}}/></colgroup>
     <thead><tr><th rowSpan={2}>SN</th><th rowSpan={2}>Item Description</th><th rowSpan={2}>Unit</th><th rowSpan={2}>Qty.</th><th colSpan={2}>CIF or FOB (USD or RMB)</th><th rowSpan={2}>Notes</th></tr><tr><th>Unit Rates</th><th>Total Price</th></tr></thead>
-    {projection.groups.map(g=>{const summary=overview.find(s=>s.id===g.id),collapsed=!expanded('APP:'+g.id);return <tbody key={g.id}>
-     <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={collapsed?5:7}>{button('APP:'+g.id,g.id==='OTHER'?g.title.toUpperCase():'APPENDIX '+g.id+' · '+g.title.toUpperCase())}</td>{collapsed&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary.amount)}</td><td>{summary.label}</td></>}</tr>
+    {projection.groups.map(g=>{const summary=overview.find(s=>s.id===g.id),showSummary=!documentMode;return <tbody key={g.id}>
+     <tr className={g.id==='OTHER'?'c1-other':'c1-app'} id={'p55-c1-app-'+g.id} style={bidOwnerStyle(g.rows[0]?.mr?.systemToken||'A')}><td colSpan={showSummary?5:7}>{button('APP:'+g.id,g.id==='OTHER'?g.title.toUpperCase():'APPENDIX '+g.id+' · '+g.title.toUpperCase())}</td>{showSummary&&<><td className="number" data-c1-summary-amount={g.id}>{c1Display0550(summary.amount)}</td><td>{summary.label}</td></>}</tr>
      {expanded('APP:'+g.id)&&g.systems.map(sys=><React.Fragment key={sys.name}>
       <tr className="c1-system"><td colSpan={7}>{button('SYS:'+g.id+':'+sys.name,sys.name)}</td></tr>
-      {expanded('SYS:'+g.id+':'+sys.name)&&sys.sites.map(site=><React.Fragment key={site.name}>
+      {expanded('SYS:'+g.id+':'+sys.name)&&screenSites(sys.sites,documentMode).map(site=><React.Fragment key={site.name}>
        <tr className="c1-site"><td colSpan={7}>{button('SITE:'+g.id+':'+sys.name+':'+site.name,site.name)}</td></tr>
        {expanded('SITE:'+g.id+':'+sys.name+':'+site.name)&&site.rows.map(r=><React.Fragment key={r.key}>
         <tr data-c1-mr-id={r.mr?.id} data-c1-owner-ids={r.ownerIds.join(' ')}><td>{r.sn}</td><td>{(r.components.length>0||r.intro||r.notes?.length>0)&&button(r.key,'ส่วนประกอบ '+r.description+' / '+r.site,true)}{r.description}</td><td>{r.unit||'—'}</td><td className="number">{r.quantity??'—'}</td><td className="number">{c1Display0550(r.unitPrice)}</td><td className="number">{c1Display0550(r.amount)}</td><td>{r.note}</td></tr>

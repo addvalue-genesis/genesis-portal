@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_SERVICE_PRICE_BASIS.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_C1_EXPANDED_PRICE_AND_COST.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -31,7 +31,8 @@
     "docs/handoff/pj2608-0550/20261104_MASTER_TOWER_IDIE_ORIGINAL_PRICES.md",
     "docs/handoff/pj2608-0550/20261104_SYSTEM_RESPONSIBILITY_OVERVIEW.md",
     "docs/handoff/pj2608-0550/20261104_EXISTING_11M_CROSSWALK.md",
-    "docs/handoff/pj2608-0550/20261104_SERVICE_PRICE_BASIS.md"
+    "docs/handoff/pj2608-0550/20261104_SERVICE_PRICE_BASIS.md",
+    "docs/handoff/pj2608-0550/20261104_C1_EXPANDED_PRICE_AND_COST.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -72,6 +73,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "Existing C1 interactive Appendix headers now keep known selling-price subtotals when expanded; separate package blocks appear before location detail. Source cost stays in VND/10.2 Working; P1-P3 C1 amounts are selling prices. Preserve MR and native/frozen order/bytes, canonical prices/quantities/FX/selection and open coverage. No full PAGA mapping, quote002 adoption or per-location allocation is implied. See latest checkpoint for actual checks and Windows limit.",
     "Existing11.M now shows known Working Base/Option and filtered subtotals beside strict reviewed/saved totals. Private Source Rev11/A Rev08 binds13 existing service identities to MR/contract excerpts without financial or review adoption. Exact predecessor44.27MB needs preparation48MiB/pair80MiB+1024; source/Vendor/backup/ancestor controls retained. Price report and read-only PAGA002 net scenario prepared privately; full MR scope and Windows consumption remain unverified. See latest checkpoint for actual validation and unresolved scope.",
     "Existing11.M grid now shows CUS/responsibility/Working/Customer row/Schedule trace,13-row B7-B9 filter and strict saved-vs-reviewed Base/Option reconciliation. Same tabs/module IDs/editors, canonical data and frozen history; no automatic mapping/pricing/approval. Source/applicability decisions and PAGA engineering remain OPEN. See latest checkpoint for tests and Windows deployment limit. Actual Rev11/Rev07 inspection also found no explicit Source IDs on these13 linked requirement records; retain existing reference text and bind already-received source clauses through WP.4, not by requesting the documents again.",
     "Antigravity d641c9f0 report checked against650bce16: Volume11 already reads official lines/customerUSD, deterministic draft allocations can be saved, native forms paginate and actual Source/private Vendor JSON exist. Real seed gap:13 B7-B9 rows have no valid default customer row. Resolve explicit Part B/Schedule allocation against customer basis, preserving prices, authored mappings and frozen issues; do not add customer rows or bypass gates blindly. See latest checkpoint for tested facts and limits.",
