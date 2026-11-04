@@ -3,10 +3,10 @@ import {nativeExhibitHtml0550} from './exhibitCNative0550';
 import {zipStore} from './exportOriginalPriceForm';
 import {SCHEDULES_0550,QUALIFICATIONS_0550} from './data/bidVolumes0550';
 import {sumMoney0550} from './data/money0550';
-import {C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
+import {isC1Appendix0550,C1_APPENDIX_LAYOUT_0550,c1AppendixTable0550} from './data/c1Appendix0550';
 const esc=v=>String(v??'OPEN').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 export function scheduleTable0550(view,id){
- if(id==='C1'&&view.c1LayoutVersion===C1_APPENDIX_LAYOUT_0550)return c1AppendixTable0550(view);
+ if(id==='C1'&&isC1Appendix0550(view))return c1AppendixTable0550(view);
  const rows=view.scheduleRows(id);
  if(id==='A')return {heads:['Description','Amount (USD)','Notes'],rows:[['Base Scope',view.baseAssigned,'A1 — mapped canonical Working only'],['Optional Scope',view.optionsAssigned,'A2 — excluded from Base'],['Initial Contract Price','OPEN','Confirm ordered options and contract scope; do not add options automatically.']]};
  if(['A1','A2'].includes(id)){
@@ -23,7 +23,7 @@ export function scheduleTable0550(view,id){
  return {heads:['SN','Description','Brand / Model','Unit','Qty','Unit Price (USD)','Total Price (USD)'],rows:rows.map((b,i)=>[i+1,b.line.description,b.line.brand||b.line.offer?.brand||'OPEN',b.unit,b.quantity,b.unitPrice,b.amount])};
 }
 export function bidVolumeSheets0550(view,volume){
- if(volume==='I')return [{name:'Cover',heads:['Document','Response'],rows:[['Document No.',view.proposal.documentNo||'OPEN'],['Revision',view.proposal.revision],['Power of Attorney / Undertaking',view.getRecord('I.cover').content||'OPEN']]},...SCHEDULES_0550.map(s=>({name:'Schedule '+s.id,...scheduleTable0550(view,s.id),note:view.getRecord('I.'+s.id).content||'OPEN — response / applicability not reviewed'}))];
+ if(volume==='I')return [{name:'Cover',heads:['Document','Response'],rows:[['Document No.',view.proposal.documentNo||'OPEN'],['Revision',view.proposal.revision],['Power of Attorney / Undertaking',view.getRecord('I.cover').content||'OPEN']]},...SCHEDULES_0550.map(s=>({name:'Schedule '+s.id,...scheduleTable0550(view,s.id),note:view.getRecord('I.'+s.id).content||(s.id==='C1'&&view.c1LayoutVersion===C1_APPENDIX_LAYOUT_0550?'':'OPEN — response / applicability not reviewed')}))];
  if(volume==='VDRL')return [{name:'VDRL',heads:['Document No.','Title','System','Submission phase','Invitation sections','Owner','Due date','Deliverable reference','Review'],rows:view.vdrl.map(r=>[r.documentNo,r.title,r.systemToken,r.phase,r.sectionIds.join(', '),r.owner,r.dueOn,r.deliverableRef,r.state])}];
  return [{name:'Volume III',heads:['Item','Qualification','BIDDER response','Review'],rows:QUALIFICATIONS_0550.map(q=>{const r=view.getRecord('III.'+q.id);return [q.id,q.title,r.content||'OPEN',r.state];})},{name:'Commercial Deviations',heads:['Title','Customer clause','Requirement','BIDDER proposal','Justification','Decision / Review'],rows:view.commercialDeviations.map(d=>[d.title,d.locator,d.requirement,d.proposal,d.reason,d.decision+' / '+d.state])}];
 }

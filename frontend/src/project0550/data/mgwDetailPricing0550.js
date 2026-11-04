@@ -4,6 +4,8 @@ import {sumMoney0550} from "./money0550";
 
 // 29-Oct-2026 user decision: price the detailed MGW scope despite cover errors.
 // This prices quoted scope; it does not certify MR quantities or adequacy.
+// Generated workflow note. It belongs in Working diagnostics, not the C1 paper.
+export const mgwDetailCustomerRemark0550=id=>'Draft price for listed quoted scope; final MR quantity, interfaces and scope reconciliation pending.'+(id==='RADIO-SHARED'?' Shared radio items charged once in A1-07.':id.startsWith('SERVICES-')?' Full quoted MGW service allowance pending scope adjustment; no credit assumed.':'');
 export const MGW_DETAIL_PRICING_VERSION_0550="0550-mgw-detail-pricing-20261029-1";
 const make=(id,title,systemToken,customerRowCode,rows,select=true,wbs="A")=>({id,title,systemToken,customerRowCode,rowIds:rows.map(r=>r.id),select,wbs});
 const section=id=>quote.rows.filter(r=>r.section===id);
@@ -60,7 +62,7 @@ export function prepareMgwDetailPricing0550(data,policies,today){
   if(g.select&&occupied)conflicts.push(g.id+": existing price owner retained; MGW priced as unselected alternative");
   const basis=`${quote.quoteRef} / ${g.rowIds.join(", ")} / ${quote.sourceUrl}. User instruction 29-Oct-2026: use detailed prices where cover conflicts. One Lot represents the listed quoted scope only, not approved MR quantities. MET/NDB/service cover-only packages retain that source limitation. Bought-in costs use existing Procured Cost policy; OEM inclusions and SI service boundaries require reconciliation.`;
   next.lines.push({id,mgwDetailGroupId:g.id,mgwDetailBasis:mgwDetailGroupBasis0550(data,g.id).source,systemToken:g.systemToken,wbs:g.wbs,description:g.title,scopeKey:"MGW-QUOTED-SCOPE."+g.id,tagRef:"Quoted sites — MR reconciliation pending",requirementRef:"",sourceRef:basis,
-   vendorId:data.offers.find(o=>mgwQuoteItem0550(o)?.id===g.rowIds[0])?.vendorId||"",offerId:"",calculationId:"",resultKey:"value",quantity:1,unit:"Lot",currency:"USD",manualCost:null,sellRate:null,markupPct:null,...policy,selected,customerRowCode:g.customerRowCode,customerRemark:"Draft price for listed quoted scope; final MR quantity, interfaces and scope reconciliation pending."+(g.id==="RADIO-SHARED"?" Shared radio items charged once in A1-07.":g.id.startsWith("SERVICES-")?" Full quoted MGW service allowance pending scope adjustment; no credit assumed.":""),brand:"",coverageBasis:basis});
+   vendorId:data.offers.find(o=>mgwQuoteItem0550(o)?.id===g.rowIds[0])?.vendorId||"",offerId:"",calculationId:"",resultKey:"value",quantity:1,unit:"Lot",currency:"USD",manualCost:null,sellRate:null,markupPct:null,...policy,selected,customerRowCode:g.customerRowCode,customerRemark:mgwDetailCustomerRemark0550(g.id),brand:"",coverageBasis:basis});
   importedLineIds.push(id);
  }
  return {...next,mgwDetailPricingImport:{version:MGW_DETAIL_PRICING_VERSION_0550,date:today,importedLineIds,conflicts,replacedLineIds,decision:"User 29-Oct-2026: use MGW detail prices; corrected choice to MGW Marine/Aero/SSB instead of Jason; include all known USD255500 other charges pending BOSCH credit. INDUSTRONIC PAGA retained."}};

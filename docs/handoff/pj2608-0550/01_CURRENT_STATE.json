@@ -1,6 +1,6 @@
 {
   "schema": "pj2608-0550-handoff/2.0",
-  "updatedDate": "2026-11-03",
+  "updatedDate": "2026-11-04",
   "repo": "addvalue-genesis/genesis-portal",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "pr": 53,
@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261103_C1_APPENDIX_AND_WORKSPACE_ALIASES.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_C1_EMPTY_PACKAGE_ROWS.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -19,7 +19,8 @@
     "docs/handoff/pj2608-0550/20261103_A_INPUT_FOCUS_AND_RECEIPT_COUNTS.md",
     "docs/handoff/pj2608-0550/20261103_PAGA_SUPPLIER_REVISION.md",
     "docs/handoff/pj2608-0550/20261103_RESTORE_SCHEDULE_A_FORMS.md",
-    "docs/handoff/pj2608-0550/20261103_C1_APPENDIX_AND_WORKSPACE_ALIASES.md"
+    "docs/handoff/pj2608-0550/20261103_C1_APPENDIX_AND_WORKSPACE_ALIASES.md",
+    "docs/handoff/pj2608-0550/20261104_C1_EMPTY_PACKAGE_ROWS.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -50,7 +51,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
-    "C1 now presents179 native MR rows under Appendix1.1–1.8 with local +/−, stable IDs/colour and customer-only grouped exports. CUS/SI/VND are display aliases. Continue canonical source/SI/vendor/Working reconciliation; do not infer project readiness from the new presentation.",
+    "C1 retains179 native MR requirements in native Appendix/site/item order with Appendix-local codes1.6.1 etc. and P1 for non-MR priced packages. Repeated MR names are audited, not automatically merged. SI technical links do not imply commercial coverage; pending unpriced owners stay internal. Native v3 / C1 layoutv2 retains historical v1/v2 restore. Continue canonical source/SI/vendor mapping; UI cleanup does not close project readiness.",
     "PAGA multi-source clause/engineering reconciliation remains OPEN:217 new TAG candidates are DTS-only customer evidence,95 old authored drafts were retained;16 derived MR defaults still need exact sources,5 prior RPTs OPEN and no closed PAGA scope review. The revision importer is not full A/SI acceptance.",
     "Private PAGA outputs10/11/12 and v2 technical draft package are separate from Git and Windows saved data. Do not treat a qualified quoted-package pricing scenario as complete customer CIF/FOB price or adopt it automatically.",
     "Implementation verification and existing-branch delivery are recorded in the latest checkpoint. No customer issue or PR merge is authorised by presentation completion."
