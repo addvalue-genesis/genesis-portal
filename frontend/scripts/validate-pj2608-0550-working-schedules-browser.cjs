@@ -26,5 +26,37 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],f=/^\/(
  await page.setViewportSize({width:390,height:844});assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Mobile containment');await page.setViewportSize({width:1600,height:1100});
  if(process.env.PJ0550_WORKING_SCHEDULE_SCREENSHOT)await page.locator('[data-native-schedule="C1"]').screenshot({path:process.env.PJ0550_WORKING_SCHEDULE_SCREENSHOT});
  await page.reload();await ready();assert.deepEqual((await read()).bidVolumes,saved.bidVolumes);assert.deepEqual((await read()).releaseRegister,before.releaseRegister);assert.deepEqual(errors,[]);
+ // Fresh repository seed in the same isolated test profile, not the owner's store.
+ await write(seed);await page.reload();await ready();
+ await page.getByRole('navigation',{name:'PJ2608-0550 sections'}).getByRole('button',{name:'Quotation',exact:true}).click();
+ await page.locator('.p55-technical-tabs').getByRole('button',{name:'11.M Schedule allocation',exact:true}).click();
+ const trace=page.getByRole('table',{name:'Exhibit C allocation',exact:true}),reconcile=page.getByRole('table',{name:'Official to Schedule reconciliation',exact:true});
+ await trace.waitFor();const crossBefore=await read();assert.equal(await reconcile.locator('tbody tr').count(),2);
+ assert.equal(await page.getByLabel('Schedule allocation filter',{exact:true}).inputValue(),'OPEN');
+ await page.getByLabel('Schedule allocation filter',{exact:true}).selectOption('B7_B9');assert.equal(await trace.locator('tbody tr').count(),13);
+ assert((await trace.innerText()).includes('CALL-OFF'));assert((await trace.innerText()).includes('ค่าธรรมเนียม'));assert((await trace.innerText()).includes('CLARIFICATION'));
+ const scopeRow=trace.locator('[data-allocation-line="REQ-MR-ACT-B7-D01"]');
+ await scopeRow.locator('td').nth(1).locator('summary').click();assert(await scopeRow.getByRole('button',{name:'Site survey',exact:true}).count());
+ await scopeRow.getByRole('button',{name:'แก้ Schedule REQ-MR-ACT-B7-D01',exact:true}).click();
+ assert.equal(await page.getByLabel('Working line to allocate',{exact:true}).inputValue(),'REQ-MR-ACT-B7-D01');
+ const editor=page.locator('[data-component-key="bid.quotation.mapping"] form');await editor.waitFor();
+ const originalBasis=await editor.getByLabel('Schedule allocation basis',{exact:true}).inputValue();
+ await editor.getByLabel('Schedule allocation basis',{exact:true}).fill(originalBasis+' UNSAVED TEST');
+ await page.getByRole('button',{name:'11.A1',exact:true}).click();assert(await page.getByRole('status').filter({hasText:'บันทึกหรือยกเลิกร่างก่อนเปลี่ยนแท็บ'}).count());
+ await editor.getByRole('button',{name:'ยกเลิกการแก้ไข',exact:true}).click();
+ for(const width of [1440,390]){await page.setViewportSize({width,height:1000});await trace.scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+2),'Crosswalk mobile containment');}
+ await page.setViewportSize({width:1600,height:1100});
+ assert.deepEqual(await read(),crossBefore,'Crosswalk filters, expand and editor cancel never write source/financial/history data');
+ if(process.env.PJ0550_CROSSWALK_SCREENSHOT){await reconcile.scrollIntoViewIfNeeded();await page.screenshot({path:process.env.PJ0550_CROSSWALK_SCREENSHOT,fullPage:false});}
+ await scopeRow.getByRole('button',{name:'Site survey',exact:true}).click();
+ const moduleSearch=page.getByLabel('Project Module Search',{exact:true});await moduleSearch.fill('bid.working-preview.step.4');
+ await page.locator('.p55-module-results button').filter({has:page.getByText('bid.working-preview.step.4',{exact:true})}).click();
+ const selectedRequirement=page.locator('[data-component-key="bid.working-preview.step.4"] select[aria-label="Working requirement"]');await selectedRequirement.waitFor();
+ assert.equal(await selectedRequirement.inputValue(),'REQDEF-MR-ACT-B7-D01');
+ assert.deepEqual(await read(),crossBefore,'Crosswalk returns to original requirement without saving');
+ await page.reload();await ready();assert.deepEqual(await read(),crossBefore,'Crosswalk remains read-only after reload');
+ assert.deepEqual(errors,[]);
+ console.log('PASS existing11.M:13 B7-B9 rows, source annotations, saved-vs-suggested price separation, two reconciliation rows, original Schedule editor/dirty guard/cancel, requirement reverse navigation,1440/390 containment, unchanged workspace and reload; unchanged tab list.');
+
  console.log('PASS Working Schedule browser: default Working view, actual MGW CCTV 28 rows/costs in internal diagnostics, canonical selling price in MR-based 8-Appendix customer C1, cost-safe Word download, read-only preview/export, one-click DRAFT allocation save, reviewed-view separation, unchanged financials/frozen history, reload/mobile; zero page errors.');
 }finally{if(browser)await browser.close();await new Promise(r=>server.close(r));if(!process.env.PJ0550_WORKING_SCHEDULE_FIXTURE)fs.rmSync(fixtureFile,{force:true});}})().catch(e=>{console.error(e);process.exitCode=1;});

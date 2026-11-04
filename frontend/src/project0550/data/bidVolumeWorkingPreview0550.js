@@ -2,7 +2,9 @@ import {evaluateServiceEquation} from '../serviceEquationRuntime';
 // ADR 2,3,5,6,8–12: an unsaved document projection of the existing Working.
 // Suggestions are SI draft allocations, never a source fact or an approval.
 import {blankScheduleBinding0550,deriveBidVolumes0550,emptyBidVolumes0550,saveBidVolumeRecord0550} from './bidVolumes0550';
-import {sumMoney0550} from './money0550';
+import {sumMoney0550,roundMoney0550} from './money0550';
+import {mappingValid} from './officialPricing0550';
+import {MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 import {integrationRequirements0550} from './integrationWorkspace0550';
 import {MGW_QUOTE_0550,mgwQuoteItem0550} from './mgwVendorBasis0550';
 import {mgwDetailGroup0550,mgwDetailGroupBasis0550} from './mgwDetailPricing0550';
@@ -22,6 +24,54 @@ const rules={
  C2:['C4','CAPITAL_SPARES','Capital spares → C4, not Exhibit C C2'],
  C3:['C3','OPERATION_SPARES','Two-year operation spares → C3; base/option source conflict remains OPEN']
 };
+
+// Internal 11.M diagnostics over the same records. No allocation, price, source
+// authority, review or issue is written by opening/filtering this projection.
+export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView){
+ const working=new Map(model.lines.map(l=>[l.id,l])),official=new Map(model.official.lines.map(l=>[l.id,l]));
+ const saved=new Map(savedView.bindings.map(b=>[b.lineId,b])),display=new Map(displayView.bindings.map(b=>[b.lineId,b]));
+ const catalog=new Map(MR_WORKING_CATALOG_0550.rows.map(r=>[r.id,r]));
+ const sources=new Set((data.sourceIntake?.sources||[]).map(s=>s.id));
+ const requirements=model.integration?.requirements||integrationRequirements0550(data),byRequirement=new Map(requirements.map(r=>[r.id,r])),byLine=new Map();
+ const link=(id,r)=>{if(!id||!r)return;if(!byLine.has(id))byLine.set(id,new Map());byLine.get(id).set(r.id,r);};
+ for(const r of requirements)for(const id of r.workLineIds||[])link(id,r);
+ for(const a of model.integration?.activities||[])link(a.workLineId,byRequirement.get(a.requirementId));
+ const rows=data.lines.map(raw=>{
+  const line=working.get(raw.id),reviewed=official.get(raw.id),binding=saved.get(raw.id),shown=display.get(raw.id),mr=catalog.get(raw.mrRequirementId);
+  const reqs=[...(byLine.get(raw.id)?.values()||[])];
+  const company=Boolean(line?.mrScopeState?.excluded||line?.satelliteScopeState?.excluded),included=Boolean(line?.mrScopeState?.covered);
+  const scope=company?'COMPANY':included?'INCLUDED':line?.selected?'SELECTED':'NOT_SELECTED';
+  const ownerId=included?line.mrScopeState.owner.id:raw.id,ownerLinkOpen=Boolean(raw.coveredByLineId&&!included&&!company);
+  const customerMapped=mappingValid(raw),reasons=[];
+  // These annotations identify work to inspect; they do not decide applicability.
+  const advisories=[];
+  if(mr?.note.includes(' / CALL-OFF.'))advisories.push('ทะเบียนเดิมระบุ CALL-OFF · ตรวจขอบเขตและ Base/Option ก่อนทบทวน');
+  if(raw.mrRequirementId==='MR-ACT-B8-D05')advisories.push('แยกค่าธรรมเนียมออกจากงานสนับสนุนเอกสาร · ยืนยันผู้รับผิดชอบ');
+  if([raw.responsibility,...reqs.map(r=>r.responsibility)].includes('CLARIFICATION'))advisories.push('ผู้รับผิดชอบ / ขอบเขตยัง CLARIFICATION');
+  if(ownerLinkOpen)reasons.push('เจ้าของต้นทุนที่อ้างยังตรวจไม่ผ่าน');
+  if(scope==='SELECTED'){
+   if(!reqs.length||reqs.some(q=>!q.sourceIds?.length||q.sourceIds.some(id=>!sources.has(id))))reasons.push('ข้อกำหนดบางข้อยังไม่ผูกไฟล์ต้นฉบับที่พบใน A');
+   if(!customerMapped)reasons.push('ยังไม่ผูก Customer row ที่ใช้ได้ใน 10.7');
+   if(!binding)reasons.push(shown?.suggested?'Schedule เป็นร่างแนะนำ ยังไม่บันทึก':'ยังไม่จัดลง Schedule');
+   else if(binding.state!=='REVIEWED')reasons.push('การจัด Schedule ยัง '+binding.state);
+   if(!Number.isFinite(reviewed?.customerUSD))reasons.push('ราคา / การทบทวน 10.7 ยัง OPEN');
+   reasons.push(...advisories);
+  }
+  return {id:raw.id,raw,line,scope,ownerId,ownerLinkOpen,requirements:reqs,mr,customerMapped,binding,shown,advisories,reasons,
+   workingUSD:scope==='SELECTED'?(Number.isFinite(line.customerUSD)?line.customerUSD:Number.isFinite(line.provisionalCustomerUSD)?line.provisionalCustomerUSD:null):null,
+   officialUSD:scope==='SELECTED'&&Number.isFinite(reviewed?.customerUSD)?reviewed.customerUSD:null,
+   needsAttention:reasons.length>0};
+ });
+ const reconciliation=['BASE','OPTION'].map(treatment=>{
+  const option=treatment==='OPTION',expected=option?model.official.optionsUSD:model.official.baseUSD,allocated=option?savedView.optionsAssigned:savedView.baseAssigned;
+  const difference=Number.isFinite(expected)&&Number.isFinite(allocated)?roundMoney0550(allocated-expected):null;
+  const active=savedView.active.filter(l=>l.wbs.startsWith('C')===option);
+  return {treatment,expected,allocated,difference,state:difference===null?'OPEN':difference===0?'AMOUNTS_MATCH':'DIFFERENCE',
+   unallocatedIds:savedView.unallocated.filter(l=>l.wbs.startsWith('C')===option).map(l=>l.id),
+   openPriceIds:active.filter(l=>!Number.isFinite(l.customerUSD)).map(l=>l.id)};
+ });
+ return {rows,reconciliation};
+}
 export function scheduleHoursFromCalculation0550(data,line){
  const c=data.calculations.find(c=>c.id===line?.calculationId);
  return line?.unit==='MD'&&line.resultKey==='MD'&&c?.equationId==='E05'&&c.sourceRef.trim()&&[line.systemToken,'COMMON'].includes(c.systemToken)&&evaluateServiceEquation(c.equationId,c.inputs).state==='CALCULATED'&&c.inputs.Hday>0&&c.inputs.Hday<=24?{hoursPerDay:c.inputs.Hday,calculationId:c.id}:null;
