@@ -1,0 +1,145 @@
+{
+  "schema": "genesis.0550.vendor-register.v1",
+  "projectId": "PJ2608-0550",
+  "batchId": "VND-CERAGON-26-30029-REVA1-DEFAULTS-20261104-1",
+  "preparedOn": "2026-11-04",
+  "coverageNote": "Default CERAGON source identities and native quantities only. Original prices/terms load privately. No Working selection, MR acceptance or finance adoption.",
+  "vendors": [
+    {
+      "id": "VENDOR-CERAGON-0550",
+      "name": "CERAGON",
+      "kind": "OEM",
+      "reference": "26-30029 / printed26-3029-1 / RevA1 / 03-Nov-2026 / legal contracting entity to confirm"
+    }
+  ],
+  "offers": [
+    {
+      "id": "OFFER-CERAGON-26-30029-REVA1-E90E86E5-R10",
+      "vendorId": "VENDOR-CERAGON-0550",
+      "description": "DMR PtP Link 300 Mbps_IP-50CX_07GHz_2+2 HSB_Antenna 1.2m\n\nSite ACP:\n- 2x Full Outdoor Unit (IP-50CX), 7GHz\n- 1x Antenna 7-8GHz, 1.2m\n- 75-meter cable is provided for both the power source and customer network connections\n\nSite APF:\n- 2x Full Outdoor Unit (IP-50CX), 7GHz\n- 1x Antenna 7-8GHz, 1.2m\n- 75-meter cable is provided for both the power source and customer network connections",
+      "brand": "CERAGON / IP-50CX",
+      "quoteRef": "26-30029 / printed26-3029-1",
+      "sourceRef": "https://docs.google.com/spreadsheets/d/1YEik9MUniq2B9oW5FZLAl8-UrphS5HD9/edit / 'Offer '!C10:G10 / BoQ!F63:J93",
+      "date": "2026-11-03",
+      "validUntil": "2026-12-03",
+      "currency": "USD",
+      "unit": "Lot",
+      "unitCost": null,
+      "unitBasis": "WHOLE_QUOTED_LINK_OR_SPARES_PACKAGE",
+      "quoteEvidence": {
+        "revision": "RevA1",
+        "systemTokens": [
+          "TEL-DMR"
+        ],
+        "sourceId": "DRV-CERAGON-ASK-26-30029-REVA1",
+        "sourceSha256": "e90e86e573545c77f354e3a12ae40d09279ea9a1b90f0cac300a8cc53ca1123f",
+        "sourceUrl": "https://docs.google.com/spreadsheets/d/1YEik9MUniq2B9oW5FZLAl8-UrphS5HD9/edit",
+        "locator": "'Offer '!C10:G10; BoQ!F63:J93",
+        "quotedQuantity": 1.0,
+        "quotedUnit": "QTY (package; unit not printed)",
+        "quotedUnitCost": null,
+        "quotedCurrency": "USD",
+        "fileName": "26-30029_BoQ_Addvalue_ASK Project_IP-50CX 2+2 HB_RevA1_20261103.xlsx",
+        "classification": "RATE",
+        "rateBasis": "Quoted source reference only. Private price/terms pending. Registration unitLot denotes whole link/spares package; support retains nativeyear. Alternative source quantity0 is preserved; no MR/Working quantity adoption.",
+        "terms": []
+      }
+    },
+    {
+      "id": "OFFER-CERAGON-26-30029-REVA1-E90E86E5-R11",
+      "vendorId": "VENDOR-CERAGON-0550",
+      "description": "DMR PtP Link 300 Mbps_IP-50CX_07GHz_2+0_Antenna 1.2m\n\nSite ACP:\n- 1x Full Outdoor Unit (IP-50CX), 7GHz\n- 1x Antenna 7-8GHz, 1.2m\n- 75-meter cable is provided for both the power source and customer network connections\n\nSite APF:\n- 1x Full Outdoor Unit (IP-50CX), 7GHz\n- 1x Antenna 7-8GHz, 1.2m\n- 75-meter cable is provided for both the power source and customer network connections",
+      "brand": "CERAGON / IP-50CX",
+      "quoteRef": "26-30029 / printed26-3029-1",
+      "sourceRef": "https://docs.google.com/spreadsheets/d/1YEik9MUniq2B9oW5FZLAl8-UrphS5HD9/edit / 'Offer '!C11:G11 / BoQ!F63:J93",
+      "date": "2026-11-03",
+      "validUntil": "2026-12-03",
+      "currency": "USD",
+      "unit": "Lot",
+      "unitCost": null,
+      "unitBasis": "WHOLE_QUOTED_LINK_OR_SPARES_PACKAGE",
+      "quoteEvidence": {
+        "revision": "RevA1",
+        "systemTokens": [
+          "TEL-DMR"
+        ],
+        "sourceId": "DRV-CERAGON-ASK-26-30029-REVA1",
+        "sourceSha256": "e90e86e573545c77f354e3a12ae40d09279ea9a1b90f0cac300a8cc53ca1123f",
+        "sourceUrl": "https://docs.google.com/spreadsheets/d/1YEik9MUniq2B9oW5FZLAl8-UrphS5HD9/edit",
+        "locator": "'Offer '!C11:G11; BoQ!F63:J93",
+        "quotedQuantity": 0.0,
+        "quotedUnit": "QTY (package; unit not printed)",
+        "quotedUnitCost": null,
+        "quotedCurrency": "USD",
+        "fileName": "26-30029_BoQ_Addvalue_ASK Project_IP-50CX 2+2 HB_RevA1_20261103.xlsx",
+        "classification": "OPTION",
+        "rateBasis": "Quoted source reference only. Private price/terms pending. Registration unitLot denotes whole link/spares package; support retains nativeyear. Alternative source quantity0 is preserved; no MR/Working quantity adoption.",
+        "terms": []
+      }
+    },
+    {
+      "id": "OFFER-CERAGON-26-30029-REVA1-E90E86E5-R12",
+      "vendorId": "VENDOR-CERAGON-0550",
+      "description": "Spares\n- 2x Main ODU (IP-50CX), 7GHz",
+      "brand": "CERAGON / IP-50CX",
+      "quoteRef": "26-30029 / printed26-3029-1",
+      "sourceRef": "https://docs.google.com/spreadsheets/d/1YEik9MUniq2B9oW5FZLAl8-UrphS5HD9/edit / 'Offer '!C12:G12 / BoQ!F63:J93",
+      "date": "2026-11-03",
+      "validUntil": "2026-12-03",
+      "currency": "USD",
+      "unit": "Lot",
+      "unitCost": null,
+      "unitBasis": "WHOLE_QUOTED_LINK_OR_SPARES_PACKAGE",
+      "quoteEvidence": {
+        "revision": "RevA1",
+        "systemTokens": [
+          "TEL-DMR"
+        ],
+        "sourceId": "DRV-CERAGON-ASK-26-30029-REVA1",
+        "sourceSha256": "e90e86e573545c77f354e3a12ae40d09279ea9a1b90f0cac300a8cc53ca1123f",
+        "sourceUrl": "https://docs.google.com/spreadsheets/d/1YEik9MUniq2B9oW5FZLAl8-UrphS5HD9/edit",
+        "locator": "'Offer '!C12:G12; BoQ!F63:J93",
+        "quotedQuantity": 1.0,
+        "quotedUnit": "QTY (package; unit not printed)",
+        "quotedUnitCost": null,
+        "quotedCurrency": "USD",
+        "fileName": "26-30029_BoQ_Addvalue_ASK Project_IP-50CX 2+2 HB_RevA1_20261103.xlsx",
+        "classification": "RATE",
+        "rateBasis": "Quoted source reference only. Private price/terms pending. Registration unitLot denotes whole link/spares package; support retains nativeyear. Alternative source quantity0 is preserved; no MR/Working quantity adoption.",
+        "terms": []
+      }
+    },
+    {
+      "id": "OFFER-CERAGON-26-30029-REVA1-E90E86E5-R14",
+      "vendorId": "VENDOR-CERAGON-0550",
+      "description": "SLA 24x7 \nGold Support & Maintenance package",
+      "brand": "CERAGON / IP-50CX",
+      "quoteRef": "26-30029 / printed26-3029-1",
+      "sourceRef": "https://docs.google.com/spreadsheets/d/1YEik9MUniq2B9oW5FZLAl8-UrphS5HD9/edit / 'Offer '!C14:G14 / BoQ!F63:J93",
+      "date": "2026-11-03",
+      "validUntil": "2026-12-03",
+      "currency": "USD",
+      "unit": "year",
+      "unitCost": null,
+      "unitBasis": "QUOTED_SUPPORT_YEAR",
+      "quoteEvidence": {
+        "revision": "RevA1",
+        "systemTokens": [
+          "TEL-DMR"
+        ],
+        "sourceId": "DRV-CERAGON-ASK-26-30029-REVA1",
+        "sourceSha256": "e90e86e573545c77f354e3a12ae40d09279ea9a1b90f0cac300a8cc53ca1123f",
+        "sourceUrl": "https://docs.google.com/spreadsheets/d/1YEik9MUniq2B9oW5FZLAl8-UrphS5HD9/edit",
+        "locator": "'Offer '!C14:G14; BoQ!F63:J93",
+        "quotedQuantity": 2.0,
+        "quotedUnit": "year",
+        "quotedUnitCost": null,
+        "quotedCurrency": "USD",
+        "fileName": "26-30029_BoQ_Addvalue_ASK Project_IP-50CX 2+2 HB_RevA1_20261103.xlsx",
+        "classification": "RATE",
+        "rateBasis": "Quoted source reference only. Private price/terms pending. Registration unitLot denotes whole link/spares package; support retains nativeyear. Alternative source quantity0 is preserved; no MR/Working quantity adoption.",
+        "terms": []
+      }
+    }
+  ]
+}

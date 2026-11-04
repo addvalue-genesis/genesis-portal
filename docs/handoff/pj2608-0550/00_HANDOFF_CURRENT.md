@@ -1,3 +1,5 @@
+Latest: [CERAGON RevA1 native quote registration and independent Vendor defaults](20261104_CERAGON_REVA1_VENDOR_REGISTER.md), UI2026-11-04.8, parent05de6515. TEL-DMR / Appendix1.5; preserve option0 and annual support units, separate private prices and no Working/FX/history adoption. Windows consumption and engineering approval remain unverified.
+
 Deployment correction: owner screenshot has new Total Price column but old3 PAGA rows. Found duplicate90_SYSTEM_WORKING folders and moved the existing PAGA JSON into original DATA next to actual Source Rev11/A Rev07; same File ID/content, parent verified. No new code or extra pull required for this move; Desktop sync/reload consumption unconfirmed. See [PAGA original quotations checkpoint](20261104_PAGA_ORIGINAL_QUOTATIONS.md#deployment-correction-after-owner-screenshot).
 
 Latest: [both original PAGA quotations with native row quantities/prices](20261104_PAGA_ORIGINAL_QUOTATIONS.md) — UI2026-11-04.7. Existing private Vendor DATA auto-loader;2 quotation identities/80 Offer IDs, no Working price adoption; owner Windows consumption unverified.

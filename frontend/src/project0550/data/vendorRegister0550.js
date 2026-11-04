@@ -19,7 +19,7 @@ export function validateVendorQuoteEvidence0550(e,systems){
  for(const k of ['revision','sourceId','sourceSha256','sourceUrl','locator','quotedUnit','rateBasis'])text(e[k]);
  if(!/^[\w.-]{1,100}$/.test(e.sourceId)||!/^[a-f0-9]{64}$/.test(e.sourceSha256)||!safeSourceUrl(e.sourceUrl)||!e.locator.trim()||!e.quotedUnit.trim()||!e.rateBasis.trim())fail('quotation source/unit basis required');
  if(!Array.isArray(e.systemTokens)||!e.systemTokens.length||new Set(e.systemTokens).size!==e.systemTokens.length||e.systemTokens.some(s=>s!=='COMMON'&&!systems.includes(s)))fail('invalid quotation systems');
- if(!Number.isFinite(e.quotedQuantity)||e.quotedQuantity<=0||e.quotedQuantity>1e12||!['RATE','OPTION'].includes(e.classification))fail('invalid quotation quantity/classification');
+ if(!Number.isFinite(e.quotedQuantity)||e.quotedQuantity<0||e.quotedQuantity===0&&e.classification!=='OPTION'||e.quotedQuantity>1e12||!['RATE','OPTION'].includes(e.classification))fail('invalid quotation quantity/classification');
  if(!['THB','USD','EUR'].includes(e.quotedCurrency)||e.quotedUnitCost!==null&&(!Number.isFinite(e.quotedUnitCost)||e.quotedUnitCost<0||e.quotedUnitCost>1e12))fail('invalid native quotation rate/currency');
  if(e.quotedTotal!==undefined&&e.quotedTotal!==null&&(!Number.isFinite(e.quotedTotal)||e.quotedTotal<0||e.quotedTotal>1e12))fail('invalid original line total');
  if(e.originBatchId!==undefined&&(typeof e.originBatchId!=='string'||!/^[\w.-]{1,100}$/.test(e.originBatchId)))fail('invalid origin batch');
@@ -36,7 +36,7 @@ export function planVendorRegister0550(data,pack,systems){
  const key=integrationFingerprint0550(pack),receipt=(data.supplierRevisionImports||[]).find(r=>r.batchId===pack.batchId);
  if(receipt){if(receipt.packageKey!==key)fail('consumed batch changed');return {workspace:data,changed:false,sourceState:'CURRENT',stats:[]};}
  if(new Set(pack.vendors.map(v=>v.id)).size!==pack.vendors.length||new Set(pack.offers.map(o=>o.id)).size!==pack.offers.length)fail('duplicate IDs');
- const vendors=[...data.vendors],vendorIds=new Map(),stats=[],defaultsConsumed=hasVendorDefaultReceipt0550(data);
+ const vendors=[...data.vendors],vendorIds=new Map(),stats=[];
  let addedVendors=0;
  for(const v of pack.vendors){
   fields(v,['id','name','kind','reference']);
@@ -45,7 +45,7 @@ export function planVendorRegister0550(data,pack,systems){
   const byId=vendors.find(x=>x.id===v.id),byName=vendors.filter(x=>nameKey(x.name)===nameKey(v.name));
   if(byId&&nameKey(byId.name)!==nameKey(v.name)||byName.length>1)fail('supplier identity conflict / '+v.id);
   const existing=byId||byName[0];vendorIds.set(v.id,existing?.id||v.id);
-  const defaultDeleted=defaultsConsumed&&isVendorDefaultVendor0550(v.id)&&pack.offers.filter(o=>o.vendorId===v.id).every(o=>isVendorDefaultOffer0550(o.id)&&!data.offers.some(old=>old.id===o.id));
+  const defaultDeleted=hasVendorDefaultReceipt0550(data,v.id)&&isVendorDefaultVendor0550(v.id)&&pack.offers.filter(o=>o.vendorId===v.id).every(o=>isVendorDefaultOffer0550(o.id)&&!data.offers.some(old=>old.id===o.id));
   if(!existing&&!defaultDeleted){vendors.push(v);addedVendors++;}
  }
  const offers=[...data.offers],preserved=[];let addedOffers=0,existingOffers=0,updatedOffers=0;
@@ -53,7 +53,7 @@ export function planVendorRegister0550(data,pack,systems){
   if(!vendorIds.has(incoming.vendorId)||!incoming.quoteEvidence||incoming.mgwQuoteLineId)fail('quoted source evidence required');
   validateVendorQuoteEvidence0550(incoming.quoteEvidence,systems);
   validateSupplierQuoteRow0550(incoming);
-  const o={...incoming,vendorId:vendorIds.get(incoming.vendorId)},e=o.quoteEvidence;
+  const o={...incoming,vendorId:vendorIds.get(incoming.vendorId)},e=o.quoteEvidence,defaultsConsumed=hasVendorDefaultReceipt0550(data,o.id);
   if(o.supplierQuoteRow&&(o.supplierQuoteRow.sourceId!==e.sourceId||o.supplierQuoteRow.quantity!==e.quotedQuantity||o.supplierQuoteRow.quotedUnit!==e.quotedUnit))fail('source row identity differs from quotation evidence');
   const matches=offers.filter(old=>old.id===o.id||(old.vendorId===o.vendorId&&old.quoteRef===o.quoteRef&&old.quoteEvidence?.revision===e.revision&&old.quoteEvidence?.sourceSha256===e.sourceSha256&&old.quoteEvidence?.locator===e.locator));
   if(matches.length>1)fail('ambiguous quotation identity / '+o.id);

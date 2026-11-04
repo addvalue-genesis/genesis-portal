@@ -17,7 +17,7 @@ import {validateSourcePreparationImports0550} from "./sourceWorkspaceAuto0550";
 import {validateBidVolumes0550} from "./bidVolumes0550";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
 export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports"];
-export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m"];
+export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m","year"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
 export function newId(prefix){
  // UUIDs identify workspace records, never authentication or approvals. Preview

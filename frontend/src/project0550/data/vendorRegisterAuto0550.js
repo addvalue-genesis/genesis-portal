@@ -1,15 +1,16 @@
 // Same canonical vendors/offers + existing receipt/idempotency policy. No Working adoption.
 import {planVendorRegister0550} from './vendorRegister0550';
-import {vendorDefaultRegister0550,VENDOR_DEFAULT_SOURCE_BATCH_0550,pendingVendorDefaultCount0550} from './vendorDefaultCatalog0550';
+import {vendorDefaultCatalogs0550,pendingVendorDefaultCount0550} from './vendorDefaultCatalog0550';
 export const VENDOR_REGISTERS_SCHEMA_0550='genesis.0550.vendor-registers.v1';
 export const VENDOR_REGISTERS_LIMIT_0550=16*1024*1024+1024;
 export function prepareVendorDefaults0550(data,systems){
- // A prior real import, including subsequent deliberate deletions, wins.
- if((data.supplierRevisionImports||[]).some(r=>r.batchId===VENDOR_DEFAULT_SOURCE_BATCH_0550))return data;
- const pack=vendorDefaultRegister0550(),name=s=>s.trim().replace(/\s+/g,' ').toLowerCase();
- // Defaults cannot commandeer an existing ID edited to represent another source.
- if(pack.vendors.some(v=>data.vendors.some(old=>old.id===v.id&&name(old.name)!==name(v.name)))||pack.offers.some(o=>data.offers.some(old=>old.id===o.id&&(old.quoteRef!==o.quoteRef||old.quoteEvidence?.sourceSha256!==o.quoteEvidence.sourceSha256||old.quoteEvidence?.locator!==o.quoteEvidence.locator))))return data;
- return planVendorRegister0550(data,pack,systems).workspace;
+ let workspace=data;const name=s=>s.trim().replace(/\s+/g,' ').toLowerCase();
+ for(const {pack,sourceBatchId} of vendorDefaultCatalogs0550()){
+  if((workspace.supplierRevisionImports||[]).some(r=>r.batchId===sourceBatchId))continue;
+  if(pack.vendors.some(v=>workspace.vendors.some(old=>old.id===v.id&&name(old.name)!==name(v.name)))||pack.offers.some(o=>workspace.offers.some(old=>old.id===o.id&&(old.quoteRef!==o.quoteRef||old.quoteEvidence?.sourceSha256!==o.quoteEvidence.sourceSha256||old.quoteEvidence?.locator!==o.quoteEvidence.locator))))continue;
+  workspace=planVendorRegister0550(workspace,pack,systems).workspace;
+ }
+ return workspace;
 }
 export function planAutomaticVendorRegisters0550(data,bundle,systems){
  if(!bundle||bundle.schema!==VENDOR_REGISTERS_SCHEMA_0550||bundle.projectId!=='PJ2608-0550'||Object.keys(bundle).some(k=>!['schema','projectId','packages'].includes(k))||!Array.isArray(bundle.packages)||bundle.packages.length>100)throw Error('VENDOR_REGISTERS_INVALID');
@@ -38,11 +39,10 @@ export function vendorRegisterLoadMessage0550(code){
 }
 
 export function vendorRegisterSyncSuccess0550(plan,data){
- const pending=pendingVendorDefaultCount0550(data);
- return {state:pending?'PENDING':plan.changed?'APPLIED':plan.packages?'CURRENT':'EMPTY',
-  message:pending?`แสดง IDIE QO26163 ในทะเบียนตั้งต้นแล้ว · เรตราคาต้นฉบับ ${pending} รายการยัง OPEN · โปรแกรมจะตรวจต้นทางให้อัตโนมัติ`:plan.changed?`โหลด Vendor อัตโนมัติแล้ว · เพิ่ม ${plan.addedVendors} Vendor / ${plan.addedOffers} Offers · เติมเรตต้นฉบับ ${plan.updatedOffers} รายการ · ราคา Working คงเดิม`:plan.packages?'ชุด Vendor ที่เตรียมไว้ถูกนำเข้าทะเบียนแล้ว · คงรายการที่แก้ไขหรือลบไว้':'ใช้ทะเบียนที่บันทึกไว้ · ยังไม่มีชุด Vendor เพิ่มเติมในข้อมูลโครงการ'};
+ const pending=pendingVendorDefaultCount0550(data),message=plan.changed?`โหลด Vendor อัตโนมัติแล้ว · เพิ่ม ${plan.addedVendors} Vendor / ${plan.addedOffers} Offers · เติมเรตต้นฉบับ ${plan.updatedOffers} รายการ · ราคา Working คงเดิม`:plan.packages?'ชุด Vendor ที่เตรียมไว้ถูกนำเข้าทะเบียนแล้ว · คงรายการที่แก้ไขหรือลบไว้':'แสดงทะเบียนตั้งต้นแล้ว';
+ return {state:pending?'PENDING':plan.changed?'APPLIED':plan.packages?'CURRENT':'EMPTY',message:message+(pending?` · เรตราคาต้นฉบับ ${pending} รายการยัง OPEN · ตรวจต้นทางอัตโนมัติช่วงเปิดโครงการ`:'')};
 }
 export function vendorRegisterSyncFailure0550(code,data){
  const pending=pendingVendorDefaultCount0550(data);
- return {state:'UNAVAILABLE',code,message:(pending?`แสดง IDIE QO26163 ในทะเบียนตั้งต้นแล้ว · เรตราคาต้นฉบับ ${pending} รายการยัง OPEN · `:'')+vendorRegisterLoadMessage0550(code)};
+ return {state:'UNAVAILABLE',code,message:(pending?`แสดงทะเบียนตั้งต้นแล้ว · เรตราคาต้นฉบับ ${pending} รายการยัง OPEN · `:'')+vendorRegisterLoadMessage0550(code)};
 }
