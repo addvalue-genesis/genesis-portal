@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.2",
+  "version": "2026-11-05.3",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "7153fc10",
-  "capability": "Existing APF60m and ACP30m Working rows show original quotation items2–5, per-tower cost and the saved aggregate owner's E11/E12/E13 selling-policy results in THB. The existing aggregate row is explicitly the summary; its price is counted once. Detail must reconcile to all saved cost/sell/customer totals; changed/incomplete bases stay OPEN. No saved price/quantity/FX, financial owner, review, export or frozen-history change; strict Official remains separate."
+  "source0550": "0982c1b1",
+  "capability": "Existing tower rows lead with full original net supplier quotation cost and explicitly separate its A equipment / B services-delivery / C erection-civil portions. Selling columns are labelled Part A only. The legacy aggregate is outside the main two-row table in a collapsed existing-ID basis section. Original financial ownership, prices, quantities, FX, review/export/frozen history and strict Official remain unchanged."
 }

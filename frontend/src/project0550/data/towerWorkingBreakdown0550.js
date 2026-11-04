@@ -24,16 +24,22 @@ export function towerWorkingBreakdown0550(data,model){
   if(offers.some(o=>{const e=o.quoteEvidence;return !e||e.sourceId!==o.supplierQuoteRow.sourceId||e.quotedQuantity!==o.supplierQuoteRow.quantity||e.quotedCurrency!=='THB'||o.currency!=='THB'||o.unitCost!==e.quotedUnitCost||!Number.isFinite(e.quotedTotal)||e.quotedTotal<0||round(e.quotedQuantity*e.quotedUnitCost)!==e.quotedTotal;}))return closed('ราคาหรือจำนวนผู้ขายเปลี่ยนจากต้นฉบับ ต้องทบทวนฐานราคาเสา');
   if(new Set(offers.map(o=>o.quoteEvidence.sourceSha256)).size!==1)return closed('รายการเสามาจากต้นฉบับคนละฉบับ ต้องทบทวน');
   const cost=sum(offers.map(o=>o.quoteEvidence.quotedTotal));
+  const nets=data.offers.filter(o=>o.vendorId===owner.vendorId&&o.quoteRef===t.quoteRef&&o.supplierQuoteRow?.classification==='NET_PACKAGE');
+  const net=nets[0]?.quoteEvidence;
+  if(nets.length!==1||!net||net.quotedCurrency!=='THB'||!Number.isFinite(net.quotedTotal)||net.quotedTotal<cost||net.sourceSha256!==offers[0].quoteEvidence.sourceSha256)return closed('ยอดสุทธิทั้งใบหรือฉบับต้นทางยังไม่ชัดเจน ต้องทบทวน');
+  const portion=codes=>{const items=data.offers.filter(o=>o.vendorId===owner.vendorId&&o.quoteRef===t.quoteRef&&o.supplierQuoteRow?.classification==='BASE_PRICE'&&codes.includes(o.supplierQuoteRow.itemCode));return items.length===codes.length&&new Set(items.map(o=>o.supplierQuoteRow.itemCode)).size===codes.length&&items.every(o=>o.quoteEvidence?.sourceSha256===net.sourceSha256&&o.quoteEvidence.quotedCurrency==='THB')?sum(items.map(o=>o.quoteEvidence.quotedTotal)):null;};
+  const serviceTHB=portion(['1','6','7','8','14','15']),constructionTHB=portion(['9','10','11','12','13']);
+  if(Number.isFinite(serviceTHB)&&Number.isFinite(constructionTHB)&&sum([cost,serviceTHB,constructionTHB])!==net.quotedTotal)return closed('ผลรวมการจัดสรร A/B/C ไม่ตรงยอดสุทธิทั้งใบ ต้องทบทวนต้นฉบับ');
   const equation=owner.sellMode==='MARGIN'?'E12':'E11',input=owner.sellMode==='MARGIN'?{cost,margin:owner.marginPct/100}:{cost,markup:owner.markupPct/100};
   if(!Number.isFinite(owner.sellMode==='MARGIN'?owner.marginPct:owner.markupPct)||!Number.isFinite(owner.primePct))return closed('นโยบายราคาขายของเจ้าของราคารวมยังไม่ครบ');
   const sell=evaluateServiceEquation(equation,input).value,customer=evaluateServiceEquation('E13',{sell,primeMarkup:owner.primePct/100}).value;
   if(![cost,sell,customer].every(Number.isFinite))return closed('สูตรราคาขายเสายังไม่พร้อม');
   const prices={costTHB:cost,workingSellTHB:round(sell),customerTHB:round(customer),calculatedCustomerTHB:round(customer),provisionalCostNative:cost,provisionalSellNative:round(sell),provisionalCustomerNative:round(customer),currency:'THB'};
-  details.push({id:t.id,kind:'DETAIL',quoteRef:t.quoteRef,offerIds:offers.map(o=>o.id),sourceUrl:offers[0].quoteEvidence.sourceUrl,prices,equation,policy:owner.sellMode==='MARGIN'?`Margin ${owner.marginPct}%`:`Markup ${owner.markupPct}%`,primePct:owner.primePct});
+  details.push({id:t.id,kind:'DETAIL',quoteRef:t.quoteRef,quoteNetTHB:net.quotedTotal,serviceTHB,constructionTHB,offerIds:offers.map(o=>o.id),sourceUrl:offers[0].quoteEvidence.sourceUrl,prices,equation,policy:owner.sellMode==='MARGIN'?`Margin ${owner.marginPct}%`:`Markup ${owner.markupPct}%`,primePct:owner.primePct});
  }
  // Never fabricate a rounding residual or redistribute an authored total.
  if(!['costTHB','workingSellTHB','customerTHB'].every(k=>sum(details.map(d=>d.prices[k]))===price[k]))return closed('ยอดรายละเอียดจากต้นฉบับไม่ตรงยอดรวมที่บันทึกไว้ ต้องทบทวนราคา/การปัดเศษ');
  for(const d of details)rows.set(d.id,d);
  rows.set(ownerId,{kind:'SUMMARY',quoteRef:'2609.95.1 / 2609.95.2',prices:{},offerIds:details.flatMap(d=>d.offerIds)});
- return {rows,state:'READY',message:'สองแถว MR แสดงรายละเอียดราคาต่อเสาจาก Item2–5 · รวมอยู่ในแถวสรุปแล้ว ไม่บวกซ้ำในยอดกลุ่ม · บริการ/ติดตั้งอยู่ใน B/C'};
+ return {rows,state:'READY',message:'ต้นทุนผู้ขายแสดงยอดสุทธิทั้งใบ ก่อน VAT · ใต้ยอดแยกการจัดสรร A อุปกรณ์ / B บริการและจัดส่ง / C ติดตั้งและโยธา · ราคาขายสองคอลัมน์เป็นเฉพาะ Part A · ไม่บวกยอดต้นฉบับซ้ำกับ A/B/C'};
 }
