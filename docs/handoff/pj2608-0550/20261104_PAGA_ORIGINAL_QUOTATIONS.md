@@ -40,8 +40,9 @@ The legacy AP712 +1 uses the source rate from a4U original row; those are distin
 source/Working quantities. Summary1Lot is expressly a normalized pricing basis.
 Same item5010 means different products across revisions; no identity is collapsed.
 
-The JSON is saved separately and placed in the existing project
-90_SYSTEM_WORKING/DATA via connected Drive; metadata readback verifies its parent.
+The initial upload landed in a duplicate same-named90_SYSTEM_WORKING/DATA.
+Metadata confirmed that upload but did not establish the canonical Desktop source
+path. See the deployment correction below; that initial check was insufficient.
 Normal existing startup loads all prepared registers, not a newest-only quotation.
 No private source amounts/payloads are added to Git. Git pull installs code, then
 restart npm and let Drive sync supply the prepared private JSON; owner Windows
@@ -65,3 +66,27 @@ consumption has not been observed. No manual file selection is required.
   identity, canonical records and frozen history. No PAGA engineering acceptance,
   price adoption, customer issue or PR merge is implied. Full monorepo build
   chain was not rerun; bounded relevant validators and production build passed.
+
+## Deployment correction after owner screenshot
+
+Owner screenshot after pull shows the new Total Price column but only three
+legacy rows. Remote code HEAD is be463bb0, so the new UI is present while the
+prepared private register has not been consumed. Direct Drive parent/child
+inspection found two folders named90_SYSTEM_WORKING under the same project.
+The newly created4-Nov folder contained Vendor registers only; the original
+20-Aug folder/DATA contains the actually used Source Rev11 and A Rev07 packages.
+The initial upload was in the former rather than the established DATA directory.
+
+Moved the existing PAGA register into the original DATA next to those Source/A
+files, removing only its verified prior parent. Same File ID,138991 bytes and
+content retained; post-move metadata confirms the original DATA parent. No
+application code or saved browser workspace was changed for this correction.
+No further code pull/manual JSON import is needed for the move; after Desktop
+sync a page reload starts the existing automatic Vendor load. Actual owner
+Windows consumption remains unobserved. Only PAGA was moved in this task.
+
+For subsequent uploads, enumerate project children and verify the DATA identity
+against the existing Source/A filenames; matching folder names and a successful
+upload alone are insufficient. Do not create another folder or delete duplicates
+without reconciling their other contents. This is a documentation/deployment
+correction under ADR principles1,2,9–11, not additional pricing/engineering work.

@@ -1,3 +1,5 @@
+Deployment correction: owner screenshot has new Total Price column but old3 PAGA rows. Found duplicate90_SYSTEM_WORKING folders and moved the existing PAGA JSON into original DATA next to actual Source Rev11/A Rev07; same File ID/content, parent verified. No new code or extra pull required for this move; Desktop sync/reload consumption unconfirmed. See [PAGA original quotations checkpoint](20261104_PAGA_ORIGINAL_QUOTATIONS.md#deployment-correction-after-owner-screenshot).
+
 Latest: [both original PAGA quotations with native row quantities/prices](20261104_PAGA_ORIGINAL_QUOTATIONS.md) — UI2026-11-04.7. Existing private Vendor DATA auto-loader;2 quotation identities/80 Offer IDs, no Working price adoption; owner Windows consumption unverified.
 
 Latest: [default Vendor presence independent of Drive and automatic rate completion](20261104_VENDOR_DEFAULT_PRESENCE.md), UI2026-11-04.6, parent7497a0f1. No Load/import click; private rates remain OPEN until read; unchanged Working/FX/history and stable IDs.
