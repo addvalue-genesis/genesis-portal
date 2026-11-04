@@ -31,9 +31,9 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],f=/^\/(
  await page.getByRole('navigation',{name:'PJ2608-0550 sections'}).getByRole('button',{name:'Quotation',exact:true}).click();
  await page.locator('.p55-technical-tabs').getByRole('button',{name:'11.M Schedule allocation',exact:true}).click();
  const trace=page.getByRole('table',{name:'Exhibit C allocation',exact:true}),reconcile=page.getByRole('table',{name:'Official to Schedule reconciliation',exact:true});
- await trace.waitFor();const crossBefore=await read();assert.equal(await reconcile.locator('tbody tr').count(),2);
+ await trace.waitFor();const crossBefore=await read();assert.equal(await reconcile.locator('tbody tr').count(),2);assert((await reconcile.innerText()).toUpperCase().includes('WORKING'));
  assert.equal(await page.getByLabel('Schedule allocation filter',{exact:true}).inputValue(),'OPEN');
- await page.getByLabel('Schedule allocation filter',{exact:true}).selectOption('B7_B9');assert.equal(await trace.locator('tbody tr').count(),13);
+ await page.getByLabel('Schedule allocation filter',{exact:true}).selectOption('B7_B9');assert.equal(await trace.locator('tbody tr').count(),13);assert((await page.locator('[data-component-key="bid.quotation.mapping"]').innerText()).includes('32,001.71'));
  assert((await trace.innerText()).includes('CALL-OFF'));assert((await trace.innerText()).includes('ค่าธรรมเนียม'));assert((await trace.innerText()).includes('CLARIFICATION'));
  const scopeRow=trace.locator('[data-allocation-line="REQ-MR-ACT-B7-D01"]');
  await scopeRow.locator('td').nth(1).locator('summary').click();assert(await scopeRow.getByRole('button',{name:'Site survey',exact:true}).count());

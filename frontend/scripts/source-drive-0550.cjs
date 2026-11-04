@@ -8,8 +8,8 @@ const VENDOR_ENDPOINT = '/api/local/pj2608-0550/vendor-registers';
 const MAX_VENDOR_BYTES = 4 * 1024 * 1024, MAX_VENDOR_RESPONSE_BYTES = 16 * 1024 * 1024;
 const MAX_BYTES = 32 * 1024 * 1024;
 // Exact predecessor snapshots are retained in the next reading continuation.
-// Bound preparation separately; source-only and paired-response limits stay fixed.
-const MAX_PREPARATION_BYTES = 40 * 1024 * 1024;
+// Bound preparation separately; source-only32 MiB and Vendor limits stay fixed.
+const MAX_PREPARATION_BYTES = 48 * 1024 * 1024;
 const PROJECT = /^PJ2608-0550(?:[ _-]|$)/;
 const FILENAME = /^PJ2608-0550_Source_Intake_Rev\d+_\d{8}\.json$/;
 const PREPARATION_FILE = /^PJ2608-0550_A_Work_Package_(?:Rev\d+_)?\d{8}\.json$/;

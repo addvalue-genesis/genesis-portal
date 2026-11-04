@@ -52,7 +52,7 @@ export async function fetchAutomaticSourceWorkspace0550(fetcher=fetch){
   // Older local bridges can still load source-only data; no manual import flow.
   if(!response.headers.get('content-type')?.includes('application/json'))return {schema:SCHEMA,sourceIntake:await fetchAutomaticSource(fetcher),aWorkPackage:null};
   if(!response.ok){const error=await response.json();throw Error(error.code||'SOURCE_BRIDGE_UNAVAILABLE');}
-  const limit=64*1024*1024+1024;
+  const limit=80*1024*1024+1024;
   if(Number(response.headers.get('content-length'))>limit)fail('SOURCE_FILE_TOO_LARGE');
   const text=await response.text();if(new Blob([text]).size>limit)fail('SOURCE_FILE_TOO_LARGE');
   return JSON.parse(text);

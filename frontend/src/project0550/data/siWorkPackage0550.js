@@ -24,9 +24,9 @@ export function preparationAncestors0550(pack){
 // the original predecessor objects/hashes for receipt and edit comparisons.
 function rebasedPreparation(pack,source){return {...pack,sourceBatchId:source.batchId,sourceBasisKey:sourcePackageBasis0550(source),...(pack.predecessor?{predecessor:rebasedPreparation(pack.predecessor,source)}:{})};}
 export const sourcePackageBasis0550=intake=>integrationFingerprint0550(intake);
-// Retain exact predecessor receipts within a bounded 40 MiB continuation.
-// Automatic source+preparation responses remain capped at 64 MiB + 1024 bytes.
-export const SI_FILE_LIMIT_0550=40*1024*1024;
+// Retain exact predecessor receipts within a bounded 48 MiB continuation.
+// Automatic source+preparation responses remain capped at 80 MiB + 1024 bytes.
+export const SI_FILE_LIMIT_0550=48*1024*1024;
 const collections=Object.keys(emptyIntegration0550()).filter(k=>k!=="schema");
 const fail=m=>{throw Error("SI work package: "+m);};
 const keys=(o,allowed)=>{if(!o||typeof o!=="object"||Array.isArray(o)||Object.keys(o).some(k=>!allowed.includes(k)))fail("unsupported fields");};

@@ -66,7 +66,9 @@ export function scheduleCrosswalk0550(data,model,savedView,displayView=savedView
   const option=treatment==='OPTION',expected=option?model.official.optionsUSD:model.official.baseUSD,allocated=option?savedView.optionsAssigned:savedView.baseAssigned;
   const difference=Number.isFinite(expected)&&Number.isFinite(allocated)?roundMoney0550(allocated-expected):null;
   const active=savedView.active.filter(l=>l.wbs.startsWith('C')===option);
-  return {treatment,expected,allocated,difference,state:difference===null?'OPEN':difference===0?'AMOUNTS_MATCH':'DIFFERENCE',
+  const selected=rows.filter(r=>r.scope==='SELECTED'&&r.raw.wbs.startsWith('C')===option);
+  const workingKnownUSD=sumMoney0550(selected.filter(r=>Number.isFinite(r.workingUSD)).map(r=>r.workingUSD));
+  return {treatment,workingKnownUSD,workingPriced:selected.filter(r=>Number.isFinite(r.workingUSD)).length,workingOpen:selected.filter(r=>!Number.isFinite(r.workingUSD)).length,expected,allocated,difference,state:difference===null?'OPEN':difference===0?'AMOUNTS_MATCH':'DIFFERENCE',
    unallocatedIds:savedView.unallocated.filter(l=>l.wbs.startsWith('C')===option).map(l=>l.id),
    openPriceIds:active.filter(l=>!Number.isFinite(l.customerUSD)).map(l=>l.id)};
  });

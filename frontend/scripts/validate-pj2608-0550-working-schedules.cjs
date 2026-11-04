@@ -37,7 +37,7 @@ try{
  // The existing 11.M grid now explains canonical links and reconciliation.
  const crossBefore=JSON.stringify(partial),pm=derive(partial),sv=saved(partial),cross=P.scheduleCrosswalk0550(partial,pm,sv,pv);
  const traced=cross.rows.find(r=>r.id==='TEST-MGW-CCTV');
- assert.equal(traced.workingUSD,line.provisionalCustomerUSD);assert.equal(traced.officialUSD,null);assert(traced.needsAttention);assert(traced.shown.suggested);assert(!traced.binding);
+ assert.equal(cross.reconciliation[0].workingKnownUSD,line.provisionalCustomerUSD);assert.equal(cross.reconciliation[0].workingPriced,1);assert.equal(cross.reconciliation[0].workingOpen,1);assert.equal(traced.workingUSD,line.provisionalCustomerUSD);assert.equal(traced.officialUSD,null);assert(traced.needsAttention);assert(traced.shown.suggested);assert(!traced.binding);
  assert.equal(cross.reconciliation.find(r=>r.treatment==='BASE').state,'OPEN','Two null totals never pass reconciliation');
  assert.equal(JSON.stringify(partial),crossBefore);
  const bm=derive(base),bv=saved(base),readyCross=P.scheduleCrosswalk0550(base,bm,bv);
@@ -57,6 +57,7 @@ try{
  assert.equal(included.scope,'INCLUDED');assert.equal(included.ownerId,'TEST-OWNER');assert.equal(included.workingUSD,null,'Included details never display additive amounts');
  const priceModel=structuredClone(pm);priceModel.lines.find(l=>l.id==='TEST-MGW-CCTV').customerUSD=null;priceModel.lines.find(l=>l.id==='TEST-MGW-CCTV').provisionalCustomerUSD=0;
  assert.equal(P.scheduleCrosswalk0550(partial,priceModel,sv,pv).rows.find(r=>r.id==='TEST-MGW-CCTV').workingUSD,0);
+ assert.equal(P.scheduleCrosswalk0550(partial,priceModel,sv,pv).reconciliation[0].workingKnownUSD,0,'A known zero is distinct from an empty priced set');
  const removed=structuredClone(seeds);removed.lines=removed.lines.filter(l=>l.id!==focus[0].id);const rm=derive(removed),rv=V.deriveBidVolumes0550(removed,rm,D.SYSTEMS,today);
  assert(!P.scheduleCrosswalk0550(removed,rm,rv).rows.some(r=>r.id===focus[0].id),'No deleted line is recreated');
  const React=require('react'),{renderToStaticMarkup}=require('react-dom/server'),{ScheduleAllocationCrosswalk0550}=require(root+'/project0550/WorkingSchedulePreview0550.jsx');
