@@ -1,3 +1,5 @@
+Latest: [0550 explicit quotation reference and exact artifact archive](20261104_QUOTATION_BASELINE_AND_EXACT_ARTIFACTS.md), UI2026-11-04.4, parent d641c9f0. Common PR56 reused; no financial adoption, new Module ID, merge or customer issue.
+
 Latest Vendor checkpoint: [existing cost register / QO26163 / both grouping directions](20261104_VENDOR_REGISTER_GROUPING.md), UI 2026-11-04.3. No new screen or financial adoption; private JSON uses the existing import surface.
 
 Latest C1 overview: [collapsed Appendix USD subtotals and readonly preservation](20261104_C1_COLLAPSED_APPENDIX_TOTALS.md), UI `2026-11-04.2`. The collapsed header shows one-owner USD totals in Total Price, marked Priced items subtotal when incomplete. Existing IDs/colours/+−, strict totals, financial inputs and native/frozen outputs stay governed. Read before earlier C1 checkpoints.

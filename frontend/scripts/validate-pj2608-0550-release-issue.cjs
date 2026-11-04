@@ -53,6 +53,16 @@ const topology=clone(d);topology.nodes.push({id:'NODE',systemToken:'TEL-PAGA',si
 const unrelated=clone(d);unrelated.nodes.push({id:'OTHER',systemToken:'TEL-CCTV',site:'TEST',label:'Unrelated',kind:'EQUIPMENT',sourceRef:'TEST'});assert.equal(I.integrationRecordBasis0550(unrelated,'requirements',w.requirements.at(-1)),originalKey);
 const bytes=X.buildOfficialCustomerXlsx(derive(frozen.releaseRegister.issues[0].snapshot).official,frozen.releaseRegister.issues[0]);assert(Buffer.from(bytes).toString().includes('COMMERCIAL PROPOSAL'));assert(!Buffer.from(bytes).toString().includes('TEST AUTH ONLY'),'Internal authorization evidence is not customer output');
 assert.throws(()=>X.buildOfficialCustomerXlsx(derive(changed).official,frozen.releaseRegister.issues[0]),/differs/);assert.deepEqual(X.buildOfficialCustomerXlsx(null,frozen.releaseRegister.issues[0]),bytes,'Frozen export reads stored columns and values without rerunning future calculation policy');
-if(process.env.PJ0550_RELEASE_RESTAMP){const f=process.env.PJ0550_RELEASE_RESTAMP,z=JSON.parse(fs.readFileSync(f));for(const l of z.lines)if(l.officialReview)l.officialReview.basisKey=P.officialLineBasisKey(z,l);for(const r of z.customerReviews)r.basisKey=P.customerScopeBasisKey(z,r.code,r);validate(z);assert(derive(z).official.scopeReviewed);fs.writeFileSync(f,JSON.stringify(z));}
+if(process.env.PJ0550_RELEASE_RESTAMP){
+ const f=process.env.PJ0550_RELEASE_RESTAMP,z=JSON.parse(fs.readFileSync(f));
+ // Synthetic basis already chosen; observe current preparation versions without
+ // importing project rates/estimates during browser startup. Real gates remain.
+ const A=require(root+'/project0550/data/tsiActivityBudget0550.js');
+ z.repositoryBasisImport={...z.repositoryBasisImport,eurThbConversionVersion:Repo.EUR_THB_WORKING_BASIS_0550.version,
+  tsiActivityBudget:{version:A.TSI_ACTIVITY_BUDGET_VERSION_0550,preparedOn:today,updatedLineIds:[],calculationIds:[],conflicts:[],expenseVersion:A.TSI_EXPENSE_BUDGET_VERSION_0550,expenseLineIds:[],expenseConflicts:[]}};
+ for(const l of z.lines)if(l.officialReview)l.officialReview.basisKey=P.officialLineBasisKey(z,l);
+ for(const r of z.customerReviews)r.basisKey=P.customerScopeBasisKey(z,r.code,r);
+ validate(z);assert(derive(z).official.scopeReviewed);fs.writeFileSync(f,JSON.stringify(z));
+}
 if(process.env.PJ0550_RELEASE_FIXTURE)fs.writeFileSync(process.env.PJ0550_RELEASE_FIXTURE,JSON.stringify(d));
 console.log('PASS controlled commercial issue: real all-scope synthetic readiness; E06 day pricing; quantity-unit rejection; topology/Official staleness; authorization, immutable snapshots, append-only history, future/missing-evidence rejection, recorded transmittal, unchanged frozen price after Working edit, native frozen XLSX.');

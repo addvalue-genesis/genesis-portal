@@ -1796,3 +1796,11 @@ details[open]>summary>.p55-vnd-toggle>span:last-child{display:inline}
 .p55-vnd-groups td{overflow-wrap:anywhere}
 .p55-vnd-groups .p55-review-toolbar{flex-wrap:wrap}
 .p55-vnd-groups button[aria-pressed=true]{background:#00556b;color:#fff}
+
+.p55-quotation-baseline{min-width:0;max-width:100%;overflow-wrap:anywhere}
+.p55-quotation-baseline input,.p55-quotation-baseline select,.p55-quotation-baseline button{max-width:100%}
+.p55-quotation-baseline .p55-bid-fields{grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr))}
+.p55-quotation-baseline label{display:flex;flex-direction:column;gap:6px;min-width:0}
+.p55-quotation-baseline input,.p55-quotation-baseline select{width:100%;min-width:0;box-sizing:border-box}
+.p55-quotation-baseline button{max-width:calc(100% - 8px);white-space:normal;overflow-wrap:anywhere}
+.p55-quotation-baseline code{white-space:normal;overflow-wrap:anywhere}

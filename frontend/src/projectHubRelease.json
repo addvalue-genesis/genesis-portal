@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.3",
+  "version": "2026-11-04.4",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "2d4ee1c2",
-  "capability": "Existing VND 07.2 switches company-to-system / system-to-company views of canonical offers. Existing SI import registers standalone supplier rates/options with original units, conditions and version/hash identity; preserves selected Working prices, source authority, edits/deletions and frozen history."
+  "source0550": "d641c9f0",
+  "capability": "Existing Release10.7 uses shared Common explicit quotation references and exact original/export artifact bytes with SHA-256, append-only browser archive and guarded portable backup. Working, native templates, prices/quantity/FX, legacy issue history and Module IDs are preserved; selection/download is not sending or customer acceptance."
 }

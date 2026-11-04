@@ -166,7 +166,7 @@ export const MODULE_REGISTRY = [
     why: "Budgetary/preliminary output must not be mistaken for final contractual release.",
     inputs: ["Closed engineering/commercial gates", "Release authorization"],
     outputs: ["RELEASED_SELL"],
-    implementation: ["Budget → Released Customer Output UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/exportOriginalPriceForm.js", "frontend/src/project0550/exhibitCNative0550.js", "frontend/src/project0550/data/bidPackageOutput0550.js", "frontend/src/project0550/data/releaseIssue0550.js"],
+    implementation: ["Budget → Released Customer Output UI", "frontend/src/project0550/BidCommercialWorkspace.jsx", "frontend/src/project0550/exportOriginalPriceForm.js", "frontend/src/project0550/exhibitCNative0550.js", "frontend/src/project0550/data/bidPackageOutput0550.js", "frontend/src/project0550/data/releaseIssue0550.js", "frontend/src/project0550/QuotationBaselineControls0550.jsx", "frontend/src/project0550/data/quotationBaseline0550.js", "frontend/src/common/governance/quotationBaseline.js", "frontend/src/common/governance/quotationBaselineStore.js"],
     invariants: ["Remain HOLD until controlled release criteria are satisfied."]
   },
   {
