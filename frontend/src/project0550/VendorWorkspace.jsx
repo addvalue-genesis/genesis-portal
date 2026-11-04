@@ -8,7 +8,7 @@ import {COMMERCIAL_SOURCES} from "./data";
 import {Module,Field,Select,Save,amount} from "./BidControls";
 import {ComponentCopyId} from "../common/ui/ComponentCopyId";
 export function VendorWorkspace(){
- const {data,put,busy}=useBidWorkspace();
+ const {data,put,busy,vendorSync}=useBidWorkspace();
  const [vendor,setVendor]=useState({id:"",name:"",kind:"SUPPLIER",reference:""});
  const blankOffer={id:"",vendorId:"",description:"",brand:"",quoteRef:"",sourceRef:"",date:"",validUntil:"",currency:"THB",unit:"MD",unitCost:null};
  const [offer,setOffer]=useState(blankOffer);
@@ -16,6 +16,7 @@ export function VendorWorkspace(){
  const setV=(k,v)=>setVendor(x=>({...x,[k]:v})),setO=(k,v)=>setOffer(x=>({...x,[k]:v}));
  return <div className="p55-stack p55-vendor-workspace">
  <Module id="bid.vendor.master" title="07.1 Vendor / Service Provider">
+ {vendorSync&&<p role="status" aria-label="Vendor register loaded status">{vendorSync.message}</p>}
  <p>ราคาเดิมที่นำเข้า: {data.vendorBasisImport?.importedLineIds.length||0} รายการ · รอปรับปรุงราคาใหม่ · วันที่/Validity ที่ไม่ทราบคงว่างตามหลักฐาน</p>
  <p>MGW Q26-063: {data.offers.filter(mgwQuoteItem0550).length} รายการ · {data.mgwQuoteImport?.conflicts.join(" · ")||"นำเข้าเพื่อเลือกตรวจราคา — ไม่แทนผู้ขายเดิมอัตโนมัติ"}</p>
  <p>ผู้ขายหนึ่งรายมีหลายใบเสนอราคา/เรตได้ แยกต้นทุนจากราคาขาย และเลือกเรตไปใช้ใน Working โดยอ้างอิง Offer ID</p>

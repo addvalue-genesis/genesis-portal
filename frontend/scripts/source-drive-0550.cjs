@@ -4,6 +4,8 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const ENDPOINT = '/api/local/pj2608-0550/source-intake';
 const WORKSPACE_ENDPOINT = '/api/local/pj2608-0550/source-workspace';
+const VENDOR_ENDPOINT = '/api/local/pj2608-0550/vendor-registers';
+const MAX_VENDOR_BYTES = 4 * 1024 * 1024, MAX_VENDOR_RESPONSE_BYTES = 16 * 1024 * 1024;
 const MAX_BYTES = 32 * 1024 * 1024;
 // Exact predecessor snapshots are retained in the next reading continuation.
 // Bound preparation separately; source-only and paired-response limits stay fixed.
@@ -11,6 +13,8 @@ const MAX_PREPARATION_BYTES = 40 * 1024 * 1024;
 const PROJECT = /^PJ2608-0550(?:[ _-]|$)/;
 const FILENAME = /^PJ2608-0550_Source_Intake_Rev\d+_\d{8}\.json$/;
 const PREPARATION_FILE = /^PJ2608-0550_A_Work_Package_(?:Rev\d+_)?\d{8}\.json$/;
+const VENDOR_FILE = /^PJ2608-0550_[A-Za-z0-9_-]*Vendor_Register_(?:Rev\d+_)?\d{8}\.json$/;
+const canonical=value=>JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
 const batchKey = value => {
   const m = /^PJ2608-0550-SOURCE-INTAKE-REV(\d+)-(\d{8})$/.exec(value || '');
   return m && {revision:Number(m[1]),date:m[2]};
@@ -107,6 +111,31 @@ async function loadDriveSourceWorkspace(options){
  if(chosen&&matches.some(r=>r.intake.batchId===chosen.intake.batchId&&r.hash!==chosen.hash))throw fail('A_PREPARATION_CONFLICT',409);
  return JSON.stringify({schema:'genesis.0550.source-workspace.v1',sourceIntake:latest.intake,aWorkPackage:chosen?.intake||null});
 }
+// Vendor evidence is independent of the CUS/A batch. Read every prepared quote,
+// not just a newest date; existing importer controls revisions and preserves edits.
+async function loadDriveVendorRegisters(options){
+ const projects=await discoverProjects(options),files=[];
+ for(const project of projects){
+  const dir=path.join(project,'90_SYSTEM_WORKING','DATA');let entries;
+  try{entries=await fs.readdir(dir,{withFileTypes:true});}catch(e){if(e.code==='ENOENT')continue;throw fail('DRIVE_UNREADABLE');}
+  files.push(...entries.filter(e=>e.isFile()&&VENDOR_FILE.test(e.name)).map(e=>path.join(dir,e.name)));
+ }
+ if(!projects.length)throw fail('VENDOR_REGISTER_NOT_FOUND',404);
+ if(files.length>100)throw fail('VENDOR_REGISTER_FILE_LIMIT');
+ const packages=new Map();let total=0;
+ for(const file of files.sort()){
+  let row;try{row=await readJson(file,MAX_VENDOR_BYTES);}catch(e){throw fail(e.code?.replace(/^SOURCE_/,'VENDOR_REGISTER_')||'DRIVE_UNREADABLE',e.status||503);}
+  const p=row.intake;
+  if(!p||p.schema!=='genesis.0550.vendor-register.v1'||p.projectId!=='PJ2608-0550'||typeof p.batchId!=='string'||!/^\w[\w.-]{0,99}$/.test(p.batchId)||typeof p.preparedOn!=='string'||!/^\d{4}-\d{2}-\d{2}$/.test(p.preparedOn)||!Number.isFinite(Date.parse(p.preparedOn))||new Date(p.preparedOn).toISOString().slice(0,10)!==p.preparedOn||!Array.isArray(p.vendors)||!Array.isArray(p.offers))throw fail('VENDOR_REGISTER_FILE_INVALID');
+  const body=canonical(p),prior=packages.get(p.batchId);
+  if(prior&&prior.body!==body)throw fail('VENDOR_REGISTER_BATCH_CONFLICT',409);
+  if(!prior){total+=Buffer.byteLength(body);if(total>MAX_VENDOR_RESPONSE_BYTES)throw fail('VENDOR_REGISTER_FILE_TOO_LARGE');packages.set(p.batchId,{body,pack:p});}
+ }
+ const ordered=[...packages.values()].map(r=>r.pack).sort((a,b)=>a.preparedOn.localeCompare(b.preparedOn)||a.batchId.localeCompare(b.batchId));
+ const body=JSON.stringify({schema:'genesis.0550.vendor-registers.v1',projectId:'PJ2608-0550',packages:ordered});
+ if(Buffer.byteLength(body)>MAX_VENDOR_RESPONSE_BYTES+1024)throw fail('VENDOR_REGISTER_FILE_TOO_LARGE');
+ return body;
+}
 function permitted(req) {
   if(!['127.0.0.1','::1','::ffff:127.0.0.1'].includes(req.socket?.remoteAddress))return false;
   try {
@@ -117,18 +146,18 @@ function permitted(req) {
     return true;
   }catch{return false;}
 }
-function createMiddleware(loader=()=>loadDriveIntake(),workspaceLoader=()=>loadDriveSourceWorkspace()) {
+function createMiddleware(loader=()=>loadDriveIntake(),workspaceLoader=()=>loadDriveSourceWorkspace(),vendorLoader=()=>loadDriveVendorRegisters()) {
   const pending=new Map();
   return async(req,res,next)=>{
     const endpoint=req.url.split('?')[0];
-    if(![ENDPOINT,WORKSPACE_ENDPOINT].includes(endpoint))return next();
+    if(![ENDPOINT,WORKSPACE_ENDPOINT,VENDOR_ENDPOINT].includes(endpoint))return next();
     res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type','application/json; charset=utf-8');res.setHeader('X-Content-Type-Options','nosniff');
     if(!permitted(req)){res.statusCode=403;return res.end(JSON.stringify({code:'LOCAL_ACCESS_ONLY'}));}
     if(req.method!=='GET'){res.statusCode=405;return res.end(JSON.stringify({code:'METHOD_NOT_ALLOWED'}));}
     try {
-      if(!pending.has(endpoint))pending.set(endpoint,(endpoint===ENDPOINT?loader:workspaceLoader)().finally(()=>pending.delete(endpoint)));
+      if(!pending.has(endpoint))pending.set(endpoint,(endpoint===ENDPOINT?loader:endpoint===WORKSPACE_ENDPOINT?workspaceLoader:vendorLoader)().finally(()=>pending.delete(endpoint)));
       res.end(await pending.get(endpoint));
     }catch(e){res.statusCode=e.status||503;res.end(JSON.stringify({code:e.status?e.code:'DRIVE_UNREADABLE'}));}
   };
 }
-module.exports={ENDPOINT,WORKSPACE_ENDPOINT,MAX_BYTES,MAX_PREPARATION_BYTES,batchKey,discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,createMiddleware,permitted};
+module.exports={ENDPOINT,WORKSPACE_ENDPOINT,VENDOR_ENDPOINT,MAX_BYTES,MAX_PREPARATION_BYTES,MAX_VENDOR_BYTES,MAX_VENDOR_RESPONSE_BYTES,batchKey,discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,loadDriveVendorRegisters,createMiddleware,permitted};

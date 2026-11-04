@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.4",
+  "version": "2026-11-04.5",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "d641c9f0",
-  "capability": "Existing Release10.7 uses shared Common explicit quotation references and exact original/export artifact bytes with SHA-256, append-only browser archive and guarded portable backup. Working, native templates, prices/quantity/FX, legacy issue history and Module IDs are preserved; selection/download is not sending or customer acceptance."
+  "source0550": "ed26995d",
+  "capability": "Automatically load prepared Vendor registers from private project DATA through the existing local bridge into existing07.1/07.2; no manual JSON import. Keep every quotation revision, native rates/terms, edits/deletions, Working prices/quantity/FX, IDs/colours and frozen history."
 }

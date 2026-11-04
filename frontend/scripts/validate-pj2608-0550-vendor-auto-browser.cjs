@@ -1,0 +1,34 @@
+// Open/reload only: no file chooser, manual import, user profile or external sending.
+const assert=require('node:assert/strict'),fs=require('node:fs/promises'),path=require('node:path'),os=require('node:os'),http=require('node:http'),{chromium}=require('playwright');
+const root=path.resolve(__dirname,'..'),bridge=require('./source-drive-0550.cjs');
+async function main(){
+ const temp=await fs.mkdtemp(path.join(os.tmpdir(),'0550-vendor-auto-browser-')),project=path.join(temp,'PJ2608-0550 Synthetic'),dir=path.join(project,'90_SYSTEM_WORKING','DATA');await fs.mkdir(dir,{recursive:true});
+ const pack=process.env.PJ0550_VENDOR_REGISTER_FILE?JSON.parse(await fs.readFile(process.env.PJ0550_VENDOR_REGISTER_FILE,'utf8')):require('./fixtures/0550-vendor-register.cjs').vendorRegisterFixture0550();
+ const options={roots:[temp]},middleware=bridge.createMiddleware(()=>bridge.loadDriveIntake(options),()=>bridge.loadDriveSourceWorkspace(options),()=>bridge.loadDriveVendorRegisters(options));let browser;
+ const server=http.createServer((req,res)=>middleware(req,res,async()=>{try{const u=req.url.split('?')[0],asset=/^\/(?:bundle|\d+(?:\.bundle)?)\.(?:js|css)$/.test(u),file=asset?path.join(root,'dist',u):path.join(root,'public/index.html');res.setHeader('Content-Type',file.endsWith('.js')?'text/javascript':file.endsWith('.css')?'text/css':'text/html');res.end(await fs.readFile(file));}catch{res.statusCode=404;res.end();}}));
+ try{
+  await new Promise(r=>server.listen(0,'127.0.0.1',r));browser=await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_EXECUTABLE_PATH||undefined,args:['--no-sandbox','--disable-dev-shm-usage','--disable-webgl','--no-zygote','--single-process']});
+  const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];page.on('pageerror',e=>errors.push(e.message));page.setDefaultTimeout(45000);
+  const url='http://127.0.0.1:'+server.address().port+'/projects/pj2608-0550';
+  const read=()=>page.evaluate(()=>new Promise((resolve,reject)=>{const q=indexedDB.open('GENESIS-PJ2608-0550-BIDDING',1);q.onsuccess=()=>{const db=q.result,tx=db.transaction('workspace'),r=tx.objectStore('workspace').get('active');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);tx.oncomplete=()=>db.close();};}));
+  const jump=async id=>{const s=page.getByLabel('Project Module Search');await s.fill(id);await s.press('Enter');};
+  const ready=()=>page.locator('.p55-bid-save').filter({hasText:/Revision \d/}).waitFor();
+  await page.goto(url);await ready();await jump('bid.vendor.master');const status=page.getByLabel('Vendor register loaded status',{exact:true});await status.filter({hasText:'ยังไม่มีชุด Vendor เพิ่มเติม'}).waitFor();const before=await read();
+  await fs.writeFile(path.join(dir,'PJ2608-0550_IDIE_QO26163_Vendor_Register_20261104.json'),JSON.stringify(pack));
+  await page.reload();await ready();await jump('bid.vendor.master');await status.filter({hasText:'โหลด Vendor อัตโนมัติแล้ว'}).waitFor();await page.locator('[data-component-key="bid.vendor.'+pack.vendors[0].id+'"]').waitFor();
+  const registered=await read();assert.equal(registered.vendors.length,before.vendors.length+1);assert.equal(registered.offers.length,before.offers.length+4);
+  for(const key of Object.keys(before).filter(k=>!['vendors','offers','supplierRevisionImports','revision','audit'].includes(k)))assert.deepEqual(registered[key],before[key],'Preserve entire '+key);
+  assert.deepEqual(registered.vendors.slice(0,before.vendors.length),before.vendors);assert.deepEqual(registered.offers.slice(0,before.offers.length),before.offers);
+  assert(registered.supplierRevisionImports.some(r=>r.batchId===pack.batchId));assert.equal(registered.revision,before.revision+1);assert.deepEqual(registered.offers.slice(-4).map(o=>o.unitCost),pack.offers.map(o=>o.unitCost));
+  await jump('bid.vendor.offers');const registry=page.getByLabel('Vendor cost register'),open=async el=>{if(!await el.evaluate(e=>e.open))await el.locator(':scope > summary').click();};
+  const company=registry.locator('[data-vnd-group="'+pack.vendors[0].id+'"]');await open(company);const system=company.locator('[data-vnd-subgroup="TEL-PAGA"]');await open(system);await open(system.locator('.p55-vnd-quote').first());assert.equal(await system.locator('tr[data-vnd-offer]').count(),4);assert((await company.innerText()).includes(pack.offers[0].quoteRef));
+  await registry.getByRole('button',{name:'ระบบ → บริษัท',exact:true}).click();const sys=registry.locator('[data-vnd-group="TEL-PAGA"]');await open(sys);const v=sys.locator('[data-vnd-subgroup="'+pack.vendors[0].id+'"]');await open(v);await open(v.locator('.p55-vnd-quote').first());assert.equal(await v.locator('tr[data-vnd-offer]').count(),4);assert.deepEqual(await read(),registered,'Both grouping views read canonical imported records without writes');
+  await page.reload();await ready();await jump('bid.vendor.master');await status.filter({hasText:'ชุด Vendor ที่เตรียมไว้ถูกนำเข้าทะเบียนแล้ว'}).waitFor();assert.deepEqual(await read(),registered,'Automatic reload preserves exact workspace, revision and receipt');
+  // Consume once, then a deliberate local deletion must survive automatic reload.
+  const deleted=structuredClone(registered);deleted.offers=deleted.offers.filter(o=>o.id!==pack.offers[1].id);
+  await page.evaluate(d=>new Promise(resolve=>{const q=indexedDB.open('GENESIS-PJ2608-0550-BIDDING',1);q.onsuccess=()=>{const db=q.result,t=db.transaction('workspace','readwrite');t.objectStore('workspace').put(d,'active');t.oncomplete=()=>{db.close();resolve();};};}),deleted);
+  await page.reload();await ready();await jump('bid.vendor.master');await status.filter({hasText:'ชุด Vendor ที่เตรียมไว้ถูกนำเข้าทะเบียนแล้ว'}).waitFor();assert.deepEqual(await read(),deleted,'No refilling deleted offers after receipt');
+  assert.deepEqual(errors,[]);console.log('PASS Vendor auto browser: real DATA/loopback HTTP/app startup/IndexedDB without file chooser;1 company/4 actual offers; both existing views; all old financial/source/history data preserved; reload no duplicate/save; deliberate deletion retained; no page errors.');
+ }finally{if(browser)await browser.close();await new Promise(r=>server.close(r));await fs.rm(temp,{recursive:true,force:true});}
+}
+main().catch(e=>{console.error(e);process.exitCode=1;});

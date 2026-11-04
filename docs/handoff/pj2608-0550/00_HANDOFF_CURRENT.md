@@ -1,3 +1,5 @@
+Latest: [automatic Vendor loading, prepared IDIE QO26163 and actual browser checks](20261104_VENDOR_AUTOMATIC_LOADING.md), UI2026-11-04.5, parent ed26995d. No manual JSON import; restart npm after Git pull; preserve old records, prices/FX and frozen history.
+
 Latest: [0550 explicit quotation reference and exact artifact archive](20261104_QUOTATION_BASELINE_AND_EXACT_ARTIFACTS.md), UI2026-11-04.4, parent d641c9f0. Common PR56 reused; no financial adoption, new Module ID, merge or customer issue.
 
 Latest Vendor checkpoint: [existing cost register / QO26163 / both grouping directions](20261104_VENDOR_REGISTER_GROUPING.md), UI 2026-11-04.3. No new screen or financial adoption; private JSON uses the existing import surface.

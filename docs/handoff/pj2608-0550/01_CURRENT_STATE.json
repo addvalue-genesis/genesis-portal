@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_QUOTATION_BASELINE_AND_EXACT_ARTIFACTS.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_VENDOR_AUTOMATIC_LOADING.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -23,7 +23,8 @@
     "docs/handoff/pj2608-0550/20261104_C1_EMPTY_PACKAGE_ROWS.md",
     "docs/handoff/pj2608-0550/20261104_C1_COLLAPSED_APPENDIX_TOTALS.md",
     "docs/handoff/pj2608-0550/20261104_VENDOR_REGISTER_GROUPING.md",
-    "docs/handoff/pj2608-0550/20261104_QUOTATION_BASELINE_AND_EXACT_ARTIFACTS.md"
+    "docs/handoff/pj2608-0550/20261104_QUOTATION_BASELINE_AND_EXACT_ARTIFACTS.md",
+    "docs/handoff/pj2608-0550/20261104_VENDOR_AUTOMATIC_LOADING.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -41,7 +42,9 @@
     "vendorCostView": "frontend/src/project0550/VendorOfferGroups0550.jsx",
     "quotationArchive": "frontend/src/project0550/data/quotationBaseline0550.js",
     "commonQuotationGovernance": "frontend/src/common/governance/quotationBaseline.js",
-    "quotationArchiveStore": "frontend/src/common/governance/quotationBaselineStore.js"
+    "quotationArchiveStore": "frontend/src/common/governance/quotationBaselineStore.js",
+    "vendorAuto": "frontend/src/project0550/data/vendorRegisterAuto0550.js",
+    "privateBridge": "frontend/scripts/source-drive-0550.cjs"
   },
   "dataContinuity": {
     "repository": "Code, governed references, defaults and handoffs. Git pull is not a backup of saved browser work.",
@@ -59,6 +62,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "Owner corrected manual Vendor import: actual private QO26163 JSON is prepared in project Drive90_SYSTEM_WORKING/DATA; code loads all prepared Vendor packages automatically via existing local bridge/startup into07.1/07.2. Restart npm after pull; Windows sync/consumption still unconfirmed. Preserve native rates, saved edits/deletions, Working selections/prices/FX and frozen history.",
     "Owner-authorised explicit reference/exact artifact archive reuses Common PR56 in existing Release10.7. Reference selection/import/capture does not adopt Working prices or imply sending/acceptance. Keep separate verified archive backup; central storage/authenticated transmission and Windows application remain unconfirmed. See current checkpoint for tests and limits.",
     "Owner-authorised QO26163 registration uses the private Vendor_Register JSON in the existing SI import; VND07.2 switches company/system views over canonical offers. No Working selection, quantity, rate, FX or frozen-history adoption. Windows application remains to be confirmed; continue PAGA engineering separately.",
     "Collapsed C1 Appendix headers now show known USD owner subtotals aligned with Total Price, labelled when incomplete; internal counts explain missing price/coverage. Keep strict totals and native/frozen output separate. Existing179 MR rows/order and financial ownership remain governed; continue source/SI/vendor mapping and PAGA closure.",

@@ -1,3 +1,4 @@
+import {fetchAutomaticVendorRegisters0550,planAutomaticVendorRegisters0550,vendorRegisterLoadMessage0550} from "./data/vendorRegisterAuto0550";
 import {prepareMgwDetailPricing0550} from "./data/mgwDetailPricing0550";
 import {deriveAvlReconciliation0550,prepareSystemAvlDeviations0550} from "./data/avlReconciliation0550";
 import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
@@ -22,6 +23,7 @@ export function downloadBidFile(data,name){const url=URL.createObjectURL(new Blo
 export function BidWorkspaceProvider({children}){
  const [data,setData]=useState(null),[error,setError]=useState(""),[busy,setBusy]=useState(false),lock=useRef(false);
  const [recovery,setRecovery]=useState(null);
+ const [vendorSync,setVendorSync]=useState({state:"CHECKING",message:"กำลังตรวจชุด Vendor ที่เตรียมไว้ในข้อมูลโครงการ"});
  const [sourceSync,setSourceSync]=useState({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
  const reload=async()=>{
   if(lock.current)return;lock.current=true;setBusy(true);
@@ -38,8 +40,18 @@ export function BidWorkspaceProvider({children}){
    if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, authorised EUR-to-THB and TSI activity estimates; preserve edited records / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
+   // Fetch independent evidence concurrently; a missing/conflicting CUS bundle
+   // must not prevent a valid Vendor register from reaching the existing07.1/07.2.
+   const sourceRequest=fetchAutomaticSourceWorkspace0550().then(bundle=>({bundle}),error=>({error}));
+   setVendorSync({state:"CHECKING",message:"กำลังตรวจชุด Vendor ที่เตรียมไว้ในข้อมูลโครงการ"});
+   try{
+    const bundle=await fetchAutomaticVendorRegisters0550(),plan=planAutomaticVendorRegisters0550(current,bundle,SYSTEMS.map(s=>s.token));
+    if(plan.changed)current=await saveProject0550Bid(plan.workspace,current.revision,"Load prepared Vendor registers automatically / "+bundle.packages.map(p=>p.batchId).join(", "));
+    setData(current);setVendorSync({state:plan.changed?"APPLIED":plan.packages?"CURRENT":"EMPTY",message:plan.changed?`โหลด Vendor อัตโนมัติแล้ว · เพิ่ม ${plan.addedVendors} Vendor / ${plan.addedOffers} Offers · ราคา Working คงเดิม`:plan.packages?"ชุด Vendor ที่เตรียมไว้ถูกนำเข้าทะเบียนแล้ว · คงรายการที่แก้ไขหรือลบไว้":"ยังไม่มีชุด Vendor เพิ่มเติมในข้อมูลโครงการ"});
+   }catch(e){current=await loadProject0550Bid();setData(current);setVendorSync({state:"UNAVAILABLE",message:vendorRegisterLoadMessage0550(e.message)});}
    try {
-    const bundle=await fetchAutomaticSourceWorkspace0550(),intake=bundle.sourceIntake,selected=selectAutomaticSourceWorkspace0550(current,bundle,SYSTEMS.map(s=>s.token));
+    const result=await sourceRequest;if(result.error)throw result.error;
+    const bundle=result.bundle,intake=bundle.sourceIntake,selected=selectAutomaticSourceWorkspace0550(current,bundle,SYSTEMS.map(s=>s.token));
     const sourced=prepareSystemAvlDeviations0550(selected.workspace,deriveIntegration0550(selected.workspace,SYSTEMS,reviewDate));
     if(sourced!==current)current=await saveProject0550Bid(sourced,current.revision,"Load canonical source/A preparation and reconcile system AVL drafts / "+intake.batchId);
     const messages={APPLIED:"โหลดข้อมูล JSON และชุดเตรียม A ให้ B ใช้แล้วอัตโนมัติ",PRESERVED_EDITS:"โหลดชุดเตรียม A แล้ว โดยคงรายการที่คุณแก้ไขไว้",ADOPTED:"ใช้ชุดเตรียม A ที่บันทึกไว้แล้ว โดยคงงานที่แก้ไขและรายการที่ลบไว้",CURRENT:"ข้อมูล JSON และชุดเตรียม A ใน workspace เป็นชุดปัจจุบันแล้ว",NOT_FOUND:"โหลดทะเบียน JSON แล้ว แต่ยังไม่พบชุดเตรียม A ที่ตรงกันใน DATA",LOCAL_NEWER:"ข้อมูลที่บันทึกอยู่ใหม่กว่าชุดบน Drive จึงเก็บข้อมูลเดิมไว้"};
@@ -61,5 +73,5 @@ export function BidWorkspaceProvider({children}){
  async function change(transform,action){if(!data||lock.current)return false;lock.current=true;setBusy(true);try{const transformed=transform(data);const next=prepareSystemAvlDeviations0550(transformed,deriveIntegration0550(transformed,SYSTEMS,reviewDate));setData(await saveProject0550Bid(next,data.revision,action));setError("");return true;}catch(e){setError(e.message);return false;}finally{lock.current=false;setBusy(false);}}
  const put=(collection,record)=>change(d=>({...d,[collection]:d[collection].some(r=>r.id===record.id)?d[collection].map(r=>r.id===record.id?record:r):[...d[collection],record]}),"Save "+collection+" / "+record.id);
  async function importFile(file){if(!file)return;try{if(file.size>64*1024*1024)throw Error("Workspace exceeds 64 MiB");const imported=validateBidWorkspace(JSON.parse(await file.text()),DATA_LAYER_META.datasetId,SYSTEMS.map(s=>s.token));await change(current=>{const releaseRegister=mergeReleaseRegister0550(current.releaseRegister,imported.releaseRegister);return {...imported,...(current.bidVolumes&&!imported.bidVolumes?{bidVolumes:current.bidVolumes}:{}),revision:current.revision,audit:current.audit,...(releaseRegister?{releaseRegister}:{})};},"Import reviewed 0550 workspace backup / merge frozen history");}catch(e){setError(e.message);}}
- return <Context.Provider value={{data,model,error,busy,recovery,change,put,reload,importFile,reviewDate,sourceSync}}>{children}</Context.Provider>;
+ return <Context.Provider value={{data,model,error,busy,recovery,change,put,reload,importFile,reviewDate,sourceSync,vendorSync}}>{children}</Context.Provider>;
 }
