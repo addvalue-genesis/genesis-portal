@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.2",
+  "version": "2026-11-04.3",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "source0550": "2d4ee1c2",
-  "capability": "Collapsed C1 Appendix rows show canonical USD owner subtotals in the Total Price column, clearly marked when only priced items are included. Internal coverage/price counts explain incomplete groups. Existing MR order, Module IDs/colours/+\u2212, financial inputs, strict totals and frozen exports preserved."
+  "capability": "Existing VND 07.2 switches company-to-system / system-to-company views of canonical offers. Existing SI import registers standalone supplier rates/options with original units, conditions and version/hash identity; preserves selected Working prices, source authority, edits/deletions and frozen history."
 }

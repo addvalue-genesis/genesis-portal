@@ -1,5 +1,6 @@
-import {MGW_QUOTE_0550,mgwQuoteItem0550} from "./data/mgwVendorBasis0550";
-import {MgwQuoteSummary,MgwOfferTable} from "./MgwQuoteViews";
+import {mgwQuoteItem0550} from "./data/mgwVendorBasis0550";
+import {MgwQuoteSummary} from "./MgwQuoteViews";
+import {VendorOfferGroups0550} from "./VendorOfferGroups0550";
 import React,{useState} from "react";
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {BID_UNITS,newId} from "./data/bidWorkspaceModel";
@@ -13,7 +14,7 @@ export function VendorWorkspace(){
  const [offer,setOffer]=useState(blankOffer);
  if(!data)return <p>กำลังเปิดฐานข้อมูล Bidding…</p>;
  const setV=(k,v)=>setVendor(x=>({...x,[k]:v})),setO=(k,v)=>setOffer(x=>({...x,[k]:v}));
- return <div className="p55-stack">
+ return <div className="p55-stack p55-vendor-workspace">
  <Module id="bid.vendor.master" title="07.1 Vendor / Service Provider">
  <p>ราคาเดิมที่นำเข้า: {data.vendorBasisImport?.importedLineIds.length||0} รายการ · รอปรับปรุงราคาใหม่ · วันที่/Validity ที่ไม่ทราบคงว่างตามหลักฐาน</p>
  <p>MGW Q26-063: {data.offers.filter(mgwQuoteItem0550).length} รายการ · {data.mgwQuoteImport?.conflicts.join(" · ")||"นำเข้าเพื่อเลือกตรวจราคา — ไม่แทนผู้ขายเดิมอัตโนมัติ"}</p>
@@ -27,14 +28,14 @@ export function VendorWorkspace(){
  <form onSubmit={async e=>{e.preventDefault();if(await put("offers",{...offer,id:offer.id||newId("OFFER")}))setOffer(blankOffer);}}>
  <div className="p55-bid-fields"><Select label="Offer vendor" value={offer.vendorId} onChange={v=>setO("vendorId",v)} options={[["","เลือก Vendor"],...data.vendors.map(v=>[v.id,v.name])]}/>
  {[['description','Product / role / service'],['brand','Brand / model'],['quoteRef','Quotation reference'],['sourceRef','Offer source / file / page']].map(([k,l])=><Field key={k} label={l} value={offer[k]} onChange={v=>setO(k,v)} required={k!=="brand"}/>)}
- <Field label="Quote date" type="date" value={offer.date} onChange={v=>setO("date",v)} required/><Field label="Valid until" type="date" value={offer.validUntil} onChange={v=>setO("validUntil",v)} required/>
+ <Field label="Quote date" type="date" value={offer.date} onChange={v=>setO("date",v)} required/><Field label="Valid until" type="date" value={offer.validUntil} onChange={v=>setO("validUntil",v)} required={!offer.quoteEvidence}/>
  {mgwQuoteItem0550(offer)?.unit===null&&<Field label="Offer unit confirmation / source" value={offer.unitBasis||""} onChange={v=>setO("unitBasis",v)} placeholder="หน่วยที่ยืนยันและแหล่งอ้างอิง"/>}
  <Select label="Offer currency" value={offer.currency} onChange={v=>setO("currency",v)} options={["THB","USD","EUR"]}/><Select label="Offer unit" value={offer.unit} onChange={v=>setO("unit",v)} options={BID_UNITS.map(unit=>[unit,unit==="MD"?"MD · Man-day":unit==="MH"?"MH · Man-hour":unit])}/><Field label="Quoted unit cost" type="number" min="0" step="any" value={offer.unitCost} onChange={v=>setO("unitCost",v)} required/></div><Save busy={busy}>บันทึกใบเสนอราคา / เรตต้นทุน</Save></form>
  <p>แก้เรตใน Offer เดิมจะคำนวณแถว Working ที่อ้างอิง Offer นั้นใหม่ หากเป็นใบเสนอราคาคนละฉบับให้สร้าง Offer ใหม่เพื่อเก็บฉบับเก่า</p>
- <div className="p55-table-wrap"><table className="p55-table"><thead><tr><th>Vendor / offer</th><th>Product or role</th><th>Cost / unit</th><th>Validity / source</th><th>ID / action</th></tr></thead><tbody>{data.offers.filter(o=>!mgwQuoteItem0550(o)).map(o=><tr key={o.id} data-component-key={"bid.vendor.offer."+o.id}><td>{data.vendors.find(v=>v.id===o.vendorId)?.name}<small>{o.quoteRef}</small></td><td>{o.description}<small>{o.brand}</small>{o.supplierQuoteRow&&<small>{o.supplierQuoteRow.classification} · Item {o.supplierQuoteRow.itemCode} · จำนวนต้นฉบับ {o.supplierQuoteRow.quantity} {o.supplierQuoteRow.quotedUnit} · อ้างอิงราคา Package เดียว</small>}</td><td>{amount(o.unitCost,o.currency)} / {o.unit}</td><td>{o.date} → {o.validUntil}<small>{o.sourceRef}</small></td><td><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.vendor.offer."+o.id}/><button type="button" onClick={()=>setOffer({...o})}>แก้ไข Offer</button></td></tr>)}</tbody></table></div>
- <MgwQuoteSummary/>{MGW_QUOTE_0550.sections.map(g=>{const offers=data.offers.filter(o=>mgwQuoteItem0550(o)?.section===g.id);return offers.length>0&&<details key={g.id} className="p55-panel" data-mgw-section={g.id}><summary>MGW · {g.title} · {offers.length} รายการ · {g.status==="TOTAL_CONFLICT"?"CONFLICT ยอดต้นฉบับ":"ราคาต้นทาง USD"}</summary><MgwOfferTable offers={offers} onEdit={o=>{setOffer({...o});document.querySelector('[aria-label="Product / role / service"]')?.scrollIntoView({block:"center"});}}/></details>;})}
+ <VendorOfferGroups0550 data={data} onEdit={o=>{setOffer({...o});document.querySelector('[aria-label="Product / role / service"]')?.scrollIntoView({block:"center"});}}/>
  </Module>
  <Module id="bid.vendor.controlled-sources" title="แหล่ง Vendor เดิมของ 0550 — ใช้อ้างอิงก่อนเลือกเรต" open={false}>
+ <MgwQuoteSummary/>
  {COMMERCIAL_SOURCES.map(s=><div key={s.id}><strong>{s.vendor} · {s.offerNo}</strong><p>{s.controlState}</p><p>Source ID: {s.id} · Currency: {s.currency}</p><p>ตรวจฉบับ/ขอบเขต/validity ก่อนลงทะเบียน Offer สำหรับข้อเสนอรอบนี้</p></div>)}
  </Module></div>;
 }

@@ -1,3 +1,5 @@
+Latest Vendor checkpoint: [existing cost register / QO26163 / both grouping directions](20261104_VENDOR_REGISTER_GROUPING.md), UI 2026-11-04.3. No new screen or financial adoption; private JSON uses the existing import surface.
+
 Latest C1 overview: [collapsed Appendix USD subtotals and readonly preservation](20261104_C1_COLLAPSED_APPENDIX_TOTALS.md), UI `2026-11-04.2`. The collapsed header shows one-owner USD totals in Total Price, marked Priced items subtotal when incomplete. Existing IDs/colours/+−, strict totals, financial inputs and native/frozen outputs stay governed. Read before earlier C1 checkpoints.
 
 Latest C1 correction: [MR captions/order/numbering and corrected package coverage](20261104_C1_EMPTY_PACKAGE_ROWS.md), UI `2026-11-04.1`. Unpriced Working owners without MR mapping stay in internal trace; retain179 MR rows, priced owners, Module IDs/Copy ID/colours and +/−. MR rows follow native scope/site order with Appendix-local item codes; technical SI links do not prove price coverage. New native v3 preserves historical v1/v2 rendering. Read before earlier C1 checkpoints.

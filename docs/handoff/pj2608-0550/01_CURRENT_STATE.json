@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_C1_COLLAPSED_APPENDIX_TOTALS.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_VENDOR_REGISTER_GROUPING.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -21,7 +21,8 @@
     "docs/handoff/pj2608-0550/20261103_RESTORE_SCHEDULE_A_FORMS.md",
     "docs/handoff/pj2608-0550/20261103_C1_APPENDIX_AND_WORKSPACE_ALIASES.md",
     "docs/handoff/pj2608-0550/20261104_C1_EMPTY_PACKAGE_ROWS.md",
-    "docs/handoff/pj2608-0550/20261104_C1_COLLAPSED_APPENDIX_TOTALS.md"
+    "docs/handoff/pj2608-0550/20261104_C1_COLLAPSED_APPENDIX_TOTALS.md",
+    "docs/handoff/pj2608-0550/20261104_VENDOR_REGISTER_GROUPING.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -34,7 +35,9 @@
     "startup": "frontend/src/project0550/BidWorkspaceContext.jsx",
     "release": "frontend/src/project0550/data/releaseIssue0550.js",
     "c1Presentation": "frontend/src/project0550/data/c1Appendix0550.js",
-    "workspaceAliases": "frontend/src/project0550/workspaceLabels0550.js"
+    "workspaceAliases": "frontend/src/project0550/workspaceLabels0550.js",
+    "vendorRegister": "frontend/src/project0550/data/vendorRegister0550.js",
+    "vendorCostView": "frontend/src/project0550/VendorOfferGroups0550.jsx"
   },
   "dataContinuity": {
     "repository": "Code, governed references, defaults and handoffs. Git pull is not a backup of saved browser work.",
@@ -52,6 +55,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "Owner-authorised QO26163 registration uses the private Vendor_Register JSON in the existing SI import; VND07.2 switches company/system views over canonical offers. No Working selection, quantity, rate, FX or frozen-history adoption. Windows application remains to be confirmed; continue PAGA engineering separately.",
     "Collapsed C1 Appendix headers now show known USD owner subtotals aligned with Total Price, labelled when incomplete; internal counts explain missing price/coverage. Keep strict totals and native/frozen output separate. Existing179 MR rows/order and financial ownership remain governed; continue source/SI/vendor mapping and PAGA closure.",
     "PAGA multi-source clause/engineering reconciliation remains OPEN:217 new TAG candidates are DTS-only customer evidence,95 old authored drafts were retained;16 derived MR defaults still need exact sources,5 prior RPTs OPEN and no closed PAGA scope review. The revision importer is not full A/SI acceptance.",
     "Private PAGA outputs10/11/12 and v2 technical draft package are separate from Git and Windows saved data. Do not treat a qualified quoted-package pricing scenario as complete customer CIF/FOB price or adopt it automatically.",
