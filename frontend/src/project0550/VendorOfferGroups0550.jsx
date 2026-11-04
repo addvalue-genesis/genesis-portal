@@ -1,5 +1,5 @@
 import React,{useMemo,useState} from 'react';
-import {vendorOfferEntries0550,groupVendorOffers0550} from './data/vendorRegister0550';
+import {vendorOfferEntries0550,groupVendorOffers0550,vendorQuoteTotals0550} from './data/vendorRegister0550';
 import {mgwQuoteItem0550} from './data/mgwVendorBasis0550';
 import {SYSTEMS} from './data';
 import {bidOwnerStyle} from './bidPresentation0550';
@@ -8,6 +8,19 @@ import {amount} from './BidControls';
 import {activeSupply0550} from './data/workingOffers0550';
 
 const Toggle=()=> <span className="p55-vnd-toggle" aria-hidden="true"><span>+</span><span>−</span></span>;
+function QuoteTotal({quote,fx}){
+ const t=vendorQuoteTotals0550(quote,fx);
+ if(t.referenceOnly)return <span className="p55-vnd-total">ฐาน Working อ้างอิง · ดูยอดในใบเสนอราคาต้นฉบับ</span>;
+ const show=(s,label)=><span className="p55-vnd-total-part">
+  <strong>{label}: {s.totalTHB!==null?amount(s.totalTHB,'THB')+' THB':s.hasConverted?'ยอดที่ทราบ '+amount(s.knownTHB,'THB')+' THB · ยังไม่ครบ':'OPEN'}</strong>
+  {s.native.length>0&&<span>ต้นทาง {s.native.map(n=>amount(n.value,n.currency)+' '+n.currency).join(' + ')}{s.missingPrices>0?' · เฉพาะยอดที่ทราบ':''}</span>}
+  {s.rates.some(r=>r.currency!=='THB')&&<span>FX {s.rates.filter(r=>r.currency!=='THB').map(r=>'1 '+r.currency+' = '+r.rate+' THB').join(' · ')} · {t.fxDate} · {t.fxSource}</span>}
+  {s.missingFX.length>0&&<span>รอ FX {s.missingFX.join(' / ')} → THB พร้อมแหล่งอ้างอิงและวันที่</span>}
+  {s.missingPrices>0&&<span>{s.missingPrices} รายการยังไม่มียอดแน่นอน / As actual</span>}
+  {s.ambiguous&&<span>OPEN · พบยอดสุทธิหลายรายการ ต้องตรวจต้นฉบับก่อนรวม</span>}
+ </span>;
+ return <span className="p55-vnd-total" data-vnd-quote-total="true">{show(t.base,t.net?'รวมสุทธิใบเสนอราคา':'รวมใบเสนอราคา')}{t.option&&show(t.option,'Option แยก')}{t.fullQuote&&<span>ยอดทั้งใบ ครอบคลุมทุกระบบในใบเดียวกัน</span>}</span>;
+}
 export function VendorOfferGroups0550({data,onEdit}){
  const [mode,setMode]=useState('company');
  const entries=useMemo(()=>vendorOfferEntries0550(data),[data]);
@@ -55,7 +68,7 @@ export function VendorOfferGroups0550({data,onEdit}){
    {g.children.map(child=><details key={child.key} className="p55-vnd-group" data-vnd-subgroup={child.key} style={bidOwnerStyle(child.system||g.system)}>
     <summary><Toggle/>{child.title}</summary>
     {child.quotes.map(q=><details key={q.key} className="p55-vnd-quote" data-vnd-source-quote={q.referenceOnly?'false':'true'}>
-     <summary><Toggle/>{q.referenceOnly?'ฐาน Working เดิม · ':''}{q.title}{q.fileName?' · '+q.fileName:''}{q.revision?' · Rev.'+q.revision:''}{q.hash?' · '+q.hash.slice(0,8):''} · {q.entries.length} รายการ</summary>
+     <summary><Toggle/>{q.referenceOnly?'ฐาน Working เดิม · ':''}{q.title}{q.fileName?' · '+q.fileName:''}{q.revision?' · Rev.'+q.revision:''}{q.hash?' · '+q.hash.slice(0,8):''} · {q.entries.length} รายการ<QuoteTotal quote={q} fx={data.fx}/></summary>
      {renderRows(q)}
     </details>)}
    </details>)}

@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.13",
+  "version": "2026-11-04.14",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "5e6160fb",
-  "capability": "Existing C1 Appendix1.4 retains the known selling-price subtotal when expanded; separate package-price blocks appear before the location detail in the interactive screen. Cost remains in existing VND/10.2 Working. Preserve native MR order, strict totals, export bytes, financial inputs, mapping gaps and frozen history; no new tab/module or automatic coverage acceptance."
+  "source0550": "a05a9fbf",
+  "capability": "Existing07.2 collapsed quotation headers show original base/net quotation totals converted to THB using saved project FX, with native currency/rate/source/date, separate options and explicit missing-price/FX states. Full quotation scope across system views, one net owner; no Working/quantity/FX/source/review/history adoption."
 }

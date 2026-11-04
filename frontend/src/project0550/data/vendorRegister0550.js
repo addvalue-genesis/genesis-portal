@@ -1,3 +1,4 @@
+import Decimal from 'decimal.js';
 import {integrationFingerprint0550} from './integrationWorkspace0550';
 import {validateBidWorkspace} from './bidWorkspaceModel';
 import {safeSourceUrl} from './sourceIntakeModel';
@@ -110,7 +111,7 @@ export function vendorOfferEntries0550(data){
   referenceWorking:[...new Map((offer.quoteEvidence?.workingReferenceOfferIds||[]).flatMap(id=>links.get(id)?.working||[]).map(l=>[l.id,l])).values()]}));
 }
 export function groupVendorOffers0550(entries,mode,systems){
- const names=new Map(systems.map(s=>[s.token,s.name])),groups=new Map(),systemName=s=>s==='UNASSIGNED'?'ยังไม่ผูกระบบ':s==='COMMON'?'COMMON · งานร่วม':names.get(s)||s;
+ const names=new Map(systems.map(s=>[s.token,s.name])),groups=new Map(),quoteEntries=new Map(),systemName=s=>s==='UNASSIGNED'?'ยังไม่ผูกระบบ':s==='COMMON'?'COMMON · งานร่วม':names.get(s)||s;
  const evidence=new Map();
  for(const {offer:o} of entries)if(o.quoteEvidence){const k=JSON.stringify([o.vendorId,o.quoteRef,o.quoteEvidence.revision]);if(!evidence.has(k))evidence.set(k,new Set());evidence.get(k).add(o.quoteEvidence.sourceSha256);}
  for(const entry of entries)for(const system of entry.systemTokens.length?entry.systemTokens:['UNASSIGNED']){
@@ -123,10 +124,48 @@ export function groupVendorOffers0550(entries,mode,systems){
   const versions=evidence.get(JSON.stringify([o.vendorId,o.quoteRef,e?.revision||'']));
   const hash=e?.sourceSha256||(versions?.size===1?[...versions][0]:'');
   const quoteKey=JSON.stringify([o.vendorId,o.quoteRef,e?.revision||'',hash||o.supplierQuoteRow?.sourceId||'']);
+  if(!quoteEntries.has(quoteKey))quoteEntries.set(quoteKey,new Map());
+  quoteEntries.get(quoteKey).set(o.id,entry);
   if(!child.quotes.has(quoteKey))child.quotes.set(quoteKey,{key:quoteKey,title:o.quoteRef||'ไม่ระบุใบเสนอราคา',revision:e?.revision??'',hash,referenceOnly:entry.referenceOnly,entries:[]});
   if(e?.fileName)child.quotes.get(quoteKey).fileName=e.fileName;
   child.quotes.get(quoteKey).entries.push(entry);
  }
  const sort=(a,b)=>a.title.localeCompare(b.title,'en',{numeric:true});
- return [...groups.values()].sort(sort).map(g=>({...g,children:[...g.children.values()].sort(sort).map(c=>({...c,quotes:[...c.quotes.values()].sort(sort)}))}));
+ return [...groups.values()].sort(sort).map(g=>({...g,children:[...g.children.values()].sort(sort).map(c=>({...c,quotes:[...c.quotes.values()].sort(sort).map(q=>({...q,totalEntries:[...quoteEntries.get(q.key).values()]}))}))}));
+}
+
+// Supplier totals are a read-only projection, never Working cost adoption.
+// Use full quotation identity across system views, one net owner, and separate options.
+export function vendorQuoteTotals0550(quote,fx={}){
+ const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
+ const entries=[...new Map((quote.totalEntries||quote.entries).filter(e=>!e.referenceOnly).map(e=>[e.offer.id,e])).values()];
+ const net=e=>e.offer.supplierQuoteRow?.classification==='NET_PACKAGE'||(!e.offer.supplierQuoteRow&&/\bitem\s+NET\b/i.test(e.offer.quoteEvidence?.locator||''));
+ const option=e=>e.offer.supplierQuoteRow?.classification==='OPTION'||e.offer.quoteEvidence?.classification==='OPTION';
+ const owners=entries.filter(net),hasComponents=entries.some(e=>e.offer.supplierQuoteRow);
+ const base=owners.length?owners:entries.filter(e=>!option(e)&&e.offer.supplierQuoteRow?.classification!=='INCLUDED_REFERENCE'&&(!hasComponents||e.offer.supplierQuoteRow));
+ const summarize=(rows,ambiguous=false)=>{
+  const native=new Map();let missingPrices=0;
+  for(const {offer:o} of rows){
+   const e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow;
+   let value=null,currency=e?.quotedCurrency||(r?'USD':o.currency);
+   if(e){
+    // Explicit null includes As actual: it must not become a fabricated extension.
+    value=e.quotedTotal!==undefined?e.quotedTotal:Number.isFinite(e.quotedQuantity)&&Number.isFinite(e.quotedUnitCost)?new Money(e.quotedQuantity).times(e.quotedUnitCost):null;
+   }else if(r)value=r.extended;
+   else if(s&&Number.isFinite(o.unitCost))value=new Money(s.quantity).times(o.unitCost);
+   if(value===null||value===undefined||!new Money(value).isFinite()){missingPrices++;continue;}
+   native.set(currency,(native.get(currency)||new Money(0)).plus(value));
+  }
+  let thb=new Money(0);const missingFX=[],rates=[];
+  const fxReady=Boolean(fx.source?.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(fx.date||''));
+  for(const [currency,value] of native){
+   const rate=currency==='THB'?1:fxReady&&Number.isFinite(fx['thbPer'+currency])&&fx['thbPer'+currency]>0?fx['thbPer'+currency]:null;
+   if(rate===null)missingFX.push(currency);else{thb=thb.plus(value.times(rate));rates.push({currency,rate});}
+  }
+  const knownTHB=thb.toDecimalPlaces(2).toNumber(),complete=rows.length>0&&!missingPrices&&!missingFX.length&&!ambiguous;
+  return {totalTHB:complete?knownTHB:null,knownTHB,hasConverted:rates.length>0,missingPrices,missingFX,rates,ambiguous,
+   native:[...native].map(([currency,value])=>({currency,value:value.toDecimalPlaces(2).toNumber()}))};
+ };
+ return {base:summarize(base,owners.length>1),option:entries.some(option)?summarize(entries.filter(option)):null,net:owners.length===1,
+  referenceOnly:quote.referenceOnly,fullQuote:entries.length>quote.entries.length,fxSource:fx.source||'',fxDate:fx.date||''};
 }

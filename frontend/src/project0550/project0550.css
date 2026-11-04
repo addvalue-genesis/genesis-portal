@@ -1788,6 +1788,9 @@
 .p55-vnd-group>summary{padding:10px;background:var(--bid-tint,#edf3f7);cursor:pointer;overflow-wrap:anywhere}
 .p55-vnd-group>.p55-vnd-group,.p55-vnd-quote{margin:10px;padding:0;min-width:0}
 .p55-vnd-quote>summary{padding:8px;cursor:pointer;overflow-wrap:anywhere}
+.p55-vnd-total{display:block;margin:6px 0 0 20px;line-height:1.5;font-weight:normal}
+.p55-vnd-total-part{display:flex;flex-wrap:wrap;gap:2px 14px;margin-top:4px}
+.p55-vnd-total-part>strong{flex-basis:100%;font-variant-numeric:tabular-nums}
 .p55-vnd-toggle{display:inline-flex;width:24px;justify-content:center;font-weight:bold}
 .p55-vnd-toggle>span:last-child{display:none}
 details[open]>summary>.p55-vnd-toggle>span:first-child{display:none}

@@ -26,7 +26,12 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],asset=/
  assert.equal(await page.locator('[data-component-key="bid.vendor.master"]').count(),1);assert.equal(await page.locator('[data-component-key="bid.vendor.offers"]').count(),1);
  const open=async locator=>{if(!await locator.evaluate(el=>el.open))await locator.locator(':scope > summary').click();};
  const first=registry.locator('[data-vnd-group="'+pack.vendors[0].id+'"]');await open(first);
- const child=first.locator('[data-vnd-subgroup="TEL-PAGA"]');await open(child);await open(child.locator('.p55-vnd-quote').filter({hasText:pack.offers[0].quoteRef}).first());
+ const child=first.locator('[data-vnd-subgroup="TEL-PAGA"]');await open(child);
+ const quote=child.locator('.p55-vnd-quote').filter({hasText:pack.offers[0].quoteRef}).first(),summary=quote.locator(':scope > summary');
+ assert.equal(await quote.evaluate(el=>el.open),false,'Quote initially collapsed');
+ assert(await summary.locator('[data-vnd-quote-total]').isVisible(),'THB total visible before opening quote');
+ assert((await summary.innerText()).includes('THB')&&(await summary.innerText()).includes('Option แยก'));
+ await open(quote);
  assert.equal(await child.locator('tr[data-vnd-offer]').count(),4);
  const ids=pack.offers.map(o=>o.id);
  for(const id of ids)assert.equal(await page.locator('[data-component-key="bid.vendor.offer.'+id+'"]').count(),1);
