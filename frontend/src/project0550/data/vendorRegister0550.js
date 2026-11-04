@@ -3,6 +3,7 @@ import {validateBidWorkspace} from './bidWorkspaceModel';
 import {safeSourceUrl} from './sourceIntakeModel';
 import {mgwQuoteItem0550} from './mgwVendorBasis0550';
 import {workingOffers0550} from './workingOffers0550';
+import {validateSupplierQuoteRow0550} from './supplierRevision0550';
 import {hasVendorDefaultReceipt0550,isVendorDefaultOffer0550,isVendorDefaultVendor0550,untouchedVendorDefault0550} from './vendorDefaultCatalog0550';
 
 // Extend the existing offer registry; this importer never creates Working prices.
@@ -10,16 +11,19 @@ export const VENDOR_REGISTER_SCHEMA_0550='genesis.0550.vendor-register.v1';
 const fail=m=>{throw Error('Vendor register: '+m);};
 const fields=(o,allowed)=>{if(!o||typeof o!=='object'||Array.isArray(o)||Object.keys(o).some(k=>!allowed.includes(k)))fail('unsupported fields');};
 const text=(s,max=4000)=>{if(typeof s!=='string'||s.length>max)fail('invalid text');};
-const same=(a,b)=>integrationFingerprint0550(a)===integrationFingerprint0550(b);
+const same=(a,b)=>a===b||a!==undefined&&b!==undefined&&integrationFingerprint0550(a)===integrationFingerprint0550(b);
 const nameKey=s=>s.trim().replace(/\s+/g,' ').toLowerCase();
 export function validateVendorQuoteEvidence0550(e,systems){
  if(e===undefined)return;
- fields(e,['revision','systemTokens','sourceId','sourceSha256','sourceUrl','locator','quotedQuantity','quotedUnit','quotedUnitCost','quotedCurrency','classification','rateBasis','terms']);
+ fields(e,['revision','systemTokens','sourceId','sourceSha256','sourceUrl','locator','quotedQuantity','quotedUnit','quotedUnitCost','quotedCurrency','classification','rateBasis','terms','quotedTotal','originBatchId','fileName']);
  for(const k of ['revision','sourceId','sourceSha256','sourceUrl','locator','quotedUnit','rateBasis'])text(e[k]);
  if(!/^[\w.-]{1,100}$/.test(e.sourceId)||!/^[a-f0-9]{64}$/.test(e.sourceSha256)||!safeSourceUrl(e.sourceUrl)||!e.locator.trim()||!e.quotedUnit.trim()||!e.rateBasis.trim())fail('quotation source/unit basis required');
  if(!Array.isArray(e.systemTokens)||!e.systemTokens.length||new Set(e.systemTokens).size!==e.systemTokens.length||e.systemTokens.some(s=>s!=='COMMON'&&!systems.includes(s)))fail('invalid quotation systems');
  if(!Number.isFinite(e.quotedQuantity)||e.quotedQuantity<=0||e.quotedQuantity>1e12||!['RATE','OPTION'].includes(e.classification))fail('invalid quotation quantity/classification');
  if(!['THB','USD','EUR'].includes(e.quotedCurrency)||e.quotedUnitCost!==null&&(!Number.isFinite(e.quotedUnitCost)||e.quotedUnitCost<0||e.quotedUnitCost>1e12))fail('invalid native quotation rate/currency');
+ if(e.quotedTotal!==undefined&&e.quotedTotal!==null&&(!Number.isFinite(e.quotedTotal)||e.quotedTotal<0||e.quotedTotal>1e12))fail('invalid original line total');
+ if(e.originBatchId!==undefined&&(typeof e.originBatchId!=='string'||!/^[\w.-]{1,100}$/.test(e.originBatchId)))fail('invalid origin batch');
+ if(e.fileName!==undefined)text(e.fileName,200);
  if(!Array.isArray(e.terms)||e.terms.length>30)fail('invalid quotation terms');
  e.terms.forEach(t=>text(t,6000));
 }
@@ -46,14 +50,26 @@ export function planVendorRegister0550(data,pack,systems){
  }
  const offers=[...data.offers],preserved=[];let addedOffers=0,existingOffers=0,updatedOffers=0;
  for(const incoming of pack.offers){
-  if(!vendorIds.has(incoming.vendorId)||!incoming.quoteEvidence||incoming.supplierQuoteRow||incoming.mgwQuoteLineId)fail('standalone quoted rate evidence required');
+  if(!vendorIds.has(incoming.vendorId)||!incoming.quoteEvidence||incoming.mgwQuoteLineId)fail('quoted source evidence required');
   validateVendorQuoteEvidence0550(incoming.quoteEvidence,systems);
+  validateSupplierQuoteRow0550(incoming);
   const o={...incoming,vendorId:vendorIds.get(incoming.vendorId)},e=o.quoteEvidence;
+  if(o.supplierQuoteRow&&(o.supplierQuoteRow.sourceId!==e.sourceId||o.supplierQuoteRow.quantity!==e.quotedQuantity||o.supplierQuoteRow.quotedUnit!==e.quotedUnit))fail('source row identity differs from quotation evidence');
   const matches=offers.filter(old=>old.id===o.id||(old.vendorId===o.vendorId&&old.quoteRef===o.quoteRef&&old.quoteEvidence?.revision===e.revision&&old.quoteEvidence?.sourceSha256===e.sourceSha256&&old.quoteEvidence?.locator===e.locator));
   if(matches.length>1)fail('ambiguous quotation identity / '+o.id);
   const old=matches[0];
+  // A previously consumed source package also owns deliberate row deletions.
+  if(!old&&e.originBatchId&&((data.supplierRevisionImports||[]).some(r=>r.batchId===e.originBatchId)||data.vendorBasisImport?.version===e.originBatchId)){preserved.push(o.id+' / deleted source row retained');continue;}
   if(!old&&defaultsConsumed&&isVendorDefaultOffer0550(o.id)){preserved.push(o.id+' / deleted default retained');continue;}
   if(old){
+   // Add original-source metadata only when every pre-existing field is exact.
+   // This cannot reprice a saved offer or change a legacy Working addition.
+   if(!old.quoteEvidence){
+    const {quoteEvidence,...sourceOffer}=o;
+    if(same(old,sourceOffer)){offers[offers.indexOf(old)]={...old,quoteEvidence};existingOffers++;updatedOffers++;continue;}
+    if(old.vendorId!==o.vendorId||old.quoteRef!==o.quoteRef||old.sourceRef!==o.sourceRef||!same(old.supplierQuoteRow,o.supplierQuoteRow))fail('Offer ID belongs to another quotation/version / '+o.id);
+    existingOffers++;preserved.push(old.id+' / saved offer retained');continue;
+   }
    if(old.vendorId!==o.vendorId||old.quoteRef!==o.quoteRef||old.quoteEvidence?.revision!==e.revision||old.quoteEvidence?.sourceSha256!==e.sourceSha256||old.quoteEvidence?.locator!==e.locator)fail('Offer ID belongs to another quotation/version / '+o.id);
    existingOffers++;
    // Only an exact, untouched OPEN default can receive the original private
@@ -63,6 +79,10 @@ export function planVendorRegister0550(data,pack,systems){
   }else{offers.push(o);addedOffers++;}
  }
  stats.push({collection:'vendors',added:addedVendors,unchanged:pack.vendors.length-addedVendors,preserved:[]},{collection:'offers',added:addedOffers,unchanged:existingOffers-updatedOffers,updated:updatedOffers,preserved});
+ for(const o of offers.filter(o=>pack.offers.some(p=>p.id===o.id)&&o.supplierQuoteRow)){
+  const parent=offers.find(p=>p.id===o.supplierQuoteRow.parentOfferId);
+  if(!parent||parent.vendorId!==o.vendorId||parent.quoteRef!==o.quoteRef)fail('source package parent missing / '+o.id);
+ }
  const workspace={...data,vendors,offers,supplierRevisionImports:[...(data.supplierRevisionImports||[]),{batchId:pack.batchId,packageKey:key,importedOn:pack.preparedOn}]};
  validateBidWorkspace(workspace,data.baselineSnapshotId,systems);
  return {workspace,changed:true,sourceState:'VENDOR_REGISTER',stats};
@@ -79,6 +99,8 @@ export function vendorOfferEntries0550(data){
 }
 export function groupVendorOffers0550(entries,mode,systems){
  const names=new Map(systems.map(s=>[s.token,s.name])),groups=new Map(),systemName=s=>s==='UNASSIGNED'?'ยังไม่ผูกระบบ':s==='COMMON'?'COMMON · งานร่วม':names.get(s)||s;
+ const evidence=new Map();
+ for(const {offer:o} of entries)if(o.quoteEvidence){const k=JSON.stringify([o.vendorId,o.quoteRef,o.quoteEvidence.revision]);if(!evidence.has(k))evidence.set(k,new Set());evidence.get(k).add(o.quoteEvidence.sourceSha256);}
  for(const entry of entries)for(const system of entry.systemTokens.length?entry.systemTokens:['UNASSIGNED']){
   const company=entry.vendor?.id||entry.offer.vendorId,companyName=entry.vendor?.name||company;
   const first=mode==='system'?system:company,second=mode==='system'?company:system;
@@ -86,8 +108,11 @@ export function groupVendorOffers0550(entries,mode,systems){
   const g=groups.get(first);g.offerIds.add(entry.offer.id);
   if(!g.children.has(second))g.children.set(second,{key:second,title:mode==='system'?companyName:systemName(system),system:mode==='system'?null:system,quotes:new Map()});
   const child=g.children.get(second),o=entry.offer,e=o.quoteEvidence;
-  const quoteKey=JSON.stringify([o.quoteRef,e?.revision||'',e?.sourceSha256||o.supplierQuoteRow?.sourceId||'']);
-  if(!child.quotes.has(quoteKey))child.quotes.set(quoteKey,{key:quoteKey,title:o.quoteRef||'ไม่ระบุใบเสนอราคา',revision:e?.revision??'',hash:e?.sourceSha256||'',entries:[]});
+  const versions=evidence.get(JSON.stringify([o.vendorId,o.quoteRef,e?.revision||'']));
+  const hash=e?.sourceSha256||(versions?.size===1?[...versions][0]:'');
+  const quoteKey=JSON.stringify([o.vendorId,o.quoteRef,e?.revision||'',hash||o.supplierQuoteRow?.sourceId||'']);
+  if(!child.quotes.has(quoteKey))child.quotes.set(quoteKey,{key:quoteKey,title:o.quoteRef||'ไม่ระบุใบเสนอราคา',revision:e?.revision??'',hash,entries:[]});
+  if(e?.fileName)child.quotes.get(quoteKey).fileName=e.fileName;
   child.quotes.get(quoteKey).entries.push(entry);
  }
  const sort=(a,b)=>a.title.localeCompare(b.title,'en',{numeric:true});

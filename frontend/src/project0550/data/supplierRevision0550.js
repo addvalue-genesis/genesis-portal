@@ -70,7 +70,7 @@ export function planSupplierRevision0550(data,pack,systems){
   const added=[],updated=[],preserved=[],unchanged=[];
   for(const r of incoming){const own=old.find(x=>x.id===r.id),expect=pack.expectedRequirements.find(x=>x.id===r.id);
    if(!own){if(allowUpdate&&expect){preserved.push(r.id+' / existing requirement absent or deleted');continue;}added.push(r);}
-   else if(same(own,r))unchanged.push(r.id);
+   else if(same(own,r)||collection==='offers'&&own.quoteEvidence&&same((({quoteEvidence,...core})=>core)(own),r))unchanged.push(r.id);
    else if(allowUpdate&&expect&&integrationFingerprint0550(own)===expect.basisKey)updated.push(r);
    else if(collection==='offers'||collection==='lines')fail('new quote ID conflicts with saved record / '+r.id);
    else preserved.push(r.id+' / saved edit retained');

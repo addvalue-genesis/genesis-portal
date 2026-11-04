@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.6",
+  "version": "2026-11-04.7",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "7497a0f1",
-  "capability": "IDIE QO26163 identity/four OPEN source rows are default on project startup, independent of Drive availability. Original private rates hydrate untouched defaults automatically with bounded retries; no Load/file chooser, duplicate costs, Working/FX adoption, overwritten edits/deletions or frozen-history changes."
+  "source0550": "e4675393",
+  "capability": "Both original PAGA quotations retain all native numbered rows, quantities, units, unit/extended prices and source filenames/locators through existing private Vendor auto-loading. Source truth is separate from unchanged Working rates/quantities/FX/history; both grouping modes show quotation count and stable Offer IDs."
 }

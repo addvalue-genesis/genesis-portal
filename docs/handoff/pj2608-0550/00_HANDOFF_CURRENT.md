@@ -1,3 +1,5 @@
+Latest: [both original PAGA quotations with native row quantities/prices](20261104_PAGA_ORIGINAL_QUOTATIONS.md) — UI2026-11-04.7. Existing private Vendor DATA auto-loader;2 quotation identities/80 Offer IDs, no Working price adoption; owner Windows consumption unverified.
+
 Latest: [default Vendor presence independent of Drive and automatic rate completion](20261104_VENDOR_DEFAULT_PRESENCE.md), UI2026-11-04.6, parent7497a0f1. No Load/import click; private rates remain OPEN until read; unchanged Working/FX/history and stable IDs.
 
 Latest: [automatic Vendor loading, prepared IDIE QO26163 and actual browser checks](20261104_VENDOR_AUTOMATIC_LOADING.md), UI2026-11-04.5, parent ed26995d. No manual JSON import; restart npm after Git pull; preserve old records, prices/FX and frozen history.

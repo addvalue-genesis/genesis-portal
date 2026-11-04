@@ -33,6 +33,28 @@ assert(html.includes('บริษัท → ระบบ')&&html.includes('ร�
 const ids=[...html.matchAll(/data-component-key="(bid\.vendor\.offer\.[^"]+)"/g)].map(m=>m[1]);assert.equal(ids.length,shared.offers.length);assert.equal(new Set(ids).size,ids.length,'One canonical navigation anchor per Offer ID');
 const unsafe=structuredClone(shared);unsafe.offers[0].description='<script>unsafe</script>';assert(renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:unsafe,onEdit:()=>{}})).includes('&lt;script&gt;'));
 const companyScoped=structuredClone(next);companyScoped.lines=[{id:'COMPANY-LINE',systemToken:'TEL-PAGA',offerId:next.offers[0].id,selected:true,responsibility:'COMPANY'}];assert(!renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:companyScoped,onEdit:()=>{}})).includes('มี Working ที่เลือกใช้'),'Company supply is not an active cost selection');
+// Two complete source quotations can be registered before choosing Working.
+const native=structuredClone(pack);native.batchId='SYNTHETIC-ORIGINAL-QUOTES';
+native.offers=native.offers.slice(0,3).map((o,i)=>({...o,unit:i?'U':'Lot',unitCost:i===2?null:i===1?75:100,
+ supplierQuoteRow:{sourceId:o.quoteEvidence.sourceId,itemCode:i===0?'NET':i===1?'5010':'INCLUDED',classification:i===0?'NET_PACKAGE':i===1?'BASE_PRICE':'INCLUDED_REFERENCE',quantity:i===1?2:1,quotedUnit:i?'U':'Lot',parentOfferId:native.offers[0].id,discountable:i===1},
+ quoteEvidence:{...o.quoteEvidence,locator:'PDF p'+(i+2)+' / item '+i,quotedQuantity:i===1?2:1,quotedUnit:i?'U':'Lot',quotedUnitCost:i===2?null:i===1?75:100,quotedTotal:i===2?null:i===1?150:100,originBatchId:'SYNTHETIC-PRIOR-REVISION'}}));
+const originals=R.planVendorRegister0550(data,native,tokens).workspace;
+assert.equal(originals.lines.length,0,'Registering a source is not choosing a Working owner');
+const noMetadata={...data,offers:native.offers.map(({quoteEvidence,...o})=>o),vendors:native.vendors};
+const enriched=R.planVendorRegister0550(noMetadata,native,tokens).workspace;
+assert.deepEqual(enriched.offers.map(({quoteEvidence,...o})=>o),noMetadata.offers,'Source metadata never changes existing offer fields');
+const second=structuredClone(native);second.batchId+='-Q2';second.offers=second.offers.map(o=>({...o,id:o.id+'-Q2',quoteRef:'SYNTHETIC-Q2',supplierQuoteRow:{...o.supplierQuoteRow,parentOfferId:o.supplierQuoteRow.parentOfferId+'-Q2'},quoteEvidence:{...o.quoteEvidence,sourceSha256:'c'.repeat(64)}}));
+const twoQuotes=R.planVendorRegister0550(originals,second,tokens).workspace;
+for(const mode of ['company','system'])assert.equal(R.groupVendorOffers0550(R.vendorOfferEntries0550(twoQuotes),mode,D.SYSTEMS)[0].children[0].quotes.length,2);
+const editedSource=structuredClone(originals);editedSource.offers[1].unitCost=999;
+const sourceHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:editedSource,onEdit:()=>{}}));
+assert(sourceHtml.includes('Total Price ต้นฉบับ')&&sourceHtml.includes('150.00')&&sourceHtml.includes('75.00')&&sourceHtml.includes('999.00'));
+const withoutMeta=structuredClone(enriched);delete withoutMeta.offers[1].quoteEvidence;
+assert.equal(R.groupVendorOffers0550(R.vendorOfferEntries0550(withoutMeta),'company',D.SYSTEMS)[0].children[0].quotes.length,1,'Unenriched saved edits stay in their one unambiguous source quotation');
+const deletedPrior={...data,vendors:native.vendors,supplierRevisionImports:[{batchId:'SYNTHETIC-PRIOR-REVISION',packageKey:'prior',importedOn:'2026-11-03'}]};
+assert.equal(R.planVendorRegister0550(deletedPrior,native,tokens).workspace.offers.length,0,'A separate source receipt preserves previously deleted quote rows');
+const invalidTotal=structuredClone(native);invalidTotal.offers[0].quoteEvidence.quotedTotal=-1;assert.throws(()=>R.planVendorRegister0550(data,invalidTotal,tokens));
+const badParent=structuredClone(native);badParent.offers[1].supplierQuoteRow.parentOfferId='MISSING';assert.throws(()=>R.planVendorRegister0550(data,badParent,tokens));
 if(process.env.PJ0550_VENDOR_REGISTER_FILE){
  const actual=JSON.parse(fs.readFileSync(process.env.PJ0550_VENDOR_REGISTER_FILE,'utf8')),actualBefore=JSON.stringify(actual),registered=R.planVendorRegister0550(data,actual,tokens).workspace;
  assert.equal(registered.offers.length,4);assert.equal(registered.lines.length,0);assert.equal(JSON.stringify(actual),actualBefore);

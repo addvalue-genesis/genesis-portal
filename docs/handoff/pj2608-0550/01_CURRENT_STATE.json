@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_VENDOR_DEFAULT_PRESENCE.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_PAGA_ORIGINAL_QUOTATIONS.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -25,7 +25,8 @@
     "docs/handoff/pj2608-0550/20261104_VENDOR_REGISTER_GROUPING.md",
     "docs/handoff/pj2608-0550/20261104_QUOTATION_BASELINE_AND_EXACT_ARTIFACTS.md",
     "docs/handoff/pj2608-0550/20261104_VENDOR_AUTOMATIC_LOADING.md",
-    "docs/handoff/pj2608-0550/20261104_VENDOR_DEFAULT_PRESENCE.md"
+    "docs/handoff/pj2608-0550/20261104_VENDOR_DEFAULT_PRESENCE.md",
+    "docs/handoff/pj2608-0550/20261104_PAGA_ORIGINAL_QUOTATIONS.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -65,6 +66,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "Both original PAGA quotations are prepared for automatic Vendor registration:37+39 native numbered rows,80 source/owner records,2 identities. Original Qty/Unit/Unit Price/Total/source filename+locator are separate from unchanged Working quantities/prices/FX/history. Private DATA uploaded and metadata verified; isolated browser auto-import/reload passed. Windows consumption remains unobserved. See latest checkpoint.",
     "Owner requires default presence, not a Load dependency: IDIE/four OPEN metadata rows are now startup defaults independent of Drive. Private original rates hydrate only untouched defaults;3 bounded retries handle later DATA arrival. Preserve actual quotes, edits/deletions, Working/FX/frozen history. Metadata presence is verified; owner Windows source access/rate consumption remains unconfirmed.",
     "Owner corrected manual Vendor import: actual private QO26163 JSON is prepared in project Drive90_SYSTEM_WORKING/DATA; code loads all prepared Vendor packages automatically via existing local bridge/startup into07.1/07.2. Restart npm after pull; Windows sync/consumption still unconfirmed. Preserve native rates, saved edits/deletions, Working selections/prices/FX and frozen history.",
     "Owner-authorised explicit reference/exact artifact archive reuses Common PR56 in existing Release10.7. Reference selection/import/capture does not adopt Working prices or imply sending/acceptance. Keep separate verified archive backup; central storage/authenticated transmission and Windows application remain unconfirmed. See current checkpoint for tests and limits.",
