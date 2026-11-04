@@ -285,3 +285,8 @@
 .p553-spare-tag-preview .p553-b10-native-annex-table th:nth-child(8){width:8%}
 .p553-spare-tag-preview .p553-c2-tag-list{margin-top:4px;max-height:120px;overflow:auto}
 @media print{.p553-c1-selected-source>summary{display:none!important}}
+.p553-baseline-fields{display:flex;flex-wrap:wrap;gap:10px;align-items:end;margin:10px 0}
+.p553-baseline-fields label{display:flex;flex-direction:column;gap:3px;max-width:100%;font-size:13px}
+.p553-baseline-fields input,.p553-baseline-fields select{padding:7px;border:1px solid #a8bac8;border-radius:3px;max-width:100%;min-width:180px;font:inherit}
+.p553-quotation-baseline code{overflow-wrap:anywhere;font-size:11px}
+.p553-quotation-baseline p{font-size:13px}

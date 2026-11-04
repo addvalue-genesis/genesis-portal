@@ -3,6 +3,8 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
+    "validate:common-quotation-baseline": "node scripts/validate-common-quotation-baseline.cjs",
+    "validate:0553-browser-startup": "node scripts/validate-0553-browser-startup.cjs",
     "validate:0553-c2-rf-drum": "node scripts/validate-0553-c2-rf-drum.cjs",
     "validate:0553-c2-cat6-drum": "node scripts/validate-0553-c2-cat6-drum.cjs",
     "validate:0553-tens-quote-rollup": "node scripts/validate-0553-tens-quote-rollup.cjs",
@@ -168,7 +170,7 @@
     "validate:0553-b1-lifecycle-review": "node scripts/validate-0553-b1-lifecycle-review.cjs",
     "start:0553": "webpack serve --mode development --env project=0553 --port 3053",
     "validate:0553-b1-only-selection": "node scripts/validate-0553-b1-only-selection.cjs",
-    "build:0553": "webpack --mode production --env project=0553",
+    "build:0553": "node scripts/validate-0553-browser-startup.cjs && webpack --mode production --env project=0553",
     "validate:0553-single-project-entry": "node scripts/validate-0553-single-project-entry.cjs",
     "validate:0553-c1-c2-engineering-control": "node scripts/validate-0553-c1-c2-engineering-control.cjs",
     "validate:0553-c1-si-tag-budget": "node scripts/validate-0553-c1-si-tag-budget.cjs",

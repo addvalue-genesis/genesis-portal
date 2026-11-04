@@ -1,4 +1,5 @@
 import {buildRawCustomerPriceBreakdown0553} from "./customerPriceBreakdownCore0553";
+import {allocateFixedParent} from "../../common/cost/quotationRounding";
 import {roundQuotedRowsUp0553,roundQuoteUnitUp0553} from "./quoteUnitRounding0553";
 import {selectOptionBudgetaryOffer0553} from "./optionBudgetaryOffer0553";
 import {roundAnnexUnitPrices0553} from "./c1SiTagBudget0553";
@@ -182,13 +183,8 @@ export function buildOfficialUsdRelease0553(source,policy=OFFICIAL_USD_POLICY_05
    const priced=g.rows.filter(r=>r.amountUSD!==null&&r.customerSellTHB>0);
    if(fixedUSD%10!==0||!priced.length||priced.some(r=>r.qty!==1))
     throw Error(g.code+" fixed price allocation requires USD10 total and one-set source rows");
-   const weight=priced.reduce((n,r)=>n+r.customerSellTHB,0),units=fixedUSD/10;
-   const shares=priced.map(r=>{const exact=units*r.customerSellTHB/weight;return {key:r.key,units:Math.floor(exact),fraction:exact-Math.floor(exact)};});
-   const order=[...shares].sort((a,b)=>b.fraction-a.fraction||(a.key<b.key?-1:a.key>b.key?1:0));
-   const residual=units-shares.reduce((n,r)=>n+r.units,0);
-   if(residual<0||residual>shares.length)throw Error(g.code+" fixed price allocation cannot reconcile");
-   for(let i=0;i<residual;i++)order[i].units++;
-   const byKey=new Map(shares.map(r=>[r.key,r.units*10]));
+   const shares=allocateFixedParent(priced.map(r=>({id:r.key,qty:r.qty,weight:r.customerSellTHB})),fixedUSD,10);
+   const byKey=new Map(shares.map(r=>[r.id,Number(r.amount)]));
    const rows=g.rows.map(r=>byKey.has(r.key)?{...r,preFixedPriceAmountUSD:r.amountUSD,
     unitUSD:byKey.get(r.key),amountUSD:byKey.get(r.key),unitRoundingUSD:10,
     commercialAllocation:"OWNER_FIXED_TOTAL_IN_USD10_UNITS"}:{...r});

@@ -1,13 +1,11 @@
 import React,{useEffect,useMemo,useRef,useState} from "react";
 import {buildOfficialUsdRelease0553,OFFICIAL_SHEETS_0553,selectSubmittedRev02Release0553,selectCurrentReleaseRev03_0553} from "./data/officialUsdRelease0553";
-import {buildNativeOfficialRelease0553} from "./nativeWorkingDraft0553";
-import template from "./data/nativeReleaseTemplate0553.json";
 import {B10KitPriceSummary0553} from "./B10KitPriceSummary0553";
 import {OtherSpareOriginalAnnex0553} from "./OtherSpareOriginalAnnex0553";
 import {SubmittedWorksheet0553} from "./ReleaseCustomerWorkbook0553";
-import {buildCustomerPriceBreakdown0553} from "./data/customerPriceBreakdown0553";
-import {buildNativePriceBreakdown0553} from "./nativePriceBreakdown0553";
 import "./releaseWorkbook0553.css";
+import {QuotationBaselineControl0553} from "./QuotationBaselineControl0553";
+import {RecordedQuotation0553} from "./RecordedQuotation0553";
 const money=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2}):"To be quoted";
 const unit=n=>Number.isFinite(n)?n.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:4}):"To be quoted";
 export function OfficialUsdRelease0553({source,onOpenSource=null}){
@@ -19,7 +17,9 @@ export function OfficialUsdRelease0553({source,onOpenSource=null}){
  const officialWorksheets=submitted.worksheets.filter(s=>!/^A[1-4] MR000[1-4]$/.test(s.name));
  const archivedSheet=officialWorksheets.find(s=>s.name===submittedSheet)||officialWorksheets[0];
  const model=useMemo(()=>releaseVersion==="WORKING_DRAFT"?buildOfficialUsdRelease0553(source):null,[source,releaseVersion]);
- const [sheet,setSheet]=useState("SUMMARY"),[busy,setBusy]=useState(false),[error,setError]=useState("");
+ const [sheet,setSheet]=useState("SUMMARY"),[error,setError]=useState("");
+ const [recordedQuotation,setRecordedQuotation]=useState(null);
+ const baselineControl=useRef(null);
  const SelectedSheet="div";
  const selectedSheetRef=useRef(null);
  useEffect(()=>{
@@ -29,18 +29,11 @@ export function OfficialUsdRelease0553({source,onOpenSource=null}){
   window.addEventListener("beforeprint",before);window.addEventListener("afterprint",after);
   return ()=>{after();window.removeEventListener("beforeprint",before);window.removeEventListener("afterprint",after);};
  },[]);
- const download=async(breakdown=false)=>{
-  if(!model)return;
-  setBusy(true);setError("");
-  try{
-   const bytes=Uint8Array.from(atob(template.base64),c=>c.charCodeAt(0));
-   const file=new File([bytes],template.sourceName,{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-   const result=breakdown?await buildNativePriceBreakdown0553(file,model,buildCustomerPriceBreakdown0553(source,model)):
-    await buildNativeOfficialRelease0553(file,model);
-   const url=URL.createObjectURL(result.blob),link=document.createElement("a");
-   link.href=url;link.download=result.filename;document.body.appendChild(link);link.click();link.remove();
-   setTimeout(()=>URL.revokeObjectURL(url),15000);
-  }catch(e){setError(e.message||String(e));}finally{setBusy(false);}
+ const captureBeforeDownload=()=>{
+  // Freeze + back up before exporting. The register then offers the captured
+  // scope/breakdown files; no new file is built from changing Working here.
+  if(baselineControl.current){setError("");return baselineControl.current.capture();}
+  setError("ทะเบียนกำลังโหลด กรุณาลองบันทึกฉบับอีกครั้ง");
  };
  const summaryRow=r=>{
   const isOption=r.code==="C1"||r.code==="C2";
@@ -67,20 +60,21 @@ export function OfficialUsdRelease0553({source,onOpenSource=null}){
  };
  return <section className="p55-panel p553-release-workbook p553-official-usd" data-component-key="bid.budget.pricing.official">
   <div className="p553-official-toolbar"><h3>10.3.4 · Official Release — English / USD</h3>
-   {releaseVersion==="WORKING_DRAFT"&&<><button type="button" className="p553-detail-button" disabled={busy} onClick={()=>download()}>{busy?"Preparing Excel…":"Export Excel — English / USD"}</button>
-   <button type="button" className="p553-detail-button" disabled={busy} onClick={()=>download(true)}>Export Breakdown — Draft / 10 sheets</button></>}
+   {releaseVersion==="WORKING_DRAFT"&&<><button type="button" className="p553-detail-button" onClick={captureBeforeDownload}>บันทึกฉบับก่อน Export Excel — English / USD</button>
+   <button type="button" className="p553-detail-button" onClick={captureBeforeDownload}>บันทึกฉบับก่อน Export Breakdown — Draft / 10 sheets</button></>}
    <button type="button" className="p553-detail-button" aria-pressed={releaseVersion==="CURRENT_REV03"} onClick={()=>setReleaseVersion("CURRENT_REV03")}>Current Rev03 · Agreed quotation</button>
    <button type="button" className="p553-detail-button" aria-pressed={historical} onClick={()=>setReleaseVersion("SUBMITTED_REV02")}>History Rev02 · 30 Oct 2026</button>
    <button type="button" className="p553-detail-button" aria-pressed={releaseVersion==="WORKING_DRAFT"} onClick={()=>setReleaseVersion("WORKING_DRAFT")}>Working draft · not issued</button></div>
-  {releaseVersion!=="WORKING_DRAFT"?<div data-release-revision={submitted.revision} data-release-state={historical?"HISTORICAL_SUBMITTED_REV02":"OWNER_SELECTED_REV03"}>
+  <QuotationBaselineControl0553 controllerRef={baselineControl} mode={releaseVersion} reference={submitted} source={source} onSelectRecord={record=>{setError("");setRecordedQuotation(record);setReleaseVersion("RECORDED");}}/>
+  {error&&<p role="alert">{error}</p>}
+  {releaseVersion==="RECORDED"&&recordedQuotation?<RecordedQuotation0553 key={recordedQuotation.id} record={recordedQuotation}/>:releaseVersion!=="WORKING_DRAFT"?<div data-release-revision={submitted.revision} data-release-state={historical?"HISTORICAL_SUBMITTED_REV02":"OWNER_SELECTED_REV03"}>
    <p><strong>{submitted.filename} · {historical?"History — submitted to SAMTEL 30 October 2026":"Current owner-selected quotation"}</strong><br/>Total A+B: <strong>USD {money(submitted.totalBaseUSD)}</strong>.</p>
    <p>{historical?"Historical reference only; this is not the current selected quotation.":"Exact Scope of supply and B10/B11/B13/C1/C2 from the owner-selected Rev03 source workbook. C1/C2 are optional and excluded from Total A+B."}</p>
-   <p><a className="p553-detail-button" href={submitted.originalWorkbookPath} download={submitted.filename}>{historical?"Download historical Rev02":"Download agreed Rev03"}</a>{" · "}<a href={submitted.sourceUrl} target="_blank" rel="noopener noreferrer">Open source workbook</a></p>
+   <p><a className="p553-detail-button" href={submitted.originalWorkbookPath} download={submitted.filename} onClick={e=>{e.preventDefault();captureBeforeDownload();}}>{historical?"บันทึกฉบับก่อนดาวน์โหลด Rev02":"บันทึกฉบับก่อนดาวน์โหลด Rev03"}</a>{" · "}<a href={submitted.sourceUrl} target="_blank" rel="noopener noreferrer">Open source workbook</a></p>
    <div className="p553-release-tabs" role="tablist" aria-label={historical?"Historical Rev02 worksheets":"Current Rev03 worksheets"}>{officialWorksheets.map(s=><button key={s.name} type="button" role="tab" aria-selected={s.name===submittedSheet} onClick={()=>setSubmittedSheet(s.name)}>{s.name}</button>)}</div>
    <SubmittedWorksheet0553 sheet={archivedSheet}/>
   </div>:<>
   <p className="p55-note">Working calculation for internal review. The current agreed quotation is Rev03; historical Rev02 remains separate.</p>
-  {error&&<p role="alert">Export failed: {error}</p>}
   <div className="p553-release-tabs" role="tablist" aria-label="Quotation worksheets">{OFFICIAL_SHEETS_0553.map(([name,code])=><button type="button" key={code} role="tab" aria-selected={sheet===code} className={sheet===code?"is-active":""} onClick={()=>setSheet(code)}>{name}</button>)}</div>
 
   <SelectedSheet ref={selectedSheetRef} className={sheet==="C1"?"p55-panel p553-c1-selected-source":"p553-selected-sheet"}>
