@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.9",
+  "version": "2026-11-04.10",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "30a705bc",
-  "capability": "Retains PAGA and CERAGON RevA1 source/default behaviour. Master Tower originals30m/60m show native line prices as2 quotations with a separate unchanged aggregate Working reference; IDIE shows original4 rates, printed Asactual amounts and option/trip totals. Metadata supplements preserve edited costs, independent family receipts, Working/FX/history and source/engineering state."
+  "source0550": "650bce16",
+  "capability": "Existing WP.1 shows CUS/VND responsibility across all systems and COMMON: TSI supply, COMPANY responsibility, TSI services, unresolved scope, registered versus linked Offers, reviewed Mapping and unique selected Working owner/known-price references. Read-only projection preserves canonical records, source authority, quantities, prices/FX, release gates and frozen history."
 }

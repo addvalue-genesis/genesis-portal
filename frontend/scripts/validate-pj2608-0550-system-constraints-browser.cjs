@@ -27,7 +27,28 @@ const server = http.createServer((req, res) => {
   const preview = page.locator('section.p55-working-preview'), select = preview.locator('select[aria-label="Working Preview system"]'); await select.waitFor();
   const tokens = await select.locator('option').evaluateAll(es => es.map(e => e.value).filter(v => v !== 'ALL'));
   assert(tokens.includes('COMMON')); assert.equal(tokens.length, 20);
-  const inspectedTokens = process.argv[2] ? ['TEL-LAN', 'TEL-CCTV', 'COMMON'] : tokens;
+  const overview = preview.getByRole('table', {name: 'All system scope reviews', exact: true});
+  assert.equal(await overview.locator('tbody tr').count(), 20);
+  const vsat = overview.locator('[data-system-responsibility="TEL-VSAT"]');
+  assert((await vsat.innerText()).includes('COMPANY รับผิดชอบ'));
+  await vsat.getByRole('button', {name: 'ตรวจขอบเขต', exact: true}).click();
+  assert.equal(await select.inputValue(), 'TEL-VSAT');
+  assert.equal(await overview.locator('tbody tr').count(), 1);
+  await preview.getByLabel('Scope completeness / applicability basis', {exact: true}).waitFor();
+  assert.equal(JSON.stringify(await read()), JSON.stringify(before), 'Opening responsibility/scope review never saves or approves');
+  const supplyGroup = overview.locator('details').filter({has: page.locator('summary', {hasText: /^TSI จัดหา/})}).first();
+  await supplyGroup.locator('summary').click();
+  const requirementButton = supplyGroup.getByRole('button').first();
+  const requirementTitle = await requirementButton.innerText();
+  await requirementButton.click();
+  await preview.locator('[data-component-key="bid.working-preview.step.4"]').locator('select[aria-label="Working requirement"]').waitFor();
+  assert((await preview.locator('[data-component-key="bid.working-preview.step.4"]').innerText()).includes(requirementTitle));
+  await navigate('bid.working-preview.step.1');
+  assert.equal(JSON.stringify(await read()), JSON.stringify(before), 'Responsibility group opens the existing editor without saving');
+  await select.selectOption('ALL');
+  for (const width of [1440, 390]) {await page.setViewportSize({width, height: 900}); await overview.scrollIntoViewIfNeeded(); assert(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 2), 'Overview fits viewport ' + width);}
+  await page.setViewportSize({width: 1440, height: 1000});
+  const inspectedTokens = process.argv[2] ? ['TEL-LAN-VCS', 'TEL-VSAT', 'TEL-VSAT-KU', 'TEL-AIS', 'TEL-LAN', 'TEL-CCTV', 'COMMON'] : tokens;
   for (const token of inspectedTokens) {await select.selectOption(token); const set = preview.locator('section.p55-system-constraints'); await set.waitFor(); assert((await set.innerText()).includes(token)); assert(await set.getByRole('table', {name: 'System constraint requirements', exact: true}).count()); console.log('CHECK constraints: scope', token);}
   await select.selectOption('TEL-LAN'); const set = preview.locator('section.p55-system-constraints');
   await set.locator('input[aria-label="System constraint search"]').fill('no-such-constraint'); assert.equal(await set.getByRole('table', {name: 'System constraint requirements', exact: true}).locator('tbody tr').count(), 0);

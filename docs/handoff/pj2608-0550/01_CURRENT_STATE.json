@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_MASTER_TOWER_IDIE_ORIGINAL_PRICES.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_SYSTEM_RESPONSIBILITY_OVERVIEW.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -28,7 +28,8 @@
     "docs/handoff/pj2608-0550/20261104_VENDOR_DEFAULT_PRESENCE.md",
     "docs/handoff/pj2608-0550/20261104_PAGA_ORIGINAL_QUOTATIONS.md",
     "docs/handoff/pj2608-0550/20261104_CERAGON_REVA1_VENDOR_REGISTER.md",
-    "docs/handoff/pj2608-0550/20261104_MASTER_TOWER_IDIE_ORIGINAL_PRICES.md"
+    "docs/handoff/pj2608-0550/20261104_MASTER_TOWER_IDIE_ORIGINAL_PRICES.md",
+    "docs/handoff/pj2608-0550/20261104_SYSTEM_RESPONSIBILITY_OVERVIEW.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -69,6 +70,8 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "Antigravity d641c9f0 report checked against650bce16: Volume11 already reads official lines/customerUSD, deterministic draft allocations can be saved, native forms paginate and actual Source/private Vendor JSON exist. Real seed gap:13 B7-B9 rows have no valid default customer row. Resolve explicit Part B/Schedule allocation against customer basis, preserving prices, authored mappings and frozen issues; do not add customer rows or bypass gates blindly. See latest checkpoint for tested facts and limits.",
+    "WP.1 responsibility / Vendor / Working overview reuses canonical records across all19 systems, COMMON and additional scope. Separate COMPANY supply, TSI supply/services, unresolved work, Offer presence, reviewed Mapping and unique selected owner/known-price references. No automatic scope acceptance, engineering proof, allocation, financial adoption or issue. See latest checkpoint for actual tests and Windows deployment limit.",
     "Master Tower both original PDF texts are already in Source Rev11; private Vendor register now32 records (15items+net per original), with two source identities and one separate unchanged combined Working supply reference. IDIE original moved to canonical DATA; follow-up metadata adds Asactual/printed totals without changing active rates. PAGA/CERAGON defaults and independent receipts preserved. Actual source/model/bounded checks and production browser passed; owner Windows consumption pending.",
     "CERAGON ASK microwave RevA1 is a separate Vendor revision under TEL-DMR / MR Appendix1.5, not VHF DMR. Existing07.1/07.2 startup metadata and independent default/private receipts preserve IDIE, local edits/deletions and prior actual quote imports. Native option quantity0 and2annual support units remain reference facts; no Working adoption or technical approval. Actual private JSON is prepared for project DATA; Windows consumption remains unverified. See latest checkpoint for source/OPEN issues and delivery verification.",
     "Deployment correction: actual Drive inspection found duplicate90_SYSTEM_WORKING folders. Moved existing PAGA register from newly created Vendor-only DATA into original DATA beside actual Source Rev11/A Rev07; same File ID/138991 bytes, post-move parent verified. New UI is visible in owner screenshot but consumption is unconfirmed. No additional code pull is required for this data move. Verify directory identity by existing Source/A files before future uploads. Other Vendor files were not moved in this task.",

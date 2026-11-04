@@ -1,9 +1,56 @@
 // ADR 1–6, 8–14. Read-only SI worklist over the existing canonical records.
 // COMMON is review context, never an implicit per-system obligation or cost.
 import {documentFamily0550} from './integrationWorkspace0550';
+import {MR_WORKING_CATALOG_0550, mrLineScope0550} from './mrWorkingBasis0550';
+import {vendorOfferEntries0550} from './vendorRegister0550';
 
 const unique = values => [...new Set(values.filter(Boolean))];
 const text = value => String(value || '').replace(/\s+/g, ' ').trim();
+
+// Counts are canonical record/reference counts, never equipment quantities,
+// technical acceptance, money allocations or an overall completeness score.
+export function systemResponsibilityOverview0550(data, model) {
+ const integration = model.integration, lines = new Map(model.lines.map(l => [l.id, l]));
+ const catalog = new Map(MR_WORKING_CATALOG_0550.rows.map(r => ['REQDEF-' + r.id, r]));
+ const offers = new Set(data.offers.map(o => o.id)), entries = vendorOfferEntries0550(data);
+ const supplyWbs = new Set(['A', 'B5', 'B6', 'C2', 'C3']);
+ const serviceWbs = new Set(['B1', 'B2', 'B3', 'B4', 'B7', 'B8', 'B9', 'C1']);
+ return integration.scopes.map(scope => {
+  const requirements = integration.requirements.filter(r => r.systemToken === scope.id);
+  const groups = {tsiSupply: [], company: [], tsiServices: [], unresolved: [], notApplicable: []};
+  const ownerIds = new Set(), ownerIssues = new Set(), unlinkedRequirements = [], linkedOffers = new Set(), missingOffers = new Set();
+  for (const r of requirements) {
+   const activities = integration.activities.filter(a => a.requirementId === r.id);
+   const refs = unique([...(r.workLineIds || []), ...activities.map(a => a.workLineId)]);
+   const linked = refs.map(id => lines.get(id)).filter(Boolean);
+   const wbs = unique(linked.map(l => l.wbs));
+   if (!wbs.length && catalog.has(r.id)) wbs.push(catalog.get(r.id).wbs);
+   const kinds = unique(wbs.map(w => supplyWbs.has(w) ? 'supply' : serviceWbs.has(w) ? 'service' : 'unknown'));
+   const group = r.state === 'NOT_APPLICABLE' ? 'notApplicable' : r.responsibility === 'COMPANY' ? 'company' : r.responsibility !== 'TSI' || kinds.length !== 1 || kinds[0] === 'unknown' ? 'unresolved' : kinds[0] === 'supply' ? 'tsiSupply' : 'tsiServices';
+   groups[group].push(r.id);
+   for (const id of r.offerIds || []) (offers.has(id) ? linkedOffers : missingOffers).add(id);
+   // COMPANY/reference-only and reviewed N/A records do not become TSI cost gaps.
+   if (['company', 'notApplicable'].includes(group)) continue;
+   if (!refs.length) unlinkedRequirements.push(r.id);
+   for (const id of refs) {
+    const l = lines.get(id);
+    if (!l) {ownerIssues.add(id); continue;}
+    const state = mrLineScope0550({lines: data.lines}, l);
+    if (state.excluded || l.satelliteScopeState?.excluded) continue;
+    if (l.coveredByLineId && !state.covered) {ownerIssues.add(id); continue;}
+    const owner = state.covered ? lines.get(state.owner.id) : l;
+    if (!owner?.selected) {ownerIssues.add(id); continue;}
+    ownerIds.add(owner.id);
+   }
+  }
+  const owners = [...ownerIds].map(id => lines.get(id));
+  return {id: scope.id, scope, groups, requirements: requirements.length,
+   registeredOfferIds: entries.filter(e => e.systemTokens.includes(scope.id)).map(e => e.offer.id),
+   linkedOfferIds: [...linkedOffers], missingOfferIds: [...missingOffers], ownerIds: [...ownerIds], ownerIssueIds: [...ownerIssues], unlinkedRequirementIds: unlinkedRequirements,
+   knownPriceOwnerIds: owners.filter(l => Number.isFinite(l.provisionalCustomerTHB)).map(l => l.id),
+   reviewedMappings: requirements.filter(r => r.state === 'REVIEWED_MAPPING').length};
+ });
+}
 
 export function systemConstraints0550(data, model, systemToken) {
  const integration = model.integration;

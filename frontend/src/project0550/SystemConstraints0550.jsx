@@ -1,11 +1,31 @@
 import React, {useMemo, useState, useEffect} from 'react';
-import {systemConstraints0550} from './data/systemConstraints0550';
+import {systemConstraints0550, systemResponsibilityOverview0550} from './data/systemConstraints0550';
 
-export function SystemConstraints0550({data, model, system, onEditRequirement, onNavigate, onOpenSource}) {
+function RequirementGroup0550({ids, label, requirements, onOpen}) {
+ const [open, setOpen] = useState(false);
+ return <details onToggle={e => setOpen(e.currentTarget.open)}><summary>{label} · {ids.length} records</summary>{open && ids.map(id => <p key={id}><button type="button" onClick={() => onOpen(requirements.get(id))}>{requirements.get(id)?.title || id}</button><small>{id}</small></p>)}</details>;
+}
+
+export function SystemConstraints0550({data, model, system, onEditRequirement, onNavigate, onOpenSource, onSelectSystem, systemName = token => token}) {
  const [query, setQuery] = useState(''), [limit, setLimit] = useState(25);
  useEffect(() => {setQuery(''); setLimit(25);}, [system]);
  const view = useMemo(() => system === 'ALL' ? null : systemConstraints0550(data, model, system), [data, model, system]);
- if (!view) return <p className="p55-note">เลือก “ตรวจขอบเขต” รายระบบ หรือเลือกจาก Working Preview system เพื่อรวมชุดข้อกำหนดและตรวจงาน SI ต่อจาก records เดิม</p>;
+ const overview = useMemo(() => systemResponsibilityOverview0550(data, model), [data, model]);
+ const requirements = new Map(model.integration.requirements.map(r => [r.id, r]));
+ const group = (ids, label) => <RequirementGroup0550 ids={ids} label={label} requirements={requirements} onOpen={r => {onEditRequirement(r); onNavigate('bid.working-preview.step.4');}}/>;
+ const summary = <section aria-label="System responsibility overview">
+  <h3>ขอบเขต CUS ↔ VND และงาน SI</h3>
+  <p className="p55-note">จำนวนเป็น records / references ไม่ใช่จำนวนอุปกรณ์หรือเปอร์เซ็นต์ความครบถ้วน · COMPANY จัดหาอุปกรณ์หลักยังอาจมีงาน SI · ไม่มี Offer ผูกระบบไม่ได้แปลว่าไม่มี Vendor · COMMON คงเป็นงานร่วม ไม่คัดลอกต้นทุนเข้าทุกระบบ</p>
+  <div className="p55-table-wrap"><table className="p55-table" aria-label="All system scope reviews"><thead><tr><th>ระบบ / Scope review</th><th>TSI จัดหา / COMPANY / งาน SI</th><th>รอยืนยัน / ไม่เกี่ยวข้อง</th><th>Vendor / Mapping</th><th>Working cost owners</th><th>เปิดทำงาน</th></tr></thead><tbody>{overview.filter(r => system === 'ALL' || r.id === system).map(r => <tr key={r.id} data-system-responsibility={r.id}>
+   <td><strong>{systemName(r.id)}</strong><small>{r.id} · {r.requirements} requirements</small><small>Scope review: {r.scope.state}</small><details><summary>{r.scope.problems.length} ประเด็น Scope</summary>{r.scope.problems.map(problem => <p key={problem}>{problem}</p>)}</details></td>
+   <td>{group(r.groups.tsiSupply, 'TSI จัดหา')}{group(r.groups.company, 'COMPANY รับผิดชอบ')}{group(r.groups.tsiServices, 'TSI บริการ / งาน SI')}</td>
+   <td>{group(r.groups.unresolved, 'รอยืนยันผู้รับผิดชอบ / ประเภทงาน')}{group(r.groups.notApplicable, 'ไม่เกี่ยวข้องตามผลทบทวน')}</td>
+   <td><p>{r.registeredOfferIds.length ? `มี Offer ผูกกับระบบ ${r.registeredOfferIds.length} IDs` : 'ยังไม่มี Offer ผูกกับระบบ'}</p><small>ข้อกำหนดอ้าง Offer ที่พบ {r.linkedOfferIds.length} IDs · refs หาไม่พบ {r.missingOfferIds.length}</small><small>REVIEWED_MAPPING {r.reviewedMappings} records</small><details><summary>เปิด Offer / ตรวจหลักฐานเดิม</summary>{[...new Set([...r.registeredOfferIds, ...r.missingOfferIds])].map(id => <button key={id} type="button" onClick={() => onNavigate('bid.vendor.offer.' + id)}>{id}</button>)}</details></td>
+   <td><p>Owner ที่เลือกและผูกอยู่ {r.ownerIds.length} IDs · มีราคา Working {r.knownPriceOwnerIds.length} IDs</p><small>ราคา / inputs ยัง OPEN {r.ownerIds.length - r.knownPriceOwnerIds.length} · owner ref รอแก้ {r.ownerIssueIds.length} · ยังไม่ผูก Working {r.unlinkedRequirementIds.length} requirements</small><small>เป็นราคา Working ที่คำนวณได้ ยังไม่ใช่ Release · owner ร่วมอาจปรากฏหลายระบบ ห้ามรวมจำนวนหรือราคาไประบบอื่น</small><details><summary>เปิด Working เดิม</summary>{[...new Set([...r.ownerIds, ...r.ownerIssueIds])].map(id => <button type="button" key={id} onClick={() => onNavigate('bid.budget.working.line.' + id)}>{id}</button>)}</details></td>
+   <td><button type="button" onClick={() => onSelectSystem?.(r.scope)}>ตรวจขอบเขต</button></td>
+  </tr>)}</tbody></table></div>
+ </section>;
+ if (!view) return summary;
  const openRequirement = (r, target = 'bid.working-preview.step.4') => {onEditRequirement(r); onNavigate(target);};
  function table(rows, label) {
   const needle = query.toLowerCase();
@@ -38,7 +58,7 @@ export function SystemConstraints0550({data, model, system, onEditRequirement, o
    {visible.length > limit && <button type="button" onClick={() => setLimit(n => n + 25)}>แสดงอีก 25 records</button>}
   </>;
  }
- return <section className="p55-system-constraints" aria-label="System constraint continuation">
+ return <>{summary}<section className="p55-system-constraints" aria-label="System constraint continuation">
   <h3>ชุดข้อกำหนดและงาน SI ต่อ · {system}</h3>
   <p>มี {view.counts.requirements} requirements · พบข้อความ A {view.counts.sourceText} · มี interpretation {view.counts.interpreted} · ผูก Supplier evidence {view.counts.supplierEvidence} · derived CAL/RPT {view.counts.proofs} · activities {view.counts.activities} · ตรวจ Mapping แล้ว {view.counts.reviewed}</p>
   <p className="p55-note">ใช้ records เดิม · แต่ละสถานะตรวจคนละเรื่องและอาจซ้อนกัน ห้ามรวมเป็นเปอร์เซ็นต์ความครบถ้วน · ข้อเสนอ/ข้อความที่มีอยู่ยังต้องตรวจ applicability, conflicts และ engineering adequacy · การเปิดหน้านี้ไม่สร้างหรืออนุมัติข้อมูล</p>
@@ -50,5 +70,5 @@ export function SystemConstraints0550({data, model, system, onEditRequirement, o
   {table(view.rows, 'System constraint requirements')}
   {system !== 'COMMON' && <details><summary>COMMON ที่ต้องพิจารณาร่วม · {view.commonRows.length} records / {view.commonParticulars.length} Particulars</summary><p>บริบทงานร่วมเพื่อทบทวน applicability เท่านั้น ยังไม่ถือว่าทุกข้อเป็นขอบเขตของ {system} · คง ID และ cost owner เดิม ไม่คัดลอกงานหรือต้นทุนไประบบนี้</p>{table(view.commonRows, 'Common constraint context')}</details>}
   {!!view.findings.length && <details><summary>Source findings ที่เกี่ยวข้อง · {view.findings.length}</summary>{view.findings.map(f => <p key={f.id}>{f.id} · {f.state} · {f.statement}<small>{f.impact}</small></p>)}</details>}
- </section>;
+ </section></>;
 }
