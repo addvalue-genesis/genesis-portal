@@ -64,6 +64,13 @@ assert(all(tree).some(n=>n.props['data-release-state']==='OWNER_SELECTED_REV03')
 assert(text(tree).includes('894,910.00'));
 const download=all(tree).find(n=>n.type==='a'&&n.props.download===current.filename);
 assert(download);assert.equal(download.props.href,current.originalWorkbookPath);
+let prevented=false,registeredCaptures=0;
+const baselineControl=all(tree).find(n=>n.props.controllerRef&&n.props.onSelectRecord);
+assert(baselineControl,'Official must host revision control inside its existing module');
+baselineControl.props.controllerRef.current={capture:()=>{registeredCaptures++;}};
+download.props.onClick({preventDefault(){prevented=true;}});
+assert(prevented&&registeredCaptures===1,'Normal original download must pass through registered capture first');
+assert.equal(liveCalls,0,'Archiving exact original does not select the live model');
 assert(all(tree).some(n=>n.type==='a'&&n.props.href===current.sourceUrl));
 assert.deepEqual(all(tree).filter(n=>n.props.role==='tab').map(n=>text(n).trim()),current.worksheets.map(s=>s.name));
 for(const name of current.worksheets.slice(1).map(s=>s.name)){

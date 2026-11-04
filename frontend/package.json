@@ -3,6 +3,7 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
+    "validate:common-quotation-baseline": "node scripts/validate-common-quotation-baseline.cjs",
     "validate:0553-c2-rf-drum": "node scripts/validate-0553-c2-rf-drum.cjs",
     "validate:0553-c2-cat6-drum": "node scripts/validate-0553-c2-cat6-drum.cjs",
     "validate:0553-tens-quote-rollup": "node scripts/validate-0553-tens-quote-rollup.cjs",

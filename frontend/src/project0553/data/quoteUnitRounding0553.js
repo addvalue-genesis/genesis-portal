@@ -1,10 +1,11 @@
+import {roundUnitUp} from "../../common/cost/quotationRounding";
 // Owner03-Nov2026: round quoted USD units UP to tens, then sum children.
 export const QUOTE_UNIT_INCREMENT_USD_0553=10;
 export function roundQuoteUnitUp0553(value){
  if(value===null||value===undefined)return null;
  if(value===0)return 0;
  if(!Number.isFinite(value)||value<0)throw Error("Invalid quoted unit price");
- return Math.ceil(value/QUOTE_UNIT_INCREMENT_USD_0553-1e-10)*QUOTE_UNIT_INCREMENT_USD_0553;
+ return Number(roundUnitUp(value,QUOTE_UNIT_INCREMENT_USD_0553));
 }
 export function roundQuotedRowsUp0553(rows,{quantityKey="qty",amountKey="totalUSD"}={}){
  return rows.map(r=>{
