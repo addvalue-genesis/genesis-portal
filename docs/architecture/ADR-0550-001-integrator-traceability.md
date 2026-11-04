@@ -232,3 +232,28 @@ inclusion of known supplier other charges. Canonical source offers feed quoted-s
 Working packages, with overlap checks and review dependencies. Direct/cross FX entry
 and preview execute independently of engineering approval. These are priced drafts,
 not automatic MR coverage, system adequacy, customer acceptance or formal issue.
+
+## 13. Supplier source cost versus A/B/C allocation — 5-Nov-2026
+
+Owner clarification applies to every0550 system and COMMON, including both
+30m and60m towers. Original supplier quotation cost is one information layer;
+allocation into commercial Parts A/B/C is another. Preserve the full source
+quote, native currency, quantities/units, line prices, net/discount/options,
+revision and locator. Moving or referencing an item in B/C never reduces or
+overwrites that source quotation amount. Distinguish costs for our additional
+work and other suppliers rather than treating an estimate as a supplier quote.
+
+Show original supplier cost independently from the allocated Working cost and
+selling price. A multi-system quotation keeps one canonical identity and the
+same full source amount in every system view; repeated references are not new
+cost owners. Multiple suppliers/revisions/options are not automatically summed
+as a project procurement total. Missing/Asactual/FX gaps stay explicit, not zero.
+Working rate-reference records must not duplicate original item or option totals.
+
+Source-declared applicability and later SI/Working candidate links are different
+facts. A candidate link does not prove that a supplier quote covers a complete
+system. Full quote versus system-specific detail and printed-cover/detail
+conflicts must remain visible; an allocation or display change does not resolve
+engineering, scope or commercial acceptance.
+
+Implementation and actual limits: [all-system supplier cost separation](../handoff/pj2608-0550/20261105_ALL_SYSTEM_SUPPLIER_COST_SEPARATION.md).

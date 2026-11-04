@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.3",
+  "version": "2026-11-05.4",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "0982c1b1",
-  "capability": "Existing tower rows lead with full original net supplier quotation cost and explicitly separate its A equipment / B services-delivery / C erection-civil portions. Selling columns are labelled Part A only. The legacy aggregate is outside the main two-row table in a collapsed existing-ID basis section. Original financial ownership, prices, quantities, FX, review/export/frozen history and strict Official remain unchanged."
+  "source0550": "f1701c76",
+  "capability": "All19 existing systems plus COMMON use one original Supplier cost projection independent of A/B/C allocation. Full quote/base/net/options/native units/FX stay intact across shared-system views; MGW printed/detail conflicts and unknown Asactual prices remain explicit. Mapping-only candidate links are separate from declared source applicability. Working tables label allocated cost separately; native item bodies load on disclosure. Preserve all financial/source/quantity/FX/review/export/history records and existing IDs."
 }

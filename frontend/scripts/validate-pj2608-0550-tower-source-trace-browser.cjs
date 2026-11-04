@@ -19,6 +19,21 @@ const server=http.createServer((req,res)=>{
  const read=()=>page.evaluate(()=>new Promise(resolve=>{const q=indexedDB.open('GENESIS-PJ2608-0550-BIDDING',1);q.onsuccess=()=>{const db=q.result,r=db.transaction('workspace').objectStore('workspace').get('active');r.onsuccess=()=>{resolve(r.result);db.close();};};}));
  const jump=async id=>{const search=page.getByLabel('Project Module Search',{exact:true});await search.fill(id);await search.press('Enter');};
  await page.goto('http://127.0.0.1:'+server.address().port+'/projects/pj2608-0550');await ready();const before=await read();
+ await jump('bid.budget.working.part.A');
+ assert.equal(await page.locator('.p55-supplier-trace').count(),20,'Same source/allocated-cost separation in all nineteen systems plus COMMON');
+ assert.equal(await page.locator('[data-working-source-item]').count(),0,'No original item bodies eagerly mounted across all systems');
+ const mgw=before.offers.find(o=>o.mgwQuoteLineId).quoteRef;
+ await jump('bid.budget.working.group.TEL-LAN');
+ const lan=page.getByLabel('Supplier to Working trace TEL-LAN',{exact:true}),lanQuote=lan.locator('[data-working-source-quote]').filter({hasText:mgw}).first();
+ const fullIdentity=await lanQuote.getAttribute('data-source-identity'),fullAmount=await lanQuote.locator('.p55-source-amount').innerText();assert(fullAmount.includes('ยอดหน้าสรุปต้นฉบับ')&&fullAmount.includes('CCTV')&&fullAmount.includes('LAN'),'MGW printed-cover/detail conflict stays visible');
+ await lanQuote.locator(':scope > summary').click();await lanQuote.locator('tbody tr').first().waitFor();const relevant=await lanQuote.locator('tbody tr').count();
+ await lanQuote.getByRole('button',{name:/ดูรายการทั้งใบ/}).click();assert.equal(await lanQuote.locator('tbody tr').count(),before.offers.filter(o=>o.mgwQuoteLineId).length);assert(relevant<await lanQuote.locator('tbody tr').count());
+ assert.equal(await lanQuote.locator('.p55-source-amount').innerText(),fullAmount,'Relevant/full source-row toggle never changes supplier totals');
+ await jump('bid.budget.working.group.TEL-CCTV');const cctv=page.getByLabel('Supplier to Working trace TEL-CCTV',{exact:true}).locator('[data-working-source-quote]').filter({hasText:mgw}).first();assert.equal(await cctv.getAttribute('data-source-identity'),fullIdentity);assert.equal(await cctv.locator('.p55-source-amount').innerText(),fullAmount,'System filter preserves the full original shared quotation');
+ await jump('bid.budget.working.group.TEL-VSAT-KU');assert((await page.getByLabel('Supplier to Working trace TEL-VSAT-KU',{exact:true}).innerText()).includes('ไม่ใช่ต้นทุน Supplier เป็นศูนย์'));
+ await jump('bid.budget.working.group.TEL-PAGA');const paga=page.getByLabel('Supplier to Working trace TEL-PAGA',{exact:true});assert.equal(await paga.locator('[data-working-source-quote]').count(),4,'Two INDUSTRONIC revisions,IDIE service quote and MGW alternative remain separate');assert((await paga.innerText()).includes('As actual'));
+ if(process.env.PJ0550_ALL_SOURCE_SCREENSHOT){await paga.evaluate(el=>scrollTo(0,scrollY+el.getBoundingClientRect().top-80));await page.screenshot({path:process.env.PJ0550_ALL_SOURCE_SCREENSHOT});}
+
  const group=page.locator('[data-component-key="bid.budget.working.group.TEL-TELT"]');
  await jump('bid.budget.working.group.TEL-TELT');await group.waitFor({state:'visible'});
  assert((await group.locator(':scope > summary').innerText()).includes('2 แถวใบเสนอราคา · ราคาขายเฉพาะ Part A'));
@@ -35,22 +50,23 @@ const server=http.createServer((req,res)=>{
  const summary=group.locator('[data-tower-price-role="SUMMARY"]');assert((await summary.innerText()).includes('ยอดสรุป'));assert.equal(await group.getByRole('table',{name:'Working cost lines TEL-TELT',exact:true}).locator('tbody tr').count(),2,'Legacy aggregate is outside the item table');assert.equal(await summary.evaluate(el=>el.open),false,'Legacy basis starts collapsed');
  if(process.env.PJ0550_TOWER_PRICE_SCREENSHOT){await group.getByRole('table',{name:'Working cost lines TEL-TELT',exact:true}).evaluate(el=>scrollTo(0,scrollY+el.getBoundingClientRect().top-80));await page.screenshot({path:process.env.PJ0550_TOWER_PRICE_SCREENSHOT});}
  const trace=page.getByLabel('Supplier to Working trace TEL-TELT',{exact:true});assert.equal(await trace.locator('[data-working-source-quote]').count(),2);
- assert.equal(await trace.locator('[data-working-source-item]').count(),30);
+ assert.equal(await trace.locator('[data-working-source-item]').count(),0,'Source items are lazy');
+ const openQuotes=async()=>{for(const q of await trace.locator('[data-working-source-quote]').all()){if(!await q.evaluate(el=>el.open))await q.locator(':scope > summary').click();await q.locator('tbody tr').first().waitFor();}};
  for(const quote of await trace.locator('[data-working-source-quote]').all()){
   assert((await quote.locator(':scope > summary').innerText()).includes('พบลิงก์ราคา 15/15'));
-  await quote.locator(':scope > summary').click();assert.equal(await quote.locator('tbody tr').count(),15);
+  await quote.locator(':scope > summary').click();await quote.locator('tbody tr').first().waitFor();assert.equal(await quote.locator('tbody tr').count(),15);
  }
  const erection=trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-10"]');assert((await erection.innerText()).includes('Part C / C1'));
  await erection.getByRole('button',{name:'PROJECT · Tower erection / lifting / rigging',exact:true}).click();
  assert(await page.locator('[data-component-key="bid.budget.working.line.REQ-MR-ACT-C1-D04"]').isVisible(),'Source row opens existing C1 owner and ancestors');
- await jump('bid.budget.working.group.TEL-TELT');
+ await jump('bid.budget.working.group.TEL-TELT');await openQuotes();
  await trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-10"]').getByRole('button',{name:'เปิด Vendor Item 10',exact:true}).click();
  await page.locator('[data-component-key="bid.vendor.offer.OFFER-MASTER-TOWER-2609.95.1-10"]').waitFor({state:'visible'});
  for(const o of before.offers.filter(o=>o.id.startsWith('OFFER-MASTER-TOWER-')&&o.supplierQuoteRow?.classification==='BASE_PRICE')){
   const text=await page.locator('[data-vnd-offer="'+o.id+'"]').innerText();
   assert(!text.includes('ยังไม่เลือกใช้ใน Working'),'Source usage visible / '+o.id);
  }
- await jump('bid.budget.working.group.TEL-TELT');
+ await jump('bid.budget.working.group.TEL-TELT');await openQuotes();
  const paint=trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-03"]');assert((await paint.innerText()).includes('70 Gl'));
  const nested=await trace.locator('[data-working-source-quote]').evaluateAll(ns=>ns.map(n=>n.open));
  const controls=page.getByRole('group',{name:'Working A expand collapse',exact:true});await controls.getByRole('button',{name:'− หุบทุกหัวข้อ',exact:true}).click();await controls.getByRole('button',{name:'+ ขยายทุกหัวข้อ',exact:true}).click();
@@ -58,6 +74,6 @@ const server=http.createServer((req,res)=>{
  for(const width of [1440,390]){await page.setViewportSize({width,height:1000});await trace.scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Page contained at '+width);}
  if(process.env.PJ0550_TOWER_SCREENSHOT){await page.setViewportSize({width:1440,height:1000});await trace.scrollIntoViewIfNeeded();await page.screenshot({path:process.env.PJ0550_TOWER_SCREENSHOT});}
  assert.deepEqual(await read(),before,'Source inspection/navigation/disclosure never writes any canonical field');
- await page.reload();await ready();await jump('bid.budget.working.group.TEL-TELT');assert.equal(await trace.locator('[data-working-source-item]').count(),30);assert.deepEqual(await read(),before,'Reload retains original workspace');assert.deepEqual(errors,[]);
- console.log('PASS production browser:per-tower source/cost/sell/customer THB in both existing MR rows,one non-additive summary,strict Official separation,2 quotes/30 items,22 Vendor allocations,source↔existing C1/Vendor navigation,native units,bulk disclosure,1440/390 containment,unchanged workspace/reload and no page errors.');
+ await page.reload();await ready();await jump('bid.budget.working.group.TEL-TELT');await openQuotes();assert.equal(await trace.locator('[data-working-source-item]').count(),30);assert.deepEqual(await read(),before,'Reload retains original workspace');assert.deepEqual(errors,[]);
+ console.log('PASS production browser:all20 source panels,shared MGW whole-invoice invariance/conflicts,missing quotes,PAGA revisions/IDIE Asactual,lazy native rows,per-tower source/cost/sell/customer THB in both existing MR rows,one non-additive summary,strict Official separation,2 quotes/30 items,22 Vendor allocations,source↔existing C1/Vendor navigation,native units,bulk disclosure,1440/390 containment,unchanged workspace/reload and no page errors.');
 }finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1;});

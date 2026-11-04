@@ -813,6 +813,8 @@
 .p55-supplier-trace { min-width: 0; overflow-wrap: anywhere; }
 .p55-supplier-trace .p55-table { min-width: 760px; }
 .p55-supplier-trace .p55-table button { display: block; margin-top: 4px; text-align: left; }
+.p55-source-amount { display: flex; flex-direction: column; gap: 5px; margin-top: 6px; }
+.p55-source-amount small { display: block; font-size: 11px; font-weight: 400; margin-top: 3px; }
 .p55-table tr[data-tower-price-role] > td:nth-child(3),
 .p55-table tr[data-tower-price-role] > td:nth-child(4),
 .p55-table tr[data-tower-price-role] > td:nth-child(5) { white-space: nowrap; }

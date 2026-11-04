@@ -3,14 +3,14 @@ const src=path.resolve(__dirname,'../src'),old=require.extensions['.js'];
 const compile=(m,f)=>f.startsWith(src+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}],'@babel/preset-react']}).code,f):old(m,f);
 require.extensions['.js']=compile;require.extensions['.jsx']=compile;
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
-const R=require(src+'/project0550/data/vendorRegister0550.js'),C=require(src+'/project0550/data/bidCompletion0550.js'),W=require(src+'/project0550/data/workingOffers0550.js');
+const S=require(src+'/project0550/data/supplierCostProjection0550.js'),R=require(src+'/project0550/data/vendorRegister0550.js'),C=require(src+'/project0550/data/bidCompletion0550.js'),W=require(src+'/project0550/data/workingOffers0550.js');
 const {WorkingSupplierTrace0550}=require(src+'/project0550/WorkingSupplierTrace0550.jsx'),{VendorOfferGroups0550}=require(src+'/project0550/VendorOfferGroups0550.jsx');
 const empty={lines:[],offers:[],vendors:[],fx:{}},render=d=>renderToStaticMarkup(React.createElement(WorkingSupplierTrace0550,{data:d,systemToken:'TEL-TELT',onNavigate:()=>{}}));
 assert.deepEqual(C.bidCompletionSourceUsages0550(empty),[]);assert(render(empty).includes('ยังไม่มีรายการต้นฉบับ'));
 if(process.argv[2]){
  const d=JSON.parse(fs.readFileSync(process.argv[2])),before=JSON.stringify(d),html=render(d),entries=R.vendorOfferEntries0550(d);
  const tower=entries.filter(e=>e.offer.id.startsWith('OFFER-MASTER-TOWER-')&&e.offer.supplierQuoteRow?.classification==='BASE_PRICE');
- assert.equal(tower.length,30);assert.equal((html.match(/data-working-source-quote=/g)||[]).length,2);assert.equal((html.match(/data-working-source-item=/g)||[]).length,30);
+ assert.equal(tower.length,30);assert.equal((html.match(/data-working-source-quote=/g)||[]).length,2);assert.equal((html.match(/data-working-source-item=/g)||[]).length,0,'Quote item bodies mount on demand');const originals=S.supplierCostProjection0550(d).bySystem.get('TEL-TELT');assert.equal(originals.reduce((n,q)=>n+q.items.length,0),30);
  assert.equal(tower.filter(e=>e.referenceWorking.some(W.activeSupply0550)).length,8);
  assert.equal(tower.filter(e=>e.allocatedWorking.some(u=>u.current&&W.activeSupply0550(u.line))).length,22);
  const uses=C.bidCompletionSourceUsages0550(d),towerIds=new Set(tower.map(e=>e.offer.id)),used=uses.flatMap(u=>u.offerIds.filter(id=>towerIds.has(id)));
@@ -20,12 +20,12 @@ if(process.argv[2]){
   const row=vendorHtml.match(new RegExp('data-vnd-offer="'+e.offer.id.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'"[\\s\\S]*?</tr>'))?.[0];
   assert(row&&!row.includes('ยังไม่เลือกใช้ใน Working'),'Used source item must not be shown unused / '+e.offer.id);
  }
- assert(html.includes('ต้นทุนผสมใบเสนอราคาและประมาณการ'));assert(html.includes('70 Gl')&&html.includes('35 Gl'),'Original paint units, never normalized U');
+ assert(originals.flatMap(q=>q.items).some(e=>e.uses.some(u=>u.label.includes('ต้นทุนผสม'))));assert.deepEqual(originals.flatMap(q=>q.items).filter(e=>e.offer.supplierQuoteRow.itemCode==='3').map(e=>[e.native.quantity,e.native.unit]).sort((a,b)=>a[0]-b[0]),[[35,'Gl'],[70,'Gl']],'Original paint units, never normalized U');
  assert(html.includes('APF')&&html.includes('ACP')&&html.includes('2609.95.1')&&html.includes('2609.95.2'));
  const own=uses.find(u=>u.kind==='QUOTED'&&u.offerIds.some(id=>towerIds.has(id))),changed=structuredClone(d);
  changed.lines.find(l=>l.id===own.line.id).manualCost+=1;
  assert.equal(C.bidCompletionSourceUsages0550(changed).find(u=>u.line.id===own.line.id).current,false,'Edited owner invalidates displayed allocation');
- assert(render(changed).includes('ฐานจัดสรรเปลี่ยน'));
+ assert(S.supplierCostProjection0550(changed).bySystem.get('TEL-TELT').some(q=>q.items.some(e=>e.stale.length)));
  const revised=structuredClone(d);revised.offers.find(o=>o.id===own.offerIds[0]).unitCost+=1;
  assert.equal(C.bidCompletionSourceUsages0550(revised).find(u=>u.line.id===own.line.id).current,false,'Changed supplier rate invalidates displayed allocation');
  const missing=structuredClone(d);missing.offers=missing.offers.filter(o=>o.id!==own.offerIds[0]);

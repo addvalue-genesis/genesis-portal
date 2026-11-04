@@ -143,9 +143,10 @@ export function groupVendorOffers0550(entries,mode,systems){
 
 // Supplier totals are a read-only projection, never Working cost adoption.
 // Use full quotation identity across system views, one net owner, and separate options.
+export const vendorWorkingRateReference0550=offer=>/Working rate reference/i.test(offer.quoteEvidence?.locator||'');
 export function vendorQuoteTotals0550(quote,fx={}){
  const Money=Decimal.clone({precision:40,rounding:Decimal.ROUND_HALF_UP});
- const entries=[...new Map((quote.totalEntries||quote.entries).filter(e=>!e.referenceOnly).map(e=>[e.offer.id,e])).values()];
+ const entries=[...new Map((quote.totalEntries||quote.entries).filter(e=>!e.referenceOnly&&!vendorWorkingRateReference0550(e.offer)).map(e=>[e.offer.id,e])).values()];
  const net=e=>e.offer.supplierQuoteRow?.classification==='NET_PACKAGE'||(!e.offer.supplierQuoteRow&&/\bitem\s+NET\b/i.test(e.offer.quoteEvidence?.locator||''));
  const option=e=>e.offer.supplierQuoteRow?.classification==='OPTION'||e.offer.quoteEvidence?.classification==='OPTION';
  const owners=entries.filter(net),hasComponents=entries.some(e=>e.offer.supplierQuoteRow);
