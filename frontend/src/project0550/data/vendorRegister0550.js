@@ -4,6 +4,7 @@ import {validateBidWorkspace} from './bidWorkspaceModel';
 import {safeSourceUrl} from './sourceIntakeModel';
 import {mgwQuoteItem0550} from './mgwVendorBasis0550';
 import {workingOffers0550} from './workingOffers0550';
+import {bidCompletionSourceUsages0550} from './bidCompletion0550';
 import {validateSupplierQuoteRow0550} from './supplierRevision0550';
 import {hasVendorDefaultReceipt0550,isVendorDefaultOffer0550,isVendorDefaultVendor0550,untouchedVendorDefault0550} from './vendorDefaultCatalog0550';
 
@@ -106,7 +107,13 @@ export function vendorOfferEntries0550(data){
  for(const r of data.integrationWorkspace?.requirements||[])for(const id of r.offerIds||[])add(id,r.systemToken);
  for(const l of data.lines)for(const o of workingOffers0550(data,l)){add(o.id,l.systemToken);links.get(o.id)?.working.push(l);}
  const referenced=new Set(data.offers.flatMap(o=>o.quoteEvidence?.workingReferenceOfferIds||[]));
+ const allocations=new Map();
+ for(const usage of bidCompletionSourceUsages0550(data))for(const id of usage.offerIds){
+  if(!allocations.has(id))allocations.set(id,[]);
+  allocations.get(id).push(usage);
+ }
  return data.offers.map(offer=>({offer,vendor:data.vendors.find(v=>v.id===offer.vendorId),systemTokens:[...links.get(offer.id).systems].sort(),working:links.get(offer.id).working,
+  allocatedWorking:allocations.get(offer.id)||[],
   referenceOnly:referenced.has(offer.id)&&!offer.quoteEvidence,
   referenceWorking:[...new Map((offer.quoteEvidence?.workingReferenceOfferIds||[]).flatMap(id=>links.get(id)?.working||[]).map(l=>[l.id,l])).values()]}));
 }

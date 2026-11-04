@@ -206,3 +206,17 @@ export function bidCompletionBasisChanged0550(data){
  const byId=new Map(data.lines.map(l=>[l.id,l]));
  return receipt.rows.some(r=>!byId.has(r.lineId)||lineKey(data,byId.get(r.lineId))!==r.inputKey||r.sourceKey!==key(r.offerIds.map(id=>data.offers.find(o=>o.id===id)||null)))||receipt.basisLineIds.some(id=>!byId.has(id))||receipt.basisKey!==key([data.fx,receipt.basisLineIds.map(id=>ownerKey(data,byId.get(id)))]);
 }
+
+// Read-only source usage for Vendor/Working inspection. Do not extend
+// workingOffers0550: that helper participates in financial/review fingerprints.
+// A receipt is evidence of a dated allocation, not a new offer selection.
+export function bidCompletionSourceUsages0550(data){
+ const receipt=data.repositoryBasisImport?.bidCompletion;
+ if(receipt?.version!==BID_COMPLETION_VERSION_0550)return [];
+ const lines=new Map(data.lines.map(l=>[l.id,l])),offers=new Map(data.offers.map(o=>[o.id,o]));
+ return receipt.rows.filter(r=>['QUOTED','ESTIMATE'].includes(r.kind)&&r.offerIds.length).flatMap(row=>{
+  const line=lines.get(row.lineId);if(!line)return [];
+  const current=lineKey(data,line)===row.inputKey&&key(row.offerIds.map(id=>offers.get(id)||null))===row.sourceKey;
+  return [{line,offerIds:row.offerIds,current,kind:row.kind,basis:row.basis}];
+ });
+}

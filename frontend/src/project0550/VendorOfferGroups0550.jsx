@@ -30,6 +30,7 @@ export function VendorOfferGroups0550({data,onEdit}){
   const o=entry.offer,e=o.quoteEvidence,r=mgwQuoteItem0550(o),s=o.supplierQuoteRow;
   const anchor=!anchors.has(o.id);anchors.add(o.id);
   const selected=entry.working.filter(activeSupply0550),referenceSelected=entry.referenceWorking.filter(activeSupply0550);
+  const allocated=entry.allocatedWorking.filter(u=>u.current&&activeSupply0550(u.line)),stale=entry.allocatedWorking.filter(u=>!u.current);
   const sourceQty=e?.quotedQuantity??s?.quantity??r?.quantity,sourceUnit=e?.quotedUnit??s?.quotedUnit??r?.sourceUnit;
   return <tr key={o.id} data-component-key={anchor?'bid.vendor.offer.'+o.id:undefined} data-vnd-offer={o.id} tabIndex={-1}>
    <td><strong>{o.description}</strong><small>{o.brand}</small><small>{entry.systemTokens.join(' / ')||'ยังไม่ผูกระบบ'}</small>
@@ -50,7 +51,9 @@ export function VendorOfferGroups0550({data,onEdit}){
     {e&&<details><summary>เงื่อนไขต้นทุน</summary>{e.terms.map((t,i)=><p key={i}>{t}</p>)}</details>}
    </td>
    <td><ComponentCopyId projectId="PJ2608-0550" componentKey={'bid.vendor.offer.'+o.id}/><button type="button" onClick={()=>onEdit(o)}>เปิด Offer / แก้ไข</button>
-    <small>{selected.length?'มี Working ที่เลือกใช้ '+selected.length+' รายการ':'ยังไม่เลือกใช้ใน Working'}</small>
+    <small>{selected.length?'มี Working ที่เลือกใช้ '+selected.length+' รายการ':allocated.length?'จัดสรรต้นทุนใน Working แล้ว '+allocated.length+' รายการ':referenceSelected.length?'อ้างอิงเจ้าของราคา Working เดิม':stale.length?'ฐานจัดสรรเปลี่ยน · ต้องทบทวน':'ยังไม่เลือกใช้ใน Working'}</small>
+    {allocated.map(u=><small key={u.line.id}>Part {u.line.wbs[0]} / {u.line.wbs} → {u.line.customerRowCode||'Customer row OPEN'} · {u.line.description}{u.kind==='ESTIMATE'?' · รวมในต้นทุนผสมใบเสนอราคาและประมาณการ':''}</small>)}
+    {stale.map(u=><small key={u.line.id}>ต้องทบทวนลิงก์ {u.line.id} · ข้อมูลรายการหรือราคาต้นทางเปลี่ยน</small>)}
     {referenceSelected.length>0&&<small>อ้างอิงฐาน Working เดิม {referenceSelected.length} รายการ · ตรวจขอบเขตก่อนเปลี่ยนราคา</small>}
     {entry.systemTokens.length>1&&<small>อ้างอิง Offer เดียวกันหลายระบบ · ไม่รวมต้นทุนซ้ำ</small>}
    </td>

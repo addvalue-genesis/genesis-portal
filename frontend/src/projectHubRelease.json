@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.19",
+  "version": "2026-11-05.1",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "8ab117b9",
-  "capability": "Existing A/B/C draft budget now has complete numeric price/cost owners on received source packages plus explicitly labelled planning estimates. One shared package allocation per cost owner; untouched MR quantities, prior selling amounts, FX, source offers and frozen history remain. Tower quotations and CERAGON spare package are partitioned once; B7–B9 use native customer rows. 10.5 discloses quoted/estimated/internal-cost/reference bases and material scope assumptions. Full technical/RFQ acceptance and controlled issue remain separate."
+  "source0550": "872fec85",
+  "capability": "Existing TEL-TELT Working group now shows both original supplier quotations and native item-to-A/B/C price-owner trace beside MR site/quantity references. Vendor usage includes current source-bound bid allocations and flags edited source/owner bases for review; mixed quoted/estimated costs remain explicit. Group counts separate owners from non-additive references. No price, quantity, FX, financial fingerprint, source, review or frozen-history migration. Engineering/RFQ acceptance remains separate."
 }

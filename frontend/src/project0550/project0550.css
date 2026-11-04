@@ -810,6 +810,10 @@
   line-height: 1.35;
 }
 
+.p55-supplier-trace { min-width: 0; overflow-wrap: anywhere; }
+.p55-supplier-trace .p55-table { min-width: 760px; }
+.p55-supplier-trace .p55-table button { display: block; margin-top: 4px; text-align: left; }
+
 .p55-table .is-number {
   text-align: right;
   white-space: nowrap;
