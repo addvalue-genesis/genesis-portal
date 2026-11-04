@@ -21,6 +21,14 @@ frozen view. Live Current/History/Working remain explicit navigation choices.
 The last used revision changes only after the owner records actual use.
 That action does not send a message, approve engineering or prove acceptance.
 
+Cross-project architectural rules and the remaining precision/treatment/template
+gaps are recorded in
+[Common / Generic Bidding Principles](../../architecture/COMMON_BIDDING_PRINCIPLES.md).
+The revision feature and extracted equations do not mean the entire legacy
+0553 financial engine has migrated away from binary floating-point arithmetic.
+The owner's external read-only review of397556f9 is reconciled separately in
+[the canonical review corrections](../../audit/pj2608-0553/20261104_REVIEW_397556F9_RECONCILIATION.md).
+
 ## How Jack uses the existing screen
 
 1. Open 10.3.4 Official / Current Rev03; check the selected numbers above.
