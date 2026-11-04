@@ -1,7 +1,14 @@
 // COMMON commercial equations. Decimal strings/BigInt avoid binary rounding.
 // Project adapters choose applicability; this file contains no project prices/FX.
 export const QUOTATION_EQUATION_VERSION="quotation-rounding/1";
-const pow=n=>10n**BigInt(n);
+// preset-env can lower BigInt exponentiation to Math.pow, which rejects BigInt.
+// Multiplication keeps this exact in both Node tests and the browser bundle.
+const powersOfTen=[1n];
+const pow=n=>{
+ if(!Number.isInteger(n)||n<0)throw Error("Invalid decimal scale");
+ for(let i=powersOfTen.length;i<=n;i++)powersOfTen.push(powersOfTen[i-1]*10n);
+ return powersOfTen[n];
+};
 function decimal(value){
  if(typeof value==="number"&&(!Number.isFinite(value)||value<0||value>Number.MAX_SAFE_INTEGER))throw Error("Invalid nonnegative decimal");
  const s=String(value),m=s.match(/^(\d+)(?:\.(\d+))?$/);

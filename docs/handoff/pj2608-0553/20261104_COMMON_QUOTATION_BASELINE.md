@@ -1,5 +1,9 @@
 # COMMON quotation baseline — 0553 implementation, 4 November 2026
 
+Startup correction: [BigInt browser transpilation fix and regression](20261104_BIGINT_BROWSER_STARTUP_FIX.md).
+The actual browser Babel preset needs runtime coverage; current-Node data tests
+and a successful webpack build alone did not catch BigInt exponent lowering.
+
 Continue from remote `review/pj2608-0553-b1-lifecycle-20261030`, HEAD
 `397556f901c7fe6c8fd2960e9465932d7535ad1c`. No new architectural Module IDs.
 The existing `bid.budget.pricing.official` hosts the controls. Supplier costs,
