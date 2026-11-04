@@ -113,12 +113,22 @@ async function loadDriveSourceWorkspace(options){
 }
 // Vendor evidence is independent of the CUS/A batch. Read every prepared quote,
 // not just a newest date; existing importer controls revisions and preserves edits.
-async function loadDriveVendorRegisters(options){
- const projects=await discoverProjects(options),files=[];
+async function vendorFiles(projects){
+ const files=[];
  for(const project of projects){
   const dir=path.join(project,'90_SYSTEM_WORKING','DATA');let entries;
   try{entries=await fs.readdir(dir,{withFileTypes:true});}catch(e){if(e.code==='ENOENT')continue;throw fail('DRIVE_UNREADABLE');}
   files.push(...entries.filter(e=>e.isFile()&&VENDOR_FILE.test(e.name)).map(e=>path.join(dir,e.name)));
+ }
+ return files;
+}
+async function loadDriveVendorRegisters(options){
+ let projects=await discoverProjects(options),files=await vendorFiles(projects);
+ // An older explicit CUS root must not hide a newly synced Vendor package in
+ // the normal project mount. Leave CUS/A override behaviour unchanged.
+ if(!files.length&&(options?.projectDir||process.env.GENESIS_0550_PROJECT_DIR)){
+  projects=[...new Set([...projects,...await discoverProjects({...options,projectDir:null})])];
+  files=await vendorFiles(projects);
  }
  if(!projects.length)throw fail('VENDOR_REGISTER_NOT_FOUND',404);
  if(files.length>100)throw fail('VENDOR_REGISTER_FILE_LIMIT');

@@ -1,4 +1,5 @@
-import {fetchAutomaticVendorRegisters0550,planAutomaticVendorRegisters0550,vendorRegisterLoadMessage0550} from "./data/vendorRegisterAuto0550";
+import {pendingVendorDefaultCount0550} from "./data/vendorDefaultCatalog0550";
+import {fetchAutomaticVendorRegisters0550,planAutomaticVendorRegisters0550,prepareVendorDefaults0550,vendorRegisterSyncSuccess0550,vendorRegisterSyncFailure0550} from "./data/vendorRegisterAuto0550";
 import {prepareMgwDetailPricing0550} from "./data/mgwDetailPricing0550";
 import {deriveAvlReconciliation0550,prepareSystemAvlDeviations0550} from "./data/avlReconciliation0550";
 import {importMgwVendorBasis0550} from "./data/mgwVendorBasis0550";
@@ -36,8 +37,8 @@ export function BidWorkspaceProvider({children}){
    const avlPrepared=prepareSystemAvlDeviations0550(priced,deriveIntegration0550(priced,SYSTEMS,reviewDate));
    const repository=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
    const labour=prepareTsiActivityBudget0550(prepareAuthorizedEurThb0550(repository,reviewDate),COMMERCIAL_POLICY,CORE_TEAM,reviewDate);
-   const prepared=prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate);
-   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, authorised EUR-to-THB and TSI activity estimates; preserve edited records / "+prepared.mgwQuoteImport.version);
+   const prepared=prepareVendorDefaults0550(prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate),SYSTEMS.map(s=>s.token));
+   if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata and authorised TSI estimates; preserve edited records / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
    // Fetch independent evidence concurrently; a missing/conflicting CUS bundle
@@ -47,8 +48,8 @@ export function BidWorkspaceProvider({children}){
    try{
     const bundle=await fetchAutomaticVendorRegisters0550(),plan=planAutomaticVendorRegisters0550(current,bundle,SYSTEMS.map(s=>s.token));
     if(plan.changed)current=await saveProject0550Bid(plan.workspace,current.revision,"Load prepared Vendor registers automatically / "+bundle.packages.map(p=>p.batchId).join(", "));
-    setData(current);setVendorSync({state:plan.changed?"APPLIED":plan.packages?"CURRENT":"EMPTY",message:plan.changed?`โหลด Vendor อัตโนมัติแล้ว · เพิ่ม ${plan.addedVendors} Vendor / ${plan.addedOffers} Offers · ราคา Working คงเดิม`:plan.packages?"ชุด Vendor ที่เตรียมไว้ถูกนำเข้าทะเบียนแล้ว · คงรายการที่แก้ไขหรือลบไว้":"ยังไม่มีชุด Vendor เพิ่มเติมในข้อมูลโครงการ"});
-   }catch(e){current=await loadProject0550Bid();setData(current);setVendorSync({state:"UNAVAILABLE",message:vendorRegisterLoadMessage0550(e.message)});}
+    setData(current);setVendorSync(vendorRegisterSyncSuccess0550(plan,current));
+   }catch(e){current=await loadProject0550Bid();setData(current);setVendorSync(vendorRegisterSyncFailure0550(e.message,current));}
    try {
     const result=await sourceRequest;if(result.error)throw result.error;
     const bundle=result.bundle,intake=bundle.sourceIntake,selected=selectAutomaticSourceWorkspace0550(current,bundle,SYSTEMS.map(s=>s.token));
@@ -68,6 +69,31 @@ export function BidWorkspaceProvider({children}){
   }finally{lock.current=false;setBusy(false);}
  };
  useEffect(()=>{reload();},[]);
+ // Arrival of a synced quote fills only untouched OPEN defaults. Retry in the
+ // background, without requiring Load/reload or resetting source/Working forms.
+ useEffect(()=>{
+  if(!data||!pendingVendorDefaultCount0550(data))return;
+  let active=true,timer,attempts=0;
+  const retry=async()=>{
+   if(!active)return;
+   if(lock.current){timer=setTimeout(retry,5000);return;}
+   attempts++;
+   try{
+    const bundle=await fetchAutomaticVendorRegisters0550();if(!active)return;
+    if(lock.current)return;
+    lock.current=true;setBusy(true);
+    try{
+     let current=await loadProject0550Bid();
+     const plan=planAutomaticVendorRegisters0550(current,bundle,SYSTEMS.map(s=>s.token));
+     if(plan.changed)current=await saveProject0550Bid(plan.workspace,current.revision,"Load prepared Vendor registers automatically / "+bundle.packages.map(p=>p.batchId).join(", "));
+     if(active){if(plan.changed||current.revision!==data.revision)setData(current);setVendorSync(vendorRegisterSyncSuccess0550(plan,current));}
+    }finally{lock.current=false;setBusy(false);}
+   }catch(e){if(active)setVendorSync(vendorRegisterSyncFailure0550(e.message,data));}
+   finally{if(active&&attempts<3)timer=setTimeout(retry,5000);}
+  };
+  timer=setTimeout(retry,5000);
+  return()=>{active=false;clearTimeout(timer);};
+ },[data]);
  const reviewDate=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Bangkok",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
  const model=useMemo(()=>{if(!data)return null;const integration=deriveIntegration0550(data,SYSTEMS,reviewDate),sourceReadiness=deriveSourceReadiness0550(data,integration,reviewDate),derived={...deriveBidWorkspace(data,SYSTEMS.map(s=>s.token),reviewDate,integration),integration,sourceReadiness,avlReconciliation:deriveAvlReconciliation0550(data,integration)};const releaseControl=deriveReleaseControl0550(data,derived,reviewDate);return {...derived,releaseControl,official:{...derived.official,releaseAllowed:releaseControl.releaseAllowed,releaseState:releaseControl.state}};},[data,reviewDate]);
  async function change(transform,action){if(!data||lock.current)return false;lock.current=true;setBusy(true);try{const transformed=transform(data);const next=prepareSystemAvlDeviations0550(transformed,deriveIntegration0550(transformed,SYSTEMS,reviewDate));setData(await saveProject0550Bid(next,data.revision,action));setError("");return true;}catch(e){setError(e.message);return false;}finally{lock.current=false;setBusy(false);}}

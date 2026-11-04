@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.5",
+  "version": "2026-11-04.6",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "ed26995d",
-  "capability": "Automatically load prepared Vendor registers from private project DATA through the existing local bridge into existing07.1/07.2; no manual JSON import. Keep every quotation revision, native rates/terms, edits/deletions, Working prices/quantity/FX, IDs/colours and frozen history."
+  "source0550": "7497a0f1",
+  "capability": "IDIE QO26163 identity/four OPEN source rows are default on project startup, independent of Drive availability. Original private rates hydrate untouched defaults automatically with bounded retries; no Load/file chooser, duplicate costs, Working/FX adoption, overwritten edits/deletions or frozen-history changes."
 }

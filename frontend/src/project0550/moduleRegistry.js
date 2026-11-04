@@ -107,7 +107,7 @@ export const MODULE_REGISTRY = [
     why: "Price, payment, delivery, warranty, validity, tax and logistics terms can all change project cost and delivery.",
     inputs: ["Original vendor quotations", "Commercial clarifications"],
     outputs: ["Full source quotation record", "Terms", "Line items", "Conditions", "Source location"],
-    implementation: ["commercialSources in controlled project dataset", "frontend/src/project0550/VendorWorkspace.jsx", "frontend/src/project0550/data/vendorRegister0550.js", "frontend/src/project0550/data/vendorRegisterAuto0550.js", "frontend/src/project0550/BidWorkspaceContext.jsx", "frontend/scripts/source-drive-0550.cjs"],
+    implementation: ["commercialSources in controlled project dataset", "frontend/src/project0550/VendorWorkspace.jsx", "frontend/src/project0550/data/vendorRegister0550.js", "frontend/src/project0550/data/vendorRegisterAuto0550.js", "frontend/src/project0550/data/vendorDefaultCatalog0550.js", "frontend/src/project0550/data/vendorRegisterDefaults0550.json", "frontend/src/project0550/BidWorkspaceContext.jsx", "frontend/scripts/source-drive-0550.cjs"],
     invariants: [
       "Do not show only a quotation total when line items/terms are available.",
       "Commercial source truth must remain separate from internal allowance."

@@ -18,9 +18,9 @@ const server=http.createServer((req,res)=>{const u=req.url.split('?')[0],asset=/
  await page.getByRole('status').filter({hasText:'บันทึก Vendor / Offer เข้าทะเบียนแล้ว'}).waitFor();
  const registered=await read();
  for(const k of ['lines','calculations','fx','releaseRegister','sourceIntake','integrationWorkspace','sourceControl','sourcePreparationImports','mgwQuoteImport','repositoryBasisImport'])assert.deepEqual(registered[k],before[k],'Preserve '+k);
- assert.deepEqual(registered.offers.slice(0,before.offers.length),before.offers);
+ const target=new Set(pack.offers.map(o=>o.id));assert.deepEqual(registered.offers.filter(o=>!target.has(o.id)).slice(0,before.offers.filter(o=>!target.has(o.id)).length),before.offers.filter(o=>!target.has(o.id)));
  assert.deepEqual(registered.vendors.slice(0,before.vendors.length),before.vendors);
- assert.equal(registered.offers.length,before.offers.length+4);assert.equal(registered.vendors.length,before.vendors.length+1);
+ assert.equal(registered.offers.length,before.offers.length+pack.offers.filter(o=>!before.offers.some(x=>x.id===o.id)).length);assert.equal(registered.vendors.length,before.vendors.length+pack.vendors.filter(v=>!before.vendors.some(x=>x.id===v.id)).length);
  await jump('bid.vendor.master');await page.locator('[data-component-key="bid.vendor.'+pack.vendors[0].id+'"]').waitFor();
  await jump('bid.vendor.offers');const registry=page.getByLabel('Vendor cost register'),company=registry.getByRole('button',{name:'บริษัท → ระบบ',exact:true}),system=registry.getByRole('button',{name:'ระบบ → บริษัท',exact:true});
  assert.equal(await page.locator('[data-component-key="bid.vendor.master"]').count(),1);assert.equal(await page.locator('[data-component-key="bid.vendor.offers"]').count(),1);

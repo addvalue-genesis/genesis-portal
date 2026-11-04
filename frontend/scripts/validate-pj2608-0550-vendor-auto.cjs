@@ -12,7 +12,7 @@ async function main(){
   const file=path.join(dir,'PJ2608-0550_IDIE_QO26163_Vendor_Register_20261104.json');
   await assert.rejects(bridge.loadDriveIntake(options),/NOT_FOUND/);
   assert.equal(JSON.parse(await bridge.loadDriveVendorRegisters(options)).packages.length,0);
-  await fs.writeFile(file,JSON.stringify(pack));await fs.writeFile(path.join(dir,'PJ2608-0553_OTHER_Vendor_Register_20261104.json'),'invalid other project must not be read');
+  await fs.writeFile(file,JSON.stringify(pack));assert.equal(JSON.parse(await bridge.loadDriveVendorRegisters({...options,projectDir:path.join(temp,'old-explicit-root')})).packages.length,1,'An old explicit CUS root cannot hide the normal Vendor mount');await fs.writeFile(path.join(dir,'PJ2608-0553_OTHER_Vendor_Register_20261104.json'),'invalid other project must not be read');
   const middleware=bridge.createMiddleware(()=>bridge.loadDriveIntake(options),()=>bridge.loadDriveSourceWorkspace(options),()=>bridge.loadDriveVendorRegisters(options));
   server=http.createServer((req,res)=>middleware(req,res,()=>{res.statusCode=404;res.end();}));await new Promise(r=>server.listen(0,'127.0.0.1',r));const base='http://127.0.0.1:'+server.address().port;
   const fetcher=(url,opts)=>fetch(base+url,opts),bundle=await Auto.fetchAutomaticVendorRegisters0550(fetcher),plan=Auto.planAutomaticVendorRegisters0550(data,bundle,tokens),registered=plan.workspace;
