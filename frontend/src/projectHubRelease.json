@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.1",
+  "version": "2026-11-04.2",
   "branch": "feat/pj2608-0550-official-working-20261028",
   "source0550": "2d4ee1c2",
-  "capability": "C1 follows native MR Appendix captions/site/item order with codes1.6.1\u20131.6.11, a repeated-name audit and P1 codes for additional priced packages. Explicit Working owners govern price coverage; unpriced unmatched owners stay internal. Module IDs/colours, financial inputs and historical frozen outputs preserved."
+  "capability": "Collapsed C1 Appendix rows show canonical USD owner subtotals in the Total Price column, clearly marked when only priced items are included. Internal coverage/price counts explain incomplete groups. Existing MR order, Module IDs/colours/+\u2212, financial inputs, strict totals and frozen exports preserved."
 }

@@ -6,6 +6,7 @@ import {MR_READER_SECTIONS_0550} from './mrReaderProfile0550';
 import {sumMoney0550,displayPriceCheck0550} from './money0550';
 import {satelliteScope0550} from './satelliteScope0550';
 import {mrLineScope0550} from './mrWorkingBasis0550';
+import {scheduleRollup0550} from './scheduleRollup0550';
 import {mgwDetailCustomerRemark0550} from './mgwDetailPricing0550';
 
 export const C1_APPENDIX_LAYOUT_LEGACY_0550='mr-appendix.v1';
@@ -144,6 +145,25 @@ export function deriveC1Appendix0550(view){
  const amount=money(bindings.map(b=>b.amount)),rendered=money(displayRows.filter(r=>r.priceOwners?.length).map(r=>r.amount));
  if(Number.isFinite(amount)&&amount!==rendered)problems.push('C1_OWNER_TOTAL_MISMATCH');
  return {groups,rows:displayRows,amount:problems.length?null:amount,knownOwnerAmount:amount,problems:unique(problems),bindings,pendingOwners,mrNameDuplicates:repeated.map(rs=>rs.map(r=>byKey.get(r.key)))};
+}
+
+// Interactive overview only. Do not replace strict customer/export subtotals or
+// frozen outputs with partial prices, and never add component/reference prices.
+export function c1AppendixOverview0550(projection){
+ const chargedIn=new Map();
+ for(const g of projection.groups)for(const r of g.rows)for(const b of r.priceOwners||[])if(!chargedIn.has(b.lineId))chargedIn.set(b.lineId,g.id);
+ return projection.groups.map(g=>{
+  const owners=g.rows.flatMap(r=>r.priceOwners||[]),pending=(projection.pendingOwners||[]).filter(b=>(C1_APPENDICES_0550.find(a=>a.systems.includes(b.line.systemToken))?.id||'OTHER')===g.id);
+  const rollup=scheduleRollup0550([...owners,...pending]);
+  const openMR=g.rows.filter(r=>r.kind==='MR'&&!r.excluded&&(!r.ownerIds.length||!(r.quantity>0))).length;
+  const keys=unique([...g.rows.map(r=>r.key),...owners.map(b=>b.lineId),...pending.map(b=>b.lineId)]);
+  const problems=projection.problems.filter(p=>p==='C1_OWNER_TOTAL_MISMATCH'||keys.some(key=>p.endsWith(' / '+key)));
+  const includedIn=unique(g.rows.flatMap(r=>r.ownerIds).map(id=>chargedIn.get(id)).filter(id=>id&&id!==g.id));
+  const complete=Number.isFinite(g.amount)&&!rollup.open&&!openMR&&!problems.length;
+  const amount=complete?g.amount:rollup.knownUSD;
+  return {id:g.id,amount,knownUSD:rollup.knownUSD,priced:rollup.priced,open:rollup.open,count:rollup.count,openMR,complete,includedIn,
+   label:Number.isFinite(amount)?complete?'Subtotal':'Priced items subtotal':includedIn.length?'Included in Appendix '+includedIn.join(', '):''};
+ });
 }
 
 const groupTitle=g=>g.id==='OTHER'?g.title:'APPENDIX '+g.id+' · '+g.title;
