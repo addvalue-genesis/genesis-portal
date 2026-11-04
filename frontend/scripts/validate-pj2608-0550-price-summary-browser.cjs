@@ -21,6 +21,24 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
   assert.equal(await page.locator('[data-component-key="bid.budget.fx"]').count(),1);
  };
  await checkOrder();
+ // Bulk disclosure belongs to the existing Part, without changing records,
+ // another Part, or the nested quotation/reference reading choices.
+ await nav('bid.budget.working.part.A');
+ const partA=page.locator('[data-component-key="bid.budget.working.part.A"]'),partB=page.locator('[data-component-key="bid.budget.working.part.B"]'),groupsA=partA.locator(':scope > details.p55-price-group'),groupsB=partB.locator(':scope > details.p55-price-group'),partControls=partA.getByRole('group',{name:'Working A expand collapse',exact:true});
+ assert.equal(await groupsA.count(),20,'All nineteen systems plus COMMON keep their existing headings');
+ const beforeB=await groupsB.evaluateAll(ns=>ns.map(n=>n.open));
+ const dtrs=partA.locator('[data-component-key="bid.budget.working.group.TEL-RADIO-DTRS"]'),marine=partA.locator('[data-component-key="bid.budget.working.group.TEL-RADIO-MARINE"]');
+ const nestedBefore=await groupsA.locator('details').evaluateAll(ns=>ns.map(n=>n.open));
+ await partControls.getByRole('button',{name:'− หุบทุกหัวข้อ',exact:true}).click();assert(await groupsA.evaluateAll(ns=>ns.every(n=>!n.open)));assert(await partA.evaluate(n=>n.open),'Keep Part A itself open');assert.deepEqual(await groupsB.evaluateAll(ns=>ns.map(n=>n.open)),beforeB);
+ await dtrs.locator(':scope > summary').focus();await page.keyboard.press('Enter');assert(await dtrs.evaluate(n=>n.open));assert.equal(await marine.evaluate(n=>n.open),false,'Individual keyboard disclosure stays independent');
+ await partControls.getByRole('button',{name:'+ ขยายทุกหัวข้อ',exact:true}).click();assert(await groupsA.evaluateAll(ns=>ns.every(n=>n.open)));assert.deepEqual(await groupsA.locator('details').evaluateAll(ns=>ns.map(n=>n.open)),nestedBefore,'Bulk commands retain nested reading choices');
+ await partControls.getByRole('button',{name:'− หุบทุกหัวข้อ',exact:true}).click();await nav('bid.budget.working.group.TEL-RADIO-MARINE');await page.waitForFunction(()=>document.querySelector('[data-component-key="bid.budget.working.group.TEL-RADIO-MARINE"]')?.open);assert(await marine.evaluate(n=>n.open));assert.equal(await dtrs.evaluate(n=>n.open),false,'Module Search opens only the requested collapsed group');
+ assert(await marine.locator(':scope > summary').getByRole('button',{name:'Copy component ID bid.budget.working.group.TEL-RADIO-MARINE',exact:true}).isVisible());
+ for(const part of ['B','C']){await nav('bid.budget.working.part.'+part);const panel=page.locator('[data-component-key="bid.budget.working.part.'+part+'"]'),groups=panel.locator(':scope > details.p55-price-group'),controls=panel.getByRole('group',{name:'Working '+part+' expand collapse',exact:true});await controls.getByRole('button',{name:'− หุบทุกหัวข้อ',exact:true}).click();assert(await groups.evaluateAll(ns=>ns.every(n=>!n.open)));await controls.getByRole('button',{name:'+ ขยายทุกหัวข้อ',exact:true}).click();assert(await groups.evaluateAll(ns=>ns.every(n=>n.open)));assert(await marine.evaluate(n=>n.open));assert.equal(await dtrs.evaluate(n=>n.open),false);}
+ await nav('bid.budget.working.part.A');await page.setViewportSize({width:390,height:844});assert(await partControls.getByRole('button',{name:'− หุบทุกหัวข้อ',exact:true}).isVisible());assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Working bulk controls fit mobile');await page.setViewportSize({width:1440,height:1100});
+ assert.deepEqual(await read(),initial,'Bulk/individual disclosure and Module Search never save financial or source/history records');
+ if(process.env.PJ0550_WORKING_GROUPS_ONLY){assert.deepEqual(errors,[]);console.log('PASS Working bulk disclosure: all20 Part A groups, independent A/B/C commands and individual keyboard toggles, nested reading state, Module Search/Copy ID, mobile containment and unchanged canonical workspace.');return;}
+ await nav('bid.budget.official.summary');
  const stages=page.getByRole('group',{name:'Bidding pricing stages'});
  for(const [label,id] of [['Budget THB','bid.budget.budget-thb'],['Release Preview USD','bid.budget.release'],['Working Preview','bid.budget.working.lines']]){
   await stages.getByRole('button').filter({hasText:label}).click();

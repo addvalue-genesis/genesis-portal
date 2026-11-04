@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.14",
+  "version": "2026-11-04.15",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "a05a9fbf",
-  "capability": "Existing07.2 collapsed quotation headers show original base/net quotation totals converted to THB using saved project FX, with native currency/rate/source/date, separate options and explicit missing-price/FX states. Full quotation scope across system views, one net owner; no Working/quantity/FX/source/review/history adoption."
+  "source0550": "85b212bf",
+  "capability": "Existing10.2 Working Parts A/B/C can expand or collapse all direct child groups with one click. Independent native disclosures, nested reading choices, Module Search, original IDs/colours and canonical financial/source/review/history records remain intact. No new tab/module."
 }

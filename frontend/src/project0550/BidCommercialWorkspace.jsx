@@ -69,9 +69,13 @@ function LineEditor({initialForm,editorState,onNavigate}){
 }
 function WorkingHierarchy({model,integration,data,onEdit,onRelease,onNew,onNavigate}){
  const identities=new Map(bidPresentationIndex(data.lines).map(m=>[m.id,m])),identity=id=>identities.get(id);
+ // Match existing native disclosure/navigation behaviour. Limit the command to
+ // this Part's direct groups; retain other Parts and nested reading choices.
+ const toggleGroups=(event,open)=>event.currentTarget.closest('details').querySelectorAll(':scope > details.p55-price-group').forEach(group=>{group.open=open;});
  return <>{["A","B","C"].map(part=>{
  const rows=model.lines.filter(r=>r.wbs[0]===part),partId="bid.budget.working.part."+part;
  return <details className="p55-price-group" key={part} open={rows.length>0} data-component-key={partId} data-module-number={identity(partId).number} data-bid-owner={part} style={bidOwnerStyle(part)}><summary><BidHeading {...identity(partId)}/><span className="p55-group-total">{rows.filter(r=>!companyReference(r)).length} รายการทำราคา · {rows.filter(companyReference).length} อ้างอิง COMPANY · Selected subtotal {amount(sumOfficial(rows.filter(r=>r.selected),"customerTHB"))}</span></summary>
+ <div className="p55-review-toolbar" role="group" aria-label={'Working '+part+' expand collapse'}><button type="button" onClick={e=>toggleGroups(e,true)}>+ ขยายทุกหัวข้อ</button><button type="button" onClick={e=>toggleGroups(e,false)}>− หุบทุกหัวข้อ</button></div>
  {part==="A"&&<p>เรียงตาม MR Rev.B1 Appendix 1.1–1.8 · หัวข้ออ้างอิงเป็น working mapping; ขอบเขตและผู้รับผิดชอบต้องตรวจจาก Clause/หน้าในแต่ละรายการ</p>}
  {BID_GROUPS_0550.filter(g=>g.part===part).map(group=>{const code=group.code,children=rows.filter(r=>lineOwner0550(r)===code),pricing=children.filter(r=>!companyReference(r)),references=children.filter(companyReference),groupId="bid.budget.working.group."+code;return <details className="p55-price-group" key={code} open={children.length>0} data-component-key={groupId} data-module-number={group.number} data-bid-owner={code} style={bidOwnerStyle(code)}><summary><BidHeading {...identity(groupId)}/><span className="p55-group-total">{pricing.length} รายการทำราคา / ตรวจขอบเขต · {references.length} อ้างอิง COMPANY · {amount(sumOfficial(pricing.filter(r=>r.selected),"customerTHB"))}</span></summary>
  <p>{group.mrAppendix?"MR App. "+group.mrAppendix+" · ":""}ปลายทาง: {CUSTOMER_FORM_0550.rows.filter(r=>part==="A"?r.systems.includes(code):r.code===code).map(r=>r.code).join(" / ")||"เลือก Customer row ตามขอบเขต"}</p>
