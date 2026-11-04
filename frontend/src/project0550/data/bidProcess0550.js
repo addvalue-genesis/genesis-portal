@@ -95,7 +95,7 @@ export function isBidControlOnly0550(data,line){
 
 export function bidRequirementOwners0550(requirement,model){
  const calculated=new Map((model.lines||[]).map(l=>[l.id,l])),priced=new Map((model.provisional?.lines||[]).map(l=>[l.id,l]));
- const ids=unique((requirement.workLineIds||[]).map(id=>{const l=calculated.get(id);return l?.mrScopeState?.covered?l.mrScopeState.owner.id:id;}));
+ const ids=unique((requirement.workLineIds||[]).flatMap(id=>{const proposed=priced.get(id)?.bidPriceAllocation;if(proposed)return proposed.ownerIds;const l=calculated.get(id);return [l?.mrScopeState?.covered?l.mrScopeState.owner.id:id];}));
  return ids.map(id=>priced.get(id)).filter(l=>l?.selected&&finite(l.customerUSD));
 }
 

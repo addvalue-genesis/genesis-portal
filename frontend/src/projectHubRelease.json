@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.18",
+  "version": "2026-11-04.19",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "0b41790f",
-  "capability": "Bid-stage scope warnings no longer suppress valid quantity/rate arithmetic. Existing WP.5/WP.7 show calculated quantities, existing one-owner package/work prices and sourced post-PO study timing. Existing10.5 shows A/B/C cost/sell and19-system delivery plans;10.7 separates unselected references. Source-bound CERAGON whole-link and exact untouched controls prepare once; preserve edits/deletions, prior rates/FX and frozen history. Actual-data/browser reload/mobile checks passed; full quotation and engineering acceptance remain distinct."
+  "source0550": "8ab117b9",
+  "capability": "Existing A/B/C draft budget now has complete numeric price/cost owners on received source packages plus explicitly labelled planning estimates. One shared package allocation per cost owner; untouched MR quantities, prior selling amounts, FX, source offers and frozen history remain. Tower quotations and CERAGON spare package are partitioned once; B7–B9 use native customer rows. 10.5 discloses quoted/estimated/internal-cost/reference bases and material scope assumptions. Full technical/RFQ acceptance and controlled issue remain separate."
 }

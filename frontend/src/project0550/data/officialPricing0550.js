@@ -1,3 +1,4 @@
+import {bidCompletionReferences0550} from "./bidCompletion0550";
 import {activeSupplyLine0550} from "./supplyProposalDraft0550";
 import {mgwDetailGroupBasis0550} from "./mgwDetailPricing0550";
 import form from "./customerForm0550.json";
@@ -97,15 +98,19 @@ export function deriveOfficialPricing(data,calculated,today,integrationModel){
 // Draft pricing while vendor refreshes and engineering review remain pending.
 // Reuses the canonical equation results; it never stamps an Official review.
 export function deriveProvisionalPricing(data,calculated){
- const lines=calculated.lines.map(r=>({...r,costTHB:r.provisionalCostTHB,workingSellTHB:r.provisionalSellTHB,customerTHB:r.provisionalCustomerTHB,customerUSD:r.provisionalCustomerUSD,
+ const calculatedPrices=calculated.lines.map(r=>({...r,costTHB:r.provisionalCostTHB,workingSellTHB:r.provisionalSellTHB,customerTHB:r.provisionalCustomerTHB,customerUSD:r.provisionalCustomerUSD,
   calculatedCustomerTHB:r.provisionalCustomerTHB,reviewState:r.mrScopeState?.covered?"INCLUDED_IN_OWNER":r.mrScopeState?.excluded||r.satelliteScopeState?.excluded?"COMPANY_SUPPLY":r.mrScopeState?.problems.length||r.satelliteScopeState?.problems.length?"SCOPE OPEN":"PROVISIONAL — ราคาเดิม / รออัปเดต",reviewProblems:[...r.problems,"ตรวจ MR / ปริมาณ / ราคาอัปเดตก่อนออกข้อเสนอจริง"]}));
+ const references=bidCompletionReferences0550(data,calculatedPrices);
+ for(const r of calculatedPrices)if(r.mrScopeState?.covered&&references.has(r.coveredByLineId))references.set(r.id,{...references.get(r.coveredByLineId),lineId:r.id});
+ const lines=calculatedPrices.map(r=>references.has(r.id)?{...r,selected:false,reviewState:"BID_PACKAGE_REFERENCE",bidPriceAllocation:references.get(r.id)}:r);
  const selected=lines.filter(r=>r.selected),unmapped=selected.filter(r=>!mappingValid(r));
+ const pricingGaps=(calculated.requirementGaps||[]).filter(g=>!references.has("REQ-"+g.id));
  const schedule=form.rows.map(t=>{
-  const children=selected.filter(r=>mappingValid(r)&&r.customerRowCode===t.code),gaps=(calculated.requirementGaps||[]).filter(g=>g.code===t.code),customerTHB=gaps.length?null:sumOfficial(children,"customerTHB"),customerUSD=gaps.length?null:sumOfficial(children,"customerUSD");
+  const children=selected.filter(r=>mappingValid(r)&&r.customerRowCode===t.code),gaps=pricingGaps.filter(g=>g.code===t.code),customerTHB=gaps.length?null:sumOfficial(children,"customerTHB"),customerUSD=gaps.length?null:sumOfficial(children,"customerUSD");
   return {...t,children,review:null,problems:["Selected vendor scope only; completeness and updated quotations pending",...gaps.map(g=>g.reason+" / "+g.id)],ready:children.length>0&&!gaps.length,excluded:false,state:"PROVISIONAL",qty:1,unit:"Lot",customerTHB,customerUSD,customerRemark:[customerSatelliteRemark(t),"Provisional pricing for listed scope; subject to scope confirmation and updated quotations."].filter(Boolean).join(" "),sourceModuleId:"bid.budget.working.customer."+t.code,releaseModuleId:"bid.budget.release.customer."+t.code};
  });
- const total=(parts,key)=>{const rows=schedule.filter(r=>parts.includes(r.part));return !unmapped.length&&!(calculated.requirementGaps||[]).some(g=>!g.code)&&rows.every(r=>r.ready)?sumOfficial(rows,key):null;};
- return {pricingBasis:"PROVISIONAL_VENDOR",requirementGaps:calculated.requirementGaps||[],lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),
+ const total=(parts,key)=>{const rows=schedule.filter(r=>parts.includes(r.part));return !unmapped.length&&!pricingGaps.some(g=>!g.code)&&rows.every(r=>r.ready)?sumOfficial(rows,key):null;};
+ return {pricingBasis:"PROVISIONAL_VENDOR",requirementGaps:pricingGaps,lines,selected,schedule,unmapped,revision:data.revision,selectedTHB:sumOfficial(selected,"customerTHB"),selectedUSD:sumOfficial(selected,"customerUSD"),
   knownTHB:sumOfficial(selected.filter(r=>Number.isFinite(r.customerTHB)),"customerTHB"),knownUSD:sumOfficial(selected.filter(r=>Number.isFinite(r.customerUSD)),"customerUSD"),
   baseTHB:total("AB","customerTHB"),baseUSD:total("AB","customerUSD"),optionsTHB:total("C","customerTHB"),optionsUSD:total("C","customerUSD"),reviewedCount:0,scopeReviewed:false,releaseAllowed:false,releaseState:"HOLD"};
 }
