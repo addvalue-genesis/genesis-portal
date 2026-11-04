@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.8",
+  "version": "2026-11-04.9",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "05de6515",
-  "capability": "Retains both original PAGA quotations and registers CERAGON RevA1 in existing Vendor07.1/07.2 under TEL-DMR. Independent default/private receipts, native zero-quantity option and annual support units; no automatic Working/FX/history adoption or MR compliance approval."
+  "source0550": "30a705bc",
+  "capability": "Retains PAGA and CERAGON RevA1 source/default behaviour. Master Tower originals30m/60m show native line prices as2 quotations with a separate unchanged aggregate Working reference; IDIE shows original4 rates, printed Asactual amounts and option/trip totals. Metadata supplements preserve edited costs, independent family receipts, Working/FX/history and source/engineering state."
 }

@@ -55,6 +55,19 @@ const deletedPrior={...data,vendors:native.vendors,supplierRevisionImports:[{bat
 assert.equal(R.planVendorRegister0550(deletedPrior,native,tokens).workspace.offers.length,0,'A separate source receipt preserves previously deleted quote rows');
 const invalidTotal=structuredClone(native);invalidTotal.offers[0].quoteEvidence.quotedTotal=-1;assert.throws(()=>R.planVendorRegister0550(data,invalidTotal,tokens));
 const badParent=structuredClone(native);badParent.offers[1].supplierQuoteRow.parentOfferId='MISSING';assert.throws(()=>R.planVendorRegister0550(data,badParent,tokens));
+// Printed amount supplements preserve edited active prices and unknown drivers.
+const amountSupplement=structuredClone(pack);amountSupplement.batchId+='-AMOUNTS';amountSupplement.offers.forEach((o,i)=>{o.quoteEvidence.fileName='synthetic.pdf';o.quoteEvidence.quotedTotal=i<2?null:o.unitCost;if(i<2)o.quoteEvidence.quotedTotalText='As actual';});
+const localRate=structuredClone(next);localRate.offers[0].unitCost=999;
+const withAmounts=R.planVendorRegister0550(localRate,amountSupplement,tokens).workspace;
+assert.equal(withAmounts.offers[0].unitCost,999);assert.equal(withAmounts.offers[0].quoteEvidence.quotedUnitCost,100);assert.equal(withAmounts.offers[0].quoteEvidence.quotedTotalText,'As actual');
+const amountHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:withAmounts,onEdit:()=>{}}));assert(amountHtml.includes('As actual'));
+const overwriteAmount=structuredClone(amountSupplement);overwriteAmount.batchId+='-CHANGED';overwriteAmount.offers[2].quoteEvidence.quotedTotal=9999;assert.equal(R.planVendorRegister0550(withAmounts,overwriteAmount,tokens).workspace.offers[2].quoteEvidence.quotedTotal,pack.offers[2].unitCost);
+const references=structuredClone(second);references.batchId+='-REFERENCES';references.offers.forEach(o=>o.quoteEvidence.workingReferenceOfferIds=['COMBINED-OWNER']);
+const combined={...native.offers[0],id:'COMBINED-OWNER',quoteRef:'Combined previous Working basis',description:'Existing combined Working price'};delete combined.quoteEvidence;delete combined.supplierQuoteRow;
+const combinedData={...originals,offers:[...originals.offers,combined]};
+const referred=R.planVendorRegister0550(combinedData,references,tokens).workspace;
+const referenceEntries=R.vendorOfferEntries0550(referred);assert(referenceEntries.find(e=>e.offer.id==='COMBINED-OWNER').referenceOnly);assert.equal(R.groupVendorOffers0550(referenceEntries,'company',D.SYSTEMS)[0].children[0].quotes.filter(q=>!q.referenceOnly).length,2,'Two original quote identities; aggregate Working reference is not a third quotation');
+const referenceHtml=renderToStaticMarkup(React.createElement(VendorOfferGroups0550,{data:referred,onEdit:()=>{}}));assert(referenceHtml.includes('2 ใบเสนอราคา')&&referenceHtml.includes('ฐาน Working เดิม'));
 if(process.env.PJ0550_VENDOR_REGISTER_FILE){
  const actual=JSON.parse(fs.readFileSync(process.env.PJ0550_VENDOR_REGISTER_FILE,'utf8')),actualBefore=JSON.stringify(actual),registered=R.planVendorRegister0550(data,actual,tokens).workspace;
  assert.equal(registered.offers.length,4);assert.equal(registered.lines.length,0);assert.equal(JSON.stringify(actual),actualBefore);
