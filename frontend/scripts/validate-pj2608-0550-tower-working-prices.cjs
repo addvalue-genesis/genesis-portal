@@ -1,0 +1,25 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),babel=require('@babel/core');
+const src=path.resolve(__dirname,'../src'),old=require.extensions['.js'];require.extensions['.js']=(m,f)=>f.startsWith(src+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}]]}).code,f):old(m,f);
+const {towerWorkingBreakdown0550:derive}=require(src+'/project0550/data/towerWorkingBreakdown0550.js');
+const parent='LINE-LEGACY-TEL-TELT-1',ids=['REQ-MR-B1-11-APF-08','REQ-MR-B1-11-ACP-06'];
+const data={lines:[{id:parent,quantity:1,unit:'Lot',calculationId:'',vendorId:'TOWER',sellMode:'MARGIN',marginPct:20,primePct:25},...ids.map(id=>({id,coveredByLineId:parent,selected:true,quantity:1,unit:'Pc',manualCost:null,sellRate:null,offerId:'',calculationId:''}))],offers:[]};
+[[100,20,5,4],[50,10,2,1]].forEach((rates,n)=>rates.forEach((rate,i)=>data.offers.push({id:'O-'+n+'-'+i,vendorId:'TOWER',quoteRef:'2609.95.'+(n+1),currency:'THB',unitCost:rate,supplierQuoteRow:{classification:'BASE_PRICE',itemCode:String(i+2),sourceId:'SOURCE-'+n,quantity:1},quoteEvidence:{sourceId:'SOURCE-'+n,sourceSha256:String(n+1).repeat(64),quotedCurrency:'THB',quotedQuantity:1,quotedUnitCost:rate,quotedTotal:rate,sourceUrl:'https://example.com/'+n}})));
+const model={pricingBasis:'PROVISIONAL_VENDOR',lines:[{id:parent,selected:true,currency:'THB',costTHB:192,workingSellTHB:240,customerTHB:300},...ids.map(id=>({id,mrScopeState:{covered:true}}))]};
+const before=JSON.stringify(data),mBefore=JSON.stringify(model),result=derive(data,model);assert.equal(result.state,'READY');assert.equal(result.rows.size,3);
+assert.deepEqual(result.rows.get(ids[0]).prices,{costTHB:129,workingSellTHB:161.25,customerTHB:201.56,calculatedCustomerTHB:201.56,provisionalCostNative:129,provisionalSellNative:161.25,provisionalCustomerNative:201.56,currency:'THB'});
+assert.equal(result.rows.get(ids[1]).prices.customerTHB,98.44);assert.equal(result.rows.get(parent).kind,'SUMMARY');
+for(const mutate of [d=>d.offers.pop(),d=>d.offers.push(d.offers[0]),d=>d.offers[0].unitCost++,d=>d.offers[0].quoteEvidence.quotedTotal++,d=>d.offers[0].quoteEvidence.sourceSha256='a'.repeat(64),d=>d.lines[1].quantity=2,d=>d.lines[1].manualCost=0,d=>d.lines[1].selected=false,d=>d.lines[0].sellMode='DIRECT']){const changed=structuredClone(data);mutate(changed);assert.equal(derive(changed,model).state,'OPEN');}
+const changedModel=structuredClone(model);changedModel.lines[0].customerTHB+=0.01;assert.equal(derive(data,changedModel).state,'OPEN','Never force a rounding residual or authored sell total');
+assert.equal(derive(data,{...model,pricingBasis:undefined}).state,'INACTIVE','Official reviewed pricing is never completed by this read-only detail');
+assert.equal(JSON.stringify(data),before);assert.equal(JSON.stringify(model),mBefore);
+if(process.argv[2]){
+ const actual=JSON.parse(fs.readFileSync(process.argv[2])),D=require(src+'/project0550/data.js'),B=require(src+'/project0550/data/bidWorkspaceModel.js'),P=require(src+'/project0550/data/officialPricing0550.js');
+ const raw=JSON.stringify(actual),m=B.deriveBidWorkspace(actual,D.SYSTEMS.map(s=>s.token),'2026-11-05'),exportBefore=JSON.stringify(P.officialCustomerRows(m.provisional)),partBefore=JSON.stringify(m.provisional),split=derive(actual,m.provisional);
+ assert.equal(split.state,'READY',split.message);
+ for(const id of ids){const row=split.rows.get(id),quoted=actual.offers.filter(o=>row.offerIds.includes(o.id));assert.equal(row.prices.costTHB,quoted.reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0));assert.equal(quoted.length,4);assert.equal(new Set(quoted.map(o=>o.quoteRef)).size,1);}
+ for(const key of ['costTHB','workingSellTHB','customerTHB'])assert.equal(Math.round(ids.reduce((n,id)=>n+split.rows.get(id).prices[key],0)*100)/100,m.provisional.lines.find(l=>l.id===parent)[key]);
+ assert.equal(m.provisional.selected.filter(l=>[parent,...ids].includes(l.id)).length,1,'The saved financial owner is counted once');
+ assert.equal(derive(actual,m.official).state,'INACTIVE');assert.equal(JSON.stringify(actual),raw);assert.equal(JSON.stringify(m.provisional),partBefore);assert.equal(JSON.stringify(P.officialCustomerRows(m.provisional)),exportBefore,'Existing release/export projection is exact');
+ console.log('PASS actual per-tower source costs, saved policy, reconciled cost/sell/customer THB, unchanged canonical records and exact financial/release projection.');
+}
+console.log('PASS synthetic independent prices, original source/unit/quantity/owner guards, no forced residual, read-only data/model and strict Official separation.');

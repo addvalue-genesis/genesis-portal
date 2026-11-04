@@ -21,7 +21,18 @@ const server=http.createServer((req,res)=>{
  await page.goto('http://127.0.0.1:'+server.address().port+'/projects/pj2608-0550');await ready();const before=await read();
  const group=page.locator('[data-component-key="bid.budget.working.group.TEL-TELT"]');
  await jump('bid.budget.working.group.TEL-TELT');await group.waitFor({state:'visible'});
- assert((await group.locator(':scope > summary').innerText()).includes('1 รายการเจ้าของราคา / ตรวจขอบเขต · 2 อ้างอิงราคาไม่บวกซ้ำ'));
+ assert((await group.locator(':scope > summary').innerText()).includes('2 แถวรายละเอียดราคา · 1 ยอดสรุปไม่บวกซ้ำ'));
+ const owner=before.lines.find(l=>l.id==='LINE-LEGACY-TEL-TELT-1'),money=v=>new Intl.NumberFormat('en-US',{style:'currency',currency:'THB'}).format(v);
+ assert.equal(await group.locator('[data-tower-price-role="SUMMARY"]').count(),1);assert.equal(await group.locator('[data-tower-price-role="DETAIL"]').count(),2);
+ for(const [id,quote] of [['REQ-MR-B1-11-APF-08','2609.95.1'],['REQ-MR-B1-11-ACP-06','2609.95.2']]){
+  const row=group.locator('[data-component-key="bid.budget.working.line.'+id+'"]'),cost=before.offers.filter(o=>o.quoteRef===quote&&['2','3','4','5'].includes(o.supplierQuoteRow?.itemCode)).reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0),sell=cost/(1-owner.marginPct/100),customer=sell*(1+owner.primePct/100);
+  assert((await row.locator('td').nth(1).innerText()).includes(quote+' · Item 2–5'));
+  for(const [index,value] of [[2,cost],[3,sell],[4,customer]]){assert((await row.locator('td').nth(index).innerText()).includes(money(value)));assert(!(await row.locator('td').nth(index).innerText()).includes('OPEN'));}
+  assert((await row.innerText()).includes('รวมในยอดสรุปแล้ว ไม่บวกซ้ำ'));
+ }
+ const basis=page.getByRole('group',{name:'Pricing basis view',exact:true});await basis.getByRole('button',{name:'Official · ตรวจทบทวนแล้ว',exact:true}).click();assert.equal(await group.locator('[data-tower-price-role="DETAIL"]').count(),0,'No unreviewed detail money injected into Official');await basis.getByRole('button',{name:'Working · ราคาเดิมรออัปเดต',exact:true}).click();
+ const summary=group.locator('[data-tower-price-role="SUMMARY"]');assert((await summary.innerText()).includes('ยอดสรุป'));
+ if(process.env.PJ0550_TOWER_PRICE_SCREENSHOT){await group.getByRole('table',{name:'Working cost lines TEL-TELT',exact:true}).evaluate(el=>scrollTo(0,scrollY+el.getBoundingClientRect().top-80));await page.screenshot({path:process.env.PJ0550_TOWER_PRICE_SCREENSHOT});}
  const trace=page.getByLabel('Supplier to Working trace TEL-TELT',{exact:true});assert.equal(await trace.locator('[data-working-source-quote]').count(),2);
  assert.equal(await trace.locator('[data-working-source-item]').count(),30);
  for(const quote of await trace.locator('[data-working-source-quote]').all()){
@@ -47,5 +58,5 @@ const server=http.createServer((req,res)=>{
  if(process.env.PJ0550_TOWER_SCREENSHOT){await page.setViewportSize({width:1440,height:1000});await trace.scrollIntoViewIfNeeded();await page.screenshot({path:process.env.PJ0550_TOWER_SCREENSHOT});}
  assert.deepEqual(await read(),before,'Source inspection/navigation/disclosure never writes any canonical field');
  await page.reload();await ready();await jump('bid.budget.working.group.TEL-TELT');assert.equal(await trace.locator('[data-working-source-item]').count(),30);assert.deepEqual(await read(),before,'Reload retains original workspace');assert.deepEqual(errors,[]);
- console.log('PASS production browser:2 quotes/30 items,1 owner+2 references,22 Vendor allocations,source↔existing C1/Vendor navigation,native units,bulk disclosure,1440/390 containment,unchanged workspace/reload and no page errors.');
+ console.log('PASS production browser:per-tower source/cost/sell/customer THB in both existing MR rows,one non-additive summary,strict Official separation,2 quotes/30 items,22 Vendor allocations,source↔existing C1/Vendor navigation,native units,bulk disclosure,1440/390 containment,unchanged workspace/reload and no page errors.');
 }finally{if(browser)await browser.close();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1;});

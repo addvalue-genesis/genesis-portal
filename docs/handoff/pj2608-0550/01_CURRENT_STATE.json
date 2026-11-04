@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_TOWER_SOURCE_WORKING_TRACE.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_TOWER_PER_HEIGHT_PRICES.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -39,7 +39,8 @@
     "docs/handoff/pj2608-0550/20261104_MR_BATCH_MAPPING.md",
     "docs/handoff/pj2608-0550/20261104_BID_PROCESS_AND_PRICE_EXECUTION.md",
     "docs/handoff/pj2608-0550/20261104_DRAFT_BUDGET_COMPLETION.md",
-    "docs/handoff/pj2608-0550/20261105_TOWER_SOURCE_WORKING_TRACE.md"
+    "docs/handoff/pj2608-0550/20261105_TOWER_SOURCE_WORKING_TRACE.md",
+    "docs/handoff/pj2608-0550/20261105_TOWER_PER_HEIGHT_PRICES.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -80,6 +81,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "UI2026-11-05.2: APF60m and ACP30m existing MR rows show per-tower original supply Item2–5 costs and saved E11/E12/E13 policy prices in THB. Existing aggregate is labelled summary and counted once; these remain non-additive price details, not new financial owners. Guard complete/current source rows and native MR basis; exact cost/sell/customer reconciliation required, no invented rounding allocation. Preserve raw prices/Qty/FX, identities, financial model, exports/reviews/history and strict Official. Actual/synthetic and browser checks recorded in latest checkpoint; Windows consumption unobserved.",
     "UI2026-11-05.1: existing TEL-TELT group exposes two originals/thirty source items and MR site/quantity to A/B/C owner trace. Vendor reads current source-bound allocation receipts for22 service/construction/delivery rows;8 supply references retain the combined owner. Changed/deleted/deselected bases do not claim current use. Counts distinguish owners and non-additive references; no financial/schema/startup/history mutation. Actual-data/SSR/adversarial, affected validators, production browser/navigation/reload/mobile and webpack passed. Engineering/SI remains DRAFT; Windows consumption unobserved. See latest checkpoint.",
     "UI2026-11-04.19: numeric draft budget complete on actual fixture (A21+B57+C10 financial owners;182 pricing-only MR references; zero monetary gaps/unmapped owners). Preserve original native MR records, selected prices, source/FX/calculations/SI/history. Draft includes29 explicit planning provisions,25 internal-cost estimates and5 new quoted partitions. Critical unconfirmed assumptions include KU12months, bulk3×5km+4×3km, support/conferencing rates, spare percentages, insurance and installation workloads; reconcile these with actual RFQ/OEM/MTO/quotes before claiming fixed/full RFQ compliance. Formal issue/engineering approval not changed. Read latest checkpoint for checks and limits.",
     "Owner correction: execute RFQ-to-bid process, do not delegate process OPEN lists to executive. UI2026-11-04.18 software verification complete: provisional arithmetic, exact control-row normalization, private CERAGON whole-link preparation, WP.5 computed quantities/owner references and WP.7 evidence,19-system SDRL phase projection;54 priced owners and215 price-input/detail rows grouped into30 SI work groups. Actual-data/browser reload/mobile, existing pricing/Working/issue-history checks passed. Continue actual package allocation/current missing-input estimates and source-bound formal bid-phase authorization; no claim all A/B/C prices/compliance are complete. See latest checkpoint.",

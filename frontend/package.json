@@ -210,6 +210,7 @@
     "validate:pj0550-si-supplier-evidence-browser": "node scripts/validate-pj2608-0550-si-supplier-evidence-browser.cjs",
     "validate:pj0550-bid-completion": "node scripts/validate-pj2608-0550-bid-completion.cjs",
     "validate:pj0550-tower-source-trace": "node scripts/validate-pj2608-0550-tower-source-trace.cjs",
+    "validate:pj0550-tower-working-prices": "node scripts/validate-pj2608-0550-tower-working-prices.cjs",
     "validate:pj0550-tower-source-trace-browser": "node scripts/validate-pj2608-0550-tower-source-trace-browser.cjs",
     "validate:pj0550-bid-process": "node scripts/validate-pj2608-0550-bid-process.cjs",
     "validate:pj0550-bid-process-browser": "node scripts/validate-pj2608-0550-bid-process-browser.cjs",

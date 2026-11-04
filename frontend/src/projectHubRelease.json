@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.1",
+  "version": "2026-11-05.2",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "872fec85",
-  "capability": "Existing TEL-TELT Working group now shows both original supplier quotations and native item-to-A/B/C price-owner trace beside MR site/quantity references. Vendor usage includes current source-bound bid allocations and flags edited source/owner bases for review; mixed quoted/estimated costs remain explicit. Group counts separate owners from non-additive references. No price, quantity, FX, financial fingerprint, source, review or frozen-history migration. Engineering/RFQ acceptance remains separate."
+  "source0550": "7153fc10",
+  "capability": "Existing APF60m and ACP30m Working rows show original quotation items2–5, per-tower cost and the saved aggregate owner's E11/E12/E13 selling-policy results in THB. The existing aggregate row is explicitly the summary; its price is counted once. Detail must reconcile to all saved cost/sell/customer totals; changed/incomplete bases stay OPEN. No saved price/quantity/FX, financial owner, review, export or frozen-history change; strict Official remains separate."
 }
