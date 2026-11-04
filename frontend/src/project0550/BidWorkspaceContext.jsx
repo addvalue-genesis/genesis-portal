@@ -1,3 +1,4 @@
+import {prepareBidProcess0550} from "./data/bidProcess0550";
 import {pendingVendorDefaultCount0550} from "./data/vendorDefaultCatalog0550";
 import {fetchAutomaticVendorRegisters0550,planAutomaticVendorRegisters0550,prepareVendorDefaults0550,vendorRegisterSyncSuccess0550,vendorRegisterSyncFailure0550} from "./data/vendorRegisterAuto0550";
 import {prepareMgwDetailPricing0550} from "./data/mgwDetailPricing0550";
@@ -37,7 +38,7 @@ export function BidWorkspaceProvider({children}){
    const avlPrepared=prepareSystemAvlDeviations0550(priced,deriveIntegration0550(priced,SYSTEMS,reviewDate));
    const repository=prepareRepositoryBidBasis0550(avlPrepared,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE},reviewDate);
    const labour=prepareTsiActivityBudget0550(prepareAuthorizedEurThb0550(repository,reviewDate),COMMERCIAL_POLICY,CORE_TEAM,reviewDate);
-   const prepared=prepareVendorDefaults0550(prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate),SYSTEMS.map(s=>s.token));
+   const prepared=prepareBidProcess0550(prepareVendorDefaults0550(prepareTsiExpenseBudget0550(labour,COMMERCIAL_POLICY,CORE_TEAM,reviewDate),SYSTEMS.map(s=>s.token)),COMMERCIAL_POLICY,reviewDate);
    if(prepared!==current)current=await saveProject0550Bid(prepared,current.revision,"Prepare vendor/MR basis, default supplier metadata and authorised TSI estimates; preserve edited records / "+prepared.mgwQuoteImport.version);
    setData(current);setError("");setRecovery(null);
    setSourceSync({state:"CHECKING",message:"กำลังตรวจทะเบียนจาก Google Drive for Desktop"});
@@ -47,7 +48,8 @@ export function BidWorkspaceProvider({children}){
    setVendorSync({state:"CHECKING",message:"กำลังตรวจชุด Vendor ที่เตรียมไว้ในข้อมูลโครงการ"});
    try{
     const bundle=await fetchAutomaticVendorRegisters0550(),plan=planAutomaticVendorRegisters0550(current,bundle,SYSTEMS.map(s=>s.token));
-    if(plan.changed)current=await saveProject0550Bid(plan.workspace,current.revision,"Load prepared Vendor registers automatically / "+bundle.packages.map(p=>p.batchId).join(", "));
+    const priced=prepareBidProcess0550(plan.workspace,COMMERCIAL_POLICY,reviewDate);
+    if(priced!==current)current=await saveProject0550Bid(priced,current.revision,"Load prepared Vendor registers and execute source-bound bid preparation / "+bundle.packages.map(p=>p.batchId).join(", "));
     setData(current);setVendorSync(vendorRegisterSyncSuccess0550(plan,current));
    }catch(e){current=await loadProject0550Bid();setData(current);setVendorSync(vendorRegisterSyncFailure0550(e.message,current));}
    try {
@@ -85,8 +87,9 @@ export function BidWorkspaceProvider({children}){
     try{
      let current=await loadProject0550Bid();
      const plan=planAutomaticVendorRegisters0550(current,bundle,SYSTEMS.map(s=>s.token));
-     if(plan.changed)current=await saveProject0550Bid(plan.workspace,current.revision,"Load prepared Vendor registers automatically / "+bundle.packages.map(p=>p.batchId).join(", "));
-     if(active){if(plan.changed||current.revision!==data.revision)setData(current);setVendorSync(vendorRegisterSyncSuccess0550(plan,current));}
+     const priced=prepareBidProcess0550(plan.workspace,COMMERCIAL_POLICY,reviewDate);
+     if(priced!==current)current=await saveProject0550Bid(priced,current.revision,"Load prepared Vendor registers and execute source-bound bid preparation / "+bundle.packages.map(p=>p.batchId).join(", "));
+     if(active){if(priced!==plan.workspace||plan.changed||current.revision!==data.revision)setData(current);setVendorSync(vendorRegisterSyncSuccess0550(plan,current));}
     }finally{lock.current=false;setBusy(false);}
    }catch(e){if(active)setVendorSync(vendorRegisterSyncFailure0550(e.message,data));}
    finally{if(active&&attempts<3)timer=setTimeout(retry,5000);}

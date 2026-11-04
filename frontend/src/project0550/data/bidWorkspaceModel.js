@@ -8,6 +8,7 @@ import { evaluateServiceEquation,bidQuantityUnit0550 } from "../serviceEquationR
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
+import {isBidScopeWarning0550} from "./bidProcess0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
 import {validateReleaseRegister0550} from "./releaseIssue0550";
@@ -65,8 +66,9 @@ export function validateBidWorkspace(data,snapshotId,systems){
  validateSupplierRevisionImports0550(data.supplierRevisionImports);
  if(data.deviationRelease!==undefined){const r=data.deviationRelease;fields(r,["projectNo","project","requisition","description","vendor"]);for(const k of ["projectNo","project","requisition","description","vendor"])string(r[k],"deviation release "+k,4000);}
  if(data.mgwDetailPricingImport!==undefined){const r=data.mgwDetailPricingImport;fields(r,["version","date","importedLineIds","conflicts","replacedLineIds","decision"]);if(r.decision!==undefined)string(r.decision,"MGW pricing decision");if(r.replacedLineIds!==undefined&&(!Array.isArray(r.replacedLineIds)||r.replacedLineIds.some(v=>typeof v!=="string"||v.length>100)))fail("Invalid replaced MGW owner list");string(r.version,"MGW pricing preparation version",100);date(r.date,"MGW pricing preparation date");for(const key of ["importedLineIds","conflicts"]){if(!Array.isArray(r[key])||r[key].length>2000||r[key].some(v=>typeof v!=="string"||v.length>400))fail("Invalid MGW pricing preparation list");}}
- if(data.repositoryBasisImport!==undefined){const r=data.repositoryBasisImport;fields(r,["version","snapshotId","preparedOn","fxInherited","eurThbConversionVersion","tsiActivityBudget"]);string(r.version,"repository preparation version",100);if(r.snapshotId!==snapshotId||typeof r.fxInherited!=="boolean")fail("Invalid repository preparation");date(r.preparedOn,"repository preparation date");
+ if(data.repositoryBasisImport!==undefined){const r=data.repositoryBasisImport;fields(r,["version","snapshotId","preparedOn","fxInherited","eurThbConversionVersion","tsiActivityBudget","bidProcess"]);string(r.version,"repository preparation version",100);if(r.snapshotId!==snapshotId||typeof r.fxInherited!=="boolean")fail("Invalid repository preparation");date(r.preparedOn,"repository preparation date");
   if(r.eurThbConversionVersion!==undefined)string(r.eurThbConversionVersion,"EUR conversion version",100);
+  if(r.bidProcess!==undefined){const p=r.bidProcess;fields(p,['version','preparedOn','controlLineIds','ceragonHandled']);if(p.version!=='0550-bid-process-20261104-1'||typeof p.ceragonHandled!=='boolean'||!Array.isArray(p.controlLineIds)||p.controlLineIds.length>4||new Set(p.controlLineIds).size!==p.controlLineIds.length||p.controlLineIds.some(id=>!['REQ-MR-ACT-B5-D04','REQ-MR-ACT-B6-D05','REQ-MR-ACT-C2-D04','REQ-MR-ACT-C3-D04'].includes(id)))fail('Invalid bid process receipt');date(p.preparedOn,'bid process date');}
   if(r.tsiActivityBudget!==undefined){const b=r.tsiActivityBudget;fields(b,["version","preparedOn","updatedLineIds","calculationIds","conflicts","expenseVersion","expenseLineIds","expenseConflicts"]);string(b.version,"TSI estimate version",100);date(b.preparedOn,"TSI estimate date");if(b.expenseVersion!==undefined)string(b.expenseVersion,"TSI expense version",100);for(const key of ["updatedLineIds","calculationIds","conflicts",...(b.expenseVersion!==undefined?["expenseLineIds","expenseConflicts"]:[])]){if(!Array.isArray(b[key])||b[key].length>100||b[key].some(v=>typeof v!=="string"||v.length>100))fail("Invalid TSI estimate receipt");}}
  }
  validateIntegration0550(data);
@@ -126,7 +128,7 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   const usdValue=ready&&usdRate!==null?eq("E17",{THB:customerTHB,fx:usdRate}):null;
   // A sourced DIRECT selling rate is independent of unestablished internal cost.
   // Cost stays null; the strict Working/Official problems above are retained.
-  const provisionalProblems=problems.filter(p=>!["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN",...(l.sellMode==="DIRECT"?["Cost rate OPEN"]:[])].includes(p));
+  const provisionalProblems=problems.filter(p=>!isBidScopeWarning0550(p)&&!["Quote date/validity missing","Quote expired — review replacement source","FX source/date/rate OPEN",...(l.sellMode==="DIRECT"?["Cost rate OPEN"]:[])].includes(p));
   const nativeReady=provisionalProblems.length===0&&(l.sellMode==="DIRECT"?[addvalueSell,customerNative]:[costNative,addvalueSell,customerNative]).every(n=>Number.isFinite(n)&&Math.abs(n)<=Number.MAX_SAFE_INTEGER/100);
   const provisionalCustomerTHB=nativeReady&&factor!==null?round(customerNative*factor):null;
   // Keep the established FX/rounding path when available; native USD needs no invented FX.

@@ -1807,3 +1807,11 @@ details[open]>summary>.p55-vnd-toggle>span:last-child{display:inline}
 .p55-quotation-baseline input,.p55-quotation-baseline select{width:100%;min-width:0;box-sizing:border-box}
 .p55-quotation-baseline button{max-width:calc(100% - 8px);white-space:normal;overflow-wrap:anywhere}
 .p55-quotation-baseline code{white-space:normal;overflow-wrap:anywhere}
+
+/* Keep bid calculations and the existing WP quantity toolbar inside narrow screens. */
+[data-component-key="bid.budget.official.summary"] .p55-metric-grid { grid-template-columns:repeat(auto-fit,minmax(min(230px,100%),1fr)); }
+.p55-working-preview > .p55-review-toolbar > .p55-bid-field { max-width:100%; }
+.p55-working-preview > .p55-review-toolbar select { min-width:0; max-width:100%; }
+[aria-label="RFQ bid process result"] { min-width:0; overflow-wrap:anywhere; }
+
+.p55-bid-presentation { overflow-wrap:anywhere; }

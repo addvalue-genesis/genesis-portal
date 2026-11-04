@@ -208,6 +208,8 @@
     "validate:pj0550-activity-budget-browser": "node scripts/validate-pj2608-0550-activity-budget-browser.cjs",
     "validate:pj0550-si-supplier-evidence": "node scripts/validate-pj2608-0550-si-supplier-evidence.cjs",
     "validate:pj0550-si-supplier-evidence-browser": "node scripts/validate-pj2608-0550-si-supplier-evidence-browser.cjs",
+    "validate:pj0550-bid-process": "node scripts/validate-pj2608-0550-bid-process.cjs",
+    "validate:pj0550-bid-process-browser": "node scripts/validate-pj2608-0550-bid-process-browser.cjs",
     "context:pj0550": "node scripts/context-pj2608-0550.cjs",
     "validate:pj0550-supplier-revision": "node scripts/validate-pj2608-0550-supplier-revision.cjs",
     "validate:pj0550-c1-appendix": "node scripts/validate-pj2608-0550-c1-appendix.cjs",

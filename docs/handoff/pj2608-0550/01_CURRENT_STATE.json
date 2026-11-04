@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_MR_BATCH_MAPPING.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_BID_PROCESS_AND_PRICE_EXECUTION.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -36,7 +36,8 @@
     "docs/handoff/pj2608-0550/20261104_VENDOR_QUOTE_THB_TOTALS.md",
     "docs/handoff/pj2608-0550/20261104_WORKING_GROUP_BULK_DISCLOSURE.md",
     "docs/handoff/pj2608-0550/20261104_REMOVE_REDUNDANT_MGW_SUMMARY.md",
-    "docs/handoff/pj2608-0550/20261104_MR_BATCH_MAPPING.md"
+    "docs/handoff/pj2608-0550/20261104_MR_BATCH_MAPPING.md",
+    "docs/handoff/pj2608-0550/20261104_BID_PROCESS_AND_PRICE_EXECUTION.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -77,6 +78,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "Owner correction: execute RFQ-to-bid process, do not delegate process OPEN lists to executive. UI2026-11-04.18 software verification complete: provisional arithmetic, exact control-row normalization, private CERAGON whole-link preparation, WP.5 computed quantities/owner references and WP.7 evidence,19-system SDRL phase projection;54 priced owners and215 price-input/detail rows grouped into30 SI work groups. Actual-data/browser reload/mobile, existing pricing/Working/issue-history checks passed. Continue actual package allocation/current missing-input estimates and source-bound formal bid-phase authorization; no claim all A/B/C prices/compliance are complete. See latest checkpoint.",
     "Owner-authorised native MR batch preparation complete in existing SI pipeline:264 native MR rows,191 proposed Offer references,6 COMPANY and67 other no-direct-Offer rows. Prices already exist for nearly every system; reconcile shared package/internal SI/actual scope before asserting additional purchases. Preserve financial selections and edited/deleted work; source applicability, technical proof, accepted coverage and financial adoption remain separate. See latest checkpoint for validation and delivery limits.",
     "Owner-authorised removal of only the redundant MGW-only summary from10.1. Keep existing MR/basis/FX/source-impact and shortcuts,07 Vendor source evidence and10.2 Working prices; no canonical/model/startup/export/history changes. See checkpoint for actual software checks and Windows limit.",
     "Existing10.2 Part A/B/C now has one-click direct-child group expand/collapse. Keep individual and nested reading choices independent, Module Search opening collapsed ancestors, original IDs/colours and financial/source/review/history records. No new tab/module or reload persistence. See latest checkpoint for actual browser checks and limits.",

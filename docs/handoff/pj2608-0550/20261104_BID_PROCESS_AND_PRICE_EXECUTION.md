@@ -1,0 +1,43 @@
+# Bid process and price execution in existing A/B/C modules
+
+2026-11-04 · UI2026-11-04.18 · parent0b41790f · existing branch / draft PR53
+
+## Owner correction
+
+The owner requires a repeatable RFQ-to-proposal process. An executive must not have to complete thousands of engineering/process fields or individually close generic OPEN flags. CAL/RPT are tools and deliverables; their RFQ submission phase matters. Missing post-order deliverables are planned and costed work, not universal prerequisites to calculating a bid. This clarification supersedes interpretations that every source fragment needs a separate completed report before any pricing can proceed. It does not waive RFQ scope, safety, mandatory With Bid evidence or source-backed quantities/rates.
+
+## Executed changes
+
+- Existing provisional monetary calculation separates three MR scope warnings (responsibility, scope basis and package reconciliation) from arithmetic prerequisites. Fully stated quantity/rate/commercial treatment can calculate cost and sell while scope remains visible. Invalid or duplicate owners, missing quantities, incompatible units, unsafe amounts and missing currency conversion still do not become numbers. Strict reviewed/engineering projections and frozen issue validation remain separate.
+- New internal helper `bidProcess0550.js` uses the existing records; it is not an architectural module or a second price equation. Existing10.5 projects A/B/C current cost and sell, distinguishes internal cost unknown from known selling rates, groups SI work by cause/system and displays all19 systems. No historical allowance is silently installed as a current cost.
+- RFQ study dates come from the unique effective-current MR B1 source, the actual SDRL row and the document's own P+ legend. B01.02/B01.05 and related study reports at P+4 are post-order submissions. Conflicting/current-copy ambiguity, replaced copies, missing rows and explicit With Bid text do not become a deferred obligation. Ten system study families are matched in the actual fixture. Existing priced B1 report-review work is a shared owner; it is not a completed engineering report or duplicated into each system.
+- A one-time startup/late-Vendor preparation executes only exact untouched defaults. Four control records (deduct existing inclusions, normalize spare quantities/prices) stop being selected as additional financial charges. They retain their canonical IDs and remain process work. A versioned receipt lets MR financial gap checks recognize these exact unpriced, deselected controls. Authored prices including zero, changed records and later deletions are preserved.
+- When the received private CERAGON RevA1 R10 whole-link rate arrives and the DMR Working set is untouched, create one selected ACP–APF supply owner using the existing Goods policy and private Offer rate. No per-site multiplication, spares/support adoption or price literals in Git. Existing DMR edits/choices or handled deletion prevent creation/recreation. Ambiguous, missing, future or expired rates are not auto-selected.
+- Existing WP.5 uses computed Working quantity (including MH/MD equations), validated covered owners and existing linked package/work price references. Same-system package candidates remain separately labelled references; they never certify coverage or multiply a price per MR row. WP.5/WP.7 show source-bound post-order study timing instead of a bare Proof OPEN. B1 report review is explicitly distinguished from the scope/cost of actually producing each study. Existing10.7 separates selected Customer-row work from neutral unselected/company/reference lines, retains all original trace IDs and direct navigation, and does not list old anchors as if they were all active price errors.
+
+## Actual-data results and limits
+
+The prepared private fixture remains the existing SourceRev13/ARev09 workspace. Model/financial input/history tests passed. The only canonical changes permitted by the new preparation are the four untouched control deselections, one new CERAGON source-price owner and its receipt; prior rates, quantities, FX, offers, reviews and history stay exact. Repeated preparation returns the same object; handled deleted owner and altered DMR choices are preserved.
+
+The actual priced owner count advances from52 to54: one already-priced expense can now calculate despite a scope warning, and one received microwave supply package is materialized. Four control rows are not four purchases. The operational projection groups215 remaining price-input rows into30 SI process groups;182 are Part A rows, many referring to already-priced packages. This is not215 missing purchases or30 executive approval requests. Part C still has12 genuine financial/detail rows without a complete numeric basis. No source/allowance/zero is invented to declare all A/B/C priced.
+
+This implementation does not complete the project quotation. Detailed package coverage, missing current supplier/installation/logistics/spares/insurance inputs, commercial treatment and bid-stage technical response completion remain work. The formal controlled-issue policy still uses the existing full engineering/package readiness; do not claim it has already been migrated to an RFQ phase-aware authorization policy. Native Word, frozen issues, approved compliance and customer sending were not changed or performed.
+
+## Validation
+
+- New bid-process tests: q/rate calculation despite scope warnings, strict reviewed separation, duplicate/invalid owners and missing quantities retained, RFQ stage/source and explicit With Bid rejection, control versus authored zero, ABC sums and exact input preservation.
+- Actual SourceRev13/ARev09:19 systems,10 source-bound post-PO study families with a priced shared work owner, four exact control preparations, one actual private CERAGON owner, full schema validation, repeat/deletion/edit preservation and no prior financial/history overwrite.
+- Existing bidding, Working Preview and controlled release validators passed.
+- Production webpack passed with the existing large-bundle advisory.
+- Actual production browser: PASSED for repository seeds and the exact private mapped workspace. Verified startup control preparation and one whole-link owner; three A/B/C rows, all19 system delivery rows, derived equation quantities despite null raw quantity, tower covered owner and retained PAGA package references, existing owner navigation, neutral unselected Release references, original financial/source/SI record preservation, deep-equal saved workspace after read-only navigation/reload,390px page containment and zero page errors. Standard existing AVL startup can append source-bound DRAFT records to the older fixture; every prior authored SI record remains exact. The bid-process helper itself changes only its declared controls/owner/receipt.
+- Context continuity / whitespace: PASSED. New npm commands expose bid-process model/browser checks; existing price-summary, Working Preview/SSR, bidding and controlled issue/history checks also passed. Production webpack passed with the existing3.44MiB chunk advisory. Broad money/source/engineering validators were not removed or weakened. Narrow-screen equation/price/reference text now wraps without widening the page.
+
+## Delivery
+
+Code only on the existing branch. No new source/A package or private-rate upload is needed. Restart the frontend after pull; existing automatic Vendor loading supplies the original CERAGON rate. If the owner edited the DMR defaults, preserve them rather than promising automatic price adoption. Windows consumption remains unobserved.
+
+## Governing principles and remaining enforcement gap
+
+ADR0550-001 §§3/5/8/10 require existing trace IDs, non-additive package links, canonical equations and bidirectional navigation; §§6/9/11 require explicit missing inputs, authored input preservation and frozen issue history. The owner's bid-process clarification governs the distinction between pricing work and completed engineering under §14. No source requirement, approval or historical issue was silently marked complete. The operational summary is read-only; its SI tasks include exact input problem categories rather than becoming executive approval requests.
+
+Software verification is complete for this change. It is not evidence that all182 PartA detail allocations,21 PartB pricing inputs or12 PartC financial/detail rows have been resolved. These counts describe work rows and include package allocation; they are not a purchase list. Full RFQ response preparation and the formal issue policy's broader phase-aware migration remain subsequent domain work. No additional private source/A package is needed for this code update.

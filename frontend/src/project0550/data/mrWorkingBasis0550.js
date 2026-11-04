@@ -56,6 +56,8 @@ export function mrWorkingGaps0550(data,lines) {
   const matches=lines.filter(l=>l.mrRequirementId===requirement.id),row=matches[0];
   if(matches.length!==1){gaps.push({id:requirement.id,code:codeFor(requirement),reason:matches.length?"DUPLICATE MR REQUIREMENT":"MR REQUIREMENT MISSING"});continue;}
   if(row.mrScopeState?.excluded)continue;
+  const bidControl=data.repositoryBasisImport?.bidProcess;
+  if(bidControl?.version==='0550-bid-process-20261104-1'&&bidControl.controlLineIds.includes(row.id)&&!row.selected&&['MR-ACT-B5-D04','MR-ACT-B6-D05','MR-ACT-C2-D04','MR-ACT-C3-D04'].includes(requirement.id)&&row.manualCost===null&&row.sellRate===null&&!row.offerId&&!row.calculationId)continue;
   const state=row.mrScopeState;
   if(state?.covered){const owner=lines.find(l=>l.id===state.owner.id);if(state.problems.length||owner?.provisionalCustomerTHB==null)gaps.push({id:requirement.id,code:row.customerRowCode,reason:"INCLUDED OWNER PRICE / SCOPE OPEN"});}
   else if(!row.selected||row.provisionalCustomerTHB==null)gaps.push({id:requirement.id,code:row.customerRowCode,reason:!row.selected?"REQUIRED ROW NOT SELECTED":"MR QUANTITY / PRICE / SCOPE OPEN"});

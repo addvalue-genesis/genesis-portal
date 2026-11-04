@@ -1,3 +1,4 @@
+import {deriveBidProcess0550} from "./data/bidProcess0550";
 import {SupplyProposalDraftFields0550} from "./SupplyProposalDraft0550";
 import {BidKnownPrices0550,BidKnownPriceHeadline0550} from "./BidKnownPrices0550";
 import {BidFxBasis0550} from "./BidFxBasis0550";
@@ -7,7 +8,7 @@ import {WorkingPreview0550} from "./WorkingPreview0550";
 import {ParticularWorkspace0550} from "./ParticularDeviationWorkspace0550";
 import {mgwQuoteItem0550} from "./data/mgwVendorBasis0550";
 import {MR_WORKING_CATALOG_0550,mrRequirement0550} from "./data/mrWorkingBasis0550";
-import React,{useEffect,useState,useRef} from "react";
+import React,{useEffect,useState,useRef,useMemo} from "react";
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {BID_WBS,BID_UNITS,newId} from "./data/bidWorkspaceModel";
 import {SYSTEMS,BUDGETARY_ESTIMATE,BUDGETARY_SUBMISSION,COMMERCIAL_POLICY,CORE_TEAM,PROJECT_0550,DATA_LAYER_META} from "./data";
@@ -86,6 +87,16 @@ function WorkingHierarchy({model,integration,data,onEdit,onRelease,onNew,onNavig
  </details>;})}</details>;
  })}</>;
 }
+function BidProcessResult0550({data,model,onNavigate}){
+ const result=useMemo(()=>deriveBidProcess0550(data,model,SYSTEMS),[data,model]);
+ return <section aria-label="RFQ bid process result"><h3>ผลประมวลผลเพื่อทำข้อเสนอ A / B / C</h3>
+ <p>ตั้งราคาต่อได้จากฐานที่มี · CAL/RPT และงานหลัง PO แยกจากการคำนวณเงิน · งานจัดสรรแพ็กเกจและจัดประมาณการเป็นงานของ SI ไม่ใช่รายการให้ผู้บริหารไล่ปิดทีละแถว</p>
+ <div className="p55-table-wrap"><table className="p55-table" aria-label="ABC bid process prices"><thead><tr><th>หมวด</th><th>ต้นทุน THB ที่มีฐานแล้ว</th><th>ราคาขาย Customer USD ที่คำนวณได้</th><th>งานราคา / ต้นทุนที่ต้องทำต่อ</th></tr></thead><tbody>{result.parts.map(p=><tr key={p.part}><td>{p.part}</td><td>{amount(p.knownCostTHB)}<small>รวมเฉพาะเจ้าของต้นทุนที่มีค่า ไม่แทนช่องว่างด้วยศูนย์</small></td><td>{amount(p.knownUSD,"USD")}<small>{p.priced} เจ้าของราคา · {p.complete?"คำนวณราคาครบแถวที่เลือก":"ยอดที่มีฐานแล้ว ยังไม่ใช่ราคาครบ RFQ"}</small></td><td>ต้องจัดฐานราคา {p.pending} แถว · ต้นทุนยังไม่มีฐาน {p.missingCost} แถว</td></tr>)}</tbody></table></div>
+ <p>{result.controlLineIds.length} รายการเป็นงานควบคุมการรวมราคา ไม่ใช่รายการซื้อเพิ่ม · การเสนอราคายังต้องตอบ RFQ ครบ; ไม่ถือว่าผ่านสเปกหรืออนุมัติส่งลูกค้าจากการมีราคา</p>
+ <details><summary>ขอบเขตและแผนส่งมอบทั้ง 19 ระบบ · ใช้ราคาเจ้าของงานเดิม</summary><div className="p55-table-wrap"><table className="p55-table" aria-label="System bid delivery plan"><thead><tr><th>ระบบ</th><th>ราคา / งานที่มีแล้ว</th><th>CAL/RPT ตาม RFQ</th></tr></thead><tbody>{result.systems.map(r=><tr key={r.token}><td>{r.name}</td><td>ราคาอุปกรณ์อ้างอิง {r.supplyOwnerIds.length} เจ้าของราคา · งาน SI {r.serviceOwnerIds.length} เจ้าของราคา{r.companySupply&&<small>มีขอบเขต COMPANY ใน MR · ตรวจงาน SI แยก</small>}<small>Owner เดียวอ้างได้หลายระบบ ไม่รวมเงินซ้ำ</small></td><td>{r.delivery?<>{r.delivery.code} · {r.delivery.dueCode} · หลัง PO {r.delivery.weeksAfterOrder} สัปดาห์<small>{r.studyWorkPriced?'มีราคางานทบทวนรายงานใน B1 · ตรวจขอบเขตงานจัดทำแยก':'ต้องจัดฐานงานและค่าใช้จ่าย'} · {r.delivery.locator}</small><button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+r.workOwnerId)}>ดูงานจัดทำรายงาน / ราคา</button></>:'ตรวจ With Bid / กำหนดส่งตามข้อกำหนดที่เกี่ยวข้อง'}</td></tr>)}</tbody></table></div></details>
+ <details><summary>งานระดับ process ที่ SI ต้องดำเนินการ · {result.groups.length} กลุ่ม</summary><p>แยกตามสาเหตุและเจ้าของงาน ไม่ใช่จำนวนเรื่องที่ต้องขอผู้บริหารตัดสินใจ</p><div className="p55-table-wrap"><table className="p55-table" aria-label="SI bid process tasks"><thead><tr><th>งาน / ระบบ</th><th>ต้องดำเนินการ</th><th>รายการที่เกี่ยวข้อง</th></tr></thead><tbody>{result.groups.map(g=><tr key={g.id}><td>{g.label}<small>{g.systemToken} / {g.wbs} · ผู้ดำเนินการ {g.role}</small></td><td>{g.action}{g.inputProblems.length>0&&<details><summary>ฐานที่ต้องจัดการ {g.inputProblems.length} ประเภท</summary><ul>{g.inputProblems.map(p=><li key={p}>{p}</li>)}</ul></details>}</td><td>{g.lineIds.length} รายการ <button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+g.lineIds[0])}>เปิดงานเดิม</button></td></tr>)}</tbody></table></div></details>
+ </section>;
+}
 export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onNavigate}){
  const {data,model,change,busy}=useBidWorkspace();
  const editorState=useRef(null);
@@ -121,6 +132,7 @@ export function BidCommercialWorkspace({legacy,navigationTarget,onOpenSource,onN
  <OfficialCustomerScope/>
  <Module id="bid.budget.scope-gates" title="OFF-03 · Coverage / gaps ก่อนอนุมัติข้อเสนอ" open={false}><p>Customer rows รอตรวจ: {official.schedule.filter(r=>!r.ready).map(r=>r.code).join(", ")||"ไม่มี"}</p><p>รายการยังไม่ระบุ Customer row: {official.unmapped.length} · แถวรอทบทวน: {official.selected.length-official.reviewedCount}</p><p>MR requirements ยังเปิด: {official.requirementGaps?.length||0} · Import conflicts: {data.mrWorkingImport?.conflicts.join(", ")||"ไม่มี"}</p><p>Engineering/TAG completeness, quote validity, ownership และ customer-form mapping ต้องตรวจครบ · C1 ต้องมีการตัดสินใจและหลักฐาน · Part C แยกเป็น Option · ผลทบทวนนี้เป็น Working review; การอนุมัติและบันทึกส่งลูกค้ายังเป็น HOLD</p></Module>
  <Module id="bid.budget.official.summary" open={true} title="สรุปสถานะและยอดราคา">
+ <BidProcessResult0550 data={data} model={model} onNavigate={onNavigate}/>
  <BidKnownPrices0550 provisional={model.provisional} fx={data.fx} onWorking={id=>go("working",id||"bid.budget.working.lines")}/>
  <div className="p55-metric-grid"><div className="p55-metric"><span>แถวที่เลือก / ทบทวนครบ</span><strong>{official.selected.length} / {official.reviewedCount}</strong></div><div className="p55-metric"><span>Selected subtotal · {currency}</span><strong>{amount(currency==="USD"?official.selectedUSD:official.selectedTHB,currency)}</strong><small>เฉพาะแถวที่เลือก ยังต้องตรวจขอบเขต Customer row</small></div><div className="p55-metric"><span>Working revision / Release</span><strong>R{data.revision} · {model.releaseControl?.state||"HOLD"}</strong><small>OPEN / STALE ไม่ถูกแทนด้วยราคา HIS-01</small></div></div>
  <div className="p55-metric-grid"><div className="p55-metric"><span>Base A+B · ต้องมีราคาครบทุกหมวด</span><strong>{amount(currency==="USD"?official.baseUSD:official.baseTHB,currency)}</strong></div><div className="p55-metric"><span>Part C · Optional</span><strong>{amount(currency==="USD"?official.optionsUSD:official.optionsTHB,currency)}</strong></div></div>
