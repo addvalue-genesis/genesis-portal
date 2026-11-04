@@ -22,11 +22,47 @@ const server = http.createServer((req, res) => {
   console.log('CHECK constraints: page loaded; waiting for canonical DATA receipt');
   await page.getByRole('button', {name: 'CUS · Customer Requirements', exact: true}).click();
   await page.locator('.p55-a-operating-tools > summary').click();
-  await page.getByLabel('Source intake loaded status', {exact: true}).filter({hasText: bundle.sourceIntake.batchId}).waitFor();
+  await page.getByLabel('Source intake loaded status', {exact: true}).filter({hasText: bundle.sourceIntake.batchId}).waitFor({timeout: 180000});
   const before = await read(); console.log('CHECK constraints: DATA receipt saved', before.sourceIntake.sources.length); await navigate('bid.working-preview.step.1');
   const preview = page.locator('section.p55-working-preview'), select = preview.locator('select[aria-label="Working Preview system"]'); await select.waitFor();
   const tokens = await select.locator('option').evaluateAll(es => es.map(e => e.value).filter(v => v !== 'ALL'));
   assert(tokens.includes('COMMON')); assert.equal(tokens.length, 20);
+  if (process.env.PJ0550_MR_MAPPING_ONLY) {
+   const native = before.integrationWorkspace.requirements.filter(r => r.id.startsWith('REQDEF-MR-'));
+   assert.equal(native.length, 264); assert(native.every(r => r.need && r.sourceExcerpt && r.criteria));
+   assert.equal(native.filter(r => r.offerIds.length).length, 191);
+   assert.equal(native.filter(r => r.responsibility === 'COMPANY').length, 6);
+   const openMapping = async token => {
+    await select.selectOption(token);
+    const stage = preview.locator('[data-component-key="bid.working-preview.step.7"]');
+    if (!await stage.evaluate(e => e.open)) await stage.locator(':scope > summary').click();
+    return stage;
+   };
+   const stage = await openMapping('TEL-PAGA');
+   const summary = stage.getByLabel('MR mapping preparation summary', {exact: true});
+   assert((await summary.innerText()).includes('MR ที่แสดง 16 รายการ · มีร่างวิเคราะห์พร้อมหลักฐาน 16'));
+   assert((await summary.innerText()).includes('ตรวจผ่าน 0'));
+   const mapping = stage.getByRole('table', {name: 'Customer integrator supplier mapping', exact: true});
+   assert(await mapping.locator('[data-supplier-mapping-offer]').count());
+   assert((await mapping.innerText()).includes('ร่าง Mapping / รายการอ้างอิง'));
+   const pagaMr = native.find(r => r.systemToken === 'TEL-PAGA' && r.offerIds.length);
+   const row = mapping.locator('tbody tr').filter({hasText: pagaMr.sourceLocator}).first();
+   assert((await row.innerText()).includes(pagaMr.need));
+   await row.getByRole('button', {name: 'ตรวจ Mapping', exact: true}).click();
+   const editor = preview.locator('[data-component-key="bid.working-preview.step.4"]');
+   assert.equal(await editor.getByLabel('Working requirement', {exact: true}).inputValue(), pagaMr.id);
+   await navigate('bid.working-preview.step.1');
+   const vsatStage = await openMapping('TEL-VSAT');
+   assert((await vsatStage.getByRole('table', {name: 'Customer integrator supplier mapping', exact: true}).innerText()).includes('COMPANY จัดหา · ตรวจงาน SI ที่เกี่ยวข้องแยก'));
+   const vcsStage = await openMapping('TEL-LAN-VCS');
+   assert((await vcsStage.getByRole('table', {name: 'Customer integrator supplier mapping', exact: true}).innerText()).includes('ตรวจแพ็กเกจเดิม / งาน SI / ขอบเขต'));
+   assert.equal(JSON.stringify(await read()), JSON.stringify(before), 'Mapping, source and existing editor navigation are read-only');
+   await page.reload(); await navigate('bid.working-preview.step.1'); await select.waitFor();
+   assert.equal(JSON.stringify(await read()), JSON.stringify(before), 'Reload of actual successor pair is idempotent');
+   assert.deepEqual(errors, []);
+   console.log('PASS MR batch mapping browser:', JSON.stringify({nativeRows: native.length, offerReferences: 191, company: 6, checks: ['actual private pair auto-load', 'PAGA evidence and candidate display', 'existing MR editor identity', 'COMPANY and non-purchase gap wording', 'exact workspace preservation', 'idempotent reload', 'no page errors']}));
+   return;
+  }
   const overview = preview.getByRole('table', {name: 'All system scope reviews', exact: true});
   assert.equal(await overview.locator('tbody tr').count(), 20);
   const vsat = overview.locator('[data-system-responsibility="TEL-VSAT"]');

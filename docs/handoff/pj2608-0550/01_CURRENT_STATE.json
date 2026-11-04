@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_REMOVE_REDUNDANT_MGW_SUMMARY.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_MR_BATCH_MAPPING.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -35,7 +35,8 @@
     "docs/handoff/pj2608-0550/20261104_C1_EXPANDED_PRICE_AND_COST.md",
     "docs/handoff/pj2608-0550/20261104_VENDOR_QUOTE_THB_TOTALS.md",
     "docs/handoff/pj2608-0550/20261104_WORKING_GROUP_BULK_DISCLOSURE.md",
-    "docs/handoff/pj2608-0550/20261104_REMOVE_REDUNDANT_MGW_SUMMARY.md"
+    "docs/handoff/pj2608-0550/20261104_REMOVE_REDUNDANT_MGW_SUMMARY.md",
+    "docs/handoff/pj2608-0550/20261104_MR_BATCH_MAPPING.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -62,7 +63,7 @@
   },
   "dataContinuity": {
     "repository": "Code, governed references, defaults and handoffs. Git pull is not a backup of saved browser work.",
-    "privateSource": "Latest prepared private Source Rev11 / A Rev08 uses the existing paired loader. Rev08 retains exact Rev07/predecessors and13 source-bound service identities, not price/approval adoption; check actual receipt before claiming Windows installation.",
+    "privateSource": "Prepared private Source Rev13 / A Rev09 continues exact Rev11 / Rev08 and prior ancestors through the existing paired loader. All264 native MR identities have source-bound DRAFT analysis; proposed Offers are not accepted coverage or financial adoption. Preserve older files and verify actual startup receipt before claiming Windows installation.",
     "savedWorkspace": "IndexedDB GENESIS-PJ2608-0550-BIDDING / workspace:active and revisions; separate from Git and origin-bound.",
     "inMemoryDrafts": "Uncommitted forms are not a saved workspace. Retained Working tab state survives tab changes, not browser close/reload.",
     "crossSession": "Read current Git/operating contracts, then loader receipts and saved workspace diagnostics. Do not infer a user workspace from repository seeds."
@@ -76,6 +77,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "Owner-authorised native MR batch preparation complete in existing SI pipeline:264 native MR rows,191 proposed Offer references,6 COMPANY and67 other no-direct-Offer rows. Prices already exist for nearly every system; reconcile shared package/internal SI/actual scope before asserting additional purchases. Preserve financial selections and edited/deleted work; source applicability, technical proof, accepted coverage and financial adoption remain separate. See latest checkpoint for validation and delivery limits.",
     "Owner-authorised removal of only the redundant MGW-only summary from10.1. Keep existing MR/basis/FX/source-impact and shortcuts,07 Vendor source evidence and10.2 Working prices; no canonical/model/startup/export/history changes. See checkpoint for actual software checks and Windows limit.",
     "Existing10.2 Part A/B/C now has one-click direct-child group expand/collapse. Keep individual and nested reading choices independent, Module Search opening collapsed ancestors, original IDs/colours and financial/source/review/history records. No new tab/module or reload persistence. See latest checkpoint for actual browser checks and limits.",
     "Existing07.2 quotation headers show read-only source base/net THB totals, native amounts and saved FX; options separate, missing FX and Asactual disclosed. Full quotation identities across system views, one net owner and unchanged canonical records. See latest checkpoint for verification and Windows limit.",

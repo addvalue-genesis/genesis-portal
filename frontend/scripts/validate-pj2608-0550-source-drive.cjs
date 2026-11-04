@@ -33,7 +33,7 @@ require.extensions['.js']=(mod,file)=>file.startsWith(root+path.sep)?mod._compil
   await fs.writeFile(older,JSON.stringify({...intake,coverageNote:'conflicting content'}));await assert.rejects(loadDriveIntake({roots:[tmp]}),/CONFLICT/);await fs.unlink(older);
   const original=await fs.readFile(file);await fs.writeFile(file,' '.repeat(MAX_BYTES+1));await assert.rejects(loadDriveIntake({roots:[tmp]}),/TOO_LARGE/);await fs.writeFile(file,original);
   // A retained-history preparation can exceed 32 MiB; source reads still cannot.
-  assert.equal(MAX_BYTES,32*1024*1024);assert.equal(MAX_PREPARATION_BYTES,48*1024*1024);
+  assert.equal(MAX_BYTES,32*1024*1024);assert.equal(MAX_PREPARATION_BYTES,64*1024*1024);
   assert.equal(require(path.join(root,'project0550/data/siWorkPackage0550.js')).SI_FILE_LIMIT_0550,MAX_PREPARATION_BYTES);
   const prep=path.join(dir,'PJ2608-0550_A_Work_Package_Rev07_20261102.json');
   await fs.writeFile(prep,JSON.stringify({schema:'genesis.0550.si-work-package.v5',projectId:'PJ2608-0550',batchId:'SYNTHETIC-BOUNDED-PREPARATION',preparedOn:'2026-11-02',sourceBatchId:intake.batchId,coverageNote:'x'.repeat(MAX_BYTES)}));
@@ -61,6 +61,17 @@ require.extensions['.js']=(mod,file)=>file.startsWith(root+path.sep)?mod._compil
    assert.deepEqual(result.workspace.sourceIntake,actual);
    assert.deepEqual(deriveBidWorkspace(result.workspace,tokens,'2026-10-27'),deriveBidWorkspace(workspace,tokens,'2026-10-27'));
    console.log('PASS private Drive payload through local HTTP bridge, fetch and financial-preserving selection');
+  }
+  if (process.argv[3]) {
+   const actualSource=JSON.parse(await fs.readFile(process.argv[2],'utf8'));
+   const actualPreparation=JSON.parse(await fs.readFile(process.argv[3],'utf8'));
+   const actualPrepFile=path.join(dir,'PJ2608-0550_A_Work_Package_Rev09_20261104.json');
+   await fs.copyFile(process.argv[3],actualPrepFile);
+   const paired=JSON.parse(await loadDriveSourceWorkspace({projectDir:project}));
+   assert.equal(paired.sourceIntake.batchId,actualSource.batchId);
+   assert.deepEqual(paired.aWorkPackage,actualPreparation);
+   assert(Buffer.byteLength(JSON.stringify(paired))<=80*1024*1024+1024);
+   console.log('PASS actual retained-history preparation through 64MiB bridge with unchanged 80MiB paired bound');
   }
   console.log('PASS Drive Desktop bridge: bounded project discovery, offline failure, schema/project checks, batch conflict/no-downgrade/history preservation, loopback/origin restriction, HTTP fetch. User Windows mount remains to verify.');
  } finally {if(server)await new Promise(resolve=>server.close(resolve));await fs.rm(tmp,{recursive:true,force:true});}
