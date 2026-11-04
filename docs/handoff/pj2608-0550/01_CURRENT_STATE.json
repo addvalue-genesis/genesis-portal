@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_WORKING_GROUP_BULK_DISCLOSURE.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261104_REMOVE_REDUNDANT_MGW_SUMMARY.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -34,7 +34,8 @@
     "docs/handoff/pj2608-0550/20261104_SERVICE_PRICE_BASIS.md",
     "docs/handoff/pj2608-0550/20261104_C1_EXPANDED_PRICE_AND_COST.md",
     "docs/handoff/pj2608-0550/20261104_VENDOR_QUOTE_THB_TOTALS.md",
-    "docs/handoff/pj2608-0550/20261104_WORKING_GROUP_BULK_DISCLOSURE.md"
+    "docs/handoff/pj2608-0550/20261104_WORKING_GROUP_BULK_DISCLOSURE.md",
+    "docs/handoff/pj2608-0550/20261104_REMOVE_REDUNDANT_MGW_SUMMARY.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -75,6 +76,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "Owner-authorised removal of only the redundant MGW-only summary from10.1. Keep existing MR/basis/FX/source-impact and shortcuts,07 Vendor source evidence and10.2 Working prices; no canonical/model/startup/export/history changes. See checkpoint for actual software checks and Windows limit.",
     "Existing10.2 Part A/B/C now has one-click direct-child group expand/collapse. Keep individual and nested reading choices independent, Module Search opening collapsed ancestors, original IDs/colours and financial/source/review/history records. No new tab/module or reload persistence. See latest checkpoint for actual browser checks and limits.",
     "Existing07.2 quotation headers show read-only source base/net THB totals, native amounts and saved FX; options separate, missing FX and Asactual disclosed. Full quotation identities across system views, one net owner and unchanged canonical records. See latest checkpoint for verification and Windows limit.",
     "Existing C1 interactive Appendix headers now keep known selling-price subtotals when expanded; separate package blocks appear before location detail. Source cost stays in VND/10.2 Working; P1-P3 C1 amounts are selling prices. Preserve MR and native/frozen order/bytes, canonical prices/quantities/FX/selection and open coverage. No full PAGA mapping, quote002 adoption or per-location allocation is implied. See latest checkpoint for actual checks and Windows limit.",

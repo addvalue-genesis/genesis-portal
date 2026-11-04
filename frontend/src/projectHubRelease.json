@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-04.15",
+  "version": "2026-11-04.16",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "85b212bf",
-  "capability": "Existing10.2 Working Parts A/B/C can expand or collapse all direct child groups with one click. Independent native disclosures, nested reading choices, Module Search, original IDs/colours and canonical financial/source/review/history records remain intact. No new tab/module."
+  "source0550": "06944d58",
+  "capability": "Remove the redundant MGW-only price summary from existing10.1. Retain MR/policies/FX/source-impact controls and shortcuts,07 Vendor,10.2 Working prices, canonical records, MGW preparation/calculation, module IDs and frozen outputs. No new tab/module or financial adoption."
 }
