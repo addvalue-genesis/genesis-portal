@@ -1,3 +1,4 @@
+import {retireLegacyTowerPricing0550,RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "./towerLegacyPricing0550";
 import {validateSupplierQuoteRow0550,validateSupplierRevisionImports0550} from "./supplierRevision0550";
 import {validateVendorQuoteEvidence0550} from "./vendorRegister0550";
 import {validateSupplyProposalDraft0550} from "./supplyProposalDraft0550";
@@ -82,6 +83,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
  return data;
 }
 export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel){
+ data=retireLegacyTowerPricing0550(data);
  const eq=(id,inputs)=>evaluateServiceEquation(id,inputs).value;
  const fxReady=Boolean(data.fx.source.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(data.fx.date));
  const fx=currency=>currency==="THB"?1:fxReady&&finite(data.fx["thbPer"+currency])&&data.fx["thbPer"+currency]>0?data.fx["thbPer"+currency]:null;
@@ -122,6 +124,10 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   if(mgwProjectWideLineConflict0550(l,offer)){
    costRate=null;
    problems.push(MGW_PROJECT_WIDE_SERVICE_0550);
+  }
+  if(l.id===RETIRED_TOWER_OWNER_0550||l.offerId===RETIRED_TOWER_OFFER_0550){
+   costRate=null;
+   problems.push(RETIRED_TOWER_BASIS_0550);
   }
   if(!finite(quantity)||quantity<=0)problems.push("Positive quantity/driver required");
   if(!nonnegative(costRate))problems.push("Cost rate OPEN");

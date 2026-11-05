@@ -6,16 +6,14 @@ import {MGW_QUOTE_0550,mgwQuoteItem0550,supplierOfferExcluded0550,MGW_SCOPE_EXCL
 import {bidRequirementOwners0550} from './bidProcess0550';
 import {bidCompletionSourceUsages0550} from './bidCompletion0550';
 import {mgwDetailGroupPrice0550} from './mgwDetailPricing0550';
-import {towerWorkingBreakdown0550} from './towerWorkingBreakdown0550';
 const unique=xs=>[...new Set(xs.filter(Boolean))];
 const okSource=(data,id)=>{const s=data.sourceIntake?.sources.find(s=>s.id===id);return s&&s.content&&s.readState!=='METADATA_ONLY'&&s.authority==='CURRENT_TENDER'&&!data.sourceIntake.sources.some(n=>n.replaces?.includes(id));};
 export function deriveControlledTagMapping0550(data,model,systems,today){
  const catalogue=customerTagCatalogue0550(data),all=model.integration?.requirements||[],lineById=new Map(data.lines.map(l=>[l.id,l])),usages=bidCompletionSourceUsages0550(data);
- const tower=towerWorkingBreakdown0550(data,model.provisional),ownerAudits=new Map();
+ const ownerAudits=new Map();
  for(const owner of model.provisional?.selected||[]){
   const raw=lineById.get(owner.id),nativeAmount=owner.provisionalCostNative,receipt=usages.find(u=>u.line.id===owner.id),items=[];
   if(receipt?.kind==='QUOTED'&&receipt.current)for(const id of receipt.offerIds){const o=data.offers.find(o=>o.id===id),n=o&&nativeSupplierItem0550(o);if(n)items.push({sourceUsageKey:id,ownerId:owner.id,currency:n.currency,amount:n.total});}
-  else if(owner.id==='LINE-LEGACY-TEL-TELT-1'&&tower.state==='READY')for(const d of tower.rows.values())if(d.kind==='DETAIL')for(const id of d.offerIds){const n=nativeSupplierItem0550(data.offers.find(o=>o.id===id));items.push({sourceUsageKey:id,ownerId:owner.id,currency:n.currency,amount:n.total});}
   else if(raw?.mgwDetailGroupId){const cost=mgwDetailGroupPrice0550(data,raw.mgwDetailGroupId,raw);items.push({sourceUsageKey:'MGW:'+raw.mgwDetailGroupId,ownerId:owner.id,currency:'USD',amount:cost.costUSD});}
   else {const o=data.offers.find(o=>o.id===raw?.offerId),n=o&&nativeSupplierItem0550(o);if(n&&o.unitCost===n.rate&&o.currency===n.currency&&o.unit===n.unit&&raw.currency===n.currency){const derived=deriveSourcedExtendedV2({quantity:owner.quantity,sourceUnitRate:n.rate,currency:n.currency,round:roundMoney0550,pricingPolicy:PRICING_POLICY_0550});items.push({sourceUsageKey:o.id,ownerId:owner.id,currency:n.currency,amount:derived.amount});}}
   const check=reconcileTagCostOwnersV2({items,ledger:[{ownerId:owner.id,currency:owner.currency,extended:nativeAmount}],round:roundMoney0550,pricingPolicy:PRICING_POLICY_0550});ownerAudits.set(owner.id,{id:owner.id,kind:check.pass?'SOURCE_RECONCILED':receipt?.kind||'BASIS_REVIEW',...check});

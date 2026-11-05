@@ -3,6 +3,7 @@ import { bidIndexedDbAdapter } from "./adapters/bidIndexedDbAdapter";
 import { emptyBidWorkspace, validateBidWorkspace } from "./bidWorkspaceModel";
 
 import { reconcileMgwWorkingScope0550 } from "./mgwVendorBasis0550";
+import { retireLegacyTowerPricing0550 } from "./towerLegacyPricing0550";
 
 const activeAdapter = controlledSnapshotAdapter;
 
@@ -26,4 +27,4 @@ export async function loadProject0550Bid(){
   throw error;
  }
 }
-export async function saveProject0550Bid(data,revision,action){return bidIndexedDbAdapter.save(reconcileMgwWorkingScope0550(validateBid(data)),revision,action);}
+export async function saveProject0550Bid(data,revision,action){return bidIndexedDbAdapter.save(reconcileMgwWorkingScope0550(retireLegacyTowerPricing0550(validateBid(data))),revision,action);}

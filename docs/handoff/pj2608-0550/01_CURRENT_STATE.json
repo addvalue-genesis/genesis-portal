@@ -8,8 +8,9 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_VENDOR_SCOPE_AND_PAGA_DRAFT_REPAIR.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_TELT_LEGACY_PRICING_CANCELLED.md",
   "requiredReading": [
+    "docs/handoff/pj2608-0550/20261105_TELT_LEGACY_PRICING_CANCELLED.md",
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
     "docs/architecture/PJ2608-0550_SI_Equation_Rev03.md",

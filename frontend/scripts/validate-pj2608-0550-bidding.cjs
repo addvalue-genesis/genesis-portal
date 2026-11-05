@@ -89,8 +89,8 @@ try {
  const dataset=JSON.parse(fs.readFileSync(path.join(root,"project0550/data/snapshots/pj2608-0550.rev07.json"),"utf8"));
  const catalog=legacyVendorCatalog0550(dataset);assert.equal(catalog.length,9);assert.equal(catalog.filter(r=>r.alternative).length,2);
  const blank=emptyBidWorkspace(snapshot),blankBytes=JSON.stringify(blank),seed=importLegacyVendorBasis0550(blank,dataset,"2026-10-28");
- assert.equal(JSON.stringify(blank),blankBytes);validate(seed);assert.equal(seed.offers.length,9);assert.equal(seed.lines.filter(r=>r.selected).length,7);assert.equal(importLegacyVendorBasis0550(seed,dataset,"2026-10-29"),seed);
- let draft=derive(seed);assert.equal(draft.provisional.selected.filter(r=>r.currency==="THB").reduce((n,r)=>n+r.provisionalCostNative,0),4700150);
+ assert.equal(JSON.stringify(blank),blankBytes);validate(seed);assert.equal(seed.offers.length,8);assert.equal(seed.lines.filter(r=>r.selected).length,6);assert.equal(importLegacyVendorBasis0550(seed,dataset,"2026-10-29"),seed);
+ let draft=derive(seed);assert.equal(draft.provisional.selected.filter(r=>r.currency==="THB").reduce((n,r)=>n+r.provisionalCostNative,0),757650);
  assert.equal(draft.provisional.selected.filter(r=>r.currency==="EUR").reduce((n,r)=>n+r.provisionalCostNative,0),231678.05);
  assert.equal(draft.provisional.baseTHB,null);assert.equal(draft.provisional.selectedUSD,null);assert.equal(draft.official.selectedTHB,null);assert.equal(draft.provisional.releaseAllowed,false);
  assert(seed.lines.every(r=>!r.officialReview));assert(seed.lines.filter(r=>["TEL-MET","TEL-NDB"].includes(r.systemToken)).every(r=>!r.selected));
@@ -103,7 +103,7 @@ try {
  assert(draft.provisional.selectedUSD>0);assert.equal(draft.official.selectedUSD,null);assert.equal(draft.provisional.baseUSD,null);
  const draftFile=Buffer.from(buildOfficialCustomerXlsx(draft.provisional)).toString();assert(draftFile.includes("PROVISIONAL"));assert(draftFile.includes("NOT ISSUED"));assert(draftFile.includes("OPEN"));for(const secret of ["226454.05","MASTER TOWER","QT2026","A20261632"])assert(!draftFile.includes(secret),"Internal vendor source leaked: "+secret);
  assert.equal(officialCustomerRows(draft.provisional).filter(r=>r.kind==="group").length,24);
- console.log("PASS existing vendor basis: 9 offers / 7 selected / 2 alternatives; THB 4,700,150 + EUR 231,678.05 cost; additive idempotent migration, preserved edits, native pricing without FX, provisional customer export, no Official review bypass.");
+ console.log("PASS existing vendor basis: 8 offers / 6 selected / 2 alternatives; THB 757,650 + EUR 231,678.05 cost; additive idempotent migration, preserved edits, native pricing without FX, provisional customer export, no Official review bypass.");
  // Satellite boundary uses explicit, evidenced component ownership, not a
  // keyword-based subtraction from legacy package totals. All values synthetic.
  const satellite=clone();satellite.calculations=[];satellite.offers=[];satellite.vendors=[];
@@ -140,7 +140,7 @@ try {
  console.log("PASS satellite scope: unclassified/mixed and KU clarification OPEN; evidenced COMPANY supply excluded in all projections/exports; retained TSI equipment/services and Entertainment priced; no raw mutation, duplicate cost or zero fallback; review staleness and backup roundtrip.");
  const {importMrWorkingBasis0550,MR_WORKING_CATALOG_0550:mrCatalog}=require(path.join(root,"project0550/data/mrWorkingBasis0550.js"));
  const beforeMr=JSON.stringify(seed),mr=importMrWorkingBasis0550(seed,COMMERCIAL_POLICY,"2026-10-28");
- validate(mr);assert.equal(mrCatalog.rows.length,264);assert.equal(mr.lines.length,273);assert.equal(JSON.stringify(seed),beforeMr);assert.equal(importMrWorkingBasis0550(mr,COMMERCIAL_POLICY,"2026-10-29"),mr);
+ validate(mr);assert.equal(mrCatalog.rows.length,264);assert.equal(mr.lines.length,seed.lines.length+mrCatalog.rows.length);assert.equal(JSON.stringify(seed),beforeMr);assert.equal(importMrWorkingBasis0550(mr,COMMERCIAL_POLICY,"2026-10-29"),mr);
  assert.equal(new Set(mrCatalog.rows.map(r=>r.systemToken).filter(t=>t!=="COMMON")).size,19);
  assert.deepEqual([...new Set(mrCatalog.rows.map(r=>r.wbs))].sort(),[...require(path.join(root,"project0550/data/bidWorkspaceModel.js")).BID_WBS].sort());
  assert.equal(mrCatalog.rows.filter(r=>r.id==="MR-B1-11-APF-08").length,1,"Repeated APF tower is one requirement");
@@ -150,23 +150,23 @@ try {
  const mrModel=derive(mr);assert(mrModel.requirementGaps.length>0);assert.equal(mrModel.provisional.baseUSD,null);assert.equal(mrModel.provisional.optionsUSD,null);
  assert.equal(mrModel.provisional.knownTHB,draft.provisional.knownTHB,"Unknown requirement rows cannot duplicate preserved vendor prices");
  assert.equal(mrModel.lines.filter(l=>l.mrScopeState?.excluded).length,6);assert(!mrModel.selected.some(l=>l.mrScopeState?.excluded));
- const towerReq=mrModel.lines.find(l=>l.mrRequirementId==="MR-B1-11-APF-08");assert.equal(towerReq.mrScopeState.covered,true);assert.equal(towerReq.selected,false);assert.equal(towerReq.mrScopeState.owner.id,"LINE-LEGACY-TEL-TELT-1");
- assert(officialCustomerRows(mrModel.provisional).some(r=>r.key===towerReq.id&&r.cells[6]==="INCLUDED"));
+ for(const id of ["MR-B1-11-APF-08","MR-B1-11-ACP-06"]){
+  const row=mrModel.lines.find(l=>l.mrRequirementId===id);
+  assert.equal(row.mrScopeState.covered,false);assert.equal(row.selected,true);assert.equal(row.provisionalCostTHB,null);
+  assert(mrModel.official.requirementGaps.some(g=>g.id===id));
+ }
  assert(!Buffer.from(buildOfficialCustomerXlsx(mrModel.provisional)).toString().includes("COMPANY communication services"));
  const mrEdited=JSON.parse(JSON.stringify(mr));mrEdited.lines.find(l=>l.mrRequirementId==="MR-B1-12-APF-01-CAB").manualCost=777;mrEdited.fx.thbPerUSD=41;delete mrEdited.mrWorkingImport;
  const mrAgain=importMrWorkingBasis0550(mrEdited,COMMERCIAL_POLICY,"2026-10-28");assert.deepEqual(mrAgain.lines,mrEdited.lines);assert.deepEqual(mrAgain.fx,mrEdited.fx);assert.deepEqual(mrAgain.offers,mrEdited.offers);
  const missingMr=JSON.parse(JSON.stringify(mr));missingMr.lines=missingMr.lines.filter(l=>l.mrRequirementId!=="MR-B1-12-APF-01-CAB");assert(derive(missingMr).requirementGaps.some(g=>g.id==="MR-B1-12-APF-01-CAB"&&g.reason.includes("MISSING")));
- const badOwner=JSON.parse(JSON.stringify(mr));badOwner.lines.find(l=>l.id==="LINE-LEGACY-TEL-TELT-1").selected=false;assert(derive(badOwner).lines.find(l=>l.id===towerReq.id).problems.some(p=>p.includes("OWNER_OPEN")));
  const conflictMr=JSON.parse(JSON.stringify(seed));conflictMr.lines.push({...satRow,id:"REQ-MR-B1-12-APF-01-CAB"});const conflictSeed=importMrWorkingBasis0550(conflictMr,COMMERCIAL_POLICY,"2026-10-28");assert(conflictSeed.mrWorkingImport.conflicts.includes("MR-B1-12-APF-01-CAB"));assert.deepEqual(conflictSeed.lines.find(l=>l.id==="REQ-MR-B1-12-APF-01-CAB"),conflictMr.lines.at(-1));
  const hiddenMr=JSON.parse(JSON.stringify(mr));hiddenMr.lines.filter(l=>l.mrRequirementId).forEach(l=>l.selected=false);assert.equal(derive(hiddenMr).baseTHB,null,"Deselection must not silently complete a required scope");assert.equal(derive(hiddenMr).provisional.baseTHB,null);
- const childBasis=officialLineBasisKey(mr,mr.lines.find(l=>l.id===towerReq.id));const changedOwner=JSON.parse(JSON.stringify(mr));changedOwner.lines.find(l=>l.id===towerReq.mrScopeState.owner.id).description+=" changed scope";assert.notEqual(officialLineBasisKey(changedOwner,changedOwner.lines.find(l=>l.id===towerReq.id)),childBasis,"Included requirement review follows owner changes");
- assert(mrModel.official.requirementGaps.some(g=>g.id===towerReq.mrRequirementId&&g.reason==="INCLUDED OWNER REVIEW OPEN"));
- console.log("PASS MR Working: 264 requirements / 19 systems / all B-C owners; additive idempotent import, preserved edits, 6 COMPANY exclusions, exact tower price owner, non-additive package components, OPEN missing units/quantities, missing/conflicting requirements and unchanged vendor subtotal.");
+ console.log("PASS MR Working: 264 requirements / 19 systems / all B-C owners; additive idempotent import, preserved edits, 6 COMPANY exclusions, two open tower MR rows, non-additive package components, OPEN missing units/quantities, missing/conflicting requirements and unchanged vendor subtotal.");
  {
  // MGW source import is additive and never silently substitutes an existing supplier.
  const {MGW_QUOTE_0550:mgwCatalog,importMgwVendorBasis0550,mgwQuoteItem0550,mgwOfferDraft0550,mgwOffersFor0550}=require(path.join(root,"project0550/data/mgwVendorBasis0550.js"));
  const mrBytes=JSON.stringify(mr),mgw=importMgwVendorBasis0550(mr,"2026-10-28");validate(mgw);
- assert.equal(JSON.stringify(mr),mrBytes);assert.equal(mgw.offers.length,117);assert.equal(mgw.vendors.length,mr.vendors.length+1);assert.deepEqual(mgw.lines,mr.lines);assert.deepEqual(mgw.fx,mr.fx);
+ assert.equal(JSON.stringify(mr),mrBytes);assert.equal(mgw.offers.length,116);assert.equal(mgw.vendors.length,mr.vendors.length+1);assert.deepEqual(mgw.lines,mr.lines);assert.deepEqual(mgw.fx,mr.fx);
  assert.equal(mgwCatalog.rows.length,130);assert.equal(mgwCatalog.rows.filter(r=>r.unitCost!==null).length,129);assert.equal(mgwCatalog.rows.filter(r=>r.unit===null).length,10);
  for(const r of mgwCatalog.rows){assert(r.systemTokens.every(t=>t==="COMMON"||ids.includes(t)),r.id);if(r.unitCost!==null)assert.equal(Math.round(r.quantity*r.unitCost*100),Math.round(r.extended*100),r.id);}
  assert.deepEqual(mgwCatalog.sections.filter(s=>s.status==="TOTAL_CONFLICT").map(s=>[s.id,s.coverTotal,s.detailTotal]),[["CCTV",133072,482142],["LAN",891222,881760]]);

@@ -1,26 +1,44 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),babel=require('@babel/core');
 const src=path.resolve(__dirname,'../src'),old=require.extensions['.js'];require.extensions['.js']=(m,f)=>f.startsWith(src+path.sep)?m._compile(babel.transformFileSync(f,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}]]}).code,f):old(m,f);
-const {towerWorkingBreakdown0550:derive}=require(src+'/project0550/data/towerWorkingBreakdown0550.js');
-const parent='LINE-LEGACY-TEL-TELT-1',ids=['REQ-MR-B1-11-APF-08','REQ-MR-B1-11-ACP-06'];
-const data={lines:[{id:parent,quantity:1,unit:'Lot',calculationId:'',vendorId:'TOWER',sellMode:'MARGIN',marginPct:20,primePct:25},...ids.map(id=>({id,coveredByLineId:parent,selected:true,quantity:1,unit:'Pc',manualCost:null,sellRate:null,offerId:'',calculationId:''}))],offers:[]};
-[[100,20,5,4],[50,10,2,1]].forEach((rates,n)=>rates.forEach((rate,i)=>data.offers.push({id:'O-'+n+'-'+i,vendorId:'TOWER',quoteRef:'2609.95.'+(n+1),currency:'THB',unitCost:rate,supplierQuoteRow:{classification:'BASE_PRICE',itemCode:String(i+2),sourceId:'SOURCE-'+n,quantity:1},quoteEvidence:{sourceId:'SOURCE-'+n,sourceSha256:String(n+1).repeat(64),quotedCurrency:'THB',quotedQuantity:1,quotedUnitCost:rate,quotedTotal:rate,sourceUrl:'https://example.com/'+n}})));
-for(let n=0;n<2;n++)data.offers.push({id:'NET-'+n,vendorId:'TOWER',quoteRef:'2609.95.'+(n+1),supplierQuoteRow:{classification:'NET_PACKAGE'},quoteEvidence:{quotedCurrency:'THB',quotedTotal:n?63:129,sourceSha256:String(n+1).repeat(64)}});
-const model={pricingBasis:'PROVISIONAL_VENDOR',lines:[{id:parent,selected:true,currency:'THB',costTHB:192,workingSellTHB:240,customerTHB:300},...ids.map(id=>({id,mrScopeState:{covered:true}}))]};
-const before=JSON.stringify(data),mBefore=JSON.stringify(model),result=derive(data,model);assert.equal(result.state,'READY');assert.equal(result.rows.size,3);
-assert.deepEqual(result.rows.get(ids[0]).prices,{costTHB:129,workingSellTHB:161.25,customerTHB:201.56,calculatedCustomerTHB:201.56,provisionalCostNative:129,provisionalSellNative:161.25,provisionalCustomerNative:201.56,currency:'THB'});
-assert.equal(result.rows.get(ids[1]).prices.customerTHB,98.44);assert.equal(result.rows.get(parent).kind,'SUMMARY');assert.equal(result.rows.get(ids[0]).quoteNetTHB,129);assert.equal(result.rows.get(ids[0]).serviceTHB,null,'Missing service detail stays unknown');
-for(const mutate of [d=>d.offers.pop(),d=>d.offers.push(d.offers[0]),d=>d.offers[0].unitCost++,d=>d.offers[0].quoteEvidence.quotedTotal++,d=>d.offers[0].quoteEvidence.sourceSha256='a'.repeat(64),d=>d.lines[1].quantity=2,d=>d.lines[1].manualCost=0,d=>d.lines[1].selected=false,d=>d.lines[0].sellMode='DIRECT']){const changed=structuredClone(data);mutate(changed);assert.equal(derive(changed,model).state,'OPEN');}
-const changedModel=structuredClone(model);changedModel.lines[0].customerTHB+=0.01;assert.equal(derive(data,changedModel).state,'OPEN','Never force a rounding residual or authored sell total');
-assert.equal(derive(data,{...model,pricingBasis:undefined}).state,'INACTIVE','Official reviewed pricing is never completed by this read-only detail');
-assert.equal(JSON.stringify(data),before);assert.equal(JSON.stringify(model),mBefore);
+const T=require(src+'/project0550/data/towerLegacyPricing0550.js');
+const B=require(src+'/project0550/data/bidWorkspaceModel.js');
+const D=require(src+'/project0550/data.js');
+const C=require(src+'/project0550/data/bidCompletion0550.js');
+const V=require(src+'/project0550/data/vendorRegister0550.js');
+const {officialCustomerRows}=require(src+'/project0550/data/officialPricing0550.js');
+const {RETIRED_TOWER_OFFER_0550:offerId,RETIRED_TOWER_OWNER_0550:ownerId,retireLegacyTowerPricing0550:retire}=T;
+const ids=['REQ-MR-B1-11-APF-08','REQ-MR-B1-11-ACP-06'];
+const owner={id:ownerId,selected:true,offerId};
+const original={lines:[owner,{id:ids[0],coveredByLineId:ownerId,coverageBasis:'Previous basis'},{id:ids[1],coveredByLineId:'AUTHORED-REPLACEMENT',coverageBasis:'New basis'}],offers:[{id:offerId}]};
+const retired=retire(original);
+assert.equal(retired.lines[0].selected,false);assert.equal(original.lines[0].selected,true);
+assert.equal(retired.lines[1].coveredByLineId,'');assert.equal(retired.lines[1].coverageBasis,'');
+assert.equal(retired.lines[2],original.lines[2]);assert.equal(retired.offers,original.offers);
+assert.equal(retire(retired),retired,'Repeat load is idempotent');
 if(process.argv[2]){
- const actual=JSON.parse(fs.readFileSync(process.argv[2])),D=require(src+'/project0550/data.js'),B=require(src+'/project0550/data/bidWorkspaceModel.js'),P=require(src+'/project0550/data/officialPricing0550.js');
- const raw=JSON.stringify(actual),m=B.deriveBidWorkspace(actual,D.SYSTEMS.map(s=>s.token),'2026-11-05'),exportBefore=JSON.stringify(P.officialCustomerRows(m.provisional)),partBefore=JSON.stringify(m.provisional),split=derive(actual,m.provisional);
- assert.equal(split.state,'READY',split.message);
- for(const id of ids){const row=split.rows.get(id),quoted=actual.offers.filter(o=>row.offerIds.includes(o.id));assert.equal(row.prices.costTHB,quoted.reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0));assert.equal(row.quoteNetTHB,actual.offers.find(o=>o.quoteRef===row.quoteRef&&o.supplierQuoteRow?.classification==='NET_PACKAGE').quoteEvidence.quotedTotal);assert.equal(Math.round((row.prices.costTHB+row.serviceTHB+row.constructionTHB)*100)/100,row.quoteNetTHB);assert.equal(quoted.length,4);assert.equal(new Set(quoted.map(o=>o.quoteRef)).size,1);}
- for(const key of ['costTHB','workingSellTHB','customerTHB'])assert.equal(Math.round(ids.reduce((n,id)=>n+split.rows.get(id).prices[key],0)*100)/100,m.provisional.lines.find(l=>l.id===parent)[key]);
- assert.equal(m.provisional.selected.filter(l=>[parent,...ids].includes(l.id)).length,1,'The saved financial owner is counted once');
- assert.equal(derive(actual,m.official).state,'INACTIVE');assert.equal(JSON.stringify(actual),raw);assert.equal(JSON.stringify(m.provisional),partBefore);assert.equal(JSON.stringify(P.officialCustomerRows(m.provisional)),exportBefore,'Existing release/export projection is exact');
- console.log('PASS actual per-tower source costs, saved policy, reconciled cost/sell/customer THB, unchanged canonical records and exact financial/release projection.');
+ const saved=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
+ const active=retire(saved),tokens=D.SYSTEMS.map(s=>s.token),today='2026-11-05';
+ B.validateBidWorkspace(active,D.DATA_LAYER_META.datasetId,tokens);
+ const prior=saved.lines.find(l=>l.id===ownerId);assert(prior.selected&&prior.offerId===offerId);
+ assert.deepEqual(active.lines.filter(l=>l.id!==ownerId&&!ids.includes(l.id)),saved.lines.filter(l=>l.id!==ownerId&&!ids.includes(l.id)));
+ for(const key of Object.keys(saved).filter(k=>k!=='lines'))assert.equal(active[key],saved[key]);
+ const model=B.deriveBidWorkspace(saved,tokens,today);
+ for(const view of [model.provisional,model.official]){
+  assert(!view.selected.some(l=>l.id===ownerId||l.offerId===offerId));
+  assert(!officialCustomerRows(view).some(r=>r.key===ownerId));
+  for(const id of ids){
+   const row=view.lines.find(l=>l.id===id);
+   assert.equal(row.quantity,1);assert.equal(row.unit,'Pc');assert.equal(row.customerRowCode,'A1-11');
+   assert.equal(row.mrScopeState.covered,false);assert.equal(row.costTHB,null);
+   assert.equal(row.customerTHB,null);assert(view.requirementGaps.some(g=>'REQ-'+g.id===id));
+  }
+ }
+ assert.equal(C.bidCompletionBasisChanged0550(active),true,'Saved percentage allowances require review');
+ assert.equal(V.vendorOfferEntries0550(active).some(e=>e.offer.id===offerId),false);
+ assert.equal(V.vendorOfferEntries0550(active).filter(e=>e.offer.id.startsWith('OFFER-MASTER-TOWER-')).length,32);
+ assert.equal(C.bidCompletionSourceUsages0550(active).filter(u=>u.current).flatMap(u=>u.offerIds).filter(id=>id.startsWith('OFFER-MASTER-TOWER-')).length,22);
+ const reassigned=structuredClone(active),row=reassigned.lines.find(l=>l.id===ids[0]);
+ row.offerId=offerId;row.sellMode='DIRECT';row.sellRate=1;row.primePct=0;
+ assert.equal(B.deriveBidWorkspace(reassigned,tokens,today).provisional.lines.find(l=>l.id===row.id).customerTHB,null,'A restored manual link cannot reuse the cancelled Offer');
 }
-console.log('PASS synthetic independent prices, original source/unit/quantity/owner guards, no forced residual, read-only data/model and strict Official separation.');
+console.log('PASS tower legacy cancellation: idempotent saved-workspace retirement, two OPEN MR rows, original Vendor and B/C sources, export and replacement guards.');

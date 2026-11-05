@@ -1,5 +1,6 @@
 import "../project0550/deviationRelease0550.css";
 import "../project0550/mrSourceReader0550.css";
+import {RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "../project0550/data/towerLegacyPricing0550";
 import {satelliteScopeNote0550} from "../project0550/data/satelliteScope0550";
 import {bidPresentationIndex,BID_TAG_TARGETS_0550} from "../project0550/bidPresentation0550";
 import {workspaceAlias0550} from '../project0550/workspaceLabels0550';
@@ -2128,7 +2129,8 @@ function Project0550Bidding({ lang = "th" }) {
     {id:"bid.schematic.canvas",title:"Overall / Schematic per system",tab:"schematic"},
     {id:"bid.vendor.controlled-sources",title:"Controlled vendor sources",tab:"documents"},
     ...(model?.lines||[]).map(r=>({id:"bid.budget.budget-thb.line."+r.id,title:r.description+" / Budget THB",tab:"budget"}))];
-  return [...new Map([...baseModuleIndex,...bidPresentationIndex(data?.lines||[])].map(m=>[m.id,m])).values()];
+  return [...new Map([...baseModuleIndex,...bidPresentationIndex(data?.lines||[])].map(m=>[m.id,m])).values()]
+   .filter(m=>m.id!=="bid.vendor.offer."+RETIRED_TOWER_OFFER_0550&&!m.id.endsWith(".line."+RETIRED_TOWER_OWNER_0550));
   },[data,model]);
   const jump=useCallback(m=>{if(technicalDirty)return;setArea(m.area||"B");setActiveTab(m.tab);if(m.system)setFocusedSystem(m.system);setNavigationTarget(null);setTimeout(()=>setNavigationTarget(m.id),0);},[technicalDirty]);
   const navigate=useCallback(id=>{const m=moduleIndex.find(m=>m.id===id);if(m)jump(m);},[moduleIndex,jump]);

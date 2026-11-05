@@ -59,7 +59,7 @@ const server=http.createServer((req,res)=>{
  for(const line of candidates){const rows=table.locator('[data-bid-working-line="'+line.id+'"]');if(!await rows.count())continue;const text=await rows.first().innerText();if(!text.includes('ปริมาณจากสมการ'))continue;assert(!text.includes('ยังไม่มีฐานปริมาณ'),line.id+' uses computed quantity');calculatedShown=true;break;}
  console.log('CHECK computed quantity',calculatedShown);assert(calculatedShown,'WP.5 renders the quantity from a canonical equation');
  if(fixture){
-  await select.selectOption('TEL-TELT');assert(await table.locator('[data-bid-price-owner="LINE-LEGACY-TEL-TELT-1"]').count(),'Validated tower owner is visible from included MR rows');
+  await select.selectOption('TEL-TELT');assert.equal(await table.locator('[data-bid-price-owner="LINE-LEGACY-TEL-TELT-1"]').count(),0,'Cancelled tower basis cannot reappear through the quantity view');
   await select.selectOption('TEL-PAGA');assert(await table.locator('[data-bid-package-reference], [data-bid-price-owner]').count(),'Existing PAGA package price remains visible from retained Working references before exact allocation');
   assert((await table.innerText()).includes('ไม่ใช่ราคาเพิ่มต่อแถว MR'));
   const ref=table.locator('[data-bid-package-reference], [data-bid-price-owner]').first(),button=ref.getByRole('button');await button.click();assert(await page.locator('[data-component-key="bid.budget.working.editor"]').isVisible(),'Existing owner navigation works');

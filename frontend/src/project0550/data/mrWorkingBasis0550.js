@@ -24,11 +24,6 @@ export function importMrWorkingBasis0550(data,policies,today) {
    customerRowCode:codeFor(r),customerRemark:"",brand:"",responsibility:r.responsibility,scopeBasis:r.note,
    coveredByLineId:r.owner?"REQ-"+r.owner:"",coverageBasis:r.owner?r.reference+" / "+r.note:"",
    ...(["TEL-VSAT","TEL-VSAT-KU"].includes(r.systemToken)?{satelliteScope:r.responsibility==="COMPANY"?"COMPANY_SUPPLY":r.responsibility==="CLARIFICATION"?"CLARIFICATION":r.wbs==="A"?"TSI_EQUIPMENT":"TSI_SERVICES"}:{})});
-  // Exact preserved tower quotation identifies both heights; use one package
-  // owner instead of inventing a 30 m / 60 m price split. Other partial vendor
-  // packages remain candidates until their detailed coverage is evidenced.
-  const tower=next.lines.find(l=>l.id==="LINE-LEGACY-TEL-TELT-1"&&l.selected&&l.description==="Current tower supply quote anchor — 30m + 60m towers"&&l.offerId&&next.offers.some(o=>o.id===l.offerId&&o.quoteRef.includes("2609.95.1")&&o.quoteRef.includes("2609.95.2")));
-  if(["MR-B1-11-APF-08","MR-B1-11-ACP-06"].includes(r.id)&&tower){const added=next.lines[next.lines.length-1];added.coveredByLineId=tower.id;added.coverageBasis="Existing quote anchor identifies 30 m + 60 m tower supply; single package price, no proportional allocation. Erection/foundation/services remain separate scope checks.";}
   importedLineIds.push(id);
  }
  next.mrWorkingImport={version:MR_WORKING_VERSION,date:today,importedLineIds,conflicts};

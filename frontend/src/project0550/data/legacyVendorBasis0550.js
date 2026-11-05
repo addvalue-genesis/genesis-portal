@@ -1,5 +1,6 @@
 import {policyDefaults0550} from "../bidWorkingBasis0550";
 import {suggestedCustomerCode} from "./officialPricing0550";
+import {RETIRED_TOWER_OFFER_0550} from "./towerLegacyPricing0550";
 
 export const VENDOR_BASIS_VERSION="0550-vendor-basis-20261028-1";
 const isoDate=value=>{const match=String(value||"").match(/^(\d{2})-([A-Za-z]{3})-(\d{4})$/);const month=match&&["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"].indexOf(match[2]);return match&&month>=0?`${match[3]}-${String(month+1).padStart(2,"0")}-${match[1]}`:"";};
@@ -35,6 +36,7 @@ export function importLegacyVendorBasis0550(data,dataset,today) {
  const importedLineIds=[],skippedSystems=new Set();
  const policy=policyDefaults0550(dataset.commercialPolicy,"Goods / Procured Cost")||{sellMode:"MARGIN",marginPct:null,primePct:null};
  for(const item of legacyVendorCatalog0550(dataset)) {
+  if("OFFER-"+item.id===RETIRED_TOWER_OFFER_0550)continue;
   const wantedVendorId="LEGACY-VENDOR-"+slug(item.vendorKey);
   let vendor=next.vendors.find(v=>v.name.trim().toLowerCase()===item.vendor.toLowerCase());
   if(!vendor){if(next.vendors.some(v=>v.id===wantedVendorId)){skippedSystems.add(item.systemToken);continue;}vendor={id:wantedVendorId,name:item.vendor,kind:"SUPPLIER",reference:item.quoteRef+" / carried-forward source; update pending"};next.vendors.push(vendor);}

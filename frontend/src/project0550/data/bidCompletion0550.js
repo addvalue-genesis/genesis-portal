@@ -82,16 +82,20 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  }
  const extraSupply=lines.filter(l=>l.wbs==='A'&&rows.some(r=>r.lineId===l.id&&r.kind==='ESTIMATE')).reduce((n,l)=>n+l.quantity*l.manualCost,0);
  supplyCost=roundMoney0550(supplyCost+extraSupply);nonMicrowave=roundMoney0550(nonMicrowave+extraSupply);
- // Partition the two complete tower quotes. The existing selected supply owner
- // already contains items2–5, so neither net quotation is purchased again.
- const supplyOwner=data.lines.find(l=>l.id==='LINE-LEGACY-TEL-TELT-1'&&l.selected);
- const towerSupply=sumMoney0550(tower.filter(o=>[2,3,4,5].includes(Number(o.supplierQuoteRow.itemCode))).map(o=>o.quoteEvidence.quotedTotal));
- if(supplyOwner&&data.offers.find(o=>o.id===supplyOwner.offerId)?.unitCost===towerSupply){
+ // The original B/C items have their own scope and do not depend on Part A pricing.
+ const towerVendor=tower[0].vendorId;
+ const completeTowerQuotes=['2609.95.1','2609.95.2'].every(ref=>{
+  const items=tower.filter(o=>o.quoteRef===ref);
+  const codes=new Set(items.map(o=>o.supplierQuoteRow.itemCode));
+  return items.length===15&&Array.from({length:15},(_,i)=>String(i+1)).every(code=>codes.has(code))&&
+   items.every(o=>o.vendorId===towerVendor&&o.currency==='THB'&&finite(o.quoteEvidence?.quotedTotal));
+ });
+ if(completeTowerQuotes){
   quoted('C1-D04',[10],'Tower erection/assembly only; purchaser C1 option; final scope/interface assignment still requires confirmation');
   quoted('C1-D05',[9,11,12,13],'Tower civil, earthing, fencing and site finishing only; purchaser C1 option, not a budget for pipeline trenching or other civil works');
   quoted('B7-D04',[6,7],'Tower TSSR and soil investigation only; general TSI survey remains in its existing labour owners');
   const id='LINE-TOWER-QUOTED-ENGINEERING-0550',offers=tower.filter(o=>[1,8,15].includes(Number(o.supplierQuoteRow.itemCode)));
-  if(at(id)<0){lines.push({id,systemToken:'TEL-TELT',wbs:'B1',description:'Tower OEM PM / foundation design / as-built — two original quotations',scopeKey:'TOWER.QUOTED.ENGINEERING',tagRef:'30m + 60m',requirementRef:'MR Rev.B1 / tower scope; Master Tower2609.95.1/2609.95.2 items1,8,15',sourceRef:'Received tower quotations; original extended amounts for items1,8,15 only. Supply2–5, survey6–7, delivery14 and physical construction9–13 are separate owners.',vendorId:supplyOwner.vendorId,offerId:'',calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'THB',manualCost:sumMoney0550(offers.map(o=>o.quoteEvidence.quotedTotal)),sellRate:null,markupPct:null,marginPct:null,primePct:null,...goods,selected:true,customerRowCode:'B1',customerRemark:'Quoted OEM tower engineering scope only.',brand:'MASTER TOWER'});rows.push({lineId:id,kind:'QUOTED',basis:'Tower original items1,8,15; disjoint from selected supply and construction.',offerIds:offers.map(o=>o.id),ownerIds:[]});}
+  if(at(id)<0){lines.push({id,systemToken:'TEL-TELT',wbs:'B1',description:'Tower OEM PM / foundation design / as-built — two original quotations',scopeKey:'TOWER.QUOTED.ENGINEERING',tagRef:'30m + 60m',requirementRef:'MR Rev.B1 / tower scope; Master Tower2609.95.1/2609.95.2 items1,8,15',sourceRef:'Received tower quotations; original extended amounts for items1,8,15 only. Supply2–5, survey6–7, delivery14 and physical construction9–13 are separate owners.',vendorId:towerVendor,offerId:'',calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'THB',manualCost:sumMoney0550(offers.map(o=>o.quoteEvidence.quotedTotal)),sellRate:null,markupPct:null,marginPct:null,primePct:null,...goods,selected:true,customerRowCode:'B1',customerRemark:'Quoted OEM tower engineering scope only.',brand:'MASTER TOWER'});rows.push({lineId:id,kind:'QUOTED',basis:'Tower original items1,8,15; disjoint from supply and construction.',offerIds:offers.map(o=>o.id),ownerIds:[]});}
  }else conflicts.push('TOWER_SUPPLY_BOUNDARY');
  const delivery=tower.filter(o=>Number(o.supplierQuoteRow.itemCode)===14);
  // Domestic tower delivery is kept distinct from the overseas freight estimate.

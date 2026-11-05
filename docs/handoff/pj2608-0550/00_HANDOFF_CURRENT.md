@@ -1,3 +1,5 @@
+Latest pricing decision: [TEL-TELT legacy Part A pricing cancelled](20261105_TELT_LEGACY_PRICING_CANCELLED.md). APF and ACP MR rows require new pricing. The Vendor originals and separate B/C allocations remain available.
+
 Latest SI data: [TEL-TELT item reconciliation and site RPT drafts](20261105_TELT_ITEM_MAPPING_REVIEW.md), Source Rev14 / A Work Package Rev11. Both tower MR rows link native Items 2–5. Two RPTs and Volume II equipment trace remain DRAFT / OPEN. The 76 MiB preparation bound preserves Rev10 ancestry. See checkpoint for source authority and validation.
 
 Latest: [Vendor quote scope and PAGA draft repair](20261105_VENDOR_SCOPE_AND_PAGA_DRAFT_REPAIR.md), parent d5390c89. B07 distinguishes the systems quoted from SI/Working references. Three exact untouched A Rev09/10 PAGA documentation links are removed from unrelated engineering drafts. UI 2026-11-05.17 places the full AVL audit in 14.1, with a filtered WP.7 summary and an Export-to-review link. UI 2026-11-05.19 removes the requirement picker from WP.5 and opens directly to quantity groups by system. WP.2 and WP.6 retain the picker for draft creation. See checkpoint for tests and limits.
