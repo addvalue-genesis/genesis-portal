@@ -1,3 +1,4 @@
+import sourceLimits from './sourceWorkspaceLimits0550.json';
 // One existing workspace: private JSON receipt + preparation, not a second DB.
 import {fetchAutomaticSource,selectAutomaticSource} from "./sourceAutoLoad";
 import {planSiWorkPackage0550,validateSiWorkPackage0550,A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550,A_AUDIT_WORK_PACKAGE_SCHEMA_0550,preparationAncestors0550,sourcePackageBasis0550} from "./siWorkPackage0550";
@@ -52,7 +53,7 @@ export async function fetchAutomaticSourceWorkspace0550(fetcher=fetch){
   // Older local bridges can still load source-only data; no manual import flow.
   if(!response.headers.get('content-type')?.includes('application/json'))return {schema:SCHEMA,sourceIntake:await fetchAutomaticSource(fetcher),aWorkPackage:null};
   if(!response.ok){const error=await response.json();throw Error(error.code||'SOURCE_BRIDGE_UNAVAILABLE');}
-  const limit=80*1024*1024+1024;
+  const limit=sourceLimits.sourceBytes+sourceLimits.preparationBytes+sourceLimits.responseOverheadBytes;
   if(Number(response.headers.get('content-length'))>limit)fail('SOURCE_FILE_TOO_LARGE');
   const text=await response.text();if(new Blob([text]).size>limit)fail('SOURCE_FILE_TOO_LARGE');
   return JSON.parse(text);

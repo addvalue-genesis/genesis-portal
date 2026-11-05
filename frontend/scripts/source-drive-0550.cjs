@@ -2,14 +2,16 @@
 const fs = require('node:fs/promises');
 const path = require('node:path');
 const crypto = require('node:crypto');
+const sourceLimits = require('../src/project0550/data/sourceWorkspaceLimits0550.json');
 const ENDPOINT = '/api/local/pj2608-0550/source-intake';
 const WORKSPACE_ENDPOINT = '/api/local/pj2608-0550/source-workspace';
 const VENDOR_ENDPOINT = '/api/local/pj2608-0550/vendor-registers';
 const MAX_VENDOR_BYTES = 4 * 1024 * 1024, MAX_VENDOR_RESPONSE_BYTES = 16 * 1024 * 1024;
-const MAX_BYTES = 32 * 1024 * 1024;
+const MAX_BYTES = sourceLimits.sourceBytes;
 // Exact predecessor snapshots are retained in the next reading continuation.
 // Bound preparation separately; source-only32 MiB and Vendor limits stay fixed.
-const MAX_PREPARATION_BYTES = 64 * 1024 * 1024;
+const MAX_PREPARATION_BYTES = sourceLimits.preparationBytes;
+const MAX_WORKSPACE_BYTES = MAX_BYTES + MAX_PREPARATION_BYTES + sourceLimits.responseOverheadBytes;
 const PROJECT = /^PJ2608-0550(?:[ _-]|$)/;
 const FILENAME = /^PJ2608-0550_Source_Intake_Rev\d+_\d{8}\.json$/;
 const PREPARATION_FILE = /^PJ2608-0550_A_Work_Package_(?:Rev\d+_)?\d{8}\.json$/;
@@ -104,12 +106,14 @@ async function loadDriveSourceWorkspace(options){
  const canonical=value=>JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);
  // Same-day continuation is ordered only by its exact embedded predecessor,
  // never filename/revision/upload time. Diverging candidates remain a conflict.
- const ancestor=(child,parent)=>{let p=child.intake;for(let n=0;n<8&&p?.predecessor;n++){if(canonical(p.predecessor)===canonical(parent.intake))return true;p=p.predecessor;}return false;};
+ const ancestor=(child,parent)=>{let p=child.intake;for(let n=0;n<sourceLimits.maxAncestors&&p?.predecessor;n++){if(canonical(p.predecessor)===canonical(parent.intake))return true;p=p.predecessor;}return false;};
  const tips=peers.filter(r=>peers.every(other=>r.hash===other.hash||ancestor(r,other)));
  const chosen=tips[0];
  if(peers.length&&(!chosen||tips.some(r=>r.hash!==chosen.hash)))throw fail('A_PREPARATION_CONFLICT',409);
  if(chosen&&matches.some(r=>r.intake.batchId===chosen.intake.batchId&&r.hash!==chosen.hash))throw fail('A_PREPARATION_CONFLICT',409);
- return JSON.stringify({schema:'genesis.0550.source-workspace.v1',sourceIntake:latest.intake,aWorkPackage:chosen?.intake||null});
+ const body=JSON.stringify({schema:'genesis.0550.source-workspace.v1',sourceIntake:latest.intake,aWorkPackage:chosen?.intake||null});
+ if(Buffer.byteLength(body)>MAX_WORKSPACE_BYTES)throw fail('SOURCE_FILE_TOO_LARGE');
+ return body;
 }
 // Vendor evidence is independent of the CUS/A batch. Read every prepared quote,
 // not just a newest date; existing importer controls revisions and preserves edits.
@@ -170,4 +174,4 @@ function createMiddleware(loader=()=>loadDriveIntake(),workspaceLoader=()=>loadD
     }catch(e){res.statusCode=e.status||503;res.end(JSON.stringify({code:e.status?e.code:'DRIVE_UNREADABLE'}));}
   };
 }
-module.exports={ENDPOINT,WORKSPACE_ENDPOINT,VENDOR_ENDPOINT,MAX_BYTES,MAX_PREPARATION_BYTES,MAX_VENDOR_BYTES,MAX_VENDOR_RESPONSE_BYTES,batchKey,discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,loadDriveVendorRegisters,createMiddleware,permitted};
+module.exports={ENDPOINT,WORKSPACE_ENDPOINT,VENDOR_ENDPOINT,MAX_BYTES,MAX_PREPARATION_BYTES,MAX_WORKSPACE_BYTES,MAX_VENDOR_BYTES,MAX_VENDOR_RESPONSE_BYTES,batchKey,discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,loadDriveVendorRegisters,createMiddleware,permitted};

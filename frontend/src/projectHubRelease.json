@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.11",
+  "version": "2026-11-05.12",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "163a1bbf",
-  "capability": "Existing MR/Working and Vendor views show original Supplier item detail from canonical Offer terms and MGW catalogue, with source references and no changes to Mapping, money, quantity, FX, reviews or frozen outputs. Existing MAP01-10/Common tag primitives audited; no invented customer TAGs or automatic mapping approval. Retain latest optional Punch controls."
+  "source0550": "b15f3f68",
+  "capability": "Seven A-input identities investigated against original received archives. Existing private Source14/A10 retains exact history and adds unresolved reconciliation/partial MR reading. Shared bounded loader admits retained ancestry with unchanged per-file caps. Preserve money, quantity, FX, user edits/deletions, reviews and frozen history; no new module or automatic acceptance."
 }

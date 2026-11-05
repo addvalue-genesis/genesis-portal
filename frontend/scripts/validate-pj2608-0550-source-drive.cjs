@@ -1,5 +1,5 @@
 const assert=require('node:assert/strict'),fs=require('node:fs/promises'),os=require('node:os'),path=require('node:path'),http=require('node:http'),babel=require('@babel/core');
-const {discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,createMiddleware,permitted,MAX_BYTES,MAX_PREPARATION_BYTES}=require('./source-drive-0550.cjs');
+const {discoverProjects,loadDriveIntake,loadDriveSourceWorkspace,createMiddleware,permitted,MAX_BYTES,MAX_PREPARATION_BYTES,MAX_WORKSPACE_BYTES}=require('./source-drive-0550.cjs');
 const root=path.resolve(__dirname,'../src'),oldJS=require.extensions['.js'];
 require.extensions['.js']=(mod,file)=>file.startsWith(root+path.sep)?mod._compile(babel.transformFileSync(file,{babelrc:false,configFile:false,presets:[['@babel/preset-env',{targets:{node:'current'},modules:'commonjs'}]]}).code,file):oldJS(mod,file);
 (async()=>{
@@ -70,8 +70,8 @@ require.extensions['.js']=(mod,file)=>file.startsWith(root+path.sep)?mod._compil
    const paired=JSON.parse(await loadDriveSourceWorkspace({projectDir:project}));
    assert.equal(paired.sourceIntake.batchId,actualSource.batchId);
    assert.deepEqual(paired.aWorkPackage,actualPreparation);
-   assert(Buffer.byteLength(JSON.stringify(paired))<=80*1024*1024+1024);
-   console.log('PASS actual retained-history preparation through 64MiB bridge with unchanged 80MiB paired bound');
+   assert(Buffer.byteLength(JSON.stringify(paired))<=MAX_WORKSPACE_BYTES);
+   console.log('PASS actual retained-history preparation through 64MiB bridge with bounded96MiB paired response');
   }
   console.log('PASS Drive Desktop bridge: bounded project discovery, offline failure, schema/project checks, batch conflict/no-downgrade/history preservation, loopback/origin restriction, HTTP fetch. User Windows mount remains to verify.');
  } finally {if(server)await new Promise(resolve=>server.close(resolve));await fs.rm(tmp,{recursive:true,force:true});}

@@ -1,3 +1,4 @@
+import sourceLimits from './sourceWorkspaceLimits0550.json';
 // Private engineering drafts enter the existing canonical workspace, never the bundle.
 // ADR-0550-001 principles 1–6, 8–11, 13–14. Import cannot approve or reprice.
 import {validateSourceIntake} from "./sourceIntakeModel";
@@ -18,15 +19,15 @@ export const A_AUDIT_WORK_PACKAGE_SCHEMA_0550="genesis.0550.si-work-package.v5";
 const linkedPackage=p=>[A_WORK_PACKAGE_SCHEMA_0550,A_CORPUS_WORK_PACKAGE_SCHEMA_0550,EPC_WORK_PACKAGE_SCHEMA_0550,A_AUDIT_WORK_PACKAGE_SCHEMA_0550].includes(p?.schema);
 export function preparationAncestors0550(pack){
  const rows=[],seen=new Set([pack]),batches=new Set([pack?.batchId]);let p=pack;
- while(p?.predecessor){const prior=p.predecessor;if(rows.length>=8||seen.has(prior)||batches.has(prior.batchId))throw Error("SI work package: invalid predecessor chain");rows.push(prior);seen.add(prior);batches.add(prior.batchId);p=prior;}return rows;
+ while(p?.predecessor){const prior=p.predecessor;if(rows.length>=sourceLimits.maxAncestors||seen.has(prior)||batches.has(prior.batchId))throw Error("SI work package: invalid predecessor chain");rows.push(prior);seen.add(prior);batches.add(prior.batchId);p=prior;}return rows;
 }
 // Validate inherited excerpts against the expanded source text, while retaining
 // the original predecessor objects/hashes for receipt and edit comparisons.
 function rebasedPreparation(pack,source){return {...pack,sourceBatchId:source.batchId,sourceBasisKey:sourcePackageBasis0550(source),...(pack.predecessor?{predecessor:rebasedPreparation(pack.predecessor,source)}:{})};}
 export const sourcePackageBasis0550=intake=>integrationFingerprint0550(intake);
 // Retain exact predecessor receipts within a bounded 64 MiB continuation.
-// Automatic source+preparation responses remain capped at 80 MiB + 1024 bytes.
-export const SI_FILE_LIMIT_0550=64*1024*1024;
+// Paired response is bounded by the unchanged32MiB source +64MiB preparation limits.
+export const SI_FILE_LIMIT_0550=sourceLimits.preparationBytes;
 const collections=Object.keys(emptyIntegration0550()).filter(k=>k!=="schema");
 const fail=m=>{throw Error("SI work package: "+m);};
 const keys=(o,allowed)=>{if(!o||typeof o!=="object"||Array.isArray(o)||Object.keys(o).some(k=>!allowed.includes(k)))fail("unsupported fields");};
