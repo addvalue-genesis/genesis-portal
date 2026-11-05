@@ -137,6 +137,7 @@
     "Private PAGA outputs10/11/12 and v2 technical draft package are separate from Git and Windows saved data. Do not treat a qualified quoted-package pricing scenario as complete customer CIF/FOB price or adopt it automatically.",
     "UI 2026-11-05.16: 10.7 detail rows expose Working-bound Offers as internal trace links to B07. Source and customer export stay separate. Price-summary SSR, production build and Release Issue validation passed; Windows runtime unverified.",
     "UI 2026-11-05.17: the full AVL audit lives in 14.1. WP.7 links from its system summary and 14.3 links from Export to review. Uses shared Working/Requirement/Offer and Deviation records. Context, SSR, AVL validation and production build passed; Windows runtime unverified.",
+    "UI 2026-11-05.18: WP.5 opens and highlights the selected requirement in its system quantity group. Unlinked records have an exact WP.4 route. Context, Working Preview, build and targeted actual-workspace browser validation passed; see the checkpoint for the legacy harness startup limitation.",
     "Implementation verification and existing-branch delivery are recorded in the latest checkpoint. No customer issue or PR merge is authorised by presentation completion."
   ],
   "historicalState": "The prior 2026-10-09 branch/PR2/port3000/STAGING checkpoint remains in Git history; it is not the current launch instruction."

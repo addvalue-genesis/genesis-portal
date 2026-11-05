@@ -50,6 +50,33 @@ const server=http.createServer((req,res)=>{
  await summary.press('Space');
  await table.waitFor({state:'detached'});
  assert(await summary.getByText('+',{exact:true}).isVisible());
+ // Selecting a requirement from an initially collapsed WP.5 opens and locates
+ // its exact row, including the case where APF and ACP share a price owner.
+ const towerId='REQDEF-MR-B1-11-ACP-06';
+ const picker=stage.getByLabel('Working requirement',{exact:true});
+ await picker.selectOption(towerId);
+ const tower=stage.locator('[data-wp-quantity-system="TEL-TELT"]');
+ const focused=tower.locator('[data-bid-requirement="'+towerId+'"].p55-wp-quantity-target');
+ await focused.waitFor();
+ assert((await focused.innerText()).includes('ข้อกำหนดที่เลือก · ACP'));
+ assert.equal(await stage.locator('[data-wp-quantity-system][open]').count(),1);
+ assert(await focused.evaluate(row=>{const {top,bottom}=row.getBoundingClientRect();return top<innerHeight&&bottom>0;}),'Jump places ACP in the viewport');
+ await tower.locator(':scope > summary').click();
+ await focused.waitFor({state:'detached'});
+ await stage.getByRole('button',{name:'ดูแถวที่เลือกใน WP.5',exact:true}).click();
+ await focused.waitFor();
+ if(fixture){
+  const unlinked=saved.integrationWorkspace.requirements.find(requirement=>!requirement.workLineIds.length);
+  if(unlinked){
+   await picker.selectOption(unlinked.id);
+   await stage.getByText('ข้อที่เลือกยังไม่มีรหัสอ้างอิง Working',{exact:true}).waitFor();
+   assert.equal(await stage.locator('.p55-wp-quantity-target').count(),0);
+   await stage.getByRole('button',{name:'เปิดข้อที่เลือกใน WP.4',exact:true}).click();
+   await page.getByRole('form',{name:'Requirement Mapping editor',exact:true}).filter({hasText:unlinked.id}).waitFor();
+   await nav('bid.working-preview.step.5');
+  }
+ }
+ console.log('CHECK exact requirement focus');
  await select.selectOption('COMMON');
  await table.waitFor();
  assert.equal(await groups.count(),1,'A selected system opens its only group');

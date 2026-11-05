@@ -85,8 +85,17 @@ function BidRequirementBasis0550({requirement,model,delivery,onNavigate}){
  {delivery&&<small>รายงานระดับระบบตาม SDRL {delivery.code}: {delivery.dueCode} / หลัง PO {delivery.weeksAfterOrder} สัปดาห์ · จัดงานและค่าใช้จ่ายตามขอบเขตรายงาน; ตรวจงานจัดทำแยกจากงานทบทวนใน B1</small>}
  {!delivery&&<small>ตรวจวิธีตอบและกำหนดส่งตาม RFQ · การไม่มี Proof ไม่ทำให้ปริมาณ × เรตที่มีอยู่คำนวณไม่ได้</small>}</>;
 }
-function WorkingQuantityGroup0550({token,title,requirements,initiallyOpen,model,workingById,rawById,delivery,onNavigate}){
+function WorkingQuantityGroup0550({token,title,requirements,initiallyOpen,focus,model,workingById,rawById,delivery,onNavigate}){
  const [open,setOpen]=useState(initiallyOpen);
+ const targetRow=useRef(null),handledFocus=useRef(null);
+ useEffect(()=>{
+  if(!focus||handledFocus.current===focus)return;
+  if(!open){setOpen(true);return;}
+  if(targetRow.current){
+   handledFocus.current=focus;
+   targetRow.current.scrollIntoView({block:"center",inline:"nearest"});
+  }
+ },[focus,open]);
  return <details className="p55-wp-quantity-group" data-wp-quantity-system={token} open={open}
   onToggle={event=>{if(event.target===event.currentTarget)setOpen(event.currentTarget.open);}}>
   <summary>
@@ -99,8 +108,11 @@ function WorkingQuantityGroup0550({token,title,requirements,initiallyOpen,model,
   {open&&<div className="p55-table-wrap">
    <table className="p55-table" aria-label="Physical requirement Working allocation">
     <thead><tr><th>Requirement</th><th>Working / required quantity</th><th>Owner / proof</th></tr></thead>
-    <tbody>{requirements.map(requirement=><tr key={requirement.id} data-bid-requirement={requirement.id}>
-     <td>{requirement.title}</td>
+    <tbody>{requirements.map(requirement=>{
+     const focused=focus?.id===requirement.id;
+     return <tr key={requirement.id} data-bid-requirement={requirement.id}
+      ref={focused?targetRow:null} className={focused?"p55-wp-quantity-target":undefined}>
+     <td>{requirement.title}{focused&&<small>ข้อกำหนดที่เลือก · {requirement.site} · {requirement.id}</small>}</td>
      <td>{requirement.workLineIds.map(id=>{
       const line=workingById.get(id);
       const owner=line?.mrScopeState?.covered?line.mrScopeState.owner:null;
@@ -114,13 +126,14 @@ function WorkingQuantityGroup0550({token,title,requirements,initiallyOpen,model,
       {requirement.workLineIds.map(id=>rawById.get(id)?.coveredByLineId||id).join(" / ")}
       <BidRequirementBasis0550 requirement={requirement} model={model} delivery={delivery} onNavigate={onNavigate}/>
      </td>
-    </tr>)}</tbody>
+    </tr>;
+    })}</tbody>
    </table>
   </div>}
  </details>;
 }
 
-function WorkingQuantity0550({requirements,scopes,system,names,data,model,studyDeliveries,onNavigate}){
+function WorkingQuantity0550({requirements,scopes,system,names,data,model,studyDeliveries,focus,onNavigate}){
  const groups=new Map();
  let linkedCount=0;
  for(const requirement of requirements){
@@ -144,6 +157,7 @@ function WorkingQuantity0550({requirements,scopes,system,names,data,model,studyD
   {scopes.filter(scope=>groups.has(scope.id)).map(({id})=><WorkingQuantityGroup0550
    key={id} token={id} title={id==="COMMON"?"งานร่วม · COMMON":names(id)}
    requirements={groups.get(id)} initiallyOpen={system!=="ALL"} model={model}
+   focus={groups.get(id).some(requirement=>requirement.id===focus?.id)?focus:null}
    workingById={workingById} rawById={rawById} delivery={studyDeliveries.get(id)} onNavigate={onNavigate}/>)}
  </>;
 }
@@ -151,6 +165,7 @@ function WorkingQuantity0550({requirements,scopes,system,names,data,model,studyD
 export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
  const {data,model:bidModel,busy,change,reviewDate}=useBidWorkspace(),root=useRef(null);
  const [system,setSystem]=useState("ALL"),[expanded,setExpanded]=useState(false),[selected,setSelected]=useState("");
+ const [quantityFocus,setQuantityFocus]=useState(null);
  const [req,setReq]=useState(null),[proof,setProof]=useState(null),[activity,setActivity]=useState(null),[scope,setScope]=useState(null),[saved,setSaved]=useState("");
  const model=bidModel?.integration;
  useEffect(()=>{if(navigationTarget?.startsWith("bid.working-preview.")){const r=model?.requirements.find(r=>navigationTarget==="bid.working-preview.requirement."+r.id);if(r){setSystem(r.systemToken);setSelected(r.id);const keys=Object.keys(blankRequirement0550("REQ"));setReq({...Object.fromEntries(keys.map(k=>[k,r[k]])),...(r.tagBindings!==undefined?{tagBindings:r.tagBindings}:{})});}}},[navigationTarget,Boolean(model)]);
@@ -167,7 +182,19 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
  const openPunchTask=(row,preferredId)=>{const route=punchTaskRoute0550(row,model.requirements,preferredId||selected),r=route.requirement;if(r){setSystem(r.systemToken);setSelected(r.id);}if(route.kind==='PROOF'){const old=w.proofs.find(p=>p.id===route.recordId);setProof(old?{...old}:punchProofDraft0550(r,newId('PROOF')));onNavigate('bid.working-preview.step.2');}else if(route.kind==='ACTIVITY'){const old=w.activities.find(a=>a.id===route.recordId);setActivity(old?{...old}:punchActivityDraft0550(r,newId('ACT'),route.activityKind));onNavigate('bid.working-preview.step.6');}else if(route.sourceTarget)onOpenSource(route.target);else onNavigate(route.target);};
  const requirementOptions=visible.map(r=>[r.id,`${r.site} · ${r.title} / ${r.id}`]);
  const requirementSelect=(form,setter)=><Select label="Linked requirement" value={form.requirementId} onChange={v=>setField(setter,"requirementId",v)} options={[["","เลือกข้อกำหนด"],...requirementOptions]}/>;
- const selection=<div className="p55-wp-current"><strong>ข้อกำหนดที่เลือก: {current?current.site+" · "+current.title:"ยังไม่มีรายการ"}</strong>{current&&<><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.working-preview.requirement."+current.id}/><Select label="Working requirement" value={current.id} onChange={setSelected} options={requirementOptions}/></>}</div>;
+ const showQuantity=id=>{
+  setSelected(id);
+  setQuantityFocus({id});
+ };
+ const requirementPicker=(onChange,actions)=><div className="p55-wp-current">
+  <strong>ข้อกำหนดที่เลือก: {current?current.site+" · "+current.title:"ยังไม่มีรายการ"}</strong>
+  {current&&<>
+   <ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.working-preview.requirement."+current.id}/>
+   <Select label="Working requirement" value={current.id} onChange={onChange} options={requirementOptions}/>
+   {actions}
+  </>}
+ </div>;
+ const selection=requirementPicker(setSelected);
  const sourceCounts=DOCUMENT_FAMILIES_0550.map(f=>({family:f,sources:model.sources.filter(s=>documentFamily0550(s)===f)}));
  const targetStage=navigationTarget?.match(/^bid\.working-preview\.step\.([1-8])$/)?.[1]||(/\.requirement\./.test(navigationTarget||"")?"4":/\.proof\./.test(navigationTarget||"")?"2":/\.activity\./.test(navigationTarget||"")?"6":null);
  const renderStage=stage=><Module key={stage.id} id={stage.id} title={stage.title} open={expanded||String(stage.step)===targetStage} defer>{()=>{
@@ -197,9 +224,16 @@ export function WorkingPreview0550({onNavigate,onOpenSource,navigationTarget}){
     <RequirementTagBindings0550 data={data} requirement={req} onChange={v=>setField(setReq,"tagBindings",v)} onOpenSource={onOpenSource}/><div className="p55-bid-fields"><ReviewFields form={req} setForm={setReq} date={reviewDate}/></div><Save busy={busy}>บันทึกข้อกำหนดและ Mapping</Save><button type="button" onClick={()=>setReq(null)}>ปิดแบบแก้ไข</button></form>}
    {model.scopes.filter(s=>system==="ALL"||s.id===system).map(s=><details key={s.id} className="p55-wp-system"><summary>{names(s.id)} · {s.requirements.length} requirements</summary><div className="p55-table-wrap"><table className="p55-table" aria-label={"Requirements "+s.id}><thead><tr><th>Requirement / Source</th><th>สถานะ</th><th>ทำงาน</th></tr></thead><tbody>{s.requirements.map(r=><tr key={r.id} data-component-key={req?.id===r.id?undefined:"bid.working-preview.requirement."+r.id}><td>{r.site} · {r.title}<small>{r.reference||r.sourceLocator}</small><ComponentCopyId projectId="PJ2608-0550" componentKey={"bid.working-preview.requirement."+r.id}/></td><td>{r.state}<button type="button" onClick={()=>{setSystem(r.systemToken);onNavigate("bid.working-preview.step.8");}}>ดู Punch / วิธีเดินงานต่อ</button></td><td><button type="button" onClick={()=>editRequirement(r)}>อ่าน / วิเคราะห์ / Map</button></td></tr>)}</tbody></table></div></details>)}
   </>;
-  if(stage.step===5)body=<>{selection}
+  if(stage.step===5)body=<>
+   {requirementPicker(showQuantity,current&&<div className="p55-review-toolbar">
+    {current.workLineIds.length>0
+     ?<button type="button" onClick={()=>showQuantity(current.id)}>ดูแถวที่เลือกใน WP.5</button>
+     :<span role="status">ข้อที่เลือกยังไม่มีรหัสอ้างอิง Working</span>}
+    <button type="button" onClick={()=>onNavigate("bid.working-preview.requirement."+current.id)}>เปิดข้อที่เลือกใน WP.4</button>
+   </div>)}
    <WorkingQuantity0550 key={system} requirements={visible} scopes={model.scopes} system={system}
-    names={names} data={data} model={bidModel} studyDeliveries={studyDeliveries} onNavigate={onNavigate}/>
+    names={names} data={data} model={bidModel} studyDeliveries={studyDeliveries}
+    focus={quantityFocus?.id===current?.id?quantityFocus:null} onNavigate={onNavigate}/>
   </>;
   if(stage.step===6)body=<><LifecycleCostDrivers0550 data={data} model={bidModel} onNavigate={onNavigate}/>{selection}<button type="button" disabled={!current} onClick={newActivity}>เพิ่มงาน / คน / ITP / เอกสาร</button><Note>แผนงานและเอกสารต้องมีผู้รับผิดชอบ เกณฑ์ยอมรับ ผลส่งมอบ ปริมาณ/ทรัพยากร และ Working cost owner · กิจกรรมหนึ่งเชื่อม requirement ได้ผ่านทะเบียนกลางโดยไม่บวกต้นทุนซ้ำ</Note>
    {activity&&<form aria-label="Execution Activity editor" onSubmit={async e=>{e.preventDefault();await save("activities",activity);}}><div className="p55-bid-fields">{requirementSelect(activity,setActivity)}<Select label="Execution / deliverable kind" value={activity.kind} onChange={v=>setField(setActivity,"kind",v)} options={DELIVERY_KINDS_0550}/><Field label="Activity / deliverable title" value={activity.title} onChange={v=>setField(setActivity,"title",v)} required/><Field label="Responsible party / role / qualifications" value={activity.responsible} onChange={v=>setField(setActivity,"responsible",v)}/><Field label="Activity quantity" type="number" min="0" step="any" value={activity.quantity} onChange={v=>setField(setActivity,"quantity",v)}/><Field label="Activity unit" value={activity.unit} onChange={v=>setField(setActivity,"unit",v)}/><Select label="Activity calculation driver" value={activity.calculationId} onChange={v=>setField(setActivity,"calculationId",v)} options={[["","ปริมาณตามหลักฐานที่ระบุ"],...data.calculations.map(c=>[c.id,c.title])]}/><Select label="Activity Working cost owner" value={activity.workLineId} onChange={v=>setField(setActivity,"workLineId",v)} options={[["","เลือกเจ้าของงาน/ต้นทุน"],...ids(data.lines)]}/><Field label="Activity scope / source / interface basis" value={activity.scopeBasis} onChange={v=>setField(setActivity,"scopeBasis",v)}/><Field label="Inspection / acceptance / hold-witness criteria" value={activity.acceptanceCriteria} onChange={v=>setField(setActivity,"acceptanceCriteria",v)}/><Field label="Deliverable / VDRL code / record / qualification evidence" value={activity.deliverable} onChange={v=>setField(setActivity,"deliverable",v)}/><Field label="Deliverable due date" type="date" value={activity.dueDate} onChange={v=>setField(setActivity,"dueDate",v)}/><ReviewFields form={activity} setForm={setActivity} date={reviewDate}/></div><Save busy={busy}>บันทึกแผนงานและเอกสาร</Save></form>}
