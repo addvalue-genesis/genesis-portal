@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.4",
+  "version": "2026-11-05.5",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "f1701c76",
-  "capability": "All19 existing systems plus COMMON use one original Supplier cost projection independent of A/B/C allocation. Full quote/base/net/options/native units/FX stay intact across shared-system views; MGW printed/detail conflicts and unknown Asactual prices remain explicit. Mapping-only candidate links are separate from declared source applicability. Working tables label allocated cost separately; native item bodies load on disclosure. Preserve all financial/source/quantity/FX/review/export/history records and existing IDs."
+  "source0550": "5b92d9ae",
+  "capability": "Working price rows show selected quotation and registered alternatives separately from review status. Named requirement links and saved MGW package quantities load on disclosure. All19 systems plus COMMON retain original supplier cost, separate ABC allocation, stable identities and saved financial/source/review/history records."
 }

@@ -67,7 +67,7 @@ const server=http.createServer((req,res)=>{const url=req.url.split('?')[0],asset
  assert.deepEqual(await read(),initial,'Opening summary does not save or rewrite any price/history');
  await page.getByRole('button',{name:'Official · ตรวจทบทวนแล้ว',exact:true}).click();assert((await customer.innerText()).includes('$'),'Provisional candidate prices remain explicitly visible alongside Official OPEN');
  await page.getByRole('group',{name:'Bidding pricing stages'}).getByRole('button').filter({hasText:'Release Preview USD'}).click();await summary.getByRole('table',{name:'Known customer prices by part',exact:true}).waitFor();assert((await summary.innerText()).includes('PROVISIONAL'));
- await page.getByRole('button',{name:'Working · ราคาเดิมรออัปเดต',exact:true}).click();
+ await page.getByRole('button',{name:'Working · ราคาที่เลือก / ประมาณการ',exact:true}).click();
  console.log('CHECK release table');
  const release=page.locator('[data-component-key="bid.budget.release"]'),identity=release.getByRole('region',{name:'Release table Module ID'}),table=release.getByRole('table',{name:'Official customer form',exact:true});
  if(process.env.PJ0550_FULL_BID_ONLY){

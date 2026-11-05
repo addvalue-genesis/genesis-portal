@@ -17,7 +17,7 @@ export function VendorWorkspace(){
  return <div className="p55-stack p55-vendor-workspace">
  <Module id="bid.vendor.master" title="07.1 Vendor / Service Provider">
  {vendorSync&&<p role="status" aria-label="Vendor register loaded status">{vendorSync.message}</p>}
- <p>ราคาเดิมที่นำเข้า: {data.vendorBasisImport?.importedLineIds.length||0} รายการ · รอปรับปรุงราคาใหม่ · วันที่/Validity ที่ไม่ทราบคงว่างตามหลักฐาน</p>
+ <p>ฐานราคาเริ่มต้นที่นำเข้า: {data.vendorBasisImport?.importedLineIds.length||0} รายการ · ตรวจฉบับที่เลือกใช้ใน Working · วันที่/Validity ที่ไม่ทราบคงว่างตามหลักฐาน</p>
  <p>MGW Q26-063: {data.offers.filter(mgwQuoteItem0550).length} รายการ · {data.mgwQuoteImport?.conflicts.join(" · ")||"นำเข้าเพื่อเลือกตรวจราคา — ไม่แทนผู้ขายเดิมอัตโนมัติ"}</p>
  <p>ผู้ขายหนึ่งรายมีหลายใบเสนอราคา/เรตได้ แยกต้นทุนจากราคาขาย และเลือกเรตไปใช้ใน Working โดยอ้างอิง Offer ID</p>
  <form onSubmit={async e=>{e.preventDefault();if(await put("vendors",{...vendor,id:vendor.id||newId("VEN")}))setVendor({id:"",name:"",kind:"SUPPLIER",reference:""});}}>

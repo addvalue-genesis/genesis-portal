@@ -1824,3 +1824,11 @@ details[open]>summary>.p55-vnd-toggle>span:last-child{display:inline}
 [aria-label="RFQ bid process result"] { min-width:0; overflow-wrap:anywhere; }
 
 .p55-bid-presentation { overflow-wrap:anywhere; }
+
+.p55-working-requirement-trace { max-width:100%; overflow-wrap:anywhere; }
+.p55-working-requirement-trace > ul { max-height:18rem; overflow:auto; margin:8px 0; padding-left:20px; }
+.p55-working-requirement-trace li { margin-bottom:8px; }
+.p55-working-requirement-trace button,.p55-working-quote-basis button { max-width:100%; white-space:normal; overflow-wrap:anywhere; }
+.p55-working-quote-basis { margin-top:8px; overflow-wrap:anywhere; }
+
+.p55-working-source-items { max-height:18rem; overflow:auto; margin:8px 0; padding-left:20px; }

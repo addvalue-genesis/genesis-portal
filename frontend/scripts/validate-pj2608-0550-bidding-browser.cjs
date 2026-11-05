@@ -24,7 +24,7 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
   const money=async(table,value)=>assert((await page.getByRole('table',{name:table,exact:true}).innerText()).includes(value),table+' missing '+value);
   await page.goto(url);await page.locator('.p55-bid-save').filter({hasText:'Revision 1'}).waitFor();
   const seeded=await db();assert.equal(seeded.offers.length,139);assert.equal(seeded.offers.filter(o=>o.mgwQuoteLineId).length,130);assert.equal(seeded.vendors.filter(v=>/MGW|Megaway/i.test(v.name)).length,1);assert.equal(seeded.lines.filter(r=>!r.mrRequirementId&&r.selected).length,7);assert.equal(seeded.lines.filter(r=>r.mrRequirementId).length,264);assert.equal(seeded.lines.length,273);assert.equal(new Set(seeded.lines.filter(r=>r.mrRequirementId&&r.systemToken!=='COMMON').map(r=>r.systemToken)).size,19);
-  assert.equal(await page.getByRole('button',{name:'Working · ราคาเดิมรออัปเดต',exact:true}).getAttribute('aria-pressed'),'true');
+  assert.equal(await page.getByRole('button',{name:'Working · ราคาที่เลือก / ประมาณการ',exact:true}).getAttribute('aria-pressed'),'true');
   await expand('bid.budget.working.part.A');await expand('bid.budget.working.group.TEL-PAGA');await money('Working cost lines TEL-PAGA','226,454.05');
   await page.getByRole('group',{name:'Bidding pricing stages'}).getByRole('button',{name:/^Release Preview USD/}).click();
   const provisionalDownload=page.waitForEvent('download');await page.getByRole('button',{name:'Export REL-04 · Provisional Draft XLSX',exact:true}).click();const provisionalBytes=fs.readFileSync(await(await provisionalDownload).path());assert(provisionalBytes.toString().includes('PROVISIONAL'));assert(provisionalBytes.toString().includes('OPEN'));assert(!provisionalBytes.toString().includes('226454.05'));
@@ -183,7 +183,7 @@ const server=http.createServer((req,res)=>{const asset=req.url.split('?')[0];con
    {...satBase,id:'SAT-TSI',scopeKey:'SAT.TSI',description:'Synthetic retained cabinet',satelliteScope:'TSI_EQUIPMENT'},
    {...satBase,id:'SAT-KU',systemToken:'TEL-VSAT-KU',customerRowCode:'A1-01',scopeKey:'SAT.KU',description:'Synthetic unresolved Internet',satelliteScope:'CLARIFICATION'}];
   await importFile(satelliteWorkspace);await page.waitForFunction(rev=>document.querySelector('.p55-bid-save').textContent.includes('Revision '+(rev+1)),beforeSatellite.revision);
-  await nav('Budget');await page.getByRole('group',{name:'Budget context'}).getByRole('button',{name:/OFF-03/}).click();await page.getByRole('button',{name:'Working · ราคาเดิมรออัปเดต',exact:true}).click();
+  await nav('Budget');await page.getByRole('group',{name:'Budget context'}).getByRole('button',{name:/OFF-03/}).click();await page.getByRole('button',{name:'Working · ราคาที่เลือก / ประมาณการ',exact:true}).click();
   await expand('bid.budget.working.part.A');await expand('bid.budget.working.group.TEL-VSAT');
   const satelliteRow=id=>page.locator('[data-component-key="bid.budget.working.line.'+id+'"]');
   assert((await satelliteRow('SAT-OLD').innerText()).includes('SATELLITE_SCOPE_OPEN'));
