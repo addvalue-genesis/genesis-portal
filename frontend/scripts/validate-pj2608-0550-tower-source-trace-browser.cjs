@@ -66,7 +66,11 @@ const server=http.createServer((req,res)=>{
  }
  const erection=trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-10"]');assert((await erection.innerText()).includes('CNEEC Option'));
  await erection.getByRole('button',{name:'เปิดแถวขอบเขต Working',exact:true}).click();
- assert(await page.locator('[data-component-key="bid.budget.working.line.REQ-MR-ACT-C1-D04"]').isVisible(),'Source row opens existing CNEEC scope reference');
+ const erectionReference=page.locator('[data-component-key="bid.budget.working.line.REQ-MR-ACT-C1-D04"]');
+ await erectionReference.waitFor({state:'visible'});
+ assert((await erectionReference.innerText()).includes('CNEEC Option'),'Source row opens the existing CNEEC scope reference');
+ const civilReference=page.locator('[data-component-key="bid.budget.working.line.REQ-MR-ACT-C1-D05"]');
+ assert((await civilReference.innerText()).includes('อยู่นอก TSI'));
  await jump('bid.budget.working.group.TEL-TELT');await openQuotes();
  await trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-10"]').getByRole('button',{name:'เปิด Vendor Item 10',exact:true}).click();
  await page.locator('[data-component-key="bid.vendor.offer.OFFER-MASTER-TOWER-2609.95.1-10"]').waitFor({state:'visible'});
