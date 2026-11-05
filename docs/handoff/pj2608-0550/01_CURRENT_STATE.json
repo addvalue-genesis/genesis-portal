@@ -8,7 +8,7 @@
   "localRoute": "http://localhost:3050/projects/pj2608-0550",
   "headPolicy": "Resolve current HEAD and dirty files with Git; this file is a checkpoint, not proof of Windows deployment or saved workspace state.",
   "contextCommand": "npm run context:pj0550",
-  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_SUPPLIER_ITEM_TEXT_AND_MAPPING_REUSE.md",
+  "latestCheckpoint": "docs/handoff/pj2608-0550/20261105_A_INPUT_AUDIT_EXECUTION.md",
   "requiredReading": [
     "AGENTS.md",
     "docs/architecture/ADR-0550-001-integrator-traceability.md",
@@ -49,7 +49,8 @@
     "docs/handoff/pj2608-0550/20261105_KU_SUPPLIER_MAPPING_VISIBILITY.md",
     "docs/handoff/pj2608-0550/20261105_PUNCH_CLOSURE_AND_MR_VENDOR_DETAILS.md",
     "docs/handoff/pj2608-0550/20261105_PUNCH_OPTIONAL_CONTROLS.md",
-    "docs/handoff/pj2608-0550/20261105_SUPPLIER_ITEM_TEXT_AND_MAPPING_REUSE.md"
+    "docs/handoff/pj2608-0550/20261105_SUPPLIER_ITEM_TEXT_AND_MAPPING_REUSE.md",
+    "docs/handoff/pj2608-0550/20261105_A_INPUT_AUDIT_EXECUTION.md"
   ],
   "canonicalContracts": {
     "architecture": "frontend/src/project0550/architectureManifest.js",
@@ -93,6 +94,7 @@
     "Preserve saved edits/deletions, prices/quantity/FX and frozen issue/history."
   ],
   "nextWork": [
+    "Actual source work5-Nov-2026: original MR Appendix2 PDF31-35/printed29-33 visually verified against available681-source reconstruction;100/107 inputs satisfy receipt,7 unresolved:5 version/number discrepancies and2 exact originals not located in searched sources. Bound-document review gaps95; no completed manifest review. SI assistant owns continuing archive/source reconciliation and native evidence drafts. Do not replace10008 with10006 or historical2022 C revisions by inference. No UI/source/price/Qty/FX/acceptance/history writes; owner Windows database unobserved. See A-input audit execution checkpoint.",
     "UI2026-11-05.11: show original Supplier item detail in existing Working/Vendor views; source-text correction only. MAP-01–10/Common TAG primitives audited before future0550 adapter; do not equate site tagRef with verified customer equipment TAG. Preserve Mapping, all prices/Qty/FX/source/reviews/history; see checkpoint for tests/limits.",
     "UI2026-11-05.10: optional Punch tools are for inspection/explicit plan editing, never a start dependency. Source work proceeds directly; only native validators establish closure. Preserve4a7d0f7 source-tracking, exact work routes and per-MR original Supplier details. No automatic assignments, plans, source edits or issue acceptance. See latest checkpoint for actual validation.",
     "UI2026-11-05.9: continue existing Punch with native cause-level closure, no false closure by deletion/phase change, and unsaved exact Proof/Activity editor routes. Per-MR full Supplier detail reuses canonical Mapping, preserving source and financial ownership. Optional tracking is explicit-save only; old notes stay unverified without subjects. See latest checkpoint for actual tests and formal-issue/Windows limits.",
