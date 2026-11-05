@@ -133,6 +133,7 @@
     "Collapsed C1 Appendix headers now show known USD owner subtotals aligned with Total Price, labelled when incomplete; internal counts explain missing price/coverage. Keep strict totals and native/frozen output separate. Existing179 MR rows/order and financial ownership remain governed; continue source/SI/vendor mapping and PAGA closure.",
     "PAGA multi-source clause/engineering reconciliation remains OPEN:217 new TAG candidates are DTS-only customer evidence,95 old authored drafts were retained;16 derived MR defaults still need exact sources,5 prior RPTs OPEN and no closed PAGA scope review. The revision importer is not full A/SI acceptance.",
     "Private PAGA outputs10/11/12 and v2 technical draft package are separate from Git and Windows saved data. Do not treat a qualified quoted-package pricing scenario as complete customer CIF/FOB price or adopt it automatically.",
+    "UI 2026-11-05.16: 10.7 detail rows expose Working-bound Offers as internal trace links to B07. Source and customer export stay separate. Price-summary SSR, production build and Release Issue validation passed; Windows runtime unverified.",
     "Implementation verification and existing-branch delivery are recorded in the latest checkpoint. No customer issue or PR merge is authorised by presentation completion."
   ],
   "historicalState": "The prior 2026-10-09 branch/PR2/port3000/STAGING checkpoint remains in Git history; it is not the current launch instruction."

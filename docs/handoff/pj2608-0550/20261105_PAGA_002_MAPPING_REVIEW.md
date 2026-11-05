@@ -9,3 +9,9 @@ Already linked rows open their existing requirement. An unlinked eligible row ca
 The actual Source Rev14/A10 and Vendor register verified all four original item/page excerpts and four existing Offer links. Supplier revision regression covered an item followed by another item containing XBC, duplicate identities, no repeated append, unchanged input and unchanged Working references. Existing supplier importer and Vendor SSR passed. Working Preview JSX compilation passed. Windows browser state was not observed.
 
 APF and ACP Access Panel quantities need the fourth panel TAG/location and unit-equivalence decision. XBC requires site/circuit review. Review the FCA delivery basis and the previous extra rows before using the revised NET as a single Working price owner. Release remains subject to its existing checks.
+
+## 10.7 internal Offer trace
+
+UI `2026-11-05.16`, parent `ccb59c0`. Expanded Release detail rows show the Offer linked to the Working price basis, with a direct route to B07. Included scope traces to its shared owner. The display uses the existing Working Offer resolver for quoted packages and identifies missing links explicitly. A registered revision appears here only when it is bound to the price basis. This applies ADR-0550-001 principles 3, 5, 8, 10, 11 and 12.
+
+The price-summary SSR regression expands the PAGA row and verifies the saved Offer appears outside the eight customer cells. Production build and controlled Release Issue validation passed. The change does not update financial inputs, source bindings, review or frozen issue data. The prior engineering and commercial decisions above remain open. Windows runtime was not observed.

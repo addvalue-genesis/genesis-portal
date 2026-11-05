@@ -96,6 +96,24 @@ assert(releaseHtml.includes('เหตุผลที่ยังเป็น OP
 assert(releaseHtml.includes('ราคาย่อยที่คำนวณได้'));assert(releaseHtml.includes('HOLD / NOT ISSUED'));
 assert(releaseHtml.includes('Full Bid systems'));for(const row of inventory)assert(releaseHtml.includes('data-full-bid-system="'+row.token+'"'));assert(releaseHtml.includes('MR-B1-11-APF-05'));
 assert(releaseHtml.includes('MR อ้างอิง / Revision / หน้า / Appendix'));assert(releaseHtml.includes(MR.MR_WORKING_CATALOG_0550.document));
+// Expand the PAGA detail in the SSR harness as the user does in REL-04.
+const pagaLine=m.provisional.lines.find(l=>l.id==='LINE-LEGACY-TEL-PAGA-1');
+const pagaRow=hierarchy.entries.find(r=>r.key===pagaLine.id);
+const linkedOffer=d.offers.find(o=>o.id===pagaLine.offerId);
+assert(pagaRow&&linkedOffer);
+const storage=globalThis.localStorage;
+try {
+ globalThis.localStorage={getItem:key=>key==='GENESIS.PJ2608-0550.release.expanded.v1'
+  ?JSON.stringify(Object.fromEntries(pagaRow.parents.map(key=>[key,true]))):null};
+ const expanded=renderToStaticMarkup(React.createElement(OfficialCustomerForm,{official:m.provisional,onSource:()=>{},onNavigate:()=>{}}));
+ const pagaMarkup=expanded.split('data-component-key="'+pagaRow.moduleId+'"')[1].split('</tr>')[0];
+ assert(pagaMarkup.includes('Offer ที่ผูกกับ Working · อ้างอิงภายใน'));
+ assert(pagaMarkup.includes('>'+linkedOffer.quoteRef+'</button>'),'Show the linked PAGA Offer in 10.7');
+ assert(!rowsBefore.find(r=>r.key===pagaLine.id).cells.includes(linkedOffer.quoteRef),'Offer trace is separate from the customer cells');
+} finally {
+ if(storage===undefined)delete globalThis.localStorage;
+ else globalThis.localStorage=storage;
+}
 const registry=require(root+'/project0550/bidPresentation0550.js').bidPresentationIndex(d.lines);
 for(const part of ['A','B','C']){const id='bid.budget.release.part.'+part;assert.equal(registry.filter(r=>r.id===id).length,1);assert(releaseHtml.includes('data-component-key="'+id+'"'));assert(releaseHtml.includes('Copy component ID '+id));}
 assert.equal(JSON.stringify(d),before,'Rendering release diagnostics never changes raw prices, selections, FX, reviews or history');
