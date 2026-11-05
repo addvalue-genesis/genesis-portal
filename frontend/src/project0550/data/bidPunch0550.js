@@ -4,6 +4,15 @@ import {deriveBidProcess0550,bidStudyDelivery0550} from './bidProcess0550';
 import {deriveBidVolumes0550} from './bidVolumes0550';
 import {bidCompletionBasisChanged0550} from './bidCompletion0550';
 
+export function punchTaskRoute0550(row,requirements,preferredId){
+ const code=row.id.split('|')[0],candidates=(row.requirementIds||[]).map(id=>requirements.find(r=>r.id===id)).filter(r=>r&&(r.problems||[]).some(p=>p.split(' / ')[0]===code)),requirement=candidates.find(r=>r.id===preferredId)||candidates[0];
+ if(code==='ENGINEERING_PROOF_OPEN'&&requirement&&['CAL','RPT'].includes(requirement.proofMode))return {kind:'PROOF',requirement,recordId:requirement.proofs?.find(p=>p.kind===requirement.proofMode&&p.state!=='REVIEWED_PROOF')?.id};
+ if(code==='ACTIVITY_OPEN'&&requirement){const kind=requirement.problems.find(p=>p.startsWith('ACTIVITY_OPEN / '))?.split(' / ')[1];return {kind:'ACTIVITY',requirement,activityKind:kind||'INSTALLATION',recordId:requirement.activities?.find(a=>a.kind===kind&&a.state!=='REVIEWED_PLAN')?.id};}
+ return {kind:'TARGET',target:requirement&&row.target?.startsWith('bid.working-preview.requirement.')?'bid.working-preview.requirement.'+requirement.id:row.target,sourceTarget:row.sourceTarget};
+}
+export const punchProofDraft0550=(r,id)=>({id,requirementId:r?.id||'',title:'',kind:r?.proofMode==='RPT'?'RPT':'CAL',calculationId:'',operator:'GTE',limit:null,unit:'',method:'',inputsBasis:'',criteria:r?.criteria||'',limitations:'',report:'',outcome:'OPEN',reviewer:'',reviewedOn:'',status:'DRAFT',basisKey:''});
+export const punchActivityDraft0550=(r,id,kind='INSTALLATION')=>({id,requirementId:r?.id||'',kind,title:'',responsible:'',quantity:null,unit:'',calculationId:'',workLineId:'',scopeBasis:'',acceptanceCriteria:r?.criteria||'',deliverable:'',dueDate:'',reviewer:'',reviewedOn:'',status:'DRAFT',basisKey:''});
+
 // Translate existing 0550 conditions, never rewrite their state or acceptance.
 export function punchCause0550(code){
  if(code==='REVIEW_OPEN')return {severity:'MINOR',priceEffect:'EVIDENCE',title:'รอบันทึกผลทบทวน',action:'ตรวจเนื้อหาและฐานก่อนบันทึกผู้ทบทวน/วันที่ในแบบเดิม'};
@@ -14,6 +23,51 @@ export function punchCause0550(code){
  if(/AVL|DEVIATION/.test(code))return {severity:'MAJOR',priceEffect:'SCOPE',title:'AVL / ข้อยกเว้นยังไม่ยืนยัน',action:'ตรวจผู้ผลิต/รุ่นกับข้อกำหนด; ถ้ามีทางเลือกให้ผูกต้นทุนและผลกระทบ พร้อมดำเนินข้อยกเว้นในทะเบียนเดิม'};
  if(/SOURCE|EXCERPT|CLAUSE|PARTICULAR|DOCUMENT/.test(code))return {severity:'REVIEW',priceEffect:'UNKNOWN',title:'ต้องตรวจฐานเอกสาร/ประเด็นต้นทาง',action:'อ่านประเด็นและฉบับที่เกี่ยวข้อง ระบุว่ากระทบชนิด จำนวน ขอบเขต หรือเป็นงานเอกสาร; ผูกหลักฐานและฐานราคาที่ใช้'};
  return {severity:'REVIEW',priceEffect:'UNKNOWN',title:'ต้องประเมินเงื่อนไขเพิ่มเติม',action:'เปิดต้นทางของเงื่อนไข ประเมินผลต่อราคาและกำหนดส่งก่อนจัด Major/Minor'};
+}
+// A disappeared row is not evidence of closure. New plans retain their exact
+// source subjects; the original live validators must clear the tracked cause.
+export function punchGateScope0550(data,model){
+ const ids=rows=>(rows||[]).map(r=>r.id||r.inputId||r.code).sort();
+ return integrationFingerprint0550({requirements:ids(model.integration?.requirements),findings:ids(data.sourceIntake?.findings),lines:ids(data.lines),inputs:ids(model.sourceReadiness?.rows),records:ids(data.bidVolumes?.records),vdrl:ids(data.bidVolumes?.vdrl),bindings:ids(data.bidVolumes?.bindings)});
+}
+export function resolveBidPunchPlan0550(data,model,plan,volumes,scopeKey){
+ const t=plan.tracking,unknown=reason=>({id:plan.id,verified:false,reason});
+ if(!t||t.key!==plan.id)return unknown('แผนเดิมไม่มีชุดอ้างอิงต้นทางสำหรับยืนยันการปิด');
+ const [code,,system,proofMode]=plan.id.split('|'),i=model.integration||{};
+ const reqCodes=['REVIEW_OPEN','REVIEW_BASIS_OPEN','STALE_DEPENDENCIES','ENGINEERING_PROOF_OPEN','RESPONSIBILITY_OPEN','SUPPLIER_ALLOCATION_OPEN','WORKING_ALLOCATION_OPEN','REQUIREMENT_INTERPRETATION_OPEN','PROOF_DISPOSITION_OPEN','CUSTOMER_SOURCE_OPEN','SUPPLIER_SOURCE_OPEN','CURRENT_SOURCE_OPEN','SOURCE_REVISION_OR_COPY_OPEN','SOURCE_MISSING','CONTENT_UNREAD','CLAUSE_LOCATOR_OR_EXCERPT_OPEN','EXCERPT_NOT_IN_REVIEWED_TEXT','OFFER_MISSING','AVL_REVIEW_OPEN','ACTIVITY_OPEN','TECHNICAL_DEVIATION_OPEN'];
+ const prefixes={PARTICULAR:['PARTICULAR_OPEN','PARTICULAR_ACTIVITY_OPEN'],FINDING:['SOURCE_FINDING'],OWNER:['PRICE','COMMERCIAL'],TECHNICAL:['TECHNICAL'],VDRL:['VDRL'],PACKAGE:['PACKAGE'],A_INPUT:['A_INPUT'],ISSUE:['ISSUE'],BUDGET:['BUDGET_BASIS_CHANGED']};
+ if(t.kind==='REQUIREMENTS'?!reqCodes.includes(code):!prefixes[t.kind]?.includes(code))return unknown('ชนิดต้นทางไม่ตรงกับสาเหตุที่ติดตาม');
+ if(t.kind!=='REQUIREMENTS'&&t.kind!=='BUDGET'&&(t.subjectIds.length!==1||plan.id!==code+'|'+t.subjectIds[0]))return unknown('ตัวตนต้นทางไม่ตรงกับรายการ Punch เดิม');
+ let records=[],valid=false,target='bid.working-preview.step.8';
+ if(t.kind==='REQUIREMENTS'){
+  records=t.subjectIds.map(id=>(i.requirements||[]).find(r=>r.id===id));
+  valid=records.length>0&&records.every(r=>r&&Array.isArray(r.problems)&&(!system||r.systemToken===system)&&(!proofMode||r.proofMode===proofMode));
+  if(valid)valid=records.every(r=>{
+   if(r.problems.some(p=>p.split(' / ')[0]===code))return false;
+   if(r.disposition==='NOT_APPLICABLE')return r.state==='NOT_APPLICABLE';
+   if(['REVIEW_OPEN','REVIEW_BASIS_OPEN','STALE_DEPENDENCIES'].includes(code))return r.status==='REVIEWED'&&!r.problems.some(p=>['REVIEW_OPEN','REVIEW_BASIS_OPEN','STALE_DEPENDENCIES'].includes(p));
+   if(code==='ENGINEERING_PROOF_OPEN')return r.proofs?.some(p=>p.kind===r.proofMode&&p.state==='REVIEWED_PROOF')||r.state==='REVIEWED_MAPPING';
+   return true;
+  });
+  if(records[0])target='bid.working-preview.requirement.'+records[0].id;
+ }else if(t.kind==='PARTICULAR'){
+  records=t.subjectIds.map(id=>(i.particulars||[]).find(p=>p.id===id));valid=records.length>0&&records.every(p=>p?.state==='REVIEWED_PARTICULAR');target='bid.working-preview.particular.'+t.subjectIds[0];
+  if(code==='PARTICULAR_ACTIVITY_OPEN')valid=valid&&Boolean(t.linkedIds?.length)&&t.linkedIds.every(id=>{const r=i.requirements?.find(r=>r.id===id);return r&&!r.problems.some(p=>p.startsWith('PARTICULAR_ACTIVITY_OPEN / '+t.subjectIds[0]+' / '));});
+ }else if(t.kind==='FINDING'){
+  records=t.subjectIds.map(id=>(data.sourceIntake?.findings||[]).find(f=>f.id===id));valid=records.length>0&&records.every(f=>f?.state==='SOURCE_SUPPORTED');target='bid.documents.finding.'+t.subjectIds[0];
+ }else if(t.kind==='OWNER'){
+  records=t.subjectIds.map(id=>model.provisional?.selected.find(l=>l.id===id));
+  valid=records.length>0&&records.every(l=>l&&Number.isFinite(l.customerUSD)&&Number.isFinite(l.costTHB)&&(!plan.id.startsWith('COMMERCIAL|')||!(l.problems||[]).some(p=>/Quote|DUPLICATE|NON_ADDITIVE|scope|MR_|SATELLITE_|FX|mismatch/i.test(p))));target='bid.budget.working.line.'+t.subjectIds[0];
+ }else if(t.kind==='TECHNICAL'||t.kind==='VDRL'){
+  const collection=t.kind==='TECHNICAL'?volumes?.technical.records:volumes?.vdrl;
+  records=t.subjectIds.map(id=>collection?.find(r=>r.id===id));valid=records.length>0&&records.every(r=>r&&(t.kind==='TECHNICAL'?r.state==='REVIEWED_DRAFT':r.state==='REVIEWED'&&(t.requiredPhase!=='BID'||r.phase==='BID')));target=t.kind==='TECHNICAL'?'bid.technical.'+(records[0]?.sectionId||'overview'):'bid.technical.vdrl';
+ }else if(t.kind==='BUDGET'){
+  valid=Boolean(t.scopeKey&&t.scopeKey===(scopeKey||punchGateScope0550(data,model))&&data.repositoryBasisImport?.bidCompletion&&!bidCompletionBasisChanged0550(data));target='bid.budget.official.summary';
+ }else if(['PACKAGE','A_INPUT','ISSUE'].includes(t.kind)){
+  const gate=t.kind==='PACKAGE'?data.bidVolumes&&volumes:t.kind==='A_INPUT'?model.sourceReadiness:model.releaseControl;
+  valid=Boolean(t.scopeKey&&t.scopeKey===(scopeKey||punchGateScope0550(data,model))&&gate?.ready===true&&Array.isArray(gate.problems)&&t.subjectIds.every(p=>!gate.problems.includes(p)));target=t.kind==='A_INPUT'?'l3.original':t.kind==='PACKAGE'?'bid.quotation':'bid.budget.release';
+ }else return unknown('ยังไม่มีวิธียืนยันการปิดสำหรับชนิดต้นทางนี้');
+ return {id:plan.id,verified:valid,reason:valid?'ต้นทางชุดเดิมยังอยู่ และผลตรวจปัจจุบันไม่พบสาเหตุนี้แล้ว':'ต้นทางถูกลบ/เปลี่ยนบริบท หรือผลตรวจเดิมยังไม่ผ่าน จึงยังยืนยันการปิดไม่ได้',target,sourceTarget:t.kind==='FINDING'||t.kind==='A_INPUT'};
 }
 export function deriveBidPunch0550(data,model,systems,today){
  const integration=model.integration||{},process=deriveBidProcess0550(data,model,systems),owners=model.provisional?.selected||[];
@@ -71,8 +125,14 @@ export function deriveBidPunch0550(data,model,systems,today){
  for(const problem of volumes.problems||[]){const cause=punchCause0550(problem),row=add('PACKAGE|'+problem,{...cause,priceEffect:'EVIDENCE',severity:'MAJOR',title:problem,context:'เงื่อนไขความครบชุดข้อเสนอเดิม',action:'เปิดแบบราคา/แผนเอกสาร ตรวจรายการลูกและฐานที่ยังขาด ไม่เปลี่ยนสถานะต้นทางจาก Punch plan',target:/VDRL|VOLUME_II|TECHNICAL/.test(problem)?'bid.technical.vdrl':/VOLUME_III/.test(problem)?'bid.commercial':'bid.quotation',requiredWithBid:true,phase:'BID'});row.systemTokens.push('COMMON');row.codes.push(problem);}
  for(const problem of model.sourceReadiness?.problems||[]){const row=add('A_INPUT|'+problem,{severity:'MAJOR',priceEffect:'EVIDENCE',title:problem,context:'A · เงื่อนไขฐานข้อมูล/การอ่าน/ฉบับใช้งานที่ยังค้าง',action:'เปิด A ตรวจทะเบียนเอกสาร การรับข้อมูลและผลทบทวน ใช้ฐานราคาเดิมทำร่างต่อ พร้อมตรวจผลกระทบของข้อมูลที่ยังไม่ครบ',target:'l3.original',sourceTarget:true});row.systemTokens.push('COMMON');row.codes.push(problem);}
  for(const problem of model.releaseControl?.problems||[]){const row=add('ISSUE|'+problem,{severity:'MAJOR',priceEffect:'EVIDENCE',title:problem,context:'เงื่อนไขออกฉบับอย่างเป็นทางการเดิม ไม่ใช่เงื่อนไขหยุดคำนวณร่าง',action:'ตรวจสาเหตุใน10.7และปิดที่ต้นทาง แผน Punch ไม่แทนการทบทวนหรือการอนุญาตออกฉบับ',target:'bid.budget.release'});row.systemTokens.push('COMMON');row.codes.push(problem);}
- const issues=[...groups.values()].map(r=>({...r,systemTokens:[...new Set(r.systemTokens.length?r.systemTokens:['COMMON'])],requirementIds:[...new Set(r.requirementIds)].filter(id=>reqById.has(id)),workLineIds:[...new Set(r.workLineIds)],codes:[...new Set(r.codes)]}));
- const assessed=assessBidPunch({issues,plans:data.bidPunchPlans||[],owners:owners.map(o=>({id:o.id,selected:o.selected,costAmount:o.costTHB,sellAmount:o.customerUSD})),today,documentsReady:volumes.ready,engineeringReady:Boolean(integration.ready)});
- const stageView=stageBidPunch(assessed.rows.map(r=>({...r,workStage:r.hardPriceBlock||/^(PRICE\||COMMERCIAL\||BUDGET_BASIS_CHANGED|A_INPUT\|)/.test(r.id)||/^ISSUE\|(NATIVE_EXHIBIT_C:|CUSTOMER_SCOPE_OPEN|REVIEWED_USD_PRICE_OPEN|BASE_TOTAL_OPEN|CURRENT_FX_OPEN|REQUIREMENT_OR_PRICE_MAPPING_OPEN|A_INPUT_READINESS_OPEN|SOURCE_INTAKE_OPEN)/.test(r.id)?'PREPARE':r.workStage})));
+ const scopeKey=punchGateScope0550(data,model);
+ const issues=[...groups.values()].map(r=>{
+  const requirementIds=[...new Set(r.requirementIds)].filter(id=>reqById.has(id)),[prefix,...parts]=r.id.split('|'),ref=parts.join('|');
+  const kind=prefix.startsWith('PARTICULAR')?'PARTICULAR':prefix==='SOURCE_FINDING'?'FINDING':['PRICE','COMMERCIAL'].includes(prefix)?'OWNER':prefix==='BUDGET_BASIS_CHANGED'?'BUDGET':['TECHNICAL','VDRL','PACKAGE','A_INPUT','ISSUE'].includes(prefix)?prefix:'REQUIREMENTS';
+  return {...r,systemTokens:[...new Set(r.systemTokens.length?r.systemTokens:['COMMON'])],requirementIds,workLineIds:[...new Set(r.workLineIds)],codes:[...new Set(r.codes)],tracking:{kind,key:r.id,subjectIds:kind==='REQUIREMENTS'?requirementIds:[ref||prefix],requiredPhase:r.requiredWithBid?'BID':r.requiredPhase||'REVIEW',...(prefix==='PARTICULAR_ACTIVITY_OPEN'?{linkedIds:requirementIds}:{}),...(['PACKAGE','A_INPUT','ISSUE','BUDGET'].includes(kind)?{scopeKey}:{})}};
+ });
+ const plans=data.bidPunchPlans||[],resolutions=plans.map(p=>resolveBidPunchPlan0550(data,model,p,volumes,scopeKey));
+ const assessed=assessBidPunch({issues,plans,owners:owners.map(o=>({id:o.id,selected:o.selected,costAmount:o.costTHB,sellAmount:o.customerUSD})),today,documentsReady:volumes.ready,engineeringReady:Boolean(integration.ready),resolutions});
+ const stageView=stageBidPunch(assessed.rows.map(r=>({...r,taskStage:r.stage,workStage:r.hardPriceBlock||/^(PRICE\||COMMERCIAL\||BUDGET_BASIS_CHANGED|A_INPUT\|)/.test(r.id)||/^ISSUE\|(NATIVE_EXHIBIT_C:|CUSTOMER_SCOPE_OPEN|REVIEWED_USD_PRICE_OPEN|BASE_TOTAL_OPEN|CURRENT_FX_OPEN|REQUIREMENT_OR_PRICE_MAPPING_OPEN|A_INPUT_READINESS_OPEN|SOURCE_INTAKE_OPEN)/.test(r.id)?'PREPARE':r.workStage})));
  return {...assessed,...stageView,volumeView:volumes,process,rawRequirementProblems:reqs.reduce((n,r)=>n+(r.problems?.length||0),0)};
 }

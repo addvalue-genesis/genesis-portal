@@ -110,7 +110,8 @@ export const MODULE_REGISTRY = [
     implementation: ["commercialSources in controlled project dataset", "frontend/src/project0550/VendorWorkspace.jsx", "frontend/src/project0550/data/vendorRegister0550.js", "frontend/src/project0550/WorkingSupplierTrace0550.jsx", "frontend/src/project0550/data/supplierCostProjection0550.js", "frontend/src/project0550/data/vendorRegisterAuto0550.js", "frontend/src/project0550/data/vendorDefaultCatalog0550.js", "frontend/src/project0550/data/vendorRegisterDefaults0550.json", "frontend/src/project0550/data/vendorRegisterCeragonDefaults0550.json", "frontend/src/project0550/BidWorkspaceContext.jsx", "frontend/scripts/source-drive-0550.cjs"],
     invariants: [
       "Do not show only a quotation total when line items/terms are available.",
-      "Commercial source truth must remain separate from internal allowance."
+      "Commercial source truth must remain separate from internal allowance.",
+      "Per-MR supplier item detail reads canonical requirement Offer references; it never infers Mapping from a shared price owner or adds another cost contribution."
     ]
   },
   {
@@ -192,7 +193,7 @@ export const MODULE_REGISTRY = [
     inputs: ["Risk scenarios", "Contract entitlement", "Insurance/mitigation"],
     outputs: ["Exposure", "Mitigation", "Recovery logic", "Residual risk"],
     implementation: ["riskScenarios in controlled dataset", "frontend/src/common/governance/bidPunch.js", "frontend/src/project0550/data/bidPunch0550.js", "frontend/src/project0550/BidPunch0550.jsx", "frontend/src/project0550/WorkingPreview0550.jsx"],
-    invariants: ["Cost exposure ≠ customer recovery.", "Bid Punch plans preserve original source/financial/technical/issue states; severity and due phase are independent, never an approval or contractual waiver."]
+    invariants: ["Cost exposure ≠ customer recovery.", "Bid Punch plans preserve original source/financial/technical/issue states; severity and due phase are independent, never an approval or contractual waiver.", "Punch closure uses live native validators and tracked original subjects; deletion, old untracked notes and planned deferrals cannot count as verified closure."]
   },
   {
     id: "MOD-REGULATORY-KNOWLEDGE",

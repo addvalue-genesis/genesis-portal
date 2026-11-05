@@ -4,9 +4,10 @@ const compile=(m,f)=>f.startsWith(src+path.sep)?m._compile(babel.transformFileSy
 require.extensions['.js']=compile;require.extensions['.jsx']=compile;
 const React=require('react'),{renderToStaticMarkup}=require('react-dom/server');
 const S=require(src+'/project0550/data/supplierCostProjection0550.js'),R=require(src+'/project0550/data/vendorRegister0550.js'),C=require(src+'/project0550/data/bidCompletion0550.js'),W=require(src+'/project0550/data/workingOffers0550.js');
-const {WorkingSupplierTrace0550}=require(src+'/project0550/WorkingSupplierTrace0550.jsx'),{VendorOfferGroups0550}=require(src+'/project0550/VendorOfferGroups0550.jsx');
+const {WorkingSupplierTrace0550,WorkingMrSupplierDetails0550}=require(src+'/project0550/WorkingSupplierTrace0550.jsx'),{VendorOfferGroups0550}=require(src+'/project0550/VendorOfferGroups0550.jsx');
 const empty={lines:[],offers:[],vendors:[],fx:{}},render=d=>renderToStaticMarkup(React.createElement(WorkingSupplierTrace0550,{data:d,systemToken:'TEL-TELT',onNavigate:()=>{}}));
 assert.deepEqual(C.bidCompletionSourceUsages0550(empty),[]);assert(render(empty).includes('ยังไม่มีรายการต้นฉบับ'));
+const legacyMr=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:{...empty,integrationWorkspace:{}},line:{id:'MR-LEGACY',mrRequirementId:'NATIVE-LEGACY',description:'Legacy MR'},projection:{quotes:new Map()},onNavigate:()=>{}}));assert(legacyMr.includes('Mapping ของ MR · 0 ใบ'),'Old/empty Integration workspace remains readable');
 if(process.argv[2]){
  const d=JSON.parse(fs.readFileSync(process.argv[2])),before=JSON.stringify(d),html=render(d),entries=R.vendorOfferEntries0550(d);
  const tower=entries.filter(e=>e.offer.id.startsWith('OFFER-MASTER-TOWER-')&&e.offer.supplierQuoteRow?.classification==='BASE_PRICE');
@@ -22,6 +23,17 @@ if(process.argv[2]){
  }
  assert(originals.flatMap(q=>q.items).some(e=>e.uses.some(u=>u.label.includes('ต้นทุนผสม'))));assert.deepEqual(originals.flatMap(q=>q.items).filter(e=>e.offer.supplierQuoteRow.itemCode==='3').map(e=>[e.native.quantity,e.native.unit]).sort((a,b)=>a[0]-b[0]),[[35,'Gl'],[70,'Gl']],'Original paint units, never normalized U');
  assert(html.includes('APF')&&html.includes('ACP')&&html.includes('2609.95.1')&&html.includes('2609.95.2'));
+ const projection=S.supplierCostProjection0550(d);
+ for(const id of ['REQ-MR-B1-11-APF-08','REQ-MR-B1-11-ACP-06']){
+  const line=d.lines.find(l=>l.id===id),row=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:d,line,projection,onNavigate:()=>{}}));
+  assert(row.includes('Mapping ของ MR · 1 ใบ'));assert(!row.includes('data-working-source-item='),'Original items beside each MR remain lazy');
+ }
+ const unmapped=structuredClone(d);unmapped.integrationWorkspace.requirements.find(r=>r.id==='REQDEF-MR-B1-11-APF-08').offerIds=[];
+ const emptyMr=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:unmapped,line:unmapped.lines.find(l=>l.id==='REQ-MR-B1-11-APF-08'),projection:S.supplierCostProjection0550(unmapped),onNavigate:()=>{}}));
+ assert(emptyMr.includes('Mapping ของ MR · 0 ใบ'),'Never infer a new MR mapping from its shared price owner');
+ const authored=structuredClone(unmapped),original=d.integrationWorkspace.requirements.find(r=>r.id==='REQDEF-MR-B1-11-APF-08');authored.integrationWorkspace.requirements.push({...original,id:'AUTHORED-MR-LINK-QA',workLineIds:['REQ-MR-B1-11-APF-08']});
+ const authoredMr=renderToStaticMarkup(React.createElement(WorkingMrSupplierDetails0550,{data:authored,line:authored.lines.find(l=>l.id==='REQ-MR-B1-11-APF-08'),projection:S.supplierCostProjection0550(authored),onNavigate:()=>{}}));assert(authoredMr.includes('Mapping ของ MR · 1 ใบ'),'Reuse explicit authored requirement-to-line links, not only seeded requirement IDs');
+
  const own=uses.find(u=>u.kind==='QUOTED'&&u.offerIds.some(id=>towerIds.has(id))),changed=structuredClone(d);
  changed.lines.find(l=>l.id===own.line.id).manualCost+=1;
  assert.equal(C.bidCompletionSourceUsages0550(changed).find(u=>u.line.id===own.line.id).current,false,'Edited owner invalidates displayed allocation');

@@ -272,3 +272,13 @@ Only the original evidence and validators establish acceptance. Existing strict
 formal issue policy is preserved; qualified bid-phase issue migration is separate.
 
 Implementation and verification: [Common bid Punch and status triage](../handoff/pj2608-0550/20261105_COMMON_BID_PUNCH_AND_STATUS_TRIAGE.md).
+
+### Punch closure and source detail continuation
+
+Punch completion must come from live native validators and the original tracked
+subject identities. Missing/deleted subjects, changed proof/system context and
+proposed later phases do not establish closure. Existing notes without source
+subjects remain unverified. Closing one cause does not accept the whole system.
+Vendor item detail next to an MR is another read-only view of canonical Supplier
+records, never another Mapping store or price owner. See the [continuation
+checkpoint](../handoff/pj2608-0550/20261105_PUNCH_CLOSURE_AND_MR_VENDOR_DETAILS.md).

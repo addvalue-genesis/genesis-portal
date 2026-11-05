@@ -40,6 +40,30 @@ const server=http.createServer((req,res)=>{
  await jump('bid.working-preview.step.8');
  await punch.getByLabel('Bid Punch filter',{exact:true}).selectOption('MINOR');
  assert.deepEqual(await read(),before,'Inspection/filter/navigation must never write canonical state');
+ // Inspect the full original quote beside each MR, not just the supply subset.
+ for(const [id,ref,paint] of [['REQ-MR-B1-11-APF-08','2609.95.1','70 Gl'],['REQ-MR-B1-11-ACP-06','2609.95.2','35 Gl']]){
+  await jump('bid.budget.working.line.'+id);
+  const detail=page.locator('[data-working-mr-vendor="'+id+'"]');await detail.locator(':scope > summary').click();
+  await detail.locator('[data-working-source-item]').first().waitFor();assert.equal(await detail.locator('[data-working-source-item]').count(),15);
+  assert.equal(await detail.locator('[data-working-source-quote]').getAttribute('data-working-source-quote'),ref);
+  assert((await detail.innerText()).includes(paint));
+  const net=before.offers.find(o=>o.quoteRef===ref&&o.supplierQuoteRow?.classification==='NET_PACKAGE').quoteEvidence.quotedTotal;
+  assert((await detail.locator('.p55-source-amount').innerText()).includes(new Intl.NumberFormat('en-US',{style:'currency',currency:'THB'}).format(net)));
+  await detail.getByRole('button',{name:'เปิด Mapping เดิมของ MR แถวนี้',exact:true}).click();await mapping.waitFor();
+  assert((await mapping.innerText()).includes('REQDEF-'+id.replace(/^REQ-/,'')));
+ }
+ await jump('bid.working-preview.step.8');await punch.getByLabel('Bid Punch filter',{exact:true}).selectOption('ALL');
+ await punch.getByLabel('Search Bid Punch',{exact:true}).fill('ENGINEERING_PROOF_OPEN');
+ const proofTask=punch.locator('[data-bid-punch="ENGINEERING_PROOF_OPEN|SYSTEM|TEL-TELT|RPT"]');await proofTask.waitFor();
+ await proofTask.getByRole('button',{name:'เปิดต้นทาง / ทำงานเดิม',exact:true}).click();
+ const proof=page.getByRole('form',{name:'Engineering Proof editor',exact:true});await proof.waitFor();
+ assert.equal(await proof.getByLabel('Linked requirement',{exact:true}).inputValue(),'REQDEF-MR-B1-11-ACP-06','Keep the MR selected from its full quote, rather than jumping to the first tower');
+ assert.equal(await proof.getByLabel('Derived proof type',{exact:true}).inputValue(),'RPT');
+ assert.equal(await proof.getByLabel('Report conclusion',{exact:true}).inputValue(),'OPEN');
+ assert.equal(await proof.getByLabel('Record review status',{exact:true}).inputValue(),'DRAFT');
+ assert.deepEqual(await read(),before,'Full quote inspection and a fresh Proof draft must not write data or approve anything');
+ await jump('bid.working-preview.step.8');await punch.getByLabel('Search Bid Punch',{exact:true}).fill('');
+ await punch.getByLabel('Bid Punch filter',{exact:true}).selectOption('MINOR');
  await task.getByRole('button',{name:'จัดแผน Major / Minor',exact:true}).click();
  const editor=page.getByRole('form',{name:'Bid Punch plan editor',exact:true});await editor.waitFor();
  await editor.getByLabel('Punch owner',{exact:true}).fill('SI QA');
@@ -51,12 +75,14 @@ const server=http.createServer((req,res)=>{
  console.log('QA save rendered');const after=await read(),withoutMeta=d=>{const {bidPunchPlans,revision,audit,...rest}=d;return rest;};
  assert.equal(after.bidPunchPlans.length,1);assert.equal(after.bidPunchPlans[0].owner,'SI QA');assert.equal(after.revision,before.revision+1);
  assert.deepEqual(withoutMeta(after),withoutMeta(before),'Only optional Punch plans and normal revision/audit may change');
- assert((await task.innerText()).includes('มีแผนจัดการ · ต้นทางยังไม่ปิด'));
+ assert.equal(await task.getAttribute('data-punch-stage'),'ACTION_PLANNED');assert.equal(after.bidPunchPlans[0].tracking.subjectIds.length,4);
  assert.equal(after.integrationWorkspace.requirements.find(r=>r.id==='REQDEF-MR-B1-11-APF-08').status,'DRAFT');
  console.log('QA before reload');await page.reload();await ready();console.log('QA reload ready');await jump('bid.working-preview.step.8');
  await page.getByLabel('Working Preview system',{exact:true}).selectOption('TEL-TELT');
  await punch.getByLabel('Bid Punch filter',{exact:true}).selectOption('MINOR');await task.waitFor();
  assert((await task.innerText()).includes('SI QA'));assert(!(await task.innerText()).includes('STALE ·'));
+ await punch.getByLabel('Bid Punch stage filter',{exact:true}).selectOption('ACTION_PLANNED');assert.equal(await punch.locator('[data-bid-punch]').count(),1);
+ await punch.getByLabel('Bid Punch stage filter',{exact:true}).selectOption('ALL');
  for(const width of [1440,390]){await page.setViewportSize({width,height:1000});await punch.scrollIntoViewIfNeeded();assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Contained at '+width);}
  await page.setViewportSize({width:1440,height:1000});
  await punch.getByLabel('Bid Punch filter',{exact:true}).selectOption('ALL');
@@ -65,5 +91,5 @@ const server=http.createServer((req,res)=>{
  const basis=page.getByRole('group',{name:'Pricing basis view',exact:true});assert(await basis.getByRole('button',{name:'Working · รอทบทวน',exact:true}).isVisible());
  const group=page.locator('[data-component-key="bid.budget.working.group.TEL-TELT"]');assert.equal(await group.locator('[data-tower-price-role="DETAIL"]').count(),2);assert(!(await group.innerText()).includes('ราคาเดิม / รออัปเดต'));
  assert.deepEqual(errors,[]);assert.deepEqual(await read(),after,'Reload/navigation does not change plans or saved workspace');
- console.log('PASS production actual browser: correct MR editor target,88/88 costs/prices despite engineering OPEN,zero numeric blockers,consolidated tasks,existing navigation,read-only inspection,durable plan+audit only,no approval/price/source changes,reload,1440/390 containment and new รอทบทวน label.');
+ console.log('PASS production actual browser: correct MR editor target,full15+15 original tower items/net/native units from each MR,exact RPT draft without writes,work-stage search/filter,88/88 costs/prices despite engineering OPEN,zero numeric blockers,consolidated tasks,existing navigation,read-only inspection,durable plan+audit only,no approval/price/source changes,reload,1440/390 containment and new รอทบทวน label.');
 }catch(e){console.error('QA failure before cleanup:',e);throw e;}finally{if(browser)await Promise.race([browser.close(),new Promise(r=>setTimeout(r,10000))]);server.closeAllConnections();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1;});

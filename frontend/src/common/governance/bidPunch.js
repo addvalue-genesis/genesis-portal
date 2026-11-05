@@ -1,6 +1,7 @@
 // Project-independent bid-work triage. A work plan never changes source truth,
 // arithmetic, technical acceptance, contractual due phases or issue authority.
 export const BID_PUNCH_VERSION='genesis.bid-punch/1';
+export const BID_PUNCH_STAGE_NAMES={UNPLANNED:'ยังไม่จัดแผน',PLAN_INCOMPLETE:'แผนยังไม่ครบ',ACTION_PLANNED:'มีแผน · รอดำเนินการที่ต้นทาง',OVERDUE:'เลยกำหนดในแผน',STALE:'ฐานเปลี่ยน · ต้องทบทวนแผน',VERIFIED_CLOSED:'ต้นทางตรวจปิดสาเหตุนี้แล้ว',UNVERIFIED_REMOVAL:'ต้นเหตุไม่ปรากฏ · ยังยืนยันการปิดไม่ได้'};
 export const BID_PUNCH_STATES=[
  ['Source','METADATA_ONLY / TEXT_PARTIAL / TEXT_READ','อ่านข้อมูลได้มากน้อยเท่าไร ไม่ใช่ผลทบทวนหรืออนุมัติ'],
  ['Authority','CURRENT_TENDER / UNCONFIRMED / HISTORICAL / REPLACED_COPY','ฐานเอกสารและฉบับใช้งาน ต้องตรวจเมื่อใช้ตัดสินใจ'],
@@ -32,14 +33,15 @@ export function validateBidPunchPlans(plans){
  if(!Array.isArray(plans)||plans.length>20000)throw Error('Invalid bid Punch plans');
  const seen=new Set(),fields=['id','basisKey','severity','phase','action','owner','dueOn','priceBasis','reference'];
  for(const p of plans){
-  if(!p||Object.keys(p).some(k=>!fields.includes(k))||fields.some(k=>typeof p[k]!=='string')||!text(p.id)||p.id.length>500||seen.has(p.id)||!text(p.basisKey)||p.basisKey.length>200)throw Error('Invalid/duplicate bid Punch plan');
+  if(!p||Object.keys(p).some(k=>!fields.includes(k)&&k!=='tracking')||fields.some(k=>typeof p[k]!=='string')||!text(p.id)||p.id.length>500||seen.has(p.id)||!text(p.basisKey)||p.basisKey.length>200)throw Error('Invalid/duplicate bid Punch plan');
   seen.add(p.id);
   if(!['MAJOR','MINOR','REVIEW'].includes(p.severity)||!['REVIEW','BID','BEFORE_PO','POST_AWARD'].includes(p.phase))throw Error('Invalid Punch severity/phase');
   if(p.dueOn&&!validDate(p.dueOn))throw Error('Invalid Punch due date');
   if(['action','owner','priceBasis','reference'].some(k=>p[k].length>4000))throw Error('Punch plan text too long');
+  if(p.tracking!==undefined){const t=p.tracking;if(!t||Object.keys(t).some(k=>!['kind','key','subjectIds','requiredPhase','linkedIds','scopeKey'].includes(k))||!text(t.kind)||t.kind.length>80||!text(t.key)||t.key.length>500||!Array.isArray(t.subjectIds)||!t.subjectIds.length||t.subjectIds.length>5000||t.subjectIds.some(id=>!text(id)||id.length>500)||new Set(t.subjectIds).size!==t.subjectIds.length||t.requiredPhase!==undefined&&(!text(t.requiredPhase)||t.requiredPhase.length>80)||t.scopeKey!==undefined&&(!text(t.scopeKey)||t.scopeKey.length>200)||t.linkedIds!==undefined&&(!Array.isArray(t.linkedIds)||t.linkedIds.length>5000||t.linkedIds.some(id=>!text(id)||id.length>500)||new Set(t.linkedIds).size!==t.linkedIds.length))throw Error('Invalid Punch source tracking');}
  }
 }
-export function assessBidPunch({issues=[],plans=[],owners=[],today,documentsReady=false,engineeringReady=false}){
+export function assessBidPunch({issues=[],plans=[],owners=[],today,documentsReady=false,engineeringReady=false,resolutions=[]}){
  validateBidPunchPlans(plans);
  const saved=new Map(plans.map(p=>[p.id,p])),seen=new Set();
  const rows=issues.map(i=>{
@@ -50,7 +52,9 @@ export function assessBidPunch({issues=[],plans=[],owners=[],today,documentsRead
   // error, missing With-Bid obligation, unknown scope or engineering criterion.
   const severity=bidPunchSeverity({...i,assessment:proposed});
   const complete=Boolean(plan&&!stale&&text(plan.action)&&text(plan.owner)&&validDate(plan.dueOn)&&text(plan.priceBasis)&&text(plan.reference));
-  return {...i,plan,stale,severity,proposedSeverity:proposed,planComplete:complete,overdue:Boolean(plan?.dueOn&&validDate(today)&&plan.dueOn<today),
+  const overdue=Boolean(plan?.dueOn&&validDate(today)&&plan.dueOn<today);
+  const stage=!plan?'UNPLANNED':stale?'STALE':!complete?'PLAN_INCOMPLETE':overdue?'OVERDUE':'ACTION_PLANNED';
+  return {...i,plan,stale,severity,proposedSeverity:proposed,planComplete:complete,overdue,stage,
    phase:plan?.phase||i.phase||'REVIEW',requiredPhase:i.requiredWithBid?'BID':i.requiredPhase||'REVIEW',
    // Plans document what will be done; closure comes only from the original
    // requirement/source/Working/VDRL projection on the next derivation.
@@ -60,10 +64,14 @@ export function assessBidPunch({issues=[],plans=[],owners=[],today,documentsRead
  // inputs only; it never assumes THB/USD, converts FX or totals unlike units.
  const actual=owners.filter(o=>o.selected!==false),known=actual.filter(o=>Number.isFinite(o.sellAmount)),missing=actual.filter(o=>!Number.isFinite(o.sellAmount)||!Number.isFinite(o.costAmount));
  const numericBlockers=rows.filter(r=>r.hardPriceBlock),scopeRisks=rows.filter(r=>r.priceEffect==='SCOPE'||r.priceEffect==='UNKNOWN');
+ const resolutionById=new Map(resolutions.map(r=>[r.id,r]));
+ const orphanPlans=plans.filter(p=>!seen.has(p.id)),history=orphanPlans.map(plan=>{const resolution=resolutionById.get(plan.id),verified=Boolean(plan.tracking&&resolution?.verified===true&&text(resolution.reason));return {plan,resolution,stage:verified?'VERIFIED_CLOSED':'UNVERIFIED_REMOVAL',resolved:verified};});
+ const stageCounts=Object.fromEntries(Object.keys(BID_PUNCH_STAGE_NAMES).map(s=>[s,[...rows,...history].filter(r=>r.stage===s).length]));
  return {version:BID_PUNCH_VERSION,rows,owners:actual.length,pricedOwners:known.length,missingOwnerIds:missing.map(o=>o.id),numericBlockers:numericBlockers.length,scopeRisks:scopeRisks.length,
   canContinuePricing:known.length>0,selectedDraftAmountsComplete:actual.length>0&&!missing.length&&!numericBlockers.length,
   major:rows.filter(r=>r.severity==='MAJOR').length,minor:rows.filter(r=>r.severity==='MINOR').length,unassessed:rows.filter(r=>r.severity==='REVIEW').length,
-  planned:rows.filter(r=>r.planComplete).length,stalePlans:rows.filter(r=>r.stale).length,orphanPlans:plans.filter(p=>!seen.has(p.id)),
+  planned:rows.filter(r=>r.planComplete).length,stalePlans:rows.filter(r=>r.stale).length,orphanPlans,history,stageCounts,
+  completedPlans:history.filter(r=>r.resolved),unverifiedPlans:history.filter(r=>!r.resolved),
   submissionReady:actual.length>0&&!missing.length&&!rows.length&&documentsReady&&engineeringReady,
   // This kernel never grants issue authorization or technical acceptance.
   engineeringReady,documentsReady,issueAuthorized:false};

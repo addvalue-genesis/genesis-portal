@@ -14,10 +14,10 @@ function SourceAmount({quote}){
   {t.base.rates.some(r=>r.currency!=='THB')&&<small>FX {t.base.rates.filter(r=>r.currency!=='THB').map(r=>'1 '+r.currency+' = '+r.rate+' THB').join(' · ')} · {t.fxDate} · {t.fxSource}</small>}
  </span>;
 }
-function SourceQuote({quote:q,onNavigate}){
- const [open,setOpen]=useState(false),[full,setFull]=useState(false),shown=full?q.items:q.relevantItems;
+function SourceQuote({quote:q,onNavigate,initiallyOpen=false}){
+ const [open,setOpen]=useState(initiallyOpen),[full,setFull]=useState(false),shown=full?q.items:q.relevantItems;
  const linked=q.items.filter(e=>e.uses.length).length;
- return <details className="p55-panel" data-working-source-quote={q.title} data-source-identity={q.key} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}>
+ return <details className="p55-panel" open={open} data-working-source-quote={q.title} data-source-identity={q.key} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}>
   <summary>{q.vendor} · {q.title}{q.revision?' · '+q.revision:''} · {q.fileName||'ต้นฉบับ'} · {q.items.length} รายการทั้งใบ · พบลิงก์ราคา {linked}/{q.items.length}<SourceAmount quote={q}/><small>{q.owners.length?'พบการใช้ราคาใน Working '+q.owners.length+' เจ้าของ · ไม่ใช่อนุมัติทั้งใบ':'ยังไม่มีเจ้าของราคาที่เลือกจากใบนี้'}</small>{q.systems.length>1&&<small>อ้างอิงใบเดียวกันใน {q.systems.join(' / ')} · ยอดทั้งใบคงเดิมทุกมุมมอง ห้ามบวกรวมซ้ำระหว่างระบบ</small>}</summary>
   {open&&<>
    <p>ต้นทุน Supplier คือราคาต้นฉบับ ไม่ถูกลดลงเพราะจัดสรร A/B/C · NET รวมรายการ Gross แล้ว · Option แยกจาก Base · การใช้เรต/แพ็กเกจไม่ใช่การยืนยัน comply</p>
@@ -27,6 +27,23 @@ function SourceQuote({quote:q,onNavigate}){
     return <tr key={o.id} data-working-source-item={o.id}><td><strong>{o.description}</strong>{n.option&&<small>OPTION ต้นฉบับ · ไม่รวม Base อัตโนมัติ</small>}<small>{n.locator}</small><button type="button" onClick={()=>onNavigate?.('bid.vendor.offer.'+o.id)}>เปิด Vendor Item {o.supplierQuoteRow?.itemCode||''}</button><small><a href={n.url} target="_blank" rel="noopener noreferrer">เปิดใบเสนอราคาต้นฉบับ</a></small><small>{n.basis}</small></td><td>{n.quantity??'OPEN'} {n.unit}</td><td>{amount(n.rate,n.currency)}{(o.unitCost!==n.rate||o.currency!==n.currency)&&<small>เรตที่บันทึกใน Offer: {amount(o.unitCost,o.currency)} / {o.unit} · ต่างจากต้นฉบับ</small>}</td><td>{Number.isFinite(n.total)?amount(n.total,n.currency):n.totalText||'OPEN · ต้นฉบับไม่ระบุยอดแน่นอน'}</td><td>{entry.uses.map(u=><div key={u.line.id}><strong>Part {u.line.wbs[0]} / {u.line.wbs} → {u.line.customerRowCode||'Customer row OPEN'}</strong><button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+u.line.id)}>{u.line.description}</button><small>{u.label}</small></div>)}{entry.stale.map(u=><small key={u.line.id}>ฐานจัดสรรเปลี่ยน · ต้องทบทวน {u.line.id}</small>)}{!entry.uses.length&&!entry.stale.length&&'ยังไม่พบการจัดสรร/ใช้เรตที่เลือก · ไม่ถือว่ารวมแล้ว'}</td></tr>;
    })}</tbody></table></div>
    <details><summary>เจ้าของราคา Working ที่เชื่อมกับใบนี้ · {q.owners.length} รายการ · แยกจากยอด Supplier</summary><ul>{q.owners.map(u=><li key={u.line.id}>{u.line.wbs} · {u.line.description} <button type="button" onClick={()=>onNavigate?.('bid.budget.working.line.'+u.line.id)}>เปิด Working เดิม</button><small>{u.label}</small></li>)}</ul><p>ต้นทุนผสมอาจมีประมาณการงานอื่นเพิ่ม · การจัดสรรหรือแพ็กเกจร่วมไม่ทำให้ยอด Supplier เปลี่ยน และไม่สร้างต้นทุนอีกก้อน</p></details>
+  </>}
+ </details>;
+}
+// This is the same immutable source projection, opened beside the MR row.
+// Mapping remains in the existing SI editor; no second mapping/price store.
+export function WorkingMrSupplierDetails0550({data,line,projection,onNavigate}){
+ const [open,setOpen]=useState(false),reqId='REQDEF-'+line.mrRequirementId;
+ const {requirements}=mrSupplierLinks0550(data,line),req=requirements.find(r=>r.id===reqId)||requirements[0],offerIds=new Set(requirements.flatMap(r=>r.offerIds||[]));
+ const quotes=[...projection.quotes.values()].filter(q=>q.allEntries.some(e=>offerIds.has(e.offer.id)));
+ return <details open={open} data-working-mr-vendor={line.id} onToggle={e=>{if(e.target===e.currentTarget)setOpen(e.currentTarget.open);}}>
+  <summary>รายละเอียด Vendor ตาม Mapping ของ MR · {quotes.length} ใบ · {line.description}</summary>
+  {open&&<>
+   <p>{line.quantity??'OPEN'} {line.unit} · {line.requirementRef}<br/>Mapping ที่บันทึก: {req?.status||'ยังไม่มี Offer ผูกกับ MR'} · รายการต้นฉบับและการจัดสรร A/B/C อ่านจากข้อมูลเดิม</p>
+   <button type="button" onClick={()=>onNavigate('bid.working-preview.requirement.'+(req?.id||reqId))}>เปิด Mapping เดิมของ MR แถวนี้</button>
+   {[...offerIds].map(id=><small key={id}>Offer ที่ MR อ้าง: {id}{!data.offers.some(o=>o.id===id)&&' · OFFER MISSING'}</small>)}
+   {!quotes.length&&<p>ยังไม่พบใบเสนอราคาต้นฉบับที่เชื่อมกับ MR แถวนี้ · ตรวจ Mapping/แพ็กเกจเดิม ไม่ใช้ใบอื่นแทนโดยอัตโนมัติ</p>}
+   {quotes.map(q=><SourceQuote key={q.key} quote={{...q,relevantItems:q.items}} onNavigate={onNavigate} initiallyOpen/>)}
   </>}
  </details>;
 }
