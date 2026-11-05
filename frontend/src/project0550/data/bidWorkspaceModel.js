@@ -17,8 +17,9 @@ import {validateSourceControl0550} from "./sourceReadiness0550";
 import {validateTechnicalProposal0550} from "./technicalProposal0550";
 import {validateSourcePreparationImports0550} from "./sourceWorkspaceAuto0550";
 import {validateBidVolumes0550} from "./bidVolumes0550";
+import {validateBidPunchPlans} from "../../common/governance/bidPunch";
 export const BID_SCHEMA="genesis.0550.bidding.v1";
-export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports"];
+export const BID_WORKSPACE_FIELDS_0550=["schema","projectId","baselineSnapshotId","revision","vendors","offers","calculations","lines","nodes","edges","fx","audit","sourceIntake","customerReviews","vendorBasisImport","mrWorkingImport","mgwQuoteImport","integrationWorkspace","deviationRelease","releaseRegister","repositoryBasisImport","mgwDetailPricingImport","technicalProposal","bidVolumes","sourceControl","sourcePreparationImports","supplierRevisionImports","bidPunchPlans"];
 export const BID_UNITS=["MD","MH","SET","LS","U","Pc","Lot","day","m","year"];
 export const BID_WBS=["A","B1","B2","B3","B4","B5","B6","B7","B8","B9","C1","C2","C3"];
 export function newId(prefix){
@@ -73,6 +74,7 @@ export function validateBidWorkspace(data,snapshotId,systems){
   if(r.bidProcess!==undefined){const p=r.bidProcess;fields(p,['version','preparedOn','controlLineIds','ceragonHandled']);if(p.version!=='0550-bid-process-20261104-1'||typeof p.ceragonHandled!=='boolean'||!Array.isArray(p.controlLineIds)||p.controlLineIds.length>4||new Set(p.controlLineIds).size!==p.controlLineIds.length||p.controlLineIds.some(id=>!['REQ-MR-ACT-B5-D04','REQ-MR-ACT-B6-D05','REQ-MR-ACT-C2-D04','REQ-MR-ACT-C3-D04'].includes(id)))fail('Invalid bid process receipt');date(p.preparedOn,'bid process date');}
   if(r.tsiActivityBudget!==undefined){const b=r.tsiActivityBudget;fields(b,["version","preparedOn","updatedLineIds","calculationIds","conflicts","expenseVersion","expenseLineIds","expenseConflicts"]);string(b.version,"TSI estimate version",100);date(b.preparedOn,"TSI estimate date");if(b.expenseVersion!==undefined)string(b.expenseVersion,"TSI expense version",100);for(const key of ["updatedLineIds","calculationIds","conflicts",...(b.expenseVersion!==undefined?["expenseLineIds","expenseConflicts"]:[])]){if(!Array.isArray(b[key])||b[key].length>100||b[key].some(v=>typeof v!=="string"||v.length>100))fail("Invalid TSI estimate receipt");}}
  }
+ validateBidPunchPlans(data.bidPunchPlans);
  validateIntegration0550(data);
  validateTechnicalProposal0550(data.technicalProposal,[...new Set([...systems,...(data.integrationWorkspace?.requirements||[]).map(r=>r.systemToken)])]);
  validateBidVolumes0550(data);

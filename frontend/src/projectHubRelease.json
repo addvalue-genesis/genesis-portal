@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-05.5",
+  "version": "2026-11-05.6",
   "branch": "feat/pj2608-0550-official-working-20261028",
-  "source0550": "5b92d9ae",
-  "capability": "Working price rows show selected quotation and registered alternatives separately from review status. Named requirement links and saved MGW package quantities load on disclosure. All19 systems plus COMMON retain original supplier cost, separate ABC allocation, stable identities and saved financial/source/review/history records."
+  "source0550": "2c62170e",
+  "capability": "Common bid Punch in existing WP.8 separates numeric pricing, Major/Minor/review work, proposed due phase and original engineering/package/issue checks. Consolidated source/system tasks retain links and source-bound optional plans. Preserve concurrent selected-versus-registered quote and deferred MGW/requirement trace, all existing IDs, financial/source/Qty/FX/review/frozen history. Owner wording: รอทบทวน."
 }

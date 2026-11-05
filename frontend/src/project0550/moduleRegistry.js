@@ -191,8 +191,8 @@ export const MODULE_REGISTRY = [
     why: "Risk exposure is not automatically a base-price addition.",
     inputs: ["Risk scenarios", "Contract entitlement", "Insurance/mitigation"],
     outputs: ["Exposure", "Mitigation", "Recovery logic", "Residual risk"],
-    implementation: ["riskScenarios in controlled dataset"],
-    invariants: ["Cost exposure ≠ customer recovery."]
+    implementation: ["riskScenarios in controlled dataset", "frontend/src/common/governance/bidPunch.js", "frontend/src/project0550/data/bidPunch0550.js", "frontend/src/project0550/BidPunch0550.jsx", "frontend/src/project0550/WorkingPreview0550.jsx"],
+    invariants: ["Cost exposure ≠ customer recovery.", "Bid Punch plans preserve original source/financial/technical/issue states; severity and due phase are independent, never an approval or contractual waiver."]
   },
   {
     id: "MOD-REGULATORY-KNOWLEDGE",

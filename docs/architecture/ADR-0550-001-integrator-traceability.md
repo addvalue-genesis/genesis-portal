@@ -257,3 +257,18 @@ conflicts must remain visible; an allocation or display change does not resolve
 engineering, scope or commercial acceptance.
 
 Implementation and actual limits: [all-system supplier cost separation](../handoff/pj2608-0550/20261105_ALL_SYSTEM_SUPPLIER_COST_SEPARATION.md).
+
+## 14. Common bid-work Punch triage — 5-Nov-2026
+
+Price arithmetic, scope/evidence review, contractual due phase and formal issue
+authority are distinct predicates. The Common evaluator may consolidate shared
+causes and classify Major/Minor/review work, while project adapters retain exact
+source/requirement/Working identities, native schedules and cost ownership.
+A plan records action, owner, date, proposed phase, price treatment and reference;
+it is neither closure nor an accepted contractual deferral. It never changes
+source authority, financial inputs, Proof/AVL/deviation acceptance or frozen issues.
+Unknown costs remain unknown; a known selling rate is not a proven internal cost.
+Only the original evidence and validators establish acceptance. Existing strict
+formal issue policy is preserved; qualified bid-phase issue migration is separate.
+
+Implementation and verification: [Common bid Punch and status triage](../handoff/pj2608-0550/20261105_COMMON_BID_PUNCH_AND_STATUS_TRIAGE.md).
