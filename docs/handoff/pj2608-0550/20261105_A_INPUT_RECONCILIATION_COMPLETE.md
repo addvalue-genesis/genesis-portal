@@ -59,8 +59,14 @@ Private artifacts (not committed to public Git):
 
 Use the verified ORIGINAL project90_SYSTEM_WORKING/DATA folder; a newer empty
 folder with the same name exists and must not be used. Preserve older files.
-A Rev10 should be uploaded before Source Rev14 so that startup never sees a
-new intake without its completed preparation. This checkpoint does not claim
+A Rev10 was uploaded before Source Rev14 so that startup never saw a
+new intake without its completed preparation. Both are now in the verified original
+DATA folder, with name/size/parent metadata and downloaded-byte SHA256 matches.
+A Rev10 Drive identity: `1gjWk9XAPbw8iDZvvGmcXMksk2IUty5uQ`; Source Rev14:
+`1cY5OhuBDFuQo0kPH4US36leexpFf0kOo`. Original Rev13/Rev09 identities and
+sizes were rechecked and retained. Reconciliation JSON and the unsent PDF draft
+are also saved there. Code tree `0b00d076ec9907819ea92bacaf241779cd5d9f89`
+was published as `d2076b5ef9588de14b4cafa285d9bb6db26c166b`. This checkpoint does not claim
 that the owner's Windows Drive sync or IndexedDB has consumed those files.
 
 ## Narrow runtime support change
@@ -86,6 +92,16 @@ repeat-load identity and raw financial/FX/review/frozen/plan equality passed.
 Derived selected-owner provisional quantities/cost/selling values are identical.
 Production webpack compiled; its existing bundle-size warning remains.
 Clarification PDF was rendered and visually checked as one legible A4 page.
+The actual Source14/A10 production-browser run passed:683 sources,1923 prepared
+requirements,253 reading drafts; startup saved the canonical data automatically
+without file-selection/import clicks. Five actual corpus document/page selections
+and mobile fit passed without writes. Edited requirements/technical text and
+deleted reading/technical records/bindings survived reload; wrong-basis input kept
+the prior source/workspace. Financial/frozen-history equality, GET-only local reads
+and zero page errors passed. An obsolete exact A.1 tab caption in the QA script
+was corrected to the existing stable tab ID; application navigation was unchanged.
+The large isolated private-fixture run was slow; no startup-performance improvement
+or owner's Windows timing/consumption is asserted.
 
 The reconstructed private QA workspace is not a replacement for the owner's
 saved workspace. It is not uploaded as an active database. Current native results
