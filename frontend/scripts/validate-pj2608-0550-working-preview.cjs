@@ -130,6 +130,8 @@ assert(!html.includes('Customer integrator supplier mapping'),'Unopened WP table
 const openedStages=stages.map(stage=>renderToStaticMarkup(React.createElement(WorkingPreview0550,{...props,navigationTarget:stage.id})));
 assert(openedStages.some(markup=>markup.includes('System Particular ที่ใช้ในขั้นนี้')));
 assert(openedStages[6].includes('Customer integrator supplier mapping'),'Direct WP.7 navigation renders its unchanged mapping table');
+assert(openedStages[6].includes('AVL mapping summary')&&openedStages[6].includes('เปิด 14.1 · ตรวจ AVL / Technical Deviation'));
+assert(!openedStages[6].includes('All system deviation coverage'),'WP.7 shows only the compact AVL view');
 const {Module}=require(root+'/project0550/BidControls.jsx');
 let bodyCalls=0;const deferredBody=()=>{bodyCalls++;return React.createElement('input',{'aria-label':'Deferred draft input',defaultValue:'unsaved synthetic draft'});};
 const closedModule=renderToStaticMarkup(React.createElement(Module,{id:'bid.budget.working.lines',title:'Synthetic deferred test',open:false,defer:true},deferredBody));
@@ -140,6 +142,7 @@ renderToStaticMarkup(React.createElement(Module,{id:'bid.budget.working.lines',t
 
 assert(renderToStaticMarkup(React.createElement(ParticularWorkspace0550,props)).includes('Document reading ledger'));
 const devHtml=renderToStaticMarkup(React.createElement(DeviationWorkspace0550,props));
+assert(devHtml.includes('All system deviation coverage'),'14.1 retains the full audit table');
 for(const col of M.DEVIATION_COLUMNS_0550)assert(devHtml.includes(col));
 assert(devHtml.includes('Subcontractors and sub-vendors declared list'));
 for(const group of groups)assert(devHtml.includes(group.vendor));
@@ -222,6 +225,8 @@ Object.assign(meta.integrationWorkspace.deviations[0],{releaseDocument:'Customer
 validateBidWorkspace(meta,DATA_LAYER_META.datasetId,tokens);assert.deepEqual(JSON.parse(JSON.stringify(meta)).deviationRelease,meta.deviationRelease);
 const {DeviationRelease0550}=require(root+'/project0550/DeviationRelease0550.jsx');
 const releaseHtml=renderToStaticMarkup(React.createElement(DeviationRelease0550,{onEdit:()=>{}}));
+assert(releaseHtml.includes('เปิด 14.1 · ตรวจหลักฐาน / แก้รายการ'));
+assert(!releaseHtml.includes('All system deviation coverage'),'14.3 is an export workspace');
 assert(releaseHtml.includes('Export Excel'));assert(releaseHtml.includes('bid.deviations.release'));
 for(const column of R.DEVIATION_RELEASE_LAYOUT_0550.columns)assert(releaseHtml.includes(column.replace(/&/g,'&amp;').replace(/'/g,'&#x27;')));
 if(process.env.PJ0550_DEVIATION_QA_OUTPUT)require('node:fs').writeFileSync(process.env.PJ0550_DEVIATION_QA_OUTPUT,bytes);

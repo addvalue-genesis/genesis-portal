@@ -1,10 +1,9 @@
-import {AvlReconciliation0550} from "./AvlReconciliation0550";
 import React,{useState} from "react";
 import {useBidWorkspace} from "./BidWorkspaceContext";
 import {Module,Field} from "./BidControls";
 import {deviationReleaseMetadata0550,deriveDeviationRelease0550,exportDeviationRelease0550,DEVIATION_RELEASE_LAYOUT_0550 as layout} from "./data/deviationRelease0550";
 const labels={projectNo:"Project No.",project:"Project",requisition:"Requisition",description:"REQ Description",vendor:"Vendor"};
-export function DeviationRelease0550({onEdit,selection,onSelectionChange,onNavigate,onOpenSource}){
+export function DeviationRelease0550({onEdit,selection,onSelectionChange,onNavigate}){
  const {data,model,change,busy}=useBidWorkspace();
  const [metadata,setMetadata]=useState(()=>deviationReleaseMetadata0550(data));
  const [localSelection,setLocalSelection]=useState(()=>model.integration.deviations.filter(d=>!deriveDeviationRelease0550(data,model.integration,[d.id]).issues.length).map(d=>d.id));
@@ -16,7 +15,8 @@ export function DeviationRelease0550({onEdit,selection,onSelectionChange,onNavig
  return <Module id="bid.deviations.release" title="Release · Deviation List — English / Draft">
  <div className="p55-deviation-release-actions"><p><strong>DRAFT / NOT ISSUED</strong> · {release.count} รายการที่เลือก · Workspace revision {data.revision}</p><button type="button" className="p55-export-button" onClick={exportFile} disabled={busy||dirty||Boolean(release.issues.length)}>Export Excel — Deviation List</button></div>
  <p>ใช้ข้อมูลที่บันทึกในทะเบียน · รูปแบบ 11 คอลัมน์ตาม 5-Deviation List.xls · ดาวน์โหลดเป็น .xlsx · การส่งคำขอพิจารณาไม่ต้องรอการอนุมัติ Deviation</p>
- <AvlReconciliation0550 onNavigate={onNavigate} onOpenSource={onOpenSource}/><details open><summary>หัวเอกสาร / เลือกรายการที่จะส่งออก</summary>
+ <button type="button" onClick={()=>onNavigate?.("bid.deviations.avl")}>เปิด 14.1 · ตรวจหลักฐาน / แก้รายการ</button>
+ <details open><summary>หัวเอกสาร / เลือกรายการที่จะส่งออก</summary>
  <div className="p55-bid-fields">{Object.entries(labels).map(([key,label])=><Field key={key} label={label} value={metadata[key]} onChange={v=>setMetadata(m=>({...m,[key]:v}))}/>)}</div>
  <button type="button" disabled={busy||!dirty} onClick={async()=>{if(await change(d=>({...d,deviationRelease:{...metadata}}),"Save deviation release document header"))setMessage("บันทึกหัวเอกสารแล้ว");}}>บันทึกหัวเอกสาร</button>
  {model.integration.deviations.map(d=><div key={d.id}><label><input type="checkbox" checked={selected.includes(d.id)} onChange={e=>setSelected(ids=>e.target.checked?[...ids,d.id]:ids.filter(id=>id!==d.id))}/> {d.systemToken} / {d.vendorQuoteRef||d.id} / {d.vendorDeviation}{deriveDeviationRelease0550(data,model.integration,[d.id]).issues.length>0&&<small>ยังไม่พร้อมส่งออก: {deriveDeviationRelease0550(data,model.integration,[d.id]).issues.join(" · ")}</small>}</label><button type="button" onClick={()=>onEdit(d.id)}>แก้รายการต้นทาง</button></div>)}
