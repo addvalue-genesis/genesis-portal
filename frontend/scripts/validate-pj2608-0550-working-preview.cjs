@@ -130,6 +130,9 @@ assert(!html.includes('Customer integrator supplier mapping'),'Unopened WP table
 const openedStages=stages.map(stage=>renderToStaticMarkup(React.createElement(WorkingPreview0550,{...props,navigationTarget:stage.id})));
 assert(openedStages.some(markup=>markup.includes('System Particular ที่ใช้ในขั้นนี้')));
 assert(openedStages[6].includes('Customer integrator supplier mapping'),'Direct WP.7 navigation renders its unchanged mapping table');
+assert(!openedStages[4].includes('aria-label="Working requirement"')&&openedStages[4].includes('data-wp-quantity-system='),
+ 'WP.5 opens directly to system quantity groups');
+for(const index of [1,5])assert(openedStages[index].includes('aria-label="Working requirement"'),'Draft creation retains its requirement picker');
 assert(openedStages[6].includes('AVL mapping summary')&&openedStages[6].includes('เปิด 14.1 · ตรวจ AVL / Technical Deviation'));
 assert(!openedStages[6].includes('All system deviation coverage'),'WP.7 shows only the compact AVL view');
 const {Module}=require(root+'/project0550/BidControls.jsx');

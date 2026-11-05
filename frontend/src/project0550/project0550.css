@@ -1764,8 +1764,6 @@
   list-style: none;
   overflow-wrap: anywhere;
 }
-.p55-wp-quantity-target { outline: 2px solid #7b50ae; outline-offset: -2px; }
-.p55-wp-quantity-target td:first-child { background: #f3eefb; }
 .p55-wp-quantity-group > summary {
   padding: .55rem .75rem;
   background: #f3eefb;
