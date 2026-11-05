@@ -5,7 +5,60 @@ import {integrationFingerprint0550,emptyIntegration0550,validateIntegration0550}
 import {validateSourceIntake} from './sourceIntakeModel';
 import {selectAutomaticSource} from './sourceAutoLoad';
 import {validateBidWorkspace} from './bidWorkspaceModel';
+import {MR_WORKING_CATALOG_0550} from './mrWorkingBasis0550';
 export const SUPPLIER_REVISION_SCHEMA_0550='genesis.0550.supplier-revision.v1';
+const PAGA_REVISION='A20261632-002';
+const PAGA_MAPPING_ITEMS=[
+ {mrId:'MR-B1-14-APF-05',item:'11010',label:'APF Access Panel',evidence:/^\s*11010\s+.*302-053-000.*$/m},
+ {mrId:'MR-B1-14-ACP-05',item:'11010',label:'ACP Access Panel',evidence:/^\s*11010\s+.*302-053-000.*$/m},
+ {mrId:'MR-B1-14-APF-01',item:'1010',label:'APF Main Node / XBC',evidence:/^\s*1x\s+XBC\s+\(IP Beacon Control Module\).*$/m},
+ {mrId:'MR-B1-14-ACP-01',item:'2010',label:'ACP Main Node / XBC',evidence:/^\s*1x\s+XBC\s+\(IP Beacon Control Module\).*$/m}
+];
+
+// Existing WP.7 uses the imported private quote and the native source text.
+// Item numbers alone cannot establish scope across quotation revisions.
+export function preparePagaRevisionMapping0550(data,requirements){
+ const net=data.offers.find(o=>o.id==='OFFER-PAGA-A20261632-002-NET');
+ if(net?.quoteRef!==PAGA_REVISION||net.supplierQuoteRow?.classification!=='NET_PACKAGE'||net.supplierQuoteRow.parentOfferId!==net.id)return null;
+ const sourceId=net.supplierQuoteRow.sourceId;
+ const sources=data.sourceIntake?.sources||[];
+ const source=sources.find(s=>s.id===sourceId&&s.documentNo.includes(PAGA_REVISION)&&s.readState!=='METADATA_ONLY');
+ const pages=new Map(Array.from((source?.content||'').matchAll(/\[PDF PAGE (\d+)\]([^]*?)(?=\[PDF PAGE |$)/g),
+  ([,pageNumber,body])=>[Number(pageNumber),body]));
+ const rows=PAGA_MAPPING_ITEMS.map(({mrId,item,label,evidence})=>{
+  const requirement=requirements.find(r=>r.id==='REQDEF-'+mrId&&r.systemToken==='TEL-PAGA');
+  const mr=MR_WORKING_CATALOG_0550.rows.find(r=>r.id===mrId);
+  const matches=data.offers.filter(o=>o.vendorId===net.vendorId&&o.quoteRef===net.quoteRef&&o.supplierQuoteRow?.itemCode===item&&
+   o.supplierQuoteRow.classification==='BASE_PRICE'&&o.supplierQuoteRow.sourceId===sourceId&&o.supplierQuoteRow.parentOfferId===net.id&&
+   o.quoteEvidence?.sourceSha256&&o.quoteEvidence.sourceSha256===net.quoteEvidence?.sourceSha256);
+  const offer=matches.length===1?matches[0]:undefined;
+  const locator=offer?.quoteEvidence?.locator||'';
+  const pageNumber=Number(locator.match(/^PDF p(\d+) \/ item /)?.[1]);
+  const page=pages.get(pageNumber)||'';
+  const itemRow=page.match(new RegExp('^[ \\t]*'+item+'[ \\t]+.*$', 'm'));
+  const afterItem=itemRow?page.slice(itemRow.index):'';
+  const nextRow=afterItem.slice(itemRow?.[0].length||0).search(/^[ \t]*\d{4,5}[ \t]+\d+[,.]\d+/m);
+  const section=nextRow<0?afterItem:afterItem.slice(0,itemRow[0].length+nextRow);
+  const match=section.match(evidence)?.[0].trim();
+  const excerpt=match?[...new Set([itemRow[0].trim(),match])].join('\n'):'';
+  return {label,requirement,mr,offer,locator,excerpt};
+ });
+ const selected=data.lines.filter(l=>l.selected&&l.systemToken==='TEL-PAGA'&&l.customerRowCode==='A1-05');
+ return {net,source,rows,selected};
+}
+
+export function pagaRevisionRequirementDraft0550(row,source){
+ const {requirement:r,offer,locator,excerpt}=row;
+ if(!r||!source||!offer||!excerpt||r.disposition==='NOT_APPLICABLE'||r.responsibility==='COMPANY'||r.offerIds.includes(offer.id))return null;
+ const append=(prior,value)=>[prior,value].filter(Boolean).join('\n');
+ const draft={...r,status:'DRAFT',reviewer:'',reviewedOn:'',basisKey:'',
+  offerIds:[...r.offerIds,offer.id],supplierSourceIds:[...new Set([...r.supplierSourceIds,source.id])],
+  supplierLocator:append(r.supplierLocator,PAGA_REVISION+' / '+locator),
+  supplierExcerpt:append(r.supplierExcerpt,excerpt),
+  supplierBasis:append(r.supplierBasis,'A20261632-002 · หลักฐานใน NET เดียว · รอตรวจ TAG / การจัดลงพื้นที่และขอบเขต · ไม่เพิ่มเจ้าของราคา')};
+ if(draft.offerIds.length>500||draft.supplierSourceIds.length>500||[draft.supplierLocator,draft.supplierExcerpt,draft.supplierBasis].some(s=>s.length>12000))return null;
+ return draft;
+}
 const fail=m=>{throw Error('Supplier revision: '+m);};
 const same=(a,b)=>integrationFingerprint0550(a)===integrationFingerprint0550(b);
 const object=(v,keys)=>{if(!v||typeof v!=='object'||Array.isArray(v)||Object.keys(v).some(k=>!keys.includes(k)))fail('unsupported fields');};

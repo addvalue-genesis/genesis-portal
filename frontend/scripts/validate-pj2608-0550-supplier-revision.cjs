@@ -13,6 +13,33 @@ const net={id:'OFFER-SYNTHETIC-NET',vendorId:vendor.id,description:'Synthetic ne
 const detail={...net,id:'OFFER-SYNTHETIC-REV2-5010',unit:'U',unitCost:125,supplierQuoteRow:{...net.supplierQuoteRow,itemCode:'5010',classification:'BASE_PRICE',quantity:1,quotedUnit:'U',discountable:true}};
 const line={id:'LINE-SYNTHETIC',systemToken:'TEL-PAGA',wbs:'A',description:'Synthetic only',scopeKey:'SYNTHETIC-SCOPE',tagRef:'',requirementRef:'',sourceRef:'Synthetic quote p2',vendorId:vendor.id,offerId:net.id,calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'EUR',manualCost:null,sellMode:'MARGIN',sellRate:null,markupPct:null,marginPct:null,primePct:null,selected:false};
 const data={...W.emptyBidWorkspace(D.DATA_LAYER_META.datasetId),vendors:[vendor],sourceIntake:intake,integrationWorkspace:{...I.emptyIntegration0550(),requirements:[base]}};
+{
+ const quoteRef='A20261632-002', id='OFFER-PAGA-A20261632-002-NET', sourceId='SYNTHETIC-SUPPLIER';
+ const revisionNet={...net,id,quoteRef,quoteEvidence:{sourceSha256:'synthetic-hash'},
+  supplierQuoteRow:{...net.supplierQuoteRow,parentOfferId:id}};
+ const item=(itemCode,page)=>({...detail,id:'TEST-'+itemCode,quoteRef,
+  supplierQuoteRow:{...detail.supplierQuoteRow,sourceId,itemCode,parentOfferId:id},
+  quoteEvidence:{sourceSha256:'synthetic-hash',locator:'PDF p'+page+' / item '+itemCode}});
+ const quote={...source,id:sourceId,documentNo:quoteRef,authority:'INTERNAL_REFERENCE',
+  content:'[PDF PAGE 4]\n1010 1,00 U Cabinet\n1x XBC (IP Beacon Control Module)\n'+
+   '[PDF PAGE 5]\n2010 1,00 U Cabinet\n2011 1,00 U Other item\n1x XBC (IP Beacon Control Module)\n'+
+   '[PDF PAGE 8]\n11010 4,00 U 302-053-000'};
+ const oldLine={...line,id:'OLD',selected:true,customerRowCode:'A1-05'};
+ const offers=[revisionNet,item('1010',4),item('2010',5),item('11010',8)];
+ const draftData={...data,offers,lines:[oldLine],sourceIntake:{...intake,sources:[source,quote]}};
+ const requirements=I.integrationRequirements0550(draftData),beforeMapping=structuredClone(draftData);
+ const mapping=R.preparePagaRevisionMapping0550(draftData,requirements);
+ assert.equal(mapping.selected[0],oldLine);
+ assert.deepEqual(mapping.rows.map(r=>Boolean(r.excerpt)),[true,true,true,false]);
+ const prepared=R.pagaRevisionRequirementDraft0550(mapping.rows[0],quote);
+ assert.equal(prepared.status,'DRAFT');
+ assert.deepEqual(prepared.offerIds,['TEST-11010']);
+ assert.deepEqual(prepared.workLineIds,mapping.rows[0].requirement.workLineIds);
+ assert.equal(R.pagaRevisionRequirementDraft0550({...mapping.rows[0],requirement:prepared},quote),null);
+ assert.equal(R.pagaRevisionRequirementDraft0550(mapping.rows[3],quote),null);
+ assert.equal(R.preparePagaRevisionMapping0550({...draftData,offers:[...offers,{...offers[3],id:'duplicate'}]},requirements).rows[0].offer,undefined);
+ assert.deepEqual(draftData,beforeMapping);
+}
 const pack={schema:R.SUPPLIER_REVISION_SCHEMA_0550,projectId:'PJ2608-0550',batchId:'SYNTHETIC-REVISION',preparedOn:'2026-11-03',coverageNote:'Synthetic only',commercialTotals:{gross:125,discountable:125,discount:25,net:100,discountPercent:20},sourceIntake:{...intake,batchId:'PJ2608-0550-SOURCE-INTAKE-REV12-20261103',reviewedOn:'2026-11-03',sources:[source,{...source,id:'SYNTHETIC-SUPPLIER',documentNo:'SYNTHETIC-REV2',authority:'INTERNAL_REFERENCE'}]},predecessorSourceKey:I.integrationFingerprint0550(intake),vendor,offers:[net,detail],line,requirements:[{...base,supplierBasis:'New revision evidence; acceptance OPEN'}, {...I.blankRequirement0550('REQ-TAG-SYNTHETIC','TEL-PAGA'),site:'APF',sourceIds:[source.id],sourceExcerpt:source.content,offerIds:[detail.id],supplierSourceIds:['SYNTHETIC-SUPPLIER'],workLineIds:[line.id]}],particulars:[],expectedRequirements:[{id:base.id,basisKey:I.integrationFingerprint0550(base)}]};
 const before=JSON.stringify(data),result=R.planSupplierRevision0550(data,pack,tokens),next=result.workspace;
 assert.equal(JSON.stringify(data),before);assert.equal(next.offers.length,2);assert.equal(next.lines[0].selected,false);assert.equal(next.integrationWorkspace.requirements.length,2);assert.equal(next.integrationWorkspace.requirements[0].supplierBasis,pack.requirements[0].supplierBasis);
