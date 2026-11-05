@@ -5,6 +5,7 @@ import {policyDefaults0550} from '../bidWorkingBasis0550';
 import {roundMoney0550,sumMoney0550} from './money0550';
 import {prepareTsiActivityBudget0550,prepareTsiExpenseBudget0550,TSI_ACTIVITY_PLAN_0550} from './tsiActivityBudget0550';
 import {workingOffers0550} from './workingOffers0550';
+import {isTowerSourceItem0550,towerC1Reference0550,TOWER_SURVEY_ID_0550,TOWER_SURVEY_BASIS_0550,TOWER_ENGINEERING_ID_0550,TOWER_ENGINEERING_BASIS_0550} from './towerTenderScope0550';
 export const BID_COMPLETION_VERSION_0550='0550-bid-completion-20261104-1';
 const finite=Number.isFinite,clone=x=>JSON.parse(JSON.stringify(x));
 const same=(a,b)=>JSON.stringify(Object.keys(a||{}).sort().map(k=>[k,a[k]]))===JSON.stringify(Object.keys(b||{}).sort().map(k=>[k,b[k]]));
@@ -12,12 +13,50 @@ const prefix='BID WORKING ESTIMATE / '+BID_COMPLETION_VERSION_0550;
 const key=value=>{const text=JSON.stringify(value,(_,v)=>v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.keys(v).sort().map(k=>[k,v[k]])):v);let h=2166136261;for(let i=0;i<text.length;i++)h=Math.imul(h^text.charCodeAt(i),16777619);return 'bid1:'+(h>>>0).toString(16)+':'+text.length;};
 const lineKey=(data,line)=>key([line,data.calculations.find(c=>c.id===line?.calculationId)||null]);
 const ownerKey=(data,line)=>key([lineKey(data,line),workingOffers0550(data,line)]);
+const sourceKey=(data,ids)=>key(ids.map(id=>data.offers.find(o=>o.id===id)||null));
+
+export function towerSurveyReviewPending0550(data){
+ return Boolean(data.repositoryBasisImport?.bidCompletion?.rows.some(row=>row.lineId===TOWER_SURVEY_ID_0550&&
+  row.offerIds.some(id=>/^OFFER-MASTER-TOWER-2609\.95\.[12]-07$/.test(id))));
+}
+
+export function reconcileTowerTenderScope0550(data){
+ const receipt=data.repositoryBasisImport?.bidCompletion;
+ const byLine=new Map((receipt?.rows||[]).filter(row=>[TOWER_SURVEY_ID_0550,TOWER_ENGINEERING_ID_0550].includes(row.lineId)).map(row=>[row.lineId,row])),updates=new Map();
+ const lines=data.lines.map(line=>{
+  const scope=towerC1Reference0550(line);
+  if(scope){
+   const description=line.description==='PROJECT · Civil / foundations / trench-related work'?'PROJECT · Tower civil / foundations and site interfaces':line.description;
+   const scopeBasis=line.scopeBasis?.startsWith('Existing activity register C1-D')?scope.text:line.scopeBasis;
+   return line.selected||description!==line.description||scopeBasis!==line.scopeBasis?{...line,selected:false,description,scopeBasis}:line;
+  }
+  const row=byLine.get(line.id);
+  if(!row||row.kind!=='QUOTED'||
+     row.inputKey!==lineKey(data,line)||row.sourceKey!==sourceKey(data,row.offerIds))return line;
+  const survey=line.id===TOWER_SURVEY_ID_0550;
+  const basis=survey?TOWER_SURVEY_BASIS_0550:TOWER_ENGINEERING_BASIS_0550;
+  if(row.basis===basis)return line;
+  const items=row.offerIds.map(id=>data.offers.find(o=>o.id===id));
+  if(items.some(o=>!isTowerSourceItem0550(o)))return line;
+  const kept=survey?items.filter(o=>o.supplierQuoteRow.itemCode==='6'):items;
+  if(survey&&(items.length!==4||kept.length!==2||new Set(kept.map(o=>o.quoteRef)).size!==2||kept.some(o=>o.currency!=='THB'||!finite(o.quoteEvidence?.quotedTotal))))return line;
+  const next={...line,...(survey?{manualCost:sumMoney0550(kept.map(o=>o.quoteEvidence.quotedTotal))}:{}),
+   sourceRef:'RECEIVED QUOTATION / '+basis+'\n'+line.requirementRef,customerRemark:'Received quoted scope; '+basis};
+  const offerIds=kept.map(o=>o.id);
+  updates.set(line.id,{...row,basis,offerIds,inputKey:lineKey(data,next),sourceKey:sourceKey(data,offerIds)});
+  return next;
+ });
+ const rows=receipt?.rows.filter(r=>!towerC1Reference0550({id:r.lineId})).map(r=>updates.get(r.lineId)||r);
+ const receiptChanged=receipt&&(rows.length!==receipt.rows.length||updates.size>0);
+ if(!receiptChanged&&lines.every((line,i)=>line===data.lines[i]))return data;
+ return {...data,lines,...(receiptChanged?{repositoryBasisImport:{...data.repositoryBasisImport,bidCompletion:{...receipt,rows}}}:{})};
+}
 export function prepareBidCompletion0550(data,{policies,team,pricing},today){
  if(today<'2026-11-04'||data.repositoryBasisImport?.bidCompletion?.version===BID_COMPLETION_VERSION_0550)return data;
  // Wait for the actual project evidence. A repository seed is not the user's DATA.
  const sources=data.sourceIntake?.sources||[],replaced=new Set(sources.flatMap(s=>s.replaces||[]));
  const currentMR=sources.filter(s=>s.documentNo==='MM-ASK-1A-APF-TEL-MR-0001'&&s.revision==='B1'&&s.authority==='CURRENT_TENDER'&&s.content&&!replaced.has(s.id)),mr=currentMR.length===1?currentMR[0]:null;
- const tower=data.offers.filter(o=>o.id.startsWith('OFFER-MASTER-TOWER-2609.95.')&&o.supplierQuoteRow?.classification==='BASE_PRICE');
+ const tower=data.offers.filter(isTowerSourceItem0550);
  const spare=data.offers.filter(o=>o.vendorId==='VENDOR-CERAGON-0550'&&o.id.endsWith('-R12')&&o.quoteEvidence?.revision==='RevA1'&&o.quoteEvidence.quotedQuantity===1&&o.unit==='Lot'&&o.currency==='USD'&&finite(o.unitCost)&&o.unitCost>0);
  if(!data.repositoryBasisImport||!mr||tower.length!==30||spare.length!==1||!finite(data.fx.thbPerUSD)||data.fx.thbPerUSD<=0)return data;
  const model=pricing(),supply=model.provisional.lines.filter(l=>l.selected&&l.wbs==='A'&&finite(l.costTHB));let supplyCost=sumMoney0550(supply.map(l=>l.costTHB));
@@ -40,7 +79,7 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
   const offers=tower.filter(o=>items.includes(Number(o.supplierQuoteRow.itemCode)));
   if(offers.length!==items.length*2||offers.some(o=>o.currency!=='THB'||!finite(o.quoteEvidence?.quotedTotal))){conflicts.push(key);return;}
   const total=sumMoney0550(offers.map(o=>o.quoteEvidence.quotedTotal));
-  set('REQ-MR-ACT-'+key,{quantity:1,unit:'Lot',currency:'THB',manualCost:total,sellRate:null,...goods},'QUOTED',basis+'; original 30m/60m quotation items '+items.join(',')+'; native extended amounts summed once. Piling and inaccessible-site secondary transport remain excluded by the source.',offers.map(o=>o.id));
+  set('REQ-MR-ACT-'+key,{quantity:1,unit:'Lot',currency:'THB',manualCost:total,sellRate:null,...goods},'QUOTED',basis,offers.map(o=>o.id));
  };
  const reference=(key,ownerIds,basis)=>{
   const id=key.startsWith('REQ-')?key:'REQ-MR-ACT-'+key;
@@ -91,11 +130,9 @@ export function prepareBidCompletion0550(data,{policies,team,pricing},today){
    items.every(o=>o.vendorId===towerVendor&&o.currency==='THB'&&finite(o.quoteEvidence?.quotedTotal));
  });
  if(completeTowerQuotes){
-  quoted('C1-D04',[10],'Tower erection/assembly only; purchaser C1 option; final scope/interface assignment still requires confirmation');
-  quoted('C1-D05',[9,11,12,13],'Tower civil, earthing, fencing and site finishing only; purchaser C1 option, not a budget for pipeline trenching or other civil works');
-  quoted('B7-D04',[6,7],'Tower TSSR and soil investigation only; general TSI survey remains in its existing labour owners');
-  const id='LINE-TOWER-QUOTED-ENGINEERING-0550',offers=tower.filter(o=>[1,8,15].includes(Number(o.supplierQuoteRow.itemCode)));
-  if(at(id)<0){lines.push({id,systemToken:'TEL-TELT',wbs:'B1',description:'Tower OEM PM / foundation design / as-built — two original quotations',scopeKey:'TOWER.QUOTED.ENGINEERING',tagRef:'30m + 60m',requirementRef:'MR Rev.B1 / tower scope; Master Tower2609.95.1/2609.95.2 items1,8,15',sourceRef:'Received tower quotations; original extended amounts for items1,8,15 only. Supply2–5, survey6–7, delivery14 and physical construction9–13 are separate owners.',vendorId:towerVendor,offerId:'',calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'THB',manualCost:sumMoney0550(offers.map(o=>o.quoteEvidence.quotedTotal)),sellRate:null,markupPct:null,marginPct:null,primePct:null,...goods,selected:true,customerRowCode:'B1',customerRemark:'Quoted OEM tower engineering scope only.',brand:'MASTER TOWER'});rows.push({lineId:id,kind:'QUOTED',basis:'Tower original items1,8,15; disjoint from supply and construction.',offerIds:offers.map(o=>o.id),ownerIds:[]});}
+  quoted('B7-D04',[6],TOWER_SURVEY_BASIS_0550);
+  const id=TOWER_ENGINEERING_ID_0550,offers=tower.filter(o=>[1,8,15].includes(Number(o.supplierQuoteRow.itemCode)));
+  if(at(id)<0){lines.push({id,systemToken:'TEL-TELT',wbs:'B1',description:'Tower OEM PM / foundation design / as-built — two original quotations',scopeKey:'TOWER.QUOTED.ENGINEERING',tagRef:'30m + 60m',requirementRef:'MR Rev.B1 / tower scope; Master Tower2609.95.1/2609.95.2 items1,8,15',sourceRef:'RECEIVED QUOTATION / '+TOWER_ENGINEERING_BASIS_0550,vendorId:towerVendor,offerId:'',calculationId:'',resultKey:'value',quantity:1,unit:'Lot',currency:'THB',manualCost:sumMoney0550(offers.map(o=>o.quoteEvidence.quotedTotal)),sellRate:null,markupPct:null,marginPct:null,primePct:null,...goods,selected:true,customerRowCode:'B1',customerRemark:'Received quoted scope; '+TOWER_ENGINEERING_BASIS_0550,brand:'MASTER TOWER'});rows.push({lineId:id,kind:'QUOTED',basis:TOWER_ENGINEERING_BASIS_0550,offerIds:offers.map(o=>o.id),ownerIds:[]});}
  }else conflicts.push('TOWER_SUPPLY_BOUNDARY');
  const delivery=tower.filter(o=>Number(o.supplierQuoteRow.itemCode)===14);
  // Domestic tower delivery is kept distinct from the overseas freight estimate.
@@ -219,7 +256,7 @@ export function bidCompletionSourceUsages0550(data){
  if(receipt?.version!==BID_COMPLETION_VERSION_0550)return [];
  const lines=new Map(data.lines.map(l=>[l.id,l])),offers=new Map(data.offers.map(o=>[o.id,o]));
  return receipt.rows.filter(r=>['QUOTED','ESTIMATE'].includes(r.kind)&&r.offerIds.length).flatMap(row=>{
-  const line=lines.get(row.lineId);if(!line)return [];
+  const line=lines.get(row.lineId);if(!line||towerC1Reference0550(line))return [];
   const current=lineKey(data,line)===row.inputKey&&key(row.offerIds.map(id=>offers.get(id)||null))===row.sourceKey;
   return [{line,offerIds:row.offerIds,current,kind:row.kind,basis:row.basis}];
  });

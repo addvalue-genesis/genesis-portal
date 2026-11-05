@@ -1,3 +1,5 @@
+Latest scope decision: [TEL-TELT foundation and installation tender boundary](20261105_TELT_CIVIL_SCOPE_BOUNDARY.md). C1-D04 is a CNEEC option reference, C1-D05 separates excluded foundation construction and open site interfaces, and Part B retains design and TSSR.
+
 Latest pricing decision: [TEL-TELT legacy Part A pricing cancelled](20261105_TELT_LEGACY_PRICING_CANCELLED.md). APF and ACP MR rows require new pricing. The Vendor originals and separate B/C allocations remain available.
 
 Latest SI data: [TEL-TELT item reconciliation and site RPT drafts](20261105_TELT_ITEM_MAPPING_REVIEW.md), Source Rev14 / A Work Package Rev11. Both tower MR rows link native Items 2–5. Two RPTs and Volume II equipment trace remain DRAFT / OPEN. The 76 MiB preparation bound preserves Rev10 ancestry. See checkpoint for source authority and validation.

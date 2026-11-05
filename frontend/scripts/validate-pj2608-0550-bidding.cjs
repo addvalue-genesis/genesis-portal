@@ -149,7 +149,7 @@ try {
  assert(mrCatalog.rows.find(r=>r.id==="MR-B1-11-APF-01").components.some(c=>c.includes("98")),"Package component requirements retained");
  const mrModel=derive(mr);assert(mrModel.requirementGaps.length>0);assert.equal(mrModel.provisional.baseUSD,null);assert.equal(mrModel.provisional.optionsUSD,null);
  assert.equal(mrModel.provisional.knownTHB,draft.provisional.knownTHB,"Unknown requirement rows cannot duplicate preserved vendor prices");
- assert.equal(mrModel.lines.filter(l=>l.mrScopeState?.excluded).length,6);assert(!mrModel.selected.some(l=>l.mrScopeState?.excluded));
+ assert.equal(mrModel.lines.filter(l=>l.mrScopeState?.excluded&&!l.mrScopeState.scopeReference).length,6);assert.equal(mrModel.lines.filter(l=>l.mrScopeState?.scopeReference).length,2);assert(!mrModel.selected.some(l=>l.mrScopeState?.excluded));
  for(const id of ["MR-B1-11-APF-08","MR-B1-11-ACP-06"]){
   const row=mrModel.lines.find(l=>l.mrRequirementId===id);
   assert.equal(row.mrScopeState.covered,false);assert.equal(row.selected,true);assert.equal(row.provisionalCostTHB,null);

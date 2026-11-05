@@ -1,3 +1,4 @@
+import {TOWER_SURVEY_ID_0550} from "./towerTenderScope0550";
 import {retireLegacyTowerPricing0550,RETIRED_TOWER_BASIS_0550,RETIRED_TOWER_OFFER_0550,RETIRED_TOWER_OWNER_0550} from "./towerLegacyPricing0550";
 import {validateSupplierQuoteRow0550,validateSupplierRevisionImports0550} from "./supplierRevision0550";
 import {validateVendorQuoteEvidence0550} from "./vendorRegister0550";
@@ -9,7 +10,7 @@ import { evaluateServiceEquation,bidQuantityUnit0550 } from "../serviceEquationR
 import { validateSourceIntake } from "./sourceIntakeModel";
 import {validateOfficialReview,deriveOfficialPricing,deriveProvisionalPricing} from "./officialPricing0550";
 import {SATELLITE_SCOPE_OPTIONS,satelliteScope0550} from "./satelliteScope0550";
-import {validateBidCompletion0550} from "./bidCompletion0550";
+import {reconcileTowerTenderScope0550,towerSurveyReviewPending0550,validateBidCompletion0550} from "./bidCompletion0550";
 import {isBidScopeWarning0550} from "./bidProcess0550";
 import {validateIntegration0550} from "./integrationWorkspace0550";
 import {roundMoney0550 as round,sumMoney0550} from "./money0550";
@@ -83,7 +84,8 @@ export function validateBidWorkspace(data,snapshotId,systems){
  return data;
 }
 export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel){
- data=retireLegacyTowerPricing0550(data);
+ data=reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(data));
+ const towerSurveyOpen=towerSurveyReviewPending0550(data);
  const eq=(id,inputs)=>evaluateServiceEquation(id,inputs).value;
  const fxReady=Boolean(data.fx.source.trim()&&/^\d{4}-\d{2}-\d{2}$/.test(data.fx.date));
  const fx=currency=>currency==="THB"?1:fxReady&&finite(data.fx["thbPer"+currency])&&data.fx["thbPer"+currency]>0?data.fx["thbPer"+currency]:null;
@@ -128,6 +130,10 @@ export function deriveBidWorkspace(data,systemTokens,reviewDate,integrationModel
   if(l.id===RETIRED_TOWER_OWNER_0550||l.offerId===RETIRED_TOWER_OFFER_0550){
    costRate=null;
    problems.push(RETIRED_TOWER_BASIS_0550);
+  }
+  if(towerSurveyOpen&&l.id===TOWER_SURVEY_ID_0550){
+   costRate=null;
+   problems.push("TOWER_GEOTECH_OPEN: ตรวจฐานราคา TSSR ที่เคยรวมค่าเจาะสำรวจก่อนใช้ยอด");
   }
   if(!finite(quantity)||quantity<=0)problems.push("Positive quantity/driver required");
   if(!nonnegative(costRate))problems.push("Cost rate OPEN");

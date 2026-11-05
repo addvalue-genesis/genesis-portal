@@ -1,3 +1,4 @@
+import {towerC1Reference0550} from './towerTenderScope0550';
 import {mgwDetailGroup0550} from './mgwDetailPricing0550';
 import {currentSupplierOffers0550,mgwWorkingLineExcluded0550,mgwProjectWideLineConflict0550} from './mgwVendorBasis0550';
 import {satelliteScope0550} from './satelliteScope0550';
@@ -12,4 +13,4 @@ export function workingOffers0550(data,line){
  const rowIds=mgwDetailGroup0550(line.mgwDetailGroupId)?.rowIds||[];
  return currentSupplierOffers0550(data,line.systemToken).filter(o=>rowIds.includes(o.mgwQuoteLineId));
 }
-export const activeSupply0550=line=>line.id!==RETIRED_TOWER_OWNER_0550&&line.offerId!==RETIRED_TOWER_OFFER_0550&&line.selected&&!line.coveredByLineId&&line.responsibility!=='COMPANY'&&!satelliteScope0550(line).excluded;
+export const activeSupply0550=line=>line.id!==RETIRED_TOWER_OWNER_0550&&line.offerId!==RETIRED_TOWER_OFFER_0550&&line.selected&&!towerC1Reference0550(line)&&!line.coveredByLineId&&line.responsibility!=='COMPANY'&&!satelliteScope0550(line).excluded;

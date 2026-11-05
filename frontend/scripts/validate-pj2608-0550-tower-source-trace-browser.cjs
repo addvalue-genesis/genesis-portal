@@ -61,19 +61,19 @@ const server=http.createServer((req,res)=>{
  assert.equal(await trace.locator('[data-working-source-item]').count(),0,'Source items are lazy');
  const openQuotes=async()=>{for(const q of await trace.locator('[data-working-source-quote]').all()){if(!await q.evaluate(el=>el.open))await q.locator(':scope > summary').click();await q.locator('tbody tr').first().waitFor();}};
  for(const quote of await trace.locator('[data-working-source-quote]').all()){
-  assert((await quote.locator(':scope > summary').innerText()).includes('พบลิงก์ราคา 11/15'));
+  assert((await quote.locator(':scope > summary').innerText()).includes('พบลิงก์ราคา 5/15'));
   await quote.locator(':scope > summary').click();await quote.locator('tbody tr').first().waitFor();assert.equal(await quote.locator('tbody tr').count(),15);
  }
- const erection=trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-10"]');assert((await erection.innerText()).includes('Part C / C1'));
- await erection.getByRole('button',{name:'PROJECT · Tower erection / lifting / rigging',exact:true}).click();
- assert(await page.locator('[data-component-key="bid.budget.working.line.REQ-MR-ACT-C1-D04"]').isVisible(),'Source row opens existing C1 owner and ancestors');
+ const erection=trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-10"]');assert((await erection.innerText()).includes('CNEEC Option'));
+ await erection.getByRole('button',{name:'เปิดแถวขอบเขต Working',exact:true}).click();
+ assert(await page.locator('[data-component-key="bid.budget.working.line.REQ-MR-ACT-C1-D04"]').isVisible(),'Source row opens existing CNEEC scope reference');
  await jump('bid.budget.working.group.TEL-TELT');await openQuotes();
  await trace.locator('[data-working-source-item="OFFER-MASTER-TOWER-2609.95.1-10"]').getByRole('button',{name:'เปิด Vendor Item 10',exact:true}).click();
  await page.locator('[data-component-key="bid.vendor.offer.OFFER-MASTER-TOWER-2609.95.1-10"]').waitFor({state:'visible'});
  for(const o of before.offers.filter(o=>o.id.startsWith('OFFER-MASTER-TOWER-')&&o.supplierQuoteRow?.classification==='BASE_PRICE')){
   const text=await page.locator('[data-vnd-offer="'+o.id+'"]').textContent();
   assert(!text.includes('อ้างอิงเจ้าของราคา Working เดิม'),'Cancelled Part A owner is no longer shown / '+o.id);
-  if(!['2','3','4','5'].includes(o.supplierQuoteRow.itemCode))assert(text.includes('จัดสรรต้นทุนใน Working แล้ว'),'Existing B/C allocation remains / '+o.id);
+  assert.equal(text.includes('จัดสรรต้นทุนใน Working แล้ว'),['1','6','8','14','15'].includes(o.supplierQuoteRow.itemCode),'Only quoted B scope is allocated / '+o.id);
   assert(await page.locator('[data-vnd-offer="'+o.id+'"] [data-supplier-source-text]').count(),'Same source detail in Vendor / '+o.id);
  }
  assert.equal(await page.locator('[data-vnd-offer="OFFER-LEGACY-TEL-TELT-1"]').count(),0);
@@ -87,5 +87,5 @@ const server=http.createServer((req,res)=>{
  if(process.env.PJ0550_TOWER_SCREENSHOT){await page.setViewportSize({width:1440,height:1000});await trace.scrollIntoViewIfNeeded();await page.screenshot({path:process.env.PJ0550_TOWER_SCREENSHOT});}
  assert.deepEqual(await read(),before,'Source inspection/navigation/disclosure never writes any canonical field');
  await page.reload();await ready();await jump('bid.budget.working.group.TEL-TELT');await openQuotes();assert.equal(await trace.locator('[data-working-source-item]').count(),30);assert.deepEqual(await read(),before,'Reload retains original workspace');assert.deepEqual(errors,[]);
- console.log('PASS production browser:all20 source panels,shared MGW whole-invoice invariance/conflicts,missing quotes,PAGA revisions/IDIE Asactual,lazy native rows,cancelled legacy price and OPEN costs/sell in both MR rows,2 quotes/30 items,22 Vendor allocations,source↔existing C1/Vendor navigation,native units,bulk disclosure,1440/390 containment,unchanged workspace/reload and no page errors.');
+ console.log('PASS production browser:all20 source panels,shared MGW whole-invoice invariance/conflicts,missing quotes,PAGA revisions/IDIE Asactual,lazy native rows,cancelled legacy price and OPEN costs/sell in both MR rows,2 quotes/30 items,10 Vendor price allocations,source↔existing C1/Vendor navigation,native units,bulk disclosure,1440/390 containment,unchanged workspace/reload and no page errors.');
 }catch(e){console.error('QA failure before cleanup:',e);throw e;}finally{if(browser)await Promise.race([browser.close(),new Promise(r=>setTimeout(r,10000))]);server.closeAllConnections();await new Promise(r=>server.close(r));}})().catch(e=>{console.error(e);process.exitCode=1;});

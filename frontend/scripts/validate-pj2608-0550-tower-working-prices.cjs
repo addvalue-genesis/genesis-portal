@@ -17,11 +17,11 @@ assert.equal(retired.lines[2],original.lines[2]);assert.equal(retired.offers,ori
 assert.equal(retire(retired),retired,'Repeat load is idempotent');
 if(process.argv[2]){
  const saved=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
- const active=retire(saved),tokens=D.SYSTEMS.map(s=>s.token),today='2026-11-05';
+ const retiredSaved=retire(saved),active=C.reconcileTowerTenderScope0550(retiredSaved),tokens=D.SYSTEMS.map(s=>s.token),today='2026-11-05';
  B.validateBidWorkspace(active,D.DATA_LAYER_META.datasetId,tokens);
  const prior=saved.lines.find(l=>l.id===ownerId);assert(prior.selected&&prior.offerId===offerId);
- assert.deepEqual(active.lines.filter(l=>l.id!==ownerId&&!ids.includes(l.id)),saved.lines.filter(l=>l.id!==ownerId&&!ids.includes(l.id)));
- for(const key of Object.keys(saved).filter(k=>k!=='lines'))assert.equal(active[key],saved[key]);
+ assert.deepEqual(retiredSaved.lines.filter(l=>l.id!==ownerId&&!ids.includes(l.id)),saved.lines.filter(l=>l.id!==ownerId&&!ids.includes(l.id)));
+ for(const key of Object.keys(saved).filter(k=>k!=='lines'))assert.equal(retiredSaved[key],saved[key]);
  const model=B.deriveBidWorkspace(saved,tokens,today);
  for(const view of [model.provisional,model.official]){
   assert(!view.selected.some(l=>l.id===ownerId||l.offerId===offerId));
@@ -36,7 +36,21 @@ if(process.argv[2]){
  assert.equal(C.bidCompletionBasisChanged0550(active),true,'Saved percentage allowances require review');
  assert.equal(V.vendorOfferEntries0550(active).some(e=>e.offer.id===offerId),false);
  assert.equal(V.vendorOfferEntries0550(active).filter(e=>e.offer.id.startsWith('OFFER-MASTER-TOWER-')).length,32);
- assert.equal(C.bidCompletionSourceUsages0550(active).filter(u=>u.current).flatMap(u=>u.offerIds).filter(id=>id.startsWith('OFFER-MASTER-TOWER-')).length,22);
+ assert.equal(C.reconcileTowerTenderScope0550(active),active,'Saved scope migration is idempotent');
+ assert.equal(active.offers,saved.offers);
+ for(const [id,state] of [['REQ-MR-ACT-C1-D04','CNEEC_OPTION'],['REQ-MR-ACT-C1-D05','CIVIL_INTERFACE_OPEN']]){
+  const line=active.lines.find(l=>l.id===id),price=model.provisional.lines.find(l=>l.id===id);
+  assert.equal(line.selected,false);assert.equal(price.reviewState,state);assert.equal(price.customerTHB,null);
+  assert(!model.provisional.schedule.find(r=>r.code==='C1').children.some(l=>l.id===id));
+ }
+ const sum=items=>saved.offers.filter(o=>o.id.startsWith('OFFER-MASTER-TOWER-')&&items.includes(o.supplierQuoteRow?.itemCode)).reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0);
+ assert.equal(active.lines.find(l=>l.id==='REQ-MR-ACT-B7-D04').manualCost,sum(['6']));
+ assert.equal(active.lines.find(l=>l.id==='LINE-TOWER-QUOTED-ENGINEERING-0550').manualCost,sum(['1','8','15']));
+ assert.equal(C.bidCompletionSourceUsages0550(active).filter(u=>u.current).flatMap(u=>u.offerIds).filter(id=>id.startsWith('OFFER-MASTER-TOWER-')).length,10);
+ const stale=structuredClone(retiredSaved);stale.lines.find(l=>l.id==='REQ-MR-ACT-B7-D04').manualCost+=1;
+ assert.equal(C.reconcileTowerTenderScope0550(stale).lines.find(l=>l.id==='REQ-MR-ACT-B7-D04'),stale.lines.find(l=>l.id==='REQ-MR-ACT-B7-D04'));
+ assert.equal(B.deriveBidWorkspace(stale,tokens,today).provisional.lines.find(l=>l.id==='REQ-MR-ACT-B7-D04').costTHB,null,'An authored mixed soil/TSSR basis stays OPEN instead of being overwritten or counted');
+ console.log('Tower scope cost deltas THB',JSON.stringify({excludedFoundation:sum(['9']),cneecErection:sum(['10']),pendingCivilInterfaces:sum(['11','12','13']),pendingSoil:sum(['7']),retainedTssr:sum(['6']),retainedOemEngineering:sum(['1','8','15'])}));
  const reassigned=structuredClone(active),row=reassigned.lines.find(l=>l.id===ids[0]);
  row.offerId=offerId;row.sellMode='DIRECT';row.sellRate=1;row.primePct=0;
  assert.equal(B.deriveBidWorkspace(reassigned,tokens,today).provisional.lines.find(l=>l.id===row.id).customerTHB,null,'A restored manual link cannot reuse the cancelled Offer');

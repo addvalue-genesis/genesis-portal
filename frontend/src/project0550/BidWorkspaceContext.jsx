@@ -1,4 +1,4 @@
-import {prepareBidCompletion0550} from "./data/bidCompletion0550";
+import {prepareBidCompletion0550,reconcileTowerTenderScope0550} from "./data/bidCompletion0550";
 import {prepareBidProcess0550} from "./data/bidProcess0550";
 import {pendingVendorDefaultCount0550} from "./data/vendorDefaultCatalog0550";
 import {fetchAutomaticVendorRegisters0550,planAutomaticVendorRegisters0550,prepareVendorDefaults0550,vendorRegisterSyncSuccess0550,vendorRegisterSyncFailure0550} from "./data/vendorRegisterAuto0550";
@@ -36,6 +36,8 @@ export function BidWorkspaceProvider({children}){
    let current=await loadProject0550Bid();
    const retired=retireLegacyTowerPricing0550(current);
    if(retired!==current)current=await saveProject0550Bid(retired,current.revision,"Cancel the legacy tower Part A pricing basis");
+   const towerScope=reconcileTowerTenderScope0550(current);
+   if(towerScope!==current)current=await saveProject0550Bid(towerScope,current.revision,"Apply TEL-TELT tender boundary: separate CNEEC works, foundation design and geotechnical review");
    const scopeRepaired=repairPagaEngineeringDrafts0550(current);
    if(scopeRepaired!==current)current=await saveProject0550Bid(scopeRepaired,current.revision,"Correct PAGA-only documentation references in three prepared SI drafts");
    const vendorPrepared=importLegacyVendorBasis0550(current,{meta:DATA_LAYER_META,budgetaryEstimate:BUDGETARY_ESTIMATE,commercialSources:COMMERCIAL_SOURCES,commercialPolicy:COMMERCIAL_POLICY},reviewDate);
@@ -110,7 +112,7 @@ export function BidWorkspaceProvider({children}){
  },[data]);
  const reviewDate=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Bangkok",year:"numeric",month:"2-digit",day:"2-digit"}).format(new Date());
  const model=useMemo(()=>{if(!data)return null;const integration=deriveIntegration0550(data,SYSTEMS,reviewDate),sourceReadiness=deriveSourceReadiness0550(data,integration,reviewDate),derived={...deriveBidWorkspace(data,SYSTEMS.map(s=>s.token),reviewDate,integration),integration,sourceReadiness,avlReconciliation:deriveAvlReconciliation0550(data,integration)};const releaseControl=deriveReleaseControl0550(data,derived,reviewDate);return {...derived,releaseControl,official:{...derived.official,releaseAllowed:releaseControl.releaseAllowed,releaseState:releaseControl.state}};},[data,reviewDate]);
- async function change(transform,action){if(!data||lock.current)return false;lock.current=true;setBusy(true);try{const transformed=repairPagaEngineeringDrafts0550(retireLegacyTowerPricing0550(transform(data)));const next=prepareSystemAvlDeviations0550(transformed,deriveIntegration0550(transformed,SYSTEMS,reviewDate));setData(await saveProject0550Bid(next,data.revision,action));setError("");return true;}catch(e){setError(e.message);return false;}finally{lock.current=false;setBusy(false);}}
+ async function change(transform,action){if(!data||lock.current)return false;lock.current=true;setBusy(true);try{const transformed=repairPagaEngineeringDrafts0550(reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(transform(data))));const next=prepareSystemAvlDeviations0550(transformed,deriveIntegration0550(transformed,SYSTEMS,reviewDate));setData(await saveProject0550Bid(next,data.revision,action));setError("");return true;}catch(e){setError(e.message);return false;}finally{lock.current=false;setBusy(false);}}
  const put=(collection,record)=>change(d=>({...d,[collection]:d[collection].some(r=>r.id===record.id)?d[collection].map(r=>r.id===record.id?record:r):[...d[collection],record]}),"Save "+collection+" / "+record.id);
  async function importFile(file){if(!file)return;try{if(file.size>64*1024*1024)throw Error("Workspace exceeds 64 MiB");const imported=validateBidWorkspace(JSON.parse(await file.text()),DATA_LAYER_META.datasetId,SYSTEMS.map(s=>s.token));await change(current=>{const releaseRegister=mergeReleaseRegister0550(current.releaseRegister,imported.releaseRegister);return {...imported,...(current.bidVolumes&&!imported.bidVolumes?{bidVolumes:current.bidVolumes}:{}),revision:current.revision,audit:current.audit,...(releaseRegister?{releaseRegister}:{})};},"Import reviewed 0550 workspace backup / merge frozen history");}catch(e){setError(e.message);}}
  return <Context.Provider value={{data,model,error,busy,recovery,change,put,reload,importFile,reviewDate,sourceSync,vendorSync}}>{children}</Context.Provider>;

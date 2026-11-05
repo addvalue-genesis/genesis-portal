@@ -1,3 +1,4 @@
+import {reconcileTowerTenderScope0550} from "./bidCompletion0550";
 import { controlledSnapshotAdapter } from "./adapters/controlledSnapshotAdapter";
 import { bidIndexedDbAdapter } from "./adapters/bidIndexedDbAdapter";
 import { emptyBidWorkspace, validateBidWorkspace } from "./bidWorkspaceModel";
@@ -27,4 +28,4 @@ export async function loadProject0550Bid(){
   throw error;
  }
 }
-export async function saveProject0550Bid(data,revision,action){return bidIndexedDbAdapter.save(reconcileMgwWorkingScope0550(retireLegacyTowerPricing0550(validateBid(data))),revision,action);}
+export async function saveProject0550Bid(data,revision,action){return bidIndexedDbAdapter.save(reconcileMgwWorkingScope0550(reconcileTowerTenderScope0550(retireLegacyTowerPricing0550(validateBid(data)))),revision,action);}

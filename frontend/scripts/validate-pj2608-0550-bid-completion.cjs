@@ -21,9 +21,16 @@ if(process.argv[2]){
  // rates. Only missing internal cost may receive its labelled planning estimate.
  for(const prior of beforeModel.provisional.lines.filter(l=>l.selected&&Number.isFinite(l.customerUSD))){const now=model.provisional.lines.find(l=>l.id===prior.id);assert.equal(now.customerUSD,prior.customerUSD,'Prior selling amount / '+prior.id);if(Number.isFinite(prior.costTHB))assert.equal(now.costTHB,prior.costTHB,'Prior sourced cost / '+prior.id);}
  for(const prior of data.lines.filter(l=>l.wbs==='A'))assert.deepEqual(prepared.lines.find(l=>l.id===prior.id),prior,'Every native MR/equipment record preserved / '+prior.id);
- assert.equal(prepared.lines.find(l=>l.id==='REQ-MR-ACT-C1-D04').manualCost,data.offers.filter(o=>o.id.startsWith('OFFER-MASTER-TOWER-')&&o.supplierQuoteRow?.itemCode==='10').reduce((s,o)=>s+o.quoteEvidence.quotedTotal,0),'Both original quoted erection amounts once');assert.equal(prepared.lines.find(l=>l.id==='REQ-MR-ACT-C1-D05').manualCost,data.offers.filter(o=>o.id.startsWith('OFFER-MASTER-TOWER-')&&['9','11','12','13'].includes(o.supplierQuoteRow?.itemCode)).reduce((s,o)=>s+o.quoteEvidence.quotedTotal,0),'Quoted civil/earthing/fencing/site finish, no invented pipeline civil');
+ for(const [id,state] of [['REQ-MR-ACT-C1-D04','CNEEC_OPTION'],['REQ-MR-ACT-C1-D05','CIVIL_INTERFACE_OPEN']]){
+  const line=model.provisional.lines.find(l=>l.id===id);
+  assert.equal(line.selected,false);assert.equal(line.costTHB,null);assert.equal(line.reviewState,state);
+  assert(!receipt.rows.some(row=>row.lineId===id));
+ }
+ const quoted=items=>data.offers.filter(o=>o.id.startsWith('OFFER-MASTER-TOWER-')&&items.includes(o.supplierQuoteRow?.itemCode)).reduce((n,o)=>n+o.quoteEvidence.quotedTotal,0);
+ assert.equal(prepared.lines.find(l=>l.id==='REQ-MR-ACT-B7-D04').manualCost,quoted(['6']));
+ assert.equal(prepared.lines.find(l=>l.id==='LINE-TOWER-QUOTED-ENGINEERING-0550').manualCost,quoted(['1','8','15']));
  const capital=prepared.lines.find(l=>l.id==='REQ-MR-ACT-C2-D02');assert.equal(capital.quantity,1);assert(capital.offerId.endsWith('-R12'));assert.equal(model.provisional.lines.find(l=>l.id===capital.id).costTHB,Math.round(data.offers.find(o=>o.id===capital.offerId).unitCost*data.fx.thbPerUSD*100)/100);
- const towerIds=receipt.rows.flatMap(r=>r.offerIds).filter(id=>id.startsWith('OFFER-MASTER-TOWER-'));assert.equal(new Set(towerIds).size,towerIds.length,'No quoted tower service item allocated twice');assert.equal(towerIds.length,22,'All22 non-supply source rows accounted for;8 supply source rows await new pricing');
+ const towerIds=receipt.rows.flatMap(r=>r.offerIds).filter(id=>id.startsWith('OFFER-MASTER-TOWER-'));assert.equal(new Set(towerIds).size,towerIds.length,'No quoted tower service item allocated twice');assert.equal(towerIds.length,10,'Only B1 engineering, B7 TSSR and B2 delivery items remain assigned');
  for(const id of ['REQ-MR-ACT-B3-D05','REQ-MR-ACT-B9-D04','REQ-MR-ACT-B2-D05','REQ-MR-ACT-C2-D01','REQ-MR-ACT-C3-D01']){assert.equal(prepared.lines.find(l=>l.id===id).selected,false);assert(C.bidCompletionReferences0550(prepared,model.provisional.lines).has(id),'Non-additive work resolves to priced owners / '+id);}
  const reference=receipt.rows.find(r=>r.kind==='PRICE_REFERENCE'),changed=structuredClone(prepared);changed.lines.find(l=>l.id===reference.lineId).quantity+=1;
  const changedModel=B.deriveBidWorkspace(changed,tokens,today);assert(!changedModel.provisional.lines.find(l=>l.id===reference.lineId).bidPriceAllocation,'Changed MR input invalidates the previous budget allocation');assert(changedModel.provisional.requirementGaps.length);

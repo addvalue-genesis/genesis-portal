@@ -1,3 +1,4 @@
+import {towerC1Reference0550} from "./towerTenderScope0550";
 import catalog from "./mrWorkingCatalog0550.json";
 import {mgwWorkingLineExcluded0550} from "./mgwVendorBasis0550";
 import form from "./customerForm0550.json";
@@ -20,7 +21,7 @@ export function importMrWorkingBasis0550(data,policies,today) {
   next.lines.push({id,mrRequirementId:r.id,systemToken:r.systemToken,wbs:r.wbs,description:r.site+" · "+r.description,
    scopeKey,tagRef:r.site,requirementRef:r.reference,sourceRef:r.reference+" / "+r.note,
    vendorId:"",offerId:"",calculationId:"",resultKey:"value",quantity:r.quantity,unit:r.unit,currency:"THB",manualCost:null,
-   sellMode:"DIRECT",sellRate:null,markupPct:null,marginPct:null,primePct:null,...policy,selected:r.responsibility!=="COMPANY",
+   sellMode:"DIRECT",sellRate:null,markupPct:null,marginPct:null,primePct:null,...policy,selected:r.responsibility!=="COMPANY"&&!towerC1Reference0550({mrRequirementId:r.id}),
    customerRowCode:codeFor(r),customerRemark:"",brand:"",responsibility:r.responsibility,scopeBasis:r.note,
    coveredByLineId:r.owner?"REQ-"+r.owner:"",coverageBasis:r.owner?r.reference+" / "+r.note:"",
    ...(["TEL-VSAT","TEL-VSAT-KU"].includes(r.systemToken)?{satelliteScope:r.responsibility==="COMPANY"?"COMPANY_SUPPLY":r.responsibility==="CLARIFICATION"?"CLARIFICATION":r.wbs==="A"?"TSI_EQUIPMENT":"TSI_SERVICES"}:{})});
@@ -31,6 +32,8 @@ export function importMrWorkingBasis0550(data,policies,today) {
 }
 export function mrLineScope0550(data,line) {
  const requirement=mrRequirement0550(line);
+ const scopeReference=towerC1Reference0550(line);
+ if(scopeReference)return {applicable:true,requirement,responsibility:line.responsibility||requirement?.responsibility,excluded:true,covered:false,scopeReference,problems:[scopeReference.text],candidates:[]};
  if(!requirement)return {applicable:false,excluded:false,covered:false,problems:[],candidates:[]};
  const responsibility=line.responsibility||requirement.responsibility,problems=[];
  const basis=Boolean(line.scopeBasis?.trim()&&line.requirementRef?.trim());
@@ -39,7 +42,7 @@ export function mrLineScope0550(data,line) {
  const excluded=responsibility==="COMPANY"&&basis;
  if(excluded)problems.push("COMPANY_SUPPLY: ไม่รวมในราคา TSI");
  const owner=data.lines.find(l=>l.id===line.coveredByLineId);
- const covered=Boolean(line.coveredByLineId&&line.coverageBasis?.trim()&&owner&&owner.id!==line.id&&owner.selected&&!mgwWorkingLineExcluded0550(data,owner)&&!owner.coveredByLineId&&owner.responsibility!=="COMPANY"&&owner.satelliteScope!=="COMPANY_SUPPLY"&&owner.wbs[0]===line.wbs[0]&&responsibility==="TSI"&&basis);
+ const covered=Boolean(line.coveredByLineId&&line.coverageBasis?.trim()&&owner&&owner.id!==line.id&&owner.selected&&!towerC1Reference0550(owner)&&!mgwWorkingLineExcluded0550(data,owner)&&!owner.coveredByLineId&&owner.responsibility!=="COMPANY"&&owner.satelliteScope!=="COMPANY_SUPPLY"&&owner.wbs[0]===line.wbs[0]&&responsibility==="TSI"&&basis);
  if(line.coveredByLineId&&!covered)problems.push("MR_COVERAGE_OWNER_OPEN: เจ้าของราคาไม่มี / ไม่เลือก / วนซ้ำ / อยู่คนละ Part / ขาดหลักฐาน");
  const candidates=data.lines.filter(l=>l.id!==line.id&&!l.mrRequirementId&&l.systemToken===line.systemToken&&l.wbs[0]===line.wbs[0]&&l.selected&&!mgwWorkingLineExcluded0550(data,l));
  if(!covered&&!excluded&&candidates.length&&!line.coverageBasis?.trim())problems.push("MR_PACKAGE_COVERAGE_OPEN: มีราคา package เดิม ต้องระบุว่ารวมอยู่ใน owner หรือเป็นงานเพิ่มที่ไม่ซ้ำ");
